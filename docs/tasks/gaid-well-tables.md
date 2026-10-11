@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:43:20Z
+updated: 2026-10-11T04:44:16Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cd7c561a-0a57-452c-9026-bbf129244c36","pid":3981134,"provider":"codex","session":"01a12945-9f27-71e2-b32a-5bbc545ac45a","start":"15979142","token":"29bed9d06311d3f15e6cd0567d9374e9a4a03a112c2135a1ce904ef6fe2f5004"}
 branch: task/gaid-well-tables
 target: main
@@ -40,12 +40,18 @@ Verified facts from the hub (2026-10-11):
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed at the printed worktree; clean initial checkout. Read authoritative forwarded request and WP03 interfaces.
+- Source contracts fetched read-only from skill_hub main to external task inputs. Exact worktree is not codegraph-indexed; native source reads used.
+- FORCE fixture exists at assets/force2020-welllogs/c8d01ee9; no model runs authorized or needed.
 ## Next steps
-1. (the next session's first action)
+1. Implement LAS helper, bounded series API, depth viewer and manifest adapter.
+2. Integrate independent table package after LAS slice, run focused and full checks, task sync, report, remove regenerable caches, task finish.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential decisions: preserve raw values/order/nulls; unknown depth basis/datum stay unknown; LAS 2.0 numerical support only, LiDAR and LAS 3 explicit unsupported. Full-data operations capped separately from metadata inspection. Display reduction retains spikes and explicit gap boundaries.
+- Independent package: tables child owns new table helper/routes/contracts/viewer/tests only. Parent owns LAS helper/routes/depth UI/manifest/tests and all shared glue, integration boundaries, AGENTS and canonical report.
+- Interfaces settled: table child exports registerGeoTableRoutes(app) and default TableRolesViewer(ViewerProps), on explicit user choice from existing table surfaces; it never replaces generic table editing. Both use WP03 sandbox resolution and inspection conventions. No overlap in owned files.
+- Integration order: LAS first; complete child and append table routes/UI entry; task sync with WP05 keeping both append-only entries; final scripts/check. No separate review quota.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
