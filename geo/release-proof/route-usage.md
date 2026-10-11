@@ -46,8 +46,8 @@ ref with `--model`. The harness verifies `/providers` resolves `authType=api_key
 and task chats and collects the actual ledger. Use a priced personal provider, not a $0 gateway masquerading as a
 paid acceptance result. The credential API and key files are not read by the harness.
 
-`chatgpt-signin`: the user completes GAID's own Settings sign-in first. Attach and select an `openai/...` or
-`openai-codex/...` model from `/model-providers/models` (OAuth-only picker). The harness does not automate login,
+`chatgpt-signin`: the user completes GAID's own Settings sign-in first. Attach and select an `openai/...` model (Sign in with ChatGPT;
+the legacy `openai-codex` login is a different route and is refused). The harness does not automate login,
 reuse another client's identity, or promise subscription quota. Provider refusal and quota errors remain evidence.
 
 ```sh

@@ -11,9 +11,15 @@ minimum accepted by this card/API. The proposed 32K profile has been removed
 because the startup prompt leaves insufficient room for task work. Previously
 saved smaller contexts remain visible and are not rewritten automatically.
 
-The 98,304-token profile records one earlier trial on one RTX 4090; it is not a
-performance guarantee. The 64K profile is untested. Real-task 64K/98K trials
-remain WP10 release-proof work.
+Release trial (2026-10-11, GeoAIDesk 0.1.0, `qwen3:30b-a3b-instruct-2507-q4_K_M`
+on one RTX 4090 24 GB, Ollama `num_ctx` matching the app context): the connection
+test passed at 64K and at 98,304 tokens. Of the real tasks, only the 98K map and
+area-table workflow met its check; both well-log QC runs and the 64K map run
+produced partial results (missing figure, tool-call loops, QC defects), and no run
+read the exposed workflow skill. Ollama kept about 7% (64K) and 18% (98K) of the
+model on the CPU. Records: `geo/compatibility.json`; see
+[docs/geo/compatibility.md](geo/compatibility.md). These are observations on one
+machine, not a performance guarantee.
 
 `gaid-local` is billed `local` ($0, not cap-counted), so chats and local specialists
 can run after the project's paid spend limit is reached. Other custom providers
