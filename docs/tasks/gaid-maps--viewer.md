@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T05:15:14Z
+updated: 2026-10-11T05:31:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -19,7 +19,8 @@ Area panel selecting vector class field, explicit method geodesic or projected w
 Visible strings isolated in map/strings.ts (Korean-first using current geo i18n pattern, English second, WP07 later owns overall wording). Tests meaningful with mocked OpenLayers if canvas needed: layer selection/request params, source/display info, bounds/area, stale project switch etc. Need real browser evidence later parent handles; provide ready instructions. Keep existing contracts (propose additive changes to parent, don't edit them). Finish child after own targeted tests; parent task complete integrates, then full scripts/check.
 
 ## Current state
-- Publication is blocked by the parent's incomplete helper integration, not by a viewer failure. Second finish merged parent 3481060 and failed its new `server/test/geo-maps-integration.test.ts`: `geo/tests/fixtures/maps_fixture.py` is absent. Backend: 145 files / 1584 tests passed, 1 integration suite failed during fixture setup, 13 tests skipped. Full-check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-z4pirnbd.log. Own 40 targeted tests, typecheck and lint passed.
+- Continuation `viewer-continue-f3b3631f1273` verified existing ownership and worktree. Parent helper dependency is resolved on published origin/task/gaid-maps (reported d6384406e486; fixture and helper verified via git cat-file). Rerun finish in place; own viewer implementation and prior 40-test evidence are unchanged. No new writer, source workaround or scope expansion.
+- Previous second finish merged parent 3481060 and failed its new `server/test/geo-maps-integration.test.ts`: `geo/tests/fixtures/maps_fixture.py` was then absent. Backend: 145 files / 1584 tests passed, 1 integration suite failed during fixture setup, 13 tests skipped. Historical full-check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-z4pirnbd.log.
 - Resumed in the original CLI-returned worktree on 2026-10-11. Read AGENTS, parent task, map/inspection contracts and plan sections 3.2–3.3 / 4.5–4.6.
 - Existing geo viewers are lazy/self-fetching through apiFetch with project scope. Codegraph is unavailable for this exact worktree; using bounded native source reads.
 - Implemented `ol` 10.11.0 lazy map viewer, isolated native-CRS views, overlay path entry, visibility/order/opacity, GPKG layer picker, band/variable entry, categorical colors/legend, feature/pixel inspection, viewport paging and sampled metadata.
@@ -27,7 +28,7 @@ Visible strings isolated in map/strings.ts (Korean-first using current geo i18n 
 - `.geomap.json` maps to `geo-map`; POST /geo/result initializes multiple sources and presents analysis table/script paths + limitations. Ordinary TIFF delegates to the existing inspection/imaging viewer; LAS registry line is unchanged.
 - Final targeted checks passed: `npm --prefix web test -- src/geo/viewers/map src/geo/viewers/inspection-viewer.test.tsx src/lib/use-sandbox.test.ts` (5 files, 40 tests, including real OpenLayers native fit); `cd web && npx tsc --noEmit --incremental false`; `cd web && npx eslint src/geo/viewers/map src/geo/viewers/registry.ts` (zero errors/warnings); `git diff --check` clean.
 ## Next steps
-1. Parent must integrate `gaid-maps--helper` (including `geo/tests/fixtures/maps_fixture.py`) into task/gaid-maps before the next finish. Do not manufacture/copy unpublished helper files or weaken parent tests. Check published parent source with `git cat-file -e origin/task/gaid-maps:geo/tests/fixtures/maps_fixture.py`, then rerun `task finish` in place (no resume required after this failed finish).
+1. Helper integration verified. Report pending parent integration for route viewer-continue-f3b3631f1273, check queued routes, and rerun `task finish` in place (no resume). Let CLI fetch/merge the published parent and run declared checks; do not weaken tests or copy unpublished sibling files.
 2. Parent integrates this ready child with `task complete gaid-maps--viewer`, performs browser evidence below, and owns the canonical report and final integration. Remove regenerated ignored dependency/build caches after the last check.
 
 ## Failed approaches
