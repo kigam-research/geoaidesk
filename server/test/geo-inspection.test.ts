@@ -95,6 +95,14 @@ describe("shared bounded inspection", () => {
     const out = await inspect("raster.tif");
     expect(out.asset.format).toBe("geotiff"); expect(out.issues.map(i => i.code)).toContain("inspection-failed");
   });
+  it.each([["tiff"], ["tiff", "geotiff"]] as const)("preserves broad raster inspectors registered for %j without demotion or looping", async (...formats) => {
+    f.write("raster.tif", tiff(true)); const baseline = await inspect("raster.tif");
+    const richer = vi.fn(async () => ({ ...baseline, bands: [{ index: 1, dtype: "custom" }] }));
+    registerGeoInspector({ name: "broad-raster", version: "3", formats, inspect: richer });
+    const out = await inspect("raster.tif");
+    expect(richer).toHaveBeenCalledTimes(1); expect(out.asset.format).toBe("geotiff");
+    expect(out.inspector).toEqual({ name: "broad-raster", version: "3" }); expect(out.bands![0].dtype).toBe("custom");
+  });
   it("reports BigTIFF and malformed IFDs instead of throwing content errors", async () => {
     f.write("big.tif", Buffer.from([73, 73, 43, 0, 8, 0, 0, 0]));
     expect((await inspect("big.tif")).issues.map(i => i.code)).toContain("bigtiff-unsupported");

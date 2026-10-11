@@ -100,7 +100,8 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
     // Honor a richer inspector registered for the corrected format, sharing the
     // same byte budget. Redirect once only, so disagreeing inspectors cannot loop.
     const corrected = inspectorFor(parsed.asset.format);
-    if (corrected && corrected !== inspector) {
+    // Never demote a custom broad-format reader back to a default baseline.
+    if (corrected && corrected !== baselineInspector && corrected !== inspector) {
       inspector = corrected;
       result.asset.format = parsed.asset.format;
       result.asset.family = familyOf(parsed.asset.format);
