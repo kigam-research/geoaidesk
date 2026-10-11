@@ -1,10 +1,12 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useState } from "react";
 import { BrainIcon, CheckIcon, ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+const appText = geoText("app");
 
 /** Pi's reasoning levels (`ThinkingLevel` in @earendil-works/pi-agent-core). */
 export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
@@ -12,19 +14,19 @@ export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhi
 export const DEFAULT_THINKING_LEVEL: ThinkingLevel = "high";
 
 export const THINKING_LEVELS: { id: ThinkingLevel; label: string; description: string }[] = [
-  { id: "off", label: "Off", description: "No extended reasoning — fastest and cheapest." },
-  { id: "minimal", label: "Minimal", description: "Bare-minimum reasoning for models that require some." },
-  { id: "low", label: "Low", description: "Brief reasoning for straightforward tasks." },
-  { id: "medium", label: "Medium", description: "Balanced reasoning effort and cost." },
-  { id: "high", label: "High", description: "Deep reasoning for hard problems." },
-  { id: "xhigh", label: "XHigh", description: "Maximum effort — slowest, most thorough, most tokens." },
+  { id: "off", label: appText("chat.thinking.off"), description: appText("chat.thinking.no_extended_reasoning_fastest_and_cheapest") },
+  { id: "minimal", label: appText("chat.thinking.minimal"), description: appText("chat.thinking.bare_minimum_reasoning_for_models_that_require") },
+  { id: "low", label: appText("chat.thinking.low"), description: appText("chat.thinking.brief_reasoning_for_straightforward_tasks") },
+  { id: "medium", label: appText("chat.thinking.medium"), description: appText("chat.thinking.balanced_reasoning_effort_and_cost") },
+  { id: "high", label: appText("chat.thinking.high"), description: appText("chat.thinking.deep_reasoning_for_hard_problems") },
+  { id: "xhigh", label: appText("chat.thinking.xhigh"), description: appText("chat.thinking.maximum_effort_slowest_most_thorough_most_tokens") },
 ];
 
 export function ThinkingSelector({
   selected,
   onChange,
   disabled = false,
-  disabledReason = "This model doesn't support adjustable thinking",
+  disabledReason = appText("chat.thinking.this_model_doesn_t_support_adjustable_thinking"),
 }: {
   selected: ThinkingLevel;
   onChange: (level: ThinkingLevel) => void;
@@ -55,7 +57,7 @@ export function ThinkingSelector({
           disabled ? "text-muted-foreground" : "font-medium text-foreground",
         )}
       >
-        {disabled ? "Off" : current.label}
+        {disabled ? appText("chat.thinking.off") : current.label}
       </span>
       {!disabled && (
         <ChevronDownIcon
@@ -93,8 +95,7 @@ export function ThinkingSelector({
       >
         <div className="flex items-center justify-between border-b px-3 py-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Thinking
-          </span>
+            {appText("chat.thinking.thinking")}</span>
         </div>
         <div className="max-h-80 overflow-y-auto py-1">
           {THINKING_LEVELS.map((level) => {

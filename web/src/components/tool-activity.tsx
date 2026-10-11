@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   BookOpenIcon,
   BrainIcon,
@@ -32,6 +32,8 @@ import { skillNameFromRead } from "@/lib/skill-invocation";
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 import { workflowScriptAgents } from "@/lib/workflow-script";
+
+const appText = geoText("app");
 
 function ToolIcon({ toolName }: { toolName?: string }) {
   const className = "size-3.5 shrink-0 text-muted-foreground";
@@ -105,7 +107,7 @@ function subagentNames(
 
 /** What a `subagent` call runs when no specialist name is known yet. */
 function workflowSummary(workflow: unknown): string | null {
-  if (workflow === true) return "workflow script";
+  if (workflow === true) return appText("chat.tools.workflow_script");
   if (typeof workflow !== "string" || !workflow.trim()) return null;
   // A value with a path separator is a script file; anything else names an
   // extension-registered workflow resource.
@@ -145,13 +147,13 @@ function summarize(
         const detail = firstLine(task);
         return `${agents.join(" + ")}${detail ? `: ${detail}` : ""}`;
       }
-      if (a.action === "list") return "list agents";
-      if (a.action === "status") return "check subagent status";
-      if (a.action === "interrupt") return "interrupt subagent";
+      if (a.action === "list") return appText("chat.tools.list_agents");
+      if (a.action === "status") return appText("chat.tools.check_subagent_status");
+      if (a.action === "interrupt") return appText("chat.tools.interrupt_subagent");
       return firstLine(a.task ?? a.prompt ?? a.description) || workflowSummary(a.workflow) || "subtask";
     }
     if (toolName === "bg_wait" || toolName === "subagent_wait") {
-      return "wait for subagents";
+      return appText("chat.tools.wait_for_subagents");
     }
     const keys = Object.keys(a);
     if (keys.length) return firstLine(a[keys[0]]) || keys.join(", ");
@@ -242,7 +244,7 @@ const ToolCard = memo(function ToolCard({ item }: { item: ActivityItem }) {
             {args && (
               <div>
                 <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {item.toolName === "bash" ? "Command" : "Input"}
+                  {item.toolName === "bash" ? appText("chat.tools.command") : appText("chat.tools.input")}
                 </div>
                 <pre className="max-h-60 overflow-auto rounded bg-muted/50 p-2 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre-wrap break-words">
                   {args}
@@ -252,7 +254,7 @@ const ToolCard = memo(function ToolCard({ item }: { item: ActivityItem }) {
             {item.result && (
               <div>
                 <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {item.status === "error" ? "Error" : "Output"}
+                  {item.status === "error" ? appText("chat.tools.error") : appText("chat.tools.output")}
                 </div>
                 <pre
                   className={cn(
@@ -317,7 +319,7 @@ export function ModalJobChip({
         </code>
       ) : (
         <span className="min-w-0 flex-1 truncate text-muted-foreground">
-          {item.status === "running" ? "Submitting durable compute…" : "Durable compute activity"}
+          {item.status === "running" ? appText("chat.tools.submitting_durable_compute") : appText("chat.tools.durable_compute_activity")}
         </span>
       )}
       <StatusDot status={item.status} />
@@ -326,7 +328,7 @@ export function ModalJobChip({
         onClick={view}
         className="shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
       >
-        {jobId ? "View job" : "Open Compute"}
+        {jobId ? appText("chat.tools.view_job") : appText("chat.tools.open_compute")}
       </button>
     </div>
   );
@@ -348,7 +350,7 @@ export function NotebookEntryChip({
   const typeLabel =
     typeof args.type === "string"
       ? args.type.charAt(0).toUpperCase() + args.type.slice(1)
-      : "Entry";
+      : appText("chat.tools.entry");
   const title = typeof args.title === "string" ? args.title : "";
   return (
     <div
@@ -356,7 +358,7 @@ export function NotebookEntryChip({
       className="my-1 flex w-full items-center gap-2 rounded-md border border-orange-500/25 bg-orange-500/5 px-2.5 py-1.5 text-xs"
     >
       <BookOpenIcon className="size-3.5 shrink-0 text-orange-500" />
-      <span className="font-medium text-foreground">Notebook · {typeLabel}</span>
+      <span className="font-medium text-foreground">{appText("chat.tools.notebookType", { type: typeLabel })}</span>
       {title && (
         <span className="min-w-0 flex-1 truncate text-muted-foreground">{title}</span>
       )}
@@ -367,8 +369,7 @@ export function NotebookEntryChip({
           onClick={() => onView(item.id)}
           className="shrink-0 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
-          View in notebook
-        </button>
+          {appText("chat.tools.view_in_notebook")}</button>
       )}
     </div>
   );
@@ -397,7 +398,7 @@ export function ReasoningBlock({ reasoning }: { reasoning: string }) {
           className={cn("size-3 transition-transform", open && "rotate-90")}
         />
         <BrainIcon className="size-3.5" />
-        <span>Reasoning</span>
+        <span>{appText("chat.tools.reasoning")}</span>
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="mt-1 border-l-2 border-muted pl-3 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap">

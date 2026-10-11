@@ -1,1 +1,23 @@
-{}
+{
+  "chip": "시작 프롬프트 ≈{tokens}",
+  "chipUnknown": "시작 프롬프트",
+  "title": "시작 프롬프트 예산",
+  "intro": "대화를 시작하기 전에 모델에 보내는 지시문과 도구 설명의 크기입니다. 글자 수를 4로 나눈 추정값이며, 실제 사용량은 첫 응답 뒤 오른쪽 게이지에 표시됩니다.",
+  "model": "모델",
+  "contextWindow": "context 길이",
+  "initialPrompt": "시작 프롬프트(추정)",
+  "outputReserve": "출력 예약",
+  "remaining": "대화·도구 결과에 남는 양",
+  "remainingWarn": "남는 양이 context의 절반보다 적습니다. 스킬 범위를 줄이거나 context가 큰 모델을 고르세요.",
+  "tools": "도구 {count}개",
+  "skills": "모델에 보이는 스킬 {exposed}개 / 설치 {installed}개",
+  "mode": "현재 대화의 스킬 범위: {mode}",
+  "modeAll": "설치된 모든 스킬",
+  "modeCatalogue": "GeoAIDesk 카탈로그 스킬",
+  "modeWorkflow": "작업: {title}",
+  "newChat": "새 채팅의 스킬 범위",
+  "newChatNote": "새로 여는 채팅부터 적용됩니다. 지금 채팅의 범위와 설치된 스킬 파일은 바뀌지 않습니다.",
+  "saved": "저장했습니다",
+  "loadError": "예산을 불러오지 못했습니다: {message}",
+  "noModel": "모델 정보 없음"
+}

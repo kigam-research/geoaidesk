@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   DownloadIcon,
   FileTextIcon,
@@ -26,6 +26,8 @@ import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { apiFetch } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { commandPreview } from "@/lib/command-blocks";
+
+const appText = geoText("app");
 
 export interface ChatTabDescriptor {
   id: string;
@@ -64,7 +66,7 @@ interface SessionListItem {
 
 function sessionTitle(s: SessionListItem): string {
   const raw = (s.name ?? commandPreview(s.firstMessage ?? "")).replace(/\s+/g, " ").trim();
-  if (!raw) return "Untitled chat";
+  if (!raw) return appText("chat.tabs.untitled_chat");
   return raw.length > 60 ? raw.slice(0, 60) + "…" : raw;
 }
 
@@ -72,12 +74,12 @@ function relativeTime(value: string | number): string {
   const then = new Date(value).getTime();
   if (!Number.isFinite(then)) return "";
   const mins = Math.round((Date.now() - then) / 60_000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return appText("chat.tabs.just_now");
+  if (mins < 60) return appText("chat.tabs.minutes", { count: mins });
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return appText("chat.tabs.hours", { count: hours });
   const days = Math.round(hours / 24);
-  return days < 7 ? `${days}d ago` : new Date(then).toLocaleDateString();
+  return days < 7 ? appText("chat.tabs.days", { count: days }) : new Date(then).toLocaleDateString();
 }
 
 /** Clock menu listing the project's stored sessions; picking one reopens it
@@ -120,17 +122,15 @@ function HistoryMenu({
       <InfoTooltip
         content={
           <>
-            <b>Chat history</b>
+            <b>{appText("chat.tabs.chat_history")}</b>
             <br />
-            Reopen a previous chat from this project — the full transcript is
-            restored and you can continue the conversation.
-          </>
+            {appText("chat.tabs.reopen_a_previous_chat_from_this_project")}</>
         }
       >
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label="Chat history"
+            aria-label={appText("chat.tabs.chat_history")}
             className="flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
           >
             <HistoryIcon className="size-3.5" />
@@ -138,14 +138,13 @@ function HistoryMenu({
         </DropdownMenuTrigger>
       </InfoTooltip>
       <DropdownMenuContent align="start" className="w-72 max-h-80 overflow-y-auto">
-        <DropdownMenuLabel>Previous chats</DropdownMenuLabel>
+        <DropdownMenuLabel>{appText("chat.tabs.previous_chats")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {sessions === null ? (
-          <div className="px-2 py-3 text-xs text-muted-foreground">Loading…</div>
+          <div className="px-2 py-3 text-xs text-muted-foreground">{appText("chat.tabs.loading")}</div>
         ) : sessions.length === 0 ? (
           <div className="px-2 py-3 text-xs text-muted-foreground">
-            No previous chats in this project yet.
-          </div>
+            {appText("chat.tabs.no_previous_chats_in_this_project_yet")}</div>
         ) : (
           sessions.map((s) => {
             const title = sessionTitle(s);
@@ -158,8 +157,7 @@ function HistoryMenu({
                 <div className="flex min-w-0 flex-col">
                   <span className="truncate">{title}</span>
                   <span className="text-[11px] text-muted-foreground">
-                    {relativeTime(s.modified)} · {s.messageCount} message
-                    {s.messageCount === 1 ? "" : "s"}
+                    {appText("chat.tabs.historySummary", { time: relativeTime(s.modified), count: s.messageCount })}
                   </span>
                 </div>
               </DropdownMenuItem>
@@ -204,43 +202,38 @@ function ExportMenu({ projectId, sessionId }: { projectId: string; sessionId: st
       <InfoTooltip
         content={
           <>
-            <b>Export session</b>
+            <b>{appText("chat.tabs.export_session")}</b>
             <br />
-            Download a reproducible record of this chat — a runnable shell
-            script of every command the agent ran, or a full lab notebook.
-          </>
+            {appText("chat.tabs.download_a_reproducible_record_of_this_chat")}</>
         }
       >
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label="Export session"
+            aria-label={appText("chat.tabs.export_session")}
             className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
           >
             <DownloadIcon className="size-3.5" />
-            Export
-          </button>
+            {appText("chat.tabs.export")}</button>
         </DropdownMenuTrigger>
       </InfoTooltip>
       <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuLabel>Reproducibility export</DropdownMenuLabel>
+        <DropdownMenuLabel>{appText("chat.tabs.reproducibility_export")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => downloadExport(projectId, sessionId, "sh")}>
           <TerminalIcon className="size-4" />
           <div className="flex flex-col">
-            <span>Shell script (.sh)</span>
+            <span>{appText("chat.tabs.shell_script_sh")}</span>
             <span className="text-[11px] text-muted-foreground">
-              Every command, in order
-            </span>
+              {appText("chat.tabs.every_command_in_order")}</span>
           </div>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => downloadExport(projectId, sessionId, "md")}>
           <FileTextIcon className="size-4" />
           <div className="flex flex-col">
-            <span>Lab notebook (.md)</span>
+            <span>{appText("chat.tabs.lab_notebook_md")}</span>
             <span className="text-[11px] text-muted-foreground">
-              Prompts, commands & outputs
-            </span>
+              {appText("chat.tabs.prompts_commands_outputs")}</span>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -313,7 +306,7 @@ export function ChatTabsBar({
                 onDoubleClick={() => startRename(tab)}
                 className="flex min-w-0 items-center gap-1.5"
                 type="button"
-                title={`${tab.title} — double-click to rename`}
+                title={appText("chat.tabs.renameHint", { name: tab.title })}
               >
                 <MessageSquareTextIcon className="size-3.5 shrink-0" />
                 {tab.isStreaming && (
@@ -355,14 +348,14 @@ export function ChatTabsBar({
                       startRename(tab);
                     }}
                     type="button"
-                    aria-label={`Rename ${tab.title}`}
+                    aria-label={appText("chat.tabs.rename", { name: tab.title })}
                     className={cn(
                       "rounded p-0.5 text-muted-foreground/40 transition-all hover:bg-muted-foreground/10 hover:text-foreground",
                       isActive
                         ? "opacity-60 hover:opacity-100"
                         : "opacity-0 group-hover:opacity-60",
                     )}
-                    title="Rename tab"
+                    title={appText("chat.tabs.rename_tab")}
                   >
                     <PencilIcon className="size-3" />
                   </button>
@@ -373,7 +366,7 @@ export function ChatTabsBar({
                         onClose(tab.id);
                       }}
                       type="button"
-                      aria-label={`Close ${tab.title}`}
+                      aria-label={appText("chat.tabs.close", { name: tab.title })}
                       className={cn(
                         "rounded p-0.5 text-muted-foreground/40 transition-all hover:bg-destructive/10 hover:text-destructive",
                         isActive
@@ -382,8 +375,8 @@ export function ChatTabsBar({
                       )}
                       title={
                         tab.isStreaming
-                          ? "Close tab (this will cancel the running turn)"
-                          : "Close tab"
+                          ? appText("chat.tabs.close_tab_this_will_cancel_the_running")
+                          : appText("chat.tabs.close_tab")
                       }
                     >
                       <XIcon className="size-3" />
@@ -399,18 +392,15 @@ export function ChatTabsBar({
           content={
             atLimit ? (
               <>
-                <b>Tab limit reached</b>
+                <b>{appText("chat.tabs.tab_limit_reached")}</b>
                 <br />
-                You can have up to {maxTabs} chat tabs running at once. Close
-                one to open a new one.
+                {appText("chat.tabs.maxTabs", { count: maxTabs })}
               </>
             ) : (
               <>
-                <b>New chat tab</b>
+                <b>{appText("chat.tabs.new_chat_tab")}</b>
                 <br />
-                Open another chat in the same project. All tabs share the
-                same sandbox files but have independent message history.
-              </>
+                {appText("chat.tabs.open_another_chat_in_the_same_project")}</>
             )
           }
         >
@@ -418,7 +408,7 @@ export function ChatTabsBar({
             onClick={onNew}
             type="button"
             disabled={atLimit}
-            aria-label="New chat tab"
+            aria-label={appText("chat.tabs.new_chat_tab")}
             className="flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent"
           >
             <PlusIcon className="size-3.5" />
@@ -434,12 +424,9 @@ export function ChatTabsBar({
         <InfoTooltip
           content={
             <>
-              <b>Workflows</b>
+              <b>{appText("chat.tabs.workflows")}</b>
               <br />
-              Pre-built scientific pipelines (e.g. RNA-seq, literature
-              review). Pick a template, attach inputs, and launch — they
-              run in the active chat tab.
-            </>
+              {appText("chat.tabs.pre_built_scientific_pipelines_e_g_rna")}</>
           }
         >
           <button
@@ -453,8 +440,7 @@ export function ChatTabsBar({
             )}
           >
             <WorkflowIcon className="size-3.5" />
-            Workflows
-          </button>
+            {appText("chat.tabs.workflows")}</button>
         </InfoTooltip>
       </div>
     </div>

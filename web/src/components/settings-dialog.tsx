@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -37,10 +37,11 @@ import { AppearancePanel } from "./settings/appearance-panel";
 import { FusionPanel } from "./settings/fusion-panel";
 import { useResizableDialog } from "./settings/use-resizable-dialog";
 
+const appText = geoText("app");
+
 const panelLoading = () => (
   <div className="p-4 text-xs text-muted-foreground" role="status">
-    Loading settings…
-  </div>
+    {appText("settings.loading_settings")}</div>
 );
 const ProvidersPanel = dynamic(() => import("./settings/providers-panel").then((m) => m.ProvidersPanel), { loading: panelLoading });
 const DefaultsPanel = dynamic(() => import("./settings/defaults-panel").then((m) => m.DefaultsPanel), { loading: panelLoading });
@@ -61,20 +62,20 @@ interface TabDef {
 }
 
 const MODEL_TABS: TabDef[] = [
-  { id: "providers", label: "Providers", icon: CloudIcon },
-  { id: "defaults", label: "Defaults", icon: SlidersHorizontalIcon },
-  { id: "fusion", label: "Fusion", icon: BrainCircuitIcon },
+  { id: "providers", label: appText("settings.providers"), icon: CloudIcon },
+  { id: "defaults", label: appText("settings.defaults"), icon: SlidersHorizontalIcon },
+  { id: "fusion", label: appText("settings.fusion"), icon: BrainCircuitIcon },
 ];
 const PROJECT_TABS: TabDef[] = [
-  { id: "project", label: "General", icon: FolderCogIcon },
-  { id: "skills", label: "Skills", icon: LayersIcon },
-  { id: "prompts", label: "Prompt templates", icon: SlashIcon },
-  { id: "specialists", label: "Specialists", icon: BotIcon },
-  { id: "connectors", label: "Connectors", icon: PlugIcon },
+  { id: "project", label: appText("settings.general"), icon: FolderCogIcon },
+  { id: "skills", label: appText("settings.skills"), icon: LayersIcon },
+  { id: "prompts", label: appText("settings.prompt_templates"), icon: SlashIcon },
+  { id: "specialists", label: appText("settings.specialists"), icon: BotIcon },
+  { id: "connectors", label: appText("settings.connectors"), icon: PlugIcon },
 ];
 const WORKSPACE_TABS: TabDef[] = [
-  { id: "services", label: "Services", icon: KeyIcon },
-  { id: "appearance", label: "Appearance", icon: PaletteIcon },
+  { id: "services", label: appText("settings.services"), icon: KeyIcon },
+  { id: "appearance", label: appText("settings.appearance"), icon: PaletteIcon },
 ];
 
 /** Tabs whose panels follow the globally active project (their API calls do). */
@@ -94,7 +95,7 @@ function TabGroup({ label, detail, tabs }: { label: string; detail?: string; tab
         {detail ? <span className="normal-case tracking-normal"> · {detail}</span> : null}
       </div>
       {tabs.map(({ id, label: tabLabel, icon: Icon }) => (
-        <TabsTrigger key={id} value={id} className="w-full justify-start gap-2 px-3 text-xs">
+        <TabsTrigger key={id} value={id} className="w-full justify-start gap-2 px-2 text-xs whitespace-normal text-left h-auto min-h-8">
           <Icon className="size-3.5" />
           {tabLabel}
         </TabsTrigger>
@@ -196,10 +197,9 @@ export function SettingsDialog({ open, onOpenChange, request }: SettingsDialogPr
         data-testid="settings-dialog"
       >
         <DialogHeader className="border-b px-6 pb-4 pt-6">
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle>{appText("settings.settings")}</DialogTitle>
           <DialogDescription className="text-xs">
-            Models, this project, and the services Kady connects to.
-          </DialogDescription>
+            {appText("settings.models_this_project_and_the_services_kady")}</DialogDescription>
         </DialogHeader>
 
         <Tabs
@@ -216,18 +216,17 @@ export function SettingsDialog({ open, onOpenChange, request }: SettingsDialogPr
         >
           <TabsList
             variant="line"
-            className="w-48 shrink-0 items-start justify-start overflow-y-auto rounded-none border-r px-2 py-3"
+            className="w-32 sm:w-48 shrink-0 items-start justify-start overflow-y-auto rounded-none border-r px-2 py-3"
           >
-            <TabGroup label="Models" tabs={MODEL_TABS} />
-            <TabGroup label="Project" detail={projectName(projectId)} tabs={PROJECT_TABS} />
-            <TabGroup label="Workspace" tabs={WORKSPACE_TABS} />
+            <TabGroup label={appText("settings.models")} tabs={MODEL_TABS} />
+            <TabGroup label={appText("settings.project")} detail={projectName(projectId)} tabs={PROJECT_TABS} />
+            <TabGroup label={appText("settings.workspace")} tabs={WORKSPACE_TABS} />
           </TabsList>
 
           <div ref={contentRef} className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
             {showsOtherProject ? (
               <div className="mx-5 mt-4 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[11px]" role="note">
-                Showing the current project, <b>{projectName(activeProjectId)}</b>. Open{" "}
-                <b>{projectName(projectId)}</b> to edit its skills, prompt templates, specialists and connectors.
+                {appText("settings.otherProject", { active: projectName(activeProjectId), target: projectName(projectId) })}
               </div>
             ) : null}
             <TabsContent value="providers" className="min-w-0 p-5">
@@ -265,10 +264,10 @@ export function SettingsDialog({ open, onOpenChange, request }: SettingsDialogPr
         <div
           {...handleProps}
           role="separator"
-          aria-label="Resize settings"
+          aria-label={appText("settings.resize_settings")}
           aria-orientation="horizontal"
           tabIndex={0}
-          title="Drag to resize · double-click to reset"
+          title={appText("settings.drag_to_resize_double_click_to_reset")}
           className="absolute bottom-0 right-0 size-5 cursor-nwse-resize touch-none select-none rounded-br-lg text-muted-foreground/60 outline-none hover:text-foreground focus-visible:text-foreground"
           data-testid="settings-resize-handle"
         >

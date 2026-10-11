@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   AtomIcon,
   BarChart3Icon,
@@ -45,18 +45,20 @@ import type {
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 
+const appText = geoText("app");
+
 const KIND_META: Record<
   ScientificResult["kind"],
   { label: string; Icon: LucideIcon }
 > = {
-  table: { label: "Table", Icon: TableIcon },
-  "statistical-test": { label: "Statistical test", Icon: FlaskConicalIcon },
-  plot: { label: "Plot", Icon: BarChart3Icon },
-  "artifact-list": { label: "Artifacts", Icon: FileIcon },
-  "qc-report": { label: "QC report", Icon: CheckCircle2Icon },
-  "dataset-schema": { label: "Dataset schema", Icon: DatabaseIcon },
-  "citation-list": { label: "Citations", Icon: BookOpenIcon },
-  molecule: { label: "Molecule", Icon: AtomIcon },
+  table: { label: appText("result.table"), Icon: TableIcon },
+  "statistical-test": { label: appText("result.statistical_test"), Icon: FlaskConicalIcon },
+  plot: { label: appText("result.plot"), Icon: BarChart3Icon },
+  "artifact-list": { label: appText("result.artifacts"), Icon: FileIcon },
+  "qc-report": { label: appText("result.qc_report"), Icon: CheckCircle2Icon },
+  "dataset-schema": { label: appText("result.dataset_schema"), Icon: DatabaseIcon },
+  "citation-list": { label: appText("result.citations"), Icon: BookOpenIcon },
+  molecule: { label: appText("result.molecule"), Icon: AtomIcon },
   "geo-result": { label: t("workspace.result.label"), Icon: MapIcon },
 };
 
@@ -175,7 +177,7 @@ function TableBody({ card }: { card: TableResult }) {
       </div>
       {(card.truncated || total > shown) && (
         <p className="text-[11px] text-muted-foreground">
-          Showing {shown.toLocaleString()} of {total.toLocaleString()} rows.
+          {appText("result.shownRows", { total: total.toLocaleString(), shown: shown.toLocaleString() })}
         </p>
       )}
     </div>
@@ -200,31 +202,31 @@ function StatisticalBody({ card }: { card: StatisticalTestResult }) {
         const values: { label: string; value: string }[] = [];
         if (test.estimate !== undefined) {
           values.push({
-            label: test.estimateLabel ?? "Estimate",
+            label: test.estimateLabel ?? appText("result.estimate"),
             value: formatNumber(test.estimate),
           });
         }
         if (test.statistic !== undefined) {
           values.push({
-            label: test.statisticLabel ?? "Statistic",
+            label: test.statisticLabel ?? appText("result.statistic"),
             value: formatNumber(test.statistic),
           });
         }
         if (test.degreesOfFreedom !== undefined) {
-          values.push({ label: "df", value: String(test.degreesOfFreedom) });
+          values.push({ label: appText("result.df"), value: String(test.degreesOfFreedom) });
         }
         if (test.pValue !== undefined) {
-          values.push({ label: "p-value", value: formatNumber(test.pValue) });
+          values.push({ label: appText("result.p_value"), value: formatNumber(test.pValue) });
         }
         if (test.adjustedPValue !== undefined) {
           values.push({
-            label: "Adjusted p",
+            label: appText("result.adjusted_p"),
             value: formatNumber(test.adjustedPValue),
           });
         }
         if (test.effectSize !== undefined) {
           values.push({
-            label: test.effectSizeLabel ?? "Effect size",
+            label: test.effectSizeLabel ?? appText("result.effect_size"),
             value: formatNumber(test.effectSize),
           });
         }
@@ -310,17 +312,17 @@ const STATUS_META: Record<
   { label: string; Icon: LucideIcon; className: string }
 > = {
   pass: {
-    label: "Pass",
+    label: appText("result.pass"),
     Icon: CheckCircle2Icon,
     className: "text-emerald-600 dark:text-emerald-400",
   },
   warn: {
-    label: "Warning",
+    label: appText("result.warning"),
     Icon: TriangleAlertIcon,
     className: "text-amber-600 dark:text-amber-400",
   },
   fail: {
-    label: "Fail",
+    label: appText("result.fail"),
     Icon: XCircleIcon,
     className: "text-destructive",
   },
@@ -358,7 +360,7 @@ function QcBody({
             {(check.value !== undefined || check.expected) && (
               <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">
                 {check.value !== undefined ? formatScalar(check.value) : ""}
-                {check.expected ? ` · expected ${check.expected}` : ""}
+                {check.expected ? appText("result.expected", { value: check.expected }) : ""}
               </div>
             )}
             {check.message && (
@@ -373,7 +375,7 @@ function QcBody({
               onClick={() => onOpenFile?.(check.artifact!)}
               disabled={!onOpenFile}
               className="shrink-0 rounded p-1 text-muted-foreground enabled:hover:bg-muted enabled:hover:text-foreground"
-              title={`Open ${check.artifact}`}
+              title={appText("result.openArtifact", { path: check.artifact })}
             >
               <FileIcon className="size-3.5" />
             </button>
@@ -413,12 +415,12 @@ function DatasetBody({
         ))}
         {card.rowCount !== undefined && (
           <span className="rounded-full border bg-muted/30 px-2 py-0.5 text-[11px]">
-            {card.rowCount.toLocaleString()} rows
+            {appText("result.rows", { count: card.rowCount.toLocaleString() })}
           </span>
         )}
         {card.columnCount !== undefined && (
           <span className="rounded-full border bg-muted/30 px-2 py-0.5 text-[11px]">
-            {card.columnCount.toLocaleString()} columns
+            {appText("result.columns", { count: card.columnCount.toLocaleString() })}
           </span>
         )}
       </div>
@@ -433,7 +435,7 @@ function DatasetBody({
           <table className="w-full min-w-max text-xs">
             <thead className="sticky top-0 bg-muted/90">
               <tr className="border-b">
-                {["Field", "Type", "Unit", "Missing", "Unique"].map((heading) => (
+                {[appText("result.field"), appText("result.type"), appText("result.unit"), appText("result.missing"), appText("result.unique")].map((heading) => (
                   <th key={heading} className="px-2.5 py-2 text-left font-semibold">
                     {heading}
                   </th>
@@ -498,7 +500,7 @@ function CitationBody({ card }: { card: CitationListResult }) {
                 href={entry.url}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={`Open citation ${entry.identifier}`}
+                aria-label={appText("result.openCitation", { id: entry.identifier })}
                 className="shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <ExternalLinkIcon className="size-3.5" />
@@ -521,10 +523,10 @@ function MoleculeBody({
   onOpenFile?: (path: string) => void;
 }) {
   const facts = [
-    card.formula && ["Formula", card.formula],
-    card.molecularWeight !== undefined && ["Molecular weight", formatNumber(card.molecularWeight)],
-    card.atomCount !== undefined && ["Atoms", card.atomCount.toLocaleString()],
-    card.bondCount !== undefined && ["Bonds", card.bondCount.toLocaleString()],
+    card.formula && [appText("result.formula"), card.formula],
+    card.molecularWeight !== undefined && [appText("result.molecular_weight"), formatNumber(card.molecularWeight)],
+    card.atomCount !== undefined && [appText("result.atoms"), card.atomCount.toLocaleString()],
+    card.bondCount !== undefined && [appText("result.bonds"), card.bondCount.toLocaleString()],
   ].filter(Boolean) as [string, string][];
   return (
     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
@@ -538,7 +540,7 @@ function MoleculeBody({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={sciRenderUrl(card.path, "chem", card.index ?? 0, undefined, projectId)}
-            alt={card.name || card.smiles || "Molecule structure"}
+            alt={card.name || card.smiles || appText("result.molecule_structure")}
             className="max-h-72 w-full object-contain"
           />
         </button>
@@ -613,7 +615,7 @@ export function ToolResultImages({
             <img
               key={`${image.mimeType}:${index}`}
               src={`data:${image.mimeType};base64,${image.data}`}
-              alt={`Tool result image ${index + 1}`}
+              alt={appText("result.image", { index: index + 1 })}
               className="max-h-80 w-full rounded-md border bg-white object-contain"
             />
           ))}
@@ -621,7 +623,7 @@ export function ToolResultImages({
       )}
       {truncated > 0 && (
         <p className="text-[11px] text-muted-foreground">
-          {truncated} image{truncated === 1 ? "" : "s"} omitted by display limits.
+          {appText("result.imagesOmitted", { count: truncated })}
         </p>
       )}
     </div>
@@ -642,8 +644,7 @@ function RawToolDetails({ item }: { item: ActivityItem }) {
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground">
         <ChevronRightIcon className={cn("size-3 transition-transform", open && "rotate-90")} />
-        Raw tool details
-      </CollapsibleTrigger>
+        {appText("result.raw_tool_details")}</CollapsibleTrigger>
       <CollapsibleContent>
         <div className="mt-1 grid gap-1.5">
           {input && (
@@ -740,8 +741,7 @@ export function ScientificResultCard({
         {commonArtifacts.length > 0 && (
           <section className="space-y-1.5">
             <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Related files
-            </h4>
+              {appText("result.related_files")}</h4>
             <ArtifactGrid artifacts={commonArtifacts} onOpenFile={onOpenFile} />
           </section>
         )}
@@ -751,8 +751,7 @@ export function ScientificResultCard({
         />
         <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-2">
           <span className="text-[10px] text-muted-foreground">
-            Structured agent output · not independently verified
-          </span>
+            {appText("result.structured_agent_output_not_independently_verified")}</span>
           <RawToolDetails item={item} />
         </div>
       </div>

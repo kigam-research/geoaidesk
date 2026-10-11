@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Shared building blocks for the Settings tabs, so every panel states its
@@ -10,13 +11,15 @@ import { AlertCircleIcon, SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+const appText = geoText("app");
+
 /** When a change takes effect — shown under every panel heading. */
 export type AppliesTo = "new-chats" | "immediately" | "live-chats";
 
 const APPLIES_TEXT: Record<AppliesTo, string> = {
-  "new-chats": "Changes apply to new chat tabs; open chats keep what they started with.",
-  immediately: "Changes apply immediately — no restart needed.",
-  "live-chats": "Changes apply immediately, including in open chats.",
+  "new-chats": appText("settings.effect.new-chats"),
+  immediately: appText("settings.effect.immediately"),
+  "live-chats": appText("settings.effect.live-chats"),
 };
 
 export function SettingsHeader({
@@ -114,11 +117,11 @@ export function ScopeSwitcher({
   disabled?: boolean;
 }) {
   const options: { value: SettingsScope; label: string }[] = [
-    { value: "project", label: `This project (${projectName})` },
-    { value: "global", label: "All projects" },
+    { value: "project", label: appText("settings.scope.project", { name: projectName }) },
+    { value: "global", label: appText("settings.scope.all") },
   ];
   return (
-    <div className="flex items-center gap-1 rounded-lg border p-1 text-xs" role="group" aria-label="Scope">
+    <div className="flex items-center gap-1 rounded-lg border p-1 text-xs" role="group" aria-label={appText("settings.scope.label")}>
       {options.map((option) => (
         <button
           key={option.value}

@@ -33,11 +33,11 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     setRecipes((previous) => ({ ...previous, [setup.workflowId]: { revision: (previous[setup.workflowId]?.revision ?? 0) + 1, setup } }));
     setSelected(setup.workflowId);
   };
-  if (!data || data.catalogue.state !== "ready") return <div className="min-w-0 space-y-3">
-    <p role="status" className="text-xs break-words">{error || (!data ? t("workspace.catalogue.loading") : t("workspace.catalogue.status", { state: data.catalogue.state, detail: data.catalogue.detail || t("workspace.catalogue.noDetail") }))}</p>
+  if (!data || data.catalogue.state !== "ready") return <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <p role="status" className="px-4 py-2 text-xs break-words">{error || (!data ? t("workspace.catalogue.loading") : t("workspace.catalogue.status", { state: data.catalogue.state, detail: data.catalogue.detail || t("workspace.catalogue.noDetail") }))}</p>
     {children}
   </div>;
-  return <section className="min-w-0 space-y-4">
+  return <section className="min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto p-4">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h2 className="text-base font-medium">{t("workspace.catalogue.title")}</h2>
       <RecipeImport projectId={projectId} onSetup={importSetup} />
@@ -53,13 +53,12 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
         <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={load} />
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={() => setSelected(workflow.id)}>{t("workspace.setup.open")}</Button>
-          <RecipeImport projectId={projectId} onSetup={importSetup} />
         </div>
         <TaskSetup key={`${workflow.id}:${recipes[workflow.id]?.revision ?? 0}`} workflow={workflow} projectId={projectId} availableFiles={availableFiles} open={selected === workflow.id} onOpenChange={(open) => setSelected(open ? workflow.id : null)} onRefresh={load} initialSetup={recipes[workflow.id]?.setup} />
       </article>)}
     </div>
     {data.workflows.length === 0 && <p className="text-xs">{t("workspace.catalogue.empty")}</p>}
     <Button size="sm" variant="ghost" aria-expanded={upstream} onClick={() => setUpstream(!upstream)}>{t(upstream ? "workspace.catalogue.hideUpstream" : "workspace.catalogue.showUpstream")}</Button>
-    {upstream && children}
+    {upstream && <div className="flex min-h-[32rem] min-w-0 flex-col rounded-lg border">{children}</div>}
   </section>;
 }

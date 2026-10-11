@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckIcon,
@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import models from "@/data/models.json";
 import { useModels } from "@/lib/use-models";
 import { openSettings } from "@/lib/settings-nav";
+
+const appText = geoText("app");
 
 export type Model = {
   id: string;
@@ -213,9 +215,9 @@ export function ModelPickerList({
         ? "OpenRouter Fusion"
         : m.sourceLabel ??
           (isOllama(m)
-            ? "Local (Ollama)"
+            ? appText("chat.models.local_ollama")
             : isOpenAICompatible(m)
-              ? "Local (OpenAI-compatible)"
+              ? appText("chat.models.local_openai_compatible")
               : "OpenRouter");
       const group = grouped.get(sourceId) ?? { label, models: [] };
       group.models.push(m);
@@ -247,7 +249,7 @@ export function ModelPickerList({
         role="option"
         aria-selected={isSelected}
         aria-disabled={!available}
-        aria-label={`${model.label} by ${model.provider}`}
+        aria-label={appText("chat.models.option", { model: model.label, provider: model.provider })}
         tabIndex={available ? 0 : -1}
         onClick={() => {
           if (available) onSelect(model);
@@ -281,16 +283,14 @@ export function ModelPickerList({
             <span className="font-semibold text-foreground truncate">{model.label}</span>
             {isRecommended(model) && (
               <span className="rounded-full bg-primary/10 px-1.5 py-px text-[10px] font-medium text-primary shrink-0">
-                recommended
-              </span>
+                {appText("chat.models.recommended")}</span>
             )}
             <span className={cn("text-[10px] font-medium shrink-0", providerColor)}>
               {model.provider}
             </span>
             {!available ? (
               <span className="rounded-full bg-destructive/10 px-1.5 py-px text-[10px] font-medium text-destructive">
-                disconnected
-              </span>
+                {appText("chat.models.disconnected")}</span>
             ) : null}
           </div>
           <div className="mt-0.5 flex items-center gap-2 text-[10px] text-muted-foreground/70">
@@ -301,21 +301,21 @@ export function ModelPickerList({
               </>
             )}
             {model.sourceId === "nvidia" ? (
-              <span>Billed via NVIDIA API credits · not metered by Kady</span>
+              <span>{appText("chat.models.billed_via_nvidia_api_credits_not_metered")}</span>
             ) : model.billingMode === "subscription" &&
               model.sourceId &&
               OAUTH_SECTION_ORDER.includes(model.sourceId) ? (
-              <span>Uses provider-managed subscription limits</span>
+              <span>{appText("chat.models.uses_provider_managed_subscription_limits")}</span>
             ) : model.billingMode === "subscription" ? (
-              <span>Billed to your provider plan or credits · not metered by Kady</span>
+              <span>{appText("chat.models.billed_to_your_provider_plan_or_credits")}</span>
             ) : model.billingMode === "metered_oauth" ? (
               <span>
-                ${model.pricing.prompt.toFixed(2)} in / ${model.pricing.completion.toFixed(2)} out per 1M tok · extra usage
+                {appText("chat.models.extraPrice", { input: model.pricing.prompt.toFixed(2), output: model.pricing.completion.toFixed(2) })}
               </span>
             ) : local ? (
-              <span>Runs locally · no API cost</span>
+              <span>{appText("chat.models.runs_locally_no_api_cost")}</span>
             ) : (
-              <span>${model.pricing.prompt.toFixed(2)} in / ${model.pricing.completion.toFixed(2)} out per 1M tok</span>
+              <span>{appText("chat.models.price", { input: model.pricing.prompt.toFixed(2), output: model.pricing.completion.toFixed(2) })}</span>
             )}
           </div>
         </div>
@@ -330,7 +330,7 @@ export function ModelPickerList({
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search models..."
+          placeholder={appText("chat.models.search_models")}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground/50"
           autoFocus
         />
@@ -342,7 +342,7 @@ export function ModelPickerList({
       <div
         ref={listRef}
         role="listbox"
-        aria-label="Models"
+        aria-label={appText("chat.models.models")}
         className={cn("relative overflow-y-auto py-1", compact ? "max-h-72" : "max-h-80")}
       >
         {groups.map((group, index) => (
@@ -358,13 +358,13 @@ export function ModelPickerList({
               <span className="ml-auto text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">
                 {group.id === "ollama"
                   ? ollamaAvailable
-                    ? `${ollamaModels.length} available`
-                    : "not running"
+                    ? appText("chat.models.ollamaAvailable", { count: ollamaModels.length })
+                    : appText("chat.models.not_running")
                   : group.id === "openai-compatible"
                     ? openaiCompatibleAvailable
-                      ? `${openaiCompatibleModels.length} available`
-                      : "not running"
-                    : `${group.models.length} model${group.models.length === 1 ? "" : "s"}`}
+                      ? appText("chat.models.compatibleAvailable", { count: openaiCompatibleModels.length })
+                      : appText("chat.models.not_running")
+                    : appText("chat.models.modelCount", { count: group.models.length })}
               </span>
             </div>
             {group.models.map(renderModelRow)}
@@ -376,15 +376,15 @@ export function ModelPickerList({
             {groups.length > 0 ? <div className="my-1 border-t border-border/60" /> : null}
             <div className="flex items-center gap-1.5 px-3 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <HardDriveIcon className="size-3" aria-hidden />
-              <span>Local (Ollama)</span>
+              <span>{appText("chat.models.local_ollama")}</span>
               <span className="ml-auto text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">
-                {ollamaAvailable ? "0 available" : "not running"}
+                {ollamaAvailable ? appText("chat.models.0_available") : appText("chat.models.not_running")}
               </span>
             </div>
             <div className="px-3 py-2 text-[11px] leading-relaxed text-muted-foreground/80">
               {ollamaAvailable ? (
                 <>
-                  Ollama is running but no models are pulled. Run{" "}
+                  {appText("chat.models.ollama_is_running_but_no_models_are")}{" "}
                   <code className="rounded bg-muted px-1 py-0.5 text-[10px]">
                     ollama pull qwen3.6
                   </code>
@@ -392,9 +392,7 @@ export function ModelPickerList({
                 </>
               ) : (
                 <>
-                  Start Ollama to use local models, then pull a model and reopen
-                  this menu.
-                </>
+                  {appText("chat.models.start_ollama_to_use_local_models_then")}</>
               )}
             </div>
           </div>
@@ -410,25 +408,18 @@ export function ModelPickerList({
             {groups.length > 0 ? <div className="my-1 border-t border-border/60" /> : null}
             <div className="flex items-center gap-1.5 px-3 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <HardDriveIcon className="size-3" aria-hidden />
-              <span>Local (OpenAI-compatible)</span>
+              <span>{appText("chat.models.local_openai_compatible")}</span>
               <span className="ml-auto text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">
-                {openaiCompatibleAvailable ? "0 available" : "not running"}
+                {openaiCompatibleAvailable ? appText("chat.models.0_available") : appText("chat.models.not_running")}
               </span>
             </div>
             <div className="px-3 py-2 text-[11px] leading-relaxed text-muted-foreground/80">
               {openaiCompatibleAvailable ? (
                 <>
-                  The server is up but serving no models. Load one and reopen
-                  this menu.
-                </>
+                  {appText("chat.models.the_server_is_up_but_serving_no")}</>
               ) : (
                 <>
-                  No server answered at{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-[10px]">
-                    OPENAI_COMPATIBLE_BASE_URL
-                  </code>
-                  (Settings → Providers → Local model servers). Start LM Studio,
-                  vLLM, or another OpenAI-compatible server and reopen this menu.
+                  {appText("chat.models.serverHelp")}
                 </>
               )}
             </div>
@@ -437,7 +428,7 @@ export function ModelPickerList({
 
         {totalCount === 0 && (
           <div className="px-3 py-6 text-center text-[11px] text-muted-foreground">
-            No models match &ldquo;{search}&rdquo;.
+            {appText("chat.models.noMatch", { query: search })}
           </div>
         )}
       </div>
@@ -463,8 +454,7 @@ export function ModelPickerList({
             openSettings({ tab: "providers" });
           }}
         >
-          Manage providers
-        </button>
+          {appText("chat.models.manage_providers")}</button>
       </div>
     </div>
   );
@@ -506,10 +496,10 @@ export function ModelSelector({
           tabIndex={0}
           aria-label={
             selectedAvailability === "checking"
-              ? `Select model, checking ${selected.label} provider`
+              ? appText("chat.models.selectChecking", { model: selected.label })
               : selectedAvailable
-              ? `Select model, current ${selected.label}`
-              : `Select model, current ${selected.label} is disconnected`
+              ? appText("chat.models.selectCurrent", { model: selected.label })
+              : appText("chat.models.selectDisconnected", { model: selected.label })
           }
         >
           <BrainCircuitIcon className="size-3 shrink-0 text-muted-foreground" />
@@ -524,7 +514,7 @@ export function ModelSelector({
                   : "text-destructive",
               )}
             >
-              {selectedAvailability === "checking" ? "checking…" : "disconnected"}
+              {selectedAvailability === "checking" ? appText("chat.models.checking") : appText("chat.models.disconnected")}
             </span>
           ) : null}
           <ChevronDownIcon
@@ -540,12 +530,12 @@ export function ModelSelector({
         side="top"
         align="start"
         sideOffset={8}
-        className="w-96 p-0 overflow-hidden rounded-xl shadow-xl"
+        className="w-96 max-w-[calc(100vw-2rem)] p-0 overflow-hidden rounded-xl shadow-xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         {selectedAvailability === "unavailable" ? (
           <div className="flex items-center gap-2 border-b bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
-            <span className="min-w-0 flex-1">{selected.label}&apos;s provider is not connected.</span>
+            <span className="min-w-0 flex-1">{appText("chat.models.providerDisconnected", { model: selected.label })}</span>
             <button
               type="button"
               className="shrink-0 font-medium underline-offset-2 hover:underline"
@@ -554,8 +544,7 @@ export function ModelSelector({
                 openSettings({ tab: "providers" });
               }}
             >
-              Connect…
-            </button>
+              {appText("chat.models.connect")}</button>
           </div>
         ) : null}
         <ModelPickerList

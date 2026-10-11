@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 /**
  * "New project" dialog shared by the project switcher and the Projects view.
  * Editing an existing project happens in Settings → Project instead.
@@ -20,6 +20,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import type { Project } from "@/lib/projects";
 import { useProjects } from "@/lib/use-projects";
+
+const appText = geoText("app");
 
 interface FormState {
   name: string;
@@ -62,7 +64,7 @@ export function ProjectCreateDialog({
     setError(null);
     const name = form.name.trim();
     if (!name) {
-      setError("Name is required");
+      setError(appText("projects.create.name_is_required"));
       return;
     }
     const trimmedLimit = form.spendLimit.trim();
@@ -70,7 +72,7 @@ export function ProjectCreateDialog({
     if (trimmedLimit !== "") {
       const parsed = Number(trimmedLimit);
       if (!Number.isFinite(parsed) || parsed < 0) {
-        setError("Spend limit must be a non-negative number (or empty)");
+        setError(appText("projects.create.spend_limit_must_be_a_non_negative"));
         return;
       }
       spendLimitUsd = parsed;
@@ -89,7 +91,7 @@ export function ProjectCreateDialog({
       onOpenChange(false);
       onCreated(project);
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Create failed");
+      setError(exc instanceof Error ? exc.message : appText("projects.create.create_failed"));
     } finally {
       setSubmitting(false);
     }
@@ -99,11 +101,9 @@ export function ProjectCreateDialog({
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>New project</DialogTitle>
+          <DialogTitle>{appText("projects.create.new_project")}</DialogTitle>
           <DialogDescription>
-            Each project has its own sandbox, chat history and settings. You can change everything
-            later in Settings → Project.
-          </DialogDescription>
+            {appText("projects.create.each_project_has_its_own_sandbox_chat")}</DialogDescription>
         </DialogHeader>
         <form
           className="flex flex-col gap-3"
@@ -113,34 +113,32 @@ export function ProjectCreateDialog({
           }}
         >
           <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-            Name
-            <Input
+            {appText("projects.create.name")}<Input
               autoFocus
               aria-invalid={Boolean(error && !form.name.trim())}
               value={form.name}
               onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-              placeholder="RNA-seq pilot"
+              placeholder={appText("projects.create.rna_seq_pilot")}
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-            Description
-            <Textarea
+            {appText("projects.create.description")}<Textarea
               rows={3}
               value={form.description}
               onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-              placeholder="Optional one-line summary."
+              placeholder={appText("projects.create.optional_one_line_summary")}
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-            Tags <span className="opacity-60">(comma separated)</span>
+            {appText("projects.create.tags")}<span className="opacity-60">{appText("projects.create.comma_separated")}</span>
             <Input
               value={form.tags}
               onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))}
-              placeholder="genomics, proteomics"
+              placeholder={appText("projects.create.genomics_proteomics")}
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-            Spend limit <span className="opacity-60">(USD, optional)</span>
+            {appText("projects.create.spend_limit")}<span className="opacity-60">{appText("projects.create.usd_optional")}</span>
             <Input
               type="number"
               inputMode="decimal"
@@ -148,7 +146,7 @@ export function ProjectCreateDialog({
               step="0.01"
               value={form.spendLimit}
               onChange={(event) => setForm((current) => ({ ...current, spendLimit: event.target.value }))}
-              placeholder="Leave empty for no limit"
+              placeholder={appText("projects.create.leave_empty_for_no_limit")}
             />
           </label>
           {error && (
@@ -158,11 +156,10 @@ export function ProjectCreateDialog({
           )}
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={close} disabled={submitting}>
-              Cancel
-            </Button>
+              {appText("projects.create.cancel")}</Button>
             <Button type="submit" disabled={submitting}>
               {submitting && <Spinner data-icon="inline-start" />}
-              {submitting ? "Creating…" : "Create project"}
+              {submitting ? appText("projects.create.creating") : appText("projects.create.create_project")}
             </Button>
           </DialogFooter>
         </form>

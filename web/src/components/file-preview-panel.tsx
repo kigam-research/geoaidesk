@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { TableInspectionOption } from "@/geo/viewers/tables/table-option";
 import { GeoFileActions } from "@/geo/workspace/file-actions";
 import { CsvViewer } from "./csv-viewer";
@@ -59,7 +59,9 @@ import {
   useState,
 } from "react";
 
-const codeLoading = () => <div className="p-4 text-xs text-muted-foreground" role="status">Loading editor…</div>;
+const appText = geoText("app");
+
+const codeLoading = () => <div className="p-4 text-xs text-muted-foreground" role="status">{appText("preview.loading_editor")}</div>;
 const ReadOnlyCodeView = dynamic(() => import("./code-views").then((m) => m.ReadOnlyCodeView), { ssr: false, loading: codeLoading });
 const TextEditor = dynamic(() => import("./code-views").then((m) => m.TextEditor), { ssr: false, loading: codeLoading });
 
@@ -69,8 +71,7 @@ const LatexEditor = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-        Loading LaTeX editor…
-      </div>
+        {appText("preview.loading_latex_editor")}</div>
     ),
   },
 );
@@ -184,7 +185,7 @@ function TabBar({
         type="button"
         data-active={showNotebook}
         onClick={onSelectNotebook}
-        title="Lab Notebook"
+        title={appText("preview.lab_notebook")}
         className={cn(
           "group relative flex shrink-0 cursor-pointer select-none",
           "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
@@ -194,7 +195,7 @@ function TabBar({
         )}
       >
         <BookOpenIcon className="size-3.5 shrink-0 text-orange-500" />
-        <span className="whitespace-nowrap font-medium">Lab Notebook</span>
+        <span className="whitespace-nowrap font-medium">{appText("preview.lab_notebook")}</span>
       </button>
 
       {/* Pinned Compute tab — project job history, never closable */}
@@ -202,7 +203,7 @@ function TabBar({
         type="button"
         data-active={showCompute}
         onClick={onSelectCompute}
-        title="Modal Compute"
+        title={appText("preview.modal_compute")}
         className={cn(
           "group relative flex shrink-0 select-none",
           "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
@@ -212,7 +213,7 @@ function TabBar({
         )}
       >
         <ServerCogIcon className="size-3.5 shrink-0 text-violet-500" />
-        <span className="whitespace-nowrap font-medium">Compute</span>
+        <span className="whitespace-nowrap font-medium">{appText("preview.compute")}</span>
       </button>
 
       {/* Pinned Automation tab — schedules + missions, never closable */}
@@ -221,7 +222,7 @@ function TabBar({
           type="button"
           data-active={showAutomation}
           onClick={onSelectAutomation}
-          title="Schedules and missions"
+          title={appText("preview.schedules_and_missions")}
           className={cn(
             "group relative flex shrink-0 select-none",
             "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
@@ -231,7 +232,7 @@ function TabBar({
           )}
         >
           <AlarmClockIcon className="size-3.5 shrink-0 text-emerald-500" />
-          <span className="whitespace-nowrap font-medium">Automation</span>
+          <span className="whitespace-nowrap font-medium">{appText("preview.automation")}</span>
         </button>
       )}
 
@@ -281,7 +282,7 @@ function TabBar({
 
             {/* Unsaved / annotating indicator */}
             {isEditing && (
-              <div className="size-1.5 shrink-0 rounded-full bg-amber-500" title="In edit mode" />
+              <div className="size-1.5 shrink-0 rounded-full bg-amber-500" title={appText("preview.in_edit_mode")} />
             )}
 
             {/* Close button */}
@@ -292,7 +293,7 @@ function TabBar({
                 "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-muted-foreground/20",
                 isActive && "opacity-40"
               )}
-              title="Close tab"
+              title={appText("preview.close_tab")}
             >
               <XIcon className="size-3" />
             </button>
@@ -342,7 +343,7 @@ function FileLoadError({
         <AlertCircleIcon className="size-5 text-amber-600" />
       </div>
       <div className="space-y-1">
-        <p className="text-sm font-medium">Could not load file</p>
+        <p className="text-sm font-medium">{appText("preview.could_not_load_file")}</p>
         <p className="max-w-md text-xs text-muted-foreground">{message}</p>
       </div>
       {onRetry && (
@@ -351,8 +352,7 @@ function FileLoadError({
           className="mt-1 inline-flex items-center gap-1.5 rounded-md border bg-background px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           <RefreshCcwIcon className="size-3.5" />
-          Retry
-        </button>
+          {appText("preview.retry")}</button>
       )}
     </div>
   );
@@ -1218,18 +1218,16 @@ function ImageAnnotator({
             className="flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
             title="Clear all annotations"
           >
-            <Trash2Icon className="size-3" /> Clear
-          </button>
+            <Trash2Icon className="size-3" /> {appText("preview.clear")}</button>
           <button onClick={onDiscard}
             className="rounded px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Cancel
-          </button>
+            {appText("preview.cancel")}</button>
           <button onClick={handleSave} disabled={strokeCount === 0 || saving}
             className="flex items-center gap-1.5 rounded bg-red-500 px-2.5 py-1 text-xs text-white transition-opacity disabled:opacity-40"
           >
             {saved ? <CheckIcon className="size-3" /> : null}
-            {saving ? "Saving…" : saved ? "Saved!" : "Save"}
+            {saving ? appText("preview.saving") : saved ? "Saved!" : appText("preview.save")}
           </button>
         </div>
       </div>
@@ -1248,8 +1246,7 @@ function ImageAnnotator({
         {!loaded && !loadError && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="size-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-            Loading…
-          </div>
+            {appText("preview.loading")}</div>
         )}
         <canvas
           ref={canvasRef}
@@ -1542,7 +1539,7 @@ function AnnDataViewer({ path, projectId }: { path: string; projectId: string })
   }
 
   if (error || !summary) {
-    return <FileLoadError message={error ?? "Unknown error"} onRetry={fetchSummary} />;
+    return <FileLoadError message={error ?? appText("preview.unknown_error")} onRetry={fetchSummary} />;
   }
 
   const obsColumnNames = summary.obs_columns.map((c) => c.name);
@@ -1802,7 +1799,7 @@ export function FilePreviewPanel({
     else dirtyPaths.current.delete(path);
   }, []);
   const confirmDiscard = useCallback((path: string) =>
-    !dirtyPaths.current.has(path) || window.confirm(`Discard unsaved changes to ${path.split("/").pop()}?`), []);
+    !dirtyPaths.current.has(path) || window.confirm(appText("preview.confirm.discard", { name: path.split("/").pop() ?? path })), []);
   const closeTab = useCallback((path: string) => {
     if (!confirmDiscard(path)) return;
     dirtyPaths.current.delete(path);
@@ -1857,33 +1854,30 @@ export function FilePreviewPanel({
               ? "bg-muted text-foreground"
               : "text-muted-foreground hover:bg-muted hover:text-foreground",
           )}
-          title="Where this file came from"
+          title={appText("preview.where_this_file_came_from")}
         >
-          <GitBranchIcon className="size-3" /> Provenance
-        </button>
+          <GitBranchIcon className="size-3" /> {appText("preview.provenance")}</button>
       )}
       {canEdit && mode === "view" && (
         <button
           onClick={() => setMode(selectedPath, "edit")}
           className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          title="Edit file"
+          title={appText("preview.edit_file")}
         >
-          <PencilIcon className="size-3" /> Edit
-        </button>
+          <PencilIcon className="size-3" /> {appText("preview.edit")}</button>
       )}
       {canAnnotate && mode === "view" && (
         <button
           onClick={() => setMode(selectedPath, "annotate")}
           className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          title="Annotate with red marker"
+          title={appText("preview.annotate_with_red_marker")}
         >
-          <BrushIcon className="size-3" /> Annotate
-        </button>
+          <BrushIcon className="size-3" /> {appText("preview.annotate")}</button>
       )}
       <button
         onClick={() => onDownload(selectedPath)}
         className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        title="Download"
+        title={appText("preview.download")}
       >
         <DownloadIcon className="size-3.5" />
       </button>
@@ -1978,8 +1972,8 @@ export function FilePreviewPanel({
             <FilesIcon className="size-6 text-muted-foreground/30" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">No file selected</p>
-            <p className="text-xs text-muted-foreground/60">Click a file in the sidebar to open it</p>
+            <p className="text-sm font-medium text-muted-foreground">{appText("preview.no_file_selected")}</p>
+            <p className="text-xs text-muted-foreground/60">{appText("preview.click_a_file_in_the_sidebar_to")}</p>
           </div>
         </div>
       )}

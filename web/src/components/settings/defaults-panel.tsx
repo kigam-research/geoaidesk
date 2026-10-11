@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ComputeSelector } from "@/components/compute-selector";
@@ -34,6 +34,8 @@ import { useModalCatalog } from "@/lib/use-modal-jobs";
 import { useModels } from "@/lib/use-models";
 import { ModelField } from "./model-field";
 import { SettingsCard, SettingsError, SettingsHeader, SettingsNotice } from "./primitives";
+
+const appText = geoText("app");
 
 interface Draft {
   model: string;
@@ -86,7 +88,7 @@ export function DefaultsPanel() {
         if (!cancelled) setImageModels(listing);
       })
       .catch((cause) => {
-        if (!cancelled) setImageModelsError(cause instanceof Error ? cause.message : "Failed to load image models");
+        if (!cancelled) setImageModelsError(cause instanceof Error ? cause.message : appText("settings.defaults.failed_to_load_image_models"));
       });
     return () => {
       cancelled = true;
@@ -101,7 +103,7 @@ export function DefaultsPanel() {
         setSaved(value);
       })
       .catch((cause) => {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Failed to load defaults");
+        if (!cancelled) setError(cause instanceof Error ? cause.message : appText("settings.defaults.failed_to_load_defaults"));
       });
     return () => {
       cancelled = true;
@@ -132,9 +134,9 @@ export function DefaultsPanel() {
       });
       setSaved(next);
       setDraft(draftFrom(next, instances));
-      setNotice("Saved. A project's next first chat starts with these; the image and verifier models apply right away.");
+      setNotice(appText("settings.defaults.saved_a_project_s_next_first_chat"));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Save failed");
+      setError(cause instanceof Error ? cause.message : appText("settings.defaults.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -143,14 +145,11 @@ export function DefaultsPanel() {
   return (
     <div className="flex flex-col gap-4">
       <SettingsHeader
-        title="Defaults for new chats"
+        title={appText("settings.defaults.defaults_for_new_chats")}
         description={
           <>
-            What a project&apos;s first chat tab starts with. A new tab opened next to an existing
-            one copies that tab&apos;s choices instead, and runs Kady starts on its own (schedules,
-            system turns) reuse the project&apos;s latest chat model, falling back to this default.
-            Specialists have their own default under{" "}
-            <SettingsLink tab="specialists">Specialists</SettingsLink>.
+            {appText("settings.defaults.intro")}
+            <SettingsLink tab="specialists">{appText("settings.defaults.specialists")}</SettingsLink>.
           </>
         }
       />
@@ -160,29 +159,25 @@ export function DefaultsPanel() {
 
       {!draft ? (
         <p className="text-xs text-muted-foreground" role="status">
-          Loading…
-        </p>
+          {appText("settings.defaults.loading")}</p>
       ) : (
-        <SettingsCard title="New chat">
+        <SettingsCard title={appText("settings.defaults.new_chat")}>
           <div className="grid gap-4">
             <div className="grid gap-1.5">
               <label htmlFor="default-model" className="text-xs font-medium">
-                Model
-              </label>
+                {appText("settings.defaults.model")}</label>
               <ModelField
                 id="default-model"
-                label="Default model"
+                label={appText("settings.defaults.default_model")}
                 value={draft.model}
-                emptyLabel={`Not set — Kady's default (${DEFAULT_MODEL.label} unless DEFAULT_MODEL_* is set in .env)`}
+                emptyLabel={appText("settings.defaults.modelFallback", { model: DEFAULT_MODEL.label })}
                 onChange={(model) => setDraft({ ...draft, model })}
               />
               <p className="text-[11px] text-muted-foreground">
-                Pick a model you have access to — a disconnected default makes every new project
-                start on a model that cannot run.
-              </p>
+                {appText("settings.defaults.pick_a_model_you_have_access_to")}</p>
             </div>
             <div className="grid gap-1.5">
-              <span className="text-xs font-medium">Thinking level</span>
+              <span className="text-xs font-medium">{appText("settings.defaults.thinking_level")}</span>
               <div className="flex">
                 <ThinkingSelector
                   selected={draft.thinkingLevel}
@@ -191,7 +186,7 @@ export function DefaultsPanel() {
               </div>
             </div>
             <div className="grid gap-1.5">
-              <span className="text-xs font-medium">Compute</span>
+              <span className="text-xs font-medium">{appText("settings.defaults.compute")}</span>
               <div className="flex">
                 <ComputeSelector
                   selected={draft.compute}
@@ -203,11 +198,7 @@ export function DefaultsPanel() {
                 />
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Remote targets need Modal connected under{" "}
-                <SettingsLink tab="services" section="modal">
-                  Services
-                </SettingsLink>
-                ; runs fall back to the local sandbox otherwise.
+                {appText("settings.defaults.remoteHelp")} <SettingsLink tab="services" section="modal">{appText("settings.defaults.services")}</SettingsLink>
               </p>
             </div>
           </div>
@@ -215,7 +206,7 @@ export function DefaultsPanel() {
       )}
 
       {draft && (
-        <SettingsCard title="Image generation">
+        <SettingsCard title={appText("settings.defaults.image_generation")}>
           <ImageModelField
             value={draft.imageModel}
             listing={imageModels}
@@ -226,7 +217,7 @@ export function DefaultsPanel() {
       )}
 
       {draft && (
-        <SettingsCard title="Verification">
+        <SettingsCard title={appText("settings.defaults.verification")}>
           <VerifierModelField
             value={draft.verifierModel}
             onChange={(verifierModel) => setDraft({ ...draft, verifierModel })}
@@ -244,10 +235,9 @@ export function DefaultsPanel() {
             disabled={!dirty || saving}
             onClick={() => baseline && setDraft(baseline)}
           >
-            Discard
-          </Button>
+            {appText("settings.defaults.discard")}</Button>
           <Button type="button" size="sm" className="text-xs" disabled={!dirty || saving} onClick={() => void save()}>
-            {saving ? "Saving…" : "Save defaults"}
+            {saving ? appText("settings.defaults.saving") : appText("settings.defaults.save_defaults")}
           </Button>
         </div>
       )}
@@ -263,30 +253,25 @@ function VerifierModelField({ value, onChange }: { value: string; onChange: (val
   return (
     <div className="grid gap-1.5">
       <label htmlFor="default-verifier-model" className="text-xs font-medium">
-        Verifier model
-      </label>
+        {appText("settings.defaults.verifier_model")}</label>
       <ModelField
         id="default-verifier-model"
-        label="Verifier model"
+        label={appText("settings.defaults.verifier_model")}
         value={value}
-        emptyLabel="Not set — verifiers run on the same model as other specialists"
+        emptyLabel={appText("settings.defaults.not_set_verifiers_run_on_the_same")}
         onChange={onChange}
       />
       {disconnected ? (
         <p className="text-[11px] text-amber-600 dark:text-amber-400">
-          This model&apos;s provider is not connected, so verifiers keep their usual model until you connect it under{" "}
-          <SettingsLink tab="providers">Providers</SettingsLink>.
+          {appText("settings.defaults.verifierDisconnected")} <SettingsLink tab="providers">{appText("settings.defaults.providers")}</SettingsLink>
         </p>
       ) : (
         <p className="text-[11px] text-muted-foreground">
-          Specialists that check work run on this model, so a result is reviewed by a different model than the one
-          that produced it. A specialist that pins its own model keeps it. Applies to the next delegation, including in
-          open chats; verifier runs count toward the project spend cap like any other.
-        </p>
+          {appText("settings.defaults.specialists_that_check_work_run_on_this")}</p>
       )}
       {agents.length > 0 ? (
         <p className="text-[11px] text-muted-foreground">
-          Applies to: <span className="font-mono">{agents.join(", ")}</span>
+          {appText("settings.defaults.applies_to")}<span className="font-mono">{agents.join(", ")}</span>
         </p>
       ) : null}
     </div>
@@ -318,8 +303,7 @@ function ImageModelField({
       <div className="flex flex-col">
         <span>{model.name}</span>
         <span className="text-[10px] text-muted-foreground">
-          {price(model.cost.input)} in · {price(model.cost.output)} out per M tokens
-          {model.imageInput ? " · edits images" : ""}
+          {appText("settings.defaults.imagePrice", { input: price(model.cost.input), output: price(model.cost.output), editing: model.imageInput ? "yes" : "no" })}
         </span>
       </div>
     </SelectItem>
@@ -327,34 +311,33 @@ function ImageModelField({
   return (
     <div className="grid gap-1.5">
       <label htmlFor="default-image-model" className="text-xs font-medium">
-        Image model
-      </label>
+        {appText("settings.defaults.image_model")}</label>
       <Select
         value={value || BUILT_IN_IMAGE_MODEL}
         onValueChange={(next) => onChange(next === BUILT_IN_IMAGE_MODEL ? "" : next)}
         disabled={!listing}
       >
-        <SelectTrigger id="default-image-model" size="sm" className="h-8 w-full text-xs" aria-label="Default image model">
+        <SelectTrigger id="default-image-model" size="sm" className="h-8 w-full text-xs" aria-label={appText("settings.defaults.default_image_model")}>
           {/* Explicit children: the items carry a price line the trigger must not mirror. */}
           <SelectValue>
-            {value ? (selected?.name ?? value) : `Not set — Kady's default (${builtIn[0] ?? "built-in order"})`}
+            {value ? (selected?.name ?? value) : appText("settings.defaults.imageFallback", { model: builtIn[0] ?? appText("settings.defaults.built_in_order") })}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value={BUILT_IN_IMAGE_MODEL} className="text-xs">
-              Not set — Kady&apos;s default{builtIn.length ? ` (${builtIn.join(", then ")})` : ""}
+              {appText("settings.defaults.imageFallbackOrder", { models: builtIn.length ? builtIn.join(", ") : "none" })}
             </SelectItem>
           </SelectGroup>
           {connected.length > 0 && (
             <SelectGroup>
-              <SelectLabel className="text-[10px]">Connected</SelectLabel>
+              <SelectLabel className="text-[10px]">{appText("settings.defaults.connected")}</SelectLabel>
               {connected.map(row)}
             </SelectGroup>
           )}
           {disconnected.length > 0 && (
             <SelectGroup>
-              <SelectLabel className="text-[10px]">Not connected</SelectLabel>
+              <SelectLabel className="text-[10px]">{appText("settings.defaults.not_connected")}</SelectLabel>
               {disconnected.map(row)}
             </SelectGroup>
           )}
@@ -364,15 +347,11 @@ function ImageModelField({
         <p className="text-[11px] text-destructive">{error}</p>
       ) : value && selected && !selected.available ? (
         <p className="text-[11px] text-amber-600 dark:text-amber-400">
-          This model&apos;s provider is not connected, so Kady uses its built-in default until you connect it under{" "}
-          <SettingsLink tab="providers">Providers</SettingsLink>.
+          {appText("settings.defaults.imageDisconnected")} <SettingsLink tab="providers">{appText("settings.defaults.providers")}</SettingsLink>
         </p>
       ) : (
         <p className="text-[11px] text-muted-foreground">
-          Used when Kady generates figures and schematics, unless you ask for another model in chat. Only models priced
-          per token are listed, so every image counts toward the project spend cap. Applies right away, including to
-          open chats.
-        </p>
+          {appText("settings.defaults.used_when_kady_generates_figures_and_schematics")}</p>
       )}
     </div>
   );
