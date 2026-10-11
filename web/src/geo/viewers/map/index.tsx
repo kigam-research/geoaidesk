@@ -70,6 +70,7 @@ function Workspace(props: ViewerProps) {
           initial = [createLayer("0", inspection)];
         }
         if (ac.signal.aborted) return;
+        setColorFields(Object.fromEntries(initial.filter(l => l.source.variable).map(l => [l.id, l.source.variable!])));
         sequence.current = initial.length; setDisplayTarget(displayCrs(initial[0]) === "native" ? "EPSG:3857" : displayCrs(initial[0])); setLayers(initial); setActiveId(initial[0].id); setReady(true);
       } catch (e) { if (!ac.signal.aborted) { setError(e instanceof Error ? e.message : t("requestError")); setReady(true); } }
     }
@@ -165,7 +166,7 @@ function Workspace(props: ViewerProps) {
         {active.inspection.bands?.length ? <label>{t("band")} <select className={input} value={active.source.band} onChange={e => changeSource({ band: Number(e.target.value) })}>{active.inspection.bands.map(b => <option key={b.index} value={b.index}>{b.index}{b.description ? ` · ${b.description}` : ""}</option>)}</select></label> : null}
         {!isVector(active) && <form className="flex flex-wrap gap-2" key={active.id + active.source.layer} onSubmit={e => { e.preventDefault(); changeSource({ variable: String(new FormData(e.currentTarget).get("variable") ?? "").trim() || undefined }); }}><label>{t("variable")} <input className={input} name="variable" defaultValue={active.source.variable ?? ""} /></label><button className={button}>{t("apply")}</button></form>}
         <label><input type="checkbox" checked={!!active.source.categorical} onChange={e => changeSource({ categorical: e.target.checked })} /> {t("categorical")}</label>
-        {isVector(active) && active.source.categorical && <label>{t("categoryField")} <select className={input} value={colorFields[active.id] ?? ""} onChange={e => setColorFields(current => ({ ...current, [active.id]: e.target.value }))}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</select></label>}
+        {isVector(active) && active.source.categorical && <label>{t("categoryField")} <select className={input} value={colorFields[active.id] ?? ""} onChange={e => { setColorFields(current => ({ ...current, [active.id]: e.target.value })); changeSource({ variable: e.target.value || undefined }); }}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</select></label>}
         <p>{t("sourceCrs")}: {sourceCrs(active).authority ?? sourceCrs(active).name ?? t("unknown")} · {t(sourceCrs(active).status)}</p>
         <p>{t("displayCrs")}: {crs === "native" ? t("native") : crs}</p><p>{t("unit")}: {active.manifest?.unit ?? active.inspection.bands?.find(b => b.index === active.source.band)?.unit ?? sourceCrs(active).axisUnits ?? t("unknown")}</p><p>{t("unchanged")}</p>
         {!hasCrs(sourceCrs(active)) && <p>{t("nativeLimit")}</p>}

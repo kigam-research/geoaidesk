@@ -102,11 +102,12 @@ describe("map viewer", () => {
   it("preserves ordinary TIFF fallback and initializes artifact layers/analysis paths", async () => {
     mockFetch.mockImplementation(() => respond({ ...inspection(), asset: { ...inspection().asset, format: "tiff", family: "raster" } }));
     const first = render(<MapViewer {...props} path="photo.tiff" />); await screen.findByText("imaging-fallback"); first.unmount();
-    const artifact: MapManifestResponse = { manifest: { schemaVersion: "geo-result/v1", kind: "map-layer", title: "Result", layers: ["one.gpkg", "two.gpkg"].map(path => ({ path, sourceCrs: "EPSG:5186", displayCrs: "EPSG:3857", unit: "m", legend: [], nodata: null, extent: [0, 0, 20, 20] })), analysis: { method: "full-layer", tablePath: "results/area.csv", scriptPath: "scripts/area.py" }, limitations: ["fixture limitation"] }, inspections: [inspection("one.gpkg"), inspection("two.gpkg")] };
+    const artifact: MapManifestResponse = { manifest: { schemaVersion: "geo-result/v1", kind: "map-layer", title: "Result", layers: ["one.gpkg", "two.gpkg"].map(path => ({ path, variable: "class", sourceCrs: "EPSG:5186", displayCrs: "EPSG:3857", unit: "m", legend: [], nodata: null, extent: [0, 0, 20, 20] })), analysis: { method: "full-layer", tablePath: "results/area.csv", scriptPath: "scripts/area.py" }, limitations: ["fixture limitation"] }, inspections: [inspection("one.gpkg"), inspection("two.gpkg")] };
     mockFetch.mockImplementation(url => url === "/geo/result" ? respond(artifact) : respond(page()));
     render(<MapViewer {...props} path="result.geomap.json" />);
     await screen.findByRole("heading", { name: "Result" });
     expect(screen.getByRole("button", { name: "Select layer: two.gpkg" })).toBeInTheDocument(); expect(screen.getByText("Full analysis table: results/area.csv")).toBeInTheDocument(); expect(screen.getByText("Analysis script: scripts/area.py")).toBeInTheDocument();
+    expect(screen.getByLabelText("Categorical colors")).toBeChecked(); expect(screen.getByLabelText("Color class field")).toHaveValue("class");
     expect(geoFileCategory("RESULT.GEOMAP.JSON")).toBe("geo-map"); expect(geoFileCategory("other.json")).toBeNull();
     expect(within(screen.getByRole("region", { name: "Layers" })).getAllByRole("slider")).toHaveLength(2);
     await waitFor(() => expect(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page")).toHaveLength(2));

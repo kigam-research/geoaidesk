@@ -21,7 +21,7 @@ export function hasCrs(crs: GeoCrs): boolean {
 export function isVector(layer: LayerState): boolean { return layer.inspection.asset.family === "vector"; }
 export function createLayer(id: string, inspection: GeoInspection, source?: MapSource, manifest?: LayerState["manifest"]): LayerState {
   // Manifest presentation/analysis fields must never leak into the transport source.
-  return { id, inspection, manifest, source: { path: source?.path ?? inspection.asset.path, layer: source?.layer ?? inspection.layers?.[0]?.name, band: source?.band ?? inspection.bands?.[0]?.index ?? 1, variable: source?.variable, categorical: source?.categorical }, visible: true, opacity: 1, offset: 0 };
+  return { id, inspection, manifest, source: { path: source?.path ?? inspection.asset.path, layer: source?.layer ?? inspection.layers?.[0]?.name, band: source?.band ?? inspection.bands?.[0]?.index ?? 1, variable: source?.variable, categorical: source?.categorical ?? (inspection.asset.family === "vector" && !!source?.variable) }, visible: true, opacity: 1, offset: 0 };
 }
 /** No shared placement for undeclared coordinates, even across two unknown files. */
 export function canOverlay(existing: LayerState[], candidate: LayerState): boolean {
