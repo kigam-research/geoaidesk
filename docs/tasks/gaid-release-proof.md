@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:06:58Z
+updated: 2026-10-11T11:15:12Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -91,6 +91,12 @@ Verified facts from the hub (2026-10-11):
   1634 passed / 11 skipped (2 mzML by the network probe), web 951 passed, geo node tests 36 passed, copy 0 errors
   (1 existing warning), environments smoke + production smoke PASS (catalogue 0.2.1, 13 skills). Job 1 disposed as
   superseded by job 2.
+- Windows at 579aa2d (map helper reads its request as UTF-8 bytes): install-5 PASSED all 30 steps (first start 323.7 s,
+  restart 13.2 s); update-5 from 882cd56 failed at base start (the base predates the non-ASCII fix) → update-6 rerun with
+  an ASCII data home. Records copied to ~/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/<run>/record.json
+  (install-5 sha256 f6438229…e419; failed install-2/3/4, update-2/5 kept).
+- Linux install proof job 3 at f75e2fc PASSED all 30 steps (record ~/data/geoaidesk/runs/
+  gaid-release-proof-20261011T111254.525490Z/out/record.json, sha256 53aa58e4…b509).
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -152,6 +158,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z/receipt.json
   - disposition: {"evidence":[],"reason":"Web card test still expected the old local-model copy; test updated, rerun passed","recorded":"2026-10-11T11:06:54Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
