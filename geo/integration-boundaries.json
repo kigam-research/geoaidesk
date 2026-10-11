@@ -47,9 +47,9 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "owner": "gaid-fork-base",
+      "owner": "gaid-release-proof",
       "status": "replaced",
-      "responsibility": "GAID tag-driven draft release (geo-v<version>) instead of upstream's push-to-main v<server version> release",
+      "responsibility": "GAID tag-driven draft release (geo-v<version>) instead of upstream's push-to-main v<server version> release (gaid-fork-base); uv set up for the geo checks that need the helper venv (gaid-release-proof)",
       "next": "gaid-release-proof"
     },
     {

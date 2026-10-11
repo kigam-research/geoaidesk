@@ -44,8 +44,10 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
-      - name: Geo checks
-        run: node --test "geo/tests/*.test.mjs"
+      # Launcher-level checks only: the map and LAS helper tests need uv and the
+      # helper venv, which the geo job above provides on Linux.
+      - name: Launcher checks
+        run: node --test geo/tests/start.test.mjs geo/tests/distribution.test.mjs geo/tests/win-fs-shim.test.mjs geo/tests/compatibility.test.mjs
       - name: Run start-gaid.sh --check
         if: runner.os != 'Windows'
         run: ./start-gaid.sh --check

@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 22
 
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.21'
+
       - name: Check the tag against geo/distribution.json
         run: node geo/release-manifest.mjs --verify-tag "$GITHUB_REF_NAME"
 
