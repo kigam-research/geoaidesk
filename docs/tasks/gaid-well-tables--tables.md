@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T05:03:12Z
+status: active
+updated: 2026-10-11T05:09:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"8b4d426a-82dc-444e-9347-60354a8ffce4","pid":3988444,"provider":"codex","session":"01a12946-e997-71b3-80cd-cd78dd1a4c97","start":"15987572","token":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
 branch: task/gaid-well-tables--tables
 target: task/gaid-well-tables
@@ -19,6 +19,7 @@ Read parent task doc and skill_hub plan section 3.4 (/home/seongin3/data/geoaide
 ## Current state
 - Delivered the owned read-only table package: CSV/TSV/XLSX parser, explicit role overlay, declarations, two-file key checks, localized UI and sandbox/project-scoped API. No shared glue/dependencies/report edited.
 - Focused verification: `npm --prefix server test -- test/geo-tables.test.ts test/geo-tables-routes.test.ts`: 2 files / 13 tests passed. Backend `npm --prefix server run typecheck` and frontend `cd web && npx tsc --noEmit --incremental false`: passed.
+- Current retry evidence: parent fixes merged at b5b148b, `node --test geo/tests/well.test.mjs` passed. Second whole-repo check stopped on an unrelated existing MCP fixture assertion (`mcp__echo__echo` absent from callable tools), with 1591 backend tests passed / 11 skipped. Exact failing MCP test passed in isolation with no source changes (`npm --prefix server test -- test/mcp.test.ts -t 'connects configured servers through Pi and exposes their tools'`: 1 passed). No assertion weakening or MCP edits. Retry whole check against latest parent; preserve second log at /home/seongin3/data/geoaidesk/work/gaid-well-tables--tables/full-check-current.log.
 - First mandatory `scripts/check` via task finish: backend 147 files / 1592 tests passed (11 skipped), frontend 135 files / 901 tests passed; distribution checks stopped on 2 parent-owned LAS Python assertions at parent revision 76b8384 (wrapped source-row count and missing-depth/gap flags). Parent has already pushed the fixes in 45229f3 and b5b148b; retry task finish to merge them and check the current tree. Full log: /home/seongin3/data/geoaidesk/work/gaid-well-tables--tables/full-check.log. No forbidden file read/edited. The hub-confirmed temporary procedure allows direct checks; task job snapshot is blocked before receipt creation by inherited .env.example.
 - No paid models, browser verification or deployment performed. Parent owns shared entry-point integration and integrated browser verification.
 ## Next steps
@@ -26,6 +27,7 @@ Read parent task doc and skill_hub plan section 3.4 (/home/seongin3/data/geoaide
 Closed 2026-10-11T05:03:12Z: ready; the parent gaid-well-tables integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Second task finish: unrelated MCP callable-tool assertion failed, then passed isolated without code changes; cause not established.
 - First task finish returned a check failure on stale parent LAS code, not the table package. Latest parent commits fix the exact failing assertions; no parent-owned source edits made here.
 - Initial `task job run -- scripts/check` refused dirty source. After reviewed `task save`, launch was still refused: `job snapshot blocked: forbidden path .env.example`. No receipt, running job or source snapshot exists. Do not retry without an environment/policy change; do not edit inherited sensitive paths or bypass task publication.
 ## Notes and decisions
