@@ -5,9 +5,9 @@ id = "gaid-maps-browser-20261011"
 title = "지도와 전체 레이어 면적표의 앱 검증"
 state = "review"
 run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-maps/browser"
-source_sha = "e3d640370cb5"
+source_sha = "d604849596b6"
 inputs = ["synthetic:geo/tests/fixtures/maps_fixture.py"]
-files = [{ path = "map-area.png", sha256 = "d1b67be501aa9fe218628bb0bc14fa2a080797f57931cf606bd2f0b5cdc53798" }, { path = "map-export.png", sha256 = "08c0302e8783afa433c47f0a95398168e7724f7b9a0e2f56a42a2b4ad6c026a3" }, { path = "area.csv", sha256 = "3f70d6557030ae465f168d858b6be69db4c169a52224d0bddf849c80a16b13ab" }]
+files = [{ path = "map-area.png", sha256 = "958980f853f8696baa9a3eccb120d18adf632cd6ae4e6d382e6614e0d4bc6a14" }, { path = "map-export.png", sha256 = "08c0302e8783afa433c47f0a95398168e7724f7b9a0e2f56a42a2b4ad6c026a3" }, { path = "area.csv", sha256 = "3f70d6557030ae465f168d858b6be69db4c169a52224d0bddf849c80a16b13ab" }]
 report = "reports/2026-10-11-gaid-maps/index.md"
 replicas = []
 

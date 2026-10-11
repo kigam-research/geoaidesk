@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:10:22Z
+updated: 2026-10-11T06:10:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -105,3 +105,6 @@ Report: reports/2026-10-11-gaid-maps/index.md
 - Published parent includes helper and fixture (git cat-file against origin/task/gaid-maps); route f3b3631f1273 updated completed for the viewer dependency only, not whole WP05. No queued routes.
 
 - Browser artifact/viewport follow-up passed: .geomap.json restores class styling and area-table reference; actual zoom POST has bbox and limit500. Test app stopped. Exported PNGs visually inspected and CSV rows read (A/B=10000 m² each, 50%).
+
+- Final browser map/area/CSV/PNG walkthrough rerun successfully after separating coordinate units from unknown value units (code d604849596b6); report figures/hash registry refreshed. Both test app processes stopped.
+- task sync received final WP04 main changes; retained both map/well AGENTS entries, both integration boundaries and both result registry entries. No judgment-dependent conflict.

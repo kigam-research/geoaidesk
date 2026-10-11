@@ -100,6 +100,6 @@ supersedes:
 | 전체 검사 | `scripts/check` — 결과 기록 대기 |
 | 결과 해시 | `results/registry.toml` |
 
-작성 시점: 2026-10-11. 검토 대상 코드 기준: `e3d640370cb5`.
+작성 시점: 2026-10-11. 검토 대상 코드 기준: `d604849596b6`.
 
 </details>
