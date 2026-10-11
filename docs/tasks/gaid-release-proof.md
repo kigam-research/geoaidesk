@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:00:45Z
+updated: 2026-10-11T11:06:58Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -87,6 +87,10 @@ Verified facts from the hub (2026-10-11):
 - scripts/check job 1 (tree 41b789e; receipt ~/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z) exit 1:
   backend 153 files passed (2 known mzML tests skipped by the network probe), web 1 failed — card.test.tsx still
   looked for the old local-model copy "CPU 오프로딩 약 18%"; test updated to the new string. Rerun pending.
+- scripts/check job 2 (tree a82ca8c; ~/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z) exit 0: backend
+  1634 passed / 11 skipped (2 mzML by the network probe), web 951 passed, geo node tests 36 passed, copy 0 errors
+  (1 existing warning), environments smoke + production smoke PASS (catalogue 0.2.1, 13 skills). Job 1 disposed as
+  superseded by job 2.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -146,6 +150,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Web card test still expected the old local-model copy; test updated, rerun passed","recorded":"2026-10-11T11:06:54Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
