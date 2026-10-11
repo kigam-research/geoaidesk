@@ -20,12 +20,14 @@ try:
     import pyogrio
     from pyogrio import raw
     from pyproj import CRS, Transformer
+    from pyproj.exceptions import ProjError
     import rasterio
     from rasterio.enums import ColorInterp, Resampling
     from rasterio.transform import from_bounds
     from rasterio.vrt import WarpedVRT
     from rasterio.windows import Window
     import shapely
+    from shapely.errors import GEOSException
     from shapely.geometry import mapping, MultiPolygon
     from shapely.geometry.polygon import orient
     from shapely.ops import transform as transform_geometry
@@ -530,7 +532,8 @@ if __name__ == '__main__':
     except FileNotFoundError as exc:
         print(str(exc)[:400], file=sys.stderr)
         sys.exit(4)
-    except (ValueError, KeyError, TypeError, rasterio.errors.RasterioError, pyogrio.errors.DataSourceError, pyogrio.errors.DataLayerError) as exc:
+    except (ValueError, KeyError, TypeError, ProjError, GEOSException, sqlite3.DatabaseError,
+            rasterio.errors.RasterioError, pyogrio.errors.DataSourceError, pyogrio.errors.DataLayerError) as exc:
         print('Invalid map request/source: ' + str(exc)[:400], file=sys.stderr)
         sys.exit(5)
     except Exception as exc:

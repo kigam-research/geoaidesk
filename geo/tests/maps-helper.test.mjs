@@ -166,6 +166,9 @@ test('normal request/source errors have concise stderr and defined exit codes', 
   request('classes.tif', 'nonsense', {}, 5);
   request('classes.tif', 'raster', {width: 0}, 5);
   request('classes.tif', 'raster', {band: 2}, 5);
+  request('classes.tif', 'raster', {displayCrs: 'not-a-crs'}, 5);
+  request('points.geojson', 'vector', {displayCrs: 'not-a-crs'}, 5);
+  request('rectangle.gpkg', 'area', {classField: 'class', method: 'projected', areaCrs: 'not-a-crs'}, 5);
   request('classes.tif', 'raster', {bbox: [0, 0, 0, 1]}, 5);
   request('classes.tif', 'raster', {bbox: [1000, 1000, 2000, 2000], displayCrs: 'EPSG:32631'}, 5);
 });
