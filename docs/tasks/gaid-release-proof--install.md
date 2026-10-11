@@ -1,7 +1,7 @@
 ---
 format: 1
-status: waiting
-updated: 2026-10-11T08:15:45Z
+status: active
+updated: 2026-10-11T08:16:41Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
