@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T03:22:58Z
+status: ready
+updated: 2026-10-11T03:23:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -133,7 +133,8 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
   `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
   from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-1. Rerun task finish with VITEST_MAX_WORKERS=4 (declared full checks), then record exact final results.
+<!-- task:closed -->
+Closed 2026-10-11T03:23:00Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory
