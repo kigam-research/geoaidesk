@@ -46,6 +46,7 @@ vector('empty.gpkg', [box(0, 0, 10, 10), None], 'EPSG:32631')
 vector('huge-geometry.gpkg', [Point(0, 0).buffer(100, quad_segs=3000)], 'EPSG:32631')
 vector('paged.gpkg', [Point(i, 0) for i in range(505)], 'EPSG:32631')
 vector('unknown.gpkg', [box(0, 0, 10, 10)], None)
+vector('booleans.gpkg', [box(0, 0, 10, 10), box(10, 0, 20, 10)], 'EPSG:32631', [True, False])
 # Driver metadata is deliberately inconsistent: this is a limit sentinel, not input to area.
 shutil.copyfile(root / 'rectangle.gpkg', root / 'oversized.gpkg')
 with sqlite3.connect(root / 'oversized.gpkg') as db:

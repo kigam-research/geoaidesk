@@ -161,6 +161,14 @@ test('ellipsoidal geodesic area matches fixed WGS84 known answers; holes subtrac
   close(holes.totalArea, 9231614224.814976, 0.1);
   assert.match(result.limitations.join(' '), /WGS 84/);
 });
+test('boolean categories obey legend/area scalar contracts and agree with attributes', () => {
+  const page = request('booleans.gpkg', 'vector', {variable: 'class'});
+  assert.deepEqual(page.features.features.map(f => f.properties.class), ['true', 'false']);
+  assert.deepEqual(new Set(page.legend.map(i => i.value)), new Set(['true', 'false']));
+  const area = request('booleans.gpkg', 'area', {classField: 'class', method: 'projected', areaCrs: 'EPSG:32631'});
+  assert.deepEqual(area.rows.map(row => row.class), ['false', 'true']);
+  assert.equal(area.totalArea, 200);
+});
 test('normal request/source errors have concise stderr and defined exit codes', () => {
   request('absent.tif', 'inspect', {}, 4);
   request('classes.tif', 'nonsense', {}, 5);

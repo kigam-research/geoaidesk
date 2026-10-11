@@ -91,7 +91,11 @@ def integer(req, key, default, low, high, clamp=True):
 def scalar(value, issues=None):
     if isinstance(value, np.generic):
         value = value.item()
-    if value is None or isinstance(value, (bool, int)):
+    if isinstance(value, bool):
+        # MapLegendItem.value and area classes accept string/number/null,
+        # not booleans. Keep the same representation in attributes and legends.
+        return 'true' if value else 'false'
+    if value is None or isinstance(value, int):
         return value
     if isinstance(value, float):
         return value if math.isfinite(value) else None

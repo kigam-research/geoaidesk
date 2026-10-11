@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T05:09:39Z
+updated: 2026-10-11T05:10:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7e627c39-8f96-4667-b685-4abba81a1202","pid":3990813,"provider":"codex","session":"01a12947-209f-7462-af88-d33c6c6d402a","start":"15989002","token":"2dabed18e5678b6758b2e4cee4be4a86329fcde0a86a4b1c1a9f684785d9f064"}
 branch: task/gaid-maps--helper
 target: task/gaid-maps
@@ -40,6 +40,7 @@ Closed 2026-10-11T04:58:11Z: ready; the parent gaid-maps integrates it. No furth
 - Two supplemental fixture checks exposed fixture construction mistakes, now corrected: GDAL writes explicit affine tags even for an identity transform (plain image fixture now uses tifffile); RGBA needs GTiff `ALPHA=YES` rather than only setting color interpretation. Focused final suite passes.
 - Interrupted the first `task finish` before publication (SIGINT, exit 130) after review identified the invalid-CRS error-code omission. Backend typecheck had passed; the interrupted full check is not completion evidence. Fix is in place; rerun finish without resume as instructed.
 - Second finish completed all declared checks and pushed its ready snapshot, but SIGINT arrived during publication before the completion notice. Remote branch and CLI check-pass receipt verify that snapshot. Preserve the boolean follow-up edits and use the CLI to finish the corrected snapshot; do not discard them.
+- CLI rejected the corrected finish with `terminal snapshot is immutable; resume before editing` because the previous snapshot had in fact published. Resumed the same unit only for this published-state exception; returned worktree is unchanged and all three boolean follow-up file edits were preserved. No user relocation/approval was needed.
 ## Notes and decisions
 - Sequential decisions: contracts are fixed by parent; helper keeps source/display CRS distinct; previews never provide analytical area input.
 - Owned implementation and tests stay in the three assigned files; no child writers/readers or shared-seam edits.
