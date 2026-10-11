@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:47:58Z
+updated: 2026-10-11T04:48:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cd7c561a-0a57-452c-9026-bbf129244c36","pid":3981134,"provider":"codex","session":"01a12945-9f27-71e2-b32a-5bbc545ac45a","start":"15979142","token":"29bed9d06311d3f15e6cd0567d9374e9a4a03a112c2135a1ce904ef6fe2f5004"}
 branch: task/gaid-well-tables
 target: main
@@ -46,9 +46,13 @@ Verified facts from the hub (2026-10-11):
 - LAS first implementation: read-only lasio 2.0 helper (64 MiB / 1M sample caps), bounded series routes, depth viewer and `.depth.json` manifest adapter, focused numerical/API/UI tests. Not yet verified.
 - FORCE fixture exists at assets/force2020-welllogs/c8d01ee9; no model runs authorized or needed.
 ## Next steps
-1. Implement LAS helper, bounded series API, depth viewer and manifest adapter.
-2. Integrate independent table package after LAS slice, run focused and full checks, task sync, report, remove regenerable caches, task finish.
+1. Resolve task job snapshot blocker through hub, then run the saved focused-check command. No receipt was created; this was pre-launch validation, not a stopped job.
+2. Remaining implementation review: browser must invoke /geo/inspect before numerical series; ensure header basis interpretation agrees with shared inspector; review table child integration; test helper and UI. Read current task before resuming; do not repeat an existing launched job.
+3. Integrate independent table package after LAS slice, run focused and full checks, task sync, report, remove regenerable caches, task finish.
 ## Failed approaches
+- 2026-10-11: first task job run (dependency install + focused type/numerical/API/UI checks) failed before receipt creation: "job snapshot blocked: forbidden path .env.example". The inherited path was not read or changed. task/jobs.py validates all ls-tree paths before git archive (even export-ignore cannot resolve it). Do not bypass task CLI with manual long-running jobs. Hub needs to resolve the tool/project compatibility. No tests have run.
+- Focused command after unblock: task job run -- bash -lc 'set -e; npm --prefix server ci --no-audit --no-fund; npm --prefix web ci --no-audit --no-fund; uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed; npm --prefix server run typecheck; cd web; npx tsc --noEmit; npm test -- src/geo/viewers/depth/viewer.test.tsx; cd ../server; npx vitest run test/geo-depth.test.ts; cd ..; node --test geo/tests/well.test.mjs'
+
 ## Notes and decisions
 - Sequential decisions: preserve raw values/order/nulls; unknown depth basis/datum stay unknown; LAS 2.0 numerical support only, LiDAR and LAS 3 explicit unsupported. Full-data operations capped separately from metadata inspection. Display reduction retains spikes and explicit gap boundaries.
 - Independent package: tables child owns new table helper/routes/contracts/viewer/tests only. Parent owns LAS helper/routes/depth UI/manifest/tests and all shared glue, integration boundaries, AGENTS and canonical report.
