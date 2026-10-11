@@ -74,6 +74,8 @@ export interface ChatWorkspaceState {
   delegation: DelegationChoice;
   queuedMessages: WorkspaceQueuedMessage[];
   composer: PromptDraftState;
+  /** GeoAIDesk: skill exposure the tab's session is created with (a started task). */
+  geoExposure?: string;
 }
 
 export interface SandboxWorkspaceState {
@@ -255,6 +257,8 @@ function sanitizeComputeTarget(value: unknown): ModalInstance | null {
   } as unknown as ModalInstance;
 }
 
+const GEO_EXPOSURE_RE = /^(?:all|catalogue|workflow:[a-z0-9][a-z0-9-]{0,63})$/;
+
 function sanitizeStoredChat(value: unknown): StoredChatState | undefined {
   if (!isRecord(value)) return undefined;
   const selectedModel = sanitizeModel(value.selectedModel);
@@ -321,6 +325,9 @@ function sanitizeStoredChat(value: unknown): StoredChatState | undefined {
       text: typeof composer.text === "string" ? composer.text : "",
       attachments: sanitizeBlobRefs(composer.attachments),
     },
+    ...(typeof value.geoExposure === "string" && GEO_EXPOSURE_RE.test(value.geoExposure)
+      ? { geoExposure: value.geoExposure }
+      : {}),
   };
 }
 

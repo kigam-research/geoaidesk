@@ -11,6 +11,7 @@ import { defineTool } from "@earendil-works/pi-coding-agent";
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 import { resolvePaths } from "../projects.ts";
+import { checkGeoResultManifest, GEO_RESULT_KINDS } from "../geo/workspace/result-reference.ts";
 import {
   apiRelative,
   guessMime,
@@ -273,6 +274,18 @@ const MoleculeCardSchema = Type.Object(
   { additionalProperties: false },
 );
 
+// GeoAIDesk: reference to a geo-result/v1 manifest (server/src/geo/workspace/result-reference.ts).
+const GeoResultCardSchema = Type.Object(
+  {
+    ...commonProperties,
+    kind: Type.Literal("geo-result"),
+    resultKind: Type.Union(GEO_RESULT_KINDS.map((kind) => Type.Literal(kind))),
+    manifestPath: PathString,
+    thumbnailPath: Type.Optional(PathString),
+  },
+  { additionalProperties: false },
+);
+
 /**
  * The stored card envelope: a discriminated union, one branch per kind.
  *
@@ -290,6 +303,7 @@ export const ScientificResultCardSchema = Type.Union(
     DatasetSchemaCardSchema,
     CitationListCardSchema,
     MoleculeCardSchema,
+    GeoResultCardSchema,
   ],
   {
     description:
@@ -331,10 +345,11 @@ export const ScientificResultParams = Type.Object(
         Type.Literal("dataset-schema"),
         Type.Literal("citation-list"),
         Type.Literal("molecule"),
+        Type.Literal("geo-result"),
       ],
       {
         description:
-          "Which kind of result card this is. Supply only that kind's fields: table -> columns+rows; statistical-test -> tests; plot -> images; artifact-list -> items; qc-report -> overall+checks; dataset-schema -> path/shape/dimensions/fields (at least one); citation-list -> entries; molecule -> path, smiles or inchi.",
+          "Which kind of result card this is. Supply only that kind's fields: table -> columns+rows; statistical-test -> tests; plot -> images; artifact-list -> items; qc-report -> overall+checks; dataset-schema -> path/shape/dimensions/fields (at least one); citation-list -> entries; molecule -> path, smiles or inchi; geo-result -> resultKind+manifestPath (a geo-result/v1 manifest such as *.geomap.json or *.depth.json), optional thumbnailPath.",
       },
     ),
     title: ShortString,
@@ -384,6 +399,11 @@ export const ScientificResultParams = Type.Object(
     atomCount: Type.Optional(Type.Integer({ minimum: 0 })),
     bondCount: Type.Optional(Type.Integer({ minimum: 0 })),
     properties: Type.Optional(Type.Array(MoleculePropertySchema, { maxItems: 30 })),
+
+    // geo-result
+    resultKind: Type.Optional(Type.Union(GEO_RESULT_KINDS.map((kind) => Type.Literal(kind)))),
+    manifestPath: Type.Optional(PathString),
+    thumbnailPath: Type.Optional(PathString),
   },
   {
     description:
@@ -448,6 +468,11 @@ const KIND_SPEC = {
       "properties",
     ],
     required: [],
+  },
+  "geo-result": {
+    schema: GeoResultCardSchema,
+    props: ["resultKind", "manifestPath", "thumbnailPath"],
+    required: ["resultKind", "manifestPath"],
   },
 } as const satisfies Record<
   ScientificResultParamsT["kind"],
@@ -601,6 +626,18 @@ function normalizeCard(
       break;
     case "statistical-test":
       break;
+    case "geo-result": {
+      card.manifestPath = normalizedFile(projectId, card.manifestPath);
+      const sandbox = resolvePaths(projectId).sandbox;
+      checkGeoResultManifest(path.resolve(sandbox, card.manifestPath), card.resultKind, card.manifestPath);
+      if (card.thumbnailPath) {
+        card.thumbnailPath = normalizedFile(projectId, card.thumbnailPath);
+        if (!guessMime(card.thumbnailPath).startsWith("image/")) {
+          throw new Error(`geo-result thumbnail must be an image file: ${card.thumbnailPath}`);
+        }
+      }
+      break;
+    }
   }
 
   if (Buffer.byteLength(JSON.stringify(card), "utf-8") > MAX_SCIENTIFIC_RESULT_BYTES) {
@@ -648,13 +685,14 @@ export function makeScientificResultTool(
       "  dataset-schema -> at least one of path, shape, dimensions, fields",
       "  citation-list -> entries",
       "  molecule -> at least one of path, smiles, inchi",
+      "  geo-result -> resultKind (map-layer | depth-track | validation-curve), manifestPath (a geo-result/v1 manifest, e.g. *.geomap.json, *.depth.json), optional thumbnailPath",
       "Do not send a schemaVersion; it is stamped for you. Every path must be an existing, user-visible sandbox file.",
       "Use only values you actually observed or computed; this tool presents evidence but does not independently verify it.",
       "Keep previews compact and save complete tables, plots, scripts, and reports as sandbox artifacts.",
       "Use the notebook tool separately for hypotheses, methods, observations, and decisions.",
     ].join("\n"),
     promptSnippet:
-      "scientific_result: present observed tables, statistics, plots, QC, schemas, citations, molecules, and artifacts as typed cards",
+      "scientific_result: present observed tables, statistics, plots, QC, schemas, citations, molecules, geo results, and artifacts as typed cards",
     promptGuidelines: [
       "After obtaining a meaningful scientific result, call `scientific_result` with a compact typed preview and links to the underlying sandbox artifacts.",
       "Pick one `kind` and send only that kind's fields — mixing fields from different kinds is rejected.",

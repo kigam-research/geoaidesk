@@ -141,7 +141,16 @@ export type ScientificResultCard =
   | QcReportResult
   | DatasetSchemaResult
   | CitationListResult
-  | MoleculeResult;
+  | MoleculeResult
+  | GeoResultResult;
+
+/** GeoAIDesk: reference to a geo-result/v1 manifest (web/src/geo/contracts/workspace.ts). */
+export interface GeoResultResult extends ScientificResultBase {
+  kind: "geo-result";
+  resultKind: "map-layer" | "depth-track" | "validation-curve";
+  manifestPath: string;
+  thumbnailPath?: string;
+}
 
 export interface ToolResultImage {
   data: string;
@@ -150,6 +159,7 @@ export interface ToolResultImage {
 
 const STATUSES = new Set<ScientificStatus>(["pass", "warn", "fail"]);
 const CITATION_KINDS = new Set(["doi", "arxiv", "pubmed", "url", "other"]);
+const GEO_RESULT_KINDS = new Set(["map-layer", "depth-track", "validation-curve"]);
 const IMAGE_MIME = new Set<ToolResultImage["mimeType"]>([
   "image/png",
   "image/jpeg",
@@ -398,6 +408,15 @@ export function parseScientificResult(value: unknown): ScientificResultCard | nu
                 isScalar(property.value) &&
                 isOptionalString(property.unit),
             )))
+      ) {
+        return null;
+      }
+      break;
+    case "geo-result":
+      if (
+        !GEO_RESULT_KINDS.has(String(value.resultKind)) ||
+        !isString(value.manifestPath) ||
+        !isOptionalString(value.thumbnailPath)
       ) {
         return null;
       }

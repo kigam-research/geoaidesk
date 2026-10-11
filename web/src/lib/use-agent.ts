@@ -744,7 +744,16 @@ async function consumeSse(
   if (buffer) consumeLine(buffer);
 }
 
-export function useAgent(projectId?: string) {
+export interface UseAgentOptions {
+  /** GeoAIDesk: JSON body for the `POST /sessions` that creates this tab's session (e.g. `{ geoExposure }`). */
+  sessionCreateBody?: Record<string, unknown>;
+}
+
+export function useAgent(projectId?: string, options: UseAgentOptions = {}) {
+  const sessionCreateBodyRef = useRef(options.sessionCreateBody);
+  useEffect(() => {
+    sessionCreateBodyRef.current = options.sessionCreateBody;
+  }, [options.sessionCreateBody]);
   const contextProjectId = useProjectScopeId();
   const scopedProjectId = projectId ?? contextProjectId;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -1233,9 +1242,12 @@ export function useAgent(projectId?: string) {
 
   const ensureSession = useCallback(async (signal?: AbortSignal) => {
     if (sessionIdRef.current) return sessionIdRef.current;
+    const body = sessionCreateBodyRef.current;
     const response = await apiFetch(
       "/sessions",
-      { method: "POST", signal },
+      body
+        ? { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
+        : { method: "POST", signal },
       scopedProjectId,
     );
     if (!response.ok) throw new Error(`Failed to create session: ${response.status}`);

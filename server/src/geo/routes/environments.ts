@@ -2,7 +2,7 @@
 import type { FastifyInstance } from "fastify";
 import { activePaths } from "../../projects.ts";
 import { geoCatalogueActive } from "../catalogue.ts";
-import { EnvironmentPreparationError, GeoEnvironmentService, loadGeoEnvironments, type EnvironmentTarget } from "../environments.ts";
+import { EnvironmentPreparationError, GeoEnvironmentService, geoEnvironmentService, loadGeoEnvironments, type EnvironmentTarget } from "../environments.ts";
 import type { GeoEnvironments } from "../catalogue-types.ts";
 
 export async function registerGeoEnvironmentRoutes(app: FastifyInstance, options: {
@@ -11,7 +11,7 @@ export async function registerGeoEnvironmentRoutes(app: FastifyInstance, options
   active?: () => boolean;
   sandbox?: () => string;
 } = {}): Promise<void> {
-  const service = options.service ?? new GeoEnvironmentService();
+  const service = options.service ?? geoEnvironmentService();
   const load = options.load ?? loadGeoEnvironments;
   const active = options.active ?? geoCatalogueActive;
   const sandbox = options.sandbox ?? (() => activePaths().sandbox);

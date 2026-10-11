@@ -1,0 +1,84 @@
+{
+  "result": {
+    "label": "Geo 결과",
+    "open": "{kind, select, map-layer {지도 열기} depth-track {Depth track 열기} validation-curve {검증 곡선 열기} other {결과 파일 열기}}",
+    "kind": "{kind, select, map-layer {지도 레이어} depth-track {Depth track} validation-curve {검증 곡선} other {Geo 결과}}",
+    "thumbnail": "{title} 미리보기"
+  },
+  "error": { "status": "서버 요청에 실패했습니다(HTTP {status})." },
+  "catalogue": {
+    "title": "Geoscience 작업",
+    "loading": "Geo 작업 목록을 읽는 중입니다.",
+    "error": "Geo 작업 목록을 읽지 못했습니다. {detail}",
+    "status": "Geo 카탈로그 상태: {state}. {detail}",
+    "noDetail": "K-Dense workflow 목록을 표시합니다.",
+    "inputs": "입력 형식: {formats}",
+    "outputs": "예상 결과 파일: {outputs}",
+    "boundary": "해석 한계: {boundary}",
+    "empty": "등록된 Geo 작업이 없습니다.",
+    "showUpstream": "K-Dense workflow 목록 보기",
+    "hideUpstream": "K-Dense workflow 목록 접기"
+  },
+  "readiness": {
+    "ready": "준비됨",
+    "skills": "필요한 스킬: {names}",
+    "environment": "환경 준비 필요: {name}",
+    "unavailable": "사용 불가: {reason}",
+    "unknown": "준비 상태를 확인하지 못했습니다.",
+    "untested": "미시험 · GAID 실행 기록 없음"
+  },
+  "environment": {
+    "prepare": "환경 준비",
+    "preparing": "환경 준비 중",
+    "progress": "프로젝트 환경의 패키지를 준비하고 import를 확인하는 중입니다.",
+    "done": "환경 패키지의 import를 확인했습니다. 작업 준비 상태를 다시 읽었습니다.",
+    "incomplete": "환경 준비 후에도 필요한 항목이 남아 있습니다. {detail}",
+    "error": "환경을 준비하지 못했습니다. {detail}"
+  },
+  "setup": {
+    "open": "작업 설정 열기",
+    "title": "{title} 작업 설정",
+    "description": "입력 파일과 분석 조건을 선택하세요. 새 채팅에 초안을 만들며 메시지를 전송하지 않습니다.",
+    "role": "{label} ({required})",
+    "required": "필수",
+    "optional": "선택",
+    "selectFile": "입력 파일 선택",
+    "decideLater": "작업 중 결정",
+    "create": "작업 초안 만들기",
+    "creating": "작업 초안 만드는 중",
+    "close": "설정 닫기",
+    "tabLimit": "채팅 탭이 가득 찼습니다. 다른 탭을 닫은 뒤 작업 초안을 다시 만드세요. 입력값은 유지합니다.",
+    "noWorkspace": "작업 공간을 찾지 못했습니다. 프로젝트 작업 공간에서 다시 시도하세요. 입력값은 유지합니다.",
+    "error": "작업 초안을 만들지 못했습니다. {detail}",
+    "none": "없음",
+    "noBoundary": "카탈로그에 해석 한계가 기록되지 않았습니다.",
+    "inputLine": "{role}: {path}",
+    "choiceLine": "{choice}: {answer}",
+    "draft": "{prompt}\n\n입력 파일:\n{inputs}\n\n선택한 분석 조건:\n{choices}\n\n작업 중 결정할 조건: {unresolved}\n미결정 조건은 분석 전에 질문하세요.\n\n해석 한계: {boundary}\n결과는 검토 전입니다. 실행 완료를 검토 완료로 표시하지 마세요."
+  },
+  "recipe": {
+    "import": "레시피 가져오기",
+    "file": "Geo 작업 레시피 파일",
+    "checking": "레시피 확인 중",
+    "error": "레시피를 읽거나 확인하지 못했습니다. {detail}",
+    "issue": "{code}: {message}",
+    "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다."
+  },
+  "files": {
+    "match": "일치한 입력: {role} · 형식: {format}",
+    "needs": "결정할 분석 조건: {choices}",
+    "error": "입력 파일 목록을 읽지 못했습니다. {detail}"
+  },
+  "skill": {
+    "open": "재사용 스킬 만들기",
+    "title": "재사용 스킬 만들기",
+    "description": "프로젝트에 스킬 템플릿을 만들고 현재 채팅에 작성 지시를 넣습니다. 메시지는 전송하지 않습니다.",
+    "name": "스킬 이름",
+    "nameRule": "소문자 영문, 숫자, 하이픈으로 최대 64자를 쓰세요. 처음과 끝에 하이픈을 쓰거나 연속해서 쓰지 마세요.",
+    "task": "재사용할 작업 설명 (한 문장)",
+    "create": "스킬 템플릿 만들기",
+    "creating": "스킬 템플릿 만드는 중",
+    "error": "스킬 템플릿을 만들지 못했습니다. {detail}",
+    "draft": "현재 채팅에서 완료한 작업을 바탕으로 `.pi/skills/{name}/SKILL.md`를 작성하세요. 재사용할 작업: {description}\n입력 자료, 실행 단계와 한계를 기록하세요. 필요한 스크립트를 `.pi/skills/{name}/` 폴더에 복사하고 스킬에서 참조하세요. 실행한 내용과 미시험 항목을 구분하고 검증을 주장하지 마세요."
+  }
+}

@@ -63,9 +63,17 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Contracts/limits and verification: `docs/geo/well-tables.md`.
 - Local model (`server/src/geo/local-model.ts`, Settings card `web/src/geo/local-model/`): one managed custom provider
   `gaid-local` with explicit context (minimum/default 65,536 tokens; no 32K proposed profile), optional derived Ollama model with `num_ctx`, optional app default. Existing saved settings are not rewritten; real-task 64K/98K validation belongs to WP10. The dedicated provider is billed `local`/$0, never cap-counted, including child requests and picker metadata; other custom providers stay payg.
-- UI branding and every visible string belong to WP07 `gaid-korean-workspace` (locale catalogues under
-  `web/src/geo/locales/`); the app UI still shows upstream names until then. Copy rules: plan §4.5–4.6 (the WP00
-  policy files `design/copy/` arrive in the catalogue archive's `policy/`).
+- UI copy and locales (WP07 `gaid-korean-workspace`): every visible GAID string lives in
+  `web/src/geo/locales/<namespace>/{ko,en}.json` (ICU messages, ids `<namespace>.<key>`, collected by
+  `web/src/geo/locales/index.ts`) and is read with `t()` from `web/src/geo/i18n.ts`; locale = saved choice
+  (`gaid:locale`) else the browser language, Korean default. The WP00 copy kit is vendored in `geo/copy/` (guideline
+  `gaid-writing.md`, `terminology.csv`, `copy-policy.json`, validator; provenance in `geo/copy/SOURCE.md`) and
+  `scripts/check` runs `node geo/copy/validate-copy.mjs web/src/geo/locales`. Before changing user-facing text:
+  사용자 표시 문구를 바꾸기 전에 design/copy/gaid-writing.md(이 포크에서는 geo/copy/gaid-writing.md), terminology.csv, 해당
+  화면의 상태 정의를 읽는다. 문구는 문자열 카탈로그에 넣고 JSX에 직접 쓰지 않는다. 한국어를 먼저 쓰고 영어는 같은 동작·조건·한계로
+  쓴다. 버튼은 다음 동작을 쓴다(한국어 목적어+동작, 영어 동사+목적어). 질문형 제목, 추상적 변환 문장, 과장 형용사, 장식 이모지를
+  쓰지 않는다. 실행 완료를 검증 완료로 바꾸지 않는다. 추정·미시험·검토 전 같은 한계를 지우지 않는다. 확인되지 않은 기능·지원
+  환경·성능·비용을 쓰지 않는다. 변경 보고에 문자열 id와 한·영 변경 전후를 적는다.
 - Releases: push a tag `geo-v<version>` matching `geo/distribution.json`; `.github/workflows/release.yml` builds and
   creates a draft release with `geo/release-manifest.mjs` assets. Bump the version in `geo/distribution.json`, not
   `server/package.json` (that stays the upstream version).

@@ -1,0 +1,84 @@
+{
+  "result": {
+    "label": "Geo result",
+    "open": "{kind, select, map-layer {Open map} depth-track {Open depth tracks} validation-curve {Open validation curve} other {Open output file}}",
+    "kind": "{kind, select, map-layer {Map layer} depth-track {Depth track} validation-curve {Validation curve} other {Geo result}}",
+    "thumbnail": "Preview of {title}"
+  },
+  "error": { "status": "The server request failed (HTTP {status})." },
+  "catalogue": {
+    "title": "Geoscience tasks",
+    "loading": "Reading the Geo task catalogue.",
+    "error": "Could not read the Geo task catalogue. {detail}",
+    "status": "Geo catalogue state: {state}. {detail}",
+    "noDetail": "Showing the K-Dense workflow list.",
+    "inputs": "Input formats: {formats}",
+    "outputs": "Expected output files: {outputs}",
+    "boundary": "Interpretation limits: {boundary}",
+    "empty": "No Geo tasks are registered.",
+    "showUpstream": "Show K-Dense workflows",
+    "hideUpstream": "Hide K-Dense workflows"
+  },
+  "readiness": {
+    "ready": "Ready",
+    "skills": "Skills needed: {names}",
+    "environment": "Environment preparation needed: {name}",
+    "unavailable": "Unavailable: {reason}",
+    "unknown": "Could not determine readiness.",
+    "untested": "Untested · No GAID run record"
+  },
+  "environment": {
+    "prepare": "Prepare environment",
+    "preparing": "Preparing environment",
+    "progress": "Preparing project environment packages and checking imports.",
+    "done": "Environment package imports were checked. Task readiness was refreshed.",
+    "incomplete": "Required items are still missing after preparation. {detail}",
+    "error": "Could not prepare the environment. {detail}"
+  },
+  "setup": {
+    "open": "Open task setup",
+    "title": "{title} task setup",
+    "description": "Choose input files and analysis settings. A draft opens in a new chat; no message is sent.",
+    "role": "{label} ({required})",
+    "required": "required",
+    "optional": "optional",
+    "selectFile": "Choose an input file",
+    "decideLater": "Decide during the task",
+    "create": "Create task draft",
+    "creating": "Creating task draft",
+    "close": "Close setup",
+    "tabLimit": "All chat tabs are in use. Close another tab and create the task draft again. Your inputs are kept.",
+    "noWorkspace": "Could not find the workspace. Try again in the project workspace. Your inputs are kept.",
+    "error": "Could not create the task draft. {detail}",
+    "none": "None",
+    "noBoundary": "The catalogue does not record interpretation limits.",
+    "inputLine": "{role}: {path}",
+    "choiceLine": "{choice}: {answer}",
+    "draft": "{prompt}\n\nInput files:\n{inputs}\n\nSelected analysis settings:\n{choices}\n\nSettings to decide during the task: {unresolved}\nAsk about unresolved settings before analysis.\n\nInterpretation limits: {boundary}\nThe results have not been reviewed. Do not label run completion as review completion."
+  },
+  "recipe": {
+    "import": "Import recipe",
+    "file": "Geo task recipe file",
+    "checking": "Checking recipe",
+    "error": "Could not read or check the recipe. {detail}",
+    "issue": "{code}: {message}",
+    "noWorkflow": "Could not find the recipe's task in the current catalogue."
+  },
+  "files": {
+    "match": "Matched input: {role} · Format: {format}",
+    "needs": "Analysis settings to decide: {choices}",
+    "error": "Could not read the input file list. {detail}"
+  },
+  "skill": {
+    "open": "Make reusable skill",
+    "title": "Make reusable skill",
+    "description": "Create a project skill template and add writing instructions to this chat. No message is sent.",
+    "name": "Skill name",
+    "nameRule": "Use up to 64 lowercase letters, digits and hyphens. Do not use leading, trailing or consecutive hyphens.",
+    "task": "Reusable task description (one sentence)",
+    "create": "Create skill template",
+    "creating": "Creating skill template",
+    "error": "Could not create the skill template. {detail}",
+    "draft": "Write `.pi/skills/{name}/SKILL.md` from the completed work in this chat. Reusable task: {description}\nRecord inputs, execution steps and limits. Copy required scripts into `.pi/skills/{name}/` and reference them from the skill. Distinguish executed work from untested items; do not claim validation."
+  }
+}

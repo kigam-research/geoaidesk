@@ -1,6 +1,7 @@
 "use client";
 
 import { TableInspectionOption } from "@/geo/viewers/tables/table-option";
+import { GeoFileActions } from "@/geo/workspace/file-actions";
 import { CsvViewer } from "./csv-viewer";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
@@ -2003,6 +2004,7 @@ export function FilePreviewPanel({
       {selectedPath && mode === "view" && (
         <>
           {header}
+          <GeoFileActions key={`${projectId}:${selectedPath}:actions`} path={selectedPath} projectId={projectId} />
           <div className={cn(
             "flex-1 min-h-0",
             // These viewers manage their own scroll internally

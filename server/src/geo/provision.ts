@@ -20,6 +20,8 @@ import {
 import type { ProjectPaths } from "../projects.ts";
 import {
   applyDefaultSkillStates,
+  enableSkill,
+  isSkillDefaultDisabled,
   listDisabledSkills,
   listProjectSkills,
   seedProjectSkills,
@@ -65,6 +67,7 @@ export function provisionGeoCatalogue(paths: ProjectPaths, options: LoadGeoCatal
  */
 export async function provisionProjectSkills(paths: ProjectPaths, allowRemote = true): Promise<number> {
   if (!geoCatalogueActive()) return seedProjectSkills(paths, allowRemote);
+  const fresh = listProjectSkills(paths).length + listDisabledSkills(paths).length === 0;
   const outcome = provisionGeoCatalogue(paths);
   if (outcome.state === "unavailable") {
     console.warn(`[gaid] geo catalogue unavailable for project ${paths.id}: ${outcome.error}`);
@@ -75,5 +78,29 @@ export async function provisionProjectSkills(paths: ProjectPaths, allowRemote = 
     );
   }
   applyDefaultSkillStates(paths);
+  if (fresh && outcome.state === "applied") enableWorkflowSkills(paths);
   return listProjectSkills(paths).length + listDisabledSkills(paths).length;
+}
+
+/**
+ * Upstream seeds package-reference skills (e.g. `geopandas`) disabled. A skill
+ * that a shipped workflow binds is part of that task's exposure set, so a new
+ * project starts with it enabled; otherwise the workflow could never be ready
+ * without a manual step. Runs once, for a project's first provisioning only:
+ * a skill the user disables later stays disabled.
+ */
+export function enableWorkflowSkills(paths: ProjectPaths, options: LoadGeoCatalogueOptions = {}): string[] {
+  let catalogue;
+  try {
+    catalogue = loadGeoCatalogue(options);
+  } catch {
+    return [];
+  }
+  const bound = new Set(catalogue.workflows.flatMap((workflow) => workflow.skillIds));
+  const enabled: string[] = [];
+  for (const skill of catalogue.index.skills) {
+    if (!bound.has(skill.id) || !isSkillDefaultDisabled(skill.runtimeName)) continue;
+    if (enableSkill(paths, skill.runtimeName).ok) enabled.push(skill.runtimeName);
+  }
+  return enabled;
 }

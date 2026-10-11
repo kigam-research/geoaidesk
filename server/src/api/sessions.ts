@@ -77,6 +77,7 @@ import {
   listSessions,
 } from "../agent/session-registry.ts";
 import { parseThinkingLevel } from "../agent/thinking.ts";
+import { geoExposureIssue, type ExposureMode } from "../geo/context.ts";
 import {
   emptySnapshot,
   isBudgetExceeded,
@@ -159,8 +160,18 @@ function streamRun(
 }
 
 export async function registerSessionRoutes(app: FastifyInstance): Promise<void> {
-  app.post("/sessions", async () => {
-    const session = await createSession(currentProjectId(), activePaths());
+  app.post<{ Body: { geoExposure?: unknown } | null }>("/sessions", async (req, reply) => {
+    // GeoAIDesk: a started task creates its chat with the task's skill exposure.
+    const geoExposure = req.body?.geoExposure;
+    if (geoExposure !== undefined) {
+      const issue = geoExposureIssue(geoExposure);
+      if (issue) {
+        reply.code(400);
+        return { detail: issue };
+      }
+    }
+    const session = await createSession(currentProjectId(), activePaths(),
+      geoExposure === undefined ? {} : { geoExposure: geoExposure as ExposureMode });
     return { id: session.sessionId, sessionFile: session.sessionFile };
   });
 

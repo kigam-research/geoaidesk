@@ -74,6 +74,7 @@ import { LEAD_DEFAULT_TOOLS, LEAD_EXCLUDED_TOOLS } from "./tools.ts";
 import { seedSubagentRuntimeSettings } from "./subagent-runtime-settings.ts";
 import { applyVerifierDefault } from "./verifier-models.ts";
 import { geoSessionParts } from "../geo/session.ts";
+import type { ExposureMode } from "../geo/context.ts";
 
 // Entry points normally establish this in env.ts. Keep the registry safe when
 // imported directly (tests/scripts) so child Pi processes still share the same
@@ -238,6 +239,8 @@ export interface OpenSessionOptions {
    * notices, and the default model is the most expensive one in the picker.
    */
   modelPolicy?: "session" | "project";
+  /** GeoAIDesk: skill exposure a brand-new session records (a started task); validated by the caller. */
+  geoExposure?: ExposureMode;
 }
 
 /** Last `{provider, modelId}` a session JSONL recorded (model change or assistant reply). */
@@ -391,6 +394,7 @@ async function build(
     paths,
     sessionId: ownId ?? "",
     isNew: sessionManager.getEntryCount() === 0,
+    mode: options.geoExposure,
   });
   const resourceLoader = new DefaultResourceLoader({
     cwd: paths.sandbox,

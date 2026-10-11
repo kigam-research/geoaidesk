@@ -135,6 +135,7 @@ export async function prepareEvidencePackage(projectId: string, raw: unknown): P
           if (card.kind === "artifact-list") for (const item of card.items) paths.add(item.path);
           if (card.kind === "qc-report") for (const check of card.checks) if (check.artifact) paths.add(check.artifact);
           if ((card.kind === "dataset-schema" || card.kind === "molecule") && card.path) paths.add(card.path);
+          if (card.kind === "geo-result") { paths.add(card.manifestPath); if (card.thumbnailPath) paths.add(card.thumbnailPath); }
           for (const p of paths) addAsset(p, undefined, "unknown", record.ref.timestamp, name);
         }
       }

@@ -1,0 +1,259 @@
+{
+  "version": 1,
+  "source": "docs/specs/geo-byok-plan.md sections 4.5 and 4.6; design/copy/gaid-writing.md",
+  "note": "Read by design/copy/validate-copy.mjs. error = blocked in product copy (check fails); warning = allowed after context review (printed, check passes). Patterns are JavaScript regular expressions; Korean patterns do not use \\b because it is ASCII-only.",
+  "locales": ["ko", "en"],
+  "scope": {
+    "exemptIds": ["*.command", "*.command.*", "*.code", "*.code.*", "*.path", "*.path.*", "*.citation", "*.citation.*", "*.userData", "*.userData.*", "*.question", "*.question.*"],
+    "stripInlineCode": true,
+    "dialogIds": ["*.dialog.*", "*.confirm.*"]
+  },
+  "roles": {
+    "hero": ["hero.*", "*.hero.*"],
+    "title": ["*.title", "*.heading", "*.h1", "*.h2", "hero.*", "*.hero.*"],
+    "cta": ["*.cta", "*.cta.*", "*.button", "*.button.*", "*.action", "*.action.*"],
+    "limit": ["limit.*", "*.limit", "*.limit.*"]
+  },
+  "protected": {
+    "ko": ["추정", "불확실성", "검토 전", "미시험", "조건에 따라", "할 수 있습니다", "판단할 수 없습니다", "확인되지 않았습니다"],
+    "en": ["estimate", "uncertainty", "not been reviewed", "not reviewed", "untested", "not yet tested", "depending on", "can be", "cannot be determined"]
+  },
+  "limitMarkers": {
+    "ko": ["추정", "불확실", "검토 전", "미시험", "조건에 따라", "판단할 수 없", "확인되지 않", "시험하지 않", "않습니다", "않았습니다", "아닙니다", "없습니다"],
+    "en": ["estimate", "uncertain", "not", "untested", "depend", "cannot"]
+  },
+  "rules": [
+    {
+      "id": "question-title",
+      "severity": "error",
+      "locale": "*",
+      "roles": ["title", "cta"],
+      "patterns": ["[?？]", "(나요|까요|습니까|입니까|인가요|을까|ㄹ까|할까)[.]?\\s*$"],
+      "message": "Question headline or question button",
+      "fix": "Use a plain section name or a statement (`설치 요구 사항`); buttons name the next action"
+    },
+    {
+      "id": "question-copy",
+      "severity": "warning",
+      "locale": "*",
+      "skipRoles": ["title", "cta"],
+      "skipDialogs": true,
+      "patterns": ["[?？]"],
+      "message": "Question in product copy outside a yes/no dialog",
+      "fix": "State the fact or the instruction; dialogs may ask only a real yes/no decision"
+    },
+    {
+      "id": "hero-destination-ending",
+      "severity": "warning",
+      "locale": "ko",
+      "roles": ["hero"],
+      "patterns": ["(으로|로|까지|위한)\\s*[.。]?\\s*$"],
+      "message": "Hero ends in a destination fragment (`~로`, `~까지`, `~을 위한`)",
+      "fix": "Write a complete statement of what the product does (`지구과학 자료를 내 PC에서 분석합니다.`)"
+    },
+    {
+      "id": "hero-destination-ending",
+      "severity": "warning",
+      "locale": "en",
+      "roles": ["hero"],
+      "patterns": ["^(from|beyond)\\b.*\\bto\\b", "^(the )?(future|next step) of\\b"],
+      "message": "Hero is a destination fragment instead of a statement",
+      "fix": "Write a complete statement (`Analyze geoscience data on your computer.`)"
+    },
+    {
+      "id": "empty-capability",
+      "severity": "error",
+      "locale": "ko",
+      "patterns": ["인사이트", "잠재력", "가능성을\\s*(넓|열|확장|펼)", "무한한\\s*가능성", "새로운\\s*가능성", "새로운\\s*차원", "한계를\\s*뛰어넘"],
+      "message": "Empty capability phrase",
+      "fix": "Name the action and its output (`결과를 CSV로 내보냅니다`)"
+    },
+    {
+      "id": "empty-capability",
+      "severity": "error",
+      "locale": "en",
+      "patterns": ["\\b(unlock|unlocks|unlocking|unleash\\w*|supercharg\\w*|empower\\w*|transform your|elevate your|revolutioniz\\w*|endless possibilities|limitless)\\b", "\\binsights?\\b"],
+      "message": "Empty capability verb",
+      "fix": "Name the action and its output (`Export the results as CSV`)"
+    },
+    {
+      "id": "hype-adjective",
+      "severity": "error",
+      "locale": "ko",
+      "patterns": ["혁신적", "차세대", "스마트한", "스마트하게", "강력한", "강력하게", "직관적", "완벽한", "완벽하게", "획기적", "놀라운", "압도적", "최첨단"],
+      "message": "Adjective in place of a function",
+      "fix": "State supported formats, actions, outputs or limits"
+    },
+    {
+      "id": "hype-adjective",
+      "severity": "error",
+      "locale": "en",
+      "patterns": ["\\b(innovative|next-gen(eration)?|smart(er)?|powerful|intuitive|perfect(ly)?|revolutionary|cutting-edge|state-of-the-art|game-changing|game changer|groundbreaking|world-class|magic(al)?|amazing|seamless(ly)?)\\b"],
+      "message": "Adjective in place of a function",
+      "fix": "State supported formats, actions, outputs or limits"
+    },
+    {
+      "id": "unproven-ease",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["한\\s?번에", "손쉽게", "간편하게", "간단하게", "쉽게", "자동으로", "빠르게", "신속하게", "즉시", "검증된", "신뢰할 수 있는", "몇\\s*분\\s*(만에|이면)", "[0-9]+\\s*분\\s*(이면|만에|안에)"],
+      "message": "Ease, speed or quality claim that needs evidence",
+      "fix": "Give the actual step count or the tested time with conditions, or delete"
+    },
+    {
+      "id": "unproven-ease",
+      "severity": "warning",
+      "locale": "en",
+      "patterns": ["\\b(one[- ]click|in one step|easily|easy|effortless\\w*|instant(ly)?|in minutes|in (a few|[0-9]+) (minutes|seconds)|automatically|quickly|fast|verified|reliable|accurate)\\b"],
+      "message": "Ease, speed or quality claim that needs evidence",
+      "fix": "Give the actual step count or the tested time with conditions, or delete"
+    },
+    {
+      "id": "not-just-contrast",
+      "severity": "error",
+      "locale": "ko",
+      "patterns": ["(단순한|단순히|그저|단지)\\s*\\S+\\s*(이|가)?\\s*아닌"],
+      "message": "\"Not just X but Y\" contrast",
+      "fix": "Say what the tool does and does not do"
+    },
+    {
+      "id": "not-just-contrast",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["뿐만\\s*아니라"],
+      "message": "Possible \"not only X but Y\" contrast",
+      "fix": "Keep it only for a factual list; otherwise say what the tool does"
+    },
+    {
+      "id": "not-just-contrast",
+      "severity": "error",
+      "locale": "en",
+      "patterns": ["\\bnot (just|only|merely|simply)\\b.*\\bbut\\b", "\\bmore than (just )?an?\\b"],
+      "message": "\"Not just X but Y\" contrast",
+      "fix": "Say what the tool does and does not do"
+    },
+    {
+      "id": "translationese",
+      "severity": "error",
+      "locale": "ko",
+      "patterns": ["것이\\s*가능합니다", "것이\\s*가능하다", "것이\\s*가능해"],
+      "message": "Translationese (`~하는 것이 가능합니다`)",
+      "fix": "Use the verb (`확인합니다`)"
+    },
+    {
+      "id": "translationese",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["수행합니다", "수행하세요", "수행됩니다", "에 대한 검토를", "진행하도록 하겠습니다"],
+      "message": "Nominalised verb (`검토를 수행합니다`)",
+      "fix": "Use the verb (`검토합니다`)"
+    },
+    {
+      "id": "translationese",
+      "severity": "warning",
+      "locale": "en",
+      "patterns": ["\\bit is possible to\\b", "\\bperform(s|ed)? (a|an|the) (review|check|analysis|validation)\\b"],
+      "message": "Nominalised verb",
+      "fix": "Use the verb (`Review the results`)"
+    },
+    {
+      "id": "experience-cta",
+      "severity": "error",
+      "locale": "ko",
+      "patterns": ["경험해\\s*보세요", "경험하세요", "경험해\\s*봐", "만나\\s*보세요", "누려\\s*보세요", "느껴\\s*보세요"],
+      "message": "Experience call to action",
+      "fix": "Name the action and object (`작업 예제 보기`)"
+    },
+    {
+      "id": "experience-cta",
+      "severity": "error",
+      "locale": "en",
+      "patterns": ["\\bexperience (the|a|an|new|our|your)\\b", "\\b(discover|see) (the|what) (future|magic|difference)\\b"],
+      "message": "Experience call to action",
+      "fix": "Name the action and object (`View an example`)"
+    },
+    {
+      "id": "launch-cta",
+      "severity": "error",
+      "locale": "*",
+      "roles": ["cta"],
+      "patterns": ["^(get started|launch app|start now|try (it )?(now|free)|바로 시작|지금 시작|시작하기)$"],
+      "message": "Button suggests the app runs without installation",
+      "fix": "Use `설치 안내` / `Installation guide` or the real next action"
+    },
+    {
+      "id": "bare-cta",
+      "severity": "warning",
+      "locale": "*",
+      "roles": ["cta"],
+      "patterns": ["^(열기|보기|확인|실행|더 보기|자세히|자세히 보기|open|view|more|learn more|click here|submit)$"],
+      "message": "Button does not name its object",
+      "fix": "Name the object (`지도 열기`, `Open map`)"
+    },
+    {
+      "id": "triad-rhythm",
+      "severity": "warning",
+      "locale": "*",
+      "check": "triad",
+      "message": "Three or more fragment sentences for rhythm",
+      "fix": "Write the real list as one sentence, or delete"
+    },
+    {
+      "id": "em-dash-cadence",
+      "severity": "warning",
+      "locale": "*",
+      "patterns": ["—[^—]*—"],
+      "message": "Repeated em dashes",
+      "fix": "Split into short complete sentences"
+    },
+    {
+      "id": "emoji",
+      "severity": "error",
+      "locale": "*",
+      "patterns": ["\\p{Extended_Pictographic}"],
+      "flags": "u",
+      "message": "Decorative emoji",
+      "fix": "Delete the emoji; state what finished and what to do next"
+    },
+    {
+      "id": "exclamation",
+      "severity": "warning",
+      "locale": "*",
+      "patterns": ["[!！]"],
+      "message": "Exclamation mark (celebration or alarm)",
+      "fix": "State the result plainly (`QC 실행이 끝났습니다.`)"
+    },
+    {
+      "id": "haeyo-voice",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["(어요|아요|해요|에요|예요|네요|군요|죠)\\s*[.!?]?(\\s|$)"],
+      "message": "해요체 ending; descriptions use 합니다체 and instructions 하세요체",
+      "fix": "`완료되었어요` → `끝났습니다`"
+    },
+    {
+      "id": "demonstrative-this",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["(^|[\\s(])(이|그)\\s+\\S"],
+      "message": "Demonstrative 이/그 carried over from English this/that (`이 컴퓨터`, `이 조합`)",
+      "fix": "Drop it or name the thing (`설치 환경 준비`, `선택한 조합`, `해당 모델 제공사`)"
+    },
+    {
+      "id": "merged-verified",
+      "severity": "warning",
+      "locale": "ko",
+      "patterns": ["검증됨", "검증\\s*완료", "검증되었습니다"],
+      "message": "Single \"verified\" state",
+      "fix": "Name the state that actually holds: `실행 완료`, `수치 대조 완료`, `검토 완료` (with a recorded review)"
+    },
+    {
+      "id": "merged-verified",
+      "severity": "warning",
+      "locale": "en",
+      "patterns": ["\\b(validated|fully tested)\\b"],
+      "message": "Single \"verified\" state",
+      "fix": "Name the state that actually holds: run complete, numbers compared, review complete"
+    }
+  ]
+}
