@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T07:05:40Z
+status: ready
+updated: 2026-10-11T07:05:52Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9de57122-4815-4e8d-8db4-f7872cf53c25","pid":447397,"provider":"codex","session":"01a129b9-c31e-7393-9a91-1bf9bdacb66f","start":"16740288","token":"0ad6da35675d2000f5c07717317e785564506d6fc8b8286f4dc84b6231054c5a"}
 branch: task/gaid-korean-workspace--tasks
 target: task/gaid-korean-workspace
@@ -120,9 +120,9 @@ reviewed files, then `task finish`.
 - Tests mock the fixed server contracts; no paid model requests and no application data were created. Full-app browser checks remain owned by the parent. CLI finish runs the declared repository suite.
 - Local frontend checks used the parent's existing dependency tree through an ignored node_modules symlink (read-only tool use). Removed the symlink after checks so the CLI's npm ci cannot mutate the parent's dependencies.
 ## Next steps
-1. Review and save exactly the owned component/helper/test/locale files plus this task document.
-2. Run `task finish` and follow the CLI's next step. After a failed finish, fix in place and rerun without resume.
-3. Parent integrates this unit with `task complete gaid-korean-workspace--tasks`, performs real-screen checks and includes these results in its canonical report.
+<!-- task:closed -->
+Closed 2026-10-11T07:05:52Z: ready; the parent gaid-korean-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial resume calls met another task command's transient transaction lock; retry after the active command completed succeeded. No manual task/Git state changes.
 - `task job run -- npm --prefix web ci` refused the dirty source before launching a job. No install/job started. Bounded frontend checks then used the already installed parent dependencies.
