@@ -50,6 +50,8 @@ step 'Launcher: --check'
 
 step 'GAID: distribution checks'
 node --test 'geo/tests/*.test.mjs'
+step 'GAID: catalogue environments (every declared module imports in the helper and a fresh project environment)'
+node geo/tests/environments-smoke.mjs
 step 'GAID: launcher --check'
 ./start-gaid.sh --check
 step 'GAID: production smoke (clean data home, start, stop, restart)'
