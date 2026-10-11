@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T02:54:05Z
+updated: 2026-10-11T03:04:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"b82d61f9-5a6a-4f75-927c-8fa251f33d2c","pid":3628209,"provider":"claude","session":"bb619be9-c3b3-4f12-a95f-244d4d2f2c38","start":"15227338","token":"4f8fd5c979bc3f8cf27ceb58e285e3aee5e10c1aae29218d216f1df7838df552"}
 branch: task/gaid-runtime
 target: main
@@ -49,9 +49,20 @@ first; it is the authoritative scope. Summary only:
   `geo-examples-0.2.0.tar.gz` 943c8bab…f38d; two exports gave identical bytes. Exporter warnings: k-dense/geopandas
   and k-dense/uncertainty-and-units address scripts as `skills/<name>/scripts` (WP01 open point, checked here).
 - Archive is over the 5 MB Git limit, so it is a named asset, not a tracked file.
+- 98e995e: shared interfaces committed (catalogue loader/staging, exposure/context, geo route + session hubs,
+  geo-inspection/v1 contract, web viewer seam, defineGeoStrings). Children started from it (2026-10-11 ~11:56):
+  `gaid-runtime--env` (writer 0becd10a), `gaid-runtime--local-model` (writer 6868fb3e), `gaid-runtime--inspect`
+  (writer c3f9df1b); briefs in ~/data/geoaidesk/work/gaid-runtime/children/prompt-*.md.
+- Writer-side done since: catalogue/provision/context tests (server/test/geo-{catalogue,provision,context}.test.ts:
+  staging + digests + real 0.2.0 asset, existing-project preservation, version follow, exposure in a live Pi
+  session, budget + preview routes), runtime support skills (pi-subagents) kept in every exposure, concise geo
+  guidance via appendSystemPromptOverride (geo mode only), web start-prompt budget chip + new-chat skill selection
+  (web/src/geo/context/, seam in chat-tab.tsx) with vitest.
 ## Next steps
-1. Settle shared interfaces (catalogue loader, geo-inspection/v1 types, geo route/session registration hubs) and
-   commit them; then start child writers env + local-model (+ inspect) with those interfaces.
+1. While children run: production smoke update (geo catalogue provisioned / archive-missing without fallback),
+   scripts/check steps, measurement of the start-prompt budget (all vs catalogue vs workflow) on the real catalogue.
+2. On each child finish: review, `task complete gaid-runtime--<child>`, integrate (boundaries file entries for their
+   seams, scripts/check step for geo/tests/environments-smoke.mjs), rerun checks.
 ## Failed approaches
 ## Notes and decisions
 ### Plan (2026-10-11)

@@ -104,7 +104,7 @@
       "path": "server/src/agent/session-registry.ts",
       "owner": "gaid-runtime",
       "status": "edited",
-      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride for task exposure, geo extension factories and custom tools appended to the lead lists"
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists"
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
@@ -117,6 +117,12 @@
       "owner": "gaid-runtime",
       "status": "unchanged",
       "responsibility": "Import the small geo-result reference schema"
+    },
+    {
+      "path": "web/src/components/chat-tab.tsx",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "GeoPromptBudget chip (web/src/geo/context/) next to the context gauge in the composer toolbar; gaid-korean-workspace owns any further change to this component"
     },
     {
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",

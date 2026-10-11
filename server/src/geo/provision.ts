@@ -10,8 +10,13 @@
  * version, edited, user-installed, deleted and non-catalogue skills are left as
  * they are. A project is re-synced only when the pinned catalogue changed.
  */
-import { GEO_CATALOGUE_REPO } from "./distribution.ts";
-import { geoCatalogueActive, geoCatalogueSkillDirs, loadGeoCatalogue } from "./catalogue.ts";
+import { SKILLS_REPO } from "../config.ts";
+import {
+  geoCatalogueActive,
+  geoCatalogueSkillDirs,
+  loadGeoCatalogue,
+  type LoadGeoCatalogueOptions,
+} from "./catalogue.ts";
 import type { ProjectPaths } from "../projects.ts";
 import {
   applyDefaultSkillStates,
@@ -35,15 +40,16 @@ export interface GeoProvisionResult {
 }
 
 /** Apply the pinned catalogue to one project when it is not already applied. */
-export function provisionGeoCatalogue(paths: ProjectPaths): GeoProvisionResult {
+export function provisionGeoCatalogue(paths: ProjectPaths, options: LoadGeoCatalogueOptions = {}): GeoProvisionResult {
   let catalogue;
   try {
-    catalogue = loadGeoCatalogue();
+    catalogue = loadGeoCatalogue(options);
   } catch (err) {
     return { state: "unavailable", error: (err as Error).message };
   }
   const status = getSkillSyncStatus(paths);
-  if (status.repo === GEO_CATALOGUE_REPO && status.upstreamCommit === catalogue.label) {
+  // skills-sync records SKILLS_REPO (the geo identity in geo mode) as the manifest repo.
+  if (status.repo === SKILLS_REPO && status.upstreamCommit === catalogue.label) {
     return { state: "current", label: catalogue.label };
   }
   const skills = new Map<string, CatalogueSkill>();
