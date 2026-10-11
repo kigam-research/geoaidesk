@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:20:33Z
+updated: 2026-10-11T11:21:29Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -132,9 +132,18 @@ release and the app release.
 On a child's finish: `task complete gaid-release-proof--<child>`.
 
 ## Next steps
-1. Writer: catalogue release script + workflow, `geo/compatibility.json` + test, `docs/geo/` guides, upstream log,
-   provider-terms re-check, mzML test failures (seen in a full vitest run at d5702af: massspec-helper, sci-helper-errors;
-   check whether they also fail on main), then ask the user: brand clearance, paid runs, publication.
+1. Waiting for the user's answers in this tab (asked 2026-10-11; report §6, vault copy
+   /home/seongin/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-11-gaid-release-proof): brand clearance, publishing the
+   catalogue release, paid route trials, local-route advertising.
+   - Catalogue publish approved → `node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.2.1 --publish`, then
+     `--verify-remote`, then one Linux install proof without --catalogue-archive (real download) → compatibility/report.
+   - Paid trials approved → user saves the key / signs in to an isolated GAID instance; run
+     `geo/release-proof/route-trial.mjs --route api-key|chatgpt-signin --allow-paid --api … --data-home …` per
+     geo/release-proof/route-usage.md; record with `requestedBy` in geo/compatibility.json.
+   - App release: only after brand clearance; tag geo-v0.1.0 creates a draft; publishing needs the user's go.
+2. Otherwise: finish with the four open decisions carried to the ledger (Windows scheduled tasks deleted, no leftover
+   processes on pc71-win; diag folders under C:\Users\KIGAM_Ahn\gaid-proof are disposable).
+3. WP09 intake templates: not on skill_hub main as of 2026-10-11 (no schemas/skill-submission.schema.json).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
