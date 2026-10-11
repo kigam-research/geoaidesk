@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:54:44Z
+updated: 2026-10-11T05:04:18Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -46,29 +46,30 @@ Context:
 - Implemented the 64K minimum/default, removed the proposed 32K profile, preserved existing saved settings, and documented untested release-proof scope.
 - Added the pure gaid-local identity and shared local classification across billing, ledger inference, child bridge/meter and picker metadata. Other custom providers remain payg.
 - Focused regression run: 4 files / 54 tests passed (2026-10-11). No paid model calls.
-- First full check passed typecheck and 1,581 tests, but the newly added lead fixture had zero tokens and therefore produced no ledger row. Fixed fixture; focused rerun passed. Full rerun pending.
+- Full rerun passed backend typecheck and 1,582 tests (11 skipped), frontend 898 tests, and the development launcher check. Distribution validation rejected the seam owner slug; changed ownership metadata to the parent WP03 package gaid-runtime, then all 11 distribution tests passed. Environment imports, GAID launcher, and production start/restart checks passed directly under the hub-authorized exception. Production smoke verified 13 skills, excluded sources absent, persistence, and unchanged tracked files.
 - task sync fetched and merged main dad53b41 into the unit; no conflicts. Current snapshot before fixture fix: 1133236ee2ff.
 ## Next steps
-1. Re-run task sync with CHECK_LOG_FILE under ~/data/geoaidesk/work/gaid-runtime-followups/; inspect full scripts/check result.
-2. Finalize the short report and run task finish; remove regenerable worktree caches after the final check.
+1. Run task finish with CHECK_LOG_FILE=~/data/geoaidesk/work/gaid-runtime-followups/check-final.log (required full scripts/check). Do not edit tracked files while it runs. If it fails, fix in place and rerun without resume.
+2. Remove regenerable worktree caches after the final check; verify the tree is clean.
 3. Relay the hub's final completion report once; do not archive the unit.
 ## Failed approaches
 - task job run -- scripts/check failed before launch because inherited .env.example is a forbidden snapshot path. No job/receipt was created; no protected file was read or changed. Use the CLI's declared-check integration path (task sync/finish), not a manual publication workaround.
 - Initial lead-run regression reported cost but zero tokens: the ledger intentionally skips zero-cost/zero-token rows after local normalization. The corrected fixture reports two tokens. An intervening focused attempt ran the stale fixture because the correction script was initially invoked from server/ instead of the worktree root; the root invocation and fresh rerun passed.
+- Distribution boundaries accept package names, not follow-up task slugs: corrected gaid-runtime-followups to gaid-runtime without widening the allowed-owner list.
+- First production smoke completed start/restart but was invalidated by this writer updating the task document during its tracked-tree snapshot check. A second unchanged-tree run passed (production-check.log).
 ## Notes and decisions
 - Sequential decisions: 64K = 65,536 tokens; reject new configurations below it, preserve existing saved configurations, remove only the proposed 32K option. Existing 96K evidence remains a one-machine trial, not release proof.
 - Ownership: this writer owns geo local-model profiles/UI/tests, a pure geo provider identity, and narrow billing/ledger/subagent/custom-picker seams plus their regression tests and documentation. No WP04/WP05 files.
 - Work packages: context settings and local billing are small; billing consumers are tightly coupled. No substantial independent child package; implement directly.
 - Integration order: declare upstream boundaries; pure identity and billing policy; consumers; context UI/API; regression checks; report and finish.
+- Hub route env-sample-jobs-gaid-runtime-followups consumed and reported completed: direct checks in the writer worktree are explicitly authorized while backbone fixes snapshot handling; never remove or rename .env.example.
 - No rollout or paid model execution in this unit. WP10 owns real-task 64K/98K trials and catalogue release distribution.
 Closes: gaid-runtime#1
 Closes: gaid-runtime#3
 ## Open items
 None; remaining release-proof work stays in WP10, as already assigned.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-11-gaid-runtime-followups/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
