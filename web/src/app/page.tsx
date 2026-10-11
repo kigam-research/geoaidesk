@@ -926,7 +926,7 @@ function WorkspacePage({
           {updateAvailable && (
             <InfoTooltip content="A newer version is available on GitHub. Click to open the release page.">
               <a
-                href="https://github.com/K-Dense-AI/k-dense-byok"
+                href={process.env.NEXT_PUBLIC_RELEASES_URL ?? "https://github.com/K-Dense-AI/k-dense-byok"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] font-medium text-blue-500 hover:text-blue-400 transition-colors"

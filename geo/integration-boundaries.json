@@ -1,0 +1,131 @@
+{
+  "schema": "gaid-integration-boundaries/v1",
+  "rule": "GAID behaviour lives in geo/, server/src/geo/ and web/src/geo/. An edit to an upstream file is a maintained seam: list it here with its owner before making it, keep it narrow, and record conflicts in docs/upstream-sync.md. Shared glue, contracts, locale aggregators and dependency locks have one owner at a time; append-only entries are allowed where noted.",
+  "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
+  "seams": [
+    {
+      "path": "start.mjs",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "--production flag (web build stamp, next start), product name and issues URL from env, KADY_ENV_FILE as the managed env file; development behaviour unchanged"
+    },
+    {
+      "path": "server/src/env.ts",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "Load KADY_ENV_FILE before the repository env files"
+    },
+    {
+      "path": "server/src/api/credentials.ts",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "Persist Settings keys to KADY_ENV_FILE when set"
+    },
+    {
+      "path": "server/src/config.ts",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "Catalogue extra sources filtered by geo/distribution.json excludedSources; later distribution defaults go to gaid-runtime",
+      "next": "gaid-runtime"
+    },
+    {
+      "path": "server/src/api/system.ts",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "Release check against the distribution repository and tag prefix"
+    },
+    {
+      "path": "web/next.config.ts",
+      "owner": "gaid-fork-base",
+      "status": "edited",
+      "responsibility": "App version and release URL from geo/distribution.json"
+    },
+    {
+      "path": "web/src/app/page.tsx",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL); branding and copy belong to gaid-korean-workspace"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "owner": "gaid-fork-base",
+      "status": "replaced",
+      "responsibility": "GAID tag-driven draft release (geo-v<version>) instead of upstream's push-to-main v<server version> release",
+      "next": "gaid-release-proof"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "owner": "upstream",
+      "status": "unchanged",
+      "responsibility": "Upstream CI kept as is; GAID checks run from .github/workflows/gaid-checks.yml and scripts/check"
+    },
+    {
+      "path": "scripts/check",
+      "owner": "gaid-fork-base",
+      "status": "added",
+      "responsibility": "Upstream CI steps plus geo checks; later packages append their own steps"
+    },
+    {
+      "path": "server/src/agent/skills-fetch.ts, server/src/agent/skills.ts",
+      "owner": "gaid-runtime",
+      "status": "unchanged",
+      "responsibility": "Release-bundle staging and task-exposure adapter; skills-sync.ts stays the only installer into live skill directories"
+    },
+    {
+      "path": "server/src/sandbox-seed.ts, server/src/helpers-env.ts",
+      "owner": "gaid-runtime",
+      "status": "unchanged",
+      "responsibility": "Seed selected geo environments and concise project instructions"
+    },
+    {
+      "path": "server/src/agent/session-registry.ts",
+      "owner": "gaid-runtime",
+      "status": "unchanged",
+      "responsibility": "Register geo inspection/context extensions and tools (extensionFactories, customTools)"
+    },
+    {
+      "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
+      "owner": "gaid-runtime",
+      "status": "unchanged",
+      "responsibility": "Mount geo routes and helpers"
+    },
+    {
+      "path": "server/src/agent/scientific-result.ts",
+      "owner": "gaid-runtime",
+      "status": "unchanged",
+      "responsibility": "Import the small geo-result reference schema"
+    },
+    {
+      "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "unchanged",
+      "responsibility": "Format-aware dispatch; gaid-runtime publishes the geo viewer interface; gaid-well-tables and gaid-maps may append their own entries (append-only lines); gaid-korean-workspace owns any non-additive change",
+      "appendOnly": ["gaid-well-tables", "gaid-maps"]
+    },
+    {
+      "path": "web/src/lib/skill-suggestions.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "unchanged",
+      "responsibility": "Delegate metadata/task-aware suggestions"
+    },
+    {
+      "path": "web/src/app/layout.tsx, web/src/app/globals.css, web/public/",
+      "owner": "gaid-korean-workspace",
+      "status": "unchanged",
+      "responsibility": "Layout, theme, metadata and brand assets (WP00 tokens, Korean-first copy in web/src/geo/locales/)"
+    },
+    {
+      "path": "server/package.json, server/package-lock.json, web/package.json, web/package-lock.json, server/src/helpers/pyproject.toml, server/src/helpers/uv.lock",
+      "owner": "gaid-fork-base",
+      "status": "unchanged",
+      "responsibility": "Dependency locks: one package at a time adds dependencies; the owner moves to the package that needs a change and back after its merge",
+      "next": "gaid-runtime"
+    }
+  ],
+  "notTouched": [
+    "Pi SDK packages and server/scripts/patch-subagents.mjs",
+    "Session JSONL / SSE event mapping (server/src/agent/events.ts)",
+    "Subagent supervision, notebook and provenance persistence, cost ledger and billing",
+    "Provider authentication and catalogue (server/src/agent/provider-*.ts)"
+  ]
+}

@@ -8,6 +8,12 @@
  * Flags:
  *   --check       report dependencies/environment and exit (no installs, no services)
  *   --no-browser  don't open the UI in a browser once it's up
+ *   --production  serve a production build of the UI (`next build` when its
+ *                 inputs changed, then `next start`) instead of `next dev`
+ *
+ * Distribution wrappers (e.g. geo/start.mjs) set KADY_PRODUCT_NAME and
+ * KADY_ISSUES_URL to relabel the messages, and KADY_ENV_FILE to keep the
+ * managed env file outside the checkout.
  */
 import { spawn, spawnSync } from "node:child_process";
 import crypto from "node:crypto";
@@ -22,7 +28,11 @@ const isWin = process.platform === "win32";
 const flags = {
   check: process.argv.includes("--check"),
   noBrowser: process.argv.includes("--no-browser"),
+  production: process.argv.includes("--production"),
 };
+const APP = process.env.KADY_PRODUCT_NAME?.trim() || "Kady";
+const ISSUES_URL =
+  process.env.KADY_ISSUES_URL?.trim() || "https://github.com/K-Dense-AI/k-dense-byok/issues";
 
 // Legacy conhost garbles unicode; Windows Terminal (WT_SESSION) renders it fine.
 const sym =
@@ -74,8 +84,8 @@ function checkNode() {
         ? "    Upgrade with 'brew install node' or from https://nodejs.org/,"
         : "    Upgrade via https://nodejs.org/ or your version manager (e.g. 'nvm install 22'),";
     fail(
-      `  ${sym.err} Node.js v${process.versions.node} is too old — Kady needs Node.js >= 22 to\n` +
-        `    build and install its packages.\n${hint}\n    then start Kady again.`,
+      `  ${sym.err} Node.js v${process.versions.node} is too old — ${APP} needs Node.js >= 22 to\n` +
+        `    build and install its packages.\n${hint}\n    then start ${APP} again.`,
     );
   }
   log(`  Node.js ${sym.ok} (v${process.versions.node})`);
@@ -128,7 +138,7 @@ function checkGit() {
     // The Pi agent runs its shell commands through the bash that Git for
     // Windows provides, so on Windows git is a hard requirement.
     fail(
-      `  ${sym.err} Git for Windows is required — Kady's agent runs its shell commands\n` +
+      `  ${sym.err} Git for Windows is required — ${APP}'s agent runs its shell commands\n` +
         "    through the Git Bash it provides. Install it from\n" +
         "    https://git-scm.com/download/win (the default components are fine),\n" +
         "    reopen your terminal, then run start.cmd again.",
@@ -150,14 +160,21 @@ function checkPython() {
 // ---- Step 2: environment ---------------------------------------------------
 
 function setupEnv() {
-  const rootEnv = path.join(repoRoot, ".env");
-  const legacyEnv = path.join(repoRoot, "kady_agent", ".env");
+  // KADY_ENV_FILE replaces the repository env files (e.g. a distribution
+  // keeping keys with its user data, outside the checkout).
+  const managedEnv = process.env.KADY_ENV_FILE?.trim()
+    ? path.resolve(repoRoot, expandHome(process.env.KADY_ENV_FILE.trim()))
+    : null;
+  const rootEnv = managedEnv ?? path.join(repoRoot, ".env");
+  const legacyEnv = managedEnv ?? path.join(repoRoot, "kady_agent", ".env");
+  const envLabel = managedEnv ?? ".env";
   const example = path.join(repoRoot, ".env.example");
   if (!fs.existsSync(rootEnv) && !fs.existsSync(legacyEnv) && fs.existsSync(example)) {
     if (flags.check) {
-      log("No .env found — a full start will create one from .env.example.");
+      log(`No ${envLabel} found — a full start will create one from .env.example.`);
     } else {
-      log("No .env found — creating one from .env.example.");
+      log(`No ${envLabel} found — creating one from .env.example.`);
+      fs.mkdirSync(path.dirname(rootEnv), { recursive: true, mode: 0o700 });
       fs.copyFileSync(example, rootEnv);
       log(
         `  ${sym.arrow} Add an OpenRouter key, run Ollama, or connect a subscription in Settings.`,
@@ -166,7 +183,7 @@ function setupEnv() {
   }
   // Holds API keys; a copied .env.example or a hand-made file is 0644.
   if (!isWin && !flags.check) {
-    for (const file of [rootEnv, legacyEnv]) {
+    for (const file of new Set([rootEnv, legacyEnv])) {
       try {
         if (fs.existsSync(file)) fs.chmodSync(file, 0o600);
       } catch {
@@ -178,7 +195,7 @@ function setupEnv() {
   // covers the frontend (NEXT_PUBLIC_* vars) and the launcher's own checks.
   // override:true = .env beats stale ambient shell exports, matching the old
   // `set -a; source .env` behavior for both spawned services.
-  if (applyEnvFile(rootEnv, { override: true })) log("Loading environment from .env...");
+  if (applyEnvFile(rootEnv, { override: true })) log(`Loading environment from ${envLabel}...`);
   else if (applyEnvFile(legacyEnv, { override: true })) log("Loading environment from kady_agent/.env...");
   // Directories created before the umask above existed (0755) would still
   // let other accounts walk into project data; closing the roots covers all
@@ -307,15 +324,17 @@ function installPackages(dir, label, packages = []) {
   const code = run("npm", ["install", "--no-audit", "--no-fund", "--loglevel=error", ...packages], {
     cwd: path.join(repoRoot, dir),
   });
-  if (code !== 0) {
-    fail(
-      `\n  ${sym.err} Installing the ${label} packages failed (see the error above).\n` +
-        "    The most common cause is a network problem — check your internet\n" +
-        "    connection and start Kady again. If it keeps failing, run\n" +
-        `    'npm install' inside ${dir}/ to see the full error, or report it at\n` +
-        "    https://github.com/K-Dense-AI/k-dense-byok/issues",
-    );
-  }
+  if (code !== 0) installFailed(dir, label);
+}
+
+function installFailed(dir, label) {
+  fail(
+    `\n  ${sym.err} Installing the ${label} packages failed (see the error above).\n` +
+      "    The most common cause is a network problem — check your internet\n" +
+      `    connection and start ${APP} again. If it keeps failing, run\n` +
+      `    'npm install' inside ${dir}/ to see the full error, or report it at\n` +
+      `    ${ISSUES_URL}`,
+  );
 }
 
 /**
@@ -342,7 +361,39 @@ const HARNESS_PACKAGES = [
 
 const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
 
-function installBackendPackages() {
+/**
+ * --production: install exactly the committed lockfile (`npm ci`), and only
+ * when it (or the Node ABI) changed since the last such install. `npm install`
+ * rewrites the lockfile under other npm versions, which leaves a release
+ * checkout modified and blocks its next update.
+ */
+function installLockedPackages(dir, label) {
+  const cwd = path.join(repoRoot, dir);
+  const stampFile = path.join(cwd, "node_modules", ".launcher-ci-stamp");
+  const stamp = crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(path.join(cwd, "package-lock.json")))
+    .update(`\0${process.platform}-${process.arch}-${process.versions.modules}`)
+    .digest("hex");
+  let previous = null;
+  try {
+    previous = fs.readFileSync(stampFile, "utf-8").trim();
+  } catch {
+    /* never installed by the launcher */
+  }
+  if (previous === stamp) {
+    log(`  ${label} packages match package-lock.json ${sym.ok}`);
+    return;
+  }
+  log(`Installing ${label} packages from package-lock.json...`);
+  if (run("npm", ["ci", "--no-audit", "--no-fund", "--loglevel=error"], { cwd }) !== 0) {
+    installFailed(dir, label);
+  }
+  fs.writeFileSync(stampFile, stamp + "\n");
+}
+
+/** Exact `name@version` specs of the harness pins; fails on a range. */
+function harnessSpecs() {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "server", "package.json"), "utf-8"));
   const specs = [];
   for (const name of HARNESS_PACKAGES) {
@@ -357,8 +408,12 @@ function installBackendPackages() {
     log(`  ${name} ${sym.arrow} v${version} (pinned)`);
     specs.push(`${name}@${version}`);
   }
+  return specs;
+}
+
+function installBackendPackages() {
   // --save-exact: npm's default save-prefix would rewrite the pins as ^ranges.
-  installPackages("server", "backend", ["--save-exact", ...specs]);
+  installPackages("server", "backend", ["--save-exact", ...harnessSpecs()]);
 }
 
 // ---- Step 4: free the ports --------------------------------------------------
@@ -446,16 +501,79 @@ async function killTree(pid) {
 async function freePort(port, label) {
   for (const pid of listenersOn(port)) {
     if (ownedByThisRepo(pid)) {
-      log(`  Stopping a leftover Kady process on port ${port} (PID ${pid})...`);
+      log(`  Stopping a leftover ${APP} process on port ${port} (PID ${pid})...`);
       await killTree(pid);
     } else {
       fail(
         `\n  ${sym.err} Port ${port} is already in use by: ${processName(pid)} (PID ${pid}).\n` +
-          `    The ${label} needs this port. Quit that program, then start Kady\n` +
+          `    The ${label} needs this port. Quit that program, then start ${APP}\n` +
           "    again. (Restarting your computer also clears it.)",
       );
     }
   }
+}
+
+// ---- Step 4b: production UI build (--production) -------------------------------
+
+/** Files whose content decides the production UI bundle (sources, configs,
+ *  lockfile, and the server package version the build injects). */
+function productionBuildInputs() {
+  const webDir = path.join(repoRoot, "web");
+  const skip = new Set(["node_modules", ".next", "out", "coverage", ".turbo"]);
+  const files = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (skip.has(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile()) files.push(full);
+    }
+  };
+  walk(webDir);
+  for (const extra of ["server/package.json", "geo/distribution.json"]) {
+    const full = path.join(repoRoot, extra);
+    if (fs.existsSync(full)) files.push(full);
+  }
+  return files.map((f) => path.relative(repoRoot, f).replaceAll("\\", "/")).sort();
+}
+
+/** Stamp of the inputs plus the NEXT_PUBLIC_* values inlined at build time. */
+function productionBuildStamp() {
+  const hash = crypto.createHash("sha256");
+  for (const rel of productionBuildInputs()) {
+    hash.update(`${rel}\0`);
+    hash.update(fs.readFileSync(path.join(repoRoot, rel)));
+    hash.update("\0");
+  }
+  for (const name of Object.keys(process.env).filter((n) => n.startsWith("NEXT_PUBLIC_")).sort()) {
+    hash.update(`env:${name}=${process.env[name]}\0`);
+  }
+  return hash.digest("hex");
+}
+
+/** Build the UI when no build exists or its inputs changed since the last one. */
+function ensureProductionBuild() {
+  const nextDir = path.join(repoRoot, "web", ".next");
+  const stampFile = path.join(nextDir, "launcher-build-stamp.json");
+  const stamp = productionBuildStamp();
+  let previous = null;
+  try {
+    previous = JSON.parse(fs.readFileSync(stampFile, "utf-8")).stamp;
+  } catch {
+    /* no previous launcher build */
+  }
+  if (previous === stamp && fs.existsSync(path.join(nextDir, "BUILD_ID"))) {
+    log(`Production UI build is up to date ${sym.ok}`);
+    return;
+  }
+  log("Building the production UI (first start or changed sources; about a minute)...");
+  if (run("npm", ["run", "build"], { cwd: path.join(repoRoot, "web") }) !== 0) {
+    fail(
+      `\n  ${sym.err} Building the UI failed (see the error above).\n` +
+        `    Fix the error or report it at ${ISSUES_URL}`,
+    );
+  }
+  fs.writeFileSync(stampFile, JSON.stringify({ stamp, builtAt: new Date().toISOString() }) + "\n");
 }
 
 // ---- Step 5/6: services + lifecycle -----------------------------------------
@@ -482,9 +600,9 @@ function startService(label, dir, npmArgs) {
   child.on("exit", () => {
     if (!shuttingDown) {
       console.error(`\n  ${sym.err} The ${label} stopped unexpectedly.`);
-      console.error("    Scroll up for its error message, then start Kady again.");
+      console.error(`    Scroll up for its error message, then start ${APP} again.`);
       console.error("    If you're stuck, report the error at");
-      console.error("    https://github.com/K-Dense-AI/k-dense-byok/issues");
+      console.error(`    ${ISSUES_URL}`);
       stopAll(1);
     }
   });
@@ -560,7 +678,7 @@ function openBrowser(url) {
 // ---- main --------------------------------------------------------------------
 
 log("============================================");
-log("  Kady — Starting up");
+log(`  ${APP} — Starting up`);
 log("============================================");
 log("");
 log("Checking dependencies...");
@@ -585,8 +703,14 @@ if (flags.check) {
   process.exit(0);
 }
 
-installBackendPackages();
-installPackages("web", "frontend");
+if (flags.production) {
+  harnessSpecs();
+  installLockedPackages("server", "backend");
+  installLockedPackages("web", "frontend");
+} else {
+  installBackendPackages();
+  installPackages("web", "frontend");
+}
 log("");
 
 const BACKEND_PORT = Number(process.env.KADY_PORT || 8000);
@@ -631,11 +755,16 @@ if (run("npm", ["run", "prep", "--silent"], { cwd: path.join(repoRoot, "server")
 }
 log("");
 
+if (flags.production) {
+  ensureProductionBuild();
+  log("");
+}
+
 log("Starting services...");
 log("");
 startService(`Backend on port ${BACKEND_PORT} (Pi agent, TypeScript)`, "server", ["run", "start"]);
-startService(`Frontend on port ${FRONTEND_PORT} (Next.js UI)`, "web", [
-  "run", "dev", "--", "-p", String(FRONTEND_PORT), "-H", FRONTEND_HOST,
+startService(`Frontend on port ${FRONTEND_PORT} (Next.js UI${flags.production ? ", production build" : ""})`, "web", [
+  "run", flags.production ? "start" : "dev", "--", "-p", String(FRONTEND_PORT), "-H", FRONTEND_HOST,
 ]);
 
 process.on("SIGINT", () => stopAll(0));
@@ -659,7 +788,7 @@ if (!shuttingDown) {
     log("   unless KADY_AUTH_TOKEN is set)");
   }
   if (backendExposed) {
-    log(`  ${sym.warn} KADY_HOST=${BACKEND_HOST}: the Kady API is reachable from other machines.`);
+    log(`  ${sym.warn} KADY_HOST=${BACKEND_HOST}: the ${APP} API is reachable from other machines.`);
   }
   log("  Press Ctrl+C to stop everything");
   log("============================================");

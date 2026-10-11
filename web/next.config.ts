@@ -2,7 +2,21 @@ import type { NextConfig } from "next";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
+/** GeoAIDesk distribution manifest; absent in an upstream checkout. */
+function readDistribution(): { version?: string; repository?: string } | null {
+  try {
+    return JSON.parse(readFileSync(resolve(__dirname, "..", "geo", "distribution.json"), "utf-8"));
+  } catch {
+    return null;
+  }
+}
+
+const distribution = readDistribution();
+
 function readAppVersion(): string {
+  // A distribution versions itself (GeoAIDesk geo-v<version> releases); the
+  // update check compares against its releases, not upstream's.
+  if (distribution?.version) return distribution.version;
   // The server package is the source of truth for the app version (it's what
   // the README badge and release tags track). Reading it here keeps the
   // frontend's update check honest — a stale fallback makes every published
@@ -35,6 +49,9 @@ const nextConfig: NextConfig = {
   },
   env: {
     NEXT_PUBLIC_APP_VERSION: readAppVersion(),
+    NEXT_PUBLIC_RELEASES_URL: `https://github.com/${distribution?.repository ?? "K-Dense-AI/k-dense-byok"}${
+      distribution?.repository ? "/releases" : ""
+    }`,
   },
 };
 

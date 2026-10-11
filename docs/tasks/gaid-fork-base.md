@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T01:51:08Z
+updated: 2026-10-11T02:08:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0c2ee874-5ddb-4118-9f20-209b6d8b615a","pid":3424104,"provider":"claude","session":"53669a44-52c3-4de7-84fd-3986e964ef40","start":"14946049","token":"204294a4c7b769cb17cdc00690c68a91f04cb61b74c54d3c345e6470c46afaf0"}
 branch: task/gaid-fork-base
 target: main
@@ -44,9 +44,26 @@ first; it is the authoritative scope. Summary only:
   (so WP03 can be sent next).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress (single writer, no child units: the pieces share the launcher/config seams and are small).
+Inputs read: skill_hub main d5b8d86 plan + WP01 contracts (gaid-product/interfaces/migration).
+
 ## Next steps
-1. (the next session's first action)
+1. Implement the plan below, then run scripts/check and the production smoke.
+
+## Plan (sequential; owned files)
+1. Seams first (upstream edits, all narrow and env-gated so upstream dev behaviour is unchanged):
+   - `start.mjs`: `--production` (build `web` when its build stamp changes, `next start` instead of `next dev`),
+     product name / issues URL from env, `KADY_ENV_FILE` for the managed env file.
+   - `server/src/env.ts`, `server/src/api/credentials.ts`: `KADY_ENV_FILE` (managed `.env` outside the checkout).
+   - `server/src/config.ts`: catalogue extra sources filtered by `geo/distribution.json` `catalogue.excludedSources`.
+2. GAID files: `geo/distribution.json`, `geo/upstream.lock.json`, `geo/integration-boundaries.json` (seam owners =
+   initial shared locks), `geo/start.mjs` + `start-gaid.sh` / `start-gaid.cmd`, `NOTICE.md`, `THIRD_PARTY_NOTICES.md`,
+   `docs/upstream-sync.md`, README fork header.
+3. Release: replace upstream auto-release (would tag `v0.15.0` on every push to main of the fork) with a GAID
+   tag-driven draft release (`geo-v<version>`) whose manifest is generated after build.
+4. Checks: `geo/tests/*.test.mjs` (node:test, deterministic) + `geo/tests/production-smoke.mjs` (clean data home,
+   start → create project → stop → restart → project still there, extras not fetched, data outside checkout), wired
+   into `scripts/check`; upstream steps unchanged.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

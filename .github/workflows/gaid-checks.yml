@@ -1,0 +1,55 @@
+name: GAID checks
+
+# GeoAIDesk checks next to the unchanged upstream CI (tests.yml): the geo unit
+# checks and the production smoke (clean data home, start, create a project,
+# stop, restart, project kept, excluded sources not fetched).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.21'
+      - name: Geo checks
+        run: node --test "geo/tests/*.test.mjs"
+      - name: Install dependencies
+        run: |
+          (cd server && npm ci --no-audit --no-fund)
+          (cd web && npm ci --no-audit --no-fund)
+      - name: Production smoke
+        run: node geo/tests/production-smoke.mjs
+
+  launcher:
+    name: start-gaid --check (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Geo checks
+        run: node --test "geo/tests/*.test.mjs"
+      - name: Run start-gaid.sh --check
+        if: runner.os != 'Windows'
+        run: ./start-gaid.sh --check
+      - name: Run start-gaid.cmd --check
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: start-gaid.cmd --check

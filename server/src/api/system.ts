@@ -5,13 +5,19 @@
  */
 import type { FastifyInstance } from "fastify";
 import {
+  REPO_ROOT,
   ollamaBaseUrl,
   openaiCompatibleBaseUrl,
   openaiCompatibleConfigured,
 } from "../config.ts";
+import { readDistributionRelease } from "../geo/distribution.ts";
 import { getSystemStats } from "../system-stats.ts";
 
-const GITHUB_REPO = "K-Dense-AI/k-dense-byok";
+// A distribution checks its own releases (e.g. GeoAIDesk `geo-v0.1.0` tags),
+// never upstream's: an upstream release is not an update of the fork.
+const distribution = readDistributionRelease(REPO_ROOT);
+const GITHUB_REPO = distribution?.repository ?? "K-Dense-AI/k-dense-byok";
+const TAG_PREFIX = distribution?.releaseTagPrefix ?? "v";
 const VERSION_CACHE_TTL_MS = 60 * 60 * 1000; // re-check at most once per hour
 let versionCache: { ts: number; latestVersion: string | null } | null = null;
 
@@ -45,7 +51,8 @@ export async function registerSystemRoutes(app: FastifyInstance): Promise<void> 
         return { latestVersion: null };
       }
       const data = (await resp.json()) as { tag_name?: string };
-      const latestVersion = (data.tag_name ?? "").replace(/^v/, "") || null;
+      const tag = data.tag_name ?? "";
+      const latestVersion = (tag.startsWith(TAG_PREFIX) ? tag.slice(TAG_PREFIX.length) : "") || null;
       versionCache = { ts: now, latestVersion };
       return { latestVersion };
     } catch {

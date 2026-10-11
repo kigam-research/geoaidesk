@@ -1,3 +1,45 @@
+# GeoAIDesk (GAID)
+
+GeoAIDesk is a geoscience distribution of K-Dense BYOK, maintained by KIGAM. It runs on your own computer with the
+model you connect (a local model, a personal API key, or a supported subscription sign-in). It is an independent fork,
+not affiliated with or endorsed by K-Dense, Inc.; see `NOTICE.md`.
+
+Status: preview (`geo/distribution.json`). Geoscience file viewers, task workflows and the geo skill catalogue are
+not in this version yet; until then the app works like the upstream release it is based on
+(`geo/upstream.lock.json`).
+
+## Install and start
+
+Requirements: Node.js 22.19 or newer and Git (Git for Windows on Windows); `uv` is installed on the first start if
+missing. Linux and WSL are the first tested platforms.
+
+```bash
+git clone https://github.com/kigam-research/geoaidesk.git
+cd geoaidesk
+./start-gaid.sh          # Windows: start-gaid.cmd
+```
+
+The first start installs packages, prepares the default project and builds the UI; then it opens
+<http://localhost:3000>. Stop with Ctrl+C. Starting again reuses the build and keeps your projects.
+
+User data stays outside the checkout, under `~/.geoaidesk` (set `GAID_HOME` to move it):
+
+| Path | Content |
+|---|---|
+| `projects/` | Projects, chats, notebooks, provenance |
+| `pi-agent/` | Model sign-ins and agent settings |
+| `config.env` | API keys saved in Settings |
+| `skills-cache/`, `office-assets/` | Download caches |
+
+`./start-gaid.sh --check` reports the environment without starting anything. The upstream launchers
+(`start.sh`, `start.cmd`) remain the development entry points (`next dev`, data in the checkout).
+
+Development rules for this fork are in `AGENTS.md`; upstream synchronization in `docs/upstream-sync.md`.
+
+---
+
+The upstream README follows.
+
 # K-Dense BYOK
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

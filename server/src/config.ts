@@ -8,6 +8,7 @@
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyCatalogueExclusions, readDistributionExclusions } from "./geo/distribution.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,23 @@ export const PROJECTS_ROOT = path.resolve(
     ? process.env.KADY_PROJECTS_ROOT
     : path.join(REPO_ROOT, "projects"),
 );
+
+/**
+ * The `.env` that Settings writes keys to: `KADY_ENV_FILE` when set (env.ts
+ * then loads only that file), else the repo-root `.env`.
+ */
+export const MANAGED_ENV_FILE = (() => {
+  const raw = process.env.KADY_ENV_FILE?.trim();
+  if (!raw) return path.join(REPO_ROOT, ".env");
+  return path.resolve(
+    REPO_ROOT,
+    raw === "~"
+      ? os.homedir()
+      : raw.startsWith("~/") || raw.startsWith("~\\")
+        ? path.join(os.homedir(), raw.slice(2))
+        : raw,
+  );
+})();
 
 /** App-scoped Pi configuration/auth directory, established by env.ts. */
 const rawPiAgentDir =
@@ -56,13 +74,23 @@ export interface CatalogueSource {
  * default-enabled policy. A later source wins a name clash, so these copies
  * replace any the primary repo still ships under the same name.
  */
-export const CATALOGUE_EXTRA_SOURCES: readonly CatalogueSource[] = [
+const UPSTREAM_CATALOGUE_EXTRA_SOURCES: readonly CatalogueSource[] = [
   {
     repo: "anthropics/skills",
     branch: "main",
     skills: ["docx", "pdf", "pptx", "xlsx"],
   },
 ];
+
+/**
+ * The extra sources minus what `geo/distribution.json` excludes (GeoAIDesk
+ * does not fetch the four `anthropics/skills` document skills: their license
+ * restricts use outside Anthropic's services). Manual installs still work.
+ */
+export const CATALOGUE_EXTRA_SOURCES: readonly CatalogueSource[] = applyCatalogueExclusions(
+  UPSTREAM_CATALOGUE_EXTRA_SOURCES,
+  readDistributionExclusions(REPO_ROOT),
+);
 
 /**
  * Staging cache the `skills` CLI fetches into. Deliberately outside any
