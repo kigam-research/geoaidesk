@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:16:41Z
+updated: 2026-10-11T08:20:58Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -83,12 +83,19 @@ before finishing (server/node_modules, server/src/helpers/.venv, web/node_module
 web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the assigned PC74 worktree; base contains shared instance harness and catalogue 0.2.1 pin.
+- Read AGENTS.md, record contract and shared harness. Codegraph is unindexed here; exact native source reads are used.
+- PC71 WSL has uv at ~/.local/bin/uv but not on its noninteractive PATH. Native Windows prerequisites respond.
 ## Next steps
-1. (the next session's first action)
+1. Implement standalone install/update runners and deterministic synthetic fixture/API assertions.
+2. Save reviewed harness, then run PC74 via task jobs and PC71 via durable user services/native scheduled execution.
+3. Record every result and limitation, run the declared Node geo tests, then task finish.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential decisions: settle evidence steps and safe fresh-output ownership first, then install runner, update runner, actual host runs, final checks.
+- Owned interfaces: install-* helpers + install-proof/update-proof; shared instance changes only when required for cleanup. No server/web/app edits.
+- Independent work: host executions may overlap after the same harness revision is saved; no nested writers. Integration order: harness, local evidence, remote evidence, parent integration.
+- No paid model requests. Session history will be explicitly marked synthetic and use Pi's own SessionManager serializer; notebook notes use the API.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

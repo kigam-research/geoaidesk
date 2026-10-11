@@ -19,6 +19,9 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const CONTROLLED_ENV = [
   "GAID_HOME",
   "GAID_CATALOGUE",
+  "GAID_CATALOGUE_ARCHIVE",
+  "GAID_CATALOGUE_URL",
+  "GAID_CATALOGUE_DOWNLOAD",
   "KADY_PROJECTS_ROOT",
   "KADY_PI_AGENT_DIR",
   "PI_CODING_AGENT_DIR",
@@ -134,7 +137,7 @@ export async function startInstance({
     }
     await sleep(1000);
   }
-  killTree(child);
+  await stopInstance(instance);
   throw new Error(`services not up after ${timeoutMs / 1000}s; see ${logFile}`);
 }
 
