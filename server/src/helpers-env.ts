@@ -36,7 +36,7 @@ export function helperPython(): string {
 export function syncHelperVenv(): boolean {
   const uv = findUv();
   if (!uv) return false;
-  const res = spawnSync(uv, ["sync"], {
+  const res = spawnSync(uv, ["sync", "--python", "3.12"], {
     cwd: HELPERS_DIR,
     stdio: "ignore",
     timeout: 15 * 60 * 1000,

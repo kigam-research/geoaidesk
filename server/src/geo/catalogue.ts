@@ -55,13 +55,13 @@ export type GeoCatalogueErrorCode =
   | "package-digest";
 
 export class GeoCatalogueError extends Error {
-  constructor(
-    readonly code: GeoCatalogueErrorCode,
-    message: string,
-    readonly searched: string[] = [],
-  ) {
+  readonly code: GeoCatalogueErrorCode;
+  readonly searched: string[];
+  constructor(code: GeoCatalogueErrorCode, message: string, searched: string[] = []) {
     super(message);
     this.name = "GeoCatalogueError";
+    this.code = code;
+    this.searched = searched;
   }
 }
 
