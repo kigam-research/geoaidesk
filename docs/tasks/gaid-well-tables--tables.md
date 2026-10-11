@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:54:53Z
+updated: 2026-10-11T04:55:32Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"8b4d426a-82dc-444e-9347-60354a8ffce4","pid":3988444,"provider":"codex","session":"01a12946-e997-71b3-80cd-cd78dd1a4c97","start":"15987572","token":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
 branch: task/gaid-well-tables--tables
 target: task/gaid-well-tables
@@ -49,3 +49,4 @@ No separate child report. Parent integration/evidence note: delivered explicit r
 - Implementation and focused verification completed in owned files. Native codegraph lookup reports this exact worktree unindexed; source files read directly. Parent retains whole-app/browser integration ownership.
 - Pre-check review: gap findings are suppressed if the source is partial or a hole contains uncertain/invalid rows; unmatched-key absence is not inferred from a partial opposite table. Positive overlaps/duplicates remain reportable on read rows.
 - First check launch refused before execution because the source was dirty (`job source dirty; save first`). Save the reviewed snapshot, then start the recorded job; no job receipt was created.
+- Received routed hub request `env-sample-jobs-gaid-well-tables--tables`: user's confirmed decision authorizes direct worktree checks while backbone fixes inherited `.env.example` snapshot classification. No env sample edits. Existing focused/typecheck commands comply; mandatory `scripts/check` remains owned by task finish.
