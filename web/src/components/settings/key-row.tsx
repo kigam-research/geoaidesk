@@ -195,7 +195,7 @@ export function KeyRow({
             size="sm"
             className="ml-auto h-6 text-[11px] text-destructive hover:text-destructive"
             disabled={saving}
-            aria-label={appText("settings.credentials.clear", { label: def.label })}
+            aria-label={appText("settings.credentials.clearField", { label: def.label })}
             onClick={() => void clear()}
           >
             {appText("settings.credentials.clear")}</Button>

@@ -1,6 +1,6 @@
 {
   "title": "Drillhole / assay table checks",
-  "loading": "Reading the table.",
+  "loading": "Reading table…",
   "failed": "Could not assess table",
   "retry": "Reload",
   "none": "Not mapped",
@@ -67,6 +67,7 @@
   "unit": "Assay unit",
   "detection_limit": "Detection limit",
   "qualifier": "Qualifier",
-  "inspect": "Inspect drillhole table",
-  "ordinary": "Standard table view"
+  "option.loading": "Reading the table.",
+  "option.inspect": "Inspect drillhole table",
+  "option.ordinary": "Standard table view"
 }

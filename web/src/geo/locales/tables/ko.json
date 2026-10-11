@@ -1,6 +1,6 @@
 {
   "title": "시추공·분석 표 검사",
-  "loading": "표를 읽는 중입니다.",
+  "loading": "표를 읽고 있습니다…",
   "failed": "표를 검사하지 못했습니다",
   "retry": "다시 읽기",
   "none": "지정하지 않음",
@@ -67,6 +67,7 @@
   "unit": "분석 단위",
   "detection_limit": "검출한계",
   "qualifier": "한정자",
-  "inspect": "시추공 표 점검",
-  "ordinary": "일반 표 보기"
+  "option.loading": "표를 읽는 중입니다.",
+  "option.inspect": "시추공 표 점검",
+  "option.ordinary": "일반 표 보기"
 }

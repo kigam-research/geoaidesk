@@ -46,7 +46,7 @@ describe("GeoPromptBudget", () => {
     expect(apiFetch).toHaveBeenCalledWith("/geo/context/preview?model=gaid-local%2Fqwen3", {}, "p1");
 
     fireEvent.click(chip);
-    expect(await screen.findByText(/남는 양이 컨텍스트의 절반보다 적습니다/)).toBeInTheDocument();
+    expect(await screen.findByText(/남는 양이 context의 절반보다 적습니다/)).toBeInTheDocument();
     const select = await screen.findByRole("combobox");
     expect(screen.getByRole("option", { name: "작업: 검층 QC" })).toBeInTheDocument();
 

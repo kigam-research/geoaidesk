@@ -28,16 +28,16 @@ describe("LocalModelCard", () => {
     render(<LocalModelCard />);
     expect(await screen.findByText("Ollama 연결됨")).toBeInTheDocument();
     expect(screen.getByText(/CPU 오프로딩 약 18%/)).toBeInTheDocument();
-    expect(screen.getByLabelText("이 컨텍스트로 파생 모델 생성")).not.toBeChecked();
-    expect(screen.getByLabelText("컨텍스트 프로필")).toHaveValue("proposed-64k");
-    expect(screen.getByLabelText("컨텍스트 토큰 수")).toHaveValue(65536);
+    expect(screen.getByLabelText("지정한 context로 파생 모델 생성")).not.toBeChecked();
+    expect(screen.getByLabelText("context 프로필")).toHaveValue("proposed-64k");
+    expect(screen.getByLabelText("context 토큰 수")).toHaveValue(65536);
     expect(screen.queryByRole("option", { name: /32K/ })).not.toBeInTheDocument();
     await userEvent.click(screen.getByLabelText("기본 모델로 사용"));
     await userEvent.click(screen.getByRole("button", { name: "모델 설정 저장" }));
     expect(await screen.findByText("모델 설정을 저장했습니다.")).toBeInTheDocument();
     expect(JSON.parse(fetcher.mock.calls[1][1].body)).toEqual({ model: "qwen3:trial", contextWindow: 65536, maxTokens: 4096, createVariant: false, setDefault: true });
     expect(fetcher.mock.calls[1][0]).toMatch(/\/geo\/local-model\/configure$/);
-    expect(screen.getByText(/저장한 모델: gaid-local\/qwen3:trial · 컨텍스트 65536/)).toBeInTheDocument();
+    expect(screen.getByText(/저장한 모델: gaid-local\/qwen3:trial · context 65536/)).toBeInTheDocument();
     expect(screen.getByText(/앱의 선언값과 Ollama 설정이 맞지 않습니다/)).toBeInTheDocument();
   });
   it("sends variant creation only after explicit selection and restores saved limits on mount", async () => {
@@ -47,15 +47,15 @@ describe("LocalModelCard", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<LocalModelCard />);
     await screen.findByText("Ollama 연결됨");
-    expect(screen.getByLabelText("컨텍스트 토큰 수")).toHaveValue(98304);
+    expect(screen.getByLabelText("context 토큰 수")).toHaveValue(98304);
     expect(screen.getByLabelText("최대 출력 토큰 수")).toHaveValue(8192);
     expect(screen.getByLabelText("기본 모델로 사용")).toBeChecked();
-    await userEvent.click(screen.getByLabelText("이 컨텍스트로 파생 모델 생성"));
-    fireEvent.change(screen.getByLabelText("컨텍스트 토큰 수"), { target: { value: "80000" } });
+    await userEvent.click(screen.getByLabelText("지정한 context로 파생 모델 생성"));
+    fireEvent.change(screen.getByLabelText("context 토큰 수"), { target: { value: "80000" } });
     await userEvent.click(screen.getByRole("button", { name: "모델 설정 저장" }));
     await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
     expect(JSON.parse(fetcher.mock.calls[1][1].body)).toMatchObject({ contextWindow: 80000, createVariant: true });
-    await waitFor(() => expect(screen.getByLabelText("이 컨텍스트로 파생 모델 생성")).not.toBeChecked());
+    await waitFor(() => expect(screen.getByLabelText("지정한 context로 파생 모델 생성")).not.toBeChecked());
   });
   it("shows unreachable status and disables saving; refresh recovers", async () => {
     const fetcher = vi.fn().mockResolvedValueOnce(response({ ...initial, reachable: false, error: "Ollama: unavailable", models: [] }))

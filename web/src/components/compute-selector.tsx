@@ -192,12 +192,12 @@ function PickerOption({
             ) : null}
             {instance.fallback ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                {appText("chat.compute.fallback", { target: instance.fallback })}
+                {appText("chat.compute.fallbackTarget", { target: instance.fallback })}
               </span>
             ) : null}
             {instance.cache ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                {appText("chat.compute.cache", { cache: instance.cache })}
+                {appText("chat.compute.cacheTarget", { cache: instance.cache })}
               </span>
             ) : null}
           </span>

@@ -349,6 +349,12 @@
       "owner": "gaid-korean-workspace",
       "status": "edited",
       "responsibility": "Localized shared Settings scope/effect timing, displayed on primary model setup path"
+    },
+    {
+      "path": "web/src/components/settings/defaults-panel.test.tsx",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "Update English product-name expectation to neutral app default; test workflow unchanged"
     }
   ],
   "notTouched": [

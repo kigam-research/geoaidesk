@@ -559,7 +559,7 @@ function ProjectCard({
       <button
         type="button"
         className="absolute inset-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-        aria-label={appText("projects.open", { name: project.name })}
+        aria-label={appText("projects.openNamed", { name: project.name })}
         onClick={onOpen}
       />
       <CardHeader className="pointer-events-none gap-1.5 px-4">
@@ -676,7 +676,7 @@ function ProjectActivityBadges({
     activity.blocked > 0
       ? {
           key: "blocked",
-          label: activity.blocked === 1 ? appText("projects.blocked") : appText("projects.blocked", { count: activity.blocked }),
+          label: activity.blocked === 1 ? appText("projects.blocked") : appText("projects.blockedCount", { count: activity.blocked }),
           className: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300",
           dot: "bg-orange-500",
         }
@@ -684,7 +684,7 @@ function ProjectActivityBadges({
     activity.running > 0
       ? {
           key: "running",
-          label: activity.running === 1 ? appText("projects.running") : appText("projects.running", { count: activity.running }),
+          label: activity.running === 1 ? appText("projects.running") : appText("projects.runningCount", { count: activity.running }),
           className: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
           dot: "bg-blue-500 animate-pulse",
         }
