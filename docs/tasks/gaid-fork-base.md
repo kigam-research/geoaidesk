@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-11T02:19:19Z
+status: active
+updated: 2026-10-11T02:30:07Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0c2ee874-5ddb-4118-9f20-209b6d8b615a","pid":3424104,"provider":"claude","session":"53669a44-52c3-4de7-84fd-3986e964ef40","start":"14946049","token":"204294a4c7b769cb17cdc00690c68a91f04cb61b74c54d3c345e6470c46afaf0"}
 branch: task/gaid-fork-base
 target: main
@@ -82,6 +82,9 @@ Closed 2026-10-11T02:19:19Z: finished; task finish integrates it into main. No f
 ## Failed approaches
 - Production install via upstream `npm install <pins>` rewrote server/package-lock.json under npm 11 (dirty release
   checkout, update conflicts) → production uses `npm ci`, gated by a lockfile+ABI stamp.
+- First `task finish`: upstream test file-preview-panel "retains a.txt draft…" failed; pre-existing flake (unmodified
+  main 3/6 full-suite runs fail on PC74; lazy editor import > default 1 s findByRole wait). Raised the wait to 4 s in
+  that test (8/8 pass); recorded as a seam in geo/integration-boundaries.json.
 - Build stamp included `web/next-env.d.ts`, which `next build` creates → fresh clones rebuilt on every restart.
   Excluded build-generated files.
 ## Notes and decisions

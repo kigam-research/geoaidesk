@@ -45,17 +45,21 @@ function panelProps(path = "a.txt"): React.ComponentProps<typeof FilePreviewPane
 
 afterEach(() => vi.restoreAllMocks());
 
+// The editor loads lazily; its first dynamic import can exceed the default 1 s
+// wait when the full suite runs on parallel workers.
+const EDITOR_WAIT = { timeout: 4000 };
+
 it.each(["a.txt", "a.tex"])("retains %s draft across file, notebook, compute, and project navigation", async (path) => {
   const props = panelProps(path);
   const { rerender } = render(<FilePreviewPanel {...props} />);
   fireEvent.click(screen.getByTitle("Edit file"));
-  fireEvent.change(await screen.findByRole("textbox", { name: "Editor" }), { target: { value: "valuable unsaved A" } });
+  fireEvent.change(await screen.findByRole("textbox", { name: "Editor" }, EDITOR_WAIT), { target: { value: "valuable unsaved A" } });
   expect(screen.queryByTitle("Where this file came from")).toBeNull();
   for (const change of [{ activeTabPath: "b.txt" }, { showNotebook: true }, { showCompute: true }, { isActive: false }]) {
     rerender(<FilePreviewPanel {...props} {...change} />);
     expect(screen.queryByRole("textbox", { name: "Editor" })).toBeNull();
     rerender(<FilePreviewPanel {...props} />);
-    expect((await screen.findByRole("textbox", { name: "Editor" }) as HTMLTextAreaElement).value).toBe("valuable unsaved A");
+    expect((await screen.findByRole("textbox", { name: "Editor" }, EDITOR_WAIT) as HTMLTextAreaElement).value).toBe("valuable unsaved A");
   }
   expect(props.onSaveText).not.toHaveBeenCalled();
   // The surviving editor saves through its owning workspace's callback/path.
@@ -68,7 +72,7 @@ it("requires confirmation to close a dirty file tab or text editor", async () =>
   const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
   render(<FilePreviewPanel {...props} />);
   fireEvent.click(screen.getByTitle("Edit file"));
-  fireEvent.change(await screen.findByRole("textbox", { name: "Editor" }), { target: { value: "unsaved" } });
+  fireEvent.change(await screen.findByRole("textbox", { name: "Editor" }, EDITOR_WAIT), { target: { value: "unsaved" } });
   fireEvent.click(screen.getAllByTitle("Close tab")[0]);
   expect(props.onTabClose).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Close editor" }));

@@ -60,6 +60,12 @@
       "responsibility": "Upstream CI kept as is; GAID checks run from .github/workflows/gaid-checks.yml and scripts/check"
     },
     {
+      "path": "web/src/components/file-preview-panel.test.tsx",
+      "owner": "upstream",
+      "status": "edited",
+      "responsibility": "gaid-fork-base raised the lazy-editor wait from the default 1 s to 4 s: the unmodified upstream test failed 3 of 6 full-suite runs on PC74 (parallel workers). Drop the change if upstream fixes it"
+    },
+    {
       "path": "scripts/check",
       "owner": "gaid-fork-base",
       "status": "added",
@@ -100,7 +106,10 @@
       "owner": "gaid-korean-workspace",
       "status": "unchanged",
       "responsibility": "Format-aware dispatch; gaid-runtime publishes the geo viewer interface; gaid-well-tables and gaid-maps may append their own entries (append-only lines); gaid-korean-workspace owns any non-additive change",
-      "appendOnly": ["gaid-well-tables", "gaid-maps"]
+      "appendOnly": [
+        "gaid-well-tables",
+        "gaid-maps"
+      ]
     },
     {
       "path": "web/src/lib/skill-suggestions.ts",
