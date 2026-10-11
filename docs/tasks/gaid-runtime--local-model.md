@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T03:07:09Z
+status: ready
+updated: 2026-10-11T03:07:23Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"6868fb3e-df61-4f95-9b8b-6969b644d3c9","pid":3660182,"provider":"codex","session":"01a128e4-01e8-7261-9bf0-b7141477814a","start":"15339424","token":"678e6a4621bca6508ffa52de4cab714cb9f6c182668863bcbd572346b02492e2"}
 branch: task/gaid-runtime--local-model
 target: task/gaid-runtime
@@ -97,9 +97,9 @@ Verified: server typecheck; 22 focused server tests (including fresh-module read
 web typecheck; 4 card tests, rerun after improving custom-profile selection.
 No codegraph index exists for this exact worktree; used direct source reads.
 ## Next steps
-1. Save the reviewed snapshot, then finish; the CLI runs scripts/check, including the full server suite.
-2. If finish fails, inspect its recorded check log, fix in place and rerun finish (do not resume).
-3. The parent integrates this child and includes its results in the canonical report.
+<!-- task:closed -->
+Closed 2026-10-11T03:07:23Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 Plan: sequentially settle status/configure response shapes, implement the server, then the card, then checks.
