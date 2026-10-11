@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T08:44:52Z
+status: done
+updated: 2026-10-11T11:55:42Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -107,7 +107,7 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Job 1 succeeded relay notification processed: reread full log and record, confirmed all 30 install/restart steps passed, final-stop passed and SHA256 unchanged (46777cca…aa7326). No rerun or additional Windows polling triggered.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-11T08:44:52Z: ready; the parent gaid-release-proof integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-11T11:55:42Z: integrated into gaid-release-proof; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
