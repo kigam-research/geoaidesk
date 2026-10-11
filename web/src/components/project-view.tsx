@@ -257,8 +257,13 @@ export function ProjectView({
           href="https://github.com/kigam-research/geoaidesk"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={appText("header.productName")}
           className="flex items-center gap-2"
-        ><span className="text-sm font-semibold tracking-tight text-primary">{appText("header.shortName")}</span><span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
+        >{/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
+          <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
           {isVersioned && (
             <span className="text-[11px] text-muted-foreground/60">
               v{APP_VERSION}

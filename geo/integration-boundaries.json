@@ -149,8 +149,8 @@
     {
       "path": "web/src/app/layout.tsx, web/src/app/globals.css, web/public/",
       "owner": "gaid-korean-workspace",
-      "status": "unchanged",
-      "responsibility": "Layout, theme, metadata and brand assets (WP00 tokens, Korean-first copy in web/src/geo/locales/)"
+      "status": "edited",
+      "responsibility": "Layout, theme, metadata and brand assets (WP00 tokens, Korean-first copy in web/src/geo/locales/). gaid-korean-workspace: GAID compact lockups web/public/brand/gaid-compact-{color,on-dark}.svg in the workspace and projects headers; app/icon.svg (adaptive favicon) and app/apple-icon.png from geo/brand/ replace the upstream favicon.ico and icon.png; the upstream kdense-logo PNGs stay in web/public/brand/ unused"
     },
     {
       "path": "server/package.json, server/package-lock.json, web/package.json, web/package-lock.json, server/src/helpers/pyproject.toml, server/src/helpers/uv.lock",
@@ -234,7 +234,7 @@
       "path": "web/src/components/project-view.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link"
     },
     {
       "path": "web/src/components/sandbox-panel.tsx",

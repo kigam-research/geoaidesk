@@ -922,7 +922,12 @@ function WorkspacePage({
             onClick={onOpenProjectView}
             aria-label={appText("header.back_to_projects")}
             className="flex items-center gap-2"
-          ><span className="text-sm font-semibold tracking-tight text-primary">{appText("header.shortName")}</span><span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
+          >{/* GAID compact lockup (WP00 design/assets, vendored in geo/brand/); the button's aria-label names it. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
+            <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
           </button>
           {isVersioned && (
             <InfoTooltip
