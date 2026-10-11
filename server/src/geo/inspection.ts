@@ -6,6 +6,8 @@ import { formatFromName, familyOf, GEO_INSPECTION_SCHEMA, type GeoFormat, type G
 import type { ProjectPaths } from "../projects.ts";
 import { safePath, isUserVisible, apiRelative, SandboxError } from "../sandbox-fs.ts";
 import { baselineInspector, sniffFormat } from "./inspectors/baseline.ts";
+import { mapInspector } from "./maps/inspector.ts";
+import { mapCompanions } from "./maps/sources.ts";
 
 export interface GeoInspectContext {
   projectId: string;
@@ -34,6 +36,7 @@ export const MAX_PREVIEW_ROWS = 50;
 /** Total actual IO per source file, including format sniffing and random TIFF reads. */
 export const MAX_INSPECTION_BYTES = 256 * 1024;
 registerGeoInspector(baselineInspector);
+registerGeoInspector(mapInspector);
 
 export async function resolveGeoPath(paths: ProjectPaths, rel: string): Promise<{ abs: string; rel: string; size: number; mtime: number }> {
   if (typeof rel !== "string" || !rel.trim() || rel.includes("\0")) throw new SandboxError(400, "A file path is required");
@@ -68,6 +71,7 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
   const sourceFiles = [primary.rel];
   const sourceStats = [[primary.rel, primary.size, primary.mtime]];
   const issues: GeoInspection["issues"] = [];
+  let unsafeCompanion = false;
   try { format = sniffFormat(primary.rel, await readBytes(primary.rel, 0, 512)); }
   catch { issues.push({ code: "unreadable-file", message: "The file header could not be read.", severity: "error" }); }
   if (format === "shapefile") {
@@ -85,6 +89,16 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
       }
     } catch { issues.push({ code: "companions-unreadable", message: "Companion directory could not be listed.", severity: "warning" }); }
   }
+  try {
+    for (const rel of await mapCompanions(paths, primary.rel, format)) {
+      if (sourceFiles.includes(rel)) continue;
+      const info = await resolveGeoPath(paths, rel);
+      sourceFiles.push(info.rel); sourceStats.push([info.rel, info.size, info.mtime]);
+    }
+  } catch {
+    unsafeCompanion = true;
+    issues.push({ code: "unreadable-companion", message: "A required or implicitly read map companion is outside the accessible project files.", severity: "error" });
+  }
   let inspector = inspectorFor(format) ?? baselineInspector;
   const fingerprintFor = (reader: GeoInspector) => createHash("sha256").update(JSON.stringify({ sources: sourceStats.sort(), inspector: [reader.name, reader.version] })).digest("hex");
   const result: GeoInspection = {
@@ -93,6 +107,8 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
     issues, inspector: { name: inspector.name, version: inspector.version },
   };
   const rows = options.previewRows ?? 8;
+  // Do not let a GDAL reader follow a companion that failed sandbox validation.
+  if (unsafeCompanion) return result;
   const ctx: GeoInspectContext = { projectId, paths, relPath: primary.rel, absPath: primary.abs, sizeBytes: primary.size, format, previewRows: Number.isFinite(rows) ? Math.max(0, Math.min(MAX_PREVIEW_ROWS, Math.floor(rows))) : 8, sourceFiles, readBytes };
   try {
     let parsed = await inspector.inspect(ctx);

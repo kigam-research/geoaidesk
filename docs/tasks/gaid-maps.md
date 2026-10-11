@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:44:01Z
+updated: 2026-10-11T04:47:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -69,3 +69,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - CRS policy: source declaration preserved; default display EPSG:3857 only for declared sources; unknown uses native/pixel inspection and cannot overlay with declared layers or calculate area. Area explicitly chooses projected CRS or ellipsoid geodesic method; never uses preview subsets.
 - Transport contract: inspect helper returns additive GeoInspection fields; vector/raster/area responses follow maps.ts. Helper input is one JSON object on stdin with `{operation, path:absolutePath, ...request}`; stdout one JSON object; errors stderr, exit 3 dependencies / 4 missing / 5 invalid / 1 other. Parent sandbox-validates paths/companions and bounds subprocess time/output.
 - Integration order: parent contract commit -> child packages -> parent routes/tests -> child completion -> task sync -> full checks -> report/cleanup/finish. No paid model runs.
+
+### Active packages
+- helper: `gaid-maps--helper`, writer `7e627c39-8f96-4667-b685-4abba81a1202`, owned Python/helper fixture paths above. Started from shared contract 91e7df38.
+- viewer: `gaid-maps--viewer`, writer `2bcba6ab-0329-4c49-8cb2-c835676e8dc3`, owned viewer/ol paths above. Started from shared contract 91e7df38.
+- Parent implementation in progress: bounded uv subprocess bridge, active-project routes, artifact manifest validation, source companion validation/fingerprints, and route tests. Tests not run yet; dependencies not present in this worktree.
