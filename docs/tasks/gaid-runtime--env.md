@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T03:10:46Z
+status: active
+updated: 2026-10-11T03:17:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0becd10a-f4fd-4f39-92ef-a666bfd98820","pid":3657853,"provider":"codex","session":"01a128e3-dbba-7443-9d73-f1900d0e9424","start":"15338416","token":"1dbe8a1fa32d526ab7c5c2b60daed9de22e6bb23df710da310f3db8bd3d7953a"}
 branch: task/gaid-runtime--env
 target: task/gaid-runtime
@@ -100,7 +100,8 @@ server/src/sandbox-seed.ts (and helpers-env.ts only if needed).
 - Targeted tests: 11 passed across two files. Backend `npm run typecheck` and frontend `npx tsc --noEmit` passed.
 - Real smoke passed: every one of 13 declared modules imported in BOTH helper and freshly generated project environments, 26/26 checks; log `/home/seongin3/data/geoaidesk/work/gaid-runtime/env-smoke.log`.
 - Full unfiltered backend suite completed: 1502 passed, 8 skipped, 3 failed (1513). Fixed the introduced native-require syntax regression; rerun of notebook-store plus both environment files passed 22/22. The remaining two failures are the existing mzML/PSI-MS vocabulary network cases handled explicitly by scripts/check. Log `/home/seongin3/data/geoaidesk/work/gaid-runtime/env-backend-tests.log`.
-- No deployment or user-project preparation performed. Helper venv synced by the real smoke only.
+- Final scripts/check first attempt: backend 1522 passed, 11 skipped; web 887 passed, 2 failed due to the documented lazy editor timeout under parallel load. The failing file reran alone successfully (4/4). Retrying task finish with CPU affinity 0-3; Vitest uses availableParallelism(), so this bounds worker concurrency without changing code/check coverage.
+- No deployment or user-project preparation performed. Helper venv synced by the real smoke and declared checks only.
 
 ### Plan and ownership
 - Sequential: pure closure/spec generation → helper manifest/lock resolution → seed seam → readiness/preparation service and routes → tests and real import smoke.
@@ -114,6 +115,7 @@ server/src/sandbox-seed.ts (and helpers-env.ts only if needed).
 Closed 2026-10-11T03:10:46Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish failed only on two existing lazy-editor wait timeouts in web/src/components/file-preview-panel.test.tsx (4 s); isolated rerun passed all 4. Preserve the tests and constrain execution parallelism instead of increasing waits.
 - Initial helper lock resolution failed on Python 3.11: catalogue numpy>=2.5.3 requires >=3.12. A Python-only uv environment marker still attempted unsupported Windows ARM64 and failed on RDKit. Neither split was among the four required Python-3.12 platform targets.
 - Resolved by setting `[tool.uv].environments` to the four shipped platforms with Python >=3.12 (catalogue requirement), preserving every required platform marker and upstream requires-python verbatim. `uv lock` then succeeded; no package bound was weakened.
 - `task job run` could not create a snapshot because inherited `.env.example` is forbidden. No job receipt was created and no job is pending. Recorded logs above for the explicitly requested checks; no forbidden file was read or changed.
