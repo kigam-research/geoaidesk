@@ -125,7 +125,7 @@ export async function configureLocalModel(input: unknown, options: LocalModelOpt
   if (!Array.isArray(tags.models) || !tags.models.some(item => record(item).name === config.model || record(item).model === config.model)) {
     throw new LocalModelError(400, "The selected model is not installed in Ollama");
   }
-  const model = config.createVariant ? `${config.model}-gaid-${config.contextWindow / 1024}k` : config.model;
+  const model = config.createVariant ? `${config.model}-gaid-${Math.round(config.contextWindow / 1024)}k` : config.model;
   const validated = validateCustomProviders([{
     id: GAID_LOCAL_PROVIDER, name: "GAID local", baseUrl: `${baseUrl}/v1`, api: "openai-completions",
     models: [{ id: model, contextWindow: config.contextWindow, maxTokens: config.maxTokens, input: ["text"],
