@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T05:31:44Z
+updated: 2026-10-11T05:33:28Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -19,6 +19,7 @@ Area panel selecting vector class field, explicit method geodesic or projected w
 Visible strings isolated in map/strings.ts (Korean-first using current geo i18n pattern, English second, WP07 later owns overall wording). Tests meaningful with mocked OpenLayers if canvas needed: layer selection/request params, source/display info, bounds/area, stale project switch etc. Need real browser evidence later parent handles; provide ready instructions. Keep existing contracts (propose additive changes to parent, don't edit them). Finish child after own targeted tests; parent task complete integrates, then full scripts/check.
 
 ## Current state
+- Continuation finish first encountered the expected append-only registry conflict with parent 94138d7/WP04. Resolved in the owned geo registry by retaining both `.depth.json`/DepthViewer (including LAS) and `.geomap.json`/MapViewer registrations. No parent/sibling implementation files were edited. Full CLI checks follow this merged snapshot.
 - Continuation `viewer-continue-f3b3631f1273` verified existing ownership and worktree. Parent helper dependency is resolved on published origin/task/gaid-maps (reported d6384406e486; fixture and helper verified via git cat-file). Rerun finish in place; own viewer implementation and prior 40-test evidence are unchanged. No new writer, source workaround or scope expansion.
 - Previous second finish merged parent 3481060 and failed its new `server/test/geo-maps-integration.test.ts`: `geo/tests/fixtures/maps_fixture.py` was then absent. Backend: 145 files / 1584 tests passed, 1 integration suite failed during fixture setup, 13 tests skipped. Historical full-check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-z4pirnbd.log.
 - Resumed in the original CLI-returned worktree on 2026-10-11. Read AGENTS, parent task, map/inspection contracts and plan sections 3.2–3.3 / 4.5–4.6.
@@ -32,6 +33,7 @@ Visible strings isolated in map/strings.ts (Korean-first using current geo i18n 
 2. Parent integrates this ready child with `task complete gaid-maps--viewer`, performs browser evidence below, and owns the canonical report and final integration. Remove regenerated ignored dependency/build caches after the last check.
 
 ## Failed approaches
+- Continuation finish stopped at the append-only viewer registry merge conflict before checks; resolved both sides as already authorized, then reran finish in place.
 - Second finish failed at the parent integration suite's fixture setup because its committed test preceded sibling helper integration. No viewer source workaround is appropriate; parent integration is the needed external change.
 - First finish was intentionally stopped (exit -15) after a direct OpenLayers probe found native pixels projection produced `resolution: NaN` with default world-resolution settings. Replaced those defaults with finite numerical native-view limits (no geographic units inferred) and added real, unmocked OL view-fit tests. Failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-xqekrgop.log. Retry finish in place without resume.
 - First resume attempts hit another task's transaction lock; waited for that process to exit and resumed successfully without changing ownership/worktree.
