@@ -11,9 +11,15 @@
   "upstreamLock": "geo/upstream.lock.json",
   "integrationBoundaries": "geo/integration-boundaries.json",
   "launch": {
-    "entryPoints": ["start-gaid.sh", "start-gaid.cmd"],
+    "entryPoints": [
+      "start-gaid.sh",
+      "start-gaid.cmd"
+    ],
     "mode": "production",
-    "developmentLaunchers": ["start.sh", "start.cmd"]
+    "developmentLaunchers": [
+      "start.sh",
+      "start.cmd"
+    ]
   },
   "dataHome": {
     "env": "GAID_HOME",
@@ -31,15 +37,25 @@
     "NEXT_TELEMETRY_DISABLED": "1"
   },
   "catalogue": {
-    "status": "pending",
-    "note": "The pinned geo catalogue archive (geo-catalogue-<version>.tar.gz from skill_hub WP01) is staged by WP03 gaid-runtime. Until then initial provisioning uses the upstream catalogue source with automatic refresh off.",
-    "version": null,
-    "archive": null,
-    "sha256": null,
+    "status": "pinned",
+    "note": "Pinned geo catalogue archive exported from kigam-research/skill_hub (docs/specs/gaid-interfaces.md). The backend stages it from GAID_CATALOGUE_ARCHIVE, <GAID_HOME>/catalogue/, geo/catalogue/ next to the checkout, or the named asset (configs/inputs.toml), and verifies the sha256 and every package digest. Without the archive no catalogue skills are installed (no fallback to the upstream sources) and GET /geo/catalogue reports where the archive was looked for.",
+    "version": "0.2.0",
+    "archive": "geo-catalogue-0.2.0.tar.gz",
+    "sha256": "0998908ef7bae10245b9cd30d3aa81929153d3d4427bc0dc1759391afb12a205",
+    "sourceCommit": "022878506f5d4b2ac7a3d98b1f9dbd416fc969f3",
+    "examples": {
+      "archive": "geo-examples-0.2.0.tar.gz",
+      "sha256": "943c8bab71405b208f9c67f7e5341e58cd896e1a1a9b75a3dc3caeb1262bf38d"
+    },
     "excludedSources": [
       {
         "repo": "anthropics/skills",
-        "skills": ["docx", "pdf", "pptx", "xlsx"],
+        "skills": [
+          "docx",
+          "pdf",
+          "pptx",
+          "xlsx"
+        ],
         "reason": "License terms of the four document skills restrict use outside Anthropic's services and redistribution (skill_hub geo-byok-plan section 2.6; release 0.1.0 excludedSources). Not bundled and not fetched automatically; manual installation by the user stays available."
       }
     ]

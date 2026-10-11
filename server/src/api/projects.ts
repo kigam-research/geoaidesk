@@ -21,7 +21,7 @@ import { withNotebookPlanHistory } from "../agent/notebook-research.ts";
 import { readNotebookAnnotations } from "../agent/notebook-annotations.ts";
 import { notebookToMarkdown } from "../agent/notebook-export.ts";
 import { buildNotebookZip } from "../agent/notebook-zip.ts";
-import { seedProjectSkills } from "../agent/skills.ts";
+import { provisionProjectSkills } from "../geo/provision.ts";
 import { runBroker } from "../agent/run-broker.ts";
 import {
   abortProjectSessions,
@@ -284,7 +284,7 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
       const body = req.body ?? {};
       const paths = resolvePaths(req.params.projectId);
       const allowRemote = body.download_skills !== false;
-      const count = await seedProjectSkills(paths, allowRemote);
+      const count = await provisionProjectSkills(paths, allowRemote);
       const venvSynced = body.sync_venv ? syncSandboxVenv(paths) : false;
       return { ok: true, skills: count, venvSynced };
     },

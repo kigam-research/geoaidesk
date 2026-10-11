@@ -1,5 +1,6 @@
 "use client";
 
+import { geoFileCategory, type GeoFileCategory } from "@/geo/viewers/registry";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { withApiToken } from "@/lib/api-auth";
@@ -21,6 +22,7 @@ export interface TreeNode {
 }
 
 export type FileCategory =
+  | GeoFileCategory
   | "image"
   | "pdf"
   | "markdown"
@@ -67,6 +69,9 @@ const ALIGNMENT_EXTS = new Set(["aln", "clustal", "sto", "stk", "phy", "phylip"]
 const MICROSCOPY_EXTS = new Set(["tif", "tiff"]);
 
 export function fileCategory(name: string): FileCategory {
+  // GeoAIDesk: geoscience formats first (web/src/geo/viewers/registry.ts).
+  const geo = geoFileCategory(name);
+  if (geo) return geo;
   const lower = name.toLowerCase();
   // Handle compound extensions like .h5ad.gz before the generic split
   if (lower.endsWith(".h5ad") || lower.endsWith(".h5ad.gz")) return "anndata";

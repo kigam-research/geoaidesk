@@ -6,7 +6,7 @@
  */
 import "./env.ts";
 import { ensureProjectExists, listProjects, resolvePaths } from "./projects.ts";
-import { seedProjectSkills } from "./agent/skills.ts";
+import { provisionProjectSkills } from "./geo/provision.ts";
 import { seedSandboxFiles, syncSandboxVenv } from "./sandbox-seed.ts";
 import { syncHelperVenv } from "./helpers-env.ts";
 import { DEFAULT_PROJECT_ID } from "./config.ts";
@@ -21,7 +21,7 @@ async function main(): Promise<void> {
     // prep is the explicit "restore my scaffolding" path, so it re-creates
     // seed files a user may have deleted (regular requests do not).
     seedSandboxFiles(paths, { force: true });
-    const count = await seedProjectSkills(paths, true);
+    const count = await provisionProjectSkills(paths, true);
     process.stdout.write(`   skills: ${count}\n`);
     const synced = syncSandboxVenv(paths, { force: true });
     process.stdout.write(`   venv: ${synced ? "synced" : "skipped (uv unavailable or sync failed)"}\n`);

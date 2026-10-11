@@ -1,5 +1,6 @@
 import { lazy, type ComponentType } from "react";
 import type { FileCategory } from "@/lib/use-sandbox";
+import { GEO_VIEWER_REGISTRY } from "@/geo/viewers/registry";
 
 export type LoadMode = "text" | "raw" | "none";
 
@@ -42,6 +43,8 @@ export const VIEWER_REGISTRY: Partial<Record<FileCategory, ViewerDef>> = {
   dicom: { loadMode: "none", Viewer: ImagingViewer, canEditSource: false, managesOwnScroll: true },
   nifti: { loadMode: "none", Viewer: ImagingViewer, canEditSource: false, managesOwnScroll: true },
   microscopy: { loadMode: "none", Viewer: ImagingViewer, canEditSource: false, managesOwnScroll: true },
+  // GeoAIDesk geo viewers (web/src/geo/viewers/registry.ts).
+  ...GEO_VIEWER_REGISTRY,
 };
 
 export function getViewerDef(cat: FileCategory): ViewerDef | undefined {

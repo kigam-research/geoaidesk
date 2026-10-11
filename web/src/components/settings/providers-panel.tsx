@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { CustomModelsCard } from "@/components/custom-models-card";
+import { LocalModelCard } from "@/geo/local-model/card";
 import { OAuthLoginDialog } from "@/components/oauth-login-dialog";
 import { apiFetch } from "@/lib/projects";
 import {
@@ -497,6 +498,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
             description="Free, private models running on this machine or your network. Kady probes each server and lists its models in the picker while it is reachable."
           >
             <div className="flex flex-col gap-3">
+              <LocalModelCard />
               <LocalServerCard
                 id="ollama"
                 title="Ollama"

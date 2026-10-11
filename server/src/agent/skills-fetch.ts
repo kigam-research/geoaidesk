@@ -28,6 +28,7 @@ import {
   SKILLS_BRANCH,
   SKILLS_REPO,
 } from "../config.ts";
+import { fetchGeoCatalogue, geoCatalogueActive } from "../geo/catalogue-staging.ts";
 
 const FETCH_TIMEOUT_MS = 5 * 60 * 1000;
 /** Trailing CLI output kept for error messages. */
@@ -468,6 +469,8 @@ export function mergeCatalogueSources(
 export async function fetchCatalogue(
   onFallback?: (reason: string) => void,
 ): Promise<FetchedCatalogue> {
+  // GeoAIDesk: the pinned, verified archive replaces the upstream sources.
+  if (geoCatalogueActive()) return fetchGeoCatalogue();
   const sources: CatalogueFetchSource[] = [
     { repo: SKILLS_REPO, branch: SKILLS_BRANCH, cacheKey: CATALOGUE_CACHE_KEY },
     ...CATALOGUE_EXTRA_SOURCES.map((source) => ({
