@@ -11,7 +11,7 @@ sha256; the harness that produced them is in `geo/release-proof/`.
 |---|---|---|
 | Linux x86-64, Ubuntu 24.04 (native) | tested | Clean install, restart, deterministic previews (LAS values, raster window, vector page, full-layer area table, CSV/TSV interval checks) and an update from the previous main commit that kept projects, chats, notebook notes, settings and edited/authored/disabled skills. |
 | Windows + WSL 2 (Ubuntu) | tested | Same install and update checks as Linux. The Windows/WSL model-endpoint boundary was not tested. |
-| Windows native (x64) | see `geo/compatibility.json` | First installs started from a scheduled task failed twice (backend stopped right after its first request, without an error); the same checkout started normally from an interactive session. A transient Windows rename lock in skill installation was found and fixed. |
+| Windows native (x64, Windows 11) | tested | Same install and update checks; the install used a data home containing a space and Korean characters, the update an ASCII one. Two defects found on such paths were fixed for this release: Node's native copy/remove helpers killed the app, and the map helper misread non-ASCII paths. Earlier versions cannot start from such a path. |
 | macOS (Apple Silicon, Intel) | untested | No macOS host was available. |
 
 The install checks call the app's API and fetch the served page; they are not browser interaction tests.

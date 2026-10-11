@@ -12,6 +12,15 @@
       "records": [
         {
           "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/out/record.json",
+          "sha256": "53aa58e41ac58c4185fc801261b04fcb2d31355a2c3ede53589d1cf548f2b509",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "f75e2fc9ce7b",
+          "note": "release-candidate code; data home with a space and Korean characters"
+        },
+        {
+          "kind": "install",
           "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/out/record.json",
           "sha256": "46777ccafac84630b4c275c1be2251b5f0567c6fc474f31ea3d9a1e076aa7326",
           "date": "2026-10-11",
@@ -62,9 +71,27 @@
     },
     {
       "id": "windows-native",
-      "label": "Windows native (x64)",
-      "status": "failed",
+      "label": "Windows native (x64, Windows 11, Node 24.13)",
+      "status": "tested",
       "records": [
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-install-5/record.json",
+          "sha256": "f64382290130105715e5d639db1ec78439f8a235f347aea1dfa6d1836b80e419",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "579aa2d8f5a2",
+          "note": "data home with a space and Korean characters"
+        },
+        {
+          "kind": "update",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-update-6/record.json",
+          "sha256": "5c17f383401637c034f4aeb64464940d174de599640f118fe55eea2d0c5b702c",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "579aa2d8f5a2",
+          "note": "from 882cd56 with an ASCII data home (882cd56 cannot start on a non-ASCII path)"
+        },
         {
           "kind": "install",
           "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/record.json",
@@ -72,11 +99,22 @@
           "date": "2026-10-11",
           "result": "failed",
           "appCommit": "d5702afe99d9",
-          "note": "backend stopped right after the launcher readiness probe in a scheduled-task first start; preparation hit a transient EPERM directory rename (fixed in 8b977c1)"
+          "note": "Node cpSync/rmSync died on the non-ASCII data home; fixed by geo/win-fs-shim.mjs (616113d)"
+        },
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-install-4/record.json",
+          "sha256": "bc3efdce6af9adf93fb09e839bb0df94b4504d6d82e4e6951675f436d5df45ce",
+          "date": "2026-10-11",
+          "result": "failed",
+          "appCommit": "616113d9a068",
+          "note": "map helper garbled non-ASCII paths (Windows code page); fixed in 579aa2d"
         }
       ],
       "knownLimits": [
-        "Frontend npm install took about 12 minutes on the test host."
+        "First start took about 5.4 minutes on the test host (package installs).",
+        "Releases before this one cannot start from a data home whose path has non-ASCII characters (for example a Korean Windows user name).",
+        "Windows briefly locks freshly copied folders; skill installation retries the rename."
       ]
     },
     {
