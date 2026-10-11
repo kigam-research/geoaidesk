@@ -1,0 +1,36 @@
+import { defineGeoStrings } from "../i18n";
+
+export const t = defineGeoStrings({
+  ko: {
+    title: "로컬 모델과 컨텍스트", description: "Ollama 모델의 컨텍스트와 최대 출력을 저장합니다. 기본 모델 변경은 새 대화에 적용됩니다.",
+    refresh: "상태 새로고침", loading: "상태를 확인합니다…", reachable: "Ollama 연결됨", unreachable: "Ollama에 연결할 수 없습니다",
+    model: "모델", choose: "모델을 선택하세요", profile: "컨텍스트 프로필", custom: "직접 입력", context: "컨텍스트 토큰 수", output: "최대 출력 토큰 수",
+    recorded: "96K — 한 기기에서 기록한 시험", compact32: "32K — 제안, 시험하지 않음", compact64: "64K — 제안, 시험하지 않음",
+    evidence: "기록한 시험: qwen3:30b-a3b-instruct-2507-q4_K_M, RTX 4090 24 GB, 98,304 토큰. CPU 오프로딩 약 18%, 최대 컨텍스트 사용률 89.9%였습니다. 이 설정은 성능을 보장하지 않습니다. 32K·64K 프로필은 시험하지 않았습니다.",
+    variant: "이 컨텍스트로 파생 모델 생성", variantHelp: "선택하면 저장할 때만 Ollama에 num_ctx를 설정한 파생 모델을 생성합니다. 원본은 바꾸지 않습니다. 같은 이름의 파생 모델은 갱신합니다. 선택하지 않으면 앱의 선언값만 바뀝니다.",
+    default: "기본 모델로 사용", save: "모델 설정 저장", saving: "저장합니다…", saved: "모델 설정을 저장했습니다.",
+    defaultHelp: "선택하지 않으면 기존 기본 모델을 유지합니다.",
+    configured: "설정한 num_ctx: {value}", trained: "학습 컨텍스트: {value}", loaded: "현재 로드된 컨텍스트: {value}", unknown: "확인되지 않음",
+    verified: "선언한 컨텍스트가 확인한 실행 설정 이내입니다. 실제 메모리 할당이나 작업 성공을 보장하지 않습니다.",
+    mismatch: "앱의 선언값과 Ollama 설정이 맞지 않습니다. 서버 주소, 설정한 num_ctx, 로드된 컨텍스트를 확인하세요.",
+    unverified: "실행 컨텍스트를 확인하지 못했습니다. 학습 컨텍스트만으로 실행 크기를 확인할 수 없습니다.",
+    persisted: "저장한 모델: {model} · 컨텍스트 {context} · 최대 출력 {output}", appDefault: "앱 기본 모델: {model}",
+    failed: "로컬 모델 설정을 처리하지 못했습니다.", invalid: "모델과 정수 토큰 수를 입력하세요. 최대 출력은 컨텍스트보다 작아야 합니다.",
+  },
+  en: {
+    title: "Local model and context", description: "Save Ollama context and output limits. Default model changes apply to new chats.",
+    refresh: "Refresh status", loading: "Checking status…", reachable: "Ollama reachable", unreachable: "Ollama is not reachable",
+    model: "Model", choose: "Choose a model", profile: "Context profile", custom: "Custom", context: "Context tokens", output: "Maximum output tokens",
+    recorded: "96K — recorded trial on one machine", compact32: "32K — proposed, not tested", compact64: "64K — proposed, not tested",
+    evidence: "Recorded trial: qwen3:30b-a3b-instruct-2507-q4_K_M, RTX 4090 24 GB, 98,304 tokens. About 18% CPU offload; peak context 89.9%. This is not a performance guarantee. The 32K and 64K profiles are not tested.",
+    variant: "Create a variant with this context", variantHelp: "Only when saving with this checked, create an Ollama variant with num_ctx. The original stays unchanged. An existing same-name variant is updated. Otherwise only the app declaration changes.",
+    default: "Use as default model", save: "Save model settings", saving: "Saving…", saved: "Model settings saved.",
+    defaultHelp: "Leave unchecked to keep the existing default model.",
+    configured: "Configured num_ctx: {value}", trained: "Trained context: {value}", loaded: "Currently loaded context: {value}", unknown: "Unknown",
+    verified: "Declared context fits the observed runtime setting. This does not guarantee memory allocation or task success.",
+    mismatch: "The app declaration and Ollama settings differ. Check the server URL, num_ctx and loaded context.",
+    unverified: "Runtime context is unverified. Trained context alone does not establish the runtime size.",
+    persisted: "Saved model: {model} · context {context} · max output {output}", appDefault: "App default model: {model}",
+    failed: "Could not process local model settings.", invalid: "Choose a model and enter integer token counts. Maximum output must be smaller than context.",
+  },
+});

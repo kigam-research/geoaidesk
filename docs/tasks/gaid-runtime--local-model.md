@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T02:57:15Z
+updated: 2026-10-11T03:07:09Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"6868fb3e-df61-4f95-9b8b-6969b644d3c9","pid":3660182,"provider":"codex","session":"01a128e4-01e8-7261-9bf0-b7141477814a","start":"15339424","token":"678e6a4621bca6508ffa52de4cab714cb9f6c182668863bcbd572346b02492e2"}
 branch: task/gaid-runtime--local-model
 target: task/gaid-runtime
@@ -91,11 +91,37 @@ web/src/components/settings/providers-panel.tsx.
 - Use the task CLI for saving/finishing (`task save`, `task finish`); your finish notifies the parent.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented Ollama status/configure, explicit-only derived models, custom-provider/default persistence, profiles,
+and the Korean/English Settings card. All tests use a loopback stub, not real Ollama.
+Verified: server typecheck; 22 focused server tests (including fresh-module reads and real Pi runtime reload/restart);
+web typecheck; 4 card tests, rerun after improving custom-profile selection.
+No codegraph index exists for this exact worktree; used direct source reads.
 ## Next steps
-1. (the next session's first action)
+1. Save the reviewed snapshot, then finish; the CLI runs scripts/check, including the full server suite.
+2. If finish fails, inspect its recorded check log, fix in place and rerun finish (do not resume).
+3. The parent integrates this child and includes its results in the canonical report.
 ## Failed approaches
 ## Notes and decisions
+Plan: sequentially settle status/configure response shapes, implement the server, then the card, then checks.
+Owned files are the brief's local-model modules/tests and providers-panel seam. No child writers are needed for this tightly coupled package.
+Integration: custom-model writer/ownership sidecar -> runtime refresh -> optional app default -> status readback.
+The parent owns integration-boundaries.json; the sole planned upstream seam is providers-panel.tsx.
+Real Ollama mutation is forbidden; all create requests will target the test HTTP fixture.
+Billing evidence: gaid-local uses existing payg classification with all four declared costs at zero; it adds $0
+to spend. No billing.ts changes. Existing generic payg admission still refuses any payg run when a project is
+already over cap (run-pipeline.ts); $0 pricing does not exempt this provider from that pre-existing guard.
+Parent integration notes: keep registerGeoLocalModelRoutes export; optional options only support isolated tests.
+Routes are /geo/local-model/status (GET) and /geo/local-model/configure (POST); UI seam is one import + one JSX
+line in web/src/components/settings/providers-panel.tsx. The parent must register this upstream file's boundary
+and include these delivered results/evidence in the parent report. No new report is created by this child.
+
+## Checks
+- `cd server && npm run typecheck`
+- `cd server && npx vitest run test/geo-local-model.test.ts`
+- `cd web && npx tsc --noEmit`
+- `cd web && npx vitest run src/geo/local-model/card.test.tsx`
+- `cd server && npm test` (full suite via scripts/check during task finish; outcome recorded by the CLI)
+- `scripts/check` (repository-declared integration checks, run by task finish)
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
