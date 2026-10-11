@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:07:21Z
+updated: 2026-10-11T06:08:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -40,28 +40,22 @@ Verified facts from the hub (2026-10-11):
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link.
 
 ## Current state
-- Parent API/manifest/inspection integration implemented. Backend typecheck and 30 targeted tests pass.
-- Helper final snapshot d91b8c0 is integrated and published in parent d6384406 (append-only map/depth route conflict resolved preserving both). Helper CLI closure completed (receipt gaid-maps--helper-f71d77ff2d43): no jobs, no rollout, clean child retirement. Viewer source is ready but awaits finish against the integrated helper.
-- Helper environment prepared with frozen uv lock (Python 3.12.14). Browser verification tooling is external under the task data directory.
-- Direct checks authorized by the hub while backbone job-template filtering is repaired. No paid model calls.
+- Both child packages integrated through task complete and cleaned; viewer cleanup additionally removed generated well/__pycache__ then task close succeeded.
+- Real API tests passed 10/10. Map frontend tests passed 19/19 after parent manifest-field restoration and transient 429 retry fixes.
+- Actual Chrome app walkthrough: raster/vector overlay, full-layer 20000 m² table, downloaded CSV/PNG, unknown-CRS native/area/overlay behavior, multiple GPKG layers and sampled raster zero passed. Browser evidence is external; reviewed PNGs are in the canonical report.
+- Full integration checks remain. No paid model calls or deployment.
 ## Next steps
-1. Receive and integrate viewer child completion. The viewer continuation dependency was reported resolved to the hub via route f3b3631f1273.
-2. Run real route/fixture integration tests, browser map-plus-table walkthrough and scripts/check.
-3. task sync shared seams, canonical result report, cache cleanup, task finish.
+1. Finish final browser artifact/viewport check, stop test app, save report and run task sync (scripts/check).
+2. Record full check evidence, remove regenerable caches, task finish, then relay hub completion once.
 ## Failed approaches
 - Job snapshot blocked on upstream `.env.example`; no job started and no receipt was issued. Hub authorized direct checks (reply 65caed1a1d90).
 - First targeted run: 27/29 tests passed; corrected unknown CRS on unsafe companions and equivalent WGS84 identifiers, then 29/29 passed. Added extent/paging coverage: 30/30 passed.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-11-gaid-maps/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
@@ -109,3 +103,5 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ### Helper integration evidence
 - `npm --prefix server test -- --run test/geo-maps-integration.test.ts test/geo-maps.test.ts`: 10/10 passed, 2 files, 24.65 s. Actual uv/GDAL HTTP pipeline verified: each rectangle 10000 m², total 20000 m² despite a one-feature display page; category/mask samples; unknown CRS; shapefile companion primary; ordinary TIFF fallback; GPKG layer selection.
 - Published parent includes helper and fixture (git cat-file against origin/task/gaid-maps); route f3b3631f1273 updated completed for the viewer dependency only, not whole WP05. No queued routes.
+
+- Browser artifact/viewport follow-up passed: .geomap.json restores class styling and area-table reference; actual zoom POST has bbox and limit500. Test app stopped. Exported PNGs visually inspected and CSV rows read (A/B=10000 m² each, 50%).
