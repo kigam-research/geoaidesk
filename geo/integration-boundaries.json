@@ -165,6 +165,12 @@
       "responsibility": "WP05 (child gaid-maps--viewer) adds only the OpenLayers ol dependency and its lock entries"
     },
     {
+      "path": "web/src/components/file-preview-panel.tsx",
+      "owner": "gaid-well-tables",
+      "status": "edited",
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged."
+    },
+    {
       "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
       "owner": "gaid-runtime",
       "status": "edited",

@@ -23,6 +23,7 @@ function Viewer(props: ViewerProps) {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"tracks" | "inventory" | "rows" | "metadata">("tracks");
   const [request, setRequest] = useState<Omit<DepthWindowRequest, "path">>({ mode: "display" });
+  const [rangeError, setRangeError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [min, setMin] = useState(""); const [max, setMax] = useState(""); const [row, setRow] = useState("1");
   useEffect(() => {
@@ -48,13 +49,14 @@ function Viewer(props: ViewerProps) {
   if (!data) return <div role="status" className="p-4">{t("loading")}</div>;
   const flags = manifest?.flags ?? [];
   return <div className="h-full overflow-auto space-y-4 p-4 text-sm" data-testid="depth-viewer">
-    <header className="space-y-1"><h3 className="font-semibold">{data.well || props.name}{data.run && ` · ${data.run}`}</h3><p>{t("source")}: {data.path}</p><p>{t("basis")}: {data.depth.basis} · {t("datum")}: {data.depth.datum || t("unknown")} · {t("unit")}: {data.depth.unit || t("unknown")} · {t("direction")}: {t(data.depth.direction)}</p>{manifest && <p>{t(manifest.status)} · {t("manifestBasis")}: {manifest.depth.basis} · {manifest.depth.datum || t("unknown")}</p>}</header>
+    <header className="space-y-1"><h3 className="font-semibold">{data.well || props.name}{data.run && ` · ${data.run}`}</h3><p>{t("source")}: {data.path}</p><p>{t("basis")}: {data.depth.basis === "unknown" ? t("unknown") : data.depth.basis} · {t("datum")}: {data.depth.datum || t("unknown")} · {t("unit")}: {data.depth.unit || t("unknown")} · {t("direction")}: {t(data.depth.direction)}</p>{manifest && <p>{t(manifest.status)} · {t("manifestBasis")}: {manifest.depth.basis === "unknown" ? t("unknown") : manifest.depth.basis} · {manifest.depth.datum || t("unknown")}</p>}</header>
     <nav aria-label={t("tracks")} className="flex flex-wrap gap-2">{(["tracks", "inventory", "rows", "metadata"] as const).map(k => <button className={button} aria-pressed={tab === k} key={k} onClick={() => selectTab(k)}>{t(k)}</button>)}</nav>
     <p>{t("sampling", { total: data.sourceRows, matched: data.matchedRows, shown: data.displayedRows })}</p>
     {data.truncated && <p role="status">{t("truncated")}</p>}
     {tab === "tracks" && <>
       <fieldset className="flex flex-wrap gap-3"><legend>{t("choose")}</legend>{data.curves.slice(1).map(c => <label key={c.column}><input type="checkbox" checked={data.selectedColumns.includes(c.column)} disabled={!data.selectedColumns.includes(c.column) && data.selectedColumns.length >= 8} onChange={e => { const cols = e.target.checked ? [...data.selectedColumns, c.column] : data.selectedColumns.filter(v => v !== c.column); if (cols.length) setRequest(r => ({ ...r, columns: cols })); }} /> {c.mnemonic}</label>)}</fieldset>
-      <form className="flex flex-wrap items-end gap-2" onSubmit={e => { e.preventDefault(); setRequest(r => ({ ...r, startRow: 1, minDepth: min === "" ? undefined : Number(min), maxDepth: max === "" ? undefined : Number(max) })); }}><label>{t("min")} [{data.depth.unit || t("unknown")}]<input className="block w-32 border bg-transparent p-1" type="number" step="any" value={min} onChange={e => setMin(e.target.value)} /></label><label>{t("max")}<input className="block w-32 border bg-transparent p-1" type="number" step="any" value={max} onChange={e => setMax(e.target.value)} /></label><button className={button}>{t("apply")}</button></form>
+      <form className="flex flex-wrap items-end gap-2" onSubmit={e => { e.preventDefault(); if (min !== "" && max !== "" && Number(min) > Number(max)) { setRangeError(true); return; } setRangeError(false); setRequest(r => ({ ...r, startRow: 1, minDepth: min === "" ? undefined : Number(min), maxDepth: max === "" ? undefined : Number(max) })); }}><label>{t("min")} [{data.depth.unit || t("unknown")}]<input className="block w-32 border bg-transparent p-1" type="number" step="any" value={min} onChange={e => setMin(e.target.value)} /></label><label>{t("max")}<input className="block w-32 border bg-transparent p-1" type="number" step="any" value={max} onChange={e => setMax(e.target.value)} /></label><button className={button}>{t("apply")}</button></form>
+      {rangeError && <p role="alert">{t("invalidWindow")}</p>}
       {data.sampled && <p>{t("reduction")}</p>}<DepthTracks data={data} flags={flags} onRow={openRow} />
     </>}
     {tab === "inventory" && <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr>{["column", "curve", "unit", "description", "coverage", "null"].map(k => <th key={k} className="p-2">{t(k as "column")}</th>)}</tr></thead><tbody>{data.curves.map(c => <tr key={c.column}><td>{c.column}</td><td>{c.mnemonic}{c.mnemonic !== c.originalMnemonic && ` (${c.originalMnemonic})`}</td><td>{c.unit || t("unknown")}</td><td>{c.description}</td><td>{c.finiteCount} / {data.sourceRows}</td><td>{c.nullCount}</td></tr>)}</tbody></table></div>}

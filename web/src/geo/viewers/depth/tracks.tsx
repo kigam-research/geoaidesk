@@ -17,6 +17,13 @@ export function curvePath(rows: DepthSample[], columnIndex: number, x: (n: numbe
   }
   return path;
 }
+/** A move-only SVG path has no visible stroke: keep isolated valid observations visible. */
+export function singletonSamples(rows: DepthSample[], columnIndex: number): DepthSample[] {
+  const valid = (row?: DepthSample) => row != null && row.depth !== null && row.values[columnIndex] != null;
+  return rows.filter((row, i) => valid(row)
+    && !(valid(rows[i - 1]) && !row.breakBefore)
+    && !(valid(rows[i + 1]) && !rows[i + 1].breakBefore));
+}
 export function DepthTracks({ data, flags, onRow }: { data: DepthWindow; flags: DepthFlag[]; onRow: (row: number) => void }) {
   const depths = data.rows.map(r => r.depth).filter((d): d is number => d !== null);
   if (!depths.length) return <p>{t("noDepth")}</p>;
@@ -33,9 +40,10 @@ export function DepthTracks({ data, flags, onRow }: { data: DepthWindow; flags: 
       const left = 85 + j * 200, x = (v: number) => left + 8 + (v - min) / (max - min || 1) * 164;
       return <g key={col}>
         <text x={left + 90} y={18} textAnchor="middle" fontSize={12} fill="currentColor">{curve.mnemonic} [{curve.unit || t("unknown")}]</text>
-        <text x={left + 8} y={38} fontSize={10} fill="currentColor">{Number(min.toPrecision(5))}</text><text x={left + 172} y={38} textAnchor="end" fontSize={10} fill="currentColor">{Number(max.toPrecision(5))}</text>
+        <text x={left + 8} y={38} fontSize={10} fill="currentColor">{values.length ? Number(min.toPrecision(5)) : t("unknown")}</text><text x={left + 172} y={38} textAnchor="end" fontSize={10} fill="currentColor">{values.length ? Number(max.toPrecision(5)) : t("unknown")}</text>
         <rect x={left} y={50} width={185} height={512} fill="none" stroke="currentColor" opacity={0.3} />
         <path data-testid={`curve-${col}`} d={curvePath(data.rows, j, x, y)} fill="none" stroke="#2563eb" strokeWidth={1.3} />
+        {singletonSamples(data.rows, j).map(row => <circle key={row.row} data-testid={`singleton-${col}-${row.row}`} cx={x(row.values[j]!)} cy={y(row.depth!)} r={2.5} fill="#2563eb" role="button" tabIndex={0} aria-label={`${curve.mnemonic}: ${row.values[j]} ${curve.unit} · ${t("row")} ${row.row}`} onClick={() => onRow(row.row)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onRow(row.row); }}><title>{curve.mnemonic}: {row.values[j]} {curve.unit} · {t("row")} {row.row}</title></circle>)}
         {!values.length && <text x={left + 8} y={85} fontSize={11} fill="currentColor">{t("allNull")}</text>}
         {flags.filter(f => f.column === undefined || f.column === col).map((f, k) => {
           const row = data.rows.find(r => r.row >= f.fromRow && r.row <= f.toRow && r.depth !== null);
