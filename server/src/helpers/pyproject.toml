@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "Python decoders the Kady backend shells out to for file previews"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
-    "scipy",
-    "matplotlib",
+    "numpy>=2.5.3",
+    "scipy>=1.18.1",
+    "matplotlib>=3.11.2",
     "anndata",
     "h5py",
     "rdkit",
@@ -19,9 +19,18 @@ dependencies = [
     "pydicom",
     "nibabel",
     "tifffile",
-    "pillow",
+    "pillow>=12.3.0",
     "openpyxl",
     "astropy",
+    "pandas>=3.0.6",
+    "scikit-learn>=1.9.1",
+    "lasio>=0.31",
+    "pyproj>=3.8.0",
+    "pyyaml>=6.0.3",
+    "rasterio>=1.4",
+    "shapely>=2.0",
+    "pyogrio",
+    "geopandas",
 ]
 
 # Resolve binary-only packages (notably RDKit) for every shipped platform.

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T02:57:36Z
+updated: 2026-10-11T03:01:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0becd10a-f4fd-4f39-92ef-a666bfd98820","pid":3657853,"provider":"codex","session":"01a128e3-dbba-7443-9d73-f1900d0e9424","start":"15338416","token":"1dbe8a1fa32d526ab7c5c2b60daed9de22e6bb23df710da310f3db8bd3d7953a"}
 branch: task/gaid-runtime--env
 target: task/gaid-runtime
@@ -94,10 +94,22 @@ server/src/sandbox-seed.ts (and helpers-env.ts only if needed).
 - Use the task CLI for saving/finishing (`task save`, `task finish`); your finish notifies the parent.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the printed worktree; read the child brief, parent plan, catalogue types and pinned environment data.
+- Pure closure, spec generation, project seed seam and readiness/preparation routes implemented; tests pending.
+- Helper pyproject now declares the catalogue bounds. `uv lock --project server/src/helpers` failed: existing `requires-python >=3.11` conflicts with `numpy>=2.5.3` requiring Python>=3.12. Existing uv.lock is unchanged; no helper sync has been performed.
+- No platform or Python requirement was changed. Independent implementation/testing continues; the helper lock and two-target smoke remain blocked by this explicit constraint conflict.
+
+### Plan and ownership
+- Sequential: pure closure/spec generation → helper manifest/lock resolution → seed seam → readiness/preparation service and routes → tests and real import smoke.
+- This child has no nested writers. The implementation is tightly coupled and stays with this writer.
+- Own only files named in the brief; leave AGENTS.md content and integration-boundaries.json to the parent.
+- Route interface: GET returns each catalogue environment with target readiness; POST accepts target project (default) or helper and validates membership before any command.
+- Verify targeted tests and typechecks, full backend suite, then both real Python import targets. Record any resolver/platform failure without weakening constraints.
 ## Next steps
-1. (the next session's first action)
+1. Add deterministic tests and the real import smoke. Install JS dependencies via the recorded job and run declared checks.
+2. Parent must reconcile the helper Python range/catalogue requirement before helper lock + smoke can complete; no silent workaround is authorized by the brief.
 ## Failed approaches
+- Helper lock resolution (one attempt): uv cannot satisfy the Python 3.11 portion of the declared >=3.11 range with catalogue numpy>=2.5.3. Do not repeat without a changed requirement; do not drop platforms or weaken package bounds.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
