@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T04:55:32Z
+status: ready
+updated: 2026-10-11T04:55:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"8b4d426a-82dc-444e-9347-60354a8ffce4","pid":3988444,"provider":"codex","session":"01a12946-e997-71b3-80cd-cd78dd1a4c97","start":"15987572","token":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
 branch: task/gaid-well-tables--tables
 target: task/gaid-well-tables
@@ -22,8 +22,9 @@ Read parent task doc and skill_hub plan section 3.4 (/home/seongin3/data/geoaide
 - Mandatory whole-repo `scripts/check` will run in `task finish`; the recorded job launcher is blocked before creating any receipt by an inherited forbidden `.env.example` path. No forbidden file was read or edited. Task CLI declared checks retain their own external failure logs.
 - No paid models, browser verification or deployment performed. Parent owns shared entry-point integration and integrated browser verification.
 ## Next steps
-1. Finish this checked child snapshot with `task finish`; fix any in-scope failures in place and rerun finish.
-2. Parent runs `task complete gaid-well-tables--tables`, appends the API/UI entries, and performs its final whole-app/browser checks. This child must not archive itself.
+<!-- task:closed -->
+Closed 2026-10-11T04:55:46Z: ready; the parent gaid-well-tables integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial `task job run -- scripts/check` refused dirty source. After reviewed `task save`, launch was still refused: `job snapshot blocked: forbidden path .env.example`. No receipt, running job or source snapshot exists. Do not retry without an environment/policy change; do not edit inherited sensitive paths or bypass task publication.
 ## Notes and decisions
