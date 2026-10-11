@@ -14,7 +14,7 @@ describe("LAS depth viewer", () => {
   });
   it("opens a manifest at its exact source rows with project-scoped source/code links", async () => {
     const manifest = { schemaVersion: "geo-result/v1", kind: "depth-track", dataPath: "well.las", depth: { column: 0, unit: "M", basis: "unknown" }, curves: [{ column: 1, unit: "API" }], flags: [{ kind: "spike", fromRow: 2, toRow: 2 }], status: "raw", sourceRow: 2, codePath: "analysis.py", limitations: [] };
-    vi.mocked(apiFetch).mockImplementation(async url => response(url === "/geo/depth-result" ? manifest : data));
+    vi.mocked(apiFetch).mockImplementation(async url => response(url === "/geo/inspect" ? { asset: { format: "las" } } : url === "/geo/depth-result" ? manifest : data));
     render(<DepthViewer name="result" path="result.depth.json" projectId="p-two" content={null} />);
     await screen.findByTestId("depth-viewer");
     fireEvent.click(screen.getByText(/Spike candidate · Data row 2/));
@@ -25,7 +25,7 @@ describe("LAS depth viewer", () => {
     expect(screen.getByText("Download data file").getAttribute("href")).toContain("path=well.las&project=p-two");
   });
   it("does not display mismatched manifest units", async () => {
-    vi.mocked(apiFetch).mockImplementation(async url => response(url === "/geo/depth-result" ? { schemaVersion: "geo-result/v1", kind: "depth-track", dataPath: "well.las", depth: { column: 0, unit: "ft", basis: "unknown" }, curves: [{ column: 1, unit: "API" }], flags: [], status: "raw", limitations: [] } : data));
+    vi.mocked(apiFetch).mockImplementation(async url => response(url === "/geo/inspect" ? { asset: { format: "las" } } : url === "/geo/depth-result" ? { schemaVersion: "geo-result/v1", kind: "depth-track", dataPath: "well.las", depth: { column: 0, unit: "ft", basis: "unknown" }, curves: [{ column: 1, unit: "API" }], flags: [], status: "raw", limitations: [] } : data));
     render(<DepthViewer name="result" path="result.depth.json" content={null} />);
     expect(await screen.findByRole("alert")).toHaveTextContent("units disagree");
     expect(screen.queryByTestId("depth-viewer")).toBeNull();

@@ -4,6 +4,7 @@ import type { ViewerProps } from "@/lib/viewers/registry";
 import { apiFetch, API_BASE, getActiveProjectId } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 import type { DepthManifest, DepthWindow, DepthWindowRequest } from "../../contracts/depth";
+import type { GeoInspection } from "../../contracts/inspection";
 import { parseDepthManifest } from "../../contracts/depth";
 import { DepthTracks, FLAG_STYLE } from "./tracks";
 import { depthText as t } from "./strings";
@@ -32,6 +33,8 @@ function Viewer(props: ViewerProps) {
       const m = isManifest ? parseDepthManifest(await post("/geo/depth-result", { path: props.path }, props.projectId, ac.signal)) : null;
       const q = { ...request, path: m?.dataPath ?? props.path, columns: request.columns ?? m?.curves.map(c => c.column) };
       if (m?.sourceRow && request.mode === "rows" && !request.startRow) q.startRow = m.sourceRow;
+      const inspection = await post<GeoInspection>("/geo/inspect", { path: q.path, previewRows: 0 }, props.projectId, ac.signal);
+      if (inspection.asset?.format !== "las") throw new Error(t("failed"));
       const out = await post<DepthWindow>("/geo/series-window", q, props.projectId, ac.signal);
       if (m && (m.depth.unit !== (out.depth.unit ?? "") || m.curves.some(c => out.curves[c.column]?.unit !== c.unit) || m.flags.some(f => f.toRow > out.sourceRows || (f.column !== undefined && !out.curves[f.column])) || (m.sourceRow !== undefined && m.sourceRow > out.sourceRows))) throw new Error(t("mismatch"));
       if (live) { setManifest(m); setData(out); }
