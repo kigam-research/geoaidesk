@@ -398,6 +398,7 @@ async function build(
     settingsManager,
     additionalExtensionPaths: [subagentsExtensionPath()],
     skillsOverride: geo.skillsOverride,
+    appendSystemPromptOverride: geo.appendSystemPromptOverride,
     extensionFactories: [
       makeSubagentLedgerExtension(
         projectId,
