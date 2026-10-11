@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T09:01:07Z
+updated: 2026-10-11T10:13:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -53,6 +53,25 @@ Verified facts from the hub (2026-10-11):
 - d5702af: distribution pins catalogue 0.2.1 with `download.url`; launcher download (geo/start.mjs `planCatalogue`,
   `downloadCatalogue`, tests in geo/tests/start.test.mjs); `/version/latest` picks the highest `geo-v*` release
   (`pickLatestRelease`, server/test/geo-distribution.test.ts); harness geo/release-proof/instance.mjs + README.
+- b72725d: geo/catalogue-release.mjs (check/publish/verify-remote of the catalogue release; not published), release
+  manifest names the download URL, geo/compatibility.json (all not-run/untested so far) + geo/tests/compatibility.test.mjs.
+- Child install integrated (e87dbc3, closed): Linux (PC74) install + update 882cd56→d5702af PASSED, PC71 WSL install +
+  update PASSED, PC71 Windows native install FAILED (backend stopped right after the readiness probe during a
+  scheduled-task first start; prep printed "skills download skipped/failed"). Records/sha256 in the child's task doc
+  (docs/tasks/gaid-release-proof--install.md). Two harness-bug update jobs disposed as superseded by job 4.
+- Windows diagnosis (writer, 2026-10-11): from an ssh session the launcher starts fine on the same checkout with an
+  ASCII and with a "diag home 한글" data home; the original backend exit did not reproduce. Prep hit
+  `EPERM rename …skill-sync-staging\<skill>.new-… -> .pi\skills\<skill>` (transient Windows lock after cpSync) →
+  fix 8b977c1: server/src/geo/rename-retry.ts used by skills-sync.ts directory renames (seam recorded).
+- Provider terms re-check (ChatGPT Pro research, 2026-10-11; answer ~/data/geoaidesk/work/gaid-release-proof/
+  oracle-provider-terms-harvest.md): SIWC OSS flow is official for local OSS apps; terms (2026-09-29) say "Use your app's
+  own name during sign-in and activation"; Pi sends agent_name_hint=Pi → fix 8b977c1 rewrites the hint to the product name
+  (server/src/geo/siwc.ts, provider-auth.ts seam). Anthropic: legal page "does not permit third-party developers to offer
+  Claude.ai login into their own applications"; Pi's Anthropic login uses Claude Code's client id → do not advertise
+  (written provider answer needed to change that). Copilot: Pi reuses VS Code's GitHub app id; only the official SDK
+  route is documented → do not advertise. Gemini CLI OAuth reuse prohibited (Pi has no such login).
+- Windows rerun at d2c535f: scheduled task GAID-Proof2-20261011 on pc71-win runs install-proof then update-proof
+  (out C:\Users\KIGAM_Ahn\gaid-proof\windows-{install,update}-2, status proof2-status.txt, logs proof2-*.log).
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -81,7 +100,7 @@ User decisions in this tab: brand clearance (geo/brand), paid runs (API, ChatGPT
 release and the app release.
 
 ## Workers
-- `gaid-release-proof--install` (general work, writer d710da92, worktree ~/worktrees/geoaidesk/gaid-release-proof--install),
+- `gaid-release-proof--install` (closed 2026-10-11; general work, writer d710da92, worktree ~/worktrees/geoaidesk/gaid-release-proof--install),
   brief ~/data/geoaidesk/work/gaid-release-proof/prompts/install.md; started 2026-10-11 from d5702af.
 - `gaid-release-proof--routes` (general work, writer 9b44cd61, worktree ~/worktrees/geoaidesk/gaid-release-proof--routes),
   brief ~/data/geoaidesk/work/gaid-release-proof/prompts/routes.md; started 2026-10-11 from d5702af.
