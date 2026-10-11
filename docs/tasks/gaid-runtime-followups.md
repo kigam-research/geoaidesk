@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-11T05:20:36Z
+status: active
+updated: 2026-10-11T05:22:41Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -57,6 +57,7 @@ Closed 2026-10-11T05:20:36Z: finished; task finish integrates it into main. No f
 - Initial lead-run regression reported cost but zero tokens: the ledger intentionally skips zero-cost/zero-token rows after local normalization. The corrected fixture reports two tokens. An intervening focused attempt ran the stale fixture because the correction script was initially invoked from server/ instead of the worktree root; the root invocation and fresh rerun passed.
 - Distribution boundaries accept package names, not follow-up task slugs: corrected gaid-runtime-followups to gaid-runtime without widening the allowed-owner list.
 - First production smoke completed start/restart but was invalidated by this writer updating the task document during its tracked-tree snapshot check. A second unchanged-tree run passed (production-check.log).
+- Applying VITEST_MAX_WORKERS=4 to the whole finish was incorrect: Vitest resolves fileParallelism:false to one worker, then applies that environment override afterward (installed server coverage.DM_a_rWm.js lines 223-225 and 380). Backend fixtures share a temp root and raced (ENOENT / missing records). Stopped only this unit's identified Vitest PID 45657; check exited 143. No source workaround. Use one worker globally to preserve backend serialization and avoid frontend CPU contention.
 ## Notes and decisions
 - Sequential decisions: 64K = 65,536 tokens; reject new configurations below it, preserve existing saved configurations, remove only the proposed 32K option. Existing 96K evidence remains a one-machine trial, not release proof.
 - Ownership: this writer owns geo local-model profiles/UI/tests, a pure geo provider identity, and narrow billing/ledger/subagent/custom-picker seams plus their regression tests and documentation. No WP04/WP05 files.
