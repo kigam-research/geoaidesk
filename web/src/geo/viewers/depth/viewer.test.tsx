@@ -5,7 +5,7 @@ import { curvePath, singletonSamples, DepthTracks, FLAG_STYLE } from "./tracks";
 import type { DepthWindow } from "../../contracts/depth";
 import { apiFetch } from "@/lib/projects";
 vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn(), API_BASE: "", getActiveProjectId: () => "default" }));
-const data = { schemaVersion: "geo-series/v1", path: "well.las", well: "Test", run: "1", version: "2.0", nullValue: -999.25, depth: { mnemonic: "DEPT", unit: "M", basis: "unknown", direction: "increasing" }, curves: [{ column: 0, mnemonic: "DEPT", originalMnemonic: "DEPT", unit: "M", finiteCount: 2, nullCount: 0 }, { column: 1, mnemonic: "GR", originalMnemonic: "GR", unit: "API", finiteCount: 1, nullCount: 1 }], selectedColumns: [1], sourceRows: 2, matchedRows: 2, displayedRows: 2, sampled: false, truncated: false, rows: [{ row: 1, depth: 100, values: [0], breakBefore: true }, { row: 2, depth: 101, values: [null], breakBefore: false }], nextRow: null, issues: [], method: "exact" };
+const data: DepthWindow = { fingerprint: "fixture", wrapped: false, schemaVersion: "geo-series/v1", path: "well.las", well: "Test", run: "1", version: "2.0", nullValue: -999.25, depth: { column: 0, mnemonic: "DEPT", unit: "M", basis: "unknown", direction: "increasing" }, curves: [{ column: 0, mnemonic: "DEPT", originalMnemonic: "DEPT", unit: "M", description: "Index", min: 100, max: 101, finiteCount: 2, nullCount: 0 }, { column: 1, mnemonic: "GR", originalMnemonic: "GR", unit: "API", description: "Gamma ray", min: 0, max: 0, finiteCount: 1, nullCount: 1 }], selectedColumns: [1], sourceRows: 2, matchedRows: 2, displayedRows: 2, sampled: false, truncated: false, rows: [{ row: 1, depth: 100, values: [0], breakBefore: true }, { row: 2, depth: 101, values: [null], breakBefore: false }], nextRow: null, issues: [], method: "exact" };
 beforeEach(() => vi.mocked(apiFetch).mockReset());
 const response = (body: unknown) => ({ ok: true, json: async () => body }) as Response;
 describe("LAS depth viewer", () => {
@@ -17,7 +17,7 @@ describe("LAS depth viewer", () => {
     const rows = [{ row: 1, depth: 100, values: [null], breakBefore: true }, { row: 2, depth: 101, values: [999], breakBefore: false }, { row: 3, depth: 102, values: [null], breakBefore: false }];
     expect(singletonSamples(rows, 0).map(r => r.row)).toEqual([2]);
     const onRow = vi.fn();
-    render(<DepthTracks data={{ ...data, rows } as DepthWindow} flags={[]} onRow={onRow} />);
+    render(<DepthTracks data={{ ...data, rows }} flags={[]} onRow={onRow} />);
     fireEvent.click(screen.getByTestId("singleton-1-2"));
     expect(onRow).toHaveBeenCalledWith(2);
   });

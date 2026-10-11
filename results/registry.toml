@@ -5,9 +5,9 @@ id = "gaid-well-tables-force-concordance"
 title = "FORCE 검층 원값·결측 비교와 실제 앱 화면"
 state = "review"
 run = "pc74:~/data/geoaidesk/work/gaid-well-tables/checks"
-source_sha = "45229f386d091abcdccd97f21caa9290cfe8bd82"
+source_sha = "ebbe2e0856a771c0cc024ef61bed7178e5833738"
 inputs = ["assets:force2020-welllogs/c8d01ee9"]
-files = [{ path = "force-concordance.json", sha256 = "4512f9ded9dea4979394fb23196eab758c5c8f8f003b5afd030d9a080e32d834" }, { path = "depth-window-ko.png", sha256 = "bd03de4f4f9dc28566190169bc4fb5f612873bb9f898c2a6ec5b6583969418f5" }, { path = "depth-exact-row-ko.png", sha256 = "6c64bc44ebe3f47e11e6e42ec90d959705ba2721c1880b76e7ae5c6199d965a8" }]
+files = [{ path = "force-concordance.json", sha256 = "4512f9ded9dea4979394fb23196eab758c5c8f8f003b5afd030d9a080e32d834" }, { path = "depth-window-ko.png", sha256 = "5e0b6dedb84fc02ffe3e243ad43106d71b912779be6a8542b623952aac58a2d5" }, { path = "depth-exact-row-ko.png", sha256 = "5a655e1b8151827fcc4d190d730f11a6140881ae9779987adc725c72c20bfb1f" }, { path = "table-checks-ko.png", sha256 = "cafca4fa59ad72c7d96f5eeb8ac51d92f4aab0762169cd461da44e4c5e9f0380" }]
 report = "reports/2026-10-11-gaid-well-tables/index.md"
 replicas = []
 supersedes = ""
