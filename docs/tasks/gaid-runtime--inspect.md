@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T03:23:00Z
+status: active
+updated: 2026-10-11T03:25:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -125,8 +125,10 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
   893 passed / 1 unrelated existing LaTeX editor test timed out at 5 seconds under parallel load.
   The check script visibly excluded the 2 known PSI-MS vocabulary/network-dependent mzML tests.
   Log: pc74:~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-iclqrqyp.log.
-  The failing LaTeX file passes alone (9 tests). Rerun `VITEST_MAX_WORKERS=4 task finish` without source changes;
-  Vitest's installed config resolver explicitly honors that environment setting. Full checks remain pending.
+  The failing LaTeX file passes alone (9 tests). Attempt 2 with `VITEST_MAX_WORKERS=4` also overrides the server's
+  fileParallelism=false (Vitest applies the environment after that rule), causing shared-temp-directory races.
+  Correct the execution environment to `VITEST_MAX_WORKERS=1 task finish`; no source/timeout changes.
+  Full checks remain pending.
   The attempted separate task job did not start: snapshot validation rejects the existing tracked `.env.example`.
   No source/config file was removed to bypass that guard and no job receipt was created.
   Safe targeted recheck: from server,
@@ -148,6 +150,10 @@ Closed 2026-10-11T03:23:00Z: ready; the parent gaid-runtime integrates it. No fu
   requires review before saving" exceeded 5000 ms; the rest of the web suite (893) and all server tests passed.
   `cd web && npx --no-install vitest run src/components/latex/latex-editor.test.tsx`: 9 passed.
   No implementation workaround or timeout change was made for that unrelated test.
+- Full check attempt 2: the global VITEST_MAX_WORKERS=4 environment overrides the backend's intentional
+  fileParallelism=false; 163 tests fail with shared PROJECTS_ROOT races. This was an execution-setting error,
+  not an inspection regression. Installed Vitest resolver applies the env override after maxWorkers=1;
+  use VITEST_MAX_WORKERS=1 for both suites. Log: check-t9l9_7me.log in the same external check-log directory.
 ## Notes and decisions
 - Implementation is tightly coupled around one inspection result; no child writers or readers are needed.
 - Sequential decisions: preserve published signatures; keep all parser IO under a per-file byte budget;
