@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:14:48Z
+updated: 2026-10-11T08:18:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -50,6 +50,9 @@ Verified facts from the hub (2026-10-11):
 ## Current state
 - 2026-10-11: catalogue 0.2.1 copied unchanged into asset pc74:~/assets/geo-catalogue/0.2.1/ (ASSET.md, MANIFEST.sha256
   sha256 9ac82d84…ee48; `cd ~/assets/geo-catalogue/0.2.1 && sha256sum --check MANIFEST.sha256`).
+- d5702af: distribution pins catalogue 0.2.1 with `download.url`; launcher download (geo/start.mjs `planCatalogue`,
+  `downloadCatalogue`, tests in geo/tests/start.test.mjs); `/version/latest` picks the highest `geo-v*` release
+  (`pickLatestRelease`, server/test/geo-distribution.test.ts); harness geo/release-proof/instance.mjs + README.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -77,8 +80,17 @@ when it lands, report. Integration order: writer interfaces → children → com
 User decisions in this tab: brand clearance (geo/brand), paid runs (API, ChatGPT sign-in), publishing the catalogue
 release and the app release.
 
+## Workers
+- `gaid-release-proof--install` (general work, writer d710da92, worktree ~/worktrees/geoaidesk/gaid-release-proof--install),
+  brief ~/data/geoaidesk/work/gaid-release-proof/prompts/install.md; started 2026-10-11 from d5702af.
+- `gaid-release-proof--routes` (general work, writer 9b44cd61, worktree ~/worktrees/geoaidesk/gaid-release-proof--routes),
+  brief ~/data/geoaidesk/work/gaid-release-proof/prompts/routes.md; started 2026-10-11 from d5702af.
+On a child's finish: `task complete gaid-release-proof--<child>`.
+
 ## Next steps
-1. Implement decisions 1–3, then start the two children.
+1. Writer: catalogue release script + workflow, `geo/compatibility.json` + test, `docs/geo/` guides, upstream log,
+   provider-terms re-check, mzML test failures (seen in a full vitest run at d5702af: massspec-helper, sci-helper-errors;
+   check whether they also fail on main), then ask the user: brand clearance, paid runs, publication.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
