@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T03:13:19Z
+updated: 2026-10-11T03:14:52Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -121,16 +121,22 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
   blocked-read reason; shapefile → Polygon, 133 features, 22 fields and declared WKT (no guessed EPSG);
   GeoTIFF → EPSG:5186, float64 band. Outputs: pc74:~/data/geoaidesk/work/gaid-runtime/inspect/manual-check.json.
   Original samples were neither copied into Git nor modified.
-- Full regression/check run remains pending. Safe targeted recheck: from server,
+- Full regression/check run remains pending; `task finish` runs the repository's declared `scripts/check` in place.
+  The attempted separate task job did not start: snapshot validation rejects the existing tracked `.env.example`.
+  No source/config file was removed to bypass that guard and no job receipt was created.
+  Safe targeted recheck: from server,
   `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
   from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-1. Save the reviewed snapshot, run the full server regression with the helper environment, then task finish.
+1. Run task finish (declared full checks), fix any relevant failures in place, then record exact final results.
 ## Failed approaches
 - Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory
   CredentialStore and fake provider stream through supported ModelRuntime/session APIs.
 - An initial root-directory npx invocation selected an unpinned Vitest; it was stopped and all recorded
   verification commands were rerun inside server/web with the lockfile-pinned executables.
+- `task job run -- bash -lc 'uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed && cd server && npm ci --no-audit --no-fund && npm test'`
+  failed before starting because the snapshot guard rejects the repository's existing tracked `.env.example`.
+  Use the task CLI's own finish/check path; do not change an unrelated tracked example or restart a missing job.
 ## Notes and decisions
 - Implementation is tightly coupled around one inspection result; no child writers or readers are needed.
 - Sequential decisions: preserve published signatures; keep all parser IO under a per-file byte budget;
@@ -154,9 +160,17 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child contribution for the parent's canonical report (no separate child report):
+- Delivered: one bounded metadata/preview result shared by HTTP, agent tools and the read hook; the browser now
+  displays LAS curves/depth, vector companions/fields/CRS and georeferenced raster metadata. Plain TIFF preserves
+  the imaging viewer. Unknown source CRS/depth basis is not guessed.
+- Evidence: deterministic synthetic-format/path/budget tests, a real SDK blocked-read/tool-result test with a fake
+  provider, project-scope route tests, mocked-fetch viewer tests, and the three original trial files read-only.
+- Limitations: baseline LAS 2.0 only (wrapped/3.0/LiDAR issue); TIFF IFD0 only (BigTIFF issue); optional helper
+  dependencies may be absent until child env is integrated; GeoJSON over the byte cap reports unknown count/CRS;
+  physical-line samples do not substitute for full-data analysis; no bash interception or map/depth rendering.
+- Integration: retain parent registration seams; add the new Python helper to integration-boundaries if required.
+  Full regression outcome will be appended after the declared check finishes.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
