@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:32:40Z
+updated: 2026-10-11T08:37:59Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -107,6 +107,7 @@ web/tsconfig.tsbuildinfo, __pycache__).
 3. Save and task finish. Parent owns full scripts/check and compatibility/report integration. Linux/WSL install and update are already verified; macOS stays untested.
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
+- Job 2 failed-exit relay notice processed: reread full log and project-scope HTTP 404; record SHA256 unchanged (a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea), final-stop passed. Fixed and superseded by passing job 4; no new action or rerun. Job 5 Windows completion remains pending.
 - PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
 - Job 3 failed-exit relay notice processed: reread full log and both history HTTP 400 errors; record SHA256 still 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005, final-stop passed. This earlier failed run is superseded by the already-verified passing job 4, not a new regression; no rerun needed. Windows completion wait (job 5) remains the next action.
 ## Notes and decisions
