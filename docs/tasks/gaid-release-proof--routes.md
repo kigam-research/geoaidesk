@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T09:13:04Z
+updated: 2026-10-11T09:17:08Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -69,7 +69,8 @@ design note for the paid routes (what the script does for `api-key` with one per
 server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
-- Four GPU jobs launched (see Running jobs). Job 1 is terminal partial; job 2 map is now running, jobs 3–4 remain GPU-queued. No paid calls and no repeat planned: job 1 failed due model-generated code and incomplete artifacts, not a harness configuration defect.
+- Four GPU jobs launched (see Running jobs). Jobs 1–2 are terminal partial. Job 3 (98K LAS) is running after a passed connection; job 4 remains GPU-queued. No paid calls or repeats: incomplete outputs arose from model-generated code, not harness configuration.
+- Bounded first-98K allocation check: app/configured/loaded context=98304, Ollama CPU/GPU=18%/82%. The managed variant suffix is -gaid-96k (98304/1024); this is the requested 98,304-token trial, not an unintended smaller allocation.
 - `node --test 'geo/tests/*.test.mjs'` passed 26/26 in 39.260 s; log: /home/seongin3/data/geoaidesk/work/gaid-release-proof--routes/geo-tests.log. Worktree helper environment and generated __pycache__ are removed after this check (job snapshots are separate).
 - Implemented the reusable route harness, pinned workflow/input preparation, independent artifact/area checks, SSE/ledger/context/offload observations, and paid-route refusal/attach design. No server/web/shared-instance edits.
 - Read the WP10 plan, local/model API contracts, map and well docs, and catalogue 0.2.1 workflow contracts. The exact worktree is not codegraph-indexed, so relevant native source was read.
@@ -84,6 +85,14 @@ server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/ts
 - Failure evidence: generated script NameError (dup_depth), repeated exact-text edit failures and pandas selection failure; final notebook admits the quicklook failed because DEPT was an index rather than a DataFrame column. The model did not activate/read the exposed workflow skill. No terminal provider overflow error was seen; the app context_usage peak was 66808/65536 (101.9409%), so this is a reported/estimated peak, not proof of an accepted over-limit request. SSE was explicitly aborted at timeout; server settled and serviceStopped=true.
 - Token accounting caveat: task.inputTokens/outputTokens (2392093/18496) tally streamed turn_end frames, not compaction/aborted usage. Use the preserved ledger for the complete run: promptTokens=2490256, completionTokens=67781, cachedTokens=1487399, totalTokens=4045436, costUsd=0, billingMode=local.
 - Scientific-quality caution: model qc.json leaves depth start/stop/step null and its notebook asserts duplicate depths incorrectly. A direct source ASCII scan confirms 16132 unique samples, first 80.15, last 2532.062; header STOP=2532.1748047 m differs by 0.1128047 m. The known header finding was not correctly captured by this model output; do not treat the surviving tables as validated QC.
+
+### Local 64K map plus area table (job 2, terminal)
+- Job: job-geoaidesk-gaid-release-proof--routes-2; receipt: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082310.944398Z/receipt.json; exit 1.
+- Record: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082310.944398Z/out/record.json; sha256: 7451474fbacd29dd2d125ef2bd5fb2c9567bf0befc4dfc8a60698f9a98e4b0ea. Source SHA a97bf28265bd (full SHA in record), version 0.1.0.
+- Route: gaid-local/qwen3:30b-a3b-instruct-2507-q4_K_M-gaid-64k; app/loaded context=65536, CPU/GPU=7%/93%. Connection passed in 20165 ms, input/output=26827/5 tokens, one turn and no tools, local/$0.
+- Task partial in 185720 ms, completed and settled: 9 turns, 11 tools, 0 retries, 0 detected dependency repairs, context peak 43689 (66.6641%). Ledger input/output=16461/13834, cached=295211, total=325506, local/$0.
+- area-table.csv exists (59 bytes), sha256 b0d541c81eaedb0736b2203dceb05789df1335e9a41cf319af02f49e339226ea; independent area check passed exactly: A=30000/B=20000 m2, 60%/40%. Missing: map.png, crs-inventory.json, crs-inventory.csv, run.json. Session/provenance/notebook paths and hashes are in the record. serviceStopped=true.
+- Failure evidence: generated script omitted matplotlib.pyplot import (NameError: plt), then three exact-text edit failures; no workflow skill read was observed. This is not a map-plus-table acceptance pass even though the table agrees. Environment observation for parent: a find tool returned "fd is not available and could not be downloaded"; subsequent ls found the input. No app edits or environment tuning were made to make the trial pass.
 
 ## Next steps
 1. On job-exit notification, read this task document and the matching receipt/exit/out/record.json before acting; do not replay launched jobs. Four trials are already registered and host-GPU serialized.
