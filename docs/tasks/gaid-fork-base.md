@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T02:30:07Z
+status: done
+updated: 2026-10-11T02:30:17Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0c2ee874-5ddb-4118-9f20-209b6d8b615a","pid":3424104,"provider":"claude","session":"53669a44-52c3-4de7-84fd-3986e964ef40","start":"14946049","token":"204294a4c7b769cb17cdc00690c68a91f04cb61b74c54d3c345e6470c46afaf0"}
 branch: task/gaid-fork-base
 target: main
@@ -56,7 +56,7 @@ Implementation done and checked (single writer, no child units). Branch saved at
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-11T02:19:19Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-fork-base.md.
+Closed 2026-10-11T02:30:17Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-fork-base.md.
 
 ## Hand-offs (for the hub; not part of WP02 done criteria)
 - WP03 gaid-runtime: stage the pinned geo catalogue archive (`geo/distribution.json` `catalogue` is `pending`); until
