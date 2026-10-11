@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:59:58Z
+updated: 2026-10-11T07:02:13Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -80,6 +80,10 @@ Verified facts from the hub (2026-10-11):
      override (`gaid:locale`) else browser language, Korean default.
   2. WP00 copy kit vendored into `geo/copy/` (validator, icu-lite, policy, terminology, guideline, agent prompt) with
      `geo/copy/SOURCE.md` (skill_hub commit + sha256); `scripts/check` runs it over `web/src/geo/locales`.
+     Re-pinned to skill_hub main 6866361 (routed request 0f9f7d4534b2, 2026-10-11): copy kit byte-identical,
+     `gaid-app.css` adds `--gaid-brand-on-dark`. The approved logo/icons/domain icons are vendored in `geo/brand/`
+     (SOURCE.md, manifest sha256 verified, 28 files); the header logo and favicon are wired at integration if the
+     --korean child has not used them (its brief predates them).
      The catalogue archive's `policy/` replaces the vendored copy when WP10 pins a release carrying it.
   3. Pack launch does not pre-create a session: the new tab carries `geoExposure: "workflow:<id>"` in its persisted
      chat state; the first send passes it to `POST /sessions` → `createSession(..., {geoExposure})` →
