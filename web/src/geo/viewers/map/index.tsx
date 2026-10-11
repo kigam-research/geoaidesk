@@ -168,7 +168,7 @@ function Workspace(props: ViewerProps) {
         <label><input type="checkbox" checked={!!active.source.categorical} onChange={e => changeSource({ categorical: e.target.checked })} /> {t("categorical")}</label>
         {isVector(active) && active.source.categorical && <label>{t("categoryField")} <select className={input} value={colorFields[active.id] ?? ""} onChange={e => { setColorFields(current => ({ ...current, [active.id]: e.target.value })); changeSource({ variable: e.target.value || undefined }); }}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</select></label>}
         <p>{t("sourceCrs")}: {sourceCrs(active).authority ?? sourceCrs(active).name ?? t("unknown")} · {t(sourceCrs(active).status)}</p>
-        <p>{t("displayCrs")}: {crs === "native" ? t("native") : crs}</p><p>{t("unit")}: {active.manifest?.unit ?? active.inspection.bands?.find(b => b.index === active.source.band)?.unit ?? sourceCrs(active).axisUnits ?? t("unknown")}</p><p>{t("unchanged")}</p>
+        <p>{t("displayCrs")}: {crs === "native" ? t("native") : crs}</p><p>{t("unit")}: {active.manifest?.unit ?? active.inspection.bands?.find(b => b.index === active.source.band)?.unit ?? t("unknown")}</p><p>{t("coordinateUnits")}: {sourceCrs(active).axisUnits ?? t("unknown")}</p><p>{t("unchanged")}</p>
         {!hasCrs(sourceCrs(active)) && <p>{t("nativeLimit")}</p>}
         {active.manifest && active.manifest.displayCrs !== crs && <p>{t("displayFallback")}</p>}
         {data && <><p>{t("extent", { crs: data.displayCrs })}: {data.bbox.join(", ")}</p><p>{t("sampling", { method: data.preview.method, sampled: t(data.preview.sampled ? "yes" : "no"), truncated: t(data.preview.truncated ? "yes" : "no") })}</p>
