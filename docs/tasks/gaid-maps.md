@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:52:32Z
+updated: 2026-10-11T05:18:07Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -100,3 +100,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - Parent TypeScript metadata path now attempts the map helper first and uses baseline only on failure, avoiding redundant metadata subprocesses on successful map requests. Typecheck + same 30 targeted checks passed after this change.
 - Added real HTTP fixture integration tests in server/test/geo-maps-integration.test.ts; these deliberately await child fixture/helper integration and have NOT run yet. Browser check must exercise actual OpenLayers rendering and area output; do not claim it from mocks.
 - Parent independent implementation is checkpointed; await child completion notification rather than polling. Both children were active at the last bounded status check.
+
+### Routed coordination f3b3631f1273
+- Viewer reports implementation complete, 40 targeted frontend tests/typecheck/lint passed. Its finish merged parent 3481060 but the full check correctly failed because parent's new real integration test refers to the not-yet-integrated helper fixture. Do not weaken that test or copy unpublished sibling files.
+- Helper's corrected finish (boolean category transport fix) is still running full scripts/check. A local ready frontmatter is not a completed CLI publication: attempted `task complete gaid-maps--helper` returned no finished unit/no completion record; no merge occurred.
+- Route reported `--blocked` as a pending-integration checkpoint. Parent remains driver. On final helper completion: task complete helper, verify published parent helper/fixture, update route report so hub resumes existing viewer in place, then integrate viewer and continue browser/full checks. No user decision needed.
