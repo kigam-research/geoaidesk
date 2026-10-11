@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:47:00Z
+updated: 2026-10-11T04:47:30Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -74,3 +74,9 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - helper: `gaid-maps--helper`, writer `7e627c39-8f96-4667-b685-4abba81a1202`, owned Python/helper fixture paths above. Started from shared contract 91e7df38.
 - viewer: `gaid-maps--viewer`, writer `2bcba6ab-0329-4c49-8cb2-c835676e8dc3`, owned viewer/ol paths above. Started from shared contract 91e7df38.
 - Parent implementation in progress: bounded uv subprocess bridge, active-project routes, artifact manifest validation, source companion validation/fingerprints, and route tests. Tests not run yet; dependencies not present in this worktree.
+
+### Checkpoint: job-launch dependency
+- Parent source and route tests published at ecfa88918f8c; execution not yet verified.
+- First dependency/targeted-check job did not start: `job snapshot blocked: forbidden path .env.example`, exit 1, no receipt. Existing upstream template was not read/edited. Do not delete or rename it to bypass the CLI.
+- Forwarded dependency to geoaidesk hub with `task hub --send`, request `65caed1a1d90`; follow the returned resolution before rerunning a new launch. No periodic polling.
+- Next action: receive child completion/CLI resolution, complete each child, run targeted checks and full scripts/check, then sync/report/cleanup/finish. Parent can review child results and continue independent integration after notification. No completion claim.
