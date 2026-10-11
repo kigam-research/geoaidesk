@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T02:19:08Z
+status: done
+updated: 2026-10-11T02:19:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0c2ee874-5ddb-4118-9f20-209b6d8b615a","pid":3424104,"provider":"claude","session":"53669a44-52c3-4de7-84fd-3986e964ef40","start":"14946049","token":"204294a4c7b769cb17cdc00690c68a91f04cb61b74c54d3c345e6470c46afaf0"}
 branch: task/gaid-fork-base
 target: main
@@ -55,7 +55,8 @@ Implementation done and checked (single writer, no child units). Branch saved at
   (free ports, temp data home; needs network for the first-start catalogue).
 
 ## Next steps
-1. `task finish` (merge to main). Nothing else pending in this unit.
+<!-- task:closed -->
+Closed 2026-10-11T02:19:19Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-fork-base.md.
 
 ## Hand-offs (for the hub; not part of WP02 done criteria)
 - WP03 gaid-runtime: stage the pinned geo catalogue archive (`geo/distribution.json` `catalogue` is `pending`); until
@@ -99,7 +100,7 @@ Implementation done and checked (single writer, no child units). Branch saved at
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [확인] 공개 저장소 kigam-research/geoaidesk의 Issues 기능이 꺼져 있어 실행기 오류 메시지와 배포 설명서의 문제 신고 주소가 열리지 않습니다 — 가) 지금 Issues를 켠다 — 나) WP09/WP10에서 접수 양식을 들여올 때 켠다 — 권장: 가) 결정 D6(공개 이슈·PR)이 이미 내려졌고 안내 주소가 이미 쓰이고 있음 — 막힌 일: 없음(신고 경로만 비어 있음) — 근거: reports/2026-10-11-gaid-fork-base#5-한계
+- [확인 gaid-fork-base#1] 공개 저장소 kigam-research/geoaidesk의 Issues 기능이 꺼져 있어 실행기 오류 메시지와 배포 설명서의 문제 신고 주소가 열리지 않습니다 — 가) 지금 Issues를 켠다 — 나) WP09/WP10에서 접수 양식을 들여올 때 켠다 — 권장: 가) 결정 D6(공개 이슈·PR)이 이미 내려졌고 안내 주소가 이미 쓰이고 있음 — 막힌 일: 없음(신고 경로만 비어 있음) — 근거: reports/2026-10-11-gaid-fork-base#5-한계
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
