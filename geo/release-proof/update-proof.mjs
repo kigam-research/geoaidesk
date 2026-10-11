@@ -38,7 +38,7 @@ async function verify(prefix) {
     assert.ok([...r.enabled, ...r.disabled].some(s => s.name === state.untouched));
     assert.match(JSON.stringify(r.sync), new RegExp(JSON.parse(fs.readFileSync(path.join(dir, 'geo/distribution.json'))).catalogue.version.replaceAll('.', '\\.')));
     // Compare live untouched bytes against the verified staged pin, not just a label.
-    const cache = path.join(g.dataHome, 'skills-cache');
+    const cache = path.join(g.dataHome, 'skills-cache', `geo-catalogue-${c.status.version}-${c.status.sha256.slice(0, 12)}`);
     function locate(folder) {
       for (const entry of fs.readdirSync(folder, { withFileTypes: true })) {
         if (!entry.isDirectory()) continue;
@@ -58,7 +58,7 @@ async function verify(prefix) {
 try {
   if (!await e.step('checkout-base', () => { dir = checkout(e, o, o['base-ref'] ?? '882cd56'); e.record.app.fromCommit = e.record.app.commit; e.record.app.fromVersion = e.record.app.version; return e.record.app; })) throw Error('No base checkout');
   if (!await e.step('base-start', async () => { g = await launch(e, o, dir, 'base-start', undefined, true); ports = g.ports; return { readyMs: g.readyMs, ports }; })) throw Error('No base instance');
-  if (!await e.step('seed-project', async () => { const r = await api('POST', '/projects', { id: project, name: 'Release user project', description: 'Update preservation proof', spendLimitUsd: 12.34 }); await api('POST', `/projects/${project}/sandbox/init`, { download_skills: true }); return r; })) throw Error('No user project');
+  if (!await e.step('seed-project', async () => { const r = await g.json('POST', '/projects', { body: { id: project, name: 'Release user project', description: 'Update preservation proof', spendLimitUsd: 12.34 } }); await api('POST', `/projects/${project}/sandbox/init`, { download_skills: true }); return r; })) throw Error('No user project');
   await e.step('seed-upload', async () => { state.upload = await upload(g, 'user.csv', 'sample,value\nA,42\n', project); return state.upload; });
   await e.step('seed-skills', async () => {
     const c = await api('GET', '/geo/catalogue'); const s = await api('GET', '/skills/all?scope=project');

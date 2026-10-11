@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:21:32Z
+updated: 2026-10-11T08:23:28Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -86,16 +86,21 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Resumed in the assigned PC74 worktree; base contains shared instance harness and catalogue 0.2.1 pin.
 - Read AGENTS.md, record contract and shared harness. Codegraph is unindexed here; exact native source reads are used.
 - PC71 WSL has uv at ~/.local/bin/uv but not on its noninteractive PATH. Native Windows prerequisites respond.
+- Harness saved at 6b7e25e; native install job 1 passed all steps (first start 44,055ms; restart 6,009ms).
+- Native update job 2 failed at project creation because harness sent an unknown project scope. Fixed creation to use default scope; original failed record retained.
+- PC71 WSL install/update services gaid-proof-{install,update}-20261011 and native Windows scheduled task GAID-Install-Proof-20261011 launched from harness 6b7e25e. Outputs: pc71:~/data/geoaidesk/work/gaid-release-proof/install/{wsl-install,wsl-update}; pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install.
 ## Next steps
-1. Implement standalone install/update runners and deterministic synthetic fixture/API assertions.
-2. Save reviewed harness, then run PC74 via task jobs and PC71 via durable user services/native scheduled execution.
+1. Save scoped-project correction; rerun native + WSL update proof into new evidence directories.
+2. Collect the already-launched installation records; fix only harness failures.
 3. Record every result and limitation, run the declared Node geo tests, then task finish.
 ## Failed approaches
+- PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
 ## Notes and decisions
 - Sequential decisions: settle evidence steps and safe fresh-output ownership first, then install runner, update runner, actual host runs, final checks.
 - Owned interfaces: install-* helpers + install-proof/update-proof; shared instance changes only when required for cleanup. No server/web/app edits.
 - Independent work: host executions may overlap after the same harness revision is saved; no nested writers. Integration order: harness, local evidence, remote evidence, parent integration.
 - No paid model requests. Session history will be explicitly marked synthetic and use Pi's own SessionManager serializer; notebook notes use the API.
+- Shared instance minimal changes: clear inherited catalogue archive/URL/download switches; timeout waits for stop and port release instead of sending an unawaited signal.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -108,6 +113,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082159.930245Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
