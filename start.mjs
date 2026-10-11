@@ -519,11 +519,12 @@ async function freePort(port, label) {
  *  lockfile, and the server package version the build injects). */
 function productionBuildInputs() {
   const webDir = path.join(repoRoot, "web");
-  const skip = new Set(["node_modules", ".next", "out", "coverage", ".turbo"]);
+  // Build outputs, including the files `next build` itself (re)writes.
+  const skip = new Set(["node_modules", ".next", "out", "coverage", ".turbo", "next-env.d.ts"]);
   const files = [];
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (skip.has(entry.name)) continue;
+      if (skip.has(entry.name) || entry.name.endsWith(".tsbuildinfo")) continue;
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(full);
       else if (entry.isFile()) files.push(full);
