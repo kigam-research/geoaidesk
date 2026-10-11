@@ -157,6 +157,12 @@
       "owner": "gaid-runtime",
       "status": "edited",
       "responsibility": "Dependency locks: one package at a time adds dependencies. gaid-runtime added the geo-core + geo-gis helper packages to server/src/helpers/pyproject.toml (uv environments limited to the four shipped platforms with Python >= 3.12) and relocked uv.lock; the owner returns to the next package that needs a change"
+    },
+    {
+      "path": "web/src/components/file-preview-panel.tsx",
+      "owner": "gaid-well-tables",
+      "status": "edited",
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged."
     }
   ],
   "notTouched": [

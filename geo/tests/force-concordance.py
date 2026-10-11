@@ -6,6 +6,8 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
+import tomllib
 from pathlib import Path
 import zipfile
 import numpy as np
@@ -15,9 +17,14 @@ spec = importlib.util.spec_from_file_location('las_helper', Path(__file__).resol
 helper = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(helper)
 p = argparse.ArgumentParser()
-p.add_argument('--asset', type=Path, required=True)
+p.add_argument('--asset', type=Path, help='Override the named force2020_welllogs asset')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
+if a.asset is None:
+    root = Path(__file__).resolve().parents[2]  # also works in a job src/ without .git
+    inputs = tomllib.loads((root / 'configs/inputs.toml').read_text())['input']
+    spec_input = next(i for i in inputs if i['name'] == 'force2020_welllogs')
+    a.asset = Path(os.environ.get('TASK_ASSETS_DIR', str(Path.home() / 'assets'))) / spec_input['path']
 source = a.asset / 'las/25_9-1.las'
 log, _ = helper.read_log(source)
 raw = pd.DataFrame(log.data, columns=[c.mnemonic for c in log.curves])

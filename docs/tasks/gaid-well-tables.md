@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:59:05Z
+updated: 2026-10-11T05:32:39Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cd7c561a-0a57-452c-9026-bbf129244c36","pid":3981134,"provider":"codex","session":"01a12945-9f27-71e2-b32a-5bbc545ac45a","start":"15979142","token":"29bed9d06311d3f15e6cd0567d9374e9a4a03a112c2135a1ce904ef6fe2f5004"}
 branch: task/gaid-well-tables
 target: main
@@ -40,16 +40,16 @@ Verified facts from the hub (2026-10-11):
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link.
 
 ## Current state
-- Resumed at the printed worktree; clean initial checkout. Read authoritative forwarded request and WP03 interfaces.
-- Source contracts fetched read-only from skill_hub main to external task inputs. Exact worktree is not codegraph-indexed; native source reads used.
-- Child tables: gaid-well-tables--tables, writer 8b4d426a-82dc-444e-9347-60354a8ffce4; owns table-only files. Complete it before final integration.
-- Initial numerical checks caught lasio 0.32 leaving NULL in the index and mishandling two-column wrapped samples; implemented strict declared-width LAS 2 numeric reading with lasio headers and retest.
-- LAS first implementation: read-only lasio 2.0 helper (64 MiB / 1M sample caps), bounded series routes, depth viewer and `.depth.json` manifest adapter, focused numerical/API/UI tests. Not yet verified.
-- FORCE fixture exists at assets/force2020-welllogs/c8d01ee9; no model runs authorized or needed.
+- LAS milestone integrated by `task sync`: db00f688bd9b, full scripts/check passed (backend 145 passed files, 1 skipped; 1,579 passed tests, 11 skipped). CLI production smoke completed; no deployed service changed.
+- Focused LAS checks: `node --test geo/tests/well.test.mjs` passed (9 Python known-answer cases); backend depth 4 tests after shared-header-basis check, frontend depth 5 tests after reader fixes, backend/frontend typechecks passed. Shared header-basis reuse was then added and the depth API tests passed again.
+- FORCE concordance: 4,841,277-byte source, 16,132 LAS rows; 15,743 uniquely matched reference rows, seven curves exact values and null masks (max difference 0, no null-mask disagreements). Header STOP discrepancy 0.1128047 m is preserved. Output checks/force-concordance.json under external task work.
+- Real Chromium application check: opened FORCE LAS without bulk text fetch; applied 1800–2400 m window; manifest spike link reached logical row 12002 with project-scoped data/code links. Korean screenshots external under task checks, copied into canonical report figures. Constructed flags test UI only, not scientific QC.
+- Pending parent glue/docs/reader fixes are intentionally still local (git diff/status). Do not lose them or publish during the child’s final check: that would make the child integrate another parent tip and repeat full checks. Once child ready is actually published, save these reviewed paths, then task complete the child and verify the combined tree. The prepared table-option imports become resolvable when the child is integrated.
+- Table child gaid-well-tables--tables (writer 8b4d426a-82dc-444e-9347-60354a8ffce4) has delivered its package and is running the final serial whole check (task finish, VITEST_MAX_WORKERS=1; started about 2026-10-11 05:19 UTC). Earlier failures and environment correction are recorded in the child document. Its local status ready is written before checks and is not published completion; wait for the actual completion notice/remote ready. Parent optional table UI wrapper/routes/docs are prepared but not yet verified together. Do not alter child-owned files until completion/integration.
+- Direct checks authorized by hub/user ("제안대로 하자.") while .env.example snapshot policy is fixed. Routed request env-sample-jobs-gaid-well-tables consumed and reported. No paid model runs.
 ## Next steps
-1. Run direct worktree checks per hub-approved interim exception (user: "제안대로 하자.", request env-sample-jobs-gaid-well-tables consumed/reported). Do not alter .env.example. No receipt was created by the rejected job.
-2. Remaining implementation review: browser must invoke /geo/inspect before numerical series; ensure header basis interpretation agrees with shared inspector; review table child integration; test helper and UI. Read current task before resuming; do not repeat an existing launched job.
-3. Integrate independent table package after LAS slice, run focused and full checks, task sync, report, remove regenerable caches, task finish.
+1. On the child completion notice, reread this document and git status, then complete/integrate the table child once ready; save prepared parent glue before integration, then run integrated focused/API/UI/type checks and a table browser smoke.
+2. Use VITEST_MAX_WORKERS=1 for final whole checks. A global value of 4 overrides backend fileParallelism=false normalization and causes shared-test-root races; child rejected that verification and restarted with 1. No assertions/deadlines/tests are changed. Finalize canonical report evidence, run final task finish checks, remove regenerable build caches after the last check, and wait for the hub completion report. Final main integration/cleanup are not yet done for the full LAS+tables scope.
 ## Failed approaches
 - 2026-10-11: first task job run (dependency install + focused type/numerical/API/UI checks) failed before receipt creation: "job snapshot blocked: forbidden path .env.example". The inherited path was not read or changed. task/jobs.py validates all ls-tree paths before git archive (even export-ignore cannot resolve it). Do not bypass task CLI with manual long-running jobs. Hub needs to resolve the tool/project compatibility. No tests have run.
 - Focused command after unblock: task job run -- bash -lc 'set -e; npm --prefix server ci --no-audit --no-fund; npm --prefix web ci --no-audit --no-fund; uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed; npm --prefix server run typecheck; cd web; npx tsc --noEmit; npm test -- src/geo/viewers/depth/viewer.test.tsx; cd ../server; npx vitest run test/geo-depth.test.ts; cd ..; node --test geo/tests/well.test.mjs'
@@ -58,16 +58,12 @@ Verified facts from the hub (2026-10-11):
 - Sequential decisions: preserve raw values/order/nulls; unknown depth basis/datum stay unknown; LAS 2.0 numerical support only, LiDAR and LAS 3 explicit unsupported. Full-data operations capped separately from metadata inspection. Display reduction retains spikes and explicit gap boundaries.
 - Independent package: tables child owns new table helper/routes/contracts/viewer/tests only. Parent owns LAS helper/routes/depth UI/manifest/tests and all shared glue, integration boundaries, AGENTS and canonical report.
 - Interfaces settled: table child exports registerGeoTableRoutes(app) and default TableRolesViewer(ViewerProps), on explicit user choice from existing table surfaces; it never replaces generic table editing. Both use WP03 sandbox resolution and inspection conventions. No overlap in owned files.
+- Read-only LAS review: native reader /root/las_review, current working tree (HEAD db00f688 plus pending basis/label changes); no writes/runs allowed, concrete outcome blockers only. Review found invisible single-point segments and an inverted-range retry trap. Fixed with visible source-linked singleton markers and local range validation; focused regressions added and all 5 depth UI tests passed. No additional blockers found in numerical parsing/reduction/source links.
 - Integration order: LAS first; complete child and append table routes/UI entry; task sync with WP05 keeping both append-only entries; final scripts/check. No separate review quota.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-11-gaid-well-tables/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

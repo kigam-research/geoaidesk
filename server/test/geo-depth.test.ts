@@ -3,7 +3,7 @@ import path from "node:path";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { readSeriesWindow, validateSeriesRequest, readDepthResult, LAS_MAX_BYTES } from "../src/geo/well/series.ts";
 import { runHelperScript } from "../src/api/sci-helpers.ts";
-import { sandboxFixture } from "./fixtures/geo/factories.ts";
+import { sandboxFixture, las2 } from "./fixtures/geo/factories.ts";
 vi.mock("../src/api/sci-helpers.ts", () => ({ runHelperScript: vi.fn() }));
 let f: ReturnType<typeof sandboxFixture>;
 beforeEach(() => { f = sandboxFixture(); vi.clearAllMocks(); });
@@ -28,4 +28,10 @@ it("validates depth manifests and resolves source/code files inside the project"
   f.write("result.depth.json", JSON.stringify(manifest)); expect(await readDepthResult(f.paths, "result.depth.json")).toEqual(manifest);
   f.write("result.depth.json", JSON.stringify({ ...manifest, dataPath: "../outside.las" })); await expect(readDepthResult(f.paths, "result.depth.json")).rejects.toThrow(/Invalid/);
   f.write("result.depth.json", JSON.stringify({ ...manifest, codePath: "missing.py" })); await expect(readDepthResult(f.paths, "result.depth.json")).rejects.toThrow(/not found/);
+});
+
+it("uses the same explicitly declared depth basis as the shared inspector", async () => {
+  f.write("basis.las", las2.replace("RUN. 1", "BASIS. TVD : depth basis\nRUN. 1"));
+  vi.mocked(runHelperScript).mockResolvedValue({ status: 0, stdout: '{"schemaVersion":"geo-series/v1","depth":{"basis":"unknown"},"rows":[]}', stderr: "", timedOut: false });
+  expect((await readSeriesWindow(f.paths, { path: "basis.las" })).depth.basis).toBe("TVD");
 });

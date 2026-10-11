@@ -45,6 +45,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/inspection.ts`, `registerGeoInspector`) serves `POST /geo/inspect`, the `geo_inspect` /
   `geo_read_window` tools and the read hint that blocks unsuitable direct `read`s of large/binary geo files with a
   bounded summary and next action. Viewers: `web/src/geo/viewers/registry.ts` (WP04/WP05 replace their own entry).
+- LAS depth/table viewers (WP04): `server/src/geo/well/` and `web/src/geo/viewers/depth/` serve LAS 2.0
+  numerical windows through `POST /geo/series-window` after shared inspection; no raw-text bulk preview.
+  Original order/units/NULLs remain, depth basis is explicit, reduction preserves extrema and gaps; limits:
+  64 MiB / 1M samples / 8M values / 128 curves, 2,000 display or 200 source rows. `.depth.json` opens the
+  LAS-backed `geo-result/v1` depth-track adapter (`POST /geo/depth-result`), with typed flag/source-row links.
+  `server/src/geo/tables/`, `web/src/geo/viewers/tables/` add an explicit read-only CSV/TSV/XLSX role/check overlay
+  to the existing view-mode file panel. `POST /geo/tables/inspect` checks intervals, IDs, units and two-file joins;
+  no desurveying, unit conversion or censored-value replacement. Generic viewers/editors are unchanged.
+  Contracts/limits and verification: `docs/geo/well-tables.md`.
 - Local model (`server/src/geo/local-model.ts`, Settings card `web/src/geo/local-model/`): one managed custom provider
   `gaid-local` with explicit context, optional derived Ollama model with `num_ctx`, optional app default.
 - UI branding and every visible string belong to WP07 `gaid-korean-workspace` (locale catalogues under
