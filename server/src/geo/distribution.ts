@@ -20,6 +20,8 @@ export interface DistributionRelease {
   repository: string;
   releaseTagPrefix: string;
   version: string;
+  /** `preview` (default) publishes GitHub prereleases; `stable` does not. */
+  channel: string;
 }
 
 export const DISTRIBUTION_FILE = path.join("geo", "distribution.json");
@@ -68,7 +70,7 @@ export function readDistributionExclusions(repoRoot: string): CatalogueExclusion
 export function readDistributionRelease(repoRoot: string): DistributionRelease | null {
   const manifest = readManifest(repoRoot);
   if (!manifest) return null;
-  const { repository, releaseTagPrefix, version } = manifest;
+  const { repository, releaseTagPrefix, version, channel } = manifest;
   if (typeof repository !== "string" || typeof version !== "string") {
     throw new Error(`${DISTRIBUTION_FILE}: repository and version are required`);
   }
@@ -76,7 +78,49 @@ export function readDistributionRelease(repoRoot: string): DistributionRelease |
     repository,
     releaseTagPrefix: typeof releaseTagPrefix === "string" ? releaseTagPrefix : "v",
     version,
+    channel: typeof channel === "string" ? channel : "preview",
   };
+}
+
+/** `[major, minor, patch, prerelease?]` of a semver string, or null. */
+function parseVersion(value: string): [number, number, number, string | null] | null {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:-([\w.-]+))?(?:\+[\w.-]+)?$/.exec(value);
+  return match ? [Number(match[1]), Number(match[2]), Number(match[3]), match[4] ?? null] : null;
+}
+
+function compareVersions(a: string, b: string): number {
+  const pa = parseVersion(a);
+  const pb = parseVersion(b);
+  if (!pa || !pb) return 0;
+  for (let i = 0; i < 3; i++) if (pa[i] !== pb[i]) return (pa[i] as number) - (pb[i] as number);
+  if (pa[3] === pb[3]) return 0;
+  if (pa[3] === null) return 1;
+  if (pb[3] === null) return -1;
+  return pa[3] < pb[3] ? -1 : 1;
+}
+
+/**
+ * The newest app version among GitHub releases (`GET /repos/{repo}/releases`):
+ * published (not draft) releases whose tag is `<prefix><semver>`. GitHub's
+ * `/releases/latest` skips prereleases, and a preview channel publishes only
+ * prereleases, so it would never report an update; other tags in the same
+ * repository (e.g. the catalogue release `geo-catalogue-0.2.1`) are ignored.
+ */
+export function pickLatestRelease(
+  releases: readonly { tag_name?: unknown; draft?: unknown; prerelease?: unknown }[],
+  prefix: string,
+  includePrereleases: boolean,
+): string | null {
+  let best: string | null = null;
+  for (const release of releases) {
+    if (release.draft === true || typeof release.tag_name !== "string") continue;
+    if (release.prerelease === true && !includePrereleases) continue;
+    if (!release.tag_name.startsWith(prefix)) continue;
+    const version = release.tag_name.slice(prefix.length);
+    if (!parseVersion(version)) continue;
+    if (best === null || compareVersions(version, best) > 0) best = version;
+  }
+  return best;
 }
 
 /** The catalogue archive a distribution pins (`catalogue.status: "pinned"`). */

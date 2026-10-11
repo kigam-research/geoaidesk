@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:00:20Z
+updated: 2026-10-11T08:14:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -48,9 +48,37 @@ Verified facts from the hub (2026-10-11):
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link (WP11 follows).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-11: catalogue 0.2.1 copied unchanged into asset pc74:~/assets/geo-catalogue/0.2.1/ (ASSET.md, MANIFEST.sha256
+  sha256 9ac82d84…ee48; `cd ~/assets/geo-catalogue/0.2.1 && sha256sum --check MANIFEST.sha256`).
+- Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
+
+## Plan (orchestration)
+Sequential decisions (writer):
+1. Catalogue pin 0.2.1 + download contract (gaid-runtime#2 가): `geo/distribution.json` `catalogue` → 0.2.1 with
+   `download.url` = asset on a dedicated geoaidesk release `geo-catalogue-0.2.1` (prerelease, so it never becomes the
+   app's "latest"); the launcher (`geo/start.mjs`) downloads into `<GAID_HOME>/catalogue/` only when no candidate
+   location has the archive, verifies sha256, atomic rename. `GAID_CATALOGUE_URL` overrides the URL (tests, mirrors),
+   `GAID_CATALOGUE_DOWNLOAD=0` disables it. catalogue.ts stays network-free.
+2. Update check: `/version/latest` uses `/releases/latest`, which skips prereleases; the preview channel publishes
+   prereleases, so pick the highest `geo-v*` tag from the release list instead (writer).
+3. Shared harness `geo/release-proof/instance.mjs` (start/stop a GAID checkout with its own data home and ports, API
+   helper) — writer, before children start.
+4. Evidence formats: `gaid-install-evidence/v1`, `gaid-route-evidence/v1` (JSON under ~/data/geoaidesk/work/gaid-release-proof/
+   or a job output); `geo/compatibility.json` (`gaid-compatibility/v1`) is written by the writer from them, with the
+   plan §2.7 route fields.
+Independent packages:
+- child `install` (general work): `geo/release-proof/{install,update}-proof.mjs` + runs on PC74 Linux, PC71 WSL,
+  PC71 Windows native. Owns `geo/release-proof/install-*`, `update-*`, its fixtures.
+- child `routes` (general work): `geo/release-proof/route-trial.mjs` + local Ollama 64K/98K LAS and map+table runs on
+  PC74. Owns `geo/release-proof/route-*`. Paid routes are designed, run only after the user asks.
+Writer: catalogue/launcher/update-check, `geo/compatibility.json` + test, `docs/geo/` guides (install, routes,
+update/rollback/remove), upstream integration log, release workflow (catalogue release asset), WP09 template import
+when it lands, report. Integration order: writer interfaces → children → compatibility.json/docs → checks → report.
+User decisions in this tab: brand clearance (geo/brand), paid runs (API, ChatGPT sign-in), publishing the catalogue
+release and the app release.
+
 ## Next steps
-1. (the next session's first action)
+1. Implement decisions 1–3, then start the two children.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
