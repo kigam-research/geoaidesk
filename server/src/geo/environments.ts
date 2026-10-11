@@ -223,7 +223,7 @@ export class GeoEnvironmentService {
     this.preparing.add(dir);
     try {
       const missing = before.packages.filter((pkg) => before.distributions.some((dist) => dist.name === pkg.name && dist.status === "missing"));
-      const args = target === "helper" ? ["sync", "--frozen"] : missing.length ? ["add", "--", ...missing.map(resolvedPackageSpec)] : null;
+      const args = target === "helper" ? ["sync", "--frozen", "--python", "3.12"] : missing.length ? ["add", "--", ...missing.map(resolvedPackageSpec)] : null;
       if (args) {
         const result = await this.runner(uv, args, { cwd: dir, timeout: 5 * 60_000 });
         if (result.code !== 0) throw new EnvironmentPreparationError("Environment preparation failed", tail(result));

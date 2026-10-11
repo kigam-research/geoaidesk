@@ -50,7 +50,7 @@ try {
   const data = loadGeoEnvironments();
   const helper = path.join(root, "server/src/helpers");
   const helperPackages = environmentPackages(requiredEnvironments(data, "helper"));
-  imports("helper", ["run", "--frozen", "--project", helper], helper, helperPackages);
+  imports("helper", ["run", "--frozen", "--python", "3.12", "--project", helper], helper, helperPackages);
   const project = path.join(sandbox, "analysis"); fs.mkdirSync(project);
   fs.writeFileSync(path.join(project, "pyproject.toml"), projectPyproject(data));
   command(["sync", "--project", project], project);

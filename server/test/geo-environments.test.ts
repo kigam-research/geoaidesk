@@ -120,7 +120,7 @@ describe("readiness and explicit preparation", () => {
     const gis = await h.service.prepare(data, "gis", "project", h.dir);
     expect(gis.ready).toBe(true); expect(h.calls.filter((c) => c.command === "uv-test").at(-1)?.args).toEqual(["add", "--", "rasterio>=1.4"]);
     await h.service.prepare(data, "gis", "helper", h.dir);
-    expect(h.calls.filter((c) => c.command === "uv-test").at(-1)?.args).toEqual(["sync", "--frozen"]);
+    expect(h.calls.filter((c) => c.command === "uv-test").at(-1)?.args).toEqual(["sync", "--frozen", "--python", "3.12"]);
   });
   it("does not install a distribution just because an installed module is broken", async () => {
     const h = harness(); h.breakImport();
