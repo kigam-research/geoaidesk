@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowUpRightIcon, KeyRoundIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { apiFetch } from "@/lib/projects";
 import { notifyProviderAuthChanged } from "@/lib/use-provider-auth";
 import { cn } from "@/lib/utils";
 import { SettingsError } from "./primitives";
+
+const appText = geoText("app");
 
 export type CredentialStatus = Record<string, { set: boolean; masked: string | null }>;
 
@@ -45,7 +47,7 @@ function hostOf(href: string): string {
 export function GetKeyLink({
   href,
   service,
-  label = "Get a key",
+  label = appText("settings.credentials.get_a_key"),
   className,
 }: {
   href: string;
@@ -60,8 +62,8 @@ export function GetKeyLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      title={`Opens ${host} in a new tab`}
-      aria-label={`${label}${service ? ` (${service})` : ""} at ${host}, opens in a new tab`}
+      title={appText("settings.credentials.opensHost", { host })}
+      aria-label={appText("settings.credentials.opensService", { label, service: service || "none", host })}
       className={cn(
         "group inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border border-border/70 px-2 py-0.5 text-[10px] leading-4 text-muted-foreground transition-colors",
         "hover:border-primary/30 hover:bg-primary/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
@@ -94,10 +96,10 @@ export function useCredentialStatus() {
     setError(null);
     try {
       const res = await apiFetch("/credentials");
-      if (!res.ok) throw new Error(`Failed to load (${res.status})`);
+      if (!res.ok) throw new Error(appText("settings.credentials.loadFailed", { status: res.status }));
       setStatus((await res.json()) as CredentialStatus);
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Failed to load credentials");
+      setError(exc instanceof Error ? exc.message : appText("settings.credentials.failed_to_load_credentials"));
     } finally {
       setLoading(false);
     }
@@ -139,14 +141,14 @@ export function KeyRow({
         const data = (await res.json().catch(() => null)) as
           | (CredentialStatus & { detail?: string })
           | null;
-        if (!res.ok) throw new Error(data?.detail || `Save failed (${res.status})`);
+        if (!res.ok) throw new Error(data?.detail || appText("settings.credentials.saveFailed", { status: res.status }));
         if (data) onStatus(data as CredentialStatus);
         // Provider keys gate model-picker sections, so re-probe them.
         if (def.notifyProviders) notifyProviderAuthChanged();
         setKeyInput("");
         setSaved(true);
       } catch (exc) {
-        setError(exc instanceof Error ? exc.message : "Save failed");
+        setError(exc instanceof Error ? exc.message : appText("settings.credentials.save_failed"));
       } finally {
         setSaving(false);
       }
@@ -162,9 +164,9 @@ export function KeyRow({
   const clear = async () => {
     if (secret) {
       const ok = await confirm({
-        title: `Remove the ${def.label}?`,
-        description: "New requests that rely on it will fail until you add a key again.",
-        confirmLabel: "Remove",
+        title: appText("settings.credentials.confirm.remove", { label: def.label }),
+        description: appText("settings.credentials.new_requests_that_rely_on_it_will"),
+        confirmLabel: appText("settings.credentials.remove"),
         destructive: true,
       });
       if (!ok) return;
@@ -185,7 +187,7 @@ export function KeyRow({
       {current?.set && (
         <div className="flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
           <span>
-            {secret ? "Key set" : "Set"} —{" "}
+            {secret ? appText("settings.credentials.key_set") : appText("settings.credentials.set")} —{" "}
             <code className="font-mono break-all">{current.masked}</code>
           </span>
           <Button
@@ -193,11 +195,10 @@ export function KeyRow({
             size="sm"
             className="ml-auto h-6 text-[11px] text-destructive hover:text-destructive"
             disabled={saving}
-            aria-label={`Clear ${def.label}`}
+            aria-label={appText("settings.credentials.clear", { label: def.label })}
             onClick={() => void clear()}
           >
-            Clear
-          </Button>
+            {appText("settings.credentials.clear")}</Button>
         </div>
       )}
       <div className="flex items-center gap-2">
@@ -208,7 +209,7 @@ export function KeyRow({
           autoComplete="off"
           placeholder={
             current?.set
-              ? `Replace ${secret ? "key" : "value"}${def.placeholder ? ` (${def.placeholder})` : ""}`
+              ? appText("settings.credentials.replace", { kind: secret ? "key" : "value", example: def.placeholder || "none" })
               : def.placeholder
           }
           className="h-8 text-xs font-mono"
@@ -228,12 +229,12 @@ export function KeyRow({
           disabled={saving || !keyInput.trim()}
           onClick={() => void submit(keyInput.trim())}
         >
-          {saving ? "Saving…" : "Save"}
+          {saving ? appText("settings.credentials.saving") : appText("settings.credentials.save")}
         </Button>
       </div>
       {saved && (
         <p className="text-[11px] text-emerald-600 dark:text-emerald-400">
-          {def.savedNote ?? "Saved. New runs use it immediately — no restart needed."}
+          {def.savedNote ?? appText("settings.credentials.saved_new_runs_use_it_immediately_no")}
         </p>
       )}
       {def.hint ? (

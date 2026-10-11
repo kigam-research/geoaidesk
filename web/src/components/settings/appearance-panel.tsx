@@ -1,28 +1,43 @@
 "use client";
-
+import { geoText, geoLocaleSetting, setGeoLocaleSetting, type GeoLocaleSetting } from "@/geo/i18n";
+import { useSyncExternalStore } from "react";
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SettingsHeader } from "./primitives";
 
+const appText = geoText("app");
+
 export function AppearancePanel() {
   const { theme, setTheme } = useTheme();
+  const language = useSyncExternalStore(() => () => {}, geoLocaleSetting, () => "auto" as GeoLocaleSetting);
 
   const options: { value: string; label: string; icon: typeof SunIcon }[] = [
-    { value: "light", label: "Light", icon: SunIcon },
-    { value: "dark", label: "Dark", icon: MoonIcon },
-    { value: "system", label: "System", icon: MonitorIcon },
+    { value: "light", label: appText("settings.appearance.light"), icon: SunIcon },
+    { value: "dark", label: appText("settings.appearance.dark"), icon: MoonIcon },
+    { value: "system", label: appText("settings.appearance.system"), icon: MonitorIcon },
   ];
 
   return (
     <div className="flex flex-col gap-4">
       <SettingsHeader
-        title="Appearance"
-        description="Choose how K-Dense BYOK looks. System follows your operating system's theme. Saved in this browser."
+        title={appText("settings.appearance.appearance")}
+        description={appText("settings.appearance.choose_how_k_dense_byok_looks_system")}
       />
 
-      <div className="flex gap-2">
+      <label className="flex flex-col gap-2 text-xs font-medium">
+        {appText("settings.appearance.language")}
+        <select className="h-9 w-full rounded-md border bg-background px-2" value={language} onChange={(event) => {
+          setGeoLocaleSetting(event.target.value as GeoLocaleSetting);
+          window.location.reload();
+        }}>
+          <option value="auto">{appText("settings.appearance.auto")}</option>
+          <option value="ko">{appText("settings.appearance.korean")}</option>
+          <option value="en">{appText("settings.appearance.english")}</option>
+        </select>
+      </label>
+      <div className="flex flex-wrap gap-2">
         {options.map((opt) => {
           const Icon = opt.icon;
           const active = theme === opt.value;

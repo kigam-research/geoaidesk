@@ -1,9 +1,9 @@
 "use client";
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import type { ViewerProps } from "@/lib/viewers/registry";
-import { defineGeoStrings } from "../../i18n";
+import { geoText } from "@/geo/i18n";
 const TableRolesViewer = lazy(() => import("./table-roles-viewer"));
-const t = defineGeoStrings({ ko: { inspect: "시추공 표 점검", ordinary: "일반 표 보기", loading: "표를 읽는 중입니다." }, en: { inspect: "Inspect drillhole table", ordinary: "Standard table view", loading: "Reading the table." } });
+const t = geoText("tables");
 /** Explicit read-only overlay, never replaces the existing generic table/editor. */
 export function TableInspectionOption({ children, ...props }: ViewerProps & { children: ReactNode }) {
   const [enabled, setEnabled] = useState(false);

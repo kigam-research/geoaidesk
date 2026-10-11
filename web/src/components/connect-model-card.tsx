@@ -1,8 +1,10 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { HardDriveIcon, KeyRoundIcon, LogInIcon, PlugZapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openSettings } from "@/lib/settings-nav";
+
+const appText = geoText("app");
 
 /**
  * First-run guidance for a chat with nowhere to send it: shown in the empty
@@ -18,17 +20,14 @@ export function ConnectModelCard() {
     >
       <PlugZapIcon className="size-6 text-muted-foreground" aria-hidden />
       <div>
-        <h3 className="text-sm font-medium">Connect a model to get started</h3>
+        <h3 className="text-sm font-medium">{appText("chat.connect.connect_a_model_to_get_started")}</h3>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          Kady brings your own model access. Sign in with a subscription you already have, paste an
-          API key, or run a model locally — credentials stay on this machine.
-        </p>
+          {appText("chat.connect.kady_brings_your_own_model_access_sign")}</p>
       </div>
       <div className="flex flex-wrap justify-center gap-2">
         <Button size="sm" className="text-xs" onClick={() => openSettings({ tab: "providers", section: "subscriptions" })}>
           <LogInIcon className="size-3.5" />
-          Sign in with a subscription
-        </Button>
+          {appText("chat.connect.sign_in_with_a_subscription")}</Button>
         <Button
           size="sm"
           variant="outline"
@@ -36,8 +35,7 @@ export function ConnectModelCard() {
           onClick={() => openSettings({ tab: "providers", section: "api-keys" })}
         >
           <KeyRoundIcon className="size-3.5" />
-          Add an API key
-        </Button>
+          {appText("chat.connect.add_an_api_key")}</Button>
         <Button
           size="sm"
           variant="outline"
@@ -45,8 +43,7 @@ export function ConnectModelCard() {
           onClick={() => openSettings({ tab: "providers", section: "local-servers" })}
         >
           <HardDriveIcon className="size-3.5" />
-          Use a local model
-        </Button>
+          {appText("chat.connect.use_a_local_model")}</Button>
       </div>
     </div>
   );

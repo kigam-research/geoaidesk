@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -31,6 +31,8 @@ import { DEFAULT_PROJECT_ID, type Project } from "@/lib/projects";
 import { openSettings } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { cn } from "@/lib/utils";
+
+const appText = geoText("app");
 
 /** Display a project ID in Title Case when we haven't loaded the project
  *  metadata yet (e.g. during the first render before `useProjects` resolves).
@@ -97,10 +99,10 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
     async (project: Project) => {
       if (project.id === DEFAULT_PROJECT_ID) return;
       const confirmed = await confirm({
-        title: `Delete "${project.name}"?`,
+        title: appText("projects.confirm.delete", { name: project.name }),
         description:
-          "Its sandbox files and chats will be permanently removed. This cannot be undone.",
-        confirmLabel: "Delete project",
+          appText("projects.switcher.its_sandbox_files_and_chats_will_be"),
+        confirmLabel: appText("projects.switcher.delete_project"),
         destructive: true,
       });
       if (!confirmed) return;
@@ -125,18 +127,16 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
           disabled={popoverOpen}
           content={
             <>
-              <b>Project: {activeProject?.name ?? formatProjectId(activeProjectId)}</b>
+              <b>{appText("projects.currentName", { name: activeProject?.name ?? "…" })}</b>
               <br />
-              Projects isolate sandbox files and chat history. Switch projects
-              to work on a different experiment without crosstalk.
-            </>
+              {appText("projects.switcher.projects_isolate_sandbox_files_and_chat_history")}</>
           }
         >
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
-              aria-label="Switch project"
+              aria-label={appText("projects.switcher.switch_project")}
               className="h-7 gap-1.5 px-2 text-xs font-medium text-foreground/80 hover:text-foreground"
             >
               <FolderIcon className="size-3.5" />
@@ -150,14 +150,14 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
         <PopoverContent align="start" className="w-[320px] p-0">
           <Command>
             <CommandInput
-              placeholder="Search or name a new project…"
+              placeholder={appText("projects.switcher.search_or_name_a_new_project")}
               value={search}
               onValueChange={setSearch}
             />
             <CommandList>
               {/* The create row below always matches (its value tracks the
                   query), so the empty state is just a never-shown fallback. */}
-              <CommandEmpty>No projects found.</CommandEmpty>
+              <CommandEmpty>{appText("projects.switcher.no_projects_found")}</CommandEmpty>
               {visibleProjects.length > 0 && (
                 <CommandGroup heading="Projects">
                   {visibleProjects.map((project) => (
@@ -210,8 +210,7 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
                     className="gap-2 text-foreground"
                   >
                     <LayoutGridIcon className="size-4" />
-                    View all projects
-                  </CommandItem>
+                    {appText("projects.switcher.view_all_projects")}</CommandItem>
                 )}
                 <CommandItem
                   // Value tracks the live query so cmdk never filters this row
@@ -224,10 +223,10 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
                   <PlusIcon className="size-4" />
                   {search.trim() ? (
                     <span className="truncate">
-                      Create “<span className="font-medium">{search.trim()}</span>”
+                      {appText("projects.createNamed", { name: search.trim() })}
                     </span>
                   ) : (
-                    "New project…"
+                    appText("projects.switcher.new_project")
                   )}
                 </CommandItem>
               </CommandGroup>
@@ -293,8 +292,8 @@ function ProjectRow({
         <button
           type="button"
           className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-          title="Project settings"
-          aria-label={`Settings for ${project.name}`}
+          title={appText("projects.switcher.project_settings")}
+          aria-label={appText("projects.settingsFor", { name: project.name })}
           onClick={(ev) => {
             ev.stopPropagation();
             onEdit();
@@ -305,7 +304,7 @@ function ProjectRow({
         <button
           type="button"
           className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-          title={project.archived ? "Unarchive" : "Archive"}
+          title={project.archived ? appText("projects.switcher.unarchive") : appText("projects.switcher.archive")}
           onClick={(ev) => {
             ev.stopPropagation();
             onArchive();
@@ -321,7 +320,7 @@ function ProjectRow({
           <button
             type="button"
             className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            title="Delete project"
+            title={appText("projects.switcher.delete_project")}
             onClick={(ev) => {
               ev.stopPropagation();
               onDelete();

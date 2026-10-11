@@ -1,1 +1,23 @@
-{}
+{
+  "chip": "Start prompt ≈{tokens}",
+  "chipUnknown": "Start prompt",
+  "title": "Start prompt budget",
+  "intro": "Size of the instructions and tool descriptions sent before any conversation. Estimated as characters / 4; measured usage appears in the gauge on the right after the first response.",
+  "model": "Model",
+  "contextWindow": "Context window",
+  "initialPrompt": "Start prompt (estimate)",
+  "outputReserve": "Output reserve",
+  "remaining": "Left for conversation and tool results",
+  "remainingWarn": "Less than half of the context is left. Narrow the skill selection or pick a model with a larger context.",
+  "tools": "{count} tools",
+  "skills": "{exposed} skills offered to the model / {installed} installed",
+  "mode": "Skills in this chat: {mode}",
+  "modeAll": "all installed skills",
+  "modeCatalogue": "GeoAIDesk catalogue skills",
+  "modeWorkflow": "task: {title}",
+  "newChat": "Skills for new chats",
+  "newChatNote": "Applies to chats opened from now on. This chat's selection and the installed skill files do not change.",
+  "saved": "Saved",
+  "loadError": "Could not load the budget: {message}",
+  "noModel": "No model information"
+}

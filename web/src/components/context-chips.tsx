@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import type { ReactNode } from "react";
 import {
   XIcon,
@@ -17,12 +17,13 @@ import { InfoTooltip } from "@/components/ui/info-tooltip";
 import type { Database } from "@/components/database-selector";
 import type { Skill } from "@/lib/use-skills";
 import {
-  RECORD_KIND_LABELS,
   researchRefKey,
   type ComposerContext,
   type DelegationChoice,
   type ResearchRef,
 } from "@/lib/composer-context";
+
+const appText = geoText("app");
 
 const RESEARCH_CHIP = "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-400";
 const DELEGATE_CHIP = "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-400";
@@ -108,25 +109,24 @@ function ComposerContextChips({
   onDelegationChange?: (next: DelegationChoice) => void;
 }) {
   const { delegation, research } = context;
-  const scope = onResearchChange ? "Applies to the next message only." : null;
+  const scope = onResearchChange ? appText("chat.chips.applies_to_the_next_message_only") : null;
   return (
     <>
       {delegation.auto && (
         <Chip
           className={DELEGATE_CHIP}
           onRemove={onDelegationChange && (() => onDelegationChange({ ...delegation, auto: false }))}
-          ariaLabel="Stop letting Kady choose specialists"
+          ariaLabel={appText("chat.chips.stop_letting_kady_choose_specialists")}
           tooltip={
             <>
-              <b>Delegate · Kady chooses</b>
+              <b>{appText("chat.chips.delegate_kady_chooses")}</b>
               <br />
-              Kady splits the work and hands parts to specialists picked by
-              their descriptions. {scope}
+              {appText("chat.chips.kady_splits_the_work_and_hands_parts")}{scope}
             </>
           }
         >
           <SparklesIcon className="size-3 shrink-0 opacity-70" />
-          <span>Specialists: Kady picks</span>
+          <span>{appText("chat.chips.specialists_kady_picks")}</span>
         </Chip>
       )}
       {delegation.specialists.map((name) => (
@@ -141,13 +141,12 @@ function ComposerContextChips({
                 specialists: delegation.specialists.filter((n) => n !== name),
               }))
           }
-          ariaLabel={`Don't delegate to ${name}`}
+          ariaLabel={appText("chat.chips.removeDelegate", { name })}
           tooltip={
             <>
-              <b>Delegate · {name}</b>
+              <b>{appText("chat.chips.delegateName", { name })}</b>
               <br />
-              Kady briefs this specialist and checks its handoff before
-              replying. {scope}
+              {appText("chat.chips.kady_briefs_this_specialist_and_checks_its")}{scope}
             </>
           }
         >
@@ -159,24 +158,23 @@ function ComposerContextChips({
         <Chip
           className={VERIFY_CHIP}
           onRemove={onDelegationChange && (() => onDelegationChange({ ...delegation, verify: false, verifiers: [] }))}
-          ariaLabel="Remove verification gate"
+          ariaLabel={appText("chat.chips.remove_verification_gate")}
           tooltip={
             <>
-              <b>Verification gate</b>
+              <b>{appText("chat.chips.verification_gate")}</b>
               <br />
-              The best-suited verifier specialist reviews the result
-              adversarially; Kady accepts it only if the review passes.{" "}
+              {appText("chat.chips.the_best_suited_verifier_specialist_reviews_the")}{" "}
               {scope}
             </>
           }
         >
           <ShieldCheckIcon className="size-3 shrink-0 opacity-70" />
-          <span>Verify before accepting</span>
+          <span>{appText("chat.chips.verify_before_accepting")}</span>
         </Chip>
       )}
       {research.map((ref) => {
         const key = researchRefKey(ref);
-        const label = ref.kind === "chat" ? "Earlier chat" : RECORD_KIND_LABELS[ref.type];
+        const label = ref.kind === "chat" ? appText("chat.chips.earlier_chat") : appText(`chat.chips.record.${ref.type}`);
         return (
           <Chip
             key={key}
@@ -185,7 +183,7 @@ function ComposerContextChips({
               onResearchChange &&
               (() => onResearchChange(research.filter((r) => researchRefKey(r) !== key)))
             }
-            ariaLabel={`Remove ${ref.title}`}
+            ariaLabel={appText("chat.chips.removeReference", { name: ref.title })}
             tooltip={
               <>
                 <b>{label}</b>
@@ -193,8 +191,8 @@ function ComposerContextChips({
                 {ref.title}
                 <br />
                 {ref.kind === "chat"
-                  ? "Kady reads a compact snapshot of this chat, taken when the message is sent."
-                  : "Kady reads this record with notebook_search before relying on it."}{" "}
+                  ? appText("chat.chips.kady_reads_a_compact_snapshot_of_this")
+                  : appText("chat.chips.kady_reads_this_record_with_notebook_search")}{" "}
                 {scope}
               </>
             }
@@ -263,7 +261,7 @@ export function ContextChipsBar({
           <Chip
             key={`file:${path}`}
             onRemove={() => onRemoveFile(path)}
-            ariaLabel={`Remove ${name}`}
+            ariaLabel={appText("chat.chips.removeFile", { name })}
             className="border-border/70 bg-muted/60 text-foreground/80 hover:bg-muted"
             tooltip={
               <>
@@ -271,9 +269,7 @@ export function ContextChipsBar({
                 <br />
                 <span className="opacity-80">{path}</span>
                 <br />
-                Attached to the next message. The agent can read this file
-                directly from the sandbox.
-              </>
+                {appText("chat.chips.attached_to_the_next_message_the_agent")}</>
             }
           >
             <KadyFileIcon name={name} className="size-3" />
@@ -295,7 +291,7 @@ export function ContextChipsBar({
           <Chip
             key={`db:${db.id}`}
             onRemove={() => removeDb(db.id)}
-            ariaLabel={`Remove ${db.name}`}
+            ariaLabel={appText("chat.chips.removeSource", { name: db.name })}
             className={cn(c.bg, c.text, c.border)}
             tooltip={
               <>
@@ -320,20 +316,18 @@ export function ContextChipsBar({
         <Chip
           key={`skill:${skill.id}`}
           onRemove={() => removeSkill(skill.id)}
-          ariaLabel={`Remove ${skill.name}`}
+          ariaLabel={appText("chat.chips.removeSkill", { name: skill.name })}
           className="bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20"
           tooltip={
             <>
-              <b>Skill · {skill.name}</b>
+              <b>{appText("chat.chips.skillName", { name: skill.name })}</b>
               {skill.author ? (
-                <span className="opacity-70"> by {skill.author}</span>
+                <span className="opacity-70"> {appText("chat.chips.skillSource", { source: skill.author })}</span>
               ) : null}
               <br />
               {skill.description}
               <br />
-              Kady follows this skill&apos;s instructions on every message
-              until you remove it.
-            </>
+              {appText("chat.chips.kady_follows_this_skill_s_instructions_on")}</>
           }
         >
           <WandSparklesIcon className="size-3 shrink-0 opacity-70" />

@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 /**
  * Settings → Models → Providers: every way to reach a model in one place.
  * One row per provider (sign-in and API key merged — see lib/provider-rows),
@@ -24,7 +24,6 @@ import { OAuthLoginDialog } from "@/components/oauth-login-dialog";
 import { apiFetch } from "@/lib/projects";
 import {
   mergeProviderRows,
-  providerStatusLabel,
   type DirectProviderField,
   type DirectProviderStatus,
   type ProviderRow,
@@ -45,13 +44,15 @@ import {
   matchesQuery,
 } from "./primitives";
 
+const appText = geoText("app");
+
 const OPENROUTER_KEY: KeyDef = {
   id: "openrouter",
   bodyField: "openrouterApiKey",
-  label: "OpenRouter API key",
+  label: appText("settings.providers.openrouter_api_key"),
   placeholder: "sk-or-v1-…",
   keysUrl: "https://openrouter.ai/keys",
-  hint: "One pay-as-you-go account for hundreds of hosted models, plus OpenRouter Fusion and server-side speech.",
+  hint: appText("settings.providers.one_pay_as_you_go_account_for"),
   notifyProviders: true,
 };
 
@@ -62,7 +63,7 @@ function fieldKeyDef(provider: DirectProviderStatus, field: DirectProviderField)
     label: field.label,
     placeholder: field.placeholder ?? (field.secret ? "…" : ""),
     keysUrl: field.isKey ? provider.keysUrl : undefined,
-    hint: field.hint ? `${field.hint} Stored as ${field.envVar} in .env.` : `Stored as ${field.envVar} in .env.`,
+    hint: field.hint ? appText("settings.providers.fieldHint", { hint: field.hint, variable: field.envVar }) : appText("settings.providers.fieldStored", { variable: field.envVar }),
     secret: field.secret,
     notifyProviders: true,
   };
@@ -78,25 +79,25 @@ const SECTION_FILTER: Record<string, MethodFilter> = {
 
 function billingBadge(provider: ModelProviderStatus): string {
   return provider.billingMode === "metered_oauth"
-    ? "Metered extra usage"
+    ? appText("settings.providers.metered_extra_usage")
     : provider.billingMode === "payg"
-      ? "Pay-as-you-go"
-      : "Subscription";
+      ? appText("settings.providers.pay_as_you_go")
+      : appText("settings.providers.subscription");
 }
 
 function StatusBadge({ row }: { row: ProviderRow }) {
   if (row.status === "none") {
     return (
-      <span className="rounded-full bg-muted px-1.5 py-px text-[10px] text-muted-foreground">Not connected</span>
+      <span className="rounded-full bg-muted px-1.5 py-px text-[10px] text-muted-foreground">{appText("settings.providers.not_connected")}</span>
     );
   }
   if (row.status === "reauth") {
-    return <Badge variant="destructive">Reconnect required</Badge>;
+    return <Badge variant="destructive">{appText("settings.providers.reconnect_required")}</Badge>;
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-px text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
       <CheckCircle2Icon className="size-3" aria-hidden />
-      {providerStatusLabel(row)}
+      {appText(`settings.providers.status.${row.status}`, { source: row.source ?? "empty" })}
     </span>
   );
 }
@@ -120,7 +121,7 @@ function ProviderRowCard({
   onDisconnect: (provider: ModelProviderStatus) => void;
   disconnecting: boolean;
 }) {
-  const methods = [row.oauth ? "Sign in" : null, row.direct || row.openrouterKey ? "API key" : null]
+  const methods = [row.oauth ? appText("settings.providers.sign_in") : null, row.direct || row.openrouterKey ? appText("settings.providers.api_key") : null]
     .filter(Boolean)
     .join(" · ");
   const keyDefs: KeyDef[] = row.openrouterKey
@@ -144,9 +145,9 @@ function ProviderRowCard({
         <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
           {row.connected
             ? row.modelCount > 0
-              ? `${row.modelCount} model${row.modelCount === 1 ? "" : "s"}`
+              ? appText("settings.providers.modelCount", { count: row.modelCount })
               : row.openrouterKey
-                ? "Full catalogue"
+                ? appText("settings.providers.full_catalogue")
                 : ""
             : methods}
         </span>
@@ -179,25 +180,24 @@ function ProviderRowCard({
                   className="shrink-0"
                   disabled={disconnecting}
                   onClick={() => onDisconnect(row.oauth!)}
-                  aria-label={`Disconnect ${row.oauth.accountLabel}`}
+                  aria-label={appText("settings.providers.disconnectAccount", { name: row.oauth.accountLabel })}
                 >
                   {disconnecting ? (
                     <LoaderCircleIcon className="size-3.5 animate-spin" aria-hidden />
                   ) : (
                     <LogOutIcon className="size-3.5" aria-hidden />
                   )}
-                  Disconnect
-                </Button>
+                  {appText("settings.providers.disconnect")}</Button>
               ) : (
                 <Button
                   type="button"
                   size="sm"
                   className="shrink-0"
                   onClick={() => onSignIn(row.oauth!)}
-                  aria-label={`${row.oauth.needsReauth ? "Reconnect" : "Connect"} ${row.oauth.accountLabel}`}
+                  aria-label={appText("settings.providers.connectAccount", { name: row.oauth.accountLabel, state: row.oauth.needsReauth ? "reconnect" : "connect" })}
                 >
                   <LogInIcon className="size-3.5" aria-hidden />
-                  {row.oauth.needsReauth ? "Reconnect" : "Sign in"}
+                  {row.oauth.needsReauth ? appText("settings.providers.reconnect") : appText("settings.providers.sign_in")}
                 </Button>
               )}
             </div>
@@ -206,8 +206,7 @@ function ProviderRowCard({
           {row.oauth && keyDefs.length > 0 ? (
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-muted-foreground">
               <span className="h-px flex-1 bg-border" />
-              or use an API key
-              <span className="h-px flex-1 bg-border" />
+              {appText("settings.providers.or_use_an_api_key")}<span className="h-px flex-1 bg-border" />
             </div>
           ) : null}
 
@@ -257,12 +256,11 @@ function LocalServerCard({
         {available ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-px text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
             <CheckCircle2Icon className="size-3" aria-hidden />
-            Running · {modelCount} model{modelCount === 1 ? "" : "s"}
+            {appText("settings.providers.serverRunning", { count: modelCount })}
           </span>
         ) : (
           <span className="rounded-full bg-muted px-1.5 py-px text-[10px] text-muted-foreground">
-            Not reachable
-          </span>
+            {appText("settings.providers.not_reachable")}</span>
         )}
         <code className="ml-auto truncate font-mono text-[10px] text-muted-foreground">{url ?? defaultUrl}</code>
       </div>
@@ -270,9 +268,9 @@ function LocalServerCard({
         def={{
           id: bodyField,
           bodyField,
-          label: "Base URL",
+          label: appText("settings.providers.base_url"),
           placeholder: defaultUrl,
-          hint: `${hint} Leave unset to use ${defaultUrl}. Stored as ${envVar} in .env.`,
+          hint: appText("settings.providers.serverHint", { hint, url: defaultUrl, variable: envVar }),
           secret: false,
           notifyProviders: true,
         }}
@@ -306,12 +304,12 @@ export function ProvidersPanel({ section }: { section?: string }) {
   const loadDirect = useCallback(async () => {
     try {
       const res = await apiFetch("/providers");
-      if (!res.ok) throw new Error(`Failed to load providers (${res.status})`);
+      if (!res.ok) throw new Error(appText("settings.providers.loadFailed", { status: res.status }));
       const data = (await res.json()) as { providers?: DirectProviderStatus[] };
       setDirect(Array.isArray(data.providers) ? data.providers : []);
       setDirectError(null);
     } catch (exc) {
-      setDirectError(exc instanceof Error ? exc.message : "Failed to load providers");
+      setDirectError(exc instanceof Error ? exc.message : appText("settings.providers.failed_to_load_providers"));
     }
   }, []);
 
@@ -361,10 +359,10 @@ export function ProvidersPanel({ section }: { section?: string }) {
 
   const disconnect = async (provider: ModelProviderStatus) => {
     const ok = await confirm({
-      title: `Disconnect ${provider.accountLabel}?`,
+      title: appText("settings.providers.confirm.disconnect", { name: provider.accountLabel }),
       description:
-        "Existing chats remain on disk, but new requests through this sign-in will stop working until you reconnect.",
-      confirmLabel: "Disconnect",
+        appText("settings.providers.existing_chats_remain_on_disk_but_new"),
+      confirmLabel: appText("settings.providers.disconnect"),
       destructive: true,
     });
     if (!ok) return;
@@ -374,7 +372,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
       await auth.logout(provider.id);
       await auth.refresh();
     } catch (cause) {
-      setActionError(cause instanceof Error ? cause.message : "Disconnect failed");
+      setActionError(cause instanceof Error ? cause.message : appText("settings.providers.disconnect_failed"));
     } finally {
       setDisconnecting(null);
     }
@@ -398,13 +396,10 @@ export function ProvidersPanel({ section }: { section?: string }) {
     <div className="flex flex-col gap-4">
       {dialog}
       <SettingsHeader
-        title="Model providers"
+        title={appText("settings.providers.model_providers")}
         description={
           <>
-            Kady is bring-your-own-model: sign in with a subscription you already have, paste an
-            API key, or point it at a local server. Credentials stay on this machine (keys in{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-[11px]">.env</code>, sign-ins in
-            Kady&apos;s Pi credential store) — nothing is sent to K-Dense.
+            {appText("settings.providers.intro")}
           </>
         }
         appliesTo="immediately"
@@ -415,15 +410,13 @@ export function ProvidersPanel({ section }: { section?: string }) {
       {loading ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
           <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
-          Loading providers…
-        </div>
+          {appText("settings.providers.loading_providers")}</div>
       ) : (
         <>
-          <SettingsCard id="connected" title={`Connected (${connected.length})`}>
+          <SettingsCard id="connected" title={appText("settings.providers.connectedCount", { count: connected.length })}>
             {connected.length === 0 ? (
               <p className="text-[11px] text-muted-foreground">
-                No model provider is connected yet. Pick one below, or run a local model server.
-              </p>
+                {appText("settings.providers.no_model_provider_is_connected_yet_pick")}</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {connected.map((row) => (
@@ -435,8 +428,8 @@ export function ProvidersPanel({ section }: { section?: string }) {
 
           <SettingsCard
             id="add-provider"
-            title="Add a provider"
-            description="Subscriptions (ChatGPT, Claude Pro/Max, Copilot, …) sign in through the provider; everything else takes an API key or cloud credential. A connected provider gets its own section in the model picker."
+            title={appText("settings.providers.add_a_provider")}
+            description={appText("settings.providers.subscriptions_chatgpt_claude_pro_max_copilot_sign")}
           >
             {/* Deep-link anchors: the first-run card's "subscription" / "API key" actions. */}
             <span id="subscriptions" className="block scroll-mt-4" aria-hidden />
@@ -445,16 +438,16 @@ export function ProvidersPanel({ section }: { section?: string }) {
               <SettingsSearch
                 value={query}
                 onChange={setQuery}
-                placeholder="Search providers (name or env var)…"
-                label="Search model providers"
+                placeholder={appText("settings.providers.search_providers_name_or_env_var")}
+                label={appText("settings.providers.search_model_providers")}
                 className="min-w-48 flex-1"
               />
-              <div className="flex items-center gap-1 rounded-lg border p-1 text-xs" role="group" aria-label="Connection method">
+              <div className="flex items-center gap-1 rounded-lg border p-1 text-xs" role="group" aria-label={appText("settings.providers.connection_method")}>
                 {(
                   [
-                    ["all", "All"],
-                    ["sign-in", "Sign in"],
-                    ["api-key", "API key"],
+                    ["all", appText("settings.providers.all")],
+                    ["sign-in", appText("settings.providers.sign_in")],
+                    ["api-key", appText("settings.providers.api_key")],
                   ] as const
                 ).map(([value, label]) => (
                   <button
@@ -474,7 +467,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
             </div>
             {filtered.length === 0 ? (
               <p className="text-[11px] text-muted-foreground">
-                {q ? "No provider matches." : "Every provider of this kind is already connected."}
+                {q ? appText("settings.providers.no_provider_matches") : appText("settings.providers.every_provider_of_this_kind_is_already")}
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -486,7 +479,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
             {!q && filter === "all" && (hiddenCount > 0 || showAll) ? (
               <div className="mt-3 flex justify-end">
                 <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={() => setShowAll((v) => !v)}>
-                  {showAll ? "Show popular only" : `Show all ${available.length} providers`}
+                  {showAll ? appText("settings.providers.show_popular_only") : appText("settings.providers.showAll", { count: available.length })}
                 </Button>
               </div>
             ) : null}
@@ -494,8 +487,8 @@ export function ProvidersPanel({ section }: { section?: string }) {
 
           <SettingsCard
             id="local-servers"
-            title="Local model servers"
-            description="Free, private models running on this machine or your network. Kady probes each server and lists its models in the picker while it is reachable."
+            title={appText("settings.providers.local_model_servers")}
+            description={appText("settings.providers.free_private_models_running_on_this_machine")}
           >
             <div className="flex flex-col gap-3">
               <LocalModelCard />
@@ -513,11 +506,11 @@ export function ProvidersPanel({ section }: { section?: string }) {
               />
               <LocalServerCard
                 id="openai-compatible"
-                title="OpenAI-compatible server"
+                title={appText("settings.providers.openai_compatible_server")}
                 envVar="OPENAI_COMPATIBLE_BASE_URL"
                 bodyField="openaiCompatibleBaseUrl"
                 defaultUrl="http://localhost:1234"
-                hint="LM Studio, vLLM, llama.cpp server, text-generation-webui — anything serving /v1/models. vLLM's default port (8000) collides with Kady's backend, so move one of them."
+                hint={appText("settings.providers.compatibleHint")}
                 credentials={credentials.status}
                 onCredentials={credentials.setStatus}
                 available={models.openaiCompatibleAvailable}
@@ -531,9 +524,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
           </div>
 
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Provider subscriptions have their own quotas and overage rules. Except for
-            Anthropic&apos;s documented metered extra usage, Kady records tokens but does not treat
-            provider-managed subscription usage as project spend.
+            {appText("settings.providers.billingNote")}
           </p>
         </>
       )}

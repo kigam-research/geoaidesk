@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   FileTreeIcon,
   FileTreeName,
@@ -44,6 +44,8 @@ import {
   PencilIcon,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const appText = geoText("app");
 
 const FILE_DRAG_TYPE = "application/x-kady-filepath";
 
@@ -185,7 +187,7 @@ const VirtualTreeRow = memo(function VirtualTreeRow({
         <FolderIcon className="size-4 shrink-0 text-blue-500" />
         <InlineInput
           defaultValue=""
-          placeholder="Folder name"
+          placeholder={appText("files.folder_name")}
           onSubmit={(name) =>
             onCreateDir(row.parentPath ? `${row.parentPath}/${name}` : name)
           }
@@ -290,28 +292,28 @@ const VirtualTreeRow = memo(function VirtualTreeRow({
             <button
               onClick={() => onStartCreateDir(node.path)}
               className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/folder:opacity-100"
-              title="New folder inside"
+              title={appText("files.new_folder_inside")}
             >
               <FolderPlusIcon className="size-3" />
             </button>
             <button
               onClick={() => onStartRename(node.path)}
               className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/folder:opacity-100"
-              title={`Rename ${node.name}`}
+              title={appText("files.rename", { name: node.name })}
             >
               <PencilIcon className="size-3" />
             </button>
             <button
               onClick={() => onDownloadDir(node.path)}
               className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/folder:opacity-100"
-              title={`Download ${node.name} as zip`}
+              title={appText("files.downloadZip", { name: node.name })}
             >
               <DownloadIcon className="size-3" />
             </button>
             <button
               onClick={() => onDeleteDir(node.path)}
               className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover/folder:opacity-100"
-              title={`Delete ${node.name}`}
+              title={appText("files.delete", { name: node.name })}
             >
               <Trash2Icon className="size-3" />
             </button>
@@ -368,21 +370,21 @@ const VirtualTreeRow = memo(function VirtualTreeRow({
           <button
             onClick={() => onStartRename(node.path)}
             className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/file:opacity-100"
-            title={`Rename ${node.name}`}
+            title={appText("files.rename", { name: node.name })}
           >
             <PencilIcon className="size-3" />
           </button>
           <button
             onClick={() => onDownload(node.path)}
             className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/file:opacity-100"
-            title={`Download ${node.name}`}
+            title={appText("files.download", { name: node.name })}
           >
             <DownloadIcon className="size-3" />
           </button>
           <button
             onClick={() => onDelete(node.path)}
             className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover/file:opacity-100"
-            title={`Delete ${node.name}`}
+            title={appText("files.delete", { name: node.name })}
           >
             <Trash2Icon className="size-3" />
           </button>
@@ -452,7 +454,7 @@ export const FileTreePanel = memo(function FileTreePanel({
   const [dropTargetPath, setDropTargetPath] = useState<string | null>(null);
 
   const hasOsFiles = useCallback((e: React.DragEvent) => {
-    return e.dataTransfer.types.includes("Files") && !e.dataTransfer.types.includes(FILE_DRAG_TYPE);
+    return e.dataTransfer.types.includes(appText("files.files")) && !e.dataTransfer.types.includes(FILE_DRAG_TYPE);
   }, []);
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -606,7 +608,7 @@ export const FileTreePanel = memo(function FileTreePanel({
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-primary/5 border-2 border-dashed border-primary rounded-md">
           <div className="flex flex-col items-center gap-1.5">
             <UploadIcon className="size-5 text-primary" />
-            <span className="text-xs font-medium text-primary">Drop files or folders to upload</span>
+            <span className="text-xs font-medium text-primary">{appText("files.drop_files_or_folders_to_upload")}</span>
           </div>
         </div>
       )}
@@ -616,17 +618,14 @@ export const FileTreePanel = memo(function FileTreePanel({
           <InfoTooltip
             content={
               <>
-                <b>Sandbox</b>
+                <b>{appText("files.sandbox")}</b>
                 <br />
-                Shared working directory the agent can read from and write to.
-                Drop files/folders here or upload — they persist across turns
-                in this project.
-              </>
+                {appText("files.shared_working_directory_the_agent_can_read")}</>
             }
           >
             <div className="flex items-center gap-2 cursor-help">
               <FolderOpenIcon className="size-4 text-blue-500" />
-              <span className="font-semibold text-sm">Sandbox</span>
+              <span className="font-semibold text-sm">{appText("files.sandbox")}</span>
               {totalFiles > 0 && (
                 <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600 tabular-nums">
                   {totalFiles}
@@ -646,14 +645,13 @@ export const FileTreePanel = memo(function FileTreePanel({
             <InfoTooltip
               content={
                 <>
-                  <b>Download all as zip</b>
+                  <b>{appText("files.download_all_as_zip")}</b>
                   <br />
-                  Package the entire sandbox into a <kbd>.zip</kbd> for archiving,
-                  sharing with collaborators, or your lab notebook.
+                  {appText("files.zipHelp")}
                 </>
               }
             >
-              <button onClick={onDownloadAll} aria-label="Download all as zip" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+              <button onClick={onDownloadAll} aria-label={appText("files.download_all_as_zip")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                 <ArchiveIcon className="size-3.5" />
               </button>
             </InfoTooltip>
@@ -661,14 +659,12 @@ export const FileTreePanel = memo(function FileTreePanel({
           <InfoTooltip
             content={
               <>
-                <b>New folder</b>
+                <b>{appText("files.new_folder")}</b>
                 <br />
-                Create a subdirectory at the sandbox root. You can also drag
-                files between folders to organize them.
-              </>
+                {appText("files.create_a_subdirectory_at_the_sandbox_root")}</>
             }
           >
-            <button onClick={() => setCreatingDirIn("")} aria-label="New folder" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button onClick={() => setCreatingDirIn("")} aria-label={appText("files.new_folder")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
               <FolderPlusIcon className="size-3.5" />
             </button>
           </InfoTooltip>
@@ -676,15 +672,13 @@ export const FileTreePanel = memo(function FileTreePanel({
             <InfoTooltip
               content={
                 <>
-                  <b>Upload files or folder</b>
+                  <b>{appText("files.upload_files_or_folder")}</b>
                   <br />
-                  Add data to the sandbox. Folders preserve their structure.
-                  Drag-and-drop anywhere in this panel also works.
-                </>
+                  {appText("files.add_data_to_the_sandbox_folders_preserve")}</>
               }
             >
               <DropdownMenuTrigger asChild>
-                <button disabled={uploading} aria-label="Upload files or folder" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50">
+                <button disabled={uploading} aria-label={appText("files.upload_files_or_folder")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50">
                   {uploading ? <LoaderIcon className="size-3.5 animate-spin" /> : <UploadIcon className="size-3.5" />}
                 </button>
               </DropdownMenuTrigger>
@@ -692,30 +686,26 @@ export const FileTreePanel = memo(function FileTreePanel({
             <DropdownMenuContent align="end" className="min-w-[140px]">
               <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                 <UploadIcon className="mr-2 size-3.5" />
-                Upload files
-              </DropdownMenuItem>
+                {appText("files.upload_files")}</DropdownMenuItem>
               <DropdownMenuItem onClick={() => dirInputRef.current?.click()}>
                 <FolderUpIcon className="mr-2 size-3.5" />
-                Upload folder
-              </DropdownMenuItem>
+                {appText("files.upload_folder")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <InfoTooltip
             content={
               <>
-                <b>Refresh</b>
+                <b>{appText("files.refresh")}</b>
                 <br />
-                Reload the file tree from disk. Useful if you edited files
-                outside of Kady.
-              </>
+                {appText("files.reload_the_file_tree_from_disk_useful")}</>
             }
           >
-            <button onClick={onRefresh} aria-label="Refresh" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button onClick={onRefresh} aria-label={appText("files.refresh")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
               <RefreshCwIcon className="size-3.5" />
             </button>
           </InfoTooltip>
-          <InfoTooltip content="Hide the sandbox panel">
-            <button onClick={onClose} aria-label="Close sandbox panel" className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+          <InfoTooltip content={appText("files.hide_the_sandbox_panel")}>
+            <button onClick={onClose} aria-label={appText("files.close_sandbox_panel")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
               <XIcon className="size-3.5" />
             </button>
           </InfoTooltip>
@@ -727,7 +717,7 @@ export const FileTreePanel = memo(function FileTreePanel({
         ref={treeViewportRef}
         className="flex-1 overflow-y-auto p-2"
         role="tree"
-        aria-label="Sandbox files"
+        aria-label={appText("files.sandbox_files")}
         onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
       >
         {!tree || ((tree.children ?? []).length === 0 && creatingDirIn === null) ? (
@@ -736,8 +726,8 @@ export const FileTreePanel = memo(function FileTreePanel({
               <FolderOpenIcon className="size-5 text-muted-foreground/50" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-xs font-medium text-muted-foreground">No files yet</p>
-              <p className="text-[11px] text-muted-foreground/60">Drop files or folders here, or use the upload button</p>
+              <p className="text-xs font-medium text-muted-foreground">{appText("files.no_files_yet")}</p>
+              <p className="text-[11px] text-muted-foreground/60">{appText("files.drop_files_or_folders_here_or_use")}</p>
             </div>
           </div>
         ) : (
@@ -790,18 +780,15 @@ function OrganizeFilesButton({ onOrganize }: { onOrganize: () => void }) {
       <InfoTooltip
         content={
           <>
-            <b>Auto-organize files</b>
+            <b>{appText("files.auto_organize_files")}</b>
             <br />
-            Ask the agent to tidy the sandbox — group related files into
-            folders (raw data, figures, notebooks, results). Does not
-            delete anything.
-          </>
+            {appText("files.ask_the_agent_to_tidy_the_sandbox")}</>
         }
       >
         <PopoverTrigger asChild>
           <button
             type="button"
-            aria-label="Auto-organize files"
+            aria-label={appText("files.auto_organize_files")}
             className={cn(
               "rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
               open && "bg-muted text-foreground",
@@ -815,13 +802,9 @@ function OrganizeFilesButton({ onOrganize }: { onOrganize: () => void }) {
         <div className="flex items-start gap-2.5">
           <WandSparklesIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
           <div className="min-w-0 space-y-1">
-            <p className="text-sm font-semibold leading-tight">Organize the sandbox with Kady?</p>
+            <p className="text-sm font-semibold leading-tight">{appText("files.organize_the_sandbox_with_kady")}</p>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Starts a run in the active chat with its current model. Kady
-              proposes a folder layout, moves files into it (nothing is
-              deleted), and updates paths in scripts and notebooks that
-              referenced the moved files.
-            </p>
+              {appText("files.starts_a_run_in_the_active_chat")}</p>
           </div>
         </div>
         <div className="mt-3 flex justify-end gap-2">
@@ -830,8 +813,7 @@ function OrganizeFilesButton({ onOrganize }: { onOrganize: () => void }) {
             onClick={() => setOpen(false)}
             className="rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Cancel
-          </button>
+            {appText("files.cancel")}</button>
           <button
             type="button"
             onClick={() => {
@@ -840,8 +822,7 @@ function OrganizeFilesButton({ onOrganize }: { onOrganize: () => void }) {
             }}
             className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Organize files
-          </button>
+            {appText("files.organize_files")}</button>
         </div>
       </PopoverContent>
     </Popover>

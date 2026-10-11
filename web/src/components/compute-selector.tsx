@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -21,19 +21,21 @@ import {
 import { cn } from "@/lib/utils";
 import { SettingsLink } from "@/components/settings-link";
 
+const appText = geoText("app");
+
 export type { ModalInstance } from "@/lib/modal-jobs";
 
 export const LOCAL_INSTANCE: ModalInstance = {
   id: "local",
-  label: "Local",
+  label: appText("chat.compute.local"),
   gpu: null,
   gpuCount: 1,
   cpu: null,
   memoryMiB: null,
   pricePerHour: 0,
   tier: "local",
-  description: "Run code in the built-in sandbox — no Modal compute needed.",
-  bestFor: "Default sandbox environment",
+  description: appText("chat.compute.run_code_in_the_built_in_sandbox"),
+  bestFor: appText("chat.compute.default_sandbox_environment"),
 };
 
 const TIER_STYLES: Record<string, { dot: string; badge: string }> = {
@@ -76,7 +78,7 @@ function memoryLabel(memoryMiB: number | null): string | null {
 }
 
 function resourceLabel(instance: ModalInstance): string {
-  if (instance.id === "local") return "Local";
+  if (instance.id === "local") return appText("chat.compute.local");
   if (instance.gpu) {
     return `${instance.gpuCount > 1 ? `${instance.gpuCount}× ` : ""}${instance.gpu}`;
   }
@@ -90,13 +92,13 @@ function describeInstance(instance: ModalInstance): string {
     memoryLabel(instance.memoryMiB),
     instance.defaultImage,
   ].filter(Boolean);
-  return details.join(" · ") || "Remote Modal sandbox";
+  return details.join(" · ") || appText("chat.compute.remote_modal_sandbox");
 }
 
 function priceLabel(instance: ModalInstance): string {
-  if (instance.id === "local") return "Free";
-  if (!Number.isFinite(instance.pricePerHour)) return "Estimate unavailable";
-  return `$${instance.pricePerHour.toFixed(instance.pricePerHour < 1 ? 2 : 2)}/hr est.`;
+  if (instance.id === "local") return appText("chat.compute.free");
+  if (!Number.isFinite(instance.pricePerHour)) return appText("chat.compute.estimate_unavailable");
+  return appText("chat.compute.price", { price: instance.pricePerHour.toFixed(2) });
 }
 
 function normalizedSelected(selected: ModalInstance | null): ModalInstance | null {
@@ -136,7 +138,7 @@ function PickerOption({
       aria-selected={selected}
       disabled={!enabled}
       onClick={onSelect}
-      title={!enabled ? "Connect Modal in Settings → Services to enable remote compute" : undefined}
+      title={!enabled ? appText("chat.compute.connect_modal_in_settings_services_to_enable") : undefined}
       className={cn(
         "flex w-full items-start gap-2.5 px-3 py-2.5 text-left text-xs transition-colors",
         enabled ? "hover:bg-muted/60 focus-visible:bg-muted/60" : "cursor-not-allowed opacity-50",
@@ -160,11 +162,10 @@ function PickerOption({
           <span className={cn("font-semibold", enabled ? "text-foreground" : "text-muted-foreground")}>
             {instance.label}
           </span>
-          <span className="text-muted-foreground">{isLocal ? "Sandbox" : resourceLabel(instance)}</span>
+          <span className="text-muted-foreground">{isLocal ? appText("chat.compute.sandbox") : resourceLabel(instance)}</span>
           {legacy ? (
             <span className="rounded bg-amber-500/10 px-1 py-0.5 text-[9px] font-medium uppercase text-amber-700 dark:text-amber-400">
-              saved
-            </span>
+              {appText("chat.compute.saved")}</span>
           ) : null}
           <span className={cn("ml-auto shrink-0 text-[10px] font-medium tabular-nums", styles.badge)}>
             {priceLabel(instance)}
@@ -181,22 +182,22 @@ function PickerOption({
           <span className="mt-1 flex flex-wrap gap-1">
             {instance.gpuCount > 1 ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                {instance.gpuCount} GPUs
+                {appText("chat.compute.gpuCount", { count: instance.gpuCount })}
               </span>
             ) : null}
             {(instance.maxGpuCount ?? 1) > instance.gpuCount ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                up to {instance.maxGpuCount} GPUs
+                {appText("chat.compute.maxGpus", { count: instance.maxGpuCount ?? 1 })}
               </span>
             ) : null}
             {instance.fallback ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                fallback {instance.fallback}
+                {appText("chat.compute.fallback", { target: instance.fallback })}
               </span>
             ) : null}
             {instance.cache ? (
               <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-                cache {instance.cache}
+                {appText("chat.compute.cache", { cache: instance.cache })}
               </span>
             ) : null}
           </span>
@@ -280,11 +281,10 @@ export function ComputePickerBody({
         <div className="flex items-start gap-2.5 border-b bg-amber-500/5 px-3 py-2.5">
           <span className="mt-1 size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden />
           <div className="min-w-0 text-[11px] leading-relaxed text-muted-foreground">
-            <span className="font-medium text-foreground">Modal is not connected.</span>{" "}
-            Save a token ID and secret together in{" "}
+            <span className="font-medium text-foreground">{appText("chat.compute.modal_is_not_connected")}</span>{" "}
+            {appText("chat.compute.save_a_token_id_and_secret_together")}{" "}
             <SettingsLink tab="services" section="modal">
-              Settings → Services
-            </SettingsLink>
+              {appText("chat.compute.settings_services")}</SettingsLink>
             .
             <a
               href="https://modal.com/settings/tokens"
@@ -292,8 +292,7 @@ export function ComputePickerBody({
               rel="noopener noreferrer"
               className="ml-1 inline-flex items-center gap-0.5 font-medium text-primary hover:underline"
             >
-              Create a Modal token
-              <ExternalLinkIcon className="size-2.5" />
+              {appText("chat.compute.create_a_modal_token")}<ExternalLinkIcon className="size-2.5" />
             </a>
           </div>
         </div>
@@ -301,7 +300,7 @@ export function ComputePickerBody({
 
       {error ? (
         <div role="alert" className="flex items-center gap-2 border-b bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
-          <span className="min-w-0 flex-1">Could not refresh compute options: {error}</span>
+          <span className="min-w-0 flex-1">{appText("chat.compute.could_not_refresh_compute_options")}{error}</span>
           {onRefresh ? (
             <button
               type="button"
@@ -309,8 +308,7 @@ export function ComputePickerBody({
               className="inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-1 font-medium hover:bg-destructive/10"
             >
               <RefreshCcwIcon className="size-3" />
-              Retry
-            </button>
+              {appText("chat.compute.retry")}</button>
           ) : null}
         </div>
       ) : null}
@@ -318,7 +316,7 @@ export function ComputePickerBody({
       <div
         ref={listRef}
         role="listbox"
-        aria-label="Compute target"
+        aria-label={appText("chat.compute.compute_target")}
         onKeyDown={handleListKeyDown}
         className="max-h-80 overflow-y-auto py-1"
       >
@@ -330,8 +328,7 @@ export function ComputePickerBody({
         />
         <div role="presentation" className="my-1 border-t px-3 pb-0.5 pt-1.5">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Modal Compute
-          </span>
+            {appText("chat.compute.modal_compute")}</span>
         </div>
         {legacy ? (
           <PickerOption
@@ -354,21 +351,18 @@ export function ComputePickerBody({
         {loading && !catalog ? (
           <div className="flex items-center gap-2 px-3 py-5 text-xs text-muted-foreground">
             <LoaderCircleIcon className="size-3.5 animate-spin" />
-            Loading server compute catalog…
-          </div>
+            {appText("chat.compute.loading_server_compute_catalog")}</div>
         ) : null}
         {!loading && catalog && catalog.instances.length === 0 ? (
           <p className="px-3 py-4 text-xs text-muted-foreground">
-            The server did not return any Modal compute options.
-          </p>
+            {appText("chat.compute.the_server_did_not_return_any_modal")}</p>
         ) : null}
       </div>
       {effective.id !== "local" && modalConfigured ? (
         <div className="grid grid-cols-3 gap-2 border-t bg-muted/10 px-3 py-2.5">
           <label className="space-y-1 text-[10px] font-medium text-muted-foreground">
-            GPU count
-            <select
-              aria-label="GPU count"
+            {appText("chat.compute.gpu_count")}<select
+              aria-label={appText("chat.compute.gpu_count")}
               value={effective.gpuCount}
               disabled={!effective.gpu}
               onChange={(event) =>
@@ -387,9 +381,8 @@ export function ComputePickerBody({
             </select>
           </label>
           <label className="space-y-1 text-[10px] font-medium text-muted-foreground">
-            Fallback
-            <select
-              aria-label="Fallback compute"
+            {appText("chat.compute.fallback")}<select
+              aria-label={appText("chat.compute.fallback_compute")}
               value={effective.fallback ?? ""}
               onChange={(event) =>
                 onChange({
@@ -399,7 +392,7 @@ export function ComputePickerBody({
               }
               className="h-7 w-full rounded border bg-background px-1.5 text-[11px] text-foreground"
             >
-              <option value="">None</option>
+              <option value="">{appText("chat.compute.none")}</option>
               {catalog?.instances
                 .filter(
                   (instance) =>
@@ -415,9 +408,8 @@ export function ComputePickerBody({
             </select>
           </label>
           <label className="space-y-1 text-[10px] font-medium text-muted-foreground">
-            Cache
-            <select
-              aria-label="Modal cache"
+            {appText("chat.compute.cache")}<select
+              aria-label={appText("chat.compute.modal_cache")}
               value={effective.cache ?? catalog?.defaults.cache ?? "project"}
               onChange={(event) =>
                 onChange({
@@ -427,8 +419,8 @@ export function ComputePickerBody({
               }
               className="h-7 w-full rounded border bg-background px-1.5 text-[11px] text-foreground"
             >
-              <option value="project">Project</option>
-              <option value="none">None</option>
+              <option value="project">{appText("chat.compute.project")}</option>
+              <option value="none">{appText("chat.compute.none")}</option>
             </select>
           </label>
         </div>
@@ -475,7 +467,7 @@ export function ComputeSelector({
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={`Compute target: ${resourceLabel(effective)}`}
+          aria-label={appText("chat.compute.current", { name: resourceLabel(effective) })}
           className={cn(
             "flex min-w-20 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors",
             open || selected
@@ -494,7 +486,7 @@ export function ComputeSelector({
           )}
           {effective.id !== "local" ? <TierDot instance={effective} /> : null}
           <span className={cn("min-w-0 truncate", effective.id === "local" ? "text-muted-foreground" : "font-medium text-foreground")}>
-            {effective.id === "local" ? "Local" : effective.label}
+            {effective.id === "local" ? appText("chat.compute.local") : effective.label}
           </span>
           {effective.id !== "local" ? (
             <>
@@ -521,7 +513,7 @@ export function ComputeSelector({
           event.preventDefault();
           requestAnimationFrame(() => {
             const selectedOption = document.querySelector<HTMLButtonElement>(
-              '[role="listbox"][aria-label="Compute target"] [role="option"][aria-selected="true"]',
+              '[role="listbox"] [role="option"][aria-selected="true"]',
             );
             selectedOption?.focus();
           });
@@ -529,11 +521,10 @@ export function ComputeSelector({
       >
         <div className="flex items-center justify-between border-b px-3 py-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Compute
-          </span>
+            {appText("chat.compute.compute")}</span>
           {catalog?.defaults.instanceId ? (
             <span className="text-[10px] text-muted-foreground">
-              Server default: {catalog.defaults.instanceId}
+              {appText("chat.compute.server_default")}{catalog.defaults.instanceId}
             </span>
           ) : null}
         </div>

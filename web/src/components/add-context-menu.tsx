@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { useRef, useState, type ChangeEvent } from "react";
 import {
   PaperclipIcon,
@@ -31,6 +31,8 @@ import { DelegatePickerBody } from "@/components/delegate-picker";
 import type { Skill } from "@/lib/use-skills";
 import type { DelegationChoice, ResearchRef } from "@/lib/composer-context";
 
+const appText = geoText("app");
+
 type TabId = "files" | "research" | "delegate" | "skills" | "data";
 
 interface TabDescriptor {
@@ -43,71 +45,59 @@ interface TabDescriptor {
 const TABS: TabDescriptor[] = [
   {
     id: "files",
-    label: "Files",
+    label: appText("chat.contextMenu.files"),
     icon: PaperclipIcon,
     hint: (
       <>
-        <b>Files</b>
+        <b>{appText("chat.contextMenu.files")}</b>
         <br />
-        Upload data, figures, manuscripts, or code. Everything lands in the
-        sandbox and can be referenced with <kbd>@</kbd>.
+        {appText("chat.contextMenu.fileHelp")}
       </>
     ),
   },
   {
     id: "research",
-    label: "Research",
+    label: appText("chat.contextMenu.research"),
     icon: BookOpenIcon,
     hint: (
       <>
-        <b>Research context</b>
+        <b>{appText("chat.contextMenu.research_context")}</b>
         <br />
-        Point Kady at notebook entries, frozen plans, notes, or an earlier
-        chat. It reads them with its own tools before answering. Applies to
-        the next message only.
-      </>
+        {appText("chat.contextMenu.point_kady_at_notebook_entries_frozen_plans")}</>
     ),
   },
   {
     id: "delegate",
-    label: "Delegate",
+    label: appText("chat.contextMenu.delegate"),
     icon: UsersIcon,
     hint: (
       <>
-        <b>Delegate</b>
+        <b>{appText("chat.contextMenu.delegate")}</b>
         <br />
-        Hand this message to specific specialists, let Kady choose, or ask
-        for a verification gate before a result is accepted. Applies to the
-        next message only.
-      </>
+        {appText("chat.contextMenu.hand_this_message_to_specific_specialists_let")}</>
     ),
   },
   {
     id: "skills",
-    label: "Skills",
+    label: appText("chat.contextMenu.skills"),
     icon: WandSparklesIcon,
     hint: (
       <>
-        <b>Skills</b>
+        <b>{appText("chat.contextMenu.skills")}</b>
         <br />
-        Opt-in playbooks for specific tasks (e.g. <i>scanpy</i>,{" "}
-        <i>literature-review</i>, <i>modal</i>). Kady follows pinned skills on
-        every message until you remove them.
+        {appText("chat.contextMenu.skillsHelp")}
       </>
     ),
   },
   {
     id: "data",
-    label: "Data",
+    label: appText("chat.contextMenu.data"),
     icon: DatabaseIcon,
     hint: (
       <>
-        <b>Data sources</b>
+        <b>{appText("chat.contextMenu.data_sources")}</b>
         <br />
-        Point Kady at public scientific APIs (PubMed, UniProt, Ensembl,
-        etc.). Their names and URLs are added to your message so Kady can
-        query and cite them.
-      </>
+        {appText("chat.contextMenu.point_kady_at_public_scientific_apis_pubmed")}</>
     ),
   },
 ];
@@ -186,7 +176,7 @@ export function AddContextMenu({
                     ? "border-border bg-muted/60 text-foreground"
                     : "border-transparent text-muted-foreground hover:border-border hover:bg-muted/40 hover:text-foreground",
                 )}
-                aria-label="Add context"
+                aria-label={appText("chat.contextMenu.add_context")}
               >
                 <PlusIcon className="size-4" />
                 {totalActive > 0 && !open && (
@@ -198,12 +188,9 @@ export function AddContextMenu({
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-xs whitespace-normal text-xs leading-relaxed">
-            <b className="font-semibold">Add context</b>
+            <b className="font-semibold">{appText("chat.contextMenu.add_context")}</b>
             <br />
-            Attach files, reference earlier research, delegate to
-            specialists, or enable skills and data sources for the next
-            message.
-          </TooltipContent>
+            {appText("chat.contextMenu.attach_files_reference_earlier_research_delegate_to")}</TooltipContent>
         </Tooltip>
 
         <PopoverContent
@@ -217,7 +204,7 @@ export function AddContextMenu({
           <div
             className="flex items-stretch border-b bg-muted/30"
             role="tablist"
-            aria-label="Add context sections"
+            aria-label={appText("chat.contextMenu.add_context_sections")}
           >
             {TABS.map((tab) => {
               const Icon = tab.icon;
@@ -327,14 +314,9 @@ function FilesPanel({
         </div>
         <div>
           <div className="text-sm font-medium text-foreground">
-            Upload files
-          </div>
+            {appText("chat.contextMenu.upload_files")}</div>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            Or drag & drop onto the input. Type{" "}
-            <kbd className="rounded border bg-background px-1 py-0.5 text-[10px] font-mono">
-              @
-            </kbd>{" "}
-            to mention tracked files.
+            {appText("chat.contextMenu.uploadHelp")}
           </p>
         </div>
       </button>
@@ -344,18 +326,17 @@ function FilesPanel({
         className="flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
       >
         <FolderUpIcon className="size-3.5" />
-        Upload a folder
-      </button>
+        {appText("chat.contextMenu.upload_a_folder")}</button>
       <input
         ref={fileInputRef}
         type="file"
         multiple
         className="hidden"
         onChange={onFilePick}
-        aria-label="Upload files"
+        aria-label={appText("chat.contextMenu.upload_files")}
       />
       {/* @ts-expect-error -- webkitdirectory is non-standard but supported in all major browsers */}
-      <input ref={folderInputRef} type="file" webkitdirectory="" className="hidden" onChange={onFilePick} aria-label="Upload a folder" />
+      <input ref={folderInputRef} type="file" webkitdirectory="" className="hidden" onChange={onFilePick} aria-label={appText("chat.contextMenu.upload_a_folder")} />
     </div>
   );
 }

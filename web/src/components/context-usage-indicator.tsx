@@ -1,11 +1,13 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { GaugeIcon, ScissorsIcon, SlidersHorizontalIcon } from "lucide-react";
 
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn, formatCompactTokens } from "@/lib/utils";
 import type { ContextUsage } from "@/lib/use-agent";
 import { openSettings } from "@/lib/settings-nav";
+
+const appText = geoText("app");
 
 export function ContextUsageIndicator({
   usage,
@@ -28,22 +30,22 @@ export function ContextUsageIndicator({
   const warning = known && percent > 70;
   const value = known ? `${Math.round(percent)}%` : "?%";
   const ariaLabel = known
-    ? `Model context ${percent.toFixed(1)} percent, ${tokens.toLocaleString()} of ${usage.contextWindow.toLocaleString()} tokens`
-    : `Model context usage awaiting provider measurement, ${usage.contextWindow.toLocaleString()} token window`;
+    ? appText("chat.context.usageAria", { percent: percent.toFixed(1), used: tokens.toLocaleString(), total: usage.contextWindow.toLocaleString() })
+    : appText("chat.context.waitingAria", { total: usage.contextWindow.toLocaleString() });
 
   const gauge = (
     <InfoTooltip
       content={
         <>
-          <b>Model context</b>
+          <b>{appText("chat.context.model_context")}</b>
           <br />
           {known
-            ? `${formatCompactTokens(tokens)} of ${formatCompactTokens(usage.contextWindow)} tokens (${percent.toFixed(1)}%)`
-            : `Awaiting provider measurement · ${formatCompactTokens(usage.contextWindow)} token window`}
+            ? appText("chat.context.usage", { used: formatCompactTokens(tokens), total: formatCompactTokens(usage.contextWindow), percent: percent.toFixed(1) })
+            : appText("chat.context.waiting", { total: formatCompactTokens(usage.contextWindow) })}
           <br />
           {known
-            ? "Pi estimates how much of the selected model's context window this conversation currently uses."
-            : "Available after the first model response and temporarily unavailable after compaction."}
+            ? appText("chat.context.pi_estimates_how_much_of_the_selected")
+            : appText("chat.context.available_after_the_first_model_response_and")}
         </>
       }
     >
@@ -78,11 +80,9 @@ export function ContextUsageIndicator({
       <InfoTooltip
         content={
           <>
-            <b>Compact now</b>
+            <b>{appText("chat.context.compact_now")}</b>
             <br />
-            Summarize older messages to free context. Kady keeps a state block
-            (plan, notebook entries, result ids, environment) ahead of the summary.
-            {compactDisabled ? " Available once the current run finishes." : ""}
+            {appText("chat.context.summarize_older_messages_to_free_context_kady")}{compactDisabled ? appText("chat.context.available_once_the_current_run_finishes") : ""}
           </>
         }
       >
@@ -90,7 +90,7 @@ export function ContextUsageIndicator({
           type="button"
           onClick={onCompact}
           disabled={compactDisabled}
-          aria-label="Compact context now"
+          aria-label={appText("chat.context.compact_context_now")}
           className="inline-flex h-7 items-center rounded-md px-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ScissorsIcon className="size-3.5" aria-hidden />
@@ -99,16 +99,15 @@ export function ContextUsageIndicator({
       <InfoTooltip
         content={
           <>
-            <b>Compaction settings</b>
+            <b>{appText("chat.context.compaction_settings")}</b>
             <br />
-            Automatic compaction and how much recent context it keeps, for every chat in this project.
-          </>
+            {appText("chat.context.automatic_compaction_and_how_much_recent_context")}</>
         }
       >
         <button
           type="button"
           onClick={() => openSettings({ tab: "project", section: "context" })}
-          aria-label="Compaction settings"
+          aria-label={appText("chat.context.compaction_settings")}
           className="inline-flex h-7 items-center rounded-md px-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <SlidersHorizontalIcon className="size-3.5" aria-hidden />

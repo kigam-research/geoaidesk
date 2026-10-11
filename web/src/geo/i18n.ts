@@ -82,18 +82,3 @@ export function t(id: string, values: MessageValues = {}, locale: GeoLocale = ge
 export function geoText(namespace: string) {
   return (key: string, values?: MessageValues, locale?: GeoLocale) => t(`${namespace}.${key}`, values, locale);
 }
-
-export type GeoText<K extends string> = (key: K, vars?: Record<string, string | number>, locale?: GeoLocale) => string;
-
-/**
- * Module-local dictionaries from before the locale catalogues (WP03–WP05).
- * Kept for modules not yet moved to `locales/`; new strings go to catalogues.
- * Every key needs Korean; English falls back to Korean. `{name}` placeholders
- * are filled from `vars`.
- */
-export function defineGeoStrings<K extends string>(strings: { ko: Record<K, string>; en: Partial<Record<K, string>> }): GeoText<K> {
-  return (key, vars = {}, locale = geoLocale()) => {
-    const template = (locale === "en" ? strings.en[key] : undefined) ?? strings.ko[key] ?? key;
-    return template.replace(/\{(\w+)\}/g, (match, name: string) => (name in vars ? String(vars[name]) : match));
-  };
-}

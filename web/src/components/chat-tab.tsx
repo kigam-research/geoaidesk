@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import {
   Conversation,
   ConversationContent,
@@ -146,9 +146,11 @@ import { computeInstanceFromDefault, useAppDefaults } from "@/lib/app-settings";
 import { openSettings } from "@/lib/settings-nav";
 import { workflowScriptsIn } from "@/lib/workflow-script";
 
+const appText = geoText("app");
+
 /** Toast action for "provider disconnected" errors. */
 const PROVIDERS_TOAST_ACTION = {
-  action: { label: "Open Settings", onClick: () => openSettings({ tab: "providers" }) },
+  action: { label: appText("chat.composer.open_settings"), onClick: () => openSettings({ tab: "providers" }) },
 };
 
 const MAX_QUEUE = 5;
@@ -196,19 +198,11 @@ function BudgetBanner({
       <span className="flex-1">
         {blocked ? (
           <>
-            <b>Project spend limit reached</b> ({formatUsd(totalUsd)}
-            {limitUsd !== null ? ` / ${formatUsd(limitUsd)}` : ""}). New runs
-            are blocked.{" "}
-            <SettingsLink tab="project" section="budget">
-              Raise the limit in project settings
-            </SettingsLink>{" "}
-            to continue.
+            {appText("chat.composer.budgetBlocked", { amount: limitUsd !== null ? `${formatUsd(totalUsd)} / ${formatUsd(limitUsd)}` : formatUsd(totalUsd) })} <SettingsLink tab="project" section="budget">{appText("chat.composer.raiseBudget")}</SettingsLink>
           </>
         ) : (
           <>
-            <b>Approaching spend limit</b> ({formatUsd(totalUsd)}
-            {limitUsd !== null ? ` / ${formatUsd(limitUsd)}` : ""}). You&apos;re
-            over 80% of the project&apos;s cap.
+            {appText("chat.composer.budgetWarning", { amount: limitUsd !== null ? `${formatUsd(totalUsd)} / ${formatUsd(limitUsd)}` : formatUsd(totalUsd) })}
           </>
         )}
       </span>
@@ -235,7 +229,7 @@ function PromptDropZone({
   const dragCounter = useRef(0);
 
   const isAccepted = useCallback((e: React.DragEvent) => {
-    return e.dataTransfer.types.includes(FILE_DRAG_TYPE) || e.dataTransfer.types.includes("Files");
+    return e.dataTransfer.types.includes(FILE_DRAG_TYPE) || e.dataTransfer.types.includes(appText("chat.composer.files"));
   }, []);
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -300,7 +294,7 @@ function PromptDropZone({
   );
 
   const isOsDrag = isDragOver;
-  const label = isDragOver ? "Drop to attach" : "Attach file";
+  const label = isDragOver ? appText("chat.composer.drop_to_attach") : appText("chat.composer.attach_file");
 
   return (
     <div
@@ -342,13 +336,13 @@ function ImageAttachmentsRow() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={f.url}
-            alt={f.filename ?? "attached image"}
+            alt={f.filename ?? appText("chat.composer.attached_image")}
             className="h-16 w-16 rounded-lg border object-cover"
           />
           <button
             type="button"
             onClick={() => attachments.remove(f.id)}
-            aria-label={`Remove ${f.filename ?? "attached image"}`}
+            aria-label={appText("chat.composer.removeImage", { name: f.filename ?? appText("chat.composer.attached_image") })}
             className="absolute -right-1.5 -top-1.5 rounded-full border bg-background p-0.5 text-muted-foreground shadow-sm transition-colors hover:text-destructive"
           >
             <XIcon className="size-3" />
@@ -437,7 +431,7 @@ function QueuedMessageEditor({
         }}
         rows={Math.min(8, Math.max(2, draft.split("\n").length))}
         className="w-full resize-y rounded-md border bg-background px-2 py-1.5 text-xs text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        aria-label="Edit queued message"
+        aria-label={appText("chat.composer.edit_queued_message")}
       />
       <div className="flex items-center gap-1.5">
         <button
@@ -446,16 +440,14 @@ function QueuedMessageEditor({
           disabled={!canSave}
           className="rounded bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
-          Save
-        </button>
+          {appText("chat.composer.save")}</button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded px-2 py-0.5 text-[10px] font-semibold text-muted-foreground transition-colors hover:bg-muted"
         >
-          Cancel
-        </button>
-        <span className="ml-auto text-[10px] text-muted-foreground">⌘⏎ save · Esc cancel</span>
+          {appText("chat.composer.cancel")}</button>
+        <span className="ml-auto text-[10px] text-muted-foreground">{appText("chat.composer.save_esc_cancel")}</span>
       </div>
     </div>
   );
@@ -497,8 +489,7 @@ function MessageQueueDisplay({
             <div className="flex items-center gap-2 border-b px-3 py-1.5">
               <ZapIcon className="size-3.5 text-muted-foreground" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Steering — delivers mid-run
-              </span>
+                {appText("chat.composer.steering_delivers_mid_run")}</span>
               <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">
                 {steering.length}
               </span>
@@ -520,8 +511,7 @@ function MessageQueueDisplay({
             <div className="flex items-center gap-2 border-b px-3 py-1.5">
               <ListOrderedIcon className="size-3.5 text-muted-foreground" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                After this turn — Kady continues
-              </span>
+                {appText("chat.composer.after_this_turn_kady_continues")}</span>
               <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">
                 {followUp.length}
               </span>
@@ -543,7 +533,7 @@ function MessageQueueDisplay({
             <div className="flex items-center gap-2 border-b px-3 py-1.5">
               <ListOrderedIcon className="size-3.5 text-muted-foreground" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {editingId ? "Held while editing" : paused ? "Paused — stopped" : "Run after"}
+                {editingId ? appText("chat.composer.held_while_editing") : paused ? appText("chat.composer.paused_stopped") : appText("chat.composer.run_after")}
               </span>
               {paused && onResume && (
                 <button
@@ -551,8 +541,7 @@ function MessageQueueDisplay({
                   onClick={onResume}
                   className="rounded px-1.5 py-0.5 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/10"
                 >
-                  Resume
-                </button>
+                  {appText("chat.composer.resume")}</button>
               )}
               <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">
                 {queue.length}/{MAX_QUEUE}
@@ -627,7 +616,7 @@ function MessageQueueDisplay({
                       {context && context.research.length > 0 && (
                         <span
                           className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
-                          title={`${context.research.length} research reference${context.research.length === 1 ? "" : "s"}`}
+                          title={appText("chat.composer.researchCount", { count: context.research.length })}
                         >
                           <BookOpenIcon className="size-2.5" />
                           {context.research.length}
@@ -636,7 +625,7 @@ function MessageQueueDisplay({
                       {delegated > 0 && (
                         <span
                           className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
-                          title={context!.delegation.auto ? "Delegate: Kady picks" : `Delegate: ${context!.delegation.specialists.join(", ")}`}
+                          title={context!.delegation.auto ? appText("chat.composer.delegate_kady_picks") : appText("chat.composer.delegateNames", { names: context!.delegation.specialists.join(", ") })}
                         >
                           <UsersIcon className="size-2.5" />
                           {context!.delegation.auto ? "auto" : delegated}
@@ -645,11 +634,10 @@ function MessageQueueDisplay({
                       {context?.delegation.verify && (
                         <span
                           className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
-                          title="Verification gate"
+                          title={appText("chat.composer.verification_gate")}
                         >
                           <ShieldCheckIcon className="size-2.5" />
-                          verify
-                        </span>
+                          {appText("chat.composer.verify")}</span>
                       )}
                     </div>
                   </div>
@@ -660,7 +648,7 @@ function MessageQueueDisplay({
                         onClick={() => onMove(item.id, "up")}
                         disabled={i === 0}
                         className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
-                        aria-label={`Move queued message ${i + 1} up`}
+                        aria-label={appText("chat.composer.queueUp", { index: i + 1 })}
                       >
                         <ChevronUpIcon className="size-3" />
                       </button>
@@ -669,7 +657,7 @@ function MessageQueueDisplay({
                         onClick={() => onMove(item.id, "down")}
                         disabled={i === queue.length - 1}
                         className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
-                        aria-label={`Move queued message ${i + 1} down`}
+                        aria-label={appText("chat.composer.queueDown", { index: i + 1 })}
                       >
                         <ChevronDownIcon className="size-3" />
                       </button>
@@ -677,7 +665,7 @@ function MessageQueueDisplay({
                         type="button"
                         onClick={() => onEditingChange(item.id)}
                         className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground"
-                        aria-label={`Edit queued message ${i + 1}`}
+                        aria-label={appText("chat.composer.queueEdit", { index: i + 1 })}
                       >
                         <PencilIcon className="size-3" />
                       </button>
@@ -685,7 +673,7 @@ function MessageQueueDisplay({
                         type="button"
                         onClick={() => onRemove(item.id)}
                         className="rounded p-1 text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive"
-                        aria-label={`Remove queued message ${i + 1}`}
+                        aria-label={appText("chat.composer.queueRemove", { index: i + 1 })}
                       >
                         <XIcon className="size-3" />
                       </button>
@@ -885,8 +873,8 @@ function ChatInput({
         if (!modelAvailable) {
           setAttachError(
             modelAvailability === "checking"
-              ? "Model provider status is still loading. Try again in a moment."
-              : "This model provider is disconnected. Reconnect it in Settings → Providers or choose another model.",
+              ? appText("chat.composer.model_provider_status_is_still_loading_try")
+              : appText("chat.composer.this_model_provider_is_disconnected_reconnect_it"),
           );
         }
         return false;
@@ -897,7 +885,7 @@ function ChatInput({
       const baseText = msg.text ?? "";
       if (!baseText.trim() && attachedFiles.length === 0) {
         if (msg.files.length > 0) {
-          setAttachError("Add a short note to send with the image.");
+          setAttachError(appText("chat.composer.add_a_short_note_to_send_with"));
         }
         return false;
       }
@@ -908,8 +896,8 @@ function ChatInput({
         : { refs: researchRefs, failed: [] };
       if (snapshots.failed.length > 0) {
         toast.warning(
-          `Couldn't snapshot ${snapshots.failed.length === 1 ? `"${snapshots.failed[0]}"` : `${snapshots.failed.length} chats`}`,
-          { description: "Kady will search the full chat log instead." },
+          appText("chat.composer.snapshotFailed", { count: snapshots.failed.length }),
+          { description: appText("chat.composer.kady_will_search_the_full_chat_log") },
         );
       }
       const composerCtx = buildComposerContext({ delegation, research: snapshots.refs });
@@ -1089,11 +1077,11 @@ function ChatInput({
       | null;
     if (!response.ok) {
       throw new Error(
-        payload?.detail || `Dictation could not be transcribed (${response.status}).`,
+        payload?.detail || appText("chat.composer.dictationFailed", { status: response.status }),
       );
     }
     if (!payload?.text?.trim()) {
-      throw new Error("The transcription provider returned no text.");
+      throw new Error(appText("chat.composer.the_transcription_provider_returned_no_text"));
     }
     return payload.text.trim();
   }, []);
@@ -1112,10 +1100,10 @@ function ChatInput({
             data-testid="slash-menu"
           >
             <div className="flex items-center gap-2 border-b px-3 py-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Commands</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{appText("chat.composer.commands")}</span>
               {slashQuery && <span className="font-mono text-[11px] text-primary">/{slashQuery}</span>}
               <span className="ml-auto text-[10px] text-muted-foreground">
-                {slashItems.length} match{slashItems.length !== 1 ? "es" : ""}
+                {appText("chat.composer.slashMatches", { count: slashItems.length })}
               </span>
               <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">↑↓</kbd>
               <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">↵</kbd>
@@ -1149,12 +1137,12 @@ function ChatInput({
             onMouseDown={(e) => e.preventDefault()}
           >
             <div className="flex items-center gap-2 border-b px-3 py-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Files</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{appText("chat.composer.files")}</span>
               {mentionQuery && (
                 <span className="font-mono text-[11px] text-primary">@{mentionQuery}</span>
               )}
               <span className="ml-auto text-[10px] text-muted-foreground">
-                {filteredFiles.length} match{filteredFiles.length !== 1 ? "es" : ""}
+                {appText("chat.composer.fileMatches", { count: filteredFiles.length })}
               </span>
               <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">↑↓</kbd>
               <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] font-mono text-muted-foreground">↵</kbd>
@@ -1241,10 +1229,10 @@ function ChatInput({
           onError={(err) =>
             setAttachError(
               err.code === "accept"
-                ? "Only PNG, JPEG, WebP, or GIF attach to the message — use + to add other files to the sandbox."
+                ? appText("chat.composer.only_png_jpeg_webp_or_gif_attach")
                 : err.code === "max_files"
-                  ? `At most ${MAX_PROMPT_IMAGES} images per message.`
-                  : "Image is too large (20MB max).",
+                  ? appText("chat.composer.maxImages", { count: MAX_PROMPT_IMAGES })
+                  : appText("chat.composer.image_is_too_large_20mb_max"),
             )
           }
           className="@container/composer rounded-xl border shadow-sm"
@@ -1266,11 +1254,11 @@ function ChatInput({
             placeholder={
               isStreaming
                 ? pendingSteers.length + pendingFollowUps.length > 0
-                  ? `Steer the run… (${pendingSteers.length + pendingFollowUps.length} pending · ⌥↵ to run after this turn)`
-                  : "Steer the run… (⌥↵ to run after this turn)"
+                  ? appText("chat.composer.steerPending", { count: pendingSteers.length + pendingFollowUps.length })
+                  : appText("chat.composer.steer_the_run_to_run_after_this")
                 : queuedMessages.length >= MAX_QUEUE
-                  ? `Queue full (${MAX_QUEUE}/${MAX_QUEUE})`
-                  : "Ask Kady anything… (@ for files, / for commands, + to add context)"
+                  ? appText("chat.composer.queueFull", { count: MAX_QUEUE })
+                  : appText("chat.composer.ask_kady_anything_for_files_for_commands")
             }
             onChange={handleChange}
             onKeyDown={handleKeyDown}
@@ -1280,7 +1268,7 @@ function ChatInput({
               Below that (the chat pane can shrink to 280px) wrapping is the
               lesser evil, so the container query hands control back. */}
           <PromptInputFooter className="@min-[30rem]/composer:flex-nowrap">
-            <div className="flex min-w-0 flex-1 items-center gap-1.5">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 @min-[30rem]/composer:flex-nowrap">
               <AddContextMenu
                 selectedDbs={selectedDbs}
                 onDbsChange={onDbsChange}
@@ -1333,15 +1321,15 @@ function ChatInput({
               <InfoTooltip
                 content={
                   <>
-                    <b>Dictate</b>
+                    <b>{appText("chat.composer.dictate")}</b>
                     <br />
                     {speechMode === "detecting"
-                      ? "Checking dictation support…"
+                      ? appText("chat.composer.checking_dictation_support")
                       : speechMode === "speech-recognition"
-                        ? "Hold to dictate using this browser's speech recognition."
+                        ? appText("chat.composer.hold_to_dictate_using_this_browser_s")
                         : speechMode === "media-recorder"
-                          ? "Hold to record. Audio is sent to OpenRouter for transcription."
-                          : "This browser cannot record audio for dictation."}
+                          ? appText("chat.composer.hold_to_record_audio_is_sent_to")
+                          : appText("chat.composer.this_browser_cannot_record_audio_for_dictation")}
                   </>
                 }
               >
@@ -1362,52 +1350,41 @@ function ChatInput({
                     <>
                       <b>
                         {modelAvailability === "checking"
-                          ? "Checking model provider"
-                          : "Model provider disconnected"}
+                          ? appText("chat.composer.checking_model_provider")
+                          : appText("chat.composer.model_provider_disconnected")}
                       </b>
                       <br />
                       {modelAvailability === "checking"
-                        ? "Wait a moment for provider status to load."
-                        : "Reconnect it in Settings → Providers or choose another model."}
+                        ? appText("chat.composer.wait_a_moment_for_provider_status_to")
+                        : appText("chat.composer.reconnect_it_in_settings_providers_or_choose")}
                     </>
                   ) : budgetBlocked ? (
                     <>
-                      <b>Spend limit reached</b>
+                      <b>{appText("chat.composer.spend_limit_reached")}</b>
                       <br />
-                      Project has hit its spend limit (
-                      {formatUsd(budgetTotalUsd)}
-                      {budgetLimitUsd !== null
-                        ? ` / ${formatUsd(budgetLimitUsd)}`
-                        : ""}
-                      ). Raise the limit in Settings → Project → General to continue.
+                      {appText("chat.composer.budgetTooltip", { amount: budgetLimitUsd !== null ? `${formatUsd(budgetTotalUsd)} / ${formatUsd(budgetLimitUsd)}` : formatUsd(budgetTotalUsd) })}
                     </>
                   ) : isStreaming ? (
                     <>
-                      <b>Stop</b>
+                      <b>{appText("chat.composer.stop")}</b>
                       <br />
-                      Cancel the current turn (⏎ steers it instead). Undelivered
-                      steering messages return to the composer, queued prompts
-                      pause until you resume them, and files the agent already
-                      wrote stay in the sandbox.
-                    </>
+                      {appText("chat.composer.cancel_the_current_turn_steers_it_instead")}</>
                   ) : queuedMessages.length >= MAX_QUEUE ? (
                     <>
-                      <b>Queue is full</b>
+                      <b>{appText("chat.composer.queue_is_full")}</b>
                       <br />
-                      Wait for the agent to finish before adding more prompts.
-                    </>
+                      {appText("chat.composer.wait_for_the_agent_to_finish_before")}</>
                   ) : (
                     <>
-                      <b>Send message</b>
+                      <b>{appText("chat.composer.send_message")}</b>
                       <br />
-                      Press <kbd>↵</kbd> to send, <kbd>⇧</kbd>+<kbd>↵</kbd> for
-                      a new line. Prompts sent while the agent is busy steer
-                      the live run; ⌥⏎ queues a new run instead.
+                      {appText("chat.composer.sendHelp")}
                     </>
                   )
                 }
               >
                 <PromptInputSubmit
+                  aria-label={appText(isStreaming ? "chat.composer.stop" : "chat.composer.submit")}
                   status={submitStatus as "streaming" | "error" | "ready"}
                   onStop={onStop}
                   disabled={(budgetBlocked || !modelAvailable) && !isStreaming}
@@ -1545,13 +1522,10 @@ export const AssistantMessageBody = memo(function AssistantMessageBody({
       {orderedBlocks}
       {isStreaming && !hasAnything ? (
         <Shimmer className="text-sm" duration={1.5}>
-          Thinking...
-        </Shimmer>
+          {appText("chat.composer.thinking")}</Shimmer>
       ) : endedWithoutReply ? (
         <p className="text-xs italic text-muted-foreground">
-          This turn ended without a closing message. Review the tool results
-          above before continuing, or ask a follow-up for a summary.
-        </p>
+          {appText("chat.composer.this_turn_ended_without_a_closing_message")}</p>
       ) : null}
       {message.citations && (
         <div className="flex flex-wrap items-center gap-2">
@@ -1603,7 +1577,7 @@ export const ChatMessageRow = memo(function ChatMessageRow({
                   <img
                     key={i}
                     src={`data:${img.mimeType};base64,${img.data}`}
-                    alt={`Attached image ${i + 1}`}
+                    alt={appText("chat.composer.imageAlt", { index: i + 1 })}
                     className="max-h-56 max-w-64 rounded-lg border object-contain"
                   />
                 ))}
@@ -1650,29 +1624,29 @@ export const ChatMessageRow = memo(function ChatMessageRow({
                   <>
                     <b>
                       {message.runBillingMode === "subscription"
-                        ? "Subscription usage"
+                        ? appText("chat.composer.subscription_usage")
                         : message.runBillingMode === "metered_oauth"
-                          ? "Metered extra usage"
-                          : "Cost of this reply"}
+                          ? appText("chat.composer.metered_extra_usage")
+                          : appText("chat.composer.cost_of_this_reply")}
                     </b>
                     <br />
                     {message.runBillingMode === "subscription"
-                      ? `${message.runProvider ?? "Provider"} manages billing and quota`
+                      ? appText("chat.composer.providerQuota", { provider: message.runProvider ?? appText("chat.composer.provider") })
                       : formatUsd(message.runCostUsd ?? 0)}
                     {typeof message.runTokens === "number" &&
                     message.runTokens > 0
-                      ? ` · ${message.runTokens.toLocaleString()} tokens`
+                      ? appText("chat.composer.replyTokens", { count: message.runTokens.toLocaleString() })
                       : ""}
                     {message.runBillingMode === "subscription" &&
                     typeof message.runListPriceUsd === "number"
-                      ? ` · ${formatUsd(message.runListPriceUsd)} list-price reference (not project spend)`
+                      ? appText("chat.composer.listPrice", { price: formatUsd(message.runListPriceUsd) })
                       : ""}
                   </>
                 }
               >
                 <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
                   {message.runBillingMode === "subscription"
-                    ? `subscription · ${(message.runTokens ?? 0).toLocaleString()} tok`
+                    ? appText("chat.composer.subscriptionTokens", { count: (message.runTokens ?? 0).toLocaleString() })
                     : formatUsd(message.runCostUsd ?? 0)}
                 </span>
               </InfoTooltip>
@@ -1824,7 +1798,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
   // on forever.
   const handleSessionUnavailable = useCallback(() => {
     onSessionUnavailable?.(tabId);
-    toast.error("That conversation is no longer available — starting a new one.");
+    toast.error(appText("chat.composer.that_conversation_is_no_longer_available_starting"));
   }, [onSessionUnavailable, tabId]);
   const initialSessionReady = useSessionRestore({
     sessionId: initialSessionId ?? null,
@@ -2176,15 +2150,15 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
     (trimmed: string, images: PromptImage[] = []) => {
       if (messageQueueLengthRef.current >= MAX_QUEUE) {
         toast.error(
-          `Queue is full (${MAX_QUEUE}/${MAX_QUEUE}). Wait for the agent to work through it.`,
+          appText("chat.composer.queueWait", { count: MAX_QUEUE }),
         );
         return false;
       }
       if (!selectedModelAvailable) {
         toast.error(
           selectedModelAvailability === "checking"
-            ? "Model provider status is still loading. Try again in a moment."
-            : "This model provider is disconnected. Reconnect it in Settings or choose another model.",
+            ? appText("chat.composer.model_provider_status_is_still_loading_try")
+            : appText("chat.composer.this_model_provider_is_disconnected_reconnect_it_2"),
           PROVIDERS_TOAST_ACTION,
         );
         return false;
@@ -2226,18 +2200,16 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
     if (result.ok) {
       const after = result.estimatedTokensAfter;
       toast.success(
-        `Context compacted: ${result.tokensBefore.toLocaleString()} tokens` +
-          (after !== null ? ` → about ${after.toLocaleString()}` : "") +
-          (result.costUsd > 0 ? ` · ${formatUsd(result.costUsd)}` : ""),
+        appText("chat.composer.compacted", { before: result.tokensBefore.toLocaleString(), after: after !== null ? after.toLocaleString() : "none", cost: result.costUsd > 0 ? formatUsd(result.costUsd) : "none" }),
       );
       return;
     }
-    if (result.reason === "streaming") toast.error("Wait for the current run to finish before compacting.");
-    else if (result.reason === "budget") toast.error(result.detail ?? "Project spend limit reached.");
-    else if (result.reason === "no_session") toast.info("Nothing to compact yet.");
+    if (result.reason === "streaming") toast.error(appText("chat.composer.wait_for_the_current_run_to_finish"));
+    else if (result.reason === "budget") toast.error(result.detail ?? appText("chat.composer.project_spend_limit_reached"));
+    else if (result.reason === "no_session") toast.info(appText("chat.composer.nothing_to_compact_yet"));
     else if (result.reason === "too_small")
-      toast.info(result.detail ?? "Nothing to compact yet: the conversation still fits in the recent-context window.");
-    else toast.error(result.detail ?? "Compaction failed.");
+      toast.info(result.detail ?? appText("chat.composer.nothing_to_compact_yet_the_conversation_still"));
+    else toast.error(result.detail ?? appText("chat.composer.compaction_failed"));
   }, [compact]);
 
   const handleSend = useCallback(
@@ -2246,8 +2218,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       if (!selectedModelAvailable) {
         toast.error(
           selectedModelAvailability === "checking"
-            ? "Model provider status is still loading. Try again in a moment."
-            : "This model provider is disconnected. Reconnect it in Settings or choose another model.",
+            ? appText("chat.composer.model_provider_status_is_still_loading_try")
+            : appText("chat.composer.this_model_provider_is_disconnected_reconnect_it_2"),
           PROVIDERS_TOAST_ACTION,
         );
         return false;
@@ -2292,7 +2264,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
         }
         // Reporting failure keeps the text AND the attachment chips; restoring
         // only the text used to drop the file context silently.
-        setSteerError("Couldn't deliver the steering message — your text was restored.");
+        setSteerError(appText("chat.composer.couldn_t_deliver_the_steering_message_your"));
         return false;
       }
       // Not awaited: send() resolves only when the whole turn is done, and the
@@ -2355,8 +2327,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
         if (!selectedModelAvailable) {
           toast.error(
             selectedModelAvailability === "checking"
-              ? "Model provider status is still loading. Try again in a moment."
-              : "Reconnect this model provider in Settings before sending.",
+              ? appText("chat.composer.model_provider_status_is_still_loading_try")
+              : appText("chat.composer.reconnect_this_model_provider_in_settings_before"),
             PROVIDERS_TOAST_ACTION,
           );
           return;
@@ -2378,8 +2350,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
         if (workflowModelAvailability !== "available") {
           toast.error(
             workflowModelAvailability === "checking"
-              ? "Model provider status is still loading. Try again in a moment."
-              : "Reconnect this model provider in Settings before launching.",
+              ? appText("chat.composer.model_provider_status_is_still_loading_try")
+              : appText("chat.composer.reconnect_this_model_provider_in_settings_before_2"),
             PROVIDERS_TOAST_ACTION,
           );
           return;
@@ -2442,8 +2414,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
               </div>
             ) : (
               <ConversationEmptyState
-                title="What can I help you with?"
-                description="I can research topics, write code, and analyze data."
+                title={appText("chat.composer.what_can_i_help_you_with")}
+                description={appText("chat.composer.i_can_research_topics_write_code_and")}
               />
             )
           ) : (
@@ -2470,7 +2442,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       <div className="px-4 pb-6 pt-2">
         {(reconnecting || (!initialSessionReady && !getSessionId())) && (
           <p role="status" className="mb-2 text-xs text-muted-foreground">
-            {reconnecting ? "Reconnecting to this run…" : "Restoring this conversation… Retrying if the server is unavailable."}
+            {reconnecting ? appText("chat.composer.reconnecting_to_this_run") : appText("chat.composer.restoring_this_conversation_retrying_if_the_server")}
           </p>
         )}
         <PromptInputProvider

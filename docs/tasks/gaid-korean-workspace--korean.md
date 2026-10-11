@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:50:26Z
+updated: 2026-10-11T07:06:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"95c18540-98e5-43b9-a8b5-0d904e284979","pid":449523,"provider":"codex","session":"01a129b9-f186-77a1-ae42-9253040f3f74","start":"16741475","token":"ec255bab0a5fc65b75b65f6aeb3722d4f293311e4cecceb860ef9f810f3b27e0"}
 branch: task/gaid-korean-workspace--korean
 target: task/gaid-korean-workspace
@@ -99,11 +99,16 @@ Keep your task document current: list string ids with Korean and English text (b
 edited upstream files, and the surfaces left in English. `task save` reviewed files, then `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Primary-path catalogue extraction and Korean translation implemented, including dynamic counts, accessible control names, branding, light-theme tokens and Appearance language control. Geo dictionaries moved into catalogues with thin wrappers; old defineGeoStrings removed. Typecheck passed before final minor copy/layout edits. Full web checks next. Dependency install job 1 exited 0; its npm-ci node_modules copied into this worktree (no lockfile changes).
 ## Next steps
-1. (the next session's first action)
+1. Finish catalogue migration and primary-path translations, brand/theme/language control.
+2. Run web typecheck, full tests, copy validation and touched-file ESLint; review/save/finish.
 ## Failed approaches
 ## Notes and decisions
+
+- Sequential implementation: register upstream seams, migrate geo dictionaries, translate primary path, then theme/language and checks. Owned: app/viewers/depth/map/tables/context/localModel catalogues and primary-path upstream files; workspace namespace and Geo mount lines stay untouched. No child writers (nested units unsupported); tightly coupled catalogue edits stay with this single writer. Parent owns browser/full scripts/check evidence.
+- Font fallback choice: use the approved system/Hangul-capable stack without fetching a new font or adding a dependency. No new font notice is needed.
+
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -116,6 +121,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T065143.526607Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

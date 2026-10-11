@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 import { FileTreePanel } from "@/components/sandbox-panel";
 import { FilePreviewPanel, SettingsDialog, WorkflowsPanel } from "@/components/lazy-surfaces";
 import type { Model } from "@/components/model-selector";
@@ -68,6 +68,8 @@ import {
   type CSSProperties,
 } from "react";
 
+const appText = geoText("app");
+
 const MAX_CHAT_TABS = 10;
 
 /**
@@ -98,7 +100,7 @@ function makeTabId(): string {
 }
 
 function defaultTabTitle(index: number): string {
-  return `Chat ${index + 1}`;
+  return appText("chat.tabs.numbered", { count: index + 1 });
 }
 
 // Thin vertical drag handle between two panels
@@ -828,7 +830,7 @@ function WorkspacePage({
       setView("chat");
       setTimeout(() => {
         const ok = tabHandles.current.get(activeTabId)?.scrollToToolCall(entryId) ?? false;
-        if (!ok) toast.error("Couldn't find this entry in the chat transcript.");
+        if (!ok) toast.error(appText("header.couldn_t_find_this_entry_in_the"));
       }, 50);
     },
     [activeTabId],
@@ -918,27 +920,17 @@ function WorkspacePage({
           <button
             type="button"
             onClick={onOpenProjectView}
-            aria-label="Back to projects"
+            aria-label={appText("header.back_to_projects")}
             className="flex items-center gap-2"
-          >
-            {/* Plain <img> to avoid Next/Image's aspect-ratio warning when we
-                set height via CSS and let width autosize. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/kdense-logo.png"
-              alt="K-Dense BYOK"
-              className="h-7 w-auto object-contain dark:invert"
-            />
-            <span className="text-sm font-semibold tracking-tight text-foreground/80">BYOK</span>
+          ><span className="text-sm font-semibold tracking-tight text-primary">{appText("header.shortName")}</span><span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
           </button>
           {isVersioned && (
             <InfoTooltip
               content={
                 <>
-                  <b>K-Dense BYOK v{APP_VERSION}</b>
+                  <b>{appText("header.version", { version: APP_VERSION })}</b>
                   <br />
-                  Bring-your-own-key research assistant. All API calls use keys from your{" "}
-                  <kbd>.env</kbd> file and run on your machine.
+                  {appText("header.attribution")}
                 </>
               }
             >
@@ -948,22 +940,21 @@ function WorkspacePage({
             </InfoTooltip>
           )}
           {updateAvailable && (
-            <InfoTooltip content="A newer version is available on GitHub. Click to open the release page.">
+            <InfoTooltip content={appText("header.a_newer_version_is_available_on_github")}>
               <a
                 href={process.env.NEXT_PUBLIC_RELEASES_URL ?? "https://github.com/K-Dense-AI/k-dense-byok"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] font-medium text-blue-500 hover:text-blue-400 transition-colors"
               >
-                Update available
-              </a>
+                {appText("header.update_available")}</a>
             </InfoTooltip>
           )}
           <span className="mx-1 h-4 w-px bg-border/60" aria-hidden />
           <ProjectSwitcher onOpenProjectView={onOpenProjectView} />
         </div>
         <p className="absolute left-1/2 hidden -translate-x-1/2 text-[11px] text-muted-foreground/60 tracking-wide select-none 2xl:block">
-          Brought to you by K-Dense, Inc.
+          {appText("header.attribution")}
         </p>
         <div className="flex flex-wrap items-center gap-2">
           {isActive && <ResourceMonitor />}
@@ -975,14 +966,12 @@ function WorkspacePage({
           />
           {activeModalJobCount > 0 ? (
             <InfoTooltip
-              content={`${activeModalJobCount} Modal compute job${
-                activeModalJobCount === 1 ? " is" : "s are"
-              } still running. Open Compute to inspect live logs.`}
+              content={appText("header.computeRunning", { count: activeModalJobCount })}
             >
               <button
                 type="button"
                 onClick={() => handleViewCompute()}
-                aria-label={`Open Compute, ${activeModalJobCount} active jobs`}
+                aria-label={appText("header.openCompute", { count: activeModalJobCount })}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/10 px-2 py-1.5 text-[11px] font-medium text-violet-700 transition-colors hover:bg-violet-500/15 dark:text-violet-300"
               >
                 <ServerCogIcon className="size-3.5" />
@@ -991,7 +980,7 @@ function WorkspacePage({
               </button>
             </InfoTooltip>
           ) : modalJobsLoading ? (
-            <span className="sr-only" aria-live="polite">Checking compute jobs</span>
+            <span className="sr-only" aria-live="polite">{appText("header.checking_compute_jobs")}</span>
           ) : null}
           {/* Panel visibility — collapse either side panel to give the center
               pane (file preview / LaTeX editor) more room. */}
@@ -999,15 +988,14 @@ function WorkspacePage({
             <InfoTooltip
               content={
                 <>
-                  <b>{sandboxOpen ? "Hide" : "Show"} file browser</b>
+                  <b>{appText(sandboxOpen ? "header.hide_file_browser" : "header.show_file_browser")}</b>
                   <br />
-                  Collapse the left file tree to widen the editor and preview.
-                </>
+                  {appText("header.collapse_the_left_file_tree_to_widen")}</>
               }
             >
               <button
                 onClick={toggleSandbox}
-                aria-label={sandboxOpen ? "Hide file browser" : "Show file browser"}
+                aria-label={sandboxOpen ? appText("header.hide_file_browser") : appText("header.show_file_browser")}
                 aria-pressed={sandboxOpen}
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
@@ -1022,15 +1010,14 @@ function WorkspacePage({
             <InfoTooltip
               content={
                 <>
-                  <b>{chatOpen ? "Hide" : "Show"} chat</b>
+                  <b>{appText(chatOpen ? "header.hide_chat" : "header.show_chat")}</b>
                   <br />
-                  Collapse the right chat panel to widen the editor and preview.
-                </>
+                  {appText("header.collapse_the_right_chat_panel_to_widen")}</>
               }
             >
               <button
                 onClick={toggleChat}
-                aria-label={chatOpen ? "Hide chat" : "Show chat"}
+                aria-label={chatOpen ? appText("header.hide_chat") : appText("header.show_chat")}
                 aria-pressed={chatOpen}
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
@@ -1046,11 +1033,9 @@ function WorkspacePage({
           <InfoTooltip
             content={
               <>
-                <b>Settings</b>
+                <b>{appText("header.settings")}</b>
                 <br />
-                Model providers and defaults, this project&apos;s budget, skills and
-                specialists, and services like web search and Modal.
-              </>
+                {appText("header.model_providers_and_defaults_this_project_s")}</>
             }
           >
             <button
@@ -1058,7 +1043,7 @@ function WorkspacePage({
                 setSettingsRequest(null);
                 setSettingsOpen(true);
               }}
-              aria-label="Open settings"
+              aria-label={appText("header.open_settings")}
               className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <SettingsIcon className="size-4" />
@@ -1068,16 +1053,16 @@ function WorkspacePage({
             <InfoTooltip
               content={
                 resolvedTheme === "dark"
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
+                  ? appText("header.switch_to_light_mode")
+                  : appText("header.switch_to_dark_mode")
               }
             >
               <button
                 onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                 aria-label={
                   resolvedTheme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
+                    ? appText("header.switch_to_light_mode")
+                    : appText("header.switch_to_dark_mode")
                 }
                 className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >

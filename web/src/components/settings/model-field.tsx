@@ -1,5 +1,5 @@
 "use client";
-
+import { geoText } from "@/geo/i18n";
 /**
  * A model picker for settings forms: the composer's picker list behind a
  * form-styled trigger, storing a canonical `provider/model` ref string.
@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { ModelPickerList } from "@/components/model-selector";
 import { useModels } from "@/lib/use-models";
 import { cn } from "@/lib/utils";
+
+const appText = geoText("app");
 
 export function ModelField({
   id,
@@ -84,13 +86,13 @@ export function ModelField({
             className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border bg-background px-2.5 text-left text-xs hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className={cn("min-w-0 flex-1 truncate", !value && "text-muted-foreground")}>
-              {value ? (selected?.label ?? <code className="font-mono">{value}</code>) : (emptyLabel ?? "Choose a model")}
+              {value ? (selected?.label ?? <code className="font-mono">{value}</code>) : (emptyLabel ?? appText("settings.model.choose_a_model"))}
             </span>
             {value && selected ? (
               <span className="shrink-0 text-[10px] text-muted-foreground">{selected.provider}</span>
             ) : null}
             {availability === "unavailable" ? (
-              <span className="shrink-0 text-[10px] font-medium text-destructive">disconnected</span>
+              <span className="shrink-0 text-[10px] font-medium text-destructive">{appText("settings.model.disconnected")}</span>
             ) : null}
             <ChevronDownIcon className="size-3 shrink-0 text-muted-foreground" aria-hidden />
           </button>
@@ -134,8 +136,8 @@ export function ModelField({
         size="icon"
         className="size-8 shrink-0"
         disabled={disabled}
-        aria-label={`Type a model id for ${label}`}
-        title="Type a model id"
+        aria-label={appText("settings.model.typeId", { label })}
+        title={appText("settings.model.type_a_model_id")}
         onClick={() => {
           setDraft(value);
           setManual(true);

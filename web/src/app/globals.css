@@ -33,8 +33,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -74,38 +74,55 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #1f5eff;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f8fafc;
+  --muted-foreground: #71717a;
+  --accent: #eef3ff;
+  --accent-foreground: #3f3f46;
+  --destructive: #b91c1c;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #1f5eff;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #3f3f46;
+  --sidebar-primary: #1f5eff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef3ff;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #1f5eff;
+  --radius: 10px;
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --gaid-ink: #0a0a0a;
+  --gaid-body: #3f3f46;
+  --gaid-muted: #71717a;
+  --gaid-subtle-alt: #f6f7f9;
+  --gaid-brand-hover: #1749cc;
+  --gaid-success: #15803d;
+  --gaid-warning: #a16207;
+  --gaid-danger: #b91c1c;
+  --gaid-untested: #71717a;
+  --gaid-nodata: #a1a1aa;
+  --gaid-body-size: 14px;
+  --gaid-h1-size: 20px;
+  --gaid-h2-size: 16px;
+  --gaid-heading-weight: 600;
+  --gaid-button-radius: var(--radius-md);
+  --gaid-button-height: 32px;
+  --gaid-button-height-secondary: 32px;
+  --gaid-motion-fast: 150ms;
+  --gaid-motion-base: 200ms;
+  --gaid-easing: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .dark {
@@ -174,3 +191,12 @@
     100% { box-shadow: 0 0 0 0 transparent; }
   }
 }
+
+/* WP00 approved Korean-first UI tokens; dark overrides above remain in force. */
+body {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-size: var(--gaid-body-size);
+  word-break: keep-all;
+}
+pre, code, kbd { word-break: normal; overflow-wrap: anywhere; }
+table, .gaid-numeric { font-variant-numeric: tabular-nums; }
