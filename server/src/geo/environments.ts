@@ -103,7 +103,7 @@ export function projectPython(sandbox: string, platform = process.platform): str
 
 export interface ImportResult { module: string; status: "ok" | "missing"; error?: string }
 export interface DistributionResult { name: string; version: string | null; status: "ok" | "missing"; error?: string }
-export interface ToolResult { name: string; check: string; optional: boolean; status: "ok" | "missing"; output: string }
+export interface ToolResult { name: string; version?: string; check: string; optional: boolean; status: "ok" | "missing"; output: string }
 export interface EnvironmentReadiness {
   id: string;
   target: EnvironmentTarget;
@@ -201,12 +201,12 @@ export class GeoEnvironmentService {
         command = parts[0]; args = parts.slice(1);
         // Checks are argv, never a shell; unsupported checks are reported, not executed.
         if (!/^[\w.-]+$/.test(command) || args.some((arg) => !/^[\w.=-]+$/.test(arg))) {
-          tools.push({ name: tool.name, check: tool.check, optional: !!tool.optional, status: "missing", output: "Unsupported tool check" });
+          tools.push({ name: tool.name, version: tool.version, check: tool.check, optional: !!tool.optional, status: "missing", output: "Unsupported tool check" });
           continue;
         }
       }
       const checked = await this.runner(command, args, { cwd: dir, timeout: 15_000 });
-      tools.push({ name: tool.name, check: tool.check, optional: !!tool.optional, status: checked.code === 0 ? "ok" : "missing", output: tail(checked) });
+      tools.push({ name: tool.name, version: tool.version, check: tool.check, optional: !!tool.optional, status: checked.code === 0 ? "ok" : "missing", output: tail(checked) });
     }
     return { id, target, packages, imports, distributions, tools,
       ready: imports.every((i) => i.status === "ok") && distributions.every((d) => d.status === "ok") && tools.every((t) => t.optional || t.status === "ok") };

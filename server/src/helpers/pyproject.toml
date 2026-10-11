@@ -36,6 +36,14 @@ dependencies = [
 # Resolve binary-only packages (notably RDKit) for every shipped platform.
 # A lock resolved only on Apple Silicon can silently drop Intel Mac support.
 [tool.uv]
+# Geo catalogue packages require Python >=3.12. Preserve upstream project metadata
+# while limiting uv's resolution/runtime targets to the catalogue Python range.
+environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version >= '3.12'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version >= '3.12'",
+    "sys_platform == 'win32' and platform_machine == 'AMD64' and python_version >= '3.12'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
+]
 required-environments = [
     "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.12'",
     "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.12'",

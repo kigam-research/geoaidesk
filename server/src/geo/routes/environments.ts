@@ -33,6 +33,7 @@ export async function registerGeoEnvironmentRoutes(app: FastifyInstance, options
   });
 
   app.post<{ Params: { id: string }; Body: { target?: EnvironmentTarget } }>("/geo/environments/:id/prepare", {
+    preValidation: async (req) => { if (req.body === undefined) req.body = {}; },
     schema: { body: { type: "object", additionalProperties: false, properties: { target: { type: "string", enum: ["helper", "project"] } } } },
   }, async (req, reply) => {
     if (!active()) return reply.code(404).send({ detail: "Geo catalogue mode is off" });
