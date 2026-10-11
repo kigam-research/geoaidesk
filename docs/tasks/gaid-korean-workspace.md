@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:40:59Z
+updated: 2026-10-11T07:46:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -59,6 +59,14 @@ Verified facts from the hub (2026-10-11):
   geo-acquisition / geo-mpm packages); suggestions: LAS → well-log-qc, assay CSV → assay-composition (element columns),
   plain CSV → none, GeoPackage polygon → geo-map-and-crs (+ find-and-prepare), GeoTIFF → geo-map-and-crs; recipes ok /
   catalogue-version + choice-state. Fixtures: ~/data/geoaidesk/work/gaid-korean-workspace/fixtures/.
+- Full scripts/check job 1 (tree 6125c59) exit 0: backend 151 files passed + 1 skipped (2 mzML tests SKIPPED: PSI-MS
+  vocabulary not downloadable on the KIGAM network), web 142/142 files, copy validator 0 errors / 1 accepted warning
+  (English limit text "not independently verified"), environments smoke, launcher checks, production smoke; "All
+  geoaidesk checks passed." Later commits (catalogue layout, theme-provider order, providers intro copy, report) are
+  re-checked by task finish.
+- Final browser checks (Korean 1440 px, keyboard, 375 px, English browser) recorded in the report; scripts and shots in
+  ~/data/geoaidesk/work/gaid-korean-workspace/browser/ (final.mjs, result.mjs, final/).
+
 ## Next steps
 1. Children running (started 2026-10-11 from ba1a71b, profile "general work", normal speed):
    - gaid-korean-workspace--tasks: Paseo agent 9de57122-4815-4e8d-8db4-f7872cf53c25, worktree
@@ -82,8 +90,8 @@ Verified facts from the hub (2026-10-11):
      workspace/projects headers, adaptive favicon + apple icon from geo/brand/ (upstream favicon.ico/icon.png removed),
      notices updated, map `displayFallback` demonstrative fixed, prompt-budget chip previews a started task's
      exposure (`GET /geo/context/preview?exposure=`). Full web suite 951/951.
-2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
-   ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
+2. Done: both children completed; full check and browser checks recorded; report written. Next: remove build caches,
+   stop the dev units gaid-wp07-be/-fe, `task finish`; then update routed request 0f9f7d4534b2 after integration.
 ## Failed approaches
 ## Notes and decisions
 - Scope = WP07 package text only (forwarded goal b619ca2ff749). Done: researcher opens data, sees relevant actions,
