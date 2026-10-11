@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:33:04Z
+updated: 2026-10-11T11:51:37Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -157,12 +157,18 @@ On a child's finish: `task complete gaid-release-proof--<child>`.
   only as a GitHub draft, published after clearance; 2 가) catalogue release published now (done: geo-catalogue-0.2.1,
   prerelease, remote sha256 verified); 3 가) run both paid routes (personal API key + Sign in with ChatGPT); 4 가) the
   local route is not advertised as supported, only its results and limits.
+- User, 2026-10-11: "그리고 유료 경로 테스트는 만약 사용자가 로그인하기만 해도 된다면 우선 넘어가도 된다." → paid and
+  subscription route trials deferred (open item); paid-trial instance stopped. PC71 has only local Ollama models
+  (qwen2.5 14b/3b); the 10.13.15.67:8000 vLLM server (qwen3.8-flash-next, seCall 2026-09-17) and the PC74 relay
+  127.0.0.1:11435 did not answer on 2026-10-11. GAID keeps its own Pi auth store; Codex CLI / Claude Code logins on
+  PC74 are not shared and their token files are not read or copied.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [대기] 유료·구독 모델 경로 시험(ChatGPT 로그인, 개인 API 키; 원하면 Claude 로그인 로컬 시험과 67 서버 qwen3.8-flash-next) — 가) 사용자가 시험용 GeoAIDesk에 로그인·키 저장 후 geo/release-proof/route-trial.mjs로 연결·과제 기록 — 나) 다음 출시 검증으로 미룸 — 권장: 가) 결정 D4가 출시 전 시험을 정함 — 막힌 일: API·구독 경로 안내 — 조건: 사용자 로그인 또는 키, 67 서버는 서버 재가동(2026-10-11 연결 불가) — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
 - [대기] 기관 브랜드(geo/brand 로고) 공개 승인 후 앱 릴리스 geo-v0.1.0 공개 — 가) 승인 받으면 초안 릴리스를 공개 — 나) 로고를 바꾼 뒤 공개 — 권장: 가) 사용자 결정(2026-10-11)대로 초안까지만 만들어 둠 — 막힌 일: 앱 릴리스 공개 — 조건: 기관 브랜드 승인 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
 ## Report
 Report: reports/2026-10-11-gaid-release-proof/index.md

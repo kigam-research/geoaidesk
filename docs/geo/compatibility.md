@@ -22,8 +22,8 @@ The install checks call the app's API and fetch the served page; they are not br
 |---|---|---|
 | Local Ollama, `qwen3:30b-a3b-instruct-2507-q4_K_M`, 64K context | connection passed; tasks partial | Well-log QC stopped at the 45-minute cap without the figure; map-plus-area-table produced an exact area table but no map. About 7% of the model on the CPU. |
 | Local Ollama, same model, 98K context | connection passed; 1 of 2 tasks passed | Map-plus-area-table passed its check in 76 s (exact areas on synthetic data); well-log QC produced every file but reached the cap in a tool-call loop and its QC values have defects. About 18% on the CPU. |
-| Personal API key | not run | Paid; runs only at the user's request. |
-| Sign in with ChatGPT | not run | Official flow for local open-source apps; GAID registers under its own name. Uses the plan's included usage and the app's limit. |
+| Personal API key | not run (deferred) | Paid; deferred for 0.1.0 at the user's choice. |
+| Sign in with ChatGPT | not run (deferred) | Official flow for local open-source apps; GAID registers under its own name. Uses the plan's included usage and the app's limit. |
 | Claude Pro/Max sign-in (Pi OAuth) | not advertised | Anthropic does not permit third-party developers to offer Claude.ai login; use a personal Anthropic API key. |
 | GitHub Copilot sign-in (Pi OAuth) | not advertised | Only the official Copilot SDK route is documented. |
 

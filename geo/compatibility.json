@@ -281,7 +281,8 @@
       "tasks": [],
       "knownLimits": [
         "Uses the ChatGPT plan's included usage and the app's own limit; not unlimited.",
-        "Legacy openai-codex login is a separate route and is not covered."
+        "Legacy openai-codex login is a separate route and is not covered.",
+        "Not run for 0.1.0: deferred by the user on 2026-10-11 (needs only the user's sign-in or key); carried as an open item."
       ]
     },
     {
@@ -305,7 +306,8 @@
       },
       "tasks": [],
       "knownLimits": [
-        "Not advertised: Anthropic's legal page does not permit third-party developers to offer Claude.ai login; advertising needs a written answer from Anthropic for this configuration. Use a personal Anthropic API key instead."
+        "Not advertised: Anthropic's legal page does not permit third-party developers to offer Claude.ai login; advertising needs a written answer from Anthropic for this configuration. Use a personal Anthropic API key instead.",
+        "A local test with the user's own account remains possible; it would not change the advertising position."
       ]
     },
     {
@@ -347,7 +349,8 @@
       },
       "tasks": [],
       "knownLimits": [
-        "Paid; run only at the user's request."
+        "Paid; run only at the user's request.",
+        "Not run for 0.1.0: deferred by the user on 2026-10-11 (needs only the user's sign-in or key); carried as an open item."
       ]
     }
   ]
