@@ -52,6 +52,7 @@ import {
 } from "@/lib/composer-context";
 import { withChatSnapshots } from "@/lib/chat-snapshot";
 import { ContextUsageIndicator } from "@/components/context-usage-indicator";
+import { GeoPromptBudget } from "@/geo/context/prompt-budget";
 import { CitationBadge } from "@/components/citation-badge";
 import {
   ModalJobChip,
@@ -1309,6 +1310,12 @@ function ChatInput({
                 loading={modalCatalogLoading}
                 error={modalCatalogError}
                 onRefresh={onRefreshModalCatalog}
+              />
+              <GeoPromptBudget
+                projectId={projectId}
+                sessionId={currentSessionId}
+                modelRef={selectedModel.id}
+                refreshKey={isStreaming}
               />
               <ContextUsageIndicator
                 usage={contextUsage}

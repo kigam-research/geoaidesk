@@ -6,7 +6,11 @@
  *   - the project and its file survive stop/restart and the build is reused,
  *   - user data is written under the data home, not into the checkout,
  *   - the excluded anthropics/skills document skills were not fetched,
- *   - unattended catalogue refresh is off.
+ *   - unattended catalogue refresh is off,
+ *   - the pinned geo catalogue is what the first start installs (or, when its
+ *     archive is not on this machine, nothing is installed and the status says
+ *     where it was looked for: no fallback to the upstream catalogue),
+ *   - a new chat's start-prompt budget is reported.
  *
  * Needs installed server/ and web/ packages (npm ci), uv, and network access for
  * the first-start skill catalogue and sandbox environment. Uses free ports.
@@ -198,6 +202,14 @@ try {
     body: NOTE_TEXT,
   });
   assert.equal(saved.status, 200, `file saved: ${saved.text}`);
+  // Catalogue status and a new chat's start-prompt budget, from the running backend.
+  const catalogueRes = await request(`${api}/geo/catalogue`);
+  assert.equal(catalogueRes.status, 200, `GET /geo/catalogue: ${catalogueRes.text.slice(0, 200)}`);
+  const catalogueText = catalogueRes.text;
+  const budgetRes = await request(`${api}/geo/context/preview`, { headers: projectHeaders });
+  assert.equal(budgetRes.status, 200, `GET /geo/context/preview: ${budgetRes.text.slice(0, 200)}`);
+  const budgetText = budgetRes.text;
+  log(`start-prompt estimate: ${JSON.parse(budgetText).budget.initialPrompt.estimatedTokens} tokens`);
   await stopLauncher(current);
   log("stop 1 ok (ports released)");
 
@@ -226,7 +238,7 @@ try {
     assert.ok(!fs.existsSync(path.join(repoRoot, "projects", PROJECT)), "no project in the checkout");
   }
 
-  // Catalogue: provisioned, without the excluded document skills.
+  // Catalogue: the pinned geo archive, without the excluded document skills.
   const sandbox = path.join(dataHome, "projects", "default", "sandbox", ".pi");
   const installed = ["skills", "skills-disabled"].flatMap((dir) => {
     try {
@@ -235,7 +247,22 @@ try {
       return [];
     }
   });
-  assert.ok(installed.length > 0, "the skill catalogue was provisioned on first start");
+  const catalogue = JSON.parse(catalogueText);
+  const pinned = catalogue.skills.map((skill) => skill.runtimeName).sort();
+  if (catalogue.status.state === "ready") {
+    for (const name of pinned) assert.ok(installed.includes(name), `catalogue skill ${name} installed`);
+    // Only catalogue skills plus the runtime's own pi-subagents skills.
+    const extra = installed.filter((name) => !pinned.includes(name) && !["pi-subagents", "council-mode"].includes(name));
+    assert.deepEqual(extra, [], "no upstream catalogue skills installed");
+    const sync = JSON.parse(fs.readFileSync(path.join(dataHome, "projects", "default", "sandbox", ".kady", "skills-sync.json"), "utf-8"));
+    assert.equal(sync.upstreamCommit, catalogue.status.label, "the project records the applied catalogue");
+    log(`geo catalogue ${catalogue.status.label}: ${pinned.length} skills`);
+  } else {
+    assert.equal(catalogue.status.code, "archive-missing", `catalogue status: ${catalogueText.slice(0, 300)}`);
+    assert.deepEqual(installed, [], "no fallback to the upstream catalogue without the pinned archive");
+    log(`geo catalogue archive not on this machine (searched ${catalogue.status.searched.length} places); nothing installed`);
+  }
+  assert.match(budgetText, /"schemaVersion":"gaid-prompt-budget\/v1"/, "start-prompt budget reported");
   for (const name of EXCLUDED) assert.ok(!installed.includes(name), `${name} not installed`);
   const cache = path.join(dataHome, "skills-cache");
   const cached = fs.existsSync(cache) ? fs.readdirSync(cache) : [];

@@ -16,6 +16,7 @@
  *   exposure/<sessionId>.json    SessionExposure, written once per chat
  */
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import type { ProjectPaths } from "../projects.ts";
 import { getSkillOrigins } from "../agent/skills-sync.ts";
@@ -117,10 +118,32 @@ function tryCatalogue(): GeoCatalogue | null {
   }
 }
 
+let supportSkills: string[] | null = null;
+
+/**
+ * Skills the app's own runtime seeds into every project (pi-subagents'
+ * delegation guidance, agent/subagent-resources.ts). They describe how to use
+ * the app's tools rather than a scientific method, so every mode keeps them.
+ */
+export function runtimeSupportSkillNames(): string[] {
+  if (supportSkills) return supportSkills;
+  try {
+    const dir = path.join(path.dirname(createRequire(import.meta.url).resolve("pi-subagents")), "skills");
+    supportSkills = fs
+      .readdirSync(dir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    supportSkills = [];
+  }
+  return supportSkills;
+}
+
 /**
  * Skill names a mode exposes. `catalogue`: every catalogue skill plus skills
  * the user installed or wrote (`registry`/`local` origin). `workflow:<id>`:
- * that workflow's skills.
+ * that workflow's skills. Both keep the runtime support skills.
  */
 export function exposedSkillNames(
   paths: ProjectPaths,
@@ -128,7 +151,7 @@ export function exposedSkillNames(
   catalogue: GeoCatalogue | null = tryCatalogue(),
 ): string[] | undefined {
   if (mode === "all") return undefined;
-  const names = new Set<string>();
+  const names = new Set<string>(runtimeSupportSkillNames());
   if (mode === "catalogue") {
     for (const skill of catalogue?.manifest.runtimeSkills ?? []) names.add(skill.runtimeName);
     for (const [name, origin] of Object.entries(getSkillOrigins(paths))) {
@@ -213,6 +236,7 @@ export interface PromptBudget {
     estimatedTokens: number;
     method: "chars/4";
   };
+  /** `installed`: skills the session loaded (project, user-level, ambient); `exposed`: offered to the model. */
   skills: { mode: ExposureMode; exposed: number; installed: number };
   /** contextWindow − initial estimate − output reserve; null without a model. */
   remainingTokens: number | null;
@@ -228,6 +252,8 @@ export const CHARS_PER_TOKEN = 4;
 export function promptBudget(
   session: BudgetSession,
   skills: { mode: ExposureMode; exposed: number; installed: number },
+  /** The model the next run will use when it differs from the session's (the picker). */
+  modelOverride?: BudgetSession["model"],
 ): PromptBudget {
   const active = new Set(session.getActiveToolNames());
   const tools = session.getAllTools().filter((tool) => active.has(tool.name));
@@ -238,9 +264,10 @@ export function promptBudget(
   );
   const systemPromptChars = session.systemPrompt.length;
   const estimatedTokens = Math.ceil((systemPromptChars + toolSchemaChars) / CHARS_PER_TOKEN);
-  const model = session.model;
+  const model = modelOverride ?? session.model;
   const remaining = model ? model.contextWindow - estimatedTokens - model.maxTokens : null;
-  const usage = session.getContextUsage();
+  // Measured usage belongs to the session's own model; omit it for another one.
+  const usage = modelOverride ? undefined : session.getContextUsage();
   return {
     schemaVersion: "gaid-prompt-budget/v1",
     model: model
