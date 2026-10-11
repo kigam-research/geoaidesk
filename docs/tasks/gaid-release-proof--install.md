@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:28:51Z
+updated: 2026-10-11T08:29:39Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -96,9 +96,10 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - WSL install record copied without alteration to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/install.json; SHA256 d31b65723c44378bf4a69120aaf27d46291bfc97fa2c8c2ed055aa976cf94f29. Original logs remain beside remote record.
 - Failed native update records retained: job 2 SHA256 a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea; job 3 SHA256 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005 (same run root pattern as receipts below, out/record.json).
 - Corrected PC74 update job 4 PASSED every step: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/out/record.json; SHA256 4b0da26427cc6939c4796fcad16483e41859900dadc283f9fdb2cc539d2790e4. Base first start 52,055ms, candidate start 11,011ms. History reopened; untouched pumping-test-diagnostics matched 0.2.1 staged bytes; local edit kept, two untouched catalogue skills updated.
-- Corrected WSL update PASSED every step. Original pc71:~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json (hash below when final evidence is consolidated).
+- Corrected WSL update PASSED every step. Original pc71:~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json; SHA256 224cd1f0b29645fed05db3efb17cbe9c48227c336d8bab757b71c4e3766ac35f. Base first start 53,066ms; candidate start 8,010ms.
 - Final Node geo suite PASSED 28/28 in 35.8s (exit 0), log /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log. Removed created server/src/helpers/.venv and well/__pycache__; no other listed build caches existed.
 - Only native Windows installation remains running. Task job 5 is a durable remote completion wait (Wait-Process for harness PID 3968), not another install. Its relay notification is the next trigger. Do not restart the scheduled task or poll periodically.
+- Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. A bounded Windows next-action check confirmed the scheduled task still running in frontend npm installation; no final Windows result exists yet. Continue only on job 5 notification.
 ## Next steps
 1. On job 5 completion notification, fetch Windows record/logs, inspect failed steps if any, verify its ports are stopped and unregister GAID-Install-Proof-20261011 after completion.
 2. Add final remote hashes/timings and known limits; preserve failed first attempts. Do not replay the already-started jobs.
