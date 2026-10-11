@@ -157,6 +157,12 @@
       "owner": "gaid-runtime",
       "status": "edited",
       "responsibility": "Dependency locks: one package at a time adds dependencies. gaid-runtime added the geo-core + geo-gis helper packages to server/src/helpers/pyproject.toml (uv environments limited to the four shipped platforms with Python >= 3.12) and relocked uv.lock; the owner returns to the next package that needs a change"
+    },
+    {
+      "path": "web/package.json, web/package-lock.json",
+      "owner": "gaid-maps--viewer",
+      "status": "edited",
+      "responsibility": "WP05 adds only the OpenLayers ol dependency and its lock entries"
     }
   ],
   "notTouched": [

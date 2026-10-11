@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:45:40Z
+updated: 2026-10-11T05:01:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -19,11 +19,26 @@ Area panel selecting vector class field, explicit method geodesic or projected w
 Visible strings isolated in map/strings.ts (Korean-first using current geo i18n pattern, English second, WP07 later owns overall wording). Tests meaningful with mocked OpenLayers if canvas needed: layer selection/request params, source/display info, bounds/area, stale project switch etc. Need real browser evidence later parent handles; provide ready instructions. Keep existing contracts (propose additive changes to parent, don't edit them). Finish child after own targeted tests; parent task complete integrates, then full scripts/check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the original CLI-returned worktree on 2026-10-11. Read AGENTS, parent task, map/inspection contracts and plan sections 3.2–3.3 / 4.5–4.6.
+- Existing geo viewers are lazy/self-fetching through apiFetch with project scope. Codegraph is unavailable for this exact worktree; using bounded native source reads.
+- Implemented `ol` 10.11.0 lazy map viewer, isolated native-CRS views, overlay path entry, visibility/order/opacity, GPKG layer picker, band/variable entry, categorical colors/legend, feature/pixel inspection, viewport paging and sampled metadata.
+- Explicit full-layer area panel (geodesic or user-entered projected EPSG; blocks EPSG:3857/4326), numerical table, browser CSV and PNG downloads. PNG includes bounded-subset label, display extent/CRS, layer source CRS and legend. No backend writes or basemap/network resources.
+- `.geomap.json` maps to `geo-map`; POST /geo/result initializes multiple sources and presents analysis table/script paths + limitations. Ordinary TIFF delegates to the existing inspection/imaging viewer; LAS registry line is unchanged.
+- Final targeted checks passed: `npm --prefix web test -- src/geo/viewers/map src/geo/viewers/inspection-viewer.test.tsx src/lib/use-sandbox.test.ts` (4 files, 38 tests); `cd web && npx tsc --noEmit --incremental false`; `cd web && npx eslint src/geo/viewers/map src/geo/viewers/registry.ts` (zero errors/warnings); `git diff --check` clean.
 ## Next steps
-1. (the next session's first action)
+1. Reviewed owned diff and final targeted checks. Run `task finish` with explicit new-file paths; task CLI additionally runs its required declared checks. Remove regenerated ignored dependency/build caches after the last check.
+2. Parent integrates ready child with `task complete gaid-maps--viewer`, performs real browser evidence below, and owns full integrated scripts/check and report.
 ## Failed approaches
+- First resume attempts hit another task's transaction lock; waited for that process to exit and resumed successfully without changing ownership/worktree.
+- Copy policy files `design/copy/{gaid-writing.md,terminology.csv,copy-policy.json}` are absent (HTTP 404) at skill_hub main and absent from the pinned archive. Applied plan 4.5–4.6 and current defineGeoStrings pattern; no external model lookup.
+- First frontend typecheck found optional OpenLayers `getViewport()` return in PNG export. Fixed with explicit viewport/size/context checks; subsequent typecheck passed.
 ## Notes and decisions
+- Sequential implementation (single child writer; no nested children): establish request/CRS utilities, then OpenLayers adapter, then React layer/area controls, then targeted tests.
+- Owned files and integration order remain exactly as the Goal. No contract edits; no independent report.
+- Unknown/conflicting source CRS uses an isolated native view; declared layers default to EPSG:3857. Analytical area is a separate full-layer request and never derives from the display subset.
+- The inspection contract has no variable inventory: raster variable choice is explicit name entry, while band and GPKG inventories use inspected selectors. No contract changes were made.
+- Built-in display CRS support is EPSG:3857/4326 (manifest first-layer setting), with one common display CRS stable across layer ordering. Other artifact display CRS settings are transformed to the common display CRS and labelled; source declaration is preserved.
+- New user-visible strings are isolated in map/strings.ts (all new IDs, no prior strings changed), with complete Korean/English pairs for loading/errors, preview/area limits and controls.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -39,3 +54,10 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+## Parent browser verification (not yet run by this child)
+1. In the integrated app with synthetic fixtures in the task sandbox, open a declared GeoTIFF. Confirm render, band switch, pan/zoom requests with bbox and <=256 dimensions, returned extent/resolution, and click zero versus nodata samples.
+2. Open a declared vector/GPKG. Choose each vector layer, inspect feature properties via map and table, next/previous pages (500 cap), and add a second declared sandbox path. Verify visibility/order/opacity and categorical field colors + matching legend.
+3. Calculate geodesic and a suitable projected-area CRS on a known-area polygon fixture. Confirm full-layer rows/total/count beside the bounded map; pan or page and confirm area result remains full-layer. Save CSV and PNG; inspect CSV precision/units and PNG subset label/CRS/legend.
+4. Open a missing-CRS shapefile alone; confirm native placement label, area disabled, overlay refused. Verify ordinary TIFF still uses imaging and a single-point vector fits visibly.
+5. Open a `.geomap.json` artifact; confirm multiple layers and referenced table/script/limitations. Switch projects while inspect/window/area requests are pending and confirm no prior-project metadata, features or tables appear.
