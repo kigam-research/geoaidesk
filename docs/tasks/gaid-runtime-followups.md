@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:45:15Z
+updated: 2026-10-11T04:47:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -43,17 +43,24 @@ Context:
 - Small change: no ADR; a short report is enough.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the original printed worktree; clean initial tree at bad86f1.
+- Source lookup: exact worktree has no codegraph index; inspected native source instead.
+- Existing defaults offer 32K; gaid-local falls through to payg, including picker metadata.
 ## Next steps
-1. (the next session's first action)
+1. Implement the minimum/default/profile and shared local-billing seam.
+2. Run focused regressions and scripts/check as a recorded job; no paid model calls.
+3. Write the short result report, remove regenerable worktree caches, save and finish.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential decisions: 64K = 65,536 tokens; reject new configurations below it, preserve existing saved configurations, remove only the proposed 32K option. Existing 96K evidence remains a one-machine trial, not release proof.
+- Ownership: this writer owns geo local-model profiles/UI/tests, a pure geo provider identity, and narrow billing/ledger/subagent/custom-picker seams plus their regression tests and documentation. No WP04/WP05 files.
+- Work packages: context settings and local billing are small; billing consumers are tightly coupled. No substantial independent child package; implement directly.
+- Integration order: declare upstream boundaries; pure identity and billing policy; consumers; context UI/API; regression checks; report and finish.
+- No rollout or paid model execution in this unit. WP10 owns real-task 64K/98K trials and catalogue release distribution.
+Closes: gaid-runtime#1
+Closes: gaid-runtime#3
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None; remaining release-proof work stays in WP10, as already assigned.
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a

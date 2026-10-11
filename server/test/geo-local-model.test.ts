@@ -74,6 +74,7 @@ describe("Ollama status and declared versus runtime context", () => {
       expect.objectContaining({ evidence: "recorded-trial", machines: 1, cpuOffloadPercent: 18 }),
       expect.objectContaining({ contextWindow: 65536, evidence: "proposed-not-tested" }),
     ]));
+    expect(data.profiles.every((profile: { contextWindow: number }) => profile.contextWindow >= 65536)).toBe(true);
     expect(creates).toEqual([]);
   });
   it("reports a mismatch using loaded context before configured context", async () => {
@@ -122,7 +123,7 @@ describe("configuration, ownership and persistence", () => {
     expect(freshCustom.listCustomProviders(dir)).toHaveLength(1);
     expect(freshCustom.listCustomProviders(dir)[0].models[0]).toMatchObject({ contextWindow: 98304, maxTokens: 8192 });
     const billing = billingForProvider("gaid-local");
-    expect(billing.billingMode).toBe("payg");
+    expect(billing.billingMode).toBe("local");
     expect(normalizeUsageCost(0, billing)).toEqual({ costUsd: 0 });
   });
   it("creates only an explicitly requested variant with num_ctx and selects it", async () => {
@@ -184,7 +185,7 @@ describe("configuration, ownership and persistence", () => {
   });
   it.each([
     {}, { ...input, model: "" }, { ...input, model: "missing" }, { ...input, model: "../oops" },
-    { ...input, contextWindow: 999 }, { ...input, contextWindow: "65536" }, { ...input, contextWindow: 1234.5 },
+    { ...input, contextWindow: 999 }, { ...input, contextWindow: 32768 }, { ...input, contextWindow: 65535 }, { ...input, contextWindow: "65536" }, { ...input, contextWindow: 1234.5 },
     { ...input, maxTokens: 65536 }, { ...input, maxTokens: 0 }, { ...input, createVariant: "true" },
     { ...input, setDefault: 1 }, { ...input, surprise: true },
   ])("rejects invalid settings without creating or writing: %j", async payload => {

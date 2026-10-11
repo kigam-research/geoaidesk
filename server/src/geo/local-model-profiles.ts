@@ -1,3 +1,5 @@
+export const MIN_LOCAL_CONTEXT = 65_536;
+
 /** Evidence labels are part of the profile: these are not hardware guarantees. */
 export const LOCAL_MODEL_PROFILES = [
   {
@@ -6,6 +8,5 @@ export const LOCAL_MODEL_PROFILES = [
     hardware: "RTX 4090 24 GB", cpuOffloadPercent: 18, peakContextPercent: 89.9,
     trialDate: "2026-10-10", machines: 1,
   },
-  { id: "proposed-32k", contextWindow: 32_768, evidence: "proposed-not-tested" },
-  { id: "proposed-64k", contextWindow: 65_536, evidence: "proposed-not-tested" },
+  { id: "proposed-64k", contextWindow: MIN_LOCAL_CONTEXT, evidence: "proposed-not-tested" },
 ] as const;

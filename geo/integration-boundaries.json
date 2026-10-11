@@ -157,12 +157,30 @@
       "owner": "gaid-runtime",
       "status": "edited",
       "responsibility": "Dependency locks: one package at a time adds dependencies. gaid-runtime added the geo-core + geo-gis helper packages to server/src/helpers/pyproject.toml (uv environments limited to the four shipped platforms with Python >= 3.12) and relocked uv.lock; the owner returns to the next package that needs a change"
+    },
+    {
+      "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
+      "owner": "gaid-runtime-followups",
+      "status": "edited",
+      "responsibility": "Recognize the dedicated gaid-local provider as local/$0/not cap-counted consistently in live billing, inferred ledger rows, child admission/receipts and picker metadata; other custom providers remain payg"
+    },
+    {
+      "path": "server/test/geo-local-model.test.ts, server/test/subagent-integration.test.ts",
+      "owner": "gaid-runtime-followups",
+      "status": "edited",
+      "responsibility": "64K minimum and gaid-local billing regression coverage, including over-cap child admission"
+    },
+    {
+      "path": "server/test/run-pipeline.test.ts, docs/local-models-ollama.md",
+      "owner": "gaid-runtime-followups",
+      "status": "edited",
+      "responsibility": "Over-cap lead regression using gaid-local billing; document the 64K minimum and local billing exception"
     }
   ],
   "notTouched": [
     "Pi SDK packages and server/scripts/patch-subagents.mjs",
     "Session JSONL / SSE event mapping (server/src/agent/events.ts)",
-    "Subagent supervision, notebook and provenance persistence, cost ledger and billing",
+    "Subagent supervision, notebook and provenance persistence",
     "Provider authentication and catalogue (server/src/agent/provider-*.ts)"
   ]
 }

@@ -32,6 +32,7 @@ import { isBudgetExceeded, recordSubagentRun } from "../cost/ledger.ts";
 import {
   billingCountsTowardBudget,
   billingForProvider,
+  isLocalProvider,
   type BillingContext,
 } from "../cost/billing.ts";
 import { resolvePaths } from "../projects.ts";
@@ -277,10 +278,8 @@ function billingFromModelRef(
     }
     return billingForProvider("unknown", "api_key");
   }
-  if (ref.startsWith("ollama/")) return billingForProvider("ollama", "local");
-  if (ref.startsWith("openai-compatible/")) {
-    return billingForProvider("openai-compatible", "local");
-  }
+  const localProvider = ref.split("/", 1)[0];
+  if (ref.includes("/") && isLocalProvider(localProvider)) return billingForProvider(localProvider, "local");
   if (ref.startsWith("fusion/") || ref.startsWith("openrouter/")) {
     return billingForProvider("openrouter", "api_key");
   }

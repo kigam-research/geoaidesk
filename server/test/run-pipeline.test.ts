@@ -29,7 +29,7 @@ import { recordRun } from "../src/cost/ledger.ts";
 import { runBroker } from "../src/agent/run-broker.ts";
 import { currentRunId } from "../src/agent/run-ids.ts";
 import { claimRun, executeRun, isRunClaimed, openRun } from "../src/agent/run-pipeline.ts";
-import type { BillingContext } from "../src/cost/billing.ts";
+import { billingForModel, type BillingContext } from "../src/cost/billing.ts";
 
 class FakeSession {
   sessionId = "pipe-1";
@@ -267,6 +267,27 @@ describe("executeRun", () => {
     types = opened.handle.state().run!.frames.map((f) => f.type);
     expect(types).toContain("cost");
     expect(costRows(capped.id, aborted.sessionId)).toHaveLength(1);
+  });
+
+  it("runs gaid-local over the paid cap and records local usage", async () => {
+    const capped = createProject({ name: "Local over cap", spendLimitUsd: 0.01 });
+    const zero = { costUsd: 0, input: 0, output: 0, cacheRead: 0, total: 0 };
+    recordRun({ sessionId: "earlier", projectId: capped.id, model: "openrouter/paid",
+      before: zero, after: { ...zero, costUsd: 0.02, total: 2 } });
+    const session = new FakeSession();
+    session.model = { provider: "gaid-local", id: "qwen/trial" } as never;
+    const runtime = { checkAuth: vi.fn() };
+    const billing = await billingForModel(session.model, runtime);
+    expect(runtime.checkAuth).not.toHaveBeenCalled();
+    const run = vi.fn(async () => { session.cost = 0.1; });
+    const opened = openRun(claimRun(capped.id, session.sessionId)!, {
+      origin: "user", kind: "turn", prompt: "x", images: [], baseline, session,
+    });
+    await executeRun(opened, { session, paths: resolvePaths(capped.id), billing, budgetPolicy: "refuse", log, run });
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(costRows(capped.id, session.sessionId).map(row => JSON.parse(row))).toEqual([
+      expect.objectContaining({ provider: "gaid-local", authType: "local", billingMode: "local", costUsd: 0, listPriceUsd: 0.1 }),
+    ]);
   });
 
   it("never runs after an explicit abort request and still completes the handle", async () => {

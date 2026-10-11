@@ -46,12 +46,14 @@ describe("resolved provider admission and accounting", () => {
     createProject({ projectId: "meter", name: "Meter", spendLimitUsd: 0.5 });
     handleSubagentMeter("usage", { projectId: "meter", sessionId: "seed", requestId: "seed", ...model, model: model.id, kind: "subagent", authType: "api_key", usage });
     const stream = meteredStream(() => resultStream(), owner(), () => true);
-    for (const provider of ["openai", "ollama", "openai-compatible"]) await (await stream({ provider, id: "test" }, {}, {})).result();
+    for (const provider of ["openai", "ollama", "openai-compatible", "gaid-local"]) await (await stream({ provider, id: "test" }, {}, {})).result();
     const summary = sessionCostSummary("parent", "meter");
     expect(summary.totalUsd).toBe(0);
-    expect(summary.entries).toHaveLength(3);
+    expect(summary.entries).toHaveLength(4);
+    expect(summary.entries[3]).toMatchObject({ provider: "gaid-local", authType: "local", billingMode: "local", costUsd: 0, listPriceUsd: 1, totalTokens: 20 });
     expect(summary.entries[0]).toMatchObject({ billingMode: "subscription", listPriceUsd: 1, totalTokens: 20 });
     await expect(stream({ provider: "anthropic", id: "test" }, {}, {})).rejects.toThrow(/spend limit/);
+    await expect(stream({ provider: "other-local", id: "test" }, {}, {})).rejects.toThrow(/spend limit/);
   });
   it("meters clean watchdog reviews and gates them before the provider is called", async () => {
     createProject({ projectId: "meter", name: "Meter", spendLimitUsd: 0.5 });
@@ -120,6 +122,7 @@ describe("workflow and definition compatibility", () => {
     const input = { workflowScript: 'return runs.run("x", {agent:"scout",task:"check"})' };
     expect(await handlers.tool_call({ toolName: "subagent", input })).toMatchObject({ block: true });
     expect(await handlers.tool_call({ toolName: "subagent", input: { ...input, model: "ollama/free" } })).toBeUndefined();
+    expect(await handlers.tool_call({ toolName: "subagent", input: { ...input, model: "gaid-local/qwen/trial" } })).toBeUndefined();
   });
   it("round-trips nested runner, memory, arrays and unknown typed fields", () => {
     const text = '---\nname: custom\ntools: [read, bash]\nmemory:\n  scope: project\n  path: notes\nrunner:\n  type: external-cli\n  command: cli\n  args: ["--flag", "a:b"]\npermissions:\n  bash: ask\ncustom:\n  enabled: false\n  limit: 12\n---\nPrompt';

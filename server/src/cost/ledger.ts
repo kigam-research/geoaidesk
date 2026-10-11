@@ -16,6 +16,7 @@ import { atomicJson } from "../atomic-json.ts";
 import { activePaths, getProject, resolvePaths } from "../projects.ts";
 import {
   billingForProvider,
+  isLocalProvider,
   normalizeUsageCost,
   type BillingContext,
   type BillingMode,
@@ -141,10 +142,8 @@ function inferredBilling(model: string, role?: CostEntry["role"]): BillingContex
   if (role === "compute" || model === "modal" || model.startsWith("modal/")) {
     return billingForProvider("modal");
   }
-  if (model.startsWith("ollama/")) return billingForProvider("ollama", "local");
-  if (model.startsWith("openai-compatible/")) {
-    return billingForProvider("openai-compatible", "local");
-  }
+  const localProvider = model.split("/", 1)[0];
+  if (model.includes("/") && isLocalProvider(localProvider)) return billingForProvider(localProvider, "local");
   if (model.startsWith("openrouter/") || model.startsWith("fusion/")) {
     return billingForProvider("openrouter", "api_key");
   }
