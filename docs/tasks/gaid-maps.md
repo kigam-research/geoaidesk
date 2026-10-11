@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T05:29:34Z
+updated: 2026-10-11T05:31:15Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -41,11 +41,11 @@ Verified facts from the hub (2026-10-11):
 
 ## Current state
 - Parent API/manifest/inspection integration implemented. Backend typecheck and 30 targeted tests pass.
-- Two child packages (helper and viewer) remain active; not integrated yet.
+- Helper final snapshot d91b8c0 is integrated and published in parent d6384406 (append-only map/depth route conflict resolved preserving both). Helper CLI closure completed (receipt gaid-maps--helper-f71d77ff2d43): no jobs, no rollout, clean child retirement. Viewer source is ready but awaits finish against the integrated helper.
 - Helper environment prepared with frozen uv lock (Python 3.12.14). Browser verification tooling is external under the task data directory.
 - Direct checks authorized by the hub while backbone job-template filtering is repaired. No paid model calls.
 ## Next steps
-1. Integrate completed helper/viewer children with task complete; inspect their reported evidence.
+1. Receive and integrate viewer child completion. The viewer continuation dependency was reported resolved to the hub via route f3b3631f1273.
 2. Run real route/fixture integration tests, browser map-plus-table walkthrough and scripts/check.
 3. task sync shared seams, canonical result report, cache cleanup, task finish.
 ## Failed approaches
@@ -105,3 +105,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - Viewer reports implementation complete, 40 targeted frontend tests/typecheck/lint passed. Its finish merged parent 3481060 but the full check correctly failed because parent's new real integration test refers to the not-yet-integrated helper fixture. Do not weaken that test or copy unpublished sibling files.
 - Helper's corrected finish (boolean category transport fix) is still running full scripts/check. A local ready frontmatter is not a completed CLI publication: attempted `task complete gaid-maps--helper` returned no finished unit/no completion record; no merge occurred.
 - Route reported `--blocked` as a pending-integration checkpoint. Parent remains driver. On final helper completion: task complete helper, verify published parent helper/fixture, update route report so hub resumes existing viewer in place, then integrate viewer and continue browser/full checks. No user decision needed.
+
+### Helper integration evidence
+- `npm --prefix server test -- --run test/geo-maps-integration.test.ts test/geo-maps.test.ts`: 10/10 passed, 2 files, 24.65 s. Actual uv/GDAL HTTP pipeline verified: each rectangle 10000 m², total 20000 m² despite a one-feature display page; category/mask samples; unknown CRS; shapefile companion primary; ordinary TIFF fallback; GPKG layer selection.
+- Published parent includes helper and fixture (git cat-file against origin/task/gaid-maps); route f3b3631f1273 updated completed for the viewer dependency only, not whole WP05. No queued routes.
