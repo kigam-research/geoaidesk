@@ -154,7 +154,7 @@ export async function main(args = process.argv.slice(2)) {
       const selected = list.models.find(x => x.id === model || `${x.provider}/${x.modelId}` === model);
       if (!selected) throw new Error('Selected route/model not listed: connect the intended credential in GAID Settings first');
       record.route = { ...record.route, provider, modelId: model.slice(provider.length+1), appContextTokens: selected.context_length,
-        billingMode: selected.billingMode, pricingUsdPerToken: selected.pricing };
+        billingMode: selected.billingMode, pricingUsdPerMillionTokens: selected.pricing };
     }
     const project = await json('POST','/projects', { body: { name: `Route trial ${o.workflow} ${o.context}`, spendLimitUsd: o.spendLimit } });
     record.projectId = project.id;
@@ -185,6 +185,10 @@ export async function main(args = process.argv.slice(2)) {
     const loaded = [...conn.offload,...m.offload];
     const allocationPassed = o.route !== 'local' || (loaded.length > 0 && loaded.every(s => s.loadedContextTokens === o.context));
     record.task = { ...record.task, ...m, ...artifacts, contextPeakRatio: m.contextPeakTokens === null ? null : m.contextPeakTokens/record.route.appContextTokens,
+      streamedInputTokens: m.inputTokens, streamedOutputTokens: m.outputTokens,
+      inputTokens: ledger.length ? ledger.reduce((s,r) => s+r.promptTokens,0) : m.inputTokens,
+      outputTokens: ledger.length ? ledger.reduce((s,r) => s+r.completionTokens,0) : m.outputTokens,
+      tokenAccounting: ledger.length ? 'ledger-including-compaction-and-aborted-usage' : 'streamed-turns-only',
       ledgerCostUsd: ledger.length ? ledger.reduce((s,r) => s+r.costUsd,0) : null, ledger,
       accountingPassed, allocationPassed,
       evidence: { session: fileEvidence(session.sessionFile,runDir), ledger: fileEvidence(ledgerPath,runDir),

@@ -29,7 +29,8 @@ is never changed. All services started by a successful launcher are stopped in `
   remain visible but do not automatically fail a completed task. Nonempty artifacts do not certify scientific quality.
 - Raw SSE, Ollama API/CLI samples every 15 s, original session JSONL, notebook and provenance remain under the run.
   VRAM fraction describes allocated bytes, while CLI `ollama ps` reports the CPU/GPU split. A missing usage field
-  stays unknown. Dependency-repair detection is a command-pattern observation, not an exhaustive package audit.
+  stays unknown. Token totals use the ledger (including compaction/aborted usage); streamed turn totals are retained
+  separately. Dependency-repair detection is a command-pattern observation, not an exhaustive package audit.
 - A timeout/disconnected SSE explicitly aborts the server-owned run, then waits up to 120 s for accounting to settle.
   Startup failures and cleanup failures are visible in the record. Records are never overwritten.
 
@@ -59,6 +60,7 @@ Cost order: local provider charges are $0 (hardware/electricity excluded). ChatG
 the resolved subscription route; quota/plan charges are external, not assumed unlimited. A personal API task costs
 more than the tiny connection probe because tool schemas and accumulated history are resent every turn. For a
 planning envelope of 50k–500k input tokens and 2k–20k output tokens, use the chosen model's picker pricing:
-`inputTokens * pricing.prompt + outputTokens * pricing.completion` (USD/token). These are sizing assumptions, not
+`(inputTokens * pricing.prompt + outputTokens * pricing.completion) / 1000000` (picker prices are USD/million tokens).
+These are sizing assumptions, not
 a quote or a promised token count. The $1 cap is an admission threshold, not a hard cap on one already admitted
 request. No API or subscription qualification is claimed until those separately approved runs exist.
