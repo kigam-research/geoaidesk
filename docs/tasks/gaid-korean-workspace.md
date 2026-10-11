@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T07:46:06Z
+status: done
+updated: 2026-10-11T07:46:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -68,30 +68,9 @@ Verified facts from the hub (2026-10-11):
   ~/data/geoaidesk/work/gaid-korean-workspace/browser/ (final.mjs, result.mjs, final/).
 
 ## Next steps
-1. Children running (started 2026-10-11 from ba1a71b, profile "general work", normal speed):
-   - gaid-korean-workspace--tasks: Paseo agent 9de57122-4815-4e8d-8db4-f7872cf53c25, worktree
-     ~/worktrees/geoaidesk/gaid-korean-workspace--tasks, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-tasks.md
-   - gaid-korean-workspace--korean: Paseo agent 95c18540-98e5-43b9-a8b5-0d904e284979, worktree
-     ~/worktrees/geoaidesk/gaid-korean-workspace--korean, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-korean.md
-   On each finish notification: `task complete gaid-korean-workspace--<child>`, then integrate.
-   - --tasks completed and closed 2026-10-11 (18df037; its build caches removed for close). Integration fixes by the
-     orchestrator: "스킬 켜기" for installed-but-disabled workflow skills and a not-installed note, unavailable reason
-     names unshipped skills, suggestion content signal shown, recipe issues localized per code (ICU select) instead
-     of the English server message; 64 geo web tests pass.
-   - Early browser pass (dev servers :18070/:3070 as user units gaid-wp07-be/-fe, smoke data, scripts
-     ~/data/geoaidesk/work/gaid-korean-workspace/browser/{flow,flow2}.mjs, shots/ there): LAS → one ready suggestion
-     with 미시험 badge; setup dialog → draft in a NEW tab (file attached, primary skill pinned, source tab unchanged);
-     catalogue lists 7 tasks; recipe file → prefilled setup; seeded fixture session (seed-session.mts, no model call)
-     shows the geo-result card and "지도 열기" opens the map viewer. Fixed: icon-only reusable-skill button (toolbar
-     overflow), catalogue padding/scroll, one recipe import instead of one per card.
-   - --korean completed and closed 2026-10-11 (1b96cfd; 640 `app.*` ids, geo dictionaries moved to catalogues, Geist
-     font fetch removed, Appearance language control). Its two failed intermediate check jobs are disposed as
-     superseded by its job 4 (exit 0; raw ESLint = unchanged upstream baseline). Integration: GAID compact logo in
-     workspace/projects headers, adaptive favicon + apple icon from geo/brand/ (upstream favicon.ico/icon.png removed),
-     notices updated, map `displayFallback` demonstrative fixed, prompt-budget chip previews a started task's
-     exposure (`GET /geo/context/preview?exposure=`). Full web suite 951/951.
-2. Done: both children completed; full check and browser checks recorded; report written. Next: remove build caches,
-   stop the dev units gaid-wp07-be/-fe, `task finish`; then update routed request 0f9f7d4534b2 after integration.
+<!-- task:closed -->
+Closed 2026-10-11T07:46:20Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Scope = WP07 package text only (forwarded goal b619ca2ff749). Done: researcher opens data, sees relevant actions,

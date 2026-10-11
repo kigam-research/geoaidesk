@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T07:22:46Z
+status: done
+updated: 2026-10-11T07:46:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"95c18540-98e5-43b9-a8b5-0d904e284979","pid":449523,"provider":"codex","session":"01a129b9-f186-77a1-ae42-9253040f3f74","start":"16741475","token":"ec255bab0a5fc65b75b65f6aeb3722d4f293311e4cecceb860ef9f810f3b27e0"}
 branch: task/gaid-korean-workspace--korean
 target: task/gaid-korean-workspace
@@ -102,7 +102,7 @@ edited upstream files, and the surfaces left in English. `task save` reviewed fi
 Primary-path catalogue extraction and Korean translation implemented, including dynamic counts, accessible control names, branding, light-theme tokens and Appearance language control. Geo dictionaries moved into catalogues with thin wrappers; old defineGeoStrings removed. Final checked source: 056ac5924b22 (job 4, exit 0). Typecheck and copy validation passed; all 927 tests in 141 files passed. Raw ESLint reports 10 errors and 4 warnings, exactly matching ba1a71b by file/rule/severity; no new diagnostics. Dependency install job 1 exited 0; its npm-ci node_modules copied into this worktree (no lockfile changes).
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-11T07:22:46Z: ready; the parent gaid-korean-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-11T07:46:20Z: integrated into gaid-korean-workspace; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 
