@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:31:43Z
+updated: 2026-10-11T11:33:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -97,6 +97,13 @@ Verified facts from the hub (2026-10-11):
   (install-5 sha256 f6438229…e419; failed install-2/3/4, update-2/5 kept).
 - Linux install proof job 3 at f75e2fc PASSED all 30 steps (record ~/data/geoaidesk/runs/
   gaid-release-proof-20261011T111254.525490Z/out/record.json, sha256 53aa58e4…b509).
+- Catalogue release published 2026-10-11 (user decision 2 가): https://github.com/kigam-research/geoaidesk/releases/tag/geo-catalogue-0.2.1
+  (prerelease; archive + .sha256 + manifest; `node geo/catalogue-release.mjs --verify-remote` ok). Linux install job 4 at
+  0720198 with an empty TASK_ASSETS_DIR downloaded it (launcher log) and PASSED all steps (record sha256 a68cf965…6717;
+  its catalogue.source field mislabels the download as asset).
+- Paid-trial instance: systemd user unit gaid-paid-trial (checkout ~/data/geoaidesk/work/gaid-release-proof/paid/checkout
+  at 0720198, data home …/paid/home, API :18110, UI :18111). Waiting for the user to save one API key and sign in with
+  ChatGPT, and to name provider/model and budget. Stop it with `systemctl --user stop gaid-paid-trial` when done.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)

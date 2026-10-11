@@ -12,6 +12,15 @@
       "records": [
         {
           "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T113007.190448Z/out/record.json",
+          "sha256": "a68cf965f32440803e85995bdb0c2eae1b45326492db9b4d186f323f4d246717",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "0720198c66f1",
+          "note": "catalogue downloaded from the public geo-catalogue-0.2.1 release (launcher log: downloading … saved … sha256 verified); the record's catalogue.source field says asset, a harness labelling error"
+        },
+        {
+          "kind": "install",
           "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/out/record.json",
           "sha256": "53aa58e41ac58c4185fc801261b04fcb2d31355a2c3ede53589d1cf548f2b509",
           "date": "2026-10-11",
