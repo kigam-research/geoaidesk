@@ -15,13 +15,14 @@
 import { lazy } from "react";
 import type { ViewerDef } from "@/lib/viewers/registry";
 
-export type GeoFileCategory = "geo-welllog" | "geo-vector" | "geo-raster";
+export type GeoFileCategory = "geo-depth-result" | "geo-welllog" | "geo-vector" | "geo-raster";
 
 const VECTOR_EXTS = new Set(["shp", "shx", "dbf", "gpkg", "geojson"]);
 
 /** Category from the file name; null leaves upstream dispatch unchanged. */
 export function geoFileCategory(name: string): GeoFileCategory | null {
   const lower = name.toLowerCase();
+  if (lower.endsWith(".depth.json")) return "geo-depth-result";
   // OME-TIFF is microscopy by construction.
   if (lower.endsWith(".ome.tif") || lower.endsWith(".ome.tiff")) return null;
   const ext = lower.includes(".") ? lower.slice(lower.lastIndexOf(".") + 1) : "";
@@ -33,10 +34,12 @@ export function geoFileCategory(name: string): GeoFileCategory | null {
   return null;
 }
 
+const DepthViewer = lazy(() => import("@/geo/viewers/depth/viewer"));
 const GeoInspectionViewer = lazy(() => import("@/geo/viewers/inspection-viewer"));
 
 export const GEO_VIEWER_REGISTRY: Record<GeoFileCategory, ViewerDef> = {
-  "geo-welllog": { loadMode: "none", Viewer: GeoInspectionViewer, canEditSource: false, managesOwnScroll: true },
+  "geo-depth-result": { loadMode: "none", Viewer: DepthViewer, canEditSource: false, managesOwnScroll: true },
+  "geo-welllog": { loadMode: "none", Viewer: DepthViewer, canEditSource: false, managesOwnScroll: true },
   "geo-vector": { loadMode: "none", Viewer: GeoInspectionViewer, canEditSource: false, managesOwnScroll: true },
   "geo-raster": { loadMode: "none", Viewer: GeoInspectionViewer, canEditSource: false, managesOwnScroll: true },
 };
