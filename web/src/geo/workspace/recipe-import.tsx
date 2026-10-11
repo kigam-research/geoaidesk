@@ -34,7 +34,7 @@ export function RecipeImport({ projectId, path, onSetup }: { projectId: string; 
       if (file) void check(() => file.text());
       event.target.value = "";
     }} />}
-    {issues.length > 0 && <ul role="alert" className="space-y-1 break-words">{issues.map((issue, index) => <li key={index}>{t("workspace.recipe.issue", { code: issue.code, message: issue.message })}</li>)}</ul>}
+    {issues.length > 0 && <ul role="alert" className="space-y-1 break-words">{issues.map((issue, index) => <li key={index}>{t("workspace.recipe.issue", { code: issue.code, subject: issue.subject ?? "" })}</li>)}</ul>}
     {error && <p role="alert" className="break-words text-destructive">{error}</p>}
   </div>;
 }

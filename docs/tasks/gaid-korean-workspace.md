@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:02:13Z
+updated: 2026-10-11T07:17:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -66,6 +66,10 @@ Verified facts from the hub (2026-10-11):
    - gaid-korean-workspace--korean: Paseo agent 95c18540-98e5-43b9-a8b5-0d904e284979, worktree
      ~/worktrees/geoaidesk/gaid-korean-workspace--korean, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-korean.md
    On each finish notification: `task complete gaid-korean-workspace--<child>`, then integrate.
+   - --tasks completed and closed 2026-10-11 (18df037; its build caches removed for close). Integration fixes by the
+     orchestrator: "스킬 켜기" for installed-but-disabled workflow skills and a not-installed note, unavailable reason
+     names unshipped skills, suggestion content signal shown, recipe issues localized per code (ICU select) instead
+     of the English server message; 64 geo web tests pass.
 2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
    ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
 ## Failed approaches

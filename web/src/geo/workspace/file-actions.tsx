@@ -42,6 +42,7 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
       {suggestions.map((suggestion) => <article key={suggestion.workflowId} className="min-w-0 max-w-full flex-1 basis-56 space-y-2 rounded border p-2 break-words text-xs">
         <h3 className="font-medium">{text(suggestion.title)}</h3>
         <p>{t("workspace.files.match", { role: text(suggestion.match.roleLabel), format: suggestion.match.format })}</p>
+        {suggestion.match.signal && <p>{t("workspace.files.signal", { kind: suggestion.match.signal.kind, columns: suggestion.match.signal.columns.join(", ") })}</p>}
         <p>{t("workspace.files.needs", { choices: suggestion.needs.map(text).join(", ") || t("workspace.setup.none") })}</p>
         <Readiness value={suggestion.readiness} />
         <Button size="sm" variant="outline" onClick={() => void open(suggestion.workflowId)}>{t("workspace.setup.open")}</Button>
