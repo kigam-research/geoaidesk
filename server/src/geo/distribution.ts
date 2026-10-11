@@ -79,6 +79,54 @@ export function readDistributionRelease(repoRoot: string): DistributionRelease |
   };
 }
 
+/** The catalogue archive a distribution pins (`catalogue.status: "pinned"`). */
+export interface CataloguePin {
+  version: string;
+  /** Archive file name, e.g. `geo-catalogue-0.2.0.tar.gz`. */
+  archive: string;
+  sha256: string;
+}
+
+/**
+ * `catalogue` of the manifest when it pins an archive; null in an upstream
+ * checkout or while the status is `pending`. A pinned entry with missing or
+ * malformed fields throws: a half-pinned catalogue must not fall back to the
+ * upstream sources silently.
+ */
+export function readDistributionCatalogue(repoRoot: string): CataloguePin | null {
+  const manifest = readManifest(repoRoot);
+  const catalogue = manifest?.catalogue as Record<string, unknown> | undefined;
+  if (!catalogue || catalogue.status !== "pinned") return null;
+  const { version, archive, sha256 } = catalogue;
+  const where = `${DISTRIBUTION_FILE}: catalogue`;
+  if (typeof version !== "string" || !/^\d+\.\d+\.\d+([-+][\w.-]+)?$/.test(version)) {
+    throw new Error(`${where}.version must be a semver string`);
+  }
+  if (typeof archive !== "string" || !/^[\w.-]+\.tar\.gz$/.test(archive)) {
+    throw new Error(`${where}.archive must be a .tar.gz file name`);
+  }
+  if (typeof sha256 !== "string" || !/^[0-9a-f]{64}$/.test(sha256)) {
+    throw new Error(`${where}.sha256 must be a lower-case sha256 hex digest`);
+  }
+  return { version, archive, sha256 };
+}
+
+/** Manifest identity of the geo catalogue in each project's `skills-sync.json`. */
+export const GEO_CATALOGUE_REPO = "geo-catalogue";
+export const GEO_CATALOGUE_BRANCH = "release";
+
+/**
+ * Geo catalogue mode: the distribution pins an archive, `GAID_CATALOGUE` is not
+ * `off`, and the user did not point `KADY_SKILLS_REPO` at another catalogue.
+ * When active, the archive replaces the upstream catalogue sources.
+ */
+export function geoCatalogueEnabled(repoRoot: string, env: NodeJS.ProcessEnv = process.env): boolean {
+  const flag = env.GAID_CATALOGUE?.trim().toLowerCase();
+  if (flag === "off" || flag === "0" || flag === "false") return false;
+  if (env.KADY_SKILLS_REPO?.trim()) return false;
+  return readDistributionCatalogue(repoRoot) !== null;
+}
+
 /**
  * Drop excluded skills from catalogue sources; a source left without skills
  * is dropped. Repository names compare case-insensitively, like GitHub.

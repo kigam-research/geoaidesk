@@ -80,8 +80,10 @@ describe("fileCategory — bio-imaging (DICOM/NIfTI/microscopy)", () => {
     expect(fileCategory("a.nii.gz")).toBe("nifti");
   });
   it("classifies TIFF/OME-TIFF microscopy formats", () => {
-    expect(fileCategory("a.tif")).toBe("microscopy");
-    expect(fileCategory("a.tiff")).toBe("microscopy");
+    // GeoAIDesk: a plain TIFF is a raster candidate; its viewer checks the
+    // georeferencing and falls back to the imaging viewer (web/src/geo/viewers).
+    expect(fileCategory("a.tif")).toBe("geo-raster");
+    expect(fileCategory("a.tiff")).toBe("geo-raster");
     expect(fileCategory("a.ome.tif")).toBe("microscopy");
     expect(fileCategory("a.ome.tiff")).toBe("microscopy");
   });

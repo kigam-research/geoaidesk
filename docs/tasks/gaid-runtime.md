@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T02:38:01Z
+updated: 2026-10-11T02:54:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"b82d61f9-5a6a-4f75-927c-8fa251f33d2c","pid":3628209,"provider":"claude","session":"bb619be9-c3b3-4f12-a95f-244d4d2f2c38","start":"15227338","token":"4f8fd5c979bc3f8cf27ceb58e285e3aee5e10c1aae29218d216f1df7838df552"}
 branch: task/gaid-runtime
 target: main
@@ -43,11 +43,51 @@ first; it is the authoritative scope. Summary only:
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-11: resumed; plan, contracts and trial notes read. Catalogue 0.2.0 exported from skill_hub main
+  0228785 (clean `git archive` copy under ~/data/geoaidesk/work/gaid-runtime/skill_hub-0228785, `npm ci`, exporter
+  with `--source-commit`): `geo-catalogue-0.2.0.tar.gz` sha256 0998908e…a205 (6.86 MB),
+  `geo-examples-0.2.0.tar.gz` 943c8bab…f38d; two exports gave identical bytes. Exporter warnings: k-dense/geopandas
+  and k-dense/uncertainty-and-units address scripts as `skills/<name>/scripts` (WP01 open point, checked here).
+- Archive is over the 5 MB Git limit, so it is a named asset, not a tracked file.
 ## Next steps
-1. (the next session's first action)
+1. Settle shared interfaces (catalogue loader, geo-inspection/v1 types, geo route/session registration hubs) and
+   commit them; then start child writers env + local-model (+ inspect) with those interfaces.
 ## Failed approaches
 ## Notes and decisions
+### Plan (2026-10-11)
+Sequential decisions (writer, first):
+1. Catalogue delivery: archive as asset `~/assets/geo-catalogue/0.2.0/` (+ `configs/inputs.toml` entry);
+   `geo/distribution.json` `catalogue.{version,archive,sha256}` pins it. The backend locates it via
+   `GAID_CATALOGUE_ARCHIVE` → `<GAID_HOME>/catalogue/<archive>` → `<checkout>/geo/catalogue/<archive>` (ignored,
+   accompanying in a release bundle), verifies sha256 and every package digest, unpacks into the skills cache with
+   a dependency-free tar reader. No network fetch until a public release asset exists (open item).
+2. Staging adapter: in geo mode `fetchCatalogue()` returns the unpacked `runtime/skills` trees; `skills-sync.ts`
+   stays the only installer. Manifest identity is constant (`geo-catalogue`/`release`), the catalogue label
+   (`geo-catalogue@<version>+<sha12>`) is recorded per project in `upstreamCommit`. New projects are seeded through
+   sync (no sibling copy); existing projects get the geo skills added once per pinned version, everything else
+   untouched (untracked skills are preserved as customized).
+3. Task exposure: per-session record `.kady/geo/exposure/<sessionId>.json` (`all` | `catalogue` | `workflow:<id>`)
+   applied through Pi's `skillsOverride` (non-exposed skills get `disableModelInvocation`; files untouched, still
+   `/skill:` invocable). New chats take the project default (`catalogue` in geo mode); chats with history and no
+   record stay `all` (unchanged behaviour).
+4. Prompt budget: `GET /geo/context?sessionId=` from the live session (system prompt + active tool schemas,
+   chars/4 estimate), model context window/max output, exposed/total skills, observed context usage.
+Independent packages (after the interfaces are committed):
+- child `env` (Codex general work): environment loader/closure from `environments.json`, helper
+  `pyproject.toml`/`uv.lock` (geo-core + geo-gis), geo project seed pyproject, import tests in both targets,
+  readiness route. Owns `server/src/geo/environments.ts`, `server/src/geo/routes/environments.ts`,
+  `server/src/helpers/{pyproject.toml,uv.lock}`, seam lines in `sandbox-seed.ts`/`helpers-env.ts`.
+- child `local-model` (Codex general work): Ollama context check/derived-model creation, custom-model entry with
+  explicit context, default model; Settings card. Owns `server/src/geo/local-model.ts`,
+  `server/src/geo/routes/local-model.ts`, `web/src/geo/local-model/`.
+- child `inspect` (Codex general work): geo-inspection/v1 inspectors (TS sniffers + `geo_inspect_helper.py`),
+  `POST /geo/inspect`, `geo_inspect`/`geo_read_window` tools, read-hint extension, generic inspection viewer.
+  Owns `server/src/geo/{inspection,tools,read-hints}.ts`, `server/src/geo/routes/inspection.ts`,
+  `server/src/helpers/geo_inspect_helper.py`, `web/src/geo/viewers/`.
+Writer keeps: catalogue/context/exposure modules, every registration seam (`index.ts`, `session-registry.ts`,
+`config.ts`, `skills*.ts`, `prep.ts`, web registry/use-sandbox/file-preview-panel hook lines), the boundaries
+file, `scripts/check`, distribution manifest, report. Integration order: writer interfaces → env, local-model,
+inspect in parallel → writer integration + checks.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

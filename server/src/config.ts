@@ -8,7 +8,13 @@
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyCatalogueExclusions, readDistributionExclusions } from "./geo/distribution.ts";
+import {
+  applyCatalogueExclusions,
+  GEO_CATALOGUE_BRANCH,
+  GEO_CATALOGUE_REPO,
+  geoCatalogueEnabled,
+  readDistributionExclusions,
+} from "./geo/distribution.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,13 +58,22 @@ export const KADY_PI_AGENT_DIR = path.resolve(
 );
 
 /**
+ * GeoAIDesk: `geo/distribution.json` pins a catalogue archive, which then
+ * replaces the upstream sources (server/src/geo/catalogue.ts). The manifest
+ * identity is constant across catalogue versions so an update keeps each
+ * project's applied hashes; the version is recorded as the applied commit.
+ */
+export const GEO_CATALOGUE_MODE = geoCatalogueEnabled(REPO_ROOT);
+
+/**
  * Default skill catalogue. Lives here rather than in `agent/skills.ts` so the
  * CLI-backed fetcher can reference it without importing back into the module
  * that installs from it.
  */
 export const SKILLS_REPO =
-  process.env.KADY_SKILLS_REPO ?? "K-Dense-AI/scientific-agent-skills";
-export const SKILLS_BRANCH = process.env.KADY_SKILLS_BRANCH ?? "main";
+  process.env.KADY_SKILLS_REPO ?? (GEO_CATALOGUE_MODE ? GEO_CATALOGUE_REPO : "K-Dense-AI/scientific-agent-skills");
+export const SKILLS_BRANCH =
+  process.env.KADY_SKILLS_BRANCH ?? (GEO_CATALOGUE_MODE ? GEO_CATALOGUE_BRANCH : "main");
 
 /** A GitHub repo contributing named skills to the catalogue. */
 export interface CatalogueSource {

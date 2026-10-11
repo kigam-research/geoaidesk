@@ -50,6 +50,7 @@ import { startAutomaticSkillSync } from "./agent/skills-sync.ts";
 import { modalJobManager } from "./modal/manager.ts";
 import { syncHelperVenv } from "./helpers-env.ts";
 import { configureHttpProxy } from "./http-proxy.ts";
+import { registerGeoRoutes } from "./geo/routes.ts";
 
 function readCookie(req: FastifyRequest, name: string): string | undefined {
   const raw = req.headers.cookie;
@@ -199,6 +200,8 @@ export async function buildApp() {
   await registerSpeechRoutes(app);
   await registerModalRoutes(app);
   await registerModelProviderRoutes(app);
+  // GeoAIDesk routes (catalogue, context, environments, inspection, local model).
+  await registerGeoRoutes(app);
 
   // Reattach durable jobs after routes are available. Recovery schedules
   // active jobs in the background and immediately reconciles any terminal job

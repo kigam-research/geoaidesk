@@ -23,10 +23,9 @@
     },
     {
       "path": "server/src/config.ts",
-      "owner": "gaid-fork-base",
+      "owner": "gaid-runtime",
       "status": "edited",
-      "responsibility": "Catalogue extra sources filtered by geo/distribution.json excludedSources; later distribution defaults go to gaid-runtime",
-      "next": "gaid-runtime"
+      "responsibility": "Catalogue extra sources filtered by geo/distribution.json excludedSources (gaid-fork-base); GEO_CATALOGUE_MODE and the geo catalogue manifest identity as SKILLS_REPO/SKILLS_BRANCH defaults when the distribution pins an archive (gaid-runtime)"
     },
     {
       "path": "server/src/api/system.ts",
@@ -74,8 +73,8 @@
     {
       "path": "server/src/agent/skills-fetch.ts, server/src/agent/skills.ts",
       "owner": "gaid-runtime",
-      "status": "unchanged",
-      "responsibility": "Release-bundle staging and task-exposure adapter; skills-sync.ts stays the only installer into live skill directories"
+      "status": "edited",
+      "responsibility": "skills-fetch.ts: fetchCatalogue() returns the verified pinned archive (server/src/geo/catalogue-staging.ts) in geo catalogue mode. skills.ts unchanged; skills-sync.ts stays the only installer into live skill directories"
     },
     {
       "path": "server/src/sandbox-seed.ts, server/src/helpers-env.ts",
@@ -84,16 +83,34 @@
       "responsibility": "Seed selected geo environments and concise project instructions"
     },
     {
+      "path": "server/src/prep.ts, server/src/api/projects.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "Skill seeding calls provisionProjectSkills (server/src/geo/provision.ts): the pinned geo catalogue through skills-sync in geo mode, upstream seedProjectSkills otherwise"
+    },
+    {
+      "path": "server/vitest.config.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "GAID_CATALOGUE=off for the test run so upstream tests keep exercising the upstream catalogue path; geo tests opt in explicitly"
+    },
+    {
+      "path": "web/src/lib/use-sandbox.test.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "A plain .tif/.tiff is now the geo-raster candidate category (its viewer falls back to the imaging viewer); OME-TIFF stays microscopy"
+    },
+    {
       "path": "server/src/agent/session-registry.ts",
       "owner": "gaid-runtime",
-      "status": "unchanged",
-      "responsibility": "Register geo inspection/context extensions and tools (extensionFactories, customTools)"
+      "status": "edited",
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride for task exposure, geo extension factories and custom tools appended to the lead lists"
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
       "owner": "gaid-runtime",
-      "status": "unchanged",
-      "responsibility": "Mount geo routes and helpers"
+      "status": "edited",
+      "responsibility": "index.ts: registerGeoRoutes (server/src/geo/routes.ts) after the upstream routes; sci-helpers.ts unchanged"
     },
     {
       "path": "server/src/agent/scientific-result.ts",
@@ -104,8 +121,8 @@
     {
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
       "owner": "gaid-korean-workspace",
-      "status": "unchanged",
-      "responsibility": "Format-aware dispatch; gaid-runtime publishes the geo viewer interface; gaid-well-tables and gaid-maps may append their own entries (append-only lines); gaid-korean-workspace owns any non-additive change",
+      "status": "edited",
+      "responsibility": "Format-aware dispatch. gaid-runtime added the geo seam: fileCategory() asks geoFileCategory() first and VIEWER_REGISTRY spreads GEO_VIEWER_REGISTRY (web/src/geo/viewers/registry.ts); gaid-well-tables and gaid-maps change only their own entry in that geo registry (append-only); gaid-korean-workspace owns any non-additive change",
       "appendOnly": [
         "gaid-well-tables",
         "gaid-maps"

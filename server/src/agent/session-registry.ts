@@ -73,6 +73,7 @@ import {
 import { LEAD_DEFAULT_TOOLS, LEAD_EXCLUDED_TOOLS } from "./tools.ts";
 import { seedSubagentRuntimeSettings } from "./subagent-runtime-settings.ts";
 import { applyVerifierDefault } from "./verifier-models.ts";
+import { geoSessionParts } from "../geo/session.ts";
 
 // Entry points normally establish this in env.ts. Keep the registry safe when
 // imported directly (tests/scripts) so child Pi processes still share the same
@@ -384,11 +385,19 @@ async function build(
   // One settings manager for the loader and the session, so the lead's
   // default-tool additions apply on top of the user's own `defaultTools`.
   const settingsManager = SettingsManager.create(paths.sandbox, getAgentDir());
+  // GeoAIDesk: task exposure (skillsOverride), read hints and geo tools.
+  const geo = geoSessionParts({
+    projectId,
+    paths,
+    sessionId: ownId ?? "",
+    isNew: sessionManager.getEntryCount() === 0,
+  });
   const resourceLoader = new DefaultResourceLoader({
     cwd: paths.sandbox,
     agentDir: getAgentDir(),
     settingsManager,
     additionalExtensionPaths: [subagentsExtensionPath()],
+    skillsOverride: geo.skillsOverride,
     extensionFactories: [
       makeSubagentLedgerExtension(
         projectId,
@@ -440,6 +449,7 @@ async function build(
       createToolSearchExtension(),
       createMcpExtension(),
       makeSubagentControlExtension(projectId),
+      ...geo.extensionFactories,
     ],
   });
   await resourceLoader.reload();
@@ -486,6 +496,7 @@ async function build(
       ...pdfAnnotationTools,
       ...modalTools,
       imageTool,
+      ...geo.customTools,
     ],
   });
   // Pi emits `session_start` only from bindExtensions(); without it the

@@ -1,0 +1,16 @@
+# Named inputs outside Git (backbone docs/project-standard.md). `path` is relative to the assets root
+# (~/assets or TASK_ASSETS_DIR) for layer "asset".
+format = 1
+
+[[input]]
+name = "geo_catalogue"
+layer = "asset"
+id = "geo-catalogue"
+version = "0.2.0"
+path = "geo-catalogue/0.2.0"
+manifest_sha256 = "acb59cf6dc273d91bd3dca0b279f813ef5277e1531e58ab117ab9789ef8becec"
+files = ["geo-catalogue-0.2.0.tar.gz", "geo-examples-0.2.0.tar.gz"]
+sha256 = { "geo-catalogue-0.2.0.tar.gz" = "0998908ef7bae10245b9cd30d3aa81929153d3d4427bc0dc1759391afb12a205", "geo-examples-0.2.0.tar.gz" = "943c8bab71405b208f9c67f7e5341e58cd896e1a1a9b75a3dc3caeb1262bf38d" }
+source = "kigam-research/skill_hub@022878506f5d4b2ac7a3d98b1f9dbd416fc969f3 web/scripts/export-byok.ts --release registry/byok/releases/0.2.0.yaml"
+consumers = ["server/src/geo/catalogue.ts", "geo/distribution.json"]
+size_bytes = 12546222

@@ -21,6 +21,10 @@ export default defineConfig({
       KADY_SKILLS_CACHE_DIR:
         process.env.VITEST_SKILLS_CACHE_DIR ??
         path.join(os.tmpdir(), `kady-vitest-skills-cache-${process.pid}`),
+      // GeoAIDesk: the pinned geo catalogue would replace the upstream
+      // catalogue sources the upstream tests exercise; geo tests opt in
+      // through explicit options (server/src/geo/catalogue.ts).
+      GAID_CATALOGUE: process.env.VITEST_GAID_CATALOGUE ?? "off",
     },
   },
 });

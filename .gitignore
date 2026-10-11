@@ -68,3 +68,6 @@ AGENTS.md
 CLAUDE.md
 # Local scratch work (demo videos, concepts)
 /work/
+
+# GeoAIDesk: pinned catalogue archive placed next to a checkout (over the 5 MB Git limit)
+geo/catalogue/*.tar.gz
