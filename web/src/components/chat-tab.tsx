@@ -896,7 +896,7 @@ function ChatInput({
         : { refs: researchRefs, failed: [] };
       if (snapshots.failed.length > 0) {
         toast.warning(
-          appText("chat.composer.snapshotFailed", { count: snapshots.failed.length }),
+          appText("chat.composer.snapshotFailed", { count: snapshots.failed.length, name: snapshots.failed[0] ?? "" }),
           { description: appText("chat.composer.kady_will_search_the_full_chat_log") },
         );
       }

@@ -522,7 +522,7 @@
   "chat.composer.imageAlt": "Attached image {index}",
   "chat.composer.providerQuota": "{provider} manages billing and quota",
   "chat.composer.queueWait": "Queue is full ({count}/{count}). Wait for the agent to work through it.",
-  "chat.composer.snapshotFailed": "Could not snapshot {count, plural, one {# chat} other {# chats}}.",
+  "chat.composer.snapshotFailed": "Couldn't snapshot {count, plural, one {\"{name}\"} other {# chats}}",
   "chat.composer.compacted": "Context compacted: {before} tokens{after, select, none {} other { → about {after}}}{cost, select, none {} other { · {cost}}}",
   "chat.contextMenu.fileHelp": "Upload data, figures, manuscripts, or code. Everything lands in the sandbox and can be referenced with @.",
   "chat.contextMenu.skillsHelp": "Opt-in playbooks for specific tasks (e.g. scanpy, literature-review, modal). The AI agent follows pinned skills on every message until you remove them.",
