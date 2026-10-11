@@ -78,7 +78,7 @@ try {
   await e.step('seed-history', async () => {
     // Use Pi's installed serializer offline; it writes the actual JSONL header/entry chain.
     const script = path.join(e.out, 'seed-session.mjs');
-    fs.writeFileSync(script, `import { SessionManager } from ${JSON.stringify(pathToFileURL(path.join(dir, 'server/node_modules/@earendil-works/pi-coding-agent/dist/index.js')).href)};\nconst s=SessionManager.create(process.argv[2],process.argv[3]);s.appendMessage({role:'user',content:'Release proof synthetic history',timestamp:Date.now()});console.log(JSON.stringify({id:s.getSessionId(),file:s.getSessionFile()}));\n`);
+    fs.writeFileSync(script, `import { SessionManager } from ${JSON.stringify(pathToFileURL(path.join(dir, 'server/node_modules/@earendil-works/pi-coding-agent/dist/index.js')).href)};\nconst s=SessionManager.create(process.argv[2],process.argv[3]);s.appendMessage({role:'user',content:[{type:'text',text:'Release proof synthetic history'}],timestamp:Date.now()});console.log(JSON.stringify({id:s.getSessionId(),file:s.getSessionFile()}));\n`);
     const sandbox = path.join(g.dataHome, 'projects', project, 'sandbox');
     const r = JSON.parse(command(process.execPath, [script, sandbox, path.join(sandbox, '.pi/sessions')], { log: path.join(e.out, 'seed-history.log') }).split('\n').at(-1));
     state.session = r.id; return { ...r, synthetic: true, modelCalled: false, method: 'Pi SessionManager.appendMessage offline (not a model-produced chat)' };

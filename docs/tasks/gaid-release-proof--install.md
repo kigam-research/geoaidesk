@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:23:28Z
+updated: 2026-10-11T08:26:03Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -89,12 +89,15 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Harness saved at 6b7e25e; native install job 1 passed all steps (first start 44,055ms; restart 6,009ms).
 - Native update job 2 failed at project creation because harness sent an unknown project scope. Fixed creation to use default scope; original failed record retained.
 - PC71 WSL install/update services gaid-proof-{install,update}-20261011 and native Windows scheduled task GAID-Install-Proof-20261011 launched from harness 6b7e25e. Outputs: pc71:~/data/geoaidesk/work/gaid-release-proof/install/{wsl-install,wsl-update}; pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install.
+- PC71 WSL install passed all steps (62,079ms first start, 4,006ms restart). Native Node geo suite passed 28/28 tests (46.5s).
+- Update job 3 checked all preservation items except history, whose synthetic seed used a string instead of the app's text-block array. Corrected that harness seed; retained the failed record.
 ## Next steps
-1. Save scoped-project correction; rerun native + WSL update proof into new evidence directories.
+1. Save text-block history seed; rerun native + WSL update proof into new evidence directories.
 2. Collect the already-launched installation records; fix only harness failures.
 3. Record every result and limitation, run the declared Node geo tests, then task finish.
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
+- PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
 ## Notes and decisions
 - Sequential decisions: settle evidence steps and safe fresh-output ownership first, then install runner, update runner, actual host runs, final checks.
 - Owned interfaces: install-* helpers + install-proof/update-proof; shared instance changes only when required for cleanup. No server/web/app edits.
@@ -114,6 +117,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082159.930245Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082352.235557Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
