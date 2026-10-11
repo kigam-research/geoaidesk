@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T10:47:17Z
+updated: 2026-10-11T10:47:36Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -72,6 +72,18 @@ Verified facts from the hub (2026-10-11):
   route is documented → do not advertise. Gemini CLI OAuth reuse prohibited (Pi has no such login).
 - Windows rerun at d2c535f: scheduled task GAID-Proof2-20261011 on pc71-win runs install-proof then update-proof
   (out C:\Users\KIGAM_Ahn\gaid-proof\windows-{install,update}-2, status proof2-status.txt, logs proof2-*.log).
+- Windows root cause (2026-10-11): reruns at d2c535f failed the same way from a scheduled task AND from an
+  interactive ssh session (fresh clone, data home "GAID home 한글"); second starts and ASCII data homes pass. Isolated
+  on pc71-win: Node 24.13 `fs.rmSync` (any), recursive `fs.rmdirSync` and `fs.cpSync`, and Node 22.21 `fs.cpSync`, kill
+  the process (0xC0000409 / 0xC0000005, no JS error) when a path has non-ASCII characters; primitives and async
+  fs.cp/fs.rm work. A Korean Windows user name puts the default data home on such a path. Fix 616113d:
+  geo/win-fs-shim.mjs (JS rmSync/cpSync/rmdirSync for non-ASCII paths on win32 only), loaded by geo/start.mjs in-process
+  and via NODE_OPTIONS --import for every child; verified on pc71-win for Node 24.13 and 22.21. Windows install proof
+  rerun at 616113d: out C:\Users\KIGAM_Ahn\gaid-proof\windows-install-4, local log
+  ~/data/geoaidesk/work/gaid-release-proof/windows-install-4.log.
+- Routes child integrated (closed): 4 local records; jobs 1–3 exit 1 = partial task outcomes by the record contract
+  (evidence, not harness failures; no disposition). geo/compatibility.json, docs/geo/compatibility.md, local-model
+  profile/copy (localModel.recorded/compact64/evidence) and docs/local-models-ollama.md updated from them.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
