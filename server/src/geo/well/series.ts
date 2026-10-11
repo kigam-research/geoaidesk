@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import type { ProjectPaths } from "../../projects.ts";
 import { SandboxError } from "../../sandbox-fs.ts";
 import { runHelperScript } from "../../api/sci-helpers.ts";
-import { resolveGeoPath } from "../inspection.ts";
+import { inspectGeoFile, resolveGeoPath } from "../inspection.ts";
 import { parseDepthManifest, type DepthWindow, type DepthWindowRequest } from "../../../../web/src/geo/contracts/depth.ts";
 export const LAS_MAX_BYTES = 64 * 1024 * 1024;
 const helper = fileURLToPath(new URL("./las_helper.py", import.meta.url));
@@ -23,6 +23,10 @@ export async function readSeriesWindow(paths: ProjectPaths, request: DepthWindow
   if (result.status !== 0) throw new SandboxError(result.status === 3 ? 503 : result.timedOut ? 504 : 422, result.stderr || "LAS preview could not be parsed");
   if (Buffer.byteLength(result.stdout) > 4 * 1024 * 1024) throw new SandboxError(413, "LAS window exceeded the response limit");
   const out = JSON.parse(result.stdout) as DepthWindow;
+  // Reuse the shared header interpretation offered to agent tools: a comment
+  // declaring depth basis must not mean something different in the browser.
+  const metadata = await inspectGeoFile("series", paths, b.path, { previewRows: 0 });
+  if (out.depth) out.depth.basis = metadata.depth?.basis ?? "unknown";
   const after = await resolveGeoPath(paths, b.path);
   if (after.size !== file.size || after.mtime !== file.mtime) throw new SandboxError(409, "The LAS changed during reading; retry the window");
   return { ...out, path: file.rel, fingerprint: createHash("sha256").update(JSON.stringify([file.rel, file.size, file.mtime, "las-window/1"])).digest("hex") };

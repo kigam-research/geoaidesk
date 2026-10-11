@@ -1,5 +1,6 @@
 "use client";
 
+import { TableInspectionOption } from "@/geo/viewers/tables/table-option";
 import { CsvViewer } from "./csv-viewer";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
@@ -2009,6 +2010,7 @@ export function FilePreviewPanel({
               ? ""
               : "overflow-auto bg-muted/10"
           )}>
+            <TableInspectionOption key={`${projectId}:${selectedPath}`} path={selectedPath} name={selectedName ?? ""} content={fileContent} projectId={projectId}>
             <FileViewer
               path={selectedPath}
               projectId={projectId}
@@ -2033,6 +2035,7 @@ export function FilePreviewPanel({
                   : undefined
               }
             />
+            </TableInspectionOption>
           </div>
         </>
       )}

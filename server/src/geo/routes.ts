@@ -10,6 +10,7 @@ import { registerGeoEnvironmentRoutes } from "./routes/environments.ts";
 import { registerGeoInspectionRoutes } from "./routes/inspection.ts";
 import { registerGeoLocalModelRoutes } from "./routes/local-model.ts";
 
+import { registerGeoTableRoutes } from "./routes/tables.ts";
 import { registerGeoDepthRoutes } from "./routes/depth.ts";
 
 export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
@@ -18,4 +19,5 @@ export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoInspectionRoutes(app);
   await registerGeoLocalModelRoutes(app);
   await registerGeoDepthRoutes(app);
+  await registerGeoTableRoutes(app);
 }
