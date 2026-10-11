@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T05:04:18Z
+status: done
+updated: 2026-10-11T05:04:40Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -49,9 +49,9 @@ Context:
 - Full rerun passed backend typecheck and 1,582 tests (11 skipped), frontend 898 tests, and the development launcher check. Distribution validation rejected the seam owner slug; changed ownership metadata to the parent WP03 package gaid-runtime, then all 11 distribution tests passed. Environment imports, GAID launcher, and production start/restart checks passed directly under the hub-authorized exception. Production smoke verified 13 skills, excluded sources absent, persistence, and unchanged tracked files.
 - task sync fetched and merged main dad53b41 into the unit; no conflicts. Current snapshot before fixture fix: 1133236ee2ff.
 ## Next steps
-1. Run task finish with CHECK_LOG_FILE=~/data/geoaidesk/work/gaid-runtime-followups/check-final.log (required full scripts/check). Do not edit tracked files while it runs. If it fails, fix in place and rerun without resume.
-2. Remove regenerable worktree caches after the final check; verify the tree is clean.
-3. Relay the hub's final completion report once; do not archive the unit.
+<!-- task:closed -->
+Closed 2026-10-11T05:04:40Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - task job run -- scripts/check failed before launch because inherited .env.example is a forbidden snapshot path. No job/receipt was created; no protected file was read or changed. Use the CLI's declared-check integration path (task sync/finish), not a manual publication workaround.
 - Initial lead-run regression reported cost but zero tokens: the ledger intentionally skips zero-cost/zero-token rows after local normalization. The corrected fixture reports two tokens. An intervening focused attempt ran the stale fixture because the correction script was initially invoked from server/ instead of the worktree root; the root invocation and fresh rerun passed.
