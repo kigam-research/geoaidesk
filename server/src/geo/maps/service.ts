@@ -21,6 +21,8 @@ function integer(value: unknown, name: string, min: number, max: number, fallbac
 }
 export function parseMapRequest(value: unknown): MapRequest {
   const body = record(value);
+  if (typeof body.offset === "number" && body.offset > 100000) throw new SandboxError(400, "offset exceeds the display paging limit; use an analysis script");
+  if (typeof body.band === "number" && body.band > 65535) throw new SandboxError(400, "band is out of range");
   const displayCrs = text(body.displayCrs, "displayCrs");
   if (displayCrs && !/^(EPSG:\d{3,6}|native)$/.test(displayCrs)) throw new SandboxError(400, "displayCrs must be EPSG:<code> or native");
   const bbox = body.bbox;

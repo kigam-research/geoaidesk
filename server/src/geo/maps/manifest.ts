@@ -19,8 +19,10 @@ export function validateMapManifest(value: unknown): MapManifest {
     if (!object(layer) || !short(layer.sourceCrs) || !short(layer.displayCrs) || typeof layer.unit !== "string" || layer.unit.length > 128
       || !Array.isArray(layer.legend) || layer.legend.length > 256 || !layer.legend.every(entry => object(entry) && short(entry.label) && typeof entry.color === "string" && /^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(entry.color))
       || !(layer.nodata === null || typeof layer.nodata === "string" || (typeof layer.nodata === "number" && Number.isFinite(layer.nodata)))) invalid();
-    parseMapRequest({ ...layer, bbox: layer.extent });
-    if (!Array.isArray(layer.extent)) invalid();
+    parseMapRequest(layer);
+    // A point or axis-aligned line has a valid zero-width/height source extent.
+    // Only a requested viewport must have positive width and height.
+    if (!Array.isArray(layer.extent) || layer.extent.length !== 4 || !layer.extent.every(v => typeof v === "number" && Number.isFinite(v)) || layer.extent[0] > layer.extent[2] || layer.extent[1] > layer.extent[3]) invalid();
   }
   for (const key of ["tablePath", "scriptPath"] as const) if (value.analysis[key] !== undefined && !short(value.analysis[key])) invalid();
   return value as unknown as MapManifest;
@@ -41,10 +43,12 @@ export async function readMapManifest(projectId: string, paths: ProjectPaths, re
     const inspection = await inspectGeoFile(projectId, paths, layer.path, { previewRows: 0 });
     if (!["vector", "raster"].includes(inspection.asset.family) || inspection.asset.format === "tiff") throw new SandboxError(422, "A map manifest layer is not a supported map dataset");
     if (layer.layer && !inspection.layers?.some(item => item.name === layer.layer)) throw new SandboxError(422, `Map layer not found: ${layer.layer}`);
+    if (!layer.layer && (inspection.layers?.length ?? 0) > 1) throw new SandboxError(422, "A multi-layer map result requires an explicit layer name");
     const crs = layer.layer ? inspection.layers?.find(item => item.name === layer.layer)?.crs ?? inspection.crs : inspection.crs;
     if (crs?.status === "unknown" && layer.displayCrs !== "native") throw new SandboxError(422, "Unknown source CRS requires native-coordinate display");
     // Metadata is authoritative; stale result records cannot silently relabel a source.
-    if (crs?.authority && layer.sourceCrs !== crs.authority) throw new SandboxError(422, "Map manifest source CRS differs from the current dataset declaration");
+    const wgs84 = new Set(["OGC:CRS84", "EPSG:4326"]);
+    if (crs?.authority && layer.sourceCrs !== crs.authority && !(wgs84.has(crs.authority) && wgs84.has(layer.sourceCrs))) throw new SandboxError(422, "Map manifest source CRS differs from the current dataset declaration");
     inspections.push(inspection);
   }
   return { manifest, inspections };

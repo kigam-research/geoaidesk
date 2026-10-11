@@ -33,7 +33,8 @@ export function registerGeoInspector(inspector: GeoInspector): void {
 }
 export function inspectorFor(format: GeoFormat): GeoInspector | undefined { return inspectors.get(format); }
 export const MAX_PREVIEW_ROWS = 50;
-/** Total actual IO per source file, including format sniffing and random TIFF reads. */
+/** Baseline byte-reader IO per file, including sniffing and TIFF reads.
+ * Format-aware map helpers use metadata/window operations with separate time/output limits. */
 export const MAX_INSPECTION_BYTES = 256 * 1024;
 registerGeoInspector(baselineInspector);
 registerGeoInspector(mapInspector);
@@ -108,7 +109,7 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
   };
   const rows = options.previewRows ?? 8;
   // Do not let a GDAL reader follow a companion that failed sandbox validation.
-  if (unsafeCompanion) return result;
+  if (unsafeCompanion) return { ...result, crs: { status: "unknown" } };
   const ctx: GeoInspectContext = { projectId, paths, relPath: primary.rel, absPath: primary.abs, sizeBytes: primary.size, format, previewRows: Number.isFinite(rows) ? Math.max(0, Math.min(MAX_PREVIEW_ROWS, Math.floor(rows))) : 8, sourceFiles, readBytes };
   try {
     let parsed = await inspector.inspect(ctx);

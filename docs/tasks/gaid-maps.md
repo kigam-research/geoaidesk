@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:47:30Z
+updated: 2026-10-11T04:50:56Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -80,3 +80,13 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - First dependency/targeted-check job did not start: `job snapshot blocked: forbidden path .env.example`, exit 1, no receipt. Existing upstream template was not read/edited. Do not delete or rename it to bypass the CLI.
 - Forwarded dependency to geoaidesk hub with `task hub --send`, request `65caed1a1d90`; follow the returned resolution before rerunning a new launch. No periodic polling.
 - Next action: receive child completion/CLI resolution, complete each child, run targeted checks and full scripts/check, then sync/report/cleanup/finish. Parent can review child results and continue independent integration after notification. No completion claim.
+
+### Hub resolution: direct checks authorized
+- Hub reply to `65caed1a1d90` verifies a backbone `.env*` snapshot-policy inconsistency; fix routed to backbone as c3b9eff232af. User accepted: "제안대로 하자."
+- Explicit interim authorization: run checks directly in this worktree, without `task job run`; checks are not retained analytical runs. `.env.example` stays unchanged/unread.
+- `npm --prefix server ci --no-audit --no-fund`: passed (504 packages, 10 s). Targeted typecheck/tests now running directly under that authorization.
+- `npm --prefix server run typecheck`: passed.
+- First targeted tests: 27/29 passed; corrected unsafe-companion unknown CRS metadata and equivalent WGS84 authority handling (OGC:CRS84/EPSG:4326). This was a code-level failure, unrelated to the job CLI.
+- Native read-only reviewer `/root/map_api_review` checks the parent TypeScript integration only; child writers remain sole owners of helper and viewer. Parent will triage concrete blockers.
+- Targeted recheck: 29/29 tests passed (3 files). Typecheck passed again.
+- Read-only reviewer found degenerate point/line manifest extents rejected and high offsets silently clamped. Parent now separately validates source extents (equality allowed) and rejects offsets above 100000; added regression assertions. Multi-layer manifests require explicit layer selection.

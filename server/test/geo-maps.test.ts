@@ -24,6 +24,7 @@ describe("map transport bounds and scientific scope", () => {
   it("caps viewport payload and strips undeclared options/project overrides", () => {
     expect(parseMapRequest({ path: "a.tif", width: 9999, height: 5000, limit: 3000, projectId: "other", assumeCrs: "EPSG:4326" })).toMatchObject({ width: 256, height: 256, limit: 500 });
     expect(parseMapRequest({ path: "a.tif", projectId: "other" })).not.toHaveProperty("projectId");
+    expect(() => parseMapRequest({ path: "a.geojson", offset: 100001 })).toThrow(/paging limit/);
     for (const extra of [{ bbox: [0,0,0,1] }, { bbox: [0,0,Infinity,1] }, { width: -1 }, { limit: "1" }, { categorical: "yes" }, { displayCrs: "guessed" }]) expect(() => parseMapRequest({ path: "x", ...extra })).toThrow();
   });
   it("requires explicit analytical method and does not forward a viewport/sample into area", () => {
@@ -52,6 +53,10 @@ describe("map transport bounds and scientific scope", () => {
   });
 });
 describe("map manifest adapter", () => {
+  it("accepts real point and axis-aligned line extents without accepting inverted bounds", () => {
+    for (const extent of [[1,2,1,2], [1,2,1,5], [1,2,5,2]]) expect(validateMapManifest({ ...manifest(), layers: [{ ...manifest().layers[0], extent }] }).layers[0].extent).toEqual(extent);
+    expect(() => validateMapManifest({ ...manifest(), layers: [{ ...manifest().layers[0], extent: [2,2,1,1] }] })).toThrow();
+  });
   it("loads artifact references in the active sandbox and preserves numerical-table reference", async () => {
     f.write("rocks.geojson", geojson); f.write("areas.csv", "class,area_m2\na,1\n"); f.write("result.geomap.json", JSON.stringify(manifest()));
     const out = await readMapManifest("p", f.paths, "result.geomap.json");
