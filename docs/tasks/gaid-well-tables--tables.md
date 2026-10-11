@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:44:47Z
+updated: 2026-10-11T04:51:51Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"8b4d426a-82dc-444e-9347-60354a8ffce4","pid":3988444,"provider":"codex","session":"01a12946-e997-71b3-80cd-cd78dd1a4c97","start":"15987572","token":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
 branch: task/gaid-well-tables--tables
 target: task/gaid-well-tables
@@ -37,3 +37,11 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+### Implementation checkpoint
+- Sequential decisions: one explicit read-only role overlay, no automatic mapping application; index-based mappings preserve duplicate/original column names. CSV/TSV are UTF-8 (BOM accepted), XLSX uses selected worksheet, formulas remain unevaluated text.
+- Scope and ownership unchanged; no child writers or shared glue edits. Parent integrates exported registerGeoTableRoutes and TableRolesViewer.
+- Source/data bounds: 16 MiB source, 64 MiB expanded XLSX, 50 sheets, 64 columns, 20k rows, 200k cells, 4 MiB parsed data, 12 preview rows, 200 findings. Partial/unassessed states are separate from no findings.
+- New implementation drafted in owned files. Native codegraph lookup reports this exact worktree unindexed; source files read directly. Focused route/helper tests and required recorded scripts/check job next; parent retains whole-app/browser integration ownership.
+- Pre-check review: gap findings are suppressed if the source is partial or a hole contains uncertain/invalid rows; unmatched-key absence is not inferred from a partial opposite table. Positive overlaps/duplicates remain reportable on read rows.
+- First check launch refused before execution because the source was dirty (`job source dirty; save first`). Save the reviewed snapshot, then start the recorded job; no job receipt was created.
