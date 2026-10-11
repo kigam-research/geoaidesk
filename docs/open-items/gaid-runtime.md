@@ -1,6 +1,0 @@
-# Open items from gaid-runtime
-
-Recorded: 2026-10-11. Close or answer an item from the project hub with `task item close|answer <id>`; closed items move to docs/open-items/closed/gaid-runtime.md.
-
-- [결정 gaid-runtime#1] 로컬 모델의 최소 컨텍스트 안내 — 가) 64K 이상을 최소로 안내(32K 제안 프로필 제거)하고 64K·98K를 WP10에서 실제 과제로 시험 — 나) 32K 지원을 목표로 로컬 모델용 도구 노출 축소 패키지를 새로 만듦 — 권장: 가) 도구를 최대한 빼도 32K에서는 대화 자리가 수천 토큰에 그치고 핵심 도구를 빼면 연구 기록 기능이 사라짐 — 막힌 일: 로컬 모델 안내 문구와 WP10 시험 조합 — 근거: reports/2026-10-11-gaid-runtime#6-결정할-일 — 답함 2026-10-11: gaid-runtime#1을 포함하여 #1,2,3,4 모두 권장안으로 진행하자. (가) for #1: 64K minimum, 32K profile removed; 64K/98K trials in WP10 gaid-release-proof. 가) for #3: local billing seam.) (후속: gaid-runtime-followups)
-- [부채 gaid-runtime#3] 로컬 모델 항목(gaid-local)은 비용 0의 사용량 과금으로 분류되어 지출 한도를 넘긴 프로젝트에서는 실행이 거부됨 — 가) billing을 local로 분류하는 이음매 추가 — 나) 현재 유지 — 권장: 가) 로컬 모델은 과금 대상이 아님 — 막힌 일: 한도 초과 프로젝트의 로컬 실행 — 근거: reports/2026-10-11-gaid-runtime#5-한계 — 답함 2026-10-11: gaid-runtime#1을 포함하여 #1,2,3,4 모두 권장안으로 진행하자. (가) for #1: 64K minimum, 32K profile removed; 64K/98K trials in WP10 gaid-release-proof. 가) for #3: local billing seam.) (후속: gaid-runtime-followups)

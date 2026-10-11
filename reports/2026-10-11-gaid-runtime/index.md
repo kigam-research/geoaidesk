@@ -4,7 +4,7 @@ date: 2026-10-11
 project: geoaidesk
 task: gaid-runtime
 headline: 앱이 skill_hub 카탈로그 0.2.0을 해시로 확인해 설치하고, 지질 패키지를 미리 갖춘 환경과 파일 요약·대용량 읽기 안내를 제공하며, 채팅마다 시작 프롬프트 크기를 보여 줍니다. 다만 도구 설명만 약 19K 토큰이라 32K 로컬 모델은 여전히 부족합니다.
-review_status: pending
+review_status: adopted
 decisions: 2
 cover: figures/01-start-prompt.png
 supersedes:
