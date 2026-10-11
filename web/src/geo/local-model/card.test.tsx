@@ -27,7 +27,7 @@ describe("LocalModelCard", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<LocalModelCard />);
     expect(await screen.findByText("Ollama 연결됨")).toBeInTheDocument();
-    expect(screen.getByText(/CPU 오프로딩 약 18%/)).toBeInTheDocument();
+    expect(screen.getByText(/98K 약 18%/)).toBeInTheDocument();
     expect(screen.getByLabelText("지정한 context로 파생 모델 생성")).not.toBeChecked();
     expect(screen.getByLabelText("context 프로필")).toHaveValue("proposed-64k");
     expect(screen.getByLabelText("context 토큰 수")).toHaveValue(65536);

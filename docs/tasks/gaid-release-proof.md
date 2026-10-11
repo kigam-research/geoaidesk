@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T10:47:36Z
+updated: 2026-10-11T10:53:21Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -84,6 +84,9 @@ Verified facts from the hub (2026-10-11):
 - Routes child integrated (closed): 4 local records; jobs 1–3 exit 1 = partial task outcomes by the record contract
   (evidence, not harness failures; no disposition). geo/compatibility.json, docs/geo/compatibility.md, local-model
   profile/copy (localModel.recorded/compact64/evidence) and docs/local-models-ollama.md updated from them.
+- scripts/check job 1 (tree 41b789e; receipt ~/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z) exit 1:
+  backend 153 files passed (2 known mzML tests skipped by the network probe), web 1 failed — card.test.tsx still
+  looked for the old local-model copy "CPU 오프로딩 약 18%"; test updated to the new string. Rerun pending.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -136,6 +139,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
