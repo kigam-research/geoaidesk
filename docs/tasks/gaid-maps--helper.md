@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T04:56:00Z
+status: ready
+updated: 2026-10-11T04:56:17Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7e627c39-8f96-4667-b685-4abba81a1202","pid":3990813,"provider":"codex","session":"01a12947-209f-7462-af88-d33c6c6d402a","start":"15989002","token":"2dabed18e5678b6758b2e4cee4be4a86329fcde0a86a4b1c1a9f684785d9f064"}
 branch: task/gaid-maps--helper
 target: task/gaid-maps
@@ -30,8 +30,9 @@ Tests must exercise exact projected rectangle 100x100 (10000m²), independent co
 - Implementation limits: 500 displayed features/page, offset 100000, 64 displayed fields (256 inventory), 512-char display attributes, 10000 vertices/feature and 30000/page; raster grid capped at 256², 128 categorical classes. Full-layer area rejects >100000 features, >2000000 vertices, >1000 classes, oversized geometries or invalid/nonpolygon geometry; never returns a subset area table. Helper response <=7 MiB; cooperative deadline 17 s plus parent's hard timeout.
 - TIFF tag inspection uses already-installed `tifffile` (header only); raster pixels use bounded Rasterio windows/WarpedVRT. No new dependencies or paid model runs.
 ## Next steps
-1. Save reviewed owned files and run `task finish` (declared `scripts/check` runs on the final candidate).
-2. Remove regenerable check caches after final checks; parent integrates the ready child with `task complete gaid-maps--helper`.
+<!-- task:closed -->
+Closed 2026-10-11T04:56:17Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Two supplemental fixture checks exposed fixture construction mistakes, now corrected: GDAL writes explicit affine tags even for an identity transform (plain image fixture now uses tifffile); RGBA needs GTiff `ALPHA=YES` rather than only setting color interpretation. Focused final suite passes.
 ## Notes and decisions
