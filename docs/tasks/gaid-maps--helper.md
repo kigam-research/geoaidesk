@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:45:19Z
+updated: 2026-10-11T04:56:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7e627c39-8f96-4667-b685-4abba81a1202","pid":3990813,"provider":"codex","session":"01a12947-209f-7462-af88-d33c6c6d402a","start":"15989002","token":"2dabed18e5678b6758b2e4cee4be4a86329fcde0a86a4b1c1a9f684785d9f064"}
 branch: task/gaid-maps--helper
 target: task/gaid-maps
@@ -21,21 +21,28 @@ Area full-layer polygons grouped classField: explicit method projected + areaCrs
 Tests must exercise exact projected rectangle 100x100 (10000m²), independent coordinate oracle (e.g. EPSG4326 lon0 lat0 ->3857 0,0 and known degree formula), multi-layer GPKG, missing CRS, categorical nearest no interpolated classes, nodata, plain TIFF versus GeoTIFF, non-COG windows, oversized/bounded requests. Generate binaries outside repo temporary dirs; tests invoked by scripts/check existing node --test geo/tests/*.test.mjs. Keep generated fixtures synthetic MIT. When done report commands/results/limitations and finish your child task; parent integrates with task complete.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the assigned worktree; read repository rules, parent ownership, map/inspection contracts and plan §3.2–3.3.
+- Helper dependencies import through the frozen uv helper environment (Python 3.12.14).
+- Implemented all four stdin JSON operations in `server/src/geo/maps/helper.py`; no shared contracts/routes/dependencies were edited.
+- Final focused verification: `node --test geo/tests/maps-helper.test.mjs` passed 11/11 (49.9 s). `git diff --check` passed.
+- Known answers cover exact 10000 m² rectangles, independent spherical Mercator coordinates, WGS84 ellipsoidal area/holes, feet-to-m² conversion, missing CRS/companions, multi-layer GeoPackage with unsupported tables/tiles, GeoJSON recognized from `.json`, plain TIFF versus affine/identity GeoTIFF, mask/alpha/nodata and categorical nearest-neighbor PNG samples, non-COG windows, pagination and limits.
+- Safe re-verification: run the focused Node command above; fixtures are generated in disposable temporary directories outside Git. The fixture generator expects a fresh destination.
+- Implementation limits: 500 displayed features/page, offset 100000, 64 displayed fields (256 inventory), 512-char display attributes, 10000 vertices/feature and 30000/page; raster grid capped at 256², 128 categorical classes. Full-layer area rejects >100000 features, >2000000 vertices, >1000 classes, oversized geometries or invalid/nonpolygon geometry; never returns a subset area table. Helper response <=7 MiB; cooperative deadline 17 s plus parent's hard timeout.
+- TIFF tag inspection uses already-installed `tifffile` (header only); raster pixels use bounded Rasterio windows/WarpedVRT. No new dependencies or paid model runs.
 ## Next steps
-1. (the next session's first action)
+1. Save reviewed owned files and run `task finish` (declared `scripts/check` runs on the final candidate).
+2. Remove regenerable check caches after final checks; parent integrates the ready child with `task complete gaid-maps--helper`.
 ## Failed approaches
+- Two supplemental fixture checks exposed fixture construction mistakes, now corrected: GDAL writes explicit affine tags even for an identity transform (plain image fixture now uses tifffile); RGBA needs GTiff `ALPHA=YES` rather than only setting color interpretation. Focused final suite passes.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential decisions: contracts are fixed by parent; helper keeps source/display CRS distinct; previews never provide analytical area input.
+- Owned implementation and tests stay in the three assigned files; no child writers/readers or shared-seam edits.
+- Integration order: helper + fixtures -> focused tests -> CLI declared checks -> parent contract handoff. Parent owns application transport/UI integration and the canonical report.
+- Limitations passed to parent: unsupported GeoPackage raster/nonspatial content is inventory-only; unknown CRS cannot transform/overlay or calculate area; native rotated rasters require a declared CRS; GCP-only files retain native pixel inspection; geodesic polygons spanning >180° longitude are rejected. Attribute display truncation has explicit issues; analytical class labels are never truncated.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child unit: evidence and limitations above are for the parent-owned canonical report; no separate report.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
