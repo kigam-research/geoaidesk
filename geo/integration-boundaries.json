@@ -29,9 +29,9 @@
     },
     {
       "path": "server/src/api/system.ts",
-      "owner": "gaid-fork-base",
+      "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Release check against the distribution repository and tag prefix"
+      "responsibility": "Release check against the distribution repository and tag prefix (gaid-fork-base); highest published geo-v* release from the release list, prereleases included outside the stable channel (gaid-release-proof)"
     },
     {
       "path": "web/next.config.ts",

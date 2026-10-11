@@ -52,3 +52,53 @@ test("isInside compares path segments, not prefixes", () => {
   assert.ok(!isInside("/a/b", "/a/bc"));
   assert.ok(!isInside("/a/b", "/a"));
 });
+
+// Catalogue download (gaid-runtime#2): planned only when no searched place has the archive.
+test("the catalogue is downloaded into the data home only when no searched place has it", async () => {
+  const { planCatalogue } = await import("../start.mjs");
+  const env = { GAID_HOME: path.join(home, ".geoaidesk") };
+  const target = path.join(home, ".geoaidesk", "catalogue", distribution.catalogue.archive);
+  const missing = planCatalogue(distribution, env, { root, home, exists: () => false });
+  assert.deepEqual(missing, {
+    action: "download",
+    url: distribution.catalogue.download.url,
+    target,
+    sha256: distribution.catalogue.sha256,
+  });
+  assert.match(distribution.catalogue.download.url, /^https:\/\/github\.com\/kigam-research\/geoaidesk\/releases\/download\//);
+  assert.ok(distribution.catalogue.download.url.endsWith(`/${distribution.catalogue.archive}`));
+  const asset = path.join(home, "assets", "geo-catalogue", distribution.catalogue.version, distribution.catalogue.archive);
+  assert.deepEqual(planCatalogue(distribution, env, { root, home, exists: (p) => p === asset }), { action: "present", path: asset });
+  assert.equal(planCatalogue(distribution, { ...env, GAID_CATALOGUE: "off" }, { root, home, exists: () => false }).action, "none");
+  assert.equal(planCatalogue(distribution, { ...env, KADY_SKILLS_REPO: "o/r" }, { root, home, exists: () => false }).action, "none");
+  assert.equal(planCatalogue(distribution, { ...env, GAID_CATALOGUE_DOWNLOAD: "0" }, { root, home, exists: () => false }).action, "none");
+  assert.equal(planCatalogue(distribution, { ...env, GAID_CATALOGUE_URL: "file:///m/c.tgz" }, { root, home, exists: () => false }).url, "file:///m/c.tgz");
+});
+
+test("a downloaded catalogue is kept only when its sha256 matches the pin", async () => {
+  const crypto = await import("node:crypto");
+  const fs = await import("node:fs");
+  const os = await import("node:os");
+  const { pathToFileURL } = await import("node:url");
+  const { downloadCatalogue } = await import("../start.mjs");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gaid-cat-"));
+  try {
+    const source = path.join(dir, "source.tar.gz");
+    fs.writeFileSync(source, "archive bytes");
+    const sha256 = crypto.createHash("sha256").update("archive bytes").digest("hex");
+    const target = path.join(dir, "home", "catalogue", "c.tar.gz");
+    await downloadCatalogue({ url: pathToFileURL(source).href, target, sha256 });
+    assert.equal(fs.readFileSync(target, "utf-8"), "archive bytes");
+    fs.rmSync(target);
+    await assert.rejects(downloadCatalogue({ url: pathToFileURL(source).href, target, sha256: "0".repeat(64) }), /does not match/);
+    const fetchImpl = async () => new Response("archive bytes");
+    await downloadCatalogue({ url: "https://example.invalid/c.tar.gz", target, sha256 }, { fetchImpl });
+    assert.equal(fs.readFileSync(target, "utf-8"), "archive bytes");
+    const notFound = async () => new Response("no", { status: 404 });
+    fs.rmSync(target);
+    await assert.rejects(downloadCatalogue({ url: "https://example.invalid/c", target, sha256 }, { fetchImpl: notFound }), /HTTP 404/);
+    assert.deepEqual(fs.readdirSync(path.dirname(target)), [], "no partial file left behind");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

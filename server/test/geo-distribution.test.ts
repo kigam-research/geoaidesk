@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { CATALOGUE_EXTRA_SOURCES, MANAGED_ENV_FILE, REPO_ROOT } from "../src/config.ts";
 import {
   applyCatalogueExclusions,
+  pickLatestRelease,
   readDistributionExclusions,
   readDistributionRelease,
 } from "../src/geo/distribution.ts";
@@ -70,5 +71,25 @@ describe("GeoAIDesk distribution policy", () => {
   it("writes Settings keys to the repo-root .env unless KADY_ENV_FILE is set", () => {
     if (process.env.KADY_ENV_FILE?.trim()) return;
     expect(MANAGED_ENV_FILE).toBe(path.join(REPO_ROOT, ".env"));
+  });
+});
+
+describe("pickLatestRelease", () => {
+  const releases = [
+    { tag_name: "geo-catalogue-0.2.1", prerelease: true },
+    { tag_name: "geo-v0.1.0", prerelease: true },
+    { tag_name: "geo-v0.10.0", draft: true },
+    { tag_name: "geo-v0.2.0-rc.1", prerelease: true },
+    { tag_name: "geo-v0.2.0", prerelease: true },
+    { tag_name: "v9.9.9" },
+  ];
+  it("picks the highest published app tag, prereleases included on the preview channel", () => {
+    expect(pickLatestRelease(releases, "geo-v", true)).toBe("0.2.0");
+    expect(pickLatestRelease(releases.slice(0, 4), "geo-v", true)).toBe("0.2.0-rc.1");
+  });
+  it("ignores drafts, other tags and, on the stable channel, prereleases", () => {
+    expect(pickLatestRelease(releases, "geo-v", false)).toBeNull();
+    expect(pickLatestRelease([...releases, { tag_name: "geo-v0.1.1" }], "geo-v", false)).toBe("0.1.1");
+    expect(pickLatestRelease([], "geo-v", true)).toBeNull();
   });
 });

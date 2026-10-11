@@ -10,7 +10,7 @@ import {
   openaiCompatibleBaseUrl,
   openaiCompatibleConfigured,
 } from "../config.ts";
-import { readDistributionRelease } from "../geo/distribution.ts";
+import { pickLatestRelease, readDistributionRelease } from "../geo/distribution.ts";
 import { getSystemStats } from "../system-stats.ts";
 
 // A distribution checks its own releases (e.g. GeoAIDesk `geo-v0.1.0` tags),
@@ -35,8 +35,10 @@ export async function registerSystemRoutes(app: FastifyInstance): Promise<void> 
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 3000);
       const token = process.env.GITHUB_TOKEN;
+      // A distribution reads its release list (see pickLatestRelease); upstream
+      // keeps GitHub's "latest release".
       const resp = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+        `https://api.github.com/repos/${GITHUB_REPO}/releases${distribution ? "?per_page=50" : "/latest"}`,
         {
           signal: ctrl.signal,
           headers: {
@@ -50,9 +52,17 @@ export async function registerSystemRoutes(app: FastifyInstance): Promise<void> 
         versionCache = { ts: now, latestVersion: null };
         return { latestVersion: null };
       }
-      const data = (await resp.json()) as { tag_name?: string };
-      const tag = data.tag_name ?? "";
-      const latestVersion = (tag.startsWith(TAG_PREFIX) ? tag.slice(TAG_PREFIX.length) : "") || null;
+      let latestVersion: string | null;
+      if (distribution) {
+        const data = (await resp.json()) as unknown;
+        latestVersion = Array.isArray(data)
+          ? pickLatestRelease(data, TAG_PREFIX, distribution.channel !== "stable")
+          : null;
+      } else {
+        const data = (await resp.json()) as { tag_name?: string };
+        const tag = data.tag_name ?? "";
+        latestVersion = (tag.startsWith(TAG_PREFIX) ? tag.slice(TAG_PREFIX.length) : "") || null;
+      }
       versionCache = { ts: now, latestVersion };
       return { latestVersion };
     } catch {
