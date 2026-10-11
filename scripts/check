@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Declared checks for geoaidesk: the upstream CI steps (.github/workflows/tests.yml) on Linux.
-# Backend typecheck + vitest (with the scientific helper env), frontend vitest, launcher --check.
+# Backend typecheck + vitest (with the scientific helper env), frontend vitest, launcher --check,
+# then the GAID distribution checks and the production smoke (geo/tests/).
 # Needs Node >= 22, uv, and network access to the npm registry and PyPI (dependencies come from the lockfiles).
 set -euo pipefail
 # Preserve full output when the task CLI captures subprocess streams without exposing them.
@@ -46,5 +47,13 @@ step 'Frontend: tests'
 
 step 'Launcher: --check'
 ./start.sh --check
+
+step 'GAID: distribution checks'
+node --test 'geo/tests/*.test.mjs'
+step 'GAID: launcher --check'
+./start-gaid.sh --check
+step 'GAID: production smoke (clean data home, start, stop, restart)'
+# Free ports and a temporary data home; network for the first-start catalogue and sandbox environment.
+node geo/tests/production-smoke.mjs
 
 printf '\nAll geoaidesk checks passed.\n'

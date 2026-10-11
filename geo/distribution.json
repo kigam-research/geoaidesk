@@ -1,0 +1,47 @@
+{
+  "schema": "gaid-distribution/v1",
+  "productName": "GeoAIDesk",
+  "shortName": "GAID",
+  "appId": "geoaidesk",
+  "version": "0.1.0",
+  "releaseTagPrefix": "geo-v",
+  "channel": "preview",
+  "repository": "kigam-research/geoaidesk",
+  "issuesUrl": "https://github.com/kigam-research/geoaidesk/issues",
+  "upstreamLock": "geo/upstream.lock.json",
+  "integrationBoundaries": "geo/integration-boundaries.json",
+  "launch": {
+    "entryPoints": ["start-gaid.sh", "start-gaid.cmd"],
+    "mode": "production",
+    "developmentLaunchers": ["start.sh", "start.cmd"]
+  },
+  "dataHome": {
+    "env": "GAID_HOME",
+    "default": "~/.geoaidesk",
+    "paths": {
+      "KADY_PROJECTS_ROOT": "projects",
+      "KADY_PI_AGENT_DIR": "pi-agent",
+      "KADY_SKILLS_CACHE_DIR": "skills-cache",
+      "KADY_OFFICE_ASSETS_DIR": "office-assets",
+      "KADY_ENV_FILE": "config.env"
+    }
+  },
+  "environment": {
+    "KADY_SKILLS_AUTO_SYNC": "0",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "catalogue": {
+    "status": "pending",
+    "note": "The pinned geo catalogue archive (geo-catalogue-<version>.tar.gz from skill_hub WP01) is staged by WP03 gaid-runtime. Until then initial provisioning uses the upstream catalogue source with automatic refresh off.",
+    "version": null,
+    "archive": null,
+    "sha256": null,
+    "excludedSources": [
+      {
+        "repo": "anthropics/skills",
+        "skills": ["docx", "pdf", "pptx", "xlsx"],
+        "reason": "License terms of the four document skills restrict use outside Anthropic's services and redistribution (skill_hub geo-byok-plan section 2.6; release 0.1.0 excludedSources). Not bundled and not fetched automatically; manual installation by the user stays available."
+      }
+    ]
+  }
+}

@@ -13,15 +13,22 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 | `server/src/helpers/` | Python helper environment (uv project) used by scientific tools and tests |
 | `server/pi-packages/` | Vendored Pi packages (PDF annotations, Modal) |
 | `web/` | Frontend (Next.js 16 / React 19), port 3000 |
-| `start.mjs`, `start.sh`, `start.cmd` | Cross-platform launcher (installs deps, seeds skills, starts both services) |
+| `start.mjs`, `start.sh`, `start.cmd` | Cross-platform launcher (installs deps, seeds skills, starts both services); development entry points |
+| `start-gaid.sh`, `start-gaid.cmd`, `geo/start.mjs` | GeoAIDesk entry points: production build, user data under `GAID_HOME` |
+| `geo/` | Distribution manifest, upstream lock, integration boundaries, release manifest script, `tests/` (unit + production smoke) |
+| `server/src/geo/` | GAID backend modules (`distribution.ts` reads `geo/distribution.json`) |
+| `NOTICE.md`, `THIRD_PARTY_NOTICES.md` | Fork attribution, third-party and excluded sources |
 | `docs/` | Upstream user documentation; `docs/cloud-policy.md` hosted-cloud work policy; `docs/tasks/` task documents |
-| `scripts/check` | Declared checks (upstream CI steps on Linux) |
-| `.github/workflows/` | Upstream CI (`tests.yml`) and release workflow |
+| `scripts/check` | Declared checks (upstream CI steps on Linux + GAID checks and production smoke) |
+| `.github/workflows/` | Upstream CI (`tests.yml`, unchanged), `gaid-checks.yml`, GAID tag-driven draft `release.yml` |
 
 ## Data and hosts
 - data_host: pc74; replica: pc71. Root checkout `pc74:~/repos/geoaidesk`; outputs `pc74:~/data/geoaidesk`.
-- App state outside Git: projects under `KADY_PROJECTS_ROOT` (default `<checkout>/projects`, ignored);
-  Pi agent config/auth under `~/.kady/pi-agent` (`PI_CODING_AGENT_DIR`); credentials in `.env` (never read or staged).
+- App state outside Git. Distribution (`start-gaid.*`): everything under `GAID_HOME` (default `~/.geoaidesk`:
+  `projects/`, `pi-agent/`, `config.env`, `skills-cache/`, `office-assets/`). Development launchers: projects under
+  `KADY_PROJECTS_ROOT` (default `<checkout>/projects`, ignored), Pi agent config/auth under `~/.kady/pi-agent`
+  (`PI_CODING_AGENT_DIR`), credentials in `.env`. Never read or stage env/credential files.
+- Smoke runs keep their logs under `~/data/geoaidesk/work/<slug>/` when `GAID_SMOKE_DIR` points there.
 - Deployed SHAs: none yet.
 
 ## Upstream

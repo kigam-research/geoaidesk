@@ -1,0 +1,31 @@
+{
+  "schema": "gaid-upstream-lock/v1",
+  "repository": "https://github.com/K-Dense-AI/k-dense-byok",
+  "remote": "upstream",
+  "branch": "main",
+  "commit": "44c52cee8e9fdc343c6132909769f49accf14a82",
+  "committedAt": "2026-10-03T21:12:41-07:00",
+  "packageVersion": "0.15.0",
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "copyright": "Copyright (c) 2026 K-Dense"
+  },
+  "harness": {
+    "@earendil-works/pi-agent-core": "1.0.0",
+    "@earendil-works/pi-ai": "1.0.0",
+    "@earendil-works/pi-coding-agent": "1.0.0",
+    "pi-subagents": "0.74.0",
+    "pi-web-access": "0.35.0",
+    "skills": "1.7.0"
+  },
+  "lockfiles": [
+    "server/package-lock.json",
+    "web/package-lock.json",
+    "server/src/helpers/uv.lock"
+  ],
+  "integration": {
+    "method": "merge commit on a task branch",
+    "procedure": "docs/upstream-sync.md"
+  }
+}

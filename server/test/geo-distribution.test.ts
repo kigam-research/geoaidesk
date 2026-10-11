@@ -1,0 +1,74 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import { CATALOGUE_EXTRA_SOURCES, MANAGED_ENV_FILE, REPO_ROOT } from "../src/config.ts";
+import {
+  applyCatalogueExclusions,
+  readDistributionExclusions,
+  readDistributionRelease,
+} from "../src/geo/distribution.ts";
+
+const sources = [
+  { repo: "anthropics/skills", branch: "main", skills: ["docx", "pdf", "pptx", "xlsx"] },
+  { repo: "other/skills", branch: "main", skills: ["a", "b"] },
+];
+
+function tempRepo(manifest: string | null): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gaid-dist-"));
+  if (manifest !== null) {
+    fs.mkdirSync(path.join(dir, "geo"));
+    fs.writeFileSync(path.join(dir, "geo", "distribution.json"), manifest);
+  }
+  return dir;
+}
+
+describe("GeoAIDesk distribution policy", () => {
+  it("does not fetch the excluded anthropics/skills document skills", () => {
+    expect(CATALOGUE_EXTRA_SOURCES.flatMap((s) => s.skills)).not.toEqual(
+      expect.arrayContaining(["docx"]),
+    );
+    expect(CATALOGUE_EXTRA_SOURCES.some((s) => s.repo.toLowerCase() === "anthropics/skills")).toBe(false);
+  });
+
+  it("drops listed skills, whole sources, and empty sources", () => {
+    expect(
+      applyCatalogueExclusions(sources, [{ repo: "Anthropics/Skills", skills: ["docx", "pdf"], reason: "r" }]),
+    ).toEqual([
+      { repo: "anthropics/skills", branch: "main", skills: ["pptx", "xlsx"] },
+      sources[1],
+    ]);
+    expect(applyCatalogueExclusions(sources, [{ repo: "other/skills", reason: "r" }])).toEqual([sources[0]]);
+    expect(
+      applyCatalogueExclusions(sources, [{ repo: "anthropics/skills", skills: ["docx", "pdf", "pptx", "xlsx"], reason: "r" }]),
+    ).toEqual([sources[1]]);
+  });
+
+  it("reads the shipped manifest", () => {
+    expect(readDistributionExclusions(REPO_ROOT)).toEqual([
+      expect.objectContaining({ repo: "anthropics/skills", skills: ["docx", "pdf", "pptx", "xlsx"] }),
+    ]);
+    expect(readDistributionRelease(REPO_ROOT)).toEqual(
+      expect.objectContaining({ repository: "kigam-research/geoaidesk", releaseTagPrefix: "geo-v" }),
+    );
+  });
+
+  it("treats a missing manifest as an upstream checkout and a malformed one as an error", () => {
+    expect(readDistributionExclusions(tempRepo(null))).toEqual([]);
+    expect(readDistributionRelease(tempRepo(null))).toBeNull();
+    expect(() => readDistributionExclusions(tempRepo("{"))).toThrow();
+    expect(() =>
+      readDistributionExclusions(tempRepo(JSON.stringify({ catalogue: { excludedSources: [{ repo: "x" }] } }))),
+    ).toThrow(/repo must be/);
+    expect(() =>
+      readDistributionExclusions(
+        tempRepo(JSON.stringify({ catalogue: { excludedSources: [{ repo: "a/b", skills: ["x"] }] } })),
+      ),
+    ).toThrow(/reason is required/);
+  });
+
+  it("writes Settings keys to the repo-root .env unless KADY_ENV_FILE is set", () => {
+    if (process.env.KADY_ENV_FILE?.trim()) return;
+    expect(MANAGED_ENV_FILE).toBe(path.join(REPO_ROOT, ".env"));
+  });
+});
