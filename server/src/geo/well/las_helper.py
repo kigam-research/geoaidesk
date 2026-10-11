@@ -131,8 +131,11 @@ def window(filename, request):
             seen.add(float(v))
     gap = np.zeros(n, dtype=bool)
     reversal = np.zeros(n, dtype=bool)
+    declared_step = finite(log.well['STEP'].value) if 'STEP' in log.well else None
+    spacing = abs(declared_step) if declared_step and abs(declared_step) > TOL else abs(step)
+    if spacing:
+        gap[1:] = np.isfinite(diff) & (np.abs(diff) > spacing * 1.5 + TOL)
     if step:
-        gap[1:] = np.isfinite(diff) & (np.abs(diff) > abs(step) * 1.5 + TOL)
         reversal[1:] = np.isfinite(diff) & (diff * step < -TOL * abs(step))
     breaks[1:] = bad[1:] | bad[:-1] | duplicate[1:] | gap[1:] | reversal[1:]
     issues = []
