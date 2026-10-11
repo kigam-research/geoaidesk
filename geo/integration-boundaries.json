@@ -79,8 +79,8 @@
     {
       "path": "server/src/sandbox-seed.ts, server/src/helpers-env.ts",
       "owner": "gaid-runtime",
-      "status": "unchanged",
-      "responsibility": "Seed selected geo environments and concise project instructions"
+      "status": "edited",
+      "responsibility": "sandbox-seed.ts: a missing pyproject.toml is seeded through seededProjectPyproject (server/src/geo/environments.ts: geo-core + geo-gis project packages in geo catalogue mode, upstream text otherwise); existing files are never rewritten. helpers-env.ts: syncHelperVenv runs uv sync --python 3.12 (catalogue packages need Python >= 3.12)"
     },
     {
       "path": "server/src/prep.ts, server/src/api/projects.ts",
@@ -154,10 +154,9 @@
     },
     {
       "path": "server/package.json, server/package-lock.json, web/package.json, web/package-lock.json, server/src/helpers/pyproject.toml, server/src/helpers/uv.lock",
-      "owner": "gaid-fork-base",
-      "status": "unchanged",
-      "responsibility": "Dependency locks: one package at a time adds dependencies; the owner moves to the package that needs a change and back after its merge",
-      "next": "gaid-runtime"
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "Dependency locks: one package at a time adds dependencies. gaid-runtime added the geo-core + geo-gis helper packages to server/src/helpers/pyproject.toml (uv environments limited to the four shipped platforms with Python >= 3.12) and relocked uv.lock; the owner returns to the next package that needs a change"
     }
   ],
   "notTouched": [
