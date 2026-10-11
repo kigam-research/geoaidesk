@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-11T06:49:53Z
-writer: {"host":"seongin3","reserved":"0ad6da35675d2000f5c07717317e785564506d6fc8b8286f4dc84b6231054c5a"}
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9de57122-4815-4e8d-8db4-f7872cf53c25","pid":447397,"provider":"codex","session":"01a129b9-c31e-7393-9a91-1bf9bdacb66f","start":"16740288","token":"0ad6da35675d2000f5c07717317e785564506d6fc8b8286f4dc84b6231054c5a"}
 branch: task/gaid-korean-workspace--tasks
 target: task/gaid-korean-workspace
 parent: gaid-korean-workspace
