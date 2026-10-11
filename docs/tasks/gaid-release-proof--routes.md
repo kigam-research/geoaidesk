@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T10:02:43Z
+updated: 2026-10-11T10:06:22Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -69,7 +69,8 @@ design note for the paid routes (what the script does for `api-key` with one per
 server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
-- Four GPU jobs launched (see Running jobs). Jobs 1–3 are terminal partial. Job 4 (98K map) is the only remaining model trial. No paid calls or repeats: failures/incomplete settlement arose from model-generated code/tool arguments, not harness configuration.
+- All four required GPU-serialized local trials are terminal and recorded: all connections passed; 64K LAS, 64K map and 98K LAS tasks partial; 98K map passed the declared file-presence/known-area engineering acceptance. All started services stopped and trial variants unloaded. No paid/subscription calls or repeats.
+- The requested test matrix and reusable scripts are delivered, not a general local-model qualification: neither LAS task is accepted scientific QC, and only one synthetic map task met bounded engineering acceptance. No workflow skill activation/read was observed in any trial despite workflow-specific exposure and an explicit instruction to read the skill.
 - Bounded first-98K allocation check: app/configured/loaded context=98304, Ollama CPU/GPU=18%/82%. The managed variant suffix is -gaid-96k (98304/1024); this is the requested 98,304-token trial, not an unintended smaller allocation.
 - `node --test 'geo/tests/*.test.mjs'` passed 26/26 in 39.260 s; log: /home/seongin3/data/geoaidesk/work/gaid-release-proof--routes/geo-tests.log. Worktree helper environment and generated __pycache__ are removed after this check (job snapshots are separate).
 - Implemented the reusable route harness, pinned workflow/input preparation, independent artifact/area checks, SSE/ledger/context/offload observations, and paid-route refusal/attach design. No server/web/shared-instance edits.
@@ -103,10 +104,27 @@ server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/ts
 - Streamed input/output=892418/62661 excludes compaction/aborted usage. Authoritative preserved ledger: promptTokens=982026, completionTokens=70309, cachedTokens=20801645, totalTokens=21853980, local/$0.
 - Output QA: qc.json correctly preserves header STOP=2532.1748047 versus actual 2532.062, but falsely counts every curve's NULLs as zero (direct source scan has 111889 declared -999.25 values), uses m as depth_basis, and applies spike counts to explicitly unconfirmed-unit curves. inventory.csv is one metadata row rather than a per-curve inventory. Visually inspected quicklook.png is not the requested same-window multi-track plot: despite title 1400–1800 m it shows the full depth range, increasing upward, and mixes distinct units on one shared value axis. It also contains a fabricated 2024 analysis timestamp. These outputs are not validated scientific QC.
 
+### Local 98K map plus area table (job 4, terminal)
+- Job: job-geoaidesk-gaid-release-proof--routes-4; receipt: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082356.800064Z/receipt.json; exit 0.
+- Record: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082356.800064Z/out/record.json; sha256: f20d17534095c9049246354451db3211df10c60e025c2941716fd1f5c0a84e21. App SHA 14572664c6de9798ed807190be67add3bf3e3c76, version 0.1.0.
+- Route: gaid-local/qwen3:30b-a3b-instruct-2507-q4_K_M-gaid-96k; app/configured/loaded context=98304, CPU/GPU=18%/82%. Connection passed in 27762 ms, input/output=26819/5, one turn/no tools, local/$0.
+- Task passed declared engineering acceptance in 75984 ms, 18 turns/17 tools, 0 retries/0 detected dependency repairs, context peak=33747 (34.3292%). Ledger input/output=6152/3015, cached=552593, total=561760, local/$0. Recovered matplotlib kwargs, exact-text edit and CSV extra-field errors are preserved; the run completed and settled normally.
+- All expected files nonempty: crs-inventory.json (197 bytes), crs-inventory.csv (145), map.png (85325), area-table.csv (58), run.json (420); all hashes/session/provenance/notebook locators are in the record. Independent areas match exactly A=30000/B=20000 m2, 60%/40%. serviceStopped=true.
+- Visually inspected map.png: the three source rectangles, categorical colours/legend and projected coordinates match the supplied recipe. Limited output QA caveat: crs-inventory lacks the requested full extent/attribute inventory, run.json lacks commands/input hashes/environment versions, and both contain a fabricated inventory_date=2026-04-26T12:34:56Z. The record's passed status is only the brief's nonempty-artifact plus known-area check, not full workflow/provenance/scientific validation. The actual run timestamp and provenance are harness-owned in the evidence.
+
+### Matrix summary for the parent
+| App context | Task | Connection | Task outcome | Duration ms | Context peak | CPU/GPU |
+|---|---|---|---|---:|---:|---|
+| 65536 | LAS | passed | partial; missing figure, timeout | 2700401 | 66808 (101.9409%, app-reported) | 7%/93% |
+| 65536 | map+table | passed | partial; area correct, map missing | 185720 | 43689 (66.6641%) | 7%/93% |
+| 98304 | LAS | passed | partial; all files, tool loop timeout, QC defects | 2700078 | 82343 (83.7636%) | 18%/82% |
+| 98304 | map+table | passed | passed bounded engineering check; QA caveats above | 75984 | 33747 (34.3292%) | 18%/82% |
+
+Paid/API and ChatGPT sign-in implementation/credential setup/cost-order note: geo/release-proof/route-usage.md. Both are intentionally untested and gated by --allow-paid (never passed here). Parent owns any separately approved paid trials and its canonical report. No new required work is added by this child.
+
 ## Next steps
-1. On job-exit notification, read this task document and the matching receipt/exit/out/record.json before acting; do not replay launched jobs. Four trials are already registered and host-GPU serialized.
-2. Inspect terminal records, preserve failures and report app defects to parent; repeat once only for a harness correction.
-3. Record per-job evidence/hash/outcomes, finish with the CLI repository checks, then remove any caches recreated by finish. Never pass --allow-paid.
+1. Run task finish (repository scripts/check), fix any in-scope check failure in place, and rerun finish without resume.
+2. Remove build/helper caches recreated by finish, then wait for parent task complete integration; deliver its completion notice once. Do not restart the four terminal trials or pass --allow-paid.
 ## Failed approaches
 - Two additional job launches were refused because the previous job added a dirty task jobs block. Saved each reviewed jobs-block update before the next launch; no failed/refused call created a job.
 ## Notes and decisions
@@ -116,16 +134,9 @@ server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/ts
 - Map input is reconstructed from the permitted MIT example rectangle-spec.json (the archive has recipe/output evidence, not the binary source); A=30000/B=20000 m2 in EPSG:5186. No known output files are uploaded.
 - Local project spend cap is zero; prompt forbids delegation, other models, paid tools and replacement downloads. Paid routes only attach after user Settings setup and require --allow-paid; see geo/release-proof/route-usage.md for cost-order assumptions and route design.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None for this child. Paid-route decisions and any follow-up scientific-quality work belong to the parent; no new required scope.
 ## Report
 No separate child report; parent incorporates this task evidence and geo/release-proof/route-usage.md.
-
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/receipt.json
