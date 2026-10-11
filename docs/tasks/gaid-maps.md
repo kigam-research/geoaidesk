@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:50:56Z
+updated: 2026-10-11T04:52:32Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -40,10 +40,17 @@ Verified facts from the hub (2026-10-11):
 - When the unit completes, its outcome returns to the skill_hub hub automatically through the goal link.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Parent API/manifest/inspection integration implemented. Backend typecheck and 30 targeted tests pass.
+- Two child packages (helper and viewer) remain active; not integrated yet.
+- Helper environment prepared with frozen uv lock (Python 3.12.14). Browser verification tooling is external under the task data directory.
+- Direct checks authorized by the hub while backbone job-template filtering is repaired. No paid model calls.
 ## Next steps
-1. (the next session's first action)
+1. Integrate completed helper/viewer children with task complete; inspect their reported evidence.
+2. Run real route/fixture integration tests, browser map-plus-table walkthrough and scripts/check.
+3. task sync shared seams, canonical result report, cache cleanup, task finish.
 ## Failed approaches
+- Job snapshot blocked on upstream `.env.example`; no job started and no receipt was issued. Hub authorized direct checks (reply 65caed1a1d90).
+- First targeted run: 27/29 tests passed; corrected unknown CRS on unsafe companions and equivalent WGS84 identifiers, then 29/29 passed. Added extent/paging coverage: 30/30 passed.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
@@ -90,3 +97,6 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - Native read-only reviewer `/root/map_api_review` checks the parent TypeScript integration only; child writers remain sole owners of helper and viewer. Parent will triage concrete blockers.
 - Targeted recheck: 29/29 tests passed (3 files). Typecheck passed again.
 - Read-only reviewer found degenerate point/line manifest extents rejected and high offsets silently clamped. Parent now separately validates source extents (equality allowed) and rejects offsets above 100000; added regression assertions. Multi-layer manifests require explicit layer selection.
+- Parent TypeScript metadata path now attempts the map helper first and uses baseline only on failure, avoiding redundant metadata subprocesses on successful map requests. Typecheck + same 30 targeted checks passed after this change.
+- Added real HTTP fixture integration tests in server/test/geo-maps-integration.test.ts; these deliberately await child fixture/helper integration and have NOT run yet. Browser check must exercise actual OpenLayers rendering and area output; do not claim it from mocks.
+- Parent independent implementation is checkpointed; await child completion notification rather than polling. Both children were active at the last bounded status check.
