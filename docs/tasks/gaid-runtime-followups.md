@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:47:51Z
+updated: 2026-10-11T04:54:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -43,14 +43,18 @@ Context:
 - Small change: no ADR; a short report is enough.
 
 ## Current state
-- Resumed in the original printed worktree; clean initial tree at bad86f1.
-- Source lookup: exact worktree has no codegraph index; inspected native source instead.
-- Existing defaults offer 32K; gaid-local falls through to payg, including picker metadata.
+- Implemented the 64K minimum/default, removed the proposed 32K profile, preserved existing saved settings, and documented untested release-proof scope.
+- Added the pure gaid-local identity and shared local classification across billing, ledger inference, child bridge/meter and picker metadata. Other custom providers remain payg.
+- Focused regression run: 4 files / 54 tests passed (2026-10-11). No paid model calls.
+- First full check passed typecheck and 1,581 tests, but the newly added lead fixture had zero tokens and therefore produced no ledger row. Fixed fixture; focused rerun passed. Full rerun pending.
+- task sync fetched and merged main dad53b41 into the unit; no conflicts. Current snapshot before fixture fix: 1133236ee2ff.
 ## Next steps
-1. Implement the minimum/default/profile and shared local-billing seam.
-2. Run focused regressions and scripts/check as a recorded job; no paid model calls.
-3. Write the short result report, remove regenerable worktree caches, save and finish.
+1. Re-run task sync with CHECK_LOG_FILE under ~/data/geoaidesk/work/gaid-runtime-followups/; inspect full scripts/check result.
+2. Finalize the short report and run task finish; remove regenerable worktree caches after the final check.
+3. Relay the hub's final completion report once; do not archive the unit.
 ## Failed approaches
+- task job run -- scripts/check failed before launch because inherited .env.example is a forbidden snapshot path. No job/receipt was created; no protected file was read or changed. Use the CLI's declared-check integration path (task sync/finish), not a manual publication workaround.
+- Initial lead-run regression reported cost but zero tokens: the ledger intentionally skips zero-cost/zero-token rows after local normalization. The corrected fixture reports two tokens. An intervening focused attempt ran the stale fixture because the correction script was initially invoked from server/ instead of the worktree root; the root invocation and fresh rerun passed.
 ## Notes and decisions
 - Sequential decisions: 64K = 65,536 tokens; reject new configurations below it, preserve existing saved configurations, remove only the proposed 32K option. Existing 96K evidence remains a one-machine trial, not release proof.
 - Ownership: this writer owns geo local-model profiles/UI/tests, a pure geo provider identity, and narrow billing/ledger/subagent/custom-picker seams plus their regression tests and documentation. No WP04/WP05 files.

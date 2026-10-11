@@ -279,7 +279,10 @@ describe("executeRun", () => {
     const runtime = { checkAuth: vi.fn() };
     const billing = await billingForModel(session.model, runtime);
     expect(runtime.checkAuth).not.toHaveBeenCalled();
-    const run = vi.fn(async () => { session.cost = 0.1; });
+    const run = vi.fn(async () => {
+      session.cost = 0.1;
+      session.getSessionStats = () => ({ cost: session.cost, tokens: { input: 1, output: 1, cacheRead: 0, total: 2 } });
+    });
     const opened = openRun(claimRun(capped.id, session.sessionId)!, {
       origin: "user", kind: "turn", prompt: "x", images: [], baseline, session,
     });
