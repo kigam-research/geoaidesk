@@ -542,7 +542,7 @@
   "chat.context.usage": "{used} of {total} tokens ({percent}%)",
   "chat.context.waiting": "Awaiting provider measurement · {total} token window",
   "settings.otherProject": "Showing the current project, {active}. Open {target} to edit its skills, prompt templates, specialists and connectors.",
-  "settings.providers.intro": "Bring your own model: sign in with a subscription, add an API key, or connect a local server. Credentials stay on this machine (keys in the environment configuration file, sign-ins in Pi's credential store); nothing is sent to K-Dense.",
+  "settings.providers.intro": "Bring your own model: sign in with a subscription, add an API key, or connect a local server. Credentials stay on this machine (keys in the environment configuration file, sign-ins in Pi's credential store); nothing is sent to the GeoAIDesk developers.",
   "settings.providers.billingNote": "Provider subscriptions have their own quotas and overage rules. Except for Anthropic's documented metered extra usage, the app records tokens but does not treat provider-managed subscription usage as project spend.",
   "settings.providers.modelCount": "{count, plural, one {# model} other {# models}}",
   "settings.providers.disconnectAccount": "Disconnect {name}",
