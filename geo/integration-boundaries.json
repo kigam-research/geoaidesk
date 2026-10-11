@@ -125,6 +125,12 @@
       "responsibility": "GeoPromptBudget chip (web/src/geo/context/) next to the context gauge in the composer toolbar; gaid-korean-workspace owns any further change to this component"
     },
     {
+      "path": "web/src/components/settings/providers-panel.tsx",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "LocalModelCard (web/src/geo/local-model/) at the top of the Local model servers section: one import and one JSX line; gaid-korean-workspace owns further changes"
+    },
+    {
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
       "owner": "gaid-korean-workspace",
       "status": "edited",
