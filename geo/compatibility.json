@@ -1,0 +1,74 @@
+{
+  "schema": "gaid-compatibility/v1",
+  "appVersion": "0.1.0",
+  "updatedAt": "2026-10-11",
+  "policy": "A combination is advertised only with an install or route record for this app version (skill_hub docs/specs/gaid-product.md section 4). Records keep failed, partial and not-run states. Paid and subscription runs happen only at the user's request. Everything not listed with evidence is untested.",
+  "evidenceLocation": "Records (gaid-install-evidence/v1, gaid-route-evidence/v1; geo/release-proof/README.md) are kept outside Git by locator and sha256.",
+  "environments": [
+    {
+      "id": "linux-x64",
+      "label": "Linux x86-64 (Ubuntu 24.04)",
+      "status": "not-run",
+      "records": [],
+      "knownLimits": []
+    },
+    {
+      "id": "windows-wsl2",
+      "label": "Windows + WSL 2 (Ubuntu)",
+      "status": "not-run",
+      "records": [],
+      "knownLimits": []
+    },
+    {
+      "id": "windows-native",
+      "label": "Windows native (x64)",
+      "status": "not-run",
+      "records": [],
+      "knownLimits": []
+    },
+    {
+      "id": "macos-arm64",
+      "label": "macOS Apple Silicon",
+      "status": "untested",
+      "records": [],
+      "knownLimits": ["No macOS host was available for this release."]
+    },
+    {
+      "id": "macos-x64",
+      "label": "macOS Intel",
+      "status": "untested",
+      "records": [],
+      "knownLimits": ["No macOS host was available for this release."]
+    }
+  ],
+  "modelRoutes": [
+    {
+      "id": "local-ollama-qwen3-30b-64k",
+      "accountRoute": "local",
+      "provider": "gaid-local (Ollama)",
+      "modelId": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+      "appContextTokens": 65536,
+      "advertised": false,
+      "documentationCheckedAt": null,
+      "documentationSources": [],
+      "adapterStatus": "implemented",
+      "connection": { "outcome": "not-run", "testedAt": null, "record": null },
+      "tasks": [],
+      "knownLimits": []
+    },
+    {
+      "id": "local-ollama-qwen3-30b-98k",
+      "accountRoute": "local",
+      "provider": "gaid-local (Ollama)",
+      "modelId": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+      "appContextTokens": 98304,
+      "advertised": false,
+      "documentationCheckedAt": null,
+      "documentationSources": [],
+      "adapterStatus": "implemented",
+      "connection": { "outcome": "not-run", "testedAt": null, "record": null },
+      "tasks": [],
+      "knownLimits": []
+    }
+  ]
+}

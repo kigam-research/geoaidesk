@@ -75,6 +75,7 @@ function main() {
       status: distribution.catalogue.status,
       version: distribution.catalogue.version,
       sha256: distribution.catalogue.sha256,
+      download: distribution.catalogue.download?.url ?? null,
       excludedSources: distribution.catalogue.excludedSources.map(({ repo, skills }) => ({ repo, skills })),
     },
     assets: [{ name: path.basename(archive), sha256: sha256File(archive), bytes: fs.statSync(archive).size }],

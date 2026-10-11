@@ -29,9 +29,9 @@
     },
     {
       "path": "server/src/api/system.ts",
-      "owner": "gaid-fork-base",
+      "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Release check against the distribution repository and tag prefix"
+      "responsibility": "Release check against the distribution repository and tag prefix (gaid-fork-base); highest published geo-v* release from the release list, prereleases included outside the stable channel (gaid-release-proof)"
     },
     {
       "path": "web/next.config.ts",
@@ -190,9 +190,9 @@
     },
     {
       "path": "server/src/agent/provider-auth.ts",
-      "owner": "gaid-runtime",
+      "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row; no authentication changes"
+      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row (gaid-runtime); Sign in with ChatGPT authorization URL carries the distribution's product name as agent_name_hint (server/src/geo/siwc.ts; OpenAI SIWC terms 2026-09-29), other providers and upstream checkouts unchanged (gaid-release-proof)"
     },
     {
       "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
@@ -355,6 +355,12 @@
       "owner": "gaid-korean-workspace",
       "status": "edited",
       "responsibility": "Update English product-name expectation to neutral app default; test workflow unchanged"
+    },
+    {
+      "path": "server/src/agent/skills-sync.ts",
+      "owner": "gaid-release-proof",
+      "status": "edited",
+      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged"
     }
   ],
   "notTouched": [

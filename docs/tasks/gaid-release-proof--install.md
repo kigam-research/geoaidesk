@@ -1,0 +1,139 @@
+---
+format: 1
+status: ready
+updated: 2026-10-11T08:44:52Z
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
+branch: task/gaid-release-proof--install
+target: task/gaid-release-proof
+parent: gaid-release-proof
+---
+# gaid-release-proof--install
+
+## Goal and done criteria
+Request from the starter:
+
+# Child writer brief: gaid-release-proof--install (geoaidesk, parent gaid-release-proof)
+
+Goal: release-specific installation, deterministic preview, restart/reopen and update evidence for GeoAIDesk on the
+advertised environments (plan decision D3: Linux/WSL first, Windows native P1, macOS untested), as scripts plus actual
+records. Parent package: WP10 in skill_hub docs/specs/geo-byok-plan.md; done criteria that concern you: "clean installs
+and deterministic previews work on advertised environments; existing projects/skills/history survive update; missing
+combinations remain untested".
+
+Base: the parent branch at d5702af or later. Read AGENTS.md, geo/release-proof/README.md (record format
+`gaid-install-evidence/v1`) and geo/release-proof/instance.mjs (shared harness owned by the parent: use it; if it
+needs a change, make the minimal change and say so in your task document).
+
+Owned files (create): `geo/release-proof/install-proof.mjs`, `geo/release-proof/update-proof.mjs`, helpers under
+`geo/release-proof/install-*`, a pure unit test `geo/tests/release-proof-install.test.mjs` only if there is pure logic
+worth testing. Do not edit geo/distribution.json, geo/start.mjs, server/ or web/ code; report needed app fixes to the
+parent (task document + finish) with evidence instead, unless a fix is a one-line obvious bug in your own scripts.
+
+What the scripts do:
+1. install-proof: from a git ref (or a `git archive` source tarball) make a fresh checkout outside any repo
+   (`--out <dir>`), fresh GAID_HOME, run the production launcher via instance.mjs (first start installs packages, builds
+   the UI, prepares the helper venv and the catalogue), then record steps: first start (time), UI served (production,
+   not dev), backend health, catalogue status ready (record source: download/asset/archive; with the catalogue release
+   not yet published, pass `GAID_CATALOGUE_URL=file://...` or `GAID_CATALOGUE_ARCHIVE`, and record which), default
+   project provisioned with the catalogue skills, deterministic previews through the real API with known answers:
+   LAS (`POST /geo/inspect`, `POST /geo/series-window`; use geo/tests/fixtures or a synthetic LAS with exact values),
+   map raster window, vector page and the full-layer area table on synthetic geometry with an analytically known area
+   (see geo/tests/maps-helper.test.mjs and geo/tests/fixtures/maps_fixture.py), CSV/TSV table checks
+   (`POST /geo/tables/inspect`); then stop, restart (build reused) and reopen: project, files, previews still answer.
+   Also the environments: `GET /geo/environments` and the import test (geo/tests/environments-smoke.mjs logic) for the
+   project target.
+2. update-proof: install a base ref (default: `882cd56`, the main commit before this unit) the same way, seed user
+   state through the API the way a user would — a second project, uploaded files, an edited catalogue skill (local
+   edit), an authored user skill, a disabled skill, project settings (spend limit, AGENTS.md edit), a chat session with
+   history and notebook annotations (if no model is available, write the session the way the app does — check
+   server/src/agent/session-registry.ts for the JSONL layout — and say so in the record), provenance user steps from
+   the uploads — then update the checkout in place to the candidate ref the way a user would (`git fetch` +
+   `git checkout <ref>`, or replacing an extracted source archive while keeping GAID_HOME), restart, and verify every
+   seeded item is still accessible through the API, the edited/user skills were not overwritten, and the catalogue
+   moved to the new pin (0.2.0 → 0.2.1) for untouched skills. Record each check as its own step.
+3. Write one `gaid-install-evidence/v1` JSON per run, plus logs, under `--out`.
+
+Runs to produce (records are the deliverable; use `task job run -- <cmd>` on PC74 for runs to keep, outputs then in the
+job output dir; otherwise ~/data/geoaidesk/work/gaid-release-proof/install/<host>/):
+- PC74 native Ubuntu 24.04 (this host): install-proof of the parent branch head, update-proof 882cd56 → head.
+- PC71 WSL (`ssh pc71`; Node v22.21 present; `uv` was not on the non-interactive PATH — install or locate it per the
+  host, record what you had to do as a setup step): install-proof and update-proof. The catalogue asset is not
+  replicated there; copy the archive (pc74:~/assets/geo-catalogue/0.2.1/geo-catalogue-0.2.1.tar.gz, sha256
+  e9f50606…5f5) to a run directory and use GAID_CATALOGUE_ARCHIVE or a file: URL.
+- PC71 Windows native (`ssh pc71-win`; Node v24.13, Git 2.51, uv 0.12.1 present): install-proof through
+  `start-gaid.cmd` semantics (instance.mjs runs `node geo/start.mjs`; that is what start-gaid.cmd wraps — check), with
+  a path containing a space and a Korean character for the data home if feasible; record what fails rather than
+  working around it in app code.
+- macOS: not available; record nothing (it stays "untested" in the compatibility file).
+A run that fails is still a record: keep it, note the cause, and fix only your harness. App-level failures go to the
+parent with the record path.
+
+Network: the KIGAM network blocks raw.githubusercontent.com; use `gh api repos/OWNER/REPO/contents/PATH?ref=REF -H
+"Accept: application/vnd.github.v3.raw"` or codeload.github.com. GitHub release downloads, npm registry and PyPI work.
+Clone the app from the local repo/branch (`git clone --branch task/gaid-release-proof
+https://github.com/kigam-research/geoaidesk.git`, the repo is public) on remote hosts.
+
+Constraints: no model runs that cost money (none are needed); no GitHub releases, tags or other publication; app data
+never inside a checkout; do not leave services running on any host (stop them; check ports). Use free ports.
+
+Evidence back to the parent (task document "Current state" and your finish): per host and kind, the record path and
+sha256, result, failed steps with causes, setup the host needed, timings. Before finishing, run `node --test
+'geo/tests/*.test.mjs'`; the full scripts/check is the parent's. Remove build caches you created inside your worktree
+before finishing (server/node_modules, server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts,
+web/tsconfig.tsbuildinfo, __pycache__).
+
+## Current state
+- Delivery complete: reproducible install/update scripts plus actual records for all requested runs. Linux/WSL install and update PASSED; Windows native install FAILED at service readiness (record retained); macOS and Windows update remain untested. Candidate app commit: d5702afe99d90e285b0fef2500126ac63537a6ed; update base: 882cd56. No app code changed, no paid model calls, no releases/tags published.
+- Resumed in the assigned PC74 worktree; base contains shared instance harness and catalogue 0.2.1 pin.
+- Read AGENTS.md, record contract and shared harness. Codegraph is unindexed here; exact native source reads are used.
+- PC71 WSL has uv at ~/.local/bin/uv but not on its noninteractive PATH. Native Windows prerequisites respond.
+- Harness saved at 6b7e25e; native install job 1 passed all steps (first start 44,055ms; restart 6,009ms).
+- Native update job 2 failed at project creation because harness sent an unknown project scope. Fixed creation to use default scope; original failed record retained.
+- PC71 WSL install/update services gaid-proof-{install,update}-20261011 and native Windows scheduled task GAID-Install-Proof-20261011 launched from harness 6b7e25e. Outputs: pc71:~/data/geoaidesk/work/gaid-release-proof/install/{wsl-install,wsl-update}; pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install.
+- PC71 WSL install passed all steps (62,079ms first start, 4,006ms restart). Native Node geo suite passed 28/28 tests (46.5s).
+- Update job 3 checked all preservation items except history, whose synthetic seed used a string instead of the app's text-block array. Corrected that harness seed; retained the failed record.
+- Final corrected update executions use harness ecfd0dd: PC74 job 4 and pc71 service gaid-proof-update-history-20261011 (out: ~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history).
+- PC74 install record: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/out/record.json; SHA256 46777ccafac84630b4c275c1be2251b5f0567c6fc474f31ea3d9a1e076aa7326.
+- WSL install record copied without alteration to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/install.json; SHA256 d31b65723c44378bf4a69120aaf27d46291bfc97fa2c8c2ed055aa976cf94f29. Original logs remain beside remote record.
+- Failed native update records retained: job 2 SHA256 a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea; job 3 SHA256 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005 (same run root pattern as receipts below, out/record.json).
+- Corrected PC74 update job 4 PASSED every step: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/out/record.json; SHA256 4b0da26427cc6939c4796fcad16483e41859900dadc283f9fdb2cc539d2790e4. Base first start 52,055ms, candidate start 11,011ms. History reopened; untouched pumping-test-diagnostics matched 0.2.1 staged bytes; local edit kept, two untouched catalogue skills updated.
+- Corrected WSL update PASSED every step. Original pc71:~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json; SHA256 224cd1f0b29645fed05db3efb17cbe9c48227c336d8bab757b71c4e3766ac35f. Base first start 53,066ms; candidate start 8,010ms.
+- Final Node geo suite PASSED 28/28 in 35.8s (exit 0), log /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log. Removed created server/src/helpers/.venv and well/__pycache__; no other listed build caches existed.
+- Windows native install finished FAILED (first-start duration 1,102,141ms). Original record pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/record.json; SHA256 7f13311b74ce5266a198691336291b8bcecf509cadc7f484b009812d72924a82. Full first-start.log in the same local folder; SHA256 3568a26ea80de1494649139768bc53b154b65aeaf1aa3e248f46672adc98f800. Backend npm install took 2m, frontend npm install 12m; production build completed; preparation printed skipped/failed; backend briefly listened then stopped during launcher's first GET / readiness probe. No explicit fatal error/exit cause in log. All subsequent API/previews/restart steps are not-run. Parent must keep Windows P1 failed/untested, not advertise this run as ready.
+- Windows used Node 24.13.0, uv 0.12.1, Git 2.51.0.windows.1, Windows 10.0.26200.9457. No prerequisite installation required. Data home really contained both space and Korean text (GAID home 한글), confirmed in UTF-8 log; do not infer this caused the failure.
+- Job 5 was only a remote completion waiter, not an installation proof. Its exit 0 is NOT a passed Windows proof: its PowerShell wrapper cast a missing exit-file read to 0. The authoritative record above is failed. No app retry performed or required for this evidence delivery.
+- Cleanup verified: Windows proof ports 50272/50273 closed, zero proof Node processes, temporary GAID-Install-Proof-20261011 scheduled task unregistered. Durable cleanup evidence: /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/cleanup.json. WSL install/final-update units inactive with exit 0; earlier failed units exited 1 and are not running (services-final.txt in WSL evidence folder).
+- Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. At that time a bounded Windows check found frontend npm still installing; Windows has since finished with the failed result above.
+- Job 1 succeeded relay notification processed: reread full log and record, confirmed all 30 install/restart steps passed, final-stop passed and SHA256 unchanged (46777cca…aa7326). No rerun or additional Windows polling triggered.
+## Next steps
+<!-- task:closed -->
+Closed 2026-10-11T08:44:52Z: ready; the parent gaid-release-proof integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
+## Failed approaches
+- PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
+- Job 2 failed-exit relay notice processed: reread full log and project-scope HTTP 404; record SHA256 unchanged (a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea), final-stop passed. Fixed and superseded by passing job 4; no new action or rerun.
+- PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
+- Job 3 failed-exit relay notice processed: reread full log and both history HTTP 400 errors; record SHA256 still 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005, final-stop passed. This earlier failed run is superseded by the already-verified passing job 4, not a new regression; no rerun needed.
+- WSL failed first attempts are retained under /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/: update-scope-failure.json SHA256 3f9213aa859838363aaf4d19109a2efbb7ced1cab34e31fffbee67636dadbd4a; update-history-failure.json SHA256 31616c4a8b0c0ccf23acf194becc6f52c392b0c6311aaaa49e60488207dfb707. Same harness defects as native jobs 2/3, superseded by passing final WSL update.
+## Notes and decisions
+- Sequential decisions: settle evidence steps and safe fresh-output ownership first, then install runner, update runner, actual host runs, final checks.
+- Owned interfaces: install-* helpers + install-proof/update-proof; shared instance changes only when required for cleanup. No server/web/app edits.
+- Independent work: host executions may overlap after the same harness revision is saved; no nested writers. Integration order: harness, local evidence, remote evidence, parent integration.
+- No paid model requests. Session history will be explicitly marked synthetic and use Pi's own SessionManager serializer; notebook notes use the API.
+- Shared instance minimal changes: clear inherited catalogue archive/URL/download switches; timeout waits for stop and port release instead of sending an unawaited signal.
+- Evidence limits: synthetic session history tests persistence/reopen only (not a model response); tests exercise API/production HTML, not browser visual layout. npm/uv download caches may be warm although each app checkout and GAID_HOME is fresh. All actual runs supplied checksum-pinned archives, so public release download and source-archive install modes were not exercised. macOS and native Windows update were not run.
+- PC74 proof ports independently checked closed after all runs; /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc74-cleanup.json records all eight ports. No worktree build caches remain.
+## Open items
+None requiring a user decision in this child. Windows startup failure and untested combinations must be carried as compatibility limitations by the parent.
+## Report
+No separate child report. Parent gaid-release-proof owns the canonical report; installation/update evidence and limitations above are its integration input. Runner usage: geo/release-proof/install-README.md.
+## Running jobs
+<!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082159.930245Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082352.235557Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082804.664308Z/receipt.json
+<!-- /task:jobs -->
+<!-- task:cloud -->
+<!-- /task:cloud -->
