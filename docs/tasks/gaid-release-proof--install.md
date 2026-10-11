@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:27:55Z
+updated: 2026-10-11T08:28:51Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -95,10 +95,14 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - PC74 install record: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/out/record.json; SHA256 46777ccafac84630b4c275c1be2251b5f0567c6fc474f31ea3d9a1e076aa7326.
 - WSL install record copied without alteration to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/install.json; SHA256 d31b65723c44378bf4a69120aaf27d46291bfc97fa2c8c2ed055aa976cf94f29. Original logs remain beside remote record.
 - Failed native update records retained: job 2 SHA256 a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea; job 3 SHA256 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005 (same run root pattern as receipts below, out/record.json).
+- Corrected PC74 update job 4 PASSED every step: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/out/record.json; SHA256 4b0da26427cc6939c4796fcad16483e41859900dadc283f9fdb2cc539d2790e4. Base first start 52,055ms, candidate start 11,011ms. History reopened; untouched pumping-test-diagnostics matched 0.2.1 staged bytes; local edit kept, two untouched catalogue skills updated.
+- Corrected WSL update PASSED every step. Original pc71:~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json (hash below when final evidence is consolidated).
+- Final Node geo suite PASSED 28/28 in 35.8s (exit 0), log /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log. Removed created server/src/helpers/.venv and well/__pycache__; no other listed build caches existed.
+- Only native Windows installation remains running. Task job 5 is a durable remote completion wait (Wait-Process for harness PID 3968), not another install. Its relay notification is the next trigger. Do not restart the scheduled task or poll periodically.
 ## Next steps
-1. On job notifications, collect corrected native/WSL update results and native Windows install result. Do not replay the already-started jobs.
-2. Final Node geo suite output is being written to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log; collect its status and remove helper/build caches created in this worktree.
-3. Record final paths, SHA256 and known limits, save, then task finish. Parent owns full scripts/check and compatibility/report integration.
+1. On job 5 completion notification, fetch Windows record/logs, inspect failed steps if any, verify its ports are stopped and unregister GAID-Install-Proof-20261011 after completion.
+2. Add final remote hashes/timings and known limits; preserve failed first attempts. Do not replay the already-started jobs.
+3. Save and task finish. Parent owns full scripts/check and compatibility/report integration. Linux/WSL install and update are already verified; macOS stays untested.
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
 - PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
@@ -121,6 +125,7 @@ No separate child report. Parent gaid-release-proof owns the canonical report; i
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082159.930245Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082352.235557Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082804.664308Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
