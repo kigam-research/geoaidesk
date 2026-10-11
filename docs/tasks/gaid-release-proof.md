@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T10:13:05Z
+status: done
+updated: 2026-10-11T11:55:42Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -72,6 +72,45 @@ Verified facts from the hub (2026-10-11):
   route is documented → do not advertise. Gemini CLI OAuth reuse prohibited (Pi has no such login).
 - Windows rerun at d2c535f: scheduled task GAID-Proof2-20261011 on pc71-win runs install-proof then update-proof
   (out C:\Users\KIGAM_Ahn\gaid-proof\windows-{install,update}-2, status proof2-status.txt, logs proof2-*.log).
+- Windows root cause (2026-10-11): reruns at d2c535f failed the same way from a scheduled task AND from an
+  interactive ssh session (fresh clone, data home "GAID home 한글"); second starts and ASCII data homes pass. Isolated
+  on pc71-win: Node 24.13 `fs.rmSync` (any), recursive `fs.rmdirSync` and `fs.cpSync`, and Node 22.21 `fs.cpSync`, kill
+  the process (0xC0000409 / 0xC0000005, no JS error) when a path has non-ASCII characters; primitives and async
+  fs.cp/fs.rm work. A Korean Windows user name puts the default data home on such a path. Fix 616113d:
+  geo/win-fs-shim.mjs (JS rmSync/cpSync/rmdirSync for non-ASCII paths on win32 only), loaded by geo/start.mjs in-process
+  and via NODE_OPTIONS --import for every child; verified on pc71-win for Node 24.13 and 22.21. Windows install proof
+  rerun at 616113d: out C:\Users\KIGAM_Ahn\gaid-proof\windows-install-4, local log
+  ~/data/geoaidesk/work/gaid-release-proof/windows-install-4.log.
+- Routes child integrated (closed): 4 local records; jobs 1–3 exit 1 = partial task outcomes by the record contract
+  (evidence, not harness failures; no disposition). geo/compatibility.json, docs/geo/compatibility.md, local-model
+  profile/copy (localModel.recorded/compact64/evidence) and docs/local-models-ollama.md updated from them.
+- scripts/check job 1 (tree 41b789e; receipt ~/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z) exit 1:
+  backend 153 files passed (2 known mzML tests skipped by the network probe), web 1 failed — card.test.tsx still
+  looked for the old local-model copy "CPU 오프로딩 약 18%"; test updated to the new string. Rerun pending.
+- scripts/check job 2 (tree a82ca8c; ~/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z) exit 0: backend
+  1634 passed / 11 skipped (2 mzML by the network probe), web 951 passed, geo node tests 36 passed, copy 0 errors
+  (1 existing warning), environments smoke + production smoke PASS (catalogue 0.2.1, 13 skills). Job 1 disposed as
+  superseded by job 2.
+- Windows at 579aa2d (map helper reads its request as UTF-8 bytes): install-5 PASSED all 30 steps (first start 323.7 s,
+  restart 13.2 s); update-5 from 882cd56 failed at base start (the base predates the non-ASCII fix) → update-6 rerun with
+  an ASCII data home. Records copied to ~/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/<run>/record.json
+  (install-5 sha256 f6438229…e419; failed install-2/3/4, update-2/5 kept).
+- Linux install proof job 3 at f75e2fc PASSED all 30 steps (record ~/data/geoaidesk/runs/
+  gaid-release-proof-20261011T111254.525490Z/out/record.json, sha256 53aa58e4…b509).
+- Catalogue release published 2026-10-11 (user decision 2 가): https://github.com/kigam-research/geoaidesk/releases/tag/geo-catalogue-0.2.1
+  (prerelease; archive + .sha256 + manifest; `node geo/catalogue-release.mjs --verify-remote` ok). Linux install job 4 at
+  0720198 with an empty TASK_ASSETS_DIR downloaded it (launcher log) and PASSED all steps (record sha256 a68cf965…6717;
+  its catalogue.source field mislabels the download as asset).
+- Paid-trial instance: systemd user unit gaid-paid-trial (checkout ~/data/geoaidesk/work/gaid-release-proof/paid/checkout
+  at 0720198, data home …/paid/home, API :18110, UI :18111). Waiting for the user to save one API key and sign in with
+  ChatGPT, and to name provider/model and budget. Stop it with `systemctl --user stop gaid-paid-trial` when done.
+- CI: GAID checks had failed on main since gaid-korean-workspace (launcher matrix ran uv-dependent geo tests without
+  uv) → ab15ad8: launcher matrix runs launcher-level tests (start, distribution, win-fs-shim, compatibility); release.yml
+  sets up uv. Verified by the release run below; the PR run at finish verifies gaid-checks.
+- App draft release (user decision 1 나): tag geo-v0.1.0 on ab15ad8 pushed; Release workflow run 38137188871 succeeded and
+  created a DRAFT prerelease with geoaidesk-0.1.0-source.tar.gz, geoaidesk-0.1.0-manifest.json, SHA256SUMS. Not
+  published; publication waits for brand clearance (open item). Paid-trial instance stopped (ports free).
+- Worktree build caches removed after the last local checks.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -107,23 +146,45 @@ release and the app release.
 On a child's finish: `task complete gaid-release-proof--<child>`.
 
 ## Next steps
-1. Writer: catalogue release script + workflow, `geo/compatibility.json` + test, `docs/geo/` guides, upstream log,
-   provider-terms re-check, mzML test failures (seen in a full vitest run at d5702af: massspec-helper, sci-helper-errors;
-   check whether they also fail on main), then ask the user: brand clearance, paid runs, publication.
+<!-- task:closed -->
+Closed 2026-10-11T11:55:42Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-release-proof.md.
+
 ## Failed approaches
+- Windows first installs failed at d5702af and d2c535f (scheduled task and interactive): root cause was Node's native
+  cpSync/rmSync on the non-ASCII data home, not the scheduled-task context; fixed in 616113d. 616113d still failed the map
+  previews (helper stdin code page); fixed in 579aa2d. Update proofs 1–2 (Linux) failed on harness bugs; Windows
+  update-5 failed because the base 882cd56 cannot start on a non-ASCII data home.
 ## Notes and decisions
+- User, 2026-10-11, on report §6 (four decisions): "모두 권장으로 진행하자." → 1 나) no brand clearance yet: app release
+  only as a GitHub draft, published after clearance; 2 가) catalogue release published now (done: geo-catalogue-0.2.1,
+  prerelease, remote sha256 verified); 3 가) run both paid routes (personal API key + Sign in with ChatGPT); 4 가) the
+  local route is not advertised as supported, only its results and limits.
+- User, 2026-10-11: "그리고 유료 경로 테스트는 만약 사용자가 로그인하기만 해도 된다면 우선 넘어가도 된다." → paid and
+  subscription route trials deferred (open item); paid-trial instance stopped. PC71 has only local Ollama models
+  (qwen2.5 14b/3b); the 10.13.15.67:8000 vLLM server (qwen3.8-flash-next, seCall 2026-09-17) and the PC74 relay
+  127.0.0.1:11435 did not answer on 2026-10-11. GAID keeps its own Pi auth store; Codex CLI / Claude Code logins on
+  PC74 are not shared and their token files are not read or copied.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [대기 gaid-release-proof#1] 유료·구독 모델 경로 시험(ChatGPT 로그인, 개인 API 키; 원하면 Claude 로그인 로컬 시험과 67 서버 qwen3.8-flash-next) — 가) 사용자가 시험용 GeoAIDesk에 로그인·키 저장 후 geo/release-proof/route-trial.mjs로 연결·과제 기록 — 나) 다음 출시 검증으로 미룸 — 권장: 가) 결정 D4가 출시 전 시험을 정함 — 막힌 일: API·구독 경로 안내 — 조건: 사용자 로그인 또는 키, 67 서버는 서버 재가동(2026-10-11 연결 불가) — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
+- [대기 gaid-release-proof#2] 기관 브랜드(geo/brand 로고) 공개 승인 후 앱 릴리스 geo-v0.1.0 공개 — 가) 승인 받으면 초안 릴리스를 공개 — 나) 로고를 바꾼 뒤 공개 — 권장: 가) 사용자 결정(2026-10-11)대로 초안까지만 만들어 둠 — 막힌 일: 앱 릴리스 공개 — 조건: 기관 브랜드 승인 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
 ## Report
+Report: reports/2026-10-11-gaid-release-proof/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T104757.348242Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Web card test still expected the old local-model copy; test updated, rerun passed","recorded":"2026-10-11T11:06:54Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json","state":"superseded"}
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T113007.190448Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

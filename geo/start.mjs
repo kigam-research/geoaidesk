@@ -181,6 +181,18 @@ async function ensureCatalogue(distribution, check) {
   }
 }
 
+/**
+ * NODE_OPTIONS for every Node process the launcher starts on Windows: preload
+ * geo/win-fs-shim.mjs (Node's native cpSync/rmSync die on non-ASCII paths
+ * there). Keeps the user's options; adds the import once.
+ */
+export function windowsNodeOptions(existing = "", shimUrl = pathToFileURL(path.join(repoRoot, "geo", "win-fs-shim.mjs")).href) {
+  const flag = `--import=${shimUrl}`;
+  const current = existing.trim();
+  if (current.split(/\s+/).includes(flag)) return current;
+  return current ? `${current} ${flag}` : flag;
+}
+
 async function main() {
   const distribution = readDistribution();
   const args = process.argv.slice(2);
@@ -196,6 +208,10 @@ async function main() {
     process.exit(1);
   }
   Object.assign(process.env, set);
+  if (process.platform === "win32") {
+    await import("./win-fs-shim.mjs");
+    process.env.NODE_OPTIONS = windowsNodeOptions(process.env.NODE_OPTIONS);
+  }
   const check = args.includes("--check");
   if (!check) fs.mkdirSync(dataHome, { recursive: true, mode: 0o700 });
   console.log(`${distribution.productName} ${distribution.version} (${distribution.channel})`);

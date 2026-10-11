@@ -145,7 +145,9 @@ export async function main(args = process.argv.slice(2)) {
     } else {
       model = o.model;
       const provider = model.split('/')[0];
-      if (o.route === 'chatgpt-signin' && !['openai','openai-codex'].includes(provider)) throw new Error('ChatGPT sign-in requires openai or openai-codex');
+      // Only the Sign in with ChatGPT login on `openai` (the SIWC open-source flow); the legacy
+      // openai-codex login is a different route and is not qualified by this trial.
+      if (o.route === 'chatgpt-signin' && provider !== 'openai') throw new Error('ChatGPT sign-in requires an openai/... model');
       if (o.route === 'api-key') {
         const providers = await json('GET','/providers');
         if (!providers.providers.some(p => p.id === provider && p.configured && p.authType === 'api_key')) throw new Error('Selected provider is not API-key connected in GAID Settings');

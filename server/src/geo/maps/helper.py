@@ -492,10 +492,12 @@ def area_table(path, req):
 
 
 def main():
-    text = sys.stdin.read(65537)
-    if len(text) > 65536:
+    # Bytes, decoded as UTF-8: sys.stdin uses the locale code page on Windows
+    # (cp949 on Korean Windows), which garbles non-ASCII paths sent as UTF-8 JSON.
+    raw = sys.stdin.buffer.read(65537)
+    if len(raw) > 65536:
         raise ValueError('Request exceeds 64 KiB')
-    req = json.loads(text)
+    req = json.loads(raw.decode('utf-8'))
     if not isinstance(req, dict) or not isinstance(req.get('path'), str):
         raise ValueError('Request must provide an absolute local path')
     path = Path(req['path'])

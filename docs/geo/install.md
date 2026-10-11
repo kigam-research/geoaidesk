@@ -46,6 +46,10 @@ Everything you create is under the data home, never inside the checkout:
 
 The launcher refuses a data home inside the checkout, because an update replaces the checkout.
 
+On Windows, a data home whose path contains non-ASCII characters (for example a Korean user name under
+`C:\Users\`) works from this release on: Node's native recursive copy/remove helpers terminate the process on such
+paths, so the launcher preloads `geo/win-fs-shim.mjs` into every Node process it starts.
+
 ## The skill catalogue
 
 `geo/distribution.json` pins one catalogue archive by version and sha256. On start the launcher looks for it in

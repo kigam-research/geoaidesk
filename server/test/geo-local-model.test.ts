@@ -72,7 +72,7 @@ describe("Ollama status and declared versus runtime context", () => {
     expect(data.verification.state).toBe("unverified");
     expect(data.profiles).toEqual(expect.arrayContaining([
       expect.objectContaining({ evidence: "recorded-trial", machines: 1, cpuOffloadPercent: 18 }),
-      expect.objectContaining({ contextWindow: 65536, evidence: "proposed-not-tested" }),
+      expect.objectContaining({ contextWindow: 65536, evidence: "recorded-trial" }),
     ]));
     expect(data.profiles.every((profile: { contextWindow: number }) => profile.contextWindow >= 65536)).toBe(true);
     expect(creates).toEqual([]);

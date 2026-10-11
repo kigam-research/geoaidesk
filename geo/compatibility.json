@@ -7,38 +7,142 @@
   "environments": [
     {
       "id": "linux-x64",
-      "label": "Linux x86-64 (Ubuntu 24.04)",
-      "status": "not-run",
-      "records": [],
-      "knownLimits": []
+      "label": "Linux x86-64 (Ubuntu 24.04, native)",
+      "status": "tested",
+      "records": [
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T113007.190448Z/out/record.json",
+          "sha256": "a68cf965f32440803e85995bdb0c2eae1b45326492db9b4d186f323f4d246717",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "0720198c66f1",
+          "note": "catalogue downloaded from the public geo-catalogue-0.2.1 release (launcher log: downloading … saved … sha256 verified); the record's catalogue.source field says asset, a harness labelling error"
+        },
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/out/record.json",
+          "sha256": "53aa58e41ac58c4185fc801261b04fcb2d31355a2c3ede53589d1cf548f2b509",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "f75e2fc9ce7b",
+          "note": "release-candidate code; data home with a space and Korean characters"
+        },
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/out/record.json",
+          "sha256": "46777ccafac84630b4c275c1be2251b5f0567c6fc474f31ea3d9a1e076aa7326",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "d5702afe99d9"
+        },
+        {
+          "kind": "update",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/out/record.json",
+          "sha256": "4b0da26427cc6939c4796fcad16483e41859900dadc283f9fdb2cc539d2790e4",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "d5702afe99d9",
+          "note": "from 882cd56 (catalogue 0.2.0) by git checkout"
+        }
+      ],
+      "knownLimits": [
+        "API and served-HTML checks; no browser interaction test in the install proof."
+      ]
     },
     {
       "id": "windows-wsl2",
       "label": "Windows + WSL 2 (Ubuntu)",
-      "status": "not-run",
-      "records": [],
-      "knownLimits": []
+      "status": "tested",
+      "records": [
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/install.json",
+          "sha256": "d31b65723c44378bf4a69120aaf27d46291bfc97fa2c8c2ed055aa976cf94f29",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "d5702afe99d9"
+        },
+        {
+          "kind": "update",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json",
+          "sha256": "224cd1f0b29645fed05db3efb17cbe9c48227c336d8bab757b71c4e3766ac35f",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "d5702afe99d9",
+          "note": "from 882cd56 (catalogue 0.2.0) by git checkout"
+        }
+      ],
+      "knownLimits": [
+        "uv was installed in ~/.local/bin but not on the non-interactive PATH of the test host; the launcher found it.",
+        "Model endpoint across the Windows/WSL boundary not tested."
+      ]
     },
     {
       "id": "windows-native",
-      "label": "Windows native (x64)",
-      "status": "not-run",
-      "records": [],
-      "knownLimits": []
+      "label": "Windows native (x64, Windows 11, Node 24.13)",
+      "status": "tested",
+      "records": [
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-install-5/record.json",
+          "sha256": "f64382290130105715e5d639db1ec78439f8a235f347aea1dfa6d1836b80e419",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "579aa2d8f5a2",
+          "note": "data home with a space and Korean characters"
+        },
+        {
+          "kind": "update",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-update-6/record.json",
+          "sha256": "5c17f383401637c034f4aeb64464940d174de599640f118fe55eea2d0c5b702c",
+          "date": "2026-10-11",
+          "result": "passed",
+          "appCommit": "579aa2d8f5a2",
+          "note": "from 882cd56 with an ASCII data home (882cd56 cannot start on a non-ASCII path)"
+        },
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/record.json",
+          "sha256": "7f13311b74ce5266a198691336291b8bcecf509cadc7f484b009812d72924a82",
+          "date": "2026-10-11",
+          "result": "failed",
+          "appCommit": "d5702afe99d9",
+          "note": "Node cpSync/rmSync died on the non-ASCII data home; fixed by geo/win-fs-shim.mjs (616113d)"
+        },
+        {
+          "kind": "install",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/work/gaid-release-proof/evidence/pc71-windows/windows-install-4/record.json",
+          "sha256": "bc3efdce6af9adf93fb09e839bb0df94b4504d6d82e4e6951675f436d5df45ce",
+          "date": "2026-10-11",
+          "result": "failed",
+          "appCommit": "616113d9a068",
+          "note": "map helper garbled non-ASCII paths (Windows code page); fixed in 579aa2d"
+        }
+      ],
+      "knownLimits": [
+        "First start took about 5.4 minutes on the test host (package installs).",
+        "Releases before this one cannot start from a data home whose path has non-ASCII characters (for example a Korean Windows user name).",
+        "Windows briefly locks freshly copied folders; skill installation retries the rename."
+      ]
     },
     {
       "id": "macos-arm64",
       "label": "macOS Apple Silicon",
       "status": "untested",
       "records": [],
-      "knownLimits": ["No macOS host was available for this release."]
+      "knownLimits": [
+        "No macOS host was available for this release."
+      ]
     },
     {
       "id": "macos-x64",
       "label": "macOS Intel",
       "status": "untested",
       "records": [],
-      "knownLimits": ["No macOS host was available for this release."]
+      "knownLimits": [
+        "No macOS host was available for this release."
+      ]
     }
   ],
   "modelRoutes": [
@@ -52,9 +156,52 @@
       "documentationCheckedAt": null,
       "documentationSources": [],
       "adapterStatus": "implemented",
-      "connection": { "outcome": "not-run", "testedAt": null, "record": null },
-      "tasks": [],
-      "knownLimits": []
+      "connection": {
+        "outcome": "passed",
+        "testedAt": "2026-10-11",
+        "record": {
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/out/record.json",
+          "sha256": "74a55d69636af62c0fe64d62876af796149ff6d714acc34ac91cdd38dc2746d9",
+          "date": "2026-10-11",
+          "result": "partial",
+          "appCommit": "fe18a954c661",
+          "note": "connection 28.7 s"
+        }
+      },
+      "tasks": [
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "partial",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/out/record.json",
+            "sha256": "74a55d69636af62c0fe64d62876af796149ff6d714acc34ac91cdd38dc2746d9",
+            "date": "2026-10-11",
+            "result": "partial",
+            "appCommit": "fe18a954c661",
+            "note": "45-min cap; quicklook.png missing; app-reported context peak 101.9%; qc.json not valid QC"
+          }
+        },
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "partial",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082310.944398Z/out/record.json",
+            "sha256": "7451474fbacd29dd2d125ef2bd5fb2c9567bf0befc4dfc8a60698f9a98e4b0ea",
+            "date": "2026-10-11",
+            "result": "partial",
+            "appCommit": "a97bf28265bd",
+            "note": "area table exact (synthetic); map.png and CRS inventory missing"
+          }
+        }
+      ],
+      "knownLimits": [
+        "No run read the exposed workflow skill.",
+        "Generated scripts needed repeated repairs; outputs are not validated scientific results.",
+        "Ollama loads part of the model on the CPU at both contexts.",
+        "64K LAS run reached the app context limit."
+      ],
+      "serverContextTokens": 65536,
+      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 7%/93%, not pure GPU"
     },
     {
       "id": "local-ollama-qwen3-30b-98k",
@@ -66,9 +213,145 @@
       "documentationCheckedAt": null,
       "documentationSources": [],
       "adapterStatus": "implemented",
-      "connection": { "outcome": "not-run", "testedAt": null, "record": null },
+      "connection": {
+        "outcome": "passed",
+        "testedAt": "2026-10-11",
+        "record": {
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082337.131367Z/out/record.json",
+          "sha256": "820b4717dda634539bc86e5d16c9d8a90f94af1c617f45c45689da6640fc6f42",
+          "date": "2026-10-11",
+          "result": "partial",
+          "appCommit": "15f70edf37c4",
+          "note": "connection 29.7 s"
+        }
+      },
+      "tasks": [
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "partial",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082337.131367Z/out/record.json",
+            "sha256": "820b4717dda634539bc86e5d16c9d8a90f94af1c617f45c45689da6640fc6f42",
+            "date": "2026-10-11",
+            "result": "partial",
+            "appCommit": "15f70edf37c4",
+            "note": "45-min cap; all files present but tool-call loop and QC defects (NULL counts, plot window)"
+          }
+        },
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082356.800064Z/out/record.json",
+            "sha256": "f20d17534095c9049246354451db3211df10c60e025c2941716fd1f5c0a84e21",
+            "date": "2026-10-11",
+            "result": "passed",
+            "appCommit": "14572664c6de",
+            "note": "all files; areas exact on synthetic data in 76 s; inventory/run.json incomplete"
+          }
+        }
+      ],
+      "knownLimits": [
+        "No run read the exposed workflow skill.",
+        "Generated scripts needed repeated repairs; outputs are not validated scientific results.",
+        "Ollama loads part of the model on the CPU at both contexts."
+      ],
+      "serverContextTokens": 98304,
+      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 18%/82%, not pure GPU"
+    },
+    {
+      "id": "chatgpt-signin",
+      "accountRoute": "chatgpt-signin",
+      "provider": "openai (Sign in with ChatGPT)",
+      "modelId": null,
+      "appContextTokens": null,
+      "advertised": false,
+      "documentationCheckedAt": "2026-10-11",
+      "documentationSources": [
+        "https://developers.openai.com/siwc/token-sharing-open-source/sign-in",
+        "https://openai.com/policies/sign-in-with-chatgpt-terms/",
+        "https://help.openai.com/en/articles/20001542-using-your-chatgpt-plan-in-other-apps-and-sites"
+      ],
+      "adapterStatus": "implemented; registers as the distribution's product name (server/src/geo/siwc.ts)",
+      "connection": {
+        "outcome": "not-run",
+        "testedAt": null,
+        "record": null
+      },
       "tasks": [],
-      "knownLimits": []
+      "knownLimits": [
+        "Uses the ChatGPT plan's included usage and the app's own limit; not unlimited.",
+        "Legacy openai-codex login is a separate route and is not covered.",
+        "Not run for 0.1.0: deferred by the user on 2026-10-11 (needs only the user's sign-in or key); carried as an open item."
+      ]
+    },
+    {
+      "id": "anthropic-claude-signin",
+      "accountRoute": "claude-signin",
+      "provider": "anthropic (Pi OAuth)",
+      "modelId": null,
+      "appContextTokens": null,
+      "advertised": false,
+      "documentationCheckedAt": "2026-10-11",
+      "documentationSources": [
+        "https://code.claude.com/docs/en/legal-and-compliance",
+        "https://code.claude.com/docs/en/agent-sdk/overview",
+        "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan"
+      ],
+      "adapterStatus": "upstream login present; uses another application's OAuth client id",
+      "connection": {
+        "outcome": "not-run",
+        "testedAt": null,
+        "record": null
+      },
+      "tasks": [],
+      "knownLimits": [
+        "Not advertised: Anthropic's legal page does not permit third-party developers to offer Claude.ai login; advertising needs a written answer from Anthropic for this configuration. Use a personal Anthropic API key instead.",
+        "A local test with the user's own account remains possible; it would not change the advertising position."
+      ]
+    },
+    {
+      "id": "github-copilot-signin",
+      "accountRoute": "copilot-signin",
+      "provider": "github-copilot (Pi OAuth)",
+      "modelId": null,
+      "appContextTokens": null,
+      "advertised": false,
+      "documentationCheckedAt": "2026-10-11",
+      "documentationSources": [
+        "https://docs.github.com/en/copilot/how-tos/copilot-sdk/setup/github-oauth"
+      ],
+      "adapterStatus": "upstream login present; uses another application's OAuth client id",
+      "connection": {
+        "outcome": "not-run",
+        "testedAt": null,
+        "record": null
+      },
+      "tasks": [],
+      "knownLimits": [
+        "Not advertised: only the official Copilot SDK route with the app's own GitHub app is documented."
+      ]
+    },
+    {
+      "id": "personal-api-key",
+      "accountRoute": "api-key",
+      "provider": "to be chosen by the user",
+      "modelId": null,
+      "appContextTokens": null,
+      "advertised": false,
+      "documentationCheckedAt": null,
+      "documentationSources": [],
+      "adapterStatus": "implemented (Settings → Providers)",
+      "connection": {
+        "outcome": "not-run",
+        "testedAt": null,
+        "record": null
+      },
+      "tasks": [],
+      "knownLimits": [
+        "Paid; run only at the user's request.",
+        "Not run for 0.1.0: deferred by the user on 2026-10-11 (needs only the user's sign-in or key); carried as an open item."
+      ]
     }
   ]
 }

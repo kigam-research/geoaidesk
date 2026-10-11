@@ -4,6 +4,12 @@ Start with [Installation](installation.md) and [Basic usage](basic-usage.md).
 These guides describe the current implementation; release history lives in
 [GitHub releases](https://github.com/K-Dense-AI/k-dense-byok/releases).
 
+## GeoAIDesk
+
+- [Install, update and remove GeoAIDesk](geo/install.md): the distribution launcher, data home, catalogue download.
+- [What 0.1.0 was tested on](geo/compatibility.md): operating systems and model routes with their evidence.
+- [Maps](geo-maps.md) and [well logs and tables](geo/well-tables.md).
+
 ## Setup and model access
 
 - [Installation](installation.md): requirements, launch, updates and troubleshooting.
