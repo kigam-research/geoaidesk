@@ -2,7 +2,6 @@ import type { Api, AuthType, Model } from "@earendil-works/pi-ai";
 import type { ModelRuntime } from "@earendil-works/pi-coding-agent";
 import { subscriptionProvider } from "../agent/provider-auth.ts";
 import { isPlanBilledProvider } from "../agent/provider-catalog.ts";
-
 import { GAID_LOCAL_PROVIDER } from "../geo/local-provider.ts";
 
 export function isLocalProvider(provider: string): boolean {
@@ -43,8 +42,8 @@ export function billingForProvider(
   provider: string,
   authType: LedgerAuthType = "none",
 ): BillingContext {
-  // Local model servers only (including GAID's dedicated Ollama entry). These are $0 because the model runs on the user's
-  // own hardware — do not extend this branch to a hosted gateway, whose real
+  // Local model servers only, including GAID's dedicated Ollama entry.
+  // These are $0 because the model runs on the user's own hardware — do not extend this branch to a hosted gateway, whose real
   // spend would then be invisible to the project cap.
   if (isLocalProvider(provider)) {
     return { provider, authType: "local", billingMode: "local" };

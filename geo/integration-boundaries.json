@@ -175,6 +175,12 @@
       "owner": "gaid-runtime-followups",
       "status": "edited",
       "responsibility": "Over-cap lead regression using gaid-local billing; document the 64K minimum and local billing exception"
+    },
+    {
+      "path": "server/src/agent/provider-auth.ts",
+      "owner": "gaid-runtime-followups",
+      "status": "edited",
+      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row; no authentication changes"
     }
   ],
   "notTouched": [
