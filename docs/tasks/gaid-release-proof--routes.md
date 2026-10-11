@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T10:06:22Z
+status: ready
+updated: 2026-10-11T10:06:31Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -123,8 +123,9 @@ server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/ts
 Paid/API and ChatGPT sign-in implementation/credential setup/cost-order note: geo/release-proof/route-usage.md. Both are intentionally untested and gated by --allow-paid (never passed here). Parent owns any separately approved paid trials and its canonical report. No new required work is added by this child.
 
 ## Next steps
-1. Run task finish (repository scripts/check), fix any in-scope check failure in place, and rerun finish without resume.
-2. Remove build/helper caches recreated by finish, then wait for parent task complete integration; deliver its completion notice once. Do not restart the four terminal trials or pass --allow-paid.
+<!-- task:closed -->
+Closed 2026-10-11T10:06:31Z: ready; the parent gaid-release-proof integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Two additional job launches were refused because the previous job added a dirty task jobs block. Saved each reviewed jobs-block update before the next launch; no failed/refused call created a job.
 ## Notes and decisions
