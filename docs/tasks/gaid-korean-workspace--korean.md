@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:12:41Z
+updated: 2026-10-11T07:14:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"95c18540-98e5-43b9-a8b5-0d904e284979","pid":449523,"provider":"codex","session":"01a129b9-f186-77a1-ae42-9253040f3f74","start":"16741475","token":"ec255bab0a5fc65b75b65f6aeb3722d4f293311e4cecceb860ef9f810f3b27e0"}
 branch: task/gaid-korean-workspace--korean
 target: task/gaid-korean-workspace
@@ -99,10 +99,10 @@ Keep your task document current: list string ids with Korean and English text (b
 edited upstream files, and the surfaces left in English. `task save` reviewed files, then `task finish`.
 
 ## Current state
-Primary-path catalogue extraction and Korean translation implemented, including dynamic counts, accessible control names, branding, light-theme tokens and Appearance language control. Geo dictionaries moved into catalogues with thin wrappers; old defineGeoStrings removed. Job 3: typecheck and copy validation passed; all 927 tests in 141 files passed. Raw ESLint reports 10 errors and 4 warnings in previously existing lines; final baseline comparison next. Dependency install job 1 exited 0; its npm-ci node_modules copied into this worktree (no lockfile changes).
+Primary-path catalogue extraction and Korean translation implemented, including dynamic counts, accessible control names, branding, light-theme tokens and Appearance language control. Geo dictionaries moved into catalogues with thin wrappers; old defineGeoStrings removed. Final checked source: 056ac5924b22 (job 4, exit 0). Typecheck and copy validation passed; all 927 tests in 141 files passed. Raw ESLint reports 10 errors and 4 warnings, exactly matching ba1a71b by file/rule/severity; no new diagnostics. Dependency install job 1 exited 0; its npm-ci node_modules copied into this worktree (no lockfile changes).
 ## Next steps
-1. Record final checks (including lint comparison against ba1a71b), review/save and task finish.
-2. Parent integrates via task complete and records full scripts/check plus actual-screen/keyboard/narrow-layout evidence.
+1. Child result ready: task finish notifies the parent writer; parent integrates via task complete.
+2. Parent records full scripts/check plus actual-screen/keyboard/narrow-layout evidence. No deployments or paid model runs performed by this child.
 ## Failed approaches
 
 - First full web check (job 2): typecheck/copy passed; 922/927 tests passed. Five assertions failed: three glossary expectations, one Kady product-name expectation and a fixed/dynamic status id collision. Fixed the copies/tests and audited all literal appText calls for missing ids/unbound parameters (0 remain).
@@ -165,6 +165,17 @@ Child unit: no separate report. Integration-ready copy ledger and verification n
   - web/src/components/settings/providers-panel.tsx
   - web/src/components/thinking-selector.tsx
   - web/src/components/tool-activity.tsx
+
+## Verification
+
+- Job 1 (dependency installation): exit 0.
+- Job 2 (initial full web checks): exit 1; five copy/id-related test failures (922/927 passing) and existing ESLint diagnostics. Fixed before job 3.
+- Job 3 (corrected full web checks): exit 1 only because raw ESLint returns nonzero for the pre-existing diagnostics; typecheck, 927 tests/141 files and copy validation passed. This is a superseded intermediate check, not an outstanding failure.
+- Job 4 (final checked source 056ac5924b22): exit 0. Commands: npm --prefix web ci; cd web && npx tsc --noEmit; npm test; node ../geo/copy/validate-copy.mjs src/geo/locales; npx eslint on every touched TS/TSX file (including new locale-root and updated tests). A separate ESLint API comparison linted the same files against ba1a71b: 10 errors/4 warnings before and after, newProblems=0. Raw lint remains nonzero; accepted by the explicit child check policy allowing pre-existing errors in untouched lines.
+- Copy validation: 8 catalogues, 0 errors, 2 warnings. The negative independently-verified statement retains its limitation despite the heuristic warning; the map displayFallback demonstrative warning is preserved migrated copy.
+- All 1,908 flat catalogue messages formatted with representative arguments without an ICU exception. All literal appText calls audited: no missing ids or parameterless messages with unbound arguments.
+- Final check receipt: /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T071232.084510Z/receipt.json; log and exit are siblings. Check harnesses and baseline input sources are under /home/seongin3/data/geoaidesk/work/gaid-korean-workspace--korean/ (not app assets; no runtime dependency).
+- Parent-owned pending checks: scripts/check, production/browser render, actual Korean primary-path keyboard/375px checks. Not claimed by this child.
 
 ## Copy ledger
 
