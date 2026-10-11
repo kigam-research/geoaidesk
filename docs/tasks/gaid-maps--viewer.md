@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T05:33:28Z
+status: ready
+updated: 2026-10-11T05:33:29Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -29,8 +29,8 @@ Visible strings isolated in map/strings.ts (Korean-first using current geo i18n 
 - `.geomap.json` maps to `geo-map`; POST /geo/result initializes multiple sources and presents analysis table/script paths + limitations. Ordinary TIFF delegates to the existing inspection/imaging viewer; LAS registry line is unchanged.
 - Final targeted checks passed: `npm --prefix web test -- src/geo/viewers/map src/geo/viewers/inspection-viewer.test.tsx src/lib/use-sandbox.test.ts` (5 files, 40 tests, including real OpenLayers native fit); `cd web && npx tsc --noEmit --incremental false`; `cd web && npx eslint src/geo/viewers/map src/geo/viewers/registry.ts` (zero errors/warnings); `git diff --check` clean.
 ## Next steps
-1. Helper integration verified. Report pending parent integration for route viewer-continue-f3b3631f1273, check queued routes, and rerun `task finish` in place (no resume). Let CLI fetch/merge the published parent and run declared checks; do not weaken tests or copy unpublished sibling files.
-2. Parent integrates this ready child with `task complete gaid-maps--viewer`, performs browser evidence below, and owns the canonical report and final integration. Remove regenerated ignored dependency/build caches after the last check.
+<!-- task:closed -->
+Closed 2026-10-11T05:33:29Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Continuation finish stopped at the append-only viewer registry merge conflict before checks; resolved both sides as already authorized, then reran finish in place.
