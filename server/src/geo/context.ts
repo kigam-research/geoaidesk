@@ -118,6 +118,11 @@ function tryCatalogue(): GeoCatalogue | null {
   }
 }
 
+/** `exposureModeIssue` against the active catalogue (for request bodies). */
+export function geoExposureIssue(mode: unknown): string | null {
+  return exposureModeIssue(mode, tryCatalogue());
+}
+
 let supportSkills: string[] | null = null;
 
 /**

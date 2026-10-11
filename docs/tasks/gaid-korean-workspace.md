@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:33:15Z
+updated: 2026-10-11T06:47:54Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -44,10 +44,50 @@ Verified facts from the hub (2026-10-11):
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
+- 2026-10-11: inputs read (forwarded goal, plan §3.5–3.6/§4.5–4.6/§5.3/WP07, gaid-interfaces.md); frontend surveyed.
+  WP00 is not on skill_hub main yet: its approved state is branch task/gaid-design-copy @ 63cbdad22f (user approved
+  the copy set there); vendored from that commit, to be re-pinned to main when it lands.
 ## Next steps
 1. (the next session's first action)
 ## Failed approaches
 ## Notes and decisions
+- Scope = WP07 package text only (forwarded goal b619ca2ff749). Done: researcher opens data, sees relevant actions,
+  launches the correct pack, opens outputs; missing skills/environments never shown as ready; new chat/pack transitions
+  preserve drafts; primary-path Korean, keyboard, narrow-layout and actual-screen checks recorded.
+- Sequential decisions (settled by the orchestrator before children start):
+  1. Locales: per-namespace catalogues `web/src/geo/locales/<ns>/{ko,en}.json` (ICU subset, flat dotted ids inside),
+     aggregated by `web/src/geo/locales/index.ts` (owner: orchestrator). Reason: parallel writers never edit one JSON
+     file; the WP00 validator walks directories recursively. `t(id, vars)` in `web/src/geo/i18n.ts`; locale = saved
+     override (`gaid:locale`) else browser language, Korean default.
+  2. WP00 copy kit vendored into `geo/copy/` (validator, icu-lite, policy, terminology, guideline, agent prompt) with
+     `geo/copy/SOURCE.md` (skill_hub commit + sha256); `scripts/check` runs it over `web/src/geo/locales`.
+     The catalogue archive's `policy/` replaces the vendored copy when WP10 pins a release carrying it.
+  3. Pack launch does not pre-create a session: the new tab carries `geoExposure: "workflow:<id>"` in its persisted
+     chat state; the first send passes it to `POST /sessions` → `createSession(..., {geoExposure})` →
+     `geoSessionParts({mode})`. Survives reload/restart like any draft. Draft = workflow prompt + choices + bound files
+     in the new tab's composer, never auto-sent; the source tab keeps its own draft.
+  4. Start-task seam: window event `gaid:start-task` (web/src/geo/workspace/events.ts) handled in page.tsx: open a new
+     tab seeded from the active tab's model/thinking/compute plus the task draft, attached files, pinned primary skill
+     and geoExposure.
+  5. Readiness is computed server-side (`GET /geo/workflows`): skills installed+enabled in the project, project
+     environment import probe, and `compatibilityRef` (GAID run record) reported separately; "ready" needs the first
+     two; no record shows as 미시험, never as verified.
+  6. geo-result reference: scientific_result kind `geo-result` {manifestPath, resultKind map-layer|depth-track|
+     validation-curve, thumbnailPath?}; the card opens the manifest through the existing onOpenFile chain.
+- Packages / owners / integration order:
+  - O (orchestrator, first): i18n + locales layout, copy kit + check step, contracts
+    `web/src/geo/contracts/workspace.ts` + `server/src/geo/workspace/types.ts`, upstream seams (page.tsx start-task
+    handler, workspace-persistence geoExposure, use-agent/chat-tab ensureSession body, sessions.ts POST body,
+    session-registry option, mount points in file-preview-panel / scientific-result-card / chat-tab).
+  - O: server workspace API (`server/src/geo/workspace/`, routes `GET /geo/workflows`, `POST /geo/suggestions`,
+    `POST /geo/recipes/check`, scientific-result `geo-result` kind) + tests.
+  - Child `gaid-korean-workspace--tasks` (general work): `web/src/geo/workspace/**` UI — workflow catalogue panel,
+    task setup dialog, recipe import, file action suggestions (≤3), geo-result card, "make reusable skill" entry; its
+    locale namespace `workspace`.
+  - Child `gaid-korean-workspace--korean` (general work): Korean primary path — branding (layout metadata, header,
+    brand assets from WP00 when present), WP00 app tokens/fonts, migrate geo module `strings.ts` into locales,
+    translate primary-path upstream components via `t()` (namespace `app.*`), language setting; boundaries entries.
+  - Integration (O): merge children, actual-screen browser checks (ko, keyboard, 375–1440 px), report.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

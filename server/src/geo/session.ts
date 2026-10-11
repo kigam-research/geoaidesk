@@ -8,7 +8,7 @@
  */
 import type { ExtensionFactory, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import type { ProjectPaths } from "../projects.ts";
-import { applyExposure, resolveSessionExposure, type ExposableSkill, type SessionExposure } from "./context.ts";
+import { applyExposure, resolveSessionExposure, type ExposableSkill, type ExposureMode, type SessionExposure } from "./context.ts";
 import { geoCatalogueActive } from "./catalogue.ts";
 import { appendGeoInstructions } from "./instructions.ts";
 import { makeGeoReadHintExtension } from "./read-hints.ts";
@@ -21,6 +21,8 @@ export interface GeoSessionContext {
   sessionId: string;
   /** True for a session file with no entries yet (a brand-new chat). */
   isNew: boolean;
+  /** Exposure a brand-new chat records instead of the project default (a started task). */
+  mode?: ExposureMode;
 }
 
 export interface GeoSessionParts {
@@ -37,7 +39,7 @@ export interface GeoSessionParts {
 export function geoSessionParts(ctx: GeoSessionContext): GeoSessionParts {
   let exposure: SessionExposure | null = null;
   try {
-    exposure = ctx.sessionId ? resolveSessionExposure(ctx.paths, ctx.sessionId, { isNew: ctx.isNew }) : null;
+    exposure = ctx.sessionId ? resolveSessionExposure(ctx.paths, ctx.sessionId, { isNew: ctx.isNew, mode: ctx.mode }) : null;
   } catch (err) {
     console.warn(`[gaid] skill exposure unavailable for ${ctx.sessionId}: ${(err as Error).message}`);
   }

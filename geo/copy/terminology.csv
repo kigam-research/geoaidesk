@@ -1,0 +1,43 @@
+ko,en,definition,forbidden_ko,forbidden_en,note
+GeoAIDesk,GeoAIDesk,"Product name; use in titles and first mentions.",지오AI데스크|지오에이아이데스크,Geo AI Desk|GeoAI Desk,Keep the Latin spelling in both languages.
+GAID,GAID,"Short product name for compact UI chrome after GeoAIDesk has appeared.",,,
+Geoscience 자료,geoscience data,"Data of any geoscience field handled by GeoAIDesk.",지구과학 자료|지구과학 데이터,,"User decision 2026-10-11: 지구과학 자료 reads as translated; mix the English term."
+에이전틱 프레임워크,agentic framework,"Product category of GeoAIDesk (user decision 2026-10-11): a framework, not a platform.",연구 보조 플랫폼|AI 플랫폼,research assistant platform,
+AI agent,AI agent,"The model-driven assistant that runs skills and analysis code in a project.",AI 에이전트|인공지능 에이전트,,
+workflow,workflow,"A recorded sequence of analysis steps for one task type.",워크플로우|작업 흐름,,
+context 길이,context length,"Token context of the connected model; must match the model server setting.",문맥 길이,,
+upstream,upstream,"The K-Dense BYOK repository GeoAIDesk is forked from.",상류 앱|상류 저장소,,
+spatial leakage,spatial leakage,"Optimistic evaluation from spatially dependent training and test data.",공간 누출|공간 누수,,
+spatial block,spatial block,"A contiguous region used as one evaluation fold.",공간 블록,,
+depth track,depth track,"A column of the well-log view that draws curves against depth.",깊이 트랙,,
+well log,well log,"Downhole measurement curves recorded against depth (LAS, DLIS).",웰로그|웰 로그,welllog,"Korean copy uses the English term (Well log at sentence start); 검층 is acceptable in formal prose."
+Well log QC,well-log QC,"Checks of curve inventory, units, depth coverage, missing values and out-of-range candidates; not interpretation.",검층 품질관리 검증,well log validation,
+측정 심도(MD),measured depth (MD),"Depth along the borehole; keep as in the source and label conversions.",측정깊이,,Keep MD/TVD labels as in the source.
+수직 심도(TVD),true vertical depth (TVD),"Vertical depth below the reference datum.",수직깊이,,
+결측값,missing value,"A value absent in the source; never shown as 0.",누락값|빈값,null value,Show nodata/missing explicitly.
+nodata,nodata,"Raster cells without data; drawn with a grey hatch, not a colour of the scale.",노데이터,no-data|NoData,Keep the token as written in the file metadata where shown.
+out-of-range 후보,out-of-range candidate,"A value outside the declared physical or reference range; a candidate until reviewed.",이상값 확정|오류값,confirmed outlier,Never call a candidate an error.
+CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the source CRS and label display reprojections.",좌표 체계|좌표시스템|좌표 시스템,coordinate system,"Korean copy uses CRS; 좌표계 is acceptable in explanatory prose."
+원본 CRS,source CRS,"The CRS declared by the source file.",,,
+표시 CRS,display CRS,"The CRS used only for drawing the map.",,,
+래스터,raster,"Gridded data such as GeoTIFF.",라스터,,
+벡터,vector,"Point, line or polygon features such as GeoPackage or Shapefile layers.",벡타,,
+지질도,geological map,"Map of geological units; a vector layer with a categorical legend.",지질 지도,geology map,
+양수시험,pumping test,"Aquifer test with drawdown records over time.",펌핑 테스트|펌핑테스트,,
+지화학 조성,assay composition,"Element or oxide concentrations from assays.",어세이 조성,,
+모델 연결,model connection,"The configured route to a language model: subscription sign-in, personal API key or local endpoint.",모델 접속,,
+연결 방식,connection method,"One of the supported routes for a model connection.",접속 방식,,
+로컬 모델,local model,"A model served on the user's own computer (for example via Ollama).",온디바이스 모델,on-device model,
+스킬,skill,"An agent instruction package (SKILL.md and its files).",,,Keep SKILL.md untranslated.
+작업 예제,worked example,"A recorded task with data, steps and outputs that a user can run.",데모,demo,
+실행 기록,run record,"The stored inputs, code, outputs and settings of one run.",실행 로그,run log,
+결과 파일,output file,"A file written by a run.",산출 파일,result file,
+실행 완료,run complete,"The program finished; says nothing about scientific correctness.",,,
+검토 완료,review complete,"A recorded review was done by a named reviewer.",,,
+검토 전,not reviewed,"No recorded review yet; protected limit wording.",,,Never removed by the validator.
+미시험,untested,"This route or combination has not been tested; protected limit wording.",테스트 안 됨,not tested yet,Never removed by the validator.
+추정,estimate,"A value derived by a model or assumption; protected limit wording.",,,Never removed by the validator.
+불확실성,uncertainty,"The stated spread or doubt of a result; protected limit wording.",,,Never removed by the validator.
+설치 안내,installation guide,"The page and button that lead to installation.",설치 가이드,install guide,
+프로젝트,project,"A folder that holds the data, runs and records of one study.",,,
+unlabeled 셀,unlabeled cell,"A PU cell without a recorded occurrence; not a confirmed negative.",미표지 셀|음성 셀|비광화 셀,negative cell,Do not call unlabeled cells confirmed negatives.

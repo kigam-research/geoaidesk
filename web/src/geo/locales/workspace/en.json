@@ -1,0 +1,6 @@
+{
+  "result": {
+    "label": "Geo result",
+    "open": "{kind, select, map-layer {Open map} depth-track {Open depth tracks} validation-curve {Open validation curve} other {Open output file}}"
+  }
+}

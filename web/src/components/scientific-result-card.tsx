@@ -14,8 +14,12 @@ import {
   TriangleAlertIcon,
   XCircleIcon,
   type LucideIcon,
+  MapIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+
+import { t } from "@/geo/i18n";
+import { GeoResultBody } from "@/geo/workspace/result-card";
 
 import { KadyFileIcon } from "@/components/file-icon";
 import {
@@ -53,6 +57,7 @@ const KIND_META: Record<
   "dataset-schema": { label: "Dataset schema", Icon: DatabaseIcon },
   "citation-list": { label: "Citations", Icon: BookOpenIcon },
   molecule: { label: "Molecule", Icon: AtomIcon },
+  "geo-result": { label: t("workspace.result.label"), Icon: MapIcon },
 };
 
 function formatNumber(value: number): string {
@@ -683,6 +688,8 @@ function CardBody({
       return <CitationBody card={card} />;
     case "molecule":
       return <MoleculeBody card={card} projectId={projectId} onOpenFile={onOpenFile} />;
+    case "geo-result":
+      return <GeoResultBody card={card} projectId={projectId} onOpenFile={onOpenFile} />;
   }
 }
 

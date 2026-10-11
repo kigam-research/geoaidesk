@@ -53,6 +53,7 @@ import {
 import { withChatSnapshots } from "@/lib/chat-snapshot";
 import { ContextUsageIndicator } from "@/components/context-usage-indicator";
 import { GeoPromptBudget } from "@/geo/context/prompt-budget";
+import { GeoChatActions } from "@/geo/workspace/chat-actions";
 import { CitationBadge } from "@/components/citation-badge";
 import {
   ModalJobChip,
@@ -1317,6 +1318,11 @@ function ChatInput({
                 modelRef={selectedModel.id}
                 refreshKey={isStreaming}
               />
+              <GeoChatActions
+                projectId={projectId}
+                sessionId={currentSessionId}
+                isStreaming={isStreaming}
+              />
               <ContextUsageIndicator
                 usage={contextUsage}
                 onCompact={onCompact}
@@ -1801,7 +1807,12 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
     loadSession,
     notebookEntries,
     subagentCompletions,
-  } = useAgent(projectId);
+  } = useAgent(projectId, {
+    // GeoAIDesk: a started task creates its session with the task's skill exposure.
+    sessionCreateBody: initialWorkspaceState?.geoExposure
+      ? { geoExposure: initialWorkspaceState.geoExposure }
+      : undefined,
+  });
   const isStreaming = status === "streaming" || status === "submitted";
   // Scopes the deep-link querySelector to THIS tab's transcript.
   const rootRef = useRef<HTMLDivElement>(null);
@@ -2092,6 +2103,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       delegation,
       queuedMessages: messageQueue,
       composer: composerDraft,
+      ...(initialWorkspaceState?.geoExposure ? { geoExposure: initialWorkspaceState.geoExposure } : {}),
     });
   }, [
     attachedFiles,

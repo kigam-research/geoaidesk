@@ -1,0 +1,6 @@
+{
+  "result": {
+    "label": "Geo 결과",
+    "open": "{kind, select, map-layer {지도 열기} depth-track {Depth track 열기} validation-curve {검증 곡선 열기} other {결과 파일 열기}}"
+  }
+}

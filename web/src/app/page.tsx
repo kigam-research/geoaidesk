@@ -56,6 +56,9 @@ import {
   type WorkspaceScreen,
 } from "@/lib/workspace-persistence";
 import { seedChatStateFromTab } from "@/lib/new-tab-state";
+import { onStartGeoTask } from "@/geo/workspace/events";
+import { geoTaskChatState } from "@/geo/workspace/tab-state";
+import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import {
   useCallback,
   useEffect,
@@ -655,6 +658,27 @@ function WorkspacePage({
     setView("chat");
   }, []);
 
+  // GeoAIDesk: a task started from the task list, a file suggestion or a
+  // recipe opens in a new tab holding its draft (never sent automatically).
+  useEffect(() => {
+    if (!isActive) return;
+    return onStartGeoTask((task) => {
+      if (tabsRef.current.length >= MAX_CHAT_TABS) {
+        task.result = "tab-limit";
+        return;
+      }
+      const id = makeTabId();
+      const state = geoTaskChatState(tabWorkspaceStatesRef.current[activeTabIdRef.current], task);
+      setTabWorkspaceStates((prev) => ({ ...prev, [id]: state }));
+      setTabs((prev) =>
+        prev.length >= MAX_CHAT_TABS ? prev : [...prev, { id, title: task.title }],
+      );
+      setActiveTabId(id);
+      setView("chat");
+      task.result = "opened";
+    });
+  }, [isActive]);
+
   const closeTab = useCallback((id: string) => {
     // Abort an in-flight stream so the agent doesn't keep running into a
     // detached component. Safe to call on a non-streaming tab too.
@@ -1213,15 +1237,17 @@ function WorkspacePage({
           {/* Workflows view */}
           {isActive && view === "workflows" && (
             <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
-              <WorkflowsPanel
-                onLaunch={handleWorkflowLaunch}
-                onUploadFiles={sandbox.uploadFiles}
-                availableFiles={allFiles}
-                availableFolders={allFolders}
-                filesReady={sandbox.tree !== null}
-                onRefreshFiles={sandbox.fetchTree}
-                budgetBlocked={projectCost.budget.state === "exceeded"}
-              />
+              <GeoTaskCatalogue projectId={projectId} availableFiles={allFiles}>
+                <WorkflowsPanel
+                  onLaunch={handleWorkflowLaunch}
+                  onUploadFiles={sandbox.uploadFiles}
+                  availableFiles={allFiles}
+                  availableFolders={allFolders}
+                  filesReady={sandbox.tree !== null}
+                  onRefreshFiles={sandbox.fetchTree}
+                  budgetBlocked={projectCost.budget.state === "exceeded"}
+                />
+              </GeoTaskCatalogue>
             </div>
           )}
         </div>

@@ -43,7 +43,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL); branding and copy belong to gaid-korean-workspace"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -104,7 +104,7 @@
       "path": "server/src/agent/session-registry.ts",
       "owner": "gaid-runtime",
       "status": "edited",
-      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists"
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode."
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
@@ -114,15 +114,15 @@
     },
     {
       "path": "server/src/agent/scientific-result.ts",
-      "owner": "gaid-runtime",
-      "status": "unchanged",
-      "responsibility": "Import the small geo-result reference schema"
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "Kind geo-result (resultKind + manifestPath + optional thumbnailPath) referencing a geo-result/v1 manifest; manifest check in server/src/geo/workspace/result-reference.ts"
     },
     {
       "path": "web/src/components/chat-tab.tsx",
-      "owner": "gaid-runtime",
+      "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "GeoPromptBudget chip (web/src/geo/context/) next to the context gauge in the composer toolbar; gaid-korean-workspace owns any further change to this component"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -134,7 +134,7 @@
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "Format-aware dispatch. gaid-runtime added the geo seam: fileCategory() asks geoFileCategory() first and VIEWER_REGISTRY spreads GEO_VIEWER_REGISTRY (web/src/geo/viewers/registry.ts); gaid-well-tables and gaid-maps change only their own entry in that geo registry (append-only); gaid-korean-workspace owns any non-additive change",
+      "responsibility": "Format-aware dispatch. gaid-runtime added the geo seam: fileCategory() asks geoFileCategory() first and VIEWER_REGISTRY spreads GEO_VIEWER_REGISTRY (web/src/geo/viewers/registry.ts); gaid-well-tables and gaid-maps change only their own entry in that geo registry (append-only); gaid-korean-workspace owns any non-additive change gaid-korean-workspace: GeoFileActions (task suggestions for the open file) above the view-mode viewer.",
       "appendOnly": [
         "gaid-well-tables",
         "gaid-maps"
@@ -193,6 +193,30 @@
       "owner": "gaid-runtime",
       "status": "edited",
       "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row; no authentication changes"
+    },
+    {
+      "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send"
+    },
+    {
+      "path": "server/src/api/sessions.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "POST /sessions accepts an optional { geoExposure } body, validated against the active catalogue (geoExposureIssue) and passed to createSession"
+    },
+    {
+      "path": "web/src/components/scientific-result-card.tsx, web/src/lib/scientific-results.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "geo-result card kind: parser branch and one dispatch line to GeoResultBody (web/src/geo/workspace/result-card.tsx)"
+    },
+    {
+      "path": "server/src/evidence/packages.ts",
+      "owner": "gaid-korean-workspace",
+      "status": "edited",
+      "responsibility": "Evidence packages include a geo-result card's manifest and thumbnail as card assets"
     }
   ],
   "notTouched": [
