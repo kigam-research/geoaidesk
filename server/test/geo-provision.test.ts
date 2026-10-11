@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PROJECTS_ROOT, SKILLS_REPO } from "../src/config.ts";
 import { resetGeoCatalogueCache } from "../src/geo/catalogue.ts";
-import { provisionGeoCatalogue } from "../src/geo/provision.ts";
+import { enableWorkflowSkills, provisionGeoCatalogue } from "../src/geo/provision.ts";
 import {
   getSkillSyncStatus,
   hashDirectory,
@@ -125,5 +125,21 @@ describe("provisionGeoCatalogue", () => {
     expect(outcome.state).toBe("unavailable");
     expect(outcome.error).toMatch(/was not found/);
     expect(names(paths)).toEqual([]);
+  });
+});
+
+describe("enableWorkflowSkills", () => {
+  it("enables default-disabled skills that a workflow binds and leaves the others", () => {
+    const paths = ensureProjectExists("geo-workflow-skills");
+    const skill = (name: string) => ({ id: `k-dense/${name}`, name, files: { "SKILL.md": `---\nname: ${name}\ndescription: ${name}\n---\n` } });
+    const fixture = buildFixtureCatalogue({
+      skills: [...defaultSkills(), skill("geopandas"), skill("matplotlib")],
+      workflows: [{ id: "geo-map-and-crs", title: { ko: "지도" }, skillIds: ["kigam/geo-map-and-crs", "k-dense/geopandas"], environmentProfile: "geo-core" }],
+    });
+    const opts = options(fixture);
+    for (const name of ["geopandas", "matplotlib"]) writeSkill(skillsDisabledDir(paths), name, name);
+    expect(enableWorkflowSkills(paths, opts)).toEqual(["geopandas"]);
+    expect(listProjectSkills(paths).map((s) => s.name)).toContain("geopandas");
+    expect(listDisabledSkills(paths).map((s) => s.name)).toEqual(["matplotlib"]);
   });
 });

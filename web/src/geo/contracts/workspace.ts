@@ -3,7 +3,7 @@
  * readiness, file-aware task suggestions, `.geo-start.json` recipe checks,
  * the start-task hand-off and the geo-result reference card.
  *
- * Server side: server/src/geo/workspace/ (types.ts mirrors this file). The
+ * Server side: server/src/geo/workspace/ imports this IO-free file. The
  * workflow fields come from the pinned catalogue's `workflows.json`
  * (skill_hub geo-workflow/v1, docs/specs/gaid-interfaces.md §9); text stays
  * `{ko, en?}` and the UI picks the locale.
@@ -106,8 +106,8 @@ export interface GeoWorkflowSummary {
 
 export interface GeoWorkflowsResponse {
   catalogue: {
-    /** `ready` only when the pinned archive is verified and staged. */
-    state: "ready" | "off" | "missing" | "invalid" | string;
+    /** `ready` only when the pinned archive is verified and staged; `error` carries `detail`. */
+    state: "ready" | "off" | "error";
     version: string | null;
     detail?: string;
   };
@@ -116,11 +116,21 @@ export interface GeoWorkflowsResponse {
 
 // --- POST /geo/suggestions  { path } ---------------------------------------
 
+/**
+ * Content evidence behind a suggestion, from the inspected columns or layers.
+ * Generic formats (CSV, XLSX, JSON, Markdown, PNG) are suggested only with one.
+ */
+export interface GeoSuggestionSignal {
+  kind: "element-columns" | "time-drawdown-columns" | "xy-label-columns" | "categorical-field";
+  /** Column or field names that matched (at most six). */
+  columns: string[];
+}
+
 export interface GeoSuggestion {
   workflowId: string;
   title: Localized;
   /** Input role the file matches and why. */
-  match: { roleId: string; roleLabel: Localized; format: string; required: boolean };
+  match: { roleId: string; roleLabel: Localized; format: string; required: boolean; signal?: GeoSuggestionSignal };
   /** Scientific choices the user still has to make. */
   needs: Localized[];
   readiness: WorkflowReadiness;
@@ -147,10 +157,23 @@ export interface GeoStartRecipe {
   unresolvedChoices: string[];
 }
 
+/** The checks of skill_hub `checkGeoStart` (web/shared/atlas/byok-export.ts) plus schema and catalogue state. */
+export type GeoRecipeIssueCode =
+  | "schema"
+  | "catalogue-off"
+  | "catalogue-version"
+  | "unknown-workflow"
+  | "workflow-skill"
+  | "unknown-choice"
+  | "unknown-skill"
+  | "unknown-example"
+  | "choice-state";
+
 export interface GeoRecipeIssue {
-  /** e.g. `catalogue-version`, `unknown-workflow`, `unknown-skill`, `workflow-skill-missing`, `unknown-choice`,
-   *  `choice-conflict`, `example-not-in-skills`, `schema`. */
-  code: string;
+  code: GeoRecipeIssueCode;
+  /** The offending value (skill id, choice key, version, schema path), for the UI message. */
+  subject?: string;
+  /** English technical detail; the UI shows its own catalogue message per code. */
   message: string;
 }
 
