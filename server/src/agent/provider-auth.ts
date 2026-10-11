@@ -713,7 +713,7 @@ export function modelForClient(
 export interface ClientDirectModel
   extends Omit<ClientProviderModel, "sourceId" | "billingMode"> {
   sourceId: string;
-  billingMode: DirectProviderBilling;
+  billingMode: DirectProviderBilling | "local";
 }
 
 /**

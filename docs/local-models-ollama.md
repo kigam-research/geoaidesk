@@ -3,6 +3,24 @@
 Kady supports Ollama and a separate OpenAI-compatible server connection. Both
 are billed at $0 in Kady and require a model with usable tool-calling support.
 
+## GeoAIDesk managed local model
+
+The **Local model and context** card manages `gaid-local` against the configured
+Ollama server. Use at least **64K (65,536 tokens)**: it is the new default and
+minimum accepted by this card/API. The proposed 32K profile has been removed
+because the startup prompt leaves insufficient room for task work. Previously
+saved smaller contexts remain visible and are not rewritten automatically.
+
+The 98,304-token profile records one earlier trial on one RTX 4090; it is not a
+performance guarantee. The 64K profile is untested. Real-task 64K/98K trials
+remain WP10 release-proof work.
+
+`gaid-local` is billed `local` ($0, not cap-counted), so chats and local specialists
+can run after the project's paid spend limit is reached. Other custom providers
+remain payg even when their declared price is zero. Paid tools and paid
+specialists still obey the spend cap. Hosted gateways must not use the dedicated
+local provider ID.
+
 ## Ollama
 
 1. Install and start Ollama on a host reachable from the BYOK backend.

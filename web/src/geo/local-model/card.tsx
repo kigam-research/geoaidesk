@@ -27,9 +27,9 @@ async function request(path: string, init?: RequestInit): Promise<LocalModelStat
 export function LocalModelCard() {
   const [status, setStatus] = useState<LocalModelStatus | null>(null);
   const [model, setModel] = useState("");
-  const [context, setContext] = useState(32_768);
+  const [context, setContext] = useState(65_536);
   const [output, setOutput] = useState(4_096);
-  const [profile, setProfile] = useState("proposed-32k");
+  const [profile, setProfile] = useState("proposed-64k");
   const [variant, setVariant] = useState(false);
   const [useDefault, setUseDefault] = useState(false);
   const [busy, setBusy] = useState(true);
@@ -41,7 +41,7 @@ export function LocalModelCard() {
     const entry = data.provider?.models[0];
     setModel(entry?.id ?? data.models[0]?.model ?? "");
     if (entry?.contextWindow) setContext(entry.contextWindow);
-    setProfile(data.profiles.find(item => item.contextWindow === (entry?.contextWindow ?? 32768))?.id ?? "custom");
+    setProfile(data.profiles.find(item => item.contextWindow === (entry?.contextWindow ?? 65536))?.id ?? "custom");
     if (entry?.maxTokens) setOutput(entry.maxTokens);
     setUseDefault(Boolean(entry && data.defaults.model === `gaid-local/${entry.id}`));
   }, []);
@@ -55,7 +55,7 @@ export function LocalModelCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setSaved(false);
-    if (!model || !Number.isInteger(context) || context < 1000 || context > 100_000_000
+    if (!model || !Number.isInteger(context) || context < 65_536 || context > 100_000_000
       || !Number.isInteger(output) || output < 1 || output > 10_000_000 || output >= context) {
       setError(t("invalid")); return;
     }
@@ -73,7 +73,7 @@ export function LocalModelCard() {
   };
   const selected = status?.models.find(item => item.model === model);
   const entry = status?.provider?.models[0];
-  const profileLabel = (id: string) => t(id === "recorded-96k" ? "recorded" : id === "proposed-32k" ? "compact32" : "compact64");
+  const profileLabel = (id: string) => t(id === "recorded-96k" ? "recorded" : "compact64");
   const number = (value: number | null | undefined) => value ?? t("unknown");
   const fieldClass = "rounded-md border bg-background px-2 py-1.5 text-xs";
 
@@ -110,9 +110,10 @@ export function LocalModelCard() {
             </select>
           </label>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1">{t("context")}<Input aria-label={t("context")} type="number" min={1000} max={100_000_000} step={1} value={context} onChange={e => { setContext(Number(e.target.value)); setProfile("custom"); setSaved(false); }} /></label>
+            <label className="flex flex-col gap-1">{t("context")}<Input aria-label={t("context")} type="number" min={65_536} max={100_000_000} step={1} value={context} onChange={e => { setContext(Number(e.target.value)); setProfile("custom"); setSaved(false); }} /></label>
             <label className="flex flex-col gap-1">{t("output")}<Input aria-label={t("output")} type="number" min={1} max={Math.min(context - 1, 10_000_000)} step={1} value={output} onChange={e => { setOutput(Number(e.target.value)); setSaved(false); }} /></label>
           </div>
+          <p role={context < 65_536 ? "alert" : undefined}>{t("minimum")}</p>
           <p className="text-muted-foreground">{t("evidence")}</p>
           <label className="flex items-center gap-2"><input type="checkbox" checked={variant} onChange={e => setVariant(e.target.checked)} />{t("variant")}</label>
           <p className="text-muted-foreground">{t("variantHelp")}</p>

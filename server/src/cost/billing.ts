@@ -2,6 +2,11 @@ import type { Api, AuthType, Model } from "@earendil-works/pi-ai";
 import type { ModelRuntime } from "@earendil-works/pi-coding-agent";
 import { subscriptionProvider } from "../agent/provider-auth.ts";
 import { isPlanBilledProvider } from "../agent/provider-catalog.ts";
+import { GAID_LOCAL_PROVIDER } from "../geo/local-provider.ts";
+
+export function isLocalProvider(provider: string): boolean {
+  return provider === "ollama" || provider === "openai-compatible" || provider === GAID_LOCAL_PROVIDER;
+}
 
 export type BillingMode =
   | "payg"
@@ -37,10 +42,10 @@ export function billingForProvider(
   provider: string,
   authType: LedgerAuthType = "none",
 ): BillingContext {
-  // Local model servers only. Both are $0 because the model runs on the user's
-  // own hardware — do not extend this branch to a hosted gateway, whose real
+  // Local model servers only, including GAID's dedicated Ollama entry.
+  // These are $0 because the model runs on the user's own hardware — do not extend this branch to a hosted gateway, whose real
   // spend would then be invisible to the project cap.
-  if (provider === "ollama" || provider === "openai-compatible") {
+  if (isLocalProvider(provider)) {
     return { provider, authType: "local", billingMode: "local" };
   }
   if (provider === "modal") {
@@ -80,7 +85,7 @@ export async function billingForModel(
   model: Model<Api>,
   runtime: Pick<ModelRuntime, "checkAuth">,
 ): Promise<BillingContext> {
-  if (model.provider === "ollama" || model.provider === "openai-compatible") {
+  if (isLocalProvider(model.provider)) {
     return billingForProvider(model.provider, "local");
   }
   const auth = await runtime.checkAuth(model.provider);
