@@ -202,9 +202,6 @@ try {
     body: NOTE_TEXT,
   });
   assert.equal(saved.status, 200, `file saved: ${saved.text}`);
-  await stopLauncher(current);
-  log("stop 1 ok (ports released)");
-
   // Catalogue status and a new chat's start-prompt budget, from the running backend.
   const catalogueRes = await request(`${api}/geo/catalogue`);
   assert.equal(catalogueRes.status, 200, `GET /geo/catalogue: ${catalogueRes.text.slice(0, 200)}`);
@@ -213,6 +210,8 @@ try {
   assert.equal(budgetRes.status, 200, `GET /geo/context/preview: ${budgetRes.text.slice(0, 200)}`);
   const budgetText = budgetRes.text;
   log(`start-prompt estimate: ${JSON.parse(budgetText).budget.initialPrompt.estimatedTokens} tokens`);
+  await stopLauncher(current);
+  log("stop 1 ok (ports released)");
 
   // Round 2: restart keeps the project and reuses the build.
   log("start 2 (restart)");
