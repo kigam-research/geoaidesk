@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:21:29Z
+updated: 2026-10-11T11:31:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -146,16 +146,17 @@ On a child's finish: `task complete gaid-release-proof--<child>`.
 3. WP09 intake templates: not on skill_hub main as of 2026-10-11 (no schemas/skill-submission.schema.json).
 ## Failed approaches
 ## Notes and decisions
+- User, 2026-10-11, on report §6 (four decisions): "모두 권장으로 진행하자." → 1 나) no brand clearance yet: app release
+  only as a GitHub draft, published after clearance; 2 가) catalogue release published now (done: geo-catalogue-0.2.1,
+  prerelease, remote sha256 verified); 3 가) run both paid routes (personal API key + Sign in with ChatGPT); 4 가) the
+  local route is not advertised as supported, only its results and limits.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 로고(GAID 브랜드 이미지)의 기관 공개 승인 — 가) 승인 받음, 공개 릴리스에 그대로 사용 — 나) 미승인, 앱 릴리스는 GitHub 초안까지만 만들고 공개는 승인 뒤 — 다) 미승인, 로고 없이 글자 표기로 공개 — 권장: 나) 공개 전 승인이 필요하다는 기록(geo/brand) — 막힌 일: 앱 릴리스 공개 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
-- [결정] 카탈로그 아카이브 0.2.1 공개(geoaidesk 릴리스 geo-catalogue-0.2.1, 시험판) — 가) 지금 공개하고 새 설치의 실제 내려받기까지 시험 — 나) 앱 릴리스 공개 때 함께 공개 — 권장: 가) 아카이브에는 스킬과 라이선스 고지만 있고 로고가 없음 — 막힌 일: 새 공개 설치의 카탈로그 스킬 설치 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
-- [결정] 유료·구독 모델 경로 시험(D4) — 가) 개인 API 키와 ChatGPT 로그인 모두 — 나) API 키만 — 다) ChatGPT 로그인만 — 라) 이번 출시는 미시험으로 표기 — 권장: 가) D4가 출시 전 두 경로 시험을 정함 — 막힌 일: API·구독 경로 안내 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
-- [결정] 로컬 모델 경로의 안내 방식 — 가) 지원으로 안내하지 않고 시험 결과와 한계만 공개 — 나) 98K 지도·면적표 과제에 한해 시험된 조합으로 안내 — 권장: 가) 4건 중 1건만 기준 통과 — 막힌 일: C 사이트·설치 안내의 로컬 모델 문구 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
+- [대기] 기관 브랜드(geo/brand 로고) 공개 승인 후 앱 릴리스 geo-v0.1.0 공개 — 가) 승인 받으면 초안 릴리스를 공개 — 나) 로고를 바꾼 뒤 공개 — 권장: 가) 사용자 결정(2026-10-11)대로 초안까지만 만들어 둠 — 막힌 일: 앱 릴리스 공개 — 조건: 기관 브랜드 승인 — 근거: reports/2026-10-11-gaid-release-proof#6-결정할-일
 ## Report
 Report: reports/2026-10-11-gaid-release-proof/index.md
 
@@ -168,6 +169,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
   - disposition: {"evidence":[],"reason":"Web card test still expected the old local-model copy; test updated, rerun passed","recorded":"2026-10-11T11:06:54Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T105926.584146Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T111254.525490Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof-20261011T113007.190448Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
