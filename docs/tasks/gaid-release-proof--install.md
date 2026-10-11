@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:37:59Z
+updated: 2026-10-11T08:44:41Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -83,6 +83,7 @@ before finishing (server/node_modules, server/src/helpers/.venv, web/node_module
 web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
+- Delivery complete: reproducible install/update scripts plus actual records for all requested runs. Linux/WSL install and update PASSED; Windows native install FAILED at service readiness (record retained); macOS and Windows update remain untested. Candidate app commit: d5702afe99d90e285b0fef2500126ac63537a6ed; update base: 882cd56. No app code changed, no paid model calls, no releases/tags published.
 - Resumed in the assigned PC74 worktree; base contains shared instance harness and catalogue 0.2.1 pin.
 - Read AGENTS.md, record contract and shared harness. Codegraph is unindexed here; exact native source reads are used.
 - PC71 WSL has uv at ~/.local/bin/uv but not on its noninteractive PATH. Native Windows prerequisites respond.
@@ -98,29 +99,32 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Corrected PC74 update job 4 PASSED every step: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/out/record.json; SHA256 4b0da26427cc6939c4796fcad16483e41859900dadc283f9fdb2cc539d2790e4. Base first start 52,055ms, candidate start 11,011ms. History reopened; untouched pumping-test-diagnostics matched 0.2.1 staged bytes; local edit kept, two untouched catalogue skills updated.
 - Corrected WSL update PASSED every step. Original pc71:~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/update.json; SHA256 224cd1f0b29645fed05db3efb17cbe9c48227c336d8bab757b71c4e3766ac35f. Base first start 53,066ms; candidate start 8,010ms.
 - Final Node geo suite PASSED 28/28 in 35.8s (exit 0), log /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log. Removed created server/src/helpers/.venv and well/__pycache__; no other listed build caches existed.
-- Only native Windows installation remains running. Task job 5 is a durable remote completion wait (Wait-Process for harness PID 3968), not another install. Its relay notification is the next trigger. Do not restart the scheduled task or poll periodically.
-- Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. A bounded Windows next-action check confirmed the scheduled task still running in frontend npm installation; no final Windows result exists yet. Continue only on job 5 notification.
+- Windows native install finished FAILED (first-start duration 1,102,141ms). Original record pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install/record.json copied unchanged to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/record.json; SHA256 7f13311b74ce5266a198691336291b8bcecf509cadc7f484b009812d72924a82. Full first-start.log in the same local folder; SHA256 3568a26ea80de1494649139768bc53b154b65aeaf1aa3e248f46672adc98f800. Backend npm install took 2m, frontend npm install 12m; production build completed; preparation printed skipped/failed; backend briefly listened then stopped during launcher's first GET / readiness probe. No explicit fatal error/exit cause in log. All subsequent API/previews/restart steps are not-run. Parent must keep Windows P1 failed/untested, not advertise this run as ready.
+- Windows used Node 24.13.0, uv 0.12.1, Git 2.51.0.windows.1, Windows 10.0.26200.9457. No prerequisite installation required. Data home really contained both space and Korean text (GAID home 한글), confirmed in UTF-8 log; do not infer this caused the failure.
+- Job 5 was only a remote completion waiter, not an installation proof. Its exit 0 is NOT a passed Windows proof: its PowerShell wrapper cast a missing exit-file read to 0. The authoritative record above is failed. No app retry performed or required for this evidence delivery.
+- Cleanup verified: Windows proof ports 50272/50273 closed, zero proof Node processes, temporary GAID-Install-Proof-20261011 scheduled task unregistered. Durable cleanup evidence: /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-windows/cleanup.json. WSL install/final-update units inactive with exit 0; earlier failed units exited 1 and are not running (services-final.txt in WSL evidence folder).
+- Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. At that time a bounded Windows check found frontend npm still installing; Windows has since finished with the failed result above.
 - Job 1 succeeded relay notification processed: reread full log and record, confirmed all 30 install/restart steps passed, final-stop passed and SHA256 unchanged (46777cca…aa7326). No rerun or additional Windows polling triggered.
 ## Next steps
-1. On job 5 completion notification, fetch Windows record/logs, inspect failed steps if any, verify its ports are stopped and unregister GAID-Install-Proof-20261011 after completion.
-2. Add final remote hashes/timings and known limits; preserve failed first attempts. Do not replay the already-started jobs.
-3. Save and task finish. Parent owns full scripts/check and compatibility/report integration. Linux/WSL install and update are already verified; macOS stays untested.
+1. Save reviewed final task evidence and task finish; parent runs task complete to integrate this child.
+2. Parent owns full scripts/check, canonical report and compatibility integration. Use the authoritative Windows failed record, not waiter job exit 0. Investigating/fixing the native Windows backend startup is app-owner work, outside this child's allowed files.
+3. No jobs/services remain to restart. Preserve all failed first attempts. No required user decision.
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
-- Job 2 failed-exit relay notice processed: reread full log and project-scope HTTP 404; record SHA256 unchanged (a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea), final-stop passed. Fixed and superseded by passing job 4; no new action or rerun. Job 5 Windows completion remains pending.
+- Job 2 failed-exit relay notice processed: reread full log and project-scope HTTP 404; record SHA256 unchanged (a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea), final-stop passed. Fixed and superseded by passing job 4; no new action or rerun.
 - PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
-- Job 3 failed-exit relay notice processed: reread full log and both history HTTP 400 errors; record SHA256 still 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005, final-stop passed. This earlier failed run is superseded by the already-verified passing job 4, not a new regression; no rerun needed. Windows completion wait (job 5) remains the next action.
+- Job 3 failed-exit relay notice processed: reread full log and both history HTTP 400 errors; record SHA256 still 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005, final-stop passed. This earlier failed run is superseded by the already-verified passing job 4, not a new regression; no rerun needed.
+- WSL failed first attempts are retained under /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/: update-scope-failure.json SHA256 3f9213aa859838363aaf4d19109a2efbb7ced1cab34e31fffbee67636dadbd4a; update-history-failure.json SHA256 31616c4a8b0c0ccf23acf194becc6f52c392b0c6311aaaa49e60488207dfb707. Same harness defects as native jobs 2/3, superseded by passing final WSL update.
 ## Notes and decisions
 - Sequential decisions: settle evidence steps and safe fresh-output ownership first, then install runner, update runner, actual host runs, final checks.
 - Owned interfaces: install-* helpers + install-proof/update-proof; shared instance changes only when required for cleanup. No server/web/app edits.
 - Independent work: host executions may overlap after the same harness revision is saved; no nested writers. Integration order: harness, local evidence, remote evidence, parent integration.
 - No paid model requests. Session history will be explicitly marked synthetic and use Pi's own SessionManager serializer; notebook notes use the API.
 - Shared instance minimal changes: clear inherited catalogue archive/URL/download switches; timeout waits for stop and port release instead of sending an unawaited signal.
+- Evidence limits: synthetic session history tests persistence/reopen only (not a model response); tests exercise API/production HTML, not browser visual layout. npm/uv download caches may be warm although each app checkout and GAID_HOME is fresh. All actual runs supplied checksum-pinned archives, so public release download and source-archive install modes were not exercised. macOS and native Windows update were not run.
+- PC74 proof ports independently checked closed after all runs; /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc74-cleanup.json records all eight ports. No worktree build caches remain.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None requiring a user decision in this child. Windows startup failure and untested combinations must be carried as compatibility limitations by the parent.
 ## Report
 No separate child report. Parent gaid-release-proof owns the canonical report; installation/update evidence and limitations above are its integration input. Runner usage: geo/release-proof/install-README.md.
 ## Running jobs
