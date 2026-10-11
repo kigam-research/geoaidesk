@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T03:14:53Z
+status: active
+updated: 2026-10-11T03:22:58Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -121,15 +121,19 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
   blocked-read reason; shapefile → Polygon, 133 features, 22 fields and declared WKT (no guessed EPSG);
   GeoTIFF → EPSG:5186, float64 band. Outputs: pc74:~/data/geoaidesk/work/gaid-runtime/inspect/manual-check.json.
   Original samples were neither copied into Git nor modified.
-- Full regression/check run remains pending; `task finish` runs the repository's declared `scripts/check` in place.
+- First `task finish` ran `scripts/check`: server typecheck and 1538 tests passed / 12 skipped; frontend
+  893 passed / 1 unrelated existing LaTeX editor test timed out at 5 seconds under parallel load.
+  The check script visibly excluded the 2 known PSI-MS vocabulary/network-dependent mzML tests.
+  Log: pc74:~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-iclqrqyp.log.
+  The failing LaTeX file passes alone (9 tests). Rerun `VITEST_MAX_WORKERS=4 task finish` without source changes;
+  Vitest's installed config resolver explicitly honors that environment setting. Full checks remain pending.
   The attempted separate task job did not start: snapshot validation rejects the existing tracked `.env.example`.
   No source/config file was removed to bypass that guard and no job receipt was created.
   Safe targeted recheck: from server,
   `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
   from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-11T03:14:53Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Rerun task finish with VITEST_MAX_WORKERS=4 (declared full checks), then record exact final results.
 
 ## Failed approaches
 - Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory
@@ -139,6 +143,10 @@ Closed 2026-10-11T03:14:53Z: ready; the parent gaid-runtime integrates it. No fu
 - `task job run -- bash -lc 'uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed && cd server && npm ci --no-audit --no-fund && npm test'`
   failed before starting because the snapshot guard rejects the repository's existing tracked `.env.example`.
   Use the task CLI's own finish/check path; do not change an unrelated tracked example or restart a missing job.
+- Full check attempt 1: frontend `latex-editor.test.tsx` / "adds the root preamble for chapter AI edits and
+  requires review before saving" exceeded 5000 ms; the rest of the web suite (893) and all server tests passed.
+  `cd web && npx --no-install vitest run src/components/latex/latex-editor.test.tsx`: 9 passed.
+  No implementation workaround or timeout change was made for that unrelated test.
 ## Notes and decisions
 - Implementation is tightly coupled around one inspection result; no child writers or readers are needed.
 - Sequential decisions: preserve published signatures; keep all parser IO under a per-file byte budget;
