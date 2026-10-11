@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:16:17Z
+updated: 2026-10-11T08:22:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -69,18 +69,28 @@ design note for the paid routes (what the script does for `api-key` with one per
 server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Implemented the reusable route harness, pinned workflow/input preparation, independent artifact/area checks, SSE/ledger/context/offload observations, and paid-route refusal/attach design. No server/web/shared-instance edits.
+- Read the WP10 plan, local/model API contracts, map and well docs, and catalogue 0.2.1 workflow contracts. The exact worktree is not codegraph-indexed, so relevant native source was read.
+- Harness checks: `node --test geo/release-proof/route-tests.mjs` passed (4 tests). Both real input preparations passed; FORCE sha256 matches configs/inputs.toml.
+- Declared checks for this child: `node --test geo/release-proof/route-tests.mjs` and `node --test 'geo/tests/*.test.mjs'` plus the four recorded real local trials. Parent owns full scripts/check after integration.
 ## Next steps
-1. (the next session's first action)
+1. Save reviewed owned files, then start four separate GPU-serialized task jobs (64K/98K × LAS/map). Never pass --allow-paid.
+2. Inspect terminal records, preserve failures and report app defects to parent; repeat once only for a harness correction.
+3. Run declared geo tests, record per-job evidence/hash/outcomes, remove any worktree caches created here, and task finish.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential phases: settle catalogue/API interface → implement harness → record four isolated local jobs → inspect evidence → declared checks/finish. This is a child unit with tightly coupled owned scripts; no nested writers and no independent reader package needed.
+- Owned files: geo/release-proof/route-trial.mjs, route-metrics.mjs, route-tests.mjs, route-usage.md and route-tasks/tasks.mjs. Shared instance.mjs and app code are read-only. Parent integrates with task complete.
+- Map input is reconstructed from the permitted MIT example rectangle-spec.json (the archive has recipe/output evidence, not the binary source); A=30000/B=20000 m2 in EPSG:5186. No known output files are uploaded.
+- Local project spend cap is zero; prompt forbids delegation, other models, paid tools and replacement downloads. Paid routes only attach after user Settings setup and require --allow-paid; see geo/release-proof/route-usage.md for cost-order assumptions and route design.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+No separate child report; parent incorporates this task evidence and geo/release-proof/route-usage.md.
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
