@@ -44,11 +44,48 @@ def read_log(filename):
         raise ValueError("LAS needs 1–128 explicitly named curves.")
     if any(not str(c.original_mnemonic).strip() for c in meta.curves):
         raise ValueError("Missing curve mnemonic: column meaning is ambiguous.")
-    with warnings.catch_warnings(record=True) as caught:
-        log = lasio.read(str(p), null_policy='strict')
-    if len(log.data) > MAX_ROWS or not len(log.data):
-        raise ValueError("LAS preview needs 1–1,000,000 logical samples.")
-    return log, [str(w.message)[:500] for w in caught[:10]]
+    # lasio 0.32 leaves the index NULL sentinel untouched and can infer one
+    # column for valid two-curve wrapped files. Read the LAS 2 numeric section
+    # strictly using the declared curve count, retaining logical row identity.
+    import array
+    import numpy as np
+    numbers = array.array('d')
+    section = ''
+    tables = 0
+    wrapped = str(meta.version['WRAP'].value).upper() == 'YES'
+    delimiter = str(meta.version['DLM'].value).upper() if 'DLM' in meta.version else 'SPACE'
+    if delimiter not in ('SPACE', 'TAB', 'COMMA'):
+        raise ValueError('Unsupported LAS delimiter: ' + delimiter)
+    width = len(meta.curves)
+    with p.open(encoding='utf-8-sig', errors='replace') as stream:
+        for physical in stream:
+            line = physical.strip()
+            if not line or line.startswith('#'):
+                continue
+            if line.startswith('~'):
+                section = line[1:].strip().upper()
+                if section.startswith('A'):
+                    tables += 1
+                continue
+            if not section.startswith('A'):
+                continue
+            tokens = line.split(',') if delimiter == 'COMMA' else line.split()
+            if not wrapped and len(tokens) != width:
+                raise ValueError('Unwrapped LAS row does not match the declared curve count; no samples were repaired.')
+            try:
+                numbers.extend(float(v.replace('D', 'E').replace('d', 'e')) for v in tokens)
+            except ValueError as exc:
+                raise ValueError('LAS numerical token is invalid; no values were guessed.') from exc
+            if len(numbers) > min(MAX_ROWS * width, 8_000_000):
+                raise ValueError('LAS preview exceeds 1,000,000 samples or 8,000,000 values.')
+    if tables != 1 or not numbers or len(numbers) % width:
+        raise ValueError('Expected one complete LAS 2.0 numerical table with the declared curve count.')
+    values = np.frombuffer(numbers, dtype=np.float64).copy().reshape(-1, width)
+    sentinel = finite(meta.well['NULL'].value) if 'NULL' in meta.well else None
+    if sentinel is not None:
+        values[values == sentinel] = np.nan
+    meta.set_data(values)
+    return meta, []
 
 
 def window(filename, request):
@@ -56,7 +93,8 @@ def window(filename, request):
     log, parser_warnings = read_log(filename)
     data = log.data
     n, width = data.shape
-    cols = request.get('columns', list(range(1, min(width, 5))))
+    preferred = [i for name in ('GR', 'RHOB', 'NPHI', 'DTC', 'RDEP', 'CALI', 'BS') for i, c in enumerate(log.curves) if i and str(c.original_mnemonic).upper() == name]
+    cols = request.get('columns', (preferred or list(range(1, width)))[:4])
     if not cols:
         cols = [0]
     if len(cols) > 8 or len(set(cols)) != len(cols) or any(type(c) is not int or c < 0 or c >= width for c in cols):
@@ -93,8 +131,11 @@ def window(filename, request):
             seen.add(float(v))
     gap = np.zeros(n, dtype=bool)
     reversal = np.zeros(n, dtype=bool)
+    declared_step = finite(log.well['STEP'].value) if 'STEP' in log.well else None
+    spacing = abs(declared_step) if declared_step and abs(declared_step) > TOL else abs(step)
+    if spacing:
+        gap[1:] = np.isfinite(diff) & (np.abs(diff) > spacing * 1.5 + TOL)
     if step:
-        gap[1:] = np.isfinite(diff) & (np.abs(diff) > abs(step) * 1.5 + TOL)
         reversal[1:] = np.isfinite(diff) & (diff * step < -TOL * abs(step))
     breaks[1:] = bad[1:] | bad[:-1] | duplicate[1:] | gap[1:] | reversal[1:]
     issues = []
@@ -104,7 +145,7 @@ def window(filename, request):
         if np.any(mask):
             issue(code, f"{int(np.sum(mask))} samples; source order preserved.")
     def header(key, default=''):
-        return log.well[key].value if key in log.well else default
+        return log.well[key].value if key in log.well else log.params[key].value if key in log.params else default
     for key, value in [('STRT', d[0]), ('STOP', d[-1]), ('STEP', step)]:
         declared = finite(header(key, None))
         if declared is not None and finite(value) is not None and abs(declared - value) > TOL:
@@ -180,7 +221,7 @@ def window(filename, request):
                 truncated = len(eligible) > limit
             selected = np.array(sorted(chosen), dtype=int)
         method = 'Source-order min/max bucket envelope with endpoints and missing/depth-break boundaries; exact prefix if topology exceeds display cap'
-    rows = [dict(row=int(i + 1), depth=finite(d[i]), values=[finite(data[i, c]) for c in cols], breakBefore=bool(breaks[i]) or (k > 0 and np.any(breaks[selected[k-1]+1:i+1]))) for k, i in enumerate(selected)]
+    rows = [dict(row=int(i + 1), depth=finite(d[i]), values=[finite(data[i, c]) for c in cols], breakBefore=bool(breaks[i] or (k > 0 and np.any(breaks[selected[k-1]+1:i+1])))) for k, i in enumerate(selected)]
     # Preserve breaks when an entire missing-depth record lies between selected samples.
     valid_depth = d[np.isfinite(d)]
     return dict(schemaVersion='geo-series/v1', well=str(header('WELL')), run=str(header('RUN')), version=str(log.version['VERS'].value), nullValue=finite(header('NULL', None)), wrapped=str(log.version['WRAP'].value).upper() == 'YES', depth=dict(column=0, mnemonic=str(log.curves[0].mnemonic), basis=basis, datum=str(header('DATUM')) or None, unit=unit, start=float(np.min(valid_depth)) if len(valid_depth) else None, stop=float(np.max(valid_depth)) if len(valid_depth) else None, step=step, direction=direction), curves=curves, selectedColumns=cols, issues=issues[:150], sourceRows=n, matchedRows=matched, displayedRows=len(rows), sampled=len(rows) < matched, truncated=truncated, method=method, rows=rows, nextRow=int(selected[-1] + 2) if truncated and len(selected) and selected[-1] < n - 1 else None)

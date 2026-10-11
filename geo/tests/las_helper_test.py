@@ -55,6 +55,11 @@ class LasTest(unittest.TestCase):
         self.assertEqual(r['rows'][3]['depth'], None)
         self.assertEqual(r['depth']['direction'], 'mixed')
 
+    def test_missing_regular_samples_use_declared_step(self):
+        r = self.read(las('100 1\n102 2\n104 3'))
+        self.assertIn('depth-gap', [i['code'] for i in r['issues']])
+        self.assertTrue(r['rows'][1]['breakBefore'])
+
     def test_downward_run_is_not_a_reversal(self):
         r = self.read(las('102 1\n101 2\n100 3').replace('STEP.M 1', 'STEP.M -1'))
         self.assertEqual(r['depth']['direction'], 'decreasing')
