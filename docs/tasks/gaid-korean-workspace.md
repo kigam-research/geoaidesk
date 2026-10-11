@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:17:14Z
+updated: 2026-10-11T07:21:07Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -70,6 +70,12 @@ Verified facts from the hub (2026-10-11):
      orchestrator: "스킬 켜기" for installed-but-disabled workflow skills and a not-installed note, unavailable reason
      names unshipped skills, suggestion content signal shown, recipe issues localized per code (ICU select) instead
      of the English server message; 64 geo web tests pass.
+   - Early browser pass (dev servers :18070/:3070 as user units gaid-wp07-be/-fe, smoke data, scripts
+     ~/data/geoaidesk/work/gaid-korean-workspace/browser/{flow,flow2}.mjs, shots/ there): LAS → one ready suggestion
+     with 미시험 badge; setup dialog → draft in a NEW tab (file attached, primary skill pinned, source tab unchanged);
+     catalogue lists 7 tasks; recipe file → prefilled setup; seeded fixture session (seed-session.mts, no model call)
+     shows the geo-result card and "지도 열기" opens the map viewer. Fixed: icon-only reusable-skill button (toolbar
+     overflow), catalogue padding/scroll, one recipe import instead of one per card.
 2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
    ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
 ## Failed approaches

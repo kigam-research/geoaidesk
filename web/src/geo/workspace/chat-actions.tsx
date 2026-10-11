@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PackagePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { t } from "@/geo/i18n";
@@ -34,7 +35,8 @@ function ChatActions({ sessionId, isStreaming }: { sessionId: string | null; isS
     finally { setBusy(false); }
   };
   return <>
-    <Button size="sm" variant="ghost" disabled={!sessionId || isStreaming} onClick={() => setOpen(true)}>{t("workspace.skill.open")}</Button>
+    {/* Icon-only in the crowded composer toolbar; the name is the accessible label and tooltip. */}
+    <Button size="icon-xs" variant="ghost" aria-label={t("workspace.skill.open")} title={t("workspace.skill.open")} disabled={!sessionId || isStreaming} onClick={() => setOpen(true)}><PackagePlusIcon aria-hidden /></Button>
     <Dialog open={open} onOpenChange={(value) => { if (!busy) setOpen(value); }}>
       <DialogContent showCloseButton={false} className="max-h-[90dvh] overflow-y-auto break-words">
         <DialogTitle>{t("workspace.skill.title")}</DialogTitle>
