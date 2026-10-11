@@ -9,7 +9,6 @@ const initial: LocalModelStatus = {
   provider: null, defaults: {}, verification: { state: "unverified" },
   profiles: [
     { id: "recorded-96k", contextWindow: 98304, evidence: "recorded-trial" },
-    { id: "proposed-32k", contextWindow: 32768, evidence: "proposed-not-tested" },
     { id: "proposed-64k", contextWindow: 65536, evidence: "proposed-not-tested" },
   ],
 };
@@ -30,7 +29,9 @@ describe("LocalModelCard", () => {
     expect(await screen.findByText("Ollama 연결됨")).toBeInTheDocument();
     expect(screen.getByText(/CPU 오프로딩 약 18%/)).toBeInTheDocument();
     expect(screen.getByLabelText("이 컨텍스트로 파생 모델 생성")).not.toBeChecked();
-    await userEvent.selectOptions(screen.getByLabelText("컨텍스트 프로필"), "proposed-64k");
+    expect(screen.getByLabelText("컨텍스트 프로필")).toHaveValue("proposed-64k");
+    expect(screen.getByLabelText("컨텍스트 토큰 수")).toHaveValue(65536);
+    expect(screen.queryByRole("option", { name: /32K/ })).not.toBeInTheDocument();
     await userEvent.click(screen.getByLabelText("기본 모델로 사용"));
     await userEvent.click(screen.getByRole("button", { name: "모델 설정 저장" }));
     expect(await screen.findByText("모델 설정을 저장했습니다.")).toBeInTheDocument();

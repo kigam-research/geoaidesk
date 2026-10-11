@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T05:49:52Z
+updated: 2026-10-11T05:50:15Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cd7c561a-0a57-452c-9026-bbf129244c36","pid":3981134,"provider":"codex","session":"01a12945-9f27-71e2-b32a-5bbc545ac45a","start":"15979142","token":"29bed9d06311d3f15e6cd0567d9374e9a4a03a112c2135a1ce904ef6fe2f5004"}
 branch: task/gaid-well-tables
 target: main
@@ -57,6 +57,7 @@ Verified facts from the hub (2026-10-11):
 - Focused command after unblock: task job run -- bash -lc 'set -e; npm --prefix server ci --no-audit --no-fund; npm --prefix web ci --no-audit --no-fund; uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed; npm --prefix server run typecheck; cd web; npx tsc --noEmit; npm test -- src/geo/viewers/depth/viewer.test.tsx; cd ../server; npx vitest run test/geo-depth.test.ts; cd ..; node --test geo/tests/well.test.mjs'
 
 ## Notes and decisions
+- Final main merge included gaid-runtime-followups (dfc90b2). Resolved the append-only conflict in geo/integration-boundaries.json by keeping both its local-provider/billing entries and this unit’s table-view wrapper entry. No sibling code was changed.
 - Sequential decisions: preserve raw values/order/nulls; unknown depth basis/datum stay unknown; LAS 2.0 numerical support only, LiDAR and LAS 3 explicit unsupported. Full-data operations capped separately from metadata inspection. Display reduction retains spikes and explicit gap boundaries.
 - Independent package: tables child owns new table helper/routes/contracts/viewer/tests only. Parent owns LAS helper/routes/depth UI/manifest/tests and all shared glue, integration boundaries, AGENTS and canonical report.
 - Interfaces settled: table child exports registerGeoTableRoutes(app) and default TableRolesViewer(ViewerProps), on explicit user choice from existing table surfaces; it never replaces generic table editing. Both use WP03 sandbox resolution and inspection conventions. No overlap in owned files.

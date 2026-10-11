@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { atomicJson } from "../atomic-json.ts";
 import { getProject, resolvePaths } from "../projects.ts";
 import { annotateSubagentCosts, isBudgetExceeded, recordRun, type CostOrigin } from "../cost/ledger.ts";
-import { billingForProvider, billingCountsTowardBudget } from "../cost/billing.ts";
+import { billingForProvider, billingCountsTowardBudget, isLocalProvider } from "../cost/billing.ts";
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$/;
 export function meteredSessionFile(projectId: string, file: string): string {
@@ -48,7 +48,7 @@ export function handleSubagentMeter(action: string, raw: Record<string, unknown>
     throw new Error("Invalid subagent accounting request");
   }
   const pid = projectId as string;
-  const billing = billingForProvider(provider, provider === "ollama" || provider === "openai-compatible" ? "local" : raw.authType as "api_key" | "oauth");
+  const billing = billingForProvider(provider, isLocalProvider(provider) ? "local" : raw.authType as "api_key" | "oauth");
   if (action === "admit") {
     recoverSubagentUsage(pid);
     const budget = isBudgetExceeded(pid);

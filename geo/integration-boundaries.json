@@ -163,12 +163,36 @@
       "owner": "gaid-well-tables",
       "status": "edited",
       "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged."
+    },
+    {
+      "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "Recognize the dedicated gaid-local provider as local/$0/not cap-counted consistently in live billing, inferred ledger rows, child admission/receipts and picker metadata; other custom providers remain payg"
+    },
+    {
+      "path": "server/test/geo-local-model.test.ts, server/test/subagent-integration.test.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "64K minimum and gaid-local billing regression coverage, including over-cap child admission"
+    },
+    {
+      "path": "server/test/run-pipeline.test.ts, docs/local-models-ollama.md",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "Over-cap lead regression using gaid-local billing; document the 64K minimum and local billing exception"
+    },
+    {
+      "path": "server/src/agent/provider-auth.ts",
+      "owner": "gaid-runtime",
+      "status": "edited",
+      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row; no authentication changes"
     }
   ],
   "notTouched": [
     "Pi SDK packages and server/scripts/patch-subagents.mjs",
     "Session JSONL / SSE event mapping (server/src/agent/events.ts)",
-    "Subagent supervision, notebook and provenance persistence, cost ledger and billing",
-    "Provider authentication and catalogue (server/src/agent/provider-*.ts)"
+    "Subagent supervision, notebook and provenance persistence",
+    "Provider authentication behaviour and catalogue (provider-auth.ts has a picker-type-only seam)"
   ]
 }
