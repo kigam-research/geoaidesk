@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:26:03Z
+updated: 2026-10-11T08:27:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -91,10 +91,14 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - PC71 WSL install/update services gaid-proof-{install,update}-20261011 and native Windows scheduled task GAID-Install-Proof-20261011 launched from harness 6b7e25e. Outputs: pc71:~/data/geoaidesk/work/gaid-release-proof/install/{wsl-install,wsl-update}; pc71-win:C:/Users/KIGAM_Ahn/gaid-proof/windows-install.
 - PC71 WSL install passed all steps (62,079ms first start, 4,006ms restart). Native Node geo suite passed 28/28 tests (46.5s).
 - Update job 3 checked all preservation items except history, whose synthetic seed used a string instead of the app's text-block array. Corrected that harness seed; retained the failed record.
+- Final corrected update executions use harness ecfd0dd: PC74 job 4 and pc71 service gaid-proof-update-history-20261011 (out: ~/data/geoaidesk/work/gaid-release-proof/install/wsl-update-history).
+- PC74 install record: /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/out/record.json; SHA256 46777ccafac84630b4c275c1be2251b5f0567c6fc474f31ea3d9a1e076aa7326.
+- WSL install record copied without alteration to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/evidence/pc71-wsl/install.json; SHA256 d31b65723c44378bf4a69120aaf27d46291bfc97fa2c8c2ed055aa976cf94f29. Original logs remain beside remote record.
+- Failed native update records retained: job 2 SHA256 a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea; job 3 SHA256 35a3cac59550363f24450f43d83e5c6951e86f46b0748f8497e932a6d436f005 (same run root pattern as receipts below, out/record.json).
 ## Next steps
-1. Save text-block history seed; rerun native + WSL update proof into new evidence directories.
-2. Collect the already-launched installation records; fix only harness failures.
-3. Record every result and limitation, run the declared Node geo tests, then task finish.
+1. On job notifications, collect corrected native/WSL update results and native Windows install result. Do not replay the already-started jobs.
+2. Final Node geo suite output is being written to /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log; collect its status and remove helper/build caches created in this worktree.
+3. Record final paths, SHA256 and known limits, save, then task finish. Parent owns full scripts/check and compatibility/report integration.
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
 - PC74 update job 3: synthetic history content was a string, while app history expects a text-block array. Before/after history returned 400; other checks passed. Fixed the serializer input, not app code.
@@ -110,14 +114,13 @@ web/tsconfig.tsbuildinfo, __pycache__).
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. Parent gaid-release-proof owns the canonical report; installation/update evidence and limitations above are its integration input. Runner usage: geo/release-proof/install-README.md.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082111.414327Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082159.930245Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082352.235557Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--install-20261011T082639.212990Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
