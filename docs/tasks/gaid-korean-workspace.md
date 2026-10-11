@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:47:54Z
+updated: 2026-10-11T06:56:10Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -47,8 +47,22 @@ Verified facts from the hub (2026-10-11):
 - 2026-10-11: inputs read (forwarded goal, plan §3.5–3.6/§4.5–4.6/§5.3/WP07, gaid-interfaces.md); frontend surveyed.
   WP00 is not on skill_hub main yet: its approved state is branch task/gaid-design-copy @ 63cbdad22f (user approved
   the copy set there); vendored from that commit, to be re-pinned to main when it lands.
+- Foundation saved (ba1a71b): locales + i18n (`web/src/geo/i18n.test.ts`), copy kit + check step, contracts, seams
+  (start-task tab, geoExposure through POST /sessions, geo-result card kind, mount points).
+- Server workspace API done: `server/src/geo/workspace/{formats,workflows,suggestions,recipes,result-reference}.ts`,
+  `server/src/geo/routes/workspace.ts`; `npx vitest run test/geo-workspace.test.ts` (15 tests: readiness kept apart,
+  unprobed env never ready, suggestions need a content signal for generic formats, recipe checkGeoStart codes,
+  POST /sessions geoExposure, geo-result manifest checks). geo-maps-integration/geo-tables fail locally only without
+  the helper venv (scripts/check prepares it).
 ## Next steps
-1. (the next session's first action)
+1. Children running (started 2026-10-11 from ba1a71b, profile "general work", normal speed):
+   - gaid-korean-workspace--tasks: Paseo agent 9de57122-4815-4e8d-8db4-f7872cf53c25, worktree
+     ~/worktrees/geoaidesk/gaid-korean-workspace--tasks, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-tasks.md
+   - gaid-korean-workspace--korean: Paseo agent 95c18540-98e5-43b9-a8b5-0d904e284979, worktree
+     ~/worktrees/geoaidesk/gaid-korean-workspace--korean, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-korean.md
+   On each finish notification: `task complete gaid-korean-workspace--<child>`, then integrate.
+2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
+   ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
 ## Failed approaches
 ## Notes and decisions
 - Scope = WP07 package text only (forwarded goal b619ca2ff749). Done: researcher opens data, sees relevant actions,

@@ -233,3 +233,10 @@ export class GeoEnvironmentService {
     } finally { this.preparing.delete(dir); }
   }
 }
+
+let sharedService: GeoEnvironmentService | null = null;
+/** One service per process, so readiness probes and preparation locks are shared by every route. */
+export function geoEnvironmentService(): GeoEnvironmentService {
+  sharedService ??= new GeoEnvironmentService();
+  return sharedService;
+}
