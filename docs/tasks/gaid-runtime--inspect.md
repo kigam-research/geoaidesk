@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T04:01:32Z
+status: active
+updated: 2026-10-11T04:06:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -141,14 +141,19 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
 - Repeated the original trial after env integration: Python helper returned declared WKT with metre axis units
   and no invented EPSG for the shapefile; all three files had no inspection issues. Baseline-only output is kept
   as baseline-manual-check.json; current enriched output is manual-check.json in the same external run folder.
+- A bounded reproduction found that registering only `geotiff` did not override the TIFF classifier's baseline
+  result. Fixed one-time corrected-format redispatch with the same IO budget, final inspector identity/fingerprint,
+  and issue fallback on richer-inspector failure. Added regression tests for richer GeoTIFF, plain TIFF unchanged,
+  and failure. Latest focused check: server typecheck and 30 tests passed (helper enabled; no skips).
+- The fourth finish/check was intentionally interrupted (own process group, exit 143) before publication to fix
+  that registration seam. Final verification must include this dispatcher fix and the latest environment smoke.
   The attempted separate task job did not start: snapshot validation rejects the existing tracked `.env.example`.
   No source/config file was removed to bypass that guard and no job receipt was created.
   Safe targeted recheck: from server,
   `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
   from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-11T04:01:32Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Save the dispatcher correction and retry VITEST_MAX_WORKERS=1 task finish against the current parent.
 
 ## Failed approaches
 - Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory

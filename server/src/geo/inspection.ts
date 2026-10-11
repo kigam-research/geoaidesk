@@ -85,19 +85,31 @@ export async function inspectGeoFile(projectId: string, paths: ProjectPaths, rel
       }
     } catch { issues.push({ code: "companions-unreadable", message: "Companion directory could not be listed.", severity: "warning" }); }
   }
-  const inspector = inspectorFor(format) ?? baselineInspector;
-  const fingerprint = createHash("sha256").update(JSON.stringify({ sources: sourceStats.sort(), inspector: [inspector.name, inspector.version] })).digest("hex");
+  let inspector = inspectorFor(format) ?? baselineInspector;
+  const fingerprintFor = (reader: GeoInspector) => createHash("sha256").update(JSON.stringify({ sources: sourceStats.sort(), inspector: [reader.name, reader.version] })).digest("hex");
   const result: GeoInspection = {
     schemaVersion: GEO_INSPECTION_SCHEMA,
-    asset: { projectId, path: primary.rel, sourceFiles: sourceFiles.sort(), format, family: familyOf(format), sizeBytes: primary.size, fingerprint },
+    asset: { projectId, path: primary.rel, sourceFiles: sourceFiles.sort(), format, family: familyOf(format), sizeBytes: primary.size, fingerprint: fingerprintFor(inspector) },
     issues, inspector: { name: inspector.name, version: inspector.version },
   };
   const rows = options.previewRows ?? 8;
   const ctx: GeoInspectContext = { projectId, paths, relPath: primary.rel, absPath: primary.abs, sizeBytes: primary.size, format, previewRows: Number.isFinite(rows) ? Math.max(0, Math.min(MAX_PREVIEW_ROWS, Math.floor(rows))) : 8, sourceFiles, readBytes };
   try {
-    const parsed = await inspector.inspect(ctx);
+    let parsed = await inspector.inspect(ctx);
+    // TIFF magic cannot distinguish GeoTIFF: georeference tags live in the IFD.
+    // Honor a richer inspector registered for the corrected format, sharing the
+    // same byte budget. Redirect once only, so disagreeing inspectors cannot loop.
+    const corrected = inspectorFor(parsed.asset.format);
+    if (corrected && corrected !== inspector) {
+      inspector = corrected;
+      result.asset.format = parsed.asset.format;
+      result.asset.family = familyOf(parsed.asset.format);
+      result.asset.fingerprint = fingerprintFor(inspector);
+      result.inspector = { name: inspector.name, version: inspector.version };
+      parsed = await inspector.inspect({ ...ctx, format: parsed.asset.format });
+    }
     // The dispatcher owns source identities, even when a downstream inspector overrides a format.
-    return { ...parsed, schemaVersion: GEO_INSPECTION_SCHEMA, asset: { ...result.asset, format: parsed.asset.format, family: familyOf(parsed.asset.format) }, inspector: result.inspector, issues: [...issues, ...parsed.issues] };
+    return { ...parsed, schemaVersion: GEO_INSPECTION_SCHEMA, asset: { ...parsed.asset, ...result.asset, format: parsed.asset.format, family: familyOf(parsed.asset.format) }, inspector: result.inspector, issues: [...issues, ...parsed.issues] };
   } catch {
     result.issues.push({ code: "inspection-failed", message: "Content could not be inspected within the metadata limits. Use a format-aware analysis reader.", severity: "error" });
     return result;

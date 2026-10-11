@@ -76,6 +76,25 @@ describe("shared bounded inspection", () => {
     expect(out.asset.format).toBe("geotiff"); expect(out.crs!.status).toBe("unknown");
     expect(out.issues.map(i => i.code)).toContain("geo-helper-deps-missing");
   });
+  it("dispatches corrected GeoTIFF to a format-only registered inspector and fingerprints its version", async () => {
+    f.write("raster.tif", tiff(true)); f.write("plain.tif", tiff());
+    const baseline = await inspect("raster.tif");
+    const richer = vi.fn(async (ctx) => {
+      expect(ctx.format).toBe("geotiff");
+      return { ...baseline, bands: [{ index: 1, dtype: "richer" }] };
+    });
+    registerGeoInspector({ name: "map-inspector", version: "2", formats: ["geotiff"], inspect: richer });
+    const out = await inspect("raster.tif");
+    expect(richer).toHaveBeenCalledTimes(1); expect(out.inspector).toEqual({ name: "map-inspector", version: "2" });
+    expect(out.bands![0].dtype).toBe("richer"); expect(out.asset.fingerprint).not.toBe(baseline.asset.fingerprint);
+    expect((await inspect("plain.tif")).asset.format).toBe("tiff"); expect(richer).toHaveBeenCalledTimes(1);
+  });
+  it("returns an issue with corrected format when a registered richer inspector fails", async () => {
+    f.write("raster.tif", tiff(true));
+    registerGeoInspector({ name: "map-inspector", version: "bad", formats: ["geotiff"], async inspect() { throw new Error("bad content"); } });
+    const out = await inspect("raster.tif");
+    expect(out.asset.format).toBe("geotiff"); expect(out.issues.map(i => i.code)).toContain("inspection-failed");
+  });
   it("reports BigTIFF and malformed IFDs instead of throwing content errors", async () => {
     f.write("big.tif", Buffer.from([73, 73, 43, 0, 8, 0, 0, 0]));
     expect((await inspect("big.tif")).issues.map(i => i.code)).toContain("bigtiff-unsupported");
