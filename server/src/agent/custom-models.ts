@@ -14,8 +14,9 @@
  *
  * Billing: custom providers are `payg` at their declared cost (`billing.ts`
  * default), so a $0-priced local server ledgers $0 and a priced gateway counts
- * toward the project cap.
+ * toward the project cap. GAID's dedicated gaid-local entry is local, not payg.
  */
+import { GAID_LOCAL_PROVIDER } from "../geo/local-provider.ts";
 import fs from "node:fs";
 import path from "node:path";
 import { KADY_PI_AGENT_DIR } from "../config.ts";
@@ -356,7 +357,7 @@ export function customModelForClient(model: Model<Api>, provider: CustomProvider
     modality: model.input.includes("image") ? "text+image->text" : "text->text",
     description: `Custom model server at ${provider.baseUrl}`,
     reasoning: model.reasoning,
-    billingMode: "payg",
+    billingMode: provider.id === GAID_LOCAL_PROVIDER ? "local" : "payg",
     available: true,
   };
 }

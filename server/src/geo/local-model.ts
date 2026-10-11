@@ -3,9 +3,10 @@ import {
 } from "../agent/custom-models.ts";
 import { readAppDefaults, writeAppDefaults } from "../app-settings.ts";
 import { ollamaBaseUrl } from "../config.ts";
-import { LOCAL_MODEL_PROFILES } from "./local-model-profiles.ts";
+import { LOCAL_MODEL_PROFILES, MIN_LOCAL_CONTEXT } from "./local-model-profiles.ts";
+import { GAID_LOCAL_PROVIDER } from "./local-provider.ts";
 
-export const GAID_LOCAL_PROVIDER = "gaid-local";
+export { GAID_LOCAL_PROVIDER } from "./local-provider.ts";
 export interface LocalModelOptions {
   agentDir?: string;
   baseUrl?: () => string;
@@ -103,10 +104,10 @@ export function validateLocalModel(input: unknown): ConfigureLocalModel {
   if (typeof value.model !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,199}$/.test(value.model)) {
     throw new LocalModelError(400, "model must be an Ollama model name (at most 200 characters)");
   }
-  if (!Number.isInteger(value.contextWindow) || Number(value.contextWindow) < 1_000 || Number(value.contextWindow) > 100_000_000
+  if (!Number.isInteger(value.contextWindow) || Number(value.contextWindow) < MIN_LOCAL_CONTEXT || Number(value.contextWindow) > 100_000_000
     || !Number.isInteger(value.maxTokens) || Number(value.maxTokens) < 1 || Number(value.maxTokens) > 10_000_000
     || Number(value.maxTokens) >= Number(value.contextWindow)) {
-    throw new LocalModelError(400, "contextWindow and maxTokens must be positive integers; output must be smaller than context");
+    throw new LocalModelError(400, "contextWindow must be at least 65536 (64K) and maxTokens must be a positive integer smaller than context");
   }
   for (const key of ["createVariant", "setDefault"]) {
     if (value[key] !== undefined && typeof value[key] !== "boolean") throw new LocalModelError(400, `${key} must be boolean`);
