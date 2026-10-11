@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T07:14:35Z
+status: ready
+updated: 2026-10-11T07:14:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"95c18540-98e5-43b9-a8b5-0d904e284979","pid":449523,"provider":"codex","session":"01a129b9-f186-77a1-ae42-9253040f3f74","start":"16741475","token":"ec255bab0a5fc65b75b65f6aeb3722d4f293311e4cecceb860ef9f810f3b27e0"}
 branch: task/gaid-korean-workspace--korean
 target: task/gaid-korean-workspace
@@ -101,8 +101,9 @@ edited upstream files, and the surfaces left in English. `task save` reviewed fi
 ## Current state
 Primary-path catalogue extraction and Korean translation implemented, including dynamic counts, accessible control names, branding, light-theme tokens and Appearance language control. Geo dictionaries moved into catalogues with thin wrappers; old defineGeoStrings removed. Final checked source: 056ac5924b22 (job 4, exit 0). Typecheck and copy validation passed; all 927 tests in 141 files passed. Raw ESLint reports 10 errors and 4 warnings, exactly matching ba1a71b by file/rule/severity; no new diagnostics. Dependency install job 1 exited 0; its npm-ci node_modules copied into this worktree (no lockfile changes).
 ## Next steps
-1. Child result ready: task finish notifies the parent writer; parent integrates via task complete.
-2. Parent records full scripts/check plus actual-screen/keyboard/narrow-layout evidence. No deployments or paid model runs performed by this child.
+<!-- task:closed -->
+Closed 2026-10-11T07:14:49Z: ready; the parent gaid-korean-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 
 - First full web check (job 2): typecheck/copy passed; 922/927 tests passed. Five assertions failed: three glossary expectations, one Kady product-name expectation and a fixed/dynamic status id collision. Fixed the copies/tests and audited all literal appText calls for missing ids/unbound parameters (0 remain).
