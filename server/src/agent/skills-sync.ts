@@ -23,6 +23,7 @@ import {
   SKILL_NAME_RE,
   type SkillScopeRef,
 } from "./skills.ts";
+import { renameSyncWithRetry } from "../geo/rename-retry.ts";
 
 const MANIFEST_VERSION = 2;
 const DEFAULT_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -477,17 +478,17 @@ export function installSkillTree(
   }
 
   if (!fs.existsSync(destination)) {
-    fs.renameSync(staged, destination);
+    renameSyncWithRetry(staged, destination);
     return true;
   }
 
-  fs.renameSync(destination, backup);
+  renameSyncWithRetry(destination, backup);
   try {
-    fs.renameSync(staged, destination);
+    renameSyncWithRetry(staged, destination);
     fs.rmSync(backup, { recursive: true, force: true });
   } catch (err) {
     fs.rmSync(destination, { recursive: true, force: true });
-    if (fs.existsSync(backup)) fs.renameSync(backup, destination);
+    if (fs.existsSync(backup)) renameSyncWithRetry(backup, destination);
     fs.rmSync(staged, { recursive: true, force: true });
     throw err;
   }
@@ -512,7 +513,7 @@ function archiveSkill(
   if (fs.existsSync(destination)) {
     destination = path.join(archiveRoot, `${name}-${Date.now()}-${crypto.randomUUID()}`);
   }
-  fs.renameSync(installed.dir, destination);
+  renameSyncWithRetry(installed.dir, destination);
   return true;
 }
 

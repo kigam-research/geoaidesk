@@ -11,6 +11,7 @@ import type {
 } from "@earendil-works/pi-ai";
 import { SettingsManager, type ModelRuntime } from "@earendil-works/pi-coding-agent";
 import { KADY_PI_AGENT_DIR } from "../config.ts";
+import { siwcAppName, siwcAuthorizationUrl } from "../geo/siwc.ts";
 import type { DirectProviderBilling, DirectProviderDefinition } from "./provider-catalog.ts";
 
 /**
@@ -530,6 +531,10 @@ export class ProviderAuthManager {
       notify: (event) => {
         if (isTerminal(flow.status)) return;
         try {
+          // GeoAIDesk: Sign in with ChatGPT registers under the app's own name.
+          if (flow.providerId === "openai" && event.type === "auth_url") {
+            event = { ...event, url: siwcAuthorizationUrl(event.url, siwcAppName()) };
+          }
           flow.events.push(publicEvent(event));
           if (flow.events.length > MAX_EVENTS) {
             flow.events.splice(0, flow.events.length - MAX_EVENTS);

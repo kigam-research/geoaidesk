@@ -66,6 +66,12 @@ export function readDistributionExclusions(repoRoot: string): CatalogueExclusion
   });
 }
 
+/** `productName` of the manifest; null in an upstream checkout or when unset. */
+export function readDistributionProductName(repoRoot: string): string | null {
+  const name = readManifest(repoRoot)?.productName;
+  return typeof name === "string" && name.trim() ? name.trim() : null;
+}
+
 /** Release identity used by the update check; null in an upstream checkout. */
 export function readDistributionRelease(repoRoot: string): DistributionRelease | null {
   const manifest = readManifest(repoRoot);
