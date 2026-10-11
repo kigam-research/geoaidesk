@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:30:33Z
+updated: 2026-10-11T08:32:40Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -100,6 +100,7 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Final Node geo suite PASSED 28/28 in 35.8s (exit 0), log /home/seongin3/data/geoaidesk/work/gaid-release-proof--install/geo-tests.log. Removed created server/src/helpers/.venv and well/__pycache__; no other listed build caches existed.
 - Only native Windows installation remains running. Task job 5 is a durable remote completion wait (Wait-Process for harness PID 3968), not another install. Its relay notification is the next trigger. Do not restart the scheduled task or poll periodically.
 - Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. A bounded Windows next-action check confirmed the scheduled task still running in frontend npm installation; no final Windows result exists yet. Continue only on job 5 notification.
+- Job 1 succeeded relay notification processed: reread full log and record, confirmed all 30 install/restart steps passed, final-stop passed and SHA256 unchanged (46777cca…aa7326). No rerun or additional Windows polling triggered.
 ## Next steps
 1. On job 5 completion notification, fetch Windows record/logs, inspect failed steps if any, verify its ports are stopped and unregister GAID-Install-Proof-20261011 after completion.
 2. Add final remote hashes/timings and known limits; preserve failed first attempts. Do not replay the already-started jobs.
