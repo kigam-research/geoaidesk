@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T03:48:28Z
+status: active
+updated: 2026-10-11T04:01:21Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -114,8 +114,9 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
 ## Current state
 - Shared dispatcher, TS baseline parsers, optional metadata helper, project-scoped POST route, geo tools,
   read hint extension and self-fetching viewer are implemented. No published signature/contract/registry changes.
-- Verified: server typecheck; web tsc; targeted server tests 27 passed / 1 visibly skipped (optional geo modules
-  absent); viewer tests 5 passed. The actual SDK session with a fake provider stream receives the blocked-read
+- Verified: server typecheck; web tsc; targeted server tests initially 27 passed / 1 visibly skipped (optional geo
+  modules absent), with the helper test subsequently exercised successfully in the full suite after env integration;
+  viewer tests 5 passed. The actual SDK session with a fake provider stream receives the blocked-read
   reason as its model-facing tool result (no model/network call).
 - Manual read-only trial: 5,876,460-byte LAS → 21 curves, depth 25–3283.9641113 m, unknown basis, 872-byte
   blocked-read reason; shapefile → Polygon, 133 features, 22 fields and declared WKT (no guessed EPSG);
@@ -127,16 +128,26 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
   Log: pc74:~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-iclqrqyp.log.
   The failing LaTeX file passes alone (9 tests). Attempt 2 with `VITEST_MAX_WORKERS=4` also overrides the server's
   fileParallelism=false (Vitest applies the environment after that rule), causing shared-temp-directory races.
-  Correct the execution environment to `VITEST_MAX_WORKERS=1 task finish`; no source/timeout changes.
-  Full checks remain pending.
+  Corrected execution environment: `VITEST_MAX_WORKERS=1 task finish`; no source/timeout changes.
+- Full declared checks passed on three successive integrated snapshots, including b696b64 (parent cc707b0,
+  local-model + env integrated): server 1572 passed / 11 existing skips, web 898 passed, 11 distribution tests,
+  both launcher checks, production start/stop/restart with 13 catalogue skills and all 4 excluded skills absent.
+  The enabled optional Python GeoPackage metadata test now passes rather than skipping.
+  Retained logs: pc74:~/data/geoaidesk/work/gaid-runtime/inspect/check-{3,4,5}.log (5 is the env-integrated result).
+- The third finish attempt did not publish: the target moved three times while checks ran. Latest target
+  12eb8ac adds an environment smoke step to scripts/check and updates boundaries/task status; retry in place.
+  The final ready status and task CLI receipt certify the latest target's declared checks; do not infer that
+  publication/integration has happened merely from the prior passing snapshots.
+- Repeated the original trial after env integration: Python helper returned declared WKT with metre axis units
+  and no invented EPSG for the shapefile; all three files had no inspection issues. Baseline-only output is kept
+  as baseline-manual-check.json; current enriched output is manual-check.json in the same external run folder.
   The attempted separate task job did not start: snapshot validation rejects the existing tracked `.env.example`.
   No source/config file was removed to bypass that guard and no job receipt was created.
   Safe targeted recheck: from server,
   `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
   from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-11T03:48:28Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Retry VITEST_MAX_WORKERS=1 task finish against the latest parent, including the new environment smoke.
 
 ## Failed approaches
 - Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory
@@ -154,6 +165,9 @@ Closed 2026-10-11T03:48:28Z: ready; the parent gaid-runtime integrates it. No fu
   fileParallelism=false; 163 tests fail with shared PROJECTS_ROOT races. This was an execution-setting error,
   not an inspection regression. Installed Vitest resolver applies the env override after maxWorkers=1;
   use VITEST_MAX_WORKERS=1 for both suites. Log: check-t9l9_7me.log in the same external check-log directory.
+- Full check attempt 3 passed every check on each of three snapshots, but task finish stopped with
+  "base moved three times; integration pending" as the parent integrated local-model, env and then its check seam.
+  No inspection source changes were needed. Retry in place against the settled parent target.
 ## Notes and decisions
 - Implementation is tightly coupled around one inspection result; no child writers or readers are needed.
 - Sequential decisions: preserve published signatures; keep all parser IO under a per-file byte budget;
@@ -187,7 +201,9 @@ Child contribution for the parent's canonical report (no separate child report):
   dependencies may be absent until child env is integrated; GeoJSON over the byte cap reports unknown count/CRS;
   physical-line samples do not substitute for full-data analysis; no bash interception or map/depth rendering.
 - Integration: retain parent registration seams; add the new Python helper to integration-boundaries if required.
-  Full regression outcome will be appended after the declared check finishes.
+  Env-integrated full checks: 1572 server tests passed / 11 existing skips; 898 web tests passed; launcher,
+  distribution and production restart checks passed. Latest-target verification is enforced by task finish's
+  receipt/ready state. External diagnostic logs and manual outputs are listed under Current state.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
