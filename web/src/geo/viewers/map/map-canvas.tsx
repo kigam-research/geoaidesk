@@ -1,8 +1,6 @@
 "use client";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import OlMap from "ol/Map";
-import View from "ol/View";
-import Projection from "ol/proj/Projection";
 import GeoJSON from "ol/format/GeoJSON";
 import ImageLayer from "ol/layer/Image";
 import VectorLayer from "ol/layer/Vector";
@@ -16,6 +14,7 @@ import { fitExtent, sourceCrs, validBBox } from "./model";
 import { vectorColor, layerLegend } from "./colors";
 import { downloadBlob } from "./client";
 import { mapText as t } from "./strings";
+import { createMapView } from "./view";
 import "ol/ol.css";
 
 export interface CanvasHandle { exportPng(): Promise<void>; fit(): void }
@@ -36,7 +35,7 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     const map = mapRef.current;
     const layer = current.current.layers.find(l => l.id === current.current.activeId);
     const bbox = layer?.data?.bbox && fitExtent(layer.data.bbox);
-    if (map && bbox) map.getView().fit(bbox, { padding: [24, 24, 24, 24], maxZoom: 20 });
+    if (map && bbox) map.getView().fit(bbox, { padding: [24, 24, 24, 24], ...(current.current.crs === "native" ? {} : { maxZoom: 20 }) });
   };
   useImperativeHandle(ref, () => ({ fit, async exportPng() {
     const map = mapRef.current;
@@ -80,8 +79,7 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
   useEffect(() => {
     if (!target.current) return;
     fitted.current = false;
-    const projection = props.crs === "native" ? new Projection({ code: "GAID:NATIVE", units: "pixels" }) : props.crs;
-    const map = new OlMap({ target: target.current, controls: [], layers: [], view: new View({ projection, center: [0, 0], zoom: 2, multiWorld: false }) });
+    const map = new OlMap({ target: target.current, controls: [], layers: [], view: createMapView(props.crs) });
     mapRef.current = map;
     map.on("moveend", () => {
       if (!fitted.current) return;
