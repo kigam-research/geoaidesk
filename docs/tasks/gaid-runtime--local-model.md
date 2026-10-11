@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T03:07:23Z
+status: active
+updated: 2026-10-11T03:15:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"6868fb3e-df61-4f95-9b8b-6969b644d3c9","pid":3660182,"provider":"codex","session":"01a128e4-01e8-7261-9bf0-b7141477814a","start":"15339424","token":"678e6a4621bca6508ffa52de4cab714cb9f6c182668863bcbd572346b02492e2"}
 branch: task/gaid-runtime--local-model
 target: task/gaid-runtime
@@ -95,12 +95,22 @@ Implemented Ollama status/configure, explicit-only derived models, custom-provid
 and the Korean/English Settings card. All tests use a loopback stub, not real Ollama.
 Verified: server typecheck; 22 focused server tests (including fresh-module reads and real Pi runtime reload/restart);
 web typecheck; 4 card tests, rerun after improving custom-profile selection.
+First task finish checked ec25d8a (including parent a2d58d9): backend 137 files passed / 1 skipped,
+1533 tests passed / 11 skipped (including 2 mzML tests excluded by the existing network probe); frontend
+133 files / 893 tests passed; launcher checks and 11 distribution tests passed. Production UI build passed.
+Finish did NOT succeed: production smoke fetched catalogue/context after stopping its backend.
+Parent has already fixed this ordering in 3f710b3; rerun task finish in place to merge that fix and recheck.
 No codegraph index exists for this exact worktree; used direct source reads.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-11T03:07:23Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+First task finish: scripts/check exited 1 in production smoke after start/build/project-create/file-save/stop succeeded.
+The smoke then fetched /geo/catalogue and /geo/context/preview from the stopped backend (ECONNREFUSED).
+This parent-owned test-order regression was fixed independently by the parent in 3f710b3; no child seam expansion.
+Check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-eb2rvih5.log
+Smoke launcher log: /tmp/gaid-smoke-X978Xu/launcher-1.log
 ## Notes and decisions
 Plan: sequentially settle status/configure response shapes, implement the server, then the card, then checks.
 Owned files are the brief's local-model modules/tests and providers-panel seam. No child writers are needed for this tightly coupled package.
