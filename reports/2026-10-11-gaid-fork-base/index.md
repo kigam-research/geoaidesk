@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-workspace.png
 supersedes:
+reviewed: 2026-10-11
 ---
 # GeoAIDesk 배포 기반 (WP02 gaid-fork-base)
 
