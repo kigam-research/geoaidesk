@@ -45,6 +45,13 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/inspection.ts`, `registerGeoInspector`) serves `POST /geo/inspect`, the `geo_inspect` /
   `geo_read_window` tools and the read hint that blocks unsuitable direct `read`s of large/binary geo files with a
   bounded summary and next action. Viewers: `web/src/geo/viewers/registry.ts` (WP04/WP05 replace their own entry).
+- Maps (WP05, `docs/geo-maps.md`): `server/src/geo/maps/` supplies metadata, bounded vector pages/raster windows,
+  explicit full-layer polygon area tables and the `*.geomap.json` artifact adapter. Routes: `/geo/vector-page`,
+  `/geo/raster-window`, `/geo/area-table`, `/geo/result`; transport: `web/src/geo/contracts/maps.ts`; OpenLayers viewer:
+  `web/src/geo/viewers/map/`. Raster previews cap at 256×256 and vector pages at 500 features; preview values never feed
+  area analysis. Unknown CRS stays native/pixel-only; declared source CRS and display CRS are distinct. Source
+  fingerprints include available companions/auxiliary files. The uv subprocess has a separate time/output budget
+  from the baseline byte reader. Tests generate synthetic map fixtures outside Git (`geo/tests/maps-helper.test.mjs`).
 - LAS depth/table viewers (WP04): `server/src/geo/well/` and `web/src/geo/viewers/depth/` serve LAS 2.0
   numerical windows through `POST /geo/series-window` after shared inspection; no raw-text bulk preview.
   Original order/units/NULLs remain, depth basis is explicit, reduction preserves extrema and gaps; limits:
