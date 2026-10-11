@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T03:04:06Z
+updated: 2026-10-11T03:07:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"b82d61f9-5a6a-4f75-927c-8fa251f33d2c","pid":3628209,"provider":"claude","session":"bb619be9-c3b3-4f12-a95f-244d4d2f2c38","start":"15227338","token":"4f8fd5c979bc3f8cf27ceb58e285e3aee5e10c1aae29218d216f1df7838df552"}
 branch: task/gaid-runtime
 target: main
@@ -58,6 +58,14 @@ first; it is the authoritative scope. Summary only:
   session, budget + preview routes), runtime support skills (pi-subagents) kept in every exposure, concise geo
   guidance via appendSystemPromptOverride (geo mode only), web start-prompt budget chip + new-chat skill selection
   (web/src/geo/context/, seam in chat-tab.tsx) with vitest.
+- Start-prompt measurement on the real catalogue (70808d4, ~/data/geoaidesk/work/gaid-runtime/measure/
+  budget-70808d4.json): GAID new project catalogue ≈26.4K tokens, workflow ≈24.8K, upstream-era project with K-Dense
+  92ace75a defaults ≈43.7K. Tool schemas alone ≈78.6K chars ≈19.6K tokens (subagent 17.9K chars, notebook 13.8K,
+  scientific_result 8.1K): exposure cannot bring the prompt under a 32K local context. Pi also loads the host user's
+  `~/.agents/skills` into every session; catalogue/workflow exposure hides them, `all` shows them (upstream behaviour).
+- WP01 open point checked: k-dense/geopandas and k-dense/uncertainty-and-units `skills/<name>/scripts/...` do not
+  resolve in the app layout (skills live in `<sandbox>/.pi/skills/<name>/`, Pi resolves relative paths against the
+  skill directory); the scripts exist at `<skill>/scripts/`. Model behaviour with these two skills not tested.
 ## Next steps
 1. While children run: production smoke update (geo catalogue provisioned / archive-missing without fallback),
    scripts/check steps, measurement of the start-prompt budget (all vs catalogue vs workflow) on the real catalogue.

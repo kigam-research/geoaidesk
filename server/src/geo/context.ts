@@ -236,6 +236,7 @@ export interface PromptBudget {
     estimatedTokens: number;
     method: "chars/4";
   };
+  /** `installed`: skills the session loaded (project, user-level, ambient); `exposed`: offered to the model. */
   skills: { mode: ExposureMode; exposed: number; installed: number };
   /** contextWindow − initial estimate − output reserve; null without a model. */
   remainingTokens: number | null;

@@ -14,8 +14,7 @@ import { currentProjectId } from "../../scope.ts";
 import fs from "node:fs";
 import { createSession, disposeSession, getModelRegistry, getSession } from "../../agent/session-registry.ts";
 import { resolveModel } from "../../agent/models.ts";
-import { listDisabledSkills, listProjectSkills } from "../../agent/skills.ts";
-import type { ProjectPaths } from "../../projects.ts";
+import type { AgentSession } from "@earendil-works/pi-coding-agent";
 import { geoCatalogueActive, geoCatalogueStatus, loadGeoCatalogue } from "../catalogue.ts";
 import {
   exposureFile,
@@ -39,11 +38,13 @@ function pickerModel(ref: string | undefined): BudgetModel | undefined {
   }
 }
 
-function skillCounts(paths: ProjectPaths, exposed: string[] | undefined): { exposed: number; installed: number } {
-  const enabled = listProjectSkills(paths);
-  const installed = enabled.length + listDisabledSkills(paths).length;
-  const offered = enabled.filter((skill) => !skill.disableModelInvocation && (!exposed || exposed.includes(skill.name)));
-  return { exposed: offered.length, installed };
+/**
+ * Skills the session loaded (project, user-level and Pi's ambient skill
+ * directories) and how many of them its system prompt offers the model.
+ */
+function skillCounts(session: AgentSession): { exposed: number; installed: number } {
+  const skills = session.resourceLoader.getSkills().skills;
+  return { exposed: skills.filter((skill) => !skill.disableModelInvocation).length, installed: skills.length };
 }
 
 /** Previews are cached briefly: each one opens and disposes a full session. */
@@ -108,7 +109,7 @@ export async function registerGeoCatalogueRoutes(app: FastifyInstance): Promise<
       exposure,
       budget: promptBudget(
         session,
-        { mode: exposure?.mode ?? "all", ...skillCounts(paths, exposure?.skills) },
+        { mode: exposure?.mode ?? "all", ...skillCounts(session) },
         pickerModel(req.query.model),
       ),
     };
@@ -138,7 +139,7 @@ export async function registerGeoCatalogueRoutes(app: FastifyInstance): Promise<
         exposure: exposure ? { ...exposure, preview: true } : null,
         budget: promptBudget(
           session,
-          { mode: exposure?.mode ?? mode, ...skillCounts(paths, exposure?.skills) },
+          { mode: exposure?.mode ?? mode, ...skillCounts(session) },
           pickerModel(req.query.model),
         ),
       };

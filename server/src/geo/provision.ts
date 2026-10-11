@@ -68,6 +68,11 @@ export async function provisionProjectSkills(paths: ProjectPaths, allowRemote = 
   const outcome = provisionGeoCatalogue(paths);
   if (outcome.state === "unavailable") {
     console.warn(`[gaid] geo catalogue unavailable for project ${paths.id}: ${outcome.error}`);
+  } else if (outcome.state === "applied" && outcome.result) {
+    const { added, updated, preserved } = outcome.result.counts;
+    console.info(
+      `[gaid] ${outcome.label} applied to project ${paths.id}: ${added} added, ${updated} updated, ${preserved} kept as edited`,
+    );
   }
   applyDefaultSkillStates(paths);
   return listProjectSkills(paths).length + listDisabledSkills(paths).length;

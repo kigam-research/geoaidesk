@@ -161,8 +161,11 @@ describe("exposure in a live Pi session", () => {
     const body = res.json();
     expect(body.exposure.mode).toBe("catalogue");
     expect(body.budget.schemaVersion).toBe("gaid-prompt-budget/v1");
-    // alpha-geo plus the runtime support skills seeded with the first session.
-    expect(body.budget.skills).toMatchObject({ mode: "catalogue", installed: 1 + runtimeSupportSkillNames().length });
+    // Loaded skills include the runtime support skills (and any user-level ones of the host).
+    expect(body.budget.skills.mode).toBe("catalogue");
+    expect(body.budget.skills.installed).toBeGreaterThanOrEqual(1 + runtimeSupportSkillNames().length);
+    // alpha-geo has no recorded origin here, so only the support skills are offered.
+    expect(body.budget.skills.exposed).toBe(runtimeSupportSkillNames().length);
     expect((await app.inject({ method: "GET", url: "/geo/context" })).statusCode).toBe(400);
     expect((await app.inject({ method: "GET", url: "/geo/context?sessionId=nope" })).statusCode).toBe(404);
     // Preview of a chat not created yet: measured, then disposed without a trace.
