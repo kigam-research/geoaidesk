@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T05:50:15Z
+status: done
+updated: 2026-10-11T05:50:27Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cd7c561a-0a57-452c-9026-bbf129244c36","pid":3981134,"provider":"codex","session":"01a12945-9f27-71e2-b32a-5bbc545ac45a","start":"15979142","token":"29bed9d06311d3f15e6cd0567d9374e9a4a03a112c2135a1ce904ef6fe2f5004"}
 branch: task/gaid-well-tables
 target: main
@@ -49,8 +49,9 @@ Verified facts from the hub (2026-10-11):
 - Combined real-browser smoke passed: explicit table overlay/suggestions, expected overlap/gap, `<0.01` retained, original file bytes unchanged, return to ordinary table; LAS depth-window and exact row 12002/source/code links rechecked. Current Korean screenshots and all four registered output hashes verified.
 - Direct checks authorized by hub/user ("제안대로 하자.") while .env.example snapshot policy is fixed. Routed request env-sample-jobs-gaid-well-tables consumed and reported. No paid model runs.
 ## Next steps
-1. Run `VITEST_MAX_WORKERS=1 task finish` on the final checked-result snapshot. All child code is integrated and the child is closed; no new source changes or deployment are planned.
-2. After finish's last check, remove the explicitly listed regenerable caches (server/node_modules, server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo and Python __pycache__); await the hub's final completion report and give it once.
+<!-- task:closed -->
+Closed 2026-10-11T05:50:27Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First parent `task complete` failed only at production TypeScript checking because the new singleton UI test fixture omitted fingerprint/wrapped and curve metadata. Fixed the fixture to match the contract; frontend typecheck, 7 affected UI tests and standalone production smoke then passed. Original full check evidence: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-w3bfbkvw.log.
 - 2026-10-11: first task job run (dependency install + focused type/numerical/API/UI checks) failed before receipt creation: "job snapshot blocked: forbidden path .env.example". The inherited path was not read or changed. task/jobs.py validates all ls-tree paths before git archive (even export-ignore cannot resolve it). Do not bypass task CLI with manual long-running jobs. At that point no tests had run. Hub subsequently authorized direct checks; current results are above.
