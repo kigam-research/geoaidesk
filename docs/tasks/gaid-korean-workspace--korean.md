@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:12:09Z
+updated: 2026-10-11T07:12:41Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"95c18540-98e5-43b9-a8b5-0d904e284979","pid":449523,"provider":"codex","session":"01a129b9-f186-77a1-ae42-9253040f3f74","start":"16741475","token":"ec255bab0a5fc65b75b65f6aeb3722d4f293311e4cecceb860ef9f810f3b27e0"}
 branch: task/gaid-korean-workspace--korean
 target: task/gaid-korean-workspace
@@ -125,6 +125,7 @@ Child unit: no separate report. Integration-ready copy ledger and verification n
 - /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T065143.526607Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T070615.876831Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T070939.407647Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace--korean-20261011T071232.084510Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
