@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T04:43:07Z
+updated: 2026-10-11T04:44:01Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -60,3 +60,12 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+## Orchestration (WP05)
+- Sequential decisions: read authoritative forwarded scope and WP03/WP06 seams; establish `web/src/geo/contracts/maps.ts`; implement bounded helper and UI independently; integrate helper through inspection/routes; integrate children; sync append-only seams; run scripts/check; remove regenerable caches; finish.
+- Parent owns map contracts, TypeScript map transport/routes, inspection registration and source identity, manifest adapter, route/integration tests, integration boundaries, report and final integration.
+- Independent package `helper`: Python raster/vector inspect/window/area implementation and generated known-answer fixtures/tests in `server/src/geo/maps/` and `geo/tests/`; no parent/interface changes.
+- Independent package `viewer`: OpenLayers map viewer and tests in `web/src/geo/viewers/map/`, its raster/vector registry entries, `ol` dependency + lock only. Parent owns all other shared seams.
+- CRS policy: source declaration preserved; default display EPSG:3857 only for declared sources; unknown uses native/pixel inspection and cannot overlay with declared layers or calculate area. Area explicitly chooses projected CRS or ellipsoid geodesic method; never uses preview subsets.
+- Transport contract: inspect helper returns additive GeoInspection fields; vector/raster/area responses follow maps.ts. Helper input is one JSON object on stdin with `{operation, path:absolutePath, ...request}`; stdout one JSON object; errors stderr, exit 3 dependencies / 4 missing / 5 invalid / 1 other. Parent sandbox-validates paths/companions and bounds subprocess time/output.
+- Integration order: parent contract commit -> child packages -> parent routes/tests -> child completion -> task sync -> full checks -> report/cleanup/finish. No paid model runs.
