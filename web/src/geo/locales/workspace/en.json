@@ -5,7 +5,9 @@
     "kind": "{kind, select, map-layer {Map layer} depth-track {Depth track} validation-curve {Validation curve} other {Geo result}}",
     "thumbnail": "Preview of {title}"
   },
-  "error": { "status": "The server request failed (HTTP {status})." },
+  "error": {
+    "status": "The server request failed (HTTP {status})."
+  },
   "catalogue": {
     "title": "Geoscience tasks",
     "loading": "Reading the Geo task catalogue.",
@@ -25,7 +27,8 @@
     "environment": "Environment preparation needed: {name}",
     "unavailable": "Unavailable: {reason}",
     "unknown": "Could not determine readiness.",
-    "untested": "Untested · No GAID run record"
+    "untested": "Untested · No GAID run record",
+    "notShipped": "Skills not in the pinned catalogue: {names}"
   },
   "environment": {
     "prepare": "Prepare environment",
@@ -61,13 +64,14 @@
     "file": "Geo task recipe file",
     "checking": "Checking recipe",
     "error": "Could not read or check the recipe. {detail}",
-    "issue": "{code}: {message}",
+    "issue": "{code, select, schema {The recipe does not match geo-start/v1: {subject}} catalogue-off {The Geo catalogue is off.} catalogue-version {The recipe is for another catalogue version: {subject}} unknown-workflow {Workflow not in the current catalogue: {subject}} workflow-skill {A skill the workflow needs is missing: {subject}} unknown-choice {Analysis setting not in the workflow: {subject}} unknown-skill {Skill not in the catalogue: {subject}} unknown-example {Example does not belong to the selected skills: {subject}} choice-state {A setting is both answered and left undecided: {subject}} other {Could not check the recipe: {subject}}}",
     "noWorkflow": "Could not find the recipe's task in the current catalogue."
   },
   "files": {
     "match": "Matched input: {role} · Format: {format}",
     "needs": "Analysis settings to decide: {choices}",
-    "error": "Could not read the input file list. {detail}"
+    "error": "Could not read the input file list. {detail}",
+    "signal": "{kind, select, element-columns {Element and oxide columns} time-drawdown-columns {Time and drawdown columns} xy-label-columns {Coordinate and label columns} categorical-field {Categorical fields} other {Matched columns}}: {columns}"
   },
   "skill": {
     "open": "Make reusable skill",
@@ -80,5 +84,11 @@
     "creating": "Creating skill template",
     "error": "Could not create the skill template. {detail}",
     "draft": "Write `.pi/skills/{name}/SKILL.md` from the completed work in this chat. Reusable task: {description}\nRecord inputs, execution steps and limits. Copy required scripts into `.pi/skills/{name}/` and reference them from the skill. Distinguish executed work from untested items; do not claim validation."
+  },
+  "skills": {
+    "enable": "Turn on skills",
+    "enabling": "Turning on skills",
+    "notInstalled": "Skills not installed in the project: {names}. Install them in Settings → Skills.",
+    "error": "Could not turn on the skills. {detail}"
   }
 }

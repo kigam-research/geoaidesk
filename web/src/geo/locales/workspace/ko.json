@@ -5,7 +5,9 @@
     "kind": "{kind, select, map-layer {지도 레이어} depth-track {Depth track} validation-curve {검증 곡선} other {Geo 결과}}",
     "thumbnail": "{title} 미리보기"
   },
-  "error": { "status": "서버 요청에 실패했습니다(HTTP {status})." },
+  "error": {
+    "status": "서버 요청에 실패했습니다(HTTP {status})."
+  },
   "catalogue": {
     "title": "Geoscience 작업",
     "loading": "Geo 작업 목록을 읽는 중입니다.",
@@ -25,7 +27,8 @@
     "environment": "환경 준비 필요: {name}",
     "unavailable": "사용 불가: {reason}",
     "unknown": "준비 상태를 확인하지 못했습니다.",
-    "untested": "미시험 · GAID 실행 기록 없음"
+    "untested": "미시험 · GAID 실행 기록 없음",
+    "notShipped": "고정된 카탈로그에 없는 스킬: {names}"
   },
   "environment": {
     "prepare": "환경 준비",
@@ -61,13 +64,14 @@
     "file": "Geo 작업 레시피 파일",
     "checking": "레시피 확인 중",
     "error": "레시피를 읽거나 확인하지 못했습니다. {detail}",
-    "issue": "{code}: {message}",
+    "issue": "{code, select, schema {레시피 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 레시피입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 workflow입니다: {subject}} workflow-skill {workflow에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {workflow에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {레시피를 확인하지 못했습니다: {subject}}}",
     "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다."
   },
   "files": {
     "match": "일치한 입력: {role} · 형식: {format}",
     "needs": "결정할 분석 조건: {choices}",
-    "error": "입력 파일 목록을 읽지 못했습니다. {detail}"
+    "error": "입력 파일 목록을 읽지 못했습니다. {detail}",
+    "signal": "{kind, select, element-columns {원소·산화물 열} time-drawdown-columns {시간·수위 강하 열} xy-label-columns {좌표·label 열} categorical-field {범주 필드} other {일치한 열}}: {columns}"
   },
   "skill": {
     "open": "재사용 스킬 만들기",
@@ -80,5 +84,11 @@
     "creating": "스킬 템플릿 만드는 중",
     "error": "스킬 템플릿을 만들지 못했습니다. {detail}",
     "draft": "현재 채팅에서 완료한 작업을 바탕으로 `.pi/skills/{name}/SKILL.md`를 작성하세요. 재사용할 작업: {description}\n입력 자료, 실행 단계와 한계를 기록하세요. 필요한 스크립트를 `.pi/skills/{name}/` 폴더에 복사하고 스킬에서 참조하세요. 실행한 내용과 미시험 항목을 구분하고 검증을 주장하지 마세요."
+  },
+  "skills": {
+    "enable": "스킬 켜기",
+    "enabling": "스킬 켜는 중",
+    "notInstalled": "프로젝트에 설치되지 않은 스킬: {names}. 설정 → 스킬에서 설치하세요.",
+    "error": "스킬을 켜지 못했습니다. {detail}"
   }
 }

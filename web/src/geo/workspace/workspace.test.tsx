@@ -34,7 +34,7 @@ let prepareResult: Response | null;
 beforeEach(() => {
   window.localStorage.clear(); Object.defineProperty(navigator, "languages", { configurable: true, value: ["ko-KR"] });
   rows = [workflow()]; suggestions = rows.map(suggestion); catalogueState = "ready";
-  recipeResult = { ok: false, issues: [{ code: "catalogue-version", message: "Version does not match" }] }; prepareResult = null;
+  recipeResult = { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "Version does not match" }] }; prepareResult = null;
   apiFetch.mockReset().mockImplementation(async (path: string) => {
     if (path === "/geo/workflows") return json({ catalogue: { state: catalogueState, version: "0.2.0" }, workflows: rows });
     if (path === "/geo/suggestions") return json({ path: "logs/A.LAS", format: "las-welllog", suggestions });
@@ -43,6 +43,7 @@ beforeEach(() => {
     if (path === "/sandbox/tree") return json({ name: "", path: "", type: "directory", children: [{ name: "other.las", path: "other.las", type: "file" }] });
     if (path === "/skills") return json([{ id: "skill-1", name: "well-skill", description: "QC" }]);
     if (path === "/skills/create") return json({ name: "my-qc" });
+    if (path === "/skills/well-skill/enable") { rows = [workflow()]; return json({ ok: true }); }
     if (path.endsWith("/prepare")) { rows = [workflow()]; return prepareResult ?? json({ ready: true }); }
     throw new Error(`Unexpected request: ${path}`);
   });
@@ -116,10 +117,10 @@ describe("task catalogue and setup", () => {
     rows = [workflow()]; finish(json({ ready: true }));
     expect(await screen.findByText("준비됨")).toBeInTheDocument();
   });
-  it("checks a local recipe without starting, showing issue code and message", async () => {
+  it("checks a local recipe without starting, showing a localized issue", async () => {
     catalogue(); await screen.findByText("Geoscience 작업"); const file = new File(["{}"], "test.geo-start.json", { type: "application/json" }); Object.defineProperty(file, "text", { value: async () => "{}" });
     fireEvent.change(screen.getAllByLabelText("Geo 작업 레시피 파일")[0], { target: { files: [file] } });
-    expect(await screen.findByRole("alert")).toHaveTextContent("catalogue-version: Version does not match"); expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0"); expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(apiFetch).toHaveBeenCalledWith("/geo/recipes/check", expect.objectContaining({ body: JSON.stringify({ recipe: {} }) }), "p1");
   });
 });
@@ -136,7 +137,7 @@ describe("file actions and recipes", () => {
   });
   it("reads the open recipe, shows issues, then prefills editable choices without starting", async () => {
     suggestions = []; render(<GeoFileActions path="recipe.geo-start.json" projectId="p1" />);
-    await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("catalogue-version");
+    await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다");
     recipeResult = { ok: true, issues: [], setup: { workflowId: "well-qc", choices: { depth: "MD", units: "m" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null } };
     await userEvent.click(screen.getByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD"); expect(within(dialog).getByLabelText("단위")).toHaveValue(""); expect(within(dialog).getByRole("button", { name: "작업 초안 만들기" })).toBeDisabled();
@@ -169,5 +170,26 @@ describe("geo-result", () => {
     setApiToken("fixture token");
     const onOpenFile = vi.fn(); render(<GeoResultBody projectId="p1" card={{ schemaVersion: 1, kind: "geo-result", title: "QC", manifestPath: "results/qc.depth.json", resultKind: kind, thumbnailPath: "results/QC preview.png" }} onOpenFile={onOpenFile} />);
     expect(screen.getByRole("img")).toHaveAttribute("src", expect.stringContaining("/sandbox/raw?path=results%2FQC%20preview.png&project=p1&kady_token=fixture%20token")); await userEvent.click(screen.getByRole("button")); expect(onOpenFile).toHaveBeenCalledWith("results/qc.depth.json"); expect(screen.getByText("results/qc.depth.json")).toBeInTheDocument();
+  });
+});
+
+describe("integration additions", () => {
+  it("turns on an installed but disabled workflow skill and re-reads readiness", async () => {
+    const off = workflow("missing-skills"); off.readiness.skills[0].installed = true; rows = [off]; catalogue();
+    await userEvent.click(await screen.findByRole("button", { name: "스킬 켜기" }));
+    expect(apiFetch).toHaveBeenCalledWith("/skills/well-skill/enable", { method: "POST" }, "p1");
+    expect(await screen.findByText("준비됨")).toBeInTheDocument();
+  });
+
+  it("names a skill that is not installed instead of offering to turn it on", async () => {
+    rows = [workflow("missing-skills")]; catalogue();
+    expect(await screen.findByText(/프로젝트에 설치되지 않은 스킬: well-skill/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "스킬 켜기" })).not.toBeInTheDocument();
+  });
+
+  it("shows the content evidence behind a suggestion", async () => {
+    suggestions = [{ ...suggestion(rows[0]), match: { ...suggestion(rows[0]).match, signal: { kind: "element-columns", columns: ["Au_ppb", "Cu_ppm", "Ni"] } } }];
+    render(<GeoFileActions path="logs/A.LAS" projectId="p1" />);
+    expect(await screen.findByText("원소·산화물 열: Au_ppb, Cu_ppm, Ni")).toBeInTheDocument();
   });
 });
