@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T08:23:42Z
+updated: 2026-10-11T08:24:37Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -69,15 +69,18 @@ design note for the paid routes (what the script does for `api-key` with one per
 server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__).
 
 ## Current state
+- Four GPU jobs launched (see Running jobs); waiting for their terminal records. Job 1 connection passed at 65536 loaded/app context, local/$0, one turn, zero tools, 28.743 s. Ollama reports 7%/93% CPU/GPU, not pure GPU. Task still running at this checkpoint.
+- `node --test 'geo/tests/*.test.mjs'` passed 26/26 in 39.260 s; log: /home/seongin3/data/geoaidesk/work/gaid-release-proof--routes/geo-tests.log. Worktree helper environment and generated __pycache__ are removed after this check (job snapshots are separate).
 - Implemented the reusable route harness, pinned workflow/input preparation, independent artifact/area checks, SSE/ledger/context/offload observations, and paid-route refusal/attach design. No server/web/shared-instance edits.
 - Read the WP10 plan, local/model API contracts, map and well docs, and catalogue 0.2.1 workflow contracts. The exact worktree is not codegraph-indexed, so relevant native source was read.
 - Harness checks: `node --test geo/release-proof/route-tests.mjs` passed (4 tests). Both real input preparations passed; FORCE sha256 matches configs/inputs.toml.
-- Declared checks for this child: `node --test geo/release-proof/route-tests.mjs` and `node --test 'geo/tests/*.test.mjs'` plus the four recorded real local trials. Parent owns full scripts/check after integration.
+- Declared checks for this child: `node --test geo/release-proof/route-tests.mjs` and `node --test 'geo/tests/*.test.mjs'` plus the four recorded real local trials. The task CLI also runs repository scripts/check at finish; parent checks its integrated snapshot separately.
 ## Next steps
-1. Save reviewed owned files, then start four separate GPU-serialized task jobs (64K/98K × LAS/map). Never pass --allow-paid.
+1. On job-exit notification, read this task document and the matching receipt/exit/out/record.json before acting; do not replay launched jobs. Four trials are already registered and host-GPU serialized.
 2. Inspect terminal records, preserve failures and report app defects to parent; repeat once only for a harness correction.
-3. Run declared geo tests, record per-job evidence/hash/outcomes, remove any worktree caches created here, and task finish.
+3. Record per-job evidence/hash/outcomes, finish with the CLI repository checks, then remove any caches recreated by finish. Never pass --allow-paid.
 ## Failed approaches
+- Two additional job launches were refused because the previous job added a dirty task jobs block. Saved each reviewed jobs-block update before the next launch; no failed/refused call created a job.
 ## Notes and decisions
 - Sequential phases: settle catalogue/API interface → implement harness → record four isolated local jobs → inspect evidence → declared checks/finish. This is a child unit with tightly coupled owned scripts; no nested writers and no independent reader package needed.
 - Owned files: geo/release-proof/route-trial.mjs, route-metrics.mjs, route-tests.mjs, route-usage.md and route-tasks/tasks.mjs. Shared instance.mjs and app code are read-only. Parent integrates with task complete.
@@ -99,6 +102,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082310.944398Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082337.131367Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082356.800064Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
