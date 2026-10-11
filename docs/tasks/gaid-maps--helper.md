@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T05:19:54Z
+status: ready
+updated: 2026-10-11T05:19:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7e627c39-8f96-4667-b685-4abba81a1202","pid":3990813,"provider":"codex","session":"01a12947-209f-7462-af88-d33c6c6d402a","start":"15989002","token":"2dabed18e5678b6758b2e4cee4be4a86329fcde0a86a4b1c1a9f684785d9f064"}
 branch: task/gaid-maps--helper
 target: task/gaid-maps
@@ -34,7 +34,7 @@ Tests must exercise exact projected rectangle 100x100 (10000m²), independent co
 - TIFF tag inspection uses already-installed `tifffile` (header only); raster pixels use bounded Rasterio windows/WarpedVRT. No new dependencies or paid model runs.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-11T05:10:22Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-11T05:19:55Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Two supplemental fixture checks exposed fixture construction mistakes, now corrected: GDAL writes explicit affine tags even for an identity transform (plain image fixture now uses tifffile); RGBA needs GTiff `ALPHA=YES` rather than only setting color interpretation. Focused final suite passes.
