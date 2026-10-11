@@ -39,9 +39,12 @@ export function GeoPromptBudget({
   sessionId,
   modelRef,
   refreshKey,
+  pendingExposure,
 }: {
   projectId: string;
   sessionId: string | null;
+  /** Exposure the chat's session will be created with (a started task), previewed before the first send. */
+  pendingExposure?: string;
   /** The picker's model ref; the budget is computed against its context window. */
   modelRef?: string;
   /** Changes when a run settles, so the measured usage is refreshed. */
@@ -58,13 +61,13 @@ export function GeoPromptBudget({
     try {
       const next = sessionId
         ? await getSessionContext(projectId, sessionId, modelRef)
-        : await getPreviewContext(projectId, modelRef);
+        : await getPreviewContext(projectId, modelRef, pendingExposure);
       setContext(next);
       setError(null);
     } catch (err) {
       setError((err as Error).message);
     }
-  }, [projectId, sessionId, modelRef]);
+  }, [projectId, sessionId, modelRef, pendingExposure]);
 
   useEffect(() => {
     void load();

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T07:34:37Z
+updated: 2026-10-11T07:35:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -76,6 +76,12 @@ Verified facts from the hub (2026-10-11):
      catalogue lists 7 tasks; recipe file → prefilled setup; seeded fixture session (seed-session.mts, no model call)
      shows the geo-result card and "지도 열기" opens the map viewer. Fixed: icon-only reusable-skill button (toolbar
      overflow), catalogue padding/scroll, one recipe import instead of one per card.
+   - --korean completed and closed 2026-10-11 (1b96cfd; 640 `app.*` ids, geo dictionaries moved to catalogues, Geist
+     font fetch removed, Appearance language control). Its two failed intermediate check jobs are disposed as
+     superseded by its job 4 (exit 0; raw ESLint = unchanged upstream baseline). Integration: GAID compact logo in
+     workspace/projects headers, adaptive favicon + apple icon from geo/brand/ (upstream favicon.ico/icon.png removed),
+     notices updated, map `displayFallback` demonstrative fixed, prompt-budget chip previews a started task's
+     exposure (`GET /geo/context/preview?exposure=`). Full web suite 951/951.
 2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
    ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
 ## Failed approaches

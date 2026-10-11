@@ -3,7 +3,8 @@
  *   GET /geo/catalogue          pinned catalogue status, skills and workflows (no archive bytes)
  *   GET /geo/context/settings   project default exposure for new chats
  *   PUT /geo/context/settings   { newChatExposure: "all" | "catalogue" | "workflow:<id>" }
- *   GET /geo/context/preview?model=     the same for a chat not created yet (new-chat settings;
+ *   GET /geo/context/preview?model=&exposure=  the same for a chat not created yet (new-chat settings, or
+ *                               `exposure` = the mode a started task's chat will be created with;
  *                               measured on a throwaway session that is disposed and leaves no record)
  *   GET /geo/context?sessionId=&model=  initial prompt budget and exposure of one chat
  *                               (`model`: the picker's ref, when it differs from the session's)
@@ -19,6 +20,7 @@ import { geoCatalogueActive, geoCatalogueStatus, loadGeoCatalogue } from "../cat
 import {
   exposureFile,
   exposureModeIssue,
+  geoExposureIssue,
   promptBudget,
   readProjectContext,
   readSessionExposure,
@@ -115,10 +117,19 @@ export async function registerGeoCatalogueRoutes(app: FastifyInstance): Promise<
     };
   });
 
-  app.get<{ Querystring: { model?: string } }>("/geo/context/preview", async (req) => {
+  app.get<{ Querystring: { model?: string; exposure?: string } }>("/geo/context/preview", async (req, reply) => {
     const projectId = currentProjectId();
     const paths = activePaths();
-    const mode = readProjectContext(paths).newChatExposure;
+    // A started task's tab previews the exposure its session will be created with.
+    const override = req.query.exposure?.trim() || undefined;
+    if (override) {
+      const issue = geoExposureIssue(override);
+      if (issue) {
+        reply.code(400);
+        return { detail: issue };
+      }
+    }
+    const mode = (override as ExposureMode | undefined) ?? readProjectContext(paths).newChatExposure;
     const skillsStamp = [paths.skillsDir, `${paths.sandbox}/.pi/skills-disabled`]
       .map((dir) => {
         try {
@@ -131,7 +142,7 @@ export async function registerGeoCatalogueRoutes(app: FastifyInstance): Promise<
     const key = [projectId, mode, req.query.model ?? "", skillsStamp].join("\0");
     const hit = previews.get(key);
     if (hit && Date.now() - hit.at < PREVIEW_TTL_MS) return hit.value;
-    const session = await createSession(projectId, paths);
+    const session = await createSession(projectId, paths, override ? { geoExposure: mode } : {});
     const id = session.sessionId;
     try {
       const exposure = readSessionExposure(paths, id);
