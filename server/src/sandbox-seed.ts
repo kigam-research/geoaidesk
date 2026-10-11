@@ -13,6 +13,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { findUv } from "./binaries.ts";
+import { seededProjectPyproject } from "./geo/environments.ts";
 import type { ProjectPaths } from "./projects.ts";
 
 const PYPROJECT_TOML = `[project]
@@ -278,7 +279,7 @@ export function seedSandboxFiles(paths: ProjectPaths, opts?: { force?: boolean }
   for (const file of SEED_FILES) {
     if (seeded.has(file.name) && !opts?.force) continue;
     const target = path.join(paths.sandbox, file.name);
-    if (!fs.existsSync(target)) fs.writeFileSync(target, file.contents, "utf-8");
+    if (!fs.existsSync(target)) fs.writeFileSync(target, file.name === "pyproject.toml" ? seededProjectPyproject(file.contents) : file.contents, "utf-8");
     if (!seeded.has(file.name)) {
       seeded.add(file.name);
       changed = true;

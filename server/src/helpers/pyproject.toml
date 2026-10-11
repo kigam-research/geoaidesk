@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "Python decoders the Kady backend shells out to for file previews"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
-    "scipy",
-    "matplotlib",
+    "numpy>=2.5.3",
+    "scipy>=1.18.1",
+    "matplotlib>=3.11.2",
     "anndata",
     "h5py",
     "rdkit",
@@ -19,14 +19,31 @@ dependencies = [
     "pydicom",
     "nibabel",
     "tifffile",
-    "pillow",
+    "pillow>=12.3.0",
     "openpyxl",
     "astropy",
+    "pandas>=3.0.6",
+    "scikit-learn>=1.9.1",
+    "lasio>=0.31",
+    "pyproj>=3.8.0",
+    "pyyaml>=6.0.3",
+    "rasterio>=1.4",
+    "shapely>=2.0",
+    "pyogrio",
+    "geopandas",
 ]
 
 # Resolve binary-only packages (notably RDKit) for every shipped platform.
 # A lock resolved only on Apple Silicon can silently drop Intel Mac support.
 [tool.uv]
+# Geo catalogue packages require Python >=3.12. Preserve upstream project metadata
+# while limiting uv's resolution/runtime targets to the catalogue Python range.
+environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version >= '3.12'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version >= '3.12'",
+    "sys_platform == 'win32' and platform_machine == 'AMD64' and python_version >= '3.12'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
+]
 required-environments = [
     "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.12'",
     "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.12'",
