@@ -355,6 +355,12 @@
       "owner": "gaid-korean-workspace",
       "status": "edited",
       "responsibility": "Update English product-name expectation to neutral app default; test workflow unchanged"
+    },
+    {
+      "path": "server/src/agent/skills-sync.ts",
+      "owner": "gaid-release-proof",
+      "status": "edited",
+      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged"
     }
   ],
   "notTouched": [
