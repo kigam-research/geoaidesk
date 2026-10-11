@@ -90,3 +90,11 @@ test("upstream license and the fork notices are present", () => {
   const thirdParty = fs.readFileSync(path.join(root, "THIRD_PARTY_NOTICES.md"), "utf-8");
   for (const skill of ["docx", "pdf", "pptx", "xlsx"]) assert.match(thirdParty, new RegExp(`\`${skill}\``));
 });
+
+test("the catalogue download URL names the pinned archive on this repository's catalogue release", async () => {
+  const { releaseTarget } = await import("../catalogue-release.mjs");
+  const { tag, asset } = releaseTarget();
+  assert.equal(asset, distribution.catalogue.archive);
+  assert.equal(tag, `geo-catalogue-${distribution.catalogue.version}`);
+  assert.ok(!tag.startsWith(distribution.releaseTagPrefix), "a catalogue tag is never read as an app release");
+});
