@@ -210,6 +210,15 @@ describe("POST /geo/suggestions", () => {
     expect(b.suggestions).toEqual([]);
   });
 
+  it("names a categorical field of a polygon layer", async () => {
+    installSkill(paths, "geo-map-and-crs");
+    touch("rect.gpkg");
+    const layer = { name: "rect", geometryType: "Polygon", fields: [{ name: "class", type: "object" }, { name: "n", type: "int64" }] };
+    const server = await app({ inspections: { "rect.gpkg": inspection("geopackage", { layers: [layer] }) } });
+    const body = (await server.inject({ method: "POST", url: "/geo/suggestions", payload: { path: "rect.gpkg" } })).json() as GeoSuggestionsResponse;
+    expect(body.suggestions[0]).toMatchObject({ workflowId: "geo-map-and-crs", match: { signal: { kind: "categorical-field", columns: ["class"] } } });
+  });
+
   it("does not treat an ordinary TIFF or a result manifest as task input", async () => {
     touch("photo.tif");
     touch("out/map.geomap.json");

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T06:56:10Z
+updated: 2026-10-11T06:59:58Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -54,6 +54,11 @@ Verified facts from the hub (2026-10-11):
   unprobed env never ready, suggestions need a content signal for generic formats, recipe checkGeoStart codes,
   POST /sessions geoExposure, geo-result manifest checks). geo-maps-integration/geo-tables fail locally only without
   the helper venv (scripts/check prepares it).
+- Real-catalogue smoke (0.2.0, backend on :18070, data ~/data/geoaidesk/work/gaid-korean-workspace/smoke, after
+  `npx tsx src/prep.ts`): 5 workflows ready, find-and-prepare-geo-data / spatial-pu-study need-environment (optional
+  geo-acquisition / geo-mpm packages); suggestions: LAS → well-log-qc, assay CSV → assay-composition (element columns),
+  plain CSV → none, GeoPackage polygon → geo-map-and-crs (+ find-and-prepare), GeoTIFF → geo-map-and-crs; recipes ok /
+  catalogue-version + choice-state. Fixtures: ~/data/geoaidesk/work/gaid-korean-workspace/fixtures/.
 ## Next steps
 1. Children running (started 2026-10-11 from ba1a71b, profile "general work", normal speed):
    - gaid-korean-workspace--tasks: Paseo agent 9de57122-4815-4e8d-8db4-f7872cf53c25, worktree
@@ -86,6 +91,10 @@ Verified facts from the hub (2026-10-11):
   5. Readiness is computed server-side (`GET /geo/workflows`): skills installed+enabled in the project, project
      environment import probe, and `compatibilityRef` (GAID run record) reported separately; "ready" needs the first
      two; no record shows as 미시험, never as verified.
+  6a. Upstream seeds package-reference skills disabled (`geopandas`), which kept geo-map-and-crs from ever being
+     ready. GAID enables, once at a project's first provisioning, the default-disabled skills that a shipped workflow
+     binds (`enableWorkflowSkills`, server/src/geo/provision.ts); later user choices stay. Existing projects get a
+     "스킬 켜기" action in the readiness UI (`setSkillEnabled`).
   6. geo-result reference: scientific_result kind `geo-result` {manifestPath, resultKind map-layer|depth-track|
      validation-curve, thumbnailPath?}; the card opens the manifest through the existing onOpenFile chain.
 - Packages / owners / integration order:

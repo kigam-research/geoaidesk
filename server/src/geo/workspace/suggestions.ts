@@ -48,7 +48,7 @@ export function contentSignals(inspection: GeoInspection | null): Map<string, Ge
   if (x && y && label) signals.set("spatial-pu-study", { kind: "xy-label-columns", columns: [x, y, label] });
   for (const layer of inspection?.layers ?? []) {
     if (!/polygon/i.test(layer.geometryType ?? "")) continue;
-    const fields = (layer.fields ?? []).filter((field) => /str|text|char/i.test(field.type)).map((field) => field.name);
+    const fields = (layer.fields ?? []).filter((field) => /str|text|char|object|categor/i.test(field.type)).map((field) => field.name);
     if (fields.length) {
       signals.set("geo-map-and-crs", { kind: "categorical-field", columns: fields.slice(0, 6) });
       break;
