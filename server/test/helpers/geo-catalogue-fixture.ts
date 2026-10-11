@@ -103,6 +103,7 @@ export function buildFixtureCatalogue(
   options: {
     version?: string;
     skills?: FixtureSkill[];
+    workflows?: { id: string; title: { ko: string; en?: string }; skillIds: string[]; environmentProfile: string }[];
     mutate?: (entries: FixtureEntry[]) => FixtureEntry[];
   } = {},
 ): FixtureCatalogue {
@@ -122,7 +123,7 @@ export function buildFixtureCatalogue(
       packageDigest: treeDigest(skill.files),
     })),
   };
-  const workflows = [
+  const workflows = options.workflows ?? [
     {
       id: "well-log-qc",
       title: { ko: "검층 QC", en: "Well-log QC" },
