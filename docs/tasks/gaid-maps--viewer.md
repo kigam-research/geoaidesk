@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-11T05:41:47Z
+status: active
+updated: 2026-10-11T05:49:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -19,6 +19,7 @@ Area panel selecting vector class field, explicit method geodesic or projected w
 Visible strings isolated in map/strings.ts (Korean-first using current geo i18n pattern, English second, WP07 later owns overall wording). Tests meaningful with mocked OpenLayers if canvas needed: layer selection/request params, source/display info, bounds/area, stale project switch etc. Need real browser evidence later parent handles; provide ready instructions. Keep existing contracts (propose additive changes to parent, don't edit them). Finish child after own targeted tests; parent task complete integrates, then full scripts/check.
 
 ## Current state
+- Corrected boundary metadata passes `node --test geo/tests/distribution.test.mjs` (6/6). Next finish dce3c08 passed backend 1589/11 skipped but hit an intermittent pre-existing LaTeX draft-restoration assertion in file-preview-panel.test.tsx (916 frontend tests passed, 1 failed); the same full frontend suite passed 917/917 on f455946 with identical viewer code. Standalone `npm --prefix web test -- src/components/file-preview-panel.test.tsx` passed 4/4. No out-of-scope editor source/test changes; rerun finish once with this evidence recorded.
 - Merged full-check snapshot f455946 passed backend typecheck, 1589 backend tests (11 skipped), 917 frontend tests and launcher check. GAID distribution checks passed all map-helper known-answer tests but rejected dependency boundary owner `gaid-maps--viewer`: the existing owner allowlist requires package owner `gaid-maps`. Corrected only this owned metadata entry, retaining child attribution in responsibility; rerun targeted distribution check and finish. No test weakened or viewer implementation changed.
 - Continuation finish first encountered the expected append-only registry conflict with parent 94138d7/WP04. Resolved in the owned geo registry by retaining both `.depth.json`/DepthViewer (including LAS) and `.geomap.json`/MapViewer registrations. No parent/sibling implementation files were edited. Full CLI checks follow this merged snapshot.
 - Continuation `viewer-continue-f3b3631f1273` verified existing ownership and worktree. Parent helper dependency is resolved on published origin/task/gaid-maps (reported d6384406e486; fixture and helper verified via git cat-file). Rerun finish in place; own viewer implementation and prior 40-test evidence are unchanged. No new writer, source workaround or scope expansion.
@@ -34,6 +35,7 @@ Visible strings isolated in map/strings.ts (Korean-first using current geo i18n 
 Closed 2026-10-11T05:41:47Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Finish dce3c08 stopped at the unrelated existing LaTeX draft-restoration test (expected unsaved draft, received original content). Standalone file test passes 4/4; historical log /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-frzbxmgo.log. This was not a map failure and no assertion was weakened. If the same failure repeats, report/checkpoint rather than modify out-of-scope editor code.
 - Continuation full check stopped at integration-boundaries owner validation (23/24 GAID tests passed), log /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-nw6s2g2y.log. Use package owner gaid-maps, not the child unit slug; fixed within the authorized tiny ownership entry.
 - Continuation finish stopped at the append-only viewer registry merge conflict before checks; resolved both sides as already authorized, then reran finish in place.
 - Second finish failed at the parent integration suite's fixture setup because its committed test preceded sibling helper integration. No viewer source workaround is appropriate; parent integration is the needed external change.
