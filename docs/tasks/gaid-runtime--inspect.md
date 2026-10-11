@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T02:56:52Z
+updated: 2026-10-11T03:13:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c3f9df1b-1dd5-4a0a-a822-373c20d04da4","pid":3662480,"provider":"codex","session":"01a128e4-26db-75a0-b2fc-633122ae641e","start":"15340371","token":"24985bfef43fa5f7bac45a53c26cd688ccc83aae65ffd3b9f0ad66d153f353f8"}
 branch: task/gaid-runtime--inspect
 target: task/gaid-runtime
@@ -112,11 +112,41 @@ server/test/geo-read-hints.test.ts, server/test/geo-tools.test.ts, server/test/f
 - Use the task CLI for saving/finishing (`task save`, `task finish`); your finish notifies the parent.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Shared dispatcher, TS baseline parsers, optional metadata helper, project-scoped POST route, geo tools,
+  read hint extension and self-fetching viewer are implemented. No published signature/contract/registry changes.
+- Verified: server typecheck; web tsc; targeted server tests 27 passed / 1 visibly skipped (optional geo modules
+  absent); viewer tests 5 passed. The actual SDK session with a fake provider stream receives the blocked-read
+  reason as its model-facing tool result (no model/network call).
+- Manual read-only trial: 5,876,460-byte LAS → 21 curves, depth 25–3283.9641113 m, unknown basis, 872-byte
+  blocked-read reason; shapefile → Polygon, 133 features, 22 fields and declared WKT (no guessed EPSG);
+  GeoTIFF → EPSG:5186, float64 band. Outputs: pc74:~/data/geoaidesk/work/gaid-runtime/inspect/manual-check.json.
+  Original samples were neither copied into Git nor modified.
+- Full regression/check run remains pending. Safe targeted recheck: from server,
+  `npm run typecheck` and `npx --no-install vitest run test/geo-inspection*.test.ts test/geo-read-hints.test.ts test/geo-tools.test.ts`;
+  from web, `npx tsc --noEmit` and `npx --no-install vitest run src/geo/viewers/inspection-viewer.test.tsx`.
 ## Next steps
-1. (the next session's first action)
+1. Save the reviewed snapshot, run the full server regression with the helper environment, then task finish.
 ## Failed approaches
+- Pi 1.0 does not export AuthStorage from its root SDK. The integration test now supplies an in-memory
+  CredentialStore and fake provider stream through supported ModelRuntime/session APIs.
+- An initial root-directory npx invocation selected an unpinned Vitest; it was stopped and all recorded
+  verification commands were rerun inside server/web with the lockfile-pinned executables.
 ## Notes and decisions
+- Implementation is tightly coupled around one inspection result; no child writers or readers are needed.
+- Sequential decisions: preserve published signatures; keep all parser IO under a per-file byte budget;
+  reject unsafe paths before parsing; content failures become issues, request/path failures remain HTTP errors.
+- Owned interfaces/files are those in the brief. No registry or other parent's seam edits are planned.
+- Integration order: dispatcher + TS inspectors → optional metadata-only helper → API/tools/read hook → viewer.
+- Bounds: TS inspection reads <=256 KiB/source file (including sniffing); preview <=50 rows; tool summaries
+  <=3000 bytes; read hints <=2000 bytes; physical-line windows <=200 lines and <=64 KiB model text, with a
+  <=4 MiB scan budget. Partial lines and scan limits are explicit. bash is intentionally not policed.
+- Optional helper is metadata-only (no features/pixels); 5-second subprocess deadline, SQLite metadata row/progress
+  limits, 128 KiB accepted JSON. Missing dependencies keep the TS result with an issue. BigTIFF has an explicit issue;
+  Python may recover its CRS but baseline BigTIFF dimensions are not promised. LAS 3/wrapped/LiDAR are explicit issues.
+- GeoJSON RFC 7946 default applies only to a complete bounded structure; large fragments retain unknown CRS/count.
+- A TIFF is geo only when georeference tags exist; ordinary TIFF retains the upstream lazy imaging viewer.
+- Upstream seam list for parent integration-boundaries: new `server/src/helpers/geo_inspect_helper.py` only;
+  no existing upstream file was edited. Every other implementation file is under server/src/geo or web/src/geo.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
