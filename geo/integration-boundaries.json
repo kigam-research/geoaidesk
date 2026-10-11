@@ -160,9 +160,9 @@
     },
     {
       "path": "web/package.json, web/package-lock.json",
-      "owner": "gaid-maps--viewer",
+      "owner": "gaid-maps",
       "status": "edited",
-      "responsibility": "WP05 adds only the OpenLayers ol dependency and its lock entries"
+      "responsibility": "WP05 (child gaid-maps--viewer) adds only the OpenLayers ol dependency and its lock entries"
     }
   ],
   "notTouched": [
