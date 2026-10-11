@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Declared checks for geoaidesk: the upstream CI steps (.github/workflows/tests.yml) on Linux.
+# Backend typecheck + vitest (with the scientific helper env), frontend vitest, launcher --check.
+# Needs Node >= 22, uv, and network access to the npm registry and PyPI (dependencies come from the lockfiles).
+set -euo pipefail
+# Preserve full output when the task CLI captures subprocess streams without exposing them.
+if [ -n "${CHECK_LOG_FILE:-}" ]; then
+    exec > "$CHECK_LOG_FILE" 2>&1
+fi
+# Callers (e.g. the backbone task CLI) may export their own import paths; checks must not inherit them.
+unset PYTHONPATH PYTHONSAFEPATH
+# Upstream tests assume the en-US locale of CI runners (e.g. Intl currency text "$25"); host locales such as ko_KR differ.
+export LC_ALL=C.UTF-8
+cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+step() { printf '\n== %s\n' "$*"; }
+
+step 'Backend: install dependencies'
+(cd server && npm ci --no-audit --no-fund)
+step 'Backend: scientific helper environment'
+uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed
+step 'Backend: typecheck'
+(cd server && npm run typecheck)
+step 'Backend: tests'
+# psims (mzML parsing) downloads the PSI-MS vocabulary on first use with a browser User-Agent. Some networks
+# (KIGAM) answer that request with an HTML page, so the two mzML-parsing tests cannot pass there: skip only them,
+# visibly. The probe uses psims' own opener so it sees the same response.
+if uv run --frozen --project server/src/helpers python -I -W ignore -c '
+import sys
+from psims.controlled_vocabulary.controlled_vocabulary import obo_cache
+try:
+    head = obo_cache._open_url("http://purl.obolibrary.org/obo/ms/psi-ms.obo").read(64)
+except Exception:
+    sys.exit(1)
+sys.exit(0 if head.startswith(b"format-version") else 1)
+'; then
+    (cd server && npm test)
+else
+    echo 'SKIPPED: 2 mzML-parsing tests (PSI-MS vocabulary not downloadable by psims on this network)'
+    (cd server && npm test -- -t '^(?!.*(summarizes an mzML run with an MS1 chromatogram|reports the parse error for a corrupt mzML)).*$')
+fi
+
+step 'Frontend: install dependencies'
+(cd web && npm ci --no-audit --no-fund)
+step 'Frontend: tests'
+(cd web && npm run test)
+
+step 'Launcher: --check'
+./start.sh --check
+
+printf '\nAll geoaidesk checks passed.\n'

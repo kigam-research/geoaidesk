@@ -2,6 +2,59 @@
 
 Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in this repository.
 
+## GeoAIDesk fork
+- This repo is GeoAIDesk (GAID), the public GitHub fork of
+  [K-Dense-AI/k-dense-byok](https://github.com/K-Dense-AI/k-dense-byok) (MIT). Integration base: upstream
+  `44c52cee8e9fdc343c6132909769f49accf14a82`. Keep the upstream LICENSE and copyright notice.
+- The sections from "Project overview" on are the upstream guidance as of that base. They describe the app
+  until GAID changes it; update them in the same task when a change makes them wrong.
+- GAID naming, notices and launchers are owned by the fork-base work package (WP02 `gaid-fork-base`; spec in
+  the skill_hub repo, `docs/specs/geo-byok-plan.md`). Until then, the app still uses upstream names.
+- Upstream sync: fetch `https://github.com/K-Dense-AI/k-dense-byok` into a task branch and integrate it with a
+  merge commit through the normal task workflow.
+- Checks: `scripts/check` runs the upstream CI steps (`.github/workflows/tests.yml`) on Linux. It needs Node
+  >= 22, uv and network access to the npm registry and PyPI.
+
+## Work policy v1
+
+Task-document-only checks: v1
+
+- This repo uses the backbone task workflow. Base: freshly fetched origin/main; one writer per task;
+  never commit directly to main. Checks: scripts/check (or: "no automated checks" — then report that,
+  never "tests passed").
+- Local or Paseo sessions must use the `task` CLI; if it is missing, that is an installation problem,
+  not permission to bypass it.
+- Hosted cloud sessions (no `task` CLI) read docs/cloud-policy.md first and follow it: own new branch from
+  fresh origin/main, the main session owns edits, checks and publication, merge-commit PR to finish.
+- Never stage .env*, secrets/, secure/, *.pem, *.key, id_* (at any depth) or files over 5MB. No force-push
+  or history rewrite.
+
+## Project layout v1
+- Standard: backbone `docs/project-standard.md`. Checkout `~/repos/<repo>`; task worktrees
+  `~/worktrees/<repo>/<slug>`; outputs `~/data/<repo>/{runs,derived,work,archive}`; inputs `~/assets/<asset>/<version>/` and
+  `~/data/<repo>/derived/<name>/<version>/`, resolved by name from `configs/inputs.toml`. Never write outputs inside the repo. Agents may inspect another project's checkout read-only for the task;
+  research code never depends on another checkout (register what it needs as an asset).
+- Code takes locations from `TASK_DATA_DIR`, `TASK_ASSETS_DIR`, `TASK_OUTPUT_DIR` (job) or the defaults
+  `~/data/<repo>` and `~/assets`; root detection must work in a job's `src/` (no `.git`).
+- Runs to keep: `task job run [--gpu] [--input assets:<asset>/<version>] -- <cmd>`. Interactive output goes to
+  `~/data/<repo>/work/<slug>/`. Notebooks: Jupytext `notebooks/*.py` is the source; `.ipynb` is not tracked;
+  executed notebooks are job outputs.
+- Results for user review: add to `results/registry.toml` as `review` with file hashes and a
+  `reports/<YYYY-MM-DD>-<topic>/index.md`; only the user's decision makes them `adopted`/`rejected`.
+  On adoption, replicate the files to the listed replica host and verify hashes before committing.
+- Git: no file over 5MB, no `revN` copies, interactive HTML with external libraries; large files stay in
+  `~/data/<repo>`, referenced from the report by locator and sha256 (Google Drive only when the user asks).
+- Users open reports from the project main workspace Files in Paseo, which shows nothing outside the
+  workspace: declare the canonical report as `Report: <repo-relative path>` under the task document's
+  `## Report` and write repo-relative paths in prose instead of relative document links. A report for review
+  embeds its decision-relevant figures as small PNGs tracked in its folder (`![caption](figures/x.png)`):
+  GitHub web/mobile shows them and Paseo Files opens each `.png`; images at local paths (`/home/...`,
+  `~/data/...`) or untracked paths do not render. Keep full-resolution originals as locator + sha256 text.
+  Text-only reports need no figures. `task finish` prints non-blocking warnings for such references.
+- App data: the backend keeps user projects under `KADY_PROJECTS_ROOT` (default `projects/` in the checkout,
+  ignored by Git). Point it at `~/data/geoaidesk/work/<slug>/projects` for task work; a deployed service uses
+  its own `~/data/geoaidesk` location.
+
 ## Project overview
 
 K-Dense BYOK is a local AI research-assistant app ("Kady") that brings the user's own model credentials (API keys or supported subscriptions). It runs natively on macOS, Linux, and Windows. It is one repo with **two** runtime services started together by the cross-platform launcher `start.mjs` (wrapped by `./start.sh` on macOS/Linux and `start.cmd` on Windows):
