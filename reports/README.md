@@ -7,4 +7,4 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
-| <img src="2026-10-11-gaid-fork-base/figures/01-workspace.png" width="120"> | 2026-10-11 11:35 | [GeoAIDesk 배포 기반 (WP02 gaid-fork-base)](2026-10-11-gaid-fork-base/index.md) | 새 checkout에서 한 줄 명령으로 설치·실행되고, 중지·재시작 후에도 프로젝트가 남으며, 사용자 자료는 소스 밖에 저장됩니다. | 검토 전 | 미정 | 0 |
+| <img src="2026-10-11-gaid-fork-base/figures/01-workspace.png" width="120"> | 2026-10-11 11:35 | [GeoAIDesk 배포 기반 (WP02 gaid-fork-base)](2026-10-11-gaid-fork-base/index.md) | 새 checkout에서 한 줄 명령으로 설치·실행되고, 중지·재시작 후에도 프로젝트가 남으며, 사용자 자료는 소스 밖에 저장됩니다. | 검토함 10-11 | 미정 | 0 |
