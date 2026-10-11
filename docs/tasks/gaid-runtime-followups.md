@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-11T05:11:56Z
+status: active
+updated: 2026-10-11T05:20:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"85450614-1e51-40d8-81d3-2d03affeb189","pid":3993687,"provider":"codex","session":"01a12947-5e03-7991-a7c3-7c4f3fb3d496","start":"15990571","token":"4532bddaeed252d92fb3ced998e7493b4011111ccf99357f24fd5d925521b444"}
 branch: task/gaid-runtime-followups
 target: main
@@ -52,6 +52,7 @@ Context:
 <!-- task:closed -->
 Closed 2026-10-11T05:11:56Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
+- First task finish passed the full suite, then detected main had advanced to b08a7053 (WP04 PR #6) and merged it without conflicts. On the automatically repeated suite, backend passed 1,585 tests (11 skipped), but one unrelated LaTeX UI test exceeded 5 seconds among 901 frontend tests. No product/test timeout changes; limit VITEST_MAX_WORKERS=4 (confirmed supported by installed Vitest) for the rerun. Current local unpublished finish intent: 52b04afdae8c.
 ## Failed approaches
 - task job run -- scripts/check failed before launch because inherited .env.example is a forbidden snapshot path. No job/receipt was created; no protected file was read or changed. Use the CLI's declared-check integration path (task sync/finish), not a manual publication workaround.
 - Initial lead-run regression reported cost but zero tokens: the ledger intentionally skips zero-cost/zero-token rows after local normalization. The corrected fixture reports two tokens. An intervening focused attempt ran the stale fixture because the correction script was initially invoked from server/ instead of the worktree root; the root invocation and fresh rerun passed.
