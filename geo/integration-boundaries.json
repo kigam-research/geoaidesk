@@ -190,9 +190,9 @@
     },
     {
       "path": "server/src/agent/provider-auth.ts",
-      "owner": "gaid-runtime",
+      "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row; no authentication changes"
+      "responsibility": "Type-only: ClientDirectModel.billingMode also accepts local for the dedicated custom-provider picker row (gaid-runtime); Sign in with ChatGPT authorization URL carries the distribution's product name as agent_name_hint (server/src/geo/siwc.ts; OpenAI SIWC terms 2026-09-29), other providers and upstream checkouts unchanged (gaid-release-proof)"
     },
     {
       "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
