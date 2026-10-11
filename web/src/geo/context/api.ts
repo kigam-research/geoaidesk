@@ -52,8 +52,9 @@ export async function getSessionContext(projectId: string, sessionId: string, mo
 }
 
 /** Budget of a chat not created yet, measured with the project's new-chat settings. */
-export async function getPreviewContext(projectId: string, modelRef?: string): Promise<SessionContext> {
-  const query = modelRef ? `?${new URLSearchParams({ model: modelRef })}` : "";
+export async function getPreviewContext(projectId: string, modelRef?: string, exposure?: string): Promise<SessionContext> {
+  const params = new URLSearchParams({ ...(modelRef ? { model: modelRef } : {}), ...(exposure ? { exposure } : {}) });
+  const query = params.size ? `?${params}` : "";
   return json(await apiFetch(`/geo/context/preview${query}`, {}, projectId));
 }
 

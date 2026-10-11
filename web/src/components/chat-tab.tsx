@@ -742,6 +742,7 @@ function ChatInput({
   modelAvailability = "available",
   projectId,
   currentSessionId,
+  pendingGeoExposure,
   researchRefs,
   onResearchChange,
   delegation,
@@ -797,6 +798,8 @@ function ChatInput({
   modelAvailability?: ModelAvailability;
   projectId: string;
   currentSessionId: string | null;
+  /** GeoAIDesk: exposure a started task's session will be created with. */
+  pendingGeoExposure?: string;
   /** Per-message research references (+ → Research); cleared once sent. */
   researchRefs: ResearchRef[];
   onResearchChange: (refs: ResearchRef[]) => void;
@@ -1305,6 +1308,7 @@ function ChatInput({
                 sessionId={currentSessionId}
                 modelRef={selectedModel.id}
                 refreshKey={isStreaming}
+                pendingExposure={pendingGeoExposure}
               />
               <GeoChatActions
                 projectId={projectId}
@@ -2507,6 +2511,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
             modelAvailability={selectedModelAvailability}
             projectId={projectId}
             currentSessionId={sessionId}
+            pendingGeoExposure={initialWorkspaceState?.geoExposure}
             researchRefs={researchRefs}
             onResearchChange={setResearchRefs}
             delegation={delegation}

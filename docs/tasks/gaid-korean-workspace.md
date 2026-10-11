@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T07:21:07Z
+status: done
+updated: 2026-10-11T07:46:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5a34c88d-50ba-4323-a756-6a9488fbdf87","pid":380762,"provider":"claude","session":"6df29ac7-f824-41c6-9216-1a3b7d461f2f","start":"16638656","token":"1a4386f654d16d2945fa89db25384d9bf52e4732defb4b77b0f0281efd272b96"}
 branch: task/gaid-korean-workspace
 target: main
@@ -59,25 +59,18 @@ Verified facts from the hub (2026-10-11):
   geo-acquisition / geo-mpm packages); suggestions: LAS → well-log-qc, assay CSV → assay-composition (element columns),
   plain CSV → none, GeoPackage polygon → geo-map-and-crs (+ find-and-prepare), GeoTIFF → geo-map-and-crs; recipes ok /
   catalogue-version + choice-state. Fixtures: ~/data/geoaidesk/work/gaid-korean-workspace/fixtures/.
+- Full scripts/check job 1 (tree 6125c59) exit 0: backend 151 files passed + 1 skipped (2 mzML tests SKIPPED: PSI-MS
+  vocabulary not downloadable on the KIGAM network), web 142/142 files, copy validator 0 errors / 1 accepted warning
+  (English limit text "not independently verified"), environments smoke, launcher checks, production smoke; "All
+  geoaidesk checks passed." Later commits (catalogue layout, theme-provider order, providers intro copy, report) are
+  re-checked by task finish.
+- Final browser checks (Korean 1440 px, keyboard, 375 px, English browser) recorded in the report; scripts and shots in
+  ~/data/geoaidesk/work/gaid-korean-workspace/browser/ (final.mjs, result.mjs, final/).
+
 ## Next steps
-1. Children running (started 2026-10-11 from ba1a71b, profile "general work", normal speed):
-   - gaid-korean-workspace--tasks: Paseo agent 9de57122-4815-4e8d-8db4-f7872cf53c25, worktree
-     ~/worktrees/geoaidesk/gaid-korean-workspace--tasks, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-tasks.md
-   - gaid-korean-workspace--korean: Paseo agent 95c18540-98e5-43b9-a8b5-0d904e284979, worktree
-     ~/worktrees/geoaidesk/gaid-korean-workspace--korean, brief ~/data/geoaidesk/work/gaid-korean-workspace/child-korean.md
-   On each finish notification: `task complete gaid-korean-workspace--<child>`, then integrate.
-   - --tasks completed and closed 2026-10-11 (18df037; its build caches removed for close). Integration fixes by the
-     orchestrator: "스킬 켜기" for installed-but-disabled workflow skills and a not-installed note, unavailable reason
-     names unshipped skills, suggestion content signal shown, recipe issues localized per code (ICU select) instead
-     of the English server message; 64 geo web tests pass.
-   - Early browser pass (dev servers :18070/:3070 as user units gaid-wp07-be/-fe, smoke data, scripts
-     ~/data/geoaidesk/work/gaid-korean-workspace/browser/{flow,flow2}.mjs, shots/ there): LAS → one ready suggestion
-     with 미시험 badge; setup dialog → draft in a NEW tab (file attached, primary skill pinned, source tab unchanged);
-     catalogue lists 7 tasks; recipe file → prefilled setup; seeded fixture session (seed-session.mts, no model call)
-     shows the geo-result card and "지도 열기" opens the map viewer. Fixed: icon-only reusable-skill button (toolbar
-     overflow), catalogue padding/scroll, one recipe import instead of one per card.
-2. After both: full scripts/check, browser checks (ko, keyboard, 375/1440 px) with Playwright scripts under
-   ~/data/geoaidesk/work/gaid-korean-workspace/browser/, report reports/2026-10-11-gaid-korean-workspace/index.md.
+<!-- task:closed -->
+Closed 2026-10-11T07:46:20Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Scope = WP07 package text only (forwarded goal b619ca2ff749). Done: researcher opens data, sees relevant actions,
@@ -132,11 +125,10 @@ Verified facts from the hub (2026-10-11):
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-11-gaid-korean-workspace/index.md
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-korean-workspace-20261011T073613.005933Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

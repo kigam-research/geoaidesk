@@ -12,6 +12,7 @@ import { registerGeoWorkspaceRoutes } from "../src/geo/routes/workspace.ts";
 import { checkRecipe } from "../src/geo/workspace/recipes.ts";
 import { taxonomyFormat } from "../src/geo/workspace/formats.ts";
 import { registerSessionRoutes } from "../src/api/sessions.ts";
+import { registerGeoCatalogueRoutes } from "../src/geo/routes/catalogue.ts";
 import { makeScientificResultTool, scientificResultFromDetails } from "../src/agent/scientific-result.ts";
 import type { GeoInspection } from "../../web/src/geo/contracts/inspection.ts";
 import type { GeoWorkflowsResponse, GeoSuggestionsResponse } from "../../web/src/geo/contracts/workspace.ts";
@@ -294,6 +295,16 @@ describe("started-task sessions", () => {
     expect(readSessionExposure(paths, ok.json().id)?.mode).toBe("workflow:well-log-qc");
     const plain = await server.inject({ method: "POST", url: "/sessions" });
     expect(plain.statusCode).toBe(200);
+  });
+});
+
+describe("prompt-budget preview of a started task", () => {
+  it("previews the task's exposure and validates it", async () => {
+    const server = Fastify();
+    await registerGeoCatalogueRoutes(server);
+    expect((await server.inject({ method: "GET", url: "/geo/context/preview?exposure=everything" })).statusCode).toBe(400);
+    const body = (await server.inject({ method: "GET", url: "/geo/context/preview?exposure=workflow:well-log-qc" })).json();
+    expect(body.exposure).toMatchObject({ mode: "workflow:well-log-qc", preview: true });
   });
 });
 

@@ -21,15 +21,16 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="antialiased">
-        <GeoLocaleRoot>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {/* ThemeProvider stays outside GeoLocaleRoot: its inline theme script must be server-rendered. */}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <GeoLocaleRoot>
             <ProjectProvider>
               <TooltipProvider delayDuration={350}>{children}</TooltipProvider>
             </ProjectProvider>
             <Toaster />
             <ApiTokenGate />
-          </ThemeProvider>
-        </GeoLocaleRoot>
+          </GeoLocaleRoot>
+        </ThemeProvider>
       </body>
     </html>
   );
