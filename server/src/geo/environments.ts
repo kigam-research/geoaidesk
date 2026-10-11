@@ -133,7 +133,8 @@ function stamp(dir: string, interpreter: string): string {
 
 const tail = (result: CommandResult): string => (result.stderr + "\n" + result.stdout).trim().slice(-8000);
 export class EnvironmentPreparationError extends Error {
-  constructor(message: string, readonly output: string) { super(message); }
+  readonly output: string;
+  constructor(message: string, output: string) { super(message); this.output = output; }
 }
 
 export interface EnvironmentServiceOptions {
