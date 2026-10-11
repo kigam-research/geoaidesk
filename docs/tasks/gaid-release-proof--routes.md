@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T09:12:46Z
+updated: 2026-10-11T09:13:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"9b44cd61-f804-4d65-90d5-69caa3d1376d","pid":1179633,"provider":"codex","session":"01a12a08-8d0f-7ca2-8a70-326e35c40d04","start":"17256638","token":"690620d2c6d8eeb81cad4c442096380d29ff243a0df2b1f51286d13d3f93ca6a"}
 branch: task/gaid-release-proof--routes
 target: task/gaid-release-proof
@@ -92,6 +92,7 @@ server/src/helpers/.venv, web/node_modules, web/.next, web/next-env.d.ts, web/ts
 ## Failed approaches
 - Two additional job launches were refused because the previous job added a dirty task jobs block. Saved each reviewed jobs-block update before the next launch; no failed/refused call created a job.
 ## Notes and decisions
+- After job 1 exposed compaction/aborted-usage differences, the final harness now records ledger token totals as authoritative and preserves streamed totals separately. All four already-launched trials use the original snapshot; their immutable records retain both streamed fields and the full ledger, and per-run notes identify authoritative values. No model rerun for this record-presentation fix. Paid picker pricing is USD/million tokens, corrected in the design note and field name before any paid use.
 - Sequential phases: settle catalogue/API interface → implement harness → record four isolated local jobs → inspect evidence → declared checks/finish. This is a child unit with tightly coupled owned scripts; no nested writers and no independent reader package needed.
 - Owned files: geo/release-proof/route-trial.mjs, route-metrics.mjs, route-tests.mjs, route-usage.md and route-tasks/tasks.mjs. Shared instance.mjs and app code are read-only. Parent integrates with task complete.
 - Map input is reconstructed from the permitted MIT example rectangle-spec.json (the archive has recipe/output evidence, not the binary source); A=30000/B=20000 m2 in EPSG:5186. No known output files are uploaded.
