@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T05:49:44Z
+status: ready
+updated: 2026-10-11T05:50:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"2bcba6ab-0329-4c49-8cb2-c835676e8dc3","pid":3995197,"provider":"codex","session":"01a12947-6e00-7253-b082-3d48ae1ad554","start":"15990995","token":"e4dda53a5d60153028223e9b921305b1392870ba97e28ebb495282f32a5a0fc9"}
 branch: task/gaid-maps--viewer
 target: task/gaid-maps
@@ -32,7 +32,7 @@ Visible strings isolated in map/strings.ts (Korean-first using current geo i18n 
 - Final targeted checks passed: `npm --prefix web test -- src/geo/viewers/map src/geo/viewers/inspection-viewer.test.tsx src/lib/use-sandbox.test.ts` (5 files, 40 tests, including real OpenLayers native fit); `cd web && npx tsc --noEmit --incremental false`; `cd web && npx eslint src/geo/viewers/map src/geo/viewers/registry.ts` (zero errors/warnings); `git diff --check` clean.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-11T05:41:47Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-11T05:50:06Z: ready; the parent gaid-maps integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Finish dce3c08 stopped at the unrelated existing LaTeX draft-restoration test (expected unsaved draft, received original content). Standalone file test passes 4/4; historical log /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-frzbxmgo.log. This was not a map failure and no assertion was weakened. If the same failure repeats, report/checkpoint rather than modify out-of-scope editor code.
