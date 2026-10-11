@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-11T11:52:33Z
+updated: 2026-10-11T11:55:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dd92b59d-5d21-4c94-a719-5bfb201dd6bd","pid":976479,"provider":"claude","session":"b8a248da-4217-409e-9ef6-b7a845d8cd98","start":"17161315","token":"755162dc1445543293b14cc570ff1c499e9d6d77636aaecc6688a83b01392fa6"}
 branch: task/gaid-release-proof
 target: main
@@ -104,6 +104,13 @@ Verified facts from the hub (2026-10-11):
 - Paid-trial instance: systemd user unit gaid-paid-trial (checkout ~/data/geoaidesk/work/gaid-release-proof/paid/checkout
   at 0720198, data home …/paid/home, API :18110, UI :18111). Waiting for the user to save one API key and sign in with
   ChatGPT, and to name provider/model and budget. Stop it with `systemctl --user stop gaid-paid-trial` when done.
+- CI: GAID checks had failed on main since gaid-korean-workspace (launcher matrix ran uv-dependent geo tests without
+  uv) → ab15ad8: launcher matrix runs launcher-level tests (start, distribution, win-fs-shim, compatibility); release.yml
+  sets up uv. Verified by the release run below; the PR run at finish verifies gaid-checks.
+- App draft release (user decision 1 나): tag geo-v0.1.0 on ab15ad8 pushed; Release workflow run 38137188871 succeeded and
+  created a DRAFT prerelease with geoaidesk-0.1.0-source.tar.gz, geoaidesk-0.1.0-manifest.json, SHA256SUMS. Not
+  published; publication waits for brand clearance (open item). Paid-trial instance stopped (ports free).
+- Worktree build caches removed after the last local checks.
 - Network: GitHub release downloads (release-assets.githubusercontent.com) work from PC74; raw.githubusercontent.com is blocked.
 
 ## Plan (orchestration)
@@ -139,19 +146,13 @@ release and the app release.
 On a child's finish: `task complete gaid-release-proof--<child>`.
 
 ## Next steps
-1. Waiting for the user's answers in this tab (asked 2026-10-11; report §6, vault copy
-   /home/seongin/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-11-gaid-release-proof): brand clearance, publishing the
-   catalogue release, paid route trials, local-route advertising.
-   - Catalogue publish approved → `node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.2.1 --publish`, then
-     `--verify-remote`, then one Linux install proof without --catalogue-archive (real download) → compatibility/report.
-   - Paid trials approved → user saves the key / signs in to an isolated GAID instance; run
-     `geo/release-proof/route-trial.mjs --route api-key|chatgpt-signin --allow-paid --api … --data-home …` per
-     geo/release-proof/route-usage.md; record with `requestedBy` in geo/compatibility.json.
-   - App release: only after brand clearance; tag geo-v0.1.0 creates a draft; publishing needs the user's go.
-2. Otherwise: finish with the four open decisions carried to the ledger (Windows scheduled tasks deleted, no leftover
-   processes on pc71-win; diag folders under C:\Users\KIGAM_Ahn\gaid-proof are disposable).
-3. WP09 intake templates: not on skill_hub main as of 2026-10-11 (no schemas/skill-submission.schema.json).
+1. `task finish` (done criteria met except the user-deferred paid routes and the brand-gated publication, both carried
+   as open items).
 ## Failed approaches
+- Windows first installs failed at d5702af and d2c535f (scheduled task and interactive): root cause was Node's native
+  cpSync/rmSync on the non-ASCII data home, not the scheduled-task context; fixed in 616113d. 616113d still failed the map
+  previews (helper stdin code page); fixed in 579aa2d. Update proofs 1–2 (Linux) failed on harness bugs; Windows
+  update-5 failed because the base 882cd56 cannot start on a non-ASCII data home.
 ## Notes and decisions
 - User, 2026-10-11, on report §6 (four decisions): "모두 권장으로 진행하자." → 1 나) no brand clearance yet: app release
   only as a GitHub draft, published after clearance; 2 가) catalogue release published now (done: geo-catalogue-0.2.1,
