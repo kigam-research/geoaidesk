@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-11T04:44:25Z
-writer: {"host":"seongin3","reserved":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"8b4d426a-82dc-444e-9347-60354a8ffce4","pid":3988444,"provider":"codex","session":"01a12946-e997-71b3-80cd-cd78dd1a4c97","start":"15987572","token":"aacbe3632ec09bb9cd0ed2462c01dea0ad31b942c1b541b060656a312c578629"}
 branch: task/gaid-well-tables--tables
 target: task/gaid-well-tables
 parent: gaid-well-tables
