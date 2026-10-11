@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T06:20:57Z
+status: done
+updated: 2026-10-11T06:21:16Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5cf81d21-5cc5-4b20-94ff-55570f0c20dc","pid":3978975,"provider":"codex","session":"01a12945-6839-7642-ba5c-59b7217a6194","start":"15977732","token":"525532c561304251f1b7cd09aedacc4c46d7ca47b8b06c05ffe31f837880c5e3"}
 branch: task/gaid-maps
 target: main
@@ -45,8 +45,9 @@ Verified facts from the hub (2026-10-11):
 - Actual Chrome app walkthrough: raster/vector overlay, full-layer 20000 m² table, downloaded CSV/PNG, unknown-CRS native/area/overlay behavior, multiple GPKG layers and sampled raster zero passed. Browser evidence is external; reviewed PNGs are in the canonical report.
 - task sync completed and integrated candidate a518e1b1b5db into main after scripts/check passed: backend1609 passed/11 skipped, frontend924 passed, GAID24 passed, both environments and production startup/stop/restart passed. No paid model calls or deployment.
 ## Next steps
-1. Save final report/check evidence; remove regenerable caches and run task finish.
-2. If finish regenerates ignored caches, clean them before hub completion. Relay the hub final completion report once.
+<!-- task:closed -->
+Closed 2026-10-11T06:21:16Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Job snapshot blocked on upstream `.env.example`; no job started and no receipt was issued. Hub authorized direct checks (reply 65caed1a1d90).
 - First targeted run: 27/29 tests passed; corrected unknown CRS on unsafe companions and equivalent WGS84 identifiers, then 29/29 passed. Added extent/paging coverage: 30/30 passed.
