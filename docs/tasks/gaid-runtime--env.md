@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T03:10:34Z
+status: ready
+updated: 2026-10-11T03:10:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0becd10a-f4fd-4f39-92ef-a666bfd98820","pid":3657853,"provider":"codex","session":"01a128e3-dbba-7443-9d73-f1900d0e9424","start":"15338416","token":"1dbe8a1fa32d526ab7c5c2b60daed9de22e6bb23df710da310f3db8bd3d7953a"}
 branch: task/gaid-runtime--env
 target: task/gaid-runtime
@@ -110,8 +110,8 @@ server/src/sandbox-seed.ts (and helpers-env.ts only if needed).
 - Integration: parent records `sandbox-seed.ts` and `helpers/pyproject.toml`, `helpers/uv.lock` seams and appends `node geo/tests/environments-smoke.mjs` to scripts/check. No helpers-env.ts change was needed.
 
 ## Next steps
-1. Save the reviewed native-require compatibility fix and run `task finish` (executes full scripts/check).
-2. Resolve relevant check failures in place if needed. Parent integrates the ready child with `task complete gaid-runtime--env`.
+<!-- task:closed -->
+Closed 2026-10-11T03:10:46Z: ready; the parent gaid-runtime integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial helper lock resolution failed on Python 3.11: catalogue numpy>=2.5.3 requires >=3.12. A Python-only uv environment marker still attempted unsupported Windows ARM64 and failed on RDKit. Neither split was among the four required Python-3.12 platform targets.
