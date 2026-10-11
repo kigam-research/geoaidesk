@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-11T08:44:41Z
+status: ready
+updated: 2026-10-11T08:44:52Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"d710da92-8f5d-43bb-b429-400890d2850d","pid":1176037,"provider":"codex","session":"01a12a08-5c19-71c3-9c52-877e889e02ec","start":"17255386","token":"7b5dc6eae16a3dd2ec7620f787d20642f161f7b59b932865ba211889ad0dd09a"}
 branch: task/gaid-release-proof--install
 target: task/gaid-release-proof
@@ -106,9 +106,9 @@ web/tsconfig.tsbuildinfo, __pycache__).
 - Job 4 succeeded notification received; reread its complete log and output, reverified record SHA256 unchanged, all before/after checks and final-stop passed. At that time a bounded Windows check found frontend npm still installing; Windows has since finished with the failed result above.
 - Job 1 succeeded relay notification processed: reread full log and record, confirmed all 30 install/restart steps passed, final-stop passed and SHA256 unchanged (46777cca…aa7326). No rerun or additional Windows polling triggered.
 ## Next steps
-1. Save reviewed final task evidence and task finish; parent runs task complete to integrate this child.
-2. Parent owns full scripts/check, canonical report and compatibility integration. Use the authoritative Windows failed record, not waiter job exit 0. Investigating/fixing the native Windows backend startup is app-owner work, outside this child's allowed files.
-3. No jobs/services remain to restart. Preserve all failed first attempts. No required user decision.
+<!-- task:closed -->
+Closed 2026-10-11T08:44:52Z: ready; the parent gaid-release-proof integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - PC74 update job 2: POST /projects with X-Project-Id of the not-yet-created project returned 404. Harness defect, not app defect; use unscoped creation.
 - Job 2 failed-exit relay notice processed: reread full log and project-scope HTTP 404; record SHA256 unchanged (a044f1daea3cdb62b9fedbae2cc2061cf0448fc89a9fbbbaf7136ec513bc28ea), final-stop passed. Fixed and superseded by passing job 4; no new action or rerun.
