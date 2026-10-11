@@ -8,6 +8,7 @@ review_status: pending
 decisions: 2
 cover: figures/01-start-prompt.png
 supersedes:
+reviewed: 2026-10-11
 ---
 # GeoAIDesk 실행 기반 — 고정 카탈로그, 준비된 환경, 파일 요약, 로컬 모델 설정 (WP03 gaid-runtime)
 
