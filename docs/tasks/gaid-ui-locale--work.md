@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T22:57:45Z
+status: done
+updated: 2026-10-12T23:09:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -109,7 +109,7 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-12T22:57:45Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-12T23:09:55Z: integrated into gaid-ui-locale; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Reinstalled finish check passed backend/frontend tests, geo tests, copy and environment smokes, then production smoke caught an import before the semicolonless use-client directive in shared dialog. Fixed directive ordering in dialog and carousel (same extraction case); run production build then retry finish in place.
