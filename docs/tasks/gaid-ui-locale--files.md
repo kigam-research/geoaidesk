@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:23:11Z
+updated: 2026-10-12T14:39:26Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e2cc47a6-cd2c-4eb2-911c-522a86045e22","pid":152477,"provider":"codex","session":"01a13070-75c8-77a1-a5c2-ca68669a3ef0","start":"28003948","token":"69ab13e691a305143f67d8563026fb4180aee339a81920be8fd79e309661e036"}
 branch: task/gaid-ui-locale--files
 target: task/gaid-ui-locale
@@ -92,11 +92,22 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation complete for the owned UI: 465 bilingual messages in the files namespace, including count/limit/error states, Office commands, PDF annotations and CodeMirror built-in search/folding/review UI. Existing app ids and all server/model inputs are unchanged. npm ci completed; TypeScript and copy checks pass on the intermediate snapshot. Full web suite pending.
+
+Additional upstream files (parent must register boundaries): web/src/lib/sci-fetch.ts and web/src/lib/latex/{api,completions,outline,spellcheck}.ts. They contain user-visible timeout, fallback, autocomplete and spelling text. No other namespaces or shared boundaries file edited.
+
+Intentional exclusions: user/source data, scientific units and schema names, code/environment names, keyboard shortcuts, HTTP/engine diagnostics, notebook In/Out markers, product/font names. The parent scanner only finds In/Out execution markers and Kady Office in owned files. Raw server-generated errors are unchanged per the parent contract. The embedded third-party LibreOffice engine chrome/dialogs still come from its pinned vendor assets, not these app catalogues; the app-owned command ribbon and known host failures are localized.
+
+English source text is unchanged; composed messages use ICU with the same words, values and plural rules. Korean statuses omit upstream Saved! punctuation. Full translation inventory: files/en.json records the upstream before and unchanged English after; files/ko.json records the Korean after (Korean before was upstream English), keyed by identical message ids.
 ## Next steps
-1. (the next session's first action)
+1. Save the reviewed implementation so the job runner can snapshot a clean revision.
+2. Run the full web suite as a recorded job; finish remaining static verification.
+3. Record final evidence, save, then task finish.
 ## Failed approaches
 ## Notes and decisions
+- Sequential plan: settle existing locale seams, convert static messages, then complete dynamic/count messages and audit data/protocol exclusions. All owned files stay with this writer; no nested writers. Parent owns integration and browser checks.
+- English wording is preserved. Technical source values, file names, units, code snippets, server/model inputs, and protocol identities remain untranslated.
+
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -112,3 +123,11 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+## Declared checks
+- `cd web && npm ci` (once).
+- `cd web && npx tsc --noEmit --incremental false`.
+- Full web suite: `npm --prefix web test`.
+- `node geo/copy/validate-copy.mjs web/src/geo/locales`.
+- `node ~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src --list`.
+- Runtime-format all files catalogue messages in both locales and audit catalogue references.

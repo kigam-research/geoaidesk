@@ -3,6 +3,7 @@
  * environments (with auto-inserted \end), snippets, and context-aware
  * \ref / \cite completion backed by document + .bib scans.
  */
+import { geoText } from "@/geo/i18n";
 import {
   snippetCompletion,
   type Completion,
@@ -10,6 +11,8 @@ import {
   type CompletionResult,
   type CompletionSource,
 } from "@codemirror/autocomplete";
+
+const filesText = geoText("files");
 
 // ---- scanners --------------------------------------------------------------
 
@@ -73,8 +76,8 @@ export const LATEX_COMMANDS: Completion[] = [
   cmd("\\bibliography{}"), cmd("\\bibliographystyle{}"), cmd("\\addbibresource{}"),
   cmd("\\printbibliography"),
   // Text formatting
-  cmd("\\textbf{}", "bold"), cmd("\\textit{}", "italic"), cmd("\\texttt{}", "monospace"),
-  cmd("\\textsc{}", "small caps"), cmd("\\emph{}"), cmd("\\underline{}"),
+  cmd("\\textbf{}", filesText("latex_completions.bold")), cmd("\\textit{}", filesText("latex_completions.italic")), cmd("\\texttt{}", filesText("latex_completions.monospace")),
+  cmd("\\textsc{}", filesText("latex_completions.small_caps")), cmd("\\emph{}"), cmd("\\underline{}"),
   cmd("\\textsuperscript{}"), cmd("\\textsubscript{}"),
   cmd("\\tiny"), cmd("\\small"), cmd("\\normalsize"), cmd("\\large"), cmd("\\Large"), cmd("\\huge"),
   cmd("\\centering"), cmd("\\raggedright"), cmd("\\noindent"),
@@ -125,27 +128,27 @@ export const LATEX_ENVIRONMENTS: string[] = [
 export const LATEX_SNIPPETS: Completion[] = [
   snippetCompletion(
     "\\begin{figure}[htbp]\n\t\\centering\n\t\\includegraphics[width=${0.8}\\linewidth]{${file}}\n\t\\caption{${caption}}\n\t\\label{fig:${label}}\n\\end{figure}",
-    { label: "figure", detail: "figure skeleton", type: "class" },
+    { label: "figure", detail: filesText("latex_completions.figure_skeleton"), type: "class" },
   ),
   snippetCompletion(
     "\\begin{table}[htbp]\n\t\\centering\n\t\\caption{${caption}}\n\t\\label{tab:${label}}\n\t\\begin{tabular}{${lcr}}\n\t\t\\toprule\n\t\t${header} \\\\\n\t\t\\midrule\n\t\t${row} \\\\\n\t\t\\bottomrule\n\t\\end{tabular}\n\\end{table}",
-    { label: "table", detail: "booktabs table skeleton", type: "class" },
+    { label: "table", detail: filesText("latex_completions.booktabs_table_skeleton"), type: "class" },
   ),
   snippetCompletion(
     "\\begin{equation}\n\t${x = y}\n\t\\label{eq:${label}}\n\\end{equation}",
-    { label: "equation", detail: "numbered equation", type: "class" },
+    { label: "equation", detail: filesText("latex_completions.numbered_equation"), type: "class" },
   ),
   snippetCompletion(
     "\\begin{align}\n\t${a} &= ${b} \\\\\n\t&= ${c}\n\\end{align}",
-    { label: "align", detail: "aligned equations", type: "class" },
+    { label: "align", detail: filesText("latex_completions.aligned_equations"), type: "class" },
   ),
   snippetCompletion(
     "\\begin{itemize}\n\t\\item ${first}\n\t\\item ${second}\n\\end{itemize}",
-    { label: "itemize", detail: "bullet list", type: "class" },
+    { label: "itemize", detail: filesText("latex_completions.bullet_list"), type: "class" },
   ),
   snippetCompletion(
     "\\begin{enumerate}\n\t\\item ${first}\n\t\\item ${second}\n\\end{enumerate}",
-    { label: "enumerate", detail: "numbered list", type: "class" },
+    { label: "enumerate", detail: filesText("latex_completions.numbered_list"), type: "class" },
   ),
 ];
 

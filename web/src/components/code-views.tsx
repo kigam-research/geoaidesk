@@ -1,13 +1,17 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { loadLanguage, type LanguageName } from "@uiw/codemirror-extensions-langs";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
+import { EditorState } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const filesText = geoText("files");
 
 const EXT_ALIAS: Record<string, LanguageName> = {
   ipynb: "json",
@@ -70,6 +74,40 @@ export function ReadOnlyCodeView({
     const lang = langExtension(name);
     return [
       ...(lang ? [lang] : []),
+      EditorState.phrases.of({
+    "Find": filesText("code_editor.find"),
+    "Replace": filesText("code_editor.replace"),
+    "next": filesText("code_editor.next"),
+    "previous": filesText("code_editor.previous"),
+    "all": filesText("code_editor.all"),
+    "match case": filesText("code_editor.match_case"),
+    "regexp": filesText("code_editor.regexp"),
+    "by word": filesText("code_editor.by_word"),
+    "replace": filesText("code_editor.replace_lowercase"),
+    "replace all": filesText("code_editor.replace_all"),
+    "close": filesText("code_editor.close"),
+    "Go to line": filesText("code_editor.go_to_line"),
+    "go": filesText("code_editor.go"),
+    "current match": filesText("code_editor.current_match"),
+    "on line": filesText("code_editor.on_line"),
+    "replaced $ matches": filesText("code_editor.replaced_matches"),
+    "replaced match on line $": filesText("code_editor.replaced_match_on_line"),
+    "Completions": filesText("code_editor.completions"),
+    "Diagnostics": filesText("code_editor.diagnostics"),
+    "No diagnostics": filesText("code_editor.no_diagnostics"),
+    "Folded lines": filesText("code_editor.folded_lines"),
+    "Unfolded lines": filesText("code_editor.unfolded_lines"),
+    "to": filesText("code_editor.to"),
+    "folded code": filesText("code_editor.folded_code"),
+    "unfold": filesText("code_editor.unfold"),
+    "Fold line": filesText("code_editor.fold_line"),
+    "Unfold line": filesText("code_editor.unfold_line"),
+    "$ unchanged lines": filesText("code_editor.unchanged_lines"),
+    "Accept": filesText("code_editor.accept"),
+    "Reject": filesText("code_editor.reject"),
+    "Revert this chunk": filesText("code_editor.revert_this_chunk"),
+    "Control character": filesText("code_editor.control_character"),
+  }),
       EditorView.lineWrapping,
       EditorView.editable.of(false),
     ];
@@ -182,6 +220,40 @@ export function TextEditor({
     const lang = langExtension(name);
     return [
       ...(lang ? [lang] : []),
+      EditorState.phrases.of({
+    "Find": filesText("code_editor.find"),
+    "Replace": filesText("code_editor.replace"),
+    "next": filesText("code_editor.next"),
+    "previous": filesText("code_editor.previous"),
+    "all": filesText("code_editor.all"),
+    "match case": filesText("code_editor.match_case"),
+    "regexp": filesText("code_editor.regexp"),
+    "by word": filesText("code_editor.by_word"),
+    "replace": filesText("code_editor.replace_lowercase"),
+    "replace all": filesText("code_editor.replace_all"),
+    "close": filesText("code_editor.close"),
+    "Go to line": filesText("code_editor.go_to_line"),
+    "go": filesText("code_editor.go"),
+    "current match": filesText("code_editor.current_match"),
+    "on line": filesText("code_editor.on_line"),
+    "replaced $ matches": filesText("code_editor.replaced_matches"),
+    "replaced match on line $": filesText("code_editor.replaced_match_on_line"),
+    "Completions": filesText("code_editor.completions"),
+    "Diagnostics": filesText("code_editor.diagnostics"),
+    "No diagnostics": filesText("code_editor.no_diagnostics"),
+    "Folded lines": filesText("code_editor.folded_lines"),
+    "Unfolded lines": filesText("code_editor.unfolded_lines"),
+    "to": filesText("code_editor.to"),
+    "folded code": filesText("code_editor.folded_code"),
+    "unfold": filesText("code_editor.unfold"),
+    "Fold line": filesText("code_editor.fold_line"),
+    "Unfold line": filesText("code_editor.unfold_line"),
+    "$ unchanged lines": filesText("code_editor.unchanged_lines"),
+    "Accept": filesText("code_editor.accept"),
+    "Reject": filesText("code_editor.reject"),
+    "Revert this chunk": filesText("code_editor.revert_this_chunk"),
+    "Control character": filesText("code_editor.control_character"),
+  }),
       EditorView.lineWrapping,
       keymap.of([{ key: "Mod-s", run: () => { handleSaveRef.current(); return true; } }]),
     ];
@@ -193,7 +265,7 @@ export function TextEditor({
       <div className="flex shrink-0 items-center gap-2 border-b bg-amber-50/80 px-3 py-1.5">
         <div className={cn("size-2 rounded-full transition-colors", isDirty ? "bg-amber-500" : "bg-muted-foreground/30")} />
         <span className="text-xs text-muted-foreground">
-          {saved ? "Saved" : isDirty ? "Unsaved changes" : "No changes"}
+          {saved ? filesText("code_views.saved") : isDirty ? filesText("code_views.unsaved_changes") : filesText("code_views.no_changes")}
         </span>
         {diskChanged && (
           <button
@@ -203,25 +275,23 @@ export function TextEditor({
               setDiskChanged(false);
             }}
             className="rounded border border-amber-500/40 px-1.5 py-0.5 text-[10px] text-amber-700 transition-colors hover:bg-amber-500/10"
-            title="Discard your edits and load the version on disk"
+            title={filesText("code_views.discard_your_edits_and_load_the_version_on_disk")}
           >
-            Changed on disk — load it
-          </button>
+             {filesText("code_views.changed_on_disk_load_it")} </button>
         )}
-        <span className="ml-auto text-[10px] text-muted-foreground/50 font-mono">{isMac ? "⌘S" : "Ctrl+S"} to save</span>
+        <span className="ml-auto text-[10px] text-muted-foreground/50 font-mono">{filesText("code_views.save_shortcut", { key: isMac ? "⌘S" : "Ctrl+S" })}</span>
         <button
           onClick={onDiscard}
           className="rounded px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          Close editor
-        </button>
+           {filesText("code_views.close_editor")} </button>
         <button
           onClick={handleSave}
           disabled={!isDirty || saving}
           className="flex items-center gap-1.5 rounded bg-primary px-2.5 py-1 text-xs text-primary-foreground transition-opacity disabled:opacity-40"
         >
           {saved ? <CheckIcon className="size-3" /> : null}
-          {saving ? "Saving…" : saved ? "Saved!" : "Save"}
+          {saving ? filesText("code_views.saving") : saved ? filesText("code_views.saved_variant") : filesText("code_views.save")}
         </button>
       </div>
 

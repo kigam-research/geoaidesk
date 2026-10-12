@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import {
   PdfViewer,
@@ -7,6 +8,8 @@ import {
 } from "@/components/pdf-viewer/pdf-viewer";
 import { FileTextIcon } from "lucide-react";
 import { memo } from "react";
+
+const filesText = geoText("files");
 
 export const LatexPdfPane = memo(function LatexPdfPane({
   pdfPath,
@@ -28,14 +31,8 @@ export const LatexPdfPane = memo(function LatexPdfPane({
           <FileTextIcon className="size-6 text-muted-foreground/30" />
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">No PDF yet</p>
-          <p className="text-xs text-muted-foreground/60">
-            Press{" "}
-            <kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
-              {modKey}↵
-            </kbd>{" "}
-            to compile
-          </p>
+          <p className="text-sm font-medium text-muted-foreground">{filesText("latex_pdf_pane.no_pdf_yet")}</p>
+          <p className="text-xs text-muted-foreground/60">{filesText("latex_pdf_pane.compile_hint", { key: `${modKey}↵` })}</p>
         </div>
       </div>
     );

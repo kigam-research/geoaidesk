@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { useMemo } from "react";
 
@@ -7,6 +8,8 @@ import {
   colorForAuthor,
 } from "@/lib/pdf-annotations";
 import { cn } from "@/lib/utils";
+
+const filesText = geoText("files");
 
 export interface AnnotationSidebarProps {
   annotations: Annotation[];
@@ -30,22 +33,15 @@ export function AnnotationSidebar({
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-l bg-background/40 md:flex">
       <div className="shrink-0 border-b px-3 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Annotations
-        <span className="ml-1 text-foreground/60">({annotations.length})</span>
+         {filesText("annotation_sidebar.annotations")} <span className="ml-1 text-foreground/60">({annotations.length})</span>
       </div>
       <div className="flex-1 overflow-auto">
         {groups.length === 0 && (
-          <div className="px-3 py-4 text-xs text-muted-foreground">
-            No annotations yet. Select text and click{" "}
-            <span className="font-medium">Highlight</span> or click{" "}
-            <span className="font-medium">Add note</span>.
-          </div>
+          <div className="px-3 py-4 text-xs text-muted-foreground">{filesText("annotation_sidebar.empty_help")}</div>
         )}
         {groups.map(([page, anns]) => (
           <div key={page} className="border-b">
-            <div className="sticky top-0 z-10 bg-background/90 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
-              Page {page}
-            </div>
+            <div className="sticky top-0 z-10 bg-background/90 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">{filesText("annotation_sidebar.page_number", { page })}</div>
             <ul>
               {anns.map((a) => {
                 const color = a.color || colorForAuthor(a.author);
@@ -67,15 +63,14 @@ export function AnnotationSidebar({
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                          <span className="truncate">{a.author.label}</span>
+                          <span className="truncate">{a.author.kind === "user" && a.author.id === "local" && a.author.label === "You" ? filesText("annotation_sidebar.you") : a.author.label}</span>
                           <span>·</span>
-                          <span>{a.type}</span>
+                          <span>{filesText("annotation_sidebar.annotation_type", { type: a.type })}</span>
                         </div>
                         <div className="line-clamp-3 text-foreground/90">
                           {snippet || (
                             <span className="italic text-muted-foreground">
-                              (empty)
-                            </span>
+                               {filesText("annotation_sidebar.empty")} </span>
                           )}
                         </div>
                       </div>

@@ -1,10 +1,13 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch, getActiveProjectId } from "@/lib/projects";
 import { renderOffice } from "@/lib/office-render";
 import type { OfficeText } from "@/lib/office";
 import type { ViewerProps } from "@/lib/viewers/registry";
 import { ExternalLinkIcon, RefreshCwIcon } from "lucide-react";
+
+const filesText = geoText("files");
 const ArrayDataViewer = lazy(() => import("./arraydata-viewer"));
 const button = "rounded border px-2.5 py-1 text-xs hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed";
 
@@ -25,7 +28,7 @@ export default function OfficeViewer({ path, name, projectId = getActiveProjectI
     if (spreadsheet) return;
     const cancel = new AbortController(); setError(""); setModel(null);
     void apiFetch(`/sandbox/office?path=${encodeURIComponent(path)}`, { signal: cancel.signal }, projectId).then(async res => {
-      const data = await res.json(); if (!res.ok) throw new Error(data.detail || "Could not preview document");
+      const data = await res.json(); if (!res.ok) throw new Error(data.detail || filesText("office_viewer.could_not_preview_document"));
       if (!cancel.signal.aborted) setModel(data);
     }).catch(e => { if (!cancel.signal.aborted) setError(String(e.message)); });
     return () => cancel.abort();
@@ -33,12 +36,12 @@ export default function OfficeViewer({ path, name, projectId = getActiveProjectI
   const url = `/office?${new URLSearchParams({ path, project: projectId })}`;
   return <div className="flex h-full min-h-0 flex-col">
     <div className="flex items-center gap-2 border-b px-3 py-2">
-      <span className="flex-1 text-xs text-muted-foreground">{spreadsheet ? "Workbook preview" : "Document preview"}</span>
-      <button className={button} onClick={reload} aria-label="Refresh Office preview"><RefreshCwIcon className="size-3.5" /></button>
-      <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Edit in Office <ExternalLinkIcon className="size-3" /></a>
+      <span className="flex-1 text-xs text-muted-foreground">{spreadsheet ? filesText("office_viewer.workbook_preview") : filesText("office_viewer.document_preview")}</span>
+      <button className={button} onClick={reload} aria-label={filesText("office_viewer.refresh_office_preview")}><RefreshCwIcon className="size-3.5" /></button>
+      <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">{filesText("office_viewer.edit_in_office")} <ExternalLinkIcon className="size-3" /></a>
     </div>
-    {error && <div role="alert" className="p-4 text-sm text-destructive">{error} <button className={button} onClick={reload}>Retry</button></div>}
-    {spreadsheet ? <Suspense fallback={<p className="p-4 text-xs">Loading workbook…</p>}><ArrayDataViewer key={generation} path={path} name={name} projectId={projectId} content={null} /></Suspense> : model ? <OfficePreview model={model} /> : !error && <p className="p-4 text-xs text-muted-foreground">Loading document…</p>}
+    {error && <div role="alert" className="p-4 text-sm text-destructive">{error} <button className={button} onClick={reload}>{filesText("office_viewer.retry")}</button></div>}
+    {spreadsheet ? <Suspense fallback={<p className="p-4 text-xs">{filesText("office_viewer.loading_workbook")}</p>}><ArrayDataViewer key={generation} path={path} name={name} projectId={projectId} content={null} /></Suspense> : model ? <OfficePreview model={model} /> : !error && <p className="p-4 text-xs text-muted-foreground">{filesText("office_viewer.loading_document")}</p>}
   </div>;
 }
 
@@ -60,21 +63,21 @@ function OfficePreview({ model }: { model: OfficeText }) {
     void renderOffice(model).then(result => { if (!cancelled) setPreview(result); }, e => { if (!cancelled) setError(String(e)); });
     return () => { cancelled = true; };
   }, [model]);
-  if (error) return <div className="overflow-auto p-4"><p role="alert" className="mb-3 text-xs text-destructive">Visual preview unavailable: {error}. Text contents are shown below.</p>{model.groups.map((g, i) => <section key={i}><h3 className="font-medium">{g.label}</h3>{g.paragraphs.map((p, j) => <p className="my-2 whitespace-pre-wrap" key={j}>{p.runs.map(r => r.text).join("")}</p>)}</section>)}</div>;
-  if (!preview) return <div className="p-4 text-xs text-muted-foreground" role="status">Rendering preview…</div>;
+  if (error) return <div className="overflow-auto p-4"><p role="alert" className="mb-3 text-xs text-destructive">{filesText("office_viewer.visual_error", { error })}</p>{model.groups.map((g, i) => <section key={i}><h3 className="font-medium">{g.label}</h3>{g.paragraphs.map((p, j) => <p className="my-2 whitespace-pre-wrap" key={j}>{p.runs.map(r => r.text).join("")}</p>)}</section>)}</div>;
+  if (!preview) return <div className="p-4 text-xs text-muted-foreground" role="status">{filesText("office_viewer.rendering_preview")}</div>;
   if (preview.html) {
     const zoom = Math.max(0.1, Math.min(1, (width - 32) / (preview.pageWidth ?? 816)));
     const html = preview.html.replace("<head>", `<head><style>:root{--office-zoom:${zoom}}</style>`);
-    return <div ref={host} className="min-h-0 flex-1"><iframe title="Word document preview" sandbox="" referrerPolicy="no-referrer" srcDoc={html} className="h-full w-full border-0 bg-white" /></div>;
+    return <div ref={host} className="min-h-0 flex-1"><iframe title={filesText("office_viewer.word_document_preview")} sandbox="" referrerPolicy="no-referrer" srcDoc={html} className="h-full w-full border-0 bg-white" /></div>;
   }
   const slides = preview.slides ?? [];
   return <div className="flex min-h-0 flex-1 flex-col">
     <div className="flex items-center justify-center gap-3 border-b p-2">
-      <button className={button} disabled={slide === 0} onClick={() => setSlide(i => i - 1)}>Previous slide</button>
-      <span className="text-xs">Slide {slides.length ? slide + 1 : 0} of {slides.length}</span>
-      <button className={button} disabled={slide >= slides.length - 1} onClick={() => setSlide(i => i + 1)}>Next slide</button>
+      <button className={button} disabled={slide === 0} onClick={() => setSlide(i => i - 1)}>{filesText("office_viewer.previous_slide")}</button>
+      <span className="text-xs">{filesText("office_viewer.slide_position", { slide: slides.length ? slide + 1 : 0, total: slides.length })}</span>
+      <button className={button} disabled={slide >= slides.length - 1} onClick={() => setSlide(i => i + 1)}>{filesText("office_viewer.next_slide")}</button>
     </div>
-    <div className="flex min-h-0 flex-1 items-start justify-center overflow-auto bg-muted/30 p-3">{slides[slide] && <img src={slides[slide]} alt={`Slide ${slide + 1}`} className="w-full bg-white shadow" />}</div>
+    <div className="flex min-h-0 flex-1 items-start justify-center overflow-auto bg-muted/30 p-3">{slides[slide] && <img src={slides[slide]} alt={filesText("office_viewer.slide_alt", { slide: slide + 1 })} className="w-full bg-white shadow" />}</div>
   </div>;
 }
 

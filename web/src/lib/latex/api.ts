@@ -1,5 +1,8 @@
 /** Thin client helpers for the LaTeX editor's backend endpoints. */
+import { geoText } from "@/geo/i18n";
 import { apiFetch } from "@/lib/projects";
+
+const filesText = geoText("files");
 
 export async function readSandboxFile(
   path: string,
@@ -92,7 +95,7 @@ export async function postLatexAssist(
     signal,
   }, projectId);
   if (!res.ok) {
-    let message = `AI assist failed (${res.status})`;
+    let message = filesText("latex_api.assist_failed", { status: res.status });
     try {
       const data = (await res.json()) as { message?: string; detail?: string };
       message = data.message ?? data.detail ?? message;
