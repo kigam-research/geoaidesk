@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:52:01Z
+updated: 2026-10-12T15:00:39Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -84,6 +84,8 @@ language should follow the UI language. The user decided (verbatim):
 - Integrated gaid-ui-locale--files (closed): 465 messages; file preview, viewers, LaTeX, PDF, Office (app-owned ribbon;
   the embedded LibreOffice engine's own dialogs stay vendor text); plus 5 lib helpers (registered). Child jobs: 1
   superseded, 1 succeeded (972 web tests).
+- Integrated gaid-ui-locale--settings (closed): 721 messages (incl. 134 app-authored provider/MCP metadata); one English
+  string reworded ("unlocks" → "enables", validator). No extra upstream files. Child ran the web suite (972) outside a job.
 - Baseline scan (`~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src`): 1191 English literals in 79 upstream
   files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
 
@@ -95,7 +97,7 @@ language should follow the UI language. The user decided (verbatim):
 - gaid-ui-locale--workflows: agent 7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb — completed and closed
 - gaid-ui-locale--work: agent a21bc230-636f-4990-93a2-4ec585bd7fd4
 - gaid-ui-locale--files: agent e2cc47a6-cd2c-4eb2-911c-522a86045e22 — completed and closed
-- gaid-ui-locale--settings: agent 597a1537-b69e-4291-b5f7-44e6e6807109
+- gaid-ui-locale--settings: agent 597a1537-b69e-4291-b5f7-44e6e6807109 — completed and closed
 - gaid-ui-locale--notebook: agent 334bb7bf-c7ab-4250-b73e-1471a312e37f — completed and closed
 - gaid-ui-locale--research: agent 34dfdfe5-4370-41a2-aa9d-087d58daaee3
 
