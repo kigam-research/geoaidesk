@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpIcon, BookOpenIcon, StickyNoteIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -36,6 +38,8 @@ import { TYPE_META } from "./lab-notebook-entry-card";
 import { NotebookMemoryDialog } from "./notebook-memory-dialog";
 import { EvidencePackageDialog } from "./evidence-package-dialog";
 import { openSettings } from "@/lib/settings-nav";
+
+const nbText = geoText("notebook");
 
 const VIEW_MODE_KEY = "kady:notebook:view:v2";
 const FOCUS_DEADLINE_MS = 4000;
@@ -172,7 +176,7 @@ export function LabNotebookView({
       notes.map((a) => ({
         id: `note-${a.id}`,
         type: "note" as const,
-        title: a.title?.trim() || "Note",
+        title: a.title?.trim() || nbText("type.note"),
         body: a.body,
         timestamp: a.createdAt,
         role: "you",
@@ -303,7 +307,7 @@ export function LabNotebookView({
       focusTimerRef.current = setTimeout(() => {
         if (pendingFocusRef.current === id) {
           pendingFocusRef.current = null;
-          toast.error("That notebook entry isn't in this chat's notebook.");
+          toast.error(nbText("view.entry_missing"));
         }
       }, FOCUS_DEADLINE_MS);
       requestAnimationFrame(tryFocus);
@@ -343,7 +347,7 @@ export function LabNotebookView({
           ? { path: `/sessions/${encodeURIComponent(sessionId)}/notebook/export`, name: sessionId }
           : null;
     if (!target) {
-      toast.error("Start a chat before exporting its notebook.");
+      toast.error(nbText("view.export_before_chat"));
       return;
     }
     try {
@@ -359,7 +363,7 @@ export function LabNotebookView({
       a.remove();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error("Export failed.");
+      toast.error(nbText("view.export_failed"));
     }
   }
 
@@ -373,7 +377,7 @@ export function LabNotebookView({
     });
     const win = window.open("", "_blank");
     if (!win) {
-      toast.error("Pop-up blocked — allow pop-ups to export a PDF.");
+      toast.error(nbText("view.popup_blocked"));
       return;
     }
     win.document.write(html);
@@ -407,27 +411,27 @@ export function LabNotebookView({
         message?: string;
       };
       if (res.status === 402) {
-        toast.error("Project spend limit reached — raise it in project settings.", {
-          action: { label: "Project settings", onClick: () => openSettings({ tab: "project", section: "budget" }) },
+        toast.error(nbText("view.spend_limit"), {
+          action: { label: nbText("view.project_settings"), onClick: () => openSettings({ tab: "project", section: "budget" }) },
         });
         return;
       }
       if (!res.ok) {
-        toast.error(data.message ?? "Methods draft failed.");
+        toast.error(data.message ?? nbText("view.methods_failed"));
         return;
       }
       toast.success(
         data.billingMode === "subscription"
-          ? "Methods draft saved (subscription usage)"
+          ? nbText("view.methods_subscription")
           : typeof data.costUsd === "number"
-          ? `Methods draft saved ($${data.costUsd.toFixed(4)})`
-          : "Methods draft saved",
+          ? nbText("view.methods_cost", { cost: data.costUsd.toFixed(4) })
+          : nbText("view.methods_saved"),
         typeof data.path === "string" ? {
-          action: { label: "Open draft", onClick: () => onOpenFile(data.path!) },
+          action: { label: nbText("view.open_draft"), onClick: () => onOpenFile(data.path!) },
         } : undefined,
       );
     } catch {
-      toast.error("Methods draft failed.");
+      toast.error(nbText("view.methods_failed"));
     } finally {
       setMethodsBusy(false);
     }
@@ -480,8 +484,8 @@ export function LabNotebookView({
       />
       {displayedData.error && (
         <div role="alert" className="flex items-center gap-2 border-b bg-amber-500/10 px-4 py-2 text-xs">
-          <span>Notebook refresh failed. Displayed evidence checks may be out of date.</span>
-          <Button variant="outline" size="xs" onClick={displayedData.refresh}>Retry</Button>
+          <span>{nbText("view.refresh_failed")}</span>
+          <Button variant="outline" size="xs" onClick={displayedData.refresh}>{nbText("common.retry")}</Button>
         </div>
       )}
       {displayEntries.length === 0 ? (
@@ -491,12 +495,12 @@ export function LabNotebookView({
           </div>
           <div className="flex max-w-xs flex-col gap-1">
             <p className="text-xs font-medium">
-              {scope === "project" ? "No entries in this project" : "Nothing recorded yet"}
+              {scope === "project" ? nbText("view.project_empty") : nbText("view.empty")}
             </p>
             <p className="text-[11px] leading-relaxed text-muted-foreground">
               {scope === "project"
-                ? "Findings from every chat in this project collect here."
-                : "Kady’s notebook — entries appear here as it works, linking hypotheses to evidence and decisions."}
+                ? nbText("view.project_description")
+                : nbText("view.empty_description")}
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-1">
@@ -559,8 +563,8 @@ export function LabNotebookView({
                   submitNote();
                 }
               }}
-              placeholder="Capture your own observation…"
-              aria-label="Add a note"
+              placeholder={nbText("view.note_placeholder")}
+              aria-label={nbText("view.add_note")}
               className="h-7 bg-background pl-8 text-[11px] shadow-none"
             />
           </div>
@@ -569,8 +573,8 @@ export function LabNotebookView({
             variant="outline"
             size="icon-xs"
             disabled={!noteDraft.trim()}
-            aria-label="Save note"
-            title="Save note"
+            aria-label={nbText("view.save_note")}
+            title={nbText("view.save_note")}
             onClick={submitNote}
           >
             <ArrowUpIcon />
