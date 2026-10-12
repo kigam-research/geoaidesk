@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:22:45Z
+updated: 2026-10-12T22:21:12Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"34dfdfe5-4370-41a2-aa9d-087d58daaee3","pid":158996,"provider":"codex","session":"01a13070-f6e5-7f13-b322-8d8d7f222e12","start":"28007253","token":"06960dbddd7b357f4f70330ac04ab223ed2e636fefb00ebc485286f900d3e23f"}
 branch: task/gaid-ui-locale--research
 target: task/gaid-ui-locale
@@ -71,9 +71,11 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the assigned worktree; inspected the six owned components, locale API and copy policy. Implementing the research namespace only.
 ## Next steps
-1. (the next session's first action)
+1. Localize static and parameterized messages in the six owned components.
+2. Review enum labels and imported UI constants without changing shared protocols.
+3. Run frontend typecheck, full web tests, copy validator and scanner, then save and finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
