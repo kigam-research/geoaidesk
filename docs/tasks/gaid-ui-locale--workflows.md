@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:08:40Z
+updated: 2026-10-12T14:22:07Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -68,21 +68,32 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend suite pending.
+
+Other upstream file touched: web/src/data/workflows.json, one comparative-genomics description only, required by copy-validator error. Parent must register this seam in geo/integration-boundaries.json.
+
 ## Next steps
-1. (the next session's first action)
+1. Save reviewed files, run full frontend suite as a recorded job, then finish.
+2. Parent integrates and performs whole-app scripts/check/browser checks.
+
+## Checks
+- Child: cd web && npm ci; npx tsc --noEmit; npm run test (full suite); node geo/copy/validate-copy.mjs web/src/geo/locales; node ~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src --list; git diff --check.
+- Parent owns whole-app scripts/check as stated in the child contract.
+
 ## Failed approaches
+- Copy validation rejects upstream comparative-genomics description (“evolutionary insights”) as empty-capability. Under the contract’s explicit English-copy-error exception, changed only that description to “Compare genomes across species to examine evolutionary relationships”, in source JSON and generated en catalogue. No prompt changed. Parent must register web/src/data/workflows.json in integration-boundaries (child is forbidden from editing the shared boundaries file).
 ## Notes and decisions
+- New warnings reviewed: cell-type-annotation describes automatic reference-based labelling requested by the task; podcast duration “in minutes” is a unit, not a speed claim; synthetic-accessibility describes the evaluated synthesis difficulty; risk-prediction-model describes validation as requested work, not a verified status. Preserve these factual meanings.
+- Intentionally unchanged: all model prompts/execution guidance, user paths/data, icons and category ids, raw upload error messages, and GAID extension rows supplied by the already-localized host.
+- Copy ids: workflows.categories.*, workflows.panel.*, workflows.dialog.*, workflows.inputs.*, workflows.rows.<id>.{name,description,inputs.<key>}. English is upstream verbatim except the comparative-genomics description noted above. Korean before: English literal; after examples: workflows.rows.review-paper.name “Review a Paper” → “논문 검토”; workflows.rows.single-cell-rnaseq.name “Single-Cell RNA-seq Pipeline” → “단일세포 RNA-seq 분석”; workflows.dialog.run “Run workflow” → “Workflow 실행”. Exact before/after for every id is available from the bilingual catalogues; source JSON remains the English reference.
+- Sequential decisions: preserve upstream prompts and raw data; localize presentation only; future missing ids fall back to upstream text.
+- Owned interfaces/files: the three assigned files, workflows namespace, and focused geo tests. No independent child packages (nested children unsupported); keep tightly coupled implementation here.
+- Integration order: UI lookup seam → bilingual data → tests/checks → parent integration.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child result and copy changes are recorded here for the parent’s canonical report.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
