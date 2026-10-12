@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-12-gaid-workflow-catalog/figures/workflow-panel-desktop.png" width="120"> | 2026-10-12 18:51 | [workflow 목록 통합, 카테고리를 고르는 레시피 저장, skill_hub 스킬 가져오기](2026-10-12-gaid-workflow-catalog/index.md) | Geoscience 작업이 K-Dense workflow와 같은 목록·검색·카테고리 버튼으로 맨 앞에 나오고, 가져온 레시피를 고른 카테고리(새 카테고리 포함)에 저장해 다시 열 수 있으며, skill_hub 사이트에서 찾은 스킬을 기존 확인·설치 절차로 가져올 수 있습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-12-gaid-map-table-ux/figures/01-map-panel-popup.png" width="120"> | 2026-10-12 18:40 | [지도 오른쪽 정보 패널, 속성표 열 정렬·필터, 지도 위 미니 팝업](2026-10-12-gaid-map-table-ux/index.md) | 범례와 기본 정보가 지도 오른쪽 패널에 함께 보이고, 속성표 열 머리글에서 정렬·필터를 쓰며, 선택한 피처와 픽셀 정보는 지도 위 미니 팝업으로 뜹니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-12-gaid-map-tiles/figures/01-latency.png" width="120"> | 2026-10-12 14:35 | [지도 타일 표시, 배경지도 선택, Markdown 그림 경로 규칙](2026-10-12-gaid-map-tiles/index.md) | 지도 확대·축소 대기가 1.5–2.4초에서 0.04초 이하로 줄었고, 배경지도를 없음·OSM·국토지리정보원·지질도 중에서 고르며, 에이전트가 쓴 Markdown의 깨진 그림 경로를 자동으로 알립니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-11-gaid-release-proof/figures/01-local-98k-map.png" width="120"> | 2026-10-11 21:01 | [GeoAIDesk 0.1.0 출시 검증 — 설치·업데이트·모델 경로 증거](2026-10-11-gaid-release-proof/index.md) | Linux·WSL·Windows 모두 새 설치와 업데이트를 통과했습니다(Windows는 한글 경로 결함 2건 수정 후). 로컬 모델은 98K 지도 과제 1건만 기준을 통과했습니다. | 검토 전 | 미정 | 0 |
