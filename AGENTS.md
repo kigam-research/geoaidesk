@@ -45,13 +45,21 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/inspection.ts`, `registerGeoInspector`) serves `POST /geo/inspect`, the `geo_inspect` /
   `geo_read_window` tools and the read hint that blocks unsuitable direct `read`s of large/binary geo files with a
   bounded summary and next action. Viewers: `web/src/geo/viewers/registry.ts` (WP04/WP05 replace their own entry).
-- Maps (WP05, `docs/geo-maps.md`): `server/src/geo/maps/` supplies metadata, bounded vector pages/raster windows,
-  explicit full-layer polygon area tables and the `*.geomap.json` artifact adapter. Routes: `/geo/vector-page`,
-  `/geo/raster-window`, `/geo/area-table`, `/geo/result`; transport: `web/src/geo/contracts/maps.ts`; OpenLayers viewer:
-  `web/src/geo/viewers/map/`. Raster previews cap at 256×256 and vector pages at 500 features; preview values never feed
-  area analysis. Unknown CRS stays native/pixel-only; declared source CRS and display CRS are distinct. Source
-  fingerprints include available companions/auxiliary files. The uv subprocess has a separate time/output budget
-  from the baseline byte reader. Tests generate synthetic map fixtures outside Git (`geo/tests/maps-helper.test.mjs`).
+- Maps (WP05, `docs/geo-maps.md`): `server/src/geo/maps/` supplies metadata, vector pages (whole layer when bounded),
+  raster display tiles, explicit full-layer polygon area tables and the `*.geomap.json` artifact adapter. Routes:
+  `/geo/vector-page`, `/geo/raster-style`, `/geo/raster-tile` (GET), `/geo/raster-point`, `/geo/raster-window`
+  (compat), `/geo/area-table`, `/geo/result`; transport: `web/src/geo/contracts/maps.ts`; OpenLayers viewer:
+  `web/src/geo/viewers/map/`. gaid-map-tiles: a pool of long-lived `helper.py --serve` workers (`process.ts`), tiles on a
+  deterministic grid with memory LRU (`tiles.ts`), projected source CRS as default view (proj4), pixel clicks read the
+  source file, derived display overviews only in the map cache. Tiles/colour ranges never feed analysis. Unknown CRS
+  stays native/pixel-only; declared source CRS and display CRS are distinct. Source fingerprints include available
+  companions/auxiliary files. Tests generate synthetic map fixtures outside Git (`geo/tests/maps-helper.test.mjs`).
+- Basemaps (gaid-map-tiles, `docs/geo/basemaps.md`): None (default) or OSM (browser direct), NGII WMTS and the KIGAM
+  1:50K geology WMS overlay through `server/src/geo/basemaps/` with per-user keys read server-side (env or
+  `~/.config/map_env/map-keys.env`); keys never reach the browser, logs or Git.
+- Markdown images (gaid-map-tiles, `server/src/geo/markdown-images.ts`): image paths in a `.md` file are relative to that
+  file's folder. GEO_INSTRUCTIONS states the rule; after an agent's write/edit of a `.md` file (lead and subagent
+  children) the tool result lists links that do not resolve, with the corrected relative path.
 - LAS depth/table viewers (WP04): `server/src/geo/well/` and `web/src/geo/viewers/depth/` serve LAS 2.0
   numerical windows through `POST /geo/series-window` after shared inspection; no raw-text bulk preview.
   Original order/units/NULLs remain, depth basis is explicit, reduction preserves extrema and gaps; limits:
