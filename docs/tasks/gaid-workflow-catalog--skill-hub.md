@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:17:39Z
+updated: 2026-10-12T09:26:42Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -90,11 +90,15 @@ AGENTS.md (one bullet).
 - Do not run `scripts/check` in full (the parent runs it after integration); remove build caches you created before finish.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the original printed worktree. Read repository rules, writer procedures, copy rules and the existing preview/install seams.
+- Dependency installation is recorded as job-geoaidesk-gaid-workflow-catalog--skill-hub-1; implementation proceeds independently.
 ## Next steps
-1. (the next session's first action)
+1. Implement bounded package intake and the Settings seam, then focused tests and isolated browser evidence.
 ## Failed approaches
 ## Notes and decisions
+- Sequential decisions: keep the existing acknowledgement/install gate; configure sites in distribution.json; use one package root and content-addressed durable sources under KADY_PI_AGENT_DIR. URL downloads refuse redirects and are limited to the exact configured site base and validated skill identifiers.
+- Work packages and integration order: server adapter/routes → frontend component and narrow SkillsPanel seam → focused tests → isolated end-to-end evidence → parent report section. All files are tightly coupled and owned by this writer; no child writers. Parent owns the workflow pane and workspace locale.
+- Limits: 20 MiB compressed, 64 MiB expanded tar, 10,000 file/directory entries. A package has one top-level skill folder with SKILL.md. The stable source is a snapshot, not an automatic update subscription.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -107,6 +111,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T091833.056202Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

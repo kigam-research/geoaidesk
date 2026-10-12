@@ -367,6 +367,12 @@
       "owner": "gaid-map-tiles",
       "status": "edited",
       "responsibility": "Register the Markdown image-path check (server/src/geo/markdown-images.ts) for subagent children so write/edit of a .md file reports image links that do not resolve from the file's folder"
+    },
+    {
+      "path": "web/src/components/skills-panel.tsx",
+      "owner": "gaid-workflow-catalog",
+      "status": "edited",
+      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation."
     }
   ],
   "notTouched": [
