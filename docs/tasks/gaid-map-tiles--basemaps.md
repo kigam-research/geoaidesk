@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T05:22:33Z
+status: ready
+updated: 2026-10-12T05:22:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -131,9 +131,8 @@ Finish with `task finish`; the parent integrates.
 - Consumed both continuation routes gmt-basemaps-finish-1 (parent) and basemaps-continue-bb9452a0e9dc (hub). The CLI blocks finish for queued AND running requests, so recorded acceptance first to clear that self-gate, then ran the actual full-check retry. Their final results will be updated with the new distribution blocker, not left as an unverified success.
 - Consumed gmt-basemaps-finish-2. Fetched parent tip a23612ef127e and re-read distribution.test.mjs: gaid-map-tiles is now included in the owners set; the parent reports 41 distribution tests passed. No child source change requested. The full-check retry and parent integration remain pending; this writer drives the retry, then the parent owns task complete. Recording the route as a pending-integration checkpoint before finish, as instructed, not as completion.
 ## Next steps
-1. Report gmt-basemaps-finish-2 as blocked pending full checks/integration, consume any other queued requests, then rerun task finish in place (no resume needed). The parent fix is verified; no further source fix is pending.
-2. After the last check, remove only regenerable worktree caches, and update the route report with verified readiness/integration state. The CLI must finish successfully before parent task complete; do not claim parent integration merely from child readiness.
-3. Parent integrates the child, wires the basemap picker/layers and preserves visible source attribution including exported online imagery. Use docs/geo/basemaps.md and evidence above in the parent report.
+<!-- task:closed -->
+Closed 2026-10-12T05:22:34Z: ready; the parent gaid-map-tiles integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
