@@ -1,0 +1,90 @@
+---
+format: 1
+status: waiting
+updated: 2026-10-12T14:06:49Z
+writer: {"host":"seongin3","reserved":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
+branch: task/gaid-ui-locale--workflows
+target: task/gaid-ui-locale
+parent: gaid-ui-locale
+---
+# gaid-ui-locale--workflows
+
+## Goal and done criteria
+Request from the starter:
+
+# Child writer: gaid-ui-locale--workflows (geoaidesk)
+
+Namespace: `workflows` (`web/src/geo/locales/workflows/{ko,en}.json`, already registered and empty).
+
+Area: the upstream workflows panel. (1) Category pill labels (WORKFLOW_CATEGORIES) and every visible string in web/src/components/workflows-panel.tsx, web/src/components/workflow-inputs.tsx and web/src/lib/workflow-inputs.ts (only visible strings; the prompt assembly sent to the model stays as is). (2) The 326 upstream workflows in web/src/data/workflows.json: translate name, description and each placeholder label (and any other visible placeholder field) into web/src/geo/locales/workflows/ko.json, keyed by workflow id, e.g. ids `workflows.rows.<workflowId>.name`, `.description`, `.inputs.<placeholderKey>`; en.json holds the upstream English verbatim for the same ids (generate it with a small script, do not hand-copy). Do NOT translate the `prompt` field (stays English as shipped). Workflow ids must be valid flattened keys (check for dots). Rendering: show the catalogue text when the id exists (hasGeoText) else the upstream field, so a workflow added by a future upstream sync shows its English text instead of an id. Search must match the displayed (translated) name/description as well as the English one. (3) Add a vitest test under web/src/geo/ (e.g. web/src/geo/workflows-locale.test.ts) that every upstream workflow id has ko+en name/description and en equals web/src/data/workflows.json (so an upstream sync that changes English text fails visibly). Use terminology.csv; scientific domain names stay natural for Korean researchers (e.g. 논문 검토, 단일세포 RNA-seq 분석; keep established English technical terms). The GAID Geoscience rows (web/src/geo/workspace/task-catalogue.tsx) are already localized; do not change them. The launch dialog of an upstream row is also in your area.
+
+Owned files:
+- `web/src/components/workflows-panel.tsx`
+- `web/src/components/workflow-inputs.tsx`
+- `web/src/lib/workflow-inputs.ts`
+
+## Contract (common to all gaid-ui-locale children)
+
+Parent unit: `gaid-ui-locale` (geoaidesk), branch `task/gaid-ui-locale`. User goal (verbatim): "GAID 시스템에서
+워크플로우에서 geoscience 레시피만 한글이다. 시스템에 일관성이 있어야한다." Decision: "1은 가" = both UI modes complete: every
+visible string of the app (upstream K-Dense screens and GAID parts) follows the one language setting (Settings →
+Appearance, `gaid:locale`, else browser language, Korean default).
+
+Goal of this child: every user-visible string in your owned files goes through the GAID locale catalogues, so Korean
+mode shows Korean and English mode shows exactly what it shows today.
+
+How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`, `web/src/components/project-view.tsx`):
+- `import { geoText } from "@/geo/i18n";` then `const xText = geoText("<namespace>");` and replace each literal with
+  `xText("<area>.<snake_of_english>", values?)`. Messages are ICU (`{count, plural, one {# file} other {# files}}`,
+  `{name}`), see `web/src/geo/icu.ts`. Ids: `<namespace>.<area>.<key>`; nested JSON objects flatten to dotted ids.
+- Put each message in BOTH `web/src/geo/locales/<namespace>/en.json` and `ko.json` (your namespace only).
+  English = the current upstream string verbatim (so English mode and existing tests stay unchanged; vitest jsdom runs
+  in en-US). Only change English if the copy validator reports an error, and say so in your report.
+- Korean: read `geo/copy/gaid-writing.md`, `geo/copy/terminology.csv`, `geo/copy/copy-policy.json` first. AGENTS.md
+  rule (verbatim): "문구는 문자열 카탈로그에 넣고 JSX에 직접 쓰지 않는다. 한국어를 먼저 쓰고 영어는 같은 동작·조건·한계로 쓴다. 버튼은
+  다음 동작을 쓴다(한국어 목적어+동작, 영어 동사+목적어). 질문형 제목, 추상적 변환 문장, 과장 형용사, 장식 이모지를 쓰지 않는다. 실행
+  완료를 검증 완료로 바꾸지 않는다. 추정·미시험·검토 전 같은 한계를 지우지 않는다. 확인되지 않은 기능·지원 환경·성능·비용을 쓰지 않는다."
+  Keep technical terms as researchers say them (terminology.csv; e.g. Geoscience, workflow, skill, agent names as listed).
+  Look at existing `web/src/geo/locales/app/ko.json` for the tone already used for upstream screens.
+- Cover: JSX text, title/aria-label/placeholder/alt/label props, toast/error/confirm messages, strings in constant
+  arrays/objects shown on screen (labels, option names, empty states, status words), relative-time and count strings.
+  Date/number formatting that hard-codes "en-US" should use `geoLocale()` from `@/geo/i18n`.
+- Do NOT translate: user data, file names, paths, model/provider/product names, raw data values, code, units, keyboard
+  keys, log text, strings sent to the server or the model (prompts, tool input), test ids, CSS classes.
+- Keep upstream diffs minimal: substitute literals in place; no refactors, no reformatting, no behaviour changes.
+- Edit only your owned files and your namespace directory. Do not edit `web/src/geo/locales/index.ts`,
+  `geo/integration-boundaries.json` or other namespaces. If you must edit another upstream file (a string you find
+  outside your list that belongs to your area), you may, but list it in your report so the parent registers it.
+  Tests: only update a test if it hard-codes something you had to change; prefer not to.
+- Checks before finish (run from your worktree): `cd web && npm ci` (once), `npx tsc --noEmit`, `npm run test`
+  (at least the tests of your files; the full web suite before finish), `node geo/copy/validate-copy.mjs
+  web/src/geo/locales` (0 errors; review new warnings in your namespace), and the scanner
+  `node ~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src --list` (rough; a remaining hit in your files must
+  be a non-visible or do-not-translate string — list those).
+- Network note: KIGAM network blocks raw.githubusercontent.com; use `gh api ... -H "Accept: application/vnd.github.v3.raw"`.
+- No app model runs. No browser screenshots needed (the parent does them).
+- Report (in your task document's Current state, English): files edited, number of messages added, any English text
+  changed and why, strings intentionally left (with reason), other upstream files touched. Then `task save` your
+  changes (named paths for new files) and `task finish`.
+
+## Current state
+(what is done, how it was verified, safe commands to re-verify)
+## Next steps
+1. (the next session's first action)
+## Failed approaches
+## Notes and decisions
+(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+## Open items
+(user decisions, checks and accepted debt that outlive this unit, one line each:
+`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
+kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
+the project hub answers or closes them with `task item`)
+## Report
+(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
+written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
+child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+## Running jobs
+<!-- task:jobs -->
+<!-- /task:jobs -->
+<!-- task:cloud -->
+<!-- /task:cloud -->
