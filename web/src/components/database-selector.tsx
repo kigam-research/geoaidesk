@@ -1,12 +1,14 @@
 "use client";
+import { workDatabaseDescription as databaseDescription, workDatabaseCategory as databaseCategory } from "@/geo/work-labels";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon, DatabaseIcon, XIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import databases from "@/data/databases.json";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+const workText = geoText("work");
 
 export type Database = {
   id: string;
@@ -70,8 +72,8 @@ export function DatabasePickerBody({
       if (!q) return true;
       return (
         db.name.toLowerCase().includes(q) ||
-        db.category.toLowerCase().includes(q) ||
-        db.description.toLowerCase().includes(q)
+        db.category.toLowerCase().includes(q) || databaseCategory(db.category).toLowerCase().includes(q) ||
+        db.description.toLowerCase().includes(q) || databaseDescription(db).toLowerCase().includes(q)
       );
     });
   }, [search, activeDomain]);
@@ -121,7 +123,7 @@ export function DatabasePickerBody({
         <div className="flex items-center gap-0.5 rounded-md bg-muted p-0.5">
           {(["all", "science", "finance"] as const).map((d) => (
             <button
-              key={d}
+              key={workText("database.domain." + d)}
               onClick={() => setActiveDomain(d)}
               className={cn(
                 "rounded px-2 py-0.5 text-[10px] font-medium capitalize transition-colors",
@@ -149,7 +151,7 @@ export function DatabasePickerBody({
           <div className="py-8 text-center text-xs text-muted-foreground">{workText("database_selector.no_databases_found")}</div>
         ) : (
           Array.from(grouped.entries()).map(([category, dbs]) => (
-            <div key={category}>
+            <div key={databaseCategory(category)}>
               <div className="sticky top-0 bg-background/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur-sm">
                 {category}
                 <span className="ml-1.5 font-normal normal-case text-muted-foreground/60">
@@ -182,7 +184,7 @@ export function DatabasePickerBody({
                         <DomainDot domain={db.domain} />
                         <span className="font-medium text-foreground truncate">{db.name}</span>
                       </div>
-                      <p className="mt-0.5 truncate text-muted-foreground/80">{db.description}</p>
+                      <p className="mt-0.5 truncate text-muted-foreground/80">{databaseDescription(db)}</p>
                     </div>
                     <a
                       href={db.url}

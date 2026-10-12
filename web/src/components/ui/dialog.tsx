@@ -1,5 +1,4 @@
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 "use client"
 
 import * as React from "react"
@@ -8,6 +7,8 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+
+const workText = geoText("work");
 
 function Dialog({
   ...props

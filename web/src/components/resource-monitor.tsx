@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import { CpuIcon, GpuIcon, HardDriveIcon, MemoryStickIcon } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -13,6 +12,8 @@ import {
 } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 import { useSystemResources } from "@/lib/use-system-resources";
+
+const workText = geoText("work");
 
 function formatBytes(n: number): string {
   if (!Number.isFinite(n) || n < 0) return "--";

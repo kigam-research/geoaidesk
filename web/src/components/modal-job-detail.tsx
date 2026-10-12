@@ -1,7 +1,6 @@
 "use client";
 import { geoLocale, geoText } from "@/geo/i18n";
-import { formatWorkModalDuration as formatModalDuration, formatWorkModalTimestamp as formatModalTimestamp, formatWorkModalResource as formatModalResource, workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
+import { formatWorkModalDuration as formatModalDuration, formatWorkModalTimestamp as formatModalTimestamp, formatWorkModalResource as formatModalResource, workLabel, workJobOwner } from "@/geo/work-labels";
 
 import {
   AlertTriangleIcon,
@@ -32,6 +31,8 @@ import {
 } from "@/lib/modal-jobs";
 import { useModalJob, useModalJobLogs } from "@/lib/use-modal-jobs";
 import { cn, formatUsd } from "@/lib/utils";
+
+const workText = geoText("work");
 
 const STATUS_STYLES: Record<ModalJobStatus, string> = {
   queued: "border-slate-400/30 bg-slate-400/10 text-slate-600 dark:text-slate-300",
@@ -82,7 +83,7 @@ function Lifecycle({ status }: { status: ModalJobStatus }) {
           ((status === "failed" || status === "cancelled" || status === "lost") &&
             index === currentIndex);
         return (
-          <li key={workLabel("status", phase)} className="min-w-0">
+          <li key={phase} className="min-w-0">
             <div
               className={cn(
                 "h-1 rounded-full",
@@ -101,7 +102,7 @@ function Lifecycle({ status }: { status: ModalJobStatus }) {
                 current ? "font-medium text-foreground" : "text-muted-foreground",
               )}
             >
-              {phase}
+              {workLabel("status", phase)}
             </span>
           </li>
         );
@@ -142,12 +143,12 @@ function ResourceCard({
         <div className="mt-1.5 flex flex-wrap gap-1">
           {resource.fallback ? (
             <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-              {workText("modal_job_detail.fallback")}{resource.fallback}
+              {workText("modal_job_detail.fallback_value", { name: resource.fallback })}
             </span>
           ) : null}
           {resource.cache ? (
             <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-              {workText("modal_job_detail.cache")}{resource.cache}
+              {workText("modal_job_detail.cache_value", { name: resource.cache })}
             </span>
           ) : null}
         </div>
@@ -495,7 +496,7 @@ export function ModalJobDetail({
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.created")}</span> {formatModalTimestamp(job.createdAt)}</p>
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.started")}</span> {formatModalTimestamp(job.startedAt)}</p>
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.finished")}</span> {formatModalTimestamp(job.finishedAt)}</p>
-            <p><span className="font-medium text-foreground">{workText("modal_job_detail.source")}</span> {job.agent ?? job.source ?? "—"}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.source")}</span> {workJobOwner(job.agent, job.source) ?? "—"}</p>
           </section>
 
           {job.command ? (
@@ -522,7 +523,7 @@ export function ModalJobDetail({
           {outputs.length > 0 ? (
             <section className="space-y-1.5">
               <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {workText("modal_job_detail.artifacts")}{outputs.length}
+                {workText("modal_job_detail.artifacts_count", { count: outputs.length })}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {outputs.map((artifact) => (

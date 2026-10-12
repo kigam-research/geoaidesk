@@ -1,8 +1,9 @@
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 import { Loader2Icon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+
+const workText = geoText("work");
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (

@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -32,6 +31,8 @@ import { DEFAULT_PROJECT_ID, type Project } from "@/lib/projects";
 import { openSettings } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 const appText = geoText("app");
 

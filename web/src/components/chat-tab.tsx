@@ -1,5 +1,6 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
+import { workLabel } from "@/geo/work-labels";
 import {
   Conversation,
   ConversationContent,
@@ -145,6 +146,8 @@ import { ConnectModelCard } from "@/components/connect-model-card";
 import { computeInstanceFromDefault, useAppDefaults } from "@/lib/app-settings";
 import { openSettings } from "@/lib/settings-nav";
 import { workflowScriptsIn } from "@/lib/workflow-script";
+
+const workText = geoText("work");
 
 const appText = geoText("app");
 
@@ -1127,7 +1130,7 @@ function ChatInput({
                   )}
                   <span className="min-w-0 flex-1 truncate text-muted-foreground">{item.description}</span>
                   <span className="shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] uppercase tracking-wide text-muted-foreground">
-                    {item.kind}
+                    {workLabel("slash_kind", item.kind)}
                   </span>
                 </div>
               ))}
@@ -1609,7 +1612,7 @@ export const ChatMessageRow = memo(function ChatMessageRow({
         <MessageToolbar>
           <MessageActions>
             <MessageAction
-              tooltip="Copy"
+              tooltip={workText("chat_tab.copy")}
               onClick={() => onCopy(message.id, message.content)}
             >
               {copied ? (
@@ -1639,7 +1642,7 @@ export const ChatMessageRow = memo(function ChatMessageRow({
                       : formatUsd(message.runCostUsd ?? 0)}
                     {typeof message.runTokens === "number" &&
                     message.runTokens > 0
-                      ? appText("chat.composer.replyTokens", { count: message.runTokens.toLocaleString() })
+                      ? appText("chat.composer.replyTokens", { count: message.runTokens.toLocaleString(geoLocale()) })
                       : ""}
                     {message.runBillingMode === "subscription" &&
                     typeof message.runListPriceUsd === "number"
@@ -1650,7 +1653,7 @@ export const ChatMessageRow = memo(function ChatMessageRow({
               >
                 <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
                   {message.runBillingMode === "subscription"
-                    ? appText("chat.composer.subscriptionTokens", { count: (message.runTokens ?? 0).toLocaleString() })
+                    ? appText("chat.composer.subscriptionTokens", { count: (message.runTokens ?? 0).toLocaleString(geoLocale()) })
                     : formatUsd(message.runCostUsd ?? 0)}
                 </span>
               </InfoTooltip>
@@ -2204,7 +2207,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
     if (result.ok) {
       const after = result.estimatedTokensAfter;
       toast.success(
-        appText("chat.composer.compacted", { before: result.tokensBefore.toLocaleString(), after: after !== null ? after.toLocaleString() : "none", cost: result.costUsd > 0 ? formatUsd(result.costUsd) : "none" }),
+        appText("chat.composer.compacted", { before: result.tokensBefore.toLocaleString(geoLocale()), after: after !== null ? after.toLocaleString(geoLocale()) : workLabel("code", "none"), cost: result.costUsd > 0 ? formatUsd(result.costUsd) : workLabel("code", "none") }),
       );
       return;
     }

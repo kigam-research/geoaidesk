@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckIcon,
@@ -14,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import models from "@/data/models.json";
 import { useModels } from "@/lib/use-models";
 import { openSettings } from "@/lib/settings-nav";
+
+const workText = geoText("work");
 
 const appText = geoText("app");
 

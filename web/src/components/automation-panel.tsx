@@ -1,7 +1,6 @@
 "use client";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 import { SubagentFleetPanel } from "./subagent-fleet-panel";
 
 /**
@@ -40,6 +39,8 @@ import {
 } from "@/lib/automation";
 import { cn, formatUsd } from "@/lib/utils";
 import { SettingsLink } from "@/components/settings-link";
+
+const workText = geoText("work");
 
 function describeTrigger(trigger: ScheduleView["trigger"], paused = false): string {
   if (trigger.kind === "interval") {
@@ -206,7 +207,7 @@ export function AutomationPanel({ projectId }: { projectId: string }) {
                     className="flex min-w-0 flex-1 items-center gap-2 text-left"
                     onClick={() => setOpen((o) => ({ ...o, [s.id]: !expanded }))}
                     aria-expanded={expanded}
-                    aria-label={`${expanded ? workText("automation_panel.collapse") : workText("automation_panel.expand")} ${s.name}`}
+                    aria-label={workText("automation_panel.toggle_name", { expanded: expanded ? "yes" : "no", name: s.name })}
                   >
                     {expanded ? <ChevronDownIcon className="size-3.5 shrink-0" /> : <ChevronRightIcon className="size-3.5 shrink-0" />}
                     <div className="min-w-0">
@@ -247,9 +248,9 @@ export function AutomationPanel({ projectId }: { projectId: string }) {
                   <div className="border-t px-3 py-2 text-[11px]">
                     <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded bg-muted/40 p-2 font-mono text-[10px] leading-relaxed">{s.workflowScript}</pre>
                     <div className="mt-2 text-muted-foreground">
-                      {workText("automation_panel.model")}{s.model ?? workText("automation_panel.inherited_from_the_project_s_latest_chat_model")}
+                      {workText("automation_panel.model_value", { model: s.model ?? workText("automation_panel.inherited_from_the_project_s_latest_chat_model") })}
                       {s.quiet ? workText("automation_panel.quiet_successful_fires_don_t_wake_kady") : ""}
-                      {" · "}{workText("automation_panel.catch_up")}{workLabel("code", s.catchUp)}
+                      {" · "}{workText("automation_panel.catch_up_value", { policy: workLabel("code", s.catchUp) })}
                       {s.timeoutMs ? workText("automation_panel.timeout_value_min", { v0: Math.round(s.timeoutMs / 60000) }) : ""}
                       {s.baseRef ? workText("automation_panel.base_value", { v0: s.baseRef }) : ""}
                     </div>
@@ -290,7 +291,7 @@ export function AutomationPanel({ projectId }: { projectId: string }) {
                 <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium">
                   <span>{missionLabel(m)}</span>
                   <Badge variant={m.status === "needs_decision" ? "destructive" : "outline"} className="h-5 text-[10px]">{workLabel("status", m.status, m.status.replace("_", " "))}</Badge>
-                  {m.goal && <Badge variant="secondary" className="h-5 text-[10px]">{workText("automation_panel.goal")}{workLabel("status", m.goal.status)}</Badge>}
+                  {m.goal && <Badge variant="secondary" className="h-5 text-[10px]">{workText("automation_panel.goal_status", { status: workLabel("status", m.goal.status) })}</Badge>}
                 </div>
                 {m.objective && m.objective !== REDACTED && <div className="truncate text-[11px] text-muted-foreground">{m.objective}</div>}
                 <div className="text-[10px] text-muted-foreground">

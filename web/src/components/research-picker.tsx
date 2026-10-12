@@ -1,7 +1,6 @@
 "use client";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -20,6 +19,8 @@ import {
   researchRefKey,
   type ResearchRef,
 } from "@/lib/composer-context";
+
+const workText = geoText("work");
 
 type Mode = "records" | "chats";
 
@@ -103,7 +104,7 @@ function hitRows(result: MemorySearchResponse): Row[] {
       workLabel("role", hit.author),
       relativeTime(hit.timestamp),
       hit.recordStatus !== "active" ? workLabel("status", hit.recordStatus) : "",
-      hit.outcome ? workText("research_picker.outcome_value", { v0: workLabel("status", hit.outcome) }) : "",
+      hit.outcome ? workText("research_picker.outcome_value", { v0: workLabel("outcome", hit.outcome) }) : "",
     ].filter(Boolean).join(" · "),
     muted: hit.recordStatus === "superseded",
   }));

@@ -1,7 +1,6 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 
 import { memo, useMemo, useState } from "react";
 import {
@@ -17,6 +16,8 @@ import {
 import { MessageResponse } from "@/components/ai-elements/message";
 import type { ChatMessage } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 /**
  * Notices a Pi extension injected into the conversation (pi-subagents
@@ -88,7 +89,7 @@ export const COLLAPSE_AFTER_LINES = 8;
 export const COLLAPSE_AFTER_CHARS = 600;
 
 function formatTokens(value: unknown): string {
-  return typeof value === "number" ? value.toLocaleString() : String(value ?? "");
+  return typeof value === "number" ? value.toLocaleString(geoLocale()) : String(value ?? "");
 }
 
 function formatDetail(key: string, value: string | number | boolean): string {

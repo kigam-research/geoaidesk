@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -15,6 +14,8 @@ import { getAgents, type AgentFile } from "@/lib/agents";
 import { openSettings } from "@/lib/settings-nav";
 import { Switch } from "@/components/ui/switch";
 import type { DelegationChoice } from "@/lib/composer-context";
+
+const workText = geoText("work");
 
 /** The agents the lead can actually launch: enabled ones, verifiers flagged. */
 function launchable(agents: AgentFile[]): AgentFile[] {

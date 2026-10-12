@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:21:15Z
+updated: 2026-10-12T22:27:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -98,28 +98,46 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-- Resumed the CLI-owned worktree and read the copy guide, terminology and policy.
-- Installed web dependencies with `npm ci`; source changes have not yet been checked.
-- Single writer owns all listed components plus `work` catalogues. No nested child units.
+- Implemented work-area localization in 27 owned upstream component files; existing app namespace ids remain unchanged. Added 737 paired work messages and GAID-only display adapters in web/src/geo/work-labels.ts with a 3-test regression suite.
+- Includes 229 database descriptions and 18 categories, translated at display time only (original database objects and model/server prompt payloads are unchanged). Known status/outcome/source codes, counts, accessibility labels, dates and relative times follow gaid:locale.
+- TypeScript passed after the conversion; the new display-adapter tests pass (3/3). Copy validator: 0 errors, 15 warnings (12 work warnings reviewed below). Final full-suite snapshot job still needs to run with its own dependencies.
+- Rough scanner remaining owned-file hits: model-selector.tsx: `ollama pull qwen3.6` (command), `Openrouter Fusion` (product name); tool-activity.tsx: `Modal ·` (product name plus punctuation). All intentionally unchanged under do-not-translate rules.
+- Also intentionally unchanged: user/model-authored chat/record/skill/specialist names and bodies, file paths and URLs, tool logs/results, protocol identifiers, CSS, keyboard keys, model/provider/hardware names and units. App-generated labels surrounding those values are localized.
+- No other upstream files touched. New files are GAID-only work-labels.ts and work-labels.test.ts. Already-localized owned files with no new literals need no code change (page/project screens, selectors and menus retain their existing app ids).
+- English copy exception: work.database.description.plaid changes “Bank account connectivity, transaction data, and financial insights” to “Bank account connectivity, transaction data, and financial analytics” because the copy validator rejects “insights”. Korean remains “은행 계좌 연결, 거래 자료, 금융 분석 정보를 제공합니다.” All other English wording is preserved (ICU interpolation/plurals replace source composition).
+
 ## Next steps
-1. Convert chat/project and activity-panel literals in place; preserve existing app ids and protocol/data strings.
-2. Audit dynamic labels, counts and dates, then run TypeScript, the full web suite, copy validation and the shared scanner.
-3. Record the inventory/evidence, save named paths and finish for parent integration.
+1. Save the completed code and run a recorded full-web test job with npm ci inside its source snapshot.
+2. Record final TypeScript/full suite/copy/scanner evidence, save the task document and run task finish for parent integration.
+
 ## Failed approaches
+- Initial full-web job job-geoaidesk-gaid-ui-locale--work-1 failed before tests: isolated snapshot had no web/node_modules, so vitest was not found. The worktree's npm ci was successful; the next snapshot job installs its own dependencies before running tests.
+- Extraction script initially detected overlapping edits; fixed before proceeding. Early TypeScript run caught duplicate geoText imports; removed them and reran successfully.
+- Provider capacity errors interrupted the writer/translation reader; preserved checkpoint 3b18ed6 and resumed without discarding edits.
+
 ## Notes and decisions
-- Sequential integration: shared translation helper and catalogue messages first, then component groups, then dynamic/status audit. File ownership is the starter list; no other upstream files are planned.
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Single writer; no nested task units. Readers /root/database_copy and /root/locale_audit did no checkout edits. Database reader produced an outside-Git translation artifact (229/229 descriptions and 18/18 categories, numeric scope preserved). Read-only audit identified lifecycle, source, outcome, slash kind and database-tooltip gaps; all fixed.
+- Display-only GAID adapters avoid edits to shared upstream lib modules (modal-jobs/automation/composer-context). Unknown values and custom metadata fall back unchanged.
+- Copy warnings reviewed: automation automatic pause/resume and mission creation describe implemented scheduler behavior; citation “verified” refers only to deterministic resolver checks, not scientific correctness; nutritionix “verified” is carried-over upstream database metadata, not a new verification claim. Two English question-copy warnings preserve existing upstream error/placeholder text. Three other warnings belong to unchanged app/skillHub catalogues.
+- Copy change examples (all work ids are fully enumerated in paired work JSON catalogues; prior Korean was missing, prior English was inline):
+
+| String id | Korean before → after | English before → after |
+| --- | --- | --- |
+| work.automation_panel.automation | missing → 자동화 | Automation → Automation |
+| work.modal_job_detail.estimated_spent | missing → 추정 지출 | Estimated spent → Estimated spent |
+| work.permission_card.allow_once | missing → 한 번 허용 | Allow once → Allow once |
+| work.chat_tab.copy | missing → 응답 복사 | Copy → Copy |
+| work.database.description.plaid | missing → 은행 계좌 연결, 거래 자료, 금융 분석 정보를 제공합니다. | financial insights → financial analytics (validator) |
+
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child result is recorded here for the parent's canonical report; no separate child report.
+
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T222158.203823Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

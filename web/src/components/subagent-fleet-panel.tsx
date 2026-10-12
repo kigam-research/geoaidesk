@@ -1,11 +1,12 @@
 "use client";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { commandPreview } from "@/lib/command-blocks";
 import { fleetSessions, getFleet, controlSpecialist, type FleetSnapshot, type FleetAction, type FleetNode } from "@/lib/subagent-fleet";
+
+const workText = geoText("work");
 const active = (state: string) => ["running", "queued", "pending"].includes(state);
 type Target = { runId: string; index?: number; label: string };
 const flatten = (rows: FleetNode[]): FleetNode[] => rows.flatMap((row) => [row, ...flatten(row.children ?? [])]);
@@ -84,7 +85,7 @@ export function SubagentFleetPanel({ projectId }: { projectId: string }) {
   const childRows = (children: FleetNode[]) => children.map((child) => <div key={child.id} className="space-y-1 pl-3">
     <div className="flex items-center justify-between gap-2 text-xs">
       <span>{child.label} · {workLabel("status", child.state)}{child.activity?.currentTool ? ` · ${child.activity.currentTool}` : ""}</span>
-      {child.control && <Button size="sm" variant="ghost" disabled={busy} onClick={() => inspect({ ...child.control!, label: child.label })}>{workText("subagent_fleet_panel.inspect")}{child.label}</Button>}
+      {child.control && <Button size="sm" variant="ghost" disabled={busy} onClick={() => inspect({ ...child.control!, label: child.label })}>{workText("subagent_fleet_panel.inspect_name", { name: child.label })}</Button>}
     </div>
     {childRows(child.children ?? [])}
   </div>);
@@ -102,7 +103,7 @@ export function SubagentFleetPanel({ projectId }: { projectId: string }) {
     {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
     {notice && <p role="status" className="whitespace-pre-wrap text-xs">{notice}</p>}
     {snapshot?.fleet && <p className="text-xs text-muted-foreground">{workText("subagent_fleet_panel.active_count", { count: snapshot.fleet.totalActive })}</p>}
-    {snapshot?.fleet?.entries.map((entry) => <div key={entry.key} className="text-xs"><span className="font-medium">{entry.agent}</span> · {entry.model || workText("subagent_fleet_panel.inherited_model")} · {entry.tokens.total.toLocaleString(geoLocale())} {workText("subagent_fleet_panel.tokens")}{entry.goal && <p className="text-muted-foreground">{entry.goal}</p>}</div>)}
+    {snapshot?.fleet?.entries.map((entry) => <div key={entry.key} className="text-xs"><span className="font-medium">{entry.agent}</span> · {entry.model || workText("subagent_fleet_panel.inherited_model")} · {workText("subagent_fleet_panel.tokens_value", { tokens: entry.tokens.total.toLocaleString(geoLocale()) })}{entry.goal && <p className="text-muted-foreground">{entry.goal}</p>}</div>)}
     {!runs.length && <p className="text-xs text-muted-foreground">{snapshot ? workText("subagent_fleet_panel.no_specialist_runs_in_this_chat") : sessionId ? workText("subagent_fleet_panel.loading_specialists") : workText("subagent_fleet_panel.start_a_chat_to_view_its_specialists")}</p>}
     {runs.map((run) => <div key={run.id} className="space-y-2 rounded-lg border p-3">
       <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm font-medium">{run.label}</span><span className="text-xs">{workLabel("status", run.state)}</span></div>
@@ -114,7 +115,7 @@ export function SubagentFleetPanel({ projectId }: { projectId: string }) {
       {childRows(run.children ?? [])}
     </div>)}
     {(snapshot?.asyncSnapshot?.omitted?.runs || snapshot?.asyncSnapshot?.omitted?.children || snapshot?.fleet?.omitted) ? <p className="text-xs text-muted-foreground">{workText("subagent_fleet_panel.some_entries_are_omitted_from_this_bounded_view_ask_kady_for_a_specific_run_s_status")}</p> : null}
-    {snapshot?.compute?.map((job) => <p key={job.id} className="text-xs">{workText("subagent_fleet_panel.compute")}{job.label} · {workLabel("status", job.state)}</p>)}
+    {snapshot?.compute?.map((job) => <p key={job.id} className="text-xs">{workText("subagent_fleet_panel.compute_value", { name: job.label, state: workLabel("status", job.state) })}</p>)}
     {selected && <div className="space-y-2 border-t pt-3">
       <div className="flex items-center justify-between"><h4 className="text-sm font-medium">{selected.label}</h4><Button size="sm" variant="ghost" onClick={() => setTranscriptRefresh((n) => n + 1)}>{workText("subagent_fleet_panel.refresh_transcript")}</Button></div>
       <pre aria-label={workText("subagent_fleet_panel.specialist_transcript")} className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs">{transcript}</pre>

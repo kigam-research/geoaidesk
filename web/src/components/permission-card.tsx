@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import { memo, useState } from "react";
 import { ShieldAlertIcon } from "lucide-react";
@@ -10,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { apiFetch, useProjectScopeId } from "@/lib/projects";
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 /** Payload the data guard attaches to a `permission_request` frame. */
 export interface PermissionPayload {

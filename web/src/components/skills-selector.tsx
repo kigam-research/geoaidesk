@@ -1,12 +1,13 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon, WandSparklesIcon, XIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Skill } from "@/lib/use-skills";
+
+const workText = geoText("work");
 
 export type { Skill };
 
@@ -111,7 +112,7 @@ export function SkillsPickerBody({
                     <span className="font-medium text-foreground">{skill.name}</span>
                     {skill.author && (
                       <span className="text-[10px] text-muted-foreground/60">
-                        {workText("skills_selector.by")}{skill.author}
+                        {workText("skills_selector.author", { author: skill.author })}
                       </span>
                     )}
                   </div>

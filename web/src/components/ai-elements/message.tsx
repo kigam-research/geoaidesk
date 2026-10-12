@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import type { UIMessage } from "ai";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
@@ -49,6 +48,8 @@ import {
   useState,
 } from "react";
 import { Block, Streamdown, defaultRehypePlugins, type BlockProps } from "streamdown";
+
+const workText = geoText("work");
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage["role"];

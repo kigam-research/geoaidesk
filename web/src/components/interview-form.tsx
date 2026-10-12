@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 /**
  * Inline interview form — the chat-side half of the backend `interview` tool
@@ -22,6 +21,8 @@ import { API_BASE, apiFetch, useProjectScopeId } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 // Mirrors the backend caps in server/src/agent/interview.ts.
 const MAX_IMAGES = 12;

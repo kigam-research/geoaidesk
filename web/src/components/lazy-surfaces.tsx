@@ -1,9 +1,10 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import dynamic from "next/dynamic";
 import { useState, type ComponentProps } from "react";
+
+const workText = geoText("work");
 
 type SettingsProps = ComponentProps<typeof import("./settings-dialog").SettingsDialog>;
 const loading = () => <div className="p-4 text-sm text-muted-foreground" role="status">{workText("lazy_surfaces.loading")}</div>;

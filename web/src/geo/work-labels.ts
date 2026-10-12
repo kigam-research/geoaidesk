@@ -9,6 +9,13 @@ export function workLabel(group: string, value: string, fallback = value): strin
   return hasGeoText("work." + key) ? workText(key) : fallback;
 }
 
+/** Distinguish protocol-generated owner labels from user-defined specialist names. */
+export function workJobOwner(agent: string | null, source: string | null): string | null {
+  if (agent === "subagent") return workLabel("source", agent);
+  if (agent?.startsWith("subagent ")) return workText("source.subagent_run", { runId: agent.slice(9) });
+  return agent ?? (source ? workLabel("source", source) : null);
+}
+
 export function workResourceName(value: string): string {
   const cpu = /^CPU · (\d+) (core|cores)$/.exec(value);
   return cpu ? workText(cpu[2] === "core" ? "resource.cpu_one" : "resource.cpu_many", { count: Number(cpu[1]) }) : value;
@@ -36,4 +43,13 @@ export function formatWorkModalDuration(startedAt: string | null | undefined, fi
 export function formatWorkModalTimestamp(value: string | null | undefined): string {
   if (!value || !Number.isFinite(Date.parse(value))) return "—";
   return new Intl.DateTimeFormat(geoLocale(), { dateStyle: "medium", timeStyle: "short" }).format(Date.parse(value));
+}
+
+/** Display catalogue metadata without changing Database objects sent to the agent. */
+export function workDatabaseDescription(db: { id: string; description: string }): string {
+  return workLabel("database.description", db.id, db.description);
+}
+export function workDatabaseCategory(category: string): string {
+  const key = category.toLowerCase().replace(/[^a-z]+/g, "_").replace(/_$/, "");
+  return workLabel("database.category", key, category);
 }

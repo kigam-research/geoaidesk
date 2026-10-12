@@ -1,7 +1,6 @@
 "use client";
 import { geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 
 import {
   BookCheckIcon,
@@ -16,6 +15,8 @@ import { useMemo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CitationEntry, CitationReport } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 const KIND_LABELS: Record<CitationEntry["kind"], string> = {
   doi: "DOI",

@@ -33,6 +33,8 @@ import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 import { workflowScriptAgents } from "@/lib/workflow-script";
 
+const workText = geoText("work");
+
 const appText = geoText("app");
 
 function ToolIcon({ toolName }: { toolName?: string }) {
@@ -111,7 +113,7 @@ function workflowSummary(workflow: unknown): string | null {
   if (typeof workflow !== "string" || !workflow.trim()) return null;
   // A value with a path separator is a script file; anything else names an
   // extension-registered workflow resource.
-  return /[\\/]/.test(workflow) ? `workflow ${workflow}` : `workflow “${workflow}”`;
+  return /[\\/]/.test(workflow) ? workText("tool_activity.workflow_path", { path: workflow }) : workText("tool_activity.workflow_name", { name: workflow });
 }
 
 const MAX_PROMPT_SUMMARY = 140;

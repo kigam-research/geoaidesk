@@ -1,5 +1,5 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
 import {
   DownloadIcon,
   FileTextIcon,
@@ -79,7 +79,7 @@ function relativeTime(value: string | number): string {
   const hours = Math.round(mins / 60);
   if (hours < 24) return appText("chat.tabs.hours", { count: hours });
   const days = Math.round(hours / 24);
-  return days < 7 ? appText("chat.tabs.days", { count: days }) : new Date(then).toLocaleDateString();
+  return days < 7 ? appText("chat.tabs.days", { count: days }) : new Date(then).toLocaleDateString(geoLocale());
 }
 
 /** Clock menu listing the project's stored sessions; picking one reopens it

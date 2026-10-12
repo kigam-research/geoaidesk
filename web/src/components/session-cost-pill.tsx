@@ -1,7 +1,6 @@
 "use client";
 import { geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
-const workText = geoText("work");
 
 import { AlertTriangleIcon, LockIcon } from "lucide-react";
 
@@ -14,6 +13,8 @@ import {
 import { cn, formatCompactTokens, formatUsd } from "@/lib/utils";
 import type { ProjectCostSummary } from "@/lib/use-project-cost";
 import type { CostEntry, SessionCostSummary } from "@/lib/use-session-cost";
+
+const workText = geoText("work");
 
 interface SessionCostPillProps {
   summary: SessionCostSummary;
@@ -131,7 +132,7 @@ export function SessionCostPill({
                 <span className="flex items-baseline gap-1">
                   <span className="text-muted-foreground">{workText("session_cost_pill.sub")}</span>
                   <span className="font-semibold">
-                    {formatTokens(summary.subscriptionTokens ?? 0)} {workText("session_cost_pill.tok")}</span>
+                    {workText("session_cost_pill.tok_value", { tokens: formatTokens(summary.subscriptionTokens ?? 0) })}</span>
                 </span>
               ) : null}
             </div>
@@ -179,7 +180,7 @@ export function SessionCostPill({
             </div>
             {heldUsd > 0 && (
               <div className="text-muted-foreground mt-1 text-xs">
-                {formatUsd(spentUsd)} {workText("session_cost_pill.recorded")}{reservedUsd > 0 ? workText("session_cost_pill.value_held_for_compute_jobs", { v0: formatUsd(reservedUsd) }) : ""}
+                {workText("session_cost_pill.recorded_value", { cost: formatUsd(spentUsd) })}{reservedUsd > 0 ? workText("session_cost_pill.value_held_for_compute_jobs", { v0: formatUsd(reservedUsd) }) : ""}
                 {inFlightUsd > 0 ? workText("session_cost_pill.value_in_the_current_run", { v0: formatUsd(inFlightUsd) }) : ""}
               </div>
             )}
@@ -234,7 +235,7 @@ export function SessionCostPill({
               <div className="flex items-baseline justify-between py-1 text-sm">
                 <span className="text-muted-foreground">{workText("session_cost_pill.subscription_usage")}</span>
                 <span className="font-mono tabular-nums">
-                  {formatTokens(summary.subscriptionTokens ?? 0)} {workText("session_cost_pill.tokens")}</span>
+                  {workText("session_cost_pill.tokens_value", { tokens: formatTokens(summary.subscriptionTokens ?? 0) })}</span>
               </div>
             ) : null}
           </div>

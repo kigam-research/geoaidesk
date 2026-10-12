@@ -1,6 +1,5 @@
 "use client";
 import { geoText } from "@/geo/i18n";
-const workText = geoText("work");
 
 import type { ChatStatus, FileUIPart, SourceDocumentUIPart } from "ai";
 import type {
@@ -75,6 +74,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+const workText = geoText("work");
 
 // ============================================================================
 // Helpers
