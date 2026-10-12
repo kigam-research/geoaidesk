@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T05:00:44Z
+updated: 2026-10-12T05:11:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -87,6 +87,23 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
   (original pixel value at full resolution). Bench in one worker (kambalda_tmi_40m.tif, 85 tiles z0-3 in EPSG:3857):
   median 87 ms, p90 94 ms; style 194 ms; point 74 ms (`~/data/geoaidesk/work/gaid-map-tiles/scripts/bench_worker.py`).
 - web: proj4 2.22.0 added (exact pin; seam owner moved to gaid-map-tiles).
+- Backend: helper worker pool (`server/src/geo/maps/process.ts`, GAID_MAP_WORKERS default min(3, cpus/2), JSON lines,
+  kill+respawn on timeout/overflow), routes POST /geo/raster-style, GET /geo/raster-tile (versioned URL, 96 MiB LRU,
+  in-flight dedupe), POST /geo/raster-point (`server/src/geo/maps/tiles.ts`); vector `full` mode (<=20k features /
+  400k vertices / 24 MiB, else truncated -> viewport pages). Hot-path fixes: cached pyproj transformers (75 ms each),
+  cached CRS info/vector metadata, GDAL `USE_OSR_FIND_MATCHES=NO` for display reads (0.15 s per shapefile open).
+  Overview VRT cache (GAID_MAP_CACHE_DIR, default <GAID_HOME>/cache/maps or ~/.kady/map-cache, pruned at 4 GiB).
+- Viewer: TileImage layers on deterministic grids (XYZ in EPSG:3857, per-extent grid otherwise), default view = the
+  projected source EPSG (proj4 registration) with Web Mercator selectable, stable OL layers (tile cache kept), pixel
+  click reads the source value, whole-layer vector table paged client-side.
+- Evidence (2026-10-12): HTTP tiles on PC74 kambalda 3857 cold median 24 ms/p95 78 ms, warm 3 ms; 8000x8000 5186
+  raster cold 13 ms/p95 25 ms. Browser through the user's path (headless Chrome on PC71 -> ssh -L -> PC74; before =
+  scratch 029681b on 13110/18110, after = this branch on 13111/18111; data ~/data/geoaidesk/work/gaid-map-tiles/tunnel/):
+  action -> last /geo/ response, before zoom in/out median 1.47-2.44 s, open 4.1-6.1 s; after zoom in 0.03-0.04 s,
+  pan 0.16-0.28 s, zoom out 0-0.04 s, open 0.55-1.47 s; vector after open: 0 requests on pan/zoom.
+  Markdown rule demo on a copy of the user's file (md-demo/notice.txt): 13 links reported with `../figures/...` fixes.
+- Running local services (stop before finish): gmt-backend-before/after, gmt-web-before/after (systemd --user),
+  PC71 tunnel `ssh -S ~/tmp/gmt/tun.sock -O exit pc74` on pc71; scratch c5fe6278eadf.
 - Baseline (before) on PC74 local backend :18110, data ~/data/geoaidesk/work/gaid-map-tiles/projects (copy of review
   samples): `/geo/raster-window` kambalda_tmi_40m.tif 256x256 = 1.32 s (5 warm runs), `/geo/vector-page`
   Seoul_Geology_250K_Litho.shp 500 = 2.2 s. Cause: each request spawns the helper twice (inspect + operation;
