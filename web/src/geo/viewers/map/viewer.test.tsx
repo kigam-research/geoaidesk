@@ -109,7 +109,8 @@ describe("map viewer", () => {
     mockFetch.mockImplementation(() => respond({ ...inspection(), asset: { ...inspection().asset, format: "tiff", family: "raster" } }));
     const first = render(<MapViewer {...props} path="photo.tiff" />); await screen.findByText("imaging-fallback"); first.unmount();
     const artifact: MapManifestResponse = { manifest: { schemaVersion: "geo-result/v1", kind: "map-layer", title: "Result", layers: ["one.gpkg", "two.gpkg"].map(path => ({ path, variable: "class", sourceCrs: "EPSG:5186", displayCrs: "EPSG:3857", unit: "m", legend: [], nodata: null, extent: [0, 0, 20, 20] })), analysis: { method: "full-layer", tablePath: "results/area.csv", scriptPath: "scripts/area.py" }, limitations: ["fixture limitation"] }, inspections: [inspection("one.gpkg"), inspection("two.gpkg")] };
-    mockFetch.mockImplementation(url => url === "/geo/result" ? respond(artifact) : respond(page()));
+    // Whole-layer answers: no viewport pages follow, so opacity must not cause any request.
+    mockFetch.mockImplementation(url => url === "/geo/result" ? respond(artifact) : respond({ ...page(), full: true, nextOffset: null }));
     render(<MapViewer {...props} path="result.geomap.json" />);
     await screen.findByRole("heading", { name: "Result" });
     expect(screen.getByRole("button", { name: "Select layer: two.gpkg" })).toBeInTheDocument(); expect(screen.getByText("Full analysis table: results/area.csv")).toBeInTheDocument(); expect(screen.getByText("Analysis script: scripts/area.py")).toBeInTheDocument();
