@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:23:24Z
+updated: 2026-10-12T14:35:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -74,6 +74,10 @@ language should follow the UI language. The user decided (verbatim):
 - Own app instance: systemd user unit `gaid-ui-locale-app` (~/data/geoaidesk/work/gaid-ui-locale/app/run.sh, dev mode
   from this worktree, data in that folder, log app.log). Screenshot script: ~/data/geoaidesk/work/gaid-ui-locale/browser/
   shots.mjs (baseline/ = before children). Stop the unit before finish.
+- Integrated gaid-ui-locale--workflows (3fd524c, closed): 1,197 messages (326 names, 326 descriptions, 484 input labels,
+  22 categories, 39 controls); en generated from web/src/data/workflows.json (generate-en.mjs), parity test
+  web/src/geo/workflows-locale.test.tsx; one upstream English description reworded (comparative-genomics, registered).
+  Two failed child test jobs disposed as superseded by job 20261012T142512 (978 web tests passed).
 - Baseline scan (`~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src`): 1191 English literals in 79 upstream
   files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
 
@@ -82,7 +86,7 @@ language should follow the UI language. The user decided (verbatim):
    browser screenshot script and own app instance (ports other than 3000/18000).
 
 ## Children (started 2026-10-12, profile "general work", prompts in ~/data/geoaidesk/work/gaid-ui-locale/prompts/)
-- gaid-ui-locale--workflows: agent 7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb
+- gaid-ui-locale--workflows: agent 7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb — completed and closed
 - gaid-ui-locale--work: agent a21bc230-636f-4990-93a2-4ec585bd7fd4
 - gaid-ui-locale--files: agent e2cc47a6-cd2c-4eb2-911c-522a86045e22
 - gaid-ui-locale--settings: agent 597a1537-b69e-4291-b5f7-44e6e6807109

@@ -1,3 +1,5 @@
+import { geoLocale } from "@/geo/i18n";
+
 /**
  * Flatten time-sorted entries into a render list with day / run / session
  * dividers. Day dividers appear only when the set spans more than one local
@@ -47,7 +49,7 @@ export function buildTimeline(
         out.push({
           kind: "day",
           key: `d-${e.sessionId ?? ""}-${dk}-${e.id}`,
-          label: d.toLocaleDateString(undefined, {
+          label: d.toLocaleDateString(geoLocale(), {
             weekday: "short",
             month: "short",
             day: "numeric",
