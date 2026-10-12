@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:34:17Z
+updated: 2026-10-12T14:34:59Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"334bb7bf-c7ab-4250-b73e-1471a312e37f","pid":156917,"provider":"codex","session":"01a13070-cbd3-7342-84f1-7f5315c5f76d","start":"28006151","token":"3629085d8a1d23c5b9de8f99b11198713cbb9dc06174c176c4fe351ffbf0c804"}
 branch: task/gaid-ui-locale--notebook
 target: task/gaid-ui-locale
@@ -74,7 +74,7 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implemented 264 paired messages in notebook/en.json and notebook/ko.json. All nine owned files now use catalogue text for UI copy, including authored evidence/execution status labels, entry types, confidence levels, relative ages, counts, result-reference limits, provenance actors and artifact roles. Existing app/workspace scientific-result ids are unchanged. Dates and numbers use geoLocale(). Implementation saved/pushed at 223d3239f75d; full web tests are running as recorded job 2.
+Implemented 264 paired messages in notebook/en.json and notebook/ko.json. All nine owned files now use catalogue text for UI copy, including authored evidence/execution status labels, entry types, confidence levels, relative ages, counts, result-reference limits, provenance actors and artifact roles. Existing app/workspace scientific-result ids are unchanged. Dates and numbers use geoLocale(). Implementation saved/pushed at 223d3239f75d; full web suite passed: 145 files / 972 tests, recorded job 2 exit 0. Ready for parent integration.
 
 Files edited: all nine owned files; web/src/geo/locales/notebook/{ko,en}.json; task document. Extra upstream files requiring parent boundary registration: web/src/lib/notebook-filters.ts (Kady lead/You labels), web/src/lib/notebook-timeline.ts (day-divider date locale). No other upstream files or shared semantic/model-input helpers changed.
 
@@ -92,10 +92,10 @@ English prose changes: none. Existing English is retained, with ICU arguments/pl
 
 Intentionally preserved: user/agent-authored titles, bodies, evidence, limitations and labels; paths, filenames, ids, hash/package/version/OS values; raw API error/reason/log details; protocol enum values and tool names; keyboard keys and code/CSS/test ids. Technical labels/units stay literal (git HEAD, InChI, R, Python, sha256, n, CI, dimN, B/KB/MB/GB). Export/server/model-generated document content and imported research dialogs are outside the owned-file contract. resultReferenceText remains unchanged for shared server/export consumers; the component now formats its own localized display.
 
-Verification so far: local web npm ci completed; web npx tsc --noEmit passed; copy validator 0 errors / 9 total warnings (6 notebook warnings reviewed: negated verified/automatically clauses and saved-result schema validation, no scientific-validity claim); scanner only git HEAD and InChI in owned files; all 264 paired ICU messages formatted in both locales for count 0, 1 and 2; git diff --check passed. No model calls or browser screenshots.
+Verification: local web npm ci completed; web npx tsc --noEmit passed; full npm run test passed (145 files / 972 tests); copy validator 0 errors / 9 total warnings (6 notebook warnings reviewed: negated verified/automatically clauses and saved-result schema validation, no scientific-validity claim); scanner only git HEAD and InChI in owned files; all 264 paired ICU messages formatted in both locales for count 0, 1 and 2; git diff --check passed. No model calls or browser screenshots.
 
 ## Next steps
-1. Read recorded job 2 result when notified; fix any relevant failure, then save the final task report and finish.
+1. Run task finish. Parent then runs task complete gaid-ui-locale--notebook, registers the two extra helper boundaries, and performs its full scripts/check and browser checks.
 ## Failed approaches
 - Initial task resume waited for another transaction; retry succeeded with no relocation.
 - The first recorded npm-ci job installed dependencies in its isolated source snapshot, not this worktree. Installed once in web locally as required by the child contract. A second job attempt was rejected before launch because the task source was dirty; no job to resume.
@@ -103,19 +103,13 @@ Verification so far: local web npm ci completed; web npx tsc --noEmit passed; co
 - First typecheck found optional counts and translated artifact role enum; fixed call-site narrowing and translated the role only at display. A subsequent invocation from repo root had no local TypeScript package; reran in web.
 ## Notes and decisions
 - Sequential work: settle catalogue wording and status labels, substitute components, inspect residual literals, then run checks. This child owns all edits; no nested writers.
-- Shared display helpers `web/src/lib/notebook-filters.ts` (role labels) and `web/src/lib/notebook-timeline.ts` (date locale) also need small substitutions; report them for parent boundary registration. Do not modify shared evidence semantics or persisted values.
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Shared display helpers `web/src/lib/notebook-filters.ts` (role labels) and `web/src/lib/notebook-timeline.ts` (date locale) received small substitutions; parent must register their boundaries. Do not modify shared evidence semantics or persisted values.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
+
 ## Report
 Child result is documented in Current state for integration into the parent report. No standalone child report.
 
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--notebook-20261012T142357.390360Z/receipt.json
