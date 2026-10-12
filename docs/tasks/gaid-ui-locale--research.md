@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T22:24:43Z
+status: ready
+updated: 2026-10-12T22:24:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"34dfdfe5-4370-41a2-aa9d-087d58daaee3","pid":158996,"provider":"codex","session":"01a13070-f6e5-7f13-b322-8d8d7f222e12","start":"28007253","token":"06960dbddd7b357f4f70330ac04ab223ed2e636fefb00ebc485286f900d3e23f"}
 branch: task/gaid-ui-locale--research
 target: task/gaid-ui-locale
@@ -79,8 +79,9 @@ Intentionally untranslated: user/model-authored research content, raw server dia
 
 Checkpoint pushed as `883423ebde4c`. Final checked changes are ready for save/finish and parent integration with `task complete gaid-ui-locale--research`.
 ## Next steps
-1. Save the reviewed final files and run `task finish`.
-2. Parent integrates the child and performs integrated application verification; no child deployment is required.
+<!-- task:closed -->
+Closed 2026-10-12T22:24:55Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial full web suite found a missing literal `$` in the model-usage error notice. Restored the original currency notation; full suite then passed without test changes.
 - Typecheck after parameterizing the SVG tooltip required an assertion for the estimate already guaranteed by the plotted-attempt filter. Added the type-only assertion; typecheck passed.
