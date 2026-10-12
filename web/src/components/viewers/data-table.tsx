@@ -1,6 +1,9 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useMemo, useState } from "react";
 import { NumericChart } from "./data-plots";
+
+const filesText = geoText("files");
 
 export interface TableSummary {
   format: string;
@@ -55,32 +58,30 @@ export default function DataTable({ summary }: { summary: TableSummary }) {
   return <div className="space-y-3 p-4">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-xs text-muted-foreground">
-        {summary.num_rows === null ? `${summary.head.length} preview rows · total not scanned` : `${summary.num_rows.toLocaleString()} rows`}
-        {` · ${summary.num_columns} columns`}
+        {summary.num_rows === null ? filesText("data_table.preview_rows", { count: summary.head.length }) : filesText("data_table.row_count", { count: summary.num_rows })}
+        {filesText("data_table.column_count", { count: summary.num_columns })}
       </p>
       <div className="flex gap-1 rounded-md border p-0.5 text-xs">
-        <button className={`rounded px-3 py-1 ${view === "table" ? "bg-muted" : ""}`} onClick={() => setView("table")} aria-pressed={view === "table"}>Table</button>
+        <button className={`rounded px-3 py-1 ${view === "table" ? "bg-muted" : ""}`} onClick={() => setView("table")} aria-pressed={view === "table"}>{filesText("data_table.table")}</button>
         <button className={`rounded px-3 py-1 disabled:opacity-40 ${view === "plot" ? "bg-muted" : ""}`} disabled={!numericColumns.length}
-          onClick={() => setView("plot")} aria-pressed={view === "plot"}>Plot</button>
+          onClick={() => setView("plot")} aria-pressed={view === "plot"}>{filesText("data_table.plot")}</button>
       </div>
     </div>
-    {(limited || summary.columns_truncated) && <p className="text-xs text-muted-foreground">
-      Showing the first {summary.head.length} rows and {summary.columns.length} columns. Search, sorting, and plots use this preview only.
-    </p>}
+    {(limited || summary.columns_truncated) && <p className="text-xs text-muted-foreground">{filesText("data_table.preview_scope", { rows: summary.head.length, columns: summary.columns.length })}</p>}
     {summary.note && <p className="text-xs text-muted-foreground">{summary.note}</p>}
     {view === "plot" ? <div className="space-y-3 rounded-lg border p-3">
       <div className="flex flex-wrap items-center gap-3 text-xs">
-        <label className="flex items-center gap-2">X axis<select className="max-w-52 rounded border bg-background px-2 py-1" value={x} onChange={e => setX(Number(e.target.value))}>
-          <option value={-1}>Row number</option>{numericColumns.map(col => <option key={col.index} value={col.index}>{col.name}</option>)}
+        <label className="flex items-center gap-2">{filesText("data_table.x_axis")}<select className="max-w-52 rounded border bg-background px-2 py-1" value={x} onChange={e => setX(Number(e.target.value))}>
+          <option value={-1}>{filesText("data_table.row_number")}</option>{numericColumns.map(col => <option key={col.index} value={col.index}>{col.name}</option>)}
         </select></label>
-        <label className="flex items-center gap-2">Y axis<select className="max-w-52 rounded border bg-background px-2 py-1" value={y} onChange={e => setY(Number(e.target.value))}>
+        <label className="flex items-center gap-2">{filesText("data_table.y_axis")}<select className="max-w-52 rounded border bg-background px-2 py-1" value={y} onChange={e => setY(Number(e.target.value))}>
           {numericColumns.map(col => <option key={col.index} value={col.index}>{col.name}</option>)}
         </select></label>
       </div>
-      <NumericChart points={points} xLabel={x === -1 ? "Row number" : summary.columns[x]?.name ?? "X"} yLabel={summary.columns[y]?.name ?? "Y"} />
-      <p className="text-xs text-muted-foreground">{points.length} numeric pairs from {summary.head.length} preview rows. Missing and nonnumeric pairs are omitted. Table search and sorting do not change the plot.</p>
+      <NumericChart points={points} xLabel={x === -1 ? filesText("data_table.row_number") : summary.columns[x]?.name ?? "X"} yLabel={summary.columns[y]?.name ?? "Y"} />
+      <p className="text-xs text-muted-foreground">{filesText("data_table.plot_scope", { count: points.length, rows: summary.head.length })}</p>
     </div> : <>
-      <input aria-label="Search preview rows" placeholder="Search preview rows…" value={search} onChange={e => setSearch(e.target.value)} className="w-full rounded-md border bg-background px-3 py-2 text-xs" />
+      <input aria-label={filesText("data_table.search_preview_rows")} placeholder={filesText("data_table.search_preview_rows_variant")} value={search} onChange={e => setSearch(e.target.value)} className="w-full rounded-md border bg-background px-3 py-2 text-xs" />
       <div className="max-h-[32rem] overflow-auto rounded-md border">
         <table className="w-full border-collapse text-xs">
           <thead><tr>{summary.columns.map((col, i) => <th key={i} aria-sort={sort?.column === i ? (sort.desc ? "descending" : "ascending") : "none"}
@@ -95,9 +96,9 @@ export default function DataTable({ summary }: { summary: TableSummary }) {
             </td>)}
           </tr>)}</tbody>
         </table>
-        {!rows.length && <p className="p-6 text-center text-xs text-muted-foreground">{summary.head.length ? "No matching preview rows." : "No data rows in this table."}</p>}
+        {!rows.length && <p className="p-6 text-center text-xs text-muted-foreground">{summary.head.length ? filesText("data_table.no_matching_preview_rows") : filesText("data_table.no_data_rows_in_this_table")}</p>}
       </div>
-      {summary.cell_limit && <p className="text-[11px] text-muted-foreground">Long cell values are limited to {summary.cell_limit} characters.</p>}
+      {summary.cell_limit && <p className="text-[11px] text-muted-foreground">{filesText("data_table.cell_limit", { count: summary.cell_limit })}</p>}
     </>}
   </div>;
 }

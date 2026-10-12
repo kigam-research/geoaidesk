@@ -1,7 +1,10 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { LoaderCircleIcon, SparklesIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
+const filesText = geoText("files");
 
 export function AiEditPopover({
   anchor,
@@ -53,7 +56,7 @@ export function AiEditPopover({
           ref={inputRef}
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
-          placeholder="Edit selection… e.g. “convert to a booktabs table”"
+          placeholder={filesText("ai_edit_popover.edit_selection_e_g_convert_to_a_booktabs_table")}
           disabled={busy}
           className="min-w-0 flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground/60"
         />
@@ -61,8 +64,7 @@ export function AiEditPopover({
           <LoaderCircleIcon className="size-3.5 animate-spin text-muted-foreground" />
         ) : (
           <button type="submit" className="rounded bg-violet-600 px-2 py-0.5 text-[11px] text-white hover:bg-violet-700">
-            Go
-          </button>
+             {filesText("ai_edit_popover.go")} </button>
         )}
         <button type="button" onClick={onCancel} className="rounded p-0.5 text-muted-foreground hover:text-foreground">
           <XIcon className="size-3" />

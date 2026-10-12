@@ -7,13 +7,16 @@
  * deadline and is aborted when the panel unmounts, so switching files doesn't
  * leave work in flight either.
  */
+import { geoText } from "@/geo/i18n";
+
+const filesText = geoText("files");
 
 /** Slightly above the server-side helper timeout so its error text wins. */
 export const SCI_FETCH_TIMEOUT_MS = 70_000;
 
 export class SciTimeoutError extends Error {
   constructor(seconds: number) {
-    super(`Preview timed out after ${seconds}s — the file may be too large.`);
+    super(filesText("scientific_fetch.timeout", { seconds }));
     this.name = "SciTimeoutError";
   }
 }

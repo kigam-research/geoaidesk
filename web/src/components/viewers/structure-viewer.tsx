@@ -1,8 +1,11 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useEffect, useRef, useState } from "react";
 import { rawFileUrl, sciSummaryUrl } from "@/lib/use-sandbox";
 import { fetchSciJson, isAbortError, SCI_FETCH_TIMEOUT_MS, SciTimeoutError } from "@/lib/sci-fetch";
 import type { ViewerProps } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 /**
  * 3Dmol parses the whole structure into JS objects on the main thread, so a
@@ -140,38 +143,32 @@ export default function StructureViewer({ path, name, projectId }: ViewerProps) 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2 text-xs">
           <span className="font-semibold">{summary.title}</span>
           <span className="text-muted-foreground">·</span>
-          <span className="text-muted-foreground">{summary.num_atoms.toLocaleString()} atoms</span>
+          <span className="text-muted-foreground">{filesText("structure_viewer.atom_count", { count: summary.num_atoms })}</span>
           <span className="text-muted-foreground">·</span>
-          <span className="text-muted-foreground">{summary.num_chains} chain{summary.num_chains !== 1 ? "s" : ""}{summary.chains.length ? ` (${summary.chains.slice(0, 8).join(", ")})` : ""}</span>
-          {summary.num_ligands > 0 && (<><span className="text-muted-foreground">·</span><span className="text-muted-foreground">{summary.num_ligands} ligand{summary.num_ligands !== 1 ? "s" : ""}</span></>)}
+          <span className="text-muted-foreground">{filesText("structure_viewer.chain_count", { count: summary.num_chains, names: summary.chains.length ? ` (${summary.chains.slice(0, 8).join(", ")})` : "" })}</span>
+          {summary.num_ligands > 0 && (<><span className="text-muted-foreground">·</span><span className="text-muted-foreground">{filesText("structure_viewer.ligand_count", { count: summary.num_ligands })}</span></>)}
           {summary.resolution != null && (<><span className="text-muted-foreground">·</span><span className="text-muted-foreground">{summary.resolution.toFixed(2)} Å</span></>)}
         </div>
       )}
       {summaryErr && (
-        <div className="border-b px-4 py-2 text-xs text-muted-foreground">Metadata unavailable: {summaryErr}</div>
+        <div className="border-b px-4 py-2 text-xs text-muted-foreground">{filesText("structure_viewer.metadata_error", { error: summaryErr })}</div>
       )}
       <div className="relative flex-1 min-h-0">
         <div ref={mountRef} className="absolute inset-0" />
         {oversizeBytes !== null && !loadAnyway && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/90 p-6 text-center text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">
-              This structure is {formatBytes(oversizeBytes)}
-            </p>
+            <p className="font-medium text-foreground">{filesText("structure_viewer.structure_size", { size: formatBytes(oversizeBytes) })}</p>
             <p className="max-w-md text-xs">
-              Rendering it in the browser may make the tab unresponsive for a while.
-            </p>
+               {filesText("structure_viewer.rendering_it_in_the_browser_may_make_the_tab_unresponsive_for_a_while")} </p>
             <button
               onClick={() => setLoadAnyway(true)}
               className="rounded border px-3 py-1 text-xs transition-colors hover:bg-muted"
             >
-              Render anyway
-            </button>
+               {filesText("structure_viewer.render_anyway")} </button>
           </div>
         )}
         {viewerErr && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 p-6 text-center text-sm text-muted-foreground">
-            3D viewer failed to load: {viewerErr}
-          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80 p-6 text-center text-sm text-muted-foreground">{filesText("structure_viewer.viewer_error", { error: viewerErr })}</div>
         )}
       </div>
     </div>
