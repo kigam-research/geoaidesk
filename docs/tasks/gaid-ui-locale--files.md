@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T14:43:36Z
+status: ready
+updated: 2026-10-12T14:44:15Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e2cc47a6-cd2c-4eb2-911c-522a86045e22","pid":152477,"provider":"codex","session":"01a13070-75c8-77a1-a5c2-ca68669a3ef0","start":"28003948","token":"69ab13e691a305143f67d8563026fb4180aee339a81920be8fd79e309661e036"}
 branch: task/gaid-ui-locale--files
 target: task/gaid-ui-locale
@@ -102,8 +102,9 @@ Intentional exclusions: user/source data, scientific units and schema names, cod
 
 English source text is unchanged; composed messages use ICU with the same words, values and plural rules. Korean statuses omit upstream Saved! punctuation. Full translation inventory: files/en.json records the upstream before and unchanged English after; files/ko.json records the Korean after (Korean before was upstream English), keyed by identical message ids.
 ## Next steps
-1. Save final verification evidence and run task finish.
-2. Parent integrates with task complete, registers the five additional upstream files, runs cross-app checks, and records the embedded vendor UI language limitation.
+<!-- task:closed -->
+Closed 2026-10-12T14:44:15Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - The first isolated web-test job exited 127 before tests: snapshot excludes node_modules, so vitest was absent. Replacement job explicitly installed the lockfile dependencies and passed. The failed job is marked superseded by the replacement receipt.
 ## Notes and decisions
