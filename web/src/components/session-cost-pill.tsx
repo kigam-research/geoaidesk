@@ -186,7 +186,7 @@ export function SessionCostPill({
             )}
             {(projectSummary.subscriptionTokens ?? 0) > 0 ? (
               <div className="mt-1 text-xs text-muted-foreground">
-                {formatTokens(projectSummary.subscriptionTokens ?? 0)} {workText("session_cost_pill.subscription_tokens_are_tracked_separately_from_this_spend")}</div>
+                {workText("session_cost_pill.subscription_separate", { tokens: formatTokens(projectSummary.subscriptionTokens ?? 0) })}</div>
             ) : null}
             {ratio !== null && (
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">

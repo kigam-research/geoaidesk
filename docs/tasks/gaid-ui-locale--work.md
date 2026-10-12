@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:27:25Z
+updated: 2026-10-12T22:29:57Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -98,9 +98,9 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-- Implemented work-area localization in 27 owned upstream component files; existing app namespace ids remain unchanged. Added 737 paired work messages and GAID-only display adapters in web/src/geo/work-labels.ts with a 3-test regression suite.
+- Implemented work-area localization in 27 owned upstream component files; existing app namespace ids remain unchanged. Added 736 paired work messages and GAID-only display adapters in web/src/geo/work-labels.ts with a 3-test regression suite.
 - Includes 229 database descriptions and 18 categories, translated at display time only (original database objects and model/server prompt payloads are unchanged). Known status/outcome/source codes, counts, accessibility labels, dates and relative times follow gaid:locale.
-- TypeScript passed after the conversion; the new display-adapter tests pass (3/3). Copy validator: 0 errors, 15 warnings (12 work warnings reviewed below). Final full-suite snapshot job still needs to run with its own dependencies.
+- TypeScript passed after the conversion; the new display-adapter tests pass (3/3). Copy validator: 0 errors, 15 warnings (12 work warnings reviewed below). Full suite at checkpoint 38d5e4: 974 passed, 1 failed (Exit code whitespace, fixed). Final rerun pending. Last focused rerun: 3 files / 23 tests passed (system card, session cost, display adapters).
 - Rough scanner remaining owned-file hits: model-selector.tsx: `ollama pull qwen3.6` (command), `Openrouter Fusion` (product name); tool-activity.tsx: `Modal ·` (product name plus punctuation). All intentionally unchanged under do-not-translate rules.
 - Also intentionally unchanged: user/model-authored chat/record/skill/specialist names and bodies, file paths and URLs, tool logs/results, protocol identifiers, CSS, keyboard keys, model/provider/hardware names and units. App-generated labels surrounding those values are localized.
 - No other upstream files touched. New files are GAID-only work-labels.ts and work-labels.test.ts. Already-localized owned files with no new literals need no code change (page/project screens, selectors and menus retain their existing app ids).
@@ -111,6 +111,7 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
 2. Record final TypeScript/full suite/copy/scanner evidence, save the task document and run task finish for parent integration.
 
 ## Failed approaches
+- Full-web job 2 ran all 975 tests and found one whitespace regression: Exit code and its value lost their separator. Replaced the entire label/value with an ICU message (and fixed the parallel byte counter); tests are rerun without changing assertions.
 - Initial full-web job job-geoaidesk-gaid-ui-locale--work-1 failed before tests: isolated snapshot had no web/node_modules, so vitest was not found. The worktree's npm ci was successful; the next snapshot job installs its own dependencies before running tests.
 - Extraction script initially detected overlapping edits; fixed before proceeding. Early TypeScript run caught duplicate geoText imports; removed them and reran successfully.
 - Provider capacity errors interrupted the writer/translation reader; preserved checkpoint 3b18ed6 and resumed without discarding edits.
@@ -138,6 +139,7 @@ Child result is recorded here for the parent's canonical report; no separate chi
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T222158.203823Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T222738.829157Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

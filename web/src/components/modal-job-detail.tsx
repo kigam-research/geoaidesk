@@ -263,7 +263,7 @@ function LiveLogs({
             {workText("modal_job_detail.live")}</span>
         ) : null}
         <span className="ml-auto text-[9px] tabular-nums text-muted-foreground">
-          {workText("modal_job_detail.byte")}{logs.cursor.toLocaleString(geoLocale())}
+          {workText("modal_job_detail.byte_value", { count: logs.cursor.toLocaleString(geoLocale()) })}
         </span>
         <button
           type="button"
@@ -451,7 +451,7 @@ export function ModalJobDetail({
                   </p>
                   {job.exitCode !== null ? (
                     <p className="mt-1 text-[10px] text-muted-foreground">
-                      {workText("modal_job_detail.exit_code")}{job.exitCode}
+                      {workText("modal_job_detail.exit_code_value", { code: job.exitCode })}
                     </p>
                   ) : null}
                 </div>

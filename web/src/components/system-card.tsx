@@ -97,7 +97,12 @@ function formatDetail(key: string, value: string | number | boolean): string {
   if (key === "durationMs" && typeof value === "number") {
     return value >= 60_000 ? workText("system_card.value_min", { v0: Math.round(value / 60_000) }) : workText("system_card.value_s", { v0: Math.max(1, Math.round(value / 1000)) });
   }
-  if (typeof value === "string") return workLabel("status", value, workLabel("code", value, value.replace(/_/g, " ")));
+  if (typeof value === "string") {
+    const fallback = value.replace(/_/g, " ");
+    if (key === "status" || key === "state") return workLabel("status", value, fallback);
+    if (key === "outcome") return workLabel("outcome", value, workLabel("status", value, fallback));
+    return fallback;
+  }
   return String(value);
 }
 

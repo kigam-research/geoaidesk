@@ -80,7 +80,6 @@
   "modal_job_detail.open_value": "Open {v0}",
   "modal_job_detail.value_copied": "{v0} copied",
   "modal_job_detail.live": "live",
-  "modal_job_detail.byte": "byte",
   "modal_job_detail.copy_value": "Copy {v0}",
   "modal_job_detail.earlier_retained_output_was_truncated": "Earlier retained output was truncated.",
   "modal_job_detail.value_log": "{v0} log",
@@ -98,7 +97,6 @@
   "modal_job_detail.remote_sandbox_lost": "Remote sandbox lost",
   "modal_job_detail.job_failure": "Job failure",
   "modal_job_detail.the_job_ended_with_status_value": "The job ended with status {v0}.",
-  "modal_job_detail.exit_code": "Exit code",
   "modal_job_detail.requested_resource": "Requested resource",
   "modal_job_detail.resolved_resource": "Resolved resource",
   "modal_job_detail.elapsed": "Elapsed",
@@ -153,7 +151,6 @@
   "session_cost_pill.project_billable_spend": "Project billable spend",
   "session_cost_pill.value_held_for_compute_jobs": " · {v0} held for compute jobs",
   "session_cost_pill.value_in_the_current_run": " · {v0} in the current run",
-  "session_cost_pill.subscription_tokens_are_tracked_separately_from_this_spend": "subscription tokens are tracked separately from this spend.",
   "session_cost_pill.spend_limit_reached_new_billable_api_and_compute_work_is_blocked_until_the_limit_is_raised_prov": "Spend limit reached. New billable API and compute work is blocked until the limit is raised; provider-managed subscription and local runs can continue.",
   "session_cost_pill.approaching_the_spend_limit_80": "Approaching the spend limit (≥80%).",
   "session_cost_pill.this_session": "This session",
@@ -735,5 +732,7 @@
   "slash_kind.template": "template",
   "slash_kind.skill": "skill",
   "skills_selector.author": "by {author}",
-  "modal_job_detail.artifacts_count": "Artifacts · {count}"
+  "modal_job_detail.artifacts_count": "Artifacts · {count}",
+  "modal_job_detail.exit_code_value": "Exit code {code}",
+  "modal_job_detail.byte_value": "byte {count}"
 }
