@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:32:37Z
+updated: 2026-10-12T14:34:17Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"334bb7bf-c7ab-4250-b73e-1471a312e37f","pid":156917,"provider":"codex","session":"01a13070-cbd3-7342-84f1-7f5315c5f76d","start":"28006151","token":"3629085d8a1d23c5b9de8f99b11198713cbb9dc06174c176c4fe351ffbf0c804"}
 branch: task/gaid-ui-locale--notebook
 target: task/gaid-ui-locale
@@ -74,9 +74,28 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implemented 264 new paired notebook messages across all nine owned files, plus two shared display helpers. Preserved existing app/workspace scientific-result ids. Copy validator: 0 errors; six notebook English warnings reviewed as negated verification/automatic-inference limits, not promotional claims. Scanner has only git HEAD and InChI in owned files (technical identifiers). Typecheck passed after fixing optional count argument types and preserving the artifact role enum. Full web tests are next.
+Implemented 264 paired messages in notebook/en.json and notebook/ko.json. All nine owned files now use catalogue text for UI copy, including authored evidence/execution status labels, entry types, confidence levels, relative ages, counts, result-reference limits, provenance actors and artifact roles. Existing app/workspace scientific-result ids are unchanged. Dates and numbers use geoLocale(). Implementation saved/pushed at 223d3239f75d; full web tests are running as recorded job 2.
+
+Files edited: all nine owned files; web/src/geo/locales/notebook/{ko,en}.json; task document. Extra upstream files requiring parent boundary registration: web/src/lib/notebook-filters.ts (Kady lead/You labels), web/src/lib/notebook-timeline.ts (day-divider date locale). No other upstream files or shared semantic/model-input helpers changed.
+
+English prose changes: none. Existing English is retained, with ICU arguments/plurals replacing concatenation. Korean previously had no messages in this namespace; all 264 are new. Representative before/after pairs (full id/text mapping is the two catalogue diffs):
+
+| Id (notebook prefix) | Previous visible text (both modes) | English after | Korean after |
+|---|---|---|---|
+| header.title | Lab Notebook | Lab Notebook | 연구 노트 |
+| header.this_chat | This chat | This chat | 현재 채팅 |
+| entry.planning_only | Planning record only — not observed evidence, a performed method or execution approval. | unchanged | 계획 기록일 뿐이며 관찰된 근거, 수행한 방법 또는 실행 승인이 아닙니다. |
+| evidence.reported_only | — reported, not independently verified | unchanged | — 보고된 상태이며 독립적으로 확인하지 않았습니다 |
+| execution.completed | completed | completed | 실행 완료 |
+| provenance.current | Current — the bytes on disk match what the producing step recorded. | unchanged | 일치함 — 디스크의 바이트가 생성 단계의 기록과 같습니다. |
+| provenance.hashed_later | hashed later | hashed later | 사후 해시 계산 |
+
+Intentionally preserved: user/agent-authored titles, bodies, evidence, limitations and labels; paths, filenames, ids, hash/package/version/OS values; raw API error/reason/log details; protocol enum values and tool names; keyboard keys and code/CSS/test ids. Technical labels/units stay literal (git HEAD, InChI, R, Python, sha256, n, CI, dimN, B/KB/MB/GB). Export/server/model-generated document content and imported research dialogs are outside the owned-file contract. resultReferenceText remains unchanged for shared server/export consumers; the component now formats its own localized display.
+
+Verification so far: local web npm ci completed; web npx tsc --noEmit passed; copy validator 0 errors / 9 total warnings (6 notebook warnings reviewed: negated verified/automatically clauses and saved-result schema validation, no scientific-validity claim); scanner only git HEAD and InChI in owned files; all 264 paired ICU messages formatted in both locales for count 0, 1 and 2; git diff --check passed. No model calls or browser screenshots.
+
 ## Next steps
-1. Complete typecheck and full web tests, record results, then save and finish.
+1. Read recorded job 2 result when notified; fix any relevant failure, then save the final task report and finish.
 ## Failed approaches
 - Initial task resume waited for another transaction; retry succeeded with no relocation.
 - The first recorded npm-ci job installed dependencies in its isolated source snapshot, not this worktree. Installed once in web locally as required by the child contract. A second job attempt was rejected before launch because the task source was dirty; no job to resume.
@@ -92,12 +111,15 @@ Implemented 264 new paired notebook messages across all nine owned files, plus t
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Child result is documented in Current state for integration into the parent report. No standalone child report.
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--notebook-20261012T142357.390360Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--notebook-20261012T143312.219855Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
