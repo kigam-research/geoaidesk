@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:49:18Z
+updated: 2026-10-12T23:09:32Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -57,6 +57,19 @@ language should follow the UI language. The user decided (verbatim):
   can close.
 
 ## Current state
+Result (2026-10-13): one language setting now switches the whole app. All six child packages are integrated and
+closed: 3,863 new ko/en message pairs (workflows 1,197 incl. 326 upstream workflow names/descriptions/484 input labels/
+22 categories; work 736 incl. 229 database descriptions; settings 721; research 480; files 465; notebook 264) across 92
+upstream files (all registered in geo/integration-boundaries.json, owner gaid-ui-locale). English mode is unchanged except
+three validator-driven English rewordings (comparative-genomics description, services Gemini note, plaid database
+description). Agent reply language: REPLY_LANGUAGE_RULE in GEO_INSTRUCTIONS (user-named language, else the latest
+request's language); the UI locale never reaches the server; verified with local qwen3 30B and MiniMax-M3 (ko→ko,
+en→en, ko+"답은 영어로"→en). Remaining English (report §5): upstream workflow prompts (open decision), server-generated
+messages, file/catalogue-authored content (skill descriptions, seeded templates/specialists), embedded LibreOffice
+dialogs, product/command names. Scanner: 1,191 → 21 hits (all commands/product names). Report:
+reports/2026-10-13-gaid-ui-locale/index.md. Interim results reached main through task complete (PRs #22–#27).
+
+Details:
 - Shared setup done (writer): namespaces `settings`, `notebook`, `research`, `files`, `work`, `workflows` registered in
   `web/src/geo/locales/index.ts` (empty `{}` catalogues); one boundaries seam per package in
   `geo/integration-boundaries.json` (owner `gaid-ui-locale`, added to `geo/tests/distribution.test.mjs` owners).
@@ -92,8 +105,9 @@ language should follow the UI language. The user decided (verbatim):
   files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
 
 ## Next steps
-1. Wait for child finishes; `task complete gaid-ui-locale--<child>` each, in integration order. Meanwhile prepare the
-   browser screenshot script and own app instance (ports other than 3000/18000).
+1. `task finish` (runs scripts/check); afterwards remove build caches (server/node_modules, server/src/helpers/.venv,
+   web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__) if close reports them.
+   Own app unit `gaid-ui-locale-app` is stopped.
 
 ## Children (started 2026-10-12, profile "general work", prompts in ~/data/geoaidesk/work/gaid-ui-locale/prompts/)
 - gaid-ui-locale--workflows: agent 7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb — completed and closed
@@ -147,11 +161,13 @@ boundaries against `git diff --name-only origin/main`, rescan, browser screensho
   hosted-model reply-language check in addition to the local model.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [선택] K-Dense workflow 프롬프트 본문(326개)을 한국어로도 둘지 — 가) 영어 유지, 한국어 답은 요청에 지시를 덧붙임 — 나) 한국어 프롬프트를 추가해 한국어 모드에서 한국어 요청으로 넣음(별도 작업, 약 42만 자) — 권장: 가) 번역량이 크고 프롬프트는 화면 문구가 아닌 요청 내용이며 응답 언어 규칙이 지시를 따름 — 막힌 일: 없음 — 근거: reports/2026-10-13-gaid-ui-locale#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-13-gaid-ui-locale/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
