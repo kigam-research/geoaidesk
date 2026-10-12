@@ -1,5 +1,8 @@
 "use client";
+import { geoLocale, geoText } from "@/geo/i18n";
 import { useEffect, useRef, useState } from "react";
+
+const filesText = geoText("files");
 
 export interface ArrayPlot {
   kind: "line" | "heatmap";
@@ -17,7 +20,7 @@ export interface ArrayPlot {
 
 export function formatNumber(value: number | null): string {
   if (value === null || !Number.isFinite(value)) return "—";
-  return new Intl.NumberFormat("en", { maximumSignificantDigits: 5 }).format(value);
+  return new Intl.NumberFormat(geoLocale(), { maximumSignificantDigits: 5 }).format(value);
 }
 
 /** Numeric axes (not category spacing), with gaps left in line series. */
@@ -51,8 +54,8 @@ export function NumericChart({ points, xLabel, yLabel, line = false }: {
     return () => { alive = false; chart?.destroy(); };
   }, [points, xLabel, yLabel, line]);
   return <div className="h-64 min-w-0">
-    {error ? <p className="p-4 text-sm text-muted-foreground">Chart unavailable. Values remain in the preview.</p>
-      : <canvas ref={canvas} role="img" aria-label={`${yLabel} versus ${xLabel}`} />}
+    {error ? <p className="p-4 text-sm text-muted-foreground">{filesText("data_plots.chart_unavailable_values_remain_in_the_preview")}</p>
+      : <canvas ref={canvas} role="img" aria-label={filesText("data_plots.chart_alt", { y: yLabel, x: xLabel })} />}
   </div>;
 }
 
@@ -70,10 +73,10 @@ function Heatmap({ plot }: { plot: ArrayPlot }) {
       ctx.fillRect(x, y, 1, 1);
     }));
   }, [plot, min, max]);
-  if (min === null) return <p className="p-4 text-sm text-muted-foreground">No finite values in this slice.</p>;
+  if (min === null) return <p className="p-4 text-sm text-muted-foreground">{filesText("data_plots.no_finite_values_in_this_slice")}</p>;
   return <div className="space-y-2">
-    <p className="text-xs text-muted-foreground">Columns {plot.x[0]}–{plot.x.at(-1)} · rows {plot.y[0]}–{plot.y.at(-1)} (zero-based, row 0 at top)</p>
-    <canvas ref={canvas} width={plot.x.length} height={plot.y.length} role="img" aria-label="Array heatmap"
+    <p className="text-xs text-muted-foreground">{filesText("data_plots.heatmap_bounds", { x0: plot.x[0], x1: plot.x.at(-1) ?? 0, y0: plot.y[0], y1: plot.y.at(-1) ?? 0 })}</p>
+    <canvas ref={canvas} width={plot.x.length} height={plot.y.length} role="img" aria-label={filesText("data_plots.array_heatmap")}
       className="h-auto max-h-96 w-full rounded border object-contain [image-rendering:pixelated]"
       style={{ aspectRatio: `${plot.x.length} / ${plot.y.length}` }}
       onMouseLeave={() => setHover("")}
@@ -84,32 +87,31 @@ function Heatmap({ plot }: { plot: ArrayPlot }) {
         const x = Math.floor((event.clientX - rect.left - (rect.width - scale * plot.x.length) / 2) / scale);
         const y = Math.floor((event.clientY - rect.top - (rect.height - scale * plot.y.length) / 2) / scale);
         setHover(x >= 0 && x < plot.x.length && y >= 0 && y < plot.y.length
-          ? `Row ${plot.y[y]}, column ${plot.x[x]}: ${formatNumber(plot.values[y][x])}` : "");
+          ? filesText("data_plots.cell_value", { row: plot.y[y], column: plot.x[x], value: formatNumber(plot.values[y][x]) }) : "");
       }} />
     <div className="flex items-center gap-2 text-xs tabular-nums">
       <span>{formatNumber(min)}</span>
       <div className="h-2 max-w-48 flex-1 rounded bg-gradient-to-r from-[#141e64] to-[#fadc28]" />
-      <span>{formatNumber(max)}</span><span className="ml-2 text-muted-foreground">Missing: gray</span>
+      <span>{formatNumber(max)}</span><span className="ml-2 text-muted-foreground">{filesText("data_plots.missing_gray")}</span>
     </div>
-    <p className="min-h-4 font-mono text-xs text-muted-foreground">{hover || "Hover over a cell to inspect its value."}</p>
+    <p className="min-h-4 font-mono text-xs text-muted-foreground">{hover || filesText("data_plots.hover_over_a_cell_to_inspect_its_value")}</p>
   </div>;
 }
 
 export function ArrayVisualization({ plot }: { plot: ArrayPlot }) {
   return <div className="space-y-3 rounded-lg border bg-background p-4">
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <span className="text-sm font-medium">{plot.kind === "heatmap" ? "Heatmap" : "Line plot"}</span>
-      <span className="text-xs text-muted-foreground">{plot.sampled ? "Strided sample" : "Full slice"} · {plot.x.length * plot.y.length} values</span>
+      <span className="text-sm font-medium">{plot.kind === "heatmap" ? filesText("data_plots.heatmap") : filesText("data_plots.line_plot")}</span>
+      <span className="text-xs text-muted-foreground">{filesText("data_plots.sample_values", { sampled: plot.sampled ? "yes" : "no", count: plot.x.length * plot.y.length })}</span>
     </div>
     {plot.kind === "heatmap" ? <Heatmap plot={plot} /> : <NumericChart
-      points={plot.x.map((x, i) => ({ x, y: plot.values[0][i] }))} xLabel="Index (zero-based)" yLabel="Value" line />}
+      points={plot.x.map((x, i) => ({ x, y: plot.values[0][i] }))} xLabel={filesText("data_plots.index_zero_based")} yLabel={filesText("data_plots.value")} line />}
     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-      <span>Min <strong className="font-mono text-foreground">{formatNumber(plot.stats.min)}</strong></span>
-      <span>Max <strong className="font-mono text-foreground">{formatNumber(plot.stats.max)}</strong></span>
-      <span>Mean <strong className="font-mono text-foreground">{formatNumber(plot.stats.mean)}</strong></span>
-      <span>{plot.missing} missing / nonfinite</span>
+      <span>{filesText("data_plots.min")} <strong className="font-mono text-foreground">{formatNumber(plot.stats.min)}</strong></span>
+      <span>{filesText("data_plots.max")} <strong className="font-mono text-foreground">{formatNumber(plot.stats.max)}</strong></span>
+      <span>{filesText("data_plots.mean")} <strong className="font-mono text-foreground">{formatNumber(plot.stats.mean)}</strong></span>
+      <span>{filesText("data_plots.missing_count", { count: plot.missing })}</span>
     </div>
-    <p className="text-xs text-muted-foreground">Statistics and color range describe the displayed {plot.sampled ? "sample" : "slice"} only.
-      {plot.leading_indices.length > 0 && ` Leading dimension indices: [${plot.leading_indices.join(", ")}].`}</p>
+    <p className="text-xs text-muted-foreground">{filesText("data_plots.statistics_scope", { sampled: plot.sampled ? "yes" : "no", indices: plot.leading_indices.length > 0 ? filesText("data_plots.leading_indices", { indices: plot.leading_indices.join(", ") }) : "" })}</p>
   </div>;
 }

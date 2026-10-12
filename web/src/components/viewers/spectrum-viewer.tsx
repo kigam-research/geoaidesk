@@ -1,8 +1,11 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useEffect, useRef, useState } from "react";
 import { sciSummaryUrl } from "@/lib/use-sandbox";
 import { fetchSciJson, isAbortError } from "@/lib/sci-fetch";
 import type { ViewerProps } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 interface SpectrumEntry {
   id: string;
@@ -118,8 +121,7 @@ function SpectrumChart({ config }: { config: Record<string, unknown> }) {
   if (chartError) {
     return (
       <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-        (chart unavailable)
-      </div>
+         {filesText("spectrum_viewer.chart_unavailable")} </div>
     );
   }
   return <canvas ref={canvasRef} />;
@@ -152,7 +154,7 @@ export default function SpectrumViewer({ path, projectId }: ViewerProps) {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">Spectrum preview failed</p>
+        <p className="font-medium">{filesText("spectrum_viewer.spectrum_preview_failed")}</p>
         <p className="max-w-md text-xs">{error}</p>
       </div>
     );
@@ -171,9 +173,7 @@ export default function SpectrumViewer({ path, projectId }: ViewerProps) {
   return (
     <div className="flex h-full flex-col overflow-auto">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2 text-xs">
-        <span className="font-semibold">
-          {summary.n_spectra} spectra · {summary.format}
-        </span>
+        <span className="font-semibold">{filesText("spectrum_viewer.spectrum_count", { count: summary.n_spectra, format: summary.format })}</span>
         {summary.title && <span className="text-muted-foreground">{summary.title}</span>}
       </div>
 
@@ -181,15 +181,14 @@ export default function SpectrumViewer({ path, projectId }: ViewerProps) {
         {summary.chromatogram && (
           <div>
             <p className="mb-1 text-xs font-medium text-muted-foreground">
-              Total ion chromatogram
-            </p>
+               {filesText("spectrum_viewer.total_ion_chromatogram")} </p>
             <div className="h-56">
               <SpectrumChart
                 config={lineConfig(
                   summary.chromatogram.x,
                   summary.chromatogram.y,
-                  "retention time",
-                  "intensity",
+                  filesText("spectrum_viewer.retention_time"),
+                  filesText("spectrum_viewer.intensity"),
                 )}
               />
             </div>
@@ -200,8 +199,7 @@ export default function SpectrumViewer({ path, projectId }: ViewerProps) {
           <div>
             <div className="mb-2 flex items-center gap-2">
               <label htmlFor="spectrum-select" className="text-xs font-medium text-muted-foreground">
-                Spectrum
-              </label>
+                 {filesText("spectrum_viewer.spectrum")} </label>
               <select
                 id="spectrum-select"
                 className="rounded-md border bg-background px-2 py-1 text-xs"
@@ -215,9 +213,7 @@ export default function SpectrumViewer({ path, projectId }: ViewerProps) {
                 ))}
               </select>
               {selected?.precursor_mz != null && (
-                <span className="text-xs text-muted-foreground">
-                  precursor m/z {selected.precursor_mz.toFixed(4)}
-                </span>
+                <span className="text-xs text-muted-foreground">{filesText("spectrum_viewer.precursor", { value: selected.precursor_mz.toFixed(4) })}</span>
               )}
               {selected?.rt != null && (
                 <span className="text-xs text-muted-foreground">rt {selected.rt.toFixed(2)}</span>

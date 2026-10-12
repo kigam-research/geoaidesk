@@ -3,6 +3,9 @@
  * machine (figure/table pick up their \caption); good enough for real papers
  * and cheap enough to re-run on a 300ms debounce.
  */
+import { geoText } from "@/geo/i18n";
+
+const filesText = geoText("files");
 export type OutlineKind =
   | "part" | "chapter" | "section" | "subsection" | "subsubsection"
   | "paragraph" | "figure" | "table";
@@ -68,7 +71,7 @@ export function parseOutline(text: string): OutlineItem[] {
     if (fb) {
       const item: OutlineItem = {
         kind: fb[1] as "figure" | "table",
-        title: fb[1] === "figure" ? "Figure" : "Table",
+        title: fb[1] === "figure" ? filesText("latex_outline.figure") : filesText("latex_outline.table"),
         line: i + 1,
         depth: depth + 1,
       };

@@ -1,10 +1,13 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useEffect, useState } from "react";
 import { fileCategory, sciSummaryUrl } from "@/lib/use-sandbox";
 import { fetchSciJson, isAbortError } from "@/lib/sci-fetch";
 import type { ViewerProps } from "@/lib/viewers/registry";
 import DataTable, { type TableSummary } from "./data-table";
 import { ArrayVisualization, formatNumber, type ArrayPlot } from "./data-plots";
+
+const filesText = geoText("files");
 
 // ---------------------------------------------------------------------------
 // Shapes (mirrors server/src/helpers/arrays_helper.py's JSON output)
@@ -117,7 +120,7 @@ function TreeView({ summary }: { summary: TreeSummary }) {
                     : "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300"
                 }`}
               >
-                {node.type}
+                {filesText("arraydata_viewer.node_type", { type: node.type })}
               </span>
               <span>{node.path || "/"}</span>
               {(node.shape || node.dtype) && (
@@ -132,9 +135,7 @@ function TreeView({ summary }: { summary: TreeSummary }) {
         })}
       </ul>
       {summary.truncated && (
-        <p className="mt-3 text-xs text-muted-foreground">
-          Tree truncated — showing the first {summary.tree.length} nodes.
-        </p>
+        <p className="mt-3 text-xs text-muted-foreground">{filesText("arraydata_viewer.tree_truncated", { count: summary.tree.length })}</p>
       )}
     </div>
   );
@@ -150,22 +151,20 @@ function NdarrayView({ summary }: { summary: NdarraySummary }) {
       {summary.arrays.map((arr, i) => (
         <div key={`${arr.name}-${i}`} className="rounded-md border p-3">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-sm font-semibold">{arr.name || "(unnamed)"}</span>
+            <span className="font-mono text-sm font-semibold">{arr.name || filesText("arraydata_viewer.unnamed")}</span>
             <span className="text-xs text-muted-foreground">
               [{arr.shape.join(", ")}] · {arr.dtype}
             </span>
           </div>
           <div className="mb-2 flex flex-wrap gap-2">
-            <Stat label="min" value={formatNumber(arr.min)} />
-            <Stat label="max" value={formatNumber(arr.max)} />
-            <Stat label="mean" value={formatNumber(arr.mean)} />
+            <Stat label={filesText("arraydata_viewer.stat_min")} value={formatNumber(arr.min)} />
+            <Stat label={filesText("arraydata_viewer.stat_max")} value={formatNumber(arr.max)} />
+            <Stat label={filesText("arraydata_viewer.stat_mean")} value={formatNumber(arr.mean)} />
           </div>
           <div className="overflow-x-auto rounded bg-muted/20 p-2">
-            <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-              displayed values{arr.preview.length > 0 ? ` (first ${arr.preview.length})` : ""}
-            </p>
+            <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">{filesText("arraydata_viewer.displayed_values", { count: arr.preview.length })}</p>
             <p className="whitespace-pre-wrap break-all font-mono text-[11px]">
-              {arr.preview.length > 0 ? arr.preview.map(value => value ?? "—").join(", ") : "(empty)"}
+              {arr.preview.length > 0 ? arr.preview.map(value => value ?? "—").join(", ") : filesText("arraydata_viewer.empty")}
             </p>
           </div>
         </div>
@@ -183,7 +182,7 @@ function VariablesView({ summary }: { summary: VariablesSummary }) {
   return (
     <div className="space-y-4 p-4">
       <div>
-        <p className="mb-1 text-xs font-medium text-muted-foreground">Dimensions</p>
+        <p className="mb-1 text-xs font-medium text-muted-foreground">{filesText("arraydata_viewer.dimensions")}</p>
         <div className="flex flex-wrap gap-1.5">
           {Object.entries(summary.dimensions ?? {}).map(([name, size]) => (
             <span
@@ -197,17 +196,15 @@ function VariablesView({ summary }: { summary: VariablesSummary }) {
       </div>
 
       <div>
-        <p className="mb-1 text-xs font-medium text-muted-foreground">
-          Variables ({summary.num_variables})
-        </p>
+        <p className="mb-1 text-xs font-medium text-muted-foreground">{filesText("arraydata_viewer.variable_count", { count: summary.num_variables })}</p>
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr>
-                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">name</th>
-                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">dims</th>
-                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">shape</th>
-                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">dtype</th>
+                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">{filesText("arraydata_viewer.column_name")}</th>
+                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">{filesText("arraydata_viewer.column_dims")}</th>
+                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">{filesText("arraydata_viewer.column_shape")}</th>
+                <th className="border-b bg-muted px-3 py-1.5 text-left font-semibold">{filesText("arraydata_viewer.column_dtype")}</th>
               </tr>
             </thead>
             <tbody>
@@ -223,15 +220,13 @@ function VariablesView({ summary }: { summary: VariablesSummary }) {
           </table>
         </div>
         {summary.truncated && (
-          <p className="mt-1 text-xs text-muted-foreground">
-            Truncated — showing {summary.variables.length} of {summary.num_variables} variables.
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{filesText("arraydata_viewer.variables_truncated", { shown: summary.variables.length, total: summary.num_variables })}</p>
         )}
       </div>
 
       {globalAttrEntries.length > 0 && (
         <div>
-          <p className="mb-1 text-xs font-medium text-muted-foreground">Global attributes</p>
+          <p className="mb-1 text-xs font-medium text-muted-foreground">{filesText("arraydata_viewer.global_attributes")}</p>
           <ul className="space-y-0.5 font-mono text-[11px]">
             {globalAttrEntries.map(([k, v]) => (
               <li key={k}>
@@ -291,49 +286,46 @@ function DataPreview({ path, projectId }: ViewerProps) {
       </div>
       <div className="flex flex-wrap items-center gap-3 px-4 pt-3 text-xs">
         {collections && collections.length > 0 && <label className="flex min-w-0 items-center gap-2">
-          {summary.format === "xlsx" ? "Sheet" : "Table"}
-          <select aria-label={summary.format === "xlsx" ? "Sheet" : "Table"} className="min-w-0 max-w-80 rounded border bg-background px-2 py-1.5"
+          {summary.format === "xlsx" ? filesText("arraydata_viewer.sheet") : filesText("arraydata_viewer.table")}
+          <select aria-label={summary.format === "xlsx" ? filesText("arraydata_viewer.sheet") : filesText("arraydata_viewer.table")} className="min-w-0 max-w-80 rounded border bg-background px-2 py-1.5"
             value={selection} disabled={loading} onChange={e => { setKey(e.target.value); setSlice(0); }}>
             {collections.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
         </label>}
-        {summary.datasets && summary.datasets.length > 0 && <label className="flex min-w-0 items-center gap-2">Dataset
-          <select aria-label="Dataset" className="min-w-0 max-w-96 rounded border bg-background px-2 py-1.5" value={selection}
+        {summary.datasets && summary.datasets.length > 0 && <label className="flex min-w-0 items-center gap-2">{filesText("arraydata_viewer.dataset")} <select aria-label={filesText("arraydata_viewer.dataset")} className="min-w-0 max-w-96 rounded border bg-background px-2 py-1.5" value={selection}
             disabled={loading} onChange={e => { setKey(e.target.value); setSlice(0); }}>
             {summary.datasets.map(dataset => <option key={dataset.key} value={dataset.key}>
-              {dataset.name || "Array"} · [{dataset.shape.join(" × ")}] · {dataset.dtype}
+              {dataset.name || filesText("arraydata_viewer.array")} · [{dataset.shape.join(" × ")}] · {dataset.dtype}
             </option>)}
           </select>
         </label>}
         {Number.isSafeInteger(sliceCount) && sliceCount > 1 && <div className="flex items-center gap-2">
-          <button aria-label="Previous slice" className="rounded border px-2 py-1 disabled:opacity-40" disabled={loading || slice === 0} onClick={() => setSlice(slice - 1)}>←</button>
-          <label className="flex items-center gap-2">Slice
-            <input aria-label="Slice" className="w-20 rounded border bg-background px-2 py-1" type="number" min={0} max={sliceCount - 1}
+          <button aria-label={filesText("arraydata_viewer.previous_slice")} className="rounded border px-2 py-1 disabled:opacity-40" disabled={loading || slice === 0} onClick={() => setSlice(slice - 1)}>←</button>
+          <label className="flex items-center gap-2">{filesText("arraydata_viewer.slice")} <input aria-label={filesText("arraydata_viewer.slice")} className="w-20 rounded border bg-background px-2 py-1" type="number" min={0} max={sliceCount - 1}
               value={slice} disabled={loading} onChange={e => {
                 const value = Number(e.target.value);
                 if (Number.isSafeInteger(value) && value >= 0 && value < sliceCount) setSlice(value);
               }} />
           </label>
-          <span className="text-muted-foreground">of {sliceCount} (zero-based)</span>
-          <button aria-label="Next slice" className="rounded border px-2 py-1 disabled:opacity-40" disabled={loading || slice >= sliceCount - 1} onClick={() => setSlice(slice + 1)}>→</button>
+          <span className="text-muted-foreground">{filesText("arraydata_viewer.slice_total", { count: sliceCount })}</span>
+          <button aria-label={filesText("arraydata_viewer.next_slice")} className="rounded border px-2 py-1 disabled:opacity-40" disabled={loading || slice >= sliceCount - 1} onClick={() => setSlice(slice + 1)}>→</button>
         </div>}
       </div>
     </>}
     {loading ? <div role="status" className="flex flex-1 items-center justify-center gap-2 p-8 text-xs text-muted-foreground">
-      <div className="size-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />Loading preview…
-    </div> : error ? <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-      <p className="font-medium">Data preview failed</p><p className="max-w-md text-xs">{error}</p>
-      <button className="mt-2 rounded border px-3 py-1 text-xs" onClick={() => setRetry(retry + 1)}>Retry preview</button>
+      <div className="size-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />{filesText("arraydata_viewer.loading_preview")} </div> : error ? <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
+      <p className="font-medium">{filesText("arraydata_viewer.data_preview_failed")}</p><p className="max-w-md text-xs">{error}</p>
+      <button className="mt-2 rounded border px-3 py-1 text-xs" onClick={() => setRetry(retry + 1)}>{filesText("arraydata_viewer.retry_preview")}</button>
     </div> : summary && <div className="flex-1 overflow-auto">
       {summary.plot && <div className="p-4 pb-0"><ArrayVisualization plot={summary.plot} /></div>}
       {summary.plot_note && <p className="px-4 pt-4 text-xs text-muted-foreground">{summary.plot_note}</p>}
-      {!!summary.value_preview?.length && <p className="break-all px-4 pt-2 font-mono text-xs">Values: {summary.value_preview.join(", ")}</p>}
+      {!!summary.value_preview?.length && <p className="break-all px-4 pt-2 font-mono text-xs">{filesText("arraydata_viewer.values_preview", { values: summary.value_preview.join(", ") })}</p>}
       {summary.kind === "tree" && <TreeView summary={summary} />}
       {summary.kind === "table" && <DataTable key={summary.selected ?? "table"} summary={summary} />}
       {summary.kind === "ndarray" && <NdarrayView summary={shownArrays ?? summary} />}
       {summary.kind === "variables" && <VariablesView summary={summary} />}
-      {summary.truncated && summary.kind === "ndarray" && <p className="px-4 pb-4 text-xs text-muted-foreground">Dataset list limited to the first 100 entries.</p>}
-      {summary.kind === "table" && summary.collections_truncated && <p className="px-4 pb-4 text-xs text-muted-foreground">Sheet/table list limited to the first 100 entries.</p>}
+      {summary.truncated && summary.kind === "ndarray" && <p className="px-4 pb-4 text-xs text-muted-foreground">{filesText("arraydata_viewer.dataset_list_limited_to_the_first_100_entries")}</p>}
+      {summary.kind === "table" && summary.collections_truncated && <p className="px-4 pb-4 text-xs text-muted-foreground">{filesText("arraydata_viewer.sheet_table_list_limited_to_the_first_100_entries")}</p>}
     </div>}
   </div>;
 }

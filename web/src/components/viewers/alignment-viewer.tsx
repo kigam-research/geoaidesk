@@ -1,7 +1,10 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useMemo } from "react";
 import { parseAlignment, type AlignRow } from "@/lib/alignment";
 import type { ViewerProps } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 // Cap what we render so a pathological/huge alignment doesn't hang the DOM —
 // beyond these, we render a prefix and note the truncation.
@@ -91,7 +94,7 @@ export default function AlignmentViewer({ content, name }: ViewerProps) {
   if (result.status === "error") {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">Couldn&apos;t parse this alignment</p>
+        <p className="font-medium">{filesText("alignment_viewer.couldn_t_parse_this_alignment")}</p>
         <p className="max-w-md text-xs">{result.message}</p>
       </div>
     );
@@ -109,21 +112,16 @@ export default function AlignmentViewer({ content, name }: ViewerProps) {
   return (
     <div className="h-full overflow-auto">
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/95 px-4 py-2 backdrop-blur text-xs">
-        <span className="font-semibold">
-          {rows.length.toLocaleString()} sequence{rows.length !== 1 ? "s" : ""}
-        </span>
+        <span className="font-semibold">{filesText("alignment_viewer.sequence_count", { count: rows.length })}</span>
         <span className="text-muted-foreground">×</span>
-        <span className="text-muted-foreground">{nCols.toLocaleString()} columns</span>
+        <span className="text-muted-foreground">{filesText("alignment_viewer.column_count", { count: nCols })}</span>
         <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
-          {type}
+          {filesText("file_preview_panel.sequence_type", { type })}
         </span>
       </div>
 
       {(rowsTruncated || colsTruncated) && (
-        <p className="px-4 pt-2 text-xs text-muted-foreground">
-          Showing the first {visibleRows.length.toLocaleString()} of {rows.length.toLocaleString()}{" "}
-          sequences and the first {displayCols.toLocaleString()} of {nCols.toLocaleString()} columns.
-        </p>
+        <p className="px-4 pt-2 text-xs text-muted-foreground">{filesText("alignment_viewer.preview_range", { shownRows: visibleRows.length, rows: rows.length, shownColumns: displayCols, columns: nCols })}</p>
       )}
 
       <div className="p-3">

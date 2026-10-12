@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { geoFileCategory, type GeoFileCategory } from "@/geo/viewers/registry";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -12,6 +13,8 @@ import {
   useProjectScopeId,
 } from "@/lib/projects";
 import { getViewerDef } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 export interface TreeNode {
   name: string;
@@ -362,8 +365,8 @@ export function useSandbox(
         });
         if (!isCurrent() || controller.signal.aborted || res.status === 304) return;
         const content = res.ok ? await res.text() : res.status === 413
-          ? "[Error: This file exceeds the preview size limit (8 MB for CSV, 512 KB for other text). Use Download to access the complete file.]"
-          : `[Error: ${res.status} ${res.statusText}]`;
+          ? filesText("use_sandbox.error_this_file_exceeds_the_preview_size_limit_8_mb_for_csv_512_kb_for_other_text_use_download_to_access_the_complete_file")
+          : filesText("use_sandbox.read_error", { status: res.status, detail: res.statusText });
         if (!isCurrent() || controller.signal.aborted) return;
         const nextEtag = res.ok ? res.headers.get("etag") : null;
         if (nextEtag) fileEtags.current.set(path, nextEtag);
@@ -373,7 +376,7 @@ export function useSandbox(
         if (!refresh && isCurrent()) {
           fileEtags.current.delete(path);
           openPathsRef.current.delete(path);
-          update("[Error: Could not load file — click to retry]");
+          update(filesText("use_sandbox.error_could_not_load_file_click_to_retry"));
         }
       } finally {
         clearTimeout(timeout);
@@ -474,7 +477,7 @@ export function useSandbox(
         const res = await scopedFetch(`/sandbox/upload`, { method: "POST", body });
         if (!res.ok) {
           const detail = (await res.json().catch(() => null)) as { detail?: string } | null;
-          throw new Error(detail?.detail || `Upload failed (${res.status})`);
+          throw new Error(detail?.detail || filesText("use_sandbox.upload_status", { status: res.status }));
         }
         const data = await res.json();
         await fetchTree();
@@ -483,12 +486,12 @@ export function useSandbox(
         // isn't where they expect and assuming their original was replaced.
         const renamed = (data.renamed as { from: string; to: string }[] | undefined) ?? [];
         if (renamed.length === 1) {
-          toast.info(`"${baseName(renamed[0].from)}" already existed`, {
-            description: `Saved as "${baseName(renamed[0].to)}" so the original is untouched.`,
+          toast.info(filesText("use_sandbox.name_existed", { name: baseName(renamed[0].from) }), {
+            description: filesText("use_sandbox.renamed_upload", { name: baseName(renamed[0].to) }),
           });
         } else if (renamed.length > 1) {
-          toast.info(`${renamed.length} files already existed`, {
-            description: "They were saved under numbered names so the originals are untouched.",
+          toast.info(filesText("use_sandbox.files_existed", { count: renamed.length }), {
+            description: filesText("use_sandbox.they_were_saved_under_numbered_names_so_the_originals_are_untouched"),
           });
         }
         return (data.uploaded as string[]) ?? [];
@@ -496,8 +499,8 @@ export function useSandbox(
         // Silently returning [] made a rejected upload (too large, backend
         // down) look like a no-op the user could only detect by hunting the
         // file tree.
-        toast.error("Upload failed", {
-          description: err instanceof Error ? err.message : "The files were not saved.",
+        toast.error(filesText("use_sandbox.upload_failed"), {
+          description: err instanceof Error ? err.message : filesText("use_sandbox.the_files_were_not_saved"),
         });
         return [];
       } finally {
@@ -693,7 +696,7 @@ export function useSandbox(
         }
         return (await res.json()) as LatexCompileResult;
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Network error";
+        const msg = e instanceof Error ? e.message : filesText("use_sandbox.network_error");
         return { success: false, pdf_path: null, log: msg, errors: [msg], synctex: false };
       }
     },

@@ -4,9 +4,12 @@
  * suggestions and "Add to dictionary". The heavy lifting (dictionary,
  * suggestion search) happens in a Web Worker via SpellWorkerClient.
  */
+import { geoText } from "@/geo/i18n";
 import { linter, type Diagnostic } from "@codemirror/lint";
 import type { Extension } from "@codemirror/state";
 import { extractProseTokens, type ProseToken } from "./prose";
+
+const filesText = geoText("files");
 
 interface Pending {
   resolve: (value: never) => void;
@@ -95,7 +98,7 @@ export function buildSpellDiagnostics(
       to: t.to,
       severity: "hint",
       source: "spellcheck",
-      message: `Unknown word: ${t.word}`,
+      message: filesText("latex_spellcheck.unknown_word", { word: t.word }),
       actions: mkActions(t),
     });
   }
@@ -139,7 +142,7 @@ export function latexSpellLinter(opts: {
         return [
           ...fixes,
           {
-            name: "Add to dictionary",
+            name: filesText("latex_spellcheck.add_dictionary"),
             apply: () => opts.onAddWord(t.word),
           },
         ];

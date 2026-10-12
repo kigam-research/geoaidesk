@@ -1,7 +1,10 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useMemo } from "react";
 import { parseNewick, type PhyloNode } from "@/lib/newick";
 import type { ViewerProps } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 // Cap the rendered tree so a pathological/huge file doesn't hang the SVG
 // layout or the browser — beyond this we show a fallback instead.
@@ -119,7 +122,7 @@ function buildEdgesAndLabels(
       });
       node.children.forEach((c) => walk(c, node));
     } else {
-      labels.push({ key: `l-${id}`, x: x + LABEL_GAP, y, text: node.name || "(unnamed)" });
+      labels.push({ key: `l-${id}`, x: x + LABEL_GAP, y, text: node.name || filesText("phylo_viewer.unnamed") });
     }
   };
   walk(root, null);
@@ -156,7 +159,7 @@ export default function PhyloViewer({ content }: ViewerProps) {
   if (result.status === "error") {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">Couldn&apos;t parse this tree</p>
+        <p className="font-medium">{filesText("phylo_viewer.couldn_t_parse_this_tree")}</p>
         <p className="max-w-md text-xs">{result.message}</p>
       </div>
     );
@@ -165,11 +168,8 @@ export default function PhyloViewer({ content }: ViewerProps) {
   if (result.status === "too-large") {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">Tree too large to render</p>
-        <p className="max-w-md text-xs">
-          This tree has {result.leafCount.toLocaleString()} leaves, above the {MAX_LEAVES}-leaf
-          preview limit.
-        </p>
+        <p className="font-medium">{filesText("phylo_viewer.tree_too_large_to_render")}</p>
+        <p className="max-w-md text-xs">{filesText("phylo_viewer.too_large", { count: result.leafCount, max: MAX_LEAVES })}</p>
       </div>
     );
   }
@@ -183,12 +183,10 @@ export default function PhyloViewer({ content }: ViewerProps) {
 
   return (
     <div className="h-full overflow-auto p-4">
-      <p className="mb-2 text-xs text-muted-foreground">
-        {leafCount.toLocaleString()} leaf{leafCount !== 1 ? "s" : ""}
-      </p>
+      <p className="mb-2 text-xs text-muted-foreground">{filesText("phylo_viewer.leaf_count", { count: leafCount })}</p>
       <svg
         role="img"
-        aria-label="Phylogenetic tree"
+        aria-label={filesText("phylo_viewer.phylogenetic_tree")}
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
