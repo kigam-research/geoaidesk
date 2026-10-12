@@ -496,7 +496,7 @@ export function ModalJobDetail({
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.created")}</span> {formatModalTimestamp(job.createdAt)}</p>
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.started")}</span> {formatModalTimestamp(job.startedAt)}</p>
             <p><span className="font-medium text-foreground">{workText("modal_job_detail.finished")}</span> {formatModalTimestamp(job.finishedAt)}</p>
-            <p><span className="font-medium text-foreground">{workText("modal_job_detail.source")}</span> {workJobOwner(job.agent, job.source) ?? "—"}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.source")}</span> {workJobOwner(job.agent, job.source, job.raw) ?? "—"}</p>
           </section>
 
           {job.command ? (

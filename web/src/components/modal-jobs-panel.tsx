@@ -66,7 +66,7 @@ function JobRow({
       </span>
       <span className="mt-1 flex min-w-0 items-center text-[10px] text-muted-foreground">
         <span className="min-w-0 flex-1 truncate">
-          {workJobOwner(job.agent, job.source) ?? workText("modal_jobs_panel.modal_compute")}
+          {workJobOwner(job.agent, job.source, job.raw) ?? workText("modal_jobs_panel.modal_compute")}
         </span>
         <span className="shrink-0 tabular-nums">
           {formatUsd(job.committedEstimatedUsd)} {workText("modal_jobs_panel.est")}</span>

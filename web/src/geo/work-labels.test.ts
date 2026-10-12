@@ -17,6 +17,7 @@ describe("work UI display adapters", () => {
     expect(workJobOwner(null, "lead")).toBe("주 agent");
     expect(workJobOwner("subagent run-42", null)).toBe("하위 agent run-42");
     expect(workJobOwner("researcher", "subagent")).toBe("researcher");
+    expect(workJobOwner("subagent", "subagent", { agent: "subagent" })).toBe("subagent");
     expect(workLabel("status", "user-defined-status")).toBe("user-defined-status");
     expect(workResourceName("NVIDIA A100 80GB")).toBe("NVIDIA A100 80GB");
     setGeoLocaleSetting("en");

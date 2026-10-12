@@ -10,7 +10,8 @@ export function workLabel(group: string, value: string, fallback = value): strin
 }
 
 /** Distinguish protocol-generated owner labels from user-defined specialist names. */
-export function workJobOwner(agent: string | null, source: string | null): string | null {
+export function workJobOwner(agent: string | null, source: string | null, raw: Record<string, unknown> = {}): string | null {
+  if ([raw.agent, raw.agentName, raw.agent_name].some((value) => typeof value === "string" && value.trim())) return agent;
   if (agent === "subagent") return workLabel("source", agent);
   if (agent?.startsWith("subagent ")) return workText("source.subagent_run", { runId: agent.slice(9) });
   return agent ?? (source ? workLabel("source", source) : null);
