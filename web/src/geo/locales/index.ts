@@ -14,6 +14,8 @@ import depthKo from "./depth/ko.json";
 import depthEn from "./depth/en.json";
 import mapKo from "./map/ko.json";
 import mapEn from "./map/en.json";
+import basemapKo from "./basemap/ko.json";
+import basemapEn from "./basemap/en.json";
 import tablesKo from "./tables/ko.json";
 import tablesEn from "./tables/en.json";
 import contextKo from "./context/ko.json";
@@ -46,6 +48,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   depth: pair(depthKo, depthEn),
   // map viewer (WP05)
   map: pair(mapKo, mapEn),
+  basemap: pair(basemapKo, basemapEn),
   // table roles (WP04)
   tables: pair(tablesKo, tablesEn),
   // prompt budget chip (WP03)

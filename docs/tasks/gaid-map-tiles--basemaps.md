@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T04:44:14Z
+updated: 2026-10-12T04:48:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -114,11 +114,17 @@ Do not touch index.tsx, map-canvas.tsx, model.ts, the map locale namespace, help
 Finish with `task finish`; the parent integrates.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the printed worktree. Read the child contract, parent decisions, AGENTS.md, writer procedures and copy rules.
+- Codegraph has no index for this exact worktree; using bounded native source reads. PC71 reference read without key values.
 ## Next steps
-1. (the next session's first action)
+1. Implement server key resolver, bounded provider adapters/routes, and independent client layer factory/picker.
+2. Run declared focused checks and one live NGII/KIGAM request on a free local port; record only safe response metadata.
+3. Review owned changes, save and finish for parent integration. Parent owns viewer wiring and full scripts/check.
 ## Failed approaches
 ## Notes and decisions
+- Sequential plan: settle fixed interfaces first; server adapter and web factory are tightly coupled and will be implemented by this single child writer (no nested units). Owned paths remain those listed above; parent integrates index.tsx/map-canvas.tsx last.
+- Existing auth accepts query tokens on all routes; existing CORS/request guard already accepts anonymous cross-origin image loads from allowed UI origins. Verify in focused route tests without changing upstream guard/auth files.
+- No server imagery disk cache or background prefetch will be added. NGII and KIGAM use bounded on-demand fetches only.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
