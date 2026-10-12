@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T06:04:50Z
+status: done
+updated: 2026-10-12T06:05:07Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -117,8 +117,9 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
   Seoul_Geology_250K_Litho.shp 500 = 2.2 s. Cause: each request spawns the helper twice (inspect + operation;
   imports alone 0.5 s) and the raster response is 1.36 MB JSON (65k sample values).
 ## Next steps
-1. task finish (done criteria met; review instance update is the hub's on the user's request).
-2. Child gaid-map-tiles--basemaps: completed and integrated (ce7198d).
+<!-- task:closed -->
+Closed 2026-10-12T06:05:07Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Oracle findings (2026-10-12, Extra High, sources in oracle-q1.out): (가) OpenLayers stays the strongest option.
