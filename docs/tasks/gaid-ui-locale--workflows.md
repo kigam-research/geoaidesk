@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:25:00Z
+updated: 2026-10-12T14:25:23Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -68,12 +68,12 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend job 2 reached all 978 tests: 975 passed, 3 failed only because geo/workspace/workspace.test.tsx expected English upstream categories/rows in its explicitly Korean locale. Updated those hard-coded assertions only; full-suite recheck pending.
+Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend job 2 reached all 978 tests: 975 passed, 3 failed only because geo/workspace/workspace.test.tsx expected English upstream categories/rows in its explicitly Korean locale. Updated those hard-coded assertions only; focused recheck passes all 33 tests across workspace and new locale files. Full-suite recheck job 3 is running.
 
 Other upstream file touched: web/src/data/workflows.json, one comparative-genomics description only, required by copy-validator error. Parent must register this seam in geo/integration-boundaries.json.
 
 ## Next steps
-1. Recheck updated Korean integration expectations, save them, run the full frontend suite again, then finish.
+1. Read job 3 exit/log on its relay notification; if successful, record the full-suite result and finish.
 2. Parent integrates and performs whole-app scripts/check/browser checks.
 
 ## Checks
@@ -100,6 +100,7 @@ Child result and copy changes are recorded here for the parent’s canonical rep
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142231.166023Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142323.119941Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142512.183960Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
