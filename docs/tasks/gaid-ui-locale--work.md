@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:56:21Z
+updated: 2026-10-12T22:57:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -98,7 +98,7 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-- Ready for parent integration: TypeScript passed, full web suite passed (146 files / 975 tests), copy validator 0 errors, scanner only exempt command/product-name hits. No deployment or parent integration claimed.
+- Implementation and unit checks passed: TypeScript, full web suite, copy validator and scanner exemptions. Final task-finish production smoke found a client-directive ordering issue, now fixed in dialog/carousel; production-build job 4 passed at 5cb9a3fd1ddd; finish retry pending. No deployment or parent integration claimed.
 - Implemented work-area localization in 27 owned upstream component files; existing app namespace ids remain unchanged. Added 736 paired work messages and GAID-only display adapters in web/src/geo/work-labels.ts with a 3-test regression suite.
 - Includes 229 database descriptions and 18 categories, translated at display time only (original database objects and model/server prompt payloads are unchanged). Known status/outcome/source codes, counts, accessibility labels, dates and relative times follow gaid:locale.
 - Checks: final TypeScript passed; full-web job 3 passed 146 files / 975 tests at 91bb93d8cfa2. Final explicit-agent-name preservation change passed a focused rerun (modal panel + display adapters: 2 files / 7 tests). Copy: 0 errors / 15 warnings (12 work warnings reviewed below); no missing literal workText ids. Previous focused rerun also passed 23 tests across system card/session cost/display adapters.
@@ -141,6 +141,8 @@ None.
 Child result is recorded here for the parent's canonical report; no separate child report.
 
 ## Verification commands
+- Production build job-geoaidesk-gaid-ui-locale--work-4 at 5cb9a3fd1ddd: exit 0 (Next.js build and prerender passed).
+- First completed repository check (after cache restoration): backend 158 files passed / 1 skipped; 1671 tests passed / 11 skipped. Frontend: 147 files / 981 tests passed. Copy after parent merge: 0 errors / 56 warnings. Geo/environment checks passed before the production-build directive error.
 - `cd web && npm ci` completed in the worktree.
 - `cd web && npx tsc --noEmit` passed on final code.
 - `task job run -- bash -c 'npm --prefix web ci && npm --prefix web run test'`: job-geoaidesk-gaid-ui-locale--work-3, exit 0; receipt /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T223024.344067Z/receipt.json.
@@ -152,8 +154,11 @@ Child result is recorded here for the parent's canonical report; no separate chi
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T222158.203823Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Snapshot dependency install and full web test rerun passed","recorded":"2026-10-12T22:56:55Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T223024.344067Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T222738.829157Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Full web rerun passed after preserving inline label spacing","recorded":"2026-10-12T22:57:18Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T223024.344067Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T223024.344067Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--work-20261012T225638.677575Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
