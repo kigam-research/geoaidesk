@@ -100,6 +100,9 @@ describe("provider bounds and upstream", () => {
     await expect(fetchImage(upstreamUrl, {}, vi.fn<typeof fetch>().mockRejectedValue(new Error("https://bad/?apikey=secret")))).rejects.toThrow("request failed or timed out");
     const jpeg = () => new Response(Buffer.from([255, 216, 255, 1]), { headers: { "content-type": "image/jpeg" } });
     expect((await fetchImage(upstreamUrl, {}, vi.fn<typeof fetch>().mockResolvedValue(jpeg()))).type).toBe("image/jpeg");
+    // NGII satellite tiles are JPEG bytes labelled image/png: the bytes decide the served type.
+    const mislabelled = new Response(Buffer.from([255, 216, 255, 1]), { headers: { "content-type": "image/png" } });
+    expect((await fetchImage(upstreamUrl, {}, vi.fn<typeof fetch>().mockResolvedValue(mislabelled))).type).toBe("image/jpeg");
     await expect(fetchImage(upstreamUrl, {}, vi.fn<typeof fetch>().mockResolvedValue(jpeg()), true)).rejects.toThrow("invalid image");
   });
 });

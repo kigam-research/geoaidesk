@@ -42,11 +42,12 @@ export async function fetchImage(url: URL, headers: Record<string, string>, fetc
     const body = Buffer.concat(chunks, size);
     const png = body.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
     const jpeg = body.subarray(0, 3).equals(Buffer.from([255, 216, 255]));
-    const type = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-    if (!((png && type === "image/png") || (!pngOnly && jpeg && ["image/jpeg", "image/jpg"].includes(type)))) {
+    // The bytes decide the type: NGII serves JPEG satellite tiles labelled image/png.
+    const declared = (response.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
+    if (!declared.startsWith("image/") || !(png || (!pngOnly && jpeg))) {
       throw new BasemapError(502, "Basemap upstream returned an invalid image.");
     }
-    return { body, type };
+    return { body, type: png ? "image/png" : "image/jpeg" };
   } catch (error) {
     if (error instanceof BasemapError) throw error;
     // Never expose fetch errors, URLs, upstream bodies, or headers containing credentials.

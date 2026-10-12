@@ -5,6 +5,10 @@ import { GEO_INSPECTION_SCHEMA, type GeoInspection } from "../../contracts/inspe
 import type { MapManifest, MapManifestResponse, MapSource, RasterPoint, RasterStyle, VectorPage } from "../../contracts/maps";
 import { buildRequest, canOverlay, createLayer, displayCrs, hasCrs, isVector, layerView, projDefinitions, sourceCrs, styleRequest, VECTOR_LIMIT, viewCrsChoices, WEB_MERCATOR, type LayerState, type MapData, type Viewport } from "./model";
 import { registerProjections } from "./view";
+import { basemapAttribution, basemapLayers, DEFAULT_BASEMAP_SELECTION, useBasemapCatalog, type BasemapSelection } from "./basemaps";
+import BasemapPicker from "./basemaps-picker";
+/** View units per pixel above which the 1:50K geology overlay is hidden (avoids hundreds of WMS requests at country scale). */
+const GEOLOGY_MAX_RESOLUTION = 400;
 import { mapPost } from "./client";
 import { layerLegend } from "./colors";
 import MapCanvas, { type CanvasHandle } from "./map-canvas";
@@ -43,12 +47,22 @@ function Workspace(props: ViewerProps) {
   const sequence = useRef(0);
   const overlayRequest = useRef<AbortController | null>(null);
   const pixelRequest = useRef<AbortController | null>(null);
+  const catalog = useBasemapCatalog();
+  const [basemap, setBasemap] = useState<BasemapSelection>(DEFAULT_BASEMAP_SELECTION);
   const active = layers.find(l => l.id === activeId) ?? layers[0];
   const crsChoices = viewCrsChoices(layers);
   const crs = layers.some(l => !hasCrs(sourceCrs(l))) ? "native" : [...crsChoices, "EPSG:4326"].includes(displayTarget) ? displayTarget : WEB_MERCATOR;
   // Projected source CRSs become OpenLayers projections before the view uses them.
   const definitions = JSON.stringify(projDefinitions(layers));
   useMemo(() => registerProjections(JSON.parse(definitions)), [definitions]);
+  // Online basemaps/overlays only with a declared CRS; "none" (default) needs no network or key.
+  const backgroundLayers = useMemo(() => {
+    if (crs === "native") return [];
+    const built = basemapLayers(basemap, catalog.providers);
+    for (const layer of built) if (layer.get("basemapId") === "kigam-geology" && crs !== "EPSG:4326") layer.setMaxResolution(GEOLOGY_MAX_RESOLUTION);
+    return built;
+  }, [basemap, catalog.providers, crs]);
+  const attributions = crs === "native" ? [] : catalog.providers.filter(p => p.available && p.id !== "none" && (p.id === basemap.base || basemap.overlays.includes(p.id as BasemapSelection["overlays"][number]))).map(basemapAttribution);
   const fields = active ? active.inspection.layers?.find(l => l.name === active.source.layer)?.fields?.map(f => f.name) ?? (active.data?.kind === "vector" ? active.data.fields : []) : [];
   const data = active?.data;
   const view = active && layerView(active);
@@ -186,7 +200,9 @@ function Workspace(props: ViewerProps) {
     <div className="flex flex-wrap gap-2"><button className={button} onClick={() => { props.onRetry?.(); setRetry(n => n + 1); }}>{t("retry")}</button><button className={button} disabled={!view} onClick={() => canvas.current?.fit()}>{t("fit")}</button><button className={button} disabled={exporting || !layers.some(l => l.visible && layerView(l)) || layers.some(l => l.visible && l.loading)} onClick={async () => { setExporting(true); try { await canvas.current?.exportPng(); } catch (e) { setError(e instanceof Error ? e.message : t("pngError")); } finally { setExporting(false); } }}>{t("downloadPng")}</button></div>
     <p className="text-xs text-muted-foreground">{t("figureNotice")}</p>
     {crs !== "native" && <label>{t("displayCrs")} <select className={input} value={crs} onChange={e => { setDisplayTarget(e.target.value); setViewport(undefined); }}>{[...new Set([...crsChoices, crs])].map(code => <option key={code} value={code}>{code === WEB_MERCATOR ? t("webMercator") : t("crsOption", { crs: code })}</option>)}</select></label>}
-    <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} fitVersion={fitVersion} fields={colorFields} selected={selected} onViewport={onViewport} onError={setError} onPick={(layerId, row) => { setActiveId(layerId); setSelected({ layerId, row }); }} onCoordinate={readPixel} />
+    <BasemapPicker providers={catalog.providers} value={basemap} onChange={setBasemap} disabled={crs === "native"} />
+    {catalog.error && <p role="status" className="text-xs">{catalog.error}</p>}
+    <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} backgroundLayers={backgroundLayers} attributions={attributions} fitVersion={fitVersion} fields={colorFields} selected={selected} onViewport={onViewport} onError={setError} onPick={(layerId, row) => { setActiveId(layerId); setSelected({ layerId, row }); }} onCoordinate={readPixel} />
     <section className="space-y-2" aria-label={t("layers")}><h3 className="font-semibold">{t("layers")}</h3>
       <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); void addLayer(); }}><label>{t("addPath")} <input className={input} value={pathToAdd} onChange={e => setPathToAdd(e.target.value)} /></label><button className={button} disabled={adding || !pathToAdd.trim()}>{t("add")}</button></form>
       {layers.map((l, index) => <div className="flex flex-wrap items-center gap-2 rounded border p-2" key={l.id}>

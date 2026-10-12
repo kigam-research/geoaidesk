@@ -60,7 +60,7 @@ health probe. Network/authentication failures still surface as failed image requ
 - Invalid input → 400; unconfigured provider → 404; upstream HTTP/network/timeout/oversize/non-image → 502.
 - Global fetch uses the app's installed proxy dispatcher; timeout 20s, streamed response cap 4MiB, redirects refused.
   Only HTTPS `map.ngii.go.kr/openapi/Gettile.do` and `data.kigam.re.kr/openapi/wms` can be fetched.
-- Magic bytes and MIME must agree (NGII PNG/JPEG; KIGAM PNG only). No upstream error body or exception URL is
+- The upstream must declare an `image/*` type; the served type comes from the magic bytes (NGII PNG/JPEG — its satellite tiles are JPEG bytes labelled `image/png`; KIGAM PNG only). No upstream error body or exception URL is
   exposed or logged. The URL redaction helper removes case-insensitive `apikey` and `key` query values.
 - Valid images use `Cache-Control: private, max-age=86400`. There is no persistent backend imagery cache,
   tile prefetch, retry loop, offline imagery download or shared public CDN. Ordinary browser HTTP caching remains.
