@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:31:19Z
+updated: 2026-10-12T09:33:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -90,12 +90,13 @@ AGENTS.md (one bullet).
 - Do not run `scripts/check` in full (the parent runs it after integration); remove build caches you created before finish.
 
 ## Current state
-- Resumed in the original printed worktree. Read repository rules, writer procedures, copy rules and the existing preview/install seams.
-- Implemented URL/file intake, bounded archive validation, durable SHA-256 sources, catalogue-name notice and existing preview/acknowledgement/install seam. Published checkpoint b3aa2370d63c.
-- Server 16 tests and web 4 tests pass; server/web tsc and copy validator pass (0 errors, 3 explained warnings). Real public package downloaded and its layout inspected.
-- Isolated end-to-end check is running as job-geoaidesk-gaid-workflow-catalog--skill-hub-3; output/evidence under ~/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/. No paid model runs or review-instance changes.
+- Delivered skill_hub site navigation, configured skill-page URL and .tar.gz file preview, archive bounds/validation, durable SHA-256 sources, catalogue-name notices and the existing acknowledgement/install gate. Existing generic source installation is preserved. No automatic site updates or local-app deep links.
+- Checks passed: server vitest 16 tests; web seam vitest 4 tests; server and web tsc; distribution node tests 7; copy validator 0 errors / 3 explained warnings. Safe re-verification commands are in the report section appendix. Full scripts/check is intentionally left to the parent after integration, as requested.
+- Real E2E job 3 exited 0: URL preview 200 → acknowledgement → install 200; upload preview 200 with the same stagingToken; acknowledgement omitted → 400; installed SKILL.md bytes match source. Browser page errors and failed requests were empty. Desktop and 430px PNGs are tracked in the parent report folder.
+- Parent report material: reports/2026-10-12-gaid-workflow-catalog/skill-hub-section.md includes options, limits, E2E evidence, screenshots, complete new ko/en copy table and the skill_hub-side request for the parent to forward. Optional per-row site links were not added.
+- No paid model runs, ~/.geoaidesk changes or ports 3000/18000 review-instance changes. Isolated services stopped; generated .next and tsbuildinfo caches removed. Code checkpoints b3aa2370d63c / 40acafbb7fff; parent integration and its full checks remain separate.
 ## Next steps
-1. Inspect job 3 exit and evidence on its completion notification; fix any concrete failure, then copy desktop/narrow PNGs into the parent report folder, finalize the report section, clean generated caches and task finish.
+1. task save final evidence and task finish. Parent gaid-workflow-catalog integrates this unit with task complete, then runs scripts/check and forwards the report's skill_hub-side request.
 ## Failed approaches
 - E2E job 2 was cancelled after its harness launched Next in the repository root instead of web/. No application failure: corrected the external harness Next directory before a fresh run.
 - Initial SkillsPanel seam test supplied an incomplete sync-status mock; fixed the fixture to use the normal default, without changing production list logic.
@@ -106,14 +107,9 @@ AGENTS.md (one bullet).
 - Limits: 20 MiB compressed, 64 MiB expanded tar, 10,000 file/directory entries. A package has one top-level skill folder with SKILL.md. The stable source is a snapshot, not an automatic update subscription.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None for this child unit. The parent owns final integration/checks and forwarding the skill_hub-side request. The optional list-row site link and broader legacy Settings responsiveness are not required for this delivered scope.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child contribution: reports/2026-10-12-gaid-workflow-catalog/skill-hub-section.md and figures/skill-hub-{desktop,narrow}.png. Parent owns the canonical index.md report.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T091833.056202Z/receipt.json

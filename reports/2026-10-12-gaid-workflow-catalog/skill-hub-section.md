@@ -27,7 +27,13 @@
 
 서버 시험 16개와 화면 시험 4개가 통과했습니다. 서버·화면 타입 검사와 문구 검사도 통과했습니다. 문구 검사에는 기존 경고 1개와 자동 갱신을 하지 않는다는 설명의 경고 2개가 남습니다. 후자는 실제 동작의 한계를 설명하므로 유지합니다.
 
-실제 앱에서 URL 입력·미리보기·동의·설치와 두 화면 캡처는 현재 기록된 별도 실행에서 확인 중입니다. 완료 결과를 이 절에 반영합니다. 전체 검사와 부모 작업의 최종 통합은 부모 작업에서 확인합니다.
+별도 앱에서 실제 공개 스킬 페이지 URL을 붙여넣고 미리보기·권한 동의·설치까지 확인했습니다. 파일 업로드도 같은 내용 지문으로 미리보기했습니다. 권한 동의 없는 설치 요청은 거부됐으며, 설치된 지침 파일은 미리보기 원본과 바이트 단위로 일치했습니다. 브라우저 실행 오류와 실패한 요청은 없었습니다. 시험용 화면·서버는 종료했습니다. 전체 검사와 부모 작업의 최종 통합은 부모 작업에서 확인합니다.
+
+![데스크톱의 스킬 추가 화면입니다. 사이트 탐색, URL 입력, 파일 선택과 기본 카탈로그 중복 안내를 확인할 수 있습니다.](figures/skill-hub-desktop.png)
+
+![폭 430 px의 스킬 추가 화면입니다. URL과 파일 입력이 세로로 배치되며, 아래 항목은 설정 패널을 스크롤해 확인합니다.](figures/skill-hub-narrow.png)
+
+좁은 화면에서는 기존 설정 패널의 좌측 메뉴와 스킬 설명이 공간을 많이 차지합니다. 새 입력은 세로로 배치되지만 기존 설정 화면 전체의 반응형 배치는 이번 수정 범위가 아닙니다.
 
 ### skill_hub 프로젝트에 전달할 요청안
 
@@ -41,7 +47,20 @@
 - 화면: `web/src/geo/skill-hub/skill-hub.tsx`, `web/src/components/skills-panel.tsx`의 좁은 연결 지점.
 - 시험: `cd server && npx vitest run test/geo-skill-hub.test.ts`; `cd web && npx vitest run src/geo/skill-hub/skill-hub.test.tsx`; 각 폴더의 `npx tsc --noEmit`; `node geo/copy/validate-copy.mjs web/src/geo/locales`.
 - 실제 패키지: `https://kigam-research.github.io/skill-atlas/api/catalog/packages/kigam/well-log-qc-quicklook/well-log-qc-quicklook.tar.gz`.
-- 별도 앱 시험 실행: `job-geoaidesk-gaid-workflow-catalog--skill-hub-2`. 사용자 앱과 검토 인스턴스는 변경하지 않습니다.
+- 별도 앱 시험 실행: `job-geoaidesk-gaid-workflow-catalog--skill-hub-3`. 반환된 작업 스냅샷에서 화면 14041 / 서버 18041로 실행했습니다. 사용자 앱과 검토 인스턴스는 변경하지 않았습니다.
+- 실제 앱 시험 결과: URL 미리보기 200, 설치 200, 업로드 미리보기 200, 동의 누락 설치 400.
+- 시험 증거 위치: `/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/e2e.json`.
+- 시험 실행 스크립트: `/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/e2e.py`.
+- 배포 설정 검사: `node --test geo/tests/distribution.test.mjs` 7개 통과.
+
+### 부록: 파일 지문
+
+| 파일 | SHA-256 |
+|---|---|
+| `/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/e2e.json` | `426de698751e8e4afddf8c03b14335ff003f2c9db7cc8c7ae85a45c25ee1584b` |
+| `/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/e2e.py` | `664065cabc336b7d6a82a08c4653e2fd4fd73a34a8e1a767478e6e754829ab36` |
+| `reports/2026-10-12-gaid-workflow-catalog/figures/skill-hub-desktop.png` | `214eb6d4b9b32577a875b434d2a0f9d126a891a3f3cf55e034dd5f9756f1aaf0` |
+| `reports/2026-10-12-gaid-workflow-catalog/figures/skill-hub-narrow.png` | `81c0dd2ad51c0059026074d5f16891168c2663ad52fde46892e2a69c72037655` |
 
 ### 부록: 새 문구
 
