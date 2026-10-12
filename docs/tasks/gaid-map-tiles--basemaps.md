@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T05:19:57Z
+updated: 2026-10-12T05:22:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -129,9 +129,10 @@ Finish with `task finish`; the parent integrates.
 - Second full-check attempt on c43ed75c3526 merged bc05638f29e0 and passed backend (155 files passed, 1 skipped; 1,648 tests passed, 11 skipped), frontend (143 files, 960 tests passed), and launcher --check. Distribution tests: 35 passed, 1 failed. The failure is geo/tests/distribution.test.mjs:75: parent introduced integration-boundary owner gaid-map-tiles, but the test's owners set does not contain it. Both integration-boundaries.json and that test are outside this child's owned paths. No basemap failure. Copy/environment/production phases were not reached by this full-check run.
 - Latest check failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-k6apsdhy.log; output ~/data/geoaidesk/work/checks/c43ed75c3526-20261012T051443.190729Z. Finish still has not succeeded.
 - Consumed both continuation routes gmt-basemaps-finish-1 (parent) and basemaps-continue-bb9452a0e9dc (hub). The CLI blocks finish for queued AND running requests, so recorded acceptance first to clear that self-gate, then ran the actual full-check retry. Their final results will be updated with the new distribution blocker, not left as an unverified success.
+- Consumed gmt-basemaps-finish-2. Fetched parent tip a23612ef127e and re-read distribution.test.mjs: gaid-map-tiles is now included in the owners set; the parent reports 41 distribution tests passed. No child source change requested. The full-check retry and parent integration remain pending; this writer drives the retry, then the parent owns task complete. Recording the route as a pending-integration checkpoint before finish, as instructed, not as completion.
 ## Next steps
-1. Parent: update the owner conformance test (or correct the declared owner with a justified ownership decision) for the new gaid-map-tiles seams, and save. Do not bypass the distribution check; neither file belongs to this child.
-2. After that parent fix, rerun task finish in place (no resume needed), then remove only regenerable worktree caches after the last check. The CLI must finish successfully before parent task complete.
+1. Report gmt-basemaps-finish-2 as blocked pending full checks/integration, consume any other queued requests, then rerun task finish in place (no resume needed). The parent fix is verified; no further source fix is pending.
+2. After the last check, remove only regenerable worktree caches, and update the route report with verified readiness/integration state. The CLI must finish successfully before parent task complete; do not claim parent integration merely from child readiness.
 3. Parent integrates the child, wires the basemap picker/layers and preserves visible source attribution including exported online imagery. Use docs/geo/basemaps.md and evidence above in the parent report.
 
 ## Failed approaches
