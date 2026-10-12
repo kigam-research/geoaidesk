@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:01:00Z
+updated: 2026-10-12T14:05:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -57,9 +57,47 @@ language should follow the UI language. The user decided (verbatim):
   can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Shared setup done (writer): namespaces `settings`, `notebook`, `research`, `files`, `work`, `workflows` registered in
+  `web/src/geo/locales/index.ts` (empty `{}` catalogues); one boundaries seam per package in
+  `geo/integration-boundaries.json` (owner `gaid-ui-locale`, added to `geo/tests/distribution.test.mjs` owners).
+- Reply language (scope 2) done: `REPLY_LANGUAGE_RULE` in `server/src/geo/instructions.ts` (GEO_INSTRUCTIONS);
+  `server/test/geo-reply-language.test.ts` checks the rule and that no server source fixes a reply language or reads
+  `gaid:locale`. Survey: no upstream/GAID system prompt, seeded sandbox AGENTS.md (`server/src/sandbox-seed.ts`) or
+  catalogue 0.2.1 file forced a reply language; the server never receives the UI locale. Task drafts
+  (`workspace.setup.draft`, `workspace.skill.draft`) are composer prefills the user sees and sends, so they are the
+  request, not an injected locale.
+- Baseline scan (`~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src`): 1191 English literals in 79 upstream
+  files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
+
 ## Next steps
-1. (the next session's first action)
+1. Start child writers (packages below), then integrate in order.
+
+## Work plan (orchestration)
+Sequential decisions (settled by the writer):
+- Keep the established GAID pattern (gaid-korean-workspace): upstream components call `geoText("<ns>")` / `t()` with
+  ids `<namespace>.<area>.<snake_of_english>`; English catalogue text = the upstream string verbatim (English mode and
+  upstream tests unchanged; vitest jsdom runs in en-US), Korean per geo/copy. Chosen over a DOM/English-text lookup:
+  the copy validator and the existing 26 converted files already use ids, and a text-keyed runtime lookup would miss
+  composed strings. Upstream diffs stay one-line substitutions.
+- Upstream workflow rows: name/description/placeholder labels translated in `web/src/geo/locales/workflows/` keyed by
+  workflow id; `web/src/data/workflows.json` stays the English source and the fallback for ids without a translation.
+  Prompts (420K chars) stay as shipped (English) — listed as remaining.
+- Not translated: user data, file names, model/provider names, raw values, server-generated error texts (listed as
+  remaining).
+Independent packages (one child each, own namespace dir + listed files; nobody else edits `locales/index.ts` or
+`geo/integration-boundaries.json`):
+- `settings` → locales/settings; Settings dialog and panels, skills/prompts/specialists/connectors/custom models,
+  sign-in dialogs, token gate.
+- `notebook` → locales/notebook; lab notebook view/cards/timeline, evidence summary, result links, provenance panel,
+  scientific result card.
+- `research` → locales/research; plan, robustness, next-experiments, memory, evidence-package dialogs.
+- `files` → locales/files; file preview panel, sandbox panel, viewers, LaTeX, PDF, Office.
+- `work` → locales/work; chat tab/composer/tabs, tool activity, automation, Modal jobs, fleet, cost pill, pickers,
+  project screens, ui primitives, page.tsx remainder.
+- `workflows` → locales/workflows; workflows panel categories/rows, workflow inputs, 326 workflow translations.
+Integration order: workflows, work, files, settings, notebook, research (each `task complete`), then reconcile
+boundaries against `git diff --name-only origin/main`, rescan, browser screenshots (ko/en), report, `scripts/check`.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
