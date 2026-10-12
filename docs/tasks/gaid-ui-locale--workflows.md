@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T14:26:35Z
+status: ready
+updated: 2026-10-12T14:26:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -75,7 +75,8 @@ Checks passed: frontend TypeScript, all 978 tests in 146 files (job 3, exit 0; S
 English exception: workflows.rows.comparative-genomics.description changed “Compare genomes across species for evolutionary insights” → “Compare genomes across species to examine evolutionary relationships” due to validator error, also in web/src/data/workflows.json so exact source parity holds. Parent must register this one extra upstream file in integration-boundaries. Other English is verbatim.
 
 ## Next steps
-1. Finish child; parent runs task complete gaid-ui-locale--workflows, registers the data seam, and performs whole-app checks.
+<!-- task:closed -->
+Closed 2026-10-12T14:26:46Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Checks
 - Full frontend suite: job 3 at /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142512.183960Z/receipt.json; exit 0; 146 files, 978 tests passed on fcdc17cef6bd.
