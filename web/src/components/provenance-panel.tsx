@@ -1,4 +1,6 @@
 "use client";
+import { geoText, geoLocale } from "@/geo/i18n";
+
 
 /**
  * Lineage view for one sandbox artifact: what produced it, from which inputs,
@@ -40,6 +42,8 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 
+const nbText = geoText("notebook");
+
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -48,7 +52,7 @@ function formatBytes(bytes: number): string {
 }
 
 function formatWhen(ms: number): string {
-  return new Date(ms).toLocaleString(undefined, {
+  return new Date(ms).toLocaleString(geoLocale(), {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -59,17 +63,17 @@ function formatWhen(ms: number): string {
 
 const CONFIDENCE_COPY: Record<EdgeConfidence, { label: string; title: string }> = {
   observed: {
-    label: "observed",
-    title: "The tool named this file and its bytes were hashed afterward.",
+    label: nbText("provenance.observed"),
+    title: nbText("provenance.observed_description"),
   },
   inferred: {
-    label: "inferred",
+    label: nbText("provenance.inferred"),
     title:
-      "Attributed from evidence rather than direct observation: either a sandbox scan that could not be split between neighbouring steps, or a file the command line named that existed beforehand — a probable input, not a verified one.",
+      nbText("provenance.inferred_description"),
   },
   declared: {
-    label: "declared",
-    title: "The model asserted this link and nothing verified it.",
+    label: nbText("provenance.declared"),
+    title: nbText("provenance.declared_description"),
   },
 };
 
@@ -120,7 +124,7 @@ function ArtifactRow({
         {ref_.path}
       </button>
       <span className="shrink-0 text-[10px] text-muted-foreground">
-        {ref_.change === "deleted" ? "deleted" : formatBytes(ref_.size)}
+        {ref_.change === "deleted" ? nbText("provenance.deleted") : formatBytes(ref_.size)}
       </span>
       {hash && (
         <span
@@ -133,9 +137,9 @@ function ArtifactRow({
       {ref_.identityAt === "harvest" && (
         <span
           className="shrink-0 text-[10px] text-muted-foreground"
-          title="Hashed when the subagent's record was parsed, not when the step wrote the file — the bytes may already have changed by then."
+          title={nbText("provenance.hashed_later_description")}
         >
-          hashed later
+          {nbText("provenance.hashed_later")}
         </span>
       )}
       {ref_.hashSkipped && (
@@ -143,11 +147,11 @@ function ArtifactRow({
           className="shrink-0 text-[10px] text-amber-600 dark:text-amber-400"
           title={
             ref_.hashSkipped === "too-large"
-              ? "Not hashed: above the size limit. Identity is size+mtime only."
-              : "Not hashed: the file could not be read."
+              ? nbText("provenance.not_hashed_large")
+              : nbText("provenance.not_hashed_unreadable")
           }
         >
-          unhashed
+          {nbText("provenance.unhashed")}
         </span>
       )}
       <ConfidenceBadge confidence={ref_.confidence} />
@@ -159,21 +163,21 @@ function ArtifactRow({
 function actorLabel(step: ProvenanceStep): string {
   switch (step.role) {
     case "subagent":
-      return `subagent${step.agentName ? `: ${step.agentName}` : ""}`;
+      return step.agentName ? nbText("provenance.named_subagent", { name: step.agentName }) : nbText("provenance.subagent");
     case "user":
       return step.toolName === "upload"
-        ? "uploaded by you"
+        ? nbText("provenance.uploaded_by_you")
         : step.toolName === "save"
-          ? "saved by you in the editor"
+          ? nbText("provenance.saved_by_you")
           : step.toolName === "move"
-            ? "moved by you"
+            ? nbText("provenance.moved_by_you")
             : step.toolName === "delete"
-              ? "deleted by you"
-              : "you";
+              ? nbText("provenance.deleted_by_you")
+              : nbText("provenance.you");
     case "compute":
-      return "remote compute";
+      return nbText("provenance.remote_compute");
     default:
-      return "lead agent";
+      return nbText("provenance.lead_agent");
   }
 }
 
@@ -204,11 +208,11 @@ function EnvironmentLine({
   const parts: string[] = [];
   if (env.python) {
     parts.push(
-      `Python ${env.python.version ?? "?"}${env.python.source === "system" ? " (system)" : ""}` +
-        (env.python.packages.length ? ` · ${env.python.packages.length} packages` : ""),
+      nbText(env.python.source === "system" ? "provenance.python_system" : "provenance.python", { version: env.python.version ?? "?" }) +
+        (env.python.packages.length ? nbText("provenance.packages_suffix", { count: env.python.packages.length }) : ""),
     );
   }
-  if (env.r) parts.push(`${env.r.version} · ${env.r.packages.length} packages`);
+  if (env.r) parts.push(nbText("provenance.r_packages", { version: env.r.version, count: env.r.packages.length }));
   for (const lock of env.lockfiles) parts.push(`${lock.path} ${lock.sha256.slice(0, 8)}`);
   if (env.git) parts.push(`git ${env.git.head.slice(0, 8)}`);
   if (parts.length === 0) parts.push(`${env.os.platform} ${env.os.arch}`);
@@ -217,16 +221,16 @@ function EnvironmentLine({
     <details className="mt-1.5">
       <summary
         className="flex cursor-pointer items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
-        title={`Environment ${env.id}`}
+        title={nbText("provenance.environment", { id: env.id })}
       >
         <PackageIcon className="size-2.5 shrink-0" />
         <span className="truncate">{parts.join(" · ")}</span>
         {atHarvest && (
           <span
             className="shrink-0 text-muted-foreground/70"
-            title="Captured when the subagent's record was parsed, not when the step ran — the subagent may have changed the environment in between."
+            title={nbText("provenance.capture_description")}
           >
-            (captured later)
+            {nbText("provenance.captured_later")}
           </span>
         )}
       </summary>
@@ -250,7 +254,7 @@ function EnvironmentLine({
             ))}
             {env.python?.packagesTruncated ? (
               <p className="text-muted-foreground">
-                + {env.python.packagesTruncated} more Python packages not recorded
+                {nbText("provenance.python_truncated", { count: env.python.packagesTruncated })}
               </p>
             ) : null}
             {env.r?.packages.map((pkg) => (
@@ -260,7 +264,7 @@ function EnvironmentLine({
             ))}
             {env.r?.packagesTruncated ? (
               <p className="text-muted-foreground">
-                + {env.r.packagesTruncated} more R packages not recorded
+                {nbText("provenance.r_truncated", { count: env.r.packagesTruncated })}
               </p>
             ) : null}
           </div>
@@ -290,7 +294,7 @@ function StepCard({
         <span className="font-mono text-xs font-medium">{step.toolName}</span>
         {step.isError && (
           <span className="rounded bg-destructive/10 px-1 py-0.5 text-[9px] font-medium uppercase tracking-wider text-destructive">
-            error
+            {nbText("provenance.error")}
           </span>
         )}
         {outputRef && <ConfidenceBadge confidence={outputRef.confidence} />}
@@ -300,9 +304,9 @@ function StepCard({
         {outputRef?.identityAt === "harvest" && (
           <span
             className="shrink-0 text-[10px] text-muted-foreground"
-            title="This step ran inside a subagent, so the file was hashed when its record was parsed rather than when the step wrote it."
+            title={nbText("provenance.step_hash_description")}
           >
-            hashed later
+            {nbText("provenance.hashed_later")}
           </span>
         )}
         <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
@@ -321,23 +325,23 @@ function StepCard({
         {step.compute && (
           <span
             className="font-mono"
-            title={`Modal job ${step.compute.jobId}${step.compute.sandboxId ? ` · sandbox ${step.compute.sandboxId}` : ""}`}
+            title={nbText("provenance.modal_job", { id: step.compute.jobId }) + (step.compute.sandboxId ? nbText("provenance.sandbox_suffix", { id: step.compute.sandboxId }) : "")}
           >
             {step.compute.instance ?? "modal"}
             {step.compute.gpu ? ` · ${step.compute.gpu}` : ""}
             {step.compute.environment ? ` · ${step.compute.environment}` : ""}
-            {step.compute.exitCode !== undefined ? ` · exit ${step.compute.exitCode}` : ""}
-            {` · job ${shortId(step.compute.jobId)}`}
+            {step.compute.exitCode !== undefined ? nbText("provenance.exit_suffix", { code: step.compute.exitCode }) : ""}
+            {nbText("provenance.job_suffix", { id: shortId(step.compute.jobId) })}
           </span>
         )}
         {step.runId && (
-          <span className="font-mono" title={`Run ${step.runId}`}>
-            run {step.runId.replace(/^run_/, "").slice(0, 8)}
+          <span className="font-mono" title={nbText("provenance.run_title", { id: step.runId })}>
+            {nbText("provenance.run", { id: step.runId.replace(/^run_/, "").slice(0, 8) })}
           </span>
         )}
         {step.role !== "user" && (
-          <span className="font-mono" title={`Session ${step.sessionId}`}>
-            session {step.sessionId.slice(0, 8)}
+          <span className="font-mono" title={nbText("provenance.session_title", { id: step.sessionId })}>
+            {nbText("provenance.session", { id: step.sessionId.slice(0, 8) })}
           </span>
         )}
       </div>
@@ -346,8 +350,8 @@ function StepCard({
         <p className="mt-1.5 flex items-start gap-1 text-[10px] text-amber-600 dark:text-amber-400">
           <AlertTriangleIcon className="mt-px size-2.5 shrink-0" />
           {step.compute.missingOutputs.length === 1
-            ? `The remote job never produced ${step.compute.missingOutputs[0]}.`
-            : `The remote job never produced ${step.compute.missingOutputs.length} requested outputs.`}
+            ? nbText("provenance.missing_output", { path: step.compute.missingOutputs[0] })
+            : nbText("provenance.missing_outputs", { count: step.compute.missingOutputs.length })}
         </p>
       ) : null}
 
@@ -357,17 +361,17 @@ function StepCard({
         <p className="mt-1.5 flex items-start gap-1 text-[10px] text-amber-600 dark:text-amber-400">
           <AlertTriangleIcon className="mt-px size-2.5 shrink-0" />
           {step.degraded === "sandbox-too-large"
-            ? "Sandbox exceeded the scan budget — file attribution for this step is incomplete."
+            ? nbText("provenance.sandbox_large")
             : step.degraded === "scan-failed"
-              ? "The sandbox scan failed — file attribution for this step is incomplete."
-              : "Ran inside a subagent and was reconstructed afterward, so this step's file effects could not be observed directly. Any files below are attributed by timing, not observation."}
+              ? nbText("provenance.scan_failed")
+              : nbText("provenance.no_baseline")}
         </p>
       )}
 
       {step.inputs.length > 0 && (
         <div className="mt-2">
           <p className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            <FileInputIcon className="size-2.5" /> Inputs
+            <FileInputIcon className="size-2.5" /> {nbText("provenance.inputs")}
           </p>
           <ul className="mt-0.5">
             {step.inputs.map((input) => (
@@ -380,7 +384,7 @@ function StepCard({
       {otherOutputs.length > 0 && (
         <div className="mt-2">
           <p className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            <FileOutputIcon className="size-2.5" /> Also wrote
+            <FileOutputIcon className="size-2.5" /> {nbText("provenance.also_wrote")}
           </p>
           <ul className="mt-0.5">
             {otherOutputs.map((output) => (
@@ -392,15 +396,14 @@ function StepCard({
 
       {step.truncatedEdges ? (
         <p className="mt-1.5 text-[10px] text-muted-foreground">
-          + {step.truncatedEdges} more file{step.truncatedEdges === 1 ? "" : "s"} not recorded
-          (per-step limit)
+          {nbText("provenance.edges_truncated", { count: step.truncatedEdges })}
         </p>
       ) : null}
 
       {step.args !== undefined && (
         <details className="mt-2">
           <summary className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground">
-            Arguments
+            {nbText("provenance.arguments")}
           </summary>
           <pre className="mt-1 max-h-40 overflow-auto rounded bg-muted/50 p-1.5 font-mono text-[10px] leading-relaxed">
             {JSON.stringify(step.args, null, 2)}
@@ -412,19 +415,19 @@ function StepCard({
 }
 
 const ROOT_COPY: Record<NonNullable<LineageNode["root"]>, { label: string; title: string }> = {
-  upload: { label: "uploaded", title: "You uploaded this file. This is where the chain starts." },
+  upload: { label: nbText("provenance.root_uploaded"), title: nbText("provenance.root_uploaded_description") },
   user: {
-    label: "created by you",
-    title: "You created this file in the editor; nothing recorded fed into it.",
+    label: nbText("provenance.root_user"),
+    title: nbText("provenance.root_user_description"),
   },
   unrecorded: {
-    label: "no recorded origin",
+    label: nbText("provenance.root_unrecorded"),
     title:
-      "No recorded step produced the version that was used here. It predates provenance recording, arrived outside the sandbox API, or was written during a run whose attribution degraded.",
+      nbText("provenance.root_unrecorded_description"),
   },
   budget: {
-    label: "walk stopped",
-    title: "The upstream walk reached its depth limit here.",
+    label: nbText("provenance.root_budget"),
+    title: nbText("provenance.root_budget_description"),
   },
 };
 
@@ -507,13 +510,13 @@ function LineageTree({
           {node?.changedSinceUse === true && (
             <span
               className="flex shrink-0 items-center gap-0.5 text-[10px] text-amber-600 dark:text-amber-400"
-              title="The bytes on disk differ from the version this step consumed. Whatever was built from it may not be reproducible from the current file."
+              title={nbText("provenance.changed_description")}
             >
-              <AlertTriangleIcon className="size-2.5" /> changed since use
+              <AlertTriangleIcon className="size-2.5" /> {nbText("provenance.changed_since_use")}
             </span>
           )}
           {repeated && (
-            <span className="shrink-0 text-[10px] text-muted-foreground/70">(shown above)</span>
+            <span className="shrink-0 text-[10px] text-muted-foreground/70">{nbText("provenance.shown_above")}</span>
           )}
         </div>
         {inputs.length > 0 && (
@@ -530,7 +533,7 @@ function LineageTree({
       <ul>{renderNode(target, 0)}</ul>
       {lineage.truncated && (
         <p className="mt-1 text-[10px] text-muted-foreground">
-          Upstream walk stopped at its limit — the record continues beyond what is shown.
+          {nbText("provenance.walk_limit")}
         </p>
       )}
     </div>
@@ -541,17 +544,17 @@ const STALENESS_COPY = {
   current: {
     Icon: ShieldCheckIcon,
     className: "text-emerald-600 dark:text-emerald-400",
-    text: "Current — the bytes on disk match what the producing step recorded.",
+    text: nbText("provenance.current"),
   },
   stale: {
     Icon: AlertTriangleIcon,
     className: "text-amber-600 dark:text-amber-400",
-    text: "Stale — this file changed after the step that produced it. Anything citing it may describe a different version.",
+    text: nbText("provenance.stale"),
   },
   unknown: {
     Icon: CircleHelpIcon,
     className: "text-muted-foreground",
-    text: "Unverified — no recorded hash to compare against, so sameness could not be checked.",
+    text: nbText("provenance.unknown"),
   },
   /**
    * Also "unknown" on the wire, but for a different reason worth stating: the
@@ -561,7 +564,7 @@ const STALENESS_COPY = {
   unknownRetrospective: {
     Icon: CircleHelpIcon,
     className: "text-muted-foreground",
-    text: "Unchanged since this record was reconstructed — but the producing step ran inside a subagent and its bytes were never hashed at the time, so a match cannot confirm this is what it produced.",
+    text: nbText("provenance.unknown_retrospective"),
   },
 } as const;
 
@@ -611,7 +614,7 @@ export function ProvenancePanel({
   if (loading && !data) {
     return (
       <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-        Loading provenance…
+        {nbText("provenance.loading")}
       </div>
     );
   }
@@ -625,7 +628,7 @@ export function ProvenancePanel({
           onClick={load}
           className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
         >
-          <RefreshCcwIcon className="size-3" /> Retry
+          <RefreshCcwIcon className="size-3" /> {nbText("provenance.retry")}
         </button>
       </div>
     );
@@ -648,15 +651,15 @@ export function ProvenancePanel({
       <div className="rounded-md border bg-card/40 p-2.5">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            This version
+            {nbText("provenance.version")}
           </p>
           <button
             onClick={load}
             disabled={loading}
             className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
-            title="Re-read from disk"
+            title={nbText("provenance.reread")}
           >
-            <RefreshCcwIcon className={cn("size-2.5", loading && "animate-spin")} /> Refresh
+            <RefreshCcwIcon className={cn("size-2.5", loading && "animate-spin")} /> {nbText("provenance.refresh")}
           </button>
         </div>
         {data.current ? (
@@ -665,12 +668,12 @@ export function ProvenancePanel({
               sha256:{data.current.sha256 ?? "—"}
             </p>
             <p className="text-[10px] text-muted-foreground">
-              {formatBytes(data.current.size)} · modified {formatWhen(data.current.mtimeMs)}
+              {nbText("provenance.modified", { size: formatBytes(data.current.size), when: formatWhen(data.current.mtimeMs) })}
             </p>
           </div>
         ) : (
           <p className="mt-1 text-[11px] text-muted-foreground">
-            This file no longer exists in the sandbox.
+            {nbText("provenance.no_file")}
           </p>
         )}
         <p className={cn("mt-2 flex items-start gap-1 text-[10px]", staleness.className)}>
@@ -684,7 +687,7 @@ export function ProvenancePanel({
       {data.lineage && data.lineage.edges.length > 0 && (
         <div className="mt-3">
           <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            Lineage
+            {nbText("provenance.lineage")}
           </p>
           <div data-testid="provenance-lineage" className="rounded-md border bg-card/40 px-2.5 py-2">
             <LineageTree lineage={data.lineage} target={data.path} onOpenFile={onOpenFile} />
@@ -695,7 +698,7 @@ export function ProvenancePanel({
       {/* Producing steps */}
       <div className="mt-3">
         <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-          Produced by {hasHistory ? `(${data.producedBy.length})` : ""}
+          {nbText("provenance.produced_by", { count: hasHistory ? `(${data.producedBy.length})` : "" })}
         </p>
         {hasHistory ? (
           <div className="space-y-2">
@@ -713,9 +716,7 @@ export function ProvenancePanel({
           </div>
         ) : (
           <p className="rounded-md border border-dashed px-2.5 py-3 text-[11px] leading-relaxed text-muted-foreground">
-            No recorded provenance. Either this file predates provenance recording,
-            it was uploaded rather than produced by the agent, or it was written
-            during a run whose attribution degraded.
+            {nbText("provenance.no_history")}
           </p>
         )}
       </div>
@@ -724,7 +725,7 @@ export function ProvenancePanel({
       {data.citedBy.length > 0 && (
         <div className="mt-3">
           <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            Cited in the notebook ({data.citedBy.length})
+            {nbText("provenance.cited", { count: data.citedBy.length })}
           </p>
           <div className="space-y-1">
             {data.citedBy.map((citation) => (
@@ -739,20 +740,19 @@ export function ProvenancePanel({
                 )}
               >
                 <span className="mt-px shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {citation.type}
+                  {nbText(`type.${citation.type}`)}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[11px] text-foreground/90">
                     {citation.title}
                   </span>
                   <span className="mt-0.5 block text-[10px] text-muted-foreground">
-                    {citation.role} · {formatWhen(citation.timestamp)}
+                    {citation.role === "agent" ? nbText("provenance.citation_agent") : citation.role === "you" ? nbText("role.you") : citation.role} · {formatWhen(citation.timestamp)}
                   </span>
                   {citation.precedesLatestOutput && (
                     <span className="mt-0.5 flex items-start gap-1 text-[10px] text-amber-600 dark:text-amber-400">
                       <AlertTriangleIcon className="mt-px size-2.5 shrink-0" />
-                      Written before the latest version of this file — the entry may
-                      describe different bytes.
+                      {nbText("provenance.old_citation")}
                     </span>
                   )}
                 </span>
@@ -766,7 +766,7 @@ export function ProvenancePanel({
       {data.readByTotal > 0 && (
         <div className="mt-3">
           <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-            Read by ({data.readByTotal})
+            {nbText("provenance.read_by", { count: data.readByTotal })}
           </p>
           <ul className="space-y-0.5">
             {data.readBy.map((step) => (
@@ -782,7 +782,7 @@ export function ProvenancePanel({
           </ul>
           {data.readByTotal > data.readBy.length && (
             <p className="mt-1 text-[10px] text-muted-foreground">
-              + {data.readByTotal - data.readBy.length} more
+              {nbText("provenance.more", { count: data.readByTotal - data.readBy.length })}
             </p>
           )}
         </div>

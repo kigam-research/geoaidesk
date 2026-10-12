@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Custom PDF viewer built on pdfjs-dist with a per-page annotation overlay.
@@ -50,6 +51,8 @@ import { usePdfPageRendering } from "./use-pdf-page-rendering";
 import { usePdfZoom } from "./use-pdf-zoom";
 import { AnnotationSidebar } from "./annotation-sidebar";
 import { NotePopover } from "./note-popover";
+
+const filesText = geoText("files");
 
 type PdfjsModule = typeof import("pdfjs-dist");
 type PdfDoc = import("pdfjs-dist").PDFDocumentProxy;
@@ -227,7 +230,7 @@ export function PdfViewer({
         if (!cancelled) setPdfjs(mod);
       })
       .catch((e) => {
-        if (!cancelled) setError(e?.message ?? "Failed to load PDF engine");
+        if (!cancelled) setError(e?.message ?? filesText("pdf_viewer.failed_to_load_pdf_engine"));
       });
     return () => {
       cancelled = true;
@@ -281,7 +284,7 @@ export function PdfViewer({
           // than leaving it dangling until unmount.
           try { docRef.current?.destroy(); } catch { /* ignore */ }
           docRef.current = null;
-          setError(e?.message ?? "Failed to load PDF");
+          setError(e?.message ?? filesText("pdf_viewer.failed_to_load_pdf"));
         }
       },
     );
@@ -717,7 +720,7 @@ export function PdfViewer({
               )}
             {!doc && (
               <div className="py-10 text-sm text-muted-foreground">
-                Loading PDF…
+                {filesText("pdf_viewer.loading_pdf")}
               </div>
             )}
           </div>
@@ -797,7 +800,7 @@ function Toolbar({
     <div className="flex shrink-0 flex-wrap items-center gap-2 border-b bg-background/60 px-2 py-1 text-xs">
       <button
         className="rounded px-2 py-1 hover:bg-muted"
-        title="Zoom out"
+        title={filesText("pdf_viewer.zoom_out")}
         onClick={() => setZoom(Math.max(0.1, +(zoom - 0.1).toFixed(2)))}
       >
         −
@@ -807,7 +810,7 @@ function Toolbar({
       </span>
       <button
         className="rounded px-2 py-1 hover:bg-muted"
-        title="Zoom in"
+        title={filesText("pdf_viewer.zoom_in")}
         onClick={() => setZoom(Math.min(4, +(zoom + 0.1).toFixed(2)))}
       >
         +
@@ -815,7 +818,7 @@ function Toolbar({
       <button
         className="rounded px-2 py-1 hover:bg-muted"
         onClick={() => setZoom(1)}
-        title="Fit 100%"
+        title={filesText("pdf_viewer.fit_100")}
       >
         100%
       </button>
@@ -824,10 +827,9 @@ function Toolbar({
         className={cn("rounded px-2 py-1 hover:bg-muted", fitWidth && "bg-muted")}
         onClick={onFitWidth}
         aria-pressed={fitWidth}
-        title="Fit page to pane width"
+        title={filesText("pdf_viewer.fit_page_to_pane_width")}
       >
-        Fit width
-      </button>
+         {filesText("pdf_viewer.fit_width")} </button>
 
       <div className="mx-2 h-4 w-px bg-border" />
 
@@ -842,7 +844,7 @@ function Toolbar({
         }}
         className="flex items-center gap-1"
       >
-        Page
+        {filesText("pdf_viewer.page_label")}
         <input
           name="p"
           defaultValue={currentPage}
@@ -860,13 +862,13 @@ function Toolbar({
             "rounded px-2 py-1",
             mode === "highlight" ? "bg-amber-200 text-amber-900" : "hover:bg-muted",
           )}
-          title="Highlight current text selection"
+          title={filesText("pdf_viewer.highlight_current_text_selection")}
           onClick={() => {
             setMode("highlight");
             onCommitHighlight();
           }}
         >
-          Highlight selection
+          {filesText("pdf_viewer.highlight_selection")}
         </button>
       )}
       {!hideAnnotationUi && (
@@ -875,10 +877,10 @@ function Toolbar({
             "rounded px-2 py-1",
             mode === "note" ? "bg-blue-200 text-blue-900" : "hover:bg-muted",
           )}
-          title="Click on the page to drop a note"
+          title={filesText("pdf_viewer.click_on_the_page_to_drop_a_note")}
           onClick={() => setMode(mode === "note" ? "none" : "note")}
         >
-          {mode === "note" ? "Click page…" : "Add note"}
+          {mode === "note" ? filesText("pdf_viewer.click_page") : filesText("pdf_viewer.add_note")}
         </button>
       )}
 
@@ -890,7 +892,7 @@ function Toolbar({
               checked={showExpert}
               onChange={(e) => setShowExpert(e.target.checked)}
             />
-            Expert annotations
+            {filesText("pdf_viewer.expert_annotations")}
           </label>
         )}
         {/* Browser-native find/print/download live in the browser's own PDF
@@ -899,7 +901,7 @@ function Toolbar({
           href={openHref}
           target="_blank"
           rel="noreferrer"
-          title="Open in browser tab (find, print, download)"
+          title={filesText("pdf_viewer.open_in_browser_tab_find_print_download")}
           className="rounded px-2 py-1 hover:bg-muted"
         >
           <ExternalLinkIcon className="size-3.5" />

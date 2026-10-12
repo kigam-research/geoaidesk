@@ -1,9 +1,12 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { useEffect, useRef, useState } from "react";
 
 import { type Author, colorForAuthor } from "@/lib/pdf-annotations";
 import { cn } from "@/lib/utils";
+
+const filesText = geoText("files");
 
 export interface NotePopoverProps {
   screen: { x: number; y: number };
@@ -78,9 +81,9 @@ export function NotePopover({
           className="inline-block size-2.5 rounded-full"
           style={{ backgroundColor: colorForAuthor(author) }}
         />
-        <span className="font-medium">{author.label}</span>
+        <span className="font-medium">{author.kind === "user" && author.id === "local" && author.label === "You" ? filesText("note_popover.you") : author.label}</span>
         <span className="text-muted-foreground">
-          {author.kind === "expert" ? "· expert" : "· you"}
+          {author.kind === "expert" ? filesText("note_popover.expert") : filesText("note_popover.you")}
         </span>
       </div>
 
@@ -88,7 +91,7 @@ export function NotePopover({
         value={body}
         onChange={(e) => setBody(e.target.value)}
         readOnly={readOnly}
-        placeholder={readOnly ? "" : "Add a note…"}
+        placeholder={readOnly ? "" : filesText("note_popover.add_a_note")}
         className={cn(
           "h-24 w-full resize-none rounded border bg-background p-2 text-sm",
           readOnly && "cursor-default text-muted-foreground",
@@ -104,8 +107,8 @@ export function NotePopover({
               onClick={() => onDelete(altHeld || !isExpert)}
               title={
                 isExpert
-                  ? "Hold Alt and click to delete an expert annotation"
-                  : "Delete annotation"
+                  ? filesText("note_popover.hold_alt_and_click_to_delete_an_expert_annotation")
+                  : filesText("note_popover.delete_annotation")
               }
               className={cn(
                 "rounded px-2 py-1 text-xs",
@@ -114,8 +117,7 @@ export function NotePopover({
                   : "text-destructive hover:bg-destructive/10",
               )}
             >
-              Delete
-            </button>
+               {filesText("note_popover.delete")} </button>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -124,16 +126,14 @@ export function NotePopover({
             onClick={onCancel}
             className="rounded px-2 py-1 text-xs hover:bg-muted"
           >
-            Cancel
-          </button>
+             {filesText("note_popover.cancel")} </button>
           {!readOnly && (
             <button
               type="button"
               onClick={() => onSave(body)}
               className="rounded bg-primary px-2 py-1 text-xs text-primary-foreground hover:opacity-90"
             >
-              Save
-            </button>
+               {filesText("note_popover.save")} </button>
           )}
         </div>
       </div>

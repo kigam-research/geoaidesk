@@ -1,4 +1,6 @@
 "use client";
+import { SettingsMessage } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 // Fusion configs panel (stored in localStorage, auto-populates model list).
 
@@ -16,6 +18,8 @@ import {
   type StoredFusionConfig,
 } from "@/lib/fusion-presets";
 import { SettingsError, SettingsHeader } from "./primitives";
+
+const settingsText = geoText("settings");
 
 const FUSION_SKELETON = JSON.stringify(
   {
@@ -41,9 +45,9 @@ function configError(text: string): string | null {
     const parsed: unknown = JSON.parse(text);
     return parsed && typeof parsed === "object" && !Array.isArray(parsed)
       ? null
-      : "The config must be a JSON object.";
+      : settingsText("fusion.the_config_must_be_a_json_object");
   } catch (cause) {
-    return `Invalid JSON: ${cause instanceof Error ? cause.message : "parse error"}`;
+    return settingsText("fusion.confirm.invalid_json", { v0: cause instanceof Error ? cause.message : settingsText("fusion.parse_error") });
   }
 }
 
@@ -99,9 +103,9 @@ export function FusionPanel() {
 
   const remove = async (config: StoredFusionConfig) => {
     const ok = await confirm({
-      title: `Delete “${config.name}”?`,
-      description: "It disappears from the model picker. Chats already using it keep their history.",
-      confirmLabel: "Delete",
+      title: settingsText("fusion.confirm.delete", { v0: config.name }),
+      description: settingsText("fusion.it_disappears_from_the_model_picker_chats_already_using_it_keep_their_history"),
+      confirmLabel: settingsText("fusion.delete"),
       destructive: true,
     });
     if (!ok) return;
@@ -138,54 +142,41 @@ export function FusionPanel() {
     <div className="flex flex-col gap-4">
       {dialog}
       <SettingsHeader
-        title="Fusion configurations"
-        description={
-          <>
-            Named OpenRouter Fusion setups appear at the top of the model picker. Paste the full
-            Fusion request body (see the{" "}
-            <a
-              href="https://openrouter.ai/docs/guides/features/plugins/fusion"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline-offset-2 hover:underline"
-            >
-              OpenRouter Fusion docs
-            </a>
-            ). Fusion needs OpenRouter access and is saved in this browser only.
-          </>
-        }
+        title={settingsText("fusion.fusion_configurations")}
+        description={<SettingsMessage id="fusion.intro" values={{ docs: <a href="https://openrouter.ai/docs/guides/features/plugins/fusion" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">{settingsText("fusion.openrouter_fusion_docs")}
+            </a> }} />}
       />
 
       <SettingsError>{error}</SettingsError>
 
       <div>
         <Button variant="outline" size="sm" className="text-xs" onClick={() => setShowAdd((v) => !v)}>
-          <PlusIcon className="size-3.5" /> Add Fusion config
+          <PlusIcon className="size-3.5" /> {settingsText("fusion.add_fusion_config")}
         </Button>
         {showAdd && (
           <div className="mt-2">
             <Input
-              placeholder="Config name (e.g. Research Fusion)"
-              aria-label="Fusion config name"
+              placeholder={settingsText("fusion.config_name_e_g_research_fusion")}
+              aria-label={settingsText("fusion.fusion_config_name")}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               className="mb-2"
             />
             <Textarea
               value={newConfig}
-              aria-label="Fusion config JSON"
+              aria-label={settingsText("fusion.fusion_config_json")}
               onChange={(e) => setNewConfig(e.target.value)}
               className="font-mono text-xs h-32"
             />
             <Button onClick={add} className="mt-2" size="sm" disabled={!newName.trim()}>
-              <PlusIcon className="size-3.5 mr-1" /> Add
+              <PlusIcon className="size-3.5 mr-1" /> {settingsText("fusion.add")}
             </Button>
           </div>
         )}
       </div>
 
       <div className="space-y-3">
-        {configs.length === 0 && <p className="text-xs text-muted-foreground">No Fusion configs yet.</p>}
+        {configs.length === 0 && <p className="text-xs text-muted-foreground">{settingsText("fusion.no_fusion_configs_yet")}</p>}
         {configs.map((c) => {
           const isEditing = editingId === c.id;
           let summary = null;
@@ -195,18 +186,18 @@ export function FusionPanel() {
               const panel = fusionPanelModels(p).join(", ");
               const judge = fusionJudgeModel(p) ?? "-";
               const r = p.reasoning_effort || "-";
-              const t = p.temperature ?? "default";
+              const t = p.temperature ?? settingsText("fusion.default");
               summary = (
                 <div className="mt-1 text-[10px] text-muted-foreground">
-                  <div>Panel: {panel}</div>
-                  <div>Judge: {judge}</div>
+                  <div>{settingsText("fusion.panel")}{panel}</div>
+                  <div>{settingsText("fusion.judge")}{judge}</div>
                   <div>
-                    Reasoning: {r} • Temp: {t}
+                    {settingsText("fusion.reasoning")}{r} {settingsText("fusion.temp")}{t}
                   </div>
                 </div>
               );
             } catch {
-              summary = <div className="mt-1 text-[10px] text-destructive">Invalid config</div>;
+              summary = <div className="mt-1 text-[10px] text-destructive">{settingsText("fusion.invalid_config")}</div>;
             }
           }
           return (
@@ -215,14 +206,14 @@ export function FusionPanel() {
                 <div className="font-medium">{c.name}</div>
                 <div className="flex gap-1">
                   {!isEditing && (
-                    <Button variant="ghost" size="icon" aria-label={`Edit ${c.name}`} onClick={() => startEdit(c)}>
+                    <Button variant="ghost" size="icon" aria-label={settingsText("fusion.edit", { v0: c.name })} onClick={() => startEdit(c)}>
                       <PencilIcon className="size-3.5" />
                     </Button>
                   )}
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={`Delete ${c.name}`}
+                    aria-label={settingsText("fusion.delete_181", { v0: c.name })}
                     onClick={() => void remove(c)}
                   >
                     <Trash2Icon className="size-3.5" />
@@ -233,16 +224,16 @@ export function FusionPanel() {
                 <>
                   <Textarea
                     value={editConfig}
-                    aria-label={`${c.name} config JSON`}
+                    aria-label={settingsText("fusion.config_json", { v0: c.name })}
                     onChange={(e) => setEditConfig(e.target.value)}
                     className="font-mono text-xs h-32 mt-2"
                   />
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" onClick={saveEdit}>
-                      Save
+                      {settingsText("fusion.save")}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={cancelEdit}>
-                      Cancel
+                      {settingsText("fusion.cancel")}
                     </Button>
                   </div>
                 </>

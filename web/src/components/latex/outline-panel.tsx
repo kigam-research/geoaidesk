@@ -1,9 +1,12 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import type { OutlineItem } from "@/lib/latex/outline";
 import { cn } from "@/lib/utils";
 import { HashIcon, ImageIcon, TableIcon } from "lucide-react";
 import { memo, useMemo } from "react";
+
+const filesText = geoText("files");
 
 function iconFor(kind: OutlineItem["kind"]) {
   if (kind === "figure") return <ImageIcon className="size-3 shrink-0" />;
@@ -33,13 +36,11 @@ export const OutlinePanel = memo(function OutlinePanel({
   return (
     <div className="flex w-48 shrink-0 flex-col overflow-hidden border-r bg-muted/10">
       <div className="shrink-0 border-b px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        Outline
-      </div>
+         {filesText("outline_panel.outline")} </div>
       <div className="flex-1 overflow-auto py-1">
         {items.length === 0 && (
           <p className="px-3 py-2 text-[11px] text-muted-foreground/60">
-            No sections yet — add a \section to see the outline.
-          </p>
+             {filesText("outline_panel.no_sections_yet_add_a_section_to_see_the_outline")} </p>
         )}
         {items.map((item, i) => (
           <button
@@ -53,7 +54,7 @@ export const OutlinePanel = memo(function OutlinePanel({
             title={item.title}
           >
             {iconFor(item.kind)}
-            <span className="truncate">{item.title || "(untitled)"}</span>
+            <span className="truncate">{item.title || filesText("outline_panel.untitled")}</span>
           </button>
         ))}
       </div>

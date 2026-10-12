@@ -1,17 +1,48 @@
 "use client";
 import { geoText } from "@/geo/i18n";
+import settingsEnglish from "@/geo/locales/settings/en.json";
 
 /**
  * Shared building blocks for the Settings tabs, so every panel states its
  * scope, reports errors and filters lists the same way.
  */
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { AlertCircleIcon, SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+const settingsText = geoText("settings");
+
 const appText = geoText("app");
+
+// Translate only known app-authored metadata. Provider/runtime diagnostics and
+// user content are kept verbatim, including future unknown messages.
+const sourceIds = new Map(
+  Object.keys(settingsEnglish).filter((id) => id.startsWith("source."))
+    .map((id) => [settingsText(id, {}, "en"), id] as const),
+);
+
+export function settingsSourceText(value: string): string {
+  const id = sourceIds.get(value);
+  return id ? settingsText(id) : value;
+}
+
+/** Whole translated sentences may contain links/code without losing their markup. */
+export function SettingsMessage({ id, values = {} }: { id: string; values?: Record<string, ReactNode> }) {
+  const nodes: ReactNode[] = [];
+  const args: Record<string, string | number> = {};
+  for (const [key, value] of Object.entries(values)) {
+    if (typeof value === "string" || typeof value === "number") args[key] = value;
+    else {
+      args[key] = "\uFFFC" + nodes.length + "\uFFFC";
+      nodes.push(value);
+    }
+  }
+  return <>{settingsText(id, args).split(/(\uFFFC\d+\uFFFC)/).map((part, index) => (
+    <Fragment key={index}>{/^\uFFFC\d+\uFFFC$/.test(part) ? nodes[Number(part.slice(1, -1))] : part}</Fragment>
+  ))}</>;
+}
 
 /** When a change takes effect — shown under every panel heading. */
 export type AppliesTo = "new-chats" | "immediately" | "live-chats";

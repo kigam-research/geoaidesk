@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
@@ -11,6 +13,8 @@ import {
   type AnnotationsDoc,
   type NotebookAnnotation,
 } from "./notebook-annotations";
+
+const nbText = geoText("notebook");
 
 function normalizeDoc(data: unknown): AnnotationsDoc {
   const anns = (data as { annotations?: unknown } | null)?.annotations;
@@ -121,7 +125,7 @@ export function useNotebookAnnotations(
           throw new Error(`save failed: ${res.status}`);
         }
       } catch {
-        toast.error("Couldn't save your annotation — reloaded from disk.");
+        toast.error(nbText("annotations.save_failed"));
         try {
           const fres = await apiFetch(url, {}, projectId);
           if (fres.ok && sid === currentSessionRef.current) {

@@ -1,8 +1,11 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 import { useEffect, useState } from "react";
 import { sciRenderUrl, sciSummaryUrl } from "@/lib/use-sandbox";
 import { fetchSciJson, isAbortError } from "@/lib/sci-fetch";
 import type { ViewerProps } from "@/lib/viewers/registry";
+
+const filesText = geoText("files");
 
 // ---------------------------------------------------------------------------
 // Shapes (mirrors server/src/helpers/imaging_helper.py's `summarize` JSON)
@@ -83,7 +86,7 @@ export default function ImagingViewer({ path, projectId }: ViewerProps) {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">Image preview failed</p>
+        <p className="font-medium">{filesText("imaging_viewer.image_preview_failed")}</p>
         <p className="max-w-md text-xs">{error}</p>
       </div>
     );
@@ -130,8 +133,7 @@ export default function ImagingViewer({ path, projectId }: ViewerProps) {
             {summary.axes.length > 1 && (
               <div className="flex items-center gap-2">
                 <label htmlFor="imaging-axis-select" className="text-xs font-medium text-muted-foreground">
-                  Axis
-                </label>
+                   {filesText("imaging_viewer.axis")} </label>
                 <select
                   id="imaging-axis-select"
                   className="rounded-md border bg-background px-2 py-1 text-xs"
@@ -148,8 +150,7 @@ export default function ImagingViewer({ path, projectId }: ViewerProps) {
             )}
             <div className="flex flex-1 items-center gap-2">
               <label htmlFor="imaging-slice-slider" className="text-xs font-medium text-muted-foreground">
-                Slice
-              </label>
+                 {filesText("imaging_viewer.slice")} </label>
               <input
                 id="imaging-slice-slider"
                 type="range"
@@ -169,15 +170,14 @@ export default function ImagingViewer({ path, projectId }: ViewerProps) {
           <div className="flex flex-1 items-center justify-center overflow-auto rounded-md border bg-muted/10 p-2">
             {sliceFailed ? (
               <p className="px-4 py-8 text-center text-xs text-muted-foreground">
-                Couldn&apos;t render this slice. Try another axis or index.
-              </p>
+                 {filesText("imaging_viewer.couldn_t_render_this_slice_try_another_axis_or_index")} </p>
             ) : (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   key={sliceKey}
                   src={sciRenderUrl(path, "imaging", index, activeAxis, projectId)}
-                  alt={`${summary.format} slice ${index} (${activeAxis})`}
+                  alt={filesText("imaging_viewer.slice_alt", { format: summary.format, index, axis: activeAxis })}
                   className="max-h-full max-w-full object-contain"
                   onError={() => setFailedSlice(sliceKey)}
                 />
@@ -188,7 +188,7 @@ export default function ImagingViewer({ path, projectId }: ViewerProps) {
 
         {metaEntries.length > 0 && (
           <div className="w-full shrink-0 lg:w-64">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">Metadata</p>
+            <p className="mb-1 text-xs font-medium text-muted-foreground">{filesText("imaging_viewer.metadata")}</p>
             <div className="overflow-x-auto rounded-md border">
               <table className="w-full border-collapse text-xs">
                 <tbody>
