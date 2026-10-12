@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-12-gaid-map-tiles/figures/01-latency.png" width="120"> | 2026-10-12 14:35 | [지도 타일 표시, 배경지도 선택, Markdown 그림 경로 규칙](2026-10-12-gaid-map-tiles/index.md) | 지도 확대·축소 대기가 1.5–2.4초에서 0.04초 이하로 줄었고, 배경지도를 없음·OSM·국토지리정보원·지질도 중에서 고르며, 에이전트가 쓴 Markdown의 깨진 그림 경로를 자동으로 알립니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-11-gaid-release-proof/figures/01-local-98k-map.png" width="120"> | 2026-10-11 21:01 | [GeoAIDesk 0.1.0 출시 검증 — 설치·업데이트·모델 경로 증거](2026-10-11-gaid-release-proof/index.md) | Linux·WSL·Windows 모두 새 설치와 업데이트를 통과했습니다(Windows는 한글 경로 결함 2건 수정 후). 로컬 모델은 98K 지도 과제 1건만 기준을 통과했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-11-gaid-korean-workspace/figures/01-file-suggestion-draft.png" width="120"> | 2026-10-11 16:54 | [한국어 작업 공간: 자료에 맞는 작업 제안, 작업 초안, 결과 카드](2026-10-11-gaid-korean-workspace/index.md) | 파일을 열면 맞는 Geoscience 작업을 준비 상태와 함께 제안하고, 새 채팅에 작업 초안을 만들며, 결과 카드에서 지도를 엽니다. 주요 화면은 한국어입니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-11-gaid-maps/figures/01-map-area.png" width="120"> | 2026-10-11 15:20 | [래스터·벡터 지도와 전체 레이어 면적표](2026-10-11-gaid-maps/index.md) | 래스터와 벡터를 함께 표시하고 전체 레이어의 분류별 면적표를 계산·저장합니다. | 검토 전 | 미정 | 0 |
