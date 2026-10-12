@@ -387,10 +387,10 @@
       "responsibility": "gaid-ui-locale (settings): visible strings read through t() from web/src/geo/locales/settings/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Settings dialog and its panels (providers, defaults, fusion, services, project settings, skills, prompt templates, specialists, connectors, custom model servers, sign-in dialogs, access token gate)"
     },
     {
-      "path": "web/src/components/lab-notebook-header.tsx, web/src/components/lab-notebook-entry-card.tsx, web/src/components/lab-notebook-view.tsx, web/src/components/lab-notebook-timeline.tsx, web/src/components/notebook-evidence-summary.tsx, web/src/components/notebook-result-links.tsx, web/src/components/provenance-panel.tsx, web/src/components/scientific-result-card.tsx, web/src/lib/use-notebook-annotations.ts",
+      "path": "web/src/components/lab-notebook-header.tsx, web/src/components/lab-notebook-entry-card.tsx, web/src/components/lab-notebook-view.tsx, web/src/components/lab-notebook-timeline.tsx, web/src/components/notebook-evidence-summary.tsx, web/src/components/notebook-result-links.tsx, web/src/components/provenance-panel.tsx, web/src/components/scientific-result-card.tsx, web/src/lib/use-notebook-annotations.ts, web/src/lib/notebook-filters.ts, web/src/lib/notebook-timeline.ts",
       "owner": "gaid-ui-locale",
       "status": "edited",
-      "responsibility": "gaid-ui-locale (notebook): visible strings read through t() from web/src/geo/locales/notebook/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Lab notebook view, entries, evidence summary, result links, provenance panel and scientific result card"
+      "responsibility": "gaid-ui-locale (notebook): visible strings read through t() from web/src/geo/locales/notebook/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Lab notebook view, entries, evidence summary, result links, provenance panel and scientific result card; notebook-filters.ts (author labels) and notebook-timeline.ts (day-divider date locale)"
     },
     {
       "path": "web/src/components/notebook-robustness-dialog.tsx, web/src/components/notebook-plan-dialog.tsx, web/src/components/next-experiments-dialog.tsx, web/src/components/next-experiment-cards.tsx, web/src/components/evidence-package-dialog.tsx, web/src/components/notebook-memory-dialog.tsx",
