@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T15:00:39Z
+updated: 2026-10-12T22:21:10Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -131,6 +131,10 @@ boundaries against `git diff --name-only origin/main`, rescan, browser screensho
 - 2026-10-12: five of six children (work, files, settings, notebook, research) stopped right after start with Paseo
   "[System Error] Selected model is at capacity" (gpt-6.1-sol), before `task resume`. Not a code problem; resent the
   same start prompt once with `paseo send <id> --prompt-file` (prompts saved in /tmp/gaid-retry/); all five running.
+- 2026-10-13: work and research stopped again mid-work with the same capacity error (uncommitted work kept in their
+  worktrees: work 27 files, research 9). Sent /tmp/gaid-retry/continue.md (save progress first, then finish). If it
+  recurs, consider a different worker profile for these two.
+
 ## Notes and decisions
 - User (2026-10-12, verbatim): "그리고 이미 minimax api 연동되어 있을것이다." MINIMAX_API_KEY is in the review instance's
   ~/.geoaidesk/config.env; the own instance's run.sh loads only `MINIMAX_*` from it (value never printed). Used for the
