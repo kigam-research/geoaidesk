@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T23:09:44Z
+status: done
+updated: 2026-10-12T23:09:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -105,9 +105,8 @@ Details:
   files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
 
 ## Next steps
-1. `task finish` (runs scripts/check); afterwards remove build caches (server/node_modules, server/src/helpers/.venv,
-   web/node_modules, web/.next, web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__) if close reports them.
-   Own app unit `gaid-ui-locale-app` is stopped.
+<!-- task:closed -->
+Closed 2026-10-12T23:09:55Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-ui-locale.md.
 
 ## Children (started 2026-10-12, profile "general work", prompts in ~/data/geoaidesk/work/gaid-ui-locale/prompts/)
 - gaid-ui-locale--workflows: agent 7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb — completed and closed
@@ -161,7 +160,7 @@ boundaries against `git diff --name-only origin/main`, rescan, browser screensho
   hosted-model reply-language check in addition to the local model.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [결정] K-Dense workflow 프롬프트 본문(326개)을 한국어로도 둘지 — 가) 영어 유지, 한국어 답은 요청에 지시를 덧붙임 — 나) 한국어 프롬프트를 추가해 한국어 모드에서 한국어 요청으로 넣음(별도 작업, 약 42만 자) — 권장: 가) 번역량이 크고 프롬프트는 화면 문구가 아닌 요청 내용이며 응답 언어 규칙이 지시를 따름 — 막힌 일: 없음 — 근거: reports/2026-10-13-gaid-ui-locale#6-결정할-일
+- [결정 gaid-ui-locale#1] K-Dense workflow 프롬프트 본문(326개)을 한국어로도 둘지 — 가) 영어 유지, 한국어 답은 요청에 지시를 덧붙임 — 나) 한국어 프롬프트를 추가해 한국어 모드에서 한국어 요청으로 넣음(별도 작업, 약 42만 자) — 권장: 가) 번역량이 크고 프롬프트는 화면 문구가 아닌 요청 내용이며 응답 언어 규칙이 지시를 따름 — 막힌 일: 없음 — 근거: reports/2026-10-13-gaid-ui-locale#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;

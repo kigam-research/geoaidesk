@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T14:35:14Z
+status: done
+updated: 2026-10-12T23:09:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"334bb7bf-c7ab-4250-b73e-1471a312e37f","pid":156917,"provider":"codex","session":"01a13070-cbd3-7342-84f1-7f5315c5f76d","start":"28006151","token":"3629085d8a1d23c5b9de8f99b11198713cbb9dc06174c176c4fe351ffbf0c804"}
 branch: task/gaid-ui-locale--notebook
 target: task/gaid-ui-locale
@@ -96,7 +96,7 @@ Verification: local web npm ci completed; web npx tsc --noEmit passed; full npm 
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-12T14:35:14Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-12T23:09:55Z: integrated into gaid-ui-locale; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial task resume waited for another transaction; retry succeeded with no relocation.
