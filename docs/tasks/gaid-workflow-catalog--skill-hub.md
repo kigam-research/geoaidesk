@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:26:42Z
+updated: 2026-10-12T09:29:56Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -91,13 +91,18 @@ AGENTS.md (one bullet).
 
 ## Current state
 - Resumed in the original printed worktree. Read repository rules, writer procedures, copy rules and the existing preview/install seams.
-- Dependency installation is recorded as job-geoaidesk-gaid-workflow-catalog--skill-hub-1; implementation proceeds independently.
+- Implemented URL/file intake, bounded archive validation, durable SHA-256 sources, catalogue-name notice and existing preview/acknowledgement/install seam. Published checkpoint b3aa2370d63c.
+- Server 16 tests and web 4 tests pass; server/web tsc and copy validator pass (0 errors, 3 explained warnings). Real public package downloaded and its layout inspected.
+- Isolated end-to-end check is running as job-geoaidesk-gaid-workflow-catalog--skill-hub-2; output/evidence under ~/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/. No paid model runs or review-instance changes.
 ## Next steps
-1. Implement bounded package intake and the Settings seam, then focused tests and isolated browser evidence.
+1. Inspect job 2 exit and evidence on its completion notification; fix any concrete failure, then copy desktop/narrow PNGs into the parent report folder, finalize the report section, clean generated caches and task finish.
 ## Failed approaches
+- E2E job 2 was cancelled after its harness launched Next in the repository root instead of web/. No application failure: corrected the external harness Next directory before a fresh run.
+- Initial SkillsPanel seam test supplied an incomplete sync-status mock; fixed the fixture to use the normal default, without changing production list logic.
 ## Notes and decisions
 - Sequential decisions: keep the existing acknowledgement/install gate; configure sites in distribution.json; use one package root and content-addressed durable sources under KADY_PI_AGENT_DIR. URL downloads refuse redirects and are limited to the exact configured site base and validated skill identifiers.
 - Work packages and integration order: server adapter/routes → frontend component and narrow SkillsPanel seam → focused tests → isolated end-to-end evidence → parent report section. All files are tightly coupled and owned by this writer; no child writers. Parent owns the workflow pane and workspace locale.
+- Distribution schema check uses a fixed owner allowlist; added gaid-workflow-catalog to geo/tests/distribution.test.mjs (minimal required distribution-test maintenance per the brief). The seven distribution tests pass.
 - Limits: 20 MiB compressed, 64 MiB expanded tar, 10,000 file/directory entries. A package has one top-level skill folder with SKILL.md. The stable source is a snapshot, not an automatic update subscription.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
@@ -112,6 +117,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T091833.056202Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T092753.682282Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/web.log"],"reason":"E2E harness launched Next from repository root, not web; fix harness directory and rerun","recorded":"2026-10-12T09:29:55Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
