@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:22:31Z
+updated: 2026-10-12T14:47:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"597a1537-b69e-4291-b5f7-44e6e6807109","pid":154306,"provider":"codex","session":"01a13070-9f74-7430-b1e9-19ce450fc69d","start":"28005015","token":"71c6622f569a3e1b601fe963d7e1a285fd1c492855206a32e60dad763b06162b"}
 branch: task/gaid-ui-locale--settings
 target: task/gaid-ui-locale
@@ -82,21 +82,50 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Delivered Settings/authentication localization in the existing shared locale mechanism: 721 messages in each settings catalogue (including 134 finite app-authored provider/MCP metadata messages). Existing app IDs remain unchanged. All edits are within the owned files; no other upstream files or integration boundaries were touched.
+
+Edited components: settings/{project-settings-panel,services-panel,fusion-panel,providers-panel,model-field,primitives}.tsx and {custom-models-card,skills-panel,prompts-panel,subagents-panel,connectors-panel,oauth-login-dialog,provider-auth-panel,api-token-gate}.tsx. Also settings/{ko,en}.json and this task document. Defaults, key-row and settings-dialog already used app IDs and needed no changes.
+
+Checks passed: npm ci; npx tsc --noEmit; full web suite 145 files / 972 tests; copy validator 0 errors; git diff --check; scanner reviewed (11 intentional hits); actual ICU formatter exercised all 1,442 bilingual messages and Korean/English rich placeholders with preserved links/code. No browser or model runs; parent owns browser QA and scripts/check.
+
+English text is preserved except settings.services.search_fallback_plus_youtube_and_video_understanding_for_fetched_links_it_is_the_same_gemi: “unlocks” → “enables”, required by empty-capability validation. Intentionally retained: product names, command/path/model/env identifiers, user-authored skill/template/agent content, raw configuration data and unknown provider/runtime diagnostics. Detailed exceptions and copy evidence follow below.
+
 ## Next steps
-1. (the next session's first action)
+1. Run task save and task finish for this checked child snapshot.
+2. Parent gaid-ui-locale integrates with task complete and owns full-repository checks/browser QA.
 ## Failed approaches
+- Initial literal extraction did not cover finite provider metadata or whole count phrases; added an exact known-source adapter and complete ICU count messages.
+- First full web test run exposed a React code node passed as a string placeholder (2 service tests failed). SettingsMessage now preserves React links/code and permits Korean word order; all 972 tests passed after the fix.
+- Intermediate type checks caught optional source text and the login title field; fixed in place. Enter keyboard values remain literal protocol values.
 ## Notes and decisions
+- Sequential decisions: preserve all English text except validator-required edits; never translate protocol values, commands, user files, or provider names.
+- Owned interfaces: only listed components and settings locale JSON; existing app IDs stay unchanged. Integration order: catalogue substitutions, dynamic UI adapters, checks, child finish.
+- Read-only readers: native translate_reader (skills/prompts/specialists copy and coverage) and connectors_reader (connectors copy and provider metadata). The single writer owns every edit.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. Parent gaid-ui-locale owns the canonical user report. The Current state and copy evidence below are the child result to incorporate.
+
+## Copy changes and retained strings
+- Complete id-level before/after evidence is the settings catalogue pair: before, each new id was an inline upstream English string with no Korean entry; after, en.json preserves that text and ko.json contains the Korean equivalent. ICU apostrophe quoting is syntax only, not an English wording change.
+- Representative changes (namespace settings):
+
+| ID | Before ko/en | After ko | After en |
+| --- | --- | --- | --- |
+| project_settings.general_budget | General & budget | 일반 및 예산 | General & budget |
+| fusion.fusion_configurations | Fusion configurations | Fusion 설정 | Fusion configurations |
+| custom_models.save_servers | Save servers | 서버 저장 | Save servers |
+| connectors.authentication | Authentication | 인증 | Authentication |
+| api_token_gate.access_token_required | Access token required | 접근 토큰 필요 | Access token required |
+| source.google_cloud_api_key_optional | Google Cloud API key (optional) | Google Cloud API 키(선택) | Google Cloud API key (optional) |
+
+- English exception: services.search_fallback_plus_youtube_and_video_understanding_for_fetched_links_it_is_the_same_gemi changes “that unlocks Google Gemini models” to “that enables Google Gemini models”. Korean: “제공사 설정에서 Google Gemini 모델을 활성화하는 GEMINI_API_KEY와 같은 키입니다.” The copy validator blocks “unlocks”. No action, condition or support claim changed.
+- Scanner retained hits: connectors-panel command example `-y @modelcontextprotocol/server-github`; custom-models-card server-name example `Lab vLLM`; prompts-panel `/name args`, `/qc user_data/a.csv`, `K-Dense`; providers-panel `Ollama`; skills-panel `/SKILL.md`; subagents-panel `Watchdog` (twice), `.pi/WATCHDOG.md`, `read, grep, find, ls, bash`. These are products/features, commands or file/tool identifiers, not untranslated prose.
+- Raw external/provider errors, runtime authentication prompts and user-provided descriptions remain verbatim unless they exactly match a finite known app-authored metadata message. Provider values, commands, keys, tool inputs, prompt bodies and stored configuration are unchanged.
+- Copy warnings reviewed: 11 settings warnings plus 3 existing warnings elsewhere, 0 errors. Automatic instruction upgrades, compaction, OAuth detection and AWS role lookup describe existing behavior. “OpenAI 플랫폼” is a glossary substring false positive for the OpenAI platform, not GAID framing. “No key?” is preserved upstream English help wording (warning only).
+- No additional upstream files, tests, dependency manifests or lockfiles changed.
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

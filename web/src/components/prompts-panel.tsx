@@ -1,4 +1,6 @@
 "use client";
+import { SettingsMessage } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Settings → Project → Prompt templates.
@@ -36,6 +38,8 @@ import {
   matchesQuery,
 } from "@/components/settings/primitives";
 
+const settingsText = geoText("settings");
+
 type Pane = "none" | "create" | "edit";
 
 export function PromptsPanel() {
@@ -64,7 +68,7 @@ export function PromptsPanel() {
     try {
       setRows(await listPromptTemplates(nextScope));
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Failed to load prompt templates");
+      setError(exc instanceof Error ? exc.message : settingsText("prompts.failed_to_load_prompt_templates"));
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -84,7 +88,7 @@ export function PromptsPanel() {
         if (message) setNotice(message);
         await load(scope, false);
       } catch (exc) {
-        setError(exc instanceof Error ? exc.message : "Operation failed");
+        setError(exc instanceof Error ? exc.message : settingsText("prompts.operation_failed"));
       } finally {
         setBusy(null);
       }
@@ -106,7 +110,7 @@ export function PromptsPanel() {
       try {
         setEditContent((await getPromptTemplateSource(name, scope)).content);
       } catch (exc) {
-        setError(exc instanceof Error ? exc.message : "Failed to load template");
+        setError(exc instanceof Error ? exc.message : settingsText("prompts.failed_to_load_template"));
       } finally {
         setEditLoading(false);
       }
@@ -119,7 +123,7 @@ export function PromptsPanel() {
     await run("save", async () => {
       await savePromptTemplateSource(editing, scope, editContent);
       closePanes();
-      return `Saved /${editing}.`;
+      return settingsText("prompts.saved", { v0: editing });
     });
   }, [closePanes, editContent, editing, run, scope]);
 
@@ -138,25 +142,25 @@ export function PromptsPanel() {
       setPane("edit");
       setEditing(created.name);
       setEditContent(created.content);
-      return `Created /${created.name}. Edit the body below.`;
+      return settingsText("prompts.created_edit_the_body_below", { v0: created.name });
     });
   }, [newDescription, newHint, newName, run, scope]);
 
   const doRemove = useCallback(
     async (row: PromptTemplateInfo) => {
       const confirmed = await confirm({
-        title: `Delete /${row.name}?`,
+        title: settingsText("prompts.confirm.delete", { v0: row.name }),
         description: row.seeded
-          ? "This is one of Kady's shipped templates; Restore defaults brings it back."
-          : "The template file is removed from disk.",
-        confirmLabel: "Delete",
+          ? settingsText("prompts.this_is_one_of_kady_s_shipped_templates_restore_defaults_brings_it_back")
+          : settingsText("prompts.the_template_file_is_removed_from_disk"),
+        confirmLabel: settingsText("prompts.delete"),
         destructive: true,
       });
       if (!confirmed) return;
       await run(`remove:${row.name}`, async () => {
         await deletePromptTemplate(row.name, scope);
         if (editing === row.name) closePanes();
-        return `Deleted /${row.name}.`;
+        return settingsText("prompts.deleted", { v0: row.name });
       });
     },
     [closePanes, confirm, editing, run, scope],
@@ -164,16 +168,16 @@ export function PromptsPanel() {
 
   const doRestore = useCallback(async () => {
     const confirmed = await confirm({
-      title: "Restore the shipped templates?",
+      title: settingsText("prompts.confirm.restore_the_shipped_templates"),
       description:
-        "Kady's shipped templates are written back to this project. Edited copies with the same names are overwritten; your own templates are untouched.",
-      confirmLabel: "Restore defaults",
+        settingsText("prompts.kady_s_shipped_templates_are_written_back_to_this_project_edited_copies_with_the_same_name"),
+      confirmLabel: settingsText("prompts.restore_defaults"),
       destructive: true,
     });
     if (!confirmed) return;
     await run("restore", async () => {
       const restored = await restoreDefaultPromptTemplates();
-      return `Restored ${restored} shipped template${restored === 1 ? "" : "s"}.`;
+      return settingsText("prompts.restored_count", { count: restored });
     });
   }, [confirm, run]);
 
@@ -186,9 +190,9 @@ export function PromptsPanel() {
     async (next: PromptScope) => {
       if (pane === "edit" && editing) {
         const ok = await confirm({
-          title: `Discard unsaved changes to /${editing}?`,
-          description: "Switching scope closes the editor without saving.",
-          confirmLabel: "Discard",
+          title: settingsText("prompts.confirm.discard_unsaved_changes_to", { v0: editing }),
+          description: settingsText("prompts.switching_scope_closes_the_editor_without_saving"),
+          confirmLabel: settingsText("prompts.discard"),
         });
         if (!ok) return;
       }
@@ -202,15 +206,8 @@ export function PromptsPanel() {
     <div className="flex flex-col gap-3">
       {confirmDialog}
       <SettingsHeader
-        title="Prompt templates"
-        description={
-          <>
-            Reusable prompts that expand from <code>/name args</code> in the composer. Type{" "}
-            <code>/</code> in the chat to pick one; add arguments after the name (
-            <code>/qc user_data/a.csv</code>) and use <code>$1</code>, <code>$2</code>… or{" "}
-            <code>$ARGUMENTS</code> in the body. A project template shadows a shared one of the same name.
-          </>
-        }
+        title={settingsText("prompts.prompt_templates")}
+        description={<SettingsMessage id="prompts.intro" values={{ command: <code>/name args</code>, slash: <code>/</code>, example: <code>/qc user_data/a.csv</code>, first: <code>$1</code>, second: <code>$2</code>, all: <code>$ARGUMENTS</code> }} />}
         appliesTo="immediately"
       />
       <ScopeSwitcher
@@ -222,20 +219,20 @@ export function PromptsPanel() {
         <SettingsSearch
           value={query}
           onChange={setQuery}
-          placeholder="Filter templates…"
-          label="Filter templates"
+          placeholder={settingsText("prompts.filter_templates")}
+          label={settingsText("prompts.filter_templates_416")}
           className="w-56"
         />
         <div className="ml-auto flex items-center gap-1.5">
           {scope === "project" && (
             <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" disabled={busy === "restore"} onClick={() => void doRestore()}>
               {busy === "restore" ? <Loader2Icon className="size-3.5 animate-spin" /> : <RotateCcwIcon className="size-3.5" />}
-              Restore defaults
+              {settingsText("prompts.restore_defaults")}
             </Button>
           )}
           <Button type="button" size="sm" className="h-8 text-xs" onClick={() => setPane(pane === "create" ? "none" : "create")}>
             <PlusIcon className="size-3.5" />
-            New template
+            {settingsText("prompts.new_template")}
           </Button>
         </div>
       </div>
@@ -245,19 +242,19 @@ export function PromptsPanel() {
 
       {pane === "create" && (
         <div className="flex flex-col gap-2 rounded-lg border p-3">
-          <div className="text-xs font-medium">New template ({scope === "project" ? "this project" : "all projects"})</div>
+          <div className="text-xs font-medium">{settingsText("prompts.new_template_scope", { scope: scope === "project" ? settingsText("prompts.this_project") : settingsText("prompts.all_projects") })}</div>
           <div className="flex flex-wrap gap-2">
-            <Input value={newName} placeholder="name (lowercase, e.g. lit-scan)" className="h-8 w-48 font-mono text-xs" onChange={(e) => setNewName(e.target.value)} aria-label="Template name" />
-            <Input value={newHint} placeholder="argument hint, e.g. <topic> [years]" className="h-8 w-56 font-mono text-xs" onChange={(e) => setNewHint(e.target.value)} aria-label="Argument hint" />
-            <Input value={newDescription} placeholder="Short description shown in the menu" className="h-8 flex-1 text-xs" onChange={(e) => setNewDescription(e.target.value)} aria-label="Template description" />
+            <Input value={newName} placeholder={settingsText("prompts.name_lowercase_e_g_lit_scan")} className="h-8 w-48 font-mono text-xs" onChange={(e) => setNewName(e.target.value)} aria-label={settingsText("prompts.template_name")} />
+            <Input value={newHint} placeholder={settingsText("prompts.argument_hint_e_g_topic_years")} className="h-8 w-56 font-mono text-xs" onChange={(e) => setNewHint(e.target.value)} aria-label={settingsText("prompts.argument_hint")} />
+            <Input value={newDescription} placeholder={settingsText("prompts.short_description_shown_in_the_menu")} className="h-8 flex-1 text-xs" onChange={(e) => setNewDescription(e.target.value)} aria-label={settingsText("prompts.template_description")} />
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" size="sm" className="h-8 text-xs" disabled={!newName.trim() || busy === "create"} onClick={() => void doCreate()}>
               {busy === "create" && <Loader2Icon className="size-3.5 animate-spin" />}
-              Create and edit
+              {settingsText("prompts.create_and_edit")}
             </Button>
             <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={closePanes}>
-              Cancel
+              {settingsText("prompts.cancel")}
             </Button>
           </div>
         </div>
@@ -265,39 +262,38 @@ export function PromptsPanel() {
 
       {pane === "edit" && editing && (
         <div className="flex flex-col gap-2 rounded-lg border p-3">
-          <div className="text-xs font-medium">Editing /{editing}</div>
+          <div className="text-xs font-medium">{settingsText("prompts.editing_template", { name: editing })}</div>
           {editLoading ? (
-            <p className="text-[11px] text-muted-foreground">Loading…</p>
+            <p className="text-[11px] text-muted-foreground">{settingsText("prompts.loading")}</p>
           ) : (
             <Textarea
               value={editContent}
               spellCheck={false}
               className="min-h-56 font-mono text-[11px]"
-              aria-label={`Template source for ${editing}`}
+              aria-label={settingsText("prompts.template_source_for", { v0: editing })}
               onChange={(e) => setEditContent(e.target.value)}
             />
           )}
           <div className="flex items-center gap-2">
             <Button type="button" size="sm" className="h-8 text-xs" disabled={busy === "save" || editLoading} onClick={() => void saveEditor()}>
               {busy === "save" && <Loader2Icon className="size-3.5 animate-spin" />}
-              Save
+              {settingsText("prompts.save")}
             </Button>
             <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={closePanes}>
-              Cancel
-            </Button>
+              {settingsText("prompts.cancel")}</Button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className="text-xs text-muted-foreground">Loading…</p>
+        <p className="text-xs text-muted-foreground">{settingsText("prompts.loading")}</p>
       ) : filtered.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           {rows.length === 0
             ? scope === "global"
-              ? "No templates for all projects yet."
-              : "No templates in this project."
-            : "No templates match."}
+              ? settingsText("prompts.no_templates_for_all_projects_yet")
+              : settingsText("prompts.no_templates_in_this_project")
+            : settingsText("prompts.no_templates_match")}
         </p>
       ) : (
         <div className="flex flex-col gap-1.5">
@@ -314,16 +310,16 @@ export function PromptsPanel() {
                   )}
                   {r.shadowed && (
                     <Badge variant="outline" className="h-5 text-[10px]">
-                      {scope === "global" ? "Shadowed by a project template" : "Also defined for all projects"}
+                      {scope === "global" ? settingsText("prompts.shadowed_by_a_project_template") : settingsText("prompts.also_defined_for_all_projects")}
                     </Badge>
                   )}
                 </div>
                 <div className="truncate text-[11px] text-muted-foreground">{r.description}</div>
               </div>
-              <Button type="button" size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={`Edit ${r.name}`} onClick={() => void openEditor(r.name)}>
+              <Button type="button" size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={settingsText("prompts.edit", { v0: r.name })} onClick={() => void openEditor(r.name)}>
                 <PencilIcon className="size-3.5" />
               </Button>
-              <Button type="button" size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={`Delete ${r.name}`} disabled={busy === `remove:${r.name}`} onClick={() => void doRemove(r)}>
+              <Button type="button" size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={settingsText("prompts.delete_443", { v0: r.name })} disabled={busy === `remove:${r.name}`} onClick={() => void doRemove(r)}>
                 {busy === `remove:${r.name}` ? <Loader2Icon className="size-3.5 animate-spin" /> : <Trash2Icon className="size-3.5" />}
               </Button>
             </div>

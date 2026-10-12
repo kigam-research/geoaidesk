@@ -1,4 +1,6 @@
 "use client";
+import { SettingsMessage } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Settings → Project → Specialists.
@@ -55,6 +57,8 @@ import {
   type AgentMemoryFile,
   type WatchdogSettings,
 } from "@/lib/agents";
+
+const settingsText = geoText("settings");
 
 interface AgentFormState {
   /** Name being edited, or null when creating a new agent. */
@@ -127,7 +131,7 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
         if (!cancelled) setSettings(s);
       })
       .catch((exc) => {
-        if (!cancelled) setError(exc instanceof Error ? exc.message : "Failed to load watchdog settings");
+        if (!cancelled) setError(exc instanceof Error ? exc.message : settingsText("subagents.failed_to_load_watchdog_settings"));
       });
     return () => {
       cancelled = true;
@@ -144,7 +148,7 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
       setSettings(await saveWatchdogSettings(patch));
     } catch (exc) {
       setSettings(previous);
-      setError(exc instanceof Error ? exc.message : "Save failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -160,7 +164,7 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
     setCadenceDraft(null);
     const next = raw === "" ? null : Number(raw);
     if (next !== null && (!Number.isInteger(next) || next < 5 || next > 500)) {
-      setError("Mid-turn review cadence must be a whole number from 5 to 500 (or empty).");
+      setError(settingsText("subagents.mid_turn_review_cadence_must_be_a_whole_number_from_5_to_500_or_empty"));
       return;
     }
     if (next !== settings.cadenceEveryNTools) void update({ cadenceEveryNTools: next });
@@ -170,7 +174,7 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
     const next = Number(stalemateDraft.trim());
     setStalemateDraft(null);
     if (!Number.isInteger(next) || next < 1 || next > 20) {
-      setError("Stalemate repeats must be a whole number from 1 to 20.");
+      setError(settingsText("subagents.stalemate_repeats_must_be_a_whole_number_from_1_to_20"));
       return;
     }
     if (next !== settings.stalemateRepeats) void update({ stalemateRepeats: next });
@@ -183,32 +187,29 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
         <div className="min-w-0 flex-1">
           <div className="text-xs font-medium">Watchdog</div>
           <p className="text-[11px] text-muted-foreground">
-            A second model reviews what the agent just did and steers findings into the chat: raw data
-            touched, silent row drops, unlogged parameter changes, claims without evidence. Per project;
-            applies to new chat tabs.
+            {settingsText("subagents.a_second_model_reviews_what_the_agent_just_did_and_steers_findings_into_the_chat_raw_data")}
           </p>
         </div>
         <Switch
-          aria-label="Enable watchdog"
+          aria-label={settingsText("subagents.enable_watchdog")}
           checked={settings?.enabled ?? false}
           disabled={!settings || saving}
           onCheckedChange={(enabled) => void update({ enabled })}
         />
       </div>
       <p className="mt-2 rounded bg-muted px-2 py-1 text-[11px] text-muted-foreground">
-        Watchdog reviews add model usage. Kady records it in the project ledger and checks the spend cap
-        before each paid request. Subscription and local models follow their usual billing rules.
+        {settingsText("subagents.watchdog_reviews_add_model_usage_kady_records_it_in_the_project_ledger_and_checks_the_spen")}
       </p>
       <SettingsError className="mt-2">{error}</SettingsError>
       {settings?.enabled && (
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="text-[11px] text-muted-foreground">
-            Model
+            {settingsText("subagents.model")}
             <ModelField
               className="mt-1"
-              label="Watchdog model"
+              label={settingsText("subagents.watchdog_model")}
               value={settings.model}
-              emptyLabel="Inherit the chat's model"
+              emptyLabel={settingsText("subagents.inherit_chat_model")}
               disabled={saving}
               onChange={(model) => {
                 if (model !== settings.model) void update({ model });
@@ -216,29 +217,29 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
             />
           </div>
           <label className="text-[11px] text-muted-foreground">
-            Thinking
+            {settingsText("subagents.thinking")}
             <select
               className="mt-1 h-8 w-full rounded-md border bg-background px-2 text-xs"
-              aria-label="Watchdog thinking level"
+              aria-label={settingsText("subagents.watchdog_thinking_level")}
               value={settings.thinking}
               onChange={(e) => void update({ thinking: e.target.value })}
             >
-              <option value="">inherit from chat</option>
+              <option value="">{settingsText("subagents.inherit_from_chat")}</option>
               {THINKING_LEVELS.map((level) => (
                 <option key={level} value={level}>
-                  {level}
+                  {settingsText("subagents.thinking_label", { level })}
                 </option>
               ))}
             </select>
           </label>
           <label className="text-[11px] text-muted-foreground">
-            Also review mid-turn every N tool calls (empty = only at turn end)
+            {settingsText("subagents.also_review_mid_turn_every_n_tool_calls_empty_only_at_turn_end")}
             <Input
               type="number"
               min={5}
               max={500}
               className="mt-1 h-8 text-xs"
-              aria-label="Watchdog cadence"
+              aria-label={settingsText("subagents.watchdog_cadence")}
               value={cadenceDraft ?? String(settings.cadenceEveryNTools ?? "")}
               onChange={(e) => setCadenceDraft(e.target.value)}
               onBlur={commitCadence}
@@ -248,25 +249,25 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
             />
           </label>
           <label className="text-[11px] text-muted-foreground">
-            Report
+            {settingsText("subagents.report")}
             <select
               className="mt-1 h-8 w-full rounded-md border bg-background px-2 text-xs"
-              aria-label="Watchdog severity threshold"
+              aria-label={settingsText("subagents.watchdog_severity_threshold")}
               value={settings.severityThreshold}
               onChange={(e) => void update({ severityThreshold: e.target.value as WatchdogSettings["severityThreshold"] })}
             >
-              <option value="concern">concerns and blockers</option>
-              <option value="blocker">blockers only</option>
+              <option value="concern">{settingsText("subagents.concerns_and_blockers")}</option>
+              <option value="blocker">{settingsText("subagents.blockers_only")}</option>
             </select>
           </label>
           <label className="text-[11px] text-muted-foreground sm:col-span-2">
-            Stop a turn after the same warning repeats this many times in a row (1–20)
+            {settingsText("subagents.stop_a_turn_after_the_same_warning_repeats_this_many_times_in_a_row_1_20")}
             <Input
               type="number"
               min={1}
               max={20}
               className="mt-1 h-8 w-24 text-xs"
-              aria-label="Watchdog stalemate repeats"
+              aria-label={settingsText("subagents.watchdog_stalemate_repeats")}
               value={stalemateDraft ?? String(settings.stalemateRepeats)}
               onChange={(e) => setStalemateDraft(e.target.value)}
               onBlur={commitStalemate}
@@ -276,18 +277,18 @@ export function WatchdogCard({ projectId }: { projectId: string }) {
             />
           </label>
           <label className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground sm:col-span-2">
-            Also review background specialists&apos; own turns
+            {settingsText("subagents.also_review_background_specialists_own_turns")}
             <Switch
-              aria-label="Watch specialists"
+              aria-label={settingsText("subagents.watch_specialists")}
               checked={settings.children}
               disabled={saving}
               onCheckedChange={(children) => void update({ children })}
             />
           </label>
           <label className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground sm:col-span-2">
-            Read the project&apos;s <code>.pi/WATCHDOG.md</code> standing instructions
+            {settingsText("subagents.read_the_project_s")}<code>.pi/WATCHDOG.md</code> {settingsText("subagents.standing_instructions")}
             <Switch
-              aria-label="Use WATCHDOG.md"
+              aria-label={settingsText("subagents.use_watchdog_md")}
               checked={settings.watchdogMd}
               disabled={saving}
               onCheckedChange={(watchdogMd) => void update({ watchdogMd })}
@@ -313,7 +314,7 @@ function SpecialistDefaultModelCard({ projectId }: { projectId: string }) {
         if (!cancelled) setValue(model ?? "");
       })
       .catch((exc) => {
-        if (!cancelled) setError(exc instanceof Error ? exc.message : "Failed to load the default model");
+        if (!cancelled) setError(exc instanceof Error ? exc.message : settingsText("subagents.failed_to_load_the_default_model"));
       });
     return () => {
       cancelled = true;
@@ -330,7 +331,7 @@ function SpecialistDefaultModelCard({ projectId }: { projectId: string }) {
       setValue((await saveSpecialistDefaultModel(next || null)) ?? "");
     } catch (exc) {
       setValue(previous);
-      setError(exc instanceof Error ? exc.message : "Save failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -338,17 +339,17 @@ function SpecialistDefaultModelCard({ projectId }: { projectId: string }) {
 
   return (
     <SettingsCard
-      title="Default model for specialists"
-      description="Used by every specialist that does not pin its own model. Inherit keeps each specialist on the model of the chat that launched it."
+      title={settingsText("subagents.default_model_for_specialists")}
+      description={settingsText("subagents.used_by_every_specialist_that_does_not_pin_its_own_model_inherit_keeps_each_specialist_on")}
     >
       {value === null ? (
-        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">Loading…</p>
+        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">{settingsText("subagents.loading")}</p>
       ) : (
         <>
           <ModelField
-            label="Default specialist model"
+            label={settingsText("subagents.default_specialist_model")}
             value={value}
-            emptyLabel="Inherit the chat's model"
+            emptyLabel={settingsText("subagents.inherit_chat_model")}
             disabled={saving}
             onChange={(next) => void change(next)}
           />
@@ -375,7 +376,7 @@ export function SubagentsPanel() {
     try {
       setAgents(await getAgents());
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Failed to load specialists");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.failed_to_load_specialists"));
     }
   }, []);
 
@@ -390,7 +391,7 @@ export function SubagentsPanel() {
       })
       .catch((exc) => {
         if (!cancelled) {
-          setError(exc instanceof Error ? exc.message : "Failed to load specialists");
+          setError(exc instanceof Error ? exc.message : settingsText("subagents.failed_to_load_specialists"));
         }
       })
       .finally(() => {
@@ -407,7 +408,7 @@ export function SubagentsPanel() {
       try {
         await setAgentEnabled(name, next);
       } catch (exc) {
-        setError(exc instanceof Error ? exc.message : "Toggle failed");
+        setError(exc instanceof Error ? exc.message : settingsText("subagents.toggle_failed"));
         void refresh(); // reconcile on failure
       }
     },
@@ -418,11 +419,11 @@ export function SubagentsPanel() {
     if (!form) return;
     const name = form.name.trim().toLowerCase();
     if (!name) {
-      setError("Specialist name is required");
+      setError(settingsText("subagents.specialist_name_is_required"));
       return;
     }
     if (!form.systemPrompt.trim()) {
-      setError("System prompt must not be empty");
+      setError(settingsText("subagents.system_prompt_must_not_be_empty"));
       return;
     }
     setSaving(true);
@@ -447,7 +448,7 @@ export function SubagentsPanel() {
       setForm(null);
       await refresh();
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Save failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -456,9 +457,9 @@ export function SubagentsPanel() {
   const handleDelete = useCallback(
     async (name: string) => {
       const ok = await confirm({
-        title: `Delete ${name}?`,
-        description: "Removes .pi/agents/" + name + ".md from this project. Running chats keep the roster they started with.",
-        confirmLabel: "Delete",
+        title: settingsText("subagents.confirm.delete", { v0: name }),
+        description: settingsText("subagents.delete_description", { name }),
+        confirmLabel: settingsText("subagents.delete"),
         destructive: true,
       });
       if (!ok) return;
@@ -468,7 +469,7 @@ export function SubagentsPanel() {
         await deleteAgent(name);
         await refresh();
       } catch (exc) {
-        setError(exc instanceof Error ? exc.message : "Delete failed");
+        setError(exc instanceof Error ? exc.message : settingsText("subagents.delete_failed"));
       } finally {
         setSaving(false);
       }
@@ -478,10 +479,10 @@ export function SubagentsPanel() {
 
   const handleRestore = useCallback(async () => {
     const ok = await confirm({
-      title: "Restore the default specialists?",
+      title: settingsText("subagents.confirm.restore_the_default_specialists"),
       description:
-        "Re-seeds the default scientific roster. Project specialists with the same names are overwritten; custom specialists are untouched.",
-      confirmLabel: "Restore defaults",
+        settingsText("subagents.re_seeds_the_default_scientific_roster_project_specialists_with_the_same_names_are_overwri"),
+      confirmLabel: settingsText("subagents.restore_defaults"),
       destructive: true,
     });
     if (!ok) return;
@@ -493,7 +494,7 @@ export function SubagentsPanel() {
       setViewing(null);
       await refresh();
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Restore failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.restore_failed"));
     } finally {
       setSaving(false);
     }
@@ -510,7 +511,7 @@ export function SubagentsPanel() {
       const file = await getAgentMemory(agent.name);
       setMemoryOpen({ name: agent.name, file, draft: file.content });
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Failed to load memory");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.failed_to_load_memory"));
       setMemoryOpen(null);
     }
   }, [memoryOpen]);
@@ -522,7 +523,7 @@ export function SubagentsPanel() {
       await saveAgentMemory(memoryOpen.name, memoryOpen.draft);
       setMemoryOpen({ ...memoryOpen, file: memoryOpen.file ? { ...memoryOpen.file, exists: true, content: memoryOpen.draft } : null });
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Save failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.save_failed_499"));
     } finally {
       setSaving(false);
     }
@@ -530,9 +531,9 @@ export function SubagentsPanel() {
   const clearMemory = useCallback(async () => {
     if (!memoryOpen) return;
     const ok = await confirm({
-      title: `Clear the memory of ${memoryOpen.name}?`,
-      description: "Deletes its MEMORY.md. The specialist starts its next run without those notes.",
-      confirmLabel: "Clear memory",
+      title: settingsText("subagents.confirm.clear_the_memory_of", { v0: memoryOpen.name }),
+      description: settingsText("subagents.deletes_its_memory_md_the_specialist_starts_its_next_run_without_those_notes"),
+      confirmLabel: settingsText("subagents.clear_memory"),
       destructive: true,
     });
     if (!ok) return;
@@ -542,7 +543,7 @@ export function SubagentsPanel() {
       await clearAgentMemory(memoryOpen.name);
       setMemoryOpen({ ...memoryOpen, draft: "", file: memoryOpen.file ? { ...memoryOpen.file, exists: false, content: "" } : null });
     } catch (exc) {
-      setError(exc instanceof Error ? exc.message : "Clear failed");
+      setError(exc instanceof Error ? exc.message : settingsText("subagents.clear_failed"));
     } finally {
       setSaving(false);
     }
@@ -559,16 +560,8 @@ export function SubagentsPanel() {
     <div className="flex flex-col gap-4">
       {dialog}
       <SettingsHeader
-        title="Specialists"
-        description={
-          <>
-            Specialist agents Kady can delegate to with the{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-[11px]">subagent</code> tool,
-            configured per project (current:{" "}
-            <span className="font-medium">{activeProject?.name ?? activeProjectId}</span>) as markdown
-            files in <code className="rounded bg-muted px-1 py-0.5 text-[11px]">.pi/agents/</code>.
-          </>
-        }
+        title={settingsText("subagents.specialists")}
+        description={<SettingsMessage id="subagents.intro" values={{ tool: <code className="rounded bg-muted px-1 py-0.5 text-[11px]">subagent</code>, project: <span className="font-medium">{activeProject?.name ?? activeProjectId}</span>, path: <code className="rounded bg-muted px-1 py-0.5 text-[11px]">.pi/agents/</code> }} />}
         appliesTo="new-chats"
       />
 
@@ -578,38 +571,38 @@ export function SubagentsPanel() {
       <SettingsError>{error}</SettingsError>
 
       {loading ? (
-        <p className="text-xs text-muted-foreground">Loading…</p>
+        <p className="text-xs text-muted-foreground">{settingsText("subagents.loading")}</p>
       ) : form ? (
         <div className="flex flex-col gap-3 rounded-lg border p-3">
           <div className="flex gap-2">
             <div className="flex flex-1 flex-col gap-1.5">
-              <label className="text-xs font-medium">Name</label>
+              <label className="text-xs font-medium">{settingsText("subagents.name")}</label>
               <Input
                 value={form.name}
-                placeholder="e.g. code-reviewer"
+                placeholder={settingsText("subagents.e_g_code_reviewer")}
                 className="h-8 text-xs font-mono"
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
             <div className="flex flex-1 flex-col gap-1.5">
               <span className="text-xs font-medium">
-                Model{" "}
-                <span className="font-normal text-muted-foreground">(optional)</span>
+                {settingsText("subagents.model")}{" "}
+                <span className="font-normal text-muted-foreground">{settingsText("subagents.optional")}</span>
               </span>
               <ModelField
-                label="Specialist model"
+                label={settingsText("subagents.specialist_model")}
                 value={form.model}
-                emptyLabel="Inherit (specialist default or chat model)"
+                emptyLabel={settingsText("subagents.inherit_default_model")}
                 onChange={(model) => setForm({ ...form, model })}
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium">Description</label>
+            <label className="text-xs font-medium">{settingsText("subagents.description")}</label>
             <Input
               value={form.description}
-              placeholder="One line shown to the main agent when it picks a specialist"
+              placeholder={settingsText("subagents.one_line_shown_to_the_main_agent_when_it_picks_a_specialist")}
               className="h-8 text-xs"
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
@@ -617,8 +610,8 @@ export function SubagentsPanel() {
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium">
-              Thinking level{" "}
-              <span className="font-normal text-muted-foreground">(optional)</span>
+              {settingsText("subagents.thinking_level")}{" "}
+              <span className="font-normal text-muted-foreground">{settingsText("subagents.optional")}</span>
             </label>
             <div className="flex flex-wrap gap-1">
               {["", ...THINKING_LEVELS].map((level) => (
@@ -629,7 +622,7 @@ export function SubagentsPanel() {
                   className="h-6 px-2 text-[11px]"
                   onClick={() => setForm({ ...form, thinking: level })}
                 >
-                  {level || "inherit"}
+                  {settingsText("subagents.thinking_label", { level: level || "inherit" })}
                 </Button>
               ))}
             </div>
@@ -637,9 +630,9 @@ export function SubagentsPanel() {
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium">
-              Tools{" "}
+              {settingsText("subagents.tools")}{" "}
               <span className="font-normal text-muted-foreground">
-                (comma-separated allowlist; empty = all tools)
+                {settingsText("subagents.comma_separated_allowlist_empty_all_tools")}
               </span>
             </label>
             <Input
@@ -656,14 +649,14 @@ export function SubagentsPanel() {
                 checked={form.inheritProjectContext}
                 onCheckedChange={(v) => setForm({ ...form, inheritProjectContext: v })}
               />
-              Inherit project context (AGENTS.md)
+              {settingsText("subagents.inherit_project_context_agents_md")}
             </label>
             <label className="flex items-center gap-2 text-xs">
               <Switch
                 checked={form.inheritSkills}
                 onCheckedChange={(v) => setForm({ ...form, inheritSkills: v })}
               />
-              Inherit skills
+              {settingsText("subagents.inherit_skills")}
             </label>
             <label className="flex items-center gap-2 text-xs">
               <Switch
@@ -672,44 +665,42 @@ export function SubagentsPanel() {
                   setForm({ ...form, systemPromptMode: v ? "replace" : "append" })
                 }
               />
-              Replace base system prompt
+              {settingsText("subagents.replace_base_system_prompt")}
             </label>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-md border p-2.5">
             <label className="flex items-center gap-2 text-xs">
               <Switch
-                aria-label="Persistent memory"
+                aria-label={settingsText("subagents.persistent_memory")}
                 checked={form.memoryEnabled}
                 onCheckedChange={(v) => setForm({ ...form, memoryEnabled: v })}
               />
-              Persistent memory
-            </label>
+              {settingsText("subagents.persistent_memory")}</label>
             {form.memoryEnabled && (
               <label className="flex items-center gap-2 text-xs">
-                Scope
+                {settingsText("subagents.scope")}
                 <select
                   className="h-7 rounded-md border bg-background px-2 text-xs"
-                  aria-label="Memory scope"
+                  aria-label={settingsText("subagents.memory_scope")}
                   value={form.memoryScope}
                   onChange={(e) => setForm({ ...form, memoryScope: e.target.value as "project" | "user" })}
                 >
-                  <option value="project">this project</option>
-                  <option value="user">all projects</option>
+                  <option value="project">{settingsText("subagents.this_project")}</option>
+                  <option value="user">{settingsText("subagents.all_projects")}</option>
                 </select>
               </label>
             )}
             <p className="w-full text-[11px] text-muted-foreground">
-              A role-specific MEMORY.md the agent reads at the start of every run and may append dated
-              notes to. Self-written by the model — instructions, not evidence.
+              {settingsText("subagents.a_role_specific_memory_md_the_agent_reads_at_the_start_of_every_run_and_may_append_dated_n")}
             </p>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium">System prompt</label>
+            <label className="text-xs font-medium">{settingsText("subagents.system_prompt")}</label>
             <Textarea
               value={form.systemPrompt}
-              placeholder="You are a …"
+              placeholder={settingsText("subagents.you_are_a")}
               className="min-h-44 text-xs font-mono leading-relaxed"
               onChange={(e) => setForm({ ...form, systemPrompt: e.target.value })}
             />
@@ -722,7 +713,7 @@ export function SubagentsPanel() {
               disabled={saving}
               onClick={() => void handleSave()}
             >
-              {saving ? "Saving…" : form.originalName ? "Save changes" : "Add specialist"}
+              {saving ? settingsText("subagents.saving") : form.originalName ? settingsText("subagents.save_changes") : settingsText("subagents.add_specialist")}
             </Button>
             <Button
               variant="ghost"
@@ -730,7 +721,7 @@ export function SubagentsPanel() {
               className="ml-auto text-xs"
               onClick={() => setForm(null)}
             >
-              Cancel
+              {settingsText("subagents.cancel")}
             </Button>
           </div>
         </div>
@@ -739,8 +730,8 @@ export function SubagentsPanel() {
           <SettingsSearch
             value={query}
             onChange={setQuery}
-            placeholder="Search specialists…"
-            label="Search specialists"
+            placeholder={settingsText("subagents.search_specialists")}
+            label={settingsText("subagents.search_specialists_540")}
           />
           <div className="flex flex-col gap-1.5">
             {project.map((agent) => (
@@ -749,7 +740,7 @@ export function SubagentsPanel() {
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-medium font-mono">{agent.name}</div>
                   <div className="truncate text-[11px] text-muted-foreground">
-                    {agent.description || "(no description)"}
+                    {agent.description || settingsText("subagents.no_description")}
                   </div>
                 </div>
                 {agent.model ? (
@@ -764,15 +755,15 @@ export function SubagentsPanel() {
                     variant={memoryOpen?.name === agent.name ? "secondary" : "ghost"}
                     size="sm"
                     className="h-7 gap-1 text-[11px]"
-                    aria-label={`Memory of ${agent.name}`}
+                    aria-label={settingsText("subagents.memory_of", { v0: agent.name })}
                     onClick={() => void openMemory(agent)}
                   >
                     <BrainIcon className="size-3.5" />
-                    Memory
+                    {settingsText("subagents.memory")}
                   </Button>
                 )}
                 <Switch
-                  aria-label={`Toggle ${agent.name}`}
+                  aria-label={settingsText("subagents.toggle", { v0: agent.name })}
                   checked={agent.enabled !== false}
                   onCheckedChange={(v) => void toggleEnabled(agent.name, v)}
                 />
@@ -780,7 +771,7 @@ export function SubagentsPanel() {
                   variant="ghost"
                   size="sm"
                   className="size-7 p-0"
-                  aria-label={`Edit ${agent.name}`}
+                  aria-label={settingsText("subagents.edit", { v0: agent.name })}
                   onClick={() => setForm(formFromAgent(agent, false))}
                 >
                   <PencilIcon className="size-3.5" />
@@ -789,7 +780,7 @@ export function SubagentsPanel() {
                   variant="ghost"
                   size="sm"
                   className="size-7 p-0 text-destructive hover:text-destructive"
-                  aria-label={`Delete ${agent.name}`}
+                  aria-label={settingsText("subagents.delete_546", { v0: agent.name })}
                   disabled={saving}
                   onClick={() => void handleDelete(agent.name)}
                 >
@@ -800,8 +791,8 @@ export function SubagentsPanel() {
             {project.length === 0 && (
               <div className="rounded-lg border px-3 py-2.5 text-xs text-muted-foreground leading-relaxed">
                 {query.trim()
-                  ? "No project specialist matches."
-                  : "No project specialists yet. Add one, or restore the default scientific roster below."}
+                  ? settingsText("subagents.no_project_specialist_matches")
+                  : settingsText("subagents.no_project_specialists_yet_add_one_or_restore_the_default_scientific_roster_below")}
               </div>
             )}
           </div>
@@ -810,39 +801,37 @@ export function SubagentsPanel() {
             <div className="flex flex-col gap-2 rounded-lg border p-3" data-testid="agent-memory-pane">
               <div className="flex items-center gap-2 text-xs font-medium">
                 <BrainIcon className="size-3.5 text-muted-foreground" />
-                Memory of {memoryOpen.name}
+                {settingsText("subagents.memory_of_549")}{memoryOpen.name}
                 {memoryOpen.file && (
                   <span className="font-normal text-muted-foreground">
-                    · {memoryOpen.file.memory.scope === "user" ? "all projects" : "this project"} · first{" "}
-                    {memoryOpen.file.limits.lines} lines are injected
-                  </span>
+                    {settingsText("subagents.memory_summary", { scope: memoryOpen.file.memory.scope === "user" ? settingsText("subagents.all_projects") : settingsText("subagents.this_project"), lines: memoryOpen.file.limits.lines })}</span>
                 )}
               </div>
               {!memoryOpen.file ? (
-                <p className="text-[11px] text-muted-foreground">Loading…</p>
+                <p className="text-[11px] text-muted-foreground">{settingsText("subagents.loading")}</p>
               ) : (
                 <>
                   {!memoryOpen.file.exists && !memoryOpen.draft && (
                     <p className="text-[11px] text-muted-foreground">
-                      Nothing written yet. The agent creates this file on its first run; you can also seed it here.
+                      {settingsText("subagents.nothing_written_yet_the_agent_creates_this_file_on_its_first_run_you_can_also_seed_it_here")}
                     </p>
                   )}
                   <Textarea
                     value={memoryOpen.draft}
                     spellCheck={false}
                     className="min-h-40 font-mono text-[11px]"
-                    aria-label={`MEMORY.md for ${memoryOpen.name}`}
+                    aria-label={settingsText("subagents.memory_md_for", { v0: memoryOpen.name })}
                     onChange={(e) => setMemoryOpen({ ...memoryOpen, draft: e.target.value })}
                   />
                   <div className="flex items-center gap-2">
                     <Button size="sm" className="h-7 text-xs" disabled={saving} onClick={() => void saveMemory()}>
-                      Save memory
+                      {settingsText("subagents.save_memory")}
                     </Button>
                     <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive" disabled={saving} onClick={() => void clearMemory()}>
-                      Clear
+                      {settingsText("subagents.clear")}
                     </Button>
                     <Button size="sm" variant="ghost" className="ml-auto h-7 text-xs" onClick={() => setMemoryOpen(null)}>
-                      Close
+                      {settingsText("subagents.close")}
                     </Button>
                   </div>
                 </>
@@ -858,7 +847,7 @@ export function SubagentsPanel() {
               onClick={() => setForm({ ...EMPTY_FORM })}
             >
               <PlusIcon className="size-3.5" />
-              Add specialist
+              {settingsText("subagents.add_specialist")}
             </Button>
             <Button
               variant="ghost"
@@ -866,19 +855,19 @@ export function SubagentsPanel() {
               className="gap-1.5 text-xs text-muted-foreground"
               disabled={saving}
               onClick={() => void handleRestore()}
-              title="Re-seed the default scientific specialists (overwrites same-named project specialists; custom ones are untouched)"
+              title={settingsText("subagents.re_seed_the_default_scientific_specialists_overwrites_same_named_project_specialists_custo")}
             >
               <RotateCcwIcon className="size-3.5" />
-              Restore defaults
+              {settingsText("subagents.restore_defaults")}
             </Button>
           </div>
 
           {builtins.length > 0 && (
             <div className="flex flex-col gap-1.5">
               <h4 className="mt-1 text-xs font-medium text-muted-foreground">
-                Built-in specialists{" "}
+                {settingsText("subagents.built_in_specialists")}{" "}
                 <span className="font-normal">
-                  (from pi-subagents — customize to override)
+                  {settingsText("subagents.from_pi_subagents_customize_to_override")}
                 </span>
               </h4>
               {builtins.map((agent) => (
@@ -898,7 +887,7 @@ export function SubagentsPanel() {
                         viewing?.name === agent.name ? "" : "truncate",
                       )}
                     >
-                      {agent.description || "(no description)"}
+                      {agent.description || settingsText("subagents.no_description")}
                     </div>
                     {viewing?.name === agent.name && (
                       <pre className="mt-2 max-h-40 overflow-y-auto whitespace-pre-wrap rounded bg-muted p-2 text-[10px] leading-relaxed">
@@ -907,7 +896,7 @@ export function SubagentsPanel() {
                     )}
                   </div>
                   <Switch
-                    aria-label={`Toggle ${agent.name}`}
+                    aria-label={settingsText("subagents.toggle", { v0: agent.name })}
                     checked={agent.enabled !== false}
                     onCheckedChange={(v) => void toggleEnabled(agent.name, v)}
                   />
@@ -919,7 +908,7 @@ export function SubagentsPanel() {
                       setViewing(viewing?.name === agent.name ? null : agent)
                     }
                   >
-                    {viewing?.name === agent.name ? "Hide" : "View"}
+                    {viewing?.name === agent.name ? settingsText("subagents.hide") : settingsText("subagents.view")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -927,7 +916,7 @@ export function SubagentsPanel() {
                     className="h-7 text-[11px]"
                     onClick={() => setForm(formFromAgent(agent, true))}
                   >
-                    Customize
+                    {settingsText("subagents.customize")}
                   </Button>
                 </div>
               ))}
@@ -948,11 +937,11 @@ function VerifierBadge({ agent }: { agent: AgentFile }) {
       className="hidden sm:inline-flex text-[10px] font-mono"
       title={
         agent.verifierModel
-          ? `Verifier: runs on ${agent.verifierModel} (Settings → Defaults → Verifier model)`
-          : "Verifier: set a verifier model in Settings → Defaults to check work with a different model"
+          ? settingsText("subagents.verifier_runs_on_settings_defaults_verifier_model", { v0: agent.verifierModel })
+          : settingsText("subagents.verifier_set_a_verifier_model_in_settings_defaults_to_check_work_with_a_different_model")
       }
     >
-      {agent.verifierModel ? `verifier · ${agent.verifierModel}` : "verifier"}
+      {agent.verifierModel ? settingsText("subagents.verifier", { v0: agent.verifierModel }) : settingsText("subagents.verifier_label")}
     </Badge>
   );
 }

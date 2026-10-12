@@ -1,4 +1,6 @@
 "use client";
+import { settingsSourceText } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -22,6 +24,8 @@ import {
   type ModelProviderStatus,
   type ProviderAuthFlow,
 } from "@/lib/use-provider-auth";
+
+const settingsText = geoText("settings");
 
 interface OAuthLoginDialogProps {
   provider: ModelProviderStatus | null;
@@ -139,7 +143,7 @@ export function OAuthLoginDialog({
       })
       .catch((cause) => {
         if (mountedRef.current && !cancelWhenStartedRef.current) {
-          setError(cause instanceof Error ? cause.message : "Could not start sign-in");
+          setError(cause instanceof Error ? cause.message : settingsText("oauth_login.could_not_start_sign_in"));
         }
       });
   }, [applyFlow, cancelBestEffort, open, providerId, start]);
@@ -160,7 +164,7 @@ export function OAuthLoginDialog({
         if (!TERMINAL.has(next.status)) schedule(700);
       } catch (cause) {
         if (disposed) return;
-        setError(cause instanceof Error ? cause.message : "Sign-in status failed");
+        setError(cause instanceof Error ? cause.message : settingsText("oauth_login.sign_in_status_failed"));
         // Authentication may still be progressing in the backend. Keep
         // polling after transient localhost/network failures.
         schedule(1_500);
@@ -211,7 +215,7 @@ export function OAuthLoginDialog({
         setAnswer("");
         applyFlow(next);
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Could not submit response");
+        setError(cause instanceof Error ? cause.message : settingsText("oauth_login.could_not_submit_response"));
       } finally {
         submittingRef.current = false;
         setSubmitting(false);
@@ -241,11 +245,10 @@ export function OAuthLoginDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            Connect {provider?.accountLabel ?? "subscription"}
+            {settingsText("oauth_login.connect_account", { name: provider ? settingsSourceText(provider.accountLabel) : settingsText("oauth_login.subscription") })}
           </DialogTitle>
           <DialogDescription>
-            Authentication is handled directly by Pi and the provider. Tokens stay
-            in Kady&apos;s local credential store.
+            {settingsText("oauth_login.authentication_is_handled_directly_by_pi_and_the_provider_tokens_stay_in_kady_s_local_cred")}
           </DialogDescription>
         </DialogHeader>
 
@@ -253,23 +256,23 @@ export function OAuthLoginDialog({
           {!flow && !error ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
-              Starting sign-in…
+              {settingsText("oauth_login.starting_sign_in")}
             </div>
           ) : null}
 
           {error ? (
             <div className="flex gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircleIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
-              <span>{error}</span>
+              <span>{settingsSourceText(error)}</span>
             </div>
           ) : null}
 
           {flow?.events.filter((event) => event.type === "info").map((event, index) => (
             <div key={index} className="space-y-2 rounded-md border p-3 text-sm">
-              <p>{event.message}</p>
+              <p>{settingsSourceText(event.message)}</p>
               {event.links?.map((link) => (
                 <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="block underline">
-                  {link.label ?? link.url}
+                  {settingsSourceText(link.label ?? link.url)}
                 </a>
               ))}
             </div>
@@ -278,12 +281,12 @@ export function OAuthLoginDialog({
           {!terminal && authUrl?.type === "auth_url" ? (
             <div className="space-y-2 rounded-md border p-3">
               <p className="text-sm">
-                {authUrl.instructions ?? "Continue sign-in in your browser."}
+                {authUrl.instructions ? settingsSourceText(authUrl.instructions) : settingsText("oauth_login.continue_sign_in_in_your_browser")}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild size="sm">
                   <a href={authUrl.url} target="_blank" rel="noopener noreferrer">
-                    Open sign-in page
+                    {settingsText("oauth_login.open_sign_in_page")}
                     <ExternalLinkIcon className="size-3.5" aria-hidden />
                   </a>
                 </Button>
@@ -294,7 +297,7 @@ export function OAuthLoginDialog({
                   onClick={() => void copy(authUrl.url)}
                 >
                   <CopyIcon className="size-3.5" aria-hidden />
-                  Copy link
+                  {settingsText("oauth_login.copy_link")}
                 </Button>
               </div>
             </div>
@@ -304,7 +307,7 @@ export function OAuthLoginDialog({
             <div className="space-y-3 rounded-md border p-3">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">
-                  Verification code
+                  {settingsText("oauth_login.verification_code")}
                 </p>
                 <div className="mt-1 flex items-center gap-2">
                   <code className="rounded bg-muted px-3 py-2 text-lg font-semibold tracking-widest">
@@ -314,7 +317,7 @@ export function OAuthLoginDialog({
                     type="button"
                     size="icon-sm"
                     variant="outline"
-                    aria-label="Copy verification code"
+                    aria-label={settingsText("oauth_login.copy_verification_code")}
                     onClick={() => void copy(deviceCode.userCode)}
                   >
                     <CopyIcon className="size-3.5" aria-hidden />
@@ -327,21 +330,20 @@ export function OAuthLoginDialog({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Open verification page
+                  {settingsText("oauth_login.open_verification_page")}
                   <ExternalLinkIcon className="size-3.5" aria-hidden />
                 </a>
               </Button>
               {deviceCode.expiresInSeconds ? (
                 <p className="text-xs text-muted-foreground">
-                  Code expires in about {Math.ceil(deviceCode.expiresInSeconds / 60)} minutes.
-                </p>
+                  {settingsText("oauth_login.expires_minutes", { minutes: Math.ceil(deviceCode.expiresInSeconds / 60) })}</p>
               ) : null}
             </div>
           ) : null}
 
           {flow?.prompt?.type === "select" ? (
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium">{flow.prompt.message}</legend>
+              <legend className="text-sm font-medium">{settingsSourceText(flow.prompt.message)}</legend>
               {flow.prompt.options.map((option) => (
                 <Button
                   key={option.id}
@@ -352,10 +354,10 @@ export function OAuthLoginDialog({
                   onClick={() => void submitAnswer(option.id)}
                 >
                   <span>
-                    <span className="block text-sm font-medium">{option.label}</span>
+                    <span className="block text-sm font-medium">{settingsSourceText(option.label)}</span>
                     {option.description ? (
                       <span className="block text-xs font-normal text-muted-foreground">
-                        {option.description}
+                        {settingsSourceText(option.description)}
                       </span>
                     ) : null}
                   </span>
@@ -373,14 +375,14 @@ export function OAuthLoginDialog({
               }}
             >
               <label className="block text-sm font-medium" htmlFor="oauth-answer">
-                {flow.prompt.message}
+                {settingsSourceText(flow.prompt.message)}
               </label>
               <Input
                 id="oauth-answer"
                 type={flow.prompt.type === "secret" ? "password" : "text"}
                 value={answer}
                 autoComplete="off"
-                placeholder={flow.prompt.placeholder}
+                placeholder={flow.prompt.placeholder ? settingsSourceText(flow.prompt.placeholder) : undefined}
                 onChange={(event) => setAnswer(event.target.value)}
               />
               <Button
@@ -391,7 +393,7 @@ export function OAuthLoginDialog({
                   (flow.prompt.type !== "text" && !answer.trim())
                 }
               >
-                {submitting ? "Submitting…" : "Continue"}
+                {submitting ? settingsText("oauth_login.submitting") : settingsText("oauth_login.continue")}
               </Button>
             </form>
           ) : null}
@@ -401,8 +403,8 @@ export function OAuthLoginDialog({
               <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
               <span>
                 {latestMessage && "message" in latestMessage
-                  ? latestMessage.message
-                  : "Waiting for provider confirmation…"}
+                  ? settingsSourceText(latestMessage.message)
+                  : settingsText("oauth_login.waiting_for_provider_confirmation")}
               </span>
             </div>
           ) : null}
@@ -410,7 +412,7 @@ export function OAuthLoginDialog({
           {flow?.status === "complete" ? (
             <div className="flex gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm text-emerald-700 dark:text-emerald-400">
               <CheckCircle2Icon className="size-4 shrink-0" aria-hidden />
-              <span>{provider?.accountLabel} connected successfully.</span>
+              <span>{settingsText("oauth_login.connected_account", { name: provider ? settingsSourceText(provider.accountLabel) : "" })}</span>
             </div>
           ) : null}
 
@@ -418,10 +420,10 @@ export function OAuthLoginDialog({
             <div className="flex gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircleIcon className="size-4 shrink-0" aria-hidden />
               <span>
-                {flow.error ??
+                {(flow.error ? settingsSourceText(flow.error) : undefined) ??
                   (flow.status === "cancelled"
-                    ? "Sign-in was cancelled."
-                    : "Sign-in expired. Start again.")}
+                    ? settingsText("oauth_login.sign_in_was_cancelled")
+                    : settingsText("oauth_login.sign_in_expired_start_again"))}
               </span>
             </div>
           ) : null}
@@ -433,7 +435,7 @@ export function OAuthLoginDialog({
             variant={flow?.status === "complete" ? "default" : "outline"}
             onClick={() => close(false)}
           >
-            {flow?.status === "complete" ? "Done" : terminal || error ? "Close" : "Cancel"}
+            {flow?.status === "complete" ? settingsText("oauth_login.done") : terminal || error ? settingsText("oauth_login.close") : settingsText("oauth_login.cancel")}
           </Button>
         </div>
       </DialogContent>
