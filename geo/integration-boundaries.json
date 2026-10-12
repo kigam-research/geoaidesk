@@ -160,9 +160,9 @@
     },
     {
       "path": "web/package.json, web/package-lock.json",
-      "owner": "gaid-maps",
+      "owner": "gaid-map-tiles",
       "status": "edited",
-      "responsibility": "WP05 (child gaid-maps--viewer) adds only the OpenLayers ol dependency and its lock entries"
+      "responsibility": "WP05 (child gaid-maps--viewer) added the OpenLayers ol dependency; gaid-map-tiles adds only proj4 (exact pin) for projected map views and basemap reprojection, and its lock entries"
     },
     {
       "path": "web/src/components/file-preview-panel.tsx",
@@ -361,6 +361,12 @@
       "owner": "gaid-release-proof",
       "status": "edited",
       "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged"
+    },
+    {
+      "path": "server/pi-packages/kady-child-runtime/index.ts",
+      "owner": "gaid-map-tiles",
+      "status": "edited",
+      "responsibility": "Register the Markdown image-path check (server/src/geo/markdown-images.ts) for subagent children so write/edit of a .md file reports image links that do not resolve from the file's folder"
     }
   ],
   "notTouched": [

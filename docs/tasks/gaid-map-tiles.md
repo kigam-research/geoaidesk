@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T04:31:24Z
+updated: 2026-10-12T04:42:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -76,11 +76,47 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
   __pycache__) so the unit can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Markdown image rule implemented: `server/src/geo/markdown-images.ts` (rule line in GEO_INSTRUCTIONS; tool_result
+  check after write/edit of `.md` for lead via geo/session.ts and children via kady-child-runtime seam);
+  `server/test/geo-markdown-images.test.ts` passes.
+- Oracle research done (Extra High; question ~/data/geoaidesk/work/gaid-map-tiles/oracle-q1.txt, answer oracle-q1.out,
+  session `research-question-answer-in-english`); findings and decision under Notes and decisions.
+- Helper `server/src/geo/maps/helper.py` has a long-lived `--serve` mode (JSON lines) and new operations
+  `raster-style` (whole-raster stretch/classes from an overview sample; optional display overview VRT in
+  GAID_MAP_CACHE_DIR), `raster-tile` (exact display-CRS bbox -> PNG, overview-level selection), `raster-point`
+  (original pixel value at full resolution). Bench in one worker (kambalda_tmi_40m.tif, 85 tiles z0-3 in EPSG:3857):
+  median 87 ms, p90 94 ms; style 194 ms; point 74 ms (`~/data/geoaidesk/work/gaid-map-tiles/scripts/bench_worker.py`).
+- web: proj4 2.22.0 added (exact pin; seam owner moved to gaid-map-tiles).
+- Baseline (before) on PC74 local backend :18110, data ~/data/geoaidesk/work/gaid-map-tiles/projects (copy of review
+  samples): `/geo/raster-window` kambalda_tmi_40m.tif 256x256 = 1.32 s (5 warm runs), `/geo/vector-page`
+  Seoul_Geology_250K_Litho.shp 500 = 2.2 s. Cause: each request spawns the helper twice (inspect + operation;
+  imports alone 0.5 s) and the raster response is 1.36 MB JSON (65k sample values).
 ## Next steps
-1. (the next session's first action)
+1. Me: Node worker pool + tile/style/point routes + caches; viewer TileLayer, native-CRS view (proj4), full-layer
+   vector load; then integrate the basemap child.
+2. Child `gaid-map-tiles--basemaps`: basemap server adapter + client layer factory/picker (contract below).
 ## Failed approaches
 ## Notes and decisions
+- Oracle findings (2026-10-12, Extra High, sources in oracle-q1.out): (가) OpenLayers stays the strongest option.
+  The bottleneck is delivery, not the library. OpenLayers has native projected views (proj4), client raster
+  reprojection (basemaps in another CRS), WMTS/WMS, pixel projections. MapLibre has no arbitrary EPSG view; Leaflet
+  needs Proj4Leaflet/plugins. Recommendations adopted: persistent Python worker pool (2-4) instead of per-request
+  spawn; tile layer with a deterministic per-layer tile grid; dataset-native projected CRS as default view with
+  optional EPSG:3857; overview-aware reads and a derived display overview copy (never modify the original); caches:
+  versioned browser URLs + backend memory LRU with in-flight dedupe (+ derived overviews on disk); pixel values from
+  the original file; unknown CRS = pixel view, no basemaps. Vectors: keep GeoJSON for ordinary layers (full layer
+  once when bounded, viewport mode otherwise); MVT/FlatGeobuf/WebGL only when measurement needs them (not now).
+  Basemaps: default None; OSM standard tiles loaded directly by the browser (tile policy discourages proxies, needs
+  attribution, no bulk/offline prefetch); NGII WMTS (korean matrix set, EPSG:5179) and KIGAM 1:50K geology WMS
+  (WMS only; KIGAM states WFS is not offered) via server-side adapters holding the user's keys; proxy/caching
+  permission for NGII/KIGAM not verified by the research -> no persistent tile cache for them, attribution shown,
+  per-user keys only. Naver excluded (no verified raw-tile/proxy permission; its SDK exposes the client id); VWorld
+  and Google not included (no keys; terms unverified).
+- Decision: proceed with (가) + these recommendations (user's condition met: research still favours (가)).
+- Work packages: (1) me — worker pool, tile/style/point routes, viewer tiles + native CRS + vector load, Markdown
+  rule (done), docs, report, integration; (2) child basemaps — owns server/src/geo/basemaps/**,
+  server/test/geo-basemaps*.test.ts, web/src/geo/viewers/map/basemaps*.ts(x), web/src/geo/locales/basemap/**,
+  docs/geo/basemaps.md. Integration order: child finishes -> I wire picker/layers into index.tsx/map-canvas.tsx.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

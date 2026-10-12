@@ -1,3 +1,5 @@
+import { MARKDOWN_IMAGE_RULE } from "./markdown-images.ts";
+
 /**
  * Concise GeoAIDesk guidance appended to the lead's system prompt in geo
  * catalogue mode (plan §3.8). Kept short on purpose: every line is sent with
@@ -11,6 +13,7 @@ export const GEO_INSTRUCTIONS = `## GeoAIDesk data handling
 - Inspect geoscience files (LAS, shapefile, GeoPackage, GeoJSON, GeoTIFF, large CSV) with \`geo_inspect\` or a bounded \`geo_read_window\` first. Analyse whole files with Python through \`uv run\`; never read a whole data file into the conversation.
 - The project environment already has the catalogue's core and GIS packages (see \`pyproject.toml\`); use their Python APIs. Do not assume GDAL command-line tools.
 - An unknown CRS stays unknown: ask for it or work in native coordinates instead of guessing.
+- ${MARKDOWN_IMAGE_RULE}
 - The skills listed for this chat are a task selection; others stay installed and the user can start a chat with them.`;
 
 /** Pi `appendSystemPromptOverride` body. */

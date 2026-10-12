@@ -3,7 +3,8 @@
  * `agent/session-registry.ts` carries a single seam per hook:
  *   - `skillsOverride` for the DefaultResourceLoader (task exposure, context.ts)
  *   - `appendSystemPromptOverride` (concise geo guidance, instructions.ts)
- *   - extension factories (read hints for unsuitable large-file reads)
+ *   - extension factories (read hints for unsuitable large-file reads,
+ *     Markdown image-path check after write/edit)
  *   - custom tools (geo inspection and bounded windows)
  */
 import type { ExtensionFactory, ToolDefinition } from "@earendil-works/pi-coding-agent";
@@ -12,6 +13,7 @@ import { applyExposure, resolveSessionExposure, type ExposableSkill, type Exposu
 import { geoCatalogueActive } from "./catalogue.ts";
 import { appendGeoInstructions } from "./instructions.ts";
 import { makeGeoReadHintExtension } from "./read-hints.ts";
+import { markdownImageExtension } from "./markdown-images.ts";
 import { makeGeoTools } from "./tools.ts";
 
 export interface GeoSessionContext {
@@ -47,7 +49,7 @@ export function geoSessionParts(ctx: GeoSessionContext): GeoSessionParts {
     exposure,
     skillsOverride: (base) => ({ ...base, skills: applyExposure(base.skills, exposure) }),
     appendSystemPromptOverride: geoCatalogueActive() ? appendGeoInstructions : undefined,
-    extensionFactories: [makeGeoReadHintExtension(ctx.projectId, ctx.paths)].filter(
+    extensionFactories: [makeGeoReadHintExtension(ctx.projectId, ctx.paths), markdownImageExtension].filter(
       (factory): factory is ExtensionFactory => factory !== null,
     ),
     customTools: makeGeoTools(ctx.projectId, ctx.paths),

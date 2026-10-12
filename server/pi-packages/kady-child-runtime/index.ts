@@ -7,6 +7,7 @@ import { registerChildNotebook } from "../kady-notebook/index.ts";
 import { registerChildModal } from "../kady-modal/index.ts";
 import { registerChildPdfAnnotations } from "../kady-pdf-annotations/index.ts";
 import { CHILD_OPERATING_GUIDANCE, setSubagentPromptSection } from "../../src/agent/subagent-prompts.ts";
+import { registerMarkdownImageCheck } from "../../src/geo/markdown-images.ts";
 
 export default function (pi: ExtensionAPI) {
   // A required runtime section reaches existing/custom personas, including
@@ -22,6 +23,8 @@ export default function (pi: ExtensionAPI) {
     registerChildModal(pi);
     registerChildPdfAnnotations(pi);
   }
+  // GAID: image links in Markdown resolve from the file's folder (geo/markdown-images.ts).
+  registerMarkdownImageCheck(pi);
   createCodemodeExtension()(pi);
   createToolSearchExtension()(pi);
   createMcpExtension()(pi);
