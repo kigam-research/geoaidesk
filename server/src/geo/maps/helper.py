@@ -42,6 +42,8 @@ except ImportError as exc:
 
 MAX_FEATURES = 100000
 MAX_VERTICES = 30000
+FULL_FEATURES = 20000
+FULL_VERTICES = 400000
 MAX_WKB = 2 * 1024 * 1024
 TILE_LIMIT = 512
 STYLE_SAMPLE = 1024
@@ -59,15 +61,33 @@ def issue(code, message, severity='warning', **kwargs):
     return dict(code=code, message=message, severity=severity, **kwargs)
 
 
+CRS_INFO = {}
+
+
 def crs_info(value):
+    """Cached: an EPSG lookup for a WKT-only .prj (to_authority) takes ~0.3 s."""
     if not value:
         return {'status': 'unknown'}
+    key = value.to_wkt() if isinstance(value, CRS) else str(value)
+    if key not in CRS_INFO:
+        if len(CRS_INFO) > 256:
+            CRS_INFO.clear()
+        CRS_INFO[key] = describe_crs(value)
+    return dict(CRS_INFO[key])
+
+
+def describe_crs(value):
     crs = CRS.from_user_input(value)
     result = {'status': 'declared', 'name': crs.name, 'wkt': crs.to_wkt(),
               'axisUnits': ', '.join(dict.fromkeys(a.unit_name for a in crs.axis_info))}
     authority = crs.to_authority()
     if authority:
         result['authority'] = ':'.join(authority)
+    result['projected'] = bool(crs.is_projected)
+    try:
+        result['proj4'] = crs.to_proj4()
+    except ProjError:
+        pass
     return result
 
 
@@ -156,7 +176,22 @@ def companions(path):
     return issues, missing
 
 
+VECTOR_METADATA = {}
+
+
 def vector_metadata(path):
+    """Cached per source identity (primary + companions) in a long-lived worker."""
+    names = sorted(p for p in path.parent.iterdir() if p.stem.lower() == path.stem.lower())
+    key = (str(path), tuple((p.name, p.stat().st_mtime_ns, p.stat().st_size) for p in names if p.is_file()))
+    if key not in VECTOR_METADATA:
+        if len(VECTOR_METADATA) > 64:
+            VECTOR_METADATA.clear()
+        VECTOR_METADATA[key] = read_vector_metadata(path)
+    infos, issues, missing = VECTOR_METADATA[key]
+    return infos, [dict(i) for i in issues], list(missing)
+
+
+def read_vector_metadata(path):
     issues, missing = companions(path)
     if path.suffix.lower() == '.geojson':
         issues.append(issue('geojson-coordinate-interpretation',
@@ -251,17 +286,21 @@ def vector_page(path, req):
     display, target = display_info(req, source)
     bounds = bbox_request(req)
     filter_bounds = bounds
-    transformer = None
+    to_display = None
     if target and source != target:
-        transformer = Transformer.from_crs(source, target, always_xy=True)
+        to_display = transformer(source, target)
         if bounds:
-            filter_bounds = Transformer.from_crs(target, source, always_xy=True).transform_bounds(*bounds, densify_pts=21)
+            filter_bounds = transformer(target, source).transform_bounds(*bounds, densify_pts=21)
             if not finite_bounds(filter_bounds):
                 raise ValueError('Viewport cannot be transformed to the source CRS')
             if filter_bounds[0] > filter_bounds[2]:
                 raise ValueError('Antimeridian viewport must be split into separate requests')
-    limit = integer(req, 'limit', 200, 1, 500)
-    offset = integer(req, 'offset', 0, 0, 100000, clamp=False)
+    full = bool(req.get('full'))
+    if full and bounds is not None:
+        raise ValueError('A full-layer display request has no bbox')
+    limit = integer(req, 'limit', 200, 1, FULL_FEATURES if full else 500)
+    offset = 0 if full else integer(req, 'offset', 0, 0, 100000, clamp=False)
+    vertex_budget = FULL_VERTICES if full else MAX_VERTICES
     fields = list(info['fields'])[:64]
     variable = req.get('variable')
     if variable is not None and variable not in info['fields']:
@@ -270,18 +309,27 @@ def vector_page(path, req):
         fields[-1] = variable
     if len(info['fields']) > len(fields):
         issues.append(issue('fields-truncated', 'Only 64 selected attribute fields are displayed.'))
-    meta, fids, wkbs, arrays = read_batch(path, info, offset, limit + 1, filter_bounds, fields)
+    # The layer CRS comes from cached metadata; skip GDAL's per-open .prj EPSG matching (~0.15 s) for this read.
+    pyogrio.set_gdal_config_options({'USE_OSR_FIND_MATCHES': 'NO'})
+    try:
+        meta, fids, wkbs, arrays = read_batch(path, info, offset, limit + 1, filter_bounds, fields)
+    finally:
+        pyogrio.set_gdal_config_options({'USE_OSR_FIND_MATCHES': None})
     more = len(fids) > limit
     features, vertices, class_values, extents = [], 0, [], []
     for index, fid in enumerate(fids[:limit]):
         check_time()
-        geom = geometry(wkbs[index], 10000)
+        geom = geometry(wkbs[index], 200000 if full else 10000)
         if geom is not None:
             vertices += shapely.get_num_coordinates(geom)
-            if vertices > MAX_VERTICES:
+            if vertices > vertex_budget:
+                if full:
+                    # Too heavy for client-side display: the viewer switches to viewport pages.
+                    more = True
+                    break
                 raise ValueError('Page exceeds 30000 vertices; request fewer features')
-            if transformer:
-                geom = transform_geometry(transformer.transform, geom)
+            if to_display:
+                geom = transform_geometry(to_display.transform, geom)
             if not np.isfinite(shapely.get_coordinates(geom)).all():
                 raise ValueError('Geometry cannot be transformed to the display CRS')
             if not geom.is_empty:
@@ -296,8 +344,9 @@ def vector_page(path, req):
         else:
             bounds = [0, 0, 0, 0]
     total = int(info['features'])
+    method = 'whole layer for display; no geometry simplification' if full else 'viewport-filtered paginated features; no geometry simplification'
     preview = dict(sampled=bool('bbox' in req or more or offset or total < 0 or total > len(features)),
-                   truncated=more, method='viewport-filtered paginated features; no geometry simplification', displayedFeatures=len(features))
+                   truncated=more, method=method, displayedFeatures=len(features))
     if total >= 0:
         preview['totalFeatures'] = total
     if not source:
@@ -307,7 +356,7 @@ def vector_page(path, req):
     return dict(kind='vector', path=str(path), layer=info['layer_name'], sourceCrs=crs_info(source), displayCrs=display,
                 bbox=bounds, issues=issues, preview=preview, legend=categorical_legend(class_values, issues), nodata=None,
                 features=dict(type='FeatureCollection', features=features), fields=fields,
-                nextOffset=offset + len(features) if more and offset + len(features) <= 100000 else None)
+                nextOffset=offset + len(features) if more and offset + len(features) <= 100000 else None, full=full and not more)
 
 
 def raster_metadata(src):
@@ -341,7 +390,7 @@ def raster_window(path, req):
             raise ValueError('Selected band does not exist')
         bounds = bbox_request(req)
         if target:
-            full = Transformer.from_crs(source, target, always_xy=True).transform_bounds(*src.bounds, densify_pts=21)
+            full = transformer(source, target).transform_bounds(*src.bounds, densify_pts=21)
             if not finite_bounds(full) or full[0] >= full[2] or full[1] >= full[3]:
                 raise ValueError('Raster extent cannot be transformed to display CRS')
             bounds = intersect(bounds or full, full)
@@ -482,15 +531,49 @@ def display_path(path, prepare=False):
     return vrt, True
 
 
+FULL_BOUNDS = {}
+TRANSFORMERS = {}
+
+
+def transformer(source, target):
+    """pyproj builds a transformer in ~75 ms; workers reuse them across tiles."""
+    key = (source.to_wkt(), target.to_wkt())
+    if key not in TRANSFORMERS:
+        if len(TRANSFORMERS) > 64:
+            TRANSFORMERS.clear()
+        TRANSFORMERS[key] = Transformer.from_crs(source, target, always_xy=True)
+    return TRANSFORMERS[key]
+
+
 def full_display_bounds(src, target):
+    key = (src.name, tuple(src.bounds), str(target))
+    if key not in FULL_BOUNDS:
+        if len(FULL_BOUNDS) > 256:
+            FULL_BOUNDS.clear()
+        FULL_BOUNDS[key] = compute_display_bounds(src, target)
+    return list(FULL_BOUNDS[key])
+
+
+def compute_display_bounds(src, target):
     if target is None:
         if src.transform.b or src.transform.d:
             raise ValueError('Rotated native rasters require a declared CRS for display')
         return [min(src.bounds.left, src.bounds.right), min(src.bounds.bottom, src.bounds.top), max(src.bounds.left, src.bounds.right), max(src.bounds.bottom, src.bounds.top)]
-    full = Transformer.from_crs(CRS.from_user_input(src.crs), target, always_xy=True).transform_bounds(*src.bounds, densify_pts=21)
+    full = transformer(CRS.from_user_input(src.crs), target).transform_bounds(*src.bounds, densify_pts=21)
     if not finite_bounds(full) or full[0] >= full[2] or full[1] >= full[3]:
         raise ValueError('Raster extent cannot be transformed to display CRS')
     return list(full)
+
+
+def native_resolution(path, src, target):
+    """Source pixel size in display units (cached per worker)."""
+    if target is None:
+        return float(max(abs(src.transform.a), abs(src.transform.e)))
+    key = (str(path), str(target))
+    if key not in NATIVE_RES:
+        transform, _, _ = calculate_default_transform(src.crs, target, src.width, src.height, *src.bounds)
+        NATIVE_RES[key] = float(abs(transform.a))
+    return NATIVE_RES[key]
 
 
 def raster_band(req, src):
@@ -520,6 +603,7 @@ def raster_style(path, req):
     valid = values[~mask]
     issues = metadata['issues']
     result = dict(kind='raster-style', path=str(path), band=band, sourceCrs=crs_info(source), displayCrs=display, bbox=full,
+                  resolution=native_resolution(path, src, target),
                   issues=issues, nodata=scalar(src.nodatavals[band-1]), categorical=bool(req.get('categorical')),
                   overviews=bool(src.overviews(band)) or prepared, needsOverviews=needs_overviews(src) and not prepared,
                   preview=dict(sampled=True, truncated=False, width=src.width, height=src.height,
@@ -561,11 +645,7 @@ def raster_tile(path, req):
         view, _ = display_path(path)
         if target is not None:
             # Choose the coarsest overview that is still at least as fine as the tile.
-            key = (str(path), str(target))
-            if key not in NATIVE_RES:
-                t, _, _ = calculate_default_transform(src.crs, target, src.width, src.height, *src.bounds)
-                NATIVE_RES[key] = abs(t.a)
-            factor = (bounds[2] - bounds[0]) / size / NATIVE_RES[key]
+            factor = (bounds[2] - bounds[0]) / size / native_resolution(path, src, target)
             base = open_raster(view)
             level = None
             for index, decimation in enumerate(base.overviews(band)):
@@ -623,7 +703,7 @@ def raster_point(path, req):
         raise ValueError('coordinate must be two finite numbers')
     x, y = point
     if target is not None:
-        x, y = Transformer.from_crs(target, source, always_xy=True).transform(x, y)
+        x, y = transformer(target, source).transform(x, y)
     col, row = (~src.transform) * (x, y)
     col, row = math.floor(col), math.floor(row)
     if not (0 <= col < src.width and 0 <= row < src.height):
@@ -671,7 +751,7 @@ def area_table(path, req):
         limitations.append(f'Ellipsoidal area on source datum: {source.ellipsoid.name}; polygons spanning >180° longitude are rejected.')
     else:
         raise ValueError('Area method must be projected or geodesic')
-    transformer = Transformer.from_crs(source, target, always_xy=True)
+    to_area = transformer(source, target)
     rows, count, empty, vertices = {}, 0, 0, 0
     while True:
         meta, fids, wkbs, arrays = read_batch(path, info, count, 500, columns=[req['classField']])
@@ -693,7 +773,7 @@ def area_table(path, req):
             vertices += shapely.get_num_coordinates(geom)
             if vertices > 2000000:
                 raise ValueError('Full-layer area exceeds 2000000 vertices; no subset was calculated')
-            geom = transform_geometry(transformer.transform, geom)
+            geom = transform_geometry(to_area.transform, geom)
             if not np.isfinite(shapely.get_coordinates(geom)).all() or not geom.is_valid:
                 raise ValueError('Area transformation produced invalid geometry')
             if method == 'projected':
@@ -764,8 +844,9 @@ def handle(req):
         raise ValueError('Unknown map operation')
     check_time()
     output = json.dumps(result, allow_nan=False, separators=(',', ':'))
-    if len(output.encode()) > 7 * 1024 * 1024:
-        raise ValueError('Map response exceeds 7 MiB; request a smaller page/window')
+    cap = 24 if req.get('full') else 7
+    if len(output.encode()) > cap * 1024 * 1024:
+        raise ValueError(f'Map response exceeds {cap} MiB; request a smaller page/window')
     return output
 
 

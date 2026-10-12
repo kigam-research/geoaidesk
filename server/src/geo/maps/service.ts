@@ -28,11 +28,14 @@ export function parseMapRequest(value: unknown): MapRequest {
   const bbox = body.bbox;
   if (bbox !== undefined && (!Array.isArray(bbox) || bbox.length !== 4 || !bbox.every(v => typeof v === "number" && Number.isFinite(v)) || bbox[0] >= bbox[2] || bbox[1] >= bbox[3])) throw new SandboxError(400, "bbox must have finite increasing bounds");
   if (body.categorical !== undefined && typeof body.categorical !== "boolean") throw new SandboxError(400, "Invalid categorical flag");
+  if (body.full !== undefined && typeof body.full !== "boolean") throw new SandboxError(400, "Invalid full flag");
+  if (body.full && bbox !== undefined) throw new SandboxError(400, "A full-layer display request has no bbox");
   return {
     path: text(body.path, "path", true)!, layer: text(body.layer, "layer"), variable: text(body.variable, "variable"),
     displayCrs, bbox: bbox as MapRequest["bbox"], categorical: body.categorical as boolean | undefined,
     band: integer(body.band, "band", 1, 65535, 1), width: integer(body.width, "width", 1, 256, 256), height: integer(body.height, "height", 1, 256, 256),
-    offset: integer(body.offset, "offset", 0, 100000, 0), limit: integer(body.limit, "limit", 1, 500, 200),
+    offset: body.full ? 0 : integer(body.offset, "offset", 0, 100000, 0), limit: integer(body.limit, "limit", 1, body.full ? 20000 : 500, body.full ? 20000 : 200),
+    ...(body.full ? { full: true } : {}),
   };
 }
 export function parseAreaRequest(value: unknown): MapAreaRequest {
