@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T05:56:53Z
+updated: 2026-10-12T06:04:50Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -107,15 +107,17 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
   appended to PNG export. Fixed NGII satellite: JPEG bytes labelled image/png -> type from magic bytes (upstream.ts).
   PC71 browser check: OSM/NGII/KIGAM tiles all 200 (raster 15/39/34, vector 12/60/61), no key in page text or PNG;
   shots + SHA256SUMS in ~/data/geoaidesk/work/gaid-map-tiles/basemap-shots/ (NGII/KIGAM imagery kept out of Git).
+- Final scripts/check on 606598958055 passed (2026-10-12, log ~/data/geoaidesk/work/gaid-map-tiles/logs/check-2.log):
+  backend + frontend 960 + geo node tests 41 + copy 0 errors (1 pre-existing warning) + environment smoke + launcher
+  checks + production smoke PASS. Local services and the PC71 tunnel are stopped, PC71 run files archived to
+  ~/data/geoaidesk/work/gaid-map-tiles/pc71-run/ and removed from PC71, scratch c5fe6278eadf released.
 - First own full scripts/check (before child integration): one timing-dependent viewer test failed; fixed (c23874e).
-- Running local services (stop before finish): gmt-backend-before/after, gmt-web-before/after (systemd --user),
-  PC71 tunnel `ssh -S ~/tmp/gmt/tun.sock -O exit pc74` on pc71; scratch c5fe6278eadf.
 - Baseline (before) on PC74 local backend :18110, data ~/data/geoaidesk/work/gaid-map-tiles/projects (copy of review
   samples): `/geo/raster-window` kambalda_tmi_40m.tif 256x256 = 1.32 s (5 warm runs), `/geo/vector-page`
   Seoul_Geology_250K_Litho.shp 500 = 2.2 s. Cause: each request spawns the helper twice (inspect + operation;
   imports alone 0.5 s) and the raster response is 1.36 MB JSON (65k sample values).
 ## Next steps
-1. Final scripts/check, stop local services/tunnel, release scratch, clean caches, task finish.
+1. task finish (done criteria met; review instance update is the hub's on the user's request).
 2. Child gaid-map-tiles--basemaps: completed and integrated (ce7198d).
 ## Failed approaches
 ## Notes and decisions
