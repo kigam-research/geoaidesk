@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T05:14:42Z
+status: ready
+updated: 2026-10-12T05:14:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -127,9 +127,8 @@ Finish with `task finish`; the parent integrates.
 - Full-check failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-l0fs7sj8.log; external output directory ~/data/geoaidesk/work/checks/12511cf2435d-20261012T045545.976346Z. mzML tests were visibly skipped by the existing network probe; unrelated to the failure.
 - Hub route bb9452a0e9dc completed: parent fixed the Markdown path conformance issue in bc05638f29e0. Re-read the fetched source: all three calls now use apiRelative imported from sandbox-fs. Parent reports 24/24 targeted tests and server typecheck passed. Ready to retry finish; previous failure is historical, not a current blocker.
 ## Next steps
-1. Rerun task finish in this worktree (no task resume needed after failed finish). The CLI will merge the saved parent fix and enforce the repository-wide suite.
-2. After the last check, remove only regenerable worktree build caches required for closure; do not change the existing review deployment or app data.
-3. Parent integrates with task complete gaid-map-tiles--basemaps, wires the viewer, keeps attribution visible including exported online imagery, and performs browser checks. Use docs/geo/basemaps.md and evidence above for the parent report; no separate child report.
+<!-- task:closed -->
+Closed 2026-10-12T05:14:43Z: ready; the parent gaid-map-tiles integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
