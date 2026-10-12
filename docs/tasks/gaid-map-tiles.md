@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T04:42:48Z
+updated: 2026-10-12T04:51:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -94,7 +94,10 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
 ## Next steps
 1. Me: Node worker pool + tile/style/point routes + caches; viewer TileLayer, native-CRS view (proj4), full-layer
    vector load; then integrate the basemap child.
-2. Child `gaid-map-tiles--basemaps`: basemap server adapter + client layer factory/picker (contract below).
+2. Child `gaid-map-tiles--basemaps` (started 2026-10-12, writer 63644923-72c4-4ae1-aefb-0cbc8717e8d7, profile
+   "general work", worktree ~/worktrees/geoaidesk/gaid-map-tiles--basemaps, brief
+   ~/data/geoaidesk/work/gaid-map-tiles/child-basemaps.md): basemap adapter + layers/picker. On its finish notice:
+   review, `task complete gaid-map-tiles--basemaps`, then integrate.
 ## Failed approaches
 ## Notes and decisions
 - Oracle findings (2026-10-12, Extra High, sources in oracle-q1.out): (가) OpenLayers stays the strongest option.

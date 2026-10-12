@@ -10,6 +10,8 @@ export interface MapRequest extends MapSource {
   height?: number;
   offset?: number;
   limit?: number;
+  /** Vector: whole layer for client-side display (no bbox; bounded features/vertices, else truncated). */
+  full?: boolean;
 }
 export interface MapPreview {
   sampled: boolean; truncated: boolean; method: string;
@@ -31,11 +33,37 @@ export interface VectorPage extends MapBase {
   kind: "vector";
   features: { type: "FeatureCollection"; features: MapFeature[] };
   fields: string[]; nextOffset: number | null;
+  /** True when this is the complete layer for client-side display (a `full` request that fit its bounds). */
+  full?: boolean;
 }
 export interface RasterWindow extends MapBase {
   kind: "raster"; band: number; image: string;
   /** Row-major display samples; null is nodata/mask. Never use as analytical full raster. */
   values: (number | null)[][];
+}
+/** Whole-raster display style shared by every tile of a layer (`POST /geo/raster-style`). */
+export interface RasterStyle {
+  kind: "raster-style"; path: string; band: number; sourceCrs: GeoCrs; displayCrs: string;
+  /** Full raster extent in displayCrs. */
+  bbox: MapBBox; issues: GeoIssue[]; preview: MapPreview; legend: MapLegendItem[]; nodata: number | string | null;
+  categorical: boolean;
+  /** Continuous colour range (2nd/98th percentile of an overview sample) and sample min/max. */
+  low?: number; high?: number; min?: number; max?: number;
+  /** Source pixel size in display units; bounds the finest tile level. */
+  resolution: number;
+  overviews: boolean; needsOverviews: boolean;
+  /** Changes when the source or its companions change; part of every tile URL. */
+  version: string;
+}
+/** `GET /geo/raster-tile` query: PNG for one exact display-CRS tile bbox. */
+export interface RasterTileQuery {
+  path: string; band: number; crs: string; bbox: MapBBox; size: 256 | 512;
+  categorical?: boolean; low?: number; high?: number; v: string;
+}
+/** Original-file pixel value under a display coordinate (`POST /geo/raster-point`). */
+export interface RasterPoint {
+  kind: "raster-point"; band: number; inside: boolean;
+  row?: number; col?: number; value?: number | string | null; sourceCoordinate?: [number, number];
 }
 export interface MapAreaRequest extends MapSource {
   classField: string;
