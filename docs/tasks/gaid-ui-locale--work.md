@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T22:32:14Z
+status: ready
+updated: 2026-10-12T22:32:30Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -108,7 +108,8 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
 - English copy exception: work.database.description.plaid changes “Bank account connectivity, transaction data, and financial insights” to “Bank account connectivity, transaction data, and financial analytics” because the copy validator rejects “insights”. Korean remains “은행 계좌 연결, 거래 자료, 금융 분석 정보를 제공합니다.” All other English wording is preserved (ICU interpolation/plurals replace source composition).
 
 ## Next steps
-1. Run task finish; the parent writer integrates this child with task complete. No user action needed.
+<!-- task:closed -->
+Closed 2026-10-12T22:32:30Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Full-web job 2 ran all 975 tests and found one whitespace regression: Exit code and its value lost their separator. Replaced the entire label/value with an ICU message (and fixed the parallel byte counter); tests are rerun without changing assertions.
