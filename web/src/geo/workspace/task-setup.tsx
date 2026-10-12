@@ -9,6 +9,7 @@ import type { SkillInfo } from "@/lib/capabilities";
 import { accepts, request, taskDraft, text } from "./api";
 import { startGeoTask } from "./events";
 import { PrepareEnvironment, Readiness } from "./readiness";
+import { DeleteRecipe } from "./recipe-add";
 
 export const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -19,9 +20,11 @@ export function WorkflowOutputs({ workflow }: { workflow: GeoWorkflowSummary }) 
   </div>;
 }
 
-export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup }: {
+export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe }: {
   workflow: GeoWorkflowSummary; projectId: string; availableFiles: string[]; open: boolean; onOpenChange: (open: boolean) => void; onRefresh: () => void | Promise<void>;
   initialBindings?: Record<string, string>; initialSetup?: GeoRecipeCheckResponse["setup"];
+  /** Set when the setup comes from a saved recipe (gaid-workflow-catalog). */
+  recipe?: { title: string; onDelete: () => Promise<void> };
 }) {
   const [bindings, setBindings] = useState(initialBindings);
   const [choices, setChoices] = useState<Record<string, string>>(() => {
@@ -48,8 +51,11 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   };
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent showCloseButton={false} className="max-h-[90dvh] overflow-y-auto break-words">
-      <DialogTitle>{t("workspace.setup.title", { title: text(workflow.title) })}</DialogTitle>
+      <DialogTitle>{t("workspace.setup.title", { title: recipe?.title ?? text(workflow.title) })}</DialogTitle>
       <DialogDescription>{t("workspace.setup.description")}</DialogDescription>
+      {recipe && <p className="text-xs">{t("workspace.saved.based", { title: text(workflow.title) })}</p>}
+      {workflow.description && <p className="text-xs text-muted-foreground">{text(workflow.description)}</p>}
+      <p className="text-xs">{t("workspace.catalogue.inputs", { formats: [...new Set(workflow.inputRoles.flatMap((role) => role.extensions))].join(", ") })}</p>
       <Readiness value={workflow.readiness} />
       {workflow.inputRoles.map((role) => <label key={role.id} className="block min-w-0 space-y-1">
         <span className="text-sm">{t("workspace.setup.role", { label: text(role.label), required: role.required ? t("workspace.setup.required") : t("workspace.setup.optional") })}</span>
@@ -72,6 +78,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
+        {recipe && <DeleteRecipe onDelete={recipe.onDelete} />}
         <DialogClose asChild><Button variant="outline">{t("workspace.setup.close")}</Button></DialogClose>
         <Button disabled={busy || workflow.readiness.state !== "ready" || missingInput} onClick={() => void start()}>{t(busy ? "workspace.setup.creating" : "workspace.setup.create")}</Button>
       </div>

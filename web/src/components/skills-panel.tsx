@@ -33,7 +33,6 @@ import {
   type SkillOrigin,
   type SkillProblem,
   type SkillScope,
-  type SkillSourcePreview,
   type SkillSyncStatus,
 } from "@/lib/capabilities";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +58,9 @@ import {
   DownloadIcon,
   SlashIcon,
 } from "lucide-react";
+
+import { SkillHubInstall, SkillHubPreviewNotes, skillHubSource, type SkillHubPreview } from "@/geo/skill-hub/skill-hub";
+import { t } from "@/geo/i18n";
 
 interface Row extends SkillInfo {
   enabled: boolean;
@@ -93,7 +95,7 @@ export function SkillsPanel() {
   // Install pane
   const [source, setSource] = useState("");
   const [ref, setRef] = useState("");
-  const [preview, setPreview] = useState<SkillSourcePreview | null>(null);
+  const [preview, setPreview] = useState<SkillHubPreview | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [acknowledged, setAcknowledged] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -182,6 +184,7 @@ export function SkillsPanel() {
 
   const closePanes = useCallback(() => {
     setPane("none");
+    setPreviewing(false);
     setPreview(null);
     setPicked(new Set());
     setAcknowledged(false);
@@ -193,8 +196,18 @@ export function SkillsPanel() {
     setRef("");
   }, []);
 
+  // A preview is scoped to its project. Never carry a hub preview into another project.
+  useEffect(() => {
+    setPreview(null);
+    setPicked(new Set());
+    setAcknowledged(false);
+    setPreviewing(false);
+  }, [activeProjectId]);
+
   const doPreview = useCallback(async () => {
     setPreviewing(true);
+    setAcknowledged(false);
+    setPicked(new Set());
     setError(null);
     setPreview(null);
     try {
@@ -439,6 +452,10 @@ export function SkillsPanel() {
       {/* Install from a source */}
       {pane === "install" && (
         <div className="flex flex-col gap-3 rounded-lg border p-3">
+          <SkillHubInstall key={`${activeProjectId}:${scope}`} scope={scope} projectId={activeProjectId} disabled={previewing || busy === "install"} onSettled={() => setPreviewing(false)}
+            onStart={() => { setPreviewing(true); setPreview(null); setPicked(new Set()); setAcknowledged(false); setError(null); }}
+            onPreview={(result) => { setPreview(result); setPicked(new Set(result.skills.filter((s) => !s.installed).map((s) => s.name))); }}
+            onError={setError} />
           <div className="text-xs font-medium">Add skills from a source</div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -478,9 +495,10 @@ export function SkillsPanel() {
 
           {preview && (
             <>
-              <div className="text-[11px] text-muted-foreground">
+              <SkillHubPreviewNotes preview={preview} />
+              <div className="break-all text-[11px] text-muted-foreground">
                 {preview.skills.length} skill{preview.skills.length === 1 ? "" : "s"} in{" "}
-                <span className="font-medium">{preview.source}</span>
+                <span className="font-medium">{skillHubSource(preview)}</span>
                 {preview.ref ? ` (${preview.ref})` : ""}
               </div>
               <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
@@ -542,8 +560,10 @@ export function SkillsPanel() {
                   onChange={(e) => setAcknowledged(e.target.checked)}
                 />
                 <span>
-                  I trust <span className="font-medium">{preview.source}</span>. Skills are
-                  instructions the agent follows, and they run with its full permissions.
+                  {preview.skillHub ? t("skillHub.trust", { source: skillHubSource(preview) }) : <>
+                    I trust <span className="font-medium">{preview.source}</span>. Skills are
+                    instructions the agent follows, and they run with its full permissions.
+                  </>}
                 </span>
               </label>
 

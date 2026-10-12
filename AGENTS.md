@@ -31,12 +31,19 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   there is no fallback to the upstream sources. Projects are provisioned through `skills-sync.ts` only
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept). Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
+- skill_hub install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills opens the configured site (`geo/distribution.json` `skillHub.sites`) and previews a skill-page URL or uploaded `.tar.gz` through the existing acknowledgement/install gate. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Task exposure and context (`server/src/geo/{context,session,instructions}.ts`): each new chat records which skills
   its system prompt offers (`.kady/geo/exposure/<sessionId>.json`; project default `.kady/geo/context.json`,
   `catalogue` in geo mode) and applies it with Pi's `skillsOverride` (`disableModelInvocation`; files untouched).
   Chats without a record keep upstream behaviour. `GET /geo/context[/preview]` reports the start-prompt budget
   (chars/4 estimate); the chip next to the context gauge is `web/src/geo/context/`. Tool schemas are ~19K tokens of
   a ~25K start prompt, so skill exposure alone cannot fit a 32K local context.
+- Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
+  `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
+  and row style; readiness/미시험/사용자 자료 badges); a row opens `TaskSetup`. "레시피 가져오기" checks a `.geo-start.json`
+  and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
+  (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
+  recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit

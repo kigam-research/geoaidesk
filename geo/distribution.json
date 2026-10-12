@@ -63,5 +63,14 @@
         "reason": "License terms of the four document skills restrict use outside Anthropic's services and redistribution (skill_hub geo-byok-plan section 2.6; release 0.1.0 excludedSources). Not bundled and not fetched automatically; manual installation by the user stays available."
       }
     ]
+  },
+  "skillHub": {
+    "sites": [
+      {
+        "id": "atlas",
+        "url": "https://kigam-research.github.io/skill-atlas/",
+        "packages": "api/catalog/packages"
+      }
+    ]
   }
 }
