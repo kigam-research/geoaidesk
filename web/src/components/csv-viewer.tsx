@@ -1,6 +1,9 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { useDeferredValue, useMemo, useState } from "react";
+
+const filesText = geoText("files");
 
 export const CSV_PAGE_SIZE = 250;
 
@@ -48,20 +51,20 @@ export function CsvViewer({ content }: { content: string }) {
       {(body.length > CSV_PAGE_SIZE || query.length > 0) && (
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b p-2 text-xs">
           <input
-            type="search" aria-label="Search all CSV rows" placeholder="Search all rows…"
+            type="search" aria-label={filesText("csv_viewer.search_all_csv_rows")} placeholder={filesText("csv_viewer.search_all_rows")}
             className="min-w-32 flex-1 rounded border bg-background px-2 py-1"
             value={query} onChange={(event) => { setQuery(event.target.value); setPage(0); }}
           />
-          <span aria-live="polite">{matches.length ? start + 1 : 0}–{Math.min(start + CSV_PAGE_SIZE, matches.length)} of {matches.length.toLocaleString()} rows</span>
-          <button className="rounded border px-2 py-1 disabled:opacity-40" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous</button>
-          <span>Page {currentPage + 1} of {pages}</span>
-          <button className="rounded border px-2 py-1 disabled:opacity-40" disabled={currentPage + 1 >= pages} onClick={() => setPage(currentPage + 1)}>Next</button>
+          <span aria-live="polite">{filesText("csv_viewer.row_range", { start: matches.length ? start + 1 : 0, end: Math.min(start + CSV_PAGE_SIZE, matches.length), count: matches.length })}</span>
+          <button className="rounded border px-2 py-1 disabled:opacity-40" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>{filesText("csv_viewer.previous")}</button>
+          <span>{filesText("csv_viewer.pagination", { page: currentPage + 1, pages })}</span>
+          <button className="rounded border px-2 py-1 disabled:opacity-40" disabled={currentPage + 1 >= pages} onClick={() => setPage(currentPage + 1)}>{filesText("csv_viewer.next")}</button>
           <button className="rounded border px-2 py-1" onClick={async () => {
-            try { await navigator.clipboard.writeText(content); setCopyState("Full CSV copied"); }
-            catch { setCopyState("Copy failed — use Download instead"); }
-          }}>Copy full CSV</button>
+            try { await navigator.clipboard.writeText(content); setCopyState(filesText("csv_viewer.full_csv_copied")); }
+            catch { setCopyState(filesText("csv_viewer.copy_failed_use_download_instead")); }
+          }}>{filesText("csv_viewer.copy_full_csv")}</button>
           {copyState && <span role="status">{copyState}</span>}
-          <p className="w-full text-muted-foreground">Search includes every row. Browser Find searches only the current page; Download and Copy include the full file.</p>
+          <p className="w-full text-muted-foreground">{filesText("csv_viewer.search_includes_every_row_browser_find_searches_only_the_current_page_download_and_copy_include_the_full_file")}</p>
         </div>
       )}
       <div className="min-h-0 flex-1 overflow-auto" aria-busy={query.trim().toLowerCase() !== search}>
@@ -73,7 +76,7 @@ export function CsvViewer({ content }: { content: string }) {
             </tr>
           ))}</tbody>
         </table>
-        {!matches.length && <p className="p-4 text-sm text-muted-foreground">No matching rows.</p>}
+        {!matches.length && <p className="p-4 text-sm text-muted-foreground">{filesText("csv_viewer.no_matching_rows")}</p>}
       </div>
     </div>
   );

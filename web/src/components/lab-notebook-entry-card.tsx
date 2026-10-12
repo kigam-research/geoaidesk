@@ -1,4 +1,6 @@
 "use client";
+import { geoText, geoLocale } from "@/geo/i18n";
+
 
 import { useState } from "react";
 import {
@@ -31,7 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { agentAccent, roleLabel } from "@/lib/notebook-filters";
 import type { NotebookAnnotation } from "@/lib/notebook-annotations";
-import { notebookEntryKey, notebookTargetKey, HYPOTHESIS_LABELS, type NotebookEntry, type NotebookEntryType } from "@/lib/notebook";
+import { notebookEntryKey, notebookTargetKey, type NotebookEntry, type NotebookEntryType } from "@/lib/notebook";
 import { NotebookEvidenceSummary } from "./notebook-evidence-summary";
 import { NotebookPlanDialog } from "./notebook-plan-dialog";
 import { NotebookResultLinks } from "./notebook-result-links";
@@ -43,6 +45,8 @@ import type { ThreadInfo } from "@/lib/notebook-threads";
 import { useProjectScopeId } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { fileCategory, rawFileUrl } from "@/lib/use-sandbox";
+
+const nbText = geoText("notebook");
 
 /**
  * Per-type accents. Colour is carried by the icon and a faint bordered tint —
@@ -64,35 +68,35 @@ export const TYPE_META: Record<
   }
 > = {
   hypothesis: {
-    label: "Hypothesis",
+    label: nbText("type.hypothesis"),
     Icon: LightbulbIcon,
     chip: "text-amber-600 dark:text-amber-400",
     surface: "border-amber-500/25 bg-amber-500/10",
     dot: "bg-amber-500",
   },
   method: {
-    label: "Method",
+    label: nbText("type.method"),
     Icon: FlaskConicalIcon,
     chip: "text-blue-600 dark:text-blue-400",
     surface: "border-blue-500/25 bg-blue-500/10",
     dot: "bg-blue-500",
   },
   observation: {
-    label: "Observation",
+    label: nbText("type.observation"),
     Icon: BarChart3Icon,
     chip: "text-emerald-600 dark:text-emerald-400",
     surface: "border-emerald-500/25 bg-emerald-500/10",
     dot: "bg-emerald-500",
   },
   decision: {
-    label: "Decision",
+    label: nbText("type.decision"),
     Icon: SignpostIcon,
     chip: "text-violet-600 dark:text-violet-400",
     surface: "border-violet-500/25 bg-violet-500/10",
     dot: "bg-violet-500",
   },
   note: {
-    label: "Note",
+    label: nbText("type.note"),
     Icon: StickyNoteIcon,
     chip: "text-muted-foreground",
     surface: "border-border bg-muted",
@@ -115,7 +119,7 @@ function ConfidenceMeter({ level }: { level: "low" | "medium" | "high" }) {
       <TooltipTrigger asChild>
         <span
           className="inline-flex h-5 items-end gap-0.5 px-1"
-          aria-label={`Confidence: ${level}`}
+          aria-label={nbText("entry.confidence", { level: nbText(`confidence.${level}`) })}
           role="img"
         >
           {[0, 1, 2].map((index) => (
@@ -130,7 +134,7 @@ function ConfidenceMeter({ level }: { level: "low" | "medium" | "high" }) {
           ))}
         </span>
       </TooltipTrigger>
-      <TooltipContent>Author confidence: {level} (self-reported, not a calibrated probability)</TooltipContent>
+      <TooltipContent>{nbText("entry.author_confidence", { level: nbText(`confidence.${level}`) })}</TooltipContent>
     </Tooltip>
   );
 }
@@ -145,7 +149,7 @@ const STATUS_META = {
 } as const;
 
 function displayTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString([], {
+  return new Date(timestamp).toLocaleTimeString(geoLocale(), {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -264,7 +268,7 @@ export function LabNotebookEntryCard({
             <time
               className="shrink-0 text-[10px] tabular-nums text-muted-foreground"
               dateTime={new Date(entry.timestamp).toISOString()}
-              title={new Date(entry.timestamp).toLocaleString()}
+              title={new Date(entry.timestamp).toLocaleString(geoLocale())}
             >
               {displayTime(entry.timestamp)}
             </time>
@@ -274,7 +278,7 @@ export function LabNotebookEntryCard({
                   variant="outline"
                   className={cn("h-5 px-1.5 text-[9px] uppercase tracking-wider", STATUS_META[status])}
                 >
-                  {HYPOTHESIS_LABELS[status]}
+                  {nbText(`hypothesis.${status}`)}
                 </Badge>
               )}
               {entry.confidence && <ConfidenceMeter level={entry.confidence} />}
@@ -284,8 +288,8 @@ export function LabNotebookEntryCard({
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => onTogglePin(entry.id)}
-                  title={pinned ? "Unpin entry" : "Pin entry"}
-                  aria-label={pinned ? "Unpin entry" : "Pin entry"}
+                  title={pinned ? nbText("entry.unpin") : nbText("entry.pin")}
+                  aria-label={pinned ? nbText("entry.unpin") : nbText("entry.pin")}
                   className="rounded-full text-muted-foreground"
                 >
                   <StarIcon className={cn(pinned && "fill-amber-400 text-amber-500")} />
@@ -297,8 +301,8 @@ export function LabNotebookEntryCard({
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => onJumpToChat(entry.id)}
-                  title="View in chat"
-                  aria-label="View in chat"
+                  title={nbText("entry.view_chat")}
+                  aria-label={nbText("entry.view_chat")}
                   className="rounded-full text-muted-foreground"
                 >
                   <MessageSquareTextIcon />
@@ -334,10 +338,10 @@ export function LabNotebookEntryCard({
                   <CornerDownRightIcon className="size-3 shrink-0" />
                   <span className="truncate">
                     {entry.stance === "supports"
-                      ? "supports"
+                      ? nbText("entry.supports")
                       : entry.stance === "refutes"
-                        ? "refutes"
-                        : "re:"}{" "}
+                        ? nbText("entry.refutes")
+                        : nbText("entry.related")}{" "}
                     <span className="font-medium underline decoration-dotted underline-offset-2">
                       {relatedEntry?.title ?? entry.relatesTo}
                     </span>
@@ -352,7 +356,7 @@ export function LabNotebookEntryCard({
                 >
                   <RotateCcwIcon className="size-3 shrink-0" />
                   <span className="truncate">
-                    amends{" "}
+                    {nbText("entry.amends")}{" "}
                     <span className="font-medium underline decoration-dotted underline-offset-2">
                       {supersedesEntry?.title ?? entry.supersedes}
                     </span>
@@ -367,7 +371,7 @@ export function LabNotebookEntryCard({
                 >
                   <RotateCcwIcon className="size-3 shrink-0" />
                   <span className="truncate">
-                    superseded by{" "}
+                    {nbText("entry.superseded_by")}{" "}
                     <span className="font-medium underline decoration-dotted underline-offset-2">
                       {supersededByEntry?.title ?? thread.supersededBy}
                     </span>
@@ -385,8 +389,8 @@ export function LabNotebookEntryCard({
           {sessionId && entry.type === "hypothesis" && <div className="flex flex-wrap gap-1.5"><NotebookPlanDialog key={`${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} /><NotebookRobustnessDialog key={`robustness:${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} onOpenFile={onOpenFile} /><NextExperimentsDialog entry={entry} sessionId={sessionId} projectId={projectId} model={model} onSaved={onResearchSaved} /></div>}
           {sessionId && !entry.provisional && ["hypothesis", "observation", "decision"].includes(entry.type) && <div><EvidencePackageDialog projectId={projectId} initialRoot={{ sessionId, entryId: entry.id }} candidates={[{ sessionId, entryId: entry.id, title: entry.title, type: entry.type }]} /></div>}
           {sessionId && Boolean(entry.results?.length) && <NotebookResultLinks key={`${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} onOpenFile={onOpenFile} />}
-          {entry.proposalOnly && <p className="rounded border border-amber-500/30 p-2 text-xs">Planning record only — not observed evidence, a performed method or execution approval.</p>}
-          {entry.nextExperiments && sessionId && <details className="min-w-0 rounded border p-2"><summary className="cursor-pointer text-xs font-medium">Proposed next investigations ({entry.nextExperiments.experiments.length}) · not executed</summary><div className="mt-2"><NextExperimentCards plan={entry.nextExperiments} projectId={projectId} sessionId={sessionId} sourceDigests={entry.nextExperimentBinding?.sourceDigests} /></div></details>}
+          {entry.proposalOnly && <p className="rounded border border-amber-500/30 p-2 text-xs">{nbText("entry.planning_only")}</p>}
+          {entry.nextExperiments && sessionId && <details className="min-w-0 rounded border p-2"><summary className="cursor-pointer text-xs font-medium">{nbText("entry.proposed", { count: entry.nextExperiments.experiments.length })}</summary><div className="mt-2"><NextExperimentCards plan={entry.nextExperiments} projectId={projectId} sessionId={sessionId} sourceDigests={entry.nextExperimentBinding?.sourceDigests} /></div></details>}
           {entry.body && (
             <div className="flex flex-col items-start gap-0.5">
               <div
@@ -416,7 +420,7 @@ export function LabNotebookEntryCard({
                     data-icon="inline-start"
                     className={cn("transition-transform", detailsOpen && "rotate-90")}
                   />
-                  {detailsOpen ? "Collapse entry" : "Read full entry"}
+                  {detailsOpen ? nbText("entry.collapse") : nbText("entry.read_full")}
                 </Button>
               )}
             </div>
@@ -438,7 +442,7 @@ export function LabNotebookEntryCard({
                     className={cn("transition-transform", codeOpen && "rotate-90")}
                   />
                   <Code2Icon />
-                  {entry.code.lang ?? "code"}
+                  {entry.code.lang ?? nbText("entry.code")}
                 </Button>
                 {showOpenAsFile && (
                   <Button
@@ -449,7 +453,7 @@ export function LabNotebookEntryCard({
                     className="ml-auto h-6 text-[11px] font-normal text-muted-foreground"
                   >
                     <ExternalLinkIcon data-icon="inline-start" />
-                    Open as file
+                    {nbText("entry.open_file")}
                   </Button>
                 )}
               </div>
@@ -547,8 +551,8 @@ export function LabNotebookEntryCard({
             >
               <MessageSquareIcon data-icon="inline-start" />
               {comments?.length
-                ? `${comments.length} comment${comments.length === 1 ? "" : "s"}`
-                : "Comment"}
+                ? nbText("entry.comments", { count: comments.length })
+                : nbText("entry.comment")}
               <ChevronRightIcon
                 data-icon="inline-end"
                 className={cn("transition-transform", commentsOpen && "rotate-90")}
@@ -559,9 +563,9 @@ export function LabNotebookEntryCard({
                 {(comments ?? []).map((comment) => (
                   <div key={comment.id} className="text-[11px]">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-medium text-amber-600 dark:text-amber-400">You</span>
+                      <span className="font-medium text-amber-600 dark:text-amber-400">{nbText("role.you")}</span>
                       <time className="text-[10px] text-muted-foreground">
-                        {new Date(comment.createdAt).toLocaleString()}
+                        {new Date(comment.createdAt).toLocaleString(geoLocale())}
                       </time>
                     </div>
                     <p className="mt-0.5 text-muted-foreground">{comment.body}</p>
@@ -574,8 +578,8 @@ export function LabNotebookEntryCard({
                     onKeyDown={(event) => {
                       if (event.key === "Enter") submitComment();
                     }}
-                    placeholder="Add a comment…"
-                    aria-label="Add a comment"
+                    placeholder={nbText("entry.add_comment_placeholder")}
+                    aria-label={nbText("entry.add_comment")}
                     className="h-7 bg-background text-[11px] shadow-none"
                   />
                 )}

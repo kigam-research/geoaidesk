@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Asks for the backend access token when the server demands one (see
@@ -18,6 +19,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AUTH_REQUIRED_EVENT, getApiToken, setApiToken } from "@/lib/api-auth";
+
+const settingsText = geoText("settings");
 
 export function ApiTokenGate() {
   const [open, setOpen] = useState(false);
@@ -45,14 +48,13 @@ export function ApiTokenGate() {
       <DialogContent showCloseButton={false} onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <KeyRoundIcon className="size-4" /> Access token required
+            <KeyRoundIcon className="size-4" /> {settingsText("api_token_gate.access_token_required")}
           </DialogTitle>
           <DialogDescription>
             {hadToken
-              ? "The Kady server rejected the saved access token (it changes each time Kady restarts unless KADY_AUTH_TOKEN is set). "
-              : "This Kady server is protected with an access token. "}
-            Open the link printed in the terminal that started Kady, or paste the
-            link or token here.
+              ? settingsText("api_token_gate.the_kady_server_rejected_the_saved_access_token_it_changes_each_time_kady_restarts_unless")
+              : settingsText("api_token_gate.this_kady_server_is_protected_with_an_access_token")}
+            {settingsText("api_token_gate.open_the_link_printed_in_the_terminal_that_started_kady_or_paste_the_link_or_token_here")}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -66,15 +68,15 @@ export function ApiTokenGate() {
             type="password"
             autoComplete="off"
             spellCheck={false}
-            placeholder="http://localhost:3000/#kady-token=… or the token"
+            placeholder={settingsText("api_token.token_placeholder")}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            aria-label="Access token"
+            aria-label={settingsText("api_token_gate.access_token")}
           />
         </form>
         <DialogFooter>
           <Button onClick={submit} disabled={!value.trim()}>
-            Continue
+            {settingsText("api_token_gate.continue")}
           </Button>
         </DialogFooter>
       </DialogContent>

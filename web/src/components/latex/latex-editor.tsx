@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { type LatexCompileResult } from "@/lib/use-sandbox";
 import { parseCompileDiagnostics } from "@/lib/latex/diagnostics";
@@ -28,7 +29,7 @@ import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
 import { getOriginalDoc, unifiedMergeView } from "@codemirror/merge";
 import { keymap } from "@codemirror/view";
-import { Compartment, type Text } from "@codemirror/state";
+import { EditorState, Compartment, type Text } from "@codemirror/state";
 import { autocompletion } from "@codemirror/autocomplete";
 import { forceLinting, linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 import { useTheme } from "next-themes";
@@ -40,6 +41,8 @@ import { OutlinePanel } from "./outline-panel";
 import { LatexPdfPane } from "./latex-pdf-pane";
 import { AiEditPopover } from "./ai-edit-popover";
 import type { PdfSyncClick, PdfSyncHighlight } from "@/components/pdf-viewer/pdf-viewer";
+
+const filesText = geoText("files");
 
 const AUTOCOMPILE_KEY = "kady:latex:autocompile";
 const OUTLINE_KEY = "kady:latex:outline";
@@ -341,11 +344,11 @@ export function LatexEditor({
 
   const doSave = useCallback(async (): Promise<boolean> => {
     if (aiAbortRef.current || aiReviewRef.current) {
-      showSyncNotice("Finish the AI edit review before saving or compiling");
+      showSyncNotice(filesText("latex_editor.finish_the_ai_edit_review_before_saving_or_compiling"));
       return false;
     }
     if (diskContentRef.current !== null) {
-      showSyncNotice("Choose Load disk version or Keep mine before saving");
+      showSyncNotice(filesText("latex_editor.choose_load_disk_version_or_keep_mine_before_saving"));
       return false;
     }
     // Serialize keyboard/button saves; never let an older request overwrite
@@ -356,7 +359,7 @@ export function LatexEditor({
     if (content === lastSavedRef.current) return true;
     setSaving(true);
     const promise = Promise.resolve().then(() => onSave(content)).catch((error: unknown) => {
-      showSyncNotice(error instanceof Error ? error.message : "Could not save document");
+      showSyncNotice(error instanceof Error ? error.message : filesText("latex_editor.could_not_save_document"));
       return false;
     });
     savePromiseRef.current = promise;
@@ -369,7 +372,7 @@ export function LatexEditor({
         setSaved(current === content);
         if (savedTimer.current) clearTimeout(savedTimer.current);
         savedTimer.current = setTimeout(() => setSaved(false), 1500);
-      } else showSyncNotice("Could not save document. Your edits are still in the editor.");
+      } else showSyncNotice(filesText("latex_editor.could_not_save_document_your_edits_are_still_in_the_editor"));
       return ok;
     } finally {
       savePromiseRef.current = null;
@@ -387,7 +390,7 @@ export function LatexEditor({
       const snapshot = viewRef.current?.state.doc ?? null;
       const docText = snapshot?.toString() ?? contentRef.current;
       if (docText !== lastSavedRef.current) {
-        showSyncNotice("Source changed while saving. Compile again to include your latest edits.");
+        showSyncNotice(filesText("latex_editor.source_changed_while_saving_compile_again_to_include_your_latest_edits"));
         return;
       }
       const magic = parseMagicComments(docText);
@@ -419,7 +422,7 @@ export function LatexEditor({
     } catch (error) {
       diagRef.current = null;
       setDiagnosticsStale(false);
-      const message = error instanceof Error ? error.message : "Compilation failed";
+      const message = error instanceof Error ? error.message : filesText("latex_editor.compilation_failed");
       setLogText(message);
       setCompileErrors([message]);
       setCompileFailed(true);
@@ -434,7 +437,7 @@ export function LatexEditor({
 
   const handleSave = useCallback(async () => {
     if (compilingRef.current) {
-      showSyncNotice("Compilation is in progress. Save again when it finishes.");
+      showSyncNotice(filesText("latex_editor.compilation_is_in_progress_save_again_when_it_finishes"));
       return;
     }
     const ok = await doSave();
@@ -508,7 +511,7 @@ export function LatexEditor({
     const pdf = pdfPathRef.current;
     if (!view || !pdf) return;
     if (compilingRef.current || !pdfDocRef.current?.eq(view.state.doc) || !synctexOk) {
-      showSyncNotice("Recompile before jumping between source and PDF");
+      showSyncNotice(filesText("latex_editor.recompile_before_jumping_between_source_and_pdf"));
       return;
     }
     setViewMode((mode) => mode === "source" ? "split" : mode);
@@ -519,7 +522,7 @@ export function LatexEditor({
     const box = await fetchSynctexForward(path, line, pdf, projectId);
     if (token !== syncTokenRef.current) return;
     if (box === "unavailable" || box === null) {
-      showSyncNotice(box === "unavailable" ? "SyncTeX not available (recompile first)" : "No PDF location found for this line");
+      showSyncNotice(box === "unavailable" ? filesText("latex_editor.synctex_not_available_recompile_first") : filesText("latex_editor.no_pdf_location_found_for_this_line"));
       return;
     }
     setSyncHighlight({ ...box, token });
@@ -536,12 +539,12 @@ export function LatexEditor({
       const pdf = pdfPathRef.current;
       if (!pdf) return;
       if (compilingRef.current || !synctexOk || !viewRef.current || !pdfDocRef.current?.eq(viewRef.current.state.doc)) {
-        showSyncNotice("Recompile before jumping between source and PDF");
+        showSyncNotice(filesText("latex_editor.recompile_before_jumping_between_source_and_pdf"));
         return;
       }
       const loc = await fetchSynctexInverse(pdf, pos.page, pos.x, pos.y, projectId);
       if (loc === "unavailable" || loc === null || !loc.file) {
-        showSyncNotice("No source location found");
+        showSyncNotice(filesText("latex_editor.no_source_location_found"));
         return;
       }
       if (loc.file === path) {
@@ -551,11 +554,11 @@ export function LatexEditor({
       // Switching tabs unmounts this editor and its unsaved CodeMirror doc —
       // never follow a cross-file jump over unsaved edits.
       if (contentRef.current !== lastSavedRef.current || aiAbortRef.current || aiReviewRef.current) {
-        showSyncNotice(`Source is in ${loc.file}:${loc.line} — save (${modKey}S) to follow`);
+        showSyncNotice(filesText("latex_editor.source_location_save", { file: loc.file, line: loc.line, key: modKey }));
         return;
       }
       onOpenFile?.(loc.file);
-      showSyncNotice(`Source is in ${loc.file}:${loc.line}`);
+      showSyncNotice(filesText("latex_editor.source_location", { file: loc.file, line: loc.line }));
     },
     [path, projectId, jumpToLine, onOpenFile, showSyncNotice, modKey, synctexOk],
   );
@@ -577,7 +580,7 @@ export function LatexEditor({
       // spellcheck fixes, external file refresh) can still move the doc — so
       // refuse if any of the source context changed during the round-trip.
       if (!expected.eq(view.state.doc) || aiReviewRef.current) {
-        showSyncNotice("Document changed during the AI request — edit not applied");
+        showSyncNotice(filesText("latex_editor.document_changed_during_the_ai_request_edit_not_applied"));
         return;
       }
       const original = view.state.doc.toString();
@@ -603,7 +606,7 @@ export function LatexEditor({
           aiReview !== null && view.state.doc.toString() !== aiReview.applied;
         view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: original } });
         if (manuallyEdited) {
-          showSyncNotice("Reverted AI edit — manual edits made during review were reverted too (undo to restore)");
+          showSyncNotice(filesText("latex_editor.reverted_ai_edit_manual_edits_made_during_review_were_reverted_too_undo_to_restore"));
         }
       }
       view?.dispatch({ effects: mergeComp.reconfigure([]) });
@@ -623,7 +626,7 @@ export function LatexEditor({
       source: string,
     ): Promise<LatexAssistResult | null> => {
       if (aiAbortRef.current || aiReviewRef.current || savePromiseRef.current || compilingRef.current) {
-        onError("Finish the current save, compilation, or AI review before starting another edit");
+        onError(filesText("latex_editor.finish_the_current_save_compilation_or_ai_review_before_starting_another_edit"));
         return null;
       }
       setAiBusy(true);
@@ -647,13 +650,13 @@ export function LatexEditor({
         );
         if (ctrl.signal.aborted) return null;
         if (result.status === "needs_context") {
-          onError(`More context needed: ${result.message}`);
+          onError(filesText("latex_editor.more_context", { message: result.message }));
           return null;
         }
         return result;
       } catch (err) {
         if (!(err instanceof DOMException && err.name === "AbortError")) {
-          onError(err instanceof LatexAssistError ? err.message : "AI request failed");
+          onError(err instanceof LatexAssistError ? err.message : filesText("latex_editor.ai_request_failed"));
         }
         return null;
       } finally {
@@ -695,7 +698,7 @@ export function LatexEditor({
       // (same staleness rule the lint gutter enforces via snap.doc.eq).
       const snap = diagRef.current;
       if (!snap || !snap.doc.eq(view.state.doc)) {
-        showSyncNotice("Document changed since the last compile — recompile before fixing with AI");
+        showSyncNotice(filesText("latex_editor.document_changed_since_the_last_compile_recompile_before_fixing_with_ai"));
         return;
       }
       // Close a lingering Cmd+K popover so its cancel can't abort this request.
@@ -718,13 +721,13 @@ export function LatexEditor({
     const view = viewRef.current;
     if (!view) return false;
     if (aiAbortRef.current || aiReviewRef.current || savePromiseRef.current || compilingRef.current) {
-      showSyncNotice("Finish the current save, compilation, or AI review before starting another edit");
+      showSyncNotice(filesText("latex_editor.finish_the_current_save_compilation_or_ai_review_before_starting_another_edit"));
       return true;
     }
     const { from, to, head } = view.state.selection.main;
     setViewMode((mode) => mode === "pdf" ? "split" : mode);
     if (from === to) {
-      showSyncNotice("Select some LaTeX source, then choose Edit with AI");
+      showSyncNotice(filesText("latex_editor.select_some_latex_source_then_choose_edit_with_ai"));
       view.focus();
       return true;
     }
@@ -765,7 +768,7 @@ export function LatexEditor({
               actions:
                 it.severity === "error"
                   ? [{
-                      name: "✦ Fix with AI",
+                      name: filesText("latex_editor.fix_with_ai"),
                       apply: () => fixWithAiRef.current(it.line, it.message),
                     }]
                   : undefined,
@@ -780,6 +783,40 @@ export function LatexEditor({
   const extensions = useMemo(() => {
     return [
       ...(texLang ? [texLang] : []),
+      EditorState.phrases.of({
+    "Find": filesText("code_editor.find"),
+    "Replace": filesText("code_editor.replace"),
+    "next": filesText("code_editor.next"),
+    "previous": filesText("code_editor.previous"),
+    "all": filesText("code_editor.all"),
+    "match case": filesText("code_editor.match_case"),
+    "regexp": filesText("code_editor.regexp"),
+    "by word": filesText("code_editor.by_word"),
+    "replace": filesText("code_editor.replace_lowercase"),
+    "replace all": filesText("code_editor.replace_all"),
+    "close": filesText("code_editor.close"),
+    "Go to line": filesText("code_editor.go_to_line"),
+    "go": filesText("code_editor.go"),
+    "current match": filesText("code_editor.current_match"),
+    "on line": filesText("code_editor.on_line"),
+    "replaced $ matches": filesText("code_editor.replaced_matches"),
+    "replaced match on line $": filesText("code_editor.replaced_match_on_line"),
+    "Completions": filesText("code_editor.completions"),
+    "Diagnostics": filesText("code_editor.diagnostics"),
+    "No diagnostics": filesText("code_editor.no_diagnostics"),
+    "Folded lines": filesText("code_editor.folded_lines"),
+    "Unfolded lines": filesText("code_editor.unfolded_lines"),
+    "to": filesText("code_editor.to"),
+    "folded code": filesText("code_editor.folded_code"),
+    "unfold": filesText("code_editor.unfold"),
+    "Fold line": filesText("code_editor.fold_line"),
+    "Unfold line": filesText("code_editor.unfold_line"),
+    "$ unchanged lines": filesText("code_editor.unchanged_lines"),
+    "Accept": filesText("code_editor.accept"),
+    "Reject": filesText("code_editor.reject"),
+    "Revert this chunk": filesText("code_editor.revert_this_chunk"),
+    "Control character": filesText("code_editor.control_character"),
+  }),
       EditorView.lineWrapping,
       lintGutter(),
       autocompletion({
@@ -890,14 +927,14 @@ export function LatexEditor({
         onAskKady={askKady}
       />
       {confirmClose && (
-        <div role="alertdialog" aria-label="Close LaTeX editor" className="flex shrink-0 items-center gap-2 border-b bg-amber-500/10 px-3 py-2 text-xs">
-          <span className="flex-1">Close without saving? Unsaved edits and any AI review will be lost.</span>
-          <button onClick={() => setConfirmClose(false)} className="rounded border px-2 py-1">Keep editing</button>
-          <button onClick={onDiscard} className="rounded border px-2 py-1 text-red-600">Close without saving</button>
+        <div role="alertdialog" aria-label={filesText("latex_editor.close_latex_editor")} className="flex shrink-0 items-center gap-2 border-b bg-amber-500/10 px-3 py-2 text-xs">
+          <span className="flex-1">{filesText("latex_editor.confirm.close")}</span>
+          <button onClick={() => setConfirmClose(false)} className="rounded border px-2 py-1">{filesText("latex_editor.keep_editing")}</button>
+          <button onClick={onDiscard} className="rounded border px-2 py-1 text-red-600">{filesText("latex_editor.close_without_saving")}</button>
         </div>
       )}
       {syncNotice && <div role="status" className="shrink-0 border-b bg-blue-500/10 px-3 py-1 text-[11px] text-blue-700 dark:text-blue-300">{syncNotice}</div>}
-      {logText !== null && <div className="shrink-0 truncate border-b px-3 py-1 text-[10px] text-muted-foreground" title={compileTarget}>Compile target: {compileTarget}</div>}
+      {logText !== null && <div className="shrink-0 truncate border-b px-3 py-1 text-[10px] text-muted-foreground" title={compileTarget}>{filesText("latex_editor.compile_target", { path: compileTarget })}</div>}
 
       <div className={cn("flex flex-1 min-h-0", dragging && "select-none")}>
         {outlineOpen && viewMode !== "pdf" && (
@@ -922,48 +959,39 @@ export function LatexEditor({
             {aiBusy && !aiPopover && (
               <div className="flex shrink-0 items-center gap-2 border-b bg-violet-500/10 px-3 py-1 text-[11px] text-violet-700 dark:text-violet-300">
                 <LoaderCircleIcon className="size-3 animate-spin" />
-                AI fix in progress — editor locked
+                {filesText("latex_editor.ai_locked")}
                 <span className="flex-1" />
                 <button
                   onClick={() => aiAbortRef.current?.abort()}
                   className="rounded border px-2 py-0.5 hover:bg-muted"
                 >
-                  Cancel
-                </button>
+                   {filesText("latex_editor.cancel")} </button>
               </div>
             )}
             {aiReview && (
               <div className="flex shrink-0 items-center gap-2 border-b bg-violet-500/10 px-3 py-1 text-[11px] text-violet-700 dark:text-violet-300">
                 <SparklesIcon className="size-3" />
-                AI edit applied — review the highlighted chunks
+                {filesText("latex_editor.ai_review")}
                 {aiReview.costUsd > 0 && <span className="text-muted-foreground">· ${aiReview.costUsd.toFixed(4)}</span>}
                 <span className="flex-1" />
-                <button onClick={() => finishReview(false)} className="rounded bg-violet-600 px-2 py-0.5 text-white hover:bg-violet-700">
-                  Keep all
-                </button>
-                <button onClick={() => finishReview(true)} className="rounded border px-2 py-0.5 hover:bg-muted">
-                  Revert all
-                </button>
+                <button onClick={() => finishReview(false)} className="rounded bg-violet-600 px-2 py-0.5 text-white hover:bg-violet-700">{filesText("latex_editor.keep_all")}</button>
+                <button onClick={() => finishReview(true)} className="rounded border px-2 py-0.5 hover:bg-muted">{filesText("latex_editor.revert_all")}</button>
               </div>
             )}
             {diskContent !== null && (
               <div className="flex shrink-0 items-center gap-2 border-b bg-amber-500/10 px-3 py-1 text-[11px] text-amber-800 dark:text-amber-300">
                 <AlertTriangleIcon className="size-3" />
-                This file changed on disk while you were editing
+                {filesText("latex_editor.disk_changed")}
                 <span className="flex-1" />
                 <button
                   onClick={() => applyDiskContent(diskContent)}
                   disabled={aiBusy || aiReview !== null}
                   className="rounded border px-2 py-0.5 hover:bg-muted"
-                >
-                  Load disk version
-                </button>
+                >{filesText("latex_editor.load_disk")}</button>
                 <button
                   onClick={keepEditorContent}
                   className="rounded border px-2 py-0.5 hover:bg-muted"
-                >
-                  Keep mine
-                </button>
+                >{filesText("latex_editor.keep_mine")}</button>
               </div>
             )}
             <div className="relative flex-1 min-h-0">
@@ -987,7 +1015,7 @@ export function LatexEditor({
             <div
               ref={dividerRef}
               role="separator"
-              aria-label="Resize source and PDF panes"
+              aria-label={filesText("latex_editor.resize_source_and_pdf_panes")}
               aria-orientation="vertical"
               aria-valuenow={Math.round(splitPct)}
               aria-valuemin={25}
@@ -1006,7 +1034,7 @@ export function LatexEditor({
           )}
 
           <div className={cn("min-w-0 flex-1 flex-col bg-muted/5", viewMode === "source" ? "hidden" : "flex")}>
-            {pdfPath && (previewStale || compileFailed) && <div className="shrink-0 border-b bg-amber-500/10 px-3 py-1 text-[11px] text-amber-800 dark:text-amber-300">{compileFailed ? "Compilation failed. Preview is from the last successful build." : "Source has changed. Compile to update the PDF."}</div>}
+            {pdfPath && (previewStale || compileFailed) && <div className="shrink-0 border-b bg-amber-500/10 px-3 py-1 text-[11px] text-amber-800 dark:text-amber-300">{compileFailed ? filesText("latex_editor.compilation_failed_preview_is_from_the_last_successful_build") : filesText("latex_editor.source_has_changed_compile_to_update_the_pdf")}</div>}
             <LatexPdfPane
               pdfPath={pdfPath}
               reloadToken={reloadToken}

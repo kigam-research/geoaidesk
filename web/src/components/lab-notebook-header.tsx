@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+
 
 import { useState, type ReactNode } from "react";
 import {
@@ -34,6 +36,8 @@ import { TYPE_META } from "./lab-notebook-entry-card";
 import { type NotebookFilterState } from "@/lib/notebook-filters";
 import type { NotebookEntryType } from "@/lib/notebook";
 
+const nbText = geoText("notebook");
+
 export type NotebookScope = "session" | "project";
 export type NotebookViewMode = "story" | "agents" | "chrono";
 export type NotebookExportFormat = "md" | "zip" | "json";
@@ -63,13 +67,13 @@ const ALL_TYPES: NotebookEntryType[] = [
 ];
 
 function relativeUpdate(timestamp?: number): string {
-  if (!timestamp) return "no activity yet";
+  if (!timestamp) return nbText("header.no_activity");
   const minutes = Math.floor(Math.max(0, Date.now() - timestamp) / 60_000);
-  if (minutes < 1) return "updated just now";
-  if (minutes < 60) return `updated ${minutes}m ago`;
+  if (minutes < 1) return nbText("header.updated_now");
+  if (minutes < 60) return nbText("header.updated_minutes", { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `updated ${hours}h ago`;
-  return `updated ${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return nbText("header.updated_hours", { count: hours });
+  return nbText("header.updated_days", { count: Math.floor(hours / 24) });
 }
 
 /**
@@ -145,7 +149,7 @@ function Highlight({
           shadow the entry card's own title in text queries. */}
       <span className="min-w-0 truncate">
         <span className="font-medium text-foreground/70">
-          {kind === "direction" ? "Direction" : "Signal"}
+          {kind === "direction" ? nbText("header.direction") : nbText("header.signal")}
         </span>{" "}
         · {title}
       </span>
@@ -219,18 +223,18 @@ export function LabNotebookHeader({
   // same "one muted line under the panel title" slot every panel header uses.
   const subtitle = hasEntries
     ? [
-        `${totalCount} ${totalCount === 1 ? "entry" : "entries"}`,
+        nbText("header.entries", { count: totalCount }),
         overview.collaboratorCount > 1
-          ? `${overview.collaboratorCount} contributors`
+          ? nbText("header.contributors", { count: overview.collaboratorCount })
           : null,
         overview.artifactCount > 0
-          ? `${overview.artifactCount} artifact${overview.artifactCount === 1 ? "" : "s"}`
+          ? nbText("header.artifacts", { count: overview.artifactCount })
           : null,
         relativeUpdate(overview.updatedAt),
       ]
         .filter(Boolean)
         .join(" · ")
-    : "Ideas, evidence, and decisions as the research unfolds";
+    : nbText("header.empty_subtitle");
 
   return (
     <header className="@container/notebook shrink-0">
@@ -238,7 +242,7 @@ export function LabNotebookHeader({
         <div className="flex min-w-0 items-center gap-2">
           <BookOpenIcon className="size-4 shrink-0 text-orange-500" />
           <div className="min-w-0">
-            <h1 className="text-xs font-semibold">Lab Notebook</h1>
+            <h1 className="text-xs font-semibold">{nbText("header.title")}</h1>
             <p className="truncate text-[10px] text-muted-foreground">{subtitle}</p>
           </div>
         </div>
@@ -246,7 +250,7 @@ export function LabNotebookHeader({
         {streaming && (
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">
             <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
-            Recording
+            {nbText("header.recording")}
           </span>
         )}
 
@@ -267,15 +271,14 @@ export function LabNotebookHeader({
                   ) : (
                     <SparklesIcon data-icon="inline-start" />
                   )}
-                  Methods draft
+                  {nbText("header.methods_draft")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium">Turn the trail into a Methods section</p>
+                  <p className="text-sm font-medium">{nbText("header.methods_heading")}</p>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Kady synthesizes the recorded methods, decisions, and observations in one
-                    budgeted AI call, then saves an editable draft to the sandbox.
+                    {nbText("header.methods_description")}
                   </p>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
@@ -285,7 +288,7 @@ export function LabNotebookHeader({
                     size="xs"
                     onClick={() => setMethodsOpen(false)}
                   >
-                    Cancel
+                    {nbText("common.cancel")}
                   </Button>
                   <Button
                     type="button"
@@ -296,7 +299,7 @@ export function LabNotebookHeader({
                     }}
                   >
                     <SparklesIcon data-icon="inline-start" />
-                    Generate
+                    {nbText("header.generate")}
                   </Button>
                 </div>
               </PopoverContent>
@@ -313,23 +316,23 @@ export function LabNotebookHeader({
                   title={
                     canExport
                       ? undefined
-                      : "Start a chat before exporting its notebook"
+                      : nbText("header.export_before_chat")
                   }
                 >
                   <DownloadIcon data-icon="inline-start" />
-                  Export
+                  {nbText("header.export")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={() => onExport("md")}>
-                    <FileTextIcon /> Markdown (.md)
+                    <FileTextIcon /> {nbText("header.markdown")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onExport("zip")}>
-                    <DownloadIcon /> Bundle with artifacts (.zip)
+                    <DownloadIcon /> {nbText("header.bundle")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onExport("json")}>
-                    <FileTextIcon /> JSON (.json)
+                    <FileTextIcon /> {nbText("header.json")}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -341,8 +344,8 @@ export function LabNotebookHeader({
               variant="outline"
               size="icon-xs"
               onClick={onPrint}
-              aria-label="Save notebook as PDF"
-              title="Export as PDF"
+              aria-label={nbText("header.save_pdf")}
+              title={nbText("header.export_pdf")}
             >
               <PrinterIcon />
             </Button>
@@ -352,29 +355,29 @@ export function LabNotebookHeader({
 
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-1.5">
         <SegmentedToggle
-          label="Notebook scope"
+          label={nbText("header.scope")}
           value={scope}
           onChange={onScopeChange}
           options={[
-            { value: "session", label: "This chat" },
-            { value: "project", label: "All chats" },
+            { value: "session", label: nbText("header.this_chat") },
+            { value: "project", label: nbText("header.all_chats") },
           ]}
         />
         {scope === "session" && hasEntries && (
           <SegmentedToggle
-            label="Notebook layout"
+            label={nbText("header.layout")}
             value={viewMode}
             onChange={onViewModeChange}
             options={[
-              { value: "story", label: "Research story", Icon: MapIcon },
-              { value: "agents", label: "By agent", Icon: UsersIcon },
-              { value: "chrono", label: "Timeline", Icon: ListIcon },
+              { value: "story", label: nbText("header.story"), Icon: MapIcon },
+              { value: "agents", label: nbText("header.agents"), Icon: UsersIcon },
+              { value: "chrono", label: nbText("header.timeline"), Icon: ListIcon },
             ]}
           />
         )}
         {hasEntries && filteredCount !== totalCount && (
           <span className="text-[10px] tabular-nums text-muted-foreground">
-            {filteredCount} of {totalCount} shown
+            {nbText("header.shown", { shown: filteredCount, total: totalCount })}
           </span>
         )}
       </div>
@@ -412,10 +415,10 @@ export function LabNotebookHeader({
               onClick={() =>
                 onFiltersChange({ ...filters, pinnedOnly: !filters.pinnedOnly })
               }
-              title="Pinned only"
+              title={nbText("header.pinned_only")}
               className="inline-flex h-6 items-center gap-1 rounded-full border px-2 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[active=true]:border-amber-500/40 data-[active=true]:bg-amber-500/10 data-[active=true]:text-amber-600 dark:data-[active=true]:text-amber-400"
             >
-              <StarIcon className="size-3" /> Pinned
+              <StarIcon className="size-3" /> {nbText("header.pinned")}
               {overview.pinnedCount > 0 && (
                 <span className="tabular-nums">{overview.pinnedCount}</span>
               )}
@@ -428,8 +431,8 @@ export function LabNotebookHeader({
               onChange={(event) =>
                 onFiltersChange({ ...filters, query: event.target.value })
               }
-              placeholder="Search entries…"
-              aria-label="Search entries"
+              placeholder={nbText("header.search_placeholder")}
+              aria-label={nbText("header.search")}
               className="h-6 rounded-full bg-background pl-8 pr-7 text-[11px] shadow-none"
             />
             {filters.query && (
@@ -437,7 +440,7 @@ export function LabNotebookHeader({
                 type="button"
                 variant="ghost"
                 size="icon-xs"
-                aria-label="Clear search"
+                aria-label={nbText("header.clear_search")}
                 onClick={() => onFiltersChange({ ...filters, query: "" })}
                 className="absolute right-0.5 size-5 rounded-full text-muted-foreground"
               >
@@ -474,27 +477,27 @@ export function LabNotebookHeader({
                 <span className="inline-flex shrink-0 items-center gap-2 tabular-nums">
                   <span
                     className="inline-flex items-center gap-1"
-                    title={`${overview.hypotheses.supported} hypotheses with supporting evidence`}
+                    title={nbText("header.supported", { count: overview.hypotheses.supported })}
                   >
                     <CheckCircle2Icon className="size-3 text-emerald-600 dark:text-emerald-400" />
                     {overview.hypotheses.supported}
                   </span>
                   <span
                     className="inline-flex items-center gap-1"
-                    title={`${overview.hypotheses.open} open`}
+                    title={nbText("header.open", { count: overview.hypotheses.open })}
                   >
                     <ActivityIcon className="size-3 text-amber-600 dark:text-amber-400" />
                     {overview.hypotheses.open}
                   </span>
                   <span
                     className="inline-flex items-center gap-1"
-                    title={`${overview.hypotheses.refuted} hypotheses with challenging evidence`}
+                    title={nbText("header.refuted", { count: overview.hypotheses.refuted })}
                   >
                     <XCircleIcon className="size-3 text-rose-600 dark:text-rose-400" />
                     {overview.hypotheses.refuted}
                   </span>
-                  {overview.hypotheses.mixed > 0 && <span className="text-violet-600 dark:text-violet-400">{overview.hypotheses.mixed} conflicting</span>}
-                  {overview.hypotheses.inconclusive > 0 && <span>{overview.hypotheses.inconclusive} inconclusive</span>}
+                  {overview.hypotheses.mixed > 0 && <span className="text-violet-600 dark:text-violet-400">{nbText("header.conflicting", { count: overview.hypotheses.mixed })}</span>}
+                  {overview.hypotheses.inconclusive > 0 && <span>{nbText("header.inconclusive", { count: overview.hypotheses.inconclusive })}</span>}
                 </span>
               )}
               {overview.topTags.length > 0 && (

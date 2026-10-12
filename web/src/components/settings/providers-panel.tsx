@@ -1,4 +1,5 @@
 "use client";
+import { settingsSourceText } from "@/components/settings/primitives";
 import { geoText } from "@/geo/i18n";
 /**
  * Settings → Models → Providers: every way to reach a model in one place.
@@ -44,6 +45,8 @@ import {
   matchesQuery,
 } from "./primitives";
 
+const settingsText = geoText("settings");
+
 const appText = geoText("app");
 
 const OPENROUTER_KEY: KeyDef = {
@@ -60,10 +63,10 @@ function fieldKeyDef(provider: DirectProviderStatus, field: DirectProviderField)
   return {
     id: field.credentialId,
     bodyField: field.bodyField,
-    label: field.label,
+    label: settingsSourceText(field.label),
     placeholder: field.placeholder ?? (field.secret ? "…" : ""),
     keysUrl: field.isKey ? provider.keysUrl : undefined,
-    hint: field.hint ? appText("settings.providers.fieldHint", { hint: field.hint, variable: field.envVar }) : appText("settings.providers.fieldStored", { variable: field.envVar }),
+    hint: field.hint ? appText("settings.providers.fieldHint", { hint: settingsSourceText(field.hint), variable: field.envVar }) : appText("settings.providers.fieldStored", { variable: field.envVar }),
     secret: field.secret,
     notifyProviders: true,
   };
@@ -158,7 +161,7 @@ function ProviderRowCard({
             <div className="flex items-start gap-3" data-testid={`provider-signin-${row.id}`}>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-medium">{row.oauth.accountLabel}</span>
+                  <span className="text-xs font-medium">{settingsSourceText(row.oauth.accountLabel)}</span>
                   <Badge variant="outline">{billingBadge(row.oauth)}</Badge>
                 </div>
                 <p
@@ -169,7 +172,7 @@ function ProviderRowCard({
                       : "text-muted-foreground",
                   )}
                 >
-                  {row.oauth.billingNote}
+                  {settingsSourceText(row.oauth.billingNote)}
                 </p>
               </div>
               {row.oauth.connected ? (
@@ -180,7 +183,7 @@ function ProviderRowCard({
                   className="shrink-0"
                   disabled={disconnecting}
                   onClick={() => onDisconnect(row.oauth!)}
-                  aria-label={appText("settings.providers.disconnectAccount", { name: row.oauth.accountLabel })}
+                  aria-label={appText("settings.providers.disconnectAccount", { name: settingsSourceText(row.oauth.accountLabel) })}
                 >
                   {disconnecting ? (
                     <LoaderCircleIcon className="size-3.5 animate-spin" aria-hidden />
@@ -194,7 +197,7 @@ function ProviderRowCard({
                   size="sm"
                   className="shrink-0"
                   onClick={() => onSignIn(row.oauth!)}
-                  aria-label={appText("settings.providers.connectAccount", { name: row.oauth.accountLabel, state: row.oauth.needsReauth ? "reconnect" : "connect" })}
+                  aria-label={appText("settings.providers.connectAccount", { name: settingsSourceText(row.oauth.accountLabel), state: row.oauth.needsReauth ? "reconnect" : "connect" })}
                 >
                   <LogInIcon className="size-3.5" aria-hidden />
                   {row.oauth.needsReauth ? appText("settings.providers.reconnect") : appText("settings.providers.sign_in")}
@@ -211,13 +214,13 @@ function ProviderRowCard({
           ) : null}
 
           {row.direct?.hint ? (
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{row.direct.hint}</p>
+            <p className="text-[11px] leading-relaxed text-muted-foreground">{settingsSourceText(row.direct.hint)}</p>
           ) : null}
           {keyDefs.map((def) => (
             <KeyRow key={def.id} def={def} current={credentials?.[def.id]} onStatus={onCredentials} />
           ))}
           {row.direct?.billingNote ? (
-            <p className="text-[11px] leading-relaxed text-muted-foreground/80">{row.direct.billingNote}</p>
+            <p className="text-[11px] leading-relaxed text-muted-foreground/80">{settingsSourceText(row.direct.billingNote)}</p>
           ) : null}
         </div>
       ) : null}
@@ -359,7 +362,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
 
   const disconnect = async (provider: ModelProviderStatus) => {
     const ok = await confirm({
-      title: appText("settings.providers.confirm.disconnect", { name: provider.accountLabel }),
+      title: appText("settings.providers.confirm.disconnect", { name: settingsSourceText(provider.accountLabel) }),
       description:
         appText("settings.providers.existing_chats_remain_on_disk_but_new"),
       confirmLabel: appText("settings.providers.disconnect"),
@@ -498,7 +501,7 @@ export function ProvidersPanel({ section }: { section?: string }) {
                 envVar="OLLAMA_BASE_URL"
                 bodyField="ollamaBaseUrl"
                 defaultUrl="http://localhost:11434"
-                hint="Run `ollama serve` and pull a model."
+                hint={settingsText("providers.run_ollama_serve_and_pull_a_model")}
                 credentials={credentials.status}
                 onCredentials={credentials.setStatus}
                 available={models.ollamaAvailable}

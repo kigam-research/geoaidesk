@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { cn } from "@/lib/utils";
 import {
@@ -19,6 +20,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+const filesText = geoText("files");
+
 export type Engine = "pdflatex" | "xelatex" | "lualatex";
 export type LatexViewMode = "source" | "split" | "pdf";
 
@@ -34,16 +37,16 @@ export type SnippetAction =
 
 const BLOCK_SNIPPETS: { label: string; text: string }[] = [
   {
-    label: "Figure",
+    label: filesText("latex_toolbar.figure"),
     text: "\\begin{figure}[htbp]\n  \\centering\n  \\includegraphics[width=0.8\\linewidth]{}\n  \\caption{}\n  \\label{fig:}\n\\end{figure}\n",
   },
   {
-    label: "Table",
+    label: filesText("latex_toolbar.table"),
     text: "\\begin{table}[htbp]\n  \\centering\n  \\caption{}\n  \\label{tab:}\n  \\begin{tabular}{lcc}\n    \\toprule\n     &  &  \\\\\n    \\midrule\n     &  &  \\\\\n    \\bottomrule\n  \\end{tabular}\n\\end{table}\n",
   },
-  { label: "Equation", text: "\\begin{equation}\n  \n  \\label{eq:}\n\\end{equation}\n" },
-  { label: "Itemize", text: "\\begin{itemize}\n  \\item \n\\end{itemize}\n" },
-  { label: "Enumerate", text: "\\begin{enumerate}\n  \\item \n\\end{enumerate}\n" },
+  { label: filesText("latex_toolbar.equation"), text: "\\begin{equation}\n  \n  \\label{eq:}\n\\end{equation}\n" },
+  { label: filesText("latex_toolbar.itemize"), text: "\\begin{itemize}\n  \\item \n\\end{itemize}\n" },
+  { label: filesText("latex_toolbar.enumerate"), text: "\\begin{enumerate}\n  \\item \n\\end{enumerate}\n" },
 ];
 
 export interface LatexToolbarProps {
@@ -100,7 +103,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
       <button
         onClick={p.onCompile}
         disabled={p.compiling || p.editingLocked}
-        title={`${p.modKey}Enter — save and compile`}
+        title={filesText("latex_toolbar.compile_shortcut", { key: p.modKey })}
         className={cn(
           "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
           p.compiling
@@ -113,11 +116,11 @@ export function LatexToolbar(p: LatexToolbarProps) {
         ) : (
           <PlayIcon className="size-3.5" />
         )}
-        {p.compiling ? "Compiling…" : "Compile"}
+        {p.compiling ? filesText("latex_toolbar.compiling") : filesText("latex_toolbar.compile")}
       </button>
 
       <select
-        aria-label="LaTeX engine"
+        aria-label={filesText("latex_toolbar.latex_engine")}
         value={p.engine}
         disabled={p.compiling}
         onChange={(e) => p.onEngineChange(e.target.value as Engine)}
@@ -132,7 +135,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
 
       <label
         className="flex cursor-pointer items-center gap-1 text-[10px] text-muted-foreground"
-        title="Compile automatically after each save"
+        title={filesText("latex_toolbar.compile_automatically_after_each_save")}
       >
         <input
           type="checkbox"
@@ -140,8 +143,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           onChange={p.onToggleAutoCompile}
           className="size-3"
         />
-        Compile on save
-      </label>
+         {filesText("latex_toolbar.compile_on_save")} </label>
 
       <div className="h-4 w-px bg-border" />
 
@@ -150,7 +152,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
         onClick={() => p.onSnippet({ kind: "wrap", before: "\\textbf{", after: "}" })}
         disabled={p.editingLocked}
         className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-        title="Bold"
+        title={filesText("latex_toolbar.bold")}
       >
         <BoldIcon className="size-3.5" />
       </button>
@@ -158,7 +160,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
         onClick={() => p.onSnippet({ kind: "wrap", before: "\\emph{", after: "}" })}
         disabled={p.editingLocked}
         className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-        title="Emphasis"
+        title={filesText("latex_toolbar.emphasis")}
       >
         <ItalicIcon className="size-3.5" />
       </button>
@@ -166,7 +168,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
         onClick={() => p.onSnippet({ kind: "wrap", before: "$", after: "$" })}
         disabled={p.editingLocked}
         className="rounded p-1 font-mono text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-        title="Inline math"
+        title={filesText("latex_toolbar.inline_math")}
       >
         $
       </button>
@@ -175,7 +177,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           onClick={() => setInsertOpen((v) => !v)}
           disabled={p.editingLocked}
           className="flex items-center gap-0.5 rounded p-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-          title="Insert block"
+          title={filesText("latex_toolbar.insert_block")}
         >
           <PlusIcon className="size-3.5" />
           <ChevronDownIcon className="size-3" />
@@ -204,7 +206,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           "rounded p-1 transition-colors hover:bg-muted",
           p.outlineOpen ? "text-foreground" : "text-muted-foreground",
         )}
-        title="Toggle outline"
+        title={filesText("latex_toolbar.toggle_outline")}
       >
         <ListTreeIcon className="size-3.5" />
       </button>
@@ -215,7 +217,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           "rounded p-1 transition-colors hover:bg-muted",
           p.spellcheck ? "text-foreground" : "text-muted-foreground",
         )}
-        title="Toggle spell check"
+        title={filesText("latex_toolbar.toggle_spell_check")}
       >
         <SpellCheckIcon className="size-3.5" />
       </button>
@@ -224,7 +226,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
         onClick={p.onJumpToPdf}
         disabled={!p.syncAvailable}
         className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
-        title={p.syncAvailable ? "Jump to PDF (SyncTeX)" : "SyncTeX unavailable — compile first"}
+        title={p.syncAvailable ? filesText("latex_toolbar.jump_to_pdf_synctex") : filesText("latex_toolbar.synctex_unavailable_compile_first")}
       >
         <CrosshairIcon className="size-3.5" />
       </button>
@@ -232,19 +234,17 @@ export function LatexToolbar(p: LatexToolbarProps) {
       <button
         onClick={p.onAiEdit}
         disabled={p.editingLocked || p.compiling || p.saving}
-        title={`Edit selected source (${p.modKey}K)`}
+        title={filesText("latex_toolbar.ai_shortcut", { key: p.modKey })}
         className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-violet-600 hover:bg-violet-500/10 disabled:opacity-40 dark:text-violet-400"
       >
-        <SparklesIcon className="size-3.5" /> Edit with AI
-      </button>
+        <SparklesIcon className="size-3.5" />  {filesText("latex_toolbar.edit_with_ai")} </button>
 
       <button
         onClick={p.onAskKady}
         className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-violet-600 transition-colors hover:bg-violet-500/10 dark:text-violet-400"
-        title="Ask Kady about this document in chat"
+        title={filesText("latex_toolbar.ask_kady_about_this_document_in_chat")}
       >
-        <MessageCircleIcon className="size-3.5" /> Ask Kady
-      </button>
+        <MessageCircleIcon className="size-3.5" />  {filesText("latex_toolbar.ask_kady")} </button>
 
       {/* Status */}
       {(p.errorCount > 0 || p.warningCount > 0) && !p.compiling && (
@@ -259,29 +259,27 @@ export function LatexToolbar(p: LatexToolbarProps) {
         >
           <AlertTriangleIcon className="size-3.5" />
           {p.errorCount > 0
-            ? `${p.errorCount} error${p.errorCount !== 1 ? "s" : ""}`
-            : `${p.warningCount} warning${p.warningCount !== 1 ? "s" : ""}`}
+            ? filesText("latex_toolbar.error_count", { count: p.errorCount })
+            : filesText("latex_toolbar.warning_count", { count: p.warningCount })}
         </button>
       )}
       {p.hasPdf && !p.compiling && (
         <span className={cn("flex items-center gap-1 text-xs", p.previewStale || p.compileFailed ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")}>
           {p.previewStale || p.compileFailed ? <AlertTriangleIcon className="size-3.5" /> : <CheckIcon className="size-3.5" />}
-          {p.compileFailed ? "Last successful PDF" : p.previewStale ? "PDF out of date" : "PDF ready"}
+          {p.compileFailed ? filesText("latex_toolbar.last_successful_pdf") : p.previewStale ? filesText("latex_toolbar.pdf_out_of_date") : filesText("latex_toolbar.pdf_ready")}
         </span>
       )}
 
       <div className="flex-1" />
-      <div role="group" aria-label="LaTeX view" className="flex overflow-hidden rounded-md border text-[11px]">
+      <div role="group" aria-label={filesText("latex_toolbar.latex_view")} className="flex overflow-hidden rounded-md border text-[11px]">
         {(["source", "split", "pdf"] as const).map((mode) => (
           <button key={mode} aria-pressed={p.viewMode === mode} onClick={() => p.onViewModeChange(mode)} className={cn("px-2 py-1", p.viewMode === mode ? "bg-muted font-medium" : "text-muted-foreground hover:bg-muted/50")}>
-            {mode === "pdf" ? "PDF" : mode === "source" ? "Source" : "Split"}
+            {mode === "pdf" ? "PDF" : mode === "source" ? filesText("latex_toolbar.source") : filesText("latex_toolbar.split")}
           </button>
         ))}
       </div>
 
-      <span className="text-[10px] tabular-nums text-muted-foreground/70">
-        {p.wordCount.toLocaleString()} words
-      </span>
+      <span className="text-[10px] tabular-nums text-muted-foreground/70">{filesText("latex_toolbar.word_count", { count: p.wordCount })}</span>
 
       {p.hasLog && (
         <button
@@ -289,8 +287,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted"
         >
           {p.logOpen ? <ChevronDownIcon className="size-3.5" /> : <ChevronUpIcon className="size-3.5" />}
-          Log
-        </button>
+           {filesText("latex_toolbar.log")} </button>
       )}
 
       <div className="h-4 w-px bg-border" />
@@ -301,9 +298,7 @@ export function LatexToolbar(p: LatexToolbarProps) {
           p.isDirty ? "bg-amber-500" : "bg-muted-foreground/30",
         )}
       />
-      <span className="font-mono text-[10px] text-muted-foreground/60">
-        {p.modKey}S save · {p.modKey}↵ compile
-      </span>
+      <span className="font-mono text-[10px] text-muted-foreground/60">{filesText("latex_toolbar.shortcuts", { key: p.modKey })}</span>
 
       <button
         onClick={p.onSave}
@@ -311,15 +306,14 @@ export function LatexToolbar(p: LatexToolbarProps) {
         className="flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs text-primary-foreground transition-opacity disabled:opacity-40"
       >
         {p.saved ? <CheckIcon className="size-3" /> : null}
-        {p.saving ? "Saving…" : p.saved ? "Saved!" : "Save"}
+        {p.saving ? filesText("latex_toolbar.saving") : p.saved ? filesText("latex_toolbar.saved") : filesText("latex_toolbar.save")}
       </button>
 
       <button
         onClick={p.onDiscard}
         className="rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       >
-        Close
-      </button>
+         {filesText("latex_toolbar.close")} </button>
     </div>
   );
 }
