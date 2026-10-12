@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:42:20Z
+updated: 2026-10-12T14:43:36Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e2cc47a6-cd2c-4eb2-911c-522a86045e22","pid":152477,"provider":"codex","session":"01a13070-75c8-77a1-a5c2-ca68669a3ef0","start":"28003948","token":"69ab13e691a305143f67d8563026fb4180aee339a81920be8fd79e309661e036"}
 branch: task/gaid-ui-locale--files
 target: task/gaid-ui-locale
@@ -92,7 +92,9 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implementation complete for the owned UI: 465 bilingual messages in the files namespace, including count/limit/error states, Office commands, PDF annotations and CodeMirror built-in search/folding/review UI. Existing app ids and all server/model inputs are unchanged. npm ci completed. TypeScript passes; copy validator has 0 errors (4 files-namespace warnings: three unchanged English Saved! strings and the implemented compile-on-save behaviour). All 465 message pairs format in both locales for count samples 0/1/2/1234. All 545 literal filesText references resolve. Full web suite is running as job-geoaidesk-gaid-ui-locale--files-2.
+Implementation complete for the owned UI: 465 bilingual messages in the files namespace, including count/limit/error states, Office commands, PDF annotations and CodeMirror built-in search/folding/review UI. Existing app ids and all server/model inputs are unchanged. npm ci completed. TypeScript passes; copy validator has 0 errors (4 files-namespace warnings: three unchanged English Saved! strings and the implemented compile-on-save behaviour). All 465 message pairs format in both locales for count samples 0/1/2/1234. All 545 literal filesText references resolve. Full web suite passed: 145 files / 972 tests, job-geoaidesk-gaid-ui-locale--files-2, exit 0. The isolated test snapshot was 096d72eb2544 (same implementation as f7d3cf27dc2f; later changes are task evidence only). No tests were changed.
+
+Files edited: 26 originally owned source files (sandbox-panel.tsx needed no change because its visible copy already uses app ids), 5 additional upstream helpers, the two files catalogues, and this task document.
 
 Additional upstream files (parent must register boundaries): web/src/lib/sci-fetch.ts and web/src/lib/latex/{api,completions,outline,spellcheck}.ts. They contain user-visible timeout, fallback, autocomplete and spelling text. No other namespaces or shared boundaries file edited.
 
@@ -100,10 +102,10 @@ Intentional exclusions: user/source data, scientific units and schema names, cod
 
 English source text is unchanged; composed messages use ICU with the same words, values and plural rules. Korean statuses omit upstream Saved! punctuation. Full translation inventory: files/en.json records the upstream before and unchanged English after; files/ko.json records the Korean after (Korean before was upstream English), keyed by identical message ids.
 ## Next steps
-1. Wait for the recorded web-test job result (relay notification; do not restart).
-2. Fix any relevant failures, record final evidence, save, then task finish.
+1. Save final verification evidence and run task finish.
+2. Parent integrates with task complete, registers the five additional upstream files, runs cross-app checks, and records the embedded vendor UI language limitation.
 ## Failed approaches
-- The first isolated web-test job exited 127 before tests: snapshot excludes node_modules, so vitest was absent. Replacement job will explicitly install the lockfile dependencies before running tests.
+- The first isolated web-test job exited 127 before tests: snapshot excludes node_modules, so vitest was absent. Replacement job explicitly installed the lockfile dependencies and passed. The failed job is marked superseded by the replacement receipt.
 ## Notes and decisions
 - Sequential plan: settle existing locale seams, convert static messages, then complete dynamic/count messages and audit data/protocol exclusions. All owned files stay with this writer; no nested writers. Parent owns integration and browser checks.
 - English wording is preserved. Technical source values, file names, units, code snippets, server/model inputs, and protocol identities remain untranslated.
@@ -143,3 +145,11 @@ All ids below are relative to files.; before in both locales was upstream Englis
 | file_preview_panel.output_count | {count} output(s) | 출력 {count}개 |
 | data_table.preview_scope | Showing the first {rows} rows and {columns} columns. Search, sorting, and plots use this preview only. | 처음 {rows}행과 {columns}열을 표시합니다. 검색, 정렬, 그래프는 미리보기 자료만 사용합니다. |
 | scientific_fetch.timeout | Preview timed out after {seconds}s — the file may be too large. | 미리보기 요청이 {seconds}초 후 시간 초과되었습니다. 파일이 너무 클 수 있습니다. |
+
+## Final verification evidence
+- `npx tsc --noEmit --incremental false`: exit 0.
+- `npm ci && npm run test` in the recorded snapshot: exit 0, 145 test files and 972 tests passed. Non-failing React act warnings remain in existing tests.
+- Copy validator: 0 errors, 7 total warnings; 4 in files/en.json are preserved upstream English punctuation or implemented automatic compilation. No Korean warnings.
+- Parent scanner: only notebook `Out [` / `In [` and product name `Kady Office` remain among owned files; all are intentional. CodeMirror phrase keys and state/protocol strings are API identifiers, not untranslated UI.
+- Runtime formatting: all 465 paired ICU messages render in ko/en with 0/1/2/1234 counts. All 545 literal catalogue calls resolve; bounded Office host lookups use five known keys plus the operation wrapper.
+- `git diff --check`: exit 0. No app model runs, browser screenshots, server changes or deployment. Parent owns full scripts/check and browser checks after integration.
