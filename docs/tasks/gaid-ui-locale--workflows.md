@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:25:23Z
+updated: 2026-10-12T14:26:35Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -68,15 +68,17 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend job 2 reached all 978 tests: 975 passed, 3 failed only because geo/workspace/workspace.test.tsx expected English upstream categories/rows in its explicitly Korean locale. Updated those hard-coded assertions only; focused recheck passes all 33 tests across workspace and new locale files. Full-suite recheck job 3 is running.
+Delivered workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 input labels, 22 categories, 39 controls/states). Edited workflows-panel.tsx, workflow-inputs.tsx and workflows/{ko,en}.json; added generate-en.mjs and workflows-locale.test.tsx; updated workspace.test.tsx’s Korean display assertions. lib/workflow-inputs.ts and all 326 model prompts/placeholder definitions remain unchanged. Geoscience rows are untouched. Translated/English search, future-row English fallback, categories and launch dialog follow the saved locale.
 
-Other upstream file touched: web/src/data/workflows.json, one comparative-genomics description only, required by copy-validator error. Parent must register this seam in geo/integration-boundaries.json.
+Checks passed: frontend TypeScript, all 978 tests in 146 files (job 3, exit 0; SHA fcdc17cef6bd), copy validator (0 errors; 4 new warnings reviewed), scanner (0 owned-file hits), diff whitespace. Jobs 1/2 failed and were superseded by job 3; reasons are recorded below. Whole-app scripts/check/browser checks belong to parent.
+
+English exception: workflows.rows.comparative-genomics.description changed “Compare genomes across species for evolutionary insights” → “Compare genomes across species to examine evolutionary relationships” due to validator error, also in web/src/data/workflows.json so exact source parity holds. Parent must register this one extra upstream file in integration-boundaries. Other English is verbatim.
 
 ## Next steps
-1. Read job 3 exit/log on its relay notification; if successful, record the full-suite result and finish.
-2. Parent integrates and performs whole-app scripts/check/browser checks.
+1. Finish child; parent runs task complete gaid-ui-locale--workflows, registers the data seam, and performs whole-app checks.
 
 ## Checks
+- Full frontend suite: job 3 at /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142512.183960Z/receipt.json; exit 0; 146 files, 978 tests passed on fcdc17cef6bd.
 - Child: cd web && npm ci; npx tsc --noEmit; npm run test (full suite); node geo/copy/validate-copy.mjs web/src/geo/locales; node ~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src --list; git diff --check.
 - Parent owns whole-app scripts/check as stated in the child contract.
 
@@ -91,7 +93,6 @@ Other upstream file touched: web/src/data/workflows.json, one comparative-genomi
 - Sequential decisions: preserve upstream prompts and raw data; localize presentation only; future missing ids fall back to upstream text.
 - Owned interfaces/files: the three assigned files, workflows namespace, and focused geo tests. No independent child packages (nested children unsupported); keep tightly coupled implementation here.
 - Integration order: UI lookup seam → bilingual data → tests/checks → parent integration.
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 None.
 ## Report
