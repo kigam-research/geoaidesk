@@ -4,13 +4,18 @@ import type { Localized, GeoWorkflowSummary } from "@/geo/contracts/workspace";
 
 export const text = (value: Localized | null | undefined) => value ? (geoLocale() === "en" ? value.en ?? value.ko : value.ko) : "";
 
-export async function request<T>(path: string, projectId: string, body?: unknown): Promise<T> {
-  const res = await apiFetch(path, body === undefined ? {} : {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+export async function request<T>(path: string, projectId: string, body?: unknown, method?: "POST" | "DELETE"): Promise<T> {
+  const res = await apiFetch(path, body === undefined ? (method ? { method } : {}) : {
+    method: method ?? "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   }, projectId);
   const data = await res.json();
-  if (!res.ok) throw new Error([data.detail, data.output].filter(Boolean).join("\n") || t("workspace.error.status", { status: res.status }));
+  if (!res.ok) throw new RequestError([data.detail, data.output].filter(Boolean).join("\n") || t("workspace.error.status", { status: res.status }), data);
   return data as T;
+}
+
+/** A failed request with the server's JSON body (e.g. recipe `issues`). */
+export class RequestError extends Error {
+  constructor(message: string, readonly body: Record<string, unknown>) { super(message); }
 }
 
 export const accepts = (path: string, extensions: string[]) => extensions.some((ext) => path.toLowerCase().endsWith(`.${ext.toLowerCase().replace(/^\./, "")}`));

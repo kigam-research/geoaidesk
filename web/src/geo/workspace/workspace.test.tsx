@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoSuggestion, GeoWorkflowSummary, WorkflowReadinessState } from "@/geo/contracts/workspace";
 import { GeoTaskCatalogue } from "./task-catalogue";
+import { WorkflowsPanel } from "@/components/workflows-panel";
 import { GeoFileActions } from "./file-actions";
 import { GeoChatActions } from "./chat-actions";
 import { GeoResultBody } from "./result-card";
@@ -12,6 +13,11 @@ import { setApiToken } from "@/lib/api-auth";
 
 const apiFetch = vi.fn();
 vi.mock("@/lib/projects", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/projects")>(), apiFetch: (...args: unknown[]) => apiFetch(...args) }));
+// A short upstream list keeps role queries fast; the panel code is the real one.
+vi.mock("@/data/workflows.json", () => ({ default: [
+  { id: "review-paper", name: "Review a Paper", description: "Critical review", category: "paper", icon: "ClipboardCheck", prompt: "Review", placeholders: [], requiresFiles: true },
+  { id: "plot", name: "Make a Plot", description: "Plot data", category: "data", icon: "BarChart3", prompt: "Plot", placeholders: [], requiresFiles: false },
+] }));
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 function workflow(state: WorkflowReadinessState = "ready", id = "well-qc"): GeoWorkflowSummary {
   return {
@@ -31,11 +37,23 @@ let suggestions: GeoSuggestion[];
 let catalogueState: string;
 let recipeResult: unknown;
 let prepareResult: Response | null;
+let saved: { categories: { id: string; label: string }[]; recipes: unknown[] };
+const okRecipe = { schemaVersion: "geo-start/v1", workflowId: "well-qc", catalogueVersion: "0.2.0", skillIds: ["geo/well"], choices: { depth: "MD" }, unresolvedChoices: ["units"] };
+const okSetup = { workflowId: "well-qc", choices: { depth: "MD" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null };
 beforeEach(() => {
   window.localStorage.clear(); Object.defineProperty(navigator, "languages", { configurable: true, value: ["ko-KR"] });
   rows = [workflow()]; suggestions = rows.map(suggestion); catalogueState = "ready";
-  recipeResult = { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "Version does not match" }] }; prepareResult = null;
-  apiFetch.mockReset().mockImplementation(async (path: string) => {
+  recipeResult = { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "Version does not match" }] }; prepareResult = null; saved = { categories: [], recipes: [] };
+  apiFetch.mockReset().mockImplementation(async (path: string, init?: RequestInit) => {
+    if (path === "/geo/recipes" && init?.method === "POST") {
+      const body = JSON.parse(String(init.body));
+      const category = body.newCategory ? "user-1" : body.category;
+      if (body.newCategory) saved.categories = [{ id: "user-1", label: body.newCategory }];
+      saved.recipes = [...saved.recipes, { id: "00000000-0000-4000-8000-000000000001", title: body.title, category, recipe: body.recipe, savedAt: "2026-10-12T00:00:00Z", check: { ok: true, issues: [], setup: okSetup } }];
+      return json(saved);
+    }
+    if (path === "/geo/recipes") return json(saved);
+    if (path.startsWith("/geo/recipes/") && init?.method === "DELETE") { saved = { categories: [], recipes: [] }; return json(saved); }
     if (path === "/geo/workflows") return json({ catalogue: { state: catalogueState, version: "0.2.0" }, workflows: rows });
     if (path === "/geo/suggestions") return json({ path: "logs/A.LAS", format: "las-welllog", suggestions });
     if (path === "/geo/recipes/check") return json(recipeResult);
@@ -48,20 +66,29 @@ beforeEach(() => {
     throw new Error(`Unexpected request: ${path}`);
   });
 });
-function catalogue() { return render(<GeoTaskCatalogue projectId="p1" availableFiles={["logs/A.LAS", "table.csv"]}><p>Upstream list</p></GeoTaskCatalogue>); }
-async function openSetup() {
-  await userEvent.click((await screen.findAllByRole("button", { name: "작업 설정 열기" }))[0]); return screen.findByRole("dialog");
+function catalogue() {
+  return render(<GeoTaskCatalogue projectId="p1" availableFiles={["logs/A.LAS", "table.csv"]}>
+    {(extension) => <WorkflowsPanel extension={extension} onLaunch={vi.fn()} availableFiles={[]} availableFolders={[]} filesReady />}
+  </GeoTaskCatalogue>);
+}
+async function openSetup(name: RegExp = /^Well log QC well-qc/) {
+  await userEvent.click(await screen.findByRole("button", { name })); return screen.findByRole("dialog");
 }
 function bindFile(dialog: HTMLElement) { fireEvent.change(within(dialog).getByLabelText("Well log (필수)"), { target: { value: "logs/A.LAS" } }); }
 
 describe("task catalogue and setup", () => {
   it.each(["ready", "missing-skills", "needs-environment", "unavailable"] as const)("separates run record from readiness: %s", async (state) => {
-    rows = [workflow(state)]; catalogue(); await screen.findByRole("heading", { name: "Geoscience 작업" });
-    expect(screen.getByText("미시험 · GAID 실행 기록 없음")).toBeInTheDocument();
-    if (state === "ready") expect(screen.getByText("준비됨")).toBeInTheDocument(); else expect(screen.queryByText("준비됨")).not.toBeInTheDocument();
-    if (state === "missing-skills") expect(screen.getByText("필요한 스킬: well-skill")).toBeInTheDocument();
-    if (state === "unavailable") expect(screen.getByText("사용 불가: uv unavailable")).toBeInTheDocument();
-    const dialog = await openSetup(); bindFile(dialog);
+    rows = [workflow(state)]; catalogue();
+    const row = await screen.findByRole("button", { name: /^Well log QC well-qc/ });
+    expect(within(row).getByText("미시험")).toHaveAttribute("title", "미시험 · GAID 실행 기록 없음");
+    expect(within(row).getByText({ ready: "준비됨", "missing-skills": "스킬 필요", "needs-environment": "환경 준비 필요", unavailable: "사용 불가" }[state])).toBeInTheDocument();
+    expect(within(row).getByText("사용자 자료 필요")).toBeInTheDocument();
+    const dialog = await openSetup();
+    expect(within(dialog).getByText("미시험 · GAID 실행 기록 없음")).toBeInTheDocument();
+    if (state === "ready") expect(within(dialog).getByText("준비됨")).toBeInTheDocument(); else expect(within(dialog).queryByText("준비됨")).not.toBeInTheDocument();
+    if (state === "missing-skills") expect(within(dialog).getByText("필요한 스킬: well-skill")).toBeInTheDocument();
+    if (state === "unavailable") expect(within(dialog).getByText("사용 불가: uv unavailable")).toBeInTheDocument();
+    bindFile(dialog);
     const start = within(dialog).getByRole("button", { name: "작업 초안 만들기" });
     if (state === "ready") expect(start).toBeEnabled(); else expect(start).toBeDisabled();
   });
@@ -83,7 +110,7 @@ describe("task catalogue and setup", () => {
     } finally { off(); }
   });
   it("keeps inputs on tab limit and does not pin a skill absent from /skills", async () => {
-    apiFetch.mockImplementation(async (path) => path === "/geo/workflows" ? json({ catalogue: { state: "ready" }, workflows: rows }) : json([]));
+    apiFetch.mockImplementation(async (path) => path === "/geo/workflows" ? json({ catalogue: { state: "ready" }, workflows: rows }) : path === "/geo/recipes" ? json(saved) : json([]));
     catalogue(); const dialog = await openSetup(); bindFile(dialog);
     const off = onStartGeoTask((detail) => { expect(detail.skills).toEqual([]); detail.result = "tab-limit"; });
     try {
@@ -91,19 +118,26 @@ describe("task catalogue and setup", () => {
       expect(await within(dialog).findByRole("alert")).toHaveTextContent("채팅 탭이 가득 찼습니다"); expect(within(dialog).getByLabelText("Well log (필수)")).toHaveValue("logs/A.LAS");
     } finally { off(); }
   });
-  it("keeps upstream reachable and displays it directly when geo is off", async () => {
-    const view = catalogue(); await screen.findByText("Geoscience 작업"); expect(screen.queryByText("Upstream list")).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "K-Dense workflow 목록 보기" })); expect(screen.getByText("Upstream list")).toBeInTheDocument();
-    view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument(); expect(screen.getByText("Upstream list")).toBeInTheDocument();
+  it("lists Geoscience first in the upstream list, searches both, and keeps upstream when geo is off", async () => {
+    const view = catalogue(); await screen.findByRole("button", { name: /^Well log QC well-qc/ });
+    const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
+    expect(headings[0]).toMatch(/^Geoscience/); expect(headings).toContainEqual(expect.stringMatching(/^Paper & Manuscript/));
+    expect(screen.getByRole("button", { name: "Geoscience" })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "las" } });
+    expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^Review a Paper/ })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "review a paper" } });
+    expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^Review a Paper/ })).toBeInTheDocument();
+    view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Review a Paper/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
   });
   it("explicitly prepares the project environment and refreshes readiness", async () => {
-    rows = [workflow("needs-environment")]; catalogue(); await screen.findByText("환경 준비 필요: Geo core"); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
-    await userEvent.click(screen.getByRole("button", { name: "환경 준비" })); expect(await screen.findByText("준비됨")).toBeInTheDocument();
+    rows = [workflow("needs-environment")]; catalogue(); const dialog = await openSetup(); within(dialog).getByText("환경 준비 필요: Geo core"); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
+    await userEvent.click(within(dialog).getByRole("button", { name: "환경 준비" })); expect(await within(dialog).findByText("준비됨")).toBeInTheDocument();
     expect(await screen.findByText(/환경 패키지의 import를 확인했습니다/)).toBeInTheDocument();
     expect(apiFetch).toHaveBeenCalledWith("/geo/environments/geo-core/prepare", expect.objectContaining({ method: "POST", body: JSON.stringify({ target: "project" }) }), "p1");
   });
   it("shows preparation failure output without claiming ready", async () => {
-    rows = [workflow("needs-environment")]; prepareResult = json({ detail: "Install failed", output: "uv: index unreachable" }, 500); catalogue();
+    rows = [workflow("needs-environment")]; prepareResult = json({ detail: "Install failed", output: "uv: index unreachable" }, 500); catalogue(); await openSetup();
     await userEvent.click(await screen.findByRole("button", { name: "환경 준비" })); expect(await screen.findByText(/uv: index unreachable/)).toBeInTheDocument(); expect(screen.queryByText("준비됨")).not.toBeInTheDocument();
   });
   it("shows indeterminate progress while preparation is running", async () => {
@@ -111,19 +145,65 @@ describe("task catalogue and setup", () => {
     const implementation = apiFetch.getMockImplementation()!;
     let finish!: (response: Response) => void;
     apiFetch.mockImplementation((path, ...args) => path.endsWith("/prepare") ? new Promise<Response>((resolve) => { finish = resolve; }) : implementation(path, ...args));
-    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "환경 준비" }));
-    expect(screen.getByRole("status")).toHaveTextContent("프로젝트 환경의 패키지를 준비하고 import를 확인하는 중입니다.");
+    catalogue(); const dialog = await openSetup(); await userEvent.click(within(dialog).getByRole("button", { name: "환경 준비" }));
+    expect(within(dialog).getByRole("status")).toHaveTextContent("프로젝트 환경의 패키지를 준비하고 import를 확인하는 중입니다.");
     expect(screen.getByRole("button", { name: "환경 준비 중" })).toBeDisabled();
     rows = [workflow()]; finish(json({ ready: true }));
-    expect(await screen.findByText("준비됨")).toBeInTheDocument();
+    expect(await within(dialog).findByText("준비됨")).toBeInTheDocument();
   });
   it("checks a local recipe without starting, showing a localized issue", async () => {
-    catalogue(); await screen.findByText("Geoscience 작업"); const file = new File(["{}"], "test.geo-start.json", { type: "application/json" }); Object.defineProperty(file, "text", { value: async () => "{}" });
-    fireEvent.change(screen.getAllByLabelText("Geo 작업 레시피 파일")[0], { target: { files: [file] } });
-    expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0"); expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile({})] } });
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0");
+    expect(within(dialog).getByRole("button", { name: "레시피 저장" })).toBeDisabled(); expect(within(dialog).getByRole("button", { name: "저장하지 않고 열기" })).toBeDisabled();
     expect(apiFetch).toHaveBeenCalledWith("/geo/recipes/check", expect.objectContaining({ body: JSON.stringify({ recipe: {} }) }), "p1");
   });
+  it("saves a checked recipe under a new category, lists it there, opens it prefilled and deletes it", async () => {
+    recipeResult = { ok: true, issues: [], setup: okSetup };
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); let dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
+    expect(await within(dialog).findByLabelText("레시피 제목")).toHaveValue("Well log QC well-qc");
+    const options = within(within(dialog).getByLabelText("카테고리")).getAllByRole("option").map((option) => option.textContent);
+    expect(options[0]).toBe("Geoscience"); expect(options).toContain("Paper & Manuscript"); expect(options.at(-1)).toBe("새 카테고리 추가");
+    fireEvent.change(within(dialog).getByLabelText("레시피 제목"), { target: { value: "MD 기준 QC" } });
+    fireEvent.change(within(dialog).getByLabelText("카테고리"), { target: { value: "__new__" } });
+    expect(within(dialog).getByRole("button", { name: "레시피 저장" })).toBeDisabled();
+    fireEvent.change(within(dialog).getByLabelText("새 카테고리 이름"), { target: { value: "현장 조사" } });
+    await userEvent.click(within(dialog).getByRole("button", { name: "레시피 저장" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(apiFetch).toHaveBeenCalledWith("/geo/recipes", expect.objectContaining({ method: "POST", body: JSON.stringify({ recipe: okRecipe, title: "MD 기준 QC", newCategory: "현장 조사" }) }), "p1");
+    expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)[1]).toMatch(/^현장 조사/); expect(screen.getByRole("button", { name: "현장 조사" })).toBeInTheDocument();
+    dialog = await openSetup(/^MD 기준 QC/);
+    expect(within(dialog).getByText("기반 작업: Well log QC well-qc")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD"); expect(within(dialog).getByLabelText("단위")).toHaveValue("");
+    await userEvent.click(within(dialog).getByRole("button", { name: "레시피 삭제" }));
+    expect(apiFetch.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
+    await userEvent.click(within(dialog).getByRole("button", { name: "레시피 삭제 확인" }));
+    await waitFor(() => expect(screen.queryByRole("button", { name: /^MD 기준 QC/ })).not.toBeInTheDocument());
+    expect(apiFetch).toHaveBeenCalledWith("/geo/recipes/00000000-0000-4000-8000-000000000001", { method: "DELETE" }, "p1");
+  });
+  it("opens a checked recipe once without saving", async () => {
+    recipeResult = { ok: true, issues: [], setup: okSetup };
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
+    await userEvent.click(await within(dialog).findByRole("button", { name: "저장하지 않고 열기" }));
+    const setup = await screen.findByRole("dialog"); expect(within(setup).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD");
+    expect(apiFetch.mock.calls.some(([path, init]) => path === "/geo/recipes" && init?.method === "POST")).toBe(false);
+  });
+  it("keeps a saved recipe the catalogue rejects and explains why", async () => {
+    saved = { categories: [], recipes: [{ id: "00000000-0000-4000-8000-000000000002", title: "옛 레시피", category: "paper", recipe: { ...okRecipe, catalogueVersion: "0.1.0" }, savedAt: "2026-10-12T00:00:00Z", check: { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "x" }] } }] };
+    catalogue(); const row = await screen.findByRole("button", { name: /^옛 레시피/ });
+    expect(within(row).getByText("사용 불가")).toBeInTheDocument(); expect(screen.getByRole("heading", { name: /^Paper & Manuscript/ })).toBeInTheDocument();
+    await userEvent.click(row); const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0");
+  });
 });
+
+function recipeFile(value: unknown) {
+  const file = new File([JSON.stringify(value)], "test.geo-start.json", { type: "application/json" });
+  Object.defineProperty(file, "text", { value: async () => JSON.stringify(value) });
+  return file;
+}
 
 describe("file actions and recipes", () => {
   it("caps suggestions at three, names the match and preselects the matching file", async () => {
@@ -175,14 +255,14 @@ describe("geo-result", () => {
 
 describe("integration additions", () => {
   it("turns on an installed but disabled workflow skill and re-reads readiness", async () => {
-    const off = workflow("missing-skills"); off.readiness.skills[0].installed = true; rows = [off]; catalogue();
-    await userEvent.click(await screen.findByRole("button", { name: "스킬 켜기" }));
+    const off = workflow("missing-skills"); off.readiness.skills[0].installed = true; rows = [off]; catalogue(); const dialog = await openSetup();
+    await userEvent.click(within(dialog).getByRole("button", { name: "스킬 켜기" }));
     expect(apiFetch).toHaveBeenCalledWith("/skills/well-skill/enable", { method: "POST" }, "p1");
-    expect(await screen.findByText("준비됨")).toBeInTheDocument();
+    expect(await within(dialog).findByText("준비됨")).toBeInTheDocument();
   });
 
   it("names a skill that is not installed instead of offering to turn it on", async () => {
-    rows = [workflow("missing-skills")]; catalogue();
+    rows = [workflow("missing-skills")]; catalogue(); await openSetup();
     expect(await screen.findByText(/프로젝트에 설치되지 않은 스킬: well-skill/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "스킬 켜기" })).not.toBeInTheDocument();
   });

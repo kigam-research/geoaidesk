@@ -4,9 +4,12 @@
  *   GET  /geo/workflows          catalogue workflows with project readiness
  *   POST /geo/suggestions        { path } → at most three task suggestions for a sandbox file
  *   POST /geo/recipes/check      { recipe } → `.geo-start.json` issues or an editable task setup
+ *   GET  /geo/recipes            saved recipes with categories, re-checked (gaid-workflow-catalog)
+ *   POST /geo/recipes            { recipe, title, category | newCategory } → save a checked recipe
+ *   DELETE /geo/recipes/:id      remove a saved recipe
  * None of them starts a task, prepares an environment or sends a prompt.
  */
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
 import { activePaths, type ProjectPaths } from "../../projects.ts";
 import { currentProjectId } from "../../scope.ts";
 import { SandboxError } from "../../sandbox-fs.ts";
@@ -17,6 +20,7 @@ import { geoEnvironmentService, type GeoEnvironmentService } from "../environmen
 import { inspectGeoFile, resolveGeoPath } from "../inspection.ts";
 import { taxonomyFormat } from "../workspace/formats.ts";
 import { checkRecipe } from "../workspace/recipes.ts";
+import { deleteSavedRecipe, listSavedRecipes, saveRecipe, SavedRecipeError } from "../workspace/saved-recipes.ts";
 import { suggestWorkflows } from "../workspace/suggestions.ts";
 import { listWorkflows } from "../workspace/workflows.ts";
 
@@ -89,5 +93,36 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
     const body = req.body as { recipe?: unknown } | null;
     if (!body || typeof body !== "object" || !("recipe" in body)) return reply.code(400).send({ detail: "Expected { recipe }" });
     return checkRecipe(body.recipe, catalogueOf());
+  });
+
+  const savedRecipeFailure = (reply: FastifyReply, err: unknown) => {
+    if (err instanceof SavedRecipeError) return reply.code(err.statusCode).send({ detail: err.message, ...(err.issues ? { issues: err.issues } : {}) });
+    throw err;
+  };
+
+  app.get("/geo/recipes", async (_req, reply) => {
+    try {
+      return listSavedRecipes(pathsOf(), catalogueOf());
+    } catch (err) {
+      return savedRecipeFailure(reply, err);
+    }
+  });
+
+  app.post("/geo/recipes", { bodyLimit: 64 * 1024 }, async (req, reply) => {
+    const body = req.body as Record<string, unknown> | null;
+    if (!body || typeof body !== "object" || !("recipe" in body)) return reply.code(400).send({ detail: "Expected { recipe, title }" });
+    try {
+      return saveRecipe(pathsOf(), catalogueOf(), body);
+    } catch (err) {
+      return savedRecipeFailure(reply, err);
+    }
+  });
+
+  app.delete<{ Params: { id: string } }>("/geo/recipes/:id", async (req, reply) => {
+    try {
+      return deleteSavedRecipe(pathsOf(), catalogueOf(), req.params.id);
+    } catch (err) {
+      return savedRecipeFailure(reply, err);
+    }
   });
 }

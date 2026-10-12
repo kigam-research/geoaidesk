@@ -190,6 +190,45 @@ export interface GeoRecipeCheckResponse {
   };
 }
 
+// --- GET/POST /geo/recipes, DELETE /geo/recipes/:id ------------------------
+
+/**
+ * Saved recipes (gaid-workflow-catalog): checked `.geo-start.json` recipes the
+ * user filed under a category of the workflow panel, per project in
+ * `.kady/geo/recipes.json`. `geoscience` and the upstream workflow category
+ * ids are built in; the user adds categories by label (`user-<n>` ids).
+ */
+export const GEO_RECIPE_CATEGORY = "geoscience";
+
+export interface GeoRecipeCategory {
+  id: string;
+  label: string;
+}
+
+export interface GeoSavedRecipe {
+  id: string;
+  title: string;
+  category: string;
+  recipe: GeoStartRecipe;
+  savedAt: string;
+  /** Re-run against the current catalogue on every list; a stale recipe is kept and reported, not dropped. */
+  check: GeoRecipeCheckResponse;
+}
+
+export interface GeoSavedRecipesResponse {
+  /** User-added categories, in creation order. */
+  categories: GeoRecipeCategory[];
+  recipes: GeoSavedRecipe[];
+}
+
+/** POST /geo/recipes: `category` names an existing id, or `newCategory` adds one. */
+export interface GeoSaveRecipeRequest {
+  recipe: unknown;
+  title: string;
+  category?: string;
+  newCategory?: string;
+}
+
 // --- Start-task hand-off (window event, handled by app/page.tsx) -------------
 
 export type GeoExposureMode = "all" | "catalogue" | `workflow:${string}`;

@@ -1,64 +1,202 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  ActivityIcon,
+  BookmarkIcon,
+  DatabaseIcon,
+  DropletIcon,
+  FileTextIcon,
+  FlaskConicalIcon,
+  GemIcon,
+  LayersIcon,
+  MapIcon,
+  MountainIcon,
+  RadarIcon,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  WORKFLOW_CATEGORIES,
+  type WorkflowPanelCategory,
+  type WorkflowPanelExtension,
+  type WorkflowPanelRow,
+} from "@/components/workflows-panel";
 import { t } from "@/geo/i18n";
-import type { GeoWorkflowsResponse, GeoRecipeCheckResponse } from "@/geo/contracts/workspace";
+import {
+  GEO_RECIPE_CATEGORY,
+  type GeoRecipeCheckResponse,
+  type GeoSavedRecipe,
+  type GeoSavedRecipesResponse,
+  type GeoWorkflowSummary,
+  type GeoWorkflowsResponse,
+} from "@/geo/contracts/workspace";
 import { request, text } from "./api";
-import { PrepareEnvironment, Readiness } from "./readiness";
-import { TaskSetup, WorkflowOutputs } from "./task-setup";
-import { RecipeImport } from "./recipe-import";
+import { RecipeAdd, RecipeProblem } from "./recipe-add";
+import { TaskSetup } from "./task-setup";
 
-export function GeoTaskCatalogue(props: { projectId: string; availableFiles: string[]; children: ReactNode }) {
+/**
+ * The Geoscience part of the workflow panel (gaid-workflow-catalog): the
+ * pinned catalogue's workflows and the project's saved recipes become rows of
+ * the upstream panel (`WorkflowPanelExtension`), so both lists share one
+ * search box, category pills and row design. A row opens the task setup.
+ */
+export function GeoTaskCatalogue(props: { projectId: string; availableFiles: string[]; children: (extension: WorkflowPanelExtension) => ReactNode }) {
   return <TaskCatalogue key={props.projectId} {...props} />;
 }
 
-function TaskCatalogue({ projectId, availableFiles, children }: { projectId: string; availableFiles: string[]; children: ReactNode }) {
+const GEO_CATEGORY_TONE = { color: "text-amber-700 dark:text-amber-400", bg: "bg-amber-700/10 hover:bg-amber-700/15 border-amber-700/25" };
+const USER_CATEGORY_TONE = { color: "text-foreground", bg: "bg-muted/40 hover:bg-muted/70 border-border" };
+
+/** Row icon from the workflow's first discipline (skill_hub taxonomy ids). */
+const DISCIPLINE_ICON: Record<string, LucideIcon> = {
+  geochemistry: FlaskConicalIcon,
+  hydrogeology: DropletIcon,
+  "remote-sensing-gis": MapIcon,
+  geophysics: RadarIcon,
+  "petroleum-reservoir": ActivityIcon,
+  "mineral-exploration-mpm": GemIcon,
+  "geology-3d": LayersIcon,
+  foundation: FileTextIcon,
+};
+const iconFor = (workflow: GeoWorkflowSummary): LucideIcon => DISCIPLINE_ICON[workflow.disciplines[0] ?? ""] ?? MountainIcon;
+
+const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-[10px] font-medium";
+const TONE = {
+  ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+  warn: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  bad: "border-destructive/30 bg-destructive/10 text-destructive",
+  muted: "border-border bg-muted/50 text-muted-foreground",
+};
+
+export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {
+  const state = workflow.readiness.state;
+  const tone = state === "ready" ? TONE.ok : state === "unavailable" ? TONE.bad : TONE.warn;
+  return <>
+    <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>
+    {workflow.readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+    {workflow.inputRoles.some((role) => role.required) && <span className={cn(PILL, TONE.warn)}><DatabaseIcon className="size-2.5" />{t("workspace.badge.userData")}</span>}
+  </>;
+}
+
+type Selection = { workflowId: string; recipe?: GeoSavedRecipe };
+
+function TaskCatalogue({ projectId, availableFiles, children }: { projectId: string; availableFiles: string[]; children: (extension: WorkflowPanelExtension) => ReactNode }) {
   const [data, setData] = useState<GeoWorkflowsResponse | null>(null);
+  const [saved, setSaved] = useState<GeoSavedRecipesResponse>({ categories: [], recipes: [] });
   const [error, setError] = useState<string | null>(null);
-  const [upstream, setUpstream] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [recipes, setRecipes] = useState<Record<string, { revision: number; setup: GeoRecipeCheckResponse["setup"] }>>({});
-  const load = async () => {
-    try { setData(await request<GeoWorkflowsResponse>("/geo/workflows", projectId)); setError(null); }
-    catch (error) { setError(t("workspace.catalogue.error", { detail: (error as Error).message })); }
-  };
-  useEffect(() => {
-    let live = true;
-    request<GeoWorkflowsResponse>("/geo/workflows", projectId).then((value) => { if (live) setData(value); }).catch((error) => { if (live) setError(t("workspace.catalogue.error", { detail: error.message })); });
-    return () => { live = false; };
+  const [selected, setSelected] = useState<Selection | null>(null);
+  const [problem, setProblem] = useState<GeoSavedRecipe | null>(null);
+  const [opened, setOpened] = useState<{ revision: number; setup: NonNullable<GeoRecipeCheckResponse["setup"]> } | null>(null);
+
+  const load = useCallback(async () => {
+    const [workflows, recipes] = await Promise.allSettled([
+      request<GeoWorkflowsResponse>("/geo/workflows", projectId),
+      request<GeoSavedRecipesResponse>("/geo/recipes", projectId),
+    ]);
+    if (workflows.status === "fulfilled") setData(workflows.value);
+    if (recipes.status === "fulfilled" && Array.isArray(recipes.value?.recipes)) setSaved(recipes.value);
+    const failed = [workflows, recipes].find((result) => result.status === "rejected") as PromiseRejectedResult | undefined;
+    setError(failed ? t("workspace.catalogue.error", { detail: (failed.reason as Error).message }) : null);
   }, [projectId]);
-  const importSetup = (setup: NonNullable<GeoRecipeCheckResponse["setup"]>) => {
-    if (!data?.workflows.some((workflow) => workflow.id === setup.workflowId)) { setError(t("workspace.recipe.noWorkflow")); return; }
-    setRecipes((previous) => ({ ...previous, [setup.workflowId]: { revision: (previous[setup.workflowId]?.revision ?? 0) + 1, setup } }));
-    setSelected(setup.workflowId);
+  useEffect(() => {
+    // Initial fetch for this project; load() only sets state after its awaits.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void load();
+  }, [load]);
+
+  const ready = data?.catalogue.state === "ready";
+  const workflows = useMemo(() => (ready ? data!.workflows : []), [data, ready]);
+  const byId = useMemo(() => new Map(workflows.map((workflow) => [workflow.id, workflow])), [workflows]);
+
+  // Geoscience first, then the user's own categories, then upstream's.
+  const leadingCategories = useMemo<WorkflowPanelCategory[]>(() => [
+    { id: GEO_RECIPE_CATEGORY, label: t("workspace.catalogue.category"), ...GEO_CATEGORY_TONE },
+    ...saved.categories.map((category) => ({ ...category, ...USER_CATEGORY_TONE })),
+  ], [saved.categories]);
+
+  const rows = useMemo<WorkflowPanelRow[]>(() => {
+    const known = new Set([GEO_RECIPE_CATEGORY, ...WORKFLOW_CATEGORIES.map((category) => category.id), ...saved.categories.map((category) => category.id)]);
+    const geo = workflows.map((workflow): WorkflowPanelRow => ({
+      id: `geo:${workflow.id}`,
+      category: GEO_RECIPE_CATEGORY,
+      name: text(workflow.title),
+      description: text(workflow.description),
+      icon: iconFor(workflow),
+      badges: <WorkflowBadges workflow={workflow} />,
+      searchText: [workflow.id, ...workflow.disciplines, ...workflow.inputRoles.flatMap((role) => role.extensions)].join(" "),
+      onSelect: () => setSelected({ workflowId: workflow.id }),
+    }));
+    const recipes = saved.recipes.map((recipe): WorkflowPanelRow => {
+      const workflow = recipe.check.ok ? byId.get(recipe.recipe.workflowId) : undefined;
+      return {
+        id: `recipe:${recipe.id}`,
+        category: known.has(recipe.category) ? recipe.category : GEO_RECIPE_CATEGORY,
+        name: recipe.title,
+        description: workflow ? t("workspace.saved.based", { title: text(workflow.title) }) : t("workspace.saved.cannotOpen"),
+        icon: BookmarkIcon,
+        badges: <>
+          <span className={cn(PILL, TONE.muted)}>{t("workspace.badge.recipe")}</span>
+          {workflow ? <WorkflowBadges workflow={workflow} /> : <span className={cn(PILL, TONE.bad)}>{t("workspace.badge.readiness", { state: "unavailable" })}</span>}
+        </>,
+        searchText: recipe.recipe.workflowId,
+        onSelect: () => (workflow ? setSelected({ workflowId: workflow.id, recipe }) : setProblem(recipe)),
+      };
+    });
+    return [...geo, ...recipes];
+  }, [byId, saved, workflows]);
+
+  const removeRecipe = async (recipe: GeoSavedRecipe) => {
+    setSaved(await request<GeoSavedRecipesResponse>(`/geo/recipes/${encodeURIComponent(recipe.id)}`, projectId, undefined, "DELETE"));
   };
-  if (!data || data.catalogue.state !== "ready") return <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-    <p role="status" className="px-4 py-2 text-xs break-words">{error || (!data ? t("workspace.catalogue.loading") : t("workspace.catalogue.status", { state: data.catalogue.state, detail: data.catalogue.detail || t("workspace.catalogue.noDetail") }))}</p>
-    {children}
+
+  const status = !data
+    ? (error ?? t("workspace.catalogue.loading"))
+    : !ready
+      ? t("workspace.catalogue.status", { state: data.catalogue.state, detail: data.catalogue.detail || t("workspace.catalogue.noDetail") })
+      : workflows.length === 0 ? t("workspace.catalogue.empty") : null;
+
+  const extension: WorkflowPanelExtension = {
+    leadingCategories,
+    rows,
+    searchPlaceholder: t("workspace.catalogue.search"),
+    headerAction: ready ? <RecipeAdd projectId={projectId} workflows={workflows} categories={saved.categories} onSaved={setSaved}
+      onOpen={(setup) => { setOpened((previous) => ({ revision: (previous?.revision ?? 0) + 1, setup })); setSelected({ workflowId: setup.workflowId }); }} /> : null,
+    notice: <>
+      {status && <p role="status" className="text-xs text-muted-foreground break-words">{status}</p>}
+      {error && data && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
+    </>,
+  };
+
+  const recipe = selected?.recipe;
+  const recipeWorkflow = recipe ? byId.get(recipe.recipe.workflowId) : undefined;
+  return <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+    {children(extension)}
+    {/* One setup per workflow stays mounted so a closed form keeps its values. */}
+    {workflows.map((workflow) => {
+      const once = opened?.setup.workflowId === workflow.id ? opened : null;
+      return <TaskSetup
+        key={`${workflow.id}:${once?.revision ?? 0}`}
+        workflow={workflow}
+        projectId={projectId}
+        availableFiles={availableFiles}
+        open={!recipe && selected?.workflowId === workflow.id}
+        onOpenChange={(open) => setSelected(open ? { workflowId: workflow.id } : null)}
+        onRefresh={load}
+        initialSetup={once?.setup}
+      />;
+    })}
+    {recipe && recipeWorkflow && <TaskSetup
+      key={`recipe:${recipe.id}`}
+      workflow={recipeWorkflow}
+      projectId={projectId}
+      availableFiles={availableFiles}
+      open
+      onOpenChange={(open) => { if (!open) setSelected(null); }}
+      onRefresh={load}
+      initialSetup={recipe.check.setup}
+      recipe={{ title: recipe.title, onDelete: async () => { await removeRecipe(recipe); setSelected(null); } }}
+    />}
+    {problem && <RecipeProblem recipe={problem} onClose={() => setProblem(null)} onDelete={async () => { await removeRecipe(problem); setProblem(null); }} />}
   </div>;
-  return <section className="min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto p-4">
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <h2 className="text-base font-medium">{t("workspace.catalogue.title")}</h2>
-      <RecipeImport projectId={projectId} onSetup={importSetup} />
-    </div>
-    {error && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
-    <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {data.workflows.map((workflow) => <article key={workflow.id} className="min-w-0 space-y-3 rounded-lg border p-3 break-words">
-        <h3 className="font-medium">{text(workflow.title)}</h3>
-        {workflow.description && <p className="text-xs text-muted-foreground">{text(workflow.description)}</p>}
-        <p className="text-xs">{t("workspace.catalogue.inputs", { formats: [...new Set(workflow.inputRoles.flatMap((role) => role.extensions))].join(", ") })}</p>
-        <WorkflowOutputs workflow={workflow} />
-        <Readiness value={workflow.readiness} />
-        <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={load} />
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={() => setSelected(workflow.id)}>{t("workspace.setup.open")}</Button>
-        </div>
-        <TaskSetup key={`${workflow.id}:${recipes[workflow.id]?.revision ?? 0}`} workflow={workflow} projectId={projectId} availableFiles={availableFiles} open={selected === workflow.id} onOpenChange={(open) => setSelected(open ? workflow.id : null)} onRefresh={load} initialSetup={recipes[workflow.id]?.setup} />
-      </article>)}
-    </div>
-    {data.workflows.length === 0 && <p className="text-xs">{t("workspace.catalogue.empty")}</p>}
-    <Button size="sm" variant="ghost" aria-expanded={upstream} onClick={() => setUpstream(!upstream)}>{t(upstream ? "workspace.catalogue.hideUpstream" : "workspace.catalogue.showUpstream")}</Button>
-    {upstream && <div className="flex min-h-[32rem] min-w-0 flex-col rounded-lg border">{children}</div>}
-  </section>;
 }

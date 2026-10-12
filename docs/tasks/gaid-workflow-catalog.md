@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:11:41Z
+updated: 2026-10-12T09:26:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3bd27baa-1dd6-4dc1-8996-69912d62ed83","pid":3106452,"provider":"claude","session":"4dd2c1b6-66b7-42cc-9f2d-f81be1d0f80f","start":"26229284","token":"fc2e7c07fe890e3f4986ff5dd2613f603b3589ae70ba499e96df0ca073ac705c"}
 branch: task/gaid-workflow-catalog
 target: main
@@ -63,11 +63,37 @@ Scope (from the request):
   web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__) so the unit can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-12: design settled (see Notes); implementation in progress by the writer itself.
+- Reader research done (summary in Notes). Server saved-recipe store + routes + test done (geo-workspace.test.ts passes).
+- Child writer `gaid-workflow-catalog--skill-hub` (Paseo agent bcdadb7d-d24a-4b57-98db-5e6554bd91e0, worktree
+  ~/worktrees/geoaidesk/gaid-workflow-catalog--skill-hub) owns item 3; brief:
+  ~/data/geoaidesk/work/gaid-workflow-catalog/child-skill-hub.md. On its finish: `task complete gaid-workflow-catalog--skill-hub`,
+  then `task sync` and integrate its report section into the parent report.
 ## Next steps
-1. (the next session's first action)
+1. Implement panel seam + Geoscience rows + saved recipes; then the skill_hub link; then checks and screenshots.
 ## Failed approaches
 ## Notes and decisions
+- Plan (writer does it all; parts are tightly coupled, no child writers):
+  1. Panel (seam): `web/src/components/workflows-panel.tsx` gets optional props for extra categories/rows and a header
+     action, and exports its category list. GAID rows are built in `web/src/geo/workspace/` (task-catalogue.tsx):
+     Geoscience category first, K-Dense list style rows (icon by discipline, title, one-line description, badges:
+     readiness, 미시험, 사용자 자료 필요). A row opens the existing TaskSetup dialog, which now carries the card details
+     (inputs, outputs, boundary, prepare environment). The collapsed "K-Dense workflow 목록" section goes away: one list.
+     page.tsx call site changes to a render prop (seam already owned by GAID).
+  2. Recipes: "레시피 추가" = check a `.geo-start.json` (existing POST /geo/recipes/check), then the user picks a category
+     (Geoscience, any K-Dense category, an earlier user category, or a new named one) and a title; saved per project in
+     `sandbox/.kady/geo/recipes.json` via GET/POST/DELETE /geo/recipes (re-checked on every list; stale recipes show as
+     unavailable, never silently dropped). Saved recipes appear as rows in their category and open TaskSetup prefilled.
+  3. skill_hub link (child unit): skill_hub repo is private and the CLI cannot fetch github.io tarballs, but every Atlas
+     detail page serves `<site>/api/catalog/packages/<pub>/<slug>/<slug>.tar.gz` (public, `<slug>/SKILL.md` layout,
+     verified). Chosen: Settings → Skills gets "skill_hub에서 스킬 찾기" (opens the configured site) and accepts a
+     skill page URL (allowlisted site origins from geo/distribution.json) or the downloaded package; the server
+     extracts it with geo/tar.ts into a content-addressed dir and hands it to the unchanged preview→acknowledge→install
+     gate. Rejected: site→localhost deep link (plan geo-byok-plan.md:879 rejects it), Git source (private repo).
+     skill_hub-side requests (GAID install target on detail pages, public per-skill mirror, publish new site) go to the hub.
+- Owned files: web/src/components/workflows-panel.tsx (seam), web/src/app/page.tsx (call site), web/src/geo/workspace/*,
+  web/src/geo/locales/workspace/*, server/src/geo/workspace/recipes*.ts, server/src/geo/routes/workspace.ts,
+  web/src/geo/contracts/workspace.ts, skills panel seam for item 3 (TBD), geo/integration-boundaries.json (append).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
