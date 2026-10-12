@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T22:50:09Z
+status: active
+updated: 2026-10-12T22:56:21Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -112,6 +112,7 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
 Closed 2026-10-12T22:50:09Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Reinstalled finish check passed backend/frontend tests, geo tests, copy and environment smokes, then production smoke caught an import before the semicolonless use-client directive in shared dialog. Fixed directive ordering in dialog and carousel (same extraction case); run production build then retry finish in place.
 - Parent writer confirmed removal of this worktree’s server/node_modules, web/node_modules, .venv and .next at about 22:33Z while the first task finish check was active. This explains the missing Vitest preload file, not a change/install defect. Stopped that check and reran task finish once; scripts/check reinstalls its own dependencies. No further investigation.
 - Full-web job 2 ran all 975 tests and found one whitespace regression: Exit code and its value lost their separator. Replaced the entire label/value with an ICU message (and fixed the parallel byte counter); tests are rerun without changing assertions.
 - Initial full-web job job-geoaidesk-gaid-ui-locale--work-1 failed before tests: isolated snapshot had no web/node_modules, so vitest was not found. The worktree's npm ci was successful; the next snapshot job installs its own dependencies before running tests.

@@ -1,5 +1,5 @@
-import { geoText } from "@/geo/i18n";
 "use client"
+import { geoText } from "@/geo/i18n";
 
 import * as React from "react"
 import { XIcon } from "lucide-react"
