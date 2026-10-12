@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:27:00Z
+updated: 2026-10-12T09:28:59Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3bd27baa-1dd6-4dc1-8996-69912d62ed83","pid":3106452,"provider":"claude","session":"4dd2c1b6-66b7-42cc-9f2d-f81be1d0f80f","start":"26229284","token":"fc2e7c07fe890e3f4986ff5dd2613f603b3589ae70ba499e96df0ca073ac705c"}
 branch: task/gaid-workflow-catalog
 target: main
@@ -63,14 +63,18 @@ Scope (from the request):
   web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__) so the unit can close.
 
 ## Current state
-- 2026-10-12: design settled (see Notes); implementation in progress by the writer itself.
+- 2026-10-12: items 1–2 implemented and pushed (8ac4b01). Web vitest 963/963, server geo-workspace 18/18, copy validator 0 errors.
+  Screenshots taken on own instance (unit gwc-app, ports 3320/18320, data ~/data/geoaidesk/work/gaid-workflow-catalog,
+  NEXT_PUBLIC_ADK_API_URL=http://localhost:18320 needed); report draft has placeholders SKILL_HUB_* and CHECK_RESULT.
+- Caution: start.mjs rewrites server/package-lock.json on launch; never commit that (reverted once in 8ac4b01).
 - Reader research done (summary in Notes). Server saved-recipe store + routes + test done (geo-workspace.test.ts passes).
 - Child writer `gaid-workflow-catalog--skill-hub` (Paseo agent bcdadb7d-d24a-4b57-98db-5e6554bd91e0, worktree
   ~/worktrees/geoaidesk/gaid-workflow-catalog--skill-hub) owns item 3; brief:
   ~/data/geoaidesk/work/gaid-workflow-catalog/child-skill-hub.md. On its finish: `task complete gaid-workflow-catalog--skill-hub`,
   then `task sync` and integrate its report section into the parent report.
 ## Next steps
-1. Implement panel seam + Geoscience rows + saved recipes; then the skill_hub link; then checks and screenshots.
+1. Wait for child skill-hub finish → `task complete gaid-workflow-catalog--skill-hub`, `task sync`, fill report placeholders.
+2. Stop gwc-app, run scripts/check, clean caches, finish.
 ## Failed approaches
 ## Notes and decisions
 - Plan (writer does it all; parts are tightly coupled, no child writers):
@@ -101,6 +105,7 @@ Scope (from the request):
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-12-gaid-workflow-catalog/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
