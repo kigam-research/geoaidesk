@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:08:02Z
+updated: 2026-10-12T14:11:56Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -66,6 +66,12 @@ language should follow the UI language. The user decided (verbatim):
   catalogue 0.2.1 file forced a reply language; the server never receives the UI locale. Task drafts
   (`workspace.setup.draft`, `workspace.skill.draft`) are composer prefills the user sees and sends, so they are the
   request, not an injected locale.
+- Reply-language demo (local model qwen3 30B gaid-64k via Ollama, own app on 3091/18091, no paid model):
+  Korean request → Korean reply; English request → English reply; Korean request + "답은 영어로 쓰세요" → English reply.
+  Raw SSE + script: ~/data/geoaidesk/work/gaid-ui-locale/reply/ (run.sh, 0?-*.sse). Model unloaded afterwards.
+- Own app instance: systemd user unit `gaid-ui-locale-app` (~/data/geoaidesk/work/gaid-ui-locale/app/run.sh, dev mode
+  from this worktree, data in that folder, log app.log). Screenshot script: ~/data/geoaidesk/work/gaid-ui-locale/browser/
+  shots.mjs (baseline/ = before children). Stop the unit before finish.
 - Baseline scan (`~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src`): 1191 English literals in 79 upstream
   files; 326 upstream workflows (22 categories) with English name/description/placeholder labels.
 
