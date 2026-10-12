@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:11:56Z
+updated: 2026-10-12T14:23:24Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -68,7 +68,9 @@ language should follow the UI language. The user decided (verbatim):
   request, not an injected locale.
 - Reply-language demo (local model qwen3 30B gaid-64k via Ollama, own app on 3091/18091, no paid model):
   Korean request → Korean reply; English request → English reply; Korean request + "답은 영어로 쓰세요" → English reply.
-  Raw SSE + script: ~/data/geoaidesk/work/gaid-ui-locale/reply/ (run.sh, 0?-*.sse). Model unloaded afterwards.
+  Same three requests with minimax/MiniMax-M3 (hosted, via the app): Korean → Korean, English → English, Korean +
+  "답은 영어로" → English. Reply language only; content accuracy not judged (one Korean reply misnamed LAS).
+  Raw SSE + script: ~/data/geoaidesk/work/gaid-ui-locale/reply/ (run.sh, MODEL=..., 0?-*/1?-*.sse). Ollama model unloaded.
 - Own app instance: systemd user unit `gaid-ui-locale-app` (~/data/geoaidesk/work/gaid-ui-locale/app/run.sh, dev mode
   from this worktree, data in that folder, log app.log). Screenshot script: ~/data/geoaidesk/work/gaid-ui-locale/browser/
   shots.mjs (baseline/ = before children). Stop the unit before finish.
@@ -114,7 +116,13 @@ Integration order: workflows, work, files, settings, notebook, research (each `t
 boundaries against `git diff --name-only origin/main`, rescan, browser screenshots (ko/en), report, `scripts/check`.
 
 ## Failed approaches
+- 2026-10-12: five of six children (work, files, settings, notebook, research) stopped right after start with Paseo
+  "[System Error] Selected model is at capacity" (gpt-6.1-sol), before `task resume`. Not a code problem; resent the
+  same start prompt once with `paseo send <id> --prompt-file` (prompts saved in /tmp/gaid-retry/); all five running.
 ## Notes and decisions
+- User (2026-10-12, verbatim): "그리고 이미 minimax api 연동되어 있을것이다." MINIMAX_API_KEY is in the review instance's
+  ~/.geoaidesk/config.env; the own instance's run.sh loads only `MINIMAX_*` from it (value never printed). Used for the
+  hosted-model reply-language check in addition to the local model.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
