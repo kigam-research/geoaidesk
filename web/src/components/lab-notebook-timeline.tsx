@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+
 import { useMemo } from "react";
 import { ChevronDownIcon, NetworkIcon, SearchXIcon, SparklesIcon } from "lucide-react";
 import {
@@ -14,6 +16,8 @@ import type { NotebookAnnotation } from "@/lib/notebook-annotations";
 import { notebookEntryKey, notebookTargetKey, type NotebookEntry, type NotebookEntryType } from "@/lib/notebook";
 import { cn } from "@/lib/utils";
 
+const nbText = geoText("notebook");
+
 const STORY_PHASES: {
   type: NotebookEntryType;
   title: string;
@@ -21,28 +25,28 @@ const STORY_PHASES: {
 }[] = [
   {
     type: "hypothesis",
-    title: "Questions & hypotheses",
-    description: "What the team thinks might be true",
+    title: nbText("timeline.hypothesis_title"),
+    description: nbText("timeline.hypothesis_description"),
   },
   {
     type: "method",
-    title: "Methods & experiments",
-    description: "What was tried and how",
+    title: nbText("timeline.method_title"),
+    description: nbText("timeline.method_description"),
   },
   {
     type: "observation",
-    title: "Findings & evidence",
-    description: "What the work revealed",
+    title: nbText("timeline.observation_title"),
+    description: nbText("timeline.observation_description"),
   },
   {
     type: "decision",
-    title: "Decisions & direction",
-    description: "What changed because of the evidence",
+    title: nbText("timeline.decision_title"),
+    description: nbText("timeline.decision_description"),
   },
   {
     type: "note",
-    title: "Researcher notes",
-    description: "Context and annotations added by the team",
+    title: nbText("timeline.note_title"),
+    description: nbText("timeline.note_description"),
   },
 ];
 
@@ -135,7 +139,7 @@ function Divider({ item }: { item: Exclude<TimelineItem, { kind: "entry" }> }) {
       <div className="-ml-8 flex items-center gap-2 py-0.5 text-[10px] text-muted-foreground/70">
         <span className="inline-flex shrink-0 items-center gap-1">
           <SparklesIcon className="size-3" />
-          new run
+          {nbText("timeline.new_run")}
         </span>
         <span className="h-px flex-1 border-t border-dashed border-border" />
       </div>
@@ -247,9 +251,9 @@ export function LabNotebookTimeline({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-12 text-center">
         <SearchXIcon className="size-7 text-muted-foreground/40" />
-        <p className="text-xs font-medium">No matching entries</p>
+        <p className="text-xs font-medium">{nbText("timeline.no_matching")}</p>
         <p className="text-[11px] leading-relaxed text-muted-foreground">
-          Try another entry type, tag, or search phrase.
+          {nbText("timeline.change_filter")}
         </p>
       </div>
     );
