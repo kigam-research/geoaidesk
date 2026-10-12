@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T09:34:23Z
+status: ready
+updated: 2026-10-12T09:34:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -96,7 +96,9 @@ AGENTS.md (one bullet).
 - Parent report material: reports/2026-10-12-gaid-workflow-catalog/skill-hub-section.md includes options, limits, E2E evidence, screenshots, complete new ko/en copy table and the skill_hub-side request for the parent to forward. Optional per-row site links were not added.
 - No paid model runs, ~/.geoaidesk changes or ports 3000/18000 review-instance changes. Isolated services stopped; generated .next and tsbuildinfo caches removed. Code checkpoints b3aa2370d63c / 40acafbb7fff; parent integration and its full checks remain separate.
 ## Next steps
-1. Save the parent integration merge with both seams, then rerun task finish. Parent gaid-workflow-catalog integrates this unit with task complete, then runs scripts/check and forwards the report's skill_hub-side request.
+<!-- task:closed -->
+Closed 2026-10-12T09:34:33Z: ready; the parent gaid-workflow-catalog integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First task finish brought parent ca720112bf91 into this branch and stopped on the expected append-only integration-boundaries conflict. Kept both skills-panel.tsx and workflows-panel.tsx seams; no parent implementation was rewritten.
 - E2E job 2 was cancelled after its harness launched Next in the repository root instead of web/. No application failure: corrected the external harness Next directory before a fresh run.
