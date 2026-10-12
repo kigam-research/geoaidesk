@@ -275,6 +275,52 @@ describe("recipes", () => {
     expect(body.ok).toBe(true);
     expect((await server.inject({ method: "POST", url: "/geo/recipes/check", payload: {} })).statusCode).toBe(400);
   });
+
+  it("saves checked recipes under a chosen or new category and re-checks them on list", async () => {
+    let catalogue: GeoCatalogue | null = CATALOGUE;
+    const server = Fastify();
+    await registerGeoWorkspaceRoutes(server, {
+      service: fakeService(["geo-core"]), catalogue: () => catalogue,
+      status: () => ({ state: "ready", version: "0.2.0" }), paths: () => paths,
+    });
+    expect((await server.inject({ method: "GET", url: "/geo/recipes" })).json()).toEqual({ categories: [], recipes: [] });
+    const bad = await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe: { ...recipe, workflowId: "nope" }, title: "x" } });
+    expect(bad.statusCode).toBe(422);
+    expect(bad.json().issues[0].code).toBe("unknown-workflow");
+    expect((await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: " " } })).statusCode).toBe(400);
+    expect((await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "x", category: "user-9" } })).statusCode).toBe(400);
+    const first = (await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "MD 기준 QC" } })).json();
+    expect(first.recipes[0]).toMatchObject({ title: "MD 기준 QC", category: "geoscience", check: { ok: true } });
+    const second = (await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "현장 A", newCategory: "현장 조사" } })).json();
+    expect(second.categories).toEqual([{ id: "user-1", label: "현장 조사" }]);
+    const third = (await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "현장 B", newCategory: "현장 조사" } })).json();
+    expect(third.categories).toHaveLength(1);
+    expect(third.recipes.map((row: { category: string }) => row.category)).toEqual(["geoscience", "user-1", "user-1"]);
+    const upstream = (await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "논문", category: "paper" } })).json();
+    expect(upstream.recipes[3].category).toBe("paper");
+
+    // A catalogue change keeps the recipe and reports why it cannot open.
+    catalogue = null;
+    const stale = (await server.inject({ method: "GET", url: "/geo/recipes" })).json();
+    expect(stale.recipes).toHaveLength(4);
+    expect(stale.recipes[0].check.issues[0].code).toBe("catalogue-off");
+    catalogue = CATALOGUE;
+
+    // Removing the last recipe of a user category removes the category.
+    for (const row of third.recipes.slice(1)) {
+      const res = await server.inject({ method: "DELETE", url: `/geo/recipes/${row.id}` });
+      expect(res.statusCode).toBe(200);
+    }
+    expect((await server.inject({ method: "GET", url: "/geo/recipes" })).json().categories).toEqual([]);
+    expect((await server.inject({ method: "DELETE", url: `/geo/recipes/${third.recipes[1].id}` })).statusCode).toBe(404);
+
+    // A malformed store is reported, never rewritten.
+    const store = path.join(paths.kadyDir, "geo", "recipes.json");
+    fs.writeFileSync(store, "{\"x\":1}");
+    expect((await server.inject({ method: "GET", url: "/geo/recipes" })).statusCode).toBe(409);
+    expect((await server.inject({ method: "POST", url: "/geo/recipes", payload: { recipe, title: "y" } })).statusCode).toBe(409);
+    expect(fs.readFileSync(store, "utf-8")).toBe("{\"x\":1}");
+  });
 });
 
 describe("started-task sessions", () => {

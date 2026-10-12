@@ -43,7 +43,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -373,6 +373,12 @@
       "owner": "gaid-workflow-catalog",
       "status": "edited",
       "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation."
+    },
+    {
+      "path": "web/src/components/workflows-panel.tsx",
+      "owner": "gaid-workflow-catalog",
+      "status": "edited",
+      "responsibility": "Optional `extension` prop (host categories before/after the upstream ones, host rows searched and grouped like upstream rows, header action, notice, search placeholder) and an exported WORKFLOW_CATEGORIES list; upstream rows and the launch dialog unchanged"
     }
   ],
   "notTouched": [

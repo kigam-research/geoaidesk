@@ -38,6 +38,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Chats without a record keep upstream behaviour. `GET /geo/context[/preview]` reports the start-prompt budget
   (chars/4 estimate); the chip next to the context gauge is `web/src/geo/context/`. Tool schemas are ~19K tokens of
   a ~25K start prompt, so skill exposure alone cannot fit a 32K local context.
+- Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
+  `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
+  and row style; readiness/미시험/사용자 자료 badges); a row opens `TaskSetup`. "레시피 가져오기" checks a `.geo-start.json`
+  and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
+  (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
+  recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit

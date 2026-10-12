@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ActivityIcon,
   AtomIcon,
@@ -227,6 +227,41 @@ const CATEGORIES: { id: string; label: string; color: string }[] = [
   { id: "engineering", label: "Engineering & Simulation", color: "text-zinc-500" },
   { id: "astro", label: "Astronomy & Space Science", color: "text-violet-600" },
 ];
+
+/** Upstream categories, for hosts that let the user file their own rows under one (GAID seam). */
+export const WORKFLOW_CATEGORIES: readonly { id: string; label: string }[] = CATEGORIES;
+
+/**
+ * GAID seam (gaid-workflow-catalog, geo/integration-boundaries.json): a host
+ * can list its own categories and rows with the upstream ones. Its rows are
+ * searched, grouped and drawn like upstream rows; selecting one calls the
+ * host instead of opening the upstream launch dialog.
+ */
+export type WorkflowPanelCategory = { id: string; label: string; color: string; bg: string };
+export type WorkflowPanelRow = {
+  id: string;
+  /** An upstream category id or one of the host's categories. */
+  category: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  badges?: ReactNode;
+  /** Extra text matched by the search box. */
+  searchText?: string;
+  onSelect: () => void;
+};
+export type WorkflowPanelExtension = {
+  /** Categories listed before the upstream ones. */
+  leadingCategories?: WorkflowPanelCategory[];
+  /** Categories listed after the upstream ones. */
+  trailingCategories?: WorkflowPanelCategory[];
+  rows?: WorkflowPanelRow[];
+  /** Placed beside the search box. */
+  headerAction?: ReactNode;
+  /** Shown under the category pills. */
+  notice?: ReactNode;
+  searchPlaceholder?: string;
+};
 
 const CATEGORY_BG: Record<string, string> = {
   paper: "bg-blue-500/10 hover:bg-blue-500/15 border-blue-500/20",
@@ -485,9 +520,11 @@ export function WorkflowsPanel({
   filesReady,
   onRefreshFiles,
   budgetBlocked = false,
+  extension,
 }: {
   onLaunch: (prompt: string, model: Model, inputFiles: string[]) => void;
   budgetBlocked?: boolean;
+  extension?: WorkflowPanelExtension;
 } & WorkflowInputProps) {
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
   const [search, setSearch] = useState("");
@@ -504,19 +541,30 @@ export function WorkflowsPanel({
     );
   }, [search]);
 
+  const categories = useMemo<{ id: string; label: string; color: string; bg?: string }[]>(
+    () => [...(extension?.leadingCategories ?? []), ...CATEGORIES, ...(extension?.trailingCategories ?? [])],
+    [extension?.leadingCategories, extension?.trailingCategories]
+  );
+
   const grouped = useMemo(() => {
-    const map = new Map<string, Workflow[]>();
-    for (const cat of CATEGORIES) map.set(cat.id, []);
+    const map = new Map<string, (Workflow | WorkflowPanelRow)[]>();
+    for (const cat of categories) map.set(cat.id, []);
+    const q = search.toLowerCase().trim();
+    const label = new Map(categories.map((cat) => [cat.id, cat.label.toLowerCase()]));
+    for (const row of extension?.rows ?? []) {
+      const text = [row.name, row.description, row.searchText ?? "", label.get(row.category) ?? ""].join("\n").toLowerCase();
+      if (!q || text.includes(q)) map.get(row.category)?.push(row);
+    }
     for (const w of filtered) {
       const list = map.get(w.category);
       if (list) list.push(w);
     }
     return map;
-  }, [filtered]);
+  }, [categories, extension?.rows, filtered, search]);
 
   const visibleCategories = useMemo(
-    () => CATEGORIES.filter((cat) => (grouped.get(cat.id)?.length ?? 0) > 0),
-    [grouped]
+    () => categories.filter((cat) => (grouped.get(cat.id)?.length ?? 0) > 0),
+    [categories, grouped]
   );
 
   const scrollToCategory = useCallback((catId: string) => {
@@ -532,14 +580,18 @@ export function WorkflowsPanel({
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Search + category pills */}
       <div className="shrink-0 border-b px-4 py-3 space-y-2.5">
-        <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search workflows..."
-            className="w-full rounded-lg border bg-background py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary placeholder:text-muted-foreground/50"
-          />
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <SearchIcon className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={extension?.searchPlaceholder ?? "Search workflows..."}
+              aria-label={extension?.searchPlaceholder ?? "Search workflows..."}
+              className="w-full rounded-lg border bg-background py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary placeholder:text-muted-foreground/50"
+            />
+          </div>
+          {extension?.headerAction}
         </div>
 
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
@@ -549,19 +601,20 @@ export function WorkflowsPanel({
               onClick={() => scrollToCategory(cat.id)}
               className={cn(
                 "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors",
-                CATEGORY_BG[cat.id]
+                cat.bg ?? CATEGORY_BG[cat.id]
               )}
             >
-              <span className={CATEGORY_ICON_COLOR[cat.id]}>{cat.label}</span>
+              <span className={cat.color}>{cat.label}</span>
             </button>
           ))}
         </div>
+        {extension?.notice}
       </div>
 
       {/* Scrollable workflow grid */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
         <div className="space-y-6">
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const workflows = grouped.get(cat.id);
             if (!workflows || workflows.length === 0) return null;
             return (
@@ -574,6 +627,30 @@ export function WorkflowsPanel({
                 </h3>
                 <div className="grid grid-cols-1 gap-2">
                   {workflows.map((w) => {
+                    if ("onSelect" in w) {
+                      const Icon = w.icon;
+                      return (
+                        <button
+                          key={w.id}
+                          onClick={w.onSelect}
+                          className={cn(
+                            "flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
+                            cat.bg ?? CATEGORY_BG[cat.id]
+                          )}
+                        >
+                          <Icon className={cn("mt-0.5 size-4 shrink-0", cat.color)} />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="text-sm font-medium text-foreground">{w.name}</span>
+                              {w.badges}
+                            </div>
+                            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                              {w.description}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    }
                     const bgClass = CATEGORY_BG[w.category] ?? "";
                     const iconColor = CATEGORY_ICON_COLOR[w.category] ?? "text-muted-foreground";
                     return (

@@ -18,8 +18,8 @@
     "outputs": "예상 결과 파일: {outputs}",
     "boundary": "해석 한계: {boundary}",
     "empty": "등록된 Geo 작업이 없습니다.",
-    "showUpstream": "K-Dense workflow 목록 보기",
-    "hideUpstream": "K-Dense workflow 목록 접기"
+    "category": "Geoscience",
+    "search": "workflow 검색"
   },
   "readiness": {
     "ready": "준비됨",
@@ -65,7 +65,19 @@
     "checking": "레시피 확인 중",
     "error": "레시피를 읽거나 확인하지 못했습니다. {detail}",
     "issue": "{code, select, schema {레시피 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 레시피입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 workflow입니다: {subject}} workflow-skill {workflow에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {workflow에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {레시피를 확인하지 못했습니다: {subject}}}",
-    "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다."
+    "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다.",
+    "description": "geo-start/v1 레시피 파일(.geo-start.json)을 확인한 뒤, 정한 제목과 카테고리로 현재 프로젝트의 workflow 목록에 저장합니다. 레시피는 작업을 실행하지 않습니다.",
+    "choose": "레시피 파일 선택",
+    "title": "레시피 제목",
+    "category": "카테고리",
+    "userCategories": "추가한 카테고리",
+    "upstreamCategories": "K-Dense workflow 카테고리",
+    "newCategory": "새 카테고리 추가",
+    "newCategoryName": "새 카테고리 이름",
+    "openOnce": "저장하지 않고 열기",
+    "save": "레시피 저장",
+    "saving": "레시피 저장 중",
+    "close": "닫기"
   },
   "files": {
     "match": "일치한 입력: {role} · 형식: {format}",
@@ -90,5 +102,19 @@
     "enabling": "스킬 켜는 중",
     "notInstalled": "프로젝트에 설치되지 않은 스킬: {names}. 설정 → 스킬에서 설치하세요.",
     "error": "스킬을 켜지 못했습니다. {detail}"
+  },
+  "badge": {
+    "readiness": "{state, select, ready {준비됨} missing-skills {스킬 필요} needs-environment {환경 준비 필요} unavailable {사용 불가} other {상태 미확인}}",
+    "untested": "미시험",
+    "userData": "사용자 자료 필요",
+    "recipe": "저장한 레시피"
+  },
+  "saved": {
+    "based": "기반 작업: {title}",
+    "cannotOpen": "현재 카탈로그로는 열 수 없는 레시피입니다.",
+    "error": "레시피를 저장하지 못했습니다. {detail}",
+    "delete": "레시피 삭제",
+    "confirmDelete": "레시피 삭제 확인",
+    "deleteError": "레시피를 삭제하지 못했습니다. {detail}"
   }
 }

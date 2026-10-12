@@ -1228,15 +1228,18 @@ function WorkspacePage({
           {isActive && view === "workflows" && (
             <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
               <GeoTaskCatalogue projectId={projectId} availableFiles={allFiles}>
-                <WorkflowsPanel
-                  onLaunch={handleWorkflowLaunch}
-                  onUploadFiles={sandbox.uploadFiles}
-                  availableFiles={allFiles}
-                  availableFolders={allFolders}
-                  filesReady={sandbox.tree !== null}
-                  onRefreshFiles={sandbox.fetchTree}
-                  budgetBlocked={projectCost.budget.state === "exceeded"}
-                />
+                {(extension) => (
+                  <WorkflowsPanel
+                    extension={extension}
+                    onLaunch={handleWorkflowLaunch}
+                    onUploadFiles={sandbox.uploadFiles}
+                    availableFiles={allFiles}
+                    availableFolders={allFolders}
+                    filesReady={sandbox.tree !== null}
+                    onRefreshFiles={sandbox.fetchTree}
+                    budgetBlocked={projectCost.budget.state === "exceeded"}
+                  />
+                )}
               </GeoTaskCatalogue>
             </div>
           )}
