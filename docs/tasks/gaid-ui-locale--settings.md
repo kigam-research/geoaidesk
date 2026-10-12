@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T14:47:14Z
+status: ready
+updated: 2026-10-12T14:47:29Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"597a1537-b69e-4291-b5f7-44e6e6807109","pid":154306,"provider":"codex","session":"01a13070-9f74-7430-b1e9-19ce450fc69d","start":"28005015","token":"71c6622f569a3e1b601fe963d7e1a285fd1c492855206a32e60dad763b06162b"}
 branch: task/gaid-ui-locale--settings
 target: task/gaid-ui-locale
@@ -91,8 +91,9 @@ Checks passed: npm ci; npx tsc --noEmit; full web suite 145 files / 972 tests; c
 English text is preserved except settings.services.search_fallback_plus_youtube_and_video_understanding_for_fetched_links_it_is_the_same_gemi: “unlocks” → “enables”, required by empty-capability validation. Intentionally retained: product names, command/path/model/env identifiers, user-authored skill/template/agent content, raw configuration data and unknown provider/runtime diagnostics. Detailed exceptions and copy evidence follow below.
 
 ## Next steps
-1. Run task save and task finish for this checked child snapshot.
-2. Parent gaid-ui-locale integrates with task complete and owns full-repository checks/browser QA.
+<!-- task:closed -->
+Closed 2026-10-12T14:47:29Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial literal extraction did not cover finite provider metadata or whole count phrases; added an exact known-source adapter and complete ICU count messages.
 - First full web test run exposed a React code node passed as a string placeholder (2 service tests failed). SettingsMessage now preserves React links/code and permits Korean word order; all 972 tests passed after the fix.
