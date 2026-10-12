@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T09:33:23Z
+status: done
+updated: 2026-10-12T09:33:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3deaaa94-6146-4a8e-bcdd-a4b418119648","pid":3104588,"provider":"claude","session":"faf47acc-261b-40ba-9a0d-c18d0e922752","start":"26228112","token":"6a36ad34b48eccc61baf2cd33f8b62570ba6f59749ebdf9f20c421a3674a4a1f"}
 branch: task/gaid-map-table-ux
 target: main
@@ -77,7 +77,9 @@ analysis; source CRS vs display CRS stay distinct.
   Build caches removed afterwards.
 - The dev launcher rewrites server/package-lock.json; restored, never commit it from here.
 ## Next steps
-1. None; finished. Hub updates the review instance after merge.
+<!-- task:closed -->
+Closed 2026-10-12T09:33:33Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: all three items touch the same viewer files (`index.tsx`, `map-canvas.tsx`), so one writer does them;
