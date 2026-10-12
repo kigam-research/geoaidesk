@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T04:55:45Z
+status: active
+updated: 2026-10-12T05:00:37Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -122,13 +122,17 @@ Finish with `task finish`; the parent integrates.
 - Live local backend check on PC74 port 18123 (then closed): catalogue HTTP 200, all six entries available; NGII HTTP 200, image/png, 33,769 bytes; KIGAM with TRANSPARENT=TRUE HTTP 200, image/png, 6,611 bytes. Only safe metadata was printed. Existing review instance/data unchanged.
 - Live evidence (external, no key values): ~/data/geoaidesk/work/gaid-map-tiles--basemaps/live-metadata.json and live-basemaps.mts. Images are local evidence, not bundled imagery.
 - Dependency preparation job #1 succeeded (exit 0); its receipt is recorded below. No server process remains from the live check.
+- task finish merged parent tip 7461bc03969e and ran full scripts/check on 12511cf2435d. It stopped at the backend suite: 154 files passed, 1 skipped, 1 failed; 1,647 tests passed, 11 skipped, 1 failed. The sole failure is the parent's geo/markdown-images.ts using path.relative directly, caught by win-portability.test.ts:151. No basemap failure. Finish has not succeeded or notified the parent as ready.
+- Full-check failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-l0fs7sj8.log; external output directory ~/data/geoaidesk/work/checks/12511cf2435d-20261012T045545.976346Z. mzML tests were visibly skipped by the existing network probe; unrelated to the failure.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-12T04:55:45Z: ready; the parent gaid-map-tiles integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Parent must fix or authorize the path-normalization change in its owned server/src/geo/markdown-images.ts, then save the parent tip. The hub receives this task-local blocker for routing, because no Paseo messaging MCP is callable here. Do not edit the parent's owned file or bypass the check.
+2. After the parent's fix is saved, rerun task finish in this worktree (no task resume needed after failed finish). The CLI enforces the repository-wide suite despite the brief assigning integrated checks to the parent.
+3. Parent integrates with task complete gaid-map-tiles--basemaps, wires the viewer, keeps attribution visible including exported online imagery, and performs browser checks. Use docs/geo/basemaps.md and evidence above for the parent report; no separate child report.
 
 ## Failed approaches
 - Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
 - Initial web typecheck rejected tests reading a protected OpenLayers source property. Tests now check the actual image element's anonymous CORS setting; typecheck passes.
+- First task finish failed only on the inherited parent Markdown-image path conformance check. Requires the parent's apiRelative/toApiPath normalization fix; no speculative changes made to basemap code.
 ## Notes and decisions
 - Sequential plan: settle fixed interfaces first; server adapter and web factory are tightly coupled and will be implemented by this single child writer (no nested units). Owned paths remain those listed above; parent integrates index.tsx/map-canvas.tsx last.
 - Existing auth accepts query tokens on all routes; existing CORS/request guard already accepts anonymous cross-origin image loads from allowed UI origins. Verify in focused route tests without changing upstream guard/auth files.
