@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoInspection } from "../../contracts/inspection";
-import type { MapManifestResponse, VectorPage, RasterWindow } from "../../contracts/maps";
+import type { MapManifestResponse, VectorPage, RasterStyle } from "../../contracts/maps";
 import { apiFetch } from "@/lib/projects";
 import MapViewer from "./index";
 import { geoFileCategory } from "../registry";
-vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn() }));
+vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn(), API_BASE: "", getActiveProjectId: () => "default" }));
 vi.mock("../inspection-viewer", () => ({ default: () => <div>imaging-fallback</div> }));
 vi.mock("./map-canvas", async () => {
   const { forwardRef, useImperativeHandle } = await import("react");
@@ -30,8 +30,10 @@ describe("map viewer", () => {
   it("inspects before paging, uses selected GPKG layer, bounds and explicit project scope", async () => {
     render(<MapViewer {...props} />);
     await screen.findByRole("heading", { name: "Viewport attribute table" });
-    const first = mockFetch.mock.calls.find(c => c[0] === "/geo/vector-page")!;
-    expect(body(first)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(first[2]).toBe("project-a");
+    // The whole layer is tried first; a truncated answer switches to viewport pages.
+    const [first, second] = mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page");
+    expect(body(first)).toMatchObject({ layer: "rocks", full: true, displayCrs: "EPSG:3857" }); expect(body(first)).not.toHaveProperty("bbox"); expect(first[2]).toBe("project-a");
+    expect(body(second)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(second[2]).toBe("project-a");
     expect(screen.getByText(/Source CRS: EPSG:5186/)).toBeInTheDocument(); expect(screen.getByText(/Display CRS: EPSG:3857/)).toBeInTheDocument();
     fireEvent.click(screen.getByText("Next page"));
     await waitFor(() => expect(mockFetch.mock.calls.some(c => c[0] === "/geo/vector-page" && body(c).offset === 500)).toBe(true));
@@ -80,24 +82,28 @@ describe("map viewer", () => {
   });
   it("discards a delayed viewport response when a newer window has arrived", async () => {
     let resolveOld!: (value: Response) => void;
-    mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection()) : body([url, init]).bbox ? respond(page()) : new Promise(resolve => { resolveOld = resolve; }));
+    mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection()) : body([url, init]).bbox || body([url, init]).full ? respond(page()) : new Promise(resolve => { resolveOld = resolve; }));
     render(<MapViewer {...props} />); await screen.findByText("pan-map");
     await waitFor(() => expect(resolveOld).toBeDefined());
-    const oldSignal = mockFetch.mock.calls.find(c => c[0] === "/geo/vector-page")![1]?.signal;
+    const oldSignal = mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page")[1][1]?.signal;
     fireEvent.click(screen.getByText("pan-map")); await screen.findByRole("heading", { name: "Viewport attribute table" });
     const old = page(); old.features.features[0].properties.class = "stale-response";
     await act(async () => resolveOld({ ok: true, json: async () => old } as Response));
     expect(oldSignal?.aborted).toBe(true); expect(screen.queryByText("stale-response")).not.toBeInTheDocument();
   });
-  it("requests bounded raster samples and keeps zero distinct from null on click", async () => {
+  it("loads one raster style for tiles, reads clicked values from the source file, and keeps zero distinct from null", async () => {
     const rasterInspection = { ...inspection("dem.tif"), asset: { ...inspection("dem.tif").asset, family: "raster", format: "geotiff" }, layers: undefined, bands: [{ index: 1 }, { index: 2 }] } as GeoInspection;
-    const raster = { kind: "raster", path: "dem.tif", sourceCrs: rasterInspection.crs, displayCrs: "EPSG:3857", bbox: [0, 0, 20, 20], values: [[0, null], [1, 2]], band: 1, image: "", legend: [], nodata: null, issues: [], preview: { method: "nearest", sampled: true, truncated: false, width: 2, height: 2 } } as RasterWindow;
-    mockFetch.mockImplementation(url => url === "/geo/inspect" ? respond(rasterInspection) : respond(raster));
-    render(<MapViewer {...props} path="dem.tif" />); await screen.findByText(/Sample dimensions/);
+    const style = { kind: "raster-style", path: "dem.tif", band: 1, sourceCrs: rasterInspection.crs!, displayCrs: "EPSG:3857", bbox: [0, 0, 20, 20], legend: [{ label: "low", value: -1, color: "#1e46b4" }, { label: "high", value: 5, color: "#e6dc28" }, { label: "nodata", value: null, color: "#80808000" }], nodata: -9999, issues: [], categorical: false, low: -1, high: 5, resolution: 10, overviews: false, needsOverviews: false, version: "v1", preview: { method: "tiles", sampled: true, truncated: false, width: 2, height: 2 } } as RasterStyle;
+    mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(rasterInspection) : url === "/geo/raster-point" ? respond(body([url, init]).coordinate[0] === 5 ? { kind: "raster-point", band: 1, inside: true, row: 0, col: 0, value: 0 } : { kind: "raster-point", band: 1, inside: true, row: 0, col: 1, value: null }) : respond(style));
+    render(<MapViewer {...props} path="dem.tif" />); await screen.findByText(/Source size: 2 × 2 pixels/);
+    expect(screen.getByText(/-1\.00000 or less/)).toBeInTheDocument();
     fireEvent.click(screen.getByText("pixel-zero")); expect(await screen.findByText(/row 0, column 0, value 0/)).toBeInTheDocument();
+    expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-point").at(-1)!)).toEqual({ path: "dem.tif", band: 1, displayCrs: "EPSG:3857", coordinate: [5, 15] });
     fireEvent.click(screen.getByText("pixel-null")); expect(await screen.findByText(/row 0, column 1, value No data/)).toBeInTheDocument();
-    fireEvent.click(screen.getByText("pan-map")); await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-window").at(-1)!)).toMatchObject({ width: 256, height: 256 }));
-    fireEvent.change(screen.getByLabelText("Band"), { target: { value: "2" } }); await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-window").at(-1)!).band).toBe(2));
+    const styles = () => mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-style");
+    fireEvent.click(screen.getByText("pan-map"));
+    expect(styles()).toHaveLength(1); expect(mockFetch.mock.calls.some(c => c[0] === "/geo/raster-window")).toBe(false);
+    fireEvent.change(screen.getByLabelText("Band"), { target: { value: "2" } }); await waitFor(() => expect(body(styles().at(-1)!).band).toBe(2));
   });
   it("preserves ordinary TIFF fallback and initializes artifact layers/analysis paths", async () => {
     mockFetch.mockImplementation(() => respond({ ...inspection(), asset: { ...inspection().asset, format: "tiff", family: "raster" } }));

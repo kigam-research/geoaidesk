@@ -1,4 +1,6 @@
-import { apiFetch } from "@/lib/projects";
+import { apiFetch, API_BASE, getActiveProjectId } from "@/lib/projects";
+import { withApiToken } from "@/lib/api-auth";
+import type { RasterTileQuery } from "../../contracts/maps";
 import { mapText as t } from "./strings";
 
 /** All requests use explicit project scope and are abortable on replacement/unmount. */
@@ -23,4 +25,13 @@ export function downloadBlob(blob: Blob, name: string): void {
   const link = document.createElement("a");
   link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Versioned tile URL loaded by OpenLayers itself (explicit project scope, optional access token). */
+export function tileUrl(query: RasterTileQuery, projectId?: string): string {
+  const params = new URLSearchParams({ project: projectId ?? getActiveProjectId(), path: query.path, band: String(query.band), crs: query.crs,
+    bbox: query.bbox.map(n => String(n)).join(","), size: String(query.size), v: query.v });
+  if (query.categorical) params.set("categorical", "1");
+  else { params.set("low", String(query.low)); params.set("high", String(query.high)); }
+  return withApiToken(`${API_BASE}/geo/raster-tile?${params}`);
 }
