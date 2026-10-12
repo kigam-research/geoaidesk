@@ -1,4 +1,7 @@
 "use client";
+import { geoLocale, geoText } from "@/geo/i18n";
+import { workLabel } from "@/geo/work-labels";
+const workText = geoText("work");
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -14,7 +17,6 @@ import type { MemoryKind, MemorySearchResponse } from "@/lib/notebook-memory";
 import type { NotebookEntry } from "@/lib/notebook";
 import { commandPreview } from "@/lib/command-blocks";
 import {
-  RECORD_KIND_LABELS,
   researchRefKey,
   type ResearchRef,
 } from "@/lib/composer-context";
@@ -22,13 +24,13 @@ import {
 type Mode = "records" | "chats";
 
 const FILTERS: { id: MemoryKind | "all"; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "hypothesis", label: "Hypotheses" },
-  { id: "observation", label: "Observations" },
-  { id: "decision", label: "Decisions" },
-  { id: "method", label: "Methods" },
-  { id: "plan", label: "Plans" },
-  { id: "user-note", label: "Notes" },
+  { id: "all", label: workText("research_picker.all") },
+  { id: "hypothesis", label: workText("research_picker.hypotheses") },
+  { id: "observation", label: workText("research_picker.observations") },
+  { id: "decision", label: workText("research_picker.decisions") },
+  { id: "method", label: workText("research_picker.methods") },
+  { id: "plan", label: workText("research_picker.plans") },
+  { id: "user-note", label: workText("research_picker.notes") },
 ];
 
 const RECENT_LIMIT = 12;
@@ -52,17 +54,17 @@ function relativeTime(value: string | number): string {
   const then = new Date(value).getTime();
   if (!Number.isFinite(then)) return "";
   const mins = Math.round((Date.now() - then) / 60_000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return workText("research_picker.just_now");
+  if (mins < 60) return workText("research_picker.valuem_ago", { v0: mins });
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return workText("research_picker.valueh_ago", { v0: hours });
   const days = Math.round(hours / 24);
-  return days < 30 ? `${days}d ago` : new Date(then).toLocaleDateString();
+  return days < 30 ? workText("research_picker.valued_ago", { v0: days }) : new Date(then).toLocaleDateString(geoLocale());
 }
 
 function chatTitle(s: SessionListItem): string {
   const raw = (s.name ?? commandPreview(s.firstMessage ?? "")).replace(/\s+/g, " ").trim();
-  return raw || "Untitled chat";
+  return raw || workText("research_picker.untitled_chat");
 }
 
 /** Latest project notebook entries that nothing later amends. */
@@ -82,7 +84,7 @@ function recentRows(entries: NotebookEntry[]): Row[] {
         source: { kind: "notebook", sessionId: e.sessionId as string, entryId: e.id },
       },
       excerpt: e.body?.replace(/\s+/g, " ").slice(0, 160),
-      meta: [e.role, relativeTime(e.timestamp)].filter(Boolean).join(" · "),
+      meta: [e.role ? workLabel("role", e.role) : e.role, relativeTime(e.timestamp)].filter(Boolean).join(" · "),
     }));
 }
 
@@ -98,10 +100,10 @@ function hitRows(result: MemorySearchResponse): Row[] {
     // A title-only match repeats the row title as "title: …"; skip it.
     excerpt: hit.excerpt.startsWith("title: ") ? undefined : hit.excerpt.replace(/\s+/g, " "),
     meta: [
-      hit.author,
+      workLabel("role", hit.author),
       relativeTime(hit.timestamp),
-      hit.recordStatus !== "active" ? hit.recordStatus : "",
-      hit.outcome ? `outcome ${hit.outcome}` : "",
+      hit.recordStatus !== "active" ? workLabel("status", hit.recordStatus) : "",
+      hit.outcome ? workText("research_picker.outcome_value", { v0: workLabel("status", hit.outcome) }) : "",
     ].filter(Boolean).join(" · "),
     muted: hit.recordStatus === "superseded",
   }));
@@ -157,7 +159,7 @@ export function ResearchPickerBody({
             { signal: controller.signal, cache: "no-store" },
             projectId,
           );
-          if (!res.ok) throw new Error(`Notebook unavailable (${res.status})`);
+          if (!res.ok) throw new Error(workText("research_picker.notebook_unavailable_value", { v0: res.status }));
           const data = (await res.json()) as { entries?: NotebookEntry[] };
           setRows(recentRows(data.entries ?? []));
         } else {
@@ -178,13 +180,13 @@ export function ResearchPickerBody({
           const data = (await res.json().catch(() => null)) as
             | (MemorySearchResponse & { detail?: string })
             | null;
-          if (!res.ok || !data) throw new Error(data?.detail || `Search failed (${res.status})`);
+          if (!res.ok || !data) throw new Error(data?.detail || workText("research_picker.search_failed_value", { v0: res.status }));
           setRows(hitRows(data));
         }
       } catch (err) {
         if (controller.signal.aborted) return;
         setRows([]);
-        setError(err instanceof Error ? err.message : "Search failed");
+        setError(err instanceof Error ? err.message : workText("research_picker.search_failed"));
       }
     }, q ? 250 : 0);
     return () => {
@@ -219,7 +221,7 @@ export function ResearchPickerBody({
       .filter(({ title }) => !q || title.toLowerCase().includes(q))
       .map(({ s, title }) => ({
         ref: { kind: "chat" as const, sessionId: s.id, title },
-        meta: [relativeTime(s.modified), `${s.messageCount} messages`].join(" · "),
+        meta: [relativeTime(s.modified), workText("research_picker.value_messages", { v0: s.messageCount })].join(" · "),
       }));
   }, [sessions, query, currentSessionId]);
 
@@ -246,17 +248,17 @@ export function ResearchPickerBody({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={
             mode === "records"
-              ? "Search notebook entries, plans and notes…"
-              : "Filter earlier chats…"
+              ? workText("research_picker.search_notebook_entries_plans_and_notes")
+              : workText("research_picker.filter_earlier_chats")
           }
-          aria-label={mode === "records" ? "Search research records" : "Filter earlier chats"}
+          aria-label={mode === "records" ? workText("research_picker.search_research_records") : workText("research_picker.filter_earlier_chats_598")}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
         />
-        <div className="flex shrink-0 rounded-md border p-0.5" role="radiogroup" aria-label="Research source">
+        <div className="flex shrink-0 rounded-md border p-0.5" role="radiogroup" aria-label={workText("research_picker.research_source")}>
           {(
             [
-              { id: "records", label: "Records", icon: BookOpenIcon },
-              { id: "chats", label: "Chats", icon: MessagesSquareIcon },
+              { id: "records", label: workText("research_picker.records"), icon: BookOpenIcon },
+              { id: "chats", label: workText("research_picker.chats"), icon: MessagesSquareIcon },
             ] as const
           ).map(({ id, label, icon: Icon }) => (
             <button
@@ -307,13 +309,11 @@ export function ResearchPickerBody({
       <div className="max-h-72 overflow-y-auto py-1">
         {idleRecords && rows && rows.length > 0 && (
           <div className="px-3 pt-1 pb-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
-            Recent notebook entries
-          </div>
+            {workText("research_picker.recent_notebook_entries")}</div>
         )}
         {loading ? (
           <div className="flex items-center justify-center gap-2 py-8 text-xs text-muted-foreground">
-            <LoaderIcon className="size-3.5 animate-spin" /> Loading…
-          </div>
+            <LoaderIcon className="size-3.5 animate-spin" /> {workText("research_picker.loading")}</div>
         ) : error ? (
           <div role="alert" className="px-3 py-6 text-center text-xs text-destructive">
             {error}
@@ -322,11 +322,11 @@ export function ResearchPickerBody({
           <div className="px-6 py-8 text-center text-xs text-muted-foreground">
             {mode === "chats"
               ? query.trim()
-                ? "No matching chats."
-                : "No other chats in this project yet."
+                ? workText("research_picker.no_matching_chats")
+                : workText("research_picker.no_other_chats_in_this_project_yet")
               : idleRecords
-                ? "No notebook entries yet. Kady records hypotheses, methods and findings here as it works."
-                : "No matching records."}
+                ? workText("research_picker.no_notebook_entries_yet_kady_records_hypotheses_methods_and_findings_here_as_it_works")
+                : workText("research_picker.no_matching_records")}
           </div>
         ) : (
           visible.map((row) => {
@@ -365,7 +365,7 @@ export function ResearchPickerBody({
                   <div className="flex min-w-0 items-center gap-1.5">
                     {row.ref.kind === "record" && (
                       <span className="shrink-0 rounded bg-sky-500/10 px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-400">
-                        {RECORD_KIND_LABELS[row.ref.type]}
+                        {workText(`record_kind.${row.ref.type}`)}
                       </span>
                     )}
                     <span className="truncate font-medium text-foreground">{row.ref.title}</span>
@@ -388,8 +388,8 @@ export function ResearchPickerBody({
       <div className="flex items-center justify-between gap-3 border-t px-3 py-1.5">
         <span className="text-[10px] text-muted-foreground">
           {mode === "records"
-            ? "Kady reads picked records with notebook_search before relying on them."
-            : "Kady reads a compact snapshot of each picked chat, taken when you send."}
+            ? workText("research_picker.kady_reads_picked_records_with_notebook_search_before_relying_on_them")
+            : workText("research_picker.kady_reads_a_compact_snapshot_of_each_picked_chat_taken_when_you_send")}
         </span>
         {selected.length > 0 && (
           <button
@@ -397,7 +397,7 @@ export function ResearchPickerBody({
             onClick={() => onChange([])}
             className="whitespace-nowrap text-[10px] text-muted-foreground transition-colors hover:text-destructive"
           >
-            Clear {selected.length}
+            {workText("research_picker.clear_count", { count: selected.length })}
           </button>
         )}
       </div>

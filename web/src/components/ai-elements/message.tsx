@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 
 import type { UIMessage } from "ai";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
@@ -280,7 +282,7 @@ export const MessageBranchPrevious = ({
 
   return (
     <Button
-      aria-label="Previous branch"
+      aria-label={workText("message.previous_branch")}
       disabled={totalBranches <= 1}
       onClick={goToPrevious}
       size="icon-sm"
@@ -303,7 +305,7 @@ export const MessageBranchNext = ({
 
   return (
     <Button
-      aria-label="Next branch"
+      aria-label={workText("message.next_branch")}
       disabled={totalBranches <= 1}
       onClick={goToNext}
       size="icon-sm"
@@ -332,7 +334,7 @@ export const MessageBranchPage = ({
       )}
       {...props}
     >
-      {currentBranch + 1} of {totalBranches}
+      {workText("message.branch_page", { current: currentBranch + 1, total: totalBranches })}
     </ButtonGroupText>
   );
 };
@@ -446,7 +448,7 @@ const WorkflowAwareBlock = memo((props: BlockProps) => {
   const lines = fence.body.split("\n").filter((line) => line.trim()).length;
   const detail = agents.length > 0
     ? agents.join(" · ")
-    : `${lines} line${lines === 1 ? "" : "s"}`;
+    : workText("message.line_count", { count: lines });
   return (
     <Collapsible open={open} onOpenChange={setOpen} data-streamdown="workflow-script">
       <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-md border bg-muted/30 px-2.5 py-1.5 text-left text-xs transition-colors hover:bg-muted/60">
@@ -454,9 +456,9 @@ const WorkflowAwareBlock = memo((props: BlockProps) => {
           className={cn("size-3 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
         />
         <WorkflowIcon className="size-3.5 shrink-0 text-muted-foreground" />
-        <span className="font-medium text-foreground">Workflow script</span>
+        <span className="font-medium text-foreground">{workText("message.workflow_script")}</span>
         <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-foreground">
-          {fence.closed && !props.isIncomplete ? detail : "writing…"}
+          {fence.closed && !props.isIncomplete ? detail : workText("message.writing")}
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent>

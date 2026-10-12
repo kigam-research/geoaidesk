@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -48,7 +50,7 @@ export function DelegatePickerBody({
       .catch((err) => {
         if (cancelled) return;
         setAgents([]);
-        setError(err instanceof Error ? err.message : "Couldn't load specialists");
+        setError(err instanceof Error ? err.message : workText("delegate_picker.couldn_t_load_specialists"));
       });
     return () => {
       cancelled = true;
@@ -98,8 +100,8 @@ export function DelegatePickerBody({
           autoFocus={autoFocus}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search specialists…"
-          aria-label="Search specialists"
+          placeholder={workText("delegate_picker.search_specialists")}
+          aria-label={workText("delegate_picker.search_specialists_332")}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
         />
       </div>
@@ -112,23 +114,21 @@ export function DelegatePickerBody({
             title={
               <span className="flex items-center gap-1.5">
                 <SparklesIcon className="size-3 text-primary" />
-                Let Kady choose
-              </span>
+                {workText("delegate_picker.let_kady_choose")}</span>
             }
-            description="Kady splits the work and picks specialists by their descriptions."
+            description={workText("delegate_picker.kady_splits_the_work_and_picks_specialists_by_their_descriptions")}
           />
         )}
         {filtered === null ? (
           <div className="flex items-center justify-center gap-2 py-6 text-xs text-muted-foreground">
-            <LoaderIcon className="size-3.5 animate-spin" /> Loading specialists…
-          </div>
+            <LoaderIcon className="size-3.5 animate-spin" /> {workText("delegate_picker.loading_specialists")}</div>
         ) : error ? (
           <div role="alert" className="px-3 py-4 text-center text-xs text-destructive">
             {error}
           </div>
         ) : filtered.length === 0 ? (
           <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-            {search.trim() ? "No matching specialists." : "No specialists are enabled for this project."}
+            {search.trim() ? workText("delegate_picker.no_matching_specialists") : workText("delegate_picker.no_specialists_are_enabled_for_this_project")}
           </div>
         ) : (
           filtered.map((agent) => (
@@ -141,8 +141,7 @@ export function DelegatePickerBody({
                   <span className="truncate">{agent.name}</span>
                   {agent.verifier && (
                     <span className="shrink-0 rounded bg-emerald-500/10 px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-                      verifier
-                    </span>
+                      {workText("delegate_picker.verifier")}</span>
                   )}
                   {agent.model && (
                     <span className="truncate text-[10px] font-normal text-muted-foreground/70">
@@ -160,33 +159,29 @@ export function DelegatePickerBody({
       <label className="flex cursor-pointer items-start gap-2.5 border-t px-3 py-2.5 text-xs">
         <ShieldCheckIcon className="mt-0.5 size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
         <span className="min-w-0 flex-1">
-          <span className="block font-medium text-foreground">Verify before accepting</span>
+          <span className="block font-medium text-foreground">{workText("delegate_picker.verify_before_accepting")}</span>
           <span className="mt-0.5 block leading-relaxed text-muted-foreground/80">
-            Kady has the best-suited verifier specialist
-            {verifiers.length > 0 ? ` (${verifiers.length} enabled)` : ""} review the result under a
-            verification gate, and accepts it only if the review passes.
+            {workText("delegate_picker.review_gate", { enabled: verifiers.length > 0 ? workText("delegate_picker.enabled_count", { count: verifiers.length }) : "" })}
           </span>
         </span>
         <Switch
           size="sm"
           checked={value.verify}
           onCheckedChange={setVerify}
-          aria-label="Verify before accepting"
+          aria-label={workText("delegate_picker.verify_before_accepting")}
           className="mt-0.5"
         />
       </label>
 
       <div className="flex items-center justify-between gap-3 border-t px-3 py-1.5">
         <span className="text-[10px] text-muted-foreground">
-          Specialists run as sub-agents and are billed like any other run.
-        </span>
+          {workText("delegate_picker.specialists_run_as_sub_agents_and_are_billed_like_any_other_run")}</span>
         <button
           type="button"
           onClick={() => openSettings({ tab: "specialists" })}
           className="whitespace-nowrap text-[10px] text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
         >
-          Manage specialists
-        </button>
+          {workText("delegate_picker.manage_specialists")}</button>
       </div>
     </>
   );

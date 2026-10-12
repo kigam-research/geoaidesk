@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon, WandSparklesIcon, XIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
@@ -66,7 +68,7 @@ export function SkillsPickerBody({
           ref={inputRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search skills..."
+          placeholder={workText("skills_selector.search_skills")}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
         />
         {selected.length > 0 && (
@@ -74,16 +76,14 @@ export function SkillsPickerBody({
             onClick={clearAll}
             className="text-[10px] text-muted-foreground hover:text-destructive transition-colors whitespace-nowrap"
           >
-            Clear all
-          </button>
+            {workText("skills_selector.clear_all")}</button>
         )}
       </div>
 
       <div className="max-h-72 overflow-y-auto py-1">
         {filtered.length === 0 ? (
           <div className="py-8 text-center text-xs text-muted-foreground">
-            No skills found
-          </div>
+            {workText("skills_selector.no_skills_found")}</div>
         ) : (
           filtered.map((skill) => {
             const isSelected = selectedIds.has(skill.id);
@@ -111,7 +111,7 @@ export function SkillsPickerBody({
                     <span className="font-medium text-foreground">{skill.name}</span>
                     {skill.author && (
                       <span className="text-[10px] text-muted-foreground/60">
-                        by {skill.author}
+                        {workText("skills_selector.by")}{skill.author}
                       </span>
                     )}
                   </div>
@@ -132,10 +132,9 @@ export function SkillsPickerBody({
 
       <div className="flex items-center justify-between border-t px-3 py-1.5">
         <span className="text-[10px] text-muted-foreground">
-          Pinned skills stay on until removed
-        </span>
+          {workText("skills_selector.pinned_skills_stay_on_until_removed")}</span>
         <span className="text-[10px] text-muted-foreground">
-          {filtered.length} of {skills.length} skills
+          {workText("skills_selector.filtered_count", { count: filtered.length, total: skills.length })}
         </span>
       </div>
     </>
@@ -186,8 +185,8 @@ export function SkillsSelector({
           <WandSparklesIcon className="size-3 shrink-0 text-muted-foreground" />
           <span className="truncate text-muted-foreground select-none whitespace-nowrap">
             {selected.length === 0
-              ? "Skills"
-              : `${selected.length} skill${selected.length !== 1 ? "s" : ""}`}
+              ? workText("skills_selector.skills")
+              : workText("skills_selector.selected_count", { count: selected.length })}
           </span>
           {selected.length > 0 && (
             <>
@@ -215,8 +214,7 @@ export function SkillsSelector({
                 ))}
                 {selected.length > 3 && (
                   <span className="text-[10px] text-muted-foreground">
-                    +{selected.length - 3} more
-                  </span>
+                    +{selected.length - 3} {workText("skills_selector.more")}</span>
                 )}
               </div>
               <span

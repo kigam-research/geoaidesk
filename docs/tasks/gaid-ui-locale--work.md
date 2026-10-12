@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:22:17Z
+updated: 2026-10-12T22:21:15Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a21bc230-636f-4990-93a2-4ec585bd7fd4","pid":150523,"provider":"codex","session":"01a13070-4ae9-70a0-bd1a-952595f36a03","start":"28002851","token":"87f683810b5cdf3f2e70864a3e7c1dc5338b044f1e4d6447a1c05a77c93a71a0"}
 branch: task/gaid-ui-locale--work
 target: task/gaid-ui-locale
@@ -98,11 +98,16 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed the CLI-owned worktree and read the copy guide, terminology and policy.
+- Installed web dependencies with `npm ci`; source changes have not yet been checked.
+- Single writer owns all listed components plus `work` catalogues. No nested child units.
 ## Next steps
-1. (the next session's first action)
+1. Convert chat/project and activity-panel literals in place; preserve existing app ids and protocol/data strings.
+2. Audit dynamic labels, counts and dates, then run TypeScript, the full web suite, copy validation and the shared scanner.
+3. Record the inventory/evidence, save named paths and finish for parent integration.
 ## Failed approaches
 ## Notes and decisions
+- Sequential integration: shared translation helper and catalogue messages first, then component groups, then dynamic/status audit. File ownership is the starter list; no other upstream files are planned.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

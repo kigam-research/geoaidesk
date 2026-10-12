@@ -1,3 +1,5 @@
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 "use client"
 
 import * as React from "react"
@@ -196,7 +198,7 @@ function CarouselPrevious({
       {...props}
     >
       <ArrowLeft />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">{workText("carousel.previous_slide")}</span>
     </Button>
   )
 }
@@ -226,7 +228,7 @@ function CarouselNext({
       {...props}
     >
       <ArrowRight />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">{workText("carousel.next_slide")}</span>
     </Button>
   )
 }

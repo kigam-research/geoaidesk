@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 
 import { CpuIcon, GpuIcon, HardDriveIcon, MemoryStickIcon } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -83,9 +85,7 @@ export function ResourceMonitor({ className }: { className?: string }) {
             "h-auto gap-2.5 px-2.5 py-1.5 font-mono text-[11px] tabular-nums",
             className,
           )}
-          aria-label={`System resources: CPU ${cpuPct}%, memory ${memPct}%${
-            gpuPct !== null ? `, GPU ${gpuPct}%` : ""
-          }`}
+          aria-label={workText("resource_monitor.resources", { cpu: cpuPct, memory: memPct, gpu: gpuPct !== null ? `, GPU ${gpuPct}%` : "" })}
         >
           <PillSegment icon={CpuIcon} pct={cpuPct} />
           <PillSegment icon={MemoryStickIcon} pct={memPct} />
@@ -94,22 +94,21 @@ export function ResourceMonitor({ className }: { className?: string }) {
       </HoverCardTrigger>
       <HoverCardContent align="end" className="w-80 p-4">
         <div className="text-muted-foreground text-xs uppercase tracking-wide">
-          System resources
-        </div>
+          {workText("resource_monitor.system_resources")}</div>
         <div className="mt-3 space-y-3">
           <MeterRow
             icon={CpuIcon}
             label="CPU"
             pct={cpuPct}
-            detail={`${stats.cpu.cores} cores · app ${stats.cpu.processPct.toFixed(1)}%`}
+            detail={workText("resource_monitor.value_cores_app_value", { v0: stats.cpu.cores, v1: stats.cpu.processPct.toFixed(1) })}
           />
           <MeterRow
             icon={MemoryStickIcon}
-            label="Memory"
+            label={workText("resource_monitor.memory")}
             pct={memPct}
-            detail={`${formatBytes(stats.memory.usedBytes)} / ${formatBytes(
+            detail={workText("resource_monitor.value_value_app_value", { v0: formatBytes(stats.memory.usedBytes), v1: formatBytes(
               stats.memory.totalBytes,
-            )} · app ${formatBytes(stats.memory.processRssBytes)}`}
+            ), v2: formatBytes(stats.memory.processRssBytes) })}
           />
           {stats.gpu && (gpuPct !== null || gpuVramPct !== null) && (
             <MeterRow
@@ -120,26 +119,24 @@ export function ResourceMonitor({ className }: { className?: string }) {
                 stats.gpu.memUsedBytes !== null && stats.gpu.memTotalBytes !== null
                   ? `${formatBytes(stats.gpu.memUsedBytes)} / ${formatBytes(
                       stats.gpu.memTotalBytes,
-                    )} VRAM${gpuPct === null ? " · no utilization counter" : ""}`
-                  : "utilization"
+                    )} VRAM${gpuPct === null ? workText("resource_monitor.no_utilization_counter") : ""}`
+                  : workText("resource_monitor.utilization")
               }
             />
           )}
           {stats.disk && diskPct !== null && (
             <MeterRow
               icon={HardDriveIcon}
-              label="Disk"
+              label={workText("resource_monitor.disk")}
               pct={diskPct}
-              detail={`${formatBytes(stats.disk.freeBytes)} free of ${formatBytes(
+              detail={workText("resource_monitor.value_free_of_value", { v0: formatBytes(stats.disk.freeBytes), v1: formatBytes(
                 stats.disk.totalBytes,
-              )}`}
+              ) })}
             />
           )}
         </div>
         <div className="text-muted-foreground/70 mt-3 text-[11px]">
-          Machine-wide usage, sampled every few seconds. &ldquo;app&rdquo; is the
-          Kady backend process.
-        </div>
+          {workText("resource_monitor.machine_wide_usage_sampled_every_few_seconds_app_is_the_kady_backend_process")}</div>
       </HoverCardContent>
     </HoverCard>
   );

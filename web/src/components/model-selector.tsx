@@ -1,5 +1,6 @@
 "use client";
 import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckIcon,
@@ -132,9 +133,9 @@ function TierDot({ tier, isFusion }: { tier: string; isFusion?: boolean }) {
 }
 
 function formatContext(tokens: number): string {
-  if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1)}M ctx`;
-  if (tokens >= 1_000) return `${Math.round(tokens / 1_000)}K ctx`;
-  return `${tokens} ctx`;
+  if (tokens >= 1_000_000) return workText("model_selector.valuem_ctx", { v0: (tokens / 1_000_000).toFixed(1) });
+  if (tokens >= 1_000) return workText("model_selector.valuek_ctx", { v0: Math.round(tokens / 1_000) });
+  return workText("model_selector.value_ctx", { v0: tokens });
 }
 
 export { DEFAULT_MODEL };

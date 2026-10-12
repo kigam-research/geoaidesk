@@ -1,10 +1,12 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 
 import dynamic from "next/dynamic";
 import { useState, type ComponentProps } from "react";
 
 type SettingsProps = ComponentProps<typeof import("./settings-dialog").SettingsDialog>;
-const loading = () => <div className="p-4 text-sm text-muted-foreground" role="status">Loading…</div>;
+const loading = () => <div className="p-4 text-sm text-muted-foreground" role="status">{workText("lazy_surfaces.loading")}</div>;
 const Settings = dynamic(() => import("./settings-dialog").then((m) => m.SettingsDialog), { loading, ssr: false });
 export const FilePreviewPanel = dynamic(() => import("./file-preview-panel").then((m) => m.FilePreviewPanel), { loading, ssr: false });
 export const WorkflowsPanel = dynamic(() => import("./workflows-panel").then((m) => m.WorkflowsPanel), { loading, ssr: false });

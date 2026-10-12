@@ -1,5 +1,6 @@
 "use client";
 import { geoText } from "@/geo/i18n";
+const workText = geoText("work");
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -159,7 +160,7 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
                   query), so the empty state is just a never-shown fallback. */}
               <CommandEmpty>{appText("projects.switcher.no_projects_found")}</CommandEmpty>
               {visibleProjects.length > 0 && (
-                <CommandGroup heading="Projects">
+                <CommandGroup heading={workText("project_switcher.projects")}>
                   {visibleProjects.map((project) => (
                     <ProjectRow
                       key={project.id}
@@ -179,7 +180,7 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
               {archivedProjects.length > 0 && (
                 <>
                   <CommandSeparator />
-                  <CommandGroup heading="Archived">
+                  <CommandGroup heading={workText("project_switcher.archived")}>
                     {archivedProjects.map((project) => (
                       <ProjectRow
                         key={project.id}

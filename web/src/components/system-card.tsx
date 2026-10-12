@@ -1,4 +1,7 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+import { workLabel } from "@/geo/work-labels";
+const workText = geoText("work");
 
 import { memo, useMemo, useState } from "react";
 import {
@@ -31,27 +34,27 @@ export interface SystemCardKind {
 export function systemCardKind(customType: string | undefined, content?: string): SystemCardKind {
   switch (customType) {
     case "subagent_supervisor_request":
-      return { label: "Subagent needs a decision", Icon: MessageCircleQuestionIcon, tone: "info" };
+      return { label: workText("system_card.subagent_needs_a_decision"), Icon: MessageCircleQuestionIcon, tone: "info" };
     case "subagent_watchdog_warning":
-      return { label: "Watchdog warning", Icon: ShieldAlertIcon, tone: "warning" };
+      return { label: workText("system_card.watchdog_warning"), Icon: ShieldAlertIcon, tone: "warning" };
     case "subagent-notify":
-      return { label: "Background subagent finished", Icon: CheckCircle2Icon, tone: "success" };
+      return { label: workText("system_card.background_subagent_finished"), Icon: CheckCircle2Icon, tone: "success" };
     case "subagent-wait-subscription":
-      return { label: "Background work update", Icon: BellIcon, tone: "info" };
+      return { label: workText("system_card.background_work_update"), Icon: BellIcon, tone: "info" };
     case "subagent_control_notice":
       // pi-subagents' activity monitor: "Subagent needs attention: <agent>" …
       if (content && /^subagent needs attention/i.test(content)) {
-        return { label: "Subagent needs attention", Icon: ActivityIcon, tone: "info" };
+        return { label: workText("system_card.subagent_needs_attention"), Icon: ActivityIcon, tone: "info" };
       }
-      return { label: "Subagent notice", Icon: BellIcon, tone: "info" };
+      return { label: workText("system_card.subagent_notice"), Icon: BellIcon, tone: "info" };
     case "subagent_steering_notice":
-      return { label: "Subagent notice", Icon: BellIcon, tone: "info" };
+      return { label: workText("system_card.subagent_notice"), Icon: BellIcon, tone: "info" };
     case "subagent-slash-text-result":
-      return { label: "Command output", Icon: TerminalSquareIcon, tone: "muted" };
+      return { label: workText("system_card.command_output"), Icon: TerminalSquareIcon, tone: "muted" };
     case "compaction":
-      return { label: "Context compacted", Icon: ScissorsIcon, tone: "muted" };
+      return { label: workText("system_card.context_compacted"), Icon: ScissorsIcon, tone: "muted" };
     default:
-      return { label: "Notice", Icon: BellIcon, tone: "info" };
+      return { label: workText("system_card.notice"), Icon: BellIcon, tone: "info" };
   }
 }
 
@@ -65,19 +68,19 @@ const TONE_CLASSES: Record<SystemCardKind["tone"], string> = {
 /** Details worth a chip, with a human label. Everything else (ids, reply
  * hints for the model, intercom targets, text already in the body) is hidden. */
 const DETAIL_LABELS: Record<string, string> = {
-  agent: "Specialist",
-  reason: "Reason",
-  category: "Category",
-  confidence: "Confidence",
-  source: "Source",
-  status: "Status",
-  state: "State",
-  outcome: "Outcome",
-  runId: "Run",
-  durationMs: "Duration",
-  stalemateRepeats: "Repeats",
-  sessionLabel: "Session",
-  handoffPath: "Result",
+  agent: workText("system_card.specialist"),
+  reason: workText("system_card.reason"),
+  category: workText("system_card.category"),
+  confidence: workText("system_card.confidence"),
+  source: workText("system_card.source"),
+  status: workText("system_card.status"),
+  state: workText("system_card.state"),
+  outcome: workText("system_card.outcome"),
+  runId: workText("system_card.run"),
+  durationMs: workText("system_card.duration"),
+  stalemateRepeats: workText("system_card.repeats"),
+  sessionLabel: workText("system_card.session"),
+  handoffPath: workText("system_card.result"),
 };
 const MONO_DETAILS = new Set(["runId", "handoffPath"]);
 
@@ -91,9 +94,9 @@ function formatTokens(value: unknown): string {
 function formatDetail(key: string, value: string | number | boolean): string {
   if (key === "runId" && typeof value === "string") return value.slice(0, 8);
   if (key === "durationMs" && typeof value === "number") {
-    return value >= 60_000 ? `${Math.round(value / 60_000)} min` : `${Math.max(1, Math.round(value / 1000))} s`;
+    return value >= 60_000 ? workText("system_card.value_min", { v0: Math.round(value / 60_000) }) : workText("system_card.value_s", { v0: Math.max(1, Math.round(value / 1000)) });
   }
-  if (typeof value === "string") return value.replace(/_/g, " ");
+  if (typeof value === "string") return workLabel("status", value, workLabel("code", value, value.replace(/_/g, " ")));
   return String(value);
 }
 
@@ -166,16 +169,15 @@ export const SystemCard = memo(function SystemCard({ message }: { message: ChatM
     return (
       <div
         role="separator"
-        aria-label="Context compacted"
+        aria-label={workText("system_card.context_compacted")}
         className="my-3 flex items-center gap-3 text-[11px] text-muted-foreground"
         data-system-card="compaction"
       >
         <span className="h-px flex-1 bg-border" />
         <span className="flex items-center gap-1.5">
           <kind.Icon className="size-3" />
-          Context compacted
-          {typeof tokensBefore === "number" ? ` · ${formatTokens(tokensBefore)} tokens summarized` : ""}
-          {reason && reason !== "threshold" ? ` · ${reason}` : ""}
+          {workText("system_card.context_compacted")}{typeof tokensBefore === "number" ? workText("system_card.value_tokens_summarized", { v0: formatTokens(tokensBefore) }) : ""}
+          {reason && reason !== "threshold" ? ` · ${workLabel("code", reason)}` : ""}
         </span>
         <span className="h-px flex-1 bg-border" />
       </div>
@@ -202,11 +204,11 @@ export const SystemCard = memo(function SystemCard({ message }: { message: ChatM
               severity === "blocker" ? "bg-red-500/15 text-red-700 dark:text-red-300" : "bg-amber-500/15",
             )}
           >
-            {severity}
+            {workLabel("code", severity)}
           </span>
         )}
         {agent && (
-          <span className="ml-auto rounded bg-background/60 px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground" title="Specialist">
+          <span className="ml-auto rounded bg-background/60 px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground" title={workText("system_card.specialist")}>
             {agent}
           </span>
         )}
@@ -222,7 +224,7 @@ export const SystemCard = memo(function SystemCard({ message }: { message: ChatM
           className="mt-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
           onClick={() => setExpanded((value) => !value)}
         >
-          {expanded ? "Show less" : `Show more (${cut.hiddenLines} more line${cut.hiddenLines === 1 ? "" : "s"})`}
+          {expanded ? workText("system_card.show_less") : workText("system_card.show_more", { count: cut.hiddenLines })}
         </button>
       )}
       {strip.length > 0 && (
