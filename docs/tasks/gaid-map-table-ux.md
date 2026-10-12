@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:26:36Z
+updated: 2026-10-12T09:27:59Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3deaaa94-6146-4a8e-bcdd-a4b418119648","pid":3104588,"provider":"claude","session":"faf47acc-261b-40ba-9a0d-c18d0e922752","start":"26228112","token":"6a36ad34b48eccc61baf2cd33f8b62570ba6f59749ebdf9f20c421a3674a4a1f"}
 branch: task/gaid-map-table-ux
 target: main
@@ -68,11 +68,13 @@ analysis; source CRS vs display CRS stay distinct.
     selection; whole-layer features outside the view are centred, viewport layers are not panned); empty click closes.
     Selection carries the response it indexes, so a newer viewport page drops it.
   - Locale ids appended to `web/src/geo/locales/map/{ko,en}.json`.
-- Verified: `npx tsc --noEmit`, `npx vitest run src/geo/viewers/map` (33 passed), copy validator 0 errors.
-- Own app instance: transient user unit `gaid-mtux-app` (UI 3310, backend 18310), data
-  ~/data/geoaidesk/work/gaid-map-table-ux/ (sample copies), log launcher.log there. Stop it before finishing.
+- Verified: `npx tsc --noEmit`, `npx vitest run src/geo` (13 files, 78 passed), eslint on the map viewer clean,
+  copy validator 0 errors. Browser check (Playwright, ~/data/geoaidesk/work/gaid-map-table-ux/shots.py) against an own
+  dev instance (UI 3310 / backend 18310, sample copies under ~/data/geoaidesk/work/gaid-map-table-ux/projects; unit
+  `gaid-mtux-app`, stopped after the screenshots). Figures in reports/2026-10-12-gaid-map-table-ux/figures/.
+- The dev launcher rewrites server/package-lock.json; restored, never commit it from here.
 ## Next steps
-1. Browser screenshots (desktop/narrow) into reports/2026-10-12-gaid-map-table-ux/, report, scripts/check, finish.
+1. scripts/check result, remove build caches, task finish.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: all three items touch the same viewer files (`index.tsx`, `map-canvas.tsx`), so one writer does them;
@@ -87,6 +89,7 @@ the project hub answers or closes them with `task item`)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-12-gaid-map-table-ux/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
