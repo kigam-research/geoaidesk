@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T05:15:08Z
+updated: 2026-10-12T05:17:26Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"cf93e1d4-8098-4416-9ff1-1dccef16a9fb","pid":2802127,"provider":"claude","session":"fe255641-5fa2-4ca4-b982-22f7cecf734d","start":"24547570","token":"1185ae0ff1a4a7bad0597128501551e71d89b1b4e62647f6e68f7b287c527be9"}
 branch: task/gaid-map-tiles
 target: main
@@ -144,6 +144,8 @@ view later; basemap none / online / both; Markdown image fix in this unit. The u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-12-gaid-map-tiles/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
