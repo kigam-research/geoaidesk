@@ -51,7 +51,7 @@ function PlanningDialog({ entry, sessionId, projectId, model, onSaved }: Props) 
     try {
       const res = await apiFetch(base + suffix, { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, projectId);
       const data = await res.json();
-      if (!res.ok) throw new Error(`${data.detail ?? rt("next_experiments.planning_request_failed")}${data.modelCallRecorded ? rt("next_experiments.usage_recorded", { cost: typeof data.costUsd === "number" ? `: ${data.costUsd.toFixed(6)}` : "" }) : ""}`);
+      if (!res.ok) throw new Error(`${data.detail ?? rt("next_experiments.planning_request_failed")}${data.modelCallRecorded ? rt("next_experiments.usage_recorded", { cost: typeof data.costUsd === "number" ? `: $${data.costUsd.toFixed(6)}` : "" }) : ""}`);
       if (version === epoch.current) return data;
     } catch (e) { if (version === epoch.current) setError(controller.signal.aborted ? rt("next_experiments.request_timed_out_a_model_call_may_still_be_running") : (e as Error).message); }
     finally { clearTimeout(timer); if (version === epoch.current) setBusy(false); }
@@ -69,7 +69,7 @@ function PlanningDialog({ entry, sessionId, projectId, model, onSaved }: Props) 
     finally { clearTimeout(timer); if (version === epoch.current) setBusy(false); }
   }
   async function copy(proposal: NextExperimentProposalView) {
-    try { await navigator.clipboard.writeText(`${nextExperimentsText(proposal.plan)}\n\nSource proposal: ${proposal.source.sessionId}/${proposal.source.entryId}\nDigest: ${proposal.digest}\nContext status: ${valueText(proposal.contextStatus)}\nOmitted source sessions default to ${proposal.source.sessionId}.\nThis is a planning brief, not authorization to execute or spend.`); toast.success(rt("next_experiments.planning_brief_copied_nothing_was_executed")); }
+    try { await navigator.clipboard.writeText(`${nextExperimentsText(proposal.plan)}\n\nSource proposal: ${proposal.source.sessionId}/${proposal.source.entryId}\nDigest: ${proposal.digest}\nContext status: ${proposal.contextStatus}\nOmitted source sessions default to ${proposal.source.sessionId}.\nThis is a planning brief, not authorization to execute or spend.`); toast.success(rt("next_experiments.planning_brief_copied_nothing_was_executed")); }
     catch { toast.error(rt("next_experiments.clipboard_unavailable")); }
   }
   return <>

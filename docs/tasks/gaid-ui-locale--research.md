@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:21:12Z
+updated: 2026-10-12T22:24:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"34dfdfe5-4370-41a2-aa9d-087d58daaee3","pid":158996,"provider":"codex","session":"01a13070-f6e5-7f13-b322-8d8d7f222e12","start":"28007253","token":"06960dbddd7b357f4f70330ac04ab223ed2e636fefb00ebc485286f900d3e23f"}
 branch: task/gaid-ui-locale--research
 target: task/gaid-ui-locale
@@ -71,23 +71,40 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Resumed in the assigned worktree; inspected the six owned components, locale API and copy policy. Implementing the research namespace only.
+Implemented locale-aware research UI in all six owned components and added 480 matching ko/en messages under `web/src/geo/locales/research/`. Includes form/accessibility labels, notices, errors, status enums, source/plan fields, counts and locale-aware dates. Scientific caveats remain explicit. English wording is unchanged; no other upstream files, shared protocols, namespace registration or boundaries were edited.
+
+Verified: `npm ci`; `npx tsc --noEmit`; full web suite (145 files, 972 tests passed); copy validator (16 catalogues, 0 errors, 19 warnings, including 16 reviewed research warnings); scanner; `git diff --check`. All 960 ko/en ICU messages also formatted successfully. No model runs, browser screenshots or deployment were performed; integrated application checks belong to the parent.
+
+Intentionally untranslated: user/model-authored research content, raw server diagnostics/qualifiers and source excerpts, code/JSON, paths/hashes/IDs, model names, units, exported/copy-for-chat protocol text and the default planning-model constraint. Scanner hits are only `--spec JSON_PATH --output RESULT_PATH` and `python3 -I verify.py`, both executable command syntax.
+
+Checkpoint pushed as `883423ebde4c`. Final checked changes are ready for save/finish and parent integration with `task complete gaid-ui-locale--research`.
 ## Next steps
-1. Localize static and parameterized messages in the six owned components.
-2. Review enum labels and imported UI constants without changing shared protocols.
-3. Run frontend typecheck, full web tests, copy validator and scanner, then save and finish.
+1. Save the reviewed final files and run `task finish`.
+2. Parent integrates the child and performs integrated application verification; no child deployment is required.
 ## Failed approaches
+- Initial full web suite found a missing literal `$` in the model-usage error notice. Restored the original currency notation; full suite then passed without test changes.
+- Typecheck after parameterizing the SVG tooltip required an assertion for the estimate already guaranteed by the plotted-attempt filter. Added the type-only assertion; typecheck passed.
+- A provider capacity failure interrupted the session. Continued in place and pushed a checkpoint before further work; no jobs or edits were discarded.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Sequential decisions: preserve English UI and protocol values; translate presentation only; keep all scientific limitations. Owned interface: research namespace plus the six listed components. Work is tightly coupled and needed no delegated workers or nested units. Integration belongs to the parent.
+
+The copy validator's 16 research warnings were reviewed: automatic inclusion is implemented and bounded; sensitive content is explicitly not automatically redacted; wording about validated predictions/manuscripts is negative limitation text, not a claim; the ZIP-removal question is a real confirmation. Existing English question labels and em-dash wording are preserved as required by the English-compatibility contract. No copy errors remain.
+
+Copy change ledger: before this task the research namespace was empty and Korean mode showed the components' inline English. Every id's previous English text is retained in `web/src/geo/locales/research/en.json`; its Korean replacement is at the same id in `ko.json`. English before/after is identical, with ICU escaping and parameters preserving rendered text. Representative changes:
+
+| String id | Korean before | Korean after | English before / after |
+| --- | --- | --- | --- |
+| `research.robustness.stress_test_finding` | Stress-test finding | 결과 강건성 시험 | Stress-test finding |
+| `research.plan.analysis_plan` | Analysis plan | 분석 계획 | Analysis plan |
+| `research.next_experiments.what_next` | What next? | 후속 실험 제안 | What next? |
+| `research.memory.project_research_memory` | Project research memory | 프로젝트 연구 메모리 | Project research memory |
+| `research.evidence_package.not_reproduced` | Not reproduced. | 재현하지 않음. | Not reproduced. |
+
+Safe re-verification from this worktree: `cd web && npx tsc --noEmit && npm run test`; then from root run `node geo/copy/validate-copy.mjs web/src/geo/locales` and `node ~/data/geoaidesk/work/gaid-ui-locale/tools/scan.mjs web/src --list`. Logs are under `~/data/geoaidesk/work/gaid-ui-locale--research/` (`web-tests.log`, `copy.log`, `scan.json`). No extra tests were added for wording.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child implementation result is recorded above for the parent's canonical report; no separate child report.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

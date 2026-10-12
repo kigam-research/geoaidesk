@@ -35,7 +35,7 @@ export function RobustnessResults({ workflow, onOpenFile }: { workflow: Robustne
     {plotted.length > 0 && <figure className="overflow-x-auto rounded border p-2">
       <svg role="img" aria-label={rt("robustness.specification_estimates_and_supplied_uncertainty_intervals")} viewBox={`0 0 660 ${plotted.length * 30 + 35}`} className="w-full min-w-[560px]">
         <line x1={x(preview.draft.nullValue)} x2={x(preview.draft.nullValue)} y1="5" y2={plotted.length * 30 + 10} stroke="currentColor" strokeDasharray="3 3" opacity="0.4" />
-        {plotted.map((a, i) => <g key={a.jobId}><title>{rt("robustness.qc_message", { value1: a.specification.label, value2: a.result!.estimate, value3: valueText(a.result!.qc) })}</title>
+        {plotted.map((a, i) => <g key={a.jobId}><title>{rt("robustness.qc_message", { value1: a.specification.label, value2: a.result!.estimate!, value3: valueText(a.result!.qc) })}</title>
           <text x="4" y={i * 30 + 24} fill="currentColor" fontSize="11">{a.specification.key.slice(0, 30)}</text>
           {a.result!.interval && <line x1={x(a.result!.interval.low)} x2={x(a.result!.interval.high)} y1={i * 30 + 20} y2={i * 30 + 20} stroke={a.result!.qc === "pass" ? "#0d9488" : "#d97706"} strokeWidth="2" />}
           <circle cx={x(a.result!.estimate!)} cy={i * 30 + 20} r="4" fill={a.result!.qc === "pass" ? "#0d9488" : "#d97706"} />
