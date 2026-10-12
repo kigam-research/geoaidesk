@@ -411,10 +411,10 @@
       "responsibility": "gaid-ui-locale (work): visible strings read through t() from web/src/geo/locales/work/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Chat window, composer, tabs, tool activity, automation, Modal jobs, specialist fleet, cost pill, pickers, project screens and shared UI primitives"
     },
     {
-      "path": "web/src/components/workflows-panel.tsx, web/src/components/workflow-inputs.tsx, web/src/lib/workflow-inputs.ts",
+      "path": "web/src/components/workflows-panel.tsx, web/src/components/workflow-inputs.tsx, web/src/lib/workflow-inputs.ts, web/src/data/workflows.json",
       "owner": "gaid-ui-locale",
       "status": "edited",
-      "responsibility": "gaid-ui-locale (workflows): visible strings read through t() from web/src/geo/locales/workflows/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Upstream workflow panel: category labels, row names, descriptions and input labels from web/src/geo/locales/workflows (keyed by workflow id; upstream web/src/data/workflows.json stays the English source and the fallback for ids without a translation); prompts stay as shipped"
+      "responsibility": "gaid-ui-locale (workflows): visible strings read through t() from web/src/geo/locales/workflows/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Upstream workflow panel: category labels, row names, descriptions and input labels from web/src/geo/locales/workflows (keyed by workflow id; upstream web/src/data/workflows.json stays the English source and the fallback for ids without a translation); prompts stay as shipped; web/src/data/workflows.json: one English description (comparative-genomics) reworded for the copy validator so the en catalogue equals the upstream source (web/src/geo/workflows-locale.test.tsx checks parity; regenerate en with web/src/geo/locales/workflows/generate-en.mjs after an upstream sync)"
     }
   ],
   "notTouched": [
