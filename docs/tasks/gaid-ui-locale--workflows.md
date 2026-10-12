@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-12T14:06:49Z
-writer: {"host":"seongin3","reserved":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
 parent: gaid-ui-locale
