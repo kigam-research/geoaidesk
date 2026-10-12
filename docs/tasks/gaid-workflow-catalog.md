@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T09:59:09Z
+status: done
+updated: 2026-10-12T09:59:18Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3bd27baa-1dd6-4dc1-8996-69912d62ed83","pid":3106452,"provider":"claude","session":"4dd2c1b6-66b7-42cc-9f2d-f81be1d0f80f","start":"26229284","token":"fc2e7c07fe890e3f4986ff5dd2613f603b3589ae70ba499e96df0ca073ac705c"}
 branch: task/gaid-workflow-catalog
 target: main
@@ -75,7 +75,9 @@ Scope (from the request):
   ~/data/geoaidesk/work/gaid-workflow-catalog/child-skill-hub.md. On its finish: `task complete gaid-workflow-catalog--skill-hub`,
   then `task sync` and integrate its report section into the parent report.
 ## Next steps
-1. `task finish` (done criteria met; checks passed 2026-10-12, log ~/data/geoaidesk/work/gaid-workflow-catalog/check.log).
+<!-- task:closed -->
+Closed 2026-10-12T09:59:18Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Plan (writer does it all; parts are tightly coupled, no child writers):
