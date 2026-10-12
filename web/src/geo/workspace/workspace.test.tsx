@@ -121,14 +121,14 @@ describe("task catalogue and setup", () => {
   it("lists Geoscience first in the upstream list, searches both, and keeps upstream when geo is off", async () => {
     const view = catalogue(); await screen.findByRole("button", { name: /^Well log QC well-qc/ });
     const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
-    expect(headings[0]).toMatch(/^Geoscience/); expect(headings).toContainEqual(expect.stringMatching(/^Paper & Manuscript/));
+    expect(headings[0]).toMatch(/^Geoscience/); expect(headings).toContainEqual(expect.stringMatching(/^논문·원고/));
     expect(screen.getByRole("button", { name: "Geoscience" })).toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "las" } });
-    expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^Review a Paper/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^논문 검토/ })).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "review a paper" } });
-    expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^Review a Paper/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument();
     view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^Review a Paper/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
   });
   it("explicitly prepares the project environment and refreshes readiness", async () => {
     rows = [workflow("needs-environment")]; catalogue(); const dialog = await openSetup(); within(dialog).getByText("환경 준비 필요: Geo core"); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
@@ -164,7 +164,7 @@ describe("task catalogue and setup", () => {
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
     expect(await within(dialog).findByLabelText("레시피 제목")).toHaveValue("Well log QC well-qc");
     const options = within(within(dialog).getByLabelText("카테고리")).getAllByRole("option").map((option) => option.textContent);
-    expect(options[0]).toBe("Geoscience"); expect(options).toContain("Paper & Manuscript"); expect(options.at(-1)).toBe("새 카테고리 추가");
+    expect(options[0]).toBe("Geoscience"); expect(options).toContain("논문·원고"); expect(options.at(-1)).toBe("새 카테고리 추가");
     fireEvent.change(within(dialog).getByLabelText("레시피 제목"), { target: { value: "MD 기준 QC" } });
     fireEvent.change(within(dialog).getByLabelText("카테고리"), { target: { value: "__new__" } });
     expect(within(dialog).getByRole("button", { name: "레시피 저장" })).toBeDisabled();
@@ -193,7 +193,7 @@ describe("task catalogue and setup", () => {
   it("keeps a saved recipe the catalogue rejects and explains why", async () => {
     saved = { categories: [], recipes: [{ id: "00000000-0000-4000-8000-000000000002", title: "옛 레시피", category: "paper", recipe: { ...okRecipe, catalogueVersion: "0.1.0" }, savedAt: "2026-10-12T00:00:00Z", check: { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "x" }] } }] };
     catalogue(); const row = await screen.findByRole("button", { name: /^옛 레시피/ });
-    expect(within(row).getByText("사용 불가")).toBeInTheDocument(); expect(screen.getByRole("heading", { name: /^Paper & Manuscript/ })).toBeInTheDocument();
+    expect(within(row).getByText("사용 불가")).toBeInTheDocument(); expect(screen.getByRole("heading", { name: /^논문·원고/ })).toBeInTheDocument();
     await userEvent.click(row); const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0");
   });

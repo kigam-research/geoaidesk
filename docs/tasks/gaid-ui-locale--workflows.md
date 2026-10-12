@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:23:35Z
+updated: 2026-10-12T14:25:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -68,12 +68,12 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend suite pending.
+Implemented workflow localization: 1,197 bilingual messages (326 names, 326 descriptions, 484 row input labels, 22 category labels, 39 panel/dialog/input messages). Modified assigned panel/input components; lib/workflow-inputs.ts remains unchanged because it contains only model-facing prompt assembly. Generated en rows with namespace-local generate-en.mjs. Added six locale contract/integration tests covering complete row/input coverage, English/source parity, ICU fidelity, future-row fallback, translated+English search, and Korean launch/prompt preservation. Targeted tests pass (6 new, 22 existing); frontend TypeScript passes. Source comparison verifies all 326 prompts and placeholder definitions are unchanged. Copy validator: zero errors, seven warnings (four new reviewed below). Scanner: zero hits in assigned files. Full frontend job 2 reached all 978 tests: 975 passed, 3 failed only because geo/workspace/workspace.test.tsx expected English upstream categories/rows in its explicitly Korean locale. Updated those hard-coded assertions only; full-suite recheck pending.
 
 Other upstream file touched: web/src/data/workflows.json, one comparative-genomics description only, required by copy-validator error. Parent must register this seam in geo/integration-boundaries.json.
 
 ## Next steps
-1. Save reviewed files, run full frontend suite as a recorded job, then finish.
+1. Recheck updated Korean integration expectations, save them, run the full frontend suite again, then finish.
 2. Parent integrates and performs whole-app scripts/check/browser checks.
 
 ## Checks
@@ -81,6 +81,7 @@ Other upstream file touched: web/src/data/workflows.json, one comparative-genomi
 - Parent owns whole-app scripts/check as stated in the child contract.
 
 ## Failed approaches
+- Job 2 (exit 1): 145/146 files and 975/978 tests passed. Three workspace integration tests hard-coded English labels despite setting ko-KR. Update only affected display assertions to Korean; mocked upstream source text and all tested behavior remain unchanged.
 - Full frontend job 1 exited 127: immutable job snapshot excludes node_modules, so vitest was unavailable. Replace with a self-contained check job that runs npm ci before npm test; source changes are not required.
 - Copy validation rejects upstream comparative-genomics description (“evolutionary insights”) as empty-capability. Under the contract’s explicit English-copy-error exception, changed only that description to “Compare genomes across species to examine evolutionary relationships”, in source JSON and generated en catalogue. No prompt changed. Parent must register web/src/data/workflows.json in integration-boundaries (child is forbidden from editing the shared boundaries file).
 ## Notes and decisions
