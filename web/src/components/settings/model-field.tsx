@@ -16,6 +16,8 @@ import { ModelPickerList } from "@/components/model-selector";
 import { useModels } from "@/lib/use-models";
 import { cn } from "@/lib/utils";
 
+const settingsText = geoText("settings");
+
 const appText = geoText("app");
 
 export function ModelField({
@@ -82,7 +84,7 @@ export function ModelField({
             id={id}
             type="button"
             disabled={disabled}
-            aria-label={`${label}: ${value ? (selected?.label ?? value) : (emptyLabel ?? "none")}`}
+            aria-label={`${label}: ${value ? (selected?.label ?? value) : (emptyLabel ?? settingsText("shared.none"))}`}
             className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border bg-background px-2.5 text-left text-xs hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className={cn("min-w-0 flex-1 truncate", !value && "text-muted-foreground")}>

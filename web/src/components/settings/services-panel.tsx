@@ -1,4 +1,6 @@
 "use client";
+import { SettingsMessage } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -22,30 +24,32 @@ import { cn } from "@/lib/utils";
 import { GetKeyLink, KeyRow, useCredentialStatus, type CredentialStatus, type KeyDef } from "./key-row";
 import { SettingsCard, SettingsError, SettingsHeader } from "./primitives";
 
+const settingsText = geoText("settings");
+
 const SEARCH_KEY_DEFS: KeyDef[] = [
   {
     id: "exa",
     bodyField: "exaApiKey",
-    label: "Exa API key",
+    label: settingsText("services.exa_api_key"),
     placeholder: "exa-…",
     keysUrl: "https://dashboard.exa.ai/api-keys",
-    hint: "Direct Exa web + code search. Without it, web search still works via a free Exa fallback.",
+    hint: settingsText("services.direct_exa_web_code_search_without_it_web_search_still_works_via_a_free_exa_fallback"),
   },
   {
     id: "perplexity",
     bodyField: "perplexityApiKey",
-    label: "Perplexity API key",
+    label: settingsText("services.perplexity_api_key"),
     placeholder: "pplx-…",
     keysUrl: "https://www.perplexity.ai/settings/api",
-    hint: "Synthesized web answers with citations as an alternative search provider.",
+    hint: settingsText("services.synthesized_web_answers_with_citations_as_an_alternative_search_provider"),
   },
   {
     id: "gemini",
     bodyField: "geminiApiKey",
-    label: "Gemini API key",
+    label: settingsText("services.gemini_api_key"),
     placeholder: "AIza…",
     keysUrl: "https://aistudio.google.com/apikey",
-    hint: "Search fallback plus YouTube and video understanding for fetched links. It is the same GEMINI_API_KEY that unlocks Google Gemini models under Providers.",
+    hint: settingsText("services.search_fallback_plus_youtube_and_video_understanding_for_fetched_links_it_is_the_same_gemi"),
     notifyProviders: true,
   },
 ];
@@ -53,11 +57,11 @@ const SEARCH_KEY_DEFS: KeyDef[] = [
 const PAPERCLIP_KEY_DEF: KeyDef = {
   id: "paperclip",
   bodyField: "paperclipApiKey",
-  label: "Paperclip API key",
+  label: settingsText("services.paperclip_api_key"),
   placeholder: "gxl_…",
   keysUrl: "https://paperclip.gxl.ai/keys",
-  hint: "Checked with Paperclip before it is saved. The connector reads the key from .env by name, so it is never copied into the connector settings.",
-  savedNote: "Saved. New chat tabs can search Paperclip — no restart needed.",
+  hint: settingsText("services.checked_with_paperclip_before_it_is_saved_the_connector_reads_the_key_from_env_by_name_so"),
+  savedNote: settingsText("services.saved_new_chat_tabs_can_search_paperclip_no_restart_needed"),
 };
 
 /**
@@ -81,7 +85,7 @@ function PaperclipCard({
       setConnector(await getPaperclipConnector());
       setError(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not load the Paperclip connector");
+      setError(cause instanceof Error ? cause.message : settingsText("services.could_not_load_the_paperclip_connector"));
     }
   }, []);
 
@@ -96,7 +100,7 @@ function PaperclipCard({
       await connectPaperclipConnector();
       await load();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not turn on the Paperclip connector");
+      setError(cause instanceof Error ? cause.message : settingsText("services.could_not_turn_on_the_paperclip_connector"));
     } finally {
       setBusy(false);
     }
@@ -110,8 +114,8 @@ function PaperclipCard({
   return (
     <SettingsCard
       id="paperclip"
-      title="Paperclip literature search"
-      description="Lets the agent search and read papers, preprints, clinical trials, FDA documents and patents. Saving a key adds a Paperclip connector shared by every project."
+      title={settingsText("services.paperclip_literature_search")}
+      description={settingsText("services.lets_the_agent_search_and_read_papers_preprints_clinical_trials_fda_documents_and_patents")}
     >
       <KeyRow
         def={PAPERCLIP_KEY_DEF}
@@ -139,15 +143,15 @@ function PaperclipCard({
           )}
           <span className="min-w-0 flex-1">
             {ready ? (
-              <>Connector {name} is on for every project.</>
+              <SettingsMessage id="services.connector_ready" values={{ name }} />
             ) : !keySet ? (
-              <>Connector {name} signs in to Paperclip without a key.</>
+              <SettingsMessage id="services.connector_without_key" values={{ name }} />
             ) : !connector.name ? (
-              "Your key is saved, but there is no Paperclip connector."
+              settingsText("services.your_key_is_saved_but_there_is_no_paperclip_connector")
             ) : !connector.usesKey ? (
-              <>Connector {name} signs in another way and does not use this key.</>
+              <SettingsMessage id="services.connector_other_auth" values={{ name }} />
             ) : (
-              <>Connector {name} is turned off.</>
+              <SettingsMessage id="services.connector_disabled" values={{ name }} />
             )}
           </span>
           {keySet && !ready ? (
@@ -159,18 +163,13 @@ function PaperclipCard({
               disabled={busy}
               onClick={() => void connect()}
             >
-              {busy ? "Turning on…" : connector.usesKey || !connector.name ? "Turn on" : "Use this key"}
+              {busy ? settingsText("services.turning_on") : connector.usesKey || !connector.name ? settingsText("services.turn_on") : settingsText("services.use_this_key")}
             </Button>
           ) : null}
         </div>
       ) : null}
       {connector && !keySet && !signsInWithoutKey ? (
-        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-          No key? Add{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-[10px]">{connector.url}</code> under{" "}
-          <SettingsLink tab="connectors">Connectors</SettingsLink> and sign in with your Paperclip
-          account instead.
-        </p>
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground"><SettingsMessage id="services.paperclip_sign_in" values={{ url: <code className="rounded bg-muted px-1 py-0.5 text-[10px]">{connector.url}</code>, connectors: <SettingsLink tab="connectors">{settingsText("services.connectors")}</SettingsLink> }} /></p>
       ) : null}
     </SettingsCard>
   );
@@ -242,7 +241,7 @@ function ModalCredentialPair({
     existingConnected ? "connected" : existingPartial ? "error" : "idle",
   );
   const [error, setError] = useState<string | null>(
-    existingPartial ? "Both Modal token fields must be set together." : null,
+    existingPartial ? settingsText("services.both_modal_token_fields_must_be_set_together") : null,
   );
   const { confirm, dialog } = useConfirm();
 
@@ -252,7 +251,7 @@ function ModalCredentialPair({
       setError(null);
     } else if (Boolean(tokenIdStatus?.set) !== Boolean(tokenSecretStatus?.set)) {
       setConnectionState("error");
-      setError("Both Modal token fields must be set together.");
+      setError(settingsText("services.both_modal_token_fields_must_be_set_together"));
     }
   }, [tokenIdStatus?.set, tokenSecretStatus?.set]);
 
@@ -260,7 +259,7 @@ function ModalCredentialPair({
     async (clear = false) => {
       if (!clear && (!tokenId.trim() || !tokenSecret.trim())) {
         setConnectionState("error");
-        setError("Enter both the Modal token ID and token secret.");
+        setError(settingsText("services.enter_both_the_modal_token_id_and_token_secret"));
         return;
       }
       setConnectionState("testing");
@@ -285,7 +284,7 @@ function ModalCredentialPair({
           throw new Error(
             connection.detail ??
               errorDetail(body) ??
-              (response.ok ? "Modal rejected this token pair." : `Modal connection failed (${response.status})`),
+              (response.ok ? settingsText("services.modal_rejected_this_token_pair") : settingsText("services.modal_connection_failed", { v0: response.status })),
           );
         }
         const nextStatus = credentialStatusFromResponse(body);
@@ -296,7 +295,7 @@ function ModalCredentialPair({
         notifyModalCredentialsChanged();
       } catch (cause) {
         setConnectionState("error");
-        setError(cause instanceof Error ? cause.message : "Modal connection failed");
+        setError(cause instanceof Error ? cause.message : settingsText("services.modal_connection_failed_104"));
       }
     },
     [onStatus, tokenId, tokenSecret],
@@ -304,10 +303,10 @@ function ModalCredentialPair({
 
   const clearPair = async () => {
     const ok = await confirm({
-      title: "Disconnect Modal?",
+      title: settingsText("services.confirm.disconnect_modal"),
       description:
-        "New remote jobs will be refused until you connect a token pair again. Jobs already running keep their records.",
-      confirmLabel: "Disconnect",
+        settingsText("services.new_remote_jobs_will_be_refused_until_you_connect_a_token_pair_again_jobs_already_running"),
+      confirmLabel: settingsText("services.disconnect"),
       destructive: true,
     });
     if (ok) await savePair(true);
@@ -316,8 +315,8 @@ function ModalCredentialPair({
   return (
     <SettingsCard
       id="modal"
-      title="Modal compute"
-      description="Save and validate the token ID and secret as one pair. The pair enables durable CPU and GPU jobs without restarting Kady; pick a target per chat with the compute chip."
+      title={settingsText("services.modal_compute")}
+      description={settingsText("services.save_and_validate_the_token_id_and_secret_as_one_pair_the_pair_enables_durable_cpu_and_gpu")}
     >
       {dialog}
       <div
@@ -342,28 +341,28 @@ function ModalCredentialPair({
         )}
         <span className="min-w-0 flex-1">
           {connectionState === "testing"
-            ? "Testing Modal connection…"
+            ? settingsText("services.testing_modal_connection")
             : connectionState === "connected"
-              ? "Connected — Modal compute is ready."
+              ? settingsText("services.connected_modal_compute_is_ready")
               : connectionState === "error"
-                ? (error ?? "Modal connection failed.")
-                : "Not connected"}
+                ? (error ?? settingsText("services.modal_connection_failed_112"))
+                : settingsText("services.not_connected")}
         </span>
         {(tokenIdStatus?.set || tokenSecretStatus?.set) && connectionState !== "testing" ? (
           <span className="hidden shrink-0 font-mono text-[10px] sm:inline">
-            {tokenIdStatus?.masked ?? "ID missing"} · {tokenSecretStatus?.masked ?? "secret missing"}
+            {tokenIdStatus?.masked ?? settingsText("services.id_missing")} · {tokenSecretStatus?.masked ?? settingsText("services.secret_missing")}
           </span>
         ) : null}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="space-y-1.5 text-[11px] font-medium">
-          <span>Token ID</span>
+          <span>{settingsText("services.token_id")}</span>
           <Input
             type="password"
             value={tokenId}
             autoComplete="off"
-            placeholder={tokenIdStatus?.set ? "Replace ak-…" : "ak-…"}
+            placeholder={tokenIdStatus?.set ? settingsText("services.replace_ak") : "ak-…"}
             className="h-8 font-mono text-xs"
             onChange={(event) => {
               setTokenId(event.target.value);
@@ -375,12 +374,12 @@ function ModalCredentialPair({
           />
         </label>
         <label className="space-y-1.5 text-[11px] font-medium">
-          <span>Token Secret</span>
+          <span>{settingsText("services.token_secret")}</span>
           <Input
             type="password"
             value={tokenSecret}
             autoComplete="off"
-            placeholder={tokenSecretStatus?.set ? "Replace as-…" : "as-…"}
+            placeholder={tokenSecretStatus?.set ? settingsText("services.replace_as") : "as-…"}
             className="h-8 font-mono text-xs"
             onChange={(event) => {
               setTokenSecret(event.target.value);
@@ -401,7 +400,7 @@ function ModalCredentialPair({
         <GetKeyLink
           href="https://modal.com/settings/tokens"
           service="Modal token pair"
-          label="Get a token"
+          label={settingsText("services.get_a_token")}
           className="mr-auto"
         />
         {tokenIdStatus?.set || tokenSecretStatus?.set ? (
@@ -413,7 +412,7 @@ function ModalCredentialPair({
             onClick={() => void clearPair()}
             className="text-xs text-destructive hover:text-destructive"
           >
-            Clear pair
+            {settingsText("services.clear_pair")}
           </Button>
         ) : null}
         <Button
@@ -423,7 +422,7 @@ function ModalCredentialPair({
           onClick={() => void savePair()}
           className="text-xs"
         >
-          {connectionState === "testing" ? "Testing…" : "Save & test"}
+          {connectionState === "testing" ? settingsText("services.testing") : settingsText("services.save_test")}
         </Button>
       </div>
     </SettingsCard>
@@ -445,11 +444,11 @@ function ModalCacheCard({ connected }: { connected: boolean }) {
   const load = useCallback(async () => {
     try {
       const res = await apiFetch("/modal/cache");
-      if (!res.ok) throw new Error(`Failed to load the cache (${res.status})`);
+      if (!res.ok) throw new Error(settingsText("services.failed_to_load_the_cache", { v0: res.status }));
       setInfo((await res.json()) as ModalCacheInfo);
       setError(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Failed to load the cache");
+      setError(cause instanceof Error ? cause.message : settingsText("services.failed_to_load_the_cache_126"));
     }
   }, []);
 
@@ -459,10 +458,10 @@ function ModalCacheCard({ connected }: { connected: boolean }) {
 
   const clear = async () => {
     const ok = await confirm({
-      title: "Clear the remote cache?",
+      title: settingsText("services.confirm.clear_the_remote_cache"),
       description:
-        "Deletes this project's Modal Volume. Files in the project sandbox are not touched; the next job that uses the cache starts cold.",
-      confirmLabel: "Clear cache",
+        settingsText("services.deletes_this_project_s_modal_volume_files_in_the_project_sandbox_are_not_touched_the_next"),
+      confirmLabel: settingsText("services.clear_cache"),
       destructive: true,
     });
     if (!ok) return;
@@ -470,10 +469,10 @@ function ModalCacheCard({ connected }: { connected: boolean }) {
     try {
       const res = await apiFetch("/modal/cache", { method: "DELETE" });
       const body = (await res.json().catch(() => null)) as { detail?: string } | null;
-      if (!res.ok) throw new Error(body?.detail || `Clear failed (${res.status})`);
+      if (!res.ok) throw new Error(body?.detail || settingsText("services.clear_failed", { v0: res.status }));
       await load();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Clear failed");
+      setError(cause instanceof Error ? cause.message : settingsText("services.clear_failed_131"));
     } finally {
       setBusy(false);
     }
@@ -483,18 +482,18 @@ function ModalCacheCard({ connected }: { connected: boolean }) {
   return (
     <SettingsCard
       id="modal-cache"
-      title="Remote cache"
-      description={`Optional Modal Volume that speeds up repeat jobs for the current project (${projectName}). It is a cache only — results always land in the local sandbox.`}
+      title={settingsText("services.remote_cache")}
+      description={settingsText("services.optional_modal_volume_that_speeds_up_repeat_jobs_for_the_current_project_it_is_a_cache_onl", { v0: projectName })}
     >
       {dialog}
       <SettingsError className="mb-2">{error}</SettingsError>
       <div className="flex items-center gap-3 text-xs">
         <span className="min-w-0 flex-1 text-muted-foreground">
           {info === null
-            ? "Loading…"
+            ? settingsText("services.loading")
             : info.cache
-              ? <>Volume <code className="font-mono">{info.cache.volumeName}</code></>
-              : "No cache yet — it is created by the first job that asks for one."}
+              ? <>{settingsText("services.volume")}<code className="font-mono">{info.cache.volumeName}</code></>
+              : settingsText("services.no_cache_yet_it_is_created_by_the_first_job_that_asks_for_one")}
         </span>
         <Button
           type="button"
@@ -502,10 +501,10 @@ function ModalCacheCard({ connected }: { connected: boolean }) {
           variant="outline"
           className="text-xs"
           disabled={!info?.cache || busy || !connected}
-          title={connected ? undefined : "Connect Modal first"}
+          title={connected ? undefined : settingsText("services.connect_modal_first")}
           onClick={() => void clear()}
         >
-          {busy ? "Clearing…" : "Clear cache"}
+          {busy ? settingsText("services.clearing") : settingsText("services.clear_cache")}
         </Button>
       </div>
     </SettingsCard>
@@ -519,27 +518,21 @@ export function ServicesPanel() {
   return (
     <div className="flex flex-col gap-4">
       <SettingsHeader
-        title="Services"
-        description={
-          <>
-            Keys for the tools Kady uses besides models. They stay on this machine (saved to{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-[11px]">.env</code>) — nothing is sent
-            to K-Dense.
-          </>
-        }
+        title={settingsText("services.services")}
+        description={<SettingsMessage id="services.intro" values={{ file: <code className="rounded bg-muted px-1 py-0.5">.env</code> }} />}
         appliesTo="immediately"
       />
 
       <SettingsError>{error}</SettingsError>
 
       {loading ? (
-        <p className="text-xs text-muted-foreground">Loading…</p>
+        <p className="text-xs text-muted-foreground">{settingsText("services.loading")}</p>
       ) : (
         <>
           <SettingsCard
             id="web-search"
-            title="Web search"
-            description="All optional: web search, page fetching, and GitHub reading work without any of them."
+            title={settingsText("services.web_search")}
+            description={settingsText("services.all_optional_web_search_page_fetching_and_github_reading_work_without_any_of_them")}
           >
             <div className="flex flex-col gap-5">
               {SEARCH_KEY_DEFS.map((def) => (
@@ -553,13 +546,7 @@ export function ServicesPanel() {
         </>
       )}
 
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
-        A few knobs are read from{" "}
-        <code className="rounded bg-muted px-1 py-0.5 text-[10px]">.env</code> at startup only —
-        e.g. <code className="rounded bg-muted px-1 py-0.5 text-[10px]">GITHUB_TOKEN</code> (update
-        checks) and <code className="rounded bg-muted px-1 py-0.5 text-[10px]">HTTPS_PROXY</code>{" "}
-        (outbound proxy). Restart Kady after changing them.
-      </p>
+      <p className="text-[11px] leading-relaxed text-muted-foreground"><SettingsMessage id="services.restart_help" values={{ file: <code className="rounded bg-muted px-1 py-0.5 text-[10px]">.env</code>, github: <code className="rounded bg-muted px-1 py-0.5 text-[10px]">GITHUB_TOKEN</code>, proxy: <code className="rounded bg-muted px-1 py-0.5 text-[10px]">HTTPS_PROXY</code> }} /></p>
     </div>
   );
 }

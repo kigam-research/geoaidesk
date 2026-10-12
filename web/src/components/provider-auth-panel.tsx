@@ -1,4 +1,6 @@
 "use client";
+import { settingsSourceText } from "@/components/settings/primitives";
+import { geoText } from "@/geo/i18n";
 
 import { useMemo, useState } from "react";
 import {
@@ -18,6 +20,8 @@ import {
   type ModelProviderStatus,
 } from "@/lib/use-provider-auth";
 
+const settingsText = geoText("settings");
+
 export function ProviderAuthPanel() {
   const auth = useProviderAuth();
   const [selectedId, setSelectedId] = useState<ModelProviderStatus["id"] | null>(
@@ -33,10 +37,10 @@ export function ProviderAuthPanel() {
 
   const disconnect = async (provider: ModelProviderStatus) => {
     const ok = await confirm({
-      title: `Disconnect ${provider.accountLabel}?`,
+      title: settingsText("provider_auth.confirm.disconnect", { v0: settingsSourceText(provider.accountLabel) }),
       description:
-        "Existing chats remain on disk, but new requests through this provider will stop working until you reconnect.",
-      confirmLabel: "Disconnect",
+        settingsText("provider_auth.existing_chats_remain_on_disk_but_new_requests_through_this_provider_will_stop_working_unt"),
+      confirmLabel: settingsText("provider_auth.disconnect"),
       destructive: true,
     });
     if (!ok) return;
@@ -46,7 +50,7 @@ export function ProviderAuthPanel() {
       await auth.logout(provider.id);
       await auth.refresh();
     } catch (cause) {
-      setActionError(cause instanceof Error ? cause.message : "Disconnect failed");
+      setActionError(cause instanceof Error ? cause.message : settingsText("provider_auth.disconnect_failed"));
     } finally {
       setDisconnecting(null);
     }
@@ -56,12 +60,9 @@ export function ProviderAuthPanel() {
     <div className="flex h-full flex-col gap-4 overflow-y-auto">
       {dialog}
       <div>
-        <h3 className="text-sm font-medium">Model providers</h3>
+        <h3 className="text-sm font-medium">{settingsText("provider_auth.model_providers")}</h3>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          Connect an existing AI subscription or account by signing in. OAuth
-          tokens stay in Kady&apos;s local Pi credential store, which is used by
-          the lead agent and its specialist processes. API keys for these and
-          every other Pi provider live under API keys.
+          {settingsText("provider_auth.connect_an_existing_ai_subscription_or_account_by_signing_in_oauth_tokens_stay_in_kady_s_l")}
         </p>
       </div>
 
@@ -75,7 +76,7 @@ export function ProviderAuthPanel() {
       {auth.loading && auth.providers.length === 0 ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
-          Loading providers…
+          {settingsText("provider_auth.loading_providers")}
         </div>
       ) : (
         <div className="space-y-3">
@@ -95,25 +96,25 @@ export function ProviderAuthPanel() {
                       }
                     >
                       {provider.needsReauth
-                        ? "Reconnect required"
+                        ? settingsText("provider_auth.reconnect_required")
                         : provider.connected
-                          ? "Connected"
+                          ? settingsText("provider_auth.connected")
                           : provider.credentialType === "api_key"
-                            ? "Using API key"
-                            : "Not connected"}
+                            ? settingsText("provider_auth.using_api_key")
+                            : settingsText("provider_auth.not_connected")}
                     </Badge>
                     <Badge variant="outline">
                       {provider.billingMode === "metered_oauth"
-                        ? "Metered extra usage"
+                        ? settingsText("provider_auth.metered_extra_usage")
                         : provider.billingMode === "payg"
-                          ? "Pay-as-you-go"
-                          : "Subscription managed"}
+                          ? settingsText("provider_auth.pay_as_you_go")
+                          : settingsText("provider_auth.subscription_managed")}
                     </Badge>
                   </div>
                   <p className="mt-1 text-xs font-medium text-muted-foreground">
-                    {provider.accountLabel}
+                    {settingsSourceText(provider.accountLabel)}
                     {provider.apiKeyAlternative ? (
-                      <span className="font-normal"> · or paste an API key under API keys</span>
+                      <span className="font-normal"> {settingsText("provider_auth.or_paste_an_api_key_under_api_keys")}</span>
                     ) : null}
                   </p>
                   <p
@@ -123,14 +124,12 @@ export function ProviderAuthPanel() {
                         : "mt-2 text-xs leading-relaxed text-muted-foreground"
                     }
                   >
-                    {provider.billingNote}
+                    {settingsSourceText(provider.billingNote)}
                   </p>
                   {provider.connected ? (
                     <p className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400">
                       <CheckCircle2Icon className="size-3.5" aria-hidden />
-                      {provider.modelCount} model
-                      {provider.modelCount === 1 ? "" : "s"} available
-                    </p>
+                      {settingsText("provider_auth.available_models", { count: provider.modelCount })}</p>
                   ) : null}
                 </div>
 
@@ -142,14 +141,14 @@ export function ProviderAuthPanel() {
                     className="shrink-0"
                     disabled={disconnecting === provider.id}
                     onClick={() => void disconnect(provider)}
-                    aria-label={`Disconnect ${provider.accountLabel}`}
+                    aria-label={settingsText("provider_auth.disconnect_731", { v0: settingsSourceText(provider.accountLabel) })}
                   >
                     {disconnecting === provider.id ? (
                       <LoaderCircleIcon className="size-3.5 animate-spin" aria-hidden />
                     ) : (
                       <LogOutIcon className="size-3.5" aria-hidden />
                     )}
-                    Disconnect
+                    {settingsText("provider_auth.disconnect")}
                   </Button>
                 ) : (
                   <Button
@@ -160,10 +159,10 @@ export function ProviderAuthPanel() {
                       setActionError(null);
                       setSelectedId(provider.id);
                     }}
-                    aria-label={`${provider.needsReauth ? "Reconnect" : "Connect"} ${provider.accountLabel}`}
+                    aria-label={settingsText("provider_auth.connect_account", { state: provider.needsReauth ? "reconnect" : "connect", name: settingsSourceText(provider.accountLabel) })}
                   >
                     <LogInIcon className="size-3.5" aria-hidden />
-                    {provider.needsReauth ? "Reconnect" : "Connect"}
+                    {provider.needsReauth ? settingsText("provider_auth.reconnect") : settingsText("provider_auth.connect")}
                   </Button>
                 )}
               </div>
@@ -173,9 +172,7 @@ export function ProviderAuthPanel() {
       )}
 
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Provider subscriptions have their own quotas and overage rules. Except
-        for Anthropic&apos;s documented metered extra usage, Kady records tokens
-        but does not treat provider-managed subscription usage as project spend.
+        {settingsText("provider_auth.provider_subscriptions_have_their_own_quotas_and_overage_rules_except_for_anthropic_s_docu")}
       </p>
 
       <CustomModelsCard />

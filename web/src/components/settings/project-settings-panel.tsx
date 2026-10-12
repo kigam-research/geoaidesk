@@ -1,4 +1,5 @@
 "use client";
+import { geoText, geoLocale } from "@/geo/i18n";
 
 /**
  * Settings → Project → General: everything that belongs to one project,
@@ -28,6 +29,8 @@ import { notifyProjectBudgetChanged, useProjectCost } from "@/lib/use-project-co
 import { useProjects } from "@/lib/use-projects";
 import { SettingsCard, SettingsError, SettingsHeader } from "./primitives";
 
+const settingsText = geoText("settings");
+
 function formatUsd(value: number | undefined): string {
   return `$${(value ?? 0).toFixed(2)}`;
 }
@@ -40,7 +43,7 @@ function CardActions({
   error,
   onDiscard,
   onSave,
-  saveLabel = "Save",
+  saveLabel = settingsText("project_settings.save"),
 }: {
   dirty: boolean;
   saving: boolean;
@@ -56,14 +59,14 @@ function CardActions({
       <div className="flex items-center justify-end gap-2">
         {saved && !dirty ? (
           <span className="mr-auto text-[11px] text-emerald-600 dark:text-emerald-400" role="status">
-            Saved.
+            {settingsText("project_settings.saved")}
           </span>
         ) : null}
         <Button type="button" variant="ghost" size="sm" className="text-xs" disabled={!dirty || saving} onClick={onDiscard}>
-          Discard
+          {settingsText("project_settings.discard")}
         </Button>
         <Button type="button" size="sm" className="text-xs" disabled={!dirty || saving} onClick={onSave}>
-          {saving ? "Saving…" : saveLabel}
+          {saving ? settingsText("project_settings.saving") : saveLabel}
         </Button>
       </div>
     </div>
@@ -111,7 +114,7 @@ function GeneralCard({ project }: { project: Project }) {
     setError(null);
     setSaved(false);
     if (!draft.name.trim()) {
-      setError("Name is required");
+      setError(settingsText("project_settings.name_is_required"));
       return;
     }
     const trimmedLimit = draft.spendLimit.trim();
@@ -119,7 +122,7 @@ function GeneralCard({ project }: { project: Project }) {
     if (trimmedLimit !== "") {
       const parsed = Number(trimmedLimit);
       if (!Number.isFinite(parsed) || parsed < 0) {
-        setError("Spend limit must be a non-negative number (or empty)");
+        setError(settingsText("project_settings.spend_limit_must_be_a_non_negative_number_or_empty"));
         return;
       }
       spendLimitUsd = parsed;
@@ -139,7 +142,7 @@ function GeneralCard({ project }: { project: Project }) {
       setSaved(true);
       notifyProjectBudgetChanged();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Save failed");
+      setError(cause instanceof Error ? cause.message : settingsText("project_settings.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -148,41 +151,41 @@ function GeneralCard({ project }: { project: Project }) {
   const budget = summary.budget;
   const committed = budget.committedUsd ?? budget.totalUsd;
   return (
-    <SettingsCard id="general" title="General & budget">
+    <SettingsCard id="general" title={settingsText("project_settings.general_budget")}>
       <div className="grid gap-3">
         <label className="grid gap-1 text-xs font-medium">
-          Name
+          {settingsText("project_settings.name")}
           <Input
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-            placeholder="RNA-seq pilot"
+            placeholder={settingsText("project_settings.rna_seq_pilot")}
             className="h-8 text-xs font-normal"
           />
         </label>
         <label className="grid gap-1 text-xs font-medium">
-          Description
+          {settingsText("project_settings.description")}
           <Textarea
             rows={2}
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-            placeholder="Optional one-line summary."
+            placeholder={settingsText("project_settings.optional_one_line_summary")}
             className="text-xs font-normal"
           />
         </label>
         <label className="grid gap-1 text-xs font-medium">
           <span>
-            Tags <span className="font-normal text-muted-foreground">(comma separated)</span>
+            {settingsText("project_settings.tags")}<span className="font-normal text-muted-foreground">{settingsText("project_settings.comma_separated")}</span>
           </span>
           <Input
             value={draft.tags}
             onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
-            placeholder="genomics, proteomics"
+            placeholder={settingsText("project_settings.genomics_proteomics")}
             className="h-8 text-xs font-normal"
           />
         </label>
         <div id="budget" className="grid scroll-mt-4 gap-1">
           <label htmlFor="project-spend-limit" className="text-xs font-medium">
-            Spend limit <span className="font-normal text-muted-foreground">(USD, optional)</span>
+            {settingsText("project_settings.spend_limit")}<span className="font-normal text-muted-foreground">{settingsText("project_settings.usd_optional")}</span>
           </label>
           <Input
             id="project-spend-limit"
@@ -192,17 +195,11 @@ function GeneralCard({ project }: { project: Project }) {
             step="0.01"
             value={draft.spendLimit}
             onChange={(e) => setDraft({ ...draft, spendLimit: e.target.value })}
-            placeholder="Leave empty for no limit"
+            placeholder={settingsText("project_settings.leave_empty_for_no_limit")}
             className="h-8 text-xs"
           />
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            So far: {formatUsd(budget.spentUsd ?? summary.totalUsd)} spent
-            {(budget.reservedUsd ?? 0) > 0 ? `, ${formatUsd(budget.reservedUsd)} reserved for running compute` : ""}
-            {budget.limitUsd !== null ? ` — ${formatUsd(committed)} of ${formatUsd(budget.limitUsd)}` : ""}.
-            Pay-as-you-go model usage, metered extra usage and Modal compute count toward the cap;
-            subscription and local models don&apos;t. New billable runs are blocked once the total
-            reaches it, with a warning at 80%.
-          </p>
+            {settingsText("project_settings.budget_summary", { spent: formatUsd(budget.spentUsd ?? summary.totalUsd), reserved: (budget.reservedUsd ?? 0) > 0 ? formatUsd(budget.reservedUsd) : "none", hasLimit: budget.limitUsd !== null ? "yes" : "no", committed: formatUsd(committed), limit: formatUsd(budget.limitUsd ?? undefined) })}</p>
         </div>
       </div>
       <CardActions
@@ -221,11 +218,11 @@ function GeneralCard({ project }: { project: Project }) {
 }
 
 const INSTRUCTIONS_TEXT: Record<InstructionsStatus, string> = {
-  current: "Up to date with the instructions Kady ships.",
-  outdated: "An older shipped version — it is upgraded automatically on the next launch.",
+  current: settingsText("project_settings.up_to_date_with_the_instructions_kady_ships"),
+  outdated: settingsText("project_settings.an_older_shipped_version_it_is_upgraded_automatically_on_the_next_launch"),
   edited:
-    "Edited in this project, so newer shipped guidance (raw-data guard, specialist questions) is not applied automatically.",
-  missing: "Missing — the agent runs without its sandbox instructions.",
+    settingsText("project_settings.edited_in_this_project_so_newer_shipped_guidance_raw_data_guard_specialist_questions_is_no"),
+  missing: settingsText("project_settings.missing_the_agent_runs_without_its_sandbox_instructions"),
 };
 
 function InstructionsCard({ projectId }: { projectId: string }) {
@@ -242,7 +239,7 @@ function InstructionsCard({ projectId }: { projectId: string }) {
         if (!cancelled) setStatus(value);
       })
       .catch((cause) => {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Failed to load");
+        if (!cancelled) setError(cause instanceof Error ? cause.message : settingsText("project_settings.failed_to_load"));
       });
     return () => {
       cancelled = true;
@@ -252,10 +249,10 @@ function InstructionsCard({ projectId }: { projectId: string }) {
   const restore = async () => {
     if (status === "edited") {
       const ok = await confirm({
-        title: "Replace the edited AGENTS.md?",
+        title: settingsText("project_settings.confirm.replace_the_edited_agents_md"),
         description:
-          "Your changes to this project's AGENTS.md are overwritten with the shipped instructions. Copy anything you want to keep first.",
-        confirmLabel: "Restore defaults",
+          settingsText("project_settings.your_changes_to_this_project_s_agents_md_are_overwritten_with_the_shipped_instructions_cop"),
+        confirmLabel: settingsText("project_settings.restore_defaults"),
         destructive: true,
       });
       if (!ok) return;
@@ -265,7 +262,7 @@ function InstructionsCard({ projectId }: { projectId: string }) {
     try {
       setStatus(await restoreProjectInstructions(projectId));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Restore failed");
+      setError(cause instanceof Error ? cause.message : settingsText("project_settings.restore_failed"));
     } finally {
       setBusy(false);
     }
@@ -274,17 +271,17 @@ function InstructionsCard({ projectId }: { projectId: string }) {
   return (
     <SettingsCard
       id="instructions"
-      title="Agent instructions (AGENTS.md)"
-      description="The sandbox's AGENTS.md tells the agent how to work in this project: ask before assuming, respect raw data, confirm costs before scheduling. To customize it, open this project's sandbox/AGENTS.md in a local text editor. This file is hidden from Kady's file browser."
+      title={settingsText("project_settings.agent_instructions_agents_md")}
+      description={settingsText("project_settings.the_sandbox_s_agents_md_tells_the_agent_how_to_work_in_this_project_ask_before_assuming_re")}
     >
       {dialog}
       <div className="flex items-center gap-3" data-testid="instructions-status">
         <p className="min-w-0 flex-1 text-[11px] text-muted-foreground">
-          {status ? INSTRUCTIONS_TEXT[status] : error ? null : "Loading…"}
+          {status ? INSTRUCTIONS_TEXT[status] : error ? null : settingsText("project_settings.loading")}
         </p>
         {status && status !== "current" ? (
           <Button type="button" size="sm" variant="outline" className="h-7 shrink-0 text-[11px]" disabled={busy} onClick={() => void restore()}>
-            {busy ? "Restoring…" : "Restore default instructions"}
+            {busy ? settingsText("project_settings.restoring") : settingsText("project_settings.restore_default_instructions")}
           </Button>
         ) : null}
       </div>
@@ -315,7 +312,7 @@ function GuardCard({ projectId }: { projectId: string }) {
         if (!cancelled) adopt(policy);
       })
       .catch((cause) => {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Failed to load");
+        if (!cancelled) setError(cause instanceof Error ? cause.message : settingsText("project_settings.failed_to_load"));
       });
     return () => {
       cancelled = true;
@@ -340,7 +337,7 @@ function GuardCard({ projectId }: { projectId: string }) {
       adopt(await putProjectGuardPolicy(projectId, { protectedPaths, destructiveConfirm }));
       setSaved(true);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Save failed");
+      setError(cause instanceof Error ? cause.message : settingsText("project_settings.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -349,30 +346,30 @@ function GuardCard({ projectId }: { projectId: string }) {
   return (
     <SettingsCard
       id="safety"
-      title="Raw-data guard"
-      description="Applies to Kady and to background specialists, in open chats too. A heuristic guard, not a security boundary — see docs/data-guard.md."
+      title={settingsText("project_settings.raw_data_guard")}
+      description={settingsText("project_settings.applies_to_kady_and_to_background_specialists_in_open_chats_too_a_heuristic_guard_not_a_se")}
     >
       {!initial ? (
-        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">Loading…</p>
+        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">{settingsText("project_settings.loading")}</p>
       ) : (
         <div data-testid="guard-settings">
           <label className="grid gap-1 text-[11px] text-muted-foreground">
-            Protected paths (one glob per line, relative to the sandbox; the agent can read but never modify them)
+            {settingsText("project_settings.protected_paths_one_glob_per_line_relative_to_the_sandbox_the_agent_can_read_but_never_mod")}
             <Textarea
               rows={3}
               value={paths}
               onChange={(e) => setPaths(e.target.value)}
               placeholder={"user_data/**\nraw/*.csv"}
-              aria-label="Protected paths"
+              aria-label={settingsText("project_settings.protected_paths")}
               className="font-mono text-xs"
             />
           </label>
           <div className="mt-3 flex items-center justify-between gap-3">
-            <span className="text-xs">Ask before destructive shell commands elsewhere</span>
+            <span className="text-xs">{settingsText("project_settings.ask_before_destructive_shell_commands_elsewhere")}</span>
             <Switch
               checked={destructiveConfirm}
               onCheckedChange={setDestructiveConfirm}
-              aria-label="Confirm destructive commands"
+              aria-label={settingsText("project_settings.confirm_destructive_commands")}
             />
           </div>
           <CardActions
@@ -416,7 +413,7 @@ function CompactionCard({ projectId }: { projectId: string }) {
         if (!cancelled) adopt(settings);
       })
       .catch((cause) => {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Failed to load");
+        if (!cancelled) setError(cause instanceof Error ? cause.message : settingsText("project_settings.failed_to_load"));
       });
     return () => {
       cancelled = true;
@@ -438,11 +435,11 @@ function CompactionCard({ projectId }: { projectId: string }) {
     const keepRecentTokens = Number(keepRecent);
     const { bounds } = initial;
     for (const [label, value, range] of [
-      ["Reserve for the reply", reserveTokens, bounds.reserveTokens],
-      ["Keep recent verbatim", keepRecentTokens, bounds.keepRecentTokens],
+      [settingsText("project_settings.reserve_for_the_reply"), reserveTokens, bounds.reserveTokens],
+      [settingsText("project_settings.keep_recent_verbatim"), keepRecentTokens, bounds.keepRecentTokens],
     ] as const) {
       if (!Number.isInteger(value) || value < range.min || value > range.max) {
-        setError(`${label} must be a whole number between ${range.min.toLocaleString()} and ${range.max.toLocaleString()}.`);
+        setError(settingsText("project_settings.must_be_a_whole_number_between_and", { v0: label, v1: range.min.toLocaleString(geoLocale()), v2: range.max.toLocaleString(geoLocale()) }));
         return;
       }
     }
@@ -451,7 +448,7 @@ function CompactionCard({ projectId }: { projectId: string }) {
       adopt(await putProjectCompaction(projectId, { enabled, reserveTokens, keepRecentTokens }));
       setSaved(true);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Save failed");
+      setError(cause instanceof Error ? cause.message : settingsText("project_settings.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -460,20 +457,20 @@ function CompactionCard({ projectId }: { projectId: string }) {
   return (
     <SettingsCard
       id="context"
-      title="Context compaction"
-      description="Compaction summarizes older messages when a conversation nears the model's context window. Kady puts its own state block (plan, notebook, results, environment) ahead of the summary. Applies to every chat in this project, including open ones; use “Compact now” in a chat to run it by hand."
+      title={settingsText("project_settings.context_compaction")}
+      description={settingsText("project_settings.compaction_summarizes_older_messages_when_a_conversation_nears_the_model_s_context_window")}
     >
       {!initial ? (
-        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">Loading…</p>
+        error ? <SettingsError>{error}</SettingsError> : <p className="text-[11px] text-muted-foreground">{settingsText("project_settings.loading")}</p>
       ) : (
         <div data-testid="compaction-settings">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs">Compact automatically near the context limit</span>
-            <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Automatic compaction" />
+            <span className="text-xs">{settingsText("project_settings.compact_automatically_near_the_context_limit")}</span>
+            <Switch checked={enabled} onCheckedChange={setEnabled} aria-label={settingsText("project_settings.automatic_compaction")} />
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="grid gap-1 text-[11px] text-muted-foreground">
-              Reserve for the reply (tokens)
+              {settingsText("project_settings.reserve_for_the_reply_tokens")}
               <Input
                 type="number"
                 inputMode="numeric"
@@ -482,15 +479,15 @@ function CompactionCard({ projectId }: { projectId: string }) {
                 step={1000}
                 value={reserve}
                 onChange={(e) => setReserve(e.target.value)}
-                aria-label="Reserve tokens"
+                aria-label={settingsText("project_settings.reserve_tokens")}
                 className="h-8 text-xs"
               />
               <span className="text-[10px]">
-                {initial.bounds.reserveTokens.min.toLocaleString()}–{initial.bounds.reserveTokens.max.toLocaleString()}
+                {initial.bounds.reserveTokens.min.toLocaleString(geoLocale())}–{initial.bounds.reserveTokens.max.toLocaleString(geoLocale())}
               </span>
             </label>
             <label className="grid gap-1 text-[11px] text-muted-foreground">
-              Keep recent verbatim (tokens)
+              {settingsText("project_settings.keep_recent_verbatim_tokens")}
               <Input
                 type="number"
                 inputMode="numeric"
@@ -499,11 +496,11 @@ function CompactionCard({ projectId }: { projectId: string }) {
                 step={1000}
                 value={keepRecent}
                 onChange={(e) => setKeepRecent(e.target.value)}
-                aria-label="Keep recent tokens"
+                aria-label={settingsText("project_settings.keep_recent_tokens")}
                 className="h-8 text-xs"
               />
               <span className="text-[10px]">
-                {initial.bounds.keepRecentTokens.min.toLocaleString()}–{initial.bounds.keepRecentTokens.max.toLocaleString()}
+                {initial.bounds.keepRecentTokens.min.toLocaleString(geoLocale())}–{initial.bounds.keepRecentTokens.max.toLocaleString(geoLocale())}
               </span>
             </label>
           </div>
@@ -531,12 +528,12 @@ export function ProjectSettingsPanel({ projectId }: { projectId: string }) {
   return (
     <div className="flex flex-col gap-4">
       <SettingsHeader
-        title={project ? `Project settings · ${project.name}` : "Project settings"}
-        description="Settings that belong to this project only: its name and budget, the agent's instructions, raw-data protection, and context compaction. Each card saves on its own."
+        title={project ? settingsText("project_settings.project_settings", { v0: project.name }) : settingsText("project_settings.project_settings_64")}
+        description={settingsText("project_settings.settings_that_belong_to_this_project_only_its_name_and_budget_the_agent_s_instructions_raw")}
       />
       {!project ? (
         <p className="text-xs text-muted-foreground" role="status">
-          Loading project…
+          {settingsText("project_settings.loading_project")}
         </p>
       ) : (
         // Remount per project so no card shows the previous project's draft.
