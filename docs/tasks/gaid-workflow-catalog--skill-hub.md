@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T09:34:33Z
+status: done
+updated: 2026-10-12T09:59:18Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -97,7 +97,7 @@ AGENTS.md (one bullet).
 - No paid model runs, ~/.geoaidesk changes or ports 3000/18000 review-instance changes. Isolated services stopped; generated .next and tsbuildinfo caches removed. Code checkpoints b3aa2370d63c / 40acafbb7fff; parent integration and its full checks remain separate.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-12T09:34:33Z: ready; the parent gaid-workflow-catalog integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-12T09:59:18Z: integrated into gaid-workflow-catalog; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish brought parent ca720112bf91 into this branch and stopped on the expected append-only integration-boundaries conflict. Kept both skills-panel.tsx and workflows-panel.tsx seams; no parent implementation was rewritten.
