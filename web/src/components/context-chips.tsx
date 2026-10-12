@@ -1,4 +1,5 @@
 "use client";
+import { workDatabaseDescription, workLabel } from "@/geo/work-labels";
 import { geoText } from "@/geo/i18n";
 import type { ReactNode } from "react";
 import {
@@ -296,9 +297,9 @@ export function ContextChipsBar({
             tooltip={
               <>
                 <b>{db.name}</b>{" "}
-                <span className="opacity-70 capitalize">· {db.domain}</span>
+                <span className="opacity-70 capitalize">· {workLabel("database.domain", db.domain)}</span>
                 <br />
-                {db.description}
+                {workDatabaseDescription(db)}
                 <br />
                 <span className="opacity-70">{db.url}</span>
               </>

@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+import { workLabel } from "@/geo/work-labels";
 
 import {
   BookCheckIcon,
@@ -13,6 +15,8 @@ import { useMemo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CitationEntry, CitationReport } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 const KIND_LABELS: Record<CitationEntry["kind"], string> = {
   doi: "DOI",
@@ -39,8 +43,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
     return (
       <div className="inline-flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
         <Loader2Icon className="size-3 animate-spin" />
-        Verifying citations...
-      </div>
+        {workText("citation_badge.verifying_citations")}</div>
     );
   }
 
@@ -68,7 +71,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
               ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400"
               : "border-amber-500/30 bg-amber-500/5 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
           )}
-          title="Click to see citation resolver details"
+          title={workText("citation_badge.click_to_see_citation_resolver_details")}
         >
           {allVerified ? (
             <BookCheckIcon className="size-3" />
@@ -76,10 +79,8 @@ export function CitationBadge({ report }: { report: CitationReport }) {
             <BookXIcon className="size-3" />
           )}
           <span>
-            {report.total} {report.total === 1 ? "citation" : "citations"}
-            {" \u00b7 "}
-            {report.verified} verified
-            {report.unresolved > 0 ? ` \u00b7 ${report.unresolved} unresolved` : ""}
+            {workText("citation_badge.summary", { count: report.total, verified: report.verified })}
+            {report.unresolved > 0 ? workText("citation_badge.value_unresolved", { v0: report.unresolved }) : ""}
           </span>
         </button>
       </PopoverTrigger>
@@ -88,9 +89,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
         className="w-[420px] max-h-[480px] overflow-y-auto p-0"
       >
         <div className="px-3 py-2 border-b text-xs text-muted-foreground">
-          Deterministic resolver pass. Authority checks: doi.org, arXiv API,
-          PubMed E-utilities, HTTP HEAD.
-        </div>
+          {workText("citation_badge.deterministic_resolver_pass_authority_checks_doi_org_arxiv_api_pubmed_e_utilities_http_head")}</div>
         <ul className="divide-y">
           {sorted.map((entry, idx) => {
             const key = `${entry.kind}:${entry.identifier}:${idx}`;
@@ -107,7 +106,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
                     {KIND_LABELS[entry.kind]}
                   </span>
                   <span className={cn("font-medium", statusColor)}>
-                    {entry.status}
+                    {workLabel("status", entry.status)}
                   </span>
                 </div>
                 <div className="mt-1 font-mono break-all leading-snug">
@@ -136,7 +135,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
                     ) : (
                       <CopyIcon className="size-3" />
                     )}
-                    <span>copy</span>
+                    <span>{workText("citation_badge.copy")}</span>
                   </button>
                   {entry.url && (
                     <a
@@ -146,7 +145,7 @@ export function CitationBadge({ report }: { report: CitationReport }) {
                       className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
                     >
                       <ExternalLinkIcon className="size-3" />
-                      <span>open</span>
+                      <span>{workText("citation_badge.open")}</span>
                     </a>
                   )}
                 </div>

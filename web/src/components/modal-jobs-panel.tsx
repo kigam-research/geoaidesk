@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+import { formatWorkModalDuration as formatModalDuration, formatWorkModalTimestamp as formatModalTimestamp, formatWorkModalResource as formatModalResource, workLabel, workJobOwner } from "@/geo/work-labels";
 
 import {
   AlertTriangleIcon,
@@ -19,13 +21,12 @@ import {
   type ModalJobGroup,
   type ModalJobStatus,
   type ModalJobSummary,
-  formatModalDuration,
-  formatModalResource,
-  formatModalTimestamp,
 } from "@/lib/modal-jobs";
 import { useModalCatalog, useModalJobs } from "@/lib/use-modal-jobs";
 import { cn, formatUsd } from "@/lib/utils";
 import { SettingsLink } from "@/components/settings-link";
+
+const workText = geoText("work");
 
 type StatusFilter = ModalJobStatus | "all";
 
@@ -65,11 +66,10 @@ function JobRow({
       </span>
       <span className="mt-1 flex min-w-0 items-center text-[10px] text-muted-foreground">
         <span className="min-w-0 flex-1 truncate">
-          {job.agent ?? job.source ?? "Modal compute"}
+          {workJobOwner(job.agent, job.source, job.raw) ?? workText("modal_jobs_panel.modal_compute")}
         </span>
         <span className="shrink-0 tabular-nums">
-          {formatUsd(job.committedEstimatedUsd)} est.
-        </span>
+          {formatUsd(job.committedEstimatedUsd)} {workText("modal_jobs_panel.est")}</span>
       </span>
       {job.error ? (
         <span className="mt-1 block truncate text-[10px] text-destructive" title={job.error}>
@@ -93,7 +93,7 @@ function JobGroupSection({
 }) {
   if (jobs.length === 0) return null;
   return (
-    <section aria-label={group?.label ?? (group ? `Group ${group.id}` : "Individual jobs")}>
+    <section aria-label={group?.label ?? (group ? workText("modal_jobs_panel.group_value", { v0: group.id }) : workText("modal_jobs_panel.individual_jobs"))}>
       {group ? (
         <div className="sticky top-0 z-[1] flex items-center gap-1.5 border-b bg-background/95 px-3 py-1.5 backdrop-blur">
           <BoxesIcon className="size-3 text-muted-foreground" />
@@ -101,7 +101,7 @@ function JobGroupSection({
             {group.label ?? group.id}
           </span>
           <span className="text-[9px] text-muted-foreground">
-            {jobs.length} job{jobs.length === 1 ? "" : "s"}
+            {workText("modal_jobs_panel.job_count", { count: jobs.length })}
           </span>
         </div>
       ) : null}
@@ -215,21 +215,20 @@ export function ModalJobsPanel({
         <div className="flex items-center gap-2">
           <ServerCogIcon className="size-4 text-violet-500" />
           <div>
-            <h1 className="text-xs font-semibold">Modal Compute</h1>
+            <h1 className="text-xs font-semibold">{workText("modal_jobs_panel.modal_compute_112")}</h1>
             <p className="text-[10px] text-muted-foreground">
-              Durable project jobs and estimated costs
-            </p>
+              {workText("modal_jobs_panel.durable_project_jobs_and_estimated_costs")}</p>
           </div>
         </div>
         {activeCount > 0 ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2 py-1 text-[10px] font-medium text-violet-700 dark:text-violet-300">
             <span className="size-1.5 animate-pulse rounded-full bg-violet-500" />
-            {activeCount} active
+            {workText("modal_jobs_panel.active_count", { count: activeCount })}
           </span>
         ) : null}
         <div
           role="group"
-          aria-label="Job scope"
+          aria-label={workText("modal_jobs_panel.job_scope")}
           className="ml-auto flex items-center rounded-md border bg-muted/20 p-0.5"
         >
           <button
@@ -243,8 +242,7 @@ export function ModalJobsPanel({
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            Project
-          </button>
+            {workText("modal_jobs_panel.project")}</button>
           <button
             type="button"
             aria-pressed={effectiveScope === "session"}
@@ -257,19 +255,16 @@ export function ModalJobsPanel({
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            This chat
-          </button>
+            {workText("modal_jobs_panel.this_chat")}</button>
         </div>
       </header>
 
       {!catalog?.modalConfigured ? (
         <div className="shrink-0 border-b bg-amber-500/5 px-4 py-2 text-[11px] text-amber-800 dark:text-amber-300">
-          Modal is not connected. Existing job history remains available; connect a token pair in{" "}
+          {workText("modal_jobs_panel.modal_is_not_connected_existing_job_history_remains_available_connect_a_token_pair_in")}{" "}
           <SettingsLink tab="services" section="modal">
-            Settings → Services
-          </SettingsLink>{" "}
-          to submit or retry jobs.
-        </div>
+            {workText("modal_jobs_panel.settings_services")}</SettingsLink>{" "}
+          {workText("modal_jobs_panel.to_submit_or_retry_jobs")}</div>
       ) : null}
 
       <div className="flex min-h-0 flex-1">
@@ -278,23 +273,22 @@ export function ModalJobsPanel({
             "min-h-0 w-full shrink-0 flex-col border-r md:flex md:w-80",
             selectedJobId ? "hidden" : "flex",
           )}
-          aria-label="Modal jobs"
+          aria-label={workText("modal_jobs_panel.modal_jobs")}
         >
           <div className="flex shrink-0 items-center gap-2 border-b px-3 py-2">
             <FilterIcon className="size-3.5 text-muted-foreground" />
             <label htmlFor="modal-status-filter" className="sr-only">
-              Filter jobs by status
-            </label>
+              {workText("modal_jobs_panel.filter_jobs_by_status")}</label>
             <select
               id="modal-status-filter"
               value={status}
               onChange={(event) => setStatus(event.target.value as StatusFilter)}
               className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-[11px]"
             >
-              <option value="all">All statuses</option>
+              <option value="all">{workText("modal_jobs_panel.all_statuses")}</option>
               {MODAL_JOB_STATUSES.map((value) => (
                 <option key={value} value={value}>
-                  {value.charAt(0).toUpperCase() + value.slice(1)}
+                  {workLabel("status_title", value)}
                 </option>
               ))}
             </select>
@@ -302,7 +296,7 @@ export function ModalJobsPanel({
               type="button"
               onClick={refresh}
               className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Refresh jobs"
+              aria-label={workText("modal_jobs_panel.refresh_jobs")}
             >
               <RefreshCcwIcon
                 className={cn("size-3.5", (loading || refreshing) && "animate-spin")}
@@ -322,19 +316,18 @@ export function ModalJobsPanel({
             {loading && jobs.length === 0 ? (
               <div className="flex items-center justify-center gap-2 px-3 py-10 text-xs text-muted-foreground">
                 <LoaderCircleIcon className="size-4 animate-spin" />
-                Loading jobs…
-              </div>
+                {workText("modal_jobs_panel.loading_jobs")}</div>
             ) : null}
             {!loading && jobs.length === 0 ? (
               <div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
                 <FolderOpenIcon className="size-7 text-muted-foreground/40" />
-                <p className="text-xs font-medium">No Modal jobs</p>
+                <p className="text-xs font-medium">{workText("modal_jobs_panel.no_modal_jobs")}</p>
                 <p className="text-[11px] leading-relaxed text-muted-foreground">
                   {effectiveScope === "session"
-                    ? "This chat has not submitted a durable compute job."
+                    ? workText("modal_jobs_panel.this_chat_has_not_submitted_a_durable_compute_job")
                     : status === "all"
-                      ? "Jobs submitted by chats and specialists will appear here."
-                      : `No ${status} jobs match this filter.`}
+                      ? workText("modal_jobs_panel.jobs_submitted_by_chats_and_specialists_will_appear_here")
+                      : workText("modal_jobs_panel.no_value_jobs_match_this_filter", { v0: workLabel("status", status) })}
                 </p>
               </div>
             ) : null}
@@ -358,8 +351,7 @@ export function ModalJobsPanel({
           {jobs.length > 0 ? (
             <div className="flex shrink-0 items-center gap-1.5 border-t px-3 py-2 text-[9px] text-muted-foreground">
               <Clock3Icon className="size-3" />
-              {jobs.length} job{jobs.length === 1 ? "" : "s"} · last updated{" "}
-              {formatModalTimestamp(new Date().toISOString())}
+              {workText("modal_jobs_panel.updated_count", { count: jobs.length, time: formatModalTimestamp(new Date().toISOString()) })}
             </div>
           ) : null}
         </aside>
@@ -369,7 +361,7 @@ export function ModalJobsPanel({
             "min-h-0 min-w-0 flex-1",
             selectedJobId ? "block" : "hidden md:block",
           )}
-          aria-label="Modal job detail"
+          aria-label={workText("modal_jobs_panel.modal_job_detail")}
         >
           {selectedJobId ? (
             <ModalJobDetail
@@ -385,11 +377,9 @@ export function ModalJobsPanel({
                 <ServerCogIcon className="size-6 text-violet-500" />
               </div>
               <div>
-                <p className="text-sm font-medium">Select a compute job</p>
+                <p className="text-sm font-medium">{workText("modal_jobs_panel.select_a_compute_job")}</p>
                 <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                  Inspect lifecycle, requested and resolved resources, live logs, estimated costs,
-                  transfers, and output artifacts.
-                </p>
+                  {workText("modal_jobs_panel.inspect_lifecycle_requested_and_resolved_resources_live_logs_estimated_costs_transfers_and_outp")}</p>
               </div>
             </div>
           )}

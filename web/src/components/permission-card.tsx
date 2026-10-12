@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import { memo, useState } from "react";
 import { ShieldAlertIcon } from "lucide-react";
@@ -8,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { apiFetch, useProjectScopeId } from "@/lib/projects";
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 /** Payload the data guard attaches to a `permission_request` frame. */
 export interface PermissionPayload {
@@ -32,11 +35,11 @@ export function parsePermissionPayload(args: unknown): PermissionPayload {
 }
 
 const OUTCOME_LABEL: Record<string, string> = {
-  allowed: "Allowed",
-  denied: "Denied",
-  timeout: "No answer — blocked",
-  cancelled: "Run stopped — blocked",
-  no_ui: "Blocked",
+  allowed: workText("permission_card.allowed"),
+  denied: workText("permission_card.denied"),
+  timeout: workText("permission_card.no_answer_blocked"),
+  cancelled: workText("permission_card.run_stopped_blocked"),
+  no_ui: workText("permission_card.blocked"),
 };
 
 /**
@@ -75,12 +78,12 @@ export const PermissionCard = memo(function PermissionCard({
       if (!response.ok) {
         toast.error(
           response.status === 404
-            ? "This request is no longer waiting for an answer."
-            : "Couldn't send your decision. Try again.",
+            ? workText("permission_card.this_request_is_no_longer_waiting_for_an_answer")
+            : workText("permission_card.couldn_t_send_your_decision_try_again"),
         );
       }
     } catch {
-      toast.error("Couldn't send your decision. Try again.");
+      toast.error(workText("permission_card.couldn_t_send_your_decision_try_again"));
     } finally {
       setBusy(null);
     }
@@ -93,11 +96,11 @@ export const PermissionCard = memo(function PermissionCard({
         pending ? "border-amber-500/40 bg-amber-500/10" : "border-border bg-muted/40",
       )}
       data-permission-card={item.id}
-      aria-label="Permission needed"
+      aria-label={workText("permission_card.permission_needed")}
     >
       <header className="mb-1 flex items-center gap-2 text-xs font-medium">
         <ShieldAlertIcon className="size-3.5 shrink-0" />
-        <span>{pending ? "Kady wants to run a destructive command" : "Destructive command"}</span>
+        <span>{pending ? workText("permission_card.kady_wants_to_run_a_destructive_command") : workText("permission_card.destructive_command")}</span>
         {outcome && (
           <span className="ml-auto rounded bg-background/60 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
             {OUTCOME_LABEL[outcome] ?? outcome}
@@ -113,14 +116,13 @@ export const PermissionCard = memo(function PermissionCard({
       {pending && (
         <div className="mt-2 flex items-center gap-2">
           <Button size="sm" variant="destructive" disabled={busy !== null} onClick={() => void answer(true)}>
-            {busy === "allow" ? "Allowing…" : "Allow once"}
+            {busy === "allow" ? workText("permission_card.allowing") : workText("permission_card.allow_once")}
           </Button>
           <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void answer(false)}>
-            {busy === "deny" ? "Denying…" : "Deny"}
+            {busy === "deny" ? workText("permission_card.denying") : workText("permission_card.deny")}
           </Button>
           <span className="text-[11px] text-muted-foreground">
-            Protected data (e.g. <code>user_data/</code>) is never touched either way.
-          </span>
+            {workText("permission_card.protected_data_e_g")}<code>user_data/</code>{workText("permission_card.is_never_touched_either_way")}</span>
         </div>
       )}
     </section>

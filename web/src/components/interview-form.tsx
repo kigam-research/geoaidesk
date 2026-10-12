@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 /**
  * Inline interview form — the chat-side half of the backend `interview` tool
@@ -20,6 +21,8 @@ import { API_BASE, apiFetch, useProjectScopeId } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
+
+const workText = geoText("work");
 
 // Mirrors the backend caps in server/src/agent/interview.ts.
 const MAX_IMAGES = 12;
@@ -119,7 +122,7 @@ function ChartMedia({ config }: { config: unknown }) {
     };
   }, [config]);
   if (error)
-    return <div className="text-xs text-muted-foreground">(chart unavailable)</div>;
+    return <div className="text-xs text-muted-foreground">{workText("interview_form.chart_unavailable")}</div>;
   return <canvas ref={canvasRef} className="max-h-72 w-full" />;
 }
 
@@ -131,7 +134,7 @@ function MediaBlock({ media }: { media: InterviewMedia }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageSrc(media.src, projectId)}
-          alt={media.caption ?? "interview media"}
+          alt={media.caption ?? workText("interview_form.interview_media")}
           className="max-h-80 rounded-md border object-contain"
         />
       ) : null;
@@ -176,7 +179,7 @@ function MediaBlock({ media }: { media: InterviewMedia }) {
           sandbox=""
           srcDoc={media.src}
           className="h-64 w-full rounded-md border bg-white"
-          title={media.caption ?? "interview html"}
+          title={media.caption ?? workText("interview_form.interview_html")}
         />
       ) : null;
     default:
@@ -266,8 +269,7 @@ function OptionRow({
           <span className="font-medium">{option.label}</span>
           {recommended && (
             <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
-              Recommended
-            </Badge>
+              {workText("interview_form.recommended")}</Badge>
           )}
         </span>
         {option.content && (
@@ -320,11 +322,11 @@ function QuestionCard({
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) continue;
       if (file.size > MAX_IMAGE_BYTES) {
-        setImageError(`${file.name} is over ${MAX_IMAGE_BYTES / (1024 * 1024)}MB`);
+        setImageError(workText("interview_form.value_is_over_valuemb", { v0: file.name, v1: MAX_IMAGE_BYTES / (1024 * 1024) }));
         continue;
       }
       if (next.length >= MAX_IMAGES) {
-        setImageError(`At most ${MAX_IMAGES} images`);
+        setImageError(workText("interview_form.at_most_value_images", { v0: MAX_IMAGES }));
         break;
       }
       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -356,8 +358,7 @@ function QuestionCard({
         </span>
         {q.weight === "critical" && (
           <Badge variant="destructive" className="ml-auto h-4 shrink-0 px-1.5 text-[10px]">
-            critical
-          </Badge>
+            {workText("interview_form.critical")}</Badge>
         )}
       </div>
       {q.context && <p className="text-xs text-muted-foreground">{q.context}</p>}
@@ -404,7 +405,7 @@ function QuestionCard({
           value={typeof state.value === "string" ? state.value : ""}
           onChange={(e) => onChange({ ...state, value: e.target.value })}
           disabled={disabled}
-          placeholder="Type your answer…"
+          placeholder={workText("interview_form.type_your_answer")}
           className="min-h-16 text-sm"
         />
       )}
@@ -427,8 +428,7 @@ function QuestionCard({
             onClick={() => fileInputRef.current?.click()}
           >
             <UploadIcon className="size-3.5" />
-            Upload images
-          </Button>
+            {workText("interview_form.upload_images")}</Button>
           {imageError && <p className="text-xs text-destructive">{imageError}</p>}
           {state.images.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -453,7 +453,7 @@ function QuestionCard({
                         })
                       }
                       className="absolute -right-1.5 -top-1.5 rounded-full border bg-background p-0.5"
-                      aria-label={`Remove ${img.name}`}
+                      aria-label={workText("interview_form.remove_value", { v0: img.name })}
                     >
                       <XIcon className="size-3" />
                     </button>
@@ -490,10 +490,10 @@ function SubmittedSummary({
     return (
       <p className="text-xs text-muted-foreground">
         {result?.includes("dismissed")
-          ? "Dismissed — the agent proceeded with its recommendations."
+          ? workText("interview_form.dismissed_the_agent_proceeded_with_its_recommendations")
           : result
-            ? "Answers submitted."
-            : "Interview closed."}
+            ? workText("interview_form.answers_submitted")
+            : workText("interview_form.interview_closed")}
       </p>
     );
   const questionFor = (id: string) =>
@@ -549,13 +549,13 @@ export function InterviewCard({
       }, scopedProjectId);
       if (!res.ok) {
         const detail = (await res.json().catch(() => null)) as { detail?: string } | null;
-        setError(detail?.detail ?? `Submission failed (${res.status})`);
+        setError(detail?.detail ?? workText("interview_form.submission_failed_value", { v0: res.status }));
         setPhase("editing");
         return;
       }
       setPhase("submitted");
     } catch {
-      setError("Submission failed — is the backend running?");
+      setError(workText("interview_form.submission_failed_is_the_backend_running"));
       setPhase("editing");
     }
   };
@@ -595,17 +595,14 @@ export function InterviewCard({
         {finished ? (
           item.status === "error" ? (
             <Badge variant="outline" className="ml-auto h-5 text-[10px] text-destructive">
-              expired
-            </Badge>
+              {workText("interview_form.expired")}</Badge>
           ) : (
             <Badge variant="outline" className="ml-auto h-5 text-[10px] text-emerald-600">
-              answered
-            </Badge>
+              {workText("interview_form.answered")}</Badge>
           )
         ) : (
           <Badge variant="outline" className="ml-auto h-5 text-[10px]">
-            waiting for you
-          </Badge>
+            {workText("interview_form.waiting_for_you")}</Badge>
         )}
       </div>
       {payload.description && (
@@ -616,8 +613,7 @@ export function InterviewCard({
         <SubmittedSummary payload={payload} result={item.result} />
       ) : item.status === "error" ? (
         <p className="text-xs text-muted-foreground">
-          This interview is no longer waiting for answers.
-        </p>
+          {workText("interview_form.this_interview_is_no_longer_waiting_for_answers")}</p>
       ) : (
         <>
           <div className="space-y-2.5">
@@ -635,7 +631,7 @@ export function InterviewCard({
           {error && <p className="text-xs text-destructive">{error}</p>}
           <div className="flex items-center gap-2">
             <Button type="button" size="sm" onClick={submit} disabled={locked || !sessionId}>
-              {phase === "submitting" ? "Submitting…" : "Submit answers"}
+              {phase === "submitting" ? workText("interview_form.submitting") : workText("interview_form.submit_answers")}
             </Button>
             <Button
               type="button"
@@ -644,13 +640,10 @@ export function InterviewCard({
               disabled={locked || !sessionId}
               onClick={() => void post({ cancelled: true })}
             >
-              Skip
-            </Button>
+              {workText("interview_form.skip")}</Button>
             {phase === "submitted" && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <CheckIcon className="size-3 text-emerald-500" /> Sent — the agent is
-                continuing…
-              </span>
+                <CheckIcon className="size-3 text-emerald-500" /> {workText("interview_form.sent_the_agent_is_continuing")}</span>
             )}
           </div>
         </>

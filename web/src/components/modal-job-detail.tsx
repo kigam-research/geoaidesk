@@ -1,4 +1,6 @@
 "use client";
+import { geoLocale, geoText } from "@/geo/i18n";
+import { formatWorkModalDuration as formatModalDuration, formatWorkModalTimestamp as formatModalTimestamp, formatWorkModalResource as formatModalResource, workLabel, workJobOwner } from "@/geo/work-labels";
 
 import {
   AlertTriangleIcon,
@@ -25,14 +27,12 @@ import {
   type ModalJobStatus,
   type ModalTransferEntry,
   formatModalBytes,
-  formatModalDuration,
-  formatModalResource,
-  formatModalTimestamp,
   isModalJobActive,
-  modalStatusLabel,
 } from "@/lib/modal-jobs";
 import { useModalJob, useModalJobLogs } from "@/lib/use-modal-jobs";
 import { cn, formatUsd } from "@/lib/utils";
+
+const workText = geoText("work");
 
 const STATUS_STYLES: Record<ModalJobStatus, string> = {
   queued: "border-slate-400/30 bg-slate-400/10 text-slate-600 dark:text-slate-300",
@@ -63,7 +63,7 @@ function StatusBadge({ status }: { status: ModalJobStatus }) {
       ) : (
         <AlertTriangleIcon className="size-3" />
       )}
-      {modalStatusLabel(status)}
+      {workLabel("status_title", status)}
     </span>
   );
 }
@@ -75,7 +75,7 @@ function Lifecycle({ status }: { status: ModalJobStatus }) {
       : status,
   );
   return (
-    <ol aria-label="Job lifecycle" className="grid grid-cols-5 gap-1">
+    <ol aria-label={workText("modal_job_detail.job_lifecycle")} className="grid grid-cols-5 gap-1">
       {LIFECYCLE.map((phase, index) => {
         const reached = index <= currentIndex;
         const current =
@@ -102,7 +102,7 @@ function Lifecycle({ status }: { status: ModalJobStatus }) {
                 current ? "font-medium text-foreground" : "text-muted-foreground",
               )}
             >
-              {phase}
+              {workLabel("status", phase)}
             </span>
           </li>
         );
@@ -122,8 +122,8 @@ function ResourceCard({
     ? [
         resource.cpu ? `${resource.cpu} CPU` : null,
         resource.memoryMiB ? `${Math.round(resource.memoryMiB / 102.4) / 10} GB RAM` : null,
-        resource.timeoutSeconds ? `${resource.timeoutSeconds}s timeout` : null,
-        resource.pricePerHour !== null ? `${formatUsd(resource.pricePerHour)}/hr est.` : null,
+        resource.timeoutSeconds ? workText("modal_job_detail.values_timeout", { v0: resource.timeoutSeconds }) : null,
+        resource.pricePerHour !== null ? workText("modal_job_detail.value_hr_est", { v0: formatUsd(resource.pricePerHour) }) : null,
       ].filter(Boolean)
     : [];
   return (
@@ -143,12 +143,12 @@ function ResourceCard({
         <div className="mt-1.5 flex flex-wrap gap-1">
           {resource.fallback ? (
             <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-              fallback {resource.fallback}
+              {workText("modal_job_detail.fallback_value", { name: resource.fallback })}
             </span>
           ) : null}
           {resource.cache ? (
             <span className="rounded bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
-              cache {resource.cache}
+              {workText("modal_job_detail.cache_value", { name: resource.cache })}
             </span>
           ) : null}
         </div>
@@ -185,7 +185,7 @@ function Transfers({
                 {entry.localPath ?? entry.path}
               </span>
               {entry.status ? (
-                <span className="shrink-0 text-[10px] text-muted-foreground">{entry.status}</span>
+                <span className="shrink-0 text-[10px] text-muted-foreground">{workLabel("status", entry.status)}</span>
               ) : null}
               <span className="shrink-0 tabular-nums text-muted-foreground">
                 {formatModalBytes(entry.bytes)}
@@ -200,7 +200,7 @@ function Transfers({
                   type="button"
                   onClick={() => onOpenOutput?.(openPath)}
                   className="shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  aria-label={`Open ${openPath}`}
+                  aria-label={workText("modal_job_detail.open_value", { v0: openPath })}
                 >
                   <ExternalLinkIcon className="size-3" />
                 </button>
@@ -235,7 +235,7 @@ function LiveLogs({
 
   const copy = async () => {
     await navigator.clipboard.writeText(logs.content);
-    toast.success(`${stream} copied`);
+    toast.success(workText("modal_job_detail.value_copied", { v0: stream }));
   };
 
   return (
@@ -260,18 +260,17 @@ function LiveLogs({
         {active ? (
           <span className="ml-2 flex items-center gap-1 text-[9px] text-violet-600 dark:text-violet-300">
             <span className="size-1.5 animate-pulse rounded-full bg-violet-500" />
-            live
-          </span>
+            {workText("modal_job_detail.live")}</span>
         ) : null}
         <span className="ml-auto text-[9px] tabular-nums text-muted-foreground">
-          byte {logs.cursor.toLocaleString()}
+          {workText("modal_job_detail.byte_value", { count: logs.cursor.toLocaleString(geoLocale()) })}
         </span>
         <button
           type="button"
           onClick={() => void copy()}
           disabled={!logs.content}
           className="ml-1 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          aria-label={`Copy ${stream}`}
+          aria-label={workText("modal_job_detail.copy_value", { v0: stream })}
         >
           <CopyIcon className="size-3" />
         </button>
@@ -283,8 +282,7 @@ function LiveLogs({
       ) : null}
       {logs.truncated ? (
         <p className="border-b bg-amber-500/5 px-2.5 py-1 text-[9px] text-amber-700 dark:text-amber-300">
-          Earlier retained output was truncated.
-        </p>
+          {workText("modal_job_detail.earlier_retained_output_was_truncated")}</p>
       ) : null}
       <pre
         ref={logRef}
@@ -294,11 +292,11 @@ function LiveLogs({
             node.scrollHeight - node.scrollTop - node.clientHeight < 32;
         }}
         tabIndex={0}
-        aria-label={`${stream} log`}
+        aria-label={workText("modal_job_detail.value_log", { v0: stream })}
         className="h-64 overflow-auto bg-zinc-950 p-3 font-mono text-[11px] leading-relaxed text-zinc-100 whitespace-pre-wrap break-words"
       >
         {logs.content ||
-          (logs.loading ? `Loading ${stream}…` : `No ${stream} output retained.`)}
+          (logs.loading ? workText("modal_job_detail.loading_value", { v0: stream }) : workText("modal_job_detail.no_value_output_retained", { v0: stream }))}
       </pre>
     </section>
   );
@@ -363,8 +361,7 @@ export function ModalJobDetail({
     return (
       <div className="flex h-full items-center justify-center gap-2 text-xs text-muted-foreground">
         <LoaderCircleIcon className="size-4 animate-spin" />
-        Loading job…
-      </div>
+        {workText("modal_job_detail.loading_job")}</div>
     );
   }
 
@@ -373,20 +370,18 @@ export function ModalJobDetail({
       <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
         <AlertTriangleIcon className="size-7 text-destructive" />
         <div>
-          <p className="text-sm font-medium">Could not load this job</p>
+          <p className="text-sm font-medium">{workText("modal_job_detail.could_not_load_this_job")}</p>
           <p role="alert" className="mt-1 text-xs text-muted-foreground">
-            {error ?? "The job record was not found."}
+            {error ?? workText("modal_job_detail.the_job_record_was_not_found")}
           </p>
         </div>
         <div className="flex gap-2">
           {onBack ? (
             <Button size="sm" variant="outline" onClick={onBack}>
-              Back
-            </Button>
+              {workText("modal_job_detail.back")}</Button>
           ) : null}
           <Button size="sm" onClick={refresh}>
-            Retry
-          </Button>
+            {workText("modal_job_detail.retry")}</Button>
         </div>
       </div>
     );
@@ -404,7 +399,7 @@ export function ModalJobDetail({
               type="button"
               onClick={onBack}
               className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
-              aria-label="Back to jobs"
+              aria-label={workText("modal_job_detail.back_to_jobs")}
             >
               <ArrowLeftIcon className="size-4" />
             </button>
@@ -418,7 +413,7 @@ export function ModalJobDetail({
             type="button"
             onClick={refresh}
             className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-            aria-label="Refresh job"
+            aria-label={workText("modal_job_detail.refresh_job")}
           >
             <RefreshCcwIcon className={cn("size-3.5", loading && "animate-spin")} />
           </button>
@@ -438,8 +433,8 @@ export function ModalJobDetail({
 
           {job.cleanupPending || job.conservativeCost ? (
             <section role="status" className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs">
-              {job.cleanupPending ? <p>Remote cleanup is pending. The sandbox may remain active until its timeout.</p> : null}
-              {job.conservativeCost ? <p>The full reservation is counted as a conservative cost estimate because the remote lifetime could not be confirmed.</p> : null}
+              {job.cleanupPending ? <p>{workText("modal_job_detail.remote_cleanup_is_pending_the_sandbox_may_remain_active_until_its_timeout")}</p> : null}
+              {job.conservativeCost ? <p>{workText("modal_job_detail.the_full_reservation_is_counted_as_a_conservative_cost_estimate_because_the_remote_lifetime_cou")}</p> : null}
             </section>
           ) : null}
 
@@ -449,14 +444,14 @@ export function ModalJobDetail({
                 <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-destructive" />
                 <div className="min-w-0">
                   <h2 className="text-xs font-semibold text-destructive">
-                    {job.status === "lost" ? "Remote sandbox lost" : "Job failure"}
+                    {job.status === "lost" ? workText("modal_job_detail.remote_sandbox_lost") : workText("modal_job_detail.job_failure")}
                   </h2>
                   <p className="mt-1 whitespace-pre-wrap break-words font-mono text-[11px] text-destructive/90">
-                    {job.error ?? `The job ended with status ${job.status}.`}
+                    {job.error ?? workText("modal_job_detail.the_job_ended_with_status_value", { v0: workLabel("status", job.status) })}
                   </p>
                   {job.exitCode !== null ? (
                     <p className="mt-1 text-[10px] text-muted-foreground">
-                      Exit code {job.exitCode}
+                      {workText("modal_job_detail.exit_code_value", { code: job.exitCode })}
                     </p>
                   ) : null}
                 </div>
@@ -465,32 +460,32 @@ export function ModalJobDetail({
           ) : null}
 
           <section className="grid gap-2 sm:grid-cols-2">
-            <ResourceCard title="Requested resource" resource={job.requestedResource} />
-            <ResourceCard title="Resolved resource" resource={job.resolvedResource} />
+            <ResourceCard title={workText("modal_job_detail.requested_resource")} resource={job.requestedResource} />
+            <ResourceCard title={workText("modal_job_detail.resolved_resource")} resource={job.resolvedResource} />
           </section>
 
           <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Elapsed</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{workText("modal_job_detail.elapsed")}</p>
               <p className="mt-1 flex items-center gap-1 text-xs font-medium tabular-nums">
                 <Clock3Icon className="size-3 text-muted-foreground" />
                 {formatModalDuration(job.startedAt, job.finishedAt, now)}
               </p>
             </div>
             <div className="rounded-lg border p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Estimated spent</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{workText("modal_job_detail.estimated_spent")}</p>
               <p className="mt-1 text-xs font-medium tabular-nums">
                 {formatUsd(job.spentEstimatedUsd)}
               </p>
             </div>
             <div className="rounded-lg border p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Estimated reserved</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{workText("modal_job_detail.estimated_reserved")}</p>
               <p className="mt-1 text-xs font-medium tabular-nums">
                 {formatUsd(job.reservedEstimatedUsd)}
               </p>
             </div>
             <div className="rounded-lg border p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Estimated committed</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{workText("modal_job_detail.estimated_committed")}</p>
               <p className="mt-1 text-xs font-medium tabular-nums">
                 {formatUsd(job.committedEstimatedUsd)}
               </p>
@@ -498,17 +493,16 @@ export function ModalJobDetail({
           </section>
 
           <section className="grid gap-2 text-[11px] text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
-            <p><span className="font-medium text-foreground">Created:</span> {formatModalTimestamp(job.createdAt)}</p>
-            <p><span className="font-medium text-foreground">Started:</span> {formatModalTimestamp(job.startedAt)}</p>
-            <p><span className="font-medium text-foreground">Finished:</span> {formatModalTimestamp(job.finishedAt)}</p>
-            <p><span className="font-medium text-foreground">Source:</span> {job.agent ?? job.source ?? "—"}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.created")}</span> {formatModalTimestamp(job.createdAt)}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.started")}</span> {formatModalTimestamp(job.startedAt)}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.finished")}</span> {formatModalTimestamp(job.finishedAt)}</p>
+            <p><span className="font-medium text-foreground">{workText("modal_job_detail.source")}</span> {workJobOwner(job.agent, job.source, job.raw) ?? "—"}</p>
           </section>
 
           {job.command ? (
             <section>
               <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Command
-              </h3>
+                {workText("modal_job_detail.command")}</h3>
               <pre className="max-h-40 overflow-auto rounded-lg border bg-muted/20 p-3 font-mono text-[11px] whitespace-pre-wrap break-words">
                 {job.command}
               </pre>
@@ -518,9 +512,9 @@ export function ModalJobDetail({
           <LiveLogs jobId={job.id} active={active} projectId={projectId} />
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <Transfers title="Inputs" entries={job.inputTransfers} />
+            <Transfers title={workText("modal_job_detail.inputs")} entries={job.inputTransfers} />
             <Transfers
-              title="Outputs"
+              title={workText("modal_job_detail.outputs")}
               entries={job.outputTransfers}
               onOpenOutput={onOpenOutput}
             />
@@ -529,7 +523,7 @@ export function ModalJobDetail({
           {outputs.length > 0 ? (
             <section className="space-y-1.5">
               <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Artifacts · {outputs.length}
+                {workText("modal_job_detail.artifacts_count", { count: outputs.length })}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {outputs.map((artifact) => (
@@ -567,8 +561,7 @@ export function ModalJobDetail({
             ) : (
               <BanIcon className="size-3.5" />
             )}
-            Cancel
-          </Button>
+            {workText("modal_job_detail.cancel")}</Button>
         ) : null}
         {canRetry ? (
           <Button
@@ -583,8 +576,7 @@ export function ModalJobDetail({
             ) : (
               <RotateCcwIcon className="size-3.5" />
             )}
-            Retry
-          </Button>
+            {workText("modal_job_detail.retry")}</Button>
         ) : null}
         {canCollect ? (
           <Button
@@ -599,8 +591,7 @@ export function ModalJobDetail({
             ) : (
               <DownloadCloudIcon className="size-3.5" />
             )}
-            Collect results
-          </Button>
+            {workText("modal_job_detail.collect_results")}</Button>
         ) : null}
         {outputs[0] && onOpenOutput ? (
           <Button
@@ -609,8 +600,7 @@ export function ModalJobDetail({
             className="ml-auto gap-1.5"
           >
             <FileOutputIcon className="size-3.5" />
-            Open output
-          </Button>
+            {workText("modal_job_detail.open_output")}</Button>
         ) : null}
       </footer>
     </div>

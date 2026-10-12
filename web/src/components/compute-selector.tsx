@@ -1,4 +1,5 @@
 "use client";
+import { workResourceName } from "@/geo/work-labels";
 import { geoText } from "@/geo/i18n";
 import {
   CheckIcon,
@@ -160,7 +161,7 @@ function PickerOption({
         <span className="flex items-center gap-1.5">
           <TierDot instance={instance} />
           <span className={cn("font-semibold", enabled ? "text-foreground" : "text-muted-foreground")}>
-            {instance.label}
+            {workResourceName(instance.label)}
           </span>
           <span className="text-muted-foreground">{isLocal ? appText("chat.compute.sandbox") : resourceLabel(instance)}</span>
           {legacy ? (

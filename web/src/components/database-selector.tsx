@@ -1,10 +1,14 @@
 "use client";
+import { workDatabaseDescription as databaseDescription, workDatabaseCategory as databaseCategory } from "@/geo/work-labels";
+import { geoText } from "@/geo/i18n";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon, DatabaseIcon, XIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import databases from "@/data/databases.json";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+const workText = geoText("work");
 
 export type Database = {
   id: string;
@@ -68,8 +72,8 @@ export function DatabasePickerBody({
       if (!q) return true;
       return (
         db.name.toLowerCase().includes(q) ||
-        db.category.toLowerCase().includes(q) ||
-        db.description.toLowerCase().includes(q)
+        db.category.toLowerCase().includes(q) || databaseCategory(db.category).toLowerCase().includes(q) ||
+        db.description.toLowerCase().includes(q) || databaseDescription(db).toLowerCase().includes(q)
       );
     });
   }, [search, activeDomain]);
@@ -113,13 +117,13 @@ export function DatabasePickerBody({
           ref={inputRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search databases…"
+          placeholder={workText("database_selector.search_databases")}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
         />
         <div className="flex items-center gap-0.5 rounded-md bg-muted p-0.5">
           {(["all", "science", "finance"] as const).map((d) => (
             <button
-              key={d}
+              key={workText("database.domain." + d)}
               onClick={() => setActiveDomain(d)}
               className={cn(
                 "rounded px-2 py-0.5 text-[10px] font-medium capitalize transition-colors",
@@ -137,18 +141,17 @@ export function DatabasePickerBody({
             onClick={clearAll}
             className="text-[10px] text-muted-foreground hover:text-destructive transition-colors whitespace-nowrap"
           >
-            Clear all
-          </button>
+            {workText("database_selector.clear_all")}</button>
         )}
       </div>
 
       {/* Results */}
       <div className="max-h-72 overflow-y-auto py-1">
         {grouped.size === 0 ? (
-          <div className="py-8 text-center text-xs text-muted-foreground">No databases found</div>
+          <div className="py-8 text-center text-xs text-muted-foreground">{workText("database_selector.no_databases_found")}</div>
         ) : (
           Array.from(grouped.entries()).map(([category, dbs]) => (
-            <div key={category}>
+            <div key={databaseCategory(category)}>
               <div className="sticky top-0 bg-background/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur-sm">
                 {category}
                 <span className="ml-1.5 font-normal normal-case text-muted-foreground/60">
@@ -181,7 +184,7 @@ export function DatabasePickerBody({
                         <DomainDot domain={db.domain} />
                         <span className="font-medium text-foreground truncate">{db.name}</span>
                       </div>
-                      <p className="mt-0.5 truncate text-muted-foreground/80">{db.description}</p>
+                      <p className="mt-0.5 truncate text-muted-foreground/80">{databaseDescription(db)}</p>
                     </div>
                     <a
                       href={db.url}
@@ -205,15 +208,13 @@ export function DatabasePickerBody({
       <div className="flex items-center justify-between border-t px-3 py-1.5">
         <span className="text-[10px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <DomainDot domain="science" /> Science
-          </span>
+            <DomainDot domain="science" /> {workText("database_selector.science")}</span>
           <span className="mx-2 text-border">·</span>
           <span className="inline-flex items-center gap-1">
-            <DomainDot domain="finance" /> Finance
-          </span>
+            <DomainDot domain="finance" /> {workText("database_selector.finance")}</span>
         </span>
         <span className="text-[10px] text-muted-foreground">
-          {filtered.length} of {ALL_DATABASES.length} databases
+          {workText("database_selector.filtered_count", { count: filtered.length, total: ALL_DATABASES.length })}
         </span>
       </div>
     </>
@@ -262,7 +263,7 @@ export function DatabaseSelector({
         >
           <DatabaseIcon className="size-3 shrink-0 text-muted-foreground" />
           <span className="truncate text-muted-foreground select-none whitespace-nowrap">
-            {selected.length === 0 ? "Add data sources" : `${selected.length} source${selected.length !== 1 ? "s" : ""}`}
+            {selected.length === 0 ? workText("database_selector.add_data_sources") : workText("database_selector.source_count", { count: selected.length })}
           </span>
           {selected.length > 0 && (
             <>
@@ -292,7 +293,7 @@ export function DatabaseSelector({
                   </span>
                 ))}
                 {selected.length > 3 && (
-                  <span className="text-[10px] text-muted-foreground">+{selected.length - 3} more</span>
+                  <span className="text-[10px] text-muted-foreground">+{selected.length - 3} {workText("database_selector.more")}</span>
                 )}
               </div>
               <span

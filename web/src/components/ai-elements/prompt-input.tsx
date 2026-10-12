@@ -1,4 +1,5 @@
 "use client";
+import { geoText } from "@/geo/i18n";
 
 import type { ChatStatus, FileUIPart, SourceDocumentUIPart } from "ai";
 import type {
@@ -73,6 +74,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+const workText = geoText("work");
 
 // ============================================================================
 // Helpers
@@ -374,7 +377,7 @@ export type PromptInputActionAddAttachmentsProps = ComponentProps<
 };
 
 export const PromptInputActionAddAttachments = ({
-  label = "Add photos or files",
+  label = workText("prompt_input.add_photos_or_files"),
   ...props
 }: PromptInputActionAddAttachmentsProps) => {
   const attachments = usePromptInputAttachments();
@@ -502,7 +505,7 @@ export const PromptInput = ({
       if (incoming.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: workText("prompt_input.no_files_match_the_accepted_types"),
         });
         return;
       }
@@ -512,7 +515,7 @@ export const PromptInput = ({
       if (accepted.length > 0 && sized.length === 0) {
         onError?.({
           code: "max_file_size",
-          message: "All files exceed the maximum size.",
+          message: workText("prompt_input.all_files_exceed_the_maximum_size"),
         });
         return;
       }
@@ -527,7 +530,7 @@ export const PromptInput = ({
         if (typeof capacity === "number" && sized.length > capacity) {
           onError?.({
             code: "max_files",
-            message: "Too many files. Some were not added.",
+            message: workText("prompt_input.too_many_files_some_were_not_added"),
           });
         }
         const next: (FileUIPart & { id: string })[] = [];
@@ -566,7 +569,7 @@ export const PromptInput = ({
       if (incoming.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: workText("prompt_input.no_files_match_the_accepted_types"),
         });
         return;
       }
@@ -576,7 +579,7 @@ export const PromptInput = ({
       if (accepted.length > 0 && sized.length === 0) {
         onError?.({
           code: "max_file_size",
-          message: "All files exceed the maximum size.",
+          message: workText("prompt_input.all_files_exceed_the_maximum_size"),
         });
         return;
       }
@@ -591,7 +594,7 @@ export const PromptInput = ({
       if (typeof capacity === "number" && sized.length > capacity) {
         onError?.({
           code: "max_files",
-          message: "Too many files. Some were not added.",
+          message: workText("prompt_input.too_many_files_some_were_not_added"),
         });
       }
 
@@ -833,12 +836,12 @@ export const PromptInput = ({
     <>
       <input
         accept={accept}
-        aria-label="Upload files"
+        aria-label={workText("prompt_input.upload_files")}
         className="hidden"
         multiple={multiple}
         onChange={handleChange}
         ref={inputRef}
-        title="Upload files"
+        title={workText("prompt_input.upload_files")}
         type="file"
       />
       <form
@@ -883,7 +886,7 @@ export const PromptInputTextarea = ({
   onChange,
   onKeyDown,
   className,
-  placeholder = "What would you like to know?",
+  placeholder = workText("prompt_input.what_would_you_like_to_know"),
   ...props
 }: PromptInputTextareaProps) => {
   const controller = useOptionalPromptInputController();
@@ -1175,7 +1178,7 @@ export const PromptInputSubmit = ({
 
   return (
     <InputGroupButton
-      aria-label={isGenerating ? "Stop" : "Submit"}
+      aria-label={isGenerating ? workText("prompt_input.stop") : workText("prompt_input.submit")}
       className={cn(className)}
       onClick={handleClick}
       size={size}

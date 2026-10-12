@@ -1,4 +1,6 @@
 "use client";
+import { geoText } from "@/geo/i18n";
+import { workLabel } from "@/geo/work-labels";
 
 import { AlertTriangleIcon, LockIcon } from "lucide-react";
 
@@ -11,6 +13,8 @@ import {
 import { cn, formatCompactTokens, formatUsd } from "@/lib/utils";
 import type { ProjectCostSummary } from "@/lib/use-project-cost";
 import type { CostEntry, SessionCostSummary } from "@/lib/use-session-cost";
+
+const workText = geoText("work");
 
 interface SessionCostPillProps {
   summary: SessionCostSummary;
@@ -93,12 +97,12 @@ export function SessionCostPill({
           aria-label={
             [
               limitUsd !== null
-                ? `Project billable cost ${formatUsd(projectTotal)} of ${formatUsd(limitUsd)}`
-                : `Project billable cost ${formatUsd(projectTotal)}`,
-              heldUsd > 0 ? `including ${formatUsd(heldUsd)} held for work in progress` : "",
-              `session billable cost ${formatUsd(sessionTotal)}`,
+                ? workText("session_cost_pill.project_billable_cost_value_of_value", { v0: formatUsd(projectTotal), v1: formatUsd(limitUsd) })
+                : workText("session_cost_pill.project_billable_cost_value", { v0: formatUsd(projectTotal) }),
+              heldUsd > 0 ? workText("session_cost_pill.including_value_held_for_work_in_progress", { v0: formatUsd(heldUsd) }) : "",
+              workText("session_cost_pill.session_billable_cost_value", { v0: formatUsd(sessionTotal) }),
               (summary.subscriptionTokens ?? 0) > 0
-                ? `${formatTokens(summary.subscriptionTokens ?? 0)} subscription tokens`
+                ? workText("session_cost_pill.value_subscription_tokens", { v0: formatTokens(summary.subscriptionTokens ?? 0) })
                 : "",
             ]
               .filter(Boolean)
@@ -112,7 +116,7 @@ export function SessionCostPill({
             )}
             <div className="flex flex-col items-end leading-tight">
               <span className="flex items-baseline gap-1">
-                <span className="text-muted-foreground">proj</span>
+                <span className="text-muted-foreground">{workText("session_cost_pill.proj")}</span>
                 <span className="font-semibold">{formatUsd(projectTotal)}</span>
                 {limitUsd !== null && (
                   <span className="text-muted-foreground">
@@ -121,15 +125,14 @@ export function SessionCostPill({
                 )}
               </span>
               <span className="flex items-baseline gap-1">
-                <span className="text-muted-foreground">sess</span>
+                <span className="text-muted-foreground">{workText("session_cost_pill.sess")}</span>
                 <span className="font-semibold">{formatUsd(sessionTotal)}</span>
               </span>
               {(summary.subscriptionTokens ?? 0) > 0 ? (
                 <span className="flex items-baseline gap-1">
-                  <span className="text-muted-foreground">sub</span>
+                  <span className="text-muted-foreground">{workText("session_cost_pill.sub")}</span>
                   <span className="font-semibold">
-                    {formatTokens(summary.subscriptionTokens ?? 0)} tok
-                  </span>
+                    {workText("session_cost_pill.tok_value", { tokens: formatTokens(summary.subscriptionTokens ?? 0) })}</span>
                 </span>
               ) : null}
             </div>
@@ -161,8 +164,7 @@ export function SessionCostPill({
         {projectSummary && (
           <div className="border-b p-4">
             <div className="text-muted-foreground text-xs uppercase tracking-wide">
-              Project billable spend
-            </div>
+              {workText("session_cost_pill.project_billable_spend")}</div>
             <div className="mt-1 flex items-baseline gap-2">
               <div className="font-mono text-2xl font-semibold tabular-nums">
                 {formatUsd(projectTotal)}
@@ -174,22 +176,17 @@ export function SessionCostPill({
               )}
             </div>
             <div className="text-muted-foreground mt-0.5 text-xs">
-              {formatTokens(projectSummary.totalTokens)} tokens across{" "}
-              {projectSummary.sessionCount} session
-              {projectSummary.sessionCount === 1 ? "" : "s"}
+              {workText("session_cost_pill.project_tokens", { tokens: formatTokens(projectSummary.totalTokens), count: projectSummary.sessionCount })}
             </div>
             {heldUsd > 0 && (
               <div className="text-muted-foreground mt-1 text-xs">
-                {formatUsd(spentUsd)} recorded
-                {reservedUsd > 0 ? ` · ${formatUsd(reservedUsd)} held for compute jobs` : ""}
-                {inFlightUsd > 0 ? ` · ${formatUsd(inFlightUsd)} in the current run` : ""}
+                {workText("session_cost_pill.recorded_value", { cost: formatUsd(spentUsd) })}{reservedUsd > 0 ? workText("session_cost_pill.value_held_for_compute_jobs", { v0: formatUsd(reservedUsd) }) : ""}
+                {inFlightUsd > 0 ? workText("session_cost_pill.value_in_the_current_run", { v0: formatUsd(inFlightUsd) }) : ""}
               </div>
             )}
             {(projectSummary.subscriptionTokens ?? 0) > 0 ? (
               <div className="mt-1 text-xs text-muted-foreground">
-                {formatTokens(projectSummary.subscriptionTokens ?? 0)} subscription
-                tokens are tracked separately from this spend.
-              </div>
+                {workText("session_cost_pill.subscription_separate", { tokens: formatTokens(projectSummary.subscriptionTokens ?? 0) })}</div>
             ) : null}
             {ratio !== null && (
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -208,45 +205,37 @@ export function SessionCostPill({
             )}
             {blockedTone && (
               <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
-                Spend limit reached. New billable API and compute work is
-                blocked until the limit is raised; provider-managed
-                subscription and local runs can continue.
-              </div>
+                {workText("session_cost_pill.spend_limit_reached_new_billable_api_and_compute_work_is_blocked_until_the_limit_is_raised_prov")}</div>
             )}
             {warnTone && (
               <div className="mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-700 dark:text-amber-400">
-                Approaching the spend limit (≥80%).
-              </div>
+                {workText("session_cost_pill.approaching_the_spend_limit_80")}</div>
             )}
           </div>
         )}
 
         <div className="border-b p-4">
           <div className="text-muted-foreground text-xs uppercase tracking-wide">
-            This session
-          </div>
+            {workText("session_cost_pill.this_session")}</div>
           <div className="mt-1 font-mono text-xl font-semibold tabular-nums">
             {formatUsd(sessionTotal)}
           </div>
           <div className="text-muted-foreground mt-0.5 text-xs">
-            {formatTokens(summary.totalTokens)} tokens across{" "}
-            {summary.entries.length} call
-            {summary.entries.length === 1 ? "" : "s"}
+            {workText("session_cost_pill.session_tokens", { tokens: formatTokens(summary.totalTokens), count: summary.entries.length })}
           </div>
           <div className="mt-2">
-            <CostRow label="Agent" costUsd={summary.agentUsd} />
+            <CostRow label={workText("session_cost_pill.agent")} costUsd={summary.agentUsd} />
             {summary.subagentUsd > 0 && (
-              <CostRow label="Subagents" costUsd={summary.subagentUsd} />
+              <CostRow label={workText("session_cost_pill.subagents")} costUsd={summary.subagentUsd} />
             )}
             {summary.computeUsd > 0 && (
-              <CostRow label="Compute (Modal)" costUsd={summary.computeUsd} />
+              <CostRow label={workText("session_cost_pill.compute_modal")} costUsd={summary.computeUsd} />
             )}
             {(summary.subscriptionTokens ?? 0) > 0 ? (
               <div className="flex items-baseline justify-between py-1 text-sm">
-                <span className="text-muted-foreground">Subscription usage</span>
+                <span className="text-muted-foreground">{workText("session_cost_pill.subscription_usage")}</span>
                 <span className="font-mono tabular-nums">
-                  {formatTokens(summary.subscriptionTokens ?? 0)} tokens
-                </span>
+                  {workText("session_cost_pill.tokens_value", { tokens: formatTokens(summary.subscriptionTokens ?? 0) })}</span>
               </div>
             ) : null}
           </div>
@@ -255,8 +244,7 @@ export function SessionCostPill({
         <div className="max-h-60 overflow-y-auto p-2">
           {summary.entries.length === 0 ? (
             <div className="text-muted-foreground px-2 py-1 text-xs">
-              No call-level breakdown yet.
-            </div>
+              {workText("session_cost_pill.no_call_level_breakdown_yet")}</div>
           ) : (
             <ul className="space-y-0.5">
               {summary.entries.map((entry, idx) => (
@@ -284,7 +272,7 @@ function EntryRow({ entry }: { entry: CostEntry }) {
     <li className="text-muted-foreground flex items-center justify-between gap-2 px-2 py-1 text-[11px]">
       <span
         className="flex min-w-0 items-center gap-1 truncate"
-        title={`${entry.role} · ${entry.model}`}
+        title={`${workLabel("role", entry.role)} · ${entry.model}`}
       >
         <span
           className={cn(
@@ -302,9 +290,9 @@ function EntryRow({ entry }: { entry: CostEntry }) {
       <span className="shrink-0 font-mono tabular-nums">
         {formatTokens(entry.totalTokens)} ·{" "}
         {entry.billingMode === "subscription"
-          ? "subscription"
+          ? workText("session_cost_pill.subscription")
           : entry.billingMode === "local"
-            ? "local"
+            ? workText("session_cost_pill.local")
             : formatUsd(entry.costUsd)}
       </span>
     </li>
