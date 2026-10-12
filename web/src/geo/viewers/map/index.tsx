@@ -1,23 +1,24 @@
 "use client";
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { X } from "lucide-react";
 import type { ViewerProps } from "@/lib/viewers/registry";
 import { GEO_INSPECTION_SCHEMA, type GeoInspection } from "../../contracts/inspection";
 import type { MapManifest, MapManifestResponse, MapSource, RasterPoint, RasterStyle, VectorPage } from "../../contracts/maps";
-import { buildRequest, canOverlay, createLayer, displayCrs, hasCrs, isVector, layerView, projDefinitions, sourceCrs, styleRequest, VECTOR_LIMIT, viewCrsChoices, WEB_MERCATOR, type LayerState, type MapData, type Viewport } from "./model";
+import { buildRequest, canOverlay, createLayer, displayCrs, hasCrs, isVector, layerView, projDefinitions, sourceCrs, styleRequest, viewCrsChoices, WEB_MERCATOR, type LayerState, type MapData, type Viewport } from "./model";
 import { registerProjections } from "./view";
 import { basemapAttribution, basemapLayers, DEFAULT_BASEMAP_SELECTION, useBasemapCatalog, type BasemapSelection } from "./basemaps";
-import BasemapPicker from "./basemaps-picker";
+import BasemapPicker, { BasemapAttributions } from "./basemaps-picker";
 /** View units per pixel above which the 1:50K geology overlay is hidden (avoids hundreds of WMS requests at country scale). */
 const GEOLOGY_MAX_RESOLUTION = 400;
 import { mapPost } from "./client";
-import { layerLegend } from "./colors";
 import MapCanvas, { type CanvasHandle } from "./map-canvas";
 import AreaPanel from "./area-panel";
+import AttributeTable, { textValue } from "./attribute-table";
+import MapSidePanel from "./side-panel";
 import { mapText as t } from "./strings";
 const InspectionViewer = lazy(() => import("../inspection-viewer"));
 const button = "rounded border px-2 py-1 disabled:opacity-40";
 const input = "rounded border bg-background p-1";
-const textValue = (value: unknown) => value == null ? t("nodata") : typeof value === "object" ? JSON.stringify(value) : String(value);
 function validateInspection(i: GeoInspection): GeoInspection {
   if (i.schemaVersion !== GEO_INSPECTION_SCHEMA || !i.asset || !Array.isArray(i.issues)) throw new Error(t("requestError"));
   return i;
@@ -40,8 +41,9 @@ function Workspace(props: ViewerProps) {
   const [displayTarget, setDisplayTarget] = useState(WEB_MERCATOR);
   const [fitVersion, setFitVersion] = useState(0);
   const [colorFields, setColorFields] = useState<Record<string, string>>({});
-  const [selected, setSelected] = useState<{ layerId: string; row: number }>();
-  const [pixel, setPixel] = useState("");
+  // A selection names the response it indexes: a newer page of the same layer drops it instead of pointing at another feature.
+  const [selected, setSelected] = useState<{ layerId: string; row: number; coordinate?: number[]; data?: MapData }>();
+  const [pixel, setPixel] = useState<{ coordinate: number[]; text: string }>();
   const [exporting, setExporting] = useState(false);
   const canvas = useRef<CanvasHandle>(null);
   const sequence = useRef(0);
@@ -63,13 +65,14 @@ function Workspace(props: ViewerProps) {
     return built;
   }, [basemap, catalog.providers, crs]);
   const attributions = crs === "native" ? [] : catalog.providers.filter(p => p.available && p.id !== "none" && (p.id === basemap.base || basemap.overlays.includes(p.id as BasemapSelection["overlays"][number]))).map(basemapAttribution);
+  const select = (layerId: string, row: number, coordinate?: number[]) => { setActiveId(layerId); setPixel(undefined); setSelected({ layerId, row, coordinate, data: layers.find(l => l.id === layerId)?.data }); };
   const fields = active ? active.inspection.layers?.find(l => l.name === active.source.layer)?.fields?.map(f => f.name) ?? (active.data?.kind === "vector" ? active.data.fields : []) : [];
   const data = active?.data;
   const view = active && layerView(active);
   const update = (id: string, patch: Partial<LayerState>) => setLayers(current => current.map(l => l.id === id ? { ...l, ...patch } : l));
   useEffect(() => {
     const ac = new AbortController();
-    setReady(false); setError(""); setLayers([]); setManifest(undefined); setFallback(false); setViewport(undefined); setSelected(undefined); setPixel("");
+    setReady(false); setError(""); setLayers([]); setManifest(undefined); setFallback(false); setViewport(undefined); setSelected(undefined); setPixel(undefined);
     async function load() {
       try {
         let initial: LayerState[];
@@ -105,7 +108,7 @@ function Workspace(props: ViewerProps) {
   useEffect(() => {
     const ac = new AbortController();
     const requests = JSON.parse(loadKey) as { id: string; source: MapSource; visible: boolean; family: string }[];
-    setSelected(undefined); setPixel("");
+    setSelected(undefined); setPixel(undefined);
     for (const request of requests.filter(l => l.visible)) {
       const layer = layers.find(l => l.id === request.id)!;
       const vector = isVector(layer);
@@ -144,11 +147,12 @@ function Workspace(props: ViewerProps) {
   }, [pageKey, crs, viewport, props.projectId]);
   function readPixel(coordinate: number[]) {
     pixelRequest.current?.abort();
+    setSelected(undefined); setPixel(undefined);
     if (!active?.style || active.style.displayCrs !== crs) return;
     const ac = new AbortController(); pixelRequest.current = ac;
     void mapPost<RasterPoint>("/geo/raster-point", { path: active.source.path, band: active.source.band, displayCrs: crs, coordinate }, props.projectId, ac.signal)
-      .then(point => { if (!ac.signal.aborted) setPixel(point.inside ? t("sourcePixel", { row: point.row ?? 0, col: point.col ?? 0, value: point.value ?? t("nodata") }) : t("outsidePixel")); })
-      .catch(e => { if (!ac.signal.aborted) setPixel(e instanceof Error ? e.message : t("requestError")); });
+      .then(point => { if (!ac.signal.aborted) setPixel({ coordinate, text: point.inside ? t("sourcePixel", { row: point.row ?? 0, col: point.col ?? 0, value: point.value ?? t("nodata") }) : t("outsidePixel") }); })
+      .catch(e => { if (!ac.signal.aborted) setPixel({ coordinate, text: e instanceof Error ? e.message : t("requestError") }); });
   }
   async function addLayer() {
     if (!pathToAdd.trim()) return;
@@ -174,7 +178,7 @@ function Workspace(props: ViewerProps) {
     const candidate = { ...active, source: { ...active.source, ...patch } };
     if (layers.length > 1 && !hasCrs(sourceCrs(candidate))) { setError(t("overlayBlocked")); return; }
     setError(""); update(active.id, { source: candidate.source, data: undefined, offset: 0 });
-    setSelected(undefined); setPixel("");
+    setSelected(undefined); setPixel(undefined);
     if (patch.layer !== undefined) { setViewport(undefined); setFitVersion(n => n + 1); }
   }
   function moveLayer(id: string, direction: number) {
@@ -191,59 +195,52 @@ function Workspace(props: ViewerProps) {
   }
   if (!ready) return <p role="status" className="p-4">{t("loading")}</p>;
   if (fallback) return <Suspense fallback={<p>{t("loading")}</p>}><InspectionViewer {...props} /></Suspense>;
-  const selectedFeature = selected ? layers.find(l => l.id === selected.layerId)?.data : undefined;
-  const properties = selectedFeature?.kind === "vector" ? selectedFeature.features.features[selected!.row]?.properties : undefined;
-  return <div className="h-full space-y-3 overflow-auto p-3 text-sm" data-testid="geo-map-viewer">
-    <h2 className="font-semibold">{manifest?.title ?? props.name}</h2>
-    <p>{t("subset")}</p>
+  const selectedLayer = selected ? layers.find(l => l.id === selected.layerId) : undefined;
+  const selection = selectedLayer?.data?.kind === "vector" && selectedLayer.data === selected!.data ? selected : undefined;
+  const properties = selection && selectedLayer?.data?.kind === "vector" ? selectedLayer.data.features.features[selection.row]?.properties : undefined;
+  const closePopup = () => { setSelected(undefined); setPixel(undefined); pixelRequest.current?.abort(); };
+  const popup = properties && selectedLayer
+    ? { at: "selected" as const, content: <MapPopup title={t("properties")} subtitle={selectedLayer.source.layer ?? selectedLayer.source.path} onClose={closePopup}><dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5">{Object.entries(properties).map(([key, value]) => <Fragment key={key}><dt className="text-muted-foreground">{key}</dt><dd className="[overflow-wrap:anywhere]">{textValue(value)}</dd></Fragment>)}</dl></MapPopup> }
+    : pixel ? { at: pixel.coordinate, content: <MapPopup title={t("pixelTitle")} subtitle={active?.source.path ?? ""} onClose={closePopup}><p role="status">{pixel.text}</p></MapPopup> } : undefined;
+  return <div className="@container h-full space-y-3 overflow-auto p-3 text-sm" data-testid="geo-map-viewer">
+    <header className="flex flex-wrap items-center gap-2">
+      <h2 className="mr-auto font-semibold">{manifest?.title ?? props.name}</h2>
+      <button className={button} onClick={() => { props.onRetry?.(); setRetry(n => n + 1); }}>{t("retry")}</button><button className={button} disabled={!view} onClick={() => canvas.current?.fit()}>{t("fit")}</button><button className={button} title={t("figureNotice")} disabled={exporting || !layers.some(l => l.visible && layerView(l)) || layers.some(l => l.visible && l.loading)} onClick={async () => { setExporting(true); try { await canvas.current?.exportPng(); } catch (e) { setError(e instanceof Error ? e.message : t("pngError")); } finally { setExporting(false); } }}>{t("downloadPng")}</button>
+    </header>
+    <p className="text-xs text-muted-foreground">{t("subset")} {t("figureNotice")}</p>
     {error && <p role="alert">{error}</p>}
-    <div className="flex flex-wrap gap-2"><button className={button} onClick={() => { props.onRetry?.(); setRetry(n => n + 1); }}>{t("retry")}</button><button className={button} disabled={!view} onClick={() => canvas.current?.fit()}>{t("fit")}</button><button className={button} disabled={exporting || !layers.some(l => l.visible && layerView(l)) || layers.some(l => l.visible && l.loading)} onClick={async () => { setExporting(true); try { await canvas.current?.exportPng(); } catch (e) { setError(e instanceof Error ? e.message : t("pngError")); } finally { setExporting(false); } }}>{t("downloadPng")}</button></div>
-    <p className="text-xs text-muted-foreground">{t("figureNotice")}</p>
-    {crs !== "native" && <label>{t("displayCrs")} <select className={input} value={crs} onChange={e => { setDisplayTarget(e.target.value); setViewport(undefined); }}>{[...new Set([...crsChoices, crs])].map(code => <option key={code} value={code}>{code === WEB_MERCATOR ? t("webMercator") : t("crsOption", { crs: code })}</option>)}</select></label>}
-    <BasemapPicker providers={catalog.providers} value={basemap} onChange={setBasemap} disabled={crs === "native"} />
+    <div className="flex flex-wrap items-start gap-x-4 gap-y-1">
+      {crs !== "native" && <label className="flex items-center gap-2">{t("displayCrs")} <select className={input} value={crs} onChange={e => { setDisplayTarget(e.target.value); setViewport(undefined); }}>{[...new Set([...crsChoices, crs])].map(code => <option key={code} value={code}>{code === WEB_MERCATOR ? t("webMercator") : t("crsOption", { crs: code })}</option>)}</select></label>}
+      <div className="min-w-0 flex-1"><BasemapPicker providers={catalog.providers} value={basemap} onChange={setBasemap} disabled={crs === "native"} /></div>
+    </div>
     {catalog.error && <p role="status" className="text-xs">{catalog.error}</p>}
-    <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} backgroundLayers={backgroundLayers} attributions={attributions} fitVersion={fitVersion} fields={colorFields} selected={selected} onViewport={onViewport} onError={setError} onPick={(layerId, row) => { setActiveId(layerId); setSelected({ layerId, row }); }} onCoordinate={readPixel} />
-    <section className="space-y-2" aria-label={t("layers")}><h3 className="font-semibold">{t("layers")}</h3>
-      <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); void addLayer(); }}><label>{t("addPath")} <input className={input} value={pathToAdd} onChange={e => setPathToAdd(e.target.value)} /></label><button className={button} disabled={adding || !pathToAdd.trim()}>{t("add")}</button></form>
-      {layers.map((l, index) => <div className="flex flex-wrap items-center gap-2 rounded border p-2" key={l.id}>
-        <button className={button} aria-pressed={active?.id === l.id} aria-label={`${t("select")}: ${l.source.path}`} onClick={() => { setActiveId(l.id); setSelected(undefined); setPixel(""); }}>{l.source.path}</button>
-        <label><input type="checkbox" checked={l.visible} onChange={e => update(l.id, { visible: e.target.checked, loading: false })} /> {t("visible")}</label>
-        <label>{t("opacity")} <input aria-label={`${t("opacity")}: ${l.source.path}`} type="range" min="0" max="1" step="0.05" value={l.opacity} onChange={e => update(l.id, { opacity: Number(e.target.value) })} /></label>
-        <button className={button} disabled={index === 0} onClick={() => moveLayer(l.id, -1)}>{t("up")}</button><button className={button} disabled={index === layers.length - 1} onClick={() => moveLayer(l.id, 1)}>{t("down")}</button><button className={button} onClick={() => { setLayers(current => current.filter(item => item.id !== l.id)); setSelected(undefined); setPixel(""); }}>{t("remove")}</button>
-        {l.loading && <span role="status">{t("loading")}</span>}{l.error && <span role="alert">{l.error}</span>}
-      </div>)}
-    </section>
-    {active && <>
-      <section className="space-y-2 rounded border p-3">
-        {active.inspection.layers?.length ? <label>{t("layer")} <select className={input} value={active.source.layer ?? ""} onChange={e => changeSource({ layer: e.target.value })}>{active.inspection.layers.map(l => <option key={l.name}>{l.name}</option>)}</select></label> : null}
-        {active.inspection.bands?.length ? <label>{t("band")} <select className={input} value={active.source.band} onChange={e => changeSource({ band: Number(e.target.value) })}>{active.inspection.bands.map(b => <option key={b.index} value={b.index}>{b.index}{b.description ? ` · ${b.description}` : ""}</option>)}</select></label> : null}
-        {!isVector(active) && <form className="flex flex-wrap gap-2" key={active.id + active.source.layer} onSubmit={e => { e.preventDefault(); changeSource({ variable: String(new FormData(e.currentTarget).get("variable") ?? "").trim() || undefined }); }}><label>{t("variable")} <input className={input} name="variable" defaultValue={active.source.variable ?? ""} /></label><button className={button}>{t("apply")}</button></form>}
-        <label><input type="checkbox" checked={!!active.source.categorical} onChange={e => changeSource({ categorical: e.target.checked })} /> {t("categorical")}</label>
-        {isVector(active) && active.source.categorical && <label>{t("categoryField")} <select className={input} value={colorFields[active.id] ?? ""} onChange={e => { setColorFields(current => ({ ...current, [active.id]: e.target.value })); changeSource({ variable: e.target.value || undefined }); }}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</select></label>}
-        <p>{t("sourceCrs")}: {sourceCrs(active).authority ?? sourceCrs(active).name ?? t("unknown")} · {t(sourceCrs(active).status)}</p>
-        <p>{t("displayCrs")}: {crs === "native" ? t("native") : crs}</p><p>{t("unit")}: {active.manifest?.unit ?? active.inspection.bands?.find(b => b.index === active.source.band)?.unit ?? t("unknown")}</p><p>{t("coordinateUnits")}: {sourceCrs(active).axisUnits ?? t("unknown")}</p><p>{t("unchanged")}</p>
-        {!hasCrs(sourceCrs(active)) && <p>{t("nativeLimit")}</p>}
-        {active.manifest && active.manifest.displayCrs !== crs && <p>{t("displayFallback")}</p>}
-        {view && <><p>{t("extent", { crs: view.displayCrs })}: {view.bbox.map(n => n.toPrecision(10)).join(", ")}</p><p>{t("sampling", { method: view.preview.method, sampled: t(view.preview.sampled ? "yes" : "no"), truncated: t(view.preview.truncated ? "yes" : "no") })}</p>
-          {view.kind === "raster-style" ? <><p>{t("rasterSize", { width: view.preview.width ?? 0, height: view.preview.height ?? 0 })}</p><p>{t("sourceResolution", { resolution: view.resolution.toPrecision(6), crs: view.displayCrs === "native" ? t("native") : view.displayCrs })}</p><p>{t("pixelHint")}</p>{pixel && <p role="status">{pixel}</p>}</>
-            : <><p>{t("featureCount", { shown: view.features.features.length, total: view.preview.totalFeatures ?? t("unknown") })}</p><p>{t(active.vectorMode === "full" ? "vectorFull" : "vectorViewport")}</p></>}
-        </>}
-        <h4>{t("legend")}</h4><ul className="max-h-48 overflow-auto">{layerLegend(active, colorFields[active.id]).map((item, n) => <li className="flex items-center gap-2" key={n}><span aria-hidden className="inline-block h-3 w-4 border" style={{ backgroundColor: item.color }} />{item.label}</li>)}<li>{t("nodata")}: {view?.nodata ?? active.manifest?.nodata ?? t("nodata")}</li></ul>
-        <ul className="list-disc pl-5">{(view?.issues ?? active.inspection.issues).map((issue, n) => <li key={n}>{issue.message}{issue.requiredInput ? ` · ${issue.requiredInput}` : ""}</li>)}</ul>
-      </section>
-      {data?.kind === "vector" && <AttributeTable data={data} layer={active} full={active.vectorMode === "full"} selectedRow={selected?.layerId === active.id ? selected.row : undefined} onSelect={row => setSelected({ layerId: active.id, row })} onOffset={offset => update(active.id, { offset })} />}
-      {properties && <section><h3>{t("properties")}</h3><dl>{Object.entries(properties).map(([key, value]) => <div key={key}><dt className="font-medium">{key}</dt><dd>{textValue(value)}</dd></div>)}</dl></section>}
-      {isVector(active) && <AreaPanel key={`${active.id}:${active.source.layer ?? ""}`} layer={active} projectId={props.projectId} fields={fields} />}
-    </>}
+    {/* Wide: map and panel side by side at one height, the panel scrolls on its own. Narrow: the panel follows the map. */}
+    <div className="flex flex-col gap-3 @3xl:flex-row">
+      <div className="relative h-[clamp(320px,62vh,720px)] min-w-0 flex-1">
+        <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} backgroundLayers={backgroundLayers} attributions={attributions} fitVersion={fitVersion} fields={colorFields} selected={selection} popup={popup} onViewport={onViewport} onError={setError} onPick={select} onCoordinate={readPixel} onClosePopup={closePopup} />
+        <BasemapAttributions providers={catalog.providers} value={basemap} disabled={crs === "native"} className="pointer-events-auto absolute bottom-1 right-1 max-w-[70%] rounded bg-white/85 px-1.5 py-0.5 text-right text-[11px] leading-tight text-black" />
+      </div>
+      <aside aria-label={t("panel")} className="rounded border p-3 @3xl:relative @3xl:w-80 @3xl:shrink-0 @3xl:p-0">
+        <div className="@3xl:absolute @3xl:inset-0 @3xl:overflow-auto @3xl:p-3">
+          <MapSidePanel layers={layers} active={active} crs={crs} colorFields={colorFields} fields={fields} pathToAdd={pathToAdd} adding={adding} onPathToAdd={setPathToAdd} onAdd={() => void addLayer()}
+            onSelect={id => { setActiveId(id); setSelected(undefined); setPixel(undefined); }} onUpdate={update} onMove={moveLayer}
+            onRemove={id => { setLayers(current => current.filter(item => item.id !== id)); setSelected(undefined); setPixel(undefined); }}
+            onSource={changeSource} onColorField={field => { if (!active) return; setColorFields(current => ({ ...current, [active.id]: field })); changeSource({ variable: field || undefined }); }} />
+        </div>
+      </aside>
+    </div>
+    {active && data?.kind === "vector" && <AttributeTable key={`table:${active.id}:${active.source.layer ?? ""}`} data={data} full={active.vectorMode === "full"} offset={active.offset} loading={active.loading} selectedRow={selection?.layerId === active.id ? selection.row : undefined} onSelect={row => select(active.id, row)} onOffset={offset => update(active.id, { offset })} />}
+    {active && isVector(active) && <AreaPanel key={`area:${active.id}:${active.source.layer ?? ""}`} layer={active} projectId={props.projectId} fields={fields} />}
     {manifest && <section className="space-y-1"><h3>{t("analysis")}</h3><p>{manifest.analysis.method}</p>{manifest.analysis.tablePath && <p>{t("tablePath", { path: manifest.analysis.tablePath })}</p>}{manifest.analysis.scriptPath && <p>{t("scriptPath", { path: manifest.analysis.scriptPath })}</p>}<h4>{t("limitations")}</h4><ul>{manifest.limitations.map((limit, n) => <li key={n}>{limit}</li>)}</ul></section>}
   </div>;
 }
-/** Whole-layer data pages client-side; viewport data pages through the server (`nextOffset`). Row = feature index in `data`. */
-function AttributeTable({ data, layer, full, selectedRow, onSelect, onOffset }: { data: VectorPage; layer: LayerState; full: boolean; selectedRow?: number; onSelect(row: number): void; onOffset(offset: number): void }) {
-  const start = full ? Math.min(layer.offset, Math.max(0, data.features.features.length - 1)) : 0;
-  const rows = full ? data.features.features.slice(start, start + VECTOR_LIMIT) : data.features.features;
-  const next = full ? (start + VECTOR_LIMIT < data.features.features.length ? start + VECTOR_LIMIT : null) : data.nextOffset;
-  return <section aria-label={t(full ? "attributesFull" : "attributes")} className="space-y-2"><h3 className="font-semibold">{t(full ? "attributesFull" : "attributes")}</h3><p>{t("offset", { offset: layer.offset })}</p>
-    <div className="max-h-64 overflow-auto"><table className="w-full text-left"><thead><tr>{data.fields.map(f => <th className="border p-1" key={f}>{f}</th>)}</tr></thead><tbody>{rows.map((f, n) => { const row = (full ? start : 0) + n; return <tr key={row} aria-selected={selectedRow === row} className="cursor-pointer aria-selected:bg-muted" onClick={() => onSelect(row)}>{data.fields.map((field, column) => <td className="border p-1" key={field}>{column === 0 ? <button className="underline" onClick={() => onSelect(row)}>{textValue(f.properties[field])}</button> : textValue(f.properties[field])}</td>)}</tr>; })}</tbody></table>{!rows.length && <p>{t("empty")}</p>}</div>
-    <div className="flex gap-2"><button className={button} disabled={layer.offset === 0 || layer.loading} onClick={() => onOffset(Math.max(0, layer.offset - VECTOR_LIMIT))}>{t("previous")}</button><button className={button} disabled={next === null || layer.loading} onClick={() => onOffset(next!)}>{t("next")}</button></div></section>;
+/** Mini popup drawn on the map at the selected feature or clicked pixel. */
+function MapPopup({ title, subtitle, onClose, children }: { title: string; subtitle: string; onClose(): void; children: ReactNode }) {
+  return <div role="dialog" aria-label={title} className="w-64 max-w-[60vw] rounded-md border bg-popover text-xs text-popover-foreground shadow-lg">
+    <div className="flex items-start gap-2 border-b px-2 py-1.5">
+      <div className="min-w-0 flex-1"><p className="font-semibold">{title}</p><p className="truncate text-muted-foreground" title={subtitle}>{subtitle}</p></div>
+      <button className="rounded p-0.5 hover:bg-muted" aria-label={t("closePopup")} onClick={onClose}><X aria-hidden className="size-3.5" /></button>
+    </div>
+    <div className="max-h-48 overflow-auto px-2 py-1.5">{children}</div>
+  </div>;
 }
