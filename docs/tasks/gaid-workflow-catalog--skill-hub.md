@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:29:56Z
+updated: 2026-10-12T09:31:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
@@ -93,9 +93,9 @@ AGENTS.md (one bullet).
 - Resumed in the original printed worktree. Read repository rules, writer procedures, copy rules and the existing preview/install seams.
 - Implemented URL/file intake, bounded archive validation, durable SHA-256 sources, catalogue-name notice and existing preview/acknowledgement/install seam. Published checkpoint b3aa2370d63c.
 - Server 16 tests and web 4 tests pass; server/web tsc and copy validator pass (0 errors, 3 explained warnings). Real public package downloaded and its layout inspected.
-- Isolated end-to-end check is running as job-geoaidesk-gaid-workflow-catalog--skill-hub-2; output/evidence under ~/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/. No paid model runs or review-instance changes.
+- Isolated end-to-end check is running as job-geoaidesk-gaid-workflow-catalog--skill-hub-3; output/evidence under ~/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/. No paid model runs or review-instance changes.
 ## Next steps
-1. Inspect job 2 exit and evidence on its completion notification; fix any concrete failure, then copy desktop/narrow PNGs into the parent report folder, finalize the report section, clean generated caches and task finish.
+1. Inspect job 3 exit and evidence on its completion notification; fix any concrete failure, then copy desktop/narrow PNGs into the parent report folder, finalize the report section, clean generated caches and task finish.
 ## Failed approaches
 - E2E job 2 was cancelled after its harness launched Next in the repository root instead of web/. No application failure: corrected the external harness Next directory before a fresh run.
 - Initial SkillsPanel seam test supplied an incomplete sync-status mock; fixed the fixture to use the normal default, without changing production list logic.
@@ -119,6 +119,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T091833.056202Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T092753.682282Z/receipt.json
   - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-workflow-catalog--skill-hub/evidence/web.log"],"reason":"E2E harness launched Next from repository root, not web; fix harness directory and rerun","recorded":"2026-10-12T09:29:55Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-catalog--skill-hub-20261012T093025.024721Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
