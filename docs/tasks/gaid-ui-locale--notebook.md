@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T14:34:59Z
+status: ready
+updated: 2026-10-12T14:35:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"334bb7bf-c7ab-4250-b73e-1471a312e37f","pid":156917,"provider":"codex","session":"01a13070-cbd3-7342-84f1-7f5315c5f76d","start":"28006151","token":"3629085d8a1d23c5b9de8f99b11198713cbb9dc06174c176c4fe351ffbf0c804"}
 branch: task/gaid-ui-locale--notebook
 target: task/gaid-ui-locale
@@ -95,7 +95,9 @@ Intentionally preserved: user/agent-authored titles, bodies, evidence, limitatio
 Verification: local web npm ci completed; web npx tsc --noEmit passed; full npm run test passed (145 files / 972 tests); copy validator 0 errors / 9 total warnings (6 notebook warnings reviewed: negated verified/automatically clauses and saved-result schema validation, no scientific-validity claim); scanner only git HEAD and InChI in owned files; all 264 paired ICU messages formatted in both locales for count 0, 1 and 2; git diff --check passed. No model calls or browser screenshots.
 
 ## Next steps
-1. Run task finish. Parent then runs task complete gaid-ui-locale--notebook, registers the two extra helper boundaries, and performs its full scripts/check and browser checks.
+<!-- task:closed -->
+Closed 2026-10-12T14:35:14Z: ready; the parent gaid-ui-locale integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial task resume waited for another transaction; retry succeeded with no relocation.
 - The first recorded npm-ci job installed dependencies in its isolated source snapshot, not this worktree. Installed once in web locally as required by the child contract. A second job attempt was rejected before launch because the task source was dirty; no job to resume.
