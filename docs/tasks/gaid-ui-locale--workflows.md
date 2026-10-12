@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:22:07Z
+updated: 2026-10-12T14:23:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"7c5ad9b2-35a5-488e-ad56-4d3d0008f9bb","pid":149069,"provider":"codex","session":"01a13070-21c0-7213-b793-c604fbd59372","start":"28001766","token":"91c8b57b2549b46aa416b8addcca52cb4456ce31be2d5c1700757d860aa1d2f0"}
 branch: task/gaid-ui-locale--workflows
 target: task/gaid-ui-locale
@@ -81,6 +81,7 @@ Other upstream file touched: web/src/data/workflows.json, one comparative-genomi
 - Parent owns whole-app scripts/check as stated in the child contract.
 
 ## Failed approaches
+- Full frontend job 1 exited 127: immutable job snapshot excludes node_modules, so vitest was unavailable. Replace with a self-contained check job that runs npm ci before npm test; source changes are not required.
 - Copy validation rejects upstream comparative-genomics description (“evolutionary insights”) as empty-capability. Under the contract’s explicit English-copy-error exception, changed only that description to “Compare genomes across species to examine evolutionary relationships”, in source JSON and generated en catalogue. No prompt changed. Parent must register web/src/data/workflows.json in integration-boundaries (child is forbidden from editing the shared boundaries file).
 ## Notes and decisions
 - New warnings reviewed: cell-type-annotation describes automatic reference-based labelling requested by the task; podcast duration “in minutes” is a unit, not a speed claim; synthetic-accessibility describes the evaluated synthesis difficulty; risk-prediction-model describes validation as requested work, not a verified status. Preserve these factual meanings.
@@ -96,6 +97,7 @@ None.
 Child result and copy changes are recorded here for the parent’s canonical report.
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--workflows-20261012T142231.166023Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
