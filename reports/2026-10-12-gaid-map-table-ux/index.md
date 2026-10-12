@@ -64,7 +64,7 @@ supersedes:
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 화면 배치와 표 조회 기능이며 자료 값을 계산하거나 바꾸지 않습니다. 정렬·필터는 표에만 적용되고 지도 색상, 면적표, 원본 파일에는 영향을 주지 않습니다. 원본 CRS와 표시 CRS는 패널에 따로 표시합니다.
-- 소프트웨어 검증: 검토용과 같은 표본 자료로 별도 실행한 앱에서 자동 브라우저(Chromium)로 지질도 열기, 범주형 색상, 지도 클릭 팝업, 속성표 정렬·필터(133행 중 "화강" 포함 37행), 행 선택 팝업, 래스터 픽셀 팝업, 좁은 화면 배치를 확인했습니다. 자동 검사로 정렬 순서(숫자·문자·결측값), 필터 조합, 팝업 위치 지정, 기존 지도 동작(요청 범위, 프로젝트 전환, 늦게 온 응답 무시)을 확인했습니다. 저장소 전체 검사 결과는 부록 A에 적었습니다.
+- 소프트웨어 검증: 검토용과 같은 표본 자료로 별도 실행한 앱에서 자동 브라우저(Chromium)로 지질도 열기, 범주형 색상, 지도 클릭 팝업, 속성표 정렬·필터(133행 중 "화강" 포함 37행), 행 선택 팝업, 래스터 픽셀 팝업, 좁은 화면 배치를 확인했습니다. 자동 검사로 정렬 순서(숫자·문자·결측값), 필터 조합, 팝업 위치 지정, 기존 지도 동작(요청 범위, 프로젝트 전환, 늦게 온 응답 무시)을 확인했습니다. 저장소 전체 검사(백엔드·웹·geo 테스트, 문구 검사, 배포 실행 점검)도 통과했습니다.
 
 ## 5. 한계
 
@@ -93,7 +93,7 @@ supersedes:
 | 항목 | 위치 |
 |---|---|
 | 코드 | `web/src/geo/viewers/map/` (`index.tsx`, `side-panel.tsx`, `attribute-table.tsx`, `table.ts`, `map-canvas.tsx`, `basemaps-picker.tsx`), 문구 `web/src/geo/locales/map/{ko,en}.json`; 브랜치 `task/gaid-map-table-ux` |
-| 자동 검사 | `cd web && npx tsc --noEmit && npx vitest run src/geo` (13 파일, 78 테스트 통과), `node geo/copy/validate-copy.mjs web/src/geo/locales` (오류 0), `scripts/check` (결과는 task 문서 Current state) |
+| 자동 검사 | `cd web && npx tsc --noEmit && npx vitest run src/geo` (13 파일, 78 테스트 통과), `node geo/copy/validate-copy.mjs web/src/geo/locales` (오류 0), `scripts/check` 통과 (백엔드 1652, 웹 965, geo 41 테스트, 문구 검사 오류 0, 배포 실행 점검 통과) |
 | 화면 확인 | PC74 별도 앱(UI 3310, 백엔드 18310), 자료 `pc74:~/data/geoaidesk/work/gaid-map-table-ux/projects` (검토용 표본 사본), 스크립트 `pc74:~/data/geoaidesk/work/gaid-map-table-ux/shots.py` |
 | 표본 자료 | `user_data/samples/vector/seoul_geology_250k/Seoul_Geology_250K_Litho.shp`, `user_data/samples/raster/kambalda_dem_1s_sample.tif` |
 

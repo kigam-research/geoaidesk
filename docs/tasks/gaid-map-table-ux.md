@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:27:59Z
+updated: 2026-10-12T09:33:23Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3deaaa94-6146-4a8e-bcdd-a4b418119648","pid":3104588,"provider":"claude","session":"faf47acc-261b-40ba-9a0d-c18d0e922752","start":"26228112","token":"6a36ad34b48eccc61baf2cd33f8b62570ba6f59749ebdf9f20c421a3674a4a1f"}
 branch: task/gaid-map-table-ux
 target: main
@@ -72,9 +72,12 @@ analysis; source CRS vs display CRS stay distinct.
   copy validator 0 errors. Browser check (Playwright, ~/data/geoaidesk/work/gaid-map-table-ux/shots.py) against an own
   dev instance (UI 3310 / backend 18310, sample copies under ~/data/geoaidesk/work/gaid-map-table-ux/projects; unit
   `gaid-mtux-app`, stopped after the screenshots). Figures in reports/2026-10-12-gaid-map-table-ux/figures/.
+- `scripts/check` passed 2026-10-12 on 7603796+ (server 1652 passed/11 skipped, web 965 passed, geo node tests 41,
+  copy 0 errors, start-gaid --check, production smoke PASS); log ~/data/geoaidesk/work/gaid-map-table-ux/check.log.
+  Build caches removed afterwards.
 - The dev launcher rewrites server/package-lock.json; restored, never commit it from here.
 ## Next steps
-1. scripts/check result, remove build caches, task finish.
+1. None; finished. Hub updates the review instance after merge.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: all three items touch the same viewer files (`index.tsx`, `map-canvas.tsx`), so one writer does them;
