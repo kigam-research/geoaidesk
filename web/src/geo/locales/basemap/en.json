@@ -10,8 +10,8 @@
     "kigam-geology": "KIGAM 1:50,000 geological map"
   },
   "attribution": {
-    "osm": "© OpenStreetMap contributors",
-    "ngii": "© National Geographic Information Institute (NGII) Baro e-map",
+    "osm": "&copy; OpenStreetMap contributors",
+    "ngii": "&copy; National Geographic Information Institute (NGII) Baro e-map",
     "kigam-geology": "Korea Institute of Geoscience and Mineral Resources (KIGAM) 1:50,000 geological map"
   },
   "missingKey": "No API key configured on the server",

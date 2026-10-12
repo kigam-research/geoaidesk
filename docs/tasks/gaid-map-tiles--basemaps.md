@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T04:48:35Z
+updated: 2026-10-12T04:55:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -116,15 +116,25 @@ Finish with `task finish`; the parent integrates.
 ## Current state
 - Resumed in the printed worktree. Read the child contract, parent decisions, AGENTS.md, writer procedures and copy rules.
 - Codegraph has no index for this exact worktree; using bounded native source reads. PC71 reference read without key values.
+- Delivered key resolver, safe catalogue and NGII/KIGAM image routes under server/src/geo/basemaps/, registered through the allowed seam. Server keys remain private, files refresh on change, all upstream fetches are allowlisted, bounded, redirect-refusing and sanitized.
+- Delivered independent basemapLayers/registerBasemapProjections/useBasemapCatalog APIs and BasemapPicker with default None, unavailable reasons, CRS-disabled state, independent geological overlay and visible linked source credits. Korean/English strings and before/after copy inventory are in docs/geo/basemaps.md.
+- Focused checks passed on 2026-10-12: server geo-basemaps.test.ts (10 tests) and npm run typecheck; web src/geo/viewers/map (5 files, 26 tests including 7 new basemap tests) and npx tsc --noEmit. Copy validator: 0 errors, 1 existing app/en warning at result.structured_agent_output_not_independently_verified.
+- Live local backend check on PC74 port 18123 (then closed): catalogue HTTP 200, all six entries available; NGII HTTP 200, image/png, 33,769 bytes; KIGAM with TRANSPARENT=TRUE HTTP 200, image/png, 6,611 bytes. Only safe metadata was printed. Existing review instance/data unchanged.
+- Live evidence (external, no key values): ~/data/geoaidesk/work/gaid-map-tiles--basemaps/live-metadata.json and live-basemaps.mts. Images are local evidence, not bundled imagery.
+- Dependency preparation job #1 succeeded (exit 0); its receipt is recorded below. No server process remains from the live check.
 ## Next steps
-1. Implement server key resolver, bounded provider adapters/routes, and independent client layer factory/picker.
-2. Run declared focused checks and one live NGII/KIGAM request on a free local port; record only safe response metadata.
-3. Review owned changes, save and finish for parent integration. Parent owns viewer wiring and full scripts/check.
+1. Review/save owned changes and run task finish. The CLI may enforce the repository-wide suite despite the brief assigning integrated checks to the parent; do not bypass it.
+2. Parent: task complete gaid-map-tiles--basemaps, wire picker/layers into index.tsx/map-canvas.tsx, keep linked attribution visible (including exported figures that show online imagery), and perform integrated browser checks/full scripts/check.
+3. Parent report contribution: use the delivered provider/credential/terms/copy inventory in docs/geo/basemaps.md and focused/live evidence above; this child has no separate canonical report.
 ## Failed approaches
+- Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
+- Initial web typecheck rejected tests reading a protected OpenLayers source property. Tests now check the actual image element's anonymous CORS setting; typecheck passes.
 ## Notes and decisions
 - Sequential plan: settle fixed interfaces first; server adapter and web factory are tightly coupled and will be implemented by this single child writer (no nested units). Owned paths remain those listed above; parent integrates index.tsx/map-canvas.tsx last.
 - Existing auth accepts query tokens on all routes; existing CORS/request guard already accepts anonymous cross-origin image loads from allowed UI origins. Verify in focused route tests without changing upstream guard/auth files.
 - No server imagery disk cache or background prefetch will be added. NGII and KIGAM use bounded on-demand fetches only.
+- State semantics: catalogue available means configured, not an external health guarantee; current live requests separately verified PNG responses. Window focus refreshes the catalogue, so added keys require no backend restart. Known native projected views support basemaps; unknown/pixel views do not.
+- The shared guard/auth/CORS tests passed with a query access token and allowed UI Origin. No upstream security/auth file changed. All changes stay in owned paths plus the two expressly allowed registration/namespace seams.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -137,6 +147,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-map-tiles--basemaps-20261012T044904.219800Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

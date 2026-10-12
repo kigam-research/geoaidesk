@@ -10,8 +10,8 @@
     "kigam-geology": "KIGAM 1:5만 지질도"
   },
   "attribution": {
-    "osm": "© OpenStreetMap contributors",
-    "ngii": "© 국토지리정보원(NGII) 바로e맵",
+    "osm": "&copy; OpenStreetMap contributors",
+    "ngii": "&copy; 국토지리정보원(NGII) 바로e맵",
     "kigam-geology": "한국지질자원연구원(KIGAM) 1:5만 지질도"
   },
   "missingKey": "서버에 API 키가 없습니다",

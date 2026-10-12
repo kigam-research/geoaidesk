@@ -72,7 +72,8 @@ export function useBasemapCatalog(): { providers: BasemapProvider[]; error?: str
 }
 
 export function basemapAttribution(provider: BasemapProvider): string {
-  return provider.id === "none" ? "" : t(`attribution.${provider.id.startsWith("ngii-") ? "ngii" : provider.id}`);
+  // Store the standard copyright entity in copy catalogues: the shared emoji rule also matches literal ©.
+  return provider.id === "none" ? "" : t(`attribution.${provider.id.startsWith("ngii-") ? "ngii" : provider.id}`).replaceAll("&copy;", "\u00a9");
 }
 function attributionHtml(provider: BasemapProvider): string {
   const text = basemapAttribution(provider);
