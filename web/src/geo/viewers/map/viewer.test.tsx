@@ -35,6 +35,8 @@ describe("map viewer", () => {
     expect(body(first)).toMatchObject({ layer: "rocks", full: true, displayCrs: "EPSG:3857" }); expect(body(first)).not.toHaveProperty("bbox"); expect(first[2]).toBe("project-a");
     expect(body(second)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(second[2]).toBe("project-a");
     expect(screen.getByText(/Source CRS: EPSG:5186/)).toBeInTheDocument(); expect(screen.getByText(/Display CRS: EPSG:3857/)).toBeInTheDocument();
+    const basemaps = screen.getByRole("region", { name: /basemap/i });
+    expect(within(basemaps).getByRole("combobox")).toBeEnabled(); expect(within(basemaps).getByRole("combobox")).toHaveValue("none");
     fireEvent.click(screen.getByText("Next page"));
     await waitFor(() => expect(mockFetch.mock.calls.some(c => c[0] === "/geo/vector-page" && body(c).offset === 500)).toBe(true));
     fireEvent.click(screen.getByText("pan-map"));
@@ -49,6 +51,9 @@ describe("map viewer", () => {
     await screen.findByText(/Native coordinates \(no geographic placement\)/);
     expect(body(mockFetch.mock.calls.find(c => c[0] === "/geo/vector-page")!).displayCrs).toBe("native");
     expect(screen.getByText("Calculate full-layer area")).toBeDisabled();
+    // Basemaps need a declared CRS: the picker stays visible but disabled, "none" selected.
+    const basemaps = screen.getByRole("region", { name: /basemap/i });
+    expect(within(basemaps).getByRole("combobox")).toBeDisabled(); expect(within(basemaps).getByRole("combobox")).toHaveValue("none");
     fireEvent.change(screen.getByLabelText("Sandbox-relative path"), { target: { value: "other.gpkg" } }); fireEvent.click(screen.getByText("Add layer"));
     await screen.findByText(/Sources with missing or conflicting CRS cannot overlay/);
     expect(screen.queryByRole("button", { name: "Select layer: other.gpkg" })).not.toBeInTheDocument();

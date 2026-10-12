@@ -26,6 +26,8 @@ interface Props {
   layers: LayerState[]; crs: string; activeId: string; projectId?: string;
   /** Basemap/overlay layers drawn under project data (their own zIndex). */
   backgroundLayers?: BaseLayer[];
+  /** Source credits of the shown basemaps; written into the exported PNG. */
+  attributions?: string[];
   fitVersion: number;
   fields: Record<string, string>; selected?: { layerId: string; row: number };
   onViewport(viewport: Viewport): void; onPick(layerId: string, row: number): void;
@@ -56,7 +58,8 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     const viewportElement = map.getViewport();
     if (!size || !viewportElement) throw new Error(t("pngError"));
     const layers = current.current.layers.filter(l => l.visible && layerView(l));
-    const lines = layers.flatMap(l => [{ label: `${l.source.path} · ${t("sourceCrs")}: ${sourceCrs(l).authority ?? sourceCrs(l).name ?? t("unknown")}`, color: "" }, ...layerLegend(l, current.current.fields[l.id])]);
+    const lines = [...layers.flatMap(l => [{ label: `${l.source.path} · ${t("sourceCrs")}: ${sourceCrs(l).authority ?? sourceCrs(l).name ?? t("unknown")}`, color: "" }, ...layerLegend(l, current.current.fields[l.id])]),
+      ...(current.current.attributions ?? []).map(label => ({ label, color: "" }))];
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(640, size[0]); canvas.height = size[1] + 78 + lines.length * 18;
     const ctx = canvas.getContext("2d");
