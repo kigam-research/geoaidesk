@@ -1,7 +1,7 @@
 ---
 format: 1
-status: waiting
-updated: 2026-10-12T09:17:19Z
+status: active
+updated: 2026-10-12T09:17:39Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"bcdadb7d-d24a-4b57-98db-5e6554bd91e0","pid":3114713,"provider":"codex","session":"01a12f67-1771-7460-b8b3-fab00e10f0c0","start":"26264790","token":"4bba7ca56e3ec863da5f58c7e3871662c112ec047a7244500b1546e07e5e5875"}
 branch: task/gaid-workflow-catalog--skill-hub
 target: task/gaid-workflow-catalog
