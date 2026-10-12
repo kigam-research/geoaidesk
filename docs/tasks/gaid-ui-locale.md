@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T22:33:15Z
+updated: 2026-10-12T22:49:18Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"5decd7e4-f38e-4e73-a0dd-0e3d9f8ff510","pid":138333,"provider":"claude","session":"4574dad1-b0b9-4bc4-828c-8e6e886cedc3","start":"27965222","token":"0e8b581b958a7ebbf30b6df3c417d49e0b22188df0413047437d5fda4f04f3ef"}
 branch: task/gaid-ui-locale
 target: main
@@ -136,6 +136,10 @@ boundaries against `git diff --name-only origin/main`, rescan, browser screensho
 - 2026-10-13: work and research stopped again mid-work with the same capacity error (uncommitted work kept in their
   worktrees: work 27 files, research 9). Sent /tmp/gaid-retry/continue.md (save progress first, then finish). If it
   recurs, consider a different worker profile for these two.
+
+- 2026-10-13: removed the work child's build caches while its `task finish` check was still running (status was
+  `ready`, finish commit pushed, but no completion record yet) → its check failed on missing vitest files. Told the child;
+  it reruns finish. Lesson: clean a child's caches only after `task complete` succeeds.
 
 ## Notes and decisions
 - User (2026-10-12, verbatim): "그리고 이미 minimax api 연동되어 있을것이다." MINIMAX_API_KEY is in the review instance's
