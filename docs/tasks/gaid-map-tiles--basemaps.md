@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-12T04:55:34Z
+status: ready
+updated: 2026-10-12T04:55:45Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -123,9 +123,9 @@ Finish with `task finish`; the parent integrates.
 - Live evidence (external, no key values): ~/data/geoaidesk/work/gaid-map-tiles--basemaps/live-metadata.json and live-basemaps.mts. Images are local evidence, not bundled imagery.
 - Dependency preparation job #1 succeeded (exit 0); its receipt is recorded below. No server process remains from the live check.
 ## Next steps
-1. Review/save owned changes and run task finish. The CLI may enforce the repository-wide suite despite the brief assigning integrated checks to the parent; do not bypass it.
-2. Parent: task complete gaid-map-tiles--basemaps, wire picker/layers into index.tsx/map-canvas.tsx, keep linked attribution visible (including exported figures that show online imagery), and perform integrated browser checks/full scripts/check.
-3. Parent report contribution: use the delivered provider/credential/terms/copy inventory in docs/geo/basemaps.md and focused/live evidence above; this child has no separate canonical report.
+<!-- task:closed -->
+Closed 2026-10-12T04:55:45Z: ready; the parent gaid-map-tiles integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
 - Initial web typecheck rejected tests reading a protected OpenLayers source property. Tests now check the actual image element's anonymous CORS setting; typecheck passes.
