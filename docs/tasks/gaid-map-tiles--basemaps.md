@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-12T05:14:43Z
+status: active
+updated: 2026-10-12T05:19:57Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"63644923-72c4-4ae1-aefb-0cbc8717e8d7","pid":2820421,"provider":"codex","session":"01a12e6c-c929-7f03-bfca-c71178e2c0f5","start":"24624387","token":"02d799b29d0f275afe13fb5e2e3fb3da10f64846764f3520d9c8d2ff2115d67f"}
 branch: task/gaid-map-tiles--basemaps
 target: task/gaid-map-tiles
@@ -126,14 +126,19 @@ Finish with `task finish`; the parent integrates.
 - task finish merged parent tip 7461bc03969e and ran full scripts/check on 12511cf2435d. It stopped at the backend suite: 154 files passed, 1 skipped, 1 failed; 1,647 tests passed, 11 skipped, 1 failed. The sole failure is the parent's geo/markdown-images.ts using path.relative directly, caught by win-portability.test.ts:151. No basemap failure. Finish has not succeeded or notified the parent as ready.
 - Full-check failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-l0fs7sj8.log; external output directory ~/data/geoaidesk/work/checks/12511cf2435d-20261012T045545.976346Z. mzML tests were visibly skipped by the existing network probe; unrelated to the failure.
 - Hub route bb9452a0e9dc completed: parent fixed the Markdown path conformance issue in bc05638f29e0. Re-read the fetched source: all three calls now use apiRelative imported from sandbox-fs. Parent reports 24/24 targeted tests and server typecheck passed. Ready to retry finish; previous failure is historical, not a current blocker.
+- Second full-check attempt on c43ed75c3526 merged bc05638f29e0 and passed backend (155 files passed, 1 skipped; 1,648 tests passed, 11 skipped), frontend (143 files, 960 tests passed), and launcher --check. Distribution tests: 35 passed, 1 failed. The failure is geo/tests/distribution.test.mjs:75: parent introduced integration-boundary owner gaid-map-tiles, but the test's owners set does not contain it. Both integration-boundaries.json and that test are outside this child's owned paths. No basemap failure. Copy/environment/production phases were not reached by this full-check run.
+- Latest check failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-k6apsdhy.log; output ~/data/geoaidesk/work/checks/c43ed75c3526-20261012T051443.190729Z. Finish still has not succeeded.
+- Consumed both continuation routes gmt-basemaps-finish-1 (parent) and basemaps-continue-bb9452a0e9dc (hub). The CLI blocks finish for queued AND running requests, so recorded acceptance first to clear that self-gate, then ran the actual full-check retry. Their final results will be updated with the new distribution blocker, not left as an unverified success.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-12T05:14:43Z: ready; the parent gaid-map-tiles integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Parent: update the owner conformance test (or correct the declared owner with a justified ownership decision) for the new gaid-map-tiles seams, and save. Do not bypass the distribution check; neither file belongs to this child.
+2. After that parent fix, rerun task finish in place (no resume needed), then remove only regenerable worktree caches after the last check. The CLI must finish successfully before parent task complete.
+3. Parent integrates the child, wires the basemap picker/layers and preserves visible source attribution including exported online imagery. Use docs/geo/basemaps.md and evidence above in the parent report.
 
 ## Failed approaches
 - Literal copyright marks in the new locale catalogues matched the shared Extended_Pictographic emoji rule. Stored the standard &copy; entity and decode it for display; rendered attribution stays exact, with no shared-policy edit.
 - Initial web typecheck rejected tests reading a protected OpenLayers source property. Tests now check the actual image element's anonymous CORS setting; typecheck passes.
 - First task finish failed only on the inherited parent Markdown-image path conformance check. Requires the parent's apiRelative/toApiPath normalization fix; no speculative changes made to basemap code.
+- The next full-check retry passed that fixed path test and both application suites, then exposed the parent's unrecognized integration-boundary owner. No child source edits were made to work around it.
 ## Notes and decisions
 - Sequential plan: settle fixed interfaces first; server adapter and web factory are tightly coupled and will be implemented by this single child writer (no nested units). Owned paths remain those listed above; parent integrates index.tsx/map-canvas.tsx last.
 - Existing auth accepts query tokens on all routes; existing CORS/request guard already accepts anonymous cross-origin image loads from allowed UI origins. Verify in focused route tests without changing upstream guard/auth files.
