@@ -102,6 +102,7 @@ import {
   modelUsesBillableBudget,
 } from "@/components/model-selector";
 import { useModels } from "@/lib/use-models";
+import { geoText, hasGeoText } from "@/geo/i18n";
 import workflowsData from "@/data/workflows.json";
 import { useAppDefaults } from "@/lib/app-settings";
 import { WorkflowInputs, type WorkflowInputProps } from "@/components/workflow-inputs";
@@ -117,6 +118,23 @@ export type Workflow = {
   placeholders: { key: string; label: string; required: boolean }[];
   requiresFiles: boolean;
 };
+
+const workflowText = geoText("workflows");
+
+/** Missing translations retain the upstream display text after a catalogue sync. */
+export function workflowDisplayText(workflow: Workflow, field: "name" | "description" | `inputs.${string}`, fallback: string): string {
+  const key = `rows.${workflow.id}.${field}`;
+  return hasGeoText(`workflows.${key}`) ? workflowText(key) : fallback;
+}
+
+export function workflowMatchesSearch(workflow: Workflow, query: string): boolean {
+  const q = query.toLowerCase().trim();
+  return [workflow.name, workflow.description, workflow.category,
+    workflowDisplayText(workflow, "name", workflow.name),
+    workflowDisplayText(workflow, "description", workflow.description),
+    workflowText(`categories.${workflow.category}`),
+  ].some((text) => text.toLowerCase().includes(q));
+}
 
 const ALL_WORKFLOWS = workflowsData as Workflow[];
 
@@ -204,28 +222,28 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 const CATEGORIES: { id: string; label: string; color: string }[] = [
-  { id: "paper", label: "Paper & Manuscript", color: "text-blue-500" },
-  { id: "visual", label: "Visual & Presentation", color: "text-rose-500" },
-  { id: "data", label: "Data & Analysis", color: "text-emerald-500" },
-  { id: "literature", label: "Literature & Research", color: "text-violet-500" },
-  { id: "grants", label: "Grants & Planning", color: "text-amber-500" },
-  { id: "scicomm", label: "Science Communication", color: "text-cyan-500" },
-  { id: "genomics", label: "Genomics & Transcriptomics", color: "text-teal-500" },
-  { id: "proteomics", label: "Proteomics & Structural Biology", color: "text-indigo-500" },
-  { id: "cellbio", label: "Cell Biology & Single-Cell", color: "text-fuchsia-500" },
-  { id: "chemistry", label: "Chemistry & Computational Chemistry", color: "text-orange-500" },
-  { id: "drugdiscovery", label: "Drug Discovery & Pharmacology", color: "text-red-500" },
-  { id: "physics", label: "Physics & Quantum Computing", color: "text-yellow-600" },
-  { id: "materials", label: "Materials Science", color: "text-slate-500" },
-  { id: "clinical", label: "Clinical & Health Sciences", color: "text-green-500" },
-  { id: "neuro", label: "Neuroscience", color: "text-purple-500" },
-  { id: "ecology", label: "Ecology & Environmental Science", color: "text-lime-600" },
-  { id: "finance", label: "Finance & Economics", color: "text-sky-500" },
-  { id: "social", label: "Social Sciences", color: "text-pink-500" },
-  { id: "math", label: "Mathematics & Modeling", color: "text-stone-500" },
-  { id: "ml", label: "Machine Learning & AI", color: "text-blue-600" },
-  { id: "engineering", label: "Engineering & Simulation", color: "text-zinc-500" },
-  { id: "astro", label: "Astronomy & Space Science", color: "text-violet-600" },
+  { id: "paper", get label() { return workflowText("categories.paper"); }, color: "text-blue-500" },
+  { id: "visual", get label() { return workflowText("categories.visual"); }, color: "text-rose-500" },
+  { id: "data", get label() { return workflowText("categories.data"); }, color: "text-emerald-500" },
+  { id: "literature", get label() { return workflowText("categories.literature"); }, color: "text-violet-500" },
+  { id: "grants", get label() { return workflowText("categories.grants"); }, color: "text-amber-500" },
+  { id: "scicomm", get label() { return workflowText("categories.scicomm"); }, color: "text-cyan-500" },
+  { id: "genomics", get label() { return workflowText("categories.genomics"); }, color: "text-teal-500" },
+  { id: "proteomics", get label() { return workflowText("categories.proteomics"); }, color: "text-indigo-500" },
+  { id: "cellbio", get label() { return workflowText("categories.cellbio"); }, color: "text-fuchsia-500" },
+  { id: "chemistry", get label() { return workflowText("categories.chemistry"); }, color: "text-orange-500" },
+  { id: "drugdiscovery", get label() { return workflowText("categories.drugdiscovery"); }, color: "text-red-500" },
+  { id: "physics", get label() { return workflowText("categories.physics"); }, color: "text-yellow-600" },
+  { id: "materials", get label() { return workflowText("categories.materials"); }, color: "text-slate-500" },
+  { id: "clinical", get label() { return workflowText("categories.clinical"); }, color: "text-green-500" },
+  { id: "neuro", get label() { return workflowText("categories.neuro"); }, color: "text-purple-500" },
+  { id: "ecology", get label() { return workflowText("categories.ecology"); }, color: "text-lime-600" },
+  { id: "finance", get label() { return workflowText("categories.finance"); }, color: "text-sky-500" },
+  { id: "social", get label() { return workflowText("categories.social"); }, color: "text-pink-500" },
+  { id: "math", get label() { return workflowText("categories.math"); }, color: "text-stone-500" },
+  { id: "ml", get label() { return workflowText("categories.ml"); }, color: "text-blue-600" },
+  { id: "engineering", get label() { return workflowText("categories.engineering"); }, color: "text-zinc-500" },
+  { id: "astro", get label() { return workflowText("categories.astro"); }, color: "text-violet-600" },
 ];
 
 /** Upstream categories, for hosts that let the user file their own rows under one (GAID seam). */
@@ -397,14 +415,14 @@ export function WorkflowLaunchDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <WorkflowIcon name={workflow.icon} className={cn("size-5", iconColor)} />
-            {workflow.name}
+            {workflowDisplayText(workflow, "name", workflow.name)}
           </DialogTitle>
-          <DialogDescription>{workflow.description}</DialogDescription>
+          <DialogDescription>{workflowDisplayText(workflow, "description", workflow.description)}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <p className="text-xs font-medium">{workflow.requiresFiles ? "Workflow data" : "Workflow data (optional)"}</p>
+            <p className="text-xs font-medium">{workflow.requiresFiles ? workflowText("dialog.data") : workflowText("dialog.data_optional")}</p>
             <WorkflowInputs
               availableFiles={availableFiles}
               availableFolders={availableFolders}
@@ -427,14 +445,14 @@ export function WorkflowLaunchDialog({
               {workflow.placeholders.map((ph) => (
                 <div key={ph.key}>
                   <label className="mb-1.5 block text-xs font-medium text-foreground">
-                    {ph.label}
+                    {workflowDisplayText(workflow, `inputs.${ph.key}`, ph.label)}
                     {ph.required && <span className="ml-0.5 text-destructive">*</span>}
                   </label>
                   <input
                     type="text"
                     value={placeholderValues[ph.key] ?? ""}
                     onChange={(e) => updatePlaceholder(ph.key, e.target.value)}
-                    placeholder={ph.label}
+                    placeholder={workflowDisplayText(workflow, `inputs.${ph.key}`, ph.label)}
                     className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50"
                   />
                 </div>
@@ -445,7 +463,7 @@ export function WorkflowLaunchDialog({
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <label className="text-xs font-medium text-muted-foreground">
-                {isEditingPrompt ? "Edit prompt" : "Prompt preview"}
+                {isEditingPrompt ? workflowText("dialog.edit_prompt") : workflowText("dialog.prompt_preview")}
               </label>
               <button
                 type="button"
@@ -458,7 +476,7 @@ export function WorkflowLaunchDialog({
                 className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <PencilIcon className="size-3" />
-                {isEditingPrompt ? "Done" : "Edit"}
+                {isEditingPrompt ? workflowText("dialog.done") : workflowText("dialog.edit")}
               </button>
             </div>
             {isEditingPrompt ? (
@@ -487,7 +505,7 @@ export function WorkflowLaunchDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {workflowText("dialog.cancel")}
           </Button>
           <Button
             onClick={handleLaunch}
@@ -495,16 +513,16 @@ export function WorkflowLaunchDialog({
             title={
               !modelAvailable
                 ? selectedModelAvailability === "checking"
-                  ? "Model provider status is still loading."
-                  : "This model provider is disconnected. Reconnect it in Settings → Providers or choose another model."
+                  ? workflowText("dialog.provider_loading")
+                  : workflowText("dialog.provider_disconnected")
                 : selectedBudgetBlocked
-                ? "Project spend limit reached. Raise the limit in Settings → Project → General to continue."
+                ? workflowText("dialog.budget_blocked")
                 : undefined
             }
             className="gap-1.5"
           >
             <PlayIcon className="size-3.5" />
-            Run workflow
+            {workflowText("dialog.run")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -533,12 +551,7 @@ export function WorkflowsPanel({
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return ALL_WORKFLOWS;
-    return ALL_WORKFLOWS.filter(
-      (w) =>
-        w.name.toLowerCase().includes(q) ||
-        w.description.toLowerCase().includes(q) ||
-        w.category.toLowerCase().includes(q)
-    );
+    return ALL_WORKFLOWS.filter((w) => workflowMatchesSearch(w, q));
   }, [search]);
 
   const categories = useMemo<{ id: string; label: string; color: string; bg?: string }[]>(
@@ -586,8 +599,8 @@ export function WorkflowsPanel({
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={extension?.searchPlaceholder ?? "Search workflows..."}
-              aria-label={extension?.searchPlaceholder ?? "Search workflows..."}
+              placeholder={extension?.searchPlaceholder ?? workflowText("panel.search")}
+              aria-label={extension?.searchPlaceholder ?? workflowText("panel.search")}
               className="w-full rounded-lg border bg-background py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary placeholder:text-muted-foreground/50"
             />
           </div>
@@ -665,16 +678,16 @@ export function WorkflowsPanel({
                         <WorkflowIcon name={w.icon} className={cn("mt-0.5 size-4 shrink-0", iconColor)} />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-medium text-foreground">{w.name}</span>
+                            <span className="text-sm font-medium text-foreground">{workflowDisplayText(w, "name", w.name)}</span>
                             {w.requiresFiles && (
                               <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-px text-[9px] font-medium text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 <DatabaseIcon className="size-2.5" />
-                                Needs user data
+                                {workflowText("panel.needs_data")}
                               </span>
                             )}
                           </div>
                           <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                            {w.description}
+                            {workflowDisplayText(w, "description", w.description)}
                           </p>
                         </div>
                       </button>

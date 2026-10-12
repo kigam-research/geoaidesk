@@ -1,0 +1,2477 @@
+{
+  "categories": {
+    "paper": "논문·원고",
+    "visual": "시각화·발표",
+    "data": "자료·분석",
+    "literature": "문헌·연구",
+    "grants": "연구비·계획",
+    "scicomm": "과학 소통",
+    "genomics": "유전체·전사체",
+    "proteomics": "단백질체·구조생물학",
+    "cellbio": "세포생물학·단일세포",
+    "chemistry": "화학·계산화학",
+    "drugdiscovery": "신약 개발·약리학",
+    "physics": "물리학·양자 컴퓨팅",
+    "materials": "재료과학",
+    "clinical": "임상·보건과학",
+    "neuro": "신경과학",
+    "ecology": "생태·환경과학",
+    "finance": "금융·경제",
+    "social": "사회과학",
+    "math": "수학·모델링",
+    "ml": "머신러닝·AI",
+    "engineering": "공학·시뮬레이션",
+    "astro": "천문·우주과학"
+  },
+  "dialog": {
+    "data": "Workflow 자료",
+    "data_optional": "Workflow 자료(선택)",
+    "edit_prompt": "프롬프트 편집",
+    "prompt_preview": "프롬프트 미리보기",
+    "done": "편집 완료",
+    "edit": "프롬프트 편집",
+    "cancel": "취소",
+    "provider_loading": "모델 제공사 상태를 불러오는 중입니다.",
+    "provider_disconnected": "모델 제공사가 연결되지 않았습니다. 설정 → 제공사에서 다시 연결하거나 다른 모델을 선택하세요.",
+    "budget_blocked": "프로젝트 비용 한도에 도달했습니다. 계속하려면 설정 → 프로젝트 → 일반에서 한도를 높이세요.",
+    "run": "Workflow 실행"
+  },
+  "panel": {
+    "search": "Workflow 검색...",
+    "needs_data": "사용자 자료 필요"
+  },
+  "inputs": {
+    "partial_upload": "일부 파일을 업로드하지 못했습니다. 선택한 입력 자료를 확인하고 빠진 파일을 다시 업로드하세요.",
+    "upload_failed": "업로드하지 못했습니다. 다시 시도하세요.",
+    "sandbox": "프로젝트 sandbox",
+    "sandbox_help": "이전 대화의 결과를 포함해 프로젝트에 있는 파일이나 폴더를 선택하세요. 파일은 BYOK를 실행하는 컴퓨터에 있습니다.",
+    "search": "Sandbox 파일·폴더 검색",
+    "search_placeholder": "이름·경로로 검색",
+    "refresh_label": "Sandbox 파일·폴더 새로고침",
+    "refresh_failed": "프로젝트 파일을 새로고침하지 못했습니다. 다시 시도하세요.",
+    "refresh": "목록 새로고침",
+    "not_ready": "프로젝트 파일 목록을 아직 불러오지 못했습니다. 새로고침하거나 아래에 자료 위치를 지정하세요.",
+    "no_matches": "검색 조건에 맞는 파일이나 폴더가 없습니다.",
+    "empty": "프로젝트에 파일이나 폴더가 없습니다. 파일을 업로드하거나 아래에 자료 위치를 지정하세요.",
+    "selected": "선택한 프로젝트 입력 자료",
+    "remove_help": "선택을 해제해도 프로젝트의 자료는 유지됩니다.",
+    "source_help": "현재 기기에서 업로드하거나 호스트 경로 또는 자료 URL을 추가할 수 있습니다. 여러 출처를 함께 사용할 수 있습니다.",
+    "upload_files_label": "Workflow 파일 업로드",
+    "upload_folder_label": "Workflow 폴더 업로드",
+    "upload_files": "현재 기기에서 파일 업로드",
+    "upload_folder": "폴더 업로드",
+    "host_source": "호스트 경로·자료 URL 사용",
+    "locations": "자료 위치(한 줄에 하나씩)",
+    "access_help": "경로는 BYOK가 실행되는 컴퓨터에서 읽을 수 있어야 합니다. URL과 저장소 위치는 접근할 수 있어야 하며 필요한 커넥터나 호스트 인증 정보를 미리 설정해야 합니다. Kady는 workflow를 시작할 때 접근 가능 여부를 확인합니다. 비밀 정보나 서명된 URL을 붙여넣지 마세요.",
+    "uploading": "BYOK 프로젝트에 업로드 중입니다…",
+    "showing": "파일·폴더 {count}개 중 100개를 표시합니다. 검색으로 목록을 좁히세요.",
+    "remove": "Workflow에서 {path} 선택 해제",
+    "location_examples": "/mnt/study/counts.csv\nuser_data/study/\ns3://bucket/study/\nhttps://example.org/data.csv"
+  },
+  "rows": {
+    "review-paper": {
+      "name": "논문 검토",
+      "description": "방법론, 통계적 엄밀성, 한계를 비판적으로 검토하고 개선 의견을 제시합니다.",
+      "inputs": {}
+    },
+    "write-paper": {
+      "name": "논문 작성",
+      "description": "제공한 자료나 결과로 논문 전체 초안을 작성합니다.",
+      "inputs": {
+        "topic": "논문 주제·제목"
+      }
+    },
+    "write-review-article": {
+      "name": "종설 작성",
+      "description": "문헌을 종합하고 연구 공백과 향후 방향을 분석합니다.",
+      "inputs": {
+        "topic": "종설 주제"
+      }
+    },
+    "edit-manuscript": {
+      "name": "원고 편집·재작성",
+      "description": "원고의 명료성, 문법, 흐름, 학술적 문체를 다듬습니다.",
+      "inputs": {}
+    },
+    "write-rebuttal": {
+      "name": "심사 의견 답변 작성",
+      "description": "심사 의견에 항목별로 답변합니다.",
+      "inputs": {}
+    },
+    "format-journal": {
+      "name": "학술지 형식 맞추기",
+      "description": "대상 학술지의 투고 지침에 맞게 원고 형식을 수정합니다.",
+      "inputs": {
+        "journal": "대상 학술지 이름"
+      }
+    },
+    "write-abstract": {
+      "name": "초록 작성",
+      "description": "논문의 구조화된 초록을 작성하거나 다듬습니다.",
+      "inputs": {
+        "details": "핵심 결과 또는 원고 주제",
+        "word_limit": "단어 수 제한(예: 250, 300)"
+      }
+    },
+    "write-cover-letter": {
+      "name": "투고 편지 작성",
+      "description": "학술지 투고용 cover letter 초안을 작성합니다.",
+      "inputs": {
+        "journal": "대상 학술지"
+      }
+    },
+    "write-methods": {
+      "name": "방법 절 작성",
+      "description": "프로토콜이나 자료로 상세한 연구 방법을 작성합니다.",
+      "inputs": {}
+    },
+    "write-results": {
+      "name": "결과 절 작성",
+      "description": "자료와 그림으로 연구 결과를 작성합니다.",
+      "inputs": {
+        "focus": "강조할 결과(선택)"
+      }
+    },
+    "write-discussion": {
+      "name": "고찰 절 작성",
+      "description": "선행 문헌을 바탕으로 결과를 해석하는 고찰을 작성합니다.",
+      "inputs": {
+        "findings": "논의할 핵심 결과"
+      }
+    },
+    "write-introduction": {
+      "name": "서론 작성",
+      "description": "연구 배경과 근거를 제시하는 서론을 작성합니다.",
+      "inputs": {
+        "topic": "논문 주제"
+      }
+    },
+    "translate-manuscript": {
+      "name": "원고 번역",
+      "description": "과학 논문 원고를 다른 언어로 번역합니다.",
+      "inputs": {
+        "source_lang": "원문 언어",
+        "target_lang": "번역할 언어"
+      }
+    },
+    "write-supplementary": {
+      "name": "보충 자료 작성",
+      "description": "보충 방법, 그림, 표를 준비합니다.",
+      "inputs": {}
+    },
+    "reference-check": {
+      "name": "참고문헌 확인·수정",
+      "description": "참고문헌을 확인하고 형식을 수정하며 빠진 인용을 찾습니다.",
+      "inputs": {
+        "style": "인용 형식(예: APA, Vancouver, Nature)"
+      }
+    },
+    "graphical-abstract": {
+      "name": "Graphical abstract 제작",
+      "description": "논문의 핵심 결과를 시각적으로 요약합니다.",
+      "inputs": {}
+    },
+    "publication-figure": {
+      "name": "논문용 그림 제작",
+      "description": "자료로 출판용 그래프와 시각화를 만듭니다.",
+      "inputs": {
+        "instructions": "그림 작성 지침(선택)"
+      }
+    },
+    "slide-deck": {
+      "name": "발표 슬라이드 제작",
+      "description": "학술 발표나 연구실 회의용 슬라이드를 만듭니다.",
+      "inputs": {
+        "context": "발표 상황(예: 학회 발표, 연구실 회의, journal club)"
+      }
+    },
+    "conference-poster": {
+      "name": "학회 포스터 제작",
+      "description": "논문이나 결과로 학술 포스터를 구성합니다.",
+      "inputs": {}
+    },
+    "infographic": {
+      "name": "인포그래픽 제작",
+      "description": "비전문가도 이해할 수 있는 시각 설명 자료를 만듭니다.",
+      "inputs": {}
+    },
+    "create-schematic": {
+      "name": "과학 모식도 제작",
+      "description": "과정의 기전이나 개념을 도식화합니다.",
+      "inputs": {
+        "concept": "도식화할 과정이나 개념"
+      }
+    },
+    "create-flowchart": {
+      "name": "순서도 제작",
+      "description": "실험 또는 분석 workflow를 도식화합니다.",
+      "inputs": {
+        "workflow": "도식화할 workflow나 과정"
+      }
+    },
+    "create-timeline": {
+      "name": "연구 일정 시각화",
+      "description": "프로젝트의 주요 일정과 결과물을 시간축에 표시합니다.",
+      "inputs": {
+        "project": "프로젝트 제목·설명",
+        "duration": "프로젝트 기간(예: 3년, 12개월)"
+      }
+    },
+    "create-heatmap": {
+      "name": "Heatmap 제작",
+      "description": "행렬 자료를 heatmap으로 시각화합니다.",
+      "inputs": {
+        "instructions": "추가 지침(선택)"
+      }
+    },
+    "create-network-diagram": {
+      "name": "네트워크 다이어그램 제작",
+      "description": "네트워크나 상호작용 그래프를 시각화합니다.",
+      "inputs": {
+        "metric": "노드 크기 지표(예: degree, betweenness)"
+      }
+    },
+    "create-geographic-map": {
+      "name": "지리 지도 제작",
+      "description": "지리·공간 자료를 시각화합니다.",
+      "inputs": {}
+    },
+    "create-dashboard": {
+      "name": "대화형 대시보드 제작",
+      "description": "여러 패널로 구성된 대화형 자료 대시보드를 만듭니다.",
+      "inputs": {}
+    },
+    "explore-data": {
+      "name": "탐색적 자료 분석",
+      "description": "분포, 상관관계, 결측값을 탐색하고 시각화합니다.",
+      "inputs": {}
+    },
+    "statistical-analysis": {
+      "name": "통계 분석",
+      "description": "적절한 검정, p값, 효과 크기와 가정을 확인합니다.",
+      "inputs": {
+        "instructions": "실행할 분석이나 비교(선택)"
+      }
+    },
+    "reproduce-analysis": {
+      "name": "분석 재현",
+      "description": "제공한 자료에 논문의 방법을 다시 적용하고 결과를 확인합니다.",
+      "inputs": {}
+    },
+    "clean-data": {
+      "name": "자료 정리·변환",
+      "description": "정리되지 않은 자료를 분석에 사용할 수 있는 형식으로 바꿉니다.",
+      "inputs": {}
+    },
+    "predictive-model": {
+      "name": "예측 모델 구축",
+      "description": "제공한 자료로 머신러닝 모델을 학습하고 평가합니다.",
+      "inputs": {
+        "target": "예측할 목표 변수"
+      }
+    },
+    "time-series-analysis": {
+      "name": "시계열 분석",
+      "description": "추세를 분해하고 예측하며 이상을 탐지합니다.",
+      "inputs": {
+        "horizon": "예측 기간(예: 30일, 12개월)"
+      }
+    },
+    "survival-analysis": {
+      "name": "생존 분석",
+      "description": "Kaplan–Meier 곡선, Cox 회귀와 위험함수를 모델링합니다.",
+      "inputs": {
+        "covariates": "포함할 주요 공변량"
+      }
+    },
+    "meta-analysis": {
+      "name": "메타분석",
+      "description": "연구 간 이질성을 평가하고 효과 크기를 통합합니다.",
+      "inputs": {}
+    },
+    "power-analysis": {
+      "name": "검정력 분석",
+      "description": "표본 크기를 계산하고 검정력 곡선을 만듭니다.",
+      "inputs": {
+        "study_design": "연구 설계(예: 두 표본 t검정, ANOVA, 로지스틱 회귀)",
+        "effect_size": "예상 효과 크기(예: Cohen's d = 0.5)",
+        "alpha": "유의수준(기본값: 0.05)"
+      }
+    },
+    "bayesian-analysis": {
+      "name": "베이지안 분석",
+      "description": "사후분포와 신용구간으로 베이지안 추론을 합니다.",
+      "inputs": {
+        "parameters": "관심 매개변수"
+      }
+    },
+    "dimensionality-reduction": {
+      "name": "차원 축소",
+      "description": "PCA, t-SNE, UMAP으로 고차원 자료를 시각화합니다.",
+      "inputs": {
+        "label": "색상을 구분할 열(선택)"
+      }
+    },
+    "clustering-analysis": {
+      "name": "군집 분석",
+      "description": "여러 알고리즘으로 비지도 군집 분석을 합니다.",
+      "inputs": {}
+    },
+    "regression-analysis": {
+      "name": "회귀 분석",
+      "description": "선형, 로지스틱 또는 혼합효과 회귀 모델을 만듭니다.",
+      "inputs": {
+        "regression_type": "회귀 유형(선형, 로지스틱, Poisson, 혼합효과)",
+        "outcome": "결과 변수",
+        "predictors": "예측 변수"
+      }
+    },
+    "anova-analysis": {
+      "name": "ANOVA·집단 비교",
+      "description": "일원, 이원 또는 반복측정 ANOVA를 합니다.",
+      "inputs": {
+        "factors": "집단 구분 요인",
+        "outcome": "결과 변수"
+      }
+    },
+    "correlation-network": {
+      "name": "상관 네트워크 분석",
+      "description": "상관관계 기반 네트워크를 만들고 시각화합니다.",
+      "inputs": {
+        "threshold": "유의성 기준(기본값: 0.05)"
+      }
+    },
+    "literature-search": {
+      "name": "문헌 검색",
+      "description": "주제에 맞는 논문을 찾아 요약합니다.",
+      "inputs": {
+        "topic": "검색 주제"
+      }
+    },
+    "summarize-paper": {
+      "name": "논문 요약",
+      "description": "목적, 방법, 결과와 의의를 구조화해 요약합니다.",
+      "inputs": {}
+    },
+    "compare-papers": {
+      "name": "논문 비교",
+      "description": "여러 논문을 나란히 비교·분석합니다.",
+      "inputs": {}
+    },
+    "research-landscape": {
+      "name": "연구 동향 지도",
+      "description": "분야의 주요 주제, 연구 집단과 동향을 시각화합니다.",
+      "inputs": {
+        "topic": "연구 분야·주제"
+      }
+    },
+    "systematic-review": {
+      "name": "체계적 문헌고찰 프로토콜",
+      "description": "PRISMA 방법론으로 체계적 문헌고찰을 설계합니다.",
+      "inputs": {
+        "question": "연구 질문"
+      }
+    },
+    "citation-analysis": {
+      "name": "인용 분석",
+      "description": "연구 성과의 인용 패턴과 영향력을 분석합니다.",
+      "inputs": {
+        "topic": "연구 주제 또는 논문 모음"
+      }
+    },
+    "find-datasets": {
+      "name": "공개 자료 찾기",
+      "description": "연구 질문에 맞는 공개 자료를 찾습니다.",
+      "inputs": {
+        "topic": "연구 주제 또는 필요한 자료 유형"
+      }
+    },
+    "track-research-trends": {
+      "name": "연구 동향 추적",
+      "description": "분야별 출판 동향과 새롭게 등장하는 주제를 분석합니다.",
+      "inputs": {
+        "field": "연구 분야",
+        "years": "기간(년, 기본값: 10)"
+      }
+    },
+    "find-preprints": {
+      "name": "최근 프리프린트 찾기",
+      "description": "bioRxiv, arXiv 등 프리프린트 서버를 검색합니다.",
+      "inputs": {
+        "topic": "검색 주제",
+        "months": "검색할 최근 개월 수(기본값: 6)"
+      }
+    },
+    "patent-landscape": {
+      "name": "특허 동향 분석",
+      "description": "기술의 특허 출원과 지식재산 동향을 분석합니다.",
+      "inputs": {
+        "technology": "기술·제품 분야"
+      }
+    },
+    "methods-comparison": {
+      "name": "방법 비교",
+      "description": "같은 과업에 적용할 수 있는 방법을 체계적으로 비교합니다.",
+      "inputs": {
+        "task": "해결할 과업·문제"
+      }
+    },
+    "specific-aim": {
+      "name": "세부 연구 목표 작성",
+      "description": "의의와 접근 방법을 포함한 연구비 신청용 Specific Aim을 작성합니다.",
+      "inputs": {
+        "topic": "연구 주제와 가설",
+        "agency": "연구비 지원기관(예: NIH R01, NSF CAREER)"
+      }
+    },
+    "research-plan": {
+      "name": "연구 계획 작성",
+      "description": "가설, 방법, 일정과 예상 결과를 작성합니다.",
+      "inputs": {
+        "topic": "연구 질문·주제"
+      }
+    },
+    "budget-justification": {
+      "name": "예산 근거 작성",
+      "description": "연구비 신청서에 사용할 예산 설명을 작성합니다.",
+      "inputs": {
+        "topic": "프로젝트 제목·주제",
+        "budget": "목표 예산(예: 3년간 연 $250K)"
+      }
+    },
+    "write-biosketch": {
+      "name": "연구자 약력 작성",
+      "description": "연구책임자의 NIH 또는 NSF 형식 약력을 작성합니다.",
+      "inputs": {
+        "name": "연구책임자 이름과 현재 직위",
+        "agency": "연구비 지원기관(NIH, NSF, DOE 등)",
+        "topic": "제안서 주제"
+      }
+    },
+    "write-significance": {
+      "name": "연구 의의 작성",
+      "description": "제안한 연구의 중요성과 영향을 설명합니다.",
+      "inputs": {
+        "topic": "연구 주제"
+      }
+    },
+    "write-innovation": {
+      "name": "연구 독창성 작성",
+      "description": "제안한 접근 방법의 새로운 점을 설명합니다.",
+      "inputs": {
+        "topic": "연구 주제와 접근 방법"
+      }
+    },
+    "write-approach": {
+      "name": "연구 전략·방법 작성",
+      "description": "연구비 신청서에 사용할 상세 실험 계획을 작성합니다.",
+      "inputs": {
+        "topic": "세부 목표를 포함한 연구 주제",
+        "agency": "연구비 지원기관"
+      }
+    },
+    "project-timeline": {
+      "name": "프로젝트 일정 작성",
+      "description": "연구비 신청용 Gantt chart와 주요 일정 계획을 만듭니다.",
+      "inputs": {
+        "topic": "프로젝트 주제",
+        "duration": "프로젝트 기간(예: 3년, 5년)"
+      }
+    },
+    "data-management-plan": {
+      "name": "자료 관리 계획 작성",
+      "description": "NIH, NSF 등의 연구비 요건에 맞는 DMP를 작성합니다.",
+      "inputs": {
+        "topic": "프로젝트 주제",
+        "agency": "연구비 지원기관(NIH, NSF, DOE)"
+      }
+    },
+    "broader-impacts": {
+      "name": "연구의 사회적 영향 작성",
+      "description": "NSF의 broader impacts 또는 NIH의 연구 성과 확산 계획을 작성합니다.",
+      "inputs": {
+        "topic": "프로젝트 주제"
+      }
+    },
+    "risk-mitigation": {
+      "name": "위험 대응 계획",
+      "description": "프로젝트의 위험 요인과 대안 전략을 찾습니다.",
+      "inputs": {
+        "topic": "프로젝트 주제와 목표"
+      }
+    },
+    "facilities-equipment": {
+      "name": "시설·장비 설명",
+      "description": "사용할 수 있는 자원과 기반 시설을 설명합니다.",
+      "inputs": {
+        "topic": "프로젝트 주제",
+        "institution": "기관 이름"
+      }
+    },
+    "plain-language-summary": {
+      "name": "일반 독자용 요약",
+      "description": "비전문가나 언론을 위한 설명으로 다시 작성합니다.",
+      "inputs": {}
+    },
+    "blog-post": {
+      "name": "블로그 글 작성",
+      "description": "논문이나 결과를 바탕으로 과학 블로그 글을 작성합니다.",
+      "inputs": {}
+    },
+    "draft-protocol": {
+      "name": "프로토콜 초안 작성",
+      "description": "실험이나 계산 절차를 단계별로 작성합니다.",
+      "inputs": {
+        "procedure": "문서화할 절차·실험"
+      }
+    },
+    "write-press-release": {
+      "name": "보도자료 작성",
+      "description": "연구 결과를 소개하는 기관 보도자료를 작성합니다.",
+      "inputs": {}
+    },
+    "social-media-post": {
+      "name": "소셜 미디어 게시물 작성",
+      "description": "연구를 요약하는 Twitter·LinkedIn 스레드를 작성합니다.",
+      "inputs": {
+        "num_posts": "스레드 게시물 수(기본값: 5~7)"
+      }
+    },
+    "podcast-script": {
+      "name": "팟캐스트 대본 작성",
+      "description": "과학 팟캐스트 에피소드의 대본을 작성합니다.",
+      "inputs": {
+        "topic": "논의할 주제",
+        "duration": "에피소드 길이(분, 기본값: 20)"
+      }
+    },
+    "policy-brief": {
+      "name": "정책 브리프 작성",
+      "description": "연구 근거를 바탕으로 의사결정자용 정책 브리프를 작성합니다.",
+      "inputs": {
+        "topic": "정책 주제",
+        "audience": "대상 독자(예: 입법자, 공중보건 담당자)"
+      }
+    },
+    "patient-education": {
+      "name": "환자 교육 자료",
+      "description": "환자가 이해할 수 있는 건강 정보 문서를 작성합니다.",
+      "inputs": {
+        "condition": "질환·시술"
+      }
+    },
+    "write-textbook-chapter": {
+      "name": "교재 장 작성",
+      "description": "주제를 종합적으로 다루는 교육용 장을 작성합니다.",
+      "inputs": {
+        "topic": "장 주제",
+        "level": "독자 수준(학부생, 대학원생, 전문가)",
+        "length": "목표 단어 수(기본값: 5000)"
+      }
+    },
+    "elevator-pitch": {
+      "name": "짧은 연구 소개 작성",
+      "description": "연구 프로젝트를 30초 분량으로 소개합니다.",
+      "inputs": {
+        "topic": "연구 프로젝트 설명",
+        "audience": "대상 독자(투자자, 일반 대중, 연구비 담당자)"
+      }
+    },
+    "rnaseq-deseq2": {
+      "name": "Bulk RNA-seq 분석",
+      "description": "RNA-seq count 자료로 차등 발현을 분석합니다.",
+      "inputs": {
+        "comparison": "비교할 집단(예: 처리군·대조군)"
+      }
+    },
+    "single-cell-rnaseq": {
+      "name": "단일세포 RNA-seq 분석",
+      "description": "원시 count부터 세포 유형까지 scRNA-seq 전체 분석을 합니다.",
+      "inputs": {
+        "tissue": "조직 유형(예: PBMC, 뇌, 간)"
+      }
+    },
+    "variant-calling": {
+      "name": "변이 검출·주석",
+      "description": "시퀀싱 자료에서 유전 변이를 찾고 주석을 붙입니다.",
+      "inputs": {
+        "reference": "참조 유전체(예: GRCh38, GRCm39)"
+      }
+    },
+    "gwas-analysis": {
+      "name": "GWAS 분석",
+      "description": "전장유전체 연관분석을 합니다.",
+      "inputs": {
+        "maf": "Minor allele frequency 기준(기본값: 0.01)"
+      }
+    },
+    "chipseq-analysis": {
+      "name": "ChIP-seq peak 검출",
+      "description": "ChIP-seq에서 전사인자 결합 부위를 찾습니다.",
+      "inputs": {
+        "factor": "전사인자 또는 histone mark",
+        "peak_type": "Peak 유형(TF는 narrow, histone mark는 broad)"
+      }
+    },
+    "atacseq-analysis": {
+      "name": "ATAC-seq 염색질 접근성 분석",
+      "description": "ATAC-seq 자료에서 열린 염색질 영역을 찾습니다.",
+      "inputs": {
+        "comparison": "비교할 집단"
+      }
+    },
+    "methylation-analysis": {
+      "name": "DNA 메틸화 분석",
+      "description": "메틸화 array 또는 bisulfite sequencing 자료를 분석합니다.",
+      "inputs": {
+        "data_type": "자료 유형(450K array, EPIC array, WGBS, RRBS)",
+        "comparison": "비교할 집단"
+      }
+    },
+    "gene-set-enrichment": {
+      "name": "유전자 집합 농축 분석",
+      "description": "유전자 목록이나 순위 자료로 GSEA와 경로 농축 분석을 합니다.",
+      "inputs": {}
+    },
+    "gene-regulatory-network": {
+      "name": "유전자 조절 네트워크",
+      "description": "전사 조절 네트워크를 추론하고 시각화합니다.",
+      "inputs": {
+        "organism": "생물종(사람, 생쥐 등)"
+      }
+    },
+    "genome-annotation": {
+      "name": "유전체 주석",
+      "description": "조립된 유전체의 유전자, 반복 서열과 특징에 주석을 붙입니다.",
+      "inputs": {}
+    },
+    "comparative-genomics": {
+      "name": "비교유전체 분석",
+      "description": "종 간 유전체를 비교해 진화적 특성을 분석합니다.",
+      "inputs": {
+        "species": "비교할 종(예: 사람, 생쥐, 제브라피시)"
+      }
+    },
+    "metagenomics-analysis": {
+      "name": "메타유전체 분석",
+      "description": "미생물 군집의 분류학적·기능적 구성을 분석합니다.",
+      "inputs": {
+        "comparison": "비교할 집단(예: 건강군·질환군)"
+      }
+    },
+    "rna-velocity": {
+      "name": "RNA velocity 분석",
+      "description": "Spliced·unspliced RNA로 세포 상태의 동역학을 추론합니다.",
+      "inputs": {}
+    },
+    "spatial-transcriptomics": {
+      "name": "공간전사체 분석",
+      "description": "공간 정보가 있는 유전자 발현 자료를 분석합니다.",
+      "inputs": {
+        "platform": "플랫폼(Visium, MERFISH, Slide-seq, Xenium)"
+      }
+    },
+    "variant-annotation": {
+      "name": "변이 주석·해석",
+      "description": "유전 변이에 주석을 붙이고 임상적 관련성에 따라 우선순위를 정합니다.",
+      "inputs": {
+        "phenotype": "관심 임상 표현형·질환"
+      }
+    },
+    "phylogenetic-analysis": {
+      "name": "계통 분석",
+      "description": "서열로 계통수를 만들고 시각화합니다.",
+      "inputs": {}
+    },
+    "gene-expression-atlas": {
+      "name": "유전자 발현 atlas",
+      "description": "조직과 조건별 유전자 발현을 조회하고 시각화합니다.",
+      "inputs": {
+        "genes": "유전자 목록(쉼표로 구분한 symbol)",
+        "conditions": "비교할 조건(선택)"
+      }
+    },
+    "protein-structure-analysis": {
+      "name": "단백질 구조 분석",
+      "description": "PDB 구조나 AlphaFold 예측 구조를 가져와 분석합니다.",
+      "inputs": {
+        "protein": "단백질 이름, UniProt ID 또는 PDB ID"
+      }
+    },
+    "molecular-docking": {
+      "name": "분자 도킹",
+      "description": "리간드를 표적 단백질에 도킹하고 결합을 분석합니다.",
+      "inputs": {
+        "ligand": "리간드 이름, SMILES 또는 파일",
+        "target": "표적 단백질(이름 또는 PDB ID)"
+      }
+    },
+    "mass-spec-proteomics": {
+      "name": "질량분석 단백질체 분석",
+      "description": "LC-MS/MS 단백질체 자료를 분석합니다.",
+      "inputs": {
+        "database": "단백질 데이터베이스(UniProt 사람, 생쥐 등)",
+        "comparison": "비교할 집단"
+      }
+    },
+    "protein-protein-interaction": {
+      "name": "단백질 상호작용 네트워크",
+      "description": "PPI 네트워크를 만들고 분석합니다.",
+      "inputs": {
+        "proteins": "단백질 목록(유전자 symbol 또는 UniProt ID)",
+        "context": "생물학적 맥락(선택, 예: 질환, 조직)"
+      }
+    },
+    "alphafold-prediction": {
+      "name": "AlphaFold 구조 예측",
+      "description": "AlphaFold로 단백질 3차원 구조를 조회하거나 예측합니다.",
+      "inputs": {
+        "protein": "단백질 이름 또는 UniProt ID"
+      }
+    },
+    "protein-engineering": {
+      "name": "단백질 공학 설계",
+      "description": "기능 개선을 위한 단백질 변이체를 설계합니다.",
+      "inputs": {
+        "protein": "설계할 단백질",
+        "property": "개선할 특성(안정성, 활성, 특이성)"
+      }
+    },
+    "binding-site-analysis": {
+      "name": "결합 부위 분석",
+      "description": "단백질의 리간드 결합 pocket 특성을 분석합니다.",
+      "inputs": {
+        "protein": "단백질 이름 또는 PDB ID"
+      }
+    },
+    "molecular-dynamics-sim": {
+      "name": "분자동역학 시뮬레이션",
+      "description": "생체분자의 MD 시뮬레이션을 설정하고 분석합니다.",
+      "inputs": {
+        "system": "분자계(단백질, 단백질·리간드 복합체, 막)",
+        "duration": "시뮬레이션 기간(예: 100 ns)"
+      }
+    },
+    "homology-modeling": {
+      "name": "상동성 모델링",
+      "description": "상동 단백질의 주형 구조로 3차원 모델을 만듭니다.",
+      "inputs": {
+        "protein": "단백질 서열 또는 UniProt ID"
+      }
+    },
+    "protein-function-prediction": {
+      "name": "단백질 기능 예측",
+      "description": "서열과 구조로 기능을 예측합니다.",
+      "inputs": {
+        "protein": "단백질 서열 또는 accession"
+      }
+    },
+    "post-translational-mods": {
+      "name": "번역 후 변형 분석",
+      "description": "번역 후 변형(PTM)을 예측하고 분석합니다.",
+      "inputs": {
+        "protein": "단백질 이름 또는 UniProt ID"
+      }
+    },
+    "structural-alignment": {
+      "name": "구조 정렬",
+      "description": "단백질 3차원 구조를 정렬하고 비교합니다.",
+      "inputs": {
+        "structures": "비교할 PDB ID 또는 단백질 이름"
+      }
+    },
+    "epitope-prediction": {
+      "name": "Epitope 예측",
+      "description": "백신 설계를 위한 B세포·T세포 epitope를 예측합니다.",
+      "inputs": {
+        "antigen": "항원 단백질 이름·서열",
+        "hla_alleles": "HLA 대립유전자(예: HLA-A*02:01 또는 'common alleles')"
+      }
+    },
+    "scrnaseq-clustering": {
+      "name": "scRNA-seq 군집 분석",
+      "description": "scRNA-seq에서 세포 군집을 찾고 특성을 분석합니다.",
+      "inputs": {
+        "reference": "사용할 참조 marker 또는 세포 atlas"
+      }
+    },
+    "cell-type-annotation": {
+      "name": "세포 유형 주석",
+      "description": "참조 atlas를 사용해 세포 유형을 자동으로 표시합니다.",
+      "inputs": {
+        "tissue": "조직 유형"
+      }
+    },
+    "trajectory-analysis": {
+      "name": "세포 궤적·pseudotime 분석",
+      "description": "세포의 발달 궤적과 순서를 추론합니다.",
+      "inputs": {
+        "root": "시작 세포 유형·marker(예: 줄기세포, 전구세포)"
+      }
+    },
+    "flow-cytometry-analysis": {
+      "name": "유세포 분석",
+      "description": "유세포 자료를 gating하고 군집화하며 정량화합니다.",
+      "inputs": {
+        "gating": "Gating 전략·패널 설명",
+        "comparison": "비교할 집단"
+      }
+    },
+    "cell-cell-communication": {
+      "name": "세포 간 소통 분석",
+      "description": "scRNA-seq로 세포 간 신호 전달을 추론합니다.",
+      "inputs": {
+        "comparison": "비교할 조건(선택)"
+      }
+    },
+    "multi-omics-integration": {
+      "name": "다중오믹스 통합",
+      "description": "전사체, 단백질체 등 여러 오믹스 자료를 통합합니다.",
+      "inputs": {
+        "modalities": "자료 modality(예: RNA + ATAC, RNA + protein)"
+      }
+    },
+    "cell-cycle-analysis": {
+      "name": "세포 주기 분석",
+      "description": "세포 주기 단계에 점수를 부여하고 회귀로 세포 주기 효과를 제거합니다.",
+      "inputs": {
+        "comparison": "비교할 조건(선택)"
+      }
+    },
+    "perturbation-analysis": {
+      "name": "Perturbation·CRISPR screen 분석",
+      "description": "Perturb-seq 또는 CRISPR screen 자료를 분석합니다.",
+      "inputs": {
+        "screen_type": "Screen 유형(Perturb-seq, CRISPRi, CRISPRa, CRISPR KO)"
+      }
+    },
+    "immune-cell-profiling": {
+      "name": "면역세포 프로파일링",
+      "description": "면역세포 집단의 특성을 상세히 분석합니다.",
+      "inputs": {
+        "data_type": "자료 유형(scRNA-seq, CyTOF, 유세포 분석)",
+        "comparison": "비교할 집단(예: 반응군·비반응군)"
+      }
+    },
+    "lineage-tracing": {
+      "name": "세포 계보 추적 분석",
+      "description": "Barcoding 자료로 세포 계보 트리를 복원합니다.",
+      "inputs": {}
+    },
+    "spatial-cell-analysis": {
+      "name": "세포 공간 분석",
+      "description": "세포의 공간적 배치와 이웃 관계를 분석합니다.",
+      "inputs": {
+        "platform": "플랫폼(MERFISH, Xenium, CosMx, IMC, mIF)",
+        "outcome": "상관관계를 분석할 임상 결과(선택)"
+      }
+    },
+    "molecular-property-prediction": {
+      "name": "분자 특성 예측",
+      "description": "분자의 물리화학적·생물학적 특성을 예측합니다.",
+      "inputs": {
+        "properties": "예측할 특성(예: 용해도, 독성, pKa)"
+      }
+    },
+    "reaction-prediction": {
+      "name": "화학 반응 예측",
+      "description": "화학 반응의 생성물, 수율이나 조건을 예측합니다.",
+      "inputs": {
+        "reaction": "반응 SMILES, 설명 또는 제공한 반응식"
+      }
+    },
+    "retrosynthesis-planning": {
+      "name": "역합성 계획",
+      "description": "목표 분자의 합성 경로를 계획합니다.",
+      "inputs": {
+        "target": "목표 분자(SMILES, 이름 또는 구조)"
+      }
+    },
+    "conformer-generation": {
+      "name": "Conformer 생성·분석",
+      "description": "분자의 3차원 형태를 생성하고 분석합니다.",
+      "inputs": {
+        "molecule": "분자(SMILES 또는 이름)"
+      }
+    },
+    "qsar-modeling": {
+      "name": "QSAR 모델링",
+      "description": "정량적 구조·활성 관계 모델을 만듭니다.",
+      "inputs": {
+        "target_property": "목표 특성(예: IC50, EC50, 용해도, 투과도)"
+      }
+    },
+    "chemical-space-exploration": {
+      "name": "화학 공간 탐색",
+      "description": "화합물 라이브러리의 화학 공간을 시각화하고 탐색합니다.",
+      "inputs": {
+        "property": "색상을 구분할 특성(선택, 예: 활성, 출처)"
+      }
+    },
+    "spectral-analysis-nmr": {
+      "name": "NMR 스펙트럼 분석",
+      "description": "NMR 스펙트럼을 해석하고 신호를 배정합니다.",
+      "inputs": {
+        "nmr_type": "NMR 유형(1H, 13C, 2D COSY, HSQC, HMBC)",
+        "compound": "예상 화합물(알려진 경우)"
+      }
+    },
+    "spectral-analysis-ms": {
+      "name": "질량 스펙트럼 분석",
+      "description": "질량 스펙트럼을 분석하고 해석합니다.",
+      "inputs": {
+        "ms_type": "MS 유형(ESI, MALDI, EI, LC-MS/MS, GC-MS)"
+      }
+    },
+    "thermodynamics-calculation": {
+      "name": "열역학 계산",
+      "description": "열역학적 특성과 평형을 계산합니다.",
+      "inputs": {
+        "system": "화학계·반응",
+        "temperature": "온도(K, 기본값: 298.15)"
+      }
+    },
+    "pka-prediction": {
+      "name": "pKa 예측",
+      "description": "분자의 산 해리 상수를 예측합니다.",
+      "inputs": {
+        "molecule": "분자(SMILES 또는 이름)",
+        "ph": "관심 pH(기본값: 7.4)"
+      }
+    },
+    "solubility-prediction": {
+      "name": "용해도 예측",
+      "description": "수용해도를 예측하고 제형 관련 사항을 검토합니다.",
+      "inputs": {
+        "molecules": "분자(SMILES 목록 또는 제공한 파일)"
+      }
+    },
+    "reaction-optimization": {
+      "name": "반응 최적화",
+      "description": "반응 조건을 최적화하기 위한 실험을 설계합니다.",
+      "inputs": {
+        "reaction": "최적화할 반응"
+      }
+    },
+    "polymer-design": {
+      "name": "고분자 설계·분석",
+      "description": "목표 특성을 갖는 고분자를 설계합니다.",
+      "inputs": {
+        "application": "목표 응용 분야",
+        "properties": "원하는 특성"
+      }
+    },
+    "catalyst-design": {
+      "name": "촉매 설계",
+      "description": "화학 반응에 사용할 촉매를 설계하고 선별합니다.",
+      "inputs": {
+        "reaction": "목표 반응"
+      }
+    },
+    "chemical-safety-assessment": {
+      "name": "화학물질 안전성 평가",
+      "description": "화합물의 유해성과 안전성을 평가합니다.",
+      "inputs": {
+        "chemicals": "화학물질 이름, CAS 번호 또는 SMILES"
+      }
+    },
+    "metabolite-identification": {
+      "name": "대사체 동정",
+      "description": "질량분석 자료에서 대사체를 동정합니다.",
+      "inputs": {
+        "data_type": "자료 유형(LC-MS, GC-MS, NMR)"
+      }
+    },
+    "synthetic-accessibility": {
+      "name": "합성 접근성 점수",
+      "description": "화합물의 합성 용이성을 평가합니다.",
+      "inputs": {}
+    },
+    "target-identification": {
+      "name": "약물 표적 발굴",
+      "description": "질환의 치료 표적을 찾고 검증합니다.",
+      "inputs": {
+        "disease": "질환 이름·적응증"
+      }
+    },
+    "virtual-screening": {
+      "name": "가상 스크리닝",
+      "description": "표적에 대해 화합물 라이브러리를 선별합니다.",
+      "inputs": {
+        "target": "약물 표적 이름",
+        "pdb_id": "표적 구조의 PDB ID",
+        "library_size": "스크리닝할 라이브러리 크기"
+      }
+    },
+    "admet-prediction": {
+      "name": "ADMET 예측",
+      "description": "흡수, 분포, 대사, 배설과 독성을 예측합니다.",
+      "inputs": {}
+    },
+    "lead-optimization": {
+      "name": "선도물질 최적화",
+      "description": "선도물질의 효능, 선택성과 ADMET를 최적화합니다.",
+      "inputs": {
+        "compound": "선도물질(SMILES 또는 이름)",
+        "target": "약물 표적",
+        "property": "최적화할 특성(효능, 선택성, 용해도, 대사 안정성)"
+      }
+    },
+    "drug-repurposing": {
+      "name": "약물 재창출",
+      "description": "기존 약물에서 새로운 적응증 후보를 찾습니다.",
+      "inputs": {
+        "disease": "질환·적응증"
+      }
+    },
+    "pharmacokinetics-modeling": {
+      "name": "약동학 모델링",
+      "description": "약동학 모델을 만들고 시뮬레이션합니다.",
+      "inputs": {
+        "drug": "약물 이름 또는 화합물 ID",
+        "doses": "시뮬레이션할 용량(예: 10 mg, 50 mg, 100 mg)"
+      }
+    },
+    "dose-response-analysis": {
+      "name": "용량·반응 분석",
+      "description": "용량·반응 곡선을 적합하고 EC50·IC50을 계산합니다.",
+      "inputs": {}
+    },
+    "drug-interaction-prediction": {
+      "name": "약물 상호작용 예측",
+      "description": "약물 간 상호작용과 기전을 예측합니다.",
+      "inputs": {
+        "drugs": "약물 이름·목록"
+      }
+    },
+    "clinical-trial-design": {
+      "name": "임상시험 설계",
+      "description": "임상시험 프로토콜을 설계합니다.",
+      "inputs": {
+        "drug": "약물·중재",
+        "indication": "질환 적응증"
+      }
+    },
+    "biomarker-discovery": {
+      "name": "바이오마커 발굴",
+      "description": "오믹스 자료에서 바이오마커를 찾고 검증합니다.",
+      "inputs": {
+        "condition": "질환·표현형",
+        "data_type": "자료 유형(전사체, 단백질체, 대사체, cfDNA)"
+      }
+    },
+    "toxicity-prediction": {
+      "name": "독성 예측",
+      "description": "화합물의 독성과 안전성 위험 요인을 예측합니다.",
+      "inputs": {}
+    },
+    "pharmacogenomics-analysis": {
+      "name": "약물유전체 분석",
+      "description": "약물 반응에 영향을 주는 유전 변이를 분석합니다.",
+      "inputs": {
+        "drug": "약물 이름",
+        "genotype": "유전자, 대립유전자 또는 합성·집계 유전자형 맥락"
+      }
+    },
+    "drug-target-network": {
+      "name": "약물·표적 상호작용 네트워크",
+      "description": "화합물의 다중 약리작용 네트워크를 구성합니다.",
+      "inputs": {
+        "compounds": "화합물 이름 또는 SMILES 목록"
+      }
+    },
+    "competitive-landscape-pharma": {
+      "name": "의약품 경쟁 동향",
+      "description": "치료 분야의 경쟁 동향을 분석합니다.",
+      "inputs": {
+        "indication": "치료 분야·적응증"
+      }
+    },
+    "side-effect-prediction": {
+      "name": "부작용 예측",
+      "description": "분자 구조로 약물 이상반응을 예측합니다.",
+      "inputs": {
+        "compound": "화합물(SMILES 또는 약물 이름)"
+      }
+    },
+    "formulation-optimization": {
+      "name": "제형 최적화",
+      "description": "생체이용률을 높이기 위한 약물 제형을 최적화합니다.",
+      "inputs": {
+        "compound": "화합물(SMILES 또는 이름)",
+        "route": "투여 경로(경구, 정맥, 국소, 흡입)"
+      }
+    },
+    "quantum-circuit-design": {
+      "name": "양자 회로 설계",
+      "description": "특정 알고리즘의 양자 회로를 설계하고 시뮬레이션합니다.",
+      "inputs": {
+        "algorithm": "알고리즘·문제(예: VQE, Grover, QFT, QAOA)"
+      }
+    },
+    "quantum-simulation": {
+      "name": "양자계 시뮬레이션",
+      "description": "양자 다체계를 시뮬레이션합니다.",
+      "inputs": {
+        "system": "양자계(예: Ising 모델, Hubbard, spin chain)",
+        "observables": "계산할 관측량"
+      }
+    },
+    "quantum-ml-model": {
+      "name": "양자 머신러닝",
+      "description": "양자·고전 혼합 머신러닝 모델을 만듭니다.",
+      "inputs": {
+        "task": "머신러닝 과업(분류, 회귀, 군집화)"
+      }
+    },
+    "classical-mechanics-sim": {
+      "name": "고전역학 시뮬레이션",
+      "description": "뉴턴 또는 라그랑주 역학계를 시뮬레이션합니다.",
+      "inputs": {
+        "system": "역학계(예: 이중진자, n체, 용수철·질량계)",
+        "conditions": "초기조건"
+      }
+    },
+    "electromagnetic-simulation": {
+      "name": "전자기 시뮬레이션",
+      "description": "전자기장 문제의 Maxwell 방정식을 풉니다.",
+      "inputs": {
+        "system": "전자기 시스템(안테나, 도파관, 광결정 등)"
+      }
+    },
+    "statistical-mechanics": {
+      "name": "통계역학 시뮬레이션",
+      "description": "통계적 앙상블에 Monte Carlo와 분자동역학을 적용합니다.",
+      "inputs": {
+        "system": "시스템(예: Ising 모델, Lennard-Jones 유체, XY 모델)",
+        "temperature": "온도·온도 범위"
+      }
+    },
+    "particle-physics-analysis": {
+      "name": "입자물리 자료 분석",
+      "description": "고에너지 물리 충돌 자료를 분석합니다.",
+      "inputs": {
+        "channel": "붕괴 channel·과정(예: H→γγ, Z→μμ)"
+      }
+    },
+    "condensed-matter-bands": {
+      "name": "밴드 구조 계산",
+      "description": "전자 밴드 구조와 상태밀도를 계산합니다.",
+      "inputs": {
+        "material": "재료(화학식 또는 결정 구조)"
+      }
+    },
+    "optics-simulation": {
+      "name": "광학 시뮬레이션",
+      "description": "렌즈, 레이저, 도파관 등 광학계를 시뮬레이션합니다.",
+      "inputs": {
+        "system": "광학계 설명",
+        "metrics": "계산할 지표(예: PSF, MTF, beam waist, NA)"
+      }
+    },
+    "thermodynamic-modeling": {
+      "name": "열역학 모델링",
+      "description": "열역학 사이클과 에너지 시스템을 모델링합니다.",
+      "inputs": {
+        "system": "열역학계(Rankine, Brayton, 냉동, 열펌프)"
+      }
+    },
+    "gravitational-wave-analysis": {
+      "name": "중력파 분석",
+      "description": "LIGO·Virgo 중력파 신호 자료를 분석합니다.",
+      "inputs": {
+        "templates": "Template 계열(compact binary, burst 등)"
+      }
+    },
+    "plasma-physics-sim": {
+      "name": "플라스마 물리 시뮬레이션",
+      "description": "플라스마 거동과 자기유체역학을 시뮬레이션합니다.",
+      "inputs": {
+        "system": "플라스마 구성(tokamak, Z-pinch, 태양풍 등)",
+        "quantities": "추적할 수량(밀도, 온도, 자기장)"
+      }
+    },
+    "quantum-error-correction": {
+      "name": "양자 오류 정정",
+      "description": "양자 오류 정정 코드를 설계하고 분석합니다.",
+      "inputs": {
+        "noise_model": "잡음 모델(depolarizing, amplitude damping, bit-flip 등)"
+      }
+    },
+    "nuclear-decay-analysis": {
+      "name": "핵붕괴 분석",
+      "description": "방사성 붕괴 자료와 핵반응을 분석합니다.",
+      "inputs": {
+        "isotope": "분석할 동위원소"
+      }
+    },
+    "crystal-structure-prediction": {
+      "name": "결정 구조 예측",
+      "description": "조성에 대한 안정한 결정 구조를 예측합니다.",
+      "inputs": {
+        "composition": "화학 조성(예: Li2FeSiO4, TiO2)"
+      }
+    },
+    "phase-diagram-analysis": {
+      "name": "상평형도 분석",
+      "description": "상평형도를 구성하고 해석합니다.",
+      "inputs": {
+        "system": "재료계(예: Fe-C, Al-Cu, Li-Ni-Mn-Co-O)"
+      }
+    },
+    "mechanical-property-prediction": {
+      "name": "기계적 특성 예측",
+      "description": "재료의 탄성계수, 경도와 강도를 예측합니다.",
+      "inputs": {
+        "material": "재료(화학식 또는 결정 구조 파일)"
+      }
+    },
+    "materials-screening": {
+      "name": "고처리량 재료 스크리닝",
+      "description": "목표 특성에 맞는 재료를 데이터베이스에서 선별합니다.",
+      "inputs": {
+        "application": "목표 응용 분야(예: 배터리 양극, 열전, 광촉매)",
+        "properties": "원하는 특성과 범위"
+      }
+    },
+    "defect-analysis": {
+      "name": "결함 분석",
+      "description": "결정의 점결함, 공공과 불순물을 분석합니다.",
+      "inputs": {
+        "material": "모재",
+        "temperature": "관심 온도(K)"
+      }
+    },
+    "alloy-design": {
+      "name": "합금 설계",
+      "description": "목표 기계적·기능적 특성에 맞는 합금을 설계합니다.",
+      "inputs": {
+        "application": "응용 분야(항공우주, 생체의료, 자동차 등)",
+        "requirements": "요구 특성"
+      }
+    },
+    "battery-material-analysis": {
+      "name": "배터리 재료 분석",
+      "description": "전기화학적 에너지 저장용 재료를 평가합니다.",
+      "inputs": {
+        "material": "재료 화학식",
+        "component": "배터리 구성요소(양극, 음극, 전해질, 고체 전해질)"
+      }
+    },
+    "thermal-conductivity-modeling": {
+      "name": "열전도도 모델링",
+      "description": "재료의 열 수송 특성을 예측합니다.",
+      "inputs": {
+        "material": "재료",
+        "t_min": "최저 온도(K, 기본값: 100)",
+        "t_max": "최고 온도(K, 기본값: 1000)"
+      }
+    },
+    "surface-energy-calculation": {
+      "name": "표면에너지 분석",
+      "description": "표면에너지를 계산하고 결정 형태를 예측합니다.",
+      "inputs": {
+        "material": "재료",
+        "adsorbate": "흡착질 분자(선택)"
+      }
+    },
+    "polymer-property-prediction": {
+      "name": "고분자 특성 예측",
+      "description": "고분자의 열적·기계적·수송 특성을 예측합니다.",
+      "inputs": {
+        "polymer": "고분자(반복단위 SMILES 또는 이름)"
+      }
+    },
+    "band-structure-calculation": {
+      "name": "전자 밴드 구조",
+      "description": "재료의 전자 밴드 구조와 DOS를 계산합니다.",
+      "inputs": {
+        "material": "재료(화학식 또는 CIF 파일)"
+      }
+    },
+    "materials-literature-review": {
+      "name": "재료과학 문헌 검토",
+      "description": "재료과학 주제의 문헌을 조사합니다.",
+      "inputs": {
+        "topic": "재료과학 주제",
+        "years": "검색 기간(년, 기본값: 5)"
+      }
+    },
+    "clinical-trial-analysis": {
+      "name": "임상시험 분석",
+      "description": "적절한 평가변수로 임상시험 자료를 분석합니다.",
+      "inputs": {
+        "endpoint": "일차 평가변수"
+      }
+    },
+    "survival-analysis-clinical": {
+      "name": "임상 생존 분석",
+      "description": "임상 결과에 Kaplan–Meier 분석과 Cox 회귀를 적용합니다.",
+      "inputs": {
+        "outcome": "결과(OS, PFS, DFS 등)",
+        "time_unit": "시간 단위(일, 월, 년)",
+        "groups": "비교할 집단",
+        "covariates": "보정할 공변량"
+      }
+    },
+    "epidemiological-study": {
+      "name": "역학 연구 설계",
+      "description": "관찰 역학 연구를 설계하고 분석합니다.",
+      "inputs": {
+        "question": "연구 질문",
+        "study_type": "연구 유형(코호트, 환자·대조군, 단면, 생태학적 연구)"
+      }
+    },
+    "medical-image-analysis": {
+      "name": "의료 영상 분석",
+      "description": "방사선 영상이나 병리 영상을 분석합니다.",
+      "inputs": {
+        "modality": "영상 modality(CT, MRI, X-ray, H&E, IHC)",
+        "target_structure": "분할·분석할 구조"
+      }
+    },
+    "diagnostic-accuracy": {
+      "name": "진단검사 정확도",
+      "description": "진단검사의 민감도, 특이도와 ROC를 평가합니다.",
+      "inputs": {
+        "test": "진단검사 이름",
+        "condition": "대상 질환",
+        "prevalence": "질환 유병률(선택)"
+      }
+    },
+    "treatment-comparison": {
+      "name": "치료법 비교",
+      "description": "집단 간 치료 결과를 비교합니다.",
+      "inputs": {
+        "treatments": "비교할 치료법",
+        "method": "보정 방법(성향점수, 회귀, 매칭)"
+      }
+    },
+    "risk-prediction-model": {
+      "name": "임상 위험 예측 모델",
+      "description": "임상 결과의 위험 예측 모델을 구축하고 검증합니다.",
+      "inputs": {
+        "outcome": "예측할 임상 결과"
+      }
+    },
+    "adverse-event-analysis": {
+      "name": "이상사례 분석",
+      "description": "임상 연구의 안전성 자료를 분석합니다.",
+      "inputs": {
+        "groups": "비교할 치료 집단"
+      }
+    },
+    "cost-effectiveness-analysis": {
+      "name": "비용·효과 분석",
+      "description": "중재의 보건경제학적 가치를 평가합니다.",
+      "inputs": {
+        "interventions": "비교할 중재",
+        "condition": "임상 질환",
+        "perspective": "분석 관점(보험자, 사회, 병원)"
+      }
+    },
+    "patient-cohort-study": {
+      "name": "환자 코호트 연구",
+      "description": "다변량 결과를 포함한 환자 코호트를 분석합니다.",
+      "inputs": {
+        "sample_size": "대략적인 표본 크기",
+        "outcome": "일차 결과",
+        "subgroups": "분석할 하위집단"
+      }
+    },
+    "systematic-review-clinical": {
+      "name": "임상 체계적 문헌고찰",
+      "description": "PRISMA에 맞게 임상 근거를 체계적으로 고찰합니다.",
+      "inputs": {
+        "question": "임상 질문(PICO 형식 권장)"
+      }
+    },
+    "clinical-guideline-summary": {
+      "name": "임상 지침 요약",
+      "description": "임상 진료 지침을 요약하고 비교합니다.",
+      "inputs": {
+        "condition": "임상 질환",
+        "societies": "지침 기관(예: AHA, NICE, WHO)"
+      }
+    },
+    "quality-improvement": {
+      "name": "의료 질 향상 분석",
+      "description": "의료 질 지표와 개선 활동을 분석합니다.",
+      "inputs": {
+        "initiative": "분석할 질 향상 활동·지표"
+      }
+    },
+    "health-equity-analysis": {
+      "name": "건강 형평성 분석",
+      "description": "인구 집단 간 건강 격차를 분석합니다.",
+      "inputs": {
+        "outcome": "건강 결과",
+        "demographics": "인구통계 변수(인종, 민족, 소득, 지리)"
+      }
+    },
+    "electronic-health-records": {
+      "name": "EHR 자료 분석",
+      "description": "구조화된 전자건강기록 자료를 분석합니다.",
+      "inputs": {
+        "criteria": "코호트 포함 기준",
+        "analysis_goal": "분석 목적"
+      }
+    },
+    "longitudinal-study": {
+      "name": "종단 자료 분석",
+      "description": "시간에 따른 반복측정 자료와 패널 자료를 분석합니다.",
+      "inputs": {
+        "outcome": "결과 변수",
+        "timepoints": "측정 시점 수",
+        "groups": "비교할 집단"
+      }
+    },
+    "population-health-assessment": {
+      "name": "인구집단 건강 평가",
+      "description": "인구집단의 건강 상태와 필요를 평가합니다.",
+      "inputs": {
+        "population": "인구집단(군, 시 또는 인구통계 집단)"
+      }
+    },
+    "case-control-analysis": {
+      "name": "환자·대조군 분석",
+      "description": "짝지은 또는 짝짓지 않은 환자·대조군 연구 자료를 분석합니다.",
+      "inputs": {
+        "cases": "환자군 정의",
+        "controls": "대조군 정의"
+      }
+    },
+    "eeg-analysis": {
+      "name": "EEG 신호 분석",
+      "description": "뇌파 자료를 처리하고 분석합니다.",
+      "inputs": {
+        "freq_range": "대역통과 필터 범위(예: 0.1-100)",
+        "events": "분석할 사건·조건"
+      }
+    },
+    "fmri-analysis": {
+      "name": "fMRI 분석",
+      "description": "기능적 MRI 뇌 영상 자료를 처리하고 분석합니다.",
+      "inputs": {
+        "contrasts": "과업 대조(예: faces > houses)",
+        "fwhm": "평활화 FWHM(mm, 기본값: 6)"
+      }
+    },
+    "spike-sorting": {
+      "name": "Spike sorting 분석",
+      "description": "세포외 기록에서 신경 spike를 분류합니다.",
+      "inputs": {
+        "recording_type": "기록 유형(tetrode, silicon probe, Neuropixels)"
+      }
+    },
+    "neural-decoding": {
+      "name": "신경 디코딩",
+      "description": "신경 활동에서 자극이나 행동을 해독합니다.",
+      "inputs": {
+        "variable": "해독할 변수(자극, 선택, 위치, 운동)"
+      }
+    },
+    "connectivity-analysis": {
+      "name": "뇌 연결성 분석",
+      "description": "기능적·구조적 뇌 연결성을 분석합니다.",
+      "inputs": {
+        "modality": "자료 modality(안정상태 fMRI, DTI, EEG)",
+        "atlas": "뇌 atlas(AAL, Schaefer, Desikan)",
+        "groups": "비교할 집단(선택)"
+      }
+    },
+    "behavioral-analysis": {
+      "name": "행동 자료 분석",
+      "description": "반응시간, 선택, 학습 등 행동 실험 자료를 분석합니다.",
+      "inputs": {
+        "task_type": "과업 유형(2AFC, go/no-go, bandit, Pavlovian)",
+        "models": "적합할 계산 모델(선택)",
+        "neural_data": "상관관계를 분석할 신경 자료(선택)"
+      }
+    },
+    "calcium-imaging-analysis": {
+      "name": "칼슘 이미징 분석",
+      "description": "칼슘 이미징 기록을 처리하고 분석합니다.",
+      "inputs": {
+        "task": "행동 과업·패러다임"
+      }
+    },
+    "neuropixels-processing": {
+      "name": "Neuropixels 자료 처리",
+      "description": "고밀도 Neuropixels probe 기록을 처리합니다.",
+      "inputs": {
+        "events": "정렬 기준이 될 행동 사건"
+      }
+    },
+    "brain-atlas-mapping": {
+      "name": "뇌 atlas 매핑",
+      "description": "신경 자료를 표준 뇌 atlas에 매핑합니다.",
+      "inputs": {
+        "atlas": "뇌 atlas(Allen CCF, MNI, Paxinos)",
+        "data_type": "매핑할 자료(세포 수, 활동, 연결성)"
+      }
+    },
+    "computational-neuron-model": {
+      "name": "계산 뉴런 모델",
+      "description": "생물물리학적 뉴런 모델을 만들고 시뮬레이션합니다.",
+      "inputs": {
+        "neuron_type": "뉴런 유형(예: 추체세포, Purkinje 세포, 사이뉴런)",
+        "species": "생물종(쥐, 생쥐, 사람)",
+        "protocol": "자극 프로토콜(step current, ramp, synaptic)"
+      }
+    },
+    "psychophysics-analysis": {
+      "name": "정신물리학 분석",
+      "description": "심리측정 함수를 적합하고 지각 자료를 분석합니다.",
+      "inputs": {
+        "task": "과업 유형(탐지, 변별, 식별)",
+        "conditions": "실험 조건"
+      }
+    },
+    "neural-network-comparison": {
+      "name": "생물 신경망·인공 신경망 비교",
+      "description": "생물학적 신경 표상을 심층 신경망의 layer와 비교합니다.",
+      "inputs": {
+        "stimuli": "사용한 자극 집합",
+        "model": "심층 신경망 모델(ResNet, CLIP, GPT 등)"
+      }
+    },
+    "species-distribution-model": {
+      "name": "종 분포 모델",
+      "description": "종의 서식 적합성과 분포 범위를 예측합니다.",
+      "inputs": {
+        "species": "종 이름(학명 또는 일반명)",
+        "scenario": "예측 기후 시나리오(선택, 예: SSP245, SSP585)"
+      }
+    },
+    "biodiversity-assessment": {
+      "name": "생물다양성 평가",
+      "description": "종 풍부도, 다양성 지수와 군집 구성을 분석합니다.",
+      "inputs": {
+        "sites": "비교할 지점·집단"
+      }
+    },
+    "population-dynamics": {
+      "name": "개체군 동태 모델링",
+      "description": "개체군 성장, 포식·피식 또는 경쟁을 모델링합니다.",
+      "inputs": {
+        "system": "생태계(단일 종, 포식·피식, 경쟁, SIR)",
+        "model_type": "모델 유형(logistic, Lotka-Volterra, 연령 구조)",
+        "scenario": "시뮬레이션할 시나리오(선택)"
+      }
+    },
+    "climate-data-analysis": {
+      "name": "기후 자료 분석",
+      "description": "기온, 강수량과 기후 추세를 분석합니다.",
+      "inputs": {
+        "region": "지리적 지역",
+        "period": "기간(예: 1950~2025)"
+      }
+    },
+    "remote-sensing-analysis": {
+      "name": "원격탐사 분석",
+      "description": "환경 모니터링을 위한 위성 영상을 분석합니다.",
+      "inputs": {
+        "sensor": "센서(Landsat, Sentinel-2, MODIS)",
+        "indices": "계산할 지수(NDVI, NDWI, NBR 등)"
+      }
+    },
+    "phylogeography": {
+      "name": "계통지리 분석",
+      "description": "유전 계통의 지리적 분포를 분석합니다.",
+      "inputs": {
+        "taxon": "분류군"
+      }
+    },
+    "ecological-network-analysis": {
+      "name": "생태 네트워크 분석",
+      "description": "먹이망, 상리공생 네트워크나 상호작용망을 분석합니다.",
+      "inputs": {
+        "network_type": "네트워크 유형(먹이망, 수분, 기생, 상리공생)"
+      }
+    },
+    "conservation-prioritization": {
+      "name": "보전 우선순위 설정",
+      "description": "보전할 지역이나 종의 우선순위를 정합니다.",
+      "inputs": {
+        "target": "보전 대상(종 집단, 생태계)",
+        "region": "지리적 지역"
+      }
+    },
+    "water-quality-analysis": {
+      "name": "수질 분석",
+      "description": "물의 화학 조성과 수질 모니터링 자료를 분석합니다.",
+      "inputs": {
+        "standards": "규제 기준(EPA, WHO, EU WFD)"
+      }
+    },
+    "carbon-footprint-analysis": {
+      "name": "탄소발자국 분석",
+      "description": "온실가스 배출량을 계산하고 분석합니다.",
+      "inputs": {
+        "entity": "대상(조직, 제품, 프로젝트, 행사)"
+      }
+    },
+    "environmental-impact": {
+      "name": "환경영향평가",
+      "description": "프로젝트나 활동의 환경영향을 평가합니다.",
+      "inputs": {
+        "project": "프로젝트 설명",
+        "framework": "환경영향평가 체계(NEPA, EU EIA Directive, IFC)"
+      }
+    },
+    "habitat-suitability": {
+      "name": "서식지 적합성 분석",
+      "description": "대상 종의 서식지 질과 적합성을 평가합니다.",
+      "inputs": {
+        "species": "대상 종",
+        "region": "연구 지역"
+      }
+    },
+    "microbial-ecology": {
+      "name": "미생물 군집 생태 분석",
+      "description": "미생물 군집의 16S·ITS amplicon sequencing 자료를 분석합니다.",
+      "inputs": {
+        "database": "참조 데이터베이스(Silva, Greengenes2, UNITE)",
+        "comparison": "비교할 집단"
+      }
+    },
+    "invasive-species-risk": {
+      "name": "외래종 위험 평가",
+      "description": "외래종의 침입 위험과 잠재적 확산을 평가합니다.",
+      "inputs": {
+        "species": "평가 대상 종",
+        "region": "관심 지역"
+      }
+    },
+    "stock-market-analysis": {
+      "name": "주식시장 분석",
+      "description": "주가 자료, 기술적 지표와 기초 여건을 분석합니다.",
+      "inputs": {
+        "ticker": "주식 ticker symbol",
+        "period": "분석 기간(예: 1Y, 5Y, YTD)"
+      }
+    },
+    "portfolio-optimization": {
+      "name": "포트폴리오 최적화",
+      "description": "현대 포트폴리오 이론으로 자산 배분을 최적화합니다.",
+      "inputs": {
+        "constraints": "제약조건(예: 자산별 최대 20%, 매수 전용)",
+        "period": "백테스트 기간"
+      }
+    },
+    "risk-assessment-finance": {
+      "name": "금융 위험 평가",
+      "description": "VaR, CVaR와 스트레스 시험 시나리오를 계산합니다.",
+      "inputs": {
+        "scenarios": "스트레스 시나리오(예: 2008년 위기, COVID 급락, 금리 인상)"
+      }
+    },
+    "economic-indicator-analysis": {
+      "name": "경제지표 분석",
+      "description": "GDP, 물가, 고용 등 거시경제 지표를 분석합니다.",
+      "inputs": {
+        "country": "국가·지역",
+        "indicators": "지표(GDP, CPI, 실업률, PMI 등)",
+        "period": "기간",
+        "benchmark": "비교할 국가"
+      }
+    },
+    "financial-statement-analysis": {
+      "name": "재무제표 분석",
+      "description": "SEC 공시나 보고서로 기업 재무를 분석합니다.",
+      "inputs": {
+        "company": "기업 이름·ticker",
+        "years": "분석 기간(년, 기본값: 5)"
+      }
+    },
+    "hedge-fund-analysis": {
+      "name": "헤지펀드 분석",
+      "description": "헤지펀드의 성과, 전략과 위험을 분석합니다.",
+      "inputs": {
+        "fund": "펀드 이름 또는 제공한 수익률 자료"
+      }
+    },
+    "cryptocurrency-analysis": {
+      "name": "암호화폐 분석",
+      "description": "암호화폐 가격 자료, 온체인 지표와 상관관계를 분석합니다.",
+      "inputs": {
+        "crypto": "암호화폐(BTC, ETH, SOL 등)",
+        "n": "비교 대상 수(기본값: 10)"
+      }
+    },
+    "time-series-forecasting-finance": {
+      "name": "금융 시계열 예측",
+      "description": "머신러닝과 통계 모델로 금융 시계열을 예측합니다.",
+      "inputs": {
+        "series_type": "시계열 유형(주가, 금리, 환율, 변동성)",
+        "horizon": "예측 기간(예: 30일, 12개월)"
+      }
+    },
+    "credit-risk-model": {
+      "name": "신용위험 모델",
+      "description": "신용평가와 채무불이행 예측 모델을 만듭니다.",
+      "inputs": {}
+    },
+    "market-sentiment-analysis": {
+      "name": "시장 심리 분석",
+      "description": "뉴스, 소셜 미디어나 보고서에서 시장 심리를 분석합니다.",
+      "inputs": {
+        "asset_or_sector": "자산·산업·시장",
+        "sources": "자료 출처(뉴스, Twitter, Reddit, SEC 공시)"
+      }
+    },
+    "econometric-modeling": {
+      "name": "계량경제 모델링",
+      "description": "정책 분석용 계량경제 모델을 만들고 추정합니다.",
+      "inputs": {
+        "relationship": "추정할 경제적 관계"
+      }
+    },
+    "fiscal-policy-analysis": {
+      "name": "재정정책 분석",
+      "description": "정부 예산, 부채와 재정 지속가능성을 분석합니다.",
+      "inputs": {
+        "country": "국가",
+        "source": "자료 출처(USFiscalData, IMF, World Bank)"
+      }
+    },
+    "real-estate-analysis": {
+      "name": "부동산 시장 분석",
+      "description": "부동산 가치, 동향과 투자 기회를 분석합니다.",
+      "inputs": {
+        "location": "지리적 위치",
+        "features": "모델링 특성(면적 sq ft, 침실 수, 학교 평가 등)"
+      }
+    },
+    "startup-valuation": {
+      "name": "스타트업 가치 평가",
+      "description": "여러 방법으로 초기 기업의 가치를 평가합니다.",
+      "inputs": {
+        "company": "기업 이름·설명",
+        "growth": "매출 성장 시나리오(비관, 기준, 낙관)"
+      }
+    },
+    "esg-analysis": {
+      "name": "ESG 분석",
+      "description": "환경, 사회와 지배구조 성과를 평가합니다.",
+      "inputs": {
+        "company": "기업 이름·ticker"
+      }
+    },
+    "trade-flow-analysis": {
+      "name": "무역 흐름 분석",
+      "description": "국제 무역 패턴과 수지를 분석합니다.",
+      "inputs": {
+        "country": "국가",
+        "sector": "산업·제품 범주"
+      }
+    },
+    "survey-analysis": {
+      "name": "설문 자료 분석",
+      "description": "적절한 통계 방법으로 설문 응답을 분석합니다.",
+      "inputs": {
+        "n": "대략적인 표본 크기",
+        "outcome": "예측할 핵심 결과"
+      }
+    },
+    "text-mining-social": {
+      "name": "텍스트 마이닝·NLP",
+      "description": "텍스트 말뭉치에서 주제와 패턴을 추출합니다.",
+      "inputs": {
+        "corpus_type": "말뭉치 유형(뉴스 기사, 소셜 미디어, 인터뷰, 정책 문서)",
+        "n_topics": "주제 수(기본값: 10)"
+      }
+    },
+    "demographic-analysis": {
+      "name": "인구 분석",
+      "description": "인구 구조, 동향과 전망을 분석합니다.",
+      "inputs": {
+        "population": "인구집단(국가, 지역, 도시)",
+        "period": "기간(예: 2000~2025)"
+      }
+    },
+    "network-analysis-social": {
+      "name": "사회 네트워크 분석",
+      "description": "사회 네트워크의 중심성, 커뮤니티와 영향력을 분석합니다.",
+      "inputs": {}
+    },
+    "sentiment-analysis-social": {
+      "name": "소셜 미디어 감성 분석",
+      "description": "소셜 미디어 자료에서 대중의 감성을 분석합니다.",
+      "inputs": {
+        "topic": "주제·해시태그"
+      }
+    },
+    "policy-evaluation": {
+      "name": "정책 영향 평가",
+      "description": "정책 중재의 인과적 영향을 평가합니다.",
+      "inputs": {
+        "policy": "정책 중재",
+        "outcome": "결과 변수",
+        "method": "방법(diff-in-diff, RDD, 성향점수, IV)"
+      }
+    },
+    "education-outcomes": {
+      "name": "교육 성과 분석",
+      "description": "학생 성과와 교육 중재를 분석합니다.",
+      "inputs": {
+        "groups": "비교할 집단(학교, 프로그램, 인구통계 집단)",
+        "outcome": "결과(시험 점수, 졸업, 등록)",
+        "intervention": "평가할 중재(선택)"
+      }
+    },
+    "public-opinion-analysis": {
+      "name": "여론 분석",
+      "description": "여론조사 자료와 여론 동향을 분석합니다.",
+      "inputs": {
+        "topic": "주제·쟁점"
+      }
+    },
+    "migration-analysis": {
+      "name": "인구 이동 분석",
+      "description": "인구 이동 패턴, 흐름과 결정 요인을 분석합니다.",
+      "inputs": {
+        "region": "분석할 지역·국가"
+      }
+    },
+    "inequality-measurement": {
+      "name": "불평등 측정",
+      "description": "경제적·사회적 불평등을 측정하고 분석합니다.",
+      "inputs": {
+        "dimension": "불평등 영역(소득, 부, 건강, 교육)",
+        "subgroups": "분해할 하위집단"
+      }
+    },
+    "behavioral-experiment": {
+      "name": "행동 실험 분석",
+      "description": "심리학이나 행동경제학 실험 자료를 분석합니다.",
+      "inputs": {
+        "design": "실험 설계(집단 간, 집단 내, 2x2 요인)",
+        "analysis_type": "분석 유형(t검정, ANOVA, 혼합효과, 매개효과)"
+      }
+    },
+    "content-analysis-social": {
+      "name": "내용 분석",
+      "description": "미디어나 문서를 체계적으로 코딩하고 분석합니다.",
+      "inputs": {
+        "categories": "코딩할 내용 범주",
+        "groups": "비교할 집단·기간"
+      }
+    },
+    "differential-equations": {
+      "name": "미분방정식 풀이",
+      "description": "ODE와 PDE의 해석해와 수치해를 구합니다.",
+      "inputs": {
+        "equation": "미분방정식",
+        "conditions": "경계·초기조건"
+      }
+    },
+    "optimization-problem": {
+      "name": "최적화 문제 풀이",
+      "description": "제약 또는 비제약 문제의 최적해를 찾습니다.",
+      "inputs": {
+        "objective": "목적함수",
+        "constraints": "제약조건"
+      }
+    },
+    "bayesian-inference": {
+      "name": "베이지안 추론",
+      "description": "베이지안 모델을 만들고 사후분포를 계산합니다.",
+      "inputs": {
+        "model": "모델 설명",
+        "priors": "사전 가정"
+      }
+    },
+    "monte-carlo-simulation": {
+      "name": "Monte Carlo 시뮬레이션",
+      "description": "확률적 표본추출로 관심 수량을 추정합니다.",
+      "inputs": {
+        "problem": "시뮬레이션할 문제",
+        "n_samples": "표본 수(기본값: 10000)"
+      }
+    },
+    "graph-theory-analysis": {
+      "name": "그래프 이론 분석",
+      "description": "그래프의 특성, 알고리즘과 최적화를 분석합니다.",
+      "inputs": {
+        "algorithms": "실행할 알고리즘(최단경로, MST, 최대유량, 색칠)"
+      }
+    },
+    "symbolic-computation": {
+      "name": "기호 계산",
+      "description": "정확한 대수 연산, 식 정리와 증명을 합니다.",
+      "inputs": {
+        "expression": "수학식·방정식",
+        "operations": "연산(미분, 적분, 급수 전개, 풀이, 인수분해)"
+      }
+    },
+    "numerical-methods": {
+      "name": "수치해법 구현",
+      "description": "수치 알고리즘을 구현하고 비교합니다.",
+      "inputs": {
+        "problem": "수치 문제(근 찾기, 적분, 선형대수, ODE)",
+        "methods": "구현·비교할 방법"
+      }
+    },
+    "stochastic-modeling": {
+      "name": "확률과정 모델링",
+      "description": "확률과정을 모델링하고 시뮬레이션합니다.",
+      "inputs": {
+        "process": "확률과정(random walk, Markov chain, Poisson, Brownian motion, SDE)"
+      }
+    },
+    "game-theory-analysis": {
+      "name": "게임 이론 분석",
+      "description": "전략적 상호작용을 분석하고 균형을 찾습니다.",
+      "inputs": {
+        "game": "게임 설명(참여자, 전략, 보수)"
+      }
+    },
+    "topology-analysis": {
+      "name": "위상적 자료 분석",
+      "description": "자료에 persistent homology와 TDA를 적용합니다.",
+      "inputs": {}
+    },
+    "fourier-analysis": {
+      "name": "Fourier 분석",
+      "description": "주파수를 분해하고 스펙트럼을 분석합니다.",
+      "inputs": {
+        "filter_spec": "필터 사양(선택, 예: 저역통과 50 Hz)"
+      }
+    },
+    "dynamical-systems": {
+      "name": "동역학계 분석",
+      "description": "동역학계의 안정성, 분기와 혼돈을 분석합니다.",
+      "inputs": {
+        "system": "시스템 방정식(dx/dt = f(x,y), dy/dt = g(x,y))",
+        "parameter": "분기 매개변수"
+      }
+    },
+    "classification-model": {
+      "name": "분류 모델 구축",
+      "description": "분류 모델을 학습하고 평가하며 해석합니다.",
+      "inputs": {
+        "target": "목표 클래스 변수"
+      }
+    },
+    "nlp-text-analysis": {
+      "name": "NLP 텍스트 분석",
+      "description": "분류, NER, 요약 또는 embedding으로 텍스트를 분석합니다.",
+      "inputs": {
+        "task": "NLP 과업(분류, NER, 감성, 요약, embedding)"
+      }
+    },
+    "image-classification": {
+      "name": "이미지 분류",
+      "description": "CNN과 전이학습으로 이미지 분류 모델을 만듭니다.",
+      "inputs": {
+        "classes": "클래스 label",
+        "backbone": "Backbone 모델(ResNet50, EfficientNet, ViT)"
+      }
+    },
+    "anomaly-detection": {
+      "name": "이상 탐지",
+      "description": "자료에서 이상치와 이상 패턴을 탐지합니다.",
+      "inputs": {
+        "constraint": "제약조건(예상 이상 비율, 허용 위양성)"
+      }
+    },
+    "feature-engineering": {
+      "name": "특성 공학",
+      "description": "원시 자료에서 예측에 유용한 특성을 만듭니다.",
+      "inputs": {
+        "target": "예측 목표"
+      }
+    },
+    "hyperparameter-tuning": {
+      "name": "하이퍼파라미터 조정",
+      "description": "체계적 탐색으로 모델 하이퍼파라미터를 최적화합니다.",
+      "inputs": {
+        "model": "모델 유형(XGBoost, random forest, SVM, 신경망)",
+        "method": "탐색 방법(grid, random, Bayesian/Optuna)",
+        "n_trials": "시도 횟수(기본값: 100)",
+        "n_folds": "교차검증 fold 수(기본값: 5)"
+      }
+    },
+    "model-interpretability": {
+      "name": "모델 해석",
+      "description": "SHAP, LIME과 특성 분석으로 머신러닝 예측을 설명합니다.",
+      "inputs": {
+        "n_samples": "개별 예측 설명용 표본 수(기본값: 10)"
+      }
+    },
+    "transfer-learning": {
+      "name": "전이학습",
+      "description": "사전학습 모델을 새로운 과업과 분야에 맞춥니다.",
+      "inputs": {
+        "task": "목표 과업",
+        "source_model": "전이할 사전학습 모델"
+      }
+    },
+    "graph-neural-network": {
+      "name": "그래프 신경망",
+      "description": "노드, 간선 또는 그래프 수준 예측을 위한 GNN을 만듭니다.",
+      "inputs": {
+        "task": "과업(노드 분류, 링크 예측, 그래프 분류)",
+        "metrics": "평가 지표"
+      }
+    },
+    "generative-model": {
+      "name": "생성 모델 구축",
+      "description": "자료 생성을 위한 VAE, GAN 또는 diffusion 모델을 학습합니다.",
+      "inputs": {
+        "data_type": "생성할 자료 유형(이미지, 분자, 텍스트, 표)",
+        "architecture": "아키텍처(VAE, GAN, diffusion, flow)",
+        "n_samples": "생성할 표본 수(기본값: 100)"
+      }
+    },
+    "reinforcement-learning": {
+      "name": "강화학습",
+      "description": "순차적 의사결정을 위한 RL agent를 학습합니다.",
+      "inputs": {
+        "environment": "환경·과업 설명",
+        "algorithm": "RL 알고리즘(PPO, SAC, DQN, A2C)"
+      }
+    },
+    "model-comparison": {
+      "name": "모델 비교·선택",
+      "description": "머신러닝 모델을 체계적으로 비교하고 선택합니다.",
+      "inputs": {
+        "target": "목표 변수",
+        "models": "비교할 모델(예: LR, RF, XGB, SVM, MLP)"
+      }
+    },
+    "dataset-bias-audit": {
+      "name": "자료·모델 편향 점검",
+      "description": "자료와 모델의 공정성 및 편향을 점검합니다.",
+      "inputs": {
+        "attributes": "보호 속성(인종, 성별, 나이 등)"
+      }
+    },
+    "recommendation-system": {
+      "name": "추천 시스템 구축",
+      "description": "협업 필터링 또는 콘텐츠 기반 추천 엔진을 만듭니다.",
+      "inputs": {
+        "data_type": "자료 유형(사용자·항목 평점, 암묵적 피드백, 콘텐츠 특성)",
+        "approach": "접근 방법(협업 필터링, 콘텐츠 기반, 혼합, 행렬 분해)"
+      }
+    },
+    "federated-learning-design": {
+      "name": "연합학습 설계",
+      "description": "개인정보를 보호하는 분산 머신러닝 시스템을 설계합니다.",
+      "inputs": {
+        "task": "머신러닝 과업",
+        "partition": "자료 분할(IID, non-IID, label skew)",
+        "epsilon": "프라이버시 예산 epsilon",
+        "n_clients": "클라이언트 수(기본값: 10)"
+      }
+    },
+    "cfd-simulation": {
+      "name": "CFD 시뮬레이션",
+      "description": "전산유체역학 시뮬레이션과 분석을 합니다.",
+      "inputs": {
+        "geometry": "형상 설명",
+        "conditions": "경계조건(유입 속도, 압력, 온도)"
+      }
+    },
+    "signal-processing": {
+      "name": "신호 처리",
+      "description": "신호를 필터링하고 변환하며 분석합니다.",
+      "inputs": {
+        "filter_spec": "필터 사양(예: 대역통과 10-100 Hz, notch 50 Hz)",
+        "features": "추출할 특성(진폭, 주파수, 위상, 포락선)"
+      }
+    },
+    "control-system-design": {
+      "name": "제어 시스템 설계",
+      "description": "피드백 제어 시스템을 설계하고 시뮬레이션합니다.",
+      "inputs": {
+        "plant": "제어할 plant·시스템",
+        "specs": "성능 사양(상승시간, overshoot, 정상상태 오차)",
+        "controller_type": "제어기 유형(PID, 상태 피드백, LQR, MPC)"
+      }
+    },
+    "heat-transfer-analysis": {
+      "name": "열전달 분석",
+      "description": "전도, 대류와 복사 열전달을 분석합니다.",
+      "inputs": {
+        "system": "열 시스템 설명"
+      }
+    },
+    "vibration-analysis": {
+      "name": "진동 분석",
+      "description": "기계 진동과 모드 해석을 합니다.",
+      "inputs": {
+        "system": "기계 시스템 또는 제공한 진동 자료",
+        "standard": "진동 표준(ISO 10816, API 670 등)"
+      }
+    },
+    "process-simulation": {
+      "name": "공정 시뮬레이션",
+      "description": "화학 또는 제조 공정을 시뮬레이션합니다.",
+      "inputs": {
+        "process": "공정 설명",
+        "objective": "최적화 목표(수율, 비용, 에너지, 처리량)"
+      }
+    },
+    "reliability-analysis": {
+      "name": "신뢰도 분석",
+      "description": "시스템 신뢰도, 고장률과 유지보수를 분석합니다.",
+      "inputs": {
+        "system": "분석할 시스템·구성요소"
+      }
+    },
+    "sensor-data-analysis": {
+      "name": "센서·IoT 자료 분석",
+      "description": "다중 센서 시계열 자료를 처리하고 분석합니다.",
+      "inputs": {
+        "sensors": "센서 유형(온도, 압력, 진동, 전류 등)",
+        "events": "상관관계를 분석할 사건(고장, 유지보수, 생산)"
+      }
+    },
+    "robot-path-planning": {
+      "name": "로봇 경로 계획",
+      "description": "로봇 시스템의 충돌 없는 경로를 계획합니다.",
+      "inputs": {
+        "robot_type": "로봇 유형(이동형, manipulator, 드론, multi-agent)",
+        "algorithm": "알고리즘(RRT*, A*, PRM, potential field)",
+        "objective": "목표(최단경로, 최대 평활성, 최단시간, 에너지 최적)"
+      }
+    },
+    "structural-analysis-eng": {
+      "name": "구조 해석",
+      "description": "구조물의 하중, 응력과 변형을 분석합니다.",
+      "inputs": {
+        "structure": "구조물 설명",
+        "loads": "작용 하중",
+        "sf": "요구 안전율(기본값: 2.0)"
+      }
+    },
+    "finite-element-analysis": {
+      "name": "유한요소 해석",
+      "description": "응력, 열 또는 전자기 문제를 FEM으로 모델링합니다.",
+      "inputs": {
+        "problem": "FEA 문제(구조, 열, 전자기)",
+        "conditions": "경계조건과 하중"
+      }
+    },
+    "circuit-simulation": {
+      "name": "회로 시뮬레이션",
+      "description": "전자회로를 시뮬레이션하고 분석합니다.",
+      "inputs": {
+        "circuit": "회로 설명·회로도",
+        "input_signal": "과도해석용 입력 신호",
+        "objective": "설계 목표(대역폭, 이득, 잡음, 전력)"
+      }
+    },
+    "stellar-classification": {
+      "name": "항성 분류",
+      "description": "측광 또는 분광 자료로 항성을 분류합니다.",
+      "inputs": {}
+    },
+    "exoplanet-detection": {
+      "name": "외계행성 탐지",
+      "description": "통과 또는 시선속도 자료에서 외계행성을 탐지합니다.",
+      "inputs": {
+        "method": "탐지 방법(통과 측광, 시선속도)"
+      }
+    },
+    "spectral-analysis-astro": {
+      "name": "천문 스펙트럼 분석",
+      "description": "항성이나 은하의 스펙트럼으로 조성과 운동을 분석합니다.",
+      "inputs": {
+        "object_type": "천체 유형(항성, 은하, 퀘이사, 성운)",
+        "params": "추정할 매개변수(Teff, log g, [Fe/H], 적색편이)"
+      }
+    },
+    "galaxy-morphology": {
+      "name": "은하 형태 분류",
+      "description": "은하의 형태와 구조 매개변수를 분류합니다.",
+      "inputs": {}
+    },
+    "orbital-mechanics": {
+      "name": "궤도역학 계산",
+      "description": "궤도, 궤도 전이와 임무 비행경로를 계산합니다.",
+      "inputs": {
+        "mission": "임무 설명(LEO에서 GEO, 지구에서 화성 등)",
+        "transfer_type": "궤도 전이 유형(Hohmann, bi-elliptic, 중력 도움)"
+      }
+    },
+    "light-curve-analysis": {
+      "name": "광도곡선 분석",
+      "description": "천체의 시간에 따른 밝기 변화를 분석합니다.",
+      "inputs": {
+        "object": "천체 이름·유형",
+        "var_type": "예상 변광 유형(식, 맥동, 회전, 일시적 현상)"
+      }
+    },
+    "radio-astronomy-analysis": {
+      "name": "전파천문 분석",
+      "description": "전파망원경 관측 자료를 처리하고 분석합니다.",
+      "inputs": {
+        "observation_type": "관측 유형(연속파, 분광선, 펄서, VLBI)",
+        "lines": "예상 분광선(HI 21cm, CO, OH 등)"
+      }
+    },
+    "gravitational-lensing": {
+      "name": "중력렌즈 분석",
+      "description": "중력렌즈를 분석해 질량 분포를 조사합니다.",
+      "inputs": {
+        "lens_type": "렌즈 유형(은하, 은하단, cosmic shear)"
+      }
+    },
+    "dark-matter-constraints": {
+      "name": "암흑물질 제약조건 분석",
+      "description": "관측 자료로 암흑물질 특성의 제약조건을 도출합니다.",
+      "inputs": {
+        "data_type": "자료 유형(회전곡선, 속도분산, X-ray, 렌즈)",
+        "profile": "적합할 암흑물질 profile(NFW, Einasto, 등온, cored)"
+      }
+    },
+    "solar-activity-analysis": {
+      "name": "태양 활동 분석",
+      "description": "태양 플레어, 흑점과 우주기상 자료를 분석합니다.",
+      "inputs": {
+        "flare_class": "분석할 플레어 등급(C, M, X 또는 전체)"
+      }
+    },
+    "cosmic-ray-analysis": {
+      "name": "우주선 분석",
+      "description": "우주선의 flux, 조성과 에너지 스펙트럼을 분석합니다.",
+      "inputs": {}
+    },
+    "metabolic-modeling": {
+      "name": "대사 flux 분석",
+      "description": "대사 네트워크를 제약 기반으로 모델링합니다.",
+      "inputs": {
+        "organism": "생물종(E. coli, 효모, 사람)",
+        "media": "생장 배지 조성"
+      }
+    },
+    "glycan-analysis": {
+      "name": "Glycan 공학·분석",
+      "description": "당화 패턴을 분석하고 설계합니다.",
+      "inputs": {
+        "comparison": "비교할 조건·제품"
+      }
+    },
+    "digital-pathology": {
+      "name": "디지털 병리 분석",
+      "description": "Whole-slide 조직병리 영상을 분석합니다.",
+      "inputs": {
+        "stain": "염색 유형(H&E, IHC, IF, 특수염색)",
+        "magnification": "분석 배율(20, 40)",
+        "metrics": "정량화할 지표(세포 수, 종양 %, TIL 밀도)"
+      }
+    },
+    "metabolomics-analysis": {
+      "name": "대사체 자료 분석",
+      "description": "비표적 또는 표적 대사체 자료를 분석합니다.",
+      "inputs": {
+        "platform": "플랫폼(LC-MS, GC-MS, NMR)",
+        "comparison": "비교할 집단",
+        "fc": "Fold change 기준(기본값: 1.5)"
+      }
+    },
+    "vc-deal-screening": {
+      "name": "VC 투자 후보 평가",
+      "description": "시장 규모와 위험을 분석해 스타트업 벤처투자를 평가합니다.",
+      "inputs": {
+        "company": "기업 이름·설명",
+        "market": "목표 시장·산업"
+      }
+    },
+    "vc-fund-benchmarking": {
+      "name": "VC 펀드 벤치마킹",
+      "description": "설립 연도, 전략과 수익률을 기준으로 벤처펀드를 동종 펀드와 비교합니다.",
+      "inputs": {
+        "vintage": "펀드 설립 연도"
+      }
+    },
+    "cap-table-modeling": {
+      "name": "지분 구조 모델링",
+      "description": "투자 라운드별 지분 구조, 희석과 waterfall을 모델링합니다.",
+      "inputs": {
+        "company": "기업 이름",
+        "round_details": "다음 라운드 조건(예: pre-money $40M, Series A $10M)",
+        "exit_values": "모델링할 exit 가치(예: $100M, $500M, $1B)"
+      }
+    },
+    "market-sizing": {
+      "name": "시장 규모 추정(TAM/SAM/SOM)",
+      "description": "투자 가설을 위한 시장 규모를 상향식·하향식으로 추정합니다.",
+      "inputs": {
+        "market": "규모를 추정할 시장·제품 범주",
+        "years": "전망 기간(년, 기본값: 5)"
+      }
+    },
+    "dcf-valuation": {
+      "name": "DCF 가치평가 모델",
+      "description": "민감도 분석을 포함한 현금흐름 할인 가치평가를 합니다.",
+      "inputs": {
+        "company": "기업 이름·ticker",
+        "years": "추정 기간(년, 기본값: 5)",
+        "growth": "매출 성장 가정(기준, 낙관, 비관)"
+      }
+    },
+    "comparable-company-analysis": {
+      "name": "유사 기업 비교 분석",
+      "description": "거래 배수와 상대가치로 유사 상장기업을 비교합니다.",
+      "inputs": {
+        "company": "대상 기업",
+        "peers": "유사 기업(쉼표로 구분)"
+      }
+    },
+    "ma-deal-analysis": {
+      "name": "M&A 거래 분석",
+      "description": "시너지, 주당이익 증가·희석과 통합을 포함해 인수·합병을 평가합니다.",
+      "inputs": {
+        "target": "대상 기업",
+        "acquirer": "인수 기업",
+        "terms": "거래 조건(가격, 구조 — 알려진 경우)"
+      }
+    },
+    "lbo-model": {
+      "name": "LBO 모델",
+      "description": "부채 상환 일정과 수익률 분석을 포함한 차입매수 모델을 만듭니다.",
+      "inputs": {
+        "company": "대상 기업",
+        "entry_terms": "진입 가치평가와 레버리지(예: EBITDA 10배, 레버리지 5배)",
+        "growth": "매출 성장 가정",
+        "exit_multiples": "시험할 exit 배수(예: 8배, 10배, 12배)"
+      }
+    },
+    "pe-fund-due-diligence": {
+      "name": "PE·VC 실사 보고서",
+      "description": "대상 기업을 종합적으로 실사·분석합니다.",
+      "inputs": {
+        "company": "대상 기업",
+        "deal_type": "거래 유형(Series A, growth equity, buyout, acquisition)"
+      }
+    },
+    "startup-data-room-dd": {
+      "name": "스타트업 데이터룸 실사",
+      "description": "제공한 데이터룸 파일로 스타트업 투자 기회를 평가합니다.",
+      "inputs": {
+        "company": "기업 이름·설명"
+      }
+    },
+    "pitch-deck-analysis": {
+      "name": "피치덱 분석",
+      "description": "투자자 관점에서 스타트업 피치덱을 비판적으로 평가합니다.",
+      "inputs": {
+        "company": "기업 이름"
+      }
+    },
+    "industry-deep-dive": {
+      "name": "산업 심층 분석",
+      "description": "투자 가설 수립을 위해 산업을 종합적으로 분석합니다.",
+      "inputs": {
+        "industry": "산업·분야",
+        "n": "분석할 기업 수(기본값: 10)"
+      }
+    },
+    "investment-memo": {
+      "name": "투자 검토 메모 작성",
+      "description": "투자심의위원회 발표용 투자 검토 메모를 구조화해 작성합니다.",
+      "inputs": {
+        "company": "기업 이름·설명",
+        "terms": "제안한 거래 조건(선택)"
+      }
+    },
+    "public-equity-research": {
+      "name": "주식 리서치 보고서",
+      "description": "목표주가를 포함한 sell-side 형식의 주식 리서치를 작성합니다.",
+      "inputs": {
+        "ticker": "주식 ticker"
+      }
+    },
+    "fund-of-funds-analysis": {
+      "name": "재간접펀드 포트폴리오 분석",
+      "description": "LP나 재간접펀드의 펀드 출자 포트폴리오를 분석합니다.",
+      "inputs": {
+        "years": "전망 기간(기본값: 5)"
+      }
+    },
+    "scenario-modeling": {
+      "name": "시나리오·민감도 모델링",
+      "description": "Tornado·Monte Carlo 분석을 포함한 다중 시나리오 재무 모델을 만듭니다.",
+      "inputs": {
+        "company": "기업 이름",
+        "variables": "주요 변수(성장률, 마진, 이탈률, ARPU 등)",
+        "n_sims": "Monte Carlo 반복 횟수(기본값: 10000)"
+      }
+    },
+    "convertible-note-analysis": {
+      "name": "전환사채·SAFE 분석",
+      "description": "전환형 투자수단의 전환 시나리오를 모델링합니다.",
+      "inputs": {
+        "instruments": "전환형 투자수단(가치 상한, 할인율, 금액)",
+        "valuations": "시험할 Series A 가치평가(예: $10M, $20M, $50M)"
+      }
+    },
+    "cohort-revenue-analysis": {
+      "name": "코호트·매출 질 분석",
+      "description": "SaaS·구독 서비스의 매출 유지, 확대와 코호트 행동을 분석합니다.",
+      "inputs": {
+        "company": "기업 이름"
+      }
+    },
+    "secondaries-pricing": {
+      "name": "세컨더리 가격 분석",
+      "description": "비상장 펀드나 지분의 세컨더리 거래 공정가치를 추정합니다.",
+      "inputs": {
+        "asset": "자산 설명(펀드 이름, 설립 연도, 전략)",
+        "discounts": "시험할 할인 수준(예: 70%, 80%, 90%, 액면가)"
+      }
+    },
+    "public-market-factor-analysis": {
+      "name": "요인 분석·성과 귀속",
+      "description": "위험 요인과 성과 귀속에 따라 포트폴리오 수익률을 분해합니다.",
+      "inputs": {}
+    },
+    "venture-market-map": {
+      "name": "벤처 시장 지도",
+      "description": "분야별 스타트업의 자금조달, 단계와 포지셔닝을 정리합니다.",
+      "inputs": {
+        "sector": "산업·세부 분야(예: AI 인프라, 기후 기술, fintech)"
+      }
+    },
+    "options-strategy-analysis": {
+      "name": "옵션 전략 분석",
+      "description": "손익 도표와 Greeks로 옵션 전략을 모델링하고 시각화합니다.",
+      "inputs": {
+        "underlying": "기초자산(ticker)",
+        "strategy": "전략(covered call, iron condor, straddle, bull spread 등)"
+      }
+    },
+    "debt-analysis": {
+      "name": "부채·신용 분석",
+      "description": "기업의 부채 구조, 약정과 신용도를 분석합니다.",
+      "inputs": {
+        "company": "기업 이름·ticker",
+        "stress": "스트레스 시나리오(예: 매출 20% 감소, 금리 인상)"
+      }
+    },
+    "activist-investor-analysis": {
+      "name": "행동주의 투자자 캠페인 분석",
+      "description": "행동주의 캠페인의 투자 논리, 대상과 예상 결과를 분석합니다.",
+      "inputs": {
+        "company": "대상 기업",
+        "activist": "행동주의 투자자 이름"
+      }
+    },
+    "fund-formation": {
+      "name": "펀드 경제성·설립 모델링",
+      "description": "GP·LP 경제성, 수수료 구조와 펀드 수익 시나리오를 모델링합니다.",
+      "inputs": {
+        "fund_type": "펀드 유형(초기 VC, growth equity, buyout)",
+        "fund_size": "펀드 규모(예: $100M)",
+        "mgmt_fee": "운용보수(기본값: 2%)",
+        "carry": "성과보수(기본값: 20%)",
+        "pref": "우선수익률(기본값: 8%)"
+      }
+    }
+  }
+}

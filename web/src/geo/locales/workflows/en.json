@@ -1,0 +1,2477 @@
+{
+  "categories": {
+    "paper": "Paper & Manuscript",
+    "visual": "Visual & Presentation",
+    "data": "Data & Analysis",
+    "literature": "Literature & Research",
+    "grants": "Grants & Planning",
+    "scicomm": "Science Communication",
+    "genomics": "Genomics & Transcriptomics",
+    "proteomics": "Proteomics & Structural Biology",
+    "cellbio": "Cell Biology & Single-Cell",
+    "chemistry": "Chemistry & Computational Chemistry",
+    "drugdiscovery": "Drug Discovery & Pharmacology",
+    "physics": "Physics & Quantum Computing",
+    "materials": "Materials Science",
+    "clinical": "Clinical & Health Sciences",
+    "neuro": "Neuroscience",
+    "ecology": "Ecology & Environmental Science",
+    "finance": "Finance & Economics",
+    "social": "Social Sciences",
+    "math": "Mathematics & Modeling",
+    "ml": "Machine Learning & AI",
+    "engineering": "Engineering & Simulation",
+    "astro": "Astronomy & Space Science"
+  },
+  "dialog": {
+    "data": "Workflow data",
+    "data_optional": "Workflow data (optional)",
+    "edit_prompt": "Edit prompt",
+    "prompt_preview": "Prompt preview",
+    "done": "Done",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "provider_loading": "Model provider status is still loading.",
+    "provider_disconnected": "This model provider is disconnected. Reconnect it in Settings → Providers or choose another model.",
+    "budget_blocked": "Project spend limit reached. Raise the limit in Settings → Project → General to continue.",
+    "run": "Run workflow"
+  },
+  "panel": {
+    "search": "Search workflows...",
+    "needs_data": "Needs user data"
+  },
+  "rows": {
+    "review-paper": {
+      "name": "Review a Paper",
+      "description": "Critical review of methodology, statistical rigor, limitations, and constructive feedback",
+      "inputs": {}
+    },
+    "write-paper": {
+      "name": "Write a Paper",
+      "description": "Draft a full manuscript from supplied data or results",
+      "inputs": {
+        "topic": "Paper topic / title"
+      }
+    },
+    "write-review-article": {
+      "name": "Write a Review Article",
+      "description": "Comprehensive literature synthesis with gap analysis and future directions",
+      "inputs": {
+        "topic": "Review topic"
+      }
+    },
+    "edit-manuscript": {
+      "name": "Edit / Rewrite Manuscript",
+      "description": "Improve clarity, grammar, flow, and scientific tone of a manuscript",
+      "inputs": {}
+    },
+    "write-rebuttal": {
+      "name": "Write a Rebuttal",
+      "description": "Point-by-point response to reviewer comments",
+      "inputs": {}
+    },
+    "format-journal": {
+      "name": "Format for Journal",
+      "description": "Reformat manuscript to match a target journal's submission guidelines",
+      "inputs": {
+        "journal": "Target journal name"
+      }
+    },
+    "write-abstract": {
+      "name": "Write an Abstract",
+      "description": "Draft or improve a structured abstract for a manuscript",
+      "inputs": {
+        "details": "Key findings or manuscript topic",
+        "word_limit": "Word limit (e.g., 250, 300)"
+      }
+    },
+    "write-cover-letter": {
+      "name": "Write a Cover Letter",
+      "description": "Draft a journal submission cover letter",
+      "inputs": {
+        "journal": "Target journal"
+      }
+    },
+    "write-methods": {
+      "name": "Write a Methods Section",
+      "description": "Write a detailed methods section from protocol or data",
+      "inputs": {}
+    },
+    "write-results": {
+      "name": "Write a Results Section",
+      "description": "Write a results section from data and figures",
+      "inputs": {
+        "focus": "Specific results to emphasize (optional)"
+      }
+    },
+    "write-discussion": {
+      "name": "Write a Discussion Section",
+      "description": "Write a discussion interpreting results in context of the literature",
+      "inputs": {
+        "findings": "Key findings to discuss"
+      }
+    },
+    "write-introduction": {
+      "name": "Write an Introduction",
+      "description": "Write an introduction establishing context and rationale",
+      "inputs": {
+        "topic": "Paper topic"
+      }
+    },
+    "translate-manuscript": {
+      "name": "Translate Manuscript",
+      "description": "Translate a scientific manuscript between languages",
+      "inputs": {
+        "source_lang": "Source language",
+        "target_lang": "Target language"
+      }
+    },
+    "write-supplementary": {
+      "name": "Write Supplementary Materials",
+      "description": "Prepare supplementary methods, figures, and tables",
+      "inputs": {}
+    },
+    "reference-check": {
+      "name": "Check & Fix References",
+      "description": "Verify references, fix formatting, and find missing citations",
+      "inputs": {
+        "style": "Citation style (e.g., APA, Vancouver, Nature)"
+      }
+    },
+    "graphical-abstract": {
+      "name": "Create a Graphical Abstract",
+      "description": "Visual summary of key findings for a paper",
+      "inputs": {}
+    },
+    "publication-figure": {
+      "name": "Make a Publication Figure",
+      "description": "Publication-quality plots and visualizations from data",
+      "inputs": {
+        "instructions": "Specific figure instructions (optional)"
+      }
+    },
+    "slide-deck": {
+      "name": "Build a Slide Deck",
+      "description": "Scientific presentation slides for talks or lab meetings",
+      "inputs": {
+        "context": "Presentation context (e.g., conference talk, lab meeting, journal club)"
+      }
+    },
+    "conference-poster": {
+      "name": "Create a Conference Poster",
+      "description": "Scientific poster layout from paper or results",
+      "inputs": {}
+    },
+    "infographic": {
+      "name": "Create an Infographic",
+      "description": "Visual explainer for broader audiences",
+      "inputs": {}
+    },
+    "create-schematic": {
+      "name": "Create a Scientific Schematic",
+      "description": "Mechanistic or conceptual diagram of a process",
+      "inputs": {
+        "concept": "Process or concept to illustrate"
+      }
+    },
+    "create-flowchart": {
+      "name": "Create a Flowchart",
+      "description": "Experimental or analytical workflow diagram",
+      "inputs": {
+        "workflow": "Workflow or process to diagram"
+      }
+    },
+    "create-timeline": {
+      "name": "Create a Research Timeline",
+      "description": "Visual timeline of project milestones and deliverables",
+      "inputs": {
+        "project": "Project title or description",
+        "duration": "Project duration (e.g., 3 years, 12 months)"
+      }
+    },
+    "create-heatmap": {
+      "name": "Create a Heatmap",
+      "description": "Heatmap visualization from matrix data",
+      "inputs": {
+        "instructions": "Additional instructions (optional)"
+      }
+    },
+    "create-network-diagram": {
+      "name": "Create a Network Diagram",
+      "description": "Network or interaction graph visualization",
+      "inputs": {
+        "metric": "Node sizing metric (e.g., degree, betweenness)"
+      }
+    },
+    "create-geographic-map": {
+      "name": "Create a Geographic Map",
+      "description": "Geographic or spatial data visualization",
+      "inputs": {}
+    },
+    "create-dashboard": {
+      "name": "Create an Interactive Dashboard",
+      "description": "Interactive multi-panel data dashboard",
+      "inputs": {}
+    },
+    "explore-data": {
+      "name": "Explore My Data",
+      "description": "EDA: distributions, correlations, missing values, and visualizations",
+      "inputs": {}
+    },
+    "statistical-analysis": {
+      "name": "Statistical Analysis",
+      "description": "Appropriate tests, p-values, effect sizes, and assumption checks",
+      "inputs": {
+        "instructions": "Specific analyses or comparisons to run (optional)"
+      }
+    },
+    "reproduce-analysis": {
+      "name": "Reproduce an Analysis",
+      "description": "Re-run a paper's methods on provided data and verify results",
+      "inputs": {}
+    },
+    "clean-data": {
+      "name": "Clean & Transform Data",
+      "description": "Wrangle messy datasets into analysis-ready format",
+      "inputs": {}
+    },
+    "predictive-model": {
+      "name": "Build a Predictive Model",
+      "description": "Train and evaluate ML models on supplied data",
+      "inputs": {
+        "target": "Target variable to predict"
+      }
+    },
+    "time-series-analysis": {
+      "name": "Time Series Analysis",
+      "description": "Trend decomposition, forecasting, and anomaly detection",
+      "inputs": {
+        "horizon": "Forecast horizon (e.g., 30 days, 12 months)"
+      }
+    },
+    "survival-analysis": {
+      "name": "Survival Analysis",
+      "description": "Kaplan-Meier curves, Cox regression, and hazard modeling",
+      "inputs": {
+        "covariates": "Key covariates to include"
+      }
+    },
+    "meta-analysis": {
+      "name": "Meta-Analysis",
+      "description": "Pool effect sizes across studies with heterogeneity assessment",
+      "inputs": {}
+    },
+    "power-analysis": {
+      "name": "Power Analysis",
+      "description": "Sample size calculation and power curves",
+      "inputs": {
+        "study_design": "Study design (e.g., two-sample t-test, ANOVA, logistic regression)",
+        "effect_size": "Expected effect size (e.g., Cohen's d = 0.5)",
+        "alpha": "Significance level (default: 0.05)"
+      }
+    },
+    "bayesian-analysis": {
+      "name": "Bayesian Analysis",
+      "description": "Bayesian inference with posterior distributions and credible intervals",
+      "inputs": {
+        "parameters": "Parameters of interest"
+      }
+    },
+    "dimensionality-reduction": {
+      "name": "Dimensionality Reduction",
+      "description": "PCA, t-SNE, UMAP for high-dimensional data visualization",
+      "inputs": {
+        "label": "Column to color by (optional)"
+      }
+    },
+    "clustering-analysis": {
+      "name": "Clustering Analysis",
+      "description": "Unsupervised clustering with multiple algorithms",
+      "inputs": {}
+    },
+    "regression-analysis": {
+      "name": "Regression Analysis",
+      "description": "Linear, logistic, or mixed-effects regression modeling",
+      "inputs": {
+        "regression_type": "Regression type (linear, logistic, Poisson, mixed-effects)",
+        "outcome": "Outcome variable",
+        "predictors": "Predictor variables"
+      }
+    },
+    "anova-analysis": {
+      "name": "ANOVA / Group Comparisons",
+      "description": "One-way, two-way, or repeated-measures ANOVA",
+      "inputs": {
+        "factors": "Grouping factor(s)",
+        "outcome": "Outcome variable"
+      }
+    },
+    "correlation-network": {
+      "name": "Correlation Network",
+      "description": "Build and visualize correlation-based networks",
+      "inputs": {
+        "threshold": "Significance threshold (default: 0.05)"
+      }
+    },
+    "literature-search": {
+      "name": "Literature Search",
+      "description": "Find and summarize relevant papers on a topic",
+      "inputs": {
+        "topic": "Search topic"
+      }
+    },
+    "summarize-paper": {
+      "name": "Summarize a Paper",
+      "description": "Structured summary: objective, methods, findings, and significance",
+      "inputs": {}
+    },
+    "compare-papers": {
+      "name": "Compare Papers",
+      "description": "Side-by-side analysis of multiple papers",
+      "inputs": {}
+    },
+    "research-landscape": {
+      "name": "Research Landscape Map",
+      "description": "Visual map of a field's key themes, groups, and trends",
+      "inputs": {
+        "topic": "Research field or topic"
+      }
+    },
+    "systematic-review": {
+      "name": "Systematic Review Protocol",
+      "description": "Design a systematic review with PRISMA methodology",
+      "inputs": {
+        "question": "Research question"
+      }
+    },
+    "citation-analysis": {
+      "name": "Citation Analysis",
+      "description": "Analyze citation patterns and impact of a body of work",
+      "inputs": {
+        "topic": "Research topic or set of papers"
+      }
+    },
+    "find-datasets": {
+      "name": "Find Public Datasets",
+      "description": "Locate relevant public datasets for a research question",
+      "inputs": {
+        "topic": "Research topic or data type needed"
+      }
+    },
+    "track-research-trends": {
+      "name": "Track Research Trends",
+      "description": "Analyze publication trends and emerging topics in a field",
+      "inputs": {
+        "field": "Research field",
+        "years": "Time window in years (default: 10)"
+      }
+    },
+    "find-preprints": {
+      "name": "Find Recent Preprints",
+      "description": "Search bioRxiv, arXiv, and other preprint servers",
+      "inputs": {
+        "topic": "Search topic",
+        "months": "Months to look back (default: 6)"
+      }
+    },
+    "patent-landscape": {
+      "name": "Patent Landscape",
+      "description": "Analyze patent filings and IP landscape for a technology",
+      "inputs": {
+        "technology": "Technology or product area"
+      }
+    },
+    "methods-comparison": {
+      "name": "Compare Methods",
+      "description": "Systematic comparison of alternative methods for a task",
+      "inputs": {
+        "task": "Task or problem to solve"
+      }
+    },
+    "specific-aim": {
+      "name": "Write a Specific Aim",
+      "description": "Draft a grant Specific Aim with significance and approach",
+      "inputs": {
+        "topic": "Research topic and hypothesis",
+        "agency": "Funding agency (e.g., NIH R01, NSF CAREER)"
+      }
+    },
+    "research-plan": {
+      "name": "Write a Research Plan",
+      "description": "Hypotheses, methods, timeline, and expected outcomes",
+      "inputs": {
+        "topic": "Research question or topic"
+      }
+    },
+    "budget-justification": {
+      "name": "Draft a Budget Justification",
+      "description": "Budget narrative for a grant proposal",
+      "inputs": {
+        "topic": "Project title / topic",
+        "budget": "Budget target (e.g., $250K/year for 3 years)"
+      }
+    },
+    "write-biosketch": {
+      "name": "Write a Biosketch",
+      "description": "NIH or NSF-style biosketch for a PI",
+      "inputs": {
+        "name": "PI name and current position",
+        "agency": "Funding agency (NIH, NSF, DOE, etc.)",
+        "topic": "Proposal topic"
+      }
+    },
+    "write-significance": {
+      "name": "Write Significance Section",
+      "description": "Establish the importance and impact of proposed research",
+      "inputs": {
+        "topic": "Research topic"
+      }
+    },
+    "write-innovation": {
+      "name": "Write Innovation Section",
+      "description": "Articulate what is novel about the proposed approach",
+      "inputs": {
+        "topic": "Research topic and approach"
+      }
+    },
+    "write-approach": {
+      "name": "Write Research Strategy / Approach",
+      "description": "Detailed experimental plan for a grant proposal",
+      "inputs": {
+        "topic": "Research topic with specific aims",
+        "agency": "Funding agency"
+      }
+    },
+    "project-timeline": {
+      "name": "Create a Project Timeline",
+      "description": "Gantt chart and milestone plan for a grant",
+      "inputs": {
+        "topic": "Project topic",
+        "duration": "Project duration (e.g., 3 years, 5 years)"
+      }
+    },
+    "data-management-plan": {
+      "name": "Write a Data Management Plan",
+      "description": "DMP for grant compliance (NIH, NSF, etc.)",
+      "inputs": {
+        "topic": "Project topic",
+        "agency": "Funding agency (NIH, NSF, DOE)"
+      }
+    },
+    "broader-impacts": {
+      "name": "Write Broader Impacts",
+      "description": "NSF broader impacts or NIH dissemination plan",
+      "inputs": {
+        "topic": "Project topic"
+      }
+    },
+    "risk-mitigation": {
+      "name": "Risk Mitigation Plan",
+      "description": "Identify risks and alternative strategies for a project",
+      "inputs": {
+        "topic": "Project topic and aims"
+      }
+    },
+    "facilities-equipment": {
+      "name": "Facilities & Equipment",
+      "description": "Describe available resources and infrastructure",
+      "inputs": {
+        "topic": "Project topic",
+        "institution": "Institution name"
+      }
+    },
+    "plain-language-summary": {
+      "name": "Plain Language Summary",
+      "description": "Rewrite for non-specialist audiences or press",
+      "inputs": {}
+    },
+    "blog-post": {
+      "name": "Write a Blog Post",
+      "description": "Engaging science blog from paper or results",
+      "inputs": {}
+    },
+    "draft-protocol": {
+      "name": "Draft a Protocol",
+      "description": "Step-by-step lab or computational protocol",
+      "inputs": {
+        "procedure": "Procedure or experiment to document"
+      }
+    },
+    "write-press-release": {
+      "name": "Write a Press Release",
+      "description": "Institutional press release about a research finding",
+      "inputs": {}
+    },
+    "social-media-post": {
+      "name": "Social Media Post",
+      "description": "Twitter/LinkedIn thread summarizing research",
+      "inputs": {
+        "num_posts": "Number of posts in thread (default: 5-7)"
+      }
+    },
+    "podcast-script": {
+      "name": "Write a Podcast Script",
+      "description": "Script for a science podcast episode",
+      "inputs": {
+        "topic": "Topic to discuss",
+        "duration": "Episode duration in minutes (default: 20)"
+      }
+    },
+    "policy-brief": {
+      "name": "Write a Policy Brief",
+      "description": "Research-informed policy brief for decision makers",
+      "inputs": {
+        "topic": "Policy topic",
+        "audience": "Target audience (e.g., legislators, public health officials)"
+      }
+    },
+    "patient-education": {
+      "name": "Patient Education Material",
+      "description": "Patient-friendly health information document",
+      "inputs": {
+        "condition": "Medical condition or procedure"
+      }
+    },
+    "write-textbook-chapter": {
+      "name": "Write a Textbook Chapter",
+      "description": "Comprehensive educational chapter on a topic",
+      "inputs": {
+        "topic": "Chapter topic",
+        "level": "Audience level (undergraduate, graduate, professional)",
+        "length": "Target word count (default: 5000)"
+      }
+    },
+    "elevator-pitch": {
+      "name": "Write an Elevator Pitch",
+      "description": "30-second pitch for a research project",
+      "inputs": {
+        "topic": "Research project description",
+        "audience": "Target audience (investors, general public, program officers)"
+      }
+    },
+    "rnaseq-deseq2": {
+      "name": "Bulk RNA-seq Analysis",
+      "description": "Differential expression analysis from RNA-seq count data",
+      "inputs": {
+        "comparison": "Groups to compare (e.g., treatment vs control)"
+      }
+    },
+    "single-cell-rnaseq": {
+      "name": "Single-Cell RNA-seq Pipeline",
+      "description": "Full scRNA-seq analysis from raw counts to cell types",
+      "inputs": {
+        "tissue": "Tissue type (e.g., PBMC, brain, liver)"
+      }
+    },
+    "variant-calling": {
+      "name": "Variant Calling & Annotation",
+      "description": "Identify and annotate genetic variants from sequencing data",
+      "inputs": {
+        "reference": "Reference genome (e.g., GRCh38, GRCm39)"
+      }
+    },
+    "gwas-analysis": {
+      "name": "GWAS Analysis",
+      "description": "Genome-wide association study analysis pipeline",
+      "inputs": {
+        "maf": "Minor allele frequency threshold (default: 0.01)"
+      }
+    },
+    "chipseq-analysis": {
+      "name": "ChIP-seq Peak Calling",
+      "description": "Identify transcription factor binding sites from ChIP-seq",
+      "inputs": {
+        "factor": "Transcription factor or histone mark",
+        "peak_type": "Peak type (narrow for TFs, broad for histone marks)"
+      }
+    },
+    "atacseq-analysis": {
+      "name": "ATAC-seq Chromatin Accessibility",
+      "description": "Map open chromatin regions from ATAC-seq data",
+      "inputs": {
+        "comparison": "Groups to compare"
+      }
+    },
+    "methylation-analysis": {
+      "name": "DNA Methylation Analysis",
+      "description": "Analyze methylation array or bisulfite sequencing data",
+      "inputs": {
+        "data_type": "Data type (450K array, EPIC array, WGBS, RRBS)",
+        "comparison": "Groups to compare"
+      }
+    },
+    "gene-set-enrichment": {
+      "name": "Gene Set Enrichment Analysis",
+      "description": "GSEA and pathway enrichment from gene lists or ranked data",
+      "inputs": {}
+    },
+    "gene-regulatory-network": {
+      "name": "Gene Regulatory Network",
+      "description": "Infer and visualize transcriptional regulatory networks",
+      "inputs": {
+        "organism": "Organism (human, mouse, etc.)"
+      }
+    },
+    "genome-annotation": {
+      "name": "Genome Annotation",
+      "description": "Annotate genes, repeats, and features in a genome assembly",
+      "inputs": {}
+    },
+    "comparative-genomics": {
+      "name": "Comparative Genomics",
+      "description": "Compare genomes across species to examine evolutionary relationships",
+      "inputs": {
+        "species": "Species to compare (e.g., human, mouse, zebrafish)"
+      }
+    },
+    "metagenomics-analysis": {
+      "name": "Metagenomics Analysis",
+      "description": "Taxonomic and functional profiling of microbial communities",
+      "inputs": {
+        "comparison": "Groups to compare (e.g., healthy vs disease)"
+      }
+    },
+    "rna-velocity": {
+      "name": "RNA Velocity Analysis",
+      "description": "Infer cell state dynamics from spliced/unspliced RNA",
+      "inputs": {}
+    },
+    "spatial-transcriptomics": {
+      "name": "Spatial Transcriptomics",
+      "description": "Analyze spatially resolved gene expression data",
+      "inputs": {
+        "platform": "Platform (Visium, MERFISH, Slide-seq, Xenium)"
+      }
+    },
+    "variant-annotation": {
+      "name": "Variant Annotation & Interpretation",
+      "description": "Annotate and prioritize genetic variants for clinical relevance",
+      "inputs": {
+        "phenotype": "Clinical phenotype or disease of interest"
+      }
+    },
+    "phylogenetic-analysis": {
+      "name": "Phylogenetic Analysis",
+      "description": "Build and visualize phylogenetic trees from sequences",
+      "inputs": {}
+    },
+    "gene-expression-atlas": {
+      "name": "Gene Expression Atlas",
+      "description": "Query and visualize gene expression across tissues and conditions",
+      "inputs": {
+        "genes": "Gene list (comma-separated symbols)",
+        "conditions": "Conditions to compare (optional)"
+      }
+    },
+    "protein-structure-analysis": {
+      "name": "Protein Structure Analysis",
+      "description": "Fetch and analyze PDB structures or AlphaFold predictions",
+      "inputs": {
+        "protein": "Protein name, UniProt ID, or PDB ID"
+      }
+    },
+    "molecular-docking": {
+      "name": "Molecular Docking",
+      "description": "Dock a ligand to a protein target and analyze binding",
+      "inputs": {
+        "ligand": "Ligand name, SMILES, or file",
+        "target": "Protein target (name or PDB ID)"
+      }
+    },
+    "mass-spec-proteomics": {
+      "name": "Mass Spectrometry Proteomics",
+      "description": "Analyze LC-MS/MS proteomics data",
+      "inputs": {
+        "database": "Protein database (UniProt human, mouse, etc.)",
+        "comparison": "Groups to compare"
+      }
+    },
+    "protein-protein-interaction": {
+      "name": "Protein-Protein Interaction Network",
+      "description": "Build and analyze PPI networks",
+      "inputs": {
+        "proteins": "Protein list (gene symbols or UniProt IDs)",
+        "context": "Biological context (optional, e.g., disease, tissue)"
+      }
+    },
+    "alphafold-prediction": {
+      "name": "AlphaFold Structure Prediction",
+      "description": "Retrieve or predict protein 3D structure with AlphaFold",
+      "inputs": {
+        "protein": "Protein name or UniProt ID"
+      }
+    },
+    "protein-engineering": {
+      "name": "Protein Engineering Design",
+      "description": "Design protein variants for improved function",
+      "inputs": {
+        "protein": "Protein to engineer",
+        "property": "Property to improve (stability, activity, specificity)"
+      }
+    },
+    "binding-site-analysis": {
+      "name": "Binding Site Analysis",
+      "description": "Characterize ligand binding pockets in a protein",
+      "inputs": {
+        "protein": "Protein name or PDB ID"
+      }
+    },
+    "molecular-dynamics-sim": {
+      "name": "Molecular Dynamics Simulation",
+      "description": "Set up and analyze MD simulations of biomolecules",
+      "inputs": {
+        "system": "Molecular system (protein, protein-ligand complex, membrane)",
+        "duration": "Simulation duration (e.g., 100 ns)"
+      }
+    },
+    "homology-modeling": {
+      "name": "Homology Modeling",
+      "description": "Build a 3D model from a homologous template structure",
+      "inputs": {
+        "protein": "Protein sequence or UniProt ID"
+      }
+    },
+    "protein-function-prediction": {
+      "name": "Protein Function Prediction",
+      "description": "Predict function from sequence and structure",
+      "inputs": {
+        "protein": "Protein sequence or accession"
+      }
+    },
+    "post-translational-mods": {
+      "name": "PTM Analysis",
+      "description": "Predict and analyze post-translational modifications",
+      "inputs": {
+        "protein": "Protein name or UniProt ID"
+      }
+    },
+    "structural-alignment": {
+      "name": "Structural Alignment",
+      "description": "Align and compare protein 3D structures",
+      "inputs": {
+        "structures": "PDB IDs or protein names to compare"
+      }
+    },
+    "epitope-prediction": {
+      "name": "Epitope Prediction",
+      "description": "Predict B-cell and T-cell epitopes for vaccine design",
+      "inputs": {
+        "antigen": "Antigen protein name or sequence",
+        "hla_alleles": "HLA alleles (e.g., HLA-A*02:01, or 'common alleles')"
+      }
+    },
+    "scrnaseq-clustering": {
+      "name": "scRNA-seq Clustering",
+      "description": "Identify and characterize cell clusters from scRNA-seq",
+      "inputs": {
+        "reference": "Reference markers or cell atlas to use"
+      }
+    },
+    "cell-type-annotation": {
+      "name": "Cell Type Annotation",
+      "description": "Automated cell type labeling using reference atlases",
+      "inputs": {
+        "tissue": "Tissue type"
+      }
+    },
+    "trajectory-analysis": {
+      "name": "Trajectory / Pseudotime Analysis",
+      "description": "Infer developmental trajectories and ordering of cells",
+      "inputs": {
+        "root": "Root cell type or marker (e.g., stem cells, progenitors)"
+      }
+    },
+    "flow-cytometry-analysis": {
+      "name": "Flow Cytometry Analysis",
+      "description": "Gate, cluster, and quantify flow cytometry data",
+      "inputs": {
+        "gating": "Gating strategy or panel description",
+        "comparison": "Groups to compare"
+      }
+    },
+    "cell-cell-communication": {
+      "name": "Cell-Cell Communication",
+      "description": "Infer intercellular signaling from scRNA-seq",
+      "inputs": {
+        "comparison": "Conditions to compare (optional)"
+      }
+    },
+    "multi-omics-integration": {
+      "name": "Multi-Omics Integration",
+      "description": "Integrate transcriptomics, proteomics, and other omics layers",
+      "inputs": {
+        "modalities": "Data modalities (e.g., RNA + ATAC, RNA + protein)"
+      }
+    },
+    "cell-cycle-analysis": {
+      "name": "Cell Cycle Analysis",
+      "description": "Score cell cycle phases and regress out cell cycle effects",
+      "inputs": {
+        "comparison": "Conditions to compare (optional)"
+      }
+    },
+    "perturbation-analysis": {
+      "name": "Perturbation / CRISPR Screen Analysis",
+      "description": "Analyze Perturb-seq or CRISPR screen data",
+      "inputs": {
+        "screen_type": "Screen type (Perturb-seq, CRISPRi, CRISPRa, CRISPR KO)"
+      }
+    },
+    "immune-cell-profiling": {
+      "name": "Immune Cell Profiling",
+      "description": "Deep characterization of immune cell populations",
+      "inputs": {
+        "data_type": "Data type (scRNA-seq, CyTOF, flow cytometry)",
+        "comparison": "Groups to compare (e.g., responders vs non-responders)"
+      }
+    },
+    "lineage-tracing": {
+      "name": "Lineage Tracing Analysis",
+      "description": "Reconstruct cell lineage trees from barcoding data",
+      "inputs": {}
+    },
+    "spatial-cell-analysis": {
+      "name": "Spatial Cell Analysis",
+      "description": "Analyze cell spatial organization and neighborhoods",
+      "inputs": {
+        "platform": "Platform (MERFISH, Xenium, CosMx, IMC, mIF)",
+        "outcome": "Clinical outcome to correlate with (optional)"
+      }
+    },
+    "molecular-property-prediction": {
+      "name": "Molecular Property Prediction",
+      "description": "Predict physicochemical and biological properties of molecules",
+      "inputs": {
+        "properties": "Properties to predict (e.g., solubility, toxicity, pKa)"
+      }
+    },
+    "reaction-prediction": {
+      "name": "Chemical Reaction Prediction",
+      "description": "Predict products, yields, or conditions for chemical reactions",
+      "inputs": {
+        "reaction": "Reaction SMILES, description, or supplied reaction scheme"
+      }
+    },
+    "retrosynthesis-planning": {
+      "name": "Retrosynthesis Planning",
+      "description": "Plan synthetic routes to a target molecule",
+      "inputs": {
+        "target": "Target molecule (SMILES, name, or structure)"
+      }
+    },
+    "conformer-generation": {
+      "name": "Conformer Generation & Analysis",
+      "description": "Generate and analyze 3D molecular conformations",
+      "inputs": {
+        "molecule": "Molecule (SMILES or name)"
+      }
+    },
+    "qsar-modeling": {
+      "name": "QSAR Modeling",
+      "description": "Build quantitative structure-activity relationship models",
+      "inputs": {
+        "target_property": "Target property (e.g., IC50, EC50, solubility, permeability)"
+      }
+    },
+    "chemical-space-exploration": {
+      "name": "Chemical Space Exploration",
+      "description": "Visualize and navigate chemical space of a compound library",
+      "inputs": {
+        "property": "Property to color by (optional, e.g., activity, source)"
+      }
+    },
+    "spectral-analysis-nmr": {
+      "name": "NMR Spectral Analysis",
+      "description": "Interpret and assign NMR spectra",
+      "inputs": {
+        "nmr_type": "NMR type (1H, 13C, 2D COSY, HSQC, HMBC)",
+        "compound": "Expected compound (if known)"
+      }
+    },
+    "spectral-analysis-ms": {
+      "name": "Mass Spectrometry Analysis",
+      "description": "Analyze and interpret mass spectra",
+      "inputs": {
+        "ms_type": "MS type (ESI, MALDI, EI, LC-MS/MS, GC-MS)"
+      }
+    },
+    "thermodynamics-calculation": {
+      "name": "Thermodynamics Calculation",
+      "description": "Calculate thermodynamic properties and equilibria",
+      "inputs": {
+        "system": "Chemical system or reaction",
+        "temperature": "Temperature (K, default: 298.15)"
+      }
+    },
+    "pka-prediction": {
+      "name": "pKa Prediction",
+      "description": "Predict acid dissociation constants for molecules",
+      "inputs": {
+        "molecule": "Molecule (SMILES or name)",
+        "ph": "pH of interest (default: 7.4)"
+      }
+    },
+    "solubility-prediction": {
+      "name": "Solubility Prediction",
+      "description": "Predict aqueous solubility and formulation considerations",
+      "inputs": {
+        "molecules": "Molecules (SMILES list or supplied file)"
+      }
+    },
+    "reaction-optimization": {
+      "name": "Reaction Optimization",
+      "description": "Design experiments to optimize reaction conditions",
+      "inputs": {
+        "reaction": "Reaction to optimize"
+      }
+    },
+    "polymer-design": {
+      "name": "Polymer Design & Analysis",
+      "description": "Design polymers with target properties",
+      "inputs": {
+        "application": "Target application",
+        "properties": "Desired properties"
+      }
+    },
+    "catalyst-design": {
+      "name": "Catalyst Design",
+      "description": "Design and screen catalysts for chemical reactions",
+      "inputs": {
+        "reaction": "Target reaction"
+      }
+    },
+    "chemical-safety-assessment": {
+      "name": "Chemical Safety Assessment",
+      "description": "Evaluate hazards and safety of chemical compounds",
+      "inputs": {
+        "chemicals": "Chemical names, CAS numbers, or SMILES"
+      }
+    },
+    "metabolite-identification": {
+      "name": "Metabolite Identification",
+      "description": "Identify metabolites from mass spectrometry data",
+      "inputs": {
+        "data_type": "Data type (LC-MS, GC-MS, NMR)"
+      }
+    },
+    "synthetic-accessibility": {
+      "name": "Synthetic Accessibility Score",
+      "description": "Evaluate how easy compounds are to synthesize",
+      "inputs": {}
+    },
+    "target-identification": {
+      "name": "Drug Target Identification",
+      "description": "Identify and validate therapeutic targets for a disease",
+      "inputs": {
+        "disease": "Disease name or indication"
+      }
+    },
+    "virtual-screening": {
+      "name": "Virtual Screening",
+      "description": "Screen compound libraries against a target",
+      "inputs": {
+        "target": "Drug target name",
+        "pdb_id": "PDB ID of target structure",
+        "library_size": "Library size to screen"
+      }
+    },
+    "admet-prediction": {
+      "name": "ADMET Prediction",
+      "description": "Predict absorption, distribution, metabolism, excretion, and toxicity",
+      "inputs": {}
+    },
+    "lead-optimization": {
+      "name": "Lead Optimization",
+      "description": "Optimize a lead compound for potency, selectivity, and ADMET",
+      "inputs": {
+        "compound": "Lead compound (SMILES or name)",
+        "target": "Drug target",
+        "property": "Property to optimize (potency, selectivity, solubility, metabolic stability)"
+      }
+    },
+    "drug-repurposing": {
+      "name": "Drug Repurposing",
+      "description": "Identify existing drugs for new therapeutic indications",
+      "inputs": {
+        "disease": "Disease or indication"
+      }
+    },
+    "pharmacokinetics-modeling": {
+      "name": "PK Modeling",
+      "description": "Pharmacokinetic modeling and simulation",
+      "inputs": {
+        "drug": "Drug name or compound ID",
+        "doses": "Doses to simulate (e.g., 10 mg, 50 mg, 100 mg)"
+      }
+    },
+    "dose-response-analysis": {
+      "name": "Dose-Response Analysis",
+      "description": "Fit dose-response curves and calculate EC50/IC50",
+      "inputs": {}
+    },
+    "drug-interaction-prediction": {
+      "name": "Drug Interaction Prediction",
+      "description": "Predict drug-drug interactions and mechanisms",
+      "inputs": {
+        "drugs": "Drug names or list"
+      }
+    },
+    "clinical-trial-design": {
+      "name": "Clinical Trial Design",
+      "description": "Design a clinical trial protocol",
+      "inputs": {
+        "drug": "Drug or intervention",
+        "indication": "Disease indication"
+      }
+    },
+    "biomarker-discovery": {
+      "name": "Biomarker Discovery",
+      "description": "Identify and validate biomarkers from omics data",
+      "inputs": {
+        "condition": "Condition or phenotype",
+        "data_type": "Data type (transcriptomics, proteomics, metabolomics, cfDNA)"
+      }
+    },
+    "toxicity-prediction": {
+      "name": "Toxicity Prediction",
+      "description": "Predict compound toxicity and safety liabilities",
+      "inputs": {}
+    },
+    "pharmacogenomics-analysis": {
+      "name": "Pharmacogenomics Analysis",
+      "description": "Analyze genetic variants affecting drug response",
+      "inputs": {
+        "drug": "Drug name",
+        "genotype": "Gene, allele, or synthetic/aggregate genotype context"
+      }
+    },
+    "drug-target-network": {
+      "name": "Drug-Target Interaction Network",
+      "description": "Map the polypharmacology network of compounds",
+      "inputs": {
+        "compounds": "Compound names or SMILES list"
+      }
+    },
+    "competitive-landscape-pharma": {
+      "name": "Pharma Competitive Landscape",
+      "description": "Analyze the competitive landscape for a therapeutic area",
+      "inputs": {
+        "indication": "Therapeutic area or indication"
+      }
+    },
+    "side-effect-prediction": {
+      "name": "Side Effect Prediction",
+      "description": "Predict adverse drug reactions from molecular structure",
+      "inputs": {
+        "compound": "Compound (SMILES or drug name)"
+      }
+    },
+    "formulation-optimization": {
+      "name": "Formulation Optimization",
+      "description": "Optimize drug formulation for bioavailability",
+      "inputs": {
+        "compound": "Compound (SMILES or name)",
+        "route": "Administration route (oral, IV, topical, inhaled)"
+      }
+    },
+    "quantum-circuit-design": {
+      "name": "Quantum Circuit Design",
+      "description": "Design and simulate quantum circuits for specific algorithms",
+      "inputs": {
+        "algorithm": "Algorithm or problem (e.g., VQE, Grover's, QFT, QAOA)"
+      }
+    },
+    "quantum-simulation": {
+      "name": "Quantum System Simulation",
+      "description": "Simulate quantum many-body systems",
+      "inputs": {
+        "system": "Quantum system (e.g., Ising model, Hubbard, spin chain)",
+        "observables": "Observables to compute"
+      }
+    },
+    "quantum-ml-model": {
+      "name": "Quantum Machine Learning",
+      "description": "Build hybrid quantum-classical ML models",
+      "inputs": {
+        "task": "ML task (classification, regression, clustering)"
+      }
+    },
+    "classical-mechanics-sim": {
+      "name": "Classical Mechanics Simulation",
+      "description": "Simulate Newtonian or Lagrangian mechanical systems",
+      "inputs": {
+        "system": "Mechanical system (e.g., double pendulum, n-body, spring-mass)",
+        "conditions": "Initial conditions"
+      }
+    },
+    "electromagnetic-simulation": {
+      "name": "Electromagnetic Simulation",
+      "description": "Solve Maxwell's equations for EM field problems",
+      "inputs": {
+        "system": "EM system (antenna, waveguide, photonic crystal, etc.)"
+      }
+    },
+    "statistical-mechanics": {
+      "name": "Statistical Mechanics Simulation",
+      "description": "Monte Carlo and molecular dynamics for statistical ensembles",
+      "inputs": {
+        "system": "System (e.g., Ising model, Lennard-Jones fluid, XY model)",
+        "temperature": "Temperature or temperature range"
+      }
+    },
+    "particle-physics-analysis": {
+      "name": "Particle Physics Data Analysis",
+      "description": "Analyze high-energy physics collision data",
+      "inputs": {
+        "channel": "Decay channel or process (e.g., H→γγ, Z→μμ)"
+      }
+    },
+    "condensed-matter-bands": {
+      "name": "Band Structure Calculation",
+      "description": "Compute electronic band structures and density of states",
+      "inputs": {
+        "material": "Material (formula or crystal structure)"
+      }
+    },
+    "optics-simulation": {
+      "name": "Optics Simulation",
+      "description": "Simulate optical systems: lenses, lasers, waveguides",
+      "inputs": {
+        "system": "Optical system description",
+        "metrics": "Metrics to compute (e.g., PSF, MTF, beam waist, NA)"
+      }
+    },
+    "thermodynamic-modeling": {
+      "name": "Thermodynamic Modeling",
+      "description": "Model thermodynamic cycles and energy systems",
+      "inputs": {
+        "system": "Thermodynamic system (Rankine, Brayton, refrigeration, heat pump)"
+      }
+    },
+    "gravitational-wave-analysis": {
+      "name": "Gravitational Wave Analysis",
+      "description": "Analyze LIGO/Virgo gravitational wave signal data",
+      "inputs": {
+        "templates": "Template family (compact binary, burst, etc.)"
+      }
+    },
+    "plasma-physics-sim": {
+      "name": "Plasma Physics Simulation",
+      "description": "Simulate plasma behavior and magnetohydrodynamics",
+      "inputs": {
+        "system": "Plasma configuration (tokamak, Z-pinch, solar wind, etc.)",
+        "quantities": "Quantities to track (density, temperature, magnetic field)"
+      }
+    },
+    "quantum-error-correction": {
+      "name": "Quantum Error Correction",
+      "description": "Design and analyze quantum error-correcting codes",
+      "inputs": {
+        "noise_model": "Noise model (depolarizing, amplitude damping, bit-flip, etc.)"
+      }
+    },
+    "nuclear-decay-analysis": {
+      "name": "Nuclear Decay Analysis",
+      "description": "Analyze radioactive decay data and nuclear reactions",
+      "inputs": {
+        "isotope": "Isotope(s) to analyze"
+      }
+    },
+    "crystal-structure-prediction": {
+      "name": "Crystal Structure Prediction",
+      "description": "Predict stable crystal structures for a composition",
+      "inputs": {
+        "composition": "Chemical composition (e.g., Li2FeSiO4, TiO2)"
+      }
+    },
+    "phase-diagram-analysis": {
+      "name": "Phase Diagram Analysis",
+      "description": "Construct and interpret phase diagrams",
+      "inputs": {
+        "system": "Material system (e.g., Fe-C, Al-Cu, Li-Ni-Mn-Co-O)"
+      }
+    },
+    "mechanical-property-prediction": {
+      "name": "Mechanical Property Prediction",
+      "description": "Predict elastic moduli, hardness, and strength of materials",
+      "inputs": {
+        "material": "Material (formula or crystal structure file)"
+      }
+    },
+    "materials-screening": {
+      "name": "High-Throughput Materials Screening",
+      "description": "Screen materials databases for target properties",
+      "inputs": {
+        "application": "Target application (e.g., battery cathode, thermoelectric, photocatalyst)",
+        "properties": "Desired properties and ranges"
+      }
+    },
+    "defect-analysis": {
+      "name": "Defect Analysis",
+      "description": "Analyze point defects, vacancies, and impurities in crystals",
+      "inputs": {
+        "material": "Host material",
+        "temperature": "Temperature of interest (K)"
+      }
+    },
+    "alloy-design": {
+      "name": "Alloy Design",
+      "description": "Design alloys with targeted mechanical or functional properties",
+      "inputs": {
+        "application": "Application (aerospace, biomedical, automotive, etc.)",
+        "requirements": "Property requirements"
+      }
+    },
+    "battery-material-analysis": {
+      "name": "Battery Material Analysis",
+      "description": "Evaluate materials for electrochemical energy storage",
+      "inputs": {
+        "material": "Material formula",
+        "component": "Battery component (cathode, anode, electrolyte, solid electrolyte)"
+      }
+    },
+    "thermal-conductivity-modeling": {
+      "name": "Thermal Conductivity Modeling",
+      "description": "Predict thermal transport properties of materials",
+      "inputs": {
+        "material": "Material",
+        "t_min": "Min temperature K (default: 100)",
+        "t_max": "Max temperature K (default: 1000)"
+      }
+    },
+    "surface-energy-calculation": {
+      "name": "Surface Energy Analysis",
+      "description": "Calculate surface energies and predict crystal morphology",
+      "inputs": {
+        "material": "Material",
+        "adsorbate": "Adsorbate molecule (optional)"
+      }
+    },
+    "polymer-property-prediction": {
+      "name": "Polymer Property Prediction",
+      "description": "Predict thermal, mechanical, and transport properties of polymers",
+      "inputs": {
+        "polymer": "Polymer (repeat unit SMILES or name)"
+      }
+    },
+    "band-structure-calculation": {
+      "name": "Electronic Band Structure",
+      "description": "Compute electronic band structure and DOS for materials",
+      "inputs": {
+        "material": "Material (formula or CIF file)"
+      }
+    },
+    "materials-literature-review": {
+      "name": "Materials Science Literature Review",
+      "description": "Survey literature for a materials science topic",
+      "inputs": {
+        "topic": "Materials topic",
+        "years": "Years to cover (default: 5)"
+      }
+    },
+    "clinical-trial-analysis": {
+      "name": "Clinical Trial Analysis",
+      "description": "Analyze clinical trial data with appropriate endpoints",
+      "inputs": {
+        "endpoint": "Primary endpoint"
+      }
+    },
+    "survival-analysis-clinical": {
+      "name": "Clinical Survival Analysis",
+      "description": "Kaplan-Meier, Cox regression for clinical outcomes",
+      "inputs": {
+        "outcome": "Outcome (OS, PFS, DFS, etc.)",
+        "time_unit": "Time unit (days, months, years)",
+        "groups": "Groups to compare",
+        "covariates": "Covariates for adjustment"
+      }
+    },
+    "epidemiological-study": {
+      "name": "Epidemiological Study Design",
+      "description": "Design and analyze observational epidemiological studies",
+      "inputs": {
+        "question": "Research question",
+        "study_type": "Study type (cohort, case-control, cross-sectional, ecological)"
+      }
+    },
+    "medical-image-analysis": {
+      "name": "Medical Image Analysis",
+      "description": "Analyze radiological or pathological images",
+      "inputs": {
+        "modality": "Imaging modality (CT, MRI, X-ray, H&E, IHC)",
+        "target_structure": "Structure to segment or analyze"
+      }
+    },
+    "diagnostic-accuracy": {
+      "name": "Diagnostic Test Accuracy",
+      "description": "Evaluate sensitivity, specificity, ROC for a diagnostic test",
+      "inputs": {
+        "test": "Diagnostic test name",
+        "condition": "Target condition",
+        "prevalence": "Disease prevalence (optional)"
+      }
+    },
+    "treatment-comparison": {
+      "name": "Treatment Comparison",
+      "description": "Compare treatment outcomes between groups",
+      "inputs": {
+        "treatments": "Treatments to compare",
+        "method": "Adjustment method (propensity score, regression, matching)"
+      }
+    },
+    "risk-prediction-model": {
+      "name": "Clinical Risk Prediction Model",
+      "description": "Build a validated risk prediction model for clinical outcomes",
+      "inputs": {
+        "outcome": "Clinical outcome to predict"
+      }
+    },
+    "adverse-event-analysis": {
+      "name": "Adverse Event Analysis",
+      "description": "Analyze safety data from clinical studies",
+      "inputs": {
+        "groups": "Treatment groups to compare"
+      }
+    },
+    "cost-effectiveness-analysis": {
+      "name": "Cost-Effectiveness Analysis",
+      "description": "Health economics evaluation of interventions",
+      "inputs": {
+        "interventions": "Interventions to compare",
+        "condition": "Clinical condition",
+        "perspective": "Analysis perspective (payer, societal, hospital)"
+      }
+    },
+    "patient-cohort-study": {
+      "name": "Patient Cohort Study",
+      "description": "Analyze a patient cohort with multi-variable outcomes",
+      "inputs": {
+        "sample_size": "Approximate sample size",
+        "outcome": "Primary outcome",
+        "subgroups": "Subgroups for analysis"
+      }
+    },
+    "systematic-review-clinical": {
+      "name": "Clinical Systematic Review",
+      "description": "PRISMA-compliant systematic review of clinical evidence",
+      "inputs": {
+        "question": "Clinical question (PICO format preferred)"
+      }
+    },
+    "clinical-guideline-summary": {
+      "name": "Clinical Guideline Summary",
+      "description": "Summarize and compare clinical practice guidelines",
+      "inputs": {
+        "condition": "Clinical condition",
+        "societies": "Guideline societies (e.g., AHA, NICE, WHO)"
+      }
+    },
+    "quality-improvement": {
+      "name": "Quality Improvement Analysis",
+      "description": "Analyze healthcare quality metrics and improvement initiatives",
+      "inputs": {
+        "initiative": "QI initiative or metric to analyze"
+      }
+    },
+    "health-equity-analysis": {
+      "name": "Health Equity Analysis",
+      "description": "Analyze health disparities across demographic groups",
+      "inputs": {
+        "outcome": "Health outcome",
+        "demographics": "Demographic variables (race, ethnicity, income, geography)"
+      }
+    },
+    "electronic-health-records": {
+      "name": "EHR Data Analysis",
+      "description": "Analyze structured electronic health record data",
+      "inputs": {
+        "criteria": "Cohort inclusion criteria",
+        "analysis_goal": "Analysis objective"
+      }
+    },
+    "longitudinal-study": {
+      "name": "Longitudinal Data Analysis",
+      "description": "Analyze repeated measures and panel data over time",
+      "inputs": {
+        "outcome": "Outcome variable",
+        "timepoints": "Number of timepoints",
+        "groups": "Groups to compare"
+      }
+    },
+    "population-health-assessment": {
+      "name": "Population Health Assessment",
+      "description": "Assess health status and needs of a population",
+      "inputs": {
+        "population": "Population (county, city, or demographic group)"
+      }
+    },
+    "case-control-analysis": {
+      "name": "Case-Control Analysis",
+      "description": "Analyze matched or unmatched case-control study data",
+      "inputs": {
+        "cases": "Case definition",
+        "controls": "Control definition"
+      }
+    },
+    "eeg-analysis": {
+      "name": "EEG Signal Analysis",
+      "description": "Process and analyze electroencephalography data",
+      "inputs": {
+        "freq_range": "Bandpass filter range (e.g., 0.1-100)",
+        "events": "Events or conditions to analyze"
+      }
+    },
+    "fmri-analysis": {
+      "name": "fMRI Analysis Pipeline",
+      "description": "Process and analyze functional MRI brain imaging data",
+      "inputs": {
+        "contrasts": "Task contrasts (e.g., faces > houses)",
+        "fwhm": "Smoothing FWHM in mm (default: 6)"
+      }
+    },
+    "spike-sorting": {
+      "name": "Spike Sorting",
+      "description": "Sort neural spikes from extracellular recordings",
+      "inputs": {
+        "recording_type": "Recording type (tetrode, silicon probe, Neuropixels)"
+      }
+    },
+    "neural-decoding": {
+      "name": "Neural Decoding",
+      "description": "Decode stimulus or behavior from neural activity",
+      "inputs": {
+        "variable": "Variable to decode (stimulus, choice, position, movement)"
+      }
+    },
+    "connectivity-analysis": {
+      "name": "Brain Connectivity Analysis",
+      "description": "Analyze functional and structural brain connectivity",
+      "inputs": {
+        "modality": "Data modality (resting-state fMRI, DTI, EEG)",
+        "atlas": "Brain atlas (AAL, Schaefer, Desikan)",
+        "groups": "Groups to compare (optional)"
+      }
+    },
+    "behavioral-analysis": {
+      "name": "Behavioral Data Analysis",
+      "description": "Analyze behavioral experiments: reaction times, choices, learning",
+      "inputs": {
+        "task_type": "Task type (2AFC, go/no-go, bandit, Pavlovian)",
+        "models": "Computational models to fit (optional)",
+        "neural_data": "Neural data to correlate with (optional)"
+      }
+    },
+    "calcium-imaging-analysis": {
+      "name": "Calcium Imaging Analysis",
+      "description": "Process and analyze calcium imaging recordings",
+      "inputs": {
+        "task": "Behavioral task or paradigm"
+      }
+    },
+    "neuropixels-processing": {
+      "name": "Neuropixels Data Processing",
+      "description": "Process high-density Neuropixels probe recordings",
+      "inputs": {
+        "events": "Behavioral events to align to"
+      }
+    },
+    "brain-atlas-mapping": {
+      "name": "Brain Atlas Mapping",
+      "description": "Map neural data onto standardized brain atlases",
+      "inputs": {
+        "atlas": "Brain atlas (Allen CCF, MNI, Paxinos)",
+        "data_type": "Data to map (cell counts, activity, connectivity)"
+      }
+    },
+    "computational-neuron-model": {
+      "name": "Computational Neuron Model",
+      "description": "Build and simulate biophysical neuron models",
+      "inputs": {
+        "neuron_type": "Neuron type (e.g., pyramidal, Purkinje, interneuron)",
+        "species": "Species (rat, mouse, human)",
+        "protocol": "Stimulation protocol (step current, ramp, synaptic)"
+      }
+    },
+    "psychophysics-analysis": {
+      "name": "Psychophysics Analysis",
+      "description": "Fit psychometric functions and analyze perceptual data",
+      "inputs": {
+        "task": "Task type (detection, discrimination, identification)",
+        "conditions": "Experimental conditions"
+      }
+    },
+    "neural-network-comparison": {
+      "name": "Compare Neural & Artificial Networks",
+      "description": "Compare biological neural representations with deep network layers",
+      "inputs": {
+        "stimuli": "Stimulus set used",
+        "model": "Deep network model (ResNet, CLIP, GPT, etc.)"
+      }
+    },
+    "species-distribution-model": {
+      "name": "Species Distribution Model",
+      "description": "Predict habitat suitability and range for species",
+      "inputs": {
+        "species": "Species name (scientific or common)",
+        "scenario": "Climate scenario for projection (optional, e.g., SSP245, SSP585)"
+      }
+    },
+    "biodiversity-assessment": {
+      "name": "Biodiversity Assessment",
+      "description": "Analyze species richness, diversity indices, and community composition",
+      "inputs": {
+        "sites": "Sites or groups to compare"
+      }
+    },
+    "population-dynamics": {
+      "name": "Population Dynamics Modeling",
+      "description": "Model population growth, predator-prey, or competition",
+      "inputs": {
+        "system": "Ecological system (single species, predator-prey, competition, SIR)",
+        "model_type": "Model type (logistic, Lotka-Volterra, age-structured)",
+        "scenario": "Scenarios to simulate (optional)"
+      }
+    },
+    "climate-data-analysis": {
+      "name": "Climate Data Analysis",
+      "description": "Analyze temperature, precipitation, and climate trends",
+      "inputs": {
+        "region": "Geographic region",
+        "period": "Time period (e.g., 1950-2025)"
+      }
+    },
+    "remote-sensing-analysis": {
+      "name": "Remote Sensing Analysis",
+      "description": "Analyze satellite imagery for environmental monitoring",
+      "inputs": {
+        "sensor": "Sensor (Landsat, Sentinel-2, MODIS)",
+        "indices": "Indices to calculate (NDVI, NDWI, NBR, etc.)"
+      }
+    },
+    "phylogeography": {
+      "name": "Phylogeographic Analysis",
+      "description": "Analyze geographic distribution of genetic lineages",
+      "inputs": {
+        "taxon": "Taxonomic group"
+      }
+    },
+    "ecological-network-analysis": {
+      "name": "Ecological Network Analysis",
+      "description": "Analyze food webs, mutualistic networks, or interaction webs",
+      "inputs": {
+        "network_type": "Network type (food web, pollination, parasitism, mutualistic)"
+      }
+    },
+    "conservation-prioritization": {
+      "name": "Conservation Prioritization",
+      "description": "Identify priority areas or species for conservation",
+      "inputs": {
+        "target": "Conservation target (species group, ecosystem)",
+        "region": "Geographic region"
+      }
+    },
+    "water-quality-analysis": {
+      "name": "Water Quality Analysis",
+      "description": "Analyze water chemistry and quality monitoring data",
+      "inputs": {
+        "standards": "Regulatory standards (EPA, WHO, EU WFD)"
+      }
+    },
+    "carbon-footprint-analysis": {
+      "name": "Carbon Footprint Analysis",
+      "description": "Calculate and analyze greenhouse gas emissions",
+      "inputs": {
+        "entity": "Entity (organization, product, project, event)"
+      }
+    },
+    "environmental-impact": {
+      "name": "Environmental Impact Assessment",
+      "description": "Assess environmental impacts of a project or activity",
+      "inputs": {
+        "project": "Project description",
+        "framework": "EIA framework (NEPA, EU EIA Directive, IFC)"
+      }
+    },
+    "habitat-suitability": {
+      "name": "Habitat Suitability Analysis",
+      "description": "Assess habitat quality and suitability for target species",
+      "inputs": {
+        "species": "Target species",
+        "region": "Study region"
+      }
+    },
+    "microbial-ecology": {
+      "name": "Microbial Community Ecology",
+      "description": "Analyze 16S/ITS amplicon sequencing for microbial communities",
+      "inputs": {
+        "database": "Reference database (Silva, Greengenes2, UNITE)",
+        "comparison": "Groups to compare"
+      }
+    },
+    "invasive-species-risk": {
+      "name": "Invasive Species Risk Assessment",
+      "description": "Assess invasion risk and potential spread of non-native species",
+      "inputs": {
+        "species": "Species under assessment",
+        "region": "Region of concern"
+      }
+    },
+    "stock-market-analysis": {
+      "name": "Stock Market Analysis",
+      "description": "Analyze stock price data, technicals, and fundamentals",
+      "inputs": {
+        "ticker": "Stock ticker symbol",
+        "period": "Analysis period (e.g., 1Y, 5Y, YTD)"
+      }
+    },
+    "portfolio-optimization": {
+      "name": "Portfolio Optimization",
+      "description": "Optimize asset allocation using modern portfolio theory",
+      "inputs": {
+        "constraints": "Constraints (e.g., max 20% per asset, long-only)",
+        "period": "Backtest period"
+      }
+    },
+    "risk-assessment-finance": {
+      "name": "Financial Risk Assessment",
+      "description": "Calculate VaR, CVaR, and stress test scenarios",
+      "inputs": {
+        "scenarios": "Stress scenarios (e.g., 2008 crisis, COVID crash, rate hike)"
+      }
+    },
+    "economic-indicator-analysis": {
+      "name": "Economic Indicator Analysis",
+      "description": "Analyze GDP, inflation, employment, and other macro indicators",
+      "inputs": {
+        "country": "Country or region",
+        "indicators": "Indicators (GDP, CPI, unemployment, PMI, etc.)",
+        "period": "Time period",
+        "benchmark": "Countries to compare with"
+      }
+    },
+    "financial-statement-analysis": {
+      "name": "Financial Statement Analysis",
+      "description": "Analyze company financials from SEC filings or reports",
+      "inputs": {
+        "company": "Company name or ticker",
+        "years": "Years to analyze (default: 5)"
+      }
+    },
+    "hedge-fund-analysis": {
+      "name": "Hedge Fund Analysis",
+      "description": "Analyze hedge fund performance, strategy, and risk",
+      "inputs": {
+        "fund": "Fund name or supplied return data"
+      }
+    },
+    "cryptocurrency-analysis": {
+      "name": "Cryptocurrency Analysis",
+      "description": "Analyze crypto price data, on-chain metrics, and correlations",
+      "inputs": {
+        "crypto": "Cryptocurrency (BTC, ETH, SOL, etc.)",
+        "n": "Number of peers to compare (default: 10)"
+      }
+    },
+    "time-series-forecasting-finance": {
+      "name": "Financial Time Series Forecasting",
+      "description": "Forecast financial time series with ML and statistical models",
+      "inputs": {
+        "series_type": "Series type (stock price, interest rate, exchange rate, volatility)",
+        "horizon": "Forecast horizon (e.g., 30 days, 12 months)"
+      }
+    },
+    "credit-risk-model": {
+      "name": "Credit Risk Model",
+      "description": "Build credit scoring and default prediction models",
+      "inputs": {}
+    },
+    "market-sentiment-analysis": {
+      "name": "Market Sentiment Analysis",
+      "description": "Analyze market sentiment from news, social media, or reports",
+      "inputs": {
+        "asset_or_sector": "Asset, sector, or market",
+        "sources": "Data sources (news, Twitter, Reddit, SEC filings)"
+      }
+    },
+    "econometric-modeling": {
+      "name": "Econometric Modeling",
+      "description": "Build and estimate econometric models for policy analysis",
+      "inputs": {
+        "relationship": "Economic relationship to estimate"
+      }
+    },
+    "fiscal-policy-analysis": {
+      "name": "Fiscal Policy Analysis",
+      "description": "Analyze government budgets, debt, and fiscal sustainability",
+      "inputs": {
+        "country": "Country",
+        "source": "Data source (USFiscalData, IMF, World Bank)"
+      }
+    },
+    "real-estate-analysis": {
+      "name": "Real Estate Market Analysis",
+      "description": "Analyze property values, trends, and investment opportunities",
+      "inputs": {
+        "location": "Geographic location",
+        "features": "Features for modeling (sq ft, bedrooms, school rating, etc.)"
+      }
+    },
+    "startup-valuation": {
+      "name": "Startup Valuation",
+      "description": "Value an early-stage company using multiple methods",
+      "inputs": {
+        "company": "Company name and description",
+        "growth": "Revenue growth scenarios (bear, base, bull)"
+      }
+    },
+    "esg-analysis": {
+      "name": "ESG Analysis",
+      "description": "Evaluate environmental, social, and governance performance",
+      "inputs": {
+        "company": "Company name or ticker"
+      }
+    },
+    "trade-flow-analysis": {
+      "name": "Trade Flow Analysis",
+      "description": "Analyze international trade patterns and balances",
+      "inputs": {
+        "country": "Country",
+        "sector": "Sector or product category"
+      }
+    },
+    "survey-analysis": {
+      "name": "Survey Data Analysis",
+      "description": "Analyze survey responses with appropriate statistical methods",
+      "inputs": {
+        "n": "Approximate sample size",
+        "outcome": "Key outcome to predict"
+      }
+    },
+    "text-mining-social": {
+      "name": "Text Mining & NLP",
+      "description": "Extract themes and patterns from text corpora",
+      "inputs": {
+        "corpus_type": "Corpus type (news articles, social media, interviews, policy documents)",
+        "n_topics": "Number of topics (default: 10)"
+      }
+    },
+    "demographic-analysis": {
+      "name": "Demographic Analysis",
+      "description": "Analyze population structure, trends, and projections",
+      "inputs": {
+        "population": "Population (country, region, city)",
+        "period": "Time period (e.g., 2000-2025)"
+      }
+    },
+    "network-analysis-social": {
+      "name": "Social Network Analysis",
+      "description": "Analyze social networks: centrality, communities, influence",
+      "inputs": {}
+    },
+    "sentiment-analysis-social": {
+      "name": "Social Media Sentiment Analysis",
+      "description": "Analyze public sentiment from social media data",
+      "inputs": {
+        "topic": "Topic or hashtag"
+      }
+    },
+    "policy-evaluation": {
+      "name": "Policy Impact Evaluation",
+      "description": "Evaluate the causal impact of a policy intervention",
+      "inputs": {
+        "policy": "Policy intervention",
+        "outcome": "Outcome variable",
+        "method": "Method (diff-in-diff, RDD, propensity score, IV)"
+      }
+    },
+    "education-outcomes": {
+      "name": "Education Outcomes Analysis",
+      "description": "Analyze student performance and educational interventions",
+      "inputs": {
+        "groups": "Groups to compare (schools, programs, demographics)",
+        "outcome": "Outcome (test scores, graduation, enrollment)",
+        "intervention": "Intervention to evaluate (optional)"
+      }
+    },
+    "public-opinion-analysis": {
+      "name": "Public Opinion Analysis",
+      "description": "Analyze polling data and public opinion trends",
+      "inputs": {
+        "topic": "Topic or issue"
+      }
+    },
+    "migration-analysis": {
+      "name": "Migration Analysis",
+      "description": "Analyze migration patterns, flows, and determinants",
+      "inputs": {
+        "region": "Region or country of focus"
+      }
+    },
+    "inequality-measurement": {
+      "name": "Inequality Measurement",
+      "description": "Measure and analyze economic or social inequality",
+      "inputs": {
+        "dimension": "Inequality dimension (income, wealth, health, education)",
+        "subgroups": "Subgroups for decomposition"
+      }
+    },
+    "behavioral-experiment": {
+      "name": "Behavioral Experiment Analysis",
+      "description": "Analyze data from psychology or behavioral economics experiments",
+      "inputs": {
+        "design": "Experimental design (between-subjects, within-subjects, 2x2 factorial)",
+        "analysis_type": "Analysis type (t-test, ANOVA, mixed-effects, mediation)"
+      }
+    },
+    "content-analysis-social": {
+      "name": "Content Analysis",
+      "description": "Systematic coding and analysis of media or documents",
+      "inputs": {
+        "categories": "Content categories to code",
+        "groups": "Groups or periods to compare"
+      }
+    },
+    "differential-equations": {
+      "name": "Solve Differential Equations",
+      "description": "Analytical and numerical solutions to ODEs and PDEs",
+      "inputs": {
+        "equation": "Differential equation(s)",
+        "conditions": "Boundary/initial conditions"
+      }
+    },
+    "optimization-problem": {
+      "name": "Solve an Optimization Problem",
+      "description": "Find optimal solutions for constrained or unconstrained problems",
+      "inputs": {
+        "objective": "Objective function",
+        "constraints": "Constraints"
+      }
+    },
+    "bayesian-inference": {
+      "name": "Bayesian Inference",
+      "description": "Build Bayesian models and compute posteriors",
+      "inputs": {
+        "model": "Model description",
+        "priors": "Prior assumptions"
+      }
+    },
+    "monte-carlo-simulation": {
+      "name": "Monte Carlo Simulation",
+      "description": "Estimate quantities through stochastic sampling",
+      "inputs": {
+        "problem": "Problem to simulate",
+        "n_samples": "Number of samples (default: 10000)"
+      }
+    },
+    "graph-theory-analysis": {
+      "name": "Graph Theory Analysis",
+      "description": "Analyze graph properties, algorithms, and optimization",
+      "inputs": {
+        "algorithms": "Algorithms to run (shortest path, MST, max flow, coloring)"
+      }
+    },
+    "symbolic-computation": {
+      "name": "Symbolic Computation",
+      "description": "Exact algebraic manipulation, simplification, and proofs",
+      "inputs": {
+        "expression": "Mathematical expression or equation",
+        "operations": "Operations (differentiate, integrate, series expand, solve, factor)"
+      }
+    },
+    "numerical-methods": {
+      "name": "Numerical Methods Implementation",
+      "description": "Implement and compare numerical algorithms",
+      "inputs": {
+        "problem": "Numerical problem (root finding, integration, linear algebra, ODE)",
+        "methods": "Methods to implement and compare"
+      }
+    },
+    "stochastic-modeling": {
+      "name": "Stochastic Process Modeling",
+      "description": "Model and simulate random processes",
+      "inputs": {
+        "process": "Stochastic process (random walk, Markov chain, Poisson, Brownian motion, SDE)"
+      }
+    },
+    "game-theory-analysis": {
+      "name": "Game Theory Analysis",
+      "description": "Analyze strategic interactions and find equilibria",
+      "inputs": {
+        "game": "Game description (players, strategies, payoffs)"
+      }
+    },
+    "topology-analysis": {
+      "name": "Topological Data Analysis",
+      "description": "Apply persistent homology and TDA to data",
+      "inputs": {}
+    },
+    "fourier-analysis": {
+      "name": "Fourier Analysis",
+      "description": "Frequency decomposition and spectral analysis",
+      "inputs": {
+        "filter_spec": "Filter specification (optional, e.g., low-pass 50 Hz)"
+      }
+    },
+    "dynamical-systems": {
+      "name": "Dynamical Systems Analysis",
+      "description": "Analyze stability, bifurcations, and chaos in dynamical systems",
+      "inputs": {
+        "system": "System equations (dx/dt = f(x,y), dy/dt = g(x,y))",
+        "parameter": "Bifurcation parameter"
+      }
+    },
+    "classification-model": {
+      "name": "Build a Classifier",
+      "description": "Train classification models with evaluation and interpretation",
+      "inputs": {
+        "target": "Target class variable"
+      }
+    },
+    "nlp-text-analysis": {
+      "name": "NLP Text Analysis",
+      "description": "Analyze text with classification, NER, summarization, or embedding",
+      "inputs": {
+        "task": "NLP task (classification, NER, sentiment, summarization, embedding)"
+      }
+    },
+    "image-classification": {
+      "name": "Image Classification",
+      "description": "Build image classifiers with CNNs and transfer learning",
+      "inputs": {
+        "classes": "Class labels",
+        "backbone": "Backbone model (ResNet50, EfficientNet, ViT)"
+      }
+    },
+    "anomaly-detection": {
+      "name": "Anomaly Detection",
+      "description": "Detect outliers and anomalies in datasets",
+      "inputs": {
+        "constraint": "Constraint (expected anomaly rate, false positive tolerance)"
+      }
+    },
+    "feature-engineering": {
+      "name": "Feature Engineering",
+      "description": "Create informative features from raw data",
+      "inputs": {
+        "target": "Prediction target"
+      }
+    },
+    "hyperparameter-tuning": {
+      "name": "Hyperparameter Tuning",
+      "description": "Optimize model hyperparameters with systematic search",
+      "inputs": {
+        "model": "Model type (XGBoost, random forest, SVM, neural network)",
+        "method": "Search method (grid, random, Bayesian/Optuna)",
+        "n_trials": "Number of trials (default: 100)",
+        "n_folds": "CV folds (default: 5)"
+      }
+    },
+    "model-interpretability": {
+      "name": "Model Interpretability",
+      "description": "Explain ML model predictions with SHAP, LIME, and feature analysis",
+      "inputs": {
+        "n_samples": "Number of samples for local explanations (default: 10)"
+      }
+    },
+    "transfer-learning": {
+      "name": "Transfer Learning",
+      "description": "Adapt pretrained models to new tasks and domains",
+      "inputs": {
+        "task": "Target task",
+        "source_model": "Pretrained model to transfer from"
+      }
+    },
+    "graph-neural-network": {
+      "name": "Graph Neural Network",
+      "description": "Build GNNs for node, edge, or graph-level prediction",
+      "inputs": {
+        "task": "Task (node classification, link prediction, graph classification)",
+        "metrics": "Evaluation metrics"
+      }
+    },
+    "generative-model": {
+      "name": "Build a Generative Model",
+      "description": "Train VAE, GAN, or diffusion model for data generation",
+      "inputs": {
+        "data_type": "Data type to generate (images, molecules, text, tabular)",
+        "architecture": "Architecture (VAE, GAN, diffusion, flow)",
+        "n_samples": "Samples to generate (default: 100)"
+      }
+    },
+    "reinforcement-learning": {
+      "name": "Reinforcement Learning",
+      "description": "Train RL agents for sequential decision-making",
+      "inputs": {
+        "environment": "Environment or task description",
+        "algorithm": "RL algorithm (PPO, SAC, DQN, A2C)"
+      }
+    },
+    "model-comparison": {
+      "name": "Model Comparison & Selection",
+      "description": "Systematically compare ML models and select the best",
+      "inputs": {
+        "target": "Target variable",
+        "models": "Models to compare (e.g., LR, RF, XGB, SVM, MLP)"
+      }
+    },
+    "dataset-bias-audit": {
+      "name": "Dataset & Model Bias Audit",
+      "description": "Audit data and models for fairness and bias",
+      "inputs": {
+        "attributes": "Protected attributes (race, gender, age, etc.)"
+      }
+    },
+    "recommendation-system": {
+      "name": "Build a Recommendation System",
+      "description": "Collaborative or content-based recommendation engine",
+      "inputs": {
+        "data_type": "Data type (user-item ratings, implicit feedback, content features)",
+        "approach": "Approach (collaborative filtering, content-based, hybrid, matrix factorization)"
+      }
+    },
+    "federated-learning-design": {
+      "name": "Federated Learning Design",
+      "description": "Design privacy-preserving distributed ML systems",
+      "inputs": {
+        "task": "ML task",
+        "partition": "Data partition (IID, non-IID, label skew)",
+        "epsilon": "Privacy budget epsilon",
+        "n_clients": "Number of clients (default: 10)"
+      }
+    },
+    "cfd-simulation": {
+      "name": "CFD Simulation",
+      "description": "Computational fluid dynamics simulation and analysis",
+      "inputs": {
+        "geometry": "Geometry description",
+        "conditions": "Boundary conditions (inlet velocity, pressure, temperature)"
+      }
+    },
+    "signal-processing": {
+      "name": "Signal Processing",
+      "description": "Filter, transform, and analyze signals",
+      "inputs": {
+        "filter_spec": "Filter specification (e.g., bandpass 10-100 Hz, notch 50 Hz)",
+        "features": "Features to extract (amplitude, frequency, phase, envelope)"
+      }
+    },
+    "control-system-design": {
+      "name": "Control System Design",
+      "description": "Design and simulate feedback control systems",
+      "inputs": {
+        "plant": "Plant/system to control",
+        "specs": "Performance specs (rise time, overshoot, steady-state error)",
+        "controller_type": "Controller type (PID, state feedback, LQR, MPC)"
+      }
+    },
+    "heat-transfer-analysis": {
+      "name": "Heat Transfer Analysis",
+      "description": "Analyze conduction, convection, and radiation heat transfer",
+      "inputs": {
+        "system": "Thermal system description"
+      }
+    },
+    "vibration-analysis": {
+      "name": "Vibration Analysis",
+      "description": "Analyze mechanical vibrations and modal analysis",
+      "inputs": {
+        "system": "Mechanical system or supplied vibration data",
+        "standard": "Vibration standard (ISO 10816, API 670, etc.)"
+      }
+    },
+    "process-simulation": {
+      "name": "Process Simulation",
+      "description": "Simulate chemical or manufacturing processes",
+      "inputs": {
+        "process": "Process description",
+        "objective": "Optimization objective (yield, cost, energy, throughput)"
+      }
+    },
+    "reliability-analysis": {
+      "name": "Reliability Analysis",
+      "description": "Analyze system reliability, failure rates, and maintenance",
+      "inputs": {
+        "system": "System or component to analyze"
+      }
+    },
+    "sensor-data-analysis": {
+      "name": "Sensor / IoT Data Analysis",
+      "description": "Process and analyze multi-sensor time series data",
+      "inputs": {
+        "sensors": "Sensor types (temperature, pressure, vibration, current, etc.)",
+        "events": "Events to correlate with (failures, maintenance, production)"
+      }
+    },
+    "robot-path-planning": {
+      "name": "Robot Path Planning",
+      "description": "Plan collision-free paths for robotic systems",
+      "inputs": {
+        "robot_type": "Robot type (mobile, manipulator, drone, multi-agent)",
+        "algorithm": "Algorithm (RRT*, A*, PRM, potential field)",
+        "objective": "Objective (shortest path, smoothest, fastest, energy-optimal)"
+      }
+    },
+    "structural-analysis-eng": {
+      "name": "Structural Analysis",
+      "description": "Analyze structural loads, stresses, and deformations",
+      "inputs": {
+        "structure": "Structure description",
+        "loads": "Applied loads",
+        "sf": "Required safety factor (default: 2.0)"
+      }
+    },
+    "finite-element-analysis": {
+      "name": "Finite Element Analysis",
+      "description": "FEM modeling for stress, thermal, or electromagnetic problems",
+      "inputs": {
+        "problem": "FEA problem (structural, thermal, electromagnetic)",
+        "conditions": "Boundary conditions and loads"
+      }
+    },
+    "circuit-simulation": {
+      "name": "Circuit Simulation",
+      "description": "Simulate and analyze electronic circuits",
+      "inputs": {
+        "circuit": "Circuit description or schematic",
+        "input_signal": "Input signal for transient analysis",
+        "objective": "Design objective (bandwidth, gain, noise, power)"
+      }
+    },
+    "stellar-classification": {
+      "name": "Stellar Classification",
+      "description": "Classify stars from photometric or spectroscopic data",
+      "inputs": {}
+    },
+    "exoplanet-detection": {
+      "name": "Exoplanet Detection",
+      "description": "Detect exoplanets from transit or radial velocity data",
+      "inputs": {
+        "method": "Detection method (transit photometry, radial velocity)"
+      }
+    },
+    "spectral-analysis-astro": {
+      "name": "Astronomical Spectral Analysis",
+      "description": "Analyze stellar or galaxy spectra for composition and kinematics",
+      "inputs": {
+        "object_type": "Object type (star, galaxy, quasar, nebula)",
+        "params": "Parameters to determine (Teff, log g, [Fe/H], redshift)"
+      }
+    },
+    "galaxy-morphology": {
+      "name": "Galaxy Morphology Classification",
+      "description": "Classify galaxy shapes and structural parameters",
+      "inputs": {}
+    },
+    "orbital-mechanics": {
+      "name": "Orbital Mechanics Calculation",
+      "description": "Calculate orbits, transfers, and mission trajectories",
+      "inputs": {
+        "mission": "Mission description (LEO to GEO, Earth to Mars, etc.)",
+        "transfer_type": "Transfer type (Hohmann, bi-elliptic, gravity assist)"
+      }
+    },
+    "light-curve-analysis": {
+      "name": "Light Curve Analysis",
+      "description": "Analyze time-varying brightness of astronomical objects",
+      "inputs": {
+        "object": "Object name or type",
+        "var_type": "Expected variability type (eclipsing, pulsating, rotating, transient)"
+      }
+    },
+    "radio-astronomy-analysis": {
+      "name": "Radio Astronomy Analysis",
+      "description": "Process and analyze radio telescope observations",
+      "inputs": {
+        "observation_type": "Observation type (continuum, spectral line, pulsar, VLBI)",
+        "lines": "Expected spectral lines (HI 21cm, CO, OH, etc.)"
+      }
+    },
+    "gravitational-lensing": {
+      "name": "Gravitational Lensing Analysis",
+      "description": "Analyze gravitational lensing to probe mass distributions",
+      "inputs": {
+        "lens_type": "Lens type (galaxy, cluster, cosmic shear)"
+      }
+    },
+    "dark-matter-constraints": {
+      "name": "Dark Matter Constraints",
+      "description": "Derive constraints on dark matter properties from observational data",
+      "inputs": {
+        "data_type": "Data type (rotation curves, velocity dispersions, X-ray, lensing)",
+        "profile": "DM profile to fit (NFW, Einasto, isothermal, cored)"
+      }
+    },
+    "solar-activity-analysis": {
+      "name": "Solar Activity Analysis",
+      "description": "Analyze solar flares, sunspots, and space weather data",
+      "inputs": {
+        "flare_class": "Flare classes to analyze (C, M, X, or all)"
+      }
+    },
+    "cosmic-ray-analysis": {
+      "name": "Cosmic Ray Analysis",
+      "description": "Analyze cosmic ray flux, composition, and energy spectra",
+      "inputs": {}
+    },
+    "metabolic-modeling": {
+      "name": "Metabolic Flux Analysis",
+      "description": "Constraint-based modeling of metabolic networks",
+      "inputs": {
+        "organism": "Organism (E. coli, yeast, human)",
+        "media": "Growth media composition"
+      }
+    },
+    "glycan-analysis": {
+      "name": "Glycan Engineering & Analysis",
+      "description": "Analyze and engineer glycosylation patterns",
+      "inputs": {
+        "comparison": "Conditions or products to compare"
+      }
+    },
+    "digital-pathology": {
+      "name": "Digital Pathology Analysis",
+      "description": "Analyze whole-slide histopathology images",
+      "inputs": {
+        "stain": "Stain type (H&E, IHC, IF, special stain)",
+        "magnification": "Analysis magnification (20, 40)",
+        "metrics": "Metrics to quantify (cell counts, tumor %, TIL density)"
+      }
+    },
+    "metabolomics-analysis": {
+      "name": "Metabolomics Data Analysis",
+      "description": "Analyze untargeted or targeted metabolomics datasets",
+      "inputs": {
+        "platform": "Platform (LC-MS, GC-MS, NMR)",
+        "comparison": "Groups to compare",
+        "fc": "Fold change threshold (default: 1.5)"
+      }
+    },
+    "vc-deal-screening": {
+      "name": "VC Deal Screening",
+      "description": "Evaluate a startup for venture investment with market sizing and risk analysis",
+      "inputs": {
+        "company": "Company name and description",
+        "market": "Target market or industry"
+      }
+    },
+    "vc-fund-benchmarking": {
+      "name": "VC Fund Benchmarking",
+      "description": "Benchmark a venture fund against peers by vintage, strategy, and returns",
+      "inputs": {
+        "vintage": "Fund vintage year"
+      }
+    },
+    "cap-table-modeling": {
+      "name": "Cap Table Modeling",
+      "description": "Model cap table, dilution, and waterfall across funding rounds",
+      "inputs": {
+        "company": "Company name",
+        "round_details": "Next round terms (e.g., $10M Series A at $40M pre)",
+        "exit_values": "Exit valuations to model (e.g., $100M, $500M, $1B)"
+      }
+    },
+    "market-sizing": {
+      "name": "Market Sizing (TAM/SAM/SOM)",
+      "description": "Bottom-up and top-down market sizing for investment thesis",
+      "inputs": {
+        "market": "Market or product category to size",
+        "years": "Projection horizon in years (default: 5)"
+      }
+    },
+    "dcf-valuation": {
+      "name": "DCF Valuation Model",
+      "description": "Full discounted cash flow valuation with sensitivity analysis",
+      "inputs": {
+        "company": "Company name or ticker",
+        "years": "Projection period in years (default: 5)",
+        "growth": "Revenue growth assumptions (base, bull, bear)"
+      }
+    },
+    "comparable-company-analysis": {
+      "name": "Comparable Company Analysis",
+      "description": "Trading comps with multiples and relative valuation",
+      "inputs": {
+        "company": "Target company",
+        "peers": "Peer companies (comma-separated)"
+      }
+    },
+    "ma-deal-analysis": {
+      "name": "M&A Deal Analysis",
+      "description": "Evaluate a merger or acquisition: synergies, accretion/dilution, and integration",
+      "inputs": {
+        "target": "Target company",
+        "acquirer": "Acquiring company",
+        "terms": "Deal terms (price, structure — if known)"
+      }
+    },
+    "lbo-model": {
+      "name": "LBO Model",
+      "description": "Leveraged buyout model with debt schedules and returns analysis",
+      "inputs": {
+        "company": "Target company",
+        "entry_terms": "Entry valuation and leverage (e.g., 10x EBITDA, 5x leverage)",
+        "growth": "Revenue growth assumptions",
+        "exit_multiples": "Exit multiples to test (e.g., 8x, 10x, 12x)"
+      }
+    },
+    "pe-fund-due-diligence": {
+      "name": "PE / VC Due Diligence Report",
+      "description": "Comprehensive due diligence analysis on a target company",
+      "inputs": {
+        "company": "Target company",
+        "deal_type": "Deal type (Series A, growth equity, buyout, acquisition)"
+      }
+    },
+    "startup-data-room-dd": {
+      "name": "Startup Data Room Due Diligence",
+      "description": "Analyze supplied data room files to evaluate a startup investment opportunity",
+      "inputs": {
+        "company": "Company name and description"
+      }
+    },
+    "pitch-deck-analysis": {
+      "name": "Pitch Deck Teardown",
+      "description": "Critically evaluate a startup pitch deck for an investor audience",
+      "inputs": {
+        "company": "Company name"
+      }
+    },
+    "industry-deep-dive": {
+      "name": "Industry Deep Dive",
+      "description": "Comprehensive sector analysis for investment thesis development",
+      "inputs": {
+        "industry": "Industry or sector",
+        "n": "Number of companies to profile (default: 10)"
+      }
+    },
+    "investment-memo": {
+      "name": "Write an Investment Memo",
+      "description": "Structured investment memo for IC presentation",
+      "inputs": {
+        "company": "Company name and description",
+        "terms": "Proposed deal terms (optional)"
+      }
+    },
+    "public-equity-research": {
+      "name": "Equity Research Report",
+      "description": "Sell-side style equity research with price target",
+      "inputs": {
+        "ticker": "Stock ticker"
+      }
+    },
+    "fund-of-funds-analysis": {
+      "name": "Fund-of-Funds Portfolio Analysis",
+      "description": "Analyze a portfolio of fund commitments for an LP or fund-of-funds",
+      "inputs": {
+        "years": "Projection horizon (default: 5)"
+      }
+    },
+    "scenario-modeling": {
+      "name": "Scenario & Sensitivity Modeling",
+      "description": "Multi-scenario financial model with tornado and Monte Carlo analysis",
+      "inputs": {
+        "company": "Company name",
+        "variables": "Key variables (growth rate, margins, churn, ARPU, etc.)",
+        "n_sims": "Monte Carlo iterations (default: 10000)"
+      }
+    },
+    "convertible-note-analysis": {
+      "name": "Convertible Note / SAFE Analysis",
+      "description": "Model conversion scenarios for convertible instruments",
+      "inputs": {
+        "instruments": "Convertible instruments (caps, discounts, amounts)",
+        "valuations": "Series A valuations to test (e.g., $10M, $20M, $50M)"
+      }
+    },
+    "cohort-revenue-analysis": {
+      "name": "Cohort & Revenue Quality Analysis",
+      "description": "Analyze revenue retention, expansion, and cohort behavior for SaaS/subscription",
+      "inputs": {
+        "company": "Company name"
+      }
+    },
+    "secondaries-pricing": {
+      "name": "Secondaries Pricing Analysis",
+      "description": "Estimate fair value for secondary market transactions in private funds or stakes",
+      "inputs": {
+        "asset": "Asset description (fund name, vintage, strategy)",
+        "discounts": "Discount levels to test (e.g., 70%, 80%, 90%, par)"
+      }
+    },
+    "public-market-factor-analysis": {
+      "name": "Factor Analysis & Attribution",
+      "description": "Decompose portfolio returns by risk factors and attribution",
+      "inputs": {}
+    },
+    "venture-market-map": {
+      "name": "Venture Market Map",
+      "description": "Map the startup landscape in a sector with funding, stage, and positioning",
+      "inputs": {
+        "sector": "Sector or vertical (e.g., AI infrastructure, climate tech, fintech)"
+      }
+    },
+    "options-strategy-analysis": {
+      "name": "Options Strategy Analysis",
+      "description": "Model and visualize options strategies with payoff diagrams and Greeks",
+      "inputs": {
+        "underlying": "Underlying asset (ticker)",
+        "strategy": "Strategy (covered call, iron condor, straddle, bull spread, etc.)"
+      }
+    },
+    "debt-analysis": {
+      "name": "Debt & Credit Analysis",
+      "description": "Analyze corporate debt structure, covenants, and credit quality",
+      "inputs": {
+        "company": "Company name or ticker",
+        "stress": "Stress scenario (e.g., 20% revenue decline, rate hike)"
+      }
+    },
+    "activist-investor-analysis": {
+      "name": "Activist Investor Campaign Analysis",
+      "description": "Analyze an activist campaign: thesis, targets, and likely outcomes",
+      "inputs": {
+        "company": "Target company",
+        "activist": "Activist investor name"
+      }
+    },
+    "fund-formation": {
+      "name": "Fund Economics & Formation Modeling",
+      "description": "Model GP/LP economics, fee structures, and fund return scenarios",
+      "inputs": {
+        "fund_type": "Fund type (early-stage VC, growth equity, buyout)",
+        "fund_size": "Fund size (e.g., $100M)",
+        "mgmt_fee": "Management fee (default: 2%)",
+        "carry": "Carried interest (default: 20%)",
+        "pref": "Preferred return (default: 8%)"
+      }
+    }
+  },
+  "inputs": {
+    "partial_upload": "Some files were not uploaded. Check the selected inputs and retry any missing files.",
+    "upload_failed": "Upload failed. Try again.",
+    "sandbox": "Project sandbox",
+    "sandbox_help": "Choose files or folders already in this project, including results from earlier chats. These are on the machine running BYOK.",
+    "search": "Search sandbox files and folders",
+    "search_placeholder": "Search by name or path",
+    "refresh_label": "Refresh sandbox files and folders",
+    "refresh_failed": "Could not refresh project files. Try again.",
+    "refresh": "Refresh",
+    "not_ready": "Project file list is not available yet. Refresh to try again, or specify a data location below.",
+    "no_matches": "No matching files or folders.",
+    "empty": "No project files or folders yet. Upload files or specify a data location below.",
+    "selected": "Selected project inputs",
+    "remove_help": "Removing a selection keeps the data in the project.",
+    "source_help": "You can also upload from this device or add a host path or data URL. Sources can be combined.",
+    "upload_files_label": "Upload workflow files",
+    "upload_folder_label": "Upload workflow folder",
+    "upload_files": "Upload files from this device",
+    "upload_folder": "Upload folder",
+    "host_source": "Use a host path or data URL",
+    "locations": "Data locations (one per line)",
+    "access_help": "Paths must be readable where BYOK runs. URLs and storage locations need a reachable source and any required connector or host credentials already configured. Kady checks access when the workflow starts. Do not paste secrets or signed URLs here.",
+    "uploading": "Uploading to the BYOK project…",
+    "showing": "Showing 100 of {count} files and folders. Search to narrow the list.",
+    "remove": "Remove {path} from workflow",
+    "location_examples": "/mnt/study/counts.csv\nuser_data/study/\ns3://bucket/study/\nhttps://example.org/data.csv"
+  }
+}

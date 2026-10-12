@@ -26,6 +26,20 @@ import localModelEn from "./localModel/en.json";
 import skillHubKo from "./skillHub/ko.json";
 import skillHubEn from "./skillHub/en.json";
 
+// gaid-ui-locale: upstream K-Dense screens
+import settingsKo from "./settings/ko.json";
+import settingsEn from "./settings/en.json";
+import notebookKo from "./notebook/ko.json";
+import notebookEn from "./notebook/en.json";
+import researchKo from "./research/ko.json";
+import researchEn from "./research/en.json";
+import filesKo from "./files/ko.json";
+import filesEn from "./files/en.json";
+import workKo from "./work/ko.json";
+import workEn from "./work/en.json";
+import workflowsKo from "./workflows/ko.json";
+import workflowsEn from "./workflows/en.json";
+
 export type Catalogue = Record<string, string>;
 
 function flatten(value: unknown, prefix = "", out: Catalogue = {}): Catalogue {
@@ -59,4 +73,11 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   context: pair(contextKo, contextEn),
   // local model card (WP03)
   localModel: pair(localModelKo, localModelEn),
+  // gaid-ui-locale: upstream K-Dense screens (settings, notebook, research dialogs, files, work surfaces, workflows)
+  settings: pair(settingsKo, settingsEn),
+  notebook: pair(notebookKo, notebookEn),
+  research: pair(researchKo, researchEn),
+  files: pair(filesKo, filesEn),
+  work: pair(workKo, workEn),
+  workflows: pair(workflowsKo, workflowsEn),
 };
