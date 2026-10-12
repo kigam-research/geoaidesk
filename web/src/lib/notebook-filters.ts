@@ -1,8 +1,13 @@
+import { geoText } from "@/geo/i18n";
+
+
 /**
  * Filtering/search/counting helpers for the notebook view, plus the stable
- * per-agent accent palette used by lanes and badges. Pure.
+ * per-agent accent palette used by lanes and badges.
  */
 import type { NotebookEntry, NotebookEntryType } from "./notebook";
+
+const nbText = geoText("notebook");
 
 export interface NotebookFilterState {
   /** Empty set = all types. */
@@ -87,7 +92,7 @@ export function agentAccent(role: string): AgentAccent {
 
 /** Display label for a lane/badge role. */
 export function roleLabel(role: string): string {
-  if (role === "agent") return "Kady (lead)";
-  if (role === "you") return "You";
+  if (role === "agent") return nbText("role.lead");
+  if (role === "you") return nbText("role.you");
   return role;
 }

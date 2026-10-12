@@ -1,5 +1,5 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoText, geoLocale } from "@/geo/i18n";
 import {
   AtomIcon,
   BarChart3Icon,
@@ -45,6 +45,7 @@ import type {
 import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 
+const nbText = geoText("notebook");
 const appText = geoText("app");
 
 const KIND_META: Record<
@@ -68,7 +69,7 @@ function formatNumber(value: number): string {
   if (abs !== 0 && (abs < 0.001 || abs >= 1_000_000)) {
     return value.toExponential(3);
   }
-  return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+  return value.toLocaleString(geoLocale(), { maximumFractionDigits: 6 });
 }
 
 function formatScalar(value: ScientificScalar | undefined): string {
@@ -104,7 +105,7 @@ function FileButton({
         <span className="block truncate text-xs font-medium">{label}</span>
         {(artifact.description || artifact.role) && (
           <span className="block truncate text-[11px] text-muted-foreground">
-            {[artifact.role, artifact.description].filter(Boolean).join(" · ")}
+            {[artifact.role ? nbText(`artifact_role.${artifact.role}`) : undefined, artifact.description].filter(Boolean).join(" · ")}
           </span>
         )}
       </span>
@@ -177,7 +178,7 @@ function TableBody({ card }: { card: TableResult }) {
       </div>
       {(card.truncated || total > shown) && (
         <p className="text-[11px] text-muted-foreground">
-          {appText("result.shownRows", { total: total.toLocaleString(), shown: shown.toLocaleString() })}
+          {appText("result.shownRows", { total: total.toLocaleString(geoLocale()), shown: shown.toLocaleString(geoLocale()) })}
         </p>
       )}
     </div>
@@ -237,7 +238,7 @@ function StatisticalBody({ card }: { card: StatisticalTestResult }) {
           });
         }
         if (test.sampleSize !== undefined) {
-          values.push({ label: "n", value: test.sampleSize.toLocaleString() });
+          values.push({ label: "n", value: test.sampleSize.toLocaleString(geoLocale()) });
         }
         return (
           <section key={`${test.name}:${index}`} className="rounded-md border p-2.5">
@@ -394,8 +395,8 @@ function DatasetBody({
   onOpenFile?: (path: string) => void;
 }) {
   const dimensions =
-    card.dimensions?.map((dimension) => `${dimension.name}: ${dimension.size.toLocaleString()}`) ??
-    card.shape?.map((size, index) => `dim${index + 1}: ${size.toLocaleString()}`) ??
+    card.dimensions?.map((dimension) => `${dimension.name}: ${dimension.size.toLocaleString(geoLocale())}`) ??
+    card.shape?.map((size, index) => `dim${index + 1}: ${size.toLocaleString(geoLocale())}`) ??
     [];
   return (
     <div className="space-y-2">
@@ -415,12 +416,12 @@ function DatasetBody({
         ))}
         {card.rowCount !== undefined && (
           <span className="rounded-full border bg-muted/30 px-2 py-0.5 text-[11px]">
-            {appText("result.rows", { count: card.rowCount.toLocaleString() })}
+            {appText("result.rows", { count: card.rowCount.toLocaleString(geoLocale()) })}
           </span>
         )}
         {card.columnCount !== undefined && (
           <span className="rounded-full border bg-muted/30 px-2 py-0.5 text-[11px]">
-            {appText("result.columns", { count: card.columnCount.toLocaleString() })}
+            {appText("result.columns", { count: card.columnCount.toLocaleString(geoLocale()) })}
           </span>
         )}
       </div>
@@ -451,10 +452,10 @@ function DatasetBody({
                   <td className="px-2.5 py-1.5 font-mono text-[11px]">{field.dtype}</td>
                   <td className="px-2.5 py-1.5">{field.unit ?? "—"}</td>
                   <td className="px-2.5 py-1.5">
-                    {field.missing?.toLocaleString() ?? "—"}
+                    {field.missing?.toLocaleString(geoLocale()) ?? "—"}
                   </td>
                   <td className="px-2.5 py-1.5">
-                    {field.unique?.toLocaleString() ?? "—"}
+                    {field.unique?.toLocaleString(geoLocale()) ?? "—"}
                   </td>
                 </tr>
               ))}
@@ -525,8 +526,8 @@ function MoleculeBody({
   const facts = [
     card.formula && [appText("result.formula"), card.formula],
     card.molecularWeight !== undefined && [appText("result.molecular_weight"), formatNumber(card.molecularWeight)],
-    card.atomCount !== undefined && [appText("result.atoms"), card.atomCount.toLocaleString()],
-    card.bondCount !== undefined && [appText("result.bonds"), card.bondCount.toLocaleString()],
+    card.atomCount !== undefined && [appText("result.atoms"), card.atomCount.toLocaleString(geoLocale())],
+    card.bondCount !== undefined && [appText("result.bonds"), card.bondCount.toLocaleString(geoLocale())],
   ].filter(Boolean) as [string, string][];
   return (
     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">

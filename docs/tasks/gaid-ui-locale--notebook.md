@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T14:22:59Z
+updated: 2026-10-12T14:32:37Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"334bb7bf-c7ab-4250-b73e-1471a312e37f","pid":156917,"provider":"codex","session":"01a13070-cbd3-7342-84f1-7f5315c5f76d","start":"28006151","token":"3629085d8a1d23c5b9de8f99b11198713cbb9dc06174c176c4fe351ffbf0c804"}
 branch: task/gaid-ui-locale--notebook
 target: task/gaid-ui-locale
@@ -74,11 +74,17 @@ How (follow the established pattern; see `web/src/components/chat-tabs-bar.tsx`,
   changes (named paths for new files) and `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented 264 new paired notebook messages across all nine owned files, plus two shared display helpers. Preserved existing app/workspace scientific-result ids. Copy validator: 0 errors; six notebook English warnings reviewed as negated verification/automatic-inference limits, not promotional claims. Scanner has only git HEAD and InChI in owned files (technical identifiers). Typecheck passed after fixing optional count argument types and preserving the artifact role enum. Full web tests are next.
 ## Next steps
-1. (the next session's first action)
+1. Complete typecheck and full web tests, record results, then save and finish.
 ## Failed approaches
+- Initial task resume waited for another transaction; retry succeeded with no relocation.
+- The first recorded npm-ci job installed dependencies in its isolated source snapshot, not this worktree. Installed once in web locally as required by the child contract. A second job attempt was rejected before launch because the task source was dirty; no job to resume.
+- Initial scanner needed dependencies and its external output directory; installed dependencies and created the directory, then scanner succeeded.
+- First typecheck found optional counts and translated artifact role enum; fixed call-site narrowing and translated the role only at display. A subsequent invocation from repo root had no local TypeScript package; reran in web.
 ## Notes and decisions
+- Sequential work: settle catalogue wording and status labels, substitute components, inspect residual literals, then run checks. This child owns all edits; no nested writers.
+- Shared display helpers `web/src/lib/notebook-filters.ts` (role labels) and `web/src/lib/notebook-timeline.ts` (date locale) also need small substitutions; report them for parent boundary registration. Do not modify shared evidence semantics or persisted values.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -91,6 +97,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-locale--notebook-20261012T142357.390360Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
