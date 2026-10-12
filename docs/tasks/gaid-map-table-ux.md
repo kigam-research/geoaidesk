@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-12T09:11:30Z
+updated: 2026-10-12T09:26:36Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"3deaaa94-6146-4a8e-bcdd-a4b418119648","pid":3104588,"provider":"claude","session":"faf47acc-261b-40ba-9a0d-c18d0e922752","start":"26228112","token":"6a36ad34b48eccc61baf2cd33f8b62570ba6f59749ebdf9f20c421a3674a4a1f"}
 branch: task/gaid-map-table-ux
 target: main
@@ -54,11 +54,29 @@ analysis; source CRS vs display CRS stay distinct.
   web/next-env.d.ts, web/tsconfig.tsbuildinfo, __pycache__) so the unit can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Implemented in `web/src/geo/viewers/map/` (no server change; filter/sort run client-side):
+  - `index.tsx`: header toolbar; display CRS + compact basemap row; map and right panel side by side
+    (container query `@3xl`, panel w-80 scrolls on its own at the map height; narrower: panel stacks under the map);
+    basemap credits in the map corner (`BasemapAttributions`); selection/pixel info as a map mini popup (`MapPopup`).
+  - `side-panel.tsx`: layers (visibility, opacity, order, remove, add), legend, basic info (source file, source/display
+    CRS, units, extent, feature count or raster size, sampling, issues), display settings (GPKG layer, band, variable,
+    categorical field).
+  - `attribute-table.tsx` + `table.ts`: header sort cycle (asc/desc/none, aria-sort) and per-column popover menu (sort,
+    "contains" text, value checklist with counts, clear). Whole-layer tables sort/filter/page every feature; viewport
+    tables apply them to the current server page only (stated in the UI). Table state never changes map or area table.
+  - `map-canvas.tsx`: OpenLayers Overlay popup (portal), anchored at the click point or the feature anchor (table
+    selection; whole-layer features outside the view are centred, viewport layers are not panned); empty click closes.
+    Selection carries the response it indexes, so a newer viewport page drops it.
+  - Locale ids appended to `web/src/geo/locales/map/{ko,en}.json`.
+- Verified: `npx tsc --noEmit`, `npx vitest run src/geo/viewers/map` (33 passed), copy validator 0 errors.
+- Own app instance: transient user unit `gaid-mtux-app` (UI 3310, backend 18310), data
+  ~/data/geoaidesk/work/gaid-map-table-ux/ (sample copies), log launcher.log there. Stop it before finishing.
 ## Next steps
-1. (the next session's first action)
+1. Browser screenshots (desktop/narrow) into reports/2026-10-12-gaid-map-table-ux/, report, scripts/check, finish.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: all three items touch the same viewer files (`index.tsx`, `map-canvas.tsx`), so one writer does them;
+  no child units.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

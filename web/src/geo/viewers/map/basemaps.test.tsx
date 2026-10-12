@@ -7,7 +7,7 @@ import { transform } from "ol/proj";
 import { apiFetch } from "@/lib/projects";
 import { setApiToken } from "@/lib/api-auth";
 import { basemapLayers, DEFAULT_BASEMAP_SELECTION, OFFLINE_BASEMAP_PROVIDERS, registerBasemapProjections, useBasemapCatalog, type BasemapProvider } from "./basemaps";
-import { BasemapPicker } from "./basemaps-picker";
+import { BasemapAttributions, BasemapPicker } from "./basemaps-picker";
 
 vi.mock("@/lib/projects", () => ({ API_BASE: "http://localhost:8000", apiFetch: vi.fn() }));
 const providers: BasemapProvider[] = [...OFFLINE_BASEMAP_PROVIDERS,
@@ -82,10 +82,11 @@ describe("picker and catalogue", () => {
     render(<BasemapPicker providers={providers} value={{ base: "osm", overlays: ["kigam-geology"] }} onChange={vi.fn()} disabled />);
     expect(screen.getByRole("combobox")).toBeDisabled(); expect(screen.getByRole("checkbox")).toBeDisabled();
     expect(screen.getByText(/require a declared source CRS/)).toBeInTheDocument();
+    render(<BasemapAttributions providers={providers} value={{ base: "osm", overlays: ["kigam-geology"] }} disabled />);
     expect(screen.queryByText("© OpenStreetMap contributors")).not.toBeInTheDocument();
   });
   it("always shows visible active OSM attribution linked to its copyright page", () => {
-    render(<BasemapPicker providers={providers} value={{ base: "osm", overlays: [] }} onChange={vi.fn()} disabled={false} />);
+    render(<BasemapAttributions providers={providers} value={{ base: "osm", overlays: [] }} disabled={false} />);
     expect(screen.getByRole("link", { name: "© OpenStreetMap contributors" })).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
   });
   it("falls back without keys/network and refreshes the catalogue on focus", async () => {

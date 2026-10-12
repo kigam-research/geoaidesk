@@ -1,6 +1,11 @@
 "use client";
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import OlMap from "ol/Map";
+import Overlay from "ol/Overlay";
+import type Feature from "ol/Feature";
+import type { Geometry, LineString, MultiPolygon, Point, Polygon } from "ol/geom";
+import { containsCoordinate, getCenter } from "ol/extent";
 import GeoJSON from "ol/format/GeoJSON";
 import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
@@ -29,9 +34,13 @@ interface Props {
   /** Source credits of the shown basemaps; written into the exported PNG. */
   attributions?: string[];
   fitVersion: number;
-  fields: Record<string, string>; selected?: { layerId: string; row: number };
-  onViewport(viewport: Viewport): void; onPick(layerId: string, row: number): void;
+  fields: Record<string, string>; selected?: { layerId: string; row: number; coordinate?: number[] };
+  /** Mini popup on the map: at the selected feature (click point, else the feature's anchor) or at a clicked point. */
+  popup?: { at: "selected" | number[]; content: ReactNode };
+  /** A click on a feature selects it; a click elsewhere reports the coordinate (raster pixel reads, closing the popup). */
+  onViewport(viewport: Viewport): void; onPick(layerId: string, row: number, coordinate: number[]): void;
   onCoordinate(coordinate: number[]): void; onError(message: string): void;
+  onClosePopup?(): void;
 }
 const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref) {
   const target = useRef<HTMLDivElement>(null);
@@ -86,6 +95,9 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     }, "image/png"));
   } }));
   useEffect(() => { fitted.current = false; }, [props.fitVersion]);
+  // The popup element lives outside React's tree position (OpenLayers moves it into the map); React renders into it by portal.
+  const popupElement = useMemo(() => typeof document === "undefined" ? null : document.createElement("div"), []);
+  const overlay = useRef<Overlay | null>(null);
   useEffect(() => {
     if (!target.current) return;
     fitted.current = false;
@@ -99,15 +111,18 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
       if (validBBox(bbox)) current.current.onViewport({ bbox, width: size[0], height: size[1] });
     });
     map.on("singleclick", event => {
-      current.current.onCoordinate(event.coordinate);
-      map.forEachFeatureAtPixel(event.pixel, feature => {
-        current.current.onPick(feature.get("_layerId"), feature.get("_rowIndex"));
+      const hit = map.forEachFeatureAtPixel(event.pixel, feature => {
+        if (feature.get("_layerId") === undefined) return undefined;
+        current.current.onPick(feature.get("_layerId"), feature.get("_rowIndex"), event.coordinate);
         return true;
       }, { hitTolerance: 5 });
+      if (!hit) current.current.onCoordinate(event.coordinate);
     });
+    if (popupElement) { overlay.current = new Overlay({ element: popupElement, stopEvent: true, offset: [0, 0] }); map.addOverlay(overlay.current); }
     const observer = new ResizeObserver(() => map.updateSize());
     observer.observe(target.current);
-    return () => { observer.disconnect(); map.setTarget(undefined); map.dispose(); mapRef.current = null; };
+    return () => { observer.disconnect(); map.setTarget(undefined); map.dispose(); mapRef.current = null; overlay.current = null; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.crs]);
   // OpenLayers layers are kept per layer identity: a tile layer keeps its tile cache across
   // re-renders (selection, opacity, order); only a new style/CRS/data object replaces it.
@@ -145,16 +160,64 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
       }
     } catch { current.current.onError(t("mapError")); }
   }, [props.layers, props.crs, props.fields, props.selected, props.activeId, props.fitVersion, props.projectId, props.backgroundLayers]);
+  // Popup position: a clicked point, or the selected feature's anchor (a table selection). A whole-layer
+  // feature outside the view is centred first; viewport layers are not panned (that would reload their page).
+  const popupAt = props.popup?.at;
+  useEffect(() => {
+    const map = mapRef.current; const o = overlay.current;
+    if (!map || !o) return;
+    let position: number[] | undefined;
+    if (Array.isArray(popupAt)) position = popupAt;
+    else if (popupAt === "selected" && props.selected) {
+      position = props.selected.coordinate;
+      if (!position) {
+        const layer = props.layers.find(l => l.id === props.selected!.layerId);
+        const source = (built.current.get(props.selected.layerId)?.layer as VectorLayer | undefined)?.getSource?.();
+        const feature = source?.getFeatures().find(f => f.get("_rowIndex") === props.selected!.row);
+        position = feature && featureAnchor(feature);
+        const size = map.getSize();
+        if (position && size && layer?.vectorMode === "full" && !containsCoordinate(map.getView().calculateExtent(size), position)) map.getView().setCenter(position);
+      }
+    }
+    o.setPosition(position);
+    if (!position) return;
+    // Open away from the nearest map edges so the popup stays inside the map without panning it.
+    const pixel = map.getPixelFromCoordinate(position); const size = map.getSize();
+    const below = !pixel || !size || pixel[1] < size[1] / 2;
+    const side = !pixel || !size ? "center" : pixel[0] < size[0] / 3 ? "left" : pixel[0] > (size[0] * 2) / 3 ? "right" : "center";
+    o.setPositioning(`${below ? "top" : "bottom"}-${side}`);
+    o.setOffset([side === "left" ? -12 : side === "right" ? 12 : 0, below ? 12 : -12]);
+  }, [popupAt, props.selected, props.layers, props.crs]);
+  useEffect(() => {
+    if (!popupElement) return;
+    const close = (e: KeyboardEvent) => { if (e.key === "Escape") current.current.onClosePopup?.(); };
+    popupElement.addEventListener("keydown", close);
+    return () => popupElement.removeEventListener("keydown", close);
+  }, [popupElement]);
   useEffect(() => () => { for (const entry of built.current.values()) entry.layer.dispose(); built.current.clear(); }, [props.crs]);
-  return <div className="relative h-[360px] min-h-[280px] w-full bg-white" style={{ backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%)", backgroundSize: "16px 16px" }}>
+  return <div className="relative h-full min-h-[320px] w-full bg-white" style={{ backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%)", backgroundSize: "16px 16px" }}>
     <div ref={target} role="region" aria-label={t("map")} className="h-full w-full" tabIndex={0} />
     <div className="absolute left-2 top-2 flex flex-col gap-1 text-black">
       <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomIn")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) + 1); }}>+</button>
       <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomOut")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) - 1); }}>−</button>
     </div>
+    {popupElement && props.popup && createPortal(props.popup.content, popupElement)}
   </div>;
 });
 export default MapCanvas;
+
+/** A point on the feature for its popup: the point itself, a polygon's interior point, a line's midpoint, else the extent centre. */
+function featureAnchor(feature: Feature): number[] | undefined {
+  const geometry = feature.getGeometry() as Geometry | undefined;
+  if (!geometry) return undefined;
+  switch (geometry.getType()) {
+    case "Point": return (geometry as Point).getCoordinates();
+    case "Polygon": return (geometry as Polygon).getInteriorPoint().getCoordinates().slice(0, 2);
+    case "MultiPolygon": return (geometry as MultiPolygon).getInteriorPoints().getCoordinates()[0]?.slice(0, 2);
+    case "LineString": return (geometry as LineString).getCoordinateAt(0.5);
+    default: return getCenter(geometry.getExtent());
+  }
+}
 
 /** Server-rendered display tiles on a deterministic grid: standard XYZ in Web Mercator, else one grid per layer extent. */
 function rasterTileLayer(map: OlMap, style: RasterStyle, layer: LayerState, projectId?: string): BaseLayer {

@@ -1,3 +1,4 @@
+import type React from "react";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoInspection } from "../../contracts/inspection";
@@ -9,9 +10,9 @@ vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn(), API_BASE: "", getActivePro
 vi.mock("../inspection-viewer", () => ({ default: () => <div>imaging-fallback</div> }));
 vi.mock("./map-canvas", async () => {
   const { forwardRef, useImperativeHandle } = await import("react");
-  return { default: forwardRef(function MockCanvas(props: { onViewport(v: unknown): void; onCoordinate(c: number[]): void; onPick(id: string, row: number): void }, ref) {
+  return { default: forwardRef(function MockCanvas(props: { onViewport(v: unknown): void; onCoordinate(c: number[]): void; onPick(id: string, row: number, c: number[]): void; popup?: { at: unknown; content: React.ReactNode } }, ref) {
     useImperativeHandle(ref, () => ({ fit: vi.fn(), exportPng: vi.fn().mockResolvedValue(undefined) }));
-    return <div><button onClick={() => props.onViewport({ bbox: [0, 0, 10, 10], width: 1000, height: 800 })}>pan-map</button><button onClick={() => props.onCoordinate([5, 15])}>pixel-zero</button><button onClick={() => props.onCoordinate([15, 15])}>pixel-null</button><button onClick={() => props.onPick("0", 0)}>pick-feature</button></div>;
+    return <div><button onClick={() => props.onViewport({ bbox: [0, 0, 10, 10], width: 1000, height: 800 })}>pan-map</button><button onClick={() => props.onCoordinate([5, 15])}>pixel-zero</button><button onClick={() => props.onCoordinate([15, 15])}>pixel-null</button><button onClick={() => props.onPick("0", 0, [1, 1])}>pick-feature</button><div data-testid="map-popup" data-at={JSON.stringify(props.popup?.at ?? null)}>{props.popup?.content}</div></div>;
   }) };
 });
 const mockFetch = vi.mocked(apiFetch);
@@ -34,7 +35,9 @@ describe("map viewer", () => {
     const [first, second] = mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page");
     expect(body(first)).toMatchObject({ layer: "rocks", full: true, displayCrs: "EPSG:3857" }); expect(body(first)).not.toHaveProperty("bbox"); expect(first[2]).toBe("project-a");
     expect(body(second)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(second[2]).toBe("project-a");
-    expect(screen.getByText(/Source CRS: EPSG:5186/)).toBeInTheDocument(); expect(screen.getByText(/Display CRS: EPSG:3857/)).toBeInTheDocument();
+    // Basic information sits in the panel next to the map.
+    const info = within(screen.getByRole("complementary", { name: "Map information" })).getByRole("region", { name: "Layer information" });
+    expect(info).toHaveTextContent("Source CRSEPSG:5186"); expect(info).toHaveTextContent("Display CRSEPSG:3857");
     const basemaps = screen.getByRole("region", { name: /basemap/i });
     expect(within(basemaps).getByRole("combobox")).toBeEnabled(); expect(within(basemaps).getByRole("combobox")).toHaveValue("none");
     fireEvent.click(screen.getByText("Next page"));
@@ -43,7 +46,13 @@ describe("map viewer", () => {
     await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").at(-1)!)).toMatchObject({ bbox: [0, 0, 10, 10], offset: 0 }));
     fireEvent.change(screen.getByLabelText("GeoPackage layer"), { target: { value: "faults" } });
     await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").at(-1)!)).toMatchObject({ layer: "faults", offset: 0 }));
-    fireEvent.click(screen.getByText("pick-feature")); await screen.findByText("Selected feature properties");
+    await screen.findAllByRole("cell", { name: "granite" });
+    fireEvent.click(screen.getByText("pick-feature"));
+    // The selected feature opens as a mini popup on the map at the clicked point, not as a list below the table.
+    const popup = screen.getByTestId("map-popup");
+    expect(within(popup).getByRole("dialog", { name: "Selected feature properties" })).toHaveTextContent("classgranite"); expect(popup).toHaveAttribute("data-at", '"selected"');
+    fireEvent.click(within(popup).getByRole("button", { name: "Close popup" }));
+    expect(within(popup).queryByRole("dialog")).not.toBeInTheDocument();
   });
   it("keeps unknown CRS native, blocks overlay, and disables analytical area", async () => {
     mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection(JSON.parse(String(init?.body)).path, true)) : respond({ ...page(), displayCrs: "native", sourceCrs: { status: "unknown" } }));
@@ -102,7 +111,8 @@ describe("map viewer", () => {
     mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(rasterInspection) : url === "/geo/raster-point" ? respond(body([url, init]).coordinate[0] === 5 ? { kind: "raster-point", band: 1, inside: true, row: 0, col: 0, value: 0 } : { kind: "raster-point", band: 1, inside: true, row: 0, col: 1, value: null }) : respond(style));
     render(<MapViewer {...props} path="dem.tif" />); await screen.findByText(/Source size: 2 × 2 pixels/);
     expect(screen.getByText(/-1\.00000 or less/)).toBeInTheDocument();
-    fireEvent.click(screen.getByText("pixel-zero")); expect(await screen.findByText(/row 0, column 0, value 0/)).toBeInTheDocument();
+    fireEvent.click(screen.getByText("pixel-zero")); expect(await within(screen.getByTestId("map-popup")).findByText(/row 0, column 0, value 0/)).toBeInTheDocument();
+    expect(screen.getByTestId("map-popup")).toHaveAttribute("data-at", "[5,15]");
     expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-point").at(-1)!)).toEqual({ path: "dem.tif", band: 1, displayCrs: "EPSG:3857", coordinate: [5, 15] });
     fireEvent.click(screen.getByText("pixel-null")); expect(await screen.findByText(/row 0, column 1, value No data/)).toBeInTheDocument();
     const styles = () => mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-style");
@@ -127,10 +137,39 @@ describe("map viewer", () => {
     fireEvent.change(screen.getByLabelText("Opacity: two.gpkg"), { target: { value: "0.35" } });
     expect(screen.getByLabelText("Opacity: two.gpkg")).toHaveValue("0.35");
     expect(mockFetch.mock.calls).toHaveLength(requestsBeforeOpacity);
-    fireEvent.click(screen.getAllByText("Move layer up")[1]);
+    fireEvent.click(screen.getAllByRole("button", { name: /^Move layer up/ })[1]);
     expect(screen.getAllByRole("button", { name: /Select layer:/ })[0]).toHaveTextContent("two.gpkg");
-    const twoRow = screen.getByRole("button", { name: "Select layer: two.gpkg" }).parentElement!;
+    const twoRow = screen.getByRole("button", { name: "Select layer: two.gpkg" }).closest<HTMLElement>("[data-layer-row]")!;
     fireEvent.click(within(twoRow).getByLabelText("Show on map"));
     expect(within(twoRow).getByLabelText("Show on map")).not.toBeChecked();
+  });
+  it("sorts and filters the whole-layer table from the column headers and opens a table row as a map popup", async () => {
+    const full: VectorPage = { ...page(), full: true, nextOffset: null, preview: { sampled: false, truncated: false, method: "full", totalFeatures: 3 }, fields: ["class", "age"],
+      features: { type: "FeatureCollection", features: [{ class: "granite", age: 220 }, { class: "gneiss", age: null }, { class: "alluvium", age: 0 }].map(properties => ({ type: "Feature" as const, geometry: null, properties })) } };
+    mockFetch.mockImplementation(url => url === "/geo/inspect" ? respond(inspection()) : respond(full));
+    render(<MapViewer {...props} />);
+    const table = await screen.findByRole("region", { name: "Layer attribute table" });
+    expect(table).toHaveTextContent("Sort and filters apply to every feature of the layer");
+    const firstColumn = () => within(table).getAllByRole("row").slice(1).map(r => within(r).getAllByRole("cell")[0].textContent);
+    expect(firstColumn()).toEqual(["granite", "gneiss", "alluvium"]);
+    fireEvent.click(within(table).getByRole("button", { name: "age" }));
+    expect(within(table).getByRole("columnheader", { name: /age/ })).toHaveAttribute("aria-sort", "ascending");
+    expect(firstColumn()).toEqual(["alluvium", "granite", "gneiss"]); // 0 before 220, missing last
+    fireEvent.click(within(table).getByRole("button", { name: "age" }));
+    expect(firstColumn()).toEqual(["granite", "alluvium", "gneiss"]);
+    fireEvent.click(within(table).getByRole("button", { name: "Sort and filter column class" }));
+    const menu = await screen.findByRole("dialog");
+    fireEvent.change(within(menu).getByLabelText("Contains"), { target: { value: "GN" } });
+    expect(firstColumn()).toEqual(["gneiss"]); expect(table).toHaveTextContent("Matching rows: 1 of 3");
+    fireEvent.click(within(menu).getByRole("button", { name: "Clear column filter" }));
+    fireEvent.click(within(menu).getByRole("checkbox", { name: /granite/ }));
+    expect(firstColumn()).toEqual(["alluvium", "gneiss"]);
+    fireEvent.keyDown(menu, { key: "Escape" });
+    fireEvent.click(within(table).getByRole("button", { name: "Clear sort and filters" }));
+    expect(firstColumn()).toEqual(["granite", "gneiss", "alluvium"]);
+    // A table row selects the feature; the canvas places the popup at that feature.
+    fireEvent.click(within(table).getAllByRole("row")[2]);
+    expect(screen.getByTestId("map-popup")).toHaveAttribute("data-at", '"selected"');
+    expect(within(screen.getByTestId("map-popup")).getByRole("dialog", { name: "Selected feature properties" })).toHaveTextContent("classgneissageNo data");
   });
 });
