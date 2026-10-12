@@ -2,7 +2,36 @@
 
 The map viewer is a read-only surface over project sandbox files. It uses OpenLayers for interaction and the same
 `geo-inspection/v1` metadata that `geo_inspect` returns to the agent. It does not require an external basemap or a model
-call. Raster/vector source coordinates are never rewritten for display.
+call; optional online basemaps are described in `docs/geo/basemaps.md`. Raster/vector source coordinates are never
+rewritten for display.
+
+## Display delivery (gaid-map-tiles)
+
+Decision record: research and choice of OpenLayers + tiles in `docs/tasks/gaid-map-tiles.md` and the report
+`reports/2026-10-12-gaid-map-tiles/index.md`.
+
+- **View CRS.** A layer whose declared source CRS is projected and has an EPSG code (for example EPSG:5186/5179) opens
+  in that CRS; the helper returns its PROJ string and the viewer registers it with proj4. Web Mercator (EPSG:3857) is
+  selectable; geographic sources open in Web Mercator. Unknown CRS stays native/pixel, without basemaps or overlays.
+- **Raster tiles.** `POST /geo/raster-style` returns the whole-raster display style once per layer/band/view CRS:
+  full extent in the view CRS, source pixel size, colour range (2nd/98th percentile of an overview sample, or the
+  classes of that sample for categorical display) and a source version. OpenLayers then requests
+  `GET /geo/raster-tile?path&band&crs&bbox&size&low&high|categorical&v` for a deterministic grid: standard XYZ in
+  EPSG:3857, otherwise one grid per layer extent (top-left origin, resolutions halving from one tile to a quarter of
+  the source pixel). Tiles are 256 px nearest-neighbour PNGs, transparent outside the raster and for nodata/mask.
+- **Pixel values.** A click calls `POST /geo/raster-point`, which reads the original file at full resolution (row,
+  column, value or nodata). Tiles and colour ranges are display-only and never feed analysis.
+- **Large rasters.** A raster over 2048 px without overviews gets a derived display overview VRT (nearest) in the
+  map cache (`GAID_MAP_CACHE_DIR`, default `<GAID_HOME>/cache/maps`, else next to the skills cache; pruned oldest-first
+  above `GAID_MAP_CACHE_BYTES`, default 4 GiB). The source file is never modified; the cache key includes its
+  path, size and mtime.
+- **Vectors.** The viewer first requests the whole layer (`full: true`: up to 20,000 features / 400,000 vertices /
+  24 MiB) and draws it client-side without further requests. A larger layer falls back to the bounded viewport pages
+  below (500 features per request). The attribute table pages the whole layer in the browser.
+- **Workers and caches.** The backend keeps a pool of long-lived helper processes (`helper.py --serve`, JSON lines;
+  `GAID_MAP_WORKERS`, default min(3, CPUs/2)) that keep datasets, CRS transformers and vector metadata open. A worker
+  that exceeds its time/output budget is killed and replaced. Tile responses are cached in a 96 MiB in-memory LRU with
+  in-flight de-duplication and sent with `Cache-Control: private, max-age=86400` under versioned URLs.
 
 ## Workflow
 
@@ -29,8 +58,11 @@ Paths are sandbox relative. The source and its implicitly read companion files m
 | Route | Input | Output |
 |---|---|---|
 | `POST /geo/inspect` | `{path}` | Shared metadata, CRS, layers/bands, issues, source fingerprint |
-| `POST /geo/vector-page` | `{path, layer?, variable?, displayCrs?, bbox?, offset?, limit?}` | Bounded GeoJSON features, attributes, legend, source/display CRS and preview scope |
-| `POST /geo/raster-window` | `{path, band?, categorical?, displayCrs?, bbox?, width?, height?}` | Bounded PNG and matching sample values; null represents mask/nodata |
+| `POST /geo/vector-page` | `{path, layer?, variable?, displayCrs?, bbox?, offset?, limit?, full?}` | Bounded GeoJSON features, attributes, legend, source/display CRS and preview scope; `full` = whole layer when within bounds |
+| `POST /geo/raster-window` | `{path, band?, categorical?, displayCrs?, bbox?, width?, height?}` | Bounded PNG and matching sample values; null represents mask/nodata (kept for compatibility; the viewer uses tiles) |
+| `POST /geo/raster-style` | `{path, band?, categorical?, displayCrs?}` | Whole-raster display style: extent, colour range/classes, source pixel size, version |
+| `GET /geo/raster-tile` | query `path, band, crs, bbox, size (256/512), low+high or categorical, v` | One display tile (PNG) |
+| `POST /geo/raster-point` | `{path, band?, displayCrs?, coordinate}` | Original-file pixel value at full resolution |
 | `POST /geo/area-table` | `{path, layer?, classField, method, areaCrs?}` | Full-layer class areas in m², percentages and limitations |
 | `POST /geo/result` | `{path}` | Validated map manifest with referenced-layer inspections |
 
@@ -41,9 +73,10 @@ geometry complexity, attributes, class counts and analysis feature counts. Categ
 neighbor. Non-COG rasters use backend windows rather than whole-raster browser downloads. GDAL may read source blocks
 internally; this is an output/allocation limit, not a promise of a fixed on-disk byte count.
 
-The helper (`server/src/geo/maps/helper.py`) reads one JSON stdin request and writes one JSON stdout response. The
-bridge uses the prepared uv helper environment, no shell or implicit dependency installation; four concurrent readers,
-20 seconds/request and 8 MiB stdout. A failure is visible, never replaced by invented CRS or an empty success.
+The helper (`server/src/geo/maps/helper.py`) reads one JSON stdin request and writes one JSON stdout response, or
+with `--serve` one JSON line per request. The bridge uses the prepared uv helper environment, no shell or implicit
+dependency installation; a bounded worker pool, 20 seconds/request (180 s for a style that prepares overviews) and
+32 MiB per response. A failure is visible, never replaced by invented CRS or an empty success.
 
 Inspection fingerprints include primary size/mtime, available Shapefile components, raster auxiliary/mask/overview/
 world files and inspector version. They invalidate metadata identity when companions change; they are not content hashes.

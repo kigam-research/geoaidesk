@@ -1,0 +1,22 @@
+{
+  "title": "배경지도와 지질도",
+  "base": "배경지도",
+  "provider": {
+    "none": "배경지도 없음",
+    "osm": "OpenStreetMap",
+    "ngii-base": "NGII 바로e맵 일반지도",
+    "ngii-satellite": "NGII 바로e맵 영상지도",
+    "ngii-white": "NGII 바로e맵 백지도",
+    "kigam-geology": "KIGAM 1:5만 지질도"
+  },
+  "attribution": {
+    "osm": "&copy; OpenStreetMap contributors",
+    "ngii": "&copy; 국토지리정보원(NGII) 바로e맵",
+    "kigam-geology": "한국지질자원연구원(KIGAM) 1:5만 지질도"
+  },
+  "missingKey": "서버에 API 키가 없습니다",
+  "missingReferer": "NGII에 등록한 활용URL이 없습니다",
+  "crsRequired": "배경지도와 지질도를 표시하려면 원본 CRS가 필요합니다. 픽셀 좌표에서는 표시하지 않습니다.",
+  "onlineNotice": "온라인 지도는 네트워크 연결이 필요합니다. 배경지도 없음은 네트워크나 API 키 없이 사용할 수 있습니다.",
+  "catalogError": "배경지도 목록을 불러오지 못했습니다. 배경지도 없음은 사용할 수 있습니다."
+}

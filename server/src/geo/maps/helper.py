@@ -8,6 +8,7 @@ import hashlib
 import io
 import json
 import math
+import os
 from pathlib import Path
 import sqlite3
 import sys
@@ -23,6 +24,8 @@ try:
     from pyproj.exceptions import ProjError
     import rasterio
     from rasterio.enums import ColorInterp, Resampling
+    import rasterio.shutil
+    from rasterio.warp import calculate_default_transform
     from rasterio.transform import from_bounds
     from rasterio.vrt import WarpedVRT
     from rasterio.windows import Window
@@ -39,12 +42,18 @@ except ImportError as exc:
 
 MAX_FEATURES = 100000
 MAX_VERTICES = 30000
+FULL_FEATURES = 20000
+FULL_VERTICES = 400000
 MAX_WKB = 2 * 1024 * 1024
+TILE_LIMIT = 512
+STYLE_SAMPLE = 1024
+OVERVIEW_THRESHOLD = 2048
 START = time.monotonic()
+BUDGET = 17
 
 
 def check_time():
-    if time.monotonic() - START > 17:
+    if time.monotonic() - START > BUDGET:
         raise ValueError('Map operation exceeded its time budget')
 
 
@@ -52,15 +61,33 @@ def issue(code, message, severity='warning', **kwargs):
     return dict(code=code, message=message, severity=severity, **kwargs)
 
 
+CRS_INFO = {}
+
+
 def crs_info(value):
+    """Cached: an EPSG lookup for a WKT-only .prj (to_authority) takes ~0.3 s."""
     if not value:
         return {'status': 'unknown'}
+    key = value.to_wkt() if isinstance(value, CRS) else str(value)
+    if key not in CRS_INFO:
+        if len(CRS_INFO) > 256:
+            CRS_INFO.clear()
+        CRS_INFO[key] = describe_crs(value)
+    return dict(CRS_INFO[key])
+
+
+def describe_crs(value):
     crs = CRS.from_user_input(value)
     result = {'status': 'declared', 'name': crs.name, 'wkt': crs.to_wkt(),
               'axisUnits': ', '.join(dict.fromkeys(a.unit_name for a in crs.axis_info))}
     authority = crs.to_authority()
     if authority:
         result['authority'] = ':'.join(authority)
+    result['projected'] = bool(crs.is_projected)
+    try:
+        result['proj4'] = crs.to_proj4()
+    except ProjError:
+        pass
     return result
 
 
@@ -149,7 +176,22 @@ def companions(path):
     return issues, missing
 
 
+VECTOR_METADATA = {}
+
+
 def vector_metadata(path):
+    """Cached per source identity (primary + companions) in a long-lived worker."""
+    names = sorted(p for p in path.parent.iterdir() if p.stem.lower() == path.stem.lower())
+    key = (str(path), tuple((p.name, p.stat().st_mtime_ns, p.stat().st_size) for p in names if p.is_file()))
+    if key not in VECTOR_METADATA:
+        if len(VECTOR_METADATA) > 64:
+            VECTOR_METADATA.clear()
+        VECTOR_METADATA[key] = read_vector_metadata(path)
+    infos, issues, missing = VECTOR_METADATA[key]
+    return infos, [dict(i) for i in issues], list(missing)
+
+
+def read_vector_metadata(path):
     issues, missing = companions(path)
     if path.suffix.lower() == '.geojson':
         issues.append(issue('geojson-coordinate-interpretation',
@@ -244,17 +286,21 @@ def vector_page(path, req):
     display, target = display_info(req, source)
     bounds = bbox_request(req)
     filter_bounds = bounds
-    transformer = None
+    to_display = None
     if target and source != target:
-        transformer = Transformer.from_crs(source, target, always_xy=True)
+        to_display = transformer(source, target)
         if bounds:
-            filter_bounds = Transformer.from_crs(target, source, always_xy=True).transform_bounds(*bounds, densify_pts=21)
+            filter_bounds = transformer(target, source).transform_bounds(*bounds, densify_pts=21)
             if not finite_bounds(filter_bounds):
                 raise ValueError('Viewport cannot be transformed to the source CRS')
             if filter_bounds[0] > filter_bounds[2]:
                 raise ValueError('Antimeridian viewport must be split into separate requests')
-    limit = integer(req, 'limit', 200, 1, 500)
-    offset = integer(req, 'offset', 0, 0, 100000, clamp=False)
+    full = bool(req.get('full'))
+    if full and bounds is not None:
+        raise ValueError('A full-layer display request has no bbox')
+    limit = integer(req, 'limit', 200, 1, FULL_FEATURES if full else 500)
+    offset = 0 if full else integer(req, 'offset', 0, 0, 100000, clamp=False)
+    vertex_budget = FULL_VERTICES if full else MAX_VERTICES
     fields = list(info['fields'])[:64]
     variable = req.get('variable')
     if variable is not None and variable not in info['fields']:
@@ -263,18 +309,27 @@ def vector_page(path, req):
         fields[-1] = variable
     if len(info['fields']) > len(fields):
         issues.append(issue('fields-truncated', 'Only 64 selected attribute fields are displayed.'))
-    meta, fids, wkbs, arrays = read_batch(path, info, offset, limit + 1, filter_bounds, fields)
+    # The layer CRS comes from cached metadata; skip GDAL's per-open .prj EPSG matching (~0.15 s) for this read.
+    pyogrio.set_gdal_config_options({'USE_OSR_FIND_MATCHES': 'NO'})
+    try:
+        meta, fids, wkbs, arrays = read_batch(path, info, offset, limit + 1, filter_bounds, fields)
+    finally:
+        pyogrio.set_gdal_config_options({'USE_OSR_FIND_MATCHES': None})
     more = len(fids) > limit
     features, vertices, class_values, extents = [], 0, [], []
     for index, fid in enumerate(fids[:limit]):
         check_time()
-        geom = geometry(wkbs[index], 10000)
+        geom = geometry(wkbs[index], 200000 if full else 10000)
         if geom is not None:
             vertices += shapely.get_num_coordinates(geom)
-            if vertices > MAX_VERTICES:
+            if vertices > vertex_budget:
+                if full:
+                    # Too heavy for client-side display: the viewer switches to viewport pages.
+                    more = True
+                    break
                 raise ValueError('Page exceeds 30000 vertices; request fewer features')
-            if transformer:
-                geom = transform_geometry(transformer.transform, geom)
+            if to_display:
+                geom = transform_geometry(to_display.transform, geom)
             if not np.isfinite(shapely.get_coordinates(geom)).all():
                 raise ValueError('Geometry cannot be transformed to the display CRS')
             if not geom.is_empty:
@@ -289,8 +344,9 @@ def vector_page(path, req):
         else:
             bounds = [0, 0, 0, 0]
     total = int(info['features'])
+    method = 'whole layer for display; no geometry simplification' if full else 'viewport-filtered paginated features; no geometry simplification'
     preview = dict(sampled=bool('bbox' in req or more or offset or total < 0 or total > len(features)),
-                   truncated=more, method='viewport-filtered paginated features; no geometry simplification', displayedFeatures=len(features))
+                   truncated=more, method=method, displayedFeatures=len(features))
     if total >= 0:
         preview['totalFeatures'] = total
     if not source:
@@ -300,7 +356,7 @@ def vector_page(path, req):
     return dict(kind='vector', path=str(path), layer=info['layer_name'], sourceCrs=crs_info(source), displayCrs=display,
                 bbox=bounds, issues=issues, preview=preview, legend=categorical_legend(class_values, issues), nodata=None,
                 features=dict(type='FeatureCollection', features=features), fields=fields,
-                nextOffset=offset + len(features) if more and offset + len(features) <= 100000 else None)
+                nextOffset=offset + len(features) if more and offset + len(features) <= 100000 else None, full=full and not more)
 
 
 def raster_metadata(src):
@@ -334,7 +390,7 @@ def raster_window(path, req):
             raise ValueError('Selected band does not exist')
         bounds = bbox_request(req)
         if target:
-            full = Transformer.from_crs(source, target, always_xy=True).transform_bounds(*src.bounds, densify_pts=21)
+            full = transformer(source, target).transform_bounds(*src.bounds, densify_pts=21)
             if not finite_bounds(full) or full[0] >= full[2] or full[1] >= full[3]:
                 raise ValueError('Raster extent cannot be transformed to display CRS')
             bounds = intersect(bounds or full, full)
@@ -368,32 +424,317 @@ def raster_window(path, req):
         valid = values[~mask]
         issues = metadata['issues']
         legend = []
-        rgba = np.zeros((height, width, 4), dtype='uint8')
-        rgba[:, :, :] = (128, 128, 128, 0)
         if req.get('categorical'):
-            classes = [scalar(v) for v in np.unique(valid)]
-            legend = categorical_legend(classes, issues)
-            for entry in legend:
-                rgb = tuple(bytes.fromhex(entry['color'][1:]))
-                rgba[(values == entry['value']) & ~mask] = (*rgb, 255)
+            legend = categorical_legend([scalar(v) for v in np.unique(valid)], issues)
+            rgba = colorize(values, mask, legend=legend)
         elif valid.size:
             low, high = float(valid.min()), float(valid.max())
-            scaled = np.clip((values - low) / (high - low or 1), 0, 1)
-            scaled[mask] = 0
-            rgba[:, :, 0] = (30 + 200 * scaled).astype('uint8')
-            rgba[:, :, 1] = (70 + 150 * scaled).astype('uint8')
-            rgba[:, :, 2] = (180 - 140 * scaled).astype('uint8')
-            rgba[:, :, 3] = np.where(mask, 0, 255)
-            legend = [dict(label=f'Sample min: {low:g}', value=low, color='#1e46b4'), dict(label=f'Sample max: {high:g}', value=high, color='#e6dc28')]
-        legend.append(dict(label='Nodata / mask (transparent)', value=None, color='#80808000'))
-        png = io.BytesIO()
-        Image.fromarray(rgba).save(png, format='PNG')
+            rgba = colorize(values, mask, low=low, high=high)
+            legend = [dict(label=f'Sample min: {low:g}', value=low, color=RAMP_LOW), dict(label=f'Sample max: {high:g}', value=high, color=RAMP_HIGH)]
+        else:
+            rgba = colorize(values, mask)
+        legend.append(NODATA_LEGEND)
+        png = png_bytes(rgba)
         rows = [[None if mask[y, x] else float(values[y, x]) for x in range(width)] for y in range(height)]
         return dict(kind='raster', path=str(path), band=band, sourceCrs=crs_info(source), displayCrs=display,
                     bbox=bounds, issues=issues, preview=dict(sampled=True, truncated=False, method='bounded window/overview; nearest-neighbor display samples',
                     width=width, height=height, resolution=f'{(bounds[2]-bounds[0])/width:g} × {(bounds[3]-bounds[1])/height:g} display units/pixel'),
                     legend=legend, nodata=scalar(src.nodatavals[band-1]), values=rows,
-                    image='data:image/png;base64,' + base64.b64encode(png.getvalue()).decode())
+                    image='data:image/png;base64,' + base64.b64encode(png).decode())
+
+
+RAMP_LOW, RAMP_HIGH = '#1e46b4', '#e6dc28'
+NODATA_LEGEND = dict(label='Nodata / mask (transparent)', value=None, color='#80808000')
+
+
+def colorize(values, mask, legend=None, low=None, high=None):
+    """RGBA display colours. Continuous: fixed low/high ramp. Categorical: per-class hash colours."""
+    rgba = np.zeros(values.shape + (4,), dtype='uint8')
+    rgba[:, :, :] = (128, 128, 128, 0)
+    if legend is not None:
+        for entry in legend:
+            if entry['value'] is None:
+                continue
+            rgb = tuple(bytes.fromhex(entry['color'][1:]))
+            rgba[(values == entry['value']) & ~mask] = (*rgb, 255)
+    elif low is not None and high is not None:
+        scaled = np.clip((np.where(mask, low, values) - low) / ((high - low) or 1), 0, 1)
+        rgba[:, :, 0] = (30 + 200 * scaled).astype('uint8')
+        rgba[:, :, 1] = (70 + 150 * scaled).astype('uint8')
+        rgba[:, :, 2] = (180 - 140 * scaled).astype('uint8')
+        rgba[:, :, 3] = np.where(mask, 0, 255)
+    return rgba
+
+
+def png_bytes(rgba):
+    png = io.BytesIO()
+    Image.fromarray(rgba).save(png, format='PNG', compress_level=1)
+    return png.getvalue()
+
+
+# Long-lived workers keep datasets open between tiles. Keyed by identity so an
+# edited file is reopened, never served from a stale handle.
+DATASETS = {}
+NATIVE_RES = {}
+
+
+def open_raster(path, overview_level=None):
+    stat = path.stat()
+    key = (str(path), stat.st_mtime_ns, stat.st_size, overview_level)
+    src = DATASETS.pop(key, None)
+    if src is None or src.closed:
+        src = rasterio.open(path, overview_level=overview_level) if overview_level is not None else rasterio.open(path)
+    DATASETS[key] = src
+    while len(DATASETS) > 24:
+        DATASETS.pop(next(iter(DATASETS))).close()
+    return src
+
+
+def overview_cache(path):
+    """Display-only overview VRT for a large raster without overviews; the source is never modified."""
+    root = os.environ.get('GAID_MAP_CACHE_DIR')
+    if not root:
+        return None
+    stat = path.resolve().stat()
+    key = hashlib.sha256(f'{path.resolve()}|{stat.st_mtime_ns}|{stat.st_size}|ovr-v1'.encode()).hexdigest()[:32]
+    return Path(root) / f'{key}.vrt'
+
+
+def prune_overview_cache(root):
+    """Keeps derived display overviews under GAID_MAP_CACHE_BYTES (default 4 GiB), oldest first."""
+    limit = int(os.environ.get('GAID_MAP_CACHE_BYTES') or 4 * 1024 ** 3)
+    entries = []
+    for vrt in root.glob('*.vrt'):
+        try:
+            size = vrt.stat().st_size + sum(p.stat().st_size for p in root.glob(vrt.name + '.ovr*'))
+            entries.append((vrt.stat().st_mtime, size, vrt))
+        except OSError:
+            continue
+    total = sum(size for _, size, _ in entries)
+    for _, size, vrt in sorted(entries):
+        if total <= limit:
+            break
+        for p in [vrt, *root.glob(vrt.name + '.ovr*')]:
+            p.unlink(missing_ok=True)
+        total -= size
+
+
+def needs_overviews(src):
+    return max(src.width, src.height) > OVERVIEW_THRESHOLD and not src.overviews(1)
+
+
+def display_path(path, prepare=False):
+    """Path tiles read from: the source, or its cached overview VRT once prepared."""
+    src = open_raster(path)
+    if not needs_overviews(src):
+        return path, False
+    vrt = overview_cache(path)
+    if vrt is None:
+        return path, False
+    if vrt.exists():
+        if prepare:
+            os.utime(vrt)  # least-recently prepared entries are pruned first
+        return vrt, True
+    if not prepare:
+        return path, False
+    vrt.parent.mkdir(parents=True, exist_ok=True)
+    prune_overview_cache(vrt.parent)
+    tmp = vrt.with_name(f'{vrt.stem}.{os.getpid()}.tmp.vrt')
+    factors, size = [], max(src.width, src.height)
+    while size / (2 ** len(factors)) > 256:
+        factors.append(2 ** (len(factors) + 1))
+    with rasterio.Env(COMPRESS_OVERVIEW='DEFLATE', GDAL_NUM_THREADS='2'):
+        rasterio.shutil.copy(src, tmp, driver='VRT')
+        with rasterio.open(tmp, 'r+') as dst:
+            dst.build_overviews(factors, Resampling.nearest)
+    # The overview file name follows the VRT name; publish the VRT last.
+    os.replace(f'{tmp}.ovr', f'{vrt}.ovr')
+    os.replace(tmp, vrt)
+    return vrt, True
+
+
+FULL_BOUNDS = {}
+TRANSFORMERS = {}
+
+
+def transformer(source, target):
+    """pyproj builds a transformer in ~75 ms; workers reuse them across tiles."""
+    key = (source.to_wkt(), target.to_wkt())
+    if key not in TRANSFORMERS:
+        if len(TRANSFORMERS) > 64:
+            TRANSFORMERS.clear()
+        TRANSFORMERS[key] = Transformer.from_crs(source, target, always_xy=True)
+    return TRANSFORMERS[key]
+
+
+def full_display_bounds(src, target):
+    key = (src.name, tuple(src.bounds), str(target))
+    if key not in FULL_BOUNDS:
+        if len(FULL_BOUNDS) > 256:
+            FULL_BOUNDS.clear()
+        FULL_BOUNDS[key] = compute_display_bounds(src, target)
+    return list(FULL_BOUNDS[key])
+
+
+def compute_display_bounds(src, target):
+    if target is None:
+        if src.transform.b or src.transform.d:
+            raise ValueError('Rotated native rasters require a declared CRS for display')
+        return [min(src.bounds.left, src.bounds.right), min(src.bounds.bottom, src.bounds.top), max(src.bounds.left, src.bounds.right), max(src.bounds.bottom, src.bounds.top)]
+    full = transformer(CRS.from_user_input(src.crs), target).transform_bounds(*src.bounds, densify_pts=21)
+    if not finite_bounds(full) or full[0] >= full[2] or full[1] >= full[3]:
+        raise ValueError('Raster extent cannot be transformed to display CRS')
+    return list(full)
+
+
+def native_resolution(path, src, target):
+    """Source pixel size in display units (cached per worker)."""
+    if target is None:
+        return float(max(abs(src.transform.a), abs(src.transform.e)))
+    key = (str(path), str(target))
+    if key not in NATIVE_RES:
+        transform, _, _ = calculate_default_transform(src.crs, target, src.width, src.height, *src.bounds)
+        NATIVE_RES[key] = float(abs(transform.a))
+    return NATIVE_RES[key]
+
+
+def raster_band(req, src):
+    band = integer(req, 'band', 1, 1, 256, clamp=False)
+    if band > src.count:
+        raise ValueError('Selected band does not exist')
+    return band
+
+
+def raster_style(path, req):
+    """Whole-raster display stretch/classes from an overview-sized sample, shared by every tile."""
+    src = open_raster(path)
+    metadata = raster_metadata(src)
+    source = CRS.from_user_input(src.crs) if src.crs else None
+    display, target = display_info(req, source)
+    band = raster_band(req, src)
+    full = full_display_bounds(src, target)
+    view, prepared = display_path(path, prepare=bool(req.get('prepare')))
+    sample = open_raster(view)
+    scale = max(sample.width, sample.height) / STYLE_SAMPLE
+    shape = (max(1, math.ceil(sample.height / scale)), max(1, math.ceil(sample.width / scale))) if scale > 1 else (sample.height, sample.width)
+    data = sample.read(band, out_shape=shape, masked=True, resampling=Resampling.nearest)
+    if np.iscomplexobj(data):
+        raise ValueError('Complex raster bands are not supported')
+    values = np.asarray(data, dtype='float64')
+    mask = np.ma.getmaskarray(data) | ~np.isfinite(values)
+    valid = values[~mask]
+    issues = metadata['issues']
+    result = dict(kind='raster-style', path=str(path), band=band, sourceCrs=crs_info(source), displayCrs=display, bbox=full,
+                  resolution=native_resolution(path, src, target),
+                  issues=issues, nodata=scalar(src.nodatavals[band-1]), categorical=bool(req.get('categorical')),
+                  overviews=bool(src.overviews(band)) or prepared, needsOverviews=needs_overviews(src) and not prepared,
+                  preview=dict(sampled=True, truncated=False, width=src.width, height=src.height,
+                               method=f'display tiles; nearest-neighbor samples; colour range from a {shape[1]}×{shape[0]} overview sample'))
+    if req.get('categorical'):
+        result['legend'] = categorical_legend([scalar(v) for v in np.unique(valid)], issues) + [NODATA_LEGEND]
+    elif valid.size:
+        low, high = (float(v) for v in np.percentile(valid, [2, 98]))
+        if not low < high:
+            low, high = float(valid.min()), float(valid.max())
+        result.update(low=low, high=high, min=float(valid.min()), max=float(valid.max()))
+        result['legend'] = [dict(label=f'≤ {low:g} (2nd percentile)', value=low, color=RAMP_LOW),
+                            dict(label=f'≥ {high:g} (98th percentile)', value=high, color=RAMP_HIGH), NODATA_LEGEND]
+    else:
+        result['legend'] = [NODATA_LEGEND]
+    return result
+
+
+def tile_bounds(req):
+    bounds = bbox_request(req)
+    if bounds is None:
+        raise ValueError('A tile bbox is required')
+    return bounds
+
+
+def raster_tile(path, req):
+    """One display tile (PNG) for an exact bbox in display CRS; areas outside the raster are transparent."""
+    size = integer(req, 'size', 256, 16, TILE_LIMIT)
+    src = open_raster(path)
+    source = CRS.from_user_input(src.crs) if src.crs else None
+    display, target = display_info(req, source)
+    band = raster_band(req, src)
+    bounds = tile_bounds(req)
+    full = full_display_bounds(src, target)
+    values = np.zeros((size, size), dtype='float64')
+    mask = np.ones((size, size), dtype=bool)
+    hit = [max(bounds[0], full[0]), max(bounds[1], full[1]), min(bounds[2], full[2]), min(bounds[3], full[3])]
+    if hit[0] < hit[2] and hit[1] < hit[3]:
+        view, _ = display_path(path)
+        if target is not None:
+            # Choose the coarsest overview that is still at least as fine as the tile.
+            factor = (bounds[2] - bounds[0]) / size / native_resolution(path, src, target)
+            base = open_raster(view)
+            level = None
+            for index, decimation in enumerate(base.overviews(band)):
+                if decimation <= factor:
+                    level = index
+            reader = open_raster(view, level) if level is not None else base
+            with WarpedVRT(reader, crs=target, transform=from_bounds(*bounds, size, size), width=size, height=size,
+                           resampling=Resampling.nearest, warp_mem_limit=32, add_alpha=ColorInterp.alpha not in reader.colorinterp) as vrt:
+                data = vrt.read(band, masked=True)
+                alpha = vrt.read(vrt.colorinterp.index(ColorInterp.alpha) + 1) == 0
+            if np.iscomplexobj(data):
+                raise ValueError('Complex raster bands are not supported')
+            values = np.asarray(data, dtype='float64')
+            mask = alpha | np.ma.getmaskarray(data)
+        else:
+            res_x, res_y = (bounds[2] - bounds[0]) / size, (bounds[3] - bounds[1]) / size
+            col0, col1 = round((hit[0] - bounds[0]) / res_x), round((hit[2] - bounds[0]) / res_x)
+            row0, row1 = round((bounds[3] - hit[3]) / res_y), round((bounds[3] - hit[1]) / res_y)
+            if col1 > col0 and row1 > row0:
+                reader = open_raster(view)
+                inverse = ~src.transform
+                p0, p1 = inverse * (hit[0], hit[1]), inverse * (hit[2], hit[3])
+                window = Window(min(p0[0], p1[0]), min(p0[1], p1[1]), abs(p1[0]-p0[0]), abs(p1[1]-p0[1]))
+                data = reader.read(band, window=window, out_shape=(row1 - row0, col1 - col0), masked=True, resampling=Resampling.nearest)
+                if np.iscomplexobj(data):
+                    raise ValueError('Complex raster bands are not supported')
+                if src.transform.e > 0:
+                    data = data[::-1, :]
+                if src.transform.a < 0:
+                    data = data[:, ::-1]
+                values[row0:row1, col0:col1] = np.asarray(data, dtype='float64')
+                mask[row0:row1, col0:col1] = np.ma.getmaskarray(data)
+    mask |= ~np.isfinite(values)
+    if req.get('categorical'):
+        classes = np.unique(values[~mask])
+        if classes.size > 1024:
+            raise ValueError('Categorical tile exceeds 1024 classes; turn off categorical display')
+        rgba = colorize(values, mask, legend=[dict(value=scalar(v), color=color(scalar(v))) for v in classes])
+    else:
+        low, high = req.get('low'), req.get('high')
+        if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in (low, high)):
+            raise ValueError('Continuous tiles require finite low/high from the raster style')
+        rgba = colorize(values, mask, low=float(low), high=float(high))
+    return dict(kind='raster-tile', empty=bool(mask.all()), png=base64.b64encode(png_bytes(rgba)).decode())
+
+
+def raster_point(path, req):
+    """The source pixel value under a display coordinate, read from the original file at full resolution."""
+    src = open_raster(path)
+    source = CRS.from_user_input(src.crs) if src.crs else None
+    _, target = display_info(req, source)
+    band = raster_band(req, src)
+    point = req.get('coordinate')
+    if not isinstance(point, list) or len(point) != 2 or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in point):
+        raise ValueError('coordinate must be two finite numbers')
+    x, y = point
+    if target is not None:
+        x, y = transformer(target, source).transform(x, y)
+    col, row = (~src.transform) * (x, y)
+    col, row = math.floor(col), math.floor(row)
+    if not (0 <= col < src.width and 0 <= row < src.height):
+        return dict(kind='raster-point', band=band, inside=False)
+    data = src.read(band, window=Window(col, row, 1, 1), masked=True)
+    value = None if np.ma.getmaskarray(data)[0, 0] else scalar(data[0, 0])
+    if isinstance(value, float) and not math.isfinite(value):
+        value = None
+    return dict(kind='raster-point', band=band, inside=True, row=row, col=col, value=value, sourceCoordinate=[x, y])
 
 
 def intersect(bounds, full):
@@ -432,7 +773,7 @@ def area_table(path, req):
         limitations.append(f'Ellipsoidal area on source datum: {source.ellipsoid.name}; polygons spanning >180° longitude are rejected.')
     else:
         raise ValueError('Area method must be projected or geodesic')
-    transformer = Transformer.from_crs(source, target, always_xy=True)
+    to_area = transformer(source, target)
     rows, count, empty, vertices = {}, 0, 0, 0
     while True:
         meta, fids, wkbs, arrays = read_batch(path, info, count, 500, columns=[req['classField']])
@@ -454,7 +795,7 @@ def area_table(path, req):
             vertices += shapely.get_num_coordinates(geom)
             if vertices > 2000000:
                 raise ValueError('Full-layer area exceeds 2000000 vertices; no subset was calculated')
-            geom = transform_geometry(transformer.transform, geom)
+            geom = transform_geometry(to_area.transform, geom)
             if not np.isfinite(shapely.get_coordinates(geom)).all() or not geom.is_valid:
                 raise ValueError('Area transformation produced invalid geometry')
             if method == 'projected':
@@ -491,13 +832,7 @@ def area_table(path, req):
     return result
 
 
-def main():
-    # Bytes, decoded as UTF-8: sys.stdin uses the locale code page on Windows
-    # (cp949 on Korean Windows), which garbles non-ASCII paths sent as UTF-8 JSON.
-    raw = sys.stdin.buffer.read(65537)
-    if len(raw) > 65536:
-        raise ValueError('Request exceeds 64 KiB')
-    req = json.loads(raw.decode('utf-8'))
+def handle(req):
     if not isinstance(req, dict) or not isinstance(req.get('path'), str):
         raise ValueError('Request must provide an absolute local path')
     path = Path(req['path'])
@@ -523,25 +858,71 @@ def main():
         result = raster_window(path, req)
     elif operation == 'area':
         result = area_table(path, req)
+    elif operation in ('raster-style', 'raster-tile', 'raster-point'):
+        if path.suffix.lower() not in ('.tif', '.tiff'):
+            raise ValueError('Display tiles are available for GeoTIFF rasters')
+        result = {'raster-style': raster_style, 'raster-tile': raster_tile, 'raster-point': raster_point}[operation](path, req)
     else:
         raise ValueError('Unknown map operation')
     check_time()
     output = json.dumps(result, allow_nan=False, separators=(',', ':'))
-    if len(output.encode()) > 7 * 1024 * 1024:
-        raise ValueError('Map response exceeds 7 MiB; request a smaller page/window')
-    print(output)
+    cap = 24 if req.get('full') else 7
+    if len(output.encode()) > cap * 1024 * 1024:
+        raise ValueError(f'Map response exceeds {cap} MiB; request a smaller page/window')
+    return output
+
+
+def main():
+    # Bytes, decoded as UTF-8: sys.stdin uses the locale code page on Windows
+    # (cp949 on Korean Windows), which garbles non-ASCII paths sent as UTF-8 JSON.
+    raw = sys.stdin.buffer.read(65537)
+    if len(raw) > 65536:
+        raise ValueError('Request exceeds 64 KiB')
+    print(handle(json.loads(raw.decode('utf-8'))))
+
+
+EXPECTED_ERRORS = (ValueError, KeyError, TypeError, ProjError, GEOSException, sqlite3.DatabaseError,
+                   rasterio.errors.RasterioError, pyogrio.errors.DataSourceError, pyogrio.errors.DataLayerError)
+
+
+def failure(exc):
+    """(exit code, message) with the one-shot exit-code contract: 4 not found, 5 bad request/source, 1 other."""
+    if isinstance(exc, FileNotFoundError):
+        return 4, str(exc)[:400]
+    if isinstance(exc, EXPECTED_ERRORS):
+        return 5, 'Invalid map request/source: ' + str(exc)[:400]
+    return 1, 'Map helper failed: ' + str(exc)[:400]
+
+
+def serve():
+    """Long-lived worker: one JSON request per stdin line, one JSON reply per stdout line, in order."""
+    global START, BUDGET
+    out = sys.stdout.buffer
+    with rasterio.Env(GDAL_CACHEMAX=128 * 1024 * 1024):
+        out.write(b'{"ready":true}\n')
+        out.flush()
+        for line in sys.stdin.buffer:
+            if len(line) > 65536:
+                reply = dict(id=None, code=5, error='Request exceeds 64 KiB')
+            else:
+                req = json.loads(line.decode('utf-8'))
+                START, BUDGET = time.monotonic(), float(req.pop('budget', 17))
+                try:
+                    reply = '{"id":%s,"result":%s}' % (json.dumps(req.get('id')), handle(req))
+                except Exception as exc:
+                    code, message = failure(exc)
+                    reply = dict(id=req.get('id'), code=code, error=message)
+            out.write((reply if isinstance(reply, str) else json.dumps(reply)).encode() + b'\n')
+            out.flush()
 
 
 if __name__ == '__main__':
+    if sys.argv[1:] == ['--serve']:
+        serve()
+        sys.exit(0)
     try:
         main()
-    except FileNotFoundError as exc:
-        print(str(exc)[:400], file=sys.stderr)
-        sys.exit(4)
-    except (ValueError, KeyError, TypeError, ProjError, GEOSException, sqlite3.DatabaseError,
-            rasterio.errors.RasterioError, pyogrio.errors.DataSourceError, pyogrio.errors.DataLayerError) as exc:
-        print('Invalid map request/source: ' + str(exc)[:400], file=sys.stderr)
-        sys.exit(5)
     except Exception as exc:
-        print('Map helper failed: ' + str(exc)[:400], file=sys.stderr)
-        sys.exit(1)
+        code, message = failure(exc)
+        print(message, file=sys.stderr)
+        sys.exit(code)

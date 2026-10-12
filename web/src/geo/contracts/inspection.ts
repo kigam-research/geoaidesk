@@ -57,6 +57,10 @@ export interface GeoCrs {
   authority?: string;
   name?: string;
   wkt?: string;
+  /** PROJ string for registering the CRS as a map view projection (gaid-map-tiles). */
+  proj4?: string;
+  /** True for a projected (not geographic) CRS. */
+  projected?: boolean;
   axisUnits?: string;
   verticalDatum?: string;
   epoch?: number;

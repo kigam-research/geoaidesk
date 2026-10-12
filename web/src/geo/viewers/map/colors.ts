@@ -21,6 +21,12 @@ export function layerLegend(layer: LayerState, field?: string): MapLegendItem[] 
   // A manifest legend without a selected classification field is not the
   // rendered vector style. Never show it as if it described the blue symbols.
   if (layer.data?.kind === "vector") return [{ label: layer.source.layer ?? layer.source.path, color: "#0072b2" }];
+  if (layer.style) {
+    // Nodata is listed separately by the viewer. A continuous range is the shared colour stretch of every tile.
+    const items = layer.style.legend.filter(item => item.value != null);
+    if (layer.style.categorical) return items;
+    return items.map((item, n) => ({ ...item, label: t(n === 0 ? "rangeLow" : "rangeHigh", { value: Number(item.value).toPrecision(6) }) }));
+  }
   const legend = layer.data?.legend?.length ? layer.data.legend : layer.manifest?.legend ?? [];
   return legend;
 }
