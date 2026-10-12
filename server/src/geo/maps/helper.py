@@ -500,6 +500,25 @@ def overview_cache(path):
     return Path(root) / f'{key}.vrt'
 
 
+def prune_overview_cache(root):
+    """Keeps derived display overviews under GAID_MAP_CACHE_BYTES (default 4 GiB), oldest first."""
+    limit = int(os.environ.get('GAID_MAP_CACHE_BYTES') or 4 * 1024 ** 3)
+    entries = []
+    for vrt in root.glob('*.vrt'):
+        try:
+            size = vrt.stat().st_size + sum(p.stat().st_size for p in root.glob(vrt.name + '.ovr*'))
+            entries.append((vrt.stat().st_mtime, size, vrt))
+        except OSError:
+            continue
+    total = sum(size for _, size, _ in entries)
+    for _, size, vrt in sorted(entries):
+        if total <= limit:
+            break
+        for p in [vrt, *root.glob(vrt.name + '.ovr*')]:
+            p.unlink(missing_ok=True)
+        total -= size
+
+
 def needs_overviews(src):
     return max(src.width, src.height) > OVERVIEW_THRESHOLD and not src.overviews(1)
 
@@ -513,10 +532,13 @@ def display_path(path, prepare=False):
     if vrt is None:
         return path, False
     if vrt.exists():
+        if prepare:
+            os.utime(vrt)  # least-recently prepared entries are pruned first
         return vrt, True
     if not prepare:
         return path, False
     vrt.parent.mkdir(parents=True, exist_ok=True)
+    prune_overview_cache(vrt.parent)
     tmp = vrt.with_name(f'{vrt.stem}.{os.getpid()}.tmp.vrt')
     factors, size = [], max(src.width, src.height)
     while size / (2 ** len(factors)) > 256:

@@ -10,6 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { ExtensionAPI, ExtensionFactory } from "@earendil-works/pi-coding-agent";
+import { apiRelative } from "../sandbox-fs.ts";
 
 export const MARKDOWN_IMAGE_RULE = "In Markdown files, write local image paths relative to the Markdown file's own folder (from `results/report.md`, a sandbox-root `figures/a.png` is `../figures/a.png`); never sandbox-root or absolute paths.";
 const MARKDOWN_FILE = /\.(md|markdown)$/i;
@@ -40,15 +41,13 @@ function decode(target: string): string {
 }
 
 function inside(root: string, abs: string): boolean {
-  const rel = path.relative(root, abs);
+  const rel = apiRelative(root, abs);
   return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
 }
 
 function isFile(abs: string): boolean {
   try { return fs.statSync(abs).isFile(); } catch { return false; }
 }
-
-const posix = (p: string) => p.split(path.sep).join("/");
 
 /** Image links in `mdAbs` that do not resolve to a file inside `sandboxRoot`. */
 export function checkMarkdownImages(sandboxRoot: string, mdAbs: string, text: string): MarkdownImageProblem[] {
@@ -63,7 +62,7 @@ export function checkMarkdownImages(sandboxRoot: string, mdAbs: string, text: st
     // Likely intents: a sandbox-root path written as if relative, or an absolute path inside the sandbox.
     const candidates = [path.resolve(root, local.replace(/^\/+/, "")), ...(absolute ? [path.resolve(local)] : [])];
     const found = candidates.find(c => inside(root, c) && isFile(c));
-    problems.push({ target, ...(found ? { suggestion: posix(path.relative(dir, found)) } : {}) });
+    problems.push({ target, ...(found ? { suggestion: apiRelative(dir, found) } : {}) });
   }
   return problems;
 }
@@ -87,7 +86,7 @@ export function registerMarkdownImageCheck(pi: ExtensionAPI): void {
       if (!inside(root, abs) || fs.statSync(abs).size > MAX_FILE_BYTES) return;
       const problems = checkMarkdownImages(root, abs, fs.readFileSync(abs, "utf8"));
       if (!problems.length) return;
-      return { content: [...event.content, { type: "text" as const, text: markdownImageNotice(posix(path.relative(root, abs)), problems) }] };
+      return { content: [...event.content, { type: "text" as const, text: markdownImageNotice(apiRelative(root, abs), problems) }] };
     } catch {
       return; // A failed check never changes the tool's own result.
     }

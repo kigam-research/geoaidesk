@@ -2,24 +2,30 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import OlMap from "ol/Map";
 import GeoJSON from "ol/format/GeoJSON";
-import ImageLayer from "ol/layer/Image";
+import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
-import ImageStatic from "ol/source/ImageStatic";
+import TileImage from "ol/source/TileImage";
+import TileGrid from "ol/tilegrid/TileGrid";
+import { createXYZ } from "ol/tilegrid";
+import { get as getProjection } from "ol/proj";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 import { asArray } from "ol/color";
 import type BaseLayer from "ol/layer/Base";
+import type { MapBBox, RasterStyle } from "../../contracts/maps";
 import type { LayerState, Viewport } from "./model";
-import { fitExtent, sourceCrs, validBBox } from "./model";
+import { fitExtent, layerView, sourceCrs, tileQuery, tileResolutions, TILE_SIZE, validBBox, WEB_MERCATOR } from "./model";
 import { vectorColor, layerLegend } from "./colors";
-import { downloadBlob } from "./client";
+import { downloadBlob, tileUrl } from "./client";
 import { mapText as t } from "./strings";
 import { createMapView } from "./view";
 import "ol/ol.css";
 
 export interface CanvasHandle { exportPng(): Promise<void>; fit(): void }
 interface Props {
-  layers: LayerState[]; crs: string; activeId: string;
+  layers: LayerState[]; crs: string; activeId: string; projectId?: string;
+  /** Basemap/overlay layers drawn under project data (their own zIndex). */
+  backgroundLayers?: BaseLayer[];
   fitVersion: number;
   fields: Record<string, string>; selected?: { layerId: string; row: number };
   onViewport(viewport: Viewport): void; onPick(layerId: string, row: number): void;
@@ -34,7 +40,8 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
   const fit = () => {
     const map = mapRef.current;
     const layer = current.current.layers.find(l => l.id === current.current.activeId);
-    const bbox = layer?.data?.bbox && fitExtent(layer.data.bbox);
+    const view = layer && layerView(layer);
+    const bbox = view?.bbox && fitExtent(view.bbox);
     if (map && bbox) map.getView().fit(bbox, { padding: [24, 24, 24, 24], ...(current.current.crs === "native" ? {} : { maxZoom: 20 }) });
   };
   useImperativeHandle(ref, () => ({ fit, async exportPng() {
@@ -48,7 +55,7 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     const size = map.getSize();
     const viewportElement = map.getViewport();
     if (!size || !viewportElement) throw new Error(t("pngError"));
-    const layers = current.current.layers.filter(l => l.visible && l.data);
+    const layers = current.current.layers.filter(l => l.visible && layerView(l));
     const lines = layers.flatMap(l => [{ label: `${l.source.path} · ${t("sourceCrs")}: ${sourceCrs(l).authority ?? sourceCrs(l).name ?? t("unknown")}`, color: "" }, ...layerLegend(l, current.current.fields[l.id])]);
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(640, size[0]); canvas.height = size[1] + 78 + lines.length * 18;
@@ -99,44 +106,43 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     observer.observe(target.current);
     return () => { observer.disconnect(); map.setTarget(undefined); map.dispose(); mapRef.current = null; };
   }, [props.crs]);
+  // OpenLayers layers are kept per layer identity: a tile layer keeps its tile cache across
+  // re-renders (selection, opacity, order); only a new style/CRS/data object replaces it.
+  const built = useRef(new Map<string, { key: unknown; layer: BaseLayer }>());
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const keep = new Set<string>();
     const rendered: BaseLayer[] = [];
     try {
       for (const [index, layer] of props.layers.entries()) {
-        const data = layer.data;
-        if (!data || !layer.visible) continue;
-        // Stale coordinates from a different display view are never drawn.
-        if (data.displayCrs !== props.crs || !fitExtent(data.bbox) || (data.kind === "raster" && !validBBox(data.bbox))) continue;
-        let olLayer: BaseLayer;
-        if (data.kind === "raster") {
-          // Raster images are inline backend previews, never browser requests to arbitrary URLs.
-          const url = data.image.startsWith("data:image/png;base64,") ? data.image : `data:image/png;base64,${data.image}`;
-          olLayer = new ImageLayer({ source: new ImageStatic({ url, imageExtent: data.bbox, projection: map.getView().getProjection(), interpolate: false }), opacity: layer.opacity });
-        } else {
-          const features = new GeoJSON().readFeatures(data.features);
-          features.forEach((f, row) => { f.set("_layerId", layer.id); f.set("_rowIndex", row); });
-          const field = props.fields[layer.id];
-          olLayer = new VectorLayer({ source: new VectorSource({ features }), opacity: layer.opacity, style: feature => {
-            const selected = props.selected?.layerId === layer.id && props.selected.row === feature.get("_rowIndex");
-            const value = feature.get(field);
-            const color = layer.source.categorical && field ? vectorColor(layer, value) : "#0072b2";
-            const stroke = new Stroke({ color: selected ? "#ffcc00" : color, width: selected ? 4 : 1.5, lineDash: layer.source.categorical && value == null && field ? [4, 4] : undefined });
-            const rgba = asArray(color);
-            const fill = new Fill({ color: [rgba[0], rgba[1], rgba[2], rgba[3] * 0.4] });
-            return new Style({ stroke, fill, image: new Circle({ radius: selected ? 7 : 5, fill, stroke }) });
-          } });
-        }
-        olLayer.setZIndex(props.layers.length - index); rendered.push(olLayer);
+        if (!layer.visible) continue;
+        let entry = built.current.get(layer.id);
+        if (layer.style) {
+          const style = layer.style;
+          // Stale coordinates from a different display view are never drawn.
+          if (style.displayCrs !== props.crs || !validBBox(style.bbox)) continue;
+          const key = `${props.crs}|${props.projectId ?? ""}|${style.path}|${style.version}|${style.band}|${style.categorical}|${style.low}|${style.high}`;
+          if (entry?.key !== key) { entry?.layer.dispose(); entry = { key, layer: rasterTileLayer(map, style, layer, props.projectId) }; }
+        } else if (layer.data?.kind === "vector") {
+          const data = layer.data;
+          if (data.displayCrs !== props.crs || !fitExtent(data.bbox)) continue;
+          if (entry?.key !== data) { entry?.layer.dispose(); entry = { key: data, layer: vectorLayer(layer.id, data, current) }; }
+          else entry.layer.changed(); // selection/classification are read by the style function
+        } else continue;
+        built.current.set(layer.id, entry);
+        keep.add(layer.id);
+        entry.layer.setOpacity(layer.opacity);
+        entry.layer.setZIndex(props.layers.length - index); rendered.push(entry.layer);
       }
-      map.getLayers().clear(); rendered.forEach(l => map.addLayer(l));
-      if (!fitted.current && props.layers.some(l => l.id === props.activeId && l.data && fitExtent(l.data.bbox))) {
+      for (const [id, entry] of built.current) if (!keep.has(id)) { entry.layer.dispose(); built.current.delete(id); }
+      map.setLayers([...(props.backgroundLayers ?? []), ...rendered]);
+      if (!fitted.current && props.layers.some(l => l.id === props.activeId && layerView(l) && fitExtent(layerView(l)!.bbox))) {
         fitted.current = true; fit();
       }
     } catch { current.current.onError(t("mapError")); }
-    return () => { rendered.forEach(l => { map.removeLayer(l); l.dispose(); }); };
-  }, [props.layers, props.crs, props.fields, props.selected, props.activeId, props.fitVersion]);
+  }, [props.layers, props.crs, props.fields, props.selected, props.activeId, props.fitVersion, props.projectId, props.backgroundLayers]);
+  useEffect(() => () => { for (const entry of built.current.values()) entry.layer.dispose(); built.current.clear(); }, [props.crs]);
   return <div className="relative h-[360px] min-h-[280px] w-full bg-white" style={{ backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%)", backgroundSize: "16px 16px" }}>
     <div ref={target} role="region" aria-label={t("map")} className="h-full w-full" tabIndex={0} />
     <div className="absolute left-2 top-2 flex flex-col gap-1 text-black">
@@ -146,3 +152,34 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
   </div>;
 });
 export default MapCanvas;
+
+/** Server-rendered display tiles on a deterministic grid: standard XYZ in Web Mercator, else one grid per layer extent. */
+function rasterTileLayer(map: OlMap, style: RasterStyle, layer: LayerState, projectId?: string): BaseLayer {
+  const projection = map.getView().getProjection();
+  const extent = style.bbox;
+  const grid = style.displayCrs === WEB_MERCATOR
+    ? createXYZ({ extent: getProjection(WEB_MERCATOR)!.getExtent(), maxZoom: Math.min(24, Math.max(0, Math.ceil(Math.log2(40075016.68 / TILE_SIZE / style.resolution)) + 2)), tileSize: TILE_SIZE })
+    : new TileGrid({ extent, origin: [extent[0], extent[3]], resolutions: tileResolutions(extent, style.resolution), tileSize: TILE_SIZE });
+  const source = new TileImage({
+    projection, tileGrid: grid, crossOrigin: "anonymous", interpolate: false, transition: 0,
+    tileUrlFunction: coord => tileUrl(tileQuery(layer, style, grid.getTileCoordExtent(coord) as MapBBox), projectId),
+  });
+  return new TileLayer({ source, extent, preload: 1 });
+}
+
+function vectorLayer(id: string, data: Extract<NonNullable<LayerState["data"]>, { kind: "vector" }>, current: { current: Props }): BaseLayer {
+  const features = new GeoJSON().readFeatures(data.features);
+  features.forEach((f, row) => { f.set("_layerId", id); f.set("_rowIndex", row); });
+  return new VectorLayer({ source: new VectorSource({ features }), style: feature => {
+    const props = current.current;
+    const layer = props.layers.find(l => l.id === id);
+    const field = props.fields[id];
+    const selected = props.selected?.layerId === id && props.selected.row === feature.get("_rowIndex");
+    const value = feature.get(field);
+    const color = layer?.source.categorical && field ? vectorColor(layer, value) : "#0072b2";
+    const stroke = new Stroke({ color: selected ? "#ffcc00" : color, width: selected ? 4 : 1.5, lineDash: layer?.source.categorical && value == null && field ? [4, 4] : undefined });
+    const rgba = asArray(color);
+    const fill = new Fill({ color: [rgba[0], rgba[1], rgba[2], rgba[3] * 0.4] });
+    return new Style({ stroke, fill, image: new Circle({ radius: selected ? 7 : 5, fill, stroke }) });
+  } });
+}
