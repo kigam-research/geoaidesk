@@ -4,10 +4,11 @@ date: 2026-10-13
 project: geoaidesk
 task: gaid-ui-locale
 headline: 언어 설정 하나로 GAID 화면과 K-Dense에서 온 화면(채팅, workflow 326개, 파일 보기, 설정, 연구 노트)이 모두 한국어 또는 영어로 바뀝니다. 에이전트는 화면 언어와 상관없이 사용자가 지정한 언어나 요청한 언어로 답합니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-workflows-ko.png
 supersedes:
+reviewed: 2026-10-13
 ---
 # 앱 전체 한국어·영어 화면 모드와 요청 언어를 따르는 응답
 

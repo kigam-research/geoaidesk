@@ -7,7 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
-| <img src="2026-10-13-gaid-ui-locale/figures/01-workflows-ko.png" width="120"> | 2026-10-13 08:15 | [앱 전체 한국어·영어 화면 모드와 요청 언어를 따르는 응답](2026-10-13-gaid-ui-locale/index.md) | 언어 설정 하나로 GAID 화면과 K-Dense에서 온 화면(채팅, workflow 326개, 파일 보기, 설정, 연구 노트)이 모두 한국어 또는 영어로 바뀝니다. 에이전트는 화면 언어와 상관없이 사용자가 지정한 언어나 요청한 언어로 답합니다. | 검토 전 | 미정 | 1 |
+| <img src="2026-10-13-gaid-ui-locale/figures/01-workflows-ko.png" width="120"> | 2026-10-13 08:15 | [앱 전체 한국어·영어 화면 모드와 요청 언어를 따르는 응답](2026-10-13-gaid-ui-locale/index.md) | 언어 설정 하나로 GAID 화면과 K-Dense에서 온 화면(채팅, workflow 326개, 파일 보기, 설정, 연구 노트)이 모두 한국어 또는 영어로 바뀝니다. 에이전트는 화면 언어와 상관없이 사용자가 지정한 언어나 요청한 언어로 답합니다. | 검토함 10-13 | 채택 | 1 |
 | <img src="2026-10-12-gaid-workflow-catalog/figures/workflow-panel-desktop.png" width="120"> | 2026-10-12 18:51 | [workflow 목록 통합, 카테고리를 고르는 레시피 저장, skill_hub 스킬 가져오기](2026-10-12-gaid-workflow-catalog/index.md) | Geoscience 작업이 K-Dense workflow와 같은 목록·검색·카테고리 버튼으로 맨 앞에 나오고, 가져온 레시피를 고른 카테고리(새 카테고리 포함)에 저장해 다시 열 수 있으며, skill_hub 사이트에서 찾은 스킬을 기존 확인·설치 절차로 가져올 수 있습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-12-gaid-map-table-ux/figures/01-map-panel-popup.png" width="120"> | 2026-10-12 18:40 | [지도 오른쪽 정보 패널, 속성표 열 정렬·필터, 지도 위 미니 팝업](2026-10-12-gaid-map-table-ux/index.md) | 범례와 기본 정보가 지도 오른쪽 패널에 함께 보이고, 속성표 열 머리글에서 정렬·필터를 쓰며, 선택한 피처와 픽셀 정보는 지도 위 미니 팝업으로 뜹니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-12-gaid-map-tiles/figures/01-latency.png" width="120"> | 2026-10-12 14:35 | [지도 타일 표시, 배경지도 선택, Markdown 그림 경로 규칙](2026-10-12-gaid-map-tiles/index.md) | 지도 확대·축소 대기가 1.5–2.4초에서 0.04초 이하로 줄었고, 배경지도를 없음·OSM·국토지리정보원·지질도 중에서 고르며, 에이전트가 쓴 Markdown의 깨진 그림 경로를 자동으로 알립니다. | 검토 전 | 미정 | 0 |
