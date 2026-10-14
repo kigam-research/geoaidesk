@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:16:41Z
+updated: 2026-10-14T12:22:08Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f950c83f-f114-403b-86ba-8e4e7d56f2d1","pid":435067,"provider":"codex","session":"01a13a50-2bfe-7e91-a78c-e914e61554c1","start":"44569531","token":"75fb704827e2463ede22fe734b25b74e4d6334906fb417af71c64d9809eb566c"}
 branch: task/gaid-qwen-followups--gaid-qwen-reasoning
 target: task/gaid-qwen-followups
@@ -82,12 +82,12 @@ request at a time.
 - Implemented provider-level reasoningLevels validation and sidecar round-trip; reasoning models receive Pi thinkingLevelMap on explicit save only. Hand-written providers/maps remain untouched.
 - Custom picker rows derive thinkingSentAs from the resolved Pi model. Chat uses fresh discovery metadata even for restored tabs; Defaults shows known-model substitutions. Added server checkboxes and visible chip/row mapping.
 - Targeted checks passed: server custom-models 12 tests; web custom-models/thinking/defaults 15 tests. Real Pi runtimes independently reload the map; intercepted completion payloads prove all six levels, including high -> medium, xhigh unchanged and Off omitted, with zero network calls.
-- Both server and web typechecks passed. Full suites run in the recorded snapshot job below. Copy validator passed with 0 errors / 56 existing warnings; no new string warnings.
+- Saved-snapshot job at 31e204869130 succeeded (exit 0): server 158 files passed / 1 skipped, 1675 tests passed / 11 skipped; web 147 files and 984 tests passed. Both typechecks passed. Copy validator: 0 errors / 56 existing warnings; none on new strings. Two mzML cases were excluded by the documented PSI-MS network probe; the other skips are existing suite conditions. Evidence is the receipt and out/*.log below.
+- Reverify with the recorded job command, or scripts/check for the integrated tree. No job restart is needed.
 - No review-instance changes and no live/paid model requests.
 ## Next steps
-1. On the recorded job completion notice, read its exit and out/{server-tests,web-tests,copy-validation}.log; record final counts. Do not restart the job.
-2. Final diff reviewed; after the job passes, record results, save and run task finish for parent integration. The CLI also enforces the declared scripts/check.
-- Waiting only for the recorded job; no independent implementation work remains.
+1. Save these verified results and run task finish. The CLI enforces scripts/check on the final tree.
+2. Parent integrates the ready tip with task complete, then performs the KIGAM live re-trial; do not change the review instance here.
 ## Failed approaches
 ## Notes and decisions
 - Sequential decisions: preserve accepted design; persist accepted levels in the managed sidecar (including servers with no reasoning models); Pi reads each reasoning model map from models.json.
