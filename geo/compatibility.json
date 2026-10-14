@@ -268,21 +268,45 @@
       "advertised": false,
       "documentationCheckedAt": null,
       "documentationSources": [],
-      "adapterStatus": "implemented (openai-completions custom provider, reasoning on, declared cost 0)",
-      "requestedBy": "user, 2026-10-14: “현재 67ip llm 서버가 복구되었다. 사용가능한지 확인해보자.” / “가와 나 모두 진행하자.”",
+      "adapterStatus": "implemented (openai-completions custom provider, reasoning on, declared cost 0; accepted reasoning levels low, medium, xhigh set in Settings → Custom model servers)",
+      "requestedBy": "user, 2026-10-14: “현재 67ip llm 서버가 복구되었다. 사용가능한지 확인해보자.” / “가와 나 모두 진행하자.” / 2026-10-14 follow-up: “1번은 가로하고 2번은 가로 하면서 높음을 지정하면 보통으로 보내지게 하자.”",
       "connection": {
         "outcome": "passed",
         "testedAt": "2026-10-14",
         "record": {
-          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/out/record.json",
-          "sha256": "2bfe9ccaee910150ae93b86a8a3c5d2ba28f6e4952825bc304b448f135b26e0f",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T123348.224521Z/out/record.json",
+          "sha256": "c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5",
           "date": "2026-10-14",
-          "appCommit": "b9b5f2d194cf",
+          "appCommit": "9a0c179b20ed",
           "result": "passed",
-          "note": "connection 9.3 s at thinking off; in-app probes: off/low/medium passed, minimal/high/xhigh failed with HTTP 400; /models/Qwen3.8-27B and /models/Qwen3.6-27B connected"
+          "note": "connection 9.8 s at thinking high, sent as medium (accepted levels low, medium, xhigh); in-app probes off/minimal/low/medium/xhigh all passed (minimal sent as low)"
         }
       },
       "tasks": [
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T123348.224521Z/out/record.json",
+            "sha256": "c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5",
+            "date": "2026-10-14",
+            "appCommit": "9a0c179b20ed",
+            "result": "passed",
+            "note": "with catalogue skills (read geo-map-and-crs SKILL.md, methods and script in the project); thinking high sent as medium; all files in 239 s; areas exact on synthetic data; map and stated extent correct"
+          }
+        },
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T124118.071733Z/out/record.json",
+            "sha256": "1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692",
+            "date": "2026-10-14",
+            "appCommit": "75e1eca01b93",
+            "result": "passed",
+            "note": "with catalogue skills (read well-log-qc-quicklook SKILL.md and script in the project); thinking high sent as medium; all files in 268 s; row count, first/last depth and all 23 NULL counts match the LAS; quicklook depth increases downward; one destructive-command confirmation denied by the harness"
+          }
+        },
         {
           "workflowId": "geo-map-and-crs",
           "outcome": "passed",
@@ -292,7 +316,7 @@
             "date": "2026-10-14",
             "appCommit": "b9b5f2d194cf",
             "result": "passed",
-            "note": "all files; areas exact on synthetic data in 646 s; map inset in the area CRS empty and extent text mislabelled"
+            "note": "without catalogue skills, thinking off: all files; areas exact on synthetic data in 646 s; map inset in the area CRS empty and extent text mislabelled"
           }
         },
         {
@@ -304,7 +328,7 @@
             "date": "2026-10-14",
             "appCommit": "a1a6a5ba46ad",
             "result": "passed",
-            "note": "all files in 633 s; row count, first/last depth, STOP residual and all 23 NULL counts match the LAS; quicklook depth axis drawn upward"
+            "note": "without catalogue skills, thinking off: all files in 633 s; row count, first/last depth, STOP residual and all 23 NULL counts match the LAS; quicklook depth axis drawn upward"
           }
         },
         {
@@ -316,19 +340,33 @@
             "date": "2026-10-14",
             "appCommit": "8cb08a50c4ec",
             "result": "partial",
-            "note": "all files and values correct, but the run stalled at an unanswered destructive-command confirmation; repeated once after the harness learned to answer (deny) such prompts"
+            "note": "without catalogue skills, thinking off: all files and values correct, but the run stalled at an unanswered destructive-command confirmation; repeated once after the harness learned to answer (deny) such prompts"
           }
         }
       ],
       "knownLimits": [
-        "The server's three model ids report the same root (/models/Qwen3.8-Flash-Next-FP8); tasks ran on qwen3.8-flash-next only, the other ids got a connection check.",
-        "The server accepts reasoning_effort low, medium and xhigh only. GAID sends the chat's thinking level as reasoning_effort, so the default level (high), minimal and xhigh (Pi lowers it to high for this model) fail with HTTP 400; use off, low or medium. With off the server still reasons at its default.",
-        "Trial projects had no geo catalogue skills: a project created while the app runs is provisioned only at the next launch. The well-log run found an older copy of the exposed skill elsewhere on the host by searching outside its sandbox.",
+        "The server's three model ids report the same root (/models/Qwen3.8-Flash-Next-FP8); tasks ran on qwen3.8-flash-next only, the other ids got a connection check on 2026-10-14 (earlier connection record).",
+        "The server accepts reasoning_effort low, medium and xhigh only. Register it with those accepted reasoning levels (Settings → Custom model servers); GAID then sends minimal as low and high as medium and shows the substitution in the thinking selector. Without the setting, minimal, high and xhigh (sent as high) fail with HTTP 400. With off the server still reasons at its default.",
+        "Tasks before the 2026-10-14 follow-up ran without catalogue skills in the project and at thinking off; the re-trial ran with skills and thinking high (sent as medium), so the two changes are not separated.",
         "Billed as a custom provider (payg at declared cost 0), not the local class; it ledgers $0.",
         "One run per task on a shared server; outputs are not validated scientific results. A first well-log attempt was lost when the PC74 disk filled (not counted)."
       ],
       "serverContextTokens": 262144,
-      "hardware": "remote institution server (vLLM 0.30.0); GPU not known to GAID"
+      "hardware": "remote institution server (vLLM 0.30.0); GPU not known to GAID",
+      "earlierConnections": [
+        {
+          "outcome": "passed",
+          "testedAt": "2026-10-14",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/out/record.json",
+            "sha256": "2bfe9ccaee910150ae93b86a8a3c5d2ba28f6e4952825bc304b448f135b26e0f",
+            "date": "2026-10-14",
+            "appCommit": "b9b5f2d194cf",
+            "result": "passed",
+            "note": "connection 9.3 s at thinking off; in-app probes: off/low/medium passed, minimal/high/xhigh failed with HTTP 400; /models/Qwen3.8-27B and /models/Qwen3.6-27B connected"
+          }
+        }
+      ]
     },
     {
       "id": "chatgpt-signin",
