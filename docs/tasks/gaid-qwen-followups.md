@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:36:44Z
+updated: 2026-10-14T12:41:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -79,8 +79,13 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   "선택한 서버에는 … 값으로 보냅니다." Screenshots: ~/data/geoaidesk/work/gaid-qwen-followups/playwright/
   {custom-server-card,thinking-selector}.png. No chat was sent from this instance (shared server: job 5 running).
 - Harness 9a0c179: `--reasoning-levels` registers the accepted levels; record keeps them and `thinkingSentAs`.
-- Job 5 (KIGAM geo-map-and-crs, thinking high, probes off/minimal/low/medium/xhigh, levels low,medium,xhigh) started
-  12:33Z, concurrently with local job 3/4 on the GPU (KIGAM run uses no GPU).
+- Job 5 (KIGAM geo-map-and-crs, app 9a0c179, thinking high, levels low,medium,xhigh; ran 12:33Z concurrently with
+  local job 3 on the GPU) passed: picker `thinkingSentAs` {minimal: low, high: medium}; connection at high 10 s;
+  probes off/minimal/low/medium/xhigh all passed (2026-10-14 trial: minimal/high/xhigh 400). Task 3 min 59 s,
+  34 turns/35 tool calls (2 recovered), peak 65,431 (25%), $0. Read `.pi/skills/geo-map-and-crs/SKILL.md`,
+  references/methods.md and scripts/geo_map_crs.py in the sandbox; nothing outside. Areas exact; map correct with
+  EPSG:5186 extent stated correctly. record sha256 c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5.
+  (2026-10-14 trial at off: 10 min 46 s, empty area-CRS inset, extent labelled wrongly.)
 ## Next steps
 1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
 2. After job 5: KIGAM well-log-qc with the same options (one KIGAM trial at a time).
