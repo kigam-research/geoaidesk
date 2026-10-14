@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:15:03Z
+updated: 2026-10-14T12:16:41Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f950c83f-f114-403b-86ba-8e4e7d56f2d1","pid":435067,"provider":"codex","session":"01a13a50-2bfe-7e91-a78c-e914e61554c1","start":"44569531","token":"75fb704827e2463ede22fe734b25b74e4d6334906fb417af71c64d9809eb566c"}
 branch: task/gaid-qwen-followups--gaid-qwen-reasoning
 target: task/gaid-qwen-followups
@@ -82,11 +82,12 @@ request at a time.
 - Implemented provider-level reasoningLevels validation and sidecar round-trip; reasoning models receive Pi thinkingLevelMap on explicit save only. Hand-written providers/maps remain untouched.
 - Custom picker rows derive thinkingSentAs from the resolved Pi model. Chat uses fresh discovery metadata even for restored tabs; Defaults shows known-model substitutions. Added server checkboxes and visible chip/row mapping.
 - Targeted checks passed: server custom-models 12 tests; web custom-models/thinking/defaults 15 tests. Real Pi runtimes independently reload the map; intercepted completion payloads prove all six levels, including high -> medium, xhigh unchanged and Off omitted, with zero network calls.
-- Server typecheck passed; web typecheck and full suites pending. Copy validator passed with 0 errors / 56 existing warnings; no new string warnings.
+- Both server and web typechecks passed. Full suites run in the recorded snapshot job below. Copy validator passed with 0 errors / 56 existing warnings; no new string warnings.
 - No review-instance changes and no live/paid model requests.
 ## Next steps
-1. Run the saved snapshot server/web suites with the scientific helper environment; record final counts.
-2. Review the final diff, remove regenerable local caches, save and finish for parent integration.
+1. On the recorded job completion notice, read its exit and out/{server-tests,web-tests,copy-validation}.log; record final counts. Do not restart the job.
+2. Final diff reviewed; after the job passes, record results, save and run task finish for parent integration. The CLI also enforces the declared scripts/check.
+- Waiting only for the recorded job; no independent implementation work remains.
 ## Failed approaches
 ## Notes and decisions
 - Sequential decisions: preserve accepted design; persist accepted levels in the managed sidecar (including servers with no reasoning models); Pi reads each reasoning model map from models.json.
@@ -113,6 +114,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups--gaid-qwen-reasoning-20261014T121603.901517Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
