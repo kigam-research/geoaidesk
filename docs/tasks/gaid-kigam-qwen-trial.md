@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T06:10:38Z
+updated: 2026-10-14T06:26:57Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -70,11 +70,21 @@ model-route guidance. Untested combinations stay untested.
 - Harness-only correction: runChat answers permission prompts (`--permission deny` default, recorded in
   `permissionRequests`); test added (6 pass). One repeat of well-log-qc as job 4 (WP10 rule: at most one repeat
   after a harness-only correction).
+- Job 4 (well-log-qc, record sha256 1d73cbe9…e16d): connection passed 1.7 s; task passed in 633 s, no permission
+  prompts, 43 turns, 47 tool calls, 2 recovered tool errors, context peak 108,676 (41.5%), ledger $0. Values exact
+  (23 NULL counts, rows, first/last, STOP residual -0.1128 reported). Quicklook: 1400–1800 window but depth axis
+  increases upward (job 3's was correct). The model searched the host for the exposed skill it could not find in
+  the sandbox and read an old copy in ~/data/geoaidesk/work/gaid-runtime/skill_hub-0228785/ (outside the sandbox).
+- Finding (app): catalogue skills reach a project only via `npm run prep` at launch or POST
+  /projects/:id/sandbox/init, which no web code calls; projects created while the app runs (all trial projects,
+  WP10 too) have no geo skills while their exposure record lists them. WP10's "never read the workflow skill" is
+  confounded by this. Out of scope here: open item.
 ## Next steps
-1. When job 2 exits: inspect its record/outputs against the LAS (WP10 reference checks), then update
-   geo/compatibility.json + docs/geo/compatibility.md (route + thinking-level limit), write the report, scripts/check.
+1. Update geo/compatibility.json + docs/geo/compatibility.md, write the report, scripts/check, finish.
 ## Failed approaches
 ## Notes and decisions
+- gaid-release-proof#1 (paid/subscription route trials incl. the 67 server) stays open: only its 67-server part is
+  done here; the hub may narrow it.
 - Orchestration: small, tightly coupled work (harness extension, two serial jobs on a shared server, record/docs
   update, report); done by the writer, no child units.
 - Trial model: `qwen3.8-flash-next` for both tasks (other ids share its root; they get connection probes only).
@@ -87,7 +97,10 @@ model-route guidance. Untested combinations stay untested.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 새 프로젝트에 지질 스킬이 바로 설치되도록 앱을 고칠지 — 가) 별도 작업으로 고치고 로컬·기관 서버 과제를 스킬이 있는 상태로 재시험 — 나) 그대로 두고 "새 프로젝트는 재시작 후 스킬 설치"만 안내 — 권장: 가) 화면에서 만든 새 프로젝트도 재시작 전까지 워크플로를 쓸 수 없고 지금 기록은 스킬 없이 낸 결과 — 막힌 일: 스킬 노출 효과 평가 — 조건: 없음 — 근거: reports/2026-10-14-gaid-kigam-qwen-trial#6-결정할-일
+- [결정] 기관 서버에서 기본 추론량 "높음"이 실패하는 문제를 앱에서 막을지 — 가) 별도 작업으로 사용자 지정 서버별 허용 추론량을 설정하고 받지 않는 값은 보내지 않게 수정 — 나) 앱은 그대로 두고 "사용 안 함·낮음·보통" 안내만 유지 — 권장: 가) 기본 설정으로 첫 대화가 실패하면 원인을 알기 어려움 — 막힌 일: 기관 서버 기본 설정 사용 — 조건: 없음 — 근거: reports/2026-10-14-gaid-kigam-qwen-trial#6-결정할-일
 ## Report
+Report: reports/2026-10-14-gaid-kigam-qwen-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
