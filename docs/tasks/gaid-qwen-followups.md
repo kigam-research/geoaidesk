@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T13:11:09Z
+updated: 2026-10-14T13:13:09Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -102,9 +102,15 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   destructive-command confirmation was denied by the harness and the model continued. record sha256
   1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692. (2026-10-14 trial at off: 10 min 33 s.)
 ## Next steps
-4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
+1. When the scripts/check job (job 7) exits: fill the 전체 검사 row of the report appendix, record the result here.
+2. Remove regenerable build caches (server/node_modules, web/node_modules, web/.next, web/next-env.d.ts,
+   server/src/helpers/.venv, __pycache__) and any app-written .env; `task review-copy` the report; `task finish`.
 ## Failed approaches
 ## Notes and decisions
+- Done: compatibility.json/.md updated (cf53ee7; earlier connection records kept as `earlierConnections`), registry
+  entry `gaid-qwen-followups-retrial` (review), report with figures; humanizer pass applied (one §1 contrast).
+- No open decisions. Optional follow-up (not done): stop repeated bounded `read` windows over large geo files in the
+  read hint (98K LAS failure).
 - Finding (2026-10-14): the UI New project dialog already calls `POST /projects/:id/sandbox/init` after create
   (`web/src/lib/use-projects.ts`), which runs `provisionProjectSkills`; the trial report's "web code does not call it"
   was wrong. The gap is `POST /projects` itself (route-trial and any API client get no skills until restart) and the
@@ -132,9 +138,7 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-14-gaid-qwen-followups/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121210.303517Z/receipt.json
