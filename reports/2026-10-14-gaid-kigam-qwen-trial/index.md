@@ -4,7 +4,7 @@ date: 2026-10-14
 project: geoaidesk
 task: gaid-kigam-qwen-trial
 headline: 기관 내부 Qwen 서버는 연결과 두 과제(지도·면적표, 검층 QC)를 모두 통과했습니다. 다만 대화의 추론량을 "사용 안 함·낮음·보통" 중 하나로 두어야 합니다.
-review_status: pending
+review_status: adopted
 decisions: 2
 cover: figures/01-kigam-qwen-map.png
 supersedes:
