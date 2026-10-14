@@ -89,6 +89,12 @@
       "responsibility": "Skill seeding calls provisionProjectSkills (server/src/geo/provision.ts): the pinned geo catalogue through skills-sync in geo mode, upstream seedProjectSkills otherwise"
     },
     {
+      "path": "server/src/api/projects.ts, server/src/api/skills.ts",
+      "owner": "gaid-qwen-followups",
+      "status": "edited",
+      "responsibility": "POST /projects provisions the pinned geo catalogue before replying (provisionCreatedProject, geo mode only); the unprefixed POST /sandbox/init uses provisionProjectSkills instead of upstream seedProjectSkills"
+    },
+    {
       "path": "server/vitest.config.ts",
       "owner": "gaid-runtime",
       "status": "edited",
