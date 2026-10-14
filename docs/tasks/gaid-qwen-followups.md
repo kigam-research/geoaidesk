@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-14T12:19:26Z
+status: done
+updated: 2026-10-14T22:57:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -63,18 +63,62 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   (A 30,000, B 20,000 m²); map correct in EPSG:5186 with legend; CRS inventory declared only. run.json carries an
   invented timestamp (2025-04-05). record sha256 0967531dab38bae7f034a918965fee6430a91097de0a28061cb7c55cb347e0ab.
   (WP10: partial, no map.)
-- B delegated to child `gaid-qwen-followups--gaid-qwen-reasoning` (writer f950c83f, workspace wks_f2ee75fc2036fa9c).
-  Note for integration: the child also needs owner `gaid-qwen-followups` in geo/tests/distribution.test.mjs (already
-  added on this branch; resolve the duplicate line on merge).
+- Job 3 (local 98K well-log-qc, app 7656c87) failed: connection 54 s; task hit the 45-min cap with no artifacts; it never
+  read the skill and instead read the raw LAS with `read` 100 lines at a time (21 calls, ~2.5 min per turn at ~89K
+  input, 22% of the model on CPU), peak 105,725 tokens (app ratio 1.08). Ran 12:20–13:05Z overlapping job 5/6 and the
+  UI instance (CPU contention possible; the reading pattern is the model's choice). No rerun (no harness defect).
+  Finding: the geo read hint did not stop line-window `read`s of a LAS file. record sha256
+  a1a7f8435b4159dc212cafaade8a39ba3203d7f9d73dcd93041061fe6a6f51b6. (WP10 98K: partial at the cap, QC defects.)
+- Job 4 (local 98K geo-map-and-crs, app 1059867) passed: connection 29 s; task 2 min 25 s, 19 turns/18 tool calls
+  (7 recovered tool errors, four script copies left in results/), peak 37,301 (38%), $0; read no skill file. Areas
+  exact; map correct. record sha256 864fff330a100332276444e8e0bf1b138ac00f851ae983327ca8845795c89ad3. (WP10 98K: passed, 76 s.)
+- B integrated (child `gaid-qwen-followups--gaid-qwen-reasoning` completed and closed 2026-10-14, merge 7d39ec7): provider
+  `reasoningLevels` (sidecar) -> per-model Pi `thinkingLevelMap`; picker rows carry `thinkingSentAs`; Settings card
+  checkboxes; thinking selector chip "높음 → 보통" and row note. Child checks: server 1675 passed/11 skipped, web 984
+  passed, typechecks. Parent copy fix cb4d83b: ids `customModels.acceptedReasoningLevels` ko "서버가 받는 추론량" / en
+  "Reasoning levels the server accepts"; `customModels.reasoningLevelsHelp` (ko uses 추론량 and "사용 안 함");
+  `chat.thinking.sentAs` ko "선택한 서버에는 {level} 값으로 보냅니다." / en "Sent to this server as {level}." (child
+  wording: "서버가 지원하는 추론 수준", "끄기", "해당 서버에는 {level}으로 보냅니다." — wrong particle after 최소);
+  `chat.thinking.mappedLevel` "{selected} → {sentAs}" unchanged.
+- UI check (own instance, start-gaid.sh at cb4d83b+, ports 3400/18400, GAID_HOME
+  ~/data/geoaidesk/work/gaid-qwen-followups/ui-home, systemd unit gaid-qwen-followups-ui, stopped): the New project
+  dialog created `proj-736297` with all 13 catalogue skills (+council-mode, pi-subagents); KIGAM server registered with
+  low/medium/xhigh -> models.json map {minimal: low, low, medium, high: medium, xhigh}; Settings card shows the
+  checkboxes; selecting `qwen3.8-flash-next` turns the chip into "높음 → 보통", rows "최소 → 낮음"/"높음 → 보통" with
+  "선택한 서버에는 … 값으로 보냅니다." Screenshots: ~/data/geoaidesk/work/gaid-qwen-followups/playwright/
+  {custom-server-card,thinking-selector}.png. No chat was sent from this instance (shared server: job 5 running).
+- Harness 9a0c179: `--reasoning-levels` registers the accepted levels; record keeps them and `thinkingSentAs`.
+- Job 5 (KIGAM geo-map-and-crs, app 9a0c179, thinking high, levels low,medium,xhigh; ran 12:33Z concurrently with
+  local job 3 on the GPU) passed: picker `thinkingSentAs` {minimal: low, high: medium}; connection at high 10 s;
+  probes off/minimal/low/medium/xhigh all passed (2026-10-14 trial: minimal/high/xhigh 400). Task 3 min 59 s,
+  34 turns/35 tool calls (2 recovered), peak 65,431 (25%), $0. Read `.pi/skills/geo-map-and-crs/SKILL.md`,
+  references/methods.md and scripts/geo_map_crs.py in the sandbox; nothing outside. Areas exact; map correct with
+  EPSG:5186 extent stated correctly. record sha256 c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5.
+  (2026-10-14 trial at off: 10 min 46 s, empty area-CRS inset, extent labelled wrongly.)
+- Job 6 (KIGAM well-log-qc, app 75e1eca, thinking high -> medium) passed: connection 10 s; task 4 min 28 s, 23 turns/27
+  tool calls (1 recovered), peak 78,074 (30%), $0; read `.pi/skills/well-log-qc-quicklook/SKILL.md` and
+  scripts/well_log_qc.py in the sandbox, nothing outside. All 23 curves match the LAS reference; quicklook 1400–1800 m,
+  depth increases downward (2026-10-14 trial: upward), missing curves grey; log-axis tick labels overlap. One
+  destructive-command confirmation was denied by the harness and the model continued. record sha256
+  1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692. (2026-10-14 trial at off: 10 min 33 s.)
+- Job 7 (scripts/check at 72ca370^ tree) failed only in web vitest: 3 of 984 tests (file-preview-panel draft
+  retention: 5 s timeout and missing editor; map viewer attribute-table heading), unrelated to this unit's files; both
+  files pass in isolation (12/12). Host load average 42 from seoul_geomodel ensemble jobs during the run. Rerun once.
+- Job 8 (scripts/check rerun) failed again for the same outside cause: only web `src/geo/viewers/map/viewer.test.tsx`
+  "inspects before paging…" (findByRole timeout); server 1679 passed/11 skipped, web 983/984; load average 41
+  (seoul_geomodel ensemble jobs). Not retried immediately; next run waits for host load to drop.
+- Job 9 (scripts/check at 6eb349c, load ~1.4 after the user chose "나") passed: server 1679 passed/11 skipped, web 984,
+  geo 41, environment smoke, production smoke (13 skills provisioned). Report appendix filled.
 ## Next steps
-1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
-2. When the child finishes: `task complete gaid-qwen-followups--gaid-qwen-reasoning`, then KIGAM re-trial
-   (custom-server, both workflows, thinking high -> medium, thinking probes for all levels), one at a time.
-3. UI check on an own instance (other ports, GAID_HOME under ~/data/geoaidesk/work/gaid-qwen-followups/): New
-   project dialog -> skills present; custom server reasoning levels; thinking selector shows the substitution.
-4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
+<!-- task:closed -->
+Closed 2026-10-14T22:57:05Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
+- Done: compatibility.json/.md updated (cf53ee7; earlier connection records kept as `earlierConnections`), registry
+  entry `gaid-qwen-followups-retrial` (review), report with figures; humanizer pass applied (one §1 contrast).
+- No open decisions. Optional follow-up (not done): stop repeated bounded `read` windows over large geo files in the
+  read hint (98K LAS failure).
 - Finding (2026-10-14): the UI New project dialog already calls `POST /projects/:id/sandbox/init` after create
   (`web/src/lib/use-projects.ts`), which runs `provisionProjectSkills`; the trial report's "web code does not call it"
   was wrong. The gap is `POST /projects` itself (route-trial and any API client get no skills until restart) and the
@@ -102,15 +146,18 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-14-gaid-qwen-followups/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121210.303517Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121233.638014Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121243.381587Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121252.863802Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T123348.224521Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T124118.071733Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T131108.286814Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T131749.464530Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T224923.177731Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

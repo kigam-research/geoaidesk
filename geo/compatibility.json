@@ -158,17 +158,41 @@
       "adapterStatus": "implemented",
       "connection": {
         "outcome": "passed",
-        "testedAt": "2026-10-11",
+        "testedAt": "2026-10-14",
         "record": {
-          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/out/record.json",
-          "sha256": "74a55d69636af62c0fe64d62876af796149ff6d714acc34ac91cdd38dc2746d9",
-          "date": "2026-10-11",
-          "result": "partial",
-          "appCommit": "fe18a954c661",
-          "note": "connection 28.7 s"
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121210.303517Z/out/record.json",
+          "sha256": "b830eec1af0d84205c79be4e352dd7ef37abde84a348bebf35c3e5265f31486a",
+          "date": "2026-10-14",
+          "appCommit": "b2076d8e2ae9",
+          "result": "passed",
+          "note": "connection 52 s"
         }
       },
       "tasks": [
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121210.303517Z/out/record.json",
+            "sha256": "b830eec1af0d84205c79be4e352dd7ef37abde84a348bebf35c3e5265f31486a",
+            "date": "2026-10-14",
+            "appCommit": "b2076d8e2ae9",
+            "result": "passed",
+            "note": "with catalogue skills (read well-log-qc-quicklook SKILL.md in the project); all files in 52 s; row count, first/last depth and all 23 NULL counts match the LAS; quicklook 1400–1800 m, depth increases downward"
+          }
+        },
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121233.638014Z/out/record.json",
+            "sha256": "0967531dab38bae7f034a918965fee6430a91097de0a28061cb7c55cb347e0ab",
+            "date": "2026-10-14",
+            "appCommit": "6e8511d25747",
+            "result": "passed",
+            "note": "with catalogue skills exposed but no skill file read; all files in 54 s; areas exact on synthetic data; map correct; run.json carries an invented timestamp"
+          }
+        },
         {
           "workflowId": "well-log-qc",
           "outcome": "partial",
@@ -178,7 +202,7 @@
             "date": "2026-10-11",
             "result": "partial",
             "appCommit": "fe18a954c661",
-            "note": "45-min cap; quicklook.png missing; app-reported context peak 101.9%; qc.json not valid QC"
+            "note": "without catalogue skills: 45-min cap; quicklook.png missing; app-reported context peak 101.9%; qc.json not valid QC"
           }
         },
         {
@@ -190,18 +214,32 @@
             "date": "2026-10-11",
             "result": "partial",
             "appCommit": "a97bf28265bd",
-            "note": "area table exact (synthetic); map.png and CRS inventory missing"
+            "note": "without catalogue skills: area table exact (synthetic); map.png and CRS inventory missing"
           }
         }
       ],
       "knownLimits": [
-        "No run read the exposed workflow skill; it was not installed in the trial project (projects created while the app runs get catalogue skills only at the next launch; found 2026-10-14).",
         "Generated scripts needed repeated repairs; outputs are not validated scientific results.",
         "Ollama loads part of the model on the CPU at both contexts.",
-        "64K LAS run reached the app context limit."
+        "The 2026-10-11 64K LAS run reached the app context limit.",
+        "Tasks from 2026-10-11 ran without catalogue skills in the project (provisioned only at launch then); the 2026-10-14 re-trial ran with them. One run per task."
       ],
       "serverContextTokens": 65536,
-      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 7%/93%, not pure GPU"
+      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 7%/93%, not pure GPU",
+      "earlierConnections": [
+        {
+          "outcome": "passed",
+          "testedAt": "2026-10-11",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082232.988087Z/out/record.json",
+            "sha256": "74a55d69636af62c0fe64d62876af796149ff6d714acc34ac91cdd38dc2746d9",
+            "date": "2026-10-11",
+            "result": "partial",
+            "appCommit": "fe18a954c661",
+            "note": "connection 28.7 s"
+          }
+        }
+      ]
     },
     {
       "id": "local-ollama-qwen3-30b-98k",
@@ -215,17 +253,41 @@
       "adapterStatus": "implemented",
       "connection": {
         "outcome": "passed",
-        "testedAt": "2026-10-11",
+        "testedAt": "2026-10-14",
         "record": {
-          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082337.131367Z/out/record.json",
-          "sha256": "820b4717dda634539bc86e5d16c9d8a90f94af1c617f45c45689da6640fc6f42",
-          "date": "2026-10-11",
-          "result": "partial",
-          "appCommit": "15f70edf37c4",
-          "note": "connection 29.7 s"
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121252.863802Z/out/record.json",
+          "sha256": "864fff330a100332276444e8e0bf1b138ac00f851ae983327ca8845795c89ad3",
+          "date": "2026-10-14",
+          "appCommit": "1059867041a5",
+          "result": "passed",
+          "note": "connection 29 s"
         }
       },
       "tasks": [
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "failed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121243.381587Z/out/record.json",
+            "sha256": "a1a7f8435b4159dc212cafaade8a39ba3203d7f9d73dcd93041061fe6a6f51b6",
+            "date": "2026-10-14",
+            "appCommit": "7656c87e4c48",
+            "result": "failed",
+            "note": "with catalogue skills exposed but never read; the model paged through the raw LAS with 100-line reads until the 45-min cap; no artifacts; app context peak 107.5%; ran alongside other trials on the host"
+          }
+        },
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T121252.863802Z/out/record.json",
+            "sha256": "864fff330a100332276444e8e0bf1b138ac00f851ae983327ca8845795c89ad3",
+            "date": "2026-10-14",
+            "appCommit": "1059867041a5",
+            "result": "passed",
+            "note": "with catalogue skills exposed but no skill file read; all files in 145 s after 7 recovered tool errors; areas exact on synthetic data; map correct"
+          }
+        },
         {
           "workflowId": "well-log-qc",
           "outcome": "partial",
@@ -235,7 +297,7 @@
             "date": "2026-10-11",
             "result": "partial",
             "appCommit": "15f70edf37c4",
-            "note": "45-min cap; all files present but tool-call loop and QC defects (NULL counts, plot window)"
+            "note": "without catalogue skills: 45-min cap; all files present but tool-call loop and QC defects (NULL counts, plot window)"
           }
         },
         {
@@ -247,17 +309,32 @@
             "date": "2026-10-11",
             "result": "passed",
             "appCommit": "14572664c6de",
-            "note": "all files; areas exact on synthetic data in 76 s; inventory/run.json incomplete"
+            "note": "without catalogue skills: all files; areas exact on synthetic data in 76 s; inventory/run.json incomplete"
           }
         }
       ],
       "knownLimits": [
-        "No run read the exposed workflow skill; it was not installed in the trial project (projects created while the app runs get catalogue skills only at the next launch; found 2026-10-14).",
         "Generated scripts needed repeated repairs; outputs are not validated scientific results.",
-        "Ollama loads part of the model on the CPU at both contexts."
+        "Ollama loads part of the model on the CPU at both contexts.",
+        "Tasks from 2026-10-11 ran without catalogue skills in the project (provisioned only at launch then); the 2026-10-14 re-trial ran with them. One run per task.",
+        "The 2026-10-14 LAS run read the raw file in 100-line windows until the cap; the geo read hint allows bounded reads, so repeated windows are not stopped."
       ],
       "serverContextTokens": 98304,
-      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 18%/82%, not pure GPU"
+      "hardware": "RTX 4090 24 GB (PC74); Ollama CPU/GPU split 18%/82%, not pure GPU",
+      "earlierConnections": [
+        {
+          "outcome": "passed",
+          "testedAt": "2026-10-11",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-release-proof--routes-20261011T082337.131367Z/out/record.json",
+            "sha256": "820b4717dda634539bc86e5d16c9d8a90f94af1c617f45c45689da6640fc6f42",
+            "date": "2026-10-11",
+            "result": "partial",
+            "appCommit": "15f70edf37c4",
+            "note": "connection 29.7 s"
+          }
+        }
+      ]
     },
     {
       "id": "kigam-qwen-vllm-262k",
@@ -268,21 +345,45 @@
       "advertised": false,
       "documentationCheckedAt": null,
       "documentationSources": [],
-      "adapterStatus": "implemented (openai-completions custom provider, reasoning on, declared cost 0)",
-      "requestedBy": "user, 2026-10-14: “현재 67ip llm 서버가 복구되었다. 사용가능한지 확인해보자.” / “가와 나 모두 진행하자.”",
+      "adapterStatus": "implemented (openai-completions custom provider, reasoning on, declared cost 0; accepted reasoning levels low, medium, xhigh set in Settings → Custom model servers)",
+      "requestedBy": "user, 2026-10-14: “현재 67ip llm 서버가 복구되었다. 사용가능한지 확인해보자.” / “가와 나 모두 진행하자.” / 2026-10-14 follow-up: “1번은 가로하고 2번은 가로 하면서 높음을 지정하면 보통으로 보내지게 하자.”",
       "connection": {
         "outcome": "passed",
         "testedAt": "2026-10-14",
         "record": {
-          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/out/record.json",
-          "sha256": "2bfe9ccaee910150ae93b86a8a3c5d2ba28f6e4952825bc304b448f135b26e0f",
+          "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T123348.224521Z/out/record.json",
+          "sha256": "c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5",
           "date": "2026-10-14",
-          "appCommit": "b9b5f2d194cf",
+          "appCommit": "9a0c179b20ed",
           "result": "passed",
-          "note": "connection 9.3 s at thinking off; in-app probes: off/low/medium passed, minimal/high/xhigh failed with HTTP 400; /models/Qwen3.8-27B and /models/Qwen3.6-27B connected"
+          "note": "connection 9.8 s at thinking high, sent as medium (accepted levels low, medium, xhigh); in-app probes off/minimal/low/medium/xhigh all passed (minimal sent as low)"
         }
       },
       "tasks": [
+        {
+          "workflowId": "geo-map-and-crs",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T123348.224521Z/out/record.json",
+            "sha256": "c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5",
+            "date": "2026-10-14",
+            "appCommit": "9a0c179b20ed",
+            "result": "passed",
+            "note": "with catalogue skills (read geo-map-and-crs SKILL.md, methods and script in the project); thinking high sent as medium; all files in 239 s; areas exact on synthetic data; map and stated extent correct"
+          }
+        },
+        {
+          "workflowId": "well-log-qc",
+          "outcome": "passed",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-qwen-followups-20261014T124118.071733Z/out/record.json",
+            "sha256": "1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692",
+            "date": "2026-10-14",
+            "appCommit": "75e1eca01b93",
+            "result": "passed",
+            "note": "with catalogue skills (read well-log-qc-quicklook SKILL.md and script in the project); thinking high sent as medium; all files in 268 s; row count, first/last depth and all 23 NULL counts match the LAS; quicklook depth increases downward; one destructive-command confirmation denied by the harness"
+          }
+        },
         {
           "workflowId": "geo-map-and-crs",
           "outcome": "passed",
@@ -292,7 +393,7 @@
             "date": "2026-10-14",
             "appCommit": "b9b5f2d194cf",
             "result": "passed",
-            "note": "all files; areas exact on synthetic data in 646 s; map inset in the area CRS empty and extent text mislabelled"
+            "note": "without catalogue skills, thinking off: all files; areas exact on synthetic data in 646 s; map inset in the area CRS empty and extent text mislabelled"
           }
         },
         {
@@ -304,7 +405,7 @@
             "date": "2026-10-14",
             "appCommit": "a1a6a5ba46ad",
             "result": "passed",
-            "note": "all files in 633 s; row count, first/last depth, STOP residual and all 23 NULL counts match the LAS; quicklook depth axis drawn upward"
+            "note": "without catalogue skills, thinking off: all files in 633 s; row count, first/last depth, STOP residual and all 23 NULL counts match the LAS; quicklook depth axis drawn upward"
           }
         },
         {
@@ -316,19 +417,33 @@
             "date": "2026-10-14",
             "appCommit": "8cb08a50c4ec",
             "result": "partial",
-            "note": "all files and values correct, but the run stalled at an unanswered destructive-command confirmation; repeated once after the harness learned to answer (deny) such prompts"
+            "note": "without catalogue skills, thinking off: all files and values correct, but the run stalled at an unanswered destructive-command confirmation; repeated once after the harness learned to answer (deny) such prompts"
           }
         }
       ],
       "knownLimits": [
-        "The server's three model ids report the same root (/models/Qwen3.8-Flash-Next-FP8); tasks ran on qwen3.8-flash-next only, the other ids got a connection check.",
-        "The server accepts reasoning_effort low, medium and xhigh only. GAID sends the chat's thinking level as reasoning_effort, so the default level (high), minimal and xhigh (Pi lowers it to high for this model) fail with HTTP 400; use off, low or medium. With off the server still reasons at its default.",
-        "Trial projects had no geo catalogue skills: a project created while the app runs is provisioned only at the next launch. The well-log run found an older copy of the exposed skill elsewhere on the host by searching outside its sandbox.",
+        "The server's three model ids report the same root (/models/Qwen3.8-Flash-Next-FP8); tasks ran on qwen3.8-flash-next only, the other ids got a connection check on 2026-10-14 (earlier connection record).",
+        "The server accepts reasoning_effort low, medium and xhigh only. Register it with those accepted reasoning levels (Settings → Custom model servers); GAID then sends minimal as low and high as medium and shows the substitution in the thinking selector. Without the setting, minimal, high and xhigh (sent as high) fail with HTTP 400. With off the server still reasons at its default.",
+        "Tasks before the 2026-10-14 follow-up ran without catalogue skills in the project and at thinking off; the re-trial ran with skills and thinking high (sent as medium), so the two changes are not separated.",
         "Billed as a custom provider (payg at declared cost 0), not the local class; it ledgers $0.",
         "One run per task on a shared server; outputs are not validated scientific results. A first well-log attempt was lost when the PC74 disk filled (not counted)."
       ],
       "serverContextTokens": 262144,
-      "hardware": "remote institution server (vLLM 0.30.0); GPU not known to GAID"
+      "hardware": "remote institution server (vLLM 0.30.0); GPU not known to GAID",
+      "earlierConnections": [
+        {
+          "outcome": "passed",
+          "testedAt": "2026-10-14",
+          "record": {
+            "locator": "pc74:/home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/out/record.json",
+            "sha256": "2bfe9ccaee910150ae93b86a8a3c5d2ba28f6e4952825bc304b448f135b26e0f",
+            "date": "2026-10-14",
+            "appCommit": "b9b5f2d194cf",
+            "result": "passed",
+            "note": "connection 9.3 s at thinking off; in-app probes: off/low/medium passed, minimal/high/xhigh failed with HTTP 400; /models/Qwen3.8-27B and /models/Qwen3.6-27B connected"
+          }
+        }
+      ]
     },
     {
       "id": "chatgpt-signin",

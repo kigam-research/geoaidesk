@@ -22,3 +22,15 @@ files = [{ path = "force-concordance.json", sha256 = "4512f9ded9dea4979394fb2319
 report = "reports/2026-10-11-gaid-well-tables/index.md"
 replicas = []
 supersedes = ""
+
+[[result]]
+id = "gaid-qwen-followups-retrial"
+title = "새 프로젝트 스킬 설치·서버별 추론량 설정 뒤 기관·로컬 모델 재시험"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs"
+source_sha = "75e1eca01b93"
+inputs = ["assets:geo-catalogue/0.2.1", "assets:force2020-welllogs/c8d01ee9"]
+files = [{ path = "gaid-qwen-followups-20261014T123348.224521Z/out/record.json", sha256 = "c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5" }, { path = "gaid-qwen-followups-20261014T124118.071733Z/out/record.json", sha256 = "1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692" }, { path = "gaid-qwen-followups-20261014T121210.303517Z/out/record.json", sha256 = "b830eec1af0d84205c79be4e352dd7ef37abde84a348bebf35c3e5265f31486a" }, { path = "gaid-qwen-followups-20261014T121233.638014Z/out/record.json", sha256 = "0967531dab38bae7f034a918965fee6430a91097de0a28061cb7c55cb347e0ab" }, { path = "gaid-qwen-followups-20261014T121243.381587Z/out/record.json", sha256 = "a1a7f8435b4159dc212cafaade8a39ba3203d7f9d73dcd93041061fe6a6f51b6" }, { path = "gaid-qwen-followups-20261014T121252.863802Z/out/record.json", sha256 = "864fff330a100332276444e8e0bf1b138ac00f851ae983327ca8845795c89ad3" }]
+report = "reports/2026-10-14-gaid-qwen-followups/index.md"
+replicas = []
+supersedes = ""

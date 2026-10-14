@@ -22,6 +22,7 @@ export function options(args) {
     'max-tokens': { type: 'string', default: '16384' }, thinking: { type: 'string', default: 'off' },
     'thinking-probe': { type: 'string', default: '' }, 'also-connect': { type: 'string', default: '' },
     permission: { type: 'string', default: 'deny' }, 'allow-missing-skills': { type: 'boolean', default: false },
+    'reasoning-levels': { type: 'string', default: '' },
   } });
   if (o.help) return o;
   if (!['local','custom-server','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
@@ -42,6 +43,8 @@ export function options(args) {
   const list = s => s.split(',').map(x => x.trim()).filter(Boolean);
   o.thinkingProbe = list(o['thinking-probe']);
   o.alsoConnect = list(o['also-connect']);
+  o.reasoningLevels = list(o['reasoning-levels']);
+  if (!o.reasoningLevels.every(l => ['minimal','low','medium','high','xhigh'].includes(l))) throw new Error('Unknown reasoning level');
   const levels = ['off','minimal','low','medium','high','xhigh'];
   if (![o.thinking, ...o.thinkingProbe].every(l => levels.includes(l))) throw new Error('Unknown thinking level');
   if (!['deny','allow','none'].includes(o.permission)) throw new Error('--permission must be deny, allow or none');
@@ -173,7 +176,7 @@ export async function main(args = process.argv.slice(2)) {
       const zero = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
       const ids = [o.model, ...o.alsoConnect];
       await json('PUT','/custom-models', { body: { providers: [{ id: o['provider-id'], name: `Trial ${o['base-url']}`, baseUrl: o['base-url'],
-        api: 'openai-completions', apiKey: '', models: ids.map(id => ({ id, reasoning: true, input: ['text'], contextWindow: o.context, maxTokens: o.maxTokens, cost: zero })) }] } });
+        api: 'openai-completions', apiKey: '', ...(o.reasoningLevels.length ? { reasoningLevels: o.reasoningLevels } : {}), models: ids.map(id => ({ id, reasoning: true, input: ['text'], contextWindow: o.context, maxTokens: o.maxTokens, cost: zero })) }] } });
       model = `${o['provider-id']}/${o.model}`;
       const list = await json('GET','/providers/models');
       const selected = list.models.find(x => x.id === model || `${x.provider}/${x.modelId}` === model);
@@ -182,7 +185,7 @@ export async function main(args = process.argv.slice(2)) {
       try { served = (await (await fetch(`${o['base-url'].replace(/\/$/,'')}/models`, { signal: AbortSignal.timeout(15_000) })).json()).data
         ?.map(x => ({ id: x.id, root: x.root, maxModelLen: x.max_model_len, ownedBy: x.owned_by })); } catch (e) { served = { error: e.message }; }
       record.route = { ...record.route, provider: `${o['provider-id']} (custom server)`, baseUrl: o['base-url'], modelId: o.model,
-        maxTokens: o.maxTokens, thinkingLevel: o.thinking, billingMode: selected.billingMode, pricingUsdPerMillionTokens: selected.pricing,
+        maxTokens: o.maxTokens, thinkingLevel: o.thinking, reasoningLevels: o.reasoningLevels, thinkingSentAs: selected.thinkingSentAs ?? null, billingMode: selected.billingMode, pricingUsdPerMillionTokens: selected.pricing,
         servedModels: served };
     } else {
       model = o.model;

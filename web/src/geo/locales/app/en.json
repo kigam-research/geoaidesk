@@ -639,8 +639,8 @@
   "chat.compute.fallbackTarget": "fallback {target}",
   "chat.compute.cacheTarget": "cache {cache}",
   "settings.credentials.clearField": "Clear {label}",
-  "customModels.acceptedReasoningLevels": "Reasoning levels accepted by the server",
-  "customModels.reasoningLevelsHelp": "Unselected levels are sent as the nearest lower accepted level, or the nearest higher one if none is lower. Leave all unchecked to keep the existing behavior. Off is always selectable.",
+  "customModels.acceptedReasoningLevels": "Reasoning levels the server accepts",
+  "customModels.reasoningLevelsHelp": "A level that is not selected is sent as the nearest lower accepted level, or the nearest higher one if none is lower. With none selected, levels are sent with the app's default handling. Off is always available.",
   "chat.thinking.mappedLevel": "{selected} → {sentAs}",
   "chat.thinking.sentAs": "Sent to this server as {level}."
 }
