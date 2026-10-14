@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:41:19Z
+updated: 2026-10-14T12:48:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -86,9 +86,14 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   references/methods.md and scripts/geo_map_crs.py in the sandbox; nothing outside. Areas exact; map correct with
   EPSG:5186 extent stated correctly. record sha256 c63e057586491272d9fc30eb4c5282491f3e2d8bff0dc7ab634704f07ad1ecc5.
   (2026-10-14 trial at off: 10 min 46 s, empty area-CRS inset, extent labelled wrongly.)
+- Job 6 (KIGAM well-log-qc, app 75e1eca, thinking high -> medium) passed: connection 10 s; task 4 min 28 s, 23 turns/27
+  tool calls (1 recovered), peak 78,074 (30%), $0; read `.pi/skills/well-log-qc-quicklook/SKILL.md` and
+  scripts/well_log_qc.py in the sandbox, nothing outside. All 23 curves match the LAS reference; quicklook 1400–1800 m,
+  depth increases downward (2026-10-14 trial: upward), missing curves grey; log-axis tick labels overlap. One
+  destructive-command confirmation was denied by the harness and the model continued. record sha256
+  1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692. (2026-10-14 trial at off: 10 min 33 s.)
 ## Next steps
 1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
-2. After job 5: KIGAM well-log-qc with the same options (one KIGAM trial at a time).
 4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
 ## Failed approaches
 ## Notes and decisions
