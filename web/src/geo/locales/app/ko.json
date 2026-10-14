@@ -639,8 +639,8 @@
   "chat.compute.fallbackTarget": "대체 환경 {target}",
   "chat.compute.cacheTarget": "캐시 {cache}",
   "settings.credentials.clearField": "{label} 지우기",
-  "customModels.acceptedReasoningLevels": "서버가 지원하는 추론 수준",
-  "customModels.reasoningLevelsHelp": "선택하지 않은 수준은 가장 가까운 낮은 지원 수준으로 보냅니다. 낮은 수준이 없으면 가장 가까운 높은 수준으로 보냅니다. 아무것도 선택하지 않으면 기존 동작을 유지합니다. 끄기는 항상 선택할 수 있습니다.",
+  "customModels.acceptedReasoningLevels": "서버가 받는 추론량",
+  "customModels.reasoningLevelsHelp": "고르지 않은 추론량은 그보다 낮은 값 중 가장 가까운 받는 값으로 보냅니다. 낮은 값이 없으면 가장 가까운 높은 값으로 보냅니다. 아무것도 고르지 않으면 앱의 기본 처리대로 보냅니다. \"사용 안 함\"은 항상 고를 수 있습니다.",
   "chat.thinking.mappedLevel": "{selected} → {sentAs}",
-  "chat.thinking.sentAs": "해당 서버에는 {level}으로 보냅니다."
+  "chat.thinking.sentAs": "선택한 서버에는 {level} 값으로 보냅니다."
 }
