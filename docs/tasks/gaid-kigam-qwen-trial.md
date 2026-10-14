@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T05:01:35Z
+updated: 2026-10-14T05:03:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -78,7 +78,3 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
-## Running jobs
-<!-- task:jobs -->
-- /home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/receipt.json
-<!-- /task:jobs -->
