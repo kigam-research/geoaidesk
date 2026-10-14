@@ -49,7 +49,9 @@ fresh instance, registers the server through `PUT /custom-models` the way Settin
 `/models` list, and runs the same connection and task chats with `--thinking` (default `off`). The route is billed as
 the app bills custom providers (`payg` at the declared cost); accounting passes when every ledger row costs $0.
 `--thinking-probe off,low,high` adds one connection chat per level; `--also-connect id1,id2` adds one for each other
-model id on the same server. No Ollama sampling or GPU lock is involved.
+model id on the same server. `--reasoning-levels low,medium,xhigh` saves the server's accepted reasoning levels with
+the registration (Settings → Custom model servers); the record keeps them and the picker row's `thinkingSentAs`.
+No Ollama sampling or GPU lock is involved.
 
 ```sh
 task job run --input assets:geo-catalogue/0.2.1 --input assets:force2020-welllogs/c8d01ee9 -- node geo/release-proof/route-trial.mjs --route custom-server --base-url http://HOST:PORT/v1 --model MODEL_ID --context 262144 --workflow geo-map-and-crs

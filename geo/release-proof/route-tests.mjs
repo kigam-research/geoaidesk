@@ -19,6 +19,8 @@ test('custom-server route is $0, needs a server and model, and checks thinking l
   assert.deepEqual(o.thinkingProbe, ['low','xhigh']);
   assert.deepEqual(o.alsoConnect, ['a','b']);
   assert.throws(() => options(['--route','custom-server','--base-url','http://x/v1','--model','m','--thinking','max']), /thinking level/);
+  assert.deepEqual(options(['--route','custom-server','--base-url','http://x/v1','--model','m','--reasoning-levels','low,medium,xhigh']).reasoningLevels, ['low','medium','xhigh']);
+  assert.throws(() => options(['--route','custom-server','--base-url','http://x/v1','--model','m','--reasoning-levels','off']), /reasoning level/);
 });
 
 test('artifact presence cannot pass a wrong synthetic area table', () => {
