@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:34:03Z
+updated: 2026-10-14T12:36:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -71,14 +71,19 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   `chat.thinking.sentAs` ko "선택한 서버에는 {level} 값으로 보냅니다." / en "Sent to this server as {level}." (child
   wording: "서버가 지원하는 추론 수준", "끄기", "해당 서버에는 {level}으로 보냅니다." — wrong particle after 최소);
   `chat.thinking.mappedLevel` "{selected} → {sentAs}" unchanged.
+- UI check (own instance, start-gaid.sh at cb4d83b+, ports 3400/18400, GAID_HOME
+  ~/data/geoaidesk/work/gaid-qwen-followups/ui-home, systemd unit gaid-qwen-followups-ui, stopped): the New project
+  dialog created `proj-736297` with all 13 catalogue skills (+council-mode, pi-subagents); KIGAM server registered with
+  low/medium/xhigh -> models.json map {minimal: low, low, medium, high: medium, xhigh}; Settings card shows the
+  checkboxes; selecting `qwen3.8-flash-next` turns the chip into "높음 → 보통", rows "최소 → 낮음"/"높음 → 보통" with
+  "선택한 서버에는 … 값으로 보냅니다." Screenshots: ~/data/geoaidesk/work/gaid-qwen-followups/playwright/
+  {custom-server-card,thinking-selector}.png. No chat was sent from this instance (shared server: job 5 running).
 - Harness 9a0c179: `--reasoning-levels` registers the accepted levels; record keeps them and `thinkingSentAs`.
 - Job 5 (KIGAM geo-map-and-crs, thinking high, probes off/minimal/low/medium/xhigh, levels low,medium,xhigh) started
   12:33Z, concurrently with local job 3/4 on the GPU (KIGAM run uses no GPU).
 ## Next steps
 1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
 2. After job 5: KIGAM well-log-qc with the same options (one KIGAM trial at a time).
-3. UI check on an own instance (other ports, GAID_HOME under ~/data/geoaidesk/work/gaid-qwen-followups/): New
-   project dialog -> skills present; custom server reasoning levels; thinking selector shows the substitution.
 4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
 ## Failed approaches
 ## Notes and decisions
