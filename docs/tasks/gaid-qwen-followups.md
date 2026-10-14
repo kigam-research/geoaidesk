@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:49:13Z
+updated: 2026-10-14T13:07:09Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -63,6 +63,12 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   (A 30,000, B 20,000 m²); map correct in EPSG:5186 with legend; CRS inventory declared only. run.json carries an
   invented timestamp (2025-04-05). record sha256 0967531dab38bae7f034a918965fee6430a91097de0a28061cb7c55cb347e0ab.
   (WP10: partial, no map.)
+- Job 3 (local 98K well-log-qc, app 7656c87) failed: connection 54 s; task hit the 45-min cap with no artifacts; it never
+  read the skill and instead read the raw LAS with `read` 100 lines at a time (21 calls, ~2.5 min per turn at ~89K
+  input, 22% of the model on CPU), peak 105,725 tokens (app ratio 1.08). Ran 12:20–13:05Z overlapping job 5/6 and the
+  UI instance (CPU contention possible; the reading pattern is the model's choice). No rerun (no harness defect).
+  Finding: the geo read hint did not stop line-window `read`s of a LAS file. record sha256
+  a1a7f8435b4159dc212cafaade8a39ba3203d7f9d73dcd93041061fe6a6f51b6. (WP10 98K: partial at the cap, QC defects.)
 - B integrated (child `gaid-qwen-followups--gaid-qwen-reasoning` completed and closed 2026-10-14, merge 7d39ec7): provider
   `reasoningLevels` (sidecar) -> per-model Pi `thinkingLevelMap`; picker rows carry `thinkingSentAs`; Settings card
   checkboxes; thinking selector chip "높음 → 보통" and row note. Child checks: server 1675 passed/11 skipped, web 984
