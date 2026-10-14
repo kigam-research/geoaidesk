@@ -21,7 +21,7 @@ import { withNotebookPlanHistory } from "../agent/notebook-research.ts";
 import { readNotebookAnnotations } from "../agent/notebook-annotations.ts";
 import { notebookToMarkdown } from "../agent/notebook-export.ts";
 import { buildNotebookZip } from "../agent/notebook-zip.ts";
-import { provisionProjectSkills } from "../geo/provision.ts";
+import { provisionCreatedProject, provisionProjectSkills } from "../geo/provision.ts";
 import { runBroker } from "../agent/run-broker.ts";
 import {
   abortProjectSessions,
@@ -42,6 +42,14 @@ import {
   validateGuardPolicyPatch,
   writeGuardPolicy,
 } from "../agent/guard-policy.ts";
+
+let provisionNewProject: (projectId: string) => Promise<unknown> = (projectId) =>
+  provisionCreatedProject(resolvePaths(projectId));
+
+/** Tests replace the geo provisioning step of `POST /projects`; null restores it. */
+export function setNewProjectProvisionerForTests(fn: ((projectId: string) => Promise<unknown>) | null): void {
+  provisionNewProject = fn ?? ((projectId) => provisionCreatedProject(resolvePaths(projectId)));
+}
 
 export async function registerProjectRoutes(app: FastifyInstance): Promise<void> {
   app.get("/projects", async () => listProjects());
@@ -64,6 +72,13 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
             ? undefined
             : (body.spendLimitUsd as number | null),
       });
+      // GAID: in geo mode the pinned catalogue is installed before the reply;
+      // a failure leaves the project usable (sandbox/init or the next start retries).
+      try {
+        await provisionNewProject(meta.id);
+      } catch (err) {
+        console.warn(`[gaid] could not provision new project ${meta.id}: ${(err as Error).message}`);
+      }
       reply.code(201);
       return meta;
     } catch (err) {

@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import { startInstance, requestJson, hostFacts, sleep } from './instance.mjs';
 import { prepareTask } from './route-tasks/tasks.mjs';
-import { metrics, observe, jsonLines, fileEvidence, checkArtifacts } from './route-metrics.mjs';
+import { metrics, observe, jsonLines, fileEvidence, checkArtifacts, installedSkills, skillUse } from './route-metrics.mjs';
 
 export function options(args) {
   const { values: o } = parseArgs({ args, options: {
@@ -21,7 +21,7 @@ export function options(args) {
     'base-url': { type: 'string' }, 'provider-id': { type: 'string', default: 'trial-server' },
     'max-tokens': { type: 'string', default: '16384' }, thinking: { type: 'string', default: 'off' },
     'thinking-probe': { type: 'string', default: '' }, 'also-connect': { type: 'string', default: '' },
-    permission: { type: 'string', default: 'deny' },
+    permission: { type: 'string', default: 'deny' }, 'allow-missing-skills': { type: 'boolean', default: false },
   } });
   if (o.help) return o;
   if (!['local','custom-server','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
@@ -204,6 +204,12 @@ export async function main(args = process.argv.slice(2)) {
     record.projectId = project.id;
     const sandbox = path.join(dataHome,'projects',project.id,'sandbox');
     if (!fs.existsSync(sandbox)) throw new Error('Attach data home does not match the API project storage');
+    // The workflow's skills must be in the new project before any chat (gaid-qwen-followups).
+    const bound = prepared.workflow.skillIds.map(id => id.split('/').pop());
+    const installed = installedSkills(sandbox);
+    record.skills = { bound, installed, boundEnabled: bound.filter(n => installed.enabled.includes(n)) }; save();
+    if (record.skills.boundEnabled.length !== bound.length && !o['allow-missing-skills'])
+      throw new Error(`Workflow skills not enabled in the new project: ${bound.filter(n => !installed.enabled.includes(n)).join(', ')}`);
     const connectionSession = await json('POST','/sessions', { project: project.id, body: { geoExposure: `workflow:${o.workflow}` } });
     record.connection = { outcome: 'not-run', testedAt: new Date().toISOString(), sessionId: connectionSession.id }; save();
     const connect = async (session, ref, label, thinkingLevel) => {
@@ -235,8 +241,10 @@ export async function main(args = process.argv.slice(2)) {
     const session = await json('POST','/sessions', { project: project.id, body: { geoExposure: `workflow:${o.workflow}` } });
     const context = await json('GET',`/geo/context?sessionId=${session.id}&model=${encodeURIComponent(model)}`,{ project: project.id });
     fs.writeFileSync(path.join(runDir,'initial-context.json'),JSON.stringify(context,null,2)+'\n');
+    record.skills.exposed = context.exposure?.skills ?? null;
     record.task = { workflowId: o.workflow, outcome: 'not-run', startedAt: new Date().toISOString(), inputs: prepared.inputs, sessionId: session.id }; save();
     const m = await runChat({ json, api: instance.api, project: project.id, session, model, prompt: prepared.prompt, runDir, label: 'task', timeoutMs: o.timeoutMs, ollamaUrl: o.route === 'local' ? o['ollama-url'] : null, thinkingLevel: o.thinking, permission: o.permission });
+    record.skills.use = skillUse(session.sessionFile, sandbox, bound);
     const ledgerPath = path.join(sandbox,'.kady/runs',session.id,'costs.jsonl');
     const ledger = jsonLines(ledgerPath);
     const artifacts = checkArtifacts(sandbox,prepared.expectedArtifacts,prepared.reference);

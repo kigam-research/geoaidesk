@@ -29,7 +29,8 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   verifies the archive, every file and every `packageDigest`, and stages it in the skills cache; in geo mode
   (`GEO_CATALOGUE_MODE`: a pin, `GAID_CATALOGUE` not `off`, no `KADY_SKILLS_REPO`) `fetchCatalogue()` returns it and
   there is no fallback to the upstream sources. Projects are provisioned through `skills-sync.ts` only
-  (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept). Vitest runs with
+  (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
+  `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
 - skill_hub install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills opens the configured site (`geo/distribution.json` `skillHub.sites`) and previews a skill-page URL or uploaded `.tar.gz` through the existing acknowledgement/install gate. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Task exposure and context (`server/src/geo/{context,session,instructions}.ts`): each new chat records which skills

@@ -31,6 +31,11 @@ is never changed. All services started by a successful launcher are stopped in `
   VRAM fraction describes allocated bytes, while CLI `ollama ps` reports the CPU/GPU split. A missing usage field
   stays unknown. Token totals use the ledger (including compaction/aborted usage); streamed turn totals are retained
   separately. Dependency-repair detection is a command-pattern observation, not an exhaustive package audit.
+- Skills: right after creating the project the harness lists its installed skills and refuses to run (harness error)
+  unless every skill the workflow binds is enabled; `--allow-missing-skills` records the gap and runs anyway.
+  `record.skills` holds the bound/installed/exposed skills and, after the task, `use`: skill files the model read
+  (inside or outside the sandbox), skill names its commands mentioned, and absolute paths outside the sandbox that
+  its tool calls named (observation, not an access audit).
 - The data guard's destructive-command confirmations (`permission_request`) are answered by `--permission`
   (default `deny`; `allow`, or `none` to leave them pending as before 2026-10-14) and listed in `permissionRequests`.
 - A timeout/disconnected SSE explicitly aborts the server-owned run, then waits up to 120 s for accounting to settle.

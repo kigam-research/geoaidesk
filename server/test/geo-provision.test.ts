@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { PROJECTS_ROOT, SKILLS_REPO } from "../src/config.ts";
 import { resetGeoCatalogueCache } from "../src/geo/catalogue.ts";
-import { enableWorkflowSkills, provisionGeoCatalogue } from "../src/geo/provision.ts";
+import { enableWorkflowSkills, provisionCreatedProject, provisionGeoCatalogue } from "../src/geo/provision.ts";
 import {
   getSkillSyncStatus,
   hashDirectory,
@@ -141,5 +141,23 @@ describe("enableWorkflowSkills", () => {
     expect(enableWorkflowSkills(paths, opts)).toEqual(["geopandas"]);
     expect(listProjectSkills(paths).map((s) => s.name)).toContain("geopandas");
     expect(listDisabledSkills(paths).map((s) => s.name)).toEqual(["matplotlib"]);
+  });
+});
+
+describe("provisionCreatedProject", () => {
+  it("installs the pinned catalogue into a project created while the app runs", async () => {
+    const paths = ensureProjectExists("geo-created");
+    expect(names(paths)).toEqual([]);
+    const count = await provisionCreatedProject(paths, options(buildFixtureCatalogue()));
+    expect(count).toBe(2);
+    expect(names(paths)).toEqual(["geo-map-and-crs", "well-log-qc-quicklook"]);
+  });
+
+  it("does nothing outside geo catalogue mode", async () => {
+    const paths = ensureProjectExists("geo-created-off");
+    const opts = options(buildFixtureCatalogue());
+    const count = await provisionCreatedProject(paths, { ...opts, env: { ...opts.env, GAID_CATALOGUE: "off" } });
+    expect(count).toBeNull();
+    expect(names(paths)).toEqual([]);
   });
 });

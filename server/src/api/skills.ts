@@ -21,7 +21,6 @@ import {
   listSkillsWithProblems,
   projectSkillRoot,
   readSkillSource,
-  seedProjectSkills,
   skillRootForScope,
   SKILL_NAME_RE,
   type SkillRoot,
@@ -46,6 +45,7 @@ import {
   writeSkillSource,
 } from "../agent/skills-install.ts";
 import { syncSandboxVenv } from "../sandbox-seed.ts";
+import { provisionProjectSkills } from "../geo/provision.ts";
 
 interface ScopeQuery {
   scope?: string;
@@ -370,7 +370,7 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       const paths = activePaths();
       seedSubagentResources(paths);
       const allowRemote = req.query.remote !== "false";
-      const count = await seedProjectSkills(paths, allowRemote);
+      const count = await provisionProjectSkills(paths, allowRemote);
       const venvSynced = req.query.venv === "true" ? syncSandboxVenv(paths) : false;
       return { ok: true, skills: count, venvSynced };
     },
