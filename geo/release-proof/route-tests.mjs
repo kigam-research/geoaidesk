@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import { options, runChat } from './route-trial.mjs';
-import { metrics, observe, checkArtifacts } from './route-metrics.mjs';
+import { metrics, observe, checkArtifacts, installedSkills, skillUse } from './route-metrics.mjs';
 
 test('paid and subscription calls are opt-in before any run', () => {
   for (const route of ['api-key','chatgpt-signin']) assert.throws(() => options(['--route',route]), /refused/);
@@ -86,4 +86,30 @@ test('a destructive-command prompt is answered and recorded instead of stalling 
     assert.deepEqual(calls[0],['POST','/sessions/s/permissions/perm_1',{allow:false}]);
     assert.equal(result.permissionRequests[0].answer,'deny');
   } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); fs.rmSync(root,{recursive:true,force:true}); }
+});
+
+test('skill evidence separates in-sandbox skill reads from host paths outside the project', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(),'gaid-route-skills-'));
+  try {
+    const sandbox = path.join(root,'sandbox');
+    for (const [dir, name] of [['.pi/skills','well-log-qc-quicklook'],['.pi/skills-disabled','rdkit']]) {
+      fs.mkdirSync(path.join(sandbox,dir,name), { recursive: true });
+      fs.writeFileSync(path.join(sandbox,dir,name,'SKILL.md'),'---\nname: x\n---\n');
+    }
+    assert.deepEqual(installedSkills(sandbox), { enabled: ['well-log-qc-quicklook'], disabled: ['rdkit'] });
+    const call = (name, args) => JSON.stringify({ type: 'message', message: { role: 'assistant', content: [{ type: 'toolCall', name, arguments: args }] } });
+    const session = path.join(root,'s.jsonl');
+    fs.writeFileSync(session, [
+      call('read', { path: '.pi/skills/well-log-qc-quicklook/SKILL.md' }),
+      call('read', { path: '/elsewhere/skills/well-log-qc-quicklook/SKILL.md' }),
+      call('bash', { command: `cd ${sandbox} && ls ~/.pi /tmp/x && cat /host/notes.txt` }),
+    ].join('\n') + '\n');
+    const use = skillUse(session, sandbox, ['well-log-qc-quicklook','geopandas']);
+    assert.deepEqual(use.skillFileReads, [
+      { path: '.pi/skills/well-log-qc-quicklook/SKILL.md', inSandbox: true },
+      { path: '/elsewhere/skills/well-log-qc-quicklook/SKILL.md', inSandbox: false },
+    ]);
+    assert.deepEqual(use.skillNamesMentioned, ['well-log-qc-quicklook']);
+    assert.deepEqual(use.outsideSandboxPaths.sort(), ['/elsewhere/skills/well-log-qc-quicklook/SKILL.md','/host/notes.txt','~/.pi'].sort());
+  } finally { fs.rmSync(root,{recursive:true,force:true}); }
 });

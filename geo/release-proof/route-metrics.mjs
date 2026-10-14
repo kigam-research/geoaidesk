@@ -86,3 +86,35 @@ export function parseCsv(text) {
   if (cell || row.length) { row.push(cell.replace(/\r$/, '')); rows.push(row); }
   return rows;
 }
+
+/** Installed skill directories of a project sandbox (enabled and disabled). */
+export function installedSkills(sandbox) {
+  const list = dir => { try { return fs.readdirSync(dir).filter(n => fs.existsSync(path.join(dir, n, 'SKILL.md'))).sort(); } catch { return []; } };
+  return { enabled: list(path.join(sandbox, '.pi/skills')), disabled: list(path.join(sandbox, '.pi/skills-disabled')) };
+}
+
+/**
+ * Which skill files a session's tool calls touched, and which absolute paths outside the sandbox
+ * they named. Observation only: a bash `cat` of a skill counts as a mention, not a verified read.
+ */
+export function skillUse(sessionFile, sandbox, skillNames) {
+  const root = path.resolve(sandbox);
+  const inside = p => { if (p.startsWith('~')) return false; const r = path.resolve(root, p); return r === root || r.startsWith(root + path.sep); };
+  const reads = [], mentions = new Set(), outside = new Set();
+  for (const row of jsonLines(sessionFile)) {
+    if (row.type !== 'message' || row.message?.role !== 'assistant') continue;
+    for (const c of row.message.content ?? []) {
+      if (c.type !== 'toolCall') continue;
+      const args = c.arguments ?? {};
+      const text = c.name === 'bash' ? String(args.command ?? '') : String(args.path ?? '');
+      if (['read', 'write', 'edit'].includes(c.name) && args.path) {
+        const p = String(args.path);
+        if (!inside(p)) outside.add(p);
+        if (c.name === 'read' && /(^|\/)skills\//.test(p)) reads.push({ path: inside(p) ? path.relative(root, path.resolve(root, p)) : p, inSandbox: inside(p) });
+      }
+      for (const name of skillNames) if (text.includes(name)) mentions.add(name);
+      if (c.name === 'bash') for (const m of text.matchAll(/(?:^|[\s'"=])((?:\/|~\/)[^\s'";|&<>]+)/g)) if (!inside(m[1]) && !/^\/(dev|tmp|usr|bin|proc)\b/.test(m[1])) outside.add(m[1]);
+    }
+  }
+  return { skillFileReads: reads, skillNamesMentioned: [...mentions].sort(), outsideSandboxPaths: [...outside].slice(0, 40) };
+}
