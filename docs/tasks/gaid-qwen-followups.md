@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:12:54Z
+updated: 2026-10-14T12:13:22Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -43,13 +43,25 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   worktree so the unit can close.
 
 ## Current state
-- Plan settled (see Notes). Package A (skills on project create) in progress by the orchestrator; package B delegated
-  to child unit `gaid-qwen-followups--gaid-qwen-reasoning` (writer f950c83f, workspace wks_f2ee75fc2036fa9c, worktree ~/worktrees/geoaidesk/gaid-qwen-followups--gaid-qwen-reasoning; started 2026-10-14).
+- A done (1927e2d): `POST /projects` provisions the pinned catalogue before replying in geo mode
+  (`provisionCreatedProject`); unprefixed `/sandbox/init` uses `provisionProjectSkills`. Tests: server
+  `geo-provision.test.ts` + new `geo-project-create.test.ts` (15 passed with project-scope), `geo/tests/distribution`.
+  Live: job 1 (app b2076d8) created a project through the API in a running app and found 13 skills enabled incl.
+  `well-log-qc-quicklook` (record.skills).
+- Harness (b2076d8): route-trial refuses to run unless the workflow's bound skills are enabled
+  (`--allow-missing-skills` overrides) and records `record.skills` {bound, installed, exposed, use}; test in route-tests.
+- Local re-trial jobs 1–4 queued on the GPU lock (64K well-log-qc, 64K geo-map-and-crs, 98K well-log-qc,
+  98K geo-map-and-crs); receipts under Running jobs.
+- B delegated to child `gaid-qwen-followups--gaid-qwen-reasoning` (writer f950c83f, workspace wks_f2ee75fc2036fa9c).
+  Note for integration: the child also needs owner `gaid-qwen-followups` in geo/tests/distribution.test.mjs (already
+  added on this branch; resolve the duplicate line on merge).
 ## Next steps
-1. A: provision geo catalogue in `POST /projects` (geo mode) + fix unprefixed `/sandbox/init`; tests.
-2. Start child B; while it runs, extend route-trial record with installed-skill evidence and run the local re-trial.
-3. After B merges into this branch: KIGAM re-trial with thinking "high" (sent as medium), update compatibility docs,
-   report, `scripts/check`.
+1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
+2. When the child finishes: `task complete gaid-qwen-followups--gaid-qwen-reasoning`, then KIGAM re-trial
+   (custom-server, both workflows, thinking high -> medium, thinking probes for all levels), one at a time.
+3. UI check on an own instance (other ports, GAID_HOME under ~/data/geoaidesk/work/gaid-qwen-followups/): New
+   project dialog -> skills present; custom server reasoning levels; thinking selector shows the substitution.
+4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
 ## Failed approaches
 ## Notes and decisions
 - Finding (2026-10-14): the UI New project dialog already calls `POST /projects/:id/sandbox/init` after create
