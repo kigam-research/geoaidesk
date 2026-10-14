@@ -89,6 +89,12 @@
       "responsibility": "Skill seeding calls provisionProjectSkills (server/src/geo/provision.ts): the pinned geo catalogue through skills-sync in geo mode, upstream seedProjectSkills otherwise"
     },
     {
+      "path": "server/src/api/projects.ts, server/src/api/skills.ts",
+      "owner": "gaid-qwen-followups",
+      "status": "edited",
+      "responsibility": "POST /projects provisions the pinned geo catalogue before replying (provisionCreatedProject, geo mode only); the unprefixed POST /sandbox/init uses provisionProjectSkills instead of upstream seedProjectSkills"
+    },
+    {
       "path": "server/vitest.config.ts",
       "owner": "gaid-runtime",
       "status": "edited",
@@ -415,6 +421,12 @@
       "owner": "gaid-ui-locale",
       "status": "edited",
       "responsibility": "gaid-ui-locale (workflows): visible strings read through t() from web/src/geo/locales/workflows/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Upstream workflow panel: category labels, row names, descriptions and input labels from web/src/geo/locales/workflows (keyed by workflow id; upstream web/src/data/workflows.json stays the English source and the fallback for ids without a translation); prompts stay as shipped; web/src/data/workflows.json: one English description (comparative-genomics) reworded for the copy validator so the en catalogue equals the upstream source (web/src/geo/workflows-locale.test.tsx checks parity; regenerate en with web/src/geo/locales/workflows/generate-en.mjs after an upstream sync)"
+    },
+    {
+      "path": "server/src/agent/custom-models.ts, server/src/agent/provider-auth.ts, server/test/custom-models.test.ts, web/src/lib/custom-models.ts, web/src/components/custom-models-card.tsx, web/src/components/custom-models-card.test.tsx, web/src/components/thinking-selector.tsx, web/src/components/thinking-selector.test.tsx, web/src/components/model-selector.tsx, web/src/components/chat-tab.tsx, web/src/components/settings/defaults-panel.tsx, web/src/components/settings/defaults-panel.test.tsx",
+      "owner": "gaid-qwen-followups",
+      "status": "edited",
+      "responsibility": "Per-custom-server accepted reasoning levels written into Pi thinkingLevelMap; custom picker rows expose wire substitutions; server settings and chat/default thinking selectors show the mapping. Existing saved providers and foreign maps remain untouched until an explicit managed-provider save."
     }
   ],
   "notTouched": [

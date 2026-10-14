@@ -1297,6 +1297,7 @@ function ChatInput({
                 selected={thinkingLevel}
                 onChange={onThinkingLevelChange}
                 disabled={thinkingDisabled}
+                thinkingSentAs={selectedModel.thinkingSentAs}
               />
               <ComputeSelector
                 selected={selectedComputeTarget}
@@ -1846,7 +1847,9 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>(
     () => initialWorkspaceState?.thinkingLevel ?? DEFAULT_THINKING_LEVEL,
   );
-  const thinkingDisabled = thinkingUnsupported(selectedModel);
+  // Discovery is authoritative after a server setting changes or a stored tab reopens.
+  const currentThinkingModel = knownModels.find((model) => model.id === selectedModel.id) ?? selectedModel;
+  const thinkingDisabled = thinkingUnsupported(currentThinkingModel);
   const {
     catalog: modalCatalog,
     loading: modalCatalogLoading,
@@ -2474,7 +2477,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
             onStop={handleStop}
             selectedDbs={selectedDbs}
             onDbsChange={setSelectedDbs}
-            selectedModel={selectedModel}
+            selectedModel={currentThinkingModel}
             onModelChange={(model) => {
               markChipsTouched();
               setSelectedModel(model);

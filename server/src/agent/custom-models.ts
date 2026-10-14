@@ -20,13 +20,27 @@ import { GAID_LOCAL_PROVIDER } from "../geo/local-provider.ts";
 import fs from "node:fs";
 import path from "node:path";
 import { KADY_PI_AGENT_DIR } from "../config.ts";
-import type { Api, Model } from "@earendil-works/pi-ai";
+import { clampThinkingLevel, type Api, type Model } from "@earendil-works/pi-ai";
 import { isDirectProvider } from "./provider-catalog.ts";
 import { isSubscriptionProvider, tierFor, type ClientDirectModel } from "./provider-auth.ts";
 
 export const CUSTOM_PROVIDER_ID_RE = /^[a-z0-9][a-z0-9-]{1,40}$/;
 export const CUSTOM_MODEL_APIS = ["openai-completions", "openai-responses", "anthropic-messages"] as const;
 export type CustomModelApi = (typeof CUSTOM_MODEL_APIS)[number];
+export const CUSTOM_REASONING_LEVELS = ["minimal", "low", "medium", "high", "xhigh"] as const;
+export type CustomReasoningLevel = (typeof CUSTOM_REASONING_LEVELS)[number];
+
+/** Prefer a lower accepted effort, using a higher one only when no lower exists. */
+export function customThinkingLevelMap(levels?: readonly CustomReasoningLevel[]) {
+  if (!levels?.length) return undefined;
+  const accepted = new Set(levels);
+  return Object.fromEntries(CUSTOM_REASONING_LEVELS.map((level, index) => [
+    level,
+    CUSTOM_REASONING_LEVELS.slice(0, index + 1).reverse().find((candidate) => accepted.has(candidate))
+      ?? CUSTOM_REASONING_LEVELS.slice(index + 1).find((candidate) => accepted.has(candidate))
+      ?? null,
+  ])) as Record<CustomReasoningLevel, CustomReasoningLevel | null>;
+}
 const RESERVED_PROVIDER_IDS = new Set(["openrouter", "ollama", "openai-compatible", "fusion", "nvidia", "modal", "kady"]);
 const MAX_PROVIDERS = 20;
 const MAX_MODELS_PER_PROVIDER = 100;
@@ -47,6 +61,8 @@ export interface CustomProvider {
   name?: string;
   baseUrl: string;
   api: CustomModelApi;
+  /** Values the server accepts under their own names; unset/empty keeps Pi defaults. */
+  reasoningLevels?: CustomReasoningLevel[];
   /** Literal key, `$ENV_VAR`, or empty for keyless servers (Pi needs *something*; we write "none"). */
   apiKey?: string;
   models: CustomModelDefinition[];
@@ -170,9 +186,13 @@ export function listCustomProviders(agentDir = KADY_PI_AGENT_DIR): CustomProvide
   const file = readJson(modelsJsonPath(agentDir));
   if (!file) return [];
   const managed = managedIds(agentDir);
+  const savedLevels = asRecord((readJson(manifestPath(agentDir)) ?? {}).reasoningLevels);
   return Object.entries(asRecord(file.providers)).map(([id, raw]) => ({
     ...providerFromJson(id, asRecord(raw)),
     managed: managed.has(id),
+    ...(managed.has(id) && Array.isArray(savedLevels[id])
+      ? { reasoningLevels: CUSTOM_REASONING_LEVELS.filter((level) => (savedLevels[id] as unknown[]).includes(level)) }
+      : {}),
   }));
 }
 
@@ -231,6 +251,12 @@ export function validateCustomProviders(input: unknown): CustomProviderInput[] |
       return `provider "${id}": apiKey may not reference Kady's own variables`;
     }
     const keepApiKey = !apiKey && p.keepApiKey === true;
+    if (p.reasoningLevels !== undefined && (!Array.isArray(p.reasoningLevels)
+      || p.reasoningLevels.some((level) => !(CUSTOM_REASONING_LEVELS as readonly unknown[]).includes(level)))) {
+      return `provider "${id}": reasoningLevels must contain only ${CUSTOM_REASONING_LEVELS.join(", ")}`;
+    }
+    const reasoningLevels = Array.isArray(p.reasoningLevels)
+      ? CUSTOM_REASONING_LEVELS.filter((level) => (p.reasoningLevels as unknown[]).includes(level)) : undefined;
     if (!Array.isArray(p.models) || p.models.length === 0) return `provider "${id}": at least one model is required`;
     if (p.models.length > MAX_MODELS_PER_PROVIDER) return `provider "${id}": at most ${MAX_MODELS_PER_PROVIDER} models`;
     const models: CustomModelDefinition[] = [];
@@ -278,6 +304,7 @@ export function validateCustomProviders(input: unknown): CustomProviderInput[] |
       ...(typeof p.name === "string" && p.name.trim() ? { name: p.name.trim() } : {}),
       baseUrl,
       api: api as CustomModelApi,
+      ...(reasoningLevels?.length ? { reasoningLevels } : {}),
       ...(apiKey ? { apiKey: encodeApiKeyForPi(apiKey) } : {}),
       ...(keepApiKey ? { keepApiKey } : {}),
       models,
@@ -318,6 +345,8 @@ export function writeCustomProviders(providers: CustomProviderInput[], agentDir 
         id: m.id,
         ...(m.name ? { name: m.name } : {}),
         ...(m.reasoning !== undefined ? { reasoning: m.reasoning } : {}),
+        ...(m.reasoning === true && p.reasoningLevels?.length
+          ? { thinkingLevelMap: customThinkingLevelMap(p.reasoningLevels) } : {}),
         ...(m.input ? { input: m.input } : {}),
         ...(m.contextWindow !== undefined ? { contextWindow: m.contextWindow } : {}),
         ...(m.maxTokens !== undefined ? { maxTokens: m.maxTokens } : {}),
@@ -336,7 +365,10 @@ export function writeCustomProviders(providers: CustomProviderInput[], agentDir 
   } catch {
     // Windows ACLs do not map to POSIX modes.
   }
-  fs.writeFileSync(manifestPath(agentDir), JSON.stringify({ managed: providers.map((p) => p.id) }, null, 2) + "\n", { encoding: "utf-8", mode: 0o600 });
+  fs.writeFileSync(manifestPath(agentDir), JSON.stringify({
+    managed: providers.map((p) => p.id),
+    reasoningLevels: Object.fromEntries(providers.filter((p) => p.reasoningLevels?.length).map((p) => [p.id, p.reasoningLevels])),
+  }, null, 2) + "\n", { encoding: "utf-8", mode: 0o600 });
   idCache = null;
   return listCustomProviders(agentDir);
 }
@@ -345,6 +377,15 @@ export const CUSTOM_SECTION_LABEL = "Custom servers";
 
 /** Picker row for a model served by a custom provider (payg at declared cost). */
 export function customModelForClient(model: Model<Api>, provider: CustomProviderListing): ClientDirectModel {
+  // Use the resolved Pi map, including a hand-written map, not sidecar settings.
+  const thinkingSentAs: Record<string, string> = {};
+  if (model.reasoning && model.thinkingLevelMap) {
+    for (const level of CUSTOM_REASONING_LEVELS) {
+      const effective = clampThinkingLevel(model, level);
+      const wire = model.thinkingLevelMap[effective] ?? effective;
+      if (wire !== level) thinkingSentAs[level] = wire;
+    }
+  }
   return {
     id: `${provider.id}/${model.id}`,
     label: model.name,
@@ -357,6 +398,7 @@ export function customModelForClient(model: Model<Api>, provider: CustomProvider
     modality: model.input.includes("image") ? "text+image->text" : "text->text",
     description: `Custom model server at ${provider.baseUrl}`,
     reasoning: model.reasoning,
+    ...(Object.keys(thinkingSentAs).length ? { thinkingSentAs } : {}),
     billingMode: provider.id === GAID_LOCAL_PROVIDER ? "local" : "payg",
     available: true,
   };

@@ -65,10 +65,14 @@ export function provisionGeoCatalogue(paths: ProjectPaths, options: LoadGeoCatal
  * the geo catalogue when active, upstream seeding otherwise. Returns the
  * number of installed skills like the upstream function.
  */
-export async function provisionProjectSkills(paths: ProjectPaths, allowRemote = true): Promise<number> {
-  if (!geoCatalogueActive()) return seedProjectSkills(paths, allowRemote);
+export async function provisionProjectSkills(
+  paths: ProjectPaths,
+  allowRemote = true,
+  options: LoadGeoCatalogueOptions = {},
+): Promise<number> {
+  if (!geoCatalogueActive(options.env, options.repoRoot)) return seedProjectSkills(paths, allowRemote);
   const fresh = listProjectSkills(paths).length + listDisabledSkills(paths).length === 0;
-  const outcome = provisionGeoCatalogue(paths);
+  const outcome = provisionGeoCatalogue(paths, options);
   if (outcome.state === "unavailable") {
     console.warn(`[gaid] geo catalogue unavailable for project ${paths.id}: ${outcome.error}`);
   } else if (outcome.state === "applied" && outcome.result) {
@@ -78,8 +82,23 @@ export async function provisionProjectSkills(paths: ProjectPaths, allowRemote = 
     );
   }
   applyDefaultSkillStates(paths);
-  if (fresh && outcome.state === "applied") enableWorkflowSkills(paths);
+  if (fresh && outcome.state === "applied") enableWorkflowSkills(paths, options);
   return listProjectSkills(paths).length + listDisabledSkills(paths).length;
+}
+
+/**
+ * `POST /projects` in geo mode: the new project gets the pinned catalogue
+ * before the reply, so any client (the UI dialog, scripts, the release-proof
+ * harness) sees its skills without an app restart or a separate
+ * `sandbox/init` call. Outside geo mode it does nothing and returns null:
+ * upstream seeding may download, so it stays on the explicit init route.
+ */
+export async function provisionCreatedProject(
+  paths: ProjectPaths,
+  options: LoadGeoCatalogueOptions = {},
+): Promise<number | null> {
+  if (!geoCatalogueActive(options.env, options.repoRoot)) return null;
+  return provisionProjectSkills(paths, false, options);
 }
 
 /**
