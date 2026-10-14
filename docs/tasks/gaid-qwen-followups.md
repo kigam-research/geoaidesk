@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T13:07:09Z
+updated: 2026-10-14T13:10:53Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -69,6 +69,9 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   UI instance (CPU contention possible; the reading pattern is the model's choice). No rerun (no harness defect).
   Finding: the geo read hint did not stop line-window `read`s of a LAS file. record sha256
   a1a7f8435b4159dc212cafaade8a39ba3203d7f9d73dcd93041061fe6a6f51b6. (WP10 98K: partial at the cap, QC defects.)
+- Job 4 (local 98K geo-map-and-crs, app 1059867) passed: connection 29 s; task 2 min 25 s, 19 turns/18 tool calls
+  (7 recovered tool errors, four script copies left in results/), peak 37,301 (38%), $0; read no skill file. Areas
+  exact; map correct. record sha256 864fff330a100332276444e8e0bf1b138ac00f851ae983327ca8845795c89ad3. (WP10 98K: passed, 76 s.)
 - B integrated (child `gaid-qwen-followups--gaid-qwen-reasoning` completed and closed 2026-10-14, merge 7d39ec7): provider
   `reasoningLevels` (sidecar) -> per-model Pi `thinkingLevelMap`; picker rows carry `thinkingSentAs`; Settings card
   checkboxes; thinking selector chip "높음 → 보통" and row note. Child checks: server 1675 passed/11 skipped, web 984
@@ -99,7 +102,6 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   destructive-command confirmation was denied by the harness and the model continued. record sha256
   1d32c957b14438d1bbcf6167bf6a3b42c840a84212ded8a9912d36fe0ecdb692. (2026-10-14 trial at off: 10 min 33 s.)
 ## Next steps
-1. When jobs exit: check records (outcome, skills.use, wall-time); keep failed records.
 4. compatibility.json/.md, report reports/2026-10-14-gaid-qwen-followups/index.md, scripts/check, cleanup caches.
 ## Failed approaches
 ## Notes and decisions
