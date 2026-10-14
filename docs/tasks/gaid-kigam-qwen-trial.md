@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T06:27:26Z
+updated: 2026-10-14T06:34:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -79,8 +79,13 @@ model-route guidance. Untested combinations stay untested.
   /projects/:id/sandbox/init, which no web code calls; projects created while the app runs (all trial projects,
   WP10 too) have no geo skills while their exposure record lists them. WP10's "never read the workflow skill" is
   confounded by this. Out of scope here: open item.
+- Records written: geo/compatibility.json route `kigam-qwen-vllm-262k` (compatibility test passes),
+  docs/geo/compatibility.md row + thinking-level and skills notes, WP10 local-route limits annotated; report
+  reports/2026-10-14-gaid-kigam-qwen-trial/index.md (humanizer pass done).
+- Job 5 `scripts/check` on 9f9daee: exit 0 (backend 1671 pass / 11 skipped, web 981, geo 41, production smoke PASS).
+  Later commits change only the report and this document. Worktree has no ignored/untracked files.
 ## Next steps
-1. Update geo/compatibility.json + docs/geo/compatibility.md, write the report, scripts/check, finish.
+1. `task finish`.
 ## Failed approaches
 ## Notes and decisions
 - gaid-release-proof#1 (paid/subscription route trials incl. the 67 server) stays open: only its 67-server part is

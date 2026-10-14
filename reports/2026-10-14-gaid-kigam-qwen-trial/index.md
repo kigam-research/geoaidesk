@@ -126,7 +126,7 @@ supersedes:
 | LAS 대조 기준값 | `pc74:~/data/geoaidesk/work/gaid-kigam-qwen-trial/las-reference.json` (lasio로 원본을 직접 읽음) |
 | 그림 원본 | 그림 1 map.png sha256 91b5f5ea08b56ca9f4e5af23d7830188708edb628de4c01f1d0d120713de3380, 그림 2 quicklook.png sha256 425adf7d9c3ded6c08f1c4481e817aaa0590161546de1e3fa4e95f1a13ec54ca (각 실행의 프로젝트 `results/route-trial/`) |
 | 스킬 설치 경로 | `server/src/geo/provision.ts` `provisionProjectSkills`: 시작 시 `npm run prep`, 또는 `POST /projects/:id/sandbox/init`(웹 코드에서 호출하지 않음) |
-| 전체 검사 | `scripts/check` (task 문서의 Current state에 결과) |
+| 전체 검사 | `scripts/check` job, `pc74:~/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T062705.955719Z` (exit 0; 백엔드 1671 통과·11 건너뜀, 웹 981, geo 41, 실제 실행 스모크 통과; 코드 9f9daee) |
 
 실행 예:
 
