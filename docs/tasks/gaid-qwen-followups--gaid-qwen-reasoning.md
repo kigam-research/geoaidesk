@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-14T12:22:08Z
+status: ready
+updated: 2026-10-14T12:22:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f950c83f-f114-403b-86ba-8e4e7d56f2d1","pid":435067,"provider":"codex","session":"01a13a50-2bfe-7e91-a78c-e914e61554c1","start":"44569531","token":"75fb704827e2463ede22fe734b25b74e4d6334906fb417af71c64d9809eb566c"}
 branch: task/gaid-qwen-followups--gaid-qwen-reasoning
 target: task/gaid-qwen-followups
@@ -86,8 +86,9 @@ request at a time.
 - Reverify with the recorded job command, or scripts/check for the integrated tree. No job restart is needed.
 - No review-instance changes and no live/paid model requests.
 ## Next steps
-1. Save these verified results and run task finish. The CLI enforces scripts/check on the final tree.
-2. Parent integrates the ready tip with task complete, then performs the KIGAM live re-trial; do not change the review instance here.
+<!-- task:closed -->
+Closed 2026-10-14T12:22:25Z: ready; the parent gaid-qwen-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Sequential decisions: preserve accepted design; persist accepted levels in the managed sidecar (including servers with no reasoning models); Pi reads each reasoning model map from models.json.
