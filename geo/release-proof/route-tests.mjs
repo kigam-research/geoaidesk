@@ -12,6 +12,15 @@ test('paid and subscription calls are opt-in before any run', () => {
   assert.throws(() => options(['--api','http://localhost:8000']), /data-home/);
 });
 
+test('custom-server route is $0, needs a server and model, and checks thinking levels', () => {
+  assert.throws(() => options(['--route','custom-server','--model','m']), /base-url/);
+  const o = options(['--route','custom-server','--base-url','http://10.0.0.1:8000/v1','--model','m','--thinking-probe','low, xhigh','--also-connect','a,b']);
+  assert.equal(o.spendLimit, 0);
+  assert.deepEqual(o.thinkingProbe, ['low','xhigh']);
+  assert.deepEqual(o.alsoConnect, ['a','b']);
+  assert.throws(() => options(['--route','custom-server','--base-url','http://x/v1','--model','m','--thinking','max']), /thinking level/);
+});
+
 test('artifact presence cannot pass a wrong synthetic area table', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(),'gaid-route-artifacts-'));
   try {

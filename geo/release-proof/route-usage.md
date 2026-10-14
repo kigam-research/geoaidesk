@@ -34,6 +34,20 @@ is never changed. All services started by a successful launcher are stopped in `
 - A timeout/disconnected SSE explicitly aborts the server-owned run, then waits up to 120 s for accounting to settle.
   Startup failures and cleanup failures are visible in the record. Records are never overwritten.
 
+## Custom OpenAI-compatible server (`custom-server`)
+
+For a keyless server the user does not pay per token for (for example an institution's vLLM). The harness starts a
+fresh instance, registers the server through `PUT /custom-models` the way Settings → Custom model servers does
+(`openai-completions`, `reasoning: true`, declared cost 0, `--context` and `--max-tokens`), records the server's
+`/models` list, and runs the same connection and task chats with `--thinking` (default `off`). The route is billed as
+the app bills custom providers (`payg` at the declared cost); accounting passes when every ledger row costs $0.
+`--thinking-probe off,low,high` adds one connection chat per level; `--also-connect id1,id2` adds one for each other
+model id on the same server. No Ollama sampling or GPU lock is involved.
+
+```sh
+task job run --input assets:geo-catalogue/0.2.1 --input assets:force2020-welllogs/c8d01ee9 -- node geo/release-proof/route-trial.mjs --route custom-server --base-url http://HOST:PORT/v1 --model MODEL_ID --context 262144 --workflow geo-map-and-crs
+```
+
 ## Paid route design (not executed by this child)
 
 Both nonlocal routes refuse before filesystem/network/model activity without `--allow-paid`. The parent owns the

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T04:57:59Z
+updated: 2026-10-14T05:00:53Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -44,11 +44,24 @@ model-route guidance. Untested combinations stay untested.
   regenerable build caches and any app-written `.env` from the worktree so the unit can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-14: server reachable from PC74; `/v1/models` lists `qwen3.8-flash-next`, `/models/Qwen3.8-27B`,
+  `/models/Qwen3.6-27B`, all with `root: /models/Qwen3.8-Flash-Next-FP8` (aliases of one weight set per the server).
+- Direct curl: `reasoning_effort` `high` and `minimal` -> HTTP 400 ("Supported types are xhigh (default), medium, and
+  low"); `low`/`medium`/`xhigh`/absent -> OK with reasoning. Pi's openai-completions sends the tab's level verbatim as
+  `reasoning_effort` (off -> field omitted), and the chat default level is `high`: expected app failure, to be
+  confirmed in the trial's thinking probe.
+- Harness: `geo/release-proof/route-trial.mjs --route custom-server` (registers via PUT /custom-models, $0 accounting,
+  `--thinking`, `--thinking-probe`, `--also-connect`); `node --test geo/release-proof/route-tests.mjs` passes (5).
 ## Next steps
-1. (the next session's first action)
+1. Run job 1 (map, with probes), then job 2 (LAS), sequentially; then record and report.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: small, tightly coupled work (harness extension, two serial jobs on a shared server, record/docs
+  update, report); done by the writer, no child units.
+- Trial model: `qwen3.8-flash-next` for both tasks (other ids share its root; they get connection probes only).
+  Context 262144 (server max_model_len, same as the user's review registration), maxTokens 16384, reasoning true,
+  cost 0. Task thinking level `off` (WP10 parity; Pi then omits `reasoning_effort` and the server reasons at its
+  default xhigh). Timeout 45 min. Order: geo-map-and-crs (with probes) -> well-log-qc, one at a time.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
