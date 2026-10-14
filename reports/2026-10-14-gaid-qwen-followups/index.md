@@ -98,7 +98,7 @@ supersedes:
 ## 4. 검증
 
 - 과학적 검증: 면적은 해석적으로 아는 정답과 비교했습니다(허용 오차 10⁻⁶ m²). 검층 QC는 원본 LAS를 따로 읽어 얻은 표본 수, 처음·끝 깊이, curve별 단위와 결측값 수에 대조했습니다. 그림은 눈으로 확인했습니다. 실측 자료의 지질 해석과 전문가 검토는 하지 않았습니다(미검증).
-- 소프트웨어 검증: 새 프로젝트 설치와 추론량 규칙에 단위 시험을 더했습니다. 하위 작업의 전체 시험은 백엔드 1,675건, 웹 984건이 통과했습니다. 앱이 서버에 실제로 보내는 값은 두 가지로 확인했습니다. 하나는 요청 내용을 가로챈 시험이고, 다른 하나는 실제 기관 서버가 "높음"을 거절하지 않은 결과입니다. 저장소 전체 검사 결과는 부록 A에 적었습니다.
+- 소프트웨어 검증: 새 프로젝트 설치와 추론량 규칙에 단위 시험을 더했습니다. 하위 작업의 전체 시험은 백엔드 1,675건, 웹 984건이 통과했습니다. 앱이 서버에 실제로 보내는 값은 두 가지로 확인했습니다. 하나는 요청 내용을 가로챈 시험이고, 다른 하나는 실제 기관 서버가 "높음"을 거절하지 않은 결과입니다. 저장소 전체 검사는 통과했습니다(부록 A).
 
 ## 5. 한계
 
@@ -146,7 +146,7 @@ supersedes:
 | 화면 확인 | 별도 인스턴스(포트 3400/18400, 데이터 `pc74:~/data/geoaidesk/work/gaid-qwen-followups/ui-home`); 원본 그림 `pc74:~/data/geoaidesk/work/gaid-qwen-followups/playwright/thinking-selector.png` sha256 653bb4a6a7e7dea2fbb4355d993ea82beae563b0b20265e409b0cc8e0407fa07, `custom-server-card.png` sha256 fd296e62c8037cbe765331ffed235e84fa30de3e6c3e291481a1f34626921edf |
 | 그림 3 원본 | 기관 검층 QC 프로젝트 `results/route-trial/quicklook.png` sha256 bb27bc7fbc5c965e1c71eb1f7841805e2dca087b2d5a9abeea6957fd218c8c84 (가로 1600으로 줄임) |
 | 호환성 기록 | `geo/compatibility.json`(경로 `kigam-qwen-vllm-262k`, `local-ollama-qwen3-30b-64k`, `local-ollama-qwen3-30b-98k`; 이전 연결 기록은 `earlierConnections`), 요약 `docs/geo/compatibility.md` |
-| 전체 검사 | CHECK_PLACEHOLDER |
+| 전체 검사 | `scripts/check` job, `pc74:~/data/geoaidesk/runs/gaid-qwen-followups-20261014T224923.177731Z` (exit 0; 백엔드 1,679 통과·11 건너뜀, 웹 984, geo 41, 실제 실행 스모크 통과; 코드 6eb349c). 앞선 두 번(`…T131108.286814Z`, `…T131749.464530Z`)은 다른 프로젝트 계산으로 부하가 높을 때 웹 화면 시험이 시간 초과로 실패했고, 해당 시험은 따로 돌리면 통과함 |
 
 실행 예:
 
