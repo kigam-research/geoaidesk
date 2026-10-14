@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:13:22Z
+updated: 2026-10-14T12:16:15Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -52,6 +52,12 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   (`--allow-missing-skills` overrides) and records `record.skills` {bound, installed, exposed, use}; test in route-tests.
 - Local re-trial jobs 1–4 queued on the GPU lock (64K well-log-qc, 64K geo-map-and-crs, 98K well-log-qc,
   98K geo-map-and-crs); receipts under Running jobs.
+- Job 1 (local 64K well-log-qc, app b2076d8) passed: connection 52 s, task 52 s, 12 turns/11 tool calls (6 recovered
+  tool errors), peak 34,130 tokens (52%), $0 local; read `.pi/skills/well-log-qc-quicklook/SKILL.md` in the sandbox,
+  no paths outside it. All 23 curves match the LAS reference (samples, NULLs, units, first/last depth;
+  `~/data/geoaidesk/work/gaid-qwen-followups/scripts/check_las.py`); quicklook 1400–1800 m, depth increases downward,
+  missing curves grey; log-axis tick labels overlap. record sha256
+  b830eec1af0d84205c79be4e352dd7ef37abde84a348bebf35c3e5265f31486a. (WP10: partial at the 45-min cap.)
 - B delegated to child `gaid-qwen-followups--gaid-qwen-reasoning` (writer f950c83f, workspace wks_f2ee75fc2036fa9c).
   Note for integration: the child also needs owner `gaid-qwen-followups` in geo/tests/distribution.test.mjs (already
   added on this branch; resolve the duplicate line on merge).
