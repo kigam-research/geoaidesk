@@ -8,6 +8,7 @@ review_status: pending
 decisions: 2
 cover: figures/01-kigam-qwen-map.png
 supersedes:
+reviewed: 2026-10-14
 ---
 # 기관 내부 Qwen 서버 실제 과제 시험 — 연결·과제 결과와 사용 조건
 
