@@ -12,6 +12,15 @@ test('paid and subscription calls are opt-in before any run', () => {
   assert.throws(() => options(['--api','http://localhost:8000']), /data-home/);
 });
 
+test('custom-server route is $0, needs a server and model, and checks thinking levels', () => {
+  assert.throws(() => options(['--route','custom-server','--model','m']), /base-url/);
+  const o = options(['--route','custom-server','--base-url','http://10.0.0.1:8000/v1','--model','m','--thinking-probe','low, xhigh','--also-connect','a,b']);
+  assert.equal(o.spendLimit, 0);
+  assert.deepEqual(o.thinkingProbe, ['low','xhigh']);
+  assert.deepEqual(o.alsoConnect, ['a','b']);
+  assert.throws(() => options(['--route','custom-server','--base-url','http://x/v1','--model','m','--thinking','max']), /thinking level/);
+});
+
 test('artifact presence cannot pass a wrong synthetic area table', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(),'gaid-route-artifacts-'));
   try {
@@ -57,5 +66,24 @@ test('timed-out stream aborts server work and waits for settled accounting', asy
     assert.equal(result.settled,true);
     assert.equal(calls[0][1],'/sessions/s/abort');
     assert.ok(result.errors.length);
+  } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); fs.rmSync(root,{recursive:true,force:true}); }
+});
+
+test('a destructive-command prompt is answered and recorded instead of stalling the run', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(),'gaid-route-permission-'));
+  const sessionFile = path.join(root,'session.jsonl'); fs.writeFileSync(sessionFile,'');
+  const server = http.createServer((_req,res) => {
+    res.writeHead(200,{'Content-Type':'text/event-stream'});
+    res.end('data: {"type":"permission_request","requestId":"perm_1","toolName":"bash","command":"rm -rf scratch","reason":"Destructive"}\n\ndata: {"type":"done"}\n\n');
+  });
+  await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
+  const calls = [];
+  try {
+    const result = await runChat({ json: async (method,route,opts) => { calls.push([method,route,opts?.body]); return {status:'complete'}; },
+      api:`http://127.0.0.1:${server.address().port}`, project:'trial',session:{id:'s',sessionFile},model:'gaid-local/test',prompt:'test',
+      runDir:root,label:'permission',timeoutMs:5000,ollamaUrl:null });
+    assert.equal(result.done,true);
+    assert.deepEqual(calls[0],['POST','/sessions/s/permissions/perm_1',{allow:false}]);
+    assert.equal(result.permissionRequests[0].answer,'deny');
   } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); fs.rmSync(root,{recursive:true,force:true}); }
 });

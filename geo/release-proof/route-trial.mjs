@@ -18,20 +18,33 @@ export function options(args) {
     'ollama-url': { type: 'string', default: 'http://127.0.0.1:11434' },
     'allow-paid': { type: 'boolean', default: false }, 'timeout-minutes': { type: 'string', default: '45' },
     'spend-limit-usd': { type: 'string', default: '1' }, help: { type: 'boolean' },
+    'base-url': { type: 'string' }, 'provider-id': { type: 'string', default: 'trial-server' },
+    'max-tokens': { type: 'string', default: '16384' }, thinking: { type: 'string', default: 'off' },
+    'thinking-probe': { type: 'string', default: '' }, 'also-connect': { type: 'string', default: '' },
+    permission: { type: 'string', default: 'deny' },
   } });
   if (o.help) return o;
-  if (!['local','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
-  if (o.route !== 'local' && !o['allow-paid']) throw new Error('Paid/subscription route refused: explicit --allow-paid is required');
+  if (!['local','custom-server','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
+  if (!['local','custom-server'].includes(o.route) && !o['allow-paid']) throw new Error('Paid/subscription route refused: explicit --allow-paid is required');
   if (!['well-log-qc','geo-map-and-crs'].includes(o.workflow)) throw new Error('Unknown workflow');
   o.context = Number(o.context);
   if (!Number.isSafeInteger(o.context) || o.context < 65536) throw new Error('Context must be at least 65536');
   o.timeoutMs = Number(o['timeout-minutes']) * 60_000;
   if (!Number.isFinite(o.timeoutMs) || o.timeoutMs <= 0) throw new Error('Invalid timeout');
-  o.spendLimit = o.route === 'local' ? 0 : Number(o['spend-limit-usd']);
+  o.spendLimit = ['local','custom-server'].includes(o.route) ? 0 : Number(o['spend-limit-usd']);
   if (!Number.isFinite(o.spendLimit) || o.spendLimit < 0) throw new Error('Invalid spend limit');
   if (o.api && !o['data-home']) throw new Error('Attach requires --data-home to collect sandbox and ledger evidence');
-  if (o.route !== 'local' && (!o.api || !o.model)) throw new Error('Paid routes require --api and explicit --model on an already connected instance');
+  // custom-server: a keyless OpenAI-compatible server the user does not pay per token for (declared cost 0).
+  if (o.route === 'custom-server' && (!o['base-url'] || !o.model)) throw new Error('custom-server requires --base-url and --model');
+  if (!['local','custom-server'].includes(o.route) && (!o.api || !o.model)) throw new Error('Paid routes require --api and explicit --model on an already connected instance');
   o.model ??= 'qwen3:30b-a3b-instruct-2507-q4_K_M';
+  o.maxTokens = Number(o['max-tokens']);
+  const list = s => s.split(',').map(x => x.trim()).filter(Boolean);
+  o.thinkingProbe = list(o['thinking-probe']);
+  o.alsoConnect = list(o['also-connect']);
+  const levels = ['off','minimal','low','medium','high','xhigh'];
+  if (![o.thinking, ...o.thinkingProbe].every(l => levels.includes(l))) throw new Error('Unknown thinking level');
+  if (!['deny','allow','none'].includes(o.permission)) throw new Error('--permission must be deny, allow or none');
   return o;
 }
 
@@ -45,8 +58,17 @@ async function modelRequest(url, route, body) {
 }
 
 /** Bound the model run, explicitly abort on timeout/disconnect, then wait for server-owned accounting. */
-export async function runChat({ json, api, project, session, model, prompt, runDir, label, timeoutMs, ollamaUrl }) {
+export async function runChat({ json, api, project, session, model, prompt, runDir, label, timeoutMs, ollamaUrl, thinkingLevel = 'off', permission = 'deny' }) {
   const m = metrics(), started = Date.now();
+  // No person watches a trial: answer the data guard's destructive-command prompts (recorded) instead of stalling.
+  m.permissionRequests = []; const answers = [];
+  const answer = frame => {
+    const entry = { requestId: frame.requestId, toolName: frame.toolName, command: String(frame.command ?? '').slice(0, 2000), reason: frame.reason, answer: permission };
+    m.permissionRequests.push(entry);
+    if (permission === 'none') return;
+    answers.push(json('POST', `/sessions/${session.id}/permissions/${frame.requestId}`, { project, body: { allow: permission === 'allow' } })
+      .catch(e => { entry.answerError = e.message; }));
+  };
   const log = fs.createWriteStream(path.join(runDir, `${label}.sse`));
   const psLog = fs.createWriteStream(path.join(runDir, `${label}-ollama.jsonl`));
   const samples = []; let sampling = false;
@@ -67,7 +89,7 @@ export async function runChat({ json, api, project, session, model, prompt, runD
   try {
     const response = await fetch(`${api}/sessions/${session.id}/run`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Project-Id': project },
-      body: JSON.stringify({ model, message: prompt, thinkingLevel: 'off' }), signal: AbortSignal.timeout(timeoutMs),
+      body: JSON.stringify({ model, message: prompt, thinkingLevel }), signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) throw new Error(`Run HTTP ${response.status}: ${(await response.text()).slice(0,1000)}`);
     let pending = ''; const decoder = new TextDecoder();
@@ -78,7 +100,10 @@ export async function runChat({ json, api, project, session, model, prompt, runD
       while ((end = pending.indexOf('\n\n')) >= 0) {
         const block = pending.slice(0,end); pending = pending.slice(end+2);
         const data = block.split('\n').filter(s => s.startsWith('data:')).map(s => s.slice(5).trim()).join('\n');
-        if (data) observe(m, JSON.parse(data));
+        if (!data) continue;
+        const frame = JSON.parse(data);
+        observe(m, frame);
+        if (frame.type === 'permission_request') answer(frame);
       }
     }
     if (!m.done) throw new Error('SSE ended without done frame');
@@ -87,6 +112,7 @@ export async function runChat({ json, api, project, session, model, prompt, runD
     try { await json('POST', `/sessions/${session.id}/abort`, { project }); } catch (abortError) { m.errors.push({ message: `abort: ${abortError.message}` }); }
   } finally {
     clearInterval(timer);
+    await Promise.all(answers);
     while (sampling) await sleep(100);
     await sample(); log.end(); psLog.end();
   }
@@ -112,7 +138,7 @@ export async function runChat({ json, api, project, session, model, prompt, runD
 
 export async function main(args = process.argv.slice(2)) {
   const o = options(args);
-  if (o.help) { console.log('node geo/release-proof/route-trial.mjs --route local --context 65536|98304 --workflow well-log-qc|geo-map-and-crs [--out DIR]\nSee geo/release-proof/route-usage.md for attach/paid routes.'); return; }
+  if (o.help) { console.log('node geo/release-proof/route-trial.mjs --route local|custom-server --context 65536|98304 --workflow well-log-qc|geo-map-and-crs [--out DIR]\nSee geo/release-proof/route-usage.md for attach/paid routes.'); return; }
   const checkout = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const runDir = path.resolve(o.out ?? process.env.TASK_OUTPUT_DIR ?? path.join(os.homedir(), 'data/geoaidesk/work/gaid-release-proof--routes', `${Date.now()}-${o.workflow}-${o.context}`));
   const dataHome = path.resolve(o['data-home'] ?? path.join(runDir,'home'));
@@ -142,6 +168,22 @@ export async function main(args = process.argv.slice(2)) {
       if (info?.configuredContext !== o.context || status.verification.state !== 'verified') throw new Error(`Local context mismatch: ${JSON.stringify(status.verification)}`);
       model = `gaid-local/${info.model}`;
       record.route = { ...record.route, provider: 'gaid-local', modelId: info.model, serverContextTokens: info.configuredContext, billingMode: 'local' };
+    } else if (o.route === 'custom-server') {
+      // Register the server the way Settings → Custom model servers does (reasoning on, declared cost 0).
+      const zero = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+      const ids = [o.model, ...o.alsoConnect];
+      await json('PUT','/custom-models', { body: { providers: [{ id: o['provider-id'], name: `Trial ${o['base-url']}`, baseUrl: o['base-url'],
+        api: 'openai-completions', apiKey: '', models: ids.map(id => ({ id, reasoning: true, input: ['text'], contextWindow: o.context, maxTokens: o.maxTokens, cost: zero })) }] } });
+      model = `${o['provider-id']}/${o.model}`;
+      const list = await json('GET','/providers/models');
+      const selected = list.models.find(x => x.id === model || `${x.provider}/${x.modelId}` === model);
+      if (!selected) throw new Error('Registered custom model not listed by /providers/models');
+      let served = null;
+      try { served = (await (await fetch(`${o['base-url'].replace(/\/$/,'')}/models`, { signal: AbortSignal.timeout(15_000) })).json()).data
+        ?.map(x => ({ id: x.id, root: x.root, maxModelLen: x.max_model_len, ownedBy: x.owned_by })); } catch (e) { served = { error: e.message }; }
+      record.route = { ...record.route, provider: `${o['provider-id']} (custom server)`, baseUrl: o['base-url'], modelId: o.model,
+        maxTokens: o.maxTokens, thinkingLevel: o.thinking, billingMode: selected.billingMode, pricingUsdPerMillionTokens: selected.pricing,
+        servedModels: served };
     } else {
       model = o.model;
       const provider = model.split('/')[0];
@@ -164,13 +206,28 @@ export async function main(args = process.argv.slice(2)) {
     if (!fs.existsSync(sandbox)) throw new Error('Attach data home does not match the API project storage');
     const connectionSession = await json('POST','/sessions', { project: project.id, body: { geoExposure: `workflow:${o.workflow}` } });
     record.connection = { outcome: 'not-run', testedAt: new Date().toISOString(), sessionId: connectionSession.id }; save();
-    const conn = await runChat({ json, api: instance.api, project: project.id, session: connectionSession, model,
-      prompt: 'Connection check only. Reply with exactly GAID_ROUTE_OK. Do not use tools or read files.', runDir, label: 'connection', timeoutMs: Math.min(o.timeoutMs, 10*60_000), ollamaUrl: o.route === 'local' ? o['ollama-url'] : null });
-    const messages = jsonLines(connectionSession.sessionFile).filter(r => r.type === 'message').map(r => r.message);
-    const answer = messages.filter(m => m?.role === 'assistant').flatMap(m => m.content ?? []).filter(c => c.type === 'text').map(c => c.text).join('');
-    record.connection = { ...conn, testedAt: record.connection.testedAt, latencyMs: conn.durationMs,
-      outcome: conn.done && !conn.errors.length && conn.toolCalls === 0 && answer.trim() === 'GAID_ROUTE_OK' && conn.reportedModels.includes(model) ? 'passed' : 'failed' };
+    const connect = async (session, ref, label, thinkingLevel) => {
+      const c = await runChat({ json, api: instance.api, project: project.id, session, model: ref, thinkingLevel,
+        prompt: 'Connection check only. Reply with exactly GAID_ROUTE_OK. Do not use tools or read files.', runDir, label, timeoutMs: Math.min(o.timeoutMs, 10*60_000), ollamaUrl: o.route === 'local' ? o['ollama-url'] : null });
+      const messages = jsonLines(session.sessionFile).filter(r => r.type === 'message').map(r => r.message);
+      const answer = messages.filter(m => m?.role === 'assistant').flatMap(m => m.content ?? []).filter(c => c.type === 'text').map(c => c.text).join('');
+      return { ...c, answer: answer.slice(0, 200),
+        outcome: c.done && !c.errors.length && c.toolCalls === 0 && answer.trim() === 'GAID_ROUTE_OK' && c.reportedModels.includes(ref) ? 'passed' : 'failed' };
+    };
+    const conn = await connect(connectionSession, model, 'connection', o.thinking);
+    record.connection = { ...conn, testedAt: record.connection.testedAt, latencyMs: conn.durationMs, thinkingLevel: o.thinking };
     save();
+    // Optional extra connection chats: other thinking levels on the trial model, then other model ids.
+    const probes = [...o.thinkingProbe.map(level => ({ ref: model, level })),
+      ...o.alsoConnect.map(id => ({ ref: `${o['provider-id']}/${id}`, level: o.thinking }))];
+    if (probes.length) record.connectionProbes = [];
+    for (const [i, p] of probes.entries()) {
+      const s = await json('POST','/sessions', { project: project.id, body: {} });
+      const r = await connect(s, p.ref, `probe-${i}`, p.level);
+      record.connectionProbes.push({ model: p.ref, thinkingLevel: p.level, outcome: r.outcome, durationMs: r.durationMs,
+        answer: r.answer, errors: r.errors, reportedModels: r.reportedModels, outputTokens: r.outputTokens });
+      save();
+    }
     // Run the workflow even after a failed connection, preserving independent outcomes.
     const form = new FormData();
     for (const f of prepared.files) form.append('files', new Blob([fs.readFileSync(f.file)]), f.name);
@@ -179,11 +236,12 @@ export async function main(args = process.argv.slice(2)) {
     const context = await json('GET',`/geo/context?sessionId=${session.id}&model=${encodeURIComponent(model)}`,{ project: project.id });
     fs.writeFileSync(path.join(runDir,'initial-context.json'),JSON.stringify(context,null,2)+'\n');
     record.task = { workflowId: o.workflow, outcome: 'not-run', startedAt: new Date().toISOString(), inputs: prepared.inputs, sessionId: session.id }; save();
-    const m = await runChat({ json, api: instance.api, project: project.id, session, model, prompt: prepared.prompt, runDir, label: 'task', timeoutMs: o.timeoutMs, ollamaUrl: o.route === 'local' ? o['ollama-url'] : null });
+    const m = await runChat({ json, api: instance.api, project: project.id, session, model, prompt: prepared.prompt, runDir, label: 'task', timeoutMs: o.timeoutMs, ollamaUrl: o.route === 'local' ? o['ollama-url'] : null, thinkingLevel: o.thinking, permission: o.permission });
     const ledgerPath = path.join(sandbox,'.kady/runs',session.id,'costs.jsonl');
     const ledger = jsonLines(ledgerPath);
     const artifacts = checkArtifacts(sandbox,prepared.expectedArtifacts,prepared.reference);
-    const accountingPassed = ledger.length > 0 && (o.route !== 'local' || ledger.every(r => r.billingMode === 'local' && r.costUsd === 0));
+    const accountingPassed = ledger.length > 0 && (o.route === 'local' ? ledger.every(r => r.billingMode === 'local' && r.costUsd === 0)
+      : o.route === 'custom-server' ? ledger.every(r => r.costUsd === 0) : true);
     const loaded = [...conn.offload,...m.offload];
     const allocationPassed = o.route !== 'local' || (loaded.length > 0 && loaded.every(s => s.loadedContextTokens === o.context));
     record.task = { ...record.task, ...m, ...artifacts, contextPeakRatio: m.contextPeakTokens === null ? null : m.contextPeakTokens/record.route.appContextTokens,
