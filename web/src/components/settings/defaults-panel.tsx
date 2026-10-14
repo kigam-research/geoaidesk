@@ -72,6 +72,7 @@ function sameDraft(a: Draft, b: Draft): boolean {
 }
 
 export function DefaultsPanel() {
+  const { models } = useModels();
   const modal = useModalCatalog();
   const [saved, setSaved] = useState<AppDefaults | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -118,6 +119,7 @@ export function DefaultsPanel() {
   }, [baseline]);
 
   const dirty = Boolean(draft && baseline && !sameDraft(draft, baseline));
+  const thinkingModel = models.find((model) => model.id === (draft?.model || DEFAULT_MODEL.id));
 
   const save = async () => {
     if (!draft) return;
@@ -181,6 +183,7 @@ export function DefaultsPanel() {
               <div className="flex">
                 <ThinkingSelector
                   selected={draft.thinkingLevel}
+                  thinkingSentAs={thinkingModel?.thinkingSentAs}
                   onChange={(thinkingLevel) => setDraft({ ...draft, thinkingLevel })}
                 />
               </div>

@@ -34,6 +34,8 @@ export type Model = {
   sourceLabel?: string;
   billingMode?: "payg" | "metered_oauth" | "subscription" | "local";
   reasoning?: boolean;
+  /** Custom server substitutions supplied by the resolved Pi model. */
+  thinkingSentAs?: Partial<Record<"minimal" | "low" | "medium" | "high" | "xhigh", string>>;
   available?: boolean;
 };
 

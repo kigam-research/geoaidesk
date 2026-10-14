@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as appSettings from "@/lib/app-settings";
 import * as projectsLib from "@/lib/projects";
 import * as modalJobs from "@/lib/use-modal-jobs";
+import * as modelHooks from "@/lib/use-models";
+import { DEFAULT_MODEL } from "@/components/model-selector";
 import { DefaultsPanel } from "@/components/settings/defaults-panel";
 
 const IMAGE_MODELS: appSettings.ImageModelListing = {
@@ -32,6 +34,22 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe("DefaultsPanel", () => {
+  it("shows the known custom default model's wire substitution without changing the saved level", async () => {
+    const model = { ...DEFAULT_MODEL, id: "kigam-qwen/qwen", reasoning: true, thinkingSentAs: { high: "medium" } };
+    vi.spyOn(modelHooks, "useModels").mockReturnValue({
+      models: [model], ollamaModels: [], ollamaAvailable: false,
+      openaiCompatibleModels: [], openaiCompatibleAvailable: false, openaiCompatibleConfigured: false,
+      providerModels: [], providerStatuses: [], directProviderModels: [model], configuredDirectProviders: ["kigam-qwen"],
+      modelAvailability: () => "available", isModelAvailable: () => true, hasAnyModelAccess: true, refresh: () => {},
+    });
+    vi.spyOn(appSettings, "getAppDefaults").mockResolvedValue({ model: model.id, thinkingLevel: "high" });
+    const put = vi.spyOn(appSettings, "putAppDefaults");
+    render(<DefaultsPanel />);
+    expect(await screen.findByText("High → Medium")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save defaults" })).toBeDisabled();
+    expect(put).not.toHaveBeenCalled();
+  });
+
   it("saves a typed default model and leaves untouched keys cleared", async () => {
     const user = userEvent.setup();
     vi.spyOn(appSettings, "getAppDefaults").mockResolvedValue({});

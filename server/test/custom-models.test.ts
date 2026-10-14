@@ -7,9 +7,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import Fastify from "fastify";
+import { ModelRuntime } from "@earendil-works/pi-coding-agent";
+import { clampThinkingLevel, getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 
 import {
   customModelForClient,
+  customThinkingLevelMap,
   customProviderIds,
   isCustomProvider,
   listCustomProviders,
@@ -56,6 +59,100 @@ describe("validateCustomProviders", () => {
     expect(validateCustomProviders([{ ...vllm, models: [{ id: "a", cost: { input: -1 } }] }])).toMatch(/cost\.input/);
     expect(validateCustomProviders([vllm, vllm])).toMatch(/duplicate provider/);
     expect(validateCustomProviders("nope")).toMatch(/must be an array/);
+  });
+});
+
+describe("custom server reasoning levels", () => {
+  const levels = ["low", "medium", "xhigh"];
+  const mapping = { minimal: "low", low: "low", medium: "medium", high: "medium", xhigh: "xhigh" };
+  const provider = { ...vllm, apiKey: "", reasoningLevels: levels, models: [
+    { id: "qwen", reasoning: true }, { id: "plain", reasoning: false },
+  ] };
+  const save = (value: unknown) => {
+    const checked = validateCustomProviders([value]);
+    if (typeof checked === "string") throw new Error(checked);
+    return writeCustomProviders(checked, dir)!;
+  };
+
+  it("validates accepted levels, normalizes order and leaves empty/unset at legacy defaults", () => {
+    for (const invalid of ["low", null, ["off"], ["max"], ["ultra"], [1]]) {
+      expect(validateCustomProviders([{ ...provider, reasoningLevels: invalid }])).toMatch(/reasoningLevels/);
+    }
+    expect(save({ ...provider, reasoningLevels: ["xhigh", "low", "medium", "low"] })[0].reasoningLevels).toEqual(levels);
+    expect(customThinkingLevelMap(["high"])).toEqual({ minimal: "high", low: "high", medium: "high", high: "high", xhigh: "high" });
+    expect(customThinkingLevelMap([])).toBeUndefined();
+    for (const accepted of [undefined, []]) {
+      const [listed] = save({ ...provider, reasoningLevels: accepted });
+      expect(listed.reasoningLevels).toBeUndefined();
+      const file = JSON.parse(fs.readFileSync(modelsJsonPath(dir), "utf8"));
+      expect(file.providers[provider.id].models[0].thinkingLevelMap).toBeUndefined();
+    }
+  });
+
+  it("writes maps only for reasoning models, round-trips levels, and preserves foreign maps", () => {
+    const foreign = { baseUrl: "http://foreign/v1", models: [{ id: "m", reasoning: true, thinkingLevelMap: { high: "custom-effort", max: null } }] };
+    fs.writeFileSync(modelsJsonPath(dir), JSON.stringify({ providers: { foreign } }));
+    const original = fs.readFileSync(modelsJsonPath(dir), "utf8");
+    listCustomProviders(dir);
+    expect(fs.readFileSync(modelsJsonPath(dir), "utf8")).toBe(original);
+    save(provider);
+    const file = JSON.parse(fs.readFileSync(modelsJsonPath(dir), "utf8"));
+    expect(file.providers.foreign).toEqual(foreign);
+    expect(file.providers[provider.id].models[0].thinkingLevelMap).toEqual(mapping);
+    expect(file.providers[provider.id].models[1].thinkingLevelMap).toBeUndefined();
+    expect(publicCustomProviders(dir).find((p) => p.id === provider.id)?.reasoningLevels).toEqual(levels);
+    // Server-level configuration survives even before any reasoning model is enabled.
+    save({ ...provider, models: [{ id: "plain", reasoning: false }] });
+    expect(listCustomProviders(dir).find((p) => p.id === provider.id)?.reasoningLevels).toEqual(levels);
+  });
+
+  it("reloads maps in independent real Pi runtimes and exposes them through the picker route", async () => {
+    save(provider);
+    const options = { authPath: path.join(dir, "test-auth.json"), modelsPath: modelsJsonPath(dir),
+      modelsStorePath: path.join(dir, "test-models-store.json"), allowModelNetwork: false };
+    const runtime = await ModelRuntime.create(options);
+    const childRuntime = await ModelRuntime.create(options);
+    expect(runtime.getError()).toBeUndefined();
+    for (const value of [runtime, childRuntime]) {
+      const model = value.getModel(provider.id, "qwen")!;
+      expect(model.thinkingLevelMap).toEqual(mapping);
+      expect(getSupportedThinkingLevels(model)).toEqual(["off", "minimal", "low", "medium", "high", "xhigh"]);
+      expect(clampThinkingLevel(model, "high")).toBe("high");
+      expect(clampThinkingLevel(model, "xhigh")).toBe("xhigh");
+    }
+    const app = Fastify();
+    try {
+      await registerModelProviderRoutes(app, { runtime, customModelsDir: dir });
+      const res = await app.inject({ method: "GET", url: "/providers/models" });
+      expect(res.statusCode).toBe(200);
+      expect(res.json().models.find((m: { id: string }) => m.id === `${provider.id}/qwen`)).toMatchObject({
+        thinkingSentAs: { minimal: "low", high: "medium" },
+      });
+      expect(res.json().models.find((m: { id: string }) => m.id === `${provider.id}/plain`).thinkingSentAs).toBeUndefined();
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("builds only accepted reasoning_effort values on the actual Pi completion path; Off omits the field", async () => {
+    save(provider);
+    const runtime = await ModelRuntime.create({ authPath: path.join(dir, "test-auth.json"), modelsPath: modelsJsonPath(dir),
+      modelsStorePath: path.join(dir, "test-models-store.json"), allowModelNetwork: false });
+    const model = runtime.getModel(provider.id, "qwen")!;
+    const fetcher = vi.fn(async () => { throw new Error("Unexpected outbound request"); });
+    for (const [selected, expected] of Object.entries({ off: undefined, ...mapping })) {
+      let payload: unknown;
+      const effective = clampThinkingLevel(model, selected as "off" | "high");
+      await runtime.completeSimple(model, { messages: [{ role: "user", content: "ok", timestamp: 0 }] }, {
+        reasoning: effective === "off" ? undefined : effective,
+        maxTokens: 1,
+        fetch: fetcher,
+        onPayload: (value) => { payload = value; throw new Error("Payload captured before network"); },
+      });
+      expect(payload).toBeDefined();
+      expect((payload as Record<string, unknown>).reasoning_effort).toBe(expected);
+    }
+    expect(fetcher).not.toHaveBeenCalled();
   });
 });
 

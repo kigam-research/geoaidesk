@@ -27,14 +27,24 @@ export function ThinkingSelector({
   onChange,
   disabled = false,
   disabledReason = appText("chat.thinking.this_model_doesn_t_support_adjustable_thinking"),
+  thinkingSentAs,
 }: {
   selected: ThinkingLevel;
   onChange: (level: ThinkingLevel) => void;
   disabled?: boolean;
   disabledReason?: string;
+  thinkingSentAs?: Partial<Record<ThinkingLevel, string>>;
 }) {
   const [open, setOpen] = useState(false);
   const current = THINKING_LEVELS.find((l) => l.id === selected) ?? THINKING_LEVELS[0];
+  const wireLabel = (level: ThinkingLevel) => {
+    const wire = thinkingSentAs?.[level];
+    return wire && wire !== level ? THINKING_LEVELS.find((candidate) => candidate.id === wire)?.label ?? wire : undefined;
+  };
+  const displayLabel = (level: typeof current) => {
+    const sentAs = wireLabel(level.id);
+    return sentAs ? appText("chat.thinking.mappedLevel", { selected: level.label, sentAs }) : level.label;
+  };
 
   const chip = (
     <div
@@ -57,7 +67,7 @@ export function ThinkingSelector({
           disabled ? "text-muted-foreground" : "font-medium text-foreground",
         )}
       >
-        {disabled ? appText("chat.thinking.off") : current.label}
+        {disabled ? appText("chat.thinking.off") : displayLabel(current)}
       </span>
       {!disabled && (
         <ChevronDownIcon
@@ -123,7 +133,12 @@ export function ThinkingSelector({
                   {isSelected && <CheckIcon className="size-2" />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="font-semibold text-foreground">{level.label}</span>
+                  <span className="font-semibold text-foreground">{displayLabel(level)}</span>
+                  {wireLabel(level.id) && (
+                    <p className="mt-0.5 font-medium text-foreground">
+                      {appText("chat.thinking.sentAs", { level: wireLabel(level.id)! })}
+                    </p>
+                  )}
                   <p className="mt-0.5 text-muted-foreground/80 leading-relaxed">
                     {level.description}
                   </p>

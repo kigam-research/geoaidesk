@@ -48,7 +48,7 @@ describe("CustomModelsCard", () => {
   it("lists foreign providers read-only, edits a managed one and saves", async () => {
     vi.spyOn(lib, "getCustomProviders").mockResolvedValue([
       { id: "mine", baseUrl: "http://x/v1", api: "openai-completions", models: [{ id: "m" }], managed: false },
-      { id: "hpc-vllm", name: "Lab", baseUrl: "http://gpu:8000/v1", api: "openai-completions", apiKey: "$K", models: [{ id: "llama", cost: { input: 0.5, output: 1.5, cacheRead: 0, cacheWrite: 0 } }], managed: true },
+      { id: "hpc-vllm", name: "Lab", baseUrl: "http://gpu:8000/v1", api: "openai-completions", apiKey: "$K", reasoningLevels: ["low", "medium", "xhigh"], models: [{ id: "llama", cost: { input: 0.5, output: 1.5, cacheRead: 0, cacheWrite: 0 } }], managed: true },
     ]);
     const save = vi.spyOn(lib, "saveCustomProviders").mockImplementation(async (providers) => ({
       providers: providers.map((p) => ({ ...p, managed: true })),
@@ -58,12 +58,17 @@ describe("CustomModelsCard", () => {
     expect(await screen.findByText("mine")).toBeInTheDocument();
     const baseUrl = screen.getByLabelText("Server 1 base URL");
     expect(baseUrl).toHaveValue("http://gpu:8000/v1");
+    expect(screen.getByRole("checkbox", { name: "Low" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "High" })).not.toBeChecked();
+    await userEvent.click(screen.getByRole("checkbox", { name: "High" }));
+    expect(screen.getByRole("checkbox", { name: "High" })).toBeChecked();
+    await userEvent.click(screen.getByRole("checkbox", { name: "High" }));
     await userEvent.clear(baseUrl);
     await userEvent.type(baseUrl, "http://gpu-2:8000/v1");
     await userEvent.click(screen.getByRole("button", { name: "Save servers" }));
     await waitFor(() => expect(save).toHaveBeenCalled());
     expect(save.mock.calls[0][0]).toEqual([
-      expect.objectContaining({ id: "hpc-vllm", baseUrl: "http://gpu-2:8000/v1", apiKey: "$K", models: [expect.objectContaining({ id: "llama", cost: expect.objectContaining({ input: 0.5, output: 1.5 }) })] }),
+      expect.objectContaining({ id: "hpc-vllm", baseUrl: "http://gpu-2:8000/v1", apiKey: "$K", reasoningLevels: ["low", "medium", "xhigh"], models: [expect.objectContaining({ id: "llama", cost: expect.objectContaining({ input: 0.5, output: 1.5 }) })] }),
     ]);
     expect(await screen.findByText(/could not resolve credentials for: hpc-vllm/)).toBeInTheDocument();
   });

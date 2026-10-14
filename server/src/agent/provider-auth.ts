@@ -719,6 +719,8 @@ export interface ClientDirectModel
   extends Omit<ClientProviderModel, "sourceId" | "billingMode"> {
   sourceId: string;
   billingMode: DirectProviderBilling | "local";
+  /** Custom servers only: effective wire values that differ from the selected level. */
+  thinkingSentAs?: Partial<Record<"minimal" | "low" | "medium" | "high" | "xhigh", string>>;
 }
 
 /**

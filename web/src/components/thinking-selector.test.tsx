@@ -31,4 +31,25 @@ describe("ThinkingSelector", () => {
     expect(screen.queryByText("Medium")).not.toBeInTheDocument();
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("shows wire substitutions on the chip and options while keeping the selected intent", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<ThinkingSelector selected="high" onChange={onChange} thinkingSentAs={{ high: "medium", minimal: "low" }} />);
+    expect(screen.getByText("High → Medium")).toBeInTheDocument();
+    await user.click(screen.getByRole("button"));
+    expect(screen.getByText("Sent to this server as Medium.")).toBeInTheDocument();
+    expect(screen.getByText("Minimal → Low")).toBeInTheDocument();
+    await user.click(screen.getAllByText("High → Medium")[1]);
+    expect(onChange).toHaveBeenCalledWith("high");
+  });
+
+  it("refreshes the substitution when server metadata changes and never maps Off", () => {
+    const { rerender } = render(<ThinkingSelector selected="high" onChange={() => {}} thinkingSentAs={{ high: "medium" }} />);
+    rerender(<ThinkingSelector selected="high" onChange={() => {}} />);
+    expect(screen.getByText("High")).toBeInTheDocument();
+    expect(screen.queryByText("High → Medium")).not.toBeInTheDocument();
+    rerender(<ThinkingSelector selected="off" onChange={() => {}} thinkingSentAs={{ high: "medium" }} />);
+    expect(screen.getByText("Off")).toBeInTheDocument();
+  });
 });

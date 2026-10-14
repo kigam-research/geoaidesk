@@ -16,11 +16,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { THINKING_LEVELS } from "@/components/thinking-selector";
 import {
   CUSTOM_MODEL_APIS,
+  CUSTOM_REASONING_LEVELS,
   getCustomProviders,
   saveCustomProviders,
   type CustomModelApi,
+  type CustomReasoningLevel,
   type CustomModelDefinition,
   type CustomProvider,
   type CustomProviderListing,
@@ -29,6 +32,7 @@ import { notifyProviderAuthChanged } from "@/lib/use-provider-auth";
 import { SettingsError } from "@/components/settings/primitives";
 
 const settingsText = geoText("settings");
+const appText = geoText("app");
 
 interface ModelRow {
   id: string;
@@ -47,6 +51,7 @@ interface ProviderDraft {
   baseUrl: string;
   api: CustomModelApi;
   apiKey: string;
+  reasoningLevels?: CustomReasoningLevel[];
   /** Mask of the key saved server-side; a blank field keeps it. */
   savedKeyMask?: string;
   models: ModelRow[];
@@ -78,6 +83,7 @@ function draftFrom(p: CustomProviderListing): ProviderDraft {
     name: p.name ?? "",
     baseUrl: p.baseUrl,
     api: p.api,
+    reasoningLevels: p.reasoningLevels,
     apiKey: p.apiKey && p.apiKey !== "none" ? p.apiKey : "",
     ...(p.apiKeySaved ? { savedKeyMask: p.apiKeyMasked || "••••" } : {}),
     models: p.models.map((m) => ({
@@ -129,6 +135,7 @@ export function providersFromDrafts(drafts: ProviderDraft[]): CustomProvider[] |
       ...(d.name.trim() ? { name: d.name.trim() } : {}),
       baseUrl: d.baseUrl.trim(),
       api: d.api,
+      ...(d.reasoningLevels?.length ? { reasoningLevels: d.reasoningLevels } : {}),
       ...(d.apiKey.trim() ? { apiKey: d.apiKey.trim() } : d.savedKeyMask ? { keepApiKey: true } : {}),
       models,
     });
@@ -321,6 +328,26 @@ export function CustomModelsCard() {
                 )}
               </label>
             </div>
+
+            <fieldset className="mt-3 text-[11px]" disabled={saving}>
+              <legend className="font-medium">{appText("customModels.acceptedReasoningLevels")}</legend>
+              <p className="mt-1 text-muted-foreground">{appText("customModels.reasoningLevelsHelp")}</p>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                {CUSTOM_REASONING_LEVELS.map((level) => (
+                  <label key={level} className="flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={d.reasoningLevels?.includes(level) ?? false}
+                      onChange={(event) => edit(pi, {
+                        reasoningLevels: CUSTOM_REASONING_LEVELS.filter((candidate) =>
+                          candidate === level ? event.target.checked : d.reasoningLevels?.includes(candidate)),
+                      })}
+                    />
+                    {THINKING_LEVELS.find((candidate) => candidate.id === level)?.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
             <ul className="mt-3 flex flex-col gap-2" aria-label={settingsText("custom_models.server_models", { v0: pi + 1 })}>
               {d.models.map((m, mi) => (

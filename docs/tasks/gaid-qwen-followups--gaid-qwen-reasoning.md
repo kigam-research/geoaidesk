@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:08:27Z
+updated: 2026-10-14T12:15:03Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f950c83f-f114-403b-86ba-8e4e7d56f2d1","pid":435067,"provider":"codex","session":"01a13a50-2bfe-7e91-a78c-e914e61554c1","start":"44569531","token":"75fb704827e2463ede22fe734b25b74e4d6334906fb417af71c64d9809eb566c"}
 branch: task/gaid-qwen-followups--gaid-qwen-reasoning
 target: task/gaid-qwen-followups
@@ -78,12 +78,30 @@ request at a time.
   the parent writes the report.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the assigned worktree; confirmed the decided per-provider mapping and owned interfaces.
+- Implemented provider-level reasoningLevels validation and sidecar round-trip; reasoning models receive Pi thinkingLevelMap on explicit save only. Hand-written providers/maps remain untouched.
+- Custom picker rows derive thinkingSentAs from the resolved Pi model. Chat uses fresh discovery metadata even for restored tabs; Defaults shows known-model substitutions. Added server checkboxes and visible chip/row mapping.
+- Targeted checks passed: server custom-models 12 tests; web custom-models/thinking/defaults 15 tests. Real Pi runtimes independently reload the map; intercepted completion payloads prove all six levels, including high -> medium, xhigh unchanged and Off omitted, with zero network calls.
+- Server typecheck passed; web typecheck and full suites pending. Copy validator passed with 0 errors / 56 existing warnings; no new string warnings.
+- No review-instance changes and no live/paid model requests.
 ## Next steps
-1. (the next session's first action)
+1. Run the saved snapshot server/web suites with the scientific helper environment; record final counts.
+2. Review the final diff, remove regenerable local caches, save and finish for parent integration.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Sequential decisions: preserve accepted design; persist accepted levels in the managed sidecar (including servers with no reasoning models); Pi reads each reasoning model map from models.json.
+- Owned interfaces: optional reasoningLevels on custom providers; optional thinkingSentAs on custom picker models. Integrate backend first, then UI and regression checks.
+- Work is tightly coupled across these interfaces and remains with this single writer; no nested child units.
+- codegraph is unavailable for this exact worktree (unindexed); native source reads are used without creating an index.
+### Added UI strings (all before: absent)
+
+| ID (app namespace) | Korean after | English after |
+|---|---|---|
+| customModels.acceptedReasoningLevels | 서버가 지원하는 추론 수준 | Reasoning levels accepted by the server |
+| customModels.reasoningLevelsHelp | 선택하지 않은 수준은 가장 가까운 낮은 지원 수준으로 보냅니다. 낮은 수준이 없으면 가장 가까운 높은 수준으로 보냅니다. 아무것도 선택하지 않으면 기존 동작을 유지합니다. 끄기는 항상 선택할 수 있습니다. | Unselected levels are sent as the nearest lower accepted level, or the nearest higher one if none is lower. Leave all unchecked to keep the existing behavior. Off is always selectable. |
+| chat.thinking.mappedLevel | {selected} → {sentAs} | {selected} → {sentAs} |
+| chat.thinking.sentAs | 해당 서버에는 {level}으로 보냅니다. | Sent to this server as {level}. |
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

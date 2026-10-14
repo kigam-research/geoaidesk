@@ -7,6 +7,8 @@ import { apiFetch } from "@/lib/projects";
 
 export const CUSTOM_MODEL_APIS = ["openai-completions", "openai-responses", "anthropic-messages"] as const;
 export type CustomModelApi = (typeof CUSTOM_MODEL_APIS)[number];
+export const CUSTOM_REASONING_LEVELS = ["minimal", "low", "medium", "high", "xhigh"] as const;
+export type CustomReasoningLevel = (typeof CUSTOM_REASONING_LEVELS)[number];
 
 export interface CustomModelDefinition {
   id: string;
@@ -24,6 +26,7 @@ export interface CustomProvider {
   name?: string;
   baseUrl: string;
   api: CustomModelApi;
+  reasoningLevels?: CustomReasoningLevel[];
   apiKey?: string;
   /** Save with the key already stored server-side (the UI only sees a mask). */
   keepApiKey?: boolean;
