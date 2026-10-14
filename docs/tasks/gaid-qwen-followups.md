@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:16:15Z
+updated: 2026-10-14T12:19:26Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -58,6 +58,11 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   `~/data/geoaidesk/work/gaid-qwen-followups/scripts/check_las.py`); quicklook 1400–1800 m, depth increases downward,
   missing curves grey; log-axis tick labels overlap. record sha256
   b830eec1af0d84205c79be4e352dd7ef37abde84a348bebf35c3e5265f31486a. (WP10: partial at the 45-min cap.)
+- Job 2 (local 64K geo-map-and-crs, app 6e8511d) passed: connection 50 s, task 54 s, 8 turns/7 tool calls (1 recovered
+  tool error), peak 31,292 tokens (48%), $0. Exposed `geo-map-and-crs`+`geopandas` but read no skill file. Areas exact
+  (A 30,000, B 20,000 m²); map correct in EPSG:5186 with legend; CRS inventory declared only. run.json carries an
+  invented timestamp (2025-04-05). record sha256 0967531dab38bae7f034a918965fee6430a91097de0a28061cb7c55cb347e0ab.
+  (WP10: partial, no map.)
 - B delegated to child `gaid-qwen-followups--gaid-qwen-reasoning` (writer f950c83f, workspace wks_f2ee75fc2036fa9c).
   Note for integration: the child also needs owner `gaid-qwen-followups` in geo/tests/distribution.test.mjs (already
   added on this branch; resolve the duplicate line on merge).
