@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T05:17:06Z
+updated: 2026-10-14T05:41:08Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -57,7 +57,10 @@ model-route guidance. Untested combinations stay untested.
   passed in 646 s: all files, areas exact, ledger $0 (payg), 54 turns, 57 tool calls, 14 recovered tool errors,
   context peak 101,560 (38.7%). Map figure defects: empty "area CRS" inset, extent text mislabelled. Did not read the
   workflow skill (read pi-subagents SKILL.md). Figure: reports/2026-10-14-gaid-kigam-qwen-trial/figures/01-kigam-qwen-map.png.
-- Job 2 (well-log-qc) started 05:14Z.
+- Job 2 (well-log-qc, 05:14Z) lost after 7.6 min: PC74 root disk full (ENOSPC host-wide at 14:22 KST; other
+  projects' data, not this unit); run.sh died on printf I/O error, record.json stayed at task start. Kept as failed
+  evidence (runs/gaid-kigam-qwen-trial-20261014T051459.845388Z). Rerun as job 3 with ~15 GB free (environment
+  failure, not a model outcome).
 ## Next steps
 1. When job 2 exits: inspect its record/outputs against the LAS (WP10 reference checks), then update
    geo/compatibility.json + docs/geo/compatibility.md (route + thinking-level limit), write the report, scripts/check.
@@ -83,6 +86,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T050117.036909Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T051459.845388Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-kigam-qwen-trial-20261014T054107.553208Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
