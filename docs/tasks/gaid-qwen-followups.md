@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T12:04:48Z
+updated: 2026-10-14T12:07:53Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -43,11 +43,35 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
   worktree so the unit can close.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Plan settled (see Notes). Package A (skills on project create) in progress by the orchestrator; package B delegated
+  to child unit `gaid-qwen-followups--reasoning` (pending start).
 ## Next steps
-1. (the next session's first action)
+1. A: provision geo catalogue in `POST /projects` (geo mode) + fix unprefixed `/sandbox/init`; tests.
+2. Start child B; while it runs, extend route-trial record with installed-skill evidence and run the local re-trial.
+3. After B merges into this branch: KIGAM re-trial with thinking "high" (sent as medium), update compatibility docs,
+   report, `scripts/check`.
 ## Failed approaches
 ## Notes and decisions
+- Finding (2026-10-14): the UI New project dialog already calls `POST /projects/:id/sandbox/init` after create
+  (`web/src/lib/use-projects.ts`), which runs `provisionProjectSkills`; the trial report's "web code does not call it"
+  was wrong. The gap is `POST /projects` itself (route-trial and any API client get no skills until restart) and the
+  unprefixed `POST /sandbox/init` (calls upstream `seedProjectSkills`, bypassing the geo catalogue). Verify the UI path
+  on a live instance anyway.
+- Decision A: in geo catalogue mode `POST /projects` provisions the pinned catalogue synchronously before replying;
+  non-geo mode keeps upstream behaviour (UI calls sandbox/init). Unprefixed `/sandbox/init` uses `provisionProjectSkills`.
+- Decision B: accepted reasoning levels are a per-custom-server setting written into Pi `models.json` as each
+  reasoning model's `thinkingLevelMap` (Pi 1.0 field), so the lead, subagent children and one-shot calls all send the
+  same mapped value. Rule: an accepted level maps to itself; an unaccepted level maps to the nearest lower accepted
+  level, else the nearest higher one; no accepted level -> null (unsupported). KIGAM {low, medium, xhigh}: minimal->low,
+  high->medium, xhigh->xhigh (fixes today's xhigh->high clamp). Pi's own clamp would send high->xhigh, hence an explicit
+  map rather than null entries. The UI shows the substitution in the thinking selector. Existing saved providers are
+  not rewritten; the review instance's `kigam-qwen` gets the setting from the hub after merge.
+- Packages: A (orchestrator) owns `server/src/api/projects.ts`, `server/src/api/skills.ts`, `server/src/geo/provision.ts`,
+  `geo/release-proof/*`, trials, compatibility docs, report. B (child) owns `server/src/agent/custom-models.ts`,
+  `server/src/api/custom-models*`, `web/src/lib/custom-models.ts`, `web/src/components/custom-models-card.tsx`,
+  `web/src/components/thinking-selector.tsx`, `chat-tab.tsx`/`defaults-panel.tsx` wiring, `web/src/geo/locales/app/*`.
+  Shared: `geo/integration-boundaries.json`, AGENTS.md (each edits its own lines). Integration order: A commits on this
+  branch; B merges via `task complete`; then KIGAM re-trial.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
