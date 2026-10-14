@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T13:17:51Z
+updated: 2026-10-14T13:27:31Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"fbead749-8243-46b1-80b0-f0fcb3855d07","pid":371150,"provider":"claude","session":"e61fac4b-e55f-422d-9768-8ca73a767600","start":"44547984","token":"acc2f6e1a2eedb1f911909f9faae8f5ba572260b726036e607ba7f18c6b6ba3e"}
 branch: task/gaid-qwen-followups
 target: main
@@ -104,8 +104,12 @@ Items (docs/open-items/gaid-kigam-qwen-trial.md; evidence reports/2026-10-14-gai
 - Job 7 (scripts/check at 72ca370^ tree) failed only in web vitest: 3 of 984 tests (file-preview-panel draft
   retention: 5 s timeout and missing editor; map viewer attribute-table heading), unrelated to this unit's files; both
   files pass in isolation (12/12). Host load average 42 from seoul_geomodel ensemble jobs during the run. Rerun once.
+- Job 8 (scripts/check rerun) failed again for the same outside cause: only web `src/geo/viewers/map/viewer.test.tsx`
+  "inspects before paging…" (findByRole timeout); server 1679 passed/11 skipped, web 983/984; load average 41
+  (seoul_geomodel ensemble jobs). Not retried immediately; next run waits for host load to drop.
 ## Next steps
-1. When the scripts/check job (job 7) exits: fill the 전체 검사 row of the report appendix, record the result here.
+1. When host load is low (load average < 12), rerun `task job run --input assets:geo-catalogue/0.2.1 -- scripts/check`;
+   fill the 전체 검사 row of the report appendix, record the result here.
 2. Remove regenerable build caches (server/node_modules, web/node_modules, web/.next, web/next-env.d.ts,
    server/src/helpers/.venv, __pycache__) and any app-written .env; `task review-copy` the report; `task finish`.
 ## Failed approaches
