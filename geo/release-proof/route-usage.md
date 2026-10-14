@@ -31,6 +31,8 @@ is never changed. All services started by a successful launcher are stopped in `
   VRAM fraction describes allocated bytes, while CLI `ollama ps` reports the CPU/GPU split. A missing usage field
   stays unknown. Token totals use the ledger (including compaction/aborted usage); streamed turn totals are retained
   separately. Dependency-repair detection is a command-pattern observation, not an exhaustive package audit.
+- The data guard's destructive-command confirmations (`permission_request`) are answered by `--permission`
+  (default `deny`; `allow`, or `none` to leave them pending as before 2026-10-14) and listed in `permissionRequests`.
 - A timeout/disconnected SSE explicitly aborts the server-owned run, then waits up to 120 s for accounting to settle.
   Startup failures and cleanup failures are visible in the record. Records are never overwritten.
 

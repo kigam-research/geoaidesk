@@ -21,6 +21,7 @@ export function options(args) {
     'base-url': { type: 'string' }, 'provider-id': { type: 'string', default: 'trial-server' },
     'max-tokens': { type: 'string', default: '16384' }, thinking: { type: 'string', default: 'off' },
     'thinking-probe': { type: 'string', default: '' }, 'also-connect': { type: 'string', default: '' },
+    permission: { type: 'string', default: 'deny' },
   } });
   if (o.help) return o;
   if (!['local','custom-server','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
@@ -43,6 +44,7 @@ export function options(args) {
   o.alsoConnect = list(o['also-connect']);
   const levels = ['off','minimal','low','medium','high','xhigh'];
   if (![o.thinking, ...o.thinkingProbe].every(l => levels.includes(l))) throw new Error('Unknown thinking level');
+  if (!['deny','allow','none'].includes(o.permission)) throw new Error('--permission must be deny, allow or none');
   return o;
 }
 
@@ -56,8 +58,17 @@ async function modelRequest(url, route, body) {
 }
 
 /** Bound the model run, explicitly abort on timeout/disconnect, then wait for server-owned accounting. */
-export async function runChat({ json, api, project, session, model, prompt, runDir, label, timeoutMs, ollamaUrl, thinkingLevel = 'off' }) {
+export async function runChat({ json, api, project, session, model, prompt, runDir, label, timeoutMs, ollamaUrl, thinkingLevel = 'off', permission = 'deny' }) {
   const m = metrics(), started = Date.now();
+  // No person watches a trial: answer the data guard's destructive-command prompts (recorded) instead of stalling.
+  m.permissionRequests = []; const answers = [];
+  const answer = frame => {
+    const entry = { requestId: frame.requestId, toolName: frame.toolName, command: String(frame.command ?? '').slice(0, 2000), reason: frame.reason, answer: permission };
+    m.permissionRequests.push(entry);
+    if (permission === 'none') return;
+    answers.push(json('POST', `/sessions/${session.id}/permissions/${frame.requestId}`, { project, body: { allow: permission === 'allow' } })
+      .catch(e => { entry.answerError = e.message; }));
+  };
   const log = fs.createWriteStream(path.join(runDir, `${label}.sse`));
   const psLog = fs.createWriteStream(path.join(runDir, `${label}-ollama.jsonl`));
   const samples = []; let sampling = false;
@@ -89,7 +100,10 @@ export async function runChat({ json, api, project, session, model, prompt, runD
       while ((end = pending.indexOf('\n\n')) >= 0) {
         const block = pending.slice(0,end); pending = pending.slice(end+2);
         const data = block.split('\n').filter(s => s.startsWith('data:')).map(s => s.slice(5).trim()).join('\n');
-        if (data) observe(m, JSON.parse(data));
+        if (!data) continue;
+        const frame = JSON.parse(data);
+        observe(m, frame);
+        if (frame.type === 'permission_request') answer(frame);
       }
     }
     if (!m.done) throw new Error('SSE ended without done frame');
@@ -98,6 +112,7 @@ export async function runChat({ json, api, project, session, model, prompt, runD
     try { await json('POST', `/sessions/${session.id}/abort`, { project }); } catch (abortError) { m.errors.push({ message: `abort: ${abortError.message}` }); }
   } finally {
     clearInterval(timer);
+    await Promise.all(answers);
     while (sampling) await sleep(100);
     await sample(); log.end(); psLog.end();
   }
@@ -221,7 +236,7 @@ export async function main(args = process.argv.slice(2)) {
     const context = await json('GET',`/geo/context?sessionId=${session.id}&model=${encodeURIComponent(model)}`,{ project: project.id });
     fs.writeFileSync(path.join(runDir,'initial-context.json'),JSON.stringify(context,null,2)+'\n');
     record.task = { workflowId: o.workflow, outcome: 'not-run', startedAt: new Date().toISOString(), inputs: prepared.inputs, sessionId: session.id }; save();
-    const m = await runChat({ json, api: instance.api, project: project.id, session, model, prompt: prepared.prompt, runDir, label: 'task', timeoutMs: o.timeoutMs, ollamaUrl: o.route === 'local' ? o['ollama-url'] : null, thinkingLevel: o.thinking });
+    const m = await runChat({ json, api: instance.api, project: project.id, session, model, prompt: prepared.prompt, runDir, label: 'task', timeoutMs: o.timeoutMs, ollamaUrl: o.route === 'local' ? o['ollama-url'] : null, thinkingLevel: o.thinking, permission: o.permission });
     const ledgerPath = path.join(sandbox,'.kady/runs',session.id,'costs.jsonl');
     const ledger = jsonLines(ledgerPath);
     const artifacts = checkArtifacts(sandbox,prepared.expectedArtifacts,prepared.reference);

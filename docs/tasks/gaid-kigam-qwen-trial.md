@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-14T05:41:29Z
+updated: 2026-10-14T06:10:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"eb12b4ec-744d-443d-ae5e-1f4d6cb5e93a","pid":2414350,"provider":"claude","session":"22045fc9-fe24-46c6-a477-28774ad3a964","start":"41986201","token":"2e679572e64c04a061b1ba8a728b7c93825bb5531f6ac582b96a513ab7656176"}
 branch: task/gaid-kigam-qwen-trial
 target: main
@@ -61,6 +61,15 @@ model-route guidance. Untested combinations stay untested.
   projects' data, not this unit); run.sh died on printf I/O error, record.json stayed at task start. Kept as failed
   evidence (runs/gaid-kigam-qwen-trial-20261014T051459.845388Z). Rerun as job 3 with ~15 GB free (environment
   failure, not a model outcome).
+- Job 3 (well-log-qc, record sha256 27a48ee7…dd1b): connection passed 1.6 s; task partial after 1518 s: all 5 files
+  present and checked against the LAS (las-reference.json in ~/data/geoaidesk/work/gaid-kigam-qwen-trial/): 16132
+  rows, first/last 80.15/2532.062, STOP-last 0.1128 kept as a finding, NULL counts of all 23 curves exact; quicklook
+  shows 1400–1800 depth-down with unit-separated tracks. The run stalled at a data-guard destructive-command prompt
+  (`rm -rf scratch/check_out`) no one answered; undici ended the silent stream ("terminated"). 56 turns, 59 tool
+  calls, 3 recovered tool errors, context peak 170,236 (64.9%), ledger $0.
+- Harness-only correction: runChat answers permission prompts (`--permission deny` default, recorded in
+  `permissionRequests`); test added (6 pass). One repeat of well-log-qc as job 4 (WP10 rule: at most one repeat
+  after a harness-only correction).
 ## Next steps
 1. When job 2 exits: inspect its record/outputs against the LAS (WP10 reference checks), then update
    geo/compatibility.json + docs/geo/compatibility.md (route + thinking-level limit), write the report, scripts/check.
