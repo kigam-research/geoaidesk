@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:19:49Z
+updated: 2026-10-15T08:20:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
@@ -34,10 +34,13 @@ All visible strings go through geoText('previewSource') and ko/en catalogs. Foll
 Evidence: focused tests for raw source seam/legacy URL preservation and page request behavior where meaningful, local copy validator; parent will do integrated browser flow and required scripts/check. Follow child task CLI check requirements and report exact checks vs not run. No model calls or scientific reruns. Keep working autonomously; finish child with task finish so parent can task complete it. Do not write a separate canonical user report.
 
 ## Current state
-Implemented controlled source input/display components and additive PdfViewer raw-URL, document-ready and sequenced page-request seams. Raw URLs force view-only mode; sandbox URL construction, cache-busting and annotation behavior remain the default when absent. Focused source/PDF tests added. Copy validation passed: 1 catalogue, 0 errors, 0 warnings. Snapshot job 1 installed dependencies and passed input/pane/existing PDF tests but exposed two test-harness failures, now fixed. Snapshot job 2 checks the fixed revision, then TypeScript.
+Delivered PreviewSourceInput and PreviewSourcePane against the frozen contract, plus additive PdfViewer sourceUrl/pageRequest/onDocumentReady seams. MAX_PREVIEW_PDF_BYTES exports the accepted 50 MiB bound. Intake checks PDF extension/MIME/nonzero size and records only HTTP/HTTPS URLs. Raw URLs force view-only mode without sandbox resolution or annotation API; legacy sandbox URL/cache-buster and annotation loading/polling are covered. Sequenced page links wait for document layout and do not reapply on zoom. Empty/loading/error/URL-recorded/reselect states use Korean/English catalogs.
+
+Verified code revision 9ec7e12ff54c in recorded snapshot job 2 (exit 0): six focused test files, 13 tests passed, then npx tsc --noEmit --incremental false passed. Coverage includes input bounds and callbacks, source-viewer wiring and placeholders, raw-URL API isolation, legacy URL/annotation defaults, toolbar navigation/zoom, deferred/repeated page requests and load errors, plus existing rendering/zoom/annotation tests. Copy validator: 1 catalogue, 0 errors, 0 warnings. git diff --check passed. No model calls, scientific computation, live service changes or deployment. Browser rendering/integrated flow and full integrated scripts/check remain parent-owned; not claimed by this focused evidence.
+
+Safe re-verification: from web/, npm run test -- src/geo/authoring-preview/source-input.test.tsx src/geo/authoring-preview/source-pane.test.tsx src/components/pdf-viewer/pdf-viewer.test.tsx src/components/pdf-viewer/use-pdf-zoom.test.tsx src/components/pdf-viewer/use-pdf-page-rendering.test.tsx src/components/pdf-viewer/annotation-layer.test.tsx; npx tsc --noEmit --incremental false. From repo root: node geo/copy/validate-copy.mjs web/src/geo/locales/previewSource. Both snapshot jobs retain receipts/logs below.
 ## Next steps
-1. Read the completion of snapshot job 2 and record focused PDF/source tests and TypeScript evidence.
-2. Fix any relevant failures, record evidence and finish the child for parent integration.
+1. Finish the child with task finish; parent integrates the exact ready tip using task complete and checks the sample/local PDF browser flow.
 ## Failed approaches
 First focused snapshot job exited 1: input/pane and existing PDF tests passed; new PdfViewer test cleanup restored the observer mock before a pending page-size effect settled, contaminating the next test. Fixed explicit cleanup ordering and waiting for page wrappers. The rejected-PDF test also created its rejection before the loader consumed it; changed it to create the promise at getDocument invocation. These were test harness failures, not a dependency block. TypeScript did not run after the test failure.
 ## Notes and decisions
@@ -45,16 +48,10 @@ Sequential decisions: preserve sandbox defaults; make raw URLs explicitly view-o
 Owned files are the two source components, their focused tests, PdfViewer and its focused test, previewSource catalogs and this task document. Parent owns shared types/index/boundaries, sample serving, browser flows and full scripts/check integration.
 Parent accepted the exported MAX_PREVIEW_PDF_BYTES = 50 * 1024 * 1024 bound, nonempty .pdf, MIME application/pdf or empty; URL http/https record-only. No URL fetch, model call, server mutation, deployment or object-URL persistence here.
 Copy additions (previous ko/en value: absent for every id) are recorded in the ko/en previewSource catalog diff: input.{label,urlLabel,urlPlaceholder,addUrl,fileLabel,selectPdf,sample,hint,pdfTypeError,pdfSizeError,urlError,clear}, pane.{label,emptyTitle,emptyBody,urlTitle,urlBody,reselectTitle,reselectBody}, pdf.{loading,error}. The catalogs carry identical conditions and bounds in Korean and English.
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None. Integrated browser checks and source object URL ownership remain within the parent's existing scope.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. Parent owns the canonical result report and catalog diffs.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081810.416192Z/receipt.json
