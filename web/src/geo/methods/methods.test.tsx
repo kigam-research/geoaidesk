@@ -10,7 +10,7 @@ const workflow: LocalMethodWorkflow = {
   id: "trial", exposure: "method:paper-method:trial", title: { ko: "논문 방법 시험", en: "Paper method trial" },
   description: { ko: "사용자 자료로 시험합니다." }, disciplines: [], inputRoles: [], requiredScientificChoices: [
     { id: "folds", label: { ko: "Fold 수" } }, { id: "cutoff", label: { ko: "Threshold" } },
-  ], skillIds: ["local:paper-method"], environmentProfile: "geo-core", expectedArtifacts: [], exampleCaseIds: [],
+  ], prompt: null, boundary: null, skillIds: ["local:paper-method"], environmentProfile: "geo-core", expectedArtifacts: [], exampleCaseIds: [],
   readiness: { state: "ready", skills: [{ id: "local:paper-method", runtimeName: "paper-method", title: null, installed: true, enabled: true }], environment: { id: "geo-core", title: null, state: "ready", missing: [] }, runRecord: "none", compatibilityRef: null },
 };
 const method: LocalMethodSummary = {

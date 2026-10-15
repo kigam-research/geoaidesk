@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { SkillHubInstall } from "./skill-hub";
+import { SkillHubInstall, SkillHubPreviewNotes } from "./skill-hub";
 import { SkillsPanel } from "@/components/skills-panel";
 import { apiFetch } from "@/lib/projects";
 import { installSkills } from "@/lib/capabilities";
@@ -76,4 +76,10 @@ it("lists hub packages and previews the descriptor through the existing gate", a
   fireEvent.click(screen.getAllByRole("button", { name: "Preview package" })[0]);
   await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
   expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview?scope=project", expect.objectContaining({ body: JSON.stringify({ url: descriptorUrl, scope: "project" }) }), "p1");
+});
+
+it("shows hub draft identity, revision and effective lifecycle in preview notes", () => {
+  render(<SkillHubPreviewNotes preview={{ ...result, skillHub: { ...result.skillHub, draft: { methodId: "local/paper", revision: 2, lifecycle: "draft", url: "https://hub.test/api/gaid/packages/local/paper/2" } } }} />);
+  expect(screen.getByText("Hub method: local/paper · revision 2 · Draft")).toBeInTheDocument();
+  expect(screen.getByText(/Changes on the site are not fetched automatically/)).toBeInTheDocument();
 });

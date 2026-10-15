@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:38:49Z
+updated: 2026-10-15T14:40:47Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"889fbc92-549f-4f63-9865-358efbab2bba","pid":793523,"provider":"codex","session":"01a13ffb-bfc7-7dd1-9fac-66f3bf150afc","start":"54082579","token":"c5f1a782a11515da3361495e6b345bc949fcea86976aaa8443c13bf3060b46d2"}
 branch: task/gaid-hub-integration--methods-ui
 target: task/gaid-hub-integration
@@ -73,7 +73,85 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
   results. Then `task finish`.
 
 ## Current state
-Implementation in progress. Contract and copy guides read; no server edits or restricted sibling files.
+- Implemented standalone UI exports in `web/src/geo/methods/methods.tsx`: `useMethodRows(projectId, availableFiles)`, `methodRows`, `MethodDetail`, `MethodTrials`, `TrialCard`, and `MethodBadges`. Workflows and method recipes open TaskSetup; methods without Workflows open detail. Readiness uses existing workspace badge strings; lifecycle is effective server lifecycle, never lifecycleClaimed.
+- Parent wiring (not done here, restricted file): import `useMethodRows` into TaskCatalogue and call it unconditionally after the project props. Prepend `methods.category` to `leadingCategories`, prepend `methods.rows` to extension rows, include `methods.notice` in extension.notice, and render `methods.dialogs` beside existing TaskSetup dialogs. Keep the existing projectId key. The notice provides detail buttons and refresh. Workflows pass method exposure; recipe choices are stringified and unresolved choices are blank/editable.
+- Settings hub pane now lists per-hub descriptors (including individual hub errors). All preview actions still use SkillHubInstall and the existing acknowledgement/install gate. Preview notes display draft identity/revision/effective lifecycle.
+- Trial cards show observation counts, models, outputs, required/missing expected artifacts, changed method warning, incomplete file attribution and verbatim researcher assessment. An existing private page callback can open session history, but no public session-focus interface is available to these components; show the full chat ID instead of a non-working link.
+- Verification pending: dependencies are being installed by recorded job; then scoped web vitest, TypeScript and copy validation. Initial copy validation: 0 errors, 56 pre-existing warnings; no methods/skillHub warnings.
+
+### Copy changes (new ids; before = absent in both locales)
+
+| String id | Korean after | English after |
+|---|---|---|
+| methods.category | 허브에서 설치한 Workflow | Workflows installed from the hub |
+| methods.loading | 설치된 Workflow를 읽는 중입니다. | Reading installed Workflows. |
+| methods.empty | 허브에서 설치한 Workflow가 없습니다. Settings의 스킬에서 패키지를 미리보고 설치하세요. | No Workflows are installed from the hub. Preview and install a package in Settings → Skills. |
+| methods.error | 설치된 Workflow를 읽지 못했습니다: {detail} | Could not read installed Workflows: {detail} |
+| methods.reload | 목록 새로고침 | Refresh list |
+| methods.close | 상세 닫기 | Close details |
+| methods.setup | 시작 설정 열기 | Open start settings |
+| methods.detail | 방법 상세 보기 | View method details |
+| methods.recipe | 레시피 | Recipe |
+| methods.workflows | Workflows | Workflows |
+| methods.recipes | 레시피 | Recipes |
+| methods.sources | 출처 | Sources |
+| methods.issues | 패키지 문제 | Package issues |
+| methods.checks | 허브 검사 기록 | Hub check receipt |
+| methods.checkSummary | 검사 도구: {checker} · {at} · 경고 {count}개 | Checker: {checker} · {at} · {count} warnings |
+| methods.questions | 허브에서 미해결인 질문 | Questions unresolved in the hub |
+| methods.revision | 버전 {version} · revision {revision} | Version {version} · revision {revision} |
+| methods.unknown | 기록 없음 | Not recorded |
+| methods.edited | GAID에서 수정됨 | Edited in GAID |
+| methods.origin | 설치 출처: {origin} | Installed from: {origin} |
+| methods.page | 허브 페이지 보기 | View hub page |
+| methods.origin.hub | skill_hub 초안·패키지 | skill_hub draft/package |
+| methods.origin.upload | 파일 업로드 | File upload |
+| methods.origin.other | 기타 설치 경로 | Other installation route |
+| methods.lifecycle.draft | 초안 | Draft |
+| methods.lifecycle.submitted | 제출됨 | Submitted |
+| methods.lifecycle.published | 공개됨 | Published |
+| methods.implementation.descriptive | 설명만 | Instructions only |
+| methods.implementation.implemented | 코드 포함 | Includes code |
+| methods.check.pass | 통과 | Passed |
+| methods.check.warn | 경고 | Warning |
+| methods.trials.title | GAID 시험 기록 | GAID trial records |
+| methods.trials.limit | 관찰값은 채팅에 기록된 도구 실행 단계에서 가져옵니다. 과학적 검토 결과가 아닙니다. | Observations come from tool steps recorded in the chat. They are not a scientific review. |
+| methods.trials.loading | 시험 기록을 읽는 중입니다. | Reading trial records. |
+| methods.trials.empty | GAID 시험 기록이 없습니다. | No GAID trial records. |
+| methods.trials.error | 시험 기록을 읽지 못했습니다: {detail} | Could not read trial records: {detail} |
+| methods.trials.started | 시험 시작: {at} | Trial started: {at} |
+| methods.trials.workflow | Workflow: {id} · revision {revision} | Workflow: {id} · revision {revision} |
+| methods.trials.changed | 시험 이후 방법 파일이 바뀌었습니다. 현재 파일은 해당 시험에 포함되지 않습니다. | Method files changed after this trial. The current files are not covered by that trial. |
+| methods.trials.calls | 도구 호출 {calls}회 · 실패 {failed}회 | {calls} tool calls · {failed} failed |
+| methods.trials.models | 모델: {models} | Models: {models} |
+| methods.trials.degraded | 파일 연결이 불완전한 단계: {count}개 | Steps with incomplete file attribution: {count} |
+| methods.trials.session | 채팅 ID: {id} | Chat ID: {id} |
+| methods.trials.outputs | 관찰된 결과 파일 | Observed output files |
+| methods.trials.expected | 예상 결과 파일 | Expected output files |
+| methods.trials.required | 필수 | Required |
+| methods.trials.optional | 선택 | Optional |
+| methods.trials.found | 발견됨: {files} | Found: {files} |
+| methods.trials.missing | 파일 일치 없음: {files} | No matching files: {files} |
+| methods.trials.none | 없음 | None |
+| methods.assessment.title | 연구자 평가 | Researcher assessment |
+| methods.assessment.outcome | 시험 평가 | Trial assessment |
+| methods.assessment.choose | 평가 선택 | Select assessment |
+| methods.assessment.useful | 유용함 | Useful |
+| methods.assessment.needs-revision | 수정 필요 | Needs revision |
+| methods.assessment.failed | 실패 | Failed |
+| methods.assessment.note | 평가 메모 | Assessment note |
+| methods.assessment.save | 평가 저장 | Save assessment |
+| methods.assessment.saving | 평가 저장 중 | Saving assessment |
+| methods.assessment.saved | 평가를 저장했습니다. | Assessment saved. |
+| methods.assessment.error | 평가를 저장하지 못했습니다: {detail} | Could not save assessment: {detail} |
+| skillHub.methods | 허브 패키지 목록 | Hub packages |
+| skillHub.methodsLoading | 허브 패키지 목록을 읽는 중입니다. | Reading hub packages. |
+| skillHub.methodsEmpty | 허브에 가져올 패키지가 없습니다. | No packages are available from the hub. |
+| skillHub.methodsError | 허브 패키지 목록을 읽지 못했습니다: {detail} | Could not read hub packages: {detail} |
+| skillHub.methodPreview | 패키지 미리보기 | Preview package |
+| skillHub.methodCreated | 생성 시각: {at} | Created: {at} |
+| skillHub.methodDraft | 허브 방법: {id} · revision {revision} · {lifecycle} | Hub method: {id} · revision {revision} · {lifecycle} |
+
 ## Next steps
 1. Implement standalone method rows/detail/trials and hub listing, then run the declared UI checks.
 ## Failed approaches
@@ -96,6 +174,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-integration--methods-ui-20261015T143901.271166Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { t } from "@/geo/i18n";
-import type { GeoWorkflowSummary, GeoRecipeCheckResponse } from "@/geo/contracts/workspace";
+import type { GeoWorkflowSummary, GeoRecipeCheckResponse, GeoExposureMode } from "@/geo/contracts/workspace";
 import type { SkillInfo } from "@/lib/capabilities";
 import { accepts, request, taskDraft, text } from "./api";
 import { startGeoTask } from "./events";
@@ -44,7 +44,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       const primary = workflow.readiness.skills.find((skill) => skill.id === workflow.skillIds[0]);
       const skill = primary?.enabled ? response.find((row) => row.name === primary.runtimeName) : undefined;
       const result = startGeoTask({ title: text(workflow.title), text: taskDraft(workflow, bindings, choices),
-        attachedFiles: [...new Set(Object.values(bindings).filter(Boolean))], skills: skill ? [{ id: skill.id, name: skill.name, description: skill.description }] : [], geoExposure: exposure ?? `workflow:${workflow.id}` });
+        attachedFiles: [...new Set(Object.values(bindings).filter(Boolean))], skills: skill ? [{ id: skill.id, name: skill.name, description: skill.description }] : [], geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
       if (result !== "opened") { setError(t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`)); return; }
       setBindings({}); setChoices({}); onOpenChange(false);
     } catch (error) { setError(t("workspace.setup.error", { detail: (error as Error).message })); }
