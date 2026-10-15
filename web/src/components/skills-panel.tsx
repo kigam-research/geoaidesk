@@ -755,7 +755,11 @@ export function SkillsPanel() {
                     <span>{r.name}</span>
                     <Badge variant="secondary" className="h-5 text-[10px]">
                       {/* Catalogue skills from a named source other than the configured catalogue name it. */}
-                      {origin === "catalogue" && r.source ? r.source : ORIGIN_LABEL[origin]}
+                      {r.builtin
+                        ? settingsText("skills.origin_builtin")
+                        : origin === "catalogue" && r.source
+                          ? r.source
+                          : ORIGIN_LABEL[origin]}
                     </Badge>
                     {updateAvailable ? (
                       <Badge variant="outline" className="h-5 text-[10px] text-amber-600">

@@ -29,6 +29,8 @@ export interface SkillInfo {
    */
   source?: string;
   ref?: string;
+  /** A support skill the app runtime seeds into every project (not from the catalogue, not written by the user). */
+  builtin?: boolean;
 }
 
 /**
