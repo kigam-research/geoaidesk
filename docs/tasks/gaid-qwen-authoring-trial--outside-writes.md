@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T14:13:01Z
+status: ready
+updated: 2026-10-15T14:13:03Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -61,7 +61,7 @@ Implemented the requested outside-project confirmation. Lead write/edit/generate
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:10:57Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-15T14:13:03Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Checks
 - PASS: server npm run typecheck.
