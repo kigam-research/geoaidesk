@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T14:41:26Z
+status: ready
+updated: 2026-10-15T14:41:27Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -125,7 +125,7 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:33:27Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-15T14:41:27Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish full scripts/check failed: backend 160 files passed / 1 failed / 1 skipped; 1699 tests passed / 1 failed / 11 skipped. The failure is skills-sync.test.ts:275: parent added baseHash to getSkillProvenance, breaking an exact upstream-shape assertion. Parent fixed this at 88d530c by adding getSkillBaseHash instead; child will integrate on finish retry. Failure log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-lokfkcwd.log. No frontend/distribution/production stage ran in that attempt.
