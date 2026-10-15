@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:47:53Z
+updated: 2026-10-15T15:55:31Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -95,7 +95,7 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-Blocked: R2 re-test by the Paseo researcher agent 77493076 on gaid-qat-app3 (a background wait reports researcher/r2/summary.md).
+Blocked: "after" visual reviewers ea327b29 (Claude 고급검토, claude-fable-5-1 medium, verified) and df0238ad (Codex 고급검토, gpt-6-astra high, normal speed, verified) are running; then fill report §4.1, humanizer, review-copy, `VITEST_MAX_WORKERS=1 task finish`.
 1. R2 re-test running (2026-10-16 ~00:00 KST): instance 3 `gaid-qat-app3` (ports 3312/18312, `GAID_HOME=<work>/home3`,
    snapshot `<work>/app3` of 13618c1 = all fixes + both children; log `<work>/logs/app3.log`); researcher 77493076
    follows `<work>/researcher/BRIEF-R2.md` → `<work>/researcher/r2/`; a background wait reports its summary. Then gate
@@ -265,7 +265,10 @@ Blocked: R2 re-test by the Paseo researcher agent 77493076 on gaid-qat-app3 (a b
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [부채] 좁은 화면(390px)에서 작업 공간의 채팅 영역이 매우 좁아 확인 카드와 입력 버튼이 화면 밖으로 밀립니다 — 가) 좁은 화면 배치를 별도 UI 작업으로 고친다 — 나) 데스크톱 우선으로 두고 지원 범위에 명시한다 — 권장: 가) 확인 카드를 못 보면 실행이 멈춘 것처럼 보입니다 — 막힌 일: 휴대폰·좁은 창에서의 승인 — 조건: 앱 전체 배치 변경 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
+- [부채] 화면 문구 약 54곳에 "Kady"·"K-Dense"가 남아 있고 앱과 에이전트를 가리키는 경우가 섞여 있습니다 — 가) 문구별로 GeoAIDesk/AI agent로 나눠 고친다 — 나) 그대로 둔다 — 권장: 가) 용어집의 "AI agent"와 제품명 규칙에 맞춥니다 — 막힌 일: 없음 — 조건: 문구별 판단 필요 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
 ## Report
+Report: reports/2026-10-15-gaid-qwen-authoring-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
