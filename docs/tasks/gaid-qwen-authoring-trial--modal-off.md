@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-15T13:51:48Z
-writer: {"host":"seongin3","reserved":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
 parent: gaid-qwen-authoring-trial
