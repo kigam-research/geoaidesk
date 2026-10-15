@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:18:36Z
+status: active
+updated: 2026-10-15T14:20:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -102,7 +102,7 @@ Evidence: `~/data/geoaidesk/runs/gaid-qwen-authoring-trial--modal-off-20261015T1
 
 Evidence: the recorded job `log`, sha256 `ff674e4ae7e07cdc59e8e26c2b3395962727984c671de350db1ac2dfd8d314b8`, `REAL_REMOTE_COMPUTE_REBUILD` record. The source manifest stayed false. Build outputs stayed in the external job snapshot; the worktree has no `.next` or generated tsbuildinfo cache.
 ### Mandatory full-check status
-The first full declared check passed the entire backend (1,683 passed / 11 skipped), but its unconstrained concurrent frontend run failed 2 existing map-viewer timing assertions. The same map file passed all 8 tests in isolation, and the entire frontend passed all 1,027 tests with VITEST_MAX_WORKERS=4. No application/test source was changed for this failure and no tests were omitted. The mandatory task finish retry uses the bounded-worker setting; launcher/distribution/environment/production-smoke stages still need its final success.
+The first full declared check passed the entire backend (1,683 passed / 11 skipped), but its unconstrained concurrent frontend run failed 2 existing map-viewer timing assertions. The same map file passed all 8 tests in isolation, and the entire frontend passed all 1,027 tests with VITEST_MAX_WORKERS=4. No application/test source was changed for this failure and no tests were omitted. The global four-worker retry accidentally overrode the backend's serial worker count: shared PROJECTS_ROOT teardown caused 121 failures (missing fixture/session files) across 28 backend files. No source fix was made. The next mandatory task finish retry uses VITEST_MAX_WORKERS=1 for both suites to preserve backend serialization and avoid frontend load-sensitive timing. Launcher/distribution/environment/production-smoke stages still need its final success.
 
 ### Parent merge recheck
 Finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`; a later retry integrated advancing parent revision `c01073715d31ad8a89e77345ff15c3aa8cb61752` with the same mechanical ledger resolution. Only the integration-boundary ledger conflicted; the parent's latest existing seam and the child Modal seam were retained. After resolution, server typecheck, web typecheck, all 6 affected web files (51 tests), distribution/launcher/stamp tests (16 passed / optional actual smoke skipped), and copy validation (0 errors / 56 warnings) passed again. Modal implementation files did not conflict or change; the successful recorded source/build evidence remains applicable.
@@ -112,6 +112,7 @@ Finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`; a late
 Closed 2026-10-15T14:18:36Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Applying VITEST_MAX_WORKERS=4 to the entire finish check overrode server serialization and raced the shared fixture root (121 failures / 28 files; mostly ENOENT). Correct execution environment: VITEST_MAX_WORKERS=1 globally, or a frontend-only cap. No speculative application/test edits.
 - task finish also runs the full declared scripts/check. First full run passed backend (160 files passed / 1 skipped; 1,683 tests passed / 11 skipped), then failed 2 map-viewer assertions in the concurrent frontend run (154 other files passed; 1,025 tests passed). The same map file passed all 8 tests in isolation. No map source edits: the full frontend passed with VITEST_MAX_WORKERS=4 (155 files / 1,027 tests, 70.95 s; supported by the installed Vitest resolver). Retry the mandatory full finish check with this same bounded-worker environment.
 - First task finish checkpointed the final evidence, then stopped on a single parent-merge conflict in geo/integration-boundaries.json. Resolved by retaining the parent's updated existing seam and appending this child's Modal seam. No implementation code conflicted.
 - The first server test used nonexistent SDK `getActiveTools`; corrected to `getActiveToolNames`/`getAllTools`. Fake Modal tokens were too short and failed input validation before the feature gate; replaced with valid-length dummy strings.
