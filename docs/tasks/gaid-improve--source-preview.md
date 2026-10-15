@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:26:42Z
+updated: 2026-10-15T08:27:12Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
@@ -48,7 +48,7 @@ Closed 2026-10-15T08:20:34Z: ready; the parent gaid-improve integrates it. No fu
 
 ## Failed approaches
 First focused snapshot job exited 1: input/pane and existing PDF tests passed; new PdfViewer test cleanup restored the observer mock before a pending page-size effect settled, contaminating the next test. Fixed explicit cleanup ordering and waiting for page wrappers. The rejected-PDF test also created its rejection before the loader consumed it; changed it to create the promise at getDocument invocation. These were test harness failures, not a dependency block. TypeScript did not run after the test failure.
-Job 1 is superseded by passing job 2. task job dispose attempted after failed finish, but CLI rejected it as "terminal task; disposition requires an open owning task"; it remains an advisory receipt only. No job was restarted.
+Job 1 is superseded by passing job 2 (disposition recorded successfully after task save reopened the unpublished terminal intent). Initial disposition attempt while the failed finish left terminal intent was rejected; no job was restarted.
 ## Notes and decisions
 Sequential decisions: preserve sandbox defaults; make raw URLs explicitly view-only; apply page requests after page wrappers exist; keep source intake controlled by parent. All implementation is tightly coupled and handled by this writer. No nested child units/readers needed.
 Owned files are the two source components, their focused tests, PdfViewer and its focused test, previewSource catalogs and this task document. Parent owns shared types/index/boundaries, sample serving, browser flows and full scripts/check integration.
@@ -61,6 +61,7 @@ No separate child report. Parent owns the canonical result report and catalog di
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081810.416192Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081921.905658Z/log"],"reason":"Test harness cleanup and rejection timing fixed; replacement focused tests and TypeScript passed","recorded":"2026-10-15T08:27:04Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081921.905658Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081921.905658Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
