@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-workflow-list.png
 supersedes:
+reviewed: 2026-10-15
 ---
 # 기관 Qwen 모델이 GAID 안에서 만든 스킬과 Workflow — 연구자 역할 시험과 수정
 
