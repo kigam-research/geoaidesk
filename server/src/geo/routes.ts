@@ -17,6 +17,7 @@ import { registerGeoDepthRoutes } from "./routes/depth.ts";
 import { registerGeoWorkspaceRoutes } from "./routes/workspace.ts";
 import { registerGeoSkillHubRoutes } from "./routes/skill-hub.ts";
 import { registerGeoHubHandoffRoutes } from "./routes/hub-handoff.ts";
+import { registerGeoMethodRoutes } from "./routes/methods.ts";
 
 export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoCatalogueRoutes(app);
@@ -30,4 +31,5 @@ export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoWorkspaceRoutes(app);
   await registerGeoSkillHubRoutes(app);
   await registerGeoHubHandoffRoutes(app);
+  await registerGeoMethodRoutes(app);
 }

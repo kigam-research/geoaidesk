@@ -372,7 +372,7 @@
       "path": "server/src/agent/skills-sync.ts",
       "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged"
+      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged. gaid-hub-integration: getSkillProvenance also returns baseHash so LocalMethod can report local edits"
     },
     {
       "path": "server/pi-packages/kady-child-runtime/index.ts",

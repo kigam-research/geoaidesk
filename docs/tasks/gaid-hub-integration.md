@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:17:50Z
+updated: 2026-10-15T14:25:19Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -56,10 +56,20 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 ## Current state
 - 2026-10-15: contract draft v0 (GAID consumer requirements) sent to the skill_hub hub, request da92dc0fec04; text in
   ~/data/geoaidesk/work/gaid-hub-integration/to-skill_hub-contract-v0.md. skill_hub unit: gaid-hub-authoring (just started).
-- No code yet.
+- P1 server implemented (not yet wired to session creation): web/src/geo/contracts/methods.ts,
+  server/src/geo/methods/{method-file,package-origin,local-methods,trials}.ts, server/src/geo/routes/methods.ts,
+  descriptor fetch + origin record in server/src/geo/skill-hub.ts, getSkillProvenance returns baseHash
+  (skills-sync.ts, boundaries updated). Consumer contract: docs/design/hub-method-package.md.
+  Verified: `cd server && npx vitest run test/geo-methods.test.ts test/geo-skill-hub.test.ts` (23 pass), typecheck clean.
+- Child P2 `gaid-hub-integration--handoff` running: writer e6a23203-e5dc-44f5-b6a0-74d8c942a195,
+  worktree ~/worktrees/geoaidesk/gaid-hub-integration--handoff; term correction forwarded to it.
+- Routed request term-workflow-gaid-hub-integration (user: "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길
+  원한다."): consumed; applies to this unit's new strings ("Workflow"; "워크플로우" only where Korean spelling is unavoidable).
+  Report it with route-report at finish.
 ## Next steps
-1. Build P1 (LocalMethod server) against contract v0; adjust when the hub answers.
-2. Start child P2 (handoff) — see Orchestration.
+1. Wire trial recording into session creation (`method:` exposure in context.ts → recordMethodTrial) once the trial
+   unit merges; until then build P3 UI parts that do not touch its files.
+2. Adjust to the hub's contract answer (da92dc0fec04).
 3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
 4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
 ## Failed approaches
