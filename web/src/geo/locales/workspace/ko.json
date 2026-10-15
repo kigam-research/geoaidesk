@@ -9,17 +9,17 @@
     "status": "서버 요청에 실패했습니다(HTTP {status})."
   },
   "catalogue": {
-    "title": "Geoscience 작업",
+    "title": "지구과학 워크플로",
     "loading": "Geo 작업 목록을 읽는 중입니다.",
     "error": "Geo 작업 목록을 읽지 못했습니다. {detail}",
     "status": "Geo 카탈로그 상태: {state}. {detail}",
-    "noDetail": "K-Dense workflow 목록을 표시합니다.",
+    "noDetail": "K-Dense 워크플로 목록을 표시합니다.",
     "inputs": "입력 형식: {formats}",
     "outputs": "예상 결과 파일: {outputs}",
     "boundary": "해석 한계: {boundary}",
     "empty": "등록된 Geo 작업이 없습니다.",
     "category": "Geoscience",
-    "search": "workflow 검색"
+    "search": "워크플로 검색"
   },
   "readiness": {
     "ready": "준비됨",
@@ -64,14 +64,14 @@
     "file": "Geo 작업 레시피 파일",
     "checking": "레시피 확인 중",
     "error": "레시피를 읽거나 확인하지 못했습니다. {detail}",
-    "issue": "{code, select, schema {레시피 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 레시피입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 workflow입니다: {subject}} workflow-skill {workflow에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {workflow에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {레시피를 확인하지 못했습니다: {subject}}}",
+    "issue": "{code, select, schema {레시피 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 레시피입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 워크플로입니다: {subject}} workflow-skill {워크플로에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {워크플로에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {레시피를 확인하지 못했습니다: {subject}}}",
     "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다.",
-    "description": "geo-start/v1 레시피 파일(.geo-start.json)을 확인한 뒤, 정한 제목과 카테고리로 현재 프로젝트의 workflow 목록에 저장합니다. 레시피는 작업을 실행하지 않습니다.",
+    "description": "geo-start/v1 레시피 파일(.geo-start.json)을 확인한 뒤, 정한 제목과 카테고리로 현재 프로젝트의 워크플로 목록에 저장합니다. 레시피는 작업을 실행하지 않습니다.",
     "choose": "레시피 파일 선택",
     "title": "레시피 제목",
     "category": "카테고리",
     "userCategories": "추가한 카테고리",
-    "upstreamCategories": "K-Dense workflow 카테고리",
+    "upstreamCategories": "K-Dense 워크플로 카테고리",
     "newCategory": "새 카테고리 추가",
     "newCategoryName": "새 카테고리 이름",
     "openOnce": "저장하지 않고 열기",

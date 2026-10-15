@@ -188,6 +188,7 @@
   "custom_models.discard_changes": "Discard changes",
   "skills.installed": "Installed",
   "skills.origin_catalogue": "Catalogue",
+  "skills.origin_builtin": "Built in",
   "skills.local": "Made here",
   "skills.failed_to_load_skills": "Failed to load skills",
   "skills.operation_failed": "Operation failed",
