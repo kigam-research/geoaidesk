@@ -1,3 +1,5 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -32,6 +34,23 @@ beforeEach(() => {
   });
 });
 afterEach(() => vi.restoreAllMocks());
+
+it("hides compute defaults and leaves an existing saved compute value untouched", async () => {
+  remoteComputeFeature.enabled = false;
+  try {
+    vi.spyOn(appSettings, "getAppDefaults").mockResolvedValue({ compute: { target: "h100" } });
+    const put = vi.spyOn(appSettings, "putAppDefaults").mockResolvedValue({});
+    render(<DefaultsPanel />);
+    const save = await screen.findByRole("button", { name: "Save defaults" });
+    expect(screen.queryByText("Compute")).not.toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Type a model id for Default model" }));
+    await user.type(screen.getByLabelText("Default model"), "openrouter/openai/gpt-5.5{Enter}");
+    await user.click(save);
+    await waitFor(() => expect(put).toHaveBeenCalled());
+    expect(put.mock.calls[0][0]).not.toHaveProperty("compute");
+  } finally { remoteComputeFeature.enabled = true; }
+});
 
 describe("DefaultsPanel", () => {
   it("shows the known custom default model's wire substitution without changing the saved level", async () => {

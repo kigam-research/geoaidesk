@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../../src/geo/distribution.ts";
 import fs from "node:fs";
 import path from "node:path";
 import { createMcpExtension, createCodemodeExtension, createToolSearchExtension, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -35,7 +36,7 @@ export default function (pi: ExtensionAPI) {
     let root = ctx.cwd;
     while (path.basename(root) !== "sandbox" && path.dirname(root) !== root) root = path.dirname(root);
     const jobsDir = path.join(root, ".kady", "modal", "jobs");
-    dispose = registerBackgroundWorkProvider({
+    if (remoteComputeEnabled()) dispose = registerBackgroundWorkProvider({
       name: `kady-modal-child:${sessionId}`,
       listActiveWork(context) {
         if (context?.sessionId !== sessionId || !fs.existsSync(jobsDir)) return [];

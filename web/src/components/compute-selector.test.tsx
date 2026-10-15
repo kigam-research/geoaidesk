@@ -1,9 +1,19 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ComputePickerBody, ComputeSelector, type ModalInstance } from "./compute-selector";
 import { parseModalCatalog, type ModalCatalog } from "@/lib/modal-jobs";
+
+it("offers no compute selector when distribution remote compute is disabled", () => {
+  remoteComputeFeature.enabled = false;
+  try {
+    const { container } = render(<ComputeSelector selected={null} onChange={vi.fn()} catalog={null} />);
+    expect(container).toBeEmptyDOMElement();
+  } finally { remoteComputeFeature.enabled = true; }
+});
 
 const catalog: ModalCatalog = {
   modalConfigured: true,

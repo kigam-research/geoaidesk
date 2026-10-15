@@ -279,6 +279,11 @@ export type WorkflowPanelExtension = {
   /** Shown under the category pills. */
   notice?: ReactNode;
   searchPlaceholder?: string;
+  /**
+   * Fold the built-in workflow list behind one button until the user opens it or searches
+   * (GeoAIDesk keeps its own rows first; gaid-qwen-authoring-trial). Extension rows always show.
+   */
+  collapseUpstream?: { showLabel: (count: number) => string; hideLabel: string };
 };
 
 const CATEGORY_BG: Record<string, string> = {
@@ -546,7 +551,9 @@ export function WorkflowsPanel({
 } & WorkflowInputProps) {
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
   const [search, setSearch] = useState("");
+  const [upstreamOpen, setUpstreamOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const upstreamFolded = Boolean(extension?.collapseUpstream) && !upstreamOpen && !search.trim();
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -568,12 +575,14 @@ export function WorkflowsPanel({
       const text = [row.name, row.description, row.searchText ?? "", label.get(row.category) ?? ""].join("\n").toLowerCase();
       if (!q || text.includes(q)) map.get(row.category)?.push(row);
     }
-    for (const w of filtered) {
-      const list = map.get(w.category);
-      if (list) list.push(w);
+    if (!upstreamFolded) {
+      for (const w of filtered) {
+        const list = map.get(w.category);
+        if (list) list.push(w);
+      }
     }
     return map;
-  }, [categories, extension?.rows, filtered, search]);
+  }, [categories, extension?.rows, filtered, search, upstreamFolded]);
 
   const visibleCategories = useMemo(
     () => categories.filter((cat) => (grouped.get(cat.id)?.length ?? 0) > 0),
@@ -697,6 +706,16 @@ export function WorkflowsPanel({
               </section>
             );
           })}
+          {extension?.collapseUpstream && !search.trim() && (
+            <button
+              type="button"
+              onClick={() => setUpstreamOpen(!upstreamOpen)}
+              aria-expanded={upstreamOpen}
+              className="w-full rounded-xl border border-dashed px-3.5 py-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted/50"
+            >
+              {upstreamOpen ? extension.collapseUpstream.hideLabel : extension.collapseUpstream.showLabel(ALL_WORKFLOWS.length)}
+            </button>
+          )}
         </div>
       </div>
 

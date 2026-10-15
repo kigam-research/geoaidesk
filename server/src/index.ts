@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "./geo/distribution.ts";
 /**
  * K-Dense BYOK backend (TypeScript, Pi SDK).
  *
@@ -172,7 +173,7 @@ export async function buildApp() {
   });
 
   app.get("/health", async () => ({ status: "ok" }));
-  app.get("/config", async () => ({ modal_configured: modalConfigured() }));
+  app.get("/config", async () => ({ remote_compute_enabled: remoteComputeEnabled(), modal_configured: remoteComputeEnabled() && modalConfigured() }));
 
   // Adopt turns that Pi extensions start on an idle session (supervisor
   // requests, scheduled-run notices) as streamed, ledgered Kady runs.
@@ -184,7 +185,7 @@ export async function buildApp() {
   await registerNotebookMemoryRoutes(app);
   await registerEvidencePackageRoutes(app);
   await registerNextExperimentRoutes(app);
-  await registerNotebookRobustnessRoutes(app);
+  if (remoteComputeEnabled()) await registerNotebookRobustnessRoutes(app);
   await registerSandboxRoutes(app);
   await registerOfficeRoutes(app);
   await registerSkillRoutes(app);
@@ -198,7 +199,7 @@ export async function buildApp() {
   await registerSubagentMeterRoutes(app);
   await registerSubagentRoutes(app);
   await registerSpeechRoutes(app);
-  await registerModalRoutes(app);
+  if (remoteComputeEnabled()) await registerModalRoutes(app);
   await registerModelProviderRoutes(app);
   // GeoAIDesk routes (catalogue, context, environments, inspection, local model).
   await registerGeoRoutes(app);
@@ -206,8 +207,10 @@ export async function buildApp() {
   // Reattach durable jobs after routes are available. Recovery schedules
   // active jobs in the background and immediately reconciles any terminal job
   // whose accounting write was interrupted by a prior shutdown.
-  await modalJobManager.recoverAllProjects();
-  await notebookRobustness.recoverAll();
+  if (remoteComputeEnabled()) {
+    await modalJobManager.recoverAllProjects();
+    await notebookRobustness.recoverAll();
+  }
   for (const project of listProjects()) {
     try { recoverSubagentUsage(project.id); }
     catch (error) { app.log.error({ err: error, projectId: project.id }, "Specialist accounting recovery failed; new child requests remain blocked until repaired"); }

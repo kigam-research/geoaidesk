@@ -1,3 +1,5 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -20,6 +22,17 @@ let fetchMock: ReturnType<typeof vi.fn>;
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+
+it("hides Modal credentials and remote cache without fetching the cache when disabled", async () => {
+  remoteComputeFeature.enabled = false;
+  try {
+    render(<ServicesPanel />);
+    await screen.findByText("Web search");
+    expect(screen.queryByText("Modal compute")).not.toBeInTheDocument();
+    expect(screen.queryByText("Remote cache")).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/modal/"))).toBe(false);
+  } finally { remoteComputeFeature.enabled = true; }
+});
 
 beforeEach(() => {
   connector = { keySet: false, name: null, usesKey: false, enabled: false, url: URL_ };

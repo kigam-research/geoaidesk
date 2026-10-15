@@ -65,7 +65,8 @@ export function SettingsHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3">
+    // Phone widths: actions go under the text so the description keeps the full width.
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
       <div className="min-w-0 flex-1">
         <h3 className="text-sm font-medium">{title}</h3>
         {description ? (
@@ -75,7 +76,7 @@ export function SettingsHeader({
           <p className="mt-1 text-[11px] text-muted-foreground/80">{APPLIES_TEXT[appliesTo]}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
     </div>
   );
 }

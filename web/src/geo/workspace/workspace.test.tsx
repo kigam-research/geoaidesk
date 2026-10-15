@@ -80,8 +80,9 @@ describe("task catalogue and setup", () => {
     rows = [workflow(state)]; catalogue();
     const row = await screen.findByRole("button", { name: /^Well log QC well-qc/ });
     expect(within(row).getByText("미시험")).toHaveAttribute("title", "미시험 · GAID 실행 기록 없음");
-    expect(within(row).getByText({ ready: "준비됨", "missing-skills": "스킬 필요", "needs-environment": "환경 준비 필요", unavailable: "사용 불가" }[state])).toBeInTheDocument();
-    expect(within(row).getByText("사용자 자료 필요")).toBeInTheDocument();
+    if (state === "ready") expect(within(row).queryByText("준비됨")).not.toBeInTheDocument();
+    else expect(within(row).getByText({ "missing-skills": "스킬 필요", "needs-environment": "환경 준비 필요", unavailable: "사용 불가" }[state])).toBeInTheDocument();
+    expect(within(row).queryByText("사용자 자료 필요")).not.toBeInTheDocument();
     const dialog = await openSetup();
     expect(within(dialog).getByText("미시험 · GAID 실행 기록 없음")).toBeInTheDocument();
     if (state === "ready") expect(within(dialog).getByText("준비됨")).toBeInTheDocument(); else expect(within(dialog).queryByText("준비됨")).not.toBeInTheDocument();
@@ -117,14 +118,19 @@ describe("task catalogue and setup", () => {
       expect(await within(dialog).findByRole("alert")).toHaveTextContent("채팅 탭이 가득 찼습니다"); expect(within(dialog).getByLabelText("Well log (필수)")).toHaveValue("logs/A.LAS");
     } finally { off(); }
   });
-  it("lists Geoscience first in the upstream list, searches both, and keeps upstream when geo is off", async () => {
+  it("lists 지구과학 first, folds other fields until asked, searches both, and keeps upstream when geo is off", async () => {
     const view = catalogue(); await screen.findByRole("button", { name: /^Well log QC well-qc/ });
     const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
-    expect(headings[0]).toMatch(/^Geoscience/); expect(headings).toContainEqual(expect.stringMatching(/^논문·원고/));
-    expect(screen.getByRole("button", { name: "Geoscience" })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "las" } });
+    expect(headings[0]).toMatch(/^지구과학/); expect(headings).not.toContainEqual(expect.stringMatching(/^논문·원고/));
+    expect(screen.getByRole("button", { name: "지구과학" })).toBeInTheDocument();
+    // Built-in workflows of other fields stay folded until asked for.
+    fireEvent.click(screen.getByRole("button", { name: /^다른 분야 Workflow 보기/ }));
+    expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toContainEqual(expect.stringMatching(/^논문·원고/));
+    fireEvent.click(screen.getByRole("button", { name: "다른 분야 Workflow 접기" }));
+    expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).not.toContainEqual(expect.stringMatching(/^논문·원고/));
+    fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "las" } });
     expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^논문 검토/ })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "review a paper" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "review a paper" } });
     expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument();
     view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
@@ -163,7 +169,7 @@ describe("task catalogue and setup", () => {
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
     expect(await within(dialog).findByLabelText("레시피 제목")).toHaveValue("Well log QC well-qc");
     const options = within(within(dialog).getByLabelText("카테고리")).getAllByRole("option").map((option) => option.textContent);
-    expect(options[0]).toBe("Geoscience"); expect(options).toContain("논문·원고"); expect(options.at(-1)).toBe("새 카테고리 추가");
+    expect(options[0]).toBe("지구과학"); expect(options).toContain("논문·원고"); expect(options.at(-1)).toBe("새 카테고리 추가");
     fireEvent.change(within(dialog).getByLabelText("레시피 제목"), { target: { value: "MD 기준 QC" } });
     fireEvent.change(within(dialog).getByLabelText("카테고리"), { target: { value: "__new__" } });
     expect(within(dialog).getByRole("button", { name: "레시피 저장" })).toBeDisabled();

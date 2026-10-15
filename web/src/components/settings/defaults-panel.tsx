@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoText } from "@/geo/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -130,7 +132,7 @@ export function DefaultsPanel() {
       const next = await putAppDefaults({
         model: draft.model || null,
         thinkingLevel: draft.thinkingLevel === DEFAULT_THINKING_LEVEL ? null : draft.thinkingLevel,
-        compute: computeDefaultFromInstance(draft.compute),
+        ...(REMOTE_COMPUTE_ENABLED ? { compute: computeDefaultFromInstance(draft.compute) } : {}),
         imageModel: draft.imageModel || null,
         verifierModel: draft.verifierModel || null,
       });
@@ -188,7 +190,7 @@ export function DefaultsPanel() {
                 />
               </div>
             </div>
-            <div className="grid gap-1.5">
+            {REMOTE_COMPUTE_ENABLED && <div className="grid gap-1.5">
               <span className="text-xs font-medium">{appText("settings.defaults.compute")}</span>
               <div className="flex">
                 <ComputeSelector
@@ -203,7 +205,7 @@ export function DefaultsPanel() {
               <p className="text-[11px] text-muted-foreground">
                 {appText("settings.defaults.remoteHelp")} <SettingsLink tab="services" section="modal">{appText("settings.defaults.services")}</SettingsLink>
               </p>
-            </div>
+            </div>}
           </div>
         </SettingsCard>
       )}

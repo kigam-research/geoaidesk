@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { TableInspectionOption } from "@/geo/viewers/tables/table-option";
 import { GeoFileActions } from "@/geo/workspace/file-actions";
@@ -201,7 +203,7 @@ function TabBar({
       </button>
 
       {/* Pinned Compute tab — project job history, never closable */}
-      <button
+      {REMOTE_COMPUTE_ENABLED && <button
         type="button"
         data-active={showCompute}
         onClick={onSelectCompute}
@@ -216,7 +218,7 @@ function TabBar({
       >
         <ServerCogIcon className="size-3.5 shrink-0 text-violet-500" />
         <span className="whitespace-nowrap font-medium">{appText("preview.compute")}</span>
-      </button>
+      </button>}
 
       {/* Pinned Automation tab — schedules + missions, never closable */}
       {onSelectAutomation && (
@@ -1739,7 +1741,7 @@ export function FilePreviewPanel({
   revealTarget,
   showNotebook,
   onSelectNotebook,
-  showCompute,
+  showCompute: requestedShowCompute,
   onSelectCompute,
   showAutomation = false,
   onSelectAutomation,
@@ -1758,6 +1760,7 @@ export function FilePreviewPanel({
   onOpenNotebookEntry,
 }: FilePreviewPanelProps) {
   // Per-tab mode tracking
+  const showCompute = REMOTE_COMPUTE_ENABLED && requestedShowCompute;
   const [tabModes, setTabModes] = useState<Record<string, PanelMode>>({});
   const dirtyPaths = useRef(new Set<string>());
   useEffect(() => {

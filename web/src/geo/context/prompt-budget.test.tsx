@@ -48,7 +48,7 @@ describe("GeoPromptBudget", () => {
     fireEvent.click(chip);
     expect(await screen.findByText(/남는 양이 context의 절반보다 적습니다/)).toBeInTheDocument();
     const select = await screen.findByRole("combobox");
-    expect(screen.getByRole("option", { name: "작업: 검층 QC" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Workflow: 검층 QC" })).toBeInTheDocument();
 
     apiFetch.mockImplementationOnce(() => json({ newChatExposure: "workflow:well-log-qc" }));
     fireEvent.change(select, { target: { value: "workflow:well-log-qc" } });

@@ -257,7 +257,7 @@ export function applyFrameToMessage(
       };
     }
     case "permission_request": {
-      // The data guard paused a destructive command; render a decision card
+      // The data guard paused a mutation; render a decision card
       // in the activity stream (like an interview) until it is resolved.
       if (typeof frame.requestId !== "string") return message;
       const activities = message.activities ?? [];
@@ -269,6 +269,8 @@ export function applyFrameToMessage(
         timestamp: now,
         toolName: "permission",
         args: {
+          kind: frame.kind,
+          path: frame.path,
           toolCallId: frame.toolCallId,
           toolName: frame.toolName,
           command: frame.command,

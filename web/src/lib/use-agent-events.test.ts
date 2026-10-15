@@ -360,8 +360,10 @@ describe("data-guard permission frames", () => {
         requestId: "perm_1",
         toolCallId: "tc1",
         toolName: "bash",
-        command: "rm -rf results",
-        reason: "Destructive shell command: rm -rf results",
+        kind: "outside-project",
+        path: "/opt/gaid/file",
+        command: "touch /opt/gaid/file",
+        reason: "Outside-project write: touch /opt/gaid/file",
       },
       5,
     );
@@ -370,7 +372,7 @@ describe("data-guard permission frames", () => {
       id: "perm_1",
       toolName: "permission",
       status: "running",
-      args: { command: "rm -rf results", toolCallId: "tc1" },
+      args: { kind: "outside-project", path: "/opt/gaid/file", command: "touch /opt/gaid/file", toolCallId: "tc1" },
     });
     expect(message.segments).toEqual([{ type: "activity", activityId: "perm_1" }]);
     // Duplicate requests (replay) are ignored.

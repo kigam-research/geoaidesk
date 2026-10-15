@@ -36,6 +36,7 @@ test("user-data paths are relative names under the data home", () => {
 });
 
 test("unattended catalogue refresh is off and the document extras are excluded", () => {
+  assert.equal(distribution.features.remoteCompute, false);
   assert.equal(distribution.environment.KADY_SKILLS_AUTO_SYNC, "0");
   const anthropic = distribution.catalogue.excludedSources.find((s) => s.repo === "anthropics/skills");
   assert.ok(anthropic, "anthropics/skills is excluded");
@@ -77,6 +78,7 @@ test("integration boundaries list existing seams with an owner", () => {
     "gaid-improve",
     "gaid-improve--source-preview",
     "gaid-hub-integration",
+    "gaid-qwen-authoring-trial",
   ]);
   for (const seam of boundaries.seams) {
     assert.ok(owners.has(seam.owner), `${seam.path}: owner ${seam.owner}`);

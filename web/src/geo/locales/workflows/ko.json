@@ -62,7 +62,7 @@
     "upload_folder": "폴더 업로드",
     "host_source": "호스트 경로·자료 URL 사용",
     "locations": "자료 위치(한 줄에 하나씩)",
-    "access_help": "경로는 BYOK가 실행되는 컴퓨터에서 읽을 수 있어야 합니다. URL과 저장소 위치는 접근할 수 있어야 하며 필요한 커넥터나 호스트 인증 정보를 미리 설정해야 합니다. Kady는 workflow를 시작할 때 접근 가능 여부를 확인합니다. 비밀 정보나 서명된 URL을 붙여넣지 마세요.",
+    "access_help": "경로는 BYOK가 실행되는 컴퓨터에서 읽을 수 있어야 합니다. URL과 저장소 위치는 접근할 수 있어야 하며 필요한 커넥터나 호스트 인증 정보를 미리 설정해야 합니다. Kady는 Workflow를 시작할 때 접근 가능 여부를 확인합니다. 비밀 정보나 서명된 URL을 붙여넣지 마세요.",
     "uploading": "BYOK 프로젝트에 업로드 중입니다…",
     "showing": "파일·폴더 {count}개 중 100개를 표시합니다. 검색으로 목록을 좁히세요.",
     "remove": "Workflow에서 {path} 선택 해제",
@@ -204,9 +204,9 @@
     },
     "create-flowchart": {
       "name": "순서도 제작",
-      "description": "실험 또는 분석 workflow를 도식화합니다.",
+      "description": "실험 또는 분석 Workflow를 도식화합니다.",
       "inputs": {
-        "workflow": "도식화할 workflow나 과정"
+        "workflow": "도식화할 Workflow나 과정"
       }
     },
     "create-timeline": {

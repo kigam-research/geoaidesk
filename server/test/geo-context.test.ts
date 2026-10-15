@@ -62,6 +62,15 @@ describe("exposure records", () => {
     expect(readProjectContext(paths).newChatExposure).toBe("all");
   });
 
+  it("offers project skills without a sync record, but not untracked catalogue leftovers", () => {
+    writeSkill(paths, "agent-written", "Written by the agent in a chat.");
+    writeSkill(paths, "old-upstream", "A catalogue skill of another catalogue.");
+    recordSkillOrigin(paths, "old-upstream", { origin: "catalogue" });
+    const names = exposedSkillNames(paths, "catalogue", null) ?? [];
+    expect(names).toContain("agent-written");
+    expect(names).not.toContain("old-upstream");
+  });
+
   it("maps a workflow's Atlas ids to runtime names", () => {
     const catalogue = {
       index: { skills: [{ id: "kigam/well-log-qc-quicklook", runtimeName: "well-log-qc-quicklook" }] },
@@ -104,6 +113,8 @@ describe("exposure in a live Pi session", () => {
     const alpha = writeSkill(paths, "alpha-geo", "ALPHA_MARKER exposed skill.");
     const beta = writeSkill(paths, "beta-bio", "BETA_MARKER hidden skill.");
     recordSkillOrigin(paths, "alpha-geo", { origin: "local" });
+    // A catalogue skill that is not in the active catalogue (e.g. an upstream leftover) stays hidden.
+    recordSkillOrigin(paths, "beta-bio", { origin: "catalogue" });
     const before = [hashDirectory(alpha), hashDirectory(beta)];
     writeProjectContext(paths, { newChatExposure: "catalogue" });
 
@@ -164,8 +175,8 @@ describe("exposure in a live Pi session", () => {
     // Loaded skills include the runtime support skills (and any user-level ones of the host).
     expect(body.budget.skills.mode).toBe("catalogue");
     expect(body.budget.skills.installed).toBeGreaterThanOrEqual(1 + runtimeSupportSkillNames().length);
-    // alpha-geo has no recorded origin here, so only the support skills are offered.
-    expect(body.budget.skills.exposed).toBe(runtimeSupportSkillNames().length);
+    // alpha-geo has no sync record (as when the agent writes a skill in a chat), so it is offered too.
+    expect(body.budget.skills.exposed).toBe(runtimeSupportSkillNames().length + 1);
     expect((await app.inject({ method: "GET", url: "/geo/context" })).statusCode).toBe(400);
     expect((await app.inject({ method: "GET", url: "/geo/context?sessionId=nope" })).statusCode).toBe(404);
     // Preview of a chat not created yet: measured, then disposed without a trace.

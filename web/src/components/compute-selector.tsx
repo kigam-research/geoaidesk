@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { workResourceName } from "@/geo/work-labels";
 import { geoText } from "@/geo/i18n";
 import {
@@ -462,6 +464,8 @@ export function ComputeSelector({
       : catalogInstance ?? parsed ?? LOCAL_INSTANCE;
   }, [catalog, selected]);
   const tier = inferredTier(effective);
+
+  if (!REMOTE_COMPUTE_ENABLED) return null;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

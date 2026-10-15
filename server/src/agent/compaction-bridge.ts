@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 /**
  * Compaction you control.
  *
@@ -325,7 +326,7 @@ export function buildCompactionPreamble(projectId: string, sessionId: string): C
   }
 
   if (lines.length === 1) lines.push("(no notebook entries, plans or results recorded yet)");
-  try {
+  if (remoteComputeEnabled()) try {
     const jobs = new ModalJobStore().list(projectId).filter((job) => job.owner?.sessionId === sessionId && !isTerminalModalState(job.state));
     lines.push(`### Pending Modal work (${jobs.length} readable session records; recheck status before continuing)`);
     for (const job of jobs.slice(0, 30)) {
@@ -428,7 +429,7 @@ export function makeScientificCompactionExtension(
             auth.apiKey,
             headers,
             event.signal,
-            joinInstructions([SCIENCE_COMPACTION_INSTRUCTIONS, recordsInstructions(records)], event.customInstructions),
+            joinInstructions([remoteComputeEnabled() ? SCIENCE_COMPACTION_INSTRUCTIONS : SCIENCE_COMPACTION_INSTRUCTIONS.replace(" and Modal job ids", ""), recordsInstructions(records)], event.customInstructions),
             previous,
             ctx.thinkingLevel,
             undefined,
@@ -450,7 +451,7 @@ export function makeScientificCompactionExtension(
             auth.apiKey,
             headers,
             event.signal,
-            joinInstructions([TURN_PREFIX_FOCUS, SCIENCE_COMPACTION_INSTRUCTIONS], event.customInstructions),
+            joinInstructions([TURN_PREFIX_FOCUS, remoteComputeEnabled() ? SCIENCE_COMPACTION_INSTRUCTIONS : SCIENCE_COMPACTION_INSTRUCTIONS.replace(" and Modal job ids", "")], event.customInstructions),
             undefined,
             ctx.thinkingLevel,
             undefined,

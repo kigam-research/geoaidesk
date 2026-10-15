@@ -177,6 +177,23 @@ export function geoCatalogueEnabled(repoRoot: string, env: NodeJS.ProcessEnv = p
   return readDistributionCatalogue(repoRoot) !== null;
 }
 
+/** Distribution-only feature policy, also safe to import in detached child runners.
+ * The launcher marker distinguishes start-gaid from the upstream dev launchers.
+ * No credentials/config module is loaded here. Existing project data is untouched.
+ */
+export function remoteComputeEnabled(
+  repoRoot = path.resolve(import.meta.dirname, "../../.."),
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (env.GAID_DISTRIBUTION !== "1" || !geoCatalogueEnabled(repoRoot, env)) return true;
+  const features = readManifest(repoRoot)?.features as { remoteCompute?: unknown } | undefined;
+  const value = features?.remoteCompute;
+  if (value !== undefined && typeof value !== "boolean") {
+    throw new Error(`${DISTRIBUTION_FILE}: features.remoteCompute must be a boolean`);
+  }
+  return value !== false;
+}
+
 /**
  * Drop excluded skills from catalogue sources; a source left without skills
  * is dropped. Repository names compare case-insensitively, like GitHub.

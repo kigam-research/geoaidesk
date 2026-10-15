@@ -88,14 +88,14 @@ function TabGroup({ label, detail, tabs }: { label: string; detail?: string; tab
     <>
       <div
         role="presentation"
-        className="w-full truncate px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground first:pt-0"
+        className="hidden w-full truncate px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground first:pt-0 sm:block"
         title={detail ? `${label} · ${detail}` : label}
       >
         {label}
         {detail ? <span className="normal-case tracking-normal"> · {detail}</span> : null}
       </div>
       {tabs.map(({ id, label: tabLabel, icon: Icon }) => (
-        <TabsTrigger key={id} value={id} className="w-full justify-start gap-2 px-2 text-xs whitespace-normal text-left h-auto min-h-8">
+        <TabsTrigger key={id} value={id} className="w-full justify-start gap-2 px-2 text-xs whitespace-normal text-left h-auto min-h-8 max-sm:w-auto! max-sm:shrink-0 max-sm:whitespace-nowrap">
           <Icon className="size-3.5" />
           {tabLabel}
         </TabsTrigger>
@@ -212,11 +212,12 @@ export function SettingsDialog({ open, onOpenChange, request }: SettingsDialogPr
             }
           }}
           orientation="vertical"
-          className="flex min-h-0 flex-1 flex-row gap-0"
+          // Phone widths: the tab list becomes one scrolling row above the content (gaid-qwen-authoring-trial).
+          className="flex min-h-0 flex-1 flex-col gap-0 sm:flex-row"
         >
           <TabsList
             variant="line"
-            className="w-32 sm:w-48 shrink-0 items-start justify-start overflow-y-auto rounded-none border-r px-2 py-3"
+            className="w-full shrink-0 items-start justify-start overflow-x-auto rounded-none border-b px-2 py-2 max-sm:flex-row! sm:w-48 sm:overflow-x-visible sm:overflow-y-auto sm:border-b-0 sm:border-r sm:py-3"
           >
             <TabGroup label={appText("settings.models")} tabs={MODEL_TABS} />
             <TabGroup label={appText("settings.project")} detail={projectName(projectId)} tabs={PROJECT_TABS} />
@@ -229,34 +230,34 @@ export function SettingsDialog({ open, onOpenChange, request }: SettingsDialogPr
                 {appText("settings.otherProject", { active: projectName(activeProjectId), target: projectName(projectId) })}
               </div>
             ) : null}
-            <TabsContent value="providers" className="min-w-0 p-5">
+            <TabsContent value="providers" className="min-w-0 p-3 sm:p-5">
               <ProvidersPanel section={section} />
             </TabsContent>
-            <TabsContent value="defaults" className="min-w-0 p-5">
+            <TabsContent value="defaults" className="min-w-0 p-3 sm:p-5">
               <DefaultsPanel />
             </TabsContent>
-            <TabsContent value="fusion" className="min-w-0 p-5">
+            <TabsContent value="fusion" className="min-w-0 p-3 sm:p-5">
               <FusionPanel />
             </TabsContent>
-            <TabsContent value="project" className="min-w-0 p-5">
+            <TabsContent value="project" className="min-w-0 p-3 sm:p-5">
               <ProjectSettingsPanel projectId={projectId} />
             </TabsContent>
-            <TabsContent value="skills" className="min-w-0 p-5">
+            <TabsContent value="skills" className="min-w-0 p-3 sm:p-5">
               <SkillsPanel />
             </TabsContent>
-            <TabsContent value="prompts" className="min-w-0 p-5">
+            <TabsContent value="prompts" className="min-w-0 p-3 sm:p-5">
               <PromptsPanel />
             </TabsContent>
-            <TabsContent value="specialists" className="min-w-0 p-5">
+            <TabsContent value="specialists" className="min-w-0 p-3 sm:p-5">
               <SubagentsPanel />
             </TabsContent>
-            <TabsContent value="connectors" className="min-w-0 p-5">
+            <TabsContent value="connectors" className="min-w-0 p-3 sm:p-5">
               <ConnectorsPanel />
             </TabsContent>
-            <TabsContent value="services" className="min-w-0 p-5">
+            <TabsContent value="services" className="min-w-0 p-3 sm:p-5">
               <ServicesPanel />
             </TabsContent>
-            <TabsContent value="appearance" className="min-w-0 p-5">
+            <TabsContent value="appearance" className="min-w-0 p-3 sm:p-5">
               <AppearancePanel />
             </TabsContent>
           </div>
