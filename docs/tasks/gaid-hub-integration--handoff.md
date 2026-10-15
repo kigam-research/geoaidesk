@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-15T14:33:27Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
@@ -124,7 +124,9 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 | `hubHandoff.errors.request` | 분석 전달 요청을 처리하지 못했습니다. 서버 연결을 확인한 뒤 다시 시도하세요. | The analysis handoff request failed. Check the server connection and try again. |
 
 ## Next steps
-1. Run task finish (which integrates the latest parent tip) and deliver the ready child to the parent for task complete. No live app deployment or P4 acceptance is claimed.
+<!-- task:closed -->
+Closed 2026-10-15T14:33:27Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First dependency job was refused before launch because the source was dirty; saved the implementation, then launched the recorded install job once (exit 0).
 - Initial task sync had one routes.ts import/register conflict; retained both independent routes. Named-path task save refused unrelated staged merge files; reviewed and saved the complete merge through task save without paths. No history rewrite.
