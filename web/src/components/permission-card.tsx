@@ -11,10 +11,12 @@ import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 
 const workText = geoText("work");
-const DESTRUCTIVE_REASON = /^Destructive shell command:/;
+const GUARD_REASON = /^(Destructive shell command:|Outside-project write:)/;
 
 /** Payload the data guard attaches to a `permission_request` frame. */
 export interface PermissionPayload {
+  kind?: string;
+  path?: string;
   toolCallId?: string;
   toolName?: string;
   command?: string;
@@ -27,6 +29,8 @@ export function parsePermissionPayload(args: unknown): PermissionPayload {
   const record = args as Record<string, unknown>;
   const str = (key: string) => (typeof record[key] === "string" ? (record[key] as string) : undefined);
   return {
+    kind: str("kind"),
+    path: str("path"),
     toolCallId: str("toolCallId"),
     toolName: str("toolName"),
     command: str("command"),
@@ -44,7 +48,7 @@ const OUTCOME_LABEL: Record<string, string> = {
 };
 
 /**
- * The data guard paused a destructive shell command and is waiting for the
+ * The data guard paused an outside write or destructive shell command and is waiting for the
  * user. Rendered inline from the run's activities, like the interview form.
  */
 export const PermissionCard = memo(function PermissionCard({
@@ -61,6 +65,7 @@ export const PermissionCard = memo(function PermissionCard({
   const payload = parsePermissionPayload(item.args);
   const [busy, setBusy] = useState<"allow" | "deny" | null>(null);
   const pending = item.status === "running";
+  const outside = payload.kind === "outside-project";
   const outcome = payload.outcome ?? (item.status === "error" ? "denied" : undefined);
 
   const answer = async (allow: boolean) => {
@@ -101,16 +106,23 @@ export const PermissionCard = memo(function PermissionCard({
     >
       <header className="mb-1 flex items-center gap-2 text-xs font-medium">
         <ShieldAlertIcon className="size-3.5 shrink-0" />
-        <span>{pending ? workText("permission_card.kady_wants_to_run_a_destructive_command") : workText("permission_card.destructive_command")}</span>
+        <span>{outside
+          ? workText(pending ? "permission_card.outside_project_pending" : "permission_card.outside_project")
+          : workText(pending ? "permission_card.kady_wants_to_run_a_destructive_command" : "permission_card.destructive_command")}</span>
         {outcome && (
           <span className="ml-auto rounded bg-background/60 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
             {OUTCOME_LABEL[outcome] ?? outcome}
           </span>
         )}
       </header>
-      {/* The guard's English reason ("Destructive shell command: …") is for the model; the title and command say it here. */}
-      {payload.reason && !DESTRUCTIVE_REASON.test(payload.reason) && (
+      {/* Guard reason strings are model-facing; the localized title, target and operation describe the request here. */}
+      {payload.reason && !GUARD_REASON.test(payload.reason) && (
         <p className="mb-1 text-xs text-muted-foreground">{payload.reason}</p>
+      )}
+      {outside && payload.path && (
+        <p className="mb-1 break-all text-xs text-muted-foreground">
+          {workText("permission_card.outside_project_target", { path: payload.path })}
+        </p>
       )}
       {payload.command && (
         <pre className="max-h-40 overflow-auto rounded bg-background/70 px-2 py-1.5 font-mono text-[12px] leading-snug">

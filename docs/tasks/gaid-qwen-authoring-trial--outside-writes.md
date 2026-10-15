@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T13:52:45Z
+updated: 2026-10-15T14:01:38Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -57,21 +57,85 @@ cases covered (table of command → verdict), tests run, and the limits. No netw
 blocked anyway). Remove build caches you created in your worktree before finishing.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 222 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. Full scripts/check and deployment belong to the parent after integration. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
+
 ## Next steps
-1. (the next session's first action)
+1. Finish this checked child snapshot with task finish.
+2. Parent: integrate with task complete gaid-qwen-authoring-trial--outside-writes, run scripts/check and include the evidence below in the canonical parent report.
+
+## Checks
+- PASS: server npm run typecheck.
+- PASS: server npx vitest run test/bash-classifier.test.ts test/data-guard.test.ts (222 tests, including byte parity, lead outcomes/policy, pending-card restore and child blocks).
+- PASS: web npx tsc --noEmit.
+- PASS: web npx vitest run src/components/permission-card.test.tsx src/lib/use-agent-events.test.ts (25 tests; old destructive payloads, outside kind/path, English/Korean titles, hidden model reason, allow/deny routes and event replay).
+- PASS: node geo/copy/validate-copy.mjs web/src/geo/locales (0 errors, 56 warnings outside the three added IDs).
+- PASS: node --test geo/tests/distribution.test.mjs (7 tests).
+- PASS: git diff --check.
+- Full scripts/check is intentionally delegated to the parent by this unit's brief.
+- Dependencies reused from the parent's external app snapshot through temporary node_modules symlinks; no dependency manifest/lockfile changed. Latest server test log: ~/data/geoaidesk/work/gaid-qwen-authoring-trial--outside-writes/server-check.log.
+
 ## Failed approaches
+- Initial task resume met a sibling task transaction; retried after the sibling completed and resumed successfully at the original path.
+- First new hook tests used ../outside under the Vitest /tmp sandbox. Those targets correctly matched the temporary-directory allowance, so the tests were corrected to /opt/gaid targets (and relative paths that actually escape /tmp). One child fixture retained the old target until the next correction. Final rerun passed.
+- One UI test used status done rather than the existing complete enum. Corrected the fixture; web typecheck and tests passed.
+
 ## Notes and decisions
+- Sequential decisions: retain protected-path priority; recognize lexical sandbox/home/temp paths with options supplied by the runtime; collect outside writes before destructive fallback. Reads remain ungated. No filesystem probing in the classifier. Node path normalization receives absolute runtime roots; homeDir/tempDirs are injected by the lead and child adapters.
+- Owned interfaces: verdict kind `outside-project` with path; optional permission kind/path across broker -> activity -> card. Existing frames without kind retain destructive rendering.
+- This is tightly coupled work across the classifier and permission path; no reader needed. Parent owns instructions and the final report; sibling owns Modal.
+- Add the small `use-agent.ts` transport seam (required for kind/path to reach the card) and its existing event test.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None. The heuristic limitations are part of the accepted brief, not a new decision gate.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Contribution to the parent's canonical report (no separate child report):
+
+### Result and limits
+Outside-project mutations now use the existing confirmation card for the lead; children block them. Protected raw data stays blocked even in a compound command that also writes outside. The classifier is heuristic: Python/other programs, dynamic shell constructs and symlinks can still write outside; the card authorizes a whole tool call and names its first recognized outside target. The temporary-directory exception also applies when a test project happens to live in /tmp. Existing destructive checks remain separate.
+
+### Representative covered commands
+Options: sandbox /proj/sandbox; home /home/test; OS temp /var/tmp/custom.
+
+| Command or file operation | Verdict |
+|---|---|
+| write/edit/generate_image /opt/gaid/file | outside-project (lead asks; child blocks) |
+| echo x > /opt/gaid/geo/distribution.json | outside-project |
+| echo x >> ../outside.txt | outside-project, /proj/outside.txt |
+| tee /opt/gaid/file | outside-project |
+| cp derived/a /opt/gaid/a; cp -t /opt/gaid derived/a | outside-project |
+| mv /opt/gaid/a derived/a; mv derived/a /opt/gaid/a | outside-project (source and destination mutations) |
+| rsync -a derived/ /opt/gaid/; install derived/a /opt/gaid/a | outside-project |
+| install -d /opt/gaid derived/dir; ln -s derived/a /opt/gaid/link | outside-project |
+| rm /opt/gaid/a; rm -rf ../elsewhere | outside-project |
+| mkdir -p ~/assets/geo-catalogue/0.2.2 | outside-project |
+| mkdir -p "$HOME/.geoaidesk/catalogue" | outside-project |
+| touch /opt/gaid/file; chmod 600 /opt/gaid/file | outside-project |
+| sed -i 's/a/b/' /opt/gaid/file; perl -pi -e 's/a/b/' /opt/gaid/file | outside-project |
+| dd if=derived/a of=/opt/gaid/file; find /opt/gaid -name '*.tmp' -delete | outside-project |
+| cd /opt/gaid && touch file; cd /opt/gaid; git reset --hard | outside-project |
+| echo x > /proj/sandbox/../outside.txt; touch /tmp/../outside | outside-project after normalization |
+| touch /tmp-other/file; touch /var/tmp/custom-other/file | outside-project (not a temp subtree) |
+| cat /opt/gaid/file; cp /opt/gaid/a derived/a | allow (reads are not gated) |
+| mkdir -p derived/a; sed -i 's/a/b/' derived/a | allow |
+| echo x > /tmp/outside.txt; touch /var/tmp/custom/file; echo x > /dev/null | allow |
+| cd /opt/gaid && cd /proj/sandbox && touch derived/file | allow |
+| rm -rf results; git clean -fdx; git reset --hard HEAD~1 | destructive (existing confirmation) |
+| touch /opt/file; rm user_data/a | protected (block takes priority) |
+| perl -pi -e's/a/b/' user_data/a.csv; find . -exec rm user_data/a.csv | protected |
+
+Windows drive, UNC and Git Bash protected paths and outside siblings remain covered by the shared table. Deny/timeout/no-UI/cancel block both kinds; allow permits one call. Switching destructiveConfirm off skips lead confirmations but not protected-path blocks or the child's outside-write block.
+
+### Copy changes (new IDs; existing destructive copy unchanged)
+All IDs are in work. Before: absent in both languages.
+
+| ID suffix | Korean after | English after |
+|---|---|---|
+| permission_card.outside_project_pending | AI agent가 프로젝트 밖 파일을 변경하려고 합니다 | The AI agent wants to change files outside the project |
+| permission_card.outside_project | 프로젝트 밖 파일 변경 | File change outside the project |
+| permission_card.outside_project_target | 변경 대상: {path} | Target: {path} |
+
+Updated docs/data-guard.md and the AGENTS.md Raw-data guard caveat to match. Applied humanizer file-mode prose review to docs/data-guard.md, retaining all conditions and the limits. No hero/approved copy changed.
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

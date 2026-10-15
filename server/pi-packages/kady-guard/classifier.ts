@@ -2,11 +2,13 @@
 /**
  * Raw-data guard: pure classification of file-tool paths and shell commands.
  *
- * Two questions, answered without touching the filesystem:
+ * Three questions, answered without touching the filesystem:
  *
  *   1. Does this call MUTATE a protected path (default `user_data/**`)?
  *      → hard block, for the lead agent and background specialists alike.
- *   2. Is this shell command DESTRUCTIVE elsewhere (`rm -rf`, `git clean -f`,
+ *   2. Does a recognized mutation target lie outside the sandbox (apart from
+ *      temporary folders and /dev/null)? → the lead asks; a child is blocked.
+ *   3. Is this shell command DESTRUCTIVE elsewhere (`rm -rf`, `git clean -f`,
  *      `find … -delete`, …)? → the lead asks the user; a child is blocked.
  *
  * This is a heuristic tokenizer, not a shell parser, and deliberately biased
@@ -19,16 +21,22 @@
  * them in step.
  */
 
+import path from "node:path";
+
 export type BashVerdict =
   | { kind: "allow" }
   | { kind: "protected"; path: string; glob: string; detail: string }
-  | { kind: "destructive"; detail: string };
+  | { kind: "destructive"; detail: string }
+  | { kind: "outside-project"; path: string; detail: string };
 
 export interface ClassifyOptions {
   /** Sandbox-relative globs (`user_data/**`, `raw/*.csv`). */
   protectedGlobs: readonly string[];
   /** Absolute sandbox root, to relativize absolute paths in commands. */
   sandboxRoot?: string;
+  /** Runtime-supplied allowances; classification itself has no host state. */
+  tempDirs?: readonly string[];
+  homeDir?: string;
 }
 
 function escapeSegment(seg: string): string {
@@ -97,7 +105,7 @@ export function resolveSandboxPath(
   cwd: string,
   sandboxRoot?: string,
 ): string | null {
-  let value = stripQuotes(token);
+  let value = resolveTargetPath(token, cwd, { sandboxRoot });
   if (!value || value.startsWith("~") || value.startsWith("$")) return null;
   const windows = isWindowsRoot(sandboxRoot);
   // Backslashes are separators only beside a Windows sandbox, and a lone
@@ -118,7 +126,33 @@ export function resolveSandboxPath(
     value = value.slice(root.length + 1);
     return normalizeRel(value);
   }
-  return normalizeRel(cwd ? `${cwd}/${value}` : value);
+  return normalizeRel(value);
+}
+
+/** Lexical resolution only: symlinks and shell expansion are not evaluated. */
+function resolveTargetPath(token: string, cwd: string, opts: Pick<ClassifyOptions, "sandboxRoot" | "homeDir">): string {
+  let value = stripQuotes(token);
+  if (opts.homeDir && /^(~|\$HOME|\$\{HOME\})(\/|$)/.test(value)) {
+    value = value.replace(/^(~|\$HOME|\$\{HOME\})/, opts.homeDir);
+  }
+  if (/^[~$]/.test(value)) return value;
+  if (/^[~$]/.test(cwd) && !path.posix.isAbsolute(value) && !/^[a-z]:[\\/]/i.test(value)) return `${cwd}/${value}`;
+  const windows = isWindowsRoot(opts.sandboxRoot);
+  if (windows) value = value.replace(/^\\(?!\\)/, "").replace(/\\/g, "/").replace(/^\/([a-z])\//i, "$1:/");
+  const api = windows ? path.win32 : path.posix;
+  const base = cwd || opts.sandboxRoot;
+  if (!base) return api.normalize(value).replace(/\\/g, "/");
+  return api.resolve(opts.sandboxRoot ?? base, cwd || ".", value).replace(/\\/g, "/");
+}
+
+function outsideTarget(token: string, cwd: string, opts: ClassifyOptions): string | null {
+  const target = resolveTargetPath(token, cwd, opts);
+  if (resolveSandboxPath(target, "", opts.sandboxRoot) !== null) return null;
+  if (stripQuotes(token) === "/dev/null" || target === "/dev/null") return null;
+  for (const dir of ["/tmp", ...(opts.tempDirs ?? [])]) {
+    if (resolveSandboxPath(target, "", resolveTargetPath(dir, "", opts)) !== null) return null;
+  }
+  return target;
 }
 
 function isWindowsRoot(root?: string): boolean {
@@ -224,7 +258,7 @@ export function splitSegments(command: string): string[] {
 /** Commands whose path arguments are mutated in place. */
 const MUTATING = new Set([
   "rm", "rmdir", "mv", "shred", "truncate", "unlink", "chmod", "chown", "chgrp",
-  "tee", "install", "ln", "mkfifo", "touch",
+  "tee", "mkfifo", "touch", "mkdir",
 ]);
 const ENV_WRAPPERS = new Set(["sudo", "env", "nice", "nohup", "time", "command", "exec"]);
 /** Targets whose recursive removal is routine, not destructive. */
@@ -248,17 +282,27 @@ function unwrap(tokens: string[]): string[] {
 
 /**
  * Classify one shell command. Returns the first protected-path mutation, else
- * the first destructive command, else allow.
+ * the first outside-project mutation, else the first destructive command,
+ * else allow. Protected-path blocks take precedence across all segments.
  */
 export function classifyBashCommand(command: string, opts: ClassifyOptions): BashVerdict {
   const globs = opts.protectedGlobs;
   let cwd = "";
   let destructive: BashVerdict | null = null;
+  let outside: BashVerdict | null = null;
   const protectedHit = (token: string): { rel: string; glob: string } | null => {
     const rel = resolveSandboxPath(token, cwd, opts.sandboxRoot);
     if (rel === null) return null;
     const glob = matchProtected(rel, globs, isWindowsRoot(opts.sandboxRoot));
     return glob ? { rel, glob } : null;
+  };
+  const mutationHit = (token: string, label: string): BashVerdict | null => {
+    const resolved = resolveTargetPath(token, cwd, opts);
+    const hit = protectedHit(resolved);
+    if (hit) return { kind: "protected", path: hit.rel, glob: hit.glob, detail: `${label} ${hit.rel}` };
+    const target = outsideTarget(token, cwd, opts);
+    if (target && !outside) outside = { kind: "outside-project", path: target, detail: `${label} ${target}` };
+    return null;
   };
 
   for (const segment of splitSegments(command)) {
@@ -268,14 +312,14 @@ export function classifyBashCommand(command: string, opts: ClassifyOptions): Bas
     // Redirections into a protected path.
     for (let i = 0; i < raw.length - 1; i++) {
       if (raw[i] === ">" || raw[i] === ">>") {
-        const hit = protectedHit(raw[i + 1]);
-        if (hit) {
-          return { kind: "protected", path: hit.rel, glob: hit.glob, detail: `redirect ${raw[i]} ${hit.rel}` };
-        }
+        // `2>&1` duplicates a descriptor, rather than writing a file.
+        if (/^&(?:\d+|-)$/.test(raw[i + 1])) continue;
+        const hit = mutationHit(raw[i + 1], `redirect ${raw[i]}`);
+        if (hit) return hit;
       }
     }
 
-    const tokens = unwrap(raw.filter((t) => t !== ">" && t !== ">>"));
+    const tokens = unwrap(raw.filter((t, i) => t !== ">" && t !== ">>" && raw[i - 1] !== ">" && raw[i - 1] !== ">>"));
     if (tokens.length === 0) continue;
     const cmd = stripQuotes(tokens[0]).split("/").pop() ?? tokens[0];
     const args = tokens.slice(1);
@@ -283,62 +327,72 @@ export function classifyBashCommand(command: string, opts: ClassifyOptions): Bas
 
     if (cmd === "cd") {
       const target = pathArgs[0];
-      if (!target) cwd = "";
-      else {
-        const resolved = resolveSandboxPath(target, cwd, opts.sandboxRoot);
-        cwd = resolved ?? cwd;
-      }
+      cwd = resolveTargetPath(target ?? opts.homeDir ?? "~", cwd, opts);
       continue;
     }
 
-    const checkAll = (label: string): BashVerdict | null => {
-      for (const a of pathArgs) {
-        const hit = protectedHit(a);
-        if (hit) return { kind: "protected", path: hit.rel, glob: hit.glob, detail: `${label} ${hit.rel}` };
+    const checkAll = (label: string, targets = pathArgs): BashVerdict | null => {
+      for (const a of targets) {
+        const hit = mutationHit(a, label);
+        if (hit) return hit;
       }
       return null;
     };
 
     if (MUTATING.has(cmd)) {
-      const hit = checkAll(cmd);
+      // Modes/owners and the truncate size are option values, not targets.
+      let targets = pathArgs;
+      if (["chmod", "chown", "chgrp"].includes(cmd) && !args.some((a) => a.startsWith("--reference"))) targets = pathArgs.slice(1);
+      if (cmd === "truncate") targets = args.filter((a, i) => !isFlag(a) && !["-s", "--size", "-r", "--reference"].includes(args[i - 1]));
+      const hit = checkAll(cmd, targets);
       if (hit) return hit;
     }
-    if (cmd === "cp" || cmd === "rsync" || cmd === "mv" || cmd === "install") {
+    if (cmd === "install" && args.includes("-d")) {
+      const hit = checkAll("install -d");
+      if (hit) return hit;
+    }
+    if (cmd === "cp" || cmd === "rsync" || cmd === "mv" || cmd === "install" || cmd === "ln") {
       // Destination (last path arg) is written; `mv` also removes its sources.
-      const dest = pathArgs[pathArgs.length - 1];
+      const targetDir = args.findIndex((a) => a === "-t" || a === "--target-directory");
+      const dest = targetDir >= 0 ? args[targetDir + 1] : args.find((a) => a.startsWith("--target-directory="))?.slice(19) ?? pathArgs[pathArgs.length - 1];
       if (dest) {
-        const hit = protectedHit(dest);
-        if (hit) return { kind: "protected", path: hit.rel, glob: hit.glob, detail: `${cmd} into ${hit.rel}` };
+        const hit = mutationHit(dest, `${cmd} into`);
+        if (hit) return hit;
       }
     }
-    if ((cmd === "sed" || cmd === "perl") && args.some((a) => /^-[a-zA-Z]*i/.test(a) || a === "--in-place")) {
-      const hit = checkAll(`${cmd} -i`);
+    if ((cmd === "sed" || cmd === "perl") && args.some((a) => /^-[a-zA-Z]*i/.test(a) || a.startsWith("--in-place"))) {
+      // Expressions are not file operands (`sed -i 's/a/b/' file`, perl -e).
+      const operands = args.filter((a, i) => !isFlag(a) && !["-e", "--expression", "-f", "--file"].includes(args[i - 1]));
+      if (!args.some((a) => /^-[ef]/.test(a) || a.startsWith("--expression") || a.startsWith("--file"))) operands.shift();
+      const hit = checkAll(`${cmd} -i`, operands);
       if (hit) return hit;
     }
     if (cmd === "dd") {
       const of = args.find((a) => a.startsWith("of="));
       if (of) {
-        const hit = protectedHit(of.slice(3));
-        if (hit) return { kind: "protected", path: hit.rel, glob: hit.glob, detail: `dd of=${hit.rel}` };
+        const hit = mutationHit(of.slice(3), "dd of=");
+        if (hit) return hit;
       }
       if (!destructive) destructive = { kind: "destructive", detail: "dd writes raw blocks" };
     }
     if (cmd === "find" && (args.includes("-delete") || (args.includes("-exec") && args.some((a) => a === "rm")))) {
-      const hit = checkAll("find -delete under");
+      const hit = checkAll("find -delete under", pathArgs.length ? pathArgs : ["."]);
       if (hit) return hit;
       if (!destructive) destructive = { kind: "destructive", detail: `${segment.trim()}` };
     }
     if (cmd === "xargs" && args.some((a) => stripQuotes(a) === "rm" || stripQuotes(a) === "shred")) {
-      const hit = checkAll("xargs rm");
+      const verbIndex = args.findIndex((a) => a === "rm" || a === "shred");
+      const hit = checkAll("xargs rm", args.slice(verbIndex + 1).filter((a) => !isFlag(a)));
       if (hit) return hit;
       if (!destructive) destructive = { kind: "destructive", detail: `${segment.trim()}` };
     }
     if (cmd === "git") {
       const sub = args.find((a) => !isFlag(a));
       const flags = args.filter(isFlag);
-      const cwdProtected = cwd ? matchProtected(cwd, globs, isWindowsRoot(opts.sandboxRoot)) : null;
+      const cwdRel = resolveSandboxPath(cwd || ".", "", opts.sandboxRoot);
+      const cwdProtected = cwdRel ? matchProtected(cwdRel, globs, isWindowsRoot(opts.sandboxRoot)) : null;
       if (sub === "clean" && flags.some((f) => /^-[a-zA-Z]*f/.test(f) || f === "--force")) {
-        if (cwdProtected) return { kind: "protected", path: cwd, glob: cwdProtected, detail: "git clean inside protected path" };
+        if (cwdProtected) return { kind: "protected", path: cwdRel!, glob: cwdProtected, detail: "git clean inside protected path" };
         if (!destructive) destructive = { kind: "destructive", detail: segment.trim() };
       }
       if (sub === "reset" && flags.includes("--hard")) {
@@ -348,7 +402,11 @@ export function classifyBashCommand(command: string, opts: ClassifyOptions): Bas
         if (!destructive) destructive = { kind: "destructive", detail: segment.trim() };
       }
       if (sub === "rm") {
-        const hit = checkAll("git rm");
+        const hit = checkAll("git rm", pathArgs.slice(1));
+        if (hit) return hit;
+      }
+      if (["clean", "reset", "checkout", "rm"].includes(sub ?? "")) {
+        const hit = mutationHit(".", `git ${sub}`);
         if (hit) return hit;
       }
     }
@@ -365,16 +423,20 @@ export function classifyBashCommand(command: string, opts: ClassifyOptions): Bas
       if (!destructive) destructive = { kind: "destructive", detail: segment.trim() };
     }
   }
-  return destructive ?? { kind: "allow" };
+  return outside ?? destructive ?? { kind: "allow" };
 }
 
 /** `write`/`edit`: is the target under a protected glob? */
 export function classifyFilePath(
   filePath: string,
   opts: ClassifyOptions,
-): { kind: "allow" } | { kind: "protected"; path: string; glob: string } {
-  const rel = resolveSandboxPath(filePath, "", opts.sandboxRoot);
-  if (rel === null) return { kind: "allow" };
+): { kind: "allow" } | { kind: "protected"; path: string; glob: string } | { kind: "outside-project"; path: string } {
+  const target = resolveTargetPath(filePath, "", opts);
+  const rel = resolveSandboxPath(target, "", opts.sandboxRoot);
+  if (rel === null) {
+    const outside = outsideTarget(filePath, "", opts);
+    return outside ? { kind: "outside-project", path: outside } : { kind: "allow" };
+  }
   const glob = matchProtected(rel, opts.protectedGlobs, isWindowsRoot(opts.sandboxRoot));
   return glob ? { kind: "protected", path: rel, glob } : { kind: "allow" };
 }
