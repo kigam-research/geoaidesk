@@ -18,8 +18,9 @@
     "outputs": "예상 결과 파일: {outputs}",
     "boundary": "해석 한계: {boundary}",
     "empty": "등록된 Geo 작업이 없습니다.",
-    "category": "Geoscience",
-    "search": "워크플로 검색"
+    "category": "지구과학",
+    "search": "워크플로 검색",
+    "showOther": "다른 분야 워크플로 보기 ({count}개)"
   },
   "readiness": {
     "ready": "준비됨",

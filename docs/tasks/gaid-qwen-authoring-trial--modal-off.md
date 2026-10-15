@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:09:43Z
+updated: 2026-10-15T14:10:10Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -102,7 +102,7 @@ Evidence: `~/data/geoaidesk/runs/gaid-qwen-authoring-trial--modal-off-20261015T1
 
 Evidence: the recorded job `log`, sha256 `ff674e4ae7e07cdc59e8e26c2b3395962727984c671de350db1ac2dfd8d314b8`, `REAL_REMOTE_COMPUTE_REBUILD` record. The source manifest stayed false. Build outputs stayed in the external job snapshot; the worktree has no `.next` or generated tsbuildinfo cache.
 ### Parent merge recheck
-The first finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`. Only the integration-boundary ledger conflicted; both entries were retained. After resolution, server typecheck, web typecheck, all 6 affected web files (51 tests), distribution/launcher/stamp tests (16 passed / optional actual smoke skipped), and copy validation (0 errors / 56 warnings) passed again. Modal implementation files did not conflict or change; the successful recorded source/build evidence remains applicable.
+Finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`; a later retry integrated advancing parent revision `c01073715d31ad8a89e77345ff15c3aa8cb61752` with the same mechanical ledger resolution. Only the integration-boundary ledger conflicted; the parent's latest existing seam and the child Modal seam were retained. After resolution, server typecheck, web typecheck, all 6 affected web files (51 tests), distribution/launcher/stamp tests (16 passed / optional actual smoke skipped), and copy validation (0 errors / 56 warnings) passed again. Modal implementation files did not conflict or change; the successful recorded source/build evidence remains applicable.
 
 ## Next steps
 1. Finish this checked child snapshot after resolving the manifest-only parent merge conflict. Parent: run task complete gaid-qwen-authoring-trial--modal-off to integrate, write the Modal report section from Current state, and run the full scripts/check. No child deployment or main integration has been performed.
