@@ -34,6 +34,7 @@ import {
 import { request, text } from "./api";
 import { RecipeAdd, RecipeProblem } from "./recipe-add";
 import { TaskSetup } from "./task-setup";
+import { useMethodRows } from "../methods/methods";
 
 /**
  * The Geoscience part of the workflow panel (gaid-workflow-catalog): the
@@ -88,6 +89,8 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
   const [selected, setSelected] = useState<Selection | null>(null);
   const [problem, setProblem] = useState<GeoSavedRecipe | null>(null);
   const [opened, setOpened] = useState<{ revision: number; setup: NonNullable<GeoRecipeCheckResponse["setup"]> } | null>(null);
+  // Workflows and 레시피 installed from skill_hub method packages (gaid-hub-integration).
+  const methods = useMethodRows(projectId, availableFiles);
 
   const load = useCallback(async () => {
     const [workflows, recipes] = await Promise.allSettled([
@@ -111,9 +114,10 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
 
   // Geoscience first, then the user's own categories, then upstream's.
   const leadingCategories = useMemo<WorkflowPanelCategory[]>(() => [
+    methods.category,
     { id: GEO_RECIPE_CATEGORY, label: t("workspace.catalogue.category"), ...GEO_CATEGORY_TONE },
     ...saved.categories.map((category) => ({ ...category, ...USER_CATEGORY_TONE })),
-  ], [saved.categories]);
+  ], [methods.category, saved.categories]);
 
   const rows = useMemo<WorkflowPanelRow[]>(() => {
     const known = new Set([GEO_RECIPE_CATEGORY, ...WORKFLOW_CATEGORIES.map((category) => category.id), ...saved.categories.map((category) => category.id)]);
@@ -143,8 +147,8 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
         onSelect: () => (workflow ? setSelected({ workflowId: workflow.id, recipe }) : setProblem(recipe)),
       };
     });
-    return [...geo, ...recipes];
-  }, [byId, saved, workflows]);
+    return [...methods.rows, ...geo, ...recipes];
+  }, [byId, methods.rows, saved, workflows]);
 
   const removeRecipe = async (recipe: GeoSavedRecipe) => {
     setSaved(await request<GeoSavedRecipesResponse>(`/geo/recipes/${encodeURIComponent(recipe.id)}`, projectId, undefined, "DELETE"));
@@ -165,6 +169,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     notice: <>
       {status && <p role="status" className="text-xs text-muted-foreground break-words">{status}</p>}
       {error && data && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
+      {methods.notice}
     </>,
   };
 
@@ -197,6 +202,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       initialSetup={recipe.check.setup}
       recipe={{ title: recipe.title, onDelete: async () => { await removeRecipe(recipe); setSelected(null); } }}
     />}
+    {methods.dialogs}
     {problem && <RecipeProblem recipe={problem} onClose={() => setProblem(null)} onDelete={async () => { await removeRecipe(problem); setProblem(null); }} />}
   </div>;
 }
