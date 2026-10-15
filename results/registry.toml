@@ -5,9 +5,9 @@ id = "gaid-researcher-ecosystem-proposal-20261015"
 title = "연구방법의 제작·실행·공유를 잇는 GAID 개편안"
 state = "review"
 run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-improve/design"
-source_sha = "55b7134b159c6e7e85a49450e05211ac4ad2d5e8"
-inputs = ["geoaidesk:81b620bb827788bbf51e3a1bbdde3eda83a4b24f", "skill_hub:957d3662e3a0b31932389c4c75794f6cdf7e5eea", "user:2026-10-15-researcher-ecosystem", "user:2026-10-15-source-first-correction", "doi:10.1007/s11053-026-10778-w"]
-files = [{ path = "researcher-ecosystem-proposal.md", sha256 = "e7da3b453fd662e0457ce768f4180d6206ccff8561f5d020568fe8bf673f8abb" }]
+source_sha = "4ec056d23089b4d950adff65e38ba40532791190"
+inputs = ["geoaidesk:81b620bb827788bbf51e3a1bbdde3eda83a4b24f", "skill_hub:957d3662e3a0b31932389c4c75794f6cdf7e5eea", "user:2026-10-15-researcher-ecosystem", "user:2026-10-15-source-first-correction", "doi:10.1007/s11053-026-10778-w", "user:2026-10-15-coauthoring-agents"]
+files = [{ path = "researcher-ecosystem-proposal.md", sha256 = "399647aa605110718c0367ec407c342613549965104a830a5913956202c0ba4b" }]
 report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
 replicas = []
 

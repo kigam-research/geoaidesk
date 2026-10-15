@@ -8,7 +8,9 @@ Assume no Spatial-PU skill exists. The researcher provides a PDF or paper URL an
 
 Pilot paper: DOI `10.1007/s11053-026-10778-w`. Discovered author R3 material is not a verified publisher PDF. Local source files are not silently preloaded user uploads. A live pilot must record the actual supplied source set before extracting content.
 
-NotebookLM informs source handling and source-grounded artifact creation; it is not an execution dependency or a claim of equivalent functionality. Public-source research is running under job `job-geoaidesk-gaid-improve-2`.
+NotebookLM informs source handling and source-grounded artifact creation only. Its UI, layout and visual design are not adopted. It is not an execution dependency or a claim of equivalent functionality. Direct official help confirms source selection, source-guide summaries, citation navigation and artifact creation; Oracle follow-up job 2 failed before prompt on argument order, and corrected job 3 is recorded for supplementary research.
+
+The user also requires the actual Codex/Claude skill-creator procedures and an explicit agent/application reliability design using the existing Codex, Claude, MiniMax and institutional Qwen 3.8 Flash Next connections. `docs/design/source-authoring-agents.md` defines the proposed lead/optional-assistant roles, durable question/decision records, validated model proposals, package/trial loop and model capability boundary. No GAID model authoring calls or provider configuration changes were performed.
 
 ## Existing mechanisms that constrain the design
 
@@ -77,7 +79,7 @@ Required states across the visual set:
 - Grounded analysis and focused questions: selected PDF page beside a source-linked finding; relevant figure only as a page-linked extracted derivative after analysis.
 - Generated skill/workflow and GAID handoff: readable method draft, actual output types, private trial action and untested state, optional sharing later.
 
-Template references retained: 21st AI CRM detail sheet, shadcnblocks `application-shell17` navigation, Design Process Case Study reading sequence and shadcn Resizable/Sheet. UUPM's contextual input validation and readable hierarchy remain useful. Taste does not govern a multi-step editor. Impeccable Operate/Read principles govern these surfaces. Public NotebookLM source research will refine the flow before the next renders.
+Template references retained: 21st AI CRM detail sheet, shadcnblocks `application-shell17` navigation, Design Process Case Study reading sequence and shadcn Resizable/Sheet. UUPM's contextual input validation and readable hierarchy remain useful. Taste does not govern a multi-step editor. Impeccable Operate/Read principles govern these surfaces. NotebookLM source research refines processing behavior only, never these visual references. The agent/question reliability design must be visible in the next renders as contextual missing decisions, preserved answers and separate generated/tested states; do not expose internal agents, schemas or hashes as the researcher's main workflow.
 
 ## History, output handling and next integration
 

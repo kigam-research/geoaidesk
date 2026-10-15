@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T07:21:10Z
+updated: 2026-10-15T07:32:20Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -82,7 +82,17 @@ User feedback (verbatim):
 
 Treat the Spatial-PU skill as a withheld evaluation reference, not generator input or prior researcher knowledge. Source-first journey: provided PDF/URL/materials → original-source viewer and recorded analysis → grounded method/figure findings → consequential questions → compatible skill/recipe draft → GAID trial/revision/use and optional hub sharing. Inspect actual K-Dense skills and BYOK runtime contracts before revising designs. NotebookLM informs source-processing flow; do not claim an API integration or equal feature set.
 
+## Coauthoring agent and skill-creator scope (2026-10-15)
+
+User clarification (verbatim):
+
+> NotebookLM 시안이나 디자인을 채택하라는 것은 아니었으며, 처리흐름을 참고하라는 것임을 알아두어야 한다. 그리고 스킬 생성과 관련한 절차는 Codex나 claude에서 제공한 스킬 생성 스킬이 있는 것으로 알고 있으며, 해당 스킬과 절차들을 참고하면 어떻게 이용자에게 스킬을 생성하는 과정에서 필요한 내용을 같이 논의하여 결정할 수 있게 할지도 참고할 수 있을 것이다. 또한, 스킬 워크플로우 생성과정에서 보조할 에이전트는 어떻게 설계할 것이며, 에이전트의 확률론적 응답에 대비하여 시스템을 어떻게 설계하여 사용자에게 스킬, 워크플로우 생성을 위한 질문을 하고 자동으로 생성하게 할지에 대한 부분도 보완되어야 한다. 현재 가용한 에이전트는 사용자가 구독중인 codex, claude, minimax와 서버로 동작할 수 있는 local model인 67ip서버의 qwen 3.8 flash next모델이 있다. GAID시스템에 연동되어 있는 모델들이다.
+
+NotebookLM is processing-flow reference only, never UI/layout/visual authority. Inspect the actual Codex and Claude skill-creator procedures. Design researcher coauthoring questions, lead/assistant roles and deterministic application state around probabilistic model proposals using the existing connected routes. This is design, not authorization to run paid authoring benchmarks or change providers.
+
 ## Current state
+- Corrected source-first public research job 3 launched: `/home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/receipt.json`, `oracle-web --effort xhigh --followup gaid-skill-hub-task-https`. Await relay, no periodic polling. Direct official NotebookLM help was also opened for source-processing facts, without adopting its design.
+- Actual Codex and Anthropic skill-creator procedures and GAID model/question interfaces audited. Parent integrated a small lead-plus-optional-assistants architecture, durable decisions, typed proposals, bounded repair and real package/trial states in `docs/design/source-authoring-agents.md` and the canonical report. Readers finished; no GAID model authoring calls or scientific tests performed.
 - Source-first public research job 2 failed (exit 1): receipt `/home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json`. Log: queued, then `error: unknown option '--effort'`; `out/` empty. Wrapper parsing stops at the first non-wrapper option, so `--effort` after `--followup` reached Oracle unchanged and failed argument parsing before a research prompt. No research result to recover. Retry with wrapper option first (`oracle-web --effort xhigh --followup ...`); do not change shared tooling or resume this terminal failed job.
 - User correction supersedes the initial figure-first A/B/C compositions. All five imagegen calls (three initial, two bounded edits) completed; no generation is running and none is approved. Originals/prompts stay external at `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`; do not publish these as the current review choice or repeat their generation.
 - Current work: source-first authoring design with the existing PU skill withheld. All three read-only correction audits completed; parent integrates compatible output contracts and revised researcher screens. Original pilot material discovery is complete; no new paper-selection question or scientific re-execution is needed.
@@ -103,8 +113,8 @@ Treat the Spatial-PU skill as a withheld evaluation reference, not generator inp
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-1. Local source-first audits are complete. Retry the public-source follow-up with the verified corrected argument order, then integrate its result with exact pinned-code evidence. Keep the existing PU skill out of authoring inputs.
-2. Source states, generated-artifact/runtime contracts and private-trial handoff are now documented in the canonical report (§§3.8–3.11) and surface brief. Incorporate verified public findings into those documents; initial A/B/C remain superseded, not choices awaiting approval.
+1. Integrate the recorded corrected public-source job 3 when it completes. Direct official-source processing facts and the Codex/Claude creator/runtime audits are available now. Keep NotebookLM visual design and the existing PU skill out of authoring inputs.
+2. Source states, creator procedures, agent roles, durable questions, model proposal checks and private-trial handoff are documented in the canonical report (§§3.8–3.14), surface brief and `docs/design/source-authoring-agents.md`. Incorporate only additional verified findings from job 3; initial A/B/C remain superseded, not choices awaiting approval.
 3. Create source-first images grounded in the settled contracts, then obtain the user's composition choice before functional code, consistent with the user's image-first sequence. No full retraining is authorized by this design step.
 4. Once implementation scope/interfaces are settled, use isolated CLI child writer units for independent packages, route skill_hub implementation to its hub, and run `scripts/check` for code changes. Do not close this standing discussion unit with `task finish` yet.
 ## Failed approaches
@@ -134,6 +144,9 @@ Treat the Spatial-PU skill as a withheld evaluation reference, not generator inp
 - Research launch precondition: `task job run` refused dirty source before creating a job; checkpoint reviewed documents, then create the first source-first research job. This was not a job stopped before start (no receipt); do not use a fabricated resume receipt. Accidental `oracle-web --help` queued behind another unit's request and was terminated without a prompt; no shared browser/research process was changed.
 - Source-first report/brief consistency check by `/root/workflow_audit`: no material current-capability or compatibility contradiction. No code/tests or scientific jobs run. Humanizer file-mode applied to new Korean report prose (§1/K1/K3); numeric tokens and link targets unchanged. Registry remains `review`, not adopted. Original author manuscript page 1 was rendered read-only with Poppler (36-page R3 PDF) for a future original-document-viewer reference; no automatic application extraction was claimed.
 - Updated source-first review copy: `/home/seongin3/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-15-gaid-researcher-ecosystem/index.md`; one file copied. CLI again reports desktop-app sync ownership and inactive `obsidian-sync-cmds-main.service`; other-device delivery unverified. Only recorded public research job 2 remains to await; no periodic checks.
+- Coauthoring phase orchestration: `/root/workflow_audit` read Codex creator and durable-question gaps; `/root/skillhub_audit` verified Anthropic creator against official pinned revision `dbd4588f9e1033efb41dad4bef2f7947c8993d44`; `/root/baseline_reader` read exact GAID model/subagent interfaces and source PDF anchors. All read-only and completed. Parent owns shared proposal/question model, report and subsequent image flow. Integration order: source/decision records → proposal validation → question UI → private package/trial adapter → source-first visuals and later implementation packages. No child writers for this tightly coupled design phase.
+- Agent-design check by `/root/workflow_audit`: no concrete capability/compatibility blocker. Parent verified institutional route and existing one-shot receipt/validation precedent; no live credential/model query. Codex creator local SHA `6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66`. Humanizer file-mode applied to new Korean prose; numeric tokens and link targets preserved. Report remains a proposal, no new runtime implementation or model trials.
+- Coauthoring report review copy refreshed at the same canonical vault path; one file copied. Desktop sync service remains inactive (desktop app owns sync). Source/report registry hash and vault body verified; review-copy adds its own metadata/notice. New design is saved as review only. Only supplementary public job 3 is running; next work is to integrate its evidence and render the corrected source-first flow, including contextual questions and distinct draft/trial states.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -149,6 +162,7 @@ The initial orientation needed no report; the later ecosystem-design request sup
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T062040.069187Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
