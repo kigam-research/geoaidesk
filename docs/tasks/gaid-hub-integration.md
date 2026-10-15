@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:13:14Z
+updated: 2026-10-15T14:17:50Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -54,11 +54,36 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   reports/<date>-<topic>/. After the last check remove build caches and app-written files/links from the worktree.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-15: contract draft v0 (GAID consumer requirements) sent to the skill_hub hub, request da92dc0fec04; text in
+  ~/data/geoaidesk/work/gaid-hub-integration/to-skill_hub-contract-v0.md. skill_hub unit: gaid-hub-authoring (just started).
+- No code yet.
 ## Next steps
-1. (the next session's first action)
+1. Build P1 (LocalMethod server) against contract v0; adjust when the hub answers.
+2. Start child P2 (handoff) — see Orchestration.
+3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
+4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
 ## Failed approaches
 ## Notes and decisions
+### Orchestration (2026-10-15)
+Sequential decisions: (1) package/registration contract with skill_hub (GAID proposal v0 = skill folder + optional
+`gaid-method.json` `gaid-method/v1` launch contract, geo-workflow/v1-shaped workflows with `local:<slug>` skill ids and
+catalogue environment ids, hub-recorded lifecycle never self-asserted; descriptor URL `gaid-hub-package/v1` with sha256;
+http only for loopback hubs); (2) exposure mode for local-method chats (`method:` mode, so a trial chat sees only the
+method's skills and not the withheld catalogue PU skill) — touches server/src/geo/context.ts, owned by the trial unit
+until it merges.
+Packages:
+- P1 LocalMethod server (parent): server/src/geo/methods/*, server/src/geo/routes/methods.ts, server/src/geo/skill-hub.ts
+  (descriptor fetch), web/src/geo/contracts/methods.ts, server/test/geo-methods*.test.ts.
+- P2 GAID→hub analysis handoff (child `handoff`, Codex general work): server/src/geo/hub-handoff/*,
+  server/src/geo/routes/hub-handoff.ts, web/src/geo/hub-handoff/*, web/src/geo/workspace/chat-actions.tsx (replace
+  "재사용 스킬 만들기" with "방금 한 분석을 skill_hub 초안으로 보내기"), locales namespace `hubHandoff`, its tests.
+- P3 LocalMethod UI (parent, after trial merge): web/src/geo/methods/*, wiring into task-catalogue.tsx/TaskSetup, locales
+  namespace `methods`.
+- P4 end-to-end acceptance (parent; researcher agent + visual reviews like the trial unit).
+Shared one-line seams: server/src/geo/routes.ts (each package adds its register call), web/src/geo/locales/index.ts.
+Integration order: P1 → P2 complete → sync trial merge → P3 → P4.
+Avoid until the trial merges: task-catalogue.tsx, workflows-panel.tsx, context.ts, instructions.ts, skills-panel.tsx,
+locales app/workspace/workflows/settings/work.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
