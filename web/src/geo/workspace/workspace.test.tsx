@@ -127,6 +127,8 @@ describe("task catalogue and setup", () => {
     // Built-in workflows of other fields stay folded until asked for.
     fireEvent.click(screen.getByRole("button", { name: /^다른 분야 Workflow 보기/ }));
     expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toContainEqual(expect.stringMatching(/^논문·원고/));
+    fireEvent.click(screen.getByRole("button", { name: "다른 분야 Workflow 접기" }));
+    expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).not.toContainEqual(expect.stringMatching(/^논문·원고/));
     fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "las" } });
     expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^논문 검토/ })).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "review a paper" } });

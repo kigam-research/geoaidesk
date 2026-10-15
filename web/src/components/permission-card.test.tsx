@@ -59,6 +59,15 @@ describe("PermissionCard", () => {
     } finally { localStorage.removeItem("gaid:locale"); }
   });
 
+  it("does not call a shell-variable target outside the project", () => {
+    localStorage.setItem("gaid:locale", "ko");
+    try {
+      render(<PermissionCard item={item({ args: { kind: "outside-project", path: "$A/geo/x.json", command: "cp a $A/geo/x.json" } })} sessionId="s1" projectId="p" />);
+      expect(screen.getByText("AI agent가 위치를 확인할 수 없는 파일을 변경하려고 합니다")).toBeInTheDocument();
+      expect(screen.getByText("변경 대상: $A/geo/x.json (셸 변수라 앱이 위치를 확인하지 못했습니다)")).toBeInTheDocument();
+    } finally { localStorage.removeItem("gaid:locale"); }
+  });
+
   it("shows the outcome once resolved and hides the buttons", () => {
     render(
       <PermissionCard

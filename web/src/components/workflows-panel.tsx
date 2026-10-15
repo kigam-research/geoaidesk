@@ -283,7 +283,7 @@ export type WorkflowPanelExtension = {
    * Fold the built-in workflow list behind one button until the user opens it or searches
    * (GeoAIDesk keeps its own rows first; gaid-qwen-authoring-trial). Extension rows always show.
    */
-  collapseUpstream?: { showLabel: (count: number) => string };
+  collapseUpstream?: { showLabel: (count: number) => string; hideLabel: string };
 };
 
 const CATEGORY_BG: Record<string, string> = {
@@ -706,13 +706,14 @@ export function WorkflowsPanel({
               </section>
             );
           })}
-          {upstreamFolded && extension?.collapseUpstream && (
+          {extension?.collapseUpstream && !search.trim() && (
             <button
               type="button"
-              onClick={() => setUpstreamOpen(true)}
+              onClick={() => setUpstreamOpen(!upstreamOpen)}
+              aria-expanded={upstreamOpen}
               className="w-full rounded-xl border border-dashed px-3.5 py-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted/50"
             >
-              {extension.collapseUpstream.showLabel(ALL_WORKFLOWS.length)}
+              {upstreamOpen ? extension.collapseUpstream.hideLabel : extension.collapseUpstream.showLabel(ALL_WORKFLOWS.length)}
             </button>
           )}
         </div>

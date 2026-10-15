@@ -737,5 +737,8 @@
   "modal_job_detail.byte_value": "byte {count}",
   "permission_card.outside_project_pending": "The AI agent wants to change files outside the project",
   "permission_card.outside_project": "File change outside the project",
-  "permission_card.outside_project_target": "Target: {path}"
+  "permission_card.outside_project_target": "Target: {path}",
+  "permission_card.unresolved_target_pending": "The AI agent wants to change files at a location the app cannot resolve",
+  "permission_card.unresolved_target": "File change at an unresolved location",
+  "permission_card.unresolved_target_path": "Target: {path} (a shell variable the app could not resolve)"
 }

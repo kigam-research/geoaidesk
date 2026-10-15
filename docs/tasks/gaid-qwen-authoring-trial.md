@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:58:07Z
+updated: 2026-10-15T15:47:53Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -95,19 +95,15 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-Blocked: modal-off (c9784d59) is in `task finish` (full check with VITEST_MAX_WORKERS=1). outside-writes finished 2026-10-15; its `task complete` waits until modal-off is ready so the parent branch does not move during modal-off's merge. Order: save parent → complete modal-off → complete outside-writes → full check → after-trial.
-- Authoring home answered 가 (2026-10-15): author in skill_hub, GAID installs/runs/tests. User: "추가 피드백으로 skill허브는
-  이제 GAID시스템의 허브인개념이다. 두 시스템은 연동되어 있으며 이미 수정연계방안이 설계되어 있었을것이다." The design exists
-  (gaid-improve report §3.9–3.10/§3.14, docs/design/source-authoring-agents.md, spatial-pu-pilot.md LocalMethod). The
-  authoring service, LocalMethod install home and "skill_hub 초안으로 보내기" are steps 2–3 of that design → sent to the
-  geoaidesk hub as a new goal (request bd45c51400e1, prompt kept in `<work>/reviews/next-goal.md`), with the skill_hub
-  contract changes (terminology 워크플로/레시피/위임 스크립트; LocalMethod package contract; atlas validation). This unit
-  does NOT build them; it finishes trial fixes, children, after-trial, after-reviews and the report.
-- Observed 2026-10-15 14:11Z: both child writers report Codex service_tier `priority` (Fast) although the user opted out of
-  fast; created by `task start` with the default profile; not changed mid-run (profiles are not edited by writers).
-- Optional after modal-off merges: `project_settings.budget_summary` (settings ko/en) still says Modal costs count toward
-  the cap (true for retained historical ledger rows); a neutral historical-cost sentence would avoid naming Modal.
-- Hold parent saves while a child is in `task finish` (modal-off asked: boundary-ledger append conflicts).
+Blocked: R2 re-test by the Paseo researcher agent 77493076 on gaid-qat-app3 (a background wait reports researcher/r2/summary.md).
+1. R2 re-test running (2026-10-16 ~00:00 KST): instance 3 `gaid-qat-app3` (ports 3312/18312, `GAID_HOME=<work>/home3`,
+   snapshot `<work>/app3` of 13618c1 = all fixes + both children; log `<work>/logs/app3.log`); researcher 77493076
+   follows `<work>/researcher/BRIEF-R2.md` → `<work>/researcher/r2/`; a background wait reports its summary. Then gate
+   its artifacts (GQAT_API=http://127.0.0.1:18312 GQAT_HOME=<work>/home3), start the "after" visual reviews (same two
+   profiles, R2 screenshots), write the report, run `VITEST_MAX_WORKERS=1 task finish`.
+2. Children done: modal-off (completed, cleanup closed after removing caches) and outside-writes (merged with a seam
+   append conflict resolved in 13618c1; completed and closed). Evidence in their task documents (merged here).
+
 - R1 re-test running (2026-10-15 ~22:45 KST): instance 2 `gaid-qat-app2` (ports 3311/18311, `GAID_HOME=<work>/home2`,
   snapshot `<work>/app2` of 7e77779, log `<work>/logs/app2.log`), kigam-qwen registered the same way; old instance
   `gaid-qat-app` stopped (data kept in `<work>/home`). Researcher 77493076 follows `<work>/researcher/BRIEF-R1.md`
@@ -178,6 +174,20 @@ Blocked: modal-off (c9784d59) is in `task finish` (full check with VITEST_MAX_WO
   unchanged. Affected UI tests updated (178/178 in src/geo + panels); copy check 0 errors. `geo/copy/terminology.csv`
   stays a byte copy: skill_hub owns the change (hub already told, requests bd45c51400e1 / 78fce59a1e63 superseded by
   the hub's correction).
+
+## R2 re-test (all fixes, 13618c1, instance 3; `<work>/researcher/r2/`)
+- Researcher (00:01–00:45 KST): no Modal/compute surfaces anywhere (workspace tabs/chips, Settings → Services); start
+  prompt ≈24.9k (≈27.5k before). Skills badges 카탈로그/기본 제공/직접 작성 distinct; Settings narrow layout usable (tab
+  row) except the Skills header paragraph; resize returns to 1040 px. Workflow list first view: 7 geo cards, only
+  미시험/환경 준비 필요 badges, one pill, "다른 분야 Workflow 보기 (326개)". Chat-made skill `las-window-qc` (Korean
+  SKILL.md, ran vs untested sections) loaded first in a fresh chat with the default scope (1/1). Workflow request (24 min):
+  3 outside-project cards (2 denied: /tmp copies of the app; 1 allowed: project scratch); no app/assets change; files in
+  `workflows/district-lithology-map/` incl. an `add_to_app.py` installer the researcher cannot run; Workflow list
+  unchanged → the "own Workflow in the list" goal is not met (LocalMethod is the next unit's scope).
+- Fixed after R2 (small): card says "위치를 확인할 수 없는 파일 변경" for shell-variable targets ($A); SettingsHeader stacks
+  actions under the text on phones; "다른 분야 Workflow 접기" button. Remaining, listed only: Workflow list covers the
+  composer (upstream panel swap), "미시험" on every card (kept by copy rule), narrow permission card visibility
+  (app-wide layout), Kady/K-Dense strings on Services, Hanzi/English mixed into Qwen's Korean answers.
 
 ## R1 re-test (after F1–F5/F9; instance 2, 7e77779; `<work>/researcher/r1/`, `<work>/evidence/r1`)
 - F1 confirmed: fresh chat with the default catalogue scope loaded the chat-made skill `las-quicklook-qc` first (1/1;

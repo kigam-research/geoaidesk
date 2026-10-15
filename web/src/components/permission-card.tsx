@@ -66,6 +66,8 @@ export const PermissionCard = memo(function PermissionCard({
   const [busy, setBusy] = useState<"allow" | "deny" | null>(null);
   const pending = item.status === "running";
   const outside = payload.kind === "outside-project";
+  // A shell variable ($A, ${OUT}) is not resolved by the guard: say the location is unknown rather than "outside".
+  const unresolved = outside && /\$/.test(payload.path ?? "");
   const outcome = payload.outcome ?? (item.status === "error" ? "denied" : undefined);
 
   const answer = async (allow: boolean) => {
@@ -107,7 +109,9 @@ export const PermissionCard = memo(function PermissionCard({
       <header className="mb-1 flex items-center gap-2 text-xs font-medium">
         <ShieldAlertIcon className="size-3.5 shrink-0" />
         <span>{outside
-          ? workText(pending ? "permission_card.outside_project_pending" : "permission_card.outside_project")
+          ? workText(unresolved
+            ? (pending ? "permission_card.unresolved_target_pending" : "permission_card.unresolved_target")
+            : (pending ? "permission_card.outside_project_pending" : "permission_card.outside_project"))
           : workText(pending ? "permission_card.kady_wants_to_run_a_destructive_command" : "permission_card.destructive_command")}</span>
         {outcome && (
           <span className="ml-auto rounded bg-background/60 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -121,7 +125,7 @@ export const PermissionCard = memo(function PermissionCard({
       )}
       {outside && payload.path && (
         <p className="mb-1 break-all text-xs text-muted-foreground">
-          {workText("permission_card.outside_project_target", { path: payload.path })}
+          {workText(unresolved ? "permission_card.unresolved_target_path" : "permission_card.outside_project_target", { path: payload.path })}
         </p>
       )}
       {payload.command && (

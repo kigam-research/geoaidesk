@@ -20,7 +20,8 @@
     "empty": "등록된 Geo 작업이 없습니다.",
     "category": "지구과학",
     "search": "Workflow 검색",
-    "showOther": "다른 분야 Workflow 보기 ({count}개)"
+    "showOther": "다른 분야 Workflow 보기 ({count}개)",
+    "hideOther": "다른 분야 Workflow 접기"
   },
   "readiness": {
     "ready": "준비됨",

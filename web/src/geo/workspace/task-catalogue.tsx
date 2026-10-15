@@ -160,7 +160,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     leadingCategories,
     rows,
     searchPlaceholder: t("workspace.catalogue.search"),
-    collapseUpstream: ready ? { showLabel: (count) => t("workspace.catalogue.showOther", { count }) } : undefined,
+    collapseUpstream: ready ? { showLabel: (count) => t("workspace.catalogue.showOther", { count }), hideLabel: t("workspace.catalogue.hideOther") } : undefined,
     headerAction: ready ? <RecipeAdd projectId={projectId} workflows={workflows} categories={saved.categories} onSaved={setSaved}
       onOpen={(setup) => { setOpened((previous) => ({ revision: (previous?.revision ?? 0) + 1, setup })); setSelected({ workflowId: setup.workflowId }); }} /> : null,
     notice: <>
