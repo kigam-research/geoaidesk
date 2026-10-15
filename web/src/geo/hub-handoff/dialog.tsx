@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/projects";
 import { t } from "@/geo/i18n";
-import { authoringUrl, checked, downloadHandoff, previewHandoff, saveDownload, type HandoffPreview, type HubSite } from "./client";
+import { authoringUrl, canSendDirect, checked, directHandoff, downloadHandoff, previewHandoff, saveDownload, type HandoffPreview, type HubSite } from "./client";
 
 export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { projectId: string; sessionId: string; isStreaming: boolean; onClose: () => void }) {
   const [preview, setPreview] = useState<HandoffPreview | null>(null);
@@ -15,6 +15,8 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const [transferPath, setTransferPath] = useState<"download" | "direct" | "download-fallback" | null>(null);
+  const [draftUrl, setDraftUrl] = useState("");
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const live = useRef(false);
@@ -37,13 +39,28 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
     return () => { active = false; };
   }, [projectId, sessionId, attempt]);
   const size = preview?.files.filter(f => selected.includes(f.path)).reduce((sum, f) => sum + f.size, 0) ?? 0;
-  const download = async () => {
+  const clearTransfer = () => { setDownloaded(false); setTransferPath(null); setDraftUrl(""); };
+  const download = async (direct = false) => {
     if (busy || loading || isStreaming || !preview) return;
-    setBusy(true); setError(""); setDownloaded(false);
+    setBusy(true); setError(""); setDownloaded(false); setTransferPath(null); setDraftUrl("");
     try {
+      if (direct && site && canSendDirect(site)) {
+        try {
+          const result = await directHandoff(projectId, sessionId, selected, note, site.id);
+          if (!live.current) return;
+          if (result.path === "direct") {
+            setDraftUrl(result.url); setTransferPath("direct"); window.open(result.url, "_blank", "noopener,noreferrer");
+          } else { saveDownload(result.blob, result.filename); setDownloaded(true); setTransferPath("download-fallback"); }
+          return;
+        } catch {
+          // A transport error can occur before the server's gzip fallback arrives.
+          if (!live.current) return;
+        }
+      }
       const result = await downloadHandoff(projectId, sessionId, selected, note);
       if (!live.current) return;
       saveDownload(result.blob, result.filename); setDownloaded(true);
+      setTransferPath(direct ? "download-fallback" : "download");
     } catch (err) { if (live.current) setError(err instanceof Error ? err.message : t("hubHandoff.errors.request")); }
     finally { if (live.current) { setBusy(false); } }
   };
@@ -65,7 +82,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
           {!preview.files.length && <p>{t("hubHandoff.emptyFiles")}</p>}
           <div className="max-h-52 space-y-2 overflow-y-auto">
             {preview.files.map(file => <label key={file.path} className="flex min-w-0 items-start gap-2">
-              <input type="checkbox" className="mt-1" checked={selected.includes(file.path)} onChange={e => { setSelected(old => e.target.checked ? [...old, file.path] : old.filter(p => p !== file.path)); setDownloaded(false); }} />
+              <input type="checkbox" className="mt-1" checked={selected.includes(file.path)} onChange={e => { setSelected(old => e.target.checked ? [...old, file.path] : old.filter(p => p !== file.path)); clearTransfer(); }} />
               <span className="min-w-0 [overflow-wrap:anywhere]">{file.path}<span className="block text-xs text-muted-foreground">{t(`hubHandoff.role.${file.role}`)} · {file.size.toLocaleString()} B</span></span>
             </label>)}
           </div>
@@ -73,18 +90,22 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
         {!!excluded && <p>{t("hubHandoff.excluded", { count: excluded })}</p>}
         <p>{t("hubHandoff.selection", { count: selected.length, size: (size / 1024 / 1024).toFixed(2) })}</p>
         <p className="text-xs text-muted-foreground">{t("hubHandoff.sizeHelp")}</p>
-        <label className="block space-y-1"><span>{t("hubHandoff.note")}</span><textarea className="w-full rounded-md border bg-background p-2" rows={3} maxLength={4000} disabled={busy || isStreaming} value={note} onChange={e => { setNote(e.target.value); setDownloaded(false); }} /></label>
-        {sites.length > 1 && <label className="block space-y-1"><span>{t("hubHandoff.site")}</span><select className="w-full rounded-md border bg-background p-2" value={siteId} onChange={e => setSiteId(e.target.value)}>{sites.map(s => <option key={s.id} value={s.id}>{s.id}</option>)}</select></label>}
+        <label className="block space-y-1"><span>{t("hubHandoff.note")}</span><textarea className="w-full rounded-md border bg-background p-2" rows={3} maxLength={4000} disabled={busy || isStreaming} value={note} onChange={e => { setNote(e.target.value); clearTransfer(); }} /></label>
+        {sites.length > 1 && <label className="block space-y-1"><span>{t("hubHandoff.site")}</span><select className="w-full rounded-md border bg-background p-2" disabled={busy || isStreaming} value={siteId} onChange={e => { setSiteId(e.target.value); clearTransfer(); }}>{sites.map(s => <option key={s.id} value={s.id}>{s.id}</option>)}</select></label>}
         {site ? <p className="text-xs [overflow-wrap:anywhere]">{t("hubHandoff.site")}: {authoringUrl(site)}</p> : <p>{t("hubHandoff.noSite")}</p>}
+        {site && canSendDirect(site) && <p className="text-xs">{t("hubHandoff.directHelp")}</p>}
       </div>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       {!loading && !preview && <Button variant="outline" onClick={() => setAttempt(n => n + 1)}>{t("hubHandoff.retry")}</Button>}
+      {transferPath && <p role="status" className="text-sm">{t(`hubHandoff.path.${transferPath}`)}</p>}
+      {draftUrl && <a href={draftUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">{t("hubHandoff.openDraft")}</a>}
       {downloaded && site && <div className="space-y-1 text-sm" role="status">
         <p>{t("hubHandoff.attach")}</p>
         <a href={authoringUrl(site)} target="_blank" rel="noopener noreferrer" className="text-primary underline">{t("hubHandoff.startDraft")}</a>
       </div>}
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="outline" disabled={busy} onClick={onClose}>{t("hubHandoff.close")}</Button>
+        {site && canSendDirect(site) && <Button variant="outline" disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download(true)}>{t("hubHandoff.sendDirect")}</Button>}
         <Button disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download()}>{t(busy ? "hubHandoff.downloading" : "hubHandoff.download")}</Button>
       </div>
     </DialogContent>

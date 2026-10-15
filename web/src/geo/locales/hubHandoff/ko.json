@@ -25,6 +25,14 @@
   "startDraft": "skill_hub에서 초안 시작하기",
   "close": "닫기",
   "retry": "분석 다시 읽기",
+  "sendDirect": "로컬 skill_hub에 초안 전달",
+  "openDraft": "전달한 skill_hub 초안 열기",
+  "directHelp": "설정된 로컬 skill_hub에 선택한 묶음을 직접 전달할 수도 있습니다. 직접 전달을 확인하지 못하면 묶음을 다운로드합니다.",
+  "path": {
+    "download": "분석 묶음 다운로드를 요청했습니다.",
+    "direct": "로컬 skill_hub에 직접 전달했습니다. 새 탭이 열리지 않으면 초안 링크를 누르세요.",
+    "download-fallback": "직접 전달 결과를 확인하지 못해 다운로드 경로로 전환했습니다. skill_hub에 초안이 이미 생겼는지 확인한 뒤 묶음을 첨부하세요."
+  },
   "errors": {
     "input": "파일 선택과 메모를 확인한 뒤 다시 다운로드하세요.",
     "session": "대화 기록을 찾지 못했습니다. 대화를 다시 연 뒤 시도하세요.",

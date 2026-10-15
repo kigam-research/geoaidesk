@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:27:49Z
+updated: 2026-10-15T14:32:39Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -73,11 +73,62 @@ just done to the hub as authoring material for a new draft.
   test results. Then `task finish`.
 
 ## Current state
-- Builder/routes and preview/download dialog implemented; targeted tests written, not yet run. Dependency installation job exited 0 (receipt under Running jobs).
+P2 implemented: the composer now offers only analysis handoff, not skill-template creation. Routes: POST /geo/hub/handoff/preview, POST /geo/hub/handoff (gzip download), POST /geo/hub/handoff/send (optional configured loopback authoring only, explicit user action; 201 JSON or gzip download fallback).
+Bundle schema: gaid-analysis-handoff/v1, handoff.json + files/<sandbox-relative path>. Request/final answer/model use the shared session history reader's readEntries/textOf; candidates use readSteps. Current bytes are rehashed. Limits: 200 files, 5 MiB/file, 20 MiB including tar metadata, 16,000 chars/text, 4,000 chars/note, 32 MiB/source log; truncation/exclusion counts are visible. user_data is opt-in; unsafe/dot/secret paths and links are refused.
+Required hub URL: site base + #/author/new?from=gaid (one authoringPath constant). Direct send normalizes authoring's trailing slash, refuses redirects, times out at 30 s, bounds the reply and checks its returned draft URL. No real trial URL is hardcoded. Failed/uncertain direct delivery does not retry the upload; UI shows download fallback and asks to check for an existing draft.
+Targeted evidence: server 12 tests passed; web handoff 11 + workspace 24 tests passed; both TypeScript checks passed. Locale validation: all namespaces 0 errors/56 existing warnings; hubHandoff alone 0 errors/0 warnings. Final rerun/CLI finish checks pending after the last small regular-file/truncation/copy edits. Full browser/live-hub acceptance remains the parent's P4; not claimed here. Settings skills unchanged. Old workspace.skill strings intentionally retained (trial-owned namespace).
+
+### String ids (new unless noted; Korean / English)
+The old composer action workspace.skill.open remains in the catalogue but is no longer rendered here: 재사용 스킬 만들기 / Create a reusable skill → hubHandoff.open below. Every other id below is new (before: absent in both locales). No other namespace copy changed.
+
+| String id | Korean after | English after |
+|---|---|---|
+| `hubHandoff.open` | 방금 한 분석을 skill_hub 초안으로 보내기 | Send the analysis just done to a skill_hub draft |
+| `hubHandoff.title` | skill_hub 초안에 보낼 분석 | Analysis for a skill_hub draft |
+| `hubHandoff.description` | 요청과 마지막 답변, 선택한 파일을 다운로드합니다. skill_hub에서 스킬 또는 Workflow 초안을 작성할 자료로 사용합니다. | Download the request, final answer and selected files as material for a skill or Workflow draft in skill_hub. |
+| `hubHandoff.rawData` | user_data/ 원본 자료는 직접 선택한 파일만 포함합니다. 요청과 답변에 적힌 내용은 함께 포함되므로 다운로드 전에 확인하세요. | Raw data under user_data/ is included only when you select it. Content written in the request and answer is included, so review it before downloading. |
+| `hubHandoff.loading` | 보낼 분석과 파일 목록을 읽는 중입니다. | Reading the analysis and file list. |
+| `hubHandoff.request` | 사용자의 첫 요청 | User's first request |
+| `hubHandoff.finalAnswer` | 마지막 답변 | Final answer |
+| `hubHandoff.model` | 사용 모델: {model} | Model used: {model} |
+| `hubHandoff.unknownModel` | 기록 없음 | Not recorded |
+| `hubHandoff.emptyText` | 기록된 텍스트가 없습니다. | No text was recorded. |
+| `hubHandoff.truncated` | 긴 텍스트 또는 파일별 실행 기록 목록을 잘랐습니다. 묶음에도 같은 한계를 표시합니다. | Long text or per-file step lists were truncated. The bundle records the same limits. |
+| `hubHandoff.files` | 포함할 파일 | Files to include |
+| `hubHandoff.role.code` | 코드 | Code |
+| `hubHandoff.role.result` | 결과 파일 | Output file |
+| `hubHandoff.role.user-data` | 사용자 원본 자료 · 직접 선택 | User raw data · select explicitly |
+| `hubHandoff.emptyFiles` | 보낼 수 있는 파일이 없습니다. 요청과 답변만 다운로드할 수 있습니다. | No files are available to send. You can download the request and answer alone. |
+| `hubHandoff.excluded` | 경로·크기 제한 또는 삭제·읽기 실패로 파일 {count}개를 목록에서 제외했습니다. | Excluded {count} files from the list due to path or size limits, deletion or read failures. |
+| `hubHandoff.selection` | 선택: {count}개 · {size} MiB | Selected: {count} files · {size} MiB |
+| `hubHandoff.sizeHelp` | 최대 200개, 파일당 5 MiB, 묶음 전체 20 MiB입니다. 다운로드할 때 파일을 다시 읽어 현재 내용을 포함합니다. | Up to 200 files, 5 MiB per file and 20 MiB for the whole bundle. Files are read again at download time to include their current contents. |
+| `hubHandoff.note` | skill_hub에 전할 메모 (선택, 최대 4,000자) | Note for skill_hub (optional, up to 4,000 characters) |
+| `hubHandoff.site` | 초안을 작성할 skill_hub | skill_hub for the draft |
+| `hubHandoff.noSite` | skill_hub 사이트가 설정되지 않았습니다. 묶음은 다운로드할 수 있습니다. | No skill_hub site is configured. You can still download the bundle. |
+| `hubHandoff.download` | 분석 묶음 다운로드 | Download analysis bundle |
+| `hubHandoff.downloading` | 분석 묶음을 만드는 중입니다. | Building the analysis bundle. |
+| `hubHandoff.attach` | skill_hub에서 초안을 열고 다운로드한 분석 묶음을 첨부하세요. GAID가 파일을 업로드하지는 않습니다. | Open a draft in skill_hub and attach the downloaded analysis bundle. GAID does not upload the files. |
+| `hubHandoff.startDraft` | skill_hub에서 초안 시작하기 | Start a draft in skill_hub |
+| `hubHandoff.close` | 닫기 | Close |
+| `hubHandoff.retry` | 분석 다시 읽기 | Read analysis again |
+| `hubHandoff.sendDirect` | 로컬 skill_hub에 초안 전달 | Send a draft to local skill_hub |
+| `hubHandoff.openDraft` | 전달한 skill_hub 초안 열기 | Open the transferred skill_hub draft |
+| `hubHandoff.directHelp` | 설정된 로컬 skill_hub에 선택한 묶음을 직접 전달할 수도 있습니다. 직접 전달을 확인하지 못하면 묶음을 다운로드합니다. | You can also send the selected bundle directly to the configured local skill_hub. If direct delivery cannot be confirmed, the bundle is downloaded. |
+| `hubHandoff.path.download` | 분석 묶음 다운로드를 요청했습니다. | Requested the analysis bundle download. |
+| `hubHandoff.path.direct` | 로컬 skill_hub에 직접 전달했습니다. 새 탭이 열리지 않으면 초안 링크를 누르세요. | Sent directly to local skill_hub. If a new tab did not open, use the draft link. |
+| `hubHandoff.path.download-fallback` | 직접 전달 결과를 확인하지 못해 다운로드 경로로 전환했습니다. skill_hub에 초안이 이미 생겼는지 확인한 뒤 묶음을 첨부하세요. | Direct delivery could not be confirmed, so the download path was used. Check whether skill_hub already created a draft before attaching the bundle. |
+| `hubHandoff.errors.input` | 파일 선택과 메모를 확인한 뒤 다시 다운로드하세요. | Check the file selection and note, then download again. |
+| `hubHandoff.errors.session` | 대화 기록을 찾지 못했습니다. 대화를 다시 연 뒤 시도하세요. | The chat record was not found. Reopen the chat and try again. |
+| `hubHandoff.errors.file` | 선택한 파일을 보낼 수 없습니다. 대화상자를 다시 열어 파일 목록을 확인하세요. | A selected file cannot be sent. Reopen the dialog to check the file list. |
+| `hubHandoff.errors.size` | 파일 또는 묶음 크기가 제한을 넘었습니다. 선택한 파일 수를 줄이세요. 대화 기록이 너무 크면 다른 대화를 선택하세요. | A file or bundle exceeds the size limit. Select fewer files. If the chat record is too large, choose another chat. |
+| `hubHandoff.errors.request` | 분석 전달 요청을 처리하지 못했습니다. 서버 연결을 확인한 뒤 다시 시도하세요. | The analysis handoff request failed. Check the server connection and try again. |
+
 ## Next steps
-1. Sync parent's agreed skill_hub contract and add opt-in loopback direct-send with download fallback.
-2. Run the declared targeted checks, record evidence/string ids, and finish for parent integration.
+1. Save and sync the parent's trailing-slash parser fix, rerun affected checks, then task finish for parent integration.
 ## Failed approaches
+- First dependency job was refused before launch because the source was dirty; saved the implementation, then launched the recorded install job once (exit 0).
+- Initial task sync had one routes.ts import/register conflict; retained both independent routes. Named-path task save refused unrelated staged merge files; reviewed and saved the complete merge through task save without paths. No history rewrite.
+- First server typecheck caught a literal-default-parameter inference (16000 instead of number); annotated the limit as number. Subsequent typecheck passed.
 ## Notes and decisions
 - 2026-10-15 terminology correction (user verbatim): "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길 원한다." New strings prefer `Workflow` even in Korean; Korean spelling, when required, is `워크플로우`. This supersedes the brief's older spelling. Other namespaces remain untouched.
 - Orchestration: this child is the single writer; no nested child units. Builder → routes → dialog → targeted tests is sequential because interfaces are tightly coupled. Own only P2 files plus append-only route/locale seams and deletion of the three old chat-action tests. Keep unused workspace.skill strings for the trial unit/parent cleanup.
@@ -90,9 +141,7 @@ just done to the hub as authoring material for a new draft.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. Parent gaid-hub-integration incorporates the P2 result/evidence and string table above into its canonical report. Full live-hub/browser and scripts/check evidence belongs to parent integration unless the child finish also runs it.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-integration--handoff-20261015T142125.650780Z/receipt.json

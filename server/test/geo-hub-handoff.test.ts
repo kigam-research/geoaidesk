@@ -3,18 +3,21 @@ import path from "node:path";
 import crypto from "node:crypto";
 import zlib from "node:zlib";
 import Fastify, { type FastifyInstance } from "fastify";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolvePaths, type ProjectPaths } from "../src/projects.ts";
 import { withActiveProject } from "../src/scope.ts";
 import { PROVENANCE_SCHEMA_VERSION, type ProvenanceStep } from "../src/provenance/store.ts";
 import { buildHandoff, HANDOFF_LIMITS, HANDOFF_SCHEMA, previewHandoff } from "../src/geo/hub-handoff/builder.ts";
 import { registerGeoHubHandoffRoutes } from "../src/geo/routes/hub-handoff.ts";
 import { readTarGz } from "../src/geo/tar.ts";
+import { directHandoffEndpoint, sendHandoff } from "../src/geo/hub-handoff/send.ts";
 
 const sessionId = "12345678-1234-1234-1234-123456789abc";
 const digest = (value: Buffer | string) => crypto.createHash("sha256").update(value).digest("hex");
 let paths: ProjectPaths;
 let app: FastifyInstance;
+let sendOptions: Parameters<typeof registerGeoHubHandoffRoutes>[1];
+const localSite = { id: "test-local", url: "http://127.0.0.1:54321/hub/", packages: "api/packages", authoring: "api/gaid/" };
 const file = (name: string, bytes: string | Buffer = "data") => {
   const target = path.join(paths.sandbox, name);
   fs.mkdirSync(path.dirname(target), { recursive: true }); fs.writeFileSync(target, bytes);
@@ -40,7 +43,8 @@ beforeEach(async () => {
   fs.rmSync(paths.root, { recursive: true, force: true }); fs.mkdirSync(paths.sandbox, { recursive: true }); session();
   app = Fastify();
   app.addHook("onRequest", (req, _reply, done) => withActiveProject(String(req.headers["x-project-id"] ?? paths.id), done));
-  await registerGeoHubHandoffRoutes(app);
+  sendOptions = { sites: [localSite], fetcher: vi.fn().mockResolvedValue(new Response(JSON.stringify({ projectId: "draft-1", url: "/hub/#/author/draft-1" }), { status: 201 })) };
+  await registerGeoHubHandoffRoutes(app, sendOptions);
 });
 afterEach(async () => { await app.close(); fs.rmSync(paths.root, { recursive: true, force: true }); });
 
@@ -137,5 +141,37 @@ describe("analysis handoff", () => {
     expect(zlib.gunzipSync(download.rawPayload).length).toBeLessThanOrEqual(HANDOFF_LIMITS.totalBytes);
     expect(readTarGz(download.rawPayload).map(e => e.path)).toEqual(["handoff.json", "files/analysis.py"]);
     expect((await app.inject({ method: "POST", url: "/geo/hub/handoff", payload: { sessionId, files: ["../bad"] } })).statusCode).toBe(400);
+  });
+  it("sends gzip only to configured loopback authoring, with timeout and no redirects", async () => {
+    file("analysis.py"); provenance(["analysis.py"]);
+    const response = await app.inject({ method: "POST", url: "/geo/hub/handoff/send", payload: { sessionId, files: ["analysis.py"], siteId: localSite.id } });
+    expect(response.statusCode).toBe(201); expect(response.headers["x-gaid-handoff-path"]).toBe("direct");
+    expect(response.json()).toEqual({ path: "direct", projectId: "draft-1", url: "http://127.0.0.1:54321/hub/#/author/draft-1" });
+    const fetcher = vi.mocked(sendOptions!.fetcher!);
+    expect(fetcher).toHaveBeenCalledWith("http://127.0.0.1:54321/hub/api/gaid/handoffs", expect.objectContaining({ method: "POST", redirect: "error", signal: expect.any(AbortSignal), headers: { "Content-Type": "application/gzip", accept: "application/json" } }));
+    expect(readTarGz(Buffer.from(fetcher.mock.calls[0][1]!.body as Uint8Array)).map(e => e.path)).toEqual(["handoff.json", "files/analysis.py"]);
+  });
+  it("refuses public/non-authoring sites without fetching and returns the download fallback", async () => {
+    for (const site of [{ ...localSite, url: "https://public.example/" }, { ...localSite, authoring: undefined }, { ...localSite, url: "ftp://localhost/" }]) {
+      expect(directHandoffEndpoint(site)).toBeNull();
+      await expect(sendHandoff(Buffer.from("data"), site.id, { sites: [site], fetcher: sendOptions!.fetcher })).rejects.toMatchObject({ code: "input" });
+    }
+    expect(sendOptions!.fetcher).not.toHaveBeenCalled();
+    const fallback = await app.inject({ method: "POST", url: "/geo/hub/handoff/send", payload: { sessionId, files: [], siteId: "unconfigured" } });
+    expect(fallback.statusCode).toBe(200); expect(fallback.headers["x-gaid-handoff-path"]).toBe("download-fallback");
+    expect(readTarGz(fallback.rawPayload)).toHaveLength(1); expect(sendOptions!.fetcher).not.toHaveBeenCalled();
+  });
+  it("falls back on network, malformed, oversized or off-site responses without retrying the upload", async () => {
+    const fetcher = vi.mocked(sendOptions!.fetcher!);
+    const responses = [new Response("not json", { status: 201 }), new Response("x".repeat(17 * 1024), { status: 201 }), new Response(JSON.stringify({ projectId: "p", url: "https://other.example/" }), { status: 201 }), new Response("error", { status: 500 })];
+    for (const response of responses) {
+      fetcher.mockResolvedValueOnce(response);
+      const fallback = await app.inject({ method: "POST", url: "/geo/hub/handoff/send", payload: { sessionId, files: [], siteId: localSite.id } });
+      expect(fallback.statusCode).toBe(200); expect(fallback.headers["content-type"]).toBe("application/gzip");
+      expect(fallback.headers["x-gaid-handoff-path"]).toBe("download-fallback"); expect(readTarGz(fallback.rawPayload)).toHaveLength(1);
+    }
+    fetcher.mockRejectedValueOnce(new Error("timeout"));
+    expect((await app.inject({ method: "POST", url: "/geo/hub/handoff/send", payload: { sessionId, files: [], siteId: localSite.id } })).headers["x-gaid-handoff-path"]).toBe("download-fallback");
+    expect(fetcher).toHaveBeenCalledTimes(5);
   });
 });

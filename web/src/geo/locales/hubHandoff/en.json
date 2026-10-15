@@ -25,6 +25,14 @@
   "startDraft": "Start a draft in skill_hub",
   "close": "Close",
   "retry": "Read analysis again",
+  "sendDirect": "Send a draft to local skill_hub",
+  "openDraft": "Open the transferred skill_hub draft",
+  "directHelp": "You can also send the selected bundle directly to the configured local skill_hub. If direct delivery cannot be confirmed, the bundle is downloaded.",
+  "path": {
+    "download": "Requested the analysis bundle download.",
+    "direct": "Sent directly to local skill_hub. If a new tab did not open, use the draft link.",
+    "download-fallback": "Direct delivery could not be confirmed, so the download path was used. Check whether skill_hub already created a draft before attaching the bundle."
+  },
   "errors": {
     "input": "Check the file selection and note, then download again.",
     "session": "The chat record was not found. Reopen the chat and try again.",

@@ -13,7 +13,7 @@ export const HANDOFF_SCHEMA = "gaid-analysis-handoff/v1" as const;
 export const HANDOFF_LIMITS = { files: 200, fileBytes: 5 * 1024 * 1024, totalBytes: 20 * 1024 * 1024, textChars: 16_000, noteChars: 4_000, logBytes: 32 * 1024 * 1024 } as const;
 const CODE = new Set([".py", ".r", ".ipynb", ".sh", ".js", ".ts", ".sql", ".m", ".json", ".yaml", ".yml", ".toml", ".md"]);
 const hash = (data: Buffer) => crypto.createHash("sha256").update(data).digest("hex");
-const clip = (text: string, limit = HANDOFF_LIMITS.textChars) => text.length > limit ? text.slice(0, limit) + "\n[…truncated]" : text;
+const clip = (text: string, limit: number = HANDOFF_LIMITS.textChars) => text.length > limit ? text.slice(0, limit) + "\n[…truncated]" : text;
 export class HandoffError extends Error {
   constructor(readonly code: "input" | "session" | "file" | "size", message: string, readonly status = 400) { super(message); }
 }
@@ -48,7 +48,8 @@ function fileBytes(root: string, name: string): Buffer {
   }
   const real = fs.realpathSync(abs);
   if (!real.startsWith(canonicalRoot + path.sep)) throw new HandoffError("file", "File is outside the sandbox");
-  const fd = fs.openSync(abs, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+  if (!fs.lstatSync(abs).isFile()) throw new HandoffError("file", "Only regular files are allowed");
+  const fd = fs.openSync(abs, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0) | (fs.constants.O_NONBLOCK ?? 0));
   try {
     const stat = fs.fstatSync(fd);
     if (!stat.isFile()) throw new HandoffError("file", "Only regular files are allowed");
@@ -108,7 +109,7 @@ export function previewHandoff(paths: ProjectPaths, sessionId: unknown): Handoff
     try {
       const data = fileBytes(paths.sandbox, name);
       const ids = [...candidates.get(name)!];
-      idsTruncated ||= ids.length > 200;
+      idsTruncated ||= ids.length > 200 || ids.some(id => id.length > 200);
       files.push({ path: name, sha256: hash(data), size: data.length, role: name.startsWith("user_data/") ? "user-data" : CODE.has(path.extname(name).toLowerCase()) ? "code" : "result", provenanceStepIds: ids.slice(0, 200).map(id => clip(id, 200)) });
     } catch (error) {
       if (error instanceof HandoffError && error.code === "size") excluded.tooLarge++;
