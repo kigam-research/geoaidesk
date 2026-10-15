@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T14:58:00Z
+status: ready
+updated: 2026-10-15T14:58:23Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"889fbc92-549f-4f63-9865-358efbab2bba","pid":793523,"provider":"codex","session":"01a13ffb-bfc7-7dd1-9fac-66f3bf150afc","start":"54082579","token":"c5f1a782a11515da3361495e6b345bc949fcea86976aaa8443c13bf3060b46d2"}
 branch: task/gaid-hub-integration--methods-ui
 target: task/gaid-hub-integration
@@ -155,7 +155,9 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
 | skillHub.methodDraft | 허브 방법: {id} · revision {revision} · {lifecycle} | Hub method: {id} · revision {revision} · {lifecycle} |
 
 ## Next steps
-1. Parent: run `task complete gaid-hub-integration--methods-ui` after the finish notification, then wire the hook using Current state and run the combined acceptance checks.
+<!-- task:closed -->
+Closed 2026-10-15T14:58:23Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - TypeScript was initially unavailable before npm ci. After installation, the new string exposure needed the existing GeoExposureMode event type at the TaskSetup seam; corrected, then typecheck passed.
 - A task sync reran its full suite after parent documentation advanced and hit the known map timing failure. No unrelated map code/test edits were made; use the frontend-only worker cap above, never a global cap that changes the server serial suite.
