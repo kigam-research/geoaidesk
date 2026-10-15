@@ -33,6 +33,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
 - skill_hub install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills opens the configured site (`geo/distribution.json` `skillHub.sites`) and previews a skill-page URL or uploaded `.tar.gz` through the existing acknowledgement/install gate. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; producer contract skill_hub
+  `docs/specs/gaid-method-package.md` v1): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
+  레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
+  `<site><authoring>packages/<owner>/<slug>/<revision>` (`skillHub.sites[].authoring`; extra sites from `GAID_SKILL_HUB_SITES`,
+  http only on loopback) and the same install gate; staged origins live in `<agentDir>/skill-hub/packages/<sha>.origin.json`
+  (`server/src/geo/methods/`). `GET /geo/methods` lists installed methods with Workflow readiness; a chat started from one uses
+  exposure `method:<slug>:<workflow>` (only that Workflow's skills offered) and its session creation pins a trial record
+  (`.kady/geo/method-trials/`), whose observations come from the session's provenance log. Lifecycle shown is the hub
+  descriptor's, uploads at most `draft`; `geo-start/v1` is unchanged.
 - Task exposure and context (`server/src/geo/{context,session,instructions}.ts`): each new chat records which skills
   its system prompt offers (`.kady/geo/exposure/<sessionId>.json`; project default `.kady/geo/context.json`,
   `catalogue` in geo mode) and applies it with Pi's `skillsOverride` (`disableModelInvocation`; files untouched).
