@@ -123,9 +123,9 @@ describe("task catalogue and setup", () => {
     const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
     expect(headings[0]).toMatch(/^Geoscience/); expect(headings).toContainEqual(expect.stringMatching(/^논문·원고/));
     expect(screen.getByRole("button", { name: "Geoscience" })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "las" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "워크플로 검색" }), { target: { value: "las" } });
     expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^논문 검토/ })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "workflow 검색" }), { target: { value: "review a paper" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "워크플로 검색" }), { target: { value: "review a paper" } });
     expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument();
     view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
