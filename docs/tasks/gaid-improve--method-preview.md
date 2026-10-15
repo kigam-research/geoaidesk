@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T08:22:02Z
+status: active
+updated: 2026-10-15T08:28:27Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0f805fd9-0a65-4a06-a989-436a5ecdcca7","pid":2472511,"provider":"codex","session":"01a13ea0-2a2c-7e30-a258-fadfb356f741","start":"51804685","token":"84f022dc40c565feab0199c4629c9faa29b46d0a9be164973d06b89729c28740"}
 branch: task/gaid-improve--method-preview
 target: task/gaid-improve
@@ -37,10 +37,13 @@ Evidence: focused UI tests for choices/defer/gating/emitted actions and dialogs 
 ## Current state
 Implemented PreviewMethodPane, PreviewTrialPane and PreviewDialogs against the frozen PreviewMethodProps contract. They emit typed events only: source-linked findings (pages 9/20), unselected implementation choices/defer, metadata-only attachments, gated draft creation, editable draft, local-save request and illustrative file/trial/sharing dialogs. The procedure branch is explanatory, not executable; all branches stay private/untested. No model, installation, execution, publication or server-write API was added. Parent integration and integrated browser checks remain parent-owned.
 
-Focused evidence: 11 UI tests passed, including metadata gating, defer without an answer, every choice, edits/save/dialog events, non-sample finding suppression, bilingual formatting, trial-summary-only state and Escape/focus restoration. Web TypeScript and owned-file ESLint passed. Copy validator: previewMethod 0 errors/0 warnings; entire locale tree 0 errors/56 existing unrelated warnings. git diff --check passed. Re-verify from web: npm test -- --run src/geo/authoring-preview/method-preview.test.tsx; npx tsc --noEmit --incremental false; npx eslint src/geo/authoring-preview/{method-pane,trial-pane,preview-dialogs,method-preview.test}.tsx. From repo: node geo/copy/validate-copy.mjs web/src/geo/locales/previewMethod. Full scripts/check and browser checks have not yet been run manually in this child; task finish applies CLI-required checks.
+Focused evidence: 11 UI tests passed, including metadata gating, defer without an answer, every choice, edits/save/dialog events, non-sample finding suppression, bilingual formatting, trial-summary-only state and Escape/focus restoration. Web TypeScript and owned-file ESLint passed. Copy validator: previewMethod 0 errors/0 warnings; entire locale tree 0 errors/56 existing unrelated warnings. git diff --check passed. Re-verify from web: npm test -- --run src/geo/authoring-preview/method-preview.test.tsx; npx tsc --noEmit --incremental false; npx eslint src/geo/authoring-preview/{method-pane,trial-pane,preview-dialogs,method-preview.test}.tsx. From repo: node geo/copy/validate-copy.mjs web/src/geo/locales/previewMethod.
+
+First task finish created local 3faa427 and merged parent 3bc0d25, but did NOT publish: required scripts/check reached backend 1679 passed/11 skipped, frontend 995 passed and launcher check passed, then distribution checks failed (40/41 passed). Parent-owned distribution owner allowlist omits the newly declared gaid-improve/gaid-improve--source-preview boundaries; first failure is geo/tests/distribution.test.mjs:79, owner gaid-improve. Exact blocker sent to parent writer f7b1833c-ee21-47b2-a47b-733efe41ebb6 with notifyOnFinish false. Parent must also ensure declared new route seams exist in its published snapshot. No child-owned failure found. Remaining copy/environment/production-smoke stages not reached. Private check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-p4sawlpi.log; output: /home/seongin3/data/geoaidesk/work/checks/3faa4273b4d6-20261015T082202.249850Z. Integrated browser checks remain parent-owned.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-15T08:22:02Z: ready; the parent gaid-improve integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Wait for the parent's saved owner-allowlist/route-seam fix, then rerun task finish in place without task resume. CLI merges the published parent snapshot automatically.
+2. Parent runs task complete gaid-improve--method-preview after the checked child snapshot publishes.
+Blocked: parent-owned distribution integration-boundary test rejects new owner names; precise fix request sent. Do not edit parent-owned files or rerun unchanged full checks.
 
 ## Failed approaches
 - Initial dependency-install task job was refused with "job source dirty; save first" before any receipt/job was created. No resume was needed. Installed frontend dependencies locally with npm ci --prefix web --no-audit --no-fund (11 seconds, no package/lock changes).
