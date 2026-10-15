@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T23:20:24Z
+status: done
+updated: 2026-10-15T23:20:55Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a1684467-2f27-4645-9134-551b40e66be6","pid":3326138,"provider":"claude","session":"23cfe4ed-f98f-472e-a572-8da185372836","start":"57046241","token":"d2a3156f13a6dd3deca1c6ab1e7a65b39282d2f1add18ba826c65acfe7946882"}
 branch: task/gaid-brand-copy
 target: main
@@ -57,7 +57,9 @@ Items (docs/open-items/gaid-qwen-authoring-trial.md; evidence reports/2026-10-15
   (log ~/data/geoaidesk/work/gaid-brand-copy/check.log): exit 0, server 1,805 passed/11 skipped, web 1,051, geo 43,
   copy 0 errors. Report written, humanized, review copy in the vault.
 ## Next steps
-1. Remove build caches, task finish.
+<!-- task:closed -->
+Closed 2026-10-15T23:20:55Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: no child writers; the work is copy plus one small server field, tightly coupled. Packages, in order:
