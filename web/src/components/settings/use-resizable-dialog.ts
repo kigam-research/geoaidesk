@@ -5,6 +5,7 @@ import {
   DEFAULT_SETTINGS_DIALOG_SIZE,
   SETTINGS_DIALOG_SIZE_KEY,
   clampDialogSize,
+  fitsViewport,
   readStoredDialogSize,
   resizeFromCorner,
   writeStoredDialogSize,
@@ -33,6 +34,7 @@ export function useResizableDialog(open: boolean): {
     sizeRef.current = size;
   }, [size]);
   const drag = useRef<{ pointerId: number; startX: number; startY: number; start: DialogSize } | null>(null);
+  const requested = useRef<DialogSize>(DEFAULT_SETTINGS_DIALOG_SIZE);
   const viewport = () => ({ width: window.innerWidth, height: window.innerHeight });
 
   useEffect(() => {
@@ -43,13 +45,19 @@ export function useResizableDialog(open: boolean): {
     } catch {
       stored = null;
     }
-    setSize(clampDialogSize(stored ?? DEFAULT_SETTINGS_DIALOG_SIZE, viewport()));
-    const onResize = () => setSize((current) => (current ? clampDialogSize(current, viewport()) : current));
+    // Clamp the size the user asked for, not the last clamped one: a narrow window
+    // must not shrink the dialog for good (gaid-qwen-authoring-trial). Below the
+    // minimum width the dialog takes the CSS width of a small screen instead.
+    requested.current = stored ?? DEFAULT_SETTINGS_DIALOG_SIZE;
+    const fit = () => (fitsViewport(viewport()) ? clampDialogSize(requested.current, viewport()) : null);
+    setSize(fit());
+    const onResize = () => setSize(fit());
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [open]);
 
   const persist = (next: DialogSize) => {
+    requested.current = next;
     try {
       writeStoredDialogSize(window.localStorage, SETTINGS_DIALOG_SIZE_KEY, next);
     } catch {

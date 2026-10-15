@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T13:37:10Z
+updated: 2026-10-15T13:38:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -120,7 +120,7 @@ gates accept them, and notable defects. Results are for review; record only obse
 - F2 [guidance added, committed: GEO_INSTRUCTIONS "work inside this project…" and skill-authoring line] Unasked side edits by Qwen: appended to catalogue `well-log-qc-quicklook/SKILL.md` and project `AGENTS.md`
   (routing rule) while "fixing" F1; read the app's own server code outside the sandbox. Candidate: GEO_INSTRUCTIONS rule.
 - F3 [fixed, committed: untracked skill → origin local "직접 작성", catalogue badge "카탈로그", Skills header shortened to one true sentence] Catalogue skills all show the "K-Dense" origin badge in Settings → Skills (KIGAM vs user not distinguishable).
-- F4 [open] Settings dialog keeps a 640 px width after a narrow→wide resize until reload; at 390 px one word per line.
+- F4 [fixed, committed: requested size re-clamped on resize; below 672 px viewport no inline size, narrower sidebar/padding; needs visual re-check] Settings dialog keeps a 640 px width after a narrow→wide resize until reload; at 390 px one word per line.
 - F5 [fixed, committed: empty Connected card explains models come from a local/custom server] Settings → Providers says "연결됨 (0)" while the custom server works.
 - F6 [open] Exposure chip cut off at the composer's right edge at 1440 px; its popover shows 6 numbers on first view.
 - S2 v1 (21:51–21:59): `grid-audit-point-sample` = SKILL.md, atlas.yaml, LICENSE, references/methods.md,

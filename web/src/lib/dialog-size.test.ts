@@ -4,6 +4,7 @@ import {
   DEFAULT_SETTINGS_DIALOG_SIZE,
   MIN_DIALOG_SIZE,
   clampDialogSize,
+  fitsViewport,
   readStoredDialogSize,
   resizeFromCorner,
   writeStoredDialogSize,
@@ -16,6 +17,11 @@ describe("dialog size helpers", () => {
     expect(clampDialogSize({ width: 100, height: 100 }, viewport)).toEqual(MIN_DIALOG_SIZE);
     expect(clampDialogSize({ width: 5000, height: 5000 }, viewport)).toEqual({ width: 1480, height: 868 });
     expect(clampDialogSize(DEFAULT_SETTINGS_DIALOG_SIZE, viewport)).toEqual(DEFAULT_SETTINGS_DIALOG_SIZE);
+  });
+
+  it("leaves phone-width screens to the dialog's CSS width", () => {
+    expect(fitsViewport({ width: 390, height: 844 })).toBe(false);
+    expect(fitsViewport({ width: 672, height: 700 })).toBe(true);
   });
 
   it("keeps the dragged corner under the pointer on a centered dialog", () => {

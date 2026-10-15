@@ -459,10 +459,10 @@
       "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
     },
     {
-      "path": "server/src/api/skills.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx, web/src/components/permission-card.tsx, web/src/components/permission-card.test.tsx, web/src/components/settings/providers-panel.tsx",
+      "path": "server/src/api/skills.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx, web/src/components/permission-card.tsx, web/src/components/permission-card.test.tsx, web/src/components/settings/providers-panel.tsx, web/src/components/settings-dialog.tsx, web/src/components/settings/use-resizable-dialog.ts, web/src/lib/dialog-size.ts, web/src/lib/dialog-size.test.ts",
       "owner": "gaid-qwen-authoring-trial",
       "status": "edited",
-      "responsibility": "A skill without a sync record is reported as origin local (made here), the catalogue badge is a locale string, the Skills header no longer promises a daily K-Dense sync; the permission card no longer repeats the guard's English reason; the empty Connected card says when models come from a local or custom server."
+      "responsibility": "A skill without a sync record is reported as origin local (made here), the catalogue badge is a locale string, the Skills header no longer promises a daily K-Dense sync; the permission card no longer repeats the guard's English reason; the empty Connected card says when models come from a local or custom server; the Settings dialog re-clamps the requested size on resize and uses the CSS width below the minimum (no 640 px dialog on a phone)."
     }
   ],
   "notTouched": [

@@ -22,6 +22,11 @@ export function clampDialogSize(size: DialogSize, viewport: DialogSize, min: Dia
   };
 }
 
+/** Whether a sized (resizable) dialog fits; smaller screens use the dialog's CSS width. */
+export function fitsViewport(viewport: DialogSize, min: DialogSize = MIN_DIALOG_SIZE): boolean {
+  return viewport.width >= min.width + DIALOG_VIEWPORT_MARGIN;
+}
+
 export function readStoredDialogSize(storage: Pick<Storage, "getItem"> | undefined, key: string): DialogSize | null {
   try {
     const raw = storage?.getItem(key);
