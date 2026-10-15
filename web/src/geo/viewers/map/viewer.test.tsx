@@ -32,6 +32,8 @@ describe("map viewer", () => {
     render(<MapViewer {...props} />);
     await screen.findByRole("heading", { name: "Viewport attribute table" });
     // The whole layer is tried first; a truncated answer switches to viewport pages.
+    // Wait for both requests: under load the heading can render before the second page request.
+    await waitFor(() => expect(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").length).toBeGreaterThanOrEqual(2));
     const [first, second] = mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page");
     expect(body(first)).toMatchObject({ layer: "rocks", full: true, displayCrs: "EPSG:3857" }); expect(body(first)).not.toHaveProperty("bbox"); expect(first[2]).toBe("project-a");
     expect(body(second)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(second[2]).toBe("project-a");
@@ -58,6 +60,8 @@ describe("map viewer", () => {
     mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection(JSON.parse(String(init?.body)).path, true)) : respond({ ...page(), displayCrs: "native", sourceCrs: { status: "unknown" } }));
     render(<MapViewer {...props} />);
     await screen.findByText(/Native coordinates \(no geographic placement\)/);
+    // The native-coordinate notice comes from inspection; the page request may follow it under load.
+    await waitFor(() => expect(mockFetch.mock.calls.some(c => c[0] === "/geo/vector-page")).toBe(true));
     expect(body(mockFetch.mock.calls.find(c => c[0] === "/geo/vector-page")!).displayCrs).toBe("native");
     expect(screen.getByText("Calculate full-layer area")).toBeDisabled();
     // Basemaps need a declared CRS: the picker stays visible but disabled, "none" selected.

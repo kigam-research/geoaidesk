@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-15T15:59:46Z
+status: active
+updated: 2026-10-15T16:09:24Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -206,6 +206,10 @@ Closed 2026-10-15T15:59:46Z: finished; task finish integrates it into main. No f
   click prototype `/authoring-preview` (no AI generation). "Authoring home" question asked in the tab; Q1/one-entry
   implementation waits for it. Independent work continues (children, terminology, info load on lists).
 ## Failed approaches
+- 2026-10-16 first `task finish`: full check failed only in `web/src/geo/viewers/map/viewer.test.tsx` (third load-related
+  failure of that file; branch does not touch map code). Cause: the test read `/geo/vector-page` calls right after a
+  heading/notice that can render before the request. Fixed the test to `waitFor` the request(s); assertions unchanged;
+  isolated 3/3 pass. Retry finish.
 - (modal-off child, 2026-10-15) `VITEST_MAX_WORKERS=4` for `scripts/check` overrides the server's serial run
   (fileParallelism:false) and causes PROJECTS_ROOT cleanup races (121 ENOENT failures). Run scripts/check without a
   global cap, or `VITEST_MAX_WORKERS=1`; cap only the web suite if host load makes map viewer tests time out.
