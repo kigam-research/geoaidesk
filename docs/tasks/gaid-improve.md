@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:16:23Z
+updated: 2026-10-15T08:33:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -124,6 +124,8 @@ This approves the preceding concrete proposal: implement a clickable prototype u
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
+- Immediate integration: publish the parent boundary correction, let both children retry finish in place, then complete each child before parent verification. New preview route entries will be declared individually together with their actual files.
+
 1. Checkpoint the approved image metadata, prototype scope and shared contract. Start isolated child writers for source/PDF and method/trial UI packages using the settled file ownership. Parent continues state/persistence, shell, runtime isolation and sample input adapter while children run.
 2. Complete each child with `task complete`, integrate locale catalogs/components, verify the approved composition and actual interactions on a separate task-owned preview instance. Preserve real PDF content and clear prepared-example states.
 3. Run meaningful focused checks and required `scripts/check`; fix in place. Update the canonical report with working route, interaction evidence, exact simulated/unconnected boundaries and copy IDs. No live review service changes by writer.
@@ -174,11 +176,17 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 Report: reports/2026-10-15-gaid-researcher-ecosystem/index.md
 The initial orientation needed no report; the later ecosystem-design request supersedes that restriction. This is a design/assessment result, not an implementation-completion report.
+## Integration checkpoint (2026-10-15)
+- Source child focused checks passed at 9ec7e12ff54c (6 files / 13 tests and web tsc); its full finish passed backend 159 / 1 skipped and frontend 150 files / 994 tests, then failed the distribution owner allowlist at line 79 (the initial child diagnosis misidentified this as fs.existsSync; comma-separated paths are already supported). Added the two owned packages to that allowlist and removed premature new-route declarations. Corrected the existing layout entry now; unpublished new routes will be declared with their implementation. Method child bf457d6e2f25 is verified pushed and awaiting the same correction. No user action or scope change.
+- Parent dependency job 4 exited 0: npm ci installed 1202 packages. No app checks implied.
+- Impeccable comp-spec coverage gate remains open: explicit normalized regions and grid bounds still produce false uncovered-ink cells. Retain measured composition and manual/browser comparison; do not claim this automated gate passed or bypass it with empty-ground assertions.
+
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T062040.069187Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T081719.031415Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
