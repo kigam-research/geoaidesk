@@ -21,7 +21,7 @@
   "noSite": "No skill_hub site is configured. You can still download the bundle.",
   "download": "Download analysis bundle",
   "downloading": "Building the analysis bundle.",
-  "attach": "Open a draft in skill_hub and attach the downloaded analysis bundle. GAID does not upload the files.",
+  "attach": "Open a draft in skill_hub and attach the downloaded analysis bundle. The download path does not upload files.",
   "startDraft": "Start a draft in skill_hub",
   "close": "Close",
   "retry": "Read analysis again",

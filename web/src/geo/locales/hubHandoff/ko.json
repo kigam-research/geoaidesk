@@ -21,7 +21,7 @@
   "noSite": "skill_hub 사이트가 설정되지 않았습니다. 묶음은 다운로드할 수 있습니다.",
   "download": "분석 묶음 다운로드",
   "downloading": "분석 묶음을 만드는 중입니다.",
-  "attach": "skill_hub에서 초안을 열고 다운로드한 분석 묶음을 첨부하세요. GAID가 파일을 업로드하지는 않습니다.",
+  "attach": "skill_hub에서 초안을 열고 다운로드한 분석 묶음을 첨부하세요. 다운로드 경로는 파일을 업로드하지 않습니다.",
   "startDraft": "skill_hub에서 초안 시작하기",
   "close": "닫기",
   "retry": "분석 다시 읽기",

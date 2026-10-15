@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:41:27Z
+status: active
+updated: 2026-10-15T14:49:45Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -76,7 +76,7 @@ just done to the hub as authoring material for a new draft.
 P2 implemented: the composer now offers only analysis handoff, not skill-template creation. Routes: POST /geo/hub/handoff/preview, POST /geo/hub/handoff (gzip download), POST /geo/hub/handoff/send (optional configured loopback authoring only, explicit user action; 201 JSON or gzip download fallback).
 Bundle schema: gaid-analysis-handoff/v1, handoff.json + files/<sandbox-relative path>. Request/final answer/model use the shared session history reader's readEntries/textOf; candidates use readSteps. Current bytes are rehashed. Limits: 200 files, 5 MiB/file, 20 MiB including tar metadata, 16,000 chars/text, 4,000 chars/note, 32 MiB/source log; truncation/exclusion counts are visible. user_data is opt-in; unsafe/dot/secret paths and links are refused.
 Required hub URL: site base + #/author/new?from=gaid (one authoringPath constant). Direct send normalizes authoring's trailing slash, refuses redirects, times out at 30 s, bounds the reply and checks its returned draft URL. No real trial URL is hardcoded. Failed/uncertain direct delivery does not retry the upload; UI shows download fallback and asks to check for an existing draft.
-Targeted evidence: final server 13 tests passed (including UTF-8 tar size rejection and small Korean-name roundtrip); web handoff 11 + workspace 24 tests passed; both TypeScript checks passed. Locale validation: all namespaces 0 errors/56 existing warnings; hubHandoff alone 0 errors/0 warnings. Final server rerun after tar-header/regular-file/truncation edits: 13/13 passed; final hubHandoff copy check: 0 errors/0 warnings. CLI finish records any full scripts/check run separately from this targeted evidence. Full browser/live-hub acceptance remains the parent's P4; not claimed here. Settings skills unchanged. Old workspace.skill strings intentionally retained (trial-owned namespace).
+Targeted evidence: final server 13 tests passed (including UTF-8 tar size rejection and small Korean-name roundtrip); web handoff 11 + workspace 24 tests passed; both TypeScript checks passed. Locale validation: all namespaces 0 errors/56 existing warnings; hubHandoff alone 0 errors/0 warnings. Final server rerun after tar-header/regular-file/truncation edits: 13/13 passed; final hubHandoff copy check: 0 errors/0 warnings. Second full CLI run passed server 1701 tests (11 skipped), frontend 1028 tests and launcher checks; stopped at the missing integration-owner whitelist entry. After fixing it, distribution.test.mjs 7/7 and start-gaid.sh --check passed; hubHandoff copy remains 0 errors/0 warnings. Final full finish retry is pending and records its outcome separately. Full browser/live-hub acceptance remains the parent's P4; not claimed here. Settings skills unchanged. Old workspace.skill strings intentionally retained (trial-owned namespace).
 
 ### String ids (new unless noted; Korean / English)
 The old composer action workspace.skill.open remains in the catalogue but is no longer rendered here: 재사용 스킬 만들기 / Make reusable skill → hubHandoff.open below. Every other id below is new (before: absent in both locales). No other namespace copy changed.
@@ -107,7 +107,7 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 | `hubHandoff.noSite` | skill_hub 사이트가 설정되지 않았습니다. 묶음은 다운로드할 수 있습니다. | No skill_hub site is configured. You can still download the bundle. |
 | `hubHandoff.download` | 분석 묶음 다운로드 | Download analysis bundle |
 | `hubHandoff.downloading` | 분석 묶음을 만드는 중입니다. | Building the analysis bundle. |
-| `hubHandoff.attach` | skill_hub에서 초안을 열고 다운로드한 분석 묶음을 첨부하세요. GAID가 파일을 업로드하지는 않습니다. | Open a draft in skill_hub and attach the downloaded analysis bundle. GAID does not upload the files. |
+| `hubHandoff.attach` | skill_hub에서 초안을 열고 다운로드한 분석 묶음을 첨부하세요. 다운로드 경로는 파일을 업로드하지 않습니다. | Open a draft in skill_hub and attach the downloaded analysis bundle. The download path does not upload files. |
 | `hubHandoff.startDraft` | skill_hub에서 초안 시작하기 | Start a draft in skill_hub |
 | `hubHandoff.close` | 닫기 | Close |
 | `hubHandoff.retry` | 분석 다시 읽기 | Read analysis again |
@@ -128,6 +128,7 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 Closed 2026-10-15T14:41:27Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Second full finish: server 1701 passed / 11 skipped, frontend 1028 passed, distribution 40 passed / 1 failed. Distribution owner whitelist lacked the newly required gaid-hub-integration boundary owner. Added that owner to geo/tests/distribution.test.mjs; no runtime change. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-blu7yoj4.log. Also qualified hubHandoff.attach to state that the download path (not all GAID paths) does not upload files; exact final ko/en text is in the string table.
 - First task finish full scripts/check failed: backend 160 files passed / 1 failed / 1 skipped; 1699 tests passed / 1 failed / 11 skipped. The failure is skills-sync.test.ts:275: parent added baseHash to getSkillProvenance, breaking an exact upstream-shape assertion. Parent fixed this at 88d530c by adding getSkillBaseHash instead; child will integrate on finish retry. Failure log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-lokfkcwd.log. No frontend/distribution/production stage ran in that attempt.
 - UTF-8 tar regression reproduced a 20,974,592-byte expanded bundle (20 MiB limit = 20,971,520) because short Korean names require PAX headers. Added a final bounded expansion check; compressed size and selected-file preflights remain. Final 13-test rerun passed, including the under-limit Korean filename roundtrip.
 - First dependency job was refused before launch because the source was dirty; saved the implementation, then launched the recorded install job once (exit 0).
