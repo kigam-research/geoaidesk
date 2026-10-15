@@ -445,6 +445,18 @@
       "owner": "gaid-improve",
       "status": "edited",
       "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git."
+    },
+    {
+      "path": "web/src/app/authoring-preview/page.tsx",
+      "owner": "gaid-improve",
+      "status": "added",
+      "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
+    },
+    {
+      "path": "web/src/app/authoring-preview/sample/route.ts",
+      "owner": "gaid-improve",
+      "status": "added",
+      "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
     }
   ],
   "notTouched": [

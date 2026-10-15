@@ -45,6 +45,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
+- Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit

@@ -1,1 +1,53 @@
-{}
+{
+  "brand": "GAID",
+  "nav": {
+    "workspace": "Research workspace",
+    "method": "Create a research method",
+    "scope": "A screen prototype for shaping methods from source material."
+  },
+  "breadcrumb": "Research workspace / New research method",
+  "title": "Create a method from a paper",
+  "status": "Screen prototype",
+  "description": "Read the original, decide what your research needs, and shape a draft skill and workflow.",
+  "reset": "Reset prototype",
+  "save": "Save in browser",
+  "steps": {
+    "label": "Method authoring stages",
+    "sources": "Read sources",
+    "method": "Refine method",
+    "trial": "Prepare a trial"
+  },
+  "sample": {
+    "name": "Yilgarn Ni · author manuscript",
+    "loading": "Opening the sample manuscript.",
+    "unavailable": "Could not open the sample manuscript. Check the server sample configuration or select a local PDF."
+  },
+  "source": {
+    "invalidPdf": "Select a nonempty PDF file no larger than 50 MiB.",
+    "invalidUrl": "Enter a URL beginning with http or https."
+  },
+  "saved": {
+    "success": "Saved the current choices and draft in this browser. File contents are not saved.",
+    "restored": "Restored the saved prototype. Local PDFs must be selected again.",
+    "invalid": "Could not read the saved prototype. Select your sources again.",
+    "unavailable": "Browser storage is unavailable. The current screen is unchanged."
+  },
+  "purpose": {
+    "default": "I want to apply the paper’s method to mineral prospectivity mapping in another region."
+  },
+  "draft": {
+    "title": "Spatial PU mineral prospectivity mapping",
+    "summary": "A draft method for assessing candidate areas from sparse positive records and unlabeled cells. Decide spatial blocks, evaluation criteria, and uncertainty interpretation for the new data before testing."
+  },
+  "intake": {
+    "1": "Research purpose and required inputs",
+    "2": "Methods supported by source pages",
+    "3": "Conditions to decide before applying new data",
+    "title": "Read the method in its source",
+    "body": "Add a paper PDF or URL first. This flow connects source review with findings and consequential researcher choices.",
+    "sample": "This is the original author manuscript. The next screen shows a prepared analysis example based on this manuscript.",
+    "openExample": "View prepared analysis example",
+    "limit": "Prepared content is available only for the sample manuscript. AI analysis of other PDFs and URLs is not connected."
+  },
+  "footer": "This screen prototype does not call models, run analysis, install skills, or publish content."
+}
