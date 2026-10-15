@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ProjectPaths } from "../../projects.ts";
 import { globalSkillRoot, projectSkillRoot, type SkillRoot } from "../../agent/skills.ts";
-import { getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
+import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
 import type {
   LocalMethodSummary,
   LocalMethodWorkflow,
@@ -144,7 +144,7 @@ export async function listLocalMethods(
       implementation: file?.implementation ?? null,
       codeOrigin: file?.codeOrigin ?? null,
       origin,
-      editedLocally: Boolean(provenance?.baseHash && provenance.baseHash !== treeHash),
+      editedLocally: (() => { const base = getSkillBaseHash(root, method.runtimeName); return Boolean(base && base !== treeHash); })(),
       treeHash,
       sources: file?.sources ?? [],
       hubChecks: file?.checks ?? null,
