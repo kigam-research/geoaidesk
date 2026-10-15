@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:40:01Z
+updated: 2026-10-15T14:43:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -85,7 +85,10 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 ## Next steps
 1. Prepare the P4 GAID instance (own ports, GAID_HOME under ~/data/geoaidesk/work/gaid-hub-integration/, kigam-qwen route)
    while children run; skill_hub sends the first real package descriptor when ready.
-2. `task complete` each child on its finish notice; then integrate.
+2. `task complete` each child on its finish notice; then integrate. After P2 integrates: edit string `hubHandoff.attach`
+   (same id, keep the preceding attach instruction): replace the last sentence "GAID가 파일을 업로드하지는 않습니다." /
+   "GAID does not upload the files." with "다운로드 경로는 파일을 업로드하지 않습니다." / "The download path does not upload
+   files." (visible after a direct-send fallback too); list the final text in the report's string table.
 3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
 4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
 ### P4 acceptance plan (2026-10-15)
