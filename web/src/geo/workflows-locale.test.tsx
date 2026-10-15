@@ -69,13 +69,13 @@ describe("upstream workflow locale contract", () => {
   it("searches translated rows, opens a Korean launch dialog, and leaves the model prompt unchanged", () => {
     const onLaunch = vi.fn();
     render(<WorkflowsPanel onLaunch={onLaunch} />);
-    fireEvent.change(screen.getByPlaceholderText("워크플로 검색..."), { target: { value: "논문 작성" } });
+    fireEvent.change(screen.getByPlaceholderText("Workflow 검색..."), { target: { value: "논문 작성" } });
     fireEvent.click(screen.getByRole("button", { name: /^논문 작성/ }));
     const dialog = within(screen.getByRole("dialog"));
     expect(dialog.getByText("제공한 자료나 결과로 논문 전체 초안을 작성합니다.")).toBeVisible();
     expect(dialog.getByText("프로젝트 sandbox")).toBeVisible();
     fireEvent.change(dialog.getByPlaceholderText("논문 주제·제목"), { target: { value: "Sedimentary basins" } });
-    fireEvent.click(dialog.getByRole("button", { name: "워크플로 실행" }));
+    fireEvent.click(dialog.getByRole("button", { name: "Workflow 실행" }));
     const row = upstream.find((row) => row.id === "write-paper")!;
     expect(onLaunch.mock.calls[0][0]).toContain(row.prompt.replaceAll("{topic}", "Sedimentary basins"));
   });
@@ -85,7 +85,7 @@ describe("upstream workflow locale contract", () => {
     const onLaunch = vi.fn();
     render(<WorkflowLaunchDialog workflow={workflow} open onOpenChange={vi.fn()} onLaunch={onLaunch} />);
     expect(screen.getByPlaceholderText("강조할 결과(선택)")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "워크플로 실행" }));
+    fireEvent.click(screen.getByRole("button", { name: "Workflow 실행" }));
     expect(onLaunch.mock.calls[0][0]).toContain("[Specific results to emphasize (optional)]");
   });
 });

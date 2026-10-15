@@ -125,11 +125,11 @@ describe("task catalogue and setup", () => {
     expect(headings[0]).toMatch(/^지구과학/); expect(headings).not.toContainEqual(expect.stringMatching(/^논문·원고/));
     expect(screen.getByRole("button", { name: "지구과학" })).toBeInTheDocument();
     // Built-in workflows of other fields stay folded until asked for.
-    fireEvent.click(screen.getByRole("button", { name: /^다른 분야 워크플로 보기/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^다른 분야 Workflow 보기/ }));
     expect(screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent)).toContainEqual(expect.stringMatching(/^논문·원고/));
-    fireEvent.change(screen.getByRole("textbox", { name: "워크플로 검색" }), { target: { value: "las" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "las" } });
     expect(screen.getByRole("button", { name: /^Well log QC well-qc/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: /^논문 검토/ })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "워크플로 검색" }), { target: { value: "review a paper" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "review a paper" } });
     expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument();
     view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();

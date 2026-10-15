@@ -100,7 +100,7 @@
       "body": "적용 조건, 분석 지침과 필요한 코드 계획을 담습니다."
     },
     "workflow": {
-      "title": "워크플로 시작 요청",
+      "title": "Workflow 시작 요청",
       "body": "자료와 설정을 받아 방법을 시작할 요청 내용을 담습니다."
     },
     "openFiles": "파일 내용 예시 보기"
@@ -113,7 +113,7 @@
   "files": {
     "dialog": {
       "title": "파일 내용 예시",
-      "description": "스킬 지침과 워크플로 요청의 구성 예시입니다. 설치하거나 파일로 생성한 내용이 아닙니다."
+      "description": "스킬 지침과 Workflow 요청의 구성 예시입니다. 설치하거나 파일로 생성한 내용이 아닙니다."
     },
     "skillFile": "SKILL.md · 지침 예시",
     "workflowFile": ".geo-start.json · 요청 구성 예시",
@@ -148,7 +148,7 @@
     },
     "includedTitle": "공유 후보",
     "method": "방법 이름, 설명과 적용 범위",
-    "instructions": "스킬 지침과 워크플로 시작 요청의 구성",
+    "instructions": "스킬 지침과 Workflow 시작 요청의 구성",
     "status": "미시험 상태와 알려진 한계",
     "excludedTitle": "기본 공유 대상에서 제외",
     "excluded": "원본 PDF, 첨부 코드, 연구 자료와 기존 결과 파일은 공유 후보에 포함하지 않습니다.",

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:09:04Z
+updated: 2026-10-15T14:32:53Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -95,8 +95,19 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-Blocked: the user's answer on where authoring lives (asked 2026-10-15 ~23:00 KST, see Notes "Authoring home") before
-the local-workflow/one-entry implementation; meanwhile R1 re-test (researcher 77493076) and two child writers run.
+Blocked: modal-off (c9784d59) is in `task finish` (full check with VITEST_MAX_WORKERS=1). outside-writes finished 2026-10-15; its `task complete` waits until modal-off is ready so the parent branch does not move during modal-off's merge. Order: save parent → complete modal-off → complete outside-writes → full check → after-trial.
+- Authoring home answered 가 (2026-10-15): author in skill_hub, GAID installs/runs/tests. User: "추가 피드백으로 skill허브는
+  이제 GAID시스템의 허브인개념이다. 두 시스템은 연동되어 있으며 이미 수정연계방안이 설계되어 있었을것이다." The design exists
+  (gaid-improve report §3.9–3.10/§3.14, docs/design/source-authoring-agents.md, spatial-pu-pilot.md LocalMethod). The
+  authoring service, LocalMethod install home and "skill_hub 초안으로 보내기" are steps 2–3 of that design → sent to the
+  geoaidesk hub as a new goal (request bd45c51400e1, prompt kept in `<work>/reviews/next-goal.md`), with the skill_hub
+  contract changes (terminology 워크플로/레시피/위임 스크립트; LocalMethod package contract; atlas validation). This unit
+  does NOT build them; it finishes trial fixes, children, after-trial, after-reviews and the report.
+- Observed 2026-10-15 14:11Z: both child writers report Codex service_tier `priority` (Fast) although the user opted out of
+  fast; created by `task start` with the default profile; not changed mid-run (profiles are not edited by writers).
+- Optional after modal-off merges: `project_settings.budget_summary` (settings ko/en) still says Modal costs count toward
+  the cap (true for retained historical ledger rows); a neutral historical-cost sentence would avoid naming Modal.
+- Hold parent saves while a child is in `task finish` (modal-off asked: boundary-ledger append conflicts).
 - R1 re-test running (2026-10-15 ~22:45 KST): instance 2 `gaid-qat-app2` (ports 3311/18311, `GAID_HOME=<work>/home2`,
   snapshot `<work>/app2` of 7e77779, log `<work>/logs/app2.log`), kigam-qwen registered the same way; old instance
   `gaid-qat-app` stopped (data kept in `<work>/home`). Researcher 77493076 follows `<work>/researcher/BRIEF-R1.md`
@@ -159,13 +170,14 @@ the local-workflow/one-entry implementation; meanwhile R1 re-test (researcher 77
   English, icon-only upload/wand/skill buttons, permission card ("Kady", English, invisible at 390 px), TaskSetup length
   and "작업 중 결정" ambiguity, file dropdowns mixing outputs with sources, shapefile parts ungrouped in the file list.
 - F7 [model, note only] Output folder overwritten without asking (`qc/15_9-13`); wrong self-explanations of F1.
-## Terminology (Q2 가, done 2026-10-15)
-- Korean UI values: "workflow" → "워크플로" (workspace catalogue/recipe, app tab, workflows panel, context mode label
-  "워크플로: {title}", authoring preview); catalogue title "Geoscience 작업" → "지구과학 워크플로"; pi-subagents workflow
-  scripts renamed "위임 스크립트" to avoid the clash; research/robustness strings left (Modal-only, hidden by modal-off);
-  ICU select keys untouched. 4 tests updated; full web suite 1021/1021 pass. `geo/copy/terminology.csv` is a byte copy of
-  skill_hub `design/copy/` (do not edit here) → skill_hub contract change to forward: canonical ko "워크플로" for
-  workflow, plus a "레시피" entry (saved start setting of a workflow, `.geo-start.json`).
+## Terminology
+- Routed `term-workflow-gaid-qwen-authoring-trial` (user, hub, verbatim): "용어로서 워크플로우가 표준용어이고 가급적 영어로
+  Workflow로 사용하길 원한다." Replaces Q2 가 ("워크플로"). Korean UI values now say "Workflow" (e.g. "지구과학 Workflow",
+  "Workflow 검색", "Workflow: {title}", robustness/evidence strings too); "워크플로우" only where Korean spelling is unavoidable
+  (none needed so far); pi-subagents workflow scripts stay "위임 스크립트"; ICU select keys untouched; English locale
+  unchanged. Affected UI tests updated (178/178 in src/geo + panels); copy check 0 errors. `geo/copy/terminology.csv`
+  stays a byte copy: skill_hub owns the change (hub already told, requests bd45c51400e1 / 78fce59a1e63 superseded by
+  the hub's correction).
 
 ## R1 re-test (after F1–F5/F9; instance 2, 7e77779; `<work>/researcher/r1/`, `<work>/evidence/r1`)
 - F1 confirmed: fresh chat with the default catalogue scope loaded the chat-made skill `las-quicklook-qc` first (1/1;
@@ -200,6 +212,9 @@ the local-workflow/one-entry implementation; meanwhile R1 re-test (researcher 77
   click prototype `/authoring-preview` (no AI generation). "Authoring home" question asked in the tab; Q1/one-entry
   implementation waits for it. Independent work continues (children, terminology, info load on lists).
 ## Failed approaches
+- (modal-off child, 2026-10-15) `VITEST_MAX_WORKERS=4` for `scripts/check` overrides the server's serial run
+  (fileParallelism:false) and causes PROJECTS_ROOT cleanup races (121 ENOENT failures). Run scripts/check without a
+  global cap, or `VITEST_MAX_WORKERS=1`; cap only the web suite if host load makes map viewer tests time out.
 ## Notes and decisions
 - Orchestration (sequential, done by this writer; no child writers: the work is one tightly coupled interactive trial,
   and the Qwen server takes one session at a time):
