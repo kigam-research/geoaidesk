@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:04:25Z
+updated: 2026-10-15T14:05:44Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -59,11 +59,29 @@ before → after, tests run. Network: raw.githubusercontent.com is blocked on th
 No paid model runs. Remove build caches you created in your worktree before finishing.
 
 ## Current state
-Resumed in the CLI-returned worktree. Inspected the distribution, lead session, required child runtime, Modal seeding, notebook guidance, startup and UI entry points. Implementation is in place. Server typecheck and 9 affected server vitest files passed (80 tests). Web typecheck and 6 affected web vitest files passed (51 tests). Distribution/launcher/stamp tests passed (16; real build smoke not yet run). Copy validation: 0 errors, 56 existing warnings; visible strings unchanged. The new compute-selector test initially omitted a required catalog prop; fixed and the web typecheck rerun passed.
+Implemented and pushed as `602d6516c583`. The GAID distribution no longer offers Modal tools or compute surfaces; upstream code and existing `.kady/modal/` data remain. Development/non-geo behaviour is preserved. Local checks passed: server typecheck + 80 tests, web typecheck + 51 tests, distribution/launcher tests, copy validator (0 errors; 56 unchanged warnings). The real production feature-only rebuild and final recorded prompt-budget evidence are running in job 1; no paid model or Modal jobs were run. The parent writes the Modal section in `reports/2026-10-15-gaid-qwen-authoring-trial/index.md` after integration; this child creates no report.
+
+### Switched-off surfaces (source evidence)
+- Policy: `geo/distribution.json:13` (`features.remoteCompute: false`), `server/src/geo/distribution.ts:184` (requires launcher marker + geo catalogue; missing switch/upstream/development stays on).
+- Web state: `geo/start.mjs:65` sets `GAID_DISTRIBUTION=1` and the computed `NEXT_PUBLIC_GAID_REMOTE_COMPUTE`; `web/next.config.ts:51` inlines it, `web/src/geo/features.ts:2` defaults upstream/dev to on. This reuses the existing build-time distribution facts and avoids adding frontend fetch/state to every surface.
+- Lead: `server/src/agent/modal-tool.ts:277` returns no Modal tools; `server/src/agent/session-registry.ts:442` skips the child attribution extension. `server/src/agent/modal-bridge.ts:24` and `:82` skip package/allowlist seeding.
+- Children: `server/src/agent/subagent-control.ts:92` omits the required kady-modal extension and `:96` omits its background-work provider. `server/pi-packages/kady-modal/index.ts:602` also refuses registration from old ambient settings or the foreground runtime; `server/pi-packages/kady-child-runtime/index.ts:39` skips the child's background-work provider.
+- Guidance: `server/src/agent/notebook.ts:172` and `:173` remove the stress-test invitation and robustness schema; `server/pi-packages/kady-notebook/index.ts:143` does the same for children. `server/src/agent/compaction-bridge.ts:329`, `:432`, `:454` omit the pending-Modal section and Modal-specific summary guidance. The seed's existing two Modal mentions are restrictions, not invitations; the parent agreed to leave them unchanged.
+- Startup/API: `server/src/index.ts:188`, `:202`, `:210` omit robustness/Modal routes and both recovery calls. `server/src/api/credentials.ts:420` refuses Modal token changes before outbound validation; `server/src/api/subagents.ts:34` returns no compute items in the specialist fleet. `/config` reports the effective feature (`server/src/index.ts:176`).
+- Composer: `web/src/components/chat-tab.tsx:1304` and `web/src/components/compute-selector.tsx:468` hide the selector; `chat-tab.tsx:1831` and `:1878` do not restore a stale target/default; `:1472` omits old Modal history navigation chips.
+- Preview/jobs: `web/src/components/file-preview-panel.tsx:206` hides the pinned compute tab; `:1763` normalizes old persisted compute navigation. `web/src/app/page.tsx:340` and `:811` do not restore/open the disabled panel. `web/src/lib/use-modal-jobs.ts:97`, `:186`, `:327`, `:476` prevent catalogue/job/detail/log polling, including header job badges.
+- Settings/notebook: `web/src/components/settings/services-panel.tsx:546` hides the token pair and remote cache; `defaults-panel.tsx:193` hides compute defaults and `:135` leaves the saved compute key untouched on other saves; `web/src/components/lab-notebook-entry-card.tsx:391` hides Stress-test finding while keeping local notebook actions.
+- Documentation: one GAID caveat added to AGENTS.md and docs/modal-compute.md; all upstream edits are recorded in the appended gaid-qwen-authoring-trial seam. No visible strings were added/changed; no locale id changes.
+
+### Checks and measurement
+- Server: `npm run typecheck`; `npx vitest run test/geo-remote-compute.test.ts test/geo-distribution.test.ts test/modal-api-credentials.test.ts test/modal-package.test.ts test/notebook-package.test.ts test/notebook-tool.test.ts test/compaction-bridge.test.ts test/session-registry.test.ts test/geo-context.test.ts` — 9 files / 80 tests passed. Tests use fake credentials/adapters or construct idle sessions; they make no paid model requests.
+- Web: `npx tsc --noEmit`; `npx vitest run src/components/compute-selector.test.tsx src/components/file-preview-panel.test.tsx src/components/settings/services-panel.test.tsx src/components/settings/defaults-panel.test.tsx src/components/lab-notebook-entry-card.test.tsx src/lib/use-modal-jobs.test.tsx` — 6 files / 51 tests passed. Off-mode tests cover selector/tab/settings/notebook hiding, old navigation, saved defaults and zero remote polling.
+- Distribution/launcher: `node --test geo/tests/distribution.test.mjs geo/tests/start.test.mjs geo/tests/production-feature-stamp.test.mjs` — 16 passed, 1 optional actual-build smoke skipped in this local run. The ordinary stamp test executes the production build functions extracted from start.mjs with fake npm: same inputs reuse BUILD_ID; changing only the public feature value calls npm run build again and changes the stamp.
+- Copy: `node geo/copy/validate-copy.mjs web/src/geo/locales` — 0 errors / 56 existing warnings. `git diff --check` passed.
+- Recorded job 1 installs locked dependencies in its external source snapshot, repeats the live off-mode test (including fleet API), writes `out/remote-compute-prompt-budget.json`, and runs the same launcher build functions with real npm/Next twice. Results pending; source SHA and receipt are in the Running jobs block. The parent runs full scripts/check after integration.
 ## Next steps
-1. Finish affected regression checks and prompt-budget measurement.
-2. Run the actual feature-only production rebuild smoke in a saved job snapshot.
-3. Record file:line evidence here and finish. The parent will write the canonical report after task complete.
+1. On the job-1 exit notice, read its exit/log and `out/remote-compute-prompt-budget.json`; do not restart it. If it never started (no exit/empty log), use task job resume with its receipt.
+2. Add the measured counts/tokens and actual Next rebuild evidence here, verify final source state and finish. The parent writes the canonical report after task complete.
 ## Failed approaches
 - The first server test used nonexistent SDK `getActiveTools`; corrected to `getActiveToolNames`/`getAllTools`. Fake Modal tokens were too short and failed input validation before the feature gate; replaced with valid-length dummy strings.
 - An early `task job run` attempt did not launch (dirty source; no receipt/jobs block created). Dependencies were installed with ordinary `npm ci` for local checks; the real build job must follow a reviewed task save.
@@ -83,6 +101,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-qwen-authoring-trial--modal-off-20261015T140438.137272Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
