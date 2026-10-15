@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T13:38:49Z
+updated: 2026-10-15T13:52:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -95,10 +95,16 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-- Concept decision asked in the writer tab (2026-10-15 ~22:35 KST): Q1 local workflow home (가 app-side local workflows,
-  recommended / 나 skill_hub only + export draft), Q2 UI term (가 "워크플로" / 나 keep "workflow"), Q3 outside-project
-  writes (가 confirmation card + guidance, recommended / 나 block / 다 guidance only). Until answered: only small fixes
-  (F1 done; F2 guidance, F3 badges, F5, F6, F9 copy; F4 if small) and the visual reviews.
+Blocked: the user's answer on where authoring lives (asked 2026-10-15 ~23:00 KST, see Notes "Authoring home") before
+the local-workflow/one-entry implementation; meanwhile R1 re-test (researcher 77493076) and two child writers run.
+- R1 re-test running (2026-10-15 ~22:45 KST): instance 2 `gaid-qat-app2` (ports 3311/18311, `GAID_HOME=<work>/home2`,
+  snapshot `<work>/app2` of 7e77779, log `<work>/logs/app2.log`), kigam-qwen registered the same way; old instance
+  `gaid-qat-app` stopped (data kept in `<work>/home`). Researcher 77493076 follows `<work>/researcher/BRIEF-R1.md`
+  (default skill scope; F1/F3/F4/F5/F9 checks) → `<work>/researcher/r1/`. Then gate its skill with gates.py
+  (API base 18311: edit `API`/`HOME` in a copy or pass env) and record before/after.
+- Children (started 2026-10-15 ~22:58 KST, Codex "general work"): `gaid-qwen-authoring-trial--modal-off` writer
+  c9784d59-bb40-4f34-92f4-b99e911e0acb (brief /tmp copy in Notes); `gaid-qwen-authoring-trial--outside-writes` writer
+  ffc3948e-1dea-402c-8e2c-549c8367b527. On each finish: `task complete <child>`, then re-run checks here.
 0. After the researcher's "before" screenshots exist: start the two visual reviewers (`task reader --profile "Claude 고급검토"` / `"Codex 고급검토"`, read-only), record ids; repeat after fixes.
 1. (done 22:26) Researcher finished S1–S3 (`<work>/researcher/summary.md`); gates applied (`evidence/s1-*, s2-*, s3-*`).
    Next: start the "before" visual reviews, then present the concept decision to the user, then fix.
@@ -153,6 +159,30 @@ gates accept them, and notable defects. Results are for review; record only obse
   English, icon-only upload/wand/skill buttons, permission card ("Kady", English, invisible at 390 px), TaskSetup length
   and "작업 중 결정" ambiguity, file dropdowns mixing outputs with sources, shapefile parts ungrouped in the file list.
 - F7 [model, note only] Output folder overwritten without asking (`qc/15_9-13`); wrong self-explanations of F1.
+## Visual review triage (before; Claude 고급검토 + Codex 고급검토, `<work>/reviews/*-before.md`)
+- Agreed blockers: narrow Settings (→ F4 fixed, re-check after), chat-made skill not offered (→ F1 fixed), no
+  skill-vs-workflow guidance / four names for one list (→ concept decision pending), authored skills indistinguishable
+  (→ F3 fixed), permission card "Kady"/English (→ F9 fixed).
+- Codex blocker 2 / Claude blocker 3 (narrow workspace: chat area ~40 px at 390 px, permission card and composer
+  controls off-screen): verified in `s1-permission-narrow.png`. Cause is the app-wide stacked layout (upstream), not the
+  authoring screens; desktop/WSL is the declared first target (product D3). Deferred as an open item, not fixed here.
+- Optional (apply on screens this unit changes after the concept decision): workflow list badges/pills, Skills page
+  rows, skill-add preview (hash/limits/git folded), recipe import jargon, TaskSetup folding and "작업 중 결정" wording,
+  exposure popover order, readable Korean names for skills. Listed only: workspace header telemetry, unlabeled file
+  icons, chip truncation, doubled "선택" in the file input, slash menu English, ~54 locale strings still saying "Kady"
+  with mixed agent/app meaning.
+## Decisions (user, writer tab, 2026-10-15)
+- "사용자가 결정한 일로 모두 권장으로 하자." → Q1 가 (local workflow home in the app), Q2 가 (UI term "워크플로"), Q3 가
+  (confirmation card for outside-project writes + guidance).
+- Same message: "그리고 Modal 서비스와 관련한 연산 환경도 없애도 되는 것이다. 불필요한 유료 서비스를 기관 연구자에게 강요한다.
+  BYOK의 연계 유료서비스로 보인다." → scope addition: switch Modal remote compute off in the distribution (child modal-off;
+  switched off, not deleted, to keep upstream sync cheap).
+- Next message: "그리고 스킬 만들기 테스트는 GAID 프레임워크 시스템이 아니라 수정된 Skill_hub 시스템에서 사용자가 테스트로 제공한
+  논문을 바탕으로 스킬을 만들고 해당 스킬을 테스트해봐야 하는 것이 아닌가? 일관성이 부족해보인다." Facts checked: skill_hub main is
+  unchanged since 2026-10-12 (957d366) and has no paper→skill authoring; the test paper is asset
+  `authoring_preview_paper` (gaid-authoring-preview/20261015, MPM nested-CV author manuscript), wired only to GAID's
+  click prototype `/authoring-preview` (no AI generation). "Authoring home" question asked in the tab; Q1/one-entry
+  implementation waits for it. Independent work continues (children, terminology, info load on lists).
 ## Failed approaches
 ## Notes and decisions
 - Orchestration (sequential, done by this writer; no child writers: the work is one tightly coupled interactive trial,
