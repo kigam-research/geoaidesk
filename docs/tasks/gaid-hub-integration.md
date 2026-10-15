@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:36:11Z
+updated: 2026-10-15T14:36:32Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -83,6 +83,23 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 2. `task complete` each child on its finish notice; then integrate.
 3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
 4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
+### P4 acceptance plan (2026-10-15)
+- Instance: snapshot of this branch (after children integrate) in ~/data/geoaidesk/work/gaid-hub-integration/app,
+  GAID_HOME=<work>/home, ports 3320/18320, systemd-run --user unit `gaid-hub-app`, log <work>/logs/app.log;
+  GAID_SKILL_HUB_SITES points at the trial hub http://127.0.0.1:4317/ (authoring "api/gaid/"). kigam-qwen provider,
+  defaults and reasoning levels copied from the trial unit's home2/pi-agent (models.json, kady-custom-models.json,
+  kady-settings.json; keyless). No paid route configured.
+- Input data for the bounded trial depends on the hub package's declared inputs: candidates are the paper's original
+  data (~/pc71-projects/narr/mpm_nested_cv/data, 130 MB, reproduction) and Kambalda grids/ozmin
+  (<trial work>/samples/kambalda, new-data). The catalogue spatial-pu-workflow skill stays installed in the project but is
+  hidden from the method chat by the `method:` exposure; verify that in the exposure record.
+- Steps: researcher agent (Claude Sonnet 5.5 high, playwright-cli) as in the trial unit: Settings → Skills hub list →
+  preview → acknowledge → install; Workflow panel method row → setup → chat on Qwen; record outcome; assessment.
+  Orchestrator gates: GET /geo/methods, trial record vs provenance, exposure record, expected artifacts. Visual reviews
+  "Claude 고급검토" and "Codex 고급검토" before/after fixes.
+- Qwen server took one session at a time (trial unit note): schedule GAID trial chats when the hub's authoring and the
+  trial unit's R1 are not using it.
+
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration (2026-10-15)
