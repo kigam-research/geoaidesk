@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:29:49Z
+updated: 2026-10-15T15:31:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -80,7 +80,12 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 - Parent after integration: handoff routes expose Content-Disposition + X-GAID-Handoff-Path (route-local, 8bc5f0d);
   method rows wired into task-catalogue.tsx (ae75fea; the trial unit edits the same file, expect a small merge).
   Verified: web tsc clean; web vitest methods/skill-hub/workspace/hub-handoff 50 pass; server handoff 13 pass.
-- Trial instance rebuilding on ae75fea (unit gaid-hub-app, 3320/18320).
+- Trial instance on ae75fea (unit gaid-hub-app, 3320/18320). Browser (playwright session `hub`, screenshots
+  ~/data/geoaidesk/work/gaid-hub-integration/playwright/): Workflow panel shows the empty hub-section notice + refresh
+  button above the Geoscience list. Real CORS: POST /geo/hub/handoff from origin :3320 exposes "ETag, X-Project-Fallback,
+  X-Content-SHA256, X-Office-Read-Only, X-Kady-Auth, Content-Disposition, X-GAID-Handoff-Path". The browser download
+  filename itself is checked in P4 with a real chat bundle. Copy fix: methods.empty ko "Settings의 스킬에서 패키지를
+  미리보고" → "설정 → 스킬에서 패키지를 미리 보고" (en unchanged).
 - Routed request term-workflow-gaid-hub-integration (user: "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길
   원한다."): consumed; applies to this unit's new strings ("Workflow"; "워크플로우" only where Korean spelling is unavoidable).
   Report it with route-report at finish.

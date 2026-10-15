@@ -1,7 +1,7 @@
 {
   "category": "허브에서 설치한 Workflow",
   "loading": "설치된 Workflow를 읽는 중입니다.",
-  "empty": "허브에서 설치한 Workflow가 없습니다. Settings의 스킬에서 패키지를 미리보고 설치하세요.",
+  "empty": "허브에서 설치한 Workflow가 없습니다. 설정 → 스킬에서 패키지를 미리 보고 설치하세요.",
   "error": "설치된 Workflow를 읽지 못했습니다: {detail}",
   "reload": "목록 새로고침",
   "close": "상세 닫기",
