@@ -122,6 +122,15 @@ describe("analysis handoff", () => {
     fs.truncateSync(path.join(paths.provenanceDir, sessionId, "steps.jsonl"), HANDOFF_LIMITS.logBytes + 1);
     expect(() => previewHandoff(paths, sessionId)).toThrow(/read limit/);
   });
+  it("includes UTF-8 tar extension headers in the whole-bundle size limit", async () => {
+    const names = Array.from({ length: 4 }, (_, i) => `${"자료".repeat(10)}${i}.bin`);
+    for (const [i, name] of names.entries()) file(name, Buffer.alloc(HANDOFF_LIMITS.fileBytes - (i === 3 ? 7000 : 0)));
+    provenance(names);
+    await expect(buildHandoff(paths, { sessionId, files: names }).then(result => zlib.gunzipSync(result.archive).length)).rejects.toMatchObject({ code: "size", status: 413 });
+    for (const name of names) file(name, "small result");
+    const accepted = await buildHandoff(paths, { sessionId, files: names });
+    expect(readTarGz(accepted.archive).map(entry => entry.path)).toEqual(["handoff.json", ...names.map(name => `files/${name}`)]);
+  });
   it("keeps modified/wrote edges and deduplicates step ids", () => {
     file("result.txt"); provenance(["result.txt"]);
     const log = path.join(paths.provenanceDir, sessionId, "steps.jsonl");

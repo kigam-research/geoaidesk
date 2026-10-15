@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import zlib from "node:zlib";
 import { TarArchive } from "archiver";
 import type { ProjectPaths } from "../../projects.ts";
 import { REPO_ROOT } from "../../config.ts";
@@ -156,5 +157,13 @@ export async function buildHandoff(paths: ProjectPaths, input: { sessionId?: unk
   archive.append(json, { name: "handoff.json", mode: 0o644 });
   for (const { file, data } of contents) archive.append(data, { name: `files/${file.path}`, mode: 0o644 });
   void archive.finalize().catch(() => { /* error event rejects done */ });
-  return { archive: await done, manifest, filename: `gaid-analysis-${preview.sessionId.slice(0, 8)}-${createdAt.slice(0, 10).replaceAll("-", "")}.tar.gz` };
+  const bytes = await done;
+  // UTF-8 names can add PAX headers even when the name is shorter than 100
+  // bytes. Check the actual expanded archive, not just the preflight estimate.
+  try { zlib.gunzipSync(bytes, { maxOutputLength: HANDOFF_LIMITS.totalBytes }); }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ERR_BUFFER_TOO_LARGE") throw new HandoffError("size", "Bundle exceeds 20 MiB including tar headers", 413);
+    throw error;
+  }
+  return { archive: bytes, manifest, filename: `gaid-analysis-${preview.sessionId.slice(0, 8)}-${createdAt.slice(0, 10).replaceAll("-", "")}.tar.gz` };
 }
