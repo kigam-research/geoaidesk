@@ -439,6 +439,12 @@
       "owner": "gaid-improve--source-preview",
       "status": "edited",
       "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default."
+    },
+    {
+      "path": ".gitignore",
+      "owner": "gaid-improve",
+      "status": "edited",
+      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git."
     }
   ],
   "notTouched": [
