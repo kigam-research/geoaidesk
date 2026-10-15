@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T08:34:45Z
+status: ready
+updated: 2026-10-15T08:34:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0f805fd9-0a65-4a06-a989-436a5ecdcca7","pid":2472511,"provider":"codex","session":"01a13ea0-2a2c-7e30-a258-fadfb356f741","start":"51804685","token":"84f022dc40c565feab0199c4629c9faa29b46d0a9be164973d06b89729c28740"}
 branch: task/gaid-improve--method-preview
 target: task/gaid-improve
@@ -41,10 +41,8 @@ Focused evidence: 11 UI tests passed, including metadata gating, defer without a
 
 First task finish created local 3faa427 and merged parent 3bc0d25, but did NOT publish: required scripts/check reached backend 1679 passed/11 skipped, frontend 995 passed and launcher check passed, then distribution checks failed (40/41 passed). Parent-owned distribution owner allowlist omits the newly declared gaid-improve/gaid-improve--source-preview boundaries; first failure is geo/tests/distribution.test.mjs:79, owner gaid-improve. Exact blocker sent to parent writer f7b1833c-ee21-47b2-a47b-733efe41ebb6 with notifyOnFinish false. Parent must also ensure declared new route seams exist in its published snapshot. No child-owned failure found. Remaining copy/environment/production-smoke stages not reached. Private check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-p4sawlpi.log; output: /home/seongin3/data/geoaidesk/work/checks/3faa4273b4d6-20261015T082202.249850Z. Integrated browser checks remain parent-owned.
 ## Next steps
-1. Verify the procedure-only trial-request gate, then rerun task finish in place without task resume. CLI merges the published parent snapshot automatically.
-2. Parent runs task complete gaid-improve--method-preview after the checked child snapshot publishes.
-
-Parent correction 6138d2dea9a4 is published: owner allowlist accepts gaid-improve and gaid-improve--source-preview; unbuilt route declarations removed. Parent reports distribution-focused 7/7 passed. The actual first failure was the owner allowlist, not comma-separated path syntax (already supported). User requested the procedure branch never enable the trial-summary event, matching the parent reducer. Updated canPreview and added a complete-metadata procedure regression test; changed the existing success-path test to draft-code. Recheck: all 12 focused UI tests passed; previewMethod copy 0 errors/0 warnings; git diff --check passed. No resume was run.
+<!-- task:closed -->
+Closed 2026-10-15T08:34:46Z: ready; the parent gaid-improve integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial dependency-install task job was refused with "job source dirty; save first" before any receipt/job was created. No resume was needed. Installed frontend dependencies locally with npm ci --prefix web --no-audit --no-fund (11 seconds, no package/lock changes).
