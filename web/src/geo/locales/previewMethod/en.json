@@ -26,7 +26,9 @@
     "new": {
       "title": "New data: decide from spatial properties",
       "body": "Determine evaluation blocks after examining spatial dependence and the scope of application. Do not use 50 km as a default."
-    }
+    },
+    "details": "Paper settings and research purpose",
+    "summary": "Paper: 50 km · New data: decide from spatial characteristics"
   },
   "purpose": {
     "title": "Saved purpose",
@@ -34,7 +36,7 @@
   },
   "choice": {
     "title": "Implementation approach",
-    "description": "The example does not include analysis code. Choose an implementation approach for the draft.",
+    "description": "Choose the implementation approach to include in the draft.",
     "defer": "Answer later",
     "deferred": "Answer deferred. Choose an implementation approach to continue to the draft.",
     "unanswered": "No implementation approach has been selected.",
@@ -73,7 +75,6 @@
     "saved": "Saved in the browser at: {time}"
   },
   "plan": {
-    "title": "Planned method steps",
     "1": {
       "title": "Inspect data",
       "body": "Check input format, coverage and recorded positives."
@@ -89,7 +90,8 @@
     "4": {
       "title": "Interpret results",
       "body": "Plan to examine exploration priorities and limits of application."
-    }
+    },
+    "title": "Planned method steps"
   },
   "contents": {
     "title": "Planned draft contents",
@@ -152,5 +154,7 @@
     "excluded": "The source PDF, attached code, research data and existing result files are not included in the proposed contents.",
     "reviewOnly": "This screen only reviews sharing contents. Nothing is published or sent to others."
   },
-  "dialog": { "close": "Close preview" }
+  "dialog": {
+    "close": "Close preview"
+  }
 }

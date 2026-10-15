@@ -31,6 +31,10 @@ export function AuthoringPreview() {
   const currentState = useRef(state);
   currentState.current = state;
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [state.step]);
+
   const releaseBlob = useCallback(() => {
     if (blob.current) URL.revokeObjectURL(blob.current);
     blob.current = null;
@@ -156,8 +160,13 @@ export function AuthoringPreview() {
             </Button>)}
           </nav>
           {(notice || loading) && <p role="status" className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-slate-700">{loading ? text("sample.loading") : notice}</p>}
-          {state.step !== "trial" && <div className="mb-3"><PreviewSourceInput source={state.source} onSample={() => void loadSample()}
+          {state.step === "sources" && <div className="mb-3"><PreviewSourceInput source={state.source} onSample={() => void loadSample()}
             onPdfFile={onPdfFile} onUrl={onUrl} onClear={() => changeSource(null, null)} /></div>}
+          {state.step === "method" && <details className="mb-4 rounded-lg border border-slate-200 bg-white px-4 py-3">
+            <summary className="cursor-pointer text-sm font-medium text-slate-600">{text("source.change")}</summary>
+            <div className="pt-4"><PreviewSourceInput source={state.source} onSample={() => void loadSample()}
+              onPdfFile={onPdfFile} onUrl={onUrl} onClear={() => changeSource(null, null)} /></div>
+          </details>}
           {state.step === "sources" && <div className="preview-columns">{sourcePane}
             <section className="h-fit rounded-xl border border-slate-200 bg-white p-6 lg:p-7">
               <FileText aria-hidden="true" className="mb-5 size-8 text-blue-600" />

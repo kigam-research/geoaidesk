@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:46:52Z
+updated: 2026-10-15T09:07:51Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -99,6 +99,16 @@ User answer (verbatim):
 This approves the preceding concrete proposal: implement a clickable prototype using the connected three-state visual flow. The image-set registry is adopted and sidecars are approved for that scope. It does not claim or authorize a complete institutional backend, paid model authoring evaluation, scientific retraining or publication. Prototype scope/interfaces/ownership are in `docs/design/authoring-preview-implementation.md`.
 
 ## Current state
+Delivered the approved frontend-only source-first authoring prototype at `/authoring-preview`: real sample/local PDF, URL metadata, source-linked prepared example, optional purpose, contextual choices/defer, editable private draft, browser save/reset and illustrative trial/files/sharing. No model calls, scientific execution, skill installation, project writes or publication.
+
+Both child ready tips are integrated and `task complete` was run for each (source 8a8c1e0d86aa, method 71a4e52f9b83; integration 49ebf26924fc). Their cleanup remains pending for generated ignored caches only; `task close` retries confirmed this. Do not resume/restart children or modify their worktrees manually.
+
+Full scripts/check passed at integration 49ebf26924fc: backend 159 files / 1679 tests passed, 1 file / 11 tests skipped (includes 2 network-dependent mzML cases); frontend 155 files / 1020 tests passed; all geo checks, copy/environments and production stop/restart smoke passed. Browser review then found/fixed outer-page scrolling during PDF page links; collapsed secondary source/settings/results UI and stage-scroll reset also applied. Latest focused 8 files / 36 tests, web TypeScript and three copy catalogs (0 errors/warnings) passed. Final finish must rerun scripts/check for these post-integration edits.
+
+Browser 1536×1024 and 390×844 checks passed: real manuscript pages 1/9/20, local PDF, URL/no inherited sample, defer/code/procedure gating, edited draft save/reload, local PDF reselection, dialogs/Escape/focus, reset and no horizontal overflow. No model/project/annotation traffic or browser errors observed. Browser job 5 exited 0 after explicit stop. Read-only review found no remaining blocker in bounded scope. Canonical report now embeds actual browser captures, not generated paper pixels.
+
+## Earlier checkpoints
+
 - Source child ready tip 8a8c1e0d86aa was merged locally by task complete into 7410d60aa037. Integration check failed because parent app imports the still-unintegrated method child; no child closure claimed yet. Integrate method ready tip 71a4e52 next, then retry source complete. Do not resume/restart children. Parent shell now also accepts an optional research purpose, with sample-specific text only when explicitly loading the sample.
 - Parent implementation is local: app shell, typed state transitions, browser-only persistence, source race protection, runtime provider isolation and fixed pinned PDF adapter. Focused parent tests: 3 files / 11 tests passed; new app interaction tests await child integration. Reader identified repeat-create draft loss and saved-draft loss when sample serving is unavailable; both fixed with regression coverage. Parent must not publish app imports before child components are integrated.
 - Child writers running from frozen shared contract at 8c0d90d36cae: `gaid-improve--source-preview` agent `0638b069-bf6b-4df6-8567-35d75a05e836`, workspace `wks_53d1b500def56d35`; `gaid-improve--method-preview` agent `0f805fd9-0a65-4a06-a989-436a5ecdcca7`, workspace `wks_7c4b25ef50c74ee2`. Both gpt-6.1-sol high. CLI initially inherited priority despite normal-speed brief; per-agent service_tier corrected to default and read back, profiles unchanged. Parent continues integration.
@@ -126,13 +136,19 @@ This approves the preceding concrete proposal: implement a clickable prototype u
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-- Immediate integration: boundary correction 6138d2dea9a4 published and distribution 7/7 passed. Both children retrying finish. Complete each, then run parent app/focused/browser checks and scripts/check. New routes now exist locally with separate boundary entries; not published yet.
+1. Finalize report/copy evidence and registry hashes, humanize new Korean prose, refresh review-copy.
+2. Save reviewed final files and run `task finish`. If it fails, fix in place and rerun; no resume. Research job 2 disposition is recorded as superseded by successful job 3; do not repeat it.
+3. Hub verifies code/jobs, applies the declared review rollout below and handles generated-cache cleanup, then sends its final completion report here. Deliver that report once; do not archive this session.
 
-1. Checkpoint the approved image metadata, prototype scope and shared contract. Start isolated child writers for source/PDF and method/trial UI packages using the settled file ownership. Parent continues state/persistence, shell, runtime isolation and sample input adapter while children run.
-2. Complete each child with `task complete`, integrate locale catalogs/components, verify the approved composition and actual interactions on a separate task-owned preview instance. Preserve real PDF content and clear prepared-example states.
-3. Run meaningful focused checks and required `scripts/check`; fix in place. Update the canonical report with working route, interaction evidence, exact simulated/unconnected boundaries and copy IDs. No live review service changes by writer.
-4. Finish this agreed prototype slice with `task finish` when implementation/checks/report are complete; follow the hub's final completion/rollout report. Remaining full authoring backend work remains a separate explicitly scoped continuation, not a prototype completion claim.
+## Rollout for hub
+- Update the existing user review instance in `~/deploy/geoaidesk` to the final integrated main revision using its current service workflow. Preserve `~/.geoaidesk`, providers, model credentials and ports 3000/18000. Writer did not change it.
+- Enable `GAID_AUTHORING_PREVIEW_SAMPLE=1` on that review instance only; the registered PC74 asset `~/assets/gaid-authoring-preview/20261015/author-manuscript.pdf` is present and verified. Verify `/authoring-preview` and its fixed sample endpoint; default GAID workspace must remain available. User reaches the existing forwarded localhost:3000 URL plus `/authoring-preview`.
+- No public release/tag, skill_hub changes, real model/science runs or external publication. If rollout cannot be completed, distinguish integrated code from pending deployment in the final report.
+- Two child worktrees have cleanup debt (`unknown ignored files`): only node_modules, helper .venv, .next, next-env.d.ts and well/__pycache__ observed. Parent retried printed `task close` once for each; did not remove files outside its owned worktree. Handle with normal hub cleanup policy, not user relay.
+
 ## Failed approaches
+- Parent integration initially published shell imports before both view packages were integrated. Source task complete merged its tip then failed the frontend suite on missing method-pane. Completing method integrated the missing package; the combined full check passed. Do not repeat this dependency-order failure.
+- Browser evidence found scrollIntoView moved the outer page for raw PDF links. Restricted raw-source navigation to the PDF scroll container and checked page 9/20 plus unchanged window scroll; legacy sandbox behavior remains unchanged.
 - Oracle follow-up job 2 used wrapper-only `--effort` after `--followup`; the wrapper only consumes leading wrapper options. Exit 1 is a CLI parse error, not a research/access failure. Inspected `~/backbone/runtime/oracle-web:140–157`; retry moves `--effort xhigh` first.
 - Initial figure-first A/B/C image round assumed a ready-made method. User rejected that premise; keep those files as external history and redesign from PDF/URL ingestion with no existing PU skill.
 - Initial hand-made wireframe was deliberately excluded after user required current design/template/skill research. Its files remain external as internal scratch only.
@@ -177,7 +193,11 @@ the project hub answers or closes them with `task item`)
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 Report: reports/2026-10-15-gaid-researcher-ecosystem/index.md
-The initial orientation needed no report; the later ecosystem-design request supersedes that restriction. This is a design/assessment result, not an implementation-completion report.
+The initial orientation restriction was superseded by the design and approved clickable-prototype scope. This canonical report records the implemented prototype, its actual checks and the separate unimplemented authoring backend.
+## Final evidence preparation
+- Applied humanizer file-mode to new Korean report/copy prose; simplified inherited-data wording and clarified typechecking. Numeric tokens and link targets preserved. Report remains review, actual browser screenshots are new review artifacts; previously adopted image comps retain their own status.
+- Browser job 5 log/exit read: requested stop true, child code 0, job exit 0. No running preview service or browser remains.
+
 ## Integration checkpoint (2026-10-15)
 - Source child focused checks passed at 9ec7e12ff54c (6 files / 13 tests and web tsc); its full finish passed backend 159 / 1 skipped and frontend 150 files / 994 tests, then failed the distribution owner allowlist at line 79 (the initial child diagnosis misidentified this as fs.existsSync; comma-separated paths are already supported). Added the two owned packages to that allowlist and removed premature new-route declarations. Corrected the existing layout entry now; unpublished new routes will be declared with their implementation. Method child bf457d6e2f25 is verified pushed and awaiting the same correction. No user action or scope change.
 - Parent dependency job 4 exited 0: npm ci installed 1202 packages. No app checks implied.
@@ -187,8 +207,10 @@ The initial orientation needed no report; the later ecosystem-design request sup
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T062040.069187Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/log"],"reason":"Research request failed before submission due to wrapper option ordering; corrected follow-up completed successfully in job 3 and its findings are integrated.","recorded":"2026-10-15T09:06:49Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T072125.103956Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T081719.031415Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T085402.145478Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

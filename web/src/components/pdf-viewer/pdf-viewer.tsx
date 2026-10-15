@@ -622,6 +622,18 @@ export function PdfViewer({
   const appliedPageRequest = useRef<{ doc: PdfDoc; page: number; sequence: number } | null>(null);
   const requestedPage = pageRequest?.page;
   const requestSequence = pageRequest?.sequence;
+  const jumpToPage = useCallback((page: number) => {
+    const container = containerRef.current;
+    const element = container?.querySelector<HTMLElement>(`[data-pdf-page="${page}"]`);
+    if (!container || !element) return false;
+    if (sourceUrl !== undefined) {
+      // scrollIntoView also scrolls the surrounding authoring page, hiding its question/header.
+      container.scrollTo({ top: container.scrollTop + element.getBoundingClientRect().top
+        - container.getBoundingClientRect().top, behavior: "instant" });
+    } else element.scrollIntoView({ behavior: "smooth", block: "start" });
+    setCurrentPage(page);
+    return true;
+  }, [sourceUrl]);
   useEffect(() => {
     if (!doc || !defaultSize || requestedPage === undefined || requestSequence === undefined) return;
     const page = requestedPage;
@@ -629,12 +641,9 @@ export function PdfViewer({
     if (!Number.isInteger(page) || page < 1 || page > numPages) return;
     const applied = appliedPageRequest.current;
     if (applied?.doc === doc && applied.page === page && applied.sequence === sequence) return;
-    const el = containerRef.current?.querySelector<HTMLElement>(`[data-pdf-page="${page}"]`);
-    if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    setCurrentPage(page);
+    if (!jumpToPage(page)) return;
     appliedPageRequest.current = { doc, page, sequence };
-  }, [doc, defaultSize, numPages, requestedPage, requestSequence]);
+  }, [doc, defaultSize, numPages, requestedPage, requestSequence, jumpToPage]);
   useEffect(() => {
     if (!doc) return;
     let cancelled = false;
@@ -713,12 +722,7 @@ export function PdfViewer({
         setShowExpert={setShowExpert}
         hideAnnotationUi={viewOnly}
         openHref={documentUrl}
-        onJumpPage={(p) => {
-          const el = containerRef.current?.querySelector<HTMLElement>(
-            `[data-pdf-page="${p}"]`,
-          );
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }}
+        onJumpPage={jumpToPage}
       />
 
       <div className="flex flex-1 min-h-0">

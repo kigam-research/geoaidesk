@@ -24,7 +24,8 @@
   },
   "source": {
     "invalidPdf": "Select a nonempty PDF file no larger than 50 MiB.",
-    "invalidUrl": "Enter a URL beginning with http or https."
+    "invalidUrl": "Enter a URL beginning with http or https.",
+    "change": "Change source · PDF or URL"
   },
   "saved": {
     "success": "Saved the current choices and draft in this browser. File contents are not saved.",

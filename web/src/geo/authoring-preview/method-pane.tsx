@@ -39,16 +39,13 @@ export function PreviewMethodPane({
   }
   return (
     <Card className="min-w-0 shadow-none">
-      <CardHeader className="gap-3">
+      <CardHeader className="gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-xl font-semibold">{text("method.title")}</h2>
           <Badge variant="secondary">{text("status.prepared")}</Badge>
         </div>
-        <p className="text-sm leading-6 text-muted-foreground">
-          {text("method.description")}
-        </p>
       </CardHeader>
-      <CardContent className="space-y-5 text-sm leading-6">
+      <CardContent className="space-y-4 text-base leading-7">
         <section
           className="rounded-lg border p-4"
           aria-labelledby={`${id}-finding`}
@@ -67,7 +64,12 @@ export function PreviewMethodPane({
             </Button>
           </div>
         </section>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <details className="rounded-lg border p-3 text-sm leading-6">
+          <summary className="cursor-pointer font-medium">
+            {text("setting.details")}
+            <span className="mt-1 block font-normal text-muted-foreground">{text("setting.summary")}</span>
+          </summary>
+        <div className="mt-3 grid gap-3 text-sm leading-6 sm:grid-cols-2">
           <section className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
             <h3 className="font-semibold text-blue-700 dark:text-blue-300">
               {text("setting.original.title")}
@@ -83,7 +85,7 @@ export function PreviewMethodPane({
             </p>
           </section>
         </div>
-        <section className="rounded-lg border p-4">
+        <section className="rounded-lg border p-3 text-sm leading-6">
           <h3 className="flex items-center gap-2 font-semibold">
             <Bookmark className="size-4" aria-hidden="true" />
             {text("purpose.title")}
@@ -92,6 +94,7 @@ export function PreviewMethodPane({
             {state.purpose || text("purpose.empty")}
           </p>
         </section>
+        </details>
         <fieldset className="space-y-3 rounded-lg border p-4">
           <legend className="px-1 font-semibold">{text("choice.title")}</legend>
           <p className="text-muted-foreground">{text("choice.description")}</p>
@@ -112,7 +115,7 @@ export function PreviewMethodPane({
                 <span className="block font-medium">
                   {text(`choice.${choice}.title`)}
                 </span>
-                <span className="block text-muted-foreground">
+                <span className="block text-sm leading-6 text-muted-foreground">
                   {text(`choice.${choice}.body`)}
                 </span>
               </span>
@@ -168,7 +171,8 @@ export function PreviewMethodPane({
               {text(`choice.${state.choice}.note`)}
             </p>
           )}
-          <div className="space-y-2 border-t pt-3">
+          <details className="space-y-2 border-t pt-3 text-sm leading-6">
+            <summary className="cursor-pointer font-medium">{text("attachment.results")}</summary>
             <label htmlFor={`${id}-results`} className="font-medium">
               {text("attachment.results")}
             </label>
@@ -205,7 +209,7 @@ export function PreviewMethodPane({
             <p className="text-xs text-muted-foreground">
               {text("attachment.metadataOnly")}
             </p>
-          </div>
+          </details>
         </fieldset>
         {state.deferred && (
           <p role="status" className="rounded-lg bg-muted p-3">

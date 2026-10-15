@@ -49,8 +49,9 @@ describe("controlled method choices", () => {
     expect(
       screen.getByRole("button", { name: "선택한 방식으로 초안 보기" }),
     ).toBeDisabled();
-    expect(screen.getByText(p.state.purpose)).toBeVisible();
     const user = userEvent.setup();
+    await user.click(screen.getByText("논문 설정과 적용 목적"));
+    expect(screen.getByText(p.state.purpose)).toBeVisible();
     await user.click(screen.getByRole("button", { name: "원고 9쪽 보기" }));
     await user.click(
       screen.getByRole("button", { name: "Figure 6 · 20쪽 보기" }),

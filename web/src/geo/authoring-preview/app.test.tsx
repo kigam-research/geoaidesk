@@ -9,8 +9,8 @@ vi.mock("./trial-pane", () => ({ PreviewTrialPane: (p: PreviewMethodProps) => <d
 vi.mock("./preview-dialogs", () => ({ PreviewDialogs: () => null }));
 import { AuthoringPreview } from "./app";
 import { PREVIEW_STORAGE_KEY } from "./state";
-beforeEach(() => { localStorage.clear(); localStorage.setItem("gaid:locale", "en"); vi.stubGlobal("fetch", mocks.fetch); vi.stubGlobal("URL", class extends URL { static createObjectURL = mocks.create; static revokeObjectURL = mocks.revoke; }); });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
+beforeEach(() => { vi.spyOn(window, "scrollTo").mockImplementation(() => {}); localStorage.clear(); localStorage.setItem("gaid:locale", "en"); vi.stubGlobal("fetch", mocks.fetch); vi.stubGlobal("URL", class extends URL { static createObjectURL = mocks.create; static revokeObjectURL = mocks.revoke; }); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); vi.clearAllMocks(); });
 it("rejects a stale sample response after the researcher selects a different PDF", async () => {
   let resolve!: (value: { ok: boolean }) => void;
   mocks.fetch.mockReturnValueOnce(new Promise((r) => { resolve = r; }));

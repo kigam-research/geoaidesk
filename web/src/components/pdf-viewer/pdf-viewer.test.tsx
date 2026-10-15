@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PdfViewer } from "./pdf-viewer";
 
 const mocks = vi.hoisted(() => ({
-  getDocument: vi.fn(), rawFileUrl: vi.fn(), fetchAnnotations: vi.fn(), subscribeAnnotations: vi.fn(), saveAnnotations: vi.fn(),
+  scrollTo: vi.fn(), getDocument: vi.fn(), rawFileUrl: vi.fn(), fetchAnnotations: vi.fn(), subscribeAnnotations: vi.fn(), saveAnnotations: vi.fn(),
 }));
 vi.mock("pdfjs-dist", () => ({ GlobalWorkerOptions: {}, getDocument: mocks.getDocument }));
 vi.mock("@/lib/use-sandbox", () => ({ rawFileUrl: mocks.rawFileUrl }));
@@ -18,7 +18,9 @@ function makeDocument(pages = 12) {
   return { numPages: pages, getPage: vi.fn(async () => ({ getViewport: () => ({ width: 600, height: 900 }) })), destroy: vi.fn() };
 }
 
+const originalScrollTo = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollTo");
 beforeEach(() => {
+  Object.defineProperty(HTMLElement.prototype, "scrollTo", { configurable: true, value: mocks.scrollTo });
   vi.clearAllMocks();
   localStorage.setItem("gaid:locale", "en");
   mocks.rawFileUrl.mockImplementation((path, project) => `/sandbox/raw?path=${encodeURIComponent(path)}&project=${project}`);
@@ -28,12 +30,16 @@ beforeEach(() => {
   vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect() {} });
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("/* worker */"));
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals();
+  if (originalScrollTo) Object.defineProperty(HTMLElement.prototype, "scrollTo", originalScrollTo);
+  else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollTo;
+});
 
 describe("PDF raw source seam", () => {
   it("loads raw blob URLs without sandbox resolution or any annotation API and retains functional navigation/zoom", async () => {
     const ready = vi.fn();
-    const scroll = vi.spyOn(Element.prototype, "scrollIntoView");
+    const outerScroll = vi.spyOn(Element.prototype, "scrollIntoView");
+    const scroll = mocks.scrollTo;
     render(<PdfViewer path="paper.pdf" sourceUrl="blob:local-paper" onDocumentReady={ready} />);
     await waitFor(() => expect(ready).toHaveBeenCalledWith(12));
     expect(mocks.getDocument).toHaveBeenCalledWith(expect.objectContaining({ url: "blob:local-paper" }));
@@ -47,7 +53,9 @@ describe("PDF raw source seam", () => {
     const page = screen.getByRole("textbox");
     fireEvent.change(page, { target: { value: "3" } });
     fireEvent.submit(page.closest("form")!);
-    expect(scroll.mock.instances.at(-1)).toHaveAttribute("data-pdf-page", "3");
+    expect(scroll.mock.instances.at(-1)).toHaveAttribute("data-pdf-scroll");
+    expect(outerScroll).not.toHaveBeenCalled();
+    expect(page).toHaveValue("3");
     fireEvent.click(screen.getByTitle("Zoom in"));
     expect(screen.getByText("110%")).toBeInTheDocument();
   });
@@ -65,14 +73,17 @@ describe("PDF raw source seam", () => {
   it("queues page requests through document load and reapplies only for a new sequence, not zoom", async () => {
     let resolve!: (doc: ReturnType<typeof makeDocument>) => void;
     mocks.getDocument.mockReturnValue({ promise: new Promise((done) => { resolve = done; }) });
-    const scroll = vi.spyOn(Element.prototype, "scrollIntoView");
+    const outerScroll = vi.spyOn(Element.prototype, "scrollIntoView");
+    const scroll = mocks.scrollTo;
     const ready = vi.fn();
     const { rerender } = render(<PdfViewer path="paper.pdf" sourceUrl="/sample.pdf" pageRequest={{ page: 9, sequence: 1 }} onDocumentReady={ready} />);
     await waitFor(() => expect(mocks.getDocument).toHaveBeenCalled());
     expect(scroll).not.toHaveBeenCalled();
     await act(async () => resolve(makeDocument()));
     await waitFor(() => expect(scroll).toHaveBeenCalledOnce());
-    expect(scroll.mock.instances.at(-1)).toHaveAttribute("data-pdf-page", "9");
+    expect(scroll.mock.instances.at(-1)).toHaveAttribute("data-pdf-scroll");
+    expect(outerScroll).not.toHaveBeenCalled();
+    expect(screen.getByRole("textbox")).toHaveValue("9");
     fireEvent.click(screen.getByTitle("Zoom in"));
     expect(scroll).toHaveBeenCalledOnce();
     rerender(<PdfViewer path="paper.pdf" sourceUrl="/sample.pdf" pageRequest={{ page: 9, sequence: 2 }} onDocumentReady={vi.fn()} />);
