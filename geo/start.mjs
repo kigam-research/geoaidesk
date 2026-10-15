@@ -60,6 +60,13 @@ export function resolveDistributionEnv(distribution, env, { root = repoRoot, hom
   }
   if (!env.KADY_PRODUCT_NAME?.trim()) set.KADY_PRODUCT_NAME = distribution.productName;
   if (!env.KADY_ISSUES_URL?.trim()) set.KADY_ISSUES_URL = distribution.issuesUrl;
+  // Identify this launcher, not the development/upstream entry points. Inline
+  // the same effective feature in the UI; NEXT_PUBLIC_* is build-stamped.
+  set.GAID_DISTRIBUTION = "1";
+  const catalogueFlag = env.GAID_CATALOGUE?.trim().toLowerCase();
+  const geoMode = distribution.catalogue?.status === "pinned" &&
+    !["off", "0", "false"].includes(catalogueFlag) && !env.KADY_SKILLS_REPO?.trim();
+  set.NEXT_PUBLIC_GAID_REMOTE_COMPUTE = String(!geoMode || distribution.features?.remoteCompute !== false);
   // The UI is built against the backend URL; follow a non-default port.
   const port = env.KADY_PORT?.trim();
   if (port && !env.NEXT_PUBLIC_ADK_API_URL?.trim()) set.NEXT_PUBLIC_ADK_API_URL = `http://localhost:${port}`;

@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../../src/geo/distribution.ts";
 /**
  * kady-notebook — a Pi package that gives CHILD pi processes the `notebook`
  * tool, so subagents can log lab-notebook entries. The parent (in-process)
@@ -111,7 +112,7 @@ export const notebookChildTool: ToolDefinition<typeof NotebookParams> = {
     "You may propose robustness on a hypothesis with a real --spec/--output Python script, defensible variations and seeds. Never launch proposed jobs or claim approval; the scientist must review the exact snapshot and compute budget in Stress-test finding. Do not search for significance or hide failed specifications.",
     "You may propose analysisPlan on a hypothesis; it is only a draft until the user reviews and freezes it in the UI. Never claim approval or external preregistration. Results can reference saved scientific_result calls in explicit parent/project sessionIds; local child result references remain unverified after harvest.",
     "Legacy relatesTo/stance links still work. To correct an entry use supersedes and explicitly restate its evidence links: amendments do not inherit relationships. Local entry ids refer to this child's notebook; only use sessionId for an explicit parent/project reference.",
-  ],
+  ].filter((line) => remoteComputeEnabled() || !line.startsWith("You may propose robustness")),
   parameters: NotebookParams,
   execute: async (toolCallId, params) => {
     const title = (params.title ?? "").trim();
@@ -139,6 +140,10 @@ export default function (pi: ExtensionAPI): void {
   registerChildNotebook(pi);
 }
 export function registerChildNotebook(pi: ExtensionAPI): void {
-  pi.registerTool(notebookChildTool);
+  pi.registerTool(remoteComputeEnabled() ? notebookChildTool : {
+    ...notebookChildTool,
+    parameters: Type.Omit(NotebookParams, ["robustness"]) as typeof NotebookParams,
+    promptGuidelines: notebookChildTool.promptGuidelines?.filter((line) => !line.startsWith("You may propose robustness")),
+  });
   pi.registerTool(notebookSearchTool(callMemoryApi));
 }

@@ -1,5 +1,14 @@
 # Modal compute
 
+GeoAIDesk distribution launches disable this upstream feature with
+`geo/distribution.json` → `features.remoteCompute: false`. `geo/start.mjs`
+marks distribution execution (`GAID_DISTRIBUTION=1`) and inlines its effective
+state as `NEXT_PUBLIC_GAID_REMOTE_COMPUTE` in the UI build. With the pinned geo
+catalogue, no Modal tools, child bridge/provider, compute UI, remote API routes
+or recovery run. Existing `.kady/modal/` records and saved credentials are not
+deleted. Development launchers, non-geo mode and distributions without the
+switch retain the upstream behaviour documented below.
+
 Kady runs remote CPU/GPU commands through a project-owned job service. The
 backend-host sandbox remains canonical; jobs, logs and outputs appear in the
 center-panel **Compute** tab.

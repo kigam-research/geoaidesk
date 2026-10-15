@@ -1,3 +1,5 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -30,6 +32,28 @@ describe("Modal data hooks", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("does not fetch or poll any remote compute resource when the distribution disables it", async () => {
+    remoteComputeFeature.enabled = false;
+    try {
+      const { result } = renderHook(() => ({
+        catalog: useModalCatalog("disabled"),
+        jobs: useModalJobs({ projectId: "disabled" }),
+        job: useModalJob("old-job", { projectId: "disabled" }),
+        logs: useModalJobLogs("old-job", "stdout", { projectId: "disabled" }),
+      }));
+      act(() => {
+        result.current.catalog.refresh();
+        result.current.jobs.refresh();
+        result.current.job.refresh();
+        result.current.logs.refresh();
+        window.dispatchEvent(new Event(MODAL_CREDENTIALS_CHANGED_EVENT));
+      });
+      await waitFor(() => expect(result.current.jobs.loading).toBe(false));
+      expect(result.current.catalog.loading).toBe(false);
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally { remoteComputeFeature.enabled = true; }
   });
 
   it("refreshes the server compute catalog immediately after credential changes", async () => {

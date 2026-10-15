@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 /**
  * Native `notebook` tool: Kady logs its own research narrative as structured
  * lab-notebook entries (hypothesis / method / observation / decision / note).
@@ -168,8 +169,8 @@ export function makeNotebookTool(
       "To stress-test a finding, write a real Python analysis script accepting --spec/--output, then propose robustness on its hypothesis with defensible variations, explicit inputs, common metric/unit, seeds and pinned packages. This is only a proposal: do not launch the proposed jobs through modal tools or claim user approval. The scientist reviews the snapshot and estimated budget in Stress-test finding. Do not search specifications for significance; retain failures and null/inconclusive outcomes.",
       "To propose the next investigation, log a NOTE with nextExperiments targeting a saved hypothesis. Compare competing explanations, predict outcomes under every explanation, and say what each possible/inconclusive result would change. Ground sources with notebook_search; prefer existing-data checks and justify new collection. Priorities/time/cost are qualitative judgments, never computed probabilities or information gain. A proposal is not an observation, an approval or permission to execute; record actual results separately.",
       "Link structured outputs using results: [{toolCallId, sessionId?}], with ids returned by scientific_result. The notebook resolves the saved cards instead of asking you to duplicate measurements.",
-    ],
-    parameters: NotebookParams,
+    ].filter((line) => remoteComputeEnabled() || !line.startsWith("To stress-test a finding")),
+    parameters: remoteComputeEnabled() ? NotebookParams : Type.Omit(NotebookParams, ["robustness"]) as typeof NotebookParams,
     execute: async (toolCallId, params, _signal) => {
       const title = (params.title ?? "").trim();
       if (!title) throw new Error("notebook entry needs a non-empty title");

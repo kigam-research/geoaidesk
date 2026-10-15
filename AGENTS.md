@@ -23,6 +23,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - The four `anthropics/skills` document skills (`docx`, `pdf`, `pptx`, `xlsx`) are never bundled or fetched
   automatically (`catalogue.excludedSources`, applied in `server/src/config.ts`); automatic catalogue refresh is off
   in the distribution (`KADY_SKILLS_AUTO_SYNC=0`).
+- Modal remote compute is off in the GAID distribution (`features.remoteCompute: false`): no tools, child bridges, compute UI or startup recovery; existing `.kady/modal/` data is preserved. Upstream/development launchers retain Modal.
 - Geo catalogue (WP03 `gaid-runtime`): `geo/distribution.json` `catalogue` pins one skill_hub archive by version and
   sha256 (asset `geo_catalogue` in `configs/inputs.toml`). `server/src/geo/catalogue.ts` finds it
   (`GAID_CATALOGUE_ARCHIVE` → `<GAID_HOME>/catalogue/` → `geo/catalogue/` (ignored) → `~/assets/geo-catalogue/<v>/`),

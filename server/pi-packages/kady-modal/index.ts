@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../../src/geo/distribution.ts";
 import { Type, type Static } from "typebox";
 import type { ExtensionAPI, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import {
@@ -597,6 +598,8 @@ export default function (pi: ExtensionAPI): void {
   registerChildModal(pi);
 }
 export function registerChildModal(pi: ExtensionAPI): void {
+  // Old project/global settings can still load this retained upstream package.
+  if (!remoteComputeEnabled()) return;
   const identity = trackSubagentChildIdentity(pi);
   for (const tool of makeModalChildTools(identity)) pi.registerTool(tool);
 }

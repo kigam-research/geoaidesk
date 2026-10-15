@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 /**
  * Runtime credential management for the bring-your-own-key model.
  *
@@ -416,6 +417,9 @@ export async function registerCredentialRoutes(
       const changesModal =
         req.body?.[MODAL_ID_FIELD] !== undefined ||
         req.body?.[MODAL_SECRET_FIELD] !== undefined;
+      if (changesModal && !remoteComputeEnabled()) {
+        return reply.code(404).send({ detail: "Remote compute is not available in this distribution" });
+      }
       if (changesModal) {
         const modalIdSpec = MANAGED_KEYS.find((spec) => spec.bodyField === MODAL_ID_FIELD)!;
         const modalSecretSpec = MANAGED_KEYS.find((spec) => spec.bodyField === MODAL_SECRET_FIELD)!;
