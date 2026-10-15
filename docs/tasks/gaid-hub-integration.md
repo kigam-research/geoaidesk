@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T23:08:43Z
+updated: 2026-10-15T23:09:12Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -101,6 +101,7 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
+Blocked: waiting for the P4 researcher agent 7e41440e (Paseo, running; UI trial of the hub package on Qwen) to write <work>/researcher/summary.md; a background wait in this session fires when it exists.
 1. P4 running (2026-10-16 08:05 KST): package local/pu-nested-cv-prospectivity rev 1 (request 351e0b68701b, sha256
    84daff9e…, hub :4317 kept up until we report). Instance rebuilt on 1905f3f. Researcher agent 7e41440e-9412-45d8-944e-444049c24585
    (Claude Sonnet 5.5 high, notifyOnFinish false), brief <work>/researcher/BRIEF.md, deliverables <work>/researcher/
