@@ -156,6 +156,10 @@ for (const [name, mod] of [
       for (const target of ["/tmp/a", "/var/tmp/custom/a", "/dev/null"]) expect(mod.classifyFilePath(target, opts).kind).toBe("allow");
       expect(mod.classifyFilePath("/proj/sandbox/../other", opts).kind).toBe("outside-project");
     });
+    it("keeps rootless relative resolution independent of the host cwd", () => {
+      expect(mod.resolveSandboxPath("a.csv", "user_data")).toBe("user_data/a.csv");
+      expect(mod.classifyBashCommand("cd user_data && rm a.csv", { protectedGlobs: globs }).kind).toBe("protected");
+    });
     it("matches globs as documented", () => {
       expect(mod.globToRegExp("user_data/**").test("user_data")).toBe(true);
       expect(mod.globToRegExp("user_data/**").test("user_data/a/b.csv")).toBe(true);

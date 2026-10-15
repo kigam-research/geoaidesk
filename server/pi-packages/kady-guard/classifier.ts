@@ -141,7 +141,11 @@ function resolveTargetPath(token: string, cwd: string, opts: Pick<ClassifyOption
   if (windows) value = value.replace(/^\\(?!\\)/, "").replace(/\\/g, "/").replace(/^\/([a-z])\//i, "$1:/");
   const api = windows ? path.win32 : path.posix;
   const base = cwd || opts.sandboxRoot;
-  if (!base) return api.normalize(value).replace(/\\/g, "/");
+  // With no absolute root, keep relative resolution relative. path.resolve
+  // would otherwise read the host cwd, making the classifier stateful.
+  if (!base || !api.isAbsolute(base)) {
+    return api.normalize(api.isAbsolute(value) ? value : api.join(base || ".", value)).replace(/\\/g, "/");
+  }
   return api.resolve(opts.sandboxRoot ?? base, cwd || ".", value).replace(/\\/g, "/");
 }
 

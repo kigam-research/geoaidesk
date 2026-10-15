@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:02:49Z
+status: active
+updated: 2026-10-15T14:10:18Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -57,7 +57,7 @@ cases covered (table of command → verdict), tests run, and the limits. No netw
 blocked anyway). Remove build caches you created in your worktree before finishing.
 
 ## Current state
-Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 222 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. Full scripts/check and deployment belong to the parent after integration. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
+Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 224 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. task finish also automatically runs the repository-wide scripts/check: the first full attempt passed the backend (1775 passed, 11 skipped) but failed one unrelated map-viewer wait assertion in the full web suite; that file then passed alone (8 tests). Retrying finish with VITEST_MAX_WORKERS=4 to bound web-suite contention. Parent integration and deployment remain pending. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
 
 ## Next steps
 <!-- task:closed -->
@@ -65,23 +65,25 @@ Closed 2026-10-15T14:02:49Z: ready; the parent gaid-qwen-authoring-trial integra
 
 ## Checks
 - PASS: server npm run typecheck.
-- PASS: server npx vitest run test/bash-classifier.test.ts test/data-guard.test.ts (222 tests, including byte parity, lead outcomes/policy, pending-card restore and child blocks).
+- PASS: server npx vitest run test/bash-classifier.test.ts test/data-guard.test.ts (224 tests, including byte parity, lead outcomes/policy, pending-card restore and child blocks).
 - PASS: web npx tsc --noEmit.
 - PASS: web npx vitest run src/components/permission-card.test.tsx src/lib/use-agent-events.test.ts (25 tests; old destructive payloads, outside kind/path, English/Korean titles, hidden model reason, allow/deny routes and event replay).
 - PASS: node geo/copy/validate-copy.mjs web/src/geo/locales (0 errors, 56 warnings outside the three added IDs).
 - PASS: node --test geo/tests/distribution.test.mjs (7 tests).
 - PASS: git diff --check.
-- Full scripts/check is intentionally delegated to the parent by this unit's brief.
+- The brief assigns full scripts/check to the parent, but task finish automatically invokes it here too. First attempt: backend 1775 passed / 11 skipped; web 1022 passed / 1 failed (map-viewer wait assertion). Isolated map-viewer rerun: 8 passed. Full-check log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-wzj64i37.log. Retry uses the installed Vitest-supported VITEST_MAX_WORKERS=4 (runtime env only; no test/config source workaround).
 - Dependencies reused from the parent's external app snapshot through temporary node_modules symlinks; no dependency manifest/lockfile changed. Latest server test log: ~/data/geoaidesk/work/gaid-qwen-authoring-trial--outside-writes/server-check.log.
 
 ## Failed approaches
+- Second finish reached the full-check web phase and failed the unrelated map-viewer wait assertion under the default parallel suite; isolated rerun passed. No map source/test edited.
+- Final code review found optional rootless cwd resolution could consult the host cwd via path.resolve. Kept rootless paths relative, copied the classifier, and added two parity-run regression assertions; the requested pure-classifier contract is preserved (224 scoped server tests passed).
 - First task finish checkpointed the code, then hit a merge conflict with parent 749160e in the appended integration-boundaries seam. Kept the parent's expanded existing responsibility and this child's new seam; no implementation conflict. All scoped checks passed again on the merged snapshot before rerunning task finish.
 - Initial task resume met a sibling task transaction; retried after the sibling completed and resumed successfully at the original path.
 - First new hook tests used ../outside under the Vitest /tmp sandbox. Those targets correctly matched the temporary-directory allowance, so the tests were corrected to /opt/gaid targets (and relative paths that actually escape /tmp). One child fixture retained the old target until the next correction. Final rerun passed.
 - One UI test used status done rather than the existing complete enum. Corrected the fixture; web typecheck and tests passed.
 
 ## Notes and decisions
-- Sequential decisions: retain protected-path priority; recognize lexical sandbox/home/temp paths with options supplied by the runtime; collect outside writes before destructive fallback. Reads remain ungated. No filesystem probing in the classifier. Node path normalization receives absolute runtime roots; homeDir/tempDirs are injected by the lead and child adapters.
+- Sequential decisions: retain protected-path priority; recognize lexical sandbox/home/temp paths with options supplied by the runtime; collect outside writes before destructive fallback. Reads remain ungated. No filesystem probing or host cwd lookup in the classifier. Node path normalization receives absolute runtime roots; homeDir/tempDirs are injected by the lead and child adapters.
 - Owned interfaces: verdict kind `outside-project` with path; optional permission kind/path across broker -> activity -> card. Existing frames without kind retain destructive rendering.
 - This is tightly coupled work across the classifier and permission path; no reader needed. Parent owns instructions and the final report; sibling owns Modal.
 - Add the small `use-agent.ts` transport seam (required for kind/path to reach the card) and its existing event test.
