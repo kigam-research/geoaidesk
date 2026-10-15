@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:40:47Z
+updated: 2026-10-15T14:58:00Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"889fbc92-549f-4f63-9865-358efbab2bba","pid":793523,"provider":"codex","session":"01a13ffb-bfc7-7dd1-9fac-66f3bf150afc","start":"54082579","token":"c5f1a782a11515da3361495e6b345bc949fcea86976aaa8443c13bf3060b46d2"}
 branch: task/gaid-hub-integration--methods-ui
 target: task/gaid-hub-integration
@@ -73,11 +73,13 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
   results. Then `task finish`.
 
 ## Current state
+- Delivered the P3 UI modules, not the parent-owned task-catalogue wiring. Scoped UI/regression tests: 42 passed; web TypeScript: passed; copy validator: 0 errors, 56 existing warnings (none in methods/skillHub). Parent commit 503fb85 (including requested 88d530c) is integrated in this branch. Final scripts/check is required by task finish; use its completion receipt for the final full-check result.
 - Implemented standalone UI exports in `web/src/geo/methods/methods.tsx`: `useMethodRows(projectId, availableFiles)`, `methodRows`, `MethodDetail`, `MethodTrials`, `TrialCard`, and `MethodBadges`. Workflows and method recipes open TaskSetup; methods without Workflows open detail. Readiness uses existing workspace badge strings; lifecycle is effective server lifecycle, never lifecycleClaimed.
 - Parent wiring (not done here, restricted file): import `useMethodRows` into TaskCatalogue and call it unconditionally after the project props. Prepend `methods.category` to `leadingCategories`, prepend `methods.rows` to extension rows, include `methods.notice` in extension.notice, and render `methods.dialogs` beside existing TaskSetup dialogs. Keep the existing projectId key. The notice provides detail buttons and refresh. Workflows pass method exposure; recipe choices are stringified and unresolved choices are blank/editable.
 - Settings hub pane now lists per-hub descriptors (including individual hub errors). All preview actions still use SkillHubInstall and the existing acknowledgement/install gate. Preview notes display draft identity/revision/effective lifecycle.
 - Trial cards show observation counts, models, outputs, required/missing expected artifacts, changed method warning, incomplete file attribution and verbatim researcher assessment. An existing private page callback can open session history, but no public session-focus interface is available to these components; show the full chat ID instead of a non-working link.
-- Verification pending: dependencies are being installed by recorded job; then scoped web vitest, TypeScript and copy validation. Initial copy validation: 0 errors, 56 pre-existing warnings; no methods/skillHub warnings.
+- Re-verification: in web run `npx vitest run src/geo/methods/methods.test.tsx src/geo/skill-hub/skill-hub.test.tsx src/geo/workspace/workspace.test.tsx` and `npx tsc --noEmit`; at repo root run `node geo/copy/validate-copy.mjs web/src/geo/locales`. Dependency setup job exited 0.
+- Full task sync check failed at 9820fac: server 1688 passed/11 skipped; web 1030 passed/1 failed. Failure: existing map/viewer test could not find the viewport-table heading within its timeout under host load. The map test file passed all 8 tests alone; this does not turn the failed full run into a pass. Parent confirmed the same recorded timing issue in gaid-qwen-authoring-trial. Final CLI retry uses a temporary external npm wrapper that sets VITEST_MAX_WORKERS=4 only for `npm run test` in web; it unsets the variable for every server invocation. The server remains serial. Wrapper: /home/seongin3/data/geoaidesk/work/gaid-hub-integration--methods-ui/check-tools/npm.
 
 ### Copy changes (new ids; before = absent in both locales)
 
@@ -153,8 +155,10 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
 | skillHub.methodDraft | 허브 방법: {id} · revision {revision} · {lifecycle} | Hub method: {id} · revision {revision} · {lifecycle} |
 
 ## Next steps
-1. Implement standalone method rows/detail/trials and hub listing, then run the declared UI checks.
+1. Parent: run `task complete gaid-hub-integration--methods-ui` after the finish notification, then wire the hook using Current state and run the combined acceptance checks.
 ## Failed approaches
+- TypeScript was initially unavailable before npm ci. After installation, the new string exposure needed the existing GeoExposureMode event type at the TaskSetup seam; corrected, then typecheck passed.
+- A task sync reran its full suite after parent documentation advanced and hit the known map timing failure. No unrelated map code/test edits were made; use the frontend-only worker cap above, never a global cap that changes the server serial suite.
 ## Notes and decisions
 ### UI orchestration
 Sequential: TaskSetup exposure seam → method UI → hub preview listing → tests → parent handoff.
@@ -164,14 +168,9 @@ Parent owns task-catalogue integration and final full-app checks/report.
 
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. Parent includes the delivered UI, copy inventory and check results in its canonical report.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-integration--methods-ui-20261015T143901.271166Z/receipt.json
