@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T16:09:24Z
+status: done
+updated: 2026-10-15T16:09:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -105,7 +105,7 @@ gates accept them, and notable defects. Results are for review; record only obse
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T15:59:46Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-qwen-authoring-trial.md.
+Closed 2026-10-15T16:09:25Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-qwen-authoring-trial.md.
 
 ## Trial findings and fixes (live list; evidence `<work>/researcher/log.md`, `<work>/evidence/`)
 - S1 (21:07–21:51 KST): Qwen copied the catalogue LAS helper, wrote `las-window-quickqc` (SKILL.md + wrapper script, no
