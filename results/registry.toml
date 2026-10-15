@@ -5,9 +5,9 @@ id = "gaid-researcher-ecosystem-proposal-20261015"
 title = "연구방법의 제작·실행·공유를 잇는 GAID 개편안"
 state = "review"
 run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-improve/design"
-source_sha = "4ec056d23089b4d950adff65e38ba40532791190"
+source_sha = "aa3f212974a5a420aa6052347393183f72486f6b"
 inputs = ["geoaidesk:81b620bb827788bbf51e3a1bbdde3eda83a4b24f", "skill_hub:957d3662e3a0b31932389c4c75794f6cdf7e5eea", "user:2026-10-15-researcher-ecosystem", "user:2026-10-15-source-first-correction", "doi:10.1007/s11053-026-10778-w", "user:2026-10-15-coauthoring-agents"]
-files = [{ path = "researcher-ecosystem-proposal.md", sha256 = "96700e4fd562c083a57cfe7e4c24d68d22acceb926c03384b1ed4ed5ab2044ed" }]
+files = [{ path = "researcher-ecosystem-proposal.md", sha256 = "89712729cc9a672938424645669c99be91372766d08cc2773c9fac98fc68ec9b" }]
 report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
 replicas = []
 
@@ -60,6 +60,27 @@ files = [
   { path = "source-first-02-coauthor.json", sha256 = "617530b0d4e47d677191e1e3612bf6f72a338bc83821288710373043db88b34f" },
   { path = "source-first-03-draft-trial.png", sha256 = "5fbc63b505c450f7e0a90e2406255620fc9d4462b3eabd0939bbca0ff69f901e" },
   { path = "source-first-03-draft-trial.json", sha256 = "2c6587e21affc925de0377b9b9a1b32ad29c00d1310e0ed118fa8ec568aaee81" }
+]
+report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
+replicas = []
+
+[[result]]
+id = "gaid-authoring-preview-20261015"
+title = "원문 기반 연구 방법 작성 클릭형 시안"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-improve/preview-browser"
+source_sha = "aa3f212974a5a420aa6052347393183f72486f6b"
+inputs = ["assets:gaid-authoring-preview/20261015", "user:2026-10-15-approved-source-first-visuals"]
+files = [
+  { path = "intake.png", sha256 = "47231f0ea0448e580b95164cc81c01303ac7b2b2a4b0e1f873b0572e43d85b08" },
+  { path = "method.png", sha256 = "d8add8f15a1051767202f7fa32c0ac6152324f50dd066c708e2ae9be338c575d" },
+  { path = "trial.png", sha256 = "1b4e5cbc6594b47b7cc2904ca1323396b9c297745540081924e1cd209ff29841" },
+  { path = "narrow.png", sha256 = "18bc66629b6c550fa3ede37ebf53744cf169a301516d42a31c10c08fa781b971" },
+  { path = "evidence.json", sha256 = "f6f9c713cd96c6b8871e2db14b63b35081a86d3dd63c94782431c9f3da264ee9" },
+  { path = "flow.js", sha256 = "06a30c90e4c4a3710c7ea6b702666b302a1ac29bf790dd11da1a4ac0db35df09" },
+  { path = "sources.js", sha256 = "0953f4cb710554b090c8337b4091a22e1dc71b336cafbd87e1b4b61d42c2a372" },
+  { path = "requests.txt", sha256 = "6864a2055128f35826550b565596ca60a699ae9754025ae628e0fe5ff3c0293f" },
+  { path = "console-errors.txt", sha256 = "ed410c4062d4a10e96f0e89484917b688f271c829f0cd60f82df8cd5c6227d5c" }
 ]
 report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
 replicas = []

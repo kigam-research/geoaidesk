@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T09:07:51Z
+updated: 2026-10-15T09:09:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -136,9 +136,8 @@ Browser 1536×1024 and 390×844 checks passed: real manuscript pages 1/9/20, loc
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-1. Finalize report/copy evidence and registry hashes, humanize new Korean prose, refresh review-copy.
-2. Save reviewed final files and run `task finish`. If it fails, fix in place and rerun; no resume. Research job 2 disposition is recorded as superseded by successful job 3; do not repeat it.
-3. Hub verifies code/jobs, applies the declared review rollout below and handles generated-cache cleanup, then sends its final completion report here. Deliver that report once; do not archive this session.
+1. Final reviewed implementation is published at aa3f212974a5; save registry/review-copy status and run `task finish`. Final scripts/check covers the post-browser navigation/UI fixes. If finish fails, fix in place and retry; no resume.
+2. Hub verifies code/jobs, applies the declared review rollout below and handles generated-cache cleanup, then sends its final completion report here. Deliver that report once; do not archive this session.
 
 ## Rollout for hub
 - Update the existing user review instance in `~/deploy/geoaidesk` to the final integrated main revision using its current service workflow. Preserve `~/.geoaidesk`, providers, model credentials and ports 3000/18000. Writer did not change it.
@@ -194,6 +193,10 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 Report: reports/2026-10-15-gaid-researcher-ecosystem/index.md
 The initial orientation restriction was superseded by the design and approved clickable-prototype scope. This canonical report records the implemented prototype, its actual checks and the separate unimplemented authoring backend.
+## Final review-copy
+- Canonical report, copy-change record and three actual browser captures refreshed in `/home/seongin3/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-15-gaid-researcher-ecosystem/`. Report body and PNG bytes match. CLI skips JSON provenance sidecars and reports inactive sync service with desktop-app ownership; other-device delivery remains unverified.
+- Current preview artifacts and report hash registered as review at source aa3f212974a5. Browser evidence includes the small viewport and request list externally; adopted original image comps retain their previous entry.
+
 ## Final evidence preparation
 - Applied humanizer file-mode to new Korean report/copy prose; simplified inherited-data wording and clarified typechecking. Numeric tokens and link targets preserved. Report remains review, actual browser screenshots are new review artifacts; previously adopted image comps retain their own status.
 - Browser job 5 log/exit read: requested stop true, child code 0, job exit 0. No running preview service or browser remains.
