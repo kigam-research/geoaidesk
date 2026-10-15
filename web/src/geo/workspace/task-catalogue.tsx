@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import {
   ActivityIcon,
   BookmarkIcon,
-  DatabaseIcon,
   DropletIcon,
   FileTextIcon,
   FlaskConicalIcon,
@@ -72,10 +71,11 @@ const TONE = {
 export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {
   const state = workflow.readiness.state;
   const tone = state === "ready" ? TONE.ok : state === "unavailable" ? TONE.bad : TONE.warn;
+  // First view keeps only what changes a decision (gaid-qwen-authoring-trial): readiness when it is not ready,
+  // and the untested limit. "Needs your data" was on nearly every row; the setup dialog lists the inputs.
   return <>
-    <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>
+    {state !== "ready" && <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>}
     {workflow.readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
-    {workflow.inputRoles.some((role) => role.required) && <span className={cn(PILL, TONE.warn)}><DatabaseIcon className="size-2.5" />{t("workspace.badge.userData")}</span>}
   </>;
 }
 
@@ -160,6 +160,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     leadingCategories,
     rows,
     searchPlaceholder: t("workspace.catalogue.search"),
+    collapseUpstream: ready ? { showLabel: (count) => t("workspace.catalogue.showOther", { count }) } : undefined,
     headerAction: ready ? <RecipeAdd projectId={projectId} workflows={workflows} categories={saved.categories} onSaved={setSaved}
       onOpen={(setup) => { setOpened((previous) => ({ revision: (previous?.revision ?? 0) + 1, setup })); setSelected({ workflowId: setup.workflowId }); }} /> : null,
     notice: <>

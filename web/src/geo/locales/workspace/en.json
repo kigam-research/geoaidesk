@@ -19,7 +19,8 @@
     "boundary": "Interpretation limits: {boundary}",
     "empty": "No Geo tasks are registered.",
     "category": "Geoscience",
-    "search": "Search workflows"
+    "search": "Search workflows",
+    "showOther": "Show workflows from other fields ({count})"
   },
   "readiness": {
     "ready": "Ready",
