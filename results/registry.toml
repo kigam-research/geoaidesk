@@ -1,6 +1,17 @@
 format = 1
 
 [[result]]
+id = "gaid-researcher-ecosystem-proposal-20261015"
+title = "연구방법의 제작·실행·공유를 잇는 GAID 개편안"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-improve/design"
+source_sha = "448aad4caaf9ae2aa1e8f6a14addd53ae678a02b"
+inputs = ["geoaidesk:81b620bb827788bbf51e3a1bbdde3eda83a4b24f", "skill_hub:957d3662e3a0b31932389c4c75794f6cdf7e5eea", "user:2026-10-15-researcher-ecosystem"]
+files = [{ path = "researcher-ecosystem-proposal.md", sha256 = "81b2902394fb6736fe24ed2664bc007b89cad8b474e70b6adea969851a808404" }]
+report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
+replicas = []
+
+[[result]]
 id = "gaid-maps-browser-20261011"
 title = "지도와 전체 레이어 면적표의 앱 검증"
 state = "review"

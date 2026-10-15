@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T06:19:50Z
+updated: 2026-10-15T06:41:29Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -49,9 +49,26 @@ User request (verbatim):
 
 Current phase: evidence-backed product/architecture discussion. Deliver a concrete assessment, proposed researcher journeys, reusable foundations versus missing contracts/services, and phased implementation options. Do not treat the broad ecosystem vision as an instruction to silently replace both products or publish anything. No product code edits or review-instance changes in this phase; skill_hub inspection is read-only. Keep this task open for the discussion and agreed implementation.
 
+User design requirement (verbatim, 2026-10-15):
+
+> 시안을 작성하거나 목업을 만들 때에는 단순하게 제시하는 것이 아니라 최신 https://21st.dev/community/templates, shadcn, UUPM 등을 포함하여 검색 및 해당 목적에 적절한 대시보드나 구조를 찾아야 하고, 사용자가 shadcnblock 유료 api가 이미 연결되어 있는것과 impeccable 스킬과 taste 스킬 등 ui/ux 구성에 가용한 스킬들도 적극 활용해야한다.
+
+Apply this to the current design phase: inspect current template/component sources and the connected paid shadcnblocks registry, discover/read the named skills (including symlinked/local resources), select layout references by researcher tasks, and explain adopted/rejected patterns. The initial hand-built notebook wireframe is an internal information-order sketch, NOT a deliverable or an approved design. Do not offer it as the finished mockup. No template purchases or production dependency changes are authorized by this research step.
+
+Confirmed answers (verbatim, 2026-10-15):
+
+> 논문·코드·기존 결과가 있는 실제 사례 (권장)
+> 기관 웹 접속을 기본으로, 필요하면 로컬 실행 (권장)
+
+Design implications: the first pilot is an author's real paper + code + existing output, reused by a second researcher on different input. Institution-web is the primary entry, with optional local execution. This does not authorize exposing the existing single-user review service as a multi-user service. Exact pilot paper/project and operational identity/compute decisions remain to be specified; do not fabricate those choices.
+
 ## Current state
+- Design phase (2026-10-15): audited GAID workflow/notebook plus skill_hub read-only; public reference research and UI reference checks completed. Confirmed first pilot is an actual paper + code + existing outputs; primary entry is institution web, local execution optional. `PRODUCT.md` records confirmed product truth, not a selected visual system. Draft proposal: `reports/2026-10-15-gaid-researcher-ecosystem/index.md`; no production code, live services, user data, global skill installation, or paid template purchase changed.
+- Core gaps: catalogue launch flattens role/choice data to chat; no general catalogue-linked research instance. Notebook already has research primitives but chronology/type groups and technical identity precede conclusions. skill_hub Studio is manual assembly, not document-grounded coauthoring; contribution backend exists but is disabled. Keep specialized robustness execution, canonical results/provenance and Atlas metadata/evidence.
+- UI evidence: inspected 21st AI CRM/AdminCN/Design Process demos; shadcnblocks MCP direct `dashboard30` / `application-shell17` metadata succeeds after registry-index search 404. Official preview DOM/screenshots were inspected; authenticated fullscreen/premium source retrieval not tested. UUPM recommendations filtered for fit; no design-system persistence. The first simplistic notebook sketch is excluded from deliverables. A reference-backed functional mockup awaits actual pilot material and surface-concept selection.
+- Latest checks in this phase: documentation diff whitespace; UUPM local searches exit 0; Oracle reference-research job exit 0. These are not app tests or a scientific/user trial. Exact pilot title/project, source locations and institutional auth/compute environment remain unspecified.
 - Resumed on 2026-10-15 in `/home/seongin3/worktrees/geoaidesk/gaid-improve`; initial worktree clean.
-- Fetched `origin/main`: `81b620bb827788bbf51e3a1bbdde3eda83a4b24f` (Qwen decision ledger closure). The review deployment's HEAD matches it. This branch differs from main only in this task document. No app code, user data, services, or model settings changed; no inference or automated checks run for this orientation.
+- At the initial orientation, fetched `origin/main`: `81b620bb827788bbf51e3a1bbdde3eda83a4b24f` (Qwen decision ledger closure), matching the review deployment's HEAD. That orientation checkpoint changed only this task document, with no app code, user data, services, model settings, inference or automated checks changed/run. Later design documents are listed above.
 - Baseline: GAID 0.1.0 preview, pinned geo catalogue 0.2.1 (13 skills), production launcher with external user data; geo inspection/context/environment support, LAS depth and table checks, vector/raster maps and result adapters, Korean workspace/workflow setup, saved recipes and skill_hub package installation are merged. Evidence: AGENTS.md GeoAIDesk section and reports dated 2026-10-11/12.
 - Later merged units: map tiles/basemaps/Markdown image hints (`dc2b80c`), map/table interaction (`a8fe765`), unified workflow catalogue (`1826fce`), full Korean/English UI (`06c488a`), institution Qwen trials (`6ba34e3`), and project provisioning + accepted reasoning levels (`69b6ab5`). See the matching reports/2026-10-12-*, reports/2026-10-13-gaid-ui-locale, and reports/2026-10-14-*.
 - Domain boundaries retained: display tiles/reduced LAS windows are not analysis inputs; polygon area sums do not dissolve overlaps; paged vector sorting/filtering covers only the loaded page; table checks do not convert units or replace censored values. LAS supports bounded LAS 2.0 numerical data, not LAS 3/LiDAR/desurveying. Evidence: `docs/geo/well-tables.md`, `docs/geo/basemaps.md`, and the map/map-table reports. Native reader reconciled older limits with later tile/runtime/locale work; old reports are historical snapshots.
@@ -62,18 +79,25 @@ Current phase: evidence-backed product/architecture discussion. Deliver a concre
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-1. Inspect the reference portal and current GAID/skill_hub user journeys and contracts, then synthesize the researcher-first redesign proposal.
-2. Present the proposed first end-to-end slice and the few scope decisions that change architecture; continue design with the user's answers. Do not close the standing unit during this discussion.
-3. Once implementation scope/interfaces are settled, use isolated CLI child writer units for independent packages, route skill_hub implementation to its hub, and run `scripts/check` for code changes.
+1. Await the exact first pilot paper/project location and discuss the proposal. Current user decisions already settle case type and institution-web-first access, so do not ask those again. Design proposal is finalized for this discussion, humanized and registered as review; no implementation-completion claim.
+2. Inspect actual pilot material, define its scientific reuse criteria and representative states, and shape the linked authoring/run/notebook mockup using verified references and available design skills. Do not treat the excluded internal wireframe as an approved comp. Institution multiuser deployment and visual-system decisions are not yet settled.
+3. Once implementation scope/interfaces are settled, use isolated CLI child writer units for independent packages, route skill_hub implementation to its hub, and run `scripts/check` for code changes. Do not close this standing discussion unit with `task finish` yet.
 ## Failed approaches
-None.
+- Initial hand-made wireframe was deliberately excluded after user required current design/template/skill research. Its files remain external as internal scratch only.
+- Global skill-root search missed project-installed impeccable/taste; located both under skill_hub/.claude/skills. UUPM official pinned source was used externally without installation. Initial UUPM matches were off-topic; one narrow retry per query produced only qualified usable recommendations.
+- shadcnblocks registry search index returned 404. Avoided repeating search; discovered item IDs on official pages and verified direct MCP reads instead. No credentials/configuration were read or changed.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 - Orientation sequence: confirm the checkout and instructions → inspect current main and recent Qwen/UI reports → reconcile an independent read-only summary of earlier packages and geo docs → checkpoint the baseline → wait for the user.
 - Ownership: the parent is the sole writer of `docs/tasks/gaid-improve.md`. A native reader may inspect existing reports/docs only and return evidence; no child writer is needed for this documentation-only orientation. Integrate its findings into this document after checking them against main and newer reports.
 - Reader: `/root/baseline_reader` completed its read-only review of earlier merged packages and `docs/geo/`; findings integrated above. No child writer units or running jobs remain.
 - Design phase sequence: distinguish product roles and terms → independently audit notebook, workflow execution, and skill_hub → compare public reference/primary-source prior art → integrate current-versus-proposed journeys and execution contracts → discuss the first slice. Parent owns this task document and the canonical design report; readers own no files/interfaces.
-- Active read-only readers: `/root/baseline_reader` (notebook/research records), `/root/workflow_audit` (workflow/recipe contracts), `/root/skillhub_audit` (other repo, read-only). No child writers. Oracle research may run as a recorded job; do not repeat it after interruption.
+- Design-phase read-only assignments: `/root/baseline_reader` (notebook/research records), `/root/workflow_audit` (workflow/recipe contracts), `/root/skillhub_audit` (other repo). No child writers. Do not repeat the recorded Oracle research job after interruption.
+- All three domain audits finished. `/root/workflow_audit` also ran UUPM searches outside Git; `/root/skillhub_audit` checked 21st/shadcnblocks public visuals. `/root/baseline_reader` completed a bounded read-only proposal check; parent owns all edits.
+- Oracle (2026-10-15): session `gaid-skill-hub-task-https`, Pro effort verified, job `job-geoaidesk-gaid-improve-1`, exit 0, research based on pushed request `448aad4caaf9`. It could not read the attached task and did not audit code; use its result only as public-source comparison. Saved note: `웹 조사/geoaidesk/2026-10-15-gaid-skill-hub-task-https--a5e826b15c.md`.
+- Design skills applied: skill_hub/.claude/skills/impeccable (4.3.1, context/shape/operate/init), design-taste-frontend (hub editorial/landing only; not dashboards), UUPM official SHA `56ea9cf174ed86786187daa9de0e6247cb0747e4` (external source/output in `~/data/geoaidesk/work/gaid-improve/design/uupm-source`). No buildPath or visual-world choice stored; high-fidelity UI construction has not started.
+- Proposal read-only review completed: outcome covered, no blocking contradiction; clarified institution execution isolation and recipe portability. Applied humanizer file-mode review to Korean prose (removed staged contrast, clarified proposal versus implemented state, shortened repeated disclaimer). No facts or source targets changed. All native readers are done; Oracle job is terminal.
+- Review copy (2026-10-15): `/home/seongin3/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-15-gaid-researcher-ecosystem/index.md`. CLI copied 1 file; reported `obsidian-sync-cmds-main.service: inactive` and desktop-app sync ownership. Other-device delivery was not verified. Report snapshot is registered as `review`, not adopted.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -83,9 +107,11 @@ the project hub answers or closes them with `task item`)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
-None: the starter explicitly requested a brief task-document baseline, no report and no code changes.
+Report: reports/2026-10-15-gaid-researcher-ecosystem/index.md
+The initial orientation needed no report; the later ecosystem-design request supersedes that restriction. This is a design/assessment result, not an implementation-completion report.
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T062040.069187Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
