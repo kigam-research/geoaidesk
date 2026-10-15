@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-15T08:13:00Z
-writer: {"host":"seongin3","reserved":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
+writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
 parent: gaid-improve
