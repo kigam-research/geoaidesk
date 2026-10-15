@@ -734,5 +734,8 @@
   "skills_selector.author": "제작: {author}",
   "modal_job_detail.artifacts_count": "결과 파일 · {count}",
   "modal_job_detail.exit_code_value": "종료 코드 {code}",
-  "modal_job_detail.byte_value": "바이트 {count}"
+  "modal_job_detail.byte_value": "바이트 {count}",
+  "permission_card.outside_project_pending": "AI agent가 프로젝트 밖 파일을 변경하려고 합니다",
+  "permission_card.outside_project": "프로젝트 밖 파일 변경",
+  "permission_card.outside_project_target": "변경 대상: {path}"
 }

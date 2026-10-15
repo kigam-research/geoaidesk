@@ -469,6 +469,12 @@
       "owner": "gaid-qwen-authoring-trial",
       "status": "edited",
       "responsibility": "Gate retained upstream Modal tools, child bridges, startup/recovery, APIs and UI in the GAID distribution; preserve development mode and existing job data."
+    },
+    {
+      "path": "server/src/agent/data-guard.ts, server/src/agent/bash-classifier.ts, server/src/agent/permissions.ts, server/pi-packages/kady-guard/classifier.ts, server/pi-packages/kady-guard/index.ts, server/test/bash-classifier.test.ts, server/test/data-guard.test.ts, web/src/components/permission-card.tsx, web/src/components/permission-card.test.tsx, web/src/lib/use-agent.ts, web/src/lib/use-agent-events.test.ts, docs/data-guard.md",
+      "owner": "gaid-qwen-authoring-trial",
+      "status": "edited",
+      "responsibility": "Confirm recognized outside-project mutations in lead tools using the existing permission lifecycle; block them in child tools, preserve sandbox/temp/null allowances and protected-path precedence, and display localized permission kinds."
     }
   ],
   "notTouched": [

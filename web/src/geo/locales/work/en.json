@@ -734,5 +734,8 @@
   "skills_selector.author": "by {author}",
   "modal_job_detail.artifacts_count": "Artifacts · {count}",
   "modal_job_detail.exit_code_value": "Exit code {code}",
-  "modal_job_detail.byte_value": "byte {count}"
+  "modal_job_detail.byte_value": "byte {count}",
+  "permission_card.outside_project_pending": "The AI agent wants to change files outside the project",
+  "permission_card.outside_project": "File change outside the project",
+  "permission_card.outside_project_target": "Target: {path}"
 }
