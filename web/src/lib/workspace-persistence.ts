@@ -257,7 +257,7 @@ function sanitizeComputeTarget(value: unknown): ModalInstance | null {
   } as unknown as ModalInstance;
 }
 
-const GEO_EXPOSURE_RE = /^(?:all|catalogue|workflow:[a-z0-9][a-z0-9-]{0,63})$/;
+const GEO_EXPOSURE_RE = /^(?:all|catalogue|workflow:[a-z0-9][a-z0-9-]{0,63}|method:[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9][a-z0-9-]{0,63})$/;
 
 function sanitizeStoredChat(value: unknown): StoredChatState | undefined {
   if (!isRecord(value)) return undefined;

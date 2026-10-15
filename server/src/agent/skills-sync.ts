@@ -335,6 +335,11 @@ export function getSkillOrigins(ref: SkillScopeRef): Record<string, SkillOrigin>
   return out;
 }
 
+/** GeoAIDesk (gaid-hub-integration): tree hash recorded at install, so LocalMethod can report local edits. */
+export function getSkillBaseHash(scope: SkillScopeRef, name: string): string | null {
+  return readManifest(scope).skills[name]?.baseHash ?? null;
+}
+
 /** Provenance for one skill, for the UI's source badge and update routing. */
 export function getSkillProvenance(
   scope: SkillScopeRef,

@@ -13,6 +13,7 @@ import type { FastifyInstance } from "fastify";
 import { activePaths } from "../../projects.ts";
 import { currentProjectId } from "../../scope.ts";
 import fs from "node:fs";
+import path from "node:path";
 import { createSession, disposeSession, getModelRegistry, getSession } from "../../agent/session-registry.ts";
 import { resolveModel } from "../../agent/models.ts";
 import type { AgentSession } from "@earendil-works/pi-coding-agent";
@@ -21,6 +22,7 @@ import {
   exposureFile,
   exposureModeIssue,
   geoExposureIssue,
+  geoStateDir,
   promptBudget,
   readProjectContext,
   readSessionExposure,
@@ -160,6 +162,8 @@ export async function registerGeoCatalogueRoutes(app: FastifyInstance): Promise<
       await disposeSession(projectId, id);
       // A session with no messages leaves no file; drop its exposure record too.
       fs.rmSync(exposureFile(paths, id), { force: true });
+      // A previewed method chat is not a trial (gaid-hub-integration).
+      fs.rmSync(path.join(geoStateDir(paths), "method-trials", `${id}.json`), { force: true });
     }
   });
 }

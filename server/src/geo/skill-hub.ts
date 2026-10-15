@@ -8,25 +8,122 @@ import { previewSkillSource } from "../agent/skills-install.ts";
 import type { ProjectPaths } from "../projects.ts";
 import { loadGeoCatalogue, packageDigest } from "./catalogue.ts";
 import { readTar } from "./tar.ts";
+import { GAID_HUB_PACKAGE_SCHEMA, type MethodLifecycle } from "../../../web/src/geo/contracts/methods.ts";
+import { readMethodFile, verifyMethodTree } from "./methods/method-file.ts";
+import { packageStore, writePackageOrigin } from "./methods/package-origin.ts";
 
 export const SKILL_HUB_LIMITS = { compressed: 20 * 1024 * 1024, expanded: 64 * 1024 * 1024, entries: 10_000 };
-export interface SkillHubSite { id: string; url: string; packages: string }
+/** `authoring`: path under the site of hub draft descriptors (`gaid-hub-package/v1`), when the hub serves drafts. */
+export interface SkillHubSite { id: string; url: string; packages: string; authoring?: string }
 export class SkillHubError extends Error {
   constructor(public code: "url" | "download" | "size" | "archive" | "input", message: string) { super(message); }
 }
 const fail = (code: SkillHubError["code"], message: string): never => { throw new SkillHubError(code, message); };
+const LOOPBACK = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
-export function readSkillHubSites(repoRoot = REPO_ROOT): SkillHubSite[] {
+/**
+ * Sites from geo/distribution.json plus `GAID_SKILL_HUB_SITES` (a JSON array of the same shape), so a hub on this
+ * machine (e.g. a trial hub on loopback) can be added without changing the distribution. Later ids replace earlier ones.
+ */
+export function readSkillHubSites(repoRoot = REPO_ROOT, env: NodeJS.ProcessEnv = process.env): SkillHubSite[] {
   const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, "geo/distribution.json"), "utf8"));
-  const sites: unknown = manifest.skillHub?.sites ?? [];
-  if (!Array.isArray(sites)) throw new Error("skillHub.sites must be an array");
-  return sites.map((site) => {
-    if (!site || typeof site.id !== "string" || typeof site.url !== "string" || typeof site.packages !== "string") throw new Error("Invalid skillHub site");
-    const url = new URL(site.url);
-    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash || !url.pathname.endsWith("/")) throw new Error("skillHub site must be an HTTPS base URL ending in /");
-    if (!/^[a-zA-Z0-9_-]+$/.test(site.id) || !/^[a-zA-Z0-9_/-]+$/.test(site.packages) || site.packages.startsWith("/") || site.packages.split("/").some((p: string) => !p)) throw new Error("Invalid skillHub site id/packages path");
-    return { id: site.id, url: url.href, packages: site.packages };
-  });
+  const shipped: unknown = manifest.skillHub?.sites ?? [];
+  if (!Array.isArray(shipped)) throw new Error("skillHub.sites must be an array");
+  let extra: unknown = [];
+  if (env.GAID_SKILL_HUB_SITES?.trim()) {
+    try { extra = JSON.parse(env.GAID_SKILL_HUB_SITES); } catch { throw new Error("GAID_SKILL_HUB_SITES must be a JSON array"); }
+    if (!Array.isArray(extra)) throw new Error("GAID_SKILL_HUB_SITES must be a JSON array");
+  }
+  const byId = new Map<string, SkillHubSite>();
+  for (const site of [...shipped, ...(extra as unknown[])].map(validSite)) byId.set(site.id, site);
+  return [...byId.values()];
+}
+
+function validSite(site: { id?: unknown; url?: unknown; packages?: unknown; authoring?: unknown } | null): SkillHubSite {
+  if (!site || typeof site.id !== "string" || typeof site.url !== "string" || typeof site.packages !== "string") throw new Error("Invalid skillHub site");
+  const url = new URL(site.url);
+  // http only for a hub on this machine (a local hub service during development or a trial).
+  const secure = url.protocol === "https:" || (url.protocol === "http:" && LOOPBACK.has(url.hostname));
+  if (!secure || url.username || url.password || url.search || url.hash || !url.pathname.endsWith("/")) throw new Error("skillHub site must be an HTTPS (or loopback HTTP) base URL ending in /");
+  const relPath = (value: unknown) => typeof value === "string" && /^[a-zA-Z0-9_/-]+$/.test(value) && !value.startsWith("/") && !value.split("/").some((p: string) => !p);
+  if (!/^[a-zA-Z0-9_-]+$/.test(site.id) || !relPath(site.packages) || (site.authoring !== undefined && !relPath(String(site.authoring).replace(/\/$/, "")))) throw new Error("Invalid skillHub site id/packages/authoring path");
+  return { id: site.id, url: url.href, packages: site.packages, ...(typeof site.authoring === "string" && site.authoring ? { authoring: site.authoring } : {}) };
+}
+
+export interface HubDescriptor {
+  methodId: string;
+  revision: number;
+  version: string;
+  lifecycle: MethodLifecycle;
+  implementation: "descriptive" | "implemented";
+  title: { ko: string; en?: string };
+  sha256: string;
+  size: number;
+  packageDigest: string;
+  packageUrl: string;
+  manifestUrl: string;
+  pageUrl: string;
+  createdAt: string;
+}
+
+/** `authoring` with exactly one trailing slash, as a URL under the site. */
+function authoringBase(site: SkillHubSite): URL | null {
+  return site.authoring ? new URL(`${site.authoring.replace(/\/+$/, "")}/`, site.url) : null;
+}
+
+/**
+ * A hub draft descriptor URL: `<site><authoring>/...` on a configured site that
+ * serves drafts. A query (an opaque capability token) is allowed here only and
+ * never stored or shown.
+ */
+export function resolveDescriptorUrl(value: string, sites = readSkillHubSites()) {
+  let url: URL;
+  try { url = new URL(value); } catch { return null; }
+  // Descriptors live at <authoring>packages/<owner>/<slug>/<revision>.
+  const site = sites.find((s) => { const base = authoringBase(s); return base && url.origin === base.origin && /^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*\/[1-9]\d*$/.test(url.pathname.slice(`${base.pathname}packages/`.length)) && url.pathname.startsWith(`${base.pathname}packages/`); });
+  if (!site || url.username || url.password || url.hash || url.pathname.includes("..") || url.href.length > 2048) return null;
+  return { siteId: site.id, site, descriptorUrl: url.href, displayUrl: `${url.origin}${url.pathname}` };
+}
+
+export function parseHubDescriptor(value: unknown, site: SkillHubSite): HubDescriptor {
+  const raw = value as Record<string, unknown> | null;
+  if (!raw || typeof raw !== "object" || raw.schemaVersion !== GAID_HUB_PACKAGE_SCHEMA) return fail("download", `Hub descriptor is not ${GAID_HUB_PACKAGE_SCHEMA}`);
+  const text = (key: string, re: RegExp) => (typeof raw[key] === "string" && re.test(raw[key] as string) ? raw[key] as string : fail("download", `Hub descriptor has an invalid ${key}`));
+  const methodId = text("methodId", /^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/);
+  const version = text("version", /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[0-9A-Za-z.-]+)?$/);
+  const lifecycle = text("lifecycle", /^(draft|submitted|published)$/) as MethodLifecycle;
+  const implementation = text("implementation", /^(descriptive|implemented)$/) as HubDescriptor["implementation"];
+  const sha256 = text("sha256", /^[a-f0-9]{64}$/);
+  const packageDigest = text("packageDigest", /^[a-f0-9]{64}$/);
+  const createdAt = text("createdAt", /^.{1,64}$/);
+  if (typeof raw.revision !== "number" || !Number.isInteger(raw.revision) || raw.revision < 1) return fail("download", "Hub descriptor has an invalid revision");
+  if (typeof raw.size !== "number" || !Number.isInteger(raw.size) || raw.size <= 0 || raw.size > SKILL_HUB_LIMITS.compressed) return fail("size", "Hub descriptor size is missing or over the limit");
+  const title = raw.title as { ko?: unknown; en?: unknown } | null;
+  if (!title || typeof title.ko !== "string" || !title.ko) return fail("download", "Hub descriptor has an invalid title");
+  // Package, manifest and page come from the same hub; a descriptor cannot send GAID elsewhere.
+  const sameHub = (key: string) => {
+    let url: URL;
+    try { url = new URL(String(raw[key]), site.url); } catch { return fail("download", `Hub descriptor has an invalid ${key}`); }
+    if (url.origin !== new URL(site.url).origin || url.username || url.password) return fail("download", `Hub ${key} is not on the configured hub`);
+    return url.href;
+  };
+  return {
+    methodId, revision: raw.revision, version, lifecycle, implementation,
+    title: typeof title.en === "string" && title.en ? { ko: title.ko, en: title.en } : { ko: title.ko },
+    sha256, size: raw.size, packageDigest, packageUrl: sameHub("packageUrl"), manifestUrl: sameHub("manifestUrl"), pageUrl: sameHub("pageUrl"), createdAt,
+  };
+}
+
+export async function fetchHubDescriptor(url: string, site: SkillHubSite, fetcher: typeof fetch = fetch): Promise<HubDescriptor> {
+  let response: Response;
+  try { response = await fetcher(url, { redirect: "error", signal: AbortSignal.timeout(30_000), headers: { accept: "application/json" } }); }
+  catch { return fail("download", "Could not reach the hub"); }
+  if (!response.ok) return fail("download", `Hub descriptor request failed (${response.status})`);
+  const body = await response.text();
+  if (body.length > 64 * 1024) return fail("download", "Hub descriptor is too large");
+  let value: unknown;
+  try { value = JSON.parse(body); } catch { return fail("download", "Hub descriptor is not JSON"); }
+  return parseHubDescriptor(value, site);
 }
 
 export function resolveSkillHubUrl(value: string, sites = readSkillHubSites()) {
@@ -114,14 +211,80 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   catalogue?: ReturnType<typeof skillHubCatalogue>;
 } = {}) {
   if ((input.url !== undefined) === (input.archive !== undefined) || (input.scope !== undefined && input.scope !== "project" && input.scope !== "global")) return fail("input", "Provide one URL or one package and a valid scope");
-  const resolved = input.url !== undefined ? resolveSkillHubUrl(input.url, deps.sites) : undefined;
-  const archive = input.archive ?? await downloadSkillHubPackage(resolved!.packageUrl, deps.fetcher);
+  const descriptorRef = input.url !== undefined ? resolveDescriptorUrl(input.url, deps.sites) : null;
+  const descriptor = descriptorRef ? await fetchHubDescriptor(descriptorRef.descriptorUrl, descriptorRef.site, deps.fetcher) : null;
+  const resolved = input.url !== undefined && !descriptorRef ? resolveSkillHubUrl(input.url, deps.sites) : undefined;
+  const archive = input.archive ?? await downloadSkillHubPackage(descriptor?.packageUrl ?? resolved!.packageUrl, deps.fetcher);
+  if (descriptor) {
+    const digest = crypto.createHash("sha256").update(archive).digest("hex");
+    if (digest !== descriptor.sha256 || archive.length !== descriptor.size) return fail("archive", "Package bytes do not match the hub descriptor");
+  }
   const staged = stageSkillHubPackage(archive, { agentDir: deps.agentDir, expectedSlug: resolved?.slug });
+  // A method package's tree must match its own file listing; a hub descriptor must name the same method revision.
+  for (const entry of fs.readdirSync(staged.source)) {
+    const file = readMethodFile(path.join(staged.source, entry), entry);
+    if (descriptor && !file.method) return fail("archive", "Hub package has no valid gaid-method.json");
+    if (!file.method) continue;
+    if (verifyMethodTree(path.join(staged.source, entry), file.method).length) return fail("archive", "Package files do not match gaid-method.json");
+    if (descriptor && (file.method.methodId !== descriptor.methodId || file.method.revision !== descriptor.revision || file.method.packageDigest !== descriptor.packageDigest)) {
+      return fail("archive", "Package method id/revision/digest do not match the hub descriptor");
+    }
+  }
+  writePackageOrigin(packageStore(deps.agentDir), {
+    sha256: staged.sha256,
+    kind: input.archive ? "upload" : "skill-hub",
+    ...(descriptorRef ? { siteId: descriptorRef.siteId, descriptorUrl: descriptorRef.displayUrl } : {}),
+    ...(resolved ? { siteId: resolved.siteId, pageUrl: resolved.pageUrl } : {}),
+    // A configured Pages site lists published skills only; a descriptor states its own lifecycle.
+    ...(descriptor ? { hub: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, pageUrl: descriptor.pageUrl } } : resolved ? { hub: { lifecycle: "published" as const } } : {}),
+    fetchedAt: new Date().toISOString(),
+  });
   const preview = await (deps.preview ?? previewSkillSource)(paths, { source: staged.source, scope: input.scope });
   const catalogue = deps.catalogue ?? skillHubCatalogue();
   return { ...preview, skillHub: {
-    sha256: staged.sha256, siteId: resolved?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
+    sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
+    ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),
     catalogueAvailable: catalogue.available,
     catalogueNames: preview.skills.filter((s) => catalogue.skills.some((c) => c.runtimeName === s.name)).map((s) => s.name),
   } };
+}
+
+export interface HubMethodListing {
+  siteId: string;
+  url: string;
+  state: "ok" | "error";
+  detail?: string;
+  methods: (HubDescriptor & { descriptorUrl: string })[];
+}
+
+/**
+ * Latest revision of every method on each configured hub that serves drafts
+ * (`GET <authoring>methods`, `gaid-hub-methods/v1`). Read-only: nothing is
+ * downloaded or installed; the UI hands a descriptor URL to the preview gate.
+ */
+export async function listHubMethods(sites = readSkillHubSites(), fetcher: typeof fetch = fetch): Promise<HubMethodListing[]> {
+  return Promise.all(sites.filter((site) => site.authoring).map(async (site): Promise<HubMethodListing> => {
+    const base = authoringBase(site)!;
+    const out: HubMethodListing = { siteId: site.id, url: site.url, state: "ok", methods: [] };
+    try {
+      const response = await fetcher(new URL("methods", base).href, { redirect: "error", signal: AbortSignal.timeout(10_000), headers: { accept: "application/json" } });
+      if (!response.ok) throw new Error(`Hub answered ${response.status}`);
+      const body = await response.text();
+      if (body.length > 1024 * 1024) throw new Error("Hub method list is too large");
+      const value = JSON.parse(body) as { schemaVersion?: unknown; methods?: unknown };
+      if (value?.schemaVersion !== "gaid-hub-methods/v1" || !Array.isArray(value.methods)) throw new Error("Hub method list is not gaid-hub-methods/v1");
+      for (const row of value.methods.slice(0, 200)) {
+        try {
+          const descriptor = parseHubDescriptor(row, site);
+          out.methods.push({ ...descriptor, descriptorUrl: new URL(`packages/${descriptor.methodId}/${descriptor.revision}`, base).href });
+        } catch {
+          // An invalid row is left out; the others stay listed.
+        }
+      }
+    } catch (error) {
+      out.state = "error";
+      out.detail = error instanceof Error ? error.message : "Could not reach the hub";
+    }
+    return out;
+  }));
 }

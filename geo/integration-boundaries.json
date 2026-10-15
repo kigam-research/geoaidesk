@@ -4,6 +4,12 @@
   "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
   "seams": [
     {
+      "path": "server/test/geo-hub-handoff.test.ts",
+      "owner": "gaid-hub-integration",
+      "status": "added",
+      "responsibility": "Bounded session-to-hub analysis preview/download, provenance selection, opt-in raw data and tar manifest regression coverage"
+    },
+    {
       "path": "start.mjs",
       "owner": "gaid-fork-base",
       "status": "edited",
@@ -204,7 +210,7 @@
       "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send"
+      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send; gaid-hub-integration: the sanitizer also accepts method:<name>:<workflow> exposures"
     },
     {
       "path": "server/src/api/sessions.ts",
@@ -366,7 +372,7 @@
       "path": "server/src/agent/skills-sync.ts",
       "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged"
+      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged. gaid-hub-integration: added getSkillBaseHash (read-only) so LocalMethod can report local edits; existing functions unchanged"
     },
     {
       "path": "server/pi-packages/kady-child-runtime/index.ts",

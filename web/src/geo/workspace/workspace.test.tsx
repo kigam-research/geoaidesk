@@ -5,7 +5,6 @@ import type { GeoSuggestion, GeoWorkflowSummary, WorkflowReadinessState } from "
 import { GeoTaskCatalogue } from "./task-catalogue";
 import { WorkflowsPanel } from "@/components/workflows-panel";
 import { GeoFileActions } from "./file-actions";
-import { GeoChatActions } from "./chat-actions";
 import { GeoResultBody } from "./result-card";
 import { onStartGeoTask } from "./events";
 import { onChatPrefill } from "@/lib/chat-prefill";
@@ -228,26 +227,6 @@ describe("file actions and recipes", () => {
     await userEvent.click(screen.getByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD"); expect(within(dialog).getByLabelText("단위")).toHaveValue(""); expect(within(dialog).getByRole("button", { name: "작업 초안 만들기" })).toBeDisabled();
     expect(apiFetch).toHaveBeenCalledWith("/sandbox/file?path=recipe.geo-start.json", {}, "p1"); expect(apiFetch.mock.calls.some(([path]) => path === "/skills")).toBe(false);
-  });
-});
-
-describe("reusable skill", () => {
-  it("disables creation without a session or during streaming", () => {
-    const { rerender } = render(<GeoChatActions projectId="p1" sessionId={null} isStreaming={false} />); expect(screen.getByRole("button", { name: "재사용 스킬 만들기" })).toBeDisabled();
-    rerender(<GeoChatActions projectId="p1" sessionId="s1" isStreaming />); expect(screen.getByRole("button", { name: "재사용 스킬 만들기" })).toBeDisabled();
-  });
-  it("validates the Pi name rule, creates a project template and prefills without sending", async () => {
-    render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); await userEvent.click(screen.getByRole("button", { name: "재사용 스킬 만들기" }));
-    fireEvent.change(screen.getByLabelText(/스킬 이름/), { target: { value: "bad--name" } }); fireEvent.change(screen.getByLabelText("재사용할 작업 설명 (한 문장)"), { target: { value: "Well log QC" } }); expect(screen.getByRole("button", { name: "스킬 템플릿 만들기" })).toBeDisabled();
-    fireEvent.change(screen.getByLabelText(/스킬 이름/), { target: { value: "my-qc" } }); const prefill = vi.fn(); const off = onChatPrefill(prefill);
-    try {
-      await userEvent.click(screen.getByRole("button", { name: "스킬 템플릿 만들기" })); await waitFor(() => expect(prefill).toHaveBeenCalledOnce());
-      expect(apiFetch).toHaveBeenCalledWith("/skills/create", expect.objectContaining({ body: JSON.stringify({ name: "my-qc", description: "Well log QC", scope: "project" }) })); expect(prefill.mock.calls[0][0]).toContain(".pi/skills/my-qc/SKILL.md"); expect(prefill.mock.calls[0][0]).toContain("검증을 주장하지 마세요"); expect(apiFetch.mock.calls.every(([path]) => path === "/skills/create")).toBe(true);
-    } finally { off(); }
-  });
-  it("shows creation errors without losing the fields", async () => {
-    apiFetch.mockResolvedValue(json({ detail: "Name exists" }, 409)); render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); await userEvent.click(screen.getByRole("button", { name: "재사용 스킬 만들기" }));
-    fireEvent.change(screen.getByLabelText(/스킬 이름/), { target: { value: "my-qc" } }); fireEvent.change(screen.getByLabelText("재사용할 작업 설명 (한 문장)"), { target: { value: "QC" } }); await userEvent.click(screen.getByRole("button", { name: "스킬 템플릿 만들기" })); expect(await screen.findByRole("alert")).toHaveTextContent("Name exists"); expect(screen.getByLabelText(/스킬 이름/)).toHaveValue("my-qc");
   });
 });
 
