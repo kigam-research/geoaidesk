@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T14:02:48Z
+status: ready
+updated: 2026-10-15T14:02:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -60,8 +60,8 @@ blocked anyway). Remove build caches you created in your worktree before finishi
 Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 222 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. Full scripts/check and deployment belong to the parent after integration. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
 
 ## Next steps
-1. Finish this checked child snapshot with task finish.
-2. Parent: integrate with task complete gaid-qwen-authoring-trial--outside-writes, run scripts/check and include the evidence below in the canonical parent report.
+<!-- task:closed -->
+Closed 2026-10-15T14:02:49Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Checks
 - PASS: server npm run typecheck.
