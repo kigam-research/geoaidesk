@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:28:27Z
+updated: 2026-10-15T08:34:45Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0f805fd9-0a65-4a06-a989-436a5ecdcca7","pid":2472511,"provider":"codex","session":"01a13ea0-2a2c-7e30-a258-fadfb356f741","start":"51804685","token":"84f022dc40c565feab0199c4629c9faa29b46d0a9be164973d06b89729c28740"}
 branch: task/gaid-improve--method-preview
 target: task/gaid-improve
@@ -41,9 +41,10 @@ Focused evidence: 11 UI tests passed, including metadata gating, defer without a
 
 First task finish created local 3faa427 and merged parent 3bc0d25, but did NOT publish: required scripts/check reached backend 1679 passed/11 skipped, frontend 995 passed and launcher check passed, then distribution checks failed (40/41 passed). Parent-owned distribution owner allowlist omits the newly declared gaid-improve/gaid-improve--source-preview boundaries; first failure is geo/tests/distribution.test.mjs:79, owner gaid-improve. Exact blocker sent to parent writer f7b1833c-ee21-47b2-a47b-733efe41ebb6 with notifyOnFinish false. Parent must also ensure declared new route seams exist in its published snapshot. No child-owned failure found. Remaining copy/environment/production-smoke stages not reached. Private check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-p4sawlpi.log; output: /home/seongin3/data/geoaidesk/work/checks/3faa4273b4d6-20261015T082202.249850Z. Integrated browser checks remain parent-owned.
 ## Next steps
-1. Wait for the parent's saved owner-allowlist/route-seam fix, then rerun task finish in place without task resume. CLI merges the published parent snapshot automatically.
+1. Verify the procedure-only trial-request gate, then rerun task finish in place without task resume. CLI merges the published parent snapshot automatically.
 2. Parent runs task complete gaid-improve--method-preview after the checked child snapshot publishes.
-Blocked: parent-owned distribution integration-boundary test rejects new owner names; precise fix request sent. Do not edit parent-owned files or rerun unchanged full checks.
+
+Parent correction 6138d2dea9a4 is published: owner allowlist accepts gaid-improve and gaid-improve--source-preview; unbuilt route declarations removed. Parent reports distribution-focused 7/7 passed. The actual first failure was the owner allowlist, not comma-separated path syntax (already supported). User requested the procedure branch never enable the trial-summary event, matching the parent reducer. Updated canPreview and added a complete-metadata procedure regression test; changed the existing success-path test to draft-code. Recheck: all 12 focused UI tests passed; previewMethod copy 0 errors/0 warnings; git diff --check passed. No resume was run.
 
 ## Failed approaches
 - Initial dependency-install task job was refused with "job source dirty; save first" before any receipt/job was created. No resume was needed. Installed frontend dependencies locally with npm ci --prefix web --no-audit --no-fund (11 seconds, no package/lock changes).
@@ -52,6 +53,7 @@ Blocked: parent-owned distribution integration-boundary test rejects new owner n
 Sequential decisions: preserve saved purpose and source-specific findings; gate attach-code on metadata; emit events only. The three views are tightly coupled and are implemented by this single writer without readers. Parent owns reducer/state validity, persistence, report, full scripts/check and integrated browser checks. Integration order: method view → trial view/dialogs → focused tests → parent integration.
 - All previewMethod IDs are new (previous catalogs were empty objects); no existing approved hero/install/limit strings changed. The complete Korean/English before→after copy record is the diff of web/src/geo/locales/previewMethod/{ko,en}.json: absent → catalog value for every added ID. Key transitions: previewMethod.method.createDraft absent → "선택한 방식으로 초안 보기" / "View draft with selected approach"; previewMethod.choice.draft-code.title absent → "논문 기반 코드 작성 계획" / "Plan code writing from the paper"; previewMethod.trial.previewRequest absent → "시험 요청 요약 보기" / "View trial request summary"; previewMethod.sharing.open absent → "공유할 내용 살펴보기" / "Review proposed sharing contents". previewMethod.finding.body preserves the no-independence-guarantee limit; setting.new.body rejects a 50 km default; choice.*.note and files/trial/sharing.dialog.description state their specific unconnected boundaries.
 - No new app dependencies. Formatting used temporary npm-exec Prettier 3.6.2 without package or lock edits. Native HTML radio controls use a labeled fieldset, keyboard behavior and no implicit answer; shadcn dialogs trap focus and restore the opener on dismissal.
+- Procedure-gate copy update: previewMethod.trial.procedure Korean "절차 설명 방식입니다. 요청에는 설명 검토 기준만 담으며 실행 pipeline을 만들지 않습니다." → "절차 설명 방식입니다. 실행 가능한 코드가 없어 시험 요청 요약을 만들지 않습니다."; English "Procedure-description approach. The request contains description-review criteria only and does not create an executable pipeline." → "Procedure-description approach. No executable code is provided, so a trial request summary cannot be prepared." This explains the now-disabled request-summary action without implying a runnable procedure.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 None. Parent integration/browser checks are already in the parent's approved scope, not new user decisions.

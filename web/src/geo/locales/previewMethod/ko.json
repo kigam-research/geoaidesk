@@ -130,7 +130,7 @@
     "removeData": "시험 자료 연결 해제",
     "criteriaLabel": "비교 기준",
     "criteriaPlaceholder": "예: 평가 자료 분리 방식, 비교할 지표와 허용 오차를 기록합니다.",
-    "procedure": "절차 설명 방식입니다. 요청에는 설명 검토 기준만 담으며 실행 pipeline을 만들지 않습니다.",
+    "procedure": "절차 설명 방식입니다. 실행 가능한 코드가 없어 시험 요청 요약을 만들지 않습니다.",
     "previewRequest": "시험 요청 요약 보기",
     "requestTitle": "시험 요청 요약 · 미실행",
     "requestNote": "요청 내용을 미리 본 상태입니다. 자료 분석, 코드 실행과 결과 판정은 하지 않았습니다."

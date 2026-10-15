@@ -26,7 +26,9 @@ export function PreviewDialogs({
   const returnFocus = useRef<HTMLElement | null>(null);
   const kind = state.dialog;
   const canPreview =
-    state.trialData !== null && state.comparisonNote.trim().length > 0;
+    state.choice !== "procedure" &&
+    state.trialData !== null &&
+    state.comparisonNote.trim().length > 0;
   return (
     <Dialog
       open={kind !== null}

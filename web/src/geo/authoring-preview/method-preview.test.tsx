@@ -178,7 +178,7 @@ describe("draft and illustrative dialogs", () => {
   });
 
   it("prepares metadata and criteria without any execution action", async () => {
-    const p = props({ draft, choice: "procedure", dialog: "trial" });
+    const p = props({ draft, choice: "draft-code", dialog: "trial" });
     const view = render(<PreviewDialogs {...p} />);
     const user = userEvent.setup();
     expect(
@@ -223,6 +223,26 @@ describe("draft and illustrative dialogs", () => {
     ).toBeVisible();
     await user.keyboard("{Escape}");
     expect(p.onEvent).toHaveBeenLastCalledWith({ type: "dialog", value: null });
+  });
+
+  it("does not enable a trial request for the procedure-only branch even with complete metadata", async () => {
+    const p = props({
+      draft,
+      choice: "procedure",
+      dialog: "trial",
+      trialData: { name: "trial.csv", size: 32 },
+      comparisonNote: "Compare fixed evaluation criteria",
+    });
+    render(<PreviewDialogs {...p} />);
+    const button = screen.getByRole("button", { name: "시험 요청 요약 보기" });
+    expect(button).toBeDisabled();
+    expect(
+      screen.getByText(
+        "절차 설명 방식입니다. 실행 가능한 코드가 없어 시험 요청 요약을 만들지 않습니다.",
+      ),
+    ).toBeVisible();
+    await userEvent.click(button);
+    expect(p.onEvent).not.toHaveBeenCalled();
   });
 
   it("shows separate instruction/request illustrations and source navigation", async () => {

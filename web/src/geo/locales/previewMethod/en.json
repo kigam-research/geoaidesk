@@ -133,7 +133,7 @@
     "removeData": "Unlink trial data",
     "criteriaLabel": "Comparison criteria",
     "criteriaPlaceholder": "For example: record evaluation-data separation, comparison metrics and tolerances.",
-    "procedure": "Procedure-description approach. The request contains description-review criteria only and does not create an executable pipeline.",
+    "procedure": "Procedure-description approach. No executable code is provided, so a trial request summary cannot be prepared.",
     "previewRequest": "View trial request summary",
     "requestTitle": "Trial request summary · not executed",
     "requestNote": "Only the request contents have been previewed. No data analysis, code execution or result assessment has taken place."
