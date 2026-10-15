@@ -59,7 +59,11 @@
     "noBoundary": "카탈로그에 해석 한계가 기록되지 않았습니다.",
     "inputLine": "{role}: {path}",
     "choiceLine": "{choice}: {answer}",
-    "draft": "{prompt}\n\n입력 파일:\n{inputs}\n\n선택한 분석 조건:\n{choices}\n\n작업 중 결정할 조건: {unresolved}\n미결정 조건은 분석 전에 질문하세요.\n\n해석 한계: {boundary}\n결과는 검토 전입니다. 실행 완료를 검토 완료로 표시하지 마세요."
+    "draft": "{prompt}\n\n입력 파일:\n{inputs}\n\n선택한 분석 조건:\n{choices}\n\n작업 중 결정할 조건: {unresolved}\n미결정 조건은 분석 전에 질문하세요.\n\n해석 한계: {boundary}\n결과는 검토 전입니다. 실행 완료를 검토 완료로 표시하지 마세요.",
+    "blockedEnvironment": "작업 초안을 만들려면 먼저 아래의 '환경 준비'를 실행하세요.",
+    "blockedSkills": "작업 초안을 만들려면 먼저 필요한 스킬을 켜세요.",
+    "blockedUnavailable": "선택한 작업은 지금 사용할 수 없어 작업 초안을 만들 수 없습니다.",
+    "blockedInput": "작업 초안을 만들려면 필수 입력 파일을 고르세요: {roles}"
   },
   "recipe": {
     "import": "레시피 가져오기",

@@ -9,7 +9,8 @@ import { apiFetch } from "@/lib/projects";
 import { t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
-import { TaskSetup, fieldClass } from "@/geo/workspace/task-setup";
+import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
+import { Readiness } from "@/geo/workspace/readiness";
 
 export const METHOD_CATEGORY = "hub-methods";
 const pill = "inline-flex rounded-full border px-1.5 py-px text-[10px] font-medium";
@@ -126,7 +127,16 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
         const href = webLink(source.kind === "doi" ? `https://doi.org/${source.ref.replace(/^https?:\/\/doi.org\//, "")}` : source.kind === "url" ? source.ref : undefined);
         return <li key={i}>{href ? <a className="text-primary underline" href={href} target="_blank" rel="noopener noreferrer">{source.title ?? source.ref}</a> : source.title ? `${source.title} · ${source.ref}` : source.ref}</li>;
       })}</ul></section>}
-      {method.workflows.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.workflows")}</h3>{method.workflows.map((workflow) => <div key={workflow.id} className="space-y-1 rounded-md border p-2 text-xs"><p>{text(workflow.title)}</p><div className="flex flex-wrap gap-1"><MethodBadges method={method} workflow={workflow} /></div><Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button></div>)}</section>}
+      {method.workflows.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.workflows")}</h3>{method.workflows.map((workflow) => <div key={workflow.id} className="space-y-1 rounded-md border p-2 text-xs">
+        <p>{text(workflow.title)}</p>
+        <div className="flex flex-wrap gap-1"><MethodBadges method={method} workflow={workflow} /></div>
+        {workflow.description && <p className="text-muted-foreground">{text(workflow.description)}</p>}
+        <Readiness value={workflow.readiness} />
+        {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
+        {workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
+        <WorkflowOutputs workflow={workflow} />
+        <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
+      </div>)}</section>}
       {method.recipes.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.recipes")}</h3>{method.recipes.map((recipe) => {
         const workflow = method.workflows.find((row) => row.id === recipe.workflowId);
         return <div className="rounded-md border p-2 text-xs" key={recipe.id}><p>{text(recipe.title)}</p><Button size="sm" variant="outline" disabled={!workflow} onClick={() => { if (workflow) onSetup(workflow, recipe); }}>{t("methods.setup")}</Button></div>;

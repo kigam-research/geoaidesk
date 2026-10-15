@@ -145,6 +145,11 @@ describe("task catalogue and setup", () => {
     rows = [workflow("needs-environment")]; prepareResult = json({ detail: "Install failed", output: "uv: index unreachable" }, 500); catalogue(); await openSetup();
     await userEvent.click(await screen.findByRole("button", { name: "환경 준비" })); expect(await screen.findByText(/uv: index unreachable/)).toBeInTheDocument(); expect(screen.queryByText("준비됨")).not.toBeInTheDocument();
   });
+  it("says why the task draft cannot be created yet", async () => {
+    rows = [workflow("needs-environment")];
+    catalogue(); const dialog = await openSetup();
+    expect(within(dialog).getByText("작업 초안을 만들려면 먼저 아래의 '환경 준비'를 실행하세요.")).toBeInTheDocument();
+  });
   it("shows indeterminate progress while preparation is running", async () => {
     rows = [workflow("needs-environment")];
     const implementation = apiFetch.getMockImplementation()!;

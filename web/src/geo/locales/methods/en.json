@@ -59,5 +59,7 @@
   "assessment.save": "Save assessment",
   "assessment.saving": "Saving assessment",
   "assessment.saved": "Assessment saved.",
-  "assessment.error": "Could not save assessment: {detail}"
+  "assessment.error": "Could not save assessment: {detail}",
+  "choices": "Scientific choices to make before the task: {choices}",
+  "inputRoles": "Inputs: {roles}"
 }

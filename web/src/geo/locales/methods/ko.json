@@ -59,5 +59,7 @@
   "assessment.save": "평가 저장",
   "assessment.saving": "평가 저장 중",
   "assessment.saved": "평가를 저장했습니다.",
-  "assessment.error": "평가를 저장하지 못했습니다: {detail}"
+  "assessment.error": "평가를 저장하지 못했습니다: {detail}",
+  "choices": "작업 전에 정할 과학적 선택: {choices}",
+  "inputRoles": "입력: {roles}"
 }
