@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T23:06:27Z
+updated: 2026-10-15T23:20:24Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a1684467-2f27-4645-9134-551b40e66be6","pid":3326138,"provider":"claude","session":"23cfe4ed-f98f-472e-a572-8da185372836","start":"57046241","token":"d2a3156f13a6dd3deca1c6ab1e7a65b39282d2f1add18ba826c65acfe7946882"}
 branch: task/gaid-brand-copy
 target: main
@@ -48,8 +48,16 @@ Items (docs/open-items/gaid-qwen-authoring-trial.md; evidence reports/2026-10-15
 - Pinned catalogue 0.2.1: 5 skills are K-Dense imports (`sourceRevision.kind: import`, repository
   K-Dense-AI/scientific-agent-skills, commit, path); 8 are KIGAM-owned; all catalogue workflows are KIGAM-owned.
   Upstream Workflows (web/src/data workflows list, ALL_WORKFLOWS in workflows-panel.tsx) are K-Dense.
+- 2026-10-16: packages A-C done (314a68a, 783eff9). 54 locale ids per language changed (20 agent -> "AI agent",
+  others app -> GAID); "Kady Office" literal -> files.office_workspace.product; prompts badge -> SourceBadge.
+  Web tests 1,032 passed; server geo-skill-origin/skills tests passed; copy validator 0 errors; geo node tests 43 passed.
+- Screenshots: before (main c4ce9bf export) vs after, ko/en, 6 screens, raw in ~/data/geoaidesk/work/gaid-brand-copy/shots,
+  composed figures in reports/2026-10-16-gaid-brand-copy/figures (6d27043). Test apps stopped.
+- Synced with main after gaid-hub-integration merged (da35cdb), no conflicts; scripts/check rerun on the merged tree
+  (log ~/data/geoaidesk/work/gaid-brand-copy/check.log): exit 0, server 1,805 passed/11 skipped, web 1,051, geo 43,
+  copy 0 errors. Report written, humanized, review copy in the vault.
 ## Next steps
-1. Implement packages A-C below myself (tightly coupled copy work), then screenshots and report.
+1. Remove build caches, task finish.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: no child writers; the work is copy plus one small server field, tightly coupled. Packages, in order:
@@ -65,6 +73,8 @@ Items (docs/open-items/gaid-qwen-authoring-trial.md; evidence reports/2026-10-15
      web/src/lib/capabilities.ts, web/src/components/{skills-panel,workflows-panel,prompts-panel}.tsx.
   C) docs: narrow-window (~390 px) workspace chat unsupported in docs/geo/compatibility.md / install.md.
   Overlap with gaid-hub-integration: geo/integration-boundaries.json, AGENTS.md, locales/index.ts only.
+Closes: gaid-qwen-authoring-trial#1
+Closes: gaid-qwen-authoring-trial#2
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -72,6 +82,7 @@ Items (docs/open-items/gaid-qwen-authoring-trial.md; evidence reports/2026-10-15
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-16-gaid-brand-copy/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
