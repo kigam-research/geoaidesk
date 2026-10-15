@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T14:18:35Z
+status: ready
+updated: 2026-10-15T14:18:36Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -109,7 +109,7 @@ Finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`; a late
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:10:10Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-15T14:18:36Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - task finish also runs the full declared scripts/check. First full run passed backend (160 files passed / 1 skipped; 1,683 tests passed / 11 skipped), then failed 2 map-viewer assertions in the concurrent frontend run (154 other files passed; 1,025 tests passed). The same map file passed all 8 tests in isolation. No map source edits: the full frontend passed with VITEST_MAX_WORKERS=4 (155 files / 1,027 tests, 70.95 s; supported by the installed Vitest resolver). Retry the mandatory full finish check with this same bounded-worker environment.
