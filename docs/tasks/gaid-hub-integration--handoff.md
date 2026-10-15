@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:32:39Z
+updated: 2026-10-15T14:33:27Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -76,10 +76,10 @@ just done to the hub as authoring material for a new draft.
 P2 implemented: the composer now offers only analysis handoff, not skill-template creation. Routes: POST /geo/hub/handoff/preview, POST /geo/hub/handoff (gzip download), POST /geo/hub/handoff/send (optional configured loopback authoring only, explicit user action; 201 JSON or gzip download fallback).
 Bundle schema: gaid-analysis-handoff/v1, handoff.json + files/<sandbox-relative path>. Request/final answer/model use the shared session history reader's readEntries/textOf; candidates use readSteps. Current bytes are rehashed. Limits: 200 files, 5 MiB/file, 20 MiB including tar metadata, 16,000 chars/text, 4,000 chars/note, 32 MiB/source log; truncation/exclusion counts are visible. user_data is opt-in; unsafe/dot/secret paths and links are refused.
 Required hub URL: site base + #/author/new?from=gaid (one authoringPath constant). Direct send normalizes authoring's trailing slash, refuses redirects, times out at 30 s, bounds the reply and checks its returned draft URL. No real trial URL is hardcoded. Failed/uncertain direct delivery does not retry the upload; UI shows download fallback and asks to check for an existing draft.
-Targeted evidence: server 12 tests passed; web handoff 11 + workspace 24 tests passed; both TypeScript checks passed. Locale validation: all namespaces 0 errors/56 existing warnings; hubHandoff alone 0 errors/0 warnings. Final rerun/CLI finish checks pending after the last small regular-file/truncation/copy edits. Full browser/live-hub acceptance remains the parent's P4; not claimed here. Settings skills unchanged. Old workspace.skill strings intentionally retained (trial-owned namespace).
+Targeted evidence: server 12 tests passed; web handoff 11 + workspace 24 tests passed; both TypeScript checks passed. Locale validation: all namespaces 0 errors/56 existing warnings; hubHandoff alone 0 errors/0 warnings. Final server rerun after regular-file/truncation edits: 12/12 passed; final hubHandoff copy check: 0 errors/0 warnings. CLI finish records any full scripts/check run separately from this targeted evidence. Full browser/live-hub acceptance remains the parent's P4; not claimed here. Settings skills unchanged. Old workspace.skill strings intentionally retained (trial-owned namespace).
 
 ### String ids (new unless noted; Korean / English)
-The old composer action workspace.skill.open remains in the catalogue but is no longer rendered here: 재사용 스킬 만들기 / Create a reusable skill → hubHandoff.open below. Every other id below is new (before: absent in both locales). No other namespace copy changed.
+The old composer action workspace.skill.open remains in the catalogue but is no longer rendered here: 재사용 스킬 만들기 / Make reusable skill → hubHandoff.open below. Every other id below is new (before: absent in both locales). No other namespace copy changed.
 
 | String id | Korean after | English after |
 |---|---|---|
@@ -124,7 +124,7 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 | `hubHandoff.errors.request` | 분석 전달 요청을 처리하지 못했습니다. 서버 연결을 확인한 뒤 다시 시도하세요. | The analysis handoff request failed. Check the server connection and try again. |
 
 ## Next steps
-1. Save and sync the parent's trailing-slash parser fix, rerun affected checks, then task finish for parent integration.
+1. Run task finish (which integrates the latest parent tip) and deliver the ready child to the parent for task complete. No live app deployment or P4 acceptance is claimed.
 ## Failed approaches
 - First dependency job was refused before launch because the source was dirty; saved the implementation, then launched the recorded install job once (exit 0).
 - Initial task sync had one routes.ts import/register conflict; retained both independent routes. Named-path task save refused unrelated staged merge files; reviewed and saved the complete merge through task save without paths. No history rewrite.
