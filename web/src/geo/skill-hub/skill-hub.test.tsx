@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { SkillHubInstall } from "./skill-hub";
+import { SkillHubInstall, SkillHubPreviewNotes } from "./skill-hub";
 import { SkillsPanel } from "@/components/skills-panel";
 import { apiFetch } from "@/lib/projects";
 import { installSkills } from "@/lib/capabilities";
@@ -12,7 +12,7 @@ const result = { source: "/durable/sha", stagingKey: "key", stagingToken: "revie
 beforeEach(() => {
   localStorage.setItem("gaid:locale", "en");
   vi.clearAllMocks();
-  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/skill-hub" ? { sites: [{ id: "atlas", url: "https://kigam-research.github.io/skill-atlas/" }] } : result), { headers: { "Content-Type": "application/json" } }));
+  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/skill-hub" ? { sites: [{ id: "atlas", url: "https://kigam-research.github.io/skill-atlas/" }] } : url === "/geo/skill-hub/methods" ? { hubs: [] } : result), { headers: { "Content-Type": "application/json" } }));
 });
 it("opens the configured site in a new tab and submits page URLs with explicit project/scope", async () => {
   const onPreview = vi.fn();
@@ -61,4 +61,25 @@ it("SkillsPanel reuses acknowledgement and the reviewed staging token on install
   expect(install).toBeEnabled();
   fireEvent.click(install);
   await waitFor(() => expect(installSkills).toHaveBeenCalledWith(expect.objectContaining({ source: "/durable/sha", names: ["example"], stagingToken: "reviewed", acknowledged: true, scope: "project" })));
+});
+
+it("lists hub packages and previews the descriptor through the existing gate", async () => {
+  const descriptorUrl = "https://hub.test/api/gaid/packages/local/paper/2";
+  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(
+    url === "/geo/skill-hub" ? { sites: [] } : url === "/geo/skill-hub/methods" ? { hubs: [
+      { siteId: "local-hub", url: "https://hub.test", state: "ok", methods: [{ methodId: "local/paper", revision: 2, version: "0.2.0", title: { ko: "논문", en: "Paper package" }, lifecycle: "submitted", implementation: "descriptive", createdAt: "2026-10-15T12:00:00Z", descriptorUrl }] },
+      { siteId: "offline-hub", url: "https://offline.test", state: "error", detail: "Hub offline", methods: [] },
+    ] } : result)));
+  const onPreview = vi.fn();
+  render(<SkillHubInstall projectId="p1" scope="project" onStart={vi.fn()} onPreview={onPreview} onError={vi.fn()} />);
+  expect(await screen.findByText("Paper package")).toBeInTheDocument(); expect(screen.getByText("Submitted · Instructions only")).toBeInTheDocument(); expect(screen.getByRole("alert")).toHaveTextContent("Hub offline");
+  fireEvent.click(screen.getAllByRole("button", { name: "Preview package" })[0]);
+  await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
+  expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview?scope=project", expect.objectContaining({ body: JSON.stringify({ url: descriptorUrl, scope: "project" }) }), "p1");
+});
+
+it("shows hub draft identity, revision and effective lifecycle in preview notes", () => {
+  render(<SkillHubPreviewNotes preview={{ ...result, skillHub: { ...result.skillHub, draft: { methodId: "local/paper", revision: 2, lifecycle: "draft", url: "https://hub.test/api/gaid/packages/local/paper/2" } } }} />);
+  expect(screen.getByText("Hub method: local/paper · revision 2 · Draft")).toBeInTheDocument();
+  expect(screen.getByText(/Changes on the site are not fetched automatically/)).toBeInTheDocument();
 });

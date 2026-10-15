@@ -21,5 +21,12 @@
     "archive": "Could not read the package. Choose a .tar.gz containing one skill folder with SKILL.md. Links and parent paths are not allowed.",
     "input": "Enter a skill page URL or choose a .tar.gz file.",
     "request": "Could not load the skill preview. Try again."
-  }
+  },
+  "methods": "Hub packages",
+  "methodsLoading": "Reading hub packages.",
+  "methodsEmpty": "No packages are available from the hub.",
+  "methodsError": "Could not read hub packages: {detail}",
+  "methodPreview": "Preview package",
+  "methodCreated": "Created: {at}",
+  "methodDraft": "Hub method: {id} · revision {revision} · {lifecycle}"
 }
