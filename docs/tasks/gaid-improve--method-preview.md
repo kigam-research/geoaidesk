@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T08:22:01Z
+status: ready
+updated: 2026-10-15T08:22:02Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0f805fd9-0a65-4a06-a989-436a5ecdcca7","pid":2472511,"provider":"codex","session":"01a13ea0-2a2c-7e30-a258-fadfb356f741","start":"51804685","token":"84f022dc40c565feab0199c4629c9faa29b46d0a9be164973d06b89729c28740"}
 branch: task/gaid-improve--method-preview
 target: task/gaid-improve
@@ -39,8 +39,9 @@ Implemented PreviewMethodPane, PreviewTrialPane and PreviewDialogs against the f
 
 Focused evidence: 11 UI tests passed, including metadata gating, defer without an answer, every choice, edits/save/dialog events, non-sample finding suppression, bilingual formatting, trial-summary-only state and Escape/focus restoration. Web TypeScript and owned-file ESLint passed. Copy validator: previewMethod 0 errors/0 warnings; entire locale tree 0 errors/56 existing unrelated warnings. git diff --check passed. Re-verify from web: npm test -- --run src/geo/authoring-preview/method-preview.test.tsx; npx tsc --noEmit --incremental false; npx eslint src/geo/authoring-preview/{method-pane,trial-pane,preview-dialogs,method-preview.test}.tsx. From repo: node geo/copy/validate-copy.mjs web/src/geo/locales/previewMethod. Full scripts/check and browser checks have not yet been run manually in this child; task finish applies CLI-required checks.
 ## Next steps
-1. Finish the reviewed owned-file snapshot with task finish; fix any required check failure in place.
-2. Parent runs task complete gaid-improve--method-preview and integrates reducer/browser evidence into its canonical report.
+<!-- task:closed -->
+Closed 2026-10-15T08:22:02Z: ready; the parent gaid-improve integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial dependency-install task job was refused with "job source dirty; save first" before any receipt/job was created. No resume was needed. Installed frontend dependencies locally with npm ci --prefix web --no-audit --no-fund (11 seconds, no package/lock changes).
 - Initial TypeScript check found PreviewAttachment was not assignable to the ICU MessageValues index-signature type. Fixed by passing plain metadata objects; recheck passed. No shared-contract change was needed.
