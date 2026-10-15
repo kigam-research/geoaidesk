@@ -188,6 +188,7 @@
   "custom_models.discard_changes": "변경 취소",
   "skills.installed": "설치됨",
   "skills.origin_catalogue": "카탈로그",
+  "skills.origin_builtin": "기본 제공",
   "skills.local": "직접 작성",
   "skills.failed_to_load_skills": "스킬을 불러오지 못했습니다",
   "skills.operation_failed": "작업을 완료하지 못했습니다",

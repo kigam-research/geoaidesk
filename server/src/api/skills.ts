@@ -46,6 +46,7 @@ import {
 } from "../agent/skills-install.ts";
 import { syncSandboxVenv } from "../sandbox-seed.ts";
 import { provisionProjectSkills } from "../geo/provision.ts";
+import { runtimeSupportSkillNames } from "../geo/context.ts";
 
 interface ScopeQuery {
   scope?: string;
@@ -64,6 +65,7 @@ function replyWithFailure(reply: { code: (n: number) => unknown }, err: unknown)
 }
 
 export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
+  const builtin = (name: string) => runtimeSupportSkillNames().includes(name);
   const toInfo = (
     skill: { name: string; description: string; disableModelInvocation?: boolean },
     root: SkillRoot,
@@ -78,8 +80,10 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       // runnable only through `/skill:<name>` in the composer.
       disableModelInvocation: skill.disableModelInvocation === true,
       // No sync record: a skill the user or the AI agent wrote straight into the skill folder
-      // (gaid-qwen-authoring-trial); showing it as a catalogue skill hid who made it.
-      origin: origins[skill.name] ?? "local",
+      // (gaid-qwen-authoring-trial); showing it as a catalogue skill hid who made it. The
+      // runtime's own support skills (pi-subagents) keep the catalogue origin and say so.
+      origin: origins[skill.name] ?? (builtin(skill.name) ? "catalogue" : "local"),
+      ...(builtin(skill.name) && !origins[skill.name] ? { builtin: true } : {}),
       ...(provenance?.source ? { source: provenance.source } : {}),
       ...(provenance?.ref ? { ref: provenance.ref } : {}),
     };

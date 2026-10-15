@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:01:38Z
+updated: 2026-10-15T14:02:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -75,6 +75,7 @@ Implemented the requested outside-project confirmation. Lead write/edit/generate
 - Dependencies reused from the parent's external app snapshot through temporary node_modules symlinks; no dependency manifest/lockfile changed. Latest server test log: ~/data/geoaidesk/work/gaid-qwen-authoring-trial--outside-writes/server-check.log.
 
 ## Failed approaches
+- First task finish checkpointed the code, then hit a merge conflict with parent 749160e in the appended integration-boundaries seam. Kept the parent's expanded existing responsibility and this child's new seam; no implementation conflict. All scoped checks passed again on the merged snapshot before rerunning task finish.
 - Initial task resume met a sibling task transaction; retried after the sibling completed and resumed successfully at the original path.
 - First new hook tests used ../outside under the Vitest /tmp sandbox. Those targets correctly matched the temporary-directory allowance, so the tests were corrected to /opt/gaid targets (and relative paths that actually escape /tmp). One child fixture retained the old target until the next correction. Final rerun passed.
 - One UI test used status done rather than the existing complete enum. Corrected the fixture; web typecheck and tests passed.
