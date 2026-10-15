@@ -1,0 +1,23 @@
+{
+  "input.label": "Source materials",
+  "input.urlLabel": "Paper or source URL",
+  "input.urlPlaceholder": "https://… paper or source URL",
+  "input.addUrl": "Add URL",
+  "input.fileLabel": "Source PDF file",
+  "input.selectPdf": "Select PDF",
+  "input.sample": "Open sample manuscript",
+  "input.hint": "Select a PDF up to 50 MiB. Selected PDFs open only in your browser. URLs are recorded without fetching remote materials.",
+  "input.pdfTypeError": "This is not a PDF file. Select a PDF with a .pdf extension.",
+  "input.pdfSizeError": "The file is empty or exceeds 50 MiB. Select a nonempty PDF up to 50 MiB.",
+  "input.urlError": "The URL format is invalid. Enter a full URL starting with http:// or https://.",
+  "input.clear": "Remove source {name}",
+  "pane.label": "Original source",
+  "pane.emptyTitle": "Original PDF",
+  "pane.emptyBody": "Select a PDF or open the sample manuscript to read the original.",
+  "pane.urlTitle": "Recorded URL",
+  "pane.urlBody": "The URL is recorded. Remote document fetching is not connected. Select a PDF to read the original.",
+  "pane.reselectTitle": "Reselect PDF",
+  "pane.reselectBody": "No PDF is open. Reselect the file matching the saved name or open the sample manuscript.",
+  "pdf.loading": "Reading PDF.",
+  "pdf.error": "Could not open the PDF. Select another PDF or reopen the sample manuscript."
+}

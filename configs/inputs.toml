@@ -25,3 +25,15 @@ files = ["las/25_9-1.las", "train.zip", "DATA-LICENSE.md"]
 sha256 = { "las/25_9-1.las" = "5604b035b6d6406eb51b01796d48688505a1b56cc77e50ec17dcf00cb40252ce", "train.zip" = "e996c8466f2d0dc7116daa71485cc90c31fcfac6345a5bb33165026478b642e9" }
 source = "bolgebrygg/Force-2020-Machine-Learning-competition@c8d01ee92c1c8e1ecba36f96cca6ea7b689338a1; Zenodo 4351156; CC BY 4.0 / NOLD 2.0"
 consumers = ["geo/tests/force-concordance.py"]
+
+
+[[input]]
+name = "authoring_preview_paper"
+layer = "asset"
+id = "gaid-authoring-preview"
+version = "20261015"
+path = "gaid-authoring-preview/20261015"
+files = ["author-manuscript.pdf", "MANIFEST.json"]
+sha256 = { "author-manuscript.pdf" = "de611db0be9cda7caa5851b5f7e1593593c389c51a3ce02cd3cf249637ba5ff0" }
+source = "Author R3 manuscript for DOI 10.1007/s11053-026-10778-w, supplied by the author; not verified publisher PDF"
+consumers = ["web/src/geo/authoring-preview/sample.ts"]

@@ -427,6 +427,36 @@
       "owner": "gaid-qwen-followups",
       "status": "edited",
       "responsibility": "Per-custom-server accepted reasoning levels written into Pi thinkingLevelMap; custom picker rows expose wire substitutions; server settings and chat/default thinking selectors show the mapping. Existing saved providers and foreign maps remain untouched until an explicit managed-provider save."
+    },
+    {
+      "path": "web/src/app/layout.tsx",
+      "owner": "gaid-improve",
+      "status": "edited",
+      "responsibility": "Isolated clickable source-first authoring prototype; root runtime boundary skips project/auth side effects only on the preview path. Fixed externally registered sample PDF adapter, no model/analysis backend."
+    },
+    {
+      "path": "web/src/components/pdf-viewer/pdf-viewer.tsx",
+      "owner": "gaid-improve--source-preview",
+      "status": "edited",
+      "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default."
+    },
+    {
+      "path": ".gitignore",
+      "owner": "gaid-improve",
+      "status": "edited",
+      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git."
+    },
+    {
+      "path": "web/src/app/authoring-preview/page.tsx",
+      "owner": "gaid-improve",
+      "status": "added",
+      "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
+    },
+    {
+      "path": "web/src/app/authoring-preview/sample/route.ts",
+      "owner": "gaid-improve",
+      "status": "added",
+      "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
     }
   ],
   "notTouched": [

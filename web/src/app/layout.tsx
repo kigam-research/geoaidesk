@@ -4,8 +4,7 @@ import { t } from "@/geo/i18n";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ProjectProvider } from "@/lib/use-projects";
-import { ApiTokenGate } from "@/components/api-token-gate";
+import { GeoRuntimeBoundary } from "@/geo/authoring-preview/runtime-boundary";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,11 +23,10 @@ export default function RootLayout({
         {/* ThemeProvider stays outside GeoLocaleRoot: its inline theme script must be server-rendered. */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <GeoLocaleRoot>
-            <ProjectProvider>
+            <GeoRuntimeBoundary>
               <TooltipProvider delayDuration={350}>{children}</TooltipProvider>
-            </ProjectProvider>
+            </GeoRuntimeBoundary>
             <Toaster />
-            <ApiTokenGate />
           </GeoLocaleRoot>
         </ThemeProvider>
       </body>
