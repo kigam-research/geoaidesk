@@ -1,3 +1,5 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import React, { Suspense, useEffect, useState } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
@@ -48,6 +50,15 @@ afterEach(() => vi.restoreAllMocks());
 // The editor loads lazily; its first dynamic import can exceed the default 1 s
 // wait when the full suite runs on parallel workers.
 const EDITOR_WAIT = { timeout: 4000 };
+
+it("hides the compute tab and ignores persisted compute navigation when disabled", () => {
+  remoteComputeFeature.enabled = false;
+  try {
+    render(<FilePreviewPanel {...panelProps()} showCompute={true} tabs={[]} activeTabPath={null} />);
+    expect(screen.queryByTitle("Modal compute")).not.toBeInTheDocument();
+    expect(screen.getByText("No file selected")).toBeInTheDocument();
+  } finally { remoteComputeFeature.enabled = true; }
+});
 
 it.each(["a.txt", "a.tex"])("retains %s draft across file, notebook, compute, and project navigation", async (path) => {
   const props = panelProps(path);

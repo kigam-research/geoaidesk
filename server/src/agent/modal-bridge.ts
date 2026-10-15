@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 import fs from "node:fs";
 import path from "node:path";
 import type { ExtensionFactory } from "@earendil-works/pi-coding-agent";
@@ -20,6 +21,7 @@ function isModalSource(entry: unknown): entry is string {
 }
 
 export function seedModalPackage(paths: ProjectPaths): boolean {
+  if (!remoteComputeEnabled()) return false;
   const dir = path.join(paths.sandbox, ".pi");
   const settingsPath = path.join(dir, "settings.json");
   let settings: Record<string, unknown> = {};
@@ -77,6 +79,7 @@ function parseFrontmatter(file: string): { name?: string; tools?: string[] } {
  * existing `tools` override is treated as user-owned and left unchanged.
  */
 export function seedBuiltinAgentModalTools(paths: ProjectPaths): boolean {
+  if (!remoteComputeEnabled()) return false;
   const agentsDir = builtinAgentsDir();
   if (!agentsDir) return false;
   let files: string[];

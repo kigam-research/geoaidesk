@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 import { makeSubagentControlExtension, subagentHost } from "./subagent-control.ts";
 import { pathToFileURL } from "node:url";
 import { patchSubagents } from "../../scripts/patch-subagents.mjs";
@@ -438,7 +439,7 @@ async function build(
       makeSubagentRefusalExtension(projectId, () => holder.session?.model),
       // Child Modal jobs are submitted through the localhost bridge under the
       // child run id; reattribute them to this parent session on completion.
-      makeSubagentModalExtension(projectId, () => holder.session?.sessionId ?? ""),
+      ...(remoteComputeEnabled() ? [makeSubagentModalExtension(projectId, () => holder.session?.sessionId ?? "")] : []),
       // Raw-data guard: blocks mutations of protected paths and asks the user
       // before destructive shell commands. Registered after the subagent
       // bridge so budget gates run first.
@@ -468,7 +469,8 @@ async function build(
   // Typed presentation layer for compact scientific results and artifact links.
   const scientificResultTool = makeScientificResultTool(projectId);
   const pdfAnnotationTools = makePdfAnnotationTools(projectId);
-  // Durable remote-compute tools are always present. Missing credentials are
+  // Durable remote-compute tools are absent when the distribution disables them.
+  // Otherwise missing credentials are
   // reported at submission time, so warm sessions become compatible
   // immediately after credentials are configured live.
   const modalTools = makeModalTools(projectId, () => holder.session?.sessionId ?? "");

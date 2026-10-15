@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 import { Type, type Static } from "typebox";
 import type { ToolDefinition } from "@earendil-works/pi-coding-agent";
 import { currentRunId } from "./run-ids.ts";
@@ -273,6 +274,7 @@ export function makeModalTools(
   projectId: string,
   getSessionId: () => string,
 ): ToolDefinition<any>[] {
+  if (!remoteComputeEnabled()) return [];
   const owner = (): ModalJobOwner => {
     const sessionId = getSessionId();
     return {

@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoText, geoLocale } from "@/geo/i18n";
 
 
@@ -386,7 +388,7 @@ export function LabNotebookEntryCard({
         </CardHeader>
 
         <CardContent className="relative flex flex-col gap-2.5 px-3 pb-2.5 pt-2">
-          {sessionId && entry.type === "hypothesis" && <div className="flex flex-wrap gap-1.5"><NotebookPlanDialog key={`${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} /><NotebookRobustnessDialog key={`robustness:${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} onOpenFile={onOpenFile} /><NextExperimentsDialog entry={entry} sessionId={sessionId} projectId={projectId} model={model} onSaved={onResearchSaved} /></div>}
+          {sessionId && entry.type === "hypothesis" && <div className="flex flex-wrap gap-1.5"><NotebookPlanDialog key={`${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} />{REMOTE_COMPUTE_ENABLED && <NotebookRobustnessDialog key={`robustness:${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} onOpenFile={onOpenFile} />}<NextExperimentsDialog entry={entry} sessionId={sessionId} projectId={projectId} model={model} onSaved={onResearchSaved} /></div>}
           {sessionId && !entry.provisional && ["hypothesis", "observation", "decision"].includes(entry.type) && <div><EvidencePackageDialog projectId={projectId} initialRoot={{ sessionId, entryId: entry.id }} candidates={[{ sessionId, entryId: entry.id, title: entry.title, type: entry.type }]} /></div>}
           {sessionId && Boolean(entry.results?.length) && <NotebookResultLinks key={`${projectId}:${sessionId}:${entry.id}`} entry={entry} sessionId={sessionId} projectId={projectId} onOpenFile={onOpenFile} />}
           {entry.proposalOnly && <p className="rounded border border-amber-500/30 p-2 text-xs">{nbText("entry.planning_only")}</p>}

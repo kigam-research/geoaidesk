@@ -1,3 +1,5 @@
+const remoteComputeFeature = vi.hoisted(() => ({ enabled: true }));
+vi.mock("@/geo/features", () => ({ get REMOTE_COMPUTE_ENABLED() { return remoteComputeFeature.enabled; } }));
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import type { ReactElement } from "react";
@@ -16,6 +18,15 @@ const entry = (over: Partial<NotebookEntry> = {}): NotebookEntry => ({
 
 // ConfidenceMeter renders a Radix Tooltip, which needs the app's provider.
 const renderCard = (ui: ReactElement) => render(<TooltipProvider>{ui}</TooltipProvider>);
+
+it("retains local hypothesis actions but offers no Modal stress-test action when disabled", () => {
+  remoteComputeFeature.enabled = false;
+  try {
+    renderCard(<LabNotebookEntryCard entry={entry()} sessionId="session" projectId="project" onOpenFile={() => {}} />);
+    expect(screen.queryByRole("button", { name: /Stress-test finding/i })).not.toBeInTheDocument();
+    expect(screen.getByText("Six cell types")).toBeInTheDocument();
+  } finally { remoteComputeFeature.enabled = true; }
+});
 
 describe("LabNotebookEntryCard", () => {
   it("renders with only the minimal props (backward compat)", () => {

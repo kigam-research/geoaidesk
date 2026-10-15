@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T13:52:23Z
+updated: 2026-10-15T14:04:25Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -59,11 +59,18 @@ before → after, tests run. Network: raw.githubusercontent.com is blocked on th
 No paid model runs. Remove build caches you created in your worktree before finishing.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the CLI-returned worktree. Inspected the distribution, lead session, required child runtime, Modal seeding, notebook guidance, startup and UI entry points. Implementation is in place. Server typecheck and 9 affected server vitest files passed (80 tests). Web typecheck and 6 affected web vitest files passed (51 tests). Distribution/launcher/stamp tests passed (16; real build smoke not yet run). Copy validation: 0 errors, 56 existing warnings; visible strings unchanged. The new compute-selector test initially omitted a required catalog prop; fixed and the web typecheck rerun passed.
 ## Next steps
-1. (the next session's first action)
+1. Finish affected regression checks and prompt-budget measurement.
+2. Run the actual feature-only production rebuild smoke in a saved job snapshot.
+3. Record file:line evidence here and finish. The parent will write the canonical report after task complete.
 ## Failed approaches
+- The first server test used nonexistent SDK `getActiveTools`; corrected to `getActiveToolNames`/`getAllTools`. Fake Modal tokens were too short and failed input validation before the feature gate; replaced with valid-length dummy strings.
+- An early `task job run` attempt did not launch (dirty source; no receipt/jobs block created). Dependencies were installed with ordinary `npm ci` for local checks; the real build job must follow a reviewed task save.
 ## Notes and decisions
+- Sequential implementation: settle a single manifest feature and distribution-launch mode; gate server/child registration and recovery; gate UI and polling; verify both modes; integrate evidence. This is tightly coupled work, with no additional workers.
+- Owned interfaces: `features.remoteCompute` in the manifest; launcher identifies distribution execution; frontend receives the computed state through an inlined `NEXT_PUBLIC_` value, included in the existing production-build stamp. Development/non-geo execution keeps upstream behaviour.
+- Existing sandbox settings may already reference kady-modal; gate the package registration itself as well as skipping new seeding. Never remove `.kady/modal` data.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

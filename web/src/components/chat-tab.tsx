@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { workLabel } from "@/geo/work-labels";
 import {
@@ -1299,14 +1301,14 @@ function ChatInput({
                 disabled={thinkingDisabled}
                 thinkingSentAs={selectedModel.thinkingSentAs}
               />
-              <ComputeSelector
+              {REMOTE_COMPUTE_ENABLED && <ComputeSelector
                 selected={selectedComputeTarget}
                 onChange={onComputeTargetChange}
                 catalog={modalCatalog}
                 loading={modalCatalogLoading}
                 error={modalCatalogError}
                 onRefresh={onRefreshModalCatalog}
-              />
+              />}
               <GeoPromptBudget
                 projectId={projectId}
                 sessionId={currentSessionId}
@@ -1467,7 +1469,7 @@ export const AssistantMessageBody = memo(function AssistantMessageBody({
       orderedBlocks.push(
         <NotebookEntryChip key={a.id} item={a} onView={onViewInNotebook} />,
       );
-    } else if (a.toolName?.startsWith("modal_")) {
+    } else if (REMOTE_COMPUTE_ENABLED && a.toolName?.startsWith("modal_")) {
       flushChunk();
       orderedBlocks.push(
         <ModalJobChip key={a.id} item={a} onView={onViewCompute} />,
@@ -1826,7 +1828,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
   const selectedBudgetBlocked =
     budgetState === "exceeded" && modelUsesBillableBudget(selectedModel);
   const [selectedComputeTarget, setSelectedComputeTarget] = useState<ModalInstance | null>(
-    () => initialWorkspaceState?.selectedComputeTarget ?? null,
+    () => REMOTE_COMPUTE_ENABLED ? initialWorkspaceState?.selectedComputeTarget ?? null : null,
   );
   const selectedComputeOptions = useMemo(
     () =>
@@ -1873,7 +1875,7 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       pending.rest = false;
       if (appDefaults.thinkingLevel) setThinkingLevel(appDefaults.thinkingLevel);
       const compute = computeInstanceFromDefault(appDefaults.compute, modalCatalog?.instances);
-      if (compute) setSelectedComputeTarget(compute);
+      if (REMOTE_COMPUTE_ENABLED && compute) setSelectedComputeTarget(compute);
     }
     if (pending.model) {
       if (!appDefaults.model) {

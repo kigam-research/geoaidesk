@@ -48,6 +48,7 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   env: {
+    NEXT_PUBLIC_GAID_REMOTE_COMPUTE: process.env.NEXT_PUBLIC_GAID_REMOTE_COMPUTE ?? "true",
     NEXT_PUBLIC_APP_VERSION: readAppVersion(),
     NEXT_PUBLIC_RELEASES_URL: `https://github.com/${distribution?.repository ?? "K-Dense-AI/k-dense-byok"}${
       distribution?.repository ? "/releases" : ""
