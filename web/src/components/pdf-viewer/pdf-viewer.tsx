@@ -53,6 +53,7 @@ import { AnnotationSidebar } from "./annotation-sidebar";
 import { NotePopover } from "./note-popover";
 
 const filesText = geoText("files");
+const sourceText = geoText("previewSource");
 
 type PdfjsModule = typeof import("pdfjs-dist");
 type PdfDoc = import("pdfjs-dist").PDFDocumentProxy;
@@ -161,6 +162,10 @@ export interface PdfSyncClick {
 } // top-left PDF points
 export interface PdfViewerProps {
   path: string;
+  /** Browser-local blob or same-origin PDF; bypasses sandbox and all annotations. */
+  sourceUrl?: string;
+  pageRequest?: { page: number; sequence: number };
+  onDocumentReady?: (pages: number) => void;
   projectId?: string;
   className?: string;
   reloadToken?: number; // bump to re-fetch the same path in place (scroll/zoom preserved)
@@ -172,6 +177,9 @@ export interface PdfViewerProps {
 
 export function PdfViewer({
   path,
+  sourceUrl,
+  pageRequest,
+  onDocumentReady,
   projectId,
   className,
   reloadToken = 0,
@@ -182,6 +190,10 @@ export function PdfViewer({
 }: PdfViewerProps) {
   const contextProjectId = useProjectScopeId();
   const scopedProjectId = projectId ?? contextProjectId;
+  const viewOnly = hideAnnotationUi || sourceUrl !== undefined;
+  const documentUrl = sourceUrl ?? rawFileUrl(path, scopedProjectId);
+  const readyCallback = useRef(onDocumentReady);
+  useEffect(() => { readyCallback.current = onDocumentReady; }, [onDocumentReady]);
   const [pdfjs, setPdfjs] = useState<PdfjsModule | null>(null);
   const [doc, setDoc] = useState<PdfDoc | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -242,9 +254,10 @@ export function PdfViewer({
     let cancelled = false;
     // Reload-in-place: same path with a doc already shown keeps the old
     // canvases up until the new document is ready, then restores scroll.
-    const isReload = docRef.current !== null && loadedPathRef.current === path;
+    const isReload = docRef.current !== null && loadedPathRef.current === documentUrl;
     const savedScroll = isReload ? (containerRef.current?.scrollTop ?? null) : null;
-    const url = rawFileUrl(path, scopedProjectId) + (reloadToken ? `&_r=${reloadToken}` : "");
+    // Preserve the legacy sandbox cache-buster, never append it to a blob URL.
+    const url = sourceUrl ?? (documentUrl + (reloadToken ? `&_r=${reloadToken}` : ""));
     // No XFA forms: not needed to render, and a script surface in a hostile PDF.
     const task = pdfjs.getDocument({ url, withCredentials: true, enableXfa: false });
     if (!isReload) {
@@ -253,6 +266,8 @@ export function PdfViewer({
         setError(null);
         setDoc(null);
         setNumPages(0);
+        setPageSize(null);
+        setCurrentPage(1);
       });
     }
     task.promise.then(
@@ -263,10 +278,11 @@ export function PdfViewer({
         }
         const prev = docRef.current;
         docRef.current = loaded;
-        loadedPathRef.current = path;
+        loadedPathRef.current = documentUrl;
         setError(null);
         setDoc(loaded);
         setNumPages(loaded.numPages);
+        readyCallback.current?.(loaded.numPages);
         if (prev && prev !== loaded) {
           try { prev.destroy(); } catch { /* already gone */ }
         }
@@ -284,7 +300,7 @@ export function PdfViewer({
           // than leaving it dangling until unmount.
           try { docRef.current?.destroy(); } catch { /* ignore */ }
           docRef.current = null;
-          setError(e?.message ?? filesText("pdf_viewer.failed_to_load_pdf"));
+          setError(sourceUrl !== undefined ? sourceText("pdf.error") : (e?.message ?? filesText("pdf_viewer.failed_to_load_pdf")));
         }
       },
     );
@@ -301,7 +317,7 @@ export function PdfViewer({
         () => {},
       );
     };
-  }, [pdfjs, path, reloadToken, scopedProjectId]);
+  }, [pdfjs, documentUrl, sourceUrl, reloadToken]);
 
   useEffect(
     () => () => {
@@ -319,7 +335,7 @@ export function PdfViewer({
   // show annotations, so skip fetching and the 3s sidecar poll entirely —
   // compiled build artifacts have no sidecar and would poll empty forever.
   useEffect(() => {
-    if (hideAnnotationUi) return;
+    if (viewOnly) return;
     let cancelled = false;
     fetchAnnotations(path, scopedProjectId).then((res) => {
       if (cancelled) return;
@@ -330,10 +346,10 @@ export function PdfViewer({
     return () => {
       cancelled = true;
     };
-  }, [path, hideAnnotationUi, scopedProjectId]);
+  }, [path, viewOnly, scopedProjectId]);
 
   useEffect(() => {
-    if (hideAnnotationUi) return;
+    if (viewOnly) return;
     const unsub = subscribeAnnotations(
       path,
       lastModifiedRef.current,
@@ -346,7 +362,7 @@ export function PdfViewer({
       scopedProjectId,
     );
     return unsub;
-  }, [path, hideAnnotationUi, scopedProjectId]);
+  }, [path, viewOnly, scopedProjectId]);
 
   // --------------------------------------------------------------------
   // Persistence (debounced per keystroke is overkill — we save on every
@@ -355,6 +371,7 @@ export function PdfViewer({
 
   const persist = useCallback(
     async (next: AnnotationsDoc) => {
+      if (viewOnly) return;
       const res = await saveAnnotations(
         path,
         next,
@@ -394,7 +411,7 @@ export function PdfViewer({
         etagRef.current = res.etag;
       }
     },
-    [path, scopedProjectId],
+    [path, scopedProjectId, viewOnly],
   );
 
   const mutate = useCallback(
@@ -539,7 +556,7 @@ export function PdfViewer({
         });
         return;
       }
-      if (mode !== "note") return;
+      if (viewOnly || mode !== "note") return;
       const el = ev.currentTarget;
       const box = el.getBoundingClientRect();
       const cssX = ev.clientX - box.left;
@@ -554,7 +571,7 @@ export function PdfViewer({
       });
       setMode("none");
     },
-    [mode, onSyncClick, zoom],
+    [mode, onSyncClick, zoom, viewOnly],
   );
 
   // --------------------------------------------------------------------
@@ -563,10 +580,10 @@ export function PdfViewer({
 
   const visibleAnnotations = useMemo(
     () =>
-      annotations.annotations.filter(
+      (viewOnly ? [] : annotations.annotations).filter(
         (a) => showExpert || a.author.kind !== "expert",
       ),
-    [annotations, showExpert],
+    [annotations, showExpert, viewOnly],
   );
 
   const annotationsByPage = useMemo(() => {
@@ -602,6 +619,19 @@ export function PdfViewer({
   // --------------------------------------------------------------------
 
   const defaultSize = useMemo(() => pageSize ? { w: pageSize.w * zoom, h: pageSize.h * zoom } : null, [pageSize, zoom]);
+  const appliedPageRequest = useRef<{ doc: PdfDoc; page: number; sequence: number } | null>(null);
+  useEffect(() => {
+    if (!doc || !defaultSize || !pageRequest) return;
+    const { page, sequence } = pageRequest;
+    if (!Number.isInteger(page) || page < 1 || page > numPages) return;
+    const applied = appliedPageRequest.current;
+    if (applied?.doc === doc && applied.page === page && applied.sequence === sequence) return;
+    const el = containerRef.current?.querySelector<HTMLElement>(`[data-pdf-page="${page}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setCurrentPage(page);
+    appliedPageRequest.current = { doc, page, sequence };
+  }, [doc, defaultSize, numPages, pageRequest?.page, pageRequest?.sequence]);
   useEffect(() => {
     if (!doc) return;
     let cancelled = false;
@@ -658,7 +688,7 @@ export function PdfViewer({
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-destructive">
+      <div role="alert" className="flex h-full items-center justify-center p-6 text-sm text-destructive">
         {error}
       </div>
     );
@@ -678,8 +708,8 @@ export function PdfViewer({
         onCommitHighlight={handleHighlightSelection}
         showExpert={showExpert}
         setShowExpert={setShowExpert}
-        hideAnnotationUi={hideAnnotationUi}
-        openHref={rawFileUrl(path, scopedProjectId)}
+        hideAnnotationUi={viewOnly}
+        openHref={documentUrl}
         onJumpPage={(p) => {
           const el = containerRef.current?.querySelector<HTMLElement>(
             `[data-pdf-page="${p}"]`,
@@ -719,14 +749,14 @@ export function PdfViewer({
                 ),
               )}
             {!doc && (
-              <div className="py-10 text-sm text-muted-foreground">
-                {filesText("pdf_viewer.loading_pdf")}
+              <div role="status" className="py-10 text-sm text-muted-foreground">
+                {sourceUrl !== undefined ? sourceText("pdf.loading") : filesText("pdf_viewer.loading_pdf")}
               </div>
             )}
           </div>
         </div>
 
-        {!hideAnnotationUi && (
+        {!viewOnly && (
           <AnnotationSidebar
             annotations={visibleAnnotations}
             onJump={jumpToAnnotation}
@@ -735,7 +765,7 @@ export function PdfViewer({
         )}
       </div>
 
-      {pendingNote && (
+      {!viewOnly && pendingNote && (
         <NotePopover
           screen={pendingNote.screen}
           initialBody=""
