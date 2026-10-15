@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T23:07:53Z
+updated: 2026-10-15T23:08:43Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -88,6 +88,16 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   미리보고" → "설정 → 스킬에서 패키지를 미리 보고" (en unchanged).
   Settings → 스킬 → 스킬 추가 shows "허브 패키지 목록" with gaid-hub "허브 패키지 목록을 읽지 못했습니다: fetch failed" while
   the hub is down (raw transport detail; recheck wording once the hub runs).
+- P4 orchestrator gates (2026-10-16 ~08:15 KST, project proj-90b0c8 "허브 방법 시험", session
+  01a141d0-14c0-7525-a9e9-1b7de9a20d63): exposure record mode method:pu-nested-cv-prospectivity:pu-nested-cv-prospectivity,
+  skills [council-mode, pi-subagents, pu-nested-cv-prospectivity] while spatial-pu-workflow is installed in the project
+  (hidden from the model); trial record pinned revision 1, packageSha256 84daff9e…; observed at 08:15: 19 tool calls,
+  5 failed, model kigam-qwen/qwen3.8-flash-next; expected artifacts unmatched (package declares no files[]).
+- Fixes from the researcher's first findings (17aa1a3): TaskSetup says why "작업 초안 만들기" is disabled
+  (workspace.setup.blocked{Environment,Skills,Unavailable,Input}); method detail shows description, readiness, inputs,
+  scientific choices, outputs and limits. Web geo tests 146 pass, tsc clean, copy 0 errors.
+- Merged main c4ce9bf (gaid-qwen-authoring-trial) at 75a4721: conflict only in geo/tests/distribution.test.mjs owners
+  (kept both); server 53 + web 145 targeted tests pass.
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
