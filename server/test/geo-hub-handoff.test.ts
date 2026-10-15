@@ -42,6 +42,8 @@ beforeEach(async () => {
   paths = resolvePaths("handoff-test");
   fs.rmSync(paths.root, { recursive: true, force: true }); fs.mkdirSync(paths.sandbox, { recursive: true }); session();
   app = Fastify();
+  // Stands in for @fastify/cors, which sets the global exposed headers before the handler runs.
+  app.addHook("onRequest", async (_req, reply) => { reply.header("Access-Control-Expose-Headers", "ETag"); });
   app.addHook("onRequest", (req, _reply, done) => withActiveProject(String(req.headers["x-project-id"] ?? paths.id), done));
   sendOptions = { sites: [localSite], fetcher: vi.fn().mockResolvedValue(new Response(JSON.stringify({ projectId: "draft-1", url: "/hub/#/author/draft-1" }), { status: 201 })) };
   await registerGeoHubHandoffRoutes(app, sendOptions);
@@ -147,6 +149,8 @@ describe("analysis handoff", () => {
     const download = await app.inject({ method: "POST", url: "/geo/hub/handoff", payload: { sessionId, files: ["analysis.py"] } });
     expect(download.statusCode).toBe(200); expect(download.headers["content-type"]).toBe("application/gzip");
     expect(download.headers["content-disposition"]).toMatch(/attachment; filename="gaid-analysis-/);
+    // The UI is cross-origin: the file name and delivery path must be readable, next to what CORS already exposes.
+    expect(String(download.headers["access-control-expose-headers"]).split(", ")).toEqual(["ETag", "Content-Disposition", "X-GAID-Handoff-Path"]);
     expect(zlib.gunzipSync(download.rawPayload).length).toBeLessThanOrEqual(HANDOFF_LIMITS.totalBytes);
     expect(readTarGz(download.rawPayload).map(e => e.path)).toEqual(["handoff.json", "files/analysis.py"]);
     expect((await app.inject({ method: "POST", url: "/geo/hub/handoff", payload: { sessionId, files: ["../bad"] } })).statusCode).toBe(400);
