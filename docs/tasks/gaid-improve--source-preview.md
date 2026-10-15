@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:19:04Z
+updated: 2026-10-15T08:19:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
@@ -34,9 +34,9 @@ All visible strings go through geoText('previewSource') and ko/en catalogs. Foll
 Evidence: focused tests for raw source seam/legacy URL preservation and page request behavior where meaningful, local copy validator; parent will do integrated browser flow and required scripts/check. Follow child task CLI check requirements and report exact checks vs not run. No model calls or scientific reruns. Keep working autonomously; finish child with task finish so parent can task complete it. Do not write a separate canonical user report.
 
 ## Current state
-Implemented controlled source input/display components and additive PdfViewer raw-URL, document-ready and sequenced page-request seams. Raw URLs force view-only mode; sandbox URL construction, cache-busting and annotation behavior remain the default when absent. Focused source/PDF tests added. Copy validation passed: 1 catalogue, 0 errors, 0 warnings. Runtime tests pending dependency installation in a recorded snapshot job.
+Implemented controlled source input/display components and additive PdfViewer raw-URL, document-ready and sequenced page-request seams. Raw URLs force view-only mode; sandbox URL construction, cache-busting and annotation behavior remain the default when absent. Focused source/PDF tests added. Copy validation passed: 1 catalogue, 0 errors, 0 warnings. Snapshot job 1 installed dependencies and passed input/pane/existing PDF tests but exposed two test-harness failures, now fixed. Snapshot job 2 checks the fixed revision, then TypeScript.
 ## Next steps
-1. Run focused PDF/source tests and TypeScript check in a recorded snapshot job (this worktree has no node_modules).
+1. Read the completion of snapshot job 2 and record focused PDF/source tests and TypeScript evidence.
 2. Fix any relevant failures, record evidence and finish the child for parent integration.
 ## Failed approaches
 First focused snapshot job exited 1: input/pane and existing PDF tests passed; new PdfViewer test cleanup restored the observer mock before a pending page-size effect settled, contaminating the next test. Fixed explicit cleanup ordering and waiting for page wrappers. The rejected-PDF test also created its rejection before the loader consumed it; changed it to create the promise at getDocument invocation. These were test harness failures, not a dependency block. TypeScript did not run after the test failure.
@@ -58,6 +58,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081810.416192Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-improve--source-preview-20261015T081921.905658Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
