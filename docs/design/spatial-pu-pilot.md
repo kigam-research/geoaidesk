@@ -1,6 +1,6 @@
 # Spatial PU source-first authoring pilot
 
-Status: source-first design in progress. Image-first delivery remains selected; no composition is approved and no product code is implemented.
+Status: connected source-first three-state images are ready for user review in the canonical report §3.15. No composition is approved and no product code is implemented.
 
 ## User-confirmed scenario
 
@@ -8,7 +8,7 @@ Assume no Spatial-PU skill exists. The researcher provides a PDF or paper URL an
 
 Pilot paper: DOI `10.1007/s11053-026-10778-w`. Discovered author R3 material is not a verified publisher PDF. Local source files are not silently preloaded user uploads. A live pilot must record the actual supplied source set before extracting content.
 
-NotebookLM informs source handling and source-grounded artifact creation only. Its UI, layout and visual design are not adopted. It is not an execution dependency or a claim of equivalent functionality. Direct official help confirms source selection, source-guide summaries, citation navigation and artifact creation; Oracle follow-up job 2 failed before prompt on argument order, and corrected job 3 is recorded for supplementary research.
+NotebookLM informs source handling and source-grounded artifact creation only. Its UI, layout and visual design are not adopted. It is not an execution dependency or a claim of equivalent functionality. Direct official help confirms source selection, source-guide summaries, citation navigation and artifact creation; Oracle follow-up job 2 failed before prompt on argument order, and corrected job 3 succeeded. Its result session is `gaid-skill-hub-pu-pdf`; findings corroborate the source-first flow. No new design source is introduced.
 
 The user also requires the actual Codex/Claude skill-creator procedures and an explicit agent/application reliability design using the existing Codex, Claude, MiniMax and institutional Qwen 3.8 Flash Next connections. `docs/design/source-authoring-agents.md` defines the proposed lead/optional-assistant roles, durable question/decision records, validated model proposals, package/trial loop and model capability boundary. No GAID model authoring calls or provider configuration changes were performed.
 
@@ -71,7 +71,9 @@ Published-study facts: 5-km cells and 50-km evaluation blocks. The historical 40
 
 ## Image-first deliverable
 
-The next image round must communicate the sequence, not only its polished endpoint. Preserve GAID white/slate, blue `#1f5eff`, Pretendard, shadcn new-york and Lucide character; reduce exposed detail and enlarge reading type. No new brand choice is required.
+Delivered review set: `reports/2026-10-15-gaid-researcher-ecosystem/figures/source-first-{01-intake,02-coauthor,03-draft-trial}.png`, each with an unapproved provenance sidecar. These are consecutive states, not alternate designs: source received/reading → grounded findings and missing-code choice → candidate package and private-trial setup after original code/results are supplied. Source PDF pixels are illustrative; implementation must use the original viewer, not generated document imagery.
+
+This image round communicates the sequence, not only its endpoint. Preserve GAID white/slate, blue `#1f5eff`, Pretendard, shadcn new-york and Lucide character; reduce exposed detail and enlarge reading type. No new brand choice is required.
 
 Required states across the visual set:
 
@@ -83,7 +85,7 @@ Template references retained: 21st AI CRM detail sheet, shadcnblocks `applicatio
 
 ## History, output handling and next integration
 
-Initial A/B/C comps were rejected in premise by the user: they showed a preselected representative map and ready-made method. Their reusable shell/typography is not approval of their flow. All five image calls completed; originals/prompts remain external under `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`. Do not publish them as current options or repeat generation. New review-sized images, when ready, belong in the canonical report and result registry; full prompts/sidecars stay external. `.impeccable/config.json` records the user's `buildPath: comp`.
+Initial A/B/C comps were rejected in premise by the user: they showed a preselected representative map and ready-made method. Their reusable shell/typography is not approval of their flow. All five image calls completed; originals/prompts remain external under `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`. Do not publish them as current options or repeat generation. Current review-sized images and provenance sidecars are in the canonical report and result registry; full originals/prompts remain external. `.impeccable/config.json` records the user's `buildPath: comp`.
 
 The installed impeccable CLI has a phase-command mismatch with its skill reference (`start --comp` versus `start --direction --kind`). No build-phase state was fabricated. Read the actual installed contract before product implementation. Project output policy overrides the skill's suggested in-repo original-image folder.
 
