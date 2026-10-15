@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:10:57Z
+status: active
+updated: 2026-10-15T14:13:01Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"ffc3948e-1dea-402c-8e2c-549c8367b527","pid":493121,"provider":"codex","session":"01a13fd5-b49b-72f1-bc25-6c5b0b437e72","start":"53833288","token":"b0845f03617ec5fec6a81b6335a63097afbad9aae9e7139698eec72bd755f81a"}
 branch: task/gaid-qwen-authoring-trial--outside-writes
 target: task/gaid-qwen-authoring-trial
@@ -57,7 +57,7 @@ cases covered (table of command → verdict), tests run, and the limits. No netw
 blocked anyway). Remove build caches you created in your worktree before finishing.
 
 ## Current state
-Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 224 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. task finish also automatically runs the repository-wide scripts/check: the first full attempt passed the backend (1775 passed, 11 skipped) but failed one unrelated map-viewer wait assertion in the full web suite; that file then passed alone (8 tests). Retrying finish with VITEST_MAX_WORKERS=4 to bound web-suite contention. Parent integration and deployment remain pending. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
+Implemented the requested outside-project confirmation. Lead write/edit/generate_image and recognized shell mutations carry kind/path through the existing allow-once/deny permission lifecycle; the existing destructiveConfirm switch governs both confirmations. Children block outside writes without a UI. Sandbox/OS-temp/null allowances, reads, protected-path precedence and classifier parity are covered. Scoped checks passed: server 224 tests, web 25 tests, distribution 7 tests, both typechecks; copy validation has 0 errors and 56 unrelated existing warnings. task finish also automatically runs the repository-wide scripts/check: the first full attempt passed the backend (1775 passed, 11 skipped) but failed one unrelated map-viewer wait assertion in the full web suite; that file then passed alone (8 tests). The VITEST_MAX_WORKERS=4 retry overrode the server's serial-worker setting and caused shared-temp-root races; retrying with VITEST_MAX_WORKERS=1 to preserve serial execution for both suites. Parent integration and deployment remain pending. No deployment or real Qwen/browser trial was performed here. Docs explicitly retain Python/program/symlink/parser limitations. Temporary dependency links and compiler cache are removed before finish.
 
 ## Next steps
 <!-- task:closed -->
@@ -71,10 +71,11 @@ Closed 2026-10-15T14:10:57Z: ready; the parent gaid-qwen-authoring-trial integra
 - PASS: node geo/copy/validate-copy.mjs web/src/geo/locales (0 errors, 56 warnings outside the three added IDs).
 - PASS: node --test geo/tests/distribution.test.mjs (7 tests).
 - PASS: git diff --check.
-- The brief assigns full scripts/check to the parent, but task finish automatically invokes it here too. First attempt: backend 1775 passed / 11 skipped; web 1022 passed / 1 failed (map-viewer wait assertion). Isolated map-viewer rerun: 8 passed. Full-check log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-wzj64i37.log. Retry uses the installed Vitest-supported VITEST_MAX_WORKERS=4 (runtime env only; no test/config source workaround).
+- The brief assigns full scripts/check to the parent, but task finish automatically invokes it here too. First attempt: backend 1775 passed / 11 skipped; web 1022 passed / 1 failed (map-viewer wait assertion). Isolated map-viewer rerun: 8 passed. Full-check log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-wzj64i37.log. The first parallelism retry used VITEST_MAX_WORKERS=4, which overrides the server's serial-worker resolution and caused filesystem races (149 failures / 1626 passed). Corrected the runtime override to VITEST_MAX_WORKERS=1; no test/config source workaround.
 - Dependencies reused from the parent's external app snapshot through temporary node_modules symlinks; no dependency manifest/lockfile changed. Latest server test log: ~/data/geoaidesk/work/gaid-qwen-authoring-trial--outside-writes/server-check.log.
 
 ## Failed approaches
+- VITEST_MAX_WORKERS=4 overrides Vitest's resolved serial-worker count even with server fileParallelism=false. The server tests share/reset one temp project root, so this retry produced ENOENT/ENOTEMPTY races. Corrected the external runtime setting to 1; no source edits for these failures.
 - Retry fetched parent c010737 and again encountered the adjacent integration-boundaries append conflict. Preserved the new parent workflow-collapse seam text and the child outside-write seam. No implementation conflict.
 - Second finish reached the full-check web phase and failed the unrelated map-viewer wait assertion under the default parallel suite; isolated rerun passed. No map source/test edited.
 - Final code review found optional rootless cwd resolution could consult the host cwd via path.resolve. Kept rootless paths relative, copied the classifier, and added two parity-run regression assertions; the requested pure-classifier contract is preserved (224 scoped server tests passed).
