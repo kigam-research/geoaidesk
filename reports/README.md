@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-15-gaid-researcher-ecosystem/figures/preview-method.png" width="120"> | 2026-10-15 18:15 | [연구방법의 제작·실행·공유를 잇는 GAID 개편안](2026-10-15-gaid-researcher-ecosystem/index.md) | 실제 PDF에서 방법 선택·초안 편집·시험 준비로 이어지는 클릭형 시안을 구현했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-14-gaid-qwen-followups/figures/01-thinking-selector.png" width="120"> | 2026-10-14 | [새 프로젝트 스킬 설치와 서버별 추론량 설정 — 기관·로컬 모델 재시험](2026-10-14-gaid-qwen-followups/index.md) | 새 프로젝트에 지질 스킬이 바로 설치되고, 기관 서버는 기본 추론량 "높음"을 "보통"으로 받아 두 과제를 4분대에 통과했습니다. 로컬 모델은 4과제 중 3과제를 통과했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-14-gaid-kigam-qwen-trial/figures/01-kigam-qwen-map.png" width="120"> | 2026-10-14 15:41 | [기관 내부 Qwen 서버 실제 과제 시험 — 연결·과제 결과와 사용 조건](2026-10-14-gaid-kigam-qwen-trial/index.md) | 기관 내부 Qwen 서버는 연결과 두 과제(지도·면적표, 검층 QC)를 모두 통과했습니다. 다만 대화의 추론량을 "사용 안 함·낮음·보통" 중 하나로 두어야 합니다. | 검토함 10-14 | 채택 | 2 |
 | <img src="2026-10-13-gaid-ui-locale/figures/01-workflows-ko.png" width="120"> | 2026-10-13 08:15 | [앱 전체 한국어·영어 화면 모드와 요청 언어를 따르는 응답](2026-10-13-gaid-ui-locale/index.md) | 언어 설정 하나로 GAID 화면과 K-Dense에서 온 화면(채팅, workflow 326개, 파일 보기, 설정, 연구 노트)이 모두 한국어 또는 영어로 바뀝니다. 에이전트는 화면 언어와 상관없이 사용자가 지정한 언어나 요청한 언어로 답합니다. | 검토함 10-13 | 채택 | 1 |
