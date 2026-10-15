@@ -28,6 +28,13 @@ function setup(props: WorkflowInputProps & { workflow?: Workflow; budgetBlocked?
 
 beforeEach(() => { modelState.availability = "available"; modelState.billable = true; });
 
+describe("workflow source (gaid-brand-copy)", () => {
+  it("names K-Dense as the source of a built-in Workflow, linked in the dialog", () => {
+    setup();
+    expect(screen.getByRole("link", { name: /Source: K-Dense/ })).toHaveAttribute("href", "https://github.com/K-Dense-AI/k-dense-byok");
+  });
+});
+
 describe("workflow data sources", () => {
   it("opens on sandbox files and folders before device uploads", () => {
     setup({ availableFiles: ["results/counts.csv"], availableFolders: ["results"], onUploadFiles: vi.fn() });

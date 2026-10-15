@@ -62,6 +62,7 @@ import {
 } from "lucide-react";
 
 import { SkillHubInstall, SkillHubPreviewNotes, skillHubSource, type SkillHubPreview } from "@/geo/skill-hub/skill-hub";
+import { SourceBadge } from "@/geo/attribution/source-badge";
 import { t } from "@/geo/i18n";
 
 const settingsText = geoText("settings");
@@ -761,6 +762,7 @@ export function SkillsPanel() {
                           ? r.source
                           : ORIGIN_LABEL[origin]}
                     </Badge>
+                    {r.upstream && <SourceBadge source={r.upstream} />}
                     {updateAvailable ? (
                       <Badge variant="outline" className="h-5 text-[10px] text-amber-600">
                         {settingsText("skills.update_available")}

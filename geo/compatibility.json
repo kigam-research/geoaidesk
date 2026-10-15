@@ -4,6 +4,13 @@
   "updatedAt": "2026-10-14",
   "policy": "A combination is advertised only with an install or route record for this app version (skill_hub docs/specs/gaid-product.md section 4). Records keep failed, partial and not-run states. Paid and subscription runs happen only at the user's request. Everything not listed with evidence is untested.",
   "evidenceLocation": "Records (gaid-install-evidence/v1, gaid-route-evidence/v1; geo/release-proof/README.md) are kept outside Git by locator and sha256.",
+  "display": {
+    "supported": "desktop browser window",
+    "unsupported": [
+      "Narrow windows (phone width, about 390 px): the workspace chat column becomes very narrow and confirmation cards and the send button can be pushed off screen. Settings adapts to narrow windows; the workspace does not."
+    ],
+    "decision": "Desktop first; no narrow-window layout work planned (gaid-qwen-authoring-trial#1, user answer 2026-10-15)."
+  },
   "environments": [
     {
       "id": "linux-x64",

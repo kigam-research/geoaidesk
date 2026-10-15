@@ -24,7 +24,8 @@ const sourceIds = new Map(
 );
 
 export function settingsSourceText(value: string): string {
-  const id = sourceIds.get(value);
+  // gaid-brand-copy: the backend's provider notes still name the app "Kady"; the catalogue says GAID.
+  const id = sourceIds.get(value) ?? sourceIds.get(value.replace(/\bKady\b/g, "GAID"));
   return id ? settingsText(id) : value;
 }
 

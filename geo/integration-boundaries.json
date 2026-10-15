@@ -475,6 +475,12 @@
       "owner": "gaid-qwen-authoring-trial",
       "status": "edited",
       "responsibility": "Confirm recognized outside-project mutations in lead tools using the existing permission lifecycle; block them in child tools, preserve sandbox/temp/null allowances and protected-path precedence, and display localized permission kinds."
+    },
+    {
+      "path": "server/src/api/skills.ts, server/test/geo-skill-origin.test.ts, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx, web/src/components/workflows-panel.tsx, web/src/components/workflows-panel.test.tsx, web/src/components/prompts-panel.tsx, web/src/components/prompts-panel.test.tsx, web/src/components/office-workspace.tsx, web/src/components/settings/primitives.tsx, web/src/components/delegate-picker.test.tsx, web/src/components/lab-notebook-view.test.tsx, web/src/components/lab-notebook-entry-card.test.tsx, web/src/lib/notebook-filters.test.ts, web/src/lib/notebook-print.test.ts",
+      "owner": "gaid-brand-copy",
+      "status": "edited",
+      "responsibility": "Visible names: Kady becomes \"AI agent\" where it names the assistant and GAID where it names the app, K-Dense as the app becomes GAID (locale strings; backend provider notes are matched with Kady read as GAID). Skills, built-in Workflows and seeded templates taken from K-Dense show a linked \"출처: K-Dense\" badge (SkillInfo.upstream from server/src/geo/skill-origin.ts). Code identifiers, env vars, routes and the upstream attribution line are unchanged."
     }
   ],
   "notTouched": [

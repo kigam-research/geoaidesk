@@ -16,6 +16,13 @@ sha256; the harness that produced them is in `geo/release-proof/`.
 
 The install checks call the app's API and fetch the served page; they are not browser interaction tests.
 
+## Screen size
+
+GeoAIDesk is made for a desktop browser window. Narrow windows (phone width, about 390 px) are not supported for the
+workspace: the chat column becomes very narrow, and confirmation cards and the send button can be pushed off screen,
+so a run waiting for your approval can look stuck. Settings adapts to narrow windows; the workspace does not. This is
+a decision (desktop first), not a pending fix.
+
 ## Model routes
 
 The 2026-10-14 re-trial ran each task once with the geo catalogue skills installed in the trial project; earlier

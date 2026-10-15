@@ -186,6 +186,28 @@ describe("SkillsPanel", () => {
     expect(screen.getByText("vercel-labs/agent-skills")).toBeInTheDocument();
   });
 
+  it("names the source project of a catalogue skill taken from K-Dense, with a link", async () => {
+    stubProjects();
+    const upstream = {
+      name: "K-Dense",
+      repository: "K-Dense-AI/scientific-agent-skills",
+      url: "https://github.com/K-Dense-AI/scientific-agent-skills/tree/92ace75/skills/geopandas",
+    };
+    vi.spyOn(caps, "getAllSkills").mockResolvedValue(
+      listing({
+        enabled: [
+          skill("geopandas", "vector data", { origin: "catalogue", upstream }),
+          skill("geo-map-and-crs", "maps", { origin: "catalogue" }),
+        ],
+      }),
+    );
+
+    render(<SkillsPanel />);
+    const link = await screen.findByRole("link", { name: /Source: K-Dense/ });
+    expect(link).toHaveAttribute("href", upstream.url);
+    expect(screen.getAllByText(/Source: K-Dense/)).toHaveLength(1);
+  });
+
   it("reloads for the all-projects scope and warns about shadowing", async () => {
     stubProjects();
     const getSpy = vi

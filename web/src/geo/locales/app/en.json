@@ -478,6 +478,8 @@
   "header.productName": "GeoAIDesk",
   "header.attribution": "Based on K-Dense BYOK (MIT)",
   "header.version": "GeoAIDesk v{version}",
+  "attribution.source": "Source: {name}",
+  "attribution.sourceTitle": "Taken from {repository}. Opens the source repository.",
   "chat.tabs.numbered": "Chat {count}",
   "header.computeRunning": "{count, plural, one {# Modal compute job is} other {# Modal compute jobs are}} still running. Open Compute to inspect live logs.",
   "header.openCompute": "Open Compute, {count} active jobs",

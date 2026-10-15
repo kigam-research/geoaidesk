@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T22:48:19Z
+updated: 2026-10-15T22:59:14Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"a1684467-2f27-4645-9134-551b40e66be6","pid":3326138,"provider":"claude","session":"23cfe4ed-f98f-472e-a572-8da185372836","start":"57046241","token":"d2a3156f13a6dd3deca1c6ab1e7a65b39282d2f1add18ba826c65acfe7946882"}
 branch: task/gaid-brand-copy
 target: main
@@ -41,11 +41,30 @@ Items (docs/open-items/gaid-qwen-authoring-trial.md; evidence reports/2026-10-15
   review instance. After the last check remove build caches and app-written files/links from the worktree.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-16: surveyed. 57 locale ids per language name Kady/K-Dense/BYOK (web/src/geo/locales/*); visible literals
+  outside locales: office-workspace "Kady Office", prompts-panel "K-Dense" badge. Provider hints in
+  server/src/agent/provider-{auth,catalog}.ts are the English lookup keys of settings `source.*` (primitives.tsx), so
+  they change together with en.json.
+- Pinned catalogue 0.2.1: 5 skills are K-Dense imports (`sourceRevision.kind: import`, repository
+  K-Dense-AI/scientific-agent-skills, commit, path); 8 are KIGAM-owned; all catalogue workflows are KIGAM-owned.
+  Upstream Workflows (web/src/data workflows list, ALL_WORKFLOWS in workflows-panel.tsx) are K-Dense.
 ## Next steps
-1. (the next session's first action)
+1. Implement packages A-C below myself (tightly coupled copy work), then screenshots and report.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: no child writers; the work is copy plus one small server field, tightly coupled. Packages, in order:
+  A) copy: Kady -> "AI agent" where it names the assistant, -> "GAID" where it names the app (restart, server, file
+     browser, credential store, billing/ledger, shipped templates); K-Dense/BYOK as the app -> GAID. Kept: header
+     attribution "Based on K-Dense BYOK (MIT)", and strings that name the upstream Workflow list itself
+     (workspace.catalogue.noDetail, workspace.recipe.upstreamCategories) because they are source attribution.
+     Code identifiers, env vars, routes, model-facing protocol strings (composer "Delegation: Kady picks") unchanged.
+  B) attribution: server adds `upstream {name, repository, url}` to SkillInfo for catalogue skills imported from
+     another repository (geo index sourceRevision.kind=import; upstream catalogue mode: KADY_SKILLS_REPO); skills panel
+     row shows "출처: K-Dense" linked; upstream Workflow rows and the launch dialog show "출처: K-Dense" linked to the
+     upstream repository. Owned files: server/src/api/skills.ts, server/src/geo/skill-origin.ts (new),
+     web/src/lib/capabilities.ts, web/src/components/{skills-panel,workflows-panel,prompts-panel}.tsx.
+  C) docs: narrow-window (~390 px) workspace chat unsupported in docs/geo/compatibility.md / install.md.
+  Overlap with gaid-hub-integration: geo/integration-boundaries.json, AGENTS.md, locales/index.ts only.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

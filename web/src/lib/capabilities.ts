@@ -31,6 +31,8 @@ export interface SkillInfo {
   ref?: string;
   /** A support skill the app runtime seeds into every project (not from the catalogue, not written by the user). */
   builtin?: boolean;
+  /** gaid-brand-copy: the project a catalogue skill was taken from (e.g. K-Dense), shown wherever the skill is. */
+  upstream?: { name: string; repository: string; url: string };
 }
 
 /**
