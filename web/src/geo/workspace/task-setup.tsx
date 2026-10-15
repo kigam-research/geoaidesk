@@ -20,9 +20,10 @@ export function WorkflowOutputs({ workflow }: { workflow: GeoWorkflowSummary }) 
   </div>;
 }
 
-export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe }: {
+export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe, exposure }: {
   workflow: GeoWorkflowSummary; projectId: string; availableFiles: string[]; open: boolean; onOpenChange: (open: boolean) => void; onRefresh: () => void | Promise<void>;
   initialBindings?: Record<string, string>; initialSetup?: GeoRecipeCheckResponse["setup"];
+  exposure?: string;
   /** Set when the setup comes from a saved recipe (gaid-workflow-catalog). */
   recipe?: { title: string; onDelete: () => Promise<void> };
 }) {
@@ -43,7 +44,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       const primary = workflow.readiness.skills.find((skill) => skill.id === workflow.skillIds[0]);
       const skill = primary?.enabled ? response.find((row) => row.name === primary.runtimeName) : undefined;
       const result = startGeoTask({ title: text(workflow.title), text: taskDraft(workflow, bindings, choices),
-        attachedFiles: [...new Set(Object.values(bindings).filter(Boolean))], skills: skill ? [{ id: skill.id, name: skill.name, description: skill.description }] : [], geoExposure: `workflow:${workflow.id}` });
+        attachedFiles: [...new Set(Object.values(bindings).filter(Boolean))], skills: skill ? [{ id: skill.id, name: skill.name, description: skill.description }] : [], geoExposure: exposure ?? `workflow:${workflow.id}` });
       if (result !== "opened") { setError(t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`)); return; }
       setBindings({}); setChoices({}); onOpenChange(false);
     } catch (error) { setError(t("workspace.setup.error", { detail: (error as Error).message })); }

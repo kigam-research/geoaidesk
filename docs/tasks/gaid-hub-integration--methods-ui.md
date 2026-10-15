@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:34:00Z
+updated: 2026-10-15T14:38:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"889fbc92-549f-4f63-9865-358efbab2bba","pid":793523,"provider":"codex","session":"01a13ffb-bfc7-7dd1-9fac-66f3bf150afc","start":"54082579","token":"c5f1a782a11515da3361495e6b345bc949fcea86976aaa8443c13bf3060b46d2"}
 branch: task/gaid-hub-integration--methods-ui
 target: task/gaid-hub-integration
@@ -73,11 +73,17 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
   results. Then `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress. Contract and copy guides read; no server edits or restricted sibling files.
 ## Next steps
-1. (the next session's first action)
+1. Implement standalone method rows/detail/trials and hub listing, then run the declared UI checks.
 ## Failed approaches
 ## Notes and decisions
+### UI orchestration
+Sequential: TaskSetup exposure seam → method UI → hub preview listing → tests → parent handoff.
+Owned: web/src/geo/methods/, skill-hub/, methods and skillHub locales, locale index, TaskSetup exposure prop.
+No independent writer packages: the hook/dialog/setup state is tightly coupled; this child cannot create nested units.
+Parent owns task-catalogue integration and final full-app checks/report.
+
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
