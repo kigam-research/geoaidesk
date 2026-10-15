@@ -23,8 +23,13 @@ import contextEn from "./context/en.json";
 import localModelKo from "./localModel/ko.json";
 import localModelEn from "./localModel/en.json";
 
+import methodsKo from "./methods/ko.json";
+import methodsEn from "./methods/en.json";
+
 import skillHubKo from "./skillHub/ko.json";
 import skillHubEn from "./skillHub/en.json";
+import hubHandoffKo from "./hubHandoff/ko.json";
+import hubHandoffEn from "./hubHandoff/en.json";
 
 // gaid-ui-locale: upstream K-Dense screens
 import settingsKo from "./settings/ko.json";
@@ -67,7 +72,9 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewMethod: pair(previewMethodKo, previewMethodEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
+  methods: pair(methodsKo, methodsEn),
   skillHub: pair(skillHubKo, skillHubEn),
+  hubHandoff: pair(hubHandoffKo, hubHandoffEn),
   // gaid-korean-workspace--tasks: task catalogue, setup, recipes, suggestions, results, reusable skill
   workspace: pair(workspaceKo, workspaceEn),
   // shared inspection viewer

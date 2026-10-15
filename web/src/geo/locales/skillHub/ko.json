@@ -21,5 +21,12 @@
     "archive": "패키지를 읽지 못했습니다. SKILL.md가 있는 스킬 폴더 하나를 담은 .tar.gz 파일을 선택하세요. 링크와 상위 경로는 허용하지 않습니다.",
     "input": "스킬 페이지 URL 또는 .tar.gz 파일을 선택하세요.",
     "request": "스킬 미리보기를 불러오지 못했습니다. 다시 시도하세요."
-  }
+  },
+  "methods": "허브 패키지 목록",
+  "methodsLoading": "허브 패키지 목록을 읽는 중입니다.",
+  "methodsEmpty": "허브에 가져올 패키지가 없습니다.",
+  "methodsError": "허브 패키지 목록을 읽지 못했습니다: {detail}",
+  "methodPreview": "패키지 미리보기",
+  "methodCreated": "생성 시각: {at}",
+  "methodDraft": "허브 방법: {id} · revision {revision} · {lifecycle}"
 }
