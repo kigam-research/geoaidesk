@@ -620,9 +620,12 @@ export function PdfViewer({
 
   const defaultSize = useMemo(() => pageSize ? { w: pageSize.w * zoom, h: pageSize.h * zoom } : null, [pageSize, zoom]);
   const appliedPageRequest = useRef<{ doc: PdfDoc; page: number; sequence: number } | null>(null);
+  const requestedPage = pageRequest?.page;
+  const requestSequence = pageRequest?.sequence;
   useEffect(() => {
-    if (!doc || !defaultSize || !pageRequest) return;
-    const { page, sequence } = pageRequest;
+    if (!doc || !defaultSize || requestedPage === undefined || requestSequence === undefined) return;
+    const page = requestedPage;
+    const sequence = requestSequence;
     if (!Number.isInteger(page) || page < 1 || page > numPages) return;
     const applied = appliedPageRequest.current;
     if (applied?.doc === doc && applied.page === page && applied.sequence === sequence) return;
@@ -631,7 +634,7 @@ export function PdfViewer({
     el.scrollIntoView({ behavior: "smooth", block: "start" });
     setCurrentPage(page);
     appliedPageRequest.current = { doc, page, sequence };
-  }, [doc, defaultSize, numPages, pageRequest?.page, pageRequest?.sequence]);
+  }, [doc, defaultSize, numPages, requestedPage, requestSequence]);
   useEffect(() => {
     if (!doc) return;
     let cancelled = false;
@@ -877,6 +880,8 @@ function Toolbar({
         {filesText("pdf_viewer.page_label")}
         <input
           name="p"
+          aria-label={filesText("pdf_viewer.page_label")}
+          inputMode="numeric"
           defaultValue={currentPage}
           key={currentPage}
           className="w-10 rounded border bg-transparent px-1 py-0.5 text-center tabular-nums"

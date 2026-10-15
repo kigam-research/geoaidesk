@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PdfViewer } from "./pdf-viewer";
 
@@ -19,6 +19,7 @@ function makeDocument(pages = 12) {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks();
   localStorage.setItem("gaid:locale", "en");
   mocks.rawFileUrl.mockImplementation((path, project) => `/sandbox/raw?path=${encodeURIComponent(path)}&project=${project}`);
   mocks.fetchAnnotations.mockResolvedValue({ doc: { version: 1, annotations: [] }, lastModified: null, etag: null });
@@ -27,7 +28,7 @@ beforeEach(() => {
   vi.stubGlobal("IntersectionObserver", class { observe() {} disconnect() {} });
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("/* worker */"));
 });
-afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("PDF raw source seam", () => {
   it("loads raw blob URLs without sandbox resolution or any annotation API and retains functional navigation/zoom", async () => {
@@ -58,6 +59,7 @@ describe("PDF raw source seam", () => {
     expect(mocks.fetchAnnotations).toHaveBeenCalledWith("folder/paper.pdf", "explicit-project");
     expect(mocks.subscribeAnnotations).toHaveBeenCalledWith("folder/paper.pdf", null, expect.any(Function), 3000, "explicit-project");
     expect(screen.getByRole("link")).toHaveAttribute("href", "/sandbox/raw?path=folder%2Fpaper.pdf&project=explicit-project");
+    await waitFor(() => expect(document.querySelectorAll("[data-pdf-page]")).toHaveLength(12));
   });
 
   it("queues page requests through document load and reapplies only for a new sequence, not zoom", async () => {
@@ -81,7 +83,7 @@ describe("PDF raw source seam", () => {
   });
 
   it("exposes a recoverable loading/error state for a rejected raw PDF", async () => {
-    mocks.getDocument.mockReturnValue({ promise: Promise.reject(new Error("invalid PDF")) });
+    mocks.getDocument.mockImplementation(() => ({ promise: Promise.reject(new Error("invalid PDF")) }));
     render(<PdfViewer path="bad.pdf" sourceUrl="blob:bad" />);
     expect(screen.getByRole("status")).toHaveTextContent("Reading PDF");
     expect(await screen.findByRole("alert")).toHaveTextContent("Select another PDF");
