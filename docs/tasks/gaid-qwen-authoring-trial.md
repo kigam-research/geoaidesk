@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:01:28Z
+updated: 2026-10-15T14:09:04Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -159,6 +159,14 @@ the local-workflow/one-entry implementation; meanwhile R1 re-test (researcher 77
   English, icon-only upload/wand/skill buttons, permission card ("Kady", English, invisible at 390 px), TaskSetup length
   and "작업 중 결정" ambiguity, file dropdowns mixing outputs with sources, shapefile parts ungrouped in the file list.
 - F7 [model, note only] Output folder overwritten without asking (`qc/15_9-13`); wrong self-explanations of F1.
+## Terminology (Q2 가, done 2026-10-15)
+- Korean UI values: "workflow" → "워크플로" (workspace catalogue/recipe, app tab, workflows panel, context mode label
+  "워크플로: {title}", authoring preview); catalogue title "Geoscience 작업" → "지구과학 워크플로"; pi-subagents workflow
+  scripts renamed "위임 스크립트" to avoid the clash; research/robustness strings left (Modal-only, hidden by modal-off);
+  ICU select keys untouched. 4 tests updated; full web suite 1021/1021 pass. `geo/copy/terminology.csv` is a byte copy of
+  skill_hub `design/copy/` (do not edit here) → skill_hub contract change to forward: canonical ko "워크플로" for
+  workflow, plus a "레시피" entry (saved start setting of a workflow, `.geo-start.json`).
+
 ## R1 re-test (after F1–F5/F9; instance 2, 7e77779; `<work>/researcher/r1/`, `<work>/evidence/r1`)
 - F1 confirmed: fresh chat with the default catalogue scope loaded the chat-made skill `las-quicklook-qc` first (1/1;
   exposure record of that chat lists it; before 0/2). F3: "직접 작성"/"카탈로그" distinguishable, but council-mode and

@@ -14,7 +14,7 @@
   "mode": "현재 대화의 스킬 범위: {mode}",
   "modeAll": "설치된 모든 스킬",
   "modeCatalogue": "GeoAIDesk 카탈로그 스킬",
-  "modeWorkflow": "작업: {title}",
+  "modeWorkflow": "워크플로: {title}",
   "newChat": "새 채팅의 스킬 범위",
   "newChatNote": "새로 여는 채팅부터 적용됩니다. 지금 채팅의 범위와 설치된 스킬 파일은 바뀌지 않습니다.",
   "saved": "저장했습니다",
