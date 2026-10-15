@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoText } from "@/geo/i18n";
 import { FileTreePanel } from "@/components/sandbox-panel";
 import { FilePreviewPanel, SettingsDialog, WorkflowsPanel } from "@/components/lazy-surfaces";
@@ -335,7 +337,7 @@ function WorkspacePage({
     () => initialState?.showAutomation ?? false,
   );
   const [showCompute, setShowCompute] = useState(
-    () => initialState?.showCompute ?? false,
+    () => REMOTE_COMPUTE_ENABLED && (initialState?.showCompute ?? false),
   );
   const [computeScope, setComputeScope] = useState<ModalComputeScope>(
     () => initialState?.computeScope ?? "project",
@@ -806,6 +808,7 @@ function WorkspacePage({
   }, []);
   const [computeFocus, setComputeFocus] = useState<{ id: string; token: number } | null>(null);
   const handleViewCompute = useCallback((jobId?: string) => {
+    if (!REMOTE_COMPUTE_ENABLED) return;
     setShowNotebook(false);
     setShowAutomation(false);
     setShowCompute(true);

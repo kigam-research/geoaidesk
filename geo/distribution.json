@@ -10,6 +10,9 @@
   "issuesUrl": "https://github.com/kigam-research/geoaidesk/issues",
   "upstreamLock": "geo/upstream.lock.json",
   "integrationBoundaries": "geo/integration-boundaries.json",
+  "features": {
+    "remoteCompute": false
+  },
   "launch": {
     "entryPoints": [
       "start-gaid.sh",

@@ -419,7 +419,10 @@ export function ProvidersPanel({ section }: { section?: string }) {
           <SettingsCard id="connected" title={appText("settings.providers.connectedCount", { count: connected.length })}>
             {connected.length === 0 ? (
               <p className="text-[11px] text-muted-foreground">
-                {appText("settings.providers.no_model_provider_is_connected_yet_pick")}</p>
+                {/* Local and custom servers are listed in their own cards below, not in this count. */}
+                {models.hasAnyModelAccess
+                  ? appText("settings.providers.models_come_from_a_server_below")
+                  : appText("settings.providers.no_model_provider_is_connected_yet_pick")}</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {connected.map((row) => (

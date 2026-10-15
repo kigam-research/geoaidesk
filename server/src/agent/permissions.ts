@@ -1,5 +1,5 @@
 /**
- * Pending permission decisions ("may the agent run this destructive command?").
+ * Pending permission decisions ("may the agent perform this mutation?").
  *
  * Mirrors the interview tool's pending-answer machinery (interview.ts), but is
  * driven from a `tool_call` hook rather than a tool: there is no toolCallId-
@@ -11,6 +11,8 @@ import { randomUUID } from "node:crypto";
 import { runBroker } from "./run-broker.ts";
 
 export interface PermissionPayload {
+  kind?: "destructive" | "outside-project";
+  path?: string;
   toolCallId: string;
   toolName: string;
   command: string;

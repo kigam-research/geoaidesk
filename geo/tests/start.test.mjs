@@ -8,6 +8,17 @@ const distribution = readDistribution();
 const root = path.resolve("/opt/geoaidesk");
 const home = path.resolve("/home/researcher");
 
+test("the distribution launcher's effective remote-compute feature reaches the UI build", () => {
+  const resolve = (manifest, env = {}) => resolveDistributionEnv(manifest, env, { root, home }).set;
+  assert.equal(resolve(distribution).GAID_DISTRIBUTION, "1");
+  assert.equal(resolve(distribution).NEXT_PUBLIC_GAID_REMOTE_COMPUTE, "false");
+  for (const env of [{ GAID_CATALOGUE: "off" }, { KADY_SKILLS_REPO: "other/skills" }]) {
+    assert.equal(resolve(distribution, env).NEXT_PUBLIC_GAID_REMOTE_COMPUTE, "true");
+  }
+  assert.equal(resolve({ ...distribution, features: undefined }).NEXT_PUBLIC_GAID_REMOTE_COMPUTE, "true");
+  assert.equal(resolve({ ...distribution, features: { remoteCompute: true } }).NEXT_PUBLIC_GAID_REMOTE_COMPUTE, "true");
+});
+
 test("defaults put every user-data path under ~/.geoaidesk", () => {
   const { set, problems, dataHome } = resolveDistributionEnv(distribution, {}, { root, home });
   assert.deepEqual(problems, []);

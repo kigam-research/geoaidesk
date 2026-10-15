@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 /** Supported event-bus RPC; scope is the actual Pi session, never a global run id. */
 import { randomUUID } from "node:crypto";
 import path from "node:path";
@@ -88,11 +89,11 @@ export function makeSubagentControlExtension(projectId: string): ExtensionFactor
       const packages = path.resolve(import.meta.dirname, "../../pi-packages");
       const webEntry = path.resolve(webAccessPackageDir(), JSON.parse(fs.readFileSync(path.join(webAccessPackageDir(), "package.json"), "utf8")).pi.extensions[0]);
       const required = registerRequiredChildExtensions({ sessionId, extensions: [
-        ...["kady-guard", "kady-notebook", "kady-modal", "kady-pdf-annotations", "kady-child-runtime"].map((id) => ({ id, path: path.join(packages, id, "index.ts") })),
+        ...["kady-guard", "kady-notebook", ...(remoteComputeEnabled() ? ["kady-modal"] : []), "kady-pdf-annotations", "kady-child-runtime"].map((id) => ({ id, path: path.join(packages, id, "index.ts") })),
         { id: "pi-web-access", path: fs.statSync(webEntry).isDirectory() ? path.join(webEntry, "index.js") : webEntry },
       ] });
       disposers.push(() => required.dispose());
-      disposers.push(registerBackgroundWorkProvider({ name: `kady-modal:${projectId}:${sessionId}`,
+      if (remoteComputeEnabled()) disposers.push(registerBackgroundWorkProvider({ name: `kady-modal:${projectId}:${sessionId}`,
         // Matched and reported under the plugin's identity (the session file):
         // under the bare session id no query ever matched, so bg_wait could not
         // see this session's Modal jobs.

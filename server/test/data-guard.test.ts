@@ -5,6 +5,8 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
+import { registerChildGuard } from "../pi-packages/kady-guard/index.ts";
 
 vi.mock("../src/agent/session-registry.ts", () => ({
   getModelRuntime: vi.fn(() => ({ checkAuth: vi.fn(async () => ({ type: "api_key", source: "test" })) })),
@@ -79,6 +81,46 @@ describe("data guard tool_call hook", () => {
     expect(await hook(call("read", { path: "user_data/a.csv" }))).toBeUndefined();
   });
 
+  it("confirms outside writes for every file tool and bash, without gating reads or allowed destinations", async () => {
+    const request = vi.fn(async () => "allowed" as const);
+    const hook = install({ request });
+    const target = "/opt/gaid/outside/file";
+    for (const toolName of ["write", "edit", "generate_image", "bash"]) {
+      const input = toolName === "bash" ? { command: `mkdir -p "${target}"` } : { path: target };
+      expect(await hook(call(toolName, input))).toBeUndefined();
+      expect(request).toHaveBeenLastCalledWith(projectId, "s1", expect.objectContaining({ kind: "outside-project", path: target, toolName, reason: expect.stringMatching(/^Outside-project write:/) }));
+    }
+    expect(request).toHaveBeenCalledTimes(4);
+    request.mockClear();
+    for (const destination of ["derived/file", path.join(os.tmpdir(), "gaid-guard-file"), "/tmp/gaid-guard-file", "/dev/null"]) {
+      for (const toolName of ["write", "edit", "generate_image"]) expect(await hook(call(toolName, { path: destination }))).toBeUndefined();
+      expect(await hook(call("bash", { command: `echo x > "${destination}"` }))).toBeUndefined();
+    }
+    expect(await hook(call("read", { path: target }))).toBeUndefined();
+    expect(await hook(call("bash", { command: `cat "${target}"` }))).toBeUndefined();
+    expect(request).not.toHaveBeenCalled();
+    expect((await hook(call("generate_image", { path: "user_data/image.png" })))?.block).toBe(true);
+  });
+
+  it("blocks outside writes on deny, timeout, no UI or cancellation, and re-reads the policy", async () => {
+    const request = vi.fn();
+    const hook = install({ request });
+    for (const toolName of ["write", "bash"]) {
+      for (const outcome of ["denied", "timeout", "no_ui", "cancelled"] as const) {
+        request.mockResolvedValueOnce(outcome);
+        const target = path.relative(resolvePaths(projectId).sandbox, "/opt/gaid/outside");
+        const input = toolName === "bash" ? { command: `touch ${target}` } : { path: target };
+        expect(await hook(call(toolName, input))).toMatchObject({ block: true, terminate: outcome === "cancelled" });
+      }
+    }
+    request.mockClear();
+    writeGuardPolicy(resolvePaths(projectId).sandbox, { protectedPaths: ["user_data/**"], destructiveConfirm: false });
+    expect(await hook(call("write", { path: "/opt/gaid/outside" }))).toBeUndefined();
+    expect(await hook(call("bash", { command: "touch /opt/gaid/outside" }))).toBeUndefined();
+    expect((await hook(call("write", { path: "user_data/file" })))?.block).toBe(true);
+    expect(request).not.toHaveBeenCalled();
+  });
+
   it("honours the project policy: custom globs and confirm off", async () => {
     writeGuardPolicy(resolvePaths(projectId).sandbox, { protectedPaths: ["raw/**"], destructiveConfirm: false });
     const request = vi.fn(async () => "allowed" as const);
@@ -106,6 +148,8 @@ describe("data guard tool_call hook", () => {
     expect(request).toHaveBeenCalledWith(projectId, "s1", {
       toolCallId: "tc1",
       toolName: "bash",
+      kind: "destructive",
+      path: undefined,
       command: "rm -rf results && echo ok",
       reason: expect.stringMatching(/Destructive shell command/),
     });
@@ -116,11 +160,14 @@ describe("permissions", () => {
 
   it("publishes a request on the live handle and resolves through the route", async () => {
     const handle = runBroker.start(projectId, "s1", { runId: "r1", prompt: "x", images: [], baseline });
-    const promise = requestPermission(projectId, "s1", { toolCallId: "tc", toolName: "bash", command: "rm -rf results", reason: "why" });
+    const promise = requestPermission(projectId, "s1", { toolCallId: "tc", toolName: "bash", command: "write ../outside", reason: "why", kind: "outside-project", path: "../outside" });
     const pending = pendingPermissionFor(projectId, "s1");
-    expect(pending).toMatchObject({ payload: { command: "rm -rf results", reason: "why" } });
+    expect(pending).toMatchObject({ payload: { command: "write ../outside", reason: "why", kind: "outside-project", path: "../outside" } });
     const frames = handle.state().run!.frames;
-    expect(frames[frames.length - 1]).toMatchObject({ type: "permission_request", requestId: pending!.requestId, command: "rm -rf results" });
+    expect(frames[frames.length - 1]).toMatchObject({ type: "permission_request", requestId: pending!.requestId, command: "write ../outside", kind: "outside-project", path: "../outside" });
+
+    const restored = await app.inject({ method: "GET", url: "/sessions/s1/permissions", headers: { "x-project-id": projectId } });
+    expect(restored.json()).toMatchObject({ pending: { requestId: pending!.requestId, payload: { kind: "outside-project", path: "../outside" } } });
 
     const res = await app.inject({
       method: "POST",
@@ -214,5 +261,22 @@ describe("kady-guard package seeding", () => {
     const settings = JSON.parse(fs.readFileSync(path.join(paths.sandbox, ".pi", "settings.json"), "utf-8"));
     expect(settings.packages).toContain(kadyGuardPackageDir());
     expect(fs.existsSync(path.join(kadyGuardPackageDir(), "index.ts"))).toBe(true);
+  });
+});
+
+describe("background specialist outside-write guard", () => {
+  it("blocks file and recognized shell writes even when lead confirmations are disabled", async () => {
+    const handlers = new Map<string, ToolCallHandler>();
+    registerChildGuard({ on: (name: string, handler: ToolCallHandler) => handlers.set(name, handler) } as never);
+    const hook = handlers.get("tool_call")!;
+    const cwd = resolvePaths(projectId).sandbox;
+    writeGuardPolicy(cwd, { protectedPaths: ["user_data/**"], destructiveConfirm: false });
+    for (const event of [call("write", { path: "/opt/gaid/outside" }), call("edit", { path: "/opt/gaid/outside" }), call("generate_image", { path: "/opt/gaid/outside.png" }), call("bash", { command: "mkdir -p ~/assets/geo-catalogue/0.2.2" })]) {
+      expect(await hook(event, { cwd })).toMatchObject({ block: true, reason: expect.stringMatching(/outside-project writes.*Report the target/) });
+    }
+    for (const event of [call("write", { path: "derived/file" }), call("write", { path: path.join(os.tmpdir(), "guard-file") }), call("bash", { command: "echo x > /dev/null" }), call("bash", { command: "cat /opt/gaid/file" }), call("read", { path: "../outside" })]) {
+      expect(await hook(event, { cwd })).toBeUndefined();
+    }
+    expect(await hook(call("bash", { command: "touch /opt/file; rm user_data/file" }), { cwd })).toMatchObject({ block: true, reason: expect.stringMatching(/protected raw data/) });
   });
 });

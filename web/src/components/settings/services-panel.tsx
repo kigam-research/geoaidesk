@@ -1,4 +1,6 @@
 "use client";
+
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { SettingsMessage } from "@/components/settings/primitives";
 import { geoText } from "@/geo/i18n";
 
@@ -541,8 +543,10 @@ export function ServicesPanel() {
             </div>
           </SettingsCard>
           <PaperclipCard status={status} onStatus={setStatus} />
-          <ModalCredentialPair status={status} onStatus={setStatus} />
-          <ModalCacheCard connected={modalConnected} />
+          {REMOTE_COMPUTE_ENABLED && <>
+            <ModalCredentialPair status={status} onStatus={setStatus} />
+            <ModalCacheCard connected={modalConnected} />
+          </>}
         </>
       )}
 

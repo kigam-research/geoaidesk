@@ -1,3 +1,4 @@
+import { remoteComputeEnabled } from "../geo/distribution.ts";
 import type { FastifyInstance } from "fastify";
 import { currentProjectId } from "../scope.ts";
 import { resolvePaths } from "../projects.ts";
@@ -30,7 +31,7 @@ export async function registerSubagentRoutes(app: FastifyInstance) {
       const h = await host(req.params.id);
       const result = await h.rpc("status");
       return { text: result.text || "", fleet: result.fleet, asyncSnapshot: result.asyncSnapshot,
-        compute: modalJobManager.list(currentProjectId(), { sessionId: req.params.id }).filter((j) => !isTerminalModalState(j.state)).map((j) => ({ id: j.id, state: j.state, label: j.request.label || j.id })) };
+        compute: !remoteComputeEnabled() ? [] : modalJobManager.list(currentProjectId(), { sessionId: req.params.id }).filter((j) => !isTerminalModalState(j.state)).map((j) => ({ id: j.id, state: j.state, label: j.request.label || j.id })) };
     } catch (error) { return reply.code(400).send({ detail: (error as Error).message }); }
   });
   app.post<{ Params: { id: string; action: string }; Body: Rec }>("/sessions/:id/subagents/:action", async (req, reply) => {

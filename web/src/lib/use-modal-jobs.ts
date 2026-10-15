@@ -1,5 +1,7 @@
 "use client";
 
+import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -81,16 +83,18 @@ export function useModalCatalog(projectId?: string): UseModalCatalogResult {
   const [catalog, setCatalog] = useState<ModalCatalog | null>(
     () => catalogCache.get(scopedProjectId) ?? null,
   );
-  const [loading, setLoading] = useState(!catalog);
+  const [loading, setLoading] = useState(REMOTE_COMPUTE_ENABLED && !catalog);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = useCallback(() => {
+    if (!REMOTE_COMPUTE_ENABLED) return;
     setLoading(true);
     setError(null);
     setRefreshKey((key) => key + 1);
   }, []);
 
   useEffect(() => {
+    if (!REMOTE_COMPUTE_ENABLED) return;
     const controller = new AbortController();
     void apiFetch(
       "/modal/instances",
@@ -175,10 +179,11 @@ export function useModalJobs(options: UseModalJobsOptions = {}): UseModalJobsRes
     sessionId = null,
     status = null,
     limit = 100,
-    enabled = true,
+    enabled: requestedEnabled = true,
     activePollMs = ACTIVE_LIST_POLL_MS,
     idlePollMs = IDLE_LIST_POLL_MS,
   } = options;
+  const enabled = REMOTE_COMPUTE_ENABLED && requestedEnabled;
   const [data, setData] = useState<ModalJobsResponse>({ jobs: [], groups: [] });
   const [loading, setLoading] = useState(enabled);
   const [refreshing, setRefreshing] = useState(false);
@@ -318,7 +323,8 @@ export function useModalJob(
 ): UseModalJobResult {
   const contextProjectId = useProjectScopeId();
   const projectId = options.projectId ?? contextProjectId;
-  const { enabled = true, activePollMs = ACTIVE_DETAIL_POLL_MS } = options;
+  const { enabled: requestedEnabled = true, activePollMs = ACTIVE_DETAIL_POLL_MS } = options;
+  const enabled = REMOTE_COMPUTE_ENABLED && requestedEnabled;
   const [job, setJob] = useState<ModalJobDetail | null>(null);
   const [loading, setLoading] = useState(Boolean(jobId && enabled));
   const [mutating, setMutating] = useState<UseModalJobResult["mutating"]>(null);
@@ -463,10 +469,11 @@ export function useModalJobLogs(
   const contextProjectId = useProjectScopeId();
   const projectId = options.projectId ?? contextProjectId;
   const {
-    enabled = true,
+    enabled: requestedEnabled = true,
     active = true,
     pollMs = ACTIVE_LOG_POLL_MS,
   } = options;
+  const enabled = REMOTE_COMPUTE_ENABLED && requestedEnabled;
   const [content, setContent] = useState("");
   const [cursor, setCursor] = useState(0);
   const cursorRef = useRef(0);

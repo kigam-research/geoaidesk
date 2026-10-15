@@ -208,7 +208,7 @@
   "permission_card.this_request_is_no_longer_waiting_for_an_answer": "This request is no longer waiting for an answer.",
   "permission_card.couldn_t_send_your_decision_try_again": "Couldn't send your decision. Try again.",
   "permission_card.permission_needed": "Permission needed",
-  "permission_card.kady_wants_to_run_a_destructive_command": "Kady wants to run a destructive command",
+  "permission_card.kady_wants_to_run_a_destructive_command": "The AI agent wants to run a destructive command",
   "permission_card.destructive_command": "Destructive command",
   "permission_card.allowing": "Allowing…",
   "permission_card.allow_once": "Allow once",
@@ -734,5 +734,11 @@
   "skills_selector.author": "by {author}",
   "modal_job_detail.artifacts_count": "Artifacts · {count}",
   "modal_job_detail.exit_code_value": "Exit code {code}",
-  "modal_job_detail.byte_value": "byte {count}"
+  "modal_job_detail.byte_value": "byte {count}",
+  "permission_card.outside_project_pending": "The AI agent wants to change files outside the project",
+  "permission_card.outside_project": "File change outside the project",
+  "permission_card.outside_project_target": "Target: {path}",
+  "permission_card.unresolved_target_pending": "The AI agent wants to change files at a location the app cannot resolve",
+  "permission_card.unresolved_target": "File change at an unresolved location",
+  "permission_card.unresolved_target_path": "Target: {path} (a shell variable the app could not resolve)"
 }

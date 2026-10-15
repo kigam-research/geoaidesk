@@ -8,6 +8,7 @@ import {
   pickLatestRelease,
   readDistributionExclusions,
   readDistributionRelease,
+  remoteComputeEnabled,
 } from "../src/geo/distribution.ts";
 
 const sources = [
@@ -52,6 +53,22 @@ describe("GeoAIDesk distribution policy", () => {
     expect(readDistributionRelease(REPO_ROOT)).toEqual(
       expect.objectContaining({ repository: "kigam-research/geoaidesk", releaseTagPrefix: "geo-v" }),
     );
+  });
+
+  it("disables remote compute only for the distribution launcher in geo mode", () => {
+    expect(remoteComputeEnabled(REPO_ROOT, { GAID_DISTRIBUTION: "1" })).toBe(false);
+    expect(remoteComputeEnabled(REPO_ROOT, {})).toBe(true);
+    for (const env of [{ GAID_CATALOGUE: "off" }, { KADY_SKILLS_REPO: "other/skills" }]) {
+      expect(remoteComputeEnabled(REPO_ROOT, { GAID_DISTRIBUTION: "1", ...env })).toBe(true);
+    }
+    expect(remoteComputeEnabled(tempRepo(null), { GAID_DISTRIBUTION: "1" })).toBe(true);
+    const manifest = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "geo/distribution.json"), "utf8"));
+    delete manifest.features;
+    expect(remoteComputeEnabled(tempRepo(JSON.stringify(manifest)), { GAID_DISTRIBUTION: "1" })).toBe(true);
+    manifest.features = { remoteCompute: true };
+    expect(remoteComputeEnabled(tempRepo(JSON.stringify(manifest)), { GAID_DISTRIBUTION: "1" })).toBe(true);
+    manifest.features.remoteCompute = "false";
+    expect(() => remoteComputeEnabled(tempRepo(JSON.stringify(manifest)), { GAID_DISTRIBUTION: "1" })).toThrow(/boolean/);
   });
 
   it("treats a missing manifest as an upstream checkout and a malformed one as an error", () => {

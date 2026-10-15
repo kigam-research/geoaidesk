@@ -457,6 +457,24 @@
       "owner": "gaid-improve",
       "status": "added",
       "responsibility": "Isolated authoring prototype route and fixed opt-in sample PDF adapter; no model backend or project writes."
+    },
+    {
+      "path": "server/src/api/skills.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx, web/src/components/permission-card.tsx, web/src/components/permission-card.test.tsx, web/src/components/settings/providers-panel.tsx, web/src/components/settings-dialog.tsx, web/src/components/settings/use-resizable-dialog.ts, web/src/lib/dialog-size.ts, web/src/lib/dialog-size.test.ts, web/src/lib/capabilities.ts, web/src/components/workflows-panel.tsx, web/src/components/settings/primitives.tsx",
+      "owner": "gaid-qwen-authoring-trial",
+      "status": "edited",
+      "responsibility": "A skill without a sync record is reported as origin local (made here), the catalogue badge is a locale string, the Skills header no longer promises a daily K-Dense sync; the permission card no longer repeats the guard's English reason; the empty Connected card says when models come from a local or custom server; the Settings dialog re-clamps the requested size on resize and uses the CSS width below the minimum (no 640 px dialog on a phone) and stacks its tab list above the content below sm; runtime support skills are flagged builtin (\"기본 제공\"); WorkflowPanelExtension.collapseUpstream folds the built-in workflow list behind one show/hide button until opened or searched; SettingsHeader stacks its actions under the text below sm; the permission card labels shell-variable targets as unresolved."
+    },
+    {
+      "path": "server/src/agent/session-registry.ts, server/src/agent/subagent-control.ts, server/src/agent/modal-bridge.ts, server/src/agent/modal-tool.ts, server/src/agent/notebook.ts, server/src/agent/compaction-bridge.ts, server/pi-packages/kady-modal/index.ts, server/pi-packages/kady-child-runtime/index.ts, server/pi-packages/kady-notebook/index.ts, server/src/index.ts, server/src/api/credentials.ts, web/next.config.ts, web/src/lib/use-modal-jobs.ts, web/src/components/chat-tab.tsx, web/src/components/compute-selector.tsx, web/src/components/file-preview-panel.tsx, web/src/components/settings/services-panel.tsx, web/src/components/settings/defaults-panel.tsx, web/src/components/lab-notebook-entry-card.tsx, web/src/app/page.tsx, server/test/geo-distribution.test.ts, server/test/geo-remote-compute.test.ts, web/src/components/compute-selector.test.tsx, web/src/components/file-preview-panel.test.tsx, web/src/components/settings/services-panel.test.tsx, web/src/components/settings/defaults-panel.test.tsx, web/src/components/lab-notebook-entry-card.test.tsx, web/src/lib/use-modal-jobs.test.tsx, server/src/api/subagents.ts, AGENTS.md, docs/modal-compute.md",
+      "owner": "gaid-qwen-authoring-trial",
+      "status": "edited",
+      "responsibility": "Gate retained upstream Modal tools, child bridges, startup/recovery, APIs and UI in the GAID distribution; preserve development mode and existing job data."
+    },
+    {
+      "path": "server/src/agent/data-guard.ts, server/src/agent/bash-classifier.ts, server/src/agent/permissions.ts, server/pi-packages/kady-guard/classifier.ts, server/pi-packages/kady-guard/index.ts, server/test/bash-classifier.test.ts, server/test/data-guard.test.ts, web/src/components/permission-card.tsx, web/src/components/permission-card.test.tsx, web/src/lib/use-agent.ts, web/src/lib/use-agent-events.test.ts, docs/data-guard.md",
+      "owner": "gaid-qwen-authoring-trial",
+      "status": "edited",
+      "responsibility": "Confirm recognized outside-project mutations in lead tools using the existing permission lifecycle; block them in child tools, preserve sandbox/temp/null allowances and protected-path precedence, and display localized permission kinds."
     }
   ],
   "notTouched": [

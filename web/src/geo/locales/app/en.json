@@ -386,6 +386,7 @@
   "settings.providers.disconnect_failed": "Disconnect failed",
   "settings.providers.model_providers": "Model providers",
   "settings.providers.loading_providers": "Loading providers…",
+  "settings.providers.models_come_from_a_server_below": "No provider or subscription is connected. The models in use come from a local or custom model server below.",
   "settings.providers.no_model_provider_is_connected_yet_pick": "No model provider is connected yet. Pick one below, or run a local model server.",
   "settings.providers.add_a_provider": "Add a provider",
   "settings.providers.subscriptions_chatgpt_claude_pro_max_copilot_sign": "Subscriptions (ChatGPT, Claude Pro/Max, Copilot, …) sign in through the provider; everything else takes an API key or cloud credential. A connected provider gets its own section in the model picker.",
