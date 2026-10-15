@@ -19,7 +19,7 @@ export interface PackageOriginRecord {
   pageUrl?: string;
   descriptorUrl?: string;
   /** From the hub descriptor, never from the package's own files. */
-  hub?: { methodId?: string; revision?: string; lifecycle?: MethodLifecycle };
+  hub?: { methodId?: string; revision?: number; lifecycle?: MethodLifecycle; pageUrl?: string };
   fetchedAt: string;
 }
 

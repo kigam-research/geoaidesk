@@ -1,10 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import { activePaths } from "../../projects.ts";
 import { SkillOperationFailure } from "../../agent/skills-install.ts";
-import { previewSkillHub, readSkillHubSites, SKILL_HUB_LIMITS, skillHubCatalogue, SkillHubError } from "../skill-hub.ts";
+import { listHubMethods, previewSkillHub, readSkillHubSites, SKILL_HUB_LIMITS, skillHubCatalogue, SkillHubError } from "../skill-hub.ts";
 
 export async function registerGeoSkillHubRoutes(app: FastifyInstance): Promise<void> {
   app.get("/geo/skill-hub", () => ({ sites: readSkillHubSites(), catalogue: skillHubCatalogue(), limits: SKILL_HUB_LIMITS }));
+  // gaid-hub-integration: method drafts the configured hubs offer (read-only listing).
+  app.get("/geo/skill-hub/methods", async () => ({ hubs: await listHubMethods() }));
   app.post<{ Body: { url?: unknown; scope?: unknown }; Querystring: { scope?: string } }>("/geo/skill-hub/preview", async (req, reply) => {
     try {
       if (req.isMultipart()) {

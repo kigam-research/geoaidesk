@@ -6,13 +6,16 @@
  * additively. Validation reports issues instead of throwing: an invalid file
  * still lists the method, without startable workflows.
  */
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import type {
-  MethodHubCheck,
+  MethodAuthoringRecord,
+  MethodHubChecks,
   MethodImplementation,
   MethodIssue,
   MethodLifecycle,
+  MethodRecipe,
   MethodSourceRef,
 } from "../../../../web/src/geo/contracts/methods.ts";
 import { GAID_METHOD_FILE, GAID_METHOD_SCHEMA, LOCAL_SKILL_PREFIX } from "../../../../web/src/geo/contracts/methods.ts";
@@ -20,8 +23,8 @@ import type { GeoWorkflow, LocalizedText } from "../catalogue-types.ts";
 
 const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const ATLAS_ID = /^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/;
-const METHOD_ID = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,127}$/;
-const REVISION = /^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$/;
+const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[0-9A-Za-z.-]+)?$/;
+const SHA256 = /^[a-f0-9]{64}$/;
 const LIFECYCLES: MethodLifecycle[] = ["draft", "submitted", "published"];
 const IMPLEMENTATIONS: MethodImplementation[] = ["descriptive", "implemented"];
 const MAX_FILE_BYTES = 256 * 1024;
@@ -31,14 +34,20 @@ const MAX_TEXT = 4000;
 
 export interface MethodFile {
   methodId: string;
-  revision: string;
+  revision: number;
+  version: string | null;
   lifecycle: MethodLifecycle;
   implementation: MethodImplementation;
+  codeOrigin: "supplied" | "generated" | null;
   title: LocalizedText;
   summary: LocalizedText | null;
   sources: MethodSourceRef[];
-  checks: MethodHubCheck[];
+  checks: MethodHubChecks | null;
+  authoring: MethodAuthoringRecord | null;
   workflows: GeoWorkflow[];
+  recipes: MethodRecipe[];
+  files: { path: string; sha256: string; size: number }[] | null;
+  packageDigest: string | null;
 }
 
 export interface MethodFileResult {
@@ -112,10 +121,13 @@ export function parseMethodFile(value: unknown, runtimeName: string): { method: 
   if (!value || typeof value !== "object" || Array.isArray(value)) return { method: null, issues: [{ subject: "$", message: "gaid-method.json must be a JSON object" }] };
   const raw = value as Record<string, unknown>;
   if (raw.schemaVersion !== GAID_METHOD_SCHEMA) add("schemaVersion", `schemaVersion must be ${GAID_METHOD_SCHEMA}`);
-  if (typeof raw.methodId !== "string" || !METHOD_ID.test(raw.methodId)) add("methodId", "methodId must be a hub identity");
-  if (typeof raw.revision !== "string" || !REVISION.test(raw.revision)) add("revision", "revision must be a hub revision id");
+  // methodId = <owner>/<slug> with the package's own slug.
+  if (typeof raw.methodId !== "string" || !ATLAS_ID.test(raw.methodId) || raw.methodId.split("/")[1] !== runtimeName) add("methodId", `methodId must be <owner>/${runtimeName}`);
+  if (typeof raw.revision !== "number" || !Number.isInteger(raw.revision) || raw.revision < 1) add("revision", "revision must be a positive integer");
+  if (raw.version !== undefined && (typeof raw.version !== "string" || !SEMVER.test(raw.version))) add("version", "version must be semver");
   if (!LIFECYCLES.includes(raw.lifecycle as MethodLifecycle)) add("lifecycle", `lifecycle must be one of ${LIFECYCLES.join(", ")}`);
   if (!IMPLEMENTATIONS.includes(raw.implementation as MethodImplementation)) add("implementation", `implementation must be one of ${IMPLEMENTATIONS.join(", ")}`);
+  if (raw.codeOrigin !== undefined && raw.codeOrigin !== "supplied" && raw.codeOrigin !== "generated") add("codeOrigin", "codeOrigin must be supplied or generated");
   const title = localized(raw.title);
   if (!title) add("title", "title must be {ko, en?} text");
   if (raw.summary !== undefined && !localized(raw.summary)) add("summary", "summary must be {ko, en?} text");
@@ -127,17 +139,57 @@ export function parseMethodFile(value: unknown, runtimeName: string): { method: 
     const record = row as Record<string, unknown> | null;
     if (!record || !["doi", "url", "file"].includes(record.kind as string) || typeof record.ref !== "string" || !record.ref.trim() || record.ref.length > 2048) {
       add(`sources[${n}]`, "source needs kind doi|url|file and ref");
-    } else sources.push({ kind: record.kind as MethodSourceRef["kind"], ref: record.ref, ...(typeof record.title === "string" ? { title: record.title.slice(0, 500) } : {}) });
+      return;
+    }
+    const text = (key: string, max: number) => (typeof record[key] === "string" ? { [key]: (record[key] as string).slice(0, max) } : {});
+    sources.push({ kind: record.kind as MethodSourceRef["kind"], ref: record.ref, ...text("title", 500), ...text("documentKind", 100), ...text("pages", 200),
+      ...(typeof record.sha256 === "string" && SHA256.test(record.sha256) ? { sha256: record.sha256 } : {}) });
   });
 
-  const checks: MethodHubCheck[] = [];
-  const checkRows = raw.checks === undefined ? [] : list(raw.checks);
-  if (!checkRows || checkRows.length > MAX_LIST) add("checks", `checks must be a list of at most ${MAX_LIST}`);
-  else checkRows.forEach((row, n) => {
-    const record = row as Record<string, unknown> | null;
-    if (!record || typeof record.name !== "string" || !["pass", "fail", "warn"].includes(record.state as string)) add(`checks[${n}]`, "check needs name and state pass|fail|warn");
-    else checks.push({ name: record.name.slice(0, 100), state: record.state as MethodHubCheck["state"], ...(typeof record.detail === "string" ? { detail: record.detail.slice(0, 1000) } : {}) });
-  });
+  let checks: MethodHubChecks | null = null;
+  if (raw.checks !== undefined) {
+    const record = raw.checks as Record<string, unknown> | null;
+    const items = list(record?.items);
+    const warnings = list(record?.warnings);
+    if (!record || typeof record !== "object" || record.passed !== true || typeof record.checker !== "string" || typeof record.checkedAt !== "string" || !items || !warnings || items.length > MAX_LIST) {
+      add("checks", "checks must be the hub receipt {passed: true, checker, checkedAt, items, warnings}");
+    } else {
+      checks = {
+        checker: record.checker.slice(0, 200),
+        checkedAt: record.checkedAt.slice(0, 64),
+        items: items.flatMap((item) => {
+          const row = item as Record<string, unknown> | null;
+          if (!row || typeof row.id !== "string" || (row.status !== "pass" && row.status !== "warn")) { add("checks.items", "check items need id and status pass|warn"); return []; }
+          return [{ id: row.id.slice(0, 50), status: row.status, ...(typeof row.detail === "string" ? { detail: row.detail.slice(0, 1000) } : {}) }];
+        }),
+        warnings: warnings.slice(0, MAX_LIST).flatMap((item) => {
+          const row = item as Record<string, unknown> | null;
+          return row && typeof row.code === "string" && typeof row.message === "string"
+            ? [{ code: row.code.slice(0, 100), path: typeof row.path === "string" ? row.path.slice(0, 300) : "", message: row.message.slice(0, 1000) }]
+            : [];
+        }),
+      };
+    }
+  }
+
+  let authoring: MethodAuthoringRecord | null = null;
+  if (raw.provenance !== undefined) {
+    const record = raw.provenance as Record<string, unknown> | null;
+    const hub = record?.hub as Record<string, unknown> | undefined;
+    if (!record || typeof record !== "object" || !hub || typeof hub.projectId !== "string" || typeof hub.draftRevision !== "number") {
+      add("provenance", "provenance must carry hub {url, projectId, draftRevision}");
+    } else {
+      const rows = (key: string) => (list(record[key]) ?? []).slice(0, MAX_LIST) as Record<string, unknown>[];
+      authoring = {
+        hubUrl: typeof hub.url === "string" ? hub.url.slice(0, 500) : "",
+        projectId: hub.projectId.slice(0, 200),
+        draftRevision: hub.draftRevision,
+        decisions: typeof record.decisions === "number" ? record.decisions : 0,
+        openQuestions: rows("openQuestions").filter((q) => typeof q?.id === "string" && typeof q.text === "string").map((q) => ({ id: (q.id as string).slice(0, 100), text: (q.text as string).slice(0, MAX_TEXT) })),
+        attempts: rows("attempts").filter((a) => a && typeof a === "object").map((a) => ({ route: String(a.route ?? "").slice(0, 200), model: String(a.model ?? "").slice(0, 200), at: String(a.at ?? "").slice(0, 64), outcome: String(a.outcome ?? "").slice(0, 200) })),
+      };
+    }
+  }
 
   const workflows: GeoWorkflow[] = [];
   const rows = raw.workflows === undefined ? [] : list(raw.workflows);
@@ -147,21 +199,99 @@ export function parseMethodFile(value: unknown, runtimeName: string): { method: 
     const ids = workflows.map((row) => row.id);
     if (new Set(ids).size !== ids.length) add("workflows", "workflow ids must be unique");
   }
+
+  // 레시피: checked like checkGeoStart against this method's own Workflows.
+  const recipes: MethodRecipe[] = [];
+  const recipeRows = raw.recipes === undefined ? [] : list(raw.recipes);
+  if (!recipeRows || recipeRows.length > MAX_LIST) add("recipes", `recipes must be a list of at most ${MAX_LIST}`);
+  else recipeRows.forEach((row, n) => {
+    const at = `recipes[${n}]`;
+    const record = row as Record<string, unknown> | null;
+    const target = workflows.find((candidate) => candidate.id === record?.workflowId);
+    const choices = record?.choices as Record<string, unknown> | undefined;
+    const unresolved = list(record?.unresolvedChoices);
+    if (!record || typeof record.id !== "string" || !SLUG.test(record.id) || !localized(record.title)) { add(at, "recipe needs id and title"); return; }
+    if (!target) { add(`${at}.workflowId`, `Workflow not in this method: ${String(record.workflowId)}`); return; }
+    if (!choices || typeof choices !== "object" || Array.isArray(choices) || !unresolved || unresolved.some((key) => typeof key !== "string")) { add(at, "recipe needs choices {} and unresolvedChoices []"); return; }
+    const known = new Set((target.requiredScientificChoices ?? []).map((choice) => choice.id));
+    const before = issues.length;
+    for (const [key, choice] of Object.entries(choices)) {
+      if (!known.has(key)) add(`${at}.choices.${key}`, `Choice not in the Workflow: ${key}`);
+      if (!["string", "number", "boolean"].includes(typeof choice)) add(`${at}.choices.${key}`, "Choice must be a string, number or boolean");
+    }
+    for (const key of unresolved as string[]) {
+      if (!known.has(key)) add(`${at}.unresolvedChoices`, `Choice not in the Workflow: ${key}`);
+      if (key in choices) add(`${at}.unresolvedChoices`, `Choice both answered and unresolved: ${key}`);
+    }
+    if (issues.length === before) recipes.push({ id: record.id, workflowId: target.id, title: localized(record.title)!, choices: choices as MethodRecipe["choices"], unresolvedChoices: [...(unresolved as string[])] });
+  });
+  if (new Set(recipes.map((recipe) => recipe.id)).size !== recipes.length) add("recipes", "recipe ids must be unique");
+
+  let files: { path: string; sha256: string; size: number }[] | null = null;
+  if (raw.files !== undefined || raw.packageDigest !== undefined) {
+    const fileRows = list(raw.files);
+    if (!fileRows || typeof raw.packageDigest !== "string" || !SHA256.test(raw.packageDigest)
+      || fileRows.some((row) => { const f = row as Record<string, unknown> | null; return !f || typeof f.path !== "string" || typeof f.sha256 !== "string" || !SHA256.test(f.sha256) || typeof f.size !== "number"; })) {
+      add("files", "files[] {path, sha256, size} and packageDigest must be present together");
+    } else files = fileRows as { path: string; sha256: string; size: number }[];
+  }
+
   if (issues.length) return { method: null, issues };
   return {
     method: {
       methodId: raw.methodId as string,
-      revision: raw.revision as string,
+      revision: raw.revision as number,
+      version: typeof raw.version === "string" ? raw.version : null,
       lifecycle: raw.lifecycle as MethodLifecycle,
       implementation: raw.implementation as MethodImplementation,
+      codeOrigin: (raw.codeOrigin as MethodFile["codeOrigin"]) ?? null,
       title: title!,
       summary: localized(raw.summary),
       sources,
       checks,
+      authoring,
       workflows,
+      recipes,
+      files,
+      packageDigest: files ? raw.packageDigest as string : null,
     },
     issues,
   };
+}
+
+/** sha256 of the sorted `path\0sha256\n` listing (catalogue rule) of every file but gaid-method.json. */
+export function methodTreeDigest(skillDir: string): { digest: string; files: { path: string; sha256: string; size: number }[] } {
+  const files: { path: string; sha256: string; size: number }[] = [];
+  const walk = (dir: string, rel: string): void => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) walk(path.join(dir, entry.name), relPath);
+      else if (entry.isFile() && relPath !== GAID_METHOD_FILE) {
+        const data = fs.readFileSync(path.join(dir, entry.name));
+        files.push({ path: relPath, sha256: crypto.createHash("sha256").update(data).digest("hex"), size: data.length });
+      }
+    }
+  };
+  walk(skillDir, "");
+  files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  return { digest: crypto.createHash("sha256").update(files.map((f) => `${f.path}\0${f.sha256}\n`).join("")).digest("hex"), files };
+}
+
+/** Problems of a staged tree against its manifest's `files[]`/`packageDigest`; empty when it matches or declares none. */
+export function verifyMethodTree(skillDir: string, method: MethodFile): string[] {
+  if (!method.files || !method.packageDigest) return [];
+  const actual = methodTreeDigest(skillDir);
+  const problems: string[] = [];
+  const declared = new Map(method.files.map((file) => [file.path, file]));
+  for (const file of actual.files) {
+    const entry = declared.get(file.path);
+    if (!entry) problems.push(`File not listed in gaid-method.json: ${file.path}`);
+    else if (entry.sha256 !== file.sha256 || entry.size !== file.size) problems.push(`File differs from gaid-method.json: ${file.path}`);
+    declared.delete(file.path);
+  }
+  for (const missing of declared.keys()) problems.push(`Listed file missing: ${missing}`);
+  if (!problems.length && actual.digest !== method.packageDigest) problems.push("packageDigest does not match the files");
+  return problems;
 }
 
 /** Read `gaid-method.json` from an installed skill folder. */

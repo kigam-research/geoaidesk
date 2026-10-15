@@ -231,7 +231,8 @@ export interface GeoSaveRecipeRequest {
 
 // --- Start-task hand-off (window event, handled by app/page.tsx) -------------
 
-export type GeoExposureMode = "all" | "catalogue" | `workflow:${string}`;
+/** `method:<name>:<workflow>`: a chat started from a LocalMethod Workflow (gaid-hub-integration). */
+export type GeoExposureMode = "all" | "catalogue" | `workflow:${string}` | `method:${string}`;
 
 export interface GeoStartTaskDetail {
   /** Tab title. */
