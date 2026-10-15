@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:36:32Z
+updated: 2026-10-15T14:38:10Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -68,6 +68,11 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   exposure (context.ts, per chat only) offers only the method's skills and pins the trial record at session creation;
   context preview removes its trial file. Trial hub: http://127.0.0.1:4317/ (skill_hub side, not up yet).
   Verified: server vitest geo-methods/geo-skill-hub/geo-context/geo-workspace 50 pass; typecheck clean.
+- P4 instance up (snapshot 42dbf61, P1 only): unit `gaid-hub-app`, ports 3320/18320, GAID_HOME
+  ~/data/geoaidesk/work/gaid-hub-integration/home, log <work>/logs/app.log, GAID_SKILL_HUB_SITES → :4317. Smoke:
+  /geo/methods, /geo/methods/trials empty; /geo/skill-hub lists atlas + gaid-hub; /geo/skill-hub/methods reports the hub
+  as error "fetch failed" (hub not started yet). Re-check: `systemctl --user status gaid-hub-app`. Rebuild from the
+  integrated branch before the acceptance run (git archive over <work>/app, restart unit).
 - Child P2 `gaid-hub-integration--handoff` (writer e6a23203-e5dc-44f5-b6a0-74d8c942a195): reported implemented and green,
   finishing. On its finish: `task complete gaid-hub-integration--handoff`.
 - Child P3 `gaid-hub-integration--methods-ui` (writer 889fbc92-549f-4f63-9865-358efbab2bba, brief
