@@ -4,6 +4,12 @@
   "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
   "seams": [
     {
+      "path": "server/test/geo-hub-handoff.test.ts",
+      "owner": "gaid-hub-integration",
+      "status": "added",
+      "responsibility": "Bounded session-to-hub analysis preview/download, provenance selection, opt-in raw data and tar manifest regression coverage"
+    },
+    {
       "path": "start.mjs",
       "owner": "gaid-fork-base",
       "status": "edited",
