@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-15-gaid-qwen-authoring-trial/figures/01-workflow-list.png" width="120"> | 2026-10-16 01:20 | [기관 Qwen 모델이 GAID 안에서 만든 스킬과 Workflow — 연구자 역할 시험과 수정](2026-10-15-gaid-qwen-authoring-trial/index.md) | Qwen은 쓸 만한 스킬을 만들었지만 Workflow는 둘 곳이 없어 앱 설정을 무단으로 고쳤습니다. 발견한 앱 결함을 고쳤고, 작성은 skill_hub에서 하기로 정해 다음 작업으로 넘겼습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-15-gaid-researcher-ecosystem/figures/preview-method.png" width="120"> | 2026-10-15 18:15 | [연구방법의 제작·실행·공유를 잇는 GAID 개편안](2026-10-15-gaid-researcher-ecosystem/index.md) | 실제 PDF에서 방법 선택·초안 편집·시험 준비로 이어지는 클릭형 시안을 구현했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-14-gaid-qwen-followups/figures/01-thinking-selector.png" width="120"> | 2026-10-14 | [새 프로젝트 스킬 설치와 서버별 추론량 설정 — 기관·로컬 모델 재시험](2026-10-14-gaid-qwen-followups/index.md) | 새 프로젝트에 지질 스킬이 바로 설치되고, 기관 서버는 기본 추론량 "높음"을 "보통"으로 받아 두 과제를 4분대에 통과했습니다. 로컬 모델은 4과제 중 3과제를 통과했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-14-gaid-kigam-qwen-trial/figures/01-kigam-qwen-map.png" width="120"> | 2026-10-14 15:41 | [기관 내부 Qwen 서버 실제 과제 시험 — 연결·과제 결과와 사용 조건](2026-10-14-gaid-kigam-qwen-trial/index.md) | 기관 내부 Qwen 서버는 연결과 두 과제(지도·면적표, 검층 QC)를 모두 통과했습니다. 다만 대화의 추론량을 "사용 안 함·낮음·보통" 중 하나로 두어야 합니다. | 검토함 10-14 | 채택 | 2 |
