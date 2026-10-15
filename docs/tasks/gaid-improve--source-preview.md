@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:27:12Z
+updated: 2026-10-15T08:33:48Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
@@ -42,7 +42,7 @@ Safe re-verification: from web/, npm run test -- src/geo/authoring-preview/sourc
 
 First task finish merged parent tip 3bc0d2524d55 and ran full scripts/check at 06a2fcb5b6f2. Backend typecheck passed; backend 159 files/1679 tests passed (1 file/11 tests skipped, including two network-dependent mzML cases). Frontend 150 files/994 tests passed. GAID tests: 40/41 passed; distribution.test.mjs:79 rejects new owners gaid-improve / gaid-improve--source-preview absent from its owners Set. Finish exited 1 before later checks; no successful ready-tip delivery/integration is claimed. Parent was sent the exact correction for its owned test file. Log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-3grij8__.log.
 ## Next steps
-Blocked: wait for parent to publish the owner allowlist correction, then rerun task finish in place (no resume). The generated closed line below records the failed finish attempt, not a passing finish.
+Parent published correction 6138d2dea9a4: the distribution test now accepts both task owners; premature unbuilt route declarations were removed. Parent reports 7/7 focused distribution checks passed. Rerun task finish in place (no resume) to merge the correction and execute required checks. The generated closed line below records the earlier failed finish attempt, not a passing finish.
 <!-- task:closed -->
 Closed 2026-10-15T08:20:34Z: ready; the parent gaid-improve integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
