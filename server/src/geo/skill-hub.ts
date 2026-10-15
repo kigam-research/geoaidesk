@@ -21,20 +21,33 @@ export class SkillHubError extends Error {
 const fail = (code: SkillHubError["code"], message: string): never => { throw new SkillHubError(code, message); };
 const LOOPBACK = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
-export function readSkillHubSites(repoRoot = REPO_ROOT): SkillHubSite[] {
+/**
+ * Sites from geo/distribution.json plus `GAID_SKILL_HUB_SITES` (a JSON array of the same shape), so a hub on this
+ * machine (e.g. a trial hub on loopback) can be added without changing the distribution. Later ids replace earlier ones.
+ */
+export function readSkillHubSites(repoRoot = REPO_ROOT, env: NodeJS.ProcessEnv = process.env): SkillHubSite[] {
   const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, "geo/distribution.json"), "utf8"));
-  const sites: unknown = manifest.skillHub?.sites ?? [];
-  if (!Array.isArray(sites)) throw new Error("skillHub.sites must be an array");
-  return sites.map((site) => {
-    if (!site || typeof site.id !== "string" || typeof site.url !== "string" || typeof site.packages !== "string") throw new Error("Invalid skillHub site");
-    const url = new URL(site.url);
-    // http only for a hub on this machine (a local hub service during development or a trial).
-    const secure = url.protocol === "https:" || (url.protocol === "http:" && LOOPBACK.has(url.hostname));
-    if (!secure || url.username || url.password || url.search || url.hash || !url.pathname.endsWith("/")) throw new Error("skillHub site must be an HTTPS (or loopback HTTP) base URL ending in /");
-    const relPath = (value: unknown) => typeof value === "string" && /^[a-zA-Z0-9_/-]+$/.test(value) && !value.startsWith("/") && !value.split("/").some((p: string) => !p);
-    if (!/^[a-zA-Z0-9_-]+$/.test(site.id) || !relPath(site.packages) || (site.authoring !== undefined && !relPath(String(site.authoring).replace(/\/$/, "")))) throw new Error("Invalid skillHub site id/packages/authoring path");
-    return { id: site.id, url: url.href, packages: site.packages, ...(site.authoring ? { authoring: site.authoring } : {}) };
-  });
+  const shipped: unknown = manifest.skillHub?.sites ?? [];
+  if (!Array.isArray(shipped)) throw new Error("skillHub.sites must be an array");
+  let extra: unknown = [];
+  if (env.GAID_SKILL_HUB_SITES?.trim()) {
+    try { extra = JSON.parse(env.GAID_SKILL_HUB_SITES); } catch { throw new Error("GAID_SKILL_HUB_SITES must be a JSON array"); }
+    if (!Array.isArray(extra)) throw new Error("GAID_SKILL_HUB_SITES must be a JSON array");
+  }
+  const byId = new Map<string, SkillHubSite>();
+  for (const site of [...shipped, ...(extra as unknown[])].map(validSite)) byId.set(site.id, site);
+  return [...byId.values()];
+}
+
+function validSite(site: { id?: unknown; url?: unknown; packages?: unknown; authoring?: unknown } | null): SkillHubSite {
+  if (!site || typeof site.id !== "string" || typeof site.url !== "string" || typeof site.packages !== "string") throw new Error("Invalid skillHub site");
+  const url = new URL(site.url);
+  // http only for a hub on this machine (a local hub service during development or a trial).
+  const secure = url.protocol === "https:" || (url.protocol === "http:" && LOOPBACK.has(url.hostname));
+  if (!secure || url.username || url.password || url.search || url.hash || !url.pathname.endsWith("/")) throw new Error("skillHub site must be an HTTPS (or loopback HTTP) base URL ending in /");
+  const relPath = (value: unknown) => typeof value === "string" && /^[a-zA-Z0-9_/-]+$/.test(value) && !value.startsWith("/") && !value.split("/").some((p: string) => !p);
+  if (!/^[a-zA-Z0-9_-]+$/.test(site.id) || !relPath(site.packages) || (site.authoring !== undefined && !relPath(String(site.authoring).replace(/\/$/, "")))) throw new Error("Invalid skillHub site id/packages/authoring path");
+  return { id: site.id, url: url.href, packages: site.packages, ...(typeof site.authoring === "string" && site.authoring ? { authoring: site.authoring } : {}) };
 }
 
 export interface HubDescriptor {

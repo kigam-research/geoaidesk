@@ -98,6 +98,9 @@ describe("hub sites", () => {
     expect(readSkillHubSites(dir)).toEqual([hub]);
     fs.writeFileSync(path.join(dir, "geo/distribution.json"), JSON.stringify({ skillHub: { sites: [{ ...hub, url: "http://hub.example/" }] } }));
     expect(() => readSkillHubSites(dir)).toThrow(/HTTPS/);
+    fs.writeFileSync(path.join(dir, "geo/distribution.json"), JSON.stringify({ skillHub: { sites: [{ id: "atlas", url: "https://a.test/", packages: "p" }] } }));
+    expect(readSkillHubSites(dir, { GAID_SKILL_HUB_SITES: JSON.stringify([hub]) })).toEqual([{ id: "atlas", url: "https://a.test/", packages: "p" }, hub]);
+    expect(() => readSkillHubSites(dir, { GAID_SKILL_HUB_SITES: "{" })).toThrow(/JSON array/);
     expect(resolveDescriptorUrl(`${DESCRIPTOR_URL}?token=secret`, [hub])).toMatchObject({ siteId: "hub", displayUrl: DESCRIPTOR_URL });
     for (const bad of ["http://127.0.0.1:4317/api/other/local/x/1", `${DESCRIPTOR_URL}/extra`, "http://127.0.0.1:4317/api/gaid/packages/local/x/0", "http://127.0.0.1:9999/api/gaid/packages/local/x/1"]) expect(resolveDescriptorUrl(bad, [hub])).toBeNull();
   });
