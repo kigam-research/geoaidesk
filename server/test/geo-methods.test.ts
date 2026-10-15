@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { previewSkillHub, readSkillHubSites, resolveDescriptorUrl } from "../src/geo/skill-hub.ts";
+import { listHubMethods, previewSkillHub, readSkillHubSites, resolveDescriptorUrl } from "../src/geo/skill-hub.ts";
 import { installStagedSkills } from "../src/agent/skills-install.ts";
 import { projectSkillRoot } from "../src/agent/skills.ts";
 import { clearStaging, cacheKeyForSource } from "../src/agent/skills-fetch.ts";
@@ -14,7 +14,8 @@ import type { ProjectPaths } from "../src/projects.ts";
 import type { GeoCatalogue } from "../src/geo/catalogue.ts";
 import { tarGz } from "./helpers/geo-catalogue-fixture.ts";
 
-const hub = { id: "hub", url: "http://127.0.0.1:4310/", packages: "api/catalog/packages", authoring: "api/gaid/packages" };
+const hub = { id: "hub", url: "http://127.0.0.1:4317/", packages: "api/catalog/packages", authoring: "api/gaid/" };
+const DESCRIPTOR_URL = "http://127.0.0.1:4317/api/gaid/packages/local/pu-nested-cv/3";
 const skillMd = Buffer.from("---\nname: pu-nested-cv\ndescription: Nested spatial CV for PU prospectivity.\n---\n\n# PU nested CV\n");
 const workflow = {
   id: "paper-reproduction",
@@ -27,19 +28,27 @@ const workflow = {
   expectedArtifacts: [{ id: "metrics", label: { ko: "평가 지표" }, required: true, files: ["metrics*.csv"] }],
   boundary: { ko: "독립 전이 검증이 아닙니다." },
 };
+const sha = (data: Buffer) => crypto.createHash("sha256").update(data).digest("hex");
+const tree = [{ path: "SKILL.md", data: skillMd }, { path: "scripts/run.py", data: Buffer.from("print('ok')\n") }];
+const files = tree.map((f) => ({ path: f.path, sha256: sha(f.data), size: f.data.length }));
+const digest = sha(Buffer.from(files.map((f) => `${f.path}\0${f.sha256}\n`).join("")));
 const methodJson = (over: Record<string, unknown> = {}) => ({
-  schemaVersion: "gaid-method/v1", methodId: "drafts/d1", revision: "r3", lifecycle: "published", implementation: "implemented",
-  title: { ko: "PU nested CV", en: "PU nested CV" }, sources: [{ kind: "doi", ref: "10.1007/s11053-026-10778-w" }],
-  checks: [{ name: "atlas", state: "pass" }], workflows: [workflow], ...over,
+  schemaVersion: "gaid-method/v1", methodId: "local/pu-nested-cv", revision: 3, version: "0.3.0", lifecycle: "published", implementation: "implemented", codeOrigin: "generated",
+  title: { ko: "PU nested CV", en: "PU nested CV" }, summary: { ko: "요약" }, sources: [{ kind: "doi", ref: "10.1007/s11053-026-10778-w" }],
+  workflows: [workflow], recipes: [{ id: "paper-50km", workflowId: "paper-reproduction", title: { ko: "논문 설정" }, choices: { block_km: "50" }, unresolvedChoices: [] }],
+  checks: { passed: true, checker: "skill_hub@abc", checkedAt: "2026-10-15T00:00:00Z", items: [{ id: "atlas", status: "pass" }], warnings: [] },
+  provenance: { hub: { url: "http://127.0.0.1:4317/", projectId: "p1", draftRevision: 4 }, decisions: 2, openQuestions: [{ id: "q3", text: "새 지역 적용 범위" }], attempts: [] },
+  files, packageDigest: digest, ...over,
 });
-const pkg = (method: unknown = methodJson()) => tarGz([
-  { path: "pu-nested-cv/SKILL.md", data: skillMd },
+const pkg = (method: unknown = methodJson(), extra: { path: string; data: Buffer }[] = []) => tarGz([
+  ...tree.map((f) => ({ path: `pu-nested-cv/${f.path}`, data: f.data })),
   { path: "pu-nested-cv/gaid-method.json", data: Buffer.from(JSON.stringify(method)) },
-  { path: "pu-nested-cv/scripts/run.py", data: Buffer.from("print('ok')\n") },
+  ...extra,
 ]);
 const descriptor = (bytes: Buffer, over: Record<string, unknown> = {}) => ({
-  schemaVersion: "gaid-hub-package/v1", methodId: "drafts/d1", revision: "r3", lifecycle: "draft",
-  sha256: crypto.createHash("sha256").update(bytes).digest("hex"), size: bytes.length, packageUrl: "api/gaid/files/d1-r3.tar.gz", ...over,
+  schemaVersion: "gaid-hub-package/v1", methodId: "local/pu-nested-cv", revision: 3, version: "0.3.0", lifecycle: "draft", implementation: "implemented",
+  title: { ko: "PU nested CV" }, sha256: sha(bytes), size: bytes.length, packageDigest: digest, createdAt: "2026-10-15T00:00:00Z",
+  packageUrl: `${DESCRIPTOR_URL}/pu-nested-cv.tar.gz`, manifestUrl: `${DESCRIPTOR_URL}/gaid-method.json`, pageUrl: "http://127.0.0.1:4317/#/author/p1", ...over,
 });
 const catalogue = { index: { skills: [] }, environments: { environments: [{ id: "geo-core", title: { ko: "기본" }, targets: ["project"], packages: [], tools: [] }] } } as unknown as GeoCatalogue;
 const readyService = { readiness: vi.fn().mockResolvedValue({ ready: true, distributions: [], imports: [], tools: [] }) };
@@ -66,7 +75,10 @@ const list = () => listLocalMethods(paths, catalogue, readyService, { roots: [pr
 
 describe("gaid-method/v1 file", () => {
   it("accepts a valid launch contract and reports precise issues otherwise", () => {
-    expect(parseMethodFile(methodJson(), "pu-nested-cv")).toMatchObject({ issues: [], method: { methodId: "drafts/d1", workflows: [{ id: "paper-reproduction" }] } });
+    expect(parseMethodFile(methodJson(), "pu-nested-cv")).toMatchObject({ issues: [], method: { methodId: "local/pu-nested-cv", revision: 3, workflows: [{ id: "paper-reproduction" }], recipes: [{ id: "paper-50km" }] } });
+    const recipe = parseMethodFile(methodJson({ recipes: [{ id: "r", workflowId: "paper-reproduction", title: { ko: "r" }, choices: { block_km: "50", other: 1 }, unresolvedChoices: ["block_km"] }] }), "pu-nested-cv");
+    expect(recipe.issues.map((issue) => issue.subject)).toEqual(["recipes[0].choices.other", "recipes[0].unresolvedChoices"]);
+    expect(parseMethodFile(methodJson({ methodId: "local/other" }), "pu-nested-cv").issues[0].subject).toBe("methodId");
     const bad = parseMethodFile(methodJson({ lifecycle: "approved", workflows: [{ ...workflow, skillIds: ["local:other", "Bad Id"] }] }), "pu-nested-cv");
     expect(bad.method).toBeNull();
     expect(bad.issues.map((issue) => issue.subject)).toEqual(expect.arrayContaining(["lifecycle", "workflows[0].skillIds"]));
@@ -85,23 +97,24 @@ describe("hub sites", () => {
     expect(readSkillHubSites(dir)).toEqual([hub]);
     fs.writeFileSync(path.join(dir, "geo/distribution.json"), JSON.stringify({ skillHub: { sites: [{ ...hub, url: "http://hub.example/" }] } }));
     expect(() => readSkillHubSites(dir)).toThrow(/HTTPS/);
-    expect(resolveDescriptorUrl("http://127.0.0.1:4310/api/gaid/packages/d1/r3?token=secret", [hub])).toMatchObject({ siteId: "hub", displayUrl: "http://127.0.0.1:4310/api/gaid/packages/d1/r3" });
-    expect(resolveDescriptorUrl("http://127.0.0.1:4310/api/other/d1", [hub])).toBeNull();
+    expect(resolveDescriptorUrl(`${DESCRIPTOR_URL}?token=secret`, [hub])).toMatchObject({ siteId: "hub", displayUrl: DESCRIPTOR_URL });
+    for (const bad of ["http://127.0.0.1:4317/api/other/local/x/1", `${DESCRIPTOR_URL}/extra`, "http://127.0.0.1:4317/api/gaid/packages/local/x/0", "http://127.0.0.1:9999/api/gaid/packages/local/x/1"]) expect(resolveDescriptorUrl(bad, [hub])).toBeNull();
   });
 });
 
 describe("hub draft install → LocalMethod", () => {
   it("installs through the descriptor, verifies bytes and shows the hub lifecycle, not the package claim", async () => {
     const bytes = pkg();
-    const fetcher = vi.fn<typeof fetch>(async (url) => String(url).includes("/api/gaid/packages/") ? new Response(JSON.stringify(descriptor(bytes))) : new Response(bytes));
-    const preview = await install({ url: "http://127.0.0.1:4310/api/gaid/packages/d1/r3?token=t" }, fetcher);
-    expect(fetcher.mock.calls[1][0]).toBe("http://127.0.0.1:4310/api/gaid/files/d1-r3.tar.gz");
-    expect(preview.skillHub).toMatchObject({ draft: { methodId: "drafts/d1", revision: "r3", lifecycle: "draft" } });
+    const fetcher = vi.fn<typeof fetch>(async (url) => String(url).endsWith(".tar.gz") ? new Response(bytes) : new Response(JSON.stringify(descriptor(bytes))));
+    const preview = await install({ url: `${DESCRIPTOR_URL}?token=t` }, fetcher);
+    expect(fetcher.mock.calls[1][0]).toBe(`${DESCRIPTOR_URL}/pu-nested-cv.tar.gz`);
+    expect(preview.skillHub).toMatchObject({ draft: { methodId: "local/pu-nested-cv", revision: 3, lifecycle: "draft" } });
     const [method] = await list();
     expect(method).toMatchObject({
       key: "project:pu-nested-cv", lifecycle: "draft", lifecycleClaimed: "published", implementation: "implemented", editedLocally: false,
-      origin: { kind: "skill-hub", siteId: "hub", descriptorUrl: "http://127.0.0.1:4310/api/gaid/packages/d1/r3" },
-      hubChecks: [{ name: "atlas", state: "pass" }],
+      origin: { kind: "skill-hub", siteId: "hub", descriptorUrl: DESCRIPTOR_URL }, codeOrigin: "generated", version: "0.3.0",
+      hubChecks: { checker: "skill_hub@abc", items: [{ id: "atlas", status: "pass" }] },
+      authoring: { projectId: "p1", draftRevision: 4, openQuestions: [{ id: "q3" }] }, recipes: [{ id: "paper-50km", choices: { block_km: "50" } }],
       workflows: [{ id: "paper-reproduction", exposure: "method:pu-nested-cv:paper-reproduction", readiness: { state: "ready" }, expectedArtifacts: [{ files: ["metrics*.csv"] }] }],
     });
     expect(JSON.stringify(method)).not.toContain("token");
@@ -111,18 +124,20 @@ describe("hub draft install → LocalMethod", () => {
 
   it("refuses byte, size, revision and off-hub mismatches", async () => {
     const bytes = pkg();
-    const run = (desc: unknown, body = bytes) => previewSkillHub(paths, { url: "http://127.0.0.1:4310/api/gaid/packages/d1/r3" }, {
+    const run = (desc: unknown, body = bytes) => previewSkillHub(paths, { url: DESCRIPTOR_URL }, {
       sites: [hub], agentDir, catalogue: { available: false, skills: [] },
-      fetcher: vi.fn<typeof fetch>(async (url) => String(url).includes("/api/gaid/packages/") ? new Response(JSON.stringify(desc)) : new Response(body)),
+      fetcher: vi.fn<typeof fetch>(async (url) => String(url).endsWith(".tar.gz") ? new Response(body) : new Response(JSON.stringify(desc))),
     });
     await expect(run(descriptor(bytes, { sha256: "0".repeat(64) }))).rejects.toMatchObject({ code: "archive" });
-    await expect(run(descriptor(bytes, { revision: "r4" }))).rejects.toMatchObject({ code: "archive" });
+    await expect(run(descriptor(bytes, { revision: 4 }))).rejects.toMatchObject({ code: "archive" });
+    const tampered = pkg(methodJson(), [{ path: "pu-nested-cv/scripts/extra.py", data: Buffer.from("x") }]);
+    await expect(run(descriptor(tampered), tampered)).rejects.toMatchObject({ code: "archive" });
     await expect(run(descriptor(bytes, { packageUrl: "https://elsewhere.test/p.tar.gz" }))).rejects.toMatchObject({ code: "download" });
     await expect(run({ ...descriptor(bytes), schemaVersion: "other" })).rejects.toMatchObject({ code: "download" });
   });
 
   it("caps an uploaded package at draft and lists invalid method files with issues and no workflows", async () => {
-    await install({ archive: pkg(methodJson({ workflows: [{ ...workflow, environmentProfile: "Not An Id" }] })) });
+    await install({ archive: pkg(methodJson({ workflows: [{ ...workflow, environmentProfile: "Not An Id" }], recipes: [] })) });
     const [method] = await list();
     expect(method).toMatchObject({ lifecycle: "draft", origin: { kind: "upload" }, workflows: [], methodId: null });
     expect(method.issues[0].subject).toBe("workflows[0].environmentProfile");
@@ -134,7 +149,7 @@ describe("trials", () => {
     await install({ archive: pkg() });
     expect(recordMethodTrial(paths, "s1", "catalogue")).toBeNull();
     const record = recordMethodTrial(paths, "s1", "method:pu-nested-cv:paper-reproduction", new Date("2026-10-15T00:00:00Z"), path.join(agentDir, "skill-hub/packages"));
-    expect(record).toMatchObject({ methodId: "drafts/d1", revision: "r3", workflowId: "paper-reproduction", packageSha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
+    expect(record).toMatchObject({ methodId: "local/pu-nested-cv", revision: 3, workflowId: "paper-reproduction", packageSha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
     const steps = path.join(paths.provenanceDir, "s1", "steps.jsonl");
     fs.mkdirSync(path.dirname(steps), { recursive: true });
     const step = (id: string, extra: object) => JSON.stringify({ schemaVersion: 1, id, sessionId: "s1", timestamp: Date.parse("2026-10-15T00:01:00Z"), toolName: "bash", role: "agent", model: "kigam-qwen/qwen3.8-flash-next", inputs: [], outputs: [], ...extra });
@@ -156,4 +171,14 @@ describe("trials", () => {
     expect(listMethodTrials(paths, { runtimeName: "pu-nested-cv" })).toMatchObject([{ sessionId: "s1", methodChanged: true }]);
     expect(recordMethodTrial(paths, "s1", "method:pu-nested-cv:paper-reproduction")?.startedAt).toBe("2026-10-15T00:00:00.000Z");
   }, 30_000);
+});
+
+describe("hub method listing", () => {
+  it("lists valid descriptors with their descriptor URL and reports an unreachable hub", async () => {
+    const bytes = pkg();
+    const ok = await listHubMethods([hub, { id: "pages", url: "https://example.test/", packages: "p" }], vi.fn<typeof fetch>(async () => new Response(JSON.stringify({ schemaVersion: "gaid-hub-methods/v1", methods: [descriptor(bytes), { bad: true }] }))));
+    expect(ok).toEqual([expect.objectContaining({ siteId: "hub", state: "ok", methods: [expect.objectContaining({ methodId: "local/pu-nested-cv", descriptorUrl: DESCRIPTOR_URL })] })]);
+    const down = await listHubMethods([hub], vi.fn<typeof fetch>().mockRejectedValue(new Error("ECONNREFUSED")));
+    expect(down[0]).toMatchObject({ state: "error", methods: [] });
+  });
 });

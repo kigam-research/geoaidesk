@@ -23,12 +23,36 @@ export interface MethodSourceRef {
   kind: "doi" | "url" | "file";
   ref: string;
   title?: string;
+  sha256?: string;
+  documentKind?: string;
+  pages?: string;
 }
 
-export interface MethodHubCheck {
-  name: string;
-  state: "pass" | "fail" | "warn";
-  detail?: string;
+/** The hub's validation receipt (`checks`); a package is built only when nothing failed. */
+export interface MethodHubChecks {
+  checker: string;
+  checkedAt: string;
+  items: { id: string; status: "pass" | "warn"; detail?: string }[];
+  warnings: { code: string; path: string; message: string }[];
+}
+
+/** 레시피 of a local method Workflow: an editable start setting, never run on open. */
+export interface MethodRecipe {
+  id: string;
+  workflowId: string;
+  title: Localized;
+  choices: Record<string, string | number | boolean>;
+  unresolvedChoices: string[];
+}
+
+/** What the hub recorded about authoring (counts and open questions, not the conversation). */
+export interface MethodAuthoringRecord {
+  hubUrl: string;
+  projectId: string;
+  draftRevision: number;
+  decisions: number;
+  openQuestions: { id: string; text: string }[];
+  attempts: { route: string; model: string; at: string; outcome: string }[];
 }
 
 /** Where the installed package bytes came from. */
@@ -62,7 +86,8 @@ export interface LocalMethodSummary {
   enabled: boolean;
   /** Hub identity and revision from `gaid-method.json` (null when the file is invalid). */
   methodId: string | null;
-  revision: string | null;
+  revision: number | null;
+  version: string | null;
   title: Localized;
   summary: Localized | null;
   /**
@@ -73,14 +98,17 @@ export interface LocalMethodSummary {
   /** What the package file claims, shown only when it differs. */
   lifecycleClaimed: MethodLifecycle | null;
   implementation: MethodImplementation | null;
+  codeOrigin: "supplied" | "generated" | null;
   origin: MethodOrigin;
   /** The installed tree differs from what was installed (edited in GAID). */
   editedLocally: boolean;
   /** `kady-skill-tree-v1` hash of the installed folder: the trial's package revision. */
   treeHash: string;
   sources: MethodSourceRef[];
-  hubChecks: MethodHubCheck[];
+  hubChecks: MethodHubChecks | null;
+  authoring: MethodAuthoringRecord | null;
   workflows: LocalMethodWorkflow[];
+  recipes: MethodRecipe[];
   issues: MethodIssue[];
 }
 
@@ -116,7 +144,7 @@ export interface MethodTrial {
   runtimeName: string;
   workflowId: string;
   methodId: string | null;
-  revision: string | null;
+  revision: number | null;
   packageSha256: string | null;
   treeHash: string;
   startedAt: string;
