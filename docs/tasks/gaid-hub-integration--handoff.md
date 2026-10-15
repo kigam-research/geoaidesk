@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T14:18:25Z
+updated: 2026-10-15T14:21:01Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -73,11 +73,16 @@ just done to the hub as authoring material for a new draft.
   test results. Then `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed the assigned worktree; read its rules and parent orchestration. P2 implementation is starting.
 ## Next steps
-1. (the next session's first action)
+1. Implement the bounded provenance-backed builder and project-scoped routes.
+2. Replace GeoChatActions with the preview/download/hub dialog; add hubHandoff locales and tests.
+3. Run the declared targeted checks, record evidence/string ids, and finish for parent integration.
 ## Failed approaches
 ## Notes and decisions
+- 2026-10-15 terminology correction (user verbatim): "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길 원한다." New strings prefer `Workflow` even in Korean; Korean spelling, when required, is `워크플로우`. This supersedes the brief's older spelling. Other namespaces remain untouched.
+- Orchestration: this child is the single writer; no nested child units. Builder → routes → dialog → targeted tests is sequential because interfaces are tightly coupled. Own only P2 files plus append-only route/locale seams and deletion of the three old chat-action tests. Keep unused workspace.skill strings for the trial unit/parent cleanup.
+- The exact worktree has no codegraph index; use native source reads without creating an index.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
