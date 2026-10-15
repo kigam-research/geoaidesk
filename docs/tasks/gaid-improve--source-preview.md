@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T08:20:33Z
+status: ready
+updated: 2026-10-15T08:20:34Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"0638b069-bf6b-4df6-8567-35d75a05e836","pid":2459592,"provider":"codex","session":"01a13e9f-4b13-7ee0-a058-2babe4e8efab","start":"51798975","token":"db9fae716c04af7d82d26b6856d3d9672b1221e85b12d91525fa96e3c37ccbca"}
 branch: task/gaid-improve--source-preview
 target: task/gaid-improve
@@ -40,7 +40,9 @@ Verified code revision 9ec7e12ff54c in recorded snapshot job 2 (exit 0): six foc
 
 Safe re-verification: from web/, npm run test -- src/geo/authoring-preview/source-input.test.tsx src/geo/authoring-preview/source-pane.test.tsx src/components/pdf-viewer/pdf-viewer.test.tsx src/components/pdf-viewer/use-pdf-zoom.test.tsx src/components/pdf-viewer/use-pdf-page-rendering.test.tsx src/components/pdf-viewer/annotation-layer.test.tsx; npx tsc --noEmit --incremental false. From repo root: node geo/copy/validate-copy.mjs web/src/geo/locales/previewSource. Both snapshot jobs retain receipts/logs below.
 ## Next steps
-1. Finish the child with task finish; parent integrates the exact ready tip using task complete and checks the sample/local PDF browser flow.
+<!-- task:closed -->
+Closed 2026-10-15T08:20:34Z: ready; the parent gaid-improve integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 First focused snapshot job exited 1: input/pane and existing PDF tests passed; new PdfViewer test cleanup restored the observer mock before a pending page-size effect settled, contaminating the next test. Fixed explicit cleanup ordering and waiting for page wrappers. The rejected-PDF test also created its rejection before the loader consumed it; changed it to create the promise at getDocument invocation. These were test harness failures, not a dependency block. TypeScript did not run after the test failure.
 ## Notes and decisions
