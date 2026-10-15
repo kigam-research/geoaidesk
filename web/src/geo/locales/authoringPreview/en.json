@@ -33,7 +33,9 @@
     "unavailable": "Browser storage is unavailable. The current screen is unchanged."
   },
   "purpose": {
-    "default": "I want to apply the paper’s method to mineral prospectivity mapping in another region."
+    "default": "I want to apply the paper’s method to mineral prospectivity mapping in another region.",
+    "label": "Research purpose · optional",
+    "placeholder": "Describe what you want to extract from these sources or apply to another study."
   },
   "draft": {
     "title": "Spatial PU mineral prospectivity mapping",

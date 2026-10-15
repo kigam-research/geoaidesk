@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, BookOpen, Check, FileText, FlaskConical, Layers3, Save, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { geoText } from "@/geo/i18n";
 import type { AuthoringPreviewState, PreviewEvent, PreviewSource, PreviewStep } from "@/geo/contracts/authoring-preview";
 import { PreviewSourceInput, MAX_PREVIEW_PDF_BYTES } from "./source-input";
@@ -18,7 +19,7 @@ const sampleEndpoint = "/authoring-preview/sample";
 const stages: PreviewStep[] = ["sources", "method", "trial"];
 
 export function AuthoringPreview() {
-  const [state, setState] = useState(() => initialPreviewState(text("purpose.default")));
+  const [state, setState] = useState(() => initialPreviewState());
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
   const [pageRequest, setPageRequest] = useState({ page: 1, sequence: 0 });
   const [pdfReady, setPdfReady] = useState(false);
@@ -60,7 +61,7 @@ export function AuthoringPreview() {
       setDocumentKey((key) => key + 1);
       setPageRequest((p) => ({ page: restored?.exampleAnalysis ? 9 : 1, sequence: p.sequence + 1 }));
       // Restored metadata is already editable while the PDF loads; do not overwrite those edits.
-      if (!restored) setState((s) => replacePreviewSource(s, {
+      if (!restored) setState((s) => replacePreviewSource({ ...s, purpose: s.purpose || text("purpose.default") }, {
         kind: "sample", name: text("sample.name"), reference: SAMPLE_REFERENCE,
       }));
       if (restored) setNotice(text("saved.restored"));
@@ -109,7 +110,7 @@ export function AuthoringPreview() {
       try { localStorage.removeItem(PREVIEW_STORAGE_KEY); }
       catch { setNotice(text("saved.unavailable")); return; }
       changeSource(null, null);
-      setState(initialPreviewState(text("purpose.default")));
+      setState(initialPreviewState());
     } else {
       setState((s) => previewTransition(s, event, { title: text("draft.title"), summary: text("draft.summary") }));
     }
@@ -162,6 +163,11 @@ export function AuthoringPreview() {
               <FileText aria-hidden="true" className="mb-5 size-8 text-blue-600" />
               <h2 className="text-xl font-semibold">{text("intake.title")}</h2>
               <p className="mt-3 text-base leading-7 text-slate-600">{text(state.source?.kind === "sample" ? "intake.sample" : "intake.body")}</p>
+              <div className="mt-5 space-y-2">
+                <label htmlFor="preview-purpose" className="text-sm font-medium">{text("purpose.label")}</label>
+                <Textarea id="preview-purpose" value={state.purpose} placeholder={text("purpose.placeholder")}
+                  className="min-h-24 text-base leading-7" onChange={(event) => onEvent({ type: "purpose", value: event.target.value })} />
+              </div>
               <ol className="my-7 space-y-4 text-base">{[1, 2, 3].map((n) => <li key={n} className="flex gap-3"><Check aria-hidden="true" className="mt-1 size-4 shrink-0 text-blue-600" />{text(`intake.${n}`)}</li>)}</ol>
               <Button className="h-auto min-h-11 w-full whitespace-normal py-3" disabled={loading || !pdfReady || state.source?.kind !== "sample"}
                 onClick={() => { setState((s) => revealPreparedAnalysis(s)); setPageRequest((p) => ({ page: 9, sequence: p.sequence + 1 })); }}>

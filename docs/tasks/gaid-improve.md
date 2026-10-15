@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T08:41:51Z
+updated: 2026-10-15T08:46:52Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -99,6 +99,7 @@ User answer (verbatim):
 This approves the preceding concrete proposal: implement a clickable prototype using the connected three-state visual flow. The image-set registry is adopted and sidecars are approved for that scope. It does not claim or authorize a complete institutional backend, paid model authoring evaluation, scientific retraining or publication. Prototype scope/interfaces/ownership are in `docs/design/authoring-preview-implementation.md`.
 
 ## Current state
+- Source child ready tip 8a8c1e0d86aa was merged locally by task complete into 7410d60aa037. Integration check failed because parent app imports the still-unintegrated method child; no child closure claimed yet. Integrate method ready tip 71a4e52 next, then retry source complete. Do not resume/restart children. Parent shell now also accepts an optional research purpose, with sample-specific text only when explicitly loading the sample.
 - Parent implementation is local: app shell, typed state transitions, browser-only persistence, source race protection, runtime provider isolation and fixed pinned PDF adapter. Focused parent tests: 3 files / 11 tests passed; new app interaction tests await child integration. Reader identified repeat-create draft loss and saved-draft loss when sample serving is unavailable; both fixed with regression coverage. Parent must not publish app imports before child components are integrated.
 - Child writers running from frozen shared contract at 8c0d90d36cae: `gaid-improve--source-preview` agent `0638b069-bf6b-4df6-8567-35d75a05e836`, workspace `wks_53d1b500def56d35`; `gaid-improve--method-preview` agent `0f805fd9-0a65-4a06-a989-436a5ecdcca7`, workspace `wks_7c4b25ef50c74ee2`. Both gpt-6.1-sol high. CLI initially inherited priority despite normal-speed brief; per-agent service_tier corrected to default and read back, profiles unchanged. Parent continues integration.
 - User approved the connected visual flow and clickable prototype. Resumed in the same printed worktree; current code base unchanged except the shared prototype contract. Settled isolated `/authoring-preview`, real PDF viewing plus explicitly prepared example interactions, no backend/model/project mutation. Parent owns state/shell/runtime/sample adapters; planned child writers own source-view and method/trial-view packages. Keep the review deployment read-only.
