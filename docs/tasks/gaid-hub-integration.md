@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:31:14Z
+updated: 2026-10-15T15:32:26Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -86,12 +86,14 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   X-Content-SHA256, X-Office-Read-Only, X-Kady-Auth, Content-Disposition, X-GAID-Handoff-Path". The browser download
   filename itself is checked in P4 with a real chat bundle. Copy fix: methods.empty ko "Settings의 스킬에서 패키지를
   미리보고" → "설정 → 스킬에서 패키지를 미리 보고" (en unchanged).
+  Settings → 스킬 → 스킬 추가 shows "허브 패키지 목록" with gaid-hub "허브 패키지 목록을 읽지 못했습니다: fetch failed" while
+  the hub is down (raw transport detail; recheck wording once the hub runs).
 - Routed request term-workflow-gaid-hub-integration (user: "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길
   원한다."): consumed; applies to this unit's new strings ("Workflow"; "워크플로우" only where Korean spelling is unavoidable).
   Report it with route-report at finish.
 ## Next steps
-1. Browser check on the rebuilt instance: Workflow panel shows the hub category (empty), handoff dialog download keeps
-   the server file name. Then wait for skill_hub's first real package descriptor (Blocked: hub package not built yet).
+1. Blocked: skill_hub's first real package of the test paper (descriptor URL, sha256, :4317 window) — skill_hub sends it.
+   Then P4: rebuild instance from the branch tip, researcher run, browser download filename check with a real bundle.
 2. `task complete` each child on its finish notice; then integrate. (P2 applied the hubHandoff.attach qualification and
    the distribution.test.mjs owner whitelist entry for gaid-hub-integration itself; take both from its merge.)
    After P2 integrates: expose `Content-Disposition` on the handoff gzip responses (route-local merge into
