@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:55:43Z
+updated: 2026-10-15T15:59:06Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -82,6 +82,15 @@ gates accept them, and notable defects. Results are for review; record only obse
   notifyOnFinish false, ids recorded here; triage as usual and summarize both in the report.
 
 ## Current state
+- Result (2026-10-16): trial, fixes, children, R1/R2 re-tests and before/after visual reviews done; canonical report
+  `reports/2026-10-15-gaid-qwen-authoring-trial/index.md` (review copy in the Obsidian vault). Qwen made usable skills;
+  chat-made skills were hidden from new chats (fixed: 0/2 → 1/1, 1/1); asked for a Workflow it re-pinned the app
+  catalogue and wrote into ~/assets (contained; now an outside-project confirmation card, R2 showed 3 cards, no outside
+  change). Workflow list/skills/settings first views trimmed; Korean UI says "Workflow"; Modal off in the distribution
+  (31→24 tools, ≈27.4k→≈23.0k start tokens). Not met here by decision: a researcher-made Workflow appearing in the list
+  and paper→skill authoring in skill_hub (sent to the hub as request bd45c51400e1). Open items: narrow workspace layout,
+  remaining Kady/K-Dense strings. Trial services gaid-qat-app{,2,3,4} stopped; data kept under
+  `~/data/geoaidesk/work/gaid-qwen-authoring-trial/`. Researcher Paseo agent 77493076 is idle (not a task reader).
 - 2026-10-15 12:05Z: trial instance up: snapshot of 001e9bb in `~/data/geoaidesk/work/gaid-qwen-authoring-trial/app`,
   user unit `gaid-qat-app` (ports 3310/18310, `GAID_HOME=<work>/home`, log `<work>/logs/app.log`). `kigam-qwen`
   registered (reasoningLevels low/medium/xhigh; picker shows high→medium), defaults model/verifier =
@@ -95,7 +104,7 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-Blocked: "after" visual reviewers ea327b29 (Claude 고급검토, claude-fable-5-1 medium, verified) and df0238ad (Codex 고급검토, gpt-6-astra high, normal speed, verified) are running; then fill report §4.1, humanizer, review-copy, `VITEST_MAX_WORKERS=1 task finish`.
+0. Final: re-report the four routed requests, `VITEST_MAX_WORKERS=1 task finish` (full scripts/check; map viewer test is load-sensitive). After-review readers ea327b29 / df0238ad finished.
 1. R2 re-test running (2026-10-16 ~00:00 KST): instance 3 `gaid-qat-app3` (ports 3312/18312, `GAID_HOME=<work>/home3`,
    snapshot `<work>/app3` of 13618c1 = all fixes + both children; log `<work>/logs/app3.log`); researcher 77493076
    follows `<work>/researcher/BRIEF-R2.md` → `<work>/researcher/r2/`; a background wait reports its summary. Then gate
