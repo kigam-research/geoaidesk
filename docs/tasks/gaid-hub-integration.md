@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:32:26Z
+updated: 2026-10-15T22:58:33Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -88,12 +88,17 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   미리보고" → "설정 → 스킬에서 패키지를 미리 보고" (en unchanged).
   Settings → 스킬 → 스킬 추가 shows "허브 패키지 목록" with gaid-hub "허브 패키지 목록을 읽지 못했습니다: fetch failed" while
   the hub is down (raw transport detail; recheck wording once the hub runs).
-- Routed request term-workflow-gaid-hub-integration (user: "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길
-  원한다."): consumed; applies to this unit's new strings ("Workflow"; "워크플로우" only where Korean spelling is unavoidable).
-  Report it with route-report at finish.
+- Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
+  351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
-1. Blocked: skill_hub's first real package of the test paper (descriptor URL, sha256, :4317 window) — skill_hub sends it.
-   Then P4: rebuild instance from the branch tip, researcher run, browser download filename check with a real bundle.
+1. P4 running (2026-10-16 08:05 KST): package local/pu-nested-cv-prospectivity rev 1 (request 351e0b68701b, sha256
+   84daff9e…, hub :4317 kept up until we report). Instance rebuilt on 1905f3f. Researcher agent 7e41440e-9412-45d8-944e-444049c24585
+   (Claude Sonnet 5.5 high, notifyOnFinish false), brief <work>/researcher/BRIEF.md, deliverables <work>/researcher/
+   {log.md,summary.md,playwright/}; bounded to the method's first human gate (no model training); data
+   <work>/samples/yilgarn (asset yilgarn-gis-db/20260911). Check: get_agent_status 7e41440e; ls <work>/researcher.
+   351e0b68701b reported --blocked (in progress); report the result with route-report when the trial is assessed.
+   Then: orchestrator gates (GET /geo/methods, trial record vs provenance, exposure record hides spatial-pu-workflow,
+   handoff download filename), visual reviews, fixes, report.
 2. `task complete` each child on its finish notice; then integrate. (P2 applied the hubHandoff.attach qualification and
    the distribution.test.mjs owner whitelist entry for gaid-hub-integration itself; take both from its merge.)
    After P2 integrates: expose `Content-Disposition` on the handoff gzip responses (route-local merge into
