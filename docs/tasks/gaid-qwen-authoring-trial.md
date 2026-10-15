@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T15:59:06Z
+status: done
+updated: 2026-10-15T15:59:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -104,34 +104,9 @@ gates accept them, and notable defects. Results are for review; record only obse
   (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
   Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-0. Final: re-report the four routed requests, `VITEST_MAX_WORKERS=1 task finish` (full scripts/check; map viewer test is load-sensitive). After-review readers ea327b29 / df0238ad finished.
-1. R2 re-test running (2026-10-16 ~00:00 KST): instance 3 `gaid-qat-app3` (ports 3312/18312, `GAID_HOME=<work>/home3`,
-   snapshot `<work>/app3` of 13618c1 = all fixes + both children; log `<work>/logs/app3.log`); researcher 77493076
-   follows `<work>/researcher/BRIEF-R2.md` → `<work>/researcher/r2/`; a background wait reports its summary. Then gate
-   its artifacts (GQAT_API=http://127.0.0.1:18312 GQAT_HOME=<work>/home3), start the "after" visual reviews (same two
-   profiles, R2 screenshots), write the report, run `VITEST_MAX_WORKERS=1 task finish`.
-2. Children done: modal-off (completed, cleanup closed after removing caches) and outside-writes (merged with a seam
-   append conflict resolved in 13618c1; completed and closed). Evidence in their task documents (merged here).
+<!-- task:closed -->
+Closed 2026-10-15T15:59:46Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-qwen-authoring-trial.md.
 
-- R1 re-test running (2026-10-15 ~22:45 KST): instance 2 `gaid-qat-app2` (ports 3311/18311, `GAID_HOME=<work>/home2`,
-  snapshot `<work>/app2` of 7e77779, log `<work>/logs/app2.log`), kigam-qwen registered the same way; old instance
-  `gaid-qat-app` stopped (data kept in `<work>/home`). Researcher 77493076 follows `<work>/researcher/BRIEF-R1.md`
-  (default skill scope; F1/F3/F4/F5/F9 checks) → `<work>/researcher/r1/`. Then gate its skill with gates.py
-  (API base 18311: edit `API`/`HOME` in a copy or pass env) and record before/after.
-- Children (started 2026-10-15 ~22:58 KST, Codex "general work"): `gaid-qwen-authoring-trial--modal-off` writer
-  c9784d59-bb40-4f34-92f4-b99e911e0acb (brief /tmp copy in Notes); `gaid-qwen-authoring-trial--outside-writes` writer
-  ffc3948e-1dea-402c-8e2c-549c8367b527. On each finish: `task complete <child>`, then re-run checks here.
-0. After the researcher's "before" screenshots exist: start the two visual reviewers (`task reader --profile "Claude 고급검토"` / `"Codex 고급검토"`, read-only), record ids; repeat after fixes.
-1. (done 22:26) Researcher finished S1–S3 (`<work>/researcher/summary.md`); gates applied (`evidence/s1-*, s2-*, s3-*`).
-   Next: start the "before" visual reviews, then present the concept decision to the user, then fix.
-   Gate command for re-runs
-   (`uv run --no-project python -I <work>/scripts/gates.py proj-7a784f <work>/evidence/<scenario>`; the trial project is
-   `proj-7a784f` "저작 시험"; baseline skill list in `<work>/evidence/baseline-skills-proj-7a784f.txt`).
-2. Triage trial defects → fix in GAID (scope `qwen-authoring-scope`), re-run the affected scenario for before/after.
-3. Skill vs workflow concept (scope `qwen-authoring-skill-vs-workflow`): combine contract findings (Notes) with trial
-   evidence, present definitions + one-entry flow + changes + any skill_hub contract change to the user in this tab;
-   only small fixes before the user's answer. Both routed requests were reported `--blocked` (in progress) on
-   2026-10-15; re-report them with the final result before/after finish.
 ## Trial findings and fixes (live list; evidence `<work>/researcher/log.md`, `<work>/evidence/`)
 - S1 (21:07–21:51 KST): Qwen copied the catalogue LAS helper, wrote `las-window-quickqc` (SKILL.md + wrapper script, no
   atlas.yaml); Pi loader and skill_hub package preview accept it (`evidence/s1-v1`, `s1-final`).
@@ -274,8 +249,8 @@ gates accept them, and notable defects. Results are for review; record only obse
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [부채] 좁은 화면(390px)에서 작업 공간의 채팅 영역이 매우 좁아 확인 카드와 입력 버튼이 화면 밖으로 밀립니다 — 가) 좁은 화면 배치를 별도 UI 작업으로 고친다 — 나) 데스크톱 우선으로 두고 지원 범위에 명시한다 — 권장: 가) 확인 카드를 못 보면 실행이 멈춘 것처럼 보입니다 — 막힌 일: 휴대폰·좁은 창에서의 승인 — 조건: 앱 전체 배치 변경 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
-- [부채] 화면 문구 약 54곳에 "Kady"·"K-Dense"가 남아 있고 앱과 에이전트를 가리키는 경우가 섞여 있습니다 — 가) 문구별로 GeoAIDesk/AI agent로 나눠 고친다 — 나) 그대로 둔다 — 권장: 가) 용어집의 "AI agent"와 제품명 규칙에 맞춥니다 — 막힌 일: 없음 — 조건: 문구별 판단 필요 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
+- [부채 gaid-qwen-authoring-trial#1] 좁은 화면(390px)에서 작업 공간의 채팅 영역이 매우 좁아 확인 카드와 입력 버튼이 화면 밖으로 밀립니다 — 가) 좁은 화면 배치를 별도 UI 작업으로 고친다 — 나) 데스크톱 우선으로 두고 지원 범위에 명시한다 — 권장: 가) 확인 카드를 못 보면 실행이 멈춘 것처럼 보입니다 — 막힌 일: 휴대폰·좁은 창에서의 승인 — 조건: 앱 전체 배치 변경 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
+- [부채 gaid-qwen-authoring-trial#2] 화면 문구 약 54곳에 "Kady"·"K-Dense"가 남아 있고 앱과 에이전트를 가리키는 경우가 섞여 있습니다 — 가) 문구별로 GeoAIDesk/AI agent로 나눠 고친다 — 나) 그대로 둔다 — 권장: 가) 용어집의 "AI agent"와 제품명 규칙에 맞춥니다 — 막힌 일: 없음 — 조건: 문구별 판단 필요 — 근거: reports/2026-10-15-gaid-qwen-authoring-trial/index.md#33-수정-후에도-남은-것-r2
 ## Report
 Report: reports/2026-10-15-gaid-qwen-authoring-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,

@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:20:44Z
+status: done
+updated: 2026-10-15T15:59:46Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"c9784d59-bb40-4f34-92f4-b99e911e0acb","pid":490184,"provider":"codex","session":"01a13fd5-7e73-7dc1-adb6-264a7912b776","start":"53831898","token":"3ed0f4ef35f21ef47645dfe765fa240819af1c91f4437fc68331c3c230921499"}
 branch: task/gaid-qwen-authoring-trial--modal-off
 target: task/gaid-qwen-authoring-trial
@@ -109,7 +109,7 @@ Finish merged parent revision `8249d3596daeb12ba06181425594d65a1b0e0ae6`; a late
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:20:44Z: ready; the parent gaid-qwen-authoring-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-15T15:59:46Z: integrated into gaid-qwen-authoring-trial; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Applying VITEST_MAX_WORKERS=4 to the entire finish check overrode server serialization and raced the shared fixture root (121 failures / 28 files; mostly ENOENT). Correct execution environment: VITEST_MAX_WORKERS=1 globally, or a frontend-only cap. No speculative application/test edits.
