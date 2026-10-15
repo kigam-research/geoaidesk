@@ -155,3 +155,35 @@ export async function listLocalMethods(
     };
   });
 }
+
+/**
+ * Skills a `method:<name>:<workflow>` chat offers the model: the runtime
+ * support skills plus that Workflow's skills (its own `local:` skill and the
+ * catalogue skills it names). Every other skill, including a catalogue skill
+ * for the same task, stays hidden from the model, so a trial exercises the
+ * method package rather than whatever the model would pick.
+ */
+export function methodExposedSkills(paths: ProjectPaths, mode: string, catalogue: GeoCatalogue | null, support: string[]): string[] {
+  const names = new Set(support);
+  const ref = parseMethodExposure(mode);
+  const method = ref ? findInstalledMethod(paths, ref.runtimeName) : null;
+  const workflow = method?.file.method?.workflows.find((candidate) => candidate.id === ref!.workflowId);
+  for (const id of workflow?.skillIds ?? []) {
+    if (id.startsWith(LOCAL_SKILL_PREFIX)) names.add(method!.runtimeName);
+    else {
+      const name = catalogue?.index.skills.find((skill) => skill.id === id)?.runtimeName;
+      if (name) names.add(name);
+    }
+  }
+  return [...names].sort();
+}
+
+/** `null` when a per-chat `method:` exposure names an installed method Workflow, else the reason. */
+export function methodExposureIssue(paths: ProjectPaths, mode: string): string | null {
+  const ref = parseMethodExposure(mode);
+  if (!ref) return `invalid method exposure "${mode}"`;
+  const method = findInstalledMethod(paths, ref.runtimeName);
+  if (!method?.file.method) return `no installed method "${ref.runtimeName}"`;
+  if (!method.file.method.workflows.some((workflow) => workflow.id === ref.workflowId)) return `method "${ref.runtimeName}" has no Workflow "${ref.workflowId}"`;
+  return null;
+}

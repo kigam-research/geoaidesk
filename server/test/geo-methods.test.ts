@@ -11,6 +11,7 @@ import { parseMethodFile } from "../src/geo/methods/method-file.ts";
 import { listLocalMethods, parseMethodExposure } from "../src/geo/methods/local-methods.ts";
 import { assessMethodTrial, getMethodTrial, listMethodTrials, recordMethodTrial } from "../src/geo/methods/trials.ts";
 import type { ProjectPaths } from "../src/projects.ts";
+import { exposureModeIssue, resolveSessionExposure, runtimeSupportSkillNames } from "../src/geo/context.ts";
 import type { GeoCatalogue } from "../src/geo/catalogue.ts";
 import { tarGz } from "./helpers/geo-catalogue-fixture.ts";
 
@@ -181,4 +182,18 @@ describe("hub method listing", () => {
     const down = await listHubMethods([hub], vi.fn<typeof fetch>().mockRejectedValue(new Error("ECONNREFUSED")));
     expect(down[0]).toMatchObject({ state: "error", methods: [] });
   });
+});
+
+describe("method exposure", () => {
+  it("offers only the method's skills to a new chat and pins its trial; never a project default", async () => {
+    await install({ archive: pkg() });
+    fs.mkdirSync(path.join(paths.skillsDir, "spatial-pu-workflow"), { recursive: true });
+    fs.writeFileSync(path.join(paths.skillsDir, "spatial-pu-workflow/SKILL.md"), "---\nname: spatial-pu-workflow\ndescription: withheld\n---\n");
+    const exposure = resolveSessionExposure(paths, "s2", { isNew: true, mode: "method:pu-nested-cv:paper-reproduction" });
+    expect(exposure?.skills).toEqual([...new Set([...runtimeSupportSkillNames(), "pu-nested-cv"])].sort());
+    expect(exposure?.skills).not.toContain("spatial-pu-workflow");
+    expect(getMethodTrial(paths, "s2")).toMatchObject({ runtimeName: "pu-nested-cv", workflowId: "paper-reproduction", revision: 3 });
+    expect(exposureModeIssue("method:pu-nested-cv:paper-reproduction")).not.toBeNull();
+    expect(exposureModeIssue("method:pu-nested-cv:paper-reproduction", undefined, { allowMethod: true })).toBeNull();
+  }, 30_000);
 });

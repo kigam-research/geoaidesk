@@ -22,7 +22,13 @@ import type { ProjectPaths } from "../projects.ts";
 import { getSkillOrigins } from "../agent/skills-sync.ts";
 import { geoCatalogueActive, loadGeoCatalogue, runtimeNameFor, type GeoCatalogue } from "./catalogue.ts";
 
-export type ExposureMode = "all" | "catalogue" | `workflow:${string}`;
+/** `method:<name>:<workflow>` (gaid-hub-integration): a chat started from a LocalMethod Workflow; per chat only. */
+export type ExposureMode = "all" | "catalogue" | `workflow:${string}` | `method:${string}`;
+
+// gaid-hub-integration: LocalMethod chats (method: exposure) and their trial records.
+import { activePaths } from "../projects.ts";
+import { methodExposedSkills, methodExposureIssue, parseMethodExposure } from "./methods/local-methods.ts";
+import { recordMethodTrial } from "./methods/trials.ts";
 
 export interface SessionExposure {
   schemaVersion: "gaid-exposure/v1";
@@ -56,9 +62,12 @@ export function exposureFile(paths: ProjectPaths, sessionId: string): string {
   return path.join(geoStateDir(paths), "exposure", `${sessionId}.json`);
 }
 
-/** `null` when valid, else the reason. */
-export function exposureModeIssue(mode: unknown, catalogue?: GeoCatalogue | null): string | null {
+/** `null` when valid, else the reason. `method:` modes are per chat (`allowMethod`), never a project default. */
+export function exposureModeIssue(mode: unknown, catalogue?: GeoCatalogue | null, options: { allowMethod?: boolean } = {}): string | null {
   if (mode === "all" || mode === "catalogue") return null;
+  if (options.allowMethod && typeof mode === "string" && mode.startsWith("method:")) {
+    return parseMethodExposure(mode) ? null : `invalid method exposure "${mode}"`;
+  }
   if (typeof mode !== "string" || !mode.startsWith("workflow:")) {
     return 'exposure must be "all", "catalogue" or "workflow:<id>"';
   }
@@ -102,7 +111,7 @@ export function writeProjectContext(paths: ProjectPaths, settings: { newChatExpo
 export function readSessionExposure(paths: ProjectPaths, sessionId: string): SessionExposure | null {
   try {
     const raw = JSON.parse(fs.readFileSync(exposureFile(paths, sessionId), "utf-8")) as SessionExposure;
-    if (raw.schemaVersion === "gaid-exposure/v1" && exposureModeIssue(raw.mode) === null) return raw;
+    if (raw.schemaVersion === "gaid-exposure/v1" && exposureModeIssue(raw.mode, undefined, { allowMethod: true }) === null) return raw;
   } catch {
     // No record.
   }
@@ -120,6 +129,7 @@ function tryCatalogue(): GeoCatalogue | null {
 
 /** `exposureModeIssue` against the active catalogue (for request bodies). */
 export function geoExposureIssue(mode: unknown): string | null {
+  if (typeof mode === "string" && mode.startsWith("method:")) return methodExposureIssue(activePaths(), mode);
   return exposureModeIssue(mode, tryCatalogue());
 }
 
@@ -188,7 +198,9 @@ export function resolveSessionExposure(
   if (!options.isNew) return null;
   const mode = options.mode ?? readProjectContext(paths).newChatExposure;
   const catalogue = tryCatalogue();
-  const skills = exposedSkillNames(paths, mode, catalogue);
+  const skills = mode.startsWith("method:")
+    ? methodExposedSkills(paths, mode, catalogue, runtimeSupportSkillNames())
+    : exposedSkillNames(paths, mode, catalogue);
   const record: SessionExposure = {
     schemaVersion: "gaid-exposure/v1",
     mode,
@@ -200,6 +212,13 @@ export function resolveSessionExposure(
     writeJsonAtomic(exposureFile(paths, sessionId), record);
   } catch (err) {
     console.warn(`[gaid] could not record skill exposure for ${sessionId}: ${(err as Error).message}`);
+  }
+  if (mode.startsWith("method:")) {
+    try {
+      recordMethodTrial(paths, sessionId, mode);
+    } catch (err) {
+      console.warn(`[gaid] could not record the method trial for ${sessionId}: ${(err as Error).message}`);
+    }
   }
   return record;
 }
