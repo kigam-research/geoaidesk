@@ -40,6 +40,13 @@ import workEn from "./work/en.json";
 import workflowsKo from "./workflows/ko.json";
 import workflowsEn from "./workflows/en.json";
 
+import authoringPreviewKo from "./authoringPreview/ko.json";
+import authoringPreviewEn from "./authoringPreview/en.json";
+import previewSourceKo from "./previewSource/ko.json";
+import previewSourceEn from "./previewSource/en.json";
+import previewMethodKo from "./previewMethod/ko.json";
+import previewMethodEn from "./previewMethod/en.json";
+
 export type Catalogue = Record<string, string>;
 
 function flatten(value: unknown, prefix = "", out: Catalogue = {}): Catalogue {
@@ -55,6 +62,9 @@ const pair = (ko: unknown, en: unknown) => ({ ko: flatten(ko), en: flatten(en) }
 
 /** namespace -> locale -> flattened catalogue */
 export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = {
+  authoringPreview: pair(authoringPreviewKo, authoringPreviewEn),
+  previewSource: pair(previewSourceKo, previewSourceEn),
+  previewMethod: pair(previewMethodKo, previewMethodEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
   skillHub: pair(skillHubKo, skillHubEn),

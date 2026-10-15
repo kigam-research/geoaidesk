@@ -49,17 +49,17 @@ supersedes = ""
 [[result]]
 id = "gaid-source-first-visuals-20261015"
 title = "자료에서 스킬·워크플로우를 만드는 연속 화면 시안"
-state = "review"
+state = "adopted"
 run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-improve/design/spatial-pu"
 source_sha = "2b0ba776ca0d2bce263c49d03f00824fb0b3b068"
 inputs = ["user:2026-10-15-source-first-correction", "user:2026-10-15-coauthoring-agents", "author-manuscript:R3", "geoaidesk:81b620bb827788bbf51e3a1bbdde3eda83a4b24f"]
 files = [
   { path = "source-first-01-intake.png", sha256 = "a77083b612f19b9c108a7c0b8170bad8e71790905d21cf4624a1d3e05c5c1147" },
-  { path = "source-first-01-intake.json", sha256 = "aacdcd7839bf3f3aaef65dbf89dd7b9f4e411fbc729b2b2685c1385f02db77da" },
+  { path = "source-first-01-intake.json", sha256 = "b8854d73bfe5d6ed59137e56a4cafba0987c28a8ee71eec3d6e493f975fe486c" },
   { path = "source-first-02-coauthor.png", sha256 = "ad5b4a176eae80b807145f866a7cdbb0d48dfa585f6840191d2049a032a0d745" },
-  { path = "source-first-02-coauthor.json", sha256 = "19404867048e123990bd29a67e4aa1cc2e5888eec682c7b87acc941c240fb841" },
+  { path = "source-first-02-coauthor.json", sha256 = "617530b0d4e47d677191e1e3612bf6f72a338bc83821288710373043db88b34f" },
   { path = "source-first-03-draft-trial.png", sha256 = "5fbc63b505c450f7e0a90e2406255620fc9d4462b3eabd0939bbca0ff69f901e" },
-  { path = "source-first-03-draft-trial.json", sha256 = "4426cd159cde3928c65b45f55e02a70f61fa12ea5d0d3166ad016720c4e4a065" }
+  { path = "source-first-03-draft-trial.json", sha256 = "2c6587e21affc925de0377b9b9a1b32ad29c00d1310e0ed118fa8ec568aaee81" }
 ]
 report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
 replicas = []

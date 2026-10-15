@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T07:49:03Z
+updated: 2026-10-15T08:12:42Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -90,7 +90,16 @@ User clarification (verbatim):
 
 NotebookLM is processing-flow reference only, never UI/layout/visual authority. Inspect the actual Codex and Claude skill-creator procedures. Design researcher coauthoring questions, lead/assistant roles and deterministic application state around probabilistic model proposals using the existing connected routes. This is design, not authorization to run paid authoring benchmarks or change providers.
 
+## Clickable prototype approval (2026-10-15)
+
+User answer (verbatim):
+
+> 진행하자.
+
+This approves the preceding concrete proposal: implement a clickable prototype using the connected three-state visual flow. The image-set registry is adopted and sidecars are approved for that scope. It does not claim or authorize a complete institutional backend, paid model authoring evaluation, scientific retraining or publication. Prototype scope/interfaces/ownership are in `docs/design/authoring-preview-implementation.md`.
+
 ## Current state
+- User approved the connected visual flow and clickable prototype. Resumed in the same printed worktree; current code base unchanged except the shared prototype contract. Settled isolated `/authoring-preview`, real PDF viewing plus explicitly prepared example interactions, no backend/model/project mutation. Parent owns state/shell/runtime/sample adapters; planned child writers own source-view and method/trial-view packages. Keep the review deployment read-only.
 - Corrected source-first visual review is ready: three consecutive state images in canonical report §3.15 (source received/reading, grounded method and missing-code choice, new method draft/private-trial handoff). Parent inspected all images; native reader checked first two; bounded edits fixed spatial-evaluation wording, source naming and redundant prose. Three initial calls plus two targeted edits completed; no image generation, reader or research job is running. Images/provenance are registered as review and unapproved. No product code, real skill creation, model authoring trial or scientific rerun performed.
 - Public research job 3 succeeded (exit 0); log read, out/ empty (text answer in log). Result session `gaid-skill-hub-pu-pdf`; log verifies Pro already selected, despite requested xhigh on follow-up. Saved note: `웹 조사/geoaidesk/2026-10-15-gaid-skill-hub-pu-pdf--30bfb615d7.md`. Findings corroborate source-kind/access distinctions, page-linked analysis, staged skill/package creation and actual trial evidence. Upstream JSON body was not accessible to Oracle; local exact-code audit remains authoritative. No running research jobs remain.
 - Actual Codex and Anthropic skill-creator procedures and GAID model/question interfaces audited. Parent integrated a small lead-plus-optional-assistants architecture, durable decisions, typed proposals, bounded repair and real package/trial states in `docs/design/source-authoring-agents.md` and the canonical report. Readers finished; no GAID model authoring calls or scientific tests performed.
@@ -114,10 +123,10 @@ NotebookLM is processing-flow reference only, never UI/layout/visual authority. 
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-1. Await the user's review of the connected source-first images in canonical report §3.15. The concrete next proposal is a clickable prototype using this flow; do not infer image approval or restart the old figure-first alternatives. No repeated paper/access/model-selection questions are needed.
-2. Apply any requested visual/flow correction. After the user chooses the composition/flow, settle prototype implementation interfaces and use isolated CLI child writers only for substantial independent code packages. Keep the existing PU skill out of authoring inputs and NotebookLM out of visual references.
-3. Preserve the lead/optional-assistant, durable-question and checked-proposal design in `docs/design/source-authoring-agents.md`. A prototype's interaction does not prove actual source extraction, package creation or scientific execution; label and test the delivered scope separately. Use `scripts/check` for product code changes.
-4. Route actual skill_hub implementation to its project hub. Keep the standing unit active for discussion and agreed implementation; do not call `task finish` before that work is settled and complete.
+1. Checkpoint the approved image metadata, prototype scope and shared contract. Start isolated child writers for source/PDF and method/trial UI packages using the settled file ownership. Parent continues state/persistence, shell, runtime isolation and sample input adapter while children run.
+2. Complete each child with `task complete`, integrate locale catalogs/components, verify the approved composition and actual interactions on a separate task-owned preview instance. Preserve real PDF content and clear prepared-example states.
+3. Run meaningful focused checks and required `scripts/check`; fix in place. Update the canonical report with working route, interaction evidence, exact simulated/unconnected boundaries and copy IDs. No live review service changes by writer.
+4. Finish this agreed prototype slice with `task finish` when implementation/checks/report are complete; follow the hub's final completion/rollout report. Remaining full authoring backend work remains a separate explicitly scoped continuation, not a prototype completion claim.
 ## Failed approaches
 - Oracle follow-up job 2 used wrapper-only `--effort` after `--followup`; the wrapper only consumes leading wrapper options. Exit 1 is a CLI parse error, not a research/access failure. Inspected `~/backbone/runtime/oracle-web:140–157`; retry moves `--effort xhigh` first.
 - Initial figure-first A/B/C image round assumed a ready-made method. User rejected that premise; keep those files as external history and redesign from PDF/URL ingestion with no existing PU skill.
@@ -151,6 +160,7 @@ NotebookLM is processing-flow reference only, never UI/layout/visual authority. 
 - Current image round follows the user's process correction: three consecutive states of one source-first journey, not the superseded figure-first layout alternatives. Parent owns prompts and generation; retain GAID/shadcn identity. Native reader verified author R3 anchors (pp.1–2 purpose, p.9 nested spatial CV, p.20 Figure 6); manual design inspection is not an implemented extraction service. No design is approved by generation.
 - Final visual artifacts: 1536×1024 PNGs, each below 5 MB, exact generation/edit prompts embedded with impeccable `embed-prompt`; provenance sidecars `approved:false`. Humanizer file-mode applied to new captions without changing numeric tokens or link targets. Registry entries cover report and image set as `review`. No initial A/B/C image is part of the review set.
 - Visual review-copy refreshed: canonical vault folder contains index.md and all three figures; PNG bytes and report body verified against workspace. CLI omitted only three JSON provenance sidecars (unsupported review-copy format); originals remain in Git/external output. Desktop sync service remains inactive; other-device delivery unverified. Registry hashes, image links, sizes and unapproved sidecar states checked. No automated app tests (design/report/image-only changes).
+- Implementation orchestration: sequential contract → independent source/PDF view and method/trial view → parent state/shell/route/locale integration → browser/focused checks → scripts/check → report/finish. Shared contract parent-owned at `web/src/geo/contracts/authoring-preview.ts`; child exact ownership in implementation brief. Image-set adoption copies verified at PC74 external originals and report/vault PNGs; no additional replica host declared.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

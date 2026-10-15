@@ -1,6 +1,6 @@
 {
-  "approved": false,
-  "status": "review",
+  "approved": true,
+  "status": "approved-for-clickable-prototype",
   "kind": "source-first-sequential-state",
   "image": "source-first-01-intake.png",
   "generatedWith": "built-in image_gen",
@@ -16,5 +16,7 @@
   "implementation": false,
   "width": 1536,
   "height": 1024,
-  "sha256": "a77083b612f19b9c108a7c0b8170bad8e71790905d21cf4624a1d3e05c5c1147"
+  "sha256": "a77083b612f19b9c108a7c0b8170bad8e71790905d21cf4624a1d3e05c5c1147",
+  "approvalQuote": "진행하자.",
+  "approvalDate": "2026-10-15"
 }
