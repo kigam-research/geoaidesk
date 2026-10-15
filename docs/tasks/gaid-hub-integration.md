@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T15:29:15Z
+updated: 2026-10-15T15:29:49Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -73,18 +73,20 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   /geo/methods, /geo/methods/trials empty; /geo/skill-hub lists atlas + gaid-hub; /geo/skill-hub/methods reports the hub
   as error "fetch failed" (hub not started yet). Re-check: `systemctl --user status gaid-hub-app`. Rebuild from the
   integrated branch before the acceptance run (git archive over <work>/app, restart unit).
-- Child P2 `gaid-hub-integration--handoff` (writer e6a23203-e5dc-44f5-b6a0-74d8c942a195): reported implemented and green,
-  finishing. On its finish: `task complete gaid-hub-integration--handoff`.
-- Child P3 `gaid-hub-integration--methods-ui` (writer 889fbc92-549f-4f63-9865-358efbab2bba, brief
-  ~/data/geoaidesk/work/gaid-hub-integration/child-methods-ui-prompt.md): Workflow-panel rows/dialogs hook for LocalMethods,
-  trial list + assessment, hub list in Settings → Skills. Parent wires its hook into task-catalogue.tsx after the trial unit
-  merges.
+- Children done and closed (2026-10-16): P2 handoff integrated 65b06c5 (bundle builder, download + optional loopback direct
+  send, composer action replaces "재사용 스킬 만들기"; its fixes: PAX-aware size cap, distribution owner whitelist,
+  hubHandoff.attach qualification); P3 methods-ui integrated 3b47cf5 (useMethodRows, detail, trials, hub list in Settings).
+  Strings: child task docs docs/tasks/gaid-hub-integration--{handoff,methods-ui}.md. Build caches removed, units closed.
+- Parent after integration: handoff routes expose Content-Disposition + X-GAID-Handoff-Path (route-local, 8bc5f0d);
+  method rows wired into task-catalogue.tsx (ae75fea; the trial unit edits the same file, expect a small merge).
+  Verified: web tsc clean; web vitest methods/skill-hub/workspace/hub-handoff 50 pass; server handoff 13 pass.
+- Trial instance rebuilding on ae75fea (unit gaid-hub-app, 3320/18320).
 - Routed request term-workflow-gaid-hub-integration (user: "용어로서 워크플로우가 표준용어이고 가급적 영어로 Workflow로 사용하길
   원한다."): consumed; applies to this unit's new strings ("Workflow"; "워크플로우" only where Korean spelling is unavoidable).
   Report it with route-report at finish.
 ## Next steps
-1. Prepare the P4 GAID instance (own ports, GAID_HOME under ~/data/geoaidesk/work/gaid-hub-integration/, kigam-qwen route)
-   while children run; skill_hub sends the first real package descriptor when ready.
+1. Browser check on the rebuilt instance: Workflow panel shows the hub category (empty), handoff dialog download keeps
+   the server file name. Then wait for skill_hub's first real package descriptor (Blocked: hub package not built yet).
 2. `task complete` each child on its finish notice; then integrate. (P2 applied the hubHandoff.attach qualification and
    the distribution.test.mjs owner whitelist entry for gaid-hub-integration itself; take both from its merge.)
    After P2 integrates: expose `Content-Disposition` on the handoff gzip responses (route-local merge into
