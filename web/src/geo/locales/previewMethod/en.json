@@ -1,1 +1,156 @@
-{}
+{
+  "status": {
+    "prepared": "Prepared example · not reviewed",
+    "private": "Private draft",
+    "untested": "Untested"
+  },
+  "method": {
+    "title": "Method from the sources",
+    "description": "Explore a draft for applying the selected sample manuscript's method to new data.",
+    "sampleOnly": "The prepared method example is shown only for the sample manuscript.",
+    "createDraft": "View draft with selected approach"
+  },
+  "finding": {
+    "title": "Evaluation accounting for spatial dependence",
+    "body": "The manuscript describes spatial blocks and nested evaluation that separates model selection from final assessment. Spatial blocks alone do not guarantee spatial independence."
+  },
+  "source": {
+    "page9": "View manuscript page 9",
+    "figure6": "View Figure 6 · page 20"
+  },
+  "setting": {
+    "original": {
+      "title": "Study setting: 50 km evaluation blocks",
+      "body": "The original study used this setting to reduce evaluation bias caused by spatial dependence."
+    },
+    "new": {
+      "title": "New data: decide from spatial properties",
+      "body": "Determine evaluation blocks after examining spatial dependence and the scope of application. Do not use 50 km as a default."
+    }
+  },
+  "purpose": {
+    "title": "Saved purpose",
+    "empty": "No purpose has been entered yet."
+  },
+  "choice": {
+    "title": "Implementation approach",
+    "description": "The example does not include analysis code. Choose an implementation approach for the draft.",
+    "defer": "Answer later",
+    "deferred": "Answer deferred. Choose an implementation approach to continue to the draft.",
+    "unanswered": "No implementation approach has been selected.",
+    "attach-code": {
+      "title": "Add existing code",
+      "body": "Link file information for your analysis code to the draft.",
+      "note": "Code inspection and execution are not connected. Attaching a file does not complete implementation or review."
+    },
+    "draft-code": {
+      "title": "Plan code writing from the paper",
+      "body": "Outline required code and a writing plan from the manuscript's description.",
+      "note": "Code writing is not connected. The on-screen draft contains no actual analysis code."
+    },
+    "procedure": {
+      "title": "Create a procedure description only",
+      "body": "Describe the analysis procedure and its steps without code.",
+      "note": "A procedure description is not an executable analysis pipeline."
+    }
+  },
+  "attachment": {
+    "code": "Select analysis code file",
+    "results": "Select existing results file · optional",
+    "metadata": "{name} · {size} bytes",
+    "required": "Select a code file before viewing a draft with the existing-code approach.",
+    "removeCode": "Unlink code",
+    "removeResults": "Unlink results",
+    "metadataOnly": "The preview links only the file name and size. File contents are not uploaded or analyzed."
+  },
+  "draft": {
+    "empty": "Choose an implementation approach to view a draft.",
+    "titleLabel": "Method name",
+    "summaryLabel": "Method description",
+    "scopeTitle": "Purpose and implementation approach",
+    "editChoice": "Edit implementation approach",
+    "save": "Save preview",
+    "saved": "Saved in the browser at: {time}"
+  },
+  "plan": {
+    "title": "Planned method steps",
+    "1": {
+      "title": "Inspect data",
+      "body": "Check input format, coverage and recorded positives."
+    },
+    "2": {
+      "title": "Design spatial evaluation",
+      "body": "Examine spatial dependence and separate model-selection data from final assessment data."
+    },
+    "3": {
+      "title": "Compare models",
+      "body": "Define models and evaluation criteria for comparison."
+    },
+    "4": {
+      "title": "Interpret results",
+      "body": "Plan to examine exploration priorities and limits of application."
+    }
+  },
+  "contents": {
+    "title": "Planned draft contents",
+    "skill": {
+      "title": "Skill",
+      "body": "Conditions of use, analysis instructions and required code plans."
+    },
+    "workflow": {
+      "title": "Workflow launch request",
+      "body": "A request to begin the method with data and settings."
+    },
+    "openFiles": "View illustrative file contents"
+  },
+  "outputs": {
+    "title": "Expected outputs",
+    "body": "Exploration-priority map · evaluation results · limits of application",
+    "note": "These are expected outputs to examine after execution. No analysis results have been generated."
+  },
+  "files": {
+    "dialog": {
+      "title": "Illustrative file contents",
+      "description": "Examples of skill instructions and a workflow request. They have not been installed or generated as files."
+    },
+    "skillFile": "SKILL.md · illustrative instructions",
+    "workflowFile": ".geo-start.json · illustrative request structure",
+    "illustration": "The method name and description reflect the edited draft.",
+    "skillInstructions": "Inspect data coverage and positive records, then design evaluation accounting for spatial dependence. Record model-comparison criteria and limits of application. Do not transfer the paper's 50 km setting directly to new data.",
+    "workflowRequest": "A request to prepare the selected method draft, from data inspection through interpretation.",
+    "workflowInputs": "Required inputs: research data, positive records, evaluation design and comparison criteria. Actual skill IDs and executable code connections are not included."
+  },
+  "trial": {
+    "title": "Prepare a trial request",
+    "description": "A preview for organizing trial data and comparison criteria. Analysis execution is not connected.",
+    "notRun": "No execution has taken place.",
+    "open": "Open trial preparation",
+    "dialog": {
+      "title": "Prepare a trial request",
+      "description": "Enter file information and comparison criteria, then review the request summary. No process will start."
+    },
+    "dataLabel": "Select trial data file",
+    "removeData": "Unlink trial data",
+    "criteriaLabel": "Comparison criteria",
+    "criteriaPlaceholder": "For example: record evaluation-data separation, comparison metrics and tolerances.",
+    "procedure": "Procedure-description approach. No executable code is provided, so a trial request summary cannot be prepared.",
+    "previewRequest": "View trial request summary",
+    "requestTitle": "Trial request summary · not executed",
+    "requestNote": "Only the request contents have been previewed. No data analysis, code execution or result assessment has taken place."
+  },
+  "sharing": {
+    "open": "Review proposed sharing contents",
+    "dialog": {
+      "title": "Review proposed sharing contents",
+      "description": "Review contents that could be proposed for sharing later. The draft remains private."
+    },
+    "includedTitle": "Proposed contents",
+    "method": "Method name, description and scope",
+    "instructions": "Structure of skill instructions and workflow launch request",
+    "status": "Untested status and known limits",
+    "excludedTitle": "Excluded from default sharing contents",
+    "excluded": "The source PDF, attached code, research data and existing result files are not included in the proposed contents.",
+    "reviewOnly": "This screen only reviews sharing contents. Nothing is published or sent to others."
+  },
+  "dialog": { "close": "Close preview" }
+}
