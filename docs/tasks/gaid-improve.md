@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T07:08:36Z
+updated: 2026-10-15T07:16:12Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"f7b1833c-ee21-47b2-a47b-733efe41ebb6","pid":862022,"provider":"codex","session":"01a13e25-78e0-77d0-977c-0bc65868bd1b","start":"51000600","token":"6331bb98ad7a5d6a212beb6348c7759bb7f33b032b95f02ab23b0254d2b27553"}
 branch: task/gaid-improve
 target: main
@@ -83,6 +83,7 @@ User feedback (verbatim):
 Treat the Spatial-PU skill as a withheld evaluation reference, not generator input or prior researcher knowledge. Source-first journey: provided PDF/URL/materials → original-source viewer and recorded analysis → grounded method/figure findings → consequential questions → compatible skill/recipe draft → GAID trial/revision/use and optional hub sharing. Inspect actual K-Dense skills and BYOK runtime contracts before revising designs. NotebookLM informs source-processing flow; do not claim an API integration or equal feature set.
 
 ## Current state
+- Source-first public research job started: `job-geoaidesk-gaid-improve-2`, receipt `/home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json`, Oracle follow-up session `gaid-skill-hub-task-https`, requested xhigh. Await relay; no polling/restart. Local audits and source-state/runtime handoff design are integrated; await this research result before rendering the corrected images.
 - User correction supersedes the initial figure-first A/B/C compositions. All five imagegen calls (three initial, two bounded edits) completed; no generation is running and none is approved. Originals/prompts stay external at `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`; do not publish these as the current review choice or repeat their generation.
 - Current work: source-first authoring design with the existing PU skill withheld. All three read-only correction audits completed; parent integrates compatible output contracts and revised researcher screens. Original pilot material discovery is complete; no new paper-selection question or scientific re-execution is needed.
 - Material distinction verified: published study uses 5 km / 70,200 cells / P818 and 50 km CV blocks; Atlas's `yilgarn-40km` showcase uses 40 km aggregate cells (1,122 total, P244/U878), not the paper result. Neither supplies automatic defaults for new data.
@@ -102,8 +103,8 @@ Treat the Spatial-PU skill as a withheld evaluation reference, not generator inp
 - Hub-verified external state, not rechecked remotely: the new skill_hub GAID install pages and app release `geo-v0.1.0` await institutional brand approval; the app release is a draft. Review instance `gaid-review`: `~/deploy/geoaidesk`, ports 3000/18000, data `~/.geoaidesk`, `kigam-qwen` configured with low/medium/xhigh. PC71 access: `ssh -N -L 3000:localhost:3000 -L 18000:localhost:18000 pc74`. It remains read-only to this writer; the hub owns updates.
 - Safe re-verification: `git fetch origin main`; `git log -1 origin/main`; `git diff --name-only origin/main`; `git -C /home/seongin3/deploy/geoaidesk rev-parse HEAD`; reread the named reports, `geo/compatibility.json`, `docs/geo/`, and `docs/open-items/` (including closed decisions). Do not restart services or repeat recorded jobs.
 ## Next steps
-1. Local source-first audits are complete. Run the queued public-source NotebookLM/K-Dense follow-up after this checkpoint, then integrate it with exact pinned-code evidence. Keep the existing PU skill out of authoring inputs.
-2. Define original-source, analysis, clarification, generated-artifact and GAID trial states; revise the canonical report and image-first composition brief. Initial A/B/C are superseded, not choices awaiting approval.
+1. Local source-first audits are complete. Integrate the recorded NotebookLM/K-Dense public-source follow-up when it completes with exact pinned-code evidence. Keep the existing PU skill out of authoring inputs.
+2. Source states, generated-artifact/runtime contracts and private-trial handoff are now documented in the canonical report (§§3.8–3.11) and surface brief. Incorporate verified public findings into those documents; initial A/B/C remain superseded, not choices awaiting approval.
 3. Create source-first images grounded in the settled contracts, then obtain the user's composition choice before functional code, consistent with the user's image-first sequence. No full retraining is authorized by this design step.
 4. Once implementation scope/interfaces are settled, use isolated CLI child writer units for independent packages, route skill_hub implementation to its hub, and run `scripts/check` for code changes. Do not close this standing discussion unit with `task finish` yet.
 ## Failed approaches
@@ -130,6 +131,8 @@ Treat the Spatial-PU skill as a withheld evaluation reference, not generator inp
 - Correction-phase orchestration: sequentially settle source facts and actual output formats before new visual generation. Independent readers: `/root/workflow_audit` owns BYOK/K-Dense mechanism evidence, `/root/baseline_reader` owns GAID PDF/source states, `/root/skillhub_audit` owns hub authoring/package evidence. All read-only, no owned Git files. Parent owns task/product/surface brief/canonical report and integration. No child writers or analysis runs.
 - Correction audit results: upstream BYOK workflows are bundled prompt templates; skills are Pi instruction/file packages. `geo-start/v1` requires existing pinned workflow/skill IDs and cannot create a new method. Existing skill preview/install and explicit invocation are reusable; new local method registration is required for a workflow card. GAID PDF viewer is reusable, but durable page/figure extraction is missing; skill_hub attachments explicitly reject PDF. Local K-Dense markitdown/scientific-writing patterns are available but absent from the 13-skill runtime catalogue. Hub contribution backend is disabled and skill submission does not update the workflow registry.
 - Research launch precondition: `task job run` refused dirty source before creating a job; checkpoint reviewed documents, then create the first source-first research job. This was not a job stopped before start (no receipt); do not use a fabricated resume receipt. Accidental `oracle-web --help` queued behind another unit's request and was terminated without a prompt; no shared browser/research process was changed.
+- Source-first report/brief consistency check by `/root/workflow_audit`: no material current-capability or compatibility contradiction. No code/tests or scientific jobs run. Humanizer file-mode applied to new Korean report prose (§1/K1/K3); numeric tokens and link targets unchanged. Registry remains `review`, not adopted. Original author manuscript page 1 was rendered read-only with Poppler (36-page R3 PDF) for a future original-document-viewer reference; no automatic application extraction was claimed.
+- Updated source-first review copy: `/home/seongin3/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-15-gaid-researcher-ecosystem/index.md`; one file copied. CLI again reports desktop-app sync ownership and inactive `obsidian-sync-cmds-main.service`; other-device delivery unverified. Only recorded public research job 2 remains to await; no periodic checks.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -144,6 +147,7 @@ The initial orientation needed no report; the later ecosystem-design request sup
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T062040.069187Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-improve-20261015T070851.289812Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

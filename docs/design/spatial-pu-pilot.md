@@ -1,66 +1,88 @@
-# Spatial PU pilot surface brief
+# Spatial PU source-first authoring pilot
 
-Status: initial three compositions superseded by the user's source-first correction. No comp approved and no product implementation yet.
+Status: source-first design in progress. Image-first delivery remains selected; no composition is approved and no product code is implemented.
 
-## Source-first correction (2026-10-15; supersedes the initial surface below)
+## User-confirmed scenario
 
-Assume no Spatial-PU skill exists. The user supplies a PDF or paper URL and optional code, data and prior results. The system must ingest and analyze those sources, show the original PDF and source-linked analysis/figures, clarify consequential missing conditions, then generate a skill and workflow recipe compatible with the actual K-Dense/BYOK mechanisms. GAID must connect this authoring state to setup, trial, results and later sharing. NotebookLM is a reference for the source-to-analysis-to-artifact journey, not an implementation dependency.
+Assume no Spatial-PU skill exists. The researcher provides a PDF or paper URL and optional code, data and previous results, then collaborates with the agent to create a reusable skill and workflow recipe. The existing `kigam/spatial-pu-workflow` is a withheld comparison reference after generation, not generator input or prior researcher knowledge. Primary entry is institutional web, with optional local execution.
 
-The already-created Spatial-PU skill is withheld from generation and used only as a comparison reference after a draft exists. Previously inspected content informs evaluation risks, not claims about what an unimplemented authoring service already extracted. Local source paths found by the agent are not silently preloaded user uploads.
+Pilot paper: DOI `10.1007/s11053-026-10778-w`. Discovered author R3 material is not a verified publisher PDF. Local source files are not silently preloaded user uploads. A live pilot must record the actual supplied source set before extracting content.
 
-The initial A/B/C images began too late: they prominently displayed a preselected paper figure and a pre-populated method without showing how an ordinary PDF/URL upload becomes those artifacts. They are external design history only, not the current review choice or a selected UI. Preserve reusable shell/typography findings, but settle source states and output contracts before new comps. Current read-only packages inspect GAID PDF/source processing, K-Dense/BYOK runtime formats and skill_hub authoring/export. Parent owns revised flow and image design; no child writers are needed for these audits.
+NotebookLM informs source handling and source-grounded artifact creation; it is not an execution dependency or a claim of equivalent functionality. Public-source research is running under job `job-geoaidesk-gaid-improve-2`.
 
-## Initial surface exploration (superseded)
+## Existing mechanisms that constrain the design
 
-## Confirmed product context
+| Object | Current behavior | Design consequence |
+|---|---|---|
+| BYOK workflow | Bundled prompt, placeholders and file references sent to the active chat | A generated workflow may be prompt-led; do not depict a machine-enforced DAG without implementing one. There is no dynamic stock-workflow CRUD endpoint. |
+| Pi skill | `SKILL.md` with trigger description and optional scripts, references, assets | Produce real files with usable relative paths and invocation, not just a card or summary. Scripts run only when invoked. |
+| Prompt template | Project/user Markdown expanded into a request | A compatible reusable launch request can accompany the new skill. |
+| `geo-start/v1` | Preset referencing known pinned workflow/skill IDs | Cannot introduce a new method. Add local-method registration without changing the meaning of old presets. |
+| Hub contribution | Generated `SKILL.md`, `atlas.yaml`, `LICENSE` and full file set; dormant service owns PR/checks | The system can serialize files without asking researchers for YAML/Git. Skill submission does not currently update the workflow registry. |
 
-- User selected the existing `kigam/spatial-pu-workflow` skill and their paper DOI `10.1007/s11053-026-10778-w`.
-- Primary entry: institutional web; optional local execution.
-- User explicitly chose image-first on 2026-10-15. `.impeccable/config.json` records `buildPath: comp`.
-- Mode: Operate for method coauthoring, Read for the source/result context. Preserve current GAID identity, not its cramped layout.
+Current GAID supports upload, PDF viewing/annotations, structured interview, local skill preview/install/invocation, notebook and typed results. It lacks durable source extraction and source-to-method authoring objects. skill_hub runtime rejects PDFs. Locally available K-Dense `markitdown` and `scientific-writing` offer extraction/evidence patterns but are not selected in GAID's 13-skill catalogue. MarkItDown's conversion receipt does not provide reliable page-coordinate/figure anchors.
 
-## Visual authority and references
+## End-to-end researcher journey
 
-Existing GAID `web/components.json`: shadcn new-york, neutral base, Lucide, CSS tokens. Existing `web/src/app/globals.css`: white canvas, slate-50 secondary surface, zinc borders, blue `#1f5eff` primary, 10 px base radius, Pretendard Korean UI font. Preserve brand, palette and component vocabulary; enlarge reading type and reduce exposed detail.
+1. **Add sources.** Upload PDF or paste URL/DOI. Add code/data/prior results when available; enter an optional short reuse goal. Do not require skill names, stages, YAML, model choices or a full questionnaire.
+2. **Open and analyze sources.** Retain the original when available. Show the real PDF viewer first, alongside received files and actual access/extraction status. For a web page or metadata-only result, show that source kind, not a simulated PDF. Start grounded analysis after source acquisition; automatic analysis may begin on successful acquisition, while missing access stays explicit.
+3. **Understand the proposed method.** Show research question, input/assumptions, methods, relevant figures and limitations derived from the supplied set. A selected finding opens its actual PDF page/section or code location. Display figures only after real extraction/selection; use original page crops or extracted images, never generated scientific imagery.
+4. **Resolve necessary gaps.** Ask contextual questions only when they affect method scope, validity, implementation or reuse. Reuse source-known facts. Separate paper reproduction from new-data generalization. Unanswered consequential choices remain unresolved; timeout is not an answer.
+5. **Create reusable artifacts.** Produce an agent skill and its workflow launch request from a shared method draft. The user reviews ordinary method language, required inputs, expected outputs and remaining work. Code/metadata files remain available in a secondary technical view. If code is missing, expose descriptive-only versus implemented/untested status and offer code development as a visible next step.
+6. **Try in GAID and revise.** Save privately and install/resolve the draft package using existing install semantics. Trial uses a fixed package/input revision, actual code and recorded checks. Publish is not a prerequisite for private trial. A failed run returns to the linked method draft without discarding source findings or answers.
+7. **Use and share.** A new local method card starts setup with the generated skill. Research notes emphasize conclusions, figures, limitations and next steps; provenance stays in details. Optional hub submission exports the portable method, not private PDF/data by default. Hub publication/registry updates are a distinct lifecycle.
 
-Identity reference: `reports/2026-10-13-gaid-ui-locale/figures/01-workflows-ko.png`. Carry chrome/palette/type vocabulary only, not its multi-pane density or tiny text.
+## Visible states and evidence
 
-Researched structural references: 21st AI CRM record/detail sheet, shadcnblocks `application-shell17` inset navigation, Design Process Case Study phase reading, shadcn Resizable/Sheet. Dashboard30 project cards are optional secondary context, not the primary result composition. UUPM supports search/hierarchy and contextual validation but its portfolio/FAQ layouts were rejected. Taste is not applied to the multi-step editor; impeccable Operate/Read principles govern it.
+| State | What may appear | What must not be implied |
+|---|---|---|
+| Source received | Supplied filename/URL and upload/access status | Paper understood or figures selected |
+| Original available | Real retained PDF, page navigation or fetched web text | Publisher PDF if only author manuscript; full text if only abstract |
+| Extracting / partial | Actual task name, available page coverage, gaps | Invented percent complete or complete OCR of unreadable pages |
+| Analysis ready | Source-linked findings and extracted figure/caption references | New scientific computation or unobserved results |
+| Clarification | Contextual missing decision, source-known values alongside | Every paper parameter being a universal default |
+| Draft created | Actual package/launch artifacts and unresolved limitations | Installed, executed, validated or published merely because generated |
+| Trial | Observed run state, outputs and comparison against declared criteria | Scientific review implied by exit 0 |
+| Private saved / shared | Exact selected version and scope | Raw sources automatically public |
 
-## Requested surface
+## Proposed minimal application records
 
-One desktop first viewport of “논문과 코드로 방법 만들기”, using the actual Spatial PU paper, original code identity and existing Figure 6 as source material. The researcher reads a source-linked method draft and identifies the few decisions needed before new-data application. Primary action: save the method draft; no analysis is started by a comp.
+These names describe interfaces for discussion, not shipped schemas.
 
-Scientific content roles:
+- `SourceDocument`: source type, acquisition status, retained project path or URL snapshot, document kind and revision.
+- `ExtractionRecord`: source revision, parser/version, actual covered pages, text/figure outputs, partial/error reasons.
+- `GroundedFinding`: source page/section/code anchors, finding kind, source statement versus agent interpretation, unresolved gaps. Figure references retain captions and actual page/region anchors.
+- `MethodDraft`: selected source findings, researcher answers, scope, input/choice/output contract, instruction/code draft and revisions.
+- `MethodPackage`: Pi-compatible skill tree, environment requirements, launch request, evidence references and explicit implementation/testing state. Hub adapter adds Atlas metadata and publication fields.
+- `LocalMethod`: app-owned identity for a new private method card; resolves local package version and launch contract without requiring a pinned catalogue workflow ID.
+- `ValidationAttempt`: package/input revision, actual environment, invoked code, outputs/checks and limitations. Reuse existing runs/provenance/results rather than inventing success from model prose.
 
-- Published study: 5 km grid, 70,200 cells, 818 positive cells; 50 km evaluation blocks. Display only as source-study facts, never prefilled universal defaults.
-- Local author R3 manuscript is not a verified publisher PDF. Use “원고” when showing that document.
-- Stored paper-related Figure 6 provides real visual material, not a fresh run result. AI-rendered thumbnail is layout reference, not a numerically authoritative figure.
-- The 40 km / 1,122 aggregate Atlas example is a separate case; keep it out of the primary paper-result panel.
-- General recipe and frozen-paper reproduction remain separate. New data has not run; no elapsed time, progress percent, passed-test count or invented model metric.
+Source/private-workspace storage and method-distribution storage are separate. Derived output changes must invalidate affected method findings/checks, not silently rewrite original evidence.
 
-## Structural candidates, ranked before composition selection
+## Pilot evaluation without the pre-existing skill
 
-1. Source-method split: source paper/code/result viewer left, source-linked editable method right; small unresolved-decision footer.
-2. Result-led reading page: stored paper result leads, current conclusion adjacent, method extraction below and source sheet on demand.
-3. Focused guide: one scientific decision at a time, short stage rail and source proof alongside.
-4. Stage master-detail: compact M0–M7 navigation, one readable active method stage, source/context side sheet.
-5. Evidence-to-method canvas: large source/evidence strip above a horizontal sequence of grouped scientific stages; active decision beside the selected stage.
-6. Editable method document: single-column method narrative with inline source anchors and a question gutter.
-7. Method library to draft: method/source list with selected draft detail, useful for comparative authoring but more complex for a first method.
+Authoring inputs may include the supplied paper, original research repository snapshot, original data documentation and previous output files. Exclude the existing skill's `SKILL.md`, generalized helpers, Atlas workflow description, generated reference guides and evaluation findings from the generation context. Where original code is archived inside the skill tree, copy only verified original upstream files into the isolated input set; do not expose the containing skill directory.
 
-Impeccable surface seed `1620ebf2` dealt 5, 1, 4. Three comps will therefore compare evidence-to-method canvas, source-method split and stage master-detail at equal fidelity. User can select/combine/revise them. No generated comp is approved merely by being shown.
+Freeze the generated package before comparison. Evaluate evidence alignment, unresolved conditions, valid installation/invocation and useful outputs, not textual similarity to the old skill. The reference skill itself is not infallible. Compare paper-specific reproduction and new-data generalization separately. An independent transfer dataset is not selected; do not rename the 40-km aggregate showcase as independent transfer evidence.
 
-## Artifact handling
+Published-study facts: 5-km cells and 50-km evaluation blocks. The historical 40-km/1,122-cell Atlas example is separate. These facts belong to paper/source findings, not the intake screen and not new-data defaults.
 
-Computed originals, prompts and sidecars live outside Git under `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`, following repository output policy. Review-sized copies go in the canonical report's figures directory and are registered as review. No paper/source data or licensed template source is republished by this prototype.
+## Image-first deliverable
 
-The installed impeccable command help executed a surface roll instead of displaying help; its build-phase CLI advertises `start --comp`, while the skill reference requests `start --direction --kind`. Do not invent successful phase-state execution or repair the shared skill. This is composition-only design; preserve decisions/provenance here and in external sidecars. After comp selection, inspect the installed build-phase contract before starting product code.
+The next image round must communicate the sequence, not only its polished endpoint. Preserve GAID white/slate, blue `#1f5eff`, Pretendard, shadcn new-york and Lucide character; reduce exposed detail and enlarge reading type. No new brand choice is required.
 
-## Acceptance at composition stage
+Required states across the visual set:
 
-- A noncoding researcher can locate the method draft, see which statements came from the source, and identify the next consequential decision.
-- Original-paper facts are visibly different from new-data settings and from an executed result.
-- The source figure is meaningful content, not decorative background; no invented scientific performance.
-- The primary task and next action are readable at ordinary desktop size, with no KPI wall, chat-dominant layout or exposed hashes.
-- These images do not demonstrate responsiveness, accessibility or interaction. Those are checked during semantic implementation after selection.
+- Source intake/original PDF: upload or URL, source list, actual document viewer, no pre-existing PU method card or map hero.
+- Grounded analysis and focused questions: selected PDF page beside a source-linked finding; relevant figure only as a page-linked extracted derivative after analysis.
+- Generated skill/workflow and GAID handoff: readable method draft, actual output types, private trial action and untested state, optional sharing later.
+
+Template references retained: 21st AI CRM detail sheet, shadcnblocks `application-shell17` navigation, Design Process Case Study reading sequence and shadcn Resizable/Sheet. UUPM's contextual input validation and readable hierarchy remain useful. Taste does not govern a multi-step editor. Impeccable Operate/Read principles govern these surfaces. Public NotebookLM source research will refine the flow before the next renders.
+
+## History, output handling and next integration
+
+Initial A/B/C comps were rejected in premise by the user: they showed a preselected representative map and ready-made method. Their reusable shell/typography is not approval of their flow. All five image calls completed; originals/prompts remain external under `~/data/geoaidesk/work/gaid-improve/design/spatial-pu/`. Do not publish them as current options or repeat generation. New review-sized images, when ready, belong in the canonical report and result registry; full prompts/sidecars stay external. `.impeccable/config.json` records the user's `buildPath: comp`.
+
+The installed impeccable CLI has a phase-command mismatch with its skill reference (`start --comp` versus `start --direction --kind`). No build-phase state was fabricated. Read the actual installed contract before product implementation. Project output policy overrides the skill's suggested in-repo original-image folder.
+
+Sequential decisions: source lifecycle → real output/runtime contracts → visible flow → image comparison → user composition choice → shared implementation interfaces. Parent owns this brief, task/product/report and image integration. Three native readers completed independent source/recipe/hub audits; no child writers or scientific analysis jobs were started. Once code is authorized and interfaces are fixed, split independent source-processing, local-method runtime and presentation packages into isolated CLI child writers; route hub code to its project hub.
