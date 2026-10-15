@@ -33,7 +33,7 @@ describe("PromptsPanel", () => {
     render(<PromptsPanel />);
     expect(await screen.findByText("/qc")).toBeInTheDocument();
     expect(screen.getByText("<file>")).toBeInTheDocument();
-    expect(screen.getByText("K-Dense")).toBeInTheDocument();
+    expect(screen.getByText("Source: K-Dense")).toBeInTheDocument();
     expect(screen.getByText("Also defined for all projects")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Edit qc" }));

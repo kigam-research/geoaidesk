@@ -107,6 +107,7 @@ import workflowsData from "@/data/workflows.json";
 import { useAppDefaults } from "@/lib/app-settings";
 import { WorkflowInputs, type WorkflowInputProps } from "@/components/workflow-inputs";
 import { buildWorkflowPrompt } from "@/lib/workflow-inputs";
+import { SourceBadge, UPSTREAM_APP_SOURCE } from "@/geo/attribution/source-badge";
 
 export type Workflow = {
   id: string;
@@ -423,6 +424,7 @@ export function WorkflowLaunchDialog({
             {workflowDisplayText(workflow, "name", workflow.name)}
           </DialogTitle>
           <DialogDescription>{workflowDisplayText(workflow, "description", workflow.description)}</DialogDescription>
+          <div><SourceBadge source={UPSTREAM_APP_SOURCE} /></div>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
@@ -686,8 +688,9 @@ export function WorkflowsPanel({
                       >
                         <WorkflowIcon name={w.icon} className={cn("mt-0.5 size-4 shrink-0", iconColor)} />
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-medium text-foreground">{workflowDisplayText(w, "name", w.name)}</span>
+                            <SourceBadge source={UPSTREAM_APP_SOURCE} asText />
                             {w.requiresFiles && (
                               <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-px text-[9px] font-medium text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 <DatabaseIcon className="size-2.5" />
