@@ -71,7 +71,7 @@ interface Row extends SkillInfo {
 }
 
 const ORIGIN_LABEL: Record<SkillOrigin, string> = {
-  catalogue: "K-Dense",
+  catalogue: settingsText("skills.origin_catalogue"),
   registry: settingsText("skills.installed"),
   local: settingsText("skills.local"),
 };
@@ -754,7 +754,7 @@ export function SkillsPanel() {
                   <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium">
                     <span>{r.name}</span>
                     <Badge variant="secondary" className="h-5 text-[10px]">
-                      {/* Catalogue skills from a source other than K-Dense's repo name it. */}
+                      {/* Catalogue skills from a named source other than the configured catalogue name it. */}
                       {origin === "catalogue" && r.source ? r.source : ORIGIN_LABEL[origin]}
                     </Badge>
                     {updateAvailable ? (

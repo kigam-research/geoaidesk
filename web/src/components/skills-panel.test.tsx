@@ -180,9 +180,9 @@ describe("SkillsPanel", () => {
     );
 
     render(<SkillsPanel />);
-    expect(await screen.findByText("K-Dense")).toBeInTheDocument();
+    expect(await screen.findByText("Catalogue")).toBeInTheDocument();
     expect(screen.getByText("Installed")).toBeInTheDocument();
-    expect(screen.getByText("Local")).toBeInTheDocument();
+    expect(screen.getByText("Made here")).toBeInTheDocument();
     expect(screen.getByText("vercel-labs/agent-skills")).toBeInTheDocument();
   });
 

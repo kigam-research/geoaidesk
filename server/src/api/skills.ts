@@ -77,7 +77,9 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       // Pi's `disable-model-invocation`: hidden from the model's skills index,
       // runnable only through `/skill:<name>` in the composer.
       disableModelInvocation: skill.disableModelInvocation === true,
-      origin: origins[skill.name] ?? "catalogue",
+      // No sync record: a skill the user or the AI agent wrote straight into the skill folder
+      // (gaid-qwen-authoring-trial); showing it as a catalogue skill hid who made it.
+      origin: origins[skill.name] ?? "local",
       ...(provenance?.source ? { source: provenance.source } : {}),
       ...(provenance?.ref ? { ref: provenance.ref } : {}),
     };

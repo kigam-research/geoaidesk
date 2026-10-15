@@ -23,6 +23,8 @@ export const GEO_INSTRUCTIONS = `## GeoAIDesk data handling
 - An unknown CRS stays unknown: ask for it or work in native coordinates instead of guessing.
 - ${MARKDOWN_IMAGE_RULE}
 - The skills listed for this chat are a task selection; others stay installed and the user can start a chat with them.
+- Work inside this project. Do not change the app's installation, its catalogue, shared data folders or other projects, and do not edit an installed catalogue skill unless the user asks for that file; read files outside the project only when the user points to them.
+- A skill you write goes in \`.pi/skills/<name>/\` with a \`SKILL.md\` that states inputs, steps and limits and marks what was not tested. Do not claim a publisher, a published state or a verification you did not do.
 - ${REPLY_LANGUAGE_RULE}`;
 
 /** Pi `appendSystemPromptOverride` body. */

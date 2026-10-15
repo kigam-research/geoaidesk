@@ -30,7 +30,9 @@ describe("PermissionCard", () => {
       return new Response(JSON.stringify({ ok: true }));
     });
     render(<PermissionCard item={item()} sessionId="s1" projectId="p" />);
-    expect(screen.getByText("Kady wants to run a destructive command")).toBeInTheDocument();
+    expect(screen.getByText("The AI agent wants to run a destructive command")).toBeInTheDocument();
+    // The guard's English reason is meant for the model, not repeated on the card.
+    expect(screen.queryByText("Destructive shell command: rm -rf results")).toBeNull();
     expect(screen.getByText("rm -rf results")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Allow once" }));
     await waitFor(() => expect(calls).toHaveLength(1));

@@ -20,6 +20,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import type { ProjectPaths } from "../projects.ts";
 import { getSkillOrigins } from "../agent/skills-sync.ts";
+import { listProjectSkills } from "../agent/skills.ts";
 import { geoCatalogueActive, loadGeoCatalogue, runtimeNameFor, type GeoCatalogue } from "./catalogue.ts";
 
 export type ExposureMode = "all" | "catalogue" | `workflow:${string}`;
@@ -146,8 +147,10 @@ export function runtimeSupportSkillNames(): string[] {
 }
 
 /**
- * Skill names a mode exposes. `catalogue`: every catalogue skill plus skills
- * the user installed or wrote (`registry`/`local` origin). `workflow:<id>`:
+ * Skill names a mode exposes. `catalogue`: every catalogue skill plus the
+ * project skills the user installed or wrote (`registry`/`local` origin, or no
+ * sync record at all: a skill the agent wrote into `.pi/skills/` in a chat has
+ * none, gaid-qwen-authoring-trial). `workflow:<id>`:
  * that workflow's skills. Both keep the runtime support skills.
  */
 export function exposedSkillNames(
@@ -159,8 +162,12 @@ export function exposedSkillNames(
   const names = new Set<string>(runtimeSupportSkillNames());
   if (mode === "catalogue") {
     for (const skill of catalogue?.manifest.runtimeSkills ?? []) names.add(skill.runtimeName);
-    for (const [name, origin] of Object.entries(getSkillOrigins(paths))) {
+    const origins = getSkillOrigins(paths);
+    for (const [name, origin] of Object.entries(origins)) {
       if (origin === "registry" || origin === "local") names.add(name);
+    }
+    for (const skill of listProjectSkills(paths)) {
+      if (!(skill.name in origins)) names.add(skill.name);
     }
   } else {
     const id = mode.slice("workflow:".length);

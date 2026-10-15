@@ -208,7 +208,7 @@
   "permission_card.this_request_is_no_longer_waiting_for_an_answer": "This request is no longer waiting for an answer.",
   "permission_card.couldn_t_send_your_decision_try_again": "Couldn't send your decision. Try again.",
   "permission_card.permission_needed": "Permission needed",
-  "permission_card.kady_wants_to_run_a_destructive_command": "Kady wants to run a destructive command",
+  "permission_card.kady_wants_to_run_a_destructive_command": "The AI agent wants to run a destructive command",
   "permission_card.destructive_command": "Destructive command",
   "permission_card.allowing": "Allowing…",
   "permission_card.allow_once": "Allow once",

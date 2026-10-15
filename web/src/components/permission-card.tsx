@@ -11,6 +11,7 @@ import type { ActivityItem } from "@/lib/use-agent";
 import { cn } from "@/lib/utils";
 
 const workText = geoText("work");
+const DESTRUCTIVE_REASON = /^Destructive shell command:/;
 
 /** Payload the data guard attaches to a `permission_request` frame. */
 export interface PermissionPayload {
@@ -107,7 +108,10 @@ export const PermissionCard = memo(function PermissionCard({
           </span>
         )}
       </header>
-      {payload.reason && <p className="mb-1 text-xs text-muted-foreground">{payload.reason}</p>}
+      {/* The guard's English reason ("Destructive shell command: …") is for the model; the title and command say it here. */}
+      {payload.reason && !DESTRUCTIVE_REASON.test(payload.reason) && (
+        <p className="mb-1 text-xs text-muted-foreground">{payload.reason}</p>
+      )}
       {payload.command && (
         <pre className="max-h-40 overflow-auto rounded bg-background/70 px-2 py-1.5 font-mono text-[12px] leading-snug">
           <code>{payload.command}</code>

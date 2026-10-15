@@ -386,6 +386,7 @@
   "settings.providers.disconnect_failed": "연결을 해제하지 못했습니다.",
   "settings.providers.model_providers": "모델 제공사",
   "settings.providers.loading_providers": "모델 제공사를 불러오는 중입니다.",
+  "settings.providers.models_come_from_a_server_below": "연결한 제공사·구독은 없습니다. 지금 쓰는 모델은 아래 로컬 모델 서버나 사용자 지정 모델 서버에서 옵니다.",
   "settings.providers.no_model_provider_is_connected_yet_pick": "연결한 모델 제공사가 없습니다. 아래에서 제공사를 선택하거나 로컬 모델 서버를 실행하세요.",
   "settings.providers.add_a_provider": "제공사 연결",
   "settings.providers.subscriptions_chatgpt_claude_pro_max_copilot_sign": "ChatGPT, Claude Pro/Max, Copilot 등 구독 계정은 제공사에서 로그인합니다. 다른 연결 방식은 API 키나 클라우드 인증 정보가 필요합니다. 연결한 제공사는 모델 선택 목록에 표시됩니다.",

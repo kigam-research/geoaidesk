@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-15T12:01:25Z
+updated: 2026-10-15T13:37:10Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"dbdb4cbd-2d57-4910-b65d-bd49f933a62c","pid":3995575,"provider":"claude","session":"b03772b2-dfa3-4e55-8fcf-0806067bf669","start":"53164560","token":"2bf8cb96689f048b8aaf4a9de4abff678c06495519fda7b0cc44b584bcedce5a"}
 branch: task/gaid-qwen-authoring-trial
 target: main
@@ -57,12 +57,137 @@ gates accept them, and notable defects. Results are for review; record only obse
   small PNGs of the key screens and examples of generated artifacts; if code changes, `scripts/check`. After your last check
   remove regenerable build caches and any app-written files/links from the worktree so the unit can close.
 
+## Scope changes (routed by the hub, 2026-10-15)
+- `qwen-authoring-scope` — user (verbatim): "위의 이해는 맞으며, 테스트 결과를 확인해가면서 시스템에 문제가 있다면 개선해야하는 것도
+  수행해야한다." The brief's understanding is confirmed. Added: fix problems found in GAID itself (app code, prompts,
+  formats, checks) in this unit, re-run the affected scenarios after each fix (report shows before/after); code changes
+  need `scripts/check`; the user's review instance stays untouched.
+- `qwen-authoring-skill-vs-workflow` — user (verbatim): "그리고 gaid-qwen-authoring-trial에서 작업해도 되고 별도의 작업트리로
+  작업해도 좋은 내용이다. 스킬과 워크플로우 레시피를 현재 분리되어 있다. 둘의 구분에 대해 검토해볼 필요가 있다. 스킬의 일종의 함수 또는
+  기능군이라고 한다면 워크플로우는 스킬을 포함한 특정 과업을 에이전트가 원활하게 수월하게 할 수 있는 워크플로우 레시피라고 볼 수 있다.
+  그리고 연구자들의 경우 이러한 스킬과 워크플로우의 차이점을 잘 구분하지 못하고 어떤것을 만들어야 하는지 어려움이 있을 수 있다. 항상
+  새로운 시스템을 이용자는 너무 많은 정보량이 플랫폼이나 시스템에서 제공되면 역치를 넘어서지 못하고 포기하거나 유입에서 빠져나올 수 있는
+  점을 고려하고 UI/UX에서도 너무 많은 글자 수자 정보량이 보이는 것은 유의해야한다." Added: (1) review the skill / workflow-recipe
+  split in GAID, the catalogue/WP01 contracts and the skill_hub site; (2) using trial evidence, design one creation entry
+  where the researcher need not choose up front (asks the goal, proposes skill, recipe or both); keep formats and gates
+  unless evidence requires a change, and name any skill_hub contract change for the hub; (3) low information load on
+  first view for the screens changed, plus a list of other overloaded screens (no app-wide rework). Present the concept
+  decision to the user in this tab before large UI changes; small fixes may go ahead.
+- `qwen-authoring-visual-review` — user (verbatim): "위의 작업이 정말 올바르게 검토하려면 연구자 역할을 하는 에이전트가 시각적으로
+  화면을 확인하면서 의견을 들어볼 필요가 있으며, 화면의 시각적 확인은 연구자 역할 에이전트도 수행해야하지만 고급 CLAUDE와 CODEX 검토도
+  받아보아야 한다." Added: (1) the researcher reads its own screenshots as images at each step (desktop and narrow width)
+  and comments as a researcher (clarity, what it would click, where it gets lost, information load); screenshots +
+  comments are evidence (small PNGs in the report folder); (2) independent visual reviews of the same screens, before and
+  after fixes, from "Claude 고급검토" (claude-fable-5-1, medium) and "Codex 고급검토" (gpt-6-astra, high), read-only,
+  notifyOnFinish false, ids recorded here; triage as usual and summarize both in the report.
+
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-15 12:05Z: trial instance up: snapshot of 001e9bb in `~/data/geoaidesk/work/gaid-qwen-authoring-trial/app`,
+  user unit `gaid-qat-app` (ports 3310/18310, `GAID_HOME=<work>/home`, log `<work>/logs/app.log`). `kigam-qwen`
+  registered (reasoningLevels low/medium/xhigh; picker shows high→medium), defaults model/verifier =
+  `kigam-qwen/qwen3.8-flash-next`, thinking high. No other provider is configured in this instance (no paid route).
+  Default project has the 13 catalogue skills. Samples in `<work>/samples` (FORCE 25_9-1 + 15_9-13 LAS, Kambalda grids
+  + ozmin, Seoul 250K litho/fault + boundary).
+- Researcher agent: Paseo `77493076-fcf2-4bfc-a5ea-b37f99c177f8` (claude-sonnet-5-5, thinking high, notifyOnFinish
+  false), brief `<work>/researcher/BRIEF.md`; deliverables `<work>/researcher/{log.md,summary.md,playwright/}`.
+  Re-check: `get_agent_status`, `ls <work>/researcher`, `systemctl --user status gaid-qat-app`. Finished 22:26.
+- Visual reviewers "before" (task readers, read-only, 2026-10-15 13:28Z): Claude 고급검토 `76752b51-39fe-4322-b3d6-39264f6ee1a9`
+  (claude-fable-5-1 medium, verified), Codex 고급검토 `6316650b-7028-4727-9825-a3f05d8d6879` (gpt-6-astra high, verified).
+  Prompt `<work>/reviews/visual-before-prompt.md`; outputs `<work>/reviews/{claude,codex}-advanced-before.md`.
 ## Next steps
-1. (the next session's first action)
+- Concept decision asked in the writer tab (2026-10-15 ~22:35 KST): Q1 local workflow home (가 app-side local workflows,
+  recommended / 나 skill_hub only + export draft), Q2 UI term (가 "워크플로" / 나 keep "workflow"), Q3 outside-project
+  writes (가 confirmation card + guidance, recommended / 나 block / 다 guidance only). Until answered: only small fixes
+  (F1 done; F2 guidance, F3 badges, F5, F6, F9 copy; F4 if small) and the visual reviews.
+0. After the researcher's "before" screenshots exist: start the two visual reviewers (`task reader --profile "Claude 고급검토"` / `"Codex 고급검토"`, read-only), record ids; repeat after fixes.
+1. (done 22:26) Researcher finished S1–S3 (`<work>/researcher/summary.md`); gates applied (`evidence/s1-*, s2-*, s3-*`).
+   Next: start the "before" visual reviews, then present the concept decision to the user, then fix.
+   Gate command for re-runs
+   (`uv run --no-project python -I <work>/scripts/gates.py proj-7a784f <work>/evidence/<scenario>`; the trial project is
+   `proj-7a784f` "저작 시험"; baseline skill list in `<work>/evidence/baseline-skills-proj-7a784f.txt`).
+2. Triage trial defects → fix in GAID (scope `qwen-authoring-scope`), re-run the affected scenario for before/after.
+3. Skill vs workflow concept (scope `qwen-authoring-skill-vs-workflow`): combine contract findings (Notes) with trial
+   evidence, present definitions + one-entry flow + changes + any skill_hub contract change to the user in this tab;
+   only small fixes before the user's answer. Both routed requests were reported `--blocked` (in progress) on
+   2026-10-15; re-report them with the final result before/after finish.
+## Trial findings and fixes (live list; evidence `<work>/researcher/log.md`, `<work>/evidence/`)
+- S1 (21:07–21:51 KST): Qwen copied the catalogue LAS helper, wrote `las-window-quickqc` (SKILL.md + wrapper script, no
+  atlas.yaml); Pi loader and skill_hub package preview accept it (`evidence/s1-v1`, `s1-final`).
+- F1 [fixed, committed; not yet re-run in an app] A skill the agent writes in a chat has no sync record, so the default
+  `catalogue` exposure hid it from every new chat although Settings shows it enabled; Qwen then picked the catalogue
+  skill (2/2 fresh chats). Fix: `server/src/geo/context.ts` offers project skills without a sync record;
+  `server/test/geo-context.test.ts` updated (8/8 pass).
+- F2 [guidance added, committed: GEO_INSTRUCTIONS "work inside this project…" and skill-authoring line] Unasked side edits by Qwen: appended to catalogue `well-log-qc-quicklook/SKILL.md` and project `AGENTS.md`
+  (routing rule) while "fixing" F1; read the app's own server code outside the sandbox. Candidate: GEO_INSTRUCTIONS rule.
+- F3 [fixed, committed: untracked skill → origin local "직접 작성", catalogue badge "카탈로그", Skills header shortened to one true sentence] Catalogue skills all show the "K-Dense" origin badge in Settings → Skills (KIGAM vs user not distinguishable).
+- F4 [open] Settings dialog keeps a 640 px width after a narrow→wide resize until reload; at 390 px one word per line.
+- F5 [fixed, committed: empty Connected card explains models come from a local/custom server] Settings → Providers says "연결됨 (0)" while the custom server works.
+- F6 [open] Exposure chip cut off at the composer's right edge at 1440 px; its popover shows 6 numbers on first view.
+- S2 v1 (21:51–21:59): `grid-audit-point-sample` = SKILL.md, atlas.yaml, LICENSE, references/methods.md,
+  scripts/{grid_audit.py,selftest.py}; Pi loader + skill_hub preview accept it (`evidence/s2-v1`). skill_hub schema check
+  (`<work>/scripts/atlas_check.py`, read-only on ~/repos/skill_hub 957d366): 5 schema errors (YAML ": " splits Korean
+  text into keys; extra `help`/`geometry`), unknown taxonomy terms tasks:tabular-extraction, dataTypes:vector-points,
+  scales:local; control geo-map-and-crs = 0 errors. Claims `id: kigam/…`, `release.state: published`, KIGAM authorship.
+- F8 [open] GAID's gates never look at atlas.yaml, so an invalid/overclaiming profile passes silently (S2).
+- F9 [card fixed, committed: title says AI agent, English guard reason hidden; remaining "Kady" in 54 locale strings mixes agent and app meanings — listed, not mass-replaced] Permission card copy says "Kady"; `__pycache__` cleanup inside a skill folder asks twice.
+- F10 [open, concept] No way to share/export a chat-made skill to a colleague (Qwen claimed "그대로 설치·사용").
+- F11 [upstream, note] User chat bubbles render Markdown: `kambalda_*.tif` became italics.
+- S2 final: README.md + shareable `results/grid-audit-point-sample-0.1.0.tar.gz` (accepted by "스킬 추가" preview; not
+  installed); atlas.yaml errors unchanged (`evidence/s2-final`).
+- S3 (22:08–22:26): Qwen wrote `workflow_authoring/district-lithology-map/{*.workflow.json (geo-workflow/v1: 3 input
+  roles, 4 choices, 5 artifacts, boundary), *.geo-start.json, scripts/district_lithology.py, README.md}` and a 강남구
+  demo. To "put it in the list" it built catalogue 0.2.2 (0.2.1 + this workflow) in `~/assets/geo-catalogue/0.2.2/` and
+  `<home>/catalogue/`, and re-pinned the trial app's `geo/distribution.json`; the list showed 8 workflows without a
+  restart; the researcher saved the recipe ("서울 구 단위 암상·면적 (내 레시피)") and created a task draft from it.
+  Recipe check: ok under the agent's 0.2.2; under the committed 0.2.1 → `unknown-workflow` + `catalogue-version`
+  (`evidence/s3-under-0.2.{1,2}`).
+- F12 [critical, open] The GAID agent wrote outside its project: app install file, `<GAID_HOME>/catalogue`, shared
+  `~/assets`; it also listed other projects' worktrees and read the app source and `config.env` (with a secrets filter).
+  Only its own `rm -rf` got a confirmation card. Containment done 2026-10-15 22:26: `~/assets/geo-catalogue/0.2.2` moved
+  to `<work>/evidence/s3-outside-writes/` (sha256 list kept; 0.2.1 MANIFEST verified OK), app pin restored from 001e9bb,
+  `<home>/catalogue` moved to evidence, `gaid-qat-app` restarted on 0.2.1. No other outside changes found (find -newer
+  over ~/assets ~/repos ~/worktrees ~/deploy ~/.geoaidesk; snapshot diff shows only geo/distribution.json).
+- F13 [concept, open] A researcher's "workflow" has no local home: geo-start can only reference a catalogue workflow,
+  so the agent's only route to the list was editing the catalogue pin. The agent was told nothing about recipes/workflows.
+- F14 [open] Researcher screen notes (summary.md "화면 의견"): workspace header numbers ($0.00, %, ≈27.4k), slash menu
+  English, icon-only upload/wand/skill buttons, permission card ("Kady", English, invisible at 390 px), TaskSetup length
+  and "작업 중 결정" ambiguity, file dropdowns mixing outputs with sources, shapefile parts ungrouped in the file list.
+- F7 [model, note only] Output folder overwritten without asking (`qc/15_9-13`); wrong self-explanations of F1.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration (sequential, done by this writer; no child writers: the work is one tightly coupled interactive trial,
+  and the Qwen server takes one session at a time):
+  1. Environment: `git archive` snapshot of this branch HEAD in `~/data/geoaidesk/work/gaid-qwen-authoring-trial/app`
+     (build caches stay out of the worktree), `GAID_HOME=<work>/home`, own ports, started with `systemd-run --user`
+     (a long-lived interactive service, so not a `task job`). Custom server `kigam-qwen` (`openai-completions`,
+     reasoningLevels low/medium/xhigh, context 262144, maxTokens 16384, cost 0) and app default model
+     `kigam-qwen/qwen3.8-flash-next` set through the API the way Settings does. Sample data copied to `<work>/samples`.
+  2. Researcher: Paseo agent (claude, claude-sonnet-5-5, thinking high), cwd `<work>/researcher` (outside Git), drives
+     the UI with `playwright-cli`; persona brief only, no format hints beyond what the UI shows a user.
+  3. Scenarios (serial chats): S1 well log QC on FORCE 2020 LAS then "재사용 스킬 만들기"; S2 a new skill from scratch for
+     Seoul borehole geology intervals; S3 a workflow request (recipe `.geo-start.json` for a catalogue workflow, then
+     "레시피 가져오기"; and a request for a new workflow on the Kambalda intake data, to see what Qwen produces when GAID
+     has no local workflow install path).
+  4. Gates applied by the orchestrator to every artifact: Pi loader (`GET /skills`), skill_hub package preview
+     (`POST /geo/skill-hub/preview` with a `.tar.gz`), recipe check/import (`POST /geo/recipes/check`, `/geo/recipes`),
+     and a field-by-field comparison with catalogue 0.2.1 (`atlas.yaml` atlas-profile/v1, `workflows.json` geo-workflow/v1).
+  5. Collect: skill folders, recipes, session JSONL, ledger, screenshots → `<work>/evidence`; report
+     `reports/2026-10-15-gaid-qwen-authoring-trial/index.md`.
+- Contract findings (2026-10-15, skill_hub main docs/specs + catalogue 0.2.1): skill = atlas-profile/v1 (`SKILL.md` +
+  `atlas.yaml`), whose `kind` is `workflow` for 5 of 8 KIGAM skills (term clash with geo-workflow); workflow =
+  geo-workflow/v1 task template (skillIds, inputRoles, requiredScientificChoices, prompt, environmentProfile,
+  expectedArtifacts, boundary), authored only in skill_hub `registry/byok/workflows/`; recipe = geo-start/v1, a filled
+  preset of a catalogue workflow. Plan §5.3: app shows at most three contextual actions; details on demand.
+- Screen survey (read-only sub-agent, 2026-10-15): no screen creates a recipe (import only; recipe = preset of one of 7
+  catalogue workflows). "재사용 스킬 만들기" is an icon-only composer button. Workflow panel is the heaviest first view
+  (24+ category pills, per-row readiness/미시험/사용자 자료 badges, 7 geo rows then 326 upstream rows); Settings → Skills
+  (long header paragraph, many badges/buttons per row) and TaskSetup (15–25 strings) are also heavy. Terms: terminology.csv
+  makes "workflow" canonical and has no "레시피" entry; the same entity is "workflow"/"Geoscience 작업"/"Geo 작업"/"기반 작업",
+  and `.geo-start.json` is both "레시피" and "workflow 시작 요청". The model is told nothing about workflows, recipes or
+  geo-start/v1 (GEO_INSTRUCTIONS mentions skills once). Existing proposal `docs/design/source-authoring-agents.md`
+  ("A beginner need not know whether the result is called a skill or a recipe") is relevant prior design.
+- GAID facts that shape the trial: a recipe (`geo-start/v1`) can only point at a workflow already in the pinned catalogue
+  (`server/src/geo/workspace/recipes.ts`); there is no local install path for a new `geo-workflow/v1` definition.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

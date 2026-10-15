@@ -208,7 +208,7 @@
   "permission_card.this_request_is_no_longer_waiting_for_an_answer": "더 이상 답변을 기다리지 않는 요청입니다.",
   "permission_card.couldn_t_send_your_decision_try_again": "결정을 보내지 못했습니다. 다시 시도하세요.",
   "permission_card.permission_needed": "권한 필요",
-  "permission_card.kady_wants_to_run_a_destructive_command": "Kady가 삭제 등 되돌릴 수 없는 명령을 실행하려고 합니다",
+  "permission_card.kady_wants_to_run_a_destructive_command": "AI agent가 삭제 등 되돌릴 수 없는 명령을 실행하려고 합니다",
   "permission_card.destructive_command": "삭제 등 되돌릴 수 없는 명령",
   "permission_card.allowing": "허용 중…",
   "permission_card.allow_once": "한 번 허용",
