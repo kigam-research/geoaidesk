@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:39:43Z
+updated: 2026-10-16T06:20:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -99,9 +99,6 @@ the sharing/discussion space, GAID projects are the personal research space.
   extracted copy ~/data/geoaidesk/work/gaid-hub/inputs/yilgarn-40km/), with the method's quick mode.
 
 ## Current state
-## Current state
-## Current state
-## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).
   skill_hub reference snapshot (read-only, never a runtime dependency): main 54fe4773d06fcb3d0dc36882d5cd44d9094cade5,
   ~/data/geoaidesk/work/gaid-hub/inputs/skill_hub/ (tarball sha256 cdea8d08…aa2c4, from `gh api .../tarball/<sha>`).
@@ -180,12 +177,14 @@ the sharing/discussion space, GAID projects are the personal research space.
    (old) Parent meanwhile: wire the approved screens to the contracts (hub home folders/recommended, shared entry page with
    stars/comments, register dialog → POST /geo/hub/entries, preview from real data, user name prompt, authoring
    folderId PATCH route, URL form → sources/url, visuals in MethodFlow); remove hub-design page and mock assets at the end.
-3. v5 trial running since 14:27:58 KST in "Yilgarn 40km 빠른 시험" (yilgarn-40km-2a436b), watcher b3s81slkx →
-   playwright/v5/run-*.png; variogram figure produced 14:30.
-   (old) Re-test: draft v5 (passes checks) → install into GAID project "Yilgarn 40km 빠른 시험" via input-prep with the 40 km
-   CSV, quick mode, bounded run; record reductions/outputs/time.
+3. v5 trial done (40 km grid, quick mode, project "Yilgarn 40km 빠른 시험" yilgarn-40km-2a436b): started 14:27:58,
+   finished 14:48 KST (~21 min wall, pipeline 12.3 min; slowest stage BaggingPU 11 min). Outputs: results/zone_map*.tif,
+   figures/zone_map.png, figures/capture_curve.png, results/sensitivity_table.csv, results/run_log.md (per-step reductions
+   and times). Two data-guard permission prompts allowed by the operator. Assessment saved "useful". Method defect for
+   the next revision: expected artifact names (outputs/*) differ from the actual results/ and figures/ paths.
 4. Report, scripts/check, cleanup, finish.
-Blocked: waiting for child finishes (gaid-hub--visuals: task finish running scripts/check; gaid-hub--shared: implementing) and the v5 40 km trial (watcher b3s81slkx).
+Blocked: waiting for child finishes, run serially (gaid-hub--shared: task finish with VITEST_MAX_WORKERS=1 running; then
+gaid-hub--visuals). VITEST_MAX_WORKERS=2/4 breaks backend serialization (temp-root races); use 1 or default.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
