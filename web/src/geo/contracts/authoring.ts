@@ -567,6 +567,9 @@ export interface OperationBody {
   opId: string;
   /** `revise` only: observations the revision must address (kept verbatim). */
   feedback?: string;
+  /** `analyze` only: the researcher's goal and target, saved on the project before reading. */
+  goal?: string;
+  target?: "skill" | "workflow" | "auto";
   /** Override the project's model for this call. */
   model?: string;
   thinkingLevel?: "low" | "medium" | "high" | "xhigh";

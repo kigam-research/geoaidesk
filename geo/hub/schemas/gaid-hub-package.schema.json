@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kigam-research.github.io/skill-atlas/schemas/gaid-hub-package.schema.json",
+  "title": "GAID hub package descriptor (GET /api/gaid/packages/<owner>/<slug>/<revision>); docs/specs/gaid-method-package.md",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "methodId",
+    "revision",
+    "version",
+    "lifecycle",
+    "implementation",
+    "title",
+    "sha256",
+    "size",
+    "packageDigest",
+    "packageUrl",
+    "manifestUrl",
+    "pageUrl",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "gaid-hub-package/v1"
+    },
+    "methodId": {
+      "$ref": "atlas-profile.schema.json#/$defs/atlasId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version": {
+      "$ref": "atlas-profile.schema.json#/$defs/semver"
+    },
+    "lifecycle": {
+      "enum": [
+        "draft",
+        "submitted",
+        "published"
+      ]
+    },
+    "implementation": {
+      "enum": [
+        "descriptive",
+        "implemented"
+      ]
+    },
+    "title": {
+      "$ref": "gaid-method.schema.json#/$defs/text"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20971520
+    },
+    "packageDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "packageUrl": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifestUrl": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pageUrl": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expiresAt": {
+      "type": "string"
+    }
+  }
+}

@@ -49,7 +49,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -246,7 +246,7 @@
       "path": "web/src/components/project-view.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link; gaid-hub: Projects/GAID hub header switch and the GAID hub entry card (optional onOpenHub prop)"
     },
     {
       "path": "web/src/components/sandbox-panel.tsx",

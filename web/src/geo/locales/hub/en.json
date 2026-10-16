@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "projects": "Projects",
+    "hub": "GAID hub",
+    "label": "GAID screens"
+  },
+  "entry": {
+    "title": "GAID hub",
+    "body": "Turn papers and code into a skill or Workflow and try it in a project.",
+    "open": "Open GAID hub"
+  },
+  "home": {
+    "title": "GAID hub",
+    "body": "Turn papers and code into a skill or Workflow.",
+    "new": "Create method",
+    "empty": "No methods yet. Upload a paper PDF or code to start.",
+    "loading": "Reading the list.",
+    "error": "Could not read the list: {detail}",
+    "updated": "Updated {when}",
+    "open": "Open {title}",
+    "back": "Hub list"
+  },
+  "stage": {
+    "sources": "Sources received",
+    "reading": "Reading sources",
+    "questions": "{count, plural, one {# question} other {# questions}}",
+    "drafting": "Drafting",
+    "draft": "Draft",
+    "package": "Ready to try"
+  },
+  "steps": {
+    "label": "Steps",
+    "sources": "Sources",
+    "questions": "Questions",
+    "draft": "Draft",
+    "trial": "Trial"
+  },
+  "sources": {
+    "title": "Upload sources",
+    "drop": "Drop a paper PDF or a code archive (.zip, .tar.gz).",
+    "pick": "Choose files",
+    "goal": "What to make",
+    "goalPlaceholder": "e.g. an exploration method for grid data from another region",
+    "target": "Kind",
+    "targetAuto": "Agent proposes",
+    "targetSkill": "Skill",
+    "targetWorkflow": "Workflow",
+    "start": "Read sources and ask questions",
+    "added": "{name} · {pages} pages",
+    "addedCode": "{name} · {count} files",
+    "addedPlain": "{name}",
+    "remove": "Remove {name}",
+    "needSource": "Upload at least one source.",
+    "uploading": "Uploading {name}.",
+    "noPdfText": "The PDF page-text tool is missing, so PDF content cannot be read. You can continue with code or notes."
+  },
+  "reading": {
+    "title": "Reading sources",
+    "elapsed": "{minutes} min {seconds} s elapsed",
+    "received": "{count, plural, one {# source} other {# sources}} received",
+    "pages": "Read text of {pages} PDF pages",
+    "files": "Checked {count} code files",
+    "analysis": "Finding the method and missing decisions",
+    "note": "This usually takes a few minutes. It continues if you close the screen.",
+    "failed": "Could not analyze the sources. Run it again.",
+    "interrupted": "The app restarted and the analysis stopped. Run it again.",
+    "retry": "Run analysis again"
+  },
+  "questions": {
+    "title": "Answer questions",
+    "progress": "{answered}/{total} answered",
+    "tab": "Question {n}",
+    "recommended": "Recommended",
+    "other": "Other",
+    "otherPlaceholder": "Write a different answer.",
+    "defer": "Decide later",
+    "deferred": "Decide later",
+    "why": "Why this matters",
+    "evidence": "Show evidence",
+    "page": "p. {page}",
+    "prev": "Previous question",
+    "next": "Next question",
+    "review": "Review answers",
+    "reviewTitle": "Review answers",
+    "reviewBody": "All answers are applied together to create the draft.",
+    "unanswered": "Not answered",
+    "edit": "Edit answer {n}",
+    "apply": "Apply answers and create draft",
+    "needAll": "{count, plural, one {# question has} other {# questions have}} no answer. Answer or choose Decide later."
+  },
+  "drafting": {
+    "title": "Creating the draft",
+    "note": "Applying {count} answers. This usually takes a few minutes."
+  },
+  "draft": {
+    "private": "Private draft",
+    "untested": "Untested",
+    "tested": "{count, plural, one {# trial} other {# trials}}",
+    "revision": "Revision {n}",
+    "flow": "Method flow",
+    "you": "You decide",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "limits": "Limits",
+    "stepDetail": "Step: {label}",
+    "checks": "Checks",
+    "close": "Close",
+    "files": "Show generated files",
+    "skill": "Skill",
+    "workflow": "Workflow",
+    "checkOk": "Format check passed",
+    "checkFail": "{count, plural, one {# issue} other {# issues}} to fix",
+    "checkFix": "Show issues",
+    "feedback": "Request changes",
+    "feedbackPlaceholder": "Describe what to change, e.g. compute the variogram on at most 10,000 cells",
+    "feedbackSend": "Revise draft"
+  },
+  "trial": {
+    "title": "Try in a project",
+    "body": "Install the draft into a project and open the Workflow start settings.",
+    "project": "Project",
+    "consent": "I understand the draft skill can run code in the project.",
+    "install": "Install and open start settings",
+    "installing": "Installing.",
+    "installed": "Installed in {project}",
+    "openAgain": "Open start settings again",
+    "notReady": "Fix the issues to try the draft."
+  },
+  "detail": {
+    "show": "Show agent record",
+    "title": "Agent record",
+    "model": "Model",
+    "attempts": "{count, plural, one {# run} other {# runs}}",
+    "outcome": "{op} · {outcome}"
+  }
+}

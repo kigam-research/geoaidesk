@@ -1,0 +1,578 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kigam-research.github.io/skill-atlas/schemas/gaid-method.schema.json",
+  "title": "GAID hub method manifest (<slug>/gaid-method.json); docs/specs/gaid-method-package.md",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "methodId",
+    "revision",
+    "version",
+    "lifecycle",
+    "implementation",
+    "title",
+    "summary",
+    "sources",
+    "workflows",
+    "recipes",
+    "checks",
+    "provenance",
+    "files",
+    "packageDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "gaid-method/v1"
+    },
+    "methodId": {
+      "$ref": "atlas-profile.schema.json#/$defs/atlasId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version": {
+      "$ref": "atlas-profile.schema.json#/$defs/semver"
+    },
+    "lifecycle": {
+      "enum": [
+        "draft",
+        "submitted",
+        "published"
+      ]
+    },
+    "implementation": {
+      "enum": [
+        "descriptive",
+        "implemented"
+      ]
+    },
+    "codeOrigin": {
+      "enum": [
+        "supplied",
+        "generated"
+      ]
+    },
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "summary": {
+      "$ref": "#/$defs/text"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "doi",
+              "url",
+              "file"
+            ]
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "documentKind": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/workflow"
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "workflowId",
+          "title",
+          "choices",
+          "unresolvedChoices"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "atlas-profile.schema.json#/$defs/slug"
+          },
+          "workflowId": {
+            "$ref": "atlas-profile.schema.json#/$defs/slug"
+          },
+          "title": {
+            "$ref": "#/$defs/text"
+          },
+          "choices": {
+            "type": "object",
+            "propertyNames": {
+              "$ref": "atlas-profile.schema.json#/$defs/localId"
+            },
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "unresolvedChoices": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "atlas-profile.schema.json#/$defs/localId"
+            }
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "passed",
+        "checker",
+        "checkedAt",
+        "items",
+        "warnings"
+      ],
+      "properties": {
+        "passed": {
+          "const": true
+        },
+        "checker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checkedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "schema",
+                  "atlas",
+                  "taxonomy",
+                  "portability",
+                  "workflow",
+                  "claims"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "pass",
+                  "warn"
+                ]
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "path",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hub",
+        "decisions",
+        "openQuestions",
+        "attempts"
+      ],
+      "properties": {
+        "hub": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "projectId",
+            "draftRevision"
+          ],
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "draftRevision": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "decisions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "openQuestions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "route",
+              "model",
+              "at",
+              "outcome"
+            ],
+            "properties": {
+              "route": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "size"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "atlas-profile.schema.json#/$defs/relPath"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "packageDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ko"
+      ],
+      "properties": {
+        "ko": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "localSkill": {
+      "type": "string",
+      "pattern": "^local:[a-z0-9][a-z0-9-]*$",
+      "maxLength": 70
+    },
+    "workflow": {
+      "title": "Local Workflow (geo-workflow/v1 fields with the gaid-method/v1 relaxations)",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "description",
+        "disciplines",
+        "inputRoles",
+        "requiredScientificChoices",
+        "prompt",
+        "skillIds",
+        "environmentProfile",
+        "expectedArtifacts",
+        "boundary",
+        "exampleCaseIds"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "geo-workflow/v1"
+        },
+        "id": {
+          "$ref": "atlas-profile.schema.json#/$defs/slug"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        },
+        "disciplines": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "atlas-profile.schema.json#/$defs/slug"
+          }
+        },
+        "inputRoles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "formats",
+              "required"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "atlas-profile.schema.json#/$defs/localId"
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              },
+              "formats": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "atlas-profile.schema.json#/$defs/slug"
+                }
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "requiredWhen": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        },
+        "requiredScientificChoices": {
+          "description": "Choices the researcher must make before results are valid; their ids are the keys of a geo-start recipe's choices/unresolvedChoices.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "why"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "atlas-profile.schema.json#/$defs/localId"
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              },
+              "why": {
+                "$ref": "#/$defs/text"
+              },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "atlas-profile.schema.json#/$defs/localId"
+                }
+              },
+              "requiredWhen": {
+                "$ref": "#/$defs/text"
+              },
+              "optionLabels": {
+                "description": "Display labels of options, keyed by option id (additive).",
+                "type": "object",
+                "propertyNames": {
+                  "$ref": "atlas-profile.schema.json#/$defs/localId"
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/text"
+                }
+              }
+            }
+          }
+        },
+        "prompt": {
+          "description": "Natural-language task prompt; skill and environment binding stay in skillIds/environmentProfile, never in this text.",
+          "$ref": "#/$defs/text"
+        },
+        "skillIds": {
+          "description": "Primary first; local:<slug> names this package's skill, other entries are catalogue Atlas ids.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "atlas-profile.schema.json#/$defs/atlasId"
+              },
+              {
+                "$ref": "#/$defs/localSkill"
+              }
+            ]
+          }
+        },
+        "environmentProfile": {
+          "description": "A catalogue environment id (geo-core, geo-gis, geo-mpm, geo-acquisition, geo-report in catalogue 0.2.1).",
+          "$ref": "atlas-profile.schema.json#/$defs/slug"
+        },
+        "expectedArtifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "required"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "atlas-profile.schema.json#/$defs/localId"
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              },
+              "skill": {
+                "anyOf": [
+                  {
+                    "$ref": "atlas-profile.schema.json#/$defs/atlasId"
+                  },
+                  {
+                    "$ref": "#/$defs/localSkill"
+                  }
+                ]
+              },
+              "output": {
+                "description": "Output port id in that skill's Atlas profile (outputs[].id).",
+                "$ref": "atlas-profile.schema.json#/$defs/localId"
+              },
+              "files": {
+                "description": "File names the skill's helper writes for this artifact, when it has a helper.",
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "requiredWhen": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        },
+        "boundary": {
+          "description": "What the result does not claim (shown with the workflow).",
+          "$ref": "#/$defs/text"
+        },
+        "exampleCaseIds": {
+          "description": "Atlas case ids of the listed skills; their files ship in the examples archive.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "atlas-profile.schema.json#/$defs/localId"
+          }
+        }
+      }
+    }
+  }
+}

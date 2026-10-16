@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kigam-research.github.io/skill-atlas/schemas/atlas-profile.schema.json",
+  "title": "Geo Skill Atlas profile (atlas-profile/v1)",
+  "description": "Typed human explanation of one skill revision. Normative form of AtlasProfile in web/shared/atlas/types.ts. Cross-reference rules (taxonomy ids, graph endpoints, case ids, package correspondence) are checked by the compiler, not here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "source",
+    "release",
+    "kind",
+    "title",
+    "tagline",
+    "summary",
+    "taxonomy",
+    "procedure",
+    "outputs",
+    "limitations",
+    "credits",
+    "licenses"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "atlas-profile/v1" },
+    "id": { "$ref": "#/$defs/atlasId" },
+    "legacyId": { "$ref": "#/$defs/slug" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": { "enum": ["owned", "import"] },
+        "path": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "upstreamVersion": { "type": "string" }
+      },
+      "if": { "properties": { "kind": { "const": "import" } } },
+      "then": { "required": ["repository", "commit"] }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atlasVersion", "state"],
+      "properties": {
+        "atlasVersion": { "$ref": "#/$defs/semver" },
+        "state": { "enum": ["draft", "submitted", "published", "deprecated", "superseded"] },
+        "date": { "$ref": "#/$defs/date" },
+        "changes": { "$ref": "#/$defs/localized" }
+      }
+    },
+    "kind": { "enum": ["workflow", "package-guide", "data-access", "reporting", "foundation"] },
+    "title": { "$ref": "#/$defs/localized" },
+    "tagline": { "$ref": "#/$defs/localized" },
+    "summary": { "$ref": "#/$defs/localized" },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "roles": { "type": "array", "items": { "$ref": "#/$defs/localized" } },
+        "priorKnowledge": { "$ref": "#/$defs/localized" }
+      }
+    },
+    "taxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disciplines", "tasks"],
+      "properties": {
+        "disciplines": { "$ref": "#/$defs/idList1" },
+        "tasks": { "$ref": "#/$defs/idList1" },
+        "methods": { "$ref": "#/$defs/idList" },
+        "dataTypes": { "$ref": "#/$defs/idList" },
+        "formats": { "$ref": "#/$defs/idList" },
+        "scales": { "$ref": "#/$defs/idList" },
+        "regions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "applicability": { "$ref": "#/$defs/localized" },
+            "examples": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "keywords": { "type": "array", "items": { "$ref": "#/$defs/localized" } }
+      }
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "type"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "label": { "$ref": "#/$defs/localized" },
+          "type": { "enum": ["text", "number", "choice", "boolean", "file-description"] },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["value", "label"],
+              "properties": {
+                "value": { "type": "string" },
+                "label": { "$ref": "#/$defs/localized" }
+              }
+            }
+          },
+          "default": { "type": ["string", "number", "boolean"] },
+          "basis": { "$ref": "#/$defs/localized" },
+          "unit": { "type": "string" },
+          "help": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "noFiles": { "type": "boolean" },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "semanticType", "formats", "required"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "label": { "$ref": "#/$defs/localized" },
+          "semanticType": { "$ref": "#/$defs/localId" },
+          "formats": { "$ref": "#/$defs/idList" },
+          "required": { "type": "boolean" },
+          "requiredWhen": { "$ref": "#/$defs/localized" },
+          "description": { "$ref": "#/$defs/localized" },
+          "exampleRef": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*#[A-Za-z0-9_.-]+$" },
+          "constraints": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "crs": { "type": "string" },
+              "verticalDatum": { "type": "string" },
+              "depthConvention": { "type": "string" },
+              "units": { "type": "string" },
+              "columns": { "type": "array", "items": { "type": "string" } },
+              "missingValues": { "type": "string" },
+              "resolution": { "type": "string" },
+              "time": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "procedure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "type", "summary"],
+            "properties": {
+              "id": { "$ref": "#/$defs/localId" },
+              "code": { "type": "string", "maxLength": 8 },
+              "label": { "$ref": "#/$defs/localized" },
+              "type": { "enum": ["input", "qa", "analysis", "decision", "human-gate", "output"] },
+              "summary": { "$ref": "#/$defs/localized" },
+              "inputs": { "$ref": "#/$defs/idList" },
+              "outputs": { "$ref": "#/$defs/idList" },
+              "reads": { "type": "array", "items": { "$ref": "#/$defs/relPath" } },
+              "prompt": { "$ref": "#/$defs/localized" },
+              "checks": { "type": "array", "items": { "$ref": "#/$defs/localized" } },
+              "decisionIds": { "$ref": "#/$defs/idList" },
+              "visual": { "type": "string" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "relation"],
+            "properties": {
+              "from": { "$ref": "#/$defs/localId" },
+              "to": { "$ref": "#/$defs/localId" },
+              "relation": { "enum": ["next", "alternative", "feedback"] },
+              "label": { "$ref": "#/$defs/localized" }
+            }
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "cue", "alternatives", "choiceBasis", "verify"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "cue": { "$ref": "#/$defs/localized" },
+          "alternatives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/localized" } },
+          "choiceBasis": { "$ref": "#/$defs/localized" },
+          "verify": { "$ref": "#/$defs/localized" },
+          "exceptions": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "userDecisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "question": { "$ref": "#/$defs/localized" },
+          "at": { "$ref": "#/$defs/localId" },
+          "options": { "type": "array", "items": { "$ref": "#/$defs/localized" } }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "kind"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "label": { "$ref": "#/$defs/localized" },
+          "kind": {
+            "enum": ["map-raster", "map-vector", "figure", "table", "report", "model", "document", "dataset", "log"]
+          },
+          "formats": { "$ref": "#/$defs/idList" },
+          "interpretation": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "delivery"],
+        "properties": {
+          "id": { "$ref": "#/$defs/localId" },
+          "label": { "$ref": "#/$defs/localized" },
+          "delivery": { "enum": ["guided", "helper-provided", "agent-guided-with-helper"] },
+          "scope": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "text"],
+        "properties": {
+          "kind": { "enum": ["not-for", "condition"] },
+          "text": { "$ref": "#/$defs/localized" },
+          "consequence": { "$ref": "#/$defs/localized" },
+          "alternative": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "examples": { "type": "array", "items": { "$ref": "#/$defs/slug" } },
+    "visuals": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primaryOutput": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*#[A-Za-z0-9_.-]+$" },
+        "overviewRenderer": { "type": "string" },
+        "mechanisms": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["renderer"],
+                "properties": { "renderer": { "type": "string" }, "params": { "type": "object" } }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "kind"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "appliesTo": { "type": "array", "items": { "type": "string" } },
+          "kind": { "enum": ["required", "optional", "runtime"] },
+          "purpose": { "$ref": "#/$defs/localized" },
+          "verificationOrigin": { "enum": ["upstream-declared", "atlas-checked", "author-declared"] }
+        }
+      }
+    },
+    "network": { "enum": ["none", "optional", "required"] },
+    "credentials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["env", "purpose"],
+        "properties": {
+          "env": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "purpose": { "$ref": "#/$defs/localized" }
+        }
+      }
+    },
+    "credits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "authors"],
+      "properties": {
+        "publisher": { "type": "string", "minLength": 1 },
+        "authors": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/person" } },
+        "profileAuthors": { "type": "array", "items": { "$ref": "#/$defs/person" } },
+        "citation": { "type": "string" }
+      }
+    },
+    "derivedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "release", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/atlasId" },
+        "release": { "type": "string" },
+        "summary": { "$ref": "#/$defs/localized" }
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component", "declared"],
+        "properties": {
+          "component": {
+            "enum": ["skill-text", "code", "example-data", "figures", "fonts", "forms", "third-party"]
+          },
+          "declared": { "type": "string", "minLength": 1 },
+          "spdx": { "type": "string" },
+          "paths": { "type": "array", "items": { "$ref": "#/$defs/relPath" } },
+          "note": { "$ref": "#/$defs/localized" },
+          "noticeFile": { "$ref": "#/$defs/relPath" }
+        }
+      }
+    },
+    "evidenceRefs": { "type": "array", "items": { "$ref": "#/$defs/slug" } },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "prompt"],
+        "properties": {
+          "title": { "$ref": "#/$defs/localized" },
+          "prompt": { "$ref": "#/$defs/localized" },
+          "when": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "with": { "type": "array", "items": { "type": "string" } },
+              "without": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files"],
+      "properties": { "files": { "type": "array", "items": { "$ref": "#/$defs/relPath" } } }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "noFiles": { "const": true } }, "required": ["noFiles"] },
+      "else": { "required": ["inputs"], "properties": { "inputs": { "minItems": 1 } } }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "workflow" } } },
+      "then": {
+        "required": ["decisions", "userDecisions"],
+        "properties": { "decisions": { "minItems": 1 }, "userDecisions": { "minItems": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "maxLength": 64 },
+    "atlasId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$" },
+    "localId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$", "maxLength": 64 },
+    "idList": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "uniqueItems": true },
+    "idList1": { "type": "array", "items": { "$ref": "#/$defs/localId" }, "uniqueItems": true, "minItems": 1 },
+    "semver": { "type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?$" },
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "relPath": { "type": "string", "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$" },
+    "localized": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ko"],
+          "properties": { "ko": { "type": "string", "minLength": 1 }, "en": { "type": "string" } }
+        }
+      ]
+    },
+    "person": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "affiliation": { "type": "string" },
+        "github": { "type": "string" },
+        "role": { "enum": ["author", "maintainer", "contributor", "profile-author", "reviewer"] }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T02:03:27Z
+updated: 2026-10-16T02:55:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -78,9 +78,26 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   GAID_HOME ~/data/geoaidesk/work/gaid-hub/home (pi-agent models.json/kady-settings copied from the hub-integration
   instance: kigam-qwen/qwen3.8-flash-next default), launcher ~/data/geoaidesk/work/gaid-hub/bin/dev.sh,
   log ~/data/geoaidesk/work/gaid-hub/logs/dev.log. Re-check: `systemctl --user status gaid-hub-dev`.
+- Contract `web/src/geo/contracts/authoring.ts` settled (d93dfc2 adds goal/target on analyze). Child `gaid-hub--server`
+  started (Paseo agent 05deecdc-e610-4f1c-806a-03963b3bcab1, worktree ~/worktrees/geoaidesk/gaid-hub--server, brief
+  ~/data/geoaidesk/work/gaid-hub/briefs/p1-server.md); told about the goal/target change.
+- Screens written against the contract (web/src/geo/hub/: shell, top-nav + entry card, home, source/working, question
+  tabs, draft + flow diagram + trial card, trial step, dialogs, api client, hash location, hand-off event); project list
+  entrance and `#hub` place wired in page.tsx/project-view.tsx (boundaries updated). Web tsc clean. Live `#hub` shows
+  "Not Found" until P1 lands. Temporary fixture page `web/src/app/hub-design/` (REMOVE before finish).
+- Design figures for the user: reports/2026-10-16-gaid-hub/figures/design-0{1..7}-*.png; review copy in the vault
+  (연구 보고서/geoaidesk/2026-10-16-gaid-hub). Presented in the writer tab 2026-10-16; awaiting the user's answer.
+- 2026-10-16 11:35 user: "왜 워커를 fast모드로 사용했나? normal모드로 진행하여라." Child 05deecdc was created with
+  service_tier priority (task receipt writer_features = priority; the CLI copies profile featureValues; the "general
+  work" profile reads default now, ~/.paseo/config.json modified 11:35:30, value at 11:03 unknown). Set the agent to
+  Normal (update_agent service_tier default, read back). The child had made no edits; it stopped with "workspace out of
+  credits", and after the switch Codex reports "access token could not be refreshed ... sign in again".
+  Retries failed 3x with the same token error. User (2026-10-16): "2번으로 진행하자." = the parent ports the server itself.
+  Hub request 0bc1c179ab4c asks the hub to retire gaid-hub--server with no changes. P1 is now parent-owned (same brief).
 ## Next steps
-1. Settle the shared contract `web/src/geo/contracts/authoring.ts` + HTTP surface (below), then start the server-port child.
-2. Build the few key screens (entrance, question tabs, draft flow) with fixture data, screenshot, present to the user.
+1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
+   `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
+2. When P1 finishes: `task complete gaid-hub--server`, wire end to end on the dev instance, real Qwen run.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
@@ -110,7 +127,7 @@ Placement decisions:
   plain explanations, agent internals hidden (on demand at most).
 
 Work packages:
-- P1 server port (child writer, general work): owns `server/src/geo/authoring/**`, `server/test/geo-authoring*.test.ts`,
+- P1 server port (parent since 2026-10-16, user choice; brief kept as the spec): owns `server/src/geo/authoring/**`, `server/test/geo-authoring*.test.ts`,
   `geo/hub/**`. Interface: the contract file + route table fixed by the parent.
 - P2 screens (parent first for key screens; may split later): owns `web/src/geo/hub/**`, locales `web/src/geo/locales/hub/`,
   the entrance edit in project-view.tsx.

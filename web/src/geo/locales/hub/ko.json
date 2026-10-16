@@ -1,0 +1,136 @@
+{
+  "nav": {
+    "projects": "프로젝트",
+    "hub": "GAID 허브",
+    "label": "GAID 화면"
+  },
+  "entry": {
+    "title": "GAID 허브",
+    "body": "논문과 코드로 스킬이나 Workflow를 만들고 프로젝트에서 시험합니다.",
+    "open": "GAID 허브 열기"
+  },
+  "home": {
+    "title": "GAID 허브",
+    "body": "논문과 코드로 스킬이나 Workflow를 만듭니다.",
+    "new": "새로 만들기",
+    "empty": "만든 방법이 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
+    "loading": "목록을 읽는 중입니다.",
+    "error": "목록을 읽지 못했습니다: {detail}",
+    "updated": "{when} 수정",
+    "open": "{title} 열기",
+    "back": "허브 목록"
+  },
+  "stage": {
+    "sources": "자료 받음",
+    "reading": "자료 읽는 중",
+    "questions": "질문 {count}개",
+    "drafting": "초안 만드는 중",
+    "draft": "초안",
+    "package": "시험 준비됨"
+  },
+  "steps": {
+    "label": "만드는 순서",
+    "sources": "자료",
+    "questions": "질문",
+    "draft": "초안",
+    "trial": "시험"
+  },
+  "sources": {
+    "title": "자료 올리기",
+    "drop": "논문 PDF나 코드 묶음(.zip, .tar.gz)을 끌어 놓으세요.",
+    "pick": "파일 선택",
+    "goal": "만들고 싶은 것",
+    "goalPlaceholder": "예: 다른 지역 격자 자료에 쓸 탐사 방법",
+    "target": "만들 종류",
+    "targetAuto": "에이전트가 제안",
+    "targetSkill": "스킬",
+    "targetWorkflow": "Workflow",
+    "start": "자료 읽고 질문 받기",
+    "added": "{name} · {pages}쪽",
+    "addedCode": "{name} · 파일 {count}개",
+    "addedPlain": "{name}",
+    "remove": "{name} 빼기",
+    "needSource": "자료를 하나 이상 올리세요.",
+    "uploading": "{name} 파일을 올리는 중입니다.",
+    "noPdfText": "PDF 쪽 글자를 읽는 도구가 없어 PDF 내용을 읽지 못합니다. 코드나 메모로 진행할 수 있습니다."
+  },
+  "reading": {
+    "title": "자료를 읽고 있습니다",
+    "elapsed": "{minutes}분 {seconds}초 지남",
+    "received": "자료 {count}개 받음",
+    "pages": "PDF {pages}쪽 글자 읽음",
+    "files": "코드 파일 {count}개 확인",
+    "analysis": "방법과 빠진 결정 찾는 중",
+    "note": "보통 몇 분 걸립니다. 화면을 닫아도 계속 진행됩니다.",
+    "failed": "자료를 분석하지 못했습니다. 다시 실행하세요.",
+    "interrupted": "앱이 다시 시작되어 분석이 멈췄습니다. 다시 실행하세요.",
+    "retry": "분석 다시 실행"
+  },
+  "questions": {
+    "title": "질문에 답하기",
+    "progress": "{answered}/{total} 답함",
+    "tab": "질문 {n}",
+    "recommended": "권장",
+    "other": "기타",
+    "otherPlaceholder": "다른 의견을 적으세요.",
+    "defer": "나중에 정하기",
+    "deferred": "나중에 정함",
+    "why": "왜 묻나요",
+    "evidence": "근거 보기",
+    "page": "{page}쪽",
+    "prev": "이전 질문",
+    "next": "다음 질문",
+    "review": "답 확인",
+    "reviewTitle": "답 확인",
+    "reviewBody": "모든 답을 한꺼번에 반영해 초안을 만듭니다.",
+    "unanswered": "답하지 않음",
+    "edit": "{n}번 답 고치기",
+    "apply": "답 반영해 초안 만들기",
+    "needAll": "답하지 않은 질문이 {count}개 있습니다. 답하거나 나중에 정하기를 고르세요."
+  },
+  "drafting": {
+    "title": "초안을 만들고 있습니다",
+    "note": "답 {count}개를 반영합니다. 보통 몇 분 걸립니다."
+  },
+  "draft": {
+    "private": "개인 초안",
+    "untested": "미시험",
+    "tested": "시험 {count}회",
+    "revision": "{n}판",
+    "flow": "방법 흐름",
+    "you": "직접 정함",
+    "inputs": "입력",
+    "outputs": "결과",
+    "limits": "한계",
+    "stepDetail": "{label} 단계",
+    "checks": "확인할 것",
+    "close": "닫기",
+    "files": "생성 파일 보기",
+    "skill": "스킬",
+    "workflow": "Workflow",
+    "checkOk": "형식 검사 통과",
+    "checkFail": "고칠 점 {count}개",
+    "checkFix": "고칠 점 보기",
+    "feedback": "고칠 점 알려주기",
+    "feedbackPlaceholder": "바꾸고 싶은 점을 적으세요. 예: 바리오그램은 표본 1만 셀 이하로 계산",
+    "feedbackSend": "초안 고치기"
+  },
+  "trial": {
+    "title": "프로젝트에서 시험",
+    "body": "초안을 프로젝트에 설치하고 Workflow 시작 설정을 엽니다.",
+    "project": "시험할 프로젝트",
+    "consent": "초안 스킬이 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
+    "install": "설치하고 시작 설정 열기",
+    "installing": "설치하는 중입니다.",
+    "installed": "{project}에 설치됨",
+    "openAgain": "시작 설정 다시 열기",
+    "notReady": "고칠 점을 해결하면 시험할 수 있습니다."
+  },
+  "detail": {
+    "show": "에이전트 기록 보기",
+    "title": "에이전트 기록",
+    "model": "모델",
+    "attempts": "실행 {count}회",
+    "outcome": "{op} · {outcome}"
+  }
+}
