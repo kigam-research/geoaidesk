@@ -55,6 +55,13 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
+- GAID hub (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
+  Backend `server/src/geo/authoring/` (`/geo/authoring/*`, user-level store under `<agentDir>/skill-hub/authoring/`; model
+  calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
+  (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, entry on the project list and a
+  Projects/GAID hub header switch): one question at a time with a recommended option and "기타", all answers applied
+  together, the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
+  Workflow start settings opened there (`gaid:open-method-setup`).
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
