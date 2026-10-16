@@ -288,7 +288,7 @@
     "remake": "Remake concept pictures",
     "starting": "Requesting concept pictures",
     "making": "Making concept pictures ({done}/{total})",
-    "note": "Uses the image model · billed per call",
+    "note": "Uses the ChatGPT subscription when signed in, else the image model is billed per call",
     "failed": "Could not make the concept pictures."
   }
 }

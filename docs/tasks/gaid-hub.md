@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-16T07:24:33Z
+status: active
+updated: 2026-10-16T07:29:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -110,6 +110,14 @@ infographic agent review of the screenshots (user rule from feedback 2), then pr
 > "가로 연결합니다." (answer to the report's decision: connect an image model to the institute's GAID)
 Applied: visuals use the saved Settings image model, else the first connected DEFAULT_IMAGE_MODELS entry (any connected
 priceable image model last). The dev instance has no image provider credential, so no real picture was generated.
+
+## User direction on the image source (verbatim, 2026-10-16, writer tab)
+> "개인용 구독 codex에서 이미지를 생성하게 하자. 서버도 현재는 사용자의 pc로 구동중이니 서버에도 사용자계정을 연동해야한다."
+Plan: concept pictures through the ChatGPT sign-in (Pi provider `openai` OAuth, legacy `openai-codex`) using the same
+endpoint Codex CLI uses with ChatGPT auth (`https://chatgpt.com/backend-api/codex/images/generations`, model
+`gpt-image-2`, per openai/codex codex-rs/ext/image-generation + codex-api/src/endpoint/images.rs); preferred when no
+image model is saved in Settings; ledgered as subscription ($0). The user signs in on the GAID server running on their PC
+(dev instance http://localhost:3330 → Settings → Providers → OpenAI "Sign in with ChatGPT"); never read ~/.codex/auth.json.
 
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).

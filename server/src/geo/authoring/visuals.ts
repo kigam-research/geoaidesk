@@ -10,6 +10,7 @@ import { DEFAULT_IMAGE_MODELS, imageModelIssue } from "../../agent/image-tool.ts
 import { DEFAULT_PROJECT_ID } from "../../config.ts";
 import { billingCountsTowardBudget, billingForProvider } from "../../cost/billing.ts";
 import { emptySnapshot, isBudgetExceeded, recordRun } from "../../cost/ledger.ts";
+import { CHATGPT_PROVIDERS, CODEX_IMAGE_MODEL, generateCodexImage } from "./codex-images.ts";
 import { AuthoringError, now, type AuthoringStore } from "./store.ts";
 
 export const VISUALS_LEDGER_SESSION = "gaid-hub-visuals";
@@ -21,9 +22,10 @@ export type PrepareImageGenerator = () => Promise<ImageGenerator>;
 const text = (v: AtlasTextInput) => (typeof v === "string" ? v : v.ko);
 
 /**
- * Same priceability, credentials and billing as generate_image. A model saved in Settings → Defaults is used as chosen;
- * without one, the first connected built-in default image model (user decision 2026-10-16: connect an image model to
- * the institute's GAID), else any connected priceable image model. Pictures are still made only on request.
+ * Picks the image source. A model saved in Settings → Defaults is used as chosen (same priceability, credentials and
+ * billing as generate_image). Without one: the researcher's ChatGPT sign-in (subscription image model, user direction
+ * 2026-10-16), else the first connected built-in default image model, else any connected priceable image model.
+ * Pictures are still made only on request.
  */
 export const prepareRuntimeImageGenerator: PrepareImageGenerator = async () => {
   const saved = readAppDefaults().imageModel;
@@ -35,6 +37,10 @@ export const prepareRuntimeImageGenerator: PrepareImageGenerator = async () => {
     throw new AuthoringError(
       "이미지 모델을 사용할 수 없습니다. 설정에서 사용량을 계산할 수 있는 이미지 모델을 선택하세요.",
     );
+  if (!saved) {
+    const chatgpt = await chatGptImageGenerator(runtime);
+    if (chatgpt) return chatgpt;
+  }
   const available = (await registry.getAvailableOfType("image")).filter((m) => !imageModelIssue(registry, refOf(m)));
   let model: (typeof available)[number] | undefined;
   if (saved) {
@@ -94,6 +100,52 @@ export const prepareRuntimeImageGenerator: PrepareImageGenerator = async () => {
     },
   };
 };
+
+type RuntimeAuth = {
+  checkAuth(provider: string): Promise<{ type: "api_key" | "oauth" } | undefined>;
+  getAuth(provider: string): Promise<{ auth: { apiKey?: string; baseUrl?: string } } | undefined>;
+};
+
+/** A generator on the ChatGPT subscription when a ChatGPT sign-in exists; null otherwise. Ledgered as subscription ($0). */
+export async function chatGptImageGenerator(
+  runtime: RuntimeAuth,
+  fetchImpl?: typeof fetch,
+): Promise<ImageGenerator | null> {
+  let provider: string | undefined;
+  for (const id of CHATGPT_PROVIDERS) {
+    if ((await runtime.checkAuth(id).catch(() => undefined))?.type === "oauth") {
+      provider = id;
+      break;
+    }
+  }
+  if (!provider) return null;
+  const ref = `${provider}/${CODEX_IMAGE_MODEL}`;
+  const billing = billingForProvider(provider, "oauth");
+  return {
+    model: ref,
+    async generate(prompt) {
+      // Fresh credentials per call: Pi refreshes an expired OAuth token here.
+      const resolved = await runtime.getAuth(provider);
+      const token = resolved?.auth.apiKey;
+      if (!token) throw new AuthoringError("ChatGPT 로그인이 만료되었습니다. 설정에서 다시 로그인하세요.", 401);
+      const image = await generateCodexImage(
+        { provider, token, baseUrl: resolved.auth.baseUrl },
+        prompt,
+        fetchImpl ? { fetch: fetchImpl } : {},
+      );
+      recordRun({
+        projectId: DEFAULT_PROJECT_ID,
+        sessionId: VISUALS_LEDGER_SESSION,
+        role: "agent",
+        model: ref,
+        billing,
+        before: emptySnapshot(),
+        after: { costUsd: 0, input: 0, output: 0, cacheRead: 0, total: 0 },
+      });
+      return image;
+    },
+  };
+}
 
 export function conceptPrompt(draft: MethodDraft, key: string) {
   const title = text(draft.profile.title);
