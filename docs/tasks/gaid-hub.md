@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T07:29:55Z
+updated: 2026-10-16T07:30:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -187,6 +187,11 @@ image model is saved in Settings; ledgered as subscription ($0). The user signs 
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub.md.
+6. User direction 2026-10-16: concept pictures through the ChatGPT sign-in (f694e61: Codex images endpoint, gpt-image-2,
+   subscription ledger; 23 tests pass, no real call yet). Dev instance gaid-hub-dev running again (3330/18330) for the
+   user's sign-in. After sign-in: make concept pictures for one draft, check them, update the report (§5/§6, figures),
+   stop the dev unit, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
+Blocked: waiting for the user to sign in with ChatGPT on the dev instance (http://localhost:3330 → Settings → Providers → OpenAI "Sign in with ChatGPT").
 
 ## Failed approaches
 ## Notes and decisions
