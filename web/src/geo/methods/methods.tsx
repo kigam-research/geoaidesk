@@ -6,7 +6,7 @@ import type { WorkflowPanelCategory, WorkflowPanelRow } from "@/components/workf
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/projects";
-import { t } from "@/geo/i18n";
+import { geoLocale, t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
@@ -120,7 +120,7 @@ export function webLink(value: string | undefined): string | undefined {
   if (!value) return undefined;
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol) ? url.href : undefined; } catch { return undefined; }
 }
-const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString();
+const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString(geoLocale() === "ko" ? "ko-KR" : "en");
 
 export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);

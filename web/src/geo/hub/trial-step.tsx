@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { AuthoringInstall, AuthoringProject } from "@/geo/contracts/authoring";
 import type { MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
 import { apiFetch } from "@/lib/projects";
 
 const text = geoText("hub");
@@ -28,10 +28,40 @@ function shortList(paths: string[], max = 8): string {
 }
 
 /** Feedback text for `revise` from one trial: the researcher's note and what GAID observed. */
+function when(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+/** GAID trial chats of the method across the projects it is installed in (null while loading). */
+export function useTrialCount(installs: AuthoringInstall[], slug: string): number | null {
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    if (!installs.length || !slug) return;
+    let live = true;
+    const latest = new Map(installs.map((i) => [i.projectId, i]));
+    void Promise.all([...latest.values()].map((i) => loadTrials(i, slug))).then(
+      (lists) => live && setCount(lists.reduce((n, l) => n + l.length, 0)),
+    );
+    return () => {
+      live = false;
+    };
+  }, [installs, slug]);
+  return installs.length ? count : 0;
+}
+
 export function trialFeedback(trial: MethodTrial): string {
   const lines = [
-    `GAID 시험 (${trial.startedAt}, 채팅 ${trial.sessionId})`,
-    trial.assessment ? `연구자 평가: ${trial.assessment.outcome} — ${trial.assessment.note}` : "연구자 평가: 없음",
+    `GAID 시험 (${when(trial.startedAt)})`,
+    trial.assessment
+      ? `연구자 평가: ${text(`trial.outcome.${trial.assessment.outcome}`)}. ${trial.assessment.note}`
+      : "연구자 평가: 없음",
     `관찰: 도구 호출 ${trial.observed.toolCalls}회, 실패 ${trial.observed.failedToolCalls}회`,
     `결과 파일: ${shortList(trial.observed.outputs.map((o) => o.path))}`,
     ...trial.expected
@@ -101,10 +131,14 @@ export function TrialStep({
               <li key={install.projectId} className="flex flex-col gap-3 rounded-xl border p-4">
                 <div className="flex items-center gap-3">
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="font-medium">{text("trial.installed", { project: projectName(install.projectId) })}</span>
+                    <span className="font-medium">
+                      {text("trial.installed", { project: projectName(install.projectId) })}
+                    </span>
                     <span className="text-xs text-muted-foreground">
                       {text("draft.revision", {
-                        n: project.packages.find((p) => p.revision === install.packageRevision)?.draftRevision ?? install.packageRevision,
+                        n:
+                          project.packages.find((p) => p.revision === install.packageRevision)?.draftRevision ??
+                          install.packageRevision,
                       })}
                     </span>
                   </span>
@@ -127,6 +161,7 @@ export function TrialStep({
                             ) : (
                               <Badge variant="outline">{text("trial.unrated")}</Badge>
                             )}
+                            <span className="text-xs text-muted-foreground">{when(trial.startedAt)}</span>
                             <span className="text-xs text-muted-foreground">
                               {text("trial.observed", {
                                 files: trial.observed.outputs.length,
@@ -134,7 +169,9 @@ export function TrialStep({
                               })}
                             </span>
                           </span>
-                          {trial.assessment?.note && <span className="line-clamp-2 text-muted-foreground">{trial.assessment.note}</span>}
+                          {trial.assessment?.note && (
+                            <span className="line-clamp-2 text-muted-foreground">{trial.assessment.note}</span>
+                          )}
                         </span>
                         <Button variant="ghost" size="sm" onClick={() => onFeedback(trialFeedback(trial))}>
                           {text("trial.revise")}

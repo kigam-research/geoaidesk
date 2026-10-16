@@ -31,7 +31,7 @@ import { HubShell, ProjectBar, type HubStep } from "./hub-shell";
 import type { HubLocation } from "./location";
 import { QuestionStep, type DraftAnswer } from "./question-step";
 import { SourceStep, WorkingPanel, type Target } from "./source-step";
-import { TrialStep } from "./trial-step";
+import { TrialStep, useTrialCount } from "./trial-step";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
 
@@ -128,6 +128,8 @@ function HubList({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
+const NO_INSTALLS: AuthoringProject["installs"] = [];
+
 function emptyProject(): AuthoringProject {
   const at = new Date().toISOString();
   return {
@@ -210,6 +212,7 @@ function HubProject({
   const [consent, setConsent] = useState(false);
   const [installing, setInstalling] = useState(false);
   const { projects, setActive } = useProjects();
+  const trialCount = useTrialCount(project?.installs ?? NO_INSTALLS, project?.drafts.at(-1)?.slug ?? "");
 
   const reload = useCallback(async () => {
     if (isNew) return;
@@ -254,7 +257,10 @@ function HubProject({
 
   const activeProjects = useMemo(() => projects.filter((p) => !p.archived), [projects]);
   useEffect(() => {
-    if (!trialProject && activeProjects.length) setTrialProject(activeProjects[0].id);
+    // Preselect where the method was installed last, else the first project.
+    const last = project?.installs.at(-1)?.projectId;
+    if (!trialProject && activeProjects.length)
+      setTrialProject(last && activeProjects.some((p) => p.id === last) ? last : activeProjects[0].id);
   }, [activeProjects, trialProject]);
 
   if (!project)
@@ -432,7 +438,7 @@ function HubProject({
     body = (
       <DraftStep
         draft={draft}
-        trialCount={project.installs.length}
+        trialCount={trialCount ?? 0}
         checkIssues={issues}
         onFeedback={() => {
           setFeedbackPrefill("");

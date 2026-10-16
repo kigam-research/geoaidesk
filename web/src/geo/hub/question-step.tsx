@@ -64,7 +64,10 @@ function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
               type="button"
               aria-pressed={i === index}
               onClick={() => setIndex(i)}
-              className={cn("rounded-md border px-2 py-1 text-xs", i === index ? "border-primary text-primary" : "text-muted-foreground")}
+              className={cn(
+                "rounded-md border px-2 py-1 text-xs",
+                i === index ? "border-primary text-primary" : "text-muted-foreground",
+              )}
             >
               {f.label}
             </button>
@@ -143,7 +146,9 @@ export function QuestionStep({
             onClick={() => go(questions.length)}
             className={cn(
               "inline-flex h-9 items-center rounded-full border px-3 text-sm font-medium transition-colors",
-              reviewing ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-foreground/30",
+              reviewing
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:border-foreground/30",
             )}
           >
             {text("questions.review")}
@@ -331,25 +336,31 @@ function QuestionCard({
             id={otherId}
             rows={2}
             readOnly={locked}
-            placeholder={choice && question.options.length ? text("questions.otherPlaceholder") : text("questions.answerPlaceholder")}
+            placeholder={
+              choice && question.options.length
+                ? text("questions.otherPlaceholder")
+                : text("questions.answerPlaceholder")
+            }
             value={answer?.defer ? "" : (answer?.response ?? "")}
             onChange={(event) => onChange({ response: event.target.value })}
           />
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => onChange({ defer: true })}
-        aria-pressed={Boolean(answer?.defer)}
-        className={cn(
-          "inline-flex items-center gap-1.5 self-start text-sm text-muted-foreground underline-offset-4 hover:underline",
-          answer?.defer && "font-medium text-foreground",
-        )}
-      >
-        <ClockIcon className="size-3.5" aria-hidden />
-        {text("questions.defer")}
-      </button>
+      {!locked && (
+        <button
+          type="button"
+          onClick={() => onChange({ defer: true })}
+          aria-pressed={Boolean(answer?.defer)}
+          className={cn(
+            "inline-flex items-center gap-1.5 self-start text-sm text-muted-foreground underline-offset-4 hover:underline",
+            answer?.defer && "font-medium text-foreground",
+          )}
+        >
+          <ClockIcon className="size-3.5" aria-hidden />
+          {text("questions.defer")}
+        </button>
+      )}
       {locked && <p className="text-sm text-muted-foreground">{text("questions.recorded")}</p>}
     </section>
   );
@@ -385,7 +396,12 @@ function ReviewPanel({
                   {answerLabel(q, answers[q.id])}
                 </span>
               </span>
-              <Button variant="ghost" size="sm" onClick={() => onEdit(i)} aria-label={text("questions.edit", { n: i + 1 })}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(i)}
+                aria-label={text("questions.edit", { n: i + 1 })}
+              >
                 <ChevronRightIcon />
               </Button>
             </li>
