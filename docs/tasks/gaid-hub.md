@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:33:32Z
+updated: 2026-10-16T05:39:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -185,6 +185,7 @@ the sharing/discussion space, GAID projects are the personal research space.
    (old) Re-test: draft v5 (passes checks) → install into GAID project "Yilgarn 40km 빠른 시험" via input-prep with the 40 km
    CSV, quick mode, bounded run; record reductions/outputs/time.
 4. Report, scripts/check, cleanup, finish.
+Blocked: waiting for child finishes (gaid-hub--visuals: task finish running scripts/check; gaid-hub--shared: implementing) and the v5 40 km trial (watcher b3s81slkx).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
