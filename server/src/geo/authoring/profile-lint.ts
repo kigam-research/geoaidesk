@@ -56,9 +56,15 @@ export function lintProfile(
   const unique = (values: string[], label: string) => {
     if (new Set(values).size !== values.length) find("error", "duplicate-id", at, `${label} id가 중복됩니다`);
   };
-  unique(raw.procedure.nodes.map((n) => n.id), "단계");
+  unique(
+    raw.procedure.nodes.map((n) => n.id),
+    "단계",
+  );
   unique([...(raw.inputs ?? []).map((n) => n.id), ...raw.outputs.map((n) => n.id)], "입출력");
-  unique((raw.decisions ?? []).map((n) => n.id), "판단");
+  unique(
+    (raw.decisions ?? []).map((n) => n.id),
+    "판단",
+  );
   if (raw.source.kind === "owned" && !raw.source.path.endsWith(`/${slug}`))
     find("error", "owned-folder", at, `스킬 폴더 이름이 ${slug}와 다릅니다: ${raw.source.path}`);
   const facetChecks: [TaxonomyFacet, string[] | undefined, string][] = [
@@ -73,9 +79,15 @@ export function lintProfile(
       if (!terms[facet].has(id)) find("error", "taxonomy-unknown", `${at}#${path}`, `분류에 없는 값입니다: ${id}`);
   for (const input of raw.inputs ?? []) {
     if (!terms.dataTypes.has(input.semanticType))
-      find("error", "taxonomy-unknown", `${at}#inputs/${input.id}`, `분류에 없는 자료 종류입니다: ${input.semanticType}`);
+      find(
+        "error",
+        "taxonomy-unknown",
+        `${at}#inputs/${input.id}`,
+        `분류에 없는 자료 종류입니다: ${input.semanticType}`,
+      );
     for (const f of input.formats)
-      if (!terms.formats.has(f)) find("error", "taxonomy-unknown", `${at}#inputs/${input.id}`, `분류에 없는 형식입니다: ${f}`);
+      if (!terms.formats.has(f))
+        find("error", "taxonomy-unknown", `${at}#inputs/${input.id}`, `분류에 없는 형식입니다: ${f}`);
   }
   const nodeIds = new Set(raw.procedure.nodes.map((n) => n.id));
   const decisionIds = new Set((raw.decisions ?? []).map((d) => d.id));
@@ -101,7 +113,11 @@ export function lintProfile(
     for (const f of output.formats ?? [])
       if (!terms.formats.has(f)) find("error", "taxonomy-unknown", at, `산출물 형식이 분류에 없습니다: ${f}`);
   for (const lic of raw.licenses)
-    if (lic.spdx === undefined && !/unknown|미지정|private|no code/i.test(lic.declared) && lic.component !== "example-data")
+    if (
+      lic.spdx === undefined &&
+      !/unknown|미지정|private|no code/i.test(lic.declared) &&
+      lic.component !== "example-data"
+    )
       find("warning", "license-spdx", `${at}#licenses/${lic.component}`, `SPDX 식별자가 없습니다: ${lic.declared}`);
   return findings;
 }

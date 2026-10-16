@@ -56,7 +56,17 @@ export const normalizeDependency = (name: string) =>
 export const BUNDLED_WITH: Record<string, readonly string[]> = {
   "scikit-learn": ["joblib", "threadpoolctl", "scipy", "numpy"],
   pandas: ["numpy", "python-dateutil", "pytz", "tzdata"],
-  matplotlib: ["numpy", "pillow", "packaging", "pyparsing", "cycler", "kiwisolver", "fonttools", "contourpy", "python-dateutil"],
+  matplotlib: [
+    "numpy",
+    "pillow",
+    "packaging",
+    "pyparsing",
+    "cycler",
+    "kiwisolver",
+    "fonttools",
+    "contourpy",
+    "python-dateutil",
+  ],
   scipy: ["numpy"],
   geopandas: ["pandas", "shapely", "pyproj", "pyogrio", "numpy", "packaging"],
   rasterio: ["numpy", "affine", "attrs", "click", "certifi"],

@@ -14,7 +14,11 @@ export function testVocabulary(): Vocabulary {
   return {
     taxonomy: loadTaxonomy(),
     environments: environmentVocabulary([
-      { id: "geo-core", purpose: "core", packages: [{ name: "numpy", imports: ["numpy"] }, { name: "pandas" }, { name: "scikit-learn" }] },
+      {
+        id: "geo-core",
+        purpose: "core",
+        packages: [{ name: "numpy", imports: ["numpy"] }, { name: "pandas" }, { name: "scikit-learn" }],
+      },
       { id: "geo-mpm", extends: "geo-core", purpose: "mpm", packages: [{ name: "xgboost" }] },
     ]),
     catalogueNames: new Set(["spatial-pu-workflow", "geo-map-and-crs"]),
@@ -83,15 +87,35 @@ export const reply =
   (...contents: unknown[]): ChatFn =>
   async () => {
     const next = contents.shift();
-    return { content: typeof next === "string" ? next : JSON.stringify(next), finishReason: "stop", usage: { input: 10, output: 5 } };
+    return {
+      content: typeof next === "string" ? next : JSON.stringify(next),
+      finishReason: "stop",
+      usage: { input: 10, output: 5 },
+    };
   };
 
 export const analysis = {
   findings: [
-    { kind: "parameter", statement: "5 km 격자와 50 km 평가 block", anchors: [{ source: "S1", page: 1, quote: "spatial blocks of 50 km" }] },
-    { kind: "method", statement: "PU 학습", anchors: [{ source: "S1", page: 1, quote: "treats unlabeled cells as unknown" }] },
-    { kind: "method", statement: "nested CV", anchors: [{ source: "S1", page: 1, quote: "separates tuning from outer testing" }] },
-    { kind: "result", statement: "없는 쪽 인용", anchors: [{ source: "S1", page: 7, quote: "separates tuning from outer testing" }] },
+    {
+      kind: "parameter",
+      statement: "5 km 격자와 50 km 평가 block",
+      anchors: [{ source: "S1", page: 1, quote: "spatial blocks of 50 km" }],
+    },
+    {
+      kind: "method",
+      statement: "PU 학습",
+      anchors: [{ source: "S1", page: 1, quote: "treats unlabeled cells as unknown" }],
+    },
+    {
+      kind: "method",
+      statement: "nested CV",
+      anchors: [{ source: "S1", page: 1, quote: "separates tuning from outer testing" }],
+    },
+    {
+      kind: "result",
+      statement: "없는 쪽 인용",
+      anchors: [{ source: "S1", page: 7, quote: "separates tuning from outer testing" }],
+    },
   ],
   scope: "새 자료에 적용할 일반화 방법",
   questions: [
@@ -132,7 +156,11 @@ export const draftReply = {
   scope: "generalization",
   kind: "workflow",
   publisher: "KIGAM",
-  taxonomy: { disciplines: ["mineral-exploration-mpm", "made-up"], tasks: ["modeling", "not-a-task"], formats: ["csv"] },
+  taxonomy: {
+    disciplines: ["mineral-exploration-mpm", "made-up"],
+    tasks: ["modeling", "not-a-task"],
+    formats: ["csv"],
+  },
   inputs: [{ id: "grid", label: "격자 표", semanticType: "grid-table", formats: ["csv"], required: true }],
   procedure: [
     { id: "prepare", label: "자료 준비", type: "input", summary: "격자 표를 확인합니다." },
@@ -140,7 +168,13 @@ export const draftReply = {
     { id: "report", label: "보고", type: "output", summary: "결과와 한계를 적습니다." },
   ],
   decisions: [
-    { id: "block", cue: "자기상관 범위", alternatives: ["variogram 범위", "사용자 지정"], choiceBasis: "label variogram", verify: "fold별 양성 수" },
+    {
+      id: "block",
+      cue: "자기상관 범위",
+      alternatives: ["variogram 범위", "사용자 지정"],
+      choiceBasis: "label variogram",
+      verify: "fold별 양성 수",
+    },
   ],
   userDecisions: [{ id: "label", question: "양성 정의는 무엇입니까?" }],
   outputs: [{ id: "scores", label: "점수 표", kind: "table", formats: ["csv"] }],
@@ -156,10 +190,11 @@ export const draftReply = {
     ],
     prompt: "격자 표로 PU 평가를 해 주세요.",
     environmentProfile: "geo-mpm",
-    expectedArtifacts: [{ id: "scores", label: "점수 표", output: "scores", files: ["outputs/scores.csv"], required: true }],
+    expectedArtifacts: [
+      { id: "scores", label: "점수 표", output: "scores", files: ["outputs/scores.csv"], required: true },
+    ],
     boundary: "자원량 추정이 아닙니다.",
   },
   recipe: { choices: { "block-size": "km50" }, unresolvedChoices: [] },
   evidence: [{ field: "procedure", findingIds: ["F1", "F99"] }],
 };
-

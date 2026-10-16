@@ -12,7 +12,17 @@ import { runOperation } from "../src/geo/authoring/agent.ts";
 import { quoteFound, readablePage } from "../src/geo/authoring/anchors.ts";
 import { answerAll, answerQuestion, editDraft } from "../src/geo/authoring/routes.ts";
 import { toContext, type ChatFn } from "../src/geo/authoring/model.ts";
-import { analysis, cleanup, config, draftReply, fixture, PAPER, reply, testVocabulary, work } from "./helpers/geo-authoring.ts";
+import {
+  analysis,
+  cleanup,
+  config,
+  draftReply,
+  fixture,
+  PAPER,
+  reply,
+  testVocabulary,
+  work,
+} from "./helpers/geo-authoring.ts";
 
 afterEach(cleanup);
 
@@ -76,7 +86,13 @@ describe("GAID hub authoring", () => {
     const repaired = await runOperation(store, projectId, "analyze", "op-repair-1", deps(reply("not json", analysis)));
     expect(repaired.outcome).toBe("repaired");
     const before = await store.read(projectId);
-    const rejected = await runOperation(store, projectId, "analyze", "op-repair-2", deps(reply('{"findings": "x"}', "{broken")));
+    const rejected = await runOperation(
+      store,
+      projectId,
+      "analyze",
+      "op-repair-2",
+      deps(reply('{"findings": "x"}', "{broken")),
+    );
     expect(rejected.outcome).toBe("rejected");
     const after = await store.read(projectId);
     expect(after.findings).toEqual(before.findings);
@@ -129,7 +145,9 @@ describe("GAID hub authoring", () => {
     await expect(
       store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 1, optionId: "not-listed" }, "r")),
     ).rejects.toMatchObject({ status: 400 });
-    const d = await store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 1, optionId: "generalization" }, "r"));
+    const d = await store.mutate(projectId, (p) =>
+      answerQuestion(p, q.id, { questionRevision: 1, optionId: "generalization" }, "r"),
+    );
     expect(d.response).toBe("새 자료 적용");
     expect((await store.read(projectId)).questions[0].status).toBe("answered");
     await runOperation(store, projectId, "analyze", "op-analyze-b", deps(reply(analysis)));
@@ -169,7 +187,9 @@ describe("GAID hub authoring", () => {
     expect(decisions.map((d) => d.response)).toEqual(["새 자료 적용", "필요한 스크립트만"]);
     p = await store.read(projectId);
     expect(p.questions.map((q) => q.status)).toEqual(["answered", "answered"]);
-    const deferred = await store.mutate(projectId, (q) => answerAll(q, [{ questionId: code.id, questionRevision: 1, defer: true }], "r"));
+    const deferred = await store.mutate(projectId, (q) =>
+      answerAll(q, [{ questionId: code.id, questionRevision: 1, defer: true }], "r"),
+    );
     expect(deferred[0].status).toBe("deferred");
     p = await store.read(projectId);
     expect(p.decisions.filter((d) => !d.supersededBy).map((d) => d.status)).toEqual(["answered", "deferred"]);
@@ -234,7 +254,15 @@ describe("GAID hub authoring", () => {
     expect(linked.source.status).toBe("failed");
     expect(linked.extraction.error ?? "").toMatch(/링크/);
     expect(store.exists(projectId, `sources/${linked.source.id}/files/link`)).toBe(false);
-    execFileSync("tar", ["-czf", join(w, "up.tar.gz"), "-C", join(w, "repo/scripts"), "--transform", "s,^,../,", "run.py"]);
+    execFileSync("tar", [
+      "-czf",
+      join(w, "up.tar.gz"),
+      "-C",
+      join(w, "repo/scripts"),
+      "--transform",
+      "s,^,../,",
+      "run.py",
+    ]);
     const up = await addSource(store, projectId, {
       name: "up.tar.gz",
       mediaType: "application/gzip",
@@ -243,7 +271,13 @@ describe("GAID hub authoring", () => {
     expect(up.source.status).toBe("failed");
     expect(up.extraction.error ?? "").toMatch(/경로/);
     // zip: the same layout through adm-zip
-    execFileSync("python3", ["-I", "-c", "import shutil,sys; shutil.make_archive(sys.argv[1], 'zip', sys.argv[2], 'repo/scripts')", join(w, "code"), w]);
+    execFileSync("python3", [
+      "-I",
+      "-c",
+      "import shutil,sys; shutil.make_archive(sys.argv[1], 'zip', sys.argv[2], 'repo/scripts')",
+      join(w, "code"),
+      w,
+    ]);
     const zipped = await addSource(store, projectId, {
       name: "code.zip",
       mediaType: "application/zip",
@@ -278,7 +312,10 @@ describe("GAID hub authoring", () => {
     const ok = await runOperation(store, projectId, "draft", "op-code-draft", deps(reply(withCode)));
     expect(ok.outcome, JSON.stringify(ok.validationErrors)).toBe("accepted");
     const d = (await store.read(projectId)).drafts[0];
-    expect(d.codeFiles.map((c) => c.path)).toEqual(["scripts/upstream/scripts/run.py", "scripts/upstream/config/config.yaml"]);
+    expect(d.codeFiles.map((c) => c.path)).toEqual([
+      "scripts/upstream/scripts/run.py",
+      "scripts/upstream/config/config.yaml",
+    ]);
     const data = { ...draftReply, codeFiles: [{ source: "S2", sourcePath: "data.bin" }] };
     const refused = await runOperation(store, projectId, "draft", "op-code-data", deps(reply(data, data)));
     expect(refused.outcome).toBe("rejected");

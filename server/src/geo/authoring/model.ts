@@ -55,7 +55,10 @@ type Complete = (model: Model<Api>, context: Context, options?: SimpleStreamOpti
  * assistant message has to be reconstructed.
  */
 export function toContext(messages: ChatMessage[]): Context {
-  const system = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+  const system = messages
+    .filter((m) => m.role === "system")
+    .map((m) => m.content)
+    .join("\n\n");
   const turns = messages.filter((m) => m.role !== "system");
   const content =
     turns.length === 1
@@ -74,7 +77,8 @@ export function toContext(messages: ChatMessage[]): Context {
 
 /** Resolve the model and refuse before any call when it is not connected or the cap is reached. */
 export async function preflight(config: ModelConfig): Promise<{ model: Model<Api> }> {
-  if (config.ref.startsWith("fusion/")) throw new AuthoringError("Fusion 모델은 저작에 쓸 수 없습니다. 다른 모델을 고르세요.", 400);
+  if (config.ref.startsWith("fusion/"))
+    throw new AuthoringError("Fusion 모델은 저작에 쓸 수 없습니다. 다른 모델을 고르세요.", 400);
   let model: Model<Api>;
   try {
     model = resolveModel(config.ref, getModelRegistry());

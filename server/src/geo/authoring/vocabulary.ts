@@ -42,7 +42,10 @@ let taxonomyCache: Taxonomy | undefined;
 export function loadTaxonomy(dir = path.join(HUB_INPUTS_DIR, "taxonomy")): Taxonomy {
   if (taxonomyCache && dir === path.join(HUB_INPUTS_DIR, "taxonomy")) return taxonomyCache;
   const taxonomy: Taxonomy = { disciplines: [], tasks: [], dataTypes: [], formats: [], scales: [] };
-  for (const name of fs.readdirSync(dir).filter((n) => n.endsWith(".yaml")).sort()) {
+  for (const name of fs
+    .readdirSync(dir)
+    .filter((n) => n.endsWith(".yaml"))
+    .sort()) {
     const doc = parse(fs.readFileSync(path.join(dir, name), "utf8")) as { facet: TaxonomyFacet; terms: TaxonTerm[] };
     if (doc?.facet in taxonomy) taxonomy[doc.facet] = doc.terms ?? [];
   }

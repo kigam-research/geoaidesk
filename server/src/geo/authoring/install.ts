@@ -66,7 +66,10 @@ export async function installPackage(
   if (installedHere) {
     const origin = originOfSource(existing?.source, storeDir).origin;
     if (origin.kind !== "gaid-hub")
-      throw new AuthoringError(`프로젝트에 같은 이름의 다른 스킬이 있습니다: ${pkg.slug}. 그 스킬을 지운 뒤 다시 설치하세요.`, 409);
+      throw new AuthoringError(
+        `프로젝트에 같은 이름의 다른 스킬이 있습니다: ${pkg.slug}. 그 스킬을 지운 뒤 다시 설치하세요.`,
+        409,
+      );
   }
 
   const preview = await previewSkillSource(paths, { source: staged.source, scope: "project" });

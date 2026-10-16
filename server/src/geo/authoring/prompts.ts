@@ -1,6 +1,6 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
-export const ANALYZE_PROMPT_VERSION = 'gaid-analyze/2026-10-16.1'
-export const DRAFT_PROMPT_VERSION = 'gaid-draft/2026-10-16.1'
+export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-16.1";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-16.1";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
 notes or an analysis handoff). Together you turn a method from these sources into a reusable agent skill and, when useful,
@@ -17,7 +17,7 @@ Rules:
 - Separate what the source states from your interpretation.
 - Never claim that anything is published, validated, tested, endorsed by an institution, or reproduced. Never choose a
   publisher, licence, release state or lifecycle; the hub sets those.
-- Output exactly one JSON object and nothing else.`
+- Output exactly one JSON object and nothing else.`;
 
 export const ANALYZE_SYSTEM = `${COMMON}
 
@@ -56,7 +56,7 @@ JSON format:
      "evidence": [{"source": "S1", "page": 2, "quote": "verbatim"}]}
   ]
 }
-For code anchors use {"source": "S2", "path": "scripts/x.py", "quote": "verbatim line"}.`
+For code anchors use {"source": "S2", "path": "scripts/x.py", "quote": "verbatim line"}.`;
 
 export const DRAFT_SYSTEM = `${COMMON}
 
@@ -132,14 +132,14 @@ JSON format:
   },
   "recipe": null or {"choices": {"<choice id>": "value"}, "unresolvedChoices": ["<choice id>"]},
   "evidence": [{"field": "procedure", "findingIds": ["F1", "F4"]}]
-}`
+}`;
 
 export const REPAIR = (errors: string[]) =>
   `The server rejected parts of your JSON. Fix only these problems and return the complete corrected JSON object (same
-format, no commentary):\n${errors.map((e) => `- ${e}`).join('\n')}`
+format, no commentary):\n${errors.map((e) => `- ${e}`).join("\n")}`;
 
-export const REVISE_PROMPT_VERSION = DRAFT_PROMPT_VERSION
+export const REVISE_PROMPT_VERSION = DRAFT_PROMPT_VERSION;
 export const REVISE_ADDENDUM = `Task: revise the current draft so it addresses the feedback, which comes from the researcher or from a
 trial run of the installed method. Keep everything the feedback does not concern, including the researcher's decisions,
 slug, Workflow choices and the code file list, unless the feedback requires a change. Check details against the sources (for
-example the original code's settings) instead of inventing values. Return the complete revised draft in the same JSON format.`
+example the original code's settings) instead of inventing values. Return the complete revised draft in the same JSON format.`;
