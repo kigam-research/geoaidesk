@@ -6,6 +6,10 @@ export interface HandoffFile {
 }
 export interface HandoffPreview {
   request: string; finalAnswer: string; modelRef: string | null; files: HandoffFile[];
+  followUps?: string[];
+  methodTrial?: { methodId: string | null; revision: number | null; workflowId: string; startedAt: string; siteId?: string;
+    assessment?: { outcome: "useful" | "needs-revision" | "failed"; note: string; recordedAt: string } } | null;
+  excludedFiles?: { path: string; reason: "policy" | "unavailable" | "too-large" | "file-limit" }[];
   excluded: Record<string, number>;
   truncated: { request: boolean; finalAnswer: boolean; provenanceStepIds: boolean };
 }

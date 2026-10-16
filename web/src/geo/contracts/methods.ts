@@ -76,6 +76,8 @@ export interface MethodIssue {
 export interface LocalMethodWorkflow extends GeoWorkflowSummary {
   /** `method:<runtimeName>:<workflowId>`: the chat exposure and trial key. */
   exposure: string;
+  /** GAID trial records of this Workflow (any revision) and the latest researcher assessment outcome. */
+  trials: { count: number; lastOutcome: "useful" | "needs-revision" | "failed" | null };
 }
 
 export interface LocalMethodSummary {

@@ -11,7 +11,11 @@
   "emptyText": "No text was recorded.",
   "truncated": "Long text or per-file step lists were truncated. The bundle records the same limits.",
   "files": "Files to include",
-  "role": { "code": "Code", "result": "Output file", "user-data": "User raw data · select explicitly" },
+  "role": {
+    "code": "Code",
+    "result": "Output file",
+    "user-data": "User raw data · select explicitly"
+  },
   "emptyFiles": "No files are available to send. You can download the request and answer alone.",
   "excluded": "Excluded {count} files from the list due to path or size limits, deletion or read failures.",
   "selection": "Selected: {count} files · {size} MiB",
@@ -39,5 +43,11 @@
     "file": "A selected file cannot be sent. Reopen the dialog to check the file list.",
     "size": "A file or bundle exceeds the size limit. Select fewer files. If the chat record is too large, choose another chat.",
     "request": "The analysis handoff request failed. Check the server connection and try again."
-  }
+  },
+  "followUps": "Later requests ({count})",
+  "methodTrial": "Method trial",
+  "methodTrialLine": "Method {method} · revision {revision} · Workflow {workflow}",
+  "assessment": "Researcher assessment: {outcome, select, useful {useful} needs-revision {needs revision} failed {failed} other {not recorded}} · {note}",
+  "noAssessment": "No researcher assessment yet. Save one in the method's trial record to send it along.",
+  "excludedFile": "{path}: {reason, select, policy {path not allowed} unavailable {could not be read} too-large {over 5 MiB} file-limit {over the file limit} other {left out}}"
 }

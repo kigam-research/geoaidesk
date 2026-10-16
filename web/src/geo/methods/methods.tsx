@@ -20,7 +20,10 @@ export function MethodBadges({ method, workflow }: { method: LocalMethodSummary;
   return <>
     {workflow && <>
       <span className={pill}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>
-      {workflow.readiness.runRecord === "none" && <span className={pill} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+      {/* A local method's evidence is GAID's own trial records, not a catalogue install record. */}
+      {workflow.trials.count === 0
+        ? <span className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
+        : <span className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>}
       {workflow.inputRoles.some((role) => role.required) && <span className={pill}>{t("workspace.badge.userData")}</span>}
     </>}
     <span className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}</span>
@@ -183,7 +186,8 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     <h4 className="font-medium">{t("methods.trials.expected")}</h4>
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>
-      <p>{t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") || t("methods.trials.none") })}</p>
+      <p>{expected.files.length === 0 ? t("methods.trials.notDeclared")
+        : t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") })}</p>
     </div>)}
     <TrialAssessment trial={trial} projectId={projectId} />
   </article>;

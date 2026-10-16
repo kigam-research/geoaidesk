@@ -61,5 +61,8 @@
   "assessment.saved": "평가를 저장했습니다.",
   "assessment.error": "평가를 저장하지 못했습니다: {detail}",
   "choices": "작업 전에 정할 과학적 선택: {choices}",
-  "inputRoles": "입력: {roles}"
+  "inputRoles": "입력: {roles}",
+  "badge.noTrials": "해당 Workflow의 GAID 시험 기록이 없습니다.",
+  "badge.trials": "GAID 시험 {count}회{outcome, select, useful { · 평가: 유용함} needs-revision { · 평가: 수정 필요} failed { · 평가: 실패} other {}}",
+  "trials.notDeclared": "패키지가 결과 파일 이름을 정하지 않아 결과 파일과 대조하지 않았습니다."
 }

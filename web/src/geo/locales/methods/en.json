@@ -61,5 +61,8 @@
   "assessment.saved": "Assessment saved.",
   "assessment.error": "Could not save assessment: {detail}",
   "choices": "Scientific choices to make before the task: {choices}",
-  "inputRoles": "Inputs: {roles}"
+  "inputRoles": "Inputs: {roles}",
+  "badge.noTrials": "No GAID trial records for this Workflow.",
+  "badge.trials": "GAID trials: {count}{outcome, select, useful { · assessed useful} needs-revision { · assessed needs revision} failed { · assessed failed} other {}}",
+  "trials.notDeclared": "The package names no result files, so GAID did not match outputs against them."
 }

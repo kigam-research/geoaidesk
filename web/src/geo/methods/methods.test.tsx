@@ -7,7 +7,7 @@ import { onStartGeoTask } from "@/geo/workspace/events";
 vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn() }));
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
 const workflow: LocalMethodWorkflow = {
-  id: "trial", exposure: "method:paper-method:trial", title: { ko: "논문 방법 시험", en: "Paper method trial" },
+  id: "trial", exposure: "method:paper-method:trial", trials: { count: 0, lastOutcome: null }, title: { ko: "논문 방법 시험", en: "Paper method trial" },
   description: { ko: "사용자 자료로 시험합니다." }, disciplines: [], inputRoles: [], requiredScientificChoices: [
     { id: "folds", label: { ko: "Fold 수" } }, { id: "cutoff", label: { ko: "Threshold" } },
   ], prompt: null, boundary: null, skillIds: ["local:paper-method"], environmentProfile: "geo-core", expectedArtifacts: [], exampleCaseIds: [],
@@ -46,6 +46,11 @@ it("provides Workflow and recipe rows with effective lifecycle, implementation a
   expect(screen.getByText("초안")).toBeInTheDocument(); expect(screen.queryByText("공개됨")).not.toBeInTheDocument();
   expect(screen.getByText("코드 포함")).toBeInTheDocument(); expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument(); expect(screen.getByText("미시험")).toBeInTheDocument();
   rows[1].onSelect(); expect(select).toHaveBeenCalledWith(method, workflow, method.recipes[0]);
+});
+it("shows GAID trial counts and the latest assessment instead of the untested badge", () => {
+  const tried = { ...method, workflows: [{ ...workflow, trials: { count: 2, lastOutcome: "needs-revision" as const } }] };
+  render(<>{methodRows([tried], vi.fn())[0].badges}</>);
+  expect(screen.getByText("GAID 시험 2회 · 평가: 수정 필요")).toBeInTheDocument(); expect(screen.queryByText("미시험")).not.toBeInTheDocument();
 });
 it("keeps an invalid method as a detail row and exposes its issues", async () => {
   const invalid = { ...method, workflows: [], recipes: [], issues: [{ subject: "gaid-method.json", message: "Invalid revision" }] };

@@ -22,6 +22,7 @@ import type { EnvironmentReadiness, GeoEnvironmentService } from "../environment
 import { environmentState, projectSkillState, readinessOf, summarizeWorkflow } from "../workspace/workflows.ts";
 import { readMethodFile, type MethodFile } from "./method-file.ts";
 import { originOfSource, packageStore } from "./package-origin.ts";
+import { trialCounts } from "./trials.ts";
 
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_METHODS = 200;
@@ -102,6 +103,7 @@ export async function listLocalMethods(
   options: { roots?: SkillRoot[]; store?: string } = {},
 ): Promise<LocalMethodSummary[]> {
   const methods = installedMethods(paths, options.roots);
+  const trials = trialCounts(paths);
   const profiles = new Set(methods.flatMap((method) => method.file.method?.workflows.map((workflow) => workflow.environmentProfile) ?? []));
   const probes = new Map<string, EnvironmentReadiness | Error | undefined>();
   const data = catalogue?.environments;
@@ -127,7 +129,11 @@ export async function listLocalMethods(
       const environment = catalogue
         ? environmentState(catalogue, workflow.environmentProfile, probes.get(workflow.environmentProfile))
         : { id: workflow.environmentProfile, title: null, state: "unknown" as const, missing: [], detail: "The geo catalogue is not active" };
-      return { ...summarizeWorkflow(workflow, readinessOf(workflow, skills, environment)), exposure: methodExposure(method.runtimeName, workflow.id) };
+      return {
+        ...summarizeWorkflow(workflow, readinessOf(workflow, skills, environment)),
+        exposure: methodExposure(method.runtimeName, workflow.id),
+        trials: trials.get(`${method.runtimeName}:${workflow.id}`) ?? { count: 0, lastOutcome: null },
+      };
     });
     return {
       key: method.key,
