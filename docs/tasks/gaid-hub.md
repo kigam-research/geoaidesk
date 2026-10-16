@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:53:27Z
+updated: 2026-10-16T08:53:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -251,10 +251,9 @@ Work packages:
 Integration order: P1 → wire P2 to real endpoints → P3.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [대기 gaid-hub#1] 기관 GAID에 이미지 모델 제공사(OpenRouter 등)를 연결해야 개념 그림이 실제로 만들어짐 (키 입력은 사람이 함) — 막힌 일: 개념 그림 실제 생성 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#6-결정할-일
-- [확인 gaid-hub#2] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
-- [부채 gaid-hub#3] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
-- [부채 gaid-hub#4] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [확인] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
+- [부채] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [부채] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
