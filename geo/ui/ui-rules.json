@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "guide": "docs/design/ui-guide.md",
+  "note": "Machine-readable part of the GAID UI guide. check-ui.mjs reads locales, copyLength, internals and styles; tokens and components are the values the guide states, for agents and mockups. Colours, fonts, radius and motion come from geo/copy/gaid-app.css (vendored WP00 tokens) and are referenced by CSS variable, not repeated.",
+  "locales": { "dir": "web/src/geo/locales", "locales": ["ko", "en"] },
+  "tokens": {
+    "source": "geo/copy/gaid-app.css",
+    "spacing": { "unitPx": 4, "scalePx": [4, 8, 12, 16, 24, 32, 48], "tailwind": ["1", "2", "3", "4", "6", "8", "12"] },
+    "type": {
+      "captionPx": 12, "bodyPx": "var(--gaid-body-size)", "subtitlePx": "var(--gaid-h2-size)", "titlePx": "var(--gaid-h1-size)",
+      "minPx": 12, "weights": { "body": 400, "emphasis": 500, "heading": "var(--gaid-heading-weight)" },
+      "lineHeight": { "body": 1.5, "heading": 1.3 }, "measureCh": { "ko": 40, "en": 75 }
+    },
+    "colour": {
+      "roles": {
+        "text": "--foreground", "textSecondary": "--muted-foreground", "surface": "--background", "surfaceSubtle": "--muted",
+        "action": "--primary", "actionHover": "--gaid-brand-hover", "focus": "--ring", "border": "--border",
+        "success": "--gaid-success", "warning": "--gaid-warning", "danger": "--gaid-danger", "untested": "--gaid-untested", "noData": "--gaid-nodata"
+      },
+      "contrastMin": { "text": 4.5, "largeText": 3, "uiComponent": 3 }
+    },
+    "radius": { "control": "var(--radius-md)", "card": "var(--radius-lg)", "popup": "var(--radius-lg)" },
+    "control": { "heightPx": 32, "minTargetPx": 24, "iconPx": 16 },
+    "motion": { "fast": "var(--gaid-motion-fast)", "base": "var(--gaid-motion-base)", "easing": "var(--gaid-easing)", "maxMs": 300 },
+    "layout": {
+      "minViewportPx": 1024, "headerPx": 56, "sidePanelPx": { "min": 280, "default": 320, "max": 400 },
+      "dialogPx": { "small": 400, "medium": 560, "large": 720 }, "contentMaxPx": 960, "dialogMaxHeightVh": 85
+    }
+  },
+  "components": {
+    "dialogMaxActions": 3,
+    "primaryActionsPerView": 1,
+    "questionOptions": { "min": 2, "max": 5, "recommendedFirst": true, "otherInput": true, "oneQuestionPerStep": true },
+    "firstView": { "maxBodyChars": { "ko": 300, "en": 600 }, "maxParagraphsBeforeAction": 2, "maxBadgesPerRow": 3 },
+    "tableMaxVisibleColumns": 8,
+    "toastMaxChars": { "ko": 40, "en": 80 }
+  },
+  "copyLength": {
+    "note": "Visible characters after ICU arguments count as argumentChars each and plural/select blocks as their longest branch. The first role whose ids match an id decides its limit.",
+    "argumentChars": 4,
+    "exemptIds": ["*.command", "*.command.*", "*.code", "*.code.*", "*.path", "*.path.*", "*.citation", "*.citation.*", "*.userData", "*.userData.*", "*.question", "*.question.*", "*.prompt", "*.prompt.*", "*.template", "*.template.*"],
+    "roles": [
+      { "id": "cta", "ids": ["*.button", "*.button.*", "*.cta", "*.cta.*", "*.action", "*.action.*"], "max": { "ko": 16, "en": 32 } },
+      { "id": "title", "ids": ["*.title", "*.heading", "*.h1", "*.h2", "*.name"], "max": { "ko": 30, "en": 60 } },
+      { "id": "toast", "ids": ["*.toast", "*.toast.*", "*.saved", "*.copied"], "max": { "ko": 40, "en": 80 } },
+      { "id": "text", "ids": ["*"], "max": { "ko": 140, "en": 280 } }
+    ]
+  },
+  "internals": {
+    "note": "Researcher-facing strings must not interpolate raw errors, model names or internal ids. Model names are allowed only where the researcher chooses or configures a model; raw detail only behind a technical-details disclosure (*.details*, *.technical*).",
+    "surfaces": ["*"],
+    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.details", "*.details.*", "*.technical", "*.technical.*"],
+    "forbiddenArguments": ["detail", "error", "message", "stderr", "stack", "model", "sessionId", "chatId", "runId", "toolCallId", "requestId"],
+    "forbiddenText": {
+      "ko": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED"],
+      "en": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED"]
+    }
+  },
+  "styles": {
+    "roots": ["web/src/geo"],
+    "extensions": [".tsx", ".ts"],
+    "skipFiles": ["*.test.ts", "*.test.tsx", "web/src/geo/locales/*"],
+    "hexAllowFiles": ["web/src/geo/viewers/map/colors.ts", "web/src/geo/viewers/map/map-canvas.tsx", "web/src/geo/viewers/depth/tracks.tsx"],
+    "minFontPx": 12
+  }
+}

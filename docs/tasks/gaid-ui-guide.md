@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:34:47Z
+updated: 2026-10-16T08:45:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -57,11 +57,25 @@ Present the guide's structure and key rules to the user in your tab before final
   caches and app-written files/links after the last check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-16: resumed; One UI source digest running (native sub-agent → ~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md)
+  and an Oracle Pro cross-check (output ~/data/geoaidesk/work/gaid-ui-guide/oracle-oneui.out).
 ## Next steps
-1. (the next session's first action)
+1. Write docs/design/ui-guide.md + geo/ui/ui-rules.json from the digest; present structure/key rules to the user.
+2. geo/ui/check-ui.mjs (+ geo/tests test, scripts/check step), AGENTS.md rule.
+3. Child writer `screens`: before screenshots from a throwaway instance (free ports, data under
+   ~/data/geoaidesk/work/gaid-ui-guide/) + after mockups for 3 screens; then persona + Claude 고급검토 + Codex 검토 reviews.
+Blocked: waiting for the One UI source digest (native sub-agent, notifies on completion) and the Oracle Pro run (systemd unit oracle-oneui-278305).
 ## Failed approaches
 ## Notes and decisions
+- Plan (2026-10-16). Sequential: One UI digest → guide + rules file (writer, owns docs/design/ui-guide.md, geo/ui/*,
+  AGENTS.md rule, scripts/check step) → screens package → reviews → report. Independent package: `screens` child
+  (owns reports/<date>-gaid-ui-guide/figures/ and mockup sources under ~/data/geoaidesk/work/gaid-ui-guide/mockups;
+  no app code edits). Integration order: guide/rules/check first (so gaid-hub can sync early), then screens, then report.
+- Representative screens: (1) workflow start setup dialog (`web/src/geo/workspace/task-setup.tsx`) → one question per
+  step with recommended option + 기타 input; (2) map viewer (`web/src/geo/viewers/map/`) → legend/info beside map,
+  popup, less explanatory text; (3) method detail dialog (`web/src/geo/methods/methods.tsx`) → no model/chat id,
+  progressive disclosure. Mockups only; app code is not rebuilt here (gaid-hub aligns its own screens).
+- geo/copy/ is vendored from skill_hub and stays unedited; new UI rules live in geo/ui/ and reference gaid-app.css vars.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
