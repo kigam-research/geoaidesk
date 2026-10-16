@@ -37,6 +37,31 @@ function trialsDir(paths: ProjectPaths): string {
   return path.join(geoStateDir(paths), "method-trials");
 }
 
+/** Counts known trial records for registered package identities, without provenance scans or the list-view cap. */
+export function countRegisteredMethodTrials(paths: ProjectPaths, methodId: string, packageSha256s: Set<string>): number {
+  let names: string[];
+  try {
+    names = fs.readdirSync(trialsDir(paths)).filter((name) => name.endsWith(".json"));
+  } catch {
+    return 0;
+  }
+  let count = 0;
+  for (const name of names) {
+    try {
+      const record = JSON.parse(fs.readFileSync(path.join(trialsDir(paths), name), "utf8")) as StoredTrial;
+      if (
+        record.schemaVersion === "gaid-method-trial/v1" &&
+        record.methodId === methodId &&
+        record.packageSha256 &&
+        packageSha256s.has(record.packageSha256)
+      ) count++;
+    } catch {
+      // Follow trialCounts: unreadable records are skipped, never rewritten or inferred successful.
+    }
+  }
+  return count;
+}
+
 function trialFile(paths: ProjectPaths, sessionId: string): string {
   if (!SESSION_ID.test(sessionId) || sessionId === USER_SESSION_ID) throw new MethodTrialError(400, `Invalid session id "${sessionId}"`);
   return path.join(trialsDir(paths), `${sessionId}.json`);
