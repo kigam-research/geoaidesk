@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T18:07:14Z
+updated: 2026-10-16T18:07:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -235,7 +235,15 @@ Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No f
     reviews/codex-final.md), researcher persona (native Sonnet, high; briefs/persona-final.md → researcher2/summary.md;
     uses Qwen, so no other Qwen run meanwhile). Then: triage, report figures at 1440x900/1280x800 with UI-guide rule ids,
     humanizer, review-copy, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
-Blocked: waiting for the three final reviews.
+12. Codex 검토 final (reviews/codex-final.md): 4 blockers fixed in cb5f616 (reinstall expected-hash guard via a new
+    seam in server/src/agent/skills-install.ts, name prompt before use, hash-safe section links, install pinned to the
+    shown revision) + default-model reset, skill-only open action. Claude 고급검토 final (reviews/claude-final.md): 3
+    blockers fixed in 391e0d6 (no empty picture frames, example values only for value columns, recommended option
+    first) + rail a11y names, picture note as tooltip, de-duplicated model list; smoke re-registered as 2판 (cover and
+    output pictures on the shared page). Not done (optional): N2 1280 layout of the new-method source step, N3 locked
+    questions as text, N4 "격자 격자" in the smoke summary (model text), N5 limit chip in the draft header.
+    Server-side fixes go live at the next dev restart, after the persona run.
+Blocked: waiting for the researcher persona run (native Sonnet).
 
 ## Failed approaches
 ## Notes and decisions
