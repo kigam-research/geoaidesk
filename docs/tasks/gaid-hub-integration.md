@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T00:07:10Z
+updated: 2026-10-16T00:08:32Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -98,43 +98,25 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   scientific choices, outputs and limits. Web geo tests 146 pass, tsc clean, copy 0 errors.
 - Merged main c4ce9bf (gaid-qwen-authoring-trial) at 75a4721: conflict only in geo/tests/distribution.test.mjs owners
   (kept both); server 53 + web 145 targeted tests pass.
+- P4 trial result (researcher 7e41440e, 07:58–09:02 KST; <work>/researcher/{summary,log}.md): install + launch without help;
+  bounded run did not reach the first human gate (Qwen rewrote/re-ran a 70,200-cell variogram for 45+ min; stopped). Trial record:
+  42 tool calls / 10 failed, outputs pyproject.toml + scripts/01_variogram.py; assessment needs-revision (verbatim). Handoff bundle
+  downloaded as gaid-analysis-01a141d0-20261016.tar.gz (server filename, CORS fix confirmed). `uv run --with scikit-gstat` works on
+  PC74 (model used the wrong distribution name `skgstat`). Reported to skill_hub (351e0b68701b completed) with 7 package items.
+- GAID fixes from the trial (921ef1b): trial counts/assessment on method Workflow rows, "no result files declared" text, handoff
+  carries followUps + methodTrial + excludedFiles, prefers the method's hub, sticky action bar. Tests: server handoff 13, web
+  methods/hub-handoff 21, geo web 147; typechecks clean; copy 0 errors. Instance rebuilt on 921ef1b.
+- Optional (not done): file suggestions ignore installed hub methods; upstream file tabs re-poll a >8 MB CSV every ~1.5 s (2,138
+  console 413s in one session); method/model run progress for long silent runs.
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
-Blocked: waiting for the P4 researcher agent 7e41440e (Paseo, running; UI trial of the hub package on Qwen) to write <work>/researcher/summary.md; a background wait in this session fires when it exists.
-1. P4 running (2026-10-16 08:05 KST): package local/pu-nested-cv-prospectivity rev 1 (request 351e0b68701b, sha256
-   84daff9e…, hub :4317 kept up until we report). Instance rebuilt on 1905f3f. Researcher agent 7e41440e-9412-45d8-944e-444049c24585
-   (Claude Sonnet 5.5 high, notifyOnFinish false), brief <work>/researcher/BRIEF.md, deliverables <work>/researcher/
-   {log.md,summary.md,playwright/}; bounded to the method's first human gate (no model training); data
-   <work>/samples/yilgarn (asset yilgarn-gis-db/20260911). Check: get_agent_status 7e41440e; ls <work>/researcher.
-   351e0b68701b reported --blocked (in progress); report the result with route-report when the trial is assessed.
-   Then: orchestrator gates (GET /geo/methods, trial record vs provenance, exposure record hides spatial-pu-workflow,
-   handoff download filename), visual reviews, fixes, report.
-2. `task complete` each child on its finish notice; then integrate. (P2 applied the hubHandoff.attach qualification and
-   the distribution.test.mjs owner whitelist entry for gaid-hub-integration itself; take both from its merge.)
-   After P2 integrates: expose `Content-Disposition` on the handoff gzip responses (route-local merge into
-   Access-Control-Expose-Headers, keeping the existing names; API is cross-origin 18xxx vs 3xxx), then check in the real
-   browser that the download keeps the server filename `gaid-analysis-<id>-<date>.tar.gz`. Do not push to the parent
-   branch while children run their finish checks.
-3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
-4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
-### P4 acceptance plan (2026-10-15)
-- Instance: snapshot of this branch (after children integrate) in ~/data/geoaidesk/work/gaid-hub-integration/app,
-  GAID_HOME=<work>/home, ports 3320/18320, systemd-run --user unit `gaid-hub-app`, log <work>/logs/app.log;
-  GAID_SKILL_HUB_SITES points at the trial hub http://127.0.0.1:4317/ (authoring "api/gaid/"). kigam-qwen provider,
-  defaults and reasoning levels copied from the trial unit's home2/pi-agent (models.json, kady-custom-models.json,
-  kady-settings.json; keyless). No paid route configured.
-- Input data for the bounded trial depends on the hub package's declared inputs: candidates are the paper's original
-  data (~/pc71-projects/narr/mpm_nested_cv/data, 130 MB, reproduction) and Kambalda grids/ozmin
-  (<trial work>/samples/kambalda, new-data). The catalogue spatial-pu-workflow skill stays installed in the project but is
-  hidden from the method chat by the `method:` exposure; verify that in the exposure record.
-- Steps: researcher agent (Claude Sonnet 5.5 high, playwright-cli) as in the trial unit: Settings → Skills hub list →
-  preview → acknowledge → install; Workflow panel method row → setup → chat on Qwen; record outcome; assessment.
-  Orchestrator gates: GET /geo/methods, trial record vs provenance, exposure record, expected artifacts. Visual reviews
-  "Claude 고급검토" and "Codex 고급검토" before/after fixes.
-- Qwen server took one session at a time (trial unit note): schedule GAID trial chats when the hub's authoring and the
-  trial unit's R1 are not using it.
-
+1. Visual reviews running (read-only readers, results arrive in this session): Claude 고급검토 f62eecd7-387d-4c81-b0dc-4ae06214607d,
+   Codex 고급검토 22391b2a-3b46-4e6f-ac5e-3a55e8f6903e; prompts/outputs ~/data/geoaidesk/work/gaid-hub-integration/reviews/.
+   Triage their findings (fix blockers, defer polish), then write reports/2026-10-16-gaid-hub-integration/index.md.
+2. If skill_hub sends a revision 2 package (answer to 351e0b68701b), re-run the bounded trial (same brief, new chat) and add it.
+3. Final: full scripts/check via task finish; remove build caches/app-written files from the worktree; Current state first block
+   = result for the forwarded goal.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration (2026-10-15)
