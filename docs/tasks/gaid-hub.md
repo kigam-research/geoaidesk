@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-16T18:45:23Z
+status: done
+updated: 2026-10-16T18:45:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -202,51 +202,7 @@ gives one). Test models: MiniMax M3.1 Flash Preview beside kigam-qwen for the hu
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub.md.
-6. User direction 2026-10-16: concept pictures through the ChatGPT sign-in (f694e61: Codex images endpoint, gpt-image-2,
-   subscription ledger; 23 tests pass, no real call yet). Dev instance gaid-hub-dev running again (3330/18330) for the
-   user's sign-in. After sign-in: make concept pictures for one draft, check them, update the report (§5/§6, figures),
-   stop the dev unit, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
-7. MiniMax (user direction above): M3.1 Flash Preview registered on `minimax` (carrying over Pi's built-ins); live chat on the
-   dev instance answered in Korean, ledgered payg $0. MiniMax image-01 source live: 4 JPEG pictures 1248x832 for the smoke
-   draft (op-minimax-test-1); the zone-map picture is only a filled outline (weak). Picture source picker in the draft.
-   ChatGPT: "Sign in with ChatGPT" (openai) refuses images (Images API: rejected_by_hardened_oauth_boundary; Responses
-   image_generation: subscription_sharing_unsupported_capability; probes ~/data/geoaidesk/work/gaid-hub/tools/). Only the
-   legacy "OpenAI Codex" login (chatgpt.com Codex backend, Codex CLI's images path) remains; code now uses that login only.
-8. Hub note note-ui-guide (2026-10-16): unit gaid-ui-guide writes a One UI-based GAID UI/UX guide (user: "현재 gaid ui/ux
-   시스템과 관련하여 https://developer.samsung.com/one-ui 를 적극 참고하여 ui/ux 가이드를 개선하자. …"). Do not lock in
-   spacing/type/colour/component details; after the guide lands on main: `task sync`, align the hub screens, then the
-   final visual review, report figures and finish. Report the consumed request before finishing.
-9. User signed in with "OpenAI Codex (legacy)": op-codex-test-1 made 4 PNG pictures 1536x1024 (good quality); comparison
-   figure reports/2026-10-16-gaid-hub/figures/visuals-compare.png; report §2/§3/§5/§6/§7/appendix updated.
-10. Codex-only pictures + usage-limit notice (dc52822); hub agent model choice (793c020). M3.1 comparison runs started
-   2026-10-16 18:01 KST (background shells, logs ~/data/geoaidesk/work/gaid-hub/m31/): authoring ap-8475d969-daf (same
-   sources/goal as smoke, recommended answers; tools/m31-authoring.mjs) and GAID trial in project yilgarn-40km-m3-1-5a4198
-   (same package ap-2bd027a9-9f2 rev 3, same 40 km CSV sha 49b7855e, same v5 start message, thinking high; permission
-   prompts auto-allowed and logged; tools/m31-trial.mjs). Qwen baselines: smoke authoring analyze 4m21s/36 findings/5 q,
-   draft 4m28s with 13 check errors; v5 trial ~21 min with outputs. Results: M3.1 analyze 13m01s (repaired, 35 findings,
-   4 q), draft 13m11s (repaired, 1 check error: SKILL.md names a file not in the package); trial ~6 min, pipeline ~17 s,
-   block 198 km, Z0-2 9.7% area → 33.6% capture; zone map north-south flipped; ran folds 1-4 unasked. Added to report §3/§5.
-11. gaid-ui-guide landed (hub note note-ui-guide-landed): main merged (32d774b); hub screens aligned to the guide (c7c1bab:
-    S2 neutral surfaces, T1/T2 type scale, B1 one filled primary, R1 Korean task labels and no provider names, F4/R2
-    research-term errors + `기술 정보` disclosure, P3/W5 collapsible summary); `check-ui` 0 errors, copy check 0 errors,
-    hub tests 18 pass. Final reviews running (2026-10-17 ~03:00 KST): Claude 고급검토 reader 2bdb7aa8
-    (briefs/review-claude-final.md → reviews/claude-final.md), Codex 검토 reader 27625365 (briefs/review-codex-final.md →
-    reviews/codex-final.md), researcher persona (native Sonnet, high; briefs/persona-final.md → researcher2/summary.md;
-    uses Qwen, so no other Qwen run meanwhile). Then: triage, report figures at 1440x900/1280x800 with UI-guide rule ids,
-    humanizer, review-copy, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
-12. Codex 검토 final (reviews/codex-final.md): 4 blockers fixed in cb5f616 (reinstall expected-hash guard via a new
-    seam in server/src/agent/skills-install.ts, name prompt before use, hash-safe section links, install pinned to the
-    shown revision) + default-model reset, skill-only open action. Claude 고급검토 final (reviews/claude-final.md): 3
-    blockers fixed in 391e0d6 (no empty picture frames, example values only for value columns, recommended option
-    first) + rail a11y names, picture note as tooltip, de-duplicated model list; smoke re-registered as 2판 (cover and
-    output pictures on the shared page). Not done (optional): N2 1280 layout of the new-method source step, N3 locked
-    questions as text, N4 "격자 격자" in the smoke summary (model text), N5 limit chip in the draft header.
-    Server-side fixes go live at the next dev restart, after the persona run.
-13. Persona final (researcher2/summary.md): whole flow done without blocks; fixes dafe7e5 (revise wording, failure detail
-    behind 기술 정보, back to hub list, author's note, folder creation in register dialog, sharing wording, result example
-    tables by output) and 8a47303 (type sizes; report screens 1440/1280). Report §0/§2/§3/§4/§5 updated. Next: humanizer
-    pass, review-copy, stop dev unit, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
+Closed 2026-10-16T18:45:24Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub.md.
 
 ## Failed approaches
 ## Notes and decisions
@@ -285,11 +241,11 @@ Work packages:
 Integration order: P1 → wire P2 to real endpoints → P3.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [확인] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
-- [부채] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
-- [선택] 허브 첫 화면에 다른 연구자가 등록한 방법 목록(폴더·검색) 추가 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
-- [선택] 저작 질문에 "원본 코드 포함"과 "빠른 시험용 줄인 설정" 항목 추가, 시작 설정 기본값을 연구자 취지에 맞추기 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
-- [부채] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [확인 gaid-hub#1] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
+- [부채 gaid-hub#2] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [선택 gaid-hub#3] 허브 첫 화면에 다른 연구자가 등록한 방법 목록(폴더·검색) 추가 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [선택 gaid-hub#4] 저작 질문에 "원본 코드 포함"과 "빠른 시험용 줄인 설정" 항목 추가, 시작 설정 기본값을 연구자 취지에 맞추기 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [부채 gaid-hub#5] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
