@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-16-gaid-hub-integration/figures/02-method-detail-after.png" width="120"> | 2026-10-16 09:32 | [skill_hub에서 만든 방법을 GAID에서 받아 설치하고 시험하기](2026-10-16-gaid-hub-integration/index.md) | hub에서 논문으로 만든 방법 초안을 GAID가 받아 설치하고 시험 채팅과 시험 기록까지 남겼으나, 제한한 첫 시험은 방법의 첫 확인 지점에 이르지 못했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-16-gaid-brand-copy/figures/01-skills-source.png" width="120"> | 2026-10-16 08:27 | [화면의 이름을 "AI agent"와 GAID로 바꾸고 K-Dense에서 온 스킬·Workflow에 출처 표시](2026-10-16-gaid-brand-copy/index.md) | 화면에 남아 있던 "Kady"·"K-Dense" 54곳을 "AI agent"와 GAID로 바꿨습니다. K-Dense에서 가져온 스킬·Workflow·템플릿에는 그 항목이 보이는 곳에 "출처: K-Dense"가 링크로 나옵니다. 좁은 창을 지원하지 않는다는 점은 지원 환경 문서에 적었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-15-gaid-qwen-authoring-trial/figures/01-workflow-list.png" width="120"> | 2026-10-16 01:20 | [기관 Qwen 모델이 GAID 안에서 만든 스킬과 Workflow — 연구자 역할 시험과 수정](2026-10-15-gaid-qwen-authoring-trial/index.md) | Qwen은 쓸 만한 스킬을 만들었지만 Workflow는 둘 곳이 없어 앱 설정을 무단으로 고쳤습니다. 발견한 앱 결함을 고쳤고, 작성은 skill_hub에서 하기로 정해 다음 작업으로 넘겼습니다. | 검토함 10-15 | 미정 | 0 |
 | <img src="2026-10-15-gaid-researcher-ecosystem/figures/preview-method.png" width="120"> | 2026-10-15 18:15 | [연구방법의 제작·실행·공유를 잇는 GAID 개편안](2026-10-15-gaid-researcher-ecosystem/index.md) | 실제 PDF에서 방법 선택·초안 편집·시험 준비로 이어지는 클릭형 시안을 구현했습니다. | 검토 전 | 미정 | 0 |
