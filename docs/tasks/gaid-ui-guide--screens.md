@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T09:10:22Z
+status: done
+updated: 2026-10-16T14:45:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20ad37cf-9bc9-4ad3-962f-7032db897bf4","pid":415644,"provider":"codex","session":"01a143e3-e983-79e0-9525-de41b13ba6d6","start":"2831125","token":"039d25a0e0b86aec275011c693c4488034e3cc00174d4a99f3fab0932b56436b"}
 branch: task/gaid-ui-guide--screens
 target: task/gaid-ui-guide
@@ -79,7 +79,7 @@ Declared checks passed: node geo/ui/check-ui.mjs (0 errors; 96 pre-existing debt
 Capture job exited 0; ports 3347/18347 released; external snapshot caches and dependency links removed. User review instances and ~/.geoaidesk unchanged.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T09:10:22Z: ready; the parent gaid-ui-guide integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T14:45:03Z: integrated into gaid-ui-guide; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - The isolated launcher omitted KADY_FRONTEND_PORT, so browser CORS blocked its non-default port. Playwright bridged requests to the same isolated API without changing responses or source.

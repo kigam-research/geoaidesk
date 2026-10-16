@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T14:30:07Z
+status: done
+updated: 2026-10-16T14:45:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9e5573c7-0899-4c21-9d60-48b4df645c01","pid":3776156,"provider":"codex","session":"01a1450f-065c-7781-81fa-b6be4aba848c","start":"4791385","token":"f03dffd1c7b13a0465fac0934a127ab80e5556a92d2f59cc934fcadd51c1db09"}
 branch: task/gaid-ui-guide--screens2
 target: task/gaid-ui-guide
@@ -75,7 +75,7 @@ Declared checks passed: node geo/ui/check-ui.mjs (0 errors, 102 existing debt); 
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T14:30:07Z: ready; the parent gaid-ui-guide integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T14:45:03Z: integrated into gaid-ui-guide; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial browser replay tried to open all attributes after Escape had also closed the map popup. Re-selecting a row before that action fixed the replay; no product workaround was needed.
