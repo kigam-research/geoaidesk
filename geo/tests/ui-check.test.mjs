@@ -14,6 +14,8 @@ const s = (id, text, locale = "ko") => ({ id, locale, text });
 test("visible length counts arguments and the longest plural branch", () => {
   assert.equal(visibleLength("파일 {name} 열기", 4), 10);
   assert.equal(visibleLength("{count, plural, one {파일 #개} other {파일 #개를 골랐습니다}}", 4), 13);
+  // Arguments inside branches (Codex review B1): the longest rendered branch, not the ICU source.
+  assert.equal(visibleLength("{state, select, missing {파일 {name}을 찾지 못했습니다.} other {파일 {name}을 읽지 못했습니다. 다시 시도하세요.}}", 4), 28);
 });
 
 test("copy limits follow the first matching role", () => {
@@ -30,14 +32,15 @@ test("copy limits follow the first matching role", () => {
 test("researcher-facing strings may not interpolate raw errors, models or ids", () => {
   const findings = checkInternals([
     s("workspace.setup.error", "작업 초안을 만들지 못했습니다. {detail}"),
-    s("workspace.setup.error.details", "{detail}"),
+    s("workspace.setup.error.technical", "{detail}"),
+    s("previewMethod.details", "모델: {model}"),
     s("methods.trial.model", "모델: {model}"),
     s("app.chat.models.selectCurrent", "모델 선택, 현재 {model}"),
     s("work.run", "실행 {runId}"),
     s("files.read", "Traceback 표시", "en"),
     s("files.ok", "파일을 읽지 못했습니다. 형식을 확인하세요."),
   ], rules);
-  assert.deepEqual(findings.map((f) => f.key), ["ko:workspace.setup.error", "ko:methods.trial.model", "ko:work.run", "en:files.read"]);
+  assert.deepEqual(findings.map((f) => f.key), ["ko:workspace.setup.error", "ko:previewMethod.details", "ko:methods.trial.model", "ko:work.run", "en:files.read"]);
 });
 
 test("styles check finds hard-coded colours and text below the scale", () => {

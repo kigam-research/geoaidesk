@@ -30,8 +30,9 @@ adapts; section 11 lists where GAID deliberately differs.
 1. Before any change to visible UI, read sections 1 and 9 and the sections for the components you touch.
 2. In the change report, list the rule ids the change follows (for example `P1 Q1–Q5 R1`) and any rule it breaks,
    with the reason. Accepted debt goes in `geo/ui/ui-baseline.json` only with that reason.
-3. Visual review: screenshot the changed screen in Korean at 1440×900 and at 1280×800, check it against the
-   checklist in section 10, and attach the screenshots to the report.
+3. Visual review (changes to layout, density, components or states; a pure wording change needs none): screenshot the
+   changed screen in Korean at 1440×900 and at 1280×800, check it against the checklist in section 10, and attach the
+   screenshots to the report.
 4. Run `node geo/ui/check-ui.mjs` (part of `scripts/check`).
 
 Rule ids: P principles, L layout, T type, S colour and states, B buttons, N navigation and tabs, D dialogs and
@@ -54,9 +55,9 @@ states), M motion, A accessibility, W copy length and density, R what researcher
 | Id | Rule | One UI source |
 |---|---|---|
 | L1 | **Desktop window classes.** Design for 1280–1920 px wide windows; 1024 px is the minimum that must work without horizontal page scroll. Narrow windows (~390 px) are unsupported for the workspace (`geo/compatibility.json`). | Large screen / Layout design "Windows size classes" (Expanded ≥ 840 dp is the desktop baseline) |
-| L2 | **Panes.** The workspace is sidebar + main + optional side panel. List/detail views use two panes with roughly 38:62 width from 960 px; side panels are 280–400 px (default 320 px). Never stretch one text column across a wide window: body text keeps a readable measure (T4). | Large screen / Designing for large screens "Multi-pane layout" (42:58 at 600–960 dp, 38:62 from 960 dp) |
+| L2 | **Panes.** The workspace is sidebar + main + optional side panel. List/detail views use two panes with roughly 38:62 width from 960 px; side panels are 280–400 px (default 320 px); the app header is 56 px; reading-width content (forms, documents) is at most 960 px wide. Never stretch one text column across a wide window: body text keeps a readable measure (T4). | Large screen / Designing for large screens "Multi-pane layout" (42:58 at 600–960 dp, 38:62 from 960 dp) |
 | L3 | **Navigation stays visible** next to content on desktop widths (sidebar, tabs); do not hide it behind a menu button. | Large screen / Layout design "Show menus together with content"; Designing for large screens "Make navigation controls fit the screen" |
-| L4 | **Spacing scale.** 4 px unit; use 4, 8, 12, 16, 24, 32, 48 px (Tailwind `1 2 3 4 6 8 12`). Inside a control or row: 4–8. Between related items: 8–12. Between groups/sections: 16–24. Page and panel inset: at least 16 px, 24 px for main content areas. | Layout / Grid system "Keyline and margin" (24 dp minimum side margin) |
+| L4 | **Spacing scale.** 4 px unit; use 4, 8, 12, 16, 24, 32, 48 px (Tailwind `1 2 3 4 6 8 12`). Inside a control or row: 4–8. Between related items: 8–12. Between groups/sections: 16–24. Page and panel inset: at least 16 px, 24 px for main content areas. | Layout / Grid system "Keyline and margin" (24 dp minimum side margin). The 4 px unit and scale are GAID's; One UI states no base grid |
 | L5 | **Group into focus blocks.** Related content goes in one card or grouped list with a short subheader; use few block types per screen. Text-only cards when the content is more than three lines. | Layout / Basic layout "Focus block" |
 | L6 | **Keep the first action visible.** The primary action of a view is visible at 1280×800 without scrolling. Long content scrolls inside its own region (list, table, panel), with header and actions fixed. Dialogs are at most 85% of the viewport height with a fixed footer. | Layout / Basic layout "Interaction area"; Large screen "Keep things reachable" |
 | L7 | **Continuity.** Resizing, collapsing a panel or switching tabs keeps scroll position, selection and unsent input. | Large screen / Designing for foldables "App continuity and responsive layouts"; App bar (state restored on return) |
@@ -68,7 +69,7 @@ Font: Pretendard (open licence) as set in `gaid-app.css`; D2Coding for code and 
 | Id | Rule | One UI source |
 |---|---|---|
 | T1 | **Scale.** Caption 12 px, body 14 px (`--gaid-body-size`), subtitle 16 px (`--gaid-h2-size`), title 20 px (`--gaid-h1-size`). Weights 400 body, 500 emphasis, 600 headings (`--gaid-heading-weight`). Nothing below 12 px; no `text-[10px]`/`text-[11px]`. | One UI states no type scale; the scale is GAID's WP00 token set. Accessibility / Layout and typography "Scalable text" |
-| T2 | **One title per view**, then subtitles for sections. Do not use more than three sizes in one view. | Layout / Basic layout "Typography for spatial design" |
+| T2 | **One title per view**, then subtitles for sections. Do not use more than three sizes in one view. | Layout / Basic layout "Typography for spatial design" (text recognisable at a glance); the three-size limit is GAID's |
 | T3 | **Line height** 1.5 for body, 1.3 for headings. Korean uses `word-break: keep-all` (already global). | — (GAID) |
 | T4 | **Measure.** Body text blocks are at most ~40 Korean characters or ~75 Latin characters per line (about 640 px at 14 px). | Large screen "Multi-pane layout" (stretched single columns are hard to read) |
 | T5 | **Numbers** in tables, coordinates and statistics use tabular figures (`table, .gaid-numeric`). | — (GAID) |
@@ -104,7 +105,7 @@ palettes for maps and depth tracks are the exception (`ui-rules.json` `styles.he
 
 | Id | Rule | One UI source |
 |---|---|---|
-| N1 | Tabs are text labels (noun), ideally ≤ 4 and never more than 5 in one tab bar; more destinations go in the sidebar or a list. | Components / Bottom navigation (fewer than 4 tabs, at most 5, text only) |
+| N1 | Tabs are text labels (noun), ideally 3 or fewer and never more than 5 in one tab bar; more destinations go in the sidebar or a list. Open-file tabs in the workspace are documents, not navigation, and are not limited by N1. | Components / Bottom navigation (fewer than 4 tabs, at most 5 if necessary, text only) |
 | N2 | Switching tabs never loses input (L7). Selected tab is announced as "Tab n of m" (`role="tab"`, `aria-selected`). | Accessibility / Screen reader announcement table |
 | N3 | A contextual selection bar appears only after multi-select, holds 2–5 actions with icon + text, and overflows into More after four. | Components / Bottom bar |
 
@@ -113,14 +114,15 @@ palettes for maps and depth tracks are the exception (`ui-rules.json` `styles.he
 | Id | Rule | One UI source |
 |---|---|---|
 | D1 | **Use a modal dialog only to** enter required data, confirm a destructive or irreversible action, get consent to send data outside the PC, or show information the researcher must read before continuing. Everything else uses a popover, side panel, inline message or toast. | Writing / Simple and human "Only interrupt for important things"; Components / Dialog |
-| D2 | A dialog has a title (statement, not a question), at most two short paragraphs, and at most **3 actions**. Sizes 400/560/720 px. It closes by its actions, Escape or the close button; destructive confirmations do not close on outside click. | Dialog; App bar (≤ 3 actions) |
+| D2 | A dialog has a title (statement, not a question), at most two short paragraphs, and at most **3 actions** (footer task buttons such as 취소 / 이전 단계 / 다음 단계; step tabs, option rows, disclosures and the close button do not count). Sizes 400/560/720 px. It closes by its actions, Escape or the close button; destructive confirmations do not close on outside click. | Dialog (purpose, dismissal); the 3-action cap is GAID's, extended from App bar "Action button" (≤ 3 per page). One UI states no dialog button count |
 | D3 | **One overlay level.** Never open a dialog over a dialog. Modal = dim backdrop; related overlays (popover, side sheet, map popup) = light shadow, no dim. Never dim and shadow together. | Structure / Visual depth |
 | D4 | Popovers open next to their trigger, hold one small task or one record, and close with Escape, outside click or a close button; focus returns to the trigger. | Large screen "Get things done without leaving the screen" |
 | D5 | Context menus are untitled lists opened by right-click or a ⋯ button; every item also exists in visible UI or the More menu. | Components / Dialog (context menu) |
 
 ### Questions and option pickers (Q)
 
-The pattern for any multi-field setup (workflow start, recipe import, method trial, interview questions).
+The pattern for any multi-field setup (workflow start, recipe import, method trial, interview questions). One UI has no
+picker or stepper component page; Q1–Q6 apply its Writing principles and the user's requirement.
 
 | Id | Rule | One UI source |
 |---|---|---|
@@ -145,7 +147,7 @@ The pattern for any multi-field setup (workflow start, recipe import, method tri
 | Id | Rule | One UI source |
 |---|---|---|
 | X1 | Sticky header; each column header has sort and filter; numbers right-aligned with tabular figures; units in the header, not in every cell. | Lists (scan and search); T5 |
-| X2 | Show ≤ 8 columns by default; other columns are chosen from a column menu. Wide tables scroll inside their own region. | Large screen "Adjust grids for large screens" |
+| X2 | Show ≤ 8 columns by default; other columns are chosen from a column menu. Wide tables scroll inside their own region. | Large screen "Adjust grids for large screens" (no column numbers); 8 is the user-approved GAID default |
 | X3 | Selecting a row opens its record in a popover or the side panel (D4); it does not navigate away. | Large screen "Avoid switching context" |
 | X4 | Above the table, one line of state: `조건에 맞는 행 133 / 전체 133`. Explanations of filtering scope go in a tooltip. | P3 |
 
@@ -153,17 +155,17 @@ The pattern for any multi-field setup (workflow start, recipe import, method tri
 
 | Id | Rule | One UI source |
 |---|---|---|
-| MAP1 | Map + side panel (320 px) side by side from 1024 px; the panel holds, in order, **레이어**, **범례**, **기본 정보**; legend and basic information are visible without scrolling the page at 1280×800 (the panel may scroll inside). | Large screen "Multi-pane layout", "Show menus together with content" |
+| MAP1 | Map + side panel (320 px) side by side from 1024 px; the panel holds, in order, **레이어**, **범례**, **기본 정보**; legend and basic information are visible without scrolling the page at 1280×800 (the panel may scroll inside). The legend uses the panel's free height; when it still cannot show every class it shows the count (`범례 14개`) and a `모두 보기` control, never a silently clipped list. | Large screen "Multi-pane layout", "Show menus together with content" |
 | MAP2 | Basic information shows at most 5 rows (source file name, CRS, unit, feature or pixel count, extent on demand). Sampling method, tile details and display-only notes go behind `자세히` or a tooltip. | P3; Writing / Simple and human "Show benefits" |
 | MAP3 | Clicking a feature or pixel opens a map popup next to the point: title (layer + feature id), up to 8 attribute rows with readable labels, `모든 속성 보기` to open the full record in the attribute table. Missing values show `결측값` in `--gaid-nodata`, not raw codes. | Large screen "Get things done without leaving the screen"; Visual depth (shadow, no dim) |
 | MAP4 | Map toolbar: at most 3 visible actions (B4). Display CRS and basemap are one compact control group above the map, each with a short label; the network note for online basemaps appears only when an online basemap is chosen. | App bar "Action button"; Writing / Simple and human "Remove defensive text" |
-| MAP5 | The attribute table sits below the map in its own region and follows X1–X4. | — |
+| MAP5 | The attribute table sits below the map in its own region (at least 6 rows visible, or a draggable map/table split) and follows X1–X4. | — |
 
 ### Feedback: progress, toasts, empty and error states (F)
 
 | Id | Rule | One UI source |
 |---|---|---|
-| F1 | **Progress** names the current research step in plain words (`입력 확인 중`, `격자 표 만드는 중 2/5`), determinate when the count is known. No logs, tool names or command lines in progress text (R1). | Motion / Motion basics "Real-time feedback response"; Writing "Understand what's happening" |
+| F1 | **Progress** names the current research step in plain words (`입력 확인 중`, `격자 표 만드는 중 2/5`), determinate when the count is known. No logs, tool names or command lines in progress text (R1). | One UI has no progress component rules (Dialog only places progress popups centrally); adapted from Motion basics "Real-time feedback response" and Writing "Understand what's happening" |
 | F2 | **Toasts** confirm minor results in one line (≤ 40 Korean / 80 English characters; never more than two lines) and may carry one follow-up action (`되돌리기`). Errors that block work, data loss or anything that needs a choice is never only a toast. Toasts do not hide important information on a timer. | Components / Toasts ("about one line, never more than three"; snack bar); Accessibility / Interaction and control |
 | F3 | **Empty states** say what is missing in one line and offer one primary action (`파일 올리기`), or a clear way back. | Writing / Focused and purposeful "Take an action" |
 | F4 | **Error states** say what did not happen and what the researcher can do next, in research terms: `지도 자료를 읽지 못했습니다. 파일 형식을 확인한 뒤 다시 읽으세요.` Raw messages, codes and stack traces go only in a collapsed `기술 정보` disclosure with a copy button (R2). Focus moves to the fix after an error. | Writing / Simple and human "Remove defensive text"; Empowering "Provide help, not limits"; Accessibility / Interaction and control |
@@ -199,10 +201,14 @@ characters (an ICU argument counts as 4); English limits are double the Korean o
 | W2 | Titles, headings, list row names | 30 / 60 | Lists "Main text" (≤ 31 characters) |
 | W3 | Toasts and saved/copied notices | 40 / 80 | Toasts (about one line) |
 | W4 | Any other single string (description, hint, message) | 140 / 280 | Writing / Focused and purposeful |
-| W5 | **First-view budget**: body text visible in a view before any interaction ≤ 300 / 600 characters, excluding data the researcher brought (file names, table values, map labels); at most 2 paragraphs before the first action; at most 3 badges per row. | per view | Writing / Focused and purposeful; Empowering "Entice users to explore" |
+| W5 | **First-view budget** (a view = the focused surface: the open dialog, or the main work area of a tab, excluding app header, sidebar and tab bar): body text visible in a view before any interaction ≤ 300 / 600 characters, excluding data the researcher brought (file names, table values, map labels); at most 2 paragraphs before the first action; at most 3 badges per row. | per view | Writing / Focused and purposeful; Empowering "Entice users to explore" |
 | W6 | One line of context under a title; longer explanation goes behind `자세히` (disclosure), a tooltip or documentation. Do not repeat the same limit sentence in several places of one view. | — | Writing / Simple and human |
 
-W1–W4 are checked per string by `check-ui.mjs` (`copy-length`). W5–W6 are checked in visual review.
+W2–W4 are checked per string by `check-ui.mjs` (`copy-length`): a role applies only to locale ids that match its
+pattern in `ui-rules.json` (W1 `*.button`, `*.cta`, `*.action`; W2 `*.title`, `*.heading`, `*.name`; W3 `*.toast`,
+`*.saved`, `*.copied`); every other id gets the W4 limit. Existing catalogues have no `*.button` ids, so W1 is checked only
+for new strings that follow this convention: key new button labels `<area>.<thing>.button` (or `.action`). W5–W6 are
+checked in visual review.
 
 One UI phrases confirmations as questions (Writing / Empowering "Engage users with questions"); GAID keeps its copy rule:
 titles and buttons are statements and actions, and only a yes/no dialog body may ask (gaid-writing.md).
@@ -210,20 +216,22 @@ titles and buttons are statements and actions, and only a yes/no dialog body may
 ## 9. What researchers never see (R)
 
 Researcher views are the workspace, chat, workflow and method screens, viewers, results, notebook, automation and
-hub screens. Settings → Models/Providers, the model picker and the local model card are configuration views where the
-model the researcher chose is content.
+hub screens. Settings (the whole `settings.*` and `app.settings.*` namespaces), the model picker and the local model card
+are configuration views where the model the researcher chose is content.
 
 | Id | Rule |
 |---|---|
 | R1 | **No agent machinery in researcher views**: model or provider names (outside configuration views and the model picker), session/chat/run/tool-call ids, token counts, prompts and system instructions, tool names and arguments, command lines, run logs, exit codes, internal state keys (`needs-environment`, `whole layer for display`), internal paths (`.kady/`, `.pi/`, cache directories), English enum values in Korean UI. |
-| R2 | **Raw errors** (exception text, HTTP status, stack traces, stderr) appear only inside a collapsed `기술 정보` disclosure with a copy button; the visible message follows F4. Locale ids for that disclosure end in `.details`/`.technical` (allowed by the check). |
+| R2 | **Raw errors** (exception text, HTTP status, stack traces, stderr) appear only inside a collapsed `기술 정보` disclosure with a copy button; the visible message follows F4. Locale ids for that disclosure end in `.technical` (allowed by the check; `.details` is an ordinary id and is checked). |
 | R3 | **Translate internal facts into research facts**: `도구 호출 42회 · 실패 10회` → `분석 단계 42개 중 10개를 다시 시도했습니다` only if that is true, otherwise leave it out; `채팅 ID` → a link `채팅 열기`; `revision 1` → `버전 1`. |
 | R4 | Provenance, environment and trial records keep their full data, but the researcher view shows a summary (what was used, when, result) with the full record behind `기록 보기`. |
 | R5 | Costs: budget and spend appear only in the budget chip and project settings, never inside results or method screens. |
 
 `check-ui.mjs` (`internals`) blocks locale strings outside configuration views that interpolate `{detail}`, `{error}`,
-`{message}`, `{stderr}`, `{stack}`, `{model}` or internal ids, and literal "stack trace"/"traceback"/"stderr". Code
-paths that show `error.message` directly are found in review, not by the check.
+`{message}`, `{stderr}`, `{stack}`, `{model}`, `{models}` or internal ids, and literal "stack trace"/"traceback"/"stderr". Code
+paths that show `error.message` directly, and strings using generic argument names (`{id}`, `{status}`, `{code}`,
+`{tokens}`), are found in review, not by the check; the literal labels `채팅 ID`, `세션 ID`, `종료 코드` and `HTTP {status}` are
+checked.
 
 ## 10. Visual review checklist
 
@@ -249,16 +257,21 @@ Use for every UI change (author) and every review (reviewer), with screenshots a
 | Bottom navigation and bottom bars | Sidebar, top tabs, selection bar above the list | Desktop layout (L3) |
 | Confirmations phrased as questions (Writing / Empowering) | Statement titles; action-named buttons | GAID copy rule (gaid-writing.md), user-approved WP00 kit |
 | Motion up to 500 ms; lively, 3D and decorative animation (Motion basics) | ≤ 300 ms, functional motion only | Research work tool; repeated use; reduced distraction |
+| One button style per screen; flat buttons inside dialogs and toolbars (Buttons) | Mixed emphasis levels with exactly one filled primary per view, also in dialogs (B1) | Desktop dialogs need a clear default action; one primary keeps the focus rule |
 | Samsung blue palette (#0072de, #3e91ff, #0381fe) and One UI Sans | GAID WP00 colours (`--primary` #1f5eff) and Pretendard | No Samsung assets or proprietary fonts; GAID brand kit |
 | Button corner radius 18 dp (pill) in the Android sample | `--radius-md` (8 px) | GAID token set; dense desktop controls |
 | Toast up to 3 lines | Toast ≤ 2 lines, prefer 1 | Korean strings wrap sooner at desktop toast width |
 | List main text ≤ 31 characters (English) | 30 Korean / 60 English | Korean characters carry more meaning per character |
 | No minimum target size stated | 24×24 px minimum (WCAG 2.2) | One UI gives only 8 dp spacing |
+| Alternative gradients for backgrounds and focus blocks (Color system "Background color") | Neutral surfaces, no gradients in work areas (S2) | Data colours on maps and charts need a calm, neutral ground |
 | Dark mode as a primary comfort feature | Light theme first (WP00 v1), dark mode checked for maps/images | WP00 tokens ship light mode only in v1 |
 
 ## 12. Source pages
 
 All read on 2026-10-16. Digest with per-page notes (not in Git): `~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`.
+Independent cross-check (ChatGPT Pro web research, same date) agreed on the cited values and found no One UI type scale,
+base grid, minimum target size, picker, progress or dialog button-count rules; the guide marks those as GAID's own.
+Vault note: `웹 조사/geoaidesk/2026-10-16-i-am-writing-a-ui--0230c8af23.md`.
 
 - Overview: https://developer.samsung.com/one-ui/index.html
 - Structure / Visual depth: https://developer.samsung.com/one-ui/structure/visual-depth.html

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T09:19:35Z
+updated: 2026-10-16T09:32:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -57,19 +57,19 @@ Present the guide's structure and key rules to the user in your tab before final
   caches and app-written files/links after the last check.
 
 ## Current state
-- a91db30 (pushed): guide draft `docs/design/ui-guide.md`, `geo/ui/{ui-rules.json,check-ui.mjs,ui-baseline.json}`,
-  `geo/tests/ui-check.test.mjs`, `scripts/check` step, AGENTS.md rule. `node geo/ui/check-ui.mjs` → 0 errors, 96 accepted
-  debt (34 copy-length, 52 internals, 10 styles); `node --test geo/tests/ui-check.test.mjs` 5/5 pass. Full scripts/check
-  not yet run.
-- One UI digest: ~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md (33 pages, curl, 2026-10-16).
-- Child `gaid-ui-guide--screens` (writer 20ad37cf, Codex general work) started: before/after for setup dialog, map viewer,
-  method detail; brief ~/data/geoaidesk/work/gaid-ui-guide/child-screens.md.
-- Oracle Pro cross-check still running (systemd unit oracle-oneui-278305, output oracle-oneui.out).
+- c5fdb05 (pushed): guide `docs/design/ui-guide.md` (user approved structure/rules/defaults 2026-10-16), `geo/ui/*`,
+  `geo/tests/ui-check.test.mjs`, `scripts/check` step, AGENTS.md rule, child `screens` integrated (closed after removing
+  its build caches): `docs/design/mockups/{setup,map,method}.html` + README, 11 PNGs in
+  `reports/2026-10-16-gaid-ui-guide/figures/` (setup/map before = live capture at fed75bc; method before reused from
+  gaid-hub-integration). check-ui: 0 errors / 96 debt; ui-check tests 5/5. Full scripts/check runs at task finish.
+- Local (unpushed): guide source-fidelity edits after the Oracle Pro cross-check (N1 wording, D2/L4/F1/Q notes marking
+  GAID-own values, cross-check note). Oracle note: 웹 조사/geoaidesk/2026-10-16-i-am-writing-a-ui--0230c8af23.md.
+- Reviews running (task readers, results to this session and ~/data/geoaidesk/work/gaid-ui-guide/reviews/):
+  researcher persona eede96f7 (claude-sonnet-5-5, thinking high), Claude 고급검토 72d8c801, Codex 검토 bc4b0abd.
 ## Next steps
-1. When Oracle finishes: compare with the digest, fix any wrong source mapping; `task research-save <session>`.
-2. After the screens child finishes: `task complete gaid-ui-guide--screens`; then reviews: researcher persona (Claude
-   Sonnet 5.5, thinking high) on screenshots, "Claude 고급검토", "Codex 검토" (no Codex 고급검토).
-3. Report reports/2026-10-16-gaid-ui-guide/index.md (humanizer, review-copy), full scripts/check, cleanup, task finish.
+1. Triage the three reviews; fix blockers (guide, rules, check, mockups/figures); recheck only if needed.
+2. Report reports/2026-10-16-gaid-ui-guide/index.md (humanizer file mode, `task review-copy`), declare under ## Report.
+3. task finish (runs scripts/check); give the hub's final report to the user.
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-16: presented guide structure, key rules and default values (first view 300 chars, copy limits, map info 5 rows / popup 8 rows, table 8 columns); user: "승인한다."

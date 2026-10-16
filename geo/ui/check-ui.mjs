@@ -13,6 +13,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parse } from '../copy/icu-lite.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
@@ -34,17 +35,21 @@ export function flatten(object, prefix = '', out = {}) {
   return out
 }
 
-// Visible length: a simple `{name}` argument counts as `argumentChars`; plural/select blocks count as their longest
-// branch text so the limit applies to what a reader sees, not to ICU syntax.
+// Visible length over the ICU tree (geo/copy/icu-lite.mjs): a simple argument counts as `argumentChars`, `#` as two
+// digits, and a plural/select block as its longest branch, so the limit applies to what a reader sees, not to ICU syntax.
+// A message the parser rejects is measured raw (the copy validator reports the syntax error).
 export function visibleLength(message, argumentChars = 4) {
-  let text = message
-  for (let i = 0; i < 4; i++) {
-    text = text.replace(/\{\s*\w+\s*,\s*(?:plural|select|selectordinal)\s*,((?:[^{}]|\{[^{}]*\})*)\}/g, (_, body) => {
-      const branches = [...body.matchAll(/\{([^{}]*)\}/g)].map((m) => m[1])
-      return branches.sort((a, b) => b.length - a.length)[0] ?? ''
-    })
+  const measure = (nodes) => nodes.reduce((sum, node) => {
+    if (node.type === 'text') return sum + node.value.length
+    if (node.type === 'pound') return sum + 2
+    if (node.branches) return sum + Math.max(0, ...Object.values(node.branches).map(measure))
+    return sum + argumentChars
+  }, 0)
+  try {
+    return measure(parse(message))
+  } catch {
+    return message.length
   }
-  return text.replace(/\{\s*\w+\s*\}/g, 'x'.repeat(argumentChars)).replace(/#/g, '00').length
 }
 
 export function loadCatalogues(dir, locales) {

@@ -36,9 +36,9 @@
     "toastMaxChars": { "ko": 40, "en": 80 }
   },
   "copyLength": {
-    "note": "Visible characters after ICU arguments count as argumentChars each and plural/select blocks as their longest branch. The first role whose ids match an id decides its limit.",
+    "note": "A role applies only to ids matching its patterns (new button labels: <area>.<thing>.button or .action); all other ids get the text limit. Visible characters after ICU arguments count as argumentChars each and plural/select blocks as their longest branch. The first role whose ids match an id decides its limit.",
     "argumentChars": 4,
-    "exemptIds": ["*.command", "*.command.*", "*.code", "*.code.*", "*.path", "*.path.*", "*.citation", "*.citation.*", "*.userData", "*.userData.*", "*.question", "*.question.*", "*.prompt", "*.prompt.*", "*.template", "*.template.*"],
+    "exemptIds": ["*.command", "*.command.*", "*.code", "*.code.*", "*.path", "*.path.*", "*.citation", "*.citation.*", "*.userData", "*.userData.*", "*.question", "*.prompt", "*.prompt.*", "*.template", "*.template.*"],
     "roles": [
       { "id": "cta", "ids": ["*.button", "*.button.*", "*.cta", "*.cta.*", "*.action", "*.action.*"], "max": { "ko": 16, "en": 32 } },
       { "id": "title", "ids": ["*.title", "*.heading", "*.h1", "*.h2", "*.name"], "max": { "ko": 30, "en": 60 } },
@@ -47,13 +47,13 @@
     ]
   },
   "internals": {
-    "note": "Researcher-facing strings must not interpolate raw errors, model names or internal ids. Model names are allowed only where the researcher chooses or configures a model; raw detail only behind a technical-details disclosure (*.details*, *.technical*).",
+    "note": "Researcher-facing strings must not interpolate raw errors, model names or internal ids. Model names are allowed only where the researcher chooses or configures a model; raw detail only behind a technical-details disclosure (ids ending .technical).",
     "surfaces": ["*"],
-    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.details", "*.details.*", "*.technical", "*.technical.*"],
-    "forbiddenArguments": ["detail", "error", "message", "stderr", "stack", "model", "sessionId", "chatId", "runId", "toolCallId", "requestId"],
+    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.technical", "*.technical.*"],
+    "forbiddenArguments": ["detail", "error", "message", "stderr", "stack", "model", "models", "sessionId", "chatId", "runId", "toolCallId", "requestId"],
     "forbiddenText": {
-      "ko": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED"],
-      "en": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED"]
+      "ko": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED", "채팅 ID", "세션 ID", "종료 코드", "HTTP \\{status\\}"],
+      "en": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED", "chat ID", "session ID", "exit code", "HTTP \\{status\\}"]
     }
   },
   "styles": {
