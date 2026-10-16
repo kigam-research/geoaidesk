@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T04:32:22Z
+updated: 2026-10-16T04:37:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -117,16 +117,23 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
 - Smoke loop finished: revise (2m12s) passed all checks; package 1 installed into GAID project proj-221132 "허브 설치
   시험"; hand-off fixed (setActive before openProject; "시작 설정 다시 열기" passes the manifest workflow/recipe) and verified
   live: the target project opens with the method's TaskSetup. TaskSetup now shows option display labels (optionLabels).
+- Persona done (12:18–13:25 KST): full flow through the browser; trial of draft 3 ran 30 min without final outputs
+  (variogram 18,193-cell subsample, B=10, Optuna 3; one outer fold > 30 min); draft 4 adds a quick mode (1 outer fold,
+  B=3, T=5, no Optuna). Summary saved to researcher/summary.md. Fixes (a42000c): bounded revise dialog + short trial
+  feedback, newer-draft notice, grouped plain check issues (server `plain`), Hangul prompt rule (prompt .2), project
+  title from first source, sticky TaskSetup actions, option labels in the task draft, folded trial output lists.
+  Not fixed (upstream chat): Enter sends a prefilled draft; long runs show no progress and "실행 중단" had no visible
+  effect for 12+ min (persona) — candidate open item.
+- v4 trial started 13:36 KST in "Yilgarn 시험" (quick-trial, paper reference values, accept-auto block size, appended
+  "무인 시험 … 2만 셀 이하 표본 … 30분 안에").
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. When the researcher persona (native Sonnet agent, started ~03:20Z) finishes: read researcher/summary.md, triage, fix,
-   then restart gaid-hub-dev (prompt 2026-10-16.2 takes effect) and re-shoot the key screens.
-2. Claude 고급검토 round 2 ("after") on the fixed screens; Codex 검토 code review if Codex sign-in works again.
-3. Report reports/2026-10-16-gaid-hub/index.md (figures), scripts/check, remove hub-design page and build caches, finish.
-4. Still open with the user: approval of the 7 design screens (presented 2026-10-16, no answer yet).
-Blocked: waiting for the researcher persona agent (native sub-agent, not visible to the task CLI) — it uses the shared
-Qwen server, so no other Qwen run until it ends.
+1. Wait for: v4 trial (Yilgarn 시험 project, started 13:36 KST, watcher screenshots ~/data/geoaidesk/work/gaid-hub/playwright/v4/
+   run-01..10, stop at 30 min), Claude 고급검토 round 2 (reader a99b1e08), Codex 검토 code review (reader 163e0278).
+2. Triage, fix; record the trial (outputs, reductions, assessment) — then report, scripts/check, cleanup (remove
+   web/src/app/hub-design/, caches), finish.
+3. Still open with the user: approval of the 7 design screens (presented 2026-10-16, no answer yet).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
