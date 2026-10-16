@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PU 탐사 방법 상세 · GAID UI 시안</title>
+<style>/* Generated from design/gaid-tokens.json by design/scripts/build-tokens.mjs (app). Do not edit by hand. */
+/* GeoAIDesk app theme: shadcn/ui variables (tweakcn layout), light mode only in v1. */
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #1f5eff;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f8fafc;
+  --muted-foreground: #71717a;
+  --accent: #eef3ff;
+  --accent-foreground: #3f3f46;
+  --destructive: #b91c1c;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #1f5eff;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #3f3f46;
+  --sidebar-primary: #1f5eff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef3ff;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #1f5eff;
+  --radius: 10px;
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --gaid-ink: #0a0a0a;
+  --gaid-body: #3f3f46;
+  --gaid-muted: #71717a;
+  --gaid-subtle-alt: #f6f7f9;
+  --gaid-brand-hover: #1749cc;
+  --gaid-brand-on-dark: #4d7fff;
+  --gaid-success: #15803d;
+  --gaid-warning: #a16207;
+  --gaid-danger: #b91c1c;
+  --gaid-untested: #71717a;
+  --gaid-nodata: #a1a1aa;
+  --gaid-body-size: 14px;
+  --gaid-h1-size: 20px;
+  --gaid-h2-size: 16px;
+  --gaid-heading-weight: 600;
+  --gaid-button-radius: var(--radius-md);
+  --gaid-button-height: 32px;
+  --gaid-button-height-secondary: 32px;
+  --gaid-motion-fast: 150ms;
+  --gaid-motion-base: 200ms;
+  --gaid-easing: cubic-bezier(0.2, 0, 0, 1);
+}
+
+
+:root{--radius-md:calc(var(--radius) - 2px);--radius-lg:var(--radius)}
+*{box-sizing:border-box}body{margin:0;background:var(--muted);color:var(--foreground);font:14px/1.5 var(--font-sans);word-break:keep-all}button,input,select{font:inherit}button,summary,a,input,select{outline-offset:3px}button:focus-visible,summary:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ring)}button{min-height:32px;padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--background);color:var(--foreground);cursor:pointer}button:hover{background:var(--muted)}button:active{background:var(--accent)}button:disabled{cursor:default;color:var(--muted-foreground);background:var(--muted)}button.primary{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}button.primary:hover{background:var(--gaid-brand-hover)}button.primary:disabled{background:var(--muted);color:var(--muted-foreground);border-color:var(--border)}button.ghost{border-color:transparent;background:transparent}button.link{color:var(--primary);border:0;background:transparent;padding:4px 8px}h1,h2,h3,p{margin:0}h1{font-size:20px;line-height:1.3;font-weight:600}h2,h3{font-size:16px;line-height:1.3;font-weight:600}.muted{color:var(--gaid-body)}.caption{font-size:12px;color:var(--gaid-body)}.row{display:flex;align-items:center;gap:8px}.spread{justify-content:space-between}.badge{font-size:12px;border:1px solid var(--border);border-radius:24px;padding:2px 8px;white-space:nowrap}.badge.warn{color:var(--gaid-warning)}.badge.blue{color:var(--primary);border-color:var(--primary)}header.app{height:56px;background:var(--background);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}.brand{color:var(--primary);font-weight:600;font-size:20px}.separator{height:20px;border-left:1px solid var(--border);margin:0 8px}.workspace{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:calc(100vh - 56px)}.sidebar{padding:24px 16px;border-right:1px solid var(--border)}.nav{padding:8px 12px;border-radius:8px;margin-bottom:8px}.nav.selected{background:var(--accent);color:var(--primary);font-weight:500}.backdrop{position:fixed;inset:56px 0 0;background:rgb(10 10 10 / .25);display:flex;align-items:center;justify-content:center;padding:24px}.dialog{width:720px;max-width:calc(100vw - 48px);max-height:85vh;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--background);display:flex;flex-direction:column;overflow:hidden}.dialog-head{padding:24px 24px 16px}.dialog-head p{margin-top:8px}.dialog-body{padding:0 24px 24px;overflow:auto;min-height:0}.dialog-foot{border-top:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--background)}.dialog-foot .actions{display:flex;gap:8px;margin-left:auto}details{margin-top:16px}summary{cursor:pointer;font-size:14px;color:var(--gaid-body);min-height:32px;display:list-item}details p,details ul,details dl{margin-top:8px}details p{max-width:40em}input[type=text],input[type=search],select{width:100%;min-height:32px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--background);color:var(--foreground)}input[type=radio],input[type=checkbox]{accent-color:var(--primary);width:16px;height:16px;flex-shrink:0}.flow{display:flex;gap:8px;align-items:center;margin-bottom:24px}.flow span{flex:1;text-align:center;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px}.flow i{font-style:normal;color:var(--gaid-body)}.steps{display:flex;border-bottom:1px solid var(--border);margin:0 24px 24px;gap:8px}.steps button{flex:1;border:0;border-radius:0;padding:8px 4px;border-bottom:2px solid transparent;min-height:40px;color:var(--gaid-body)}.steps button[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}.question{margin-bottom:16px}.question p{margin-top:8px}.option{display:flex;align-items:flex-start;gap:12px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);margin-top:12px;cursor:pointer}.option:has(input:checked){border-color:var(--primary);background:var(--accent)}.option .content{flex:1;min-width:0}.option strong{font-weight:500}.option small{display:block;font-size:12px;color:var(--gaid-body);margin-top:4px}.option .custom{margin-top:12px}.filename{word-break:break-all}.summary-row{display:grid;grid-template-columns:100px 1fr auto;gap:16px;align-items:center;border-bottom:1px solid var(--border);padding:12px 0}.summary-row dt{color:var(--gaid-body)}.summary-row dd{margin:0}.panel{border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:var(--background)}.panel+.panel{margin-top:16px}.panel h2{margin-bottom:12px}.status-line{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}.method-overview{display:grid;grid-template-columns:100px 1fr;gap:8px 16px;margin:16px 0}.method-overview dt{color:var(--gaid-body)}.method-overview dd{margin:0}.result-list{padding-left:20px;margin:8px 0}.result-list li{margin:4px 0}.mock-note{font-size:12px;color:var(--gaid-body)}[hidden]{display:none!important}@media(prefers-reduced-motion:reduce){*{transition:none!important}}@media(max-height:820px){.dialog-head{padding-top:16px}.dialog-body{padding-bottom:16px}.option{padding:12px}.flow{margin-bottom:16px}.steps{margin-bottom:16px}}
+button:not(.ghost):not(.link):not(.primary),input[type=text],input[type=search],select{border-color:color-mix(in srgb,var(--border) 50%,var(--foreground))}.nodata{color:color-mix(in srgb,var(--gaid-nodata) 60%,var(--foreground))}.dialog-body > .panel{padding:12px}.dialog-body > .panel+.panel{margin-top:12px}.method-overview{margin:12px 0}.dialog-body > details{margin-top:12px}.methods-main{padding:24px;min-width:0;height:calc(100vh - 56px);display:flex;flex-direction:column;gap:16px}.method-layout{display:grid;grid-template-columns:minmax(260px,38fr) minmax(0,62fr);gap:24px;min-height:0;flex:1}.method-list{min-width:0}.method-list input{margin:8px 0 16px}.method-row{width:100%;text-align:left;padding:16px;background:var(--accent);border-color:var(--primary)!important}.method-row strong,.method-row span{display:block}.method-row span{margin-top:8px}.dialog{width:auto;max-width:none;max-height:none;height:100%;position:relative;box-shadow:0 4px 20px rgb(10 10 10 / .10)}.dialog-head{padding:16px}.dialog-body{padding:0 16px 16px}.dialog-foot{padding:16px}.method-overview{margin:12px 0}.dialog-body>details{margin-top:8px}.chat-preview{position:absolute;inset:64px 16px 80px;background:var(--background);padding:24px;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgb(10 10 10 / .10)}.chat-preview p{margin-top:16px}abbr{text-decoration-style:dotted;text-underline-offset:4px}#trial-model{font:12px var(--font-mono);min-width:0}@media(max-width:1300px){.workspace{grid-template-columns:160px 1fr}.methods-main{padding:16px}.method-layout{gap:16px;grid-template-columns:minmax(250px,36fr) minmax(0,64fr)}}@media(max-height:820px){.dialog-body>.panel{padding:12px}.dialog-body>.panel+.panel{margin-top:12px}.dialog-foot .caption{max-width:170px}}.dialog-body .panel h2{margin-bottom:0}.dialog-body details{margin-top:8px}.dialog-body summary{min-height:24px}.dialog-body .panel{padding:12px}.dialog-body .panel+.panel{margin-top:12px}.dialog-body>.panel>.row+p{margin-top:8px}.dialog-body .method-overview{margin:8px 0}.dialog-head p{margin-top:8px}.dialog-body>.caption{margin-top:12px!important}.dialog-body{flex:1}</style>
+</head>
+<body>
+<header class="app">
+<div class="row">
+<span class="brand">GAID</span>
+<span>GeoAIDesk</span>
+<span class="separator">
+</span>
+<span>Default</span>
+</div>
+<span class="mock-note">UI 가이드 적용 시안 · 실제 실행 없음</span>
+</header>
+<div class="workspace">
+<aside class="sidebar">
+<div class="nav selected">Workflow</div>
+<div class="nav ">지도</div>
+<div class="nav">연구 노트</div>
+<div class="nav">작업 폴더</div>
+</aside>
+<main class="methods-main"><h1>Workflow</h1><div class="method-layout"><section class="method-list" aria-label="Workflow 목록"><label for="method-search" class="caption">Workflow 검색</label><input id="method-search" type="search" placeholder="이름 검색"><button id="method-row" class="method-row" aria-expanded="true" aria-controls="method-detail"><strong>PU 학습·공간 CV 탐사 유망도</strong><span class="caption">입력: 그리드 셀 테이블(CSV)</span></button><p id="no-method" hidden>조건에 맞는 방법이 없습니다.</p></section>
+<section class="dialog" id="method-detail" aria-labelledby="method-title">
+<div class="dialog-head">
+<div class="row spread">
+<h1 id="method-title"><abbr title="Positive–Unlabeled (양성·unlabeled) 학습">PU</abbr> 학습·공간 <abbr title="Cross-Validation (교차검증)">CV</abbr> 탐사 유망도</h1>
+<button class="ghost" id="close" aria-label="상세 닫기">×</button>
+</div>
+<p class="muted">희소 양성 격자 자료의 탐사 우선순위 구역을 구분합니다.</p>
+</div>
+<div class="dialog-body">
+<div class="row">
+<span class="badge" tabindex="0" title="방법 패키지가 초안 상태임을 뜻합니다.">초안</span>
+<span class="badge" tabindex="0" title="실행 코드가 들어 있는 패키지입니다.">코드 포함</span>
+</div>
+<dl class="method-overview">
+<dt>설치 출처</dt>
+<dd>KIGAM 방법 허브</dd>
+<dt>버전</dt>
+<dd data-user>1</dd>
+</dl>
+<section class="panel">
+<div class="row spread">
+<h2>최근 시험</h2>
+<span class="caption" data-user>2026. 10. 16.</span>
+</div>
+<p>바리오그램 계산을 45분 넘게 반복해 연구자가 중단했습니다.</p>
+<div class="status-line">
+<span class="caption">연구자 평가: 수정 필요</span>
+<details style="margin:0">
+<summary>평가 근거 보기</summary>
+<p>블록 크기 제안 전에 바리오그램 계산을 반복해 시험을 중단했습니다.</p>
+</details>
+</div>
+<details>
+<summary>기록 보기</summary>
+<label for="trial-model" class="caption">사용 모델</label><div class="row"><input id="trial-model" type="text" readonly data-user value="kigam-qwen/qwen3.8-flash-next"><button id="copy-model">모델명 복사</button></div><span id="copy-state" role="status" class="caption"></span>
+<p>관찰된 파일</p>
+<ul data-user class="result-list">
+<li>pyproject.toml</li>
+<li>scripts/01_variogram.py</li>
+</ul>
+<p>패키지가 결과 파일 이름을 정하지 않아 결과 파일과 대조하지 않았습니다.</p>
+<p>시험 시작: 2026. 10. 16. 오전 8:05:18.</p>
+<p class="caption">결과는 검토 전입니다. 시험 기록은 과학적 검토가 아닙니다.</p>
+</details>
+<div class="row" style="margin-top:12px"><button id="chat">채팅 열기</button><span class="caption">블록 크기 확인 전 · 파일 2개</span></div>
+</section>
+<section class="panel">
+<h2>입력과 예상 결과</h2>
+<p>입력: 그리드 셀 테이블(CSV)</p>
+<p class="caption" style="margin-top:8px">예상 결과: 유망도 구역 지도·우선순위 목록</p>
+<details>
+<summary>Workflow와 레시피 보기</summary>
+<p>PU 학습·공간 블록 CV·컨포멀 구역화 탐사 유망도 Workflow</p>
+<p>바리오그램 기반 블록 크기 제안 → 사용자 확인 → 전처리 확인 → 중첩 공간 CV → XGBoost/BaggingPU-XGBoost 학습 → 부트스트랩 pIQR → 크로스-컨포멀 보정 → 5구역 할당</p>
+<p>선택 조건: 크로스-컨포멀 구현 방식, 구역 lift 백분위 경계, pIQR 불확실성 컷오프, 최소 양성 샘플 수, 변수별 전처리.</p>
+<p>선택 입력: 전처리 설정. 예상 결과에는 포획·커버리지·구역 통계 보고서와 바리오그램 분석 결과도 포함됩니다.</p>
+</details>
+</section>
+<p class="caption" style="margin-top:16px">Yilgarn Ni 사례에서만 검증했습니다. 다른 지질 환경은 미검증입니다.</p>
+<details>
+<summary>해석 한계 보기</summary>
+<p>결과는 새 지역 그리드 데이터에 대한 통계적 유망도 구역화이며, 광상의 존재를 보장하지 않습니다. 단일 크라톤(Yilgarn) Ni에서 검증된 방법의 전이이며, 다른 지질 환경에서의 성능은 미검증입니다. pIQR은 모델 불안정성만 정량화하며 레이블 모호성·구조적 불확실성을 포함하지 않습니다. 컨포멀 커버리지는 교환성 가정 하의 유한표본 보정이며 공간 자기상관에서 엄밀히 성립하지 않습니다.</p>
+</details>
+</div>
+<footer class="dialog-foot">
+<span class="caption">시험 입력과 조건을 정합니다.</span>
+<div class="actions">
+<button class="primary" id="setup">시작 설정 열기</button>
+</div>
+</footer>
+<section id="chat-preview" hidden tabindex="-1" class="chat-preview" aria-label="시험 채팅 연결 시안"><div class="row spread"><h2>시험 채팅</h2><button id="close-chat">채팅 닫기</button></div><p>화면 연결 시안입니다. 실제 시험 채팅은 GAID에서 열 수 있습니다.</p><p class="caption">기록: 2026. 10. 16. · 블록 크기 확인 전 중단</p></section>
+</section>
+</div></main></div><script>
+const panel=document.querySelector('#method-detail'),row=document.querySelector('#method-row');
+function show(open){panel.hidden=!open;row.setAttribute('aria-expanded',String(open));if(!open)row.focus()}
+document.querySelector('#close').onclick=()=>show(false);row.onclick=()=>show(true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')show(false)});
+document.querySelector('#method-search').oninput=e=>{const matches=row.textContent.toLowerCase().includes(e.target.value.toLowerCase());row.hidden=!matches;document.querySelector('#no-method').hidden=matches};
+document.querySelector('#setup').onclick=()=>{location.href='setup.html'};
+document.querySelector('#copy-model').onclick=async()=>{const input=document.querySelector('#trial-model');input.select();try{await navigator.clipboard.writeText(input.value);document.querySelector('#copy-state').textContent='모델명을 복사했습니다.'}catch{document.querySelector('#copy-state').textContent='모델명을 선택했습니다. 복사 단축키를 사용하세요.'}};
+document.querySelector('#chat').onclick=()=>{document.querySelector('#chat-preview').hidden=false;document.querySelector('#chat-preview').focus()};
+document.querySelector('#close-chat').onclick=()=>{document.querySelector('#chat-preview').hidden=true;document.querySelector('#chat').focus()};
+</script></body></html>
