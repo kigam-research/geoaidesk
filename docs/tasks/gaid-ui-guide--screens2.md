@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-16T14:12:45Z
-writer: {"host":"seongin3","reserved":"f03dffd1c7b13a0465fac0934a127ab80e5556a92d2f59cc934fcadd51c1db09"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9e5573c7-0899-4c21-9d60-48b4df645c01","pid":3776156,"provider":"codex","session":"01a1450f-065c-7781-81fa-b6be4aba848c","start":"4791385","token":"f03dffd1c7b13a0465fac0934a127ab80e5556a92d2f59cc934fcadd51c1db09"}
 branch: task/gaid-ui-guide--screens2
 target: task/gaid-ui-guide
 parent: gaid-ui-guide
