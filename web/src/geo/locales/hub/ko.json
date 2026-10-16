@@ -115,7 +115,8 @@
     "checkFix": "고칠 점 보기",
     "feedback": "고칠 점 알려주기",
     "feedbackPlaceholder": "바꾸고 싶은 점을 적으세요. 예: 바리오그램은 표본 1만 셀 이하로 계산",
-    "feedbackSend": "초안 고치기"
+    "feedbackSend": "초안 고치기",
+    "autoFix": "에이전트에게 고치게 하기"
   },
   "trial": {
     "title": "프로젝트에서 시험",

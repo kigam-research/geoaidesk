@@ -428,7 +428,16 @@ function HubProject({
       {draft && (
         <FilesDialog open={dialog === "files"} onOpenChange={(o) => setDialog(o ? "files" : null)} load={() => hubApi.files(id, draft.revision)} />
       )}
-      <IssuesDialog open={dialog === "issues"} onOpenChange={(o) => setDialog(o ? "issues" : null)} check={check} />
+      <IssuesDialog
+        open={dialog === "issues"}
+        onOpenChange={(o) => setDialog(o ? "issues" : null)}
+        check={check}
+        onFix={async (feedback) => {
+          await hubApi.revise(id, { opId: newOpId(), feedback });
+          setStep("questions");
+          await reload();
+        }}
+      />
       <AgentRecordDialog open={dialog === "record"} onOpenChange={(o) => setDialog(o ? "record" : null)} attempts={project.attempts} />
       {page && pdfSource && (
         <SourcePageDialog

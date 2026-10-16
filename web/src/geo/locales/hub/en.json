@@ -115,7 +115,8 @@
     "checkFix": "Show issues",
     "feedback": "Request changes",
     "feedbackPlaceholder": "Describe what to change, e.g. compute the variogram on at most 10,000 cells",
-    "feedbackSend": "Revise draft"
+    "feedbackSend": "Revise draft",
+    "autoFix": "Ask the agent to fix them"
   },
   "trial": {
     "title": "Try in a project",

@@ -107,8 +107,24 @@ export function FilesDialog({ open, onOpenChange, load }: DialogProps & { load: 
   );
 }
 
-export function IssuesDialog({ open, onOpenChange, check }: DialogProps & { check: CheckResult | null }) {
+/** Feedback that asks the coauthor to fix the check errors (technical text stays in the request, not on screen). */
+export function issuesFeedback(check: CheckResult): string {
+  const errors = check.findings.filter((f) => f.level === "error");
+  return [
+    "패키지 검사에서 나온 고칠 점을 모두 고쳐 주세요. 다른 내용은 바꾸지 마세요.",
+    ...errors.map((f) => `- [${f.check}/${f.code}] ${f.path}: ${f.message}`),
+  ].join("\n");
+}
+
+export function IssuesDialog({
+  open,
+  onOpenChange,
+  check,
+  onFix,
+}: DialogProps & { check: CheckResult | null; onFix?: (feedback: string) => Promise<void> }) {
   const findings = check?.findings ?? [];
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -130,6 +146,28 @@ export function IssuesDialog({ open, onOpenChange, check }: DialogProps & { chec
             </li>
           ))}
         </ul>
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        {onFix && check && findings.some((f) => f.level === "error") && (
+          <DialogFooter>
+            <Button
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setError(null);
+                try {
+                  await onFix(issuesFeedback(check));
+                  onOpenChange(false);
+                } catch (e) {
+                  setError((e as Error).message);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {text("draft.autoFix")}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
