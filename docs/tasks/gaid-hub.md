@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:23:36Z
+updated: 2026-10-16T05:33:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -167,14 +167,18 @@ the sharing/discussion space, GAID projects are the personal research space.
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Waiting for the user's answer on mockup round 4 (presented 2026-10-16 ~14:20 KST; figures
-   reports/2026-10-16-gaid-hub/figures/mock4-01..10-*.png, vault copy made). After agreement: shared hub on the institute
-   GAID server (researcher name identity, registry, topic folders, stars, comments, recommended = catalogue + most starred),
-   URL fetch, concept-image generation via a configured image model, figure handling without PDF crops.
-2. Re-test loop: draft v5 revise from the v4 trial started ~14:22 (ap-2bd027a9-9f2, prompt gaid-draft .2). Then install v5
-   in "Yilgarn 시험" through the input-prep path and run a bounded trial (target < 30 min); record reductions and outputs.
-3. Then report, scripts/check, cleanup (web/src/app/hub-design/, web/public/hub-design-mock/ untracked, caches), finish.
-Blocked: mockup implementation waits for the user's agreement (user asked to agree mockups before building).
+1. Children (Normal speed) running: gaid-hub--shared (writer 5ec9f772, brief briefs/child-shared.md: shared hub server
+   /geo/hub/*, install refactor in authoring/install.ts) and gaid-hub--visuals (writer 3a6c6bdd, brief
+   briefs/child-visuals.md: concept images via image model, URL sources). `task complete` each when it finishes.
+   Child shared note (2026-10-16): exports getAuthoringStore(app) from authoring/routes.ts, mounts hub-shared after
+   authoring, adds GET /geo/hub/entries/:id/visuals/:key (?revision) beside /cover; parent avoids install.ts and route
+   mounting edits until it is integrated.
+2. Parent meanwhile: wire the approved screens to the contracts (hub home folders/recommended, shared entry page with
+   stars/comments, register dialog → POST /geo/hub/entries, preview from real data, user name prompt, authoring
+   folderId PATCH route, URL form → sources/url, visuals in MethodFlow); remove hub-design page and mock assets at the end.
+3. Re-test: draft v5 (passes checks) → install into GAID project "Yilgarn 40km 빠른 시험" via input-prep with the 40 km
+   CSV, quick mode, bounded run; record reductions/outputs/time.
+4. Report, scripts/check, cleanup, finish.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)

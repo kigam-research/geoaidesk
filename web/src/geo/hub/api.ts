@@ -69,7 +69,8 @@ export const hubApi = {
     post<MethodPackageRecord>(`${pid(id)}/packages`, { opId: newOpId(), draftRevision }),
   install: (id: string, rev: number, body: InstallBody) =>
     post<InstallResult>(`${pid(id)}/packages/${rev}/install`, body),
-  originalUrl: (id: string, sourceId: string) => `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
+  originalUrl: (id: string, sourceId: string) =>
+    `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
 };
 
 /** Base64 of a File for `AddSourceBody.contentBase64`. */

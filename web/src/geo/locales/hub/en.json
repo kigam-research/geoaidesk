@@ -25,7 +25,9 @@
     "mine": "My skills and Workflows (drafts and registered)",
     "folders": "Folders",
     "newFolder": "New folder",
-    "allFolders": "All"
+    "allFolders": "All",
+    "registered": "In hub · rev {n}",
+    "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project."
   },
   "stage": {
     "sources": "Sources received",
@@ -201,8 +203,9 @@
     "optional": "Optional",
     "upload": "Upload file",
     "openSetup": "Open start settings",
-    "needInputs": "Upload every required input to open the start settings.",
-    "uploadFailed": "Could not upload the file: {detail}"
+    "needInputs": "Upload every required input and prepare the run environment to open the start settings.",
+    "uploadFailed": "Could not upload the file: {detail}",
+    "environment": "Run environment"
   },
   "register": {
     "open": "Preview hub page",
@@ -230,7 +233,8 @@
     "comments": "{count, plural, one {# comment} other {# comments}}",
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
     "comment": "Add comment",
-    "toComments": "{count, plural, one {Show # comment} other {Show # comments}}"
+    "toComments": "{count, plural, one {Show # comment} other {Show # comments}}",
+    "registeredAt": "registered {when}"
   },
   "flow": {
     "decide": "You decide: {question}"
@@ -242,5 +246,17 @@
     "generated": "Concept image (generated)",
     "noImage": "No image",
     "exampleTable": "Example table · example values"
+  },
+  "user": {
+    "title": "Name in the hub",
+    "body": "Registrations, stars and comments show this name. It is kept in this browser.",
+    "placeholder": "e.g. Jane Doe (Mineral Resources Division)",
+    "save": "Save name"
+  },
+  "folder": {
+    "title": "New folder",
+    "name": "Folder name",
+    "placeholder": "e.g. Mineral exploration",
+    "create": "Create folder"
   }
 }
