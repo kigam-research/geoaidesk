@@ -82,7 +82,7 @@ export function ProjectBar({
         <ChevronLeftIcon className="size-4" aria-hidden />
         {text("home.back")}
       </button>
-      <h1 className="min-w-0 truncate text-lg font-semibold">{title}</h1>
+      <h1 className="min-w-0 truncate text-base font-semibold">{title}</h1>
       <nav aria-label={text("steps.label")} className="ml-auto flex items-center gap-1">
         {steps.map((s, i) => {
           const enabled = reached.includes(s);

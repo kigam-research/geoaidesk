@@ -78,14 +78,14 @@ export function DraftStep({
       <div className="flex min-h-0 flex-col gap-5 overflow-y-auto pr-1">
         <header className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-bold tracking-tight">{localText(profile.title)}</h2>
+            <h2 className="text-xl font-semibold">{localText(profile.title)}</h2>
             <Badge variant="secondary">{text("draft.private")}</Badge>
             <Badge variant="outline">
               {trialCount > 0 ? text("draft.tested", { count: trialCount }) : text("draft.untested")}
             </Badge>
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
           </div>
-          <p className="max-w-3xl text-base leading-7 text-foreground/80">{localText(profile.tagline)}</p>
+          <p className="max-w-[640px] text-base">{localText(profile.tagline)}</p>
           {onRegister && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
               <Share2Icon className="size-5 text-primary" aria-hidden />
