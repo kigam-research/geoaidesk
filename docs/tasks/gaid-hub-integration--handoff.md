@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:49:46Z
+status: done
+updated: 2026-10-16T00:23:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"e6a23203-e5dc-44f5-b6a0-74d8c942a195","pid":665078,"provider":"codex","session":"01a13fed-7ed2-7881-9654-a6218e794d87","start":"53989197","token":"a3929f3225e1d96db2f1b61b4260ff571b00591ae659bf12d432aa22b67b343b"}
 branch: task/gaid-hub-integration--handoff
 target: task/gaid-hub-integration
@@ -125,7 +125,7 @@ The old composer action workspace.skill.open remains in the catalogue but is no 
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:49:46Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T00:23:05Z: integrated into gaid-hub-integration; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Second full finish: server 1701 passed / 11 skipped, frontend 1028 passed, distribution 40 passed / 1 failed. Distribution owner whitelist lacked the newly required gaid-hub-integration boundary owner. Added that owner to geo/tests/distribution.test.mjs; no runtime change. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-blu7yoj4.log. Also qualified hubHandoff.attach to state that the download path (not all GAID paths) does not upload files; exact final ko/en text is in the string table.

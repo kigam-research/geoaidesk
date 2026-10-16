@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-15T14:58:23Z
+status: done
+updated: 2026-10-16T00:23:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"889fbc92-549f-4f63-9865-358efbab2bba","pid":793523,"provider":"codex","session":"01a13ffb-bfc7-7dd1-9fac-66f3bf150afc","start":"54082579","token":"c5f1a782a11515da3361495e6b345bc949fcea86976aaa8443c13bf3060b46d2"}
 branch: task/gaid-hub-integration--methods-ui
 target: task/gaid-hub-integration
@@ -156,7 +156,7 @@ Terminology (user): "용어로서 워크플로우가 표준용어이고 가급�
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-15T14:58:23Z: ready; the parent gaid-hub-integration integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T00:23:05Z: integrated into gaid-hub-integration; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - TypeScript was initially unavailable before npm ci. After installation, the new string exposure needed the existing GeoExposureMode event type at the TaskSetup seam; corrected, then typecheck passed.
