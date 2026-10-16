@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T05:37:42Z
+status: active
+updated: 2026-10-16T05:55:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -81,8 +81,16 @@ semicolons, 120 columns).
   are kept, including copies with no base hash. Origins remain `gaid-hub`.
 - `npm run typecheck` passed; `npx vitest run test/geo-hub-shared.test.ts test/geo-authoring.test.ts
   test/geo-authoring-package.test.ts` passed (3 files, 25 tests). No real model calls or running-instance changes.
-- Full repository checks will run via `task finish`; parent owns screen integration and final runtime walkthrough.
+- First `task finish` full check: backend 166 files passed/1 skipped; 1,830 tests passed/11 skipped. Frontend stopped
+  on one stale project title expectation and load-related file-preview/map viewer waits (3 files/4 tests).
+- Parent explicitly authorized `project-view.test.tsx`: Choose a project → My research (approved UI title), identical
+  to their local correction. Boundary entry added; other frontend code/tests are unchanged. The three affected
+  frontend files pass with two workers (19 tests). No resume or task save after the failed finish.
+- Parent owns screen integration and final runtime walkthrough. Parent confirmed the sibling check ended at 14:54:59;
+  no sibling scripts/check process remains. Retrying full checks in place with the authorized title correction.
 ## Next steps
+1. Rerun `task finish` in place; do not resume or save. Fix any material failure, otherwise await parent integration.
+
 <!-- task:closed -->
 Closed 2026-10-16T05:37:42Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
@@ -91,6 +99,8 @@ Closed 2026-10-16T05:37:42Z: ready; the parent gaid-hub integrates it. No furthe
   corrected the text helper and check-result narrowing.
 - Recommendation test initially copied a draft with the same slug into a second project, correctly triggering the
   existing method-name collision check. Updated the fixture's slug AND workflow/artifact local skill refs; suite passed.
+- Initial full frontend check ran concurrently with sibling gaid-hub--visuals. Do not change timeout/product code to
+  accommodate that load; parent confirmed load-related baseline waits and requested an in-place finish retry.
 ## Notes and decisions
 - Sequential decisions: keep parent contracts unchanged; reuse the live AuthoringStore (no second cache); serialize
   registration by deterministic entry id, then package by authoring project; snapshot draft/images before publishing.
@@ -100,7 +110,8 @@ Closed 2026-10-16T05:37:42Z: ready; the parent gaid-hub integrates it. No furthe
 - Integration order: store/install seam → routes → temp-directory integration tests → typecheck and authoring regression.
 - Codegraph has no index for this exact worktree; using bounded native source reads instead, as instructed by its tool.
 - Parent coordination applied verbatim: getAuthoringStore WeakMap code after AuthoringOptions and stores.set after
-  initialization. Route mounted after authoring. No contract, frontend, locale or lockfile edits.
+  initialization. Route mounted after authoring. No contract, frontend product, locale or lockfile edits; the single
+  frontend test expectation correction was explicitly requested by the parent after the first full check.
 - Image convention confirmed by parent: `cover` exclusively selects cover (fallback first available image), known node
   ids populate detail.visuals, `output:<outputId>` becomes detail.outputImages[outputId]. Additive immutable image route:
   GET /geo/hub/entries/:id/visuals/:key?revision=n. Cover/package revision queries address shared-entry revisions.
