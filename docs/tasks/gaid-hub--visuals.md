@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T05:47:56Z
+status: active
+updated: 2026-10-16T06:20:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3a6c6bdd-8e42-4c22-bc50-f3253b4bbc42","pid":2866986,"provider":"codex","session":"01a1432a-e540-7610-91df-bc7f924d9de8","start":"1618610","token":"af79afaa600e2e3514663724af3dca4cfb94e58c4f31a7f39a23719a1acbc8d7"}
 branch: task/gaid-hub--visuals
 target: task/gaid-hub
@@ -81,13 +81,22 @@ Prettier style as the authoring code. No real image-model or provider calls in t
 - First task finish automatically ran full scripts/check: backend 166 files / 1,844 passed, 11 skipped; frontend
   155 files / 1,056 passed, three failures (stale project heading and load-related CSV/LaTeX timeouts). Parent
   explicitly directed the identical one-line heading expectation fix and a serial finish retry, with no timeout
-  test edits. Integration/production verification remains subject to the complete check result.
+  test edits. Second full check passed backend 1,844 again and fixed heading/CSV/LaTeX tests; frontend then
+  failed file-preview-panel a.txt timeout and subsequent a.tex Editor loading. Installed Vitest supports
+  VITEST_MAX_WORKERS (dist/chunks/coverage.Da5gzbsu.js), parent corrected the retry to 1 worker: values above 1 override backend serial execution and can race
+  on shared temporary roots;
+  no timeout tests/config edits. Focused file-preview-panel rerun: all 5 tests passed in 6.09 s.
+  Integration/production verification remains subject to full check success.
 
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-16T05:47:56Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Shared child check has exited (verified no matching process). Run
+   VITEST_MAX_WORKERS=1 task finish docs/tasks/gaid-hub--visuals.md. No task resume or task save is needed.
+2. If the parent target moved after shared integration, follow the task CLI's printed integration step.
 
 ## Failed approaches
+- Second finish failed on unrelated file-preview-panel async loading/timeouts under the default high worker
+  count. Reduce concurrency via VITEST_MAX_WORKERS=1, not source workarounds. Log: check-qgoabi3f.log
+  under the same external check-logs directory. Backend 1,844 pass; frontend 1,057 pass, two failures.
 - First finish failed on the pre-existing Choose a project expectation (approved UI says My research) and two
   frontend 5-second timeouts under concurrent child full checks. Parent authorized exactly the expectation
   replacement; no timeout edits. Full log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-pl71ptzi.log.
@@ -96,6 +105,10 @@ Closed 2026-10-16T05:47:56Z: ready; the parent gaid-hub integrates it. No furthe
   former; root npx refused without installing. Reissued from the correct directories. No recurring tool block.
 
 ## Notes and decisions
+Parent steering after shared finished: run the full check serially with VITEST_MAX_WORKERS=1 (environment
+only). Do not edit tests/config to work around host-load timeouts. Parent may integrate shared while this
+finish runs; follow the task CLI if its target moves.
+
 Parent steering (2026-10-16): keys are procedure node id, cover and output:<outputId>. Eligible result-form ports
 are map-raster, map-vector and figure; table/report outputs remain UI examples. Cover + at most six step/output
 images total. Default selection reserves slots for eligible outputs (first six), then fills remaining slots with
