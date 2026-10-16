@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T06:04:06Z
+status: active
+updated: 2026-10-16T06:08:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -90,8 +90,9 @@ semicolons, 120 columns).
   check found that its hard-coded boundary owner set did not include `gaid-hub`, newly used for the authorized project
   view test seam. Added that owner to the distribution test registry; product behaviour and timeout tests unchanged.
 - Parent owns screen integration and final runtime walkthrough. Retrying finish in place after focused distribution check.
-- Focused distribution check passed (7 tests). Final full retry uses VITEST_MAX_WORKERS=2 (supported by both installed
-  Vitest versions) to bound host load; the declared suite, timeout values and test selection are unchanged.
+- Focused distribution check passed (7 tests). VITEST_MAX_WORKERS=2 unexpectedly overrides the backend's serial worker
+  setting despite fileParallelism:false; that environment-only retry failed with shared temporary-root races. Correct
+  the override to VITEST_MAX_WORKERS=1 for the final full retry. Suite, timeout values and test selection are unchanged.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-16T06:04:06Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
@@ -105,6 +106,9 @@ Closed 2026-10-16T06:04:06Z: ready; the parent gaid-hub integrates it. No furthe
   accommodate that load; parent confirmed load-related baseline waits and requested an in-place finish retry.
 - Serial retry resolved every frontend wait without test/source changes. It stopped only on the metadata owner list;
   add gaid-hub alongside the other maintained package owners, then rerun `task finish` in place.
+- Global VITEST_MAX_WORKERS=2 is unsuitable: it caused concurrent backend files to delete shared temp roots (76 tests
+  failed, including ENOTEMPTY/ENOENT). Do not edit product/test logic for this environment cause. Use one worker globally;
+  the backend had already passed twice with its default serial execution.
 ## Notes and decisions
 - Sequential decisions: keep parent contracts unchanged; reuse the live AuthoringStore (no second cache); serialize
   registration by deterministic entry id, then package by authoring project; snapshot draft/images before publishing.
