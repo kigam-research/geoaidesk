@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T09:00:25Z
+updated: 2026-10-16T09:27:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -219,6 +219,14 @@ Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No f
    final visual review, report figures and finish. Report the consumed request before finishing.
 9. User signed in with "OpenAI Codex (legacy)": op-codex-test-1 made 4 PNG pictures 1536x1024 (good quality); comparison
    figure reports/2026-10-16-gaid-hub/figures/visuals-compare.png; report §2/§3/§5/§6/§7/appendix updated.
+10. Codex-only pictures + usage-limit notice (dc52822); hub agent model choice (793c020). M3.1 comparison runs started
+   2026-10-16 18:01 KST (background shells, logs ~/data/geoaidesk/work/gaid-hub/m31/): authoring ap-8475d969-daf (same
+   sources/goal as smoke, recommended answers; tools/m31-authoring.mjs) and GAID trial in project yilgarn-40km-m3-1-5a4198
+   (same package ap-2bd027a9-9f2 rev 3, same 40 km CSV sha 49b7855e, same v5 start message, thinking high; permission
+   prompts auto-allowed and logged; tools/m31-trial.mjs). Qwen baselines: smoke authoring analyze 4m21s/36 findings/5 q,
+   draft 4m28s with 13 check errors; v5 trial ~21 min with outputs. Results: M3.1 analyze 13m01s (repaired, 35 findings,
+   4 q), draft 13m11s (repaired, 1 check error: SKILL.md names a file not in the package); trial ~6 min, pipeline ~17 s,
+   block 198 km, Z0-2 9.7% area → 33.6% capture; zone map north-south flipped; ran folds 1-4 unasked. Added to report §3/§5.
 Blocked: waiting for gaid-ui-guide to land on main (hub note note-ui-guide); then task sync, align the hub screens, final visual review, report figures, finish.
 
 ## Failed approaches
