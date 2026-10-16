@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T14:13:08Z
+updated: 2026-10-16T14:30:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9e5573c7-0899-4c21-9d60-48b4df645c01","pid":3776156,"provider":"codex","session":"01a1450f-065c-7781-81fa-b6be4aba848c","start":"4791385","token":"f03dffd1c7b13a0465fac0934a127ab80e5556a92d2f59cc934fcadd51c1db09"}
 branch: task/gaid-ui-guide--screens2
 target: task/gaid-ui-guide
@@ -65,18 +65,31 @@ raw.githubusercontent.com. Keep the worktree clean of caches. Checks: `node geo/
 `## Current state` in your task document, then `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Delivered the revised static setup, map and method references and README in docs/design/mockups/. Replaced eight after PNGs and added 01c-setup-after-area{,-1280}.png under reports/2026-10-16-gaid-ui-guide/figures/. All 13 PNGs are <400 KB (8 at 1440×900, 5 at 1280×800); the three before PNGs, source attributes and SVG geometry are unchanged.
+
+All 16 agreed changes are addressed: single setup sequence, file choosers, input facts and readiness actions, conditional CRS/area reason; full-height 14-class legend, six complete table rows, unlimited explicit column selection, visible overlay/add-layer controls, scale/cursor/selection; adjacent method pane, specific scientific limit, separate assessment and copyable model record. README maps Claude B1/N5, Codex N3/N4 and researcher sections to the changes. Rules: setup Q1–Q6/D1–D2/W5–W6; map MAP1–MAP6/X1–X4/A3; method D1/D3/P4/G2/F5/R4. No guide exception or baseline debt added.
+
+First-view all-UI/body counts at both sizes: input 261/170, AOI 182/117, field 213/146, area 249/165, summary 244/134, map 298/97, method 300/213. No page overflow; actions and initial limits fit. Playwright replay passed with 0 page errors/external requests; file persistence, conditional CRS, 37-row filter, numeric sort, 10 columns, 22-field record, selection and model-copy fallback checked.
+
+Declared checks passed: node geo/ui/check-ui.mjs (0 errors, 102 existing debt); node --test geo/tests/ui-check.test.mjs (5 passed). Browser evidence/replay: ~/data/geoaidesk/work/gaid-ui-guide--screens2/visual-check.log and verify.js. Reverify with those commands and README's replay. No new app instance, dependencies, model run, app/locales/rules changes or deployment. Full scripts/check, dark mode, 200% zoom and formal contrast/greyscale audit were outside this child brief. README prose received the humanizer file-mode pass.
+
 ## Next steps
-1. (the next session's first action)
+1. Finish this child unit. Parent gaid-ui-guide integrates it with task complete and updates its canonical report using this README and the figures.
 ## Failed approaches
+- Initial browser replay tried to open all attributes after Escape had also closed the map popup. Re-selecting a row before that action fixed the replay; no product workaround was needed.
+- Opening a native file chooser inside one long Playwright CLI snippet left its modal state pending and suppressed the return value. Confirmed that the chooser opened, closed the browser session, and reran with chooser-type verification inside the batch. The separate file-input upload/persistence checks pass.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Sequential decisions: preserve source data and existing before PNGs; standardize setup terminology; revise each focused surface; integrate shared copy conventions; capture and verify all views. Owned files: docs/design/mockups/* and after PNGs in the parent report figures folder. These compact static references share layout and copy decisions, so the single writer handles them directly; no child writers or readers are needed.
+
+Trial cause is supported by reports/2026-10-16-gaid-hub-integration/index.md: the researcher stopped after more than 45 minutes of repeated variogram work, before the block-size checkpoint. The before figure records kigam-qwen/qwen3.8-flash-next; keep it only in a read-only record view.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+This child supplies figures and README to the parent report; no separate child report.
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

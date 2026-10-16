@@ -1,153 +1,186 @@
 # GAID UI guide screen references
 
-Three reference mockups and eleven Korean screenshots show the guide applied to existing screens. They do not
-change the running app. Open `setup.html`, `map.html` or `method.html` in a browser; each file contains its own CSS,
-script and data, with no external libraries, fonts or requests. The inlined theme variables come from
-`geo/copy/gaid-app.css`. The installed system font supplies the Korean fallback.
+Three static references and thirteen Korean PNGs show the revised guide on workflow setup, a map and a method detail.
+The running application is unchanged. Eight after PNGs were replaced and two area-step PNGs were added in
+`gaid-ui-guide--screens2`; the three before PNGs are byte-for-byte unchanged.
 
-The parent report is `reports/2026-10-16-gaid-ui-guide/index.md`. This child supplies its figures and this source
-record; it does not create a separate report. Figure paths below are repository-relative.
+Open `setup.html`, `map.html` or `method.html` in a browser. Each contains its CSS, script and data without external
+libraries, fonts or requests. Theme variables come from `geo/copy/gaid-app.css`; the installed system font supplies
+the Korean fallback. The parent report is `reports/2026-10-16-gaid-ui-guide/index.md`. Paths below are repo-relative.
 
-## 1. Workflow setup
+## Workflow setup
 
-- Before: `reports/2026-10-16-gaid-ui-guide/figures/01-setup-before.png`.
-- After: `reports/2026-10-16-gaid-ui-guide/figures/01-setup-after.png` and
-  `reports/2026-10-16-gaid-ui-guide/figures/01b-setup-after-summary.png`.
-- Reference: `docs/design/mockups/setup.html`.
-- Rules: Q1–Q6, D2, B1, W5, L6, N2 and A1–A2 for the demonstrated controls.
+Source: `docs/design/mockups/setup.html`. Figures in `reports/2026-10-16-gaid-ui-guide/figures/`:
 
-The before image is a live capture of `TaskSetup` opened from the Workflows panel for the pinned catalogue's
-`geo-map-and-crs` workflow. Source snapshot: `fed75bc3ff170276df0525c4f413253e861eee5e` (app source unchanged from
-`2de915213e321bf527729d285f9a8342057fe9fb`). Catalogue: 0.2.1. The isolated project's only map input is a copy of
+- `01-setup-before.png`: unchanged live capture.
+- `01-setup-after.png` and `01-setup-after-1280.png`: input and readiness.
+- `01b-setup-after-summary.png` and `01b-setup-after-summary-1280.png`: answers and disabled draft action.
+- `01c-setup-after-area.png` and `01c-setup-after-area-1280.png`: area method, its reason and alternatives.
+
+Rules: Q1–Q6, D1–D2, B1, W5–W6, L6–L7, N2, F5 and A1–A2 for the demonstrated controls. Agreed changes 7–12 are
+addressed. Review references: researcher-persona §1b–d and top changes 2–3/5; Codex N2's sequence concern.
+
+The step tabs are the only sequence: 입력 → 관심 지역 → 범주 → 면적 계산 → 요약. The sole existing file is a fact,
+without `권장`; its projection-only CRS state and 133 features appear at selection. Both file questions use native
+file choosers for `기타 (파일 선택)`. Field and area-condition questions retain free text. File selection and answers
+persist across tabs; missing required input disables Next.
+
+The first step names the disabled 범주 지도·좌표계·면적 표 skill and the unprepared GeoPandas environment, with
+`필요한 스킬 켜기` and `환경 준비` controls. These controls report that the mockup does not change settings. The
+same readiness condition remains next to the disabled `시작 초안 만들기` action. It does not claim a draft was
+created or an analysis ran.
+
+The area step explains that the calculation method changes the area. Geodesic area is explicitly a proposed
+default when no calculation CRS is specified, not a recommendation supplied by the catalogue. The projection
+alternative requires a calculation CRS. Selecting another file, whose CRS this static reference has not inspected,
+adds `원본 CRS 확인` within the area step and requires the source CRS and its evidence before proceeding. The known
+sample does not show that conditional input. This models the missing/unconfirmed-CRS branch; it does not inspect
+uploaded files or infer their CRS. Production must use actual inspection and preserve the missing/conflicting-CRS
+question.
+
+Terms across setup and method: the flow is `시작 설정`, opening it is `시작 설정 열기`, its draft is `시작 초안`, and
+the final action is `시작 초안 만들기`. The opening label follows the current `methods.setup` locale; `workflow`
+retains its glossary meaning and the existing Workflow navigation label. Disclosures name their contents, including
+`예상 결과와 한계 보기`. No production locale ids or ko/en strings changed: these Korean-only HTML references are
+not application components.
+
+The before image captured `TaskSetup` for catalogue 0.2.1's `geo-map-and-crs` workflow at
+`fed75bc3ff170276df0525c4f413253e861eee5e` (app source unchanged from
+`2de915213e321bf527729d285f9a8342057fe9fb`). The isolated project's only map input was a copy of
 `user_data/samples/vector/seoul_geology_250k/Seoul_Geology_250K_Litho.shp` and its companions.
 
-The five tabs cover input, area of interest, class field, area method and summary. Each decision has a recommended
-first option and a final `기타 (직접 입력)` option. Direct input persists when navigating; an empty direct input blocks
-Next. Arrow keys move between tabs. The summary offers Edit links and one disabled primary action, preserving
-the captured missing-skills/missing-environment state. It does not claim that a draft was created or an analysis ran.
+## Map and attribute table
 
-| Before content | After destination |
-|---|---|
-| All inputs and scientific conditions in one scrolling form | One decision per tab, followed by the summary |
-| Long description and output/limit paragraphs | Four-box flow; summary disclosure `예상 결과와 한계 자세히` |
-| Raw area method identifiers `projected-crs`, `geodesic` | `투영 CRS 지정`, `측지 면적` |
-| CRS-unknown question shown for every input | Area-method details explain the conditional check; the sample has declared CRS |
-| Repeated missing-skill text | One blocking line next to the summary action |
+Source: `docs/design/mockups/map.html`. Figures in `reports/2026-10-16-gaid-ui-guide/figures/`:
 
-Recommendations apply to this sample, not every dataset: the existing file for input, full extent when no area
-restriction is supplied, LITHONAME for a lithology map, and geodesic area when no calculation CRS is supplied. The
-last choice is a proposed default for later implementation, not a catalogue-provided recommendation. A production
-stepper must condition its CRS question on inspection and must not suppress it for an unknown or conflicting CRS.
+- `02-map-before.png`: unchanged live capture from the same snapshot and sample as setup.
+- `02-map-after.png` and `02-map-after-1280.png`: revised map, panel and six complete table rows.
 
-## 2. Map and attribute table
+Rules: MAP1–MAP6, X1–X4, P2–P3, W5–W6, R1, B4, L6 and A1–A3 for the demonstrated controls. Agreed changes 1–6 are
+addressed. Review references: Claude B1/N5; Codex N3; researcher-persona §2b–d and top changes 1/5.
 
-- Before: `reports/2026-10-16-gaid-ui-guide/figures/02-map-before.png`.
-- After: `reports/2026-10-16-gaid-ui-guide/figures/02-map-after.png`.
-- Reference: `docs/design/mockups/map.html`.
-- Rules: MAP1–MAP5, X1–X4, P2–P3, W5–W6, R1 and B4.
+The 320 px information panel spans the map and table height. The legend uses its free height, showing all classes
+at 1440×900 and scrolling internally at 1280×800. `범례 14개` and `모두 보기` expose the complete legend without
+silently clipping it. The source actually contains 14 distinct non-null LITHONAME values, including the literal
+`0`. The previous generic missing-value legend entry was removed because no LITHONAME value in this sample is null.
+Missing attribute values, such as MAPIDX, still display `결측값`.
 
-The before is a live capture from the same snapshot and sample as setup, with the conversation pane hidden,
-LITHONAME categorical colours and FID 113 selected. Current file-task suggestions remain above the map; they consume
-vertical space in the before image. No app elements were removed by a screenshot-only DOM edit.
+The table has six complete rows at both sizes, five initial columns, per-column sort and 24×24 px filter controls.
+Any additional columns can be selected, with horizontal overflow confined to the table; there is no 1–8 cap.
+`암상명` is consistent across legend, popup and table, with `LITHONAME` available on hover. Other fields also retain
+their raw names in tooltips. Numeric descending sort, filtering, row/feature selection and the full 22-field record
+work locally. Filtering 암상명 by 화강 returns 37 of 133 rows. Sorting/filtering changes only the table.
 
-The after embeds the actual 133 features returned by the isolated `/geo/vector-page` API in EPSG:3857. SVG coordinates
-are rounded to a tenth of a display-coordinate unit after mapping the full extent to 1,000 SVG units. Attributes are
-unchanged. This is display geometry, not an analytical replacement for the source. Colours use the app's existing
-category hash and palette. FID 113 has `대보관입암류 화강암`, `중생대 쥬라기`, `Jgr`, `화강암류`; MAPIDX is missing. No
-source EPSG authority was returned, so the original CRS stays `Transverse_Mercator`, not an inferred EPSG code.
+The overlay toggle `KIGAM 1:5만 지질도` and `레이어 추가` are visible without opening settings. Adding a layer opens
+a native file chooser. Actual layer loading, online overlays and PNG export are not implemented; controls explain
+that limit without making external requests. Opacity, layer visibility, zoom and zoom-to-layer work locally. The
+selected FID 113 has a blue outline and stronger fill, also reflected in its selected table row.
 
-| Before content | After destination |
-|---|---|
-| Layer, long legend and verbose metadata inside a tall panel | Fixed 320 px panel: layer, internally scrolling legend, four basic information rows |
-| Sampling/internal display notes and full sandbox path | Omitted from the overview; extent and source/display CRS distinction remain behind `자세히` |
-| Generic preview disclaimer including raster guidance on a vector | Relevant source/display distinction behind `자세히` |
-| Online-basemap network note when no online basemap is selected | Omitted in this offline view |
-| Long raw feature popup | Five labelled attributes and `모든 속성 보기` for the complete 22-field record |
-| Twenty-two columns and long filter-scope explanation | Five default columns, column menu, one-line row state and scope tooltip |
-| Full-layer area calculation form below the viewer | Separate task, outside this read-only inspection view |
-| File-task suggestions above the map | Workflow navigation, outside the map's work area |
+The scale bar tracks SVG zoom and resize. It labels display-CRS map distance, not ground distance; its tooltip
+states that distinction. Cursor coordinates are derived from the SVG transform in EPSG:3857 and show metres.
+The source row says `Transverse_Mercator · 투영법만 기록됨`. No source authority was returned and no EPSG code is
+invented. Extent and the source/display distinction remain under `범위와 표시 조건 보기`; the PNG action explains
+its display-only scope in a tooltip.
 
-Sorting, per-column text filtering, selecting rows/features, the complete record, column selection, opacity and
-zoom controls work locally. Filtering `암상명` by `화강` gives 37 of 133 rows, matching the source. Filtering changes
-the table only. PNG export and More do not call the app; they report that this is a reference. The initial popup is
-open for comparison; later feature clicks place it by the click, bounded by the map edges.
+The embedded 133 API features, their attributes and SVG display geometry are unchanged. The source API returned
+display geometry in EPSG:3857; coordinates were mapped to 1,000 SVG units and rounded to a tenth of a display unit.
+This is not an analytical replacement for the source. Colours retain the app's category hash and palette. FID 113
+has 대보관입암류 화강암, 중생대 쥬라기, Jgr and 화강암류, with missing MAPIDX.
 
-## 3. Method detail
+## Method detail
 
-- Before: `reports/2026-10-16-gaid-ui-guide/figures/03-method-before.png`.
-- After: `reports/2026-10-16-gaid-ui-guide/figures/03-method-after.png`.
-- Reference: `docs/design/mockups/method.html`.
-- Rules: P1/P3, R1–R4, D2, G1/G2, F5, W5 and L6.
+Source: `docs/design/mockups/method.html`. Figures in `reports/2026-10-16-gaid-ui-guide/figures/`:
 
-The before is reused unchanged from
-`reports/2026-10-16-gaid-hub-integration/figures/02-method-detail-after.png`, recorded with the existing method and
-trial in the report available at main `0679b17`. Its size is already 1440×900. A new paid or local model run was not
-made for these mockups.
+- `03-method-before.png`: unchanged reuse of the gaid-hub-integration detail figure.
+- `03-method-after.png` and `03-method-after-1280.png`: workflow list and its adjacent detail pane.
 
-The method content and trial outcome come from that figure and
-`reports/2026-10-16-gaid-hub-integration/index.md`. The trial stopped before the first block-size checkpoint; the
-researcher assessed it as `수정 필요`. The observed files were `pyproject.toml` and `scripts/01_variogram.py`. No map,
-priority list or successful method validation is invented.
+Rules: D1/D3, P1/P3/P4, R1–R4, G1/G2, F5, W5–W6, L6–L7 and A1–A2 for the demonstrated controls. Agreed changes
+13–16 are addressed. Review references: Codex N4; researcher-persona §3b–d and top change 4.
 
-| Before content | After destination |
-|---|---|
-| Five or more badges, repeated readiness and full method description | Three badges: draft, code included, revision needed; one context line |
-| Tool-call/failure counts, model name, chat ID, raw workflow ID and revision enum | Omitted from the researcher overview; the app's original trial data is unchanged |
-| Full outputs and trial detail stacked below workflow and recipe cards | Recent-trial summary and `결과 파일과 기록 보기` disclosure |
-| Multiple start actions for method, workflow and recipe | One `시작 설정 열기` action; workflow/recipe details in a disclosure |
-| Long scientific boundary paragraph | One visible `검토 전` limit and full boundary behind `해석 한계 자세히` |
-| Assessment form mixed into the detail | Existing assessment shown behind `평가 보기`; no assessment writes |
+Method browsing uses a right-hand detail pane with a light shadow and no dim backdrop or modal focus trap. The list
+stays usable beside it. The two package badges, `초안` and `코드 포함`, have tooltips. `연구자 평가: 수정 필요` is a
+separate trial assessment. `KIGAM 방법 허브` replaces the raw source label `skill_hub`; PU and CV expand on hover.
 
-The static reference links its start action to the separate setup reference. That reference demonstrates a map
-workflow, so this link is a navigation demonstration, not the PU method's implemented setup. Original hub-check
-receipts, provenance and assessment records remain in the real app; this prototype does not replace or modify them.
+The visible limit names the actual boundary: validation only in the Yilgarn Ni case; other geological settings are
+unvalidated. `해석 한계 보기` retains the full boundary on deposit guarantees, pIQR's limited uncertainty scope,
+exchangeability and spatial autocorrelation. It is visible without scrolling at both sizes.
 
-## Verification and scope
+The trial summary states the documented reason: repeated variogram calculation for more than 45 minutes led the
+researcher to stop before the block-size checkpoint. Evidence: `reports/2026-10-16-gaid-hub-integration/index.md`,
+section 3, and its unchanged before figure. The observed files remain `pyproject.toml` and `scripts/01_variogram.py`.
+No successful method validation, map or priority list is invented.
 
-All seven main figures are 1440×900. Four additional `*-1280.png` figures cover each after view and the setup summary
-at 1280×800. Every PNG is below 400 KB. The browser screenshots use CSS pixels with no downscaling or recompression.
+`채팅 열기` opens an explicitly labelled connection mockup; it does not access the real chat. `기록 보기` contains
+the read-only, selectable model name `kigam-qwen/qwen3.8-flash-next`, taken verbatim from the before figure, plus a
+copy action, trial date and observed files. On an insecure static origin where Clipboard API is unavailable, the
+copy action selects the value and explains the copy-shortcut fallback. The model name is absent from the overview.
 
-| First-view check | Setup | Map | Method |
-|---|---:|---:|---:|
-| Visible UI characters, including labels/headings/actions, excluding supplied data and collapsed details | 197 | 262 | 270 |
-| Page overflow, horizontal/vertical at both sizes | 0 / 0 | 0 / 0 | 0 / 0 |
-| Primary action in the viewport at both sizes | Yes | Yes | Yes |
-| Initial side panel requires scrolling at either size | — | No | — |
+`시작 설정 열기` links to the map setup reference as a navigation demonstration. It is not an implemented PU-method
+setup. Original hub-check receipts, provenance, chat and assessment records stay in the real application. No new
+paid or local-model run was made.
 
-The count includes labels and headings, making it stricter than the guide's body-text budget. The map legend and
-attribute table have their own scroll regions. Dialogs stay within 85% of viewport height with fixed footers. The
-method detail initially shows its limit disclosure at 1280×800; opening longer details scrolls only its body.
+## Verification
 
-Browser checks covered custom-answer persistence and validation, step arrows and summary, Escape, numeric descending
-sort, the 37-row category filter, row selection, the full 22-field record, retained scientific limits and the separate
-setup link. Status meaning is also written as text. UI text uses at least 12 px; visible secondary text uses the
-body colour. Native control borders and missing-value text are darkened from token roles with `color-mix` for contrast.
-This is a light-theme layout/reference check, not a release accessibility audit. Dark mode and 200% browser zoom
-were not checked.
+Eight PNGs are 1440×900 and five are 1280×800. All thirteen are below 400,000 bytes; the largest new/updated PNG is
+242,849 bytes. Browser captures use CSS pixels without downscaling or recompression. Steps 2 and 3, the conditional
+CRS branch and the expanded model record were also checked; their extra evidence stays outside Git.
+
+| Focused view | W5 body characters | All UI characters, including headings/controls |
+|---|---:|---:|
+| Setup input | 170 | 261 |
+| Setup area of interest | 117 | 182 |
+| Setup category field | 146 | 213 |
+| Setup area method | 165 | 249 |
+| Setup summary | 134 | 244 |
+| Map main work area and information panel | 97 | 298 |
+| Method detail pane | 213 | 300 |
+
+Counts are identical at both sizes. The focused view excludes app chrome, the adjacent method list, supplied data
+marked `data-user`, SVG labels and collapsed content. Text-node edges are trimmed; internal spaces and punctuation
+count. Body counts additionally exclude headings, buttons, disclosure labels, select controls, metadata labels and
+step tabs. The all-UI count retains those, so even that stricter count stays at or below 300. Cursor values, unlike
+its label, are data and are excluded. The browser replay contains the exact traversal.
+
+All captured views have zero horizontal/vertical page overflow and visible primary actions. All five setup steps
+fit without body scrolling. The map panel itself needs no scrolling (698 px at 1440×900, 598 px at 1280×800); only
+the legend and table have internal scroll. The method body also fits initially; expanding its records or scientific
+boundary scrolls the body while keeping the start action fixed.
+
+Checks against guide section 10 covered one primary action, density, grouped actions, scoped disclosures, hidden
+internals, setup navigation, map legend/info, table controls, textual statuses, visible selection and keyboard focus.
+Keyboard checks include step arrows, Escape, retained answers, numeric sort and row selection. The filter targets
+measure 24×24 px with 8 px gaps from adjacent header controls. This is a light-theme reference review, not a release
+accessibility audit; dark mode, 200% zoom and a formal contrast/greyscale audit were not run.
 
 Declared checks:
 
-- `node geo/ui/check-ui.mjs`: 0 errors, 96 existing accepted-debt entries, 0 resolved. No baseline was changed.
+- `node geo/ui/check-ui.mjs`: 10,562 strings, 0 errors, 102 existing accepted-debt entries, 0 resolved. No baseline changed.
 - `node --test geo/tests/ui-check.test.mjs`: 5 passed.
-- The child brief does not require full `scripts/check`. Any additional repository-wide gate enforced by
-  `task finish` is recorded in the CLI completion receipt, separately from the visual checks above.
+- Playwright interaction/capture replay: passed, no page errors and no external requests.
+- Source comparison: all three before PNGs, embedded attributes and map display geometry are unchanged.
 
-These checks cover the existing locale/code rules, not the static HTML's text. Korean-only reference copy is inline
-as requested; no application locale/catalogue strings changed, so there is no production ko/en string migration.
+The two repository checks cover application locale/code rules, not static HTML copy. No full `scripts/check`, new
+app instance, new dependencies, application changes or deployment belong to this child brief. Any additional gate
+required by `task finish` is recorded separately in the completion receipt. No guide exception or new baseline debt
+was introduced by these references.
 
-## Capture isolation and cleanup
+## Capture and replay
 
-The throwaway frontend/backend ran from the recorded snapshot, using existing installed dependencies, on ports
-3347/18347. All user data and logs were under `~/data/geoaidesk/work/gaid-ui-guide--screens/`. The user's review
-instances, `~/.geoaidesk` and the deployed app were not changed. Only the named sample's five source files were copied
-read-only from the user data home.
+This revision used Playwright CLI route fulfilment at `http://gaid-ui.local/`, without a server. Browser state, scripts,
+logs and intermediate captures are under `~/data/geoaidesk/work/gaid-ui-guide--screens2/`. There are no runtime caches
+in this worktree. The user's review instances, user data home and deployment were not touched.
 
-The first browser connection was blocked because the capture launcher omitted its custom frontend port from the
-backend's CORS configuration. The browser capture used a local Playwright request bridge to the same isolated API;
-no app source or API response data was changed. Static mockups were served by Playwright route fulfilment, so their
-rendering made no external requests. Direct file URLs are blocked by this automation tool.
+Replay from this task worktree (update the hard-coded worktree path in `verify.js` if relocated):
 
-Recorded job: `~/data/geoaidesk/runs/gaid-ui-guide--screens-20261016T084840.096516Z/receipt.json`. The capture process
-stopped normally with exit 0 and released both ports. Its generated build cache and dependency links are in the job's
-external source snapshot; the task worktree has no runtime cache or app-written files. They were removed after capture.
-Browser evidence and replay snippets remain under `~/data/geoaidesk/work/gaid-ui-guide--screens/`.
+```bash
+PLAYWRIGHT_MCP_OUTPUT_DIR=/home/seongin3/data/geoaidesk/work/gaid-ui-guide--screens2/playwright playwright-cli -s=screens2 open about:blank
+uv run --no-project python /home/seongin3/data/geoaidesk/work/gaid-ui-guide--screens2/route.py
+playwright-cli -s=screens2 run-code --filename /home/seongin3/data/geoaidesk/work/gaid-ui-guide--screens2/route.js
+playwright-cli -s=screens2 run-code --filename /home/seongin3/data/geoaidesk/work/gaid-ui-guide--screens2/verify.js
+playwright-cli -s=screens2 close
+```
+
+The previous before captures and original source-data preparation remain documented by
+`docs/tasks/gaid-ui-guide--screens.md` and its external evidence folder
+`~/data/geoaidesk/work/gaid-ui-guide--screens/`. Its isolated runtime job exited normally and released its ports;
+this revision did not restart it.
