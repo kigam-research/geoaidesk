@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T04:57:47Z
+updated: 2026-10-16T04:58:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -143,11 +143,17 @@ detail with concept/IO images, input/output examples) and agree them with the us
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Wait for: v4 trial (Yilgarn 시험 project, started 13:36 KST, watcher screenshots ~/data/geoaidesk/work/gaid-hub/playwright/v4/
-   run-01..10, stop at 30 min), Claude 고급검토 round 2 (reader a99b1e08), Codex 검토 code review (reader 163e0278).
-2. Triage, fix; record the trial (outputs, reductions, assessment) — then report, scripts/check, cleanup (remove
-   web/src/app/hub-design/, caches), finish.
-3. Still open with the user: approval of the 7 design screens (presented 2026-10-16, no answer yet).
+1. Mockup round 2 (user feedback): components saved (121fa40); waiting for 8 concept images from reader f494414c
+   ("인포그래픽 및 그림 생성 작업" profile, re-prompted to save under CODEX_HOME then copy to
+   ~/data/geoaidesk/work/gaid-hub/mockup/concept/). Then copy them to web/public/hub-design-mock/concept/ (UNTRACKED,
+   never commit; delete with hub-design page before finish), screenshot /hub-design?view=home|shared|sources|reading|
+   questions|draft|register, put PNGs in reports/2026-10-16-gaid-hub/figures/mock2-*.png, review-copy, present to user.
+2. v4 trial running (Yilgarn 시험; one permission allowed at ~13:45; pipeline log derived/mpm_run_q3/logs_fold0.log
+   stuck at "Training 3 bootstrap models" from 13:48). Stop/record at 14:06 (30 min).
+3. Readers running: Claude 고급검토 round 2 (a99b1e08), Codex 검토 code (163e0278).
+4. After user agreement on mockups: implement shared hub (users by name, registry, folders, stars, comments), URL fetch,
+   figure crops (server pageImage + crop like ~/data/geoaidesk/work/gaid-hub/tools/figcrop.py), concept image generation
+   via a configured image model, then tests/report/check/finish.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
