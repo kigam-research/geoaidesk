@@ -32,6 +32,7 @@ import type { HubLocation } from "./location";
 import { QuestionStep, type DraftAnswer } from "./question-step";
 import { SourceStep, WorkingPanel, type Target } from "./source-step";
 import { TrialStep } from "./trial-step";
+import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
 
 const appText = geoText("app");
@@ -52,13 +53,20 @@ export function GaidHub({
   const { resolvedTheme, setTheme } = useTheme();
   const actions = (
     <>
-      <Button variant="ghost" size="icon-sm" aria-label={appText("projects.open_settings")} onClick={() => setSettingsOpen(true)}>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={appText("projects.open_settings")}
+        onClick={() => setSettingsOpen(true)}
+      >
         <SettingsIcon />
       </Button>
       <Button
         variant="ghost"
         size="icon-sm"
-        aria-label={resolvedTheme === "dark" ? appText("projects.switch_to_light_mode") : appText("projects.switch_to_dark_mode")}
+        aria-label={
+          resolvedTheme === "dark" ? appText("projects.switch_to_light_mode") : appText("projects.switch_to_dark_mode")
+        }
         onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       >
         {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -105,7 +113,9 @@ function HubList({ onOpen }: { onOpen: (id: string) => void }) {
       window.clearInterval(timer);
     };
   }, []);
-  return <HubHome projects={projects} loading={loading} error={error} onCreate={() => onOpen(NEW_ID)} onOpen={onOpen} />;
+  return (
+    <HubHome projects={projects} loading={loading} error={error} onCreate={() => onOpen(NEW_ID)} onOpen={onOpen} />
+  );
 }
 
 function emptyProject(): AuthoringProject {
@@ -142,7 +152,8 @@ export function recordedAnswers(p: AuthoringProject): Record<string, DraftAnswer
     if (q.status === "open") continue;
     const d = p.decisions.find((x) => x.questionId === q.id && !x.supersededBy);
     if (!d) continue;
-    out[q.id] = d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
+    out[q.id] =
+      d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
   }
   return out;
 }
@@ -237,7 +248,11 @@ function HubProject({
   }, [activeProjects, trialProject]);
 
   if (!project)
-    return <p className="p-10 text-sm text-muted-foreground">{error ? text("home.error", { detail: error }) : text("home.loading")}</p>;
+    return (
+      <p className="p-10 text-sm text-muted-foreground">
+        {error ? text("home.error", { detail: error }) : text("home.loading")}
+      </p>
+    );
 
   const questions = liveQuestions(project);
   const current = step ?? defaultStep(project);
@@ -307,11 +322,9 @@ function HubProject({
     try {
       const existing = project.packages.find((p) => p.draftRevision === draft.revision);
       const pkg = existing ?? (await hubApi.pack(id, draft.revision));
-      const result = await hubApi.install(id, pkg.revision, { projectId: trialProject, acknowledged: true });
+      // Install only; the inputs are prepared in the project before the start settings open (InputPrep).
+      await hubApi.install(id, pkg.revision, { projectId: trialProject, acknowledged: true });
       await reload();
-      setActive(trialProject);
-      onOpenProject(trialProject);
-      openMethodSetup({ projectId: trialProject, methodKey: result.install.methodKey, workflowId: result.workflowId, recipeId: result.recipeId });
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -319,8 +332,30 @@ function HubProject({
     }
   };
 
+  /** Open the installed method's start settings in its project (after the inputs are there). */
+  const openSetup = (projectId: string, methodKey: string, packageRevision: number) => {
+    const manifest = project.packages.find((p) => p.revision === packageRevision)?.manifest as
+      | { workflows?: { id: string }[]; recipes?: { id: string }[] }
+      | undefined;
+    setActive(projectId);
+    onOpenProject(projectId);
+    openMethodSetup({
+      projectId,
+      methodKey,
+      workflowId: manifest?.workflows?.[0]?.id ?? null,
+      recipeId: manifest?.recipes?.[0]?.id ?? null,
+    });
+  };
+  const currentPackage = draft ? project.packages.find((p) => p.draftRevision === draft.revision) : undefined;
+  const currentInstall = currentPackage
+    ? project.installs
+        .filter((i) => i.projectId === trialProject && i.packageRevision === currentPackage.revision)
+        .at(-1)
+    : undefined;
+
   const failed = project.attempts.at(-1);
-  const lastFailed = !running && failed && ["failed", "rejected", "interrupted"].includes(failed.outcome) ? failed : null;
+  const lastFailed =
+    !running && failed && ["failed", "rejected", "interrupted"].includes(failed.outcome) ? failed : null;
 
   let body: React.ReactNode;
   if (running && (current === "sources" || current === "questions")) {
@@ -328,8 +363,18 @@ function HubProject({
       <WorkingPanel
         project={project}
         attempt={running}
-        title={running.op === "analyze" ? text("reading.title") : running.op === "revise" ? text("drafting.revising") : text("drafting.title")}
-        note={running.op === "analyze" ? text("reading.note") : text("drafting.note", { count: project.decisions.filter((d) => !d.supersededBy).length })}
+        title={
+          running.op === "analyze"
+            ? text("reading.title")
+            : running.op === "revise"
+              ? text("drafting.revising")
+              : text("drafting.title")
+        }
+        note={
+          running.op === "analyze"
+            ? text("reading.note")
+            : text("drafting.note", { count: project.decisions.filter((d) => !d.supersededBy).length })
+        }
       />
     );
   } else if (current === "sources") {
@@ -391,6 +436,21 @@ function HubProject({
             onInstall={install}
             installing={installing}
             disabledReason={issues ? text("trial.notReady") : null}
+            prepared={
+              currentInstall ? (
+                <InputPrep
+                  key={`${currentInstall.projectId}:${currentInstall.packageRevision}`}
+                  projectId={currentInstall.projectId}
+                  projectName={
+                    activeProjects.find((p) => p.id === currentInstall.projectId)?.name ?? currentInstall.projectId
+                  }
+                  methodKey={currentInstall.methodKey}
+                  onOpenSetup={() =>
+                    openSetup(currentInstall.projectId, currentInstall.methodKey, currentInstall.packageRevision)
+                  }
+                />
+              ) : null
+            }
           />
         }
       />
@@ -401,19 +461,7 @@ function HubProject({
         onDraft={() => setStep("draft")}
         project={project}
         projectName={(pid) => activeProjects.find((p) => p.id === pid)?.name ?? pid}
-        onOpen={(install) => {
-          setActive(install.projectId);
-          onOpenProject(install.projectId);
-          const manifest = project.packages.find((p) => p.revision === install.packageRevision)?.manifest as
-            | { workflows?: { id: string }[]; recipes?: { id: string }[] }
-            | undefined;
-          openMethodSetup({
-            projectId: install.projectId,
-            methodKey: install.methodKey,
-            workflowId: manifest?.workflows?.[0]?.id ?? null,
-            recipeId: manifest?.recipes?.[0]?.id ?? null,
-          });
-        }}
+        onOpen={(install) => openSetup(install.projectId, install.methodKey, install.packageRevision)}
         onFeedback={(prefill) => {
           setFeedbackPrefill(prefill ?? "");
           setDialog("feedback");
@@ -433,7 +481,11 @@ function HubProject({
         onBack={onBack}
         extra={
           project.attempts.length > 0 ? (
-            <button type="button" className="text-xs text-muted-foreground underline-offset-4 hover:underline" onClick={() => setDialog("record")}>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+              onClick={() => setDialog("record")}
+            >
               {text("detail.show")}
             </button>
           ) : null
@@ -451,7 +503,11 @@ function HubProject({
         }}
       />
       {draft && (
-        <FilesDialog open={dialog === "files"} onOpenChange={(o) => setDialog(o ? "files" : null)} load={() => hubApi.files(id, draft.revision)} />
+        <FilesDialog
+          open={dialog === "files"}
+          onOpenChange={(o) => setDialog(o ? "files" : null)}
+          load={() => hubApi.files(id, draft.revision)}
+        />
       )}
       <IssuesDialog
         open={dialog === "issues"}
@@ -463,7 +519,11 @@ function HubProject({
           await reload();
         }}
       />
-      <AgentRecordDialog open={dialog === "record"} onOpenChange={(o) => setDialog(o ? "record" : null)} attempts={project.attempts} />
+      <AgentRecordDialog
+        open={dialog === "record"}
+        onOpenChange={(o) => setDialog(o ? "record" : null)}
+        attempts={project.attempts}
+      />
       {page && pdfSource && (
         <SourcePageDialog
           open
@@ -479,7 +539,10 @@ function HubProject({
 
 function FailedNotice({ outcome, message, onRetry }: { outcome: string; message?: string; onRetry: () => void }) {
   return (
-    <div role="alert" className="mx-auto mb-4 flex max-w-2xl items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm">
+    <div
+      role="alert"
+      className="mx-auto mb-4 flex max-w-2xl items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm"
+    >
       <span>{outcome === "interrupted" ? text("reading.interrupted") : (message ?? text("reading.failed"))}</span>
       <Button size="sm" variant="outline" onClick={onRetry}>
         {text("reading.retry")}

@@ -152,7 +152,10 @@ export function TrialCard({
   installing,
   disabledReason,
   installedIn,
+  prepared,
 }: {
+  /** After installation: the input preparation that leads to the start settings. */
+  prepared?: ReactNode;
   projects: { id: string; name: string }[];
   projectId: string;
   onProject: (id: string) => void;
@@ -184,19 +187,25 @@ export function TrialCard({
           ))}
         </select>
       </label>
-      <label className="flex items-start gap-2 text-sm">
-        <input
-          type="checkbox"
-          className="mt-0.5 size-4 accent-primary"
-          checked={consent}
-          onChange={(event) => onConsent(event.target.checked)}
-        />
-        {text("trial.consent")}
-      </label>
-      <Button onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
-        {installing ? text("trial.installing") : text("trial.install")}
-      </Button>
-      {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
+      {prepared ? (
+        prepared
+      ) : (
+        <>
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 accent-primary"
+              checked={consent}
+              onChange={(event) => onConsent(event.target.checked)}
+            />
+            {text("trial.consent")}
+          </label>
+          <Button onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
+            {installing ? text("trial.installing") : text("trial.install")}
+          </Button>
+          {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
+        </>
+      )}
       {installedIn && <p className="text-sm text-primary">{text("trial.installed", { project: installedIn })}</p>}
     </section>
   );

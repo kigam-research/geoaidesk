@@ -129,10 +129,10 @@
   },
   "trial": {
     "title": "Try in a project",
-    "body": "Install the draft into a project and open the Workflow start settings.",
+    "body": "Install the draft into a project, prepare its inputs, then open the Workflow start settings.",
     "project": "Project",
     "consent": "I understand the draft skill can run code in the project.",
-    "install": "Install and open start settings",
+    "install": "Install in project",
     "installing": "Installing.",
     "installed": "Installed in {project}",
     "openAgain": "Open start settings again",
@@ -169,5 +169,16 @@
       "interrupted": "Interrupted"
     },
     "validation": "Items the checks removed"
+  },
+  "prep": {
+    "loading": "Checking the installed method.",
+    "noWorkflow": "The installed method has no Workflow. Open the method from the project's Workflow panel.",
+    "title": "Inputs for {project}",
+    "required": "Required",
+    "optional": "Optional",
+    "upload": "Upload file",
+    "openSetup": "Open start settings",
+    "needInputs": "Upload every required input to open the start settings.",
+    "uploadFailed": "Could not upload the file: {detail}"
   }
 }

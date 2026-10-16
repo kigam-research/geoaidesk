@@ -129,10 +129,10 @@
   },
   "trial": {
     "title": "프로젝트에서 시험",
-    "body": "초안을 프로젝트에 설치하고 Workflow 시작 설정을 엽니다.",
+    "body": "초안을 프로젝트에 설치하고 입력 자료를 준비한 뒤 Workflow 시작 설정을 엽니다.",
     "project": "시험할 프로젝트",
     "consent": "초안 스킬이 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
-    "install": "설치하고 시작 설정 열기",
+    "install": "프로젝트에 설치하기",
     "installing": "설치하는 중입니다.",
     "installed": "{project}에 설치됨",
     "openAgain": "시작 설정 다시 열기",
@@ -169,5 +169,16 @@
       "interrupted": "중단됨"
     },
     "validation": "검사에서 걸러진 내용"
+  },
+  "prep": {
+    "loading": "설치한 방법을 확인하는 중입니다.",
+    "noWorkflow": "설치한 방법에 Workflow가 없습니다. 프로젝트의 Workflow 패널에서 방법을 여세요.",
+    "title": "{project}에 넣을 입력 자료",
+    "required": "필수",
+    "optional": "선택",
+    "upload": "파일 올리기",
+    "openSetup": "시작 설정 열기",
+    "needInputs": "필수 입력 자료를 모두 올리면 시작 설정을 열 수 있습니다.",
+    "uploadFailed": "파일을 올리지 못했습니다: {detail}"
   }
 }
