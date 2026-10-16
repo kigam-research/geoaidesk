@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T07:11:23Z
+updated: 2026-10-16T07:11:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -172,27 +172,24 @@ infographic agent review of the screenshots (user rule from feedback 2), then pr
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Children (Normal speed) running: gaid-hub--shared (writer 5ec9f772, brief briefs/child-shared.md: shared hub server
-   /geo/hub/*, install refactor in authoring/install.ts) and gaid-hub--visuals (writer 3a6c6bdd, brief
-   briefs/child-visuals.md: concept images via image model, URL sources). `task complete` each when it finishes.
-   Child shared note (2026-10-16): exports getAuthoringStore(app) from authoring/routes.ts, mounts hub-shared after
-   authoring, adds GET /geo/hub/entries/:id/visuals/:key (?revision) beside /cover; parent avoids install.ts and route
-   mounting edits until it is integrated.
-2. Done by parent (57dd339): shared hub wiring (entry page, stars/comments, use-in-my-research dialog with install +
-   InputPrep incl. environment prep, register from preview, folders + recommended on home, display-name prompt, #hub/e/<id>).
-   Remaining after children integrate: URL form → POST sources/url, visuals in MethodFlow + "개념 그림 만들기" action,
-   authoring folderId PATCH (my routes.ts; after child merge), live end-to-end check.
-   (old) Parent meanwhile: wire the approved screens to the contracts (hub home folders/recommended, shared entry page with
-   stars/comments, register dialog → POST /geo/hub/entries, preview from real data, user name prompt, authoring
-   folderId PATCH route, URL form → sources/url, visuals in MethodFlow); remove hub-design page and mock assets at the end.
-3. v5 trial done (40 km grid, quick mode, project "Yilgarn 40km 빠른 시험" yilgarn-40km-2a436b): started 14:27:58,
+1. Children done: gaid-hub--shared (81984e9) and gaid-hub--visuals (a297b62) integrated and closed (full scripts/check passed
+   in each with VITEST_MAX_WORKERS=1; >1 breaks backend serialization).
+2. Done by parent: feedback-3 redesign (4f37b35: hero, input→steps→result band, summary points, limits card, step detail,
+   home hero/cards); URL sources + concept-picture action wired (eb54922; no image model configured on the dev instance →
+   Korean 400 shown, no paid image call made); live shared-hub check on the dev instance: register (entry
+   entry-ap-a135f290-1c4), star, comment, use in "Yilgarn 40km 빠른 시험" → input prep → start settings opened (not run).
+   Fixes found there (1c2e7e1): register dialog folder selection, long input paths in the use dialog. Authoring folderId
+   PATCH dropped: registration picks the hub folder, and the home groups by registered folder.
+3. Infographic review round 4 running: reader 5d219d67 (profile "인포그래픽 및 그림 생성 작업"), brief
+   briefs/review-infographic-4.md → reviews/infographic-4.md. Apply relevant changes, then present screens to the user.
+4. v5 trial done (40 km grid, quick mode, project "Yilgarn 40km 빠른 시험" yilgarn-40km-2a436b): started 14:27:58,
    finished 14:48 KST (~21 min wall, pipeline 12.3 min; slowest stage BaggingPU 11 min). Outputs: results/zone_map*.tif,
    figures/zone_map.png, figures/capture_curve.png, results/sensitivity_table.csv, results/run_log.md (per-step reductions
    and times). Two data-guard permission prompts allowed by the operator. Assessment saved "useful". Method defect for
    the next revision: expected artifact names (outputs/*) differ from the actual results/ and figures/ paths.
-4. Report, scripts/check, cleanup, finish.
-Blocked: waiting for child finishes, run serially (gaid-hub--shared: task finish with VITEST_MAX_WORKERS=1 running; then
-gaid-hub--visuals). VITEST_MAX_WORKERS=2/4 breaks backend serialization (temp-root races); use 1 or default.
+5. Report (reports/2026-10-16-gaid-hub/index.md), scripts/check, remove web/src/app/hub-design/ and
+   web/public/hub-design-mock/ and build caches, task finish.
+Blocked: waiting for the infographic review (reader 5d219d67).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
