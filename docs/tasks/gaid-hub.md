@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T03:10:51Z
+updated: 2026-10-16T03:12:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -108,6 +108,12 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   original code c03c67d): analyze 4m21s, 36 findings, 5 questions (one repair); answers given in the UI (4 recommended,
   1 free text) and applied together; draft attempt started 12:0x.
 - Child gaid-hub--server retired without changes (hub request 0bc1c179ab4c; take → finish → complete, closed).
+- Live loop on smoke project: draft 1 (4m28s, repaired) had 13 check errors (SKILL.md named code paths without the
+  scripts/upstream/ prefix); added "에이전트에게 고치게 하기" in the issues dialog (revise with the check errors as feedback);
+  revise started 03:10Z. Trial step now lists GAID trial records and "시험 결과로 초안 고치기".
+- Readers: Claude 고급검토 visual review round 1 = reader 1f81f17a (output ~/data/geoaidesk/work/gaid-hub/reviews/
+  claude-visual-1.md). Researcher persona brief ready: ~/data/geoaidesk/work/gaid-hub/briefs/researcher-persona.md
+  (native Sonnet agent, high effort; uses Qwen — run alone).
 ## Next steps
 1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
    `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
