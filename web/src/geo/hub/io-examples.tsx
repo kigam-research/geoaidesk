@@ -19,11 +19,12 @@ export function exampleColumns(port: InputPort): string[] {
 }
 
 function exampleValue(column: string, row: number): string {
-  const c = column.toLowerCase();
-  if (c === "…") return "…";
-  if (c === "x" || c.includes("east") || c.includes("lon")) return String(512_500 + row * 5000);
-  if (c === "y" || c.includes("north") || c.includes("lat")) return String(6_702_500 - row * 5000);
-  if (c.includes("label") || c.includes("deposit") || c.includes("positive")) return row === 1 ? "1" : "0";
+  const c = column.toLowerCase().replace(/[<>]/g, "");
+  if (c === "…" || c === "...") return "…";
+  if (/^(x|tmx)$|east|lon|경도/.test(c)) return String(512_500 + row * 5000);
+  if (/^(y|tmy)$|north|lat|위도/.test(c)) return String(6_702_500 - row * 5000);
+  if (/label|deposit|positive|mine|라벨|광상|양성/.test(c)) return row === 1 ? "1" : "0";
+  if (/id$|_id|번호/.test(c)) return `C-${10_412 + row * 37}`;
   return (0.12 + row * 0.31).toFixed(2);
 }
 
@@ -114,8 +115,9 @@ export function BoundaryExample({ port }: { port: InputPort }) {
 
 export function InputExample({ port }: { port: InputPort }) {
   const polygon =
-    port.formats.some((f) => /shp|gpkg|geojson|polygon|vector/i.test(f)) ||
-    /boundary|polygon|region/i.test(port.semanticType);
+    port.formats.some((f) => /shp|shapefile|gpkg|geopackage|geojson|polygon|vector/i.test(f)) ||
+    /boundary|polygon|region|vector|area/i.test(port.semanticType) ||
+    /경계|도형|폴리곤|polygon|boundary/i.test(localText(port.label));
   return polygon ? <BoundaryExample port={port} /> : <TableExample port={port} />;
 }
 

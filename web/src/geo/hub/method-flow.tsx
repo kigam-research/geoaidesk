@@ -3,7 +3,7 @@
  * Method flow, vertical: the steps as stacked boxes on the left; the chosen step's explanation, its concept picture
  * and the shape of its inputs and outputs on the right.
  */
-import { CheckIcon, ChevronRightIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
+import { ChevronRightIcon, CircleIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { DraftProfile, ProcedureNode } from "@/geo/contracts/authoring";
@@ -170,8 +170,8 @@ function StepDetail({
             <p className="text-xs font-semibold text-muted-foreground">{text("draft.checks")}</p>
             <ul className="flex flex-wrap gap-1.5">
               {node.checks.map((c, i) => (
-                <li key={i} className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs">
-                  <CheckIcon className="size-3.5 text-primary" aria-hidden />
+                <li key={i} className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px]">
+                  <CircleIcon className="size-3 text-primary" aria-hidden />
                   {localText(c)}
                 </li>
               ))}

@@ -1,6 +1,6 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
 export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-16.2";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-16.2";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-16.3";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
 notes or an analysis handoff). Together you turn a method from these sources into a reusable agent skill and, when useful,
@@ -99,7 +99,11 @@ Use only ids from the vocabularies given in the request for taxonomy, input form
 the Workflow environmentProfile. Procedure: 3-12 steps with type input|qa|analysis|decision|human-gate|output. The researcher
 reads the procedure as a flow diagram: each step label is a few words and each step summary is one or two short plain
 sentences; mark a step where the researcher must decide with type "human-gate". Put detail into instructions/references,
-not into the summaries. Keep tagline to one short line.
+not into the summaries. Other researchers read tagline and summary on the shared hub page: tagline is one short line
+that names what the method is applied to and what it produces, with no list of techniques; summary is 2-4 short
+sentences (each under about 70 characters), one point each: what it does, which data it fits, what it produces, what to
+re-check for a new region. Technique names, parameter values and limits go to the procedure, limitations and
+instructions, not into tagline or summary.
 
 JSON format:
 {

@@ -5,9 +5,13 @@
  */
 import {
   ArrowRightIcon,
+  DatabaseIcon,
+  DropletsIcon,
+  FlaskConicalIcon,
   FolderIcon,
   FolderPlusIcon,
   LoaderCircleIcon,
+  MapIcon,
   PlusIcon,
   StarIcon,
   WorkflowIcon,
@@ -34,32 +38,23 @@ const STAGE_TONE: Record<ProjectSummary["stage"], { stripe: string; chip: string
   },
 };
 
-/** Placeholder art for a card without a picture: a soft gradient with a contour-like pattern, varied by id. */
-function CardArt({ seed, tone }: { seed: string; tone: number }) {
-  const hues = [
-    "from-sky-400 to-indigo-500",
-    "from-emerald-400 to-teal-600",
-    "from-amber-400 to-rose-500",
-    "from-violet-400 to-fuchsia-500",
-  ];
-  const n = [...seed].reduce((sum, ch) => sum + ch.codePointAt(0)!, 0);
+/** A card without a picture: a short brand-blue band with an icon that matches the Workflow's subject. */
+function CardArt({ title }: { title: string }) {
+  const Icon = /지도|좌표|map|crs/i.test(title)
+    ? MapIcon
+    : /양수|수위|지하수|pump|well/i.test(title)
+      ? DropletsIcon
+      : /분석값|조성|화학|assay|geochem/i.test(title)
+        ? FlaskConicalIcon
+        : /자료|검색|공개|data|search/i.test(title)
+          ? DatabaseIcon
+          : WorkflowIcon;
   return (
-    <span className={cn("absolute inset-0 bg-gradient-to-br", hues[tone % hues.length])} aria-hidden>
-      <svg viewBox="0 0 300 200" className="size-full opacity-30" preserveAspectRatio="xMidYMid slice">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <ellipse
-            key={i}
-            cx={150 + (n % 40) - 20}
-            cy={110}
-            rx={40 + i * 28}
-            ry={24 + i * 18}
-            fill="none"
-            stroke="white"
-            strokeWidth={1.5}
-          />
-        ))}
-      </svg>
-      <WorkflowIcon className="absolute bottom-3 left-3 size-6 text-white/90" />
+    <span
+      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/90 to-sky-500"
+      aria-hidden
+    >
+      <Icon className="size-9 text-white/90" strokeWidth={1.5} />
     </span>
   );
 }
@@ -169,14 +164,14 @@ export function HubHome({
           {text("home.recommended")}
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {recommended.slice(0, 4).map((card, index) => (
+          {recommended.slice(0, 4).map((card) => (
             <li key={card.id}>
               <button
                 type="button"
                 onClick={() => onOpenRecommended?.(card.id)}
                 className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border bg-card text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
               >
-                <span className="relative aspect-[3/2] w-full overflow-hidden bg-muted">
+                <span className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
                   {card.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -185,12 +180,12 @@ export function HubHome({
                       className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   ) : (
-                    <CardArt seed={card.id} tone={index} />
+                    <CardArt title={card.title} />
                   )}
                 </span>
                 <span className="flex flex-1 flex-col gap-1.5 p-3">
-                  <span className="text-[15px] font-semibold leading-snug">{card.title}</span>
-                  <span className="line-clamp-2 text-sm text-muted-foreground">{card.line}</span>
+                  <span className="line-clamp-2 text-base font-semibold leading-snug">{card.title}</span>
+                  <span className="line-clamp-2 text-sm leading-6 text-muted-foreground">{card.line}</span>
                   <span className="mt-auto flex items-center gap-2 pt-1 text-xs text-muted-foreground">
                     <Badge variant="secondary">
                       {card.source === "catalogue" ? text("home.catalogue") : text("home.shared")}

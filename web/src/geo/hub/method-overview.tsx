@@ -6,7 +6,6 @@
  */
 import {
   ArrowRightIcon,
-  CheckIcon,
   FileInputIcon,
   FileOutputIcon,
   ListOrderedIcon,
@@ -134,20 +133,22 @@ function BandCell({
   );
 }
 
-/** The summary as a lead sentence and checked points (instead of one paragraph). */
+/** The summary as a lead sentence and short points (instead of one paragraph), at a readable width. */
 export function SummaryPoints({ summary }: { summary: string }) {
   const sentences = summarySentences(summary);
   if (sentences.length === 0) return null;
   const [lead, ...rest] = sentences;
   return (
-    <section className="flex flex-col gap-3" aria-label={text("overview.about")}>
-      <h3 className="text-sm font-semibold text-muted-foreground">{text("overview.about")}</h3>
-      <p className="max-w-4xl text-[15px] leading-7 text-foreground">{lead}</p>
+    <section className="flex max-w-3xl flex-col gap-3" aria-labelledby="method-about">
+      <h3 id="method-about" className="text-lg font-semibold">
+        {text("overview.about")}
+      </h3>
+      <p className="text-base leading-7 text-foreground">{lead}</p>
       {rest.length > 0 && (
-        <ul className="grid gap-2 md:grid-cols-2">
+        <ul className="flex flex-col gap-2">
           {rest.map((s, i) => (
-            <li key={i} className="flex items-start gap-2.5 rounded-xl bg-muted/50 px-3.5 py-3 text-sm leading-6">
-              <CheckIcon className="mt-1 size-4 shrink-0 text-primary" aria-hidden />
+            <li key={i} className="flex items-start gap-3 text-[15px] leading-7 text-foreground/85">
+              <span className="mt-3 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
               <span>{s}</span>
             </li>
           ))}
@@ -157,26 +158,45 @@ export function SummaryPoints({ summary }: { summary: string }) {
   );
 }
 
-/** Limits: never shortened (a limit is not cut), the first three shown, the rest behind "모두 보기". */
+/** Limits: never shortened (a limit is not cut), each marked "적용하지 않음" or "조건"; the first three shown. */
 export function LimitsCard({ profile }: { profile: DraftProfile }) {
   const [open, setOpen] = useState(false);
-  const items = profile.limitations.map((l) => localText(l.text)).filter(Boolean);
+  const items = profile.limitations
+    .map((l) => ({ kind: l.kind, text: localText(l.text), alternative: localText(l.alternative) }))
+    .filter((l) => l.text);
   if (items.length === 0) return null;
   const shown = open ? items : items.slice(0, 3);
   return (
     <section
-      className="flex flex-col gap-2.5 rounded-2xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900 dark:bg-amber-950/20"
+      id="method-limits"
+      className="flex scroll-mt-20 flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-5 dark:border-amber-900 dark:bg-amber-950/20"
       aria-label={text("draft.limits")}
     >
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300">
+      <h3 className="flex items-center gap-2 text-base font-semibold text-amber-900 dark:text-amber-300">
         <TriangleAlertIcon className="size-4" aria-hidden />
         {text("overview.limits", { count: items.length })}
       </h3>
-      <ul className="flex flex-col gap-1.5 text-sm leading-6">
+      <ul className="flex max-w-3xl flex-col gap-2.5">
         {shown.map((item, i) => (
-          <li key={i} className="flex items-start gap-2">
-            <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden />
-            <span>{item}</span>
+          <li key={i} className="flex items-start gap-3 text-[15px] leading-7">
+            <span
+              className={cn(
+                "mt-1 shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold",
+                item.kind === "not-for"
+                  ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                  : "bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200",
+              )}
+            >
+              {item.kind === "not-for" ? text("overview.notFor") : text("overview.condition")}
+            </span>
+            <span>
+              {item.text}
+              {item.alternative && (
+                <span className="block text-sm text-muted-foreground">
+                  {text("overview.instead", { alternative: item.alternative })}
+                </span>
+              )}
+            </span>
           </li>
         ))}
       </ul>
@@ -184,7 +204,7 @@ export function LimitsCard({ profile }: { profile: DraftProfile }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="self-start text-xs font-medium text-amber-800 underline-offset-4 hover:underline dark:text-amber-300"
+          className="self-start text-sm font-medium text-amber-900 underline-offset-4 hover:underline dark:text-amber-300"
         >
           {open ? text("draft.showLess") : text("draft.showAll", { count: items.length })}
         </button>

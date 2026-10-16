@@ -240,7 +240,8 @@
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
     "comment": "Add comment",
     "toComments": "{count, plural, one {Show # comment} other {Show # comments}}",
-    "registeredAt": "registered {when}"
+    "registeredAt": "registered {when}",
+    "afterRegister": "After registration, other researchers can star it and comment."
   },
   "flow": {
     "decide": "You decide: {question}",
@@ -274,7 +275,13 @@
     "gates": "{count, plural, one {# researcher decision} other {# researcher decisions}}",
     "more": "{count} more",
     "about": "About this method",
-    "limits": "Limits and cautions ({count})"
+    "limits": "Limits and cautions ({count})",
+    "notFor": "Not for",
+    "condition": "Condition",
+    "instead": "Instead: {alternative}",
+    "jumpFlow": "Method steps",
+    "jumpLimits": "Limits",
+    "jumpComments": "{count, plural, one {# comment} other {# comments}}"
   },
   "visuals": {
     "make": "Make concept pictures",

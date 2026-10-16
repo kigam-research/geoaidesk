@@ -101,9 +101,9 @@ export function SharedMethod({
         </div>
       )}
 
-      <header className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/[0.09] via-background to-sky-100/60 p-6 md:p-8 dark:to-sky-950/30">
-        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="flex min-w-0 flex-col gap-4">
+      <header className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/[0.09] via-background to-sky-100/60 p-6 md:px-8 md:py-7 dark:to-sky-950/30">
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_16rem] md:items-start">
+          <div className="flex min-w-0 flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
               <span className="rounded-full bg-primary px-2.5 py-1 text-primary-foreground">
                 {method.kind === "workflow" ? text("draft.workflow") : text("draft.skill")}
@@ -140,6 +140,21 @@ export function SharedMethod({
                 ))}
               </div>
             )}
+            <nav className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-sm font-medium" aria-label={text("draft.flow")}>
+              <a href="#method-flow" className="text-primary underline-offset-4 hover:underline">
+                {text("overview.jumpFlow")}
+              </a>
+              {profile.limitations.length > 0 && (
+                <a href="#method-limits" className="text-primary underline-offset-4 hover:underline">
+                  {text("overview.jumpLimits")}
+                </a>
+              )}
+              {!preview && (
+                <a href="#shared-comments" className="text-primary underline-offset-4 hover:underline">
+                  {text("overview.jumpComments", { count: method.comments.length })}
+                </a>
+              )}
+            </nav>
           </div>
           <div className="flex flex-col gap-3">
             {method.image && (
@@ -147,7 +162,7 @@ export function SharedMethod({
               <img
                 src={method.image}
                 alt=""
-                className="aspect-[3/2] w-full rounded-2xl border bg-background object-cover shadow-sm"
+                className="aspect-[16/10] w-full rounded-2xl border bg-background object-cover shadow-sm"
               />
             )}
             <Button size="lg" variant={preview ? "outline" : "default"} onClick={onTry} className="w-full">
@@ -158,22 +173,18 @@ export function SharedMethod({
               <button
                 type="button"
                 onClick={onStar}
+                disabled={Boolean(preview)}
                 aria-pressed={method.starred}
-                className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium hover:bg-muted"
+                className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <StarIcon className={cn("size-4", method.starred && "fill-amber-400 text-amber-500")} aria-hidden />
                 {method.starred ? text("shared.starred") : text("shared.star")}
               </button>
               <span className="flex items-center border-l px-3 text-sm font-semibold tabular-nums">{method.stars}</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{text("shared.trials", { count: method.trials })}</span>
-              {method.comments.length > 0 && (
-                <a href="#shared-comments" className="font-medium text-primary underline-offset-4 hover:underline">
-                  {text("shared.toComments", { count: method.comments.length })}
-                </a>
-              )}
-            </div>
+            <p className="text-[13px] text-muted-foreground">
+              {preview ? text("shared.afterRegister") : text("shared.trials", { count: method.trials })}
+            </p>
           </div>
         </div>
       </header>
@@ -181,19 +192,23 @@ export function SharedMethod({
       <OverviewBand profile={profile} />
       <SummaryPoints summary={method.summary} />
 
-      <section className="flex flex-col gap-3" aria-label={text("draft.flow")}>
+      <section id="method-flow" className="flex scroll-mt-20 flex-col gap-3" aria-label={text("draft.flow")}>
         <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
         {flow}
       </section>
 
       <LimitsCard profile={profile} />
 
-      <section className="flex flex-col gap-4" aria-labelledby="shared-comments">
-        <h3 id="shared-comments" className="flex items-center gap-2 text-lg font-semibold">
+      <section
+        className="flex scroll-mt-20 flex-col gap-4"
+        id="shared-comments-section"
+        aria-labelledby="shared-comments"
+      >
+        <h3 id="shared-comments" className="flex scroll-mt-20 items-center gap-2 text-lg font-semibold">
           <MessageSquareIcon className="size-5" aria-hidden />
           {text("shared.comments", { count: method.comments.length })}
         </h3>
-        <ul className="flex flex-col gap-3">
+        <ul className="flex max-w-4xl flex-col gap-3">
           {method.comments.map((c) => (
             <li key={c.id} className="flex gap-3">
               <Avatar name={c.author} className="mt-1 size-8" />
@@ -210,24 +225,30 @@ export function SharedMethod({
             </li>
           ))}
         </ul>
-        <div className="flex flex-col gap-2 rounded-xl border p-3">
-          <Textarea
-            rows={3}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={text("shared.commentPlaceholder")}
-          />
-          <Button
-            className="self-end"
-            disabled={!draft.trim()}
-            onClick={() => {
-              onComment(draft.trim());
-              setDraft("");
-            }}
-          >
-            {text("shared.comment")}
-          </Button>
-        </div>
+        {preview ? (
+          <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+            {text("shared.afterRegister")}
+          </p>
+        ) : (
+          <div className="flex max-w-4xl flex-col gap-2 rounded-xl border p-3">
+            <Textarea
+              rows={3}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder={text("shared.commentPlaceholder")}
+            />
+            <Button
+              className="self-end"
+              disabled={!draft.trim()}
+              onClick={() => {
+                onComment(draft.trim());
+                setDraft("");
+              }}
+            >
+              {text("shared.comment")}
+            </Button>
+          </div>
+        )}
       </section>
     </div>
   );
