@@ -93,7 +93,7 @@ export function safeRelative(path: string): boolean {
 
 const isText = (b: Uint8Array) => b.length <= TEXT_LIMIT && !b.subarray(0, 8192).includes(0);
 
-async function extractPdf(store: AuthoringStore, projectId: string, source: SourceDocument, file: string) {
+export async function extractPdf(store: AuthoringStore, projectId: string, source: SourceDocument, file: string) {
   const record: ExtractionRecord = {
     sourceId: source.id,
     sourceSha256: source.sha256,

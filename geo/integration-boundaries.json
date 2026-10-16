@@ -493,6 +493,24 @@
       "owner": "gaid-brand-copy",
       "status": "edited",
       "responsibility": "Visible names: Kady becomes \"AI agent\" where it names the assistant and GAID where it names the app, K-Dense as the app becomes GAID (locale strings; backend provider notes are matched with Kady read as GAID). Skills, built-in Workflows and seeded templates taken from K-Dense show a linked \"출처: K-Dense\" badge (SkillInfo.upstream from server/src/geo/skill-origin.ts). Code identifiers, env vars, routes and the upstream attribution line are unchanged."
+    },
+    {
+      "path": "server/test/geo-authoring-extra.test.ts",
+      "owner": "gaid-hub",
+      "status": "added",
+      "responsibility": "URL ingestion and concept illustration regression tests (gaid-hub--visuals)."
+    },
+    {
+      "path": "server/package.json, server/package-lock.json",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Direct pinned htmlparser2 dependency for URL source text extraction (gaid-hub--visuals)."
+    },
+    {
+      "path": "web/src/components/project-view.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Parent-approved stale heading expectation Choose a project → My research; no UI changes (gaid-hub--visuals)."
     }
   ],
   "notTouched": [
