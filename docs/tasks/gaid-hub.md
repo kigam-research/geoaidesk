@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T18:44:17Z
+updated: 2026-10-16T18:45:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -243,7 +243,10 @@ Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No f
     output pictures on the shared page). Not done (optional): N2 1280 layout of the new-method source step, N3 locked
     questions as text, N4 "격자 격자" in the smoke summary (model text), N5 limit chip in the draft header.
     Server-side fixes go live at the next dev restart, after the persona run.
-Blocked: waiting for the researcher persona run (native Sonnet).
+13. Persona final (researcher2/summary.md): whole flow done without blocks; fixes dafe7e5 (revise wording, failure detail
+    behind 기술 정보, back to hub list, author's note, folder creation in register dialog, sharing wording, result example
+    tables by output) and 8a47303 (type sizes; report screens 1440/1280). Report §0/§2/§3/§4/§5 updated. Next: humanizer
+    pass, review-copy, stop dev unit, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
 
 ## Failed approaches
 ## Notes and decisions
@@ -284,6 +287,8 @@ Integration order: P1 → wire P2 to real endpoints → P3.
 ## Open items
 - [확인] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
 - [부채] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [선택] 허브 첫 화면에 다른 연구자가 등록한 방법 목록(폴더·검색) 추가 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [선택] 저작 질문에 "원본 코드 포함"과 "빠른 시험용 줄인 설정" 항목 추가, 시작 설정 기본값을 연구자 취지에 맞추기 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 - [부채] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
