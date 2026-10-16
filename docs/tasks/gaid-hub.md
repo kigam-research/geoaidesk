@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:33:15Z
+updated: 2026-10-16T05:39:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -173,12 +173,19 @@ the sharing/discussion space, GAID projects are the personal research space.
    Child shared note (2026-10-16): exports getAuthoringStore(app) from authoring/routes.ts, mounts hub-shared after
    authoring, adds GET /geo/hub/entries/:id/visuals/:key (?revision) beside /cover; parent avoids install.ts and route
    mounting edits until it is integrated.
-2. Parent meanwhile: wire the approved screens to the contracts (hub home folders/recommended, shared entry page with
+2. Done by parent (57dd339): shared hub wiring (entry page, stars/comments, use-in-my-research dialog with install +
+   InputPrep incl. environment prep, register from preview, folders + recommended on home, display-name prompt, #hub/e/<id>).
+   Remaining after children integrate: URL form → POST sources/url, visuals in MethodFlow + "개념 그림 만들기" action,
+   authoring folderId PATCH (my routes.ts; after child merge), live end-to-end check.
+   (old) Parent meanwhile: wire the approved screens to the contracts (hub home folders/recommended, shared entry page with
    stars/comments, register dialog → POST /geo/hub/entries, preview from real data, user name prompt, authoring
    folderId PATCH route, URL form → sources/url, visuals in MethodFlow); remove hub-design page and mock assets at the end.
-3. Re-test: draft v5 (passes checks) → install into GAID project "Yilgarn 40km 빠른 시험" via input-prep with the 40 km
+3. v5 trial running since 14:27:58 KST in "Yilgarn 40km 빠른 시험" (yilgarn-40km-2a436b), watcher b3s81slkx →
+   playwright/v5/run-*.png; variogram figure produced 14:30.
+   (old) Re-test: draft v5 (passes checks) → install into GAID project "Yilgarn 40km 빠른 시험" via input-prep with the 40 km
    CSV, quick mode, bounded run; record reductions/outputs/time.
 4. Report, scripts/check, cleanup, finish.
+Blocked: waiting for child finishes (gaid-hub--visuals: task finish running scripts/check; gaid-hub--shared: implementing) and the v5 40 km trial (watcher b3s81slkx).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
