@@ -204,3 +204,45 @@ export function assessMethodTrial(paths: ProjectPaths, sessionId: string, body: 
   writeAtomic(file, record);
   return view(paths, record);
 }
+
+/**
+ * What a hub handoff of this chat carries about its method trial: identity, revision and the researcher's
+ * assessment (verbatim), plus the hub the method came from. null when the chat is not a method trial.
+ */
+export function trialHandoffRef(paths: ProjectPaths, sessionId: string, store = packageStore()) {
+  let record: StoredTrial;
+  try {
+    record = JSON.parse(fs.readFileSync(trialFile(paths, sessionId), "utf-8")) as StoredTrial;
+  } catch {
+    return null;
+  }
+  if (record?.schemaVersion !== "gaid-method-trial/v1") return null;
+  const method = findInstalledMethod(paths, record.runtimeName);
+  const root = method?.scope === "global" ? globalSkillRoot() : projectSkillRoot(paths);
+  const siteId = method ? originOfSource(getSkillProvenance(root, method.runtimeName)?.source, store).origin.siteId : undefined;
+  return {
+    methodId: record.methodId, revision: record.revision, workflowId: record.workflowId, packageSha256: record.packageSha256,
+    startedAt: record.startedAt, ...(record.assessment ? { assessment: record.assessment } : {}), ...(siteId ? { siteId } : {}),
+  };
+}
+
+/** Trial counts per `<runtimeName>:<workflowId>` with the latest assessment outcome, read from records only. */
+export function trialCounts(paths: ProjectPaths): Map<string, { count: number; lastOutcome: "useful" | "needs-revision" | "failed" | null }> {
+  const out = new Map<string, { count: number; lastOutcome: "useful" | "needs-revision" | "failed" | null; at: string }>();
+  let names: string[] = [];
+  try { names = fs.readdirSync(trialsDir(paths)).filter((name) => name.endsWith(".json")); } catch { return new Map(); }
+  for (const name of names) {
+    try {
+      const record = JSON.parse(fs.readFileSync(path.join(trialsDir(paths), name), "utf-8")) as StoredTrial;
+      if (record?.schemaVersion !== "gaid-method-trial/v1") continue;
+      const key = `${record.runtimeName}:${record.workflowId}`;
+      const row = out.get(key) ?? { count: 0, lastOutcome: null, at: "" };
+      row.count += 1;
+      if (record.assessment && record.assessment.recordedAt > row.at) { row.lastOutcome = record.assessment.outcome; row.at = record.assessment.recordedAt; }
+      out.set(key, row);
+    } catch {
+      // Unreadable records are skipped.
+    }
+  }
+  return new Map([...out].map(([key, { count, lastOutcome }]) => [key, { count, lastOutcome }]));
+}

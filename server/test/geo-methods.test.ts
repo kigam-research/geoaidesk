@@ -173,6 +173,8 @@ describe("trials", () => {
     expect(assessMethodTrial(paths, "s1", { outcome: "needs-revision", note: " 블록 크기 질문 누락 " }).assessment).toMatchObject({ outcome: "needs-revision", note: "블록 크기 질문 누락" });
     fs.appendFileSync(path.join(paths.skillsDir, "pu-nested-cv/SKILL.md"), "edit\n");
     expect(listMethodTrials(paths, { runtimeName: "pu-nested-cv" })).toMatchObject([{ sessionId: "s1", methodChanged: true }]);
+    // The Workflow row now reports GAID's own run record instead of "untested".
+    expect((await list())[0].workflows[0]).toMatchObject({ trials: { count: 1, lastOutcome: "needs-revision" }, readiness: { runRecord: "recorded" } });
     expect(recordMethodTrial(paths, "s1", "method:pu-nested-cv:paper-reproduction")?.startedAt).toBe("2026-10-15T00:00:00.000Z");
   }, 30_000);
 });

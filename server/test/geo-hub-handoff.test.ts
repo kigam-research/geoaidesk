@@ -61,6 +61,8 @@ describe("analysis handoff", () => {
       expect.objectContaining({ path: "results/plot.png", role: "result" }), expect.objectContaining({ path: "user_data/raw.csv", role: "user-data" }),
     ]));
     expect(preview.files).toHaveLength(3);
+    // Later user messages carry scope limits and corrections; a plain chat is no method trial.
+    expect(preview).toMatchObject({ followUps: ["Now summarize"], methodTrial: null, excludedFiles: [] });
     expect(JSON.stringify(preview)).not.toMatch(/private tool output|private reasoning|I will inspect/);
   });
   it("downloads only explicitly selected files, rehashes changed bytes and records tar contents", async () => {
@@ -96,6 +98,7 @@ describe("analysis handoff", () => {
     const preview = previewHandoff(paths, sessionId);
     expect(preview.files.map(f => f.path)).toEqual(["good.txt"]);
     expect(preview.excluded).toMatchObject({ policy: unsafe.length + 2, unavailable: 1, tooLarge: 1 });
+    expect(preview.excludedFiles.map(f => f.reason).sort()).toEqual([...Array(unsafe.length + 2).fill("policy"), "too-large", "unavailable"].sort());
     for (const name of [...unsafe, "link.txt", "linked/good.txt", "missing.txt", "huge.bin"]) await expect(buildHandoff(paths, { sessionId, files: [name] })).rejects.toMatchObject({ code: "file" });
   });
   it("does not allow an arbitrary sandbox file or another session's artifacts", async () => {

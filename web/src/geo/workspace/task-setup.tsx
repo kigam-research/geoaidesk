@@ -36,6 +36,13 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const missingInput = workflow.inputRoles.some((role) => role.required && !bindings[role.id]);
+  // Say why "Create task draft" is disabled instead of leaving a silent grey button (gaid-hub-integration trial).
+  const state = workflow.readiness.state;
+  const blocked = state === "needs-environment" ? t("workspace.setup.blockedEnvironment")
+    : state === "missing-skills" ? t("workspace.setup.blockedSkills")
+    : state === "unavailable" ? t("workspace.setup.blockedUnavailable")
+    : missingInput ? t("workspace.setup.blockedInput", { roles: workflow.inputRoles.filter((role) => role.required && !bindings[role.id]).map((role) => text(role.label)).join(", ") })
+    : null;
   const start = async () => {
     setBusy(true); setError(null);
     try {
@@ -77,6 +84,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       </label>)}
       <WorkflowOutputs workflow={workflow} />
       <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />
+      {blocked && <p className="text-xs text-muted-foreground">{blocked}</p>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
         {recipe && <DeleteRecipe onDelete={recipe.onDelete} />}

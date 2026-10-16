@@ -59,7 +59,11 @@
     "noBoundary": "The catalogue does not record interpretation limits.",
     "inputLine": "{role}: {path}",
     "choiceLine": "{choice}: {answer}",
-    "draft": "{prompt}\n\nInput files:\n{inputs}\n\nSelected analysis settings:\n{choices}\n\nSettings to decide during the task: {unresolved}\nAsk about unresolved settings before analysis.\n\nInterpretation limits: {boundary}\nThe results have not been reviewed. Do not label run completion as review completion."
+    "draft": "{prompt}\n\nInput files:\n{inputs}\n\nSelected analysis settings:\n{choices}\n\nSettings to decide during the task: {unresolved}\nAsk about unresolved settings before analysis.\n\nInterpretation limits: {boundary}\nThe results have not been reviewed. Do not label run completion as review completion.",
+    "blockedEnvironment": "Run 'Prepare environment' below before you create the task draft.",
+    "blockedSkills": "Turn on the required skills before you create the task draft.",
+    "blockedUnavailable": "This task is unavailable now, so no task draft can be created.",
+    "blockedInput": "Choose the required input files to create the task draft: {roles}"
   },
   "recipe": {
     "import": "Import recipe",

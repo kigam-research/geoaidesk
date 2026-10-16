@@ -9,6 +9,7 @@ import { REPO_ROOT } from "../../config.ts";
 import { findSessionFile, readEntries, textOf } from "../../agent/session-export.ts";
 import { readSteps, stepsPath } from "../../provenance/store.ts";
 import { readDistributionRelease } from "../distribution.ts";
+import { trialHandoffRef } from "../methods/trials.ts";
 
 export const HANDOFF_SCHEMA = "gaid-analysis-handoff/v1" as const;
 export const HANDOFF_LIMITS = { files: 200, fileBytes: 5 * 1024 * 1024, totalBytes: 20 * 1024 * 1024, textChars: 16_000, noteChars: 4_000, logBytes: 32 * 1024 * 1024 } as const;
@@ -23,8 +24,14 @@ export interface HandoffFile {
 }
 export interface HandoffPreview {
   request: string; finalAnswer: string; modelRef: string | null; projectId: string; sessionId: string;
+  /** Later user messages of the chat, in order (gaid-hub-integration): scope limits and corrections live there. */
+  followUps: string[];
+  /** Set when the chat was started from a hub method Workflow: its trial identity and the researcher's assessment. */
+  methodTrial: ReturnType<typeof trialHandoffRef>;
   files: HandoffFile[];
   excluded: { policy: number; unavailable: number; tooLarge: number; fileLimit: number; unselected: number };
+  /** The paths behind `excluded` (except unselected), so the user can see what was left out and why. */
+  excludedFiles: { path: string; reason: "policy" | "unavailable" | "too-large" | "file-limit" }[];
   truncated: { request: boolean; finalAnswer: boolean; provenanceStepIds: boolean };
   limits: typeof HANDOFF_LIMITS;
 }
@@ -77,9 +84,11 @@ export function previewHandoff(paths: ProjectPaths, sessionId: unknown): Handoff
   // Pick the last assistant text message, excluding reasoning and tool output.
   const entries = readEntries(file);
   let request = "", finalAnswer = "", modelRef: string | null = null, sawRequest = false;
+  const followUps: string[] = [];
   for (const row of entries) {
     if (row.type !== "message") continue;
     const m = row.message;
+    if (m.role === "user" && sawRequest) { const text = textOf(m.content); if (text && followUps.length < 20) followUps.push(clip(text, HANDOFF_LIMITS.noteChars)); }
     if (m.role === "user" && !sawRequest) { request = textOf(m.content); sawRequest = true; }
     if (m.role === "assistant") {
       const text = textOf(m.content);
@@ -101,24 +110,26 @@ export function previewHandoff(paths: ProjectPaths, sessionId: unknown): Handoff
     }
   }
   const files: HandoffFile[] = [];
+  const excludedFiles: HandoffPreview["excludedFiles"] = [];
+  const leftOut = (name: string, reason: HandoffPreview["excludedFiles"][number]["reason"]) => { if (excludedFiles.length < 50) excludedFiles.push({ path: clip(name, 300), reason }); };
   let idsTruncated = false;
   // Produced code/results first; read-only user data remains opt-in.
   const names = [...candidates.keys()].sort((a, b) => Number(a.startsWith("user_data/")) - Number(b.startsWith("user_data/")) || a.localeCompare(b));
   for (const name of names) {
-    if (!safeName(name)) { excluded.policy++; continue; }
-    if (files.length >= HANDOFF_LIMITS.files) { excluded.fileLimit++; continue; }
+    if (!safeName(name)) { excluded.policy++; leftOut(name, "policy"); continue; }
+    if (files.length >= HANDOFF_LIMITS.files) { excluded.fileLimit++; leftOut(name, "file-limit"); continue; }
     try {
       const data = fileBytes(paths.sandbox, name);
       const ids = [...candidates.get(name)!];
       idsTruncated ||= ids.length > 200 || ids.some(id => id.length > 200);
       files.push({ path: name, sha256: hash(data), size: data.length, role: name.startsWith("user_data/") ? "user-data" : CODE.has(path.extname(name).toLowerCase()) ? "code" : "result", provenanceStepIds: ids.slice(0, 200).map(id => clip(id, 200)) });
     } catch (error) {
-      if (error instanceof HandoffError && error.code === "size") excluded.tooLarge++;
-      else if (error instanceof HandoffError) excluded.policy++;
-      else excluded.unavailable++;
+      if (error instanceof HandoffError && error.code === "size") { excluded.tooLarge++; leftOut(name, "too-large"); }
+      else if (error instanceof HandoffError) { excluded.policy++; leftOut(name, "policy"); }
+      else { excluded.unavailable++; leftOut(name, "unavailable"); }
     }
   }
-  return { request: clip(request), finalAnswer: clip(finalAnswer), modelRef: modelRef ? clip(modelRef, 500) : null, projectId: paths.id, sessionId, files, excluded,
+  return { request: clip(request), followUps, methodTrial: trialHandoffRef(paths, sessionId), finalAnswer: clip(finalAnswer), modelRef: modelRef ? clip(modelRef, 500) : null, projectId: paths.id, sessionId, files, excluded, excludedFiles,
     truncated: { request: request.length > HANDOFF_LIMITS.textChars, finalAnswer: finalAnswer.length > HANDOFF_LIMITS.textChars, provenanceStepIds: idsTruncated }, limits: HANDOFF_LIMITS };
 }
 

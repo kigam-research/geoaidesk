@@ -33,7 +33,8 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
     ]).then(([data, hub]) => {
       if (!active) return;
       setPreview(data); setSelected(data.files.filter(f => f.role !== "user-data").map(f => f.path));
-      setSites(hub.sites); setSiteId(hub.sites[0]?.id ?? ""); setDownloaded(false);
+      const preferred = hub.sites.find(s => s.id === data.methodTrial?.siteId) ?? hub.sites.find(s => s.authoring) ?? hub.sites[0];
+      setSites(hub.sites); setSiteId(preferred?.id ?? ""); setDownloaded(false);
     }).catch(err => { if (active) setError(err instanceof Error ? err.message : t("hubHandoff.errors.request")); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
@@ -72,8 +73,13 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
       <DialogDescription>{t("hubHandoff.description")}</DialogDescription>
       <p className="text-sm">{t("hubHandoff.rawData")}</p>
       {loading && <p role="status">{t("hubHandoff.loading")}</p>}
-      {preview && !loading && <div className="min-w-0 space-y-3 text-sm">
+      {preview && !loading && <div className="min-w-0 space-y-3 pb-2 text-sm">
         <section><h3 className="font-medium">{t("hubHandoff.request")}</h3><p className="max-h-32 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.request || t("hubHandoff.emptyText")}</p></section>
+        {!!preview.followUps?.length && <section><h3 className="font-medium">{t("hubHandoff.followUps", { count: preview.followUps.length })}</h3><ol className="max-h-32 list-decimal space-y-1 overflow-y-auto pl-5 whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.followUps.map((text, i) => <li key={i}>{text}</li>)}</ol></section>}
+        {preview.methodTrial && <section><h3 className="font-medium">{t("hubHandoff.methodTrial")}</h3>
+          <p>{t("hubHandoff.methodTrialLine", { method: preview.methodTrial.methodId ?? "-", revision: preview.methodTrial.revision ?? "-", workflow: preview.methodTrial.workflowId })}</p>
+          <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.methodTrial.assessment ? t("hubHandoff.assessment", { outcome: preview.methodTrial.assessment.outcome, note: preview.methodTrial.assessment.note || "-" }) : t("hubHandoff.noAssessment")}</p>
+        </section>}
         <section><h3 className="font-medium">{t("hubHandoff.finalAnswer")}</h3><p className="max-h-40 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.finalAnswer || t("hubHandoff.emptyText")}</p></section>
         <p>{t("hubHandoff.model", { model: preview.modelRef ?? t("hubHandoff.unknownModel") })}</p>
         {Object.values(preview.truncated).some(Boolean) && <p>{t("hubHandoff.truncated")}</p>}
@@ -88,6 +94,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
           </div>
         </fieldset>
         {!!excluded && <p>{t("hubHandoff.excluded", { count: excluded })}</p>}
+        {!!preview.excludedFiles?.length && <ul className="list-disc pl-5 text-xs [overflow-wrap:anywhere]">{preview.excludedFiles.map(file => <li key={file.path}>{t("hubHandoff.excludedFile", { path: file.path, reason: file.reason })}</li>)}</ul>}
         <p>{t("hubHandoff.selection", { count: selected.length, size: (size / 1024 / 1024).toFixed(2) })}</p>
         <p className="text-xs text-muted-foreground">{t("hubHandoff.sizeHelp")}</p>
         <label className="block space-y-1"><span>{t("hubHandoff.note")}</span><textarea className="w-full rounded-md border bg-background p-2" rows={3} maxLength={4000} disabled={busy || isStreaming} value={note} onChange={e => { setNote(e.target.value); clearTransfer(); }} /></label>
@@ -103,7 +110,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
         <p>{t("hubHandoff.attach")}</p>
         <a href={authoringUrl(site)} target="_blank" rel="noopener noreferrer" className="text-primary underline">{t("hubHandoff.startDraft")}</a>
       </div>}
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="sticky bottom-0 -mx-6 -mb-6 flex flex-wrap justify-end gap-2 border-t bg-background px-6 py-3">
         <Button variant="outline" disabled={busy} onClick={onClose}>{t("hubHandoff.close")}</Button>
         {site && canSendDirect(site) && <Button variant="outline" disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download(true)}>{t("hubHandoff.sendDirect")}</Button>}
         <Button disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download()}>{t(busy ? "hubHandoff.downloading" : "hubHandoff.download")}</Button>

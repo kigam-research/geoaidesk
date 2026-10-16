@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-15T22:58:33Z
+status: done
+updated: 2026-10-16T00:23:05Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -54,6 +54,17 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   reports/<date>-<topic>/. After the last check remove build caches and app-written files/links from the worktree.
 
 ## Current state
+Result for the forwarded goal (bd45c51400e1, 2026-10-16): GAID side of the GAID-hub ecosystem is implemented on branch
+task/gaid-hub-integration and verified in a real app with the user's paper scenario. GAID fetches a skill_hub method package
+(contract v1, agreed with skill_hub gaid-hub-authoring) through the existing preview → acknowledgement → install gate, registers it
+as a LocalMethod ("허브에서 설치한 Workflow": Workflows + 레시피, hub lifecycle, check receipt, open questions), starts a trial chat
+that exposes only the method's skills (the withheld spatial-pu-workflow stays hidden), pins a trial record and stores the researcher's
+assessment. The chat's only authoring entry is "방금 한 분석을 skill_hub 초안으로 보내기" (bundle download + hub link; direct send to a
+loopback hub). Trial of local/pu-nested-cv-prospectivity rev 1 (from the test paper + original code) on the Yilgarn grid with Qwen:
+install and launch worked without help; the bounded run did not reach the method's first gate (45+ min variogram loop on 70k
+cells, wrong library name), assessed "needs revision"; package fixes went to skill_hub (351e0b68701b). Open: re-run on a hub
+revision 2 not done (user wrap-up 2026-10-16; open item). Migration inventory: report appendix B. Report: reports/2026-10-16-gaid-hub-integration/index.md.
+
 - 2026-10-15: contract draft v0 (GAID consumer requirements) sent to the skill_hub hub, request da92dc0fec04; text in
   ~/data/geoaidesk/work/gaid-hub-integration/to-skill_hub-contract-v0.md. skill_hub unit: gaid-hub-authoring (just started).
 - P1 server implemented (not yet wired to session creation): web/src/geo/contracts/methods.ts,
@@ -88,41 +99,31 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   미리보고" → "설정 → 스킬에서 패키지를 미리 보고" (en unchanged).
   Settings → 스킬 → 스킬 추가 shows "허브 패키지 목록" with gaid-hub "허브 패키지 목록을 읽지 못했습니다: fetch failed" while
   the hub is down (raw transport detail; recheck wording once the hub runs).
+- P4 orchestrator gates (2026-10-16 ~08:15 KST, project proj-90b0c8 "허브 방법 시험", session
+  01a141d0-14c0-7525-a9e9-1b7de9a20d63): exposure record mode method:pu-nested-cv-prospectivity:pu-nested-cv-prospectivity,
+  skills [council-mode, pi-subagents, pu-nested-cv-prospectivity] while spatial-pu-workflow is installed in the project
+  (hidden from the model); trial record pinned revision 1, packageSha256 84daff9e…; observed at 08:15: 19 tool calls,
+  5 failed, model kigam-qwen/qwen3.8-flash-next; expected artifacts unmatched (package declares no files[]).
+- Fixes from the researcher's first findings (17aa1a3): TaskSetup says why "작업 초안 만들기" is disabled
+  (workspace.setup.blocked{Environment,Skills,Unavailable,Input}); method detail shows description, readiness, inputs,
+  scientific choices, outputs and limits. Web geo tests 146 pass, tsc clean, copy 0 errors.
+- Merged main c4ce9bf (gaid-qwen-authoring-trial) at 75a4721: conflict only in geo/tests/distribution.test.mjs owners
+  (kept both); server 53 + web 145 targeted tests pass.
+- P4 trial result (researcher 7e41440e, 07:58–09:02 KST; <work>/researcher/{summary,log}.md): install + launch without help;
+  bounded run did not reach the first human gate (Qwen rewrote/re-ran a 70,200-cell variogram for 45+ min; stopped). Trial record:
+  42 tool calls / 10 failed, outputs pyproject.toml + scripts/01_variogram.py; assessment needs-revision (verbatim). Handoff bundle
+  downloaded as gaid-analysis-01a141d0-20261016.tar.gz (server filename, CORS fix confirmed). `uv run --with scikit-gstat` works on
+  PC74 (model used the wrong distribution name `skgstat`). Reported to skill_hub (351e0b68701b completed) with 7 package items.
+- GAID fixes from the trial (921ef1b): trial counts/assessment on method Workflow rows, "no result files declared" text, handoff
+  carries followUps + methodTrial + excludedFiles, prefers the method's hub, sticky action bar. Tests: server handoff 13, web
+  methods/hub-handoff 21, geo web 147; typechecks clean; copy 0 errors. Instance rebuilt on 921ef1b.
+- Optional (not done): file suggestions ignore installed hub methods; upstream file tabs re-poll a >8 MB CSV every ~1.5 s (2,138
+  console 413s in one session); method/model run progress for long silent runs.
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
-1. P4 running (2026-10-16 08:05 KST): package local/pu-nested-cv-prospectivity rev 1 (request 351e0b68701b, sha256
-   84daff9e…, hub :4317 kept up until we report). Instance rebuilt on 1905f3f. Researcher agent 7e41440e-9412-45d8-944e-444049c24585
-   (Claude Sonnet 5.5 high, notifyOnFinish false), brief <work>/researcher/BRIEF.md, deliverables <work>/researcher/
-   {log.md,summary.md,playwright/}; bounded to the method's first human gate (no model training); data
-   <work>/samples/yilgarn (asset yilgarn-gis-db/20260911). Check: get_agent_status 7e41440e; ls <work>/researcher.
-   351e0b68701b reported --blocked (in progress); report the result with route-report when the trial is assessed.
-   Then: orchestrator gates (GET /geo/methods, trial record vs provenance, exposure record hides spatial-pu-workflow,
-   handoff download filename), visual reviews, fixes, report.
-2. `task complete` each child on its finish notice; then integrate. (P2 applied the hubHandoff.attach qualification and
-   the distribution.test.mjs owner whitelist entry for gaid-hub-integration itself; take both from its merge.)
-   After P2 integrates: expose `Content-Disposition` on the handoff gzip responses (route-local merge into
-   Access-Control-Expose-Headers, keeping the existing names; API is cross-origin 18xxx vs 3xxx), then check in the real
-   browser that the download keeps the server filename `gaid-analysis-<id>-<date>.tar.gz`. Do not push to the parent
-   branch while children run their finish checks.
-3. After gaid-qwen-authoring-trial merges: `task sync`, then P3 (UI) and the `method:` exposure in context.ts.
-4. When the hub delivers authoring + package URLs: P4 end-to-end acceptance with the paper (Qwen route, no paid runs).
-### P4 acceptance plan (2026-10-15)
-- Instance: snapshot of this branch (after children integrate) in ~/data/geoaidesk/work/gaid-hub-integration/app,
-  GAID_HOME=<work>/home, ports 3320/18320, systemd-run --user unit `gaid-hub-app`, log <work>/logs/app.log;
-  GAID_SKILL_HUB_SITES points at the trial hub http://127.0.0.1:4317/ (authoring "api/gaid/"). kigam-qwen provider,
-  defaults and reasoning levels copied from the trial unit's home2/pi-agent (models.json, kady-custom-models.json,
-  kady-settings.json; keyless). No paid route configured.
-- Input data for the bounded trial depends on the hub package's declared inputs: candidates are the paper's original
-  data (~/pc71-projects/narr/mpm_nested_cv/data, 130 MB, reproduction) and Kambalda grids/ozmin
-  (<trial work>/samples/kambalda, new-data). The catalogue spatial-pu-workflow skill stays installed in the project but is
-  hidden from the method chat by the `method:` exposure; verify that in the exposure record.
-- Steps: researcher agent (Claude Sonnet 5.5 high, playwright-cli) as in the trial unit: Settings → Skills hub list →
-  preview → acknowledge → install; Workflow panel method row → setup → chat on Qwen; record outcome; assessment.
-  Orchestrator gates: GET /geo/methods, trial record vs provenance, exposure record, expected artifacts. Visual reviews
-  "Claude 고급검토" and "Codex 고급검토" before/after fixes.
-- Qwen server took one session at a time (trial unit note): schedule GAID trial chats when the hub's authoring and the
-  trial unit's R1 are not using it.
+<!-- task:closed -->
+Closed 2026-10-16T00:23:05Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-integration.md.
 
 ## Failed approaches
 ## Notes and decisions
@@ -148,11 +149,14 @@ Avoid until the trial merges: task-catalogue.tsx, workflows-panel.tsx, context.t
 locales app/workspace/workflows/settings/work.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [부채 gaid-hub-integration#1] hub 수정판 패키지로 같은 제한 시험 다시 하기(사용자 지시로 이번 단위에서는 하지 않음) — 가) 한 프로젝트로 옮긴 뒤 수정판 패키지로 같은 지시서로 다시 시험 — 나) 이번 결과로 끝냄 — 권장: 가) 방법의 첫 확인 지점까지 가는지 아직 확인하지 못함 — 막힌 일: PU 시나리오 종단 확인 완료 — 조건: GAID_HUB가 바리오그램 규모·라이브러리 이름·결과 파일 이름을 고친 패키지를 만듦 — 근거: reports/2026-10-16-gaid-hub-integration#6-결정할-일
+- [부채 gaid-hub-integration#2] GAID 쪽 남은 결함: 긴 실행의 진행 표시 없음, 작업 제안에 hub 방법 없음, 8 MB 넘는 CSV 미리보기 반복 요청, 보내기 기능 아이콘에 글자 없음, hub 쪽 받기 미확인 — 가) 한 프로젝트로 옮기는 작업에서 함께 고침 — 나) 별도 단위 — 권장: 가) 같은 화면 규칙으로 한 번에 다룸 — 막힌 일: 없음 — 근거: reports/2026-10-16-gaid-hub-integration#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-16-gaid-hub-integration/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

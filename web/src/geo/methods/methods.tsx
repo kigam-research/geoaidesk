@@ -9,7 +9,8 @@ import { apiFetch } from "@/lib/projects";
 import { t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
-import { TaskSetup, fieldClass } from "@/geo/workspace/task-setup";
+import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
+import { Readiness } from "@/geo/workspace/readiness";
 
 export const METHOD_CATEGORY = "hub-methods";
 const pill = "inline-flex rounded-full border px-1.5 py-px text-[10px] font-medium";
@@ -19,7 +20,10 @@ export function MethodBadges({ method, workflow }: { method: LocalMethodSummary;
   return <>
     {workflow && <>
       <span className={pill}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>
-      {workflow.readiness.runRecord === "none" && <span className={pill} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+      {/* A local method's evidence is GAID's own trial records, not a catalogue install record. */}
+      {workflow.trials.count === 0
+        ? <span className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
+        : <span className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>}
       {workflow.inputRoles.some((role) => role.required) && <span className={pill}>{t("workspace.badge.userData")}</span>}
     </>}
     <span className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}</span>
@@ -107,7 +111,7 @@ const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Da
 export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);
   return <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto break-words sm:max-w-2xl">
+    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-2xl">
       <DialogTitle>{text(method.title)}</DialogTitle>
       <DialogDescription>{text(method.summary) || method.runtimeName}</DialogDescription>
       <div className="flex flex-wrap gap-1"><MethodBadges method={method} /></div>
@@ -126,7 +130,16 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
         const href = webLink(source.kind === "doi" ? `https://doi.org/${source.ref.replace(/^https?:\/\/doi.org\//, "")}` : source.kind === "url" ? source.ref : undefined);
         return <li key={i}>{href ? <a className="text-primary underline" href={href} target="_blank" rel="noopener noreferrer">{source.title ?? source.ref}</a> : source.title ? `${source.title} · ${source.ref}` : source.ref}</li>;
       })}</ul></section>}
-      {method.workflows.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.workflows")}</h3>{method.workflows.map((workflow) => <div key={workflow.id} className="space-y-1 rounded-md border p-2 text-xs"><p>{text(workflow.title)}</p><div className="flex flex-wrap gap-1"><MethodBadges method={method} workflow={workflow} /></div><Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button></div>)}</section>}
+      {method.workflows.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.workflows")}</h3>{method.workflows.map((workflow) => <div key={workflow.id} className="space-y-1 rounded-md border p-2 text-xs">
+        <p>{text(workflow.title)}</p>
+        <div className="flex flex-wrap gap-1"><MethodBadges method={method} workflow={workflow} /></div>
+        {workflow.description && <p className="text-muted-foreground">{text(workflow.description)}</p>}
+        <Readiness value={workflow.readiness} />
+        {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
+        {workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
+        <WorkflowOutputs workflow={workflow} />
+        <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
+      </div>)}</section>}
       {method.recipes.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.recipes")}</h3>{method.recipes.map((recipe) => {
         const workflow = method.workflows.find((row) => row.id === recipe.workflowId);
         return <div className="rounded-md border p-2 text-xs" key={recipe.id}><p>{text(recipe.title)}</p><Button size="sm" variant="outline" disabled={!workflow} onClick={() => { if (workflow) onSetup(workflow, recipe); }}>{t("methods.setup")}</Button></div>;
@@ -173,7 +186,8 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     <h4 className="font-medium">{t("methods.trials.expected")}</h4>
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>
-      <p>{t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") || t("methods.trials.none") })}</p>
+      <p>{expected.files.length === 0 ? t("methods.trials.notDeclared")
+        : t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") })}</p>
     </div>)}
     <TrialAssessment trial={trial} projectId={projectId} />
   </article>;
