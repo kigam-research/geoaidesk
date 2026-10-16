@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T14:13:46Z
+updated: 2026-10-16T14:43:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -57,16 +57,17 @@ Present the guide's structure and key rules to the user in your tab before final
   caches and app-written files/links after the last check.
 
 ## Current state
-- 4884daf (pushed): guide revised after three reviews; check-ui ICU-aware (0 errors / 102 debt); ui-check tests 5/5.
-  Screens child #1 integrated and closed (mockups + 11 PNGs).
-- Child `gaid-ui-guide--screens2` (writer 9e5573c7) revising mockups/figures per agreed findings; brief
-  ~/data/geoaidesk/work/gaid-ui-guide/child-screens2.md.
-- Reviews (all on c5fdb05): ~/data/geoaidesk/work/gaid-ui-guide/reviews/{claude-advanced-review.md,codex-review.md,researcher-persona.md}.
+- Result: GAID UI/UX guide `docs/design/ui-guide.md` (adapted from Samsung One UI, every rule mapped to its source,
+  deliberate differences in §11; user approved structure/rules/defaults 2026-10-16), machine-readable rules
+  `geo/ui/ui-rules.json`, check `geo/ui/check-ui.mjs` (+ `geo/tests/ui-check.test.mjs`, `scripts/check` step; 0 errors,
+  102 accepted debt in `geo/ui/ui-baseline.json`), AGENTS.md "UI guide" rule, reference mockups
+  `docs/design/mockups/{setup,map,method}.html` + README, report `reports/2026-10-16-gaid-ui-guide/index.md` with three
+  before/after figures. Reviews (persona Sonnet 5.5, Claude 고급검토, Codex 검토) triaged and fixed (Notes). App screens
+  are unchanged; gaid-hub and later UI units align to the guide after merge.
+- Children: screens (closed), screens2 (closed; its finish ran scripts/check on tree a11de7cc24bc). Caches removed.
+- Re-verify: `node geo/ui/check-ui.mjs`; `node --test geo/tests/ui-check.test.mjs`; open the mockups in a browser.
 ## Next steps
-1. When screens2 finishes: `task complete gaid-ui-guide--screens2` (remove its caches if close is pending), look at the
-   new figures; short recheck of the revised mockups/guide by the persona reader only if the figures leave doubt.
-2. Report reports/2026-10-16-gaid-ui-guide/index.md (humanizer file mode, `task review-copy`), declare under ## Report.
-3. task finish (runs scripts/check); give the hub's final report to the user.
+1. task finish (runs scripts/check); give the hub's final report to the user.
 ## Failed approaches
 - check-ui v1 measured ICU length with a regex; arguments inside select/plural branches made short messages count as
   their whole source (Codex B1). Replaced by a walk over the vendored icu-lite parse tree.
@@ -99,6 +100,8 @@ Present the guide's structure and key rules to the user in your tab before final
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-16-gaid-ui-guide/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
