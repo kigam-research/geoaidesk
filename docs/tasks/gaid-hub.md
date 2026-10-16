@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T07:16:36Z
+updated: 2026-10-16T07:20:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -120,7 +120,7 @@ infographic agent review of the screenshots (user rule from feedback 2), then pr
 - Screens written against the contract (web/src/geo/hub/: shell, top-nav + entry card, home, source/working, question
   tabs, draft + flow diagram + trial card, trial step, dialogs, api client, hash location, hand-off event); project list
   entrance and `#hub` place wired in page.tsx/project-view.tsx (boundaries updated). Web tsc clean. Live `#hub` shows
-  "Not Found" until P1 lands. Temporary fixture page `web/src/app/hub-design/` (REMOVE before finish).
+  "Not Found" until P1 lands. Temporary fixture page `web/src/app/hub-design/` (removed before finish).
 - Design figures for the user: reports/2026-10-16-gaid-hub/figures/design-0{1..7}-*.png; review copy in the vault
   (연구 보고서/geoaidesk/2026-10-16-gaid-hub). Presented in the writer tab 2026-10-16; awaiting the user's answer.
 - 2026-10-16 11:35 user: "왜 워커를 fast모드로 사용했나? normal모드로 진행하여라." Child 05deecdc was created with
@@ -180,16 +180,17 @@ infographic agent review of the screenshots (user rule from feedback 2), then pr
    entry-ap-a135f290-1c4), star, comment, use in "Yilgarn 40km 빠른 시험" → input prep → start settings opened (not run).
    Fixes found there (1c2e7e1): register dialog folder selection, long input paths in the use dialog. Authoring folderId
    PATCH dropped: registration picks the hub folder, and the home groups by registered folder.
-3. Infographic review round 4 running: reader 5d219d67 (profile "인포그래픽 및 그림 생성 작업"), brief
-   briefs/review-infographic-4.md → reviews/infographic-4.md. Apply relevant changes, then present screens to the user.
+3. Infographic review round 4 (reader 5d219d67, reviews/infographic-4.md) applied in dc72efe: readable intro, limits
+   with kind labels, jump links, preview star/comments as after-registration, boundary example, subject icons; draft
+   prompt gaid-draft/2026-10-16.3 keeps tagline/summary short. Slogan kept (user's own words).
 4. v5 trial done (40 km grid, quick mode, project "Yilgarn 40km 빠른 시험" yilgarn-40km-2a436b): started 14:27:58,
    finished 14:48 KST (~21 min wall, pipeline 12.3 min; slowest stage BaggingPU 11 min). Outputs: results/zone_map*.tif,
    figures/zone_map.png, figures/capture_curve.png, results/sensitivity_table.csv, results/run_log.md (per-step reductions
    and times). Two data-guard permission prompts allowed by the operator. Assessment saved "useful". Method defect for
    the next revision: expected artifact names (outputs/*) differ from the actual results/ and figures/ paths.
-5. Report (reports/2026-10-16-gaid-hub/index.md), scripts/check, remove web/src/app/hub-design/ and
-   web/public/hub-design-mock/ and build caches, task finish.
-Blocked: waiting for the infographic review (reader 5d219d67).
+5. Report written (reports/2026-10-16-gaid-hub/index.md, humanizer pass, vault review copy). Temporary design page and
+   mock images removed; dev unit gaid-hub-dev stopped (its data stays under ~/data/geoaidesk/work/gaid-hub/). Next:
+   `VITEST_MAX_WORKERS=1 task finish`, then remove build caches from the worktree.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
@@ -227,11 +228,16 @@ Work packages:
 Integration order: P1 → wire P2 to real endpoints → P3.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [결정] 개념 그림을 만들 이미지 모델을 기관 GAID에 연결할지 — 가) 연결합니다(초안마다 "개념 그림 만들기"를 누를 때만 최대 6장, 호출마다 비용) — 나) 연결하지 않습니다(단계 설명과 예시 도식, 카드는 아이콘) — 권장: 가) 사용자가 이미 이미지 생성 모델 사용을 골랐고 그림이 있어야 카드와 단계 설명이 읽힘 — 막힌 일: 개념 그림 실제 생성 확인 — 조건: 설정 기본값에 이미지 모델 지정 — 근거: reports/2026-10-16-gaid-hub/index.md#6-결정할-일
+- [확인] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
+- [부채] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [부채] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-16-gaid-hub/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
