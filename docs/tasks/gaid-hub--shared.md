@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T05:55:31Z
+status: active
+updated: 2026-10-16T06:04:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -86,8 +86,12 @@ semicolons, 120 columns).
 - Parent explicitly authorized `project-view.test.tsx`: Choose a project → My research (approved UI title), identical
   to their local correction. Boundary entry added; other frontend code/tests are unchanged. The three affected
   frontend files pass with two workers (19 tests). No resume or task save after the failed finish.
-- Parent owns screen integration and final runtime walkthrough. Parent confirmed the sibling check ended at 14:54:59;
-  no sibling scripts/check process remains. Retrying full checks in place with the authorized title correction.
+- Serial full retry: backend 1,830 passed/11 skipped; ALL frontend 1,059 passed; launcher's check passed. Distribution
+  check found that its hard-coded boundary owner set did not include `gaid-hub`, newly used for the authorized project
+  view test seam. Added that owner to the distribution test registry; product behaviour and timeout tests unchanged.
+- Parent owns screen integration and final runtime walkthrough. Retrying finish in place after focused distribution check.
+- Focused distribution check passed (7 tests). Final full retry uses VITEST_MAX_WORKERS=2 (supported by both installed
+  Vitest versions) to bound host load; the declared suite, timeout values and test selection are unchanged.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-16T05:55:31Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
@@ -99,6 +103,8 @@ Closed 2026-10-16T05:55:31Z: ready; the parent gaid-hub integrates it. No furthe
   existing method-name collision check. Updated the fixture's slug AND workflow/artifact local skill refs; suite passed.
 - Initial full frontend check ran concurrently with sibling gaid-hub--visuals. Do not change timeout/product code to
   accommodate that load; parent confirmed load-related baseline waits and requested an in-place finish retry.
+- Serial retry resolved every frontend wait without test/source changes. It stopped only on the metadata owner list;
+  add gaid-hub alongside the other maintained package owners, then rerun `task finish` in place.
 ## Notes and decisions
 - Sequential decisions: keep parent contracts unchanged; reuse the live AuthoringStore (no second cache); serialize
   registration by deterministic entry id, then package by authoring project; snapshot draft/images before publishing.
