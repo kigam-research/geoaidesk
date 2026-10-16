@@ -32,6 +32,14 @@ export interface AuthoringOptions {
   chat?: import("./model.ts").ChatFn;
 }
 
+const stores = new WeakMap<FastifyInstance, AuthoringStore>();
+/** The authoring store registered on this app (shared by the hub-shared and authoring-extra routes). */
+export function getAuthoringStore(app: FastifyInstance): AuthoringStore {
+  const store = stores.get(app);
+  if (!store) throw new Error("authoring routes are not registered");
+  return store;
+}
+
 const OP_ID = /^[\w-]{6,80}$/;
 
 /** Researcher edit: a new draft revision on top of the latest one; a stale base is refused. */
@@ -130,6 +138,7 @@ export async function registerAuthoringRoutes(
 ): Promise<AuthoringStore> {
   const store = options.store ?? new AuthoringStore();
   await store.initialize();
+  stores.set(app, store);
   const vocabulary = () => options.vocabulary ?? loadVocabulary();
   const context = (): PackageContext => ({ store, vocabulary: vocabulary(), checker: "gaid-hub" });
   const deps = (body: OperationBody | AnswersBody | undefined, project?: AuthoringProject) => ({

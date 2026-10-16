@@ -208,10 +208,10 @@ export interface DraftRecipe {
 
 export const AUTHORING_PROJECT_SCHEMA = "gaid-authoring-project/v1";
 
-export type SourceKind = "pdf" | "code" | "text" | "gaid-analysis";
+export type SourceKind = "pdf" | "code" | "text" | "gaid-analysis" | "web";
 export type SourceStatus = "received" | "extracted" | "partial" | "failed";
 
-/** A file the researcher supplied. The original bytes stay in the private store and never enter a package. */
+/** A supplied file or fetched URL. Original bytes stay private and never enter a package. */
 export interface SourceDocument {
   id: string;
   kind: SourceKind;
@@ -224,6 +224,8 @@ export interface SourceDocument {
   documentKind?: string;
   doi?: string;
   title?: string;
+  url?: string;
+  fetch?: { requestedUrl: string; finalUrl?: string; fetchedAt: string; status?: number; contentHash?: string };
 }
 
 export interface ExtractedFigure {
@@ -467,8 +469,9 @@ export interface AuthoringProject {
   model?: string;
   /** Hub topic folder the researcher filed this method under (my methods on the hub home). */
   folderId?: string;
-  /** Concept images of the latest draft per procedure node id (files under the project's visuals/ folder). */
+  /** Concept images keyed by procedure node id, cover, or output:<outputId> (files under visuals/). */
   visuals?: Record<string, { file: string; caption: string; model: string; draftRevision: number }>;
+  visualOperations?: Record<string, VisualOperation>;
   createdAt: string;
   updatedAt: string;
   /** Increments on every source change; findings record the revision they read. */
@@ -525,6 +528,9 @@ export const liveQuestions = (p: AuthoringProject): Question[] =>
 // GET    /geo/authoring/projects/:id                   → AuthoringProject
 // DELETE /geo/authoring/projects/:id                   → 204 (moves the folder to an archive, never in-place delete)
 // POST   /geo/authoring/projects/:id/sources           AddSourceBody → { source, extraction }
+// POST   /geo/authoring/projects/:id/sources/url       AddUrlSourceBody → { source, extraction }
+// POST   /geo/authoring/projects/:id/drafts/:rev/visuals GenerateVisualsBody → 202 VisualOperation
+// GET    /geo/authoring/projects/:id/visuals/:key       PNG/WebP bytes
 // GET    /geo/authoring/projects/:id/sources/:sid/original      original bytes (PDF inline)
 // GET    /geo/authoring/projects/:id/sources/:sid/pages/:page   → { page, text }
 // GET    /geo/authoring/projects/:id/sources/:sid/files/*       → { path, text }
@@ -555,6 +561,29 @@ export interface CreateProjectBody {
   goal?: string;
   target?: "skill" | "workflow" | "auto";
   model?: string;
+}
+
+export interface AddUrlSourceBody {
+  url: string;
+  kind: "paper" | "blog" | "search";
+}
+
+export interface VisualOperation {
+  opId: string;
+  draftRevision: number;
+  model: string;
+  keys: string[];
+  completed: string[];
+  status: "running" | "complete" | "failed" | "interrupted";
+  startedAt: string;
+  endedAt?: string;
+  error?: string;
+}
+
+export interface GenerateVisualsBody {
+  opId: string;
+  /** Optional step ids; eligible output ports reserve slots within the six-image shared cap. */
+  steps?: string[];
 }
 
 export interface AddSourceBody {

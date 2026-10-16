@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:24:30Z
+updated: 2026-10-16T05:37:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3a6c6bdd-8e42-4c22-bc50-f3253b4bbc42","pid":2866986,"provider":"codex","session":"01a1432a-e540-7610-91df-bc7f924d9de8","start":"1618610","token":"af79afaa600e2e3514663724af3dca4cfb94e58c4f31a7f39a23719a1acbc8d7"}
 branch: task/gaid-hub--visuals
 target: task/gaid-hub
@@ -60,21 +60,65 @@ Prettier style as the authoring code. No real image-model or provider calls in t
 - raw.githubusercontent.com is blocked. Record what you built and the evidence in your task document; `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Implemented URL source intake and background concept illustrations; ready for parent integration.
+- URL intake persists original bytes, final URL, fetch time/status and SHA-256; HTML headings/paragraphs become
+  32,000-character text pages and use existing sourceContext/anchor verification without changing agent.ts.
+  PDF URLs reuse pdftotext page and figure-caption extraction. No page crops or PDF images enter prompts.
+- URL policy: http(s), no credentials, five redirects, shared 30-second fetch/DNS/body deadline, 30 MiB declared
+  and streamed byte limits. Loopback/link-local IPv4, IPv6 and mapped addresses are refused at every redirect;
+  GAID_URL_SOURCE_ALLOW allows exact test hosts. Global fetch retains the app's configured proxy dispatcher.
+  Network/extraction failures persist as failed/partial sources with Korean reasons.
+- Visuals use only Settings Defaults imageModel, existing priceability/auth/billing, default project's cap checked
+  before every image, ledger session gaid-hub-visuals. Response usage is recorded before image validation,
+  including a paid response without an image. No model configured returns Korean 400 before scheduling.
+- Durable visualOperations expose running/complete/failed/interrupted status, selected/completed keys and error.
+  Concurrent retries of one opId do not make another call; a project allows one active image batch. Restart
+  marks running batches interrupted and never silently retries paid work. Partial images remain available.
+- New routes share the exact parent-approved getAuthoringStore(app) WeakMap getter and mount after authoring.
+- Verified: server npm run typecheck; npx --no-install vitest run test/geo-authoring*.test.ts: 3 files,
+  39 tests passed (20 new tests); git diff --check. Local HTTP server/fake image transport only. No paid calls,
+  user review/dev instances, UI files, locales, agent.ts or prompts.ts changed. No computed outputs in Git.
+- Full scripts/check and integrated UI/production checks remain parent-owned; this child's declared check scope
+  is the focused server typecheck + authoring tests in the brief.
+
 ## Next steps
-1. (the next session's first action)
+1. Finish this checked child snapshot with task finish. Parent runs task complete gaid-hub--visuals and wires UI.
+
 ## Failed approaches
+- Initial task resume found the shared task transaction busy; the retry resumed this printed worktree unchanged.
+- Two shell calls used server-prefixed paths or root npx from the wrong cwd. No source file was written by the
+  former; root npx refused without installing. Reissued from the correct directories. No recurring tool block.
+
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Parent steering (2026-10-16): keys are procedure node id, cover and output:<outputId>. Eligible result-form ports
+are map-raster, map-vector and figure; table/report outputs remain UI examples. Cover + at most six step/output
+images total. Default selection reserves slots for eligible outputs (first six), then fills remaining slots with
+steps. Explicit steps exceeding the combined cap return 400. The returned operation.keys states the selection.
+
+Sequential decisions: additive contract and shared store getter → URL source implementation → image adapter/operation
+→ route tests and integration. All implementation was tightly coupled and owned by this writer; no child writers.
+Parent informed of contract/store changes via Paseo (notifyOnFinish false); used the exact requested shared getter.
+
+Integration surface:
+- web/src/geo/contracts/authoring.ts: additive SourceKind web, SourceDocument.url/fetch, AddUrlSourceBody,
+  GenerateVisualsBody, VisualOperation and AuthoringProject.visualOperations. Visual record format unchanged.
+- SourceDocument.url is the last successfully fetched URL; fetch.requestedUrl preserves the initial URL,
+  credentials stripped even on refusal. fetch.finalUrl/status identify the last HTTP response; contentHash is
+  present only when complete bytes were received. A URL PDF has kind pdf with url/fetch metadata.
+- POST sources/url returns { source, extraction } (200, including a recorded fetch failure); malformed request
+  bodies return 400. HTML pages are synthetic text segments, not physical PDF pages.
+- POST drafts/:rev/visuals returns VisualOperation (202); poll GET authoring project.visualOperations[opId].
+  GET visuals/:key serves PNG/WebP bytes; browser URL builders must use encodeURIComponent(key) and withApiToken.
+- For retry after failure/interruption, use a new opId. The old id is permanently idempotent.
+- htmlparser2 9.1.0 is now a direct pinned server dependency (already present transitively, lock adds one entry).
+- No frontend catalogue strings were edited; Korean backend error/caption strings follow existing authoring routes.
+
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None for this child unit.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child evidence is in this task document. Parent incorporates the result into its one canonical GAID hub report.
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

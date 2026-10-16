@@ -42,8 +42,18 @@ export class AuthoringStore {
     // Model calls do not survive a restart; never infer their outcome.
     for (const id of await this.ids()) {
       const p = await this.read(id);
-      if (!p.attempts.some((a) => a.outcome === "running")) continue;
+      if (
+        !p.attempts.some((a) => a.outcome === "running") &&
+        !Object.values(p.visualOperations ?? {}).some((o) => o.status === "running")
+      ) continue;
       await this.mutate(id, (project) => {
+        for (const op of Object.values(project.visualOperations ?? {})) {
+          if (op.status === "running") {
+            op.status = "interrupted";
+            op.endedAt = now();
+            op.error = "서버가 다시 시작되어 그림 생성을 중단했습니다. 새 작업으로 다시 시도하세요.";
+          }
+        }
         for (const a of project.attempts)
           if (a.outcome === "running") {
             a.outcome = "interrupted";
