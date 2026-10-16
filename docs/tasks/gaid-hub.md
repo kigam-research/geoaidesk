@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T03:24:50Z
+updated: 2026-10-16T03:25:12Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -120,9 +120,13 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
-   `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
-2. When P1 finishes: `task complete gaid-hub--server`, wire end to end on the dev instance, real Qwen run.
+1. When the researcher persona (native Sonnet agent, started ~03:20Z) finishes: read researcher/summary.md, triage, fix,
+   then restart gaid-hub-dev (prompt 2026-10-16.2 takes effect) and re-shoot the key screens.
+2. Claude 고급검토 round 2 ("after") on the fixed screens; Codex 검토 code review if Codex sign-in works again.
+3. Report reports/2026-10-16-gaid-hub/index.md (figures), scripts/check, remove hub-design page and build caches, finish.
+4. Still open with the user: approval of the 7 design screens (presented 2026-10-16, no answer yet).
+Blocked: waiting for the researcher persona agent (native sub-agent, not visible to the task CLI) — it uses the shared
+Qwen server, so no other Qwen run until it ends.
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
