@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:17:17Z
+updated: 2026-10-16T05:19:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -146,26 +146,26 @@ the sharing/discussion space, GAID projects are the personal research space.
   title from first source, sticky TaskSetup actions, option labels in the task draft, folded trial output lists.
   Not fixed (upstream chat): Enter sends a prefilled draft; long runs show no progress and "실행 중단" had no visible
   effect for 12+ min (persona) — candidate open item.
+- v4 trial result (13:36–14:17 KST, stopped at 41 min): no final outputs (zone map, capture curve). Variogram on
+  <=20,000-cell subsample was quick; 3 bootstrap XGBoost fits took 10.5 min; cross-conformal XGBoost refits ~2.5 min each
+  (13:59–14:17 still running). One data-guard permission prompt (~13:45) waited for the operator. Pressing "실행 중단" ended
+  the chat run but NOT the agent's nohup background pipeline; the operator killed it. Assessment saved (needs-revision).
+  GAID defect for the report/open items: chat stop does not stop background processes started by the agent.
+- Reviews: Codex 검토 code review (4 blockers fixed in 0e1814d), Claude 고급검토 round 2 (met; trial badge fix 0221817),
+  infographic agent mockup review (applied in 327d18f), reports under ~/data/geoaidesk/work/gaid-hub/reviews/.
 - v4 trial started 13:36 KST in "Yilgarn 시험" (quick-trial, paper reference values, accept-auto block size, appended
   "무인 시험 … 2만 셀 이하 표본 … 30분 안에").
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Mockup round 3 (after user feedback 2): screenshots ~/data/geoaidesk/work/gaid-hub/playwright/mock3/*.png; concept images
-   in web/public/hub-design-mock/concept/ (untracked, copied from mockup/concept). Infographic agent f494414c reviewing
-   (brief briefs/mockup-review-infographic.md → reviews/infographic-mockup-3.md); then apply, copy figures to
-   reports/2026-10-16-gaid-hub/figures/mock3-*.png, review-copy, present to the user.
-0. (old) Mockup round 2 (user feedback): components saved (121fa40); waiting for 8 concept images from reader f494414c
-   ("인포그래픽 및 그림 생성 작업" profile, re-prompted to save under CODEX_HOME then copy to
-   ~/data/geoaidesk/work/gaid-hub/mockup/concept/). Then copy them to web/public/hub-design-mock/concept/ (UNTRACKED,
-   never commit; delete with hub-design page before finish), screenshot /hub-design?view=home|shared|sources|reading|
-   questions|draft|register, put PNGs in reports/2026-10-16-gaid-hub/figures/mock2-*.png, review-copy, present to user.
-2. v4 trial running (Yilgarn 시험; one permission allowed at ~13:45; pipeline log derived/mpm_run_q3/logs_fold0.log
-   stuck at "Training 3 bootstrap models" from 13:48). Stop/record at 14:06 (30 min).
-3. Readers running: Claude 고급검토 round 2 (a99b1e08), Codex 검토 code (163e0278).
-4. After user agreement on mockups: implement shared hub (users by name, registry, folders, stars, comments), URL fetch,
-   figure crops (server pageImage + crop like ~/data/geoaidesk/work/gaid-hub/tools/figcrop.py), concept image generation
-   via a configured image model, then tests/report/check/finish.
+1. Waiting for the user's answer on mockup round 4 (presented 2026-10-16 ~14:20 KST; figures
+   reports/2026-10-16-gaid-hub/figures/mock4-01..10-*.png, vault copy made). After agreement: shared hub on the institute
+   GAID server (researcher name identity, registry, topic folders, stars, comments, recommended = catalogue + most starred),
+   URL fetch, concept-image generation via a configured image model, figure handling without PDF crops.
+2. Re-test loop: draft v5 revise from the v4 trial started ~14:22 (ap-2bd027a9-9f2, prompt gaid-draft .2). Then install v5
+   in "Yilgarn 시험" through the input-prep path and run a bounded trial (target < 30 min); record reductions and outputs.
+3. Then report, scripts/check, cleanup (web/src/app/hub-design/, web/public/hub-design-mock/ untracked, caches), finish.
+Blocked: mockup implementation waits for the user's agreement (user asked to agree mockups before building).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration plan (2026-10-16)
