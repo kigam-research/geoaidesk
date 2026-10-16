@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T05:37:36Z
+status: active
+updated: 2026-10-16T05:47:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3a6c6bdd-8e42-4c22-bc50-f3253b4bbc42","pid":2866986,"provider":"codex","session":"01a1432a-e540-7610-91df-bc7f924d9de8","start":"1618610","token":"af79afaa600e2e3514663724af3dca4cfb94e58c4f31a7f39a23719a1acbc8d7"}
 branch: task/gaid-hub--visuals
 target: task/gaid-hub
@@ -78,14 +78,19 @@ Prettier style as the authoring code. No real image-model or provider calls in t
 - Verified: server npm run typecheck; npx --no-install vitest run test/geo-authoring*.test.ts: 3 files,
   39 tests passed (20 new tests); git diff --check. Local HTTP server/fake image transport only. No paid calls,
   user review/dev instances, UI files, locales, agent.ts or prompts.ts changed. No computed outputs in Git.
-- Full scripts/check and integrated UI/production checks remain parent-owned; this child's declared check scope
-  is the focused server typecheck + authoring tests in the brief.
+- First task finish automatically ran full scripts/check: backend 166 files / 1,844 passed, 11 skipped; frontend
+  155 files / 1,056 passed, three failures (stale project heading and load-related CSV/LaTeX timeouts). Parent
+  explicitly directed the identical one-line heading expectation fix and a serial finish retry, with no timeout
+  test edits. Integration/production verification remains subject to the complete check result.
 
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-16T05:37:36Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First finish failed on the pre-existing Choose a project expectation (approved UI says My research) and two
+  frontend 5-second timeouts under concurrent child full checks. Parent authorized exactly the expectation
+  replacement; no timeout edits. Full log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-pl71ptzi.log.
 - Initial task resume found the shared task transaction busy; the retry resumed this printed worktree unchanged.
 - Two shell calls used server-prefixed paths or root npx from the wrong cwd. No source file was written by the
   former; root npx refused without installing. Reissued from the correct directories. No recurring tool block.

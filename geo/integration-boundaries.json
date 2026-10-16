@@ -499,6 +499,12 @@
       "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Direct pinned htmlparser2 dependency for URL source text extraction (gaid-hub--visuals)."
+    },
+    {
+      "path": "web/src/components/project-view.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Parent-approved stale heading expectation Choose a project → My research; no UI changes (gaid-hub--visuals)."
     }
   ],
   "notTouched": [
