@@ -73,6 +73,8 @@
     "recommended": "권장",
     "other": "기타",
     "otherPlaceholder": "다른 의견을 적으세요.",
+    "answer": "답",
+    "answerPlaceholder": "답을 적으세요.",
     "defer": "나중에 정하기",
     "deferred": "나중에 정함",
     "why": "왜 묻나요",

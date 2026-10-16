@@ -247,12 +247,12 @@ function QuestionCard({
       {free && (
         <div className="flex flex-col gap-2">
           <label htmlFor={otherId} className="text-sm font-medium">
-            {text("questions.other")}
+            {choice && question.options.length ? text("questions.other") : text("questions.answer")}
           </label>
           <Textarea
             id={otherId}
             rows={2}
-            placeholder={text("questions.otherPlaceholder")}
+            placeholder={choice && question.options.length ? text("questions.otherPlaceholder") : text("questions.answerPlaceholder")}
             value={answer?.defer ? "" : (answer?.response ?? "")}
             onChange={(event) => onChange({ response: event.target.value })}
           />

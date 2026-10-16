@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T03:01:22Z
+updated: 2026-10-16T03:03:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -94,6 +94,20 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   credits", and after the switch Codex reports "access token could not be refreshed ... sign in again".
   Retries failed 3x with the same token error. User (2026-10-16): "2번으로 진행하자." = the parent ports the server itself.
   Hub request 0bc1c179ab4c asks the hub to retire gaid-hub--server with no changes. P1 is now parent-owned (same brief).
+- Server port done by the parent (ef4d124 + 6fcaa97): server/src/geo/authoring/ {store, sources (pdftotext; tar/zip
+  in-process via geo/tar.ts + adm-zip), anchors, prompts (gaid-analyze/gaid-draft 2026-10-16.1: one-sentence questions,
+  2-4 options with hints, recommended id + why, short step summaries), agent, model (GAID runtime completeSimple, timeout,
+  ledger default/gaid-hub-authoring, 402 over cap, preflight 401/400), python (imports, BUNDLED_WITH e.g. joblib with
+  scikit-learn), vocabulary (geo/hub taxonomy + pinned catalogue envs/names), profile-lint, package (6 checks, own
+  deterministic ustar+PAX writer, gaid-local: hub url), install (stage → method verify → origin gaid-hub → preview →
+  installStagedSkills; never replaces a non-hub skill), routes (Fastify, batch answers all-or-none)}. Vendored inputs
+  geo/hub/{schemas,taxonomy} (SOURCE.md still to write). Every question accepts 기타 free text.
+  Verified: `cd server && npx vitest run test/geo-authoring.test.ts test/geo-authoring-package.test.ts` 18 pass;
+  server tsc clean; web tsc clean.
+- Live Qwen (kigam-qwen/qwen3.8-flash-next, medium) on the dev instance, smoke project ap-a135f290-1c4 (paper +
+  original code c03c67d): analyze 4m21s, 36 findings, 5 questions (one repair); answers given in the UI (4 recommended,
+  1 free text) and applied together; draft attempt started 12:0x.
+- Child gaid-hub--server retired without changes (hub request 0bc1c179ab4c; take → finish → complete, closed).
 ## Next steps
 1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
    `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.

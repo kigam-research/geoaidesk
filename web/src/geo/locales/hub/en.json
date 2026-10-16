@@ -73,6 +73,8 @@
     "recommended": "Recommended",
     "other": "Other",
     "otherPlaceholder": "Write a different answer.",
+    "answer": "Your answer",
+    "answerPlaceholder": "Write your answer.",
     "defer": "Decide later",
     "deferred": "Decide later",
     "why": "Why this matters",

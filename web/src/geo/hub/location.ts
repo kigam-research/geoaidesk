@@ -18,7 +18,11 @@ export function useHubLocation(): [HubLocation, (next: HubLocation) => void] {
     const read = () => setLocation(parseHubHash(window.location.hash));
     read();
     window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
+    window.addEventListener("popstate", read);
+    return () => {
+      window.removeEventListener("hashchange", read);
+      window.removeEventListener("popstate", read);
+    };
   }, []);
   const navigate = useCallback((next: HubLocation) => {
     const hash = next.open ? (next.projectId ? `#hub/${next.projectId}` : "#hub") : "";
