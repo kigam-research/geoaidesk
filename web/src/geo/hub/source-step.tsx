@@ -68,6 +68,15 @@ export function sourceLine(project: AuthoringProject, source: SourceDocument): s
   if (source.kind === "pdf" && x?.pages) return text("sources.added", { name: source.name, pages: x.pages });
   if (source.kind === "code" && x?.files)
     return text("sources.addedCode", { name: source.name, count: x.files.length });
+  if (source.kind === "web") {
+    let host = source.url ?? source.name;
+    try {
+      host = new URL(source.url ?? "").hostname;
+    } catch {
+      /* keep the name */
+    }
+    return text("sources.addedWeb", { name: source.title ?? source.name, host });
+  }
   return text("sources.addedPlain", { name: source.name });
 }
 
@@ -160,6 +169,8 @@ export function SourceStep({
             <li key={s.id} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
               {s.kind === "code" ? (
                 <FileArchiveIcon className="size-4 text-muted-foreground" aria-hidden />
+              ) : s.kind === "web" ? (
+                <GlobeIcon className="size-4 text-muted-foreground" aria-hidden />
               ) : (
                 <FileTextIcon className="size-4 text-muted-foreground" aria-hidden />
               )}

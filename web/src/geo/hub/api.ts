@@ -1,6 +1,8 @@
 /** Client for `/geo/authoring/*` (contract: web/src/geo/contracts/authoring.ts). */
 import type {
   AddSourceBody,
+  AddUrlSourceBody,
+  VisualOperation,
   AnswersBody,
   AuthoringAttempt,
   AuthoringHealth,
@@ -58,6 +60,11 @@ export const hubApi = {
   remove: (id: string) => call<null>(pid(id), { method: "DELETE" }),
   addSource: (id: string, body: AddSourceBody) =>
     post<{ source: SourceDocument; extraction: ExtractionRecord }>(`${pid(id)}/sources`, body),
+  addUrl: (id: string, body: AddUrlSourceBody) =>
+    post<{ source: SourceDocument; extraction: ExtractionRecord }>(`${pid(id)}/sources/url`, body),
+  visuals: (id: string, rev: number, steps?: string[]) =>
+    post<VisualOperation>(`${pid(id)}/drafts/${rev}/visuals`, { opId: newOpId(), ...(steps ? { steps } : {}) }),
+  visualUrl: (id: string, key: string) => `/geo/authoring${pid(id)}/visuals/${encodeURIComponent(key)}`,
   analyze: (id: string, body: OperationBody) => post<AuthoringAttempt>(`${pid(id)}/analyze`, body),
   answers: (id: string, body: AnswersBody) =>
     post<{ decisions: Decision[]; attempt?: AuthoringAttempt }>(`${pid(id)}/answers`, body),

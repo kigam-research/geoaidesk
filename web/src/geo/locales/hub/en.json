@@ -80,7 +80,8 @@
     "urlNote": "The server inside the institute network reads the address and keeps the text with the original.",
     "url_fetched": "Read",
     "url_fetching": "Reading",
-    "url_failed": "Could not read"
+    "url_failed": "Could not read",
+    "addedWeb": "{name} · {host}"
   },
   "reading": {
     "title": "Reading sources",
@@ -274,5 +275,13 @@
     "more": "{count} more",
     "about": "About this method",
     "limits": "Limits and cautions ({count})"
+  },
+  "visuals": {
+    "make": "Make concept pictures",
+    "remake": "Remake concept pictures",
+    "starting": "Requesting concept pictures",
+    "making": "Making concept pictures ({done}/{total})",
+    "note": "Uses the image model · billed per call",
+    "failed": "Could not make the concept pictures."
   }
 }

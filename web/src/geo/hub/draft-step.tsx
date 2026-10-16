@@ -5,7 +5,7 @@
  * flow. The right rail tries the draft in a project. Technical files, check output and the
  * agent record open only on request.
  */
-import { FileTextIcon, FlaskConicalIcon, PencilLineIcon, Share2Icon } from "lucide-react";
+import { FileTextIcon, FlaskConicalIcon, ImageIcon, LoaderCircleIcon, PencilLineIcon, Share2Icon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,16 @@ export function DraftStep({
   registered,
   visuals,
   outputImages,
+  visualAction,
 }: {
+  /** Concept pictures made with the configured image model (paid per call); explicit action only. */
+  visualAction?: {
+    busy: boolean;
+    progress: { done: number; total: number } | null;
+    has: boolean;
+    error: string | null;
+    onMake: () => void;
+  };
   /** Register the draft in the shared GAID hub (others can star and comment). */
   onRegister?: () => void;
   /** Already registered: revision shown in the hub. */
@@ -78,7 +87,31 @@ export function DraftStep({
         <OverviewBand profile={profile} />
 
         <section className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
+            {visualAction && (
+              <div className="ml-auto flex flex-wrap items-center gap-2">
+                {visualAction.error && !visualAction.busy && (
+                  <span className="text-xs text-destructive">{visualAction.error}</span>
+                )}
+                <span className="text-xs text-muted-foreground">{text("visuals.note")}</span>
+                <Button variant="outline" size="sm" disabled={visualAction.busy} onClick={visualAction.onMake}>
+                  {visualAction.busy ? (
+                    <LoaderCircleIcon data-icon="inline-start" className="animate-spin" />
+                  ) : (
+                    <ImageIcon data-icon="inline-start" />
+                  )}
+                  {visualAction.busy
+                    ? visualAction.progress
+                      ? text("visuals.making", visualAction.progress)
+                      : text("visuals.starting")
+                    : visualAction.has
+                      ? text("visuals.remake")
+                      : text("visuals.make")}
+                </Button>
+              </div>
+            )}
+          </div>
           <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
         </section>
 

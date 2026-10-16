@@ -16,6 +16,7 @@ import {
   runningAttempt,
   type AuthoringProject,
   type CheckResult,
+  type MethodDraft,
   type ProjectSummary,
 } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
@@ -30,10 +31,10 @@ import { HubHome } from "./hub-home";
 import { HubShell, ProjectBar, type HubStep } from "./hub-shell";
 import type { HubLocation } from "./location";
 import { QuestionStep, type DraftAnswer } from "./question-step";
-import { SourceStep, WorkingPanel, type Target } from "./source-step";
+import { SourceStep, WorkingPanel, type Target, type WebSourceKind } from "./source-step";
 import { TrialStep, useTrialCount } from "./trial-step";
 import { SharedMethod } from "./shared-method";
-import { MethodFlow } from "./method-flow";
+import { MethodFlow, type StepVisual } from "./method-flow";
 import { localText } from "./text";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
@@ -215,6 +216,24 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
 
 const NO_INSTALLS: AuthoringProject["installs"] = [];
 
+/** Concept images of the project for the current draft: per step, per output (`output:<id>`) and the cover. */
+function draftVisuals(project: AuthoringProject, draft: MethodDraft | undefined) {
+  const steps: Record<string, StepVisual> = {};
+  const outputs: Record<string, StepVisual> = {};
+  let cover: string | null = null;
+  if (!draft) return { steps, outputs, cover };
+  const nodeIds = new Set(draft.profile.procedure.nodes.map((n) => n.id));
+  const outputIds = new Set(draft.profile.outputs.map((o) => o.id));
+  for (const [key, v] of Object.entries(project.visuals ?? {})) {
+    const src = withApiToken(`${API_BASE}${hubApi.visualUrl(project.id, key)}`);
+    const visual: StepVisual = { src, kind: "generated", caption: v.caption };
+    if (key === "cover") cover = src;
+    else if (key.startsWith("output:") && outputIds.has(key.slice(7))) outputs[key.slice(7)] = visual;
+    else if (nodeIds.has(key)) steps[key] = visual;
+  }
+  return { steps, outputs, cover };
+}
+
 function emptyProject(): AuthoringProject {
   const at = new Date().toISOString();
   return {
@@ -285,6 +304,8 @@ function HubProject({
   const [goal, setGoal] = useState("");
   const [target, setTarget] = useState<Target>("auto");
   const [uploading, setUploading] = useState<string | null>(null);
+  const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
+  const [visualsBusy, setVisualsBusy] = useState(false);
   const [answers, setAnswers] = useState<Record<string, DraftAnswer>>(() => {
     try {
       return JSON.parse(window.localStorage.getItem(answersKey(id)) ?? "{}") as Record<string, DraftAnswer>;
@@ -330,17 +351,33 @@ function HubProject({
   }, [reload]);
 
   const running = project ? runningAttempt(project) : undefined;
+  const visualRun = project
+    ? Object.values(project.visualOperations ?? {}).find((o) => o.status === "running")
+    : undefined;
+  const polling = Boolean(running || visualRun);
   useEffect(() => {
-    if (!running) return;
+    if (!polling) return;
     const timer = window.setInterval(() => void reload(), 3000);
     return () => window.clearInterval(timer);
-  }, [running, reload]);
+  }, [polling, reload]);
 
   useEffect(() => {
     window.localStorage.setItem(answersKey(id), JSON.stringify(answers));
   }, [answers, id]);
 
   const draft = project?.drafts.at(-1);
+  const pictures = useMemo(
+    () => (project ? draftVisuals(project, draft) : draftVisuals(emptyProject(), undefined)),
+    [project, draft],
+  );
+  const lastVisualOp = Object.values(project?.visualOperations ?? {})
+    .filter((o) => o.draftRevision === draft?.revision)
+    .sort((a, b) => a.startedAt.localeCompare(b.startedAt))
+    .at(-1);
+  const lastVisualError =
+    lastVisualOp && lastVisualOp.status !== "running" && lastVisualOp.status !== "complete"
+      ? (lastVisualOp.error ?? text("visuals.failed"))
+      : null;
   useEffect(() => {
     if (!draft || isNew) return setCheck(null);
     let live = true;
@@ -402,6 +439,33 @@ function HubProject({
       toast.error((e as Error).message);
     } finally {
       setUploading(null);
+    }
+  };
+
+  const addUrl = async (url: string, kind: WebSourceKind) => {
+    setUrls((cur) => [...cur.filter((u) => u.url !== url), { url, kind, status: "fetching" }]);
+    try {
+      const pid = await ensureProject();
+      await hubApi.addUrl(pid, { url, kind });
+      setUrls((cur) => cur.filter((u) => u.url !== url));
+      if (pid !== id) onCreated(pid);
+      else await reload();
+    } catch (e) {
+      setUrls((cur) => cur.map((u) => (u.url === url ? { ...u, status: "failed" } : u)));
+      toast.error((e as Error).message);
+    }
+  };
+
+  const makeVisuals = async () => {
+    if (!draft) return;
+    setVisualsBusy(true);
+    try {
+      await hubApi.visuals(id, draft.revision);
+      await reload();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setVisualsBusy(false);
     }
   };
 
@@ -507,6 +571,8 @@ function HubProject({
           target={target}
           onTarget={setTarget}
           onFiles={addFiles}
+          onUrl={addUrl}
+          urls={urls}
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}
@@ -552,11 +618,11 @@ function HubProject({
           stars: 0,
           starred: false,
           trials: trialCount ?? 0,
-          image: null,
+          image: pictures.cover,
           comments: [],
         }}
         profile={draft.profile}
-        flow={<MethodFlow profile={draft.profile} />}
+        flow={<MethodFlow profile={draft.profile} visuals={pictures.steps} outputImages={pictures.outputs} />}
         onStar={() => undefined}
         onComment={() => undefined}
         onTry={() => setStep("trial")}
@@ -567,6 +633,15 @@ function HubProject({
     body = (
       <DraftStep
         draft={draft}
+        visuals={pictures.steps}
+        outputImages={pictures.outputs}
+        visualAction={{
+          busy: visualsBusy || Boolean(visualRun),
+          progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
+          has: Object.keys(pictures.steps).length + Object.keys(pictures.outputs).length > 0,
+          error: lastVisualError,
+          onMake: () => void makeVisuals(),
+        }}
         trialCount={trialCount ?? 0}
         checkIssues={issues}
         onFeedback={() => {
