@@ -4,42 +4,58 @@ import type {
   GenerateVisualsBody,
   MethodDraft,
   VisualOperation,
+  VisualSource,
+  VisualSourceInfo,
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { readAppDefaults } from "../../app-settings.ts";
 import { DEFAULT_IMAGE_MODELS, imageModelIssue } from "../../agent/image-tool.ts";
 import { DEFAULT_PROJECT_ID } from "../../config.ts";
 import { billingCountsTowardBudget, billingForProvider } from "../../cost/billing.ts";
 import { emptySnapshot, isBudgetExceeded, recordRun } from "../../cost/ledger.ts";
-import { CHATGPT_PROVIDERS, CODEX_IMAGE_MODEL, generateCodexImage } from "./codex-images.ts";
+import { CHATGPT_PROVIDERS, CODEX_IMAGE_MODEL, generateCodexImage, type ImageMime } from "./codex-images.ts";
+import { generateMiniMaxImage, MINIMAX_IMAGE_MODEL } from "./minimax-images.ts";
 import { AuthoringError, now, type AuthoringStore } from "./store.ts";
 
 export const VISUALS_LEDGER_SESSION = "gaid-hub-visuals";
+const EXTENSION: Record<ImageMime, string> = { "image/png": "png", "image/webp": "webp", "image/jpeg": "jpg" };
 export interface ImageGenerator {
   model: string;
-  generate(prompt: string): Promise<{ bytes: Uint8Array; mimeType: "image/png" | "image/webp" }>;
+  generate(prompt: string): Promise<{ bytes: Uint8Array; mimeType: ImageMime }>;
 }
-export type PrepareImageGenerator = () => Promise<ImageGenerator>;
+export type PrepareImageGenerator = (source?: VisualSource) => Promise<ImageGenerator>;
 const text = (v: AtlasTextInput) => (typeof v === "string" ? v : v.ko);
 
 /**
- * Picks the image source. A model saved in Settings → Defaults is used as chosen (same priceability, credentials and
- * billing as generate_image). Without one: the researcher's ChatGPT sign-in (subscription image model, user direction
- * 2026-10-16), else the first connected built-in default image model, else any connected priceable image model.
+ * Picks the image source. The researcher may name one ("chatgpt": ChatGPT sign-in, "minimax": MiniMax key, "model":
+ * the Settings/connected image model). Without a choice: a model saved in Settings → Defaults as chosen (same
+ * priceability, credentials and billing as generate_image); else the ChatGPT sign-in, the MiniMax key (user directions
+ * 2026-10-16), the first connected built-in default image model, any connected priceable image model.
  * Pictures are still made only on request.
  */
-export const prepareRuntimeImageGenerator: PrepareImageGenerator = async () => {
+export const prepareRuntimeImageGenerator: PrepareImageGenerator = async (source) => {
   const saved = readAppDefaults().imageModel;
   const { getModelRegistry, getModelRuntime } = await import("../../agent/session-registry.ts");
   const registry = getModelRegistry();
   const runtime = getModelRuntime();
+  if (source === "chatgpt" || source === "minimax") {
+    const generator =
+      source === "chatgpt" ? await chatGptImageGenerator(runtime) : await miniMaxImageGenerator(runtime);
+    if (!generator)
+      throw new AuthoringError(
+        source === "chatgpt"
+          ? "OpenAI Codex 로그인이 없습니다. 설정의 제공사에서 OpenAI Codex (legacy)로 로그인하세요. ChatGPT 로그인(Sign in with ChatGPT)은 그림 생성을 허용하지 않습니다."
+          : "MiniMax 키가 없습니다. 설정의 제공사에서 MiniMax 키를 넣으세요.",
+      );
+    return generator;
+  }
   const refOf = (m: { provider: string; id: string }) => `${m.provider}/${m.id}`;
   if (saved && imageModelIssue(registry, saved))
     throw new AuthoringError(
       "이미지 모델을 사용할 수 없습니다. 설정에서 사용량을 계산할 수 있는 이미지 모델을 선택하세요.",
     );
-  if (!saved) {
-    const chatgpt = await chatGptImageGenerator(runtime);
-    if (chatgpt) return chatgpt;
+  if (!saved && source !== "model") {
+    const subscription = (await chatGptImageGenerator(runtime)) ?? (await miniMaxImageGenerator(runtime));
+    if (subscription) return subscription;
   }
   const available = (await registry.getAvailableOfType("image")).filter((m) => !imageModelIssue(registry, refOf(m)));
   let model: (typeof available)[number] | undefined;
@@ -147,6 +163,55 @@ export async function chatGptImageGenerator(
   };
 }
 
+/** A generator on the MiniMax key (M Plan: one shared quota), ledgered as subscription at $0; null without a key. */
+export async function miniMaxImageGenerator(
+  runtime: RuntimeAuth,
+  fetchImpl?: typeof fetch,
+): Promise<ImageGenerator | null> {
+  const check = await runtime.checkAuth("minimax").catch(() => undefined);
+  if (!check) return null;
+  const ref = `minimax/${MINIMAX_IMAGE_MODEL}`;
+  const billing = { provider: "minimax", authType: check.type, billingMode: "subscription" as const };
+  return {
+    model: ref,
+    async generate(prompt) {
+      const key = (await runtime.getAuth("minimax"))?.auth.apiKey;
+      if (!key) throw new AuthoringError("MiniMax 키가 없습니다. 설정의 제공사에서 MiniMax 키를 넣으세요.", 401);
+      const image = await generateMiniMaxImage(key, prompt, fetchImpl ? { fetch: fetchImpl } : {});
+      recordRun({
+        projectId: DEFAULT_PROJECT_ID,
+        sessionId: VISUALS_LEDGER_SESSION,
+        role: "agent",
+        model: ref,
+        billing,
+        before: emptySnapshot(),
+        after: { costUsd: 0, input: 0, output: 0, cacheRead: 0, total: 0 },
+      });
+      return image;
+    },
+  };
+}
+
+/** Image sources the researcher can pick for concept pictures, with whether each is connected now. */
+export async function listVisualSources(): Promise<VisualSourceInfo[]> {
+  const { getModelRegistry, getModelRuntime } = await import("../../agent/session-registry.ts");
+  const runtime = getModelRuntime();
+  const registry = getModelRegistry();
+  const chatgpt = await chatGptImageGenerator(runtime);
+  const minimax = await miniMaxImageGenerator(runtime);
+  const images = await registry.getAvailableOfType("image").catch(() => []);
+  const model = images.find((m) => !imageModelIssue(registry, `${m.provider}/${m.id}`));
+  return [
+    { id: "chatgpt", available: Boolean(chatgpt), model: chatgpt?.model ?? null },
+    { id: "minimax", available: Boolean(minimax), model: minimax?.model ?? null },
+    {
+      id: "model",
+      available: Boolean(readAppDefaults().imageModel || model),
+      model: readAppDefaults().imageModel ?? (model ? `${model.provider}/${model.id}` : null),
+    },
+  ];
+}
+
 export function conceptPrompt(draft: MethodDraft, key: string) {
   const title = text(draft.profile.title);
   const node = key === "cover" ? undefined : draft.profile.procedure.nodes.find((n) => n.id === key);
@@ -211,7 +276,9 @@ export async function startVisuals(
     ),
     ...outputs.map((o) => `output:${o.id}`),
   ];
-  const generator = await prepare();
+  if (body.source !== undefined && !["chatgpt", "minimax", "model"].includes(body.source))
+    throw new AuthoringError("그림 출처를 확인해 주세요.");
+  const generator = await prepare(body.source);
   const claimed = await store.mutate(projectId, (p) => {
     const old = Object.hasOwn(p.visualOperations ?? {}, body.opId) ? p.visualOperations![body.opId] : undefined;
     if (old) return { operation: old, fresh: false };
@@ -238,7 +305,7 @@ export async function startVisuals(
         const result = await generator.generate(prompt);
         if (!result.bytes.length || result.bytes.length > 30 * 1024 * 1024)
           throw new AuthoringError("생성한 그림이 비어 있거나 30 MiB를 넘습니다.");
-        const file = `visuals/${body.opId}/${keys.indexOf(key)}.${result.mimeType === "image/webp" ? "webp" : "png"}`;
+        const file = `visuals/${body.opId}/${keys.indexOf(key)}.${EXTENSION[result.mimeType]}`;
         await store.writeFile(projectId, file, result.bytes);
         await store.mutate(projectId, (p) => {
           const previous = Object.hasOwn(p.visuals ?? {}, key) ? p.visuals![key] : undefined;

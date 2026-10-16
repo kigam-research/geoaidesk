@@ -122,7 +122,7 @@
       "path": "server/src/agent/session-registry.ts",
       "owner": "gaid-runtime",
       "status": "edited",
-      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode."
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode. gaid-hub: one call to registerGeoProviderModels (server/src/geo/providers.ts) after setupModelRuntime."
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",

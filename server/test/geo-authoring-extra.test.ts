@@ -49,7 +49,9 @@ vi.mock("../src/agent/session-registry.ts", () => ({
     getAvailableOfType: async () => (mocks.connected ? [mocks.model] : []),
     generateImages: mocks.generate,
   }),
-  getModelRuntime: () => ({ checkAuth: async () => ({ type: "api_key" }) }),
+  getModelRuntime: () => ({
+    checkAuth: async (provider: string) => (provider === "openrouter" ? { type: "api_key" } : undefined),
+  }),
 }));
 vi.mock("../src/cost/ledger.ts", async (original) => ({
   ...(await original<typeof import("../src/cost/ledger.ts")>()),

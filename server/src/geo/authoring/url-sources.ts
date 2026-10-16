@@ -42,8 +42,7 @@ export async function validateSourceUrl(value: string, signal?: AbortSignal): Pr
   } catch {
     throw new AuthoringError("URL 형식을 확인해 주세요.");
   }
-  if (!["http:", "https:"].includes(url.protocol))
-    throw new AuthoringError("http 또는 https URL만 받을 수 있습니다.");
+  if (!["http:", "https:"].includes(url.protocol)) throw new AuthoringError("http 또는 https URL만 받을 수 있습니다.");
   if (url.username || url.password) throw new AuthoringError("인증 정보가 포함된 URL은 받을 수 없습니다.");
   const host = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
   const allow = (process.env.GAID_URL_SOURCE_ALLOW || "")
@@ -51,9 +50,7 @@ export async function validateSourceUrl(value: string, signal?: AbortSignal): Pr
     .map((x) => x.trim().toLowerCase())
     .filter(Boolean);
   if (allow.includes(host)) return url;
-  const addresses = isIP(host)
-    ? [{ address: host }]
-    : await withinDeadline(lookup(host, { all: true }), signal);
+  const addresses = isIP(host) ? [{ address: host }] : await withinDeadline(lookup(host, { all: true }), signal);
   if (
     !addresses.length ||
     addresses.some(({ address }) => blocked.check(address, isIP(address) === 6 ? "ipv6" : "ipv4"))
@@ -88,8 +85,7 @@ export function readableHtml(html: string): { title: string; text: string } {
   const parser = new Parser(
     {
       onopentag(tag, attrs) {
-        const hidden =
-          stack.at(-1)?.skip || skip.has(tag) || "hidden" in attrs || attrs["aria-hidden"] === "true";
+        const hidden = stack.at(-1)?.skip || skip.has(tag) || "hidden" in attrs || attrs["aria-hidden"] === "true";
         stack.push({ tag, skip: !!hidden });
         if (tag === "title") inTitle = true;
         if (!hidden && breaks.has(tag)) out.push("\n\n");
@@ -198,8 +194,7 @@ export async function addUrlSource(
         url = await validateSourceUrl(new URL(location, url).href, signal);
         continue;
       }
-      if (!response.ok)
-        throw new AuthoringError(`웹 서버가 자료를 제공하지 않았습니다 (HTTP ${response.status}).`);
+      if (!response.ok) throw new AuthoringError(`웹 서버가 자료를 제공하지 않았습니다 (HTTP ${response.status}).`);
       break;
     }
     const limit = Math.min(options.limitBytes ?? SOURCE_LIMIT_BYTES, SOURCE_LIMIT_BYTES);
@@ -225,10 +220,7 @@ export async function addUrlSource(
     source.size = bytes.length;
     source.sha256 = sha256(bytes);
     source.fetch!.contentHash = source.sha256;
-    source.mediaType = (response.headers.get("content-type") || "text/html")
-      .split(";")[0]
-      .trim()
-      .toLowerCase();
+    source.mediaType = (response.headers.get("content-type") || "text/html").split(";")[0].trim().toLowerCase();
     const original = await store.writeFile(projectId, `sources/${source.id}/original`, bytes);
     if (source.mediaType === "application/pdf") {
       source.kind = "pdf";
@@ -238,8 +230,7 @@ export async function addUrlSource(
     } else {
       if (!["text/html", "application/xhtml+xml", "text/plain"].includes(source.mediaType))
         throw new AuthoringError("PDF, HTML 또는 텍스트 자료만 읽을 수 있습니다.");
-      const charset =
-        /charset=["']?([^;\s"']+)/i.exec(response.headers.get("content-type") || "")?.[1] || "utf-8";
+      const charset = /charset=["']?([^;\s"']+)/i.exec(response.headers.get("content-type") || "")?.[1] || "utf-8";
       const content = new TextDecoder(charset).decode(bytes);
       const parsed = source.mediaType === "text/plain" ? { title: "", text: content } : readableHtml(content);
       source.title = parsed.title || undefined;
@@ -273,8 +264,7 @@ export async function addUrlSource(
     p.sources.push(source);
     p.extractions[source.id] = extraction;
     p.sourceRevision++;
-    if (p.title === "새 방법" && p.sources.length === 1)
-      p.title = (source.title || source.name).slice(0, 120);
+    if (p.title === "새 방법" && p.sources.length === 1) p.title = (source.title || source.name).slice(0, 120);
   });
   return { source, extraction };
 }

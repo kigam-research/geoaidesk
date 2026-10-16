@@ -75,6 +75,7 @@ import { LEAD_DEFAULT_TOOLS, LEAD_EXCLUDED_TOOLS } from "./tools.ts";
 import { seedSubagentRuntimeSettings } from "./subagent-runtime-settings.ts";
 import { applyVerifierDefault } from "./verifier-models.ts";
 import { geoSessionParts } from "../geo/session.ts";
+import { registerGeoProviderModels } from "../geo/providers.ts";
 import type { ExposureMode } from "../geo/context.ts";
 
 // Entry points normally establish this in env.ts. Keep the registry safe when
@@ -100,6 +101,7 @@ const modelRuntime = await ModelRuntime.create({
   authPath: path.join(KADY_PI_AGENT_DIR, "auth.json"),
 });
 await setupModelRuntime(modelRuntime);
+registerGeoProviderModels(modelRuntime); // GeoAIDesk: models Pi's catalogue lacks (server/src/geo/providers.ts)
 const modelRegistry = new ModelRegistry(modelRuntime);
 
 export function getModelRuntime(): ModelRuntime {

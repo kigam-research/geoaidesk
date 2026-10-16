@@ -1,13 +1,18 @@
 import type { FastifyInstance } from "fastify";
-import type { AddUrlSourceBody, GenerateVisualsBody } from "../../../../web/src/geo/contracts/authoring.ts";
+import type {
+  AddUrlSourceBody,
+  GenerateVisualsBody,
+  VisualSourceInfo,
+} from "../../../../web/src/geo/contracts/authoring.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { AuthoringError, type AuthoringStore } from "../authoring/store.ts";
 import { addUrlSource, type UrlSourceOptions } from "../authoring/url-sources.ts";
-import { startVisuals, type PrepareImageGenerator } from "../authoring/visuals.ts";
+import { listVisualSources, startVisuals, type PrepareImageGenerator } from "../authoring/visuals.ts";
 
 export interface AuthoringExtraOptions {
   store?: AuthoringStore;
   prepareImageGenerator?: PrepareImageGenerator;
+  listVisualSources?: () => Promise<VisualSourceInfo[]>;
   url?: UrlSourceOptions;
 }
 export async function registerGeoAuthoringExtraRoutes(
@@ -31,6 +36,9 @@ export async function registerGeoAuthoringExtraRoutes(
       reply.header("Cache-Control", "no-store");
       return payload;
     });
+    scope.get("/geo/authoring/visual-sources", async () => ({
+      sources: options.listVisualSources ? await options.listVisualSources() : await listVisualSources(),
+    }));
     scope.post<{ Params: { id: string }; Body: AddUrlSourceBody }>(
       "/geo/authoring/projects/:id/sources/url",
       async (req) => addUrlSource(store, req.params.id, req.body, options.url),
@@ -40,8 +48,7 @@ export async function registerGeoAuthoringExtraRoutes(
       Body: GenerateVisualsBody;
     }>("/geo/authoring/projects/:id/drafts/:rev/visuals", async (req, reply) => {
       const revision = Number(req.params.rev);
-      if (!Number.isSafeInteger(revision) || revision < 1)
-        throw new AuthoringError("초안 번호를 확인해 주세요.");
+      if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("초안 번호를 확인해 주세요.");
       const { operation, completion } = await startVisuals(
         store,
         req.params.id,
@@ -61,7 +68,10 @@ export async function registerGeoAuthoringExtraRoutes(
           ? project.visuals![req.params.key]
           : undefined;
         if (!visual) throw new AuthoringError("개념 그림을 찾을 수 없습니다.", 404);
-        reply.header("Content-Type", visual.file.endsWith(".webp") ? "image/webp" : "image/png");
+        reply.header(
+          "Content-Type",
+          visual.file.endsWith(".webp") ? "image/webp" : visual.file.endsWith(".jpg") ? "image/jpeg" : "image/png",
+        );
         reply.header("X-Content-Type-Options", "nosniff");
         return reply.send(await store.readFile(project.id, visual.file));
       },

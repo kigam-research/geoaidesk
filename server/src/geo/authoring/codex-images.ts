@@ -7,8 +7,14 @@
 import { AuthoringError } from "./store.ts";
 
 export const CODEX_IMAGE_MODEL = "gpt-image-2";
-/** Pi providers whose OAuth login is a ChatGPT account (current first). */
-export const CHATGPT_PROVIDERS = ["openai", "openai-codex"] as const;
+export type ImageMime = "image/png" | "image/webp" | "image/jpeg";
+/**
+ * Pi providers whose OAuth token reaches the ChatGPT Codex backend. Only the legacy "OpenAI Codex" login qualifies:
+ * the current "Sign in with ChatGPT" (`openai`) token is for api.openai.com subscription sharing, which refuses image
+ * generation ("subscription_sharing_unsupported_capability", checked 2026-10-16) and the Images API
+ * ("rejected_by_hardened_oauth_boundary").
+ */
+export const CHATGPT_PROVIDERS = ["openai-codex"] as const;
 const DEFAULT_BACKEND = "https://chatgpt.com/backend-api";
 const JWT_CLAIM_PATH = "https://api.openai.com/auth";
 const MAX_IMAGE_BYTES = 32 * 1024 * 1024;
@@ -41,7 +47,7 @@ export async function generateCodexImage(
   auth: ChatGptAuth,
   prompt: string,
   options: { fetch?: typeof fetch; signal?: AbortSignal } = {},
-): Promise<{ bytes: Uint8Array; mimeType: "image/png" | "image/webp" }> {
+): Promise<{ bytes: Uint8Array; mimeType: ImageMime }> {
   const response = await (options.fetch ?? fetch)(codexImagesUrl(auth.baseUrl), {
     method: "POST",
     signal: options.signal ?? AbortSignal.timeout(5 * 60_000),
@@ -66,7 +72,8 @@ export async function generateCodexImage(
   const png = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
   const webp =
     bytes.subarray(0, 4).toString("latin1") === "RIFF" && bytes.subarray(8, 12).toString("latin1") === "WEBP";
-  if (!png && !webp)
-    throw new AuthoringError("ChatGPT 구독 이미지 모델이 PNG 또는 WebP 그림을 반환하지 않았습니다.", 422);
-  return { bytes, mimeType: png ? "image/png" : "image/webp" };
+  const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  if (!png && !webp && !jpeg)
+    throw new AuthoringError("ChatGPT 구독 이미지 모델이 그림 파일을 반환하지 않았습니다.", 422);
+  return { bytes, mimeType: png ? "image/png" : webp ? "image/webp" : "image/jpeg" };
 }

@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { MethodDraft } from "@/geo/contracts/authoring";
+import type { MethodDraft, VisualSource, VisualSourceInfo } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
 import { MethodFlow, type StepVisual } from "./method-flow";
@@ -40,6 +40,9 @@ export function DraftStep({
     has: boolean;
     error: string | null;
     onMake: () => void;
+    sources: VisualSourceInfo[];
+    source: VisualSource | null;
+    onSource: (source: VisualSource) => void;
   };
   /** Register the draft in the shared GAID hub (others can star and comment). */
   onRegister?: () => void;
@@ -94,8 +97,30 @@ export function DraftStep({
                 {visualAction.error && !visualAction.busy && (
                   <span className="text-xs text-destructive">{visualAction.error}</span>
                 )}
-                <span className="text-xs text-muted-foreground">{text("visuals.note")}</span>
-                <Button variant="outline" size="sm" disabled={visualAction.busy} onClick={visualAction.onMake}>
+                {visualAction.sources.length > 0 && (
+                  <select
+                    aria-label={text("visuals.sourceLabel")}
+                    className="h-8 rounded-md border bg-background px-2 text-sm"
+                    value={visualAction.source ?? ""}
+                    onChange={(e) => visualAction.onSource(e.target.value as VisualSource)}
+                  >
+                    {visualAction.sources.map((s) => (
+                      <option key={s.id} value={s.id} disabled={!s.available}>
+                        {text(`visuals.source.${s.id}`)}
+                        {s.available ? "" : ` (${text("visuals.notConnected")})`}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  {visualAction.source === "model" ? text("visuals.notePaid") : text("visuals.note")}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={visualAction.busy || (visualAction.sources.length > 0 && !visualAction.source)}
+                  onClick={visualAction.onMake}
+                >
                   {visualAction.busy ? (
                     <LoaderCircleIcon data-icon="inline-start" className="animate-spin" />
                   ) : (

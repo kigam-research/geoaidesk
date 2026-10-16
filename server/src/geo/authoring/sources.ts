@@ -317,7 +317,20 @@ export async function pageImage(
   const dir = await mkdtemp(join(tmpdir(), "authoring-page-"));
   try {
     const root = join(dir, "page");
-    const r = await run("pdftoppm", ["-png", "-f", String(page), "-l", String(page), "-scale-to-x", String(w), "-scale-to-y", "-1", "-singlefile", original, root]);
+    const r = await run("pdftoppm", [
+      "-png",
+      "-f",
+      String(page),
+      "-l",
+      String(page),
+      "-scale-to-x",
+      String(w),
+      "-scale-to-y",
+      "-1",
+      "-singlefile",
+      original,
+      root,
+    ]);
     const png = r.code === 0 ? await readFile(`${root}.png`).catch(() => null) : null;
     if (!png?.length) throw new AuthoringError("쪽 그림을 만들지 못했습니다.", 422);
     await store.writeFile(projectId, cached, png);

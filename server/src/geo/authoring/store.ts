@@ -45,7 +45,8 @@ export class AuthoringStore {
       if (
         !p.attempts.some((a) => a.outcome === "running") &&
         !Object.values(p.visualOperations ?? {}).some((o) => o.status === "running")
-      ) continue;
+      )
+        continue;
       await this.mutate(id, (project) => {
         for (const op of Object.values(project.visualOperations ?? {})) {
           if (op.status === "running") {

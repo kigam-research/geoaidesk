@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T07:30:18Z
+updated: 2026-10-16T08:44:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -119,6 +119,15 @@ endpoint Codex CLI uses with ChatGPT auth (`https://chatgpt.com/backend-api/code
 image model is saved in Settings; ledgered as subscription ($0). The user signs in on the GAID server running on their PC
 (dev instance http://localhost:3330 → Settings → Providers → OpenAI "Sign in with ChatGPT"); never read ~/.codex/auth.json.
 
+## User direction on MiniMax (verbatim, 2026-10-16, writer tab)
+> "openai와 minimax를 연결하였다. 그리고 사용자의 구독에서는 minimax는 3.1 preview를 사용할 수 있으며, 이미지 생성까지 지원하고 있다. 아래의 내용을 확인하고 BYOK의 업데이트 내용을 확인하거나 provider 연결 옵션을 확인하여 minimax 3.1preview를 사용할 수 있게 하고 이미지 생성도 해당모델을 사용할 수 있게 하자." (pasted tier: Max, M3.1 Flash Preview / image / speech, one shared quota, 1M context; https://platform.minimax.io/docs/api-reference/api-overview)
+Findings: upstream k-dense-byok has no commits after the base 44c52ce; Pi 1.0.0 and the newest 1.3.0 list only MiniMax-M2.7,
+-M2.7-highspeed, -M3 and no MiniMax image models. MiniMax docs: chat id `MiniMax-M3.1-Flash-Preview` (M Plan / MiniMax Code
+only, Anthropic-compatible `https://api.minimax.io/anthropic`, 1M); image `POST https://api.minimax.io/v1/image_generation`,
+model `image-01`, Bearer key, `response_format: base64` → `data.image_base64[]`, `base_resp.status_code` 0 ok.
+Plan: GAID registers M3.1 Flash Preview on Pi's `minimax` provider at startup (cost 0: plan-only model); concept pictures
+get a MiniMax image-01 source beside the ChatGPT source, and the draft's "개념 그림 만들기" lets the researcher pick the source.
+
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).
   skill_hub reference snapshot (read-only, never a runtime dependency): main 54fe4773d06fcb3d0dc36882d5cd44d9094cade5,
@@ -191,7 +200,13 @@ Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No f
    subscription ledger; 23 tests pass, no real call yet). Dev instance gaid-hub-dev running again (3330/18330) for the
    user's sign-in. After sign-in: make concept pictures for one draft, check them, update the report (§5/§6, figures),
    stop the dev unit, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
-Blocked: waiting for the user to sign in with ChatGPT on the dev instance (http://localhost:3330 → Settings → Providers → OpenAI "Sign in with ChatGPT").
+7. MiniMax (user direction above): M3.1 Flash Preview registered on `minimax` (carrying over Pi's built-ins); live chat on the
+   dev instance answered in Korean, ledgered payg $0. MiniMax image-01 source live: 4 JPEG pictures 1248x832 for the smoke
+   draft (op-minimax-test-1); the zone-map picture is only a filled outline (weak). Picture source picker in the draft.
+   ChatGPT: "Sign in with ChatGPT" (openai) refuses images (Images API: rejected_by_hardened_oauth_boundary; Responses
+   image_generation: subscription_sharing_unsupported_capability; probes ~/data/geoaidesk/work/gaid-hub/tools/). Only the
+   legacy "OpenAI Codex" login (chatgpt.com Codex backend, Codex CLI's images path) remains; code now uses that login only.
+Blocked: waiting for the user to sign in with "OpenAI Codex (legacy)" on the dev instance (http://localhost:3330 → Settings → Providers), to test ChatGPT pictures.
 
 ## Failed approaches
 ## Notes and decisions

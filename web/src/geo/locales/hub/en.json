@@ -288,7 +288,15 @@
     "remake": "Remake concept pictures",
     "starting": "Requesting concept pictures",
     "making": "Making concept pictures ({done}/{total})",
-    "note": "Uses the ChatGPT subscription when signed in, else the image model is billed per call",
-    "failed": "Could not make the concept pictures."
+    "note": "Uses the subscription quota",
+    "failed": "Could not make the concept pictures.",
+    "notePaid": "Image model billed per call",
+    "sourceLabel": "Picture source",
+    "notConnected": "not connected",
+    "source": {
+      "chatgpt": "OpenAI Codex subscription",
+      "minimax": "MiniMax subscription",
+      "model": "Image model"
+    }
   }
 }
