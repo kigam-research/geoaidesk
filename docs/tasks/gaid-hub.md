@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T06:20:29Z
+updated: 2026-10-16T06:46:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -97,6 +97,14 @@ the sharing/discussion space, GAID projects are the personal research space.
   label Ni_mine) from the pinned examples asset geo-catalogue/0.2.1 geo-examples-0.2.1.tar.gz
   `examples/kigam/spatial-pu-workflow/yilgarn-40km/repo/web/datasets/yilgarn/yilgarn_40km.csv` (sha256 49b7855e…f151;
   extracted copy ~/data/geoaidesk/work/gaid-hub/inputs/yilgarn-40km/), with the method's quick mode.
+
+## User feedback 3 (verbatim, 2026-10-16 ~15:40, writer tab, with a screenshot of the preview page of "smoke")
+"중간 피드백이다. 허브에서 보이는 화면에서 아래의 내용처럼 텍스트가 많은 부분은 시인성이 좋게 표시되고 웹 상에서 디자인적으로
+상품성 및 마케팅성 있게 보여야 한다. 이외에도 문구들의 색상, 구성, 배치에서 시인성, 상품성, 마케팅성을 고려하여 UI/UX를
+개선하여야 한다." (quoted example: the long method summary paragraph on the preview/shared page)
+Plan: redesign the hub screens for readability and product feel (hero with tagline + key facts strip from the profile
+instead of one paragraph, structured summary, colour/hierarchy pass over home, shared/preview, draft, questions);
+infographic agent review of the screenshots (user rule from feedback 2), then present to the user.
 
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).

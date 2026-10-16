@@ -27,7 +27,12 @@
     "newFolder": "New folder",
     "allFolders": "All",
     "registered": "In hub · rev {n}",
-    "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project."
+    "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project.",
+    "flow": {
+      "make": "Build from papers and code",
+      "register": "Register in the hub",
+      "feedback": "Get stars and comments"
+    }
   },
   "stage": {
     "sources": "Sources received",
@@ -237,15 +242,16 @@
     "registeredAt": "registered {when}"
   },
   "flow": {
-    "decide": "You decide: {question}"
+    "decide": "You decide: {question}",
+    "stepOf": "Step {n} of {total}"
   },
   "io": {
-    "tableCaption": "Example of {label} ({formats}) · example values",
-    "boundaryCaption": "Example of {label} ({formats}) · example shape",
     "paperFigure": "Paper figure",
     "generated": "Concept image (generated)",
     "noImage": "No image",
-    "exampleTable": "Example table · example values"
+    "exampleTable": "Example table · example values",
+    "exampleOf": "Example values · {formats}",
+    "shapeOf": "Example shape · {formats}"
   },
   "user": {
     "title": "Name in the hub",
@@ -258,5 +264,15 @@
     "name": "Folder name",
     "placeholder": "e.g. Mineral exploration",
     "create": "Create folder"
+  },
+  "overview": {
+    "in": "Inputs",
+    "out": "Results",
+    "process": "Method",
+    "steps": "{count, plural, one {# step} other {# steps}}",
+    "gates": "{count, plural, one {# researcher decision} other {# researcher decisions}}",
+    "more": "{count} more",
+    "about": "About this method",
+    "limits": "Limits and cautions ({count})"
   }
 }

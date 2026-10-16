@@ -6,7 +6,7 @@
  * agent record open only on request.
  */
 import { FileTextIcon, FlaskConicalIcon, PencilLineIcon, Share2Icon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
 import { MethodFlow, type StepVisual } from "./method-flow";
+import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
 
 const text = geoText("hub");
@@ -53,14 +54,14 @@ export function DraftStep({
       <div className="flex min-h-0 flex-col gap-5 overflow-y-auto pr-1">
         <header className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-semibold tracking-tight">{localText(profile.title)}</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{localText(profile.title)}</h2>
             <Badge variant="secondary">{text("draft.private")}</Badge>
             <Badge variant="outline">
               {trialCount > 0 ? text("draft.tested", { count: trialCount }) : text("draft.untested")}
             </Badge>
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
           </div>
-          <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{localText(profile.tagline)}</p>
+          <p className="max-w-3xl text-base leading-7 text-foreground/80">{localText(profile.tagline)}</p>
           {onRegister && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
               <Share2Icon className="size-5 text-primary" aria-hidden />
@@ -74,12 +75,14 @@ export function DraftStep({
           )}
         </header>
 
+        <OverviewBand profile={profile} />
+
         <section className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold">{text("draft.flow")}</h3>
+          <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
           <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
         </section>
 
-        <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} full />
+        <LimitsCard profile={profile} />
 
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={onFeedback}>
@@ -101,33 +104,6 @@ export function DraftStep({
         </div>
       </div>
       <aside className="flex min-h-0 flex-col gap-4">{rail}</aside>
-    </div>
-  );
-}
-
-/** A short list; longer ones open with "모두 보기". `full` (limits) never shortens an item: limits are not cut. */
-function Facts({ title, items, full = false }: { title: string; items: string[]; full?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const shown = open ? items : items.slice(0, 3);
-  return (
-    <div className="flex flex-col gap-2 rounded-xl border p-3">
-      <h3 className="text-sm font-semibold">{title}</h3>
-      <ul className="flex flex-col gap-1 text-sm text-muted-foreground">
-        {shown.map((item, i) => (
-          <li key={i} className={full || open ? undefined : "line-clamp-2"}>
-            {item}
-          </li>
-        ))}
-      </ul>
-      {(items.length > 3 || (!full && items.some((item) => item.length > 60))) && (
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="self-start text-xs text-primary underline-offset-4 hover:underline"
-        >
-          {open ? text("draft.showLess") : text("draft.showAll", { count: items.length })}
-        </button>
-      )}
     </div>
   );
 }

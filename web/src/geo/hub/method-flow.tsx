@@ -3,7 +3,7 @@
  * Method flow, vertical: the steps as stacked boxes on the left; the chosen step's explanation, its concept picture
  * and the shape of its inputs and outputs on the right.
  */
-import { ChevronRightIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
+import { CheckIcon, ChevronRightIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { DraftProfile, ProcedureNode } from "@/geo/contracts/authoring";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 import { orderedNodes } from "./flow-diagram";
 import { InputExample, ResultExample } from "./io-examples";
+import { shortLabel } from "./method-overview";
 import { localText } from "./text";
 
 const text = geoText("hub");
@@ -45,7 +46,16 @@ export function MethodFlow({
           </li>
         ))}
       </ol>
-      {node && <StepDetail node={node} profile={profile} visual={visuals[node.id]} outputImages={outputImages} />}
+      {node && (
+        <StepDetail
+          node={node}
+          index={nodes.indexOf(node)}
+          total={nodes.length}
+          profile={profile}
+          visual={visuals[node.id]}
+          outputImages={outputImages}
+        />
+      )}
     </div>
   );
 }
@@ -69,34 +79,56 @@ function StepBox({
       onClick={onSelect}
       aria-current={active ? "step" : undefined}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg border bg-card px-3 py-2.5 text-left text-sm transition-colors hover:border-primary/60",
-        gate && "border-amber-300 bg-amber-50/60 dark:border-amber-700 dark:bg-amber-950/30",
-        active && "border-primary ring-2 ring-primary/20",
+        "group flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 text-left text-sm transition-all hover:border-primary/60 hover:shadow-sm",
+        gate && !active && "border-amber-300 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-950/30",
+        active && "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20",
       )}
     >
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+      <span
+        className={cn(
+          "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+          active ? "bg-primary-foreground text-primary" : "bg-primary/10 text-primary",
+        )}
+      >
         {index + 1}
       </span>
       <span className="min-w-0 flex-1 font-medium leading-snug">{localText(node.label)}</span>
       {gate && (
-        <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1 text-xs font-medium",
+            active ? "text-primary-foreground/90" : "text-amber-700 dark:text-amber-400",
+          )}
+        >
           <UserRoundCheckIcon className="size-3.5" aria-hidden />
           {text("draft.you")}
         </span>
       )}
-      {Icon && <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
-      <ChevronRightIcon className={cn("size-4 shrink-0 text-muted-foreground", active && "text-primary")} aria-hidden />
+      {Icon && (
+        <Icon
+          className={cn("size-4 shrink-0", active ? "text-primary-foreground/80" : "text-muted-foreground")}
+          aria-hidden
+        />
+      )}
+      <ChevronRightIcon
+        className={cn("size-4 shrink-0", active ? "text-primary-foreground" : "text-muted-foreground")}
+        aria-hidden
+      />
     </button>
   );
 }
 
 function StepDetail({
   node,
+  index,
+  total,
   profile,
   visual,
   outputImages,
 }: {
   node: ProcedureNode;
+  index: number;
+  total: number;
   profile: DraftProfile;
   visual?: StepVisual;
   outputImages: Record<string, StepVisual>;
@@ -106,9 +138,15 @@ function StepDetail({
   const outputs = profile.outputs.filter((p) => node.type === "output" || node.outputs?.includes(p.id));
   const decisions = (profile.userDecisions ?? []).filter((d) => d.at === node.id);
   return (
-    <section className="flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-4" aria-live="polite">
-      <div className="flex flex-col gap-1.5">
-        <h3 className="flex items-center gap-2 text-lg font-semibold">
+    <section
+      className="flex min-w-0 flex-col gap-5 self-start rounded-2xl border bg-card p-5 shadow-sm md:sticky md:top-16"
+      aria-live="polite"
+    >
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-semibold tracking-wide text-primary">
+          {text("flow.stepOf", { n: index + 1, total })}
+        </p>
+        <h3 className="flex flex-wrap items-center gap-2 text-xl font-bold tracking-tight">
           {localText(node.label)}
           {gate && (
             <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 dark:text-amber-400">
@@ -117,16 +155,28 @@ function StepDetail({
             </span>
           )}
         </h3>
-        <p className="text-sm leading-relaxed">{localText(node.summary)}</p>
+        <p className="text-[15px] leading-7">{localText(node.summary)}</p>
         {decisions.map((d) => (
-          <p key={d.id} className="text-sm text-amber-800 dark:text-amber-300">
+          <p
+            key={d.id}
+            className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+          >
+            <UserRoundCheckIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
             {text("flow.decide", { question: localText(d.question) })}
           </p>
         ))}
         {node.checks && node.checks.length > 0 && (
-          <p className="text-sm text-muted-foreground">
-            {text("draft.checks")}: {node.checks.map(localText).join(" · ")}
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs font-semibold text-muted-foreground">{text("draft.checks")}</p>
+            <ul className="flex flex-wrap gap-1.5">
+              {node.checks.map((c, i) => (
+                <li key={i} className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs">
+                  <CheckIcon className="size-3.5 text-primary" aria-hidden />
+                  {localText(c)}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
       {visual && (
@@ -142,22 +192,41 @@ function StepDetail({
         <div className="grid gap-4 lg:grid-cols-2">
           {inputs.map((p) => (
             <div key={p.id} className="flex flex-col gap-1.5">
-              <h4 className="text-sm font-semibold">
-                {text("draft.inputs")}: {localText(p.label)}
-              </h4>
+              <PortHeading kind="in" label={localText(p.label)} />
               <InputExample port={p} />
             </div>
           ))}
           {outputs.map((p) => (
             <div key={p.id} className="flex flex-col gap-1.5">
-              <h4 className="text-sm font-semibold">
-                {text("draft.outputs")}: {localText(p.label)}
-              </h4>
+              <PortHeading kind="out" label={localText(p.label)} />
               <ResultExample port={p} image={outputImages[p.id]?.src} imageKind={outputImages[p.id]?.kind} />
             </div>
           ))}
         </div>
       )}
     </section>
+  );
+}
+
+/** "입력"/"결과" chip, the short port name, and its full description underneath when it differs. */
+function PortHeading({ kind, label }: { kind: "in" | "out"; label: string }) {
+  const short = shortLabel(label);
+  return (
+    <div className="flex flex-col gap-0.5">
+      <h4 className="flex items-center gap-2 text-sm font-semibold">
+        <span
+          className={cn(
+            "rounded px-1.5 py-0.5 text-[11px] font-semibold",
+            kind === "in"
+              ? "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300"
+              : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+          )}
+        >
+          {kind === "in" ? text("draft.inputs") : text("draft.outputs")}
+        </span>
+        {short}
+      </h4>
+      {short !== label && <p className="text-xs leading-5 text-muted-foreground">{label}</p>}
+    </div>
   );
 }

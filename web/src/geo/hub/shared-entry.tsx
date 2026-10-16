@@ -18,6 +18,7 @@ import { InputPrep } from "./input-prep";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
 import { hubUserName, sharedHub } from "./shared-api";
+import { localText } from "./text";
 
 const text = geoText("hub");
 
@@ -60,6 +61,7 @@ export function SharedEntryScreen({
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
 }) {
   const [detail, setDetail] = useState<HubEntryDetail | null>(null);
+  const [folders, setFolders] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [useOpen, setUseOpen] = useState(false);
   const named = useNamedAction();
@@ -68,6 +70,8 @@ export function SharedEntryScreen({
     try {
       setDetail(await sharedHub.entry(entryId));
       setError(null);
+      const list = await sharedHub.folders().catch(() => ({ folders: [] }));
+      setFolders(Object.fromEntries(list.folders.map((f) => [f.id, f.name])));
     } catch (e) {
       setError((e as Error).message);
     }
@@ -102,9 +106,10 @@ export function SharedEntryScreen({
         method={{
           id: e.id,
           title: e.title,
-          summary: e.summary,
+          tagline: localText(detail.profile.tagline),
+          summary: localText(detail.profile.summary) || e.summary,
           author: e.author,
-          folder: e.folderId,
+          folder: folders[e.folderId] ?? null,
           revision: e.latestRevision,
           registeredAt: latest ? text("shared.registeredAt", { when: when(latest.registeredAt) }) : "",
           kind: e.kind,
@@ -121,6 +126,7 @@ export function SharedEntryScreen({
             revision: c.revision,
           })),
         }}
+        profile={detail.profile}
         flow={<MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
         onStar={() =>
           named.run(() => {

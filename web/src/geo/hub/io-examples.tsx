@@ -36,7 +36,7 @@ export function TableExample({ port }: { port: InputPort }) {
           <thead className="bg-muted/60">
             <tr>
               {columns.map((c) => (
-                <th key={c} className="px-2 py-1.5 text-left font-medium">
+                <th key={c} className="px-2.5 py-1.5 text-left font-medium whitespace-nowrap">
                   {c}
                 </th>
               ))}
@@ -46,7 +46,7 @@ export function TableExample({ port }: { port: InputPort }) {
             {[0, 1, 2].map((r) => (
               <tr key={r} className="border-t">
                 {columns.map((c) => (
-                  <td key={c} className="px-2 py-1 font-mono text-muted-foreground">
+                  <td key={c} className="px-2.5 py-1 font-mono whitespace-nowrap text-muted-foreground">
                     {exampleValue(c, r)}
                   </td>
                 ))}
@@ -56,7 +56,7 @@ export function TableExample({ port }: { port: InputPort }) {
         </table>
       </div>
       <figcaption className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-        <span>{text("io.tableCaption", { label: localText(port.label), formats: port.formats.join(", ") })}</span>
+        <span>{text("io.exampleOf", { formats: port.formats.join(", ") })}</span>
         {port.description && <span>{localText(port.description)}</span>}
       </figcaption>
     </figure>
@@ -106,7 +106,7 @@ export function BoundaryExample({ port }: { port: InputPort }) {
         <path d="M110 22 L120 136" stroke="#1f5eff" strokeDasharray="4 3" strokeWidth={1} />
       </svg>
       <figcaption className="text-xs text-muted-foreground">
-        {text("io.boundaryCaption", { label: localText(port.label), formats: port.formats.join(", ") })}
+        {text("io.shapeOf", { formats: port.formats.join(", ") })}
       </figcaption>
     </figure>
   );
@@ -141,7 +141,7 @@ function ResultTable({ port }: { port: OutputPort }) {
         <thead className="bg-muted/60">
           <tr>
             {columns.map((c) => (
-              <th key={c} className="px-2 py-1.5 text-left font-medium">
+              <th key={c} className="px-2.5 py-1.5 text-left font-medium whitespace-nowrap">
                 {c}
               </th>
             ))}
@@ -151,7 +151,7 @@ function ResultTable({ port }: { port: OutputPort }) {
           {rows.map((r, i) => (
             <tr key={i} className="border-t">
               {r.map((v, j) => (
-                <td key={j} className="px-2 py-1 font-mono text-muted-foreground">
+                <td key={j} className="px-2.5 py-1 font-mono whitespace-nowrap text-muted-foreground">
                   {v}
                 </td>
               ))}
@@ -186,7 +186,6 @@ export function ResultExample({
         </div>
       )}
       <figcaption className="text-xs text-muted-foreground">
-        {localText(port.label)} ·{" "}
         {tabular
           ? text("io.exampleTable")
           : imageKind === "paper"

@@ -38,7 +38,7 @@ import { localText } from "./text";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
 import type { HubEntry, HubFolder, HubRecommendation } from "@/geo/contracts/hub-shared";
-import { sharedHub } from "./shared-api";
+import { hubUserName, sharedHub } from "./shared-api";
 import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
@@ -541,9 +541,10 @@ function HubProject({
         method={{
           id: project.id,
           title: localText(draft.profile.title),
+          tagline: localText(draft.profile.tagline),
           summary: localText(draft.profile.summary),
-          author: project.owner,
-          folder: "—",
+          author: hubUserName() ?? project.owner,
+          folder: null,
           revision: draft.revision,
           registeredAt: text("register.before"),
           kind: draft.workflow ? "workflow" : "skill",
@@ -554,6 +555,7 @@ function HubProject({
           image: null,
           comments: [],
         }}
+        profile={draft.profile}
         flow={<MethodFlow profile={draft.profile} />}
         onStar={() => undefined}
         onComment={() => undefined}

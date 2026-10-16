@@ -165,6 +165,7 @@ export default function HubDesign() {
             method={{
               id: "r1",
               title: "공간 PU 탐사 유망도 분석",
+              tagline: "알려진 광상 몇 곳과 격자 표만으로 탐사 우선순위 구역 지도를 만듭니다.",
               summary:
                 "알려진 광상 셀과 미표지 셀로 PU 모델을 학습하고, 공간 블록 교차검증과 보정으로 탐사 우선순위 구역을 정합니다.",
               author: "연구자 A",
@@ -194,6 +195,7 @@ export default function HubDesign() {
                 },
               ],
             }}
+            profile={draft.profile}
             flow={<MethodFlow profile={draft.profile} visuals={visuals} outputImages={outputImages} />}
             onStar={nav}
             onComment={nav}
@@ -280,6 +282,7 @@ export default function HubDesign() {
             method={{
               id: "draft",
               title: "공간 PU 탐사 유망도 분석",
+              tagline: "알려진 광상 몇 곳과 격자 표만으로 탐사 우선순위 구역 지도를 만듭니다.",
               summary:
                 "알려진 광상 셀과 미표지 셀로 PU 모델을 학습하고, 공간 블록 교차검증과 보정으로 탐사 우선순위 구역을 정합니다.",
               author: "연구자 A",
@@ -294,6 +297,7 @@ export default function HubDesign() {
               image: `${M}/concept/step-zones.png`,
               comments: [],
             }}
+            profile={draft.profile}
             flow={<MethodFlow profile={draft.profile} visuals={visuals} outputImages={outputImages} />}
             onStar={nav}
             onComment={nav}
