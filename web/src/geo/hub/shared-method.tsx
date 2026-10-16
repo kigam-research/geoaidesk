@@ -48,6 +48,14 @@ export interface SharedMethodView {
   comments: SharedComment[];
 }
 
+/**
+ * Scroll to a section without touching the location hash: the hash routes the hub (`#hub/...`), so a plain fragment
+ * link would close it.
+ */
+function jumpTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 /** Initial-letter avatar for a researcher's display name. */
 export function Avatar({ name, className }: { name: string; className?: string }) {
   const palette = ["bg-sky-600", "bg-emerald-600", "bg-violet-600", "bg-amber-600", "bg-rose-600", "bg-teal-600"];
@@ -137,18 +145,30 @@ export function SharedMethod({
               </div>
             )}
             <nav className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-sm" aria-label={text("draft.flow")}>
-              <a href="#method-flow" className="text-primary underline-offset-4 hover:underline">
+              <button
+                type="button"
+                onClick={() => jumpTo("method-flow")}
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 {text("overview.jumpFlow")}
-              </a>
+              </button>
               {profile.limitations.length > 0 && (
-                <a href="#method-limits" className="text-primary underline-offset-4 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => jumpTo("method-limits")}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
                   {text("overview.jumpLimits")}
-                </a>
+                </button>
               )}
               {!preview && (
-                <a href="#shared-comments" className="text-primary underline-offset-4 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => jumpTo("shared-comments")}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
                   {text("overview.jumpComments", { count: method.comments.length })}
-                </a>
+                </button>
               )}
             </nav>
           </div>

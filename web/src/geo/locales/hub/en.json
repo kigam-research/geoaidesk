@@ -214,7 +214,8 @@
     "openSetup": "Open start settings",
     "needInputs": "Upload every required input and prepare the run environment to open the start settings.",
     "uploadFailed": "Could not upload the file. Check the file and upload it again.",
-    "environment": "Run environment"
+    "environment": "Run environment",
+    "openProject": "Open the project"
   },
   "register": {
     "open": "Preview hub page",

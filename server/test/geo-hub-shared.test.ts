@@ -345,6 +345,20 @@ describe("shared GAID hub", () => {
     });
     expect((await install()).statusCode).toBe(201);
     expect((await f.shared.read(entry.id)).installs).toHaveLength(2);
+    // The revision the researcher looked at is installed; an unknown or malformed revision is refused.
+    const pinned = (revision: unknown) =>
+      f.app.inject({
+        method: "POST",
+        url: `/geo/hub/entries/${entry.id}/install`,
+        headers: headers("이 연구원"),
+        payload: { projectId: project.id, acknowledged: true, revision },
+      });
+    const atOne = await pinned(1);
+    expect(atOne.statusCode, atOne.body).toBe(201);
+    expect(atOne.json().install.packageRevision).toBeGreaterThanOrEqual(1);
+    expect((await pinned(9)).statusCode).toBe(404);
+    expect((await pinned(0)).statusCode).toBe(400);
+    expect((await f.shared.read(entry.id)).installs).toHaveLength(3);
     const paths = resolvePaths(project.id);
     const trial = recordMethodTrial(
       paths,

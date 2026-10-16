@@ -146,12 +146,13 @@ export function SharedEntryScreen({
               .catch((err: Error) => toast.error(err.message));
           })
         }
-        onTry={() => setUseOpen(true)}
+        onTry={() => named.run(() => setUseOpen(true))}
       />
       <UseInProjectDialog
         open={useOpen}
         onOpenChange={setUseOpen}
         entryId={e.id}
+        revision={e.latestRevision}
         projects={projects}
         onOpenSetup={onOpenSetup}
       />
@@ -164,12 +165,15 @@ function UseInProjectDialog({
   open,
   onOpenChange,
   entryId,
+  revision,
   projects,
   onOpenSetup,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entryId: string;
+  /** The revision shown on the page: installation is pinned to it. */
+  revision: number;
   projects: { id: string; name: string }[];
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
 }) {
@@ -227,7 +231,7 @@ function UseInProjectDialog({
               onClick={async () => {
                 setBusy(true);
                 try {
-                  const r = await sharedHub.install(entryId, projectId);
+                  const r = await sharedHub.install(entryId, projectId, revision);
                   setInstalled({ methodKey: r.install.methodKey, workflowId: r.workflowId, recipeId: r.recipeId });
                 } catch (e) {
                   toast.error((e as Error).message);

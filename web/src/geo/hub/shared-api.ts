@@ -59,7 +59,7 @@ export const sharedHub = {
   register: (body: RegisterBody) => post<HubEntry>("/entries", body),
   star: (id: string, on: boolean) => post<{ stars: number; starredByMe: boolean }>(`${eid(id)}/star`, { on }),
   comment: (id: string, body: string) => post<HubComment>(`${eid(id)}/comments`, { body }),
-  install: (id: string, projectId: string) =>
-    post<InstallResult>(`${eid(id)}/install`, { projectId, acknowledged: true }),
+  install: (id: string, projectId: string, revision: number) =>
+    post<InstallResult>(`${eid(id)}/install`, { projectId, acknowledged: true, revision }),
   recommended: () => call<{ cards: HubRecommendation[] }>("/recommended"),
 };

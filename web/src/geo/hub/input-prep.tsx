@@ -104,7 +104,15 @@ export function InputPrep({
         {text("prep.loading")}
       </p>
     );
-  if (!workflow) return <p className="text-sm text-muted-foreground">{text("prep.noWorkflow")}</p>;
+  if (!workflow)
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-muted-foreground">{text("prep.noWorkflow")}</p>
+        <Button variant={secondary ? "outline" : "default"} onClick={onOpenSetup}>
+          {text("prep.openProject")}
+        </Button>
+      </div>
+    );
   const ready = setupReady(workflow, files);
   const envReady = workflow.readiness.state === "ready";
   return (

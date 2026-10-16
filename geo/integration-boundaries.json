@@ -511,6 +511,12 @@
       "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Parent-approved stale heading expectation Choose a project → My research; no UI changes (gaid-hub--visuals)."
+    },
+    {
+      "path": "server/src/agent/skills-install.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Optional expectedDestinationHashes on installStagedSkills: a replacement whose destination changed after the caller's check becomes a conflict (passes the hash to installSkillTree's existing guard); default behaviour unchanged."
     }
   ],
   "notTouched": [

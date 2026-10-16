@@ -445,7 +445,8 @@ function HubProject({
   if (project.drafts.length) reached.push("draft", "publish", "trial");
   const title = project.title || text("home.new");
 
-  const withModel = agentModel ? { model: agentModel } : {};
+  // "" = the app default, sent explicitly so a project created with another model can switch back to the default.
+  const withModel = { model: agentModel };
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({

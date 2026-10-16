@@ -79,6 +79,7 @@ export async function installPackageBytes(
   const existing = getSkillProvenance(root, pkg.slug);
   const existingDir = findSkillDir(root, pkg.slug);
   const installedHere = existingDir !== null;
+  let checkedHash: string | undefined;
   if (installedHere) {
     const origin = originOfSource(existing?.source, storeDir).origin;
     if (origin.kind !== "gaid-hub")
@@ -88,7 +89,8 @@ export async function installPackageBytes(
       );
     // A researcher's edits to the installed copy are never overwritten by a reinstall.
     const base = getSkillBaseHash(root, pkg.slug);
-    if (!base || hashDirectory(existingDir!) !== base)
+    checkedHash = hashDirectory(existingDir!);
+    if (!base || checkedHash !== base)
       throw new AuthoringError(
         `프로젝트에서 고친 ${pkg.slug} 스킬이 있어 덮어쓰지 않았습니다. 고친 내용을 옮겨 두거나 그 스킬을 지운 뒤 다시 설치하세요.`,
         409,
@@ -105,7 +107,14 @@ export async function installPackageBytes(
     stagingToken: preview.stagingToken,
     replace: installedHere,
     acknowledged: true,
+    // The copy checked above must still be unchanged when it is replaced (edits during staging are kept).
+    ...(checkedHash ? { expectedDestinationHashes: { [pkg.slug]: checkedHash } } : {}),
   });
+  if (result.conflicts.includes(pkg.slug))
+    throw new AuthoringError(
+      `설치하는 동안 프로젝트의 ${pkg.slug} 스킬이 바뀌어 덮어쓰지 않았습니다. 고친 내용을 확인한 뒤 다시 설치하세요.`,
+      409,
+    );
   if (!result.installed.includes(pkg.slug)) throw new AuthoringError("스킬을 설치하지 못했습니다.", 409);
 
   const install: AuthoringInstall = {

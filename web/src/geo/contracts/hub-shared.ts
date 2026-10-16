@@ -104,8 +104,15 @@ export interface HubRecommendation {
 // POST   /geo/hub/entries/:id/comments                 { body } → HubComment
 // GET    /geo/hub/entries/:id/cover                    image bytes
 // GET    /geo/hub/entries/:id/package.tar.gz           latest package bytes (?revision=n)
-// POST   /geo/hub/entries/:id/install                  { projectId, acknowledged: true } → InstallResult (authoring.ts)
+// POST   /geo/hub/entries/:id/install                  SharedInstallBody → InstallResult (authoring.ts)
 // GET    /geo/hub/recommended                          → { cards: HubRecommendation[] } (3-4 cards)
+
+/** Install a registered method; `revision` pins the revision the researcher looked at (default: latest). */
+export interface SharedInstallBody {
+  projectId: string;
+  acknowledged: true;
+  revision?: number;
+}
 
 export interface RegisterBody {
   authoringProjectId: string;

@@ -229,6 +229,11 @@ export interface InstallStagedOptions {
   /** Overwrite a name that is already installed in the target scope. */
   replace?: boolean;
   /**
+   * GeoAIDesk: per skill name, the tree hash the caller checked before staging. A replacement whose destination no
+   * longer has that hash (edited meanwhile) is reported as a conflict instead of being overwritten.
+   */
+  expectedDestinationHashes?: Record<string, string>;
+  /**
    * The caller has told the user these skills run with the agent's full
    * permissions and they accepted. Enforced here, not only in the UI: an
    * install is the moment third-party instructions enter the agent.
@@ -295,7 +300,11 @@ export async function installStagedSkills(
     // Keep an existing skill's enabled/disabled placement on replacement;
     // a fresh install is enabled, because the user picked it by name.
     const destination = existing ?? path.join(root.skillsDir, name);
-    installSkillTree(root, stagedSkill, destination);
+    const expected = existing ? options.expectedDestinationHashes?.[name] : undefined;
+    if (!installSkillTree(root, stagedSkill, destination, expected)) {
+      conflicts.push(name);
+      continue;
+    }
     recordSkillOrigin(root, name, {
       origin: "registry",
       source: lock[name]?.source ?? source,

@@ -8,6 +8,7 @@ import type {
   HubEntryDetail,
   HubRecommendation,
   RegisterBody,
+  SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { HUB_USER_HEADER } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
@@ -319,22 +320,30 @@ export async function registerSharedHubRoutes(
           .send(await store.bytes(record.entry.id, `packages/${revision}.tar.gz`));
       },
     );
-    scope.post<{ Params: { id: string }; Body: InstallBody }>("/geo/hub/entries/:id/install", async (req, reply) => {
-      const result = await store.serial(req.params.id, async () => {
-        const record = await store.read(req.params.id);
-        const snapshot = snapshotOf(record);
-        const result = await installPackageBytes(
-          await store.bytes(record.entry.id, `packages/${record.entry.latestRevision}.tar.gz`),
-          snapshot.package,
-          req.body ?? ({} as InstallBody),
-          options,
-        );
-        record.installs.push(result.install);
-        await store.write(record);
-        return result;
-      });
-      return reply.code(201).send(result);
-    });
+    scope.post<{ Params: { id: string }; Body: SharedInstallBody }>(
+      "/geo/hub/entries/:id/install",
+      async (req, reply) => {
+        const result = await store.serial(req.params.id, async () => {
+          const record = await store.read(req.params.id);
+          // Install the revision the researcher looked at (immutable snapshot), not whatever is latest now.
+          const asked = req.body?.revision;
+          if (asked !== undefined && (!Number.isSafeInteger(asked) || asked < 1))
+            throw new AuthoringError("등록 판 번호를 확인해 주세요.");
+          const revision = asked ?? record.entry.latestRevision;
+          const snapshot = snapshotOf(record, String(revision));
+          const result = await installPackageBytes(
+            await store.bytes(record.entry.id, `packages/${revision}.tar.gz`),
+            snapshot.package,
+            req.body ?? ({} as InstallBody),
+            options,
+          );
+          record.installs.push(result.install);
+          await store.write(record);
+          return result;
+        });
+        return reply.code(201).send(result);
+      },
+    );
     scope.get("/geo/hub/recommended", async (req) => {
       const entries = await Promise.all((await store.list()).map((r) => entryView(r, hubUser(req))));
       const cards: HubRecommendation[] = entries
