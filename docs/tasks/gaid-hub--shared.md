@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-16T06:04:04Z
+status: ready
+updated: 2026-10-16T06:04:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -94,7 +94,7 @@ semicolons, 120 columns).
   Vitest versions) to bound host load; the declared suite, timeout values and test selection are unchanged.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T05:55:31Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T06:04:06Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial typecheck caught the difference between AtlasTextInput and MethodText and an inferred optional union;
