@@ -1,6 +1,6 @@
 {
   "nav": {
-    "projects": "Projects",
+    "projects": "My research",
     "hub": "GAID hub",
     "label": "GAID screens"
   },
@@ -22,7 +22,7 @@
     "recommended": "Recommended Workflows",
     "catalogue": "Catalogue",
     "shared": "Shared",
-    "mine": "My skills and Workflows",
+    "mine": "My skills and Workflows (drafts and registered)",
     "folders": "Folders",
     "newFolder": "New folder",
     "allFolders": "All"
@@ -149,7 +149,7 @@
     "warnings": "{count, plural, one {# note} other {# notes}}"
   },
   "trial": {
-    "title": "Try in a project",
+    "title": "Try in my research project first (optional)",
     "body": "Install the draft into a project, prepare its inputs, then open the Workflow start settings.",
     "project": "Project",
     "consent": "I understand the draft skill can run code in the project.",
@@ -203,7 +203,7 @@
     "uploadFailed": "Could not upload the file: {detail}"
   },
   "register": {
-    "open": "Register in hub",
+    "open": "Preview hub page",
     "update": "Update hub entry (revision {n})",
     "title": "Register in the GAID hub",
     "folder": "Folder",
@@ -211,7 +211,11 @@
     "notePlaceholder": "e.g. Quick trial done on the Yilgarn grid. Please try it on data from another craton.",
     "shared": "Shared: skill and Workflow files, method flow, check record, trial assessments",
     "notShared": "Not shared: uploaded paper PDFs, original code archives, research data",
-    "submit": "Register in hub"
+    "submit": "Register in hub",
+    "line": "Registered methods can be viewed, starred and discussed by other researchers. Check how it will look first.",
+    "registeredLine": "Revision {n} is registered in the hub.",
+    "previewBanner": "Preview: this is how other researchers will see it in the hub.",
+    "backToDraft": "Back to draft"
   },
   "shared": {
     "by": "{author} · {folder} · registered {when}",

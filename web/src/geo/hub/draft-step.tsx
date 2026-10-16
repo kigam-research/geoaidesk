@@ -61,6 +61,13 @@ export function DraftStep({
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
           </div>
           <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{localText(profile.tagline)}</p>
+          {onRegister && (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
+              <Share2Icon className="size-5 text-primary" aria-hidden />
+              <p className="min-w-0 flex-1 text-sm">{registered ? text("register.registeredLine", { n: registered }) : text("register.line")}</p>
+              <Button onClick={onRegister}>{registered ? text("register.update", { n: registered }) : text("register.open")}</Button>
+            </div>
+          )}
         </header>
 
         <section className="flex flex-col gap-3">
@@ -71,12 +78,6 @@ export function DraftStep({
         <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} full />
 
         <div className="flex flex-wrap items-center gap-2">
-          {onRegister && (
-            <Button size="sm" onClick={onRegister}>
-              <Share2Icon data-icon="inline-start" />
-              {registered ? text("register.update", { n: registered }) : text("register.open")}
-            </Button>
-          )}
           <Button variant="outline" size="sm" onClick={onFeedback}>
             <PencilLineIcon data-icon="inline-start" />
             {text("draft.feedback")}

@@ -46,7 +46,10 @@ export function SharedMethod({
   onStar,
   onComment,
   onTry,
+  preview,
 }: {
+  /** Preview before registration: how the method will look to other researchers, with the register action. */
+  preview?: { onRegister: () => void; onBack: () => void };
   method: SharedMethodView;
   /** The method's step list and detail (same component as the draft view, read-only). */
   flow: ReactNode;
@@ -57,6 +60,15 @@ export function SharedMethod({
   const [draft, setDraft] = useState("");
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-6">
+      {preview && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-700 dark:bg-amber-950/30">
+          <span className="min-w-0 flex-1">{text("register.previewBanner")}</span>
+          <Button variant="outline" onClick={preview.onBack}>
+            {text("register.backToDraft")}
+          </Button>
+          <Button onClick={preview.onRegister}>{text("register.submit")}</Button>
+        </div>
+      )}
       <header className="flex flex-col gap-4 md:flex-row md:items-start">
         {method.image && (
           // eslint-disable-next-line @next/next/no-img-element

@@ -18,26 +18,23 @@ const M = "/hub-design-mock";
 const SMOKE_PDF = `${API_BASE}/geo/authoring/projects/ap-a135f290-1c4/sources/src-93486098-d56/original`;
 
 const visuals = {
-  n1: { src: `${M}/fig-6.png`, kind: "paper" as const, caption: "Fig. 1 지질 배경과 예측 변수 (6쪽)" },
-  n2: { src: `${M}/concept/step-spatial-cv.png`, kind: "generated" as const, caption: "공간 의존성과 블록 나누기" },
-  n4: { src: `${M}/fig-10.png`, kind: "paper" as const, caption: "Fig. 2 중첩 공간 블록 교차검증 (10쪽)" },
+  n1: { src: `${M}/concept/step-pu-learning.png`, kind: "generated" as const, caption: "알려진 광상 셀과 미표지 셀" },
+  n2: { src: `${M}/concept/step-spatial-cv.png`, kind: "generated" as const, caption: "공간 블록으로 나눈 학습·평가 영역" },
+  n4: { src: `${M}/concept/step-spatial-cv.png`, kind: "generated" as const, caption: "외측·내측 공간 교차검증" },
   n5: { src: `${M}/concept/step-uncertainty.png`, kind: "generated" as const, caption: "부트스트랩 불확실성과 컨포멀 집합" },
-  n6: { src: `${M}/fig-15.png`, kind: "paper" as const, caption: "Fig. 3 구역 분류 절차 (15쪽)" },
+  n6: { src: `${M}/concept/step-zones.png`, kind: "generated" as const, caption: "구역 경계와 누적 포획 곡선" },
   n7: { src: `${M}/concept/step-zones.png`, kind: "generated" as const, caption: "우선순위 구역 지도" },
 };
 const outputImages = {
-  zones: { src: `${M}/fig-20.png`, kind: "paper" as const, caption: "Fig. 6 구역 지도 (20쪽)" },
+  zones: { src: `${M}/concept/step-zones.png`, kind: "generated" as const, caption: "우선순위 구역 지도" },
 };
 
 const figures = (q: { key: string }): QuestionFigure[] =>
   q.key === "scope"
-    ? [
-        { src: `${M}/fig-6.png`, label: "Fig. 1", page: 6, caption: "Geological setting, variogram analysis, and representative predictor layers.", note: "논문의 예측 변수는 Yilgarn Ni 시스템에 맞춰져 있습니다. 다른 지역에서는 변수 구성이 달라집니다." },
-        { src: `${M}/fig-20.png`, label: "Fig. 6", page: 20, caption: "Spatial practical zone classification maps under the lift-based framework." },
-      ]
+    ? [{ src: `${M}/concept/step-pu-learning.png`, label: "개념 그림 · 원문 Fig. 1", page: 6, caption: "논문은 Yilgarn Ni 광상 셀과 미표지 셀로 학습했습니다.", note: "다른 지역에 쓰면 예측 변수와 양성 셀 정의를 그 지역에 맞게 다시 정해야 합니다." }]
     : q.key === "zone-thresholds"
-      ? [{ src: `${M}/fig-15.png`, label: "Fig. 3", page: 15, caption: "Practical zone classification workflow combining bootstrap mean probability, ρIQR uncertainty, conformal membership.", note: "구역 경계(lift 백분위, ρIQR)가 결과 지도의 구역 수와 면적을 정합니다." }]
-      : [{ src: `${M}/fig-10.png`, label: "Fig. 2", page: 10, caption: "Nested spatial block cross-validation design." }];
+      ? [{ src: `${M}/concept/step-zones.png`, label: "개념 그림 · 원문 Fig. 3", page: 15, caption: "구역 경계(lift 백분위, ρIQR)가 구역 수와 면적을 정합니다.", note: "논문 경계값은 Yilgarn 자료에 맞춘 값입니다." }]
+      : [{ src: `${M}/concept/step-spatial-cv.png`, label: "개념 그림 · 원문 Fig. 2", page: 10, caption: "공간 블록으로 나눠 학습과 평가 자료가 붙어 있지 않게 합니다." }];
 
 export default function HubDesign() {
   const view = typeof window === "undefined" ? "home" : (new URLSearchParams(window.location.search).get("view") ?? "home");
@@ -172,6 +169,36 @@ export default function HubDesign() {
       </HubShell>
     );
   }
+  if (view === "preview")
+    return (
+      <HubShell onNavigate={nav}>
+        <main className="min-h-0 flex-1 overflow-y-auto">
+          <SharedMethod
+            preview={{ onRegister: nav, onBack: nav }}
+            method={{
+              id: "draft",
+              title: "공간 PU 탐사 유망도 분석",
+              summary: "알려진 광상 셀과 미표지 셀로 PU 모델을 학습하고, 공간 블록 교차검증과 보정으로 탐사 우선순위 구역을 정합니다.",
+              author: "연구자 A",
+              folder: "광물 탐사",
+              revision: 4,
+              registeredAt: "등록 전",
+              kind: "workflow",
+              tags: ["광물 탐사", "PU 학습", "공간 교차검증", "격자 표"],
+              stars: 0,
+              starred: false,
+              trials: 1,
+              image: `${M}/concept/step-zones.png`,
+              comments: [],
+            }}
+            flow={<MethodFlow profile={draft.profile} visuals={visuals} outputImages={outputImages} />}
+            onStar={nav}
+            onComment={nav}
+            onTry={nav}
+          />
+        </main>
+      </HubShell>
+    );
   return (
     <HubShell onNavigate={nav}>
       {bar("draft", ["sources", "questions", "draft", "trial"])}
