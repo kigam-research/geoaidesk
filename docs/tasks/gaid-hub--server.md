@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T02:56:23Z
+status: done
+updated: 2026-10-16T07:20:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub--server
 target: task/gaid-hub
@@ -117,7 +117,7 @@ Full `scripts/check` is run by the parent at integration; do not run it unless c
   writer (gaid-hub, Claude) ports the server itself; it did so on task/gaid-hub (ef4d124). Hub request 0bc1c179ab4c.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T02:56:23Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T07:20:25Z: integrated into gaid-hub; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
