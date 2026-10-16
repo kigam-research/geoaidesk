@@ -49,7 +49,7 @@
   "internals": {
     "note": "Researcher-facing strings must not interpolate raw errors, model names or internal ids. Model names are allowed only where the researcher chooses or configures a model; raw detail only behind a technical-details disclosure (ids ending .technical).",
     "surfaces": ["*"],
-    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.technical", "*.technical.*"],
+    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.technical", "*.technical.*", "*.record", "*.record.*"],
     "forbiddenArguments": ["detail", "error", "message", "stderr", "stack", "model", "models", "sessionId", "chatId", "runId", "toolCallId", "requestId"],
     "forbiddenText": {
       "ko": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED", "채팅 ID", "세션 ID", "종료 코드", "HTTP \\{status\\}"],
