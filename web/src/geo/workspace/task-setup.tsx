@@ -77,7 +77,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         <span className="text-sm">{text(choice.label)}</span>
         {choice.options ? <select className={fieldClass} value={choices[choice.id] ?? ""} onChange={(event) => setChoices({ ...choices, [choice.id]: event.target.value })}>
           <option value="">{t("workspace.setup.decideLater")}</option>
-          {choice.options.map((option) => <option key={option} value={option}>{option}</option>)}
+          {choice.options.map((option) => <option key={option} value={option}>{choice.optionLabels?.[option] ? text(choice.optionLabels[option]) : option}</option>)}
         </select> : <input className={fieldClass} value={choices[choice.id] ?? ""} placeholder={t("workspace.setup.decideLater")} onChange={(event) => setChoices({ ...choices, [choice.id]: event.target.value })} />}
         {choice.why && <span className="block text-xs text-muted-foreground">{text(choice.why)}</span>}
         {choice.requiredWhen && <span className="block text-xs text-muted-foreground">{text(choice.requiredWhen)}</span>}

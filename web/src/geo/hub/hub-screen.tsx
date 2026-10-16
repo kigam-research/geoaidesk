@@ -176,7 +176,7 @@ function HubProject({
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
   const [installing, setInstalling] = useState(false);
-  const { projects } = useProjects();
+  const { projects, setActive } = useProjects();
 
   const reload = useCallback(async () => {
     if (isNew) return;
@@ -297,6 +297,7 @@ function HubProject({
       const pkg = existing ?? (await hubApi.pack(id, draft.revision));
       const result = await hubApi.install(id, pkg.revision, { projectId: trialProject, acknowledged: true });
       await reload();
+      setActive(trialProject);
       onOpenProject(trialProject);
       openMethodSetup({ projectId: trialProject, methodKey: result.install.methodKey, workflowId: result.workflowId, recipeId: result.recipeId });
     } catch (e) {
@@ -386,8 +387,17 @@ function HubProject({
         project={project}
         projectName={(pid) => activeProjects.find((p) => p.id === pid)?.name ?? pid}
         onOpen={(install) => {
+          setActive(install.projectId);
           onOpenProject(install.projectId);
-          openMethodSetup({ projectId: install.projectId, methodKey: install.methodKey, workflowId: null, recipeId: null });
+          const manifest = project.packages.find((p) => p.revision === install.packageRevision)?.manifest as
+            | { workflows?: { id: string }[]; recipes?: { id: string }[] }
+            | undefined;
+          openMethodSetup({
+            projectId: install.projectId,
+            methodKey: install.methodKey,
+            workflowId: manifest?.workflows?.[0]?.id ?? null,
+            recipeId: manifest?.recipes?.[0]?.id ?? null,
+          });
         }}
         onFeedback={(prefill) => {
           setFeedbackPrefill(prefill ?? "");

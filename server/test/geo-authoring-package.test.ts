@@ -26,6 +26,7 @@ import { projectSkillRoot } from "../src/agent/skills.ts";
 import { readMethodFile, verifyMethodTree } from "../src/geo/methods/method-file.ts";
 import { listLocalMethods } from "../src/geo/methods/local-methods.ts";
 import { readTarGz } from "../src/geo/tar.ts";
+import { summarizeWorkflow } from "../src/geo/workspace/workflows.ts";
 import { createProject, resolvePaths } from "../src/projects.ts";
 import type { GeoCatalogue } from "../src/geo/catalogue.ts";
 import type { MethodDraft } from "../../web/src/geo/contracts/authoring.ts";
@@ -179,6 +180,15 @@ describe("GAID hub packages", () => {
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
+    // TaskSetup shows the options' display labels from the package.
+    const withLabels = {
+      ...(first.record.manifest as { workflows: Record<string, unknown>[] }).workflows[0],
+      requiredScientificChoices: [
+        { id: "block-size", label: { ko: "block 크기" }, options: ["km25", "km50"], optionLabels: { km50: { ko: "50 km" } } },
+      ],
+    };
+    const summary = summarizeWorkflow(withLabels as never, {} as never);
+    expect(summary.requiredScientificChoices[0].optionLabels).toEqual({ km50: { ko: "50 km" } });
     // Long names go through a PAX path record and still read back.
     const long = archive("x", [{ path: `${"d".repeat(120)}/f.txt`, content: "a", encoding: "utf8" }]);
     expect(readTarGz(long).map((e) => e.path)).toContain(`x/${"d".repeat(120)}/f.txt`);
