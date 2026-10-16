@@ -101,6 +101,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   쓴다. 버튼은 다음 동작을 쓴다(한국어 목적어+동작, 영어 동사+목적어). 질문형 제목, 추상적 변환 문장, 과장 형용사, 장식 이모지를
   쓰지 않는다. 실행 완료를 검증 완료로 바꾸지 않는다. 추정·미시험·검토 전 같은 한계를 지우지 않는다. 확인되지 않은 기능·지원
   환경·성능·비용을 쓰지 않는다. 변경 보고에 문자열 id와 한·영 변경 전후를 적는다.
+- Names in visible copy (gaid-brand-copy, user decision 2026-10-15): the assistant is "AI agent" and the app is GAID;
+  "Kady"/"K-Dense"/"BYOK" stay only in code identifiers, env vars, routes, model-facing text and the upstream attribution
+  line. Content taken from K-Dense shows its source where it is shown: catalogue skills via `SkillInfo.upstream`
+  (`server/src/geo/skill-origin.ts`, from the catalogue's `sourceRevision.kind: "import"`), built-in Workflows and seeded
+  prompt templates via `UPSTREAM_APP_SOURCE`; all use `SourceBadge` (`web/src/geo/attribution/`). Desktop first: narrow
+  windows (~390 px) are unsupported for the workspace (`geo/compatibility.json` `display`).
 - Releases: push a tag `geo-v<version>` matching `geo/distribution.json`; `.github/workflows/release.yml` builds and
   creates a draft release with `geo/release-manifest.mjs` assets. Bump the version in `geo/distribution.json`, not
   `server/package.json` (that stays the upstream version).

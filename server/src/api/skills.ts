@@ -47,6 +47,7 @@ import {
 import { syncSandboxVenv } from "../sandbox-seed.ts";
 import { provisionProjectSkills } from "../geo/provision.ts";
 import { runtimeSupportSkillNames } from "../geo/context.ts";
+import { skillUpstreamResolver, type SkillUpstream } from "../geo/skill-origin.ts";
 
 interface ScopeQuery {
   scope?: string;
@@ -70,8 +71,13 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
     skill: { name: string; description: string; disableModelInvocation?: boolean },
     root: SkillRoot,
     origins: Record<string, string>,
+    upstreamOf: (name: string, origin: string, source?: string) => SkillUpstream | undefined,
   ) => {
     const provenance = getSkillProvenance(root, skill.name);
+    const origin = origins[skill.name] ?? (builtin(skill.name) ? "catalogue" : "local");
+    const isBuiltin = builtin(skill.name) && !origins[skill.name];
+    // gaid-brand-copy: a catalogue skill taken from another project (K-Dense) names its source.
+    const upstream = isBuiltin ? undefined : upstreamOf(skill.name, origin, provenance?.source);
     return {
       id: skill.name,
       name: skill.name,
@@ -82,10 +88,11 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       // No sync record: a skill the user or the AI agent wrote straight into the skill folder
       // (gaid-qwen-authoring-trial); showing it as a catalogue skill hid who made it. The
       // runtime's own support skills (pi-subagents) keep the catalogue origin and say so.
-      origin: origins[skill.name] ?? (builtin(skill.name) ? "catalogue" : "local"),
-      ...(builtin(skill.name) && !origins[skill.name] ? { builtin: true } : {}),
+      origin,
+      ...(isBuiltin ? { builtin: true } : {}),
       ...(provenance?.source ? { source: provenance.source } : {}),
       ...(provenance?.ref ? { ref: provenance.ref } : {}),
+      ...(upstream ? { upstream } : {}),
     };
   };
 
@@ -104,18 +111,20 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
     if (req.query.scope) {
       const root = skillRootForScope(paths, req.query.scope);
       const origins = getSkillOrigins(root);
-      return listProjectSkills(root).map((s) => toInfo(s, root, origins));
+      const upstreamOf = skillUpstreamResolver();
+      return listProjectSkills(root).map((s) => toInfo(s, root, origins, upstreamOf));
     }
 
     const project = projectSkillRoot(paths);
     const global = globalSkillRoot();
     const byName = new Map<string, ReturnType<typeof toInfo>>();
+    const upstreamOf = skillUpstreamResolver();
     for (const [root, origins] of [
       [global, getSkillOrigins(global)] as const,
       [project, getSkillOrigins(project)] as const,
     ]) {
       for (const skill of listProjectSkills(root)) {
-        byName.set(skill.name, toInfo(skill, root, origins));
+        byName.set(skill.name, toInfo(skill, root, origins, upstreamOf));
       }
     }
     return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
@@ -128,6 +137,7 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
     const root = skillRootForScope(paths, req.query.scope);
     const { enabled, disabled, problems } = listSkillsWithProblems(root);
     const origins = getSkillOrigins(root);
+    const upstreamOf = skillUpstreamResolver();
 
     // Pi resolves project skills before user-level ones and skill-name
     // collisions are first-wins, so a project skill of the same name wins.
@@ -144,8 +154,8 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
 
     return {
       scope: root.kind,
-      enabled: enabled.map((s) => toInfo(s, root, origins)),
-      disabled: disabled.map((s) => toInfo(s, root, origins)),
+      enabled: enabled.map((s) => toInfo(s, root, origins, upstreamOf)),
+      disabled: disabled.map((s) => toInfo(s, root, origins, upstreamOf)),
       problems,
       shadowed: [...enabled, ...disabled]
         .map((s) => s.name)

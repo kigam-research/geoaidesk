@@ -478,6 +478,8 @@
   "header.productName": "GeoAIDesk",
   "header.attribution": "K-Dense BYOK 기반 (MIT)",
   "header.version": "GeoAIDesk v{version}",
+  "attribution.source": "출처: {name}",
+  "attribution.sourceTitle": "{repository}에서 가져왔습니다. 원본 저장소를 엽니다.",
   "chat.tabs.numbered": "대화 {count}",
   "header.computeRunning": "Modal 연산 작업 {count}개가 실행 중입니다. 연산 환경에서 실시간 출력을 확인하세요.",
   "header.openCompute": "연산 환경 열기, 실행 중 {count}개",

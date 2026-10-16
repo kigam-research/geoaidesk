@@ -15,6 +15,7 @@ listed there is untested.
 | uv | Installed by the launcher when missing (official installer into `~/.local/bin`). |
 | Network on first start | npm registry, PyPI, GitHub (release download of the skill catalogue). |
 | A model | A local model server, a personal API key, or a supported sign-in; configured inside the app. |
+| A desktop browser window | Narrow windows (phone width, about 390 px) are not supported for the workspace; see [compatibility.md](compatibility.md#screen-size). |
 
 ## Install and start
 

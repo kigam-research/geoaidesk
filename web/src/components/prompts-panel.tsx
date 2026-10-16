@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2Icon, PencilIcon, PlusIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { SourceBadge, UPSTREAM_APP_SOURCE } from "@/geo/attribution/source-badge";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
@@ -304,9 +305,7 @@ export function PromptsPanel() {
                   <span className="font-mono">/{r.name}</span>
                   {r.argumentHint && <span className="font-mono text-[11px] text-muted-foreground">{r.argumentHint}</span>}
                   {r.seeded && (
-                    <Badge variant="secondary" className="h-5 text-[10px]">
-                      K-Dense
-                    </Badge>
+                    <SourceBadge source={UPSTREAM_APP_SOURCE} />
                   )}
                   {r.shadowed && (
                     <Badge variant="outline" className="h-5 text-[10px]">
