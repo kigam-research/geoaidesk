@@ -132,7 +132,8 @@
   "drafting": {
     "title": "초안을 만들고 있습니다",
     "note": "답 {count}개를 반영합니다. 화면을 닫아도 계속 진행됩니다.",
-    "revising": "초안을 고치고 있습니다"
+    "revising": "초안을 고치고 있습니다",
+    "reviseNote": "알려 주신 고칠 점을 반영합니다. 화면을 닫아도 계속 진행됩니다."
   },
   "draft": {
     "private": "개인 초안",
@@ -227,14 +228,16 @@
     "note": "다른 연구자에게 남길 말",
     "notePlaceholder": "예: 다른 지역 격자 자료에 쓰도록 만들었습니다. 시험해 보고 의견을 남겨 주세요.",
     "shared": "공유: 스킬·Workflow 파일, 방법 흐름, 검사 기록, 시험 평가",
-    "notShared": "공유하지 않음: 올린 원문 PDF, 코드 묶음 원본, 연구 자료",
+    "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 연구 자료. 패키지에 넣은 코드는 공유됩니다.",
     "submit": "허브에 등록",
     "line": "허브에 등록하면 다른 연구자가 보고 star와 의견을 남길 수 있습니다. 등록 전 모습을 먼저 확인하세요.",
     "registeredLine": "{n}판이 허브에 등록되어 있습니다.",
     "previewBanner": "미리보기: 허브에 등록하면 다른 연구자에게 이렇게 보입니다.",
     "backToDraft": "초안으로 돌아가기",
     "notYet": "허브 공유 저장소는 화면 협의 후 연결합니다. 지금은 미리보기만 됩니다.",
-    "before": "등록 전"
+    "before": "등록 전",
+    "newFolder": "폴더 만들기",
+    "newFolderPlaceholder": "새 폴더 이름"
   },
   "shared": {
     "by": "{author} · {folder} · {when}",
@@ -247,7 +250,9 @@
     "comment": "의견 남기기",
     "toComments": "의견 {count}개 보기",
     "registeredAt": "{when} 등록",
-    "afterRegister": "등록하면 다른 연구자가 star와 의견을 남길 수 있습니다."
+    "afterRegister": "등록하면 다른 연구자가 star와 의견을 남길 수 있습니다.",
+    "back": "허브 목록",
+    "note": "작성자의 말"
   },
   "flow": {
     "decide": "연구자가 정함: {question}",
@@ -259,7 +264,9 @@
     "noImage": "예시 그림이 아직 없습니다",
     "exampleTable": "예시 표 · 예시 값",
     "exampleOf": "예시 값 · {formats}",
-    "shapeOf": "예시 도형 · {formats}"
+    "shapeOf": "예시 도형 · {formats}",
+    "item": "항목",
+    "value": "값"
   },
   "user": {
     "title": "허브에서 쓸 이름",

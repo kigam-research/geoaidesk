@@ -33,6 +33,8 @@ export interface SharedMethodView {
   title: string;
   /** One-line tagline (the hero's lead); the summary is shown as points below. */
   tagline: string;
+  /** The author's note for the shown revision. */
+  note?: string;
   summary: string;
   author: string;
   /** Folder display name, or null before registration. */
@@ -135,6 +137,11 @@ export function SharedMethod({
               <span aria-hidden>·</span>
               <span>{method.registeredAt}</span>
             </div>
+            {method.note && (
+              <p className="max-w-[640px] text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{text("shared.note")}</span> {method.note}
+              </p>
+            )}
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((t) => (

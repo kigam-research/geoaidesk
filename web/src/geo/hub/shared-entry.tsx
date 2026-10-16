@@ -3,6 +3,7 @@
  * A registered method in the shared GAID hub (`#hub/e/<id>`): details, method flow, stars and comments, and "use in my
  * research" (install into one of my projects, prepare its inputs, open its start settings).
  */
+import { ChevronLeftIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -56,7 +57,10 @@ export function SharedEntryScreen({
   entryId,
   projects,
   onOpenSetup,
+  onBack,
 }: {
+  /** Back to the hub list. */
+  onBack?: () => void;
   entryId: string;
   projects: { id: string; name: string }[];
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
@@ -104,11 +108,20 @@ export function SharedEntryScreen({
   );
   return (
     <main className="min-h-0 flex-1 overflow-y-auto">
+      {onBack && (
+        <div className="mx-auto w-full max-w-6xl px-6 pt-4">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ChevronLeftIcon data-icon="inline-start" />
+            {text("shared.back")}
+          </Button>
+        </div>
+      )}
       <SharedMethod
         method={{
           id: e.id,
           title: e.title,
           tagline: localText(detail.profile.tagline),
+          note: latest?.note || undefined,
           summary: localText(detail.profile.summary) || e.summary,
           author: e.author,
           folder: folders[e.folderId] ?? null,

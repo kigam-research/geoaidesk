@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { AuthoringAttempt, CheckResult, DraftFileView } from "@/geo/contracts/authoring";
 import { geoLocale, geoText } from "@/geo/i18n";
@@ -319,9 +320,12 @@ export function RegisterDialog({
   open,
   onOpenChange,
   folders,
+  onCreateFolder,
   onRegister,
 }: DialogProps & {
   folders: { id: string; name: string }[];
+  /** Create a topic folder here (no detour to the hub list); returns its id. */
+  onCreateFolder?: (name: string) => Promise<string>;
   onRegister: (folderId: string, note: string) => Promise<void>;
 }) {
   const [folder, setFolder] = useState(folders[0]?.id ?? "");
@@ -329,6 +333,7 @@ export function RegisterDialog({
   useEffect(() => {
     if (folders.length && !folders.some((f) => f.id === folder)) setFolder(folders[0].id);
   }, [folders, folder]);
+  const [newFolder, setNewFolder] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   return (
@@ -351,6 +356,29 @@ export function RegisterDialog({
             ))}
           </select>
         </label>
+        {onCreateFolder && (
+          <form
+            className="flex items-center gap-2"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const name = newFolder.trim();
+              if (!name) return;
+              setFolder(await onCreateFolder(name));
+              setNewFolder("");
+            }}
+          >
+            <Input
+              className="h-8 flex-1"
+              value={newFolder}
+              onChange={(e) => setNewFolder(e.target.value)}
+              placeholder={text("register.newFolderPlaceholder")}
+              aria-label={text("register.newFolder")}
+            />
+            <Button type="submit" size="sm" variant="outline" disabled={!newFolder.trim()}>
+              {text("register.newFolder")}
+            </Button>
+          </form>
+        )}
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {text("register.note")}
           <Textarea

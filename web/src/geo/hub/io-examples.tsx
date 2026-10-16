@@ -124,29 +124,62 @@ export function InputExample({ port }: { port: InputPort }) {
   return polygon ? <BoundaryExample port={port} /> : <TableExample port={port} />;
 }
 
-/** Example rows for a result table, from the output's label (illustrative values). */
-function ResultTable({ port }: { port: OutputPort }) {
-  const label = localText(port.label);
-  const ranking = /순위|rank|목록|list/i.test(label);
-  const columns = ranking ? ["cell_id", "zone", "p_mean", "ρIQR"] : ["fold", "PR-AUC", "ROC-AUC", "coverage"];
-  const rows = ranking
-    ? [
+/** Example rows for a result table, shaped by what the output's label says it holds (illustrative values). */
+export function resultExampleRows(label: string): { columns: string[]; rows: string[][] } {
+  if (/순위|rank|목록|list/i.test(label))
+    return {
+      columns: ["cell_id", "zone", "p_mean", "ρIQR"],
+      rows: [
         ["C-10412", "0", "0.81", "0.18"],
         ["C-10977", "0", "0.77", "0.22"],
         ["C-20031", "1", "0.64", "0.27"],
-      ]
-    : [
+      ],
+    };
+  if (/구역|등급|zone|tier|class/i.test(label))
+    return {
+      columns: ["zone", "area_pct", "capture_pct", "cells"],
+      rows: [
+        ["0", "1.1", "4.1", "12"],
+        ["1", "4.0", "15.2", "45"],
+        ["2", "4.6", "14.3", "52"],
+      ],
+    };
+  if (/바리오그램|변리오그램|variogram|semivar/i.test(label))
+    return {
+      columns: ["lag_km", "semivariance", "pairs"],
+      rows: [
+        ["40", "0.08", "2,140"],
+        ["80", "0.12", "3,920"],
+        ["120", "0.15", "4,410"],
+      ],
+    };
+  if (/성능|평가|fold|검증|metric|score/i.test(label))
+    return {
+      columns: ["fold", "PR-AUC", "ROC-AUC", "coverage"],
+      rows: [
         ["0", "0.19", "0.91", "0.86"],
         ["1", "0.21", "0.90", "0.84"],
         ["2", "0.18", "0.92", "0.87"],
-      ];
+      ],
+    };
+  return {
+    columns: ["항목", "값"],
+    rows: [
+      ["…", "…"],
+      ["…", "…"],
+    ],
+  };
+}
+
+function ResultTable({ port }: { port: OutputPort }) {
+  const { columns, rows } = resultExampleRows(localText(port.label));
   return (
     <div className="overflow-x-auto rounded-lg border">
       <table className="w-full text-xs">
         <thead className="bg-muted/60">
           <tr>
             {columns.map((c) => (
-              <th key={c} className="px-2.5 py-1.5 text-left font-medium whitespace-nowrap">
+              <th key={c} className="px-2 py-1 text-left font-medium whitespace-nowrap">
                 {c}
               </th>
             ))}
@@ -156,7 +189,7 @@ function ResultTable({ port }: { port: OutputPort }) {
           {rows.map((r, i) => (
             <tr key={i} className="border-t">
               {r.map((v, j) => (
-                <td key={j} className="px-2.5 py-1 font-mono whitespace-nowrap text-muted-foreground">
+                <td key={j} className="px-2 py-1 font-mono whitespace-nowrap text-muted-foreground tabular-nums">
                   {v}
                 </td>
               ))}

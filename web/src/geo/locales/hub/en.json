@@ -132,7 +132,8 @@
   "drafting": {
     "title": "Creating the draft",
     "note": "Applying {count} answers. It continues if you close the screen.",
-    "revising": "Revising the draft"
+    "revising": "Revising the draft",
+    "reviseNote": "Applying the changes you asked for. You can close this screen; it keeps running."
   },
   "draft": {
     "private": "Private draft",
@@ -227,14 +228,16 @@
     "note": "Note for other researchers",
     "notePlaceholder": "e.g. Built for grid data from other regions. Please try it and leave feedback.",
     "shared": "Shared: skill and Workflow files, method flow, check record, trial assessments",
-    "notShared": "Not shared: uploaded paper PDFs, original code archives, research data",
+    "notShared": "Not shared: the uploaded PDF and archive files, research data. Code placed in the package is shared.",
     "submit": "Register in hub",
     "line": "Registered methods can be viewed, starred and discussed by other researchers. Check how it will look first.",
     "registeredLine": "Revision {n} is registered in the hub.",
     "previewBanner": "Preview: this is how other researchers will see it in the hub.",
     "backToDraft": "Back to draft",
     "notYet": "The shared hub store is connected after the screens are agreed. Preview only for now.",
-    "before": "not registered"
+    "before": "not registered",
+    "newFolder": "Create folder",
+    "newFolderPlaceholder": "New folder name"
   },
   "shared": {
     "by": "{author} · {folder} · {when}",
@@ -247,7 +250,9 @@
     "comment": "Add comment",
     "toComments": "{count, plural, one {Show # comment} other {Show # comments}}",
     "registeredAt": "registered {when}",
-    "afterRegister": "After registration, other researchers can star it and comment."
+    "afterRegister": "After registration, other researchers can star it and comment.",
+    "back": "Hub list",
+    "note": "Author's note"
   },
   "flow": {
     "decide": "You decide: {question}",
@@ -259,7 +264,9 @@
     "noImage": "No example picture yet",
     "exampleTable": "Example table · example values",
     "exampleOf": "Example values · {formats}",
-    "shapeOf": "Example shape · {formats}"
+    "shapeOf": "Example shape · {formats}",
+    "item": "Item",
+    "value": "Value"
   },
   "user": {
     "title": "Name in the hub",

@@ -95,6 +95,7 @@ export function GaidHub({
           key={entryId}
           entryId={entryId}
           projects={hubProjects}
+          onBack={() => onNavigate({ open: true, projectId: null })}
           onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
             setActive(projectId);
             onOpenProject(projectId);
@@ -593,7 +594,9 @@ function HubProject({
         note={
           running.op === "analyze"
             ? text("reading.note")
-            : text("drafting.note", { count: project.decisions.filter((d) => !d.supersededBy).length })
+            : running.op === "revise"
+              ? text("drafting.reviseNote")
+              : text("drafting.note", { count: project.decisions.filter((d) => !d.supersededBy).length })
         }
       />
     );
@@ -766,6 +769,11 @@ function HubProject({
         open={registerOpen}
         onOpenChange={setRegisterOpen}
         folders={hubFolders}
+        onCreateFolder={async (name) => {
+          const folder = await sharedHub.createFolder(name);
+          setHubFolders((cur) => [...cur, folder]);
+          return folder.id;
+        }}
         onRegister={async (folderId, note) => {
           try {
             const entry = await sharedHub.register({
@@ -831,12 +839,15 @@ function FailedNotice({ outcome, message, onRetry }: { outcome: string; message?
   return (
     <div
       role="alert"
-      className="mx-auto mb-4 flex max-w-2xl items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm"
+      className="mx-auto mb-4 flex max-w-2xl flex-col gap-2 rounded-lg border border-destructive/30 p-3 text-sm"
     >
-      <span>{outcome === "interrupted" ? text("reading.interrupted") : (message ?? text("reading.failed"))}</span>
-      <Button size="sm" variant="outline" onClick={onRetry}>
-        {text("reading.retry")}
-      </Button>
+      <div className="flex items-center justify-between gap-3">
+        <span>{outcome === "interrupted" ? text("reading.interrupted") : text("reading.failed")}</span>
+        <Button size="sm" variant="outline" onClick={onRetry}>
+          {text("reading.retry")}
+        </Button>
+      </div>
+      {outcome !== "interrupted" && <TechnicalDetail detail={message} />}
     </div>
   );
 }
