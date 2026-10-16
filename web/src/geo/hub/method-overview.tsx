@@ -53,73 +53,47 @@ export function OverviewBand({ profile }: { profile: DraftProfile }) {
   const gates = profile.procedure.nodes.filter((n) => n.type === "human-gate" || n.type === "decision").length;
   return (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)_auto_minmax(0,1fr)] md:items-stretch">
-      <BandCell
-        icon={<FileInputIcon className="size-4" aria-hidden />}
-        title={text("overview.in")}
-        tone="sky"
-        items={inputs}
-      />
+      <BandCell icon={<FileInputIcon className="size-4" aria-hidden />} title={text("overview.in")} items={inputs} />
       <BandArrow />
-      <div className="flex flex-col justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/[0.06] p-4">
-        <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-primary uppercase">
-          <ListOrderedIcon className="size-4" aria-hidden />
+      <div className="flex flex-col justify-center gap-2 rounded-lg border bg-card p-4">
+        <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <ListOrderedIcon className="size-4 text-primary" aria-hidden />
           {text("overview.process")}
         </p>
-        <p className="text-2xl font-bold tracking-tight">{text("overview.steps", { count: steps })}</p>
+        <p className="text-xl font-semibold">{text("overview.steps", { count: steps })}</p>
         {gates > 0 && (
-          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
+          <p className="inline-flex items-center gap-2 text-sm text-[var(--gaid-warning)]">
             <UserRoundCheckIcon className="size-4" aria-hidden />
             {text("overview.gates", { count: gates })}
           </p>
         )}
       </div>
       <BandArrow />
-      <BandCell
-        icon={<FileOutputIcon className="size-4" aria-hidden />}
-        title={text("overview.out")}
-        tone="emerald"
-        items={outputs}
-      />
+      <BandCell icon={<FileOutputIcon className="size-4" aria-hidden />} title={text("overview.out")} items={outputs} />
     </div>
   );
 }
 
 function BandArrow() {
   return (
-    <span className="hidden items-center justify-center text-muted-foreground/60 md:flex" aria-hidden>
-      <ArrowRightIcon className="size-5" />
+    <span className="hidden items-center justify-center text-muted-foreground md:flex" aria-hidden>
+      <ArrowRightIcon className="size-4" />
     </span>
   );
 }
 
-const TONES = {
-  sky: "border-sky-200 bg-sky-50/70 text-sky-700 dark:border-sky-900 dark:bg-sky-950/30 dark:text-sky-300",
-  emerald:
-    "border-emerald-200 bg-emerald-50/70 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300",
-} as const;
-
-function BandCell({
-  icon,
-  title,
-  tone,
-  items,
-}: {
-  icon: ReactNode;
-  title: string;
-  tone: keyof typeof TONES;
-  items: string[];
-}) {
+function BandCell({ icon, title, items }: { icon: ReactNode; title: string; items: string[] }) {
   const shown = items.slice(0, 4);
   return (
-    <div className={cn("flex flex-col gap-2 rounded-2xl border p-4", TONES[tone])}>
-      <p className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
-        {icon}
+    <div className="flex flex-col gap-2 rounded-lg border bg-card p-4">
+      <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <span className="text-primary">{icon}</span>
         {title}
       </p>
-      <ul className="flex flex-col gap-1.5">
+      <ul className="flex flex-col gap-1">
         {shown.map((item, i) => (
-          <li key={i} title={item} className="flex items-start gap-2 text-sm font-medium text-foreground">
-            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-current opacity-60" aria-hidden />
+          <li key={i} title={item} className="flex items-start gap-2 text-sm font-medium">
+            <span className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground" aria-hidden />
             <span className="line-clamp-1">{shortLabel(item)}</span>
           </li>
         ))}
@@ -133,26 +107,40 @@ function BandCell({
   );
 }
 
-/** The summary as a lead sentence and short points (instead of one paragraph), at a readable width. */
+/**
+ * The summary as a lead sentence; the other sentences open with "방법 소개 더 보기" (UI guide P3, W5), at a readable
+ * measure (T4).
+ */
 export function SummaryPoints({ summary }: { summary: string }) {
+  const [open, setOpen] = useState(false);
   const sentences = summarySentences(summary);
   if (sentences.length === 0) return null;
   const [lead, ...rest] = sentences;
   return (
-    <section className="flex max-w-3xl flex-col gap-3" aria-labelledby="method-about">
-      <h3 id="method-about" className="text-lg font-semibold">
+    <section className="flex max-w-[640px] flex-col gap-2" aria-labelledby="method-about">
+      <h3 id="method-about" className="text-base font-semibold">
         {text("overview.about")}
       </h3>
-      <p className="text-base leading-7 text-foreground">{lead}</p>
-      {rest.length > 0 && (
-        <ul className="flex flex-col gap-2">
+      <p className="text-sm">{lead}</p>
+      {rest.length > 0 && open && (
+        <ul className="flex flex-col gap-1">
           {rest.map((s, i) => (
-            <li key={i} className="flex items-start gap-3 text-[15px] leading-7 text-foreground/85">
-              <span className="mt-3 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <span className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground" aria-hidden />
               <span>{s}</span>
             </li>
           ))}
         </ul>
+      )}
+      {rest.length > 0 && (
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="self-start text-sm text-primary underline-offset-4 hover:underline"
+        >
+          {open ? text("overview.aboutLess") : text("overview.aboutMore")}
+        </button>
       )}
     </section>
   );
@@ -169,22 +157,22 @@ export function LimitsCard({ profile }: { profile: DraftProfile }) {
   return (
     <section
       id="method-limits"
-      className="flex scroll-mt-20 flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-5 dark:border-amber-900 dark:bg-amber-950/20"
+      className="flex scroll-mt-20 flex-col gap-3 rounded-lg border bg-card p-4"
       aria-label={text("draft.limits")}
     >
-      <h3 className="flex items-center gap-2 text-base font-semibold text-amber-900 dark:text-amber-300">
-        <TriangleAlertIcon className="size-4" aria-hidden />
+      <h3 className="flex items-center gap-2 text-base font-semibold">
+        <TriangleAlertIcon className="size-4 text-[var(--gaid-warning)]" aria-hidden />
         {text("overview.limits", { count: items.length })}
       </h3>
-      <ul className="flex max-w-3xl flex-col gap-2.5">
+      <ul className="flex max-w-[640px] flex-col gap-2">
         {shown.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-[15px] leading-7">
+          <li key={i} className="flex items-start gap-2 text-sm">
             <span
               className={cn(
-                "mt-1 shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold",
+                "shrink-0 rounded border px-1 text-xs font-medium",
                 item.kind === "not-for"
-                  ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-                  : "bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200",
+                  ? "border-[var(--gaid-danger)]/40 text-[var(--gaid-danger)]"
+                  : "border-[var(--gaid-warning)]/40 text-[var(--gaid-warning)]",
               )}
             >
               {item.kind === "not-for" ? text("overview.notFor") : text("overview.condition")}
@@ -204,7 +192,7 @@ export function LimitsCard({ profile }: { profile: DraftProfile }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="self-start text-sm font-medium text-amber-900 underline-offset-4 hover:underline dark:text-amber-300"
+          className="self-start text-sm text-primary underline-offset-4 hover:underline"
         >
           {open ? text("draft.showLess") : text("draft.showAll", { count: items.length })}
         </button>

@@ -15,6 +15,7 @@ import { PrepareEnvironment } from "@/geo/workspace/readiness";
 import { apiFetch } from "@/lib/projects";
 import { flattenFiles, type TreeNode } from "@/lib/use-sandbox";
 
+import { TechnicalDetail } from "./technical";
 const text = geoText("hub");
 
 async function projectFiles(projectId: string): Promise<string[]> {
@@ -44,7 +45,10 @@ export function InputPrep({
   projectName,
   methodKey,
   onOpenSetup,
+  secondary = false,
 }: {
+  /** Shown beside another view's primary action (draft rail): the open button is not a filled primary (UI guide B1). */
+  secondary?: boolean;
   projectId: string;
   projectName: string;
   methodKey: string;
@@ -55,6 +59,7 @@ export function InputPrep({
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const pickers = useRef<Record<string, HTMLInputElement | null>>({});
 
   const load = useCallback(async () => {
@@ -71,6 +76,7 @@ export function InputPrep({
     if (!list?.length) return;
     setUploading(roleId);
     setError(null);
+    setErrorDetail(null);
     try {
       const body = new FormData();
       for (const file of Array.from(list)) {
@@ -84,7 +90,8 @@ export function InputPrep({
         );
       await load();
     } catch (e) {
-      setError(text("prep.uploadFailed", { detail: (e as Error).message }));
+      setError(text("prep.uploadFailed"));
+      setErrorDetail((e as Error).message);
     } finally {
       setUploading(null);
     }
@@ -175,7 +182,8 @@ export function InputPrep({
         </div>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button onClick={onOpenSetup} disabled={!ready}>
+      <TechnicalDetail detail={errorDetail} />
+      <Button variant={secondary ? "outline" : "default"} onClick={onOpenSetup} disabled={!ready}>
         {text("prep.openSetup")}
       </Button>
       {!ready && <p className="text-xs text-muted-foreground">{text("prep.needInputs")}</p>}

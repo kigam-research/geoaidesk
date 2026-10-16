@@ -22,23 +22,24 @@ import type { ProjectSummary } from "@/geo/contracts/authoring";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
+import { TechnicalDetail } from "./technical";
 const text = geoText("hub");
 
 const STAGE_TONE: Record<ProjectSummary["stage"], { stripe: string; chip: string }> = {
-  sources: { stripe: "border-l-slate-300", chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300" },
-  analysis: { stripe: "border-l-slate-300", chip: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300" },
+  sources: { stripe: "border-l-border", chip: "bg-muted text-muted-foreground" },
+  analysis: { stripe: "border-l-border", chip: "bg-muted text-muted-foreground" },
   questions: {
-    stripe: "border-l-amber-400",
-    chip: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+    stripe: "border-l-[var(--gaid-warning)]",
+    chip: "border border-[var(--gaid-warning)]/40 text-[var(--gaid-warning)]",
   },
-  draft: { stripe: "border-l-sky-400", chip: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300" },
+  draft: { stripe: "border-l-primary", chip: "bg-primary/10 text-primary" },
   package: {
-    stripe: "border-l-emerald-400",
-    chip: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+    stripe: "border-l-[var(--gaid-success)]",
+    chip: "border border-[var(--gaid-success)]/40 text-[var(--gaid-success)]",
   },
 };
 
-/** A card without a picture: a short brand-blue band with an icon that matches the Workflow's subject. */
+/** A card without a picture: a neutral band with an icon that matches the Workflow's subject (UI guide S2). */
 function CardArt({ title }: { title: string }) {
   const Icon = /지도|좌표|map|crs/i.test(title)
     ? MapIcon
@@ -50,11 +51,8 @@ function CardArt({ title }: { title: string }) {
           ? DatabaseIcon
           : WorkflowIcon;
   return (
-    <span
-      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/90 to-sky-500"
-      aria-hidden
-    >
-      <Icon className="size-9 text-white/90" strokeWidth={1.5} />
+    <span className="absolute inset-0 flex items-center justify-center bg-muted" aria-hidden>
+      <Icon className="size-8 text-primary" strokeWidth={1.5} />
     </span>
   );
 }
@@ -125,42 +123,32 @@ export function HubHome({
 }) {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 overflow-y-auto px-6 py-8">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1f5eff] via-[#3b6dff] to-[#0ea5e9] px-8 py-9 text-white shadow-lg shadow-primary/20">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -top-16 -right-10 size-64 rounded-full bg-white/10 blur-2xl"
-        />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -bottom-24 left-1/3 size-72 rounded-full bg-sky-300/20 blur-3xl"
-        />
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="flex max-w-2xl flex-col gap-3">
-            <h1 className="text-4xl font-bold tracking-tight">{text("home.title")}</h1>
-            <p className="text-lg leading-8 text-white/90 text-pretty">{text("home.body")}</p>
-            <ol className="mt-1 flex flex-wrap items-center gap-2 text-sm font-medium">
-              {(["make", "register", "feedback"] as const).map((k, i) => (
-                <li key={k} className="flex items-center gap-2">
-                  {i > 0 && <ArrowRightIcon className="size-4 text-white/60" aria-hidden />}
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 ring-1 ring-white/25">
-                    <span className="flex size-5 items-center justify-center rounded-full bg-white text-xs font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    {text(`home.flow.${k}`)}
+      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="flex max-w-[640px] flex-col gap-2">
+          <h1 className="text-xl font-semibold">{text("home.title")}</h1>
+          <p className="text-sm text-muted-foreground">{text("home.body")}</p>
+          <ol className="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium">
+            {(["make", "register", "feedback"] as const).map((k, i) => (
+              <li key={k} className="flex items-center gap-2">
+                {i > 0 && <ArrowRightIcon className="size-4 text-muted-foreground" aria-hidden />}
+                <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1">
+                  <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {i + 1}
                   </span>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <Button size="lg" onClick={onCreate} className="bg-white text-primary shadow-md hover:bg-white/90">
-            <PlusIcon data-icon="inline-start" />
-            {text("home.new")}
-          </Button>
+                  {text(`home.flow.${k}`)}
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
+        <Button onClick={onCreate}>
+          <PlusIcon data-icon="inline-start" />
+          {text("home.new")}
+        </Button>
       </section>
 
       <section className="flex flex-col gap-3" aria-labelledby="hub-recommended">
-        <h2 id="hub-recommended" className="text-lg font-semibold">
+        <h2 id="hub-recommended" className="text-base font-semibold">
           {text("home.recommended")}
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -169,23 +157,21 @@ export function HubHome({
               <button
                 type="button"
                 onClick={() => onOpenRecommended?.(card.id)}
-                className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border bg-card text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+                className="group flex h-full w-full flex-col overflow-hidden rounded-lg border bg-card text-left transition-colors hover:border-primary/60"
               >
                 <span className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
                   {card.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={card.image}
-                      alt=""
-                      className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
+                    <img src={card.image} alt="" className="size-full object-cover" />
                   ) : (
                     <CardArt title={card.title} />
                   )}
                 </span>
-                <span className="flex flex-1 flex-col gap-1.5 p-3">
-                  <span className="line-clamp-2 text-base font-semibold leading-snug">{card.title}</span>
-                  <span className="line-clamp-2 text-sm leading-6 text-muted-foreground">{card.line}</span>
+                <span className="flex flex-1 flex-col gap-2 p-3">
+                  <span className="line-clamp-2 text-sm font-semibold">{card.title}</span>
+                  <span className="line-clamp-1 text-sm text-muted-foreground" title={card.line}>
+                    {card.line}
+                  </span>
                   <span className="mt-auto flex items-center gap-2 pt-1 text-xs text-muted-foreground">
                     <Badge variant="secondary">
                       {card.source === "catalogue" ? text("home.catalogue") : text("home.shared")}
@@ -204,10 +190,15 @@ export function HubHome({
       </section>
 
       <section className="flex min-h-0 flex-col gap-3" aria-labelledby="hub-mine">
-        <h2 id="hub-mine" className="text-lg font-semibold">
+        <h2 id="hub-mine" className="text-base font-semibold">
           {text("home.mine")}
         </h2>
-        {error && <p className="text-sm text-destructive">{text("home.error", { detail: error })}</p>}
+        {error && (
+          <div className="flex flex-col gap-1">
+            <p className="text-sm text-destructive">{text("home.error")}</p>
+            <TechnicalDetail detail={error} />
+          </div>
+        )}
         <div className="grid gap-4 md:grid-cols-[14rem_minmax(0,1fr)]">
           <nav aria-label={text("home.folders")} className="flex flex-col gap-1">
             {folders.map((f) => (
@@ -259,7 +250,7 @@ export function HubHome({
                     onClick={() => onOpen(p.id)}
                     aria-label={text("home.open", { title: p.methodTitle ?? p.title })}
                     className={cn(
-                      "flex h-full w-full flex-col gap-2 rounded-2xl border border-l-4 bg-card p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+                      "flex h-full w-full flex-col gap-2 rounded-lg border border-l-4 bg-card p-4 text-left transition-colors hover:border-primary/60",
                       STAGE_TONE[p.stage].stripe,
                     )}
                   >
@@ -272,7 +263,7 @@ export function HubHome({
                       {p.busy && <LoaderCircleIcon className="size-3 animate-spin" aria-hidden />}
                       {stageLabel(p)}
                     </span>
-                    <span className="text-[15px] leading-snug font-semibold">{p.methodTitle ?? p.title}</span>
+                    <span className="text-sm font-semibold">{p.methodTitle ?? p.title}</span>
                     {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
                     <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
                       {text("home.updated", { when: when(p.updatedAt) })}

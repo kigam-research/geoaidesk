@@ -69,7 +69,7 @@ export function BoundaryExample({ port }: { port: InputPort }) {
     <figure className="flex flex-col gap-1.5">
       <svg
         viewBox="0 0 240 150"
-        className="w-full rounded-lg border bg-muted/30"
+        className="w-full rounded-lg border bg-muted/30 text-primary"
         role="img"
         aria-label={localText(port.label)}
       >
@@ -99,12 +99,12 @@ export function BoundaryExample({ port }: { port: InputPort }) {
         ))}
         <path
           d="M30 110 L52 40 L110 22 L170 34 L208 78 L190 124 L120 136 L64 130 Z"
-          fill="#1f5eff"
+          fill="currentColor"
           fillOpacity={0.12}
-          stroke="#1f5eff"
+          stroke="currentColor"
           strokeWidth={2}
         />
-        <path d="M110 22 L120 136" stroke="#1f5eff" strokeDasharray="4 3" strokeWidth={1} />
+        <path d="M110 22 L120 136" stroke="currentColor" strokeDasharray="4 3" strokeWidth={1} />
       </svg>
       <figcaption className="text-xs text-muted-foreground">
         {text("io.shapeOf", { formats: port.formats.join(", ") })}

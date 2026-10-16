@@ -15,7 +15,7 @@
     "new": "스킬·Workflow 만들기",
     "empty": "만든 방법이 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
     "loading": "목록을 읽는 중입니다.",
-    "error": "목록을 읽지 못했습니다: {detail}",
+    "error": "목록을 읽지 못했습니다. 잠시 뒤 다시 여세요.",
     "updated": "{when} 수정",
     "open": "{title} 열기",
     "back": "허브 목록",
@@ -213,7 +213,7 @@
     "upload": "파일 올리기",
     "openSetup": "시작 설정 열기",
     "needInputs": "필수 입력 자료를 올리고 실행 환경을 준비하면 시작 설정을 열 수 있습니다.",
-    "uploadFailed": "파일을 올리지 못했습니다: {detail}",
+    "uploadFailed": "파일을 올리지 못했습니다. 파일을 확인한 뒤 다시 올리세요.",
     "environment": "실행 환경"
   },
   "register": {
@@ -284,16 +284,26 @@
     "instead": "대신: {alternative}",
     "jumpFlow": "방법 흐름",
     "jumpLimits": "한계",
-    "jumpComments": "의견 {count}개"
+    "jumpComments": "의견 {count}개",
+    "aboutMore": "방법 소개 더 보기",
+    "aboutLess": "방법 소개 접기"
   },
   "visuals": {
     "make": "개념 그림 만들기",
     "remake": "개념 그림 다시 만들기",
     "starting": "개념 그림 요청 중",
     "making": "개념 그림 만드는 중 ({done}/{total})",
-    "note": "OpenAI Codex 구독 사용",
-    "failed": "개념 그림을 만들지 못했습니다.",
-    "needLogin": "설정에서 OpenAI Codex (legacy)로 로그인하면 만들 수 있습니다",
-    "limitTitle": "그림 생성 사용량 한도에 도달했습니다"
+    "note": "구독 사용량으로 만듭니다",
+    "failed": "개념 그림을 만들지 못했습니다. 다시 만드세요.",
+    "needLogin": "그림 생성 계정이 연결되지 않았습니다. 설정의 제공사에서 연결하세요.",
+    "interrupted": "그림 만들기가 중단되었습니다. 다시 만드세요.",
+    "quota": "그림 생성 사용량 한도에 도달했습니다. 한도가 풀린 뒤 다시 만드세요.",
+    "quotaUntil": "그림 생성 사용량 한도에 도달했습니다. {when, date, short} {when, time, short} 이후 다시 만드세요.",
+    "quotaTitle": "그림 생성 사용량 한도에 도달했습니다"
+  },
+  "technical": {
+    "label": "기술 정보",
+    "copy": "기술 정보 복사",
+    "copied": "기술 정보를 복사했습니다"
   }
 }

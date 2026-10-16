@@ -36,6 +36,7 @@ import { SourceStep, WorkingPanel, type Target, type WebSourceKind } from "./sou
 import { TrialStep, useTrialCount } from "./trial-step";
 import { SharedMethod } from "./shared-method";
 import { MethodFlow, type StepVisual } from "./method-flow";
+import { TechnicalDetail } from "./technical";
 import { localText } from "./text";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
@@ -386,11 +387,19 @@ function HubProject({
     .filter((o) => o.draftRevision === draft?.revision)
     .sort((a, b) => a.startedAt.localeCompare(b.startedAt))
     .at(-1);
-  const lastVisualError =
-    lastVisualOp && lastVisualOp.status !== "running" && lastVisualOp.status !== "complete"
-      ? (lastVisualOp.error ?? text("visuals.failed"))
-      : null;
   const usageLimit = lastVisualOp?.status === "failed" ? lastVisualOp.usageLimit : undefined;
+  const visualFailed = Boolean(lastVisualOp && lastVisualOp.status !== "running" && lastVisualOp.status !== "complete");
+  // Researcher-facing wording (UI guide F4, R1); the server text only behind the technical disclosure.
+  const lastVisualError = !visualFailed
+    ? null
+    : usageLimit
+      ? usageLimit.resetsAt
+        ? text("visuals.quotaUntil", { when: Date.parse(usageLimit.resetsAt) })
+        : text("visuals.quota")
+      : lastVisualOp?.status === "interrupted"
+        ? text("visuals.interrupted")
+        : text("visuals.failed");
+  const lastVisualDetail = visualFailed && !usageLimit ? (lastVisualOp?.error ?? null) : null;
   // A usage limit is announced once, when the batch that hit it ends (also after a reload while it ran).
   const limitOp = usageLimit ? lastVisualOp?.opId : undefined;
   useEffect(() => {
@@ -398,7 +407,7 @@ function HubProject({
     const key = `gaid:hub-limit-notice:${limitOp}`;
     if (window.sessionStorage.getItem(key)) return;
     window.sessionStorage.setItem(key, "1");
-    toast.warning(text("visuals.limitTitle"), { description: lastVisualError ?? undefined, duration: 12_000 });
+    toast.warning(text("visuals.quotaTitle"), { description: lastVisualError ?? undefined, duration: 12_000 });
   }, [limitOp, lastVisualError]);
   useEffect(() => {
     if (!draft || isNew) return setCheck(null);
@@ -422,9 +431,10 @@ function HubProject({
 
   if (!project)
     return (
-      <p className="p-10 text-sm text-muted-foreground">
-        {error ? text("home.error", { detail: error }) : text("home.loading")}
-      </p>
+      <div className="flex flex-col gap-2 p-10 text-sm text-muted-foreground">
+        <p>{error ? text("home.error") : text("home.loading")}</p>
+        {error && <TechnicalDetail detail={error} />}
+      </div>
     );
 
   const questions = liveQuestions(project);
@@ -670,6 +680,7 @@ function HubProject({
           progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
           has: Object.keys(pictures.steps).length + Object.keys(pictures.outputs).length > 0,
           error: lastVisualError,
+          errorDetail: lastVisualDetail,
           usageLimit: Boolean(usageLimit),
           onMake: () => void makeVisuals(),
           connected: visualSource?.available ?? null,
@@ -696,6 +707,7 @@ function HubProject({
             prepared={
               currentInstall ? (
                 <InputPrep
+                  secondary
                   key={`${currentInstall.projectId}:${currentInstall.packageRevision}`}
                   projectId={currentInstall.projectId}
                   projectName={

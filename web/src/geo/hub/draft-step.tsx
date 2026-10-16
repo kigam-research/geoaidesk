@@ -25,6 +25,7 @@ import { MethodFlow, type StepVisual } from "./method-flow";
 import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
 
+import { TechnicalDetail } from "./technical";
 const text = geoText("hub");
 
 export function DraftStep({
@@ -47,6 +48,8 @@ export function DraftStep({
     progress: { done: number; total: number } | null;
     has: boolean;
     error: string | null;
+    /** Raw server text, shown only behind the technical disclosure. */
+    errorDetail: string | null;
     /** The last batch stopped at the subscription's usage limit. */
     usageLimit: boolean;
     onMake: () => void;
@@ -100,7 +103,7 @@ export function DraftStep({
 
         <section className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
+            <h3 className="text-base font-semibold">{text("draft.flow")}</h3>
             {visualAction && (
               <div className="ml-auto flex flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">
@@ -133,7 +136,7 @@ export function DraftStep({
               role={visualAction.usageLimit ? "alert" : undefined}
               className={
                 visualAction.usageLimit
-                  ? "flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                  ? "flex items-start gap-2 rounded-md border border-[var(--gaid-warning)]/40 px-3 py-2 text-sm text-[var(--gaid-warning)]"
                   : "text-sm text-destructive"
               }
             >
@@ -141,6 +144,7 @@ export function DraftStep({
               {visualAction.error}
             </p>
           )}
+          {visualAction && !visualAction.busy && <TechnicalDetail detail={visualAction.errorDetail} />}
           <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
         </section>
 
@@ -229,7 +233,7 @@ export function TrialCard({
             />
             {text("trial.consent")}
           </label>
-          <Button onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
+          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
             {installing ? text("trial.installing") : text("trial.install")}
           </Button>
           {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}

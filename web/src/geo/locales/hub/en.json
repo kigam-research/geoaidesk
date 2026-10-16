@@ -15,7 +15,7 @@
     "new": "Create skill or Workflow",
     "empty": "No methods yet. Upload a paper PDF or code to start.",
     "loading": "Reading the list.",
-    "error": "Could not read the list: {detail}",
+    "error": "Could not read the list. Open it again in a moment.",
     "updated": "Updated {when}",
     "open": "Open {title}",
     "back": "Hub list",
@@ -213,7 +213,7 @@
     "upload": "Upload file",
     "openSetup": "Open start settings",
     "needInputs": "Upload every required input and prepare the run environment to open the start settings.",
-    "uploadFailed": "Could not upload the file: {detail}",
+    "uploadFailed": "Could not upload the file. Check the file and upload it again.",
     "environment": "Run environment"
   },
   "register": {
@@ -284,16 +284,26 @@
     "instead": "Instead: {alternative}",
     "jumpFlow": "Method steps",
     "jumpLimits": "Limits",
-    "jumpComments": "{count, plural, one {# comment} other {# comments}}"
+    "jumpComments": "{count, plural, one {# comment} other {# comments}}",
+    "aboutMore": "Show more about the method",
+    "aboutLess": "Show less"
   },
   "visuals": {
     "make": "Make concept pictures",
     "remake": "Remake concept pictures",
     "starting": "Requesting concept pictures",
     "making": "Making concept pictures ({done}/{total})",
-    "note": "Uses the OpenAI Codex subscription",
-    "failed": "Could not make the concept pictures.",
-    "needLogin": "Sign in with OpenAI Codex (legacy) in Settings to make pictures",
-    "limitTitle": "Picture usage limit reached"
+    "note": "Uses the subscription quota",
+    "failed": "Could not make the concept pictures. Make them again.",
+    "needLogin": "No picture account is connected. Connect one in Settings → Providers.",
+    "interrupted": "Making pictures stopped. Make them again.",
+    "quota": "Picture usage limit reached. Make them again once the limit resets.",
+    "quotaUntil": "Picture usage limit reached. Make them again after {when, date, short} {when, time, short}.",
+    "quotaTitle": "Picture usage limit reached"
+  },
+  "technical": {
+    "label": "Technical details",
+    "copy": "Copy technical details",
+    "copied": "Copied technical details"
   }
 }

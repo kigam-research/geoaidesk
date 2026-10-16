@@ -14,6 +14,8 @@ import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
 import { LimitsCard, OverviewBand, SummaryPoints } from "./method-overview";
+import { TASK_LABELS } from "./taxonomy";
+import { localText } from "./text";
 
 const text = geoText("hub");
 
@@ -84,14 +86,13 @@ export function SharedMethod({
   onTry: () => void;
 }) {
   const [draft, setDraft] = useState("");
+  const tags = method.tags.map((t) => localText(TASK_LABELS[t])).filter(Boolean);
   return (
     <div className={cn("mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-10", !preview && "pt-6")}>
       {preview && (
-        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b border-amber-200 bg-amber-50/95 px-6 py-3 text-sm backdrop-blur dark:border-amber-800 dark:bg-amber-950/80">
-          <SparklesIcon className="size-4 text-amber-600" aria-hidden />
-          <span className="min-w-0 flex-1 font-medium text-amber-900 dark:text-amber-200">
-            {text("register.previewBanner")}
-          </span>
+        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b bg-muted/95 px-6 py-3 text-sm backdrop-blur">
+          <SparklesIcon className="size-4 text-primary" aria-hidden />
+          <span className="min-w-0 flex-1 font-medium">{text("register.previewBanner")}</span>
           <Button variant="outline" size="sm" onClick={preview.onBack}>
             {text("register.backToDraft")}
           </Button>
@@ -101,46 +102,41 @@ export function SharedMethod({
         </div>
       )}
 
-      <header className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/[0.09] via-background to-sky-100/60 p-6 md:px-8 md:py-7 dark:to-sky-950/30">
+      <header className="rounded-lg border bg-card p-6">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_16rem] md:items-start">
           <div className="flex min-w-0 flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-              <span className="rounded-full bg-primary px-2.5 py-1 text-primary-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
                 {method.kind === "workflow" ? text("draft.workflow") : text("draft.skill")}
               </span>
-              <span className="rounded-full border bg-background/80 px-2.5 py-1 text-muted-foreground">
+              <span className="rounded-full border px-2 py-1 text-muted-foreground">
                 {text("draft.revision", { n: method.revision })}
               </span>
               {method.folder && (
-                <span className="inline-flex items-center gap-1 rounded-full border bg-background/80 px-2.5 py-1 text-muted-foreground">
-                  <FolderIcon className="size-3.5" aria-hidden />
+                <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-muted-foreground">
+                  <FolderIcon className="size-4" aria-hidden />
                   {method.folder}
                 </span>
               )}
             </div>
-            <h2 className="text-3xl leading-tight font-bold tracking-tight text-balance">{method.title}</h2>
-            {method.tagline && (
-              <p className="max-w-3xl text-lg leading-8 text-foreground/80 text-pretty">{method.tagline}</p>
-            )}
+            <h2 className="text-xl font-semibold text-balance">{method.title}</h2>
+            {method.tagline && <p className="max-w-[640px] text-base text-pretty">{method.tagline}</p>}
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Avatar name={method.author} />
               <span className="font-medium text-foreground">{method.author}</span>
               <span aria-hidden>·</span>
               <span>{method.registeredAt}</span>
             </div>
-            {method.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {method.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-md bg-background/80 px-2 py-0.5 font-mono text-xs text-muted-foreground ring-1 ring-border"
-                  >
-                    #{t}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((t) => (
+                  <span key={t} className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+                    {t}
                   </span>
                 ))}
               </div>
             )}
-            <nav className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-sm font-medium" aria-label={text("draft.flow")}>
+            <nav className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-sm" aria-label={text("draft.flow")}>
               <a href="#method-flow" className="text-primary underline-offset-4 hover:underline">
                 {text("overview.jumpFlow")}
               </a>
@@ -162,10 +158,10 @@ export function SharedMethod({
               <img
                 src={method.image}
                 alt=""
-                className="aspect-[16/10] w-full rounded-2xl border bg-background object-cover shadow-sm"
+                className="aspect-[16/10] w-full rounded-lg border bg-background object-cover"
               />
             )}
-            <Button size="lg" variant={preview ? "outline" : "default"} onClick={onTry} className="w-full">
+            <Button variant={preview ? "outline" : "default"} onClick={onTry} className="w-full">
               <DownloadIcon data-icon="inline-start" />
               {text("shared.try")}
             </Button>
@@ -175,14 +171,14 @@ export function SharedMethod({
                 onClick={onStar}
                 disabled={Boolean(preview)}
                 aria-pressed={method.starred}
-                className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex flex-1 items-center justify-center gap-2 px-3 py-2 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <StarIcon className={cn("size-4", method.starred && "fill-amber-400 text-amber-500")} aria-hidden />
+                <StarIcon className={cn("size-4", method.starred && "fill-current text-primary")} aria-hidden />
                 {method.starred ? text("shared.starred") : text("shared.star")}
               </button>
               <span className="flex items-center border-l px-3 text-sm font-semibold tabular-nums">{method.stars}</span>
             </div>
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {preview ? text("shared.afterRegister") : text("shared.trials", { count: method.trials })}
             </p>
           </div>
@@ -193,7 +189,7 @@ export function SharedMethod({
       <SummaryPoints summary={method.summary} />
 
       <section id="method-flow" className="flex scroll-mt-20 flex-col gap-3" aria-label={text("draft.flow")}>
-        <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
+        <h3 className="text-base font-semibold">{text("draft.flow")}</h3>
         {flow}
       </section>
 
@@ -204,7 +200,7 @@ export function SharedMethod({
         id="shared-comments-section"
         aria-labelledby="shared-comments"
       >
-        <h3 id="shared-comments" className="flex scroll-mt-20 items-center gap-2 text-lg font-semibold">
+        <h3 id="shared-comments" className="flex scroll-mt-20 items-center gap-2 text-base font-semibold">
           <MessageSquareIcon className="size-5" aria-hidden />
           {text("shared.comments", { count: method.comments.length })}
         </h3>
@@ -220,7 +216,7 @@ export function SharedMethod({
                     {text("draft.revision", { n: c.revision })}
                   </span>
                 </p>
-                <p className="px-3 py-2.5 text-sm leading-6 whitespace-pre-wrap">{c.body}</p>
+                <p className="px-3 py-2 text-sm whitespace-pre-wrap">{c.body}</p>
               </div>
             </li>
           ))}

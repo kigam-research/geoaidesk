@@ -18,6 +18,7 @@ import { InputPrep } from "./input-prep";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
 import { hubUserName, sharedHub } from "./shared-api";
+import { TechnicalDetail } from "./technical";
 import { localText } from "./text";
 
 const text = geoText("hub");
@@ -82,9 +83,10 @@ export function SharedEntryScreen({
 
   if (!detail)
     return (
-      <p className="p-10 text-sm text-muted-foreground">
-        {error ? text("home.error", { detail: error }) : text("home.loading")}
-      </p>
+      <div className="flex flex-col gap-2 p-10 text-sm text-muted-foreground">
+        <p>{error ? text("home.error") : text("home.loading")}</p>
+        {error && <TechnicalDetail detail={error} />}
+      </div>
     );
   const e = detail.entry;
   const latest = e.revisions.at(-1);

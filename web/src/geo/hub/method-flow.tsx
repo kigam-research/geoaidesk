@@ -79,9 +79,9 @@ function StepBox({
       onClick={onSelect}
       aria-current={active ? "step" : undefined}
       className={cn(
-        "group flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 text-left text-sm transition-all hover:border-primary/60 hover:shadow-sm",
-        gate && !active && "border-amber-300 bg-amber-50/70 dark:border-amber-800 dark:bg-amber-950/30",
-        active && "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20",
+        "group flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-left text-sm transition-colors hover:border-primary/60",
+        gate && !active && "border-[var(--gaid-warning)]/40",
+        active && "border-primary bg-primary text-primary-foreground",
       )}
     >
       <span
@@ -97,7 +97,7 @@ function StepBox({
         <span
           className={cn(
             "inline-flex shrink-0 items-center gap-1 text-xs font-medium",
-            active ? "text-primary-foreground/90" : "text-amber-700 dark:text-amber-400",
+            active ? "text-primary-foreground" : "text-[var(--gaid-warning)]",
           )}
         >
           <UserRoundCheckIcon className="size-3.5" aria-hidden />
@@ -139,27 +139,27 @@ function StepDetail({
   const decisions = (profile.userDecisions ?? []).filter((d) => d.at === node.id);
   return (
     <section
-      className="flex min-w-0 flex-col gap-5 self-start rounded-2xl border bg-card p-5 shadow-sm md:sticky md:top-16"
+      className="flex min-w-0 flex-col gap-4 self-start rounded-lg border bg-card p-4 md:sticky md:top-16"
       aria-live="polite"
     >
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold tracking-wide text-primary">
           {text("flow.stepOf", { n: index + 1, total })}
         </p>
-        <h3 className="flex flex-wrap items-center gap-2 text-xl font-bold tracking-tight">
+        <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold">
           {localText(node.label)}
           {gate && (
-            <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 dark:text-amber-400">
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-[var(--gaid-warning)]">
               <UserRoundCheckIcon className="size-4" aria-hidden />
               {text("draft.you")}
             </span>
           )}
         </h3>
-        <p className="text-[15px] leading-7">{localText(node.summary)}</p>
+        <p className="max-w-[640px] text-sm">{localText(node.summary)}</p>
         {decisions.map((d) => (
           <p
             key={d.id}
-            className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/30 dark:text-amber-200"
+            className="flex items-start gap-2 rounded-md border px-3 py-2 text-sm text-[var(--gaid-warning)]"
           >
             <UserRoundCheckIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
             {text("flow.decide", { question: localText(d.question) })}
@@ -170,7 +170,7 @@ function StepDetail({
             <p className="text-xs font-semibold text-muted-foreground">{text("draft.checks")}</p>
             <ul className="flex flex-wrap gap-1.5">
               {node.checks.map((c, i) => (
-                <li key={i} className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px]">
+                <li key={i} className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs">
                   <CircleIcon className="size-3 text-primary" aria-hidden />
                   {localText(c)}
                 </li>
@@ -216,10 +216,8 @@ function PortHeading({ kind, label }: { kind: "in" | "out"; label: string }) {
       <h4 className="flex items-center gap-2 text-sm font-semibold">
         <span
           className={cn(
-            "rounded px-1.5 py-0.5 text-[11px] font-semibold",
-            kind === "in"
-              ? "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300"
-              : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+            "rounded px-1.5 py-0.5 text-xs font-semibold",
+            kind === "in" ? "bg-primary/10 text-primary" : "bg-muted text-foreground",
           )}
         >
           {kind === "in" ? text("draft.inputs") : text("draft.outputs")}

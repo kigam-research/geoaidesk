@@ -40,7 +40,7 @@ export function HubShell({
             className="hidden h-6 w-auto dark:block"
           />
           <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
-          {isVersioned && <span className="text-[11px] text-muted-foreground/60">v{APP_VERSION}</span>}
+          {isVersioned && <span className="text-xs text-muted-foreground">v{APP_VERSION}</span>}
         </div>
         <GaidTopNav current="hub" className="absolute left-1/2 -translate-x-1/2" onNavigate={onNavigate} />
         <div className="flex items-center gap-1">{actions}</div>
