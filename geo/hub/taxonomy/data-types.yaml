@@ -1,0 +1,19 @@
+# Geo Skill Atlas data types (atlas taxonomy v1).
+schemaVersion: atlas-taxonomy/v1
+facet: dataTypes
+terms:
+  - { id: raster, label: { ko: 래스터, en: Raster }, synonyms: { ko: [격자 영상, 위성영상, DEM], en: [raster, image, DEM] } }
+  - { id: vector-features, label: { ko: 벡터 도형, en: Vector features }, synonyms: { ko: [점, 선, 면, 경계, 도형], en: [points, lines, polygons, features] } }
+  - { id: grid-table, label: { ko: 격자 표, en: Grid table }, synonyms: { ko: [격자 CSV, 셀 표, 좌표 표], en: [grid CSV, cell table] } }
+  - { id: borehole-intervals, label: { ko: 시추 구간, en: Borehole intervals }, synonyms: { ko: [시추공, 주상도, 구간 자료], en: [borehole, drillhole, interval] } }
+  - { id: well-logs, label: { ko: 물리검층, en: Well logs }, synonyms: { ko: [검층, 검층 곡선], en: [well log, log curve] } }
+  - { id: seismic, label: { ko: 탄성파 트레이스·볼륨, en: Seismic traces and volumes }, synonyms: { ko: [탄성파, 반사법], en: [seismic, SEG-Y] } }
+  - { id: waveforms, label: { ko: 지진 파형, en: Waveforms }, synonyms: { ko: [파형, 지진 기록], en: [waveform, seismogram] } }
+  - { id: time-series, label: { ko: 시계열, en: Time series }, synonyms: { ko: [시계열, 수위 기록, 관측 기록], en: [time series, monitoring] } }
+  - { id: assays-lab, label: { ko: 분석치·실험 표, en: Assays and lab tables }, synonyms: { ko: [분석치, 시료 분석, 실험 자료], en: [assay, lab results, sample table] } }
+  - { id: mesh-volume, label: { ko: 메시·볼륨, en: Mesh and volume }, synonyms: { ko: [메시, 3D 모델], en: [mesh, volume, 3D model] } }
+  - { id: point-cloud, label: { ko: 점군, en: Point cloud }, synonyms: { ko: [점군, 라이다], en: [point cloud, LiDAR] } }
+  - { id: scenario-table, label: { ko: 시나리오·FEP 표, en: Scenario and FEP table }, synonyms: { ko: [시나리오, FEP], en: [scenario, FEP] } }
+  - { id: document, label: { ko: 문서, en: Document }, synonyms: { ko: [문서, 보고서, 원고], en: [document, report, manuscript] } }
+  - { id: catalog, label: { ko: 자료 목록, en: Catalog }, synonyms: { ko: [목록, 메타데이터, 카탈로그], en: [catalog, metadata, STAC] } }
+  - { id: tabular, label: { ko: 일반 표, en: Table }, synonyms: { ko: [표, 측정값, 계산 표], en: [table, measurements] } }

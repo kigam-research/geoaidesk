@@ -1,0 +1,43 @@
+# Geo Skill Atlas tasks (atlas taxonomy v1): what the researcher is trying to do.
+schemaVersion: atlas-taxonomy/v1
+facet: tasks
+terms:
+  - id: data-discovery
+    label: { ko: 자료 찾기, en: Data discovery }
+    synonyms: { ko: [자료 검색, 자료원, 포털, 어디서 받나], en: [find data, data source, catalog search] }
+  - id: acquisition
+    label: { ko: 자료 수집·접근, en: Acquisition and access }
+    synonyms: { ko: [자료 수집, 다운로드, API, 내려받기], en: [download, acquire, API access] }
+  - id: data-qc
+    label: { ko: 자료 QC, en: Data QC }
+    synonyms: { ko: [품질 점검, 품질 관리, 결측, 단위 확인, 이상치, 검층 QC], en: [quality control, QC, missing values, unit check, outlier] }
+  - id: spatial-transform
+    label: { ko: 공간 변환·정합, en: Spatial transformation }
+    synonyms: { ko: [좌표 변환, 재투영, 격자화, 정합, 리샘플], en: [reproject, rasterize, resample, align, grid] }
+  - id: interpretation
+    label: { ko: 해석, en: Interpretation }
+    synonyms: { ko: [해석, 진단, 이상대, 판단], en: [interpretation, diagnosis, anomaly] }
+  - id: modeling
+    label: { ko: 모델링, en: Modelling }
+    synonyms: { ko: [모델, 예측 모델, 기계학습, 분류], en: [model, machine learning, prediction, classification] }
+  - id: simulation
+    label: { ko: 시뮬레이션, en: Simulation }
+    synonyms: { ko: [수치 모사, 시뮬레이션, 유동 해석], en: [simulation, numerical model, flow model] }
+  - id: inversion
+    label: { ko: 역산, en: Inversion }
+    synonyms: { ko: [역산, 역해석, 매개변수 추정], en: [inversion, parameter estimation] }
+  - id: calibration
+    label: { ko: 보정, en: Calibration }
+    synonyms: { ko: [보정, 캘리브레이션, 이력 정합], en: [calibration, history matching] }
+  - id: uncertainty
+    label: { ko: 불확실성, en: Uncertainty }
+    synonyms: { ko: [불확도, 불확실성, 오차 전파, 신뢰구간], en: [uncertainty, error propagation, confidence interval] }
+  - id: spatial-validation
+    label: { ko: 공간 검증, en: Spatial validation }
+    synonyms: { ko: [공간 교차검증, 블록 분할, 누출, 평가 설계], en: [spatial cross-validation, block split, leakage] }
+  - id: visualization
+    label: { ko: 시각화, en: Visualisation }
+    synonyms: { ko: [지도, 그림, 차트, 시각화], en: [map, figure, chart, plot] }
+  - id: reporting
+    label: { ko: 보고서, en: Reporting }
+    synonyms: { ko: [보고서, 연차실적서, HWPX, 문서 작성], en: [report, document, HWPX] }

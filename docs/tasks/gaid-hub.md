@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T02:36:29Z
+updated: 2026-10-16T02:55:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -92,7 +92,8 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   work" profile reads default now, ~/.paseo/config.json modified 11:35:30, value at 11:03 unknown). Set the agent to
   Normal (update_agent service_tier default, read back). The child had made no edits; it stopped with "workspace out of
   credits", and after the switch Codex reports "access token could not be refreshed ... sign in again".
-  Blocked: Codex sign-in needs the user. Receipt still says priority: a handoff successor would start Fast.
+  Retries failed 3x with the same token error. User (2026-10-16): "2번으로 진행하자." = the parent ports the server itself.
+  Hub request 0bc1c179ab4c asks the hub to retire gaid-hub--server with no changes. P1 is now parent-owned (same brief).
 ## Next steps
 1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
    `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
@@ -126,7 +127,7 @@ Placement decisions:
   plain explanations, agent internals hidden (on demand at most).
 
 Work packages:
-- P1 server port (child writer, general work): owns `server/src/geo/authoring/**`, `server/test/geo-authoring*.test.ts`,
+- P1 server port (parent since 2026-10-16, user choice; brief kept as the spec): owns `server/src/geo/authoring/**`, `server/test/geo-authoring*.test.ts`,
   `geo/hub/**`. Interface: the contract file + route table fixed by the parent.
 - P2 screens (parent first for key screens; may split later): owns `web/src/geo/hub/**`, locales `web/src/geo/locales/hub/`,
   the entrance edit in project-view.tsx.

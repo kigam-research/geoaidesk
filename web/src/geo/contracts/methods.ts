@@ -57,8 +57,8 @@ export interface MethodAuthoringRecord {
 
 /** Where the installed package bytes came from. */
 export interface MethodOrigin {
-  /** `skill-hub`: fetched from a configured hub URL; `upload`: a `.tar.gz` the user chose; `other`: any other install. */
-  kind: "skill-hub" | "upload" | "other";
+  /** `skill-hub`: fetched from a configured hub URL; `upload`: a `.tar.gz` the user chose; `gaid-hub`: built in this app's GAID hub; `other`: any other install. */
+  kind: "skill-hub" | "upload" | "gaid-hub" | "other";
   packageSha256?: string;
   siteId?: string;
   pageUrl?: string;
