@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T03:18:08Z
+updated: 2026-10-16T03:18:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -114,6 +114,11 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
 - Readers: Claude 고급검토 visual review round 1 = reader 1f81f17a (output ~/data/geoaidesk/work/gaid-hub/reviews/
   claude-visual-1.md). Researcher persona brief ready: ~/data/geoaidesk/work/gaid-hub/briefs/researcher-persona.md
   (native Sonnet agent, high effort; uses Qwen — run alone).
+- Smoke loop finished: revise (2m12s) passed all checks; package 1 installed into GAID project proj-221132 "허브 설치
+  시험"; hand-off fixed (setActive before openProject; "시작 설정 다시 열기" passes the manifest workflow/recipe) and verified
+  live: the target project opens with the method's TaskSetup. TaskSetup now shows option display labels (optionLabels).
+- Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
+  output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
 1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
    `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
