@@ -6,19 +6,26 @@
   },
   "entry": {
     "title": "GAID 허브",
-    "body": "논문과 코드로 스킬이나 Workflow를 만들고 프로젝트에서 시험합니다.",
+    "body": "문헌 및 데이터로 스킬 또는 Workflow를 만들어서 공유하고 피드백을 받는 허브 공간",
     "open": "GAID 허브 열기"
   },
   "home": {
     "title": "GAID 허브",
-    "body": "논문과 코드로 스킬이나 Workflow를 만듭니다.",
+    "body": "문헌 및 데이터로 스킬 또는 Workflow를 만들어서 공유하고 피드백을 받는 허브 공간",
     "new": "새로 만들기",
     "empty": "만든 방법이 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
     "loading": "목록을 읽는 중입니다.",
     "error": "목록을 읽지 못했습니다: {detail}",
     "updated": "{when} 수정",
     "open": "{title} 열기",
-    "back": "허브 목록"
+    "back": "허브 목록",
+    "recommended": "추천 Workflow",
+    "catalogue": "카탈로그",
+    "shared": "공유",
+    "mine": "나의 스킬 · Workflow",
+    "folders": "폴더",
+    "newFolder": "새 폴더",
+    "allFolders": "전체"
   },
   "stage": {
     "sources": "자료 받음",
@@ -53,7 +60,18 @@
     "needSource": "자료를 하나 이상 올리세요.",
     "uploading": "{name} 파일을 올리는 중입니다.",
     "noPdfText": "PDF 쪽 글자를 읽는 도구가 없어 PDF 내용을 읽지 못합니다. 코드나 메모로 진행할 수 있습니다.",
-    "reread": "자료 다시 읽기"
+    "reread": "자료 다시 읽기",
+    "url": "웹 주소로 추가",
+    "urlKind": "자료 종류",
+    "kindPaper": "논문·문헌",
+    "kindBlog": "블로그·기사",
+    "kindSearch": "웹 검색 결과",
+    "urlPlaceholder": "https://doi.org/… 또는 웹 페이지 주소",
+    "addUrl": "주소 추가",
+    "urlNote": "기관망 안의 서버가 주소를 직접 읽어 옵니다. 읽은 내용은 원문과 함께 보관합니다.",
+    "url_fetched": "읽음",
+    "url_fetching": "읽는 중",
+    "url_failed": "읽지 못함"
   },
   "reading": {
     "title": "자료를 읽고 있습니다",
@@ -91,7 +109,9 @@
     "apply": "답 반영해 초안 만들기",
     "needAll": "답하지 않은 질문이 {count}개 있습니다. 답하거나 나중에 정하기를 고르세요.",
     "allApplied": "모든 답이 초안에 반영되었습니다. 바꿀 점은 초안 화면의 \"고칠 점 알려주기\"로 알려 주세요.",
-    "recorded": "반영된 답입니다."
+    "recorded": "반영된 답입니다.",
+    "intent": "질문 의도",
+    "link": "방법과의 연결"
   },
   "drafting": {
     "title": "초안을 만들고 있습니다",
@@ -180,5 +200,36 @@
     "openSetup": "시작 설정 열기",
     "needInputs": "필수 입력 자료를 모두 올리면 시작 설정을 열 수 있습니다.",
     "uploadFailed": "파일을 올리지 못했습니다: {detail}"
+  },
+  "register": {
+    "open": "허브에 등록",
+    "update": "허브 등록 갱신 ({n}판)",
+    "title": "GAID 허브에 등록",
+    "folder": "폴더",
+    "note": "다른 연구자에게 남길 말",
+    "notePlaceholder": "예: Yilgarn 격자 자료로 빠른 시험을 마쳤습니다. 다른 크라톤 자료로 시험해 주세요.",
+    "shared": "공유: 스킬·Workflow 파일, 방법 흐름, 검사 기록, 시험 평가",
+    "notShared": "공유하지 않음: 올린 원문 PDF, 코드 묶음 원본, 연구 자료",
+    "submit": "허브에 등록"
+  },
+  "shared": {
+    "by": "{author} · {folder} · {when} 등록",
+    "star": "Star",
+    "starred": "Star 함",
+    "try": "내 프로젝트에서 시험",
+    "trials": "GAID 시험 {count}회",
+    "comments": "의견 {count}개",
+    "commentPlaceholder": "시험해 본 결과나 고칠 점을 적으세요.",
+    "comment": "의견 남기기"
+  },
+  "flow": {
+    "decide": "연구자가 정함: {question}"
+  },
+  "io": {
+    "tableCaption": "{label} 예시 ({formats}) · 예시 값",
+    "boundaryCaption": "{label} 예시 ({formats}) · 예시 도형",
+    "paperFigure": "논문 그림",
+    "generated": "개념 그림(생성)",
+    "noImage": "그림 없음"
   }
 }

@@ -282,3 +282,61 @@ export function SourcePageDialog({ open, onOpenChange, name, url, page }: Dialog
     </Dialog>
   );
 }
+
+/** Register a draft in the shared GAID hub: folder, a short note for other researchers, what is and is not shared. */
+export function RegisterDialog({
+  open,
+  onOpenChange,
+  folders,
+  onRegister,
+}: DialogProps & { folders: { id: string; name: string }[]; onRegister: (folderId: string, note: string) => Promise<void> }) {
+  const [folder, setFolder] = useState(folders[0]?.id ?? "");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{text("register.title")}</DialogTitle>
+        </DialogHeader>
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          {text("register.folder")}
+          <select className="h-9 rounded-md border bg-background px-2 text-sm font-normal" value={folder} onChange={(e) => setFolder(e.target.value)}>
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          {text("register.note")}
+          <Textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder={text("register.notePlaceholder")} />
+        </label>
+        <ul className="flex flex-col gap-1 rounded-lg bg-muted/50 p-3 text-sm">
+          <li>{text("register.shared")}</li>
+          <li className="text-muted-foreground">{text("register.notShared")}</li>
+        </ul>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {text("draft.close")}
+          </Button>
+          <Button
+            disabled={busy || !folder}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await onRegister(folder, note.trim());
+                onOpenChange(false);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {text("register.submit")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

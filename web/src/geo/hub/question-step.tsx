@@ -32,6 +32,49 @@ export function answerLabel(q: Question, a: DraftAnswer | undefined): string {
   return option?.label ?? a.response?.trim() ?? "";
 }
 
+/** A figure of the source that a question refers to (page image and caption). */
+export interface QuestionFigure {
+  src: string;
+  label: string;
+  caption: string;
+  page: number;
+  /** One line on what the figure shows for this question (optional). */
+  note?: string;
+}
+
+function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
+  const [index, setIndex] = useState(0);
+  const figure = figures[Math.min(index, figures.length - 1)];
+  return (
+    <figure className="flex min-h-0 flex-col gap-2 rounded-xl border bg-card p-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={figure.src} alt={figure.label} className="max-h-[46vh] w-full rounded-md border object-contain" />
+      <figcaption className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">
+          {figure.label} · {text("questions.page", { page: figure.page })}
+        </span>
+        <span className="line-clamp-3 text-muted-foreground">{figure.caption}</span>
+        {figure.note && <span className="text-primary/90">{figure.note}</span>}
+      </figcaption>
+      {figures.length > 1 && (
+        <div className="flex gap-1.5">
+          {figures.map((f, i) => (
+            <button
+              key={`${f.page}-${f.label}`}
+              type="button"
+              aria-pressed={i === index}
+              onClick={() => setIndex(i)}
+              className={cn("rounded-md border px-2 py-1 text-xs", i === index ? "border-primary text-primary" : "text-muted-foreground")}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </figure>
+  );
+}
+
 export function QuestionStep({
   questions,
   answers,
@@ -40,7 +83,10 @@ export function QuestionStep({
   applying,
   onOpenPage,
   locked,
+  figures,
 }: {
+  /** Figures of the sources related to a question (shown beside it). */
+  figures?: (question: Question) => QuestionFigure[];
   questions: Question[];
   answers: Record<string, DraftAnswer>;
   /** Questions whose answers are already recorded: shown, not editable, not sent again. */
@@ -60,7 +106,7 @@ export function QuestionStep({
   const go = (i: number) => setIndex(Math.max(0, Math.min(questions.length, i)));
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-2xl flex-col gap-4">
+    <div className={cn("mx-auto flex h-full min-h-0 w-full flex-col gap-4", figures ? "max-w-6xl" : "max-w-2xl")}>
       <div className="flex items-center justify-between gap-3">
         <div role="tablist" aria-label={text("questions.title")} className="flex flex-wrap items-center gap-1.5">
           {questions.map((q, i) => {
@@ -108,6 +154,19 @@ export function QuestionStep({
       <div className="min-h-0 flex-1 overflow-y-auto">
         {reviewing ? (
           <ReviewPanel questions={questions} answers={answers} onEdit={go} />
+        ) : figures && figures(questions[index]).length > 0 ? (
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+            <FigurePanel key={questions[index].id} figures={figures(questions[index])} />
+            <QuestionCard
+              key={questions[index].id}
+              number={index + 1}
+              question={questions[index]}
+              locked={locked?.has(questions[index].id) ?? false}
+              answer={answers[questions[index].id]}
+              onChange={(a) => onAnswer(questions[index].id, a)}
+              onOpenPage={onOpenPage}
+            />
+          </div>
         ) : (
           <QuestionCard
             key={questions[index].id}
@@ -180,14 +239,13 @@ function QuestionCard({
         <h2 id={`${otherId}-q`} className="text-xl font-semibold leading-snug">
           {question.text}
         </h2>
+        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 rounded-lg bg-muted/50 px-3 py-2 text-sm">
+          <dt className="font-medium text-muted-foreground">{text("questions.intent")}</dt>
+          <dd>{question.reason}</dd>
+          <dt className="font-medium text-muted-foreground">{text("questions.link")}</dt>
+          <dd>{question.affects}</dd>
+        </dl>
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <Popover>
-            <PopoverTrigger className="underline-offset-4 hover:underline">{text("questions.why")}</PopoverTrigger>
-            <PopoverContent className="w-80 text-sm leading-relaxed">
-              <p>{question.reason}</p>
-              <p className="mt-2 text-muted-foreground">{question.affects}</p>
-            </PopoverContent>
-          </Popover>
           {evidence.length > 0 && (
             <Popover>
               <PopoverTrigger className="inline-flex items-center gap-1 underline-offset-4 hover:underline">

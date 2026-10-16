@@ -5,7 +5,7 @@
  * flow. The right rail tries the draft in a project. Technical files, check output and the
  * agent record open only on request.
  */
-import { FileTextIcon, FlaskConicalIcon, PencilLineIcon, XIcon } from "lucide-react";
+import { FileTextIcon, FlaskConicalIcon, PencilLineIcon, Share2Icon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
-import { FlowDiagram } from "./flow-diagram";
+import { MethodFlow, type StepVisual } from "./method-flow";
 import { localText } from "./text";
 
 const text = geoText("hub");
@@ -26,7 +26,17 @@ export function DraftStep({
   onFeedback,
   onShowFiles,
   onShowIssues,
+  onRegister,
+  registered,
+  visuals,
+  outputImages,
 }: {
+  /** Register the draft in the shared GAID hub (others can star and comment). */
+  onRegister?: () => void;
+  /** Already registered: revision shown in the hub. */
+  registered?: number | null;
+  visuals?: Record<string, StepVisual>;
+  outputImages?: Record<string, StepVisual>;
   draft: MethodDraft;
   trialCount: number;
   /** Error findings of the latest check (0 = passed); null while unknown. */
@@ -36,9 +46,7 @@ export function DraftStep({
   onShowFiles?: () => void;
   onShowIssues?: () => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
   const profile = draft.profile;
-  const node = profile.procedure.nodes.find((n) => n.id === selected) ?? null;
 
   return (
     <div className="grid h-full min-h-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -57,40 +65,18 @@ export function DraftStep({
 
         <section className="flex flex-col gap-3">
           <h3 className="text-sm font-semibold">{text("draft.flow")}</h3>
-          <FlowDiagram
-            nodes={profile.procedure.nodes}
-            edges={profile.procedure.edges}
-            selected={selected}
-            onSelect={(id) => setSelected((cur) => (cur === id ? null : id))}
-          />
-          {node && (
-            <div className="relative rounded-xl border bg-muted/40 p-4 text-sm">
-              <button
-                type="button"
-                aria-label={text("draft.close")}
-                onClick={() => setSelected(null)}
-                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
-              >
-                <XIcon className="size-4" />
-              </button>
-              <p className="font-semibold">{text("draft.stepDetail", { label: localText(node.label) })}</p>
-              <p className="mt-1 leading-relaxed">{localText(node.summary)}</p>
-              {node.checks && node.checks.length > 0 && (
-                <p className="mt-2 text-muted-foreground">
-                  {text("draft.checks")}: {node.checks.map(localText).join(" · ")}
-                </p>
-              )}
-            </div>
-          )}
+          <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
         </section>
 
-        <section className="grid gap-3 md:grid-cols-3">
-          <Facts title={text("draft.inputs")} items={(profile.inputs ?? []).map((i) => localText(i.label))} />
-          <Facts title={text("draft.outputs")} items={profile.outputs.map((o) => localText(o.label))} />
-          <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} full />
-        </section>
+        <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} full />
 
         <div className="flex flex-wrap items-center gap-2">
+          {onRegister && (
+            <Button size="sm" onClick={onRegister}>
+              <Share2Icon data-icon="inline-start" />
+              {registered ? text("register.update", { n: registered }) : text("register.open")}
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={onFeedback}>
             <PencilLineIcon data-icon="inline-start" />
             {text("draft.feedback")}

@@ -1,8 +1,9 @@
 "use client";
 /** Sources: drop files, say what to make, start reading. While reading, show real progress only. */
-import { CheckIcon, FileArchiveIcon, FileTextIcon, LoaderCircleIcon, UploadIcon, XIcon } from "lucide-react";
+import { CheckIcon, FileArchiveIcon, FileTextIcon, GlobeIcon, LinkIcon, LoaderCircleIcon, UploadIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { AuthoringAttempt, AuthoringProject, SourceDocument } from "@/geo/contracts/authoring";
@@ -12,6 +13,46 @@ import { cn } from "@/lib/utils";
 const text = geoText("hub");
 
 export type Target = "auto" | "skill" | "workflow";
+export type WebSourceKind = "paper" | "blog" | "search";
+
+function UrlForm({ onAdd }: { onAdd: (url: string, kind: WebSourceKind) => void }) {
+  const [url, setUrl] = useState("");
+  const [kind, setKind] = useState<WebSourceKind>("paper");
+  const valid = /^https?:\/\/\S+$/.test(url.trim());
+  return (
+    <form
+      className="flex flex-col gap-2 sm:flex-row"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!valid) return;
+        onAdd(url.trim(), kind);
+        setUrl("");
+      }}
+    >
+      <select
+        aria-label={text("sources.urlKind")}
+        className="h-9 rounded-md border bg-background px-2 text-sm"
+        value={kind}
+        onChange={(e) => setKind(e.target.value as WebSourceKind)}
+      >
+        <option value="paper">{text("sources.kindPaper")}</option>
+        <option value="blog">{text("sources.kindBlog")}</option>
+        <option value="search">{text("sources.kindSearch")}</option>
+      </select>
+      <Input
+        className="flex-1"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder={text("sources.urlPlaceholder")}
+        aria-label={text("sources.url")}
+      />
+      <Button type="submit" variant="outline" disabled={!valid}>
+        <LinkIcon data-icon="inline-start" />
+        {text("sources.addUrl")}
+      </Button>
+    </form>
+  );
+}
 
 export function sourceLine(project: AuthoringProject, source: SourceDocument): string {
   const x = project.extractions[source.id];
@@ -32,7 +73,13 @@ export function SourceStep({
   onStart,
   pdfText = true,
   analyzed = false,
+  onUrl,
+  urls = [],
 }: {
+  /** Add a web source (paper/article URL, blog, a web search result page); the server fetches it inside the institute network. */
+  onUrl?: (url: string, kind: WebSourceKind) => void;
+  /** Web sources already added (mockup until the server fetches URLs). */
+  urls?: { url: string; kind: WebSourceKind; status: "fetched" | "fetching" | "failed"; title?: string }[];
   project: AuthoringProject;
   goal: string;
   onGoal: (value: string) => void;
@@ -89,8 +136,15 @@ export function SourceStep({
           }}
         />
       </div>
+      {onUrl && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium">{text("sources.url")}</span>
+          <UrlForm onAdd={onUrl} />
+          <span className="text-xs text-muted-foreground">{text("sources.urlNote")}</span>
+        </div>
+      )}
       {!pdfText && <p className="text-sm text-muted-foreground">{text("sources.noPdfText")}</p>}
-      {(project.sources.length > 0 || uploading) && (
+      {(project.sources.length > 0 || uploading || urls.length > 0) && (
         <ul className="flex flex-col gap-2">
           {project.sources.map((s) => (
             <li key={s.id} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
@@ -110,6 +164,16 @@ export function SourceStep({
                   <XIcon className="size-4" />
                 </button>
               )}
+            </li>
+          ))}
+          {urls.map((u) => (
+            <li key={u.url} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+              <GlobeIcon className="size-4 text-muted-foreground" aria-hidden />
+              <span className="min-w-0 flex-1 truncate">{u.title ?? u.url}</span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {text(`sources.kind${u.kind === "paper" ? "Paper" : u.kind === "blog" ? "Blog" : "Search"}`)} ·{" "}
+                {text(`sources.url_${u.status}`)}
+              </span>
             </li>
           ))}
           {uploading && (
@@ -210,5 +274,37 @@ export function WorkingPanel({
       </ol>
       <p className="text-sm text-muted-foreground">{note}</p>
     </section>
+  );
+}
+
+/** While the coauthor reads: the original PDF on the left (page by page), the real progress on the right. */
+export function ReadingView({
+  project,
+  attempt,
+  title,
+  note,
+  pdf,
+}: {
+  project: AuthoringProject;
+  attempt: AuthoringAttempt;
+  title: string;
+  note: string;
+  /** The first PDF source to show; null when the sources have no PDF. */
+  pdf: { name: string; url: string } | null;
+}) {
+  if (!pdf) return <WorkingPanel project={project} attempt={attempt} title={title} note={note} />;
+  return (
+    <div className="grid h-full min-h-0 gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <section className="flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-xl border">
+        <header className="flex items-center gap-2 border-b bg-muted/40 px-3 py-2 text-sm font-medium">
+          <FileTextIcon className="size-4" aria-hidden />
+          <span className="truncate">{pdf.name}</span>
+        </header>
+        <div className="min-h-0 flex-1">
+          <PdfViewer path={pdf.name} sourceUrl={pdf.url} hideAnnotationUi initialFitWidth />
+        </div>
+      </section>
+      <WorkingPanel project={project} attempt={attempt} title={title} note={note} />
+    </div>
   );
 }

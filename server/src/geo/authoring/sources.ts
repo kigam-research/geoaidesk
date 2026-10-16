@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { gunzipSync } from "node:zlib";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import AdmZip from "adm-zip";
 import { readTar, safeEntryPath, type TarEntry } from "../tar.ts";
 import type {
@@ -295,4 +298,30 @@ export async function addSource(
 
 export async function pageText(store: AuthoringStore, projectId: string, sourceId: string, page: number) {
   return (await store.readFile(projectId, pageFile(sourceId, page))).toString("utf8");
+}
+
+/** PNG of one PDF page (poppler `pdftoppm`), cached next to the page text; width 200-1600 px. */
+export async function pageImage(
+  store: AuthoringStore,
+  projectId: string,
+  sourceId: string,
+  page: number,
+  width: number,
+): Promise<Buffer> {
+  const w = Math.max(200, Math.min(1600, Math.round(width / 100) * 100 || 800));
+  const cached = `sources/${sourceId}/page-images/${String(page).padStart(4, "0")}-${w}.png`;
+  if (store.exists(projectId, cached)) return store.readFile(projectId, cached);
+  const original = store.within(projectId, `sources/${sourceId}/original`);
+  // pdftoppm writes files (it has no stdout mode for PNG): render into a temp folder, then cache.
+  const dir = await mkdtemp(join(tmpdir(), "authoring-page-"));
+  try {
+    const root = join(dir, "page");
+    const r = await run("pdftoppm", ["-png", "-f", String(page), "-l", String(page), "-scale-to-x", String(w), "-scale-to-y", "-1", "-singlefile", original, root]);
+    const png = r.code === 0 ? await readFile(`${root}.png`).catch(() => null) : null;
+    if (!png?.length) throw new AuthoringError("쪽 그림을 만들지 못했습니다.", 422);
+    await store.writeFile(projectId, cached, png);
+    return png;
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 }

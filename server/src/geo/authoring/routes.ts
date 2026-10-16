@@ -19,7 +19,7 @@ import { startOperation } from "./agent.ts";
 import { installPackage } from "./install.ts";
 import { modelConfig } from "./model.ts";
 import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./package.ts";
-import { addSource, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
+import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, AuthoringStore, authoringOwner, newId, now } from "./store.ts";
 import { loadVocabulary, type Vocabulary } from "./vocabulary.ts";
 
@@ -188,6 +188,17 @@ export async function registerAuthoringRoutes(
         `${source.kind === "pdf" ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(source.name)}`,
       );
       return reply.send(bytes);
+    });
+    scope.get("/geo/authoring/projects/:id/sources/:sid/page-image/:page", async (req, reply) => {
+      const project = await store.read(id(req.params));
+      const params = req.params as { sid: string; page: string };
+      const extraction = project.extractions[params.sid];
+      const page = Number(params.page);
+      if (!extraction?.pages || !Number.isInteger(page) || page < 1 || page > extraction.pages)
+        throw new AuthoringError("없는 쪽입니다.", 404);
+      const width = Number((req.query as { w?: string }).w ?? 800);
+      reply.header("Content-Type", "image/png");
+      return reply.send(await pageImage(store, project.id, params.sid, page, width));
     });
     scope.get("/geo/authoring/projects/:id/sources/:sid/pages/:page", async (req) => {
       const project = await store.read(id(req.params));

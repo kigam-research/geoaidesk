@@ -114,7 +114,17 @@ function HubList({ onOpen }: { onOpen: (id: string) => void }) {
     };
   }, []);
   return (
-    <HubHome projects={projects} loading={loading} error={error} onCreate={() => onOpen(NEW_ID)} onOpen={onOpen} />
+    <HubHome
+      recommended={[]}
+      folders={[{ id: "all", name: text("home.allFolders"), count: projects.length }]}
+      folderId="all"
+      onFolder={() => undefined}
+      projects={projects}
+      loading={loading}
+      error={error}
+      onCreate={() => onOpen(NEW_ID)}
+      onOpen={onOpen}
+    />
   );
 }
 
