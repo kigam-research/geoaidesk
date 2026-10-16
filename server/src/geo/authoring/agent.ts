@@ -290,9 +290,8 @@ export function validateAnalysis(
     const affects = str(q.affects, 300)
     if (!text || !reason || !affects)
       return errors.push(`${where}: text, reason and affects are required`)
-    const answerType =
-      (['choice', 'text', 'choice-or-text'] as const).find((t) => t === q.answerType) ??
-      'choice-or-text'
+    // The screen always offers a free-text "기타" next to the options.
+    const answerType = q.answerType === 'text' ? ('text' as const) : ('choice-or-text' as const)
     const options: QuestionOption[] = arr(q.options)
       .filter(isObj)
       .map((o) => {

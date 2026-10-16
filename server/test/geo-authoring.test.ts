@@ -127,7 +127,7 @@ describe("GAID hub authoring", () => {
       store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 2, optionId: "generalization" }, "r")),
     ).rejects.toMatchObject({ status: 409 });
     await expect(
-      store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 1, response: "아무거나" }, "r")),
+      store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 1, optionId: "not-listed" }, "r")),
     ).rejects.toMatchObject({ status: 400 });
     const d = await store.mutate(projectId, (p) => answerQuestion(p, q.id, { questionRevision: 1, optionId: "generalization" }, "r"));
     expect(d.response).toBe("새 자료 적용");
@@ -140,14 +140,14 @@ describe("GAID hub authoring", () => {
     const { store, projectId } = await fixture();
     await runOperation(store, projectId, "analyze", "op-analyze-all", deps(reply(analysis)));
     const [scope, code] = (await store.read(projectId)).questions;
-    // One bad item (scope is choice-only and gets free text): nothing is stored.
+    // One bad item (an option the question does not list): nothing is stored.
     await expect(
       store.mutate(projectId, (p) =>
         answerAll(
           p,
           [
             { questionId: code.id, questionRevision: 1, response: "필요한 스크립트만" },
-            { questionId: scope.id, questionRevision: 1, response: "둘 다" },
+            { questionId: scope.id, questionRevision: 1, optionId: "both" },
           ],
           "r",
         ),

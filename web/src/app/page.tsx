@@ -63,6 +63,7 @@ import { geoTaskChatState } from "@/geo/workspace/tab-state";
 import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
+import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
 import {
   useCallback,
   useEffect,
@@ -680,6 +681,16 @@ function WorkspacePage({
     setActiveTabId(id);
     setView("chat");
   }, []);
+
+  // GAID hub: a draft installed into this project opens its start settings in the Workflows view.
+  useEffect(() => {
+    if (!isActive) return;
+    const check = () => {
+      if (hasMethodSetup(projectId)) setView("workflows");
+    };
+    check();
+    return onMethodSetupRequest(check);
+  }, [isActive, projectId]);
 
   // GeoAIDesk: a task started from the task list, a file suggestion or a
   // recipe opens in a new tab holding its draft (never sent automatically).

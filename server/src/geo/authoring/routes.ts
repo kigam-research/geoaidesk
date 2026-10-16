@@ -98,7 +98,8 @@ export function answerQuestion(
       if (!option || q.answerType === 'text') throw new AuthoringError('선택지에 없는 답입니다.')
       optionId = option.id
       if (!response) response = option.label
-    } else if (q.answerType === 'choice') throw new AuthoringError('선택지 중 하나를 골라 주세요.')
+    }
+    // Every question accepts a free-text answer ("기타"), also when the coauthor proposed choices only.
     if (!response || response.length > 4000) throw new AuthoringError('답을 입력해 주세요.')
   }
   const decision = {

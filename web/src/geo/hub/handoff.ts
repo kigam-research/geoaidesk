@@ -19,6 +19,10 @@ export function openMethodSetup(request: OpenMethodSetupRequest): void {
   window.dispatchEvent(new CustomEvent(OPEN_METHOD_SETUP_EVENT));
 }
 
+export function hasMethodSetup(projectId: string): boolean {
+  return pending?.projectId === projectId;
+}
+
 /** The workspace of `projectId` takes a pending request (once). */
 export function takeMethodSetup(projectId: string): OpenMethodSetupRequest | null {
   if (!pending || pending.projectId !== projectId) return null;

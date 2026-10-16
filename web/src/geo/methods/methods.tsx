@@ -11,6 +11,7 @@ import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, Met
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
 import { Readiness } from "@/geo/workspace/readiness";
+import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 
 export const METHOD_CATEGORY = "hub-methods";
 const pill = "inline-flex rounded-full border px-1.5 py-px text-[10px] font-medium";
@@ -72,6 +73,19 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
     void reload();
     return () => { generation.current++; };
   }, [reload]);
+  // GAID hub: a draft just installed into this project opens its start settings (or its detail without a Workflow).
+  useEffect(() => {
+    const take = () => {
+      const request = takeMethodSetup(projectId);
+      if (!request) return;
+      void reload().then(() => {
+        if (request.workflowId) setSetup({ methodKey: request.methodKey, workflowId: request.workflowId, recipeId: request.recipeId ?? undefined });
+        else setDetailKey(request.methodKey);
+      });
+    };
+    take();
+    return onMethodSetupRequest(take);
+  }, [projectId, reload]);
   const methods = data?.methods ?? [];
   const selectSetup = (method: LocalMethodSummary, workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => {
     setDetailKey(null); setSetup({ methodKey: method.key, workflowId: workflow.id, recipeId: recipe?.id });

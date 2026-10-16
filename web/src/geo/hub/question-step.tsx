@@ -158,7 +158,8 @@ function QuestionCard({
 }) {
   const otherId = useId();
   const choice = question.answerType !== "text";
-  const free = question.answerType !== "choice";
+  // Always offer "기타" (also for a stored choice-only question).
+  const free = true;
   const evidence = question.evidence.filter((e) => e.verified && e.page);
   return (
     <section className="flex flex-col gap-5 py-2" aria-labelledby={`${otherId}-q`}>
