@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-16T05:37:25Z
+status: ready
+updated: 2026-10-16T05:37:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -83,7 +83,9 @@ semicolons, 120 columns).
   test/geo-authoring-package.test.ts` passed (3 files, 25 tests). No real model calls or running-instance changes.
 - Full repository checks will run via `task finish`; parent owns screen integration and final runtime walkthrough.
 ## Next steps
-1. Final file review and `task finish` (explicitly include new server files and test), then parent `task complete`.
+<!-- task:closed -->
+Closed 2026-10-16T05:37:42Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial typecheck caught the difference between AtlasTextInput and MethodText and an inferred optional union;
   corrected the text helper and check-result narrowing.
