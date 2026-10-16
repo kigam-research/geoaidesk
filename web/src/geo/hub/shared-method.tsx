@@ -99,12 +99,17 @@ export function SharedMethod({
               {method.starred ? text("shared.starred") : text("shared.star")}
               <span className="ml-1 rounded bg-background/20 px-1.5 text-xs">{method.stars}</span>
             </Button>
-            <Button onClick={onTry}>
+            <Button variant={preview ? "outline" : "default"} onClick={onTry}>
               <DownloadIcon data-icon="inline-start" />
               {text("shared.try")}
             </Button>
           </div>
           <span className="text-xs text-muted-foreground">{text("shared.trials", { count: method.trials })}</span>
+          {method.comments.length > 0 && (
+            <a href="#shared-comments" className="text-sm text-primary underline-offset-4 hover:underline">
+              {text("shared.toComments", { count: method.comments.length })}
+            </a>
+          )}
         </div>
       </header>
 

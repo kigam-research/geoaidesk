@@ -12,7 +12,7 @@
   "home": {
     "title": "GAID hub",
     "body": "A hub to build skills or Workflows from literature and data, share them and get feedback",
-    "new": "Create method",
+    "new": "Create skill or Workflow",
     "empty": "No methods yet. Upload a paper PDF or code to start.",
     "loading": "Reading the list.",
     "error": "Could not read the list: {detail}",
@@ -40,7 +40,9 @@
     "sources": "Sources",
     "questions": "Questions",
     "draft": "Draft",
-    "trial": "Trial"
+    "trial": "Trial",
+    "publish": "Register in hub",
+    "trialOptional": "Try in my research (optional)"
   },
   "sources": {
     "title": "Upload sources",
@@ -206,26 +208,29 @@
     "open": "Preview hub page",
     "update": "Update hub entry (revision {n})",
     "title": "Register in the GAID hub",
-    "folder": "Folder",
+    "folder": "Hub category (folder)",
     "note": "Note for other researchers",
-    "notePlaceholder": "e.g. Quick trial done on the Yilgarn grid. Please try it on data from another craton.",
+    "notePlaceholder": "e.g. Built for grid data from other regions. Please try it and leave feedback.",
     "shared": "Shared: skill and Workflow files, method flow, check record, trial assessments",
     "notShared": "Not shared: uploaded paper PDFs, original code archives, research data",
     "submit": "Register in hub",
     "line": "Registered methods can be viewed, starred and discussed by other researchers. Check how it will look first.",
     "registeredLine": "Revision {n} is registered in the hub.",
     "previewBanner": "Preview: this is how other researchers will see it in the hub.",
-    "backToDraft": "Back to draft"
+    "backToDraft": "Back to draft",
+    "notYet": "The shared hub store is connected after the screens are agreed. Preview only for now.",
+    "before": "not registered"
   },
   "shared": {
-    "by": "{author} · {folder} · registered {when}",
+    "by": "{author} · {folder} · {when}",
     "star": "Star",
     "starred": "Starred",
     "try": "Try in my project",
-    "trials": "{count, plural, one {# GAID trial} other {# GAID trials}}",
+    "trials": "{count, plural, one {# GAID trial record} other {# GAID trial records}} (not a review)",
     "comments": "{count, plural, one {# comment} other {# comments}}",
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
-    "comment": "Add comment"
+    "comment": "Add comment",
+    "toComments": "{count, plural, one {Show # comment} other {Show # comments}}"
   },
   "flow": {
     "decide": "You decide: {question}"
@@ -235,6 +240,7 @@
     "boundaryCaption": "Example of {label} ({formats}) · example shape",
     "paperFigure": "Paper figure",
     "generated": "Concept image (generated)",
-    "noImage": "No image"
+    "noImage": "No image",
+    "exampleTable": "Example table · example values"
   }
 }

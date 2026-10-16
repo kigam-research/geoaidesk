@@ -32,6 +32,9 @@ import type { HubLocation } from "./location";
 import { QuestionStep, type DraftAnswer } from "./question-step";
 import { SourceStep, WorkingPanel, type Target } from "./source-step";
 import { TrialStep, useTrialCount } from "./trial-step";
+import { SharedMethod } from "./shared-method";
+import { MethodFlow } from "./method-flow";
+import { localText } from "./text";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
 
@@ -275,7 +278,7 @@ function HubProject({
   const reached: HubStep[] = ["sources"];
   // Analysis done (findings) also opens the questions step, so a run with zero questions can still create the draft.
   if (questions.length || project.findings.length || (running && running.op !== "analyze")) reached.push("questions");
-  if (project.drafts.length) reached.push("draft", "trial");
+  if (project.drafts.length) reached.push("draft", "publish", "trial");
   const title = project.title || text("home.new");
 
   const ensureProject = async (): Promise<string> => {
@@ -433,6 +436,36 @@ function HubProject({
         />
       </>
     );
+  } else if (draft && current === "publish") {
+    body = (
+      <SharedMethod
+        preview={{
+          onBack: () => setStep("draft"),
+          // The shared registry (institute GAID server) is built after the mockups are agreed with the user.
+          onRegister: () => toast.info(text("register.notYet")),
+        }}
+        method={{
+          id: project.id,
+          title: localText(draft.profile.title),
+          summary: localText(draft.profile.summary),
+          author: project.owner,
+          folder: "—",
+          revision: draft.revision,
+          registeredAt: text("register.before"),
+          kind: draft.workflow ? "workflow" : "skill",
+          tags: [...draft.profile.taxonomy.tasks, ...(draft.profile.taxonomy.methods ?? [])].slice(0, 5),
+          stars: 0,
+          starred: false,
+          trials: trialCount ?? 0,
+          image: null,
+          comments: [],
+        }}
+        flow={<MethodFlow profile={draft.profile} />}
+        onStar={() => undefined}
+        onComment={() => undefined}
+        onTry={() => setStep("trial")}
+      />
+    );
   } else if (draft && current === "draft") {
     const issues = check ? check.findings.filter((f) => f.level === "error").length : null;
     body = (
@@ -446,6 +479,7 @@ function HubProject({
         }}
         onShowFiles={() => setDialog("files")}
         onShowIssues={() => setDialog("issues")}
+        onRegister={() => setStep("publish")}
         rail={
           <TrialCard
             projects={activeProjects.map((p) => ({ id: p.id, name: p.name }))}

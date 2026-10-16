@@ -36,6 +36,20 @@ const code = {
   status: "extracted" as const,
 };
 
+const REASONS: Record<string, [string, string]> = {
+  scope: [
+    "재현이면 논문 설정을 그대로 고정하고, 적용이면 블록 크기와 구역 경계를 새 자료에서 다시 정합니다.",
+    "2·3·6단계와 레시피의 미정 항목",
+  ],
+  "code-path": [
+    "포함하면 원본 스크립트가 스킬에 들어가 바로 실행되고, 빼면 단계 설명만 남습니다.",
+    "스킬 파일 구성과 시험 방식",
+  ],
+  "zone-thresholds": ["연구자가 정하면 실행 중에 묻고, 논문 값이면 1/5/10% 경계를 미리 넣습니다.", "6단계 구역 경계"],
+  "input-format": ["CSV면 셀 표를 바로 읽고, 래스터면 격자로 바꾸는 단계가 앞에 붙습니다.", "1단계 자료 확인"],
+  outputs: ["보고서용이면 그림과 요약 표를 함께 만들고, 검토용이면 지도와 목록만 만듭니다.", "7단계 결과 정리"],
+};
+
 function question(
   id: string,
   key: string,
@@ -49,8 +63,8 @@ function question(
     key,
     revision: 1,
     text,
-    reason: "답에 따라 만드는 방법의 범위가 달라집니다.",
-    affects: "초안의 단계와 레시피",
+    reason: REASONS[key]?.[0] ?? "답에 따라 만드는 방법의 범위가 달라집니다.",
+    affects: REASONS[key]?.[1] ?? "초안의 단계와 레시피",
     answerType: "choice-or-text",
     options,
     materiality: "required",
@@ -116,15 +130,10 @@ export const FIXTURE_QUESTIONS: Question[] = [
     "grid-csv",
     "원본 코드가 격자 셀 표를 읽습니다.",
   ),
-  question(
-    "q-output001",
-    "outputs",
-    "결과물은 어디에 쓸 예정인가요?",
-    [
-      { id: "targeting", label: "탐사 대상 선정 검토" },
-      { id: "report", label: "보고서 그림과 표" },
-    ],
-  ),
+  question("q-output001", "outputs", "결과물은 어디에 쓸 예정인가요?", [
+    { id: "targeting", label: "탐사 대상 선정 검토" },
+    { id: "report", label: "보고서 그림과 표" },
+  ]),
 ];
 
 const draft: MethodDraft = {
@@ -157,11 +166,39 @@ const draft: MethodDraft = {
     procedure: {
       nodes: [
         { id: "n1", label: "자료 확인", type: "input", summary: "셀 수, 양성 셀 수, 격자 간격과 좌표계를 확인합니다." },
-        { id: "n2", label: "공간 의존성 확인", type: "analysis", summary: "축소한 표본으로 바리오그램을 계산해 블록 크기를 제안합니다.", checks: ["표본 약 18,000셀, 2–5분"] },
-        { id: "n3", label: "블록 크기 확정", type: "human-gate", summary: "제안한 블록 크기를 연구자가 확인합니다.", decisionIds: ["block-size"] },
-        { id: "n4", label: "중첩 공간 교차검증", type: "analysis", summary: "공간 블록으로 나눠 모델을 학습하고 평가합니다." },
-        { id: "n5", label: "불확실성과 보정", type: "analysis", summary: "부트스트랩과 컨포멀 보정으로 예측 범위를 구합니다." },
-        { id: "n6", label: "구역 경계 정하기", type: "human-gate", summary: "우선순위 구역 경계값을 연구자가 정합니다.", decisionIds: ["zone-thresholds"] },
+        {
+          id: "n2",
+          label: "공간 의존성 확인",
+          type: "analysis",
+          summary: "축소한 표본으로 바리오그램을 계산해 블록 크기를 제안합니다.",
+          checks: ["표본 약 18,000셀, 2–5분"],
+        },
+        {
+          id: "n3",
+          label: "블록 크기 확정",
+          type: "human-gate",
+          summary: "제안한 블록 크기를 연구자가 확인합니다.",
+          decisionIds: ["block-size"],
+        },
+        {
+          id: "n4",
+          label: "중첩 공간 교차검증",
+          type: "analysis",
+          summary: "공간 블록으로 나눠 모델을 학습하고 평가합니다.",
+        },
+        {
+          id: "n5",
+          label: "불확실성과 보정",
+          type: "analysis",
+          summary: "부트스트랩과 컨포멀 보정으로 예측 범위를 구합니다.",
+        },
+        {
+          id: "n6",
+          label: "구역 경계 정하기",
+          type: "human-gate",
+          summary: "우선순위 구역 경계값을 연구자가 정합니다.",
+          decisionIds: ["zone-thresholds"],
+        },
         { id: "n7", label: "결과 정리", type: "output", summary: "구역 지도와 우선순위 목록, 적용 한계를 만듭니다." },
       ],
       edges: [

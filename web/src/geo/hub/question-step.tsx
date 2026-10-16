@@ -37,7 +37,8 @@ export interface QuestionFigure {
   src: string;
   label: string;
   caption: string;
-  page: number;
+  /** Source page, when the figure is the paper's own figure. */
+  page?: number;
   /** One line on what the figure shows for this question (optional). */
   note?: string;
 }
@@ -51,7 +52,8 @@ function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
       <img src={figure.src} alt={figure.label} className="max-h-[46vh] w-full rounded-md border object-contain" />
       <figcaption className="flex flex-col gap-1 text-sm">
         <span className="font-medium">
-          {figure.label} · {text("questions.page", { page: figure.page })}
+          {figure.label}
+          {figure.page ? ` · ${text("questions.page", { page: figure.page })}` : ""}
         </span>
         <span className="line-clamp-3 text-muted-foreground">{figure.caption}</span>
         {figure.note && <span className="text-primary/90">{figure.note}</span>}
@@ -164,7 +166,7 @@ export function QuestionStep({
           <ReviewPanel questions={questions} answers={answers} onEdit={go} />
         ) : figures && figures(questions[index]).length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-            <FigurePanel key={questions[index].id} figures={figures(questions[index])} />
+            <FigurePanel key={`figure-${questions[index].id}`} figures={figures(questions[index])} />
             <QuestionCard
               key={questions[index].id}
               number={index + 1}
@@ -176,15 +178,17 @@ export function QuestionStep({
             />
           </div>
         ) : (
-          <QuestionCard
-            key={questions[index].id}
-            number={index + 1}
-            question={questions[index]}
-            locked={locked?.has(questions[index].id) ?? false}
-            answer={answers[questions[index].id]}
-            onChange={(a) => onAnswer(questions[index].id, a)}
-            onOpenPage={onOpenPage}
-          />
+          <div className="mx-auto w-full max-w-2xl">
+            <QuestionCard
+              key={questions[index].id}
+              number={index + 1}
+              question={questions[index]}
+              locked={locked?.has(questions[index].id) ?? false}
+              answer={answers[questions[index].id]}
+              onChange={(a) => onAnswer(questions[index].id, a)}
+              onOpenPage={onOpenPage}
+            />
+          </div>
         )}
       </div>
 

@@ -12,7 +12,7 @@
   "home": {
     "title": "GAID 허브",
     "body": "문헌 및 데이터로 스킬 또는 Workflow를 만들어서 공유하고 피드백을 받는 허브 공간",
-    "new": "새로 만들기",
+    "new": "스킬·Workflow 만들기",
     "empty": "만든 방법이 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
     "loading": "목록을 읽는 중입니다.",
     "error": "목록을 읽지 못했습니다: {detail}",
@@ -40,7 +40,9 @@
     "sources": "자료",
     "questions": "질문",
     "draft": "초안",
-    "trial": "시험"
+    "trial": "시험",
+    "publish": "허브 등록",
+    "trialOptional": "내 연구에서 시험 (선택)"
   },
   "sources": {
     "title": "자료 올리기",
@@ -206,26 +208,29 @@
     "open": "허브 등록 미리보기",
     "update": "허브 등록 갱신 ({n}판)",
     "title": "GAID 허브에 등록",
-    "folder": "폴더",
+    "folder": "허브 공개 분류 (폴더)",
     "note": "다른 연구자에게 남길 말",
-    "notePlaceholder": "예: Yilgarn 격자 자료로 빠른 시험을 마쳤습니다. 다른 크라톤 자료로 시험해 주세요.",
+    "notePlaceholder": "예: 다른 지역 격자 자료에 쓰도록 만들었습니다. 시험해 보고 의견을 남겨 주세요.",
     "shared": "공유: 스킬·Workflow 파일, 방법 흐름, 검사 기록, 시험 평가",
     "notShared": "공유하지 않음: 올린 원문 PDF, 코드 묶음 원본, 연구 자료",
     "submit": "허브에 등록",
     "line": "허브에 등록하면 다른 연구자가 보고 star와 의견을 남길 수 있습니다. 등록 전 모습을 먼저 확인하세요.",
     "registeredLine": "{n}판이 허브에 등록되어 있습니다.",
     "previewBanner": "미리보기: 허브에 등록하면 다른 연구자에게 이렇게 보입니다.",
-    "backToDraft": "초안으로 돌아가기"
+    "backToDraft": "초안으로 돌아가기",
+    "notYet": "허브 공유 저장소는 화면 협의 후 연결합니다. 지금은 미리보기만 됩니다.",
+    "before": "등록 전"
   },
   "shared": {
-    "by": "{author} · {folder} · {when} 등록",
+    "by": "{author} · {folder} · {when}",
     "star": "Star",
     "starred": "Star 함",
     "try": "내 프로젝트에서 시험",
-    "trials": "GAID 시험 {count}회",
+    "trials": "GAID 시험 기록 {count}회 (검토 결과 아님)",
     "comments": "의견 {count}개",
     "commentPlaceholder": "시험해 본 결과나 고칠 점을 적으세요.",
-    "comment": "의견 남기기"
+    "comment": "의견 남기기",
+    "toComments": "의견 {count}개 보기"
   },
   "flow": {
     "decide": "연구자가 정함: {question}"
@@ -235,6 +240,7 @@
     "boundaryCaption": "{label} 예시 ({formats}) · 예시 도형",
     "paperFigure": "논문 그림",
     "generated": "개념 그림(생성)",
-    "noImage": "그림 없음"
+    "noImage": "그림 없음",
+    "exampleTable": "예시 표 · 예시 값"
   }
 }

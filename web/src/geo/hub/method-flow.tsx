@@ -50,7 +50,17 @@ export function MethodFlow({
   );
 }
 
-function StepBox({ node, index, active, onSelect }: { node: ProcedureNode; index: number; active: boolean; onSelect: () => void }) {
+function StepBox({
+  node,
+  index,
+  active,
+  onSelect,
+}: {
+  node: ProcedureNode;
+  index: number;
+  active: boolean;
+  onSelect: () => void;
+}) {
   const gate = node.type === "human-gate" || node.type === "decision";
   const Icon = node.type === "input" ? FileInputIcon : node.type === "output" ? FileOutputIcon : null;
   return (
@@ -68,7 +78,12 @@ function StepBox({ node, index, active, onSelect }: { node: ProcedureNode; index
         {index + 1}
       </span>
       <span className="min-w-0 flex-1 font-medium leading-snug">{localText(node.label)}</span>
-      {gate && <UserRoundCheckIcon className="size-4 shrink-0 text-amber-600" aria-label={text("draft.you")} />}
+      {gate && (
+        <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+          <UserRoundCheckIcon className="size-3.5" aria-hidden />
+          {text("draft.you")}
+        </span>
+      )}
       {Icon && <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
       <ChevronRightIcon className={cn("size-4 shrink-0 text-muted-foreground", active && "text-primary")} aria-hidden />
     </button>
@@ -117,7 +132,7 @@ function StepDetail({
       {visual && (
         <figure className="flex flex-col gap-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={visual.src} alt="" className="max-h-72 w-full rounded-lg border object-contain" />
+          <img src={visual.src} alt="" className="max-h-56 w-full rounded-lg border object-contain" />
           <figcaption className="text-xs text-muted-foreground">
             {visual.caption} · {visual.kind === "paper" ? text("io.paperFigure") : text("io.generated")}
           </figcaption>

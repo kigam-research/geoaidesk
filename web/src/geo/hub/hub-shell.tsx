@@ -32,7 +32,13 @@ export function HubShell({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
+          <img
+            src="/brand/gaid-compact-on-dark.svg"
+            alt=""
+            width={73}
+            height={24}
+            className="hidden h-6 w-auto dark:block"
+          />
           <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
           {isVersioned && <span className="text-[11px] text-muted-foreground/60">v{APP_VERSION}</span>}
         </div>
@@ -44,7 +50,7 @@ export function HubShell({
   );
 }
 
-export type HubStep = "sources" | "questions" | "draft" | "trial";
+export type HubStep = "sources" | "questions" | "draft" | "publish" | "trial";
 
 /** Title row of one authoring project: back link, title, and the four steps. */
 export function ProjectBar({
@@ -63,7 +69,8 @@ export function ProjectBar({
   onBack: () => void;
   extra?: ReactNode;
 }) {
-  const steps: HubStep[] = ["sources", "questions", "draft", "trial"];
+  // The main path ends with registration in the hub; trying in a research project is a separate, optional view.
+  const steps: HubStep[] = ["sources", "questions", "draft", "publish"];
   const currentIndex = steps.indexOf(step);
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b px-6 py-3">
@@ -107,6 +114,19 @@ export function ProjectBar({
           );
         })}
       </nav>
+      {reached.includes("trial") && (
+        <button
+          type="button"
+          aria-current={step === "trial" ? "page" : undefined}
+          onClick={() => onStep("trial")}
+          className={cn(
+            "inline-flex h-8 items-center gap-1 rounded-full border border-dashed px-3 text-sm",
+            step === "trial" ? "border-primary text-primary" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {text("steps.trialOptional")}
+        </button>
+      )}
       {extra}
     </div>
   );
