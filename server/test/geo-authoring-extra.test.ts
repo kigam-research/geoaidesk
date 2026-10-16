@@ -29,6 +29,7 @@ import {
 
 const mocks = vi.hoisted(() => ({
   defaults: {} as { imageModel?: string },
+  connected: true,
   generate: vi.fn(),
   record: vi.fn(),
   budget: vi.fn(() => ({ exceeded: false })),
@@ -45,7 +46,7 @@ vi.mock("../src/app-settings.ts", () => ({
 vi.mock("../src/agent/session-registry.ts", () => ({
   getModelRegistry: () => ({
     getModelOfType: () => mocks.model,
-    getAvailableOfType: async () => [mocks.model],
+    getAvailableOfType: async () => (mocks.connected ? [mocks.model] : []),
     generateImages: mocks.generate,
   }),
   getModelRuntime: () => ({ checkAuth: async () => ({ type: "api_key" }) }),
@@ -65,6 +66,7 @@ afterEach(async () => {
   }
   vi.unstubAllEnvs();
   mocks.defaults = {};
+  mocks.connected = true;
   mocks.generate.mockReset();
   mocks.record.mockReset();
   mocks.budget.mockReset().mockReturnValue({ exceeded: false });
@@ -87,9 +89,7 @@ async function localServer() {
       );
     } else if (path === "/pdf") {
       res.writeHead(200, { "Content-Type": "application/pdf" });
-      res.end(
-        pdf(["Spatial blocks separate outer testing.", "Figure 1. A conceptual spatial evaluation method."]),
-      );
+      res.end(pdf(["Spatial blocks separate outer testing.", "Figure 1. A conceptual spatial evaluation method."]));
     } else if (path === "/large-header") {
       res.writeHead(200, {
         "Content-Type": "text/html",
@@ -253,12 +253,7 @@ describe("URL sources", () => {
     const base = await localServer();
     const { store, id } = await newStore();
     for (const path of ["large-header", "large-chunks"]) {
-      const result = await addUrlSource(
-        store,
-        id,
-        { url: `${base}/${path}`, kind: "blog" },
-        { limitBytes: 100 },
-      );
+      const result = await addUrlSource(store, id, { url: `${base}/${path}`, kind: "blog" }, { limitBytes: 100 });
       expect(result.source.status).toBe("failed");
       expect(result.extraction.error).toContain("30 MiB");
     }
@@ -374,9 +369,7 @@ describe("Concept illustrations", () => {
       .fn()
       .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
       .mockRejectedValueOnce(Error("provider failure"));
-    const run = await startVisuals(store, projectId, 1, { opId: "visual-fail" }, async () =>
-      fakeGenerator(generate),
-    );
+    const run = await startVisuals(store, projectId, 1, { opId: "visual-fail" }, async () => fakeGenerator(generate));
     await run.completion;
     const p = await store.read(projectId);
     expect(p.visualOperations!["visual-fail"]).toMatchObject({
@@ -410,9 +403,13 @@ describe("Concept illustrations", () => {
       throw Error("must not run");
     });
   });
-  it("refuses an unset model and cap reached before calls; ledgers even a paid response with no image", async () => {
-    await expect(prepareRuntimeImageGenerator()).rejects.toThrow("이미지 모델이 설정되지 않았습니다");
+  it("falls back to a connected image model, refuses none and cap reached before calls; ledgers a paid empty response", async () => {
+    expect((await prepareRuntimeImageGenerator()).model).toBe("openrouter/fake-image");
+    mocks.connected = false;
+    await expect(prepareRuntimeImageGenerator()).rejects.toThrow("이미지 생성 모델이 연결되지 않았습니다");
     mocks.defaults.imageModel = "openrouter/fake-image";
+    await expect(prepareRuntimeImageGenerator()).rejects.toMatchObject({ status: 401 });
+    mocks.connected = true;
     mocks.budget.mockReturnValue({ exceeded: true });
     await expect(prepareRuntimeImageGenerator()).rejects.toMatchObject({
       status: 402,
@@ -445,7 +442,7 @@ describe("Concept illustrations", () => {
     });
     expect(mocks.generate).toHaveBeenCalledTimes(1);
   });
-  it("shares the registered store; routes serve bytes, return 202 and report unset model as Korean 400", async () => {
+  it("shares the registered store; routes serve bytes, return 202 and report no connected model as Korean 400", async () => {
     const { store, projectId } = await drafted();
     const app = Fastify();
     apps.push(app);
@@ -470,13 +467,15 @@ describe("Concept illustrations", () => {
     });
     expect(image.headers["content-type"]).toBe("image/png");
     expect(image.rawPayload).toEqual(PNG);
+    mocks.connected = false;
     const noModel = await app2.inject({
       method: "POST",
       url: `/geo/authoring/projects/${projectId}/drafts/1/visuals`,
       payload: { opId: "visual-no-model" },
     });
     expect(noModel.statusCode).toBe(400);
-    expect(noModel.json().error).toContain("이미지 모델이 설정되지");
+    expect(noModel.json().error).toContain("이미지 생성 모델이 연결되지");
+    mocks.connected = true;
     const base = await localServer();
     const urlResponse = await app2.inject({
       method: "POST",

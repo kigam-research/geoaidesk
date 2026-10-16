@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-16T07:20:25Z
+status: active
+updated: 2026-10-16T07:24:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -105,6 +105,11 @@ the sharing/discussion space, GAID projects are the personal research space.
 Plan: redesign the hub screens for readability and product feel (hero with tagline + key facts strip from the profile
 instead of one paragraph, structured summary, colour/hierarchy pass over home, shared/preview, draft, questions);
 infographic agent review of the screenshots (user rule from feedback 2), then present to the user.
+
+## User decision on concept pictures (verbatim, 2026-10-16, writer tab)
+> "가로 연결합니다." (answer to the report's decision: connect an image model to the institute's GAID)
+Applied: visuals use the saved Settings image model, else the first connected DEFAULT_IMAGE_MODELS entry (any connected
+priceable image model last). The dev instance has no image provider credential, so no real picture was generated.
 
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).
@@ -212,10 +217,10 @@ Work packages:
 Integration order: P1 → wire P2 to real endpoints → P3.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [결정 gaid-hub#1] 개념 그림을 만들 이미지 모델을 기관 GAID에 연결할지 — 가) 연결합니다(초안마다 "개념 그림 만들기"를 누를 때만 최대 6장, 호출마다 비용) — 나) 연결하지 않습니다(단계 설명과 예시 도식, 카드는 아이콘) — 권장: 가) 사용자가 이미 이미지 생성 모델 사용을 골랐고 그림이 있어야 카드와 단계 설명이 읽힘 — 막힌 일: 개념 그림 실제 생성 확인 — 조건: 설정 기본값에 이미지 모델 지정 — 근거: reports/2026-10-16-gaid-hub/index.md#6-결정할-일
-- [확인 gaid-hub#2] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
-- [부채 gaid-hub#3] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
-- [부채 gaid-hub#4] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [대기] 기관 GAID에 이미지 모델 제공사(OpenRouter 등)를 연결해야 개념 그림이 실제로 만들어짐 (키 입력은 사람이 함) — 막힌 일: 개념 그림 실제 생성 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#6-결정할-일
+- [확인] 시인성·상품성 피드백을 반영한 허브 화면(첫 화면, 등록된 방법, 초안, 내 연구로 가져오기)을 확인 — 근거: reports/2026-10-16-gaid-hub/index.md#3-결과
+- [부채] GAID 채팅의 "실행 중단"이 에이전트가 배경으로 띄운 계산을 멈추지 않고, 무인 시험 중 데이터 보호 확인 창이 뜸 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
+- [부채] 시험한 PU 방법의 다음 판: 예상 결과 파일 이름과 실제 저장 위치 불일치, 빠른 모드의 BaggingPU 11분 — 근거: reports/2026-10-16-gaid-hub/index.md#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;

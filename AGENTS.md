@@ -61,7 +61,13 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, entry on the project list and a
   Projects/GAID hub header switch): one question at a time with a recommended option and "기타", all answers applied
   together, the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
-  Workflow start settings opened there (`gaid:open-method-setup`).
+  Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
+  `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
+  `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
+  recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
+  settings). Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
+  (`authoring/visuals.ts`, explicit action only, ≤6 per draft, ledgered as `gaid-hub-visuals`; the saved Settings image
+  model, else the first connected `DEFAULT_IMAGE_MODELS` entry — user decision 2026-10-16). Never PDF page crops.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
