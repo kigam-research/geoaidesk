@@ -111,7 +111,8 @@
     "allApplied": "All answers are in the draft. Use \"Request changes\" on the draft screen to change something.",
     "recorded": "This answer is already applied.",
     "intent": "Why we ask",
-    "link": "Where it goes"
+    "link": "Where it goes",
+    "makeDraft": "Create draft"
   },
   "drafting": {
     "title": "Creating the draft",

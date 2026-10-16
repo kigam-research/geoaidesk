@@ -15,7 +15,7 @@ import type {
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { installStagedSkills, previewSkillSource } from "../../agent/skills-install.ts";
 import { projectSkillRoot } from "../../agent/skills.ts";
-import { getSkillProvenance } from "../../agent/skills-sync.ts";
+import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { readMethodFile, verifyMethodTree } from "../methods/method-file.ts";
 import { originOfSource, packageStore, writePackageOrigin } from "../methods/package-origin.ts";
@@ -68,6 +68,13 @@ export async function installPackage(
     if (origin.kind !== "gaid-hub")
       throw new AuthoringError(
         `프로젝트에 같은 이름의 다른 스킬이 있습니다: ${pkg.slug}. 그 스킬을 지운 뒤 다시 설치하세요.`,
+        409,
+      );
+    // A researcher's edits to the installed copy are never overwritten by a reinstall.
+    const base = getSkillBaseHash(root, pkg.slug);
+    if (base && hashDirectory(path.join(root.skillsDir, pkg.slug)) !== base)
+      throw new AuthoringError(
+        `프로젝트에서 고친 ${pkg.slug} 스킬이 있어 덮어쓰지 않았습니다. 고친 내용을 옮겨 두거나 그 스킬을 지운 뒤 다시 설치하세요.`,
         409,
       );
   }

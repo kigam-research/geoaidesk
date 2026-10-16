@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T04:58:03Z
+updated: 2026-10-16T05:02:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -83,6 +83,14 @@ Next: fix the install order (inputs before start settings) now; revise mockups (
 stars, URL sources, PDF viewer while reading, questions with figures, draft with register-to-hub and vertical step list +
 detail with concept/IO images, input/output examples) and agree them with the user before building.
 
+## User feedback 2 (verbatim, 2026-10-16, writer tab)
+> "초안의 그림이나 개념 생성 이미지와 관련해서는 관련된 이미지나 정보만 보여야 하는 것이지 완성도가 떨어지게 PDF의 일부를 잘라서 보여주는 방식 등은 AI SLOP 형식과 다를바가 없다. UI/UX와 목업 관련해서는 인포그래픽 및 그림 생성 에이전트에게 검토 받아야 한다. 그리고 현재 GAID 허브에서 사용자가 스킬 또는 워크플로우를 생성하면 허브에 등록되었을 때 어떤 모습인지에 대한 것 없이 바로 GAID 시스템에서 시험하는 것으로 밖에 UI/UX가 유도하고 있다. GAID 시스템은 개별 연구자가 GAID 허브에서 유용한 스킬 및 워크플로우를 바탕으로 개인 연구를 수행하는 공간이고 실제로 스킬 및 워크플로우가 공유되고 토의되는 공간은 GAID 허브임을 명심하고 이를 시스템에서 구분하고 반영해야한다."
+Applied to the mockups: no cropped PDF page parts; only relevant images (generated concept images, clean figure images)
+and information; mockups reviewed by the "인포그래픽 및 그림 생성 작업" agent; the draft leads to "how it looks in the hub"
+(preview of the shared page) and registration as the main path, trying in a personal GAID project is secondary; the hub is
+the sharing/discussion space, GAID projects are the personal research space.
+
+## Current state
 ## Current state
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).

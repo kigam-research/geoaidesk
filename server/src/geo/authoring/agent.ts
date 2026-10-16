@@ -351,6 +351,7 @@ function draftRequest(
     findingIds,
     text: [
       `Project: ${project.title}${project.goal ? `\nResearcher's goal: ${project.goal}` : ""}`,
+      targetLine(project),
       `Sources: ${[...ctx.aliases].map(([a, id]) => `${a} = ${project.sources.find((s) => s.id === id)!.name}`).join("; ")}`,
       scope?.result?.scope ? `## Scope proposed in the analysis\n${scope.result.scope}` : "",
       `## Verified findings\n${findings.join("\n")}`,
@@ -424,6 +425,14 @@ function reviseRequest(
 }
 
 /** Folder of a supplied code source inside the skill: scripts/upstream (one code source) or scripts/upstream-<n>. */
+/** What the researcher asked to make; the draft must follow it (validated in validateDraft). */
+function targetLine(project: AuthoringProject): string {
+  if (project.target === "workflow")
+    return "Requested output: a Workflow (the skill plus a workflow object and its recipe; workflow must not be null).";
+  if (project.target === "skill") return "Requested output: a skill only (set workflow and recipe to null).";
+  return "Requested output: propose skill only or skill plus Workflow, whichever fits the sources and answers.";
+}
+
 export function codeRoot(project: AuthoringProject, sourceId: string): string {
   const code = project.sources.filter((s) => project.extractions[s.id]?.files?.some((f) => f.text));
   const n = code.findIndex((s) => s.id === sourceId);
@@ -807,6 +816,10 @@ export function validateDraft(
         .filter((y): y is string => !!y),
     }))
     .filter((e) => e.field && e.findingIds.length);
+  if (project.target === "workflow" && !workflow)
+    errors.push('the researcher asked for a Workflow: add the "workflow" object and its "recipe"');
+  if (project.target === "skill" && workflow)
+    errors.push('the researcher asked for a skill only: set "workflow" and "recipe" to null');
   if (errors.length) return { errors };
   const scopes = ["reproduction", "generalization", "both", "unknown"] as const;
   return {

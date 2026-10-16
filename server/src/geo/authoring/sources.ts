@@ -75,7 +75,8 @@ function kindOf(body: AddSourceBody, bytes: Uint8Array): SourceKind {
   )
     return "pdf";
   if (/\.(zip|tar\.gz|tgz)$/.test(name)) return "code";
-  if (/\.(py|r|m|js|ts|ipynb|sh|toml|ya?ml|json|cfg|ini|txt|md)$/.test(name)) return "text";
+  // A single script or notebook is code too, so a draft may include it (packaging accepts code sources only).
+  if (/\.(py|r|m|jl|js|ts|ipynb|sh)$/.test(name)) return "code";
   return "text";
 }
 

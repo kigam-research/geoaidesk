@@ -262,6 +262,13 @@ describe("GAID hub packages", () => {
         { projectId: target.id, acknowledged: true },
         { agentDir },
       );
+      // A researcher's edits to the installed copy are not overwritten by a reinstall.
+      const installed = path.join(projectSkillRoot(paths).skillsDir, "pu-nested-cv-method", "SKILL.md");
+      fs.appendFileSync(installed, "\n연구자가 고친 줄\n");
+      await expect(
+        installPackage(store, await store.read(projectId), built.record, { projectId: target.id, acknowledged: true }, { agentDir }),
+      ).rejects.toMatchObject({ status: 409 });
+      expect(fs.readFileSync(installed, "utf8")).toContain("연구자가 고친 줄");
       // A user skill of the same name is never overwritten.
       const other = createProject({ name: "foreign skill" });
       const otherPaths = resolvePaths(other.id);

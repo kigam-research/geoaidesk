@@ -379,4 +379,29 @@ describe("GAID hub authoring", () => {
     expect(d.revision).toBe(2);
     expect(d.codeFiles.map((c) => c.path)).toEqual(["scripts/upstream/scripts/run.py"]);
   });
+
+  it("follows the requested kind (skill only or Workflow) and treats a single script as code", async () => {
+    const { store, projectId } = await fixture();
+    await store.mutate(projectId, (p) => {
+      p.target = "workflow";
+    });
+    await runOperation(store, projectId, "analyze", "op-target-analyze", deps(reply(analysis)));
+    const noWorkflow = { ...draftReply, workflow: null, recipe: null };
+    const refused = await runOperation(store, projectId, "draft", "op-target-1", deps(reply(noWorkflow, noWorkflow)));
+    expect(refused.outcome).toBe("rejected");
+    expect(refused.validationErrors[0].join("\n")).toMatch(/asked for a Workflow/);
+    await store.mutate(projectId, (p) => {
+      p.target = "skill";
+    });
+    const skillOnly = await runOperation(store, projectId, "draft", "op-target-2", deps(reply(draftReply, noWorkflow)));
+    expect(skillOnly.outcome).toBe("repaired");
+    expect((await store.read(projectId)).drafts.at(-1)?.workflow).toBeUndefined();
+    const script = await addSource(store, projectId, {
+      name: "run.py",
+      mediaType: "text/x-python",
+      contentBase64: Buffer.from("import numpy\nprint(1)\n").toString("base64"),
+    });
+    expect(script.source.kind).toBe("code");
+    expect(script.extraction.files?.map((f) => f.path)).toEqual(["run.py"]);
+  });
 });

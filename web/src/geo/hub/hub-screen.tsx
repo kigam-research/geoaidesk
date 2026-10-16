@@ -173,7 +173,7 @@ function defaultStep(p: AuthoringProject): HubStep {
   if (running?.op === "analyze") return "sources";
   if (running) return "questions";
   if (p.drafts.length) return p.installs.length ? "trial" : "draft";
-  if (liveQuestions(p).length) return "questions";
+  if (liveQuestions(p).length || p.findings.length) return "questions";
   return "sources";
 }
 
@@ -267,7 +267,8 @@ function HubProject({
   const questions = liveQuestions(project);
   const current = step ?? defaultStep(project);
   const reached: HubStep[] = ["sources"];
-  if (questions.length || (running && running.op !== "analyze")) reached.push("questions");
+  // Analysis done (findings) also opens the questions step, so a run with zero questions can still create the draft.
+  if (questions.length || project.findings.length || (running && running.op !== "analyze")) reached.push("questions");
   if (project.drafts.length) reached.push("draft", "trial");
   const title = project.title || text("home.new");
 
@@ -312,13 +313,15 @@ function HubProject({
 
   const applyAnswers = async () => {
     try {
-      await hubApi.answers(id, {
-        opId: newOpId(),
-        draft: true,
-        answers: questions
-          .filter((q) => q.status === "open")
-          .map((q) => ({ questionId: q.id, questionRevision: q.revision, ...answers[q.id] })),
-      });
+      const open = questions.filter((q) => q.status === "open");
+      // Answers already recorded (or no questions at all): start the draft directly (also the retry after a failure).
+      if (open.length === 0) await hubApi.draft(id, { opId: newOpId() });
+      else
+        await hubApi.answers(id, {
+          opId: newOpId(),
+          draft: true,
+          answers: open.map((q) => ({ questionId: q.id, questionRevision: q.revision, ...answers[q.id] })),
+        });
       setStep(null);
       await reload();
     } catch (e) {
@@ -415,6 +418,7 @@ function HubProject({
         <QuestionStep
           questions={questions}
           answers={{ ...recordedAnswers(project), ...answers }}
+          needsDraft={project.drafts.length === 0}
           locked={new Set(questions.filter((q) => q.status !== "open").map((q) => q.id))}
           onAnswer={(qid, a) => setAnswers((cur) => ({ ...cur, [qid]: a }))}
           onApply={applyAnswers}

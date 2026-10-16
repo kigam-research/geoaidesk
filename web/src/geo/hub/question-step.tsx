@@ -84,7 +84,10 @@ export function QuestionStep({
   onOpenPage,
   locked,
   figures,
+  needsDraft = false,
 }: {
+  /** No draft exists yet: with every answer recorded (or no questions), offer to create it. */
+  needsDraft?: boolean;
   /** Figures of the sources related to a question (shown beside it). */
   figures?: (question: Question) => QuestionFigure[];
   questions: Question[];
@@ -185,7 +188,11 @@ export function QuestionStep({
           <ChevronLeftIcon data-icon="inline-start" />
           {text("questions.prev")}
         </Button>
-        {reviewing && pending.length === 0 ? (
+        {reviewing && pending.length === 0 && needsDraft ? (
+          <Button onClick={onApply} disabled={applying}>
+            {text("questions.makeDraft")}
+          </Button>
+        ) : reviewing && pending.length === 0 ? (
           <span className="text-sm text-muted-foreground">{text("questions.allApplied")}</span>
         ) : reviewing ? (
           <div className="flex items-center gap-3">
