@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T02:15:19Z
+updated: 2026-10-16T02:36:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -87,6 +87,12 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   "Not Found" until P1 lands. Temporary fixture page `web/src/app/hub-design/` (REMOVE before finish).
 - Design figures for the user: reports/2026-10-16-gaid-hub/figures/design-0{1..7}-*.png; review copy in the vault
   (연구 보고서/geoaidesk/2026-10-16-gaid-hub). Presented in the writer tab 2026-10-16; awaiting the user's answer.
+- 2026-10-16 11:35 user: "왜 워커를 fast모드로 사용했나? normal모드로 진행하여라." Child 05deecdc was created with
+  service_tier priority (task receipt writer_features = priority; the CLI copies profile featureValues; the "general
+  work" profile reads default now, ~/.paseo/config.json modified 11:35:30, value at 11:03 unknown). Set the agent to
+  Normal (update_agent service_tier default, read back). The child had made no edits; it stopped with "workspace out of
+  credits", and after the switch Codex reports "access token could not be refreshed ... sign in again".
+  Blocked: Codex sign-in needs the user. Receipt still says priority: a handoff successor would start Fast.
 ## Next steps
 1. Apply the user's answer on the key screens; then the workspace side of the hand-off (Workflow panel listens to
    `gaid:open-method-setup` and opens the installed method's TaskSetup) and a "GAID 허브" link in the workspace header.
