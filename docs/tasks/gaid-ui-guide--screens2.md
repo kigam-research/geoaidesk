@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-16T14:30:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9e5573c7-0899-4c21-9d60-48b4df645c01","pid":3776156,"provider":"codex","session":"01a1450f-065c-7781-81fa-b6be4aba848c","start":"4791385","token":"f03dffd1c7b13a0465fac0934a127ab80e5556a92d2f59cc934fcadd51c1db09"}
 branch: task/gaid-ui-guide--screens2
@@ -74,7 +74,9 @@ First-view all-UI/body counts at both sizes: input 261/170, AOI 182/117, field 2
 Declared checks passed: node geo/ui/check-ui.mjs (0 errors, 102 existing debt); node --test geo/tests/ui-check.test.mjs (5 passed). Browser evidence/replay: ~/data/geoaidesk/work/gaid-ui-guide--screens2/visual-check.log and verify.js. Reverify with those commands and README's replay. No new app instance, dependencies, model run, app/locales/rules changes or deployment. Full scripts/check, dark mode, 200% zoom and formal contrast/greyscale audit were outside this child brief. README prose received the humanizer file-mode pass.
 
 ## Next steps
-1. Finish this child unit. Parent gaid-ui-guide integrates it with task complete and updates its canonical report using this README and the figures.
+<!-- task:closed -->
+Closed 2026-10-16T14:30:07Z: ready; the parent gaid-ui-guide integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial browser replay tried to open all attributes after Escape had also closed the map popup. Re-selecting a row before that action fixed the replay; no product workaround was needed.
 - Opening a native file chooser inside one long Playwright CLI snippet left its modal state pending and suppressed the return value. Confirmed that the chooser opened, closed the browser session, and reran with chooser-type verification inside the batch. The separate file-input upload/persistence checks pass.
