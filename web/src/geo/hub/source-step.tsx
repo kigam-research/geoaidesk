@@ -1,6 +1,15 @@
 "use client";
 /** Sources: drop files, say what to make, start reading. While reading, show real progress only. */
-import { CheckIcon, FileArchiveIcon, FileTextIcon, GlobeIcon, LinkIcon, LoaderCircleIcon, UploadIcon, XIcon } from "lucide-react";
+import {
+  CheckIcon,
+  FileArchiveIcon,
+  FileTextIcon,
+  GlobeIcon,
+  LinkIcon,
+  LoaderCircleIcon,
+  UploadIcon,
+  XIcon,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
@@ -57,7 +66,8 @@ function UrlForm({ onAdd }: { onAdd: (url: string, kind: WebSourceKind) => void 
 export function sourceLine(project: AuthoringProject, source: SourceDocument): string {
   const x = project.extractions[source.id];
   if (source.kind === "pdf" && x?.pages) return text("sources.added", { name: source.name, pages: x.pages });
-  if (source.kind === "code" && x?.files) return text("sources.addedCode", { name: source.name, count: x.files.length });
+  if (source.kind === "code" && x?.files)
+    return text("sources.addedCode", { name: source.name, count: x.files.length });
   return text("sources.addedPlain", { name: source.name });
 }
 
@@ -269,7 +279,9 @@ export function WorkingPanel({
         <li className="flex items-center gap-2 font-medium">
           <LoaderCircleIcon className="size-4 animate-spin text-primary" aria-hidden />
           {attempt.op === "analyze" ? text("reading.analysis") : title}
-          <span className="font-normal text-muted-foreground">· {text("reading.elapsed", elapsed(attempt.startedAt, now))}</span>
+          <span className="font-normal text-muted-foreground">
+            · {text("reading.elapsed", elapsed(attempt.startedAt, now))}
+          </span>
         </li>
       </ol>
       <p className="text-sm text-muted-foreground">{note}</p>

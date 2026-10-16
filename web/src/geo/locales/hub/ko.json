@@ -25,7 +25,9 @@
     "mine": "나의 스킬 · Workflow (초안과 등록한 것)",
     "folders": "폴더",
     "newFolder": "새 폴더",
-    "allFolders": "전체"
+    "allFolders": "전체",
+    "registered": "허브 등록 {n}판",
+    "catalogueHint": "{title}: 카탈로그 Workflow입니다. 내 연구 프로젝트의 Workflow 패널에서 시작합니다."
   },
   "stage": {
     "sources": "자료 받음",
@@ -201,8 +203,9 @@
     "optional": "선택",
     "upload": "파일 올리기",
     "openSetup": "시작 설정 열기",
-    "needInputs": "필수 입력 자료를 모두 올리면 시작 설정을 열 수 있습니다.",
-    "uploadFailed": "파일을 올리지 못했습니다: {detail}"
+    "needInputs": "필수 입력 자료를 올리고 실행 환경을 준비하면 시작 설정을 열 수 있습니다.",
+    "uploadFailed": "파일을 올리지 못했습니다: {detail}",
+    "environment": "실행 환경"
   },
   "register": {
     "open": "허브 등록 미리보기",
@@ -230,7 +233,8 @@
     "comments": "의견 {count}개",
     "commentPlaceholder": "시험해 본 결과나 고칠 점을 적으세요.",
     "comment": "의견 남기기",
-    "toComments": "의견 {count}개 보기"
+    "toComments": "의견 {count}개 보기",
+    "registeredAt": "{when} 등록"
   },
   "flow": {
     "decide": "연구자가 정함: {question}"
@@ -242,5 +246,17 @@
     "generated": "개념 그림(생성)",
     "noImage": "그림 없음",
     "exampleTable": "예시 표 · 예시 값"
+  },
+  "user": {
+    "title": "허브에서 쓸 이름",
+    "body": "등록, star, 의견에 이 이름이 표시됩니다. 이 브라우저에 저장합니다.",
+    "placeholder": "예: 홍길동 (광물자원연구본부)",
+    "save": "이름 저장"
+  },
+  "folder": {
+    "title": "새 폴더",
+    "name": "폴더 이름",
+    "placeholder": "예: 광물 탐사",
+    "create": "폴더 만들기"
   }
 }

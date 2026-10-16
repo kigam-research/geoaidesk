@@ -64,8 +64,12 @@ export function DraftStep({
           {onRegister && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
               <Share2Icon className="size-5 text-primary" aria-hidden />
-              <p className="min-w-0 flex-1 text-sm">{registered ? text("register.registeredLine", { n: registered }) : text("register.line")}</p>
-              <Button onClick={onRegister}>{registered ? text("register.update", { n: registered }) : text("register.open")}</Button>
+              <p className="min-w-0 flex-1 text-sm">
+                {registered ? text("register.registeredLine", { n: registered }) : text("register.line")}
+              </p>
+              <Button onClick={onRegister}>
+                {registered ? text("register.update", { n: registered }) : text("register.open")}
+              </Button>
             </div>
           )}
         </header>

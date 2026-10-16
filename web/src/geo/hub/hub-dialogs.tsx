@@ -10,11 +10,16 @@ import type { AuthoringAttempt, CheckResult, DraftFileView } from "@/geo/contrac
 import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
+import { setHubUserName } from "./shared-api";
+
 const text = geoText("hub");
 
 function when(iso: string): string {
   try {
-    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", { dateStyle: "short", timeStyle: "medium" }).format(new Date(iso));
+    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", {
+      dateStyle: "short",
+      timeStyle: "medium",
+    }).format(new Date(iso));
   } catch {
     return iso;
   }
@@ -76,7 +81,11 @@ export function FeedbackDialog({
   );
 }
 
-export function FilesDialog({ open, onOpenChange, load }: DialogProps & { load: () => Promise<{ files: DraftFileView[] }> }) {
+export function FilesDialog({
+  open,
+  onOpenChange,
+  load,
+}: DialogProps & { load: () => Promise<{ files: DraftFileView[] }> }) {
   const [files, setFiles] = useState<DraftFileView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState(0);
@@ -105,7 +114,10 @@ export function FilesDialog({ open, onOpenChange, load }: DialogProps & { load: 
                 <button
                   type="button"
                   onClick={() => setSelected(i)}
-                  className={cn("w-full truncate rounded px-2 py-1 text-left font-mono text-xs", i === selected ? "bg-primary/10 text-primary" : "hover:bg-muted")}
+                  className={cn(
+                    "w-full truncate rounded px-2 py-1 text-left font-mono text-xs",
+                    i === selected ? "bg-primary/10 text-primary" : "hover:bg-muted",
+                  )}
                 >
                   {f.path}
                 </button>
@@ -199,7 +211,9 @@ function IssueGroups({ findings }: { findings: CheckResult["findings"] }) {
         <div key={sentence} className="rounded-lg border border-destructive/40 p-3">
           <p>
             {sentence}
-            {items.length > 1 && <span className="text-muted-foreground"> {text("draft.issueCount", { count: items.length })}</span>}
+            {items.length > 1 && (
+              <span className="text-muted-foreground"> {text("draft.issueCount", { count: items.length })}</span>
+            )}
           </p>
           <details className="mt-1 text-xs text-muted-foreground">
             <summary className="cursor-pointer">{text("draft.issueDetail")}</summary>
@@ -244,7 +258,10 @@ export function AgentRecordDialog({ open, onOpenChange, attempts }: DialogProps 
             .map((a) => (
               <li key={a.id} className="rounded-lg border p-3">
                 <p className="font-medium">
-                  {text("detail.outcome", { op: text(`detail.op.${a.op}`), outcome: text(`detail.result.${a.outcome}`) })}
+                  {text("detail.outcome", {
+                    op: text(`detail.op.${a.op}`),
+                    outcome: text(`detail.result.${a.outcome}`),
+                  })}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {text("detail.model")}: {a.model}
@@ -255,7 +272,9 @@ export function AgentRecordDialog({ open, onOpenChange, attempts }: DialogProps 
                 {a.validationErrors.some((e) => e.length) && (
                   <details className="mt-1 text-xs text-muted-foreground">
                     <summary className="cursor-pointer">{text("detail.validation")}</summary>
-                    <pre className="whitespace-pre-wrap">{a.validationErrors.map((e) => e.join("\n")).join("\n---\n")}</pre>
+                    <pre className="whitespace-pre-wrap">
+                      {a.validationErrors.map((e) => e.join("\n")).join("\n---\n")}
+                    </pre>
                   </details>
                 )}
               </li>
@@ -266,7 +285,13 @@ export function AgentRecordDialog({ open, onOpenChange, attempts }: DialogProps 
   );
 }
 
-export function SourcePageDialog({ open, onOpenChange, name, url, page }: DialogProps & { name: string; url: string; page: number }) {
+export function SourcePageDialog({
+  open,
+  onOpenChange,
+  name,
+  url,
+  page,
+}: DialogProps & { name: string; url: string; page: number }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[88vh] max-w-4xl flex-col sm:max-w-4xl">
@@ -276,7 +301,13 @@ export function SourcePageDialog({ open, onOpenChange, name, url, page }: Dialog
           </DialogTitle>
         </DialogHeader>
         <div className="min-h-0 flex-1 overflow-hidden rounded-lg border">
-          <PdfViewer path={name} sourceUrl={url} pageRequest={{ page, sequence: page }} hideAnnotationUi initialFitWidth />
+          <PdfViewer
+            path={name}
+            sourceUrl={url}
+            pageRequest={{ page, sequence: page }}
+            hideAnnotationUi
+            initialFitWidth
+          />
         </div>
       </DialogContent>
     </Dialog>
@@ -289,7 +320,10 @@ export function RegisterDialog({
   onOpenChange,
   folders,
   onRegister,
-}: DialogProps & { folders: { id: string; name: string }[]; onRegister: (folderId: string, note: string) => Promise<void> }) {
+}: DialogProps & {
+  folders: { id: string; name: string }[];
+  onRegister: (folderId: string, note: string) => Promise<void>;
+}) {
   const [folder, setFolder] = useState(folders[0]?.id ?? "");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -301,7 +335,11 @@ export function RegisterDialog({
         </DialogHeader>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {text("register.folder")}
-          <select className="h-9 rounded-md border bg-background px-2 text-sm font-normal" value={folder} onChange={(e) => setFolder(e.target.value)}>
+          <select
+            className="h-9 rounded-md border bg-background px-2 text-sm font-normal"
+            value={folder}
+            onChange={(e) => setFolder(e.target.value)}
+          >
             {folders.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name}
@@ -311,7 +349,12 @@ export function RegisterDialog({
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {text("register.note")}
-          <Textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder={text("register.notePlaceholder")} />
+          <Textarea
+            rows={3}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={text("register.notePlaceholder")}
+          />
         </label>
         <ul className="flex flex-col gap-1 rounded-lg bg-muted/50 p-3 text-sm">
           <li>{text("register.shared")}</li>
@@ -328,12 +371,96 @@ export function RegisterDialog({
               try {
                 await onRegister(folder, note.trim());
                 onOpenChange(false);
+              } catch {
+                // The caller reported the error; the dialog stays open with the researcher's note.
               } finally {
                 setBusy(false);
               }
             }}
           >
             {text("register.submit")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** The display name other researchers see on registrations, stars and comments (asked once, kept in this browser). */
+export function HubUserDialog({ open, onOpenChange, onSaved }: DialogProps & { onSaved: () => void }) {
+  const [name, setName] = useState("");
+  const valid = name.trim().length >= 1 && name.trim().length <= 40;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{text("user.title")}</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground">{text("user.body")}</p>
+        <input
+          className="h-9 rounded-md border bg-background px-3 text-sm"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={text("user.placeholder")}
+          aria-label={text("user.title")}
+        />
+        <DialogFooter>
+          <Button
+            disabled={!valid}
+            onClick={() => {
+              setHubUserName(name);
+              onSaved();
+            }}
+          >
+            {text("user.save")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** A new shared topic folder of the hub. */
+export function NewFolderDialog({
+  open,
+  onOpenChange,
+  onCreate,
+}: DialogProps & { onCreate: (name: string) => Promise<void> }) {
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{text("folder.title")}</DialogTitle>
+        </DialogHeader>
+        <input
+          className="h-9 rounded-md border bg-background px-3 text-sm"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={text("folder.placeholder")}
+          aria-label={text("folder.name")}
+        />
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <DialogFooter>
+          <Button
+            disabled={!name.trim() || busy}
+            onClick={async () => {
+              setBusy(true);
+              setError(null);
+              try {
+                await onCreate(name.trim());
+                setName("");
+                onOpenChange(false);
+              } catch (e) {
+                setError((e as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {text("folder.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

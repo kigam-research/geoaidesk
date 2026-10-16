@@ -21,7 +21,9 @@ export function stageLabel(p: ProjectSummary): string {
 
 function when(iso: string): string {
   try {
-    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", { dateStyle: "medium" }).format(new Date(iso));
+    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", { dateStyle: "medium" }).format(
+      new Date(iso),
+    );
   } catch {
     return iso;
   }
@@ -56,7 +58,12 @@ export function HubHome({
   onCreate,
   onOpen,
   onOpenRecommended,
+  registered = {},
+  onOpenEntry,
 }: {
+  /** My methods already registered in the shared hub, by authoring project id. */
+  registered?: Record<string, { entryId: string; stars: number; comments: number; revision: number }>;
+  onOpenEntry?: (entryId: string) => void;
   recommended: RecommendedCard[];
   folders: HubFolder[];
   folderId: string;
@@ -185,7 +192,30 @@ export function HubHome({
                       </Badge>
                     </span>
                     {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
-                    <span className="mt-auto text-xs text-muted-foreground">{text("home.updated", { when: when(p.updatedAt) })}</span>
+                    <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
+                      {text("home.updated", { when: when(p.updatedAt) })}
+                      {registered[p.id] && (
+                        <span
+                          role="link"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenEntry?.(registered[p.id].entryId);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.stopPropagation();
+                              onOpenEntry?.(registered[p.id].entryId);
+                            }
+                          }}
+                          className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary hover:underline"
+                        >
+                          {text("home.registered", { n: registered[p.id].revision })}
+                          <StarIcon className="size-3" aria-hidden />
+                          {registered[p.id].stars}
+                        </span>
+                      )}
+                    </span>
                   </button>
                 </li>
               ))}
@@ -196,4 +226,3 @@ export function HubHome({
     </main>
   );
 }
-

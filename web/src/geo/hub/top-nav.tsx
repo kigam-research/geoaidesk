@@ -34,9 +34,7 @@ export function GaidTopNav({
           onClick={() => current !== id && onNavigate(id)}
           className={cn(
             "inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-colors",
-            current === id
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
+            current === id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
           )}
         >
           <Icon className="size-4" aria-hidden />

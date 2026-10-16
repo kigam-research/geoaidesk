@@ -49,7 +49,10 @@ export function FlowDiagram({
 }) {
   const ordered = orderedNodes(nodes, edges);
   return (
-    <ol className="grid grid-cols-[repeat(auto-fill,minmax(11.5rem,1fr))] gap-x-6 gap-y-4" aria-label={text("draft.flow")}>
+    <ol
+      className="grid grid-cols-[repeat(auto-fill,minmax(11.5rem,1fr))] gap-x-6 gap-y-4"
+      aria-label={text("draft.flow")}
+    >
       {ordered.map((node, index) => {
         const gate = node.type === "human-gate" || node.type === "decision";
         const Icon = node.type === "input" ? FileInputIcon : node.type === "output" ? FileOutputIcon : null;
@@ -72,7 +75,9 @@ export function FlowDiagram({
                 <span className="text-sm font-semibold leading-tight">{localText(node.label)}</span>
                 {Icon && <Icon className="ml-auto size-4 text-muted-foreground" aria-hidden />}
               </span>
-              <span className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{localText(node.summary)}</span>
+              <span className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                {localText(node.summary)}
+              </span>
               {gate && (
                 <span className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
                   <UserRoundCheckIcon className="size-3.5" aria-hidden />
