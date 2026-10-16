@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:53:57Z
+updated: 2026-10-16T08:58:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -127,6 +127,13 @@ only, Anthropic-compatible `https://api.minimax.io/anthropic`, 1M); image `POST 
 model `image-01`, Bearer key, `response_format: base64` → `data.image_base64[]`, `base_resp.status_code` 0 ok.
 Plan: GAID registers M3.1 Flash Preview on Pi's `minimax` provider at startup (cost 0: plan-only model); concept pictures
 get a MiniMax image-01 source beside the ChatGPT source, and the draft's "개념 그림 만들기" lets the researcher pick the source.
+
+## User direction on pictures and test models (verbatim, 2026-10-16, writer tab)
+> "이미지 생성은 gpt를 사용하도록 하자.fallback 없이 사용량 제한이면 알림 메시지를 제공하자. 그리고 gaid 시스템을 이용할 때 설정되는 에이전트를 qwen과 함께 minimax 3.1도 테스트하게 설정하자."
+Plan: concept pictures only through the OpenAI Codex login (gpt-image-2), no MiniMax/image-model fallback and no source
+picker; a usage-limit refusal becomes a visible notice in the draft (toast + inline, with reset time when the backend
+gives one). Test models: MiniMax M3.1 Flash Preview beside kigam-qwen for the hub authoring agent and the GAID trial agent
+(model choice in the hub, comparison trial on the 40 km quick scenario).
 
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).

@@ -4,6 +4,7 @@ import { once } from "node:events";
 import Fastify from "fastify";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AuthoringError, AuthoringStore } from "../src/geo/authoring/store.ts";
+import { UsageLimitError } from "../src/geo/authoring/codex-images.ts";
 import { addUrlSource, readableHtml, validateSourceUrl } from "../src/geo/authoring/url-sources.ts";
 import { pageText, SOURCE_LIMIT_BYTES } from "../src/geo/authoring/sources.ts";
 import {
@@ -30,6 +31,7 @@ import {
 const mocks = vi.hoisted(() => ({
   defaults: {} as { imageModel?: string },
   connected: true,
+  codex: true,
   generate: vi.fn(),
   record: vi.fn(),
   budget: vi.fn(() => ({ exceeded: false })),
@@ -50,7 +52,13 @@ vi.mock("../src/agent/session-registry.ts", () => ({
     generateImages: mocks.generate,
   }),
   getModelRuntime: () => ({
-    checkAuth: async (provider: string) => (provider === "openrouter" ? { type: "api_key" } : undefined),
+    checkAuth: async (provider: string) =>
+      provider === "openrouter"
+        ? { type: "api_key" }
+        : provider === "openai-codex" && mocks.codex
+          ? { type: "oauth" }
+          : undefined,
+    getAuth: async () => ({ auth: { apiKey: "token" } }),
   }),
 }));
 vi.mock("../src/cost/ledger.ts", async (original) => ({
@@ -69,6 +77,7 @@ afterEach(async () => {
   vi.unstubAllEnvs();
   mocks.defaults = {};
   mocks.connected = true;
+  mocks.codex = true;
   mocks.generate.mockReset();
   mocks.record.mockReset();
   mocks.budget.mockReset().mockReturnValue({ exceeded: false });
@@ -405,46 +414,30 @@ describe("Concept illustrations", () => {
       throw Error("must not run");
     });
   });
-  it("falls back to a connected image model, refuses none and cap reached before calls; ledgers a paid empty response", async () => {
-    expect((await prepareRuntimeImageGenerator()).model).toBe("openrouter/fake-image");
-    mocks.connected = false;
-    await expect(prepareRuntimeImageGenerator()).rejects.toThrow("이미지 생성 모델이 연결되지 않았습니다");
-    mocks.defaults.imageModel = "openrouter/fake-image";
-    await expect(prepareRuntimeImageGenerator()).rejects.toMatchObject({ status: 401 });
-    mocks.connected = true;
-    mocks.budget.mockReturnValue({ exceeded: true });
-    await expect(prepareRuntimeImageGenerator()).rejects.toMatchObject({
-      status: 402,
-    });
+  it("uses only the OpenAI Codex login, never another image model, and refuses without it", async () => {
+    expect((await prepareRuntimeImageGenerator()).model).toBe("openai-codex/gpt-image-2");
+    mocks.codex = false;
+    await expect(prepareRuntimeImageGenerator()).rejects.toThrow("OpenAI Codex 로그인이 없습니다");
     expect(mocks.generate).not.toHaveBeenCalled();
-    mocks.budget.mockReturnValue({ exceeded: false });
-    mocks.generate.mockResolvedValue({
-      stopReason: "stop",
-      output: [],
-      usage: {
-        cost: { total: 0.03 },
-        input: 10,
-        output: 20,
-        cacheRead: 0,
-        totalTokens: 30,
-      },
-    });
-    const generator = await prepareRuntimeImageGenerator();
-    await expect(generator.generate("concept")).rejects.toThrow("그림을 반환하지");
-    expect(mocks.record).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sessionId: VISUALS_LEDGER_SESSION,
-        model: "openrouter/fake-image",
-        after: expect.objectContaining({ costUsd: 0.03 }),
-      }),
-    );
-    mocks.budget.mockReturnValue({ exceeded: true });
-    await expect(generator.generate("next")).rejects.toMatchObject({
-      status: 402,
-    });
-    expect(mocks.generate).toHaveBeenCalledTimes(1);
   });
-  it("shares the registered store; routes serve bytes, return 202 and report no connected model as Korean 400", async () => {
+  it("stops the batch at the usage limit and records it for a notice", async () => {
+    const { store, projectId } = await drafted();
+    const generate = vi
+      .fn()
+      .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
+      .mockRejectedValueOnce(new UsageLimitError("2026-10-16T12:00:00.000Z"));
+    const run = await startVisuals(store, projectId, 1, { opId: "visual-limit" }, async () => fakeGenerator(generate));
+    await run.completion;
+    const op = (await store.read(projectId)).visualOperations!["visual-limit"];
+    expect(op).toMatchObject({
+      status: "failed",
+      completed: ["cover"],
+      usageLimit: { resetsAt: "2026-10-16T12:00:00.000Z" },
+    });
+    expect(op.error).toContain("사용량 한도");
+    expect(generate).toHaveBeenCalledTimes(2);
+  });
+  it("shares the registered store; routes serve bytes, return 202 and report a missing Codex login as Korean 400", async () => {
     const { store, projectId } = await drafted();
     const app = Fastify();
     apps.push(app);
@@ -469,15 +462,15 @@ describe("Concept illustrations", () => {
     });
     expect(image.headers["content-type"]).toBe("image/png");
     expect(image.rawPayload).toEqual(PNG);
-    mocks.connected = false;
+    mocks.codex = false;
     const noModel = await app2.inject({
       method: "POST",
       url: `/geo/authoring/projects/${projectId}/drafts/1/visuals`,
       payload: { opId: "visual-no-model" },
     });
     expect(noModel.statusCode).toBe(400);
-    expect(noModel.json().error).toContain("이미지 생성 모델이 연결되지");
-    mocks.connected = true;
+    expect(noModel.json().error).toContain("OpenAI Codex 로그인이 없습니다");
+    mocks.codex = true;
     const base = await localServer();
     const urlResponse = await app2.inject({
       method: "POST",

@@ -531,7 +531,7 @@ export const liveQuestions = (p: AuthoringProject): Question[] =>
 // POST   /geo/authoring/projects/:id/sources/url       AddUrlSourceBody → { source, extraction }
 // POST   /geo/authoring/projects/:id/drafts/:rev/visuals GenerateVisualsBody → 202 VisualOperation
 // GET    /geo/authoring/projects/:id/visuals/:key       PNG/WebP/JPEG bytes
-// GET    /geo/authoring/visual-sources                  → { sources: VisualSourceInfo[] }
+// GET    /geo/authoring/visual-source                   → VisualSourceInfo
 // GET    /geo/authoring/projects/:id/sources/:sid/original      original bytes (PDF inline)
 // GET    /geo/authoring/projects/:id/sources/:sid/pages/:page   → { page, text }
 // GET    /geo/authoring/projects/:id/sources/:sid/files/*       → { path, text }
@@ -579,21 +579,21 @@ export interface VisualOperation {
   startedAt: string;
   endedAt?: string;
   error?: string;
+  /** Set when the subscription's image quota stopped the batch; resetsAt when the backend said. */
+  usageLimit?: { resetsAt?: string };
 }
 
-/** Where concept pictures come from: the ChatGPT sign-in, the MiniMax key, or the Settings/connected image model. */
-export type VisualSource = "chatgpt" | "minimax" | "model";
+/** The concept-picture source: only the OpenAI Codex login (user direction 2026-10-16, no fallback). */
+export type VisualSource = "chatgpt";
 export interface VisualSourceInfo {
   id: VisualSource;
   available: boolean;
-  /** Model ref used, e.g. "openai/gpt-image-2", "minimax/image-01". */
+  /** Model ref used, e.g. "openai-codex/gpt-image-2". */
   model: string | null;
 }
 
 export interface GenerateVisualsBody {
   opId: string;
-  /** Picture source; default: Settings image model, else ChatGPT, MiniMax, connected image model. */
-  source?: VisualSource;
   /** Optional step ids; eligible output ports reserve slots within the six-image shared cap. */
   steps?: string[];
 }

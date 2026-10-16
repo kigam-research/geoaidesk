@@ -288,15 +288,9 @@
     "remake": "Remake concept pictures",
     "starting": "Requesting concept pictures",
     "making": "Making concept pictures ({done}/{total})",
-    "note": "Uses the subscription quota",
+    "note": "Uses the OpenAI Codex subscription",
     "failed": "Could not make the concept pictures.",
-    "notePaid": "Image model billed per call",
-    "sourceLabel": "Picture source",
-    "notConnected": "not connected",
-    "source": {
-      "chatgpt": "OpenAI Codex subscription",
-      "minimax": "MiniMax subscription",
-      "model": "Image model"
-    }
+    "needLogin": "Sign in with OpenAI Codex (legacy) in Settings to make pictures",
+    "limitTitle": "Picture usage limit reached"
   }
 }

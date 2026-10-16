@@ -9,6 +9,7 @@ vi.mock("../src/cost/ledger.ts", async (original) => ({
 }));
 
 const { chatGptImageGenerator } = await import("../src/geo/authoring/visuals.ts");
+const { usageLimit } = await import("../src/geo/authoring/codex-images.ts");
 
 const PNG = Buffer.from("89504e470d0a1a0a0000000d49484452", "hex");
 const token = (claims: object) => ["e30", Buffer.from(JSON.stringify(claims)).toString("base64url"), "sig"].join(".");
@@ -47,6 +48,14 @@ describe("concept pictures through the ChatGPT subscription", () => {
     ).rejects.toMatchObject({ status: 422 });
   });
 
+  it("turns a Codex usage-limit body into a notice with the reset time", () => {
+    const at = usageLimit({ error: { type: "usage_limit_reached", resets_at: 1_792_000_000 } });
+    expect(at.status).toBe(429);
+    expect(at.resetsAt).toBe(new Date(1_792_000_000_000).toISOString());
+    expect(usageLimit({ error: { resets_in_seconds: 60 } }, 0).resetsAt).toBe(new Date(60_000).toISOString());
+    expect(usageLimit(null).resetsAt).toBeUndefined();
+  });
+
   it("is used only with a ChatGPT OAuth sign-in and ledgers subscription use at $0", async () => {
     const none = { checkAuth: async () => ({ type: "api_key" as const }), getAuth: async () => undefined };
     expect(await chatGptImageGenerator(none)).toBeNull();
@@ -75,48 +84,7 @@ describe("concept pictures through the ChatGPT subscription", () => {
   });
 });
 
-describe("concept pictures through the MiniMax key", () => {
-  it("posts image-01 with base64 output, maps base_resp codes and accepts PNG", async () => {
-    const { generateMiniMaxImage } = await import("../src/geo/authoring/minimax-images.ts");
-    const ok = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
-      expect(JSON.parse(String(init?.body))).toMatchObject({ model: "image-01", response_format: "base64", n: 1 });
-      return new Response(
-        JSON.stringify({ data: { image_base64: [PNG.toString("base64")] }, base_resp: { status_code: 0 } }),
-      );
-    });
-    const image = await generateMiniMaxImage("key", "concept", { fetch: ok as typeof fetch });
-    expect(image.mimeType).toBe("image/png");
-    const limited = vi.fn(async () => new Response(JSON.stringify({ base_resp: { status_code: 1008 } })));
-    await expect(generateMiniMaxImage("key", "x", { fetch: limited as typeof fetch })).rejects.toMatchObject({
-      status: 402,
-    });
-  });
-
-  it("needs a MiniMax key and ledgers the plan use at $0", async () => {
-    const { miniMaxImageGenerator } = await import("../src/geo/authoring/visuals.ts");
-    expect(
-      await miniMaxImageGenerator({ checkAuth: async () => undefined, getAuth: async () => undefined }),
-    ).toBeNull();
-    const fetchImpl = vi.fn(
-      async () =>
-        new Response(
-          JSON.stringify({ data: { image_base64: [PNG.toString("base64")] }, base_resp: { status_code: 0 } }),
-        ),
-    );
-    const generator = await miniMaxImageGenerator(
-      { checkAuth: async () => ({ type: "api_key" as const }), getAuth: async () => ({ auth: { apiKey: "k" } }) },
-      fetchImpl as typeof fetch,
-    );
-    expect(generator?.model).toBe("minimax/image-01");
-    await generator!.generate("concept");
-    expect(mocks.record).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        model: "minimax/image-01",
-        billing: expect.objectContaining({ billingMode: "subscription" }),
-      }),
-    );
-  });
-
+describe("MiniMax M3.1 Flash Preview", () => {
   it("adds MiniMax M3.1 Flash Preview to the minimax provider", async () => {
     const { registerGeoProviderModels, MINIMAX_M31_FLASH_PREVIEW } = await import("../src/geo/providers.ts");
     const registerProvider = vi.fn();

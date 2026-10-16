@@ -7,12 +7,12 @@ import type {
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { AuthoringError, type AuthoringStore } from "../authoring/store.ts";
 import { addUrlSource, type UrlSourceOptions } from "../authoring/url-sources.ts";
-import { listVisualSources, startVisuals, type PrepareImageGenerator } from "../authoring/visuals.ts";
+import { startVisuals, visualSourceStatus, type PrepareImageGenerator } from "../authoring/visuals.ts";
 
 export interface AuthoringExtraOptions {
   store?: AuthoringStore;
   prepareImageGenerator?: PrepareImageGenerator;
-  listVisualSources?: () => Promise<VisualSourceInfo[]>;
+  visualSourceStatus?: () => Promise<VisualSourceInfo>;
   url?: UrlSourceOptions;
 }
 export async function registerGeoAuthoringExtraRoutes(
@@ -36,9 +36,9 @@ export async function registerGeoAuthoringExtraRoutes(
       reply.header("Cache-Control", "no-store");
       return payload;
     });
-    scope.get("/geo/authoring/visual-sources", async () => ({
-      sources: options.listVisualSources ? await options.listVisualSources() : await listVisualSources(),
-    }));
+    scope.get("/geo/authoring/visual-source", async () =>
+      options.visualSourceStatus ? await options.visualSourceStatus() : await visualSourceStatus(),
+    );
     scope.post<{ Params: { id: string }; Body: AddUrlSourceBody }>(
       "/geo/authoring/projects/:id/sources/url",
       async (req) => addUrlSource(store, req.params.id, req.body, options.url),

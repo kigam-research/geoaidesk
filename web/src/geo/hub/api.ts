@@ -3,7 +3,6 @@ import type {
   AddSourceBody,
   AddUrlSourceBody,
   VisualOperation,
-  VisualSource,
   VisualSourceInfo,
   AnswersBody,
   AuthoringAttempt,
@@ -64,9 +63,8 @@ export const hubApi = {
     post<{ source: SourceDocument; extraction: ExtractionRecord }>(`${pid(id)}/sources`, body),
   addUrl: (id: string, body: AddUrlSourceBody) =>
     post<{ source: SourceDocument; extraction: ExtractionRecord }>(`${pid(id)}/sources/url`, body),
-  visuals: (id: string, rev: number, source?: VisualSource) =>
-    post<VisualOperation>(`${pid(id)}/drafts/${rev}/visuals`, { opId: newOpId(), ...(source ? { source } : {}) }),
-  visualSources: () => call<{ sources: VisualSourceInfo[] }>("/visual-sources"),
+  visuals: (id: string, rev: number) => post<VisualOperation>(`${pid(id)}/drafts/${rev}/visuals`, { opId: newOpId() }),
+  visualSource: () => call<VisualSourceInfo>("/visual-source"),
   visualUrl: (id: string, key: string) => `/geo/authoring${pid(id)}/visuals/${encodeURIComponent(key)}`,
   analyze: (id: string, body: OperationBody) => post<AuthoringAttempt>(`${pid(id)}/analyze`, body),
   answers: (id: string, body: AnswersBody) =>

@@ -25,6 +25,32 @@ export interface ChatGptAuth {
   baseUrl?: string;
 }
 
+/** The subscription's image quota is used up; `resetsAt` (ISO) when the backend says when it resets. */
+export class UsageLimitError extends AuthoringError {
+  resetsAt?: string;
+  constructor(resetsAt?: string) {
+    super(
+      resetsAt
+        ? `OpenAI Codex 구독의 그림 생성 사용량 한도에 도달했습니다. ${resetsAt} 이후 다시 만드세요.`
+        : "OpenAI Codex 구독의 그림 생성 사용량 한도에 도달했습니다. 한도가 풀린 뒤 다시 만드세요.",
+      429,
+    );
+    this.resetsAt = resetsAt;
+  }
+}
+
+/** Reads `resets_at` (unix seconds) or `resets_in_seconds` from a Codex usage-limit body, as Codex CLI does. */
+export function usageLimit(body: unknown, nowMs = Date.now()): UsageLimitError {
+  const error = (body as { error?: { resets_at?: unknown; resets_in_seconds?: unknown } } | null)?.error;
+  const at =
+    typeof error?.resets_at === "number"
+      ? error.resets_at * 1000
+      : typeof error?.resets_in_seconds === "number"
+        ? nowMs + error.resets_in_seconds * 1000
+        : undefined;
+  return new UsageLimitError(at && Number.isFinite(at) ? new Date(at).toISOString() : undefined);
+}
+
 /** The ChatGPT account id carried in the access token (same claim Pi's Codex transport reads). */
 export function chatGptAccountId(token: string): string {
   try {
@@ -61,8 +87,7 @@ export async function generateCodexImage(
   });
   if (response.status === 401 || response.status === 403)
     throw new AuthoringError("ChatGPT 구독으로 그림을 만들 권한이 없습니다. 설정에서 다시 로그인하세요.", 401);
-  if (response.status === 429)
-    throw new AuthoringError("ChatGPT 구독의 그림 생성 사용량 한도에 도달했습니다. 잠시 뒤 다시 시도하세요.", 429);
+  if (response.status === 429) throw usageLimit(await response.json().catch(() => null));
   if (!response.ok) throw new AuthoringError(`ChatGPT 구독 그림 생성이 실패했습니다 (HTTP ${response.status}).`, 502);
   const body = (await response.json().catch(() => null)) as { data?: { b64_json?: string }[] } | null;
   const b64 = body?.data?.[0]?.b64_json;

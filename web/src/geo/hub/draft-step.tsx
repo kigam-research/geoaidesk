@@ -5,12 +5,20 @@
  * flow. The right rail tries the draft in a project. Technical files, check output and the
  * agent record open only on request.
  */
-import { FileTextIcon, FlaskConicalIcon, ImageIcon, LoaderCircleIcon, PencilLineIcon, Share2Icon } from "lucide-react";
+import {
+  FileTextIcon,
+  FlaskConicalIcon,
+  ImageIcon,
+  LoaderCircleIcon,
+  PencilLineIcon,
+  Share2Icon,
+  TriangleAlertIcon,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { MethodDraft, VisualSource, VisualSourceInfo } from "@/geo/contracts/authoring";
+import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
 import { MethodFlow, type StepVisual } from "./method-flow";
@@ -33,16 +41,17 @@ export function DraftStep({
   outputImages,
   visualAction,
 }: {
-  /** Concept pictures made with the configured image model (paid per call); explicit action only. */
+  /** Concept pictures through the OpenAI Codex subscription only (no fallback); explicit action only. */
   visualAction?: {
     busy: boolean;
     progress: { done: number; total: number } | null;
     has: boolean;
     error: string | null;
+    /** The last batch stopped at the subscription's usage limit. */
+    usageLimit: boolean;
     onMake: () => void;
-    sources: VisualSourceInfo[];
-    source: VisualSource | null;
-    onSource: (source: VisualSource) => void;
+    /** The OpenAI Codex login is connected (null while unknown). */
+    connected: boolean | null;
   };
   /** Register the draft in the shared GAID hub (others can star and comment). */
   onRegister?: () => void;
@@ -94,31 +103,13 @@ export function DraftStep({
             <h3 className="text-lg font-semibold">{text("draft.flow")}</h3>
             {visualAction && (
               <div className="ml-auto flex flex-wrap items-center gap-2">
-                {visualAction.error && !visualAction.busy && (
-                  <span className="text-xs text-destructive">{visualAction.error}</span>
-                )}
-                {visualAction.sources.length > 0 && (
-                  <select
-                    aria-label={text("visuals.sourceLabel")}
-                    className="h-8 rounded-md border bg-background px-2 text-sm"
-                    value={visualAction.source ?? ""}
-                    onChange={(e) => visualAction.onSource(e.target.value as VisualSource)}
-                  >
-                    {visualAction.sources.map((s) => (
-                      <option key={s.id} value={s.id} disabled={!s.available}>
-                        {text(`visuals.source.${s.id}`)}
-                        {s.available ? "" : ` (${text("visuals.notConnected")})`}
-                      </option>
-                    ))}
-                  </select>
-                )}
                 <span className="text-xs text-muted-foreground">
-                  {visualAction.source === "model" ? text("visuals.notePaid") : text("visuals.note")}
+                  {visualAction.connected === false ? text("visuals.needLogin") : text("visuals.note")}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={visualAction.busy || (visualAction.sources.length > 0 && !visualAction.source)}
+                  disabled={visualAction.busy || visualAction.connected === false}
                   onClick={visualAction.onMake}
                 >
                   {visualAction.busy ? (
@@ -137,6 +128,19 @@ export function DraftStep({
               </div>
             )}
           </div>
+          {visualAction?.error && !visualAction.busy && (
+            <p
+              role={visualAction.usageLimit ? "alert" : undefined}
+              className={
+                visualAction.usageLimit
+                  ? "flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                  : "text-sm text-destructive"
+              }
+            >
+              {visualAction.usageLimit && <TriangleAlertIcon className="mt-0.5 size-4 shrink-0" aria-hidden />}
+              {visualAction.error}
+            </p>
+          )}
           <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
         </section>
 

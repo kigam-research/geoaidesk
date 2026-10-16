@@ -18,7 +18,6 @@ import {
   type CheckResult,
   type MethodDraft,
   type ProjectSummary,
-  type VisualSource,
   type VisualSourceInfo,
 } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
@@ -308,8 +307,7 @@ function HubProject({
   const [uploading, setUploading] = useState<string | null>(null);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
   const [visualsBusy, setVisualsBusy] = useState(false);
-  const [visualSources, setVisualSources] = useState<VisualSourceInfo[]>([]);
-  const [visualSource, setVisualSource] = useState<VisualSource | null>(null);
+  const [visualSource, setVisualSource] = useState<VisualSourceInfo | null>(null);
   const [answers, setAnswers] = useState<Record<string, DraftAnswer>>(() => {
     try {
       return JSON.parse(window.localStorage.getItem(answersKey(id)) ?? "{}") as Record<string, DraftAnswer>;
@@ -374,12 +372,9 @@ function HubProject({
   useEffect(() => {
     if (!showingDraft) return;
     void hubApi
-      .visualSources()
-      .then((r) => {
-        setVisualSources(r.sources);
-        setVisualSource((cur) => cur ?? r.sources.find((x) => x.available)?.id ?? null);
-      })
-      .catch(() => setVisualSources([]));
+      .visualSource()
+      .then(setVisualSource)
+      .catch(() => setVisualSource(null));
   }, [showingDraft]);
   const pictures = useMemo(
     () => (project ? draftVisuals(project, draft) : draftVisuals(emptyProject(), undefined)),
@@ -393,6 +388,16 @@ function HubProject({
     lastVisualOp && lastVisualOp.status !== "running" && lastVisualOp.status !== "complete"
       ? (lastVisualOp.error ?? text("visuals.failed"))
       : null;
+  const usageLimit = lastVisualOp?.status === "failed" ? lastVisualOp.usageLimit : undefined;
+  // A usage limit is announced once, when the batch that hit it ends (also after a reload while it ran).
+  const limitOp = usageLimit ? lastVisualOp?.opId : undefined;
+  useEffect(() => {
+    if (!limitOp) return;
+    const key = `gaid:hub-limit-notice:${limitOp}`;
+    if (window.sessionStorage.getItem(key)) return;
+    window.sessionStorage.setItem(key, "1");
+    toast.warning(text("visuals.limitTitle"), { description: lastVisualError ?? undefined, duration: 12_000 });
+  }, [limitOp, lastVisualError]);
   useEffect(() => {
     if (!draft || isNew) return setCheck(null);
     let live = true;
@@ -475,7 +480,7 @@ function HubProject({
     if (!draft) return;
     setVisualsBusy(true);
     try {
-      await hubApi.visuals(id, draft.revision, visualSource ?? undefined);
+      await hubApi.visuals(id, draft.revision);
       await reload();
     } catch (e) {
       toast.error((e as Error).message);
@@ -655,10 +660,9 @@ function HubProject({
           progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
           has: Object.keys(pictures.steps).length + Object.keys(pictures.outputs).length > 0,
           error: lastVisualError,
+          usageLimit: Boolean(usageLimit),
           onMake: () => void makeVisuals(),
-          sources: visualSources,
-          source: visualSource,
-          onSource: setVisualSource,
+          connected: visualSource?.available ?? null,
         }}
         trialCount={trialCount ?? 0}
         checkIssues={issues}
