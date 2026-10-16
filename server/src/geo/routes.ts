@@ -20,6 +20,7 @@ import { registerGeoHubHandoffRoutes } from "./routes/hub-handoff.ts";
 import { registerGeoMethodRoutes } from "./routes/methods.ts";
 import { registerGeoAuthoringRoutes } from "./routes/authoring.ts";
 import { registerGeoAuthoringExtraRoutes } from "./routes/authoring-extra.ts";
+import { registerGeoHubSharedRoutes } from "./routes/hub-shared.ts";
 
 export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoCatalogueRoutes(app);
@@ -36,4 +37,5 @@ export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoMethodRoutes(app);
   await registerGeoAuthoringRoutes(app);
   await registerGeoAuthoringExtraRoutes(app);
+  await registerGeoHubSharedRoutes(app);
 }

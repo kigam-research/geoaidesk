@@ -14,7 +14,7 @@ import type {
   MethodPackageRecord,
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { installStagedSkills, previewSkillSource } from "../../agent/skills-install.ts";
-import { projectSkillRoot } from "../../agent/skills.ts";
+import { findSkillDir, projectSkillRoot } from "../../agent/skills.ts";
 import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { readMethodFile, verifyMethodTree } from "../methods/method-file.ts";
@@ -33,12 +33,25 @@ export async function installPackage(
   body: InstallBody,
   deps: InstallDeps = {},
 ): Promise<InstallResult> {
+  const result = await installPackageBytes(await store.readFile(project.id, pkg.archive), pkg, body, deps);
+  await store.mutate(project.id, (p) => {
+    p.installs.push(result.install);
+  });
+  return result;
+}
+
+/** Both authoring and shared entries install the same reviewed, immutable package bytes through this gate. */
+export async function installPackageBytes(
+  archive: Buffer,
+  pkg: Pick<MethodPackageRecord, "slug" | "methodId" | "revision" | "manifest">,
+  body: InstallBody,
+  deps: InstallDeps = {},
+): Promise<InstallResult> {
   if (body?.acknowledged !== true)
     throw new AuthoringError("초안 스킬이 프로젝트에서 코드를 실행할 수 있음을 확인해 주세요.", 400);
   if (typeof body.projectId !== "string" || !getProject(body.projectId))
     throw new AuthoringError("시험할 프로젝트를 찾을 수 없습니다.", 404);
   const paths = resolvePaths(body.projectId);
-  const archive = await store.readFile(project.id, pkg.archive);
 
   let staged: { source: string; sha256: string };
   try {
@@ -50,6 +63,8 @@ export async function installPackage(
   const file = fs.existsSync(skillDir) ? readMethodFile(skillDir, pkg.slug) : null;
   if (!file?.method || verifyMethodTree(skillDir, file.method).length)
     throw new AuthoringError("패키지 파일이 gaid-method.json 목록과 맞지 않습니다.", 422);
+  if (file.method.methodId !== pkg.methodId || file.method.revision !== pkg.revision)
+    throw new AuthoringError("패키지의 방법 식별자나 판이 등록 기록과 맞지 않습니다.", 422);
 
   const storeDir = packageStore(deps.agentDir);
   writePackageOrigin(storeDir, {
@@ -62,7 +77,8 @@ export async function installPackage(
   // Never overwrite a project skill of the same name that did not come from the GAID hub.
   const root = projectSkillRoot(paths);
   const existing = getSkillProvenance(root, pkg.slug);
-  const installedHere = fs.existsSync(path.join(root.skillsDir, pkg.slug));
+  const existingDir = findSkillDir(root, pkg.slug);
+  const installedHere = existingDir !== null;
   if (installedHere) {
     const origin = originOfSource(existing?.source, storeDir).origin;
     if (origin.kind !== "gaid-hub")
@@ -72,7 +88,7 @@ export async function installPackage(
       );
     // A researcher's edits to the installed copy are never overwritten by a reinstall.
     const base = getSkillBaseHash(root, pkg.slug);
-    if (base && hashDirectory(path.join(root.skillsDir, pkg.slug)) !== base)
+    if (!base || hashDirectory(existingDir!) !== base)
       throw new AuthoringError(
         `프로젝트에서 고친 ${pkg.slug} 스킬이 있어 덮어쓰지 않았습니다. 고친 내용을 옮겨 두거나 그 스킬을 지운 뒤 다시 설치하세요.`,
         409,
@@ -98,9 +114,6 @@ export async function installPackage(
     methodKey: `project:${pkg.slug}`,
     installedAt: now(),
   };
-  await store.mutate(project.id, (p) => {
-    p.installs.push(install);
-  });
   const manifest = pkg.manifest as { workflows?: { id: string }[]; recipes?: { id: string }[] };
   return { install, workflowId: manifest.workflows?.[0]?.id ?? null, recipeId: manifest.recipes?.[0]?.id ?? null };
 }

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T06:31:08Z
+updated: 2026-10-16T06:33:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3a6c6bdd-8e42-4c22-bc50-f3253b4bbc42","pid":2866986,"provider":"codex","session":"01a1432a-e540-7610-91df-bc7f924d9de8","start":"1618610","token":"af79afaa600e2e3514663724af3dca4cfb94e58c4f31a7f39a23719a1acbc8d7"}
 branch: task/gaid-hub--visuals
 target: task/gaid-hub
@@ -111,6 +111,10 @@ Prettier style as the authoring code. No real image-model or provider calls in t
   former; root npx refused without installing. Reissued from the correct directories. No recurring tool block.
 
 ## Notes and decisions
+Parent advanced to 81984e96 after integrating shared. The finish retry merged it and found only the expected
+route import/registration insertion conflict. Resolved by retaining both authoring-extra and hub-shared,
+registered after base authoring; no shared feature code was edited.
+
 Parent steering after shared finished: run the full check serially with VITEST_MAX_WORKERS=1 (environment
 only). Do not edit tests/config to work around host-load timeouts. Parent may integrate shared while this
 finish runs; follow the task CLI if its target moves.
