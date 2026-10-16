@@ -73,7 +73,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
       <DialogDescription>{t("hubHandoff.description")}</DialogDescription>
       <p className="text-sm">{t("hubHandoff.rawData")}</p>
       {loading && <p role="status">{t("hubHandoff.loading")}</p>}
-      {preview && !loading && <div className="min-w-0 space-y-3 text-sm">
+      {preview && !loading && <div className="min-w-0 space-y-3 pb-2 text-sm">
         <section><h3 className="font-medium">{t("hubHandoff.request")}</h3><p className="max-h-32 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.request || t("hubHandoff.emptyText")}</p></section>
         {!!preview.followUps?.length && <section><h3 className="font-medium">{t("hubHandoff.followUps", { count: preview.followUps.length })}</h3><ol className="max-h-32 list-decimal space-y-1 overflow-y-auto pl-5 whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.followUps.map((text, i) => <li key={i}>{text}</li>)}</ol></section>}
         {preview.methodTrial && <section><h3 className="font-medium">{t("hubHandoff.methodTrial")}</h3>

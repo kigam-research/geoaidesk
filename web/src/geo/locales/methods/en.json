@@ -43,7 +43,7 @@
   "trials.degraded": "Steps with incomplete file attribution: {count}",
   "trials.session": "Chat ID: {id}",
   "trials.outputs": "Observed output files",
-  "trials.expected": "Expected output files",
+  "trials.expected": "Expected result files (whole Workflow)",
   "trials.required": "Required",
   "trials.optional": "Optional",
   "trials.found": "Found: {files}",

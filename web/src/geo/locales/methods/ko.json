@@ -43,7 +43,7 @@
   "trials.degraded": "파일 연결이 불완전한 단계: {count}개",
   "trials.session": "채팅 ID: {id}",
   "trials.outputs": "관찰된 결과 파일",
-  "trials.expected": "예상 결과 파일",
+  "trials.expected": "예상 결과 파일 (Workflow 전체 기준)",
   "trials.required": "필수",
   "trials.optional": "선택",
   "trials.found": "발견됨: {files}",

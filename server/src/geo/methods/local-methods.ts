@@ -129,10 +129,14 @@ export async function listLocalMethods(
       const environment = catalogue
         ? environmentState(catalogue, workflow.environmentProfile, probes.get(workflow.environmentProfile))
         : { id: workflow.environmentProfile, title: null, state: "unknown" as const, missing: [], detail: "The geo catalogue is not active" };
+      const tried = trials.get(`${method.runtimeName}:${workflow.id}`) ?? { count: 0, lastOutcome: null };
+      const readiness = readinessOf(workflow, skills, environment);
+      // A local method's run record is GAID's own trial record (no catalogue install record exists), so every
+      // screen that shows "untested" agrees with the trial count.
       return {
-        ...summarizeWorkflow(workflow, readinessOf(workflow, skills, environment)),
+        ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }),
         exposure: methodExposure(method.runtimeName, workflow.id),
-        trials: trials.get(`${method.runtimeName}:${workflow.id}`) ?? { count: 0, lastOutcome: null },
+        trials: tried,
       };
     });
     return {

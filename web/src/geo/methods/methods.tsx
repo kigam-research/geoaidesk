@@ -111,7 +111,7 @@ const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Da
 export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);
   return <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto break-words sm:max-w-2xl">
+    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-2xl">
       <DialogTitle>{text(method.title)}</DialogTitle>
       <DialogDescription>{text(method.summary) || method.runtimeName}</DialogDescription>
       <div className="flex flex-wrap gap-1"><MethodBadges method={method} /></div>
