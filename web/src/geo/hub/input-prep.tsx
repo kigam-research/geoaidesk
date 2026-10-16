@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import type { LocalMethodsResponse, LocalMethodWorkflow } from "@/geo/contracts/methods";
 import { geoText } from "@/geo/i18n";
 import { accepts, text as local } from "@/geo/workspace/api";
+import { PrepareEnvironment } from "@/geo/workspace/readiness";
 import { apiFetch } from "@/lib/projects";
 import { flattenFiles, type TreeNode } from "@/lib/use-sandbox";
 
@@ -26,6 +27,11 @@ async function methodWorkflow(projectId: string, methodKey: string): Promise<Loc
   if (!res.ok) return null;
   const method = ((await res.json()) as LocalMethodsResponse).methods.find((m) => m.key === methodKey);
   return method?.workflows[0] ?? null;
+}
+
+/** The setup can start: required inputs present and the Workflow environment ready. */
+export function setupReady(workflow: LocalMethodWorkflow, files: string[]): boolean {
+  return inputsReady(workflow, files) && workflow.readiness.state === "ready";
 }
 
 /** Required input roles that have at least one matching file. */
@@ -92,7 +98,8 @@ export function InputPrep({
       </p>
     );
   if (!workflow) return <p className="text-sm text-muted-foreground">{text("prep.noWorkflow")}</p>;
-  const ready = inputsReady(workflow, files);
+  const ready = setupReady(workflow, files);
+  const envReady = workflow.readiness.state === "ready";
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium">{text("prep.title", { project: projectName })}</p>
@@ -146,6 +153,22 @@ export function InputPrep({
           );
         })}
       </ul>
+      <div className="flex flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
+        <span className="flex items-center gap-2">
+          {envReady ? (
+            <CheckIcon className="size-4 text-primary" aria-hidden />
+          ) : (
+            <CircleDashedIcon className="size-4 text-muted-foreground" aria-hidden />
+          )}
+          <span className="font-medium">{text("prep.environment")}</span>
+          <span className="text-xs text-muted-foreground">
+            {local(workflow.readiness.environment.title) || workflow.readiness.environment.id}
+          </span>
+        </span>
+        <div className="pl-6">
+          <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={load} />
+        </div>
+      </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button onClick={onOpenSetup} disabled={!ready}>
         {text("prep.openSetup")}

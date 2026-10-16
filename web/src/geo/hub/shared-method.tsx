@@ -134,7 +134,12 @@ export function SharedMethod({
           ))}
         </ul>
         <div className="flex flex-col gap-2 rounded-xl border p-3">
-          <Textarea rows={3} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={text("shared.commentPlaceholder")} />
+          <Textarea
+            rows={3}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={text("shared.commentPlaceholder")}
+          />
           <Button
             className="self-end"
             disabled={!draft.trim()}

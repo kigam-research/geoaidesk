@@ -72,9 +72,19 @@ describe("GAID hub draft flow", () => {
   it("orders steps along next edges and marks researcher decisions", () => {
     const draft = fixtureDraft().drafts[0];
     const shuffled = [...draft.profile.procedure.nodes].reverse();
-    expect(orderedNodes(shuffled, draft.profile.procedure.edges).map((n) => n.id)).toEqual(["n1", "n2", "n3", "n4", "n5", "n6", "n7"]);
+    expect(orderedNodes(shuffled, draft.profile.procedure.edges).map((n) => n.id)).toEqual([
+      "n1",
+      "n2",
+      "n3",
+      "n4",
+      "n5",
+      "n6",
+      "n7",
+    ]);
     const onSelect = vi.fn();
-    render(<FlowDiagram nodes={draft.profile.procedure.nodes} edges={draft.profile.procedure.edges} onSelect={onSelect} />);
+    render(
+      <FlowDiagram nodes={draft.profile.procedure.nodes} edges={draft.profile.procedure.edges} onSelect={onSelect} />,
+    );
     expect(screen.getAllByText("직접 정함")).toHaveLength(2);
     fireEvent.click(screen.getByRole("button", { name: /블록 크기 확정/ }));
     expect(onSelect).toHaveBeenCalledWith("n3");

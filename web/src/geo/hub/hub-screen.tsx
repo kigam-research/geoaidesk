@@ -37,22 +37,31 @@ import { MethodFlow } from "./method-flow";
 import { localText } from "./text";
 import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
+import type { HubEntry, HubFolder, HubRecommendation } from "@/geo/contracts/hub-shared";
+import { sharedHub } from "./shared-api";
+import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
+import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
 const appText = geoText("app");
 const text = geoText("hub");
 
 export function GaidHub({
   authoringId,
+  entryId = null,
   onNavigate,
   onOpenProjects,
   onOpenProject,
 }: {
   authoringId: string | null;
+  /** A registered entry of the shared hub to show. */
+  entryId?: string | null;
   onNavigate: (next: HubLocation) => void;
   onOpenProjects: () => void;
   onOpenProject: (projectId: string) => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { projects, setActive } = useProjects();
+  const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
   const { resolvedTheme, setTheme } = useTheme();
   const actions = (
     <>
@@ -78,14 +87,29 @@ export function GaidHub({
   );
   return (
     <HubShell onNavigate={(place) => place === "projects" && onOpenProjects()} actions={actions}>
-      {authoringId === null ? (
-        <HubList onOpen={(id) => onNavigate({ open: true, projectId: id })} />
+      {entryId ? (
+        <SharedEntryScreen
+          key={entryId}
+          entryId={entryId}
+          projects={hubProjects}
+          onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
+            setActive(projectId);
+            onOpenProject(projectId);
+            openMethodSetup({ projectId, methodKey, workflowId, recipeId });
+          }}
+        />
+      ) : authoringId === null ? (
+        <HubList
+          onOpen={(id) => onNavigate({ open: true, projectId: id })}
+          onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
+        />
       ) : (
         <HubProject
           key={authoringId}
           id={authoringId}
           onBack={() => onNavigate({ open: true, projectId: null })}
           onCreated={(id) => onNavigate({ open: true, projectId: id })}
+          onRegistered={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
           onOpenProject={onOpenProject}
         />
       )}
@@ -97,10 +121,23 @@ export function GaidHub({
 /** `#hub/new` is a project not yet created: it is created with the first uploaded source. */
 export const NEW_ID = "new-method";
 
-function HubList({ onOpen }: { onOpen: (id: string) => void }) {
+function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpenEntry: (id: string) => void }) {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [entries, setEntries] = useState<HubEntry[]>([]);
+  const [folders, setFolders] = useState<(HubFolder & { entries: number })[]>([]);
+  const [cards, setCards] = useState<HubRecommendation[]>([]);
+  const [folderId, setFolderId] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newFolder, setNewFolder] = useState(false);
+  const named = useNamedAction();
+  const loadShared = useCallback(async () => {
+    // The shared hub may be unavailable (older server): my methods still list.
+    const [f, e, r] = await Promise.allSettled([sharedHub.folders(), sharedHub.entries(), sharedHub.recommended()]);
+    if (f.status === "fulfilled") setFolders(f.value.folders);
+    if (e.status === "fulfilled") setEntries(e.value.entries);
+    if (r.status === "fulfilled") setCards(r.value.cards);
+  }, []);
   useEffect(() => {
     let live = true;
     const load = () =>
@@ -110,24 +147,69 @@ function HubList({ onOpen }: { onOpen: (id: string) => void }) {
         .catch((e: Error) => live && setError(e.message))
         .finally(() => live && setLoading(false));
     void load();
+    void loadShared();
     const timer = window.setInterval(load, 10_000);
     return () => {
       live = false;
       window.clearInterval(timer);
     };
-  }, []);
+  }, [loadShared]);
+  const entryOf = (p: ProjectSummary) => entries.find((e) => e.revisions.some((r) => r.authoringProjectId === p.id));
+  const shown = folderId === "all" ? projects : projects.filter((p) => entryOf(p)?.folderId === folderId);
   return (
-    <HubHome
-      recommended={[]}
-      folders={[{ id: "all", name: text("home.allFolders"), count: projects.length }]}
-      folderId="all"
-      onFolder={() => undefined}
-      projects={projects}
-      loading={loading}
-      error={error}
-      onCreate={() => onOpen(NEW_ID)}
-      onOpen={onOpen}
-    />
+    <>
+      <HubHome
+        recommended={cards.map((c) => ({
+          id: c.id,
+          title: c.title,
+          line: c.line,
+          image: hubImage(c.image),
+          source: c.source,
+          stars: c.stars,
+          author: c.author,
+        }))}
+        folders={[
+          { id: "all", name: text("home.allFolders"), count: projects.length },
+          ...folders.map((f) => ({
+            id: f.id,
+            name: f.name,
+            count: projects.filter((p) => entryOf(p)?.folderId === f.id).length,
+          })),
+        ]}
+        folderId={folderId}
+        onFolder={setFolderId}
+        onNewFolder={() => named.run(() => setNewFolder(true))}
+        projects={shown}
+        registered={Object.fromEntries(
+          projects.flatMap((p) => {
+            const e = entryOf(p);
+            return e
+              ? [[p.id, { entryId: e.id, stars: e.stars, comments: e.comments, revision: e.latestRevision }]]
+              : [];
+          }),
+        )}
+        loading={loading}
+        error={error}
+        onCreate={() => onOpen(NEW_ID)}
+        onOpen={onOpen}
+        onOpenEntry={onOpenEntry}
+        onOpenRecommended={(id) => {
+          const card = cards.find((c) => c.id === id);
+          if (card?.source === "shared") onOpenEntry(card.ref);
+          else if (card) toast.info(text("home.catalogueHint", { title: card.title }));
+        }}
+      />
+      <NewFolderDialog
+        open={newFolder}
+        onOpenChange={setNewFolder}
+        onCreate={async (name) => {
+          const f = await sharedHub.createFolder(name);
+          await loadShared();
+          setFolderId(f.id);
+        }}
+      />
+      {named.dialog}
+    </>
   );
 }
 
@@ -187,7 +269,10 @@ function HubProject({
   onBack,
   onCreated,
   onOpenProject,
+  onRegistered,
 }: {
+  /** The draft was registered in the shared hub: show its entry. */
+  onRegistered: (entryId: string) => void;
   id: string;
   onBack: () => void;
   onCreated: (id: string) => void;
@@ -210,6 +295,16 @@ function HubProject({
   const [check, setCheck] = useState<CheckResult | null>(null);
   const [dialog, setDialog] = useState<null | "feedback" | "files" | "issues" | "record">(null);
   const [feedbackPrefill, setFeedbackPrefill] = useState("");
+  const [registerOpen, setRegisterOpen] = useState(false);
+  const [hubFolders, setHubFolders] = useState<HubFolder[]>([]);
+  const named = useNamedAction();
+  useEffect(() => {
+    if (!registerOpen) return;
+    void sharedHub
+      .folders()
+      .then((r) => setHubFolders(r.folders))
+      .catch(() => setHubFolders([]));
+  }, [registerOpen]);
   const [page, setPage] = useState<{ sourceId: string; page: number } | null>(null);
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
@@ -441,8 +536,7 @@ function HubProject({
       <SharedMethod
         preview={{
           onBack: () => setStep("draft"),
-          // The shared registry (institute GAID server) is built after the mockups are agreed with the user.
-          onRegister: () => toast.info(text("register.notYet")),
+          onRegister: () => named.run(() => setRegisterOpen(true)),
         }}
         method={{
           id: project.id,
@@ -546,6 +640,26 @@ function HubProject({
         }
       />
       <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{body}</main>
+      <RegisterDialog
+        open={registerOpen}
+        onOpenChange={setRegisterOpen}
+        folders={hubFolders}
+        onRegister={async (folderId, note) => {
+          try {
+            const entry = await sharedHub.register({
+              authoringProjectId: id,
+              draftRevision: draft?.revision,
+              folderId,
+              note,
+            });
+            onRegistered(entry.id);
+          } catch (e) {
+            toast.error((e as Error).message);
+            throw e;
+          }
+        }}
+      />
+      {named.dialog}
       <FeedbackDialog
         initial={feedbackPrefill}
         open={dialog === "feedback"}
