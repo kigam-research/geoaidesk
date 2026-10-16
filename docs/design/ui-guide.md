@@ -1,6 +1,6 @@
 # GAID UI/UX guide v1
 
-Status: draft for user review (gaid-ui-guide, 2026-10-16). Machine-readable values: `geo/ui/ui-rules.json`. Checks:
+Status: structure, rules and default values approved by the user on 2026-10-16 ("승인한다."); before/after screens and visual review in gaid-ui-guide. Machine-readable values: `geo/ui/ui-rules.json`. Checks:
 `node geo/ui/check-ui.mjs` (run by `scripts/check`). Copy voice and wording stay in `geo/copy/gaid-writing.md` and
 `geo/copy/terminology.csv`; colours, fonts, radius and motion tokens stay in `geo/copy/gaid-app.css` (vendored WP00
 kit). This guide decides layout, density, components, states and what a researcher sees.

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:45:22Z
+updated: 2026-10-16T08:48:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -57,16 +57,22 @@ Present the guide's structure and key rules to the user in your tab before final
   caches and app-written files/links after the last check.
 
 ## Current state
-- 2026-10-16: resumed; One UI source digest running (native sub-agent → ~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md)
-  and an Oracle Pro cross-check (output ~/data/geoaidesk/work/gaid-ui-guide/oracle-oneui.out).
+- a91db30 (pushed): guide draft `docs/design/ui-guide.md`, `geo/ui/{ui-rules.json,check-ui.mjs,ui-baseline.json}`,
+  `geo/tests/ui-check.test.mjs`, `scripts/check` step, AGENTS.md rule. `node geo/ui/check-ui.mjs` → 0 errors, 96 accepted
+  debt (34 copy-length, 52 internals, 10 styles); `node --test geo/tests/ui-check.test.mjs` 5/5 pass. Full scripts/check
+  not yet run.
+- One UI digest: ~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md (33 pages, curl, 2026-10-16).
+- Child `gaid-ui-guide--screens` (writer 20ad37cf, Codex general work) started: before/after for setup dialog, map viewer,
+  method detail; brief ~/data/geoaidesk/work/gaid-ui-guide/child-screens.md.
+- Oracle Pro cross-check still running (systemd unit oracle-oneui-278305, output oracle-oneui.out).
 ## Next steps
-1. Write docs/design/ui-guide.md + geo/ui/ui-rules.json from the digest; present structure/key rules to the user.
-2. geo/ui/check-ui.mjs (+ geo/tests test, scripts/check step), AGENTS.md rule.
-3. Child writer `screens`: before screenshots from a throwaway instance (free ports, data under
-   ~/data/geoaidesk/work/gaid-ui-guide/) + after mockups for 3 screens; then persona + Claude 고급검토 + Codex 검토 reviews.
-Blocked: waiting for the One UI source digest (native sub-agent, notifies on completion) and the Oracle Pro run (systemd unit oracle-oneui-278305).
+1. When Oracle finishes: compare with the digest, fix any wrong source mapping; `task research-save <session>`.
+2. After the screens child finishes: `task complete gaid-ui-guide--screens`; then reviews: researcher persona (Claude
+   Sonnet 5.5, thinking high) on screenshots, "Claude 고급검토", "Codex 검토" (no Codex 고급검토).
+3. Report reports/2026-10-16-gaid-ui-guide/index.md (humanizer, review-copy), full scripts/check, cleanup, task finish.
 ## Failed approaches
 ## Notes and decisions
+- 2026-10-16: presented guide structure, key rules and default values (first view 300 chars, copy limits, map info 5 rows / popup 8 rows, table 8 columns); user: "승인한다."
 - Plan (2026-10-16). Sequential: One UI digest → guide + rules file (writer, owns docs/design/ui-guide.md, geo/ui/*,
   AGENTS.md rule, scripts/check step) → screens package → reviews → report. Independent package: `screens` child
   (owns reports/<date>-gaid-ui-guide/figures/ and mockup sources under ~/data/geoaidesk/work/gaid-ui-guide/mockups;
