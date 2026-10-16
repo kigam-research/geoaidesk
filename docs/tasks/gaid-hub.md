@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T01:56:38Z
+updated: 2026-10-16T02:03:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -71,11 +71,51 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   app-written files/links from the worktree after the last check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).
+  skill_hub reference snapshot (read-only, never a runtime dependency): main 54fe4773d06fcb3d0dc36882d5cd44d9094cade5,
+  ~/data/geoaidesk/work/gaid-hub/inputs/skill_hub/ (tarball sha256 cdea8d08…aa2c4, from `gh api .../tarball/<sha>`).
+- Dev instance: user unit `gaid-hub-dev` (next dev from this worktree, hot reload), ports 3330/18330,
+  GAID_HOME ~/data/geoaidesk/work/gaid-hub/home (pi-agent models.json/kady-settings copied from the hub-integration
+  instance: kigam-qwen/qwen3.8-flash-next default), launcher ~/data/geoaidesk/work/gaid-hub/bin/dev.sh,
+  log ~/data/geoaidesk/work/gaid-hub/logs/dev.log. Re-check: `systemctl --user status gaid-hub-dev`.
 ## Next steps
-1. (the next session's first action)
+1. Settle the shared contract `web/src/geo/contracts/authoring.ts` + HTTP surface (below), then start the server-port child.
+2. Build the few key screens (entrance, question tabs, draft flow) with fixture data, screenshot, present to the user.
 ## Failed approaches
 ## Notes and decisions
+### Orchestration plan (2026-10-16)
+Sequential decisions: (1) shared records/contract + route surface (parent) → (2) server port and screen design run in
+parallel → (3) user approves key screens → (4) build all screens → (5) wire end to end, reviews → (6) re-test in GAID →
+(7) report, scripts/check, cleanup.
+
+Placement decisions:
+- Server: `server/src/geo/authoring/` (store, sources, anchors, prompts, agent, model adapter, package, checks, routes).
+  User-level store (not per GAID project): `<GAID_HOME-derived agent dir>/authoring/` (exact helper picked from
+  existing path helpers); routes `/geo/authoring/*`, global (no project scope), loopback/auth as other geo routes.
+- Model: GAID's own runtime (`ModelRuntime.completeSimple` via the one-shot pattern of next-experiments.ts), model =
+  the researcher's chosen connected model (default: app default); ledgered under pseudo session `authoring`; spend cap
+  applies. No direct provider endpoint calls.
+- Contract types: `web/src/geo/contracts/authoring.ts` (port of skill_hub web/shared/authoring/records.ts, adapted);
+  gaid-method types reuse/extend `web/src/geo/contracts/methods.ts`.
+- Vendored hub inputs with provenance: `geo/hub/` (atlas-profile, gaid-method, gaid-hub-package, geo-workflow schemas;
+  taxonomy YAML; SOURCE.md with skill_hub SHA). Environments and catalogue skill ids come from GAID's pinned catalogue
+  (environments.json, catalogue/index.json), not from a skill_hub checkout. The atlas check runs single-profile
+  validation (no whole-catalogue compile).
+- Install: a locally built package goes through the existing preview → acknowledgement → install gate (no HTTP fetch);
+  remote hub-fetch stays.
+- Web: GAID hub screens under `web/src/geo/hub/` and a route outside the project workspace; entrance on the project
+  selection screen (`web/src/components/project-view.tsx`, add to integration-boundaries).
+- UX rules (user, 2026-10-16): little text, no endless scroll, one question at a time in tabs (prev/next), options with a
+  marked recommendation + "기타" free text, all answers applied together → draft, draft as flow diagram with short
+  plain explanations, agent internals hidden (on demand at most).
+
+Work packages:
+- P1 server port (child writer, general work): owns `server/src/geo/authoring/**`, `server/test/geo-authoring*.test.ts`,
+  `geo/hub/**`. Interface: the contract file + route table fixed by the parent.
+- P2 screens (parent first for key screens; may split later): owns `web/src/geo/hub/**`, locales `web/src/geo/locales/hub/`,
+  the entrance edit in project-view.tsx.
+- P3 re-test (parent, after integration): own instance, Qwen route, researcher persona + Claude 고급검토 + Codex 검토.
+Integration order: P1 → wire P2 to real endpoints → P3.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
