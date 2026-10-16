@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T14:12:37Z
+updated: 2026-10-16T14:13:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -57,20 +57,19 @@ Present the guide's structure and key rules to the user in your tab before final
   caches and app-written files/links after the last check.
 
 ## Current state
-- c5fdb05 (pushed): guide `docs/design/ui-guide.md` (user approved structure/rules/defaults 2026-10-16), `geo/ui/*`,
-  `geo/tests/ui-check.test.mjs`, `scripts/check` step, AGENTS.md rule, child `screens` integrated (closed after removing
-  its build caches): `docs/design/mockups/{setup,map,method}.html` + README, 11 PNGs in
-  `reports/2026-10-16-gaid-ui-guide/figures/` (setup/map before = live capture at fed75bc; method before reused from
-  gaid-hub-integration). check-ui: 0 errors / 96 debt; ui-check tests 5/5. Full scripts/check runs at task finish.
-- Local (unpushed): guide source-fidelity edits after the Oracle Pro cross-check (N1 wording, D2/L4/F1/Q notes marking
-  GAID-own values, cross-check note). Oracle note: 웹 조사/geoaidesk/2026-10-16-i-am-writing-a-ui--0230c8af23.md.
-- Reviews running (task readers, results to this session and ~/data/geoaidesk/work/gaid-ui-guide/reviews/):
-  researcher persona eede96f7 (claude-sonnet-5-5, thinking high), Claude 고급검토 72d8c801, Codex 검토 bc4b0abd.
+- 4884daf (pushed): guide revised after three reviews; check-ui ICU-aware (0 errors / 102 debt); ui-check tests 5/5.
+  Screens child #1 integrated and closed (mockups + 11 PNGs).
+- Child `gaid-ui-guide--screens2` (writer 9e5573c7) revising mockups/figures per agreed findings; brief
+  ~/data/geoaidesk/work/gaid-ui-guide/child-screens2.md.
+- Reviews (all on c5fdb05): ~/data/geoaidesk/work/gaid-ui-guide/reviews/{claude-advanced-review.md,codex-review.md,researcher-persona.md}.
 ## Next steps
-1. Triage the three reviews; fix blockers (guide, rules, check, mockups/figures); recheck only if needed.
+1. When screens2 finishes: `task complete gaid-ui-guide--screens2` (remove its caches if close is pending), look at the
+   new figures; short recheck of the revised mockups/guide by the persona reader only if the figures leave doubt.
 2. Report reports/2026-10-16-gaid-ui-guide/index.md (humanizer file mode, `task review-copy`), declare under ## Report.
 3. task finish (runs scripts/check); give the hub's final report to the user.
 ## Failed approaches
+- check-ui v1 measured ICU length with a regex; arguments inside select/plural branches made short messages count as
+  their whole source (Codex B1). Replaced by a walk over the vendored icu-lite parse tree.
 ## Notes and decisions
 - 2026-10-16: presented guide structure, key rules and default values (first view 300 chars, copy limits, map info 5 rows / popup 8 rows, table 8 columns); user: "승인한다."
 - Plan (2026-10-16). Sequential: One UI digest → guide + rules file (writer, owns docs/design/ui-guide.md, geo/ui/*,
@@ -83,6 +82,17 @@ Present the guide's structure and key rules to the user in your tab before final
   progressive disclosure. Mockups only; app code is not rebuilt here (gaid-hub aligns its own screens).
 - geo/copy/ is vendored from skill_hub and stays unedited; new UI rules live in geo/ui/ and reference gaid-app.css vars.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Review triage (2026-10-16). Fixed: Claude B1 (map legend → screens2), N1/N2 source notes, N3 W1 coverage wording +
+  id convention, N4 literal labels (채팅 ID, 세션 ID, 종료 코드, HTTP {status}) + `{models}`, N6, N7 view definition,
+  screenshot scope; Codex B1 (ICU length), N1 (`.details` no longer exempt → `.technical`; `.question.*` no longer
+  exempt from length), N2 (tabs ≤3 preferred, button-style difference in §11, D2 action counting), N3/N4 → screens2;
+  persona: R4 record view keeps the model name and chat link for citation; Q2 권장 only with a source/reason, no
+  pre-selection for unsourced scientific parameters; Q3 file chooser; Q4 blockers on step 1 with fixing action, recipe
+  starts at summary; Q5 one sequence; F5 specific limit visible; MAP2 CRS naming; MAP4 overlay/layer add; MAP6 scale
+  bar, cursor coordinates, highlight; W6 one term per concept. Not adopted: relabelling data value `0` (it is source
+  data); an all-on-one-page setup mode (contradicts the user's one-question-per-step requirement; recipes/earlier runs
+  open at the summary instead); MAP2 extent stays on demand. Optional/deferred: N5 resizable split (in screens2 if
+  cheap), N8 checker edge cases (#rrggbbaa, inline fontSize).
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
