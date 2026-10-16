@@ -80,7 +80,18 @@ supersedes:
 
 ## 6. 결정할 일
 
-없음. 다음 일은 hub를 기다립니다: hub가 수정판 패키지를 보내면 같은 제한 시험을 다시 합니다.
+없음. 사용자 지시(2026-10-16)에 따라 수정판 패키지를 기다리지 않고 이번 결과로 마무리했습니다. 수정판으로 다시 시험하는 일은 미완료 항목으로 남깁니다.
+
+GAID_HUB 쪽에 남은 결함(이번 시험 패키지 기준):
+1. 바리오그램 계산 규모(표본 크기, 예상 시간)가 정해져 있지 않음
+2. 바리오그램 라이브러리의 설치 이름이 적혀 있지 않고, 해당 라이브러리가 MPM 분석 환경에 없음
+3. 예상 결과에 파일 이름이 없어 GAID가 결과를 대조하지 못함
+4. 과학적 선택의 선택지가 영문 식별자로만 보임(계약에 표시 이름 없음)
+5. 입력 이름에 "(선택)"이 들어 있어 GAID 표시와 겹침
+6. 출처 제목이 "Subject:"로 비어 있고, 검사 경고가 영어 원문임
+7. Workflow 요청문이 연구자의 요청이 아니라 방법 설명으로 쓰임
+
+GAID 쪽에 남은 결함: 5절의 긴 실행 진행 표시, 작업 제안에 hub 방법 없음, 큰 CSV 반복 요청, 보내기 기능의 아이콘 표시. hub 쪽 받기는 확인하지 않았습니다.
 
 Optional(사용자가 고르기 전에는 하지 않음):
 - 업로드한 파일에 맞는 hub 방법도 작업 제안에 넣기
@@ -107,3 +118,19 @@ Optional(사용자가 고르기 전에는 하지 않음):
 - 시각 검토: reviews/claude-advanced.md(reader f62eecd7), reviews/codex-advanced.md(reader 22391b2a), 같은 폴더의 playwright-*/.
 - hub 보고: routed request 351e0b68701b 결과 파일 ~/data/geoaidesk/work/gaid-hub-integration/route-results/351e0b68701b.md.
 - 그림 원본: researcher/playwright/05-preview.png, 21c-trial-rating-saved.png, playwright/after-method-detail.png (1440×900).
+
+## 부록 B. 한 프로젝트로 옮길 때 참고할 목록
+
+GAID가 GAID_HUB(skill_hub)에 기대는 부분:
+- 저작 서비스: 논문·코드 첨부, 질문과 답, 초안 작성(Skill Atlas 서버 안, 시험용 :4317). 화면 `#/author/new?from=gaid`, `#/author/<id>`.
+- 패키지 빌더: 결정적 tar.gz, 스킬 폴더 안의 gaid-method.json(gaid-method/v1), files[]·packageDigest, revision·version 규칙.
+- 검사: schema, atlas, taxonomy, portability, workflow, claims 영수증. atlas.yaml(atlas-profile/v1)과 분류 용어.
+- 엔드포인트: GET /api/gaid/methods, GET /api/gaid/packages/<owner>/<slug>/<revision>(+ .tar.gz, gaid-method.json), POST /api/gaid/handoffs(같은 PC 한정).
+- 그 밖에: 고정 카탈로그 묶음(geo-catalogue 0.2.1)과 Workflow·환경 정의, 문구 키트(design/copy, GAID에는 geo/copy로 복사), 공개 Atlas 사이트의 스킬 페이지·패키지 경로.
+
+GAID에 이미 있는 부분:
+- 설치 관문(미리보기·동의·설치), hub 사이트 설정과 GAID_SKILL_HUB_SITES, descriptor 받기와 바이트·파일 목록·revision 대조, 출처 기록.
+- LocalMethod: 설치된 방법 목록, Workflow 준비 상태, 레시피, method 노출, 시험 기록과 연구자 평가, 화면(Workflow 패널 범주, 상세, 시험 기록, 설정의 hub 목록).
+- 보내기: 분석 묶음(gaid-analysis-handoff/v1) 만들기, 내려받기, 같은 PC hub로 직접 보내기.
+- 저작 화면 시안: /authoring-preview(프런트엔드 전용, 모델 호출·설치 없음).
+- 카탈로그 고정·검증·배치, geo-start/v1 레시피, 환경 준비.

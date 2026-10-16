@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T00:21:09Z
+updated: 2026-10-16T00:22:24Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -63,7 +63,7 @@ assessment. The chat's only authoring entry is "방금 한 분석을 skill_hub �
 loopback hub). Trial of local/pu-nested-cv-prospectivity rev 1 (from the test paper + original code) on the Yilgarn grid with Qwen:
 install and launch worked without help; the bounded run did not reach the method's first gate (45+ min variogram loop on 70k
 cells, wrong library name), assessed "needs revision"; package fixes went to skill_hub (351e0b68701b). Open: re-run on a hub
-revision 2. Report: reports/2026-10-16-gaid-hub-integration/index.md.
+revision 2 not done (user wrap-up 2026-10-16; open item). Migration inventory: report appendix B. Report: reports/2026-10-16-gaid-hub-integration/index.md.
 
 - 2026-10-15: contract draft v0 (GAID consumer requirements) sent to the skill_hub hub, request da92dc0fec04; text in
   ~/data/geoaidesk/work/gaid-hub-integration/to-skill_hub-contract-v0.md. skill_hub unit: gaid-hub-authoring (just started).
@@ -122,10 +122,9 @@ revision 2. Report: reports/2026-10-16-gaid-hub-integration/index.md.
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
-1. task finish (runs scripts/check). After the hub's completion report: the trial instance unit gaid-hub-app (3320/18320)
-   keeps running for inspection; stop it with `systemctl --user stop gaid-hub-app` when no longer needed (data stays in
-   ~/data/geoaidesk/work/gaid-hub-integration/home). Researcher agent 7e41440e archived; review readers close with the unit.
-2. Open item [대기]: re-run the bounded trial on a skill_hub revision 2 package (same brief, new chat).
+1. task finish (runs scripts/check); then remove build caches from the worktree. Trial instance gaid-hub-app stopped
+   2026-10-16 (data kept in ~/data/geoaidesk/work/gaid-hub-integration/home). Revision-2 re-run dropped by the user's
+   wrap-up instruction (open item).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration (2026-10-15)
@@ -150,7 +149,8 @@ Avoid until the trial merges: task-catalogue.tsx, workflows-panel.tsx, context.t
 locales app/workspace/workflows/settings/work.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [대기] hub 수정판 패키지로 같은 제한 시험 다시 하기 — 가) skill_hub가 revision 2를 보내면 같은 지시서로 다시 시험 — 나) 이번 결과로 마무리 — 권장: 가) 첫 확인 지점까지 가는지 아직 확인하지 못함 — 막힌 일: PU 시나리오 종단 확인 완료 — 조건: skill_hub가 바리오그램 규모·라이브러리 이름·결과 파일 이름을 고친 패키지를 만듦 — 근거: reports/2026-10-16-gaid-hub-integration#5-한계
+- [부채] hub 수정판 패키지로 같은 제한 시험 다시 하기(사용자 지시로 이번 단위에서는 하지 않음) — 가) 한 프로젝트로 옮긴 뒤 수정판 패키지로 같은 지시서로 다시 시험 — 나) 이번 결과로 끝냄 — 권장: 가) 방법의 첫 확인 지점까지 가는지 아직 확인하지 못함 — 막힌 일: PU 시나리오 종단 확인 완료 — 조건: GAID_HUB가 바리오그램 규모·라이브러리 이름·결과 파일 이름을 고친 패키지를 만듦 — 근거: reports/2026-10-16-gaid-hub-integration#6-결정할-일
+- [부채] GAID 쪽 남은 결함: 긴 실행의 진행 표시 없음, 작업 제안에 hub 방법 없음, 8 MB 넘는 CSV 미리보기 반복 요청, 보내기 기능 아이콘에 글자 없음, hub 쪽 받기 미확인 — 가) 한 프로젝트로 옮기는 작업에서 함께 고침 — 나) 별도 단위 — 권장: 가) 같은 화면 규칙으로 한 번에 다룸 — 막힌 일: 없음 — 근거: reports/2026-10-16-gaid-hub-integration#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
