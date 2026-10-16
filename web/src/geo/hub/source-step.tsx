@@ -19,6 +19,8 @@ import type { AuthoringAttempt, AuthoringProject, SourceDocument } from "@/geo/c
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
+import { AgentModelSelect } from "./agent-model";
+
 const text = geoText("hub");
 
 export type Target = "auto" | "skill" | "workflow";
@@ -94,7 +96,12 @@ export function SourceStep({
   analyzed = false,
   onUrl,
   urls = [],
+  agentModel,
+  onAgentModel,
 }: {
+  /** Agent model for reading and drafting ("" = the app default). */
+  agentModel?: string;
+  onAgentModel?: (ref: string) => void;
   /** Add a web source (paper/article URL, blog, a web search result page); the server fetches it inside the institute network. */
   onUrl?: (url: string, kind: WebSourceKind) => void;
   /** Web sources already added (mockup until the server fetches URLs). */
@@ -205,6 +212,7 @@ export function SourceStep({
           )}
         </ul>
       )}
+      {onAgentModel && <AgentModelSelect value={agentModel ?? ""} onChange={onAgentModel} />}
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {text("sources.goal")}
         <Input value={goal} onChange={(e) => onGoal(e.target.value)} placeholder={text("sources.goalPlaceholder")} />

@@ -81,7 +81,10 @@
     "url_fetched": "Read",
     "url_fetching": "Reading",
     "url_failed": "Could not read",
-    "addedWeb": "{name} · {host}"
+    "addedWeb": "{name} · {host}",
+    "agentModel": "Agent model",
+    "agentModelDefault": "Default model from Settings",
+    "agentModelHint": "Used to read the sources, ask questions and write the draft."
   },
   "reading": {
     "title": "Reading sources",

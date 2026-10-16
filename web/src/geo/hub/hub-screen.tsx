@@ -304,6 +304,7 @@ function HubProject({
   const [step, setStep] = useState<HubStep | null>(null);
   const [goal, setGoal] = useState("");
   const [target, setTarget] = useState<Target>("auto");
+  const [agentModel, setAgentModel] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
   const [visualsBusy, setVisualsBusy] = useState(false);
@@ -343,6 +344,7 @@ function HubProject({
       setError(null);
       setGoal((g) => g || p.goal || "");
       setTarget((t) => (p.target && t === "auto" ? p.target : t));
+      setAgentModel((m) => m || p.model || "");
     } catch (e) {
       setError((e as Error).message);
     }
@@ -433,9 +435,14 @@ function HubProject({
   if (project.drafts.length) reached.push("draft", "publish", "trial");
   const title = project.title || text("home.new");
 
+  const withModel = agentModel ? { model: agentModel } : {};
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
-    const created = await hubApi.create({ goal: goal || undefined, target });
+    const created = await hubApi.create({
+      goal: goal || undefined,
+      target,
+      ...(agentModel ? { model: agentModel } : {}),
+    });
     return created.id;
   };
 
@@ -491,7 +498,7 @@ function HubProject({
 
   const startAnalysis = async () => {
     try {
-      await hubApi.analyze(id, { opId: newOpId(), goal: goal.trim() || undefined, target });
+      await hubApi.analyze(id, { opId: newOpId(), goal: goal.trim() || undefined, target, ...withModel });
       setStep(null);
       await reload();
     } catch (e) {
@@ -503,9 +510,10 @@ function HubProject({
     try {
       const open = questions.filter((q) => q.status === "open");
       // Answers already recorded (or no questions at all): start the draft directly (also the retry after a failure).
-      if (open.length === 0) await hubApi.draft(id, { opId: newOpId() });
+      if (open.length === 0) await hubApi.draft(id, { opId: newOpId(), ...withModel });
       else
         await hubApi.answers(id, {
+          ...withModel,
           opId: newOpId(),
           draft: true,
           answers: open.map((q) => ({ questionId: q.id, questionRevision: q.revision, ...answers[q.id] })),
@@ -593,6 +601,8 @@ function HubProject({
           onFiles={addFiles}
           onUrl={addUrl}
           urls={urls}
+          agentModel={agentModel}
+          onAgentModel={setAgentModel}
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}
@@ -764,7 +774,7 @@ function HubProject({
         open={dialog === "feedback"}
         onOpenChange={(o) => setDialog(o ? "feedback" : null)}
         onSend={async (feedback) => {
-          await hubApi.revise(id, { opId: newOpId(), feedback });
+          await hubApi.revise(id, { opId: newOpId(), feedback, ...withModel });
           setStep(null);
           await reload();
         }}
@@ -781,7 +791,7 @@ function HubProject({
         onOpenChange={(o) => setDialog(o ? "issues" : null)}
         check={check}
         onFix={async (feedback) => {
-          await hubApi.revise(id, { opId: newOpId(), feedback });
+          await hubApi.revise(id, { opId: newOpId(), feedback, ...withModel });
           setStep(null);
           await reload();
         }}

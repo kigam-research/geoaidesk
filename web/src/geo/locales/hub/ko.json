@@ -81,7 +81,10 @@
     "url_fetched": "읽음",
     "url_fetching": "읽는 중",
     "url_failed": "읽지 못함",
-    "addedWeb": "{name} · {host}"
+    "addedWeb": "{name} · {host}",
+    "agentModel": "에이전트 모델",
+    "agentModelDefault": "설정의 기본 모델",
+    "agentModelHint": "자료 읽기, 질문, 초안 작성에 쓰는 모델입니다."
   },
   "reading": {
     "title": "자료를 읽고 있습니다",
