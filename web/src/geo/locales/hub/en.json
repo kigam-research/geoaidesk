@@ -126,7 +126,16 @@
     "installing": "Installing.",
     "installed": "Installed in {project}",
     "openAgain": "Open start settings again",
-    "notReady": "Fix the issues to try the draft."
+    "notReady": "Fix the issues to try the draft.",
+    "none": "No trial chat yet. Start a trial from the start settings.",
+    "unrated": "Not rated",
+    "observed": "{files, plural, one {# output file} other {# output files}} · {failed, plural, one {# failed tool call} other {# failed tool calls}}",
+    "revise": "Revise draft from trial",
+    "outcome": {
+      "useful": "Useful",
+      "needs-revision": "Needs revision",
+      "failed": "Failed"
+    }
   },
   "detail": {
     "show": "Show agent record",

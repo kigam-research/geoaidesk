@@ -171,6 +171,7 @@ function HubProject({
   });
   const [check, setCheck] = useState<CheckResult | null>(null);
   const [dialog, setDialog] = useState<null | "feedback" | "files" | "issues" | "record">(null);
+  const [feedbackPrefill, setFeedbackPrefill] = useState("");
   const [page, setPage] = useState<{ sourceId: string; page: number } | null>(null);
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
@@ -359,7 +360,10 @@ function HubProject({
         draft={draft}
         trialCount={project.installs.length}
         checkIssues={issues}
-        onFeedback={() => setDialog("feedback")}
+        onFeedback={() => {
+          setFeedbackPrefill("");
+          setDialog("feedback");
+        }}
         onShowFiles={() => setDialog("files")}
         onShowIssues={() => setDialog("issues")}
         rail={
@@ -385,7 +389,10 @@ function HubProject({
           onOpenProject(install.projectId);
           openMethodSetup({ projectId: install.projectId, methodKey: install.methodKey, workflowId: null, recipeId: null });
         }}
-        onFeedback={() => setDialog("feedback")}
+        onFeedback={(prefill) => {
+          setFeedbackPrefill(prefill ?? "");
+          setDialog("feedback");
+        }}
       />
     );
   }
@@ -409,6 +416,7 @@ function HubProject({
       />
       <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{body}</main>
       <FeedbackDialog
+        initial={feedbackPrefill}
         open={dialog === "feedback"}
         onOpenChange={(o) => setDialog(o ? "feedback" : null)}
         onSend={async (feedback) => {

@@ -14,8 +14,16 @@ const text = geoText("hub");
 
 type DialogProps = { open: boolean; onOpenChange: (open: boolean) => void };
 
-export function FeedbackDialog({ open, onOpenChange, onSend }: DialogProps & { onSend: (feedback: string) => Promise<void> }) {
-  const [value, setValue] = useState("");
+export function FeedbackDialog({
+  open,
+  onOpenChange,
+  onSend,
+  initial = "",
+}: DialogProps & { onSend: (feedback: string) => Promise<void>; initial?: string }) {
+  const [value, setValue] = useState(initial);
+  useEffect(() => {
+    if (open) setValue(initial);
+  }, [open, initial]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
