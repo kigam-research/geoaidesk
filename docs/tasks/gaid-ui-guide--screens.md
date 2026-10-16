@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:48:28Z
+updated: 2026-10-16T09:10:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20ad37cf-9bc9-4ad3-962f-7032db897bf4","pid":415644,"provider":"codex","session":"01a143e3-e983-79e0-9525-de41b13ba6d6","start":"2831125","token":"039d25a0e0b86aec275011c693c4488034e3cc00174d4a99f3fab0932b56436b"}
 branch: task/gaid-ui-guide--screens
 target: task/gaid-ui-guide
@@ -70,18 +70,27 @@ throwaway instance and remove build caches and app-written files/links in the wo
 `scripts/check` is not required for this child. Finish with `task finish`.
 
 ## Current state
-Resumed in the printed worktree on PC74. Guide sections 1–10, UI rules, tokens, copy rules and screen sources read.
-No app source edits are authorized. Existing map/method report figures are available as documented fallbacks.
+Delivered three standalone Korean HTML references in docs/design/mockups/{setup,map,method}.html and source/rule notes in docs/design/mockups/README.md.
+Delivered eleven PNGs in reports/2026-10-16-gaid-ui-guide/figures/: seven 1440×900 before/after/summary figures and four 1280×800 after/summary checks, all below 400 KB.
+Setup/map before figures are live captures from fed75bc3 (app sources unchanged); method before reuses the permitted gaid-hub-integration figure. No model runs or app code/locale changes.
+Rules: setup Q1–Q6 D2 B1 W5 L6 N2; map MAP1–MAP5 X1–X4 P2/P3 W5/W6 R1 B4; method P1/P3 R1–R4 D2 G1/G2 F5 W5 L6.
+Verified: both viewport sizes have no page overflow, visible primary actions and 197/262/270 visible UI characters; map panel needs no initial scroll. Step persistence/validation/arrows/summary/Escape, numeric sort, 37/133 lithology filter, 22-field record and retained scientific limits passed browser checks.
+Declared checks passed: node geo/ui/check-ui.mjs (0 errors; 96 pre-existing debt entries), node --test geo/tests/ui-check.test.mjs (5 passed). Full scripts/check is not required by the child brief; any additional CLI-enforced finish gate is reported separately. Reverify by opening the references and rerunning those two commands; external browser evidence is in ~/data/geoaidesk/work/gaid-ui-guide--screens/visual-check.log.
+Capture job exited 0; ports 3347/18347 released; external snapshot caches and dependency links removed. User review instances and ~/.geoaidesk unchanged.
 ## Next steps
-1. Capture the setup dialog and, if practical, map from an isolated instance; reuse the existing method figure.
-2. Build three standalone HTML references, capture at 1440×900 and verify at 1280×800, then document source/rules.
-3. Run the two declared UI checks, clean temporary runtime files, review deliverables and task finish.
+1. Parent integrates this child with task complete gaid-ui-guide--screens and uses the figures/README in its canonical report.
+2. Parent records figure hashes in the review registry with its report. Production implementation is outside this child.
 ## Failed approaches
+- The isolated launcher omitted KADY_FRONTEND_PORT, so browser CORS blocked its non-default port. Playwright bridged requests to the same isolated API without changing responses or source.
+- Automation blocks file:// URLs and does not expose require() in run-code. Static HTML was loaded through Playwright route fulfilment from an external replay snippet, with no network requests.
+- Label lookup did not match the map's existing combobox; role/name lookup selected the observed control. No source workaround.
 ## Notes and decisions
 Execution plan: sequential source/content verification → before capture → self-contained mockups → visual checks → publication.
 Owned files: docs/design/mockups/*, reports/2026-10-16-gaid-ui-guide/figures/* and this task document.
 No delegated writers or nested units. Shared interface is the parent's existing guide and token values; integrate images/README after this child finishes.
 Runtime isolation: use only ~/data/geoaidesk/work/gaid-ui-guide--screens for app data; never write to user review instances or ~/.geoaidesk.
+- Prototype limits: sample-specific recommendations are proposed defaults, not catalogue facts. A production CRS-unknown step must be conditional on inspection. Method start links to the map setup reference only to demonstrate separate navigation. Dark mode/200% zoom are not checked; this is not a release accessibility audit.
+- The canonical report belongs to the parent. No separate child report or UI-baseline debt was added. Humanizer file-mode prose pass applied to the README; technical values and source references preserved.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -89,11 +98,10 @@ Runtime isolation: use only ~/data/geoaidesk/work/gaid-ui-guide--screens for app
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Parent report: reports/2026-10-16-gaid-ui-guide/index.md. Child-owned source/verification notes: docs/design/mockups/README.md.
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-guide--screens-20261016T084840.096516Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
