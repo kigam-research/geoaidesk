@@ -101,13 +101,13 @@ export function InputPrep({
   const ready = setupReady(workflow, files);
   const envReady = workflow.readiness.state === "ready";
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-3">
       <p className="text-sm font-medium">{text("prep.title", { project: projectName })}</p>
       <ul className="flex flex-col gap-2">
         {workflow.inputRoles.map((role) => {
           const matches = files.filter((f) => accepts(f, role.extensions));
           return (
-            <li key={role.id} className="flex flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
+            <li key={role.id} className="flex min-w-0 flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
               <span className="flex items-center gap-2">
                 {matches.length ? (
                   <CheckIcon className="size-4 text-primary" aria-hidden />
@@ -120,7 +120,12 @@ export function InputPrep({
                 </span>
               </span>
               {matches.length > 0 && (
-                <span className="truncate pl-6 text-xs text-muted-foreground">{matches.slice(0, 3).join(", ")}</span>
+                <span className="truncate pl-6 text-xs text-muted-foreground" title={matches.join("\n")}>
+                  {matches
+                    .slice(0, 3)
+                    .map((m) => m.split("/").at(-1))
+                    .join(", ")}
+                </span>
               )}
               <Button
                 variant="outline"

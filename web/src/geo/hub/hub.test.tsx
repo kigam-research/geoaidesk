@@ -6,6 +6,7 @@ import { FlowDiagram, orderedNodes } from "./flow-diagram";
 import { parseHubHash } from "./location";
 import { QuestionStep, isAnswered, type DraftAnswer } from "./question-step";
 import { hasMethodSetup, openMethodSetup, takeMethodSetup } from "./handoff";
+import { RegisterDialog } from "./hub-dialogs";
 
 beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
 afterEach(() => localStorage.removeItem("gaid:locale"));
@@ -106,5 +107,18 @@ describe("GAID hub location and hand-off", () => {
     expect(hasMethodSetup("p1")).toBe(true);
     expect(takeMethodSetup("p1")).toMatchObject({ methodKey: "project:m", workflowId: "w" });
     expect(takeMethodSetup("p1")).toBeNull();
+  });
+});
+
+describe("GAID hub registration", () => {
+  it("selects the first folder when the folder list arrives after the dialog opened", async () => {
+    const onRegister = vi.fn(async () => undefined);
+    const props = { open: true, onOpenChange: () => undefined, onRegister };
+    const { rerender } = render(<RegisterDialog {...props} folders={[]} />);
+    rerender(<RegisterDialog {...props} folders={[{ id: "general", name: "일반" }]} />);
+    const submit = screen.getByRole("button", { name: "허브에 등록" });
+    expect((submit as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(submit);
+    await vi.waitFor(() => expect(onRegister).toHaveBeenCalledWith("general", ""));
   });
 });

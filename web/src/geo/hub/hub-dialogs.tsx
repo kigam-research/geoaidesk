@@ -325,6 +325,10 @@ export function RegisterDialog({
   onRegister: (folderId: string, note: string) => Promise<void>;
 }) {
   const [folder, setFolder] = useState(folders[0]?.id ?? "");
+  // The folder list arrives after the dialog opens: select the first folder once it is known.
+  useEffect(() => {
+    if (folders.length && !folders.some((f) => f.id === folder)) setFolder(folders[0].id);
+  }, [folders, folder]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   return (
