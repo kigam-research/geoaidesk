@@ -291,43 +291,48 @@ function QuestionCard({
 
       {choice && (
         <div role="radiogroup" aria-labelledby={`${otherId}-q`} className="flex flex-col gap-2">
-          {question.options.map((option) => {
-            const selected = !answer?.defer && answer?.optionId === option.id;
-            const recommended = question.recommendedOptionId === option.id;
-            return (
-              <button
-                key={option.id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                aria-disabled={locked}
-                onClick={() => onChange({ optionId: option.id })}
-                className={cn(
-                  "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
-                  selected && "border-primary bg-primary/5 ring-1 ring-primary",
-                )}
-              >
-                <span
+          {[...question.options]
+            // The recommended option comes first (UI guide Q2); answers are stored by option id, so order is display only.
+            .sort(
+              (a, b) => Number(b.id === question.recommendedOptionId) - Number(a.id === question.recommendedOptionId),
+            )
+            .map((option) => {
+              const selected = !answer?.defer && answer?.optionId === option.id;
+              const recommended = question.recommendedOptionId === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  aria-disabled={locked}
+                  onClick={() => onChange({ optionId: option.id })}
                   className={cn(
-                    "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
-                    selected && "border-primary bg-primary text-primary-foreground",
+                    "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
+                    selected && "border-primary bg-primary/5 ring-1 ring-primary",
                   )}
                 >
-                  {selected && <CheckIcon className="size-3.5" aria-hidden />}
-                </span>
-                <span className="flex flex-col gap-1">
-                  <span className="flex flex-wrap items-center gap-2 font-medium">
-                    {option.label}
-                    {recommended && <Badge>{text("questions.recommended")}</Badge>}
+                  <span
+                    className={cn(
+                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
+                      selected && "border-primary bg-primary text-primary-foreground",
+                    )}
+                  >
+                    {selected && <CheckIcon className="size-3.5" aria-hidden />}
                   </span>
-                  {option.hint && <span className="text-sm text-muted-foreground">{option.hint}</span>}
-                  {recommended && question.recommendedWhy && (
-                    <span className="text-sm text-primary/90">{question.recommendedWhy}</span>
-                  )}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="flex flex-col gap-1">
+                    <span className="flex flex-wrap items-center gap-2 font-medium">
+                      {option.label}
+                      {recommended && <Badge>{text("questions.recommended")}</Badge>}
+                    </span>
+                    {option.hint && <span className="text-sm text-muted-foreground">{option.hint}</span>}
+                    {recommended && question.recommendedWhy && (
+                      <span className="text-sm text-primary/90">{question.recommendedWhy}</span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
         </div>
       )}
 

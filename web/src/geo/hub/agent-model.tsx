@@ -8,7 +8,13 @@ const text = geoText("hub");
 export function AgentModelSelect({ value, onChange }: { value: string; onChange: (ref: string) => void }) {
   const { providerModels, directProviderModels } = useModels();
   const options = [...directProviderModels, ...providerModels].filter(
-    (m, i, all) => m.available !== false && !m.isFusion && all.findIndex((x) => x.id === m.id) === i,
+    (m, i, all) =>
+      m.available !== false &&
+      !m.isFusion &&
+      all.findIndex(
+        (x) =>
+          x.id === m.id || (x.label === m.label && (x.sourceLabel ?? x.provider) === (m.sourceLabel ?? m.provider)),
+      ) === i,
   );
   const groups = new Map<string, typeof options>();
   for (const m of options) {

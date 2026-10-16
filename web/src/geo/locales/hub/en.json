@@ -49,7 +49,9 @@
     "draft": "Draft",
     "trial": "Trial",
     "publish": "Register in hub",
-    "trialOptional": "Try in my research (optional)"
+    "trialOptional": "Try in my research (optional)",
+    "doneLabel": "Step {n} {name}, done",
+    "stepLabel": "Step {n} {name}"
   },
   "sources": {
     "title": "Upload sources",
@@ -254,7 +256,7 @@
   "io": {
     "paperFigure": "Paper figure",
     "generated": "Concept image (generated)",
-    "noImage": "No image",
+    "noImage": "No example picture yet",
     "exampleTable": "Example table · example values",
     "exampleOf": "Example values · {formats}",
     "shapeOf": "Example shape · {formats}"

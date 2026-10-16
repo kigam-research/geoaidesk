@@ -106,13 +106,14 @@ export function DraftStep({
             <h3 className="text-base font-semibold">{text("draft.flow")}</h3>
             {visualAction && (
               <div className="ml-auto flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {visualAction.connected === false ? text("visuals.needLogin") : text("visuals.note")}
-                </span>
+                {visualAction.connected === false && (
+                  <span className="text-xs text-muted-foreground">{text("visuals.needLogin")}</span>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
                   disabled={visualAction.busy || visualAction.connected === false}
+                  title={text("visuals.note")}
                   onClick={visualAction.onMake}
                 >
                   {visualAction.busy ? (

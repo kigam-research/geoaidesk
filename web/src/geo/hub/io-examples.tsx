@@ -24,8 +24,11 @@ function exampleValue(column: string, row: number): string {
   if (/^(x|tmx)$|east|lon|경도/.test(c)) return String(512_500 + row * 5000);
   if (/^(y|tmy)$|north|lat|위도/.test(c)) return String(6_702_500 - row * 5000);
   if (/label|deposit|positive|mine|라벨|광상|양성/.test(c)) return row === 1 ? "1" : "0";
-  if (/id$|_id|번호/.test(c)) return `C-${10_412 + row * 37}`;
-  return (0.12 + row * 0.31).toFixed(2);
+  if (/(^|_)id$|번호/.test(c)) return `C-${10_412 + row * 37}`;
+  // Numbers only for columns that read as measured or predictor values; other columns show their shape only.
+  if (/feature|predictor|예측|변수|value|값|score|prob|grad|dist|mag|grav|depth|elev|conc|ppm|pct|ratio/.test(c))
+    return (0.12 + row * 0.31).toFixed(2);
+  return "…";
 }
 
 export function TableExample({ port }: { port: InputPort }) {
@@ -182,11 +185,7 @@ export function ResultExample({
       ) : image ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={image} alt="" className="w-full rounded-lg border object-contain" />
-      ) : (
-        <div className="flex aspect-[3/2] items-center justify-center rounded-lg border border-dashed text-xs text-muted-foreground">
-          {text("io.noImage")}
-        </div>
-      )}
+      ) : null}
       <figcaption className="text-xs text-muted-foreground">
         {tabular
           ? text("io.exampleTable")

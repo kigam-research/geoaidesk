@@ -94,6 +94,11 @@ export function ProjectBar({
                 type="button"
                 disabled={!enabled}
                 aria-current={s === step ? "step" : undefined}
+                aria-label={
+                  done
+                    ? text("steps.doneLabel", { n: i + 1, name: text(`steps.${s}`) })
+                    : text("steps.stepLabel", { n: i + 1, name: text(`steps.${s}`) })
+                }
                 onClick={() => onStep(s)}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium transition-colors disabled:opacity-40",

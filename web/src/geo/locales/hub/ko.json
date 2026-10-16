@@ -49,7 +49,9 @@
     "draft": "초안",
     "trial": "시험",
     "publish": "허브 등록",
-    "trialOptional": "내 연구에서 시험 (선택)"
+    "trialOptional": "내 연구에서 시험 (선택)",
+    "doneLabel": "{n}단계 {name}, 완료",
+    "stepLabel": "{n}단계 {name}"
   },
   "sources": {
     "title": "자료 올리기",
@@ -254,7 +256,7 @@
   "io": {
     "paperFigure": "논문 그림",
     "generated": "개념 그림(생성)",
-    "noImage": "그림 없음",
+    "noImage": "예시 그림이 아직 없습니다",
     "exampleTable": "예시 표 · 예시 값",
     "exampleOf": "예시 값 · {formats}",
     "shapeOf": "예시 도형 · {formats}"
