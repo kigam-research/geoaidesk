@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-16T15:07:02Z
+status: active
+updated: 2026-10-16T17:18:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -73,7 +73,9 @@ Closed 2026-10-16T15:07:02Z: finished; task finish integrates it into main. No f
 ## Failed approaches
 - 2026-10-17 first task finish: scripts/check failed on 3 web tests (csv-viewer and project-view 5 s timeouts, map
   viewer.test findByRole timeout) while load average was ~48 on 32 threads; this branch has no web/server diff vs
-  main and the same 3 files pass alone (18/18). Treated as load flakiness; finish retried. (An earlier finish attempt
+  main and the same 3 files pass alone (18/18). Treated as load flakiness; finish retried. Second finish failed the same way on 3 different web tests (csv-viewer,
+  latex-editor x2; backend 1805 passed) at load ~58; the load is another project's recorded job (ccs_transport
+  route-zigzag-diagnosis-20261016T144213Z, all cores). Waiting for it to end, then one more finish. (An earlier finish attempt
   was killed by a too-short 10 min background timeout before checks completed.)
 - check-ui v1 measured ICU length with a regex; arguments inside select/plural branches made short messages count as
   their whole source (Codex B1). Replaced by a walk over the vendored icu-lite parse tree.
