@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T00:15:12Z
+updated: 2026-10-16T00:21:09Z
 writer: {"boot":"02f44cdd-0481-4957-ab4c-2e8fc0942338","host":"seongin3","paseo":"30efe6cf-247e-4b79-ae96-4f2d48ae2ae8","pid":616412,"provider":"claude","session":"e4759be6-1136-4c5c-8dd0-c43f9b2997c1","start":"53955591","token":"44c9356cdb1cfd8e6e5266192f329ff05ef51ffc9b47036733adc766aad28642"}
 branch: task/gaid-hub-integration
 target: main
@@ -54,6 +54,17 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
   reports/<date>-<topic>/. After the last check remove build caches and app-written files/links from the worktree.
 
 ## Current state
+Result for the forwarded goal (bd45c51400e1, 2026-10-16): GAID side of the GAID-hub ecosystem is implemented on branch
+task/gaid-hub-integration and verified in a real app with the user's paper scenario. GAID fetches a skill_hub method package
+(contract v1, agreed with skill_hub gaid-hub-authoring) through the existing preview → acknowledgement → install gate, registers it
+as a LocalMethod ("허브에서 설치한 Workflow": Workflows + 레시피, hub lifecycle, check receipt, open questions), starts a trial chat
+that exposes only the method's skills (the withheld spatial-pu-workflow stays hidden), pins a trial record and stores the researcher's
+assessment. The chat's only authoring entry is "방금 한 분석을 skill_hub 초안으로 보내기" (bundle download + hub link; direct send to a
+loopback hub). Trial of local/pu-nested-cv-prospectivity rev 1 (from the test paper + original code) on the Yilgarn grid with Qwen:
+install and launch worked without help; the bounded run did not reach the method's first gate (45+ min variogram loop on 70k
+cells, wrong library name), assessed "needs revision"; package fixes went to skill_hub (351e0b68701b). Open: re-run on a hub
+revision 2. Report: reports/2026-10-16-gaid-hub-integration/index.md.
+
 - 2026-10-15: contract draft v0 (GAID consumer requirements) sent to the skill_hub hub, request da92dc0fec04; text in
   ~/data/geoaidesk/work/gaid-hub-integration/to-skill_hub-contract-v0.md. skill_hub unit: gaid-hub-authoring (just started).
 - P1 server implemented (not yet wired to session creation): web/src/geo/contracts/methods.ts,
@@ -111,12 +122,10 @@ This unit answers forwarded goal bd45c51400e1 (from the gaid-qwen-authoring-tria
 - Routed requests reported 2026-10-16: 9862b1c63414, 9e9de355733f, term-workflow-gaid-hub-integration (completed);
   351e0b68701b (blocked = in progress). Result files ~/data/geoaidesk/work/gaid-hub-integration/route-results/.
 ## Next steps
-1. Visual reviews running (read-only readers, results arrive in this session): Claude 고급검토 f62eecd7-387d-4c81-b0dc-4ae06214607d,
-   Codex 고급검토 22391b2a-3b46-4e6f-ac5e-3a55e8f6903e; prompts/outputs ~/data/geoaidesk/work/gaid-hub-integration/reviews/.
-   Triage their findings (fix blockers, defer polish), then write reports/2026-10-16-gaid-hub-integration/index.md.
-2. If skill_hub sends a revision 2 package (answer to 351e0b68701b), re-run the bounded trial (same brief, new chat) and add it.
-3. Final: full scripts/check via task finish; remove build caches/app-written files from the worktree; Current state first block
-   = result for the forwarded goal.
+1. task finish (runs scripts/check). After the hub's completion report: the trial instance unit gaid-hub-app (3320/18320)
+   keeps running for inspection; stop it with `systemctl --user stop gaid-hub-app` when no longer needed (data stays in
+   ~/data/geoaidesk/work/gaid-hub-integration/home). Researcher agent 7e41440e archived; review readers close with the unit.
+2. Open item [대기]: re-run the bounded trial on a skill_hub revision 2 package (same brief, new chat).
 ## Failed approaches
 ## Notes and decisions
 ### Orchestration (2026-10-15)
@@ -141,11 +150,13 @@ Avoid until the trial merges: task-catalogue.tsx, workflows-panel.tsx, context.t
 locales app/workspace/workflows/settings/work.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [대기] hub 수정판 패키지로 같은 제한 시험 다시 하기 — 가) skill_hub가 revision 2를 보내면 같은 지시서로 다시 시험 — 나) 이번 결과로 마무리 — 권장: 가) 첫 확인 지점까지 가는지 아직 확인하지 못함 — 막힌 일: PU 시나리오 종단 확인 완료 — 조건: skill_hub가 바리오그램 규모·라이브러리 이름·결과 파일 이름을 고친 패키지를 만듦 — 근거: reports/2026-10-16-gaid-hub-integration#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-16-gaid-hub-integration/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
