@@ -5,7 +5,7 @@ import { LoaderCircleIcon, PlusIcon, SparklesIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ProjectSummary } from "@/geo/contracts/authoring";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
 
 const text = geoText("hub");
 
@@ -18,7 +18,7 @@ export function stageLabel(p: ProjectSummary): string {
 
 function when(iso: string): string {
   try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
+    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
   } catch {
     return iso;
   }

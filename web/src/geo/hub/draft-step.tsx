@@ -87,7 +87,7 @@ export function DraftStep({
         <section className="grid gap-3 md:grid-cols-3">
           <Facts title={text("draft.inputs")} items={(profile.inputs ?? []).map((i) => localText(i.label))} />
           <Facts title={text("draft.outputs")} items={profile.outputs.map((o) => localText(o.label))} />
-          <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} />
+          <Facts title={text("draft.limits")} items={profile.limitations.map((l) => localText(l.text))} full />
         </section>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -114,18 +114,29 @@ export function DraftStep({
   );
 }
 
-function Facts({ title, items }: { title: string; items: string[] }) {
+/** A short list; longer ones open with "모두 보기". `full` (limits) never shortens an item: limits are not cut. */
+function Facts({ title, items, full = false }: { title: string; items: string[]; full?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const shown = open ? items : items.slice(0, 3);
   return (
     <div className="flex flex-col gap-2 rounded-xl border p-3">
       <h3 className="text-sm font-semibold">{title}</h3>
       <ul className="flex flex-col gap-1 text-sm text-muted-foreground">
-        {items.slice(0, 3).map((item, i) => (
-          <li key={i} className="line-clamp-2">
+        {shown.map((item, i) => (
+          <li key={i} className={full || open ? undefined : "line-clamp-2"}>
             {item}
           </li>
         ))}
-        {items.length > 3 && <li className="text-xs">+{items.length - 3}</li>}
       </ul>
+      {(items.length > 3 || (!full && items.some((item) => item.length > 60))) && (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="self-start text-xs text-primary underline-offset-4 hover:underline"
+        >
+          {open ? text("draft.showLess") : text("draft.showAll", { count: items.length })}
+        </button>
+      )}
     </div>
   );
 }

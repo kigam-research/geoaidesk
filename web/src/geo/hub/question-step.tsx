@@ -39,9 +39,12 @@ export function QuestionStep({
   onApply,
   applying,
   onOpenPage,
+  locked,
 }: {
   questions: Question[];
   answers: Record<string, DraftAnswer>;
+  /** Questions whose answers are already recorded: shown, not editable, not sent again. */
+  locked?: ReadonlySet<string>;
   onAnswer: (questionId: string, answer: DraftAnswer) => void;
   onApply: () => void;
   applying?: boolean;
@@ -52,6 +55,7 @@ export function QuestionStep({
     return first < 0 ? questions.length : first;
   });
   const answered = questions.filter((q) => isAnswered(answers[q.id])).length;
+  const pending = questions.filter((q) => !locked?.has(q.id));
   const reviewing = index >= questions.length;
   const go = (i: number) => setIndex(Math.max(0, Math.min(questions.length, i)));
 
@@ -109,6 +113,7 @@ export function QuestionStep({
             key={questions[index].id}
             number={index + 1}
             question={questions[index]}
+            locked={locked?.has(questions[index].id) ?? false}
             answer={answers[questions[index].id]}
             onChange={(a) => onAnswer(questions[index].id, a)}
             onOpenPage={onOpenPage}
@@ -121,7 +126,9 @@ export function QuestionStep({
           <ChevronLeftIcon data-icon="inline-start" />
           {text("questions.prev")}
         </Button>
-        {reviewing ? (
+        {reviewing && pending.length === 0 ? (
+          <span className="text-sm text-muted-foreground">{text("questions.allApplied")}</span>
+        ) : reviewing ? (
           <div className="flex items-center gap-3">
             {answered < questions.length && (
               <span className="text-sm text-muted-foreground">
@@ -147,22 +154,27 @@ function QuestionCard({
   number,
   question,
   answer,
-  onChange,
+  onChange: change,
   onOpenPage,
+  locked,
 }: {
   number: number;
+  locked: boolean;
   question: Question;
   answer: DraftAnswer | undefined;
   onChange: (a: DraftAnswer) => void;
   onOpenPage?: (sourceId: string, page: number) => void;
 }) {
   const otherId = useId();
+  const onChange = (a: DraftAnswer) => {
+    if (!locked) change(a);
+  };
   const choice = question.answerType !== "text";
   // Always offer "기타" (also for a stored choice-only question).
   const free = true;
   const evidence = question.evidence.filter((e) => e.verified && e.page);
   return (
-    <section className="flex flex-col gap-5 py-2" aria-labelledby={`${otherId}-q`}>
+    <section className="flex flex-col gap-4 py-1" aria-labelledby={`${otherId}-q`}>
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium text-primary">{text("questions.tab", { n: number })}</span>
         <h2 id={`${otherId}-q`} className="text-xl font-semibold leading-snug">
@@ -214,9 +226,10 @@ function QuestionCard({
                 type="button"
                 role="radio"
                 aria-checked={selected}
+                aria-disabled={locked}
                 onClick={() => onChange({ optionId: option.id })}
                 className={cn(
-                  "flex items-start gap-3 rounded-xl border p-4 text-left transition-colors hover:border-primary/60",
+                  "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
                   selected && "border-primary bg-primary/5 ring-1 ring-primary",
                 )}
               >
@@ -252,6 +265,7 @@ function QuestionCard({
           <Textarea
             id={otherId}
             rows={2}
+            readOnly={locked}
             placeholder={choice && question.options.length ? text("questions.otherPlaceholder") : text("questions.answerPlaceholder")}
             value={answer?.defer ? "" : (answer?.response ?? "")}
             onChange={(event) => onChange({ response: event.target.value })}
@@ -271,6 +285,7 @@ function QuestionCard({
         <ClockIcon className="size-3.5" aria-hidden />
         {text("questions.defer")}
       </button>
+      {locked && <p className="text-sm text-muted-foreground">{text("questions.recorded")}</p>}
     </section>
   );
 }

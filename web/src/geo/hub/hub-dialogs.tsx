@@ -7,10 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import type { AuthoringAttempt, CheckResult, DraftFileView } from "@/geo/contracts/authoring";
-import { geoText } from "@/geo/i18n";
+import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
 const text = geoText("hub");
+
+function when(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat(geoLocale() === "ko" ? "ko-KR" : "en", { dateStyle: "short", timeStyle: "medium" }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
 
 type DialogProps = { open: boolean; onOpenChange: (open: boolean) => void };
 
@@ -186,16 +194,18 @@ export function AgentRecordDialog({ open, onOpenChange, attempts }: DialogProps 
             .reverse()
             .map((a) => (
               <li key={a.id} className="rounded-lg border p-3">
-                <p className="font-medium">{text("detail.outcome", { op: a.op, outcome: a.outcome })}</p>
+                <p className="font-medium">
+                  {text("detail.outcome", { op: text(`detail.op.${a.op}`), outcome: text(`detail.result.${a.outcome}`) })}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {text("detail.model")}: {a.model}
-                  {a.thinkingLevel ? ` · ${a.thinkingLevel}` : ""} · {a.startedAt}
-                  {a.endedAt ? ` → ${a.endedAt}` : ""}
+                  {a.thinkingLevel ? ` · ${a.thinkingLevel}` : ""} · {when(a.startedAt)}
+                  {a.endedAt ? ` → ${when(a.endedAt)}` : ""}
                 </p>
                 {a.error && <p className="mt-1 text-xs text-destructive">{a.error}</p>}
                 {a.validationErrors.some((e) => e.length) && (
                   <details className="mt-1 text-xs text-muted-foreground">
-                    <summary className="cursor-pointer">validation</summary>
+                    <summary className="cursor-pointer">{text("detail.validation")}</summary>
                     <pre className="whitespace-pre-wrap">{a.validationErrors.map((e) => e.join("\n")).join("\n---\n")}</pre>
                   </details>
                 )}

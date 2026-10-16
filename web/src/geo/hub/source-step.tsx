@@ -31,6 +31,7 @@ export function SourceStep({
   uploading,
   onStart,
   pdfText = true,
+  analyzed = false,
 }: {
   project: AuthoringProject;
   goal: string;
@@ -42,6 +43,8 @@ export function SourceStep({
   uploading?: string | null;
   onStart: () => void;
   pdfText?: boolean;
+  /** Sources were already analyzed: starting again re-reads them (secondary action). */
+  analyzed?: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
@@ -140,8 +143,13 @@ export function SourceStep({
           ))}
         </div>
       </fieldset>
-      <Button size="lg" onClick={onStart} disabled={!project.sources.length || Boolean(uploading)}>
-        {text("sources.start")}
+      <Button
+        size="lg"
+        variant={analyzed ? "outline" : "default"}
+        onClick={onStart}
+        disabled={!project.sources.length || Boolean(uploading)}
+      >
+        {analyzed ? text("sources.reread") : text("sources.start")}
       </Button>
       {!project.sources.length && <p className="-mt-3 text-sm text-muted-foreground">{text("sources.needSource")}</p>}
     </section>

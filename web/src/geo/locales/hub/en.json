@@ -52,7 +52,8 @@
     "remove": "Remove {name}",
     "needSource": "Upload at least one source.",
     "uploading": "Uploading {name}.",
-    "noPdfText": "The PDF page-text tool is missing, so PDF content cannot be read. You can continue with code or notes."
+    "noPdfText": "The PDF page-text tool is missing, so PDF content cannot be read. You can continue with code or notes.",
+    "reread": "Read sources again"
   },
   "reading": {
     "title": "Reading sources",
@@ -61,7 +62,7 @@
     "pages": "Read text of {pages} PDF pages",
     "files": "Checked {count} code files",
     "analysis": "Finding the method and missing decisions",
-    "note": "This usually takes a few minutes. It continues if you close the screen.",
+    "note": "It continues if you close the screen.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
     "retry": "Run analysis again"
@@ -88,11 +89,13 @@
     "unanswered": "Not answered",
     "edit": "Edit answer {n}",
     "apply": "Apply answers and create draft",
-    "needAll": "{count, plural, one {# question has} other {# questions have}} no answer. Answer or choose Decide later."
+    "needAll": "{count, plural, one {# question has} other {# questions have}} no answer. Answer or choose Decide later.",
+    "allApplied": "All answers are in the draft. Use \"Request changes\" on the draft screen to change something.",
+    "recorded": "This answer is already applied."
   },
   "drafting": {
     "title": "Creating the draft",
-    "note": "Applying {count} answers. This usually takes a few minutes."
+    "note": "Applying {count} answers. It continues if you close the screen."
   },
   "draft": {
     "private": "Private draft",
@@ -116,7 +119,9 @@
     "feedback": "Request changes",
     "feedbackPlaceholder": "Describe what to change, e.g. compute the variogram on at most 10,000 cells",
     "feedbackSend": "Revise draft",
-    "autoFix": "Ask the agent to fix them"
+    "autoFix": "Ask the agent to fix them",
+    "showAll": "Show all ({count})",
+    "showLess": "Show less"
   },
   "trial": {
     "title": "Try in a project",
@@ -143,6 +148,20 @@
     "title": "Agent record",
     "model": "Model",
     "attempts": "{count, plural, one {# run} other {# runs}}",
-    "outcome": "{op} · {outcome}"
+    "outcome": "{op} · {outcome}",
+    "op": {
+      "analyze": "Source analysis",
+      "draft": "Draft",
+      "revise": "Revision"
+    },
+    "result": {
+      "running": "Running",
+      "accepted": "Applied",
+      "repaired": "Applied after one repair",
+      "rejected": "Did not pass checks",
+      "failed": "Failed",
+      "interrupted": "Interrupted"
+    },
+    "validation": "Items the checks removed"
   }
 }

@@ -135,6 +135,18 @@ function answersKey(id: string) {
   return `gaid:hub:answers:${id}`;
 }
 
+/** Answers the server already recorded (answered or deferred), shown as such and not sent again. */
+export function recordedAnswers(p: AuthoringProject): Record<string, DraftAnswer> {
+  const out: Record<string, DraftAnswer> = {};
+  for (const q of p.questions) {
+    if (q.status === "open") continue;
+    const d = p.decisions.find((x) => x.questionId === q.id && !x.supersededBy);
+    if (!d) continue;
+    out[q.id] = d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
+  }
+  return out;
+}
+
 function defaultStep(p: AuthoringProject): HubStep {
   const running = runningAttempt(p);
   if (running?.op === "analyze") return "sources";
@@ -335,6 +347,7 @@ function HubProject({
           onFiles={addFiles}
           uploading={uploading}
           onStart={startAnalysis}
+          analyzed={project.findings.length > 0}
         />
       </>
     );
@@ -346,7 +359,8 @@ function HubProject({
         )}
         <QuestionStep
           questions={questions}
-          answers={answers}
+          answers={{ ...recordedAnswers(project), ...answers }}
+          locked={new Set(questions.filter((q) => q.status !== "open").map((q) => q.id))}
           onAnswer={(qid, a) => setAnswers((cur) => ({ ...cur, [qid]: a }))}
           onApply={applyAnswers}
           applying={Boolean(running)}
@@ -431,7 +445,7 @@ function HubProject({
         onOpenChange={(o) => setDialog(o ? "feedback" : null)}
         onSend={async (feedback) => {
           await hubApi.revise(id, { opId: newOpId(), feedback });
-          setStep("questions");
+          setStep(null);
           await reload();
         }}
       />
@@ -444,7 +458,7 @@ function HubProject({
         check={check}
         onFix={async (feedback) => {
           await hubApi.revise(id, { opId: newOpId(), feedback });
-          setStep("questions");
+          setStep(null);
           await reload();
         }}
       />
