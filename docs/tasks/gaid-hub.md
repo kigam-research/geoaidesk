@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:19:28Z
+updated: 2026-10-16T05:23:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -90,6 +90,15 @@ and information; mockups reviewed by the "인포그래픽 및 그림 생성 작�
 (preview of the shared page) and registration as the main path, trying in a personal GAID project is secondary; the hub is
 the sharing/discussion space, GAID projects are the personal research space.
 
+## User decisions after mockup round 4 (verbatim, 2026-10-16)
+> "목업은 승인하겠다. 그리고 시험테스트가 너무 오래걸린다. skill_hub에서 간단한 시험을 테스트할 수 있게 한 데이터셋이 있었던 것으로 기억한다. 격자 크기를 더 크게해서 계산시간을 단축한 시나리오로 앞으로 테스트하고 빠른 모드로 테스트하게 해야 작업 진척이 빨라진다."
+- Mockups (round 4) approved → implement them.
+- Trials from now on: the 40 km Yilgarn aggregate (1,122 blocks, P 244 / U 878, 21 predictors; TMX/TMY EPSG:3857,
+  label Ni_mine) from the pinned examples asset geo-catalogue/0.2.1 geo-examples-0.2.1.tar.gz
+  `examples/kigam/spatial-pu-workflow/yilgarn-40km/repo/web/datasets/yilgarn/yilgarn_40km.csv` (sha256 49b7855e…f151;
+  extracted copy ~/data/geoaidesk/work/gaid-hub/inputs/yilgarn-40km/), with the method's quick mode.
+
+## Current state
 ## Current state
 ## Current state
 ## Current state

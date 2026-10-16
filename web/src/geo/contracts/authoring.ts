@@ -465,6 +465,10 @@ export interface AuthoringProject {
   target?: "skill" | "workflow" | "auto";
   /** Model ref chosen for this project; absent = the app default at call time. */
   model?: string;
+  /** Hub topic folder the researcher filed this method under (my methods on the hub home). */
+  folderId?: string;
+  /** Concept images of the latest draft per procedure node id (files under the project's visuals/ folder). */
+  visuals?: Record<string, { file: string; caption: string; model: string; draftRevision: number }>;
   createdAt: string;
   updatedAt: string;
   /** Increments on every source change; findings record the revision they read. */
