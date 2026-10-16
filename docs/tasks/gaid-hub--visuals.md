@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-16T06:20:55Z
+status: active
+updated: 2026-10-16T06:31:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3a6c6bdd-8e42-4c22-bc50-f3253b4bbc42","pid":2866986,"provider":"codex","session":"01a1432a-e540-7610-91df-bc7f924d9de8","start":"1618610","token":"af79afaa600e2e3514663724af3dca4cfb94e58c4f31a7f39a23719a1acbc8d7"}
 branch: task/gaid-hub--visuals
 target: task/gaid-hub
@@ -86,13 +86,20 @@ Prettier style as the authoring code. No real image-model or provider calls in t
   VITEST_MAX_WORKERS (dist/chunks/coverage.Da5gzbsu.js), parent corrected the retry to 1 worker: values above 1 override backend serial execution and can race
   on shared temporary roots;
   no timeout tests/config edits. Focused file-preview-panel rerun: all 5 tests passed in 6.09 s.
+  Third full check with one worker passed backend 1,844 and all frontend 1,059; distribution then failed
+  because the allowed boundary-owner registry had not yet registered the new gaid-hub owner. Add only
+  gaid-hub to that closed registry (geo/tests/distribution.test.mjs); keep all ownership assertions intact.
   Integration/production verification remains subject to full check success.
 
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-16T06:20:55Z: ready; the parent gaid-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Verify the new boundary-owner registration with node --test geo/tests/distribution.test.mjs, then rerun
+   VITEST_MAX_WORKERS=1 task finish docs/tasks/gaid-hub--visuals.md geo/tests/distribution.test.mjs.
+2. If the parent target moved after shared integration, follow the task CLI's printed integration step.
 
 ## Failed approaches
+- Third finish resolved frontend load failures (all 1,059 passed); the distribution boundary test then found
+  a missing gaid-hub owner in its closed registry. Register the actual new owner, not a different package
+  owner; retain all existing seam/path assertions. Log: check-mtwo6bnb.log.
 - Second finish failed on unrelated file-preview-panel async loading/timeouts under the default high worker
   count. Reduce concurrency via VITEST_MAX_WORKERS=1, not source workarounds. Log: check-qgoabi3f.log
   under the same external check-logs directory. Backend 1,844 pass; frontend 1,057 pass, two failures.
