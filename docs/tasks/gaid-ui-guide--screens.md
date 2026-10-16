@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T08:46:27Z
+updated: 2026-10-16T08:48:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20ad37cf-9bc9-4ad3-962f-7032db897bf4","pid":415644,"provider":"codex","session":"01a143e3-e983-79e0-9525-de41b13ba6d6","start":"2831125","token":"039d25a0e0b86aec275011c693c4488034e3cc00174d4a99f3fab0932b56436b"}
 branch: task/gaid-ui-guide--screens
 target: task/gaid-ui-guide
@@ -70,11 +70,18 @@ throwaway instance and remove build caches and app-written files/links in the wo
 `scripts/check` is not required for this child. Finish with `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the printed worktree on PC74. Guide sections 1–10, UI rules, tokens, copy rules and screen sources read.
+No app source edits are authorized. Existing map/method report figures are available as documented fallbacks.
 ## Next steps
-1. (the next session's first action)
+1. Capture the setup dialog and, if practical, map from an isolated instance; reuse the existing method figure.
+2. Build three standalone HTML references, capture at 1440×900 and verify at 1280×800, then document source/rules.
+3. Run the two declared UI checks, clean temporary runtime files, review deliverables and task finish.
 ## Failed approaches
 ## Notes and decisions
+Execution plan: sequential source/content verification → before capture → self-contained mockups → visual checks → publication.
+Owned files: docs/design/mockups/*, reports/2026-10-16-gaid-ui-guide/figures/* and this task document.
+No delegated writers or nested units. Shared interface is the parent's existing guide and token values; integrate images/README after this child finishes.
+Runtime isolation: use only ~/data/geoaidesk/work/gaid-ui-guide--screens for app data; never write to user review instances or ~/.geoaidesk.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
