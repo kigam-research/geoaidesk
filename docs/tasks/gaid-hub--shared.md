@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:24:16Z
+updated: 2026-10-16T05:37:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5ec9f772-e53c-4317-86d2-a3fcfa929f01","pid":2862681,"provider":"codex","session":"01a1432a-b5ae-7f33-944f-b94e9a46e39d","start":"1617388","token":"491aea7f6f8038cd7a0c9baf26f006c00849ba73061cccfb131ec8664caf046d"}
 branch: task/gaid-hub--shared
 target: task/gaid-hub
@@ -73,11 +73,40 @@ semicolons, 120 columns).
 - Record in your task document what you built, deviations and test evidence; `task finish` when done.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Shared server implemented: name identity; default/general and researcher-created folders; filtered registry;
+  per-project registration/revisions; immutable registered package/draft/image snapshots; star counts; append-only
+  revision-bound comments; up to four star-first/catalogue recommendations; acknowledged project install; trial counts.
+- The live authoring store is shared through the parent's exact getter. `installPackageBytes` is the common gate;
+  `installPackage` retains its signature and authoring install log. Foreign/locally edited enabled AND disabled skills
+  are kept, including copies with no base hash. Origins remain `gaid-hub`.
+- `npm run typecheck` passed; `npx vitest run test/geo-hub-shared.test.ts test/geo-authoring.test.ts
+  test/geo-authoring-package.test.ts` passed (3 files, 25 tests). No real model calls or running-instance changes.
+- Full repository checks will run via `task finish`; parent owns screen integration and final runtime walkthrough.
 ## Next steps
-1. (the next session's first action)
+1. Final file review and `task finish` (explicitly include new server files and test), then parent `task complete`.
 ## Failed approaches
+- Initial typecheck caught the difference between AtlasTextInput and MethodText and an inferred optional union;
+  corrected the text helper and check-result narrowing.
+- Recommendation test initially copied a draft with the same slug into a second project, correctly triggering the
+  existing method-name collision check. Updated the fixture's slug AND workflow/artifact local skill refs; suite passed.
 ## Notes and decisions
+- Sequential decisions: keep parent contracts unchanged; reuse the live AuthoringStore (no second cache); serialize
+  registration by deterministic entry id, then package by authoring project; snapshot draft/images before publishing.
+- Owned files: server/src/geo/hub-shared/**, routes/hub-shared.ts, test/geo-hub-shared.test.ts; additive mounting/store
+  getter and install.ts refactor. Trial counting may add a lightweight record-count helper to methods/trials.ts.
+- No independent work package warrants another reader; this child cannot create nested writer units.
+- Integration order: store/install seam → routes → temp-directory integration tests → typecheck and authoring regression.
+- Codegraph has no index for this exact worktree; using bounded native source reads instead, as instructed by its tool.
+- Parent coordination applied verbatim: getAuthoringStore WeakMap code after AuthoringOptions and stores.set after
+  initialization. Route mounted after authoring. No contract, frontend, locale or lockfile edits.
+- Image convention confirmed by parent: `cover` exclusively selects cover (fallback first available image), known node
+  ids populate detail.visuals, `output:<outputId>` becomes detail.outputImages[outputId]. Additive immutable image route:
+  GET /geo/hub/entries/:id/visuals/:key?revision=n. Cover/package revision queries address shared-entry revisions.
+- Trials count only actual matching methodId/packageSha256 records in distinct projects from the entry install log;
+  unreadable records are skipped like existing trialCounts. No 200-row list cap and no inferred scientific review.
+- Storage follows AuthoringStore's single-process ownership. Atomic JSON replacement; immutable files published by
+  no-overwrite hard links; per-entry serialized mutations. Malformed JSON/comment logs return 409 and stay untouched.
+- Empty/invalid/missing X-GAID-User returns 401 for mutations; display names are not account authentication, per scope.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
