@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-16T15:07:00Z
+status: done
+updated: 2026-10-16T15:07:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2bcfea81-9275-44fd-a5a1-b9fafc08ffe8","pid":258415,"provider":"claude","session":"8184888d-c0b2-4d0c-aa76-7c348aa1179c","start":"2758168","token":"4dbb19fe6abf051a4775c62f53fa0c0eaaca350d579435e10a2c473b08653f8e"}
 branch: task/gaid-ui-guide
 target: main
@@ -68,7 +68,7 @@ Present the guide's structure and key rules to the user in your tab before final
 - Re-verify: `node geo/ui/check-ui.mjs`; `node --test geo/tests/ui-check.test.mjs`; open the mockups in a browser.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-16T14:55:25Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-16T15:07:02Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - 2026-10-17 first task finish: scripts/check failed on 3 web tests (csv-viewer and project-view 5 s timeouts, map
