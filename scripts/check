@@ -52,6 +52,8 @@ step 'GAID: distribution checks'
 node --test 'geo/tests/*.test.mjs'
 step 'GAID: UI copy (WP00 validator over the locale catalogues)'
 node geo/copy/validate-copy.mjs web/src/geo/locales
+step 'GAID: UI guide checks (docs/design/ui-guide.md: copy length, agent internals, style tokens)'
+node geo/ui/check-ui.mjs
 step 'GAID: catalogue environments (every declared module imports in the helper and a fresh project environment)'
 node geo/tests/environments-smoke.mjs
 step 'GAID: launcher --check'
