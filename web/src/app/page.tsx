@@ -61,6 +61,8 @@ import { seedChatStateFromTab } from "@/lib/new-tab-state";
 import { onStartGeoTask } from "@/geo/workspace/events";
 import { geoTaskChatState } from "@/geo/workspace/tab-state";
 import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
+import { GaidHub } from "@/geo/hub/hub-screen";
+import { useHubLocation } from "@/geo/hub/location";
 import {
   useCallback,
   useEffect,
@@ -119,6 +121,8 @@ function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => v
 
 export default function HomePage() {
   const [screen, setScreen] = useState<WorkspaceScreen>("projects");
+  // GAID hub: a third place of this page (URL hash), shown over the project list/workspace.
+  const [hub, setHub] = useHubLocation();
   const [openedProjectIds, setOpenedProjectIds] = useState<string[]>([]);
   const [restoredProjects, setRestoredProjects] = useState<
     Record<string, ProjectWorkspaceState>
@@ -248,18 +252,33 @@ export default function HomePage() {
 
   return (
     <>
+      {hub.open && (
+        <GaidHub
+          authoringId={hub.projectId}
+          onNavigate={(next) => setHub(next)}
+          onOpenProjects={() => {
+            setHub({ open: false, projectId: null });
+            setScreen("projects");
+          }}
+          onOpenProject={(projectId) => {
+            setHub({ open: false, projectId: null });
+            openProject(projectId);
+          }}
+        />
+      )}
       <div
-        className={screen === "projects" ? "contents" : "hidden"}
-        aria-hidden={screen !== "projects"}
+        className={!hub.open && screen === "projects" ? "contents" : "hidden"}
+        aria-hidden={hub.open || screen !== "projects"}
       >
         <ProjectView
-          isActive={screen === "projects"}
+          isActive={!hub.open && screen === "projects"}
           onOpenProject={openProject}
           projectActivities={displayedProjectActivities}
+          onOpenHub={() => setHub({ open: true, projectId: null })}
         />
       </div>
       {projectDirectoryHydrated && openedProjectIds.map((projectId) => {
-        const isActive = screen === "workspace" && projectId === activeProjectId;
+        const isActive = !hub.open && screen === "workspace" && projectId === activeProjectId;
         return (
           <ProjectScopeProvider key={projectId} value={projectId}>
             <div className={isActive ? "contents" : "hidden"} aria-hidden={!isActive}>

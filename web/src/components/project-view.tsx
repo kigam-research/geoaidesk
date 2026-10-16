@@ -65,6 +65,7 @@ import { DEFAULT_PROJECT_ID, type Project } from "@/lib/projects";
 import type { ProjectActivitySummary } from "@/lib/project-activity";
 import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
+import { GaidHubEntry, GaidTopNav } from "@/geo/hub/top-nav";
 import { cn } from "@/lib/utils";
 import { APP_VERSION, isVersioned } from "@/lib/version";
 
@@ -75,6 +76,8 @@ interface ProjectViewProps {
   projectActivities?: Readonly<Record<string, ProjectActivitySummary>>;
   /** False while hidden behind a workspace; gates the Settings deep-link listener. */
   isActive?: boolean;
+  /** GAID: opens the GAID hub (header switch and entry card). */
+  onOpenHub?: () => void;
 }
 
 type ProjectSort = "recent" | "name" | "status";
@@ -139,6 +142,7 @@ export function ProjectView({
   onOpenProject,
   projectActivities = {},
   isActive = true,
+  onOpenHub,
 }: ProjectViewProps) {
   const {
     projects,
@@ -271,6 +275,8 @@ export function ProjectView({
           )}
         </a>
 
+        {onOpenHub && <GaidTopNav current="projects" className="absolute left-1/2 -translate-x-1/2" onNavigate={(place) => place === "hub" && onOpenHub()} />}
+
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -314,6 +320,8 @@ export function ProjectView({
             <PlusIcon data-icon="inline-start" />
             {appText("projects.new_project")}</Button>
         </div>
+
+        {onOpenHub && <GaidHubEntry onOpen={onOpenHub} />}
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <InputGroup className="max-w-sm bg-background">
