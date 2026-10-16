@@ -50,6 +50,7 @@
   "trials.found": "발견됨: {files}",
   "trials.missing": "파일 일치 없음: {files}",
   "trials.none": "없음",
+  "trials.moreOutputs": "파일 {count}개 더 보기",
   "assessment.title": "연구자 평가",
   "assessment.outcome": "시험 평가",
   "assessment.choose": "평가 선택",

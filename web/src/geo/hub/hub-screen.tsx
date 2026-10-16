@@ -328,7 +328,7 @@ function HubProject({
       <WorkingPanel
         project={project}
         attempt={running}
-        title={running.op === "analyze" ? text("reading.title") : text("drafting.title")}
+        title={running.op === "analyze" ? text("reading.title") : running.op === "revise" ? text("drafting.revising") : text("drafting.title")}
         note={running.op === "analyze" ? text("reading.note") : text("drafting.note", { count: project.decisions.filter((d) => !d.supersededBy).length })}
       />
     );
@@ -398,6 +398,7 @@ function HubProject({
   } else if (draft) {
     body = (
       <TrialStep
+        onDraft={() => setStep("draft")}
         project={project}
         projectName={(pid) => activeProjects.find((p) => p.id === pid)?.name ?? pid}
         onOpen={(install) => {

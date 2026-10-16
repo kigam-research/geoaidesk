@@ -248,6 +248,34 @@ export async function draftFiles(
   return files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 }
 
+/** Researcher-readable sentence per check code; the technical message stays in `message`. */
+const PLAIN: Record<string, string> = {
+  "package-file": "스킬 설명이 패키지에 없는 파일을 가리킵니다.",
+  "package-link": "스킬 문서의 링크가 패키지 안의 파일로 이어지지 않습니다.",
+  "profile-file": "단계 설명이 패키지에 없는 참고 파일을 가리킵니다.",
+  "installed-path": "실행 명령이 설치된 스킬 폴더 기준 경로를 쓰지 않습니다.",
+  "absolute-link": "스킬 문서에 설치 폴더 밖을 가리키는 링크가 있습니다.",
+  "repo-relative-path": "스킬 문서에 설치 후 열 수 없는 저장소 기준 경로가 있습니다.",
+  "personal-path": "개인 PC의 경로가 들어 있습니다.",
+  "undeclared-dependency": "코드가 쓰는 Python 패키지가 의존성 목록에 없습니다.",
+  "environment-package": "실행 환경에 없는 패키지의 설치 방법이 스킬 설명에 없습니다.",
+  environment: "실행 환경 이름이 카탈로그에 없습니다.",
+  "taxonomy-unknown": "분류 용어에 없는 값이 있습니다.",
+  "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
+  "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
+  "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
+  "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",
+  "unverified-claim": "시험·발행·기관 보증을 확인하지 않은 표현이 있습니다.",
+  "draft-note": "서버가 모델 제안을 고친 내용입니다.",
+  "catalogue-name": "카탈로그 스킬과 이름이 같습니다.",
+  "method-id-collision": "다른 작업에서 이미 쓴 방법 이름입니다.",
+  description: "스킬을 언제 쓰는지 설명이 필요합니다.",
+  lines: "스킬 본문이 너무 깁니다.",
+  "package-limit": "패키지 크기나 파일 수가 제한을 넘습니다.",
+};
+const withPlain = (findings: CheckFinding[]): CheckFinding[] =>
+  findings.map((f) => (PLAIN[f.code] ? { ...f, plain: PLAIN[f.code] } : f));
+
 /** All six checks; errors block the archive, warnings remain in its validation receipt. */
 export async function checkMethod(
   project: AuthoringProject,
@@ -274,7 +302,7 @@ export async function checkMethod(
     files = await draftFiles(project, draft, ctx);
   } catch (e) {
     find("portability", "draft-files", "files", e instanceof Error ? e.message : String(e));
-    return findings;
+    return withPlain(findings);
   }
   const profile = parse(files.find((f) => f.path === "atlas.yaml")!.content) as AtlasProfile;
   if (!validateAtlas(profile))
@@ -511,7 +539,7 @@ export async function checkMethod(
   const total = generated.reduce((sum, f) => sum + f.size, 0);
   if (total > PACKAGE_LIMITS.expanded || generated.length + 2 > PACKAGE_LIMITS.entries)
     find("portability", "package-limit", "files", "패키지의 크기 또는 파일 개수 제한을 초과했습니다.");
-  return findings;
+  return withPlain(findings);
 }
 
 /** One ustar header block; long paths go into a PAX `path` record (GAID's reader understands both). */

@@ -14,7 +14,8 @@ Rules:
   every quote against the page text and drops claims whose quote is not found.
 - Write statements, questions and method text in Korean 합니다체: statements end with "~합니다/~입니다", questions with
   "~할까요?/~입니까?" (never "~한가?", "~하다.", "~함."). Keep technical terms, variable names, file names and numbers as in
-  the source. Write "Workflow" for workflow. Do not repeat a word ("격자 격자").
+  the source. Write "Workflow" for workflow. Do not repeat a word ("격자 격자"). Never write Chinese characters (汉字/漢字);
+  write Korean words in Hangul (논문, 집합), keeping English technical terms in English.
 - Separate what the source states from your interpretation.
 - Never claim that anything is published, validated, tested, endorsed by an institution, or reproduced. Never choose a
   publisher, licence, release state or lifecycle; the hub sets those.

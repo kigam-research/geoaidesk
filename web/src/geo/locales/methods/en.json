@@ -50,6 +50,7 @@
   "trials.found": "Found: {files}",
   "trials.missing": "No matching files: {files}",
   "trials.none": "None",
+  "trials.moreOutputs": "{count, plural, one {Show # more file} other {Show # more files}}",
   "assessment.title": "Researcher assessment",
   "assessment.outcome": "Trial assessment",
   "assessment.choose": "Select assessment",

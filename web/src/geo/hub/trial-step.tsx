@@ -21,14 +21,22 @@ async function loadTrials(install: AuthoringInstall, slug: string): Promise<Meth
   return ((await res.json()) as MethodTrialsResponse).trials;
 }
 
+function shortList(paths: string[], max = 8): string {
+  if (!paths.length) return "없음";
+  const shown = paths.slice(0, max).join(", ");
+  return paths.length > max ? `${shown} 외 ${paths.length - max}개` : shown;
+}
+
 /** Feedback text for `revise` from one trial: the researcher's note and what GAID observed. */
 export function trialFeedback(trial: MethodTrial): string {
   const lines = [
     `GAID 시험 (${trial.startedAt}, 채팅 ${trial.sessionId})`,
     trial.assessment ? `연구자 평가: ${trial.assessment.outcome} — ${trial.assessment.note}` : "연구자 평가: 없음",
     `관찰: 도구 호출 ${trial.observed.toolCalls}회, 실패 ${trial.observed.failedToolCalls}회`,
-    `결과 파일: ${trial.observed.outputs.map((o) => o.path).join(", ") || "없음"}`,
-    ...trial.expected.filter((e) => e.required && !e.found.length).map((e) => `예상했지만 없는 결과: ${e.files.join(", ") || e.id}`),
+    `결과 파일: ${shortList(trial.observed.outputs.map((o) => o.path))}`,
+    ...trial.expected
+      .filter((e) => e.required && !e.found.length)
+      .map((e) => `예상했지만 없는 결과: ${e.files.join(", ") || e.id}`),
   ];
   return lines.join("\n");
 }
@@ -38,7 +46,9 @@ export function TrialStep({
   projectName,
   onOpen,
   onFeedback,
+  onDraft,
 }: {
+  onDraft: () => void;
   project: AuthoringProject;
   projectName: (projectId: string) => string;
   onOpen: (install: AuthoringInstall) => void;
@@ -59,6 +69,11 @@ export function TrialStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project.installs.length, slug]);
 
+  const latestDraft = project.drafts.at(-1)?.revision ?? 0;
+  const installedDraft = Math.max(
+    0,
+    ...installs.map((i) => project.packages.find((p) => p.revision === i.packageRevision)?.draftRevision ?? 0),
+  );
   const latestByProject = new Map<string, AuthoringInstall>();
   for (const i of installs) if (!latestByProject.has(i.projectId)) latestByProject.set(i.projectId, i);
 
@@ -68,6 +83,14 @@ export function TrialStep({
         <FlaskConicalIcon className="size-5 text-primary" aria-hidden />
         <h2 className="text-xl font-semibold">{text("trial.title")}</h2>
       </div>
+      {latestDraft > installedDraft && installedDraft > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm">
+          <span className="flex-1">{text("trial.newer", { n: latestDraft, installed: installedDraft })}</span>
+          <Button size="sm" onClick={onDraft}>
+            {text("trial.toDraft")}
+          </Button>
+        </div>
+      )}
       {latestByProject.size === 0 ? (
         <p className="text-sm text-muted-foreground">{text("trial.body")}</p>
       ) : (

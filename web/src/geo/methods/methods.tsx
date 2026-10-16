@@ -196,7 +196,13 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     {trial.observed.degradedSteps > 0 && <p>{t("methods.trials.degraded", { count: trial.observed.degradedSteps })}</p>}
     <p className="font-mono" title={trial.sessionId}>{t("methods.trials.session", { id: trial.sessionId })}</p>
     <h4 className="font-medium">{t("methods.trials.outputs")}</h4>
-    {trial.observed.outputs.length ? <ul className="list-disc pl-5">{trial.observed.outputs.map((file) => <li key={file.path}>{file.path}</li>)}</ul> : <p>{t("methods.trials.none")}</p>}
+    {trial.observed.outputs.length ? <>
+      <ul className="list-disc pl-5">{trial.observed.outputs.slice(0, 8).map((file) => <li key={file.path}>{file.path}</li>)}</ul>
+      {/* gaid-hub: long output lists fold so the assessment stays near the top. */}
+      {trial.observed.outputs.length > 8 && <details><summary className="cursor-pointer text-xs">{t("methods.trials.moreOutputs", { count: trial.observed.outputs.length - 8 })}</summary>
+        <ul className="list-disc pl-5">{trial.observed.outputs.slice(8).map((file) => <li key={file.path}>{file.path}</li>)}</ul>
+      </details>}
+    </> : <p>{t("methods.trials.none")}</p>}
     <h4 className="font-medium">{t("methods.trials.expected")}</h4>
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>

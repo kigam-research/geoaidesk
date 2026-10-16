@@ -284,6 +284,9 @@ export async function addSource(
   source.status = extraction.characters ? (extraction.error ? "partial" : "extracted") : "failed";
   await store.mutate(projectId, (p: AuthoringProject) => {
     p.sources.push(source);
+    // A new project takes its name from its first source (the paper title when the PDF states one).
+    if (p.title === "새 방법" && p.sources.length === 1)
+      p.title = (source.title || name.replace(/\.(pdf|zip|tar\.gz|tgz|md|txt)$/i, "")).slice(0, 120);
     p.extractions[source.id] = extraction;
     p.sourceRevision += 1;
   });

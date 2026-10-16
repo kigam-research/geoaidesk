@@ -86,7 +86,8 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />
       {blocked && <p className="text-xs text-muted-foreground">{blocked}</p>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <div className="flex flex-wrap justify-end gap-2">
+      {/* gaid-hub: the actions stay visible while the form scrolls. */}
+      <div className="sticky -bottom-6 -mx-6 -mb-6 flex flex-wrap justify-end gap-2 border-t bg-background px-6 py-3">
         {recipe && <DeleteRecipe onDelete={recipe.onDelete} />}
         <DialogClose asChild><Button variant="outline">{t("workspace.setup.close")}</Button></DialogClose>
         <Button disabled={busy || workflow.readiness.state !== "ready" || missingInput} onClick={() => void start()}>{t(busy ? "workspace.setup.creating" : "workspace.setup.create")}</Button>

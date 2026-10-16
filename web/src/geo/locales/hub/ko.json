@@ -95,7 +95,8 @@
   },
   "drafting": {
     "title": "초안을 만들고 있습니다",
-    "note": "답 {count}개를 반영합니다. 화면을 닫아도 계속 진행됩니다."
+    "note": "답 {count}개를 반영합니다. 화면을 닫아도 계속 진행됩니다.",
+    "revising": "초안을 고치고 있습니다"
   },
   "draft": {
     "private": "개인 초안",
@@ -121,7 +122,10 @@
     "feedbackSend": "초안 고치기",
     "autoFix": "에이전트에게 고치게 하기",
     "showAll": "모두 보기 ({count}개)",
-    "showLess": "접기"
+    "showLess": "접기",
+    "issueCount": "({count}곳)",
+    "issueDetail": "자세히 보기",
+    "warnings": "참고 사항 {count}개"
   },
   "trial": {
     "title": "프로젝트에서 시험",
@@ -141,7 +145,9 @@
       "useful": "쓸모 있음",
       "needs-revision": "수정 필요",
       "failed": "실패"
-    }
+    },
+    "newer": "{n}판 초안이 새로 있습니다. 시험한 판은 {installed}판입니다.",
+    "toDraft": "초안 화면에서 설치하기"
   },
   "detail": {
     "show": "에이전트 기록 보기",

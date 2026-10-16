@@ -36,11 +36,17 @@ export function FeedbackDialog({
   const [error, setError] = useState<string | null>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="flex max-h-[85vh] flex-col">
         <DialogHeader>
           <DialogTitle>{text("draft.feedback")}</DialogTitle>
         </DialogHeader>
-        <Textarea rows={5} value={value} onChange={(e) => setValue(e.target.value)} placeholder={text("draft.feedbackPlaceholder")} />
+        <Textarea
+          rows={6}
+          className="max-h-[50vh] min-h-24 overflow-y-auto"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={text("draft.feedbackPlaceholder")}
+        />
         {error && <p className="text-sm text-destructive">{error}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -107,7 +113,7 @@ export function FilesDialog({ open, onOpenChange, load }: DialogProps & { load: 
             ))}
           </ul>
           <pre className="min-h-0 overflow-auto rounded-lg border bg-muted/40 p-3 font-mono text-xs whitespace-pre-wrap">
-            {file ? (file.encoding === "utf8" ? file.content : `(${file.encoding})`) : ""}
+            {file ? (file.encoding === "utf8" ? file.content : (decodeText(file.content) ?? `(${file.encoding})`)) : ""}
           </pre>
         </div>
       </DialogContent>
@@ -139,21 +145,7 @@ export function IssuesDialog({
         <DialogHeader>
           <DialogTitle>{text("draft.checkFix")}</DialogTitle>
         </DialogHeader>
-        <ul className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto text-sm">
-          {findings.map((f, i) => (
-            <li key={i} className={cn("rounded-lg border p-3", f.level === "error" ? "border-destructive/40" : "")}>
-              <p>{f.plain ?? f.message}</p>
-              {f.plain && (
-                <details className="mt-1 text-xs text-muted-foreground">
-                  <summary className="cursor-pointer">{text("detail.show")}</summary>
-                  <code className="break-all">
-                    {f.check} · {f.code} · {f.path}: {f.message}
-                  </code>
-                </details>
-              )}
-            </li>
-          ))}
-        </ul>
+        <IssueGroups findings={findings} />
         {error && <p className="text-sm text-destructive">{error}</p>}
         {onFix && check && findings.some((f) => f.level === "error") && (
           <DialogFooter>
@@ -178,6 +170,63 @@ export function IssuesDialog({
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** Text of a base64 file when it is valid UTF-8 without control bytes (e.g. a LICENSE copied from code), else null. */
+function decodeText(base64: string): string | null {
+  try {
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const value = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return /[\u0000-\u0008\u000e-\u001f]/.test(value) ? null : value;
+  } catch {
+    return null;
+  }
+}
+
+/** Errors grouped by their plain sentence with a count; technical lines and warnings stay folded. */
+function IssueGroups({ findings }: { findings: CheckResult["findings"] }) {
+  const errors = findings.filter((f) => f.level === "error");
+  const warnings = findings.filter((f) => f.level === "warning");
+  const groups = new Map<string, typeof errors>();
+  for (const f of errors) {
+    const key = f.plain ?? f.message;
+    groups.set(key, [...(groups.get(key) ?? []), f]);
+  }
+  return (
+    <div className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto text-sm">
+      {[...groups].map(([sentence, items]) => (
+        <div key={sentence} className="rounded-lg border border-destructive/40 p-3">
+          <p>
+            {sentence}
+            {items.length > 1 && <span className="text-muted-foreground"> {text("draft.issueCount", { count: items.length })}</span>}
+          </p>
+          <details className="mt-1 text-xs text-muted-foreground">
+            <summary className="cursor-pointer">{text("draft.issueDetail")}</summary>
+            <ul className="mt-1 flex flex-col gap-1">
+              {items.map((f, i) => (
+                <li key={i} className="break-all">
+                  {f.message}
+                </li>
+              ))}
+            </ul>
+          </details>
+        </div>
+      ))}
+      {warnings.length > 0 && (
+        <details className="text-xs text-muted-foreground">
+          <summary className="cursor-pointer">{text("draft.warnings", { count: warnings.length })}</summary>
+          <ul className="mt-1 flex flex-col gap-1">
+            {warnings.map((f, i) => (
+              <li key={i} className="break-all">
+                {f.plain ? `${f.plain} ` : ""}
+                {f.message}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
   );
 }
 
