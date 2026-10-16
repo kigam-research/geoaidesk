@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T05:06:36Z
+updated: 2026-10-16T05:06:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -151,7 +151,11 @@ the sharing/discussion space, GAID projects are the personal research space.
 - Researcher persona (native Sonnet, high) started ~03:20Z on the full scenario (new authoring project, Yilgarn trial);
   output ~/data/geoaidesk/work/gaid-hub/researcher/{log,summary}.md, shots/. Uses Qwen: no other Qwen run meanwhile.
 ## Next steps
-1. Mockup round 2 (user feedback): components saved (121fa40); waiting for 8 concept images from reader f494414c
+1. Mockup round 3 (after user feedback 2): screenshots ~/data/geoaidesk/work/gaid-hub/playwright/mock3/*.png; concept images
+   in web/public/hub-design-mock/concept/ (untracked, copied from mockup/concept). Infographic agent f494414c reviewing
+   (brief briefs/mockup-review-infographic.md → reviews/infographic-mockup-3.md); then apply, copy figures to
+   reports/2026-10-16-gaid-hub/figures/mock3-*.png, review-copy, present to the user.
+0. (old) Mockup round 2 (user feedback): components saved (121fa40); waiting for 8 concept images from reader f494414c
    ("인포그래픽 및 그림 생성 작업" profile, re-prompted to save under CODEX_HOME then copy to
    ~/data/geoaidesk/work/gaid-hub/mockup/concept/). Then copy them to web/public/hub-design-mock/concept/ (UNTRACKED,
    never commit; delete with hub-design page before finish), screenshot /hub-design?view=home|shared|sources|reading|
