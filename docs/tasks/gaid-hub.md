@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T17:53:08Z
+updated: 2026-10-16T17:54:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -227,7 +227,15 @@ Closed 2026-10-16T07:24:33Z: finished; task finish integrates it into main. No f
    draft 4m28s with 13 check errors; v5 trial ~21 min with outputs. Results: M3.1 analyze 13m01s (repaired, 35 findings,
    4 q), draft 13m11s (repaired, 1 check error: SKILL.md names a file not in the package); trial ~6 min, pipeline ~17 s,
    block 198 km, Z0-2 9.7% area → 33.6% capture; zone map north-south flipped; ran folds 1-4 unasked. Added to report §3/§5.
-Blocked: waiting for gaid-ui-guide to land on main (hub note note-ui-guide); then task sync, align the hub screens, final visual review, report figures, finish.
+11. gaid-ui-guide landed (hub note note-ui-guide-landed): main merged (32d774b); hub screens aligned to the guide (c7c1bab:
+    S2 neutral surfaces, T1/T2 type scale, B1 one filled primary, R1 Korean task labels and no provider names, F4/R2
+    research-term errors + `기술 정보` disclosure, P3/W5 collapsible summary); `check-ui` 0 errors, copy check 0 errors,
+    hub tests 18 pass. Final reviews running (2026-10-17 ~03:00 KST): Claude 고급검토 reader 2bdb7aa8
+    (briefs/review-claude-final.md → reviews/claude-final.md), Codex 검토 reader 27625365 (briefs/review-codex-final.md →
+    reviews/codex-final.md), researcher persona (native Sonnet, high; briefs/persona-final.md → researcher2/summary.md;
+    uses Qwen, so no other Qwen run meanwhile). Then: triage, report figures at 1440x900/1280x800 with UI-guide rule ids,
+    humanizer, review-copy, `VITEST_MAX_WORKERS=1 task finish`, remove build caches.
+Blocked: waiting for the three final reviews.
 
 ## Failed approaches
 ## Notes and decisions
