@@ -33,6 +33,8 @@ export interface WorkflowChoice {
   label: Localized;
   why?: Localized;
   options?: string[];
+  /** Display labels of `options` (gaid-method/v1 packages); an option without one shows its id. */
+  optionLabels?: Record<string, Localized>;
   requiredWhen?: Localized;
 }
 

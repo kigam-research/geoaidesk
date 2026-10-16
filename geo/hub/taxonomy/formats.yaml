@@ -1,0 +1,30 @@
+# Geo Skill Atlas formats (atlas taxonomy v1). Versions are noted where they change meaning.
+schemaVersion: atlas-taxonomy/v1
+facet: formats
+terms:
+  - { id: geotiff, label: { ko: GeoTIFF·COG, en: GeoTIFF/COG }, synonyms: { en: [tif, tiff, cog] } }
+  - { id: geopackage, label: { ko: GeoPackage, en: GeoPackage }, synonyms: { en: [gpkg] } }
+  - { id: geoparquet, label: { ko: GeoParquet, en: GeoParquet } }
+  - { id: shapefile, label: { ko: Shapefile, en: Shapefile }, synonyms: { en: [shp] } }
+  - { id: geojson, label: { ko: GeoJSON, en: GeoJSON } }
+  - { id: csv, label: { ko: CSV, en: CSV }, synonyms: { en: [tsv, txt] } }
+  - { id: parquet, label: { ko: Parquet, en: Parquet } }
+  - { id: xlsx, label: { ko: Excel, en: Excel }, synonyms: { en: [xlsx, xls] } }
+  - { id: netcdf, label: { ko: NetCDF, en: NetCDF }, note: { ko: CF 등 규약을 함께 적습니다, en: Note the conventions (e.g. CF) } }
+  - { id: zarr, label: { ko: Zarr, en: Zarr } }
+  - { id: las-welllog, label: { ko: LAS 검층, en: LAS well log }, note: { ko: LAS 2.0/3.0 검층 형식. LiDAR LAS와 다릅니다, en: LAS 2.0/3.0 well log; distinct from LiDAR LAS } }
+  - { id: las-lidar, label: { ko: LAS 점군, en: LAS point cloud }, note: { ko: LiDAR 점군 형식. 검층 LAS와 다릅니다, en: LiDAR point cloud; distinct from LAS well logs } }
+  - { id: dlis, label: { ko: DLIS, en: DLIS } }
+  - { id: segy, label: { ko: SEG-Y, en: SEG-Y }, note: { ko: rev0/1/2를 구분합니다, en: Distinguish rev0/1/2 } }
+  - { id: miniseed, label: { ko: miniSEED, en: miniSEED } }
+  - { id: ags4, label: { ko: AGS4, en: AGS4 } }
+  - { id: gef, label: { ko: GEF, en: GEF } }
+  - { id: modflow6, label: { ko: MODFLOW 6, en: MODFLOW 6 } }
+  - { id: vtk, label: { ko: VTK·XDMF, en: VTK/XDMF } }
+  - { id: stac, label: { ko: STAC, en: STAC } }
+  - { id: json, label: { ko: JSON, en: JSON } }
+  - { id: markdown, label: { ko: Markdown, en: Markdown }, synonyms: { en: [md] } }
+  - { id: hwpx, label: { ko: HWPX, en: HWPX }, synonyms: { ko: [한글 문서, 아래아한글], en: [hwp] } }
+  - { id: pdf, label: { ko: PDF, en: PDF } }
+  - { id: png, label: { ko: PNG 그림, en: PNG figure }, synonyms: { en: [image] } }
+  - { id: python, label: { ko: Python 코드, en: Python code }, synonyms: { en: [py, script] } }

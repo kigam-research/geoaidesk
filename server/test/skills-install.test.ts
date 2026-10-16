@@ -17,11 +17,7 @@ import {
   readSkillSource,
   skillsDisabledDir,
 } from "../src/agent/skills.ts";
-import {
-  getSkillProvenance,
-  getSkillSyncStatus,
-  syncProjectSkillsFromCatalogue,
-} from "../src/agent/skills-sync.ts";
+import { getSkillProvenance, getSkillSyncStatus, syncProjectSkillsFromCatalogue } from "../src/agent/skills-sync.ts";
 import {
   checkSkillUpdate,
   createSkill,
@@ -69,10 +65,7 @@ const ack = { acknowledged: true } as const;
 describe("installing skills from a source", () => {
   it("previews what a source holds without installing anything", async () => {
     const preview = await previewSkillSource(paths, { source: sourceRoot });
-    expect(preview.skills.map((s) => s.name).sort()).toEqual([
-      "alpha-skill",
-      "beta-skill",
-    ]);
+    expect(preview.skills.map((s) => s.name).sort()).toEqual(["alpha-skill", "beta-skill"]);
     expect(preview.skills[0].description).toContain("skill");
     expect(preview.skills.every((s) => !s.installed)).toBe(true);
     expect(listProjectSkills(paths)).toHaveLength(0);
@@ -81,9 +74,9 @@ describe("installing skills from a source", () => {
   it("refuses to install without the permissions acknowledgement", async () => {
     // The gate lives on the server, not only in the dialog: an install is the
     // moment third-party instructions enter the agent.
-    await expect(
-      installStagedSkills(paths, { source: sourceRoot, names: ["alpha-skill"] }),
-    ).rejects.toMatchObject({ status: 400 });
+    await expect(installStagedSkills(paths, { source: sourceRoot, names: ["alpha-skill"] })).rejects.toMatchObject({
+      status: 400,
+    });
     expect(listProjectSkills(paths)).toHaveLength(0);
   });
 
@@ -145,6 +138,20 @@ describe("installing skills from a source", () => {
     expect(fs.existsSync(path.join(skillsDisabledDir(paths), "alpha-skill"))).toBe(true);
   });
 
+  it("keeps a replacement target that changed after the caller checked it (GeoAIDesk expected hash)", async () => {
+    await installStagedSkills(paths, { source: sourceRoot, names: ["alpha-skill"], ...ack });
+    writeSourceSkill("alpha-skill", "alpha v2");
+    const result = await installStagedSkills(paths, {
+      source: sourceRoot,
+      names: ["alpha-skill"],
+      replace: true,
+      expectedDestinationHashes: { "alpha-skill": "not-the-current-hash" },
+      ...ack,
+    });
+    expect(result).toEqual({ installed: [], conflicts: ["alpha-skill"] });
+    expect(readSkillSource(paths, "alpha-skill")).toContain("alpha v1");
+  });
+
   it("installs the reviewed bytes with a valid token, and refetches without one", async () => {
     const preview = await previewSkillSource(paths, { source: sourceRoot });
     writeSourceSkill("alpha-skill", "alpha v2");
@@ -171,9 +178,9 @@ describe("installing skills from a source", () => {
   });
 
   it("rejects a name the source does not offer", async () => {
-    await expect(
-      installStagedSkills(paths, { source: sourceRoot, names: ["nope"], ...ack }),
-    ).rejects.toBeInstanceOf(SkillOperationFailure);
+    await expect(installStagedSkills(paths, { source: sourceRoot, names: ["nope"], ...ack })).rejects.toBeInstanceOf(
+      SkillOperationFailure,
+    );
   });
 
   it("installs into the user-level scope, visible to every project", async () => {
@@ -185,18 +192,14 @@ describe("installing skills from a source", () => {
     });
     const global = globalSkillRoot();
     expect(listProjectSkills(global).map((s) => s.name)).toEqual(["beta-skill"]);
-    expect(
-      fs.existsSync(path.join(KADY_PI_AGENT_DIR, "skills", "beta-skill", "SKILL.md")),
-    ).toBe(true);
+    expect(fs.existsSync(path.join(KADY_PI_AGENT_DIR, "skills", "beta-skill", "SKILL.md"))).toBe(true);
     // The project scope is untouched by a global install.
     expect(listProjectSkills(paths)).toHaveLength(0);
 
     // A second project sees it without doing anything.
     const other = ensureProjectExists("second-project");
     expect(listProjectSkills(projectSkillRoot(other))).toHaveLength(0);
-    expect(listProjectSkills(globalSkillRoot()).map((s) => s.name)).toEqual([
-      "beta-skill",
-    ]);
+    expect(listProjectSkills(globalSkillRoot()).map((s) => s.name)).toEqual(["beta-skill"]);
   });
 });
 
@@ -208,9 +211,7 @@ describe("authoring and editing skills", () => {
     ["First line\nSecond line", "First line\nSecond line"],
   ])("creates a loadable skill with description %s", (description, expected) => {
     createSkill(paths, { name: "my-workflow", description });
-    expect(listProjectSkills(paths)).toEqual([
-      expect.objectContaining({ name: "my-workflow", description: expected }),
-    ]);
+    expect(listProjectSkills(paths)).toEqual([expect.objectContaining({ name: "my-workflow", description: expected })]);
   });
 
   it("creates a skill from a template and records it as local", () => {
@@ -269,25 +270,20 @@ describe("removing skills", () => {
     for (const name of ["cat-one", "cat-two"]) {
       const dir = path.join(catalogue, name);
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(
-        path.join(dir, "SKILL.md"),
-        `---\nname: ${name}\ndescription: ${name}\n---\n\nbody\n`,
-        "utf-8",
-      );
+      fs.writeFileSync(path.join(dir, "SKILL.md"), `---\nname: ${name}\ndescription: ${name}\n---\n\nbody\n`, "utf-8");
     }
     syncProjectSkillsFromCatalogue(paths, catalogue, null);
-    expect(listProjectSkills(paths).map((s) => s.name).sort()).toEqual([
-      "cat-one",
-      "cat-two",
-    ]);
+    expect(
+      listProjectSkills(paths)
+        .map((s) => s.name)
+        .sort(),
+    ).toEqual(["cat-one", "cat-two"]);
 
     expect(removeSkill(paths, "cat-one")).toEqual({
       name: "cat-one",
       disposition: "archived",
     });
-    expect(
-      fs.existsSync(path.join(paths.sandbox, ".pi", "skills-archived", "cat-one")),
-    ).toBe(true);
+    expect(fs.existsSync(path.join(paths.sandbox, ".pi", "skills-archived", "cat-one"))).toBe(true);
     expect(getSkillSyncStatus(paths).removed).toEqual(["cat-one"]);
 
     syncProjectSkillsFromCatalogue(paths, catalogue, null);
@@ -337,10 +333,7 @@ describe("update checks for user-installed skills", () => {
       names: ["alpha-skill"],
       ...ack,
     });
-    fs.appendFileSync(
-      path.join(paths.skillsDir, "alpha-skill", "SKILL.md"),
-      "\nLocal note.\n",
-    );
+    fs.appendFileSync(path.join(paths.skillsDir, "alpha-skill", "SKILL.md"), "\nLocal note.\n");
     expect(await checkSkillUpdate(paths, "alpha-skill")).toMatchObject({
       updateAvailable: true,
     });

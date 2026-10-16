@@ -24,7 +24,7 @@ export function taskDraft(workflow: GeoWorkflowSummary, bindings: Record<string,
   return t("workspace.setup.draft", {
     prompt: text(workflow.prompt) || text(workflow.description) || text(workflow.title),
     inputs: workflow.inputRoles.filter((role) => bindings[role.id]).map((role) => t("workspace.setup.inputLine", { role: text(role.label), path: bindings[role.id] })).join("\n") || t("workspace.setup.none"),
-    choices: workflow.requiredScientificChoices.filter((choice) => choices[choice.id]?.trim()).map((choice) => t("workspace.setup.choiceLine", { choice: text(choice.label), answer: choices[choice.id].trim() })).join("\n") || t("workspace.setup.none"),
+    choices: workflow.requiredScientificChoices.filter((choice) => choices[choice.id]?.trim()).map((choice) => t("workspace.setup.choiceLine", { choice: text(choice.label), answer: choice.optionLabels?.[choices[choice.id].trim()] ? `${text(choice.optionLabels[choices[choice.id].trim()])} (${choices[choice.id].trim()})` : choices[choice.id].trim() })).join("\n") || t("workspace.setup.none"),
     unresolved: workflow.requiredScientificChoices.filter((choice) => !choices[choice.id]?.trim()).map((choice) => text(choice.label)).join(", ") || t("workspace.setup.none"),
     boundary: text(workflow.boundary) || t("workspace.setup.noBoundary"),
   });

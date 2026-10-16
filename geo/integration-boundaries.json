@@ -4,6 +4,12 @@
   "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
   "seams": [
     {
+      "path": "web/src/components/project-view.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Project-list regression expectation follows the approved My research heading"
+    },
+    {
       "path": "server/test/geo-hub-handoff.test.ts",
       "owner": "gaid-hub-integration",
       "status": "added",
@@ -49,7 +55,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -116,7 +122,7 @@
       "path": "server/src/agent/session-registry.ts",
       "owner": "gaid-runtime",
       "status": "edited",
-      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode."
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode. gaid-hub: one call to registerGeoProviderModels (server/src/geo/providers.ts) after setupModelRuntime."
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
@@ -246,7 +252,7 @@
       "path": "web/src/components/project-view.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link; gaid-hub: Projects/GAID hub header switch and the GAID hub entry card (optional onOpenHub prop)"
     },
     {
       "path": "web/src/components/sandbox-panel.tsx",
@@ -487,6 +493,30 @@
       "owner": "gaid-brand-copy",
       "status": "edited",
       "responsibility": "Visible names: Kady becomes \"AI agent\" where it names the assistant and GAID where it names the app, K-Dense as the app becomes GAID (locale strings; backend provider notes are matched with Kady read as GAID). Skills, built-in Workflows and seeded templates taken from K-Dense show a linked \"출처: K-Dense\" badge (SkillInfo.upstream from server/src/geo/skill-origin.ts). Code identifiers, env vars, routes and the upstream attribution line are unchanged."
+    },
+    {
+      "path": "server/test/geo-authoring-extra.test.ts",
+      "owner": "gaid-hub",
+      "status": "added",
+      "responsibility": "URL ingestion and concept illustration regression tests (gaid-hub--visuals)."
+    },
+    {
+      "path": "server/package.json, server/package-lock.json",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Direct pinned htmlparser2 dependency for URL source text extraction (gaid-hub--visuals)."
+    },
+    {
+      "path": "web/src/components/project-view.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Parent-approved stale heading expectation Choose a project → My research; no UI changes (gaid-hub--visuals)."
+    },
+    {
+      "path": "server/src/agent/skills-install.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Optional expectedDestinationHashes on installStagedSkills: a replacement whose destination changed after the caller's check becomes a conflict (passes the hash to installSkillTree's existing guard); default behaviour unchanged."
     }
   ],
   "notTouched": [

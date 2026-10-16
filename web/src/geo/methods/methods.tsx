@@ -6,11 +6,12 @@ import type { WorkflowPanelCategory, WorkflowPanelRow } from "@/components/workf
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/projects";
-import { t } from "@/geo/i18n";
+import { geoLocale, t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
 import { Readiness } from "@/geo/workspace/readiness";
+import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 
 export const METHOD_CATEGORY = "hub-methods";
 const pill = "inline-flex rounded-full border px-1.5 py-px text-[10px] font-medium";
@@ -72,6 +73,19 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
     void reload();
     return () => { generation.current++; };
   }, [reload]);
+  // GAID hub: a draft just installed into this project opens its start settings (or its detail without a Workflow).
+  useEffect(() => {
+    const take = () => {
+      const request = takeMethodSetup(projectId);
+      if (!request) return;
+      void reload().then(() => {
+        if (request.workflowId) setSetup({ methodKey: request.methodKey, workflowId: request.workflowId, recipeId: request.recipeId ?? undefined });
+        else setDetailKey(request.methodKey);
+      });
+    };
+    take();
+    return onMethodSetupRequest(take);
+  }, [projectId, reload]);
   const methods = data?.methods ?? [];
   const selectSetup = (method: LocalMethodSummary, workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => {
     setDetailKey(null); setSetup({ methodKey: method.key, workflowId: workflow.id, recipeId: recipe?.id });
@@ -106,7 +120,7 @@ export function webLink(value: string | undefined): string | undefined {
   if (!value) return undefined;
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol) ? url.href : undefined; } catch { return undefined; }
 }
-const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString();
+const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString(geoLocale() === "ko" ? "ko-KR" : "en");
 
 export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);
@@ -182,7 +196,13 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     {trial.observed.degradedSteps > 0 && <p>{t("methods.trials.degraded", { count: trial.observed.degradedSteps })}</p>}
     <p className="font-mono" title={trial.sessionId}>{t("methods.trials.session", { id: trial.sessionId })}</p>
     <h4 className="font-medium">{t("methods.trials.outputs")}</h4>
-    {trial.observed.outputs.length ? <ul className="list-disc pl-5">{trial.observed.outputs.map((file) => <li key={file.path}>{file.path}</li>)}</ul> : <p>{t("methods.trials.none")}</p>}
+    {trial.observed.outputs.length ? <>
+      <ul className="list-disc pl-5">{trial.observed.outputs.slice(0, 8).map((file) => <li key={file.path}>{file.path}</li>)}</ul>
+      {/* gaid-hub: long output lists fold so the assessment stays near the top. */}
+      {trial.observed.outputs.length > 8 && <details><summary className="cursor-pointer text-xs">{t("methods.trials.moreOutputs", { count: trial.observed.outputs.length - 8 })}</summary>
+        <ul className="list-disc pl-5">{trial.observed.outputs.slice(8).map((file) => <li key={file.path}>{file.path}</li>)}</ul>
+      </details>}
+    </> : <p>{t("methods.trials.none")}</p>}
     <h4 className="font-medium">{t("methods.trials.expected")}</h4>
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>

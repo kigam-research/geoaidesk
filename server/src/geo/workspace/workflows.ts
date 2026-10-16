@@ -25,7 +25,7 @@ import type { EnvironmentReadiness, GeoEnvironmentService } from "../environment
 import { extensionsFor } from "./formats.ts";
 
 type RawRole = { id: string; label: LocalizedText; formats?: string[]; required?: boolean; requiredWhen?: LocalizedText };
-type RawChoice = { id: string; label: LocalizedText; why?: LocalizedText; options?: unknown[]; requiredWhen?: LocalizedText };
+type RawChoice = { id: string; label: LocalizedText; why?: LocalizedText; options?: unknown[]; optionLabels?: Record<string, unknown>; requiredWhen?: LocalizedText };
 type RawArtifact = { id: string; label: LocalizedText; required?: boolean; requiredWhen?: LocalizedText; files?: unknown[] };
 
 function text(value: unknown): Localized | null {
@@ -94,6 +94,17 @@ export function readinessOf(
   return { state, skills, environment, runRecord: compatibilityRef ? "recorded" : "none", compatibilityRef };
 }
 
+/** Display labels of a choice's options (gaid-method/v1 `optionLabels`); ids without a label show as ids. */
+function optionLabels(choice: RawChoice): Record<string, Localized> | null {
+  if (!choice.optionLabels || typeof choice.optionLabels !== "object") return null;
+  const out: Record<string, Localized> = {};
+  for (const option of strings(choice.options)) {
+    const label = text(choice.optionLabels[option]);
+    if (label) out[option] = label;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
 export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowReadiness): GeoWorkflowSummary {
   const roles = (workflow.inputRoles ?? []) as RawRole[];
   const choices = (workflow.requiredScientificChoices ?? []) as RawChoice[];
@@ -116,6 +127,7 @@ export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowRead
       label: text(choice.label) ?? { ko: choice.id },
       ...(text(choice.why) ? { why: text(choice.why)! } : {}),
       ...(strings(choice.options).length ? { options: strings(choice.options) } : {}),
+      ...(optionLabels(choice) ? { optionLabels: optionLabels(choice)! } : {}),
       ...(text(choice.requiredWhen) ? { requiredWhen: text(choice.requiredWhen)! } : {}),
     })),
     prompt: text(workflow.prompt),

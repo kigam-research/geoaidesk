@@ -1,0 +1,46 @@
+# Geo Skill Atlas disciplines (atlas taxonomy v1). Ids are stable; labels and synonyms may change.
+# `foundation` holds cross-domain basics (units, CRS, data access, EDA, visualisation, reporting).
+# GCMD/CGI URI mappings can be added later as `uri:` fields.
+schemaVersion: atlas-taxonomy/v1
+facet: disciplines
+terms:
+  - id: geology-3d
+    label: { ko: 지질·3차원 지질모델, en: Geology and 3D geological modelling }
+    synonyms: { ko: [지질, 지질도, 시추, 단면, 3D 지질모델, 층서], en: [geology, borehole, cross-section, geological model, stratigraphy] }
+  - id: mineral-exploration-mpm
+    label: { ko: 광물탐사·광상 유망도, en: Mineral exploration and prospectivity }
+    synonyms: { ko: [광물탐사, 광상, 유망도, 유망 지역, MPM, 탐사 우선순위], en: [mineral exploration, prospectivity, MPM, targeting, ore deposit] }
+  - id: geophysics
+    label: { ko: 지구물리, en: Geophysics }
+    synonyms: { ko: [탄성파, 중력, 자력, 전기비저항, 지진파, 물리탐사], en: [seismic, gravity, magnetics, resistivity, geophysical survey] }
+  - id: geochemistry
+    label: { ko: 지구화학, en: Geochemistry }
+    synonyms: { ko: [지화학, 분석치, 원소, 조성, 이상대, 검출한계], en: [geochemistry, assay, composition, anomaly, detection limit] }
+  - id: remote-sensing-gis
+    label: { ko: 원격탐사·GIS, en: Remote sensing and GIS }
+    synonyms: { ko: [원격탐사, 위성영상, GIS, 공간자료, 래스터, 벡터, 좌표계], en: [remote sensing, satellite imagery, GIS, raster, vector, CRS] }
+  - id: hydrogeology
+    label: { ko: 지하수·수문지질, en: Hydrogeology }
+    synonyms: { ko: [지하수, 양수시험, 대수층, 투수계수, 수위, 수문지질], en: [groundwater, pumping test, aquifer, transmissivity, hydrogeology] }
+  - id: petroleum-reservoir
+    label: { ko: 석유·저류층 공학, en: Petroleum and reservoir engineering }
+    synonyms: { ko: [석유, 저류층, 검층, 물리검층, 유정, 생산], en: [petroleum, reservoir, well log, LAS, production] }
+  - id: rock-mechanics
+    label: { ko: 암반공학, en: Rock mechanics }
+    synonyms: { ko: [암반, 불연속면, 절리, 평사투영, 터널, 사면 안정], en: [rock mechanics, discontinuity, joint, stereonet, tunnel, slope stability] }
+  - id: geotechnical
+    label: { ko: 지반공학, en: Geotechnical engineering }
+    synonyms: { ko: [지반, 콘관입시험, CPT, 시추주상도, 토질], en: [geotechnical, CPT, soil, borehole log, AGS] }
+  - id: radioactive-waste-disposal
+    label: { ko: 방사성폐기물 처분, en: Radioactive waste disposal }
+    synonyms: { ko: [방사성폐기물, 처분장, 심층처분, FEP, 시나리오, 안전성], en: [radioactive waste, repository, deep geological disposal, FEP, safety case] }
+  - id: ccs
+    label: { ko: CO₂ 지중저장, en: CO₂ geological storage }
+    synonyms: { ko: [CO2 저장, 이산화탄소 지중저장, CCS, 주입, 포획], en: [CCS, CO2 storage, carbon storage, injection, trapping] }
+  - id: geothermal
+    label: { ko: 지열, en: Geothermal }
+    synonyms: { ko: [지열, 지온경사, 열류량, 온도 검층], en: [geothermal, heat flow, temperature gradient] }
+  - id: foundation
+    label: { ko: 기초 역량, en: Foundations }
+    description: { ko: 단위·좌표계·자료 접근·탐색 분석·시각화·보고처럼 여러 분야가 함께 쓰는 기본 작업, en: "Cross-domain basics such as units, CRS, data access, EDA, visualisation and reporting" }
+    synonyms: { ko: [단위, 불확도, 좌표계, 자료 조회, 보고서, 시각화], en: [units, uncertainty, CRS, data lookup, report, visualization] }

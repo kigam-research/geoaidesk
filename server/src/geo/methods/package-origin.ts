@@ -14,7 +14,8 @@ import type { MethodLifecycle, MethodOrigin } from "../../../../web/src/geo/cont
 export interface PackageOriginRecord {
   schemaVersion: "gaid-package-origin/v1";
   sha256: string;
-  kind: "skill-hub" | "upload";
+  /** `gaid-hub`: built by the GAID hub authoring service in this app (gaid-hub). */
+  kind: "skill-hub" | "upload" | "gaid-hub";
   siteId?: string;
   pageUrl?: string;
   descriptorUrl?: string;
@@ -46,7 +47,7 @@ export function readPackageOrigin(store: string, sha256: string): PackageOriginR
 /** A hub fetch replaces the record; an upload never downgrades an existing hub record. */
 export function writePackageOrigin(store: string, record: Omit<PackageOriginRecord, "schemaVersion">): void {
   const existing = readPackageOrigin(store, record.sha256);
-  if (existing?.kind === "skill-hub" && record.kind === "upload") return;
+  if ((existing?.kind === "skill-hub" || existing?.kind === "gaid-hub") && record.kind === "upload") return;
   const target = originFile(store, record.sha256);
   fs.mkdirSync(store, { recursive: true });
   const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;

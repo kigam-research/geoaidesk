@@ -79,7 +79,7 @@ describe("ProjectView", () => {
     const onOpenProject = vi.fn();
     render(<ProjectView onOpenProject={onOpenProject} />);
 
-    expect(screen.getByRole("heading", { name: "Choose a project" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "My research" })).toBeInTheDocument();
     expect(screen.getByText("RNA pilot")).toBeInTheDocument();
     expect(screen.getByText("Current")).toBeInTheDocument();
     expect(screen.getByText("$25 budget")).toBeInTheDocument();

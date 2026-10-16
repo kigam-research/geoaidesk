@@ -77,7 +77,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         <span className="text-sm">{text(choice.label)}</span>
         {choice.options ? <select className={fieldClass} value={choices[choice.id] ?? ""} onChange={(event) => setChoices({ ...choices, [choice.id]: event.target.value })}>
           <option value="">{t("workspace.setup.decideLater")}</option>
-          {choice.options.map((option) => <option key={option} value={option}>{option}</option>)}
+          {choice.options.map((option) => <option key={option} value={option}>{choice.optionLabels?.[option] ? text(choice.optionLabels[option]) : option}</option>)}
         </select> : <input className={fieldClass} value={choices[choice.id] ?? ""} placeholder={t("workspace.setup.decideLater")} onChange={(event) => setChoices({ ...choices, [choice.id]: event.target.value })} />}
         {choice.why && <span className="block text-xs text-muted-foreground">{text(choice.why)}</span>}
         {choice.requiredWhen && <span className="block text-xs text-muted-foreground">{text(choice.requiredWhen)}</span>}
@@ -86,7 +86,8 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />
       {blocked && <p className="text-xs text-muted-foreground">{blocked}</p>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <div className="flex flex-wrap justify-end gap-2">
+      {/* gaid-hub: the actions stay visible while the form scrolls. */}
+      <div className="sticky -bottom-6 -mx-6 -mb-6 flex flex-wrap justify-end gap-2 border-t bg-background px-6 py-3">
         {recipe && <DeleteRecipe onDelete={recipe.onDelete} />}
         <DialogClose asChild><Button variant="outline">{t("workspace.setup.close")}</Button></DialogClose>
         <Button disabled={busy || workflow.readiness.state !== "ready" || missingInput} onClick={() => void start()}>{t(busy ? "workspace.setup.creating" : "workspace.setup.create")}</Button>

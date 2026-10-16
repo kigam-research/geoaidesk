@@ -1,0 +1,15 @@
+# Geo Skill Atlas scales (atlas taxonomy v1).
+schemaVersion: atlas-taxonomy/v1
+facet: scales
+terms:
+  - { id: sample, label: { ko: 시료, en: Sample } }
+  - { id: core, label: { ko: 코어, en: Core } }
+  - { id: borehole, label: { ko: 시추공, en: Borehole } }
+  - { id: site, label: { ko: 현장, en: Site } }
+  - { id: catchment, label: { ko: 유역, en: Catchment } }
+  - { id: reservoir, label: { ko: 저류층, en: Reservoir } }
+  - { id: district, label: { ko: 광역 지구, en: District } }
+  - { id: basin, label: { ko: 분지, en: Basin } }
+  - { id: regional, label: { ko: 지역, en: Regional } }
+  - { id: national, label: { ko: 국가, en: National } }
+  - { id: global, label: { ko: 전 지구, en: Global } }
