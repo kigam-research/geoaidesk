@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-16T04:37:14Z
+updated: 2026-10-16T04:40:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"44493f95-ae0b-4928-a7a8-aece5a9dd72d","pid":473002,"provider":"claude","session":"86221638-71d6-426f-8fae-de543721f7e2","start":"369943","token":"7b34b1e9deea5360f09dd28a3eb9c003ae004588a4f735954bd988c2a9967395"}
 branch: task/gaid-hub
 target: main
@@ -70,6 +70,11 @@ Hub's confirmed understanding included: "2번 끈다" = disable skill_hub's auth
   all screens. Checks: scripts/check. Report under reports/<date>-<topic>/ with small PNGs. Remove build caches and
   app-written files/links from the worktree after the last check.
 
+## User feedback on the screen design (verbatim, 2026-10-16, writer tab)
+> "화면 시안과 관련하여 home에서는 개별 연구자 만든 스킬 • 워크플로우만 보이는 것이 아니라 추천 워크플로우가 상단에 대표그림과 함께 3~4개의 카드로 노출되고 하단에 나의 스킬 • 워크플로우라는 별도 제목 하단에 개별 연구자 작성중인 것들이 하단 왼쪽에서는 프로젝트 폴더를 선택할 수 있게 하고 하단 오른쪽에 카드로 해당 프로젝트에서의 스킬 • 워크플로우가 카드형태로 나타나는 형태로 시안이 수정되기를 원한다. 그리고 대표 문구로 "논문과 코드로 스킬이나 워크플로우를 만듭니다"라고 되어 있는데 이것을 "문헌 및 데이터로 스킬 또는 워크플로우를 만들어서 공유하고 피드백을 받는 허브 공간"으로 수정하자. 그리고 다른 연구자들이 올린 스킬이나 워크플로우를 조회하면 해당 내용에 대한 정보를 조회할 수 있게 하단에 댓글란과 star란을 추가하여 피드백 의견과 star수를 카운트하여 github 시스템처럼 운영될 수 있게 하자. source에서는 개별 연구자가 자료를 올릴 수 있지만, 기관 내 연구자들은 논문자료를 URL로 제공하여도 서버도 기관 망 내에 있을 것이므로 논문 조회가 가능할 것이므로 웹 URL로 문헌/논문이나 블로그, 검색 웹자료를 추가할 수 있는 기능과 시안을 마련해두자. Reading에서는 pdf뷰어 기능이 제공되어야 하는 것이 아닌가? 시안에는 단순히 읽는 중이라는 표시만 보인다. 질문에서는 관련된 그림들이 함께 보이고 이것에 대한 설명과 질문의 의도 및 스킬 또는 워크플로우에 어떻게 연관되는지가 이용자들에게 인사이트를 제공해주는 방식으로 시안이 수정되어야 한다. draft에서는 프로젝트에서 시험하는 것도 있지만 허브에 등록할 수 있는 기능도 별도로 추가되어야 한다. 그리고 허브에 등록되면 이전에 얘기한대로 다른 사용자가 피드백 댓글을 남기거나 star를 누를 수 있게 하는 ui도 추가되어야 한다. draft에서 방법 흐름은 가로 카드로 화살표로 단순 나열형으로 보여주기보다는 왼쪽에는 대표 단계를 사각 박스 카드 모양에 세로로 쌓고 각 단계 박스를 클릭하면 오른편에 해당 단계의 설명과 대표하는 개념 그림이나 입출력 형태 모습이 나타나는 형태로 수정될 필요가 있다. 그리고 스킬 및 워크플로우에서 요구하는 입력 결과의 모습에 대해서도 표의 경우 표의 예시모습, 경계도형의 경우 경계도형의 예시모습, 결과의 경우 논문 자료를 활용하거나 개념 생성 그림을 활용하여 모습이나 요약 표 예시 모습이 시각적으로 보여야 플랫폼으로서 가치가 있다. 그리고 설치하고 시작설정 열기했을 때 바로 GAID 시스템으로 연결되는데 해당 프로젝트에는 어떠한 데이터도 없는데 작업 설정이 열려서 이용자가 데이터를 입력조차 할 수 없다. 시스템 적용상 순서가 잘못된 것이므로 확인 후 수정도 필요하다. 사용자의 피드백은 방대하므로 먼저 확인 후 제대로 이해하였는지와 모호한 부분은 확인받고 시안부분에서도 수정된 목업 시안을 통해 사용자와 협의해가면서 진행해야한다."
+Status: understanding and open questions sent to the user; mockup revision follows the answers.
+
+## Current state
 ## Current state
 - 2026-10-16: resumed; inventory read (skill_hub report §3.6/appendix A, hub-integration appendix B, design docs).
   skill_hub reference snapshot (read-only, never a runtime dependency): main 54fe4773d06fcb3d0dc36882d5cd44d9094cade5,
