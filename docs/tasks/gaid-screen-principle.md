@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-17T00:13:38Z
+status: done
+updated: 2026-10-17T00:13:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d759b1f0-0402-40f9-808a-39d3cb2ebda7","pid":2621260,"provider":"claude","session":"b02fbf17-ebb4-43b8-b72e-c3ca401b410a","start":"8295692","token":"358cbec5c59e65ced92221015167899359873e80e714cc98e0319ef0fe35c3e6"}
 branch: task/gaid-screen-principle
 target: main
@@ -40,7 +40,9 @@ R1's list now names commit SHAs and check receipts. The backbone draft-compariso
 for this rule). No UI code change. Check: scripts/check passed on 2026-10-17 (second run; the first failed only a web map-viewer
 timing test under a concurrent check, which passed 8/8 alone). Copy warnings shown are pre-existing; no locale edited.
 ## Next steps
-1. None; task finish.
+<!-- task:closed -->
+Closed 2026-10-17T00:13:48Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Placement: ui-guide section 1 (read first per AGENTS.md "UI guide" bullet); no AGENTS.md edit needed.
