@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T08:57:45Z
+status: ready
+updated: 2026-10-18T08:57:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd14a2b1-08ca-4ec5-b9a5-c36ac0b3decd","pid":2986331,"provider":"codex","session":"01a14e34-3599-7921-a909-ef8c86596d17","start":"20134566","token":"f8920c52ddfb78cfda8aa61a33610fd220a79d3b368da7c773080f68204acb5b"}
 branch: task/gaid-notebook-review--record-cleanup
 target: task/gaid-notebook-review
@@ -55,7 +55,9 @@ and English before → after (copy rule). Then `task finish`.
 ## Current state
 Implemented locale-aware work-record export/print labels, collapsed copyable execution/source technical disclosures, GAID session-export branding, a Methods draft language rule and localized proposal constraints. Authored titles, bodies, code and machine JSON keys/enum values are preserved. Web/server typechecks passed; focused web tests: 7 files/98 tests, server tests: 5 files/64 tests. Final print/helper recheck: 3 files/31 tests. Copy validation: 0 errors/62 warnings (scientific-limit wording retained). UI validation: 0 errors/102 existing accepted debt. Runtime tsx smoke produced the Korean work-record heading. No deployment performed; parent integration/screenshots/full scripts/check remain.
 ## Next steps
-1. Run task finish with all changed files and the new shared catalogue reader. Parent integrates this child with task complete; no further child implementation remains.
+<!-- task:closed -->
+Closed 2026-10-18T08:57:46Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial typechecks could not start because dependencies were absent. npm ci completed in web and server without changing lockfiles.
 - A task job request for dependency installation did not launch: the CLI required a clean saved source. No receipt/job was created; routine dependency setup then ran directly (13–18 seconds).
