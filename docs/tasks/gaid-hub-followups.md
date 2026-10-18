@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:09:39Z
+updated: 2026-10-18T05:09:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -71,21 +71,19 @@ Outside check: no outside check (app work; the re-trial is the acceptance eviden
 - Revised PU method: authoring project ap-c8f90117-4e8 (paper author-manuscript.pdf + code
   mpm-pu-conformal-yilgarn-c03c67d.tar.gz, Qwen). Analysis 35 findings, 5 model questions + code-use + trial-scale;
   answers in tools/answers1.json (generic-grid, thresholds user-input, model user-select, min-131-per-fold,
-  variogram both-fallback, include code, quick-and-full). Draft running.
+  variogram both-fallback, include code, quick-and-full). Draft 1 accepted (run-scale quick only pre-set; thread rule, quick table, scikit-gstat install, 결과 파일 present;
+  defect: local module r1324_r22_analysis declared as a PyPI dependency -> fixed in declareImports, 89087a4). Revise running.
 - Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
   gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
-1. Authoring changes (this writer): fixed questions "code-use"/"quick-trial" (server-side, after validateAnalysis); quick
-   recipe (`<slug>-quick`) when quick-trial is chosen; prompt rules: nested-parallelism thread bound (BaggingPU 11 min was
-   XGB n_jobs=-1 inside BaggingPU), expected files = the paths the skill/code actually writes; server strips "(선택)/(필수)"
-   from labels; recipe choices only from researcher decisions (start defaults were paper values); single-file input
-   preselected in TaskSetup; trial matching falls back to basename (found elsewhere).
-2. Hub-side receive: HandoffDialog "GAID 허브로 보내기" -> new authoring project with the bundle as a `gaid-analysis` source;
-   kindOf detects the manifest.
-3. Trial instance from this worktree (ports 3360/18360, data ~/data/geoaidesk/work/gaid-hub-followups/home), produce the
-   revised PU package in the GAID hub from the paper + code, re-run the gaid-hub-integration limited trial (same instruction
-   text, 70,200-cell Yilgarn_GIS_DB.csv) with a researcher-role agent.
-4. `task complete` each child, integrate, scripts/check, report, finish.
+1. Wait for the revise of ap-c8f90117-4e8 (feedback tools/feedback1.md: block size as human-gate, variogram bound in the
+   step, quick = outer fold 0, variogram figure + block_size.json as optional artifacts); check the draft (no
+   r1324-r22-analysis dependency, module copied in).
+2. `task complete` gaid-hub-followups--hub-browse and --defects when their finish notices arrive (both were running final
+   checks; use VITEST_MAX_WORKERS unset/1 for server tests), then restart the trial instance on the integrated tip.
+3. Run the researcher-role re-trial (briefs/researcher-retrial.md, replace __AUTHORING_ID__ with ap-c8f90117-4e8).
+4. Report reports/2026-10-18-gaid-hub-followups/index.md (children's sections from their task docs), scripts/check,
+   task finish.
 ## Failed approaches
 ## Notes and decisions
 - Ownership: defects child owns chat/tool-activity, use-agent, events.ts tool_update, file-actions + suggestions, use-sandbox
