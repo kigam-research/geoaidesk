@@ -601,6 +601,12 @@
       "owner": "gaid-notebook-review",
       "status": "added",
       "responsibility": "Research-note parsing, file-master storage, lead hooks, project routes and provenance handoff regression coverage"
+    },
+    {
+      "path": "geo/tests/distribution.test.mjs",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Register the explicitly requested research-note seam owner in the existing bounded owner allowlist"
     }
   ],
   "notTouched": [

@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T09:06:31Z
+status: active
+updated: 2026-10-18T09:14:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03bb8c52-5554-4f2c-8eac-ff609606e9cb","pid":2981080,"provider":"codex","session":"01a14e33-e7dc-7f11-896d-cc8d6a1c24a8","start":"20132575","token":"9229f706ac6aec69b0c3a4f13b440d4152f6c305c5f8571194c2420dbb8d0540"}
 branch: task/gaid-notebook-review--notes-server
 target: task/gaid-notebook-review
@@ -73,6 +73,7 @@ Implemented the server-side research notes: pure bilingual parser, bounded NFC/N
 Closed 2026-10-18T09:06:31Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+Second task finish passed backend (1899 passed / 15 skipped) and frontend (1077 passed), then failed the distribution owner allowlist: this task's explicitly requested gaid-notebook-review owner was not registered. Both full-check failures reflected the assumption that the existing repository-wide integration guards already covered the new area. Direct source inspection confirmed a literal owner allowlist; added only gaid-notebook-review (preserving the requested boundary owner) and a self-describing boundary seam for that check file. This necessary declared-check maintenance adds geo/tests/distribution.test.mjs to the owned scope. Validate that check directly before the next finish, rather than changing the owner or weakening the guard.
 First task finish full check failed on the existing win-portability source guard: direct path.relative calls in the new store/extension bypassed the repository choke point (even though they manually normalised separators). Replaced them with sandbox-fs apiRelative/isWithin; no guard weakening or upstream test edits. First full backend result: 1 failed / 1898 passed / 15 skipped, with the new notes tests passing. Rerun task finish in place; do not resume or task save between finishes.
 Initial tests exposed an NFC/NFD sibling-root lookup failure; path resolution now explores both actual spellings and list deduplicates NFC ids. Test fixtures initially used the wrong ProvenanceRecorder API, a string instead of Pi content blocks, and an invalid installed-method identity; corrected against the existing sources. A 2 MiB Buffer deep-equality assertion exceeded Vitest's timeout; Buffer.equals verifies the same bytes without per-element matcher overhead. No unresolved implementation failure remains.
 ## Notes and decisions
@@ -81,7 +82,7 @@ Sequential decisions: preserve the IO-free contract and file-master behaviour; s
 ### Implementation and integration evidence
 
 - New files: server/src/geo/notes/{parser,store,extension}.ts, server/src/geo/routes/notes.ts, server/test/geo-notes.test.ts.
-- Updated seams: server/src/geo/{session,routes,instructions}.ts; appended only the new test entry (owner gaid-notebook-review) in geo/integration-boundaries.json. The task document is the only changed documentation.
+- Updated seams: server/src/geo/{session,routes,instructions}.ts; appended the new note test and the distribution owner-registration check entries (owner gaid-notebook-review) in geo/integration-boundaries.json. geo/tests/distribution.test.mjs registers that owner, as required by its existing allowlist. The task document is the only changed documentation.
 - Public API: GET /geo/notes → ResearchNoteListResponse; GET /geo/notes/:id → ResearchNoteResponse; POST /geo/notes/:id/status → the updated ResearchNoteSummary (not a content wrapper). Invalid status → 400, unknown/unsafe id → 404, oversized direct read/status → 413.
 - Oversized files are skipped in lists and explicitly rejected on direct reads/status edits. Listings retain at most 500 notes, sorted by date then updatedAt. Frontmatter status is the only rewritten line; BOM, newline style and all other bytes survive. A status edit that would cross 2 MiB is rejected before replacement. Atomic replacement failure preserves the original and removes its temporary file.
 - notes.json is an object mapping NFC note ids to unique session-id arrays, oldest first. Malformed mapping reads return empty associations without writing; a subsequent hook refuses to overwrite the malformed map. Lead associations are recorded even if a later format check fails. No child hook is registered.
@@ -103,6 +104,8 @@ RESEARCH_NOTE_RULE is **675 JavaScript characters**; the one bullet adds **678 c
 - Affected regression command after the portability fix: `cd server && npx vitest run test/geo-notes.test.ts test/win-portability.test.ts test/geo-context.test.ts test/geo-reply-language.test.ts test/geo-markdown-images.test.ts test/geo-hub-handoff.test.ts test/geo-methods.test.ts test/geo-read-hints.test.ts test/session-registry.test.ts`. Final rerun: 9/9 files, 89/89 tests passed (49.70 s). Backend typecheck also passed after that fix.
 - `git diff --check` and parsing geo/integration-boundaries.json: passed. Final source/test files reviewed; no out-of-scope edits.
 - Full `scripts/check` via first task finish: failed only the existing direct-path.relative source guard (1898 backend tests passed, 15 skipped). Fixed with apiRelative/isWithin and verified the guard in the focused command above. The rerun task finish executes the full declared check and stores its result in the CLI receipt; do not infer full-suite success from the focused tests.
+- Second full check: backend 1899 passed / 15 skipped; frontend 1077 passed; launcher dependency check passed; distribution 47 passed / 1 skipped / 1 failed (new owner missing from its literal allowlist). Only that registration is changed for the next finish; earlier component behaviour is unchanged.
+- `node --test geo/tests/distribution.test.mjs`: 7/7 passed after registering the requested owner. `git diff --check`: passed. Rerun task finish in place to complete the remaining declared-check phases and publication.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
