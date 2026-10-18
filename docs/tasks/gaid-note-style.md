@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T12:21:19Z
+updated: 2026-10-18T12:35:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"62008f86-1be6-4772-943a-a951ffca285d","pid":468448,"provider":"claude","session":"85b4150d-ec81-4480-967e-62529d54438c","start":"21342974","token":"5b8b5067b5c9f3de1c1fb5825e3148f5d6bbd2ebb965c023135d08bfdc476cdc"}
 branch: task/gaid-note-style
 target: main
@@ -28,15 +28,17 @@ the same request as the gaid-output-style comparison, showing the resulting note
 Outside check: no outside check.
 
 ## Current state
-- Edited: `RESEARCH_NOTE_RULE` (server/src/geo/instructions.ts) gains one sentence fixing Korean notes to 합니다체;
-  the `gaid-note-style` skill's register line now says 합니다체 (was "one register, keep the researcher's");
-  docs/geo/research-notes.md "Prose style"; one assertion in server/test/geo-note-style.test.ts.
-- Trial: unit `gaid-notestyle-app` (this worktree, ports 3373/18373), GAID_HOME
-  `~/data/geoaidesk/work/gaid-note-style/home` (config/pi-agent copied from gaid-output-style/before), same request
-  `tools/msg1.md`, model `kigam-qwen/qwen3.8-flash-next`, logs in `~/data/geoaidesk/work/gaid-note-style/logs/`.
+- Edited: `RESEARCH_NOTE_RULE` (server/src/geo/instructions.ts) gains one sentence fixing Korean notes to 합니다체
+  (headline, table sentences and decision options included; +131 chars); the `gaid-note-style` skill's register line
+  says the same; docs/geo/research-notes.md "Prose style"; one assertion in server/test/geo-note-style.test.ts.
+- Trial (institute Qwen, same request as gaid-output-style): run1 (commit 57b5228) body 합니다체 but 5 decision options
+  in 해라체; run2 (a918790, options named) 0 해라체 / 50 합니다체 endings. Evidence in
+  `~/data/geoaidesk/work/gaid-note-style/evidence/run{1,2}/`. Trial app unit `gaid-notestyle-app` stopped.
+- Report: reports/2026-10-18-gaid-note-style/index.md.
 ## Next steps
-1. Run the trial chat, read the note, write the brief report, scripts/check, finish.
+1. scripts/check result into report appendix, review-copy, finish.
 ## Failed approaches
+- Naming only headline and table sentences: decision options stayed 해라체 (run1).
 ## Notes and decisions
 - Small, tightly coupled change: done by the top writer, no child units.
 Closes: gaid-output-style#1
@@ -47,6 +49,7 @@ Closes: gaid-output-style#1
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-18-gaid-note-style/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
