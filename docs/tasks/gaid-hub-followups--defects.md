@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:00:58Z
+updated: 2026-10-18T05:03:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -125,6 +125,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 - Visual review caught a clipped hub label due to the composer inner nowrap query; removed only that inner nowrap rule and recaptured both sizes.
 - Shell-prefix test initially assumed a settings file had been seeded by ensureProjectExists; it had not. The fixture now creates its own settings before session construction.
 ## Notes and decisions
+- Parent correction: integration-boundaries owner must be whitelisted. Follow-up seams now use existing owner gaid-hub, while responsibility text still identifies gaid-hub-followups. The untouched HTTP sessions route retains its original seam unchanged. Parent handoff-test fix is published at e5461bd42dd3 and will arrive through task finish integration.
 - Supplementary verifier: /home/seongin3/data/geoaidesk/work/gaid-hub-followups--defects/verify-remainder.sh; sha256 105b4d173b7db4add57a4de64861c818ffc7aa0738556bd7dd061966621878b9. It does not alter scripts/check or parent tests. Full frontend excluding only the parent-owned handoff file, then launcher/distribution/copy/UI/environment/production smoke. Catalogue-off and installed-method UI focused rerun: 27 passed. Integration checkpoint cf126308e71b.
 - Parent instruction after full-check launch: only the old hub-handoff.test.tsx button-name failure may remain for integration; do not edit the parent-owned test. No other failure is waived. At the bounded check on this instruction, the recorded job was still running through backend tests (no final exit/result yet).
 - Parent clarification: chat-actions renders hubHandoff.openLabel, keeps hubHandoff.open for aria/title. Parent exclusively owns those locale keys; not edited here. Parent locale commit cdda9dc was received unchanged before UI/check verification.
