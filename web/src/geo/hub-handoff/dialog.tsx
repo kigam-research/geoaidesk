@@ -6,6 +6,16 @@ import { apiFetch } from "@/lib/projects";
 import { t } from "@/geo/i18n";
 import { authoringUrl, canSendDirect, checked, directHandoff, downloadHandoff, previewHandoff, saveDownload, sendToHub, type HandoffPreview, type HubSite } from "./client";
 
+/** Preview text without Markdown markers (re-trial: "## 최종 보고" and "**…**" showed as raw text). The bundle keeps the original. */
+export function plainMarkdown(text: string): string {
+  return text
+    .replace(/^#{1,6}[ \t]+/gm, "")
+    .replace(/\*\*([^*\n]+)\*\*|__([^_\n]+)__/g, "$1$2")
+    .replace(/`([^`\n]+)`/g, "$1")
+    .replace(/!?\[([^\]\n]*)\]\([^)\n]*\)/g, "$1")
+    .replace(/^[ \t]*[-*+][ \t]+/gm, "• ");
+}
+
 export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { projectId: string; sessionId: string; isStreaming: boolean; onClose: () => void }) {
   const [preview, setPreview] = useState<HandoffPreview | null>(null);
   const [sites, setSites] = useState<HubSite[]>([]);
@@ -93,7 +103,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
           <p>{t("hubHandoff.methodTrialLine", { method: preview.methodTrial.methodId ?? "-", revision: preview.methodTrial.revision ?? "-", workflow: preview.methodTrial.workflowId })}</p>
           <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.methodTrial.assessment ? t("hubHandoff.assessment", { outcome: preview.methodTrial.assessment.outcome, note: preview.methodTrial.assessment.note || "-" }) : t("hubHandoff.noAssessment")}</p>
         </section>}
-        <section><h3 className="font-medium">{t("hubHandoff.finalAnswer")}</h3><p className="max-h-40 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere]">{preview.finalAnswer || t("hubHandoff.emptyText")}</p></section>
+        <section><h3 className="font-medium">{t("hubHandoff.finalAnswer")}</h3><p className="max-h-40 overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere]">{plainMarkdown(preview.finalAnswer) || t("hubHandoff.emptyText")}</p></section>
         <p>{t("hubHandoff.model", { model: preview.modelRef ?? t("hubHandoff.unknownModel") })}</p>
         {Object.values(preview.truncated).some(Boolean) && <p>{t("hubHandoff.truncated")}</p>}
         <fieldset disabled={busy || isStreaming} className="min-w-0 space-y-2">
@@ -112,7 +122,8 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
         <p className="text-xs text-muted-foreground">{t("hubHandoff.sizeHelp")}</p>
         <label className="block space-y-1"><span>{t("hubHandoff.note")}</span><textarea className="w-full rounded-md border bg-background p-2" rows={3} maxLength={4000} disabled={busy || isStreaming} value={note} onChange={e => { setNote(e.target.value); clearTransfer(); }} /></label>
         {sites.length > 1 && <label className="block space-y-1"><span>{t("hubHandoff.site")}</span><select className="w-full rounded-md border bg-background p-2" disabled={busy || isStreaming} value={siteId} onChange={e => { setSiteId(e.target.value); clearTransfer(); }}>{sites.map(s => <option key={s.id} value={s.id}>{s.id}</option>)}</select></label>}
-        {site && <p className="text-xs [overflow-wrap:anywhere]">{t("hubHandoff.site")}: {authoringUrl(site)}</p>}
+        {/* The analysis goes to this app's GAID hub; an external hub is named only where it can take a direct send. */}
+        {site && canSendDirect(site) && <p className="text-xs [overflow-wrap:anywhere]">{t("hubHandoff.site")}: {authoringUrl(site)}</p>}
         {site && canSendDirect(site) && <p className="text-xs">{t("hubHandoff.directHelp")}</p>}
       </div>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}

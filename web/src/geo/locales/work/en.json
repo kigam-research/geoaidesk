@@ -187,7 +187,7 @@
   "interview_form.type_your_answer": "Type your answer…",
   "interview_form.upload_images": "Upload images",
   "interview_form.remove_value": "Remove {v0}",
-  "interview_form.dismissed_the_agent_proceeded_with_its_recommendations": "Dismissed — the agent proceeded with its recommendations.",
+  "interview_form.dismissed_the_agent_proceeded_with_its_recommendations": "Skipped. The agent does not take this as approval and stops to report when a required value is missing.",
   "interview_form.answers_submitted": "Answers submitted.",
   "interview_form.interview_closed": "Interview closed.",
   "interview_form.submission_failed_value": "Submission failed ({v0})",

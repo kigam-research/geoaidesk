@@ -6,7 +6,7 @@ import { MARKDOWN_IMAGE_RULE } from "./markdown-images.ts";
  * setting the server does not see and does not put into prompts.
  */
 export const REPLY_LANGUAGE_RULE =
-  "Reply in the language the user asked for; otherwise in the language of the user's latest request. Files written for the user follow the same choice unless the task names another language.";
+  "Reply in the language the user asked for; otherwise in the language of the user's latest request. Files written for the user, notebook entries and result summaries follow the same choice unless the task names another language.";
 
 /**
  * Concise GeoAIDesk guidance appended to the lead's system prompt in geo

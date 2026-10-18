@@ -187,7 +187,7 @@
   "interview_form.type_your_answer": "답변 입력…",
   "interview_form.upload_images": "이미지 업로드",
   "interview_form.remove_value": "{v0} 제거",
-  "interview_form.dismissed_the_agent_proceeded_with_its_recommendations": "건너뛰었습니다. AI agent가 권장안으로 계속 진행했습니다.",
+  "interview_form.dismissed_the_agent_proceeded_with_its_recommendations": "질문을 건너뛰었습니다. AI agent는 이를 승인으로 보지 않고, 꼭 필요한 값이 없으면 멈추고 알립니다.",
   "interview_form.answers_submitted": "답변을 제출했습니다.",
   "interview_form.interview_closed": "질문 양식을 닫았습니다.",
   "interview_form.submission_failed_value": "제출 실패({v0})",

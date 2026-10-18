@@ -41,9 +41,17 @@ export function methodRows(methods: LocalMethodSummary[], select: (method: Local
       badges: <>{recipe && <span className={pill}>{t("methods.recipe")}</span>}<MethodBadges method={method} workflow={workflow} /></>,
       onSelect: () => select(method, workflow, recipe),
     });
+    // A Workflow with a single 레시피 is one row that opens with that 레시피's start settings: two rows of the same name,
+    // one without the researcher's defaults, misled the re-trial researcher (gaid-hub-followups).
+    const single = (workflow: LocalMethodWorkflow) => {
+      const own = method.recipes.filter((recipe) => recipe.workflowId === workflow.id);
+      return own.length === 1 ? own[0] : undefined;
+    };
     return [
-      ...method.workflows.map((workflow) => row(`workflow:${workflow.id}`, text(workflow.title), workflow)),
-      ...method.recipes.map((recipe) => row(`recipe:${recipe.id}`, text(recipe.title), method.workflows.find((w) => w.id === recipe.workflowId), recipe)),
+      ...method.workflows.map((workflow) => row(`workflow:${workflow.id}`, text(workflow.title), workflow, single(workflow))),
+      ...method.recipes
+        .filter((recipe) => { const workflow = method.workflows.find((w) => w.id === recipe.workflowId); return !workflow || single(workflow) !== recipe; })
+        .map((recipe) => row(`recipe:${recipe.id}`, text(recipe.title), method.workflows.find((w) => w.id === recipe.workflowId), recipe)),
       ...(method.workflows.length === 0 ? [row("detail", text(method.title))] : []),
     ];
   });

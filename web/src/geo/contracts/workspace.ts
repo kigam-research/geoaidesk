@@ -135,6 +135,8 @@ export interface GeoSuggestion {
   exposure?: string;
   /** The matching installed Workflow, used directly by TaskSetup. */
   workflow?: GeoWorkflowSummary;
+  /** Start settings of the method's single 레시피 for this Workflow (the researcher's defaults). */
+  setup?: GeoRecipeCheckResponse["setup"];
   title: Localized;
   /** Input role the file matches and why. */
   match: { roleId: string; roleLabel: Localized; format: string; required: boolean; signal?: GeoSuggestionSignal };

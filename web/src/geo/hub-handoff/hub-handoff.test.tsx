@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GeoChatActions } from "../workspace/chat-actions";
 import { setGeoLocaleSetting } from "../i18n";
 import type { HandoffPreview } from "./client";
+import { plainMarkdown } from "./dialog";
 
 const { apiFetch, saveDownload } = vi.hoisted(() => ({ apiFetch: vi.fn(), saveDownload: vi.fn() }));
 vi.mock("@/lib/projects", () => ({ apiFetch }));
@@ -153,5 +154,8 @@ describe("hub analysis handoff", () => {
     await userEvent.click(dialog.getByRole("button", { name: "허브 초안 열기" }));
     expect(window.location.hash).toBe("#hub/ap-12345678-abc");
     expect(saveDownload).not.toHaveBeenCalled();
+  });
+  it("shows the final answer without Markdown markers", () => {
+    expect(plainMarkdown("## 최종 보고\n- **블록 크기**: `50 km` ([그림](outputs/v.png))")).toBe("최종 보고\n• 블록 크기: 50 km (그림)");
   });
 });

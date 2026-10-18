@@ -262,6 +262,17 @@ describe("GAID hub packages", () => {
         { projectId: target.id, acknowledged: true },
         { agentDir },
       );
+      // Bytecode caches left by a trial run are not edits: the reinstall still replaces the copy.
+      const cache = path.join(projectSkillRoot(paths).skillsDir, "pu-nested-cv-method", "__pycache__");
+      fs.mkdirSync(cache, { recursive: true });
+      fs.writeFileSync(path.join(cache, "run.cpython-312.pyc"), "c");
+      await installPackage(
+        store,
+        await store.read(projectId),
+        built.record,
+        { projectId: target.id, acknowledged: true },
+        { agentDir },
+      );
       // A researcher's edits to the installed copy are not overwritten by a reinstall.
       const installed = path.join(projectSkillRoot(paths).skillsDir, "pu-nested-cv-method", "SKILL.md");
       fs.appendFileSync(installed, "\n연구자가 고친 줄\n");

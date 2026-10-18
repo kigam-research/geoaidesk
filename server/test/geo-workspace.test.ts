@@ -188,9 +188,9 @@ describe("POST /geo/suggestions", () => {
     fs.writeFileSync(path.join(dir, "gaid-method.json"), JSON.stringify({
       schemaVersion: "gaid-method/v1", methodId: "local/table-method", revision: 1, version: "0.1.0",
       lifecycle: "draft", implementation: "implemented", codeOrigin: "supplied", title: ko("Installed table method"),
-      sources: [], recipes: [],
+      sources: [], recipes: [{ id: "table-method-default", workflowId: "assay-composition", title: ko("Default"), choices: { "run-scale": "quick" }, unresolvedChoices: [] }],
       workflows: [{ id: "assay-composition", title: ko("Installed table method"), inputRoles: [role("grid", ["csv"])],
-        requiredScientificChoices: [], prompt: ko("Analyze table"), skillIds: ["local:table-method"], environmentProfile: "geo-core",
+        requiredScientificChoices: [{ id: "run-scale", label: ko("Run scale"), why: ko("First trial"), options: ["quick", "full"] }], prompt: ko("Analyze table"), skillIds: ["local:table-method"], environmentProfile: "geo-core",
         expectedArtifacts: [{ id: "out", label: ko("Output"), files: ["out.csv"], required: true }], boundary: ko("Review before interpretation") }],
     }));
     fs.writeFileSync(path.join(paths.sandbox, "a.csv"), "Au,Cu,Ni\n1,2,3\n");
@@ -198,6 +198,8 @@ describe("POST /geo/suggestions", () => {
       const server = await app({ catalogue });
       const response = (await server.inject({ method: "POST", url: "/geo/suggestions", payload: { path: "a.csv" } })).json() as GeoSuggestionsResponse;
       expect(response.suggestions[0]).toMatchObject({ workflowId: "assay-composition", exposure: "method:table-method:assay-composition", workflow: { inputRoles: [{ id: "grid" }] } });
+      // The method's single 레시피 travels with the suggestion, so the setup starts from the researcher's defaults.
+      expect(response.suggestions[0].setup).toMatchObject({ workflowId: "assay-composition", choices: { "run-scale": "quick" } });
       await server.close();
     }
   });

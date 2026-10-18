@@ -8,7 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ProjectPaths } from "../../projects.ts";
 import { globalSkillRoot, projectSkillRoot, type SkillRoot } from "../../agent/skills.ts";
-import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
+import { getSkillBaseHash, getSkillProvenance } from "../../agent/skills-sync.ts";
+import { methodTreeHash } from "./tree-hash.ts";
 import type {
   LocalMethodSummary,
   LocalMethodWorkflow,
@@ -120,7 +121,7 @@ export async function listLocalMethods(
     const root = method.scope === "global" ? globalSkillRoot() : projectSkillRoot(paths);
     const provenance = getSkillProvenance(root, method.runtimeName);
     const { origin, record } = originOfSource(provenance?.source, options.store ?? packageStore());
-    const treeHash = hashDirectory(method.dir);
+    const treeHash = methodTreeHash(method.dir);
     const file = method.file.method;
     // Only a hub descriptor's value counts; the package's own claim never promotes it.
     const lifecycle: MethodLifecycle = origin.kind === "skill-hub" && record?.hub?.lifecycle ? record.hub.lifecycle : "draft";

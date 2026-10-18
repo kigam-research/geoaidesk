@@ -12,7 +12,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ProjectPaths } from "../../projects.ts";
 import { globalSkillRoot, projectSkillRoot } from "../../agent/skills.ts";
-import { getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
+import { getSkillProvenance } from "../../agent/skills-sync.ts";
+import { methodTreeHash } from "./tree-hash.ts";
 import { PROVENANCE_SCHEMA_VERSION, USER_SESSION_ID, type ProvenanceStep } from "../../provenance/store.ts";
 import type { MethodTrial, MethodTrialExpected, MethodTrialFile } from "../../../../web/src/geo/contracts/methods.ts";
 import { geoStateDir } from "../context.ts";
@@ -100,7 +101,7 @@ export function recordMethodTrial(paths: ProjectPaths, sessionId: string, mode: 
     methodId: parsed.methodId,
     revision: parsed.revision,
     packageSha256: origin.packageSha256 ?? null,
-    treeHash: hashDirectory(method.dir),
+    treeHash: methodTreeHash(method.dir),
     startedAt: now.toISOString(),
     expected: artifacts.map((artifact) => ({
       id: artifact.id,
@@ -194,7 +195,7 @@ function observe(paths: ProjectPaths, record: StoredTrial): Pick<MethodTrial, "o
 function view(paths: ProjectPaths, record: StoredTrial): MethodTrial {
   const { schemaVersion: _schema, ...rest } = record;
   const method = findInstalledMethod(paths, record.runtimeName);
-  const methodChanged = !method || hashDirectory(method.dir) !== record.treeHash;
+  const methodChanged = !method || methodTreeHash(method.dir) !== record.treeHash;
   return { ...rest, ...observe(paths, record), methodChanged };
 }
 

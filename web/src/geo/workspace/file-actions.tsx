@@ -56,8 +56,9 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
     {[...(catalogue?.workflows ?? []), ...visibleSuggestions.flatMap((suggestion) => suggestion.workflow ? [{ ...suggestion.workflow, exposure: suggestion.exposure }] : [])].map((workflow) => {
       const exposure = "exposure" in workflow ? workflow.exposure as string : undefined;
       const key = workflowKey(workflow.id, exposure);
-      const role = visibleSuggestions.find((suggestion) => workflowKey(suggestion.workflowId, suggestion.exposure) === key)?.match.roleId;
-      return <TaskSetup key={`${key}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} exposure={exposure} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : undefined} open={selected === key} onOpenChange={(open) => setSelected(open ? key : null)} onRefresh={refresh} />;
+      const suggested = visibleSuggestions.find((suggestion) => workflowKey(suggestion.workflowId, suggestion.exposure) === key);
+      const role = suggested?.match.roleId;
+      return <TaskSetup key={`${key}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} exposure={exposure} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : suggested?.setup} open={selected === key} onOpenChange={(open) => setSelected(open ? key : null)} onRefresh={refresh} />;
     })}
   </section>;
 }

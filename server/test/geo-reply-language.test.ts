@@ -20,6 +20,8 @@ describe("reply language", () => {
     expect(GEO_INSTRUCTIONS).toContain(REPLY_LANGUAGE_RULE);
     expect(REPLY_LANGUAGE_RULE).toMatch(/language the user asked for/);
     expect(REPLY_LANGUAGE_RULE).toMatch(/language of the user's latest request/);
+    // Re-trial (gaid-hub-followups): Korean request, English notebook entries and result cards.
+    expect(REPLY_LANGUAGE_RULE).toMatch(/notebook entries and result summaries/);
   });
 
   it("no server prompt fixes a reply language or reads the UI locale", () => {

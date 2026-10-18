@@ -41,11 +41,14 @@ function Catalogue({ projectId = "p1" }: { projectId?: string }) {
 }
 it("provides Workflow and recipe rows with effective lifecycle, implementation and local-edit badges", () => {
   const select = vi.fn(); const rows = methodRows([method], select);
-  expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial", "method:project:paper-method:recipe:r1"]);
+  // A Workflow with a single 레시피 is one row that starts from the 레시피; a second 레시피 brings back separate rows.
+  expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial"]);
   render(<>{rows[0].badges}</>);
   expect(screen.getByText("초안")).toBeInTheDocument(); expect(screen.queryByText("공개됨")).not.toBeInTheDocument();
   expect(screen.getByText("코드 포함")).toBeInTheDocument(); expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument(); expect(screen.getByText("미시험")).toBeInTheDocument();
-  rows[1].onSelect(); expect(select).toHaveBeenCalledWith(method, workflow, method.recipes[0]);
+  rows[0].onSelect(); expect(select).toHaveBeenCalledWith(method, workflow, method.recipes[0]);
+  const two = { ...method, recipes: [...method.recipes, { ...method.recipes[0], id: "r2", title: { ko: "Fold 3 레시피" } }] };
+  expect(methodRows([two], select).map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial", "method:project:paper-method:recipe:r1", "method:project:paper-method:recipe:r2"]);
 });
 it("shows GAID trial counts and the latest assessment instead of the untested badge", () => {
   const tried = { ...method, workflows: [{ ...workflow, trials: { count: 2, lastOutcome: "needs-revision" as const } }] };
@@ -73,7 +76,7 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
   const start = vi.fn((detail) => { detail.result = "opened"; }); const off = onStartGeoTask(start);
   try {
     render(<Catalogue />);
-    fireEvent.click(await screen.findByRole("button", { name: /^Fold 5 레시피/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /^논문 방법 시험/ }));
     const dialog = screen.getByRole("dialog"); expect(within(dialog).getByLabelText("Fold 수")).toHaveValue("5"); expect(within(dialog).getByLabelText("Threshold")).toHaveValue(""); expect(start).not.toHaveBeenCalled();
     fireEvent.click(within(dialog).getByRole("button", { name: "작업 초안 만들기" }));
     await waitFor(() => expect(start).toHaveBeenCalledOnce());
