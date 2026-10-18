@@ -32,6 +32,33 @@
       "make": "논문·코드로 만들기",
       "register": "허브에 등록",
       "feedback": "star와 의견 받기"
+    },
+    "browse": {
+      "title": "허브에 등록된 방법",
+      "tabs": "방법 목록",
+      "all": "전체",
+      "folders": "등록 방법 주제 폴더",
+      "search": {
+        "label": "등록 방법 검색",
+        "placeholder": "제목, 한 줄 설명, 연구자, 분류 검색"
+      },
+      "order": "star 많은 순 · 최근 등록순",
+      "count": "방법 {count}개",
+      "loading": "등록 방법을 읽는 중입니다.",
+      "error": "등록 방법을 읽지 못했습니다. 목록을 다시 읽으세요.",
+      "retry": {
+        "button": "목록 다시 읽기"
+      },
+      "noResults": "조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.",
+      "empty": "등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.",
+      "reset": {
+        "button": "전체 방법 보기"
+      },
+      "recommended": {
+        "action": "추천 Workflow 보기"
+      },
+      "open": "{title} 열기",
+      "stars": "star {count}개"
     }
   },
   "stage": {

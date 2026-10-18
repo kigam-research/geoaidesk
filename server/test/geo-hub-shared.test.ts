@@ -324,6 +324,44 @@ describe("shared GAID hub", () => {
     ]);
   });
 
+  it("browses all researchers by title, tagline, author and taxonomy labels, combining folder filters and ranking", async () => {
+    const f = await setup();
+    const first = (await f.register()).json<HubEntry>();
+    const folder = (await f.app.inject({ method: "POST", url: "/geo/hub/folders", headers: headers(), payload: { name: "지도" } })).json();
+    const second = await f.store.create({ title: "다른 작업" });
+    const project = await f.store.read(f.projectId);
+    await f.store.mutate(second.id, (s) => {
+      s.drafts = structuredClone(project.drafts);
+      s.drafts[0].slug = "map-method";
+      s.drafts[0].profile.title = "좌표 비교";
+      s.drafts[0].profile.tagline = { ko: "독립적인 한 줄 설명", en: "Unique bilingual tagline" };
+      s.drafts[0].workflow!.skillIds = ["local:map-method"];
+      s.drafts[0].workflow!.expectedArtifacts.forEach((a) => { a.skill = "local:map-method"; });
+    });
+    const registered = await f.register("이 연구원", { authoringProjectId: second.id, folderId: folder.id });
+    expect(registered.statusCode, registered.body).toBe(201);
+    const other = registered.json<HubEntry>();
+    for (const [id, at] of [[first.id, "2026-10-16T00:00:00Z"], [other.id, "2026-10-17T00:00:00Z"]]) {
+      const record = await f.shared.read(id);
+      record.entry.updatedAt = at;
+      await f.shared.write(record);
+    }
+    const list = async (q = "", folderId = "") => (await f.app.inject({ url: "/geo/hub/entries?" + new URLSearchParams({ q, ...(folderId ? { folder: folderId } : {}) }) })).json().entries as HubEntry[];
+    expect((await list()).map((e) => e.id)).toEqual([other.id, first.id]);
+    for (const q of ["좌표 비교", "독립적인 한 줄", "  UNIQUE BILINGUAL  ", "이 연구원"]) {
+      expect((await list(q)).map((e) => e.id)).toEqual([other.id]);
+    }
+    expect((await list("모델링")).map((e) => e.id)).toEqual([other.id, first.id]);
+    expect((await list("Modelling")).length).toBe(2);
+    expect((await list("모델링", folder.id)).map((e) => e.id)).toEqual([other.id]);
+    expect(await list("이 연구원", DEFAULT_FOLDER)).toEqual([]);
+    expect(await list("missing")).toEqual([]);
+    expect(await list("", "missing")).toEqual([]);
+    expect((await list("좌표 비교"))[0].tagline).toBe("독립적인 한 줄 설명");
+    await f.app.inject({ method: "POST", url: `/geo/hub/entries/${first.id}/star`, headers: headers(), payload: { on: true } });
+    expect((await list()).map((e) => e.id)).toEqual([first.id, other.id]);
+  });
+
   it("installs registered bytes through the normal gate, preserves local/foreign skills and counts actual trial records", async () => {
     const f = await setup();
     const entry = (await f.register()).json<HubEntry>();

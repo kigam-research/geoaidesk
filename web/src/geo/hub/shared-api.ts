@@ -51,10 +51,12 @@ const eid = (id: string) => `/entries/${encodeURIComponent(id)}`;
 export const sharedHub = {
   folders: () => call<{ folders: (HubFolder & { entries: number })[] }>("/folders"),
   createFolder: (name: string) => post<HubFolder>("/folders", { name }),
-  entries: (folder?: string) =>
-    call<{ entries: HubEntry[] }>(
-      `/entries${folder && folder !== "all" ? `?folder=${encodeURIComponent(folder)}` : ""}`,
-    ),
+  entries: (folder?: string, q?: string) => {
+    const params = new URLSearchParams();
+    if (folder && folder !== "all") params.set("folder", folder);
+    if (q?.trim()) params.set("q", q.trim());
+    return call<{ entries: HubEntry[] }>(`/entries${params.size ? `?${params}` : ""}`);
+  },
   entry: (id: string) => call<HubEntryDetail>(eid(id)),
   register: (body: RegisterBody) => post<HubEntry>("/entries", body),
   star: (id: string, on: boolean) => post<{ stars: number; starredByMe: boolean }>(`${eid(id)}/star`, { on }),

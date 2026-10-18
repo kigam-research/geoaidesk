@@ -39,6 +39,8 @@ export interface HubEntry {
   methodId: string;
   slug: string;
   title: string;
+  /** One-line description from the registered draft (older servers may omit it). */
+  tagline?: string;
   summary: string;
   kind: "skill" | "workflow";
   tags: string[];

@@ -1,4 +1,4 @@
-// Byte-identical copy of server/src/agent/bash-classifier.ts (parity-tested); edit the source, then re-copy.
+// Copied from src/agent/bash-classifier.ts; keep in sync.
 /**
  * Raw-data guard: pure classification of file-tool paths and shell commands.
  *
@@ -8,7 +8,7 @@
  *      → hard block, for the lead agent and background specialists alike.
  *   2. Does a recognized mutation target lie outside the sandbox (apart from
  *      temporary folders and /dev/null)? → the lead asks; a child is blocked.
- *   3. Is this shell command DESTRUCTIVE elsewhere (`rm -rf`, `git clean -f`,
+ *   3. Is this shell command DESTRUCTIVE elsewhere (unsafe `rm -rf`, `git clean -f`,
  *      `find … -delete`, …)? → the lead asks the user; a child is blocked.
  *
  * This is a heuristic tokenizer, not a shell parser, and deliberately biased
@@ -265,10 +265,34 @@ const MUTATING = new Set([
   "tee", "mkfifo", "touch", "mkdir",
 ]);
 const ENV_WRAPPERS = new Set(["sudo", "env", "nice", "nohup", "time", "command", "exec"]);
-/** Targets whose recursive removal is routine, not destructive. */
-const BENIGN_RM_TARGETS = [
-  /^(\/tmp|tmp|\.tmp|\.cache|\.venv|venv|node_modules|__pycache__|\.pytest_cache|\.mypy_cache|\.ipynb_checkpoints|dist|build|\.ruff_cache)(\/|$)/,
-];
+/** A literal work subtree must not contain any protected/internal subtree.
+ * Compare segments up to the first wildcard, conservatively: an unknown glob
+ * suffix can still protect a descendant of the removal target. */
+function safeCleanupTarget(token: string, cwd: string, opts: ClassifyOptions): boolean {
+  const value = stripQuotes(token);
+  if (/[\$`*?{}[\]]/.test(value) || value.startsWith("~")) return false;
+  const rel = resolveSandboxPath(token, cwd, opts.sandboxRoot);
+  if (rel === null) {
+    const absolute = resolveTargetPath(token, cwd, opts);
+    return ["/tmp", ...(opts.tempDirs ?? [])].some((dir) => {
+      const tempRel = resolveSandboxPath(absolute, "", dir);
+      return tempRel !== null && tempRel !== "";
+    });
+  }
+  if (!rel) return false;
+  const target = rel.split("/");
+  for (const glob of [...opts.protectedGlobs, ".pi/**", ".kady/**"]) {
+    const segments = (normalizeRel(glob) ?? "").split("/");
+    let disjoint = false;
+    for (let i = 0; i < Math.min(target.length, segments.length); i++) {
+      if (segments[i] === "**") break;
+      const re = new RegExp(`^${escapeSegment(segments[i])}$`, isWindowsRoot(opts.sandboxRoot) ? "i" : "");
+      if (!re.test(target[i])) { disjoint = true; break; }
+    }
+    if (!disjoint) return false;
+  }
+  return true;
+}
 
 function isFlag(token: string): boolean {
   return token.startsWith("-") && token !== "-";
@@ -417,8 +441,7 @@ export function classifyBashCommand(command: string, opts: ClassifyOptions): Bas
     if (cmd === "rm" || cmd === "rmdir" || cmd === "shred" || cmd === "unlink") {
       const recursive = cmd === "rm" && args.some((a) => /^-[a-zA-Z]*[rR]/.test(a) || a === "--recursive");
       const forced = cmd === "rm" && args.some((a) => /^-[a-zA-Z]*f/.test(a) || a === "--force");
-      const targets = pathArgs.map((a) => resolveSandboxPath(a, cwd, opts.sandboxRoot) ?? stripQuotes(a));
-      const benign = targets.length > 0 && targets.every((t) => BENIGN_RM_TARGETS.some((re) => re.test(t)));
+      const benign = pathArgs.length > 0 && pathArgs.every((target) => safeCleanupTarget(target, cwd, opts));
       if (cmd === "shred" || (recursive && (forced || pathArgs.length > 0) && !benign) || (cmd === "rm" && pathArgs.some((a) => /[*?]/.test(a) && !benign))) {
         if (!destructive) destructive = { kind: "destructive", detail: segment.trim() };
       }

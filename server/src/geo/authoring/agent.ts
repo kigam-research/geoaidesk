@@ -310,6 +310,81 @@ export function validateAnalysis(
   return { findings, questions, scope: str(value.scope, 2000), errors, fatal };
 }
 
+/** "(선택)", "(필수)" and similar markers: the screens show the required flag themselves. */
+export function plainLabel(label: string): string {
+  return label
+    .replace(/\s*[(（\[]\s*(선택|필수|선택 사항|optional|required)\s*[)）\]]\s*/gi, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+/** Keys of the questions the hub always asks (when they apply), whatever the model proposes. */
+export const CODE_USE_KEY = "code-use";
+export const TRIAL_SCALE_KEY = "trial-scale";
+/** Workflow choice the draft must carry when the researcher asked for a reduced first-trial setting. */
+export const RUN_SCALE_CHOICE = "run-scale";
+
+/**
+ * Questions the hub asks for every method when they apply (gaid-hub-followups, user direction 2026-10-16: heavy
+ * computation such as variograms must be reducible for a first trial; include the original code when supplied). They are
+ * skipped when already decided or open, or when the model asked the same thing under a similar key.
+ */
+export function standardQuestions(project: AuthoringProject, proposed: Question[], attemptId: string): Question[] {
+  const live = new Set([
+    ...project.decisions.filter((d) => !d.supersededBy).map((d) => d.key),
+    ...project.questions.filter((q) => q.status === "open").map((q) => q.key),
+    ...proposed.map((q) => q.key),
+  ]);
+  const similar = (re: RegExp) => [...live].some((k) => re.test(k));
+  const hasCode = project.sources.some((s) => (project.extractions[s.id]?.files?.length ?? 0) > 0);
+  const base = {
+    revision: 1,
+    answerType: "choice-or-text" as const,
+    materiality: "required" as const,
+    evidence: [],
+    status: "open" as const,
+    attemptId,
+    draftRevision: project.drafts.at(-1)?.revision ?? 0,
+    createdAt: now(),
+  };
+  const out: Question[] = [];
+  if (hasCode && !live.has(CODE_USE_KEY) && !similar(/(^|-)code(-|$)/))
+    out.push({
+      ...base,
+      id: newId("q"),
+      key: CODE_USE_KEY,
+      text: "원본 코드를 방법에 함께 넣을까요?",
+      reason: "코드를 넣으면 에이전트가 원본과 같은 계산을 실행하고, 빼면 절차 설명만 남습니다.",
+      affects: "스킬의 계산 단계",
+      options: [
+        { id: "include", label: "원본 코드 포함", hint: "필요한 코드 파일을 스킬에 넣고 실행 방법을 적습니다." },
+        { id: "describe", label: "절차 설명만", hint: "계산 코드는 넣지 않고 단계와 판단 기준만 적습니다." },
+      ],
+      recommendedOptionId: "include",
+      recommendedWhy: "올린 자료에 원본 코드가 있어 같은 계산을 다시 실행할 수 있습니다.",
+    });
+  if (!live.has(TRIAL_SCALE_KEY) && !similar(/quick|trial|scale|reduced|run-mode|compute/))
+    out.push({
+      ...base,
+      id: newId("q"),
+      key: TRIAL_SCALE_KEY,
+      text: "빠른 첫 시험용 줄인 설정을 함께 만들까요?",
+      reason: "무거운 계산을 줄이면 첫 시험이 몇 분 안에 끝나지만, 그 결과는 흐름 확인용입니다.",
+      affects: "시작 설정과 계산 단계",
+      options: [
+        {
+          id: "quick-and-full",
+          label: "줄인 설정 포함",
+          hint: "표본 수·반복 횟수·탐색을 줄인 설정으로 먼저 시험하고, 전체 설정도 고를 수 있습니다.",
+        },
+        { id: "full-only", label: "전체 설정만", hint: "원본 연구와 같은 규모로만 실행합니다." },
+      ],
+      recommendedOptionId: "quick-and-full",
+      recommendedWhy: "새 자료에서는 짧은 시험으로 흐름을 먼저 확인해야 긴 계산을 헛되이 돌리지 않습니다.",
+    });
+  return out;
+}
+
 // ------------------------------------------------------------------------------------------------
 // Draft
 
@@ -539,7 +614,7 @@ export function validateDraft(
       }
       return {
         id: uniqueId(x.id, `inputs[${i}]`),
-        label: loc(str(x.label, 200) || str(x.id, 64)),
+        label: loc(plainLabel(str(x.label, 200)) || str(x.id, 64)),
         semanticType,
         formats: [
           ...new Set(
@@ -746,7 +821,7 @@ export function validateDraft(
         if (!f.length) errors.push(`workflow.inputRoles[${i}].formats needs at least one format id`);
         return {
           id: uniqueId(x.id, `workflow.inputRoles[${i}]`),
-          label: loc(str(x.label, 200)),
+          label: loc(plainLabel(str(x.label, 200))),
           formats: f,
           required: x.required !== false,
         };
@@ -796,14 +871,38 @@ export function validateDraft(
     const keys = new Set(choices.map((c) => c.id));
     const r = isObj(value.recipe) ? value.recipe : {};
     const answered: Record<string, string | number | boolean> = {};
+    // A start-setting default needs a researcher decision behind it: a paper value or the model's own suggestion stays
+    // open ("작업 중 결정"), so the start settings follow what the researcher said rather than the study's values.
+    const decisions = new Map(
+      project.decisions.filter((d) => !d.supersededBy && d.status === "answered").map((d) => [d.key, d]),
+    );
+    let unbacked = 0;
     if (isObj(r.choices))
-      for (const [k, val] of Object.entries(r.choices)) {
+      for (const [k, raw] of Object.entries(r.choices)) {
         if (!keys.has(k)) {
           errors.push(`recipe.choices "${k}" is not a requiredScientificChoices id`);
           continue;
         }
-        if (["string", "number", "boolean"].includes(typeof val)) answered[k] = val as string | number | boolean;
+        const val = isObj(raw) ? raw.value : raw;
+        const basis = isObj(raw) ? str(raw.decision, 48) : "";
+        if (!["string", "number", "boolean"].includes(typeof val)) continue;
+        const opts = choices.find((c) => c.id === k)?.options;
+        if (!basis || !decisions.has(basis) || (opts && !opts.includes(String(val)))) {
+          unbacked++;
+          continue;
+        }
+        answered[k] = val as string | number | boolean;
       }
+    if (unbacked) notes.push(`연구자 답이 뒷받침하지 않는 시작 설정 기본값 ${unbacked}개는 작업 중 결정으로 두었습니다.`);
+    // The researcher asked for a reduced first-trial setting: the Workflow carries a run-scale choice, set to quick.
+    if (decisions.get(TRIAL_SCALE_KEY)?.optionId === "quick-and-full") {
+      const scale = choices.find((c) => c.id === RUN_SCALE_CHOICE);
+      if (!scale || !scale.options?.includes("quick") || !scale.options.includes("full"))
+        errors.push(
+          `the researcher asked for a reduced first-trial setting: add workflow.requiredScientificChoices "${RUN_SCALE_CHOICE}" with options {"id": "quick", "label": "빠른 시험"} and {"id": "full", "label": "전체 설정"}, and describe both in SKILL.md`,
+        );
+      else answered[RUN_SCALE_CHOICE] = "quick";
+    }
     const unresolved = [...keys].filter((k) => !(k in answered));
     recipe = { choices: answered, unresolvedChoices: unresolved };
   } else if (value.workflow !== null && value.workflow !== undefined) errors.push("workflow must be an object or null");
@@ -860,15 +959,57 @@ type CandidateDraft = NonNullable<ReturnType<typeof validateDraft>["draft"]>;
  * Declare the third-party imports of the supplied code files that the draft includes. The import scan is
  * deterministic, so the server records these instead of asking the model to remember them.
  */
-export function declareImports(draft: CandidateDraft, ctx: SourceContext) {
-  const files: PackageFile[] = draft.codeFiles.map((c) => ({
-    path: c.path,
-    sha256: "",
-    size: 0,
-    text: ctx.files.get(c.sourceId)?.get(c.sourcePath),
-  }));
+export function declareImports(draft: CandidateDraft, ctx: SourceContext, project?: AuthoringProject) {
+  const asFiles = (): PackageFile[] =>
+    draft.codeFiles.map((c) => ({
+      path: c.path,
+      sha256: "",
+      size: 0,
+      text: ctx.files.get(c.sourceId)?.get(c.sourcePath),
+    }));
+  let files = asFiles();
   if (!files.some((f) => f.path.endsWith(".py"))) return;
   const declared = withBundled((draft.profile.dependencies ?? []).map((d) => distributionOf(d.name)));
+  // A module the included code imports that exists in the supplied code (a sibling script or package) is copied in,
+  // never declared as a PyPI distribution (gaid-hub-followups: r1324_r22_analysis became a "dependency").
+  if (project) {
+    const included: string[] = [];
+    for (let round = 0; round < 5; round++) {
+      // Not filtered by the declared list: an earlier draft may have declared the local module as a distribution.
+      const missing = pythonImports(files, pythonStdlib());
+      let added = 0;
+      for (const module of missing)
+        for (const sourceId of new Set(draft.codeFiles.map((c) => c.sourceId))) {
+          const tree = ctx.files.get(sourceId);
+          if (!tree) continue;
+          const paths = [...tree.keys()].filter(
+            (p) => p.endsWith(".py") && (p === `${module}.py` || p.endsWith(`/${module}.py`) || p.split("/").slice(0, -1).includes(module)),
+          );
+          if (!paths.length) continue;
+          for (const sourcePath of paths) {
+            const path = `${codeRoot(project, sourceId)}/${sourcePath}`;
+            if (draft.codeFiles.some((c) => c.path === path) || !safeRelative(path)) continue;
+            draft.codeFiles.push({ path, sourceId, sourcePath });
+            included.push(sourcePath);
+            added++;
+          }
+          break;
+        }
+      if (!added) break;
+      files = asFiles();
+    }
+    // Every module the skill now carries (included by the model or here) is local, not a distribution.
+    const local = new Set<string>();
+    for (const c of draft.codeFiles) {
+      const parts = c.sourcePath.split("/");
+      if (c.sourcePath.endsWith(".py")) local.add(distributionOf(parts.at(-1)!.replace(/\.py$/, "")));
+      for (const dir of parts.slice(0, -1)) local.add(distributionOf(dir));
+    }
+    if (draft.profile.dependencies)
+      draft.profile.dependencies = draft.profile.dependencies.filter((d) => !local.has(distributionOf(d.name)));
+    if (included.length)
+      draft.notes.push(`포함한 코드가 불러오는 같은 자료 안의 파일 ${included.length}개를 함께 넣었습니다: ${included.slice(0, 5).join(", ")}`);
+  }
   const modules = pythonImports(files, pythonStdlib()).filter((m) => !declared.has(distributionOf(m)));
   const names = [...new Set(modules.map(distributionOf))];
   // A distribution installed with another needed one (joblib with scikit-learn) is not declared separately.
@@ -1077,7 +1218,7 @@ async function execute(
         result = { ok: !!d.draft, errors: d.errors, draft: d.draft };
         // Run the package checks on the candidate so the bounded repair can fix what packaging would refuse.
         if (d.draft) {
-          declareImports(d.draft, ctx);
+          declareImports(d.draft, ctx, project);
           result.errors = [...result.errors, ...(await packageErrors(store, project, d.draft, deps))];
         }
       }
@@ -1124,7 +1265,8 @@ async function execute(
         p.findings = analysis!.findings;
         const decided = new Set(p.decisions.filter((d) => !d.supersededBy).map((d) => d.key));
         const open = new Set(p.questions.filter((q) => q.status === "open").map((q) => q.key));
-        for (const q of analysis!.questions) if (!decided.has(q.key) && !open.has(q.key)) p.questions.push(q);
+        const fresh = analysis!.questions.filter((q) => !decided.has(q.key) && !open.has(q.key));
+        p.questions.push(...fresh, ...standardQuestions(p, fresh, attempt.id));
         a.result = {
           findings: analysis!.findings.length,
           questions: analysis!.questions.length,

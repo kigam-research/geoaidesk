@@ -41,9 +41,17 @@ export function methodRows(methods: LocalMethodSummary[], select: (method: Local
       badges: <>{recipe && <span className={pill}>{t("methods.recipe")}</span>}<MethodBadges method={method} workflow={workflow} /></>,
       onSelect: () => select(method, workflow, recipe),
     });
+    // A Workflow with a single 레시피 is one row that opens with that 레시피's start settings: two rows of the same name,
+    // one without the researcher's defaults, misled the re-trial researcher (gaid-hub-followups).
+    const single = (workflow: LocalMethodWorkflow) => {
+      const own = method.recipes.filter((recipe) => recipe.workflowId === workflow.id);
+      return own.length === 1 ? own[0] : undefined;
+    };
     return [
-      ...method.workflows.map((workflow) => row(`workflow:${workflow.id}`, text(workflow.title), workflow)),
-      ...method.recipes.map((recipe) => row(`recipe:${recipe.id}`, text(recipe.title), method.workflows.find((w) => w.id === recipe.workflowId), recipe)),
+      ...method.workflows.map((workflow) => row(`workflow:${workflow.id}`, text(workflow.title), workflow, single(workflow))),
+      ...method.recipes
+        .filter((recipe) => { const workflow = method.workflows.find((w) => w.id === recipe.workflowId); return !workflow || single(workflow) !== recipe; })
+        .map((recipe) => row(`recipe:${recipe.id}`, text(recipe.title), method.workflows.find((w) => w.id === recipe.workflowId), recipe)),
       ...(method.workflows.length === 0 ? [row("detail", text(method.title))] : []),
     ];
   });
@@ -207,7 +215,9 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>
       <p>{expected.files.length === 0 ? t("methods.trials.notDeclared")
-        : t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") })}</p>
+        : expected.found.length ? t("methods.trials.found", { files: expected.found.join(", ") })
+        : expected.foundElsewhere?.length ? t("methods.trials.elsewhere", { files: expected.foundElsewhere.join(", "), expected: expected.files.join(", ") })
+        : t("methods.trials.missing", { files: expected.files.join(", ") })}</p>
     </div>)}
     <TrialAssessment trial={trial} projectId={projectId} />
   </article>;

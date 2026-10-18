@@ -175,7 +175,7 @@ describe("GAID hub packages", () => {
       expect(manifest.provenance.hub.url).toBe(LOCAL_HUB_URL);
       expect(manifest.recipes[0]).toMatchObject({
         workflowId: "pu-nested-cv-method",
-        unresolvedChoices: ["label-def"],
+        unresolvedChoices: ["block-size", "label-def"],
       });
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -255,6 +255,17 @@ describe("GAID hub packages", () => {
         origin: { kind: "gaid-hub" },
       });
       // Installing the same revision again replaces the GAID-hub copy.
+      await installPackage(
+        store,
+        await store.read(projectId),
+        built.record,
+        { projectId: target.id, acknowledged: true },
+        { agentDir },
+      );
+      // Bytecode caches left by a trial run are not edits: the reinstall still replaces the copy.
+      const cache = path.join(projectSkillRoot(paths).skillsDir, "pu-nested-cv-method", "__pycache__");
+      fs.mkdirSync(cache, { recursive: true });
+      fs.writeFileSync(path.join(cache, "run.cpython-312.pyc"), "c");
       await installPackage(
         store,
         await store.read(projectId),

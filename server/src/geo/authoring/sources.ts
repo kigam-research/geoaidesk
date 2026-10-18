@@ -74,6 +74,8 @@ function kindOf(body: AddSourceBody, bytes: Uint8Array): SourceKind {
     Buffer.from(bytes.subarray(0, 5)).toString("latin1") === "%PDF-"
   )
     return "pdf";
+  // The chat's analysis bundle (server/src/geo/hub-handoff/builder.ts names it gaid-analysis-<session>-<date>.tar.gz).
+  if (/^gaid-analysis-[a-z0-9-]+\.tar\.gz$/.test(name)) return "gaid-analysis";
   if (/\.(zip|tar\.gz|tgz)$/.test(name)) return "code";
   // A single script or notebook is code too, so a draft may include it (packaging accepts code sources only).
   if (/\.(py|r|m|jl|js|ts|ipynb|sh)$/.test(name)) return "code";

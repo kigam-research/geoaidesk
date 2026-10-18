@@ -22,6 +22,7 @@ import { taxonomyFormat } from "../workspace/formats.ts";
 import { checkRecipe } from "../workspace/recipes.ts";
 import { deleteSavedRecipe, listSavedRecipes, saveRecipe, SavedRecipeError } from "../workspace/saved-recipes.ts";
 import { suggestWorkflows } from "../workspace/suggestions.ts";
+import { listLocalMethods } from "../methods/local-methods.ts";
 import { listWorkflows } from "../workspace/workflows.ts";
 
 export interface GeoWorkspaceRouteOptions {
@@ -76,7 +77,6 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
       if (err instanceof SandboxError) return reply.code(err.statusCode).send({ detail: err.message });
       throw err;
     }
-    if (!catalogue) return { path: rel, format: null, suggestions: [] };
     let inspection: GeoInspection | null = null;
     try {
       inspection = await inspect(rel);
@@ -85,8 +85,30 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
     }
     const format = taxonomyFormat(rel, inspection?.asset.format);
     if (!format) return { path: rel, format: null, suggestions: [] };
-    const workflows = await listWorkflows(pathsOf(), catalogue, service);
-    return { path: rel, format, suggestions: suggestWorkflows(format, inspection, workflows) };
+    const [workflows, methods] = await Promise.all([
+      catalogue ? listWorkflows(pathsOf(), catalogue, service) : [],
+      listLocalMethods(pathsOf(), catalogue, service),
+    ]);
+    // Pi resolves project methods before global methods of the same name.
+    const seen = new Set<string>();
+    const enabled = methods.filter((method) => {
+      if (seen.has(method.runtimeName)) return false;
+      seen.add(method.runtimeName);
+      return method.enabled;
+    });
+    const local = enabled.flatMap((method) => method.workflows);
+    // A method Workflow with a single 레시피 starts from it, as in the Workflow panel (gaid-hub-followups).
+    const setups = new Map(enabled.flatMap((method) => method.workflows.flatMap((workflow) => {
+      const own = method.recipes.filter((recipe) => recipe.workflowId === workflow.id);
+      if (own.length !== 1) return [];
+      const choices = Object.fromEntries(Object.entries(own[0].choices).map(([id, value]) => [id, String(value)]));
+      return [[workflow.exposure, { workflowId: workflow.id, choices, unresolvedChoices: own[0].unresolvedChoices, skillIds: workflow.skillIds, exampleId: null }] as const];
+    })));
+    const suggestions = suggestWorkflows(format, inspection, [...local, ...workflows]).map((suggestion) => {
+      const setup = suggestion.exposure ? setups.get(suggestion.exposure) : undefined;
+      return setup ? { ...suggestion, setup } : suggestion;
+    });
+    return { path: rel, format, suggestions };
   });
 
   app.post("/geo/recipes/check", { bodyLimit: 64 * 1024 }, async (req, reply) => {

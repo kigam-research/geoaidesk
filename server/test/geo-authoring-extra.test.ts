@@ -3,6 +3,7 @@ import { createServer, type Server } from "node:http";
 import { once } from "node:events";
 import Fastify from "fastify";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { plainLabel } from "../src/geo/authoring/agent.ts";
 import { AuthoringError, AuthoringStore } from "../src/geo/authoring/store.ts";
 import { UsageLimitError } from "../src/geo/authoring/codex-images.ts";
 import { addUrlSource, readableHtml, validateSourceUrl } from "../src/geo/authoring/url-sources.ts";
@@ -479,5 +480,14 @@ describe("Concept illustrations", () => {
     });
     expect(urlResponse.statusCode).toBe(200);
     expect(urlResponse.json().source.status).toBe("extracted");
+  });
+});
+
+describe("plain labels", () => {
+  it("drops required/optional markers the screens add themselves", () => {
+    expect(plainLabel("경계 도형 (선택)")).toBe("경계 도형");
+    expect(plainLabel("격자 표(필수) 파일")).toBe("격자 표 파일");
+    expect(plainLabel("Boundary (optional)")).toBe("Boundary");
+    expect(plainLabel("선택 기준 표")).toBe("선택 기준 표");
   });
 });

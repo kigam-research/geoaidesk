@@ -120,9 +120,9 @@
     },
     {
       "path": "server/src/agent/session-registry.ts",
-      "owner": "gaid-runtime",
+      "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode. gaid-hub: one call to registerGeoProviderModels (server/src/geo/providers.ts) after setupModelRuntime."
+      "responsibility": "One call to geoSessionParts (server/src/geo/session.ts): skillsOverride (task exposure) and appendSystemPromptOverride (concise geo guidance, geo mode only) for the resource loader; geo extension factories and custom tools appended to the lead lists gaid-korean-workspace: OpenSessionOptions.geoExposure passed to geoSessionParts as the new chat's exposure mode. gaid-hub: one call to registerGeoProviderModels (server/src/geo/providers.ts) after setupModelRuntime.; gaid-hub-followups: Track lead shell processes and clean up on disposal"
     },
     {
       "path": "server/src/index.ts, server/src/api/sci-helpers.ts",
@@ -138,9 +138,9 @@
     },
     {
       "path": "web/src/components/chat-tab.tsx",
-      "owner": "gaid-korean-workspace",
+      "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -304,9 +304,9 @@
     },
     {
       "path": "web/src/components/tool-activity.tsx",
-      "owner": "gaid-korean-workspace",
+      "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-hub-followups: Running activity elapsed feedback"
     },
     {
       "path": "web/src/components/connect-model-card.tsx",
@@ -517,6 +517,84 @@
       "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Optional expectedDestinationHashes on installStagedSkills: a replacement whose destination changed after the caller's check becomes a conflict (passes the hash to installSkillTree's existing guard); default behaviour unchanged."
+    },
+    {
+      "path": "server/test/geo-hub-shared.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Shared hub browse query/folder filtering and star/recency sorting regression coverage"
+    },
+    {
+      "path": "web/src/components/tool-activity.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Elapsed feedback regression"
+    },
+    {
+      "path": "web/src/lib/use-sandbox.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Cache oversized preview ETags"
+    },
+    {
+      "path": "web/src/lib/use-sandbox-refresh.test.tsx",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Oversized preview refresh regression"
+    },
+    {
+      "path": "server/src/api/sandbox.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Conditional oversized file previews"
+    },
+    {
+      "path": "server/test/sandbox-file-cache.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Oversized preview conditional regression"
+    },
+    {
+      "path": "server/src/agent/bash-classifier.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Allow recursive cleanup of non-protected sandbox work"
+    },
+    {
+      "path": "server/pi-packages/kady-guard/classifier.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Child classifier parity"
+    },
+    {
+      "path": "server/test/bash-classifier.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Sandbox cleanup guard regression"
+    },
+    {
+      "path": "docs/data-guard.md",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Sandbox cleanup policy"
+    },
+    {
+      "path": "server/test/geo-workspace.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Installed method suggestion regression"
+    },
+    {
+      "path": "server/test/geo-session-processes.test.ts",
+      "owner": "gaid-hub",
+      "status": "added",
+      "responsibility": "Detached process abort/dispose regression"
+    },
+    {
+      "path": "server/test/data-guard.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Focused safe-cleanup no-permission test and destructive scenario update"
     }
   ],
   "notTouched": [

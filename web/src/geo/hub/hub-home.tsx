@@ -17,6 +17,9 @@ import {
   WorkflowIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SharedBrowse } from "./shared-browse";
 import { Button } from "@/components/ui/button";
 import type { ProjectSummary } from "@/geo/contracts/authoring";
 import { geoLocale, geoText } from "@/geo/i18n";
@@ -121,6 +124,7 @@ export function HubHome({
   onOpen: (id: string) => void;
   onOpenRecommended?: (id: string) => void;
 }) {
+  const [listTab, setListTab] = useState("browse");
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 overflow-y-auto px-6 py-8">
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -189,6 +193,15 @@ export function HubHome({
         </ul>
       </section>
 
+      <Tabs value={listTab} onValueChange={setListTab} className="gap-4">
+        <TabsList aria-label={text("home.browse.tabs")}>
+          <TabsTrigger value="browse">{text("home.browse.title")}</TabsTrigger>
+          <TabsTrigger value="mine">{text("home.mine")}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="browse" forceMount hidden={listTab !== "browse"} className="data-[state=inactive]:hidden">
+          <SharedBrowse onOpen={(id) => onOpenEntry?.(id)} />
+        </TabsContent>
+        <TabsContent value="mine" forceMount hidden={listTab !== "mine"} className="data-[state=inactive]:hidden">
       <section className="flex min-h-0 flex-col gap-3" aria-labelledby="hub-mine">
         <h2 id="hub-mine" className="text-base font-semibold">
           {text("home.mine")}
@@ -296,6 +309,8 @@ export function HubHome({
           )}
         </div>
       </section>
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }

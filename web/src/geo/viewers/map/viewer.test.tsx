@@ -30,7 +30,8 @@ beforeEach(() => {
 describe("map viewer", () => {
   it("inspects before paging, uses selected GPKG layer, bounds and explicit project scope", async () => {
     render(<MapViewer {...props} />);
-    await screen.findByRole("heading", { name: "Viewport attribute table" });
+    // The heading follows an inspect and a page request; under a full parallel suite this takes over the 1 s default.
+    await screen.findByRole("heading", { name: "Viewport attribute table" }, { timeout: 10_000 });
     // The whole layer is tried first; a truncated answer switches to viewport pages.
     // Wait for both requests: under load the heading can render before the second page request.
     await waitFor(() => expect(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").length).toBeGreaterThanOrEqual(2));

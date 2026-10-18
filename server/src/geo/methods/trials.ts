@@ -12,7 +12,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ProjectPaths } from "../../projects.ts";
 import { globalSkillRoot, projectSkillRoot } from "../../agent/skills.ts";
-import { getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
+import { getSkillProvenance } from "../../agent/skills-sync.ts";
+import { methodTreeHash } from "./tree-hash.ts";
 import { PROVENANCE_SCHEMA_VERSION, USER_SESSION_ID, type ProvenanceStep } from "../../provenance/store.ts";
 import type { MethodTrial, MethodTrialExpected, MethodTrialFile } from "../../../../web/src/geo/contracts/methods.ts";
 import { geoStateDir } from "../context.ts";
@@ -100,7 +101,7 @@ export function recordMethodTrial(paths: ProjectPaths, sessionId: string, mode: 
     methodId: parsed.methodId,
     revision: parsed.revision,
     packageSha256: origin.packageSha256 ?? null,
-    treeHash: hashDirectory(method.dir),
+    treeHash: methodTreeHash(method.dir),
     startedAt: now.toISOString(),
     expected: artifacts.map((artifact) => ({
       id: artifact.id,
@@ -118,6 +119,19 @@ function matches(pattern: string, filePath: string): boolean {
   const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*");
   const target = pattern.includes("/") ? filePath : filePath.split("/").pop() ?? filePath;
   return new RegExp(`^${escaped}$`).test(target) || (pattern.includes("/") && new RegExp(`(^|/)${escaped}$`).test(filePath));
+}
+
+/**
+ * Session outputs that match an artifact's declared names. When none matches exactly, a file with a declared name in
+ * another folder (results/ instead of outputs/) is reported as `foundElsewhere` (gaid-hub trial).
+ */
+export function matchArtifact(patterns: string[], files: string[]): { found: string[]; foundElsewhere?: string[] } {
+  const found = files.filter((file) => patterns.some((pattern) => matches(pattern, file))).slice(0, 50);
+  if (found.length) return { found };
+  const elsewhere = files
+    .filter((file) => patterns.some((pattern) => pattern.includes("/") && matches(pattern.split("/").pop()!, file)))
+    .slice(0, 50);
+  return elsewhere.length ? { found, foundElsewhere: elsewhere } : { found };
 }
 
 /** The session's provenance rows (same file and row rules as provenance/store.ts readSteps). */
@@ -174,17 +188,14 @@ function observe(paths: ProjectPaths, record: StoredTrial): Pick<MethodTrial, "o
       degradedSteps: degraded,
       lastStepAt: last ? new Date(last).toISOString() : null,
     },
-    expected: record.expected.map((artifact) => ({
-      ...artifact,
-      found: [...outputs.keys()].filter((file) => artifact.files.some((pattern) => matches(pattern, file))).slice(0, 50),
-    })),
+    expected: record.expected.map((artifact) => ({ ...artifact, ...matchArtifact(artifact.files, [...outputs.keys()]) })),
   };
 }
 
 function view(paths: ProjectPaths, record: StoredTrial): MethodTrial {
   const { schemaVersion: _schema, ...rest } = record;
   const method = findInstalledMethod(paths, record.runtimeName);
-  const methodChanged = !method || hashDirectory(method.dir) !== record.treeHash;
+  const methodChanged = !method || methodTreeHash(method.dir) !== record.treeHash;
   return { ...rest, ...observe(paths, record), methodChanged };
 }
 

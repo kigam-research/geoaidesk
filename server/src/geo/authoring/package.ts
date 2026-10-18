@@ -259,12 +259,14 @@ const PLAIN: Record<string, string> = {
   "personal-path": "개인 PC의 경로가 들어 있습니다.",
   "undeclared-dependency": "코드가 쓰는 Python 패키지가 의존성 목록에 없습니다.",
   "environment-package": "실행 환경에 없는 패키지의 설치 방법이 스킬 설명에 없습니다.",
+  "environment-package-install": "실행 환경에 없는 패키지가 있어, 실행할 때 스킬 설명의 방법으로 설치합니다.",
   environment: "실행 환경 이름이 카탈로그에 없습니다.",
   "taxonomy-unknown": "분류 용어에 없는 값이 있습니다.",
   "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
   "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
   "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
   "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",
+  "artifact-file": "예상 결과 파일 이름이 스킬 설명에 없어 시험 결과와 맞춰 보지 못할 수 있습니다.",
   "unverified-claim": "시험·발행·기관 보증을 확인하지 않은 표현이 있습니다.",
   "draft-note": "서버가 모델 제안을 고친 내용입니다.",
   "catalogue-name": "카탈로그 스킬과 이름이 같습니다.",
@@ -457,7 +459,7 @@ export async function checkMethod(
         const mentioned = skillText.includes(name) || skillText.includes(distributionOf(name));
         find(
           "workflow",
-          "environment-package",
+          mentioned ? "environment-package-install" : "environment-package",
           "atlas.yaml#dependencies",
           mentioned
             ? `${w.environmentProfile} 환경에 없는 패키지입니다: ${dep.name}. 실행 전에 SKILL.md의 설치 방법을 따라야 합니다.`
@@ -473,6 +475,12 @@ export async function checkMethod(
     for (const discipline of w.disciplines ?? [])
       if (!v.taxonomy.disciplines.some((t) => t.id === discipline))
         find("workflow", "workflow-discipline", "workflow/disciplines", `분류에 없는 분야입니다: ${discipline}`);
+    // GAID matches a trial's outputs to these names, so the skill must tell the agent to write exactly them.
+    const docs = [skill, ...files.filter((f) => f.path.startsWith("references/")).map((f) => f.content)].join("\n");
+    for (const a of w.expectedArtifacts ?? [])
+      for (const name of a.files ?? [])
+        if (!name.includes("*") && !docs.includes(name))
+          find("workflow", "artifact-file", `workflow/expectedArtifacts/${a.id}`, `스킬 문서에 없는 결과 파일 이름입니다: ${name}`, "warning");
     for (const a of w.expectedArtifacts ?? []) {
       if (a.skill && a.skill !== `local:${draft.slug}`) {
         if (!v.catalogueIds.has(a.skill))

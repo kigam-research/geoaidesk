@@ -32,6 +32,33 @@
       "make": "Build from papers and code",
       "register": "Register in the hub",
       "feedback": "Get stars and comments"
+    },
+    "browse": {
+      "title": "Methods registered in the hub",
+      "tabs": "Method lists",
+      "all": "All",
+      "folders": "Registered method topic folders",
+      "search": {
+        "label": "Search registered methods",
+        "placeholder": "Search title, tagline, author or taxonomy"
+      },
+      "order": "Most stars · Newest registration",
+      "count": "{count} methods",
+      "loading": "Reading registered methods.",
+      "error": "Could not read registered methods. Reload the list.",
+      "retry": {
+        "button": "Reload list"
+      },
+      "noResults": "No methods match. Change the search term or folder.",
+      "empty": "No methods are registered. Browse recommended Workflows.",
+      "reset": {
+        "button": "View all methods"
+      },
+      "recommended": {
+        "action": "View recommended Workflows"
+      },
+      "open": "Open {title}",
+      "stars": "{count} stars"
     }
   },
   "stage": {

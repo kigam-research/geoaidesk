@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GeoChatActions } from "../workspace/chat-actions";
 import { setGeoLocaleSetting } from "../i18n";
 import type { HandoffPreview } from "./client";
+import { plainMarkdown } from "./dialog";
 
 const { apiFetch, saveDownload } = vi.hoisted(() => ({ apiFetch: vi.fn(), saveDownload: vi.fn() }));
 vi.mock("@/lib/projects", () => ({ apiFetch }));
@@ -23,12 +24,13 @@ beforeEach(() => {
   apiFetch.mockReset().mockImplementation(async (path: string) => {
     if (path === "/geo/hub/handoff/preview") return json(preview);
     if (path === "/geo/skill-hub") return json({ sites });
+    if (path === "/geo/authoring/handoffs") return json({ projectId: "ap-12345678-abc" }, 201);
     if (path === "/geo/hub/handoff/send") return json({ projectId: "draft-1", url: "http://localhost:54321/#/author/draft-1" }, 201);
     if (path === "/geo/hub/handoff") return new Response("gzip bytes", { headers: { "Content-Type": "application/gzip", "Content-Disposition": 'attachment; filename="gaid-analysis-12345678-20261015.tar.gz"' } });
     throw new Error(`Unexpected request: ${path}`);
   });
 });
-const action = "방금 한 분석을 skill_hub 초안으로 보내기";
+const action = "방금 한 분석을 GAID 허브 초안으로 보내기";
 async function open() {
   await userEvent.click(screen.getByRole("button", { name: action }));
   const dialog = await screen.findByRole("dialog");
@@ -59,7 +61,7 @@ describe("hub analysis handoff", () => {
     await waitFor(() => expect(saveDownload).toHaveBeenCalledOnce());
     expect(apiFetch).toHaveBeenCalledWith("/geo/hub/handoff", expect.objectContaining({ method: "POST", body: JSON.stringify({ sessionId: "s1", files: ["analysis.py", "user_data/raw.csv"], note: "Workflow draft" }) }), "p1");
     expect(saveDownload.mock.calls[0][1]).toBe("gaid-analysis-12345678-20261015.tar.gz");
-    expect(dialog.getByRole("link", { name: "skill_hub에서 초안 시작하기" })).toHaveAttribute("href", "https://example.test/hub/#/author/new?from=gaid");
+    expect(dialog.getByRole("link", { name: "외부 허브에서 초안 시작하기" })).toHaveAttribute("href", "https://example.test/hub/#/author/new?from=gaid");
     expect(dialog.getByRole("link")).toHaveAttribute("target", "_blank");
     expect(dialog.getByText(/묶음을 첨부하세요/)).toBeInTheDocument();
     expect(apiFetch.mock.calls.every(([path]) => !path.startsWith("/skills"))).toBe(true);
@@ -98,16 +100,16 @@ describe("hub analysis handoff", () => {
     preview.files = []; sites = [];
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); const dialog = await open();
     expect(dialog.getByText(/요청과 답변만 다운로드할 수 있습니다/)).toBeInTheDocument();
-    expect(dialog.getByText(/사이트가 설정되지 않았습니다/)).toBeInTheDocument();
+    expect(dialog.queryByText(/외부 허브/)).not.toBeInTheDocument();
     await userEvent.click(dialog.getByRole("button", { name: "분석 묶음 다운로드" }));
     await waitFor(() => expect(saveDownload).toHaveBeenCalledOnce()); expect(dialog.queryByRole("link")).not.toBeInTheDocument();
   });
   it("renders English Workflow wording and truncation notice", async () => {
     setGeoLocaleSetting("en"); preview.truncated.finalAnswer = true;
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
-    await userEvent.click(screen.getByRole("button", { name: "Send the analysis just done to a skill_hub draft" }));
+    await userEvent.click(screen.getByRole("button", { name: "Send the analysis just done to a GAID hub draft" }));
     expect(await screen.findByText(/Long text or per-file step lists were truncated/)).toBeInTheDocument();
-    expect(screen.getByText(/material for a skill or Workflow draft/)).toBeInTheDocument();
+    expect(screen.getByText(/material for a new method draft/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download analysis bundle" })).toBeEnabled();
   });
   it("shows direct send only for loopback authoring sites and opens the confirmed draft", async () => {
@@ -115,10 +117,10 @@ describe("hub analysis handoff", () => {
     const openTab = vi.spyOn(window, "open").mockReturnValue(null);
     try {
       render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); const dialog = await open();
-      await userEvent.click(dialog.getByRole("button", { name: "로컬 skill_hub에 초안 전달" }));
-      expect(await dialog.findByText(/로컬 skill_hub에 직접 전달했습니다/)).toBeInTheDocument();
+      await userEvent.click(dialog.getByRole("button", { name: "외부 허브에 초안 전달" }));
+      expect(await dialog.findByText(/외부 허브에 직접 전달했습니다/)).toBeInTheDocument();
       expect(openTab).toHaveBeenCalledWith("http://localhost:54321/#/author/draft-1", "_blank", "noopener,noreferrer");
-      expect(dialog.getByRole("link", { name: "전달한 skill_hub 초안 열기" })).toHaveAttribute("href", "http://localhost:54321/#/author/draft-1");
+      expect(dialog.getByRole("link", { name: "전달한 외부 허브 초안 열기" })).toHaveAttribute("href", "http://localhost:54321/#/author/draft-1");
       expect(saveDownload).not.toHaveBeenCalled();
       expect(apiFetch).toHaveBeenCalledWith("/geo/hub/handoff/send", expect.objectContaining({ body: JSON.stringify({ sessionId: "s1", files: ["analysis.py", "plot.png"], note: "", siteId: "local-test" }) }), "p1");
       await userEvent.click(dialog.getByRole("checkbox", { name: /analysis.py/ }));
@@ -130,14 +132,30 @@ describe("hub analysis handoff", () => {
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); const dialog = await open();
     if (cause === "network-error") apiFetch.mockRejectedValueOnce(new Error("network"));
     else apiFetch.mockResolvedValueOnce(new Response("gzip", { headers: { "Content-Type": "application/gzip" } }));
-    await userEvent.click(dialog.getByRole("button", { name: "로컬 skill_hub에 초안 전달" }));
+    await userEvent.click(dialog.getByRole("button", { name: "외부 허브에 초안 전달" }));
     expect(await dialog.findByText(/다운로드 경로로 전환했습니다/)).toBeInTheDocument();
     expect(saveDownload).toHaveBeenCalledOnce();
-    expect(dialog.getByRole("link", { name: "skill_hub에서 초안 시작하기" })).toHaveAttribute("href", "http://localhost:54321/#/author/new?from=gaid");
+    expect(dialog.getByRole("link", { name: "외부 허브에서 초안 시작하기" })).toHaveAttribute("href", "http://localhost:54321/#/author/new?from=gaid");
   });
   it("does not offer direct send for a public hub even with an authoring path", async () => {
     sites[0].authoring = "api/gaid/";
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />); const dialog = await open();
-    expect(dialog.queryByRole("button", { name: "로컬 skill_hub에 초안 전달" })).not.toBeInTheDocument();
+    expect(dialog.queryByRole("button", { name: "외부 허브에 초안 전달" })).not.toBeInTheDocument();
+  });
+  it("sends the chosen files to a new GAID hub draft and opens it in the hub", async () => {
+    render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
+    const dialog = await open();
+    fireEvent.change(dialog.getByRole("textbox"), { target: { value: "격자 분석 방법" } });
+    await userEvent.click(dialog.getByRole("button", { name: "허브 초안으로 보내기" }));
+    expect(await dialog.findByText("GAID 허브에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.")).toBeInTheDocument();
+    const call = apiFetch.mock.calls.find(([path]) => path === "/geo/authoring/handoffs")!;
+    expect(JSON.parse(call[1].body)).toEqual({ sessionId: "s1", files: ["analysis.py", "plot.png"], note: "격자 분석 방법" });
+    expect(dialog.getByRole("button", { name: "허브 초안으로 보내기" })).toBeDisabled();
+    await userEvent.click(dialog.getByRole("button", { name: "허브 초안 열기" }));
+    expect(window.location.hash).toBe("#hub/ap-12345678-abc");
+    expect(saveDownload).not.toHaveBeenCalled();
+  });
+  it("shows the final answer without Markdown markers", () => {
+    expect(plainMarkdown("## 최종 보고\n- **블록 크기**: `50 km` ([그림](outputs/v.png))")).toBe("최종 보고\n• 블록 크기: 50 km (그림)");
   });
 });

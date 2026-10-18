@@ -368,7 +368,7 @@ export function useSandbox(
           ? filesText("use_sandbox.error_this_file_exceeds_the_preview_size_limit_8_mb_for_csv_512_kb_for_other_text_use_download_to_access_the_complete_file")
           : filesText("use_sandbox.read_error", { status: res.status, detail: res.statusText });
         if (!isCurrent() || controller.signal.aborted) return;
-        const nextEtag = res.ok ? res.headers.get("etag") : null;
+        const nextEtag = res.ok || res.status === 413 ? res.headers.get("etag") : null;
         if (nextEtag) fileEtags.current.set(path, nextEtag);
         else fileEtags.current.delete(path);
         update(content);

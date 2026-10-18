@@ -8,6 +8,20 @@ const text = (body: string, etag = 'W/"one"') => new Response(body, { headers: {
 beforeEach(() => fetchMock.mockReset());
 
 describe("conditional sandbox refresh", () => {
+  it("keeps the too-large message and validator until the CSV changes", async () => {
+    fetchMock.mockResolvedValueOnce(new Response("too large", { status: 413, headers: { ETag: 'W/"large"' } }));
+    const { result } = renderHook(() => useSandbox(false, "test"));
+    await act(() => result.current.selectFile("large.csv"));
+    const tabs = result.current.tabs;
+    expect(tabs[0].content).toMatch(/preview size limit/);
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 304 }));
+    await act(() => result.current.refreshOpenTabs());
+    expect(fetchMock.mock.calls.at(-1)?.[1].headers).toEqual({ "If-None-Match": 'W/"large"' });
+    expect(result.current.tabs).toBe(tabs);
+    fetchMock.mockResolvedValueOnce(text("now small"));
+    await act(() => result.current.refreshOpenTabs());
+    expect(result.current.tabs[0].content).toBe("now small");
+  });
   it("uses validators and preserves tab identity for 304 and equal content", async () => {
     fetchMock.mockResolvedValueOnce(text("original"));
     const { result } = renderHook(() => useSandbox(false, "test"));

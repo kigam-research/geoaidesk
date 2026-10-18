@@ -62,6 +62,12 @@ function install(options: Parameters<typeof makeDataGuardExtension>[3] = {}) {
 const call = (toolName: string, input: Record<string, unknown>) => ({ type: "tool_call", toolCallId: "tc1", toolName, input });
 
 describe("data guard tool_call hook", () => {
+  it("does not pause a trial cleaning only its non-protected work", async () => {
+    const request = vi.fn(async () => "allowed" as const);
+    const hook = install({ request });
+    expect(await hook(call("bash", { command: "cd derived/mpm_run && rm -rf outputs/folds && echo ok" }))).toBeUndefined();
+    expect(request).not.toHaveBeenCalled();
+  });
   it("blocks write/edit/bash mutations under protected paths with an actionable reason", async () => {
     const hook = install();
     const sandbox = resolvePaths(projectId).sandbox;
@@ -138,7 +144,7 @@ describe("data guard tool_call hook", () => {
     for (const outcome of outcomes) request.mockResolvedValueOnce(outcome);
     const hook = install({ request: request as never });
     const results = [];
-    for (const _ of outcomes) results.push(await hook(call("bash", { command: "rm -rf results && echo ok" })));
+    for (const _ of outcomes) results.push(await hook(call("bash", { command: "rm -rf .kady && echo ok" })));
     expect(results[0]).toBeUndefined();
     expect(results[1]).toMatchObject({ block: true, terminate: false });
     expect(results[1]!.reason).toMatch(/declined/);
@@ -150,7 +156,7 @@ describe("data guard tool_call hook", () => {
       toolName: "bash",
       kind: "destructive",
       path: undefined,
-      command: "rm -rf results && echo ok",
+      command: "rm -rf .kady && echo ok",
       reason: expect.stringMatching(/Destructive shell command/),
     });
   });
