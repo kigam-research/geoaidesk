@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T07:41:58Z
+updated: 2026-10-18T07:57:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20c56c1e-1c40-4e4b-91a7-71f36f7eb67c","pid":1512234,"provider":"claude","session":"2cbf721c-43fd-4509-a2a4-c3d7f0dba0b8","start":"19721847","token":"f4f562224bbbdb6fbb1d4221f0ac42ff23998b39dd15d754d0d1787ba50a9aea"}
 branch: task/gaid-system-ui
 target: main
@@ -33,11 +33,29 @@ Scope confirmed with the user (option 가)):
 Outside check: no outside check (UI work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Plan settled (2026-10-18). Target design: the approved mockup of gaid-ui-guide
+  (reports/2026-10-16-gaid-ui-guide/figures/01-setup-after*.png, docs/design/mockups/setup.html).
+- Isolated runtime for screenshots: `systemd-run --user --unit gsu-runtime ... ~/data/geoaidesk/work/gaid-system-ui/bin/run.sh`
+  (UI 127.0.0.1:3361, API 18361, data home ~/data/geoaidesk/work/gaid-system-ui/home, samples copied from ~/.geoaidesk).
+  Stop: `systemctl --user stop gsu-runtime`. Before shots: ~/data/geoaidesk/work/gaid-system-ui/shots/before-*.
+- web/ and server/ have their own `npm ci` node_modules (no symlinks to ~/deploy).
 ## Next steps
-1. (the next session's first action)
+1. Rebuild TaskSetup as a stepper (package A below), screenshots, then audit (package B).
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: the popup (A) and the audit fixes (B) share workspace locales and readiness.tsx; both are done by
+  this writer sequentially (A then B). No child writers: the work is tightly coupled and moderate in size.
+- A. Start-settings popup (`web/src/geo/workspace/task-setup.tsx`, new `setup-steps.tsx`, `readiness.tsx`,
+  `web/src/geo/locales/workspace/*`): 720 px dialog, header = title + one line, step rail grouped
+  입력 파일 / 분석 조건 / 요약 (numbered pills, Q4/Q5), one question per step (Q1), file inputs as radio cards of
+  fitting project files + 기타 (other project file) + 사용하지 않음 for optional roles (Q3), choices as radio cards
+  with option labels + 기타 (직접 입력) + 작업 중 결정 (Q2/Q3), readiness blockers with their fix on the first step
+  and the summary (Q4), summary with 수정 links and the one primary action (Q5), description/outputs/boundary behind
+  disclosures (P3/F5), raw errors behind 기술 정보 (R2). No `권장`: the workflow contract has no recommendation
+  source (Q2); recipe/method setup values are pre-selected and labelled as recipe values. A setup opened with
+  initial values starts at the first unanswered step, else the summary (Q4).
+- Terminology (W6): the hub calls this flow "시작 설정"; the workspace said "작업 설정". Unified to "시작 설정"
+  in workspace strings; action "시작 초안 만들기" (as in the approved mockup).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

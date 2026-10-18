@@ -77,8 +77,9 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
   try {
     render(<Catalogue />);
     fireEvent.click(await screen.findByRole("button", { name: /^논문 방법 시험/ }));
-    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByLabelText("Fold 수")).toHaveValue("5"); expect(within(dialog).getByLabelText("Threshold")).toHaveValue(""); expect(start).not.toHaveBeenCalled();
-    fireEvent.click(within(dialog).getByRole("button", { name: "작업 초안 만들기" }));
+    // The recipe opens at the summary: its Fold value, its unresolved Threshold left to the chat.
+    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByText("5")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument(); expect(start).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" }));
     await waitFor(() => expect(start).toHaveBeenCalledOnce());
     expect(start.mock.calls[0][0].geoExposure).toBe("method:paper-method:trial");
     expect(start.mock.calls[0][0].skills[0].name).toBe("paper-method");
