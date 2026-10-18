@@ -55,7 +55,6 @@
     "noBoundary": "The catalogue does not record interpretation limits.",
     "inputLine": "{role}: {path}",
     "choiceLine": "{choice}: {answer}",
-    "draft": "{prompt}\n\nInput files:\n{inputs}\n\nSelected analysis settings:\n{choices}\n\nSettings to decide during the task: {unresolved}\nAsk about unresolved settings before analysis.\n\nInterpretation limits: {boundary}\nThe results have not been reviewed. Do not label run completion as review completion.",
     "blockedEnvironment": "Prepare the environment first.",
     "blockedSkills": "Turn on the required skills first.",
     "blockedUnavailable": "A start draft cannot be created now.",
@@ -118,7 +117,19 @@
       "elevation": "Elevation"
     },
     "reasonMore": "Show the full reason",
-    "reasonLess": "Show less"
+    "reasonLess": "Show less",
+    "undecided": "The chat asks about the {count} undecided conditions before the step that needs each one.",
+    "draft": {
+      "settings": "Settings chosen by the researcher (these take precedence over the Workflow instruction below)",
+      "inputs": "Input files:",
+      "choices": "Selected analysis settings:",
+      "unresolved": "Settings to decide during the task: {unresolved}",
+      "ask": "Ask about each unresolved setting before the step that needs it.",
+      "instruction": "Workflow instruction:",
+      "examples": "If example values in the instruction (target, resolution, data size) differ from the settings above or the input files, follow those and point out the difference first.",
+      "boundary": "Interpretation limits: {boundary}",
+      "review": "The results have not been reviewed. Do not label run completion as review completion."
+    }
   },
   "recipe": {
     "import": "Import recipe",

@@ -27,7 +27,7 @@
   "lifecycle.draft": "초안",
   "lifecycle.submitted": "제출됨",
   "lifecycle.published": "공개됨",
-  "implementation.descriptive": "설명만",
+  "implementation.descriptive": "분석 지침만",
   "implementation.implemented": "코드 포함",
   "check.pass": "통과",
   "check.warn": "경고",

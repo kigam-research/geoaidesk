@@ -116,6 +116,8 @@ describe("task catalogue and setup", () => {
       await userEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" })); await waitFor(() => expect(handoff).toHaveBeenCalledOnce());
       expect(handoff.mock.calls[0][0]).toMatchObject({ title: "Well log QC well-qc", attachedFiles: ["logs/A.LAS"], skills: [{ id: "skill-1", name: "well-skill", description: "QC" }], geoExposure: "workflow:well-qc" });
       expect(handoff.mock.calls[0][0].text).toContain("심도 기준: MD"); expect(handoff.mock.calls[0][0].text).toContain("작업 중 결정할 조건: 단위"); expect(handoff.mock.calls[0][0].text).toContain("해석 결과가 아닙니다.");
+      // The researcher's settings come before the saved Workflow prompt, which may hold its author's example values.
+      const draft: string = handoff.mock.calls[0][0].text; expect(draft.indexOf("심도 기준: MD")).toBeLessThan(draft.indexOf("원본 Well log를 확인하세요."));
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument()); dialog = await openSetup();
       expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument(); await step(dialog, 2); expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "false");
       expect(apiFetch).toHaveBeenCalledWith("/skills", {}, "p1");

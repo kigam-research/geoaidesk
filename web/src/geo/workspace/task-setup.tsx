@@ -116,6 +116,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     return row.kind === "choice" ? [{ step: i, label: text(row.choice.label), value: choiceValue(row.choice, choices[row.choice.id]), muted: !(row.choice.id in values) }] : [];
   });
   const untested = workflow.readiness.runRecord === "none";
+  const undecided = workflow.requiredScientificChoices.filter((choice) => !(choice.id in values)).length;
 
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="flex h-[min(680px,85dvh)] flex-col gap-0 p-0 sm:max-w-[720px]">
@@ -142,6 +143,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
           </div>
           {index !== 0 && state !== "ready" && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
           {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
+          {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
           <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
           <details className="text-sm">
             <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>

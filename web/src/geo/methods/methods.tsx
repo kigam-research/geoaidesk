@@ -35,7 +35,8 @@ export function MethodBadges({ method, workflow }: { method: LocalMethodSummary;
 
 /**
  * A list row shows at most three badges (UI guide G2, W5), in this order: readiness when not ready, GAID trials or
- * 미시험, the lifecycle, a local edit, the implementation, needs user data. The method details show all of them.
+ * 미시험, the lifecycle (with "분석 지침만" for a method without code), a local edit, "코드 포함", needs user data. The
+ * method details show all of them.
  */
 function RowBadges({ method, workflow }: { method: LocalMethodSummary; workflow?: LocalMethodWorkflow }) {
   const badges: ReactNode[] = [];
@@ -43,9 +44,10 @@ function RowBadges({ method, workflow }: { method: LocalMethodSummary; workflow?
   if (workflow) badges.push(workflow.trials.count === 0
     ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
     : <span key="trials" className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>);
-  badges.push(<span key="life" className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}</span>);
+  // A method without code says so on its row (novice review): lifecycle and "분석 지침만" share one badge.
+  badges.push(<span key="life" className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}{method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>);
   if (method.editedLocally) badges.push(<span key="edit" className={pill}>{t("methods.edited")}</span>);
-  if (method.implementation) badges.push(<span key="impl" className={pill}>{t(`methods.implementation.${method.implementation}`)}</span>);
+  if (method.implementation === "implemented") badges.push(<span key="impl" className={pill}>{t("methods.implementation.implemented")}</span>);
   if (workflow?.inputRoles.some((role) => role.required)) badges.push(<span key="data" className={pill}>{t("workspace.badge.userData")}</span>);
   return <>{badges.slice(0, 3)}</>;
 }
