@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:14:30Z
+updated: 2026-10-18T08:42:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -42,11 +42,9 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. Wait for child gaid-hub-novice-review--shared (Paseo b4c674e6; checkpoint f161a4c, needs `task sync` of b32f43b for
-   NewProject). On its finish: `task complete gaid-hub-novice-review--shared`, then web/server typecheck (hub-screen
-   passes `implementation` to SharedMethodView, defined by the child) and hub tests.
-2. Round 2: fresh first-time-user reader with briefs/novice-2.md (output novice2/), same goals; check the fixed points.
-3. Report reports/2026-10-18-gaid-hub-novice-review/index.md (string tables, rule ids, screenshots 1440/1280).
+1. Round 2 reader (briefs/novice-2.md, output novice2/) on the restarted app (integrated ce0128c + doc). Then triage,
+   any fixes, report. Note: gaid-system-ui's TaskSetup/workspace fixes (8ae7682) are not on this branch; round 2 sees
+   the old popup.
 
 Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
 
@@ -66,6 +64,13 @@ Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summa
   draft badge + hint for 분석 지침만 · 실행 코드 없음; stage.package "시험·등록 준비됨"; TrialCard NewProject form.
   Tests: web src/geo/hub 26 pass, server extra-packages + geo-methods 12 pass; copy 0 errors; check-ui 0 errors.
   Screenshots shots/home-{1440,1280}.png, glossary-1440.png.
+- Child --shared completed and closed (integrated ce0128c): search words AND + commodity aliases + description/IO/limits
+  (server/src/geo/hub-shared/search.ts), HubEntry.implementation + entry/preview badge, trial wording as started trials,
+  NewProject in the shared install dialog. Its checks: scripts/check passed (backend 1905, web 1076, geo/copy/UI).
+  Evidence in docs/tasks/gaid-hub-novice-review--shared.md; screenshots ~/data/geoaidesk/work/gaid-hub-novice-review--shared/playwright/.
+  After integration here: web/server tsc clean, web src/geo/hub 30 tests pass.
+- gaid-system-ui answered route 88fe3c357f47 (8ae7682 on its branch): draft puts researcher settings first, summary step,
+  workspace hub switch, "초안 · 분석 지침만"; quick-trial preset not done (contract field needed).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
