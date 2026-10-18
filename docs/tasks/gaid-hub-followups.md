@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T06:50:52Z
+updated: 2026-10-18T06:54:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -52,6 +52,22 @@ new main (user's standing practice: update the review app once after work comple
 Outside check: no outside check (app work; the re-trial is the acceptance evidence for package 1).
 
 ## Current state
+Result (2026-10-18): all three packages done. Revised PU method (GAID hub authoring project ap-c8f90117-4e8, draft 3,
+checks pass) reached its first check point in the same bounded trial as gaid-hub-integration (same limit line,
+70,200-cell Yilgarn_GIS_DB.csv, Qwen): about 9 min to variogram + proposed block 50 km (effective range 31.5 km), stopped
+before training; first version did not get there in 45 min. GAID defects fixed (children + this writer), hub browse list,
+standard authoring questions, decision-backed start defaults, hub-side receive verified in the re-trial (new hub draft
+ap-2efc649a-540 with the bundle attached). Six defects found in the re-trial fixed afterwards and checked on the restarted
+instance (single-recipe row keeps defaults, Python caches not edits, skip notice, handoff dialog, language and time rules).
+The report is declared under ## Report.
+
+Re-verify safely: server `npx vitest run test/geo-authoring*.test.ts test/geo-hub-handoff.test.ts test/geo-methods.test.ts
+test/geo-method-tree-hash.test.ts test/geo-workspace.test.ts`; web `npx vitest run src/geo/hub-handoff src/geo/methods
+src/geo/workspace src/geo/hub`; `node geo/ui/check-ui.mjs`; full check with `env -u VITEST_MAX_WORKERS taskset -c 0-7
+scripts/check` while other projects load the PC. Trial instance unit gaid-followups-app (3360/18360) is a dev instance;
+stop it after the finish.
+
+History:
 - 2026-10-18: code sites mapped (three read-only Explore agents). Children started (Codex gpt-6.1-sol high, normal speed):
   - gaid-hub-followups--defects, agent 67556782 — package 2 except the hub-side receive: chat long-run progress, hub
     methods in file task suggestions, 413 loop on big CSV, text label on the handoff button, abort kills background
@@ -85,12 +101,14 @@ Outside check: no outside check (app work; the re-trial is the acceptance eviden
 - Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
   gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
-Blocked: the researcher-role re-trial runs as a native sub-agent (started 15:12 KST, brief
-briefs/researcher-retrial.md, outputs ~/data/geoaidesk/work/gaid-hub-followups/researcher/); wait for its summary.
-1. Read researcher/summary.md + log.md; check the trial record and outputs in project "허브 방법 재시험" read-only.
-2. Report reports/2026-10-18-gaid-hub-followups/index.md; figures copied from figures/{defects,hub-browse}/ and the re-trial.
-3. scripts/check with `env -u VITEST_MAX_WORKERS taskset -c 0-7` (machine shared with heavy seoul_geomodel jobs), task finish.
+1. task finish (env -u VITEST_MAX_WORKERS taskset -c 0-7), then stop gaid-followups-app; the hub updates the review app
+   (gaid-review) once to the new main.
 ## Failed approaches
+- Two task complete runs of hub-browse failed on load-dependent UI timing tests (map viewer heading 1 s wait, file preview
+  5 s test) while seoul_geomodel jobs held load ~43/32 threads; not code. Passed with `env -u VITEST_MAX_WORKERS taskset
+  -c 0-7`. VITEST_MAX_WORKERS=4 breaks the serial server suite (children's finding).
+- Re-trial first send failed: the trial launcher exported ports after `--print-env`, so the web build pointed at :8000.
+  Fixed in ~/data/geoaidesk/work/gaid-hub-followups/bin/dev.sh (export ports before the eval).
 ## Notes and decisions
 - Ownership: defects child owns chat/tool-activity, use-agent, events.ts tool_update, file-actions + suggestions, use-sandbox
   + sandbox.ts 413, chat-actions.tsx, sessions abort/process tracking, data-guard/bash-classifier (+kady-guard copy).
@@ -102,15 +120,23 @@ briefs/researcher-retrial.md, outputs ~/data/geoaidesk/work/gaid-hub-followups/r
   ~/data/geoaidesk/work/gaid-hub-integration/samples/yilgarn/Yilgarn_GIS_DB.csv (asset yilgarn-gis-db/20260911).
   geo-mpm environment = geo-gis + xgboost only (no scikit-gstat, pulearn, optuna).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-hub-integration#1
+Closes: gaid-hub-integration#2
+Closes: gaid-hub#2
+Closes: gaid-hub#3
+Closes: gaid-hub#4
+Closes: gaid-hub#5
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [확인] 다음 PU 시험에서 빠른 시험을 모델 학습까지 실행해 5,000점 변이함수와 BaggingPU 시간(스레드 제한)을 확인 — 가) 다음 PU 시험 때 빠른 시험 전체 실행 — 나) 확인하지 않고 둠 — 권장: 가) 이번 재시험은 첫 확인 지점에서 멈춰 이 두 가지를 실행하지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-18-gaid-hub-followups/index.md#5-한계
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-18-gaid-hub-followups/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
