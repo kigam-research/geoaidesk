@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:04:47Z
+updated: 2026-10-18T05:07:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,9 +77,9 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-All six code changes are implemented. Backend full suite: 1,873 passed / 11 skipped. Corrected frontend full suite (4 workers): 158 files / 1,053 tests passed, excluding only parent-owned old hub-handoff.test.tsx; its fix is published in parent e5461bd42dd3 for task finish integration. Corrected boundary definition: 7/7 local tests passed. Job 3 is still verifying downstream environment/distribution/production stages. No deployment or parent integration yet.
+All six code changes are implemented. Backend full suite: 1,873 passed / 11 skipped. Corrected frontend full suite (4 workers): 158 files / 1,053 tests passed, excluding only parent-owned old hub-handoff.test.tsx; its fix is published in parent e5461bd42dd3 for task finish integration. Corrected distribution suite: 48 passed / 1 optional test skipped. Job 3 exited 0: launchers, copy/UI checks, all required environment imports in helper and fresh project, production clean start/stop/restart all passed. No deployment or parent integration yet.
 
-Verification ledger: job 1 scripts/check exited 1 (backend passed; old handoff tests plus now-fixed catalogue-off regression and load-sensitive map timeout). Job 2 exited 1 only at the expected immutable pre-fix boundary owner; its full frontend suite passed. Job 3 tests corrected boundaries and all remaining stages. Failed receipts are retained as evidence, not treated as current unfixed failures.
+Verification ledger: job 1 scripts/check exited 1 (backend passed; old handoff tests plus now-fixed catalogue-off regression and load-sensitive map timeout). Job 2 exited 1 only at the expected immutable pre-fix boundary owner; its full frontend suite passed. Job 3 exited 0 on corrected boundaries and all remaining stages. Failed receipts are retained as evidence, not treated as current unfixed failures.
 
 - Running activities tick elapsed minutes/seconds from ActivityItem.timestamp; completed/error items unmount the timer. Bash commands remain in the collapsed disclosure; the main bash label is localized.
 - POST /geo/suggestions includes installed, enabled method Workflows, prioritized by matching declared input format (including generic CSV without catalogue-only column heuristics). The response carries the method exposure and complete Workflow. FileActions binds the current file and opens the correct TaskSetup even when catalogue/method ids collide or the catalogue is off. Pi project-over-global shadowing is preserved.
@@ -91,6 +91,8 @@ Verification ledger: job 1 scripts/check exited 1 (backend passed; old handoff t
 Focused verification so far: server workspace, guard hook/classifier and oversized-cache tests pass; real-session detached process/other-chat/disposal/shell-prefix test passes; existing session-registry tests pass. Frontend elapsed timer/cache tests (25) and method-selection/visible-handoff tests (2) pass. Server typecheck passed in full job 1; web typecheck passed again after the final catalogue-off fix. UI validator (final strings): 11,110 strings, 0 errors, 102 pre-existing accepted debt. Copy validator: 0 errors, 57 existing warnings.
 
 ### Korean section for the parent report (humanizer file-mode reviewed)
+
+백엔드 전체 시험 1,873개와 프런트엔드 시험 1,053개가 통과했습니다. 프런트엔드에서는 부모 작업이 고친 기존 인계 화면 시험만 제외했으며, 수정본은 통합 때 반영합니다. 배포 관련 시험은 48개가 통과했고 선택 시험 1개를 건너뛰었습니다. 보조 환경과 새 프로젝트에서 필수 모듈을 불러왔고, 프로덕션 환경의 첫 실행·종료·재시작 시험도 통과했습니다. 운영 서비스에는 배포하지 않았습니다.
 
 장시간 계산 중인 채팅에 경과시간을 표시했습니다. 설치한 방법 중 파일 형식과 맞는 방법을 먼저 추천하며, 추천을 누르면 해당 방법의 작업 설정에 현재 파일이 연결됩니다. 8 MB를 넘는 CSV는 기존 크기 제한 안내를 유지하고, 파일이 바뀌지 않았으면 본문을 다시 받지 않습니다. 실제 화면에서는 첫 요청의 413 이후 304 응답을 확인했습니다.
 
@@ -115,8 +117,7 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. On job 3 completion notice, inspect corrected distribution/environment/production results. Job 2 is terminal: 1,053 frontend tests passed; only the stale boundary owner failed. Do not replay recorded jobs.
-2. Inspect every failure. Parent-owned web/src/geo/hub-handoff/hub-handoff.test.tsx is being rewritten with the parent HandoffDialog; do not edit it. If it is the only failing check, record "parent-owned test, fixed at integration" and task finish per parent authorization. Fix any other failure in this unit. Temporary browser/dev services are stopped.
+1. Run task finish; it receives parent updates, including e5461bd42dd3 (parent-owned test, fixed at integration). Do not replay the recorded jobs. Parent then owns task complete/integration and the canonical report.
 ## Failed approaches
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
 - First full check: workspace.test.tsx correctly caught catalogue-only suggestions appearing when catalogue is off. Fixed FileActions to keep only method-exposure suggestions without an active catalogue; installed methods remain available.
@@ -136,14 +137,11 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 - Optional raw shell-output tail is omitted: elapsed time meets the feedback goal without introducing more machinery into the main view.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None newly requiring a user decision. Parent accepted the second guard prompt as not evidenced in the supplied snapshot and owns the already-published handoff-test integration fix.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No standalone report for this child. The Korean section and external small PNGs above belong in the parent's canonical report.
+
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-followups--defects-20261018T045312.006938Z/receipt.json
