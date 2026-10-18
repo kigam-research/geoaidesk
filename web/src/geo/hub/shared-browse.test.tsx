@@ -45,12 +45,12 @@ describe("Shared hub browse", () => {
     vi.mocked(sharedHub.entries).mockRejectedValueOnce(new Error("offline"));
     render(<SharedBrowse onOpen={vi.fn()} />);
     await screen.findByText("등록 방법을 읽지 못했습니다. 목록을 다시 읽으세요.");
-    expect(screen.queryByText("등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.")).toBeNull();
+    expect(screen.queryByText("등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.")).toBeNull();
     vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [] });
     fireEvent.click(screen.getByRole("button", { name: "목록 다시 읽기" }));
-    await screen.findByText("등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.");
+    await screen.findByText("등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.");
     expect(screen.queryByText("원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다.")).toBeNull();
-    expect(screen.getByRole("button", { name: "추천 Workflow 보기" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "추천 분석 방법 보기" })).toBeTruthy();
   });
 
   it("ignores an older response arriving after a newer folder result", async () => {

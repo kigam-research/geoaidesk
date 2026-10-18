@@ -193,7 +193,8 @@ export function UseInProjectDialog({
   projects: { id: string; name: string }[];
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
 }) {
-  const [projectId, setProjectId] = useState(projects[0]?.id ?? "");
+  // No preselection: on a shared institute GAID the first project may be someone else's.
+  const [projectId, setProjectId] = useState("");
   const [createdProjects, setCreatedProjects] = useState<{ id: string; name: string }[]>([]);
   const choices = [...projects, ...createdProjects.filter((p) => !projects.some((existing) => existing.id === p.id))];
   const { create } = useProjects();
@@ -230,6 +231,9 @@ export function UseInProjectDialog({
                 disabled={busy}
                 onChange={(e) => setProjectId(e.target.value)}
               >
+                <option value="" disabled>
+                  {text("trial.pickProject")}
+                </option>
                 {choices.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}

@@ -19,7 +19,7 @@
     "updated": "{when} 수정",
     "open": "{title} 열기",
     "back": "허브 목록",
-    "recommended": "추천 Workflow",
+    "recommended": "추천 분석 방법",
     "catalogue": "카탈로그",
     "shared": "공유",
     "mine": "내가 만든 방법 (초안과 등록한 것)",
@@ -46,12 +46,12 @@
         "button": "목록 다시 읽기"
       },
       "noResults": "조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.",
-      "empty": "등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.",
+      "empty": "등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.",
       "reset": {
         "button": "전체 방법 보기"
       },
       "recommended": {
-        "action": "추천 Workflow 보기"
+        "action": "추천 분석 방법 보기"
       },
       "open": "{title} 열기",
       "stars": "star {count}개"
@@ -99,7 +99,8 @@
         "text": "내 프로젝트에서 방법을 실제로 실행해 본 기록입니다. 검토 결과는 아닙니다."
       }
     },
-    "byUpdated": "{author} · {when} 수정"
+    "byUpdated": "{author} · {when} 수정",
+    "noAuthor": "만든 사람 기록 없음"
   },
   "stage": {
     "sources": "자료 받음",
@@ -107,7 +108,8 @@
     "questions": "질문 {count}개",
     "drafting": "초안 만드는 중",
     "draft": "초안",
-    "package": "시험·등록 준비됨"
+    "package": "시험·등록 준비됨",
+    "registered": "허브에 등록됨"
   },
   "steps": {
     "label": "만드는 순서",
@@ -265,7 +267,8 @@
       "button": "프로젝트 만들기",
       "cancel": "취소",
       "failed": "프로젝트를 만들지 못했습니다. 이름을 바꿔 다시 만드세요."
-    }
+    },
+    "pickProject": "프로젝트 고르기"
   },
   "detail": {
     "show": "에이전트 기록 보기",

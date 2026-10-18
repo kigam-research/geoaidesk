@@ -323,12 +323,12 @@ export function HubHome({
                       )}
                     >
                       {p.busy && <LoaderCircleIcon className="size-3 animate-spin" aria-hidden />}
-                      {stageLabel(p)}
+                      {registered[p.id] && !p.busy ? text("stage.registered") : stageLabel(p)}
                     </span>
                     <span className="text-sm font-semibold">{p.methodTitle ?? p.title}</span>
                     {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
                     <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
-                      {p.author ? text("home.byUpdated", { author: p.author, when: when(p.updatedAt) }) : text("home.updated", { when: when(p.updatedAt) })}
+                      {text("home.byUpdated", { author: p.author ?? text("home.noAuthor"), when: when(p.updatedAt) })}
                       {registered[p.id] && (
                         <span
                           role="link"

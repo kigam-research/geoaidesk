@@ -427,10 +427,9 @@ function HubProject({
 
   const activeProjects = useMemo(() => projects.filter((p) => !p.archived), [projects]);
   useEffect(() => {
-    // Preselect where the method was installed last, else the first project.
     const last = project?.installs.at(-1)?.projectId;
-    if (!trialProject && activeProjects.length)
-      setTrialProject(last && activeProjects.some((p) => p.id === last) ? last : activeProjects[0].id);
+    // Only where this method was installed before; otherwise the researcher picks (projects are shared on an institute GAID).
+    if (!trialProject && last && activeProjects.some((p) => p.id === last)) setTrialProject(last);
   }, [activeProjects, trialProject]);
 
   if (!project)

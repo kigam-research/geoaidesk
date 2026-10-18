@@ -44,7 +44,7 @@ describe("shared install project creation", () => {
     expect(screen.getByText("HTTP 500 private detail").closest("details")?.open).toBe(false);
     expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("연구");
     fireEvent.click(screen.getByRole("button", { name: /^취소$/ }));
-    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("default");
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe(""); // nothing preselected on a shared GAID
     expect(sharedHub.install).not.toHaveBeenCalled();
   });
 });

@@ -19,7 +19,7 @@
     "updated": "Updated {when}",
     "open": "Open {title}",
     "back": "Hub list",
-    "recommended": "Recommended Workflows",
+    "recommended": "Recommended analysis methods",
     "catalogue": "Catalogue",
     "shared": "Shared",
     "mine": "Methods I made (drafts and registered)",
@@ -46,12 +46,12 @@
         "button": "Reload list"
       },
       "noResults": "No methods match. Change the search term or folder.",
-      "empty": "No methods are registered. Browse recommended Workflows.",
+      "empty": "No methods are registered. Browse the recommended analysis methods.",
       "reset": {
         "button": "View all methods"
       },
       "recommended": {
-        "action": "View recommended Workflows"
+        "action": "View recommended methods"
       },
       "open": "Open {title}",
       "stars": "{count} stars"
@@ -99,7 +99,8 @@
         "text": "A record of running the method in your project. It is not a review result."
       }
     },
-    "byUpdated": "{author} · updated {when}"
+    "byUpdated": "{author} · updated {when}",
+    "noAuthor": "Maker not recorded"
   },
   "stage": {
     "sources": "Sources received",
@@ -107,7 +108,8 @@
     "questions": "{count, plural, one {# question} other {# questions}}",
     "drafting": "Drafting",
     "draft": "Draft",
-    "package": "Ready to try and register"
+    "package": "Ready to try and register",
+    "registered": "Registered in the hub"
   },
   "steps": {
     "label": "Steps",
@@ -265,7 +267,8 @@
       "button": "Create project",
       "cancel": "Cancel",
       "failed": "Could not create the project. Change the name and create it again."
-    }
+    },
+    "pickProject": "Choose a project"
   },
   "detail": {
     "show": "Show agent record",

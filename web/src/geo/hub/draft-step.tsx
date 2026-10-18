@@ -274,6 +274,9 @@ export function TrialCard({
           value={projectId}
           onChange={(event) => onProject(event.target.value)}
         >
+          <option value="" disabled>
+            {text("trial.pickProject")}
+          </option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -295,7 +298,7 @@ export function TrialCard({
             />
             {text("trial.consent")}
           </label>
-          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
+          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || !projectId || Boolean(disabledReason)}>
             {installing ? text("trial.installing") : text("trial.install")}
           </Button>
           {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
