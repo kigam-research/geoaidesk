@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T04:55:29Z
+status: ready
+updated: 2026-10-18T04:55:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03077f19-d7c4-4f7d-9814-7922a8e164f0","pid":2568287,"provider":"codex","session":"01a14d52-83a7-7210-aa24-5a0e1d29ac97","start":"18655459","token":"2df86b15744ca28cbee2c16419a110bf67b00f4a71a8d124f2ca31e90ac1332d"}
 branch: task/gaid-hub-followups--hub-browse
 target: task/gaid-hub-followups
@@ -101,8 +101,9 @@ Re-verify safely: server npm test -- test/geo-hub-shared.test.ts and npm run typ
 | hub.home.browse.stars | 없음 → star {count}개 | Absent → {count} stars |
 
 ## Next steps
-1. Verify corrected integration-boundary package owner, then task finish (declared full checks).
-2. Parent integrates with task complete after successful finish.
+<!-- task:closed -->
+Closed 2026-10-18T04:55:30Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Full-check job 1 failed the integration-boundaries owner whitelist: used child task slug instead of an established owning package. Corrected to gaid-hub without changing check policy.
 - Initial web assertions assumed whitespace in the accessible folder name and CSS-based hidden state in jsdom. Match the name flexibly and use explicit hidden attributes; all tests now pass.
