@@ -94,7 +94,8 @@ malformed decisions, missing images) so the agent fixes them in the same turn.
 ## Prose style
 
 Before writing or updating a note the lead reads the `gaid-note-style` skill (gaid-output-style) and polishes the
-note's prose with it: result first, no staging, inflation or empty hedges, Korean sentence rules (verbs instead of
+note's prose with it: Korean notes in 합니다체 throughout (also stated in `RESEARCH_NOTE_RULE`, gaid-note-style; the skill
+alone was not followed), result first, no staging, inflation or empty hedges, Korean sentence rules (verbs instead of
 nominalised phrases, no translationese), with facts, numbers, links and stated confidence unchanged. The skill ships in
 `geo/skills/gaid-note-style/` (condensed from blader/humanizer, MIT, and KIGAM's Korean rules; `THIRD_PARTY_NOTICES.md`)
 and `server/src/geo/note-style.ts` copies it into each geo project's `.pi/skills/` when a chat starts or the project is

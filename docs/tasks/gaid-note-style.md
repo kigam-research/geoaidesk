@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T12:12:20Z
+updated: 2026-10-18T12:15:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"62008f86-1be6-4772-943a-a951ffca285d","pid":468448,"provider":"claude","session":"85b4150d-ec81-4480-967e-62529d54438c","start":"21342974","token":"5b8b5067b5c9f3de1c1fb5825e3148f5d6bbd2ebb965c023135d08bfdc476cdc"}
 branch: task/gaid-note-style
 target: main
@@ -28,11 +28,18 @@ the same request as the gaid-output-style comparison, showing the resulting note
 Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Edited: `RESEARCH_NOTE_RULE` (server/src/geo/instructions.ts) gains one sentence fixing Korean notes to 합니다체;
+  the `gaid-note-style` skill's register line now says 합니다체 (was "one register, keep the researcher's");
+  docs/geo/research-notes.md "Prose style"; one assertion in server/test/geo-note-style.test.ts.
+- Trial: unit `gaid-notestyle-app` (this worktree, ports 3373/18373), GAID_HOME
+  `~/data/geoaidesk/work/gaid-note-style/home` (config/pi-agent copied from gaid-output-style/before), same request
+  `tools/msg1.md`, model `kigam-qwen/qwen3.8-flash-next`, logs in `~/data/geoaidesk/work/gaid-note-style/logs/`.
 ## Next steps
-1. (the next session's first action)
+1. Run the trial chat, read the note, write the brief report, scripts/check, finish.
 ## Failed approaches
 ## Notes and decisions
+- Small, tightly coupled change: done by the top writer, no child units.
+Closes: gaid-output-style#1
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
