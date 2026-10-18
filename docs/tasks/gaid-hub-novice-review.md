@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T09:03:40Z
+updated: 2026-10-18T09:05:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -42,9 +42,9 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. Round 2 reader running: Paseo e6e928de-e743-41ad-afb7-9de759029794 (briefs/novice-2.md, output novice2/); do not edit web/server while it runs on the restarted app (integrated ce0128c + doc). Then triage,
-   any fixes, report. Note: gaid-system-ui's TaskSetup/workspace fixes (8ae7682) are not on this branch; round 2 sees
-   the old popup.
+1. Round 3 reader running: Paseo 5db3a0b5-ed04-4b4f-a26b-37a3369623af (briefs/novice-3.md, output novice3/); do not edit
+   web/server while it runs. Then triage (finding about the TaskSetup request contradiction is gaid-system-ui's, fixed on
+   its branch 8ae7682, not here), report reports/2026-10-18-gaid-hub-novice-review/index.md, finish.
 
 Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
 
@@ -71,6 +71,18 @@ Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summa
   After integration here: web/server tsc clean, web src/geo/hub 30 tests pass.
 - gaid-system-ui answered route 88fe3c357f47 (8ae7682 on its branch): draft puts researcher settings first, summary step,
   workspace hub switch, "초안 · 분석 지침만"; quick-trial preset not done (contract field needed).
+- Round 2 (reader e6e928de, novice2/summary.md): goals 1,3,4 yes, 2 partly (stopped before sending the contradictory
+  TaskSetup request of the old shared method — gaid-system-ui's fix). Round-1 fixes confirmed useful (two routes,
+  glossary, empty-search tip, reading reopen note, implementation badge, new project in install). Own new draft's
+  start request was consistent (authoring rule effective). New findings fixed here (252ef27): trial step shows
+  InputPrep before the first trial (F2); "내가 만든 방법" lists drafts started under my hub name (author recorded at
+  creation, name asked before 방법 만들기) + author on cards, glossary draft text accurate (F3); trial count scope
+  "등록한 판으로 시작한 시험" and counts the author's pre-registration trials of the same package (F4; live: round-2
+  entry now 1); trial.consent neutral; 필수/선택 on overview inputs (F5); plain-language authoring rule, no S1 aliases,
+  no coined method translations, one term per concept (F6, prompt versions .3/.6); front-page hub copy (F7).
+  Not done: multi-topic folders (F8, optional); raw tool names / "Make sure to use the skills" in chat transcript
+  (workspace chat, not hub). Checks: web tsc, web hub 30, server authoring/hub-shared/extra 68 + author test, copy 0
+  errors, check-ui 0 errors. Screenshots shots/entry-r2-{1440,1280}.png.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
