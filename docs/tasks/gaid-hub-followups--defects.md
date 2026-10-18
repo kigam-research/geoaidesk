@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:53:01Z
+updated: 2026-10-18T04:53:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,7 +77,7 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-All six code changes are implemented. No deployment or parent integration yet. Full scripts/check remains pending.
+All six code changes are implemented. No deployment or parent integration yet. Full scripts/check is running as recorded job job-geoaidesk-gaid-hub-followups--defects-1 at checkpoint a68e8e1ea773.
 
 - Running activities tick elapsed minutes/seconds from ActivityItem.timestamp; completed/error items unmount the timer. Bash commands remain in the collapsed disclosure; the main bash label is localized.
 - POST /geo/suggestions includes installed, enabled method Workflows, prioritized by matching declared input format (including generic CSV without catalogue-only column heuristics). The response carries the method exposure and complete Workflow. FileActions binds the current file and opens the correct TaskSetup even when catalogue/method ids collide or the catalogue is off. Pi project-over-global shadowing is preserved.
@@ -113,8 +113,8 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. Save reviewed files with task save; temporary browser/dev services have been stopped after screenshot inspection.
-2. Run the full scripts/check once using task job run; inspect its result, fix material failures, then task finish.
+1. On job completion notice, inspect recorded job-geoaidesk-gaid-hub-followups--defects-1 receipt/logs; do not start another copy.
+2. Fix material failures if any, update verified state, then task finish. Temporary browser/dev services are stopped.
 ## Failed approaches
 - Initial resume calls encountered other live task transactions; retried after they completed (no lock edits).
 - Initial elapsed string keys incorrectly repeated the namespace; focused rendering caught the missing lookup, fixed to nested namespace-local keys.
@@ -137,6 +137,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-followups--defects-20261018T045312.006938Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
