@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T08:27:53Z
+status: ready
+updated: 2026-10-18T08:27:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b4c674e6-3330-4284-8f14-ab1e619c6fe4","pid":1905277,"provider":"codex","session":"01a14e0c-9ac1-7a22-84f7-fe396a47cfb5","start":"19875020","token":"c8527c7072114ae3c43b788a5371371c2e5e7835f8bb261a59ddaafbccd0b63b"}
 branch: task/gaid-hub-novice-review--shared
 target: task/gaid-hub-novice-review
@@ -75,7 +75,9 @@ tests flake under load. raw.githubusercontent.com is blocked on this network.
 - The final declared scripts/check result is enforced and recorded by task finish: only a passing snapshot may be published ready for the parent.
 
 ## Next steps
-1. Finish this checked snapshot with task finish; the parent integrates the ready unit with task complete gaid-hub-novice-review--shared.
+<!-- task:closed -->
+Closed 2026-10-18T08:27:54Z: ready; the parent gaid-hub-novice-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First task sync merged parent b32f43b9 but scripts/check failed at production TypeScript checking: a new test used unsupported getByRole option exact. Replaced it with an anchored name regex. Frontend tsc --noEmit and all 8 focused web tests then passed.
 - Initial focused tests could not run because this fresh worktree had no npm dependencies. Installed both lockfiles with npm ci; no source workaround. task job run refused the dirty source before starting or issuing any job receipt; these short dependency installs ran locally.
