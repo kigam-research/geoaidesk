@@ -1,13 +1,14 @@
 /**
  * File-aware task suggestions (`POST /geo/suggestions`, skill_hub
  * geo-byok-plan §3.6): detected data + workflow input roles + readiness, at
- * most three, ready ones first.
+ * most three, matching installed methods first, then readiness.
  *
  * A specific format (LAS, shapefile, GeoPackage, GeoJSON, GeoTIFF, Parquet)
  * matches on its own. A generic format (CSV, XLSX, JSON, Markdown, PNG) says
  * little about the task, so it needs a content signal from the inspected
  * columns; otherwise nothing is suggested rather than every workflow that
- * accepts a table. Nothing runs: a suggestion only opens a task setup.
+ * accepts a table. Installed methods are a user-selected library, so their
+ * declared input formats suffice. Nothing runs: a suggestion only opens a task setup.
  */
 import type { GeoInspection } from "../../../../web/src/geo/contracts/inspection.ts";
 import type {

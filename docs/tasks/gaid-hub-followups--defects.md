@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:55:43Z
+updated: 2026-10-18T05:00:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,7 +77,7 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-All six code changes are implemented. No deployment or parent integration yet. Full scripts/check is running as recorded job job-geoaidesk-gaid-hub-followups--defects-1 at checkpoint a68e8e1ea773.
+All six code changes are implemented. No deployment or parent integration yet. Full scripts/check job job-geoaidesk-gaid-hub-followups--defects-1 at a68e8e1ea773 exited 1. Backend: 169 files / 1,873 tests passed; 1 file / 11 tests skipped visibly. Frontend: 156 files / 1,051 tests passed; 13 failures in 3 files (details below). Downstream distribution/production stages did not execute.
 
 - Running activities tick elapsed minutes/seconds from ActivityItem.timestamp; completed/error items unmount the timer. Bash commands remain in the collapsed disclosure; the main bash label is localized.
 - POST /geo/suggestions includes installed, enabled method Workflows, prioritized by matching declared input format (including generic CSV without catalogue-only column heuristics). The response carries the method exposure and complete Workflow. FileActions binds the current file and opens the correct TaskSetup even when catalogue/method ids collide or the catalogue is off. Pi project-over-global shadowing is preserved.
@@ -113,9 +113,12 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. On job completion notice, inspect recorded job-geoaidesk-gaid-hub-followups--defects-1 receipt/logs; do not start another copy.
+1. Verify the catalogue-off regression fix and re-run the frontend suite with VITEST_MAX_WORKERS=4. Backend code is unchanged since its full 1,873-test pass. Job 1 is terminal, not resumable.
 2. Inspect every failure. Parent-owned web/src/geo/hub-handoff/hub-handoff.test.tsx is being rewritten with the parent HandoffDialog; do not edit it. If it is the only failing check, record "parent-owned test, fixed at integration" and task finish per parent authorization. Fix any other failure in this unit. Temporary browser/dev services are stopped.
 ## Failed approaches
+- First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
+- First full check: workspace.test.tsx correctly caught catalogue-only suggestions appearing when catalogue is off. Fixed FileActions to keep only method-exposure suggestions without an active catalogue; installed methods remain available.
+- First full check: map viewer first test timed out waiting for the viewport table during highly parallel frontend execution. No map code changed. All 8 map viewer tests passed in the isolated rerun; the original failure was consistent with resource contention. Rechecking the full frontend with VITEST_MAX_WORKERS=4 (supported by the installed Vitest) before finish.
 - Initial resume calls encountered other live task transactions; retried after they completed (no lock edits).
 - Initial elapsed string keys incorrectly repeated the namespace; focused rendering caught the missing lookup, fixed to nested namespace-local keys.
 - SIGKILL delivery is asynchronous; the real detached-process test caught an immediate-state race. Added bounded post-signal observation before abort returns.
