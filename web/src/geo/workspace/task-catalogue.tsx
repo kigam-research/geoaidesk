@@ -61,7 +61,7 @@ const DISCIPLINE_ICON: Record<string, LucideIcon> = {
 };
 const iconFor = (workflow: GeoWorkflowSummary): LucideIcon => DISCIPLINE_ICON[workflow.disciplines[0] ?? ""] ?? MountainIcon;
 
-const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-[10px] font-medium";
+const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-xs font-medium";
 const TONE = {
   ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   warn: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",

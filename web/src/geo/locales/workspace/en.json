@@ -101,7 +101,7 @@
     "moreResults": "Show expected results and limits",
     "ready": {
       "skills": "Required skills are turned off: {names}",
-      "environment": "The {name} environment is not ready yet.",
+      "environment": "Environment not ready yet: {name}",
       "unavailable": "The selected Workflow cannot be used now.",
       "done": "Ready. You can create the start draft."
     },
@@ -116,7 +116,9 @@
       "MD": "Measured depth (MD)",
       "TVD": "True vertical depth (TVD)",
       "elevation": "Elevation"
-    }
+    },
+    "reasonMore": "Show the full reason",
+    "reasonLess": "Show less"
   },
   "recipe": {
     "import": "Import recipe",

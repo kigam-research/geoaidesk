@@ -88,7 +88,7 @@ describe("task catalogue and setup", () => {
     const dialog = await openSetup();
     expect(within(dialog).getByText("미시험")).toHaveAttribute("title", "미시험 · GAID 실행 기록 없음");
     if (state === "missing-skills") expect(within(dialog).getByText("프로젝트에 설치되지 않은 스킬: well-skill. 설정 → 스킬에서 설치하세요.")).toBeInTheDocument();
-    if (state === "needs-environment") expect(within(dialog).getByText("Geo core 환경이 아직 준비되지 않았습니다.")).toBeInTheDocument();
+    if (state === "needs-environment") expect(within(dialog).getByText("준비되지 않은 실행 환경: Geo core")).toBeInTheDocument();
     if (state === "unavailable") { expect(within(dialog).getByText("지금은 선택한 Workflow를 쓸 수 없습니다.")).toBeInTheDocument(); expect(within(dialog).getByText("uv unavailable")).not.toBeVisible(); }
     if (state === "ready") expect(within(dialog).queryByText(/환경이 아직|쓸 수 없습니다|설치되지 않은/)).not.toBeInTheDocument();
     // The only fitting file is preselected; a file of another format is not offered as a choice.
@@ -157,7 +157,7 @@ describe("task catalogue and setup", () => {
     expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "레시피 가져오기" })).not.toBeInTheDocument();
   });
   it("explicitly prepares the project environment and refreshes readiness", async () => {
-    rows = [workflow("needs-environment")]; catalogue(); const dialog = await openSetup(); within(dialog).getByText("Geo core 환경이 아직 준비되지 않았습니다."); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
+    rows = [workflow("needs-environment")]; catalogue(); const dialog = await openSetup(); within(dialog).getByText("준비되지 않은 실행 환경: Geo core"); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
     await userEvent.click(within(dialog).getByRole("button", { name: "환경 준비" })); expect(await within(dialog).findByText("준비를 마쳤습니다. 시작 초안을 만들 수 있습니다.")).toBeInTheDocument();
     expect(await screen.findByText("환경을 준비했습니다. 패키지를 불러올 수 있습니다.")).toBeInTheDocument();
     expect(apiFetch).toHaveBeenCalledWith("/geo/environments/geo-core/prepare", expect.objectContaining({ method: "POST", body: JSON.stringify({ target: "project" }) }), "p1");
@@ -170,7 +170,7 @@ describe("task catalogue and setup", () => {
   it("says why the start draft cannot be created yet", async () => {
     rows = [workflow("needs-environment")];
     catalogue(); const dialog = await openSetup(); await step(dialog, 4);
-    expect(within(dialog).getByText("먼저 환경을 준비하세요.")).toBeInTheDocument(); expect(within(dialog).getByText("Geo core 환경이 아직 준비되지 않았습니다.")).toBeInTheDocument();
+    expect(within(dialog).getByText("먼저 환경을 준비하세요.")).toBeInTheDocument(); expect(within(dialog).getByText("준비되지 않은 실행 환경: Geo core")).toBeInTheDocument();
   });
   it("shows indeterminate progress while preparation is running", async () => {
     rows = [workflow("needs-environment")];

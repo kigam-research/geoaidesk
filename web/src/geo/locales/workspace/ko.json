@@ -101,7 +101,7 @@
     "moreResults": "예상 결과와 해석 한계 보기",
     "ready": {
       "skills": "필요한 스킬이 꺼져 있습니다: {names}",
-      "environment": "{name} 환경이 아직 준비되지 않았습니다.",
+      "environment": "준비되지 않은 실행 환경: {name}",
       "unavailable": "지금은 선택한 Workflow를 쓸 수 없습니다.",
       "done": "준비를 마쳤습니다. 시작 초안을 만들 수 있습니다."
     },
@@ -116,7 +116,9 @@
       "MD": "측정 심도(MD)",
       "TVD": "수직 심도(TVD)",
       "elevation": "표고 기준"
-    }
+    },
+    "reasonMore": "근거 전체 보기",
+    "reasonLess": "근거 접기"
   },
   "recipe": {
     "import": "레시피 가져오기",

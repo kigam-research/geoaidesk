@@ -96,10 +96,8 @@
       "web/src/geo/authoring-preview/source-input.tsx:#174bd1",
       "web/src/geo/authoring-preview/source-input.tsx:#1f5eff",
       "web/src/geo/context/prompt-budget.tsx:text-[11px]",
-      "web/src/geo/methods/methods.tsx:text-[10px]",
       "web/src/geo/skill-hub/skill-hub.tsx:text-[11px]",
-      "web/src/geo/viewers/map/index.tsx:text-[11px]",
-      "web/src/geo/workspace/task-catalogue.tsx:text-[10px]"
+      "web/src/geo/viewers/map/index.tsx:text-[11px]"
     ]
   }
 }

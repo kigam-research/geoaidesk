@@ -4,7 +4,7 @@
  * file or analysis condition, and the summary. State lives in TaskSetup; these components only render it.
  */
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,10 +98,22 @@ function OptionCard({ selected, onSelect, title, hint, badge, children }: { sele
 
 const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+/** Package-authored reasons can run long: two lines first, the rest on request (UI guide Q1, P3). */
+function ClampedLine({ value }: { value: string }) {
+  const [open, setOpen] = useState(false);
+  const long = value.length > 90;
+  return <p className="text-sm text-muted-foreground break-words">
+    <span className={cn(long && !open && "line-clamp-2")}>{value}</span>
+    {long && <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="mt-0.5 text-xs text-primary underline-offset-4 hover:underline">
+      {t(open ? "workspace.setup.reasonLess" : "workspace.setup.reasonMore")}
+    </button>}
+  </p>;
+}
+
 function StepHeading({ id, title, lines }: { id: string; title: string; lines: (string | null | undefined)[] }) {
   return <div className="space-y-1">
     <h3 id={id} className="text-base font-semibold leading-snug break-words">{title}</h3>
-    {lines.filter(Boolean).map((line) => <p key={line} className="text-sm text-muted-foreground break-words">{line}</p>)}
+    {lines.filter((line): line is string => Boolean(line)).map((line) => <ClampedLine key={line} value={line} />)}
   </div>;
 }
 
