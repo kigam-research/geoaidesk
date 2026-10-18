@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import {
   ActivityIcon,
   AtomIcon,
+  InfoIcon,
   BarChart3Icon,
   BinaryIcon,
   BookOpenIcon,
@@ -268,6 +269,8 @@ export type WorkflowPanelRow = {
   /** Extra text matched by the search box. */
   searchText?: string;
   onSelect: () => void;
+  /** Optional secondary action shown as an icon button at the row's right edge (e.g. method details). */
+  detail?: { label: string; onSelect: () => void };
 };
 export type WorkflowPanelExtension = {
   /** Categories listed before the upstream ones. */
@@ -624,7 +627,7 @@ export function WorkflowsPanel({
               key={cat.id}
               onClick={() => scrollToCategory(cat.id)}
               className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors",
+                "shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                 cat.bg ?? CATEGORY_BG[cat.id]
               )}
             >
@@ -643,9 +646,9 @@ export function WorkflowsPanel({
             if (!workflows || workflows.length === 0) return null;
             return (
               <section key={cat.id} data-category={cat.id}>
-                <h3 className={cn("mb-2.5 text-xs font-semibold uppercase tracking-wider", cat.color)}>
+                <h3 className={cn("mb-2.5 text-xs font-semibold", cat.color)}>
                   {cat.label}
-                  <span className="ml-1.5 text-[10px] font-normal text-muted-foreground">
+                  <span className="ml-1.5 text-xs font-normal text-muted-foreground">
                     ({workflows.length})
                   </span>
                 </h3>
@@ -653,26 +656,36 @@ export function WorkflowsPanel({
                   {workflows.map((w) => {
                     if ("onSelect" in w) {
                       const Icon = w.icon;
+                      // GAID rows: one line of description (UI guide G1); details open from the row's own action.
                       return (
-                        <button
-                          key={w.id}
-                          onClick={w.onSelect}
-                          className={cn(
-                            "flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
-                            cat.bg ?? CATEGORY_BG[cat.id]
-                          )}
-                        >
-                          <Icon className={cn("mt-0.5 size-4 shrink-0", cat.color)} />
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="text-sm font-medium text-foreground">{w.name}</span>
-                              {w.badges}
+                        <div key={w.id} className={cn("flex items-start rounded-xl border transition-all", cat.bg ?? CATEGORY_BG[cat.id])}>
+                          <button
+                            onClick={w.onSelect}
+                            className="flex min-w-0 flex-1 items-start gap-3 rounded-xl px-3.5 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <Icon className={cn("mt-0.5 size-4 shrink-0", cat.color)} />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-sm font-medium text-foreground">{w.name}</span>
+                                {w.badges}
+                              </div>
+                              <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-1" title={w.description}>
+                                {w.description}
+                              </p>
                             </div>
-                            <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                              {w.description}
-                            </p>
-                          </div>
-                        </button>
+                          </button>
+                          {w.detail && (
+                            <button
+                              type="button"
+                              onClick={w.detail.onSelect}
+                              aria-label={w.detail.label}
+                              title={w.detail.label}
+                              className="m-2 shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-background/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              <InfoIcon className="size-4" aria-hidden />
+                            </button>
+                          )}
+                        </div>
                       );
                     }
                     const bgClass = CATEGORY_BG[w.category] ?? "";

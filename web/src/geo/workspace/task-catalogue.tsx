@@ -61,7 +61,7 @@ const DISCIPLINE_ICON: Record<string, LucideIcon> = {
 };
 const iconFor = (workflow: GeoWorkflowSummary): LucideIcon => DISCIPLINE_ICON[workflow.disciplines[0] ?? ""] ?? MountainIcon;
 
-const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-[10px] font-medium";
+const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-xs font-medium";
 const TONE = {
   ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   warn: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
@@ -70,13 +70,17 @@ const TONE = {
 };
 
 export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {
-  const state = workflow.readiness.state;
+  return <ReadinessBadges readiness={workflow.readiness} />;
+}
+
+export function ReadinessBadges({ readiness }: { readiness: GeoWorkflowSummary["readiness"] }) {
+  const state = readiness.state;
   const tone = state === "ready" ? TONE.ok : state === "unavailable" ? TONE.bad : TONE.warn;
   // First view keeps only what changes a decision (gaid-qwen-authoring-trial): readiness when it is not ready,
   // and the untested limit. "Needs your data" was on nearly every row; the setup dialog lists the inputs.
   return <>
     {state !== "ready" && <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>}
-    {workflow.readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+    {readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
   </>;
 }
 

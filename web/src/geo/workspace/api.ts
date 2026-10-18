@@ -20,12 +20,18 @@ export class RequestError extends Error {
 
 export const accepts = (path: string, extensions: string[]) => extensions.some((ext) => path.toLowerCase().endsWith(`.${ext.toLowerCase().replace(/^\./, "")}`));
 
+/**
+ * The start draft put into a new chat (never sent). The researcher's settings come first and take precedence: a
+ * method's saved Workflow prompt may carry its author's example values (gaid-hub-novice-review, round 1).
+ */
 export function taskDraft(workflow: GeoWorkflowSummary, bindings: Record<string, string>, choices: Record<string, string>): string {
-  return t("workspace.setup.draft", {
-    prompt: text(workflow.prompt) || text(workflow.description) || text(workflow.title),
-    inputs: workflow.inputRoles.filter((role) => bindings[role.id]).map((role) => t("workspace.setup.inputLine", { role: text(role.label), path: bindings[role.id] })).join("\n") || t("workspace.setup.none"),
-    choices: workflow.requiredScientificChoices.filter((choice) => choices[choice.id]?.trim()).map((choice) => t("workspace.setup.choiceLine", { choice: text(choice.label), answer: choice.optionLabels?.[choices[choice.id].trim()] ? `${text(choice.optionLabels[choices[choice.id].trim()])} (${choices[choice.id].trim()})` : choices[choice.id].trim() })).join("\n") || t("workspace.setup.none"),
-    unresolved: workflow.requiredScientificChoices.filter((choice) => !choices[choice.id]?.trim()).map((choice) => text(choice.label)).join(", ") || t("workspace.setup.none"),
-    boundary: text(workflow.boundary) || t("workspace.setup.noBoundary"),
-  });
+  const d = (key: string, values?: Record<string, string>) => t(`workspace.setup.draft.${key}`, values);
+  const inputs = workflow.inputRoles.filter((role) => bindings[role.id]).map((role) => t("workspace.setup.inputLine", { role: text(role.label), path: bindings[role.id] })).join("\n") || t("workspace.setup.none");
+  const chosen = workflow.requiredScientificChoices.filter((choice) => choices[choice.id]?.trim()).map((choice) => t("workspace.setup.choiceLine", { choice: text(choice.label), answer: choice.optionLabels?.[choices[choice.id].trim()] ? `${text(choice.optionLabels[choices[choice.id].trim()])} (${choices[choice.id].trim()})` : choices[choice.id].trim() })).join("\n") || t("workspace.setup.none");
+  const unresolved = workflow.requiredScientificChoices.filter((choice) => !choices[choice.id]?.trim()).map((choice) => text(choice.label)).join(", ") || t("workspace.setup.none");
+  return [
+    d("settings"), "", d("inputs"), inputs, "", d("choices"), chosen, "", d("unresolved", { unresolved }), d("ask"), "",
+    d("instruction"), text(workflow.prompt) || text(workflow.description) || text(workflow.title), d("examples"), "",
+    d("boundary", { boundary: text(workflow.boundary) || t("workspace.setup.noBoundary") }), d("review"),
+  ].join("\n");
 }

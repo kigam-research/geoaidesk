@@ -72,7 +72,7 @@ it("lists hub packages and previews the descriptor through the existing gate", a
     ] } : result)));
   const onPreview = vi.fn();
   render(<SkillHubInstall projectId="p1" scope="project" onStart={vi.fn()} onPreview={onPreview} onError={vi.fn()} />);
-  expect(await screen.findByText("Paper package")).toBeInTheDocument(); expect(screen.getByText("Submitted · Instructions only")).toBeInTheDocument(); expect(screen.getByRole("alert")).toHaveTextContent("Hub offline");
+  expect(await screen.findByText("Paper package")).toBeInTheDocument(); expect(screen.getByText(/Submitted · Instructions only/)).toBeInTheDocument(); expect(screen.getByRole("alert")).toHaveTextContent("Hub offline");
   fireEvent.click(screen.getAllByRole("button", { name: "Preview package" })[0]);
   await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
   expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview?scope=project", expect.objectContaining({ body: JSON.stringify({ url: descriptorUrl, scope: "project" }) }), "p1");

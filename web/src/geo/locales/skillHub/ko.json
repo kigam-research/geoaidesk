@@ -28,5 +28,7 @@
   "methodsError": "허브 패키지 목록을 읽지 못했습니다: {detail}",
   "methodPreview": "패키지 미리보기",
   "methodCreated": "생성 시각: {at}",
-  "methodDraft": "허브 방법: {id} · revision {revision} · {lifecycle}"
+  "methodDraft": "허브 방법: {id} · revision {revision} · {lifecycle}",
+  "chooseFile": "패키지 파일 선택",
+  "noFile": "선택한 파일 없음"
 }
