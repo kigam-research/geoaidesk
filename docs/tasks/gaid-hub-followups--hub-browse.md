@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T05:05:24Z
+status: ready
+updated: 2026-10-18T05:05:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03077f19-d7c4-4f7d-9814-7922a8e164f0","pid":2568287,"provider":"codex","session":"01a14d52-83a7-7210-aa24-5a0e1d29ac97","start":"18655459","token":"2df86b15744ca28cbee2c16419a110bf67b00f4a71a8d124f2ca31e90ac1332d"}
 branch: task/gaid-hub-followups--hub-browse
 target: task/gaid-hub-followups
@@ -104,7 +104,7 @@ Re-verify safely: server npm test -- test/geo-hub-shared.test.ts and npm run typ
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T05:02:50Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T05:05:25Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Global VITEST_MAX_WORKERS=4 overrides backend fileParallelism:false in installed Vitest (coverage.DM_a_rWm.js lines223–225 versus380), causing shared-temp-root ENOENT/ENOTEMPTY races. Restore maxWorkers=1 and directly verify affected backend files before full retry. Failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-gd24hdt1.log.
