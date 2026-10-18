@@ -19,6 +19,15 @@ function setup(changed = false) {
 async function open() { const user = userEvent.setup(); await user.click(screen.getByRole("button", { name: "What next?" })); await user.click(await screen.findByText("Generate a source-linked proposal")); return user; }
 beforeEach(() => vi.clearAllMocks());
 describe("next-investigation planning review", () => {
+  it("initializes decision constraints in the UI language", async () => {
+    localStorage.setItem("gaid:locale", "ko");
+    try {
+      setup();
+      fireEvent.click(screen.getByRole("button", { name: "후속 실험 제안" }));
+      fireEvent.click(await screen.findByText("출처를 연결한 제안 생성"));
+      expect(screen.getByRole("textbox", { name: "결정의 제약 조건" })).toHaveValue("새 자료를 수집하기 전에 기존 자료로 판단에 도움이 되는 저비용 확인을 우선합니다.");
+    } finally { localStorage.removeItem("gaid:locale"); }
+  });
   it("does not fetch or generate merely by rendering; opening is read-only", async () => {
     setup(); expect(fetch).not.toHaveBeenCalled(); await open(); expect(fetch).toHaveBeenCalledTimes(1); expect(fetch.mock.calls[0][1]?.method).not.toBe("POST");
     expect(screen.getByRole("button", { name: "Generate proposals" })).toBeDisabled(); expect(screen.getAllByText(/Predicted outcome — not observed evidence/)).toHaveLength(2);

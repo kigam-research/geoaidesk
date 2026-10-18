@@ -478,5 +478,6 @@
   "values.incoming supports": "지지하는 기록",
   "values.incoming challenges": "반박하는 기록",
   "values.incoming inconclusive": "결론 미정 근거 기록",
-  "values.incoming context": "배경 근거 기록"
+  "values.incoming context": "배경 근거 기록",
+  "next_experiments.default_constraints": "새 자료를 수집하기 전에 기존 자료로 판단에 도움이 되는 저비용 확인을 우선합니다."
 }

@@ -20,6 +20,20 @@ describe("escapeHtml", () => {
 });
 
 describe("buildNotebookPrintHtml", () => {
+  it("uses the UI language for labels and preserves authored text", () => {
+    localStorage.setItem("gaid:locale", "ko");
+    try {
+      const html = buildNotebookPrintHtml([e("m", { type: "method", title: "Original title", body: "Original body",
+        execution: { status: "completed", evidence: "python analysis.py" }, scope: "Original scope" })]);
+      expect(html).toContain('<html lang="ko">');
+      expect(html).toContain("<h1>작업 기록</h1>");
+      expect(html).toContain("실행 완료");
+      expect(html).toContain("적용 범위 (작성자 보고)");
+      expect(html).toContain("Original body");
+      expect(html).toContain("Original title");
+      expect(html).not.toContain("Lab Notebook");
+    } finally { localStorage.removeItem("gaid:locale"); }
+  });
   it("renders markdown bodies (bold → <strong>)", () => {
     const html = buildNotebookPrintHtml([e("a", { body: "some **bold** text" })]);
     expect(html).toContain("<strong>bold</strong>");

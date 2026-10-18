@@ -10,6 +10,21 @@ const entries: NotebookEntry[] = [
 ];
 
 describe("notebookToMarkdown", () => {
+  it("localizes annotation and evidence headings while retaining authored notes and code", () => {
+    const md = notebookToMarkdown(entries, { lang: "ko", sessionId: "s", annotations: [
+      { id: "c", kind: "comment", entryId: "a", body: "Original comment", createdAt: 1 },
+      { id: "n", kind: "note", body: "Original note", createdAt: 1 },
+    ] });
+    expect(md).toContain("# 작업 기록");
+    expect(md).toContain("가설: Six types");
+    expect(md).toContain("**근거 상태:**");
+    expect(md).toContain("사용자 댓글");
+    expect(md).toContain("사용자 메모");
+    expect(md).toContain("Original comment");
+    expect(md).toContain("Original note");
+    expect(md).toContain("print('hi')");
+    expect(md).not.toContain("export.");
+  });
   const md = notebookToMarkdown(entries, { sessionId: "sess-1", projectName: "TME scRNA-seq" });
 
   it("has a titled header naming the project and session", () => {

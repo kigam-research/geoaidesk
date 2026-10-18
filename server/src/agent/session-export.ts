@@ -1,3 +1,4 @@
+import { notebookExportText } from "../../../web/src/geo/notebook/export-text.ts";
 /**
  * Reproducibility export: reconstruct a session's work from its Pi JSONL file.
  *
@@ -240,16 +241,18 @@ export function toShellScript(file: string, sessionId: string, sandboxRoot = "")
 
 /** Build a markdown "lab notebook" of the full session: prompts, reasoning,
  *  commands, outputs, and final answers. */
-export function toNotebook(file: string, sessionId: string, sandboxRoot = ""): string {
+export function toNotebook(file: string, sessionId: string, sandboxRoot = "", lang?: string): string {
+  const text = notebookExportText(lang);
+  const label = (key: string) => text("export." + key);
   const rel = (s: string) => relativizeSandboxPaths(s, sandboxRoot);
   const rows = readRows(file);
   // Index tool results by call id so we can show output beneath each command.
   const resultsById = indexToolResults(rows);
 
   const out: string[] = [
-    "# Lab Notebook",
+    `# ${label("title")}`,
     "",
-    `_Session \`${sessionId}\` — reproducible record exported from K-Dense BYOK._`,
+    text("export.session_intro", { session: sessionId }),
     "",
     "---",
     "",
@@ -261,7 +264,7 @@ export function toNotebook(file: string, sessionId: string, sandboxRoot = ""): s
       const t = textOf(content);
       if (!t) continue;
       turn++;
-      out.push(`## ${turn}. Prompt`, "", t, "");
+      out.push(`## ${turn}. ${label("prompt")}`, "", t, "");
       continue;
     }
     if (role !== "assistant") continue;
@@ -270,22 +273,22 @@ export function toNotebook(file: string, sessionId: string, sandboxRoot = ""): s
       if (part.type === "thinking") {
         const think = (part as ThinkingPart).thinking?.trim();
         if (think) {
-          out.push("<details><summary>Reasoning</summary>", "", "> " + think.replace(/\n/g, "\n> "), "", "</details>", "");
+          out.push(`<details><summary>${label("reasoning")}</summary>`, "", "> " + think.replace(/\n/g, "\n> "), "", "</details>", "");
         }
       } else if (part.type === "toolCall") {
         const call = part as ToolCallPart;
         const result = resultsById.get(call.id);
         if (call.name === "bash" && call.arguments?.command) {
-          out.push("**Command**", "", "```bash", rel(String(call.arguments.command)), "```", "");
+          out.push(`**${label("command")}**`, "", "```bash", rel(String(call.arguments.command)), "```", "");
         } else {
-          out.push(`**Tool: \`${call.name}\`**`, "", "```json", JSON.stringify(relativizeSandboxPaths(call.arguments ?? {}, sandboxRoot), null, 2), "```", "");
+          out.push(`**${label("tool")}: \`${call.name}\`**`, "", "```json", JSON.stringify(relativizeSandboxPaths(call.arguments ?? {}, sandboxRoot), null, 2), "```", "");
         }
         if (result) {
           const text = rel(resultText(result.content));
           if (text) {
-            const label = result.isError ? "Error" : "Output";
-            const clipped = text.length > 4000 ? text.slice(0, 4000) + "\n…(truncated)" : text;
-            out.push(`**${label}**`, "", "```", clipped, "```", "");
+            const resultLabel = result.isError ? label("error") : label("output");
+            const clipped = text.length > 4000 ? text.slice(0, 4000) + "\n" + label("truncated") : text;
+            out.push(`**${resultLabel}**`, "", "```", clipped, "```", "");
           }
         }
       } else if (part.type === "text") {

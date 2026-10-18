@@ -1,3 +1,4 @@
+import { notebookExportLocale, notebookExportLabels } from "../../../web/src/geo/notebook/export-text.ts";
 /**
  * Project CRUD endpoints — TS port of the projects_router in kady_agent/projects.py.
  * Costs and sandbox/init endpoints are added in later phases.
@@ -222,10 +223,11 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
   // /sessions/:id/notebook/export. Same three formats, merged across every
   // session, with each chat's annotation sidecar folded in — the session route
   // would silently export only the active chat's slice of what's on screen.
-  app.get<{ Params: { projectId: string }; Querystring: { format?: string } }>(
+  app.get<{ Params: { projectId: string }; Querystring: { format?: string; lang?: string } }>(
     "/projects/:projectId/notebook/export",
     async (req, reply) => {
       const format = req.query.format ?? "md";
+      const lang = notebookExportLocale(req.query.lang);
       if (format !== "md" && format !== "json" && format !== "zip") {
         reply.code(400);
         return { detail: "format must be md, json, or zip (PDF is exported client-side)" };
@@ -264,6 +266,8 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
           return {
             projectId,
             projectName,
+            locale: lang,
+            labels: notebookExportLabels(lang),
             sessions: [...sessionLabels].map(([id, label]) => ({ id, label })),
             entries,
             annotations,
@@ -271,6 +275,7 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
         }
         if (format === "zip") {
           const { buffer } = buildNotebookZip(entries, {
+            lang,
             projectName,
             sandboxRoot: paths.sandbox,
             annotations,
@@ -280,7 +285,7 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
           attachment("zip");
           return buffer;
         }
-        const md = notebookToMarkdown(entries, { projectName, annotations, sessionLabels });
+        const md = notebookToMarkdown(entries, { lang, projectName, annotations, sessionLabels });
         reply.header("Content-Type", "text/markdown; charset=utf-8");
         attachment("md");
         return md;

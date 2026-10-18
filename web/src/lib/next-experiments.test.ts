@@ -5,6 +5,18 @@ import { normalizeNotebookEntries } from "./notebook";
 import { buildNotebookPrintHtml } from "./notebook-print";
 import { experimentPlan, experimentView } from "../test/next-experiments-fixture";
 describe("next-investigation protocol", () => {
+  it("localizes proposal labels without translating scientific statements", () => {
+    const text = nextExperimentsText(experimentPlan, "ko");
+    expect(text).toContain("# 다음 연구 제안");
+    expect(text).toContain("우선순위: 우선 (정성 평가)");
+    expect(text).toContain("판단 불가 시:");
+    expect(text).toContain(experimentPlan.question);
+    expect(text).toContain(experimentPlan.experiments[0].predictions[0].expectedOutcome);
+    expect(text).not.toContain("export.");
+    const html = buildNotebookPrintHtml([{ id: "p", type: "note", title: "Proposal", timestamp: 1, nextExperiments: experimentPlan }], { lang: "ko" });
+    expect(html).toContain("다음 연구 제안 (수행하지 않음)");
+    expect(html).toContain("우선순위: 우선 (정성 평가)");
+  });
   it("normalizes qualitative proposals, strips forged approval/information-gain fields and preserves conditional predictions", () => {
     const plan = normalizeNextExperiments({ ...experimentPlan, approved: true, informationGain: 0.99, execute: true });
     expect(plan).toEqual(experimentPlan); expect("approved" in plan).toBe(false); expect("informationGain" in plan).toBe(false);

@@ -7,6 +7,17 @@ const frozen: FrozenPlanEvent = { version: 1, kind: "freeze", id: "plan-1", sequ
 const history: AnalysisPlanHistory = { source, head: "digest-2", events: [frozen, { version: 1, kind: "deviation", id: "d1", sequence: 2, previousDigest: "digest", digest: "digest-2", source, actor: "user", recordedAt: 2000, planId: "plan-1", field: "model", planned: "Linear model", actual: "Robust model", reason: "Heavy tails", timing: "after-results" }] };
 
 describe("analysis-plan protocol and exports", () => {
+  it("localizes plan labels and retains recorded scientific choices and deviations", () => {
+    const text = planHistoryText(history, "ko");
+    expect(text).toContain("로컬 분석 계획 기록");
+    expect(text).toContain("확정한 버전 1");
+    expect(text).toContain("결과 확인 후 (자체 보고)");
+    expect(text).toContain("통계 모델 / 분석 절차");
+    expect(text).toContain("Linear model");
+    expect(text).toContain("Robust model");
+    expect(text).toContain("외부 사전등록");
+    expect(text).not.toContain("export.");
+  });
   it("validates every scientific field and strips forged approval properties", () => {
     expect(normalizeAnalysisPlan({ ...plan, approved: true, actor: "user", digest: "fake" })).toEqual(plan);
     expect(() => normalizeAnalysisPlan({ ...plan, model: " " })).toThrow(/Statistical model/);

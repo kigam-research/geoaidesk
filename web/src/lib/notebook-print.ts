@@ -1,3 +1,5 @@
+import { t, geoLocale, type GeoLocale } from "../geo/i18n";
+import { notebookExecutionText } from "./notebook-execution";
 /**
  * Self-contained, print-ready HTML for the notebook's PDF export.
  *
@@ -10,12 +12,11 @@
 import { Marked } from "marked";
 import DOMPurify from "dompurify";
 import { rawFileUrl, fileCategory } from "./use-sandbox";
-import { notebookEntryKey, notebookTargetKey, evidenceLinks, HYPOTHESIS_LABELS, type NotebookEntry } from "./notebook";
+import { notebookEntryKey, notebookTargetKey, evidenceLinks, type NotebookEntry } from "./notebook";
 import { deriveThreads } from "./notebook-threads";
 import { nextExperimentsText } from "./next-experiments";
 import { planHistoryText } from "./notebook-plans";
 import { resultReferenceText } from "./notebook-result-links";
-import { roleLabel } from "./notebook-filters";
 import { derive, type NotebookAnnotation } from "./notebook-annotations";
 
 export function escapeHtml(s: string): string {
@@ -47,15 +48,9 @@ function mdToHtml(md: string, projectId?: string): string {
   return DOMPurify.sanitize(marked.parse(md) as string);
 }
 
-const TYPE_LABEL: Record<NotebookEntry["type"], string> = {
-  hypothesis: "Hypothesis",
-  method: "Method",
-  observation: "Observation",
-  decision: "Decision",
-  note: "Note",
-};
 
 export interface NotebookPrintOpts {
+  lang?: GeoLocale;
   scope?: "session" | "project";
   sessionNames?: ReadonlyMap<string, string>;
   projectId?: string;
@@ -66,6 +61,7 @@ export interface NotebookPrintOpts {
 function entryHtml(
   entry: NotebookEntry,
   ctx: {
+    lang: GeoLocale;
     byId: Map<string, NotebookEntry>;
     threads: ReturnType<typeof deriveThreads>;
     pinnedIds: Set<string>;
@@ -74,60 +70,63 @@ function entryHtml(
     projectId?: string;
   },
 ): string {
+  const text = (key: string, values = {}) => t("notebook." + key, values, ctx.lang);
+  const label = (key: string) => escapeHtml(text("export." + key));
   const thread = ctx.threads.get(notebookEntryKey(entry));
   const superseded = Boolean(thread?.supersededBy);
   const meta: string[] = [
-    `<span class="entry-type">${escapeHtml(TYPE_LABEL[entry.type] ?? entry.type)}</span>`,
+    `<span class="entry-type">${escapeHtml(text("type." + entry.type))}</span>`,
   ];
-  if (ctx.showRole) meta.push(`<span>by ${escapeHtml(roleLabel(entry.role ?? "agent"))}</span>`);
-  if (entry.confidence) meta.push(`<span>author confidence: ${escapeHtml(entry.confidence)} (self-reported)</span>`);
-  if (entry.provisional) meta.push("<span>Provisional — not yet saved</span>");
-  meta.push(`<span class="entry-time">${escapeHtml(new Date(entry.timestamp).toLocaleString())}</span>`);
+  if (ctx.showRole) meta.push(`<span>${escapeHtml(text("export.by", { role: entry.role === "you" ? text("role.you") : !entry.role || entry.role === "agent" ? text("role.lead") : entry.role }))}</span>`);
+  if (entry.confidence) meta.push(`<span>${escapeHtml(text("export.confidence", { confidence: text("confidence." + entry.confidence) }))}</span>`);
+  if (entry.provisional) meta.push(`<span>${label("provisional")}</span>`);
+  meta.push(`<span class="entry-time">${escapeHtml(new Date(entry.timestamp).toLocaleString(ctx.lang))}</span>`);
 
   const badges: string[] = [];
   if (entry.type === "hypothesis" && thread?.status) {
-    badges.push(`<span class="badge badge-${thread.status}">${HYPOTHESIS_LABELS[thread.status]}</span>`);
+    badges.push(`<span class="badge badge-${thread.status}">${escapeHtml(text("hypothesis." + thread.status))}</span>`);
   }
-  if (ctx.pinnedIds.has(entry.id)) badges.push(`<span class="badge badge-pin">★ pinned</span>`);
+  if (ctx.pinnedIds.has(entry.id)) badges.push(`<span class="badge badge-pin">★ ${label("pin")}</span>`);
 
   const threadLines: string[] = [];
   for (const link of evidenceLinks(entry)) {
     const target = ctx.byId.get(notebookTargetKey(entry, link.entryId, link.sessionId));
-    const rel = link.relation === "challenges" ? "refutes / challenges" : link.relation === "context" ? "relates to" : link.relation;
-    threadLines.push(`<div class="thread">↳ ${rel}: ${escapeHtml(target?.title ?? link.entryId)}${!target ? " (not in this export)" : ""}${link.rationale ? ` — ${escapeHtml(link.rationale)}` : ""}</div>`);
+    const rel = escapeHtml(text((link.relation === "challenges" || link.relation === "context" ? "export.relation." : "relation.") + link.relation));
+    threadLines.push(`<div class="thread">↳ ${rel}: ${escapeHtml(target?.title ?? link.entryId)}${!target ? ` (${label("unavailable")})` : ""}${link.rationale ? ` — ${escapeHtml(link.rationale)}` : ""}</div>`);
   }
-  if (thread?.reviewRequired) threadLines.push('<div class="thread">Needs review: cited artifacts changed or are missing. This does not refute the claim.</div>');
-  if (thread?.status) threadLines.push('<div class="thread">Evidence links are authored interpretations, not independent replications or probabilities.</div>');
-  if (entry.scope) threadLines.push(`<div class="thread">Applicability (authored): ${escapeHtml(entry.scope)}</div>`);
-  if (entry.revisitWhen) threadLines.push(`<div class="thread">Revisit when (condition, not an automatic action): ${escapeHtml(entry.revisitWhen)}</div>`);
-  if (entry.outcome) threadLines.push(`<div class="thread">Outcome: ${escapeHtml(entry.outcome)} — null results and technical failures do not automatically refute a hypothesis.</div>`);
-  if (entry.limitations?.length) threadLines.push(`<div class="thread">Limitations:<ul>${entry.limitations.map((x) => `<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`);
+  if (thread?.reviewRequired) threadLines.push(`<div class="thread">${label("needs_review")}: ${label("review_description")}</div>`);
+  if (thread?.status) threadLines.push(`<div class="thread">${label("interpretations")}</div>`);
+  if (entry.execution || entry.type === "method") threadLines.push(`<div class="thread"><pre>${escapeHtml(notebookExecutionText(entry.execution, ctx.lang))}</pre></div>`);
+  if (entry.scope) threadLines.push(`<div class="thread">${label("applicability")}: ${escapeHtml(entry.scope)}</div>`);
+  if (entry.revisitWhen) threadLines.push(`<div class="thread">${label("revisit")}: ${escapeHtml(entry.revisitWhen)}</div>`);
+  if (entry.outcome) threadLines.push(`<div class="thread">${label("outcome")}: ${escapeHtml(text("outcome." + entry.outcome))} — ${label("outcome_notice")}</div>`);
+  if (entry.limitations?.length) threadLines.push(`<div class="thread">${label("limitations")}:<ul>${entry.limitations.map((x) => `<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`);
   if (entry.artifactHealth?.length) {
-    threadLines.push('<div class="thread">Artifact checks: direct cited files only, not scientific validity or upstream inputs.</div>');
-    for (const health of entry.artifactHealth) threadLines.push(`<div class="thread">${escapeHtml(health.path)}: ${escapeHtml(health.status)} — ${escapeHtml(health.reason ?? "")} (checked ${escapeHtml(new Date(health.checkedAt).toLocaleString())})</div>`);
+    threadLines.push(`<div class="thread">${label("artifact_notice")}</div>`);
+    for (const health of entry.artifactHealth) threadLines.push(`<div class="thread">${escapeHtml(health.path)}: ${escapeHtml(text("health." + health.status))} — ${escapeHtml(health.reason ?? "")} (${escapeHtml(text("export.checked", { when: new Date(health.checkedAt).toLocaleString(ctx.lang) }))})</div>`);
   }
-  if (entry.artifactHealthTruncated) threadLines.push(`<div class="thread">${entry.artifactHealthTruncated} additional artifacts were not checked.</div>`);
-  if (entry.nextExperiments) threadLines.push(`<div class="thread">Proposed next investigations — not performed:<pre>${escapeHtml(nextExperimentsText(entry.nextExperiments))}</pre></div>`);
-  if (entry.nextExperimentBinding) threadLines.push(`<div class="thread">Recorded proposal context (not scientific verification):<pre>${escapeHtml(JSON.stringify(entry.nextExperimentBinding, null, 2))}</pre></div>`);
-  if (entry.nextExperimentDecision) threadLines.push(`<div class="thread">User planning preference — not execution/spending approval:<pre>${escapeHtml(JSON.stringify(entry.nextExperimentDecision, null, 2))}</pre></div>`);
-  if (entry.analysisPlan) threadLines.push(`<div class="thread">Proposed analysis plan (draft, not approved):<pre>${escapeHtml(JSON.stringify(entry.analysisPlan, null, 2))}</pre></div>`);
-  if (entry.robustness) threadLines.push(`<div class="thread">Proposed robustness workflow (not approved or executed):<pre>${escapeHtml(JSON.stringify(entry.robustness, null, 2))}</pre></div>`);
-  if (entry.planHistory) threadLines.push(`<div class="body">${mdToHtml(planHistoryText(entry.planHistory), ctx.projectId)}</div>`);
-  if (entry.planHistoryError) threadLines.push(`<div class="thread">Plan history unavailable: ${escapeHtml(entry.planHistoryError)}</div>`);
+  if (entry.artifactHealthTruncated) threadLines.push(`<div class="thread">${escapeHtml(text("export.omitted", { count: entry.artifactHealthTruncated }))}</div>`);
+  if (entry.nextExperiments) threadLines.push(`<div class="thread">${label("next")}:<pre>${escapeHtml(nextExperimentsText(entry.nextExperiments, ctx.lang))}</pre></div>`);
+  if (entry.nextExperimentBinding) threadLines.push(`<div class="thread">${label("proposal_context")}:<pre>${escapeHtml(JSON.stringify(entry.nextExperimentBinding, null, 2))}</pre></div>`);
+  if (entry.nextExperimentDecision) threadLines.push(`<div class="thread">${label("preference")}:<pre>${escapeHtml(JSON.stringify(entry.nextExperimentDecision, null, 2))}</pre></div>`);
+  if (entry.analysisPlan) threadLines.push(`<div class="thread">${label("analysis_plan")}:<pre>${escapeHtml(JSON.stringify(entry.analysisPlan, null, 2))}</pre></div>`);
+  if (entry.robustness) threadLines.push(`<div class="thread">${label("robustness")}:<pre>${escapeHtml(JSON.stringify(entry.robustness, null, 2))}</pre></div>`);
+  if (entry.planHistory) threadLines.push(`<div class="body">${mdToHtml(planHistoryText(entry.planHistory, ctx.lang), ctx.projectId)}</div>`);
+  if (entry.planHistoryError) threadLines.push(`<div class="thread">${label("plan_unavailable")}: ${escapeHtml(entry.planHistoryError)}</div>`);
   if (entry.results?.length) {
-    threadLines.push('<div class="thread">Recorded scientific-result references (not independently verified measurements):</div>');
+    threadLines.push(`<div class="thread">${label("result_refs")}: ${label("result_notice")}</div>`);
     for (const ref of entry.results) {
       const snapshot = entry.resultSnapshots?.find((s) => s.toolCallId === ref.toolCallId && (ref.sessionId === undefined || s.sessionId === ref.sessionId));
-      threadLines.push(`<div class="thread">${escapeHtml(resultReferenceText(snapshot ?? ref, entry.sessionId))}</div>`);
+      threadLines.push(`<div class="thread">${escapeHtml(resultReferenceText(snapshot ?? ref, entry.sessionId, ctx.lang))}</div>`);
     }
   }
   if (entry.supersedes) {
     const target = ctx.byId.get(notebookTargetKey(entry, entry.supersedes));
-    threadLines.push(`<div class="thread">↺ supersedes: ${escapeHtml(target?.title ?? entry.supersedes)}</div>`);
+    threadLines.push(`<div class="thread">${label("supersedes")}: ${escapeHtml(target?.title ?? entry.supersedes)}</div>`);
   }
   if (thread?.supersededBy) {
     const by = ctx.byId.get(thread.supersededBy);
-    threadLines.push(`<div class="thread superseded-note">⚠ superseded by: ${escapeHtml(by?.title ?? thread.supersededBy)}</div>`);
+    threadLines.push(`<div class="thread superseded-note">${label("superseded_by")}: ${escapeHtml(by?.title ?? thread.supersededBy)}</div>`);
   }
 
   const tags = entry.tags?.length
@@ -151,7 +150,7 @@ function entryHtml(
   const comments = (ctx.commentsByEntry.get(entry.id) ?? [])
     .map(
       (c) =>
-        `<div class="comment"><span class="comment-author">You</span> <span class="entry-time">${escapeHtml(new Date(c.createdAt).toLocaleString())}</span><div>${mdToHtml(c.body ?? "", ctx.projectId)}</div></div>`,
+        `<div class="comment"><span class="comment-author">${label("you")}</span> <span class="entry-time">${escapeHtml(new Date(c.createdAt).toLocaleString(ctx.lang))}</span><div>${mdToHtml(c.body ?? "", ctx.projectId)}</div></div>`,
     )
     .join("\n");
 
@@ -173,6 +172,8 @@ export function buildNotebookPrintHtml(
   entries: NotebookEntry[],
   opts: NotebookPrintOpts = {},
 ): string {
+  const lang = opts.lang ?? geoLocale();
+  const label = (key: string, values = {}) => escapeHtml(t("notebook.export." + key, values, lang));
   const byId = new Map(entries.map((e) => [notebookEntryKey(e), e]));
   const threads = deriveThreads(entries);
   const { pinnedIds, commentsByEntry } = derive({
@@ -200,6 +201,7 @@ export function buildNotebookPrintHtml(
           .get(sid)!
           .map((e) =>
             entryHtml(e, {
+              lang,
               byId,
               threads,
               pinnedIds,
@@ -232,6 +234,7 @@ export function buildNotebookPrintHtml(
           .get(role)!
           .map((e) =>
             entryHtml(e, {
+              lang,
               byId,
               threads,
               pinnedIds,
@@ -241,16 +244,16 @@ export function buildNotebookPrintHtml(
             }),
           )
           .join("\n");
-        return multiLane ? `<h2 class="lane">${escapeHtml(roleLabel(role))}</h2>\n${inner}` : inner;
+        return multiLane ? `<h2 class="lane">${escapeHtml(role === "agent" ? t("notebook.role.lead", {}, lang) : role === "you" ? t("notebook.role.you", {}, lang) : role)}</h2>\n${inner}` : inner;
       })
       .join("\n");
   }
 
   return `<!doctype html>
-<html>
+<html lang="${lang}">
 <head>
 <meta charset="utf-8" />
-<title>Lab Notebook</title>
+<title>${label("title")}</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #111; margin: 2rem; }
   h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
@@ -291,8 +294,8 @@ export function buildNotebookPrintHtml(
 </style>
 </head>
 <body>
-  <h1>Lab Notebook</h1>
-  <div class="subtitle">Exported ${escapeHtml(new Date().toLocaleString())}</div>
+  <h1>${label("title")}</h1>
+  <div class="subtitle">${label("exported", { when: new Date().toLocaleString(lang) })}</div>
   ${sectionsHtml}
 </body>
 </html>`;

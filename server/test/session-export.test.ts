@@ -25,6 +25,18 @@ function writeFixture(name: string, rows: unknown[]): string {
 
 const msg = (message: Record<string, unknown>) => ({ type: "message", message });
 
+it("exports localized GAID labels without rewriting chat contents", () => {
+  const file = writeFixture("locale.jsonl", [msg({ role: "user", content: [{ type: "text", text: "Keep my request" }] })]);
+  for (const lang of ["ko", "en"]) {
+    const md = toNotebook(file, "s", "", lang);
+    expect(md).toContain(lang === "ko" ? "# 작업 기록" : "# Lab Notebook");
+    expect(md).toContain(lang === "ko" ? "1. 요청" : "1. Prompt");
+    expect(md).toContain("Keep my request");
+    expect(md).toContain("GAID");
+    expect(md).not.toMatch(/K-Dense|BYOK/);
+  }
+});
+
 const FIXTURE = [
   { type: "session", id: "s1" },
   msg({

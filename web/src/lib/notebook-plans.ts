@@ -1,3 +1,4 @@
+import { notebookExportText } from "../geo/notebook/export-text";
 /** Shared, IO-free analysis-plan protocol. Local records are not external preregistrations. */
 import type { NotebookArtifactSnapshot } from "./notebook-evidence-core";
 
@@ -98,19 +99,22 @@ export function latestFrozenPlan(history: AnalysisPlanHistory): FrozenPlanEvent 
 // Form fields are plain text, not a way to inject markup into a frozen record.
 const planText = (value: string) => value.replace(/[\\`*_{}\[\]<>()#+.!|~\-]/g, "\\$&").replace(/\n/g, "  \n");
 
-export function planHistoryText(history: AnalysisPlanHistory): string {
-  if (!history.events.length) return "No frozen analysis plan recorded.";
-  const lines = ["### Local analysis-plan record", "User-confirmed local records, not external preregistration or proof of data-naivety. Plan contents describe intentions, not evidence that procedures were executed. Dataset hashes are metadata, not retained historical data copies."];
+export function planHistoryText(history: AnalysisPlanHistory, lang?: string): string {
+  const text = notebookExportText(lang);
+  const label = (key: string) => text("export." + key);
+  const value = (v: string) => lang === "ko" ? text("export.value." + v) : v;
+  if (!history.events.length) return label("plan_empty");
+  const lines = [`### ${label("plan_title")}`, label("plan_notice")];
   for (const event of history.events) {
-    lines.push(`\n#### ${event.kind === "freeze" ? `Frozen revision ${event.revision}` : "Deviation"} — ${event.id}`, `Recorded ${new Date(event.recordedAt).toISOString()} by user · digest ${event.digest}`);
+    lines.push(`\n#### ${event.kind === "freeze" ? text("export.frozen", { revision: event.revision }) : label("deviation")} — ${event.id}`, text("export.plan_recorded", { when: new Date(event.recordedAt).toISOString(), digest: event.digest }));
     if (event.kind === "freeze") {
-      lines.push(`Intent: ${event.plan.intent} (declared) · prior exposure: ${event.plan.priorExposure}`, `Revision reason: ${planText(event.revisionReason || "Initial plan")}`);
-      for (const field of Object.keys(PLAN_TEXT_FIELDS) as PlanTextField[]) lines.push(`**${PLAN_TEXT_FIELDS[field]}:** ${planText(event.plan[field])}`);
-      lines.push("**Dataset identities measured for this revision:**");
-      for (const data of event.datasets) lines.push(`- ${planText(data.path)}: ${data.sha256 ? `sha256 ${data.sha256}` : `unverified (${data.reason ?? "no hash"})`} (measured ${new Date(data.capturedAt).toISOString()})`);
+      lines.push(`${label("intent")}: ${value(event.plan.intent)} (${label("declared")}) · ${label("exposure")}: ${value(event.plan.priorExposure)}`, `${label("revision_reason")}: ${planText(event.revisionReason || label("initial"))}`);
+      for (const field of Object.keys(PLAN_TEXT_FIELDS) as PlanTextField[]) lines.push(`**${label("plan_field." + field)}:** ${planText(event.plan[field])}`);
+      lines.push(`**${label("datasets")}:**`);
+      for (const data of event.datasets) lines.push(`- ${planText(data.path)}: ${data.sha256 ? `sha256 ${data.sha256}` : `${label("unverified")} (${data.reason ? value(data.reason) : label("no_hash")})`} (${text("export.measured", { when: new Date(data.capturedAt).toISOString() })})`);
     } else {
-      lines.push(`Plan: ${event.planId} · field: ${event.field} · timing: ${event.timing} (self-reported)`, `Planned: ${planText(event.planned)}`, `Actual: ${planText(event.actual)}`, `Reason: ${planText(event.reason)}`);
-      if (event.corrects) lines.push(`Corrects deviation ${event.corrects}; original retained.`);
+      lines.push(`${label("plan")}: ${event.planId} · ${label("field")}: ${lang === "ko" ? label("plan_field." + event.field) : event.field} · ${label("timing")}: ${value(event.timing)} (${label("self_reported")})`, `${label("planned")}: ${planText(event.planned)}`, `${label("actual")}: ${planText(event.actual)}`, `${label("reason")}: ${planText(event.reason)}`);
+      if (event.corrects) lines.push(text("export.corrects", { id: event.corrects }));
     }
   }
   return lines.join("\n\n");

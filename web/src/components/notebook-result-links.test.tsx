@@ -14,9 +14,14 @@ describe("saved scientific-result links", () => {
   it("loads canonical values lazily using the owning notebook's scoped reference", async () => {
     fetch.mockResolvedValue(response({ reference, status: "available", card, reason: "Matches the cited persisted result." }));
     render(<NotebookResultLinks {...props} />); expect(fetch).not.toHaveBeenCalled();
+    expect(screen.queryByText("source/result-1")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "View saved result 1" }));
     expect(await screen.findByText("Saved measurements")).toBeInTheDocument();
     expect(screen.getByText("100")).toBeInTheDocument();
+    const source = screen.getByText(/source\/result-1/).closest("details");
+    expect(source).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("Result source technical information"));
+    expect(source).toHaveAttribute("open");
     expect(fetch.mock.calls[0][0]).toBe("/sessions/owner/notebook/o1/results/0");
     expect(fetch.mock.calls[0][2]).toBe("project-a");
     expect(screen.getByText(/not independently verified/)).toBeInTheDocument();
@@ -32,7 +37,9 @@ describe("saved scientific-result links", () => {
     fetch.mockResolvedValue(response({ reference: { ...reference, sha256: undefined }, status: "unverified", card, reason: "Citation-time identity was not pinned." }));
     render(<NotebookResultLinks {...props} />);
     fireEvent.click(screen.getByRole("button", { name: "View saved result 1" }));
-    expect(await screen.findByText(/unverified: Citation-time/)).toBeInTheDocument();
+    expect(await screen.findByText("Citation-time identity was not pinned.")).toBeInTheDocument();
+    expect(screen.getByText("Citation-time identity was not pinned.").closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByText("unverified", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText("Saved measurements")).toBeInTheDocument();
   });
   it("exposes invalid result payloads as errors rather than crashing the notebook", async () => {

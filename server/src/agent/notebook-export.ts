@@ -1,3 +1,4 @@
+import { notebookExportText } from "../../../web/src/geo/notebook/export-text.ts";
 /**
  * Render notebook entries to a Markdown lab record: a header, then one section
  * per entry with type label, title, attribution, thread links, body, embedded
@@ -5,21 +6,14 @@
  * from the first entry. Pure (no fs) — zip bundling passes artifactHref /
  * missingArtifacts to rewrite or annotate artifact references.
  */
-import type { NotebookEntry, NotebookEntryType } from "./notebook-store.ts";
-import { deriveEvidenceThreads, evidenceLinks, notebookEntryKey, notebookTargetKey, HYPOTHESIS_LABELS } from "../../../web/src/lib/notebook-evidence-core.ts";
+import type { NotebookEntry } from "./notebook-store.ts";
+import { deriveEvidenceThreads, evidenceLinks, notebookEntryKey, notebookTargetKey } from "../../../web/src/lib/notebook-evidence-core.ts";
 import type { NotebookAnnotation } from "./notebook-annotations.ts";
 import { nextExperimentsText } from "../../../web/src/lib/next-experiments.ts";
 import { planHistoryText } from "../../../web/src/lib/notebook-plans.ts";
 import { resultReferenceText } from "../../../web/src/lib/notebook-result-links.ts";
 import { notebookExecutionText } from "../../../web/src/lib/notebook-execution.ts";
 
-const LABEL: Record<NotebookEntryType, string> = {
-  hypothesis: "Hypothesis",
-  method: "Method",
-  observation: "Observation",
-  decision: "Decision",
-  note: "Note",
-};
 
 const IMAGE_RE = /\.(png|jpe?g|gif|svg|webp)$/i;
 
@@ -27,6 +21,7 @@ const IMAGE_RE = /\.(png|jpe?g|gif|svg|webp)$/i;
 type ScopedEntry = NotebookEntry & { sessionId?: string };
 
 export interface NotebookMarkdownOpts {
+  lang?: string;
   /** Session-scope export: the session's id. Omit for a project-scope export. */
   sessionId?: string;
   projectName?: string;
@@ -53,21 +48,23 @@ export function notebookToMarkdown(
   entries: NotebookEntry[],
   opts: NotebookMarkdownOpts,
 ): string {
+  const text = notebookExportText(opts.lang);
+  const label = (key: string) => text("export." + key);
   const grouped = opts.sessionLabels !== undefined;
   const h = grouped ? "###" : "##";
   const lines: string[] = [];
-  lines.push(`# Lab Notebook`);
-  if (opts.projectName) lines.push(`**Project:** ${opts.projectName}`);
-  if (opts.sessionId) lines.push(`**Session:** ${opts.sessionId}`);
+  lines.push(`# ${label("title")}`);
+  if (opts.projectName) lines.push(`**${label("project")}:** ${opts.projectName}`);
+  if (opts.sessionId) lines.push(`**${label("session")}:** ${opts.sessionId}`);
   if (grouped) {
     const chats = new Set(entries.map((e) => (e as ScopedEntry).sessionId ?? ""));
-    lines.push(`**Chats:** ${chats.size}`);
+    lines.push(`**${label("chats")}:** ${chats.size}`);
   }
   if (entries.length > 0) {
     const start = new Date(entries[0].timestamp).toISOString();
     const end = new Date(entries[entries.length - 1].timestamp).toISOString();
-    lines.push(`**Span:** ${start} → ${end}`);
-    lines.push(`**Entries:** ${entries.length}`);
+    lines.push(`**${label("span")}:** ${start} → ${end}`);
+    lines.push(`**${label("entries")}:** ${entries.length}`);
   }
   lines.push("");
   lines.push("---");
@@ -100,61 +97,61 @@ export function notebookToMarkdown(
       const sid = (e as ScopedEntry).sessionId ?? "";
       if (sid !== openSession) {
         openSession = sid;
-        lines.push(`## ${opts.sessionLabels?.get(sid) || sid || "Unattributed"}`, "");
+        lines.push(`## ${opts.sessionLabels?.get(sid) || sid || label("unattributed")}`, "");
       }
     }
     const elapsed = Math.max(0, Math.round((e.timestamp - t0) / 1000));
-    lines.push(`${h} ${LABEL[e.type]}: ${e.title}`);
-    const bits = [`+${elapsed}s`, `by ${e.role}`];
-    if (e.confidence) bits.push(`author confidence: ${e.confidence} (self-reported)`);
+    lines.push(`${h} ${text("type." + e.type)}: ${e.title}`);
+    const bits = [`+${elapsed}s`, text("export.by", { role: opts.lang !== "ko" ? e.role ?? "" : e.role === "agent" ? text("role.lead") : e.role === "you" ? text("role.you") : e.role ?? "" })];
+    if (e.confidence) bits.push(text("export.confidence", { confidence: text("confidence." + e.confidence) }));
     if (e.tags?.length) bits.push(e.tags.map((t) => `#${t}`).join(" "));
     lines.push(`_${bits.join(" · ")}_`);
     const thread = threads.get(notebookEntryKey(e as ScopedEntry));
-    if (thread?.status) lines.push(`**Evidence status:** ${HYPOTHESIS_LABELS[thread.status]} (authored interpretations, not a scientific verdict)`);
-    if (thread?.reviewRequired) lines.push("**Needs review:** direct artifacts in this entry or its linked evidence changed or are missing. This does not refute the claim.");
+    if (thread?.status) lines.push(`**${label("evidence_status")}:** ${text("hypothesis." + thread.status)} (${label("authored_interpretations")})`);
+    if (thread?.reviewRequired) lines.push(`**${label("needs_review")}:** ${label("review_description")}`);
     for (const link of evidenceLinks(e)) {
       const target = byId.get(notebookTargetKey(e as ScopedEntry, link.entryId, link.sessionId));
-      const rel = link.relation === "challenges" ? "refutes / challenges" : link.relation === "context" ? "relates to" : link.relation;
-      lines.push(`_↳ ${rel} “${target?.title ?? link.entryId}” (${link.entryId})${!target ? " — unavailable in this export" : ""}_`);
+      const rel = text((link.relation === "challenges" || link.relation === "context" ? "export.relation." : "relation.") + link.relation);
+      lines.push(`_↳ ${rel} “${target?.title ?? link.entryId}” (${link.entryId})${!target ? ` — ${label("unavailable")}` : ""}_`);
       if (link.rationale) lines.push(link.rationale);
     }
     if (e.supersedes) {
       const target = byId.get(notebookTargetKey(e as ScopedEntry, e.supersedes));
-      lines.push(`_↺ supersedes “${target?.title ?? e.supersedes}” (${e.supersedes})_`);
+      lines.push(`_↺ ${label("supersedes")} “${target?.title ?? e.supersedes}” (${e.supersedes})_`);
     }
     const superseder = thread?.supersededBy ? byId.get(thread.supersededBy) : undefined;
-    if (superseder) lines.push(`_⚠ superseded by “${superseder.title}”_`);
-    if (e.scope) lines.push(`**Applicability (authored):** ${e.scope}`);
-    if (e.execution || e.type === "method") lines.push(notebookExecutionText(e.execution));
-    if (e.revisitWhen) lines.push(`**Revisit when (condition, not an automatic action):** ${e.revisitWhen}`);
-    if (e.outcome) lines.push(`**Outcome:** ${e.outcome} (null results and technical failures do not automatically refute a hypothesis)`);
-    if (e.limitations?.length) lines.push("**Limitations:**", ...e.limitations.map((x) => `- ${x}`));
+    if (superseder) lines.push(`_⚠ ${label("superseded_by")} “${superseder.title}”_`);
+    if (e.scope) lines.push(`**${label("applicability")}:** ${e.scope}`);
+    if (e.execution || e.type === "method") lines.push(notebookExecutionText(e.execution, opts.lang));
+    if (e.revisitWhen) lines.push(`**${label("revisit")}:** ${e.revisitWhen}`);
+    if (e.outcome) lines.push(`**${label("outcome")}:** ${text("outcome." + e.outcome)} (${label("outcome_notice")})`);
+    if (e.limitations?.length) lines.push(`**${label("limitations")}:**`, ...e.limitations.map((x) => `- ${x}`));
     if (e.artifactHealth?.length) {
-      lines.push("**Artifact checks:** direct cited files only; unchanged bytes do not verify scientific validity or upstream inputs.");
-      for (const check of e.artifactHealth) lines.push(`- \`${check.path}\`: **${check.status}** — ${check.reason ?? ""} (checked ${annotationTime(check.checkedAt)})`);
+      lines.push(`**${label("artifact_checks")}:** ${label("artifact_notice")}`);
+      for (const check of e.artifactHealth) lines.push(`- \`${check.path}\`: **${text("health." + check.status)}** — ${check.reason ?? ""} (${text("export.checked", { when: annotationTime(check.checkedAt) })})`);
     }
-    if (e.artifactHealthTruncated) lines.push(`**Incomplete checks:** ${e.artifactHealthTruncated} additional artifacts were not checked.`);
+    if (e.artifactHealthTruncated) lines.push(`**${label("incomplete")}:** ${text("export.omitted", { count: e.artifactHealthTruncated })}`);
     const entryAnnotations = annotationsByEntry.get(notebookEntryKey(e as ScopedEntry)) ?? [];
     const pins = entryAnnotations.filter((annotation) => annotation.kind === "pin");
     if (pins.length > 0) {
       const times = pins.map((pin) => annotationTime(pin.createdAt)).join(", ");
-      lines.push(`_Pinned by user (${times})_`);
+      lines.push(`_${text("export.pinned", { times })}_`);
     }
     lines.push("");
     if (e.body) { lines.push(e.body); lines.push(""); }
-    if (e.nextExperiments) lines.push("**Proposed next investigations — not performed:**", nextExperimentsText(e.nextExperiments), "");
-    if (e.nextExperimentBinding) lines.push("**Recorded proposal context (not scientific verification):**", "```json", JSON.stringify(e.nextExperimentBinding, null, 2), "```", "");
-    if (e.nextExperimentDecision) lines.push("**User planning preference — not execution/spending approval:**", "```json", JSON.stringify(e.nextExperimentDecision, null, 2), "```", "");
-    if (e.analysisPlan) lines.push("**Proposed analysis plan (draft, not approved):**", "```json", JSON.stringify(e.analysisPlan, null, 2), "```", "");
-    if (e.robustness) lines.push("**Proposed robustness workflow (not approved or executed):**", "```json", JSON.stringify(e.robustness, null, 2), "```", "");
-    if (e.planHistory) lines.push(planHistoryText(e.planHistory), "");
-    if (e.planHistoryError) lines.push(`**Plan history unavailable:** ${e.planHistoryError}`, "");
+    if (e.nextExperiments) lines.push(`**${label("next")}:**`, nextExperimentsText(e.nextExperiments, opts.lang), "");
+    if (e.nextExperimentBinding) lines.push(`**${label("proposal_context")}:**`, "```json", JSON.stringify(e.nextExperimentBinding, null, 2), "```", "");
+    if (e.nextExperimentDecision) lines.push(`**${label("preference")}:**`, "```json", JSON.stringify(e.nextExperimentDecision, null, 2), "```", "");
+    if (e.analysisPlan) lines.push(`**${label("analysis_plan")}:**`, "```json", JSON.stringify(e.analysisPlan, null, 2), "```", "");
+    if (e.robustness) lines.push(`**${label("robustness")}:**`, "```json", JSON.stringify(e.robustness, null, 2), "```", "");
+    if (e.planHistory) lines.push(planHistoryText(e.planHistory, opts.lang), "");
+    if (e.planHistoryError) lines.push(`**${label("plan_unavailable")}:** ${e.planHistoryError}`, "");
     if (e.results?.length) {
-      lines.push("**Recorded scientific-result references:** source identifiers and pinned content digests, not independently verified measurements. Canonical source session logs are not bundled in this notebook export.");
+      lines.push(`**${label("result_refs")}:** ${label("result_notice")}`);
       for (const ref of e.results) {
         const sid = ref.sessionId ?? (e as ScopedEntry).sessionId ?? opts.sessionId;
         const snapshot = e.resultSnapshots?.find((s) => s.sessionId === sid && s.toolCallId === ref.toolCallId);
-        lines.push(`- ${resultReferenceText(snapshot ?? ref, sid)}`);
+        lines.push(`- ${resultReferenceText(snapshot ?? ref, sid, opts.lang)}`);
       }
       lines.push("");
     }
@@ -167,7 +164,7 @@ export function notebookToMarkdown(
     if (e.artifacts?.length) {
       for (const p of e.artifacts) {
         if (opts.missingArtifacts?.has(p)) {
-          lines.push(`\`${p}\` _(artifact missing at export time)_`);
+          lines.push(`\`${p}\` _(${label("missing_artifact")})_`);
           continue;
         }
         const name = p.split("/").pop() ?? p;
@@ -178,26 +175,26 @@ export function notebookToMarkdown(
     }
     const comments = entryAnnotations.filter((annotation) => annotation.kind === "comment");
     if (comments.length > 0) {
-      lines.push(`${h}# User comments`, "");
+      lines.push(`${h}# ${label("comments")}`, "");
       for (const comment of comments) {
         lines.push(`**${annotationTime(comment.createdAt)}**`, "", comment.body ?? "", "");
       }
     }
   }
   if (notes.length > 0) {
-    lines.push("## User notes", "");
+    lines.push(`## ${label("notes")}`, "");
     for (const note of notes) {
-      lines.push(`### ${note.title?.trim() || "Note"}`);
+      lines.push(`### ${note.title?.trim() || text("type.note")}`);
       lines.push(`_${annotationTime(note.createdAt)}_`, "", note.body ?? "", "");
     }
   }
   if (unresolved.length > 0) {
-    lines.push("## Unresolved annotations", "");
+    lines.push(`## ${label("unresolved")}`, "");
     for (const annotation of unresolved) {
-      const target = annotation.entryId ?? "unknown";
+      const target = annotation.entryId ?? label("unknown");
       const detail = annotation.kind === "comment" ? `: ${annotation.body ?? ""}` : "";
       lines.push(
-        `- ${annotation.kind} for missing entry \`${target}\` (${annotationTime(annotation.createdAt)})${detail}`,
+        `- ${text("export.missing_entry", { kind: text("annotation." + annotation.kind), target, when: annotationTime(annotation.createdAt), comment: detail })}`,
       );
     }
     lines.push("");
