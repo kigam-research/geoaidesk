@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:13:27Z
+updated: 2026-10-18T08:27:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20c56c1e-1c40-4e4b-91a7-71f36f7eb67c","pid":1512234,"provider":"claude","session":"2cbf721c-43fd-4509-a2a4-c3d7f0dba0b8","start":"19721847","token":"f4f562224bbbdb6fbb1d4221f0ac42ff23998b39dd15d754d0d1787ba50a9aea"}
 branch: task/gaid-system-ui
 target: main
@@ -33,14 +33,20 @@ Scope confirmed with the user (option 가)):
 Outside check: no outside check (UI work).
 
 ## Current state
-- Plan settled (2026-10-18). Target design: the approved mockup of gaid-ui-guide
-  (reports/2026-10-16-gaid-ui-guide/figures/01-setup-after*.png, docs/design/mockups/setup.html).
-- Isolated runtime for screenshots: `systemd-run --user --unit gsu-runtime ... ~/data/geoaidesk/work/gaid-system-ui/bin/run.sh`
-  (UI 127.0.0.1:3361, API 18361, data home ~/data/geoaidesk/work/gaid-system-ui/home, samples copied from ~/.geoaidesk).
-  Stop: `systemctl --user stop gsu-runtime`. Before shots: ~/data/geoaidesk/work/gaid-system-ui/shots/before-*.
-- web/ and server/ have their own `npm ci` node_modules (no symlinks to ~/deploy).
+- Done (all pushed on task/gaid-system-ui):
+  - A. TaskSetup rebuilt as a stepper (task-setup.tsx + setup-steps.tsx; readiness.tsx ReadinessNotice; api.ts draft).
+  - B. Audit fixes: Workflow list (one-line rows, <=3 badges, row detail icon, 12 px pills; workflows-panel.tsx,
+    methods.tsx, task-catalogue.tsx), file panel (compact suggestion rows; Korean "[오류:" load-error marker in
+    file-preview-panel.tsx), skill_hub card (labelled file chooser, empty list hidden), workspace header hub switch.
+  - Routed request 88fe3c357f47 (gaid-hub-novice-review findings 1-6) handled and reported with `task route-report`.
+- Verified: `cd web && npx vitest run src/geo src/components` green; `node geo/ui/check-ui.mjs` 0 errors, debt 102 -> 89;
+  copy validator 0 errors; screenshots ~/data/geoaidesk/work/gaid-system-ui/shots/final (both sizes).
+- scripts/check: EXIT=0 (log ~/data/geoaidesk/work/gaid-system-ui/logs/check.log). First-view chars (W5, measured with
+  bin/count.js): input 113, choice 297, summary 250 incl. titles/buttons; body 77/199/123.
+- Isolated runtime (stopped): `systemd-run --user --unit gsu-runtime --collect -E PATH=$PATH -E HOME=$HOME
+  ~/data/geoaidesk/work/gaid-system-ui/bin/run.sh` (UI 3361, API 18361); shots: bin/final-shots.sh.
 ## Next steps
-1. Rebuild TaskSetup as a stepper (package A below), screenshots, then audit (package B).
+1. task finish.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: the popup (A) and the audit fixes (B) share workspace locales and readiness.tsx; both are done by
@@ -58,16 +64,7 @@ Outside check: no outside check (UI work).
   in workspace strings; action "시작 초안 만들기" (as in the approved mockup).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+- [부채] 방법 상세 대화상자가 시험 기록의 도구 호출 횟수와 허브 검사 ID·영어 메시지를 그대로 보입니다(UI 가이드 R1, R3, P3) — 가) 허브 화면 작업과 함께 연구자용 요약 + 기록 보기로 정리 — 나) 그대로 둠 — 권장: 가) 방법 상세는 허브와 같은 정보를 다룸 — 막힌 일: 없음 — 조건: 다음 허브/방법 화면 작업 — 근거: reports/2026-10-18-gaid-system-ui#5-한계
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
-## Running jobs
-<!-- task:jobs -->
-<!-- /task:jobs -->
-<!-- task:cloud -->
-<!-- /task:cloud -->
+Report: reports/2026-10-18-gaid-system-ui/index.md
