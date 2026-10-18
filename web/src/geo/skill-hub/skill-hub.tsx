@@ -35,6 +35,7 @@ export function SkillHubInstall({ scope, projectId, disabled, onStart, onPreview
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const generation = useRef(0);
+  const fileInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     let alive = true;
     void apiFetch("/geo/skill-hub", {}, projectId).then(async (res) => {
@@ -69,22 +70,32 @@ export function SkillHubInstall({ scope, projectId, disabled, onStart, onPreview
       if (ticket === generation.current) onError(error instanceof Error ? error.message : t("skillHub.errors.request"));
     } finally { if (ticket === generation.current) { setLoading(false); onSettled?.(); } }
   };
-  return <section className="flex min-w-0 flex-col gap-2 rounded-md border p-3" aria-label={t("skillHub.title")}>
-    <h3 className="text-xs font-medium">{t("skillHub.title")}</h3>
-    {sites.map((site) => <a key={site.id} href={site.url} target="_blank" rel="noopener noreferrer" className="w-fit text-xs text-primary underline">{t("skillHub.browse")}{sites.length > 1 ? ` (${site.id})` : ""}</a>)}
-    <SkillHubMethods projectId={projectId} disabled={loading || disabled} onPreview={(descriptorUrl) => void preview(false, descriptorUrl)} />
+  // gaid-system-ui: one title row, two short input rows and the limits in one line; the browser's own file field
+  // (English "Choose File") is replaced by a labelled button (UI guide P2, T1, W6).
+  return <section className="flex min-w-0 flex-col gap-3 rounded-md border p-3" aria-label={t("skillHub.title")}>
+    <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <h3 className="text-sm font-medium">{t("skillHub.title")}</h3>
+      {sites.map((site) => <a key={site.id} href={site.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline-offset-4 hover:underline">{t("skillHub.browse")}{sites.length > 1 ? ` (${site.id})` : ""}</a>)}
+    </div>
     <p className="text-xs text-muted-foreground">{t("skillHub.help")}</p>
-    <label className="text-xs" htmlFor="skill-hub-url">{t("skillHub.url")}</label>
-    <div className="flex flex-col gap-2 sm:flex-row">
-      <Input id="skill-hub-url" value={url} placeholder={t("skillHub.placeholder")} disabled={loading || disabled} onChange={(e) => setUrl(e.target.value)} className="h-8 min-w-0 flex-1 text-xs" />
-      <Button type="button" variant="outline" size="sm" disabled={!url.trim() || loading || disabled} onClick={() => void preview(false)}>{t("skillHub.preview")}</Button>
+    <SkillHubMethods projectId={projectId} disabled={loading || disabled} onPreview={(descriptorUrl) => void preview(false, descriptorUrl)} />
+    <div className="space-y-1">
+      <label className="text-xs font-medium" htmlFor="skill-hub-url">{t("skillHub.url")}</label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input id="skill-hub-url" value={url} placeholder={t("skillHub.placeholder")} disabled={loading || disabled} onChange={(e) => setUrl(e.target.value)} className="h-8 min-w-0 flex-1 text-sm" />
+        <Button type="button" variant="outline" size="sm" disabled={!url.trim() || loading || disabled} onClick={() => void preview(false)}>{t("skillHub.preview")}</Button>
+      </div>
     </div>
-    <label className="text-xs" htmlFor="skill-hub-file">{t("skillHub.file")}</label>
-    <div className="flex flex-col gap-2 sm:flex-row">
-      <input id="skill-hub-file" type="file" accept=".tar.gz,application/gzip" disabled={loading || disabled} className="min-w-0 flex-1 text-xs" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-      <Button type="button" variant="outline" size="sm" disabled={!file || loading || disabled} onClick={() => void preview(true)}>{t("skillHub.upload")}</Button>
+    <div className="space-y-1">
+      <label className="text-xs font-medium" htmlFor="skill-hub-file">{t("skillHub.file")}</label>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <input ref={fileInput} id="skill-hub-file" type="file" accept=".tar.gz,application/gzip" disabled={loading || disabled} className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+        <Button type="button" variant="outline" size="sm" disabled={loading || disabled} onClick={() => fileInput.current?.click()}>{t("skillHub.chooseFile")}</Button>
+        <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground" title={file?.name}>{file?.name ?? t("skillHub.noFile")}</span>
+        <Button type="button" variant="outline" size="sm" disabled={!file || loading || disabled} onClick={() => void preview(true)}>{t("skillHub.upload")}</Button>
+      </div>
+      <p className="text-xs text-muted-foreground">{t("skillHub.sizeHelp")}</p>
     </div>
-    <p className="text-[11px] text-muted-foreground">{t("skillHub.sizeHelp")}</p>
     {loading && <p role="status" className="text-xs">{t("skillHub.loading")}</p>}
   </section>;
 }
@@ -108,18 +119,19 @@ export function SkillHubMethods({ projectId, disabled, onPreview }: { projectId:
     }).catch((err) => { if (alive) setError(t("skillHub.methodsError", { detail: (err as Error).message })); });
     return () => { alive = false; };
   }, [projectId]);
+  // Nothing to show while loading or when no configured hub lists a package: the card stays two inputs long (P3).
+  const empty = data && data.hubs.every((hub) => hub.state === "ok" && hub.methods.length === 0);
+  if ((!data && !error) || empty) return null;
   return <section className="space-y-2" aria-label={t("skillHub.methods")}>
     <h4 className="text-xs font-medium">{t("skillHub.methods")}</h4>
-    {!data && !error && <p role="status" className="text-xs">{t("skillHub.methodsLoading")}</p>}
     {error && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
-    {data?.hubs.length === 0 && <p className="text-xs text-muted-foreground">{t("skillHub.methodsEmpty")}</p>}
     {data?.hubs.map((hub) => <div key={hub.siteId} className="space-y-2 rounded border p-2 text-xs break-words">
       <p className="font-medium">{hub.siteId}</p>
       {hub.state === "error" ? <p role="alert" className="text-destructive">{t("skillHub.methodsError", { detail: hub.detail ?? hub.url })}</p> : hub.methods.length === 0 ? <p>{t("skillHub.methodsEmpty")}</p> : hub.methods.map((method) => <div key={`${method.methodId}:${method.revision}`} className="space-y-1 border-t pt-2">
-        <p>{text(method.title)}</p>
-        <p>{t("methods.revision", { version: method.version, revision: method.revision })}</p>
-        <p>{t(`methods.lifecycle.${method.lifecycle}`)} · {t(`methods.implementation.${method.implementation}`)}</p>
-        <p>{t("skillHub.methodCreated", { at: Number.isNaN(Date.parse(method.createdAt)) ? method.createdAt : new Date(method.createdAt).toLocaleString() })}</p>
+        <p className="font-medium">{text(method.title)}</p>
+        <p className="text-muted-foreground" title={t("skillHub.methodCreated", { at: Number.isNaN(Date.parse(method.createdAt)) ? method.createdAt : new Date(method.createdAt).toLocaleString() })}>
+          {t("methods.revision", { version: method.version, revision: method.revision })} · {t(`methods.lifecycle.${method.lifecycle}`)} · {t(`methods.implementation.${method.implementation}`)}
+        </p>
         <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={() => onPreview(method.descriptorUrl)}>{t("skillHub.methodPreview")}</Button>
       </div>)}
     </div>)}

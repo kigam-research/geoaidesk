@@ -14,7 +14,7 @@ import { Readiness } from "@/geo/workspace/readiness";
 import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 
 export const METHOD_CATEGORY = "hub-methods";
-const pill = "inline-flex rounded-full border px-1.5 py-px text-[10px] font-medium";
+const pill = "inline-flex rounded-full border px-1.5 py-px text-xs font-medium";
 
 /** Same readiness/untested/user-data strings as WorkflowBadges, without a catalogue import cycle. */
 export function MethodBadges({ method, workflow }: { method: LocalMethodSummary; workflow?: LocalMethodWorkflow }) {
@@ -33,13 +33,33 @@ export function MethodBadges({ method, workflow }: { method: LocalMethodSummary;
   </>;
 }
 
-export function methodRows(methods: LocalMethodSummary[], select: (method: LocalMethodSummary, workflow?: LocalMethodWorkflow, recipe?: MethodRecipe) => void): WorkflowPanelRow[] {
+/**
+ * A list row shows at most three badges (UI guide G2, W5), in this order: readiness when not ready, GAID trials or
+ * 미시험, the lifecycle (with "분석 지침만" for a method without code), a local edit, "코드 포함", needs user data. The
+ * method details show all of them.
+ */
+function RowBadges({ method, workflow }: { method: LocalMethodSummary; workflow?: LocalMethodWorkflow }) {
+  const badges: ReactNode[] = [];
+  if (workflow && workflow.readiness.state !== "ready") badges.push(<span key="ready" className={pill}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>);
+  if (workflow) badges.push(workflow.trials.count === 0
+    ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
+    : <span key="trials" className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>);
+  // A method without code says so on its row (novice review): lifecycle and "분석 지침만" share one badge.
+  badges.push(<span key="life" className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}{method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>);
+  if (method.editedLocally) badges.push(<span key="edit" className={pill}>{t("methods.edited")}</span>);
+  if (method.implementation === "implemented") badges.push(<span key="impl" className={pill}>{t("methods.implementation.implemented")}</span>);
+  if (workflow?.inputRoles.some((role) => role.required)) badges.push(<span key="data" className={pill}>{t("workspace.badge.userData")}</span>);
+  return <>{badges.slice(0, 3)}</>;
+}
+
+export function methodRows(methods: LocalMethodSummary[], select: (method: LocalMethodSummary, workflow?: LocalMethodWorkflow, recipe?: MethodRecipe) => void, showDetail?: (method: LocalMethodSummary) => void): WorkflowPanelRow[] {
   return methods.flatMap((method) => {
     const base = { category: METHOD_CATEGORY, description: text(method.summary), searchText: `${method.runtimeName} ${method.methodId ?? ""} ${text(method.title)}` };
     const row = (id: string, name: string, workflow?: LocalMethodWorkflow, recipe?: MethodRecipe): WorkflowPanelRow => ({
       ...base, id: `method:${method.key}:${id}`, name, icon: recipe ? BookmarkIcon : PackageIcon,
-      badges: <>{recipe && <span className={pill}>{t("methods.recipe")}</span>}<MethodBadges method={method} workflow={workflow} /></>,
+      badges: <RowBadges method={method} workflow={workflow} />,
       onSelect: () => select(method, workflow, recipe),
+      detail: showDetail && workflow ? { label: `${t("methods.detail")}: ${text(method.title)}`, onSelect: () => showDetail(method) } : undefined,
     });
     // A Workflow with a single 레시피 is one row that opens with that 레시피's start settings: two rows of the same name,
     // one without the researcher's defaults, misled the re-trial researcher (gaid-hub-followups).
@@ -98,22 +118,19 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
   const selectSetup = (method: LocalMethodSummary, workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => {
     setDetailKey(null); setSetup({ methodKey: method.key, workflowId: workflow.id, recipeId: recipe?.id });
   };
+  // A row opens its editable setup; the row's info button opens the method details.
   const rows = methodRows(methods, (method, workflow, recipe) => {
     if (workflow) selectSetup(method, workflow, recipe); else setDetailKey(method.key);
-  });
-  // Each method also has an explicit detail action; workflow rows still open the existing editable setup directly.
-  const detailActions = methods.length > 0 && <div className="flex flex-wrap gap-2">
-    {methods.map((method) => <Button key={method.key} variant="outline" size="sm" onClick={() => setDetailKey(method.key)}>{t("methods.detail")}: {text(method.title)}</Button>)}
-  </div>;
+  }, (method) => setDetailKey(method.key));
   const selectedMethod = methods.find((method) => method.key === setup?.methodKey);
   const selectedWorkflow = selectedMethod?.workflows.find((workflow) => workflow.id === setup?.workflowId);
   const selectedRecipe = selectedMethod?.recipes.find((recipe) => recipe.id === setup?.recipeId);
   const detailMethod = methods.find((method) => method.key === detailKey);
   const category: WorkflowPanelCategory = { id: METHOD_CATEGORY, label: t("methods.category"), color: "text-sky-700 dark:text-sky-400", bg: "bg-sky-700/10 hover:bg-sky-700/15 border-sky-700/25" };
-  const notice = <div className="space-y-2">
-    {error ? <p role="alert" className="text-xs text-destructive break-words">{error}</p> : !data ? <p role="status" className="text-xs">{t("methods.loading")}</p> : methods.length === 0 ? <p className="text-xs text-muted-foreground">{t("methods.empty")}</p> : null}
-    <Button size="sm" variant="ghost" onClick={() => void reload()}>{t("methods.reload")}</Button>
-    {detailActions}
+  // Status only when it says something (loading, error, none installed); a full list needs no notice (UI guide P3).
+  const notice = (error || !data || methods.length === 0) && <div className="flex flex-wrap items-center gap-2">
+    {error ? <p role="alert" className="text-xs text-destructive break-words">{error}</p> : !data ? <p role="status" className="text-xs">{t("methods.loading")}</p> : <p className="text-xs text-muted-foreground">{t("methods.empty")}</p>}
+    {data && <Button size="sm" variant="ghost" onClick={() => void reload()}>{t("methods.reload")}</Button>}
   </div>;
   const dialogs: ReactNode = <>
     {detailMethod && <MethodDetail key={`${projectId}:${detailMethod.key}`} method={detailMethod} projectId={projectId} onClose={() => setDetailKey(null)} onSetup={(workflow, recipe) => selectSetup(detailMethod, workflow, recipe)} />}

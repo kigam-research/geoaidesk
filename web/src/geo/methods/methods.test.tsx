@@ -37,15 +37,17 @@ beforeEach(() => {
 });
 function Catalogue({ projectId = "p1" }: { projectId?: string }) {
   const { category, rows, dialogs, notice } = useMethodRows(projectId, []);
-  return <><h2>{category.label}</h2>{notice}{rows.map((row) => <button key={row.id} onClick={row.onSelect}>{row.name}{row.badges}</button>)}{dialogs}</>;
+  return <><h2>{category.label}</h2>{notice}{rows.map((row) => <div key={row.id}><button onClick={row.onSelect}>{row.name}{row.badges}</button>{row.detail && <button onClick={row.detail.onSelect}>{row.detail.label}</button>}</div>)}{dialogs}</>;
 }
-it("provides Workflow and recipe rows with effective lifecycle, implementation and local-edit badges", () => {
+it("provides Workflow and recipe rows with at most three badges: trials, lifecycle, local edit", () => {
   const select = vi.fn(); const rows = methodRows([method], select);
   // A Workflow with a single 레시피 is one row that starts from the 레시피; a second 레시피 brings back separate rows.
   expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial"]);
   render(<>{rows[0].badges}</>);
   expect(screen.getByText("초안")).toBeInTheDocument(); expect(screen.queryByText("공개됨")).not.toBeInTheDocument();
-  expect(screen.getByText("코드 포함")).toBeInTheDocument(); expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument(); expect(screen.getByText("미시험")).toBeInTheDocument();
+  expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument(); expect(screen.getByText("미시험")).toBeInTheDocument();
+  // The implementation badge moves to the method details (UI guide G2: at most three badges per row).
+  expect(screen.queryByText("코드 포함")).not.toBeInTheDocument();
   rows[0].onSelect(); expect(select).toHaveBeenCalledWith(method, workflow, method.recipes[0]);
   const two = { ...method, recipes: [...method.recipes, { ...method.recipes[0], id: "r2", title: { ko: "Fold 3 레시피" } }] };
   expect(methodRows([two], select).map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial", "method:project:paper-method:recipe:r1", "method:project:paper-method:recipe:r2"]);
@@ -77,8 +79,9 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
   try {
     render(<Catalogue />);
     fireEvent.click(await screen.findByRole("button", { name: /^논문 방법 시험/ }));
-    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByLabelText("Fold 수")).toHaveValue("5"); expect(within(dialog).getByLabelText("Threshold")).toHaveValue(""); expect(start).not.toHaveBeenCalled();
-    fireEvent.click(within(dialog).getByRole("button", { name: "작업 초안 만들기" }));
+    // The recipe opens at the summary: its Fold value, its unresolved Threshold left to the chat.
+    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByText("5")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument(); expect(start).not.toHaveBeenCalled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" }));
     await waitFor(() => expect(start).toHaveBeenCalledOnce());
     expect(start.mock.calls[0][0].geoExposure).toBe("method:paper-method:trial");
     expect(start.mock.calls[0][0].skills[0].name).toBe("paper-method");

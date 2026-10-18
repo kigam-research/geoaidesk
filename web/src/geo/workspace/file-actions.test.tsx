@@ -20,7 +20,7 @@ beforeEach(() => {
 describe("file method actions", () => {
   it("opens the installed method with its exposure and file binding even without the catalogue", async () => {
     render(<GeoFileActions path="research.csv" projectId="p" />);
-    fireEvent.click(await screen.findByRole("button", { name: "작업 설정 열기" }));
+    fireEvent.click(await screen.findByRole("button", { name: "시작 설정 열기" }));
     await waitFor(() => expect(screen.getByTestId("setup")).toHaveAttribute("data-exposure", "method:table-method:shared-id"));
     expect(screen.getByTestId("setup")).toHaveTextContent('"grid":"research.csv"');
   });

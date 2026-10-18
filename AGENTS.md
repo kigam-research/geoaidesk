@@ -51,7 +51,11 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   a ~25K start prompt, so skill exposure alone cannot fit a 32K local context.
 - Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
   `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
-  and row style; readiness/미시험/사용자 자료 badges); a row opens `TaskSetup`. "레시피 가져오기" checks a `.geo-start.json`
+  and row style; one-line rows, at most three badges, an optional row detail icon); a row opens `TaskSetup`, the Workflow
+  start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`): one input file or analysis condition per step under a
+  grouped step rail (입력 파일 → 분석 조건 → 요약), readiness blockers with their fix on step 1 and the summary, a summary with
+  Edit links and the one primary action; a recipe or method default opens at the summary. The start draft lists the
+  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.

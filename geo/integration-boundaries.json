@@ -55,7 +55,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav)"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -146,7 +146,7 @@
       "path": "web/src/components/settings/providers-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "LocalModelCard (web/src/geo/local-model/) at the top of the Local model servers section: one import and one JSX line; gaid-korean-workspace owns further changes; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "LocalModelCard (web/src/geo/local-model/) at the top of the Local model servers section: one import and one JSX line; gaid-korean-workspace owns further changes; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:)"
     },
     {
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
@@ -186,7 +186,7 @@
       "path": "web/src/components/file-preview-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:)"
     },
     {
       "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
@@ -396,7 +396,7 @@
       "path": "web/src/components/workflows-panel.tsx",
       "owner": "gaid-workflow-catalog",
       "status": "edited",
-      "responsibility": "Optional `extension` prop (host categories before/after the upstream ones, host rows searched and grouped like upstream rows, header action, notice, search placeholder) and an exported WORKFLOW_CATEGORIES list; upstream rows and the launch dialog unchanged"
+      "responsibility": "Optional `extension` prop (host categories before/after the upstream ones, host rows searched and grouped like upstream rows, header action, notice, search placeholder) and an exported WORKFLOW_CATEGORIES list; upstream rows and the launch dialog unchanged. gaid-system-ui: host rows take an optional detail icon action and clamp their description to one line; category pills and counts use 12 px text without uppercase (UI guide G1, T1)"
     },
     {
       "path": "web/src/components/settings/project-settings-panel.tsx, web/src/components/settings/services-panel.tsx, web/src/components/settings/fusion-panel.tsx, web/src/components/settings/providers-panel.tsx, web/src/components/settings/model-field.tsx, web/src/components/settings/primitives.tsx, web/src/components/custom-models-card.tsx, web/src/components/skills-panel.tsx, web/src/components/prompts-panel.tsx, web/src/components/subagents-panel.tsx, web/src/components/connectors-panel.tsx, web/src/components/oauth-login-dialog.tsx, web/src/components/provider-auth-panel.tsx, web/src/components/api-token-gate.tsx",
