@@ -240,13 +240,16 @@ try {
 
   // Catalogue: the pinned geo archive, without the excluded document skills.
   const sandbox = path.join(dataHome, "projects", "default", "sandbox", ".pi");
-  const installed = ["skills", "skills-disabled"].flatMap((dir) => {
+  const all = ["skills", "skills-disabled"].flatMap((dir) => {
     try {
       return fs.readdirSync(path.join(sandbox, dir));
     } catch {
       return [];
     }
   });
+  // GAID's own research-note style skill is seeded into every geo project (gaid-output-style).
+  assert.ok(all.includes("gaid-note-style"), "GAID note style skill seeded");
+  const installed = all.filter((name) => name !== "gaid-note-style");
   const catalogue = JSON.parse(catalogueText);
   const pinned = catalogue.skills.map((skill) => skill.runtimeName).sort();
   if (catalogue.status.state === "ready") {
