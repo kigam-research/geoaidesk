@@ -65,7 +65,12 @@
   "assessment.error": "Could not save assessment: {detail}",
   "choices": "Scientific choices to make before the task: {choices}",
   "inputRoles": "Inputs: {roles}",
-  "badge.noTrials": "No GAID trial records for this Workflow.",
+  "badge.noTrials": "No GAID trial of this Workflow in this project.",
   "badge.trials": "GAID trials: {count}{outcome, select, useful { · assessed useful} needs-revision { · assessed needs revision} failed { · assessed failed} other {}}",
-  "trials.notDeclared": "The package names no result files, so GAID did not match outputs against them."
+  "trials.notDeclared": "The package names no result files, so GAID did not match outputs against them.",
+  "badge.trialsTip": "GAID trials of this Workflow started in this project. Not a scientific review result.",
+  "badge.readinessTip": "What this project needs before this Workflow can start.",
+  "badge.stage": "{stage, select, draft {Hub draft} submitted {Hub submitted} published {Hub published} other {Hub stage unknown}}",
+  "badge.stageTip": "The stage the hub records for this method package. Separate from this project's preparation and trials.",
+  "badge.codeTip": "Whether the method package contains executable code."
 }

@@ -46,5 +46,16 @@
   "imaging": "지리 참조가 없는 TIFF입니다. 영상 뷰어로 표시합니다.",
   "genericError": "요청을 처리하지 못했습니다.",
   "nodata": "결측값",
-  "description": "설명"
+  "description": "설명",
+  "oversize.title": "미리보기 한도보다 큰 파일입니다",
+  "oversize.size": "파일 크기 {size} MB.",
+  "oversize.body": "미리보기는 CSV 8 MB, 다른 텍스트 512 KB까지입니다. 전체 파일은 내려받아 여세요.",
+  "oversize.download": "파일 내려받기",
+  "oversize.loading": "앞부분 표본을 읽고 있습니다…",
+  "oversize.failed": "앞부분 표본을 읽지 못했습니다.",
+  "oversize.sample": "앞부분 표본",
+  "oversize.state": "앞부분 {rows}행 표본 · 열 {columns}개{estimate, plural, =-1 {} other { · 전체 약 #행(추정)}}",
+  "oversize.lines": "앞부분 {rows}줄 표본",
+  "oversize.allColumns": "열 {count}개 모두 보기",
+  "oversize.fewerColumns": "처음 8개 열만 보기"
 }
