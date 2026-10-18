@@ -146,7 +146,7 @@
       "path": "web/src/components/settings/providers-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "LocalModelCard (web/src/geo/local-model/) at the top of the Local model servers section: one import and one JSX line; gaid-korean-workspace owns further changes; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "LocalModelCard (web/src/geo/local-model/) at the top of the Local model servers section: one import and one JSX line; gaid-korean-workspace owns further changes; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:)"
     },
     {
       "path": "web/src/lib/viewers/registry.ts, web/src/components/file-preview-panel.tsx, web/src/lib/use-sandbox.ts",
@@ -186,7 +186,7 @@
       "path": "web/src/components/file-preview-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls"
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:)"
     },
     {
       "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",

@@ -56,7 +56,6 @@
       "en:workspace.catalogue.error",
       "en:workspace.catalogue.status",
       "en:workspace.error.status",
-      "en:workspace.files.error",
       "en:workspace.recipe.error",
       "en:workspace.saved.deleteError",
       "en:workspace.saved.error",
@@ -83,7 +82,6 @@
       "ko:workspace.catalogue.error",
       "ko:workspace.catalogue.status",
       "ko:workspace.error.status",
-      "ko:workspace.files.error",
       "ko:workspace.recipe.error",
       "ko:workspace.saved.deleteError",
       "ko:workspace.saved.error",
@@ -96,7 +94,6 @@
       "web/src/geo/authoring-preview/source-input.tsx:#174bd1",
       "web/src/geo/authoring-preview/source-input.tsx:#1f5eff",
       "web/src/geo/context/prompt-budget.tsx:text-[11px]",
-      "web/src/geo/skill-hub/skill-hub.tsx:text-[11px]",
       "web/src/geo/viewers/map/index.tsx:text-[11px]"
     ]
   }

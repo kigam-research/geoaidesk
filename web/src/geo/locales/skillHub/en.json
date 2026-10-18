@@ -28,5 +28,7 @@
   "methodsError": "Could not read hub packages: {detail}",
   "methodPreview": "Preview package",
   "methodCreated": "Created: {at}",
-  "methodDraft": "Hub method: {id} · revision {revision} · {lifecycle}"
+  "methodDraft": "Hub method: {id} · revision {revision} · {lifecycle}",
+  "chooseFile": "Choose package file",
+  "noFile": "No file chosen"
 }

@@ -6,7 +6,7 @@ import { t } from "@/geo/i18n";
 import { flattenFiles, type TreeNode } from "@/lib/use-sandbox";
 import type { GeoSuggestionsResponse, GeoWorkflowsResponse, GeoRecipeCheckResponse } from "@/geo/contracts/workspace";
 import { request, text } from "./api";
-import { Readiness } from "./readiness";
+import { ReadinessBadges } from "./task-catalogue";
 import { TaskSetup } from "./task-setup";
 import { RecipeImport } from "./recipe-import";
 
@@ -33,7 +33,7 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
   const open = async (id: string) => {
     setSelected(id);
     try { setFiles([...new Set([path, ...flattenFiles(await request<TreeNode>("/sandbox/tree", projectId))])]); }
-    catch (error) { setError(t("workspace.files.error", { detail: (error as Error).message })); }
+    catch { setError(t("workspace.files.error")); }
   };
   // Catalogue suggestions need an active catalogue; installed methods remain
   // available on their own (their readiness still states any missing setup).
@@ -42,16 +42,29 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
   const workflowKey = (id: string, exposure?: string) => exposure ?? id;
   return <section className="min-w-0 space-y-2 border-b p-2">
     {path.toLowerCase().endsWith(".geo-start.json") && <RecipeImport projectId={projectId} path={path} onSetup={(setup) => { setRecipe(setup); setRevision((value) => value + 1); void open(setup.workflowId); }} />}
-    <div className="flex min-w-0 flex-wrap gap-2">
-      {visibleSuggestions.map((suggestion) => <article key={workflowKey(suggestion.workflowId, suggestion.exposure)} className="min-w-0 max-w-full flex-1 basis-56 space-y-2 rounded border p-2 break-words text-xs">
-        <h3 className="font-medium">{text(suggestion.title)}</h3>
-        <p>{t("workspace.files.match", { role: text(suggestion.match.roleLabel), format: suggestion.match.format })}</p>
-        {suggestion.match.signal && <p>{t("workspace.files.signal", { kind: suggestion.match.signal.kind, columns: suggestion.match.signal.columns.join(", ") })}</p>}
-        <p>{t("workspace.files.needs", { choices: suggestion.needs.map(text).join(", ") || t("workspace.setup.none") })}</p>
-        <Readiness value={suggestion.readiness} />
-        <Button size="sm" variant="outline" onClick={() => void open(workflowKey(suggestion.workflowId, suggestion.exposure))}>{t("workspace.setup.open")}</Button>
-      </article>)}
-    </div>
+    {/* One row per suggestion: title, at most two badges, one line of evidence and the action (UI guide G1, G2, P3).
+        The analysis conditions still to decide are asked in the start settings, not listed here. */}
+    {visibleSuggestions.length > 0 && <div className="min-w-0 space-y-1">
+      <h3 className="px-1 text-xs font-medium text-muted-foreground">{t("workspace.files.title")}</h3>
+      <ul className="divide-y rounded-md border">
+        {visibleSuggestions.map((suggestion) => {
+          const match = t("workspace.files.match", { role: text(suggestion.match.roleLabel) });
+          const signal = suggestion.match.signal && t("workspace.files.signal", { kind: suggestion.match.signal.kind, columns: suggestion.match.signal.columns.join(", ") });
+          return <li key={workflowKey(suggestion.workflowId, suggestion.exposure)} className="flex min-w-0 items-center gap-3 px-3 py-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                <span className="truncate text-sm font-medium">{text(suggestion.title)}</span>
+                <ReadinessBadges readiness={suggestion.readiness} />
+              </div>
+              <p className="truncate text-xs text-muted-foreground" title={signal ? `${match} · ${signal}` : match}>
+                <span>{match}</span>{signal && <> · <span>{signal}</span></>}
+              </p>
+            </div>
+            <Button size="sm" variant="outline" className="shrink-0" onClick={() => void open(workflowKey(suggestion.workflowId, suggestion.exposure))}>{t("workspace.setup.open")}</Button>
+          </li>;
+        })}
+      </ul>
+    </div>}
     {error && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
     {[...(catalogue?.workflows ?? []), ...visibleSuggestions.flatMap((suggestion) => suggestion.workflow ? [{ ...suggestion.workflow, exposure: suggestion.exposure }] : [])].map((workflow) => {
       const exposure = "exposure" in workflow ? workflow.exposure as string : undefined;

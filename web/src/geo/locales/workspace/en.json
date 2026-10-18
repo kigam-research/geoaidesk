@@ -141,10 +141,10 @@
     "close": "Close"
   },
   "files": {
-    "match": "Matched input: {role} · Format: {format}",
-    "needs": "Analysis settings to decide: {choices}",
-    "error": "Could not read the input file list. {detail}",
-    "signal": "{kind, select, element-columns {Element and oxide columns} time-drawdown-columns {Time and drawdown columns} xy-label-columns {Coordinate and label columns} categorical-field {Categorical fields} other {Matched columns}}: {columns}"
+    "match": "Matching input: {role}",
+    "error": "Could not read the project file list. Open the start settings again.",
+    "signal": "{kind, select, element-columns {Element and oxide columns} time-drawdown-columns {Time and drawdown columns} xy-label-columns {Coordinate and label columns} categorical-field {Categorical fields} other {Matched columns}}: {columns}",
+    "title": "Workflows you can start with the open file"
   },
   "skill": {
     "open": "Make reusable skill",

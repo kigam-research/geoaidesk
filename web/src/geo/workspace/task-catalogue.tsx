@@ -70,13 +70,17 @@ const TONE = {
 };
 
 export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {
-  const state = workflow.readiness.state;
+  return <ReadinessBadges readiness={workflow.readiness} />;
+}
+
+export function ReadinessBadges({ readiness }: { readiness: GeoWorkflowSummary["readiness"] }) {
+  const state = readiness.state;
   const tone = state === "ready" ? TONE.ok : state === "unavailable" ? TONE.bad : TONE.warn;
   // First view keeps only what changes a decision (gaid-qwen-authoring-trial): readiness when it is not ready,
   // and the untested limit. "Needs your data" was on nearly every row; the setup dialog lists the inputs.
   return <>
     {state !== "ready" && <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>}
-    {workflow.readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+    {readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
   </>;
 }
 

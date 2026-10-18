@@ -242,7 +242,7 @@ function recipeFile(value: unknown) {
 describe("file actions and recipes", () => {
   it("caps suggestions at three, names the match and preselects the matching file", async () => {
     rows = ["one", "two", "three", "four"].map((id) => workflow("ready", id)); suggestions = rows.map(suggestion); render(<GeoFileActions path="logs/A.LAS" projectId="p1" />);
-    const buttons = await screen.findAllByRole("button", { name: "시작 설정 열기" }); expect(buttons).toHaveLength(3); expect(screen.getAllByText("일치한 입력: Well log · 형식: las-welllog")).toHaveLength(3);
+    const buttons = await screen.findAllByRole("button", { name: "시작 설정 열기" }); expect(buttons).toHaveLength(3); expect(screen.getAllByText("일치한 입력: Well log")).toHaveLength(3);
     await userEvent.click(buttons[0]); const dialog = await screen.findByRole("dialog"); expect(radio(dialog, /A\.LAS/)).toHaveAttribute("aria-checked", "true"); expect(await within(dialog).findByRole("radio", { name: /other\.las/ })).toBeInTheDocument();
   });
   it.each(["off", "empty"])("renders no strip for %s", async (condition) => {
