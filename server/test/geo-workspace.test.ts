@@ -181,6 +181,26 @@ describe("GET /geo/workflows readiness", () => {
 });
 
 describe("POST /geo/suggestions", () => {
+  it("prioritizes installed methods by declared format, keeps exposure, and works without a catalogue", async () => {
+    const dir = path.join(paths.skillsDir, "table-method");
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, "SKILL.md"), "---\nname: table-method\ndescription: Table analysis\n---\n");
+    fs.writeFileSync(path.join(dir, "gaid-method.json"), JSON.stringify({
+      schemaVersion: "gaid-method/v1", methodId: "local/table-method", revision: 1, version: "0.1.0",
+      lifecycle: "draft", implementation: "implemented", codeOrigin: "supplied", title: ko("Installed table method"),
+      sources: [], recipes: [],
+      workflows: [{ id: "assay-composition", title: ko("Installed table method"), inputRoles: [role("grid", ["csv"])],
+        requiredScientificChoices: [], prompt: ko("Analyze table"), skillIds: ["local:table-method"], environmentProfile: "geo-core",
+        expectedArtifacts: [{ id: "out", label: ko("Output"), files: ["out.csv"], required: true }], boundary: ko("Review before interpretation") }],
+    }));
+    fs.writeFileSync(path.join(paths.sandbox, "a.csv"), "Au,Cu,Ni\n1,2,3\n");
+    for (const catalogue of [CATALOGUE, null]) {
+      const server = await app({ catalogue });
+      const response = (await server.inject({ method: "POST", url: "/geo/suggestions", payload: { path: "a.csv" } })).json() as GeoSuggestionsResponse;
+      expect(response.suggestions[0]).toMatchObject({ workflowId: "assay-composition", exposure: "method:table-method:assay-composition", workflow: { inputRoles: [{ id: "grid" }] } });
+      await server.close();
+    }
+  });
   it("suggests from a specific format and lists the unconditional choices", async () => {
     installSkill(paths, "well-log-qc-quicklook");
     touch("logs/w1.las");

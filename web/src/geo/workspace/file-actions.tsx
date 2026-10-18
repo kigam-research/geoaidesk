@@ -35,23 +35,26 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
     try { setFiles([...new Set([path, ...flattenFiles(await request<TreeNode>("/sandbox/tree", projectId))])]); }
     catch (error) { setError(t("workspace.files.error", { detail: (error as Error).message })); }
   };
-  if (catalogue?.catalogue.state !== "ready" || (!suggestions.length && !path.toLowerCase().endsWith(".geo-start.json"))) return null;
+  if (!suggestions.length && !(catalogue?.catalogue.state === "ready" && path.toLowerCase().endsWith(".geo-start.json"))) return null;
+  const workflowKey = (id: string, exposure?: string) => exposure ?? id;
   return <section className="min-w-0 space-y-2 border-b p-2">
     {path.toLowerCase().endsWith(".geo-start.json") && <RecipeImport projectId={projectId} path={path} onSetup={(setup) => { setRecipe(setup); setRevision((value) => value + 1); void open(setup.workflowId); }} />}
     <div className="flex min-w-0 flex-wrap gap-2">
-      {suggestions.map((suggestion) => <article key={suggestion.workflowId} className="min-w-0 max-w-full flex-1 basis-56 space-y-2 rounded border p-2 break-words text-xs">
+      {suggestions.map((suggestion) => <article key={workflowKey(suggestion.workflowId, suggestion.exposure)} className="min-w-0 max-w-full flex-1 basis-56 space-y-2 rounded border p-2 break-words text-xs">
         <h3 className="font-medium">{text(suggestion.title)}</h3>
         <p>{t("workspace.files.match", { role: text(suggestion.match.roleLabel), format: suggestion.match.format })}</p>
         {suggestion.match.signal && <p>{t("workspace.files.signal", { kind: suggestion.match.signal.kind, columns: suggestion.match.signal.columns.join(", ") })}</p>}
         <p>{t("workspace.files.needs", { choices: suggestion.needs.map(text).join(", ") || t("workspace.setup.none") })}</p>
         <Readiness value={suggestion.readiness} />
-        <Button size="sm" variant="outline" onClick={() => void open(suggestion.workflowId)}>{t("workspace.setup.open")}</Button>
+        <Button size="sm" variant="outline" onClick={() => void open(workflowKey(suggestion.workflowId, suggestion.exposure))}>{t("workspace.setup.open")}</Button>
       </article>)}
     </div>
     {error && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
-    {catalogue.workflows.map((workflow) => {
-      const role = suggestions.find((suggestion) => suggestion.workflowId === workflow.id)?.match.roleId;
-      return <TaskSetup key={`${workflow.id}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : undefined} open={selected === workflow.id} onOpenChange={(open) => setSelected(open ? workflow.id : null)} onRefresh={refresh} />;
+    {[...(catalogue?.workflows ?? []), ...suggestions.flatMap((suggestion) => suggestion.workflow ? [{ ...suggestion.workflow, exposure: suggestion.exposure }] : [])].map((workflow) => {
+      const exposure = "exposure" in workflow ? workflow.exposure as string : undefined;
+      const key = workflowKey(workflow.id, exposure);
+      const role = suggestions.find((suggestion) => workflowKey(suggestion.workflowId, suggestion.exposure) === key)?.match.roleId;
+      return <TaskSetup key={`${key}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} exposure={exposure} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : undefined} open={selected === key} onOpenChange={(open) => setSelected(open ? key : null)} onRefresh={refresh} />;
     })}
   </section>;
 }

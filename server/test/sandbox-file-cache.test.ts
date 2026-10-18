@@ -11,6 +11,17 @@ const get = (etag?: string) => app.inject({ method: "GET", url: "/sandbox/file?p
 beforeEach(() => { fs.rmSync(PROJECTS_ROOT, { recursive: true, force: true }); ensureProjectExists("default"); });
 afterAll(async () => { await app.close(); fs.rmSync(PROJECTS_ROOT, { recursive: true, force: true }); });
 describe("conditional file previews", () => {
+  it("validates a rejected large preview until it changes, then resumes previewing", async () => {
+    fs.writeFileSync(target(), Buffer.alloc(512001));
+    const large = await get();
+    expect(large.statusCode).toBe(413);
+    expect(large.headers.etag).toBeTruthy();
+    expect((await get(String(large.headers.etag))).statusCode).toBe(304);
+    fs.writeFileSync(target(), "small again");
+    const changed = await get(String(large.headers.etag));
+    expect(changed.statusCode).toBe(200);
+    expect(changed.body).toBe("small again");
+  });
   it("previews paginated research CSVs up to 8 MB while retaining the text limit", async () => {
     const csv = path.join(resolvePaths("default").sandbox, "research.CSV");
     const readCsv = () => app.inject({ method: "GET", url: "/sandbox/file?path=research.CSV", headers: { "x-project-id": "default" } });

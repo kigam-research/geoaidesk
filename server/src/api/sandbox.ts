@@ -380,9 +380,6 @@ export async function registerSandboxRoutes(app: FastifyInstance): Promise<void>
         const stat = await file.stat({ bigint: true });
         if (!stat.isFile()) return reply.code(404).send("File not found");
         const maxBytes = path.extname(target).toLowerCase() === ".csv" ? MAX_CSV_PREVIEW_BYTES : MAX_PREVIEW_BYTES;
-        if (stat.size > BigInt(maxBytes)) {
-          return reply.code(413).send("File too large to preview");
-        }
         // Include inode + change time: atomic replacement and same-size edits
         // with restored mtimes must invalidate the preview too.
         const version = (s: typeof stat) =>
@@ -391,6 +388,9 @@ export async function registerSandboxRoutes(app: FastifyInstance): Promise<void>
         reply.header("Cache-Control", "private, no-cache");
         if (req.headers["if-none-match"]?.split(/\s*,\s*/).includes(etag)) {
           return reply.header("ETag", etag).code(304).send();
+        }
+        if (stat.size > BigInt(maxBytes)) {
+          return reply.header("ETag", etag).code(413).send("File too large to preview");
         }
         // A file can grow after stat while an agent writes it. Bound the
         // actual read too, rather than allocating a newly huge dataset.
@@ -401,7 +401,11 @@ export async function registerSandboxRoutes(app: FastifyInstance): Promise<void>
           if (!bytesRead) break;
           length += bytesRead;
         }
-        if (length > maxBytes) return reply.code(413).send("File too large to preview");
+        if (length > maxBytes) {
+          const latest = await file.stat({ bigint: true });
+          if (latest.size > BigInt(maxBytes)) reply.header("ETag", version(latest));
+          return reply.code(413).send("File too large to preview");
+        }
         const content = buffer.subarray(0, length).toString("utf-8");
         // Don't let an in-place write during this read validate mixed bytes.
         if (version(await file.stat({ bigint: true })) === etag) reply.header("ETag", etag);

@@ -15,6 +15,7 @@ import type {
   GeoSuggestionSignal,
   GeoWorkflowSummary,
 } from "../../../../web/src/geo/contracts/workspace.ts";
+import type { LocalMethodWorkflow } from "../../../../web/src/geo/contracts/methods.ts";
 import { GENERIC_FORMATS } from "./formats.ts";
 
 export const MAX_SUGGESTIONS = 3;
@@ -62,7 +63,7 @@ const READY_ORDER = { ready: 0, "needs-environment": 1, "missing-skills": 2, una
 export function suggestWorkflows(
   format: string | null,
   inspection: GeoInspection | null,
-  workflows: GeoWorkflowSummary[],
+  workflows: (GeoWorkflowSummary | LocalMethodWorkflow)[],
 ): GeoSuggestion[] {
   if (!format) return [];
   const signals = contentSignals(inspection);
@@ -73,12 +74,14 @@ export function suggestWorkflows(
     if (roleIndex < 0) continue;
     const role = workflow.inputRoles[roleIndex];
     const signal = signals.get(workflow.id);
-    if (generic && !signal) continue;
+    const exposure = "exposure" in workflow ? workflow.exposure : undefined;
+    if (generic && !signal && !exposure) continue;
     const score = (signal ? 3 : 0) + (generic ? 0 : 2) + (role.required ? 1 : 0) + (roleIndex === 0 ? 1 : 0);
     scored.push({
       score,
       suggestion: {
         workflowId: workflow.id,
+        ...(exposure ? { exposure, workflow } : {}),
         title: workflow.title,
         match: {
           roleId: role.id,
@@ -94,6 +97,7 @@ export function suggestWorkflows(
   }
   scored.sort(
     (a, b) =>
+      Number(Boolean(b.suggestion.exposure)) - Number(Boolean(a.suggestion.exposure)) ||
       READY_ORDER[a.suggestion.readiness.state] - READY_ORDER[b.suggestion.readiness.state] || b.score - a.score,
   );
   return scored.slice(0, MAX_SUGGESTIONS).map((entry) => entry.suggestion);

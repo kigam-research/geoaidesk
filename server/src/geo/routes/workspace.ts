@@ -22,6 +22,7 @@ import { taxonomyFormat } from "../workspace/formats.ts";
 import { checkRecipe } from "../workspace/recipes.ts";
 import { deleteSavedRecipe, listSavedRecipes, saveRecipe, SavedRecipeError } from "../workspace/saved-recipes.ts";
 import { suggestWorkflows } from "../workspace/suggestions.ts";
+import { listLocalMethods } from "../methods/local-methods.ts";
 import { listWorkflows } from "../workspace/workflows.ts";
 
 export interface GeoWorkspaceRouteOptions {
@@ -76,7 +77,6 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
       if (err instanceof SandboxError) return reply.code(err.statusCode).send({ detail: err.message });
       throw err;
     }
-    if (!catalogue) return { path: rel, format: null, suggestions: [] };
     let inspection: GeoInspection | null = null;
     try {
       inspection = await inspect(rel);
@@ -85,8 +85,18 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
     }
     const format = taxonomyFormat(rel, inspection?.asset.format);
     if (!format) return { path: rel, format: null, suggestions: [] };
-    const workflows = await listWorkflows(pathsOf(), catalogue, service);
-    return { path: rel, format, suggestions: suggestWorkflows(format, inspection, workflows) };
+    const [workflows, methods] = await Promise.all([
+      catalogue ? listWorkflows(pathsOf(), catalogue, service) : [],
+      listLocalMethods(pathsOf(), catalogue, service),
+    ]);
+    // Pi resolves project methods before global methods of the same name.
+    const seen = new Set<string>();
+    const local = methods.filter((method) => {
+      if (seen.has(method.runtimeName)) return false;
+      seen.add(method.runtimeName);
+      return method.enabled;
+    }).flatMap((method) => method.workflows);
+    return { path: rel, format, suggestions: suggestWorkflows(format, inspection, [...local, ...workflows]) };
   });
 
   app.post("/geo/recipes/check", { bodyLimit: 64 * 1024 }, async (req, reply) => {

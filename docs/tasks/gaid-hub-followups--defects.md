@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:44:24Z
+updated: 2026-10-18T04:53:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,11 +77,54 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+All six code changes are implemented. No deployment or parent integration yet. Full scripts/check remains pending.
+
+- Running activities tick elapsed minutes/seconds from ActivityItem.timestamp; completed/error items unmount the timer. Bash commands remain in the collapsed disclosure; the main bash label is localized.
+- POST /geo/suggestions includes installed, enabled method Workflows, prioritized by matching declared input format (including generic CSV without catalogue-only column heuristics). The response carries the method exposure and complete Workflow. FileActions binds the current file and opens the correct TaskSetup even when catalogue/method ids collide or the catalogue is off. Pi project-over-global shadowing is preserved.
+- Oversized previews return ETag with 413, answer unchanged requests with 304 before the size check, and resume ordinary preview after change. The client retains the 413 validator and existing message. Actual browser observation: one initial 413, then nine 304 responses during a running-chat fixture (no repeating 413).
+- The hub action has a visible label. Parent-owned hubHandoff locale files were imported unchanged from cdda9dcf98b8e88e336e7e8f6f7dd9c7e5bde797 under explicit file-only authorization. Composer controls wrap to keep the label and send/stop reachable at 1280×800.
+- Lead bash tools inherit an opaque per-project/session process marker. Linux abort (including the existing HTTP path through session.abort) and registry disposal send TERM, then KILL after 350 ms, to matching processes, including detached nohup/setsid jobs. Another chat is unaffected. Windows is a no-op beyond Pi's existing abort. Existing shellPath/commandPrefix settings are retained. No subagent ownership claim.
+- Literal recursive cleanup of non-protected sandbox work no longer asks for confirmation. Sandbox root, protected ancestors, .pi/.kady, wildcard/unresolved and outside targets remain guarded. Classifier parity is retained. Exact supplied trial replay confirmed only rm -rf outputs/folds; a second prompt is not evidenced in that JSONL snapshot. Parent accepted this limitation.
+
+Focused verification so far: server workspace, guard hook/classifier and oversized-cache tests pass; real-session detached process/other-chat/disposal/shell-prefix test passes; existing session-registry tests pass. Frontend elapsed timer/cache tests (25) and method-selection/visible-handoff tests (2) pass. Server and web typechecks passed after process/suggestion changes; full scripts/check will recheck the final snapshot. UI validator (final strings): 11,110 strings, 0 errors, 102 pre-existing accepted debt. Copy validator: 0 errors, 57 existing warnings.
+
+### Korean section for the parent report (humanizer file-mode reviewed)
+
+장시간 계산 중인 채팅에 경과시간을 표시했습니다. 설치한 방법 중 파일 형식과 맞는 방법을 먼저 추천하며, 추천을 누르면 해당 방법의 작업 설정에 현재 파일이 연결됩니다. 8 MB를 넘는 CSV는 기존 크기 제한 안내를 유지하고, 파일이 바뀌지 않았으면 본문을 다시 받지 않습니다. 실제 화면에서는 첫 요청의 413 이후 304 응답을 확인했습니다.
+
+허브 전송 버튼에 ‘허브 초안으로 보내기’를 표시했습니다. 1280×800에서도 버튼이 잘리지 않도록 입력창의 동작 버튼이 줄바꿈됩니다. 실행 중단과 대화 정리는 Linux에서 해당 채팅이 시작한 백그라운드 계산도 종료합니다. 다른 채팅의 계산은 유지되는지 시험했습니다. Windows에서는 기존 실행 중단 동작을 유지합니다.
+
+보호된 자료와 내부 상태 폴더를 포함하지 않는 작업 폴더의 재귀 삭제는 확인 창 없이 실행됩니다. 제공된 시험 기록에서는 outputs/folds 삭제 확인 한 건을 확인했습니다. 두 번째 확인 요청은 기록에서 확인하지 못했습니다. 연구 계산을 다시 수행한 결과는 아니며, 화면의 실행 상태는 모델을 호출하지 않는 고정 응답으로 재현했습니다. 파일 추천·큰 파일 응답과 백그라운드 프로세스 시험에는 실제 앱 경로를 사용했습니다.
+
+화면 규칙: P3, P4, F1, B3, W1, L6, A1, R1을 따릅니다. 새 예외는 추가하지 않았습니다. 두 해상도에서 동작 버튼과 상태 표시를 확인했습니다. 명령줄은 접힌 상세 영역에만 있습니다.
+
+| String id | Korean before → after | English before → after |
+| --- | --- | --- |
+| workspace.run.elapsed | 없음 → {minutes}분 {seconds}초째 실행 중 | absent → Running for {minutes}m {seconds}s |
+| workspace.run.analysis | bash → 분석 실행 | bash → Run analysis |
+| hubHandoff.openLabel (parent-owned) | 없음 → 허브 초안으로 보내기 | absent → Send to hub draft |
+| hubHandoff.open (parent-owned) | 방금 한 분석을 skill_hub 초안으로 보내기 → 방금 한 분석을 GAID 허브 초안으로 보내기 | Send the analysis just done to a skill_hub draft → Send the analysis just done to a GAID hub draft |
+
+Screenshots (parent should copy into its canonical report's figures/):
+- /home/seongin3/data/geoaidesk/work/gaid-hub-followups/figures/defects/progress-method-{1440,1280}.png
+- /home/seongin3/data/geoaidesk/work/gaid-hub-followups/figures/defects/large-file-{1440,1280}.png
+- /home/seongin3/data/geoaidesk/work/gaid-hub-followups/figures/defects/method-setup-{1440,1280}.png
+
+Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
+
 ## Next steps
-1. (the next session's first action)
+1. Save reviewed files with task save; temporary browser/dev services have been stopped after screenshot inspection.
+2. Run the full scripts/check once using task job run; inspect its result, fix material failures, then task finish.
 ## Failed approaches
+- Initial resume calls encountered other live task transactions; retried after they completed (no lock edits).
+- Initial elapsed string keys incorrectly repeated the namespace; focused rendering caught the missing lookup, fixed to nested namespace-local keys.
+- SIGKILL delivery is asynchronous; the real detached-process test caught an immediate-state race. Added bounded post-signal observation before abort returns.
+- Visual review caught a clipped hub label due to the composer inner nowrap query; removed only that inner nowrap rule and recaptured both sizes.
+- Shell-prefix test initially assumed a settings file had been seeded by ensureProjectExists; it had not. The fixture now creates its own settings before session construction.
 ## Notes and decisions
+- Parent clarification: chat-actions renders hubHandoff.openLabel, keeps hubHandoff.open for aria/title. Parent exclusively owns those locale keys; not edited here. Parent locale commit cdda9dc was received unchanged before UI/check verification.
+- Integration order: UI feedback and label are independent; suggestion server/client contract is owned together; cache server/client contract is owned together; process lifecycle precedes abort/dispose tests. Only the main writer edits. Parent owns authoring, hub handoff, TaskSetup and trials; these remain untouched.
+- Optional raw shell-output tail is omitted: elapsed time meets the feedback goal without introducing more machinery into the main view.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

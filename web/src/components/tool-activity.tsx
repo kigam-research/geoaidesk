@@ -1,5 +1,5 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoText, t } from "@/geo/i18n";
 import {
   BookOpenIcon,
   BrainIcon,
@@ -18,7 +18,7 @@ import {
   WrenchIcon,
   XIcon,
 } from "lucide-react";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import {
   Collapsible,
@@ -163,6 +163,16 @@ function summarize(
   return typeof args === "string" ? args.split("\n")[0] : "";
 }
 
+function RunningElapsed({ timestamp }: { timestamp: number }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const elapsed = Math.max(0, Math.floor((now - timestamp) / 1000));
+  return <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{t("workspace.run.elapsed", { minutes: Math.floor(elapsed / 60), seconds: elapsed % 60 })}</span>;
+}
+
 function StatusDot({ status }: { status: ActivityItem["status"] }) {
   if (status === "running") return <Spinner className="size-3 shrink-0" />;
   if (status === "error")
@@ -192,8 +202,8 @@ const ToolCard = memo(function ToolCard({ item }: { item: ActivityItem }) {
   // instead of a generic file read (the path stays visible under Input). The
   // server resolves the frontmatter name; the path-derived name is a fallback.
   const skill = item.skillName ?? skillNameFromRead(item.toolName, item.args);
-  const name = skill ? "skill" : (item.toolName ?? item.label);
-  const summary = skill ?? summarize(item.toolName, item.args, item.result, item.replyWorkflowScript);
+  const name = item.toolName === "bash" ? t("workspace.run.analysis") : skill ? "skill" : (item.toolName ?? item.label);
+  const summary = item.toolName === "bash" ? "" : skill ?? summarize(item.toolName, item.args, item.result, item.replyWorkflowScript);
   // A generated image is the point of the call: keep it visible while the
   // card is collapsed instead of behind the disclosure.
   const inlineImages = item.toolName === "generate_image";
@@ -236,7 +246,8 @@ const ToolCard = memo(function ToolCard({ item }: { item: ActivityItem }) {
             {summary}
           </span>
         )}
-        <span className={cn(!summary && "ml-auto")}>
+        {item.status === "running" && <RunningElapsed timestamp={item.timestamp} />}
+        <span className={cn(!summary && item.status !== "running" && "ml-auto")}>
           <StatusDot status={item.status} />
         </span>
       </CollapsibleTrigger>

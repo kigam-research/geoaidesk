@@ -130,6 +130,10 @@ export interface GeoSuggestionSignal {
 
 export interface GeoSuggestion {
   workflowId: string;
+  /** Installed method identity; absent for catalogue suggestions. */
+  exposure?: string;
+  /** The matching installed Workflow, used directly by TaskSetup. */
+  workflow?: GeoWorkflowSummary;
   title: Localized;
   /** Input role the file matches and why. */
   match: { roleId: string; roleLabel: Localized; format: string; required: boolean; signal?: GeoSuggestionSignal };

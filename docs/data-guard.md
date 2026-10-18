@@ -24,13 +24,17 @@ filesystem access.
 - The sandbox, the OS temporary directory (`os.tmpdir()`), `/tmp`, and the exact
   path `/dev/null` do not require an outside-project confirmation. Protected
   paths still take priority. Existing destructive-command checks still apply;
-  this exception does not authorize destructive work inside the sandbox.
+  recursive removal of non-protected working subtrees is allowed as described below.
   Reading outside files or copying them into the sandbox does not ask.
 - Destructive shell commands also ask first when `destructiveConfirm` is on:
   `rm -rf <dir>`, `git clean -f`, `git reset --hard`, `git checkout -- .`,
   `find … -delete`, `shred`, and `dd`. Routine recursive clean-ups such as
-  `.venv`, `node_modules`, `__pycache__`, and `/tmp` retain their existing
-  exceptions. An outside-project target takes priority over the destructive
+  `.venv`, `node_modules`, and `__pycache__` are allowed, as are other literal
+  working subtrees (for example `derived/mpm_run/outputs/folds`) when all targets
+  resolve inside the sandbox and cannot contain protected paths, `.pi/` or `.kady/`.
+  Removing the sandbox root, protected ancestors, internal state, unresolved
+  variables and wildcard targets remains guarded. Explicit temporary subtrees
+  under `/tmp` or the OS temporary directory are also allowed. An outside-project target takes priority over the destructive
   title; a protected target is blocked without asking.
 - For either kind of request, you can allow the operation once or deny it.
   No answer within ten minutes, stopping the run, or no interactive run to
