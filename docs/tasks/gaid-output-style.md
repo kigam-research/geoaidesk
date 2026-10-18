@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T11:48:30Z
+status: done
+updated: 2026-10-18T11:49:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cf3c2630-5a5a-41da-8ca1-d21368a34174","pid":165774,"provider":"claude","session":"9b0b1311-fa15-49ef-bbc6-156ac66a94d3","start":"21076687","token":"ae93645b472f334531a322a6678e004f8dcc942d075e067c3a6e63b8bed5282d"}
 branch: task/gaid-output-style
 target: main
@@ -50,7 +50,9 @@ Outside check: no outside check (app output-style work; the before/after compari
 - Trial apps stopped (units gaid-style-before/after); data and evidence in ~/data/geoaidesk/work/gaid-output-style/.
   Scratch checkout ~/worktrees/geoaidesk/_scratch/9b471037dcac (main b4749e6) left for the CLI to clean.
 ## Next steps
-1. task finish; the hub handles rollout to the review app.
+<!-- task:closed -->
+Closed 2026-10-18T11:49:02Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-output-style.md.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: small, tightly coupled change; the top writer does all packages itself (no child writers).
@@ -72,7 +74,7 @@ Outside check: no outside check (app output-style work; the before/after compari
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 연구노트 문체를 하나로 정할까요? — 가) 정하지 않음(AI agent가 노트마다 한 문체로 씀, 시험에서는 해라체) — 나) 합니다체로 고정 — 권장: 나) 요청한 backbone 출력 방식의 보고서와 채팅 답변이 모두 합니다체입니다 — 막힌 일: 없음 — 조건: 나)이면 노트 지시에 한 줄을 넣고 기관 Qwen으로 다시 시험 — 근거: reports/2026-10-18-gaid-output-style#6
+- [결정 gaid-output-style#1] 연구노트 문체를 하나로 정할까요? — 가) 정하지 않음(AI agent가 노트마다 한 문체로 씀, 시험에서는 해라체) — 나) 합니다체로 고정 — 권장: 나) 요청한 backbone 출력 방식의 보고서와 채팅 답변이 모두 합니다체입니다 — 막힌 일: 없음 — 조건: 나)이면 노트 지시에 한 줄을 넣고 기관 Qwen으로 다시 시험 — 근거: reports/2026-10-18-gaid-output-style#6
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
