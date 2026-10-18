@@ -263,7 +263,7 @@
   "artifact_role.output": "output",
   "artifact_role.script": "script",
   "artifact_role.report": "report",
-  "export.title": "Lab Notebook",
+  "export.title": "Work record",
   "export.project": "Project",
   "export.session": "Session",
   "export.chats": "Chats",

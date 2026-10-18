@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T10:24:52Z
+updated: 2026-10-18T10:27:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -34,27 +34,20 @@ Scope confirmed with the user:
 Outside check: no outside check (app/system design work).
 
 ## Current state
-- Phase 1 (diagnosis) done, no code changes. Report `reports/2026-10-18-gaid-notebook-review/index.md` (figures: current
-  notebook screenshot from the review app, static HTML mockup of option 가). Evidence: native Explore surveys of the
-  notebook code and the vault (findings with file:line in report appendix A); review app `gaid-review` (~/.geoaidesk,
-  project `default`, 2 notebook sessions, 5 entries); screenshots/mockup source in `~/data/geoaidesk/work/gaid-notebook-review/`.
-- Key findings: notebook = per-chat hidden JSONL agent log (`.kady/notebook/`), no topic/conclusion/decision/status, user can
-  only pin/comment/note (note box hidden in default all-chats scope), no visible Markdown, exports/methods draft in English,
-  R1 violations (command lines, session/tool-call ids), no link to GAID methods/trials/recipes/hub handoff (handoff skips dot
-  dirs). The agent already writes a reader-facing report into `results/*.md` that the notebook treats as just an artifact.
-- User decision 2026-10-18 (verbatim): "모두 권장으로 진행하자." → report §6 1-가 (research-note-first) and 2-가 (the agent
-  writes/updates a note when an analysis has results; 노트 정리 prefills a request). Phase 2 in progress.
-- Shared interfaces settled by the top writer: contract `web/src/geo/contracts/research-notes.ts`, format/behaviour spec
-  `docs/geo/research-notes.md`.
-- W done and saved (0515475): `web/src/geo/notes/` panel + tests (7 pass), notes locales, notebook-tab seam in
-  `file-preview-panel.tsx`/`page.tsx`, AGENTS.md + docs/lab-notebook.md lines; web tsc, copy validator, check-ui clean;
-  related existing web tests 57 pass. Live check waits for S.
-- Workers: child units `gaid-notebook-review--notes-server` (S) and `gaid-notebook-review--record-cleanup` (C), both
-  "general work", started 2026-10-18; prompts in `~/data/geoaidesk/work/gaid-notebook-review/prompts/`.
+- Phase 1 (diagnosis) and Phase 2 (option 가 + 2-가, user decision 2026-10-18 "모두 권장으로 진행하자.") done.
+- Integrated: C record-cleanup (2ddf4de, closed), S notes-server (82118f0, closed), W research-notes panel (top writer).
+  Post-integration fixes from the live check: standalone `(권장: …)` lines parsed, localized dates, plain one-line labels,
+  note heading scale (renderer promotes `##` to h1), ICU-escaped `{title}` in the decision prompt, work-record header
+  "작업 기록", decision answers open the note's chat then prefill, note terms in `geo/copy/terminology.csv`.
+- Live check: trial unit `gaid-notes-app` (this worktree, ports 3370/18370, GAID_HOME
+  `~/data/geoaidesk/work/gaid-notebook-review/home`; stopped after screenshots). Institute Qwen wrote a full note on the
+  Seoul 1:250k litho task (run1) and, after a decision answer, updated the same note (run2). Screenshots 1440×900 and
+  1280×800 in the report.
+- Checks run: web tsc; notes 8 + notebook/print 69 + file-preview tests; server notes 23; geo node tests 48 pass/1 skip;
+  copy validator and check-ui 0 errors. Full scripts/check runs in task finish.
+- Not done here: the user's review app (ports 3000/18000) is not updated; the hub handles rollout after merge.
 ## Next steps
-Blocked: notes-server child's `task finish` is still running its full check; `task complete` waits for its finish record.
-1. C integrated and closed (2ddf4de). Children run S and C (below); top writer builds W against the contract, then integrates S → C → W, runs scripts/check,
-   screenshots (UI guide §10), updates the report (result of Phase 2, §6 answered) and finishes.
+1. task finish (full declared check), then give the hub's final report to the user once.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
