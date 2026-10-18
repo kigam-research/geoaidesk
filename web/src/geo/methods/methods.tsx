@@ -207,7 +207,9 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
     {trial.expected.map((expected) => <div key={expected.id} className="rounded border p-2">
       <p>{text(expected.label)} · {t(`methods.trials.${expected.required ? "required" : "optional"}`)}</p>
       <p>{expected.files.length === 0 ? t("methods.trials.notDeclared")
-        : t(`methods.trials.${expected.found.length ? "found" : "missing"}`, { files: (expected.found.length ? expected.found : expected.files).join(", ") })}</p>
+        : expected.found.length ? t("methods.trials.found", { files: expected.found.join(", ") })
+        : expected.foundElsewhere?.length ? t("methods.trials.elsewhere", { files: expected.foundElsewhere.join(", "), expected: expected.files.join(", ") })
+        : t("methods.trials.missing", { files: expected.files.join(", ") })}</p>
     </div>)}
     <TrialAssessment trial={trial} projectId={projectId} />
   </article>;

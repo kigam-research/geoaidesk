@@ -230,7 +230,8 @@ describe("file actions and recipes", () => {
     await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다");
     recipeResult = { ok: true, issues: [], setup: { workflowId: "well-qc", choices: { depth: "MD", units: "m" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null } };
     await userEvent.click(screen.getByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD"); expect(within(dialog).getByLabelText("단위")).toHaveValue(""); expect(within(dialog).getByRole("button", { name: "작업 초안 만들기" })).toBeDisabled();
+    expect(within(dialog).getByLabelText("심도 기준", { exact: false })).toHaveValue("MD"); expect(within(dialog).getByLabelText("단위")).toHaveValue("");
+    // The project's only fitting file is bound to the required input; nothing starts until the researcher does.
     expect(apiFetch).toHaveBeenCalledWith("/sandbox/file?path=recipe.geo-start.json", {}, "p1"); expect(apiFetch.mock.calls.some(([path]) => path === "/skills")).toBe(false);
   });
 });

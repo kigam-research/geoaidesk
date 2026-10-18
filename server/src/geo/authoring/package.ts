@@ -265,6 +265,7 @@ const PLAIN: Record<string, string> = {
   "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
   "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
   "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",
+  "artifact-file": "예상 결과 파일 이름이 스킬 설명에 없어 시험 결과와 맞춰 보지 못할 수 있습니다.",
   "unverified-claim": "시험·발행·기관 보증을 확인하지 않은 표현이 있습니다.",
   "draft-note": "서버가 모델 제안을 고친 내용입니다.",
   "catalogue-name": "카탈로그 스킬과 이름이 같습니다.",
@@ -473,6 +474,12 @@ export async function checkMethod(
     for (const discipline of w.disciplines ?? [])
       if (!v.taxonomy.disciplines.some((t) => t.id === discipline))
         find("workflow", "workflow-discipline", "workflow/disciplines", `분류에 없는 분야입니다: ${discipline}`);
+    // GAID matches a trial's outputs to these names, so the skill must tell the agent to write exactly them.
+    const docs = [skill, ...files.filter((f) => f.path.startsWith("references/")).map((f) => f.content)].join("\n");
+    for (const a of w.expectedArtifacts ?? [])
+      for (const name of a.files ?? [])
+        if (!name.includes("*") && !docs.includes(name))
+          find("workflow", "artifact-file", `workflow/expectedArtifacts/${a.id}`, `스킬 문서에 없는 결과 파일 이름입니다: ${name}`, "warning");
     for (const a of w.expectedArtifacts ?? []) {
       if (a.skill && a.skill !== `local:${draft.slug}`) {
         if (!v.catalogueIds.has(a.skill))

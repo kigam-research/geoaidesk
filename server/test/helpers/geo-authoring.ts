@@ -195,6 +195,6 @@ export const draftReply = {
     ],
     boundary: "자원량 추정이 아닙니다.",
   },
-  recipe: { choices: { "block-size": "km50" }, unresolvedChoices: [] },
+  recipe: { choices: { "block-size": { value: "km50", decision: "scope" } }, unresolvedChoices: [] },
   evidence: [{ field: "procedure", findingIds: ["F1", "F99"] }],
 };

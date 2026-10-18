@@ -49,6 +49,7 @@
   "trials.optional": "Optional",
   "trials.found": "Found: {files}",
   "trials.missing": "No matching files: {files}",
+  "trials.elsewhere": "Saved in another folder: {files} (expected: {expected})",
   "trials.none": "None",
   "trials.moreOutputs": "{count, plural, one {Show # more file} other {Show # more files}}",
   "assessment.title": "Researcher assessment",

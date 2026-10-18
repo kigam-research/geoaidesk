@@ -133,6 +133,8 @@ export interface MethodTrialExpected {
   /** Declared file names and the session outputs that match them. */
   files: string[];
   found: string[];
+  /** Outputs with a declared file name saved in another folder (no exact match); shown, counted as present. */
+  foundElsewhere?: string[];
 }
 
 /**

@@ -46,6 +46,11 @@ export async function directHandoff(projectId: string, sessionId: string, files:
   const data: { url: string; projectId: string } = await response.json();
   return { path: "direct" as const, ...data };
 }
+/** GAID hub receive: a new method draft in this app's hub with the bundle as its first source. */
+export async function sendToHub(projectId: string, sessionId: string, files: string[], note: string): Promise<{ projectId: string }> {
+  const response = await checked(await apiFetch("/geo/authoring/handoffs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, files, note }) }, projectId));
+  return response.json();
+}
 export function saveDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

@@ -49,6 +49,7 @@
   "trials.optional": "선택",
   "trials.found": "발견됨: {files}",
   "trials.missing": "파일 일치 없음: {files}",
+  "trials.elsewhere": "다른 폴더에 저장됨: {files} (예상 위치: {expected})",
   "trials.none": "없음",
   "trials.moreOutputs": "파일 {count}개 더 보기",
   "assessment.title": "연구자 평가",

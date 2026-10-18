@@ -175,7 +175,7 @@ describe("GAID hub packages", () => {
       expect(manifest.provenance.hub.url).toBe(LOCAL_HUB_URL);
       expect(manifest.recipes[0]).toMatchObject({
         workflowId: "pu-nested-cv-method",
-        unresolvedChoices: ["label-def"],
+        unresolvedChoices: ["block-size", "label-def"],
       });
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
