@@ -59,7 +59,10 @@ it("opens a note, renders its body around answerable decision cards and confirms
   const option = screen.getByRole("button", { name: /시료 표를 올려 다시 실행/ });
   expect(option).toHaveTextContent("권장");
   fireEvent.click(option);
-  expect(prefillChat).toHaveBeenCalledWith(expect.stringContaining("“다원소 분석값 점검” 노트의 결정 1에 답합니다: 가) 시료 표를 올려 다시 실행"));
+  // The answer goes to the chat that wrote the note.
+  expect(onOpenChat).toHaveBeenCalledWith("s1", "다원소 분석값 점검");
+  await waitFor(() => expect(prefillChat).toHaveBeenCalledWith(expect.stringContaining("“다원소 분석값 점검” 노트의 결정 1에 답합니다: 가) 시료 표를 올려 다시 실행")));
+  onOpenChat.mockClear();
   fireEvent.click(screen.getByRole("button", { name: /채팅 열기/ }));
   expect(onOpenChat).toHaveBeenCalledWith("s1", "다원소 분석값 점검");
   fireEvent.click(screen.getByRole("button", { name: "확인함으로 표시" }));

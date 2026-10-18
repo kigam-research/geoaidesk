@@ -74,7 +74,7 @@
   "decision": {
     "title": "결정할 일",
     "recommended": "권장",
-    "answerTip": "고른 답을 채팅 입력창에 넣습니다. 보내기 전에 고칠 수 있습니다.",
+    "answerTip": "노트를 쓴 채팅을 열고 고른 답을 입력창에 넣습니다. 보내기 전에 고칠 수 있습니다.",
     "prompt": "“{title}” 노트의 결정 {number}에 답합니다: {label}) {text}\n노트: {path}\n고른 답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
   }
 }

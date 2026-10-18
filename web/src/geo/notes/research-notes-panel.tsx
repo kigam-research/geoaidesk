@@ -33,6 +33,9 @@ const TONE: Record<ResearchNoteStatus | "decision" | "format", string> = {
   format: "border-border bg-muted/50 text-muted-foreground",
 };
 
+/** Time for a just-opened chat tab to become active and listen for the composer prefill. */
+const ANSWER_PREFILL_DELAY_MS = 400;
+
 type View = { kind: "list" } | { kind: "note"; id: string; focusDecisions?: boolean } | { kind: "record" };
 
 export interface ResearchNotesPanelProps {
@@ -352,6 +355,13 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   };
 
   const chat = note?.sessions.at(-1);
+  // An answer goes to the chat that wrote the note, where its analysis context is; else to the active chat.
+  const answer = (text: string) => {
+    if (chat && onOpenChat && note) {
+      onOpenChat(chat, note.title);
+      window.setTimeout(() => prefillChat(text), ANSWER_PREFILL_DELAY_MS);
+    } else prefillChat(text);
+  };
   const meta = note ? [
     formatDate(note.date),
     note.method ? t("notes.detail.method", { name: note.method.name ?? t("notes.detail.methodUnnamed") }) : null,
@@ -414,7 +424,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
                 {data.note.decisions.length ? (
-                  <DecisionCards note={data.note} />
+                  <DecisionCards note={data.note} onAnswer={answer} />
                 ) : (
                   <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
                 )}
@@ -428,18 +438,18 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   );
 }
 
-function DecisionCards({ note }: { note: ResearchNoteSummary }) {
+function DecisionCards({ note, onAnswer }: { note: ResearchNoteSummary; onAnswer: (text: string) => void }) {
   return (
     <section aria-label={t("notes.decision.title")}>
       <h2 className="mb-3 text-base font-semibold">{t("notes.decision.title")}</h2>
       <div className="space-y-3">
-        {note.decisions.map((decision) => <DecisionCard key={decision.number} note={note} decision={decision} />)}
+        {note.decisions.map((decision) => <DecisionCard key={decision.number} note={note} decision={decision} onAnswer={onAnswer} />)}
       </div>
     </section>
   );
 }
 
-function DecisionCard({ note, decision }: { note: ResearchNoteSummary; decision: ResearchNoteDecision }) {
+function DecisionCard({ note, decision, onAnswer }: { note: ResearchNoteSummary; decision: ResearchNoteDecision; onAnswer: (text: string) => void }) {
   const options = [...decision.options].sort((a, b) => Number(b.recommended) - Number(a.recommended));
   return (
     <div className="rounded-md border border-[var(--gaid-warning)]/40 p-3">
@@ -450,7 +460,7 @@ function DecisionCard({ note, decision }: { note: ResearchNoteSummary; decision:
             key={option.label}
             type="button"
             title={t("notes.decision.answerTip")}
-            onClick={() => prefillChat(t("notes.decision.prompt", {
+            onClick={() => onAnswer(t("notes.decision.prompt", {
               title: note.title, number: decision.number, label: option.label, text: option.text, path: note.path,
             }))}
             className="flex w-full items-start gap-2 rounded-md border bg-background px-3 py-2 text-left text-sm hover:bg-muted/40"

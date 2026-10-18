@@ -74,7 +74,7 @@
   "decision": {
     "title": "Decisions to make",
     "recommended": "Recommended",
-    "answerTip": "Puts the chosen answer in the chat box. You can edit it before sending.",
+    "answerTip": "Opens the chat that wrote the note and puts the chosen answer in its chat box. You can edit it before sending.",
     "prompt": "Answering decision {number} of the note \"{title}\": {label}) {text}\nNote: {path}\nContinue the work accordingly and update the note."
   }
 }
