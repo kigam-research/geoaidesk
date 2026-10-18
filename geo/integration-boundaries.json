@@ -757,6 +757,12 @@
       "owner": "gaid-notebook-review",
       "status": "edited",
       "responsibility": "Korean work-record export coverage for plan and next-investigation labels, preserving authored values"
+    },
+    {
+      "path": "geo/tests/distribution.test.mjs",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Recognize the notebook-review owner required by new maintained work-record seams"
     }
   ],
   "notTouched": [

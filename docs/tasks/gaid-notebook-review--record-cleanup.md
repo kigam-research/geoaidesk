@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T09:09:06Z
+status: active
+updated: 2026-10-18T09:18:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd14a2b1-08ca-4ec5-b9a5-c36ac0b3decd","pid":2986331,"provider":"codex","session":"01a14e34-3599-7921-a909-ef8c86596d17","start":"20134566","token":"f8920c52ddfb78cfda8aa61a33610fd220a79d3b368da7c773080f68204acb5b"}
 branch: task/gaid-notebook-review--record-cleanup
 target: task/gaid-notebook-review
@@ -53,12 +53,13 @@ Evidence in your task document: files changed, check commands and results, and e
 and English before → after (copy rule). Then `task finish`.
 
 ## Current state
-Implemented locale-aware work-record export/print labels, collapsed copyable execution/source technical disclosures, GAID session-export branding, a Methods draft language rule and localized proposal constraints. Authored titles, bodies, code and machine JSON keys/enum values are preserved. Web/server typechecks passed; focused web tests: 7 files/98 tests, server tests: 5 files/64 tests. Final print/helper recheck: 3 files/31 tests. Copy validation: 0 errors/62 warnings (scientific-limit wording retained). UI validation: 0 errors/102 existing accepted debt. Runtime tsx smoke produced the Korean work-record heading. No deployment performed. First task finish ran full scripts/check: backend 1,884 passed/11 skipped, then three unrelated frontend timeout failures. The affected files pass with maxWorkers=2 (2 files/9 tests). The global VITEST_MAX_WORKERS=4 retry overrode server serialization and caused shared-fixture races. Direct createVitest config inspection without that variable confirms backend fileParallelism=false/maxWorkers=1. Retry uses CPU affinity 0-3 instead (Node availableParallelism=4); parent integration/screenshots remain.
+Implemented collapsed copyable execution/source technical disclosures, locale-aware work-record exports/print, GAID chat-export branding, the Methods language rule and localized proposal constraints. Authored prose/code and JSON machine keys/values remain unchanged. Focused web 98/server 64 tests and both typechecks pass. Full retry with CPU affinity: backend 1,884 passed/11 skipped; frontend 1,082 passed. Distribution check found its owner allowlist lacked the required gaid-notebook-review owner. Added that owner and its seam; direct distribution recheck passes all 7 tests. UI/copy have no errors. Final task-finish pipeline rerun remains; no deployment performed. Parent owns integration and screenshots.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-18T09:09:06Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Third finish b9c4926 completed backend 1,884 passed/11 skipped and frontend 1,082 passed. GAID tests then rejected required new seam owner gaid-notebook-review because distribution.test.mjs had a fixed owner allowlist. Added that owner (and a maintained seam for the test); direct node --test geo/tests/distribution.test.mjs passes 7 tests. This is a distinct source metadata mismatch, not the prior execution-environment failures. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-ql5wuajh.log; output: ~/data/geoaidesk/work/checks/b9c49264ffe3-20261018T090906.595830Z.
 - Second finish failed because the supported global VITEST_MAX_WORKERS=4 override is applied after backend fileParallelism=false forces maxWorkers=1 (installed Vitest coverage configuration lines 223–225 and 380). Multiple backend files then deleted their shared fixture root concurrently. Rejected premise: a global worker cap preserves per-suite serialization. Direct createVitest inspection under env -u VITEST_MAX_WORKERS taskset -c 0-3 confirms backend fileParallelism=false/maxWorkers=1; Node reports availableParallelism=4, bounding the frontend default without overriding serialization. No speculative source fixes. Second full log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-bncfk14r.log; output: ~/data/geoaidesk/work/checks/92aedf6598fa-20261018T090629.003222Z.
 - First task finish f383d61 failed in full frontend tests: file-preview-panel (2 tests) and csv-viewer (1 test) timed out under default parallelism while another child was also checking. No source edits to those files. Direct recheck with --maxWorkers=2 passed 2 files/9 tests in 5.58 seconds. Installed Vitest reads VITEST_MAX_WORKERS (coverage chunk configuration), so retry uses a temporary 4-worker cap. Full log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-qp16f0bm.log; output: ~/data/geoaidesk/work/checks/f383d6138447-20261018T085746.484320Z.
 - Initial typechecks could not start because dependencies were absent. npm ci completed in web and server without changing lockfiles.
@@ -84,6 +85,7 @@ No separate child report. Parent incorporates this evidence into reports/2026-10
 
 ### Files and interfaces
 
+- geo/tests/distribution.test.mjs (synchronize the existing fixed owner allowlist with the requested gaid-notebook-review seams).
 - server/src/agent/methods-draft.ts
 - server/src/agent/notebook-export.ts
 - server/src/agent/notebook-zip.ts
@@ -283,6 +285,8 @@ All rows below are new catalogue ids (∅ means no previous catalogue entry). Ex
 
 ### Checks
 
+- PASS: full scripts/check backend and frontend stages under temporary CPU affinity 0-3 — 1,884 backend tests (11 skipped) and 1,082 frontend tests.
+- PASS: node --test geo/tests/distribution.test.mjs after the required owner allowlist fix — 7 tests. Full pipeline continues on the next finish; catalogue environment/production stages were not reached in the previous failed finish.
 - PASS: cd web && npx tsc --noEmit.
 - PASS: cd web && npx vitest run src/components/lab-notebook-entry-card.test.tsx src/components/notebook-result-links.test.tsx src/components/next-experiments-dialog.test.tsx src/components/lab-notebook-view.test.tsx src/lib/notebook-print.test.ts src/lib/notebook-plans.test.ts src/lib/next-experiments.test.ts — 7 files, 98 tests.
 - PASS: cd server && npm run typecheck.
