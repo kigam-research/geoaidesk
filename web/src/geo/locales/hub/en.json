@@ -11,8 +11,8 @@
   },
   "home": {
     "title": "GAID hub",
-    "body": "A hub to build skills or Workflows from literature and data, share them and get feedback",
-    "new": "Create skill or Workflow",
+    "body": "Use analysis methods other researchers registered with your own data, or make a new method from your paper or code.",
+    "new": "Make a method",
     "empty": "No methods yet. Upload a paper PDF or code to start.",
     "loading": "Reading the list.",
     "error": "Could not read the list. Open it again in a moment.",
@@ -28,11 +28,6 @@
     "allFolders": "All",
     "registered": "In hub · rev {n}",
     "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project.",
-    "flow": {
-      "make": "Build from papers and code",
-      "register": "Register in the hub",
-      "feedback": "Get stars and comments"
-    },
     "browse": {
       "title": "Methods registered in the hub",
       "tabs": "Method lists",
@@ -60,6 +55,49 @@
       },
       "open": "Open {title}",
       "stars": "{count} stars"
+    },
+    "route": {
+      "use": {
+        "title": "Use a registered method",
+        "body": "Pick a method, install it in your project and start it with your data.",
+        "button": "Browse methods"
+      },
+      "make": {
+        "title": "Make a method from your paper",
+        "body": "Upload a paper or code and answer the questions to get a method draft."
+      }
+    },
+    "glossary": {
+      "button": "Show terms",
+      "title": "Words used in the hub",
+      "method": {
+        "term": "Method",
+        "text": "The unit of analysis in the hub: one skill and, when present, one Workflow."
+      },
+      "skill": {
+        "term": "Skill",
+        "text": "Analysis instructions the AI agent follows. Some skills also include run code."
+      },
+      "workflow": {
+        "term": "Workflow",
+        "text": "The steps to start a skill with your data. It asks for input files and values to set first."
+      },
+      "recipe": {
+        "term": "Start settings",
+        "text": "Values chosen in advance for starting a Workflow, also called a recipe."
+      },
+      "draft": {
+        "term": "Draft",
+        "text": "A method not yet registered in the hub. Only the researcher who made it sees it."
+      },
+      "revision": {
+        "term": "Revision",
+        "text": "The number that goes up each time a registered method is revised and registered again. Comments stay with their revision."
+      },
+      "trial": {
+        "term": "Trial",
+        "text": "A record of running the method in your project. It is not a review result."
+      }
     }
   },
   "stage": {
@@ -68,7 +106,7 @@
     "questions": "{count, plural, one {# question} other {# questions}}",
     "drafting": "Drafting",
     "draft": "Draft",
-    "package": "Ready to try"
+    "package": "Ready to try and register"
   },
   "steps": {
     "label": "Steps",
@@ -114,7 +152,9 @@
     "addedWeb": "{name} · {host}",
     "agentModel": "Agent model",
     "agentModelDefault": "Default model from Settings",
-    "agentModelHint": "Used to read the sources, ask questions and write the draft."
+    "agentModelHint": "Used to read the sources, ask questions and write the draft.",
+    "readDone": "The sources have been read. Next, answer the questions that decide the method.",
+    "next": "Answer the questions"
   },
   "reading": {
     "title": "Reading sources",
@@ -123,7 +163,7 @@
     "pages": "Read text of {pages} PDF pages",
     "files": "Checked {count} code files",
     "analysis": "Finding the method and missing decisions",
-    "note": "It continues if you close the screen.",
+    "note": "Reading continues if you close this screen. Reopen it from 'My skills and Workflows' on the hub home. A long paper takes several minutes or more.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
     "retry": "Run analysis again"
@@ -217,7 +257,15 @@
       "failed": "Failed"
     },
     "newer": "Revision {n} of the draft is new. The tried revision is {installed}.",
-    "toDraft": "Install from the draft screen"
+    "toDraft": "Install from the draft screen",
+    "newProject": {
+      "action": "Create a new project",
+      "label": "New project name",
+      "placeholder": "e.g. Nickel targeting trial",
+      "button": "Create project",
+      "cancel": "Cancel",
+      "failed": "Could not create the project. Change the name and create it again."
+    }
   },
   "detail": {
     "show": "Show agent record",
@@ -251,7 +299,9 @@
     "needInputs": "Upload every required input and prepare the run environment to open the start settings.",
     "uploadFailed": "Could not upload the file. Check the file and upload it again.",
     "environment": "Run environment",
-    "openProject": "Open the project"
+    "openProject": "Open the project",
+    "extraPackages": "Packages outside the prepared environment: {packages}. The AI agent installs them during the analysis as the skill describes. On a PC that blocks installation, those steps stop.",
+    "optionalPackage": "{name} (optional step)"
   },
   "register": {
     "open": "Preview hub page",
