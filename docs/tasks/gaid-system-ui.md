@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T08:27:13Z
+status: done
+updated: 2026-10-18T08:27:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"20c56c1e-1c40-4e4b-91a7-71f36f7eb67c","pid":1512234,"provider":"claude","session":"2cbf721c-43fd-4509-a2a4-c3d7f0dba0b8","start":"19721847","token":"f4f562224bbbdb6fbb1d4221f0ac42ff23998b39dd15d754d0d1787ba50a9aea"}
 branch: task/gaid-system-ui
 target: main
@@ -46,7 +46,9 @@ Outside check: no outside check (UI work).
 - Isolated runtime (stopped): `systemd-run --user --unit gsu-runtime --collect -E PATH=$PATH -E HOME=$HOME
   ~/data/geoaidesk/work/gaid-system-ui/bin/run.sh` (UI 3361, API 18361); shots: bin/final-shots.sh.
 ## Next steps
-1. task finish.
+<!-- task:closed -->
+Closed 2026-10-18T08:27:38Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-system-ui.md.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: the popup (A) and the audit fixes (B) share workspace locales and readiness.tsx; both are done by
@@ -64,7 +66,7 @@ Outside check: no outside check (UI work).
   in workspace strings; action "시작 초안 만들기" (as in the approved mockup).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [부채] 방법 상세 대화상자가 시험 기록의 도구 호출 횟수와 허브 검사 ID·영어 메시지를 그대로 보입니다(UI 가이드 R1, R3, P3) — 가) 허브 화면 작업과 함께 연구자용 요약 + 기록 보기로 정리 — 나) 그대로 둠 — 권장: 가) 방법 상세는 허브와 같은 정보를 다룸 — 막힌 일: 없음 — 조건: 다음 허브/방법 화면 작업 — 근거: reports/2026-10-18-gaid-system-ui#5-한계
+- [부채 gaid-system-ui#1] 방법 상세 대화상자가 시험 기록의 도구 호출 횟수와 허브 검사 ID·영어 메시지를 그대로 보입니다(UI 가이드 R1, R3, P3) — 가) 허브 화면 작업과 함께 연구자용 요약 + 기록 보기로 정리 — 나) 그대로 둠 — 권장: 가) 방법 상세는 허브와 같은 정보를 다룸 — 막힌 일: 없음 — 조건: 다음 허브/방법 화면 작업 — 근거: reports/2026-10-18-gaid-system-ui#5-한계
 
 ## Report
 Report: reports/2026-10-18-gaid-system-ui/index.md
