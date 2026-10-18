@@ -53,6 +53,9 @@ import previewMethodKo from "./previewMethod/ko.json";
 import previewMethodEn from "./previewMethod/en.json";
 import hubKo from "./hub/ko.json";
 import hubEn from "./hub/en.json";
+// gaid-notebook-review: research notes
+import notesKo from "./notes/ko.json";
+import notesEn from "./notes/en.json";
 
 export type Catalogue = Record<string, string>;
 
@@ -73,6 +76,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  notes: pair(notesKo, notesEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
   methods: pair(methodsKo, methodsEn),

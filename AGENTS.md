@@ -73,6 +73,13 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `MiniMax-M3.1-Flash-Preview` is added to Pi's `minimax` provider at startup (`server/src/geo/providers.ts`). Never PDF
   page crops.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
+- Research notes (gaid-notebook-review, `docs/geo/research-notes.md`; user decision 2026-10-18): the notebook tab opens on
+  research notes (정리 노트), one Markdown note per analysis at `연구노트/<YYYY-MM-DD>-<topic>/index.md` (+ `figures/`), written result
+  first by the lead agent with ordinary write/edit (`RESEARCH_NOTE_RULE` in GEO_INSTRUCTIONS) and editable by the researcher; the
+  file is the master. `server/src/geo/notes/` parses notes, maps note → chats in `.kady/geo/notes.json` from a write/edit hook and
+  serves `GET /geo/notes`, `GET /geo/notes/:id`, `POST /geo/notes/:id/status` (contract `web/src/geo/contracts/research-notes.ts`);
+  screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail with answerable decisions that prefill the
+  chat, 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit
