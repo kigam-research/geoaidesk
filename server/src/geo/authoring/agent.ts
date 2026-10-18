@@ -998,8 +998,13 @@ export function declareImports(draft: CandidateDraft, ctx: SourceContext, projec
       if (!added) break;
       files = asFiles();
     }
-    const local = new Set(included.map((p) => distributionOf(p.split("/").at(-1)!.replace(/\.py$/, ""))));
-    for (const p of included) for (const dir of p.split("/").slice(0, -1)) local.add(distributionOf(dir));
+    // Every module the skill now carries (included by the model or here) is local, not a distribution.
+    const local = new Set<string>();
+    for (const c of draft.codeFiles) {
+      const parts = c.sourcePath.split("/");
+      if (c.sourcePath.endsWith(".py")) local.add(distributionOf(parts.at(-1)!.replace(/\.py$/, "")));
+      for (const dir of parts.slice(0, -1)) local.add(distributionOf(dir));
+    }
     if (draft.profile.dependencies)
       draft.profile.dependencies = draft.profile.dependencies.filter((d) => !local.has(distributionOf(d.name)));
     if (included.length)

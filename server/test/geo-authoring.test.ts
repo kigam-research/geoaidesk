@@ -415,7 +415,12 @@ describe("GAID hub authoring", () => {
       status: 400,
     });
     // A draft that wrongly declares the local module as a distribution gets it copied in and the entry dropped.
-    const declaredLocal = { ...withCode, dependencies: [{ name: "helper-mod", kind: "required", purpose: "x" }] };
+    // The model itself lists the module as a code file and as a dependency (seen in the gaid-hub-followups draft).
+    const declaredLocal = {
+      ...withCode,
+      codeFiles: [...withCode.codeFiles, { source: "S2", sourcePath: "scripts/analysis/helper_mod.py" }],
+      dependencies: [{ name: "helper-mod", kind: "required", purpose: "x" }],
+    };
     const fixed = await runOperation(store, projectId, "revise", "op-rev-local", {
       ...deps(reply(declaredLocal)),
       feedback: "helper_mod는 같은 코드 안의 파일입니다.",
