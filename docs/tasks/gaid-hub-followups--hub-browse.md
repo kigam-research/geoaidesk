@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:43:47Z
+updated: 2026-10-18T04:46:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03077f19-d7c4-4f7d-9814-7922a8e164f0","pid":2568287,"provider":"codex","session":"01a14d52-83a7-7210-aa24-5a0e1d29ac97","start":"18655459","token":"2df86b15744ca28cbee2c16419a110bf67b00f4a71a8d124f2ca31e90ac1332d"}
 branch: task/gaid-hub-followups--hub-browse
 target: task/gaid-hub-followups
@@ -54,11 +54,15 @@ Tests: server route test for q/folder filtering; a web test for the list (search
 - Finish with `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress. No pre-existing edits on resume. Dependencies installing locally.
 ## Next steps
-1. (the next session's first action)
+1. Implement and verify shared browsing, then capture Korean desktop views and run scripts/check.
 ## Failed approaches
 ## Notes and decisions
+- Sequential decisions: shared browse is the default tab; personal drafts remain a separate tab to follow P1/P3/W5. One primary create action remains in the header.
+- Interfaces: entries(folder?, q?) preserves existing callers; optional tagline derives from the immutable registered snapshot for old records. Server owns search/sort.
+- Owned implementation: hub-home/shared list, shared-api, shared routes/contract and home.browse locale keys. A focused server route test extends server/test/geo-hub-shared.test.ts (existing GAID test). No delegated packages: this child is tightly coupled and nested children are unsupported.
+- Integration order: server search/sort and client API, list/tab UI, targeted checks, API seed/browser QA, full checks, finish.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
