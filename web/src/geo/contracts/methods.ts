@@ -78,6 +78,15 @@ export interface LocalMethodWorkflow extends GeoWorkflowSummary {
   exposure: string;
   /** GAID trial records of this Workflow (any revision) and the latest researcher assessment outcome. */
   trials: { count: number; lastOutcome: "useful" | "needs-revision" | "failed" | null };
+  /** Packages the method declares that the Workflow's environment does not install (the agent installs them in the run). */
+  extraPackages?: MethodExtraPackage[];
+}
+
+/** A Python distribution a method needs beyond its catalogue environment. */
+export interface MethodExtraPackage {
+  name: string;
+  /** `false`: declared optional (used by an optional step). */
+  required: boolean;
 }
 
 export interface LocalMethodSummary {

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:06:21Z
+updated: 2026-10-18T08:13:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -49,6 +49,17 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 3. Fix, then round 2 with a fresh reader (novice2/), report.
 
 Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
+
+Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summary.md. Triage:
+- Routed to gaid-system-ui via hub (request 88fe3c357f47, briefs/route-system-ui.md): TaskSetup contradictions,
+  quick-trial preset, dependent options, workspace has no way back to the hub, methods panel implementation pill.
+- Child gaid-hub-novice-review--shared (brief briefs/child-shared.md): search aliases (니켈/Ni), HubEntry.implementation
+  + entry badge, honest trial scope. Owns server/src/geo/hub-shared/**, contracts/hub-shared.ts, hub/shared-*.
+  Locale ids `draft.implementation.{descriptive,implemented,descriptiveHint}` are shared (same text both sides).
+- This writer: authoring rules (prompts.ts, done 32ad970); hub-home two routes + glossary (F5); io-examples keeps label
+  column (F4: exampleColumns sliced 6 and dropped `label`); source-step completion action (F8); input-prep extra
+  packages (F3); draft-step / stage label implementation state (F2); hub-dialogs registration preview status (F6)
+  and install chooser new project (F9b).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

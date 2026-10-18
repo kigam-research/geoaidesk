@@ -20,6 +20,7 @@ import type { WorkflowSkillState } from "../../../../web/src/geo/contracts/works
 import type { GeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow } from "../catalogue-types.ts";
 import type { EnvironmentReadiness, GeoEnvironmentService } from "../environments.ts";
+import { extraPackages } from "./extra-packages.ts";
 import { environmentState, projectSkillState, readinessOf, summarizeWorkflow } from "../workspace/workflows.ts";
 import { readMethodFile, type MethodFile } from "./method-file.ts";
 import { originOfSource, packageStore } from "./package-origin.ts";
@@ -138,6 +139,7 @@ export async function listLocalMethods(
         ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }),
         exposure: methodExposure(method.runtimeName, workflow.id),
         trials: tried,
+        extraPackages: extraPackages(method.dir, catalogue, workflow.environmentProfile),
       };
     });
     return {
