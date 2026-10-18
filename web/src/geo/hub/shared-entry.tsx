@@ -13,9 +13,11 @@ import type { HubEntryDetail } from "@/geo/contracts/hub-shared";
 import { geoText } from "@/geo/i18n";
 import { withApiToken } from "@/lib/api-auth";
 import { API_BASE } from "@/lib/projects";
+import { useProjects } from "@/lib/use-projects";
 
 import { HubUserDialog } from "./hub-dialogs";
 import { InputPrep } from "./input-prep";
+import { NewProject } from "./draft-step";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
 import { hubUserName, sharedHub } from "./shared-api";
@@ -128,6 +130,7 @@ export function SharedEntryScreen({
           revision: e.latestRevision,
           registeredAt: latest ? text("shared.registeredAt", { when: when(latest.registeredAt) }) : "",
           kind: e.kind,
+          implementation: e.implementation,
           tags: e.tags,
           stars: e.stars,
           starred: e.starredByMe,
@@ -174,7 +177,7 @@ export function SharedEntryScreen({
   );
 }
 
-function UseInProjectDialog({
+export function UseInProjectDialog({
   open,
   onOpenChange,
   entryId,
@@ -190,7 +193,11 @@ function UseInProjectDialog({
   projects: { id: string; name: string }[];
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
 }) {
-  const [projectId, setProjectId] = useState(projects[0]?.id ?? "");
+  // No preselection: on a shared institute GAID the first project may be someone else's.
+  const [projectId, setProjectId] = useState("");
+  const [createdProjects, setCreatedProjects] = useState<{ id: string; name: string }[]>([]);
+  const choices = [...projects, ...createdProjects.filter((p) => !projects.some((existing) => existing.id === p.id))];
+  const { create } = useProjects();
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [installed, setInstalled] = useState<{
@@ -207,7 +214,7 @@ function UseInProjectDialog({
         {installed ? (
           <InputPrep
             projectId={projectId}
-            projectName={projects.find((p) => p.id === projectId)?.name ?? projectId}
+            projectName={choices.find((p) => p.id === projectId)?.name ?? projectId}
             methodKey={installed.methodKey}
             onOpenSetup={() => {
               onOpenChange(false);
@@ -221,20 +228,38 @@ function UseInProjectDialog({
               <select
                 className="h-9 rounded-md border bg-background px-2 text-sm font-normal"
                 value={projectId}
+                disabled={busy}
                 onChange={(e) => setProjectId(e.target.value)}
               >
-                {projects.map((p) => (
+                <option value="" disabled>
+                  {text("trial.pickProject")}
+                </option>
+                {choices.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
                 ))}
               </select>
             </label>
+            <fieldset disabled={busy} className="min-w-0">
+              <NewProject onCreate={async (name) => {
+                setBusy(true);
+                try {
+                  const project = await create({ name });
+                  setCreatedProjects((previous) => [...previous, project]);
+                  setProjectId(project.id);
+                  setConsent(false);
+                } finally {
+                  setBusy(false);
+                }
+              }} />
+            </fieldset>
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
                 className="mt-0.5 size-4 accent-primary"
                 checked={consent}
+                disabled={busy}
                 onChange={(e) => setConsent(e.target.checked)}
               />
               {text("trial.consent")}

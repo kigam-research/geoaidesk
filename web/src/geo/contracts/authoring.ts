@@ -461,6 +461,8 @@ export interface AuthoringProject {
   schemaVersion: typeof AUTHORING_PROJECT_SCHEMA;
   id: string;
   owner: string;
+  /** Hub display name of the researcher who started it (X-GAID-User at creation); absent on older projects. */
+  author?: string;
   title: string;
   goal?: string;
   /** What the researcher wants to make; `auto` lets the coauthor propose. */
@@ -493,6 +495,7 @@ export interface ProjectSummary {
   id: string;
   title: string;
   owner: string;
+  author?: string;
   updatedAt: string;
   stage: ProjectStage;
   /** An attempt is running now. */
@@ -558,6 +561,8 @@ export interface AuthoringHealth {
 }
 
 export interface CreateProjectBody {
+  /** The researcher's hub display name; used to list "my" methods, not an access control. */
+  author?: string;
   title?: string;
   goal?: string;
   target?: "skill" | "workflow" | "auto";

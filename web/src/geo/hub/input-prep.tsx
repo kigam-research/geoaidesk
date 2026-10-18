@@ -115,6 +115,7 @@ export function InputPrep({
     );
   const ready = setupReady(workflow, files);
   const envReady = workflow.readiness.state === "ready";
+  const extra = workflow.extraPackages ?? [];
   return (
     <div className="flex min-w-0 flex-col gap-3">
       <p className="text-sm font-medium">{text("prep.title", { project: projectName })}</p>
@@ -188,6 +189,13 @@ export function InputPrep({
         <div className="pl-6">
           <PrepareEnvironment value={workflow.readiness} projectId={projectId} onPrepared={load} />
         </div>
+        {extra.length > 0 && (
+          <p className="pl-6 text-xs text-muted-foreground">
+            {text("prep.extraPackages", {
+              packages: extra.map((p) => (p.required ? p.name : text("prep.optionalPackage", { name: p.name }))).join(", "),
+            })}
+          </p>
+        )}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <TechnicalDetail detail={errorDetail} />

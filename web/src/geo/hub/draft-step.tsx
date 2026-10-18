@@ -14,10 +14,11 @@ import {
   Share2Icon,
   TriangleAlertIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
@@ -83,9 +84,15 @@ export function DraftStep({
             <Badge variant="outline">
               {trialCount > 0 ? text("draft.tested", { count: trialCount }) : text("draft.untested")}
             </Badge>
+            <Badge variant="outline">
+              {text(draft.codeFiles.length ? "draft.implementation.implemented" : "draft.implementation.descriptive")}
+            </Badge>
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
           </div>
           <p className="max-w-[640px] text-base">{localText(profile.tagline)}</p>
+          {!draft.codeFiles.length && (
+            <p className="text-sm text-muted-foreground">{text("draft.implementation.descriptiveHint")}</p>
+          )}
           {onRegister && (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
               <Share2Icon className="size-5 text-primary" aria-hidden />
@@ -176,6 +183,56 @@ export function DraftStep({
 }
 
 /** Right-rail card that installs the draft into a project and opens its start settings. */
+/** A one-field form behind a link: name a new project and create it. */
+export function NewProject({ onCreate }: { onCreate: (name: string) => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  if (!open)
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="self-start text-sm text-primary underline">
+        {text("trial.newProject.action")}
+      </button>
+    );
+  return (
+    <form
+      className="flex flex-col gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!name.trim() || busy) return;
+        setBusy(true);
+        setFailed(null);
+        onCreate(name.trim())
+          .then(() => {
+            setOpen(false);
+            setName("");
+          })
+          .catch((err: Error) => setFailed(err.message))
+          .finally(() => setBusy(false));
+      }}
+    >
+      <Input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder={text("trial.newProject.placeholder")}
+        aria-label={text("trial.newProject.label")}
+        autoFocus
+      />
+      <div className="flex gap-2">
+        <Button type="submit" variant="outline" size="sm" disabled={!name.trim() || busy}>
+          {text("trial.newProject.button")}
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+          {text("trial.newProject.cancel")}
+        </Button>
+      </div>
+      {failed && <p className="text-sm text-destructive">{text("trial.newProject.failed")}</p>}
+      <TechnicalDetail detail={failed} />
+    </form>
+  );
+}
+
 export function TrialCard({
   projects,
   projectId,
@@ -187,9 +244,12 @@ export function TrialCard({
   disabledReason,
   installedIn,
   prepared,
+  onCreateProject,
 }: {
   /** After installation: the input preparation that leads to the start settings. */
   prepared?: ReactNode;
+  /** Make a new research project to try the draft in (selected afterwards). */
+  onCreateProject?: (name: string) => Promise<void>;
   projects: { id: string; name: string }[];
   projectId: string;
   onProject: (id: string) => void;
@@ -214,6 +274,9 @@ export function TrialCard({
           value={projectId}
           onChange={(event) => onProject(event.target.value)}
         >
+          <option value="" disabled>
+            {text("trial.pickProject")}
+          </option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -221,6 +284,7 @@ export function TrialCard({
           ))}
         </select>
       </label>
+      {!prepared && onCreateProject && <NewProject onCreate={onCreateProject} />}
       {prepared ? (
         prepared
       ) : (
@@ -234,7 +298,7 @@ export function TrialCard({
             />
             {text("trial.consent")}
           </label>
-          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || Boolean(disabledReason)}>
+          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || !projectId || Boolean(disabledReason)}>
             {installing ? text("trial.installing") : text("trial.install")}
           </Button>
           {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
