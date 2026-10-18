@@ -43,7 +43,7 @@ describe("shared install project creation", () => {
     await screen.findByText("프로젝트를 만들지 못했습니다. 이름을 바꿔 다시 만드세요.");
     expect(screen.getByText("HTTP 500 private detail").closest("details")?.open).toBe(false);
     expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("연구");
-    fireEvent.click(screen.getByRole("button", { name: "취소", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^취소$/ }));
     expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("default");
     expect(sharedHub.install).not.toHaveBeenCalled();
   });

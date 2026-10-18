@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:13:34Z
+updated: 2026-10-18T08:27:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b4c674e6-3330-4284-8f14-ab1e619c6fe4","pid":1905277,"provider":"codex","session":"01a14e0c-9ac1-7a22-84f7-fe396a47cfb5","start":"19875020","token":"c8527c7072114ae3c43b788a5371371c2e5e7835f8bb261a59ddaafbccd0b63b"}
 branch: task/gaid-hub-novice-review--shared
 target: task/gaid-hub-novice-review
@@ -40,7 +40,7 @@ instructions only or includes run code, and (3) is not misled by trial counts.
    are not there yet when you start, exactly with this text):
    - `draft.implementation.descriptive`: ko "분석 지침만 · 실행 코드 없음", en "Instructions only · no run code"
    - `draft.implementation.implemented`: ko "실행 코드 포함", en "Includes run code"
-   - `draft.implementation.descriptiveHint`: ko "시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다.",
+   - `draft.implementation.descriptiveHint`: ko "시험하면 AI agent가 이 지침에 따라 분석 코드를 새로 씁니다.",
      en "When you try it, the AI agent writes the analysis code from these instructions."
    Optionally also as a small badge on browse cards (UI guide: at most 3 badges per row).
 3. Trial scope: the entry shows "GAID 시험 기록 {count}회 (검토 결과 아님)"; the user's input-only check counted as a
@@ -67,19 +67,23 @@ Record all of it in your task document. Server tests: run with `env -u VITEST_MA
 tests flake under load. raw.githubusercontent.com is blocked on this network.
 
 ## Current state
-- Shared hub search, code-availability labels and started-trial wording are implemented. Server focused tests pass (30/30); browse/method web tests pass (6/6). New-project creation wiring awaits the parent's saved NewProject export for integration/QA.
-- Resumed the assigned writer in the original printed worktree; read the task, project rules, UI guide and round-1 evidence.
-- Implemented snapshot-grounded multiword commodity-alias search, latest-snapshot implementation state and empty-search hint; verification pending.
-- Codegraph has no index for this exact worktree; used native reads as instructed.
+- Delivered snapshot-grounded commodity-alias AND-word search (including description, bilingual IO labels and limitations), unchanged star/date/id ranking, explicit implementation state, empty-search tip and honest started-trial wording.
+- Delivered shared install → NewProject → useProjects().create → selected new project → install flow using the parent's common component. Creation and install cannot run concurrently; the newly created name/id remains available while project props refresh.
+- Focused server tests: 30/30 passed. Focused web tests: 8/8 passed. Server and frontend TypeScript checks passed. Copy/UI checks passed (0 errors; 57 existing copy warnings, 102 accepted UI debt).
+- Actual copied-data QA: 니켈 / Ni / nickel returned the same three entries in the same order; adding an absent word returned none. Two entries report implemented, the paper-only entry descriptive. Created proj-7da5c2, selected it, installed the shown registered revision and reached its InputPrep screen. No analysis/model request was sent.
+- Korean screenshots were visually checked at both required sizes; no horizontal overflow, implementation/trial lines readable, entry primary action visible, empty-state reset visible and keyboard Enter resets the query. Browser closed and QA services stopped. Parent integration and deployment are separate; no deployment was performed.
+- The final declared scripts/check result is enforced and recorded by task finish: only a passing snapshot may be published ready for the parent.
+
 ## Next steps
-1. Add focused server/web tests, run declared checks, then capture Korean entry/empty-search screenshots on isolated ports.
+1. Finish this checked snapshot with task finish; the parent integrates the ready unit with task complete gaid-hub-novice-review--shared.
 ## Failed approaches
+- First task sync merged parent b32f43b9 but scripts/check failed at production TypeScript checking: a new test used unsupported getByRole option exact. Replaced it with an anchored name regex. Frontend tsc --noEmit and all 8 focused web tests then passed.
 - Initial focused tests could not run because this fresh worktree had no npm dependencies. Installed both lockfiles with npm ci; no source workaround. task job run refused the dirty source before starting or issuing any job receipt; these short dependency installs ran locally.
 - Extended integration fixture initially omitted the skill-description trigger, causing the existing format gate to reject it. Preserved the original trigger and appended Ni text. The next run exposed an obsolete phrase-search expectation: “이 연구원” now matches words across fields. Used a unique author surname and verified the intended AND-word semantics in the unit test.
 - Initial isolated browser API calls failed CORS because its backend lacked KADY_FRONTEND_PORT=3380; restarted only that QA backend with its matching UI port.
 ## Notes and decisions
 - UI rules: P1/B1 (one install task; secondary inline project creation), P3/W5/G2 (implementation is plain text beside trial scope, no extra badge row), F3 (empty result retains reset and adds one search hint), W4 (all new strings within 140/280 chars), R2 (creation failure detail remains collapsed), A1 (labeled name and project controls).
-- Checks so far: backend typecheck passed; server focused tests passed 30/30; browse/method web tests passed 6/6; copy validator passed with 0 errors / 58 warnings (parent subsequently changed descriptiveHint to “스킬 지침” to remove its added warning); UI validator passed 0 errors / 102 existing accepted debt.
+- Initial focused checks: backend typecheck passed; server focused tests passed 30/30; browse/method web tests passed 6/6; copy validator passed with 0 errors / 58 warnings (parent subsequently changed descriptiveHint to “스킬 지침” to remove its added warning); UI validator passed 0 errors / 102 existing accepted debt.
 
 ### Changed strings owned by this child
 | Id | Korean before → after | English before → after |
@@ -95,6 +99,32 @@ tests flake under load. raw.githubusercontent.com is blocked on this network.
 - Trial scope uses the explicitly allowed “started trials” wording. Current observation reads whole provenance logs; no cheap bounded completeness aggregate exists. Do not introduce provenance scans into list/detail requests for a count.
 - HubEntry implementation is required in API responses and derived at read time; stored entries need no migration. SharedMethodView accepts an optional implementation for the parent's registration-preview caller in hub-screen.tsx; parent confirmed that it now supplies the derived value. Shared entry always supplies it.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+### Verification evidence
+- Backend: `cd server && env -u VITEST_MAX_WORKERS taskset -c 0-7 npm test -- test/geo-hub-shared.test.ts test/geo-hub-shared-search.test.ts` → 2 files / 30 tests passed.
+- Web: `cd web && npm test -- src/geo/hub/shared-entry.test.tsx src/geo/hub/shared-method.test.tsx src/geo/hub/shared-browse.test.tsx` → 3 files / 8 tests passed after the type fix.
+- `cd server && npm run typecheck`; `cd web && npx --no-install tsc --noEmit` → both passed.
+- `node geo/copy/validate-copy.mjs web/src/geo/locales` → 0 errors / 57 warnings in the declared check. The new descriptiveHint warning was removed by the parent's exact wording correction; hub-only rerun has one pre-existing user.body warning.
+- `node geo/ui/check-ui.mjs` → 11,210 strings, 0 errors, 102 existing accepted debt; no new baseline entry.
+- First declared check via `env -u VITEST_MAX_WORKERS taskset -c 0-7 task sync`: backend 172 passed files / 1 skipped, 1905 passed tests / 11 skipped; web 163 files / 1076 tests passed; GAID tests, environment imports and launch checks passed. Two mzML tests were excluded by the existing PSI-MS network probe. Production smoke failed solely on the test type error noted above; final finish reruns the required gate after that fix.
+- QA instance: UI http://localhost:3380; backend 18380; copy of the parent's novice-review home under pc74:/home/seongin3/data/geoaidesk/work/gaid-hub-novice-review--shared/home (config/credential files excluded). Original parent's ports/data were untouched. Systemd QA units and browser are stopped.
+- UI requests observed: POST /projects 201, sandbox/init 200, installation 201, methods/tree 200. Console: 0 errors, two existing DialogContent description warnings. No new UI-rule exception was introduced.
+- Section 10 visual review: P1/B1 one install primary with secondary creation form; L1/L6 no horizontal overflow and try/reset actions visible; S1/S3 role colours and textual states; A1/A2 named controls, visible focus, keyboard reset; R1/R2 no machinery/raw errors in the changed researcher view; W4/W5 no extra badge row and short state strings. Existing researcher-provided titles/notes are excluded from the body-copy budget. The 1280 empty-state capture scrolls the browse surface into view.
+- API fixture evidence: pc74:/home/seongin3/data/geoaidesk/work/gaid-hub-novice-review--shared/api-search.json.
+
+### Korean screenshots for the parent's report
+Locator prefix: pc74:/home/seongin3/data/geoaidesk/work/gaid-hub-novice-review--shared/playwright/.
+
+| File | SHA-256 |
+| --- | --- |
+| descriptive-1440x900.png | 33afd0537f4ccfc74aa4650a506f3322b756181d17b8e28fca449a47b09fa0c8 |
+| descriptive-1280x800.png | c54c715fad669fa156f94034bab0cf01768fc55a258000a96ddbc4435fce5d40 |
+| implemented-1440x900.png | a1e6cf8f1383014ddcafc7efebca37cbfebe2b5eba125071206118001d4af227 |
+| implemented-1280x800.png | 3f7e003e01168698dfd0c6839c7fadeeec17ec048e5480684b45276fc533f6ad |
+| empty-1440x900.png | 430e56bc9fdc9db84dfa2d4c1ef337b3f0188e4439e9fc6e636dad7c5bdc36ae |
+| empty-1280x800.png | 943d1cc2c6d8933ba7ec9b5d5199c29838312b365cdf175cf59d78ad79f6aa39 |
+| project-selected-1440x900.png | 04afd3da0bd65237460b4cf751151f423580f77027cbe9747b9e68c9801ac925 |
+| project-selected-1280x800.png | 40fa5783dda294d4d3a736e9ac90f99735d94b268c137255a7d97b0b1b486057 |
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
