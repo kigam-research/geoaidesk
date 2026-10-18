@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:00:27Z
+updated: 2026-10-18T05:00:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -113,7 +113,7 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. Verify the catalogue-off regression fix and re-run the frontend suite with VITEST_MAX_WORKERS=4. Backend code is unchanged since its full 1,873-test pass. Job 1 is terminal, not resumable.
+1. Wait for recorded supplementary job 2, then inspect its receipt/log. It rechecks the full frontend (VITEST_MAX_WORKERS=4; only parent-owned old handoff test excluded) and all downstream stages skipped when scripts/check stopped. Backend code is unchanged since its full 1,873-test pass. Job 1 is terminal, not resumable.
 2. Inspect every failure. Parent-owned web/src/geo/hub-handoff/hub-handoff.test.tsx is being rewritten with the parent HandoffDialog; do not edit it. If it is the only failing check, record "parent-owned test, fixed at integration" and task finish per parent authorization. Fix any other failure in this unit. Temporary browser/dev services are stopped.
 ## Failed approaches
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
@@ -125,6 +125,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 - Visual review caught a clipped hub label due to the composer inner nowrap query; removed only that inner nowrap rule and recaptured both sizes.
 - Shell-prefix test initially assumed a settings file had been seeded by ensureProjectExists; it had not. The fixture now creates its own settings before session construction.
 ## Notes and decisions
+- Supplementary verifier: /home/seongin3/data/geoaidesk/work/gaid-hub-followups--defects/verify-remainder.sh; sha256 105b4d173b7db4add57a4de64861c818ffc7aa0738556bd7dd061966621878b9. It does not alter scripts/check or parent tests. Full frontend excluding only the parent-owned handoff file, then launcher/distribution/copy/UI/environment/production smoke. Catalogue-off and installed-method UI focused rerun: 27 passed. Integration checkpoint cf126308e71b.
 - Parent instruction after full-check launch: only the old hub-handoff.test.tsx button-name failure may remain for integration; do not edit the parent-owned test. No other failure is waived. At the bounded check on this instruction, the recorded job was still running through backend tests (no final exit/result yet).
 - Parent clarification: chat-actions renders hubHandoff.openLabel, keeps hubHandoff.open for aria/title. Parent exclusively owns those locale keys; not edited here. Parent locale commit cdda9dc was received unchanged before UI/check verification.
 - Integration order: UI feedback and label are independent; suggestion server/client contract is owned together; cache server/client contract is owned together; process lifecycle precedes abort/dispose tests. Only the main writer edits. Parent owns authoring, hub handoff, TaskSetup and trials; these remain untouched.
@@ -142,6 +143,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-followups--defects-20261018T045312.006938Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-followups--defects-20261018T050052.337343Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
