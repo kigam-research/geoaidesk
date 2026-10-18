@@ -491,3 +491,17 @@ describe("plain labels", () => {
     expect(plainLabel("선택 기준 표")).toBe("선택 기준 표");
   });
 });
+
+describe("authoring project author", () => {
+  it("records the hub display name for the 'my methods' list and drops invalid names", async () => {
+    const store = new AuthoringStore(await work("author-test-"));
+    await store.initialize();
+    const named = await store.create({ author: "  새연구자2 " });
+    const unnamed = await store.create({ author: "x".repeat(41) });
+    expect(named.author).toBe("새연구자2");
+    expect(unnamed.author).toBeUndefined();
+    const list = await store.list();
+    expect(list.find((p) => p.id === named.id)?.author).toBe("새연구자2");
+    expect(list.find((p) => p.id === unnamed.id)).not.toHaveProperty("author");
+  });
+});

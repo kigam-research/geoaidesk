@@ -4,8 +4,9 @@
  * topic folders on the left and the methods of the chosen folder as cards on the right.
  */
 import {
-  ArrowRightIcon,
+  BookOpenIcon,
   DatabaseIcon,
+  FileTextIcon,
   DropletsIcon,
   FlaskConicalIcon,
   FolderIcon,
@@ -13,6 +14,7 @@ import {
   LoaderCircleIcon,
   MapIcon,
   PlusIcon,
+  SearchIcon,
   StarIcon,
   WorkflowIcon,
 } from "lucide-react";
@@ -21,6 +23,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SharedBrowse } from "./shared-browse";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { ProjectSummary } from "@/geo/contracts/authoring";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
@@ -57,6 +60,33 @@ function CardArt({ title }: { title: string }) {
     <span className="absolute inset-0 flex items-center justify-center bg-muted" aria-hidden>
       <Icon className="size-8 text-primary" strokeWidth={1.5} />
     </span>
+  );
+}
+
+const GLOSSARY = ["method", "skill", "workflow", "recipe", "draft", "revision", "trial"] as const;
+
+/** Short definitions of the words the hub uses, behind one header action (UI guide P3, W6). */
+function HubGlossary() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <BookOpenIcon data-icon="inline-start" />
+          {text("home.glossary.button")}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-96">
+        <h2 className="mb-2 text-sm font-semibold">{text("home.glossary.title")}</h2>
+        <dl className="flex flex-col gap-2 text-sm">
+          {GLOSSARY.map((k) => (
+            <div key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
+              <dt className="font-medium">{text(`home.glossary.${k}.term`)}</dt>
+              <dd className="text-muted-foreground">{text(`home.glossary.${k}.text`)}</dd>
+            </div>
+          ))}
+        </dl>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -127,28 +157,47 @@ export function HubHome({
   const [listTab, setListTab] = useState("browse");
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 overflow-y-auto px-6 py-8">
-      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div className="flex max-w-[640px] flex-col gap-2">
-          <h1 className="text-xl font-semibold">{text("home.title")}</h1>
-          <p className="text-sm text-muted-foreground">{text("home.body")}</p>
-          <ol className="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium">
-            {(["make", "register", "feedback"] as const).map((k, i) => (
-              <li key={k} className="flex items-center gap-2">
-                {i > 0 && <ArrowRightIcon className="size-4 text-muted-foreground" aria-hidden />}
-                <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {i + 1}
-                  </span>
-                  {text(`home.flow.${k}`)}
-                </span>
-              </li>
-            ))}
-          </ol>
+      <section className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex max-w-[640px] flex-col gap-1">
+            <h1 className="text-xl font-semibold">{text("home.title")}</h1>
+            <p className="text-sm text-muted-foreground">{text("home.body")}</p>
+          </div>
+          <HubGlossary />
         </div>
-        <Button onClick={onCreate}>
-          <PlusIcon data-icon="inline-start" />
-          {text("home.new")}
-        </Button>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+              <SearchIcon className="size-5" aria-hidden />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="text-sm font-semibold">{text("home.route.use.title")}</span>
+              <span className="text-sm text-muted-foreground">{text("home.route.use.body")}</span>
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setListTab("browse");
+                document.getElementById("hub-lists")?.scrollIntoView({ behavior: "instant", block: "start" });
+              }}
+            >
+              {text("home.route.use.button")}
+            </Button>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <FileTextIcon className="size-5" aria-hidden />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="text-sm font-semibold">{text("home.route.make.title")}</span>
+              <span className="text-sm text-muted-foreground">{text("home.route.make.body")}</span>
+            </span>
+            <Button onClick={onCreate}>
+              <PlusIcon data-icon="inline-start" />
+              {text("home.new")}
+            </Button>
+          </div>
+        </div>
       </section>
 
       <section className="flex flex-col gap-3" aria-labelledby="hub-recommended">
@@ -193,7 +242,7 @@ export function HubHome({
         </ul>
       </section>
 
-      <Tabs value={listTab} onValueChange={setListTab} className="gap-4">
+      <Tabs id="hub-lists" value={listTab} onValueChange={setListTab} className="scroll-mt-4 gap-4">
         <TabsList aria-label={text("home.browse.tabs")}>
           <TabsTrigger value="browse">{text("home.browse.title")}</TabsTrigger>
           <TabsTrigger value="mine">{text("home.mine")}</TabsTrigger>
@@ -274,12 +323,12 @@ export function HubHome({
                       )}
                     >
                       {p.busy && <LoaderCircleIcon className="size-3 animate-spin" aria-hidden />}
-                      {stageLabel(p)}
+                      {registered[p.id] && !p.busy ? text("stage.registered") : stageLabel(p)}
                     </span>
                     <span className="text-sm font-semibold">{p.methodTitle ?? p.title}</span>
                     {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
                     <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
-                      {text("home.updated", { when: when(p.updatedAt) })}
+                      {text("home.byUpdated", { author: p.author ?? text("home.noAuthor"), when: when(p.updatedAt) })}
                       {registered[p.id] && (
                         <span
                           role="link"

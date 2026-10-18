@@ -1,5 +1,6 @@
 /** Shared hub integration: real package builder/gate, isolated stores/projects, scripted authoring responses. */
 import Fastify, { type FastifyInstance } from "fastify";
+import { execFileSync } from "node:child_process";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -7,6 +8,7 @@ import type { HubEntry, HubEntryDetail } from "../../web/src/geo/contracts/hub-s
 import { runOperation } from "../src/geo/authoring/agent.ts";
 import { editDraft, getAuthoringStore, registerAuthoringRoutes } from "../src/geo/authoring/routes.ts";
 import { AuthoringStore } from "../src/geo/authoring/store.ts";
+import { addSource } from "../src/geo/authoring/sources.ts";
 import { registerSharedHubRoutes } from "../src/geo/hub-shared/routes.ts";
 import { DEFAULT_FOLDER, SharedHubStore } from "../src/geo/hub-shared/store.ts";
 import { geoStateDir } from "../src/geo/context.ts";
@@ -115,6 +117,7 @@ describe("shared GAID hub", () => {
       comments: 0,
       trials: 0,
       kind: "workflow",
+      implementation: "descriptive",
       tags: ["modeling"],
     });
     expect(entry.cover).toContain("revision=1");
@@ -135,17 +138,27 @@ describe("shared GAID hub", () => {
     expect(p.packages).toHaveLength(1);
     expect(archive.rawPayload).toEqual(await f.store.readFile(f.projectId, p.packages[0].archive));
 
-    // Editing the private draft/visual never changes the registered snapshot, even across store restarts.
+    // Code availability follows the registered snapshot, never a private later draft.
+    const codeDir = await work("hub-shared-code-");
+    await writeFile(join(codeDir, "run.py"), "print('trial')\n");
+    execFileSync("tar", ["-czf", join(codeDir, "code.tar.gz"), "-C", codeDir, "run.py"]);
+    const code = await addSource(f.store, f.projectId, {
+      name: "code.tar.gz", mediaType: "application/gzip",
+      contentBase64: (await readFile(join(codeDir, "code.tar.gz"))).toString("base64"),
+    });
     await f.store.mutate(f.projectId, (p) => {
       p.drafts.push(editDraft(p, { baseRevision: 1, title: "새 판 제목" }));
+      p.drafts.at(-1)!.codeFiles.push({ path: "scripts/run.py", sourceId: code.source.id, sourcePath: "run.py" });
     });
     await f.store.writeFile(f.projectId, "visuals/prepare.png", Buffer.from("changed private image"));
     expect((await f.app.inject(`/geo/hub/entries/${entry.id}`)).json().profile).toEqual(detail.profile);
+    expect((await f.app.inject(`/geo/hub/entries/${entry.id}`)).json().entry.implementation).toBe("descriptive");
     expect((await f.app.inject(entry.cover!)).rawPayload).toEqual(PNG);
     expect((await new SharedHubStore(f.shared.root).read(entry.id)).snapshots[1].draft.profile).toEqual(detail.profile);
     const r2 = await f.register();
     expect(r2.statusCode, r2.body).toBe(201);
-    expect(r2.json()).toMatchObject({ id: entry.id, latestRevision: 2, title: "새 판 제목", cover: null });
+    expect(r2.json()).toMatchObject({ id: entry.id, latestRevision: 2, title: "새 판 제목", cover: null, implementation: "implemented" });
+    expect((await f.app.inject("/geo/hub/entries")).json().entries[0].implementation).toBe("implemented");
     expect((await f.app.inject(`/geo/hub/entries/${entry.id}/package.tar.gz?revision=1`)).rawPayload).toEqual(
       archive.rawPayload,
     );
@@ -335,10 +348,14 @@ describe("shared GAID hub", () => {
       s.drafts[0].slug = "map-method";
       s.drafts[0].profile.title = "좌표 비교";
       s.drafts[0].profile.tagline = { ko: "독립적인 한 줄 설명", en: "Unique bilingual tagline" };
+      s.drafts[0].description += " Ni exploration instructions.";
+      s.drafts[0].profile.inputs![0].label = { ko: "시료 좌표", en: "sample coordinates" };
+      s.drafts[0].profile.outputs[0].label = { ko: "우선순위 결과", en: "priority results" };
+      s.drafts[0].profile.limitations[0].text = { ko: "현장 확인 전", en: "Field confirmation pending" };
       s.drafts[0].workflow!.skillIds = ["local:map-method"];
       s.drafts[0].workflow!.expectedArtifacts.forEach((a) => { a.skill = "local:map-method"; });
     });
-    const registered = await f.register("이 연구원", { authoringProjectId: second.id, folderId: folder.id });
+    const registered = await f.register("박 연구원", { authoringProjectId: second.id, folderId: folder.id });
     expect(registered.statusCode, registered.body).toBe(201);
     const other = registered.json<HubEntry>();
     for (const [id, at] of [[first.id, "2026-10-16T00:00:00Z"], [other.id, "2026-10-17T00:00:00Z"]]) {
@@ -348,16 +365,21 @@ describe("shared GAID hub", () => {
     }
     const list = async (q = "", folderId = "") => (await f.app.inject({ url: "/geo/hub/entries?" + new URLSearchParams({ q, ...(folderId ? { folder: folderId } : {}) }) })).json().entries as HubEntry[];
     expect((await list()).map((e) => e.id)).toEqual([other.id, first.id]);
-    for (const q of ["좌표 비교", "독립적인 한 줄", "  UNIQUE BILINGUAL  ", "이 연구원"]) {
-      expect((await list(q)).map((e) => e.id)).toEqual([other.id]);
+    for (const q of ["좌표 비교", "독립적인 한 줄", "  UNIQUE BILINGUAL  ", "박 연구원"]) {
+      expect((await list(q)).map((e) => e.id), q).toEqual([other.id]);
     }
     expect((await list("모델링")).map((e) => e.id)).toEqual([other.id, first.id]);
     expect((await list("Modelling")).length).toBe(2);
     expect((await list("모델링", folder.id)).map((e) => e.id)).toEqual([other.id]);
-    expect(await list("이 연구원", DEFAULT_FOLDER)).toEqual([]);
+    expect(await list("박 연구원", DEFAULT_FOLDER)).toEqual([]);
     expect(await list("missing")).toEqual([]);
     expect(await list("", "missing")).toEqual([]);
     expect((await list("좌표 비교"))[0].tagline).toBe("독립적인 한 줄 설명");
+    for (const q of ["니켈", "nickel", "니켈 비교", "시료 우선순위", "sample results", "현장 확인", "field pending"]) {
+      expect((await list(q)).map((e) => e.id), q).toEqual([other.id]);
+    }
+    expect(await list("니켈 없는말")).toEqual([]);
+    expect(await list("니켈", DEFAULT_FOLDER)).toEqual([]);
     await f.app.inject({ method: "POST", url: `/geo/hub/entries/${first.id}/star`, headers: headers(), payload: { on: true } });
     expect((await list()).map((e) => e.id)).toEqual([first.id, other.id]);
   });

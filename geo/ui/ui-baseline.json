@@ -55,16 +55,11 @@
       "en:work.source.subagent_run",
       "en:workspace.catalogue.error",
       "en:workspace.catalogue.status",
-      "en:workspace.environment.error",
-      "en:workspace.environment.incomplete",
       "en:workspace.error.status",
-      "en:workspace.files.error",
       "en:workspace.recipe.error",
       "en:workspace.saved.deleteError",
       "en:workspace.saved.error",
-      "en:workspace.setup.error",
       "en:workspace.skill.error",
-      "en:workspace.skills.error",
       "ko:context.loadError",
       "ko:files.latex_editor.more_context",
       "ko:files.office_runtime.operation_failed",
@@ -86,16 +81,11 @@
       "ko:work.source.subagent_run",
       "ko:workspace.catalogue.error",
       "ko:workspace.catalogue.status",
-      "ko:workspace.environment.error",
-      "ko:workspace.environment.incomplete",
       "ko:workspace.error.status",
-      "ko:workspace.files.error",
       "ko:workspace.recipe.error",
       "ko:workspace.saved.deleteError",
       "ko:workspace.saved.error",
-      "ko:workspace.setup.error",
-      "ko:workspace.skill.error",
-      "ko:workspace.skills.error"
+      "ko:workspace.skill.error"
     ],
     "styles": [
       "web/src/geo/attribution/source-badge.tsx:text-[10px]",
@@ -104,10 +94,7 @@
       "web/src/geo/authoring-preview/source-input.tsx:#174bd1",
       "web/src/geo/authoring-preview/source-input.tsx:#1f5eff",
       "web/src/geo/context/prompt-budget.tsx:text-[11px]",
-      "web/src/geo/methods/methods.tsx:text-[10px]",
-      "web/src/geo/skill-hub/skill-hub.tsx:text-[11px]",
-      "web/src/geo/viewers/map/index.tsx:text-[11px]",
-      "web/src/geo/workspace/task-catalogue.tsx:text-[10px]"
+      "web/src/geo/viewers/map/index.tsx:text-[11px]"
     ]
   }
 }

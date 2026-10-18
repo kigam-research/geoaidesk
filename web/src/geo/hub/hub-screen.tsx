@@ -159,7 +159,10 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
     };
   }, [loadShared]);
   const entryOf = (p: ProjectSummary) => entries.find((e) => e.revisions.some((r) => r.authoringProjectId === p.id));
-  const shown = folderId === "all" ? projects : projects.filter((p) => entryOf(p)?.folderId === folderId);
+  // "My" methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name.
+  const me = hubUserName();
+  const mine = me ? projects.filter((p) => !p.author || p.author === me) : projects;
+  const shown = folderId === "all" ? mine : mine.filter((p) => entryOf(p)?.folderId === folderId);
   return (
     <>
       <HubHome
@@ -173,11 +176,11 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
           author: c.author,
         }))}
         folders={[
-          { id: "all", name: text("home.allFolders"), count: projects.length },
+          { id: "all", name: text("home.allFolders"), count: mine.length },
           ...folders.map((f) => ({
             id: f.id,
             name: f.name,
-            count: projects.filter((p) => entryOf(p)?.folderId === f.id).length,
+            count: mine.filter((p) => entryOf(p)?.folderId === f.id).length,
           })),
         ]}
         folderId={folderId}
@@ -185,7 +188,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         onNewFolder={() => named.run(() => setNewFolder(true))}
         projects={shown}
         registered={Object.fromEntries(
-          projects.flatMap((p) => {
+          mine.flatMap((p) => {
             const e = entryOf(p);
             return e
               ? [[p.id, { entryId: e.id, stars: e.stars, comments: e.comments, revision: e.latestRevision }]]
@@ -194,7 +197,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         )}
         loading={loading}
         error={error}
-        onCreate={() => onOpen(NEW_ID)}
+        onCreate={() => named.run(() => onOpen(NEW_ID))}
         onOpen={onOpen}
         onOpenEntry={onOpenEntry}
         onOpenRecommended={(id) => {
@@ -335,7 +338,7 @@ function HubProject({
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
   const [installing, setInstalling] = useState(false);
-  const { projects, setActive } = useProjects();
+  const { projects, setActive, create: createProject } = useProjects();
   const trialCount = useTrialCount(project?.installs ?? NO_INSTALLS, project?.drafts.at(-1)?.slug ?? "");
 
   const reload = useCallback(async () => {
@@ -424,10 +427,9 @@ function HubProject({
 
   const activeProjects = useMemo(() => projects.filter((p) => !p.archived), [projects]);
   useEffect(() => {
-    // Preselect where the method was installed last, else the first project.
     const last = project?.installs.at(-1)?.projectId;
-    if (!trialProject && activeProjects.length)
-      setTrialProject(last && activeProjects.some((p) => p.id === last) ? last : activeProjects[0].id);
+    // Only where this method was installed before; otherwise the researcher picks (projects are shared on an institute GAID).
+    if (!trialProject && last && activeProjects.some((p) => p.id === last)) setTrialProject(last);
   }, [activeProjects, trialProject]);
 
   if (!project)
@@ -451,6 +453,7 @@ function HubProject({
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
+      ...(hubUserName() ? { author: hubUserName()! } : {}),
       goal: goal || undefined,
       target,
       ...(agentModel ? { model: agentModel } : {}),
@@ -620,6 +623,7 @@ function HubProject({
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}
+          onNext={project.findings.length > 0 ? () => setStep("questions") : undefined}
         />
       </>
     );
@@ -658,6 +662,7 @@ function HubProject({
           revision: draft.revision,
           registeredAt: text("register.before"),
           kind: draft.workflow ? "workflow" : "skill",
+          implementation: draft.codeFiles.length ? "implemented" : "descriptive",
           tags: [...draft.profile.taxonomy.tasks, ...(draft.profile.taxonomy.methods ?? [])].slice(0, 5),
           stars: 0,
           starred: false,
@@ -706,6 +711,10 @@ function HubProject({
             consent={consent}
             onConsent={setConsent}
             onInstall={install}
+            onCreateProject={async (name) => {
+              const created = await createProject({ name });
+              setTrialProject(created.id);
+            }}
             installing={installing}
             disabledReason={issues ? text("trial.notReady") : null}
             prepared={

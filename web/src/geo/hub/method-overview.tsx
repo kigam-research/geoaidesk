@@ -47,8 +47,11 @@ export function summarySentences(summary: string): string[] {
 
 /** Input → steps → result, with counts of the steps and of the places where the researcher decides. */
 export function OverviewBand({ profile }: { profile: DraftProfile }) {
-  const inputs = (profile.inputs ?? []).map((p) => localText(p.label));
-  const outputs = profile.outputs.map((p) => localText(p.label));
+  const inputs = (profile.inputs ?? []).map((p) => ({
+    label: localText(p.label),
+    tag: text(p.required ? "overview.required" : "overview.optional"),
+  }));
+  const outputs = profile.outputs.map((p) => ({ label: localText(p.label) }));
   const steps = profile.procedure.nodes.length;
   const gates = profile.procedure.nodes.filter((n) => n.type === "human-gate" || n.type === "decision").length;
   return (
@@ -82,7 +85,16 @@ function BandArrow() {
   );
 }
 
-function BandCell({ icon, title, items }: { icon: ReactNode; title: string; items: string[] }) {
+function BandCell({
+  icon,
+  title,
+  items,
+}: {
+  icon: ReactNode;
+  title: string;
+  /** `tag`: a short qualifier after the label (필수/선택 for inputs). */
+  items: { label: string; tag?: string }[];
+}) {
   const shown = items.slice(0, 4);
   return (
     <div className="flex flex-col gap-2 rounded-lg border bg-card p-4">
@@ -92,9 +104,10 @@ function BandCell({ icon, title, items }: { icon: ReactNode; title: string; item
       </p>
       <ul className="flex flex-col gap-1">
         {shown.map((item, i) => (
-          <li key={i} title={item} className="flex items-start gap-2 text-sm font-medium">
+          <li key={i} title={item.label} className="flex items-start gap-2 text-sm font-medium">
             <span className="mt-2 size-1 shrink-0 rounded-full bg-muted-foreground" aria-hidden />
-            <span className="line-clamp-1">{shortLabel(item)}</span>
+            <span className="line-clamp-1 min-w-0">{shortLabel(item.label)}</span>
+            {item.tag && <span className="shrink-0 text-xs font-normal text-muted-foreground">{item.tag}</span>}
           </li>
         ))}
         {items.length > shown.length && (

@@ -92,6 +92,7 @@ export function SourceStep({
   onRemove,
   uploading,
   onStart,
+  onNext,
   pdfText = true,
   analyzed = false,
   onUrl,
@@ -115,6 +116,8 @@ export function SourceStep({
   onRemove?: (sourceId: string) => void;
   uploading?: string | null;
   onStart: () => void;
+  /** Sources were read: go on to the questions (the primary action then). */
+  onNext?: () => void;
   pdfText?: boolean;
   /** Sources were already analyzed: starting again re-reads them (secondary action). */
   analyzed?: boolean;
@@ -236,6 +239,14 @@ export function SourceStep({
           ))}
         </div>
       </fieldset>
+      {analyzed && onNext && (
+        <div className="flex flex-col gap-2 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <p className="text-sm">{text("sources.readDone")}</p>
+          <Button size="lg" onClick={onNext}>
+            {text("sources.next")}
+          </Button>
+        </div>
+      )}
       <Button
         size="lg"
         variant={analyzed ? "outline" : "default"}

@@ -43,6 +43,8 @@ export interface HubEntry {
   tagline?: string;
   summary: string;
   kind: "skill" | "workflow";
+  /** Code availability in the latest registered snapshot, not execution or review status. */
+  implementation: "descriptive" | "implemented";
   tags: string[];
   author: string;
   folderId: string;
@@ -53,7 +55,7 @@ export interface HubEntry {
   stars: number;
   starredByMe: boolean;
   comments: number;
-  /** GAID trial records reported for this entry (counts, not a review). */
+  /** Chats started from this entry's registered packages, not completed analyses or reviews. */
   trials: number;
   updatedAt: string;
 }

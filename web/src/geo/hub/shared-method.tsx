@@ -42,6 +42,8 @@ export interface SharedMethodView {
   revision: number;
   registeredAt: string;
   kind: "skill" | "workflow";
+  /** Registration previews can supply this too; omitted by older callers. */
+  implementation?: "descriptive" | "implemented";
   tags: string[];
   stars: number;
   starred: boolean;
@@ -208,6 +210,14 @@ export function SharedMethod({
             <p className="text-xs text-muted-foreground">
               {preview ? text("shared.afterRegister") : text("shared.trials", { count: method.trials })}
             </p>
+            {method.implementation && (
+              <div className="flex flex-col gap-1 text-sm">
+                <p className="font-medium">{text(`draft.implementation.${method.implementation}`)}</p>
+                {method.implementation === "descriptive" && (
+                  <p className="text-xs text-muted-foreground">{text("draft.implementation.descriptiveHint")}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -102,6 +102,7 @@ export function SharedBrowse({ onOpen }: { onOpen: (id: string) => void }) {
               <p className="text-sm text-muted-foreground">
                 {text(filtered ? "home.browse.noResults" : "home.browse.empty")}
               </p>
+              {filtered && <p className="text-sm text-muted-foreground">{text("home.browse.search.hint")}</p>}
               {filtered ? (
                 <Button variant="outline" onClick={reset}>{text("home.browse.reset.button")}</Button>
               ) : (

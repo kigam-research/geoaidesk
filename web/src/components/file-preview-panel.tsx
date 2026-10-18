@@ -383,6 +383,9 @@ function MarkdownViewer({
   );
 }
 
+/** Load-error content written by use-sandbox, in either catalogue language. */
+const LOAD_ERROR_MARKER = /^\[(?:Error|오류):\s*/;
+
 function FileViewer({
   path, name, content, loading, projectId, onRetry, onSave, revealLine, revealCell, revealToken,
 }: {
@@ -403,8 +406,10 @@ function FileViewer({
   }
   // Surface backend load errors with an explicit retry affordance so the
   // user doesn't have to close and reopen the tab.
-  if (content !== null && /^\[Error:/.test(content)) {
-    const msg = content.replace(/^\[Error:\s*/, "").replace(/\]$/, "");
+  // GeoAIDesk: the Korean catalogue writes these markers as "[오류: …]" (gaid-system-ui; a 16 MB CSV showed the
+  // size-limit message as its table header).
+  if (content !== null && LOAD_ERROR_MARKER.test(content)) {
+    const msg = content.replace(LOAD_ERROR_MARKER, "").replace(/\]$/, "");
     return <FileLoadError message={msg} onRetry={onRetry} />;
   }
   const cat = name ? fileCategory(name) : "text";

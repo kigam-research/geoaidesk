@@ -11,11 +11,19 @@ import { localText } from "./text";
 
 const text = geoText("hub");
 
-/** Columns to show for a table input: declared columns, else a generic grid-table layout. */
+const ELLIPSIS = /^(…|\.\.\.)$/;
+
+/**
+ * Columns to show for a table input: declared columns, else a generic grid-table layout. Long lists keep their first
+ * three and last two columns around one "…", so a label or target column at the end is never cut off.
+ */
 export function exampleColumns(port: InputPort): string[] {
   const declared = port.constraints?.columns ?? [];
-  if (declared.length) return declared.slice(0, 6);
-  return ["x", "y", "label", "feature_1", "feature_2", "…"];
+  if (!declared.length) return ["x", "y", "label", "feature_1", "feature_2", "…"];
+  if (declared.length <= 6) return declared;
+  const head = declared.slice(0, 3);
+  const tail = declared.slice(-2);
+  return [...head, ...(ELLIPSIS.test(head[2]) || ELLIPSIS.test(tail[0]) ? [] : ["…"]), ...tail];
 }
 
 function exampleValue(column: string, row: number): string {

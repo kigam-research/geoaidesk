@@ -22,6 +22,7 @@ import { geoCatalogueActive, loadGeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow } from "../catalogue-types.ts";
 import { countRegisteredMethodTrials } from "../methods/trials.ts";
 import { SharedHubStore, type RegisteredSnapshot, type StoredEntry } from "./store.ts";
+import { hubSearchFields, matchesHubSearch } from "./search.ts";
 
 export interface SharedHubOptions extends InstallDeps {
   store?: SharedHubStore;
@@ -83,8 +84,14 @@ export async function registerSharedHubRoutes(
       hashes.add(snapshot.package.sha256);
       identities.set(snapshot.package.methodId, hashes);
     }
+    // Trials of the registered package bytes count wherever they were installed: through this entry, or by the author
+    // trying the same draft revision before registering (authoring installs).
+    const authorInstalls = await authoring
+      .read(record.authoringProjectId)
+      .then((p) => p.installs.map((i) => i.projectId))
+      .catch(() => [] as string[]);
     let trials = 0;
-    for (const projectId of new Set(record.installs.map((i) => i.projectId))) {
+    for (const projectId of new Set([...record.installs.map((i) => i.projectId), ...authorInstalls])) {
       if (getProject(projectId))
         for (const [methodId, hashes] of identities)
           trials += countRegisteredMethodTrials(resolvePaths(projectId), methodId, hashes);
@@ -92,6 +99,7 @@ export async function registerSharedHubRoutes(
     return {
       ...record.entry,
       tagline: korean(snapshotOf(record).draft.profile.tagline),
+      implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       stars: Object.keys(stars).length,
       starredByMe: user !== null && Object.hasOwn(stars, user),
       comments: comments.length,
@@ -137,12 +145,7 @@ export async function registerSharedHubRoutes(
           const e = record.entry;
           if (req.query.folder && e.folderId !== req.query.folder) return false;
           if (!query) return true;
-          const profile = snapshotOf(record).draft.profile;
-          const terms = Object.values(profile.taxonomy).flat();
-          return [e.title, e.summary, e.author, ...e.tags,
-            ...(typeof profile.tagline === "string" ? [profile.tagline] : Object.values(profile.tagline)),
-            ...terms.flatMap((id) => [id, labels.get(id) ?? ""]),
-          ].join(" ").toLocaleLowerCase().includes(query);
+          return matchesHubSearch(query, hubSearchFields(e, snapshotOf(record).draft, labels));
         },
       );
       const entries = await Promise.all(records.map((r) => entryView(r, hubUser(req))));

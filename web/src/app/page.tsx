@@ -64,6 +64,7 @@ import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
+import { GaidTopNav } from "@/geo/hub/top-nav";
 import {
   useCallback,
   useEffect,
@@ -291,6 +292,7 @@ export default function HomePage() {
                 initialState={restoredProjects[projectId]}
                 onProjectActivityChange={handleProjectActivityChange}
                 onOpenProjectView={() => setScreen("projects")}
+                onOpenHub={() => setHub({ open: true, projectId: null })}
               />
             </div>
           </ProjectScopeProvider>
@@ -307,6 +309,7 @@ function WorkspacePage({
   initialState,
   onProjectActivityChange,
   onOpenProjectView,
+  onOpenHub,
 }: {
   projectId: string;
   isActive: boolean;
@@ -317,6 +320,8 @@ function WorkspacePage({
     activity: ProjectActivitySummary,
   ) => void;
   onOpenProjectView: () => void;
+  /** GeoAIDesk: the same 내 연구 / GAID 허브 switch as the project list (gaid-system-ui, novice review). */
+  onOpenHub?: () => void;
 }) {
   const [sandboxWorkspace, setSandboxWorkspace] = useState<SandboxWorkspaceState>(
     () => initialState?.sandbox ?? { openPaths: [], activePath: null },
@@ -990,6 +995,7 @@ function WorkspacePage({
             </InfoTooltip>
           )}
           <span className="mx-1 h-4 w-px bg-border/60" aria-hidden />
+          {onOpenHub && <GaidTopNav current="projects" onNavigate={(place) => (place === "hub" ? onOpenHub() : onOpenProjectView())} />}
           <ProjectSwitcher onOpenProjectView={onOpenProjectView} />
         </div>
         <p className="absolute left-1/2 hidden -translate-x-1/2 text-[11px] text-muted-foreground/60 tracking-wide select-none 2xl:block">

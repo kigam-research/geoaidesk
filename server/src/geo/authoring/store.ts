@@ -28,6 +28,12 @@ export const authoringOwner = () => process.env.GAID_AUTHORING_OWNER || "local";
 const ID = /^[a-z0-9][a-z0-9-]{5,63}$/;
 export const newId = (prefix: string) => `${prefix}-${randomUUID().slice(0, 12)}`;
 export const now = () => new Date().toISOString();
+/** A hub display name as the shared hub accepts it (1-40 characters, no control characters), else undefined. */
+const authorName = (value: unknown): string | undefined => {
+  if (typeof value !== "string") return undefined;
+  const name = value.trim();
+  return name && [...name].length <= 40 && !/[\u0000-\u001f\u007f]/.test(name) ? name : undefined;
+};
 
 /** File-backed project store. One process owns a directory; mutations of one project are serialized. */
 export class AuthoringStore {
@@ -103,6 +109,7 @@ export class AuthoringStore {
         id: p.id,
         title: p.title,
         owner: p.owner,
+        ...(p.author ? { author: p.author } : {}),
         updatedAt: p.updatedAt,
         stage: projectStage(p),
         busy: runningAttempt(p)?.op ?? null,
@@ -122,6 +129,7 @@ export class AuthoringStore {
       schemaVersion: AUTHORING_PROJECT_SCHEMA,
       id,
       owner: authoringOwner(),
+      ...(authorName(input.author) ? { author: authorName(input.author) } : {}),
       title: input.title?.trim() || "새 방법",
       ...(input.goal?.trim() ? { goal: input.goal.trim() } : {}),
       ...(input.target ? { target: input.target } : {}),
