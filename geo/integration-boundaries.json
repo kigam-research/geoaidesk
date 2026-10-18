@@ -603,10 +603,172 @@
       "responsibility": "Research-note parsing, file-master storage, lead hooks, project routes and provenance handoff regression coverage"
     },
     {
+      "path": "server/src/agent/notebook-export.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/src/agent/notebook-zip.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/src/agent/session-export.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/src/agent/methods-draft.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/src/api/sessions.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/src/api/projects.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/notebook-evidence-summary.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/notebook-result-links.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/next-experiments-dialog.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/lab-notebook-view.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/chat-tabs-bar.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-print.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-execution.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-result-links.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/next-experiments.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-plans.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/lab-notebook-entry-card.test.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/notebook-result-links.test.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/next-experiments-dialog.test.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/components/lab-notebook-view.test.tsx",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-print.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/test/notebook-export.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/test/notebook-routes.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/test/session-export.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "server/test/methods-draft.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Researcher-facing work-record disclosure and locale-aware export labels; notebook-view changes limited to export language plumbing"
+    },
+    {
+      "path": "web/src/lib/notebook-plans.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Korean work-record export coverage for plan and next-investigation labels, preserving authored values"
+    },
+    {
+      "path": "web/src/lib/next-experiments.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "Korean work-record export coverage for plan and next-investigation labels, preserving authored values"
+    },
+    {
       "path": "geo/tests/distribution.test.mjs",
       "owner": "gaid-notebook-review",
       "status": "edited",
-      "responsibility": "Register the explicitly requested research-note seam owner in the existing bounded owner allowlist"
+      "responsibility": "Register the requested notebook-review owner for maintained research-note and work-record seams"
     }
   ],
   "notTouched": [

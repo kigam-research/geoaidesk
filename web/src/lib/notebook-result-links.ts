@@ -1,3 +1,4 @@
+import { notebookExportText } from "../geo/notebook/export-text";
 /** References to canonical persisted scientific_result tool results, never copied measurements. */
 import type { ScientificResultCard } from "./scientific-results";
 export interface NotebookResultLink {
@@ -30,8 +31,10 @@ export function normalizeResultLinks(input: unknown, allowChildLocal = false): N
   }
   return [...unique.values()];
 }
-export function resultReferenceText(ref: NotebookResultSnapshot | NotebookResultLink, sessionId?: string): string {
+export function resultReferenceText(ref: NotebookResultSnapshot | NotebookResultLink, sessionId?: string, lang?: string): string {
   const snapshot = ref as NotebookResultSnapshot;
+  const text = notebookExportText(lang);
+  if (lang === "ko") return ref.childLocal ? text("links.child_reference", { id: ref.toolCallId }) : text(snapshot.sha256 ? "links.pinned_reference" : "links.unpinned_reference", { session: ref.sessionId ?? sessionId ?? text("export.session"), id: ref.toolCallId, hash: snapshot.sha256 ?? "" });
   if (ref.childLocal) return `child-local/${ref.toolCallId} · source not indexed; unverified`;
   return `${ref.sessionId ?? sessionId ?? "this chat"}/${ref.toolCallId}${snapshot.sha256 ? ` · sha256 ${snapshot.sha256}` : " · identity not pinned"}`;
 }

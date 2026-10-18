@@ -177,7 +177,7 @@ async function downloadExport(
 ) {
   try {
     const res = await apiFetch(
-      `/sessions/${encodeURIComponent(sessionId)}/export?format=${format}`,
+      `/sessions/${encodeURIComponent(sessionId)}/export?format=${format}&lang=${geoLocale()}`,
       {},
       projectId,
     );

@@ -27,7 +27,7 @@ beforeEach(() => {
   vi.mocked(apiFetch).mockReset().mockImplementation(async (path, init) => {
     if (path === "/geo/notes") return json({ dir: "연구노트", notes: [note(), note({ id: "2026-10-12-map", path: "연구노트/2026-10-12-map/index.md", title: "지질도 면적", headline: "14개 암상 면적표", status: "confirmed", decisions: [], method: null })] });
     if (path === `/geo/notes/${encodeURIComponent("2026-10-15-assay")}`) return json({ note: note(), content: CONTENT });
-    if (path.endsWith("/status") && init?.method === "POST") return json({ note: note({ status: "confirmed" }) });
+    if (path.endsWith("/status") && init?.method === "POST") return json(note({ status: "confirmed" }));
     throw new Error(`Unexpected: ${path}`);
   });
 });

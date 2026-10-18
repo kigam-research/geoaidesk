@@ -39,20 +39,27 @@ export function NotebookResultLinks({ entry, sessionId, projectId, onOpenFile }:
     return () => { disposed = true; controller.abort(); clearTimeout(timer); };
   }, [entry.id, sessionId, projectId, selected, retry]);
   if (!entry.results?.length) return null;
-  return <div className="space-y-1 text-[11px]">
+  return <div className="space-y-1 text-xs">
     <p className="font-medium">{nbText("links.results")}</p>
     {entry.results.map((ref, index) => <div key={`${ref.sessionId}:${ref.toolCallId}:${index}`} className="flex min-w-0 flex-wrap items-center gap-1">
       <Button type="button" variant="outline" size="xs" disabled={entry.provisional} onClick={() => setSelected(index)}>{nbText("links.view", { index: index + 1 })}</Button>
-      <span className="break-all text-muted-foreground">{ref.childLocal ? nbText("links.child_local") : ref.sessionId ?? sessionId}/{ref.toolCallId}</span>
     </div>)}
     <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>
       <DialogContent className="min-w-0 max-h-[85vh] grid-cols-[minmax(0,1fr)] overflow-y-auto sm:max-w-3xl">
         <DialogHeader><DialogTitle>{nbText("links.result_title")}</DialogTitle><DialogDescription>{nbText("links.description")}</DialogDescription></DialogHeader>
-        {error && <div role="alert" className="text-sm text-destructive">{error} <Button variant="outline" size="xs" onClick={() => setRetry((n) => n + 1)}>{nbText("common.retry")}</Button></div>}
+        {error && <div role="alert" className="text-sm text-destructive">{nbText("links.lookup_failed")} <Button variant="outline" size="xs" onClick={() => setRetry((n) => n + 1)}>{nbText("common.retry")}</Button>
+          <details className="mt-2 text-xs"><summary className="cursor-pointer">{nbText("links.source.technical")}</summary>
+            <button type="button" className="my-1 underline" onClick={() => void navigator.clipboard.writeText(error)}>{nbText("common.copy.button")}</button>
+            <p className="whitespace-pre-wrap">{error}</p>
+          </details>
+        </div>}
         {!error && !result && <p role="status">{nbText("links.loading")}</p>}
         {result && <>
-          <p className="break-all text-xs text-muted-foreground">{result.reference.childLocal ? nbText("links.child_reference", { id: result.reference.toolCallId }) : nbText(result.reference.sha256 ? "links.pinned_reference" : "links.unpinned_reference", { session: result.reference.sessionId, id: result.reference.toolCallId, hash: result.reference.sha256 ?? "" })}</p>
-          <p className={result.status === "available" ? "text-xs" : "rounded border border-amber-500/40 p-2 text-xs"}>{nbText(`result_status.${result.status}`)}: {result.reason}</p>
+          <details className="rounded border p-2 text-xs"><summary className="cursor-pointer">{nbText("links.source.technical")}</summary>
+          <button type="button" className="my-1 underline" onClick={() => void navigator.clipboard.writeText(JSON.stringify({ reference: result.reference, reason: result.reason }, null, 2))}>{nbText("common.copy.button")}</button>
+          <p className="break-all text-muted-foreground">{result.reference.childLocal ? nbText("links.child_reference", { id: result.reference.toolCallId }) : nbText(result.reference.sha256 ? "links.pinned_reference" : "links.unpinned_reference", { session: result.reference.sessionId, id: result.reference.toolCallId, hash: result.reference.sha256 ?? "" })}</p>
+          {result.reason && <p>{result.reason}</p>}</details>
+          <p className={result.status === "available" ? "text-xs" : "rounded border border-amber-500/40 p-2 text-xs"}>{nbText(`result_status.${result.status}`)}</p>
           {result.card && <ScientificResultCard projectId={projectId} onOpenFile={onOpenFile} item={{ id: `notebook-result-${result.reference.toolCallId}`, label: nbText("links.recorded"), toolName: "scientific_result", status: "complete", timestamp: entry.timestamp, scientificResult: result.card }} />}
         </>}
       </DialogContent>

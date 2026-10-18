@@ -1,3 +1,4 @@
+import { notebookExportText } from "../geo/notebook/export-text";
 /** Authored execution reports are distinct from server-observed provenance. */
 export interface NotebookExecution {
   status: "planned" | "attempted" | "completed" | "unverified";
@@ -15,8 +16,9 @@ export function normalizeNotebookExecution(value: unknown): NotebookExecution | 
   return { status, ...(evidence ? { evidence } : {}) };
 }
 
-export function notebookExecutionText(value: unknown): string {
+export function notebookExecutionText(value: unknown, lang?: string): string {
   const execution = normalizeNotebookExecution(value);
-  return `Execution (authored, not independently verified): ${execution?.status ?? "unverified"}`
-    + (execution?.evidence ? `\nReported execution evidence: ${execution.evidence}` : "\nExecution evidence not recorded in this field.");
+  const text = notebookExportText(lang);
+  return text("export.execution", { status: text("execution." + (execution?.status ?? "unverified")) })
+    + "\n" + (execution?.evidence ? text("export.execution_evidence", { evidence: execution.evidence }) : text("export.no_execution_evidence"));
 }

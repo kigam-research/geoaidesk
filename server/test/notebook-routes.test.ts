@@ -38,6 +38,34 @@ const entry = (over: Partial<NotebookEntry> = {}): NotebookEntry => ({
   id: "tc_1", type: "method", title: "Ran PCA", timestamp: 1, role: "agent", ...over,
 });
 
+describe("notebook export language", () => {
+  it("localizes session and project Markdown, JSON display labels and ZIP without rewriting records", async () => {
+    appendNotebookEntry("language", entry({ title: "Original title", body: "Keep this body.",
+      execution: { status: "completed", evidence: "uv run python analysis.py" } }), "default");
+    for (const base of ["/sessions/language/notebook/export", "/projects/default/notebook/export"]) {
+      for (const lang of ["ko", "en"]) {
+        const title = lang === "ko" ? "작업 기록" : "Lab Notebook";
+        const md = await app.inject({ method: "GET", url: `${base}?format=md&lang=${lang}` });
+        expect(md.statusCode).toBe(200);
+        expect(md.body).toContain(`# ${title}`);
+        expect(md.body).toContain("Original title");
+        expect(md.body).toContain("Keep this body.");
+        expect(md.body).toContain("uv run python analysis.py");
+        const json = await app.inject({ method: "GET", url: `${base}?format=json&lang=${lang}` });
+        expect(json.json().locale).toBe(lang);
+        expect(json.json().labels["export.title"]).toBe(title);
+        expect(json.json().entries[0].execution.status).toBe("completed");
+        const zip = await app.inject({ method: "GET", url: `${base}?format=zip&lang=${lang}` });
+        expect(new AdmZip(zip.rawPayload).readAsText("lab-notebook.md")).toContain(`# ${title}`);
+      }
+      for (const query of ["", "&lang=invalid"]) {
+        const md = await app.inject({ method: "GET", url: `${base}?format=md${query}` });
+        expect(md.body).toContain("# Lab Notebook");
+      }
+    }
+  });
+});
+
 describe("GET /sessions/:id/notebook", () => {
   it("returns [] for a session with no entries", async () => {
     const res = await getNotebook("empty-sess");

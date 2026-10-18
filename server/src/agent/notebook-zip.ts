@@ -28,6 +28,7 @@ export function buildNotebookZip(
   opts: {
     /** Session-scope export only; omit for a project-scope bundle. */
     sessionId?: string;
+    lang?: string;
     projectName?: string;
     sandboxRoot: string;
     annotations?: readonly NotebookAnnotation[];
@@ -61,6 +62,7 @@ export function buildNotebookZip(
   }
   const md = notebookToMarkdown(entries, {
     sessionId: opts.sessionId,
+    lang: opts.lang,
     projectName: opts.projectName,
     annotations: opts.annotations,
     sessionLabels: opts.sessionLabels,

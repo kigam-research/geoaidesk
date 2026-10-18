@@ -1,5 +1,5 @@
 "use client";
-import { geoText } from "@/geo/i18n";
+import { geoText, geoLocale } from "@/geo/i18n";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpIcon, BookOpenIcon, StickyNoteIcon } from "lucide-react";
@@ -351,7 +351,7 @@ export function LabNotebookView({
       return;
     }
     try {
-      const res = await apiFetch(`${target.path}?format=${format}`, {}, scopedProjectId);
+      const res = await apiFetch(`${target.path}?format=${format}&lang=${geoLocale()}`, {}, scopedProjectId);
       if (!res.ok) throw new Error(`export failed: ${res.status}`);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:56:20Z
+updated: 2026-10-18T09:43:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -52,7 +52,8 @@ Outside check: no outside check (app/system design work).
 - Workers: child units `gaid-notebook-review--notes-server` (S) and `gaid-notebook-review--record-cleanup` (C), both
   "general work", started 2026-10-18; prompts in `~/data/geoaidesk/work/gaid-notebook-review/prompts/`.
 ## Next steps
-1. Children run S and C (below); top writer builds W against the contract, then integrates S → C → W, runs scripts/check,
+Blocked: notes-server child's `task finish` is still running its full check; `task complete` waits for its finish record.
+1. C integrated and closed (2ddf4de). Children run S and C (below); top writer builds W against the contract, then integrates S → C → W, runs scripts/check,
    screenshots (UI guide §10), updates the report (result of Phase 2, §6 answered) and finishes.
 ## Failed approaches
 ## Notes and decisions
