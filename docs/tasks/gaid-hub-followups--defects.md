@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:53:23Z
+updated: 2026-10-18T04:55:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -114,7 +114,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 
 ## Next steps
 1. On job completion notice, inspect recorded job-geoaidesk-gaid-hub-followups--defects-1 receipt/logs; do not start another copy.
-2. Fix material failures if any, update verified state, then task finish. Temporary browser/dev services are stopped.
+2. Inspect every failure. Parent-owned web/src/geo/hub-handoff/hub-handoff.test.tsx is being rewritten with the parent HandoffDialog; do not edit it. If it is the only failing check, record "parent-owned test, fixed at integration" and task finish per parent authorization. Fix any other failure in this unit. Temporary browser/dev services are stopped.
 ## Failed approaches
 - Initial resume calls encountered other live task transactions; retried after they completed (no lock edits).
 - Initial elapsed string keys incorrectly repeated the namespace; focused rendering caught the missing lookup, fixed to nested namespace-local keys.
@@ -122,6 +122,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 - Visual review caught a clipped hub label due to the composer inner nowrap query; removed only that inner nowrap rule and recaptured both sizes.
 - Shell-prefix test initially assumed a settings file had been seeded by ensureProjectExists; it had not. The fixture now creates its own settings before session construction.
 ## Notes and decisions
+- Parent instruction after full-check launch: only the old hub-handoff.test.tsx button-name failure may remain for integration; do not edit the parent-owned test. No other failure is waived. At the bounded check on this instruction, the recorded job was still running through backend tests (no final exit/result yet).
 - Parent clarification: chat-actions renders hubHandoff.openLabel, keeps hubHandoff.open for aria/title. Parent exclusively owns those locale keys; not edited here. Parent locale commit cdda9dc was received unchanged before UI/check verification.
 - Integration order: UI feedback and label are independent; suggestion server/client contract is owned together; cache server/client contract is owned together; process lifecycle precedes abort/dispose tests. Only the main writer edits. Parent owns authoring, hub handoff, TaskSetup and trials; these remain untouched.
 - Optional raw shell-output tail is omitted: elapsed time meets the feedback goal without introducing more machinery into the main view.
