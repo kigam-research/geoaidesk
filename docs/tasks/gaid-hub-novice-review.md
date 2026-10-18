@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T09:36:08Z
+updated: 2026-10-18T09:38:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -35,6 +35,15 @@ Scope confirmed with the user:
 Outside check: no outside check (app usability work; the first-time-user re-check is the acceptance evidence).
 
 ## Current state
+Result (2026-10-18): three fresh first-time-user readers used the hub end to end; round 3 reached all four goals
+(find/understand, use with own CSV, author from own paper + register, star/comment). Hub and authoring-rule findings of
+rounds 1-3 fixed here (last code 3870223); TaskSetup/workspace/file-preview findings routed to gaid-system-ui
+(88fe3c357f47 answered with 8ae7682 on its branch, not yet on main; f5448549a275 pending there). The remaining
+top finding (start request contradicting chosen settings for the older shared method) disappears only when
+gaid-system-ui lands. Report: reports/2026-10-18-gaid-hub-novice-review/index.md.
+Re-verify: web `npx tsc --noEmit && npx vitest run src/geo/hub`; server `npx tsc --noEmit && env -u VITEST_MAX_WORKERS npx vitest
+run test/geo-authoring.test.ts test/geo-authoring-extra.test.ts test/geo-hub-shared.test.ts test/geo-method-extra-packages.test.ts`;
+`node geo/copy/validate-copy.mjs web/src/geo/locales`; `node geo/ui/check-ui.mjs`.
 - Test app: user service `gaid-novice-app` (dev mode, ports 3370/18370), script
   ~/data/geoaidesk/work/gaid-hub-novice-review/bin/dev.sh, GAID_HOME ~/data/geoaidesk/work/gaid-hub-novice-review/home
   (config/models copied from the gaid-hub-followups test home, Qwen model; shared hub entries copied so the hub is not
@@ -42,9 +51,7 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. Round 3 reader running: Paseo 5db3a0b5-ed04-4b4f-a26b-37a3369623af (briefs/novice-3.md, output novice3/); do not edit
-   web/server while it runs. Then triage (finding about the TaskSetup request contradiction is gaid-system-ui's, fixed on
-   its branch 8ae7682, not here), report reports/2026-10-18-gaid-hub-novice-review/index.md, finish.
+1. `task finish` (runs scripts/check). Stop the test app first: `systemctl --user stop gaid-novice-app`.
 
 Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
 
@@ -83,6 +90,13 @@ Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summa
   Not done: multi-topic folders (F8, optional); raw tool names / "Make sure to use the skills" in chat transcript
   (workspace chat, not hub). Checks: web tsc, web hub 30, server authoring/hub-shared/extra 68 + author test, copy 0
   errors, check-ui 0 errors. Screenshots shots/entry-r2-{1440,1280}.png.
+- Round 3 (reader 5db3a0b5, novice3/summary.md): all four goals yes (request contradiction corrected by hand, not sent).
+  Fixed here (ad4f7b3, 3870223): no project preselection in both install pickers (install disabled until chosen);
+  "허브에 등록됨" chip after registration; legacy drafts labelled "작성자 미기록"; "추천 분석 방법"; authoring rules: no
+  recommendation for facts about the researcher's data, no time in quick-run labels (prompt versions analyze .4 / draft .7).
+  Routed to gaid-system-ui (f5448549a275): CSV preview limit error rendered as headers; stacked Workflow-list badges.
+  Not done (report §5): multi-topic folders, reading sub-progress/cancel, editing generated labels, chat transcript
+  tool names. Round-3 fixes verified by tests + screenshots, not by a fourth reader.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -92,6 +106,8 @@ Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summa
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-18-gaid-hub-novice-review/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
