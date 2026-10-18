@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:03:16Z
+updated: 2026-10-18T05:04:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,7 +77,9 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-All six code changes are implemented. No deployment or parent integration yet. Full scripts/check job job-geoaidesk-gaid-hub-followups--defects-1 at a68e8e1ea773 exited 1. Backend: 169 files / 1,873 tests passed; 1 file / 11 tests skipped visibly. Frontend: 156 files / 1,051 tests passed; 13 failures in 3 files (details below). Downstream distribution/production stages did not execute.
+All six code changes are implemented. Backend full suite: 1,873 passed / 11 skipped. Corrected frontend full suite (4 workers): 158 files / 1,053 tests passed, excluding only parent-owned old hub-handoff.test.tsx; its fix is published in parent e5461bd42dd3 for task finish integration. Corrected boundary definition: 7/7 local tests passed. Job 3 is still verifying downstream environment/distribution/production stages. No deployment or parent integration yet.
+
+Verification ledger: job 1 scripts/check exited 1 (backend passed; old handoff tests plus now-fixed catalogue-off regression and load-sensitive map timeout). Job 2 exited 1 only at the expected immutable pre-fix boundary owner; its full frontend suite passed. Job 3 tests corrected boundaries and all remaining stages. Failed receipts are retained as evidence, not treated as current unfixed failures.
 
 - Running activities tick elapsed minutes/seconds from ActivityItem.timestamp; completed/error items unmount the timer. Bash commands remain in the collapsed disclosure; the main bash label is localized.
 - POST /geo/suggestions includes installed, enabled method Workflows, prioritized by matching declared input format (including generic CSV without catalogue-only column heuristics). The response carries the method exposure and complete Workflow. FileActions binds the current file and opens the correct TaskSetup even when catalogue/method ids collide or the catalogue is off. Pi project-over-global shadowing is preserved.
@@ -86,7 +88,7 @@ All six code changes are implemented. No deployment or parent integration yet. F
 - Lead bash tools inherit an opaque per-project/session process marker. Linux abort (including the existing HTTP path through session.abort) and registry disposal send TERM, then KILL after 350 ms, to matching processes, including detached nohup/setsid jobs. Another chat is unaffected. Windows is a no-op beyond Pi's existing abort. Existing shellPath/commandPrefix settings are retained. No subagent ownership claim.
 - Literal recursive cleanup of non-protected sandbox work no longer asks for confirmation. Sandbox root, protected ancestors, .pi/.kady, wildcard/unresolved and outside targets remain guarded. Classifier parity is retained. Exact supplied trial replay confirmed only rm -rf outputs/folds; a second prompt is not evidenced in that JSONL snapshot. Parent accepted this limitation.
 
-Focused verification so far: server workspace, guard hook/classifier and oversized-cache tests pass; real-session detached process/other-chat/disposal/shell-prefix test passes; existing session-registry tests pass. Frontend elapsed timer/cache tests (25) and method-selection/visible-handoff tests (2) pass. Server and web typechecks passed after process/suggestion changes; full scripts/check will recheck the final snapshot. UI validator (final strings): 11,110 strings, 0 errors, 102 pre-existing accepted debt. Copy validator: 0 errors, 57 existing warnings.
+Focused verification so far: server workspace, guard hook/classifier and oversized-cache tests pass; real-session detached process/other-chat/disposal/shell-prefix test passes; existing session-registry tests pass. Frontend elapsed timer/cache tests (25) and method-selection/visible-handoff tests (2) pass. Server typecheck passed in full job 1; web typecheck passed again after the final catalogue-off fix. UI validator (final strings): 11,110 strings, 0 errors, 102 pre-existing accepted debt. Copy validator: 0 errors, 57 existing warnings.
 
 ### Korean section for the parent report (humanizer file-mode reviewed)
 
@@ -113,12 +115,12 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. Inspect job 2 on its exit notice for the bounded full frontend result (only parent-owned old handoff test excluded); disregard only its expected stale boundary-owner failure. Inspect job 3 on exit for corrected distribution/environment/production stages. Neither job should be replayed. Backend code is unchanged since its full 1,873-test pass. Job 1 is terminal.
+1. On job 3 completion notice, inspect corrected distribution/environment/production results. Job 2 is terminal: 1,053 frontend tests passed; only the stale boundary owner failed. Do not replay recorded jobs.
 2. Inspect every failure. Parent-owned web/src/geo/hub-handoff/hub-handoff.test.tsx is being rewritten with the parent HandoffDialog; do not edit it. If it is the only failing check, record "parent-owned test, fixed at integration" and task finish per parent authorization. Fix any other failure in this unit. Temporary browser/dev services are stopped.
 ## Failed approaches
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
 - First full check: workspace.test.tsx correctly caught catalogue-only suggestions appearing when catalogue is off. Fixed FileActions to keep only method-exposure suggestions without an active catalogue; installed methods remain available.
-- First full check: map viewer first test timed out waiting for the viewport table during highly parallel frontend execution. No map code changed. All 8 map viewer tests passed in the isolated rerun; the original failure was consistent with resource contention. Rechecking the full frontend with VITEST_MAX_WORKERS=4 (supported by the installed Vitest) before finish.
+- First full check: map viewer first test timed out waiting for the viewport table during highly parallel frontend execution. No map code changed. All 8 map viewer tests passed in the isolated rerun; the original failure was consistent with resource contention. Full frontend rerun with VITEST_MAX_WORKERS=4 passed all 1,053 non-parent tests; no map source/test change was needed.
 - Initial resume calls encountered other live task transactions; retried after they completed (no lock edits).
 - Initial elapsed string keys incorrectly repeated the namespace; focused rendering caught the missing lookup, fixed to nested namespace-local keys.
 - SIGKILL delivery is asynchronous; the real detached-process test caught an immediate-state race. Added bounded post-signal observation before abort returns.
