@@ -1,3 +1,4 @@
+import { sessionBashTool, stopSessionProcesses } from "../geo/session-processes.ts";
 import { remoteComputeEnabled } from "../geo/distribution.ts";
 import { makeSubagentControlExtension, subagentHost } from "./subagent-control.ts";
 import { pathToFileURL } from "node:url";
@@ -224,7 +225,7 @@ function release(projectId: string, key: string, session: AgentSession): Promise
     timer = setTimeout(resolve, SHUTDOWN_GRACE_MS);
     timer.unref();
   });
-  return Promise.race([shutdown, grace]).finally(() => {
+  return Promise.all([Promise.race([shutdown, grace]), stopSessionProcesses(projectId, session.sessionId)]).then(() => {}).finally(() => {
     clearTimeout(timer);
     session.dispose();
   });
@@ -498,6 +499,7 @@ async function build(
     // codemode/tool_search when MCP needs them) — is active by default.
     excludeTools: LEAD_EXCLUDED_TOOLS,
     customTools: [
+      sessionBashTool(projectId, ownId ?? "", paths.sandbox, { shellPath: settingsManager.getShellPath(), commandPrefix: settingsManager.getShellCommandPrefix() }),
       interviewTool,
       notebookTool,
       notebookSearchTool((params) => executeMemoryRecall(projectId, params)),
@@ -508,6 +510,13 @@ async function build(
       ...geo.customTools,
     ],
   });
+  // All abort paths (HTTP, budget, project shutdown) stop detached lead jobs,
+  // even when Pi's foreground bash call already returned successfully.
+  const abort = session.abort.bind(session);
+  session.abort = async () => {
+    try { await abort(); }
+    finally { await stopSessionProcesses(projectId, session.sessionId); }
+  };
   // Pi emits `session_start` only from bindExtensions(); without it the
   // extensions never see a live session: pi-subagents never starts its
   // supervisor channel (so the `subagent_supervisor` tool in the allowlist

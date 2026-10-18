@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ModalJobChip, NotebookEntryChip, ToolActivityList } from "./tool-activity";
 import type { ActivityItem } from "@/lib/use-agent";
 
@@ -12,6 +12,21 @@ const item = (over: Partial<ActivityItem> = {}): ActivityItem => ({
 });
 
 describe("ToolActivityList", () => {
+  it("ticks elapsed time only while a tool is running and keeps bash behind disclosure", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(193_000);
+    try {
+      const { rerender, unmount } = render(<ToolActivityList activities={[item({ timestamp: 1000, status: "running", toolName: "bash", args: { command: "sleep 300" } })]} />);
+      expect(screen.getByText("Running for 3m 12s")).toBeInTheDocument();
+      expect(screen.queryByText("sleep 300")).not.toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(screen.getByText("Running for 3m 13s")).toBeInTheDocument();
+      rerender(<ToolActivityList activities={[item({ status: "complete", toolName: "bash" })]} />);
+      expect(screen.queryByText(/Running for/)).not.toBeInTheDocument();
+      unmount();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
+  });
   it("stamps each tool card with its tool-call id", () => {
     const { container } = render(
       <ToolActivityList

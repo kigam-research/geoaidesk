@@ -11,7 +11,7 @@ export function GeoChatActions(props: { projectId: string; sessionId: string | n
 function ChatActions({ projectId, sessionId, isStreaming }: { projectId: string; sessionId: string | null; isStreaming: boolean }) {
   const [open, setOpen] = useState(false);
   return <>
-    <Button size="icon-xs" variant="ghost" aria-label={t("hubHandoff.open")} title={t("hubHandoff.open")} disabled={!sessionId || isStreaming} onClick={() => setOpen(true)}><SendIcon aria-hidden /></Button>
+    <Button size="sm" variant="ghost" aria-label={t("hubHandoff.open")} title={t("hubHandoff.open")} disabled={!sessionId || isStreaming} onClick={() => setOpen(true)}><SendIcon aria-hidden />{t("hubHandoff.openLabel")}</Button>
     {open && sessionId && <HandoffDialog projectId={projectId} sessionId={sessionId} isStreaming={isStreaming} onClose={() => setOpen(false)} />}
   </>;
 }

@@ -42,9 +42,9 @@ const protectedCases: Array<[string, string]> = [
 ];
 
 const destructiveCases: string[] = [
-  "rm -rf results",
-  "rm -r derived",
   "rm -fr .",
+  "rm -rf .pi .kady",
+  "rm -rf derived/../.pi/sessions",
   "rm *.csv",
   "git clean -fdx",
   "git reset --hard HEAD~1",
@@ -56,6 +56,7 @@ const destructiveCases: string[] = [
 ];
 
 const outsideCases: Array<[string, string]> = [
+  ["rm -rf $TARGET", "$TARGET"],
   ["echo x > /opt/gaid/geo/distribution.json", "/opt/gaid/geo/distribution.json"],
   ["echo x >> ../outside.txt", "/proj/outside.txt"],
   ["tee /opt/gaid/file", "/opt/gaid/file"],
@@ -91,6 +92,10 @@ const outsideCases: Array<[string, string]> = [
 ];
 
 const allowedCases: string[] = [
+  "rm -rf results",
+  "rm -r derived",
+  "cd derived/mpm_run && rm -rf outputs/folds",
+  `rm -rf ${SANDBOX}/derived/mpm_run/outputs/folds results`,
   "head user_data/a.csv",
   "cat /opt/gaid/geo/distribution.json",
   "cp /opt/gaid/a derived/a",
@@ -146,6 +151,13 @@ for (const [name, mod] of [
     });
     it.each(allowedCases)("allows: %s", (command) => {
       expect(mod.classifyBashCommand(command, opts)).toEqual({ kind: "allow" });
+    });
+    it("does not exempt deletion of protected ancestors or wildcard scopes", () => {
+      const custom = { ...opts, protectedGlobs: ["derived/raw/**"] };
+      for (const command of ["rm -rf derived", "rm -rf .", "rm -rf derived/*"]) {
+        expect(mod.classifyBashCommand(command, custom).kind).not.toBe("allow");
+      }
+      expect(mod.classifyBashCommand("rm -rf derived/outputs", custom).kind).toBe("allow");
     });
     it("classifies write/edit paths", () => {
       expect(mod.classifyFilePath("user_data/a.csv", opts)).toMatchObject({ kind: "protected", path: "user_data/a.csv" });

@@ -122,5 +122,9 @@
     "delete": "레시피 삭제",
     "confirmDelete": "레시피 삭제 확인",
     "deleteError": "레시피를 삭제하지 못했습니다. {detail}"
+  },
+  "run": {
+    "elapsed": "{minutes}분 {seconds}초째 실행 중",
+    "analysis": "분석 실행"
   }
 }

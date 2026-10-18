@@ -122,5 +122,9 @@
     "delete": "Delete recipe",
     "confirmDelete": "Confirm deletion",
     "deleteError": "Could not delete the recipe. {detail}"
+  },
+  "run": {
+    "elapsed": "Running for {minutes}m {seconds}s",
+    "analysis": "Run analysis"
   }
 }

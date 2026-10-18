@@ -120,7 +120,8 @@ export interface GeoWorkflowsResponse {
 
 /**
  * Content evidence behind a suggestion, from the inspected columns or layers.
- * Generic formats (CSV, XLSX, JSON, Markdown, PNG) are suggested only with one.
+ * Catalogue workflows using generic formats (CSV, XLSX, JSON, Markdown, PNG)
+ * are suggested only with one; installed methods use declared formats.
  */
 export interface GeoSuggestionSignal {
   kind: "element-columns" | "time-drawdown-columns" | "xy-label-columns" | "categorical-field";
@@ -130,6 +131,10 @@ export interface GeoSuggestionSignal {
 
 export interface GeoSuggestion {
   workflowId: string;
+  /** Installed method identity; absent for catalogue suggestions. */
+  exposure?: string;
+  /** The matching installed Workflow, used directly by TaskSetup. */
+  workflow?: GeoWorkflowSummary;
   title: Localized;
   /** Input role the file matches and why. */
   match: { roleId: string; roleLabel: Localized; format: string; required: boolean; signal?: GeoSuggestionSignal };
@@ -142,7 +147,7 @@ export interface GeoSuggestionsResponse {
   path: string;
   /** Taxonomy format id detected for the file, or null when no workflow reads it. */
   format: string | null;
-  /** At most three, ready ones first. */
+  /** At most three, matching installed methods first, then readiness. */
   suggestions: GeoSuggestion[];
 }
 
