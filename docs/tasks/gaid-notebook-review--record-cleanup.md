@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T09:09:05Z
+status: ready
+updated: 2026-10-18T09:09:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd14a2b1-08ca-4ec5-b9a5-c36ac0b3decd","pid":2986331,"provider":"codex","session":"01a14e34-3599-7921-a909-ef8c86596d17","start":"20134566","token":"f8920c52ddfb78cfda8aa61a33610fd220a79d3b368da7c773080f68204acb5b"}
 branch: task/gaid-notebook-review--record-cleanup
 target: task/gaid-notebook-review
@@ -56,7 +56,7 @@ and English before → after (copy rule). Then `task finish`.
 Implemented locale-aware work-record export/print labels, collapsed copyable execution/source technical disclosures, GAID session-export branding, a Methods draft language rule and localized proposal constraints. Authored titles, bodies, code and machine JSON keys/enum values are preserved. Web/server typechecks passed; focused web tests: 7 files/98 tests, server tests: 5 files/64 tests. Final print/helper recheck: 3 files/31 tests. Copy validation: 0 errors/62 warnings (scientific-limit wording retained). UI validation: 0 errors/102 existing accepted debt. Runtime tsx smoke produced the Korean work-record heading. No deployment performed. First task finish ran full scripts/check: backend 1,884 passed/11 skipped, then three unrelated frontend timeout failures. The affected files pass with maxWorkers=2 (2 files/9 tests). The global VITEST_MAX_WORKERS=4 retry overrode server serialization and caused shared-fixture races. Direct createVitest config inspection without that variable confirms backend fileParallelism=false/maxWorkers=1. Retry uses CPU affinity 0-3 instead (Node availableParallelism=4); parent integration/screenshots remain.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T09:06:28Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T09:09:06Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Second finish failed because the supported global VITEST_MAX_WORKERS=4 override is applied after backend fileParallelism=false forces maxWorkers=1 (installed Vitest coverage configuration lines 223–225 and 380). Multiple backend files then deleted their shared fixture root concurrently. Rejected premise: a global worker cap preserves per-suite serialization. Direct createVitest inspection under env -u VITEST_MAX_WORKERS taskset -c 0-3 confirms backend fileParallelism=false/maxWorkers=1; Node reports availableParallelism=4, bounding the frontend default without overriding serialization. No speculative source fixes. Second full log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-bncfk14r.log; output: ~/data/geoaidesk/work/checks/92aedf6598fa-20261018T090629.003222Z.
