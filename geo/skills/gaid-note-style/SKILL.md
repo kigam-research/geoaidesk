@@ -12,7 +12,6 @@ Use this when you write or update a research note. Apply it last: settle the res
 
 - Every fact, number, unit, date, name, link target, figure path and citation, and the confidence the note states. Do not add a fact, and do not make a claim stronger or weaker. If a claim looks wrong or unsupported, leave it and say so under 한계 (Limits) or ask the researcher.
 - Frontmatter, code, paths, identifiers, table values and quoted text.
-- The style of the language: Korean notes in 합니다체 unless the researcher's own text uses another; English notes plain and neutral.
 
 ## Steps
 
@@ -38,6 +37,8 @@ Use this when you write or update a research note. Apply it last: settle the res
 
 ## Korean sentences
 
+- Write Korean notes in 합니다체 (~합니다, ~입니다, ~했습니다), including the headline and sentences in table cells; change a 해라체 draft (~한다, ~이다). Keep another register only where the researcher wrote the text.
+- Korean words in Korean sentences: 폴리곤, 중앙 경선, 미터, 병합 rather than polygon, central meridian, metre, dissolve. Keep field names, codes, file names and abbreviations a researcher uses as they are (LITHONAME, EPSG, CRS).
 - Verbs, not nominalised phrases: "검토를 진행하였습니다" → "검토했습니다"; "분석 작업을 수행했습니다" → "분석했습니다". Headings, table cells and status words may stay nouns.
 - No noun chains or repeated 의: "지층 경계 추정 결과의 신뢰도의 평가" → "지층 경계를 추정한 결과가 얼마나 믿을 만한지 평가". Established terms stay.
 - No translationese: "~에 대해" → "~을", "~을 통해" → "~로", "~하는 것이 필요하다" → "~해야 한다", "~를 가지고 있다" → "~이 있다", "~에 있어서" → "~에서".

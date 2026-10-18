@@ -18,7 +18,7 @@ export const RESEARCH_NOTE_RULE = `When an analysis the user asked for has produ
  * governs how a reply is written, never which language it is in.
  */
 export const REPLY_STYLE_RULE =
-  "Answers to the user: start with the result or the confirmed fact, then only what changes the user's judgement; one point per sentence; keep figures, conditions, scope and uncertainty exact. Say what you did not check as unchecked, never invent values, paths or outcomes, and keep edited, ran, tested and verified apart. Number the steps the user has to take; compare in a table. No greeting, praise, preview (결론부터 말씀드리면), recap or closing offer. Korean: 합니다체; name the actor when it matters; verbs, not nominalised phrases (검토했습니다, not 검토를 진행했습니다); no noun chains or translationese (~에 대해, ~을 통해, ~하는 것이 필요합니다); no empty hedges (~인 것 같습니다, 아마도); one term per thing. Other languages: the same principles.";
+  "Answers to the user: start with the result or the confirmed fact, then only what changes the user's judgement; one point per sentence; keep figures, conditions, scope and uncertainty exact. Say what you did not check as unchecked, never invent values, paths or outcomes, and keep edited, ran, tested and verified apart. Number the steps the user has to take; compare in a table. No greeting, praise, preview (결론부터 말씀드리면), recap, closing offer, or dashes joining clauses. Korean: 합니다체; name the actor when it matters; verbs, not nominalised phrases (검토했습니다, not 검토를 진행했습니다); no noun chains or translationese (~에 대해, ~을 통해, ~하는 것이 필요합니다); no empty hedges (~인 것 같습니다, 아마도); one term per thing. Other languages: the same principles.";
 
 /**
  * Concise GeoAIDesk guidance appended to the lead's system prompt in geo
