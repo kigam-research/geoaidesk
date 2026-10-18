@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:50:45Z
+updated: 2026-10-18T08:57:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03bb8c52-5554-4f2c-8eac-ff609606e9cb","pid":2981080,"provider":"codex","session":"01a14e33-e7dc-7f11-896d-cc8d6a1c24a8","start":"20132575","token":"9229f706ac6aec69b0c3a4f13b440d4152f6c305c5f8571194c2420dbb8d0540"}
 branch: task/gaid-notebook-review--notes-server
 target: task/gaid-notebook-review
@@ -67,11 +67,40 @@ Evidence in your task document: files changed, test commands and results, the fi
 length, any contract deviation. Then `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the server-side research notes: pure bilingual parser, bounded NFC/NFD-aware sandbox store, byte-preserving atomic status edits, lead write/edit format checks and session association, project-scoped list/read/status routes, and the exact requested agent instruction. No shared contract or web/UI changes. Hub handoff needs no source change: a real ProvenanceRecorder test verifies that lead-written notes and figures appear in preview.files. Final backend typecheck and 69/69 tests across 8 affected suites passed (23 note tests). RESEARCH_NOTE_RULE is the supplied 675-character text, adding 678 prompt characters. POST status returns ResearchNoteSummary directly. Parent integration and deployment have not happened; task finish runs the declared full check before publishing this child.
 ## Next steps
-1. (the next session's first action)
+1. Run task finish with all new files named. The CLI runs its declared full check before publishing.
+2. The parent writer integrates this ready child with task complete; the parent owns the user-facing report, UI and deployment.
 ## Failed approaches
+Initial tests exposed an NFC/NFD sibling-root lookup failure; path resolution now explores both actual spellings and list deduplicates NFC ids. Test fixtures initially used the wrong ProvenanceRecorder API, a string instead of Pi content blocks, and an invalid installed-method identity; corrected against the existing sources. A 2 MiB Buffer deep-equality assertion exceeded Vitest's timeout; Buffer.equals verifies the same bytes without per-element matcher overhead. No unresolved implementation failure remains.
 ## Notes and decisions
+Sequential decisions: preserve the IO-free contract and file-master behaviour; settle parser output before store/routes. Owned files: server/src/geo/notes/*, routes/notes.ts, routes.ts, session.ts, instructions.ts, server/test/geo-notes.test.ts and append-only boundary entries. Integration order: parser → store → hook/routes/instructions → tests. This child has no independent writer packages; tightly coupled implementation stays with this writer, with no nested child units.
+
+### Implementation and integration evidence
+
+- New files: server/src/geo/notes/{parser,store,extension}.ts, server/src/geo/routes/notes.ts, server/test/geo-notes.test.ts.
+- Updated seams: server/src/geo/{session,routes,instructions}.ts; appended only the new test entry (owner gaid-notebook-review) in geo/integration-boundaries.json. The task document is the only changed documentation.
+- Public API: GET /geo/notes → ResearchNoteListResponse; GET /geo/notes/:id → ResearchNoteResponse; POST /geo/notes/:id/status → the updated ResearchNoteSummary (not a content wrapper). Invalid status → 400, unknown/unsafe id → 404, oversized direct read/status → 413.
+- Oversized files are skipped in lists and explicitly rejected on direct reads/status edits. Listings retain at most 500 notes, sorted by date then updatedAt. Frontmatter status is the only rewritten line; BOM, newline style and all other bytes survive. A status edit that would cross 2 MiB is rejected before replacement. Atomic replacement failure preserves the original and removes its temporary file.
+- notes.json is an object mapping NFC note ids to unique session-id arrays, oldest first. Malformed mapping reads return empty associations without writing; a subsequent hook refuses to overwrite the malformed map. Lead associations are recorded even if a later format check fails. No child hook is registered.
+- Method identity/workflow/assessment come from the latest associated session with a recorded method trial; the installed method supplies its Korean name (English fallback), otherwise name is null. No trial assessment is inferred from tool success.
+- No contract deviation, additional field or change to docs/geo/research-notes.md is needed. No locale strings or visible UI were changed; the new notice and instruction are model-facing English.
+- Codegraph is unindexed for this exact worktree; used native reads after its explicit unavailable response.
+
+### Agent instruction
+
+RESEARCH_NOTE_RULE is **675 JavaScript characters**; the one bullet adds **678 characters** to GEO_INSTRUCTIONS (newline + `- ` + rule). Existing tests do not pin a full prompt-size constant. Final text, exactly as requested:
+
+> When an analysis the user asked for has produced results, write a research note before your final reply, or update the note of the same question: `연구노트/<YYYY-MM-DD>-<topic>/index.md`, with the figures it shows copied to its `figures/`. Frontmatter: title, date, status: pending, headline (one-sentence conclusion), cover, supersedes. Sections in order: 한눈에 (table: 요청, 결론, 믿을 수 있는 정도, 결정할 일), 결과, 한 일, 한계, 결정할 일 (numbered questions, options `- 가) …`, one marked `(권장: reason)`), 근거 (links to files). In English replies use At a glance, Results, What was done, Limits, Decisions, Evidence. Research language only: no commands, tool names or ids. Keep logging notebook entries.
+
+### Checks
+
+- `cd server && npm ci`: passed; no dependency or lockfile edits.
+- `cd server && npm run typecheck`: final rerun passed.
+- `cd server && npx vitest run test/geo-notes.test.ts`: 23/23 passed, including bilingual parser/malformed decisions, list/read/status and limits, NFD, supersession, corrupt-map preservation, installed/uninstalled method attribution, hook notices and session mapping, project routes and actual provenance-to-hub preview.
+- Affected regression command: `cd server && npx vitest run test/geo-notes.test.ts test/geo-context.test.ts test/geo-reply-language.test.ts test/geo-markdown-images.test.ts test/geo-hub-handoff.test.ts test/geo-methods.test.ts test/geo-read-hints.test.ts test/session-registry.test.ts`. Final rerun: 8/8 files, 69/69 tests passed (23.67 s).
+- `git diff --check` and parsing geo/integration-boundaries.json: passed. Final source/test files reviewed; no out-of-scope edits.
+- Full `scripts/check`: not run manually; task finish executes the declared check and stores its result in the CLI receipt. Do not infer full-suite success from the focused tests above.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

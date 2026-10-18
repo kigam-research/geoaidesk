@@ -595,6 +595,12 @@
       "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Focused safe-cleanup no-permission test and destructive scenario update"
+    },
+    {
+      "path": "server/test/geo-notes.test.ts",
+      "owner": "gaid-notebook-review",
+      "status": "added",
+      "responsibility": "Research-note parsing, file-master storage, lead hooks, project routes and provenance handoff regression coverage"
     }
   ],
   "notTouched": [
