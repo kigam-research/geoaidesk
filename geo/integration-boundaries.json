@@ -517,6 +517,12 @@
       "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Optional expectedDestinationHashes on installStagedSkills: a replacement whose destination changed after the caller's check becomes a conflict (passes the hash to installSkillTree's existing guard); default behaviour unchanged."
+    },
+    {
+      "path": "server/test/geo-hub-shared.test.ts",
+      "owner": "gaid-hub",
+      "status": "edited",
+      "responsibility": "Shared hub browse query/folder filtering and star/recency sorting regression coverage"
     }
   ],
   "notTouched": [

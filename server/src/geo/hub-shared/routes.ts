@@ -91,6 +91,7 @@ export async function registerSharedHubRoutes(
     }
     return {
       ...record.entry,
+      tagline: korean(snapshotOf(record).draft.profile.tagline),
       stars: Object.keys(stars).length,
       starredByMe: user !== null && Object.hasOwn(stars, user),
       comments: comments.length,
@@ -127,12 +128,26 @@ export async function registerSharedHubRoutes(
     );
     scope.get<{ Querystring: { folder?: string; q?: string } }>("/geo/hub/entries", async (req) => {
       const query = req.query.q?.trim().toLocaleLowerCase();
+      const taxonomy = (options.vocabulary ?? loadVocabulary()).taxonomy;
+      const labels = new Map(Object.values(taxonomy).flat().map((term) => [
+        term.id, typeof term.label === "string" ? term.label : Object.values(term.label).join(" "),
+      ]));
       const records = (await store.list()).filter(
-        ({ entry: e }) =>
-          (!req.query.folder || e.folderId === req.query.folder) &&
-          (!query || [e.title, e.summary, e.author, ...e.tags].join(" ").toLocaleLowerCase().includes(query)),
+        (record) => {
+          const e = record.entry;
+          if (req.query.folder && e.folderId !== req.query.folder) return false;
+          if (!query) return true;
+          const profile = snapshotOf(record).draft.profile;
+          const terms = Object.values(profile.taxonomy).flat();
+          return [e.title, e.summary, e.author, ...e.tags,
+            ...(typeof profile.tagline === "string" ? [profile.tagline] : Object.values(profile.tagline)),
+            ...terms.flatMap((id) => [id, labels.get(id) ?? ""]),
+          ].join(" ").toLocaleLowerCase().includes(query);
+        },
       );
-      return { entries: await Promise.all(records.map((r) => entryView(r, hubUser(req)))) };
+      const entries = await Promise.all(records.map((r) => entryView(r, hubUser(req))));
+      entries.sort((a, b) => b.stars - a.stars || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
+      return { entries };
     });
     scope.post<{ Body: RegisterBody }>("/geo/hub/entries", async (req, reply) => {
       const body = req.body;

@@ -1,0 +1,76 @@
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { HubEntry } from "@/geo/contracts/hub-shared";
+import { SharedBrowse } from "./shared-browse";
+import { sharedHub } from "./shared-api";
+import { HubHome } from "./hub-home";
+
+vi.mock("./shared-api", () => ({ sharedHub: { folders: vi.fn(), entries: vi.fn() } }));
+const folder = { id: "geo", name: "지질", entries: 1, createdBy: "김 연구원", createdAt: "2026-10-18" };
+const entry = { id: "entry-one", title: "지질 지도 확인", tagline: "원본 좌표와 범위를 확인합니다.", author: "김 연구원", stars: 3, folderId: "geo" } as HubEntry;
+beforeEach(() => {
+  localStorage.setItem("gaid:locale", "ko");
+  vi.mocked(sharedHub.folders).mockResolvedValue({ folders: [folder] });
+  vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [entry] });
+});
+afterEach(() => { vi.clearAllMocks(); localStorage.removeItem("gaid:locale"); });
+
+async function loaded() { return screen.findByRole("button", { name: "지질 지도 확인 열기" }); }
+
+describe("Shared hub browse", () => {
+  it("opens a registered entry, combines debounced search with folders, and resets no results", async () => {
+    const open = vi.fn();
+    render(<SharedBrowse onOpen={open} />);
+    fireEvent.click(await loaded());
+    expect(open).toHaveBeenCalledWith("entry-one");
+    expect(sharedHub.entries).toHaveBeenCalledWith("all", "");
+    expect(screen.getByText(entry.tagline!)).toBeTruthy();
+    expect(screen.getByLabelText("star 3개")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /^지질\s*1$/ }));
+    await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", ""));
+    await loaded();
+    vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [] });
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "없는 방법" } });
+    expect(screen.queryByRole("button", { name: "지질 지도 확인 열기" })).toBeNull();
+    expect(sharedHub.entries).not.toHaveBeenCalledWith("geo", "없는 방법");
+    await screen.findByText("조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.");
+    expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", "없는 방법");
+    fireEvent.click(screen.getByRole("button", { name: "전체 방법 보기" }));
+    await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("all", ""));
+    expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("");
+  });
+
+  it("shows an empty registry and a recoverable error instead of treating an error as empty", async () => {
+    vi.mocked(sharedHub.entries).mockRejectedValueOnce(new Error("offline"));
+    render(<SharedBrowse onOpen={vi.fn()} />);
+    await screen.findByText("등록 방법을 읽지 못했습니다. 목록을 다시 읽으세요.");
+    expect(screen.queryByText("등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.")).toBeNull();
+    vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [] });
+    fireEvent.click(screen.getByRole("button", { name: "목록 다시 읽기" }));
+    await screen.findByText("등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.");
+    expect(screen.getByRole("button", { name: "추천 Workflow 보기" })).toBeTruthy();
+  });
+
+  it("ignores an older response arriving after a newer folder result", async () => {
+    let resolve!: (r: { entries: HubEntry[] }) => void;
+    vi.mocked(sharedHub.entries).mockReturnValueOnce(new Promise((r) => { resolve = r; }));
+    render(<SharedBrowse onOpen={vi.fn()} />);
+    await waitFor(() => expect(sharedHub.entries).toHaveBeenCalled());
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "newer" } });
+    await loaded();
+    await act(async () => { resolve({ entries: [] }); });
+    expect(screen.getByRole("button", { name: "지질 지도 확인 열기" })).toBeTruthy();
+  });
+
+  it("defaults home to browse and keeps search when switching to personal drafts and back", async () => {
+    render(<HubHome recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />);
+    expect(screen.getByRole("tab", { name: "허브에 등록된 방법" }).getAttribute("aria-selected")).toBe("true");
+    await loaded();
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "지도" } });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /나의 스킬/ }), { button: 0, ctrlKey: false });
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "허브에 등록된 방법" }), { button: 0, ctrlKey: false });
+    expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("지도");
+    await loaded();
+  });
+});
