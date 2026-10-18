@@ -68,8 +68,9 @@ export function ReadinessNotice({ value, projectId, onPrepared }: { value: Workf
     : value.state === "needs-environment" ? t("workspace.setup.ready.environment", { name: environment })
     : value.state === "unavailable" ? t("workspace.setup.ready.unavailable")
     : t("workspace.setup.ready.done");
-  return <div className="space-y-2 rounded-lg border bg-muted/50 px-4 py-3 text-sm">
-    {message && <p className="break-words">{message}</p>}
+  // One row: the blocker and the action that fixes it (UI guide Q4); results wrap below.
+  return <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-muted/50 px-4 py-2.5 text-sm">
+    {message && <p className="min-w-0 flex-1 break-words">{message}</p>}
     {value.state === "unavailable" ? <TechnicalDetail detail={unavailableReason(value)} /> : <PrepareEnvironment value={value} projectId={projectId} onPrepared={onPrepared} />}
   </div>;
 }

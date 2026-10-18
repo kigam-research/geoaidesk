@@ -53,7 +53,7 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
           return <li key={workflowKey(suggestion.workflowId, suggestion.exposure)} className="flex min-w-0 items-center gap-3 px-3 py-2">
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                <span className="truncate text-sm font-medium">{text(suggestion.title)}</span>
+                <span className="truncate text-sm font-medium" title={text(suggestion.title)}>{text(suggestion.title)}</span>
                 <ReadinessBadges readiness={suggestion.readiness} />
               </div>
               <p className="truncate text-xs text-muted-foreground" title={signal ? `${match} · ${signal}` : match}>
