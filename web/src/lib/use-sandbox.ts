@@ -186,6 +186,8 @@ export interface Tab {
   path: string;
   content: string | null;
   loading: boolean;
+  /** GeoAIDesk: the file is over the preview size limit (413); `content` holds the notice text, not file bytes. */
+  previewLimited?: boolean;
 }
 
 export interface SandboxPersistenceState {
@@ -341,14 +343,14 @@ export function useSandbox(
     const generation = fileGenerations.current.get(path) ?? {};
     fileGenerations.current.set(path, generation);
     const isCurrent = () => fileGenerations.current.get(path) === generation;
-    const update = (content: string) => {
+    const update = (content: string, previewLimited = false) => {
       setTabs((prev) => {
         if (!isCurrent()) return prev;
         let changed = false;
         const next = prev.map((tab) => {
-          if (tab.path !== path || (tab.content === content && !tab.loading)) return tab;
+          if (tab.path !== path || (tab.content === content && !tab.loading && !!tab.previewLimited === previewLimited)) return tab;
           changed = true;
-          return { ...tab, content, loading: false };
+          return { ...tab, content, loading: false, previewLimited };
         });
         if (!changed) return prev;
         tabsRef.current = next;
@@ -371,7 +373,7 @@ export function useSandbox(
         const nextEtag = res.ok || res.status === 413 ? res.headers.get("etag") : null;
         if (nextEtag) fileEtags.current.set(path, nextEtag);
         else fileEtags.current.delete(path);
-        update(content);
+        update(content, res.status === 413);
       } catch {
         if (!refresh && isCurrent()) {
           fileEtags.current.delete(path);

@@ -44,13 +44,24 @@ it("provides Workflow and recipe rows with at most three badges: trials, lifecyc
   // A Workflow with a single 레시피 is one row that starts from the 레시피; a second 레시피 brings back separate rows.
   expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial"]);
   render(<>{rows[0].badges}</>);
-  expect(screen.getByText("초안")).toBeInTheDocument(); expect(screen.queryByText("공개됨")).not.toBeInTheDocument();
-  expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument(); expect(screen.getByText("미시험")).toBeInTheDocument();
+  // Each badge names its scope: the hub package stage, GAID trials in this project (novice review round 3).
+  expect(screen.getByText("허브 초안")).toHaveAttribute("title", "허브에 기록된 방법 패키지의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.");
+  expect(screen.queryByText("허브 공개됨")).not.toBeInTheDocument();
+  expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument();
+  expect(screen.getByText("미시험")).toHaveAttribute("title", "현재 프로젝트에서 해당 Workflow를 GAID로 시험한 기록이 없습니다.");
+
   // The implementation badge moves to the method details (UI guide G2: at most three badges per row).
   expect(screen.queryByText("코드 포함")).not.toBeInTheDocument();
   rows[0].onSelect(); expect(select).toHaveBeenCalledWith(method, workflow, method.recipes[0]);
   const two = { ...method, recipes: [...method.recipes, { ...method.recipes[0], id: "r2", title: { ko: "Fold 3 레시피" } }] };
   expect(methodRows([two], select).map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial", "method:project:paper-method:recipe:r1", "method:project:paper-method:recipe:r2"]);
+});
+it("scopes every row badge and leaves the fixed required-input property to the inputs line", () => {
+  const needsData = { ...workflow, inputRoles: [{ id: "grid", label: { ko: "격자 표" }, formats: ["csv"], extensions: ["csv"], required: true }], readiness: { ...workflow.readiness, state: "needs-environment" as const } };
+  render(<>{methodRows([{ ...method, editedLocally: false, workflows: [needsData] }], vi.fn())[0].badges}</>);
+  expect(screen.getByText("환경 준비 필요")).toHaveAttribute("title", "현재 프로젝트에서 해당 Workflow를 시작하는 데 필요한 준비 상태입니다.");
+  expect(screen.getByText("허브 초안")).toBeInTheDocument();
+  expect(screen.queryByText("사용자 자료 필요")).not.toBeInTheDocument();
 });
 it("shows GAID trial counts and the latest assessment instead of the untested badge", () => {
   const tried = { ...method, workflows: [{ ...workflow, trials: { count: 2, lastOutcome: "needs-revision" as const } }] };

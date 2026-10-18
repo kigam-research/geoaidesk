@@ -126,3 +126,28 @@ it("retains annotations across navigation and treats a new stroke after saving a
   expect(confirm).toHaveBeenCalled();
   expect(props.onTabClose).not.toHaveBeenCalled();
 });
+
+// GeoAIDesk (gaid-system-ui-followups): a 413 tab is its own state, never a table of the notice text or an edit target.
+it("shows a size-limited CSV as a preview-limit state with a first-rows sample and no edit", async () => {
+  const props = panelProps("big.csv");
+  const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => String(url).endsWith("/geo/inspect") ? new Response(JSON.stringify({
+    schemaVersion: "geo-inspection/v1",
+    asset: { projectId: "project-a", path: "big.csv", sourceFiles: ["big.csv"], format: "csv", family: "table", sizeBytes: 16031273, fingerprint: "f" },
+    issues: [], columns: [{ name: "X" }, { name: "Y" }, { name: "Ni" }],
+    preview: { sampled: true, truncated: true, rows: [["1", "2", "0.5"]], displayedRows: 1, sourceRows: 52000 },
+  }), { status: 200 }) : new Response("{}", { status: 404 }));
+  render(<FilePreviewPanel {...props} tabs={[{ path: "big.csv", content: "[Error: too large]", loading: false, previewLimited: true }]} />);
+  expect(screen.getByText("This file is larger than the preview limit")).toBeInTheDocument();
+  expect(await screen.findByRole("columnheader", { name: "Ni" })).toBeInTheDocument();
+  expect(screen.getByText(/about 52,?000 rows in total \(estimate\)/)).toBeInTheDocument();
+  expect(screen.queryByText("Retry")).toBeNull();
+  expect(screen.queryByTitle("Edit file")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Download file" }));
+  expect(props.onDownload).toHaveBeenCalledWith("big.csv");
+  expect(fetchSpy.mock.calls.some(([url]) => String(url).endsWith("/geo/inspect"))).toBe(true);
+});
+
+it("offers no edit for a tab whose load failed", () => {
+  render(<FilePreviewPanel {...panelProps()} tabs={[{ path: "a.txt", content: "[Error: Could not load file — click to retry]", loading: false }]} />);
+  expect(screen.queryByTitle("Edit file")).toBeNull();
+});

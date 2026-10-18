@@ -3,6 +3,7 @@
 import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { TableInspectionOption } from "@/geo/viewers/tables/table-option";
+import { PreviewLimit } from "@/geo/viewers/preview-limit";
 import { GeoFileActions } from "@/geo/workspace/file-actions";
 import { CsvViewer } from "./csv-viewer";
 import { MessageResponse } from "@/components/ai-elements/message";
@@ -387,11 +388,13 @@ function MarkdownViewer({
 const LOAD_ERROR_MARKER = /^\[(?:Error|오류):\s*/;
 
 function FileViewer({
-  path, name, content, loading, projectId, onRetry, onSave, revealLine, revealCell, revealToken,
+  path, name, content, loading, projectId, onRetry, onSave, revealLine, revealCell, revealToken, previewLimited, onDownload,
 }: {
   path: string; name: string | null; content: string | null; loading: boolean;
   projectId: string;
   onRetry?: () => void;
+  previewLimited?: boolean;
+  onDownload?: () => void;
   onSave?: (content: string) => Promise<boolean>;
   revealLine?: number;
   revealCell?: number;
@@ -408,6 +411,8 @@ function FileViewer({
   // user doesn't have to close and reopen the tab.
   // GeoAIDesk: the Korean catalogue writes these markers as "[오류: …]" (gaid-system-ui; a 16 MB CSV showed the
   // size-limit message as its table header).
+  // GeoAIDesk (gaid-system-ui-followups): over the size limit is not a load failure; retrying cannot help.
+  if (previewLimited) return <PreviewLimit path={path} projectId={projectId} onDownload={onDownload} />;
   if (content !== null && LOAD_ERROR_MARKER.test(content)) {
     const msg = content.replace(LOAD_ERROR_MARKER, "").replace(/\]$/, "");
     return <FileLoadError message={msg} onRetry={onRetry} />;
@@ -1820,7 +1825,9 @@ export function FilePreviewPanel({
   // All text-based formats can be edited as source. Binary/structured
   // viewers (images, PDFs, anndata) have no raw-text editor. Registered
   // scientific viewers declare their own editability.
-  const canEdit = regDef ? regDef.canEditSource : (cat !== "image" && cat !== "pdf" && cat !== "anndata");
+  // GeoAIDesk: a size-limited or failed load holds a notice, not the file; editing it would save the notice over the file.
+  const loadFailed = !!activeTab?.previewLimited || (fileContent !== null && LOAD_ERROR_MARKER.test(fileContent));
+  const canEdit = !loadFailed && (regDef ? regDef.canEditSource : (cat !== "image" && cat !== "pdf" && cat !== "anndata"));
   const canAnnotate = cat === "image";
 
   const header = selectedPath && (
@@ -2009,6 +2016,8 @@ export function FilePreviewPanel({
               name={selectedName}
               content={fileContent}
               loading={loadingFile}
+              previewLimited={activeTab?.previewLimited}
+              onDownload={() => onDownload(selectedPath)}
               onRetry={onRetry ? () => onRetry(selectedPath) : undefined}
               onSave={(content) => onSaveText(selectedPath, content)}
               revealLine={

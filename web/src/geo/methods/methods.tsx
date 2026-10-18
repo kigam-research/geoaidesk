@@ -16,39 +16,43 @@ import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 export const METHOD_CATEGORY = "hub-methods";
 const pill = "inline-flex rounded-full border px-1.5 py-px text-xs font-medium";
 
-/** Same readiness/untested/user-data strings as WorkflowBadges, without a catalogue import cycle. */
-export function MethodBadges({ method, workflow }: { method: LocalMethodSummary; workflow?: LocalMethodWorkflow }) {
+/*
+ * Every badge says what it describes (gaid-system-ui-followups, novice review round 3: "레시피 준비됨 미시험 사용자 자료 필요
+ * 초안" could not be told apart): readiness is this project's environment, trials are GAID trials in this project, the
+ * stage is the hub package's ("허브 초안"), code/edit are package facts. "사용자 자료 필요" is no badge: it is a fixed
+ * package property that read as a project state after the data was uploaded; the inputs line lists required inputs.
+ */
+const readinessBadge = (workflow: LocalMethodWorkflow) =>
+  <span key="ready" className={pill} title={t("methods.badge.readinessTip")}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>;
+// A local method's evidence is GAID's own trial records, not a catalogue install record.
+const trialsBadge = (workflow: LocalMethodWorkflow) => workflow.trials.count === 0
+  ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
+  : <span key="trials" className={pill} title={t("methods.badge.trialsTip")}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>;
+const stageBadge = (method: LocalMethodSummary, withCode: boolean) =>
+  <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
+
+/** Method details: the package badges. Each Workflow card states its readiness and record in its readiness line. */
+export function MethodBadges({ method }: { method: LocalMethodSummary }) {
   return <>
-    {workflow && <>
-      <span className={pill}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>
-      {/* A local method's evidence is GAID's own trial records, not a catalogue install record. */}
-      {workflow.trials.count === 0
-        ? <span className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
-        : <span className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>}
-      {workflow.inputRoles.some((role) => role.required) && <span className={pill}>{t("workspace.badge.userData")}</span>}
-    </>}
-    <span className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}</span>
-    {method.implementation && <span className={pill}>{t(`methods.implementation.${method.implementation}`)}</span>}
+    {stageBadge(method, false)}
+    {method.implementation && <span className={pill} title={t("methods.badge.codeTip")}>{t(`methods.implementation.${method.implementation}`)}</span>}
     {method.editedLocally && <span className={pill}>{t("methods.edited")}</span>}
   </>;
 }
 
 /**
  * A list row shows at most three badges (UI guide G2, W5), in this order: readiness when not ready, GAID trials or
- * 미시험, the lifecycle (with "분석 지침만" for a method without code), a local edit, "코드 포함", needs user data. The
- * method details show all of them.
+ * 미시험, the hub stage (with "분석 지침만" for a method without code), a local edit, "코드 포함". The method details show
+ * all of them.
  */
 function RowBadges({ method, workflow }: { method: LocalMethodSummary; workflow?: LocalMethodWorkflow }) {
   const badges: ReactNode[] = [];
-  if (workflow && workflow.readiness.state !== "ready") badges.push(<span key="ready" className={pill}>{t("workspace.badge.readiness", { state: workflow.readiness.state })}</span>);
-  if (workflow) badges.push(workflow.trials.count === 0
-    ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
-    : <span key="trials" className={pill}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>);
-  // A method without code says so on its row (novice review): lifecycle and "분석 지침만" share one badge.
-  badges.push(<span key="life" className={pill}>{t(`methods.lifecycle.${method.lifecycle}`)}{method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>);
+  if (workflow && workflow.readiness.state !== "ready") badges.push(readinessBadge(workflow));
+  if (workflow) badges.push(trialsBadge(workflow));
+  // A method without code says so on its row (novice review): stage and "분석 지침만" share one badge.
+  badges.push(stageBadge(method, true));
   if (method.editedLocally) badges.push(<span key="edit" className={pill}>{t("methods.edited")}</span>);
-  if (method.implementation === "implemented") badges.push(<span key="impl" className={pill}>{t("methods.implementation.implemented")}</span>);
-  if (workflow?.inputRoles.some((role) => role.required)) badges.push(<span key="data" className={pill}>{t("workspace.badge.userData")}</span>);
+  if (method.implementation === "implemented") badges.push(<span key="impl" className={pill} title={t("methods.badge.codeTip")}>{t("methods.implementation.implemented")}</span>);
   return <>{badges.slice(0, 3)}</>;
 }
 
@@ -171,7 +175,6 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
       })}</ul></section>}
       {method.workflows.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.workflows")}</h3>{method.workflows.map((workflow) => <div key={workflow.id} className="space-y-1 rounded-md border p-2 text-xs">
         <p>{text(workflow.title)}</p>
-        <div className="flex flex-wrap gap-1"><MethodBadges method={method} workflow={workflow} /></div>
         {workflow.description && <p className="text-muted-foreground">{text(workflow.description)}</p>}
         <Readiness value={workflow.readiness} />
         {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
