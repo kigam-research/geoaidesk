@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T09:38:14Z
+status: done
+updated: 2026-10-18T09:38:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -51,52 +51,9 @@ run test/geo-authoring.test.ts test/geo-authoring-extra.test.ts test/geo-hub-sha
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. `task finish` (runs scripts/check). Stop the test app first: `systemctl --user stop gaid-novice-app`.
+<!-- task:closed -->
+Closed 2026-10-18T09:38:15Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
-Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
-
-Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summary.md. Triage:
-- Routed to gaid-system-ui via hub (request 88fe3c357f47, briefs/route-system-ui.md): TaskSetup contradictions,
-  quick-trial preset, dependent options, workspace has no way back to the hub, methods panel implementation pill.
-- Child gaid-hub-novice-review--shared (brief briefs/child-shared.md): search aliases (니켈/Ni), HubEntry.implementation
-  + entry badge, honest trial scope. Owns server/src/geo/hub-shared/**, contracts/hub-shared.ts, hub/shared-*.
-  Locale ids `draft.implementation.{descriptive,implemented,descriptiveHint}` are shared (same text both sides).
-- This writer: authoring rules (prompts.ts, done 32ad970); hub-home two routes + glossary (F5); io-examples keeps label
-  column (F4: exampleColumns sliced 6 and dropped `label`); source-step completion action (F8); input-prep extra
-  packages (F3); draft-step / stage label implementation state (F2); hub-dialogs registration preview status (F6)
-  and install chooser new project (F9b).
-- Done by this writer (b32f43b): hub home two route cards + "용어 보기" glossary popover (P1 P3 W6 B1); io-examples keeps
-  last columns (label); SourceStep "질문에 답하기" after reading + reading note on where to reopen; InputPrep lists
-  packages outside the environment (server `extraPackages` in /geo/methods, new server/src/geo/methods/extra-packages.ts);
-  draft badge + hint for 분석 지침만 · 실행 코드 없음; stage.package "시험·등록 준비됨"; TrialCard NewProject form.
-  Tests: web src/geo/hub 26 pass, server extra-packages + geo-methods 12 pass; copy 0 errors; check-ui 0 errors.
-  Screenshots shots/home-{1440,1280}.png, glossary-1440.png.
-- Child --shared completed and closed (integrated ce0128c): search words AND + commodity aliases + description/IO/limits
-  (server/src/geo/hub-shared/search.ts), HubEntry.implementation + entry/preview badge, trial wording as started trials,
-  NewProject in the shared install dialog. Its checks: scripts/check passed (backend 1905, web 1076, geo/copy/UI).
-  Evidence in docs/tasks/gaid-hub-novice-review--shared.md; screenshots ~/data/geoaidesk/work/gaid-hub-novice-review--shared/playwright/.
-  After integration here: web/server tsc clean, web src/geo/hub 30 tests pass.
-- gaid-system-ui answered route 88fe3c357f47 (8ae7682 on its branch): draft puts researcher settings first, summary step,
-  workspace hub switch, "초안 · 분석 지침만"; quick-trial preset not done (contract field needed).
-- Round 2 (reader e6e928de, novice2/summary.md): goals 1,3,4 yes, 2 partly (stopped before sending the contradictory
-  TaskSetup request of the old shared method — gaid-system-ui's fix). Round-1 fixes confirmed useful (two routes,
-  glossary, empty-search tip, reading reopen note, implementation badge, new project in install). Own new draft's
-  start request was consistent (authoring rule effective). New findings fixed here (252ef27): trial step shows
-  InputPrep before the first trial (F2); "내가 만든 방법" lists drafts started under my hub name (author recorded at
-  creation, name asked before 방법 만들기) + author on cards, glossary draft text accurate (F3); trial count scope
-  "등록한 판으로 시작한 시험" and counts the author's pre-registration trials of the same package (F4; live: round-2
-  entry now 1); trial.consent neutral; 필수/선택 on overview inputs (F5); plain-language authoring rule, no S1 aliases,
-  no coined method translations, one term per concept (F6, prompt versions .3/.6); front-page hub copy (F7).
-  Not done: multi-topic folders (F8, optional); raw tool names / "Make sure to use the skills" in chat transcript
-  (workspace chat, not hub). Checks: web tsc, web hub 30, server authoring/hub-shared/extra 68 + author test, copy 0
-  errors, check-ui 0 errors. Screenshots shots/entry-r2-{1440,1280}.png.
-- Round 3 (reader 5db3a0b5, novice3/summary.md): all four goals yes (request contradiction corrected by hand, not sent).
-  Fixed here (ad4f7b3, 3870223): no project preselection in both install pickers (install disabled until chosen);
-  "허브에 등록됨" chip after registration; legacy drafts labelled "작성자 미기록"; "추천 분석 방법"; authoring rules: no
-  recommendation for facts about the researcher's data, no time in quick-run labels (prompt versions analyze .4 / draft .7).
-  Routed to gaid-system-ui (f5448549a275): CSV preview limit error rendered as headers; stacked Workflow-list badges.
-  Not done (report §5): multi-topic folders, reading sub-progress/cancel, editing generated labels, chat transcript
-  tool names. Round-3 fixes verified by tests + screenshots, not by a fourth reader.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
