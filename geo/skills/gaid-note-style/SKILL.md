@@ -37,7 +37,7 @@ Use this when you write or update a research note. Apply it last: settle the res
 
 ## Korean sentences
 
-- 합니다체 (~했습니다, ~입니다) through the whole note, headline and table sentences included. Rewrite any 해라체 sentence (~했다, ~이다) in the draft. Table cells and headings that are nouns stay nouns.
+- 합니다체 (~했습니다, ~입니다) through the whole note, headline, table sentences and decision options included ("- 가) 그대로 둡니다", not "그대로 둔다"). Rewrite any 해라체 sentence (~했다, ~이다) in the draft. Table cells and headings that are nouns stay nouns.
 - Korean words in Korean sentences: 폴리곤, 중앙 경선, 미터, 병합 rather than polygon, central meridian, metre, dissolve. Keep field names, codes, file names and abbreviations a researcher uses as they are (LITHONAME, EPSG, CRS).
 - Verbs, not nominalised phrases: "검토를 진행하였습니다" → "검토했습니다"; "분석 작업을 수행했습니다" → "분석했습니다". Headings, table cells and status words may stay nouns.
 - No noun chains or repeated 의: "지층 경계 추정 결과의 신뢰도의 평가" → "지층 경계를 추정한 결과가 얼마나 믿을 만한지 평가". Established terms stay.
