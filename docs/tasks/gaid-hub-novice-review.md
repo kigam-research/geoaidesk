@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:42:36Z
+updated: 2026-10-18T08:42:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -42,7 +42,7 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. Round 2 reader (briefs/novice-2.md, output novice2/) on the restarted app (integrated ce0128c + doc). Then triage,
+1. Round 2 reader running: Paseo e6e928de-e743-41ad-afb7-9de759029794 (briefs/novice-2.md, output novice2/); do not edit web/server while it runs on the restarted app (integrated ce0128c + doc). Then triage,
    any fixes, report. Note: gaid-system-ui's TaskSetup/workspace fixes (8ae7682) are not on this branch; round 2 sees
    the old popup.
 
