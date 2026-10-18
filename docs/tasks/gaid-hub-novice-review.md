@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:13:10Z
+updated: 2026-10-18T08:14:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -42,11 +42,11 @@ Outside check: no outside check (app usability work; the first-time-user re-chec
 - Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
   (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. Round-1 reader running: Paseo agent 857f65bb-d15b-4929-8f05-83b1166c0f3e ("general work"), output
-   ~/data/geoaidesk/work/gaid-hub-novice-review/novice1/{log,summary}.md. Do not edit web/server files while it runs
-   (dev server hot-reloads). Wait for its final message.
-2. Triage findings: hub fixes here; TaskSetup popup findings -> gaid-system-ui via `task hub --send --kind route`.
-3. Fix, then round 2 with a fresh reader (novice2/), report.
+1. Wait for child gaid-hub-novice-review--shared (Paseo b4c674e6; checkpoint f161a4c, needs `task sync` of b32f43b for
+   NewProject). On its finish: `task complete gaid-hub-novice-review--shared`, then web/server typecheck (hub-screen
+   passes `implementation` to SharedMethodView, defined by the child) and hub tests.
+2. Round 2: fresh first-time-user reader with briefs/novice-2.md (output novice2/), same goals; check the fixed points.
+3. Report reports/2026-10-18-gaid-hub-novice-review/index.md (string tables, rule ids, screenshots 1440/1280).
 
 Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
 
@@ -60,6 +60,12 @@ Round 1 done (reader 857f65bb): all 4 goals reached; 9 findings in novice1/summa
   column (F4: exampleColumns sliced 6 and dropped `label`); source-step completion action (F8); input-prep extra
   packages (F3); draft-step / stage label implementation state (F2); hub-dialogs registration preview status (F6)
   and install chooser new project (F9b).
+- Done by this writer (b32f43b): hub home two route cards + "용어 보기" glossary popover (P1 P3 W6 B1); io-examples keeps
+  last columns (label); SourceStep "질문에 답하기" after reading + reading note on where to reopen; InputPrep lists
+  packages outside the environment (server `extraPackages` in /geo/methods, new server/src/geo/methods/extra-packages.ts);
+  draft badge + hint for 분석 지침만 · 실행 코드 없음; stage.package "시험·등록 준비됨"; TrialCard NewProject form.
+  Tests: web src/geo/hub 26 pass, server extra-packages + geo-methods 12 pass; copy 0 errors; check-ui 0 errors.
+  Screenshots shots/home-{1440,1280}.png, glossary-1440.png.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
