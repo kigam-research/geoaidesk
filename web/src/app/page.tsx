@@ -1194,6 +1194,7 @@ function WorkspacePage({
               onOpenNotebookFile={handleFileSelect}
               notebookFocus={notebookFocus}
               onNotebookJumpToChat={handleNotebookJumpToChat}
+              onOpenNotebookChat={(sessionId, title) => { setChatOpen(true); openSession(sessionId, title); }}
               onOpenNotebookEntry={handleViewInNotebook}
             />
         </div>
