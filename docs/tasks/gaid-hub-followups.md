@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T06:54:29Z
+status: done
+updated: 2026-10-18T06:54:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -101,8 +101,9 @@ History:
 - Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
   gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
-1. task finish (env -u VITEST_MAX_WORKERS taskset -c 0-7), then stop gaid-followups-app; the hub updates the review app
-   (gaid-review) once to the new main.
+<!-- task:closed -->
+Closed 2026-10-18T06:54:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-followups.md.
+
 ## Failed approaches
 - Two task complete runs of hub-browse failed on load-dependent UI timing tests (map viewer heading 1 s wait, file preview
   5 s test) while seoul_geomodel jobs held load ~43/32 threads; not code. Passed with `env -u VITEST_MAX_WORKERS taskset
@@ -131,7 +132,7 @@ Closes: gaid-hub#5
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [확인] 다음 PU 시험에서 빠른 시험을 모델 학습까지 실행해 5,000점 변이함수와 BaggingPU 시간(스레드 제한)을 확인 — 가) 다음 PU 시험 때 빠른 시험 전체 실행 — 나) 확인하지 않고 둠 — 권장: 가) 이번 재시험은 첫 확인 지점에서 멈춰 이 두 가지를 실행하지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-18-gaid-hub-followups/index.md#5-한계
+- [확인 gaid-hub-followups#1] 다음 PU 시험에서 빠른 시험을 모델 학습까지 실행해 5,000점 변이함수와 BaggingPU 시간(스레드 제한)을 확인 — 가) 다음 PU 시험 때 빠른 시험 전체 실행 — 나) 확인하지 않고 둠 — 권장: 가) 이번 재시험은 첫 확인 지점에서 멈춰 이 두 가지를 실행하지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-18-gaid-hub-followups/index.md#5-한계
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a

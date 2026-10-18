@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T05:23:48Z
+status: done
+updated: 2026-10-18T06:54:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -118,7 +118,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T05:23:48Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T06:54:43Z: integrated into gaid-hub-followups; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Finish at latest frozen parent 90a7c3f8 failed because I applied VITEST_MAX_WORKERS=4 globally. Installed Vitest applies this env override after fileParallelism:false has forced maxWorkers=1; backend files then raced while deleting their shared per-run temporary project root (ENOENT/ENOTEMPTY across 33 files). This is an execution-environment mistake, not a product source regression. Verified directly in server vitest config and runtime resolveConfig ordering (coverage chunk lines 223-225 vs 380). Remove the env override and bound CPU affinity instead, which preserves backend serialization and bounds frontend defaults. Do not patch unrelated product/test sources around the race.
