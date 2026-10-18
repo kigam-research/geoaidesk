@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T07:41:47Z
+updated: 2026-10-18T07:44:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d5ccf3fd-f3f5-4c7d-bd56-706709e93d52","pid":1500366,"provider":"claude","session":"08462f75-6cc2-44d7-8916-85fe4ec1ce7b","start":"19720226","token":"b3fc2052aa1f2db180340374b5e8418ae8568a6717a7cbdeffc044faf4daf5ce"}
 branch: task/gaid-hub-novice-review
 target: main
@@ -35,9 +35,20 @@ Scope confirmed with the user:
 Outside check: no outside check (app usability work; the first-time-user re-check is the acceptance evidence).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Test app: user service `gaid-novice-app` (dev mode, ports 3370/18370), script
+  ~/data/geoaidesk/work/gaid-hub-novice-review/bin/dev.sh, GAID_HOME ~/data/geoaidesk/work/gaid-hub-novice-review/home
+  (config/models copied from the gaid-hub-followups test home, Qwen model; shared hub entries copied so the hub is not
+  empty; no personal authoring projects). Log logs/app.log there.
+- Round 1 brief: ~/data/geoaidesk/work/gaid-hub-novice-review/briefs/novice-1.md; materials novice1/materials/
+  (my-paper.pdf = authoring_preview_paper asset, Yilgarn_GIS_DB.csv = yilgarn-gis-db/20260911).
 ## Next steps
-1. (the next session's first action)
+1. Round-1 reader running: Paseo agent 857f65bb-d15b-4929-8f05-83b1166c0f3e ("general work"), output
+   ~/data/geoaidesk/work/gaid-hub-novice-review/novice1/{log,summary}.md. Do not edit web/server files while it runs
+   (dev server hot-reloads). Wait for its final message.
+2. Triage findings: hub fixes here; TaskSetup popup findings -> gaid-system-ui via `task hub --send --kind route`.
+3. Fix, then round 2 with a fresh reader (novice2/), report.
+
+Plan (sequential): round 1 review -> triage -> fixes (self or child writers if large, split by files) -> round 2.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
