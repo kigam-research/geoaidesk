@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T09:18:44Z
+status: ready
+updated: 2026-10-18T09:18:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd14a2b1-08ca-4ec5-b9a5-c36ac0b3decd","pid":2986331,"provider":"codex","session":"01a14e34-3599-7921-a909-ef8c86596d17","start":"20134566","token":"f8920c52ddfb78cfda8aa61a33610fd220a79d3b368da7c773080f68204acb5b"}
 branch: task/gaid-notebook-review--record-cleanup
 target: task/gaid-notebook-review
@@ -56,7 +56,7 @@ and English before → after (copy rule). Then `task finish`.
 Implemented collapsed copyable execution/source technical disclosures, locale-aware work-record exports/print, GAID chat-export branding, the Methods language rule and localized proposal constraints. Authored prose/code and JSON machine keys/values remain unchanged. Focused web 98/server 64 tests and both typechecks pass. Full retry with CPU affinity: backend 1,884 passed/11 skipped; frontend 1,082 passed. Distribution check found its owner allowlist lacked the required gaid-notebook-review owner. Added that owner and its seam; direct distribution recheck passes all 7 tests. UI/copy have no errors. Final task-finish pipeline rerun remains; no deployment performed. Parent owns integration and screenshots.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T09:09:06Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T09:18:46Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Third finish b9c4926 completed backend 1,884 passed/11 skipped and frontend 1,082 passed. GAID tests then rejected required new seam owner gaid-notebook-review because distribution.test.mjs had a fixed owner allowlist. Added that owner (and a maintained seam for the test); direct node --test geo/tests/distribution.test.mjs passes 7 tests. This is a distinct source metadata mismatch, not the prior execution-environment failures. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-ql5wuajh.log; output: ~/data/geoaidesk/work/checks/b9c49264ffe3-20261018T090906.595830Z.
