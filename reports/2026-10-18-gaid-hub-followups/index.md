@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-retrial-checkpoint.png
 supersedes:
+reviewed: 2026-10-18
 ---
 # PU 방법 수정판 재시험과 GAID 허브·채팅 결함 정리
 
