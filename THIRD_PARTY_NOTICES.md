@@ -18,6 +18,13 @@ fetch. Each component keeps its own license; nothing here relicenses it.
 Exact versions are pinned by the lockfiles; the license of each installed package is in its own metadata under
 `node_modules/` or the helper environment.
 
+## Writing guidance adapted into GeoAIDesk
+
+| Material | Where | License |
+|---|---|---|
+| Attention Control (`aaddrick/attention-control`), through KIGAM's Korean adaptation: delivery rules for chat answers | `REPLY_STYLE_RULE` in `server/src/geo/instructions.ts` (condensed, reworded) | MIT, Copyright (c) 2026 aaddrick; portions Copyright (c) 2026 Ayoub Ghriss |
+| Humanizer (`blader/humanizer` v3.1.0), through KIGAM's Korean adaptation: prose patterns for research notes; its patterns come from Wikipedia's "Signs of AI writing" (WikiProject AI Cleanup) | `geo/skills/gaid-note-style/` (condensed, reworded; seeded into each project's `.pi/skills/`) | MIT, Copyright (c) 2025 Siqi Chen; text in `geo/skills/gaid-note-style/LICENSE` |
+
 ## Content fetched at runtime
 
 | Content | When | Terms |

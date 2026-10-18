@@ -22,6 +22,7 @@ import type { ProjectPaths } from "../projects.ts";
 import { getSkillOrigins } from "../agent/skills-sync.ts";
 import { listProjectSkills } from "../agent/skills.ts";
 import { geoCatalogueActive, loadGeoCatalogue, runtimeNameFor, type GeoCatalogue } from "./catalogue.ts";
+import { NOTE_STYLE_SKILL } from "./note-style.ts";
 
 /** `method:<name>:<workflow>` (gaid-hub-integration): a chat started from a LocalMethod Workflow; per chat only. */
 export type ExposureMode = "all" | "catalogue" | `workflow:${string}` | `method:${string}`;
@@ -236,10 +237,14 @@ export interface ExposableSkill {
   disableModelInvocation: boolean;
 }
 
-/** Pi `skillsOverride` body: hide non-exposed skills from the model only. */
+/**
+ * Pi `skillsOverride` body: hide non-exposed skills from the model only. The
+ * research-note style skill stays offered in every chat, because the note rule
+ * of the system prompt points to it.
+ */
 export function applyExposure<T extends ExposableSkill>(skills: T[], exposure: SessionExposure | null): T[] {
   if (!exposure?.skills) return skills;
-  const visible = new Set(exposure.skills);
+  const visible = new Set([...exposure.skills, NOTE_STYLE_SKILL]);
   return skills.map((skill) =>
     visible.has(skill.name) || skill.disableModelInvocation ? skill : { ...skill, disableModelInvocation: true },
   );

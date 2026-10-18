@@ -90,3 +90,14 @@ Rules:
 The lead's instruction is one line in `GEO_INSTRUCTIONS` (`server/src/geo/instructions.ts`, `RESEARCH_NOTE_RULE`);
 after a write/edit of `연구노트/*/index.md` the tool result lists format problems (missing frontmatter or sections,
 malformed decisions, missing images) so the agent fixes them in the same turn.
+
+## Prose style
+
+Before writing or updating a note the lead reads the `gaid-note-style` skill (gaid-output-style) and polishes the
+note's prose with it: result first, no staging, inflation or empty hedges, Korean sentence rules (verbs instead of
+nominalised phrases, no translationese), with facts, numbers, links and stated confidence unchanged. The skill ships in
+`geo/skills/gaid-note-style/` (condensed from blader/humanizer, MIT, and KIGAM's Korean rules; `THIRD_PARTY_NOTICES.md`)
+and `server/src/geo/note-style.ts` copies it into each geo project's `.pi/skills/` when a chat starts or the project is
+provisioned. The copy is the project's: it follows a new shipped version only while unedited, and a deleted or
+disabled copy stays that way. `applyExposure` keeps it offered under every task selection. Chat answers follow
+`REPLY_STYLE_RULE` (a compact Attention Control rule) in the same system-prompt block.

@@ -149,8 +149,9 @@ describe("provisionCreatedProject", () => {
     const paths = ensureProjectExists("geo-created");
     expect(names(paths)).toEqual([]);
     const count = await provisionCreatedProject(paths, options(buildFixtureCatalogue()));
-    expect(count).toBe(2);
-    expect(names(paths)).toEqual(["geo-map-and-crs", "well-log-qc-quicklook"]);
+    // + the shipped research-note style skill (gaid-output-style).
+    expect(count).toBe(3);
+    expect(names(paths)).toEqual(["gaid-note-style", "geo-map-and-crs", "well-log-qc-quicklook"]);
   });
 
   it("does nothing outside geo catalogue mode", async () => {

@@ -84,6 +84,11 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   serves `GET /geo/notes`, `GET /geo/notes/:id`, `POST /geo/notes/:id/status` (contract `web/src/geo/contracts/research-notes.ts`);
   screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail with answerable decisions that prefill the
   chat, 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
+- Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
+  compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
+  shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`
+  seeds into each geo project's `.pi/skills/` (unedited copies follow new versions; deleted/disabled stay) and
+  `applyExposure` always offers. Sources and licences: `THIRD_PARTY_NOTICES.md`.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit
