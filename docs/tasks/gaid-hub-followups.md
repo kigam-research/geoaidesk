@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:57:10Z
+updated: 2026-10-18T05:08:19Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -59,7 +59,21 @@ Outside check: no outside check (app work; the re-trial is the acceptance eviden
     ~/data/geoaidesk/work/gaid-hub-followups/briefs/child-defects.md
   - gaid-hub-followups--hub-browse, agent 03077f19 — gaid-hub#3 shared-method list (folders + search) on the hub home.
     Brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/child-hub-browse.md
-- This writer: authoring rules + start defaults + hub-side receive, then the revised PU package and the re-trial.
+- This writer, done and published (e5461bd): standard authoring questions `code-use`/`trial-scale`; 레시피 defaults only
+  with a named researcher decision; `run-scale` (quick/full, quick default) when the researcher asks for a quick trial;
+  prompt rules for nested-parallel thread limits and a "결과 파일" section; "(선택)/(필수)" stripped from labels;
+  `artifact-file` check warning; trial records report `foundElsewhere`; TaskSetup binds the only fitting file; hub-side
+  receive `POST /geo/authoring/handoffs` + HandoffDialog primary "허브 초안으로 보내기" (opens `#hub/<id>`). Checks: server
+  authoring/handoff/methods tests 63+14 pass, web hub/handoff/methods/workspace 54 pass, typechecks, check-ui, copy: 0 errors.
+- Trial instance: `systemd-run --user` unit gaid-followups-app (this worktree, next dev, ports 3360/18360), GAID_HOME
+  ~/data/geoaidesk/work/gaid-hub-followups/home (config + pi-agent copied from the gaid-hub dev home), log
+  ~/data/geoaidesk/work/gaid-hub-followups/logs/dev.log. API helper ~/data/geoaidesk/work/gaid-hub-followups/tools/api.mjs.
+- Revised PU method: authoring project ap-c8f90117-4e8 (paper author-manuscript.pdf + code
+  mpm-pu-conformal-yilgarn-c03c67d.tar.gz, Qwen). Analysis 35 findings, 5 model questions + code-use + trial-scale;
+  answers in tools/answers1.json (generic-grid, thresholds user-input, model user-select, min-131-per-fold,
+  variogram both-fallback, include code, quick-and-full). Draft running.
+- Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
+  gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
 1. Authoring changes (this writer): fixed questions "code-use"/"quick-trial" (server-side, after validateAnalysis); quick
    recipe (`<slug>-quick`) when quick-trial is chosen; prompt rules: nested-parallelism thread bound (BaggingPU 11 min was

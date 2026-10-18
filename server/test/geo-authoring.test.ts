@@ -367,7 +367,10 @@ describe("GAID hub authoring", () => {
     const { store, projectId } = await fixture();
     const w = await work("authoring-revise-");
     await mkdir(join(w, "repo/scripts"), { recursive: true });
-    await writeFile(join(w, "repo/scripts/run.py"), "import skgstat\nimport joblib\nimport sklearn\n");
+    await mkdir(join(w, "repo/scripts/analysis"), { recursive: true });
+    await writeFile(join(w, "repo/scripts/run.py"), "import skgstat\nimport joblib\nimport sklearn\nfrom helper_mod import f\n");
+    // A sibling script the model left out: copied in, not declared as a PyPI distribution.
+    await writeFile(join(w, "repo/scripts/analysis/helper_mod.py"), "import numpy\n");
     execFileSync("tar", ["-czf", join(w, "code.tar.gz"), "-C", w, "repo"]);
     await addSource(store, projectId, {
       name: "code.tar.gz",
@@ -406,9 +409,21 @@ describe("GAID hub authoring", () => {
     expect(declared).toContain("scikit-gstat");
     expect(declared).toContain("scikit-learn");
     expect(declared).not.toContain("joblib");
+    expect(declared).not.toContain("helper-mod");
+    expect(d.codeFiles.map((c) => c.path)).toContain("scripts/upstream/scripts/analysis/helper_mod.py");
     await expect(runOperation(store, projectId, "revise", "op-rev-none", deps(reply(withCode)))).rejects.toMatchObject({
       status: 400,
     });
+    // A draft that wrongly declares the local module as a distribution gets it copied in and the entry dropped.
+    const declaredLocal = { ...withCode, dependencies: [{ name: "helper-mod", kind: "required", purpose: "x" }] };
+    const fixed = await runOperation(store, projectId, "revise", "op-rev-local", {
+      ...deps(reply(declaredLocal)),
+      feedback: "helper_mod는 같은 코드 안의 파일입니다.",
+    });
+    expect(fixed.outcome, JSON.stringify(fixed.validationErrors)).toBe("accepted");
+    d = (await store.read(projectId)).drafts.at(-1)!;
+    expect((d.profile.dependencies ?? []).map((x) => x.name)).not.toContain("helper-mod");
+    expect(d.codeFiles.map((c) => c.path)).toContain("scripts/upstream/scripts/analysis/helper_mod.py");
     const { codeFiles: _omit, ...withoutCode } = withCode;
     const revised = await runOperation(store, projectId, "revise", "op-rev-1", {
       ...deps(reply({ ...withoutCode, summary: "바리오그램 표본 상한을 적었습니다." })),
@@ -416,9 +431,9 @@ describe("GAID hub authoring", () => {
     });
     expect(revised.outcome, JSON.stringify(revised.validationErrors)).toBe("accepted");
     expect(revised.feedback).toBe("바리오그램이 7만 셀 전체로 45분 넘게 돌았습니다.");
-    d = (await store.read(projectId)).drafts[1];
-    expect(d.revision).toBe(2);
-    expect(d.codeFiles.map((c) => c.path)).toEqual(["scripts/upstream/scripts/run.py"]);
+    d = (await store.read(projectId)).drafts.at(-1)!;
+    expect(d.revision).toBe(3);
+    expect(d.codeFiles.map((c) => c.path)).toEqual(["scripts/upstream/scripts/run.py", "scripts/upstream/scripts/analysis/helper_mod.py"]);
   });
 
   it("follows the requested kind (skill only or Workflow) and treats a single script as code", async () => {
