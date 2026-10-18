@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T11:47:29Z
+status: done
+updated: 2026-10-18T11:47:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"81c1eacb-84d7-460a-b61b-4e2be6067a45","pid":160287,"provider":"claude","session":"f33cd217-a4a1-4543-b115-693a0e6a8e72","start":"21075456","token":"1535f0d6ef859e6718f8fef67ae04e89df7f05e795203b4fd9ce36f9f83891fa"}
 branch: task/gaid-system-ui-followups
 target: main
@@ -47,7 +47,9 @@ Done: both fixed per docs/design/ui-guide.md and the copy rules, checked in the 
 - Dev instance `gaid-suf-dev` stopped; its data stays in `~/data/geoaidesk/work/gaid-system-ui-followups/`.
 
 ## Next steps
-1. task finish.
+<!-- task:closed -->
+Closed 2026-10-18T11:47:38Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: two small, tightly coupled UI fixes; done by the writer alone, no child units.
