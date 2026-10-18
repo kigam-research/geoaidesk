@@ -194,7 +194,7 @@
     "implementation": {
       "descriptive": "분석 지침만 · 실행 코드 없음",
       "implemented": "실행 코드 포함",
-      "descriptiveHint": "시험하면 AI agent가 이 지침에 따라 분석 코드를 새로 씁니다."
+      "descriptiveHint": "시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다."
     }
   },
   "trial": {

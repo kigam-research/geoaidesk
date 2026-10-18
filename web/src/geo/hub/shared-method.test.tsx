@@ -20,7 +20,7 @@ describe("shared method evidence labels", () => {
   it("explains instructions-only and identifies trial starts, not completed analyses", () => {
     show("descriptive");
     expect(screen.getByText("분석 지침만 · 실행 코드 없음")).toBeTruthy();
-    expect(screen.getByText("시험하면 AI agent가 이 지침에 따라 분석 코드를 새로 씁니다.")).toBeTruthy();
+    expect(screen.getByText("시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다.")).toBeTruthy();
     expect(screen.getByText("GAID 시험 시작 1회 (검토 결과 아님)")).toBeTruthy();
     expect(screen.getByRole("button", { name: "내 프로젝트에서 시험" })).toBeTruthy();
   });
@@ -28,6 +28,6 @@ describe("shared method evidence labels", () => {
   it("shows supplied code availability without the code-writing hint", () => {
     show("implemented");
     expect(screen.getByText("실행 코드 포함")).toBeTruthy();
-    expect(screen.queryByText("시험하면 AI agent가 이 지침에 따라 분석 코드를 새로 씁니다.")).toBeNull();
+    expect(screen.queryByText("시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다.")).toBeNull();
   });
 });

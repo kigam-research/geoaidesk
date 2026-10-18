@@ -277,7 +277,7 @@
     "star": "Star",
     "starred": "Starred",
     "try": "Try in my project",
-    "trials": "{count} GAID trials started (not a review)",
+    "trials": "{count, plural, one {# GAID trial started} other {# GAID trials started}} (not a review)",
     "comments": "{count, plural, one {# comment} other {# comments}}",
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
     "comment": "Add comment",

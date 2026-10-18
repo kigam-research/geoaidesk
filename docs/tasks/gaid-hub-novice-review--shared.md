@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:12:52Z
+updated: 2026-10-18T08:13:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b4c674e6-3330-4284-8f14-ab1e619c6fe4","pid":1905277,"provider":"codex","session":"01a14e0c-9ac1-7a22-84f7-fe396a47cfb5","start":"19875020","token":"c8527c7072114ae3c43b788a5371371c2e5e7835f8bb261a59ddaafbccd0b63b"}
 branch: task/gaid-hub-novice-review--shared
 target: task/gaid-hub-novice-review
@@ -40,7 +40,7 @@ instructions only or includes run code, and (3) is not misled by trial counts.
    are not there yet when you start, exactly with this text):
    - `draft.implementation.descriptive`: ko "분석 지침만 · 실행 코드 없음", en "Instructions only · no run code"
    - `draft.implementation.implemented`: ko "실행 코드 포함", en "Includes run code"
-   - `draft.implementation.descriptiveHint`: ko "시험하면 AI agent가 이 지침에 따라 분석 코드를 새로 씁니다.",
+   - `draft.implementation.descriptiveHint`: ko "시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다.",
      en "When you try it, the AI agent writes the analysis code from these instructions."
    Optionally also as a small badge on browse cards (UI guide: at most 3 badges per row).
 3. Trial scope: the entry shows "GAID 시험 기록 {count}회 (검토 결과 아님)"; the user's input-only check counted as a
@@ -67,6 +67,7 @@ Record all of it in your task document. Server tests: run with `env -u VITEST_MA
 tests flake under load. raw.githubusercontent.com is blocked on this network.
 
 ## Current state
+- Shared hub search, code-availability labels and started-trial wording are implemented. Server focused tests pass (30/30); browse/method web tests pass (6/6). New-project creation wiring awaits the parent's saved NewProject export for integration/QA.
 - Resumed the assigned writer in the original printed worktree; read the task, project rules, UI guide and round-1 evidence.
 - Implemented snapshot-grounded multiword commodity-alias search, latest-snapshot implementation state and empty-search hint; verification pending.
 - Codegraph has no index for this exact worktree; used native reads as instructed.
@@ -77,6 +78,18 @@ tests flake under load. raw.githubusercontent.com is blocked on this network.
 - Extended integration fixture initially omitted the skill-description trigger, causing the existing format gate to reject it. Preserved the original trigger and appended Ni text. The next run exposed an obsolete phrase-search expectation: “이 연구원” now matches words across fields. Used a unique author surname and verified the intended AND-word semantics in the unit test.
 - Initial isolated browser API calls failed CORS because its backend lacked KADY_FRONTEND_PORT=3380; restarted only that QA backend with its matching UI port.
 ## Notes and decisions
+- UI rules: P1/B1 (one install task; secondary inline project creation), P3/W5/G2 (implementation is plain text beside trial scope, no extra badge row), F3 (empty result retains reset and adds one search hint), W4 (all new strings within 140/280 chars), R2 (creation failure detail remains collapsed), A1 (labeled name and project controls).
+- Checks so far: backend typecheck passed; server focused tests passed 30/30; browse/method web tests passed 6/6; copy validator passed with 0 errors / 58 warnings (parent subsequently changed descriptiveHint to “스킬 지침” to remove its added warning); UI validator passed 0 errors / 102 existing accepted debt.
+
+### Changed strings owned by this child
+| Id | Korean before → after | English before → after |
+| --- | --- | --- |
+| hub.home.browse.search.hint | absent → 원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다. | absent → You can also search by element symbol (Ni) or method name (PU). |
+| hub.shared.trials | GAID 시험 기록 {count}회 (검토 결과 아님) → GAID 시험 시작 {count}회 (검토 결과 아님) | {count, plural, one {# GAID trial record} other {# GAID trial records}} (not a review) → {count, plural, one {# GAID trial started} other {# GAID trials started}} (not a review) |
+| hub.draft.implementation.descriptive | absent → 분석 지침만 · 실행 코드 없음 | absent → Instructions only · no run code |
+| hub.draft.implementation.implemented | absent → 실행 코드 포함 | absent → Includes run code |
+| hub.draft.implementation.descriptiveHint | absent → 시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다. | absent → When you try it, the AI agent writes the analysis code from these instructions. |
+
 - Parent expanded scope in this tab: add new-project creation to the shared install dialog using the existing POST /projects client; reuse the parent's NewProject component from draft-step.tsx and useProjects().create, then select it for installation (P1/B1). Parent owns trial.newProject.* strings; no new shared creation strings remain. Parent confirms the preview caller is hub-screen.tsx and already supplies implementation there.
 - Sequential plan: settle search/API semantics → update shared entry/empty state → focused tests → isolated UI QA → declared checks and finish. Owned files follow the starter contract; no independent package warrants a reader, and nested child units are not supported.
 - Trial scope uses the explicitly allowed “started trials” wording. Current observation reads whole provenance logs; no cheap bounded completeness aggregate exists. Do not introduce provenance scans into list/detail requests for a count.
