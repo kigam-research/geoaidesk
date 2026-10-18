@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T05:18:11Z
+status: active
+updated: 2026-10-18T05:20:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -77,7 +77,7 @@ Network note: the KIGAM network blocks raw.githubusercontent.com; use `gh api ..
 - Finish with `task finish`. No report of your own.
 
 ## Current state
-All six code changes are implemented. Backend full suite: 1,873 passed / 11 skipped. Corrected frontend full suite (4 workers): 158 files / 1,053 tests passed, excluding only parent-owned old hub-handoff.test.tsx; its fix is published in parent e5461bd42dd3 for task finish integration. Corrected distribution suite: 48 passed / 1 optional test skipped. Job 3 exited 0: launchers, copy/UI checks, all required environment imports in helper and fresh project, production clean start/stop/restart all passed. No deployment or parent integration yet.
+All six changes are implemented. The first task finish merged parent e5461bd42dd3 and passed the full scripts/check at eeca6a6: backend 1,877 passed / 11 skipped, frontend 159 files / 1,065 tests passed (including the parent handoff tests), all distribution/environment/production checks passed. Corrected distribution suite: 48 passed / 1 optional test skipped. Job 3 exited 0: launchers, copy/UI checks, all required environment imports in helper and fresh project, production clean start/stop/restart all passed. No deployment or child publication/integration yet. Parent then advanced during finish, so a final frozen-target verification remains.
 
 Verification ledger: job 1 scripts/check exited 1 (backend passed; old handoff tests plus now-fixed catalogue-off regression and load-sensitive map timeout). Job 2 exited 1 only at the expected immutable pre-fix boundary owner; its full frontend suite passed. Job 3 exited 0 on corrected boundaries and all remaining stages. Failed receipts are retained as evidence, not treated as current unfixed failures.
 
@@ -92,7 +92,7 @@ Focused verification so far: server workspace, guard hook/classifier and oversiz
 
 ### Korean section for the parent report (humanizer file-mode reviewed)
 
-백엔드 전체 시험 1,873개와 프런트엔드 시험 1,053개가 통과했습니다. 프런트엔드에서는 부모 작업이 고친 기존 인계 화면 시험만 제외했으며, 수정본은 통합 때 반영합니다. 배포 관련 시험은 48개가 통과했고 선택 시험 1개를 건너뛰었습니다. 보조 환경과 새 프로젝트에서 필수 모듈을 불러왔고, 프로덕션 환경의 첫 실행·종료·재시작 시험도 통과했습니다. 운영 서비스에는 배포하지 않았습니다.
+부모 작업의 인계 화면 수정을 합친 코드에서 백엔드 시험 1,877개와 프런트엔드 시험 1,065개가 통과했습니다. 인계 화면 시험도 포함했습니다. 배포 관련 시험은 48개가 통과했고 선택 시험 1개를 건너뛰었습니다. 보조 환경과 새 프로젝트에서 필수 모듈을 불러왔고, 프로덕션 환경의 첫 실행·종료·재시작 시험도 통과했습니다. 운영 서비스에는 배포하지 않았습니다.
 
 장시간 계산 중인 채팅에 경과시간을 표시했습니다. 설치한 방법 중 파일 형식과 맞는 방법을 먼저 추천하며, 추천을 누르면 해당 방법의 작업 설정에 현재 파일이 연결됩니다. 8 MB를 넘는 CSV는 기존 크기 제한 안내를 유지하고, 파일이 바뀌지 않았으면 본문을 다시 받지 않습니다. 실제 화면에서는 첫 요청의 413 이후 304 응답을 확인했습니다.
 
@@ -121,6 +121,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 Closed 2026-10-18T05:18:11Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish passed full scripts/check at eeca6a6, but the parent advanced to 1a59b39 while checks ran; finish merged it and began another full check at 56f4c42. Parent had already advanced again to a434b899/90a7c3f8 before agreeing to freeze publication. Stopped only the verified own obsolete check process tree with SIGTERM (exit -15) and will rerun task finish once against frozen 90a7c3f8. No source regression or test failure was involved.
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
 - First full check: workspace.test.tsx correctly caught catalogue-only suggestions appearing when catalogue is off. Fixed FileActions to keep only method-exposure suggestions without an active catalogue; installed methods remain available.
 - First full check: map viewer first test timed out waiting for the viewport table during highly parallel frontend execution. No map code changed. All 8 map viewer tests passed in the isolated rerun; the original failure was consistent with resource contention. Full frontend rerun with VITEST_MAX_WORKERS=4 passed all 1,053 non-parent tests; no map source/test change was needed.
