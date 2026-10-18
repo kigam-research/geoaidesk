@@ -135,7 +135,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
         <p>{t("hubHandoff.attach")}</p>
         <a href={authoringUrl(site)} target="_blank" rel="noopener noreferrer" className="text-primary underline">{t("hubHandoff.startDraft")}</a>
       </div>}
-      <div className="sticky bottom-0 -mx-6 -mb-6 flex flex-wrap justify-end gap-2 border-t bg-background px-6 py-3">
+      <div className="sticky -bottom-6 -mx-6 -mb-6 flex flex-wrap justify-end gap-2 border-t bg-background px-6 py-3">
         <Button variant="outline" disabled={busy} onClick={onClose}>{t("hubHandoff.close")}</Button>
         {site && canSendDirect(site) && <Button variant="outline" disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download(true)}>{t("hubHandoff.sendDirect")}</Button>}
         <Button variant="outline" disabled={loading || busy || isStreaming || !preview || size > 20 * 1024 * 1024} onClick={() => void download()}>{t("hubHandoff.download")}</Button>
