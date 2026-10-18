@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T10:35:24Z
+status: done
+updated: 2026-10-18T10:35:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -48,7 +48,7 @@ Outside check: no outside check (app/system design work).
 - Not done here: the user's review app (ports 3000/18000) is not updated; the hub handles rollout after merge.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T10:29:30Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T10:35:34Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First finish: merge of main conflicted in geo/integration-boundaries.json (gaid-system-ui appended to the same two seams); kept both. Second finish: 4 server export tests failed because I changed `notebook.export.title` (en) to "Work record"; the server uses it as its default English export title for upstream callers. Reverted that string.
