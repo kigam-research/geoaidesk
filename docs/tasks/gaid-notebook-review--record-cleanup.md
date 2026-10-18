@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T08:57:46Z
+status: active
+updated: 2026-10-18T09:06:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd14a2b1-08ca-4ec5-b9a5-c36ac0b3decd","pid":2986331,"provider":"codex","session":"01a14e34-3599-7921-a909-ef8c86596d17","start":"20134566","token":"f8920c52ddfb78cfda8aa61a33610fd220a79d3b368da7c773080f68204acb5b"}
 branch: task/gaid-notebook-review--record-cleanup
 target: task/gaid-notebook-review
@@ -53,12 +53,13 @@ Evidence in your task document: files changed, check commands and results, and e
 and English before → after (copy rule). Then `task finish`.
 
 ## Current state
-Implemented locale-aware work-record export/print labels, collapsed copyable execution/source technical disclosures, GAID session-export branding, a Methods draft language rule and localized proposal constraints. Authored titles, bodies, code and machine JSON keys/enum values are preserved. Web/server typechecks passed; focused web tests: 7 files/98 tests, server tests: 5 files/64 tests. Final print/helper recheck: 3 files/31 tests. Copy validation: 0 errors/62 warnings (scientific-limit wording retained). UI validation: 0 errors/102 existing accepted debt. Runtime tsx smoke produced the Korean work-record heading. No deployment performed; parent integration/screenshots/full scripts/check remain.
+Implemented locale-aware work-record export/print labels, collapsed copyable execution/source technical disclosures, GAID session-export branding, a Methods draft language rule and localized proposal constraints. Authored titles, bodies, code and machine JSON keys/enum values are preserved. Web/server typechecks passed; focused web tests: 7 files/98 tests, server tests: 5 files/64 tests. Final print/helper recheck: 3 files/31 tests. Copy validation: 0 errors/62 warnings (scientific-limit wording retained). UI validation: 0 errors/102 existing accepted debt. Runtime tsx smoke produced the Korean work-record heading. No deployment performed. First task finish ran full scripts/check: backend 1,884 passed/11 skipped, then three unrelated frontend timeout failures. The affected files pass with maxWorkers=2 (2 files/9 tests). Retrying finish with the installed Vitest-supported VITEST_MAX_WORKERS=4 setting; parent integration/screenshots remain.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-18T08:57:46Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish f383d61 failed in full frontend tests: file-preview-panel (2 tests) and csv-viewer (1 test) timed out under default parallelism while another child was also checking. No source edits to those files. Direct recheck with --maxWorkers=2 passed 2 files/9 tests in 5.58 seconds. Installed Vitest reads VITEST_MAX_WORKERS (coverage chunk configuration), so retry uses a temporary 4-worker cap. Full log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-qp16f0bm.log; output: ~/data/geoaidesk/work/checks/f383d6138447-20261018T085746.484320Z.
 - Initial typechecks could not start because dependencies were absent. npm ci completed in web and server without changing lockfiles.
 - A task job request for dependency installation did not launch: the CLI required a clean saved source. No receipt/job was created; routine dependency setup then ran directly (13–18 seconds).
 - First source checks found an over-broad label substitution in a local variable and web imports with .ts extensions; fixed both. Restored the existing English challenge/context labels after a regression assertion detected the difference.
@@ -291,4 +292,4 @@ All rows below are new catalogue ids (∅ means no previous catalogue entry). Ex
 - PASS: git diff --check.
 - PASS: direct tsx runtime import/render of notebookToMarkdown([], {lang: "ko"}) — Korean work-record heading; validates cross-root JSON/ICU imports outside Vitest.
 
-Logs: ~/data/geoaidesk/work/gaid-notebook-review--record-cleanup/checks/{web,server,copy}.log. Full scripts/check and integrated screenshots remain with the parent by the child contract.
+Logs: ~/data/geoaidesk/work/gaid-notebook-review--record-cleanup/checks/{web,server,copy}.log. The task CLI automatically ran full scripts/check despite the child’s focused-check contract; its first frontend run hit unrelated timeouts, as recorded above. Retry uses VITEST_MAX_WORKERS=4. Integrated screenshots remain with the parent.
