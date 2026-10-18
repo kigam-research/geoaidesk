@@ -1,6 +1,7 @@
 import path from "node:path";
 import type { ExtensionFactory } from "@earendil-works/pi-coding-agent";
 import type { ProjectPaths } from "../../projects.ts";
+import { apiRelative } from "../../sandbox-fs.ts";
 import { RESEARCH_NOTES_DIR, RESEARCH_NOTE_FILE, RESEARCH_NOTE_ID } from "../../../../web/src/geo/contracts/research-notes.ts";
 import { getResearchNote, recordResearchNoteSession, safeNoteId } from "./store.ts";
 
@@ -12,8 +13,7 @@ export function makeResearchNoteExtension(paths: ProjectPaths, sessionId: string
       const target = (event.input as { path?: unknown } | null)?.path;
       if (typeof target !== "string") return;
       try {
-        const relative = path.relative(path.resolve(paths.sandbox), path.resolve(paths.sandbox, target.replace(/^@/, "")))
-          .split(path.sep).join("/").normalize("NFC");
+        const relative = apiRelative(path.resolve(paths.sandbox), path.resolve(paths.sandbox, target.replace(/^@/, ""))).normalize("NFC");
         const [dir, id, file, extra] = relative.split("/");
         if (dir !== RESEARCH_NOTES_DIR || !id || !safeNoteId(id) || file !== RESEARCH_NOTE_FILE || extra !== undefined) return;
         recordResearchNoteSession(paths, id, sessionId);

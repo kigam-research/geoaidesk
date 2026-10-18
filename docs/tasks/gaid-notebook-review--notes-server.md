@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T08:57:40Z
+status: active
+updated: 2026-10-18T09:06:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03bb8c52-5554-4f2c-8eac-ff609606e9cb","pid":2981080,"provider":"codex","session":"01a14e33-e7dc-7f11-896d-cc8d6a1c24a8","start":"20132575","token":"9229f706ac6aec69b0c3a4f13b440d4152f6c305c5f8571194c2420dbb8d0540"}
 branch: task/gaid-notebook-review--notes-server
 target: task/gaid-notebook-review
@@ -67,12 +67,13 @@ Evidence in your task document: files changed, test commands and results, the fi
 length, any contract deviation. Then `task finish`.
 
 ## Current state
-Implemented the server-side research notes: pure bilingual parser, bounded NFC/NFD-aware sandbox store, byte-preserving atomic status edits, lead write/edit format checks and session association, project-scoped list/read/status routes, and the exact requested agent instruction. No shared contract or web/UI changes. Hub handoff needs no source change: a real ProvenanceRecorder test verifies that lead-written notes and figures appear in preview.files. Final backend typecheck and 69/69 tests across 8 affected suites passed (23 note tests). RESEARCH_NOTE_RULE is the supplied 675-character text, adding 678 prompt characters. POST status returns ResearchNoteSummary directly. Parent integration and deployment have not happened; task finish runs the declared full check before publishing this child.
+Implemented the server-side research notes: pure bilingual parser, bounded NFC/NFD-aware sandbox store, byte-preserving atomic status edits, lead write/edit format checks and session association, project-scoped list/read/status routes, and the exact requested agent instruction. No shared contract or web/UI changes. Hub handoff needs no source change: a real ProvenanceRecorder test verifies that lead-written notes and figures appear in preview.files. After fixing the full-check Windows path guard, final backend typecheck and 89/89 tests across 9 affected suites passed (23 note tests). RESEARCH_NOTE_RULE is the supplied 675-character text, adding 678 prompt characters. POST status returns ResearchNoteSummary directly. Parent integration and deployment have not happened; task finish reruns the declared full check before publishing this child.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-18T08:57:40Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+First task finish full check failed on the existing win-portability source guard: direct path.relative calls in the new store/extension bypassed the repository choke point (even though they manually normalised separators). Replaced them with sandbox-fs apiRelative/isWithin; no guard weakening or upstream test edits. First full backend result: 1 failed / 1898 passed / 15 skipped, with the new notes tests passing. Rerun task finish in place; do not resume or task save between finishes.
 Initial tests exposed an NFC/NFD sibling-root lookup failure; path resolution now explores both actual spellings and list deduplicates NFC ids. Test fixtures initially used the wrong ProvenanceRecorder API, a string instead of Pi content blocks, and an invalid installed-method identity; corrected against the existing sources. A 2 MiB Buffer deep-equality assertion exceeded Vitest's timeout; Buffer.equals verifies the same bytes without per-element matcher overhead. No unresolved implementation failure remains.
 ## Notes and decisions
 Sequential decisions: preserve the IO-free contract and file-master behaviour; settle parser output before store/routes. Owned files: server/src/geo/notes/*, routes/notes.ts, routes.ts, session.ts, instructions.ts, server/test/geo-notes.test.ts and append-only boundary entries. Integration order: parser → store → hook/routes/instructions → tests. This child has no independent writer packages; tightly coupled implementation stays with this writer, with no nested child units.
@@ -99,9 +100,9 @@ RESEARCH_NOTE_RULE is **675 JavaScript characters**; the one bullet adds **678 c
 - `cd server && npm ci`: passed; no dependency or lockfile edits.
 - `cd server && npm run typecheck`: final rerun passed.
 - `cd server && npx vitest run test/geo-notes.test.ts`: 23/23 passed, including bilingual parser/malformed decisions, list/read/status and limits, NFD, supersession, corrupt-map preservation, installed/uninstalled method attribution, hook notices and session mapping, project routes and actual provenance-to-hub preview.
-- Affected regression command: `cd server && npx vitest run test/geo-notes.test.ts test/geo-context.test.ts test/geo-reply-language.test.ts test/geo-markdown-images.test.ts test/geo-hub-handoff.test.ts test/geo-methods.test.ts test/geo-read-hints.test.ts test/session-registry.test.ts`. Final rerun: 8/8 files, 69/69 tests passed (23.67 s).
+- Affected regression command after the portability fix: `cd server && npx vitest run test/geo-notes.test.ts test/win-portability.test.ts test/geo-context.test.ts test/geo-reply-language.test.ts test/geo-markdown-images.test.ts test/geo-hub-handoff.test.ts test/geo-methods.test.ts test/geo-read-hints.test.ts test/session-registry.test.ts`. Final rerun: 9/9 files, 89/89 tests passed (49.70 s). Backend typecheck also passed after that fix.
 - `git diff --check` and parsing geo/integration-boundaries.json: passed. Final source/test files reviewed; no out-of-scope edits.
-- Full `scripts/check`: not run manually; task finish executes the declared check and stores its result in the CLI receipt. Do not infer full-suite success from the focused tests above.
+- Full `scripts/check` via first task finish: failed only the existing direct-path.relative source guard (1898 backend tests passed, 15 skipped). Fixed with apiRelative/isWithin and verified the guard in the focused command above. The rerun task finish executes the full declared check and stores its result in the CLI receipt; do not infer full-suite success from the focused tests.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type { ProjectPaths } from "../../projects.ts";
+import { apiRelative, isWithin } from "../../sandbox-fs.ts";
 import { geoStateDir } from "../context.ts";
 import { installedMethods } from "../methods/local-methods.ts";
 import { trialHandoffRef } from "../methods/trials.ts";
@@ -24,10 +25,7 @@ export function safeNoteId(value: string): boolean {
   return !!value && value.length <= 255 && !value.startsWith(".") && !/[\\/\x00-\x1f\x7f:]/.test(value);
 }
 
-const inside = (root: string, target: string) => {
-  const relative = path.relative(root, target);
-  return !path.isAbsolute(relative) && relative !== ".." && !relative.startsWith(`..${path.sep}`);
-};
+const inside = isWithin;
 
 /** Resolve each actual on-disk segment, including NFD names written by macOS. */
 function actualPaths(root: string, relative: string): string[] {
@@ -143,7 +141,7 @@ function readOne(paths: ProjectPaths, id: string, map: SessionMap, methods: Retu
       if (/^(?:[a-z][a-z0-9+.-]*:|\/|\\)/i.test(target)) return null;
       const decoded = decodeURIComponent(target.split(/[?#]/)[0]).normalize("NFC");
       const abs = sandboxFile(paths, `${base}${decoded}`);
-      return path.relative(fs.realpathSync(paths.sandbox), abs).split(path.sep).join("/").normalize("NFC");
+      return apiRelative(fs.realpathSync(paths.sandbox), abs).normalize("NFC");
     } catch { return null; }
   };
   const cover = parsed.cover ? resolveImage(parsed.cover) : null;
