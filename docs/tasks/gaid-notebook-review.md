@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T07:41:26Z
+updated: 2026-10-18T07:49:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -34,9 +34,19 @@ Scope confirmed with the user:
 Outside check: no outside check (app/system design work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Phase 1 (diagnosis) done, no code changes. Report `reports/2026-10-18-gaid-notebook-review/index.md` (figures: current
+  notebook screenshot from the review app, static HTML mockup of option 가). Evidence: native Explore surveys of the
+  notebook code and the vault (findings with file:line in report appendix A); review app `gaid-review` (~/.geoaidesk,
+  project `default`, 2 notebook sessions, 5 entries); screenshots/mockup source in `~/data/geoaidesk/work/gaid-notebook-review/`.
+- Key findings: notebook = per-chat hidden JSONL agent log (`.kady/notebook/`), no topic/conclusion/decision/status, user can
+  only pin/comment/note (note box hidden in default all-chats scope), no visible Markdown, exports/methods draft in English,
+  R1 violations (command lines, session/tool-call ids), no link to GAID methods/trials/recipes/hub handoff (handoff skips dot
+  dirs). The agent already writes a reader-facing report into `results/*.md` that the notebook treats as just an artifact.
+- Waiting for the user's choice (report §6): direction 가) research-note-first / 나) tidy + links / 다) minimal; and, for 가),
+  when notes are written.
 ## Next steps
-1. (the next session's first action)
+1. User answers report §6 in this tab. Then record the answer here, remove/adjust the matching Open items, and plan Phase 2
+   (work packages, owned files, integration order) for the agreed scope only.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -45,10 +55,13 @@ Outside check: no outside check (app/system design work).
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 연구노트를 어떤 방향으로 바꿀지 — 가) 정리 노트 중심: 분석마다 결과부터 쓰는 노트를 프로젝트 `연구노트` 폴더에 두고 지금 기록은 근거로 내림 — 나) 지금 기록을 정리하고 연결 보강 — 다) 최소 수정(내부 정보 숨김, 한국어 내보내기) — 권장: 가) 작업 흐름만 따라가는 문제와 연계 부족을 둘 다 고치고 Obsidian 보고서와 같은 순서로 읽힘 — 막힌 일: 2단계 구현 — 조건: 없음 — 근거: reports/2026-10-18-gaid-notebook-review#6. 결정할 일
+- [결정] 가)일 때 정리 노트를 언제 쓸지 — 가) 분석 하나가 끝나면 AI agent가 같은 대화에서 쓰고 이어지는 질문이면 고침, "노트 정리"로 다시 쓰게 할 수 있음 — 나) 연구자가 "노트 정리"를 누를 때만 — 권장: 가) 연구자가 잊어도 기록이 남고 모델을 한 번 더 부르지 않음 — 막힌 일: 2단계 AI agent 지시 — 조건: 1번에서 가) 선택 — 근거: reports/2026-10-18-gaid-notebook-review#6. 결정할 일
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-18-gaid-notebook-review/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
