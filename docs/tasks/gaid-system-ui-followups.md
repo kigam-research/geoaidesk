@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T11:41:10Z
+updated: 2026-10-18T11:47:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"81c1eacb-84d7-460a-b61b-4e2be6067a45","pid":160287,"provider":"claude","session":"f33cd217-a4a1-4543-b115-693a0e6a8e72","start":"21075456","token":"1535f0d6ef859e6718f8fef67ae04e89df7f05e795203b4fd9ce36f9f83891fa"}
 branch: task/gaid-system-ui-followups
 target: main
@@ -43,11 +43,11 @@ Done: both fixed per docs/design/ui-guide.md and the copy rules, checked in the 
   2. Hub method badges name their scope (`허브 초안`; tooltips "현재 프로젝트…"); `사용자 자료 필요` removed; the
      Workflow card in the method detail drops its duplicate badge row.
 - Tests: web vitest for file-preview-panel, methods, workspace pass; copy validator 0 errors (61 warnings, as main);
-  check-ui 0 errors; web tsc clean. Full `scripts/check`: see Notes when it finishes.
-- Dev instance: unit `gaid-suf-dev` (`~/data/geoaidesk/work/gaid-system-ui-followups/bin/dev.sh`, ports 3390/18390).
-  Stop it before finish.
+  check-ui 0 errors; web tsc clean. Full `scripts/check` passed (exit 0, 2026-10-18).
+- Dev instance `gaid-suf-dev` stopped; its data stays in `~/data/geoaidesk/work/gaid-system-ui-followups/`.
+
 ## Next steps
-1. Confirm scripts/check, stop `gaid-suf-dev`, review copy, save, finish.
+1. task finish.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: two small, tightly coupled UI fixes; done by the writer alone, no child units.

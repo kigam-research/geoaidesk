@@ -95,7 +95,7 @@ supersedes:
 | 시험 | `web/src/components/file-preview-panel.test.tsx`, `web/src/geo/methods/methods.test.tsx` |
 | 실제 앱 | PC74 `~/data/geoaidesk/work/gaid-system-ui-followups/bin/dev.sh`(개발 서버, GAID_HOME은 novice-review 자료 사본); 원본 스크린숏 `~/data/geoaidesk/work/gaid-system-ui-followups/playwright/` |
 | 검토 근거 | `~/data/geoaidesk/work/gaid-hub-novice-review/novice3/summary.md` 지적 2, 7; `shots/16-csv-preview-error.png`, `shots/09-start-settings.png` |
-| 전체 검사 | `scripts/check`, 로그 `~/data/geoaidesk/work/gaid-system-ui-followups/logs/check.log` |
+| 전체 검사 | `scripts/check` 통과(2026-10-18, 백엔드 1,929개·웹 1,093개 시험, GAID 검사 포함), 로그 `~/data/geoaidesk/work/gaid-system-ui-followups/logs/check.log` |
 
 화면 가이드 규칙: F4(오류·한도 화면이 할 수 있는 다음 동작을 알림, 다시 시도 없음), F3/B1(주 동작 하나: 파일 내려받기), X2/X4(기본 8열, 표 위 상태 한 줄), P3(표본 외 정보 없음), G2/W5(행 배지 3개 이하, 배지마다 설명), W6(같은 상태를 한 화면에 두 번 쓰지 않음), R1(내부 이름 없음). 어긴 규칙: 없음.
 
