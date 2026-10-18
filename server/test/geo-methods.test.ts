@@ -9,7 +9,7 @@ import { projectSkillRoot } from "../src/agent/skills.ts";
 import { clearStaging, cacheKeyForSource } from "../src/agent/skills-fetch.ts";
 import { parseMethodFile } from "../src/geo/methods/method-file.ts";
 import { listLocalMethods, parseMethodExposure } from "../src/geo/methods/local-methods.ts";
-import { assessMethodTrial, getMethodTrial, listMethodTrials, recordMethodTrial } from "../src/geo/methods/trials.ts";
+import { assessMethodTrial, getMethodTrial, listMethodTrials, matchArtifact, recordMethodTrial } from "../src/geo/methods/trials.ts";
 import type { ProjectPaths } from "../src/projects.ts";
 import { exposureModeIssue, resolveSessionExposure, runtimeSupportSkillNames } from "../src/geo/context.ts";
 import type { GeoCatalogue } from "../src/geo/catalogue.ts";
@@ -149,6 +149,14 @@ describe("hub draft install → LocalMethod", () => {
 });
 
 describe("trials", () => {
+  it("matches declared outputs exactly, else by file name in another folder", () => {
+    const files = ["results/zone_map.tif", "figures/capture_curve.png", "outputs/run_log.md"];
+    expect(matchArtifact(["outputs/run_log.md"], files)).toEqual({ found: ["outputs/run_log.md"] });
+    expect(matchArtifact(["outputs/zone_map.tif"], files)).toEqual({ found: [], foundElsewhere: ["results/zone_map.tif"] });
+    expect(matchArtifact(["capture_curve.png"], files)).toEqual({ found: ["figures/capture_curve.png"] });
+    expect(matchArtifact(["outputs/summary.csv"], files)).toEqual({ found: [] });
+  });
+
   it("pins the method revision at session start and observes outputs from provenance only", async () => {
     await install({ archive: pkg() });
     expect(recordMethodTrial(paths, "s1", "catalogue")).toBeNull();

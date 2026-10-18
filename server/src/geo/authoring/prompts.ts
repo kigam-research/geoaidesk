@@ -1,6 +1,6 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
-export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-16.2";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-16.3";
+export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-18.1";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-18.1";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
 notes or an analysis handoff). Together you turn a method from these sources into a reusable agent skill and, when useful,
@@ -38,8 +38,10 @@ Task: read the sources and report
      choosing it means}. The screen always adds a free-text "기타" field, so do not add an "other" option;
    - recommended: the id of the option you suggest, with recommendedWhy: one short sentence citing the source or the
      researcher's goal. A recommendation is only a suggestion and is never stored as an answer.
-   Use answerType "text" only when no sensible options exist. Use stable kebab-case keys, e.g. "scope", "code-path",
-   "target-data", "decision-use". Do not repeat a key listed under "Already decided".
+   Use answerType "text" only when no sensible options exist. Use stable kebab-case keys, e.g. "scope",
+   "target-data", "decision-use". Do not repeat a key listed under "Already decided". The hub itself always asks whether
+   to include the supplied code ("code-use") and whether to add a reduced quick first-trial setting ("trial-scale"); do
+   not ask those two.
 
 JSON format:
 {
@@ -77,12 +79,23 @@ exist); explain how to run them with exactly those paths, writing every file pat
 path. Include every local module the included code imports. Python packages the code imports are declared by the server. Otherwise the skill is descriptive and must say that computation code
 is not included.
 A 레시피 choice is answered only when a researcher's decision answers that exact choice; a paper value or your recommendation
-is not an answer. If the researcher said the user must decide a value, keep that choice unresolved and show the paper value as
-reference text in the Workflow (label/why) instead.
+is not an answer. Write each answered choice as {"value": "<option id>", "decision": "<decision key>"} naming the decision
+that answers it; the server drops a value without such a decision and leaves the choice for the researcher to set at the
+start ("작업 중 결정"). If the researcher said the user must decide a value, keep that choice unresolved and show the paper
+value as reference text in the Workflow (label/why) instead.
+When the researcher chose a reduced first-trial setting (decision "trial-scale" = "quick-and-full"), add the Workflow choice
+"run-scale" with options {"id": "quick", "label": "빠른 시험"} and {"id": "full", "label": "전체 설정"} (the server sets
+quick as the start default), and give SKILL.md a section "빠른 시험 설정" listing every reduced setting next to its full
+value (for example variogram sample size and lags, number of folds actually run, bootstrap rounds, trees, skipped searches,
+thread limits) and the expected time, so the quick run finishes in about 10 minutes on a normal PC for data like the
+researcher's; say that quick results only check the flow and are not for interpretation.
 Keep SKILL.md under 400 lines; put long detail into references/*.md files.
 
 Every expected artifact lists the relative output file name(s) the method writes (files), using the same names the
-SKILL.md instructions tell the agent to write, so GAID can match produced files to it.
+SKILL.md instructions tell the agent to write, so GAID can match produced files to it. SKILL.md has a section "결과 파일"
+that lists exactly these paths and tells the agent to write the final results there (when included code writes elsewhere,
+the instructions say to copy or save the final files to these paths); do not invent folder names the instructions do not
+use.
 
 Method practice rules:
 - A step whose cost grows with data size (pairwise distances, variograms, nested searches) states the bound the source code or
@@ -90,6 +103,9 @@ Method practice rules:
   when the data is much larger than in the study.
 - Dependencies that the Workflow's environmentProfile does not install need, in SKILL.md, the exact PyPI distribution name and
   an install command (for example "uv run --with scikit-gstat python ..."), plus a fallback when installation is not possible.
+- Nested parallel work (a bagging or ensemble wrapper, or parallel cross-validation, around a model that itself uses all
+  cores, such as XGBoost n_jobs=-1 inside BaggingPU) oversubscribes the CPU and can run ten times slower: SKILL.md sets the
+  inner model to one thread (n_jobs=1 / nthread=1) or bounds the outer workers, and says so where that step runs.
 - Labels never carry required/optional markers such as "(선택)" or "(필수)"; use the required flag.
 - workflow.prompt is the researcher's request to the agent, written in first person ("이 격자 표로 ... 해 주세요"), not a
   description of the method.
@@ -136,7 +152,8 @@ JSON format:
                            "files": ["outputs/zone_map.tif"], "required": true}],
     "boundary": "Korean: what the result does not claim"
   },
-  "recipe": null or {"choices": {"<choice id>": "value"}, "unresolvedChoices": ["<choice id>"]},
+  "recipe": null or {"choices": {"<choice id>": {"value": "<option id>", "decision": "<decision key>"}},
+                     "unresolvedChoices": ["<choice id>"]},
   "evidence": [{"field": "procedure", "findingIds": ["F1", "F4"]}]
 }`;
 

@@ -60,12 +60,13 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
   (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, entry on the project list and a
   Projects/GAID hub header switch): one question at a time with a recommended option and "기타", all answers applied
-  together, the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
+  together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
   `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
   recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
-  settings). Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
+  settings). The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
+  `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and
   is shown as a notice (user directions 2026-10-16). "Sign in with ChatGPT" tokens cannot generate images. MiniMax

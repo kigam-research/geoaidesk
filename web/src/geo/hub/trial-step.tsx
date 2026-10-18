@@ -65,8 +65,11 @@ export function trialFeedback(trial: MethodTrial): string {
     `관찰: 도구 호출 ${trial.observed.toolCalls}회, 실패 ${trial.observed.failedToolCalls}회`,
     `결과 파일: ${shortList(trial.observed.outputs.map((o) => o.path))}`,
     ...trial.expected
-      .filter((e) => e.required && !e.found.length)
+      .filter((e) => e.required && !e.found.length && !e.foundElsewhere?.length)
       .map((e) => `예상했지만 없는 결과: ${e.files.join(", ") || e.id}`),
+    ...trial.expected
+      .filter((e) => e.foundElsewhere?.length)
+      .map((e) => `예상한 위치(${e.files.join(", ")})가 아닌 곳에 저장된 결과: ${e.foundElsewhere!.join(", ")}`),
   ];
   return lines.join("\n");
 }

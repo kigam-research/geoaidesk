@@ -22,6 +22,8 @@ import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./pa
 import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, AuthoringStore, authoringOwner, newId, now } from "./store.ts";
 import { loadVocabulary, type Vocabulary } from "./vocabulary.ts";
+import { activePaths } from "../../projects.ts";
+import { buildHandoff, HandoffError } from "../hub-handoff/builder.ts";
 
 type AnswerBody = Omit<AnswerItem, "questionId">;
 
@@ -175,6 +177,29 @@ export async function registerAuthoringRoutes(
     scope.get("/geo/authoring/projects", async () => ({ projects: await store.list() }));
     scope.post<{ Body: CreateProjectBody }>("/geo/authoring/projects", async (req, reply) =>
       reply.code(201).send(await store.create(req.body ?? {})),
+    );
+    // Hub-side receive (gaid-hub-followups): the chat's "send to the hub draft" bundles the analysis of the request's
+    // project and starts a new method with that bundle as its first source (kind gaid-analysis).
+    scope.post<{ Body: { sessionId?: unknown; files?: unknown; note?: unknown } }>(
+      "/geo/authoring/handoffs",
+      async (req, reply) => {
+        let built: Awaited<ReturnType<typeof buildHandoff>>;
+        try {
+          built = await buildHandoff(activePaths(), req.body ?? {});
+        } catch (e) {
+          if (e instanceof HandoffError) return reply.code(e.status).send({ code: e.code, error: e.message });
+          throw e;
+        }
+        const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
+        const project = await store.create({ title: "분석에서 시작한 방법", ...(note ? { goal: note.slice(0, 2000) } : {}) });
+        await addSource(store, project.id, {
+          name: built.filename,
+          mediaType: "application/gzip",
+          kind: "gaid-analysis",
+          contentBase64: built.archive.toString("base64"),
+        });
+        return reply.code(201).send({ projectId: project.id });
+      },
     );
     scope.get("/geo/authoring/projects/:id", async (req) => store.read(id(req.params)));
     scope.delete("/geo/authoring/projects/:id", async (req, reply) => {
