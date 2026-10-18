@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-18-gaid-hub-followups/figures/01-retrial-checkpoint.png" width="120"> | 2026-10-18 16:07 | [PU 방법 수정판 재시험과 GAID 허브·채팅 결함 정리](2026-10-18-gaid-hub-followups/index.md) | GAID 허브에서 다시 만든 PU 방법이 같은 제한 시험에서 약 9분 만에 첫 확인 지점(변이함수와 제안 블록 크기 50 km)에 이르렀고, 남은 GAID 결함과 허브 개선을 고쳤습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-16-gaid-hub/figures/screen-02-shared.png" width="120"> | 2026-10-16 | [GAID 안에서 스킬·Workflow를 만들고 공유하는 GAID 허브](2026-10-16-gaid-hub/index.md) | 논문과 코드로 방법을 만드는 기능을 skill_hub에서 GAID로 옮겨, 같은 앱 안에서 만들기·허브 등록·star와 의견·내 연구 프로젝트 설치가 이어지고, 40 km 격자 빠른 시험은 21분에 결과 지도를 냈습니다. | 검토함 10-18 | 미정 | 0 |
 | <img src="2026-10-16-gaid-ui-guide/figures/02-map-compare.png" width="120"> | 2026-10-16 | [Samsung One UI를 참고한 GAID 화면 가이드와 화면 적용 예](2026-10-16-gaid-ui-guide/index.md) | 에이전트가 GAID 화면을 만들 때 따를 화면 가이드를 저장소에 넣었습니다. 규칙마다 근거가 된 One UI 페이지를 적었고, 문구 길이·내부 정보 노출·색 사용은 자동 검사로 막습니다. 워크플로 시작 설정, 지도, 방법 상세 세 화면에 적용한 시안으로 효과를 보였습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-16-gaid-hub-integration/figures/02-method-detail-after.png" width="120"> | 2026-10-16 09:32 | [skill_hub에서 만든 방법을 GAID에서 받아 설치하고 시험하기](2026-10-16-gaid-hub-integration/index.md) | hub에서 논문으로 만든 방법 초안을 GAID가 받아 설치하고 시험 채팅과 시험 기록까지 남겼으나, 제한한 첫 시험은 방법의 첫 확인 지점에 이르지 못했습니다. | 검토함 10-18 | 미정 | 0 |
