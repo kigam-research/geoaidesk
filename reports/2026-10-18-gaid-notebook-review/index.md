@@ -162,7 +162,7 @@ supersedes:
 | 서버 | `server/src/geo/notes/{parser,store,extension}.ts`, `server/src/geo/routes/notes.ts`, `RESEARCH_NOTE_RULE`(`server/src/geo/instructions.ts`, 시작 프롬프트 +678자), 시험 `server/test/geo-notes.test.ts` (하위 작업 gaid-notebook-review--notes-server) |
 | 화면 | `web/src/geo/notes/`, 문구 `web/src/geo/locales/notes/{ko,en}.json`, 연결 `web/src/components/file-preview-panel.tsx`, `web/src/app/page.tsx` |
 | 기존 기록 정리 | 하위 작업 gaid-notebook-review--record-cleanup: 실행 근거·출처 접기, 결과 링크 ID 제거, 내보내기·인쇄 언어, 채팅 내보내기 이름, 연구 방법 초안 언어. 문구 id별 변경 전후는 `docs/tasks/gaid-notebook-review--record-cleanup.md` "Catalogue changes" |
-| 이 작업의 문구 변경 | 새 이름공간 `notes.*`(ko/en 전체 새로 추가). `notebook.header.title` 연구 노트 → 작업 기록 / Lab Notebook → Work record. `notebook.export.title`(en) Lab Notebook → Work record. 용어 `geo/copy/terminology.csv`에 정리 노트, 작업 기록 추가 |
+| 이 작업의 문구 변경 | 새 이름공간 `notes.*`(ko/en 전체 새로 추가). `notebook.header.title` 연구 노트 → 작업 기록 / Lab Notebook → Work record. 용어 `geo/copy/terminology.csv`에 정리 노트, 작업 기록 추가 |
 | 시험용 앱 | PC74 `systemd-run --user` unit `gaid-notes-app`(이 작업 트리, 포트 3370/18370), 자료 `~/data/geoaidesk/work/gaid-notebook-review/home`, 로그 `.../logs/app.log` |
 | 실제 분석 | 채팅 `01a14e7a-d440-76b4-83b1-aeb7777ab157`, 모델 `kigam-qwen/qwen3.8-flash-next`, 요청·출력 `~/data/geoaidesk/work/gaid-notebook-review/tools/{msg1,msg2}.md`, `run1.log`, `run2.log` |
 | 노트 원본 | `~/data/geoaidesk/work/gaid-notebook-review/home/projects/default/sandbox/연구노트/2026-10-18-seoul-250k-litho-area-map/` |
