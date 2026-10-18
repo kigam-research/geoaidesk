@@ -44,6 +44,8 @@ describe("output style rules", () => {
   it("the note rule names the shipped skill", () => {
     expect(RESEARCH_NOTE_RULE).toContain(`read the \`${NOTE_STYLE_SKILL}\` skill`);
     expect(GEO_INSTRUCTIONS).toContain(`- ${RESEARCH_NOTE_RULE}`);
+    // gaid-note-style: Korean notes are fixed to 합니다체 (decision gaid-output-style#1).
+    expect(RESEARCH_NOTE_RULE).toMatch(/Korean note in 합니다체/);
   });
 
   it("ships a loadable, attributed and compact skill", () => {
