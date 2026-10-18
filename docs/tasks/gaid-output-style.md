@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T11:27:46Z
+updated: 2026-10-18T11:37:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cf3c2630-5a5a-41da-8ca1-d21368a34174","pid":165774,"provider":"claude","session":"9b0b1311-fa15-49ef-bbc6-156ac66a94d3","start":"21076687","token":"ae93645b472f334531a322a6678e004f8dcc942d075e067c3a6e63b8bed5282d"}
 branch: task/gaid-output-style
 target: main
@@ -37,11 +37,24 @@ Out of scope: fixed UI copy (already governed by geo/copy/).
 Outside check: no outside check (app output-style work; the before/after comparison is the evidence).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Plan settled (below); implementation in progress by the top writer.
 ## Next steps
-1. (the next session's first action)
+1. Implement P1-P3, then the before/after Qwen trial (P4), then the report.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: small, tightly coupled change; the top writer does all packages itself (no child writers).
+  Order: P1 chat-answer rule -> P2 note-style skill + seeding + exposure -> P3 notices/docs/tests -> P4 trial -> report.
+- P1 `REPLY_STYLE_RULE` in `server/src/geo/instructions.ts` (compact Attention Control Korean, English equivalent),
+  appended to GEO_INSTRUCTIONS (geo catalogue mode only, like the other rules).
+- P2 skill `gaid-note-style` shipped in `geo/skills/gaid-note-style/` (compact rewrite for research notes, ko+en; not the
+  32 KB upstream file, for the 64K local context). Seeded into each geo project's `.pi/skills/` by
+  `server/src/geo/note-style.ts` (seed once; upgrade only an unedited copy; a deleted/disabled copy stays so), always
+  offered by `applyExposure`, and named in RESEARCH_NOTE_RULE.
+- Sources/licences: attention-control (MIT, aaddrick; Ayoub Ghriss portions), blader/humanizer (MIT, Siqi Chen;
+  patterns from Wikipedia "Signs of AI writing"), backbone Korean adaptations (kigam-research/backbone, private, same
+  org) paraphrased, not copied. Notices in THIRD_PARTY_NOTICES.md and the skill's LICENSE/SOURCE.
+- Trial: same request as gaid-notebook-review (Seoul 1:250k litho area table + map) with `kigam-qwen/qwen3.8-flash-next`,
+  before = main (task scratch), after = this branch; data under `~/data/geoaidesk/work/gaid-output-style/`.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
