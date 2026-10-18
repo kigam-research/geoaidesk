@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/screen-02-shared.png
 supersedes:
+reviewed: 2026-10-18
 ---
 # GAID 안에서 스킬·Workflow를 만들고 공유하는 GAID 허브
 
