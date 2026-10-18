@@ -27,7 +27,17 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   /** Set when the setup comes from a saved recipe (gaid-workflow-catalog). */
   recipe?: { title: string; onDelete: () => Promise<void> };
 }) {
-  const [bindings, setBindings] = useState(initialBindings);
+  // A required input with exactly one fitting file in the project starts bound to it (gaid-hub trial: one CSV, still
+  // had to be picked by hand).
+  const [bindings, setBindings] = useState<Record<string, string>>(() => {
+    const values = { ...initialBindings };
+    for (const role of workflow.inputRoles) {
+      if (!role.required || values[role.id]) continue;
+      const fitting = [...new Set(availableFiles)].filter((path) => accepts(path, role.extensions));
+      if (fitting.length === 1) values[role.id] = fitting[0];
+    }
+    return values;
+  });
   const [choices, setChoices] = useState<Record<string, string>>(() => {
     const values = { ...initialSetup?.choices };
     initialSetup?.unresolvedChoices.forEach((id) => { values[id] = ""; });

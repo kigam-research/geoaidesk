@@ -120,6 +120,19 @@ function matches(pattern: string, filePath: string): boolean {
   return new RegExp(`^${escaped}$`).test(target) || (pattern.includes("/") && new RegExp(`(^|/)${escaped}$`).test(filePath));
 }
 
+/**
+ * Session outputs that match an artifact's declared names. When none matches exactly, a file with a declared name in
+ * another folder (results/ instead of outputs/) is reported as `foundElsewhere` (gaid-hub trial).
+ */
+export function matchArtifact(patterns: string[], files: string[]): { found: string[]; foundElsewhere?: string[] } {
+  const found = files.filter((file) => patterns.some((pattern) => matches(pattern, file))).slice(0, 50);
+  if (found.length) return { found };
+  const elsewhere = files
+    .filter((file) => patterns.some((pattern) => pattern.includes("/") && matches(pattern.split("/").pop()!, file)))
+    .slice(0, 50);
+  return elsewhere.length ? { found, foundElsewhere: elsewhere } : { found };
+}
+
 /** The session's provenance rows (same file and row rules as provenance/store.ts readSteps). */
 function readTrialSteps(paths: ProjectPaths, sessionId: string): ProvenanceStep[] {
   let raw: string;
@@ -174,10 +187,7 @@ function observe(paths: ProjectPaths, record: StoredTrial): Pick<MethodTrial, "o
       degradedSteps: degraded,
       lastStepAt: last ? new Date(last).toISOString() : null,
     },
-    expected: record.expected.map((artifact) => ({
-      ...artifact,
-      found: [...outputs.keys()].filter((file) => artifact.files.some((pattern) => matches(pattern, file))).slice(0, 50),
-    })),
+    expected: record.expected.map((artifact) => ({ ...artifact, ...matchArtifact(artifact.files, [...outputs.keys()]) })),
   };
 }
 

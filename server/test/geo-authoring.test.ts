@@ -74,7 +74,10 @@ describe("GAID hub authoring", () => {
     const restarted = new AuthoringStore(dir);
     await restarted.initialize();
     p = await restarted.read(projectId);
-    expect(p.questions.map((q) => q.status)).toEqual(["open", "open"]);
+    // The hub adds its standard first-trial question; the model already asked about the code.
+    expect(p.questions.map((q) => q.key)).toEqual(["scope", "code-path", "trial-scale"]);
+    expect(p.questions[2]).toMatchObject({ recommendedOptionId: "quick-and-full", status: "open" });
+    expect(p.questions.map((q) => q.status)).toEqual(["open", "open", "open"]);
     expect(p.decisions).toHaveLength(0);
     const raw = JSON.parse(await readFile(join(dir, "projects", projectId, p.attempts[0].record!), "utf8"));
     expect(raw.responses).toHaveLength(1);
@@ -151,7 +154,7 @@ describe("GAID hub authoring", () => {
     expect(d.response).toBe("새 자료 적용");
     expect((await store.read(projectId)).questions[0].status).toBe("answered");
     await runOperation(store, projectId, "analyze", "op-analyze-b", deps(reply(analysis)));
-    expect((await store.read(projectId)).questions).toHaveLength(2);
+    expect((await store.read(projectId)).questions).toHaveLength(3);
   });
 
   it("applies a round of answers all or none, with 기타 text and deferral", async () => {
@@ -186,13 +189,49 @@ describe("GAID hub authoring", () => {
     );
     expect(decisions.map((d) => d.response)).toEqual(["새 자료 적용", "필요한 스크립트만"]);
     p = await store.read(projectId);
-    expect(p.questions.map((q) => q.status)).toEqual(["answered", "answered"]);
+    expect(p.questions.map((q) => q.status)).toEqual(["answered", "answered", "open"]);
     const deferred = await store.mutate(projectId, (q) =>
       answerAll(q, [{ questionId: code.id, questionRevision: 1, defer: true }], "r"),
     );
     expect(deferred[0].status).toBe("deferred");
     p = await store.read(projectId);
     expect(p.decisions.filter((d) => !d.supersededBy).map((d) => d.status)).toEqual(["answered", "deferred"]);
+  });
+
+  it("keeps start defaults the researcher's answers back and adds the quick run-scale choice", async () => {
+    const { store, projectId } = await fixture();
+    await runOperation(store, projectId, "analyze", "op-analyze-q", deps(reply(analysis)));
+    const qs = (await store.read(projectId)).questions;
+    const byKey = (k: string) => qs.find((q) => q.key === k)!;
+    await store.mutate(projectId, (p) =>
+      answerAll(
+        p,
+        [
+          { questionId: byKey("scope").id, questionRevision: 1, optionId: "generalization" },
+          { questionId: byKey("code-path").id, questionRevision: 1, optionId: "include" },
+          { questionId: byKey("trial-scale").id, questionRevision: 1, optionId: "quick-and-full" },
+        ],
+        "r",
+      ),
+    );
+    // Without the run-scale choice the draft is refused (the bounded repair returns the same reply).
+    const missing = await runOperation(store, projectId, "draft", "op-draft-q1", deps(reply(draftReply, draftReply)));
+    expect(missing.outcome, missing.error).toBe("rejected");
+    expect(missing.validationErrors.flat().join("\n")).toMatch(/run-scale/);
+    const withScale = structuredClone(draftReply) as typeof draftReply;
+    (withScale.workflow!.requiredScientificChoices as unknown[]).push({
+      id: "run-scale",
+      label: "실행 규모",
+      why: "첫 시험을 짧게 끝냅니다.",
+      options: [
+        { id: "quick", label: "빠른 시험" },
+        { id: "full", label: "전체 설정" },
+      ],
+    });
+    const ok = await runOperation(store, projectId, "draft", "op-draft-q2", deps(reply(withScale)));
+    expect(ok.outcome, JSON.stringify(ok.validationErrors)).toBe("accepted");
+    const d = (await store.read(projectId)).drafts.at(-1)!;
+    expect(d.recipe).toEqual({ choices: { "block-size": "km50", "run-scale": "quick" }, unresolvedChoices: ["label-def"] });
   });
 
   it("drafts with vocabulary filtering, server-owned fields, a recipe and stale-base protection", async () => {
@@ -208,7 +247,9 @@ describe("GAID hub authoring", () => {
     expect(d.notes.some((n) => n.includes("made-up"))).toBe(true);
     expect(d.workflow?.skillIds).toEqual(["local:pu-nested-cv-method"]);
     expect(d.workflow?.expectedArtifacts[0].files).toEqual(["outputs/scores.csv"]);
-    expect(d.recipe).toEqual({ choices: { "block-size": "km50" }, unresolvedChoices: ["label-def"] });
+    // No researcher decision backs the model's block-size value yet: it stays for the start settings.
+    expect(d.recipe).toEqual({ choices: {}, unresolvedChoices: ["block-size", "label-def"] });
+    expect(d.notes.some((n) => n.includes("작업 중 결정"))).toBe(true);
     expect(d.evidence[0].findingIds).toHaveLength(1);
     expect(d.profile.procedure.edges).toHaveLength(2);
     // A researcher edit during a model draft wins; the model result is not applied.

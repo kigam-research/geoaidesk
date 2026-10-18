@@ -11,6 +11,8 @@ import { buildHandoff, HANDOFF_LIMITS, HANDOFF_SCHEMA, previewHandoff } from "..
 import { registerGeoHubHandoffRoutes } from "../src/geo/routes/hub-handoff.ts";
 import { readTarGz } from "../src/geo/tar.ts";
 import { directHandoffEndpoint, sendHandoff } from "../src/geo/hub-handoff/send.ts";
+import { registerAuthoringRoutes } from "../src/geo/authoring/routes.ts";
+import { AuthoringStore } from "../src/geo/authoring/store.ts";
 
 const sessionId = "12345678-1234-1234-1234-123456789abc";
 const digest = (value: Buffer | string) => crypto.createHash("sha256").update(value).digest("hex");
@@ -189,5 +191,25 @@ describe("analysis handoff", () => {
     fetcher.mockRejectedValueOnce(new Error("timeout"));
     expect((await app.inject({ method: "POST", url: "/geo/hub/handoff/send", payload: { sessionId, files: [], siteId: localSite.id } })).headers["x-gaid-handoff-path"]).toBe("download-fallback");
     expect(fetcher).toHaveBeenCalledTimes(5);
+  });
+  it("hub-side receive: starts a GAID hub draft with the bundle attached as analysis material", async () => {
+    file("analysis.py", "print(1)"); provenance(["analysis.py"]);
+    const dir = fs.mkdtempSync(path.join(paths.root, "authoring-"));
+    const hub = Fastify();
+    hub.addHook("onRequest", (req, _reply, done) => withActiveProject(String(req.headers["x-project-id"] ?? paths.id), done));
+    const store = await registerAuthoringRoutes(hub, { store: new AuthoringStore(dir) });
+    try {
+      const sent = await hub.inject({ method: "POST", url: "/geo/authoring/handoffs", payload: { sessionId, files: ["analysis.py"], note: "격자 분석 방법" } });
+      expect(sent.statusCode).toBe(201);
+      const project = await store.read(sent.json().projectId);
+      expect(project.goal).toBe("격자 분석 방법");
+      expect(project.sources).toHaveLength(1);
+      expect(project.sources[0]).toMatchObject({ kind: "gaid-analysis", status: "extracted" });
+      expect(project.sources[0].name).toMatch(/^gaid-analysis-12345678-\d{8}\.tar\.gz$/);
+      expect(project.extractions[project.sources[0].id].files?.some((f) => f.path.endsWith("analysis.py"))).toBe(true);
+      const bad = await hub.inject({ method: "POST", url: "/geo/authoring/handoffs", payload: { sessionId, files: ["../bad"] } });
+      expect(bad.statusCode).toBe(400);
+      expect((await store.list()).length).toBe(1);
+    } finally { await hub.close(); }
   });
 });
