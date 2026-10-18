@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T09:54:09Z
+status: done
+updated: 2026-10-18T10:29:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03bb8c52-5554-4f2c-8eac-ff609606e9cb","pid":2981080,"provider":"codex","session":"01a14e33-e7dc-7f11-896d-cc8d6a1c24a8","start":"20132575","token":"9229f706ac6aec69b0c3a4f13b440d4152f6c305c5f8571194c2420dbb8d0540"}
 branch: task/gaid-notebook-review--notes-server
 target: task/gaid-notebook-review
@@ -70,7 +70,7 @@ length, any contract deviation. Then `task finish`.
 Implemented the server-side research notes: pure bilingual parser, bounded NFC/NFD-aware sandbox store, byte-preserving atomic status edits, lead write/edit format checks and session association, project-scoped list/read/status routes, and the exact requested agent instruction. No shared contract or web/UI changes. Hub handoff needs no source change: a real ProvenanceRecorder test verifies that lead-written notes and figures appear in preview.files. After fixing the full-check Windows path guard, final backend typecheck and 89/89 tests across 9 affected suites passed (23 note tests). RESEARCH_NOTE_RULE is the supplied 675-character text, adding 678 prompt characters. POST status returns ResearchNoteSummary directly. Parent integration and deployment have not happened; task finish reruns the declared full check before publishing this child.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T09:54:09Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T10:29:30Z: integrated into gaid-notebook-review; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 Fifth finish (VITEST_MAX_WORKERS=1) completed the entire declared check: backend 1899 passed / 15 skipped; frontend 1077 passed; distribution 48 passed / 1 skipped; UI copy, UI guide, catalogue environments, both launchers and production smoke passed. Publication then detected the parent's updated b0e27ce tip; merging it conflicted only in append-only geo/integration-boundaries.json. Preserved both the note-test seam and all incoming work-record seams, and combined the duplicate distribution-check responsibility (same owner/status). No code decision conflict. The incoming research-note contract changes only the POST response comment to explicitly say ResearchNoteSummary, matching this implementation. Direct distribution check after resolution: 7/7 passed. Rerun task finish in place on the merged snapshot; keep VITEST_MAX_WORKERS=1.
