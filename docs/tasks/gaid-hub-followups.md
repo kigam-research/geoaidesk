@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:18:38Z
+updated: 2026-10-18T05:35:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -80,13 +80,13 @@ Outside check: no outside check (app work; the re-trial is the acceptance eviden
 - Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
   gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
-1. Wait for the revise of ap-c8f90117-4e8 (feedback tools/feedback1.md: block size as human-gate, variogram bound in the
-   step, quick = outer fold 0, variogram figure + block_size.json as optional artifacts); check the draft (no
-   r1324-r22-analysis dependency, module copied in).
-2. `task complete` gaid-hub-followups--hub-browse and --defects when their finish notices arrive (both were running final
-   checks; use VITEST_MAX_WORKERS unset/1 for server tests), then restart the trial instance on the integrated tip.
-3. Run the researcher-role re-trial (briefs/researcher-retrial.md, replace __AUTHORING_ID__ with ap-c8f90117-4e8).
-4. Report reports/2026-10-18-gaid-hub-followups/index.md (children's sections from their task docs), scripts/check,
+Blocked: both children are inside `task finish` (full scripts/check on the merged tree); they asked the parent not to
+publish until their finish returns. Draft 3 of ap-c8f90117-4e8 is ready (checks pass).
+1. On each child finish notice: `task complete gaid-hub-followups--hub-browse` / `--defects`, then restart the trial
+   instance on the integrated tip.
+2. Run the researcher-role re-trial (briefs/researcher-retrial.md, __AUTHORING_ID__ = ap-c8f90117-4e8).
+3. Report reports/2026-10-18-gaid-hub-followups/index.md (children's sections from their task docs; figures under
+   ~/data/geoaidesk/work/gaid-hub-followups/figures/{defects,hub-browse}/), scripts/check with VITEST_MAX_WORKERS unset,
    task finish.
 ## Failed approaches
 ## Notes and decisions
