@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { noteBody, rebaseNoteLinks, rebasePath, splitDecisions, stripFrontmatter } from "./note-markdown";
+import { noteBody, plainText, rebaseNoteLinks, rebasePath, splitDecisions, stripFrontmatter } from "./note-markdown";
 
 const NOTE = "연구노트/2026-10-15-다원소/index.md";
 
@@ -32,5 +32,9 @@ describe("research note markdown", () => {
     expect(splitDecisions("## 5. Decisions\n\n1. q\n").decisions).toContain("1. q");
     expect(splitDecisions("```\n## 결정할 일\n```\n").decisions).toBeNull();
     expect(splitDecisions("## 결과\n").decisions).toBeNull();
+  });
+
+  it("reduces inline Markdown to text for one-line labels", () => {
+    expect(plainText("`0`(시대 미상) **중요** [표](a.csv) *강조* 2*3*4")).toBe("0(시대 미상) 중요 표 강조 2*3*4");
   });
 });

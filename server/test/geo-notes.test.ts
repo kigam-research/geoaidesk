@@ -44,6 +44,12 @@ describe("pure research-note parser", () => {
       { label: "나", text: "마무리", recommended: false, reason: null },
     ] }] });
     expect(parseResearchNote(source("", "2) Continue?\n- a) Rerun (Recommended: collect samples)\n- b) Stop", true), first)).toMatchObject({ problems: [], decisions: [{ number: 2, question: "Continue?", options: [{ label: "a", recommended: true, reason: "collect samples" }, { label: "b", recommended: false }] }] });
+    // Recommendation written on its own line after the options (seen from the institute Qwen, 2026-10-18).
+    expect(parseResearchNote(source("", "1. 클래스 취급\n- 가) 유지\n- 나) 이름 변경\n- (권장: 나 — 오독을 막는다)"), first)).toMatchObject({ problems: [], decisions: [{ options: [
+      { label: "가", recommended: false }, { label: "나", recommended: true, reason: "오독을 막는다" },
+    ] }] });
+    expect(parseResearchNote(source("", "1. q\n- 가) a\n- 나) b\n권장: 가) 이유"), first).decisions[0].options[0]).toMatchObject({ recommended: true, reason: "이유" });
+    expect(parseResearchNote(source("", "1) q\n- a) x\n- b) y\n- (Recommended: because z)", true), first).problems).toContainEqual({ code: "decision-format", target: "decisions" });
     for (const value of [`[${first}, 'old-note']`, `${first}, old-note`]) {
       expect(parseResearchNote(source().replace("supersedes:", `supersedes: ${value}`), second).supersedes).toEqual([first, "old-note"]);
     }

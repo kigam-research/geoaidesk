@@ -13,7 +13,6 @@
   "record": {
     "button": "작업 기록 보기",
     "back": "정리 노트로 돌아가기",
-    "title": "작업 기록",
     "hint": "AI agent가 작업하면서 남긴 항목입니다. 정리 노트의 근거입니다."
   },
   "group": {
@@ -76,6 +75,6 @@
     "title": "결정할 일",
     "recommended": "권장",
     "answerTip": "고른 답을 채팅 입력창에 넣습니다. 보내기 전에 고칠 수 있습니다.",
-    "prompt": "'{title}' 노트의 결정 {number}에 답합니다: {label}) {text}\n노트: {path}\n고른 답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
+    "prompt": "“{title}” 노트의 결정 {number}에 답합니다: {label}) {text}\n노트: {path}\n고른 답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
   }
 }

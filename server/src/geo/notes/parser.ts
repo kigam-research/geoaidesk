@@ -53,6 +53,16 @@ function parseDecisions(text: string, problems: ResearchNoteProblem[]): Research
       decisions.push(current);
       continue;
     }
+    // A recommendation on its own line after the options (`- (권장: 나 — reason)`, `권장: 나) reason`), as models
+    // and the vault's decision lines often write it.
+    const standalone = /^(?:[-*]\s+)?\(?\s*(?:권장|recommended)\s*:\s*([\p{L}])(?:\)|\s*[—–:-]|\s*$)\s*(.*?)\)?\s*$/iu.exec(trimmed);
+    if (standalone && current) {
+      const target = current.options.find(o => o.label === standalone[1]);
+      if (!target || current.options.some(o => o.recommended)) { malformed(); continue; }
+      target.recommended = true;
+      target.reason = standalone[2].trim() || null;
+      continue;
+    }
     const option = /^-\s+([\p{L}])\)\s+(.+)$/u.exec(trimmed);
     if (!option || !current) { malformed(); continue; }
     const recommendation = /\((?:권장|recommended):\s*([^)]*)\)\s*$/i.exec(option[2]);

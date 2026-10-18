@@ -13,7 +13,6 @@
   "record": {
     "button": "View work record",
     "back": "Back to research notes",
-    "title": "Work record",
     "hint": "Entries the AI agent logged while working. They are the evidence behind research notes."
   },
   "group": {
@@ -55,17 +54,27 @@
       "needs-revision": "Trial assessment: needs revision",
       "failed": "Trial assessment: failed"
     },
-    "confirm": { "button": "Mark as reviewed" },
-    "unconfirm": { "button": "Mark as not reviewed" },
-    "openChat": { "button": "Open chat" },
-    "openFile": { "button": "Open as file" },
+    "confirm": {
+      "button": "Mark as reviewed"
+    },
+    "unconfirm": {
+      "button": "Mark as not reviewed"
+    },
+    "openChat": {
+      "button": "Open chat"
+    },
+    "openFile": {
+      "button": "Open as file"
+    },
     "supersededBy": "A newer note replaces this note.",
-    "openSuperseding": { "button": "Open newer note" }
+    "openSuperseding": {
+      "button": "Open newer note"
+    }
   },
   "decision": {
     "title": "Decisions to make",
     "recommended": "Recommended",
     "answerTip": "Puts the chosen answer in the chat box. You can edit it before sending.",
-    "prompt": "Answering decision {number} of the note '{title}': {label}) {text}\nNote: {path}\nContinue the work accordingly and update the note."
+    "prompt": "Answering decision {number} of the note \"{title}\": {label}) {text}\nNote: {path}\nContinue the work accordingly and update the note."
   }
 }

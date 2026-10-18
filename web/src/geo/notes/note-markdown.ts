@@ -81,3 +81,12 @@ export function splitDecisions(markdown: string): { before: string; decisions: s
 export function noteBody(markdown: string, notePath: string): string {
   return rebaseNoteLinks(stripTitleHeading(stripFrontmatter(markdown)), notePath);
 }
+
+/** Inline Markdown (code, emphasis, links) reduced to its text, for one-line labels outside the rendered body. */
+export function plainText(text: string): string {
+  return text
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/(\*\*|__)(.+?)\1/g, "$2")
+    .replace(/(^|[^\w*])\*(?!\s)([^*\n]+?)\*(?!\w)/g, "$1$2");
+}

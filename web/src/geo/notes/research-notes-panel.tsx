@@ -13,12 +13,17 @@ import { apiFetch } from "@/lib/projects";
 import { prefillChat } from "@/lib/chat-prefill";
 import { rawFileUrl } from "@/lib/use-sandbox";
 import { cn } from "@/lib/utils";
-import { t } from "@/geo/i18n";
+import { geoLocale, t } from "@/geo/i18n";
 import type {
   ResearchNoteDecision, ResearchNoteListResponse, ResearchNoteResponse, ResearchNoteStatus, ResearchNoteSummary,
 } from "@/geo/contracts/research-notes";
-import { noteBody, splitDecisions } from "./note-markdown";
+import { noteBody, plainText, splitDecisions } from "./note-markdown";
 
+/**
+ * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
+ * The shared renderer promotes the top heading level, so a note's `##` sections arrive as h1.
+ */
+const NOTE_PROSE = "[&_h1]:mt-6 [&_h1]:mb-2 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-sm [&_h3]:font-semibold";
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium";
 const TONE: Record<ResearchNoteStatus | "decision" | "format", string> = {
   pending: "border-primary/30 bg-primary/10 text-primary",
@@ -52,10 +57,9 @@ export function ResearchNotesPanel({ projectId, streaming, recordFocusToken, onO
     return (
       <div className="flex h-full min-h-0 flex-col">
         <div className="flex items-center gap-2 border-b px-3 py-2">
-          <Button variant="ghost" size="sm" onClick={() => setView({ kind: "list" })}>
+          <Button variant="ghost" size="sm" onClick={() => setView({ kind: "list" })} title={t("notes.record.hint")}>
             <ArrowLeftIcon aria-hidden />{t("notes.record.back")}
           </Button>
-          <span className="truncate text-sm text-muted-foreground" title={t("notes.record.hint")}>{t("notes.record.title")}</span>
         </div>
         <div className="min-h-0 flex-1">{workRecord}</div>
       </div>
@@ -190,8 +194,8 @@ function NoteList({ state, onOpen, onRecord }: {
                     className="flex w-full items-center gap-3 rounded-md border border-[var(--gaid-warning)]/40 bg-background px-3 py-2 text-left hover:bg-muted/40"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{decision.question}</span>
-                      <span className="block truncate text-xs text-muted-foreground">{note.title}</span>
+                      <span className="block truncate text-sm font-medium">{plainText(decision.question)}</span>
+                      <span className="block truncate text-xs text-muted-foreground">{plainText(note.title)}</span>
                     </span>
                     <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                   </button>
@@ -250,8 +254,8 @@ function NoteRow({ note, onOpen }: { note: ResearchNoteSummary; onOpen: (id: str
         </span>
       )}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold">{note.title}</span>
-        {note.headline && <span className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{note.headline}</span>}
+        <span className="block truncate text-sm font-semibold">{plainText(note.title)}</span>
+        {note.headline && <span className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{plainText(note.headline)}</span>}
         <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <span>{formatDate(note.date)}</span>
           <StatusBadge status={note.status} />
@@ -289,7 +293,7 @@ function LoadError({ message, onRetry }: { message: string; onRetry: () => void 
 function formatDate(date: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   if (!m) return date;
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(geoLocale() === "ko" ? "ko-KR" : "en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
 // ---------------------------------------------------------------------------
@@ -362,7 +366,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
         </Button>
         {note && (
           <>
-            <h2 className="mt-1 text-base font-semibold leading-snug">{note.title}</h2>
+            <h2 className="mt-1 text-base font-semibold leading-snug">{plainText(note.title)}</h2>
             <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
               <span>{meta}</span>
               <StatusBadge status={note.status} />
@@ -406,17 +410,17 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
           <p className="text-muted-foreground">{t("notes.panel.loading")}</p>
         ) : (
           <div className="mx-auto max-w-[960px]">
-            <MessageResponse onOpenFile={onOpenFile}>{parts.before}</MessageResponse>
+            <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.before}</MessageResponse>
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
                 {data.note.decisions.length ? (
                   <DecisionCards note={data.note} />
                 ) : (
-                  <MessageResponse onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
+                  <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
                 )}
               </div>
             )}
-            {parts.after.trim() && <div className="mt-6"><MessageResponse onOpenFile={onOpenFile}>{parts.after}</MessageResponse></div>}
+            {parts.after.trim() && <div className="mt-6"><MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.after}</MessageResponse></div>}
           </div>
         )}
       </div>
@@ -439,7 +443,7 @@ function DecisionCard({ note, decision }: { note: ResearchNoteSummary; decision:
   const options = [...decision.options].sort((a, b) => Number(b.recommended) - Number(a.recommended));
   return (
     <div className="rounded-md border border-[var(--gaid-warning)]/40 p-3">
-      <p className="text-sm font-semibold">{decision.number}. {decision.question}</p>
+      <p className="text-sm font-semibold">{decision.number}. {plainText(decision.question)}</p>
       <div className="mt-2 space-y-1.5">
         {options.map((option) => (
           <button
@@ -453,8 +457,8 @@ function DecisionCard({ note, decision }: { note: ResearchNoteSummary; decision:
           >
             <span className="font-medium">{option.label})</span>
             <span className="min-w-0 flex-1">
-              <span className="block">{option.text}</span>
-              {option.recommended && option.reason && <span className="mt-0.5 block text-xs text-muted-foreground">{option.reason}</span>}
+              <span className="block">{plainText(option.text)}</span>
+              {option.recommended && option.reason && <span className="mt-0.5 block text-xs text-muted-foreground">{plainText(option.reason)}</span>}
             </span>
             {option.recommended && <span className={cn(PILL, TONE.pending, "shrink-0")}>{t("notes.decision.recommended")}</span>}
           </button>
