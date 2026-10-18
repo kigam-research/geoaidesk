@@ -259,6 +259,7 @@ const PLAIN: Record<string, string> = {
   "personal-path": "개인 PC의 경로가 들어 있습니다.",
   "undeclared-dependency": "코드가 쓰는 Python 패키지가 의존성 목록에 없습니다.",
   "environment-package": "실행 환경에 없는 패키지의 설치 방법이 스킬 설명에 없습니다.",
+  "environment-package-install": "실행 환경에 없는 패키지가 있어, 실행할 때 스킬 설명의 방법으로 설치합니다.",
   environment: "실행 환경 이름이 카탈로그에 없습니다.",
   "taxonomy-unknown": "분류 용어에 없는 값이 있습니다.",
   "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
@@ -458,7 +459,7 @@ export async function checkMethod(
         const mentioned = skillText.includes(name) || skillText.includes(distributionOf(name));
         find(
           "workflow",
-          "environment-package",
+          mentioned ? "environment-package-install" : "environment-package",
           "atlas.yaml#dependencies",
           mentioned
             ? `${w.environmentProfile} 환경에 없는 패키지입니다: ${dep.name}. 실행 전에 SKILL.md의 설치 방법을 따라야 합니다.`

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T05:14:09Z
+updated: 2026-10-18T05:18:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -72,7 +72,11 @@ Outside check: no outside check (app work; the re-trial is the acceptance eviden
   mpm-pu-conformal-yilgarn-c03c67d.tar.gz, Qwen). Analysis 35 findings, 5 model questions + code-use + trial-scale;
   answers in tools/answers1.json (generic-grid, thresholds user-input, model user-select, min-131-per-fold,
   variogram both-fallback, include code, quick-and-full). Draft 1 accepted (run-scale quick only pre-set; thread rule, quick table, scikit-gstat install, 결과 파일 present;
-  defect: local module r1324_r22_analysis declared as a PyPI dependency -> fixed in declareImports, 89087a4). Revise running.
+  defect: local module r1324_r22_analysis declared as a PyPI dependency -> fixed in declareImports, 89087a4). Revise 1 (feedback1.md) -> draft 2: block size human-gate, variogram bound in the step (downsample factor 2 + positives,
+  cap ~20,000, quick 5,000 points / 8 lags), quick = fold 0 only, variogram_fit.png + block_size.json optional artifacts.
+  Revise 2 (feedback2.md) -> draft 3: checks pass (one warning: optuna installed via SKILL.md), r1324 dependency gone.
+  Rule fixes from these rounds: carried modules never stay declared (1a59b39); bounds in the step + human-gate rule
+  (ddfd566); cite code by installed path; separate check sentence when the install method is present.
 - Re-trial brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/researcher-retrial.md (same limit line as the
   gaid-hub-integration trial). Run after the children are integrated so their chat/guard fixes are in the trial.
 ## Next steps
