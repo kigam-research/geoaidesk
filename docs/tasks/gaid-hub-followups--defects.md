@@ -1,7 +1,7 @@
 ---
 format: 1
 status: ready
-updated: 2026-10-18T05:07:45Z
+updated: 2026-10-18T05:18:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -118,7 +118,7 @@ Safe re-verification: use npm test focused files in server/test/{geo-session-pro
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T05:07:45Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T05:18:11Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
