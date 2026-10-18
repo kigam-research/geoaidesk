@@ -106,7 +106,7 @@ export interface ResearchNoteResponse {
   content: string;
 }
 
-/** POST /geo/notes/:id/status — rewrites only the frontmatter `status` line; answers the updated summary. */
+/** POST /geo/notes/:id/status — rewrites only the frontmatter `status` line; answers the updated ResearchNoteSummary itself. */
 export interface ResearchNoteStatusRequest {
   status: ResearchNoteStatus;
 }

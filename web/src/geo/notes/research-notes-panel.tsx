@@ -337,8 +337,8 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }),
       }, projectId);
       if (!res.ok) throw new Error(String(res.status));
-      const updated = (await res.json()) as { note: ResearchNoteSummary };
-      setData((prev) => prev ? { ...prev, note: updated.note } : prev);
+      const updated = (await res.json()) as ResearchNoteSummary;
+      setData((prev) => prev ? { ...prev, note: updated } : prev);
       void onChanged();
     } catch {
       setStatusError(true);
