@@ -159,7 +159,10 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
     };
   }, [loadShared]);
   const entryOf = (p: ProjectSummary) => entries.find((e) => e.revisions.some((r) => r.authoringProjectId === p.id));
-  const shown = folderId === "all" ? projects : projects.filter((p) => entryOf(p)?.folderId === folderId);
+  // "My" methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name.
+  const me = hubUserName();
+  const mine = me ? projects.filter((p) => !p.author || p.author === me) : projects;
+  const shown = folderId === "all" ? mine : mine.filter((p) => entryOf(p)?.folderId === folderId);
   return (
     <>
       <HubHome
@@ -173,11 +176,11 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
           author: c.author,
         }))}
         folders={[
-          { id: "all", name: text("home.allFolders"), count: projects.length },
+          { id: "all", name: text("home.allFolders"), count: mine.length },
           ...folders.map((f) => ({
             id: f.id,
             name: f.name,
-            count: projects.filter((p) => entryOf(p)?.folderId === f.id).length,
+            count: mine.filter((p) => entryOf(p)?.folderId === f.id).length,
           })),
         ]}
         folderId={folderId}
@@ -185,7 +188,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         onNewFolder={() => named.run(() => setNewFolder(true))}
         projects={shown}
         registered={Object.fromEntries(
-          projects.flatMap((p) => {
+          mine.flatMap((p) => {
             const e = entryOf(p);
             return e
               ? [[p.id, { entryId: e.id, stars: e.stars, comments: e.comments, revision: e.latestRevision }]]
@@ -194,7 +197,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         )}
         loading={loading}
         error={error}
-        onCreate={() => onOpen(NEW_ID)}
+        onCreate={() => named.run(() => onOpen(NEW_ID))}
         onOpen={onOpen}
         onOpenEntry={onOpenEntry}
         onOpenRecommended={(id) => {
@@ -451,6 +454,7 @@ function HubProject({
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
+      ...(hubUserName() ? { author: hubUserName()! } : {}),
       goal: goal || undefined,
       target,
       ...(agentModel ? { model: agentModel } : {}),

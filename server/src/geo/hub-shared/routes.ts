@@ -84,8 +84,14 @@ export async function registerSharedHubRoutes(
       hashes.add(snapshot.package.sha256);
       identities.set(snapshot.package.methodId, hashes);
     }
+    // Trials of the registered package bytes count wherever they were installed: through this entry, or by the author
+    // trying the same draft revision before registering (authoring installs).
+    const authorInstalls = await authoring
+      .read(record.authoringProjectId)
+      .then((p) => p.installs.map((i) => i.projectId))
+      .catch(() => [] as string[]);
     let trials = 0;
-    for (const projectId of new Set(record.installs.map((i) => i.projectId))) {
+    for (const projectId of new Set([...record.installs.map((i) => i.projectId), ...authorInstalls])) {
       if (getProject(projectId))
         for (const [methodId, hashes] of identities)
           trials += countRegisteredMethodTrials(resolvePaths(projectId), methodId, hashes);

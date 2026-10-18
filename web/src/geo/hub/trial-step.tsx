@@ -13,6 +13,8 @@ import type { MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods"
 import { geoLocale, geoText } from "@/geo/i18n";
 import { apiFetch } from "@/lib/projects";
 
+import { InputPrep } from "./input-prep";
+
 const text = geoText("hub");
 
 async function loadTrials(install: AuthoringInstall, slug: string): Promise<MethodTrial[]> {
@@ -145,12 +147,20 @@ export function TrialStep({
                       })}
                     </span>
                   </span>
-                  <Button variant="outline" size="sm" onClick={() => onOpen(install)}>
-                    {text("trial.openAgain")}
-                  </Button>
+                  {list.length > 0 && (
+                    <Button variant="outline" size="sm" onClick={() => onOpen(install)}>
+                      {text("trial.openAgain")}
+                    </Button>
+                  )}
                 </div>
                 {list.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{text("trial.none")}</p>
+                  // No trial yet: the same input and environment preparation as the shared-method path.
+                  <InputPrep
+                    projectId={install.projectId}
+                    projectName={projectName(install.projectId)}
+                    methodKey={install.methodKey}
+                    onOpenSetup={() => onOpen(install)}
+                  />
                 ) : (
                   <ul className="flex flex-col divide-y rounded-lg border text-sm">
                     {list.slice(0, 3).map((trial) => (

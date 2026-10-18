@@ -69,7 +69,7 @@ describe("Shared hub browse", () => {
     expect(screen.getByRole("tab", { name: "허브에 등록된 방법" }).getAttribute("aria-selected")).toBe("true");
     await loaded();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "지도" } });
-    fireEvent.mouseDown(screen.getByRole("tab", { name: /나의 스킬/ }), { button: 0, ctrlKey: false });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /내가 만든 방법/ }), { button: 0, ctrlKey: false });
     expect(screen.queryByRole("searchbox")).toBeNull();
     fireEvent.mouseDown(screen.getByRole("tab", { name: "허브에 등록된 방법" }), { button: 0, ctrlKey: false });
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("지도");

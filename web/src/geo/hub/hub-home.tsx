@@ -328,7 +328,7 @@ export function HubHome({
                     <span className="text-sm font-semibold">{p.methodTitle ?? p.title}</span>
                     {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
                     <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
-                      {text("home.updated", { when: when(p.updatedAt) })}
+                      {p.author ? text("home.byUpdated", { author: p.author, when: when(p.updatedAt) }) : text("home.updated", { when: when(p.updatedAt) })}
                       {registered[p.id] && (
                         <span
                           role="link"
