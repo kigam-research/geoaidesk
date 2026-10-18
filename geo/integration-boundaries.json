@@ -520,7 +520,7 @@
     },
     {
       "path": "server/test/geo-hub-shared.test.ts",
-      "owner": "gaid-hub-followups--hub-browse",
+      "owner": "gaid-hub",
       "status": "edited",
       "responsibility": "Shared hub browse query/folder filtering and star/recency sorting regression coverage"
     }
