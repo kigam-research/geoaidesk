@@ -4,7 +4,7 @@ date: 2026-10-18
 project: geoaidesk
 task: gaid-output-style
 headline: GAID AI agent가 채팅 답변을 결과부터 쓰고, 연구노트는 쓰기 전에 문장 다듬기 스킬을 읽고 씁니다. 같은 분석을 기관 Qwen으로 돌려 보니 답변의 첫 문장이 결과로 바뀌었고 장식용 굵은 글씨와 대시가 줄었습니다. 노트 문체(합니다체/해라체)는 정하지 않았습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover:
 supersedes:
