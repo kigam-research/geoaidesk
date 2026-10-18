@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T04:35:23Z
+updated: 2026-10-18T04:44:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9359a03e-346b-46ab-8fd2-b550d5f2892a","pid":2509241,"provider":"claude","session":"eb90d3f8-ef5f-4682-a9ac-f9f30fcfb71b","start":"18601177","token":"2d3dd8390a92fcf9b4abf90fd2ccf7992fce26cc1f0b454ab49bb9a35e29d5e0"}
 branch: task/gaid-hub-followups
 target: main
@@ -52,11 +52,37 @@ new main (user's standing practice: update the review app once after work comple
 Outside check: no outside check (app work; the re-trial is the acceptance evidence for package 1).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-18: code sites mapped (three read-only Explore agents). Children started (Codex gpt-6.1-sol high, normal speed):
+  - gaid-hub-followups--defects, agent 67556782 — package 2 except the hub-side receive: chat long-run progress, hub
+    methods in file task suggestions, 413 loop on big CSV, text label on the handoff button, abort kills background
+    processes, data guard does not prompt for in-sandbox non-protected removals. Brief:
+    ~/data/geoaidesk/work/gaid-hub-followups/briefs/child-defects.md
+  - gaid-hub-followups--hub-browse, agent 03077f19 — gaid-hub#3 shared-method list (folders + search) on the hub home.
+    Brief: ~/data/geoaidesk/work/gaid-hub-followups/briefs/child-hub-browse.md
+- This writer: authoring rules + start defaults + hub-side receive, then the revised PU package and the re-trial.
 ## Next steps
-1. (the next session's first action)
+1. Authoring changes (this writer): fixed questions "code-use"/"quick-trial" (server-side, after validateAnalysis); quick
+   recipe (`<slug>-quick`) when quick-trial is chosen; prompt rules: nested-parallelism thread bound (BaggingPU 11 min was
+   XGB n_jobs=-1 inside BaggingPU), expected files = the paths the skill/code actually writes; server strips "(선택)/(필수)"
+   from labels; recipe choices only from researcher decisions (start defaults were paper values); single-file input
+   preselected in TaskSetup; trial matching falls back to basename (found elsewhere).
+2. Hub-side receive: HandoffDialog "GAID 허브로 보내기" -> new authoring project with the bundle as a `gaid-analysis` source;
+   kindOf detects the manifest.
+3. Trial instance from this worktree (ports 3360/18360, data ~/data/geoaidesk/work/gaid-hub-followups/home), produce the
+   revised PU package in the GAID hub from the paper + code, re-run the gaid-hub-integration limited trial (same instruction
+   text, 70,200-cell Yilgarn_GIS_DB.csv) with a researcher-role agent.
+4. `task complete` each child, integrate, scripts/check, report, finish.
 ## Failed approaches
 ## Notes and decisions
+- Ownership: defects child owns chat/tool-activity, use-agent, events.ts tool_update, file-actions + suggestions, use-sandbox
+  + sandbox.ts 413, chat-actions.tsx, sessions abort/process tracking, data-guard/bash-classifier (+kady-guard copy).
+  hub-browse child owns hub-home.tsx, shared-api.ts, server/src/geo/hub-shared/**, contracts/hub-shared.ts, `home.browse.*`
+  keys. This writer owns server/src/geo/authoring/**, hub-handoff (server+web), web/src/geo/hub/* other than hub-home,
+  task-setup.tsx, methods/trials.ts. Integration order: hub-browse, defects, then this writer's branch tip.
+- Prior trial facts: gaid-hub-integration instruction text and dataset in
+  ~/data/geoaidesk/work/gaid-hub-integration/researcher/{BRIEF.md,log.md}; dataset copy
+  ~/data/geoaidesk/work/gaid-hub-integration/samples/yilgarn/Yilgarn_GIS_DB.csv (asset yilgarn-gis-db/20260911).
+  geo-mpm environment = geo-gis + xgboost only (no scikit-gstat, pulearn, optuna).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
