@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T09:25:33Z
+status: ready
+updated: 2026-10-18T09:25:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03bb8c52-5554-4f2c-8eac-ff609606e9cb","pid":2981080,"provider":"codex","session":"01a14e33-e7dc-7f11-896d-cc8d6a1c24a8","start":"20132575","token":"9229f706ac6aec69b0c3a4f13b440d4152f6c305c5f8571194c2420dbb8d0540"}
 branch: task/gaid-notebook-review--notes-server
 target: task/gaid-notebook-review
@@ -70,7 +70,7 @@ length, any contract deviation. Then `task finish`.
 Implemented the server-side research notes: pure bilingual parser, bounded NFC/NFD-aware sandbox store, byte-preserving atomic status edits, lead write/edit format checks and session association, project-scoped list/read/status routes, and the exact requested agent instruction. No shared contract or web/UI changes. Hub handoff needs no source change: a real ProvenanceRecorder test verifies that lead-written notes and figures appear in preview.files. After fixing the full-check Windows path guard, final backend typecheck and 89/89 tests across 9 affected suites passed (23 note tests). RESEARCH_NOTE_RULE is the supplied 675-character text, adding 678 prompt characters. POST status returns ResearchNoteSummary directly. Parent integration and deployment have not happened; task finish reruns the declared full check before publishing this child.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-18T09:14:08Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-18T09:25:35Z: ready; the parent gaid-notebook-review integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 Third full check again passed all backend tests, but two unrelated frontend tests (CSV pagination and LaTeX review/save) hit their existing 5-second timeout under host load ~43 on 32 threads (41 GiB RAM available). The previous full run passed all 1077 frontend tests. Do not change out-of-scope UI source or weaken the test timeout. Direct rerun with `--maxWorkers=2` passed both files, 13/13 tests (11.45 s). Installed Vitest source confirms VITEST_MAX_WORKERS overrides maxWorkers, so use `VITEST_MAX_WORKERS=2 task finish` for the next finish only; no persistent config change. The closed marker above is an unpublished finish intent, not evidence of successful publication.
