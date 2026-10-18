@@ -34,6 +34,7 @@ describe("Shared hub browse", () => {
     expect(screen.queryByRole("button", { name: "지질 지도 확인 열기" })).toBeNull();
     expect(sharedHub.entries).not.toHaveBeenCalledWith("geo", "없는 방법");
     await screen.findByText("조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.");
+    expect(screen.getByText("원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다.")).toBeTruthy();
     expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", "없는 방법");
     fireEvent.click(screen.getByRole("button", { name: "전체 방법 보기" }));
     await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("all", ""));
@@ -48,6 +49,7 @@ describe("Shared hub browse", () => {
     vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [] });
     fireEvent.click(screen.getByRole("button", { name: "목록 다시 읽기" }));
     await screen.findByText("등록된 방법이 없습니다. 추천 Workflow를 살펴보세요.");
+    expect(screen.queryByText("원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다.")).toBeNull();
     expect(screen.getByRole("button", { name: "추천 Workflow 보기" })).toBeTruthy();
   });
 

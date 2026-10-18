@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:07:02Z
+updated: 2026-10-18T08:12:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b4c674e6-3330-4284-8f14-ab1e619c6fe4","pid":1905277,"provider":"codex","session":"01a14e0c-9ac1-7a22-84f7-fe396a47cfb5","start":"19875020","token":"c8527c7072114ae3c43b788a5371371c2e5e7835f8bb261a59ddaafbccd0b63b"}
 branch: task/gaid-hub-novice-review--shared
 target: task/gaid-hub-novice-review
@@ -67,11 +67,20 @@ Record all of it in your task document. Server tests: run with `env -u VITEST_MA
 tests flake under load. raw.githubusercontent.com is blocked on this network.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed the assigned writer in the original printed worktree; read the task, project rules, UI guide and round-1 evidence.
+- Implemented snapshot-grounded multiword commodity-alias search, latest-snapshot implementation state and empty-search hint; verification pending.
+- Codegraph has no index for this exact worktree; used native reads as instructed.
 ## Next steps
-1. (the next session's first action)
+1. Add focused server/web tests, run declared checks, then capture Korean entry/empty-search screenshots on isolated ports.
 ## Failed approaches
+- Initial focused tests could not run because this fresh worktree had no npm dependencies. Installed both lockfiles with npm ci; no source workaround. task job run refused the dirty source before starting or issuing any job receipt; these short dependency installs ran locally.
+- Extended integration fixture initially omitted the skill-description trigger, causing the existing format gate to reject it. Preserved the original trigger and appended Ni text. The next run exposed an obsolete phrase-search expectation: “이 연구원” now matches words across fields. Used a unique author surname and verified the intended AND-word semantics in the unit test.
+- Initial isolated browser API calls failed CORS because its backend lacked KADY_FRONTEND_PORT=3380; restarted only that QA backend with its matching UI port.
 ## Notes and decisions
+- Parent expanded scope in this tab: add new-project creation to the shared install dialog using the existing POST /projects client; reuse the parent's NewProject component from draft-step.tsx and useProjects().create, then select it for installation (P1/B1). Parent owns trial.newProject.* strings; no new shared creation strings remain. Parent confirms the preview caller is hub-screen.tsx and already supplies implementation there.
+- Sequential plan: settle search/API semantics → update shared entry/empty state → focused tests → isolated UI QA → declared checks and finish. Owned files follow the starter contract; no independent package warrants a reader, and nested child units are not supported.
+- Trial scope uses the explicitly allowed “started trials” wording. Current observation reads whole provenance logs; no cheap bounded completeness aggregate exists. Do not introduce provenance scans into list/detail requests for a count.
+- HubEntry implementation is required in API responses and derived at read time; stored entries need no migration. SharedMethodView accepts an optional implementation for the parent's registration-preview caller in hub-screen.tsx; parent confirmed that it now supplies the derived value. Shared entry always supplies it.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

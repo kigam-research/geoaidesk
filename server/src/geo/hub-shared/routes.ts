@@ -22,6 +22,7 @@ import { geoCatalogueActive, loadGeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow } from "../catalogue-types.ts";
 import { countRegisteredMethodTrials } from "../methods/trials.ts";
 import { SharedHubStore, type RegisteredSnapshot, type StoredEntry } from "./store.ts";
+import { hubSearchFields, matchesHubSearch } from "./search.ts";
 
 export interface SharedHubOptions extends InstallDeps {
   store?: SharedHubStore;
@@ -92,6 +93,7 @@ export async function registerSharedHubRoutes(
     return {
       ...record.entry,
       tagline: korean(snapshotOf(record).draft.profile.tagline),
+      implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       stars: Object.keys(stars).length,
       starredByMe: user !== null && Object.hasOwn(stars, user),
       comments: comments.length,
@@ -137,12 +139,7 @@ export async function registerSharedHubRoutes(
           const e = record.entry;
           if (req.query.folder && e.folderId !== req.query.folder) return false;
           if (!query) return true;
-          const profile = snapshotOf(record).draft.profile;
-          const terms = Object.values(profile.taxonomy).flat();
-          return [e.title, e.summary, e.author, ...e.tags,
-            ...(typeof profile.tagline === "string" ? [profile.tagline] : Object.values(profile.tagline)),
-            ...terms.flatMap((id) => [id, labels.get(id) ?? ""]),
-          ].join(" ").toLocaleLowerCase().includes(query);
+          return matchesHubSearch(query, hubSearchFields(e, snapshotOf(record).draft, labels));
         },
       );
       const entries = await Promise.all(records.map((r) => entryView(r, hubUser(req))));

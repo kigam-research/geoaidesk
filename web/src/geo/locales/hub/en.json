@@ -40,7 +40,8 @@
       "folders": "Registered method topic folders",
       "search": {
         "label": "Search registered methods",
-        "placeholder": "Search title, tagline, author or taxonomy"
+        "placeholder": "Search title, tagline, author or taxonomy",
+        "hint": "You can also search by element symbol (Ni) or method name (PU)."
       },
       "order": "Most stars · Newest registration",
       "count": "{count} methods",
@@ -189,7 +190,12 @@
     "showLess": "Show less",
     "issueCount": "({count, plural, one {# place} other {# places}})",
     "issueDetail": "Show details",
-    "warnings": "{count, plural, one {# note} other {# notes}}"
+    "warnings": "{count, plural, one {# note} other {# notes}}",
+    "implementation": {
+      "descriptive": "Instructions only · no run code",
+      "implemented": "Includes run code",
+      "descriptiveHint": "When you try it, the AI agent writes the analysis code from these instructions."
+    }
   },
   "trial": {
     "title": "Try in my research project first (optional)",
@@ -271,7 +277,7 @@
     "star": "Star",
     "starred": "Starred",
     "try": "Try in my project",
-    "trials": "{count, plural, one {# GAID trial record} other {# GAID trial records}} (not a review)",
+    "trials": "{count} GAID trials started (not a review)",
     "comments": "{count, plural, one {# comment} other {# comments}}",
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
     "comment": "Add comment",

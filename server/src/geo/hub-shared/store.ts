@@ -29,7 +29,7 @@ export interface RegisteredSnapshot {
 export interface StoredEntry {
   schemaVersion: "gaid-hub-entry/v1";
   authoringProjectId: string;
-  entry: Omit<HubEntry, "stars" | "starredByMe" | "comments" | "trials">;
+  entry: Omit<HubEntry, "stars" | "starredByMe" | "comments" | "trials" | "implementation">;
   snapshots: Record<string, RegisteredSnapshot>;
   installs: AuthoringInstall[];
 }
