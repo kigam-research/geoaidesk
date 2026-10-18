@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T12:35:48Z
+status: done
+updated: 2026-10-18T12:36:19Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"62008f86-1be6-4772-943a-a951ffca285d","pid":468448,"provider":"claude","session":"85b4150d-ec81-4480-967e-62529d54438c","start":"21342974","token":"5b8b5067b5c9f3de1c1fb5825e3148f5d6bbd2ebb965c023135d08bfdc476cdc"}
 branch: task/gaid-note-style
 target: main
@@ -36,7 +36,9 @@ Outside check: no outside check.
   `~/data/geoaidesk/work/gaid-note-style/evidence/run{1,2}/`. Trial app unit `gaid-notestyle-app` stopped.
 - Report: reports/2026-10-18-gaid-note-style/index.md.
 ## Next steps
-1. scripts/check result into report appendix, review-copy, finish.
+<!-- task:closed -->
+Closed 2026-10-18T12:36:19Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Naming only headline and table sentences: decision options stayed 해라체 (run1).
 ## Notes and decisions
