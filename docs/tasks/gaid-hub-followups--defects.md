@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-18T05:07:44Z
+status: ready
+updated: 2026-10-18T05:07:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"67556782-4e39-4225-a8e6-ec2cfcbc0a94","pid":2562420,"provider":"codex","session":"01a14d52-3852-76d0-91eb-002d0c05241d","start":"18653523","token":"706cb393c680deb9e7376fd62f4fb19feaf63b84034021c2e3f99c9c33c86a07"}
 branch: task/gaid-hub-followups--defects
 target: task/gaid-hub-followups
@@ -117,7 +117,9 @@ Screenshots (parent should copy into its canonical report's figures/):
 Safe re-verification: use npm test focused files in server/test/{geo-session-processes,session-registry,geo-workspace,bash-classifier,data-guard,sandbox-file-cache}.test.ts and web/src/{components/tool-activity,lib/use-sandbox-refresh,geo/workspace/file-actions}.test.tsx; scripts/check is the full declared check. Screenshot fixture scripts/logs are external under ~/data/geoaidesk/work/gaid-hub-followups--defects/. Do not replay any job recorded below.
 
 ## Next steps
-1. Run task finish; it receives parent updates, including e5461bd42dd3 (parent-owned test, fixed at integration). Do not replay the recorded jobs. Parent then owns task complete/integration and the canonical report.
+<!-- task:closed -->
+Closed 2026-10-18T05:07:45Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First full check: 11 failures in parent-owned hub-handoff.test.tsx (old skill_hub button names/old dialog text), accepted by parent as "parent-owned test, fixed at integration". Do not edit it here.
 - First full check: workspace.test.tsx correctly caught catalogue-only suggestions appearing when catalogue is off. Fixed FileActions to keep only method-exposure suggestions without an active catalogue; installed methods remain available.
