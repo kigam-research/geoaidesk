@@ -959,15 +959,57 @@ type CandidateDraft = NonNullable<ReturnType<typeof validateDraft>["draft"]>;
  * Declare the third-party imports of the supplied code files that the draft includes. The import scan is
  * deterministic, so the server records these instead of asking the model to remember them.
  */
-export function declareImports(draft: CandidateDraft, ctx: SourceContext) {
-  const files: PackageFile[] = draft.codeFiles.map((c) => ({
-    path: c.path,
-    sha256: "",
-    size: 0,
-    text: ctx.files.get(c.sourceId)?.get(c.sourcePath),
-  }));
+export function declareImports(draft: CandidateDraft, ctx: SourceContext, project?: AuthoringProject) {
+  const asFiles = (): PackageFile[] =>
+    draft.codeFiles.map((c) => ({
+      path: c.path,
+      sha256: "",
+      size: 0,
+      text: ctx.files.get(c.sourceId)?.get(c.sourcePath),
+    }));
+  let files = asFiles();
   if (!files.some((f) => f.path.endsWith(".py"))) return;
   const declared = withBundled((draft.profile.dependencies ?? []).map((d) => distributionOf(d.name)));
+  // A module the included code imports that exists in the supplied code (a sibling script or package) is copied in,
+  // never declared as a PyPI distribution (gaid-hub-followups: r1324_r22_analysis became a "dependency").
+  if (project) {
+    const included: string[] = [];
+    for (let round = 0; round < 5; round++) {
+      // Not filtered by the declared list: an earlier draft may have declared the local module as a distribution.
+      const missing = pythonImports(files, pythonStdlib());
+      let added = 0;
+      for (const module of missing)
+        for (const sourceId of new Set(draft.codeFiles.map((c) => c.sourceId))) {
+          const tree = ctx.files.get(sourceId);
+          if (!tree) continue;
+          const paths = [...tree.keys()].filter(
+            (p) => p.endsWith(".py") && (p === `${module}.py` || p.endsWith(`/${module}.py`) || p.split("/").slice(0, -1).includes(module)),
+          );
+          if (!paths.length) continue;
+          for (const sourcePath of paths) {
+            const path = `${codeRoot(project, sourceId)}/${sourcePath}`;
+            if (draft.codeFiles.some((c) => c.path === path) || !safeRelative(path)) continue;
+            draft.codeFiles.push({ path, sourceId, sourcePath });
+            included.push(sourcePath);
+            added++;
+          }
+          break;
+        }
+      if (!added) break;
+      files = asFiles();
+    }
+    // Every module the skill now carries (included by the model or here) is local, not a distribution.
+    const local = new Set<string>();
+    for (const c of draft.codeFiles) {
+      const parts = c.sourcePath.split("/");
+      if (c.sourcePath.endsWith(".py")) local.add(distributionOf(parts.at(-1)!.replace(/\.py$/, "")));
+      for (const dir of parts.slice(0, -1)) local.add(distributionOf(dir));
+    }
+    if (draft.profile.dependencies)
+      draft.profile.dependencies = draft.profile.dependencies.filter((d) => !local.has(distributionOf(d.name)));
+    if (included.length)
+      draft.notes.push(`포함한 코드가 불러오는 같은 자료 안의 파일 ${included.length}개를 함께 넣었습니다: ${included.slice(0, 5).join(", ")}`);
+  }
   const modules = pythonImports(files, pythonStdlib()).filter((m) => !declared.has(distributionOf(m)));
   const names = [...new Set(modules.map(distributionOf))];
   // A distribution installed with another needed one (joblib with scikit-learn) is not declared separately.
@@ -1176,7 +1218,7 @@ async function execute(
         result = { ok: !!d.draft, errors: d.errors, draft: d.draft };
         // Run the package checks on the candidate so the bounded repair can fix what packaging would refuse.
         if (d.draft) {
-          declareImports(d.draft, ctx);
+          declareImports(d.draft, ctx, project);
           result.errors = [...result.errors, ...(await packageErrors(store, project, d.draft, deps))];
         }
       }
