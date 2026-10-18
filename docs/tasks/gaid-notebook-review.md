@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T07:49:18Z
+updated: 2026-10-18T08:48:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -42,21 +42,38 @@ Outside check: no outside check (app/system design work).
   only pin/comment/note (note box hidden in default all-chats scope), no visible Markdown, exports/methods draft in English,
   R1 violations (command lines, session/tool-call ids), no link to GAID methods/trials/recipes/hub handoff (handoff skips dot
   dirs). The agent already writes a reader-facing report into `results/*.md` that the notebook treats as just an artifact.
-- Waiting for the user's choice (report §6): direction 가) research-note-first / 나) tidy + links / 다) minimal; and, for 가),
-  when notes are written.
+- User decision 2026-10-18 (verbatim): "모두 권장으로 진행하자." → report §6 1-가 (research-note-first) and 2-가 (the agent
+  writes/updates a note when an analysis has results; 노트 정리 prefills a request). Phase 2 in progress.
+- Shared interfaces settled by the top writer: contract `web/src/geo/contracts/research-notes.ts`, format/behaviour spec
+  `docs/geo/research-notes.md`.
 ## Next steps
-1. User answers report §6 in this tab. Then record the answer here, remove/adjust the matching Open items, and plan Phase 2
-   (work packages, owned files, integration order) for the agreed scope only.
+1. Children run S and C (below); top writer builds W against the contract, then integrates S → C → W, runs scripts/check,
+   screenshots (UI guide §10), updates the report (result of Phase 2, §6 answered) and finishes.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Phase 2 plan (scope = option 가 + 2-가 only):
+- Sequential decisions (top writer, done): note location `연구노트/<YYYY-MM-DD>-<topic>/index.md` + `figures/`; file is the
+  master, agent writes with ordinary write/edit (no new tool: tool schemas already dominate the start prompt); server
+  parses frontmatter + sections; `.kady/geo/notes.json` maps note → chats; method link derived from method-trial records
+  of those chats; status `pending|confirmed|superseded`, only the researcher confirms; 노트 정리 = chat prefill (no
+  separate model call); notes render in the notebook tab (list → note detail), the old timeline becomes 작업 기록.
+- Packages / owned files:
+  - S `gaid-notebook-review--notes-server` (child, general work): `server/src/geo/notes/**`, `server/src/geo/routes/notes.ts`,
+    registration lines in `server/src/geo/routes.ts` and `server/src/geo/session.ts`, `RESEARCH_NOTE_RULE` in
+    `server/src/geo/instructions.ts`, `server/test/geo-notes.test.ts`, boundaries entries for its files.
+  - C `gaid-notebook-review--record-cleanup` (child, general work): R1/language cleanup of the existing notebook
+    (entry card execution evidence and result-link ids behind a disclosure, Korean/locale export and print labels,
+    session-export heading, methods-draft reply language), `web/src/geo/locales/notebook/*`, upstream notebook files
+    with boundaries entries. Must not touch `file-preview-panel.tsx`, `lab-notebook-view.tsx` layout/scope, or `web/src/geo/notes/`.
+  - W (top writer): `web/src/geo/notes/**`, `web/src/geo/locales/notes/*`, the notebook-tab branch in
+    `web/src/components/file-preview-panel.tsx`, docs (`docs/geo/research-notes.md`, `docs/lab-notebook.md`, AGENTS.md line).
+- Integration order: S → C → W (W developed against the contract meanwhile). Boundaries file: append-only entries.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 연구노트를 어떤 방향으로 바꿀지 — 가) 정리 노트 중심: 분석마다 결과부터 쓰는 노트를 프로젝트 `연구노트` 폴더에 두고 지금 기록은 근거로 내림 — 나) 지금 기록을 정리하고 연결 보강 — 다) 최소 수정(내부 정보 숨김, 한국어 내보내기) — 권장: 가) 작업 흐름만 따라가는 문제와 연계 부족을 둘 다 고치고 Obsidian 보고서와 같은 순서로 읽힘 — 막힌 일: 2단계 구현 — 조건: 없음 — 근거: reports/2026-10-18-gaid-notebook-review#6. 결정할 일
-- [결정] 가)일 때 정리 노트를 언제 쓸지 — 가) 분석 하나가 끝나면 AI agent가 같은 대화에서 쓰고 이어지는 질문이면 고침, "노트 정리"로 다시 쓰게 할 수 있음 — 나) 연구자가 "노트 정리"를 누를 때만 — 권장: 가) 연구자가 잊어도 기록이 남고 모델을 한 번 더 부르지 않음 — 막힌 일: 2단계 AI agent 지시 — 조건: 1번에서 가) 선택 — 근거: reports/2026-10-18-gaid-notebook-review#6. 결정할 일
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
