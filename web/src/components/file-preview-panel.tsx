@@ -9,6 +9,7 @@ import { MessageResponse } from "@/components/ai-elements/message";
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
 import { KadyFileIcon } from "@/components/file-icon";
 import { LabNotebookView } from "@/components/lab-notebook-view";
+import { ResearchNotesPanel } from "@/geo/notes/research-notes-panel";
 import { ModalJobsPanel } from "@/components/modal-jobs-panel";
 import { AutomationPanel } from "@/components/automation-panel";
 import { ProvenancePanel } from "@/components/provenance-panel";
@@ -1726,6 +1727,8 @@ export interface FilePreviewPanelProps {
   notebookFocus?: { id: string; token: number } | null;
   /** Scroll the chat transcript to a notebook entry's tool call. */
   onNotebookJumpToChat?: (entryId: string) => void;
+  /** gaid-notebook-review: open the chat that wrote a research note. */
+  onOpenNotebookChat?: (sessionId: string, title: string) => void;
   /** Open the Lab Notebook focused on an entry (used by artifact citations). */
   onOpenNotebookEntry?: (entryId: string) => void;
 }
@@ -1762,6 +1765,7 @@ export function FilePreviewPanel({
   onOpenNotebookFile,
   notebookFocus,
   onNotebookJumpToChat,
+  onOpenNotebookChat,
   onOpenNotebookEntry,
 }: FilePreviewPanelProps) {
   // Per-tab mode tracking
@@ -1924,16 +1928,25 @@ export function FilePreviewPanel({
       })}
 
       {isActive && (showNotebook ? (
-        <LabNotebookView
+        <ResearchNotesPanel
           projectId={projectId}
-          model={oneShotModelRef}
-          sessionId={notebookSessionId}
-          liveEntries={notebookEntries}
           streaming={notebookStreaming}
-          subagentCompletions={notebookSubagentCompletions}
+          recordFocusToken={notebookFocus?.token ?? null}
           onOpenFile={onOpenNotebookFile}
-          focusEntry={notebookFocus}
-          onJumpToChat={onNotebookJumpToChat}
+          onOpenChat={onOpenNotebookChat}
+          workRecord={
+            <LabNotebookView
+              projectId={projectId}
+              model={oneShotModelRef}
+              sessionId={notebookSessionId}
+              liveEntries={notebookEntries}
+              streaming={notebookStreaming}
+              subagentCompletions={notebookSubagentCompletions}
+              onOpenFile={onOpenNotebookFile}
+              focusEntry={notebookFocus}
+              onJumpToChat={onNotebookJumpToChat}
+            />
+          }
         />
       ) : showAutomation ? (
         <AutomationPanel projectId={projectId} />

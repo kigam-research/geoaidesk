@@ -30,7 +30,7 @@ export function NotebookEvidenceSummary({ entry, thread, entries, onJump, onOpen
   const hasChecks = health.length > 0 || Boolean(entry.artifacts?.length);
   const isClaim = entry.type === "hypothesis";
   return (
-    <div className="flex min-w-0 flex-col gap-1.5 text-[11px] text-muted-foreground [overflow-wrap:anywhere]">
+    <div className="flex min-w-0 flex-col gap-1.5 text-xs text-muted-foreground [overflow-wrap:anywhere]">
       {entry.provisional && <span>{nbText("evidence.provisional")}</span>}
       {thread?.reviewRequired && (
         <p className="flex items-start gap-1.5 rounded border border-amber-500/30 bg-amber-500/10 p-2 text-amber-700 dark:text-amber-300">
@@ -47,7 +47,7 @@ export function NotebookEvidenceSummary({ entry, thread, entries, onJump, onOpen
       {sourceIds.length > 0 && (
         <details className="rounded border px-2 py-1">
           <summary className="cursor-pointer">{nbText("evidence.inspect", { count: sourceIds.length })}</summary>
-          <p className="my-1 text-[10px]">{nbText("evidence.interpretations")}</p>
+          <p className="my-1 text-xs">{nbText("evidence.interpretations")}</p>
           <ul className="flex flex-col gap-1">
             {sourceIds.slice(0, visibleCount).map((id) => {
               const source = entries?.get(id);
@@ -76,7 +76,11 @@ export function NotebookEvidenceSummary({ entry, thread, entries, onJump, onOpen
       {entry.outcome && <p>{nbText("evidence.outcome")} <strong>{nbText(`outcome.${entry.outcome}`)}</strong>{entry.outcome === "technical-failure" ? nbText("evidence.technical_failure") : entry.outcome === "null" ? nbText("evidence.null") : ""}</p>}
       {(entry.execution || entry.type === "method") && <div>
         <p>{nbText("evidence.execution")} <strong>{nbText(`execution.${entry.execution?.status ?? "unverified"}`)}</strong> {nbText("evidence.reported_only")}</p>
-        {entry.execution?.evidence && <p className="whitespace-pre-wrap">{nbText("evidence.reported", { evidence: entry.execution.evidence })}</p>}
+        {entry.execution?.evidence && <details className="rounded border px-2 py-1">
+          <summary className="cursor-pointer">{nbText("evidence.execution.technical")}</summary>
+          <button type="button" className="my-1 underline" onClick={() => void navigator.clipboard.writeText(entry.execution!.evidence!)}>{nbText("common.copy.button")}</button>
+          <p className="whitespace-pre-wrap">{nbText("evidence.reported", { evidence: entry.execution.evidence })}</p>
+        </details>}
       </div>}
       {entry.scope && <p><strong>{nbText("evidence.applies")}</strong> {entry.scope}</p>}
       {entry.revisitWhen && <p><strong>{nbText("evidence.revisit")}</strong> {entry.revisitWhen} <span>{nbText("evidence.condition")}</span></p>}
@@ -84,14 +88,14 @@ export function NotebookEvidenceSummary({ entry, thread, entries, onJump, onOpen
       {hasChecks && (
         <details className="rounded border px-2 py-1">
           <summary className="cursor-pointer">{health.length ? nbText("evidence.checks", { unchanged: health.filter((h) => h.status === "unchanged").length, total: health.length }) : nbText("evidence.checks_unverified")}</summary>
-          <p className="my-1 text-[10px]">{nbText("evidence.direct_files")}</p>
+          <p className="my-1 text-xs">{nbText("evidence.direct_files")}</p>
           {health.length === 0 && <p>{nbText("evidence.no_verification")}</p>}
           <ul className="flex flex-col gap-1">
             {health.map((h) => <li key={h.path}>
               <button type="button" className="text-left underline decoration-dotted underline-offset-2" onClick={() => onOpenFile(h.path)}>{h.path}</button>
               {" — "}<strong>{nbText(`health.${h.status}`)}</strong>
               <p>{h.reason}</p>
-              <time className="text-[10px]" dateTime={new Date(h.checkedAt).toISOString()}>{nbText("evidence.checked", { when: new Date(h.checkedAt).toLocaleString(geoLocale()) })}</time>
+              <time className="text-xs" dateTime={new Date(h.checkedAt).toISOString()}>{nbText("evidence.checked", { when: new Date(h.checkedAt).toLocaleString(geoLocale()) })}</time>
             </li>)}
           </ul>
           {Boolean(entry.artifactHealthTruncated) && <p>{nbText("evidence.truncated", { count: entry.artifactHealthTruncated! })}</p>}

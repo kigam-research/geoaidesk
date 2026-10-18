@@ -478,5 +478,6 @@
   "values.incoming supports": "incoming supports",
   "values.incoming challenges": "incoming challenges",
   "values.incoming inconclusive": "incoming inconclusive",
-  "values.incoming context": "incoming context"
+  "values.incoming context": "incoming context",
+  "next_experiments.default_constraints": "Prefer informative, low-cost checks using existing data before new collection."
 }

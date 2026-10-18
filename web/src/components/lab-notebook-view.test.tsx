@@ -370,7 +370,7 @@ describe("LabNotebookView", () => {
       await waitFor(() => expect(createURL).toHaveBeenCalled());
       expect(
         spy.mock.calls.some(
-          ([u]) => u === "/projects/default/notebook/export?format=md",
+          ([u]) => u === "/projects/default/notebook/export?format=md&lang=en",
         ),
       ).toBe(true);
       // The session route must not be used for a project-scope export.

@@ -18,7 +18,7 @@ function PlanningDialog({ entry, sessionId, projectId, model, onSaved }: Props) 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<NextExperimentView | null>(null);
   const [busy, setBusy] = useState(false); const [error, setError] = useState("");
-  const [constraints, setConstraints] = useState("Prefer informative, low-cost checks using existing data before new collection.");
+  const [constraints, setConstraints] = useState(() => rt("next_experiments.default_constraints"));
   const [approveCall, setApproveCall] = useState(false);
   const [lastRequest, setLastRequest] = useState<string | null>(null); const [requestStatus, setRequestStatus] = useState("");
   const [selection, setSelection] = useState<{ proposal: NextExperimentProposalView; candidateId: string } | null>(null);

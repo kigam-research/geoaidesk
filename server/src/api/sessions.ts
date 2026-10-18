@@ -1,3 +1,4 @@
+import { notebookExportLocale, notebookExportLabels } from "../../../web/src/geo/notebook/export-text.ts";
 /**
  * Session lifecycle + the streaming run endpoint.
  *
@@ -231,10 +232,11 @@ export async function registerSessionRoutes(app: FastifyInstance): Promise<void>
     }
   });
 
-  app.get<{ Params: { id: string }; Querystring: { format?: string } }>(
+  app.get<{ Params: { id: string }; Querystring: { format?: string; lang?: string } }>(
     "/sessions/:id/notebook/export",
     async (req, reply) => {
       const format = req.query.format ?? "md";
+      const lang = notebookExportLocale(req.query.lang);
       if (format !== "md" && format !== "json" && format !== "zip") {
         reply.code(400);
         return { detail: "format must be md, json, or zip (PDF is exported client-side)" };
@@ -256,10 +258,11 @@ export async function registerSessionRoutes(app: FastifyInstance): Promise<void>
         if (format === "json") {
           reply.header("Content-Type", "application/json; charset=utf-8");
           attachment("json");
-          return { sessionId: req.params.id, projectName, entries, annotations };
+          return { sessionId: req.params.id, projectName, entries, annotations, locale: lang, labels: notebookExportLabels(lang) };
         }
         if (format === "zip") {
           const { buffer } = buildNotebookZip(entries, {
+            lang,
             sessionId: req.params.id,
             projectName,
             sandboxRoot: activePaths().sandbox,
@@ -269,7 +272,7 @@ export async function registerSessionRoutes(app: FastifyInstance): Promise<void>
           attachment("zip");
           return buffer;
         }
-        const md = notebookToMarkdown(entries, {
+        const md = notebookToMarkdown(entries, { lang,
           sessionId: req.params.id,
           projectName,
           annotations,
@@ -385,7 +388,7 @@ export async function registerSessionRoutes(app: FastifyInstance): Promise<void>
 
   // Reproducibility export: a runnable shell script (?format=sh) or a markdown
   // lab notebook (?format=md) reconstructed from the Pi session log.
-  app.get<{ Params: { id: string }; Querystring: { format?: string } }>(
+  app.get<{ Params: { id: string }; Querystring: { format?: string; lang?: string } }>(
     "/sessions/:id/export",
     async (req, reply) => {
       try {
@@ -398,7 +401,7 @@ export async function registerSessionRoutes(app: FastifyInstance): Promise<void>
         }
         const body =
           format === "md"
-            ? toNotebook(file, req.params.id, paths.sandbox)
+            ? toNotebook(file, req.params.id, paths.sandbox, req.query.lang)
             : toShellScript(file, req.params.id, paths.sandbox);
         const ext = format === "md" ? "md" : "sh";
         reply.type(format === "md" ? "text/markdown" : "text/x-shellscript");

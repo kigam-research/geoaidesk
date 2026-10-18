@@ -8,6 +8,8 @@ import { MARKDOWN_IMAGE_RULE } from "./markdown-images.ts";
 export const REPLY_LANGUAGE_RULE =
   "Reply in the language the user asked for; otherwise in the language of the user's latest request. Files written for the user, notebook entries and result summaries follow the same choice unless the task names another language.";
 
+export const RESEARCH_NOTE_RULE = "When an analysis the user asked for has produced results, write a research note before your final reply, or update the note of the same question: `연구노트/<YYYY-MM-DD>-<topic>/index.md`, with the figures it shows copied to its `figures/`. Frontmatter: title, date, status: pending, headline (one-sentence conclusion), cover, supersedes. Sections in order: 한눈에 (table: 요청, 결론, 믿을 수 있는 정도, 결정할 일), 결과, 한 일, 한계, 결정할 일 (numbered questions, options `- 가) …`, one marked `(권장: reason)`), 근거 (links to files). In English replies use At a glance, Results, What was done, Limits, Decisions, Evidence. Research language only: no commands, tool names or ids. Keep logging notebook entries.";
+
 /**
  * Concise GeoAIDesk guidance appended to the lead's system prompt in geo
  * catalogue mode (plan §3.8). Kept short on purpose: every line is sent with
@@ -22,6 +24,7 @@ export const GEO_INSTRUCTIONS = `## GeoAIDesk data handling
 - The project environment already has the catalogue's core and GIS packages (see \`pyproject.toml\`); use their Python APIs. Do not assume GDAL command-line tools.
 - An unknown CRS stays unknown: ask for it or work in native coordinates instead of guessing.
 - ${MARKDOWN_IMAGE_RULE}
+- ${RESEARCH_NOTE_RULE}
 - The skills listed for this chat are a task selection; others stay installed and the user can start a chat with them.
 - Work inside this project. Do not change the app's installation, its catalogue, shared data folders or other projects, and do not edit an installed catalogue skill unless the user asks for that file; read files outside the project only when the user points to them.
 - A skill you write goes in \`.pi/skills/<name>/\` with a \`SKILL.md\` that states inputs, steps and limits and marks what was not tested. Do not claim a publisher, a published state or a verification you did not do.

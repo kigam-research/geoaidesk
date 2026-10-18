@@ -1,0 +1,80 @@
+{
+  "panel": {
+    "title": "Lab Notebook",
+    "summary": "{count} research notes · {decisions} decisions to make",
+    "summaryNoDecisions": "{count} research notes",
+    "loading": "Reading research notes."
+  },
+  "organize": {
+    "button": "Write note",
+    "tip": "Puts a request in the chat box asking the AI agent to write this chat's results as a research note.",
+    "prompt": "Write the results of this chat's analysis as a research note. If a note for the same question already exists, update that note."
+  },
+  "record": {
+    "button": "View work record",
+    "back": "Back to research notes",
+    "hint": "Entries the AI agent logged while working. They are the evidence behind research notes."
+  },
+  "group": {
+    "decisions": "Decisions to make {count}",
+    "pending": "Not reviewed {count}",
+    "confirmed": "Reviewed {count}",
+    "superseded": "Replaced {count}"
+  },
+  "status": {
+    "pending": "Not reviewed",
+    "confirmed": "Reviewed",
+    "superseded": "Replaced",
+    "pendingTip": "No researcher has reviewed this note yet.",
+    "confirmedTip": "A researcher reviewed this note.",
+    "supersededTip": "A newer note replaces this note's conclusion."
+  },
+  "badge": {
+    "decisions": "{count} decisions",
+    "decisionsTip": "This note has decisions to answer.",
+    "format": "Check format",
+    "formatTip": "Parts of the note are missing. Use Write note to have them fixed."
+  },
+  "empty": {
+    "title": "No research notes yet",
+    "body": "When an analysis has results, the AI agent writes a note that starts with the results in the 연구노트 folder."
+  },
+  "error": {
+    "load": "Research notes could not be read. Open them again in a moment.",
+    "status": "The note status was not changed. Try again.",
+    "retry": "Read again",
+    "technical": "Technical details"
+  },
+  "detail": {
+    "back": "Back to list",
+    "method": "Method used: {name}",
+    "methodUnnamed": "hub method",
+    "assessment": {
+      "useful": "Trial assessment: useful",
+      "needs-revision": "Trial assessment: needs revision",
+      "failed": "Trial assessment: failed"
+    },
+    "confirm": {
+      "button": "Mark as reviewed"
+    },
+    "unconfirm": {
+      "button": "Mark as not reviewed"
+    },
+    "openChat": {
+      "button": "Open chat"
+    },
+    "openFile": {
+      "button": "Open as file"
+    },
+    "supersededBy": "A newer note replaces this note.",
+    "openSuperseding": {
+      "button": "Open newer note"
+    }
+  },
+  "decision": {
+    "title": "Decisions to make",
+    "recommended": "Recommended",
+    "answerTip": "Opens the chat that wrote the note and puts the chosen answer in its chat box. You can edit it before sending.",
+    "prompt": "Answering decision {number} of the note \"{title}\": {label}) {text}\nNote: {path}\nContinue the work accordingly and update the note."
+  }
+}

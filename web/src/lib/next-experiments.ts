@@ -1,3 +1,4 @@
+import { notebookExportText } from "../geo/notebook/export-text";
 /** IO-free next-investigation protocol. Predictions and preferences are not evidence or permission. */
 import type { MemorySource, MemoryHit, MemoryCoverage } from "./notebook-memory";
 import type { NotebookArtifactSnapshot } from "./notebook-evidence-core";
@@ -208,14 +209,17 @@ export function orderedExperiments(plan: NextExperimentPlan): NextExperimentPlan
   const add = (e: NextExperimentPlan["experiments"][number]) => { if (done.has(e.id)) return; done.add(e.id); for (const dep of e.dependsOn) { const target = plan.experiments.find((x) => x.id === dep); if (target) add(target); } out.push(e); };
   for (const e of sorted) add(e); return out;
 }
-export function nextExperimentsText(plan: NextExperimentPlan): string {
-  return ["# Proposed next investigations", NEXT_EXPERIMENT_NOTICE, `Target hypothesis: ${JSON.stringify(plan.target)} (omitted source sessions default to the proposal's session)`, `Question: ${plan.question}`, `Decision to inform: ${plan.decision}`, `Existing-data assessment: ${plan.existingDataAssessment}`,
-    ...plan.explanations.map((e) => `Explanation ${e.id}: ${e.label}\n${e.description}\nSources: ${JSON.stringify(e.sources)}`),
+export function nextExperimentsText(plan: NextExperimentPlan, lang?: string): string {
+  const text = notebookExportText(lang);
+  const label = (key: string) => text("export." + key);
+  const value = (v: string) => lang === "ko" ? text("export.value." + v) : v;
+  return [`# ${label("proposal_title")}`, [label("proposal_notice"), label("proposal_judgments"), label("proposal_review")].join(" "), `${label("target")}: ${JSON.stringify(plan.target)} (${label("target_notice")})`, `${label("question")}: ${plan.question}`, `${label("decision")}: ${plan.decision}`, `${label("existing")}: ${plan.existingDataAssessment}`,
+    ...plan.explanations.map((e) => `${label("explanation")} ${e.id}: ${e.label}\n${e.description}\n${label("sources")}: ${JSON.stringify(e.sources)}`),
     ...orderedExperiments(plan).map((e) => [
-      `## ${e.title} (${e.id})`, `Priority: ${e.priority} (qualitative); kind: ${e.kind}; prerequisites: ${e.dependsOn.join(", ") || "none declared"}`, `Rationale: ${e.rationale}`, `Proposed method: ${e.method}`, `Measurement: ${e.measurement}`, `Controls: ${e.controls.join("; ")}`,
-      ...e.predictions.map((p) => `PREDICTED under ${p.explanationId}: ${p.expectedOutcome}`), ...e.decisionBranches.map((b) => `IF observed: ${b.outcome}\nTHEN reconsider decision: ${b.decisionChange}`),
-      `If inconclusive: ${e.inconclusiveAction}`, `Required inputs (not verified available): ${e.requiredInputs.join("; ")}`, `Resources: ${e.resources}`, `Time: ${e.time.level} — ${e.time.rationale}`, `Cost: ${e.cost.level} — ${e.cost.rationale} (not a quote)`,
-      e.whyNewData ? `Why new data: ${e.whyNewData}` : "", `Limitations: ${e.limitations.join("; ")}`, `Sources: ${JSON.stringify(e.sources)}`,
+      `## ${e.title} (${e.id})`, `${label("priority")}: ${value(e.priority)} (${label("qualitative")}); ${label("kind")}: ${value(e.kind)}; ${label("prerequisites")}: ${e.dependsOn.join(", ") || label("none")}`, `${label("rationale")}: ${e.rationale}`, `${label("method")}: ${e.method}`, `${label("measurement")}: ${e.measurement}`, `${label("controls")}: ${e.controls.join("; ")}`,
+      ...e.predictions.map((p) => text("export.predicted", { explanation: p.explanationId, outcome: p.expectedOutcome })), ...e.decisionBranches.map((b) => text("export.branch", { outcome: b.outcome, decision: b.decisionChange })),
+      `${label("inconclusive")}: ${e.inconclusiveAction}`, `${label("inputs")}: ${e.requiredInputs.join("; ")}`, `${label("resources")}: ${e.resources}`, `${label("time")}: ${value(e.time.level)} — ${e.time.rationale}`, `${label("cost")}: ${value(e.cost.level)} — ${e.cost.rationale} (${label("not_quote")})`,
+      e.whyNewData ? `${label("why_new")}: ${e.whyNewData}` : "", `${label("limitations")}: ${e.limitations.join("; ")}`, `${label("sources")}: ${JSON.stringify(e.sources)}`,
     ].filter(Boolean).join("\n\n")),
   ].join("\n\n");
 }

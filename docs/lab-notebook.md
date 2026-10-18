@@ -1,5 +1,9 @@
 # Lab Notebook
 
+> GeoAIDesk: the notebook tab opens on **research notes** (정리 노트), one result-first Markdown note per analysis in the
+> project's `연구노트` folder; the entries described below are the **work record** (작업 기록) behind them, one click away.
+> See [Research notes](geo/research-notes.md).
+
 The center-panel **Lab Notebook** contains entries authored through Kady's
 `notebook` tool, plus your notes and annotations. It is a research record, not
 a complete execution trace; [Provenance](provenance.md) records observed tool work.

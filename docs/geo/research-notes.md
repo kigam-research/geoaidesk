@@ -1,0 +1,92 @@
+# Research notes
+
+GAID's research notebook is organised around **research notes** (정리 노트): one Markdown note per analysis (one
+research question), written result first, stored where the researcher can see and open it. The notebook entries the
+agent logs while it works (`notebook` tool, `.kady/notebook/`) stay as the **work record** (작업 기록) behind the notes.
+User decision 2026-10-18 (reports/2026-10-18-gaid-notebook-review, §6 1-가 and 2-가).
+
+Contract: `web/src/geo/contracts/research-notes.ts`. Server: `server/src/geo/notes/`. Screens: `web/src/geo/notes/`.
+
+## Storage
+
+- `연구노트/<YYYY-MM-DD>-<topic>/index.md` in the project sandbox, figures in `연구노트/<id>/figures/`. The folder is
+  visible in the file tree; Obsidian opens it as is; a ZIP of the folder is a complete copy.
+- The file is the master. The researcher may edit it in GAID or elsewhere; the server only parses it and rewrites
+  nothing except the `status` line when the researcher marks a note confirmed or back to pending.
+- `.kady/geo/notes.json` maps a note id to the chats (session ids) whose lead agent wrote or edited it. It is filled by
+  the write/edit hook and is the only server-owned state; losing it loses only the chat links.
+
+## Format
+
+```markdown
+---
+title: 다원소 분석값 점검과 조성 탐색
+date: 2026-10-15
+status: pending
+headline: 지정 입력 2개는 시료 자료가 아니어서 참조 자료로 형식을 시연했습니다.
+cover: figures/01-anomaly-map.png
+supersedes:
+---
+# 다원소 분석값 점검과 조성 탐색
+
+## 한눈에
+
+| | |
+|---|---|
+| 요청 | 지정한 두 파일의 단위·검출한계·한정자를 점검하고 조성을 탐색 |
+| 결론 | … |
+| 믿을 수 있는 정도 | … |
+| 결정할 일 | 1건 |
+
+## 결과
+
+![참조 자료의 Ni 이상치 후보 위치](figures/01-anomaly-map.png)
+
+그림 1. … 볼 것: …
+
+## 한 일
+
+1. …
+
+## 한계
+
+- …
+
+## 결정할 일
+
+1. 의뢰 지역 시료 자료로 다시 분석할지
+   - 가) 시료 표를 올려 다시 실행 (권장: 지금 결과는 참조 자료 시연)
+   - 나) 시연으로 마무리
+
+## 근거
+
+- 결과 표: [anomaly_candidates_Ni.csv](../../derived/assay_explorer_demo/anomaly_candidates_Ni.csv)
+- 스크립트: [run_kola.py](../../scripts/run_kola.py)
+```
+
+Rules:
+
+- Frontmatter fields: `title` (required), `date` (YYYY-MM-DD), `status` (`pending` | `confirmed` | `superseded`; the
+  agent writes `pending`, only the researcher sets `confirmed`), `headline` (one sentence), `cover` (path relative to the
+  note), `supersedes` (note ids, comma-separated).
+- Sections in this order, headings in the reply language: 한눈에 / At a glance, 결과 / Results, 한 일 / What was done,
+  한계 / Limits, 결정할 일 / Decisions, 근거 / Evidence. Write "없음" / "None" under an empty section.
+- Decisions: numbered questions; options as `- 가) …`, `- 나) …` (or `a)`, `b)`); one option may carry
+  `(권장: <reason>)` / `(recommended: <reason>)`. A decision the researcher answered moves out of the section (into 한 일)
+  with the answer.
+- Research language in the body: no command lines, tool names, session ids or internal paths; links to files go in 근거.
+  Image paths are relative to the note's folder (`MARKDOWN_IMAGE_RULE`); copy the figures a note shows into its
+  `figures/`.
+
+## When the agent writes a note
+
+- When an analysis the researcher asked for has produced results (files, figures or a stated finding), the lead agent
+  writes a note in the same turn before its final reply, or updates the note of the same question when the chat
+  continues it. A new question gets a new note; a note that replaces an older conclusion names it in `supersedes`.
+- The researcher can ask at any time with **노트 정리** (prefills the chat with a request; normal chat billing).
+- No note for chit-chat, setup, failed starts with no result, or questions answered without analysis.
+- Notebook entries keep being logged as before; the note does not replace them.
+
+The lead's instruction is one line in `GEO_INSTRUCTIONS` (`server/src/geo/instructions.ts`, `RESEARCH_NOTE_RULE`);
+after a write/edit of `연구노트/*/index.md` the tool result lists format problems (missing frontmatter or sections,
+malformed decisions, missing images) so the agent fixes them in the same turn.

@@ -41,3 +41,5 @@ CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the 
 설치 안내,installation guide,"The page and button that lead to installation.",설치 가이드,install guide,
 프로젝트,project,"A folder that holds the data, runs and records of one study.",,,
 unlabeled 셀,unlabeled cell,"A PU cell without a recorded occurrence; not a confirmed negative.",미표지 셀|음성 셀|비광화 셀,negative cell,Do not call unlabeled cells confirmed negatives.
+정리 노트,research note,"One result-first Markdown note per analysis in the project's 연구노트 folder: request, conclusion, how far it can be trusted, results, decisions to make, evidence.",요약 노트|보고서 노트,summary note,"User decision 2026-10-18 (gaid-notebook-review)."
+작업 기록,work record,"The entries the AI agent logs while it works (methods, observations, decisions); the evidence behind research notes.",작업 로그|실행 로그,work log,

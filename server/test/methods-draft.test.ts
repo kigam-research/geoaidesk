@@ -44,6 +44,12 @@ function fakeMessage(text: string, over: Partial<AssistantMessage> = {}): Assist
 }
 
 describe("buildMethodsDraftContext", () => {
+  it("follows the entries or explicit request language, including section headings", () => {
+    const context = buildMethodsDraftContext([entryOf({ title: "자료 정리" })], { sessionId: "s" });
+    expect(context.systemPrompt).toContain("language of the notebook entries or the user’s explicit language request");
+    expect(context.systemPrompt).toContain("Translate section headings into that language");
+    expect(context.systemPrompt).not.toContain('a "## Methods" heading');
+  });
   const entries: NotebookEntry[] = [
     { id: "h1", type: "hypothesis", title: "Six populations exist", timestamp: 1000, role: "agent" },
     { id: "m1", type: "method", title: "Ran PCA", timestamp: 2000, role: "agent",

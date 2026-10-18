@@ -29,6 +29,21 @@ it("retains local hypothesis actions but offers no Modal stress-test action when
 });
 
 describe("LabNotebookEntryCard", () => {
+  it("keeps execution state visible and command evidence in a collapsed disclosure", () => {
+    localStorage.setItem("gaid:locale", "ko");
+    try {
+      renderCard(<LabNotebookEntryCard entry={entry({ type: "method", title: "Original title", body: "Original body",
+        execution: { status: "completed", evidence: "uv run python .pi/skills/run.py" } })} onOpenFile={() => {}} />);
+      expect(screen.getByText("실행 완료")).toBeVisible();
+      expect(screen.getByText("Original title")).toBeVisible();
+      expect(screen.getByText("Original body")).toBeVisible();
+      const evidence = screen.getByText(/보고된 근거: uv run python/);
+      const details = evidence.closest("details");
+      expect(details).not.toHaveAttribute("open");
+      fireEvent.click(screen.getByText("실행 기술 정보"));
+      expect(details).toHaveAttribute("open");
+    } finally { localStorage.removeItem("gaid:locale"); }
+  });
   it("renders with only the minimal props (backward compat)", () => {
     renderCard(<LabNotebookEntryCard entry={entry()} onOpenFile={() => {}} />);
     expect(screen.getByTestId("nb-entry-tc_1")).toBeInTheDocument();
