@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-18T08:48:21Z
+updated: 2026-10-18T08:56:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2a0d6567-6722-4491-9400-da914dac4c4e","pid":1485640,"provider":"claude","session":"292656f0-3260-4849-aaaa-e3598dfcdb42","start":"19718604","token":"033a89b7f46acbfd1b417e923adeab15d24a42da090cd0ec87b3944e17a0b622"}
 branch: task/gaid-notebook-review
 target: main
@@ -46,6 +46,11 @@ Outside check: no outside check (app/system design work).
   writes/updates a note when an analysis has results; 노트 정리 prefills a request). Phase 2 in progress.
 - Shared interfaces settled by the top writer: contract `web/src/geo/contracts/research-notes.ts`, format/behaviour spec
   `docs/geo/research-notes.md`.
+- W done and saved (0515475): `web/src/geo/notes/` panel + tests (7 pass), notes locales, notebook-tab seam in
+  `file-preview-panel.tsx`/`page.tsx`, AGENTS.md + docs/lab-notebook.md lines; web tsc, copy validator, check-ui clean;
+  related existing web tests 57 pass. Live check waits for S.
+- Workers: child units `gaid-notebook-review--notes-server` (S) and `gaid-notebook-review--record-cleanup` (C), both
+  "general work", started 2026-10-18; prompts in `~/data/geoaidesk/work/gaid-notebook-review/prompts/`.
 ## Next steps
 1. Children run S and C (below); top writer builds W against the contract, then integrates S → C → W, runs scripts/check,
    screenshots (UI guide §10), updates the report (result of Phase 2, §6 answered) and finishes.
