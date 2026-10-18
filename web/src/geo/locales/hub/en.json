@@ -100,7 +100,7 @@
       }
     },
     "byUpdated": "{author} · updated {when}",
-    "noAuthor": "Maker not recorded"
+    "noAuthor": "Maker unknown"
   },
   "stage": {
     "sources": "Sources received",

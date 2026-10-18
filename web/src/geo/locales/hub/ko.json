@@ -100,7 +100,7 @@
       }
     },
     "byUpdated": "{author} · {when} 수정",
-    "noAuthor": "만든 사람 기록 없음"
+    "noAuthor": "작성자 미기록"
   },
   "stage": {
     "sources": "자료 받음",
