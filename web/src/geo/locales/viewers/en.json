@@ -46,5 +46,16 @@
   "imaging": "TIFF has no georeference tags. Showing the imaging viewer.",
   "genericError": "The request could not be completed.",
   "nodata": "No data",
-  "description": "Description"
+  "description": "Description",
+  "oversize.title": "This file is larger than the preview limit",
+  "oversize.size": "File size {size} MB.",
+  "oversize.body": "This view shows CSV files up to 8 MB and other text up to 512 KB. Download the file to open all of it.",
+  "oversize.download": "Download file",
+  "oversize.loading": "Reading the first rows…",
+  "oversize.failed": "Could not read the first rows.",
+  "oversize.sample": "First rows",
+  "oversize.state": "Sample of the first {rows} rows · {columns} columns{estimate, plural, =-1 {} other { · about # rows in total (estimate)}}",
+  "oversize.lines": "Sample of the first {rows} lines",
+  "oversize.allColumns": "Show all {count} columns",
+  "oversize.fewerColumns": "Show the first 8 columns"
 }
