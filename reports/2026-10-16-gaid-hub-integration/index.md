@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/02-method-detail-after.png
 supersedes:
+reviewed: 2026-10-18
 ---
 # skill_hub에서 만든 방법을 GAID에서 받아 설치하고 시험하기
 
