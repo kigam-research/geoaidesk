@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover:
 supersedes:
+reviewed: 2026-10-18
 ---
 # GAID 채팅 답변과 연구노트의 문장 다듬기
 
