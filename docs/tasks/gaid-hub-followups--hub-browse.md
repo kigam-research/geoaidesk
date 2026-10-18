@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-18T04:55:30Z
+status: active
+updated: 2026-10-18T05:02:49Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"03077f19-d7c4-4f7d-9814-7922a8e164f0","pid":2568287,"provider":"codex","session":"01a14d52-83a7-7210-aa24-5a0e1d29ac97","start":"18655459","token":"2df86b15744ca28cbee2c16419a110bf67b00f4a71a8d124f2ca31e90ac1332d"}
 branch: task/gaid-hub-followups--hub-browse
 target: task/gaid-hub-followups
@@ -56,7 +56,7 @@ Tests: server route test for q/folder filtering; a web test for the list (search
 ## Current state
 Implemented shared registry browsing on hub home (commit 5ca74651a991). The default tab lists all researchers' methods; personal drafts remain in a separate tab. Folder counts, server-side title/tagline/author/taxonomy-label search (250 ms debounce), stars/recency order, recovery states and existing registered-entry navigation are delivered. Optional tagline is derived from registered snapshots; existing callers/stored records stay compatible.
 
-Verified: server typecheck and shared-hub Vitest 7/7; web tsc and hub Vitest 11/11; UI checker 0 errors (102 existing debt); copy validator 0 errors (57 existing warnings). Korean real-app browser QA at 1440×900 and 1280×800 used 3 API-registered examples in 2 topic folders. Folder/search/reset, arrow-key tabs and Enter-to-detail passed; no console errors. One primary button, no horizontal overflow. Temporary browser/API/web services are closed. Full scripts/check job 1 exited 1: backend 1858 passed/11 skipped (including the documented network PSI-MS skips), frontend 1064 passed, launcher passed; distribution failed only because the new seam owner was a child slug outside the allowed package list. Corrected the seam owner to existing package gaid-hub; targeted distribution recheck passed 7/7. Remaining full-check stages have not run. Receipt stays in Running jobs as failure evidence.
+Verified: server typecheck and shared-hub Vitest 7/7; web tsc and hub Vitest 11/11; UI checker 0 errors (102 existing debt); copy validator 0 errors (57 existing warnings). Korean real-app browser QA at 1440×900 and 1280×800 used 3 API-registered examples in 2 topic folders. Folder/search/reset, arrow-key tabs and Enter-to-detail passed; no console errors. One primary button, no horizontal overflow. Temporary browser/API/web services are closed. Full scripts/check job 1 exited 1: backend 1858 passed/11 skipped (including the documented network PSI-MS skips), frontend 1064 passed, launcher passed; distribution failed only because the new seam owner was a child slug outside the allowed package list. Corrected the seam owner to existing package gaid-hub; targeted distribution recheck passed 7/7. First task finish merged parent cdda9dc, then failed web checks: 11 hub-handoff assertions still expect skill_hub instead of the parent's GAID hub copy; 2 file-preview-panel and 1 map-viewer failures were load-dependent: focused rerun with VITEST_MAX_WORKERS=4 passed all 13 tests without source changes. Parent published corrected handoff expectations and reworked HandoffDialog at e5461bd42dd3; next finish imports it. Retry uses VITEST_MAX_WORKERS=4 (supported by installed Vitest), leaving room for other projects. Final-finish failure log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-_4xsbjam.log. Backend again passed 1858/11 skipped. Receipt stays in Running jobs as failure evidence.
 
 Re-verify safely: server npm test -- test/geo-hub-shared.test.ts and npm run typecheck; web npm test -- src/geo/hub/shared-browse.test.tsx src/geo/hub/hub.test.tsx and npx tsc --noEmit; node geo/ui/check-ui.mjs; node geo/copy/validate-copy.mjs web/src/geo/locales. Seed harness/logs live outside Git under ~/data/geoaidesk/work/gaid-hub-followups--hub-browse/. Seed used real create/source/analyze/draft/register/star HTTP APIs, with scripted model transport only for synthetic authoring; screenshots use the normal full backend.
 
@@ -70,7 +70,7 @@ Re-verify safely: server npm test -- test/geo-hub-shared.test.ts and npm run typ
 
 화면은 P1·P3·W5에 따라 등록 방법과 개인 작업을 탭으로 나누고, 기존 만들기 버튼 하나만 주요 버튼으로 유지했습니다. N1·N2에 따라 텍스트 탭과 선택 상태를 제공하며, G1·G4에 따라 카드 제목과 설명을 한 줄로 제한했습니다. F3·F4·R2에 따라 빈 목록, 검색 결과 없음, 오류와 기술 정보를 구분했습니다. A1·A2·A5에 맞춰 접근 가능한 이름, 키보드 이동, 결과 상태를 제공합니다. G3의 서버 검색을 추가했습니다. 최근 검색어·추천 검색어 기능은 이번 요청 범위에 포함하지 않았습니다. 새 UI 부채는 추가하지 않았습니다.
 
-한국어 1440×900·1280×800 화면에서 등록 방법 3개와 두 주제 폴더를 확인했습니다. 가로 넘침은 없으며, 만들기 버튼과 목록이 첫 화면에 보입니다. 방법 제목·설명·연구자·폴더 등 등록 자료를 제외한 고정 본문은 W5의 300자 이내입니다. 방향키로 탭을 바꾸고 Enter 키로 등록 방법을 열었습니다. 브라우저 콘솔 오류는 없었습니다. 전체 검사에서 서버 시험 1,858개와 웹 시험 1,064개가 통과했습니다. 배포 검사에서 테스트 파일의 소유 패키지 표기가 허용 목록과 맞지 않아 멈췄습니다. 표기를 바로잡은 뒤 배포 검사 7개가 통과했습니다. 나머지 전체 검사는 최종 제출 때 실행합니다.
+한국어 1440×900·1280×800 화면에서 등록 방법 3개와 두 주제 폴더를 확인했습니다. 가로 넘침은 없으며, 만들기 버튼과 목록이 첫 화면에 보입니다. 방법 제목·설명·연구자·폴더 등 등록 자료를 제외한 고정 본문은 W5의 300자 이내입니다. 방향키로 탭을 바꾸고 Enter 키로 등록 방법을 열었습니다. 브라우저 콘솔 오류는 없었습니다. 전체 검사에서 서버 시험 1,858개와 웹 시험 1,064개가 통과했습니다. 배포 검사에서 테스트 파일의 소유 패키지 표기가 허용 목록과 맞지 않아 멈췄습니다. 표기를 바로잡은 뒤 배포 검사 7개가 통과했습니다. 다른 화면 시험에서 발생한 제한 시간 오류는 동시 실행 수를 줄인 재검사에서 13개 모두 통과했습니다. 부모 작업의 문구·시험 수정본을 반영한 전체 검사는 최종 제출 절차에서 실행합니다. 최종 통과 여부는 제출 결과로 확인합니다.
 
 ### Screenshot handoff (parent copies chosen PNGs into its report figures/)
 
@@ -105,6 +105,8 @@ Re-verify safely: server npm test -- test/geo-hub-shared.test.ts and npm run typ
 Closed 2026-10-18T04:55:30Z: ready; the parent gaid-hub-followups integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Disposition of the old diagnostic job was refused because the unpublished finish intent is terminal. No receipt/history changed; preserve failed job as documented history and let the final successful integration check establish readiness.
+- First task finish failed after auto-merging parent cdda9dc: 11 hub-handoff copy expectations are stale; parent owns the correction. The other 3 failures were load-dependent; focused 13/13 passes with maxWorkers=4 and no source change. Parent correction published e5461bd42dd3.
 - Full-check job 1 failed the integration-boundaries owner whitelist: used child task slug instead of an established owning package. Corrected to gaid-hub without changing check policy.
 - Initial web assertions assumed whitespace in the accessible folder name and CSS-based hidden state in jsdom. Match the name flexibly and use explicit hidden attributes; all tests now pass.
 - Initial keyboard browser assertion read aria-selected before Radix focus activation settled. Waiting for the actual selected state confirmed keyboard behavior; no source change needed.
