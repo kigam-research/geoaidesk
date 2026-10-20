@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T08:58:38Z
+updated: 2026-10-20T08:58:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"973096b8-d85d-4540-8407-314c27f4b24a","pid":2418100,"provider":"claude","session":"2485ae34-3b6a-477b-a2a1-60e3eb8b9d65","start":"37298903","token":"a46848df5264acf9fe4f245bb6541d25f6cf250193347f9ea63666ff5eb8e35b"}
 branch: task/gaid-hub-editing
 target: main
@@ -71,9 +71,12 @@ Writer packages done (2026-10-20, commits up to 54c06d2):
 Trial app: `systemd-run --user --unit gaid-hubedit-app --collect -E PATH=$PATH -E HOME=$HOME
 ~/data/geoaidesk/work/gaid-hub-editing/bin/run.sh` (UI 3380, API 18380, GAID_HOME `~/data/geoaidesk/work/gaid-hub-editing/home`).
 ## Next steps
+Blocked: waiting for the finish notices of both child writers (agents running their task finish / scripts/check; both
+branches trial-merge cleanly into e029124).
 1. Wait for child finishes (concept-pictures agent 5c402641-eeba-4c12-a6be-b069a47e1c65; hub-in-project), then
    `task complete gaid-hub-editing--concept-pictures` / `--hub-in-project`, resolve hub locale JSON merges, rerun hub tests.
-2. Full `scripts/check`, report `reports/2026-10-20-gaid-hub-editing/index.md` (p3/p4 figures + children sections),
+2. Click the concept-picture "connect" link in the hub after integrating P2 (parent fix e029124 makes GaidHub listen to
+   openSettings). Full `scripts/check`, report `reports/2026-10-20-gaid-hub-editing/index.md` (p3/p4 figures + children sections),
    humanizer, `task review-copy`, `task finish`.
 ## Failed approaches
 ## Notes and decisions
