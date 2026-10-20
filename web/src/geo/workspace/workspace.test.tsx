@@ -215,7 +215,7 @@ describe("task catalogue and setup", () => {
     expect(within(dialog).getByText("기반 작업: Well log QC well-qc")).toBeInTheDocument();
     // A recipe opens at the summary (UI guide Q4); its values are labelled as recipe values on their step.
     expect(within(dialog).getByRole("heading", { name: "선택 내용 확인" })).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
-    await step(dialog, 2); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("레시피 값")).toBeInTheDocument(); await step(dialog, 4);
+    await step(dialog, 2); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 4);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제" }));
     expect(apiFetch.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제 확인" }));
