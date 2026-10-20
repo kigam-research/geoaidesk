@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T14:48:32Z
+status: done
+updated: 2026-10-20T15:29:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -82,7 +82,7 @@ Screenshot originals and hashes (base: /home/seongin3/data/geoaidesk/work/gaid-w
 - 06-hub-catalogue-1440.png: `76eccc51dc97e325b55da665ad6c9d4993437a66171dc4724ff299586f3940d4`
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T14:48:32Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T15:29:47Z: integrated into gaid-workflow-model; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish: backend 1965 passed/8 skipped and frontend 1132 passed, but a file-preview TextEditor saved-indicator timeout fired after jsdom teardown (window is not defined). Parent authorized timer cleanup after observing a second intermittent failure in that area.

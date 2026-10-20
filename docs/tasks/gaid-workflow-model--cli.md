@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T14:21:14Z
+status: done
+updated: 2026-10-20T15:29:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -72,7 +72,7 @@ Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): 
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T14:21:14Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T15:29:47Z: integrated into gaid-workflow-model; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Isolated full job -3 exposed the missing gaid-workflow-model owner in the distribution checker allowlist; registered the actual owner and the distribution tests pass. Application code was unchanged.

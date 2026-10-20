@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T15:29:14Z
+status: done
+updated: 2026-10-20T15:29:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -49,7 +49,9 @@ Outside check: no outside check (product/IA work).
 - Isolated app `gaid-wfm-app` (ports 3110/18110, GAID_HOME ~/data/geoaidesk/work/gaid-workflow-model/home) is stopped
   before finish; restart recipe in report appendix A.
 ## Next steps
-1. Run task finish (full scripts/check on the integrated tree).
+<!-- task:closed -->
+Closed 2026-10-20T15:29:47Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-workflow-model.md.
+
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-20 user (verbatim): "모두 권장하는 방식으로 진행해도 좋다. skill_hub는 legacy이므로 계획에 포함하지 말아야 한다. GAID 허브에서 스킬도 추후에 관리해야한다. 그리고 워크플로우에서 스킬을 사용하는 것은 어떻게 사용하는지도 설계되어야 하며, BYOK의 워크플로우는 지침이 GAID 시스템에서 보이는데 GAID 허브의 워크플로우는 어떤 형태로 GAID 시스템의 에이전트 채팅에 반영되는지도 정의되어야 한다. 지침형태로 되는 것인지? 아니면 지금의 형태가 어떻게 구현되어 있는지도 구체화되고 확정되어야 한다. 즉, GAID 허브에서도 최종 워크플로우 형태가 어떤 것인지 보여야 한다는 것이다. 현재는 워크플로우가 어떤 흐름으로 진행되는지 설명만 있을 뿐 에이전트 채팅(CLAUDE, CODEX 채팅 같은 형태), CLI 환경에서 어떻게 적용되는지가 불분명하다."
@@ -87,8 +89,8 @@ Outside check: no outside check (product/IA work).
   first, then the parent's design implementation.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [대기] GAID 허브에서 스킬을 관리하는 기능 (사용자 2026-10-20: "GAID 허브에서 스킬도 추후에 관리해야한다") — 가) 별도 작업으로 설계 — 나) 지금처럼 Workflow만 등록 — 권장: 가) 사용자 요청 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
-- [부채] Codex CLI용 내보내기 미지원 — 가) Codex 사용자 정의 명령을 확인할 수 있을 때 추가 — 나) Pi·Claude Code만 유지 — 권장: 가) 확인 전에는 내놓지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
+- [대기 gaid-workflow-model#1] GAID 허브에서 스킬을 관리하는 기능 (사용자 2026-10-20: "GAID 허브에서 스킬도 추후에 관리해야한다") — 가) 별도 작업으로 설계 — 나) 지금처럼 Workflow만 등록 — 권장: 가) 사용자 요청 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
+- [부채 gaid-workflow-model#2] Codex CLI용 내보내기 미지원 — 가) Codex 사용자 정의 명령을 확인할 수 있을 때 추가 — 나) Pi·Claude Code만 유지 — 권장: 가) 확인 전에는 내놓지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;

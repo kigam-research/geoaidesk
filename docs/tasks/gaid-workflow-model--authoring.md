@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T14:45:31Z
+status: done
+updated: 2026-10-20T15:29:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bf8b4c2-896d-4828-b900-b59150cf411d","pid":2653212,"provider":"codex","session":"01a159a9-e310-73e2-bbba-edf004cd26d4","start":"39360728","token":"f286d62a1decc68fd25437f6fb6e4181f19bbb4b3f1d98bb2a8e554497f80ee7"}
 branch: task/gaid-workflow-model--authoring
 target: task/gaid-workflow-model
@@ -92,7 +92,7 @@ Owned files: authoring/**, hub-shared/edit.ts, authoring/shared-hub tests/fixtur
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T14:45:31Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T15:29:47Z: integrated into gaid-workflow-model; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial task resume briefly encountered other task transactions; retried without changing workflow state.
