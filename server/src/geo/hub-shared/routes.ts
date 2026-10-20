@@ -100,6 +100,7 @@ export async function registerSharedHubRoutes(
       ...record.entry,
       tagline: korean(snapshotOf(record).draft.profile.tagline),
       implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
+      recipe: Boolean(snapshotOf(record).draft.workflow && snapshotOf(record).draft.recipe),
       stars: Object.keys(stars).length,
       starredByMe: user !== null && Object.hasOwn(stars, user),
       comments: comments.length,

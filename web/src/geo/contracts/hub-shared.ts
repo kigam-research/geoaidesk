@@ -45,6 +45,8 @@ export interface HubEntry {
   kind: "skill" | "workflow";
   /** Code availability in the latest registered snapshot, not execution or review status. */
   implementation: "descriptive" | "implemented";
+  /** The latest registered snapshot carries a Workflow with 레시피 defaults (start settings); older servers omit it. */
+  recipe?: boolean;
   tags: string[];
   author: string;
   folderId: string;

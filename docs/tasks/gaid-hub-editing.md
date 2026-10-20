@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T08:31:30Z
+updated: 2026-10-20T08:39:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"973096b8-d85d-4540-8407-314c27f4b24a","pid":2418100,"provider":"claude","session":"2485ae34-3b6a-477b-a2a1-60e3eb8b9d65","start":"37298903","token":"a46848df5264acf9fe4f245bb6541d25f6cf250193347f9ea63666ff5eb8e35b"}
 branch: task/gaid-hub-editing
 target: main
@@ -39,12 +39,49 @@ The writer may split independent packages into child units. UI guide + copy rule
 Outside check: no outside check (app work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Step 0 (current behaviour, 2026-10-20, trial app from this worktree with a copy of ~/.geoaidesk; screenshots
+`~/data/geoaidesk/work/gaid-hub-editing/before/`): all five observations confirmed.
+1. Recipe import: the Workflow panel's "레시피 가져오기" dialog only takes a `.geo-start.json` file; no hub search (07-recipe-import.png).
+2. Settings → Skills → 스킬 추가: the first card is "skill_hub 스킬 추가" (skill_hub site link, page URL, .tar.gz); GAID hub
+   entries are not listed (05-skill-add.png).
+3. Registered entry page (`#hub/e/<id>`): star, comment, "내 프로젝트에서 시험" only; no edit action, also for the author
+   (02-entry-own.png). Server: a new revision is accepted only from the same authoring project and the same display name.
+   In the review data 2 of 5 entries (incl. the user's own "서성인" entry) have no authoring project on this server, so
+   even the author could not reach a draft to edit.
+4. Questions step: recorded answers are locked (`locked` in QuestionStep, all non-open questions); the review panel says
+   "모든 답이 초안에 반영되었습니다. 바꿀 점은 … 고칠 점 알려주기" (04-questions.png). The server already supersedes a
+   decision when the same question is answered again (`answerQuestion`), so the lock is UI-only.
+5. Concept pictures: draft step shows a disabled "개념 그림 만들기" with a small grey line "그림 생성 계정이 연결되지
+   않았습니다…" (03-draft.png); no explanation of how pictures are made, no link to connect, no per-picture regenerate or
+   revise. Review data has 0 pictures.
+
+Trial app: `systemd-run --user --unit gaid-hubedit-app --collect -E PATH=$PATH -E HOME=$HOME
+~/data/geoaidesk/work/gaid-hub-editing/bin/run.sh` (UI 3380, API 18380, GAID_HOME `~/data/geoaidesk/work/gaid-hub-editing/home`).
 ## Next steps
-1. (the next session's first action)
+1. Add `HubEntry.recipe` to the shared contract, then start children P1 and P2; implement P3 + P4 here.
 ## Failed approaches
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Plan (2026-10-20):
+- Shared interface first (writer): `HubEntry.recipe?: boolean` (latest snapshot carries a 레시피/Workflow) in
+  `web/src/geo/contracts/hub-shared.ts` + `server/src/geo/hub-shared/routes.ts` entryView.
+- P1 child `hub-in-project` (Codex general work): items 1+2. Owns `web/src/geo/workspace/recipe-add.tsx`, a new hub
+  picker under `web/src/geo/hub-picker/`, `web/src/geo/skill-hub/`, `server/src/geo/skill-hub.ts`,
+  `server/src/geo/routes/skill-hub.ts`, locales `workspace`/`skillHub` (+ new `hubPicker`). Uses `GET /geo/hub/entries`,
+  `POST /geo/hub/entries/:id/install`; skills preview reads hub entry bytes server-side through the existing preview gate.
+- P2 child `concept-pictures` (Codex general work): item 5. Owns `server/src/geo/authoring/{visuals,codex-images}.ts`, the
+  visuals route body, `GenerateVisualsBody`, draft-step/method-flow picture UI, hub locale keys `visuals.*`.
+- Writer: P3 (item 3, edit registered method) in `server/src/geo/hub-shared/`, authoring store fields, entry page; P4
+  (item 4, change recorded answers) in `question-step.tsx`/`hub-screen.tsx`.
+- Integration order: P3/P4 here, then `task complete` P1, P2; resolve hub locale JSON merges; screenshots; report.
+
+Decision (item 3, who may edit; display names are not accounts):
+- The registering author (same display name) edits in place: "이 방법 고치기" opens the linked draft, or a draft seeded from
+  the latest registered snapshot when the linked one is missing; registering it adds the next revision of the same entry.
+  Earlier revisions stay installable; every revision records who registered it.
+- Any other researcher gets "복사해서 고치기": a copy becomes their own draft (whole authoring project when it is on this
+  server, otherwise the snapshot); registering it creates a separate entry that names the original (`basedOn`).
+- Rejected: anyone adds revisions to any entry (wiki model) — with free display names it would let anyone overwrite the
+  latest revision others install by default.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
