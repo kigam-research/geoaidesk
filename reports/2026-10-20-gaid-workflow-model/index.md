@@ -319,6 +319,20 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 - skill_hub는 사용자 결정대로 계획에 넣지 않습니다. Workflow 형식은 GAID가 정하고, 고정된 카탈로그 파일은 바꾸지 않습니다.
 - 2단계 순서: (1) 이름 정리·스킬 화면 연결·결함 수정(하위 작업으로 이미 시작, 이 설계와 무관), (2) 이 설계 확정 후 지침 문서를 만드는 공통 부분과 채팅 시작 방식, (3) 허브·프로젝트·시작 설정의 Workflow 상세 화면, (4) 허브 작성 기능이 단계를 쓰도록 바꾸기, (5) CLI에서 쓰기.
 
+### 3.16 CLI용 지침과 스킬 내보내기
+
+기본 Workflow, 프로젝트에 설치한 Workflow, 허브에 등록한 Workflow를 Pi 또는 Claude Code용 ZIP으로 받을 수 있는 기능을 만들었습니다. ZIP에는 같은 렌더러가 만든 Workflow 지침, 그 Workflow가 쓰는 스킬 파일, 한국어·영어 시작 안내가 들어갑니다. 기본 스킬은 고정된 카탈로그에서, 딸린 스킬은 설치한 폴더나 허브 등록 사본에서 가져옵니다. 외부에서 가져온 스킬은 프로젝트의 설치 사본을 씁니다. 사본이 없으면 시작 안내에 빠진 스킬을 적습니다.
+
+명령 뒤에 입력 파일과 분석 조건을 적어 시작합니다. 인수가 비어 있으면 AI agent가 지침에 적힌 조건을 묻습니다. 분석 자료와 실행 환경은 ZIP에 포함하지 않습니다. 파일 경로가 스킬 폴더를 벗어나거나 링크·특수 파일이 있으면 내보내지 않습니다. 기존 패키지와 같은 크기 제한을 적용합니다.
+
+실제 Pi와 Claude Code에서 ZIP을 풀어 명령과 스킬이 목록에 잡히는 것을 확인했습니다. 분석은 실행하지 않았습니다. Codex는 명령 파일의 인식·확장을 확인하지 못해 내려받기 목록에서 제외했습니다.
+
+새 내려받기 버튼은 상세 화면에서 쓸 수 있는 구성요소로 제공했습니다. 그림은 이 구성요소만 띄운 시험 화면이며, 실제 상세 화면에 배치하기 전입니다. 두 창 크기에서 잘림과 가로 넘침이 없고 Escape로 닫으면 버튼에 초점이 돌아오는 것을 확인했습니다.
+
+![CLI용 파일 내려받기 구성요소 시험 화면(1440×900). Pi와 Claude Code 파일 받기를 고릅니다.](figures/cli-export-1440.png)
+
+![같은 구성요소의 1280×800 시험 화면. 안내와 두 내려받기 버튼이 모두 보입니다.](figures/cli-export-1280.png)
+
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 이 작업은 화면 구성과 용어 진단입니다.
@@ -384,6 +398,20 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 | 설계 | ADR `docs/adr/2026-10-20-workflow-runtime-form.md` (proposed); catalogue skill procedures `catalogue/details/*/*.json` `profile.procedure.nodes` (3–8 per skill, catalogue 0.2.1) |
 | 결함 | registration copy `hub/ko.json:322`; install origin label `server/src/geo/authoring/install.ts:70-76`, `methods/ko.json:23`; install without visible preview `install.ts:103-115` |
 
-작성 시점: 2026-10-20, commit 6bbd7fa (task branch).
+
+### CLI 내보내기 구현 근거 (2026-10-20)
+
+- 구현: server/src/geo/cli-export.ts, server/src/geo/routes/cli-export.ts, web/src/geo/workflow/cli-export.tsx. 경로: GET /geo/workflows/:id/cli-export?target=pi|claude[&method=<runtimeName>], GET /geo/hub/entries/:id/cli-export?target=pi|claude; locale=ko|en, 기본 ko; application/zip, 파일 이름 <workflow-id>-<target>.zip. 프로젝트는 X-Project-Id 또는 다운로드 주소의 project로 지정하고 withApiToken()을 적용합니다.
+- 코드 기준: 1da2f0824572 (구현). 실제 CLI 시험 코드와 ZIP: PC74 /home/seongin3/data/geoaidesk/work/gaid-workflow-model--cli/{make-export.mts,pi-probe.mjs,claude-probe.mjs,pi-export.zip,claude-export.zip}. 시험용 지침과 스킬만 포함합니다. 분석 자료와 인증 정보는 넣지 않았습니다.
+- Pi 1.0.0: node <server>/node_modules/@earendil-works/pi-coding-agent/dist/cli.js --mode rpc --no-session --no-extensions --no-tools --offline --approve, PI_CODING_AGENT_DIR=<scratch>/agent. 생성한 ZIP을 pi-probe에 풀었습니다. get_commands 응답: gaid-workflow-probe (source prompt), skill:gaid-probe (source skill), success=true. 모델을 호출하지 않았습니다. 폴더: .pi/prompts/<id>.md, .pi/skills/<name>/.
+- Claude Code 2.1.304: claude -p '/gaid-workflow-probe sentinel' --max-budget-usd 0.000001 --output-format stream-json --verbose --tools '' --strict-mcp-config --setting-sources project --no-session-persistence 명령을 ZIP을 푼 claude-probe 폴더에서 실행했습니다. 초기 slash_commands: gaid-workflow-probe 및 gaid-probe; skills: gaid-probe. error_max_budget_usd와 종료 코드 1로 끝났습니다. 명령·스킬 인식만 확인했으며 분석 실행을 확인한 시험은 아닙니다. 폴더: .claude/commands/<id>.md, .claude/skills/<name>/. 두 CLI의 명령 파일 모두 description/argument-hint와 공통 렌더러의 $ARGUMENTS를 담습니다.
+- Codex 0.163.0: codex --help, codex app-server --help, codex app-server generate-json-schema --out <scratch>/codex-schema. 생성한 app-server 스키마에는 skills/list가 있고 customPrompts/list는 없습니다. 프롬프트 확장을 확인하지 못해 지원 목록에서 제외했습니다. 참고한 공식 문서: https://learn.chatgpt.com/docs/custom-prompts and https://learn.chatgpt.com/docs/build-skills (developers.openai.com/codex/{custom-prompts,skills}에서 이동). Codex 지원을 주장하지 않습니다.
+- 전체 검사: 첫 scripts/check 작업은 종료 코드 0, 서버 1968개 통과·8개 건너뜀, 웹 1123개 통과, 배포·환경·생산 실행 재시작 시험 통과. 작업 실행기가 호출자의 환경변수를 보존하지 않아 작업 전용 경로를 명령 안에 지정해 다시 검사했습니다. 두 번째 검사도 서버·웹 시험은 모두 통과했으나 새 소유자 이름이 배포 검사 허용 목록에 빠져 종료했습니다. 목록을 보완한 뒤 해당 배포 검사 7개가 통과했습니다. 최종 통합 트리는 task finish에서 같은 작업 전용 환경으로 다시 검사합니다. 첫 작업 기록: /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140225.089338Z/receipt.json, 두 번째: /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T141232.488050Z/receipt.json.
+- 관련 시험: npm test -- --run test/geo-cli-export.test.ts (서버, 10개 통과); npm test -- --run src/geo/workflow/cli-export.test.tsx (웹, 2개 통과); npm run typecheck (서버, 통과). 카탈로그·설치 패키지·허브 등록 사본, 가져온 스킬의 설치 여부, 실행 권한, 한·영 문구, 잘못된 대상·언어·식별자, 경로·링크·ZIP 크기 제한을 시험했습니다.
+- 새 문자열(변경 전에는 없음): workflowCli.export.button = CLI에서 쓰기 / Use in a CLI; workflowCli.target.title = CLI용 파일 내려받기 / Download CLI files; workflowCli.target.hint = 지침, 사용 스킬, 시작 안내를 ZIP으로 받습니다. 실행할 CLI를 고릅니다. / Get instructions, skills and a start guide as a ZIP. Choose the CLI you will use.; workflowCli.pi.button = Pi용 파일 받기 / Download for Pi; workflowCli.claude.button = Claude Code용 받기 / Download for Claude Code.
+- UI 규칙: P1/P3/P4, B1–B3, D1/D4, T1, S1/S5, A1–A3, W1–W6. R1 적용 예외: 사용자가 요청한 CLI 내보내기 대상을 구분하기 위해 CLI 이름을 표시합니다. 팝오버에 모델·제공자·프롬프트·경로·로그는 표시하지 않습니다. 내보낸 지침은 요청한 파일에 포함합니다. UI 부채를 추가하지 않았습니다.
+- 한국어 화면 점검: 실제 상세 화면이 아닌 임시 Vite 구성요소 시험 화면. 그림: figures/cli-export-1440.png and figures/cli-export-1280.png. 본문 약 100자, 안내 1문단, 내려받기 버튼 높이 32 px이며 가로 넘침이 없습니다. Escape로 닫으면 원래 버튼에 초점이 돌아옵니다. 상세 화면 배치는 부모 작업에서 담당합니다. Playwright 세션과 시험 서비스를 종료했습니다.
+
+작성 시점: 2026-10-20, commit 6bbd7fa (task branch; CLI evidence added at 1da2f082).
 
 </details>
