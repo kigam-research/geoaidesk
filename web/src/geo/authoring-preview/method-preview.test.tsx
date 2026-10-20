@@ -2,13 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useState } from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PreviewStepsPane } from "./method-pane";
+import { PreviewMethodPane } from "./method-pane";
 import { PreviewTrialPane } from "./trial-pane";
 import { PreviewDialogs } from "./preview-dialogs";
 import { t } from "@/geo/i18n";
 import type { AuthoringPreviewState } from "@/geo/contracts/authoring-preview";
-import ko from "@/geo/locales/previewSteps/ko.json";
-import en from "@/geo/locales/previewSteps/en.json";
+import ko from "@/geo/locales/previewMethod/ko.json";
+import en from "@/geo/locales/previewMethod/en.json";
 
 function state(
   patch: Partial<AuthoringPreviewState> = {},
@@ -41,7 +41,7 @@ beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
 describe("controlled method choices", () => {
   it("leaves the answer empty, preserves purpose and links real source pages", async () => {
     const p = props();
-    render(<PreviewStepsPane {...p} />);
+    render(<PreviewMethodPane {...p} />);
     expect(screen.getAllByRole("radio")).toHaveLength(3);
     screen
       .getAllByRole("radio")
@@ -66,7 +66,7 @@ describe("controlled method choices", () => {
 
   it("emits all choices and requires metadata for the attached-code draft", async () => {
     const p = props();
-    const view = render(<PreviewStepsPane {...p} />);
+    const view = render(<PreviewMethodPane {...p} />);
     const user = userEvent.setup();
     for (const radio of screen.getAllByRole("radio")) await user.click(radio);
     expect(p.onEvent.mock.calls).toEqual(
@@ -75,7 +75,7 @@ describe("controlled method choices", () => {
       ]),
     );
     view.rerender(
-      <PreviewStepsPane {...p} state={state({ choice: "attach-code" })} />,
+      <PreviewMethodPane {...p} state={state({ choice: "attach-code" })} />,
     );
     expect(
       screen.getByRole("button", { name: "선택한 방식으로 초안 보기" }),
@@ -88,7 +88,7 @@ describe("controlled method choices", () => {
       file: { name: "analysis.py", size: file.size },
     });
     view.rerender(
-      <PreviewStepsPane
+      <PreviewMethodPane
         {...p}
         state={state({
           choice: "attach-code",
@@ -111,7 +111,7 @@ describe("controlled method choices", () => {
     "allows the %s preview, never claims code was written",
     async (choice) => {
       const p = props({ choice, deferred: true });
-      render(<PreviewStepsPane {...p} />);
+      render(<PreviewMethodPane {...p} />);
       expect(screen.getByRole("status")).toHaveTextContent("답변을 미뤘습니다");
       const button = screen.getByRole("button", {
         name: "선택한 방식으로 초안 보기",
@@ -124,7 +124,7 @@ describe("controlled method choices", () => {
 
   it("does not display fixture findings for another source", () => {
     render(
-      <PreviewStepsPane
+      <PreviewMethodPane
         {...props({ source: { kind: "local-pdf", name: "other.pdf" } })}
       />,
     );
@@ -144,7 +144,7 @@ describe("draft and illustrative dialogs", () => {
       savedAt: "2026-10-15T08:00:00Z",
     });
     render(<PreviewTrialPane {...p} />);
-    fireEvent.change(screen.getByLabelText("방법 이름"), {
+    fireEvent.change(screen.getByLabelText("Workflow 이름"), {
       target: { value: "새 이름" },
     });
     expect(p.onEvent).toHaveBeenLastCalledWith({
@@ -152,7 +152,7 @@ describe("draft and illustrative dialogs", () => {
       field: "title",
       value: "새 이름",
     });
-    fireEvent.change(screen.getByLabelText("방법 설명"), {
+    fireEvent.change(screen.getByLabelText("Workflow 설명"), {
       target: { value: "새 설명" },
     });
     expect(p.onEvent).toHaveBeenLastCalledWith({
@@ -312,7 +312,7 @@ describe("draft and illustrative dialogs", () => {
   });
 });
 
-it("keeps every previewSteps ID bilingual and formatable", () => {
+it("keeps every previewMethod ID bilingual and formatable", () => {
   function keys(value: object, prefix = ""): string[] {
     return Object.entries(value).flatMap(([key, child]) =>
       typeof child === "string"
@@ -324,11 +324,11 @@ it("keeps every previewSteps ID bilingual and formatable", () => {
   for (const locale of ["ko", "en"] as const)
     for (const key of keys(ko)) {
       const result = t(
-        `previewSteps.${key}`,
+        `previewMethod.${key}`,
         { name: "file.csv", size: 12, time: "recorded time" },
         locale,
       );
-      expect(result).not.toBe(`previewSteps.${key}`);
+      expect(result).not.toBe(`previewMethod.${key}`);
       expect(result).not.toMatch(/\{(?:name|size|time)\}/);
     }
 });

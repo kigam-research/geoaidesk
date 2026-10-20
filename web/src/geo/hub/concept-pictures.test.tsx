@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DraftStep } from "./draft-step";
 import { fixtureDraft } from "./fixtures";
-import { StepsFlow } from "./method-flow";
+import { MethodFlow } from "./method-flow";
 import { onOpenSettings } from "@/lib/settings-nav";
 
 beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
@@ -18,7 +18,7 @@ describe("concept pictures in a draft", () => {
     const settings = vi.fn();
     const off = onOpenSettings(settings);
     render(<DraftStep draft={draft()} trialCount={0} checkIssues={null} rail={null} visualAction={action(false)} />);
-    expect(screen.getByText(/방법을 설명하는 그림입니다/)).toBeTruthy();
+    expect(screen.getByText(/Workflow를 설명하는 그림입니다/)).toBeTruthy();
     expect(screen.getByText(/OpenAI Codex \(legacy\)로 로그인/)).toBeTruthy();
     expect((screen.getByRole("button", { name: "개념 그림 다시 만들기" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: "제공사 설정 열기" }));
@@ -54,7 +54,7 @@ describe("concept pictures in a draft", () => {
 
   it("does not show editing controls in the shared read-only flow", () => {
     const d = draft();
-    render(<StepsFlow profile={d.profile} visuals={{ [d.profile.procedure.nodes[0].id]: visual }} />);
+    render(<MethodFlow profile={d.profile} visuals={{ [d.profile.procedure.nodes[0].id]: visual }} />);
     expect(screen.queryByRole("button", { name: "다시 만들기" })).toBeNull();
   });
 });

@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import type { PreviewSourceInputProps, PreviewSourcePaneProps, PreviewStepsProps } from "../contracts/authoring-preview";
+import type { PreviewSourceInputProps, PreviewSourcePaneProps, PreviewMethodProps } from "../contracts/authoring-preview";
 const mocks = vi.hoisted(() => ({ fetch: vi.fn(), revoke: vi.fn(), create: vi.fn(() => "blob:local-pdf") }));
 vi.mock("./source-input", () => ({ MAX_PREVIEW_PDF_BYTES: 50 * 1024 * 1024, PreviewSourceInput: (p: PreviewSourceInputProps) => <><button onClick={p.onSample}>Sample</button><button onClick={() => p.onPdfFile(new File(["%PDF-fixture"], "local.pdf", { type: "application/pdf" }))}>Local PDF</button><button onClick={p.onClear}>Clear source</button></> }));
 vi.mock("./source-pane", () => ({ PreviewSourcePane: (p: PreviewSourcePaneProps) => <div><span>{p.source?.name}</span><span>{p.sourceUrl}</span><button onClick={() => p.onPdfReady?.(36)}>PDF ready</button></div> }));
-vi.mock("./method-pane", () => ({ PreviewStepsPane: (p: PreviewStepsProps) => <div>Prepared findings<button onClick={() => p.onEvent({ type: "choice", value: "draft-code" })}>Choose draft</button><button onClick={() => p.onEvent({ type: "create-draft" })}>Create draft</button></div> }));
-vi.mock("./trial-pane", () => ({ PreviewTrialPane: (p: PreviewStepsProps) => <div>Untested draft: {p.state.draft?.title}</div> }));
+vi.mock("./method-pane", () => ({ PreviewMethodPane: (p: PreviewMethodProps) => <div>Prepared findings<button onClick={() => p.onEvent({ type: "choice", value: "draft-code" })}>Choose draft</button><button onClick={() => p.onEvent({ type: "create-draft" })}>Create draft</button></div> }));
+vi.mock("./trial-pane", () => ({ PreviewTrialPane: (p: PreviewMethodProps) => <div>Untested draft: {p.state.draft?.title}</div> }));
 vi.mock("./preview-dialogs", () => ({ PreviewDialogs: () => null }));
 import { AuthoringPreview } from "./app";
 import { PREVIEW_STORAGE_KEY } from "./state";

@@ -14,7 +14,8 @@ import { DEFAULT_FOLDER, SharedHubStore } from "../src/geo/hub-shared/store.ts";
 import { geoStateDir } from "../src/geo/context.ts";
 import type { GeoWorkflow } from "../src/geo/catalogue-types.ts";
 import { recordMethodTrial } from "../src/geo/methods/trials.ts";
-import { packageStore } from "../src/geo/methods/package-origin.ts";
+import { getSkillProvenance } from "../src/agent/skills-sync.ts";
+import { originOfSource, packageStore } from "../src/geo/methods/package-origin.ts";
 import { projectSkillRoot } from "../src/agent/skills.ts";
 import { createProject, deleteProject, resolvePaths } from "../src/projects.ts";
 import {
@@ -96,6 +97,28 @@ function target() {
 }
 
 describe("shared GAID hub", () => {
+  it("refuses skill-only registration and explains the missing Workflow", async () => {
+    const f = await setup();
+    await f.store.mutate(f.projectId, (p) => { p.drafts.at(-1)!.workflow = null; p.drafts.at(-1)!.recipe = null; });
+    const response = await f.register();
+    expect(response.statusCode).toBe(422);
+    expect(response.json().error).toMatch(/Workflow가 없는 초안.*입력 자료, 분석 조건과 AI agent 지시문/);
+    expect(await f.shared.list()).toHaveLength(0);
+  });
+
+  it("previews exact built draft files before installation without installing them", async () => {
+    const f = await setup();
+    expect((await f.register()).statusCode).toBe(201);
+    const p = await f.store.read(f.projectId);
+    const pkg = p.packages.at(-1)!;
+    const project = target();
+    const response = await f.app.inject({ method: "POST", url: `/geo/authoring/projects/${f.projectId}/packages/${pkg.revision}/preview`, payload: { projectId: project.id } });
+    expect(response.statusCode, response.body).toBe(200);
+    expect(response.json()).toMatchObject({ skills: [{ name: draftReply.slug }], contents: [{ name: draftReply.slug, files: expect.arrayContaining(["SKILL.md", "gaid-method.json"]), hasCode: false, prompts: expect.any(Array) }] });
+    expect(getSkillProvenance(projectSkillRoot(resolvePaths(project.id)), draftReply.slug)).toBeNull();
+    expect((await f.store.read(f.projectId)).installs).toHaveLength(0);
+  });
+
   it("registers once per project, freezes draft/visual/package snapshots and keeps old revisions downloadable", async () => {
     const f = await setup();
     await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
@@ -407,6 +430,8 @@ describe("shared GAID hub", () => {
       recipeId: `${draftReply.slug}-default`,
       install: { projectId: project.id, methodKey: `project:${draftReply.slug}` },
     });
+    const recorded = getSkillProvenance(projectSkillRoot(resolvePaths(project.id)), draftReply.slug);
+    expect(originOfSource(recorded?.source, packageStore(f.agentDir)).origin).toMatchObject({ kind: "gaid-hub", hubEntry: { id: entry.id, revision: 1 } });
     expect((await install()).statusCode).toBe(201);
     expect((await f.shared.read(entry.id)).installs).toHaveLength(2);
     // The revision the researcher looked at is installed; an unknown or malformed revision is refused.

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UseInProjectDialog } from "./shared-entry";
+import { apiFetch } from "@/lib/projects";
 import { sharedHub } from "./shared-api";
 
 const { createProject } = vi.hoisted(() => ({ createProject: vi.fn() }));
@@ -8,7 +9,11 @@ vi.mock("@/lib/use-projects", () => ({ useProjects: () => ({ create: createProje
 vi.mock("./shared-api", () => ({ sharedHub: { install: vi.fn() }, hubUserName: () => "연구자" }));
 vi.mock("./input-prep", () => ({ InputPrep: ({ projectName }: { projectName: string }) => <p>{projectName} 입력 준비</p> }));
 
-beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
+vi.mock("@/lib/projects", async (original) => ({ ...await original<typeof import("@/lib/projects")>(), apiFetch: vi.fn() }));
+beforeEach(() => {
+  localStorage.setItem("gaid:locale", "ko");
+  vi.mocked(apiFetch).mockResolvedValue(new Response(JSON.stringify({ skills: [{ name: "method", files: 1 }], contents: [{ name: "method", files: ["SKILL.md"], hasCode: false, prompts: [{ ko: "분석해 주세요." }] }] })));
+});
 afterEach(() => { localStorage.removeItem("gaid:locale"); vi.resetAllMocks(); });
 function show() {
   return render(<UseInProjectDialog open onOpenChange={vi.fn()} entryId="entry-method" revision={2}
@@ -28,6 +33,8 @@ describe("shared install project creation", () => {
     await waitFor(() => expect(createProject).toHaveBeenCalledWith({ name: "니켈 연구" }));
     await waitFor(() => expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("new-study"));
     expect(sharedHub.install).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByRole("checkbox")).toBeEnabled());
+    expect(screen.getByRole("region", { name: "설치 내용 미리보기" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: "프로젝트에 설치하기" }));
     await waitFor(() => expect(sharedHub.install).toHaveBeenCalledWith("entry-method", "new-study", 2));

@@ -30,8 +30,8 @@ it("submits downloaded packages and reports server validation errors", async () 
   render(<SkillHubInstall scope="project" projectId="test" onStart={vi.fn()} onPreview={vi.fn()} onError={onError} />);
   await screen.findByRole("link");
   vi.mocked(apiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ code: "archive" }), { status: 400 }));
-  fireEvent.change(screen.getByLabelText("Skill file bundle file (.tar.gz)"), { target: { files: [new File(["bytes"], "example.tar.gz")] } });
-  fireEvent.click(screen.getByRole("button", { name: "Preview file bundle" }));
+  fireEvent.change(screen.getByLabelText("Skill archive (.tar.gz)"), { target: { files: [new File(["bytes"], "example.tar.gz")] } });
+  fireEvent.click(screen.getByRole("button", { name: "Preview archive" }));
   await waitFor(() => expect(onError).toHaveBeenCalledWith(expect.stringContaining("Links and parent paths are not allowed")));
   expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview?scope=project", expect.objectContaining({ body: expect.any(FormData) }), "test");
 });
@@ -74,37 +74,23 @@ it("lists hub packages and previews the descriptor through the existing gate", a
   const onPreview = vi.fn();
   render(<SkillHubInstall projectId="p1" scope="project" onStart={vi.fn()} onPreview={onPreview} onError={vi.fn()} />);
   expect(await screen.findByText("Paper package")).toBeInTheDocument(); expect(screen.getByText(/Submitted · Instructions only/)).toBeInTheDocument(); expect(screen.getByRole("alert")).toHaveTextContent("Hub offline");
-  fireEvent.click(screen.getAllByRole("button", { name: "Preview file bundle" })[0]);
+  fireEvent.click(screen.getAllByRole("button", { name: "Preview archive" })[0]);
   await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
   expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview?scope=project", expect.objectContaining({ body: JSON.stringify({ url: descriptorUrl, scope: "project" }) }), "p1");
 });
 
 it("shows hub draft identity, revision and effective lifecycle in preview notes", () => {
   render(<SkillHubPreviewNotes preview={{ ...result, skillHub: { ...result.skillHub, draft: { methodId: "local/paper", revision: 2, lifecycle: "draft", url: "https://hub.test/api/gaid/packages/local/paper/2" } } }} />);
-  expect(screen.getByText("Hub method: local/paper · revision 2 · Draft")).toBeInTheDocument();
+  expect(screen.getByText("Workflow: local/paper · revision 2 · Draft")).toBeInTheDocument();
   expect(screen.getByText(/Changes on the site are not fetched automatically/)).toBeInTheDocument();
 });
 
-const hubEntry = { id: "entry-paper", methodId: "local/paper", title: "Hub skill", tagline: "Skill package", author: "Researcher", stars: 4, latestRevision: 3, kind: "skill", recipe: false };
-it("previews the selected shared-hub revision with project and scope and leaves legacy collapsed", async () => {
-  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/hub/entries" ? { entries: [hubEntry] } : result)));
-  const onPreview = vi.fn();
-  render(<HubSkillInstall scope="global" projectId="test" onStart={vi.fn()} onPreview={onPreview} onError={vi.fn()} />);
+it("keeps hub Workflow search out of the skill installer and legacy collapsed", async () => {
+  render(<HubSkillInstall scope="global" projectId="test" onStart={vi.fn()} onPreview={vi.fn()} onError={vi.fn()} />);
   expect(screen.queryByLabelText("Skill page URL")).not.toBeInTheDocument();
-  fireEvent.click(await screen.findByRole("button", { name: /Hub skill/ }));
-  fireEvent.click(screen.getByRole("button", { name: "Preview file bundle" }));
-  await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
-  expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview", expect.objectContaining({ body: JSON.stringify({ hubEntry: { id: "entry-paper", revision: 3 }, scope: "global" }) }), "test");
-  expect(vi.mocked(apiFetch).mock.calls.some(([url]) => url === "/geo/skill-hub/methods")).toBe(false);
-});
-it("SkillsPanel shared-hub preview uses the same explicit trust and staging-token install gate", async () => {
-  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/hub/entries" ? { entries: [hubEntry] } : result)));
-  render(<SkillsPanel />);
-  fireEvent.click(await screen.findByRole("button", { name: /^Add$/ }));
-  fireEvent.click(await screen.findByRole("button", { name: /Hub skill/ }));
-  fireEvent.click(screen.getByRole("button", { name: "Preview file bundle" }));
-  await screen.findByText("Example description");
-  const install = screen.getByRole("button", { name: "Install 1 skill" }); expect(install).toBeDisabled();
-  fireEvent.click(screen.getByRole("checkbox", { name: "Trust this source" })); fireEvent.click(install);
-  await waitFor(() => expect(installSkills).toHaveBeenCalledWith(expect.objectContaining({ stagingToken: "reviewed", acknowledged: true, scope: "project" })));
+  expect(screen.getByText("Previous skill_hub")).toBeInTheDocument();
+  expect(apiFetch).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByText("Previous skill_hub"));
+  await screen.findByRole("link", { name: "Find skills on skill_hub" });
+  expect(vi.mocked(apiFetch).mock.calls.some(([url]) => url === "/geo/hub/entries")).toBe(false);
 });

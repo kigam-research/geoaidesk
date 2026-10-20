@@ -109,7 +109,7 @@ describe("hub analysis handoff", () => {
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
     await userEvent.click(screen.getByRole("button", { name: "Send the analysis just done to a GAID hub draft" }));
     expect(await screen.findByText(/Long text or per-file step lists were truncated/)).toBeInTheDocument();
-    expect(screen.getByText(/material for a new method draft/)).toBeInTheDocument();
+    expect(screen.getByText(/material for a new Workflow draft/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download analysis bundle" })).toBeEnabled();
   });
   it("shows direct send only for loopback authoring sites and opens the confirmed draft", async () => {

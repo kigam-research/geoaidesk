@@ -1,18 +1,18 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fixtureDraft } from "./fixtures";
-import { SharedSteps, type SharedStepsView } from "./shared-method";
+import { SharedMethod, type SharedMethodView } from "./shared-method";
 
 beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
 afterEach(() => localStorage.removeItem("gaid:locale"));
 
-const base: SharedStepsView = {
+const base: SharedMethodView = {
   id: "entry-test", title: "공유 방법", tagline: "자료를 확인합니다.", summary: "분석 지침입니다.",
   author: "연구자", folder: "탐사", revision: 1, registeredAt: "2026. 10. 18.", kind: "workflow",
   tags: [], stars: 0, starred: false, trials: 1, image: null, comments: [],
 };
-function show(implementation: SharedStepsView["implementation"]) {
-  return render(<SharedSteps method={{ ...base, implementation }} profile={fixtureDraft().drafts[0].profile}
+function show(implementation: SharedMethodView["implementation"]) {
+  return render(<SharedMethod method={{ ...base, implementation }} profile={fixtureDraft().drafts[0].profile}
     flow={<div />} onStar={vi.fn()} onComment={vi.fn()} onTry={vi.fn()} />);
 }
 
@@ -45,19 +45,19 @@ describe("editing a registered method", () => {
         { revision: 2, at: "2026. 10. 20.", by: "연구자", note: "구역 기준을 고쳤습니다." },
       ],
     };
-    const { rerender } = render(<SharedSteps method={view} profile={profile} flow={<div />} onStar={vi.fn()}
+    const { rerender } = render(<SharedMethod method={view} profile={profile} flow={<div />} onStar={vi.fn()}
       onComment={vi.fn()} onTry={vi.fn()} onEdit={{ mode: "edit", run }} />);
     fireEvent.click(screen.getByRole("button", { name: "Workflow 고치기" }));
     expect(run).toHaveBeenCalledOnce();
     expect(screen.getByText(/새 판으로 등록합니다/)).toBeTruthy();
-    expect(screen.getByText(/김 연구원의 「원본 방법」 2판을 복사해 고친 방법입니다/)).toBeTruthy();
+    expect(screen.getByText(/김 연구원의 「원본 방법」 2판을 복사해 고친 Workflow입니다/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "원본 보기" }));
     expect(onOpen).toHaveBeenCalledOnce();
     expect(screen.getByText("판 기록 2개")).toBeTruthy();
     expect(screen.getByText("구역 기준을 고쳤습니다.")).toBeTruthy();
-    rerender(<SharedSteps method={view} profile={profile} flow={<div />} onStar={vi.fn()}
+    rerender(<SharedMethod method={view} profile={profile} flow={<div />} onStar={vi.fn()}
       onComment={vi.fn()} onTry={vi.fn()} onEdit={{ mode: "copy", run }} />);
     expect(screen.getByRole("button", { name: "복사해서 고치기" })).toBeTruthy();
-    expect(screen.getByText(/원본을 밝힌 별도 방법이 됩니다/)).toBeTruthy();
+    expect(screen.getByText(/원본을 밝힌 별도 Workflow가 됩니다/)).toBeTruthy();
   });
 });

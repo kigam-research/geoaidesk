@@ -17,7 +17,7 @@
     "skill": "Skill",
     "workflow": "Workflow"
   },
-  "kindTip": "The type of research Workflow registered in the hub.",
+  "kindTip": "The type of Workflow registered in the hub.",
   "recipe": "saved start settings",
   "recipeTip": "The Workflow has saved start settings.",
   "browse": {
@@ -35,12 +35,12 @@
   "install": {
     "button": "Install and open start settings"
   },
-  "installing": "Installing the research Workflow.",
-  "installError": "Could not install the research Workflow. Check the selected revision in the hub and try again.",
+  "installing": "Installing the Workflow.",
+  "installError": "Could not install the Workflow. Check the selected revision in the hub and try again.",
   "installed": "Already available in the project. Open its saved start settings.",
   "installedNeedsCheck": "This Workflow is already installed. Open it to check its availability and saved start settings.",
   "method": {
-    "button": "Open research Workflow"
+    "button": "Open Workflow"
   },
   "open": {
     "button": "Open start settings"
@@ -49,7 +49,7 @@
   "skillTitle": "Find skills in GAID hub",
   "skillHelp": "Select a skill, then preview its included files.",
   "preview": {
-    "button": "Preview file bundle"
+    "button": "Preview archive"
   },
   "legacy": "Previous skill_hub",
   "previewSource": "GAID hub · {title} · revision {count}"

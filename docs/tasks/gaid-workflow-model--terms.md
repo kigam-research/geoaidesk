@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:28:43Z
+updated: 2026-10-20T13:32:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -89,10 +89,9 @@ Implementation in progress. No stored data or package contracts will change.
 2. Add skill provenance/read-only instructions, constrain authoring registration, expose install preview.
 3. Run declared checks and isolated browser review; finish this child for parent integration.
 ## Failed approaches
+- Initial global replacement in test sources also changed identifiers; restored original tests and updated only displayed-copy assertions. Follow-up failures were stale partial strings. Confirmed actual locale values directly before the third focused run.
+- First job invocation refused a dirty source before starting; saved the checkpoint and launched the first recorded check job. No stopped-before-start receipt existed.
 ## Notes and decisions
-- Ownership: this child owns existing locale namespaces, skill panel/API, authoring target/install and shared-registration gate; parent owns composition UI and flow counts. These tightly coupled changes are implemented by this writer. Integration order: copy → backend metadata/gates → skill/install UI → checks.
-- Catalogue group chosen: 기본 Workflow; upstream folded group: 일반 Workflow.
-- The copy validator cannot scope glossary forbidden variants by concept/namespace; exclusions for 방법 and 레시피 are documented as notes, not global warnings.
 - Ownership: this child owns existing locale namespaces, skill panel/API, authoring target/install and shared-registration gate; parent owns composition UI and flow counts. These tightly coupled changes are implemented by this writer. Integration order: copy → backend metadata/gates → skill/install UI → checks.
 - Catalogue group chosen: 기본 Workflow; upstream folded group: 일반 Workflow.
 - The copy validator cannot scope glossary forbidden variants by concept/namespace; exclusions for 방법 and 레시피 are documented as notes, not global warnings.
@@ -108,6 +107,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T132855.119601Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
