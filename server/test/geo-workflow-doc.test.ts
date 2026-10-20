@@ -64,6 +64,13 @@ describe("gaid-workflow/v1 in gaid-method.json", () => {
     expect(foreign).toContain("workflows[0].skills[0].name");
   });
 
+  it("accepts an empty prompt only in gaid-workflow/v1 and renders no instructions section", () => {
+    expect(parseMethodFile(method({ ...structured, prompt: { ko: "" } }), "grid-priority").issues).toEqual([]);
+    expect(parseMethodFile(method({ ...base, prompt: { ko: "" } }), "grid-priority").issues.map((i) => i.subject)).toContain("workflows[0].prompt");
+    const doc = workflowDocFor({ ...structured, prompt: { ko: "" } } as unknown as GeoWorkflow, { skills: [] });
+    expect(doc.instructions).toBeNull();
+  });
+
   it("still accepts a geo-workflow/v1 Workflow without steps", () => {
     expect(parseMethodFile(method(base), "grid-priority").issues).toEqual([]);
   });
