@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T13:57:17Z
+status: ready
+updated: 2026-10-20T13:57:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -319,7 +319,9 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. Run `task finish` for the reviewed child snapshot. The parent then integrates with `task complete gaid-workflow-model--terms` and includes the recorded evidence in its single canonical report.
+<!-- task:closed -->
+Closed 2026-10-20T13:57:18Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Job 6 continuation wrapper installed dependencies but omitted scripts/check's local step() output helper, so it exited 127 before the first remaining stage. Added extraction of that original function alongside the original suffix; product code was unchanged.
 - Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
