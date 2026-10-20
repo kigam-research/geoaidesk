@@ -197,7 +197,7 @@ export function DraftStep({
             </p>
           )}
           {visualAction && !visualAction.busy && <TechnicalDetail detail={visualAction.errorDetail} />}
-          {doc ? <WorkflowView doc={doc} profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} loadSkillSource={async () => ({ content: draft.instructions })} /> : authoringId && draft.workflow ? <p className="text-sm text-muted-foreground">{geoText("workflowView")(documentFailed ? "error" : "loading")}</p> : <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />}
+          {doc ? <WorkflowView showStepsHeading={false} doc={doc} profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} loadSkillSource={async () => ({ content: draft.instructions })} /> : authoringId && draft.workflow ? <p className="text-sm text-muted-foreground">{geoText("workflowView")(documentFailed ? "error" : "loading")}</p> : <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />}
         </section>
 
         <LimitsCard profile={profile} />

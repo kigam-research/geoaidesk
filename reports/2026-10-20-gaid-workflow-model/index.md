@@ -319,6 +319,16 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 - skill_hub는 사용자 결정대로 계획에 넣지 않습니다. Workflow 형식은 GAID가 정하고, 고정된 카탈로그 파일은 바꾸지 않습니다.
 - 2단계 순서: (1) 이름 정리·스킬 화면 연결·결함 수정(하위 작업으로 이미 시작, 이 설계와 무관), (2) 이 설계 확정 후 지침 문서를 만드는 공통 부분과 채팅 시작 방식, (3) 허브·프로젝트·시작 설정의 Workflow 상세 화면, (4) 허브 작성 기능이 단계를 쓰도록 바꾸기, (5) CLI에서 쓰기.
 
+### 3.16 최종 Workflow 지침을 허브와 프로젝트에서 함께 봅니다
+
+허브 등록 항목, 작성 중인 초안, 프로젝트의 Workflow 상세, 기본 Workflow 상세에 공통 구성 화면을 연결했습니다. 기본 Workflow는 패널 줄의 상세 단추나 허브 추천 카드에서 엽니다. 시작 설정 요약에서는 연구자가 채운 입력과 조건을 반영한 지침을 펼쳐 읽고 복사합니다. 복사한 글과 새 채팅의 첫 메시지는 같은 문서 렌더러를 씁니다.
+
+단계마다 사용하는 스킬, 먼저 읽을 부분, 확인할 항목, 연구자 결정, 결과를 표시합니다. 허브의 개념 그림과 입력·결과 예시는 기존 표시 기능을 재사용합니다. 연구자 결정 표시는 단계에 연결된 선택 조건에서 읽습니다. 이전 형식의 Workflow에는 자세한 방법을 스킬 지침에서 읽어야 한다는 안내가 남습니다.
+
+사용하는 스킬은 기본 제공, 가져온 스킬, Workflow에 딸린 스킬로 구분합니다. 프로젝트에 설치한 스킬 지침은 읽기 전용으로 엽니다. 허브 등록 항목의 스킬 지침은 화면에 표시한 판의 실제 등록 파일에서 읽습니다. 기본 Workflow의 스킬도 허브에서 읽을 수 있습니다. 입력과 선택 조건 전체, 결과 파일과 해석 한계, AI agent가 받는 지침은 접힌 칸에서 확인합니다. 프로젝트 상세에서는 첫 단계만 펼쳐 보여 주며, 나머지는 제목을 눌러 읽습니다. 검사 기록도 접힌 칸에 보관합니다.
+
+가져온 스킬이 프로젝트에 없으면 이름과 기록된 출처를 표시합니다. 가져오기 단추는 기존 스킬 설치 화면에 출처를 채웁니다. 출처를 읽거나 설치하는 동작은 연구자가 미리보기와 출처 확인을 거쳐 선택합니다.
+
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 이 작업은 화면 구성과 용어 진단입니다.
@@ -387,3 +397,11 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 작성 시점: 2026-10-20, commit 6bbd7fa (task branch).
 
 </details>
+
+### 화면 구현 근거 (gaid-workflow-model--views)
+
+- 공통 구성 화면: `web/src/geo/workflow/workflow-view.tsx`; 그림과 입출력 예시 재사용: `web/src/geo/hub/method-flow.tsx`.
+- 적용 위치: 허브 등록 상세, 허브 초안, 프로젝트 Workflow 상세, 기본 Workflow 패널 상세, 허브 추천 상세, 시작 설정 요약.
+- UI guide 적용: P1–P3, L6, B1, D2, F1/F4, A1–A3, Q4, R2. R1의 지시문 비표시 규칙은 사용자 요청과 승인된 Workflow 지침 ADR에 따라 이 문서에 한해 예외로 합니다. 시스템 지시나 실행 로그를 새로 공개하지 않습니다.
+- 문자열: `workflowView.*`는 모두 신규(변경 전 없음). 한·영 전체 대응은 `web/src/geo/locales/workflowView/{ko,en}.json`. 주요 신규 문구: `workflowView.agentInstructions`: “AI agent가 받는 지침 보기” / “View instructions the AI agent receives”; `workflowView.instructions.button`: “지침 보기” / “Read instructions”; `workflowView.detail.button`: “Workflow 상세 보기” / “View Workflow details”; `workflowView.import.button`: “GitHub 등에서 가져오기” / “Import from GitHub or elsewhere”. 기존 문자열은 바꾸지 않았습니다.
+- 부모 통합용 CLI 동작은 공통 상세 화면, 허브 상세와 프로젝트 상세의 `exportAction` 슬롯으로 전달합니다. 이 자식 작업에서는 CLI 구현 파일을 수정하지 않았습니다.

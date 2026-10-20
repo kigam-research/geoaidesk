@@ -15,8 +15,9 @@ const text = geoText("workflowView");
 export type SkillSourceLoader = (name: string) => Promise<{ content: string }>;
 
 /** One read-only view of the structured Workflow and the exact instruction document it renders. */
-export function WorkflowView({ doc, projectId, readiness, profile, visuals, outputImages, pictureAction, loadSkillSource, exportAction }: {
+export function WorkflowView({ doc, projectId, readiness, profile, visuals, outputImages, pictureAction, loadSkillSource, exportAction, showStepsHeading = true }: {
   doc: WorkflowDoc;
+  showStepsHeading?: boolean;
   projectId?: string;
   readiness?: WorkflowReadiness;
   profile?: DraftProfile;
@@ -31,12 +32,14 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
   return <div className="flex min-w-0 flex-col gap-4 text-sm [overflow-wrap:anywhere]">
     {doc.kind === "legacy" && <p className="text-muted-foreground">{text("legacy")}</p>}
     <section className="space-y-3">
-      <h3 className="text-base font-semibold">{text("steps")}</h3>
+      {showStepsHeading && <h3 className="text-base font-semibold">{text("steps")}</h3>}
       {profile ? <MethodFlow profile={profile} doc={doc} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} stepDetail={(stepId) => <StepFacts doc={doc} stepId={stepId} />} /> : <ol className="space-y-2">
         {doc.steps.map((step, i) => <li key={step.id} className="rounded-lg border p-3">
-          <h4 className="font-semibold">{i + 1}. {localText(step.title)}</h4>
-          <p className="mt-1">{localText(step.does)}</p>
-          <StepFacts doc={doc} stepId={step.id} />
+          <details open={i === 0}>
+            <summary className="cursor-pointer font-semibold">{i + 1}. {localText(step.title)}</summary>
+            <p className="mt-2">{localText(step.does)}</p>
+            <StepFacts doc={doc} stepId={step.id} />
+          </details>
         </li>)}
       </ol>}
       {doc.steps.length === 0 && <p className="text-muted-foreground">{text("noSteps")}</p>}

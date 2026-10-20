@@ -107,7 +107,7 @@ export function MethodFlow({
     const previous = profile.procedure.nodes.find((n) => n.id === step.id);
     return { ...previous, id: step.id, label: step.title, summary: step.does,
       type: step.choiceIds.length ? "human-gate" : previous?.type === "input" ? "input" : previous?.type === "output" ? "output" : "analysis",
-      checks: [], decisionIds: step.choiceIds, outputs: step.outputs };
+      checks: [], decisionIds: step.choiceIds, outputs: [...new Set([...(previous?.outputs ?? []), ...step.outputs])] };
   }) : orderedNodes(profile.procedure.nodes, profile.procedure.edges);
   const [selected, setSelected] = useState<string>(nodes[0]?.id ?? "");
   const node = nodes.find((n) => n.id === selected) ?? nodes[0];

@@ -163,12 +163,12 @@ export function MethodDetail({ method, projectId, onClose, onSetup, exportAction
       <p className="text-xs">{t("methods.revision", { revision: method.origin.hubEntry?.revision ?? method.revision ?? t("methods.unknown") })}</p>
       {page && <a className="text-xs text-primary underline" href={page} target="_blank" rel="noopener noreferrer">{t("methods.page")}</a>}
       {method.issues.length > 0 && <section role="alert"><h3 className="text-sm font-medium">{t("methods.issues")}</h3><ul className="list-disc pl-5 text-xs">{method.issues.map((issue, i) => <li key={i}>{issue.subject}: {issue.message}</li>)}</ul></section>}
-      {method.hubChecks && <section className="space-y-1 text-xs">
-        <h3 className="text-sm font-medium">{t("methods.checks")}</h3>
+      {method.hubChecks && <details className="space-y-1 text-xs">
+        <summary className="cursor-pointer text-sm font-medium">{t("methods.checks")}</summary>
         <p>{t("methods.checkSummary", { checker: method.hubChecks.checker, at: when(method.hubChecks.checkedAt), count: method.hubChecks.warnings.length })}</p>
         <ul className="list-disc pl-5">{method.hubChecks.items.map((item) => <li key={item.id}>{item.id}: {t(`methods.check.${item.status}`)}{item.detail ? ` · ${item.detail}` : ""}</li>)}</ul>
         <ul className="list-disc pl-5">{method.hubChecks.warnings.map((warning, i) => <li key={i}>{warning.path}: {warning.message}</li>)}</ul>
-      </section>}
+      </details>}
       {!!method.authoring?.openQuestions.length && <section><h3 className="text-sm font-medium">{t("methods.questions")}</h3><ul className="list-disc pl-5 text-xs">{method.authoring.openQuestions.map((question) => <li key={question.id}>{question.text}</li>)}</ul></section>}
       {method.sources.length > 0 && <section><h3 className="text-sm font-medium">{t("methods.sources")}</h3><ul className="list-disc pl-5 text-xs">{method.sources.map((source, i) => {
         const href = webLink(source.kind === "doi" ? `https://doi.org/${source.ref.replace(/^https?:\/\/doi.org\//, "")}` : source.kind === "url" ? source.ref : undefined);
@@ -178,8 +178,8 @@ export function MethodDetail({ method, projectId, onClose, onSetup, exportAction
         <p>{text(workflow.title)}</p>
         {workflow.description && <p className="text-muted-foreground">{text(workflow.description)}</p>}
         <Readiness value={workflow.readiness} />
-        {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
-        {workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
+        {!workflow.doc && workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
+        {!workflow.doc && workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
         {workflow.doc ? <WorkflowView doc={workflow.doc} projectId={projectId} readiness={workflow.readiness} exportAction={exportAction?.(workflow)} /> : <WorkflowOutputs workflow={workflow} />}
         <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
       </div>)}</section>}

@@ -167,7 +167,7 @@ export function SharedEntryScreen({
         }}
         profile={detail.profile}
         workflowDoc={detail.workflowDoc}
-        flow={detail.workflowDoc ? <WorkflowView doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction?.(detail)} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
+        flow={detail.workflowDoc ? <WorkflowView showStepsHeading={false} doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction?.(detail)} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
         onStar={() =>
           named.run(() => {
             void sharedHub
