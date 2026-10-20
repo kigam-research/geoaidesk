@@ -119,6 +119,25 @@ export function answerQuestion(project: AuthoringProject, questionId: string, bo
   return decision;
 }
 
+/**
+ * The revision request after a round of answers: which answers are new and which replace an earlier answer (the
+ * researcher changed their mind on a draft that already used the old one), so the coauthor revises those parts.
+ */
+export function answersFeedback(project: AuthoringProject, decisions: Decision[]): string {
+  const said = (d: Decision) => (d.status === "deferred" ? "나중에 정하기" : `"${d.response}"`);
+  const lines = decisions.map((d) => {
+    const q = project.questions.find((x) => x.id === d.questionId);
+    const before = project.decisions.find((x) => x.supersededBy === d.id);
+    return before
+      ? `- ${d.key} (${q?.text ?? ""}): 이전 답 ${said(before)} → 바꾼 답 ${said(d)}`
+      : `- ${d.key} (${q?.text ?? ""}): 새 답 ${said(d)}`;
+  });
+  return [
+    "연구자가 질문에 답하거나 기록한 답을 바꿨습니다. 아래 답에 맞게 초안을 고치고, 바뀐 답에 기대던 단계·설명·기본값도 함께 고치세요.",
+    ...lines,
+  ].join("\n");
+}
+
 /** Validate every answer of a round first, then apply all of them (or none). */
 export function answerAll(project: AuthoringProject, answers: AnswerItem[], by: string): Decision[] {
   if (!Array.isArray(answers) || !answers.length) throw new AuthoringError("답이 없습니다.");
@@ -301,7 +320,7 @@ export async function registerAuthoringRoutes(
       const op = project.drafts.length ? "revise" : "draft";
       const attempt = await startOperation(store, projectId, op, `${body.opId}-draft`, {
         ...deps(body, project),
-        ...(op === "revise" ? { feedback: "연구자가 새 질문에 답했습니다. 기록된 답을 초안에 반영하세요." } : {}),
+        ...(op === "revise" ? { feedback: answersFeedback(project, decisions) } : {}),
       });
       return reply.code(202).send({ decisions, attempt });
     });

@@ -60,9 +60,15 @@ export function SharedEntryScreen({
   projects,
   onOpenSetup,
   onBack,
+  onOpenDraft,
+  onOpenEntry,
 }: {
   /** Back to the hub list. */
   onBack?: () => void;
+  /** Open a draft in the hub ("방법 고치기" / "복사해서 고치기"); without it the action is not offered. */
+  onOpenDraft?: (authoringId: string) => void;
+  /** Open another registered entry (the original of a copy). */
+  onOpenEntry?: (entryId: string) => void;
   entryId: string;
   projects: { id: string; name: string }[];
   onOpenSetup: (projectId: string, methodKey: string, workflowId: string | null, recipeId: string | null) => void;
@@ -71,6 +77,7 @@ export function SharedEntryScreen({
   const [folders, setFolders] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [useOpen, setUseOpen] = useState(false);
+  const [opening, setOpening] = useState(false);
   const named = useNamedAction();
 
   const load = useCallback(async () => {
@@ -136,6 +143,16 @@ export function SharedEntryScreen({
           starred: e.starredByMe,
           trials: e.trials,
           image: hubImage(e.cover),
+          basedOn:
+            e.basedOn && onOpenEntry
+              ? { ...e.basedOn, onOpen: () => onOpenEntry(e.basedOn!.entryId) }
+              : undefined,
+          revisions: e.revisions.map((r) => ({
+            revision: r.revision,
+            at: when(r.registeredAt),
+            by: r.registeredBy,
+            note: r.note,
+          })),
           comments: detail.comments.map((c) => ({
             id: c.id,
             author: c.author,
@@ -163,6 +180,24 @@ export function SharedEntryScreen({
           })
         }
         onTry={() => named.run(() => setUseOpen(true))}
+        onEdit={
+          onOpenDraft
+            ? {
+                // Display names are not accounts: the registering name edits the entry, any other name edits a copy.
+                mode: hubUserName() === e.author ? "edit" : "copy",
+                busy: opening,
+                run: () =>
+                  named.run(() => {
+                    setOpening(true);
+                    void sharedHub
+                      .edit(e.id)
+                      .then((r) => onOpenDraft(r.authoringProjectId))
+                      .catch((err: Error) => toast.error(err.message))
+                      .finally(() => setOpening(false));
+                  }),
+              }
+            : undefined
+        }
       />
       <UseInProjectDialog
         open={useOpen}

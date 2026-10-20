@@ -194,11 +194,16 @@
     "edit": "Edit answer {n}",
     "apply": "Apply answers and create draft",
     "needAll": "{count, plural, one {# question has} other {# questions have}} no answer. Answer or choose Decide later.",
-    "allApplied": "All answers are in the draft. Use \"Request changes\" on the draft screen to change something.",
-    "recorded": "This answer is already applied.",
+    "allApplied": "Every answer is in the draft. To change one, select its question number and choose again.",
     "intent": "Why we ask",
     "link": "Where it goes",
-    "makeDraft": "Create draft"
+    "makeDraft": "Create draft",
+    "recordedEditable": "This answer is in the draft. Choosing another one revises the draft.",
+    "changedNote": "Differs from the answer in the draft. Apply it under Review answers to revise the draft.",
+    "changedMark": "Changed answer",
+    "changedBadge": "Changed",
+    "changedCount": "{count, plural, one {# changed answer} other {# changed answers}}",
+    "applyChanged": "Apply changed answers"
   },
   "drafting": {
     "title": "Creating the draft",
@@ -338,7 +343,21 @@
     "registeredAt": "registered {when}",
     "afterRegister": "After registration, other researchers can star it and comment.",
     "back": "Hub list",
-    "note": "Author's note"
+    "note": "Author's note",
+    "edit": {
+      "button": "Edit method",
+      "hint": "Your changes are registered as a new revision. Earlier revisions stay installable."
+    },
+    "copy": {
+      "button": "Copy and edit",
+      "hint": "Copies the method into your own methods. Registered, it becomes a separate method that names the original."
+    },
+    "basedOn": "Copied and edited from revision {revision} of “{title}” by {author}.",
+    "openOriginal": "View original",
+    "revisions": {
+      "title": "Revision history ({count})",
+      "row": "Revision {revision} · {when} · {author}"
+    }
   },
   "flow": {
     "decide": "You decide: {question}",
@@ -403,5 +422,9 @@
     "label": "Technical details",
     "copy": "Copy technical details",
     "copied": "Copied technical details"
+  },
+  "editing": {
+    "edit": "You are editing revision {revision} of your registered method. Registering it in the hub makes revision {next}.",
+    "copy": "Your copy of revision {revision} of “{title}” by {author}. Registered, it becomes a separate method that names the original."
   }
 }
