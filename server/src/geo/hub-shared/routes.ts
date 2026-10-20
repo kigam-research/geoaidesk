@@ -1,7 +1,11 @@
 /** Institute-shared method registry. Display-name identity is intentionally not account authentication. */
 import { procedureSteps, workflowDocFor } from "../workflow-doc.ts";
+import { gunzipSync } from "node:zlib";
+import { readTar } from "../tar.ts";
+import { catalogueWorkflowDoc } from "../workspace/workflows.ts";
 import { createHash } from "node:crypto";
-import { extname } from "node:path";
+import { extname, join } from "node:path";
+import { readFile, stat } from "node:fs/promises";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { AtlasTextInput, CheckResult, InstallBody } from "../../../../web/src/geo/contracts/authoring.ts";
 import type {
@@ -400,6 +404,39 @@ export async function registerSharedHubRoutes(
         return reply.code(201).send(result);
       },
     );
+    scope.get<{ Params: { id: string }; Querystring: { revision?: string; name?: string } }>("/geo/hub/entries/:id/skill-source", async (req) => {
+      const record = await store.read(req.params.id);
+      const snapshot = snapshotOf(record, req.query.revision);
+      if (req.query.name !== snapshot.package.slug) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
+      const revision = req.query.revision === undefined ? record.entry.latestRevision : Number(req.query.revision);
+      const archive = await store.bytes(record.entry.id, `packages/${revision}.tar.gz`);
+      if (createHash("sha256").update(archive).digest("hex") !== snapshot.package.sha256)
+        throw new AuthoringError("등록 파일을 읽지 못했습니다.", 409);
+      const files = readTar(gunzipSync(archive, { maxOutputLength: 64 * 1024 * 1024 }));
+      const skill = files.find((f) => f.type === "file" && f.path === `${snapshot.package.slug}/SKILL.md`);
+      if (!skill || skill.data.length > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 404);
+      return { content: skill.data.toString("utf8") };
+    });
+    scope.get<{ Params: { id: string }; Querystring: { name?: string } }>("/geo/hub/catalogue/:id/skill-source", async (req) => {
+      if (!geoCatalogueActive()) throw new AuthoringError("기본 Workflow를 찾을 수 없습니다.", 404);
+      const catalogue = loadGeoCatalogue();
+      const workflow = catalogue.workflows.find((w) => w.id === req.params.id);
+      const skill = catalogue.index.skills.find((s) => workflow?.skillIds.includes(s.id) && s.runtimeName === req.query.name);
+      if (!skill || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skill.runtimeName)) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
+      const file = join(catalogue.skillsDir, skill.runtimeName, "SKILL.md");
+      if ((await stat(file)).size > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 413);
+      return { content: await readFile(file, "utf8") };
+    });
+    scope.get<{ Params: { id: string } }>("/geo/hub/catalogue/:id", async (req) => {
+      const catalogue = geoCatalogueActive() ? loadGeoCatalogue() : null;
+      const workflow = (options.catalogueWorkflows?.() ?? catalogue?.workflows ?? []).find((w) => w.id === req.params.id);
+      if (!workflow) throw new AuthoringError("기본 Workflow를 찾을 수 없습니다.", 404);
+      const doc = catalogue ? catalogueWorkflowDoc(catalogue, workflow, workflow.skillIds.map((id) => {
+        const skill = catalogue.index.skills.find((s) => s.id === id);
+        return { id, runtimeName: skill?.runtimeName ?? null, title: skill?.title ?? null, installed: false, enabled: false };
+      })) : workflowDocFor(workflow, { skills: workflow.skillIds.map((id) => ({ name: id, source: "catalogue" })) });
+      return { doc };
+    });
     scope.get("/geo/hub/recommended", async (req) => {
       const entries = await Promise.all((await store.list()).map((r) => entryView(r, hubUser(req))));
       const cards: HubRecommendation[] = entries

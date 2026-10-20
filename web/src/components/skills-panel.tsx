@@ -82,9 +82,12 @@ const ORIGIN_LABEL: Record<SkillOrigin, string> = {
 
 type Pane = "none" | "install" | "create" | "edit";
 
+import { onSkillImport, takeSkillImport } from "@/geo/skills/import-request";
+
 export function SkillsPanel() {
   const [reading, setReading] = useState<string | null>(null);
   const { activeProject, activeProjectId } = useProjects();
+  const [importSource] = useState(() => takeSkillImport(activeProjectId));
   const { confirm, dialog: confirmDialog } = useConfirm();
   const [scope, setScope] = useState<SkillScope>("project");
   const [rows, setRows] = useState<Row[]>([]);
@@ -99,15 +102,22 @@ export function SkillsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [pane, setPane] = useState<Pane>("none");
+  const [pane, setPane] = useState<Pane>(importSource ? "install" : "none");
 
   // Install pane
-  const [source, setSource] = useState("");
+  const [source, setSource] = useState(importSource ?? "");
   const [ref, setRef] = useState("");
   const [preview, setPreview] = useState<SkillHubPreview | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [acknowledged, setAcknowledged] = useState(false);
   const [previewing, setPreviewing] = useState(false);
+
+  useEffect(() => onSkillImport(() => {
+    const source = takeSkillImport(activeProjectId);
+    if (!source) return;
+    setPane("install"); setSource(source); setRef(""); setScope("project");
+    setPreview(null); setAcknowledged(false); setPicked(new Set());
+  }), [activeProjectId]);
 
   // Create pane
   const [newName, setNewName] = useState("");

@@ -10,6 +10,8 @@ import { geoLocale, t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
+import { CliExportButton } from "@/geo/workflow/cli-export";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { Readiness } from "@/geo/workspace/readiness";
 import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 
@@ -151,10 +153,10 @@ export function webLink(value: string | undefined): string | undefined {
 }
 const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString(geoLocale() === "ko" ? "ko-KR" : "en");
 
-export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
+export function MethodDetail({ method, projectId, onClose, onSetup, exportAction }: { exportAction?: (workflow: LocalMethodWorkflow) => ReactNode; method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);
   return <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-2xl">
+    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-4xl">
       <DialogTitle>{text(method.title)}</DialogTitle>
       <DialogDescription>{text(method.summary) || method.runtimeName}</DialogDescription>
       <div className="flex flex-wrap gap-1"><MethodBadges method={method} /></div>
@@ -162,12 +164,12 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
       <p className="text-xs">{t("methods.revision", { revision: method.origin.hubEntry?.revision ?? method.revision ?? t("methods.unknown") })}</p>
       {page && <a className="text-xs text-primary underline" href={page} target="_blank" rel="noopener noreferrer">{t("methods.page")}</a>}
       {method.issues.length > 0 && <section role="alert"><h3 className="text-sm font-medium">{t("methods.issues")}</h3><ul className="list-disc pl-5 text-xs">{method.issues.map((issue, i) => <li key={i}>{issue.subject}: {issue.message}</li>)}</ul></section>}
-      {method.hubChecks && <section className="space-y-1 text-xs">
-        <h3 className="text-sm font-medium">{t("methods.checks")}</h3>
+      {method.hubChecks && <details className="space-y-1 text-xs">
+        <summary className="cursor-pointer text-sm font-medium">{t("methods.checks")}</summary>
         <p>{t("methods.checkSummary", { checker: method.hubChecks.checker, at: when(method.hubChecks.checkedAt), count: method.hubChecks.warnings.length })}</p>
         <ul className="list-disc pl-5">{method.hubChecks.items.map((item) => <li key={item.id}>{item.id}: {t(`methods.check.${item.status}`)}{item.detail ? ` · ${item.detail}` : ""}</li>)}</ul>
         <ul className="list-disc pl-5">{method.hubChecks.warnings.map((warning, i) => <li key={i}>{warning.path}: {warning.message}</li>)}</ul>
-      </section>}
+      </details>}
       {!!method.authoring?.openQuestions.length && <section><h3 className="text-sm font-medium">{t("methods.questions")}</h3><ul className="list-disc pl-5 text-xs">{method.authoring.openQuestions.map((question) => <li key={question.id}>{question.text}</li>)}</ul></section>}
       {method.sources.length > 0 && <section><h3 className="text-sm font-medium">{t("methods.sources")}</h3><ul className="list-disc pl-5 text-xs">{method.sources.map((source, i) => {
         const href = webLink(source.kind === "doi" ? `https://doi.org/${source.ref.replace(/^https?:\/\/doi.org\//, "")}` : source.kind === "url" ? source.ref : undefined);
@@ -177,9 +179,9 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
         <p>{text(workflow.title)}</p>
         {workflow.description && <p className="text-muted-foreground">{text(workflow.description)}</p>}
         <Readiness value={workflow.readiness} />
-        {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
-        {workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
-        <WorkflowOutputs workflow={workflow} />
+        {!workflow.doc && workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
+        {!workflow.doc && workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
+        {workflow.doc ? <WorkflowView doc={workflow.doc} projectId={projectId} readiness={workflow.readiness} exportAction={exportAction ? exportAction(workflow) : <CliExportButton source={{ kind: "project", workflowId: workflow.id, method: method.key }} />} /> : <WorkflowOutputs workflow={workflow} />}
         <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
       </div>)}</section>}
       {method.recipes.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.recipes")}</h3>{method.recipes.map((recipe) => {

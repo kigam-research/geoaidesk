@@ -787,6 +787,24 @@
       "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "Workflow terminology, skill origin/read-only file details, registration gate and installation preview regression checks."
+    },
+    {
+      "path": "web/src/components/skills-panel.tsx",
+      "owner": "gaid-workflow-model",
+      "status": "edited",
+      "responsibility": "Project-scoped imported Workflow skill reference prefills the existing preview, acknowledgement and install flow"
+    },
+    {
+      "path": "server/test/geo-workflow-views.test.ts",
+      "owner": "gaid-workflow-model",
+      "status": "added",
+      "responsibility": "Read-only draft/catalogue documents and registered revision skill source integration tests"
+    },
+    {
+      "path": "web/src/components/code-views.tsx, web/src/components/file-preview-panel.test.tsx",
+      "owner": "gaid-workflow-model",
+      "status": "edited",
+      "responsibility": "Cancel the text editor saved-indicator timeout on unmount and before re-arming; prevent stale callbacks after file-preview teardown"
     }
   ],
   "notTouched": [

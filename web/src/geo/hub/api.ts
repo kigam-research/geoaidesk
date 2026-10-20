@@ -73,6 +73,7 @@ export const hubApi = {
     post<{ decisions: Decision[]; attempt?: AuthoringAttempt }>(`${pid(id)}/answers`, body),
   draft: (id: string, body: OperationBody) => post<AuthoringAttempt>(`${pid(id)}/draft`, body),
   revise: (id: string, body: OperationBody) => post<AuthoringAttempt>(`${pid(id)}/revise`, body),
+  workflow: (id: string, rev: number) => call<{ doc: import("@/geo/contracts/workflow-doc").WorkflowDoc | null }>(`${pid(id)}/drafts/${rev}/workflow`),
   files: (id: string, rev: number) => call<{ files: DraftFileView[] }>(`${pid(id)}/drafts/${rev}/files`),
   check: (id: string, rev: number) => call<CheckResult>(`${pid(id)}/drafts/${rev}/check`),
   pack: (id: string, draftRevision: number) =>

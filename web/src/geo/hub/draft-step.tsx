@@ -14,7 +14,7 @@ import {
   Share2Icon,
   TriangleAlertIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,9 @@ import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { openSettings } from "@/lib/settings-nav";
 
+import type { WorkflowDoc } from "@/geo/contracts/workflow-doc";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
+import { hubApi } from "./api";
 import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { MethodFlow, PictureControls, type StepVisual } from "./method-flow";
 import { LimitsCard, OverviewBand } from "./method-overview";
@@ -33,6 +36,7 @@ const text = geoText("hub");
 
 export function DraftStep({
   draft,
+  authoringId,
   trialCount,
   checkIssues,
   rail,
@@ -68,6 +72,7 @@ export function DraftStep({
   cover?: string | null;
   outputImages?: Record<string, StepVisual>;
   draft: MethodDraft;
+  authoringId?: string;
   trialCount: number;
   /** Error findings of the latest check (0 = passed); null while unknown. */
   checkIssues: number | null;
@@ -77,6 +82,17 @@ export function DraftStep({
   onShowIssues?: () => void;
 }) {
   const profile = draft.profile;
+  const [document, setDocument] = useState<{ revision: number; doc: WorkflowDoc | null } | null>(null);
+  const [documentFailed, setDocumentFailed] = useState(false);
+  useEffect(() => {
+    if (!authoringId) return;
+    let alive = true;
+    void hubApi.workflow(authoringId, draft.revision).then((r) => {
+      if (alive) { setDocument({ revision: draft.revision, doc: r.doc }); setDocumentFailed(false); }
+    }).catch(() => { if (alive) setDocumentFailed(true); });
+    return () => { alive = false; };
+  }, [authoringId, draft.revision]);
+  const doc = document?.revision === draft.revision ? document.doc : null;
   const pictureAction = visualAction ? {
     disabled: visualAction.busy || visualAction.connected !== true,
     onMake: visualAction.onMake,
@@ -114,7 +130,7 @@ export function DraftStep({
           )}
         </header>
 
-        <OverviewBand profile={profile} />
+        <OverviewBand profile={profile} doc={doc} />
 
         <section className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -181,7 +197,7 @@ export function DraftStep({
             </p>
           )}
           {visualAction && !visualAction.busy && <TechnicalDetail detail={visualAction.errorDetail} />}
-          <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />
+          {doc ? <WorkflowView showStepsHeading={false} doc={doc} profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} loadSkillSource={async () => ({ content: draft.instructions })} /> : authoringId && draft.workflow ? <p className="text-sm text-muted-foreground">{geoText("workflowView")(documentFailed ? "error" : "loading")}</p> : <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />}
         </section>
 
         <LimitsCard profile={profile} />

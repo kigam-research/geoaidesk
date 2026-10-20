@@ -4,7 +4,7 @@
  * research" (install into one of my projects, prepare its inputs, open its start settings).
  */
 import { ChevronLeftIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import { HubUserDialog } from "./hub-dialogs";
 import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { InputPrep } from "./input-prep";
 import { NewProject } from "./draft-step";
+import { CliExportButton } from "@/geo/workflow/cli-export";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
 import { hubUserName, sharedHub } from "./shared-api";
@@ -63,7 +65,9 @@ export function SharedEntryScreen({
   onBack,
   onOpenDraft,
   onOpenEntry,
+  exportAction,
 }: {
+  exportAction?: (detail: HubEntryDetail) => ReactNode;
   /** Back to the hub list. */
   onBack?: () => void;
   /** Open a draft in the hub ("방법 고치기" / "복사해서 고치기"); without it the action is not offered. */
@@ -163,7 +167,8 @@ export function SharedEntryScreen({
           })),
         }}
         profile={detail.profile}
-        flow={<MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
+        workflowDoc={detail.workflowDoc}
+        flow={detail.workflowDoc ? <WorkflowView showStepsHeading={false} doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction ? exportAction(detail) : <CliExportButton source={{ kind: "hub", entryId: e.id }} />} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
         onStar={() =>
           named.run(() => {
             void sharedHub

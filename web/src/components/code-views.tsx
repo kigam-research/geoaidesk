@@ -175,6 +175,10 @@ export function TextEditor({
   const [content, setContent] = useState(initialContent);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current);
+  }, []);
   // The sandbox poll refreshes `initialContent`, so comparing against the prop
   // made the dirty flag (and the Save button) flip off when the agent touched
   // the file — leaving real edits unsavable. Track what we last wrote instead.
@@ -210,7 +214,11 @@ export function TextEditor({
       savedRef.current = content;
       setDiskChanged(false);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => {
+        savedTimerRef.current = null;
+        setSaved(false);
+      }, 2000);
     }
   }, [content, onSave]);
 

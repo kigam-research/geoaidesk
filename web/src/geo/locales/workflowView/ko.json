@@ -1,0 +1,46 @@
+{
+  "steps": "Workflow 단계",
+  "legacy": "이전 형식입니다. 자세한 방법은 스킬 지침의 처리 절차를 따릅니다.",
+  "noSteps": "별도 단계 없이 Workflow 지시문을 따릅니다.",
+  "skills": "사용하는 스킬 ({count})",
+  "source": {
+    "catalogue": "기본 제공",
+    "imported": "가져온 스킬",
+    "bundled": "Workflow에 딸린 스킬"
+  },
+  "instructions": {
+    "button": "지침 보기"
+  },
+  "inputsChoices": "입력과 연구자가 정할 조건",
+  "inputs": "입력",
+  "choices": "연구자가 정할 조건",
+  "required": "필수",
+  "optional": "선택",
+  "openChoice": "연구자가 직접 정합니다.",
+  "resultsLimits": "결과 파일과 해석 한계",
+  "agentInstructions": "AI agent가 받는 지침 보기",
+  "copy": {
+    "button": "지침 복사",
+    "copied": "지침을 복사했습니다.",
+    "failed": "복사하지 못했습니다. 지침을 선택해 복사하세요."
+  },
+  "close": {
+    "button": "지침 닫기"
+  },
+  "stepSkill": "사용 스킬: {name}",
+  "stepOutputs": "결과: {names}",
+  "checks": "확인할 항목",
+  "sourceError": "스킬 지침을 읽지 못했습니다. 다시 열어 주세요.",
+  "loading": "Workflow를 읽는 중입니다.",
+  "error": "Workflow를 읽지 못했습니다. 다시 열어 주세요.",
+  "detail": {
+    "button": "Workflow 상세 보기"
+  },
+  "back": {
+    "button": "허브 목록 보기"
+  },
+  "import": {
+    "button": "GitHub 등에서 가져오기"
+  },
+  "importRef": "가져올 출처: {ref}"
+}
