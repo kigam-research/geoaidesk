@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:42:37Z
+updated: 2026-10-20T13:43:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. The final recheck is pending; do not mark this unit complete yet.
+Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Full scripts/check recheck job 5 is running at f9e8125e94af; do not mark this unit complete yet.
 
 ### Delivered result
 
@@ -99,7 +99,7 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 ### Verification and integration notes
 
 - Backend typecheck and frontend TypeScript check passed locally. Focused shared-hub integration: 12/12 passed, including rejection of skill-only registration, a non-installing exact-byte draft preview and preservation of registered origin identity.
-- Focused frontend review covered 138 tests; the final remaining copy expectation was corrected and the affected workspace suite passed 26/26 (`workspace-label-check.log`). Full scripts/check at code snapshot 0628e6032d76 (job 4) completed backend typecheck and 1,952 tests, with 8 skipped and one failure: the new helper used path.relative directly rather than the required apiRelative choke point. This is fixed in place; the full recheck is pending. The final import-label-only change has the focused suite and both validators; it changes no data or execution behavior.
+- Focused frontend review covered 138 tests; the final remaining copy expectation was corrected and the affected workspace suite passed 26/26 (`workspace-label-check.log`). Full scripts/check at code snapshot 0628e6032d76 (job 4) completed backend typecheck and 1,952 tests, with 8 skipped and one failure: the new helper used path.relative directly rather than the required apiRelative choke point. This is fixed in place; the Windows-conformance + shared-hub focused suites pass 32/32 and full recheck job 5 is running. The final import-label-only change has the focused suite and both validators; it changes no data or execution behavior.
 - Copy validator: 0 errors, 61 warnings. UI guide checker: 0 errors, 89 pre-existing accepted debt entries. No UI debt was added. `git diff --check` passed.
 - Production UI built successfully in the isolated app job at 55a3b22c479c. Browser review used GAID_HOME under this unit's external work directory (a sanitized parent review-data copy), not ~/.geoaidesk. A newly created test project installed another researcher's registered Workflow through preview → consent → install. Confirmed `등록됨 · 1판`, title-based skill provenance, read-only instructions and GitHub-first import. No model/research execution was started. Browser console: 0 errors; 2 existing Radix missing-description warnings on dialogs. All observed task-path API requests succeeded.
 - UI rules followed: P1/P3/P4/P6 (one task, disclosures, contextual read-only view, researcher terms), B2/B3 (named row action), D3 (inline read-only instructions inside the existing settings dialog), S5 (preview readiness gates), G1/G2, W5, R1. Checked section 10 at 1440×900 and 1280×800: no page horizontal overflow or clipped primary action in the changed default states; file/prompt details stay folded initially. Legacy method-detail density is unchanged and the parent-owned composition screen supersedes it.
@@ -314,7 +314,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. Run the full current-source check after the apiRelative portability fix, inspect its final log/exit and fix any relevant blockers.
+1. On job-5 completion, inspect its final log/exit and fix any relevant blockers.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
 - Job 4 exposed the wire-format portability contract: even a slash-normalized local path.relative call is disallowed. Reused apiRelative instead; no test exemption or rule change.
@@ -343,6 +343,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T133324.634891Z/receipt.json
   - disposition: {"evidence":[],"reason":"Stopped superseded source check to leave one complete current-source check running.","recorded":"2026-10-20T13:38:28Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T133449.058175Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T133449.058175Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Fixed the observed API-path portability violation and reran the current source with revision-bound draft consent.","recorded":"2026-10-20T13:43:06Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/receipt.json","state":"superseded"}
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
