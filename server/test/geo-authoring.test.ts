@@ -10,7 +10,7 @@ import { AuthoringError, AuthoringStore } from "../src/geo/authoring/store.ts";
 import { addSource } from "../src/geo/authoring/sources.ts";
 import { runOperation } from "../src/geo/authoring/agent.ts";
 import { quoteFound, readablePage } from "../src/geo/authoring/anchors.ts";
-import { answerAll, answerQuestion, editDraft } from "../src/geo/authoring/routes.ts";
+import { answerAll, answerQuestion, answersFeedback, editDraft } from "../src/geo/authoring/routes.ts";
 import { toContext, type ChatFn } from "../src/geo/authoring/model.ts";
 import {
   analysis,
@@ -196,6 +196,10 @@ describe("GAID hub authoring", () => {
     expect(deferred[0].status).toBe("deferred");
     p = await store.read(projectId);
     expect(p.decisions.filter((d) => !d.supersededBy).map((d) => d.status)).toEqual(["answered", "deferred"]);
+    // The revision request names the changed answer with its earlier value, and a first answer as new.
+    const feedback = answersFeedback(p, deferred);
+    expect(feedback).toContain('이전 답 "필요한 스크립트만" → 바꾼 답 나중에 정하기');
+    expect(answersFeedback(p, decisions.slice(0, 1))).toContain('새 답 "새 자료 적용"');
   });
 
   it("keeps start defaults the researcher's answers back and adds the quick run-scale choice", async () => {

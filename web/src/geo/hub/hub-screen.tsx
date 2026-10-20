@@ -4,7 +4,7 @@
  * Workflow (authoring service `/geo/authoring/*`) and tries it in a project. One screen per
  * step; panels scroll inside, the page does not.
  */
-import { MoonIcon, SettingsIcon, SunIcon } from "lucide-react";
+import { MoonIcon, PencilIcon, SettingsIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ import { AgentRecordDialog, FeedbackDialog, FilesDialog, IssuesDialog, SourcePag
 import { HubHome } from "./hub-home";
 import { HubShell, ProjectBar, type HubStep } from "./hub-shell";
 import type { HubLocation } from "./location";
-import { QuestionStep, type DraftAnswer } from "./question-step";
+import { QuestionStep, sameAnswer, type DraftAnswer } from "./question-step";
 import { SourceStep, WorkingPanel, type Target, type WebSourceKind } from "./source-step";
 import { TrialStep, useTrialCount } from "./trial-step";
 import { SharedMethod } from "./shared-method";
@@ -96,6 +96,8 @@ export function GaidHub({
           entryId={entryId}
           projects={hubProjects}
           onBack={() => onNavigate({ open: true, projectId: null })}
+          onOpenDraft={(id) => onNavigate({ open: true, projectId: id })}
+          onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
           onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
             setActive(projectId);
             onOpenProject(projectId);
@@ -158,7 +160,12 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
       window.clearInterval(timer);
     };
   }, [loadShared]);
-  const entryOf = (p: ProjectSummary) => entries.find((e) => e.revisions.some((r) => r.authoringProjectId === p.id));
+  const entryOf = (p: ProjectSummary) =>
+    entries.find(
+      (e) =>
+        (p.hubEntry?.mode === "edit" && e.id === p.hubEntry.entryId) ||
+        e.revisions.some((r) => r.authoringProjectId === p.id),
+    );
   // "My" methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name.
   const me = hubUserName();
   const mine = me ? projects.filter((p) => !p.author || p.author === me) : projects;
@@ -326,14 +333,22 @@ function HubProject({
   const [feedbackPrefill, setFeedbackPrefill] = useState("");
   const [registerOpen, setRegisterOpen] = useState(false);
   const [hubFolders, setHubFolders] = useState<HubFolder[]>([]);
+  const [entryFolder, setEntryFolder] = useState<string | undefined>(undefined);
   const named = useNamedAction();
+  const editedEntry = project?.hubEntry?.mode === "edit" ? project.hubEntry.entryId : null;
   useEffect(() => {
     if (!registerOpen) return;
     void sharedHub
       .folders()
       .then((r) => setHubFolders(r.folders))
       .catch(() => setHubFolders([]));
-  }, [registerOpen]);
+    // The next revision of an edited entry stays in its folder unless the researcher picks another.
+    if (editedEntry)
+      void sharedHub
+        .entry(editedEntry)
+        .then((d) => setEntryFolder(d.entry.folderId))
+        .catch(() => setEntryFolder(undefined));
+  }, [registerOpen, editedEntry]);
   const [page, setPage] = useState<{ sourceId: string; page: number } | null>(null);
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
@@ -523,16 +538,22 @@ function HubProject({
 
   const applyAnswers = async () => {
     try {
-      const open = questions.filter((q) => q.status === "open");
-      // Answers already recorded (or no questions at all): start the draft directly (also the retry after a failure).
-      if (open.length === 0) await hubApi.draft(id, { opId: newOpId(), ...withModel });
+      // Open questions plus recorded answers the researcher changed; the server revises an existing draft to them.
+      const recorded = recordedAnswers(project);
+      const send = questions.filter(
+        (q) => q.status === "open" || (q.id in recorded && answers[q.id] && !sameAnswer(answers[q.id], recorded[q.id])),
+      );
+      // Nothing new (or no questions at all): start the draft directly (also the retry after a failure).
+      if (send.length === 0) await hubApi.draft(id, { opId: newOpId(), ...withModel });
       else
         await hubApi.answers(id, {
           ...withModel,
           opId: newOpId(),
           draft: true,
-          answers: open.map((q) => ({ questionId: q.id, questionRevision: q.revision, ...answers[q.id] })),
+          answers: send.map((q) => ({ questionId: q.id, questionRevision: q.revision, ...answers[q.id] })),
         });
+      // Sent answers are now the recorded ones; drop the local copies so a reload shows the server's answers.
+      setAnswers((cur) => Object.fromEntries(Object.entries(cur).filter(([qid]) => !send.some((q) => q.id === qid))));
       setStep(null);
       await reload();
     } catch (e) {
@@ -637,7 +658,7 @@ function HubProject({
           questions={questions}
           answers={{ ...recordedAnswers(project), ...answers }}
           needsDraft={project.drafts.length === 0}
-          locked={new Set(questions.filter((q) => q.status !== "open").map((q) => q.id))}
+          recorded={recordedAnswers(project)}
           onAnswer={(qid, a) => setAnswers((cur) => ({ ...cur, [qid]: a }))}
           onApply={applyAnswers}
           applying={Boolean(running)}
@@ -773,8 +794,13 @@ function HubProject({
           ) : null
         }
       />
-      <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{body}</main>
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
+        {project.hubEntry && <EditingNotice link={project.hubEntry} />}
+        <div className="min-h-0 flex-1">{body}</div>
+      </main>
       <RegisterDialog
+        key={entryFolder ?? "folder"}
+        initialFolder={entryFolder}
         open={registerOpen}
         onOpenChange={setRegisterOpen}
         folders={hubFolders}
@@ -841,6 +867,18 @@ function HubProject({
         />
       )}
     </>
+  );
+}
+
+/** Which registered method this draft edits (next revision) or copies (separate entry naming the original). */
+function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"]> }) {
+  return (
+    <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+      <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
+      {link.mode === "edit"
+        ? text("editing.edit", { revision: link.revision, next: link.revision + 1 })
+        : text("editing.copy", { author: link.author, title: link.title, revision: link.revision })}
+    </p>
   );
 }
 

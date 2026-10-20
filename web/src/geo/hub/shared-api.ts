@@ -8,6 +8,7 @@ import {
   type HubFolder,
   type HubRecommendation,
   type RegisterBody,
+  type EditEntryResult,
 } from "@/geo/contracts/hub-shared";
 import { apiFetch } from "@/lib/projects";
 
@@ -59,6 +60,8 @@ export const sharedHub = {
   },
   entry: (id: string) => call<HubEntryDetail>(eid(id)),
   register: (body: RegisterBody) => post<HubEntry>("/entries", body),
+  /** The draft to open for "방법 고치기" (author) or "복사해서 고치기" (anyone else). */
+  edit: (id: string) => post<EditEntryResult>(`${eid(id)}/edit`, {}),
   star: (id: string, on: boolean) => post<{ stars: number; starredByMe: boolean }>(`${eid(id)}/star`, { on }),
   comment: (id: string, body: string) => post<HubComment>(`${eid(id)}/comments`, { body }),
   install: (id: string, projectId: string, revision: number) =>

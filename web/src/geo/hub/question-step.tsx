@@ -3,6 +3,8 @@
  * One question at a time. Tabs above move between questions (and a last "답 확인" tab);
  * each question offers its options with the recommended one marked, a free-text "기타"
  * field and "나중에 정하기". Nothing is sent until the researcher applies all answers.
+ * Recorded answers stay editable (gaid-hub-editing): a changed one is sent with the next
+ * round and the draft is revised to it.
  */
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, CircleDashedIcon, ClockIcon, QuoteIcon } from "lucide-react";
 import { useId, useState } from "react";
@@ -23,6 +25,13 @@ export function isAnswered(a: DraftAnswer | undefined): boolean {
   if (!a) return false;
   if (a.defer) return true;
   return Boolean(a.optionId) || Boolean(a.response?.trim());
+}
+
+/** Same answer (option, words, or deferral), ignoring surrounding spaces. */
+export function sameAnswer(a: DraftAnswer | undefined, b: DraftAnswer | undefined): boolean {
+  if (!a || !b) return a === b;
+  if (Boolean(a.defer) || Boolean(b.defer)) return Boolean(a.defer) === Boolean(b.defer);
+  return (a.optionId ?? "") === (b.optionId ?? "") && (a.response ?? "").trim() === (b.response ?? "").trim();
 }
 
 export function answerLabel(q: Question, a: DraftAnswer | undefined): string {
@@ -87,7 +96,7 @@ export function QuestionStep({
   onApply,
   applying,
   onOpenPage,
-  locked,
+  recorded = {},
   figures,
   needsDraft = false,
 }: {
@@ -97,8 +106,8 @@ export function QuestionStep({
   figures?: (question: Question) => QuestionFigure[];
   questions: Question[];
   answers: Record<string, DraftAnswer>;
-  /** Questions whose answers are already recorded: shown, not editable, not sent again. */
-  locked?: ReadonlySet<string>;
+  /** Answers the server already recorded; a question is sent again only when its answer differs from this. */
+  recorded?: Record<string, DraftAnswer>;
   onAnswer: (questionId: string, answer: DraftAnswer) => void;
   onApply: () => void;
   applying?: boolean;
@@ -109,7 +118,9 @@ export function QuestionStep({
     return first < 0 ? questions.length : first;
   });
   const answered = questions.filter((q) => isAnswered(answers[q.id])).length;
-  const pending = questions.filter((q) => !locked?.has(q.id));
+  const isChanged = (q: Question) => q.id in recorded && !sameAnswer(answers[q.id], recorded[q.id]);
+  const changed = questions.filter(isChanged);
+  const pending = questions.filter((q) => !(q.id in recorded) || isChanged(q));
   const reviewing = index >= questions.length;
   const go = (i: number) => setIndex(Math.max(0, Math.min(questions.length, i)));
 
@@ -138,6 +149,8 @@ export function QuestionStep({
               >
                 {done && i !== index ? <CheckIcon className="size-3.5" aria-hidden /> : null}
                 {i + 1}
+                {isChanged(q) && <span className="sr-only">{text("questions.changedMark")}</span>}
+                {isChanged(q) && <span aria-hidden className="size-1.5 rounded-full bg-current" />}
               </button>
             );
           })}
@@ -163,7 +176,13 @@ export function QuestionStep({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {reviewing ? (
-          <ReviewPanel questions={questions} answers={answers} onEdit={go} />
+          <ReviewPanel
+            questions={questions}
+            answers={answers}
+            changed={new Set(changed.map((q) => q.id))}
+            revising={!needsDraft}
+            onEdit={go}
+          />
         ) : figures && figures(questions[index]).length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
             <FigurePanel key={`figure-${questions[index].id}`} figures={figures(questions[index])} />
@@ -171,7 +190,8 @@ export function QuestionStep({
               key={questions[index].id}
               number={index + 1}
               question={questions[index]}
-              locked={locked?.has(questions[index].id) ?? false}
+              recorded={questions[index].id in recorded}
+              changed={isChanged(questions[index])}
               answer={answers[questions[index].id]}
               onChange={(a) => onAnswer(questions[index].id, a)}
               onOpenPage={onOpenPage}
@@ -183,7 +203,8 @@ export function QuestionStep({
               key={questions[index].id}
               number={index + 1}
               question={questions[index]}
-              locked={locked?.has(questions[index].id) ?? false}
+              recorded={questions[index].id in recorded}
+              changed={isChanged(questions[index])}
               answer={answers[questions[index].id]}
               onChange={(a) => onAnswer(questions[index].id, a)}
               onOpenPage={onOpenPage}
@@ -203,6 +224,15 @@ export function QuestionStep({
           </Button>
         ) : reviewing && pending.length === 0 ? (
           <span className="text-sm text-muted-foreground">{text("questions.allApplied")}</span>
+        ) : reviewing && pending.length === changed.length && !needsDraft ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              {text("questions.changedCount", { count: changed.length })}
+            </span>
+            <Button onClick={onApply} disabled={applying}>
+              {text("questions.applyChanged")}
+            </Button>
+          </div>
         ) : reviewing ? (
           <div className="flex items-center gap-3">
             {answered < questions.length && (
@@ -231,19 +261,21 @@ function QuestionCard({
   answer,
   onChange: change,
   onOpenPage,
-  locked,
+  recorded,
+  changed,
 }: {
   number: number;
-  locked: boolean;
+  /** The server has an answer for this question (it stays editable). */
+  recorded: boolean;
+  /** The shown answer differs from the recorded one. */
+  changed: boolean;
   question: Question;
   answer: DraftAnswer | undefined;
   onChange: (a: DraftAnswer) => void;
   onOpenPage?: (sourceId: string, page: number) => void;
 }) {
   const otherId = useId();
-  const onChange = (a: DraftAnswer) => {
-    if (!locked) change(a);
-  };
+  const onChange = change;
   const choice = question.answerType !== "text";
   // Always offer "기타" (also for a stored choice-only question).
   const free = true;
@@ -305,7 +337,6 @@ function QuestionCard({
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-disabled={locked}
                   onClick={() => onChange({ optionId: option.id })}
                   className={cn(
                     "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
@@ -344,7 +375,6 @@ function QuestionCard({
           <Textarea
             id={otherId}
             rows={2}
-            readOnly={locked}
             placeholder={
               choice && question.options.length
                 ? text("questions.otherPlaceholder")
@@ -356,8 +386,7 @@ function QuestionCard({
         </div>
       )}
 
-      {!locked && (
-        <button
+      <button
           type="button"
           onClick={() => onChange({ defer: true })}
           aria-pressed={Boolean(answer?.defer)}
@@ -369,8 +398,11 @@ function QuestionCard({
           <ClockIcon className="size-3.5" aria-hidden />
           {text("questions.defer")}
         </button>
+      {recorded && (
+        <p className={cn("text-sm", changed ? "font-medium text-primary" : "text-muted-foreground")}>
+          {changed ? text("questions.changedNote") : text("questions.recordedEditable")}
+        </p>
       )}
-      {locked && <p className="text-sm text-muted-foreground">{text("questions.recorded")}</p>}
     </section>
   );
 }
@@ -378,17 +410,22 @@ function QuestionCard({
 function ReviewPanel({
   questions,
   answers,
+  changed,
+  revising,
   onEdit,
 }: {
   questions: Question[];
   answers: Record<string, DraftAnswer>;
+  changed: ReadonlySet<string>;
+  /** A draft exists: applying answers revises it. */
+  revising: boolean;
   onEdit: (index: number) => void;
 }) {
   return (
     <section className="flex flex-col gap-4 py-2">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">{text("questions.reviewTitle")}</h2>
-        <p className="text-sm text-muted-foreground">{text("questions.reviewBody")}</p>
+        <p className="text-sm text-muted-foreground">{revising ? text("questions.reviewBodyRevise") : text("questions.reviewBody")}</p>
       </div>
       <ol className="flex flex-col divide-y rounded-xl border">
         {questions.map((q, i) => {
@@ -403,6 +440,11 @@ function ReviewPanel({
                 <span className={cn("text-sm font-medium", !done && "text-destructive")}>
                   {!done && <CircleDashedIcon className="mr-1 inline size-3.5" aria-hidden />}
                   {answerLabel(q, answers[q.id])}
+                  {changed.has(q.id) && (
+                    <Badge variant="outline" className="ml-2 align-middle">
+                      {text("questions.changedBadge")}
+                    </Badge>
+                  )}
                 </span>
               </span>
               <Button

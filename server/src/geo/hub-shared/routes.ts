@@ -21,6 +21,7 @@ import { loadVocabulary, type Vocabulary } from "../authoring/vocabulary.ts";
 import { geoCatalogueActive, loadGeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow } from "../catalogue-types.ts";
 import { countRegisteredMethodTrials } from "../methods/trials.ts";
+import { openEntryForEdit } from "./edit.ts";
 import { SharedHubStore, type RegisteredSnapshot, type StoredEntry } from "./store.ts";
 import { hubSearchFields, matchesHubSearch } from "./search.ts";
 
@@ -157,9 +158,11 @@ export async function registerSharedHubRoutes(
       const body = req.body;
       const user = userRequired(req);
       const projectId = text(body?.authoringProjectId, "방법 작업 식별자", 64);
-      // Validates the authoring id before it can determine an entry path.
+      // Validates the authoring id before it can determine an entry path. A draft opened with "방법 고치기" adds the next
+      // revision of the entry it edits; any other draft (also a copy) registers as its own entry.
       authoring.projectDir(projectId);
-      const id = `entry-${projectId}`;
+      const link = (await authoring.read(projectId)).hubEntry;
+      const id = link?.mode === "edit" ? link.entryId : `entry-${projectId}`;
       const folderId = text(body?.folderId, "폴더 식별자", 80);
       const note = text(body?.note, "등록 설명", 4000, true);
       if (!(await store.folders()).some((f) => f.id === folderId))
@@ -168,6 +171,8 @@ export async function registerSharedHubRoutes(
         const previous = await store.find(id);
         if (previous && previous.entry.author !== user)
           throw new AuthoringError("등록한 연구자만 새 판을 등록할 수 있습니다.", 403);
+        if (link?.mode === "edit" && !previous) throw new AuthoringError("고치던 등록 방법을 찾을 수 없습니다.", 404);
+        const original = link?.mode === "copy" ? await store.find(link.entryId) : null;
         const prepared = await authoring.mutate(projectId, async (project) => {
           const draft =
             body.draftRevision === undefined
@@ -194,9 +199,16 @@ export async function registerSharedHubRoutes(
             throw new AuthoringError("패키지 파일이 저장된 해시와 맞지 않습니다.", 409);
           await store.immutableBytes(id, `packages/${revision}.tar.gz`, archive);
           const visuals: RegisteredSnapshot["visuals"] = {};
+          // Pictures shown on the draft: those of this revision or earlier whose step, output or cover still exists.
+          const keys = new Set([
+            "cover",
+            ...draft.profile.procedure.nodes.map((n) => n.id),
+            ...draft.profile.outputs.map((o) => `output:${o.id}`),
+          ]);
           for (const [key, visual] of Object.entries(project.visuals ?? {})) {
             if (
-              visual.draftRevision !== draft.revision ||
+              visual.draftRevision > draft.revision ||
+              !keys.has(key) ||
               !safeRelative(visual.file) ||
               !visual.file.startsWith("visuals/")
             )
@@ -230,7 +242,19 @@ export async function registerSharedHubRoutes(
             tags: [
               ...new Set([...(draft.profile.taxonomy?.tasks ?? []), ...(draft.profile.taxonomy?.methods ?? [])]),
             ].slice(0, 6),
-            author: user,
+            author: previous?.entry.author ?? user,
+            ...(previous?.entry.basedOn
+              ? { basedOn: previous.entry.basedOn }
+              : link?.mode === "copy"
+                ? {
+                    basedOn: {
+                      entryId: link.entryId,
+                      revision: link.revision,
+                      title: original?.entry.title ?? link.title,
+                      author: original?.entry.author ?? link.author,
+                    },
+                  }
+                : {}),
             folderId,
             cover: Object.keys(visuals).length ? `/geo/hub/entries/${id}/cover?revision=${revision}` : null,
             latestRevision: revision,
@@ -258,6 +282,10 @@ export async function registerSharedHubRoutes(
       });
       if ("check" in result) return reply.code(409).send(result.check);
       return reply.code(201).send(await entryView(result.entry, user));
+    });
+    scope.post<{ Params: { id: string } }>("/geo/hub/entries/:id/edit", async (req, reply) => {
+      const result = await openEntryForEdit(store, authoring, req.params.id, userRequired(req));
+      return reply.code(result.created ? 201 : 200).send(result);
     });
     scope.get<{ Params: { id: string } }>("/geo/hub/entries/:id", async (req): Promise<HubEntryDetail> => {
       const record = await store.read(req.params.id);
