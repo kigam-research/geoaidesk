@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T14:35:35Z
+status: ready
+updated: 2026-10-20T14:35:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -81,8 +81,9 @@ Screenshot originals and hashes (base: /home/seongin3/data/geoaidesk/work/gaid-w
 - 06-hub-catalogue-1280.png: `fac576fded6d2914f3e40aa9c6174f13377300f19d06ad0a5ee3c73a089a7aab`
 - 06-hub-catalogue-1440.png: `76eccc51dc97e325b55da665ad6c9d4993437a66171dc4724ff299586f3940d4`
 ## Next steps
-1. Finish the final declared scripts/check on the saved code, record its result, and remove local build caches.
-2. Save and finish; parent integrates this child and supplies CliExportButton through the exportAction slots.
+<!-- task:closed -->
+Closed 2026-10-20T14:35:52Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Preliminary task sync checks were stopped after concurrent test/source edits invalidated their tree. Parent integration already completed.
 - The first full check job found a seam-owner allowlist failure; use the parent work-package owner, not the child unit slug. No application source workaround was needed.
