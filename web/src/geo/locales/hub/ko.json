@@ -203,7 +203,8 @@
     "changedMark": "바꾼 답",
     "changedBadge": "바꾼 답",
     "changedCount": "바꾼 답 {count}개",
-    "applyChanged": "바꾼 답 반영"
+    "applyChanged": "바꾼 답 반영",
+    "reviewBodyRevise": "답을 반영해 초안을 다시 고칩니다. 바꾼 답에는 표시가 붙습니다."
   },
   "drafting": {
     "title": "초안을 만들고 있습니다",

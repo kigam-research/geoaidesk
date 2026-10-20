@@ -537,10 +537,20 @@ describe("editing a registered method (gaid-hub-editing)", () => {
   it("seeds a draft from the registered revision when the author's draft is not on this server", async () => {
     const f = await setup();
     await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
+    const codeDir = await work("hub-edit-code-");
+    await writeFile(join(codeDir, "run.py"), "print('trial')\n");
+    execFileSync("tar", ["-czf", join(codeDir, "code.tar.gz"), "-C", codeDir, "run.py"]);
+    const code = await addSource(f.store, f.projectId, {
+      name: "code.tar.gz", mediaType: "application/gzip",
+      contentBase64: (await readFile(join(codeDir, "code.tar.gz"))).toString("base64"),
+    });
     await f.store.mutate(f.projectId, (p) => {
-      p.visuals = { prepare: { file: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 1 } };
+      p.visuals = { prepare: { file: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 2 } };
+      p.drafts.push(editDraft(p, { baseRevision: 1, title: "코드 포함 판" }));
+      p.drafts.at(-1)!.codeFiles.push({ path: "scripts/run.py", sourceId: code.source.id, sourcePath: "run.py" });
     });
     const entry = (await f.register()).json<HubEntry>();
+    expect(entry.implementation).toBe("implemented");
     await f.store.archive(f.projectId);
     const opened = await edit(f, entry.id, "김 연구원");
     expect(opened.statusCode).toBe(201);
@@ -555,6 +565,9 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(seeded.drafts).toHaveLength(1);
     expect(seeded.drafts[0]).toMatchObject({ revision: 1, origin: "researcher", slug: draftReply.slug });
     expect(await f.store.readFile(authoringProjectId, seeded.visuals!.prepare.file)).toEqual(PNG);
+    // The registered package is the code source; the seeded draft's code files resolve inside it.
+    const check = (await f.app.inject(`/geo/authoring/projects/${authoringProjectId}/drafts/1/check`)).json();
+    expect(check.findings.filter((x: { code: string }) => x.code === "draft-files")).toEqual([]);
     // A second click reopens the seeded draft.
     expect((await edit(f, entry.id, "김 연구원")).json()).toMatchObject({ authoringProjectId, created: false });
     await reviseSummary(f, authoringProjectId, "새 서버에서 고친 요약");

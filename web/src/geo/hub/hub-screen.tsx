@@ -794,9 +794,9 @@ function HubProject({
           ) : null
         }
       />
-      <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
         {project.hubEntry && <EditingNotice link={project.hubEntry} />}
-        {body}
+        <div className="min-h-0 flex-1">{body}</div>
       </main>
       <RegisterDialog
         key={entryFolder ?? "folder"}
@@ -873,7 +873,7 @@ function HubProject({
 /** Which registered method this draft edits (next revision) or copies (separate entry naming the original). */
 function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"]> }) {
   return (
-    <p className="mx-auto mb-4 flex max-w-6xl items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+    <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
       <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
       {link.mode === "edit"
         ? text("editing.edit", { revision: link.revision, next: link.revision + 1 })

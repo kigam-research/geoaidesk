@@ -80,16 +80,18 @@ async function seedFromEntry(
       });
   } else if (draft.codeFiles.length) {
     const archive = await store.bytes(record.entry.id, `packages/${revision}.tar.gz`);
-    const { source } = await addSource(authoring, project.id, {
+    const { source, extraction } = await addSource(authoring, project.id, {
       name: `${snapshot.package.slug}-hub-${revision}.tar.gz`,
       mediaType: "application/gzip",
       kind: "code",
       contentBase64: archive.toString("base64"),
     });
+    // The unpacker drops a single top-level folder (`<slug>/`); match either layout.
+    const listed = new Set((extraction.files ?? []).map((f) => f.path));
     draft.codeFiles = draft.codeFiles.map((f) => ({
       path: f.path,
       sourceId: source.id,
-      sourcePath: `${snapshot.package.slug}/${f.path}`,
+      sourcePath: listed.has(f.path) ? f.path : `${snapshot.package.slug}/${f.path}`,
     }));
   }
   const visuals: NonNullable<AuthoringProject["visuals"]> = {};

@@ -203,7 +203,8 @@
     "changedMark": "Changed answer",
     "changedBadge": "Changed",
     "changedCount": "{count, plural, one {# changed answer} other {# changed answers}}",
-    "applyChanged": "Apply changed answers"
+    "applyChanged": "Apply changed answers",
+    "reviewBodyRevise": "Applying answers revises the draft. Changed answers are marked."
   },
   "drafting": {
     "title": "Creating the draft",
