@@ -471,6 +471,8 @@ export interface AuthoringProject {
   model?: string;
   /** Hub topic folder the researcher filed this method under (my methods on the hub home). */
   folderId?: string;
+  /** A registered hub method this draft edits (`edit`: registering adds its next revision) or was copied from (`copy`). */
+  hubEntry?: HubEntryLink;
   /** Concept images keyed by procedure node id, cover, or output:<outputId> (files under visuals/). */
   visuals?: Record<string, { file: string; caption: string; model: string; draftRevision: number }>;
   visualOperations?: Record<string, VisualOperation>;
@@ -491,11 +493,23 @@ export interface AuthoringProject {
   ops: Record<string, string>;
 }
 
+/** Link from a draft to the registered hub method it was opened from (gaid-hub-editing). */
+export interface HubEntryLink {
+  entryId: string;
+  /** The registered revision the draft started from. */
+  revision: number;
+  mode: "edit" | "copy";
+  /** Title and author of that entry when the draft was opened (shown on the draft). */
+  title: string;
+  author: string;
+}
+
 export interface ProjectSummary {
   id: string;
   title: string;
   owner: string;
   author?: string;
+  hubEntry?: HubEntryLink;
   updatedAt: string;
   stage: ProjectStage;
   /** An attempt is running now. */
@@ -579,6 +593,8 @@ export interface VisualOperation {
   draftRevision: number;
   model: string;
   keys: string[];
+  /** Researcher's revision request, preserved verbatim (up to 500 characters). */
+  instruction?: string;
   completed: string[];
   status: "running" | "complete" | "failed" | "interrupted";
   startedAt: string;
@@ -599,6 +615,10 @@ export interface VisualSourceInfo {
 
 export interface GenerateVisualsBody {
   opId: string;
+  /** Exact pictures to generate: cover, procedure node id, output:<outputId>; 1–6 unique keys. */
+  keys?: string[];
+  /** Revise the selected existing pictures with this request (up to 500 characters). */
+  instruction?: string;
   /** Optional step ids; eligible output ports reserve slots within the six-image shared cap. */
   steps?: string[];
 }

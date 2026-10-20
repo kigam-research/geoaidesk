@@ -52,6 +52,8 @@ beforeEach(() => {
       return json(saved);
     }
     if (path === "/geo/recipes") return json(saved);
+    if (path === "/geo/hub/entries") return json({ entries: [] });
+    if (path === "/geo/methods") return json({ methods: [] });
     if (path.startsWith("/geo/recipes/") && init?.method === "DELETE") { saved = { categories: [], recipes: [] }; return json(saved); }
     if (path === "/geo/workflows") return json({ catalogue: { state: catalogueState, version: "0.2.0" }, workflows: rows });
     if (path === "/geo/suggestions") return json({ path: "logs/A.LAS", format: "las-welllog", suggestions });
@@ -187,6 +189,7 @@ describe("task catalogue and setup", () => {
   });
   it("checks a local recipe without starting, showing a localized issue", async () => {
     catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile({})] } });
     expect(await within(dialog).findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 레시피입니다: 0.1.0");
     expect(within(dialog).getByRole("button", { name: "레시피 저장" })).toBeDisabled(); expect(within(dialog).getByRole("button", { name: "저장하지 않고 열기" })).toBeDisabled();
@@ -195,6 +198,7 @@ describe("task catalogue and setup", () => {
   it("saves a checked recipe under a new category, lists it there, opens it prefilled and deletes it", async () => {
     recipeResult = { ok: true, issues: [], setup: okSetup };
     catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); let dialog = await screen.findByRole("dialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
     expect(await within(dialog).findByLabelText("레시피 제목")).toHaveValue("Well log QC well-qc");
     const options = within(within(dialog).getByLabelText("카테고리")).getAllByRole("option").map((option) => option.textContent);
@@ -221,6 +225,7 @@ describe("task catalogue and setup", () => {
   it("opens a checked recipe once without saving", async () => {
     recipeResult = { ok: true, issues: [], setup: okSetup };
     catalogue(); await userEvent.click(await screen.findByRole("button", { name: "레시피 가져오기" })); const dialog = await screen.findByRole("dialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 레시피 파일"), { target: { files: [recipeFile(okRecipe)] } });
     await userEvent.click(await within(dialog).findByRole("button", { name: "저장하지 않고 열기" }));
     const setup = await screen.findByRole("dialog"); expect(within(setup).getByText("측정 심도(MD)")).toBeInTheDocument();

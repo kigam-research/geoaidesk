@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { SkillHubInstall, SkillHubPreviewNotes } from "./skill-hub";
+import { LegacySkillHubInstall as SkillHubInstall, SkillHubInstall as HubSkillInstall, SkillHubPreviewNotes } from "./skill-hub";
 import { SkillsPanel } from "@/components/skills-panel";
 import { apiFetch } from "@/lib/projects";
 import { installSkills } from "@/lib/capabilities";
@@ -12,7 +12,7 @@ const result = { source: "/durable/sha", stagingKey: "key", stagingToken: "revie
 beforeEach(() => {
   localStorage.setItem("gaid:locale", "en");
   vi.clearAllMocks();
-  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/skill-hub" ? { sites: [{ id: "atlas", url: "https://kigam-research.github.io/skill-atlas/" }] } : url === "/geo/skill-hub/methods" ? { hubs: [] } : result), { headers: { "Content-Type": "application/json" } }));
+  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/skill-hub" ? { sites: [{ id: "atlas", url: "https://kigam-research.github.io/skill-atlas/" }] } : url === "/geo/skill-hub/methods" ? { hubs: [] } : url === "/geo/hub/entries" ? { entries: [] } : result), { headers: { "Content-Type": "application/json" } }));
 });
 it("opens the configured site in a new tab and submits page URLs with explicit project/scope", async () => {
   const onPreview = vi.fn();
@@ -50,6 +50,7 @@ it("does not deliver a stale preview after project/scope unmount", async () => {
 it("SkillsPanel reuses acknowledgement and the reviewed staging token on installation", async () => {
   render(<SkillsPanel />);
   fireEvent.click(await screen.findByRole("button", { name: /^Add$/ }));
+  fireEvent.click(screen.getByText("Previous skill_hub"));
   await screen.findByRole("link", { name: "Find skills on skill_hub" });
   fireEvent.change(screen.getByLabelText("Skill page URL"), { target: { value: "https://kigam-research.github.io/skill-atlas/#/skills/kigam/example" } });
   fireEvent.click(screen.getByRole("button", { name: "Preview skill" }));
@@ -82,4 +83,28 @@ it("shows hub draft identity, revision and effective lifecycle in preview notes"
   render(<SkillHubPreviewNotes preview={{ ...result, skillHub: { ...result.skillHub, draft: { methodId: "local/paper", revision: 2, lifecycle: "draft", url: "https://hub.test/api/gaid/packages/local/paper/2" } } }} />);
   expect(screen.getByText("Hub method: local/paper · revision 2 · Draft")).toBeInTheDocument();
   expect(screen.getByText(/Changes on the site are not fetched automatically/)).toBeInTheDocument();
+});
+
+const hubEntry = { id: "entry-paper", methodId: "local/paper", title: "Hub skill", tagline: "Skill package", author: "Researcher", stars: 4, latestRevision: 3, kind: "skill", recipe: false };
+it("previews the selected shared-hub revision with project and scope and leaves legacy collapsed", async () => {
+  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/hub/entries" ? { entries: [hubEntry] } : result)));
+  const onPreview = vi.fn();
+  render(<HubSkillInstall scope="global" projectId="test" onStart={vi.fn()} onPreview={onPreview} onError={vi.fn()} />);
+  expect(screen.queryByLabelText("Skill page URL")).not.toBeInTheDocument();
+  fireEvent.click(await screen.findByRole("button", { name: /Hub skill/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Preview package" }));
+  await waitFor(() => expect(onPreview).toHaveBeenCalledWith(result));
+  expect(apiFetch).toHaveBeenLastCalledWith("/geo/skill-hub/preview", expect.objectContaining({ body: JSON.stringify({ hubEntry: { id: "entry-paper", revision: 3 }, scope: "global" }) }), "test");
+  expect(vi.mocked(apiFetch).mock.calls.some(([url]) => url === "/geo/skill-hub/methods")).toBe(false);
+});
+it("SkillsPanel shared-hub preview uses the same explicit trust and staging-token install gate", async () => {
+  vi.mocked(apiFetch).mockImplementation(async (url) => new Response(JSON.stringify(url === "/geo/hub/entries" ? { entries: [hubEntry] } : result)));
+  render(<SkillsPanel />);
+  fireEvent.click(await screen.findByRole("button", { name: /^Add$/ }));
+  fireEvent.click(await screen.findByRole("button", { name: /Hub skill/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Preview package" }));
+  await screen.findByText("Example description");
+  const install = screen.getByRole("button", { name: "Install 1 skill" }); expect(install).toBeDisabled();
+  fireEvent.click(screen.getByRole("checkbox", { name: "Trust this source" })); fireEvent.click(install);
+  await waitFor(() => expect(installSkills).toHaveBeenCalledWith(expect.objectContaining({ stagingToken: "reviewed", acknowledged: true, scope: "project" })));
 });

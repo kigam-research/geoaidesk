@@ -110,6 +110,7 @@ export class AuthoringStore {
         title: p.title,
         owner: p.owner,
         ...(p.author ? { author: p.author } : {}),
+        ...(p.hubEntry ? { hubEntry: p.hubEntry } : {}),
         updatedAt: p.updatedAt,
         stage: projectStage(p),
         busy: runningAttempt(p)?.op ?? null,

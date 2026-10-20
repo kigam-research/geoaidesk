@@ -33,7 +33,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
-- skill_hub install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills opens the configured site (`geo/distribution.json` `skillHub.sites`) and previews a skill-page URL or uploaded `.tar.gz` through the existing acknowledgement/install gate. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills searches the shared GAID hub first, then previews the selected registered revision through the existing acknowledgement/install gate (origin `gaid-hub`). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; producer contract skill_hub
   `docs/specs/gaid-method-package.md` v1): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
   레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
@@ -55,7 +55,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`): one input file or analysis condition per step under a
   grouped step rail (입력 파일 → 분석 조건 → 요약), readiness blockers with their fix on step 1 and the summary, a summary with
   Edit links and the one primary action; a recipe or method default opens at the summary. The start draft lists the
-  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" checks a `.geo-start.json`
+  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" searches GAID hub recipes first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
@@ -69,7 +69,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
   `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
   recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
-  settings). The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
+  settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
+  `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
+  latest revision when that draft is not on this server; registering adds the next revision), any other name gets one own
+  copy (`<slug>-copy`; sources, questions and current answers come along when the original draft is on this server) that
+  registers as a separate entry with `basedOn`; drafts carry `hubEntry`. Registration keeps pictures whose cover, step or
+  output still exists. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
+  (`answersFeedback`). Concept pictures can be redone one at a time or revised by a researcher instruction (≤ 500 chars,
+  previous picture as input to `codex/images/edits`); older picture files stay. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
   `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and

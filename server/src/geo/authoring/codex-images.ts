@@ -2,12 +2,16 @@
  * Concept pictures through the researcher's ChatGPT sign-in (subscription), the way Codex CLI makes images with ChatGPT
  * auth: POST `<chatgpt backend>/codex/images/generations` with an Images API body (openai/codex
  * codex-rs/codex-api/src/endpoint/images.rs, codex-rs/ext/image-generation). The token comes from Pi's auth store through
- * GAID's model runtime (Settings → Providers → OpenAI "Sign in with ChatGPT"); it is never read from ~/.codex.
+ * GAID's model runtime (Settings → Providers → OpenAI Codex (legacy)); it is never read from ~/.codex.
  */
 import { AuthoringError } from "./store.ts";
 
 export const CODEX_IMAGE_MODEL = "gpt-image-2";
 export type ImageMime = "image/png" | "image/webp" | "image/jpeg";
+export interface ImageInput {
+  bytes: Uint8Array;
+  mimeType: ImageMime;
+}
 /**
  * Pi providers whose OAuth token reaches the ChatGPT Codex backend. Only the legacy "OpenAI Codex" login qualifies:
  * the current "Sign in with ChatGPT" (`openai`) token is for api.openai.com subscription sharing, which refuses image
@@ -72,9 +76,12 @@ export function codexImagesUrl(baseUrl?: string): string {
 export async function generateCodexImage(
   auth: ChatGptAuth,
   prompt: string,
-  options: { fetch?: typeof fetch; signal?: AbortSignal } = {},
+  options: { fetch?: typeof fetch; signal?: AbortSignal; image?: ImageInput } = {},
 ): Promise<{ bytes: Uint8Array; mimeType: ImageMime }> {
-  const response = await (options.fetch ?? fetch)(codexImagesUrl(auth.baseUrl), {
+  // Confirmed by openai/codex e18a20d6: ImagesClient::edit uses JSON ImageEditRequest,
+  // including images: [{ image_url: "data:image/png;base64,..." }], not multipart.
+  const url = codexImagesUrl(auth.baseUrl).replace(/generations$/, options.image ? "edits" : "generations");
+  const response = await (options.fetch ?? fetch)(url, {
     method: "POST",
     signal: options.signal ?? AbortSignal.timeout(5 * 60_000),
     headers: {
@@ -83,7 +90,16 @@ export async function generateCodexImage(
       originator: "pi",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ prompt, model: CODEX_IMAGE_MODEL, n: 1, size: "1536x1024", quality: "medium" }),
+    body: JSON.stringify({
+      prompt,
+      model: CODEX_IMAGE_MODEL,
+      n: 1,
+      size: "1536x1024",
+      quality: "medium",
+      ...(options.image
+        ? { images: [{ image_url: `data:${options.image.mimeType};base64,${Buffer.from(options.image.bytes).toString("base64")}` }] }
+        : {}),
+    }),
   });
   if (response.status === 401 || response.status === 403)
     throw new AuthoringError("ChatGPT 구독으로 그림을 만들 권한이 없습니다. 설정에서 다시 로그인하세요.", 401);

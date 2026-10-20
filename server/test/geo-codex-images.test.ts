@@ -56,6 +56,23 @@ describe("concept pictures through the ChatGPT subscription", () => {
     expect(usageLimit(null).resetsAt).toBeUndefined();
   });
 
+  it("edits the supplied picture with the same subscription transport and no fallback on a quota refusal", async () => {
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ data: [{ b64_json: PNG.toString("base64") }] })));
+    const runtime = { checkAuth: async () => ({ type: "oauth" as const }), getAuth: async () => ({ auth: { apiKey: TOKEN } }) };
+    const generator = await chatGptImageGenerator(runtime, fetchImpl as typeof fetch);
+    await generator!.generate("larger blocks", { bytes: PNG, mimeType: "image/png" });
+    const [url, init] = vi.mocked(fetchImpl as typeof fetch).mock.calls[0];
+    expect(url).toBe("https://chatgpt.com/backend-api/codex/images/edits");
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      prompt: "larger blocks", model: "gpt-image-2", images: [{ image_url: `data:image/png;base64,${PNG.toString("base64")}` }],
+    });
+    const denied = vi.fn(async () => new Response(JSON.stringify({ error: { resets_in_seconds: 60 } }), { status: 429 }));
+    await expect(generateCodexImage({ provider: "openai-codex", token: TOKEN }, "edit", {
+      image: { bytes: PNG, mimeType: "image/png" }, fetch: denied as typeof fetch,
+    })).rejects.toMatchObject({ status: 429 });
+    expect(denied).toHaveBeenCalledOnce();
+  });
+
   it("is used only with a ChatGPT OAuth sign-in and ledgers subscription use at $0", async () => {
     const none = { checkAuth: async () => ({ type: "api_key" as const }), getAuth: async () => undefined };
     expect(await chatGptImageGenerator(none)).toBeNull();
