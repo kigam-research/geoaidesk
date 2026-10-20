@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:12:23Z
+updated: 2026-10-20T14:13:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -68,10 +68,10 @@ Implemented both project Workflow and registered hub ZIP routes and CliExportBut
 
 Targeted checks: server typecheck passed, server route tests 10 passed, web button tests 2 passed; copy validator 0 errors/61 existing warnings; UI validator 0 errors/89 existing debt. Korean 1440x900 and 1280x800 isolated-component screenshots verified, no overflow, 32 px targets, Escape closes/returns focus. Parent report §3.16 and appendix contain screenshots, exact commands, string ids and rule compliance; final integrated screen placement is parent-owned. Humanizer file-mode review applied to added Korean report prose.
 
-Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): backend 1968 passed/8 skipped, frontend 1123 passed, distribution checks, environment imports and production restart smoke passed. Inspection found task job does not preserve caller env: start-gaid.sh --check referenced default user data home (dependency-only, no services). Repeat full check with explicit env command arguments to verify the required isolated home. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. No build caches in writer workspace; remove job build caches after checks. No deployment performed.
+Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): backend 1968 passed/8 skipped, frontend 1123 passed, distribution checks, environment imports and production restart smoke passed. Inspection found task job does not preserve caller env: start-gaid.sh --check referenced default user data home (dependency-only, no services). Isolation-corrected full check is running as job-geoaidesk-gaid-workflow-model--cli-3 with env inside its recorded command. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. Writer build caches and first successful job web/.next removed; remove corrected job cache after it exits. No deployment performed.
 
 ## Next steps
-1. Run the isolation-corrected full check with task job run -- env GAID_HOME=<task-home> KADY_ENV_FILE=<task-config> KADY_PROJECTS_ROOT=<task-projects> bash scripts/check; wait for its recorded notification.
+1. Wait for job-geoaidesk-gaid-workflow-model--cli-3 notification; read terminal result and verify launcher uses task-local home. Do not restart it.
 2. Resolve any in-scope failures, update report/check evidence, remove build caches and task finish. Parent integrates with task complete.
 
 ## Failed approaches
@@ -98,6 +98,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140225.089338Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140233.693652Z/receipt.json
   - disposition: {"evidence":["reports/2026-10-20-gaid-workflow-model/figures/cli-export-1440.png and cli-export-1280.png"],"reason":"Temporary CLI export UI harness stopped after visual and keyboard checks completed","recorded":"2026-10-20T14:04:40Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T141232.488050Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
