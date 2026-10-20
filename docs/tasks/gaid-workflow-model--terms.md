@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T13:57:18Z
+status: active
+updated: 2026-10-20T14:04:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Ready for parent integration. Workflow terminology, skill-screen linkage, Workflow-only registration and all three install previews are implemented and pushed. Existing stored titles/data and gaid-method/v1 remain unchanged. All declared scripts/check stages passed across job 5's backend/frontend/launcher prefix and job 7's distribution-to-production suffix (exit 0). Backend: 1,953 passed, 8 skipped; frontend: 1,111 passed; GAID tests: 48 passed, 1 skipped. Copy/UI validators passed, both environment targets imported all required modules, and clean-start/stop/restart production smoke passed. Eighteen Korean screenshots at both required sizes and 171 exact bilingual copy changes are recorded below. Browser review and temporary app cleanup are complete; no deployment was performed. The parent owns the canonical report, composition-screen integration and final product completion.
+Child-scoped implementation and checks are complete; final integrated submission validation is being retried. Workflow terminology, skill-screen linkage, Workflow-only registration and all three install previews are implemented and pushed. Existing stored titles/data and gaid-method/v1 remain unchanged. All declared scripts/check stages passed across job 5's backend/frontend/launcher prefix and job 7's distribution-to-production suffix (exit 0). Backend: 1,953 passed, 8 skipped; frontend: 1,111 passed; GAID tests: 48 passed, 1 skipped. Copy/UI validators passed, both environment targets imported all required modules, and clean-start/stop/restart production smoke passed. Eighteen Korean screenshots at both required sizes and 171 exact bilingual copy changes are recorded below. Browser review and temporary app cleanup are complete; no deployment was performed. The parent owns the canonical report, composition-screen integration and final product completion.
 
 ### Delivered result
 
@@ -323,6 +323,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 Closed 2026-10-20T13:57:18Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task-finish check merged parent target 9114c8e (integrated snapshot 1c533b4a), passed backend, then reported one existing file-preview-panel draft-retention test failure (a.tex: expected unsaved draft, observed initial text); 1,119 frontend tests passed. Source and test are unchanged versus passing f9e8125. Isolated file-preview-panel recheck passed 7/7 (`file-preview-recheck.log`); no product/test edit was made without reproduction. Retrying task finish in place, without task save/resume.
 - Job 6 continuation wrapper installed dependencies but omitted scripts/check's local step() output helper, so it exited 127 before the first remaining stage. Added extraction of that original function alongside the original suffix; product code was unchanged.
 - Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
 - Delayed job-1 exit notice was reread after the job-5 launch: job 1 had the same now-fixed portability failure (1,950 passed, 8 skipped). Its existing superseded disposition remains valid; do not restart it or replay the obsolete source.
