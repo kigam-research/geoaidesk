@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T14:04:14Z
+status: ready
+updated: 2026-10-20T14:04:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -320,7 +320,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 </details>
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T13:57:18Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T14:04:16Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task-finish check merged parent target 9114c8e (integrated snapshot 1c533b4a), passed backend, then reported one existing file-preview-panel draft-retention test failure (a.tex: expected unsaved draft, observed initial text); 1,119 frontend tests passed. Source and test are unchanged versus passing f9e8125. Isolated file-preview-panel recheck passed 7/7 (`file-preview-recheck.log`); no product/test edit was made without reproduction. Retrying task finish in place, without task save/resume.
