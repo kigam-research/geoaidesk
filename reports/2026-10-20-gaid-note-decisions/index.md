@@ -64,7 +64,7 @@ supersedes:
 
 - 실제 앱 확인: 사용자 검토 자료를 복사한 시험용 앱에서 결정 2건짜리 노트("서울 1:25만 암상도의 암상별 면적표와 색분류 지도")로 확인했습니다. "답변 보내기"를 누르자 노트를 쓴 채팅이 열리고, 서버가 그 채팅의 실행 요청을 한 번 받았습니다. 실행 기록에서 사용자 메시지 하나에 두 답이 목록으로 들어간 것을 확인했습니다. 시험에 쓴 로컬 모델(Qwen3 30B)은 별도 지시에 따라 타원면 기준 면적 비교(2,013.314 km², 0.02% 차이)를 노트에 덧붙였습니다. 다만 답한 결정을 결정할 일 절에서 옮기지 않았고, 영어로 답했습니다. 이것은 모델의 응답 품질이며 답을 전달하는 이번 변경과는 별개입니다.
 - 대체 경로: 모델이 연결되지 않은 채팅에서는 메시지가 입력창에 들어가고 노트 화면이 그 사실을 알리는 것을 확인했습니다(그림 4). 채팅을 열지 못하는 경우는 자동 시험으로만 확인했습니다.
-- 자동 시험: 노트 화면 시험(선택만으로는 아무것도 보내지 않음, 보낸 메시지 내용, 보내지 못했을 때 답 유지, 입력창으로 넘어간 경우 안내)과 채팅 연결 시험을 추가했고 통과했습니다. 전체 검사 결과는 부록 A에 적습니다.
+- 자동 시험: 노트 화면 시험(선택만으로는 아무것도 보내지 않음, 보낸 메시지 내용, 보내지 못했을 때 답 유지, 입력창으로 넘어간 경우 안내)과 채팅 연결 시험을 추가했고 통과했습니다. 전체 검사도 통과했습니다(서버 시험 1,944건, 화면 시험 1,096건, GAID 시험 48건, 설치 후 시작·재시작 점검).
 - 화면 기준: 한 화면 한 주 버튼(B1), 비활성 이유 표시(S5), 선택지 행과 직접 입력(Q2, Q3), 주 동작이 스크롤 없이 보임(L6), 선택 상태와 이름 노출(A1)을 따랐습니다. 화면 기준과 다르게 한 점은 5절에 적습니다.
 
 ## 5. 한계
@@ -102,7 +102,7 @@ supersedes:
 | 문자열 | 추가: `notes.decision.instruction.{label,field,placeholder}`, `notes.decision.send.button`, `notes.decision.{sendTip,sending,progress,sendBlocked,sent,filled,sendFailed}`, `notes.decision.prompt.{head,note,option,instruction,open,tail}`. 삭제: `notes.decision.answerTip`(전: "노트를 쓴 채팅을 열고 고른 답을 입력창에 넣습니다. 보내기 전에 고칠 수 있습니다." / "Opens the chat that wrote the note and puts the chosen answer in its chat box. You can edit it before sending."), 단일 문자열 `notes.decision.prompt`(전: "“{title}” 노트의 결정 {number}에 답합니다: {label}) {text}…")는 위 `prompt.*`로 나눴습니다. |
 | 시험용 앱 | PC74 systemd 사용자 서비스 `gaid-note-decisions-app`, 포트 3310/18310, 자료 `~/data/geoaidesk/work/gaid-note-decisions/home` (`~/.geoaidesk`의 설정과 검토용 프로젝트 review-note-style 복사본) |
 | 화면 원본 | PC74:`~/data/geoaidesk/work/gaid-note-decisions/playwright/` |
-| 검사 | `scripts/check` 기록 PC74:`~/data/geoaidesk/work/gaid-note-decisions/logs/check.log` |
+| 검사 | `scripts/check` 종료 코드 0 (서버 vitest 1944 통과·8 건너뜀, web vitest 1096 통과, GAID node 시험 48 통과·1 건너뜀, environments smoke, production smoke PASS). 기록 PC74:`~/data/geoaidesk/work/gaid-note-decisions/logs/check.log`; 첫 실행(경계 파일 소유자 오류로 종료 코드 1)은 `check-1.log` |
 
 작성 시점: 2026-10-20.
 

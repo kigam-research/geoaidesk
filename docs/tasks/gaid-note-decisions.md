@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T09:03:39Z
+updated: 2026-10-20T09:11:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f3513ee-8a5d-41ea-ab37-591555203b6d","pid":2413519,"provider":"claude","session":"e110d0e5-34df-4728-8c24-0178bd483529","start":"37297710","token":"11392b68f53c59c140adfdb8a7d3415bc02ca1339dcf6012b83deab1af8c4edc"}
 branch: task/gaid-note-decisions
 target: main
@@ -48,11 +48,11 @@ Outside check: no outside check (UI work).
   ~/data/geoaidesk/work/gaid-note-decisions/home (copy of ~/.geoaidesk config, pi-agent, skills-cache and project
   review-note-style; the copied session header cwd was rewritten to the copy, otherwise "No such session");
   log ~/data/geoaidesk/work/gaid-note-decisions/app.log. Stop it before finish.
-- scripts/check running as unit `gaid-note-decisions-check`, log ~/data/geoaidesk/work/gaid-note-decisions/logs/check.log.
+- scripts/check run 2: exit 0 (server vitest 1944 passed / 8 skipped, web vitest 1096 passed, GAID node tests 48 passed /
+  1 skipped, environments smoke, production smoke PASS); log ~/data/geoaidesk/work/gaid-note-decisions/logs/check.log.
+- Test app unit stopped; report review copy made (vault 연구 보고서/geoaidesk/2026-10-20-gaid-note-decisions).
 ## Next steps
-1. Read check result; retake figure 02 (sent message without the copy-artifact error) if useful; stop the app unit;
-   review-copy the report; task save; task finish.
-Blocked: waiting for scripts/check run 2 (user unit gaid-note-decisions-check2); in-session waiter notifies on exit. Test app stopped; figure 02 retaken.
+1. task finish. Rollout to the review app (gaid-review) is the hub's call after merge.
 ## Failed approaches
 - scripts/check run 1 failed (exit 1) only on geo/tests/distribution.test.mjs: a seam owner must be a registered package; the
   chat-prefill.ts seam now lists owner gaid-notebook-review (responsibility names gaid-note-decisions). Run 1 log:
