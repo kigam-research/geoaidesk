@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:30:26Z
+updated: 2026-10-20T14:35:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -61,12 +61,31 @@ never ~/.geoaidesk). Tests for the view and each mount. Run scripts/check; remov
 Evidence in your task document's Current state, first and self-contained (screenshot paths + sha256).
 
 ## Current state
-Resumed in the printed worktree. Parent owns WorkflowDoc contract/render/runtime; this child owns view/mounts and read-only routes. Shared WorkflowView is implemented at all six requested mounts; MethodFlow reads steps/choiceIds and keeps its picture/IO renderer. Registered skill source reads exact archive revision; catalogue and draft docs are read-only. Imported-skill source prefills the existing Settings install gate. Focused existing tests: 99 passed; new view/mount tests and inherited Workflow card tests: 18 passed; new server route tests: 3 passed; import gate tests: 2 passed. Backend typecheck passed. Parent changes integrated by task sync (b349ff0b); preliminary full check was stopped because subsequent test/source additions invalidated its tree. First isolated browser pass confirmed all views load; duplicate headings and over-expanded project step cards were corrected. Final screenshots at the corrected SHA and full checks remain.
+Implemented all six requested WorkflowDoc mounts; exact preview/chat renderer, copy, all choices/options, source-labelled skills and read-only skill instructions. MethodFlow reuses picture/IO logic and uses steps/choiceIds; project steps are compact disclosures. Imported missing skills use the existing import/acknowledgement gate with ref prefill. CLI exportAction slots remain for parent integration. No authoring/** edits.
+Verification: 103 focused frontend tests passed after visual fixes; 29 view/method rechecks passed; 3 new server route tests passed; backend/frontend typecheck and focused lint passed. Korean screenshots of six mounts plus hub instructions at 1440×900 and 1280×800 (14 files) were visually inspected; no overflow outside the intended scroll panels or browser console errors. Source SHA 4e214c0204bd. Report sections 3.16 and appendix carry the result and three figures.
+Full scripts/check job at 1b0ddcf0 failed the distribution seam-owner allowlist: child slug was not an allowed owner. Corrected new seams to parent owner gaid-workflow-model; the exact failing check now passes. Full final checked snapshot remains for task finish.
+
+Screenshot originals and hashes (base: /home/seongin3/data/geoaidesk/work/gaid-workflow-model--views/playwright):
+- 01-hub-entry-1280.png: `18d3dda38d58d1a1971cc4743417402242ea1ae6c49b09b5b25a30e23eb2c6d4`
+- 01-hub-entry-1440.png: `5b77afa9b3056f95a19a21a8ed32f63928628e95f79779337c23b8a89b031026`
+- 01b-hub-instructions-1280.png: `43891cc91cb5a591e23bfd73488423cce187359c280c5ec4db703fd75e94baea`
+- 01b-hub-instructions-1440.png: `df3d0fd89f6719232cd0f55428777b9af2344a8191049e175d4da9486a6bdcae`
+- 02-hub-draft-1280.png: `9c6b81eda1eec393024822904d1e943cd6074215f393b8d50d3335857a079a9c`
+- 02-hub-draft-1440.png: `1dfd18e740d3148a88fe1a23b4378c8aac346dac0b1a4a88977470244580bddc`
+- 03-project-detail-1280.png: `512981e5b3c31422cb446cd29aba30023aa2ad91fd30dddbba0cf50f5259db59`
+- 03-project-detail-1440.png: `682c8df9d9a21346209eeb012b976784e5430b175d0c8681292b47f14228d664`
+- 04-setup-summary-1280.png: `45de160737076fb2ef8b58f531b08e07cbd4d83f523d5de4787c1558f7e3467c`
+- 04-setup-summary-1440.png: `dab1b345d38f1877dc631e99adfa737a6c18ce1914f8e499d6546bece21af959`
+- 05-catalogue-detail-1280.png: `905652b5f915ba7a372c4d0fce8e92c3a051a83b21714983e4b5d37d582759bf`
+- 05-catalogue-detail-1440.png: `a90dc52d7498bced0876cbc06769361347b9701d3ba847e27139b25f48eabba3`
+- 06-hub-catalogue-1280.png: `fac576fded6d2914f3e40aa9c6174f13377300f19d06ad0a5ee3c73a089a7aab`
+- 06-hub-catalogue-1440.png: `76eccc51dc97e325b55da665ad6c9d4993437a66171dc4724ff299586f3940d4`
 ## Next steps
-1. Rebuild the isolated test app at the saved UI revision after visual fixes (duplicate headings, compact project steps, preserved intermediate IO).
-2. Capture six mounted screens at both requested sizes in isolated copied GAID_HOME; run final scripts/check and record screenshot hashes.
-3. Add results/evidence to the parent report, remove build caches and finish.
+1. Finish the final declared scripts/check on the saved code, record its result, and remove local build caches.
+2. Save and finish; parent integrates this child and supplies CliExportButton through the exportAction slots.
 ## Failed approaches
+- Preliminary task sync checks were stopped after concurrent test/source edits invalidated their tree. Parent integration already completed.
+- The first full check job found a seam-owner allowlist failure; use the parent work-package owner, not the child unit slug. No application source workaround was needed.
 ## Notes and decisions
 - Sequential decisions: preserve MethodFlow picture/IO renderer; adapt its profile from WorkflowDoc steps/choiceIds. Shared WorkflowView owns the remaining sections and rendered text.
 - Owned interfaces: ReactNode exportAction slots for parent CLI integration; read-only /geo/hub/catalogue/:id, entry skill source, authoring draft document routes.
@@ -78,13 +97,14 @@ Resumed in the printed worktree. Parent owns WorkflowDoc contract/render/runtime
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-20-gaid-workflow-model/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--views-20261020T142545.403242Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Replaced the first browser test server with the saved UI revision after screenshot-driven layout fixes; its service was stopped.","recorded":"2026-10-20T14:31:15Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--views-20261020T143040.142590Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--views-20261020T142600.100164Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--views-20261020T143040.142590Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-workflow-model--views/playwright/screenshots.json"],"reason":"Temporary isolated browser test server stopped after all six mounted views and 14 Korean screenshots were verified; evidence is preserved under work/gaid-workflow-model--views/playwright.","recorded":"2026-10-20T14:34:36Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

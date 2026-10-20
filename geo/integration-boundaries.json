@@ -784,13 +784,13 @@
     },
     {
       "path": "web/src/components/skills-panel.tsx",
-      "owner": "gaid-workflow-model--views",
+      "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "Project-scoped imported Workflow skill reference prefills the existing preview, acknowledgement and install flow"
     },
     {
       "path": "server/test/geo-workflow-views.test.ts",
-      "owner": "gaid-workflow-model--views",
+      "owner": "gaid-workflow-model",
       "status": "added",
       "responsibility": "Read-only draft/catalogue documents and registered revision skill source integration tests"
     }

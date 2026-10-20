@@ -329,6 +329,18 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 
 가져온 스킬이 프로젝트에 없으면 이름과 기록된 출처를 표시합니다. 가져오기 단추는 기존 스킬 설치 화면에 출처를 채웁니다. 출처를 읽거나 설치하는 동작은 연구자가 미리보기와 출처 확인을 거쳐 선택합니다.
 
+![허브에서 보는 최종 Workflow 지침](figures/08-workflow-hub-instructions.png)
+
+그림 8. 허브 등록 항목의 최종 지침. 연구자가 정할 조건과 전체 단계가 AI agent에게 전달될 문서 안에 함께 들어갑니다.
+
+![프로젝트의 Workflow 단계](figures/09-workflow-project-detail.png)
+
+그림 9. 프로젝트의 Workflow 상세. 첫 단계를 펼치고 나머지는 제목으로 보여 전체 순서를 확인할 수 있습니다.
+
+![시작 설정을 반영한 지침](figures/10-workflow-setup-instructions.png)
+
+그림 10. 시작 설정 요약의 지침. 선택한 입력 파일과 분석 조건을 반영하고, 정하지 않은 조건을 따로 표시합니다.
+
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 이 작업은 화면 구성과 용어 진단입니다.
@@ -405,3 +417,7 @@ Pi에서는 GAID가 이미 같은 방식(프롬프트 템플릿과 스킬 폴더
 - UI guide 적용: P1–P3, L6, B1, D2, F1/F4, A1–A3, Q4, R2. R1의 지시문 비표시 규칙은 사용자 요청과 승인된 Workflow 지침 ADR에 따라 이 문서에 한해 예외로 합니다. 시스템 지시나 실행 로그를 새로 공개하지 않습니다.
 - 문자열: `workflowView.*`는 모두 신규(변경 전 없음). 한·영 전체 대응은 `web/src/geo/locales/workflowView/{ko,en}.json`. 주요 신규 문구: `workflowView.agentInstructions`: “AI agent가 받는 지침 보기” / “View instructions the AI agent receives”; `workflowView.instructions.button`: “지침 보기” / “Read instructions”; `workflowView.detail.button`: “Workflow 상세 보기” / “View Workflow details”; `workflowView.import.button`: “GitHub 등에서 가져오기” / “Import from GitHub or elsewhere”. 기존 문자열은 바꾸지 않았습니다.
 - 부모 통합용 CLI 동작은 공통 상세 화면, 허브 상세와 프로젝트 상세의 `exportAction` 슬롯으로 전달합니다. 이 자식 작업에서는 CLI 구현 파일을 수정하지 않았습니다.
+
+- 화면 확인: 여섯 적용 위치를 한국어 1440×900, 1280×800에서 확인했습니다. 추가로 허브의 최종 지침도 두 크기로 캡처했습니다(총 14장). 단계 순서·그림 유지, 스킬 지침 읽기, 전체 선택지 표시, 시작 설정의 입력 반영, 브라우저 오류 0건을 확인했습니다. 모델 호출이나 설치는 하지 않았습니다.
+- 화면의 코드 스냅샷: `4e214c0204bd`. 원본과 SHA-256 목록: `~/data/geoaidesk/work/gaid-workflow-model--views/playwright/screenshots.json`. 재현 경로: 같은 폴더의 `capture.js`; 데이터: `~/data/geoaidesk/work/gaid-workflow-model--views/home`(부모 시험 데이터의 격리 사본).
+- 이전 형식에서 단계와 선택 조건을 연결한 정보가 없으면 결정 표시를 추정하지 않습니다. 전체 조건은 구성 화면과 최종 지침에서 읽을 수 있습니다. 새 형식의 결정 표시와 개요 단계 수는 `steps[].choiceIds`를 따릅니다.
