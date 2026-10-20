@@ -19,6 +19,8 @@ export interface PackageOriginRecord {
   siteId?: string;
   pageUrl?: string;
   descriptorUrl?: string;
+  /** Registered GAID hub entry and the exact shared revision selected for preview. */
+  hubEntry?: { id: string; revision: number };
   /** From the hub descriptor, never from the package's own files. */
   hub?: { methodId?: string; revision?: number; lifecycle?: MethodLifecycle; pageUrl?: string };
   fetchedAt: string;

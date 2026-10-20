@@ -28,6 +28,8 @@ import methodsEn from "./methods/en.json";
 
 import skillHubKo from "./skillHub/ko.json";
 import skillHubEn from "./skillHub/en.json";
+import hubPickerKo from "./hubPicker/ko.json";
+import hubPickerEn from "./hubPicker/en.json";
 import hubHandoffKo from "./hubHandoff/ko.json";
 import hubHandoffEn from "./hubHandoff/en.json";
 
@@ -81,6 +83,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   app: pair(appKo, appEn),
   methods: pair(methodsKo, methodsEn),
   skillHub: pair(skillHubKo, skillHubEn),
+  hubPicker: pair(hubPickerKo, hubPickerEn),
   hubHandoff: pair(hubHandoffKo, hubHandoffEn),
   // gaid-korean-workspace--tasks: task catalogue, setup, recipes, suggestions, results, reusable skill
   workspace: pair(workspaceKo, workspaceEn),

@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input";
 import type { MethodLifecycle, MethodImplementation } from "@/geo/contracts/methods";
 import type { Localized } from "@/geo/contracts/workspace";
 import { text } from "@/geo/workspace/api";
+import type { HubEntry } from "@/geo/contracts/hub-shared";
+import { HubPicker } from "@/geo/hub-picker/hub-picker";
 
 export interface SkillHubPreview extends SkillSourcePreview {
-  skillHub?: { sha256: string; pageUrl?: string; skillId?: string; siteId?: string; catalogueAvailable: boolean; catalogueNames: string[]; draft?: { methodId: string; revision: number; lifecycle: MethodLifecycle; url: string } };
+  skillHub?: { sha256: string; pageUrl?: string; skillId?: string; siteId?: string; hubEntry?: { id: string; revision: number; title: string }; catalogueAvailable: boolean; catalogueNames: string[]; draft?: { methodId: string; revision: number; lifecycle: MethodLifecycle; url: string } };
 }
 export function skillHubSource(preview: SkillHubPreview): string {
+  if (preview.skillHub?.hubEntry) return t("hubPicker.previewSource", { title: preview.skillHub.hubEntry.title, count: preview.skillHub.hubEntry.revision });
   return preview.skillHub?.pageUrl ?? (preview.skillHub ? t("skillHub.source", { digest: preview.skillHub.sha256.slice(0, 12) }) : preview.source);
 }
 export function SkillHubPreviewNotes({ preview }: { preview: SkillHubPreview }) {
@@ -27,9 +30,51 @@ export function SkillHubPreviewNotes({ preview }: { preview: SkillHubPreview }) 
 }
 
 /** This component only previews. SkillsPanel owns selection, acknowledgement and installation. */
-export function SkillHubInstall({ scope, projectId, disabled, onStart, onPreview, onError, onSettled }: {
+type InstallProps = {
   scope: SkillScope; projectId: string; disabled?: boolean; onStart: () => void; onPreview: (preview: SkillHubPreview) => void; onError: (error: string) => void; onSettled?: () => void;
-}) {
+};
+
+/** Shared hub first; the old catalogue site and manual package inputs are opt-in legacy paths. */
+export function SkillHubInstall(props: InstallProps) {
+  const [entry, setEntry] = useState<HubEntry | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [legacy, setLegacy] = useState(false);
+  const generation = useRef(0);
+  useEffect(() => () => { generation.current++; }, []);
+  const preview = async () => {
+    if (!entry) return;
+    const ticket = ++generation.current;
+    setLoading(true); props.onStart();
+    try {
+      const response = await apiFetch("/geo/skill-hub/preview", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hubEntry: { id: entry.id, revision: entry.latestRevision }, scope: props.scope }) }, props.projectId);
+      if (!response.ok) throw new Error();
+      const result = await response.json();
+      if (ticket === generation.current) props.onPreview(result);
+    } catch { if (ticket === generation.current) props.onError(t("skillHub.errors.request")); }
+    finally { if (ticket === generation.current) { setLoading(false); props.onSettled?.(); } }
+  };
+  return <div className="min-w-0 space-y-3">
+    <section className="min-w-0 space-y-3 rounded-md border p-3" aria-label={t("hubPicker.skillTitle")}>
+      <h3 className="text-sm font-medium">{t("hubPicker.skillTitle")}</h3>
+      <p className="text-xs text-muted-foreground">{t("hubPicker.skillHelp")}</p>
+      {entry ? <>
+        <p className="truncate text-sm font-medium" title={entry.title}>{entry.title}</p>
+        <p className="text-xs text-muted-foreground">{t("hubPicker.revision", { count: entry.latestRevision })}</p>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="ghost" size="sm" disabled={loading || props.disabled} onClick={() => setEntry(null)}>{t("hubPicker.back.button")}</Button>
+          <Button variant="outline" size="sm" disabled={loading || props.disabled} onClick={() => void preview()}>{t(loading ? "skillHub.loading" : "hubPicker.preview.button")}</Button>
+        </div>
+      </> : <HubPicker disabled={props.disabled} onSelect={setEntry} />}
+    </section>
+    <details className="min-w-0" onToggle={(event) => setLegacy(event.currentTarget.open)}>
+      <summary className="cursor-pointer text-sm text-muted-foreground">{t("hubPicker.legacy")}</summary>
+      {legacy && <div className="mt-3"><LegacySkillHubInstall {...props} disabled={loading || props.disabled} /></div>}
+    </details>
+  </div>;
+}
+
+export function LegacySkillHubInstall({ scope, projectId, disabled, onStart, onPreview, onError, onSettled }: InstallProps) {
   const [sites, setSites] = useState<{ id: string; url: string }[]>([]);
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);

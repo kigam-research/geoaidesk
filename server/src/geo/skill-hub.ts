@@ -11,6 +11,7 @@ import { readTar } from "./tar.ts";
 import { GAID_HUB_PACKAGE_SCHEMA, type MethodLifecycle } from "../../../web/src/geo/contracts/methods.ts";
 import { readMethodFile, verifyMethodTree } from "./methods/method-file.ts";
 import { packageStore, writePackageOrigin } from "./methods/package-origin.ts";
+import { SharedHubStore } from "./hub-shared/store.ts";
 
 export const SKILL_HUB_LIMITS = { compressed: 20 * 1024 * 1024, expanded: 64 * 1024 * 1024, entries: 10_000 };
 /** `authoring`: path under the site of hub draft descriptors (`gaid-hub-package/v1`), when the hub serves drafts. */
@@ -206,15 +207,23 @@ export function skillHubCatalogue() {
   catch { return { available: false, skills: [] as { id: string; runtimeName: string }[] }; }
 }
 
-export async function previewSkillHub(paths: ProjectPaths, input: { url?: string; archive?: Buffer; scope?: string }, deps: {
+export async function previewSkillHub(paths: ProjectPaths, input: { url?: string; archive?: Buffer; hubEntry?: { id: string; revision: number }; scope?: string }, deps: {
   sites?: SkillHubSite[]; agentDir?: string; fetcher?: typeof fetch; preview?: typeof previewSkillSource;
+  sharedStore?: SharedHubStore;
   catalogue?: ReturnType<typeof skillHubCatalogue>;
 } = {}) {
-  if ((input.url !== undefined) === (input.archive !== undefined) || (input.scope !== undefined && input.scope !== "project" && input.scope !== "global")) return fail("input", "Provide one URL or one package and a valid scope");
+  if ([input.url, input.archive, input.hubEntry].filter((v) => v !== undefined).length !== 1 || (input.scope !== undefined && input.scope !== "project" && input.scope !== "global")) return fail("input", "Provide one URL, package or hub entry and a valid scope");
+  const ref = input.hubEntry;
+  if (ref && (typeof ref.id !== "string" || !Number.isSafeInteger(ref.revision) || ref.revision < 1)) return fail("input", "Provide a hub entry and a positive revision");
+  const store = ref ? deps.sharedStore ?? new SharedHubStore() : null;
+  const record = ref ? await store!.read(ref.id) : null;
+  const snapshot = ref && record ? record.snapshots[String(ref.revision)] : undefined;
+  if (ref && !snapshot) return fail("input", "Hub entry revision was not found; search the hub again");
   const descriptorRef = input.url !== undefined ? resolveDescriptorUrl(input.url, deps.sites) : null;
   const descriptor = descriptorRef ? await fetchHubDescriptor(descriptorRef.descriptorUrl, descriptorRef.site, deps.fetcher) : null;
   const resolved = input.url !== undefined && !descriptorRef ? resolveSkillHubUrl(input.url, deps.sites) : undefined;
-  const archive = input.archive ?? await downloadSkillHubPackage(descriptor?.packageUrl ?? resolved!.packageUrl, deps.fetcher);
+  const archive = ref ? await store!.bytes(ref.id, `packages/${ref.revision}.tar.gz`) : input.archive ?? await downloadSkillHubPackage(descriptor?.packageUrl ?? resolved!.packageUrl, deps.fetcher);
+  if (snapshot && (archive.length !== snapshot.package.size || crypto.createHash("sha256").update(archive).digest("hex") !== snapshot.package.sha256)) return fail("archive", "Package bytes do not match the registered hub revision");
   if (descriptor) {
     const digest = crypto.createHash("sha256").update(archive).digest("hex");
     if (digest !== descriptor.sha256 || archive.length !== descriptor.size) return fail("archive", "Package bytes do not match the hub descriptor");
@@ -223,16 +232,19 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   // A method package's tree must match its own file listing; a hub descriptor must name the same method revision.
   for (const entry of fs.readdirSync(staged.source)) {
     const file = readMethodFile(path.join(staged.source, entry), entry);
-    if (descriptor && !file.method) return fail("archive", "Hub package has no valid gaid-method.json");
+    if ((descriptor || snapshot) && !file.method) return fail("archive", "Hub package has no valid gaid-method.json");
     if (!file.method) continue;
     if (verifyMethodTree(path.join(staged.source, entry), file.method).length) return fail("archive", "Package files do not match gaid-method.json");
     if (descriptor && (file.method.methodId !== descriptor.methodId || file.method.revision !== descriptor.revision || file.method.packageDigest !== descriptor.packageDigest)) {
       return fail("archive", "Package method id/revision/digest do not match the hub descriptor");
     }
+    if (snapshot && (file.method.methodId !== snapshot.package.methodId || file.method.revision !== snapshot.package.revision || file.method.packageDigest !== snapshot.package.packageDigest)) return fail("archive", "Package method does not match the registered hub revision");
   }
   writePackageOrigin(packageStore(deps.agentDir), {
     sha256: staged.sha256,
-    kind: input.archive ? "upload" : "skill-hub",
+    kind: ref ? "gaid-hub" : input.archive ? "upload" : "skill-hub",
+    ...(ref ? { hubEntry: ref } : {}),
+    ...(snapshot ? { hub: { methodId: snapshot.package.methodId, revision: snapshot.package.revision, lifecycle: "draft" as const } } : {}),
     ...(descriptorRef ? { siteId: descriptorRef.siteId, descriptorUrl: descriptorRef.displayUrl } : {}),
     ...(resolved ? { siteId: resolved.siteId, pageUrl: resolved.pageUrl } : {}),
     // A configured Pages site lists published skills only; a descriptor states its own lifecycle.
@@ -243,6 +255,7 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   const catalogue = deps.catalogue ?? skillHubCatalogue();
   return { ...preview, skillHub: {
     sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
+    ...(ref ? { hubEntry: { ...ref, title: record!.entry.title } } : {}),
     ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),
     catalogueAvailable: catalogue.available,
     catalogueNames: preview.skills.filter((s) => catalogue.skills.some((c) => c.runtimeName === s.name)).map((s) => s.name),

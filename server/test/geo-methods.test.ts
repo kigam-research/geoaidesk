@@ -210,3 +210,27 @@ describe("method exposure", () => {
     expect(exposureModeIssue("method:pu-nested-cv:paper-reproduction", undefined, { allowMethod: true })).toBeNull();
   }, 30_000);
 });
+
+// Shared GAID hub packages enter the same preview/acknowledgement/install gate as manual uploads.
+it("previews a pinned shared-hub revision, verifies bytes and records the registered origin", async () => {
+  const { SharedHubStore } = await import("../src/geo/hub-shared/store.ts");
+  const { readPackageOrigin, packageStore } = await import("../src/geo/methods/package-origin.ts");
+  const store = new SharedHubStore(path.join(root, "shared-hub"));
+  await store.initialize();
+  const bytes = pkg();
+  const packageRecord = { methodId: "local/pu-nested-cv", revision: 3, size: bytes.length, sha256: sha(bytes), packageDigest: digest };
+  await store.write({ schemaVersion: "gaid-hub-entry/v1", entry: { id: "entry-paper", title: "Registered paper", latestRevision: 2 }, snapshots: { "1": { package: packageRecord }, "2": { package: { ...packageRecord, sha256: "f".repeat(64) } } } } as unknown as import("../src/geo/hub-shared/store.ts").StoredEntry);
+  await store.immutableBytes("entry-paper", "packages/1.tar.gz", bytes);
+  const preview = vi.fn().mockResolvedValue({ source: "staged", stagingKey: "key", stagingToken: "reviewed", skills: [{ name: "pu-nested-cv" }], problems: [] });
+  const deps = { agentDir, sharedStore: store, preview, catalogue: { available: false, skills: [] } };
+  const result = await previewSkillHub(paths, { hubEntry: { id: "entry-paper", revision: 1 }, scope: "global" }, deps);
+  expect(preview).toHaveBeenCalledWith(paths, { source: expect.stringContaining("/skill-hub/packages/"), scope: "global" });
+  expect(result).toMatchObject({ stagingToken: "reviewed", skillHub: { hubEntry: { id: "entry-paper", revision: 1, title: "Registered paper" } } });
+  expect(readPackageOrigin(packageStore(agentDir), sha(bytes))).toMatchObject({ kind: "gaid-hub", hubEntry: { id: "entry-paper", revision: 1 } });
+  expect(fs.existsSync(path.join(paths.skillsDir, "pu-nested-cv"))).toBe(false);
+  await expect(previewSkillHub(paths, { hubEntry: { id: "entry-paper", revision: 9 } }, deps)).rejects.toMatchObject({ code: "input" });
+  await expect(previewSkillHub(paths, { hubEntry: { id: "entry-paper", revision: 0 } }, deps)).rejects.toMatchObject({ code: "input" });
+  await expect(previewSkillHub(paths, { hubEntry: { id: "entry-paper", revision: 1 }, archive: bytes }, deps)).rejects.toMatchObject({ code: "input" });
+  fs.writeFileSync(store.within("entry-paper", "packages/1.tar.gz"), Buffer.from("changed"));
+  await expect(previewSkillHub(paths, { hubEntry: { id: "entry-paper", revision: 1 } }, deps)).rejects.toMatchObject({ code: "archive" });
+});
