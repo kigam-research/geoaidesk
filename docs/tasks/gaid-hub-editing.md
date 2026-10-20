@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T09:23:32Z
+updated: 2026-10-20T09:40:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"973096b8-d85d-4540-8407-314c27f4b24a","pid":2418100,"provider":"claude","session":"2485ae34-3b6a-477b-a2a1-60e3eb8b9d65","start":"37298903","token":"a46848df5264acf9fe4f245bb6541d25f6cf250193347f9ea63666ff5eb8e35b"}
 branch: task/gaid-hub-editing
 target: main
@@ -39,6 +39,18 @@ The writer may split independent packages into child units. UI guide + copy rule
 Outside check: no outside check (app work).
 
 ## Current state
+Result (2026-10-20): all five hub points are implemented on task/gaid-hub-editing and checked in a trial app (copy of
+the review data). (1) "레시피 가져오기" searches GAID hub methods first, installs the shown revision and opens its start
+settings; file import stays. (2) Settings → Skills → 스킬 추가 starts with "GAID 허브에서 스킬 찾기" through the unchanged
+preview/trust/install gate; skill_hub only behind "이전 skill_hub". (3) Registered methods: the registering display name gets
+"방법 고치기" (next revision of the same entry, a draft seeded from the latest revision when its draft is not on this server),
+any other name "복사해서 고치기" (own copy, separate entry naming the original); "판 기록" on the entry page. (4) Recorded
+answers are editable; "바꾼 답 반영" sends changed answers and asks the coauthor to revise (old → new listed). (5) Concept
+pictures: explanation + "제공사 설정 열기" when not connected, per-picture "다시 만들기"/"고쳐 만들기" (≤ 500-char
+instruction, previous picture as edit input). Not run live: model revise after changed answers, real picture
+generation/edit (no OpenAI Codex (legacy) login in the trial app). Decision for the user: who may edit (report §6).
+Children gaid-hub-editing--hub-in-project and --concept-pictures completed and closed.
+
 Step 0 (current behaviour, 2026-10-20, trial app from this worktree with a copy of ~/.geoaidesk; screenshots
 `~/data/geoaidesk/work/gaid-hub-editing/before/`): all five observations confirmed.
 1. Recipe import: the Workflow panel's "레시피 가져오기" dialog only takes a `.geo-start.json` file; no hub search (07-recipe-import.png).
@@ -71,14 +83,12 @@ Writer packages done (2026-10-20, commits up to 54c06d2):
 Trial app: `systemd-run --user --unit gaid-hubedit-app --collect -E PATH=$PATH -E HOME=$HOME
 ~/data/geoaidesk/work/gaid-hub-editing/bin/run.sh` (UI 3380, API 18380, GAID_HOME `~/data/geoaidesk/work/gaid-hub-editing/home`).
 ## Next steps
-Blocked: waiting for the finish notices of both child writers (agents running their task finish / scripts/check; both
-branches trial-merge cleanly into e029124).
-1. Wait for child finishes (concept-pictures agent 5c402641-eeba-4c12-a6be-b069a47e1c65; hub-in-project), then
-   `task complete gaid-hub-editing--concept-pictures` / `--hub-in-project`, resolve hub locale JSON merges, rerun hub tests.
-2. Click the concept-picture "connect" link in the hub after integrating P2 (parent fix e029124 makes GaidHub listen to
-   openSettings). Full `scripts/check`, report `reports/2026-10-20-gaid-hub-editing/index.md` (p3/p4 figures + children sections),
-   humanizer, `task review-copy`, `task finish`.
+1. `task review-copy` of the report, then `task finish`. Full scripts/check passed on 68872f3 (backend 1951/8 skipped,
+   frontend 1109, GAID checks, production smoke; log ~/data/geoaidesk/work/gaid-hub-editing/logs/check.log).
+
 ## Failed approaches
+- Seeded drafts first pointed code files at `<slug>/<path>` inside the registered package; the code-source unpacker drops
+  a single top-level folder, so the check failed. Fixed by matching the extracted layout (test covers it).
 ## Notes and decisions
 Plan (2026-10-20):
 - Shared interface first (writer): `HubEntry.recipe?: boolean` (latest snapshot carries a 레시피/Workflow) in
