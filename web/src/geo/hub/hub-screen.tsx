@@ -23,6 +23,7 @@ import {
 import { geoText } from "@/geo/i18n";
 import { API_BASE } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
+import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 
 import { fileBase64, hubApi, newOpId } from "./api";
@@ -63,6 +64,17 @@ export function GaidHub({
   onOpenProject: (projectId: string) => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsRequest, setSettingsRequest] = useState<OpenSettingsRequest | null>(null);
+  // Deep links into Settings from hub screens (e.g. "connect the picture account" → Providers); the project list and
+  // workspace listeners are off while the hub is shown.
+  useEffect(
+    () =>
+      onOpenSettings((request) => {
+        setSettingsRequest(request);
+        setSettingsOpen(true);
+      }),
+    [],
+  );
   const { projects, setActive } = useProjects();
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
   const { resolvedTheme, setTheme } = useTheme();
@@ -72,7 +84,10 @@ export function GaidHub({
         variant="ghost"
         size="icon-sm"
         aria-label={appText("projects.open_settings")}
-        onClick={() => setSettingsOpen(true)}
+        onClick={() => {
+          setSettingsRequest(null);
+          setSettingsOpen(true);
+        }}
       >
         <SettingsIcon />
       </Button>
@@ -119,7 +134,9 @@ export function GaidHub({
           onOpenProject={onOpenProject}
         />
       )}
-      {settingsOpen && <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />}
+      {settingsOpen && (
+        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
+      )}
     </HubShell>
   );
 }
