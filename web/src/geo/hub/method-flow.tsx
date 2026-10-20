@@ -5,6 +5,8 @@
  */
 import { ChevronRightIcon, CircleIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import type { DraftProfile, ProcedureNode } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
@@ -24,14 +26,76 @@ export interface StepVisual {
   caption: string;
 }
 
+export interface PictureAction {
+  disabled: boolean;
+  onMake: (keys?: string[], instruction?: string) => void;
+}
+
+/** An instruction edits the previous image; an unprompted redo starts a fresh picture. */
+export function PictureControls({ pictureKey, label, hasPicture, action }: {
+  pictureKey: string;
+  label: string;
+  hasPicture: boolean;
+  action?: PictureAction;
+}) {
+  const [editing, setEditing] = useState<string | null>(null);
+  const [requests, setRequests] = useState<Record<string, string>>({});
+  if (!action) return null;
+  const instruction = requests[pictureKey] ?? "";
+  return (
+    <div role="group" aria-label={text("visuals.actions", { name: label })} className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" disabled={action.disabled} onClick={() => action.onMake([pictureKey])}>
+          {text(hasPicture ? "visuals.redo" : "visuals.makeOne")}
+        </Button>
+        {hasPicture && (
+          <Button
+            variant="outline" size="sm" disabled={action.disabled} aria-expanded={editing === pictureKey}
+            onClick={() => setEditing(editing === pictureKey ? null : pictureKey)}
+          >
+            {text("visuals.revise")}
+          </Button>
+        )}
+      </div>
+      {editing === pictureKey && (
+        <form className="flex flex-col gap-2" onSubmit={(e) => {
+          e.preventDefault();
+          if (!instruction.trim() || action.disabled) return;
+          action.onMake([pictureKey], instruction);
+          setEditing(null);
+        }}>
+          <label className="flex flex-col gap-1.5 text-sm">
+            {text("visuals.instruction")}
+            <Input
+              autoFocus maxLength={500} value={instruction} placeholder={text("visuals.placeholder")}
+              onChange={(e) => setRequests((old) => ({ ...old, [pictureKey]: e.target.value }))}
+            />
+          </label>
+          <p className="text-xs text-muted-foreground">{text("visuals.editHint")}</p>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setEditing(null)}>
+              {text("visuals.cancel")}
+            </Button>
+            <Button type="submit" variant="outline" size="sm" disabled={action.disabled || !instruction.trim()}>
+              {text("visuals.apply")}
+            </Button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export function MethodFlow({
   profile,
   visuals = {},
   outputImages = {},
+  pictureAction,
 }: {
   profile: DraftProfile;
   visuals?: Record<string, StepVisual>;
   outputImages?: Record<string, StepVisual>;
+  pictureAction?: PictureAction;
 }) {
   const nodes = orderedNodes(profile.procedure.nodes, profile.procedure.edges);
   const [selected, setSelected] = useState<string>(nodes[0]?.id ?? "");
@@ -54,6 +118,7 @@ export function MethodFlow({
           profile={profile}
           visual={visuals[node.id]}
           outputImages={outputImages}
+          pictureAction={pictureAction}
         />
       )}
     </div>
@@ -125,6 +190,7 @@ function StepDetail({
   profile,
   visual,
   outputImages,
+  pictureAction,
 }: {
   node: ProcedureNode;
   index: number;
@@ -132,6 +198,7 @@ function StepDetail({
   profile: DraftProfile;
   visual?: StepVisual;
   outputImages: Record<string, StepVisual>;
+  pictureAction?: PictureAction;
 }) {
   const gate = node.type === "human-gate" || node.type === "decision";
   const inputs = (profile.inputs ?? []).filter((p) => node.type === "input" || node.inputs?.includes(p.id));
@@ -188,6 +255,7 @@ function StepDetail({
           </figcaption>
         </figure>
       )}
+      <PictureControls pictureKey={node.id} label={localText(node.label)} hasPicture={visual?.kind === "generated"} action={pictureAction} />
       {(inputs.length > 0 || outputs.length > 0) && (
         <div className="grid gap-4 lg:grid-cols-2">
           {inputs.map((p) => (
@@ -200,6 +268,7 @@ function StepDetail({
             <div key={p.id} className="flex flex-col gap-1.5">
               <PortHeading kind="out" label={localText(p.label)} />
               <ResultExample port={p} image={outputImages[p.id]?.src} imageKind={outputImages[p.id]?.kind} />
+              <PictureControls pictureKey={`output:${p.id}`} label={localText(p.label)} hasPicture={outputImages[p.id]?.kind === "generated"} action={pictureAction} />
             </div>
           ))}
         </div>

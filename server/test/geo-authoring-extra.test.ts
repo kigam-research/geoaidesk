@@ -288,6 +288,46 @@ describe("URL sources", () => {
 });
 
 describe("Concept illustrations", () => {
+  it("redoes only the selected key and edits with the prior bytes, preserving history and the verbatim request", async () => {
+    const { store, projectId } = await drafted();
+    const generator = fakeGenerator();
+    await (await startVisuals(store, projectId, 1, { opId: "pictures-first" }, async () => generator)).completion;
+    const before = await store.read(projectId);
+    const request = "  블록을 더 크게, 색은 단색으로  ";
+    const run = await startVisuals(store, projectId, 1, { opId: "picture-edit", keys: ["prepare"], instruction: request }, async () => generator);
+    await run.completion;
+    const after = await store.read(projectId);
+    expect(after.visuals!.cover).toEqual(before.visuals!.cover);
+    expect(after.visuals!.evaluate).toEqual(before.visuals!.evaluate);
+    expect(after.visuals!.prepare.file).not.toBe(before.visuals!.prepare.file);
+    expect(await store.readFile(projectId, before.visuals!.prepare.file)).toEqual(PNG);
+    expect(after.visualOperations!["picture-edit"]).toMatchObject({ keys: ["prepare"], completed: ["prepare"], instruction: request, status: "complete" });
+    const call = vi.mocked(generator.generate).mock.calls.at(-1)!;
+    expect(call[0]).toContain(request);
+    expect(call[0]).toContain("not data");
+    expect(call[1]).toEqual({ bytes: PNG, mimeType: "image/png" });
+    await startVisuals(store, projectId, 1, { opId: "picture-edit", keys: ["cover"] }, async () => { throw Error("retry must not prepare"); });
+    await (await startVisuals(store, projectId, 1, { opId: "picture-redo", keys: ["prepare"] }, async () => generator)).completion;
+    expect(vi.mocked(generator.generate).mock.calls.at(-1)![1]).toBeUndefined();
+  });
+
+  it("validates targeted keys and instructions before preparing a generator", async () => {
+    const { store, projectId } = await drafted();
+    const prepare = vi.fn(async () => fakeGenerator());
+    for (const selection of [
+      { keys: [] }, { keys: ["absent"] }, { keys: ["cover", "cover"] }, { keys: Array(7).fill("cover") },
+      { keys: ["cover"], steps: [] }, { keys: ["cover"], instruction: "a".repeat(501) },
+      { keys: ["cover"], instruction: "   " }, { instruction: "edit" }, { keys: ["cover"], instruction: "edit" },
+      { keys: "cover" }, { instruction: 3 }, { keys: [null] },
+    ]) {
+      await expect(startVisuals(store, projectId, 1, { opId: "invalid-selection", ...selection } as never, prepare)).rejects.toMatchObject({ status: 400 });
+    }
+    expect(prepare).not.toHaveBeenCalled();
+    const generator = fakeGenerator();
+    await (await startVisuals(store, projectId, 1, { opId: "valid-cover", keys: ["cover"] }, async () => generator)).completion;
+    await (await startVisuals(store, projectId, 1, { opId: "valid-length", keys: ["cover"], instruction: "a".repeat(500) }, async () => generator)).completion;
+    expect((await store.read(projectId)).visualOperations!["valid-length"].status).toBe("complete");
+  });
   it("generates cover and steps, records revision/model/captions, and concurrent retries stay idempotent", async () => {
     const { store, projectId } = await drafted();
     const generator = fakeGenerator();
@@ -450,7 +490,7 @@ describe("Concept illustrations", () => {
     const response = await app.inject({
       method: "POST",
       url: `/geo/authoring/projects/${projectId}/drafts/1/visuals`,
-      payload: { opId: "visual-route", steps: [] },
+      payload: { opId: "visual-route", keys: ["cover"] },
     });
     expect(response.statusCode).toBe(202);
     await app.close();

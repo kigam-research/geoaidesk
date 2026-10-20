@@ -24,6 +24,8 @@ import { geoText } from "@/geo/i18n";
 import { API_BASE } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 import { useProjects } from "@/lib/use-projects";
+import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
+import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
 
 import { fileBase64, hubApi, newOpId } from "./api";
 import { DraftStep, TrialCard } from "./draft-step";
@@ -378,10 +380,26 @@ function HubProject({
   const showingDraft = Boolean(draft);
   useEffect(() => {
     if (!showingDraft) return;
-    void hubApi
-      .visualSource()
-      .then(setVisualSource)
-      .catch(() => setVisualSource(null));
+    let live = true;
+    let pending = false;
+    const refresh = () => {
+      if (pending) return;
+      pending = true;
+      void hubApi.visualSource()
+        .then((source) => { if (live) setVisualSource(source); })
+        .catch(() => { if (live) setVisualSource(null); })
+        .finally(() => { pending = false; });
+    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    window.addEventListener(PROVIDER_AUTH_CHANGED_EVENT, refresh);
+    window.addEventListener(CAPABILITIES_CHANGED_EVENT, refresh);
+    return () => {
+      live = false;
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener(PROVIDER_AUTH_CHANGED_EVENT, refresh);
+      window.removeEventListener(CAPABILITIES_CHANGED_EVENT, refresh);
+    };
   }, [showingDraft]);
   const pictures = useMemo(
     () => (project ? draftVisuals(project, draft) : draftVisuals(emptyProject(), undefined)),
@@ -498,11 +516,11 @@ function HubProject({
     }
   };
 
-  const makeVisuals = async () => {
+  const makeVisuals = async (keys?: string[], instruction?: string) => {
     if (!draft) return;
     setVisualsBusy(true);
     try {
-      await hubApi.visuals(id, draft.revision);
+      await hubApi.visuals(id, draft.revision, { keys, instruction });
       await reload();
     } catch (e) {
       toast.error((e as Error).message);
@@ -684,14 +702,15 @@ function HubProject({
         draft={draft}
         visuals={pictures.steps}
         outputImages={pictures.outputs}
+        cover={pictures.cover}
         visualAction={{
           busy: visualsBusy || Boolean(visualRun),
           progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
-          has: Object.keys(pictures.steps).length + Object.keys(pictures.outputs).length > 0,
+          has: Boolean(pictures.cover) || Object.keys(pictures.steps).length + Object.keys(pictures.outputs).length > 0,
           error: lastVisualError,
           errorDetail: lastVisualDetail,
           usageLimit: Boolean(usageLimit),
-          onMake: () => void makeVisuals(),
+          onMake: (keys, instruction) => void makeVisuals(keys, instruction),
           connected: visualSource?.available ?? null,
         }}
         trialCount={trialCount ?? 0}
