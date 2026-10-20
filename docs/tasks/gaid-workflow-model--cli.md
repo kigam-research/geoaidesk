@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:55:46Z
+updated: 2026-10-20T14:02:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -64,9 +64,9 @@ before finishing. Put the evidence (layouts verified per CLI with commands run a
 check results) in your task document's Current state, first and self-contained.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation started. Shared renderer and source contracts read. Codegraph is unavailable for this exact worktree (not indexed); bounded native reads used. Dependencies installed from lockfiles. No application data or credentials read.
 ## Next steps
-1. (the next session's first action)
+Implementation order: shared document resolver + bounded ZIP builder; route registration; verified CLI adapters; download popover and tests; real export discovery probes; full declared checks and screenshot evidence. Own only new CLI files and small routes/locales registrations. Parent owns screen placement and shared contract changes. No nested child units.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
