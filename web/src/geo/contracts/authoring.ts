@@ -14,6 +14,7 @@
 
 // --- Atlas profile subset (skill_hub web/shared/atlas/types.ts, atlas-profile/v1) ---
 
+import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
 export interface AtlasText {
   ko: string;
   en?: string;
@@ -160,7 +161,8 @@ export interface MethodText {
 
 /** geo-workflow/v1 with the gaid-method/v1 relaxations (skill_hub docs/specs/gaid-method-package.md §3). */
 export interface LocalWorkflow {
-  schemaVersion: "geo-workflow/v1";
+  /** gaid-workflow/v1 adds `skills` and `steps` (gaid-workflow-model, ADR 2026-10-20-workflow-runtime-form). */
+  schemaVersion: "geo-workflow/v1" | "gaid-workflow/v1";
   id: string;
   title: MethodText;
   description: MethodText;
@@ -197,6 +199,10 @@ export interface LocalWorkflow {
   }[];
   boundary: MethodText;
   exampleCaseIds: string[];
+  /** gaid-workflow/v1: every skill the Workflow uses, with its source. */
+  skills?: WorkflowDocSkill[];
+  /** gaid-workflow/v1: the procedure the Workflow 지침 lists (single written source). */
+  steps?: GaidWorkflowStep[];
 }
 
 export interface DraftRecipe {

@@ -9,7 +9,7 @@
  * `{ko, en?}` and the UI picks the locale.
  */
 
-import type { WorkflowDoc } from "./workflow-doc";
+import type { WorkflowDoc, WorkflowSkillSource } from "./workflow-doc";
 
 export interface Localized {
   ko: string;
@@ -58,6 +58,9 @@ export interface WorkflowSkillState {
   installed: boolean;
   /** Installed and not disabled, so a new chat can load it. */
   enabled: boolean;
+  /** gaid-workflow-model: where the skill comes from; `ref` is the import source of an `imported` skill. */
+  source?: WorkflowSkillSource;
+  ref?: string | null;
 }
 
 export interface WorkflowEnvironmentState {

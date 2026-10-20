@@ -88,15 +88,29 @@ export function findInstalledMethod(paths: ProjectPaths, runtimeName: string, ro
 }
 
 function skillStates(paths: ProjectPaths, catalogue: GeoCatalogue | null, method: InstalledMethod, file: MethodFile, workflow: GeoWorkflow): WorkflowSkillState[] {
-  return workflow.skillIds.map((id) => {
+  const states: WorkflowSkillState[] = workflow.skillIds.map((id) => {
     if (id.startsWith(LOCAL_SKILL_PREFIX)) {
-      return { id, runtimeName: method.runtimeName, title: file.title, installed: true, enabled: method.enabled };
+      return { id, runtimeName: method.runtimeName, title: file.title, installed: true, enabled: method.enabled, source: "bundled" as const };
     }
     const entry = catalogue?.index.skills.find((skill) => skill.id === id);
     const runtimeName = entry?.runtimeName ?? null;
     const state = runtimeName ? projectSkillState(paths, runtimeName) : { installed: false, enabled: false };
-    return { id, runtimeName, title: entry?.title ?? null, ...state };
+    return { id, runtimeName, title: entry?.title ?? null, ...state, source: "catalogue" as const };
   });
+  // gaid-workflow/v1: skills imported from GitHub and similar sources count toward readiness like the others; a
+  // missing one makes the Workflow "missing-skills" and carries its recorded source for the import action.
+  for (const skill of (workflow.skills ?? []) as { name?: unknown; source?: unknown; ref?: unknown }[]) {
+    if (skill?.source !== "imported" || typeof skill.name !== "string") continue;
+    states.push({
+      id: `imported:${skill.name}`,
+      runtimeName: skill.name,
+      title: null,
+      ...projectSkillState(paths, skill.name),
+      source: "imported",
+      ref: typeof skill.ref === "string" ? skill.ref : null,
+    });
+  }
+  return states;
 }
 
 export async function listLocalMethods(
