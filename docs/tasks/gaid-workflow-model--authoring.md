@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T14:45:15Z
+status: ready
+updated: 2026-10-20T14:45:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bf8b4c2-896d-4828-b900-b59150cf411d","pid":2653212,"provider":"codex","session":"01a159a9-e310-73e2-bbba-edf004cd26d4","start":"39360728","token":"f286d62a1decc68fd25437f6fb6e4181f19bbb4b3f1d98bb2a8e554497f80ee7"}
 branch: task/gaid-workflow-model--authoring
 target: task/gaid-workflow-model
@@ -91,7 +91,9 @@ Sequential decisions: use workflow.steps as the sole procedure for new model out
 Owned files: authoring/**, hub-shared/edit.ts, authoring/shared-hub tests/fixture/manual trial runner. Parent additionally authorized the registration-only normalization in hub-shared/routes.ts (normalize snapshot before packaging; bypass cached legacy package). Shared authoring contract and empty-prompt importer came from parent (aadb532, b349ff0). No web screen, locale catalogue, vendored hub schema or pinned catalogue changes. No child writers/readers were needed. Remaining sequence: checkpoint all task metadata → clean task finish (no edits while checks run) → remove generated ignored build caches → parent integration.
 
 ## Next steps
-1. Run task finish from the clean checkpoint and leave tracked files untouched during checks. After readiness, remove generated ignored build caches and let the parent run task complete. Do not repeat the completed model job.
+<!-- task:closed -->
+Closed 2026-10-20T14:45:31Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial task resume briefly encountered other task transactions; retried without changing workflow state.
 - First task sync typecheck found optional stored-step arrays; fixed with defaults. Second typecheck found cached package manifest typed unknown; fixed the local cast and reran typecheck successfully.
