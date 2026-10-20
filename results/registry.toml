@@ -84,3 +84,18 @@ files = [
 ]
 report = "reports/2026-10-15-gaid-researcher-ecosystem/index.md"
 replicas = []
+
+[[result]]
+id = "gaid-workflow-views-20261020"
+title = "허브와 프로젝트의 최종 Workflow 지침 화면"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/work/gaid-workflow-model--views/playwright"
+source_sha = "4e214c0204bd"
+inputs = ["user:2026-10-20-workflow-runtime-form", "local:isolated-parent-test-home"]
+files = [
+  { path = "screenshots.json", sha256 = "0e08aa91e901237520ac21bf7f60e9e6542881990bef4f56e157fded94038919" },
+  { path = "capture.js", sha256 = "b74587f1e7926e9979ff14d9bf9c35479e0603f8d990644131768977274e5017" },
+
+]
+report = "reports/2026-10-20-gaid-workflow-model/index.md"
+replicas = []
