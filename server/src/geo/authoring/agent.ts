@@ -34,6 +34,8 @@ import {
 import { pageFile, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
+import { procedureFor, structuredDraft, workflowProblems } from "./workflow.ts";
+
 const localSkill = (slug: string) => `local:${slug}`;
 
 export interface AgentDeps {
@@ -463,12 +465,12 @@ function reviseRequest(
   feedback: string,
 ): { text: string; findingIds: Map<string, string> } {
   const base = draftRequest(project, ctx, v);
-  const d = project.drafts.at(-1)!;
+  const d = structuredDraft(project.drafts.at(-1)!);
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
   const current = {
     slug: d.slug,
     ...(plain(d.profile) as Json),
-    procedure: plain(d.profile.procedure.nodes),
+    procedure: d.workflow ? undefined : plain(d.profile.procedure.nodes),
     description: d.description,
     scope: d.scope,
     instructions: d.instructions,
@@ -632,7 +634,7 @@ export function validateDraft(
       };
     });
   const TYPES = ["input", "qa", "analysis", "decision", "human-gate", "output"] as const;
-  const nodes = arr(value.procedure)
+  const nodes = arr(isObj(value.workflow) ? [] : value.procedure)
     .filter(isObj)
     .map((x, i) => {
       const type = TYPES.find((tt) => tt === x.type);
@@ -648,7 +650,7 @@ export function validateDraft(
         ...(checks.length ? { checks: checks.map(loc) } : {}),
       };
     });
-  if (nodes.length < 3 || nodes.length > 12) errors.push("procedure needs 3-12 steps");
+  if (!isObj(value.workflow) && (nodes.length < 3 || nodes.length > 12)) errors.push("procedure needs 3-12 steps");
   if (nodes.some((n) => !n.label.ko || !n.summary.ko)) errors.push("every procedure step needs label and summary");
   const decisions = arr(value.decisions)
     .filter(isObj)
@@ -775,7 +777,7 @@ export function validateDraft(
       if (codeFiles.some((c) => c.path === path)) return;
       codeFiles.push({ path, sourceId, sourcePath });
     });
-  const procedure = {
+  let procedure: DraftProfile["procedure"] = {
     nodes,
     edges: nodes.slice(1).map((n, i) => ({ from: nodes[i].id, to: n.id, relation: "next" as const })),
   };
@@ -851,10 +853,10 @@ export function validateDraft(
     if (!artifacts.length) errors.push("workflow.expectedArtifacts needs at least one artifact");
     const prompt = str(w.prompt, 6000);
     const boundary = str(w.boundary, 1200);
-    if (!str(w.title, 120) || !str(w.description, 1200) || !prompt || !boundary)
-      errors.push("workflow needs title, description, prompt and boundary");
+    if (!str(w.title, 120) || !str(w.description, 1200) || !boundary)
+      errors.push("workflow needs title, description and boundary");
     workflow = {
-      schemaVersion: "geo-workflow/v1",
+      schemaVersion: "gaid-workflow/v1",
       id: slug,
       title: loc(str(w.title, 120)),
       description: loc(str(w.description, 1200)),
@@ -868,6 +870,30 @@ export function validateDraft(
       boundary: loc(boundary),
       exampleCaseIds: [],
     };
+    const skills = arr(w.skills).filter(isObj).map((x, i) => {
+      const name = str(x.name, 64);
+      const source = x.source === "bundled" ? "bundled" as const : "catalogue" as const;
+      if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(name)) errors.push(`workflow.skills[${i}].name must be a runtime skill name`);
+      if (x.source !== "bundled" && x.source !== "catalogue") errors.push(`workflow.skills[${i}].source must be bundled|catalogue`);
+      if (x.role !== "primary" && x.role !== "supporting") errors.push(`workflow.skills[${i}].role must be primary|supporting`);
+      if (source === "bundled" && name !== slug) errors.push(`workflow.skills[${i}]: only ${slug} is bundled`);
+      if (source === "catalogue" && !v.catalogueNames.has(name)) errors.push(`workflow.skills[${i}]: unknown catalogue skill ${name}`);
+      return { name, source, role: x.role === "primary" ? "primary" as const : "supporting" as const, purpose: loc(str(x.purpose, 1200)) };
+    });
+    const ids = (raw: unknown) => arr(raw).map((x) => str(x, 64)).filter(Boolean);
+    const steps = arr(w.steps).filter(isObj).map((x, i) => ({
+      id: uniqueId(x.id, `workflow.steps[${i}]`),
+      title: loc(str(x.title, 120)), does: loc(str(x.does, 1200)),
+      skill: str(x.skill, 64), read: loc(str(x.read, 200)),
+      checks: arr(x.checks).map((x) => str(x, 300)).filter(Boolean).map(loc),
+      choiceIds: ids(x.choiceIds), outputs: ids(x.outputs),
+    }));
+    workflow.skills = skills;
+    workflow.steps = steps;
+    workflow.skillIds = skills.map((s) => s.source === "bundled" ? localSkill(slug) :
+      [...v.catalogueIds].find((id) => id.split("/").at(-1) === s.name) ?? s.name);
+    errors.push(...workflowProblems(workflow, slug));
+    procedure = procedureFor(workflow);
     const keys = new Set(choices.map((c) => c.id));
     const r = isObj(value.recipe) ? value.recipe : {};
     const answered: Record<string, string | number | boolean> = {};
