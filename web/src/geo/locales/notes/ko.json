@@ -74,7 +74,28 @@
   "decision": {
     "title": "결정할 일",
     "recommended": "권장",
-    "answerTip": "노트를 쓴 채팅을 열고 고른 답을 입력창에 넣습니다. 보내기 전에 고칠 수 있습니다.",
-    "prompt": "“{title}” 노트의 결정 {number}에 답합니다: {label}) {text}\n노트: {path}\n고른 답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
+    "instruction": {
+      "label": "별도 지시 (직접 입력)",
+      "field": "결정 {number}의 별도 지시",
+      "placeholder": "AI agent가 이어서 할 일을 쓰세요. 예: 시료 표를 올린 뒤 다시 실행"
+    },
+    "send": {
+      "button": "답변 보내기"
+    },
+    "sendTip": "고른 답을 노트를 쓴 채팅에 메시지 하나로 보냅니다.",
+    "sending": "보내는 중",
+    "progress": "결정 {count}건 중 {answered}건에 답했습니다.",
+    "sendBlocked": "결정마다 답을 고른 뒤 함께 보내세요.",
+    "sent": "답변을 채팅으로 보냈습니다.",
+    "filled": "채팅에서 지금 보낼 수 없어 답변을 채팅 입력창에 넣었습니다. 채팅에서 확인한 뒤 보내세요.",
+    "sendFailed": "노트를 쓴 채팅을 열지 못해 답변을 보내지 못했습니다. 채팅 탭이 많으면 하나 닫은 뒤 다시 보내세요.",
+    "prompt": {
+      "head": "“{title}” 노트의 결정할 일에 답합니다.",
+      "note": "노트: {path}",
+      "option": "결정 {number}: {label}) {text}",
+      "instruction": "결정 {number}(별도 지시): {instruction}",
+      "open": "결정 {numbers}에는 아직 답하지 않았습니다. 그대로 두세요.",
+      "tail": "답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
+    }
   }
 }

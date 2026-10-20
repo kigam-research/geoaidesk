@@ -74,7 +74,28 @@
   "decision": {
     "title": "Decisions to make",
     "recommended": "Recommended",
-    "answerTip": "Opens the chat that wrote the note and puts the chosen answer in its chat box. You can edit it before sending.",
-    "prompt": "Answering decision {number} of the note \"{title}\": {label}) {text}\nNote: {path}\nContinue the work accordingly and update the note."
+    "instruction": {
+      "label": "Separate instruction (write your own)",
+      "field": "Separate instruction for decision {number}",
+      "placeholder": "Write what the AI agent should do next, e.g. rerun after uploading the sample table"
+    },
+    "send": {
+      "button": "Send answers"
+    },
+    "sendTip": "Sends the chosen answers to the chat that wrote the note in one message.",
+    "sending": "Sending",
+    "progress": "Answered {answered} of {count} decisions.",
+    "sendBlocked": "Choose an answer for each decision, then send them together.",
+    "sent": "Answers sent to the chat.",
+    "filled": "The chat cannot send right now, so the answers are in its chat box. Check them there and send.",
+    "sendFailed": "Could not open the chat that wrote the note, so the answers were not sent. If many chat tabs are open, close one and send again.",
+    "prompt": {
+      "head": "Answering the decisions of the note \"{title}\".",
+      "note": "Note: {path}",
+      "option": "Decision {number}: {label}) {text}",
+      "instruction": "Decision {number} (separate instruction): {instruction}",
+      "open": "Not answered yet: decision {numbers}. Leave them open.",
+      "tail": "Continue the work according to these answers and update the note."
+    }
   }
 }
