@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:51:10Z
+updated: 2026-10-20T13:51:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; the failed stage and remaining GAID checks will be rerun.
+Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; job 6 at 4fc318d85b91 is rerunning the failed distribution stage and all remaining GAID checks.
 
 ### Delivered result
 
@@ -106,6 +106,10 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 - 18 Korean screenshots cover hub home, hub entry, installation preview, skill row, read-only instructions, GitHub-first skill import, Workflow panel/detail and general Workflow attribution at both required sizes. Full paths and hashes are below. App source predates only final sharing-copy precision and local-file import wording; the photographed changes are otherwise final.
 - Isolated app/browser stopped after review. Current worktree build caches (`web/.next`, tsbuildinfo, Vite caches) removed. Obsolete check jobs 1 and 3 were stopped and disposed as superseded by job 4; the app job 2 was disposed as intentionally cancelled after successful review. Its later `lost` notice is expected: systemd intentionally stopped the foreground app, so there is no natural exit receipt; the log confirms successful production start and browser/API use through review completion. Do not restart that app job. Logs/receipts remain intact.
 - Parent owns the single canonical report and composition UI. Update the project AGENTS.md summary during parent integration: Skills no longer searches the shared hub, new drafts target Workflow, and registration requires a Workflow. Do not change skill_hub or its contract.
+
+### Remaining-check execution
+
+- Suffix script: `/home/seongin3/data/geoaidesk/work/gaid-workflow-model--terms/remaining-checks.sh`, SHA-256 `3bcc0e7df20f26de7ac28a0690af6a56e8258714a8205d55f4285b1dc353f615`. It installs both lockfiles and the frozen scientific-helper environment in the fresh source snapshot, then executes the unmodified scripts/check suffix from `GAID: distribution checks` to its end. No passed backend/frontend test stage is replayed for the registry-only fix.
 
 ### Screenshot evidence
 
@@ -314,7 +318,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. Run the distribution stage and all remaining scripts/check stages after the owner-registry fix; the passed backend/frontend suites need no repeat for this metadata-only change.
+1. On job-6 completion, inspect the suffix log/exit. Job 5 preserves the successful backend/frontend prefix; job 6 runs distribution and every remaining original scripts/check stage.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
 - Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
@@ -347,6 +351,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T133449.058175Z/receipt.json
   - disposition: {"evidence":[],"reason":"Fixed the observed API-path portability violation and reran the current source with revision-bound draft consent.","recorded":"2026-10-20T13:43:06Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/log"],"reason":"Backend/frontend prefix passed; owner registry metadata is fixed and job 6 reruns the failed distribution stage plus every remaining scripts/check stage.","recorded":"2026-10-20T13:51:37Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135119.189133Z/receipt.json","state":"superseded"}
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135119.189133Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
