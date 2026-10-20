@@ -593,6 +593,8 @@ export interface VisualOperation {
   draftRevision: number;
   model: string;
   keys: string[];
+  /** Researcher's revision request, preserved verbatim (up to 500 characters). */
+  instruction?: string;
   completed: string[];
   status: "running" | "complete" | "failed" | "interrupted";
   startedAt: string;
@@ -613,6 +615,10 @@ export interface VisualSourceInfo {
 
 export interface GenerateVisualsBody {
   opId: string;
+  /** Exact pictures to generate: cover, procedure node id, output:<outputId>; 1–6 unique keys. */
+  keys?: string[];
+  /** Revise the selected existing pictures with this request (up to 500 characters). */
+  instruction?: string;
   /** Optional step ids; eligible output ports reserve slots within the six-image shared cap. */
   steps?: string[];
 }

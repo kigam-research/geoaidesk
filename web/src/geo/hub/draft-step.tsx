@@ -21,8 +21,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
+import { openSettings } from "@/lib/settings-nav";
 
-import { MethodFlow, type StepVisual } from "./method-flow";
+import { MethodFlow, PictureControls, type StepVisual } from "./method-flow";
 import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
 
@@ -42,6 +43,7 @@ export function DraftStep({
   visuals,
   outputImages,
   visualAction,
+  cover,
 }: {
   /** Concept pictures through the OpenAI Codex subscription only (no fallback); explicit action only. */
   visualAction?: {
@@ -53,7 +55,7 @@ export function DraftStep({
     errorDetail: string | null;
     /** The last batch stopped at the subscription's usage limit. */
     usageLimit: boolean;
-    onMake: () => void;
+    onMake: (keys?: string[], instruction?: string) => void;
     /** The OpenAI Codex login is connected (null while unknown). */
     connected: boolean | null;
   };
@@ -62,6 +64,7 @@ export function DraftStep({
   /** Already registered: revision shown in the hub. */
   registered?: number | null;
   visuals?: Record<string, StepVisual>;
+  cover?: string | null;
   outputImages?: Record<string, StepVisual>;
   draft: MethodDraft;
   trialCount: number;
@@ -73,6 +76,10 @@ export function DraftStep({
   onShowIssues?: () => void;
 }) {
   const profile = draft.profile;
+  const pictureAction = visualAction ? {
+    disabled: visualAction.busy || visualAction.connected !== true,
+    onMake: visualAction.onMake,
+  } : undefined;
 
   return (
     <div className="grid h-full min-h-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -113,15 +120,12 @@ export function DraftStep({
             <h3 className="text-base font-semibold">{text("draft.flow")}</h3>
             {visualAction && (
               <div className="ml-auto flex flex-wrap items-center gap-2">
-                {visualAction.connected === false && (
-                  <span className="text-xs text-muted-foreground">{text("visuals.needLogin")}</span>
-                )}
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={visualAction.busy || visualAction.connected === false}
+                  disabled={visualAction.busy || visualAction.connected !== true}
                   title={text("visuals.note")}
-                  onClick={visualAction.onMake}
+                  onClick={() => visualAction.onMake()}
                 >
                   {visualAction.busy ? (
                     <LoaderCircleIcon data-icon="inline-start" className="animate-spin" />
@@ -139,6 +143,29 @@ export function DraftStep({
               </div>
             )}
           </div>
+          {visualAction && <section aria-label={text("visuals.title")} className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3">
+            <h4 className="text-sm font-semibold">{text("visuals.title")}</h4>
+            <p className="max-w-[640px] text-sm">{text("visuals.explanation")}</p>
+            <details className="text-sm">
+              <summary className="cursor-pointer text-primary">{text("visuals.how")}</summary>
+              <p className="mt-2 max-w-[640px] text-sm text-muted-foreground">{text("visuals.source.record")}</p>
+            </details>
+            {visualAction.connected !== true && <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm text-muted-foreground">{text(visualAction.connected === false ? "visuals.needLogin" : "visuals.checking")}</p>
+              <Button variant="outline" size="sm" onClick={() => openSettings({ tab: "providers" })}>{text("visuals.connect.action")}</Button>
+            </div>}
+            <details className="text-sm">
+              <summary className="cursor-pointer text-primary">{text("visuals.cover")}</summary>
+              <div className="mt-2 flex flex-col gap-2">
+                {cover && <figure className="flex flex-col gap-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={cover} alt="" className="max-h-40 w-full rounded-lg border object-contain" />
+                  <figcaption className="text-xs text-muted-foreground">{text("visuals.note")}</figcaption>
+                </figure>}
+                <PictureControls pictureKey="cover" label={text("visuals.cover")} hasPicture={Boolean(cover)} action={pictureAction} />
+              </div>
+            </details>
+          </section>}
           {visualAction?.error && !visualAction.busy && (
             <p
               role={visualAction.usageLimit ? "alert" : undefined}
@@ -153,7 +180,7 @@ export function DraftStep({
             </p>
           )}
           {visualAction && !visualAction.busy && <TechnicalDetail detail={visualAction.errorDetail} />}
-          <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} />
+          <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />
         </section>
 
         <LimitsCard profile={profile} />
