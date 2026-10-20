@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:46:15Z
+updated: 2026-10-20T13:51:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Full scripts/check recheck job 5 is running at f9e8125e94af; do not mark this unit complete yet.
+Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; the failed stage and remaining GAID checks will be rerun.
 
 ### Delivered result
 
@@ -99,7 +99,7 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 ### Verification and integration notes
 
 - Backend typecheck and frontend TypeScript check passed locally. Focused shared-hub integration: 12/12 passed, including rejection of skill-only registration, a non-installing exact-byte draft preview and preservation of registered origin identity.
-- Focused frontend review covered 138 tests; the final remaining copy expectation was corrected and the affected workspace suite passed 26/26 (`workspace-label-check.log`). Full scripts/check at code snapshot 0628e6032d76 (job 4) completed backend typecheck and 1,952 tests, with 8 skipped and one failure: the new helper used path.relative directly rather than the required apiRelative choke point. This is fixed in place; the Windows-conformance + shared-hub focused suites pass 32/32 and full recheck job 5 is running. The final import-label-only change has the focused suite and both validators; it changes no data or execution behavior.
+- Focused frontend review covered 138 tests; the final remaining copy expectation was corrected and the affected workspace suite passed 26/26 (`workspace-label-check.log`). Full scripts/check at code snapshot 0628e6032d76 (job 4) completed backend typecheck and 1,952 tests, with 8 skipped and one failure: the new helper used path.relative directly rather than the required apiRelative choke point. This is fixed in place; the Windows-conformance + shared-hub focused suites pass 32/32 and job 5 passed all 1,953 backend tests (8 skipped) and all 1,111 frontend tests. It then stopped at distribution.test.mjs because the newly declared gaid-workflow-model owner was absent from that test's explicit owner registry. The registry is now updated; no assertion or existing owner was removed. The final import-label-only change has the focused suite and both validators; it changes no data or execution behavior.
 - Copy validator: 0 errors, 61 warnings. UI guide checker: 0 errors, 89 pre-existing accepted debt entries. No UI debt was added. `git diff --check` passed.
 - Production UI built successfully in the isolated app job at 55a3b22c479c. Browser review used GAID_HOME under this unit's external work directory (a sanitized parent review-data copy), not ~/.geoaidesk. A newly created test project installed another researcher's registered Workflow through preview → consent → install. Confirmed `등록됨 · 1판`, title-based skill provenance, read-only instructions and GitHub-first import. No model/research execution was started. Browser console: 0 errors; 2 existing Radix missing-description warnings on dialogs. All observed task-path API requests succeeded.
 - UI rules followed: P1/P3/P4/P6 (one task, disclosures, contextual read-only view, researcher terms), B2/B3 (named row action), D3 (inline read-only instructions inside the existing settings dialog), S5 (preview readiness gates), G1/G2, W5, R1. Checked section 10 at 1440×900 and 1280×800: no page horizontal overflow or clipped primary action in the changed default states; file/prompt details stay folded initially. Legacy method-detail density is unchanged and the parent-owned composition screen supersedes it.
@@ -314,9 +314,10 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. On job-5 completion, inspect its final log/exit and fix any relevant blockers.
+1. Run the distribution stage and all remaining scripts/check stages after the owner-registry fix; the passed backend/frontend suites need no repeat for this metadata-only change.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
+- Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
 - Delayed job-1 exit notice was reread after the job-5 launch: job 1 had the same now-fixed portability failure (1,950 passed, 8 skipped). Its existing superseded disposition remains valid; do not restart it or replay the obsolete source.
 - Job 4 exposed the wire-format portability contract: even a slash-normalized local path.relative call is disallowed. Reused apiRelative instead; no test exemption or rule change.
 - Initial global replacement in test sources also changed identifiers; restored original tests and updated only displayed-copy assertions. Follow-up failures were stale partial strings. Confirmed actual locale values directly before the third focused run.
