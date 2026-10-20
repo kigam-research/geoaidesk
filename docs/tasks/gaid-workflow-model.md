@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:56:17Z
+updated: 2026-10-20T14:14:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -46,13 +46,11 @@ Outside check: no outside check (product/IA work).
   ~/data/geoaidesk/work/gaid-workflow-model/home, log ../app.log) still running for phase 2 screenshots; stop with
   `systemctl --user stop gaid-wfm-app`.
 ## Next steps
-1. When child `terms` finishes: `task complete gaid-workflow-model--terms`, then start children `views` and
-   `authoring` (prompts ready in ~/data/geoaidesk/work/gaid-workflow-model/prompts/{views,authoring}.md).
-2. Child `cli` (writer 5d1f02f4…, CLI export: Pi/Claude Code/Codex layouts verified with real CLIs) is running;
-   `task complete` it when it finishes.
-3. After all children: integrate, mount CliExportButton if the views child left a slot, update AGENTS.md overview
-   (terms items below + Workflow 지침/chat block/gaid-workflow/v1), run scripts/check, browser-check the chat start in
-   the isolated app, finish the report (phase-2 results section), task finish.
+1. Children running: `cli` (5d1f02f4…; full check passed once, rerunning with isolated env), `views` (ba3b4f2b…),
+   `authoring` (7bf8b4c2…). `task complete` each when it finishes (remove scripts/check caches if close is pending).
+2. After all children: integrate, mount CliExportButton if the views child left a slot, update AGENTS.md overview
+   (terms items + Workflow 지침/chat block/gaid-workflow/v1/CLI export), run scripts/check, browser-check the chat
+   start in the isolated app, finish the report (phase-2 results section), task finish.
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-20 user (verbatim): "모두 권장하는 방식으로 진행해도 좋다. skill_hub는 legacy이므로 계획에 포함하지 말아야 한다. GAID 허브에서 스킬도 추후에 관리해야한다. 그리고 워크플로우에서 스킬을 사용하는 것은 어떻게 사용하는지도 설계되어야 하며, BYOK의 워크플로우는 지침이 GAID 시스템에서 보이는데 GAID 허브의 워크플로우는 어떤 형태로 GAID 시스템의 에이전트 채팅에 반영되는지도 정의되어야 한다. 지침형태로 되는 것인지? 아니면 지금의 형태가 어떻게 구현되어 있는지도 구체화되고 확정되어야 한다. 즉, GAID 허브에서도 최종 워크플로우 형태가 어떤 것인지 보여야 한다는 것이다. 현재는 워크플로우가 어떤 흐름으로 진행되는지 설명만 있을 뿐 에이전트 채팅(CLAUDE, CODEX 채팅 같은 형태), CLI 환경에서 어떻게 적용되는지가 불분명하다."
@@ -74,6 +72,8 @@ Outside check: no outside check (product/IA work).
   HubEntryDetail.workflowDoc, gaid-workflow/v1 validation (skills[]/steps[]) and imported-skill exposure, TaskSetup
   start sends the <workflow> block without a pinned skill, chat renders it as WorkflowBlockCard. Tests: web
   contracts/workflow (9), server geo-workflow-doc + geo-methods + geo-workspace (37) pass; tsc both pass.
+- 2026-10-20: child `terms` completed and closed (integrated 5abac05; receipt
+  ~/data/geoaidesk/work/reports/gaid-workflow-model--terms-2c7c0a9aa14f.md).
 - Children (phase 2b): `cli` (CLI export, interface GET /geo/workflows/:id/cli-export, GET /geo/hub/entries/:id/cli-export,
   CliExportButton in web/src/geo/workflow/cli-export.tsx, namespace workflowCli); `views` (WorkflowView in
   web/src/geo/workflow/workflow-view.tsx mounted in hub entry, author draft, project detail, catalogue rows, hub
