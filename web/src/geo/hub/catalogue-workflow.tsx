@@ -19,6 +19,6 @@ export function CatalogueWorkflowScreen({ id, onBack }: { id: string; onBack: ()
   }, [id]);
   return <main className="min-h-0 flex-1 overflow-y-auto"><div className="mx-auto max-w-6xl space-y-4 px-6 py-4">
     <Button variant="ghost" size="sm" onClick={onBack}>{text("back.button")}</Button>
-    {doc ? <><h1 className="text-xl font-semibold">{localText(doc.title)}</h1>{doc.purpose && <p className="max-w-[640px] text-sm text-muted-foreground">{localText(doc.purpose)}</p>}<WorkflowView doc={doc} /></> : <p role={failed ? "alert" : "status"} className="text-sm">{text(failed ? "error" : "loading")}</p>}
+    {doc ? <><h1 className="text-xl font-semibold">{localText(doc.title)}</h1>{doc.purpose && <p className="max-w-[640px] text-sm text-muted-foreground">{localText(doc.purpose)}</p>}<WorkflowView doc={doc} loadSkillSource={(name) => sharedHub.catalogueSkillSource(id, name)} /></> : <p role={failed ? "alert" : "status"} className="text-sm">{text(failed ? "error" : "loading")}</p>}
   </div></main>;
 }

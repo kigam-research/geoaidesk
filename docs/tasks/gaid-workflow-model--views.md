@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:20:15Z
+updated: 2026-10-20T14:24:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -61,10 +61,11 @@ never ~/.geoaidesk). Tests for the view and each mount. Run scripts/check; remov
 Evidence in your task document's Current state, first and self-contained (screenshot paths + sha256).
 
 ## Current state
-Resumed in the printed worktree. Parent owns WorkflowDoc contract/render/runtime; this child owns view/mounts and read-only routes. No existing local edits.
+Resumed in the printed worktree. Parent owns WorkflowDoc contract/render/runtime; this child owns view/mounts and read-only routes. Shared WorkflowView is implemented at all six requested mounts; MethodFlow reads steps/choiceIds and keeps its picture/IO renderer. Registered skill source reads exact archive revision; catalogue and draft docs are read-only. Imported-skill source prefills the existing Settings install gate. Focused existing tests: 99 passed; new view/mount tests and inherited Workflow card tests: 18 passed; new server route tests: 3 passed. Backend typecheck passed. Parent changes integrated by task sync (b349ff0b); preliminary full check was stopped because subsequent test/source additions invalidated its tree. Final checks and browser evidence remain.
 ## Next steps
 1. Implement shared WorkflowView and MethodFlow document adapter; mount hub entry/draft, project detail, catalogue detail and setup summary.
-2. Add bounded read-only document/source endpoints and imported-skill install link, then focused tests, UI screenshots and scripts/check.
+2. Capture six mounted screens at both requested sizes in isolated copied GAID_HOME; run final scripts/check and record screenshot hashes.
+3. Add results/evidence to the parent report, remove build caches and finish.
 ## Failed approaches
 ## Notes and decisions
 - Sequential decisions: preserve MethodFlow picture/IO renderer; adapt its profile from WorkflowDoc steps/choiceIds. Shared WorkflowView owns the remaining sections and rendered text.

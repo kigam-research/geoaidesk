@@ -46,13 +46,13 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
       <ul className="mt-3 space-y-3">
         {doc.skills.map((skill) => {
           const installed = readiness?.skills.some((s) => s.runtimeName === skill.name && s.installed);
-          const readable = Boolean(loadSkillSource && skill.source === "bundled") || Boolean(projectId && installed);
+          const readable = Boolean(loadSkillSource && skill.source !== "imported") || Boolean(projectId && installed);
           return <li key={skill.name} className="space-y-1">
             <p className="font-medium">{localText(skill.title) || skill.name}</p>
             <p className="text-muted-foreground">{text(`source.${skill.source}`)}{skill.ref ? ` · ${skill.ref}` : ""}</p>
             {skill.purpose && <p>{localText(skill.purpose)}</p>}
             {readable && <Button variant="outline" size="sm" onClick={() => setReading(skill.name)}>{text("instructions.button")}</Button>}
-            {reading === skill.name && (skill.source === "bundled" && loadSkillSource
+            {reading === skill.name && (skill.source !== "imported" && loadSkillSource
               ? <RemoteSkillSource key={skill.name} name={skill.name} load={loadSkillSource} onBack={() => setReading(null)} />
               : projectId && <SkillInstructions key={skill.name} name={skill.name} scope="project" projectId={projectId} onBack={() => setReading(null)} />)}
           </li>;

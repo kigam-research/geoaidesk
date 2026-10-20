@@ -787,6 +787,12 @@
       "owner": "gaid-workflow-model--views",
       "status": "edited",
       "responsibility": "Project-scoped imported Workflow skill reference prefills the existing preview, acknowledgement and install flow"
+    },
+    {
+      "path": "server/test/geo-workflow-views.test.ts",
+      "owner": "gaid-workflow-model--views",
+      "status": "added",
+      "responsibility": "Read-only draft/catalogue documents and registered revision skill source integration tests"
     }
   ],
   "notTouched": [

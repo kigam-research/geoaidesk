@@ -4,7 +4,8 @@ import { gunzipSync } from "node:zlib";
 import { readTar } from "../tar.ts";
 import { catalogueWorkflowDoc } from "../workspace/workflows.ts";
 import { createHash } from "node:crypto";
-import { extname } from "node:path";
+import { extname, join } from "node:path";
+import { readFile, stat } from "node:fs/promises";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { AtlasTextInput, CheckResult, InstallBody } from "../../../../web/src/geo/contracts/authoring.ts";
 import type {
@@ -415,6 +416,16 @@ export async function registerSharedHubRoutes(
       const skill = files.find((f) => f.type === "file" && f.path === `${snapshot.package.slug}/SKILL.md`);
       if (!skill || skill.data.length > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 404);
       return { content: skill.data.toString("utf8") };
+    });
+    scope.get<{ Params: { id: string }; Querystring: { name?: string } }>("/geo/hub/catalogue/:id/skill-source", async (req) => {
+      if (!geoCatalogueActive()) throw new AuthoringError("기본 Workflow를 찾을 수 없습니다.", 404);
+      const catalogue = loadGeoCatalogue();
+      const workflow = catalogue.workflows.find((w) => w.id === req.params.id);
+      const skill = catalogue.index.skills.find((s) => workflow?.skillIds.includes(s.id) && s.runtimeName === req.query.name);
+      if (!skill || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skill.runtimeName)) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
+      const file = join(catalogue.skillsDir, skill.runtimeName, "SKILL.md");
+      if ((await stat(file)).size > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 413);
+      return { content: await readFile(file, "utf8") };
     });
     scope.get<{ Params: { id: string } }>("/geo/hub/catalogue/:id", async (req) => {
       const catalogue = geoCatalogueActive() ? loadGeoCatalogue() : null;

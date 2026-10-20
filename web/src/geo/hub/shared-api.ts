@@ -58,6 +58,7 @@ export const sharedHub = {
     if (q?.trim()) params.set("q", q.trim());
     return call<{ entries: HubEntry[] }>(`/entries${params.size ? `?${params}` : ""}`);
   },
+  catalogueSkillSource: (id: string, name: string) => call<{ content: string }>(`/catalogue/${encodeURIComponent(id)}/skill-source?name=${encodeURIComponent(name)}`),
   catalogue: (id: string) => call<{ doc: import("@/geo/contracts/workflow-doc").WorkflowDoc }>(`/catalogue/${encodeURIComponent(id)}`),
   skillSource: (id: string, revision: number, name: string) => call<{ content: string }>(`${eid(id)}/skill-source?revision=${revision}&name=${encodeURIComponent(name)}`),
   entry: (id: string) => call<HubEntryDetail>(eid(id)),
