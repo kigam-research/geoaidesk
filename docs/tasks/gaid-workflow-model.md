@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T15:26:03Z
+updated: 2026-10-20T15:29:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -32,33 +32,24 @@ Scope (same pattern as gaid-notebook-review):
 Outside check: no outside check (product/IA work).
 
 ## Current state
-- Phase 1 done (diagnosis and proposal, no code changes): report reports/2026-10-20-gaid-workflow-model/index.md
-  (6 screenshots from the isolated app). Waiting for the user's four decisions (Open items).
-- Findings: one hub entry is called 방법 / Workflow / 설치됨 스킬 depending on the screen; "Workflow" means three things
-  (326 BYOK prompt templates; 7 catalogue start forms; the start form inside a hub package). The procedure lives in the
-  skill (SKILL.md 8 steps) and separately in atlas.yaml procedure (7 nodes shown by the hub); geo-workflow/v1 has no
-  steps. Prompt, skills and files are not visible before start in hub or project. GitHub skill import already exists
-  (Settings → Skills, bundled `skills` CLI) but Workflows cannot reference such skills.
-- Recommendation: Workflow-centred model (hub unit = Workflow; skills = parts from catalogue / GitHub etc. / bundled);
-  phase 2 first does wording, one shared "Workflow 구성" view, skills-screen linkage and four defects, with no format
-  change; format extension (Workflow steps, external skill refs) decided separately with skill_hub.
-- Isolated app `gaid-wfm-app` (systemd user unit, ports 3110/18110, GAID_HOME
-  ~/data/geoaidesk/work/gaid-workflow-model/home, log ../app.log) still running for phase 2 screenshots; stop with
-  `systemctl --user stop gaid-wfm-app`.
+- Result (2026-10-21): GAID is Workflow-centred and a Workflow reaches the agent as one rendered 지침 document. Copy
+  uses Workflow / 스킬 / 저장한 시작 설정 / 판; the hub registers Workflows only; Settings → Skills imports from GitHub
+  and similar first and shows read-only SKILL.md. The 지침 (inputs, researcher settings, skills, steps, outputs,
+  limits) is the same text in the hub entry, author draft, project detail, catalogue rows, hub catalogue cards, start
+  settings summary, the chat's first message (composer card → transcript card, labels "Workflow · 제목") and the CLI
+  export (Pi, Claude Code; Codex not offered). Hub authoring writes gaid-workflow/v1 with steps[] as the one procedure;
+  older entries/catalogue Workflows show derived steps as 이전 형식; stored data unchanged. Imported skills count toward
+  readiness and are offered to the Workflow's chat.
+- Verified: real KIGAM Qwen chat in the isolated app — the agent read the Workflow's skill SKILL.md first, ran step 1
+  only, wrote a research note and reported two example-vs-file differences (report §3.0). Real authoring draft with
+  KIGAM Qwen passed first response (9 steps, 3 choices, 7 artifacts linked). Children's full scripts/check passed
+  (backend 1,965–1,977 / 8 skipped, frontend 1,120–1,133); after the final parent fixes focused tests pass (web 30,
+  server 22) and the full check runs in task finish. Not done: rollout to the review app (port 3000).
+- Report: reports/2026-10-20-gaid-workflow-model/index.md (result §3.0, design §3.11–3.15, screens §3.16, CLI §3.17).
+- Isolated app `gaid-wfm-app` (ports 3110/18110, GAID_HOME ~/data/geoaidesk/work/gaid-workflow-model/home) is stopped
+  before finish; restart recipe in report appendix A.
 ## Next steps
-Blocked: waiting for children `views` (ba3b4f2b…) and `authoring` (7bf8b4c2…) to finish their final checks; the parent
-branch stays at e9e076a (child `cli` integrated and closed) until then. Then
-`task complete` both (remove caches if close is pending) and publish. Views disposed its own jobs; views mounts
-CliExportButton in the hub entry and project Workflow detail.
-2. After all children: integrate, mount CliExportButton if the views child left a slot, update AGENTS.md overview
-   (terms items + Workflow 지침/chat block/gaid-workflow/v1/CLI export), run scripts/check, browser-check the chat
-   start in the isolated app, finish the report (phase-2 results section), task finish.
-   AGENTS.md items requested by children: authoring — new/revised hub drafts are gaid-workflow/v1, `steps[]` own the
-   procedure, atlas procedure nodes are derived from steps, SKILL.md headings are checked against steps (receipt item
-   `workflow`, warning), stored old files unchanged, an edit/re-register clone upgrades (registration normalizes the
-   selected draft and ignores a cached legacy package); views — WorkflowView mounts (hub entry, author draft, project
-   detail, catalogue rows, hub catalogue cards, TaskSetup summary), new read-only routes (routes/workflow-view.ts,
-   hub-shared catalogue doc and registered SKILL.md), imported-skill readiness with source prefill into the skills gate.
+1. Run task finish (full scripts/check on the integrated tree).
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-20 user (verbatim): "모두 권장하는 방식으로 진행해도 좋다. skill_hub는 legacy이므로 계획에 포함하지 말아야 한다. GAID 허브에서 스킬도 추후에 관리해야한다. 그리고 워크플로우에서 스킬을 사용하는 것은 어떻게 사용하는지도 설계되어야 하며, BYOK의 워크플로우는 지침이 GAID 시스템에서 보이는데 GAID 허브의 워크플로우는 어떤 형태로 GAID 시스템의 에이전트 채팅에 반영되는지도 정의되어야 한다. 지침형태로 되는 것인지? 아니면 지금의 형태가 어떻게 구현되어 있는지도 구체화되고 확정되어야 한다. 즉, GAID 허브에서도 최종 워크플로우 형태가 어떤 것인지 보여야 한다는 것이다. 현재는 워크플로우가 어떤 흐름으로 진행되는지 설명만 있을 뿐 에이전트 채팅(CLAUDE, CODEX 채팅 같은 형태), CLI 환경에서 어떻게 적용되는지가 불분명하다."
@@ -96,6 +87,8 @@ CliExportButton in the hub entry and project Workflow detail.
   first, then the parent's design implementation.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [대기] GAID 허브에서 스킬을 관리하는 기능 (사용자 2026-10-20: "GAID 허브에서 스킬도 추후에 관리해야한다") — 가) 별도 작업으로 설계 — 나) 지금처럼 Workflow만 등록 — 권장: 가) 사용자 요청 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
+- [부채] Codex CLI용 내보내기 미지원 — 가) Codex 사용자 정의 명령을 확인할 수 있을 때 추가 — 나) Pi·Claude Code만 유지 — 권장: 가) 확인 전에는 내놓지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-20-gaid-workflow-model#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
