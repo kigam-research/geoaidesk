@@ -7,6 +7,7 @@ import { cp } from "node:fs/promises";
 import { extname } from "node:path";
 import type { AuthoringProject, HubEntryLink, MethodDraft } from "../../../../web/src/geo/contracts/authoring.ts";
 import type { EditEntryResult } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import { structuredDraft } from "../authoring/workflow.ts";
 import { addSource } from "../authoring/sources.ts";
 import { AuthoringError, now, type AuthoringStore } from "../authoring/store.ts";
 import type { SharedHubStore, StoredEntry } from "./store.ts";
@@ -69,7 +70,7 @@ async function seedFromEntry(
     ...(original?.goal ? { goal: original.goal } : {}),
     target: snapshot.draft.workflow ? "workflow" : "skill",
   });
-  let draft: MethodDraft = structuredClone(snapshot.draft);
+  let draft: MethodDraft = structuredDraft(snapshot.draft);
   // A copy is another method: it needs its own name (method id), an edit keeps the entry's.
   if (link.mode === "copy") draft = renamed(draft, await freeSlug(store, authoring, draft.slug));
   if (original) {
@@ -154,6 +155,8 @@ function renamed(draft: MethodDraft, slug: string): MethodDraft {
   const out = structuredClone(draft);
   if (out.workflow) {
     if (out.workflow.id === draft.slug) out.workflow.id = slug;
+    for (const skill of out.workflow.skills ?? []) if (skill.name === draft.slug && skill.source === "bundled") skill.name = slug;
+    for (const step of out.workflow.steps ?? []) if (step.skill === draft.slug) step.skill = slug;
     out.workflow.skillIds = out.workflow.skillIds.map((id) => (id === from ? to : id));
     for (const a of out.workflow.expectedArtifacts ?? []) if (a.skill === from) a.skill = to;
   }

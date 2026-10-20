@@ -181,6 +181,12 @@ export const draftReply = {
   limitations: [{ kind: "condition", text: "unlabeled 셀은 음성이 아닙니다." }],
   instructions: "# PU nested CV 방법\n\n논문(S1 1쪽)의 절차를 따릅니다.",
   workflow: {
+    skills: [{ name: "pu-nested-cv-method", source: "bundled", role: "primary", purpose: "PU 평가를 실행합니다." }],
+    steps: [
+      { id: "prepare", title: "자료 준비", does: "격자 표를 확인합니다.", skill: "pu-nested-cv-method", read: "자료 준비", checks: ["양성 정의를 확인합니다."], choiceIds: ["label-def"], outputs: [] },
+      { id: "evaluate", title: "nested CV", does: "공간 block으로 평가합니다.", skill: "pu-nested-cv-method", read: "nested CV", checks: [], choiceIds: ["block-size"], outputs: [] },
+      { id: "report", title: "보고", does: "결과와 한계를 적습니다.", skill: "pu-nested-cv-method", read: "보고", checks: [], choiceIds: [], outputs: ["scores"] },
+    ],
     title: "PU 평가",
     description: "격자 자료로 PU 모델을 공간 평가합니다.",
     inputRoles: [{ id: "grid", label: "격자 표", formats: ["csv"], required: true }],

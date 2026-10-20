@@ -109,6 +109,7 @@ export function vocabularyText(v: Vocabulary): string {
     `environmentProfile (id: purpose; Python packages it installs): ${v.environments
       .map((e) => `${e.id}: ${e.purpose}; ${e.packages.join(", ") || "none"}`)
       .join(" | ")}`,
+    `catalogue skill ids (runtime name = final path segment): ${[...v.catalogueIds].sort().join(", ")}`,
     `existing catalogue skill names (slug must differ): ${[...v.catalogueNames].sort().join(", ")}`,
   ].join("\n");
 }
