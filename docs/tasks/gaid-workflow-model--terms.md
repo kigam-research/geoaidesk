@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:52:21Z
+updated: 2026-10-20T13:52:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; Job 6 stopped in the continuation wrapper before the distribution stage because the original step() helper was not included. The wrapper now includes the original helper and the original suffix; the corrected continuation is pending.
+Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; Job 6 stopped in the continuation wrapper before the distribution stage because the original step() helper was not included. The wrapper now includes the original helper and the original suffix; corrected continuation job 7 at 0b09c95fc8fa is running.
 
 ### Delivered result
 
@@ -318,7 +318,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. Launch the corrected continuation wrapper, then inspect its final log/exit. Job 5 preserves the successful backend/frontend prefix; the suffix covers distribution and every remaining original scripts/check stage.
+1. On job-7 completion, inspect the final suffix log/exit. Job 5 preserves the successful backend/frontend prefix; the suffix covers distribution and every remaining original scripts/check stage.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
 - Job 6 continuation wrapper installed dependencies but omitted scripts/check's local step() output helper, so it exited 127 before the first remaining stage. Added extraction of that original function alongside the original suffix; product code was unchanged.
@@ -354,6 +354,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/receipt.json
   - disposition: {"evidence":["/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T134251.972313Z/log"],"reason":"Backend/frontend prefix passed; owner registry metadata is fixed and job 6 reruns the failed distribution stage plus every remaining scripts/check stage.","recorded":"2026-10-20T13:51:37Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135119.189133Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135119.189133Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Corrected the continuation wrapper to include the original scripts/check step() helper; no product-code change.","recorded":"2026-10-20T13:52:50Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135230.391770Z/receipt.json","state":"superseded"}
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135230.391770Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
