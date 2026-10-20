@@ -609,6 +609,28 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect((await registerFrom(f, authoringProjectId, "다른 연구원")).statusCode).toBe(403);
   });
 
+  it("re-registers a linked legacy draft with a structured snapshot and document without rewriting the old draft", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    await f.store.mutate(f.projectId, (p) => {
+      const w = p.drafts[0].workflow!;
+      w.schemaVersion = "geo-workflow/v1";
+      delete w.skills;
+      delete w.steps;
+      for (const pkg of p.packages) pkg.manifest.workflows[0].schemaVersion = "geo-workflow/v1";
+    });
+    const before = JSON.stringify((await f.store.read(f.projectId)).drafts);
+    expect((await edit(f, entry.id, "김 연구원")).json()).toMatchObject({ authoringProjectId: f.projectId, created: false });
+    const next = await f.register();
+    expect(next.statusCode, next.body).toBe(201);
+    const record = await f.shared.read(entry.id);
+    expect(record.snapshots[2].package.manifest.workflows[0].schemaVersion).toBe("gaid-workflow/v1");
+    expect(record.snapshots[2].draft.workflow!.schemaVersion).toBe("gaid-workflow/v1");
+    const detail = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
+    expect(detail.workflowDoc?.kind).toBe("structured");
+    expect(JSON.stringify((await f.store.read(f.projectId)).drafts)).toBe(before);
+  });
+
   it("seeds legacy registered snapshots with derived structured steps and leaves the snapshot unchanged", async () => {
     const f = await setup();
     const entry = (await f.register()).json<HubEntry>();

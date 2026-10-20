@@ -14,6 +14,7 @@ import type {
 import { HUB_USER_HEADER } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
+import { structuredDraft } from "../authoring/workflow.ts";
 import { buildPackage } from "../authoring/package.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { safeRelative } from "../authoring/sources.ts";
@@ -175,13 +176,15 @@ export async function registerSharedHubRoutes(
         if (link?.mode === "edit" && !previous) throw new AuthoringError("고치던 등록 방법을 찾을 수 없습니다.", 404);
         const original = link?.mode === "copy" ? await store.find(link.entryId) : null;
         const prepared = await authoring.mutate(projectId, async (project) => {
-          const draft =
+          const selectedDraft =
             body.draftRevision === undefined
               ? project.drafts.at(-1)
               : project.drafts.find((d) => d.revision === body.draftRevision);
-          if (!draft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
+          if (!selectedDraft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
+          const draft = structuredDraft(selectedDraft);
           if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
-          let pkg = project.packages.find((p) => p.draftRevision === draft.revision);
+          let pkg = project.packages.find((p) => p.draftRevision === draft.revision &&
+            p.manifest.workflows.some((w) => w.id === draft.workflow!.id && w.schemaVersion === "gaid-workflow/v1"));
           if (!pkg) {
             const built = await buildPackage(project, draft, {
               store: authoring,

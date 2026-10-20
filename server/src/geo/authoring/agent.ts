@@ -851,7 +851,7 @@ export function validateDraft(
         };
       });
     if (!artifacts.length) errors.push("workflow.expectedArtifacts needs at least one artifact");
-    const prompt = str(w.prompt, 6000);
+    const prompt = str(w.prompt, 4000);
     const boundary = str(w.boundary, 1200);
     if (!str(w.title, 120) || !str(w.description, 1200) || !boundary)
       errors.push("workflow needs title, description and boundary");

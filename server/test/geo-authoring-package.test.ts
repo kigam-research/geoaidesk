@@ -175,6 +175,7 @@ describe("GAID hub packages", () => {
 
   it("builds a schema-valid, deterministic single-root package that GAID's reader verifies", async () => {
     const { store, projectId, project, draft, ctx } = await drafted(withCode, true);
+    draft.workflow!.prompt = { ko: "" };
     const first = await buildPackage(project, draft, ctx);
     const second = await buildPackage(project, draft, ctx);
     if (!("record" in first) || !("record" in second)) throw new Error(JSON.stringify(first));

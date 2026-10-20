@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:23:32Z
+updated: 2026-10-20T14:24:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bf8b4c2-896d-4828-b900-b59150cf411d","pid":2653212,"provider":"codex","session":"01a159a9-e310-73e2-bbba-edf004cd26d4","start":"39360728","token":"f286d62a1decc68fd25437f6fb6e4181f19bbb4b3f1d98bb2a8e554497f80ee7"}
 branch: task/gaid-workflow-model--authoring
 target: task/gaid-workflow-model
@@ -57,7 +57,7 @@ Isolated home copied from the parent trial home, excluding config.env/auth.json/
 
 Sequential decisions: use workflow.steps as the only procedure for new model output; derive atlas nodes at validation and packaging; upgrade legacy drafts in cloned edit/package views only. Shared authoring contract changes requested from parent.
 
-Owned files: server/src/geo/authoring/**, server/src/geo/hub-shared/edit.ts, server/test/geo-authoring*.test.ts and fixture, hub edit tests. No web screen changes. Work is tightly coupled; no readers needed. Integration order: model format/validation, package checks, legacy edit path, focused tests, isolated real run, scripts/check, remove build caches, task finish.
+Owned files: server/src/geo/authoring/**, server/src/geo/hub-shared/edit.ts, plus the registration-only normalization in hub-shared/routes.ts explicitly delegated by parent on 2026-10-20 (normalize snapshot before packaging; bypass a cached legacy package), server/test/geo-authoring*.test.ts and fixture, hub edit tests. No web screen changes. Work is tightly coupled; no readers needed. Integration order: model format/validation, package checks, legacy edit path, focused tests, isolated real run, scripts/check, remove build caches, task finish.
 ## Next steps
 1. Implement structured authoring and legacy draft upgrade; validate with focused tests then the real institute-model run.
 ## Failed approaches
