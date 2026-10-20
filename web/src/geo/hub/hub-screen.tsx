@@ -409,6 +409,8 @@ function HubProject({
   }, [answers, id]);
 
   const draft = project?.drafts.at(-1);
+  // Consent belongs to the exact draft revision that was previewed.
+  useEffect(() => { setConsent(false); }, [id, draft?.revision]);
   const showingDraft = Boolean(draft);
   useEffect(() => {
     if (!showingDraft) return;

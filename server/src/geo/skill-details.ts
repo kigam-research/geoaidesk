@@ -1,6 +1,7 @@
 /** Researcher-facing provenance and a bounded read-only file listing; no storage migration. */
 import fs from "node:fs";
 import path from "node:path";
+import { apiRelative } from "../sandbox-fs.ts";
 import { findSkillDir, type SkillRoot } from "../agent/skills.ts";
 import { readMethodFile } from "./methods/method-file.ts";
 import { originOfSource } from "./methods/package-origin.ts";
@@ -23,7 +24,7 @@ export function skillFileList(root: SkillRoot, name: string) {
       if (entry.isSymbolicLink() || [".git", "__pycache__"].includes(entry.name)) continue;
       const full = path.join(folder, entry.name);
       if (entry.isDirectory()) walk(full, depth + 1);
-      else if (entry.isFile()) files.push(path.relative(dir!, full).split(path.sep).join("/"));
+      else if (entry.isFile()) files.push(apiRelative(dir!, full));
     }
   };
   if (dir) walk(dir);
