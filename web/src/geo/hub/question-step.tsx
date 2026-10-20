@@ -176,7 +176,13 @@ export function QuestionStep({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {reviewing ? (
-          <ReviewPanel questions={questions} answers={answers} changed={new Set(changed.map((q) => q.id))} onEdit={go} />
+          <ReviewPanel
+            questions={questions}
+            answers={answers}
+            changed={new Set(changed.map((q) => q.id))}
+            revising={!needsDraft}
+            onEdit={go}
+          />
         ) : figures && figures(questions[index]).length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
             <FigurePanel key={`figure-${questions[index].id}`} figures={figures(questions[index])} />
@@ -405,18 +411,21 @@ function ReviewPanel({
   questions,
   answers,
   changed,
+  revising,
   onEdit,
 }: {
   questions: Question[];
   answers: Record<string, DraftAnswer>;
   changed: ReadonlySet<string>;
+  /** A draft exists: applying answers revises it. */
+  revising: boolean;
   onEdit: (index: number) => void;
 }) {
   return (
     <section className="flex flex-col gap-4 py-2">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold">{text("questions.reviewTitle")}</h2>
-        <p className="text-sm text-muted-foreground">{text("questions.reviewBody")}</p>
+        <p className="text-sm text-muted-foreground">{revising ? text("questions.reviewBodyRevise") : text("questions.reviewBody")}</p>
       </div>
       <ol className="flex flex-col divide-y rounded-xl border">
         {questions.map((q, i) => {

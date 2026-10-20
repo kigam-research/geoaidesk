@@ -23,6 +23,7 @@ import {
 import { geoText } from "@/geo/i18n";
 import { API_BASE } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
+import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
@@ -65,6 +66,17 @@ export function GaidHub({
   onOpenProject: (projectId: string) => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsRequest, setSettingsRequest] = useState<OpenSettingsRequest | null>(null);
+  // Deep links into Settings from hub screens (e.g. "connect the picture account" → Providers); the project list and
+  // workspace listeners are off while the hub is shown.
+  useEffect(
+    () =>
+      onOpenSettings((request) => {
+        setSettingsRequest(request);
+        setSettingsOpen(true);
+      }),
+    [],
+  );
   const { projects, setActive } = useProjects();
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
   const { resolvedTheme, setTheme } = useTheme();
@@ -74,7 +86,10 @@ export function GaidHub({
         variant="ghost"
         size="icon-sm"
         aria-label={appText("projects.open_settings")}
-        onClick={() => setSettingsOpen(true)}
+        onClick={() => {
+          setSettingsRequest(null);
+          setSettingsOpen(true);
+        }}
       >
         <SettingsIcon />
       </Button>
@@ -121,7 +136,9 @@ export function GaidHub({
           onOpenProject={onOpenProject}
         />
       )}
-      {settingsOpen && <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />}
+      {settingsOpen && (
+        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
+      )}
     </HubShell>
   );
 }
@@ -813,9 +830,9 @@ function HubProject({
           ) : null
         }
       />
-      <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
         {project.hubEntry && <EditingNotice link={project.hubEntry} />}
-        {body}
+        <div className="min-h-0 flex-1">{body}</div>
       </main>
       <RegisterDialog
         key={entryFolder ?? "folder"}
@@ -892,7 +909,7 @@ function HubProject({
 /** Which registered method this draft edits (next revision) or copies (separate entry naming the original). */
 function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"]> }) {
   return (
-    <p className="mx-auto mb-4 flex max-w-6xl items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+    <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
       <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
       {link.mode === "edit"
         ? text("editing.edit", { revision: link.revision, next: link.revision + 1 })
