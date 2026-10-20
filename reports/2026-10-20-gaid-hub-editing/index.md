@@ -4,10 +4,11 @@ date: 2026-10-20
 project: geoaidesk
 task: gaid-hub-editing
 headline: 등록한 방법을 새 판으로 고치거나 복사해 고칠 수 있고, 답한 질문을 다시 고를 수 있으며, 레시피·스킬을 GAID 허브에서 찾고 개념 그림을 한 장씩 다시 만들 수 있습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/p3-entry-edit.png
 supersedes:
+reviewed: 2026-10-20
 ---
 # GAID 허브 개선: 방법 고치기, 답 다시 고르기, 허브 연동, 개념 그림
 
