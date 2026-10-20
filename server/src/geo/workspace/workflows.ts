@@ -54,7 +54,7 @@ export function workflowSkills(paths: ProjectPaths, catalogue: GeoCatalogue, wor
     const entry = catalogue.index.skills.find((skill) => skill.id === id);
     const runtimeName = entry?.runtimeName ?? null;
     const state = runtimeName ? projectSkillState(paths, runtimeName) : { installed: false, enabled: false };
-    return { id, runtimeName, title: text(entry?.title), ...state };
+    return { id, runtimeName, title: text(entry?.title), ...state, source: "catalogue" as const };
   });
 }
 

@@ -65,6 +65,12 @@ function localized(value: unknown): LocalizedText | null {
   return typeof en === "string" && en.trim() ? { ko, en } : { ko };
 }
 
+function isEmptyText(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const { ko, en } = value as { ko?: unknown; en?: unknown };
+  return ko === "" && (en === undefined || en === "");
+}
+
 function list(value: unknown): unknown[] | null {
   return Array.isArray(value) ? value : null;
 }
@@ -109,7 +115,10 @@ function workflow(value: unknown, index: number, runtimeName: string, issues: Me
   if (raw.inputRoles !== undefined && list(raw.inputRoles)?.some((role) => !Array.isArray((role as { formats?: unknown }).formats))) {
     add("inputRoles", "every input role needs formats (taxonomy format ids)");
   }
+  // gaid-workflow/v1: `prompt` holds only the author's additional instructions, so it may be empty ({ko: ""}).
+  const emptyPrompt = raw.schemaVersion === "gaid-workflow/v1" && isEmptyText(raw.prompt);
   for (const field of ["description", "prompt", "boundary"] as const) {
+    if (field === "prompt" && emptyPrompt) continue;
     if (raw[field] !== undefined && !localized(raw[field])) add(field, `${field} must be {ko, en?} text`);
   }
   if (raw.schemaVersion !== undefined && raw.schemaVersion !== "geo-workflow/v1" && raw.schemaVersion !== "gaid-workflow/v1") {
