@@ -37,3 +37,18 @@ describe("Workflow start message", () => {
     expect(screen.getByText(/LAS 판과 단위를 확인합니다/)).toBeInTheDocument();
   });
 });
+
+describe("pending Workflow in the composer", () => {
+  it("shows the card with a remove action and keeps the sent message parseable with attached paths after it", async () => {
+    const { PendingWorkflowChip } = await import("./workflow-card");
+    const block = workflowStartMessage(doc, { log: "logs/A.LAS" }, {});
+    let removed = false;
+    render(<PendingWorkflowChip block={block} onRemove={() => { removed = true; }} />);
+    expect(screen.getByRole("button", { name: /Workflow · 검층 점검 · 2판/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Workflow 빼기" }));
+    expect(removed).toBe(true);
+    // chat-tab sends `${block}\n\n${typed text + attached paths + context}`.
+    const sent = `${block}\n\n북쪽만\nlogs/A.LAS`;
+    expect(parseWorkflowBlock(sent)).toMatchObject({ id: "well-qc", tail: "북쪽만\nlogs/A.LAS" });
+  });
+});

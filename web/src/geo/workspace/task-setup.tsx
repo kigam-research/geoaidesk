@@ -100,10 +100,11 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     try {
       // gaid-workflow-model: the first message is the Workflow 지침 in a <workflow> block; each step names its skill,
       // so no skill is pinned. A Workflow summary without a document (older server) keeps the previous draft.
-      let draft: string;
+      let draft = "";
+      let workflowBlock: string | undefined;
       let skills: { id: string; name: string; description: string }[] = [];
       if (workflow.doc) {
-        draft = workflowStartMessage(workflow.doc, bindings, values);
+        workflowBlock = workflowStartMessage(workflow.doc, bindings, values);
       } else {
         // /skills is the merged list the composer's picker uses, not /skills/all.
         const response = await request<SkillInfo[]>("/skills", projectId);
@@ -112,7 +113,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         if (skill) skills = [{ id: skill.id, name: skill.name, description: skill.description }];
         draft = taskDraft(workflow, bindings, values);
       }
-      const result = startGeoTask({ title: text(workflow.title), text: draft,
+      const result = startGeoTask({ title: text(workflow.title), text: draft, ...(workflowBlock ? { workflowBlock } : {}),
         attachedFiles: [...new Set(Object.values(bindings))], skills, geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
       if (result !== "opened") { setError({ message: t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`) }); return; }
       setInputs(initialInputs(workflow, files, {})); setChoices({}); setIndex(0); onOpenChange(false);

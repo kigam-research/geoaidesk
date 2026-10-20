@@ -255,6 +255,8 @@ export interface GeoStartTaskDetail {
   title: string;
   /** Composer draft for the new tab; never sent automatically. */
   text: string;
+  /** A Workflow start: the `<workflow>` block shown as a card above the composer and sent before its text. */
+  workflowBlock?: string;
   /** Sandbox paths attached to the draft. */
   attachedFiles: string[];
   /** Skills pinned to the draft (`/skills` rows). */

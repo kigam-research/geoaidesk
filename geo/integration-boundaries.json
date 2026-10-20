@@ -140,7 +140,7 @@
       "path": "web/src/components/chat-tab.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip; the composer shows a started Workflow as PendingWorkflowChip and sends its block before the typed text (attached paths and context follow, so the block stays parseable)"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -216,7 +216,7 @@
       "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send; gaid-hub-integration: the sanitizer also accepts method:<name>:<workflow> exposures"
+      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send; gaid-hub-integration: the sanitizer also accepts method:<name>:<workflow> exposures; gaid-workflow-model: ChatWorkspaceState.pendingWorkflow (a started Workflow's `<workflow>` block, persisted and sanitized)"
     },
     {
       "path": "server/src/api/sessions.ts",

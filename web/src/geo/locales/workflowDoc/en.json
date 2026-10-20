@@ -56,6 +56,8 @@
     "label": "Workflow · {title}",
     "labelRevision": "Workflow · {title} · revision {revision}",
     "expand": "Show instructions",
-    "collapse": "Hide instructions"
+    "collapse": "Hide instructions",
+    "remove": "Remove Workflow",
+    "pendingHint": "When you send, these Workflow instructions go first and what you type follows them."
   }
 }

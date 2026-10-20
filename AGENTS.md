@@ -33,9 +33,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
-- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills searches the shared GAID hub first, then previews the selected registered revision through the existing acknowledgement/install gate (origin `gaid-hub`). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
-- Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; producer contract skill_hub
-  `docs/specs/gaid-method-package.md` v1): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
+- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`; gaid-workflow-model): Settings → Skills adds skills from GitHub and similar sources first (upstream `skills` CLI: owner/repo, Git URL, local path) and no longer searches the shared hub (hub Workflows install from the hub or the Workflow panel). Every skill row has a read-only 지침 보기 (SKILL.md and file list, `server/src/geo/skill-details.ts`, `web/src/geo/skills/`); a skill installed from the hub shows its Workflow title and 판, never the storage path. Hub installs (shared entry, picker, draft trial) show one install preview (`web/src/geo/skill-hub/install-preview.tsx`) before consent, through the existing acknowledgement/install gate (origin `gaid-hub`; registered installs show 등록됨 + 판, drafts 초안). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; original producer contract skill_hub
+  `docs/specs/gaid-method-package.md` v1 — skill_hub is legacy since 2026-10-20 and GAID owns the format, see "Workflow model"): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
   레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
   `<site><authoring>packages/<owner>/<slug>/<revision>` (`skillHub.sites[].authoring`; extra sites from `GAID_SKILL_HUB_SITES`,
   http only on loopback) and the same install gate; staged origins live in `<agentDir>/skill-hub/packages/<sha>.origin.json`
@@ -49,13 +49,38 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Chats without a record keep upstream behaviour. `GET /geo/context[/preview]` reports the start-prompt budget
   (chars/4 estimate); the chip next to the context gauge is `web/src/geo/context/`. Tool schemas are ~19K tokens of
   a ~25K start prompt, so skill exposure alone cannot fit a 32K local context.
+- Workflow model (gaid-workflow-model, ADR `docs/adr/2026-10-20-workflow-runtime-form.md`, report
+  `reports/2026-10-20-gaid-workflow-model/`; user decisions 2026-10-20): GAID is Workflow-centred. Researcher-facing terms:
+  the hub unit and the Workflow panel row are "Workflow" (never 방법/패키지 in copy), catalogue Workflows "기본 Workflow",
+  upstream BYOK ones "일반 Workflow", 레시피 → "저장한 시작 설정", revisions "판"; skills are parts a Workflow uses (built-in,
+  imported from GitHub and similar, bundled with the Workflow; hub-managed skills later). The hub registers Workflows only
+  (Workflow-less drafts are refused). A Workflow reaches the agent as one rendered 지침 document:
+  `web/src/geo/contracts/workflow-doc.ts` (IO-free `WorkflowDoc` schema `gaid-workflow/v1`, `renderWorkflowDocument` for
+  `chat|preview|cli`, `<workflow id revision title>` block, `legacyWorkflowDoc`), wording in locale namespace `workflowDoc`,
+  server side `server/src/geo/workflow-doc.ts` (`workflowDocFor`: own `steps[]`, else steps derived from the primary skill's
+  procedure in catalogue details / package `atlas.yaml`, marked 이전 형식; stored data is never rewritten). `GeoWorkflowSummary.doc`
+  and `HubEntryDetail.workflowDoc` carry it. Starting a Workflow puts the `<workflow>` block (researcher's settings filled in)
+  into the new chat's composer with no pinned skill; the transcript renders it as `WorkflowBlockCard`
+  (`web/src/geo/workflow/`, seam in `chat-tab.tsx`). gaid-workflow/v1 Workflows add `skills[]` (`catalogue|bundled|imported`,
+  role, ref) and `steps[]` (`id, title, does, skill, read, checks, choiceIds, outputs`; validated in
+  `server/src/geo/methods/method-file.ts`; `prompt` = only the author's extra instructions, may be empty); imported skills
+  count toward readiness (missing → import prefilled with the recorded ref, never auto-fetched) and are offered to the
+  Workflow's chat. Hub authoring writes gaid-workflow/v1: `steps[]` own the procedure, atlas `procedure.nodes` are derived from
+  them, SKILL.md headings are checked against steps (receipt item `workflow`, warning); editing or re-registering an older
+  entry upgrades a clone. `web/src/geo/workflow/workflow-view.tsx` (namespace `workflowView`) shows the doc (steps, skills
+  with read-only SKILL.md, inputs, all conditions, outputs, limits, "AI agent가 받는 지침") on the hub entry, the author's
+  draft, the project Workflow detail, 기본 Workflow rows, hub catalogue cards (`GET /geo/hub/catalogue/:id`) and the start
+  settings summary (filled-in chat text); read-only routes in `server/src/geo/routes/workflow-view.ts`. "CLI에서 쓰기"
+  (`server/src/geo/cli-export.ts`, `GET /geo/workflows/:id/cli-export`, `GET /geo/hub/entries/:id/cli-export`,
+  `web/src/geo/workflow/cli-export.tsx`, namespace `workflowCli`) downloads the 지침 as a prompt/command file (`$ARGUMENTS`)
+  plus the skill folders for Pi and Claude Code (verified with the real CLIs); Codex is not offered until verified.
 - Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
   `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
   and row style; one-line rows, at most three badges, an optional row detail icon); a row opens `TaskSetup`, the Workflow
   start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`): one input file or analysis condition per step under a
   grouped step rail (입력 파일 → 분석 조건 → 요약), readiness blockers with their fix on step 1 and the summary, a summary with
-  Edit links and the one primary action; a recipe or method default opens at the summary. The start draft lists the
-  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" searches GAID hub recipes first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
+  Edit links and the one primary action; a recipe or method default opens at the summary. The start message is the
+  Workflow 지침 (see "Workflow model"), researcher's settings first and stated to take precedence. "허브에서 Workflow 가져오기" searches the GAID hub first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.

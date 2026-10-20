@@ -56,6 +56,8 @@
     "label": "Workflow · {title}",
     "labelRevision": "Workflow · {title} · {revision}판",
     "expand": "지침 펼치기",
-    "collapse": "지침 접기"
+    "collapse": "지침 접기",
+    "remove": "Workflow 빼기",
+    "pendingHint": "보내면 Workflow 지침이 먼저 가고, 입력창에 쓴 내용이 뒤에 붙습니다."
   }
 }
