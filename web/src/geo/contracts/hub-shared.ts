@@ -7,6 +7,7 @@
  * Identity: one shared server, researchers identified by the display name they enter once (header `X-GAID-User`,
  * URL-encoded UTF-8); no accounts yet. Server side: server/src/geo/hub-shared/ imports this IO-free file.
  */
+import type { WorkflowDoc } from "./workflow-doc";
 import type { DraftProfile, MethodText } from "./authoring";
 
 export const HUB_USER_HEADER = "X-GAID-User";
@@ -82,6 +83,8 @@ export interface HubEntryDetail {
   visuals: Record<string, { src: string; caption: string }>;
   outputImages: Record<string, { src: string; caption: string }>;
   workflowTitle: MethodText | null;
+  /** The Workflow 지침 the agent receives (gaid-workflow-model); null for an entry without a Workflow. */
+  workflowDoc: WorkflowDoc | null;
   comments: HubComment[];
 }
 

@@ -58,6 +58,9 @@ import hubEn from "./hub/en.json";
 // gaid-notebook-review: research notes
 import notesKo from "./notes/ko.json";
 import notesEn from "./notes/en.json";
+// gaid-workflow-model: the Workflow 지침 (rendered for the agent, the hub and the CLI)
+import workflowDocKo from "./workflowDoc/ko.json";
+import workflowDocEn from "./workflowDoc/en.json";
 
 export type Catalogue = Record<string, string>;
 
@@ -79,6 +82,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
   notes: pair(notesKo, notesEn),
+  workflowDoc: pair(workflowDocKo, workflowDocEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
   methods: pair(methodsKo, methodsEn),

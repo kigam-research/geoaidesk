@@ -1,4 +1,5 @@
 /** Institute-shared method registry. Display-name identity is intentionally not account authentication. */
+import { procedureSteps, workflowDocFor } from "../workflow-doc.ts";
 import { createHash } from "node:crypto";
 import { extname } from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
@@ -312,6 +313,13 @@ export async function registerSharedHubRoutes(
         visuals,
         outputImages,
         workflowTitle: snapshot.draft.workflow?.title ?? null,
+        workflowDoc: snapshot.draft.workflow
+          ? workflowDocFor(snapshot.draft.workflow as unknown as GeoWorkflow, {
+            revision: record.entry.latestRevision,
+            skills: [{ name: snapshot.draft.slug, source: "bundled" }],
+            procedure: procedureSteps(snapshot.draft.profile),
+          })
+          : null,
         comments: await store.comments(record.entry.id),
       };
     });

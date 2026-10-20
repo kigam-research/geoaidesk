@@ -1,6 +1,6 @@
 # ADR 2026-10-20: A Workflow reaches the agent as one rendered instruction document
 
-Status: proposed (gaid-workflow-model, awaiting user confirmation). Context: reports/2026-10-20-gaid-workflow-model §3.11–3.14.
+Status: accepted 2026-10-20 (user chose 가) 지침 문서, gaid-workflow-model). Context: reports/2026-10-20-gaid-workflow-model §3.11–3.14.
 
 ## Context
 
@@ -23,7 +23,7 @@ Current form (verified in code, 2026-10-20):
 - Upstream BYOK Workflows are a prompt template; the launch dialog shows the final prompt. Kady already expands
   `/skill:<name>` to `<skill …>` and `/<template>` to `<prompt-template …>` blocks rendered as chips.
 
-## Decision (proposed)
+## Decision
 
 1. **A Workflow's runtime form is one instruction document (Workflow 지침)**, rendered deterministically by GAID from the
    Workflow's structured parts: purpose; the researcher's settings (inputs and choices; unresolved ones to ask before the

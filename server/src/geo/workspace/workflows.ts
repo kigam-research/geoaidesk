@@ -23,6 +23,8 @@ import type { GeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow, LocalizedText } from "../catalogue-types.ts";
 import type { EnvironmentReadiness, GeoEnvironmentService } from "../environments.ts";
 import { extensionsFor } from "./formats.ts";
+import type { WorkflowDoc } from "../../../../web/src/geo/contracts/workflow-doc.ts";
+import { catalogueProcedure, workflowDocFor } from "../workflow-doc.ts";
 
 type RawRole = { id: string; label: LocalizedText; formats?: string[]; required?: boolean; requiredWhen?: LocalizedText };
 type RawChoice = { id: string; label: LocalizedText; why?: LocalizedText; options?: unknown[]; optionLabels?: Record<string, unknown>; requiredWhen?: LocalizedText };
@@ -105,7 +107,7 @@ function optionLabels(choice: RawChoice): Record<string, Localized> | null {
   return Object.keys(out).length ? out : null;
 }
 
-export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowReadiness): GeoWorkflowSummary {
+export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowReadiness, doc?: WorkflowDoc): GeoWorkflowSummary {
   const roles = (workflow.inputRoles ?? []) as RawRole[];
   const choices = (workflow.requiredScientificChoices ?? []) as RawChoice[];
   const artifacts = (workflow.expectedArtifacts ?? []) as RawArtifact[];
@@ -143,6 +145,7 @@ export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowRead
     boundary: text(workflow.boundary),
     exampleCaseIds: strings(workflow.exampleCaseIds),
     readiness,
+    ...(doc ? { doc } : {}),
   };
 }
 
@@ -171,6 +174,15 @@ export async function listWorkflows(
   return catalogue.workflows.map((workflow) => {
     const skills = workflowSkills(paths, catalogue, workflow);
     const environment = environmentState(catalogue, workflow.environmentProfile, probes.get(workflow.environmentProfile));
-    return summarizeWorkflow(workflow, readinessOf(workflow, skills, environment));
+    return summarizeWorkflow(workflow, readinessOf(workflow, skills, environment), catalogueWorkflowDoc(catalogue, workflow, skills));
+  });
+}
+
+/** The 지침 document of a catalogue Workflow: steps from its primary skill's catalogue procedure. */
+export function catalogueWorkflowDoc(catalogue: GeoCatalogue, workflow: GeoWorkflow, skills: WorkflowSkillState[]): WorkflowDoc {
+  return workflowDocFor(workflow, {
+    revision: null,
+    skills: skills.map((skill) => ({ name: skill.runtimeName ?? skill.id, title: skill.title, source: "catalogue" as const })),
+    procedure: workflow.skillIds[0] ? catalogueProcedure(catalogue, workflow.skillIds[0]) : null,
   });
 }

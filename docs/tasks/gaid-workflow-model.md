@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:39:39Z
+updated: 2026-10-20T13:54:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -63,6 +63,8 @@ Outside check: no outside check (product/IA work).
   later); "저장한 시작 설정" replaces 레시피; phase 2 = wording + one Workflow composition view + skills-screen linkage
   + defects, format change decided separately. skill_hub is legacy: no skill_hub work or contract alignment in the
   plan; GAID owns the Workflow format.
+- 2026-10-20 user chose (verbatim): "가) 지침 문서 (권장)" for the Workflow runtime form; ADR
+  docs/adr/2026-10-20-workflow-runtime-form.md accepted.
 - New design requirement: define (and show in hub and project) the final runtime form of a Workflow in the agent chat
   and in a CLI agent, and how a Workflow uses skills. Verified current form (2026-10-20): system prompt gets the
   `<available_skills>` index limited to the Workflow's skills (exposure); the start message is an unsent composer
@@ -76,7 +78,6 @@ Outside check: no outside check (product/IA work).
   first, then the parent's design implementation.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [결정] Workflow가 AI agent에게 가는 형태를 무엇으로 확정할까요? — 가) 지침 문서: 입력·조건·단계·사용 스킬·결과·한계로 GAID가 하나의 지침 문서를 만들고 허브·프로젝트·시작 설정·채팅 첫 메시지·CLI 파일이 모두 이 문서를 씀 — 나) 지금 형태 유지하고 보여 주기만 함 — 다) Workflow에 딸린 스킬의 지침 전문을 첫 메시지로 보냄 — 권장: 가) 허브에서 본 글이 곧 AI agent가 받는 글이 되고 CLI에서도 같은 파일을 씀 — 막힌 일: 2단계 (2)–(5) — 근거: reports/2026-10-20-gaid-workflow-model#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;

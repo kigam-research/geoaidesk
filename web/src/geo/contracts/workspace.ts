@@ -9,6 +9,8 @@
  * `{ko, en?}` and the UI picks the locale.
  */
 
+import type { WorkflowDoc } from "./workflow-doc";
+
 export interface Localized {
   ko: string;
   en?: string;
@@ -104,6 +106,8 @@ export interface GeoWorkflowSummary {
   boundary: Localized | null;
   exampleCaseIds: string[];
   readiness: WorkflowReadiness;
+  /** The Workflow 지침 the agent receives (gaid-workflow-model; render with renderWorkflowDocument). */
+  doc?: WorkflowDoc;
 }
 
 export interface GeoWorkflowsResponse {

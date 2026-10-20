@@ -112,7 +112,61 @@ function workflow(value: unknown, index: number, runtimeName: string, issues: Me
   for (const field of ["description", "prompt", "boundary"] as const) {
     if (raw[field] !== undefined && !localized(raw[field])) add(field, `${field} must be {ko, en?} text`);
   }
+  if (raw.schemaVersion !== undefined && raw.schemaVersion !== "geo-workflow/v1" && raw.schemaVersion !== "gaid-workflow/v1") {
+    add("schemaVersion", "schemaVersion must be geo-workflow/v1 or gaid-workflow/v1");
+  }
+  if (raw.schemaVersion === "gaid-workflow/v1") gaidWorkflowParts(raw, runtimeName, add);
   return issues.length === before ? (raw as unknown as GeoWorkflow) : null;
+}
+
+const SKILL_SOURCES = ["catalogue", "bundled", "imported"];
+const MAX_STEPS = 30;
+
+/**
+ * gaid-workflow/v1 additions (ADR docs/adr/2026-10-20-workflow-runtime-form.md): `skills[]` names every skill the
+ * Workflow uses with its source; `steps[]` is the procedure the 지침 document lists. A step's skill must be one of
+ * `skills`, its `choiceIds` choices and its `outputs` expected artifacts of this Workflow.
+ */
+function gaidWorkflowParts(raw: Record<string, unknown>, runtimeName: string, add: (field: string, message: string) => void): void {
+  const names = new Set<string>();
+  const skills = raw.skills === undefined ? [] : list(raw.skills);
+  if (!skills || skills.length > MAX_LIST) add("skills", `skills must be a list of at most ${MAX_LIST}`);
+  else skills.forEach((value, n) => {
+    const skill = value as Record<string, unknown> | null;
+    if (!skill || typeof skill.name !== "string" || !SLUG.test(skill.name)) return add(`skills[${n}].name`, "name must be a skill folder name");
+    if (!SKILL_SOURCES.includes(skill.source as string)) add(`skills[${n}].source`, `source must be one of ${SKILL_SOURCES.join("|")}`);
+    if (skill.source === "bundled" && skill.name !== runtimeName) add(`skills[${n}].name`, `a bundled skill must be this package's skill (${runtimeName})`);
+    if (skill.role !== "primary" && skill.role !== "supporting") add(`skills[${n}].role`, "role must be primary|supporting");
+    if (skill.ref !== undefined && (typeof skill.ref !== "string" || skill.ref.length > 500)) add(`skills[${n}].ref`, "ref must be text");
+    for (const field of ["purpose", "title"] as const) {
+      if (skill[field] !== undefined && !localized(skill[field])) add(`skills[${n}].${field}`, `${field} must be {ko, en?} text`);
+    }
+    if (names.has(skill.name)) add(`skills[${n}].name`, "skill names must be unique");
+    names.add(skill.name);
+  });
+  const ids = (field: string) => new Set((list(raw[field]) ?? []).map((row) => (row as { id?: unknown })?.id).filter((id): id is string => typeof id === "string"));
+  const choiceIds = ids("requiredScientificChoices");
+  const outputIds = ids("expectedArtifacts");
+  const steps = list(raw.steps);
+  if (!steps || steps.length === 0 || steps.length > MAX_STEPS) return add("steps", `steps must be a list of 1-${MAX_STEPS}`);
+  const stepIds = new Set<string>();
+  steps.forEach((value, n) => {
+    const step = value as Record<string, unknown> | null;
+    const at = `steps[${n}]`;
+    if (!step || typeof step.id !== "string" || !SLUG.test(step.id)) return add(`${at}.id`, "id must be a slug");
+    if (stepIds.has(step.id)) add(`${at}.id`, "step ids must be unique");
+    stepIds.add(step.id);
+    if (!localized(step.title)) add(`${at}.title`, "title must be {ko, en?} text");
+    if (!localized(step.does)) add(`${at}.does`, "does must be {ko, en?} text");
+    if (step.read !== undefined && step.read !== null && !localized(step.read)) add(`${at}.read`, "read must be {ko, en?} text");
+    if (step.skill !== undefined && step.skill !== null && (typeof step.skill !== "string" || !names.has(step.skill))) add(`${at}.skill`, "skill must be one of skills[].name");
+    const checks = step.checks === undefined ? [] : list(step.checks);
+    if (!checks || checks.length > MAX_LIST || checks.some((check) => !localized(check))) add(`${at}.checks`, "checks must be a list of {ko, en?} text");
+    for (const [field, known] of [["choiceIds", choiceIds], ["outputs", outputIds]] as const) {
+      const refs = step[field] === undefined ? [] : list(step[field]);
+      if (!refs || refs.some((ref) => typeof ref !== "string" || !known.has(ref))) add(`${at}.${field}`, `${field} must name this Workflow's ${field === "choiceIds" ? "requiredScientificChoices" : "expectedArtifacts"}`);
+    }
+  });
 }
 
 export function parseMethodFile(value: unknown, runtimeName: string): { method: MethodFile | null; issues: MethodIssue[] } {
