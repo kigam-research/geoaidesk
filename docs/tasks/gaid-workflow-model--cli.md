@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:02:27Z
+updated: 2026-10-20T14:05:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -64,11 +64,23 @@ before finishing. Put the evidence (layouts verified per CLI with commands run a
 check results) in your task document's Current state, first and self-contained.
 
 ## Current state
-Implementation started. Shared renderer and source contracts read. Codegraph is unavailable for this exact worktree (not indexed); bounded native reads used. Dependencies installed from lockfiles. No application data or credentials read.
+Implemented both project Workflow and registered hub ZIP routes and CliExportButton(source). Export includes shared target=cli instructions ($ARGUMENTS), skill files and ko/en README; catalogue from pinned staging, bundled from installed/hub package, imported from project copy (missing noted). Only Pi and Claude are offered. Actual generated ZIPs unpacked in ~/data/geoaidesk/work/gaid-workflow-model--cli/: Pi 1.0.0 RPC get_commands found prompt gaid-workflow-probe and skill:gaid-probe (no model request); Claude Code 2.1.304 init listed command + skill, then error_max_budget_usd with minimum 0.000001 cap (no analysis). Codex 0.163.0 prompt behavior not verified, omitted.
+
+Targeted checks: server typecheck passed, server route tests 10 passed, web button tests 2 passed; copy validator 0 errors/61 existing warnings; UI validator 0 errors/89 existing debt. Korean 1440x900 and 1280x800 isolated-component screenshots verified, no overflow, 32 px targets, Escape closes/returns focus. Parent report §3.16 and appendix contain screenshots, exact commands, string ids and rule compliance; final integrated screen placement is parent-owned. Humanizer file-mode review applied to added Korean report prose.
+
+Full scripts/check runs as job-geoaidesk-gaid-workflow-model--cli-1 at implementation 1da2f082 (receipt in Running jobs), currently pending. Temporary UI harness job -2 stopped after screenshots, disposition cancelled. No build caches in writer workspace; remove job build caches after checks. No deployment performed.
+
 ## Next steps
-Implementation order: shared document resolver + bounded ZIP builder; route registration; verified CLI adapters; download popover and tests; real export discovery probes; full declared checks and screenshot evidence. Own only new CLI files and small routes/locales registrations. Parent owns screen placement and shared contract changes. No nested child units.
+1. Wait for recorded full-check job notification; inspect its terminal exit/log. Do not start a replacement job.
+2. Resolve any in-scope failures, update report/check evidence, remove build caches and task finish. Parent integrates with task complete.
+
 ## Failed approaches
+- Initial Claude probe with max-budget-usd 0 was rejected by CLI argument validation; positive 0.000001 worked.
+- Initial external export probe .ts loaded as CJS; renamed .mts (no source workaround).
+- First server test reused a mutable Workflow fixture across cases; beforeEach now clones it, all 10 pass.
+- Isolated Vite harness required bare React imports and process.env shim, both external-only.
 ## Notes and decisions
+- Sequential decisions: shared renderer/resolution → bounded ZIP → real CLI discovery → authenticated download UI/tests → full check and evidence. No nested writers/readers used; parent owns integrated placements.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -76,12 +88,15 @@ Implementation order: shared document resolver + bounded ZIP builder; route regi
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-20-gaid-workflow-model/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140225.089338Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140233.693652Z/receipt.json
+  - disposition: {"evidence":["reports/2026-10-20-gaid-workflow-model/figures/cli-export-1440.png and cli-export-1280.png"],"reason":"Temporary CLI export UI harness stopped after visual and keyboard checks completed","recorded":"2026-10-20T14:04:40Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

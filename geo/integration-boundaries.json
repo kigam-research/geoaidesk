@@ -775,6 +775,12 @@
       "owner": "gaid-notebook-review",
       "status": "edited",
       "responsibility": "gaid-note-decisions: optional send flag and target chat on the prefill handoff; prefillChat reports whether a chat tab took it (research-note answers)"
+    },
+    {
+      "path": "server/test/geo-cli-export.test.ts",
+      "owner": "gaid-workflow-model",
+      "status": "added",
+      "responsibility": "CLI ZIP route coverage for pinned catalogue, installed methods, immutable hub packages and bounded skill-file export"
     }
   ],
   "notTouched": [
