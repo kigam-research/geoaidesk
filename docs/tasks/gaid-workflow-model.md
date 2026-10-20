@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:30:24Z
+updated: 2026-10-20T13:39:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -50,7 +50,11 @@ Outside check: no outside check (product/IA work).
    §3.11–3.15). Then: shared IO-free renderer + gaid-workflow/v1 types (parent), chat start block, then delegate the
    composition views, authoring steps and CLI export as child units.
 2. Child gaid-workflow-model--terms (wording, skills-screen linkage, 3 defects) is running (checkpoint fcbac4509604;
-   owns existing locale namespaces, skills-panel, skill-hub install preview; do not edit them until complete); `task complete` it when it
+   owns existing locale namespaces, skills-panel, skill-hub install preview; do not edit them until complete);
+   At integration the parent updates AGENTS.md overview: Settings → Skills no longer searches the shared hub (GitHub-first
+   add flow, read-only SKILL.md/files, Workflow-title provenance); new hub drafts target a Workflow only; shared
+   registration refuses Workflow-less drafts; hub installs show one install preview. Child evidence: checkpoint 55a3b22,
+   18 PNGs in ~/data/geoaidesk/work/gaid-workflow-model--terms/playwright. `task complete` it when it
    finishes, before the parent's design implementation merges.
 ## Failed approaches
 ## Notes and decisions
