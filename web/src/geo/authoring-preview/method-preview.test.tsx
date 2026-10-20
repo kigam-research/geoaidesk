@@ -144,7 +144,7 @@ describe("draft and illustrative dialogs", () => {
       savedAt: "2026-10-15T08:00:00Z",
     });
     render(<PreviewTrialPane {...p} />);
-    fireEvent.change(screen.getByLabelText("방법 이름"), {
+    fireEvent.change(screen.getByLabelText("Workflow 이름"), {
       target: { value: "새 이름" },
     });
     expect(p.onEvent).toHaveBeenLastCalledWith({
@@ -152,7 +152,7 @@ describe("draft and illustrative dialogs", () => {
       field: "title",
       value: "새 이름",
     });
-    fireEvent.change(screen.getByLabelText("방법 설명"), {
+    fireEvent.change(screen.getByLabelText("Workflow 설명"), {
       target: { value: "새 설명" },
     });
     expect(p.onEvent).toHaveBeenLastCalledWith({

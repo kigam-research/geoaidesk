@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:54:51Z
+updated: 2026-10-20T14:20:00Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -46,16 +46,11 @@ Outside check: no outside check (product/IA work).
   ~/data/geoaidesk/work/gaid-workflow-model/home, log ../app.log) still running for phase 2 screenshots; stop with
   `systemctl --user stop gaid-wfm-app`.
 ## Next steps
-1. Get the user's confirmation of the runtime form (ADR docs/adr/2026-10-20-workflow-runtime-form.md, report
-   §3.11–3.15). Then: shared IO-free renderer + gaid-workflow/v1 types (parent), chat start block, then delegate the
-   composition views, authoring steps and CLI export as child units.
-2. Child gaid-workflow-model--terms (wording, skills-screen linkage, 3 defects) is running (checkpoint fcbac4509604;
-   owns existing locale namespaces, skills-panel, skill-hub install preview; do not edit them until complete);
-   At integration the parent updates AGENTS.md overview: Settings → Skills no longer searches the shared hub (GitHub-first
-   add flow, read-only SKILL.md/files, Workflow-title provenance); new hub drafts target a Workflow only; shared
-   registration refuses Workflow-less drafts; hub installs show one install preview. Child evidence: checkpoint 55a3b22,
-   18 PNGs in ~/data/geoaidesk/work/gaid-workflow-model--terms/playwright. `task complete` it when it
-   finishes, before the parent's design implementation merges.
+1. Children running: `cli` (5d1f02f4…; full check passed once, rerunning with isolated env), `views` (ba3b4f2b…),
+   `authoring` (7bf8b4c2…). `task complete` each when it finishes (remove scripts/check caches if close is pending).
+2. After all children: integrate, mount CliExportButton if the views child left a slot, update AGENTS.md overview
+   (terms items + Workflow 지침/chat block/gaid-workflow/v1/CLI export), run scripts/check, browser-check the chat
+   start in the isolated app, finish the report (phase-2 results section), task finish.
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-20 user (verbatim): "모두 권장하는 방식으로 진행해도 좋다. skill_hub는 legacy이므로 계획에 포함하지 말아야 한다. GAID 허브에서 스킬도 추후에 관리해야한다. 그리고 워크플로우에서 스킬을 사용하는 것은 어떻게 사용하는지도 설계되어야 하며, BYOK의 워크플로우는 지침이 GAID 시스템에서 보이는데 GAID 허브의 워크플로우는 어떤 형태로 GAID 시스템의 에이전트 채팅에 반영되는지도 정의되어야 한다. 지침형태로 되는 것인지? 아니면 지금의 형태가 어떻게 구현되어 있는지도 구체화되고 확정되어야 한다. 즉, GAID 허브에서도 최종 워크플로우 형태가 어떤 것인지 보여야 한다는 것이다. 현재는 워크플로우가 어떤 흐름으로 진행되는지 설명만 있을 뿐 에이전트 채팅(CLAUDE, CODEX 채팅 같은 형태), CLI 환경에서 어떻게 적용되는지가 불분명하다."
@@ -70,6 +65,21 @@ Outside check: no outside check (product/IA work).
   `<available_skills>` index limited to the Workflow's skills (exposure); the start message is an unsent composer
   draft = researcher settings + "Workflow 지시문" (one paragraph) + boundary; on send the composer appends "Make sure to
   use the skills: '<primary>'"; the procedure reaches the model only if it chooses to `read` SKILL.md.
+- Parent work done 2026-10-20 (published f306935): shared contract web/src/geo/contracts/workflow-doc.ts
+  (WorkflowDoc gaid-workflow/v1, renderWorkflowDocument chat|preview|cli, workflowBlock/parseWorkflowBlock,
+  legacyWorkflowDoc), locale namespace workflowDoc, server/src/geo/workflow-doc.ts (workflowDocFor, catalogue/package
+  procedure readers, workflowDocSay), GeoWorkflowSummary.doc for catalogue and installed Workflows,
+  HubEntryDetail.workflowDoc, gaid-workflow/v1 validation (skills[]/steps[]) and imported-skill exposure, TaskSetup
+  start sends the <workflow> block without a pinned skill, chat renders it as WorkflowBlockCard. Tests: web
+  contracts/workflow (9), server geo-workflow-doc + geo-methods + geo-workspace (37) pass; tsc both pass.
+- 2026-10-20: child `terms` completed and closed (integrated 5abac05; receipt
+  ~/data/geoaidesk/work/reports/gaid-workflow-model--terms-2c7c0a9aa14f.md).
+- Children (phase 2b): `cli` (CLI export, interface GET /geo/workflows/:id/cli-export, GET /geo/hub/entries/:id/cli-export,
+  CliExportButton in web/src/geo/workflow/cli-export.tsx, namespace workflowCli); `views` (WorkflowView in
+  web/src/geo/workflow/workflow-view.tsx mounted in hub entry, author draft, project detail, catalogue rows, hub
+  catalogue cards, TaskSetup summary; namespace workflowView; imported-skill readiness; decision marks from choiceIds);
+  `authoring` (authoring writes gaid-workflow/v1 steps[]/skills[], atlas procedure derived from steps, SKILL.md headings
+  check, hub editing seeds derived steps). Integration order: terms → cli/authoring → views → parent integration.
 - Orchestration (phase 2): sequential: (1) runtime-form design + ADR, confirmed by the user, (2) Workflow format /
   composition view / runtime implementation on it. Independent now: child `terms` = wording to the agreed terms
   (locales, geo/copy terminology, hub glossary, authoring prompt naming) + defects (registration copy over-promise,

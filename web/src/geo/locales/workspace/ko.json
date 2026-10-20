@@ -9,7 +9,7 @@
     "status": "서버 요청에 실패했습니다(HTTP {status})."
   },
   "catalogue": {
-    "title": "지구과학 Workflow",
+    "title": "기본 Workflow",
     "loading": "Geo 작업 목록을 읽는 중입니다.",
     "error": "Geo 작업 목록을 읽지 못했습니다. {detail}",
     "status": "Geo 카탈로그 상태: {state}. {detail}",
@@ -18,10 +18,10 @@
     "outputs": "예상 결과 파일: {outputs}",
     "boundary": "해석 한계: {boundary}",
     "empty": "등록된 Geo 작업이 없습니다.",
-    "category": "지구과학",
+    "category": "기본 Workflow",
     "search": "Workflow 검색",
-    "showOther": "다른 분야 Workflow 보기 ({count}개)",
-    "hideOther": "다른 분야 Workflow 접기"
+    "showOther": "일반 Workflow {count}개 보기",
+    "hideOther": "일반 Workflow 접기"
   },
   "readiness": {
     "ready": "준비됨",
@@ -35,9 +35,9 @@
   "environment": {
     "prepare": "환경 준비",
     "preparing": "환경 준비 중",
-    "progress": "프로젝트 환경의 패키지를 준비하고 import를 확인하는 중입니다.",
-    "done": "환경을 준비했습니다. 패키지를 불러올 수 있습니다.",
-    "incomplete": "환경 준비 후에도 불러오지 못한 패키지가 있습니다.",
+    "progress": "프로젝트 환경의 Python 라이브러리를 준비하고 import를 확인하는 중입니다.",
+    "done": "환경을 준비했습니다. Python 라이브러리를 불러올 수 있습니다.",
+    "incomplete": "환경 준비 후에도 불러오지 못한 Python 라이브러리가 있습니다.",
     "error": "환경을 준비하지 못했습니다. 다시 준비하세요."
   },
   "setup": {
@@ -83,7 +83,7 @@
       "free": "직접 입력",
       "placeholder": "값과 근거를 한 줄로 적으세요",
       "deferHint": "채팅에서 분석 전에 다시 묻습니다.",
-      "recipe": "레시피 값"
+      "recipe": "저장한 시작 설정 값"
     },
     "next": "다음 단계",
     "toSummary": "요약 보기",
@@ -132,24 +132,25 @@
     }
   },
   "recipe": {
-    "import": "레시피 가져오기",
-    "file": "Geo 작업 레시피 파일",
-    "checking": "레시피 확인 중",
-    "error": "레시피를 읽거나 확인하지 못했습니다. {detail}",
-    "issue": "{code, select, schema {레시피 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 레시피입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 Workflow입니다: {subject}} workflow-skill {Workflow에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {Workflow에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {레시피를 확인하지 못했습니다: {subject}}}",
-    "noWorkflow": "레시피의 작업을 현재 카탈로그에서 찾지 못했습니다.",
-    "description": "geo-start/v1 레시피 파일(.geo-start.json)을 확인한 뒤, 정한 제목과 카테고리로 현재 프로젝트의 Workflow 목록에 저장합니다. 레시피는 작업을 실행하지 않습니다.",
-    "choose": "레시피 파일 선택",
-    "title": "레시피 제목",
+    "import": "허브에서 Workflow 가져오기",
+    "file": "Geo 작업 저장한 시작 설정 파일",
+    "checking": "저장한 시작 설정 확인 중",
+    "error": "저장한 시작 설정을 읽거나 확인하지 못했습니다. {detail}",
+    "issue": "{code, select, schema {저장한 시작 설정 형식이 geo-start/v1과 맞지 않습니다: {subject}} catalogue-off {Geo 카탈로그가 꺼져 있습니다.} catalogue-version {다른 카탈로그 판의 저장한 시작 설정입니다: {subject}} unknown-workflow {현재 카탈로그에 없는 Workflow입니다: {subject}} workflow-skill {Workflow에 필요한 스킬이 빠졌습니다: {subject}} unknown-choice {Workflow에 없는 분석 조건입니다: {subject}} unknown-skill {카탈로그에 없는 스킬입니다: {subject}} unknown-example {선택한 스킬의 사례가 아닙니다: {subject}} choice-state {답한 조건이 미결정으로도 남아 있습니다: {subject}} other {저장한 시작 설정을 확인하지 못했습니다: {subject}}}",
+    "noWorkflow": "저장한 시작 설정의 작업을 현재 카탈로그에서 찾지 못했습니다.",
+    "description": "저장한 시작 설정 파일(.geo-start.json)을 확인한 뒤 정한 제목과 카테고리로 프로젝트에 저장합니다. 저장한 시작 설정은 작업을 실행하지 않습니다.",
+    "choose": "저장한 시작 설정 파일 선택",
+    "title": "저장한 시작 설정 제목",
     "category": "카테고리",
     "userCategories": "추가한 카테고리",
     "upstreamCategories": "K-Dense Workflow 카테고리",
     "newCategory": "새 카테고리 추가",
     "newCategoryName": "새 카테고리 이름",
     "openOnce": "저장하지 않고 열기",
-    "save": "레시피 저장",
-    "saving": "레시피 저장 중",
-    "close": "닫기"
+    "save": "저장한 시작 설정 저장",
+    "saving": "저장한 시작 설정 저장 중",
+    "close": "닫기",
+    "importFile": "시작 설정 가져오기"
   },
   "files": {
     "match": "일치한 입력: {role}",
@@ -179,15 +180,15 @@
     "readiness": "{state, select, ready {준비됨} missing-skills {스킬 필요} needs-environment {환경 준비 필요} unavailable {사용 불가} other {상태 미확인}}",
     "untested": "미시험",
     "userData": "사용자 자료 필요",
-    "recipe": "저장한 레시피"
+    "recipe": "저장한 시작 설정"
   },
   "saved": {
     "based": "기반 작업: {title}",
-    "cannotOpen": "현재 카탈로그로는 열 수 없는 레시피입니다.",
-    "error": "레시피를 저장하지 못했습니다. {detail}",
-    "delete": "레시피 삭제",
-    "confirmDelete": "레시피 삭제 확인",
-    "deleteError": "레시피를 삭제하지 못했습니다. {detail}"
+    "cannotOpen": "현재 카탈로그로는 열 수 없는 저장한 시작 설정입니다.",
+    "error": "저장한 시작 설정을 저장하지 못했습니다. {detail}",
+    "delete": "저장한 시작 설정 삭제",
+    "confirmDelete": "저장한 시작 설정 삭제 확인",
+    "deleteError": "저장한 시작 설정을 삭제하지 못했습니다. {detail}"
   },
   "run": {
     "elapsed": "{minutes}분 {seconds}초째 실행 중",

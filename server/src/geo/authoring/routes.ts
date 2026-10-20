@@ -16,7 +16,7 @@ import type {
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { startOperation } from "./agent.ts";
-import { installPackage } from "./install.ts";
+import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
 import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./package.ts";
 import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
@@ -378,6 +378,12 @@ export async function registerAuthoringRoutes(
       reply.header("Content-Type", "application/gzip");
       reply.header("Content-Disposition", `attachment; filename="${pkg.slug}-${pkg.revision}.tar.gz"`);
       return reply.send(await store.readFile(p.id, pkg.archive));
+    });
+    scope.post<{ Body: { projectId: string } }>("/geo/authoring/projects/:id/packages/:rev/preview", async (req) => {
+      const p = await store.read(id(req.params));
+      const pkg = p.packages.find((x) => x.revision === Number((req.params as { rev: string }).rev));
+      if (!pkg) throw new AuthoringError("설치할 Workflow를 찾을 수 없습니다.", 404);
+      return previewPackageBytes(await store.readFile(p.id, pkg.archive), pkg, req.body?.projectId);
     });
     scope.post<{ Body: InstallBody }>("/geo/authoring/projects/:id/packages/:rev/install", async (req, reply) => {
       const body = req.body ?? ({} as InstallBody);

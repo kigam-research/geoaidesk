@@ -3,6 +3,9 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { parseMethodFile } from "../src/geo/methods/method-file.ts";
+import { listLocalMethods, methodExposedSkills } from "../src/geo/methods/local-methods.ts";
+import { projectSkillRoot } from "../src/agent/skills.ts";
+import type { ProjectPaths } from "../src/projects.ts";
 import { catalogueProcedure, packageProcedure, workflowDocFor, workflowDocSay } from "../src/geo/workflow-doc.ts";
 import { renderWorkflowDocument } from "../../web/src/geo/contracts/workflow-doc.ts";
 import type { GeoCatalogue } from "../src/geo/catalogue.ts";
@@ -61,6 +64,13 @@ describe("gaid-workflow/v1 in gaid-method.json", () => {
     expect(foreign).toContain("workflows[0].skills[0].name");
   });
 
+  it("accepts an empty prompt only in gaid-workflow/v1 and renders no instructions section", () => {
+    expect(parseMethodFile(method({ ...structured, prompt: { ko: "" } }), "grid-priority").issues).toEqual([]);
+    expect(parseMethodFile(method({ ...base, prompt: { ko: "" } }), "grid-priority").issues.map((i) => i.subject)).toContain("workflows[0].prompt");
+    const doc = workflowDocFor({ ...structured, prompt: { ko: "" } } as unknown as GeoWorkflow, { skills: [] });
+    expect(doc.instructions).toBeNull();
+  });
+
   it("still accepts a geo-workflow/v1 Workflow without steps", () => {
     expect(parseMethodFile(method(base), "grid-priority").issues).toEqual([]);
   });
@@ -105,5 +115,30 @@ describe("workflowDocFor", () => {
     expect(catalogueProcedure(catalogue, "../kigam/well-qc")).toBeNull();
     expect(catalogueProcedure(catalogue, "kigam/missing")).toBeNull();
     expect(packageProcedure(path.join(root, "none"))).toBeNull();
+  });
+});
+
+describe("imported skills of an installed gaid-workflow/v1 Workflow", () => {
+  it("count toward readiness with their source and are offered to the Workflow's chat", async () => {
+    const sandbox = path.join(root, "sandbox");
+    const paths = { id: "p", sandbox, kadyDir: path.join(sandbox, ".kady"), skillsDir: path.join(sandbox, ".pi/skills"), provenanceDir: path.join(sandbox, ".kady/provenance") } as ProjectPaths;
+    const dir = path.join(paths.skillsDir, "grid-priority");
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, "SKILL.md"), "---\nname: grid-priority\ndescription: x\n---\n");
+    fs.writeFileSync(path.join(dir, "gaid-method.json"), JSON.stringify(method(structured)));
+    const service = { readiness: async () => ({ ready: true, distributions: [], imports: [], tools: [] }) };
+    const catalogue = { index: { skills: [] }, environments: { environments: [{ id: "geo-core", title: { ko: "기본" }, targets: ["project"], packages: [], tools: [] }] } } as unknown as GeoCatalogue;
+    const list = () => listLocalMethods(paths, catalogue, service as never, { roots: [projectSkillRoot(paths)], store: path.join(root, "store") });
+    let [wf] = (await list())[0].workflows;
+    expect(wf.readiness.skills.map((skill) => [skill.runtimeName, skill.source, skill.enabled, skill.ref ?? null])).toEqual([
+      ["grid-priority", "bundled", true, null], ["geo-tools", "imported", false, "example/geo-tools@v1"],
+    ]);
+    expect(wf.readiness.state).toBe("missing-skills");
+    expect(wf.doc?.kind).toBe("structured");
+    fs.mkdirSync(path.join(paths.skillsDir, "geo-tools"), { recursive: true });
+    fs.writeFileSync(path.join(paths.skillsDir, "geo-tools", "SKILL.md"), "---\nname: geo-tools\ndescription: y\n---\n");
+    [wf] = (await list())[0].workflows;
+    expect(wf.readiness.state).toBe("ready");
+    expect(methodExposedSkills(paths, "method:grid-priority:grid-priority", catalogue, ["support"])).toEqual(["geo-tools", "grid-priority", "support"]);
   });
 });

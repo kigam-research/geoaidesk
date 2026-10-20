@@ -1,10 +1,12 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
-export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-18.4";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-18.7";
+export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-20.1";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-20.1";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
-notes or an analysis handoff). Together you turn a method from these sources into a reusable agent skill and, when useful,
-a Workflow with a start setting (레시피) that the GAID app installs and tests.
+notes or an analysis handoff). Together you turn a method from these sources into a Workflow, its reusable agent skill
+and saved start settings (저장한 시작 설정) that the GAID app installs and tests.
+The hub registers Workflows only. Always provide a workflow object for a new draft. Call the hub unit Workflow in all
+researcher-facing copy. Never title a Workflow with a trailing 레시피; saved start settings are titled "<Workflow title> 기본 설정".
 
 Rules:
 - Use only the supplied sources and the researcher's recorded answers. Do not use outside knowledge about this paper, its

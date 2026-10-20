@@ -45,7 +45,7 @@ it("provides Workflow and recipe rows with at most three badges: trials, lifecyc
   expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial"]);
   render(<>{rows[0].badges}</>);
   // Each badge names its scope: the hub package stage, GAID trials in this project (novice review round 3).
-  expect(screen.getByText("허브 초안")).toHaveAttribute("title", "허브에 기록된 방법 패키지의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.");
+  expect(screen.getByText("허브 초안")).toHaveAttribute("title", "허브에 기록된 Workflow 파일 묶음의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.");
   expect(screen.queryByText("허브 공개됨")).not.toBeInTheDocument();
   expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument();
   expect(screen.getByText("미시험")).toHaveAttribute("title", "현재 프로젝트에서 해당 Workflow를 GAID로 시험한 기록이 없습니다.");
@@ -77,7 +77,7 @@ it("keeps an invalid method as a detail row and exposes its issues", async () =>
 });
 it("shows origin, revision, check receipt, unresolved hub questions, source DOI and trial observations", async () => {
   render(<MethodDetail method={method} projectId="p1" onClose={vi.fn()} onSetup={vi.fn()} />);
-  expect(screen.getByText("설치 출처: 파일 업로드")).toBeInTheDocument(); expect(screen.getByText("버전 0.2.0 · revision 2")).toBeInTheDocument();
+  expect(screen.getByText("설치 출처: 파일 업로드")).toBeInTheDocument(); expect(screen.getByText("2판")).toBeInTheDocument();
   expect(screen.getByText(/경고 1개/)).toBeInTheDocument(); expect(screen.getByText("manifest: 통과")).toBeInTheDocument(); expect(screen.getByText("허브에서 미해결인 질문")).toBeInTheDocument(); expect(screen.getByText("대조 자료는 미정입니다.")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Paper" })).toHaveAttribute("href", "https://doi.org/10.1234/paper");
   expect(await screen.findByText("도구 호출 3회 · 실패 1회")).toBeInTheDocument();
@@ -99,7 +99,7 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
   } finally { off(); }
 });
 it("provides detail actions alongside Workflow rows without starting a task", async () => {
-  render(<Catalogue />); fireEvent.click(await screen.findByRole("button", { name: "방법 상세 보기: 논문 기반 방법" }));
+  render(<Catalogue />); fireEvent.click(await screen.findByRole("button", { name: "Workflow 상세 보기: 논문 기반 방법" }));
   expect(screen.getByRole("dialog")).toHaveTextContent("허브 검사 기록");
   await screen.findByText("도구 호출 3회 · 실패 1회");
 });

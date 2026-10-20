@@ -29,7 +29,7 @@ const trialsBadge = (workflow: LocalMethodWorkflow) => workflow.trials.count ===
   ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
   : <span key="trials" className={pill} title={t("methods.badge.trialsTip")}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>;
 const stageBadge = (method: LocalMethodSummary, withCode: boolean) =>
-  <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
+  <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{method.origin.hubEntry ? t("methods.registered", { revision: method.origin.hubEntry.revision }) : t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
 
 /** Method details: the package badges. Each Workflow card states its readiness and record in its readiness line. */
 export function MethodBadges({ method }: { method: LocalMethodSummary }) {
@@ -159,7 +159,7 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
       <DialogDescription>{text(method.summary) || method.runtimeName}</DialogDescription>
       <div className="flex flex-wrap gap-1"><MethodBadges method={method} /></div>
       <p className="text-xs">{t("methods.origin", { origin: t(`methods.origin.${method.origin.kind === "skill-hub" ? "hub" : method.origin.kind}`) })}</p>
-      <p className="text-xs">{t("methods.revision", { version: method.version ?? t("methods.unknown"), revision: method.revision ?? t("methods.unknown") })}</p>
+      <p className="text-xs">{t("methods.revision", { revision: method.origin.hubEntry?.revision ?? method.revision ?? t("methods.unknown") })}</p>
       {page && <a className="text-xs text-primary underline" href={page} target="_blank" rel="noopener noreferrer">{t("methods.page")}</a>}
       {method.issues.length > 0 && <section role="alert"><h3 className="text-sm font-medium">{t("methods.issues")}</h3><ul className="list-disc pl-5 text-xs">{method.issues.map((issue, i) => <li key={i}>{issue.subject}: {issue.message}</li>)}</ul></section>}
       {method.hubChecks && <section className="space-y-1 text-xs">

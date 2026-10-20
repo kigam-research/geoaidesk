@@ -18,7 +18,7 @@ describe("concept pictures in a draft", () => {
     const settings = vi.fn();
     const off = onOpenSettings(settings);
     render(<DraftStep draft={draft()} trialCount={0} checkIssues={null} rail={null} visualAction={action(false)} />);
-    expect(screen.getByText(/방법을 설명하는 그림입니다/)).toBeTruthy();
+    expect(screen.getByText(/Workflow를 설명하는 그림입니다/)).toBeTruthy();
     expect(screen.getByText(/OpenAI Codex \(legacy\)로 로그인/)).toBeTruthy();
     expect((screen.getByRole("button", { name: "개념 그림 다시 만들기" }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: "제공사 설정 열기" }));

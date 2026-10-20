@@ -23,6 +23,7 @@ import type { MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { openSettings } from "@/lib/settings-nav";
 
+import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { MethodFlow, PictureControls, type StepVisual } from "./method-flow";
 import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
@@ -261,6 +262,7 @@ export function NewProject({ onCreate }: { onCreate: (name: string) => Promise<v
 }
 
 export function TrialCard({
+  authoringId, draftRevision,
   projects,
   projectId,
   onProject,
@@ -273,6 +275,7 @@ export function TrialCard({
   prepared,
   onCreateProject,
 }: {
+  authoringId: string; draftRevision: number;
   /** After installation: the input preparation that leads to the start settings. */
   prepared?: ReactNode;
   /** Make a new research project to try the draft in (selected afterwards). */
@@ -287,6 +290,7 @@ export function TrialCard({
   disabledReason?: string | null;
   installedIn?: string | null;
 }) {
+  const [previewReady, setPreviewReady] = useState(false);
   return (
     <section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2">
@@ -316,16 +320,18 @@ export function TrialCard({
         prepared
       ) : (
         <>
+          {projectId && !disabledReason && <InstallPreview projectId={projectId} authoringId={authoringId} revision={draftRevision} onReady={setPreviewReady} />}
           <label className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"
               className="mt-0.5 size-4 accent-primary"
               checked={consent}
+              disabled={!previewReady || Boolean(disabledReason)}
               onChange={(event) => onConsent(event.target.checked)}
             />
             {text("trial.consent")}
           </label>
-          <Button variant="outline" onClick={onInstall} disabled={!consent || installing || !projectId || Boolean(disabledReason)}>
+          <Button variant="outline" onClick={onInstall} disabled={!consent || !previewReady || installing || !projectId || Boolean(disabledReason)}>
             {installing ? text("trial.installing") : text("trial.install")}
           </Button>
           {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}

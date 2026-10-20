@@ -28,7 +28,7 @@ export function RecipeImport({ projectId, path, onSetup }: { projectId: string; 
     return res.text();
   };
   return <div className="min-w-0 space-y-2 text-xs">
-    <Button size="sm" variant="outline" disabled={busy} onClick={() => path ? void check(readOpenFile) : input.current?.click()}>{t(busy ? "workspace.recipe.checking" : "workspace.recipe.import")}</Button>
+    <Button size="sm" variant="outline" disabled={busy} onClick={() => path ? void check(readOpenFile) : input.current?.click()}>{t(busy ? "workspace.recipe.checking" : "workspace.recipe.importFile")}</Button>
     {!path && <input ref={input} className="sr-only" tabIndex={-1} type="file" accept=".geo-start.json,application/json" aria-label={t("workspace.recipe.file")} onChange={(event) => {
       const file = event.target.files?.[0];
       if (file) void check(() => file.text());

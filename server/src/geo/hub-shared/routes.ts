@@ -180,6 +180,7 @@ export async function registerSharedHubRoutes(
               ? project.drafts.at(-1)
               : project.drafts.find((d) => d.revision === body.draftRevision);
           if (!draft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
+          if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
           let pkg = project.packages.find((p) => p.draftRevision === draft.revision);
           if (!pkg) {
             const built = await buildPackage(project, draft, {
@@ -390,7 +391,7 @@ export async function registerSharedHubRoutes(
             await store.bytes(record.entry.id, `packages/${revision}.tar.gz`),
             snapshot.package,
             req.body ?? ({} as InstallBody),
-            options,
+            { ...options, hubEntry: { id: record.entry.id, revision } },
           );
           record.installs.push(result.install);
           await store.write(record);

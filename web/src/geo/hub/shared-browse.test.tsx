@@ -33,10 +33,10 @@ describe("Shared hub browse", () => {
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "없는 방법" } });
     expect(screen.queryByRole("button", { name: "지질 지도 확인 열기" })).toBeNull();
     expect(sharedHub.entries).not.toHaveBeenCalledWith("geo", "없는 방법");
-    await screen.findByText("조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.");
-    expect(screen.getByText("원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다.")).toBeTruthy();
+    await screen.findByText("조건에 맞는 Workflow가 없습니다. 검색어나 폴더를 바꾸세요.");
+    expect(screen.getByText("원소 기호(Ni)나 Workflow 이름(PU)으로도 찾을 수 있습니다.")).toBeTruthy();
     expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", "없는 방법");
-    fireEvent.click(screen.getByRole("button", { name: "전체 방법 보기" }));
+    fireEvent.click(screen.getByRole("button", { name: "전체 Workflow 보기" }));
     await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("all", ""));
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("");
   });
@@ -44,13 +44,13 @@ describe("Shared hub browse", () => {
   it("shows an empty registry and a recoverable error instead of treating an error as empty", async () => {
     vi.mocked(sharedHub.entries).mockRejectedValueOnce(new Error("offline"));
     render(<SharedBrowse onOpen={vi.fn()} />);
-    await screen.findByText("등록 방법을 읽지 못했습니다. 목록을 다시 읽으세요.");
-    expect(screen.queryByText("등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.")).toBeNull();
+    await screen.findByText("등록 Workflow를 읽지 못했습니다. 목록을 다시 읽으세요.");
+    expect(screen.queryByText("등록된 Workflow가 없습니다. 추천 Workflow를 살펴보세요.")).toBeNull();
     vi.mocked(sharedHub.entries).mockResolvedValue({ entries: [] });
     fireEvent.click(screen.getByRole("button", { name: "목록 다시 읽기" }));
-    await screen.findByText("등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.");
-    expect(screen.queryByText("원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다.")).toBeNull();
-    expect(screen.getByRole("button", { name: "추천 분석 방법 보기" })).toBeTruthy();
+    await screen.findByText("등록된 Workflow가 없습니다. 추천 Workflow를 살펴보세요.");
+    expect(screen.queryByText("원소 기호(Ni)나 Workflow 이름(PU)으로도 찾을 수 있습니다.")).toBeNull();
+    expect(screen.getByRole("button", { name: "추천 Workflow 보기" })).toBeTruthy();
   });
 
   it("ignores an older response arriving after a newer folder result", async () => {
@@ -66,12 +66,12 @@ describe("Shared hub browse", () => {
 
   it("defaults home to browse and keeps search when switching to personal drafts and back", async () => {
     render(<HubHome recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />);
-    expect(screen.getByRole("tab", { name: "허브에 등록된 방법" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "허브에 등록된 Workflow" }).getAttribute("aria-selected")).toBe("true");
     await loaded();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "지도" } });
-    fireEvent.mouseDown(screen.getByRole("tab", { name: /내가 만든 방법/ }), { button: 0, ctrlKey: false });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /내가 만든 Workflow/ }), { button: 0, ctrlKey: false });
     expect(screen.queryByRole("searchbox")).toBeNull();
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "허브에 등록된 방법" }), { button: 0, ctrlKey: false });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "허브에 등록된 Workflow" }), { button: 0, ctrlKey: false });
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("지도");
     await loaded();
   });

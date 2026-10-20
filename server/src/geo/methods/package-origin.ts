@@ -72,6 +72,7 @@ export function originOfSource(source: string | undefined, store = packageStore(
     record,
     origin: {
       kind: record.kind,
+      ...(record.hubEntry ? { hubEntry: record.hubEntry } : {}),
       packageSha256: sha,
       ...(record.siteId ? { siteId: record.siteId } : {}),
       ...(record.pageUrl ?? record.hub?.pageUrl ? { pageUrl: record.pageUrl ?? record.hub?.pageUrl } : {}),
