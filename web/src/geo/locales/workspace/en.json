@@ -149,7 +149,8 @@
     "openOnce": "Open without saving",
     "save": "Save saved start settings",
     "saving": "Saving saved start settings",
-    "close": "Close"
+    "close": "Close",
+    "importFile": "Import start settings"
   },
   "files": {
     "match": "Matching input: {role}",

@@ -89,7 +89,7 @@ export function RecipeAdd({ projectId, workflows, categories, onSaved, onOpen }:
     <Button size="sm" variant="outline" className="shrink-0" onClick={() => setOpen(true)}>{t("workspace.recipe.import")}</Button>
     <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) { reset(); setSource("hub"); } }}>
       <DialogContent className="max-h-[85dvh] overflow-y-auto break-words sm:max-w-xl">
-        <DialogTitle>{t("workspace.recipe.import")}</DialogTitle>
+        <DialogTitle>{t(source === "hub" ? "workspace.recipe.import" : "workspace.recipe.importFile")}</DialogTitle>
         <DialogDescription>{t(source === "hub" ? "hubPicker.description" : "workspace.recipe.description")}</DialogDescription>
         <div className="flex flex-wrap gap-2" role="group" aria-label={t("workspace.recipe.import")}>
           <Button variant="outline" size="sm" className="aria-pressed:border-primary aria-pressed:bg-muted" aria-pressed={source === "hub"} disabled={busy} onClick={() => setSource("hub")}>{t("hubPicker.browse.button")}</Button>

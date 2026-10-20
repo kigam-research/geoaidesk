@@ -149,7 +149,8 @@
     "openOnce": "저장하지 않고 열기",
     "save": "저장한 시작 설정 저장",
     "saving": "저장한 시작 설정 저장 중",
-    "close": "닫기"
+    "close": "닫기",
+    "importFile": "시작 설정 가져오기"
   },
   "files": {
     "match": "일치한 입력: {role}",

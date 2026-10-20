@@ -258,9 +258,9 @@ describe("file actions and recipes", () => {
   });
   it("reads the open recipe, shows issues, then prefills editable choices without starting", async () => {
     suggestions = []; render(<GeoFileActions path="recipe.geo-start.json" projectId="p1" />);
-    await userEvent.click(await screen.findByRole("button", { name: "허브에서 Workflow 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 저장한 시작 설정입니다");
+    await userEvent.click(await screen.findByRole("button", { name: "시작 설정 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 저장한 시작 설정입니다");
     recipeResult = { ok: true, issues: [], setup: { workflowId: "well-qc", choices: { depth: "MD", units: "m" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null } };
-    await userEvent.click(screen.getByRole("button", { name: "허브에서 Workflow 가져오기" })); const dialog = await screen.findByRole("dialog");
+    await userEvent.click(screen.getByRole("button", { name: "시작 설정 가져오기" })); const dialog = await screen.findByRole("dialog");
     // An unresolved choice stays open even with a value in the recipe.
     expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
     // The project's only fitting file is bound to the required input; nothing starts until the researcher does.
