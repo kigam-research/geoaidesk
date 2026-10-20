@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:02:11Z
+updated: 2026-10-20T14:02:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -81,6 +81,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-model--cli-20261020T140225.089338Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
