@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:51:40Z
+updated: 2026-10-20T13:52:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; job 6 at 4fc318d85b91 is rerunning the failed distribution stage and all remaining GAID checks.
+Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; Job 6 stopped in the continuation wrapper before the distribution stage because the original step() helper was not included. The wrapper now includes the original helper and the original suffix; the corrected continuation is pending.
 
 ### Delivered result
 
@@ -109,7 +109,7 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 
 ### Remaining-check execution
 
-- Suffix script: `/home/seongin3/data/geoaidesk/work/gaid-workflow-model--terms/remaining-checks.sh`, SHA-256 `3bcc0e7df20f26de7ac28a0690af6a56e8258714a8205d55f4285b1dc353f615`. It installs both lockfiles and the frozen scientific-helper environment in the fresh source snapshot, then executes the unmodified scripts/check suffix from `GAID: distribution checks` to its end. No passed backend/frontend test stage is replayed for the registry-only fix.
+- Suffix script: `/home/seongin3/data/geoaidesk/work/gaid-workflow-model--terms/remaining-checks.sh`, SHA-256 `6d46a3b0df55d0e2430438c1fd339bed555364225bf0eb07514954dbba32d793`. It installs both lockfiles and the frozen scientific-helper environment in the fresh source snapshot, then executes the original step() helper plus the unmodified scripts/check suffix from `GAID: distribution checks` to its end. No passed backend/frontend test stage is replayed for the registry-only fix.
 
 ### Screenshot evidence
 
@@ -318,9 +318,10 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. On job-6 completion, inspect the suffix log/exit. Job 5 preserves the successful backend/frontend prefix; job 6 runs distribution and every remaining original scripts/check stage.
+1. Launch the corrected continuation wrapper, then inspect its final log/exit. Job 5 preserves the successful backend/frontend prefix; the suffix covers distribution and every remaining original scripts/check stage.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
+- Job 6 continuation wrapper installed dependencies but omitted scripts/check's local step() output helper, so it exited 127 before the first remaining stage. Added extraction of that original function alongside the original suffix; product code was unchanged.
 - Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
 - Delayed job-1 exit notice was reread after the job-5 launch: job 1 had the same now-fixed portability failure (1,950 passed, 8 skipped). Its existing superseded disposition remains valid; do not restart it or replay the obsolete source.
 - Job 4 exposed the wire-format portability contract: even a slash-normalized local path.relative call is disallowed. Reused apiRelative instead; no test exemption or rule change.
