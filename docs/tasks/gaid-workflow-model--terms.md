@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:43:10Z
+updated: 2026-10-20T13:44:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -317,6 +317,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 1. On job-5 completion, inspect its final log/exit and fix any relevant blockers.
 2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
 ## Failed approaches
+- Delayed job-1 exit notice was reread after the job-5 launch: job 1 had the same now-fixed portability failure (1,950 passed, 8 skipped). Its existing superseded disposition remains valid; do not restart it or replay the obsolete source.
 - Job 4 exposed the wire-format portability contract: even a slash-normalized local path.relative call is disallowed. Reused apiRelative instead; no test exemption or rule change.
 - Initial global replacement in test sources also changed identifiers; restored original tests and updated only displayed-copy assertions. Follow-up failures were stale partial strings. Confirmed actual locale values directly before the third focused run.
 - First job invocation refused a dirty source before starting; saved the checkpoint and launched the first recorded check job. No stopped-before-start receipt existed.
