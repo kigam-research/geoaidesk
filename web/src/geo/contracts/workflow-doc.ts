@@ -26,6 +26,18 @@ export interface WorkflowDocSkill {
   purpose?: Localized | null;
 }
 
+/** A step as stored in a gaid-workflow/v1 Workflow (list fields optional); `WorkflowDocStep` is the filled form. */
+export interface GaidWorkflowStep {
+  id: string;
+  title: Localized;
+  does: Localized;
+  skill?: string | null;
+  read?: Localized | null;
+  checks?: Localized[];
+  choiceIds?: string[];
+  outputs?: string[];
+}
+
 export interface WorkflowDocStep {
   id: string;
   title: Localized;
