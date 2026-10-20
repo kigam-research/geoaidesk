@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:52:58Z
+updated: 2026-10-20T13:57:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,7 +83,7 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-Implemented and pushed to the child branch; parent integration is pending. No package format or existing stored data was migrated. Job 4 completed with one portability-conformance failure in the new file-list helper; the common apiRelative helper now replaces the local path conversion. Job 5 at f9e8125e94af passed backend/frontend suites and launcher checks, then found a missing declared owner in the distribution-test registry. Added gaid-workflow-model to the explicit owner list; Job 6 stopped in the continuation wrapper before the distribution stage because the original step() helper was not included. The wrapper now includes the original helper and the original suffix; corrected continuation job 7 at 0b09c95fc8fa is running.
+Ready for parent integration. Workflow terminology, skill-screen linkage, Workflow-only registration and all three install previews are implemented and pushed. Existing stored titles/data and gaid-method/v1 remain unchanged. All declared scripts/check stages passed across job 5's backend/frontend/launcher prefix and job 7's distribution-to-production suffix (exit 0). Backend: 1,953 passed, 8 skipped; frontend: 1,111 passed; GAID tests: 48 passed, 1 skipped. Copy/UI validators passed, both environment targets imported all required modules, and clean-start/stop/restart production smoke passed. Eighteen Korean screenshots at both required sizes and 171 exact bilingual copy changes are recorded below. Browser review and temporary app cleanup are complete; no deployment was performed. The parent owns the canonical report, composition-screen integration and final product completion.
 
 ### Delivered result
 
@@ -99,7 +99,8 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 ### Verification and integration notes
 
 - Backend typecheck and frontend TypeScript check passed locally. Focused shared-hub integration: 12/12 passed, including rejection of skill-only registration, a non-installing exact-byte draft preview and preservation of registered origin identity.
-- Focused frontend review covered 138 tests; the final remaining copy expectation was corrected and the affected workspace suite passed 26/26 (`workspace-label-check.log`). Full scripts/check at code snapshot 0628e6032d76 (job 4) completed backend typecheck and 1,952 tests, with 8 skipped and one failure: the new helper used path.relative directly rather than the required apiRelative choke point. This is fixed in place; the Windows-conformance + shared-hub focused suites pass 32/32 and job 5 passed all 1,953 backend tests (8 skipped) and all 1,111 frontend tests. It then stopped at distribution.test.mjs because the newly declared gaid-workflow-model owner was absent from that test's explicit owner registry. The registry is now updated; no assertion or existing owner was removed. The final import-label-only change has the focused suite and both validators; it changes no data or execution behavior.
+- Full scripts/check evidence is split at the metadata-only owner-registry fix: job 5 (`f9e8125e94af`) passed backend typecheck, 1,953 backend tests (8 skipped), 1,111 frontend tests and the development launcher check. The only later source change was the explicit distribution owner registry/seam metadata. Job 7 (`0b09c95fc8fa`) reran the failed distribution stage and every remaining original stage: 48 GAID tests passed (1 skipped), copy/UI checks passed, all 13 required modules imported in both helper and fresh-project environments, GAID launcher check passed, and clean start/stop/restart production smoke passed (exit 0). Job-7 receipt: `/home/seongin3/data/geoaidesk/runs/gaid-workflow-model--terms-20261020T135230.391770Z/receipt.json`. Full logs retain earlier failed attempts and their superseding dispositions. No passed backend/frontend suite was replayed for the registry-only fix.
+- Focused checks additionally passed: portability + shared-hub integration 32/32 and the final local-file import-label workspace suite 26/26.
 - Copy validator: 0 errors, 61 warnings. UI guide checker: 0 errors, 89 pre-existing accepted debt entries. No UI debt was added. `git diff --check` passed.
 - Production UI built successfully in the isolated app job at 55a3b22c479c. Browser review used GAID_HOME under this unit's external work directory (a sanitized parent review-data copy), not ~/.geoaidesk. A newly created test project installed another researcher's registered Workflow through preview → consent → install. Confirmed `등록됨 · 1판`, title-based skill provenance, read-only instructions and GitHub-first import. No model/research execution was started. Browser console: 0 errors; 2 existing Radix missing-description warnings on dialogs. All observed task-path API requests succeeded.
 - UI rules followed: P1/P3/P4/P6 (one task, disclosures, contextual read-only view, researcher terms), B2/B3 (named row action), D3 (inline read-only instructions inside the existing settings dialog), S5 (preview readiness gates), G1/G2, W5, R1. Checked section 10 at 1440×900 and 1280×800: no page horizontal overflow or clipped primary action in the changed default states; file/prompt details stay folded initially. Legacy method-detail density is unchanged and the parent-owned composition screen supersedes it.
@@ -318,8 +319,7 @@ Baseline: child activation 05fd2f9. Complete ko/en before → after values (incl
 
 </details>
 ## Next steps
-1. On job-7 completion, inspect the final suffix log/exit. Job 5 preserves the successful backend/frontend prefix; the suffix covers distribution and every remaining original scripts/check stage.
-2. Record the final check outcome, save the reviewed snapshot and run `task finish`; the parent integrates with `task complete`.
+1. Run `task finish` for the reviewed child snapshot. The parent then integrates with `task complete gaid-workflow-model--terms` and includes the recorded evidence in its single canonical report.
 ## Failed approaches
 - Job 6 continuation wrapper installed dependencies but omitted scripts/check's local step() output helper, so it exited 127 before the first remaining stage. Added extraction of that original function alongside the original suffix; product code was unchanged.
 - Job 5 passed backend/frontend but stopped at the distribution owner registry: integration-boundaries owner additions also require a corresponding allowed-owner entry in geo/tests/distribution.test.mjs. Added the requested owner rather than weakening the check.
