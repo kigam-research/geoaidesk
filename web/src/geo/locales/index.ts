@@ -61,6 +61,8 @@ import notesEn from "./notes/en.json";
 // gaid-workflow-model: the Workflow 지침 (rendered for the agent, the hub and the CLI)
 import workflowDocKo from "./workflowDoc/ko.json";
 import workflowDocEn from "./workflowDoc/en.json";
+import workflowCliKo from "./workflowCli/ko.json";
+import workflowCliEn from "./workflowCli/en.json";
 
 import workflowViewKo from "./workflowView/ko.json";
 import workflowViewEn from "./workflowView/en.json";
@@ -87,6 +89,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   notes: pair(notesKo, notesEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),
+  workflowCli: pair(workflowCliKo, workflowCliEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
   methods: pair(methodsKo, methodsEn),

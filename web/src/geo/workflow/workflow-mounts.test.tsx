@@ -57,4 +57,11 @@ it("mounts the registered entry document while preserving its profile and commen
   render(<SharedEntryScreen entryId="entry-one" projects={[]} onOpenSetup={vi.fn()} />);
   expect(await screen.findByText("원본 자료를 점검합니다.")).toBeInTheDocument();
   expect(screen.getByText("AI agent가 받는 지침 보기")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "CLI에서 쓰기" })).toBeInTheDocument();
+});
+
+it("offers CLI export in the installed project's detail by default", () => {
+  const method = { key: "grid", title: doc.title, summary: null, runtimeName: "grid", origin: { kind: "upload" }, lifecycle: "draft", issues: [], sources: [], workflows: [workflow], recipes: [] } as unknown as LocalMethodSummary;
+  render(<MethodDetail method={method} projectId="p1" onClose={vi.fn()} onSetup={vi.fn()} />);
+  expect(screen.getByRole("button", { name: "CLI에서 쓰기" })).toBeInTheDocument();
 });

@@ -19,6 +19,7 @@ import { HubUserDialog } from "./hub-dialogs";
 import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { InputPrep } from "./input-prep";
 import { NewProject } from "./draft-step";
+import { CliExportButton } from "@/geo/workflow/cli-export";
 import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
@@ -167,7 +168,7 @@ export function SharedEntryScreen({
         }}
         profile={detail.profile}
         workflowDoc={detail.workflowDoc}
-        flow={detail.workflowDoc ? <WorkflowView showStepsHeading={false} doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction?.(detail)} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
+        flow={detail.workflowDoc ? <WorkflowView showStepsHeading={false} doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction ? exportAction(detail) : <CliExportButton source={{ kind: "hub", entryId: e.id }} />} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
         onStar={() =>
           named.run(() => {
             void sharedHub

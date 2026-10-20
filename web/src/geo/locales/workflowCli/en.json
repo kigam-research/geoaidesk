@@ -1,0 +1,9 @@
+{
+  "export": { "button": "Use in a CLI" },
+  "target": {
+    "title": "Download CLI files",
+    "hint": "Get instructions, skills and a start guide as a ZIP. Choose the CLI you will use."
+  },
+  "pi": { "button": "Download for Pi" },
+  "claude": { "button": "Download for Claude Code" }
+}

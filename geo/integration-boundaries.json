@@ -766,15 +766,21 @@
     },
     {
       "path": "geo/tests/distribution.test.mjs",
-      "owner": "gaid-notebook-review",
+      "owner": "gaid-workflow-model",
       "status": "edited",
-      "responsibility": "Register the requested notebook-review owner for maintained research-note and work-record seams"
+      "responsibility": "Register the Workflow-model owner for maintained CLI export seams, retaining existing notebook-review and other owner registrations"
     },
     {
       "path": "web/src/lib/chat-prefill.ts",
       "owner": "gaid-notebook-review",
       "status": "edited",
       "responsibility": "gaid-note-decisions: optional send flag and target chat on the prefill handoff; prefillChat reports whether a chat tab took it (research-note answers)"
+    },
+    {
+      "path": "server/test/geo-cli-export.test.ts",
+      "owner": "gaid-workflow-model",
+      "status": "added",
+      "responsibility": "CLI ZIP route coverage for pinned catalogue, installed methods, immutable hub packages and bounded skill-file export"
     },
     {
       "path": "server/src/api/skills.ts, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, server/test/geo-hub-shared.test.ts",

@@ -10,6 +10,7 @@ import { geoLocale, t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
+import { CliExportButton } from "@/geo/workflow/cli-export";
 import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { Readiness } from "@/geo/workspace/readiness";
 import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
@@ -180,7 +181,7 @@ export function MethodDetail({ method, projectId, onClose, onSetup, exportAction
         <Readiness value={workflow.readiness} />
         {!workflow.doc && workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
         {!workflow.doc && workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
-        {workflow.doc ? <WorkflowView doc={workflow.doc} projectId={projectId} readiness={workflow.readiness} exportAction={exportAction?.(workflow)} /> : <WorkflowOutputs workflow={workflow} />}
+        {workflow.doc ? <WorkflowView doc={workflow.doc} projectId={projectId} readiness={workflow.readiness} exportAction={exportAction ? exportAction(workflow) : <CliExportButton source={{ kind: "project", workflowId: workflow.id, method: method.key }} />} /> : <WorkflowOutputs workflow={workflow} />}
         <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
       </div>)}</section>}
       {method.recipes.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.recipes")}</h3>{method.recipes.map((recipe) => {
