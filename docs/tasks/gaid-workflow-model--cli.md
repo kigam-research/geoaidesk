@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:05:45Z
+updated: 2026-10-20T14:06:33Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -68,7 +68,7 @@ Implemented both project Workflow and registered hub ZIP routes and CliExportBut
 
 Targeted checks: server typecheck passed, server route tests 10 passed, web button tests 2 passed; copy validator 0 errors/61 existing warnings; UI validator 0 errors/89 existing debt. Korean 1440x900 and 1280x800 isolated-component screenshots verified, no overflow, 32 px targets, Escape closes/returns focus. Parent report §3.16 and appendix contain screenshots, exact commands, string ids and rule compliance; final integrated screen placement is parent-owned. Humanizer file-mode review applied to added Korean report prose.
 
-Full scripts/check runs as job-geoaidesk-gaid-workflow-model--cli-1 at implementation 1da2f082 (receipt in Running jobs), currently pending. Temporary UI harness job -2 stopped after screenshots, disposition cancelled. No build caches in writer workspace; remove job build caches after checks. No deployment performed.
+Full scripts/check runs as job-geoaidesk-gaid-workflow-model--cli-1 at implementation 1da2f082 (receipt in Running jobs), currently pending. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. No build caches in writer workspace; remove job build caches after checks. No deployment performed.
 
 ## Next steps
 1. Wait for recorded full-check job notification; inspect its terminal exit/log. Do not start a replacement job.
