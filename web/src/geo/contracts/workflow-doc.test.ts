@@ -33,7 +33,8 @@ describe("renderWorkflowDocument", () => {
     expect(text.split("\n")[0]).toBe("# Workflow: 격자 탐사 우선순위 (1판)");
     expect(text).toContain("- 집계 격자 CSV: user_data/grid.csv");
     expect(text).toContain("- 순응 보정 alpha: 0.15");
-    expect(text).toContain("정하지 않은 조건: 계산 설정 규모");
+    // The sentences after the settings list start after a blank line, so Markdown does not join them to the last item.
+    expect(text).toContain("- 순응 보정 alpha: 0.15\n\n정하지 않은 조건: 계산 설정 규모");
     expect(text).toContain("- conformal-grid-priority (Workflow에 딸린 스킬, 주 스킬): PU 학습과 순응 보정 코드 1, 2단계에서 씁니다.");
     expect(text).toContain("2. 순응 보정·구역 분류 [연구자 결정: 순응 보정 alpha]: 구역을 나눕니다.");
     expect(text).toContain("   스킬: conformal-grid-priority (먼저 읽을 곳: 1단계)");

@@ -137,6 +137,8 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
       else if (settings) unresolved.push(p(choice.label));
       else lines.push(`- ${choiceAsk(choice, locale, say)}`);
     }
+    // A blank line ends the Markdown list, so these sentences do not join its last item.
+    lines.push("");
     if (settings) lines.push(say("settings.unresolved", { list: unresolved.length ? unresolved.join(", ") : say("settings.none") }));
     lines.push(say("settings.askBeforeStep"));
   }
@@ -153,7 +155,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
       const where = usedIn.length ? say("skill.usedIn", { steps: usedIn.join(", ") }) : "";
       lines.push(`- ${skill.name} (${parts.join(", ")})${what ? `: ${what}` : ""}${where ? ` ${where}` : ""}`);
     }
-    lines.push(say("skill.readRule"));
+    lines.push("", say("skill.readRule"));
   }
 
   // Steps.
