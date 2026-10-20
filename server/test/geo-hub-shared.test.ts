@@ -45,7 +45,7 @@ const PNG = Buffer.from(
 async function drafted(slug = draftReply.slug) {
   const f = await fixture();
   await runOperation(f.store, f.projectId, "analyze", "hub-analyze", deps(analysis));
-  const attempt = await runOperation(f.store, f.projectId, "draft", "hub-draft", deps({ ...draftReply, slug }));
+  const attempt = await runOperation(f.store, f.projectId, "draft", "hub-draft", deps({ ...draftReply, slug, workflow: { ...draftReply.workflow, skills: draftReply.workflow.skills.map((s) => ({ ...s, name: slug })), steps: draftReply.workflow.steps.map((s) => ({ ...s, skill: slug })) } }));
   expect(attempt.outcome).toMatch(/accepted|repaired/);
   return f;
 }
@@ -334,6 +334,8 @@ describe("shared GAID hub", () => {
     await f.store.mutate(second.id, (s) => {
       s.drafts = structuredClone(p.drafts);
       s.drafts[0].slug = "other-method";
+      for (const skill of s.drafts[0].workflow?.skills ?? []) if (skill.source === "bundled") skill.name = "other-method";
+      for (const step of s.drafts[0].workflow?.steps ?? []) if (step.skill === draftReply.slug) step.skill = "other-method";
       s.drafts[0].workflow!.skillIds = ["local:other-method"];
       s.drafts[0].workflow!.expectedArtifacts.forEach((a) => {
         a.skill = "local:other-method";
@@ -373,6 +375,8 @@ describe("shared GAID hub", () => {
     await f.store.mutate(second.id, (s) => {
       s.drafts = structuredClone(project.drafts);
       s.drafts[0].slug = "map-method";
+      for (const skill of s.drafts[0].workflow?.skills ?? []) if (skill.source === "bundled") skill.name = "map-method";
+      for (const step of s.drafts[0].workflow?.steps ?? []) if (step.skill === draftReply.slug) step.skill = "map-method";
       s.drafts[0].profile.title = "좌표 비교";
       s.drafts[0].profile.tagline = { ko: "독립적인 한 줄 설명", en: "Unique bilingual tagline" };
       s.drafts[0].description += " Ni exploration instructions.";
@@ -603,6 +607,32 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(detail.visuals.prepare.caption).toBe("입력 개념");
     // Another name cannot add revisions through the author's seeded draft.
     expect((await registerFrom(f, authoringProjectId, "다른 연구원")).statusCode).toBe(403);
+  });
+
+  it("seeds legacy registered snapshots with derived structured steps and leaves the snapshot unchanged", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    const record = await f.shared.read(entry.id);
+    const old = record.snapshots[1].draft.workflow!;
+    old.schemaVersion = "geo-workflow/v1";
+    delete old.skills;
+    delete old.steps;
+    for (const node of record.snapshots[1].draft.profile.procedure.nodes) delete node.decisionIds;
+    await f.shared.write(record);
+    const before = JSON.stringify((await f.shared.read(entry.id)).snapshots[1]);
+    await f.store.archive(f.projectId);
+    const opened = await edit(f, entry.id, "김 연구원");
+    expect(opened.statusCode, opened.body).toBe(201);
+    const seeded = await f.store.read(opened.json().authoringProjectId);
+    expect(seeded.drafts[0].workflow).toMatchObject({ schemaVersion: "gaid-workflow/v1", skills: [{ name: draftReply.slug, source: "bundled", role: "primary" }] });
+    expect(seeded.drafts[0].workflow!.steps).toHaveLength(3);
+    expect(seeded.drafts[0].workflow!.steps![0].choiceIds).toEqual(expect.arrayContaining(["label-def", "block-size"]));
+    expect(seeded.drafts[0].workflow!.steps![2].outputs).toEqual(["scores"]);
+    expect(JSON.stringify((await f.shared.read(entry.id)).snapshots[1])).toBe(before);
+    const next = await registerFrom(f, seeded.id, "김 연구원");
+    expect(next.statusCode, next.body).toBe(201);
+    const current = await f.shared.read(entry.id);
+    expect(current.snapshots[2].package.manifest.workflows[0].schemaVersion).toBe("gaid-workflow/v1");
   });
 
   it("gives another researcher one own copy, registered as a separate entry that names its original", async () => {

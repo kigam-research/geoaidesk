@@ -15,6 +15,7 @@ import type {
   OperationBody,
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
+import { structuredDraft } from "./workflow.ts";
 import { startOperation } from "./agent.ts";
 import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
@@ -50,7 +51,7 @@ export function editDraft(project: AuthoringProject, body: EditDraftBody): Metho
   if (!latest) throw new AuthoringError("먼저 방법 초안을 만들어 주세요.", 409);
   if (body.baseRevision !== latest.revision)
     throw new AuthoringError("다른 곳에서 초안이 바뀌었습니다. 최신 초안을 다시 불러와 주세요.", 409);
-  const next: MethodDraft = structuredClone(latest);
+  const next: MethodDraft = structuredDraft(latest);
   next.revision = latest.revision + 1;
   next.baseRevision = latest.revision;
   next.origin = "researcher";

@@ -37,6 +37,7 @@ export function lintProfile(
   taxonomy: Taxonomy,
   at: string,
   skillMd: { name: string; version: string; license: string },
+  workflowChoiceIds: string[] = [],
 ): LintFinding[] {
   const findings: LintFinding[] = [];
   const find = (level: LintFinding["level"], code: string, path: string, message: string) =>
@@ -90,7 +91,7 @@ export function lintProfile(
         find("error", "taxonomy-unknown", `${at}#inputs/${input.id}`, `분류에 없는 형식입니다: ${f}`);
   }
   const nodeIds = new Set(raw.procedure.nodes.map((n) => n.id));
-  const decisionIds = new Set((raw.decisions ?? []).map((d) => d.id));
+  const decisionIds = new Set([...(raw.decisions ?? []).map((d) => d.id), ...workflowChoiceIds]);
   const portIds = new Set([...(raw.inputs ?? []).map((i) => i.id), ...raw.outputs.map((o) => o.id)]);
   if (raw.procedure.nodes.length < 3 || raw.procedure.nodes.length > 12)
     find("error", "procedure-size", `${at}#procedure`, "단계는 3–12개여야 합니다");

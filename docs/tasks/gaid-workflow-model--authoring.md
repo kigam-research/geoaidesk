@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:17:50Z
+updated: 2026-10-20T14:22:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bf8b4c2-896d-4828-b900-b59150cf411d","pid":2653212,"provider":"codex","session":"01a159a9-e310-73e2-bbba-edf004cd26d4","start":"39360728","token":"f286d62a1decc68fd25437f6fb6e4181f19bbb4b3f1d98bb2a8e554497f80ee7"}
 branch: task/gaid-workflow-model--authoring
 target: task/gaid-workflow-model
@@ -51,7 +51,9 @@ AGENTS.md rules; scripts/check; remove build caches before finishing. Evidence (
 checks, tests) in your task document's Current state, first and self-contained.
 
 ## Current state
-Implementation started. Active worktree verified by task resume; no stored drafts or live home changed.
+Implementation implemented, focused checks in progress. Typecheck passed; 60/61 focused tests passed, the remaining new legacy test had an incorrect fixture expectation (fixed by explicitly using legacy nodes without choice links). No stored drafts or live home changed.
+
+Isolated home copied from the parent trial home, excluding config.env/auth.json/key material. Real trial will use the configured kigam-qwen/qwen3.8-flash-next runtime route and the copied sample paper/findings/decisions in ap-b232edf4-30a; it creates a fresh project, calls the actual draft model, builds a package and renders target=chat. No shared registration/install.
 
 Sequential decisions: use workflow.steps as the only procedure for new model output; derive atlas nodes at validation and packaging; upgrade legacy drafts in cloned edit/package views only. Shared authoring contract changes requested from parent.
 

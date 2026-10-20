@@ -232,6 +232,7 @@ describe("GAID hub authoring", () => {
         { id: "full", label: "전체 설정" },
       ],
     });
+    withScale.workflow.steps[0].choiceIds.push("run-scale");
     const ok = await runOperation(store, projectId, "draft", "op-draft-q2", deps(reply(withScale)));
     expect(ok.outcome, JSON.stringify(ok.validationErrors)).toBe("accepted");
     const d = (await store.read(projectId)).drafts.at(-1)!;
@@ -388,6 +389,7 @@ describe("GAID hub authoring", () => {
       instructions: "# 방법\n\n`uv run --with scikit-gstat python <skill>/scripts/upstream/scripts/run.py`",
       workflow: {
         ...draftReply.workflow,
+        steps: draftReply.workflow.steps.map((s) => ({ ...s, choiceIds: s.choiceIds.filter((id) => id !== "label-def") })),
         requiredScientificChoices: [
           {
             id: "block-size",
@@ -469,4 +471,26 @@ describe("GAID hub authoring", () => {
     expect(script.source.kind).toBe("code");
     expect(script.extraction.files?.map((f) => f.path)).toEqual(["run.py"]);
   });
+  it("writes the procedure once in steps, resolves catalogue skills and repairs unattached choices/artifacts", async () => {
+    const { store, projectId } = await fixture();
+    await runOperation(store, projectId, "analyze", "structured-analyze", deps(reply(analysis)));
+    const good = structuredClone(draftReply);
+    good.procedure[0].label = "SHOULD NOT BE USED";
+    good.workflow.prompt = "";
+    good.workflow.skills.push({ name: "spatial-pu-workflow", source: "catalogue", role: "supporting", purpose: "공간 평가를 점검합니다." });
+    good.workflow.steps[1].skill = "spatial-pu-workflow";
+    const bad = structuredClone(good);
+    bad.workflow.steps[1].choiceIds = [];
+    bad.workflow.steps[2].outputs = [];
+    const attempt = await runOperation(store, projectId, "draft", "structured-draft", deps(reply(bad, good)));
+    expect(attempt.outcome, JSON.stringify(attempt.validationErrors)).toBe("repaired");
+    expect(attempt.validationErrors[0].join("\n")).toMatch(/block-size.*attached/);
+    expect(attempt.validationErrors[0].join("\n")).toMatch(/scores.*attached/);
+    const draft = (await store.read(projectId)).drafts.at(-1)!;
+    expect(draft.workflow).toMatchObject({ schemaVersion: "gaid-workflow/v1", prompt: { ko: "" }, skillIds: ["local:pu-nested-cv-method", "kigam/spatial-pu-workflow"] });
+    expect(draft.profile.procedure.nodes.map((n) => n.label)).toEqual(draft.workflow!.steps!.map((s) => s.title));
+    expect(draft.profile.procedure.nodes[1]).toMatchObject({ summary: draft.workflow!.steps![1].does, decisionIds: ["block-size"] });
+    expect(draft.profile.procedure.nodes[2].outputs).toEqual(["scores"]);
+  });
+
 });

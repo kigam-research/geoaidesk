@@ -101,6 +101,39 @@ describe("GAID hub packages", () => {
     expect(files.some((f) => f.path.endsWith(".pdf"))).toBe(false);
   });
 
+  it("derives Atlas from steps, warns on mismatched headings and carries the warning into the receipt", async () => {
+    const { project, draft, ctx } = await drafted();
+    draft.profile.procedure.nodes[0].label = { ko: "stale atlas label" };
+    draft.instructions = "## 처리 절차\n\n### 자료 준비\n자료를 확인합니다.\n\n### nested CV\n공간 평가를 실행합니다.\n\n### 보고\noutputs/scores.csv에 저장합니다.\n";
+    let findings = await checkMethod(project, draft, ctx);
+    expect(findings.filter((f) => f.code === "workflow-headings")).toEqual([]);
+    const files = await draftFiles(project, draft, ctx);
+    expect(parse(files.find((f) => f.path === "atlas.yaml")!.content).procedure.nodes[0].label).toEqual({ ko: "자료 준비" });
+    draft.instructions = draft.instructions.replace("### nested CV", "### 다른 제목");
+    findings = await checkMethod(project, draft, ctx);
+    expect(findings).toContainEqual(expect.objectContaining({ check: "workflow", code: "workflow-headings", level: "warning" }));
+    const built = await buildPackage(project, draft, ctx);
+    if (!("record" in built)) throw Error(JSON.stringify(built));
+    expect(built.record.manifest.workflows[0].schemaVersion).toBe("gaid-workflow/v1");
+    expect(built.record.manifest.checks?.items).toContainEqual(expect.objectContaining({ id: "workflow", status: "warn" }));
+  });
+
+  it("exports a new structured package from a legacy draft without rewriting the draft or its recipe", async () => {
+    const { project, draft, ctx } = await drafted();
+    draft.workflow!.schemaVersion = "geo-workflow/v1";
+    delete draft.workflow!.steps;
+    delete draft.workflow!.skills;
+    const before = JSON.stringify(draft);
+    const built = await buildPackage(project, draft, ctx);
+    if (!("record" in built)) throw Error(JSON.stringify(built));
+    const workflow = built.record.manifest.workflows[0];
+    expect(workflow.schemaVersion).toBe("gaid-workflow/v1");
+    expect(workflow.steps).toHaveLength(3);
+    expect(JSON.stringify(draft)).toBe(before);
+    expect(built.record.manifest.recipes[0].choices).toEqual(draft.recipe!.choices);
+    expect(built.record.manifest.checks?.items).toContainEqual(expect.objectContaining({ id: "workflow", status: "warn" }));
+  });
+
   it("checks taxonomy, claims, recipe conflicts, environments and the Workflow schema", async () => {
     const { project, draft, ctx } = await drafted();
     expect((await checkMethod(project, draft, ctx)).filter((f) => f.level === "error")).toEqual([]);
