@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-20T08:30:29Z
-writer: {"host":"seongin3","reserved":"11392b68f53c59c140adfdb8a7d3415bc02ca1339dcf6012b83deab1af8c4edc"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f3513ee-8a5d-41ea-ab37-591555203b6d","pid":2413519,"provider":"claude","session":"e110d0e5-34df-4728-8c24-0178bd483529","start":"37297710","token":"11392b68f53c59c140adfdb8a7d3415bc02ca1339dcf6012b83deab1af8c4edc"}
 branch: task/gaid-note-decisions
 target: main
 parent: 
