@@ -125,8 +125,6 @@ export function SourceStep({
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
   const targets: { id: Target; label: string }[] = [
-    { id: "auto", label: text("sources.targetAuto") },
-    { id: "skill", label: text("sources.targetSkill") },
     { id: "workflow", label: text("sources.targetWorkflow") },
   ];
   return (

@@ -76,6 +76,8 @@ export interface ChatWorkspaceState {
   composer: PromptDraftState;
   /** GeoAIDesk: skill exposure the tab's session is created with (a started task). */
   geoExposure?: string;
+  /** GeoAIDesk (gaid-workflow-model): a started Workflow's `<workflow>` block, sent before the composer text. */
+  pendingWorkflow?: string;
 }
 
 export interface SandboxWorkspaceState {
@@ -327,6 +329,9 @@ function sanitizeStoredChat(value: unknown): StoredChatState | undefined {
     },
     ...(typeof value.geoExposure === "string" && GEO_EXPOSURE_RE.test(value.geoExposure)
       ? { geoExposure: value.geoExposure }
+      : {}),
+    ...(typeof value.pendingWorkflow === "string" && value.pendingWorkflow.startsWith("<workflow ") && value.pendingWorkflow.length <= 200_000
+      ? { pendingWorkflow: value.pendingWorkflow }
       : {}),
   };
 }

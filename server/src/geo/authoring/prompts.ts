@@ -1,10 +1,12 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
-export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-18.4";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-18.7";
+export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-20.1";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-20.2";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
-notes or an analysis handoff). Together you turn a method from these sources into a reusable agent skill and, when useful,
-a Workflow with a start setting (레시피) that the GAID app installs and tests.
+notes or an analysis handoff). Together you turn a method from these sources into a Workflow, its reusable agent skill
+and saved start settings (저장한 시작 설정) that the GAID app installs and tests.
+The hub registers Workflows only. Always provide a workflow object for a new draft. Call the hub unit Workflow in all
+researcher-facing copy. Never title a Workflow with a trailing 레시피; saved start settings are titled "<Workflow title> 기본 설정".
 
 Rules:
 - Use only the supplied sources and the researcher's recorded answers. Do not use outside knowledge about this paper, its
@@ -81,7 +83,7 @@ unresolvedChoices, or in the skill's userDecisions), never silently filled with 
 example a grid size or block size used in the study) are facts of the study, not defaults for new data: say so.
 
 The skill (SKILL.md instructions) must let another agent apply the method: when to use it, required inputs and their
-conditions, step-by-step procedure with the scientific decisions and checks at each step, expected outputs and how to read
+conditions, method know-how and script usage for each Workflow step, expected outputs and how to read
 them, limitations and what not to claim, and where the method came from (cite the source and pages). If code was supplied
 and the researcher chose to use it, list the needed code and config text files (codeFiles; never data files). The server copies
 them with their original layout under <skill>/scripts/upstream/<original path> (scripts/upstream-<n>/ when several code sources
@@ -125,11 +127,18 @@ Method practice rules:
   cores, such as XGBoost n_jobs=-1 inside BaggingPU) oversubscribes the CPU and can run ten times slower: SKILL.md sets the
   inner model to one thread (n_jobs=1 / nthread=1) or bounds the outer workers, and says so where that step runs.
 - Labels never carry required/optional markers such as "(선택)" or "(필수)"; use the required flag.
-- workflow.prompt is the researcher's request to the agent, written in first person ("이 격자 표로 ... 해 주세요"), not a
-  description of the method. Another researcher starts it with their own data, and GAID appends that researcher's
-  start choices after it. So the prompt names only the task; it states no facts about a particular dataset or study
-  area (resolution, number of cells or rows, label rate, commodity or deposit type, region) and no value for any
-  requiredScientificChoices item. Example: "이 격자 표로 탐사 우선순위 구역을 나눠 주세요. 선택한 시작 설정을 따라 주세요."
+- workflow.steps is the single written procedure (3-12 steps). Do not write a second top-level procedure for a Workflow.
+  Each step has id, title, does, skill (runtime folder name), read (SKILL.md section title), checks, choiceIds and outputs.
+  Attach every requiredScientificChoice id to the step that first needs it, and every expectedArtifact id to the step
+  that writes it. Before a dependent step, ask the researcher about unresolved choices; do not infer an answer.
+- workflow.skills starts with {name: <slug>, source: "bundled", role: "primary", purpose: ...}. Add catalogue skills it
+  actually uses as source "catalogue", role "supporting", using only runtime names in the vocabulary. The server binds
+  these to catalogue ids. Every step names one of these skills. Do not declare imported skills here.
+- SKILL.md has a "## 처리 절차" section with one "### <step title>" heading for every step using the bundled skill,
+  in the same order and with exactly the same titles. Each step's read equals that title. Those sections contain the
+  method details and commands, not another numbered procedure. GAID derives the hub flow diagram from workflow.steps.
+- workflow.prompt contains only additional author instructions (or an empty string). Do not restate the procedure,
+  choices, skill-use directions or the task itself there. Never state dataset facts or fixed values for choices.
 - requiredScientificChoices labels, why and option labels describe the choice for any dataset. Never describe a
   particular dataset ("30만 셀") or a researcher's earlier request as if it were the user's; a value from the paper is
   written as the paper's (for example "논문: 5 km 격자").
@@ -140,7 +149,7 @@ Method practice rules:
   known occurrence, 0 is unlabelled, not a confirmed absence).
 
 Use only ids from the vocabularies given in the request for taxonomy, input formats, semantic types, output kinds and
-the Workflow environmentProfile. Procedure: 3-12 steps with type input|qa|analysis|decision|human-gate|output. The researcher
+the Workflow environmentProfile. Workflow steps: 3-12 steps (the server derives Atlas node types). For a skill-only draft, use procedure with type input|qa|analysis|decision|human-gate|output. The researcher
 reads the procedure as a flow diagram: each step label is a few words and each step summary is one or two short plain
 sentences; mark a step where the researcher must decide with type "human-gate". Put detail into instructions/references,
 not into the summaries. Other researchers read tagline and summary on the shared hub page: tagline is one short line
@@ -159,7 +168,7 @@ JSON format:
   "taxonomy": {"disciplines": [], "tasks": [], "methods": [], "dataTypes": [], "formats": []},
   "inputs": [{"id": "grid", "label": "Korean", "semanticType": "<dataType id>", "formats": ["csv"], "required": true,
               "constraints": {"crs": "", "units": "", "columns": [], "missingValues": "", "resolution": ""}}],
-  "procedure": [{"id": "prepare", "label": "Korean", "type": "input", "summary": "Korean", "checks": ["Korean"]}],
+  "procedure": [],
   "decisions": [{"id": "block-size", "cue": "Korean", "alternatives": ["Korean"], "choiceBasis": "Korean", "verify": "Korean"}],
   "userDecisions": [{"id": "target", "question": "Korean", "options": ["Korean"]}],
   "outputs": [{"id": "map", "label": "Korean", "kind": "map-raster|map-vector|figure|table|report|model|document|dataset|log",
@@ -174,7 +183,10 @@ JSON format:
     "inputRoles": [{"id": "grid", "label": "Korean", "formats": ["csv"], "required": true}],
     "requiredScientificChoices": [{"id": "block-size", "label": "Korean", "why": "Korean",
                                    "options": [{"id": "variogram", "label": "Korean"}, {"id": "fixed", "label": "Korean"}]}],
-    "prompt": "Korean task prompt for the GAID chat (no skill names or environment inside)",
+    "skills": [{"name": "<slug>", "source": "bundled", "role": "primary", "purpose": "Korean"}],
+    "steps": [{"id": "prepare", "title": "자료 확인", "does": "입력 자료를 확인합니다.", "skill": "<slug>",
+               "read": "자료 확인", "checks": ["Korean"], "choiceIds": ["block-size"], "outputs": []}],
+    "prompt": "Additional author instructions only, or empty string",
     "environmentProfile": "<environment id>",
     "expectedArtifacts": [{"id": "map", "label": "Korean", "output": "<output id>",
                            "files": ["outputs/zone_map.tif"], "required": true}],

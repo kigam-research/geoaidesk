@@ -63,7 +63,7 @@ function CardArt({ title }: { title: string }) {
   );
 }
 
-const GLOSSARY = ["method", "skill", "workflow", "recipe", "draft", "revision", "trial"] as const;
+const GLOSSARY = ["workflow", "skill", "recipe", "draft", "revision", "trial"] as const;
 
 /** Short definitions of the words the hub uses, behind one header action (UI guide P3, W6). */
 function HubGlossary() {

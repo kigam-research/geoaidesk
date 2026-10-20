@@ -14,7 +14,8 @@ import { DEFAULT_FOLDER, SharedHubStore } from "../src/geo/hub-shared/store.ts";
 import { geoStateDir } from "../src/geo/context.ts";
 import type { GeoWorkflow } from "../src/geo/catalogue-types.ts";
 import { recordMethodTrial } from "../src/geo/methods/trials.ts";
-import { packageStore } from "../src/geo/methods/package-origin.ts";
+import { getSkillProvenance } from "../src/agent/skills-sync.ts";
+import { originOfSource, packageStore } from "../src/geo/methods/package-origin.ts";
 import { projectSkillRoot } from "../src/agent/skills.ts";
 import { createProject, deleteProject, resolvePaths } from "../src/projects.ts";
 import {
@@ -44,7 +45,7 @@ const PNG = Buffer.from(
 async function drafted(slug = draftReply.slug) {
   const f = await fixture();
   await runOperation(f.store, f.projectId, "analyze", "hub-analyze", deps(analysis));
-  const attempt = await runOperation(f.store, f.projectId, "draft", "hub-draft", deps({ ...draftReply, slug }));
+  const attempt = await runOperation(f.store, f.projectId, "draft", "hub-draft", deps({ ...draftReply, slug, workflow: { ...draftReply.workflow, skills: draftReply.workflow.skills.map((s) => ({ ...s, name: slug })), steps: draftReply.workflow.steps.map((s) => ({ ...s, skill: slug })) } }));
   expect(attempt.outcome).toMatch(/accepted|repaired/);
   return f;
 }
@@ -96,6 +97,28 @@ function target() {
 }
 
 describe("shared GAID hub", () => {
+  it("refuses skill-only registration and explains the missing Workflow", async () => {
+    const f = await setup();
+    await f.store.mutate(f.projectId, (p) => { p.drafts.at(-1)!.workflow = null; p.drafts.at(-1)!.recipe = null; });
+    const response = await f.register();
+    expect(response.statusCode).toBe(422);
+    expect(response.json().error).toMatch(/Workflow가 없는 초안.*입력 자료, 분석 조건과 AI agent 지시문/);
+    expect(await f.shared.list()).toHaveLength(0);
+  });
+
+  it("previews exact built draft files before installation without installing them", async () => {
+    const f = await setup();
+    expect((await f.register()).statusCode).toBe(201);
+    const p = await f.store.read(f.projectId);
+    const pkg = p.packages.at(-1)!;
+    const project = target();
+    const response = await f.app.inject({ method: "POST", url: `/geo/authoring/projects/${f.projectId}/packages/${pkg.revision}/preview`, payload: { projectId: project.id } });
+    expect(response.statusCode, response.body).toBe(200);
+    expect(response.json()).toMatchObject({ skills: [{ name: draftReply.slug }], contents: [{ name: draftReply.slug, files: expect.arrayContaining(["SKILL.md", "gaid-method.json"]), hasCode: false, prompts: expect.any(Array) }] });
+    expect(getSkillProvenance(projectSkillRoot(resolvePaths(project.id)), draftReply.slug)).toBeNull();
+    expect((await f.store.read(f.projectId)).installs).toHaveLength(0);
+  });
+
   it("registers once per project, freezes draft/visual/package snapshots and keeps old revisions downloadable", async () => {
     const f = await setup();
     await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
@@ -311,6 +334,8 @@ describe("shared GAID hub", () => {
     await f.store.mutate(second.id, (s) => {
       s.drafts = structuredClone(p.drafts);
       s.drafts[0].slug = "other-method";
+      for (const skill of s.drafts[0].workflow?.skills ?? []) if (skill.source === "bundled") skill.name = "other-method";
+      for (const step of s.drafts[0].workflow?.steps ?? []) if (step.skill === draftReply.slug) step.skill = "other-method";
       s.drafts[0].workflow!.skillIds = ["local:other-method"];
       s.drafts[0].workflow!.expectedArtifacts.forEach((a) => {
         a.skill = "local:other-method";
@@ -350,6 +375,8 @@ describe("shared GAID hub", () => {
     await f.store.mutate(second.id, (s) => {
       s.drafts = structuredClone(project.drafts);
       s.drafts[0].slug = "map-method";
+      for (const skill of s.drafts[0].workflow?.skills ?? []) if (skill.source === "bundled") skill.name = "map-method";
+      for (const step of s.drafts[0].workflow?.steps ?? []) if (step.skill === draftReply.slug) step.skill = "map-method";
       s.drafts[0].profile.title = "좌표 비교";
       s.drafts[0].profile.tagline = { ko: "독립적인 한 줄 설명", en: "Unique bilingual tagline" };
       s.drafts[0].description += " Ni exploration instructions.";
@@ -407,6 +434,8 @@ describe("shared GAID hub", () => {
       recipeId: `${draftReply.slug}-default`,
       install: { projectId: project.id, methodKey: `project:${draftReply.slug}` },
     });
+    const recorded = getSkillProvenance(projectSkillRoot(resolvePaths(project.id)), draftReply.slug);
+    expect(originOfSource(recorded?.source, packageStore(f.agentDir)).origin).toMatchObject({ kind: "gaid-hub", hubEntry: { id: entry.id, revision: 1 } });
     expect((await install()).statusCode).toBe(201);
     expect((await f.shared.read(entry.id)).installs).toHaveLength(2);
     // The revision the researcher looked at is installed; an unknown or malformed revision is refused.
@@ -578,6 +607,54 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(detail.visuals.prepare.caption).toBe("입력 개념");
     // Another name cannot add revisions through the author's seeded draft.
     expect((await registerFrom(f, authoringProjectId, "다른 연구원")).statusCode).toBe(403);
+  });
+
+  it("re-registers a linked legacy draft with a structured snapshot and document without rewriting the old draft", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    await f.store.mutate(f.projectId, (p) => {
+      const w = p.drafts[0].workflow!;
+      w.schemaVersion = "geo-workflow/v1";
+      delete w.skills;
+      delete w.steps;
+      for (const pkg of p.packages) pkg.manifest.workflows[0].schemaVersion = "geo-workflow/v1";
+    });
+    const before = JSON.stringify((await f.store.read(f.projectId)).drafts);
+    expect((await edit(f, entry.id, "김 연구원")).json()).toMatchObject({ authoringProjectId: f.projectId, created: false });
+    const next = await f.register();
+    expect(next.statusCode, next.body).toBe(201);
+    const record = await f.shared.read(entry.id);
+    expect(record.snapshots[2].package.manifest.workflows[0].schemaVersion).toBe("gaid-workflow/v1");
+    expect(record.snapshots[2].draft.workflow!.schemaVersion).toBe("gaid-workflow/v1");
+    const detail = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
+    expect(detail.workflowDoc?.kind).toBe("structured");
+    expect(JSON.stringify((await f.store.read(f.projectId)).drafts)).toBe(before);
+  });
+
+  it("seeds legacy registered snapshots with derived structured steps and leaves the snapshot unchanged", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    const record = await f.shared.read(entry.id);
+    const old = record.snapshots[1].draft.workflow!;
+    old.schemaVersion = "geo-workflow/v1";
+    delete old.skills;
+    delete old.steps;
+    for (const node of record.snapshots[1].draft.profile.procedure.nodes) delete node.decisionIds;
+    await f.shared.write(record);
+    const before = JSON.stringify((await f.shared.read(entry.id)).snapshots[1]);
+    await f.store.archive(f.projectId);
+    const opened = await edit(f, entry.id, "김 연구원");
+    expect(opened.statusCode, opened.body).toBe(201);
+    const seeded = await f.store.read(opened.json().authoringProjectId);
+    expect(seeded.drafts[0].workflow).toMatchObject({ schemaVersion: "gaid-workflow/v1", skills: [{ name: draftReply.slug, source: "bundled", role: "primary" }] });
+    expect(seeded.drafts[0].workflow!.steps).toHaveLength(3);
+    expect(seeded.drafts[0].workflow!.steps![0].choiceIds).toEqual(expect.arrayContaining(["label-def", "block-size"]));
+    expect(seeded.drafts[0].workflow!.steps![2].outputs).toEqual(["scores"]);
+    expect(JSON.stringify((await f.shared.read(entry.id)).snapshots[1])).toBe(before);
+    const next = await registerFrom(f, seeded.id, "김 연구원");
+    expect(next.statusCode, next.body).toBe(201);
+    const current = await f.shared.read(entry.id);
+    expect(current.snapshots[2].package.manifest.workflows[0].schemaVersion).toBe("gaid-workflow/v1");
   });
 
   it("gives another researcher one own copy, registered as a separate entry that names its original", async () => {

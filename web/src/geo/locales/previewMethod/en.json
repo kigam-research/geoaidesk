@@ -5,9 +5,9 @@
     "untested": "Untested"
   },
   "method": {
-    "title": "Method from the sources",
-    "description": "Explore a draft for applying the selected sample manuscript's method to new data.",
-    "sampleOnly": "The prepared method example is shown only for the sample manuscript.",
+    "title": "Workflow from the sources",
+    "description": "Explore a draft for applying the selected sample manuscript's Workflow to new data.",
+    "sampleOnly": "The prepared Workflow example is shown only for the sample manuscript.",
     "createDraft": "View draft with selected approach"
   },
   "finding": {
@@ -67,8 +67,8 @@
   },
   "draft": {
     "empty": "Choose an implementation approach to view a draft.",
-    "titleLabel": "Method name",
-    "summaryLabel": "Method description",
+    "titleLabel": "Workflow name",
+    "summaryLabel": "Workflow description",
     "scopeTitle": "Purpose and implementation approach",
     "editChoice": "Edit implementation approach",
     "save": "Save preview",
@@ -91,7 +91,7 @@
       "title": "Interpret results",
       "body": "Plan to examine exploration priorities and limits of application."
     },
-    "title": "Planned method steps"
+    "title": "Planned Workflow steps"
   },
   "contents": {
     "title": "Planned draft contents",
@@ -101,7 +101,7 @@
     },
     "workflow": {
       "title": "Workflow launch request",
-      "body": "A request to begin the method with data and settings."
+      "body": "A request to begin the Workflow with data and settings."
     },
     "openFiles": "View illustrative file contents"
   },
@@ -117,9 +117,9 @@
     },
     "skillFile": "SKILL.md · illustrative instructions",
     "workflowFile": ".geo-start.json · illustrative request structure",
-    "illustration": "The method name and description reflect the edited draft.",
+    "illustration": "The Workflow name and description reflect the edited draft.",
     "skillInstructions": "Inspect data coverage and positive records, then design evaluation accounting for spatial dependence. Record model-comparison criteria and limits of application. Do not transfer the paper's 50 km setting directly to new data.",
-    "workflowRequest": "A request to prepare the selected method draft, from data inspection through interpretation.",
+    "workflowRequest": "A request to prepare the selected Workflow draft, from data inspection through interpretation.",
     "workflowInputs": "Required inputs: research data, positive records, evaluation design and comparison criteria. Actual skill IDs and executable code connections are not included."
   },
   "trial": {
@@ -147,7 +147,7 @@
       "description": "Review contents that could be proposed for sharing later. The draft remains private."
     },
     "includedTitle": "Proposed contents",
-    "method": "Method name, description and scope",
+    "method": "Workflow name, description and scope",
     "instructions": "Structure of skill instructions and workflow launch request",
     "status": "Untested status and known limits",
     "excludedTitle": "Excluded from default sharing contents",

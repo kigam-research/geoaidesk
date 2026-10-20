@@ -223,7 +223,7 @@
   "skills.the_catalogue_is_per_project_switch_to_this_project_to_sync_it": "The catalogue is per project; switch to this project to sync it.",
   "skills.sync_catalogue": "Sync catalogue",
   "skills.stored_in_your_kady_pi_agent_directory_available_to_every_project_and_to_subagents_a_proje": "Stored in your GAID Pi agent directory: available to every project and to subagents. A project skill of the same name takes precedence.",
-  "skills.add_skills_from_a_source": "Add skills from a source",
+  "skills.add_skills_from_a_source": "Import from GitHub or another source",
   "skills.owner_repo_a_git_url_or_a_local_path": "owner/repo, a git URL, or a local path",
   "skills.branch_tag_optional": "branch / tag (optional)",
   "skills.look_up": "Look up",

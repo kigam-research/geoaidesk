@@ -25,6 +25,8 @@ import { AuthoringError, now, type AuthoringStore } from "./store.ts";
 
 export interface InstallDeps {
   agentDir?: string;
+  /** Set only by the shared registry route, never from the request body. */
+  hubEntry?: { id: string; revision: number };
 }
 
 export async function installPackage(
@@ -71,6 +73,7 @@ export async function installPackageBytes(
   writePackageOrigin(storeDir, {
     sha256: staged.sha256,
     kind: "gaid-hub",
+    ...(deps.hubEntry ? { hubEntry: deps.hubEntry } : {}),
     hub: { methodId: pkg.methodId, revision: pkg.revision, lifecycle: "draft" },
     fetchedAt: now(),
   });
@@ -128,4 +131,16 @@ export async function installPackageBytes(
   };
   const manifest = pkg.manifest as { workflows?: { id: string }[]; recipes?: { id: string }[] };
   return { install, workflowId: manifest.workflows?.[0]?.id ?? null, recipeId: manifest.recipes?.[0]?.id ?? null };
+}
+
+/** Preview the exact built bytes before consent; installation remains an explicit separate action. */
+export async function previewPackageBytes(archive: Buffer, pkg: Pick<MethodPackageRecord, "slug" | "methodId" | "revision">, projectId: string, deps: InstallDeps = {}) {
+  if (typeof projectId !== "string" || !getProject(projectId)) throw new AuthoringError("시험할 프로젝트를 찾을 수 없습니다.", 404);
+  const staged = stageSkillHubPackage(archive, { agentDir: deps.agentDir, expectedSlug: pkg.slug });
+  const dir = path.join(staged.source, pkg.slug);
+  const file = readMethodFile(dir, pkg.slug).method;
+  if (!file || verifyMethodTree(dir, file).length || file.methodId !== pkg.methodId || file.revision !== pkg.revision)
+    throw new AuthoringError("설치할 Workflow 파일이 검사한 내용과 맞지 않습니다. 초안을 다시 검사하세요.", 422);
+  const preview = await previewSkillSource(resolvePaths(projectId), { source: staged.source, scope: "project" });
+  return { ...preview, contents: [{ name: pkg.slug, files: ["gaid-method.json", ...(file.files ?? []).map((f) => f.path)], hasCode: file.implementation === "implemented", prompts: file.workflows.map((w) => w.prompt) }] };
 }

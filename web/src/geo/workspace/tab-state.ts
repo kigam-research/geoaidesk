@@ -30,5 +30,6 @@ export function geoTaskChatState(source: ChatWorkspaceState | undefined, task: G
     selectedSkills: task.skills,
     composer: { text: task.text, attachments: [] },
     geoExposure: task.geoExposure,
+    ...(task.workflowBlock ? { pendingWorkflow: task.workflowBlock } : {}),
   };
 }

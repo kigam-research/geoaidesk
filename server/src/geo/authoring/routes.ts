@@ -15,8 +15,9 @@ import type {
   OperationBody,
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
+import { structuredDraft } from "./workflow.ts";
 import { startOperation } from "./agent.ts";
-import { installPackage } from "./install.ts";
+import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
 import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./package.ts";
 import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
@@ -50,7 +51,7 @@ export function editDraft(project: AuthoringProject, body: EditDraftBody): Metho
   if (!latest) throw new AuthoringError("먼저 방법 초안을 만들어 주세요.", 409);
   if (body.baseRevision !== latest.revision)
     throw new AuthoringError("다른 곳에서 초안이 바뀌었습니다. 최신 초안을 다시 불러와 주세요.", 409);
-  const next: MethodDraft = structuredClone(latest);
+  const next: MethodDraft = structuredDraft(latest);
   next.revision = latest.revision + 1;
   next.baseRevision = latest.revision;
   next.origin = "researcher";
@@ -378,6 +379,12 @@ export async function registerAuthoringRoutes(
       reply.header("Content-Type", "application/gzip");
       reply.header("Content-Disposition", `attachment; filename="${pkg.slug}-${pkg.revision}.tar.gz"`);
       return reply.send(await store.readFile(p.id, pkg.archive));
+    });
+    scope.post<{ Body: { projectId: string } }>("/geo/authoring/projects/:id/packages/:rev/preview", async (req) => {
+      const p = await store.read(id(req.params));
+      const pkg = p.packages.find((x) => x.revision === Number((req.params as { rev: string }).rev));
+      if (!pkg) throw new AuthoringError("설치할 Workflow를 찾을 수 없습니다.", 404);
+      return previewPackageBytes(await store.readFile(p.id, pkg.archive), pkg, req.body?.projectId);
     });
     scope.post<{ Body: InstallBody }>("/geo/authoring/projects/:id/packages/:rev/install", async (req, reply) => {
       const body = req.body ?? ({} as InstallBody);

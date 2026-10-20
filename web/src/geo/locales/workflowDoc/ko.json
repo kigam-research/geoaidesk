@@ -1,0 +1,63 @@
+{
+  "heading": {
+    "title": "# Workflow: {title}",
+    "titleRevision": "# Workflow: {title} ({revision}판)"
+  },
+  "section": {
+    "settings": "연구자가 정한 설정 (지침의 예시 값보다 우선합니다)",
+    "skills": "사용하는 스킬",
+    "steps": "단계",
+    "instructions": "작성자의 추가 지시",
+    "artifacts": "결과 파일",
+    "boundary": "해석 한계",
+    "closing": "끝낼 때"
+  },
+  "settings": {
+    "researcherPicks": "연구자가 고릅니다",
+    "notUsed": "사용하지 않음",
+    "none": "없음",
+    "unresolved": "정하지 않은 조건: {list}",
+    "askBeforeStep": "정하지 않은 조건은 해당 조건을 쓰는 단계 전에 연구자에게 물으세요.",
+    "choiceOptions": "{label}: 연구자가 고릅니다 (선택지: {options})",
+    "choiceOpen": "{label}: 연구자가 정합니다",
+    "inputAsk": "{label} ({need})",
+    "cliArguments": "명령 뒤에 적은 값이 연구자의 설정입니다:",
+    "cliAsk": "아래 항목 가운데 위 값에 없는 것은 시작하기 전에 연구자에게 물으세요."
+  },
+  "need": {
+    "required": "필수",
+    "optional": "선택"
+  },
+  "source": {
+    "catalogue": "기본 제공 스킬",
+    "bundled": "Workflow에 딸린 스킬",
+    "imported": "가져온 스킬"
+  },
+  "skill": {
+    "primary": "주 스킬",
+    "usedIn": "{steps}단계에서 씁니다.",
+    "readRule": "스킬은 해당 스킬을 쓰는 단계를 시작하기 전에 지침 파일(SKILL.md)을 읽으세요."
+  },
+  "steps": {
+    "legacy": "이전 형식의 Workflow입니다. 단계별 자세한 방법은 스킬 {skill}의 지침에 있는 처리 절차를 따르세요."
+  },
+  "step": {
+    "headDecision": "{title} [연구자 결정: {decisions}]",
+    "skill": "스킬: {skill}",
+    "skillRead": "스킬: {skill} (먼저 읽을 곳: {read})",
+    "checks": "확인할 것: {checks}",
+    "outputs": "만드는 결과: {outputs}"
+  },
+  "closing": {
+    "review": "결과는 검토 전입니다. 실행 완료를 검토 완료로 쓰지 마세요.",
+    "examples": "지침의 예시 값(대상, 해상도, 자료 규모 등)이 연구자의 설정이나 실제 파일과 다르면 연구자의 설정과 실제 파일을 따르고, 다른 점을 먼저 알리세요."
+  },
+  "card": {
+    "label": "Workflow · {title}",
+    "labelRevision": "Workflow · {title} · {revision}판",
+    "expand": "지침 펼치기",
+    "collapse": "지침 접기",
+    "remove": "Workflow 빼기",
+    "pendingHint": "보내면 Workflow 지침이 먼저 가고, 입력창에 쓴 내용이 뒤에 붙습니다."
+  }
+}

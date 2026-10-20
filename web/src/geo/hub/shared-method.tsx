@@ -91,7 +91,9 @@ export function SharedMethod({
   onTry,
   onEdit,
   preview,
+  workflowDoc,
 }: {
+  workflowDoc?: import("@/geo/contracts/workflow-doc").WorkflowDoc | null;
   /** "방법 고치기" (`edit`, the registering author) or "복사해서 고치기" (`copy`, anyone else). */
   onEdit?: { mode: "edit" | "copy"; run: () => void; busy?: boolean };
   /** Preview before registration: how the method will look to other researchers, with the register action. */
@@ -256,7 +258,7 @@ export function SharedMethod({
         </div>
       </header>
 
-      <OverviewBand profile={profile} />
+      <OverviewBand profile={profile} doc={workflowDoc} />
       <SummaryPoints summary={method.summary} />
 
       <section id="method-flow" className="flex scroll-mt-20 flex-col gap-3" aria-label={text("draft.flow")}>

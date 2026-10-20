@@ -6,97 +6,93 @@
   },
   "entry": {
     "title": "GAID hub",
-    "body": "Use analysis methods other researchers registered with your own data, or make a new method from your paper or code.",
+    "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
     "open": "Open GAID hub"
   },
   "home": {
     "title": "GAID hub",
-    "body": "Use analysis methods other researchers registered with your own data, or make a new method from your paper or code.",
-    "new": "Make a method",
-    "empty": "No methods yet. Upload a paper PDF or code to start.",
+    "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
+    "new": "Make a Workflow",
+    "empty": "No Workflows yet. Upload a paper PDF or code to start.",
     "loading": "Reading the list.",
     "error": "Could not read the list. Open it again in a moment.",
     "updated": "Updated {when}",
     "open": "Open {title}",
     "back": "Hub list",
-    "recommended": "Recommended analysis methods",
-    "catalogue": "Catalogue",
+    "recommended": "Recommended analysis Workflows",
+    "catalogue": "Built-in Workflow",
     "shared": "Shared",
-    "mine": "Methods I made (drafts and registered)",
+    "mine": "Workflows I made (drafts and registered)",
     "folders": "Folders",
     "newFolder": "New folder",
     "allFolders": "All",
     "registered": "In hub · rev {n}",
     "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project.",
     "browse": {
-      "title": "Methods registered in the hub",
-      "tabs": "Method lists",
+      "title": "Workflows registered in the hub",
+      "tabs": "Workflow lists",
       "all": "All",
-      "folders": "Registered method topic folders",
+      "folders": "Registered Workflow topic folders",
       "search": {
-        "label": "Search registered methods",
+        "label": "Search registered Workflows",
         "placeholder": "Search title, tagline, author or taxonomy",
-        "hint": "You can also search by element symbol (Ni) or method name (PU)."
+        "hint": "You can also search by element symbol (Ni) or Workflow name (PU)."
       },
       "order": "Most stars · Newest registration",
-      "count": "{count} methods",
-      "loading": "Reading registered methods.",
-      "error": "Could not read registered methods. Reload the list.",
+      "count": "{count} Workflows",
+      "loading": "Reading registered Workflows.",
+      "error": "Could not read registered Workflows. Reload the list.",
       "retry": {
         "button": "Reload list"
       },
-      "noResults": "No methods match. Change the search term or folder.",
-      "empty": "No methods are registered. Browse the recommended analysis methods.",
+      "noResults": "No Workflows match. Change the search term or folder.",
+      "empty": "No Workflows are registered. Browse the recommended analysis Workflows.",
       "reset": {
-        "button": "View all methods"
+        "button": "View all Workflows"
       },
       "recommended": {
-        "action": "View recommended methods"
+        "action": "View recommended Workflows"
       },
       "open": "Open {title}",
       "stars": "{count} stars"
     },
     "route": {
       "use": {
-        "title": "Use a registered method",
-        "body": "Pick a method, install it in your project and start it with your data.",
-        "button": "Browse methods"
+        "title": "Use a registered Workflow",
+        "body": "Pick a Workflow, install it in your project and start it with your data.",
+        "button": "Browse Workflows"
       },
       "make": {
-        "title": "Make a method from your paper",
-        "body": "Upload a paper or code and answer the questions to get a method draft."
+        "title": "Make a Workflow from your paper",
+        "body": "Upload a paper or code and answer the questions to get a Workflow draft."
       }
     },
     "glossary": {
       "button": "Show terms",
       "title": "Words used in the hub",
-      "method": {
-        "term": "Method",
-        "text": "The unit of analysis in the hub: one skill and, when present, one Workflow."
-      },
       "skill": {
         "term": "Skill",
-        "text": "Analysis instructions the AI agent follows. Some skills also include run code."
+        "text": "Instructions and tools used by a Workflow: built-in skills, skills imported from GitHub or other sources, and skills included with a Workflow."
       },
       "workflow": {
         "term": "Workflow",
-        "text": "The steps to start a skill with your data. It asks for input files and values to set first."
+        "text": "A procedure for assigning one research task to an AI agent. It includes input data, researcher choices, steps, agent instructions, skills, outputs and interpretation limits."
       },
       "recipe": {
-        "term": "Start settings",
-        "text": "Values chosen in advance for starting a Workflow, also called a recipe."
+        "term": "Saved start settings",
+        "text": "Preset input and condition values for a Workflow."
       },
       "draft": {
         "term": "Draft",
-        "text": "A method not yet registered in the hub. It does not appear in other researchers' hub lists."
+        "text": "A Workflow not yet registered in the hub. It does not appear in other researchers' hub lists."
       },
       "revision": {
         "term": "Revision",
-        "text": "The number that goes up each time a registered method is revised and registered again. Comments stay with their revision."
+        "text": "The number that goes up each time a registered Workflow is revised and registered again. Comments stay with their revision."
       },
       "trial": {
         "term": "Trial",
-        "text": "A record of running the method in your project. It is not a review result."
+        "text": "A record of running the Workflow in your project. It is not a review result."
       }
     },
     "byUpdated": "{author} · updated {when}",
@@ -127,7 +123,7 @@
     "drop": "Drop a paper PDF or a code archive (.zip, .tar.gz).",
     "pick": "Choose files",
     "goal": "What to make",
-    "goalPlaceholder": "e.g. an exploration method for grid data from another region",
+    "goalPlaceholder": "e.g. an exploration Workflow for grid data from another region",
     "target": "Kind",
     "targetAuto": "Agent proposes",
     "targetSkill": "Skill",
@@ -156,7 +152,7 @@
     "agentModel": "Agent model",
     "agentModelDefault": "Default model from Settings",
     "agentModelHint": "Used to read the sources, ask questions and write the draft.",
-    "readDone": "The sources have been read. Next, answer the questions that decide the method.",
+    "readDone": "The sources have been read. Next, answer the questions that decide the Workflow.",
     "next": "Answer the questions"
   },
   "reading": {
@@ -165,8 +161,8 @@
     "received": "{count, plural, one {# source} other {# sources}} received",
     "pages": "Read text of {pages} PDF pages",
     "files": "Checked {count} code files",
-    "analysis": "Finding the method and missing decisions",
-    "note": "Reading continues if you close this screen. Reopen it from 'Methods I made' on the hub home. A long paper takes several minutes or more.",
+    "analysis": "Finding the Workflow and missing decisions",
+    "note": "Reading continues if you close this screen. Reopen it from 'Workflows I made' on the hub home. A long paper takes several minutes or more.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
     "retry": "Run analysis again"
@@ -217,7 +213,7 @@
     "untested": "Untested",
     "tested": "{count, plural, one {# trial} other {# trials}}",
     "revision": "Revision {n}",
-    "flow": "Method flow",
+    "flow": "Workflow steps",
     "you": "You decide",
     "inputs": "Inputs",
     "outputs": "Outputs",
@@ -250,7 +246,7 @@
     "title": "Try in my research project first (optional)",
     "body": "Install the draft into a project, prepare its inputs, then open the Workflow start settings.",
     "project": "Project",
-    "consent": "I understand that the method to install can run code in the project.",
+    "consent": "I understand that the Workflow to install can run code in the project.",
     "install": "Install in project",
     "installing": "Installing.",
     "installed": "Installed in {project}",
@@ -298,8 +294,8 @@
     "validation": "Items the checks removed"
   },
   "prep": {
-    "loading": "Checking the installed method.",
-    "noWorkflow": "The installed method has no Workflow. Open the method from the project's Workflow panel.",
+    "loading": "Checking the installed Workflow.",
+    "noWorkflow": "The installed Workflow has no Workflow. Open the Workflow from the project's Workflow panel.",
     "title": "Inputs for {project}",
     "required": "Required",
     "optional": "Optional",
@@ -309,7 +305,7 @@
     "uploadFailed": "Could not upload the file. Check the file and upload it again.",
     "environment": "Run environment",
     "openProject": "Open the project",
-    "extraPackages": "Packages outside the prepared environment: {packages}. The AI agent installs them during the analysis as the skill describes. On a PC that blocks installation, those steps stop.",
+    "extraPackages": "Python libraries outside the prepared environment: {packages}. The AI agent installs them during analysis following the skill instructions. If installation is blocked, that step stops.",
     "optionalPackage": "{name} (optional step)"
   },
   "register": {
@@ -319,10 +315,10 @@
     "folder": "Hub category (folder)",
     "note": "Note for other researchers",
     "notePlaceholder": "e.g. Built for grid data from other regions. Please try it and leave feedback.",
-    "shared": "Shared: skill and Workflow files, method flow, check record, trial assessments",
-    "notShared": "Not shared: the uploaded PDF and archive files, research data. Code placed in the package is shared.",
+    "shared": "Shared: Workflow description, steps and files, included code and concept pictures, file check summary",
+    "notShared": "Not shared: original uploaded PDFs and archives, research data, project run records and trial assessments",
     "submit": "Register in hub",
-    "line": "Registered methods can be viewed, starred and discussed by other researchers. Check how it will look first.",
+    "line": "Registered Workflows can be viewed, starred and discussed by other researchers. Check how it will look first.",
     "registeredLine": "Revision {n} is registered in the hub.",
     "previewBanner": "Preview: this is how other researchers will see it in the hub.",
     "backToDraft": "Back to draft",
@@ -346,12 +342,12 @@
     "back": "Hub list",
     "note": "Author's note",
     "edit": {
-      "button": "Edit method",
+      "button": "Edit Workflow",
       "hint": "Your changes are registered as a new revision. Earlier revisions stay installable."
     },
     "copy": {
       "button": "Copy and edit",
-      "hint": "Copies the method into your own methods. Registered, it becomes a separate method that names the original."
+      "hint": "Copies the Workflow into your own Workflows. Registered, it becomes a separate Workflow that names the original."
     },
     "basedOn": "Copied and edited from revision {revision} of “{title}” by {author}.",
     "openOriginal": "View original",
@@ -376,7 +372,7 @@
   },
   "user": {
     "title": "Name in the hub",
-    "body": "The name shown on methods you make, registrations, stars and comments. It is saved in this browser.",
+    "body": "The name shown on Workflows you make, registrations, stars and comments. It is saved in this browser.",
     "placeholder": "e.g. Jane Doe (Mineral Resources Division)",
     "save": "Save name"
   },
@@ -389,19 +385,19 @@
   "overview": {
     "in": "Inputs",
     "out": "Results",
-    "process": "Method",
+    "process": "Steps",
     "steps": "{count, plural, one {# step} other {# steps}}",
     "gates": "{count, plural, one {# researcher decision} other {# researcher decisions}}",
     "more": "{count} more",
-    "about": "About this method",
+    "about": "About this Workflow",
     "limits": "Limits and cautions ({count})",
     "notFor": "Not for",
     "condition": "Condition",
     "instead": "Instead: {alternative}",
-    "jumpFlow": "Method steps",
+    "jumpFlow": "Workflow steps",
     "jumpLimits": "Limits",
     "jumpComments": "{count, plural, one {# comment} other {# comments}}",
-    "aboutMore": "Show more about the method",
+    "aboutMore": "Show more about the Workflow",
     "aboutLess": "Show less",
     "required": "required",
     "optional": "optional"
@@ -413,10 +409,14 @@
     "making": "Making concept pictures ({done}/{total})",
     "note": "Concept illustration, not analysis data or results",
     "title": "Concept pictures",
-    "explanation": "Illustrations of the method, not analysis data or results. They appear in the draft and hub registration.",
-    "how": "View generation method",
-    "source": { "record": "Pictures are generated with gpt-image-2 through your OpenAI Codex (legacy) login only when you request them. They use that subscription's image quota, with no other picture source as a fallback. Sign in with ChatGPT does not support picture generation." },
-    "connect": { "action": "Open provider settings" },
+    "explanation": "Illustrations of the Workflow, not analysis data or results. They appear in the draft and hub registration.",
+    "how": "View generation Workflow",
+    "source": {
+      "record": "Pictures are generated with gpt-image-2 through your OpenAI Codex (legacy) login only when you request them. They use that subscription's image quota, with no other picture source as a fallback. Sign in with ChatGPT does not support picture generation."
+    },
+    "connect": {
+      "action": "Open provider settings"
+    },
     "checking": "Checking the picture connection.",
     "cover": "Cover picture",
     "actions": "{name} concept picture actions",
@@ -441,7 +441,7 @@
     "copied": "Copied technical details"
   },
   "editing": {
-    "edit": "You are editing revision {revision} of your registered method. Registering it in the hub makes revision {next}.",
-    "copy": "Your copy of revision {revision} of “{title}” by {author}. Registered, it becomes a separate method that names the original."
+    "edit": "You are editing revision {revision} of your registered Workflow. Registering it in the hub makes revision {next}.",
+    "copy": "Your copy of revision {revision} of “{title}” by {author}. Registered, it becomes a separate Workflow that names the original."
   }
 }

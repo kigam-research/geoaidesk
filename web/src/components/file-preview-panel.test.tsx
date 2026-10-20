@@ -151,3 +151,25 @@ it("offers no edit for a tab whose load failed", () => {
   render(<FilePreviewPanel {...panelProps()} tabs={[{ path: "a.txt", content: "[Error: Could not load file — click to retry]", loading: false }]} />);
   expect(screen.queryByTitle("Edit file")).toBeNull();
 });
+
+it("cancels the saved indicator when re-saving or unmounting the text editor", async () => {
+  const { TextEditor } = await import("./code-views");
+  vi.useFakeTimers();
+  try {
+    const onSave = vi.fn(async () => true);
+    const { unmount } = render(<TextEditor path="timer.txt" name="timer.txt" initialContent="original" onSave={onSave} onDiscard={vi.fn()} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Editor" }), { target: { value: "first edit" } });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: /^Save/ })); });
+    expect(onSave).toHaveBeenCalledWith("first edit");
+    expect(vi.getTimerCount()).toBe(1);
+    fireEvent.change(screen.getByRole("textbox", { name: "Editor" }), { target: { value: "second edit" } });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: /^Save/ })); });
+    expect(onSave).toHaveBeenCalledWith("second edit");
+    expect(vi.getTimerCount()).toBe(1);
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
+    expect(() => vi.runAllTimers()).not.toThrow();
+  } finally {
+    vi.useRealTimers();
+  }
+});

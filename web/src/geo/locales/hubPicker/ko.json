@@ -1,34 +1,56 @@
 {
-  "search": { "label": "GAID 허브 검색", "placeholder": "이름이나 분석 주제 검색" },
+  "search": {
+    "label": "GAID 허브 검색",
+    "placeholder": "이름이나 분석 주제 검색"
+  },
   "loading": "허브 목록을 읽는 중입니다.",
   "error": "허브 목록을 읽지 못했습니다. 다시 읽으세요.",
-  "retry": { "button": "목록 다시 읽기" },
+  "retry": {
+    "button": "목록 다시 읽기"
+  },
   "empty": "조건에 맞는 항목이 없습니다. 검색어를 바꾸세요.",
-  "emptyRecipes": "조건에 맞는 레시피가 없습니다. 검색어를 바꾸거나 파일에서 가져오세요.",
+  "emptyRecipes": "저장한 시작 설정이 있는 Workflow가 없습니다. 검색어를 바꾸거나 파일에서 가져오세요.",
   "results": "허브 검색 결과",
   "stars": "★ {count}",
-  "revision": "판 {count}",
-  "kind": { "skill": "스킬", "workflow": "Workflow" },
-  "kindTip": "허브에 등록된 분석 방법의 유형입니다.",
-  "recipe": "레시피",
-  "recipeTip": "Workflow에 저장된 시작 설정이 있습니다.",
-  "browse": { "button": "GAID 허브에서 찾기" },
-  "file": { "button": "파일에서 가져오기" },
-  "description": "GAID 허브의 레시피를 찾거나 저장한 파일을 가져옵니다.",
-  "back": { "button": "목록으로 돌아가기" },
-  "installHelp": "현재 프로젝트에 분석 방법을 설치하고 레시피의 시작 설정을 엽니다.",
-  "consent": "설치할 방법이 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
-  "install": { "button": "설치 후 시작 설정 열기" },
-  "installing": "분석 방법을 설치하는 중입니다.",
-  "installError": "분석 방법을 설치하지 못했습니다. 허브에서 선택한 판을 확인한 뒤 다시 시도하세요.",
+  "revision": "{count}판",
+  "kind": {
+    "skill": "스킬",
+    "workflow": "Workflow"
+  },
+  "kindTip": "허브에 등록된 Workflow의 유형입니다.",
+  "recipe": "저장한 시작 설정",
+  "recipeTip": "Workflow에 저장한 시작 설정이 있습니다.",
+  "browse": {
+    "button": "GAID 허브에서 찾기"
+  },
+  "file": {
+    "button": "파일에서 가져오기"
+  },
+  "description": "GAID 허브에서 Workflow를 찾거나 저장한 시작 설정 파일을 가져옵니다.",
+  "back": {
+    "button": "목록으로 돌아가기"
+  },
+  "installHelp": "현재 프로젝트에 Workflow를 설치하고 저장한 시작 설정을 엽니다.",
+  "consent": "설치할 Workflow가 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
+  "install": {
+    "button": "설치 후 시작 설정 열기"
+  },
+  "installing": "Workflow를 설치하는 중입니다.",
+  "installError": "Workflow를 설치하지 못했습니다. 허브에서 선택한 판을 확인한 뒤 다시 시도하세요.",
   "installed": "프로젝트에서 이미 사용할 수 있습니다. 저장된 시작 설정을 엽니다.",
-  "installedNeedsCheck": "이미 설치된 분석 방법입니다. 분석 방법을 열어 사용 상태와 레시피를 확인하세요.",
-  "method": { "button": "분석 방법 열기" },
-  "open": { "button": "시작 설정 열기" },
-  "methodsError": "설치된 분석 방법을 읽지 못했습니다. 대화창을 닫고 다시 여세요.",
+  "installedNeedsCheck": "이미 설치된 Workflow입니다. Workflow를 열어 사용 상태와 저장한 시작 설정을 확인하세요.",
+  "method": {
+    "button": "Workflow 열기"
+  },
+  "open": {
+    "button": "시작 설정 열기"
+  },
+  "methodsError": "설치된 Workflow를 읽지 못했습니다. 대화창을 닫고 다시 여세요.",
   "skillTitle": "GAID 허브에서 스킬 찾기",
   "skillHelp": "스킬을 선택한 뒤 포함 파일을 미리 확인합니다.",
-  "preview": { "button": "패키지 미리보기" },
+  "preview": {
+    "button": "파일 묶음 미리보기"
+  },
   "legacy": "이전 skill_hub",
-  "previewSource": "GAID 허브 · {title} · 판 {count}"
+  "previewSource": "GAID 허브 · {title} · {count}판"
 }

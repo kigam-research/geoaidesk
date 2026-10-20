@@ -5,6 +5,7 @@
  * regex for skills; templates use Kady's own `<prompt-template>` wrapper.
  */
 import { stripComposerContext } from "./composer-context";
+import { parseWorkflowBlock } from "../geo/contracts/workflow-doc";
 
 export interface CommandBlock {
   kind: "skill" | "template";
@@ -29,6 +30,12 @@ export function parseCommandBlock(text: string): CommandBlock | null {
 /** Compact session labels, including server-truncated command expansions. */
 export function commandPreview(raw: string): string {
   const text = stripComposerContext(raw);
+  // GeoAIDesk (gaid-workflow-model): a Workflow start shows as "Workflow · <title>", plus the researcher's text.
+  const workflow = text.match(/^<workflow id="[^"]*"(?: revision="\d+")? title="([^"]*)">/);
+  if (workflow) {
+    const tail = parseWorkflowBlock(text)?.tail.split("\n")[0]?.trim();
+    return tail ? `Workflow · ${workflow[1]} — ${tail}` : `Workflow · ${workflow[1]}`;
+  }
   const prefix = text.match(/^<(skill|prompt-template) name="([^"]+)"/);
   if (!prefix) return text;
   const command = prefix[1] === "skill" ? `/skill:${prefix[2]}` : `/${prefix[2]}`;

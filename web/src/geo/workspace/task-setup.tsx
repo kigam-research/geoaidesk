@@ -10,6 +10,8 @@ import type { GeoWorkflowSummary, GeoRecipeCheckResponse, GeoExposureMode } from
 import type { SkillInfo } from "@/lib/capabilities";
 import { accepts, request, taskDraft, text } from "./api";
 import { startGeoTask } from "./events";
+import { WorkflowInstructions } from "@/geo/workflow/workflow-view";
+import { workflowStartMessage } from "@/geo/workflow/render";
 import { ReadinessNotice } from "./readiness";
 import { DeleteRecipe } from "./recipe-add";
 import { ChoiceStep, InputStep, StepRail, SummaryRows, choiceDone, choiceValue, inputDone, inputValue, setupSteps, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
@@ -96,12 +98,23 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const start = async () => {
     setBusy(true); setError(null);
     try {
-      // /skills is the merged list the composer's picker uses, not /skills/all.
-      const response = await request<SkillInfo[]>("/skills", projectId);
-      const primary = workflow.readiness.skills.find((skill) => skill.id === workflow.skillIds[0]);
-      const skill = primary?.enabled ? response.find((row) => row.name === primary.runtimeName) : undefined;
-      const result = startGeoTask({ title: text(workflow.title), text: taskDraft(workflow, bindings, values),
-        attachedFiles: [...new Set(Object.values(bindings))], skills: skill ? [{ id: skill.id, name: skill.name, description: skill.description }] : [], geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
+      // gaid-workflow-model: the first message is the Workflow 지침 in a <workflow> block; each step names its skill,
+      // so no skill is pinned. A Workflow summary without a document (older server) keeps the previous draft.
+      let draft = "";
+      let workflowBlock: string | undefined;
+      let skills: { id: string; name: string; description: string }[] = [];
+      if (workflow.doc) {
+        workflowBlock = workflowStartMessage(workflow.doc, bindings, values);
+      } else {
+        // /skills is the merged list the composer's picker uses, not /skills/all.
+        const response = await request<SkillInfo[]>("/skills", projectId);
+        const primary = workflow.readiness.skills.find((skill) => skill.id === workflow.skillIds[0]);
+        const skill = primary?.enabled ? response.find((row) => row.name === primary.runtimeName) : undefined;
+        if (skill) skills = [{ id: skill.id, name: skill.name, description: skill.description }];
+        draft = taskDraft(workflow, bindings, values);
+      }
+      const result = startGeoTask({ title: text(workflow.title), text: draft, ...(workflowBlock ? { workflowBlock } : {}),
+        attachedFiles: [...new Set(Object.values(bindings))], skills, geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
       if (result !== "opened") { setError({ message: t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`) }); return; }
       setInputs(initialInputs(workflow, files, {})); setChoices({}); setIndex(0); onOpenChange(false);
     } catch (error) { setError({ message: t("workspace.setup.error"), detail: (error as Error).message }); }
@@ -145,6 +158,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
           {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
           {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
           <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
+          {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values }} />}
           <details className="text-sm">
             <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
             <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>

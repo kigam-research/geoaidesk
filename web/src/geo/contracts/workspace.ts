@@ -9,6 +9,8 @@
  * `{ko, en?}` and the UI picks the locale.
  */
 
+import type { WorkflowDoc, WorkflowSkillSource } from "./workflow-doc";
+
 export interface Localized {
   ko: string;
   en?: string;
@@ -56,6 +58,9 @@ export interface WorkflowSkillState {
   installed: boolean;
   /** Installed and not disabled, so a new chat can load it. */
   enabled: boolean;
+  /** gaid-workflow-model: where the skill comes from; `ref` is the import source of an `imported` skill. */
+  source?: WorkflowSkillSource;
+  ref?: string | null;
 }
 
 export interface WorkflowEnvironmentState {
@@ -104,6 +109,8 @@ export interface GeoWorkflowSummary {
   boundary: Localized | null;
   exampleCaseIds: string[];
   readiness: WorkflowReadiness;
+  /** The Workflow 지침 the agent receives (gaid-workflow-model; render with renderWorkflowDocument). */
+  doc?: WorkflowDoc;
 }
 
 export interface GeoWorkflowsResponse {
@@ -248,6 +255,8 @@ export interface GeoStartTaskDetail {
   title: string;
   /** Composer draft for the new tab; never sent automatically. */
   text: string;
+  /** A Workflow start: the `<workflow>` block shown as a card above the composer and sent before its text. */
+  workflowBlock?: string;
   /** Sandbox paths attached to the draft. */
   attachedFiles: string[];
   /** Skills pinned to the draft (`/skills` rows). */

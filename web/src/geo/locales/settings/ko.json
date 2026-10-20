@@ -223,7 +223,7 @@
   "skills.the_catalogue_is_per_project_switch_to_this_project_to_sync_it": "카탈로그는 프로젝트별로 관리합니다. 동기화하려면 적용 범위를 현재 프로젝트로 바꾸세요.",
   "skills.sync_catalogue": "카탈로그 동기화",
   "skills.stored_in_your_kady_pi_agent_directory_available_to_every_project_and_to_subagents_a_proje": "GAID Pi agent 디렉터리에 저장하며 모든 프로젝트와 하위 AI agent에서 사용할 수 있습니다. 이름이 같은 프로젝트 스킬이 있으면 프로젝트 스킬을 우선합니다.",
-  "skills.add_skills_from_a_source": "소스에서 스킬 추가",
+  "skills.add_skills_from_a_source": "GitHub 등에서 가져오기",
   "skills.owner_repo_a_git_url_or_a_local_path": "owner/repo, Git URL 또는 로컬 경로",
   "skills.branch_tag_optional": "브랜치 / 태그(선택)",
   "skills.look_up": "스킬 조회",

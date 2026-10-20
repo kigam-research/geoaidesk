@@ -1,0 +1,294 @@
+/**
+ * The Workflow 지침 (gaid-workflow-model, ADR docs/adr/2026-10-20-workflow-runtime-form.md): a Workflow reaches the
+ * agent as one instruction document rendered here from its structured parts. The hub preview, the project preview, the
+ * start settings summary, the chat's first message and the CLI export all call `renderWorkflowDocument`, so every
+ * place shows the text the agent receives.
+ *
+ * IO-free and shared by server and web. Fixed wording comes through `say` (locale namespace `workflowDoc`): the web
+ * passes `t`, the server a formatter over the same catalogue.
+ */
+import type { Localized, WorkflowArtifact, WorkflowChoice } from "./workspace";
+
+export const WORKFLOW_DOC_SCHEMA = "gaid-workflow/v1";
+
+/** Where a skill comes from. `bundled` ships inside the Workflow's package; `imported` came from GitHub or similar. */
+export type WorkflowSkillSource = "catalogue" | "bundled" | "imported";
+
+export interface WorkflowDocSkill {
+  /** Runtime skill name (the SKILL.md folder name the agent sees). */
+  name: string;
+  title?: Localized | null;
+  source: WorkflowSkillSource;
+  /** For `imported`: where it came from (`owner/repo`, Git URL) and the ref, so readiness can offer to import it. */
+  ref?: string | null;
+  role: "primary" | "supporting";
+  /** What the Workflow uses it for. */
+  purpose?: Localized | null;
+}
+
+/** A step as stored in a gaid-workflow/v1 Workflow (list fields optional); `WorkflowDocStep` is the filled form. */
+export interface GaidWorkflowStep {
+  id: string;
+  title: Localized;
+  does: Localized;
+  skill?: string | null;
+  read?: Localized | null;
+  checks?: Localized[];
+  choiceIds?: string[];
+  outputs?: string[];
+}
+
+export interface WorkflowDocStep {
+  id: string;
+  title: Localized;
+  /** One or two sentences: what the agent does in this step. */
+  does: Localized;
+  /** Runtime name of the skill this step uses. */
+  skill?: string | null;
+  /** Which part of that skill to read first (a SKILL.md section title). */
+  read?: Localized | null;
+  checks: Localized[];
+  /** Ids of `choices` this step depends on (researcher decisions). */
+  choiceIds: string[];
+  /** Ids of `artifacts` this step writes. */
+  outputs: string[];
+}
+
+/**
+ * `structured`: steps are the Workflow's own. `legacy`: a geo-workflow/v1 Workflow whose steps were derived from its
+ * primary skill's procedure; the skill's SKILL.md holds the detailed procedure.
+ */
+export type WorkflowDocKind = "structured" | "legacy";
+
+export interface WorkflowDoc {
+  schemaVersion: typeof WORKFLOW_DOC_SCHEMA;
+  kind: WorkflowDocKind;
+  id: string;
+  title: Localized;
+  /** Registered revision (판); null for catalogue Workflows and unregistered drafts. */
+  revision: number | null;
+  purpose: Localized | null;
+  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized }[];
+  choices: WorkflowChoice[];
+  skills: WorkflowDocSkill[];
+  steps: WorkflowDocStep[];
+  artifacts: WorkflowArtifact[];
+  boundary: Localized | null;
+  /** The author's free-text instructions (a geo-workflow/v1 `prompt`); shown as its own section. */
+  instructions: Localized | null;
+}
+
+/** The researcher's start settings: input role id → project path, choice id → option id or free text. */
+export interface WorkflowDocSettings {
+  inputs: Record<string, string>;
+  choices: Record<string, string>;
+}
+
+/**
+ * `chat`: the first message, settings filled in. `preview`: hub/project view; settings shown as what the researcher
+ * will choose. `cli`: a prompt file for a CLI agent; settings come from the command's arguments.
+ */
+export type WorkflowDocTarget = "chat" | "preview" | "cli";
+
+export type WorkflowDocSay = (key: string, values?: Record<string, string | number>) => string;
+
+export interface RenderOptions {
+  locale: "ko" | "en";
+  target: WorkflowDocTarget;
+  say: WorkflowDocSay;
+  /** Researcher settings; used by `chat` (and by `preview` when given). */
+  settings?: WorkflowDocSettings | null;
+}
+
+const pick = (value: Localized | null | undefined, locale: "ko" | "en") =>
+  value ? (locale === "en" ? value.en ?? value.ko : value.ko) : "";
+
+const optionText = (choice: WorkflowChoice, value: string, locale: "ko" | "en") => {
+  const label = choice.optionLabels?.[value];
+  return label ? pick(label, locale) : value;
+};
+
+/** Render the Workflow 지침 as Markdown. Deterministic: same doc, settings and locale give the same text. */
+export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions): string {
+  const { locale, target, say } = options;
+  const p = (value: Localized | null | undefined) => pick(value, locale);
+  const settings = target === "cli" ? null : options.settings ?? null;
+  const lines: string[] = [];
+  const title = p(doc.title);
+  lines.push(doc.revision ? say("heading.titleRevision", { title, revision: doc.revision }) : say("heading.title", { title }));
+  if (p(doc.purpose)) lines.push("", p(doc.purpose));
+
+  // Settings.
+  lines.push("", `## ${say("section.settings")}`);
+  if (target === "cli") {
+    lines.push(say("settings.cliArguments"), "", "$ARGUMENTS", "", say("settings.cliAsk"));
+    for (const role of doc.inputRoles) lines.push(`- ${say("settings.inputAsk", { label: p(role.label), need: say(role.required ? "need.required" : "need.optional") })}`);
+    for (const choice of doc.choices) lines.push(`- ${choiceAsk(choice, locale, say)}`);
+  } else {
+    for (const role of doc.inputRoles) {
+      const path = settings?.inputs[role.id]?.trim();
+      const value = path || (settings ? say("settings.notUsed") : say("settings.researcherPicks"));
+      lines.push(`- ${p(role.label)}: ${value}`);
+    }
+    const unresolved: string[] = [];
+    for (const choice of doc.choices) {
+      const answer = settings?.choices[choice.id]?.trim();
+      if (answer) lines.push(`- ${p(choice.label)}: ${optionText(choice, answer, locale)}`);
+      else if (settings) unresolved.push(p(choice.label));
+      else lines.push(`- ${choiceAsk(choice, locale, say)}`);
+    }
+    // A blank line ends the Markdown list, so these sentences do not join its last item.
+    lines.push("");
+    if (settings) lines.push(say("settings.unresolved", { list: unresolved.length ? unresolved.join(", ") : say("settings.none") }));
+    lines.push(say("settings.askBeforeStep"));
+  }
+
+  // Skills.
+  if (doc.skills.length) {
+    lines.push("", `## ${say("section.skills")}`);
+    for (const skill of doc.skills) {
+      const usedIn = doc.steps.flatMap((step, i) => (step.skill === skill.name ? [i + 1] : []));
+      const parts = [say(`source.${skill.source}`)];
+      if (skill.source === "imported" && skill.ref) parts.push(skill.ref);
+      if (skill.role === "primary") parts.push(say("skill.primary"));
+      const what = p(skill.purpose) || p(skill.title);
+      const where = usedIn.length ? say("skill.usedIn", { steps: usedIn.join(", ") }) : "";
+      lines.push(`- ${skill.name} (${parts.join(", ")})${what ? `: ${what}` : ""}${where ? ` ${where}` : ""}`);
+    }
+    lines.push("", say("skill.readRule"));
+  }
+
+  // Steps.
+  if (doc.steps.length) {
+    lines.push("", `## ${say("section.steps")}`);
+    if (doc.kind === "legacy") {
+      const primary = doc.skills.find((skill) => skill.role === "primary")?.name ?? doc.skills[0]?.name ?? "";
+      lines.push(say("steps.legacy", { skill: primary }), "");
+    }
+    const choiceLabel = new Map(doc.choices.map((choice) => [choice.id, p(choice.label)]));
+    const artifactLabel = new Map(doc.artifacts.map((artifact) => [artifact.id, p(artifact.label)]));
+    doc.steps.forEach((step, i) => {
+      const decisions = step.choiceIds.map((id) => choiceLabel.get(id)).filter((x): x is string => Boolean(x));
+      const head = decisions.length ? say("step.headDecision", { title: p(step.title), decisions: decisions.join(", ") }) : p(step.title);
+      lines.push(`${i + 1}. ${head}: ${p(step.does)}`);
+      if (step.skill) lines.push(`   ${p(step.read) ? say("step.skillRead", { skill: step.skill, read: p(step.read) }) : say("step.skill", { skill: step.skill })}`);
+      if (step.checks.length) lines.push(`   ${say("step.checks", { checks: step.checks.map(p).join(" / ") })}`);
+      const outputs = step.outputs.map((id) => artifactLabel.get(id)).filter((x): x is string => Boolean(x));
+      if (outputs.length) lines.push(`   ${say("step.outputs", { outputs: outputs.join(", ") })}`);
+    });
+  }
+
+  if (p(doc.instructions)) lines.push("", `## ${say("section.instructions")}`, p(doc.instructions));
+
+  if (doc.artifacts.length) {
+    lines.push("", `## ${say("section.artifacts")}`);
+    for (const artifact of doc.artifacts) {
+      const need = say(artifact.required ? "need.required" : "need.optional");
+      const files = artifact.files?.length ? `${artifact.files.join(", ")}: ` : "";
+      lines.push(`- ${files}${p(artifact.label)} (${need})`);
+    }
+  }
+
+  if (p(doc.boundary)) lines.push("", `## ${say("section.boundary")}`, p(doc.boundary));
+  lines.push("", `## ${say("section.closing")}`, say("closing.review"));
+  if (settings || target === "cli") lines.push(say("closing.examples"));
+  return lines.join("\n");
+}
+
+function choiceAsk(choice: WorkflowChoice, locale: "ko" | "en", say: WorkflowDocSay) {
+  const label = pick(choice.label, locale);
+  const options = (choice.options ?? []).map((option) => optionText(choice, option, locale));
+  return options.length ? say("settings.choiceOptions", { label, options: options.join(" / ") }) : say("settings.choiceOpen", { label });
+}
+
+// --- Chat block ------------------------------------------------------------------------------------------------
+
+/** Attribute values are kept to one line without quotes, so the block parses back exactly. */
+const attr = (value: string) => value.replace(/["\n\r]/g, " ").trim();
+
+/**
+ * The chat's first message: the rendered document in a `<workflow>` block, then the researcher's own text. The
+ * transcript shows the block as a "Workflow · <title> · <n>판" card (like the skill and template chips).
+ */
+export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "revision">, body: string, locale: "ko" | "en"): string {
+  const title = attr(pick(doc.title, locale));
+  const revision = doc.revision ? ` revision="${doc.revision}"` : "";
+  return `<workflow id="${attr(doc.id)}"${revision} title="${title}">\n${body}\n</workflow>`;
+}
+
+export interface ParsedWorkflowBlock {
+  id: string;
+  title: string;
+  revision: number | null;
+  body: string;
+  /** Text after the block (the researcher's additions). */
+  tail: string;
+}
+
+const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)")? title="([^"]*)">\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
+
+export function parseWorkflowBlock(text: string): ParsedWorkflowBlock | null {
+  const match = text.match(WORKFLOW_RE);
+  if (!match) return null;
+  return { id: match[1], revision: match[2] ? Number(match[2]) : null, title: match[3], body: match[4], tail: match[5] ?? "" };
+}
+
+// --- Older Workflows -------------------------------------------------------------------------------------------
+
+/** A procedure step of a skill (hub `atlas.yaml` / catalogue details `profile.procedure.nodes`). */
+export interface SkillProcedureStep {
+  id: string;
+  label: Localized;
+  summary?: Localized | null;
+  checks?: Localized[];
+  decisionIds?: string[];
+}
+
+export interface LegacyWorkflowInput {
+  id: string;
+  title: Localized;
+  description: Localized | null;
+  inputRoles: WorkflowDoc["inputRoles"];
+  requiredScientificChoices: WorkflowChoice[];
+  prompt: Localized | null;
+  expectedArtifacts: WorkflowArtifact[];
+  boundary: Localized | null;
+  revision?: number | null;
+  /** The Workflow's skills in `skillIds` order (primary first), resolved to runtime names. */
+  skills: { name: string; title?: Localized | null; source: WorkflowSkillSource; ref?: string | null }[];
+  /** The primary skill's procedure; absent when unknown. */
+  procedure?: SkillProcedureStep[] | null;
+}
+
+/**
+ * Build a document for a geo-workflow/v1 Workflow (hub entries registered before gaid-workflow/v1, their installed
+ * copies, catalogue Workflows). Steps come from the primary skill's procedure; stored data is not changed.
+ */
+export function legacyWorkflowDoc(input: LegacyWorkflowInput): WorkflowDoc {
+  const choiceIds = new Set(input.requiredScientificChoices.map((choice) => choice.id));
+  const primary = input.skills[0]?.name ?? null;
+  return {
+    schemaVersion: WORKFLOW_DOC_SCHEMA,
+    kind: "legacy",
+    id: input.id,
+    title: input.title,
+    revision: input.revision ?? null,
+    purpose: input.description,
+    inputRoles: input.inputRoles,
+    choices: input.requiredScientificChoices,
+    skills: input.skills.map((skill, i) => ({ ...skill, role: i === 0 ? "primary" : "supporting" })),
+    steps: (input.procedure ?? []).map((node) => ({
+      id: node.id,
+      title: node.label,
+      does: node.summary ?? node.label,
+      skill: primary,
+      read: null,
+      checks: node.checks ?? [],
+      choiceIds: (node.decisionIds ?? []).filter((id) => choiceIds.has(id)),
+      outputs: [],
+    })),
+    artifacts: input.expectedArtifacts,
+    boundary: input.boundary,
+    instructions: input.prompt,
+  };
+}

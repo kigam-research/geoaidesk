@@ -69,6 +69,8 @@ import { SystemCard } from "@/components/system-card";
 import { PermissionCard } from "@/components/permission-card";
 import { CommandBlockChip } from "@/components/command-block-chip";
 import { parseCommandBlock, slashMenuItems, type SlashMenuItem } from "@/lib/command-blocks";
+import { parseWorkflowBlock } from "@/geo/contracts/workflow-doc";
+import { PendingWorkflowChip, WorkflowBlockCard } from "@/geo/workflow/workflow-card";
 import { usePromptTemplates } from "@/lib/use-prompts";
 import { KadyFileIcon } from "@/components/file-icon";
 import { ScientificResultCard } from "@/components/scientific-result-card";
@@ -709,6 +711,8 @@ function ChatInput({
   onSend,
   pendingSteers,
   pendingFollowUps = [],
+  pendingWorkflow = null,
+  onClearWorkflow,
   composerRestoreRef,
   inlineError,
   isStreaming,
@@ -764,6 +768,9 @@ function ChatInput({
   pendingSteers: string[];
   /** Pi follow-ups queued for the live run (⌥↵). */
   pendingFollowUps?: string[];
+  /** GeoAIDesk: a started Workflow's `<workflow>` block, sent before the typed text (gaid-workflow-model). */
+  pendingWorkflow?: string | null;
+  onClearWorkflow?: () => void;
   composerRestoreRef: MutableRefObject<((text: string) => void) | null>;
   inlineError: string | null;
   isStreaming: boolean;
@@ -912,7 +919,7 @@ function ChatInput({
       const dbCtx = buildDatabaseContext(selectedDbs);
       const skillsCtx = buildSkillsContext(selectedSkills);
       const baseText = msg.text ?? "";
-      if (!baseText.trim() && attachedFiles.length === 0) {
+      if (!baseText.trim() && attachedFiles.length === 0 && !pendingWorkflow) {
         if (msg.files.length > 0) {
           setAttachError(appText("chat.composer.add_a_short_note_to_send_with"));
         }
@@ -933,18 +940,22 @@ function ChatInput({
       const images = await promptImagesFromParts(msg.files);
       // Only clear once the message is actually accepted: a full queue or a
       // failed steer used to wipe the composer text and attachment chips.
-      const accepted = await onSend(baseText + refs + dbCtx + skillsCtx + composerCtx, intent, images);
+      // A started Workflow goes first as its own block so the transcript shows it as a card; the rest is its tail.
+      const rest = (baseText + refs + dbCtx + skillsCtx + composerCtx).replace(/^\s+/, "");
+      const outgoing = pendingWorkflow ? (rest ? `${pendingWorkflow}\n\n${rest}` : pendingWorkflow) : baseText + refs + dbCtx + skillsCtx + composerCtx;
+      const accepted = await onSend(outgoing, intent, images);
       if (!accepted) {
         event?.preventDefault();
         return false;
       }
       onClearFiles();
+      if (pendingWorkflow) onClearWorkflow?.();
       // Research references and delegation are instructions for this one
       // message; pinned skills and data sources stay.
       onResearchChange([]);
       onDelegationChange(EMPTY_DELEGATION);
     },
-    [budgetBlocked, modelAvailability, modelAvailable, onSend, attachedFiles, onClearFiles, selectedDbs, selectedSkills, delegation, researchRefs, onResearchChange, onDelegationChange, projectId]
+    [budgetBlocked, modelAvailability, modelAvailable, onSend, attachedFiles, onClearFiles, selectedDbs, selectedSkills, delegation, researchRefs, onResearchChange, onDelegationChange, projectId, pendingWorkflow, onClearWorkflow]
   );
 
   // @ mention state
@@ -1267,6 +1278,7 @@ function ChatInput({
           className="@container/composer rounded-xl border shadow-sm"
         >
           <ImageAttachmentsRow />
+          {pendingWorkflow && <PendingWorkflowChip block={pendingWorkflow} onRemove={onClearWorkflow} />}
           <ContextChipsBar
             attachedFiles={attachedFiles}
             onRemoveFile={onRemoveFile}
@@ -1614,10 +1626,11 @@ export const ChatMessageRow = memo(function ChatMessageRow({
             )}
             {(() => {
               const { text, context } = splitComposerContext(message.content);
-              const block = parseCommandBlock(text);
+              const workflow = parseWorkflowBlock(text);
+              const block = workflow ? null : parseCommandBlock(text);
               return (
                 <>
-                  {block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
+                  {workflow ? <WorkflowBlockCard block={workflow} /> : block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
                   {context && <SentContextChips context={context} />}
                 </>
               );
@@ -1915,6 +1928,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
   const [attachedFiles, setAttachedFiles] = useState<string[]>(
     () => initialWorkspaceState?.attachedFiles ?? [],
   );
+  const [pendingWorkflow, setPendingWorkflow] = useState<string | null>(() => initialWorkspaceState?.pendingWorkflow ?? null);
+  const clearPendingWorkflow = useCallback(() => setPendingWorkflow(null), []);
   const [selectedDbs, setSelectedDbs] = useState<Database[]>(
     () => initialWorkspaceState?.selectedDatabases ?? [],
   );
@@ -2109,8 +2124,10 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       queuedMessages: messageQueue,
       composer: composerDraft,
       ...(initialWorkspaceState?.geoExposure ? { geoExposure: initialWorkspaceState.geoExposure } : {}),
+      ...(pendingWorkflow ? { pendingWorkflow } : {}),
     });
   }, [
+    pendingWorkflow,
     attachedFiles,
     composerDraft,
     delegation,
@@ -2491,6 +2508,8 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
             onSend={handleSend}
             pendingSteers={pendingSteers}
             pendingFollowUps={pendingFollowUps}
+            pendingWorkflow={pendingWorkflow}
+            onClearWorkflow={clearPendingWorkflow}
             composerRestoreRef={composerRestoreRef}
             inlineError={steerError}
             isStreaming={isStreaming}

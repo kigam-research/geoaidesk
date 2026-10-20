@@ -1,0 +1,63 @@
+{
+  "heading": {
+    "title": "# Workflow: {title}",
+    "titleRevision": "# Workflow: {title} (revision {revision})"
+  },
+  "section": {
+    "settings": "Researcher's settings (these take precedence over example values in this document)",
+    "skills": "Skills used",
+    "steps": "Steps",
+    "instructions": "Author's additional instructions",
+    "artifacts": "Result files",
+    "boundary": "Interpretation limits",
+    "closing": "When you finish"
+  },
+  "settings": {
+    "researcherPicks": "chosen by the researcher",
+    "notUsed": "not used",
+    "none": "none",
+    "unresolved": "Conditions not set: {list}",
+    "askBeforeStep": "Ask the researcher about a condition that is not set before the step that uses it.",
+    "choiceOptions": "{label}: chosen by the researcher (options: {options})",
+    "choiceOpen": "{label}: set by the researcher",
+    "inputAsk": "{label} ({need})",
+    "cliArguments": "The values after the command are the researcher's settings:",
+    "cliAsk": "Before you start, ask the researcher for any item below that those values do not give."
+  },
+  "need": {
+    "required": "required",
+    "optional": "optional"
+  },
+  "source": {
+    "catalogue": "built-in skill",
+    "bundled": "skill bundled with this Workflow",
+    "imported": "imported skill"
+  },
+  "skill": {
+    "primary": "primary skill",
+    "usedIn": "Used in step {steps}.",
+    "readRule": "Before you start a step that uses a skill, read that skill's instruction file (SKILL.md)."
+  },
+  "steps": {
+    "legacy": "This Workflow uses the earlier format. For the detailed method of each step, follow the procedure in the instructions of skill {skill}."
+  },
+  "step": {
+    "headDecision": "{title} [researcher decision: {decisions}]",
+    "skill": "Skill: {skill}",
+    "skillRead": "Skill: {skill} (read first: {read})",
+    "checks": "Check: {checks}",
+    "outputs": "Writes: {outputs}"
+  },
+  "closing": {
+    "review": "The results are not reviewed yet. Do not report a completed run as a completed review.",
+    "examples": "If example values in this document (target, resolution, data size and so on) differ from the researcher's settings or the actual files, follow the settings and the files and say what differs first."
+  },
+  "card": {
+    "label": "Workflow · {title}",
+    "labelRevision": "Workflow · {title} · revision {revision}",
+    "expand": "Show instructions",
+    "collapse": "Hide instructions",
+    "remove": "Remove Workflow",
+    "pendingHint": "When you send, these Workflow instructions go first and what you type follows them."
+  }
+}

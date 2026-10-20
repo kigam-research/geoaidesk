@@ -1,6 +1,11 @@
 /** Institute-shared method registry. Display-name identity is intentionally not account authentication. */
+import { procedureSteps, workflowDocFor } from "../workflow-doc.ts";
+import { gunzipSync } from "node:zlib";
+import { readTar } from "../tar.ts";
+import { catalogueWorkflowDoc } from "../workspace/workflows.ts";
 import { createHash } from "node:crypto";
-import { extname } from "node:path";
+import { extname, join } from "node:path";
+import { readFile, stat } from "node:fs/promises";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { AtlasTextInput, CheckResult, InstallBody } from "../../../../web/src/geo/contracts/authoring.ts";
 import type {
@@ -13,6 +18,7 @@ import type {
 import { HUB_USER_HEADER } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
+import { structuredDraft } from "../authoring/workflow.ts";
 import { buildPackage } from "../authoring/package.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { safeRelative } from "../authoring/sources.ts";
@@ -174,12 +180,15 @@ export async function registerSharedHubRoutes(
         if (link?.mode === "edit" && !previous) throw new AuthoringError("고치던 등록 방법을 찾을 수 없습니다.", 404);
         const original = link?.mode === "copy" ? await store.find(link.entryId) : null;
         const prepared = await authoring.mutate(projectId, async (project) => {
-          const draft =
+          const selectedDraft =
             body.draftRevision === undefined
               ? project.drafts.at(-1)
               : project.drafts.find((d) => d.revision === body.draftRevision);
-          if (!draft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
-          let pkg = project.packages.find((p) => p.draftRevision === draft.revision);
+          if (!selectedDraft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
+          const draft = structuredDraft(selectedDraft);
+          if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
+          let pkg = project.packages.find((p) => p.draftRevision === draft.revision &&
+            ((p.manifest as { workflows?: GeoWorkflow[] } | null)?.workflows ?? []).some((w) => w.id === draft.workflow!.id && w.schemaVersion === "gaid-workflow/v1"));
           if (!pkg) {
             const built = await buildPackage(project, draft, {
               store: authoring,
@@ -312,6 +321,13 @@ export async function registerSharedHubRoutes(
         visuals,
         outputImages,
         workflowTitle: snapshot.draft.workflow?.title ?? null,
+        workflowDoc: snapshot.draft.workflow
+          ? workflowDocFor(snapshot.draft.workflow as unknown as GeoWorkflow, {
+            revision: record.entry.latestRevision,
+            skills: [{ name: snapshot.draft.slug, source: "bundled" }],
+            procedure: procedureSteps(snapshot.draft.profile),
+          })
+          : null,
         comments: await store.comments(record.entry.id),
       };
     });
@@ -382,7 +398,7 @@ export async function registerSharedHubRoutes(
             await store.bytes(record.entry.id, `packages/${revision}.tar.gz`),
             snapshot.package,
             req.body ?? ({} as InstallBody),
-            options,
+            { ...options, hubEntry: { id: record.entry.id, revision } },
           );
           record.installs.push(result.install);
           await store.write(record);
@@ -391,6 +407,39 @@ export async function registerSharedHubRoutes(
         return reply.code(201).send(result);
       },
     );
+    scope.get<{ Params: { id: string }; Querystring: { revision?: string; name?: string } }>("/geo/hub/entries/:id/skill-source", async (req) => {
+      const record = await store.read(req.params.id);
+      const snapshot = snapshotOf(record, req.query.revision);
+      if (req.query.name !== snapshot.package.slug) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
+      const revision = req.query.revision === undefined ? record.entry.latestRevision : Number(req.query.revision);
+      const archive = await store.bytes(record.entry.id, `packages/${revision}.tar.gz`);
+      if (createHash("sha256").update(archive).digest("hex") !== snapshot.package.sha256)
+        throw new AuthoringError("등록 파일을 읽지 못했습니다.", 409);
+      const files = readTar(gunzipSync(archive, { maxOutputLength: 64 * 1024 * 1024 }));
+      const skill = files.find((f) => f.type === "file" && f.path === `${snapshot.package.slug}/SKILL.md`);
+      if (!skill || skill.data.length > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 404);
+      return { content: skill.data.toString("utf8") };
+    });
+    scope.get<{ Params: { id: string }; Querystring: { name?: string } }>("/geo/hub/catalogue/:id/skill-source", async (req) => {
+      if (!geoCatalogueActive()) throw new AuthoringError("기본 Workflow를 찾을 수 없습니다.", 404);
+      const catalogue = loadGeoCatalogue();
+      const workflow = catalogue.workflows.find((w) => w.id === req.params.id);
+      const skill = catalogue.index.skills.find((s) => workflow?.skillIds.includes(s.id) && s.runtimeName === req.query.name);
+      if (!skill || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skill.runtimeName)) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
+      const file = join(catalogue.skillsDir, skill.runtimeName, "SKILL.md");
+      if ((await stat(file)).size > 2 * 1024 * 1024) throw new AuthoringError("스킬 지침을 읽지 못했습니다.", 413);
+      return { content: await readFile(file, "utf8") };
+    });
+    scope.get<{ Params: { id: string } }>("/geo/hub/catalogue/:id", async (req) => {
+      const catalogue = geoCatalogueActive() ? loadGeoCatalogue() : null;
+      const workflow = (options.catalogueWorkflows?.() ?? catalogue?.workflows ?? []).find((w) => w.id === req.params.id);
+      if (!workflow) throw new AuthoringError("기본 Workflow를 찾을 수 없습니다.", 404);
+      const doc = catalogue ? catalogueWorkflowDoc(catalogue, workflow, workflow.skillIds.map((id) => {
+        const skill = catalogue.index.skills.find((s) => s.id === id);
+        return { id, runtimeName: skill?.runtimeName ?? null, title: skill?.title ?? null, installed: false, enabled: false };
+      })) : workflowDocFor(workflow, { skills: workflow.skillIds.map((id) => ({ name: id, source: "catalogue" })) });
+      return { doc };
+    });
     scope.get("/geo/hub/recommended", async (req) => {
       const entries = await Promise.all((await store.list()).map((r) => entryView(r, hubUser(req))));
       const cards: HubRecommendation[] = entries

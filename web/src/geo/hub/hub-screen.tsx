@@ -45,6 +45,7 @@ import { InputPrep } from "./input-prep";
 import { openMethodSetup } from "./handoff";
 import type { HubEntry, HubFolder, HubRecommendation } from "@/geo/contracts/hub-shared";
 import { hubUserName, sharedHub } from "./shared-api";
+import { CatalogueWorkflowScreen } from "./catalogue-workflow";
 import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
@@ -154,6 +155,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
   const [folderId, setFolderId] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [catalogueId, setCatalogueId] = useState<string | null>(null);
   const [newFolder, setNewFolder] = useState(false);
   const named = useNamedAction();
   const loadShared = useCallback(async () => {
@@ -189,6 +191,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
   const me = hubUserName();
   const mine = me ? projects.filter((p) => !p.author || p.author === me) : projects;
   const shown = folderId === "all" ? mine : mine.filter((p) => entryOf(p)?.folderId === folderId);
+  if (catalogueId) return <CatalogueWorkflowScreen key={catalogueId} id={catalogueId} onBack={() => setCatalogueId(null)} />;
   return (
     <>
       <HubHome
@@ -229,7 +232,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         onOpenRecommended={(id) => {
           const card = cards.find((c) => c.id === id);
           if (card?.source === "shared") onOpenEntry(card.ref);
-          else if (card) toast.info(text("home.catalogueHint", { title: card.title }));
+          else if (card) setCatalogueId(card.ref);
         }}
       />
       <NewFolderDialog
@@ -334,7 +337,7 @@ function HubProject({
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<HubStep | null>(null);
   const [goal, setGoal] = useState("");
-  const [target, setTarget] = useState<Target>("auto");
+  const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
@@ -382,7 +385,7 @@ function HubProject({
       setProject(p);
       setError(null);
       setGoal((g) => g || p.goal || "");
-      setTarget((t) => (p.target && t === "auto" ? p.target : t));
+      setTarget("workflow");
       setAgentModel((m) => m || p.model || "");
     } catch (e) {
       setError((e as Error).message);
@@ -409,6 +412,8 @@ function HubProject({
   }, [answers, id]);
 
   const draft = project?.drafts.at(-1);
+  // Consent belongs to the exact draft revision that was previewed.
+  useEffect(() => { setConsent(false); }, [id, draft?.revision]);
   const showingDraft = Boolean(draft);
   useEffect(() => {
     if (!showingDraft) return;
@@ -738,6 +743,7 @@ function HubProject({
     body = (
       <DraftStep
         draft={draft}
+        authoringId={id}
         visuals={pictures.steps}
         outputImages={pictures.outputs}
         cover={pictures.cover}
@@ -762,9 +768,12 @@ function HubProject({
         onRegister={() => setStep("publish")}
         rail={
           <TrialCard
+            key={`${draft.revision}:${trialProject}`}
+            authoringId={id}
+            draftRevision={draft.revision}
             projects={activeProjects.map((p) => ({ id: p.id, name: p.name }))}
             projectId={trialProject}
-            onProject={setTrialProject}
+            onProject={(next) => { setConsent(false); setTrialProject(next); }}
             consent={consent}
             onConsent={setConsent}
             onInstall={install}

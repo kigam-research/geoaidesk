@@ -60,6 +60,8 @@ export interface MethodOrigin {
   /** `skill-hub`: fetched from a configured hub URL; `upload`: a `.tar.gz` the user chose; `gaid-hub`: built in this app's GAID hub; `other`: any other install. */
   kind: "skill-hub" | "upload" | "gaid-hub" | "other";
   packageSha256?: string;
+  /** Shared-hub registration identity, independent of the draft/package revision. */
+  hubEntry?: { id: string; revision: number };
   siteId?: string;
   pageUrl?: string;
   /** Hub descriptor (`gaid-hub-package/v1`) the package was fetched through, token removed. */

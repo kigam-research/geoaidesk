@@ -47,10 +47,10 @@ describe("editing a registered method", () => {
     };
     const { rerender } = render(<SharedMethod method={view} profile={profile} flow={<div />} onStar={vi.fn()}
       onComment={vi.fn()} onTry={vi.fn()} onEdit={{ mode: "edit", run }} />);
-    fireEvent.click(screen.getByRole("button", { name: "방법 고치기" }));
+    fireEvent.click(screen.getByRole("button", { name: "Workflow 고치기" }));
     expect(run).toHaveBeenCalledOnce();
     expect(screen.getByText(/새 판으로 등록합니다/)).toBeTruthy();
-    expect(screen.getByText(/김 연구원의 「원본 방법」 2판을 복사해 고친 방법입니다/)).toBeTruthy();
+    expect(screen.getByText(/김 연구원의 「원본 방법」 2판을 복사해 고친 Workflow입니다/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "원본 보기" }));
     expect(onOpen).toHaveBeenCalledOnce();
     expect(screen.getByText("판 기록 2개")).toBeTruthy();
@@ -58,6 +58,6 @@ describe("editing a registered method", () => {
     rerender(<SharedMethod method={view} profile={profile} flow={<div />} onStar={vi.fn()}
       onComment={vi.fn()} onTry={vi.fn()} onEdit={{ mode: "copy", run }} />);
     expect(screen.getByRole("button", { name: "복사해서 고치기" })).toBeTruthy();
-    expect(screen.getByText(/원본을 밝힌 별도 방법이 됩니다/)).toBeTruthy();
+    expect(screen.getByText(/원본을 밝힌 별도 Workflow가 됩니다/)).toBeTruthy();
   });
 });

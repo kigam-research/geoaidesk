@@ -4,7 +4,7 @@
  * research" (install into one of my projects, prepare its inputs, open its start settings).
  */
 import { ChevronLeftIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,11 @@ import { API_BASE } from "@/lib/projects";
 import { useProjects } from "@/lib/use-projects";
 
 import { HubUserDialog } from "./hub-dialogs";
+import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { InputPrep } from "./input-prep";
 import { NewProject } from "./draft-step";
+import { CliExportButton } from "@/geo/workflow/cli-export";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
 import { hubUserName, sharedHub } from "./shared-api";
@@ -62,7 +65,9 @@ export function SharedEntryScreen({
   onBack,
   onOpenDraft,
   onOpenEntry,
+  exportAction,
 }: {
+  exportAction?: (detail: HubEntryDetail) => ReactNode;
   /** Back to the hub list. */
   onBack?: () => void;
   /** Open a draft in the hub ("방법 고치기" / "복사해서 고치기"); without it the action is not offered. */
@@ -162,7 +167,8 @@ export function SharedEntryScreen({
           })),
         }}
         profile={detail.profile}
-        flow={<MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
+        workflowDoc={detail.workflowDoc}
+        flow={detail.workflowDoc ? <WorkflowView showStepsHeading={false} doc={detail.workflowDoc} profile={detail.profile} visuals={visuals} outputImages={outputImages} loadSkillSource={(name) => sharedHub.skillSource(e.id, e.latestRevision, name)} exportAction={exportAction ? exportAction(detail) : <CliExportButton source={{ kind: "hub", entryId: e.id }} />} /> : <MethodFlow profile={detail.profile} visuals={visuals} outputImages={outputImages} />}
         onStar={() =>
           named.run(() => {
             void sharedHub
@@ -234,6 +240,8 @@ export function UseInProjectDialog({
   const choices = [...projects, ...createdProjects.filter((p) => !projects.some((existing) => existing.id === p.id))];
   const { create } = useProjects();
   const [consent, setConsent] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
+  useEffect(() => { setConsent(false); setPreviewReady(false); setInstalled(null); }, [open, entryId, revision, projectId]);
   const [busy, setBusy] = useState(false);
   const [installed, setInstalled] = useState<{
     methodKey: string;
@@ -242,7 +250,7 @@ export function UseInProjectDialog({
   } | null>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{text("shared.try")}</DialogTitle>
         </DialogHeader>
@@ -264,7 +272,7 @@ export function UseInProjectDialog({
                 className="h-9 rounded-md border bg-background px-2 text-sm font-normal"
                 value={projectId}
                 disabled={busy}
-                onChange={(e) => setProjectId(e.target.value)}
+                onChange={(e) => { setProjectId(e.target.value); setConsent(false); setPreviewReady(false); }}
               >
                 <option value="" disabled>
                   {text("trial.pickProject")}
@@ -289,18 +297,19 @@ export function UseInProjectDialog({
                 }
               }} />
             </fieldset>
+            {open && projectId && <InstallPreview key={`${entryId}:${revision}:${projectId}`} projectId={projectId} entryId={entryId} revision={revision} onReady={setPreviewReady} />}
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
                 className="mt-0.5 size-4 accent-primary"
                 checked={consent}
-                disabled={busy}
+                disabled={busy || !previewReady}
                 onChange={(e) => setConsent(e.target.checked)}
               />
               {text("trial.consent")}
             </label>
             <Button
-              disabled={!consent || busy || !projectId}
+              disabled={!consent || busy || !projectId || !previewReady}
               onClick={async () => {
                 setBusy(true);
                 try {

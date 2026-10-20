@@ -6,97 +6,93 @@
   },
   "entry": {
     "title": "GAID 허브",
-    "body": "연구자들이 등록한 분석 방법을 내 자료로 쓰거나, 내 논문·코드로 새 방법을 만듭니다.",
+    "body": "연구자들이 등록한 Workflow를 내 자료로 쓰거나, 내 논문·코드로 새 Workflow를 만듭니다.",
     "open": "GAID 허브 열기"
   },
   "home": {
     "title": "GAID 허브",
-    "body": "연구자들이 등록한 분석 방법을 내 자료로 쓰거나, 내 논문·코드로 새 방법을 만듭니다.",
-    "new": "방법 만들기",
-    "empty": "만든 방법이 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
+    "body": "연구자들이 등록한 Workflow를 내 자료로 쓰거나, 내 논문·코드로 새 Workflow를 만듭니다.",
+    "new": "Workflow 만들기",
+    "empty": "만든 Workflow가 없습니다. 논문 PDF나 코드를 올려 시작하세요.",
     "loading": "목록을 읽는 중입니다.",
     "error": "목록을 읽지 못했습니다. 잠시 뒤 다시 여세요.",
     "updated": "{when} 수정",
     "open": "{title} 열기",
     "back": "허브 목록",
-    "recommended": "추천 분석 방법",
-    "catalogue": "카탈로그",
+    "recommended": "추천 Workflow",
+    "catalogue": "기본 Workflow",
     "shared": "공유",
-    "mine": "내가 만든 방법 (초안과 등록한 것)",
+    "mine": "내가 만든 Workflow (초안과 등록한 것)",
     "folders": "폴더",
     "newFolder": "새 폴더",
     "allFolders": "전체",
     "registered": "허브 등록 {n}판",
     "catalogueHint": "{title}: 카탈로그 Workflow입니다. 내 연구 프로젝트의 Workflow 패널에서 시작합니다.",
     "browse": {
-      "title": "허브에 등록된 방법",
-      "tabs": "방법 목록",
+      "title": "허브에 등록된 Workflow",
+      "tabs": "Workflow 목록",
       "all": "전체",
-      "folders": "등록 방법 주제 폴더",
+      "folders": "등록 Workflow 주제 폴더",
       "search": {
-        "label": "등록 방법 검색",
+        "label": "등록 Workflow 검색",
         "placeholder": "제목, 한 줄 설명, 연구자, 분류 검색",
-        "hint": "원소 기호(Ni)나 방법 이름(PU)으로도 찾을 수 있습니다."
+        "hint": "원소 기호(Ni)나 Workflow 이름(PU)으로도 찾을 수 있습니다."
       },
       "order": "star 많은 순 · 최근 등록순",
-      "count": "방법 {count}개",
-      "loading": "등록 방법을 읽는 중입니다.",
-      "error": "등록 방법을 읽지 못했습니다. 목록을 다시 읽으세요.",
+      "count": "Workflow {count}개",
+      "loading": "등록 Workflow를 읽는 중입니다.",
+      "error": "등록 Workflow를 읽지 못했습니다. 목록을 다시 읽으세요.",
       "retry": {
         "button": "목록 다시 읽기"
       },
-      "noResults": "조건에 맞는 방법이 없습니다. 검색어나 폴더를 바꾸세요.",
-      "empty": "등록된 방법이 없습니다. 추천 분석 방법을 살펴보세요.",
+      "noResults": "조건에 맞는 Workflow가 없습니다. 검색어나 폴더를 바꾸세요.",
+      "empty": "등록된 Workflow가 없습니다. 추천 Workflow를 살펴보세요.",
       "reset": {
-        "button": "전체 방법 보기"
+        "button": "전체 Workflow 보기"
       },
       "recommended": {
-        "action": "추천 분석 방법 보기"
+        "action": "추천 Workflow 보기"
       },
       "open": "{title} 열기",
       "stars": "star {count}개"
     },
     "route": {
       "use": {
-        "title": "등록된 방법 쓰기",
-        "body": "방법을 골라 내 프로젝트에 설치하고 내 자료로 시작합니다.",
-        "button": "방법 둘러보기"
+        "title": "등록된 Workflow 쓰기",
+        "body": "Workflow를 골라 내 프로젝트에 설치하고 내 자료로 시작합니다.",
+        "button": "Workflow 둘러보기"
       },
       "make": {
-        "title": "내 논문으로 방법 만들기",
-        "body": "논문이나 코드를 올리고 질문에 답하면 방법 초안이 만들어집니다."
+        "title": "내 논문으로 Workflow 만들기",
+        "body": "논문이나 코드를 올리고 질문에 답하면 Workflow 초안이 만들어집니다."
       }
     },
     "glossary": {
       "button": "용어 보기",
       "title": "허브에서 쓰는 말",
-      "method": {
-        "term": "방법",
-        "text": "허브에 올라오는 분석 단위입니다. 스킬 하나와, 있으면 Workflow 하나로 이루어집니다."
-      },
       "skill": {
         "term": "스킬",
-        "text": "AI agent가 따르는 분석 지침입니다. 실행 코드가 함께 들어 있는 스킬도 있습니다."
+        "text": "Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬이 있습니다."
       },
       "workflow": {
         "term": "Workflow",
-        "text": "스킬을 내 자료로 시작하는 순서입니다. 입력 파일과 미리 정할 값을 묻습니다."
+        "text": "연구 작업 하나를 AI agent에게 맡기는 절차입니다. 입력 자료, 연구자가 정할 조건, 단계, AI agent 지시문, 사용하는 스킬, 결과와 해석 한계로 이루어집니다."
       },
       "recipe": {
-        "term": "시작 설정",
-        "text": "Workflow를 시작할 때 미리 골라 둔 값입니다. 레시피라고도 부릅니다."
+        "term": "저장한 시작 설정",
+        "text": "Workflow의 입력과 조건 값을 미리 정해 둔 것입니다."
       },
       "draft": {
         "term": "초안",
-        "text": "아직 허브에 등록하지 않은 방법입니다. 다른 연구자의 허브 목록에는 나오지 않습니다."
+        "text": "아직 허브에 등록하지 않은 Workflow입니다. 다른 연구자의 허브 목록에는 나오지 않습니다."
       },
       "revision": {
         "term": "판",
-        "text": "등록한 방법을 고쳐 다시 등록할 때마다 올라가는 번호입니다. 의견은 판마다 남습니다."
+        "text": "등록한 Workflow를 고쳐 다시 등록할 때마다 올라가는 번호입니다. 의견은 판마다 남습니다."
       },
       "trial": {
         "term": "시험",
-        "text": "내 프로젝트에서 방법을 실제로 실행해 본 기록입니다. 검토 결과는 아닙니다."
+        "text": "내 프로젝트에서 Workflow를 실제로 실행해 본 기록입니다. 검토 결과는 아닙니다."
       }
     },
     "byUpdated": "{author} · {when} 수정",
@@ -127,7 +123,7 @@
     "drop": "논문 PDF나 코드 묶음(.zip, .tar.gz)을 끌어 놓으세요.",
     "pick": "파일 선택",
     "goal": "만들고 싶은 것",
-    "goalPlaceholder": "예: 다른 지역 격자 자료에 쓸 탐사 방법",
+    "goalPlaceholder": "예: 다른 지역 격자 자료에 쓸 탐사 Workflow",
     "target": "만들 종류",
     "targetAuto": "에이전트가 제안",
     "targetSkill": "스킬",
@@ -156,7 +152,7 @@
     "agentModel": "에이전트 모델",
     "agentModelDefault": "설정의 기본 모델",
     "agentModelHint": "자료 읽기, 질문, 초안 작성에 쓰는 모델입니다.",
-    "readDone": "자료를 다 읽었습니다. 다음은 방법을 정하는 질문에 답할 차례입니다.",
+    "readDone": "자료를 다 읽었습니다. 다음은 Workflow를 정하는 질문에 답할 차례입니다.",
     "next": "질문에 답하기"
   },
   "reading": {
@@ -165,8 +161,8 @@
     "received": "자료 {count}개 받음",
     "pages": "PDF {pages}쪽 글자 읽음",
     "files": "코드 파일 {count}개 확인",
-    "analysis": "방법과 빠진 결정 찾는 중",
-    "note": "화면을 닫아도 계속 읽습니다. 허브 첫 화면의 '내가 만든 방법'에서 다시 열 수 있습니다. 논문이 길면 몇 분 넘게 걸립니다.",
+    "analysis": "Workflow와 빠진 결정 찾는 중",
+    "note": "화면을 닫아도 계속 읽습니다. 허브 첫 화면의 '내가 만든 Workflow'에서 다시 열 수 있습니다. 논문이 길면 몇 분 넘게 걸립니다.",
     "failed": "자료를 분석하지 못했습니다. 다시 실행하세요.",
     "interrupted": "앱이 다시 시작되어 분석이 멈췄습니다. 다시 실행하세요.",
     "retry": "분석 다시 실행"
@@ -196,7 +192,7 @@
     "needAll": "답하지 않은 질문이 {count}개 있습니다. 답하거나 나중에 정하기를 고르세요.",
     "allApplied": "모든 답이 초안에 반영되었습니다. 답을 바꾸려면 질문 번호를 눌러 다시 고르세요.",
     "intent": "질문 의도",
-    "link": "방법과의 연결",
+    "link": "Workflow와의 연결",
     "makeDraft": "초안 만들기",
     "recordedEditable": "초안에 반영된 답입니다. 다른 답을 고르면 초안을 다시 고칩니다.",
     "changedNote": "반영된 답과 다릅니다. 답 확인에서 반영하면 초안을 다시 고칩니다.",
@@ -217,7 +213,7 @@
     "untested": "미시험",
     "tested": "시험 {count}회",
     "revision": "{n}판",
-    "flow": "방법 흐름",
+    "flow": "Workflow 단계",
     "you": "직접 정함",
     "inputs": "입력",
     "outputs": "결과",
@@ -250,7 +246,7 @@
     "title": "내 연구 프로젝트에서 먼저 시험 (선택)",
     "body": "초안을 프로젝트에 설치하고 입력 자료를 준비한 뒤 Workflow 시작 설정을 엽니다.",
     "project": "시험할 프로젝트",
-    "consent": "설치할 방법이 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
+    "consent": "설치할 Workflow가 프로젝트에서 코드를 실행할 수 있음을 확인했습니다.",
     "install": "프로젝트에 설치하기",
     "installing": "설치하는 중입니다.",
     "installed": "{project}에 설치됨",
@@ -298,8 +294,8 @@
     "validation": "검사에서 걸러진 내용"
   },
   "prep": {
-    "loading": "설치한 방법을 확인하는 중입니다.",
-    "noWorkflow": "설치한 방법에 Workflow가 없습니다. 프로젝트의 Workflow 패널에서 방법을 여세요.",
+    "loading": "설치한 Workflow를 확인하는 중입니다.",
+    "noWorkflow": "설치한 Workflow에 Workflow가 없습니다. 프로젝트의 Workflow 패널에서 Workflow를 여세요.",
     "title": "{project}에 넣을 입력 자료",
     "required": "필수",
     "optional": "선택",
@@ -309,7 +305,7 @@
     "uploadFailed": "파일을 올리지 못했습니다. 파일을 확인한 뒤 다시 올리세요.",
     "environment": "실행 환경",
     "openProject": "프로젝트 열기",
-    "extraPackages": "준비된 환경 밖의 패키지: {packages}. 분석할 때 AI agent가 스킬 안내에 따라 설치합니다. 설치가 막힌 PC에서는 해당 단계가 멈춥니다.",
+    "extraPackages": "준비된 환경 밖의 Python 라이브러리: {packages}. 분석할 때 AI agent가 스킬 안내에 따라 설치합니다. 설치가 막힌 PC에서는 해당 단계가 멈춥니다.",
     "optionalPackage": "{name}(선택 단계)"
   },
   "register": {
@@ -319,8 +315,8 @@
     "folder": "허브 공개 분류 (폴더)",
     "note": "다른 연구자에게 남길 말",
     "notePlaceholder": "예: 다른 지역 격자 자료에 쓰도록 만들었습니다. 시험해 보고 의견을 남겨 주세요.",
-    "shared": "공유: 스킬·Workflow 파일, 방법 흐름, 검사 기록, 시험 평가",
-    "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 연구 자료. 패키지에 넣은 코드는 공유됩니다.",
+    "shared": "공유: Workflow 설명·단계·파일, 포함 코드·개념 그림, 파일 검사 요약",
+    "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 연구 자료, 프로젝트 실행 기록과 시험 평가",
     "submit": "허브에 등록",
     "line": "허브에 등록하면 다른 연구자가 보고 star와 의견을 남길 수 있습니다. 등록 전 모습을 먼저 확인하세요.",
     "registeredLine": "{n}판이 허브에 등록되어 있습니다.",
@@ -346,14 +342,14 @@
     "back": "허브 목록",
     "note": "작성자의 말",
     "edit": {
-      "button": "방법 고치기",
+      "button": "Workflow 고치기",
       "hint": "고친 내용은 새 판으로 등록합니다. 이전 판도 계속 설치할 수 있습니다."
     },
     "copy": {
       "button": "복사해서 고치기",
-      "hint": "내 방법으로 복사해 고칩니다. 등록하면 원본을 밝힌 별도 방법이 됩니다."
+      "hint": "내 Workflow로 복사해 고칩니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
     },
-    "basedOn": "{author}의 「{title}」 {revision}판을 복사해 고친 방법입니다.",
+    "basedOn": "{author}의 「{title}」 {revision}판을 복사해 고친 Workflow입니다.",
     "openOriginal": "원본 보기",
     "revisions": {
       "title": "판 기록 {count}개",
@@ -376,7 +372,7 @@
   },
   "user": {
     "title": "허브에서 쓸 이름",
-    "body": "만든 방법, 등록, star, 의견에 표시할 이름입니다. 브라우저에 저장합니다.",
+    "body": "만든 Workflow, 등록, star, 의견에 표시할 이름입니다. 브라우저에 저장합니다.",
     "placeholder": "예: 홍길동 (광물자원연구본부)",
     "save": "이름 저장"
   },
@@ -389,20 +385,20 @@
   "overview": {
     "in": "넣는 자료",
     "out": "얻는 결과",
-    "process": "방법",
+    "process": "단계",
     "steps": "{count}단계",
     "gates": "연구자가 정하는 곳 {count}개",
     "more": "외 {count}개",
-    "about": "방법 소개",
+    "about": "Workflow 소개",
     "limits": "한계와 주의 {count}개",
     "notFor": "적용하지 않음",
     "condition": "조건",
     "instead": "대신: {alternative}",
-    "jumpFlow": "방법 흐름",
+    "jumpFlow": "Workflow 단계",
     "jumpLimits": "한계",
     "jumpComments": "의견 {count}개",
-    "aboutMore": "방법 소개 더 보기",
-    "aboutLess": "방법 소개 접기",
+    "aboutMore": "Workflow 소개 더 보기",
+    "aboutLess": "Workflow 소개 접기",
     "required": "필수",
     "optional": "선택"
   },
@@ -413,10 +409,14 @@
     "making": "개념 그림 만드는 중 ({done}/{total})",
     "note": "개념 그림이며 분석 자료나 결과가 아닙니다",
     "title": "개념 그림",
-    "explanation": "방법을 설명하는 그림입니다. 분석 자료나 결과가 아니며, 초안과 hub 등록 화면에 표시됩니다.",
+    "explanation": "Workflow를 설명하는 그림입니다. 분석 자료나 결과가 아니며, 초안과 hub 등록 화면에 표시됩니다.",
     "how": "생성 방식 보기",
-    "source": { "record": "만들기를 누를 때만 OpenAI Codex (legacy) 로그인의 gpt-image-2로 생성합니다. 해당 구독의 그림 생성 한도를 사용하며, 다른 소스는 쓰지 않습니다. Sign in with ChatGPT 로그인은 그림 생성을 지원하지 않습니다." },
-    "connect": { "action": "제공사 설정 열기" },
+    "source": {
+      "record": "만들기를 누를 때만 OpenAI Codex (legacy) 로그인의 gpt-image-2로 생성합니다. 해당 구독의 그림 생성 한도를 사용하며, 다른 소스는 쓰지 않습니다. Sign in with ChatGPT 로그인은 그림 생성을 지원하지 않습니다."
+    },
+    "connect": {
+      "action": "제공사 설정 열기"
+    },
     "checking": "그림 생성 연결을 확인하고 있습니다.",
     "cover": "대표 그림",
     "actions": "{name} 개념 그림 동작",
@@ -441,7 +441,7 @@
     "copied": "기술 정보를 복사했습니다"
   },
   "editing": {
-    "edit": "등록한 방법의 {revision}판을 고치고 있습니다. 허브에 등록하면 {next}판이 됩니다.",
-    "copy": "{author}의 「{title}」 {revision}판을 복사한 내 방법입니다. 등록하면 원본을 밝힌 별도 방법이 됩니다."
+    "edit": "등록한 Workflow의 {revision}판을 고치고 있습니다. 허브에 등록하면 {next}판이 됩니다.",
+    "copy": "{author}의 「{title}」 {revision}판을 복사한 내 Workflow입니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
   }
 }

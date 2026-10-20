@@ -54,6 +54,7 @@ import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   Loader2Icon,
   PencilIcon,
+  BookOpenIcon,
   PlusIcon,
   RefreshCwIcon,
   Trash2Icon,
@@ -64,6 +65,8 @@ import {
 import { SkillHubInstall, SkillHubPreviewNotes, skillHubSource, type SkillHubPreview } from "@/geo/skill-hub/skill-hub";
 import { SourceBadge } from "@/geo/attribution/source-badge";
 import { t } from "@/geo/i18n";
+import { text as localizedText } from "@/geo/workspace/api";
+import { SkillInstructions } from "@/geo/skills/skill-instructions";
 
 const settingsText = geoText("settings");
 
@@ -79,8 +82,12 @@ const ORIGIN_LABEL: Record<SkillOrigin, string> = {
 
 type Pane = "none" | "install" | "create" | "edit";
 
+import { onSkillImport, takeSkillImport } from "@/geo/skills/import-request";
+
 export function SkillsPanel() {
+  const [reading, setReading] = useState<string | null>(null);
   const { activeProject, activeProjectId } = useProjects();
+  const [importSource] = useState(() => takeSkillImport(activeProjectId));
   const { confirm, dialog: confirmDialog } = useConfirm();
   const [scope, setScope] = useState<SkillScope>("project");
   const [rows, setRows] = useState<Row[]>([]);
@@ -95,15 +102,22 @@ export function SkillsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [pane, setPane] = useState<Pane>("none");
+  const [pane, setPane] = useState<Pane>(importSource ? "install" : "none");
 
   // Install pane
-  const [source, setSource] = useState("");
+  const [source, setSource] = useState(importSource ?? "");
   const [ref, setRef] = useState("");
   const [preview, setPreview] = useState<SkillHubPreview | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [acknowledged, setAcknowledged] = useState(false);
   const [previewing, setPreviewing] = useState(false);
+
+  useEffect(() => onSkillImport(() => {
+    const source = takeSkillImport(activeProjectId);
+    if (!source) return;
+    setPane("install"); setSource(source); setRef(""); setScope("project");
+    setPreview(null); setAcknowledged(false); setPicked(new Set());
+  }), [activeProjectId]);
 
   // Create pane
   const [newName, setNewName] = useState("");
@@ -203,6 +217,7 @@ export function SkillsPanel() {
 
   // A preview is scoped to its project. Never carry a hub preview into another project.
   useEffect(() => {
+    setReading(null);
     setPreview(null);
     setPicked(new Set());
     setAcknowledged(false);
@@ -376,6 +391,8 @@ export function SkillsPanel() {
 
   const shadowedSet = useMemo(() => new Set(shadowed), [shadowed]);
 
+  if (reading) return <SkillInstructions key={`${activeProjectId}:${scope}:${reading}`} name={reading} scope={scope} projectId={activeProjectId} onBack={() => setReading(null)} />;
+
   return (
     <div className="flex flex-col gap-4">
       {confirmDialog}
@@ -452,10 +469,6 @@ export function SkillsPanel() {
       {/* Install from a source */}
       {pane === "install" && (
         <div className="flex flex-col gap-3 rounded-lg border p-3">
-          <SkillHubInstall key={`${activeProjectId}:${scope}`} scope={scope} projectId={activeProjectId} disabled={previewing || busy === "install"} onSettled={() => setPreviewing(false)}
-            onStart={() => { setPreviewing(true); setPreview(null); setPicked(new Set()); setAcknowledged(false); setError(null); }}
-            onPreview={(result) => { setPreview(result); setPicked(new Set(result.skills.filter((s) => !s.installed).map((s) => s.name))); }}
-            onError={setError} />
           <div className="text-xs font-medium">{settingsText("skills.add_skills_from_a_source")}</div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -493,6 +506,10 @@ export function SkillsPanel() {
             </p>
           )}
 
+          <SkillHubInstall key={`${activeProjectId}:${scope}`} scope={scope} projectId={activeProjectId} disabled={previewing || busy === "install"} onSettled={() => setPreviewing(false)}
+            onStart={() => { setPreviewing(true); setPreview(null); setPicked(new Set()); setAcknowledged(false); setError(null); }}
+            onPreview={(result) => { setPreview(result); setPicked(new Set(result.skills.filter((s) => !s.installed).map((s) => s.name))); }}
+            onError={setError} />
           {preview && (
             <>
               <SkillHubPreviewNotes preview={preview} />
@@ -792,13 +809,20 @@ export function SkillsPanel() {
                   <div className="truncate text-[11px] text-muted-foreground">
                     {r.description}
                   </div>
-                  {r.source && origin === "registry" && (
+                  {r.workflow ? (
+                    <div className="truncate text-xs text-muted-foreground" title={t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}>{t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}</div>
+                  ) : r.source && origin === "registry" && (
                     <div className="truncate text-[10px] text-muted-foreground/80">
                       {r.source}
                       {r.ref ? `#${r.ref}` : ""}
                     </div>
                   )}
                 </div>
+
+                <Button type="button" size="sm" variant="ghost" onClick={() => setReading(r.name)} aria-label={t("skillHub.readSkill", { name: r.name })} title={t("skillHub.readSkill", { name: r.name })}>
+                  <BookOpenIcon className="size-4" />
+                  {t("skillHub.read")}
+                </Button>
 
                 {updateAvailable && (
                   <Button

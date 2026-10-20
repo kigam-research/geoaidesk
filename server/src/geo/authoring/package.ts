@@ -25,6 +25,7 @@ import type {
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { GAID_METHOD_SCHEMA } from "../../../../web/src/geo/contracts/methods.ts";
 import { lintProfile, type AtlasProfile, type LintFinding } from "./profile-lint.ts";
+import { headingMismatch, structuredDraft, workflowProblems } from "./workflow.ts";
 import { safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, type AuthoringStore } from "./store.ts";
 import { HUB_INPUTS_DIR, type Vocabulary } from "./vocabulary.ts";
@@ -56,7 +57,24 @@ const digest = (bytes: string | Uint8Array) => createHash("sha256").update(bytes
 const bytesOf = (f: DraftFile) => Buffer.from(f.content, f.encoding);
 const versionOf = (p: AuthoringProject) => `0.${p.packages.length + 1}.0`;
 const atlasSchema = schema("atlas-profile.schema.json");
-const methodSchema = schema("gaid-method.schema.json");
+// Extend the vendored legacy producer schema in GAID only; its on-disk contract stays unchanged.
+const methodSchema = schema("gaid-method.schema.json") as { $id: string; $defs: { workflow: { properties: Record<string, unknown> } } };
+const workflowProperties = methodSchema.$defs.workflow.properties;
+workflowProperties.schemaVersion = { enum: ["geo-workflow/v1", "gaid-workflow/v1"] };
+workflowProperties.prompt = { type: "object", required: ["ko"], additionalProperties: false, properties: { ko: { type: "string", maxLength: 4000 }, en: { type: "string", maxLength: 4000 } } };
+const textSchema = { $ref: "#/$defs/text" };
+const textList = { type: "array", items: textSchema };
+const idList = { type: "array", uniqueItems: true, items: { type: "string", pattern: "^[a-z0-9][a-z0-9._-]*$" } };
+workflowProperties.skills = { type: "array", minItems: 1, maxItems: 100, items: {
+  type: "object", required: ["name", "source", "role"], additionalProperties: false,
+  properties: { name: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, source: { enum: ["bundled", "catalogue"] },
+    role: { enum: ["primary", "supporting"] }, title: textSchema, purpose: textSchema },
+} };
+workflowProperties.steps = { type: "array", minItems: 3, maxItems: 12, items: {
+  type: "object", required: ["id", "title", "does"], additionalProperties: false,
+  properties: { id: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, title: textSchema, does: textSchema,
+    skill: { type: ["string", "null"] }, read: { anyOf: [textSchema, { type: "null" }] }, checks: textList, choiceIds: idList, outputs: idList },
+} };
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 ajv.addSchema(atlasSchema);
 ajv.addSchema(methodSchema);
@@ -107,6 +125,7 @@ export async function draftFiles(
   draft: MethodDraft,
   ctx: PackageContext,
 ): Promise<DraftFile[]> {
+  draft = structuredDraft(draft);
   const files: DraftFile[] = [];
   const put = (path: string, content: string | Buffer) => {
     if (!safePackagePath(path) || files.some((f) => f.path === path))
@@ -263,6 +282,8 @@ const PLAIN: Record<string, string> = {
   environment: "실행 환경 이름이 카탈로그에 없습니다.",
   "taxonomy-unknown": "분류 용어에 없는 값이 있습니다.",
   "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
+  "workflow-links": "Workflow 단계에 사용 스킬, 필요한 조건과 결과 파일을 연결해 주세요.",
+  "workflow-headings": "Workflow 단계와 스킬 처리 절차의 절 제목·순서를 맞춰 주세요.",
   "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
   "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
   "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",
@@ -284,6 +305,7 @@ export async function checkMethod(
   draft: MethodDraft,
   ctx: PackageContext,
 ): Promise<CheckFinding[]> {
+  draft = structuredDraft(draft);
   const findings: CheckFinding[] = [];
   const find = (check: CheckId, code: string, path: string, message: string, level: CheckFinding["level"] = "error") =>
     findings.push({ check, code, path, message, level });
@@ -426,12 +448,17 @@ export async function checkMethod(
     name: draft.slug,
     version: versionOf(project),
     license: PRIVATE,
-  }))
+  }, draft.workflow?.requiredScientificChoices.map((c) => c.id)))
     lint(f.code.startsWith("taxonomy") ? "taxonomy" : "atlas", [f]);
   if (v.catalogueNames.has(draft.slug) || v.catalogueIds.has(profile.id))
     find("atlas", "catalogue-name", "slug", `카탈로그 스킬과 같은 이름입니다: ${draft.slug}. 다른 이름을 쓰세요.`);
   if (draft.workflow) {
     const w = draft.workflow;
+    if (w.schemaVersion === "gaid-workflow/v1") {
+      for (const problem of workflowProblems(w, draft.slug)) find("workflow", "workflow-links", "workflow/steps", problem);
+      if (headingMismatch(draft.instructions, w.steps ?? [], draft.slug))
+        find("workflow", "workflow-headings", "SKILL.md#처리 절차", "Workflow 단계와 SKILL.md 처리 절차의 절 제목·순서가 다릅니다. 단계 이름과 읽을 절을 맞춰 주세요.", "warning");
+    }
     if (!validateWorkflow(w))
       for (const e of validateWorkflow.errors ?? [])
         find("workflow", "workflow-schema", `workflow${e.instancePath}`, `${e.message} ${JSON.stringify(e.params)}`);
@@ -617,6 +644,7 @@ export async function buildPackage(
   draft: MethodDraft,
   ctx: PackageContext,
 ): Promise<{ record: MethodPackageRecord } | { findings: CheckFinding[] }> {
+  draft = structuredDraft(draft);
   const findings = await checkMethod(project, draft, ctx);
   if (findings.some((f) => f.level === "error")) return { findings };
   const revision = project.packages.length + 1;
@@ -651,7 +679,7 @@ export async function buildPackage(
               ...draft.recipe,
               id: `${draft.slug}-default`,
               workflowId: draft.workflow.id,
-              title: L(draft.workflow.title),
+              title: Object.fromEntries(Object.entries(L(draft.workflow.title)).map(([lang, title]) => [lang, `${title}${lang === "ko" ? " 기본 설정" : " default settings"}`])),
             },
           ]
         : [],

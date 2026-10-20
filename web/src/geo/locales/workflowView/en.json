@@ -1,0 +1,46 @@
+{
+  "steps": "Workflow steps",
+  "legacy": "Previous format. Follow the procedure in the skill instructions for the detailed method.",
+  "noSteps": "Follow the Workflow instructions without separate steps.",
+  "skills": "Skills used ({count})",
+  "source": {
+    "catalogue": "Built in",
+    "imported": "Imported skill",
+    "bundled": "Skill bundled with the Workflow"
+  },
+  "instructions": {
+    "button": "Read instructions"
+  },
+  "inputsChoices": "Inputs and researcher choices",
+  "inputs": "Inputs",
+  "choices": "Researcher choices",
+  "required": "Required",
+  "optional": "Optional",
+  "openChoice": "The researcher decides.",
+  "resultsLimits": "Output files and interpretation limits",
+  "agentInstructions": "View instructions the AI agent receives",
+  "copy": {
+    "button": "Copy instructions",
+    "copied": "Instructions copied.",
+    "failed": "Could not copy. Select the instructions and copy them."
+  },
+  "close": {
+    "button": "Close instructions"
+  },
+  "stepSkill": "Skill used: {name}",
+  "stepOutputs": "Outputs: {names}",
+  "checks": "Checks",
+  "sourceError": "Could not read the skill instructions. Open them again.",
+  "loading": "Reading the Workflow.",
+  "error": "Could not read the Workflow. Open it again.",
+  "detail": {
+    "button": "View Workflow details"
+  },
+  "back": {
+    "button": "View hub list"
+  },
+  "import": {
+    "button": "Import from GitHub or elsewhere"
+  },
+  "importRef": "Source to import: {ref}"
+}
