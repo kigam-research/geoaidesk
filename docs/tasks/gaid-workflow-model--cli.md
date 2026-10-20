@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T14:21:13Z
+status: ready
+updated: 2026-10-20T14:21:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -71,8 +71,8 @@ Targeted checks: server typecheck passed, server route tests 10 passed, web butt
 Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): backend 1968 passed/8 skipped, frontend 1123 passed, distribution checks, environment imports and production restart smoke passed. Inspection found task job does not preserve caller env: start-gaid.sh --check referenced default user data home (dependency-only, no services). Isolated job -3 passed backend 1968/8 skipped and frontend1123, then failed the integration-boundary owner allowlist added in documentation commit. Added gaid-workflow-model to geo/tests/distribution.test.mjs owner set; targeted distribution tests 7/7 pass. Final full check runs automatically under task finish with explicit task-local GAID_HOME/KADY_ENV_FILE/KADY_PROJECTS_ROOT. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. Writer build caches and first successful job web/.next removed; remove corrected job cache after it exits. No deployment performed.
 
 ## Next steps
-1. Run task finish with task-local GAID_HOME/KADY_ENV_FILE/KADY_PROJECTS_ROOT and external CHECK_LOG_FILE. It checks the final integrated tree and notifies the parent.
-2. Remove any newly generated build cache after the final check; parent integrates with task complete.
+<!-- task:closed -->
+Closed 2026-10-20T14:21:14Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Isolated full job -3 exposed the missing gaid-workflow-model owner in the distribution checker allowlist; registered the actual owner and the distribution tests pass. Application code was unchanged.
