@@ -10,6 +10,7 @@ import type { GeoWorkflowSummary, GeoRecipeCheckResponse, GeoExposureMode } from
 import type { SkillInfo } from "@/lib/capabilities";
 import { accepts, request, taskDraft, text } from "./api";
 import { startGeoTask } from "./events";
+import { WorkflowInstructions } from "@/geo/workflow/workflow-view";
 import { workflowStartMessage } from "@/geo/workflow/render";
 import { ReadinessNotice } from "./readiness";
 import { DeleteRecipe } from "./recipe-add";
@@ -156,6 +157,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
           {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
           {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
           <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
+          {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values }} />}
           <details className="text-sm">
             <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
             <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>

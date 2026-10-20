@@ -4,10 +4,11 @@
  * and the shape of its inputs and outputs on the right.
  */
 import { ChevronRightIcon, CircleIcon, FileInputIcon, FileOutputIcon, UserRoundCheckIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import type { WorkflowDoc } from "@/geo/contracts/workflow-doc";
 import type { DraftProfile, ProcedureNode } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
@@ -91,13 +92,23 @@ export function MethodFlow({
   visuals = {},
   outputImages = {},
   pictureAction,
+  doc,
+  stepDetail,
 }: {
+  doc?: WorkflowDoc;
+  stepDetail?: (stepId: string) => ReactNode;
   profile: DraftProfile;
   visuals?: Record<string, StepVisual>;
   outputImages?: Record<string, StepVisual>;
   pictureAction?: PictureAction;
 }) {
-  const nodes = orderedNodes(profile.procedure.nodes, profile.procedure.edges);
+  // Workflow steps are authoritative; retain picture/IO metadata only for matching profile nodes.
+  const nodes: ProcedureNode[] = doc ? doc.steps.map((step) => {
+    const previous = profile.procedure.nodes.find((n) => n.id === step.id);
+    return { ...previous, id: step.id, label: step.title, summary: step.does,
+      type: step.choiceIds.length ? "human-gate" : previous?.type === "input" ? "input" : previous?.type === "output" ? "output" : "analysis",
+      checks: [], decisionIds: step.choiceIds, outputs: step.outputs };
+  }) : orderedNodes(profile.procedure.nodes, profile.procedure.edges);
   const [selected, setSelected] = useState<string>(nodes[0]?.id ?? "");
   const node = nodes.find((n) => n.id === selected) ?? nodes[0];
   return (
@@ -119,6 +130,8 @@ export function MethodFlow({
           visual={visuals[node.id]}
           outputImages={outputImages}
           pictureAction={pictureAction}
+          extra={stepDetail?.(node.id)}
+          documentMode={Boolean(doc)}
         />
       )}
     </div>
@@ -191,7 +204,11 @@ function StepDetail({
   visual,
   outputImages,
   pictureAction,
+  extra,
+  documentMode,
 }: {
+  extra?: ReactNode;
+  documentMode?: boolean;
   node: ProcedureNode;
   index: number;
   total: number;
@@ -203,7 +220,7 @@ function StepDetail({
   const gate = node.type === "human-gate" || node.type === "decision";
   const inputs = (profile.inputs ?? []).filter((p) => node.type === "input" || node.inputs?.includes(p.id));
   const outputs = profile.outputs.filter((p) => node.type === "output" || node.outputs?.includes(p.id));
-  const decisions = (profile.userDecisions ?? []).filter((d) => d.at === node.id);
+  const decisions = documentMode ? [] : (profile.userDecisions ?? []).filter((d) => d.at === node.id);
   return (
     <section
       className="flex min-w-0 flex-col gap-4 self-start rounded-lg border bg-card p-4 md:sticky md:top-16"
@@ -246,6 +263,7 @@ function StepDetail({
           </div>
         )}
       </div>
+      {extra}
       {visual && (
         <figure className="flex flex-col gap-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}

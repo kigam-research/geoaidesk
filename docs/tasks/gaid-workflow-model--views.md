@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:14:37Z
+updated: 2026-10-20T14:20:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -61,11 +61,15 @@ never ~/.geoaidesk). Tests for the view and each mount. Run scripts/check; remov
 Evidence in your task document's Current state, first and self-contained (screenshot paths + sha256).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the printed worktree. Parent owns WorkflowDoc contract/render/runtime; this child owns view/mounts and read-only routes. No existing local edits.
 ## Next steps
-1. (the next session's first action)
+1. Implement shared WorkflowView and MethodFlow document adapter; mount hub entry/draft, project detail, catalogue detail and setup summary.
+2. Add bounded read-only document/source endpoints and imported-skill install link, then focused tests, UI screenshots and scripts/check.
 ## Failed approaches
 ## Notes and decisions
+- Sequential decisions: preserve MethodFlow picture/IO renderer; adapt its profile from WorkflowDoc steps/choiceIds. Shared WorkflowView owns the remaining sections and rendered text.
+- Owned interfaces: ReactNode exportAction slots for parent CLI integration; read-only /geo/hub/catalogue/:id, entry skill source, authoring draft document routes.
+- Integration order: shared view → routes → all mounts → tests → visual checks/full checks. Parent is asked to own imported-skill backend readiness/exposure; child wires the import UI. No delegated workers (tightly coupled screens).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

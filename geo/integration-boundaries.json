@@ -781,6 +781,12 @@
       "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "Workflow terminology, skill origin/read-only file details, registration gate and installation preview regression checks."
+    },
+    {
+      "path": "web/src/components/skills-panel.tsx",
+      "owner": "gaid-workflow-model--views",
+      "status": "edited",
+      "responsibility": "Project-scoped imported Workflow skill reference prefills the existing preview, acknowledgement and install flow"
     }
   ],
   "notTouched": [

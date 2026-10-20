@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TechnicalDetail } from "@/geo/hub/technical";
+import { requestSkillImport } from "@/geo/skills/import-request";
 import { t } from "@/geo/i18n";
 import type { WorkflowReadiness } from "@/geo/contracts/workspace";
 import { apiFetch } from "@/lib/projects";
@@ -99,6 +100,10 @@ function EnableSkills({ value, projectId, onEnabled }: { value: WorkflowReadines
   return <div className="space-y-2 text-xs">
     {disabled.length > 0 && <Button size="sm" variant="outline" disabled={busy} onClick={() => void enable()}>{t(busy ? "workspace.skills.enabling" : "workspace.skills.enable")}</Button>}
     {absent.length > 0 && <p className="break-words">{t("workspace.skills.notInstalled", { names: absent.map((skill) => text(skill.title) || skill.runtimeName || skill.id).join(", ") })}</p>}
+    {absent.filter((skill) => skill.source === "imported" && skill.ref).map((skill) => <div key={skill.id} className="space-y-1">
+      <p>{t("workflowView.importRef", { ref: skill.ref! })}</p>
+      <Button size="sm" variant="outline" onClick={() => requestSkillImport(projectId, skill.ref!)}>{t("workflowView.import.button")}</Button>
+    </div>)}
     {error && <div role="alert" className="space-y-1"><p className="text-destructive">{t("workspace.skills.error")}</p><TechnicalDetail detail={error} /></div>}
   </div>;
 }

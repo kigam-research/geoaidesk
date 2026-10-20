@@ -46,14 +46,14 @@ export function summarySentences(summary: string): string[] {
 }
 
 /** Input → steps → result, with counts of the steps and of the places where the researcher decides. */
-export function OverviewBand({ profile }: { profile: DraftProfile }) {
+export function OverviewBand({ profile, doc }: { profile: DraftProfile; doc?: import("@/geo/contracts/workflow-doc").WorkflowDoc | null }) {
   const inputs = (profile.inputs ?? []).map((p) => ({
     label: localText(p.label),
     tag: text(p.required ? "overview.required" : "overview.optional"),
   }));
   const outputs = profile.outputs.map((p) => ({ label: localText(p.label) }));
-  const steps = profile.procedure.nodes.length;
-  const gates = profile.procedure.nodes.filter((n) => n.type === "human-gate" || n.type === "decision").length;
+  const steps = doc ? doc.steps.length : profile.procedure.nodes.length;
+  const gates = doc ? doc.steps.filter((step) => step.choiceIds.length > 0).length : profile.procedure.nodes.filter((n) => n.type === "human-gate" || n.type === "decision").length;
   return (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)_auto_minmax(0,1fr)] md:items-stretch">
       <BandCell icon={<FileInputIcon className="size-4" aria-hidden />} title={text("overview.in")} items={inputs} />

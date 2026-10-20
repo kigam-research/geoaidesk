@@ -21,6 +21,9 @@ import {
   type WorkflowPanelExtension,
   type WorkflowPanelRow,
 } from "@/components/workflows-panel";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { t } from "@/geo/i18n";
 import {
   GEO_RECIPE_CATEGORY,
@@ -90,6 +93,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
   const [data, setData] = useState<GeoWorkflowsResponse | null>(null);
   const [saved, setSaved] = useState<GeoSavedRecipesResponse>({ categories: [], recipes: [] });
   const [error, setError] = useState<string | null>(null);
+  const [detail, setDetail] = useState<GeoWorkflowSummary | null>(null);
   const [selected, setSelected] = useState<Selection | null>(null);
   const [problem, setProblem] = useState<GeoSavedRecipe | null>(null);
   const [opened, setOpened] = useState<{ revision: number; setup: NonNullable<GeoRecipeCheckResponse["setup"]> } | null>(null);
@@ -134,6 +138,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       badges: <WorkflowBadges workflow={workflow} />,
       searchText: [workflow.id, ...workflow.disciplines, ...workflow.inputRoles.flatMap((role) => role.extensions)].join(" "),
       onSelect: () => setSelected({ workflowId: workflow.id }),
+      detail: workflow.doc ? { label: t("workflowView.detail.button"), onSelect: () => setDetail(workflow) } : undefined,
     }));
     const recipes = saved.recipes.map((recipe): WorkflowPanelRow => {
       const workflow = recipe.check.ok ? byId.get(recipe.recipe.workflowId) : undefined;
@@ -207,6 +212,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       initialSetup={recipe.check.setup}
       recipe={{ title: recipe.title, onDelete: async () => { await removeRecipe(recipe); setSelected(null); } }}
     />}
+    {detail?.doc && <Dialog open onOpenChange={(open) => { if (!open) setDetail(null); }}><DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-4xl"><DialogTitle>{text(detail.title)}</DialogTitle><DialogDescription>{text(detail.description)}</DialogDescription><WorkflowView doc={detail.doc} projectId={projectId} readiness={detail.readiness} /><Button onClick={() => { setSelected({ workflowId: detail.id }); setDetail(null); }}>{t("methods.setup")}</Button></DialogContent></Dialog>}
     {methods.dialogs}
     {problem && <RecipeProblem recipe={problem} onClose={() => setProblem(null)} onDelete={async () => { await removeRecipe(problem); setProblem(null); }} />}
   </div>;

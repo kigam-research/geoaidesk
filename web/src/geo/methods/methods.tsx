@@ -10,6 +10,7 @@ import { geoLocale, t } from "@/geo/i18n";
 import type { LocalMethodSummary, LocalMethodsResponse, LocalMethodWorkflow, MethodRecipe, MethodTrial, MethodTrialsResponse } from "@/geo/contracts/methods";
 import { request, text } from "@/geo/workspace/api";
 import { TaskSetup, WorkflowOutputs, fieldClass } from "@/geo/workspace/task-setup";
+import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { Readiness } from "@/geo/workspace/readiness";
 import { onMethodSetupRequest, takeMethodSetup } from "@/geo/hub/handoff";
 
@@ -151,10 +152,10 @@ export function webLink(value: string | undefined): string | undefined {
 }
 const when = (value: string) => Number.isNaN(Date.parse(value)) ? value : new Date(value).toLocaleString(geoLocale() === "ko" ? "ko-KR" : "en");
 
-export function MethodDetail({ method, projectId, onClose, onSetup }: { method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
+export function MethodDetail({ method, projectId, onClose, onSetup, exportAction }: { exportAction?: (workflow: LocalMethodWorkflow) => ReactNode; method: LocalMethodSummary; projectId: string; onClose: () => void; onSetup: (workflow: LocalMethodWorkflow, recipe?: MethodRecipe) => void }) {
   const page = webLink(method.origin.pageUrl);
   return <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-2xl">
+    <DialogContent className="max-h-[90dvh] overflow-y-auto overflow-x-hidden break-words [overflow-wrap:anywhere] sm:max-w-4xl">
       <DialogTitle>{text(method.title)}</DialogTitle>
       <DialogDescription>{text(method.summary) || method.runtimeName}</DialogDescription>
       <div className="flex flex-wrap gap-1"><MethodBadges method={method} /></div>
@@ -179,7 +180,7 @@ export function MethodDetail({ method, projectId, onClose, onSetup }: { method: 
         <Readiness value={workflow.readiness} />
         {workflow.inputRoles.length > 0 && <p>{t("methods.inputRoles", { roles: workflow.inputRoles.map((role) => `${text(role.label)} (${t(role.required ? "workspace.setup.required" : "workspace.setup.optional")})`).join(", ") })}</p>}
         {workflow.requiredScientificChoices.length > 0 && <p>{t("methods.choices", { choices: workflow.requiredScientificChoices.map((choice) => text(choice.label)).join(", ") })}</p>}
-        <WorkflowOutputs workflow={workflow} />
+        {workflow.doc ? <WorkflowView doc={workflow.doc} projectId={projectId} readiness={workflow.readiness} exportAction={exportAction?.(workflow)} /> : <WorkflowOutputs workflow={workflow} />}
         <Button size="sm" variant="outline" onClick={() => onSetup(workflow)}>{t("methods.setup")}</Button>
       </div>)}</section>}
       {method.recipes.length > 0 && <section className="space-y-2"><h3 className="text-sm font-medium">{t("methods.recipes")}</h3>{method.recipes.map((recipe) => {

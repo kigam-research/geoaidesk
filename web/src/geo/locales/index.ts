@@ -62,6 +62,9 @@ import notesEn from "./notes/en.json";
 import workflowDocKo from "./workflowDoc/ko.json";
 import workflowDocEn from "./workflowDoc/en.json";
 
+import workflowViewKo from "./workflowView/ko.json";
+import workflowViewEn from "./workflowView/en.json";
+
 export type Catalogue = Record<string, string>;
 
 function flatten(value: unknown, prefix = "", out: Catalogue = {}): Catalogue {
@@ -83,6 +86,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   hub: pair(hubKo, hubEn),
   notes: pair(notesKo, notesEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
+  workflowView: pair(workflowViewKo, workflowViewEn),
   // gaid-korean-workspace--korean: branding and upstream primary-path strings
   app: pair(appKo, appEn),
   methods: pair(methodsKo, methodsEn),
