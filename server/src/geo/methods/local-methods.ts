@@ -25,6 +25,7 @@ import { environmentState, projectSkillState, readinessOf, summarizeWorkflow } f
 import { readMethodFile, type MethodFile } from "./method-file.ts";
 import { originOfSource, packageStore } from "./package-origin.ts";
 import { trialCounts } from "./trials.ts";
+import { packageProcedure, workflowDocFor } from "../workflow-doc.ts";
 
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_METHODS = 200;
@@ -136,7 +137,15 @@ export async function listLocalMethods(
       // A local method's run record is GAID's own trial record (no catalogue install record exists), so every
       // screen that shows "untested" agrees with the trial count.
       return {
-        ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }),
+        ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }, workflowDocFor(workflow, {
+          revision: file?.revision ?? null,
+          skills: workflow.skillIds.map((id, i) => ({
+            name: skills[i]?.runtimeName ?? id,
+            title: skills[i]?.title ?? null,
+            source: id.startsWith(LOCAL_SKILL_PREFIX) ? "bundled" as const : "catalogue" as const,
+          })),
+          procedure: packageProcedure(method.dir),
+        })),
         exposure: methodExposure(method.runtimeName, workflow.id),
         trials: tried,
         extraPackages: extraPackages(method.dir, catalogue, workflow.environmentProfile),
@@ -187,6 +196,10 @@ export function methodExposedSkills(paths: ProjectPaths, mode: string, catalogue
       const name = catalogue?.index.skills.find((skill) => skill.id === id)?.runtimeName;
       if (name) names.add(name);
     }
+  }
+  // gaid-workflow/v1: skills imported from GitHub and similar sources are named in `skills[]` only.
+  for (const skill of (workflow?.skills ?? []) as { name?: unknown; source?: unknown }[]) {
+    if (skill?.source === "imported" && typeof skill.name === "string") names.add(skill.name);
   }
   return [...names].sort();
 }

@@ -140,7 +140,7 @@
       "path": "web/src/components/chat-tab.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",

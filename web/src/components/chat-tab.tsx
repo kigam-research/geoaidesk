@@ -69,6 +69,8 @@ import { SystemCard } from "@/components/system-card";
 import { PermissionCard } from "@/components/permission-card";
 import { CommandBlockChip } from "@/components/command-block-chip";
 import { parseCommandBlock, slashMenuItems, type SlashMenuItem } from "@/lib/command-blocks";
+import { parseWorkflowBlock } from "@/geo/contracts/workflow-doc";
+import { WorkflowBlockCard } from "@/geo/workflow/workflow-card";
 import { usePromptTemplates } from "@/lib/use-prompts";
 import { KadyFileIcon } from "@/components/file-icon";
 import { ScientificResultCard } from "@/components/scientific-result-card";
@@ -1614,10 +1616,11 @@ export const ChatMessageRow = memo(function ChatMessageRow({
             )}
             {(() => {
               const { text, context } = splitComposerContext(message.content);
-              const block = parseCommandBlock(text);
+              const workflow = parseWorkflowBlock(text);
+              const block = workflow ? null : parseCommandBlock(text);
               return (
                 <>
-                  {block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
+                  {workflow ? <WorkflowBlockCard block={workflow} /> : block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
                   {context && <SentContextChips context={context} />}
                 </>
               );
