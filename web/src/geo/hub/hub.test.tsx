@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FIXTURE_QUESTIONS, fixtureDraft } from "./fixtures";
 import { FlowDiagram, orderedNodes } from "./flow-diagram";
 import { parseHubHash } from "./location";
-import { QuestionStep, isAnswered, type DraftAnswer } from "./question-step";
+import { QuestionStep, isAnswered, sameAnswer, type DraftAnswer } from "./question-step";
 import { hasMethodSetup, openMethodSetup, takeMethodSetup } from "./handoff";
 import { RegisterDialog } from "./hub-dialogs";
 
@@ -58,6 +58,44 @@ describe("GAID hub question step", () => {
     expect(screen.getByText("나중에 정함")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "답 반영해 초안 만들기" }));
     expect(onApply).toHaveBeenCalledOnce();
+  });
+
+  it("keeps recorded answers editable and applies only the changed ones after a draft exists", () => {
+    const recorded: Record<string, DraftAnswer> = Object.fromEntries(
+      FIXTURE_QUESTIONS.map((q) => [q.id, q.options.length ? { optionId: q.options[0].id } : { response: "답" }]),
+    );
+    const onApply = vi.fn();
+    function Recorded() {
+      const [answers, setAnswers] = useState<Record<string, DraftAnswer>>(recorded);
+      return (
+        <QuestionStep
+          questions={FIXTURE_QUESTIONS}
+          answers={answers}
+          recorded={recorded}
+          onAnswer={(id, a) => setAnswers((cur) => ({ ...cur, [id]: a }))}
+          onApply={onApply}
+        />
+      );
+    }
+    render(<Recorded />);
+    // Opens on the review tab: everything is recorded, nothing to apply yet.
+    expect(screen.getByText(/답을 바꾸려면 질문 번호를 눌러/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "질문 1" }));
+    expect(screen.getByText(/초안에 반영된 답입니다/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("기타"), { target: { value: "다른 지역 격자도 받기" } });
+    expect(screen.getByText(/반영된 답과 다릅니다/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "답 확인" }));
+    expect(screen.getByText("바꾼 답 1개")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "바꾼 답 반영" }));
+    expect(onApply).toHaveBeenCalledOnce();
+  });
+
+  it("compares answers by option, words or deferral", () => {
+    expect(sameAnswer({ optionId: "a" }, { optionId: "a" })).toBe(true);
+    expect(sameAnswer({ optionId: "a" }, { optionId: "b" })).toBe(false);
+    expect(sameAnswer({ response: " x " }, { response: "x" })).toBe(true);
+    expect(sameAnswer({ defer: true }, { optionId: "a" })).toBe(false);
+    expect(sameAnswer(undefined, { optionId: "a" })).toBe(false);
   });
 
   it("treats an option, free text or deferral as an answer", () => {

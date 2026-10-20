@@ -4,7 +4,7 @@
  * star and "use in my research"; the method at a glance (input → steps → result); the summary as points; the steps;
  * the limits; comments (GitHub-like feedback). The registration preview shows the same page with a sticky bar.
  */
-import { DownloadIcon, FolderIcon, MessageSquareIcon, SparklesIcon, StarIcon } from "lucide-react";
+import { DownloadIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, SparklesIcon, StarIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,10 @@ export interface SharedMethodView {
   trials: number;
   image: string | null;
   comments: SharedComment[];
+  /** The registered method this one was copied from. */
+  basedOn?: { title: string; author: string; revision: number; onOpen: () => void };
+  /** Registered revisions, oldest first (shown behind the "판 기록" disclosure). */
+  revisions?: { revision: number; at: string; by: string; note: string }[];
 }
 
 /**
@@ -85,8 +89,11 @@ export function SharedMethod({
   onStar,
   onComment,
   onTry,
+  onEdit,
   preview,
 }: {
+  /** "방법 고치기" (`edit`, the registering author) or "복사해서 고치기" (`copy`, anyone else). */
+  onEdit?: { mode: "edit" | "copy"; run: () => void; busy?: boolean };
   /** Preview before registration: how the method will look to other researchers, with the register action. */
   preview?: { onRegister: () => void; onBack: () => void };
   method: SharedMethodView;
@@ -139,6 +146,22 @@ export function SharedMethod({
               <span aria-hidden>·</span>
               <span>{method.registeredAt}</span>
             </div>
+            {method.basedOn && (
+              <p className="max-w-[640px] text-sm text-muted-foreground">
+                {text("shared.basedOn", {
+                  author: method.basedOn.author,
+                  title: method.basedOn.title,
+                  revision: method.basedOn.revision,
+                })}{" "}
+                <button
+                  type="button"
+                  onClick={method.basedOn.onOpen}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  {text("shared.openOriginal")}
+                </button>
+              </p>
+            )}
             {method.note && (
               <p className="max-w-[640px] text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{text("shared.note")}</span> {method.note}
@@ -210,6 +233,17 @@ export function SharedMethod({
             <p className="text-xs text-muted-foreground">
               {preview ? text("shared.afterRegister") : text("shared.trials", { count: method.trials })}
             </p>
+            {onEdit && (
+              <div className="flex flex-col gap-1">
+                <Button variant="outline" onClick={onEdit.run} disabled={onEdit.busy} className="w-full">
+                  <PencilIcon data-icon="inline-start" />
+                  {onEdit.mode === "edit" ? text("shared.edit.button") : text("shared.copy.button")}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  {onEdit.mode === "edit" ? text("shared.edit.hint") : text("shared.copy.hint")}
+                </p>
+              </div>
+            )}
             {method.implementation && (
               <div className="flex flex-col gap-1 text-sm">
                 <p className="font-medium">{text(`draft.implementation.${method.implementation}`)}</p>
@@ -231,6 +265,25 @@ export function SharedMethod({
       </section>
 
       <LimitsCard profile={profile} />
+
+      {method.revisions && method.revisions.length > 1 && (
+        <details className="max-w-4xl rounded-xl border px-4 py-3 text-sm">
+          <summary className="flex cursor-pointer items-center gap-2 font-medium">
+            <HistoryIcon className="size-4" aria-hidden />
+            {text("shared.revisions.title", { count: method.revisions.length })}
+          </summary>
+          <ol className="mt-3 flex flex-col gap-2">
+            {[...method.revisions].reverse().map((r) => (
+              <li key={r.revision} className="flex flex-col gap-0.5 border-t pt-2 first:border-t-0 first:pt-0">
+                <span className="font-medium">
+                  {text("shared.revisions.row", { revision: r.revision, when: r.at, author: r.by })}
+                </span>
+                {r.note && <span className="text-muted-foreground">{r.note}</span>}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
 
       <section
         className="flex scroll-mt-20 flex-col gap-4"

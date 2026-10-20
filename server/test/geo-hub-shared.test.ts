@@ -157,13 +157,17 @@ describe("shared GAID hub", () => {
     expect((await new SharedHubStore(f.shared.root).read(entry.id)).snapshots[1].draft.profile).toEqual(detail.profile);
     const r2 = await f.register();
     expect(r2.statusCode, r2.body).toBe(201);
-    expect(r2.json()).toMatchObject({ id: entry.id, latestRevision: 2, title: "새 판 제목", cover: null, implementation: "implemented" });
+    // Pictures whose step/output/cover still exists carry into the next revision (as the draft shows them), frozen anew.
+    expect(r2.json()).toMatchObject({ id: entry.id, latestRevision: 2, title: "새 판 제목", implementation: "implemented" });
+    expect(r2.json().cover).toContain("revision=2");
     expect((await f.app.inject("/geo/hub/entries")).json().entries[0].implementation).toBe("implemented");
     expect((await f.app.inject(`/geo/hub/entries/${entry.id}/package.tar.gz?revision=1`)).rawPayload).toEqual(
       archive.rawPayload,
     );
     expect((await f.app.inject(entry.cover!)).rawPayload).toEqual(PNG);
-    expect((await f.app.inject(`/geo/hub/entries/${entry.id}/cover`)).statusCode).toBe(404);
+    expect((await f.app.inject(`/geo/hub/entries/${entry.id}/cover`)).rawPayload).toEqual(
+      Buffer.from("changed private image"),
+    );
     await f.register();
     expect((await f.store.read(f.projectId)).packages).toHaveLength(2);
     expect(await f.shared.list()).toHaveLength(1);
@@ -491,5 +495,108 @@ describe("shared GAID hub", () => {
     });
     expect(comment.statusCode).toBe(409);
     expect(await readFile(f.shared.within(results[0].json().id, "comments.jsonl"), "utf8")).toBe("{");
+  });
+});
+
+describe("editing a registered method (gaid-hub-editing)", () => {
+  const edit = (f: Awaited<ReturnType<typeof setup>>, id: string, user: string) =>
+    f.app.inject({ method: "POST", url: `/geo/hub/entries/${id}/edit`, headers: headers(user), payload: {} });
+  const registerFrom = (f: Awaited<ReturnType<typeof setup>>, projectId: string, user: string) =>
+    f.app.inject({
+      method: "POST",
+      url: "/geo/hub/entries",
+      headers: headers(user),
+      payload: { authoringProjectId: projectId, folderId: DEFAULT_FOLDER, note: "고친 판" },
+    });
+  const reviseSummary = async (f: Awaited<ReturnType<typeof setup>>, projectId: string, summary: string) => {
+    const p = await f.store.read(projectId);
+    const response = await f.app.inject({
+      method: "POST",
+      url: `/geo/authoring/projects/${projectId}/drafts`,
+      payload: { baseRevision: p.drafts.at(-1)!.revision, summary },
+    });
+    expect(response.statusCode, response.body).toBe(201);
+  };
+
+  it("lets the author reopen the linked draft and register the next revision of the same entry", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    expect((await f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/edit` })).statusCode).toBe(401);
+    const opened = await edit(f, entry.id, "김 연구원");
+    expect(opened.statusCode).toBe(200);
+    expect(opened.json()).toEqual({ authoringProjectId: f.projectId, mode: "edit", created: false });
+    await reviseSummary(f, f.projectId, "고친 요약");
+    const second = await f.register();
+    expect(second.statusCode, second.body).toBe(201);
+    expect(second.json<HubEntry>()).toMatchObject({ id: entry.id, latestRevision: 2, author: "김 연구원" });
+    const detail = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
+    expect(detail.profile.summary).toEqual({ ko: "고친 요약" });
+    expect((await f.app.inject(`/geo/hub/entries/${entry.id}/package.tar.gz?revision=1`)).statusCode).toBe(200);
+  });
+
+  it("seeds a draft from the registered revision when the author's draft is not on this server", async () => {
+    const f = await setup();
+    await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
+    await f.store.mutate(f.projectId, (p) => {
+      p.visuals = { prepare: { file: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 1 } };
+    });
+    const entry = (await f.register()).json<HubEntry>();
+    await f.store.archive(f.projectId);
+    const opened = await edit(f, entry.id, "김 연구원");
+    expect(opened.statusCode).toBe(201);
+    const { authoringProjectId, mode } = opened.json();
+    expect(mode).toBe("edit");
+    expect(authoringProjectId).not.toBe(f.projectId);
+    const seeded = await f.store.read(authoringProjectId);
+    expect(seeded).toMatchObject({
+      author: "김 연구원",
+      hubEntry: { entryId: entry.id, revision: 1, mode: "edit", author: "김 연구원" },
+    });
+    expect(seeded.drafts).toHaveLength(1);
+    expect(seeded.drafts[0]).toMatchObject({ revision: 1, origin: "researcher", slug: draftReply.slug });
+    expect(await f.store.readFile(authoringProjectId, seeded.visuals!.prepare.file)).toEqual(PNG);
+    // A second click reopens the seeded draft.
+    expect((await edit(f, entry.id, "김 연구원")).json()).toMatchObject({ authoringProjectId, created: false });
+    await reviseSummary(f, authoringProjectId, "새 서버에서 고친 요약");
+    const second = await registerFrom(f, authoringProjectId, "김 연구원");
+    expect(second.statusCode, second.body).toBe(201);
+    expect(second.json<HubEntry>()).toMatchObject({ id: entry.id, latestRevision: 2 });
+    const detail = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
+    expect(detail.visuals.prepare.caption).toBe("입력 개념");
+    // Another name cannot add revisions through the author's seeded draft.
+    expect((await registerFrom(f, authoringProjectId, "다른 연구원")).statusCode).toBe(403);
+  });
+
+  it("gives another researcher one own copy, registered as a separate entry that names its original", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    const opened = await edit(f, entry.id, "박 연구원");
+    expect(opened.statusCode).toBe(201);
+    const { authoringProjectId, mode } = opened.json();
+    expect(mode).toBe("copy");
+    const copy = await f.store.read(authoringProjectId);
+    const original = await f.store.read(f.projectId);
+    expect(copy.author).toBe("박 연구원");
+    expect(copy.drafts[0].slug).toBe(`${draftReply.slug}-copy`);
+    expect(copy.drafts[0].workflow?.skillIds[0]).toBe(`local:${draftReply.slug}-copy`);
+    expect(copy.sources.map((s) => s.id)).toEqual(original.sources.map((s) => s.id));
+    expect(copy.questions.map((q) => q.id)).toEqual(
+      original.questions.filter((q) => q.status !== "superseded").map((q) => q.id),
+    );
+    for (const s of copy.sources)
+      expect(f.store.exists(authoringProjectId, `sources/${s.id}/original`)).toBe(true);
+    expect((await edit(f, entry.id, "박 연구원")).json()).toMatchObject({ authoringProjectId, created: false });
+    await reviseSummary(f, authoringProjectId, "박 연구원의 판");
+    const registered = await registerFrom(f, authoringProjectId, "박 연구원");
+    expect(registered.statusCode, registered.body).toBe(201);
+    const own = registered.json<HubEntry>();
+    expect(own.id).not.toBe(entry.id);
+    expect(own).toMatchObject({
+      author: "박 연구원",
+      latestRevision: 1,
+      basedOn: { entryId: entry.id, revision: 1, author: "김 연구원" },
+    });
+    const untouched = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
+    expect(untouched.entry.latestRevision).toBe(1);
   });
 });

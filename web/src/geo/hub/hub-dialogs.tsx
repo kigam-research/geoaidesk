@@ -322,17 +322,21 @@ export function RegisterDialog({
   folders,
   onCreateFolder,
   onRegister,
+  initialFolder,
 }: DialogProps & {
   folders: { id: string; name: string }[];
+  /** Folder to preselect (the entry's folder when registering its next revision). */
+  initialFolder?: string;
   /** Create a topic folder here (no detour to the hub list); returns its id. */
   onCreateFolder?: (name: string) => Promise<string>;
   onRegister: (folderId: string, note: string) => Promise<void>;
 }) {
-  const [folder, setFolder] = useState(folders[0]?.id ?? "");
-  // The folder list arrives after the dialog opens: select the first folder once it is known.
+  const [folder, setFolder] = useState(initialFolder ?? folders[0]?.id ?? "");
+  // The folder list arrives after the dialog opens: select the preset (or first) folder once it is known.
   useEffect(() => {
-    if (folders.length && !folders.some((f) => f.id === folder)) setFolder(folders[0].id);
-  }, [folders, folder]);
+    if (folders.length && !folders.some((f) => f.id === folder))
+      setFolder(folders.some((f) => f.id === initialFolder) ? initialFolder! : folders[0].id);
+  }, [folders, folder, initialFolder]);
   const [newFolder, setNewFolder] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);

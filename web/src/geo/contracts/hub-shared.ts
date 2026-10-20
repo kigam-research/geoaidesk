@@ -49,6 +49,8 @@ export interface HubEntry {
   recipe?: boolean;
   tags: string[];
   author: string;
+  /** The registered method this one was copied from ("복사해서 고치기"). */
+  basedOn?: { entryId: string; revision: number; title: string; author: string };
   folderId: string;
   /** Cover image URL (`/geo/hub/entries/:id/cover`), when the draft has one. */
   cover: string | null;
@@ -110,6 +112,7 @@ export interface HubRecommendation {
 // POST   /geo/hub/entries/:id/comments                 { body } → HubComment
 // GET    /geo/hub/entries/:id/cover                    image bytes
 // GET    /geo/hub/entries/:id/package.tar.gz           latest package bytes (?revision=n)
+// POST   /geo/hub/entries/:id/edit                     {} → EditEntryResult (author: edit; others: own copy)
 // POST   /geo/hub/entries/:id/install                  SharedInstallBody → InstallResult (authoring.ts)
 // GET    /geo/hub/recommended                          → { cards: HubRecommendation[] } (3-4 cards)
 
@@ -126,4 +129,17 @@ export interface RegisterBody {
   draftRevision?: number;
   folderId: string;
   note: string;
+}
+
+/**
+ * "방법 고치기" / "복사해서 고치기": the draft to open. The registering author (same display name) edits the entry: its
+ * linked draft, or a draft seeded from the latest registered revision when that draft is not on this server; registering
+ * it adds the next revision. Anyone else gets their own copy (reused on a repeat), registered as a separate entry with
+ * `basedOn`. Display names are not accounts: this keeps the latest revision with whoever registered the method first.
+ */
+export interface EditEntryResult {
+  authoringProjectId: string;
+  mode: "edit" | "copy";
+  /** A new draft was made now (false: an existing draft was reopened). */
+  created: boolean;
 }
