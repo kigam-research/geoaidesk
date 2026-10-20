@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:13:04Z
+updated: 2026-10-20T14:20:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5d1f02f4-c1d7-45c6-94b1-e23826920ff8","pid":2414289,"provider":"codex","session":"01a15998-92e0-72a2-bd54-db683ae2e7f0","start":"39247260","token":"492f28b4693ca05ccac8371ea73b8486e2156fde236a5b7544a88fa3795b321f"}
 branch: task/gaid-workflow-model--cli
 target: task/gaid-workflow-model
@@ -68,13 +68,14 @@ Implemented both project Workflow and registered hub ZIP routes and CliExportBut
 
 Targeted checks: server typecheck passed, server route tests 10 passed, web button tests 2 passed; copy validator 0 errors/61 existing warnings; UI validator 0 errors/89 existing debt. Korean 1440x900 and 1280x800 isolated-component screenshots verified, no overflow, 32 px targets, Escape closes/returns focus. Parent report §3.16 and appendix contain screenshots, exact commands, string ids and rule compliance; final integrated screen placement is parent-owned. Humanizer file-mode review applied to added Korean report prose.
 
-Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): backend 1968 passed/8 skipped, frontend 1123 passed, distribution checks, environment imports and production restart smoke passed. Inspection found task job does not preserve caller env: start-gaid.sh --check referenced default user data home (dependency-only, no services). Isolation-corrected full check is running as job-geoaidesk-gaid-workflow-model--cli-3 with env inside its recorded command. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. Writer build caches and first successful job web/.next removed; remove corrected job cache after it exits. No deployment performed.
+Full scripts/check job-geoaidesk-gaid-workflow-model--cli-1 succeeded (exit 0): backend 1968 passed/8 skipped, frontend 1123 passed, distribution checks, environment imports and production restart smoke passed. Inspection found task job does not preserve caller env: start-gaid.sh --check referenced default user data home (dependency-only, no services). Isolated job -3 passed backend 1968/8 skipped and frontend1123, then failed the integration-boundary owner allowlist added in documentation commit. Added gaid-workflow-model to geo/tests/distribution.test.mjs owner set; targeted distribution tests 7/7 pass. Final full check runs automatically under task finish with explicit task-local GAID_HOME/KADY_ENV_FILE/KADY_PROJECTS_ROOT. Temporary UI harness job -2 stopped after screenshots, disposition cancelled; its lost notice was inspected on 2026-10-20 and matches the intentional stop (Vite ready/reloads in log, no exit file), not a failed check. Writer build caches and first successful job web/.next removed; remove corrected job cache after it exits. No deployment performed.
 
 ## Next steps
-1. Wait for job-geoaidesk-gaid-workflow-model--cli-3 notification; read terminal result and verify launcher uses task-local home. Do not restart it.
-2. Resolve any in-scope failures, update report/check evidence, remove build caches and task finish. Parent integrates with task complete.
+1. Run task finish with task-local GAID_HOME/KADY_ENV_FILE/KADY_PROJECTS_ROOT and external CHECK_LOG_FILE. It checks the final integrated tree and notifies the parent.
+2. Remove any newly generated build cache after the final check; parent integrates with task complete.
 
 ## Failed approaches
+- Isolated full job -3 exposed the missing gaid-workflow-model owner in the distribution checker allowlist; registered the actual owner and the distribution tests pass. Application code was unchanged.
 - Passing GAID_HOME et al outside task job run did not reach the job; first full check passed but launcher dependency check referenced default data home. Repeat with env in the recorded command, not speculative source changes.
 - Initial Claude probe with max-budget-usd 0 was rejected by CLI argument validation; positive 0.000001 worked.
 - Initial external export probe .ts loaded as CJS; renamed .mts (no source workaround).

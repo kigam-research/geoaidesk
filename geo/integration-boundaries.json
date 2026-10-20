@@ -766,9 +766,9 @@
     },
     {
       "path": "geo/tests/distribution.test.mjs",
-      "owner": "gaid-notebook-review",
+      "owner": "gaid-workflow-model",
       "status": "edited",
-      "responsibility": "Register the requested notebook-review owner for maintained research-note and work-record seams"
+      "responsibility": "Register the Workflow-model owner for maintained CLI export seams, retaining existing notebook-review and other owner registrations"
     },
     {
       "path": "web/src/lib/chat-prefill.ts",
