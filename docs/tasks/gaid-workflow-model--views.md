@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T14:35:52Z
+status: active
+updated: 2026-10-20T14:45:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ba3b4f2b-c8fe-4134-9b12-57a30c6692b3","pid":2648217,"provider":"codex","session":"01a159a9-b149-7c60-ad98-b868e9e79a56","start":"39359451","token":"6ad9a80a4529b2d1d5e199dd84072973e513b30277243ddd8deb218c1e6b41c9"}
 branch: task/gaid-workflow-model--views
 target: task/gaid-workflow-model
@@ -63,7 +63,7 @@ Evidence in your task document's Current state, first and self-contained (screen
 ## Current state
 Implemented all six requested WorkflowDoc mounts; exact preview/chat renderer, copy, all choices/options, source-labelled skills and read-only skill instructions. MethodFlow reuses picture/IO logic and uses steps/choiceIds; project steps are compact disclosures. Imported missing skills use the existing import/acknowledgement gate with ref prefill. CLI exportAction slots remain for parent integration. No authoring/** edits.
 Verification: 103 focused frontend tests passed after visual fixes; 29 view/method rechecks passed; 3 new server route tests passed; backend/frontend typecheck and focused lint passed. Korean screenshots of six mounts plus hub instructions at 1440×900 and 1280×800 (14 files) were visually inspected; no overflow outside the intended scroll panels or browser console errors. Source SHA 4e214c0204bd. Report sections 3.16 and appendix carry the result and three figures.
-Full scripts/check job at 1b0ddcf0 failed the distribution seam-owner allowlist: child slug was not an allowed owner. Corrected new seams to parent owner gaid-workflow-model; the exact failing check now passes. The final declared check is run and attached to the saved snapshot by task finish; its exit/result is the check authority.
+Full scripts/check job at 1b0ddcf0 failed the distribution seam-owner allowlist: child slug was not an allowed owner. Corrected new seams to parent owner gaid-workflow-model; the exact failing check now passes. First task finish passed backend 1965 tests (8 skipped) and all 1132 frontend assertions but failed on an existing file-preview saved-indicator timer after jsdom teardown. Full frontend rerun passed (1132). Parent authorized narrow timer lifecycle cleanup; the 8 file-preview tests including re-arm/unmount regression and all 1133 frontend tests now pass. Final task finish reruns the declared check and attaches its authoritative result.
 
 Screenshot originals and hashes (base: /home/seongin3/data/geoaidesk/work/gaid-workflow-model--views/playwright):
 - 01-hub-entry-1280.png: `18d3dda38d58d1a1971cc4743417402242ea1ae6c49b09b5b25a30e23eb2c6d4`
@@ -85,9 +85,11 @@ Screenshot originals and hashes (base: /home/seongin3/data/geoaidesk/work/gaid-w
 Closed 2026-10-20T14:35:52Z: ready; the parent gaid-workflow-model integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish: backend 1965 passed/8 skipped and frontend 1132 passed, but a file-preview TextEditor saved-indicator timeout fired after jsdom teardown (window is not defined). Parent authorized timer cleanup after observing a second intermittent failure in that area.
 - Preliminary task sync checks were stopped after concurrent test/source edits invalidated their tree. Parent integration already completed.
 - The first full check job found a seam-owner allowlist failure; use the parent work-package owner, not the child unit slug. No application source workaround was needed.
 ## Notes and decisions
+- Parent authorized a narrow baseline fix after final full-suite failure: code-views.tsx saved-indicator timer is now retained in a ref, cancelled before re-arm and on unmount; file-preview-panel test covers both. No test suppression. Optional lint of the upstream editor still reports pre-existing ref-in-render patterns outside this narrow fix; the focused Workflow view lint passed.
 - Sequential decisions: preserve MethodFlow picture/IO renderer; adapt its profile from WorkflowDoc steps/choiceIds. Shared WorkflowView owns the remaining sections and rendered text.
 - Owned interfaces: ReactNode exportAction slots for parent CLI integration; read-only /geo/hub/catalogue/:id, entry skill source, authoring draft document routes.
 - Integration order: shared view → routes → all mounts → tests → visual checks/full checks. Parent is asked to own imported-skill backend readiness/exposure; child wires the import UI. No delegated workers (tightly coupled screens).
