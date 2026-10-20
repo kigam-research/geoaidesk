@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T08:58:54Z
+updated: 2026-10-20T09:23:26Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"973096b8-d85d-4540-8407-314c27f4b24a","pid":2418100,"provider":"claude","session":"2485ae34-3b6a-477b-a2a1-60e3eb8b9d65","start":"37298903","token":"a46848df5264acf9fe4f245bb6541d25f6cf250193347f9ea63666ff5eb8e35b"}
 branch: task/gaid-hub-editing
 target: main
@@ -106,7 +106,9 @@ Decision (item 3, who may edit; display names are not accounts):
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 등록한 방법을 고칠 수 있는 사람 — 가) 등록한 이름만 새 판, 다른 사람은 복사해서 별도 방법으로 등록 — 나) 누구나 새 판을 올리고 판 기록에 등록한 이름을 남김 — 권장: 가) 이름은 계정이 아니어서 나)는 다른 사람이 설치하는 최신 판을 아무나 덮어쓸 수 있음 — 막힌 일: 없음(가)로 구현됨) — 근거: reports/2026-10-20-gaid-hub-editing#6-결정할-일
 ## Report
+Report: reports/2026-10-20-gaid-hub-editing/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
