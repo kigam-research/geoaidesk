@@ -25,7 +25,8 @@ it("serves the exact draft revision document read-only and rejects unknown revis
   const revision = before.drafts.at(-1)!.revision;
   const r = await f.app.inject(`/geo/authoring/projects/${f.projectId}/drafts/${revision}/workflow`);
   expect(r.statusCode, r.body).toBe(200);
-  expect(r.json().doc).toMatchObject({ schemaVersion: "gaid-workflow/v1", kind: "legacy", skills: [{ name: draftReply.slug, source: "bundled" }] });
+  // New drafts are authored as gaid-workflow/v1 (gaid-workflow-model--authoring), so the draft document is structured.
+  expect(r.json().doc).toMatchObject({ schemaVersion: "gaid-workflow/v1", kind: "structured", skills: [{ name: draftReply.slug, source: "bundled" }] });
   expect((await f.app.inject(`/geo/authoring/projects/${f.projectId}/drafts/999/workflow`)).statusCode).toBe(404);
   expect(await f.store.read(f.projectId)).toEqual(before);
 });
