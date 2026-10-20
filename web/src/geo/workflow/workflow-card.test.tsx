@@ -52,3 +52,12 @@ describe("pending Workflow in the composer", () => {
     expect(parseWorkflowBlock(sent)).toMatchObject({ id: "well-qc", tail: "북쪽만\nlogs/A.LAS" });
   });
 });
+
+describe("chat labels", () => {
+  it("names a Workflow start in tab and history labels", async () => {
+    const { commandPreview } = await import("@/lib/command-blocks");
+    const block = workflowStartMessage(doc, {}, {});
+    expect(commandPreview(block)).toBe("Workflow · 검층 점검");
+    expect(commandPreview(`${block}\n\n북쪽만 보세요.\nlogs/A.LAS`)).toBe("Workflow · 검층 점검 — 북쪽만 보세요.");
+  });
+});

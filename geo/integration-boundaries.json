@@ -140,7 +140,7 @@
       "path": "web/src/components/chat-tab.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip; the composer shows a started Workflow as PendingWorkflowChip and sends its block before the typed text (attached paths and context follow, so the block stays parseable)"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip; the composer shows a started Workflow as PendingWorkflowChip and sends its block before the typed text (attached paths and context follow, so the block stays parseable); web/src/lib/command-blocks.ts commandPreview names a Workflow start \"Workflow · <title>\" in tab and history labels"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -805,6 +805,12 @@
       "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "Cancel the text editor saved-indicator timeout on unmount and before re-arming; prevent stale callbacks after file-preview teardown"
+    },
+    {
+      "path": "web/src/lib/command-blocks.ts",
+      "owner": "gaid-workflow-model",
+      "status": "edited",
+      "responsibility": "commandPreview names a Workflow start (`<workflow>` block) \"Workflow · <title>\" in tab and history labels, with the researcher's first line"
     }
   ],
   "notTouched": [
