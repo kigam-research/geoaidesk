@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-20T09:41:45Z
+status: active
+updated: 2026-10-20T09:47:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"973096b8-d85d-4540-8407-314c27f4b24a","pid":2418100,"provider":"claude","session":"2485ae34-3b6a-477b-a2a1-60e3eb8b9d65","start":"37298903","token":"a46848df5264acf9fe4f245bb6541d25f6cf250193347f9ea63666ff5eb8e35b"}
 branch: task/gaid-hub-editing
 target: main
@@ -87,6 +87,8 @@ Trial app: `systemd-run --user --unit gaid-hubedit-app --collect -E PATH=$PATH -
 Closed 2026-10-20T09:41:45Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-editing.md.
 
 ## Failed approaches
+- First `task finish` (after merging main 75181f5): web `file-preview-panel.test.tsx` "retains a.tex draft…" failed once
+  under full-suite load (code not touched by this task); it passed 3/3 when run alone. Reran finish.
 - Seeded drafts first pointed code files at `<slug>/<path>` inside the registered package; the code-source unpacker drops
   a single top-level folder, so the check failed. Fixed by matching the extracted layout (test covers it).
 ## Notes and decisions
