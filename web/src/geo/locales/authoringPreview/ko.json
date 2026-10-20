@@ -2,19 +2,19 @@
   "brand": "GAID",
   "nav": {
     "workspace": "연구 공간",
-    "method": "연구 방법 만들기",
-    "scope": "자료에서 방법을 정리하는 화면 시안입니다."
+    "method": "Workflow 만들기",
+    "scope": "자료에서 Workflow를 정리하는 화면 시안입니다."
   },
-  "breadcrumb": "연구 공간 / 새 연구 방법",
-  "title": "논문에서 연구 방법 만들기",
+  "breadcrumb": "연구 공간 / 새 Workflow",
+  "title": "논문에서 Workflow 만들기",
   "status": "화면 시안",
   "description": "원문을 살펴보고, 연구에 필요한 선택을 정리한 뒤 스킬과 Workflow의 초안을 구성합니다.",
   "reset": "시안 초기화",
   "save": "브라우저에 저장",
   "steps": {
-    "label": "연구 방법 작성 단계",
+    "label": "Workflow 작성 단계",
     "sources": "자료 읽기",
-    "method": "방법 다듬기",
+    "method": "Workflow 다듬기",
     "trial": "시험하기"
   },
   "sample": {
@@ -40,7 +40,7 @@
   },
   "draft": {
     "title": "공간 PU 기반 광상 부존 가능성 분석",
-    "summary": "희소한 양성 기록과 unlabeled 셀로 후보 지역을 평가하는 방법 초안입니다. 새 자료에 맞는 spatial block, 평가 기준과 불확실성 해석을 시험 전에 결정합니다."
+    "summary": "희소한 양성 기록과 unlabeled 셀로 후보 지역을 평가하는 Workflow 초안입니다. 새 자료에 맞는 spatial block, 평가 기준과 불확실성 해석을 시험 전에 결정합니다."
   },
   "intake": {
     "1": "연구 목적과 필요한 입력 자료",

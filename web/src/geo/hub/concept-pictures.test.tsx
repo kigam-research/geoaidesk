@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DraftStep } from "./draft-step";
 import { fixtureDraft } from "./fixtures";
-import { MethodFlow } from "./method-flow";
+import { StepsFlow } from "./method-flow";
 import { onOpenSettings } from "@/lib/settings-nav";
 
 beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
@@ -54,7 +54,7 @@ describe("concept pictures in a draft", () => {
 
   it("does not show editing controls in the shared read-only flow", () => {
     const d = draft();
-    render(<MethodFlow profile={d.profile} visuals={{ [d.profile.procedure.nodes[0].id]: visual }} />);
+    render(<StepsFlow profile={d.profile} visuals={{ [d.profile.procedure.nodes[0].id]: visual }} />);
     expect(screen.queryByRole("button", { name: "다시 만들기" })).toBeNull();
   });
 });

@@ -9,7 +9,7 @@
     "status": "The server request failed (HTTP {status})."
   },
   "catalogue": {
-    "title": "Geoscience tasks",
+    "title": "Built-in Workflows",
     "loading": "Reading the Geo task catalogue.",
     "error": "Could not read the Geo task catalogue. {detail}",
     "status": "Geo catalogue state: {state}. {detail}",
@@ -18,10 +18,10 @@
     "outputs": "Expected output files: {outputs}",
     "boundary": "Interpretation limits: {boundary}",
     "empty": "No Geo tasks are registered.",
-    "category": "Geoscience",
+    "category": "Built-in Workflows",
     "search": "Search workflows",
-    "showOther": "Show workflows from other fields ({count})",
-    "hideOther": "Hide workflows from other fields"
+    "showOther": "Show {count} general Workflows",
+    "hideOther": "Hide general Workflows"
   },
   "readiness": {
     "ready": "Ready",
@@ -35,9 +35,9 @@
   "environment": {
     "prepare": "Prepare environment",
     "preparing": "Preparing environment",
-    "progress": "Preparing project environment packages and checking imports.",
-    "done": "Environment prepared. Its packages can be imported.",
-    "incomplete": "Some packages still cannot be imported after preparation.",
+    "progress": "Preparing project Python libraries and checking imports.",
+    "done": "Environment prepared. Its Python libraries can be imported.",
+    "incomplete": "Some Python libraries still cannot be imported after preparation.",
     "error": "Could not prepare the environment. Prepare it again."
   },
   "setup": {
@@ -83,7 +83,7 @@
       "free": "Type an answer",
       "placeholder": "Write the value and its reason in one line",
       "deferHint": "The chat asks again before the analysis.",
-      "recipe": "Recipe value"
+      "recipe": "saved start settings value"
     },
     "next": "Next step",
     "toSummary": "View summary",
@@ -132,23 +132,23 @@
     }
   },
   "recipe": {
-    "import": "Import recipe",
-    "file": "Geo task recipe file",
-    "checking": "Checking recipe",
-    "error": "Could not read or check the recipe. {detail}",
-    "issue": "{code, select, schema {The recipe does not match geo-start/v1: {subject}} catalogue-off {The Geo catalogue is off.} catalogue-version {The recipe is for another catalogue version: {subject}} unknown-workflow {Workflow not in the current catalogue: {subject}} workflow-skill {A skill the workflow needs is missing: {subject}} unknown-choice {Analysis setting not in the workflow: {subject}} unknown-skill {Skill not in the catalogue: {subject}} unknown-example {Example does not belong to the selected skills: {subject}} choice-state {A setting is both answered and left undecided: {subject}} other {Could not check the recipe: {subject}}}",
-    "noWorkflow": "Could not find the recipe's task in the current catalogue.",
-    "description": "Checks a geo-start/v1 recipe file (.geo-start.json), then saves it to this project's workflow list under the title and category you choose. A recipe does not run a task.",
-    "choose": "Choose recipe file",
-    "title": "Recipe title",
+    "import": "Import Workflow from hub",
+    "file": "Geo task saved start settings file",
+    "checking": "Checking saved start settings",
+    "error": "Could not read or check the saved start settings. {detail}",
+    "issue": "{code, select, schema {The saved start settings does not match geo-start/v1: {subject}} catalogue-off {The Geo catalogue is off.} catalogue-version {The saved start settings is for another catalogue version: {subject}} unknown-workflow {Workflow not in the current catalogue: {subject}} workflow-skill {A skill the workflow needs is missing: {subject}} unknown-choice {Analysis setting not in the workflow: {subject}} unknown-skill {Skill not in the catalogue: {subject}} unknown-example {Example does not belong to the selected skills: {subject}} choice-state {A setting is both answered and left undecided: {subject}} other {Could not check the saved start settings: {subject}}}",
+    "noWorkflow": "Could not find the saved start settings's task in the current catalogue.",
+    "description": "Check a saved start settings file (.geo-start.json), then save it to the project with a title and category. Saved start settings do not run a task.",
+    "choose": "Choose saved start settings file",
+    "title": "saved start settings title",
     "category": "Category",
     "userCategories": "Added categories",
     "upstreamCategories": "K-Dense workflow categories",
     "newCategory": "Add a new category",
     "newCategoryName": "New category name",
     "openOnce": "Open without saving",
-    "save": "Save recipe",
-    "saving": "Saving recipe",
+    "save": "Save saved start settings",
+    "saving": "Saving saved start settings",
     "close": "Close"
   },
   "files": {
@@ -179,15 +179,15 @@
     "readiness": "{state, select, ready {Ready} missing-skills {Skills needed} needs-environment {Environment needed} unavailable {Unavailable} other {State unknown}}",
     "untested": "Untested",
     "userData": "Needs user data",
-    "recipe": "Saved recipe"
+    "recipe": "Saved saved start settings"
   },
   "saved": {
     "based": "Based on: {title}",
-    "cannotOpen": "This recipe cannot be opened with the current catalogue.",
-    "error": "Could not save the recipe. {detail}",
-    "delete": "Delete recipe",
+    "cannotOpen": "This saved start settings cannot be opened with the current catalogue.",
+    "error": "Could not save the saved start settings. {detail}",
+    "delete": "Delete saved start settings",
     "confirmDelete": "Confirm deletion",
-    "deleteError": "Could not delete the recipe. {detail}"
+    "deleteError": "Could not delete the saved start settings. {detail}"
   },
   "run": {
     "elapsed": "Running for {minutes}m {seconds}s",

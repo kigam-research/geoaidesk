@@ -180,7 +180,7 @@ describe("SkillsPanel", () => {
     );
 
     render(<SkillsPanel />);
-    expect(await screen.findByText("Catalogue")).toBeInTheDocument();
+    expect(await screen.findByText("Built-in Workflow")).toBeInTheDocument();
     expect(screen.getByText("Installed")).toBeInTheDocument();
     expect(screen.getByText("Made here")).toBeInTheDocument();
     expect(screen.getByText("vercel-labs/agent-skills")).toBeInTheDocument();

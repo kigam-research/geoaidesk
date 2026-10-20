@@ -5,7 +5,7 @@ import { FIXTURE_QUESTIONS, fixtureDraft } from "./fixtures";
 import { FlowDiagram, orderedNodes } from "./flow-diagram";
 import { parseHubHash } from "./location";
 import { QuestionStep, isAnswered, sameAnswer, type DraftAnswer } from "./question-step";
-import { hasMethodSetup, openMethodSetup, takeMethodSetup } from "./handoff";
+import { hasStepsSetup, openStepsSetup, takeStepsSetup } from "./handoff";
 import { RegisterDialog } from "./hub-dialogs";
 
 beforeEach(() => localStorage.setItem("gaid:locale", "ko"));
@@ -139,12 +139,12 @@ describe("GAID hub location and hand-off", () => {
   });
 
   it("keeps a setup request until the target project's workspace takes it once", () => {
-    openMethodSetup({ projectId: "p1", methodKey: "project:m", workflowId: "w", recipeId: null });
-    expect(hasMethodSetup("p2")).toBe(false);
-    expect(takeMethodSetup("p2")).toBeNull();
-    expect(hasMethodSetup("p1")).toBe(true);
-    expect(takeMethodSetup("p1")).toMatchObject({ methodKey: "project:m", workflowId: "w" });
-    expect(takeMethodSetup("p1")).toBeNull();
+    openStepsSetup({ projectId: "p1", methodKey: "project:m", workflowId: "w", recipeId: null });
+    expect(hasStepsSetup("p2")).toBe(false);
+    expect(takeStepsSetup("p2")).toBeNull();
+    expect(hasStepsSetup("p1")).toBe(true);
+    expect(takeStepsSetup("p1")).toMatchObject({ methodKey: "project:m", workflowId: "w" });
+    expect(takeStepsSetup("p1")).toBeNull();
   });
 });
 

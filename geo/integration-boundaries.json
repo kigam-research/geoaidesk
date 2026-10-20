@@ -775,6 +775,12 @@
       "owner": "gaid-notebook-review",
       "status": "edited",
       "responsibility": "gaid-note-decisions: optional send flag and target chat on the prefill handoff; prefillChat reports whether a chat tab took it (research-note answers)"
+    },
+    {
+      "path": "server/src/api/skills.ts, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, server/test/geo-authoring.test.ts, server/test/geo-hub-shared.test.ts, web/src/components/skills-panel.test.tsx, web/src/geo/hub/shared-entry.test.tsx, web/src/geo/hub-picker/hub-picker.test.tsx, web/src/components/lab-notebook-view.test.tsx",
+      "owner": "gaid-workflow-model",
+      "status": "edited",
+      "responsibility": "Workflow terminology, skill origin/read-only file details, registration gate and installation preview regression checks."
     }
   ],
   "notTouched": [

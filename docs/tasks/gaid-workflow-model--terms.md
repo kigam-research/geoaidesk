@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:22:35Z
+updated: 2026-10-20T13:28:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -83,11 +83,19 @@ for those, format changes.
   first and self-contained, and small PNGs only if the parent asks.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress. No stored data or package contracts will change.
 ## Next steps
-1. (the next session's first action)
+1. Normalize locale catalogues and glossary.
+2. Add skill provenance/read-only instructions, constrain authoring registration, expose install preview.
+3. Run declared checks and isolated browser review; finish this child for parent integration.
 ## Failed approaches
 ## Notes and decisions
+- Ownership: this child owns existing locale namespaces, skill panel/API, authoring target/install and shared-registration gate; parent owns composition UI and flow counts. These tightly coupled changes are implemented by this writer. Integration order: copy → backend metadata/gates → skill/install UI → checks.
+- Catalogue group chosen: 기본 Workflow; upstream folded group: 일반 Workflow.
+- The copy validator cannot scope glossary forbidden variants by concept/namespace; exclusions for 방법 and 레시피 are documented as notes, not global warnings.
+- Ownership: this child owns existing locale namespaces, skill panel/API, authoring target/install and shared-registration gate; parent owns composition UI and flow counts. These tightly coupled changes are implemented by this writer. Integration order: copy → backend metadata/gates → skill/install UI → checks.
+- Catalogue group chosen: 기본 Workflow; upstream folded group: 일반 Workflow.
+- The copy validator cannot scope glossary forbidden variants by concept/namespace; exclusions for 방법 and 레시피 are documented as notes, not global warnings.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

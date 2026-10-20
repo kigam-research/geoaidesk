@@ -229,11 +229,13 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
     if (digest !== descriptor.sha256 || archive.length !== descriptor.size) return fail("archive", "Package bytes do not match the hub descriptor");
   }
   const staged = stageSkillHubPackage(archive, { agentDir: deps.agentDir, expectedSlug: resolved?.slug });
+  const contents: { name: string; files: string[]; hasCode: boolean; prompts: unknown[] }[] = [];
   // A method package's tree must match its own file listing; a hub descriptor must name the same method revision.
   for (const entry of fs.readdirSync(staged.source)) {
     const file = readMethodFile(path.join(staged.source, entry), entry);
     if ((descriptor || snapshot) && !file.method) return fail("archive", "Hub package has no valid gaid-method.json");
     if (!file.method) continue;
+    contents.push({ name: entry, files: ["gaid-method.json", ...(file.method.files ?? []).map((f) => f.path)], hasCode: file.method.implementation === "implemented", prompts: file.method.workflows.map((w) => w.prompt) });
     if (verifyMethodTree(path.join(staged.source, entry), file.method).length) return fail("archive", "Package files do not match gaid-method.json");
     if (descriptor && (file.method.methodId !== descriptor.methodId || file.method.revision !== descriptor.revision || file.method.packageDigest !== descriptor.packageDigest)) {
       return fail("archive", "Package method id/revision/digest do not match the hub descriptor");
@@ -253,7 +255,7 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   });
   const preview = await (deps.preview ?? previewSkillSource)(paths, { source: staged.source, scope: input.scope });
   const catalogue = deps.catalogue ?? skillHubCatalogue();
-  return { ...preview, skillHub: {
+  return { ...preview, contents, skillHub: {
     sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
     ...(ref ? { hubEntry: { ...ref, title: record!.entry.title } } : {}),
     ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),

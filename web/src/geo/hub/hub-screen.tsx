@@ -334,7 +334,7 @@ function HubProject({
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<HubStep | null>(null);
   const [goal, setGoal] = useState("");
-  const [target, setTarget] = useState<Target>("auto");
+  const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
@@ -382,7 +382,7 @@ function HubProject({
       setProject(p);
       setError(null);
       setGoal((g) => g || p.goal || "");
-      setTarget((t) => (p.target && t === "auto" ? p.target : t));
+      setTarget("workflow");
       setAgentModel((m) => m || p.model || "");
     } catch (e) {
       setError((e as Error).message);
@@ -762,9 +762,12 @@ function HubProject({
         onRegister={() => setStep("publish")}
         rail={
           <TrialCard
+            key={`${draft.revision}:${trialProject}`}
+            authoringId={id}
+            draftRevision={draft.revision}
             projects={activeProjects.map((p) => ({ id: p.id, name: p.name }))}
             projectId={trialProject}
-            onProject={setTrialProject}
+            onProject={(next) => { setConsent(false); setTrialProject(next); }}
             consent={consent}
             onConsent={setConsent}
             onInstall={install}

@@ -2,19 +2,19 @@
   "brand": "GAID",
   "nav": {
     "workspace": "Research workspace",
-    "method": "Create a research method",
-    "scope": "A screen prototype for shaping methods from source material."
+    "method": "Create a research Workflow",
+    "scope": "A screen prototype for shaping Workflows from source material."
   },
-  "breadcrumb": "Research workspace / New research method",
-  "title": "Create a method from a paper",
+  "breadcrumb": "Research workspace / New research Workflow",
+  "title": "Create a Workflow from a paper",
   "status": "Screen prototype",
   "description": "Read the original, decide what your research needs, and shape a draft skill and workflow.",
   "reset": "Reset prototype",
   "save": "Save in browser",
   "steps": {
-    "label": "Method authoring stages",
+    "label": "Workflow authoring stages",
     "sources": "Read sources",
-    "method": "Refine method",
+    "method": "Refine Workflow",
     "trial": "Prepare a trial"
   },
   "sample": {
@@ -40,7 +40,7 @@
   },
   "draft": {
     "title": "Spatial PU mineral prospectivity mapping",
-    "summary": "A draft method for assessing candidate areas from sparse positive records and unlabeled cells. Decide spatial blocks, evaluation criteria, and uncertainty interpretation for the new data before testing."
+    "summary": "A draft Workflow for assessing candidate areas from sparse positive records and unlabeled cells. Decide spatial blocks, evaluation criteria, and uncertainty interpretation for the new data before testing."
   },
   "intake": {
     "1": "Research purpose and required inputs",

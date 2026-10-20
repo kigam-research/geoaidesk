@@ -1,3 +1,4 @@
+import { skillWorkflow, skillFileList } from "../geo/skill-details.ts";
 import { seedSubagentResources } from "../agent/subagent-resources.ts";
 /**
  * Skill management endpoints.
@@ -93,6 +94,7 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       ...(provenance?.source ? { source: provenance.source } : {}),
       ...(provenance?.ref ? { ref: provenance.ref } : {}),
       ...(upstream ? { upstream } : {}),
+      workflow: skillWorkflow(root, skill.name, provenance?.source),
     };
   };
 
@@ -196,7 +198,7 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
         reply.code(404);
         return { detail: `No such skill: ${req.params.name}` };
       }
-      return { content, origin: getSkillProvenance(root, req.params.name)?.origin };
+      return { content, origin: getSkillProvenance(root, req.params.name)?.origin, ...skillFileList(root, req.params.name) };
     },
   );
 

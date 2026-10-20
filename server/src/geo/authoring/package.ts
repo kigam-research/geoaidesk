@@ -651,7 +651,7 @@ export async function buildPackage(
               ...draft.recipe,
               id: `${draft.slug}-default`,
               workflowId: draft.workflow.id,
-              title: L(draft.workflow.title),
+              title: Object.fromEntries(Object.entries(L(draft.workflow.title)).map(([lang, title]) => [lang, `${title}${lang === "ko" ? " 기본 설정" : " default settings"}`])),
             },
           ]
         : [],

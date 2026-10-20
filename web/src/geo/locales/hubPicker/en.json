@@ -1,34 +1,56 @@
 {
-  "search": { "label": "Search GAID hub", "placeholder": "Search by name or research topic" },
+  "search": {
+    "label": "Search GAID hub",
+    "placeholder": "Search by name or research topic"
+  },
   "loading": "Reading hub entries.",
   "error": "Could not read hub entries. Reload the list.",
-  "retry": { "button": "Reload list" },
+  "retry": {
+    "button": "Reload list"
+  },
   "empty": "No entries match. Change the search term.",
-  "emptyRecipes": "No recipes match. Change the search term or import a file.",
+  "emptyRecipes": "No Workflows with saved start settings match. Change the search term or import a file.",
   "results": "Hub search results",
   "stars": "★ {count}",
   "revision": "Revision {count}",
-  "kind": { "skill": "Skill", "workflow": "Workflow" },
-  "kindTip": "The type of research method registered in the hub.",
-  "recipe": "Recipe",
+  "kind": {
+    "skill": "Skill",
+    "workflow": "Workflow"
+  },
+  "kindTip": "The type of research Workflow registered in the hub.",
+  "recipe": "saved start settings",
   "recipeTip": "The Workflow has saved start settings.",
-  "browse": { "button": "Find in GAID hub" },
-  "file": { "button": "Import from file" },
-  "description": "Find recipes in GAID hub or import a saved file.",
-  "back": { "button": "Back to list" },
-  "installHelp": "Install the research method into the current project and open the recipe's start settings.",
-  "consent": "I understand that the method to install can run code in the project.",
-  "install": { "button": "Install and open start settings" },
-  "installing": "Installing the research method.",
-  "installError": "Could not install the research method. Check the selected revision in the hub and try again.",
+  "browse": {
+    "button": "Find in GAID hub"
+  },
+  "file": {
+    "button": "Import from file"
+  },
+  "description": "Find a Workflow in the GAID hub or import a saved start settings file.",
+  "back": {
+    "button": "Back to list"
+  },
+  "installHelp": "Install the Workflow into the current project and open its saved start settings.",
+  "consent": "I understand that the Workflow to install can run code in the project.",
+  "install": {
+    "button": "Install and open start settings"
+  },
+  "installing": "Installing the research Workflow.",
+  "installError": "Could not install the research Workflow. Check the selected revision in the hub and try again.",
   "installed": "Already available in the project. Open its saved start settings.",
-  "installedNeedsCheck": "This method is already installed. Open it to check its availability and recipes.",
-  "method": { "button": "Open research method" },
-  "open": { "button": "Open start settings" },
-  "methodsError": "Could not read installed methods. Close and reopen the dialog.",
+  "installedNeedsCheck": "This Workflow is already installed. Open it to check its availability and saved start settings.",
+  "method": {
+    "button": "Open research Workflow"
+  },
+  "open": {
+    "button": "Open start settings"
+  },
+  "methodsError": "Could not read installed Workflows. Close and reopen the dialog.",
   "skillTitle": "Find skills in GAID hub",
   "skillHelp": "Select a skill, then preview its included files.",
-  "preview": { "button": "Preview package" },
+  "preview": {
+    "button": "Preview file bundle"
+  },
   "legacy": "Previous skill_hub",
   "previewSource": "GAID hub · {title} · revision {count}"
 }
