@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T14:29:54Z
+updated: 2026-10-20T14:57:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd7d1f93-03d6-4dca-953b-00e41c858900","pid":965617,"provider":"claude","session":"1a56399d-d1de-433f-a555-be30e08751b3","start":"38658235","token":"bb278cf12f9fe20443735ce69e3424ce3a001e5efa08c85b523ada62206e2191"}
 branch: task/gaid-workflow-model
 target: main
@@ -46,8 +46,10 @@ Outside check: no outside check (product/IA work).
   ~/data/geoaidesk/work/gaid-workflow-model/home, log ../app.log) still running for phase 2 screenshots; stop with
   `systemctl --user stop gaid-wfm-app`.
 ## Next steps
-1. Children running: `cli` (5d1f02f4…; full check passed once, rerunning with isolated env), `views` (ba3b4f2b…),
-   `authoring` (7bf8b4c2…). `task complete` each when it finishes (remove scripts/check caches if close is pending).
+Blocked: waiting for children `views` (ba3b4f2b…) and `authoring` (7bf8b4c2…) to finish their final checks; the parent
+branch stays at e9e076a (child `cli` integrated and closed) until then. Then
+`task complete` both (remove caches if close is pending) and publish. Views disposed its own jobs; views mounts
+CliExportButton in the hub entry and project Workflow detail.
 2. After all children: integrate, mount CliExportButton if the views child left a slot, update AGENTS.md overview
    (terms items + Workflow 지침/chat block/gaid-workflow/v1/CLI export), run scripts/check, browser-check the chat
    start in the isolated app, finish the report (phase-2 results section), task finish.
