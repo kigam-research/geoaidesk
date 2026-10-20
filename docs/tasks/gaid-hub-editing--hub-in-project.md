@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-20T08:55:50Z
+status: ready
+updated: 2026-10-20T08:56:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c359215c-e879-4d90-a057-edcee1bddc36","pid":2584475,"provider":"codex","session":"01a15877-cef2-7143-9188-68e06ebafa16","start":"37354718","token":"8691512afe8ffc731b44bed2379aa7dd89fc4e8eded71cb9167c4bdbd3dfa27d"}
 branch: task/gaid-hub-editing--hub-in-project
 target: task/gaid-hub-editing
@@ -96,7 +96,9 @@ Report-ready Korean prose (polished in file mode with humanizer Korean rules; sc
 관련 프런트엔드 시험 69개와 백엔드 시험 27개, 양쪽 형식 검사, 문자열 검사와 UI 검사가 통과했습니다. 별도 시험용 앱에서도 레시피 설치 후 시작 설정 열기와 스킬 미리보기를 확인했습니다. 한국어 화면은 1440×900과 1280×800에서 확인했습니다. 실제 분석이나 모델 호출은 실행하지 않았습니다. 전체 검사와 배포는 상위 작업에서 진행합니다.
 
 ## Next steps
-1. Save the reviewed files and finish this child; parent integrates with `task complete gaid-hub-editing--hub-in-project`, runs full `scripts/check`, and adds the prose/screenshots to its canonical report.
+<!-- task:closed -->
+Closed 2026-10-20T08:56:07Z: ready; the parent gaid-hub-editing integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First resume met another task transaction; a retry succeeded in the same printed worktree.
 - Dependencies were absent (`tsc: not found`); ran `npm ci` in server/web, with no lockfile changes.
