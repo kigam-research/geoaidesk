@@ -69,7 +69,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
   `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
   recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
-  settings). The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
+  settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
+  `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
+  latest revision when that draft is not on this server; registering adds the next revision), any other name gets one own
+  copy (`<slug>-copy`; sources, questions and current answers come along when the original draft is on this server) that
+  registers as a separate entry with `basedOn`; drafts carry `hubEntry`. Registration keeps pictures whose cover, step or
+  output still exists. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
+  (`answersFeedback`). Concept pictures can be redone one at a time or revised by a researcher instruction (≤ 500 chars,
+  previous picture as input to `codex/images/edits`); older picture files stay. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
   `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and
