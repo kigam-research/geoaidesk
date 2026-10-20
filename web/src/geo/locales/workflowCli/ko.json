@@ -1,0 +1,9 @@
+{
+  "export": { "button": "CLI에서 쓰기" },
+  "target": {
+    "title": "CLI용 파일 내려받기",
+    "hint": "지침, 사용 스킬, 시작 안내를 ZIP으로 받습니다. 실행할 CLI를 고릅니다."
+  },
+  "pi": { "button": "Pi용 파일 받기" },
+  "claude": { "button": "Claude Code용 받기" }
+}
