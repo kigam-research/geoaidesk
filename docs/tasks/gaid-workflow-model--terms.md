@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T13:44:40Z
+updated: 2026-10-20T13:46:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6937d947-6bbc-4ef2-a026-3c4433c4937e","pid":1723062,"provider":"codex","session":"01a1597a-323e-7433-b81f-ae6c86fe977e","start":"39048145","token":"3b0452194c456f2ac2c267aeba20dc29fceeb7207688aedc9fc6cedbbaf8a7e1"}
 branch: task/gaid-workflow-model--terms
 target: task/gaid-workflow-model
@@ -104,7 +104,7 @@ Implemented and pushed to the child branch; parent integration is pending. No pa
 - Production UI built successfully in the isolated app job at 55a3b22c479c. Browser review used GAID_HOME under this unit's external work directory (a sanitized parent review-data copy), not ~/.geoaidesk. A newly created test project installed another researcher's registered Workflow through preview → consent → install. Confirmed `등록됨 · 1판`, title-based skill provenance, read-only instructions and GitHub-first import. No model/research execution was started. Browser console: 0 errors; 2 existing Radix missing-description warnings on dialogs. All observed task-path API requests succeeded.
 - UI rules followed: P1/P3/P4/P6 (one task, disclosures, contextual read-only view, researcher terms), B2/B3 (named row action), D3 (inline read-only instructions inside the existing settings dialog), S5 (preview readiness gates), G1/G2, W5, R1. Checked section 10 at 1440×900 and 1280×800: no page horizontal overflow or clipped primary action in the changed default states; file/prompt details stay folded initially. Legacy method-detail density is unchanged and the parent-owned composition screen supersedes it.
 - 18 Korean screenshots cover hub home, hub entry, installation preview, skill row, read-only instructions, GitHub-first skill import, Workflow panel/detail and general Workflow attribution at both required sizes. Full paths and hashes are below. App source predates only final sharing-copy precision and local-file import wording; the photographed changes are otherwise final.
-- Isolated app/browser stopped after review. Current worktree build caches (`web/.next`, tsbuildinfo, Vite caches) removed. Obsolete check jobs 1 and 3 were stopped and disposed as superseded by job 4; the app job 2 was disposed as intentionally cancelled after successful review. Logs/receipts remain intact.
+- Isolated app/browser stopped after review. Current worktree build caches (`web/.next`, tsbuildinfo, Vite caches) removed. Obsolete check jobs 1 and 3 were stopped and disposed as superseded by job 4; the app job 2 was disposed as intentionally cancelled after successful review. Its later `lost` notice is expected: systemd intentionally stopped the foreground app, so there is no natural exit receipt; the log confirms successful production start and browser/API use through review completion. Do not restart that app job. Logs/receipts remain intact.
 - Parent owns the single canonical report and composition UI. Update the project AGENTS.md summary during parent integration: Skills no longer searches the shared hub, new drafts target Workflow, and registration requires a Workflow. Do not change skill_hub or its contract.
 
 ### Screenshot evidence
