@@ -282,6 +282,8 @@ const PLAIN: Record<string, string> = {
   environment: "실행 환경 이름이 카탈로그에 없습니다.",
   "taxonomy-unknown": "분류 용어에 없는 값이 있습니다.",
   "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
+  "workflow-links": "Workflow 단계에 사용 스킬, 필요한 조건과 결과 파일을 연결해 주세요.",
+  "workflow-headings": "Workflow 단계와 스킬 처리 절차의 절 제목·순서를 맞춰 주세요.",
   "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
   "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
   "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",

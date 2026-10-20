@@ -184,7 +184,7 @@ export async function registerSharedHubRoutes(
           const draft = structuredDraft(selectedDraft);
           if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
           let pkg = project.packages.find((p) => p.draftRevision === draft.revision &&
-            p.manifest.workflows.some((w) => w.id === draft.workflow!.id && w.schemaVersion === "gaid-workflow/v1"));
+            ((p.manifest as { workflows?: GeoWorkflow[] } | null)?.workflows ?? []).some((w) => w.id === draft.workflow!.id && w.schemaVersion === "gaid-workflow/v1"));
           if (!pkg) {
             const built = await buildPackage(project, draft, {
               store: authoring,
