@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T09:14:34Z
+status: done
+updated: 2026-10-20T09:41:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c359215c-e879-4d90-a057-edcee1bddc36","pid":2584475,"provider":"codex","session":"01a15877-cef2-7143-9188-68e06ebafa16","start":"37354718","token":"8691512afe8ffc731b44bed2379aa7dd89fc4e8eded71cb9167c4bdbd3dfa27d"}
 branch: task/gaid-hub-editing--hub-in-project
 target: task/gaid-hub-editing
@@ -97,7 +97,7 @@ Report-ready Korean prose (polished in file mode with humanizer Korean rules; sc
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T09:14:34Z: ready; the parent gaid-hub-editing integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T09:41:45Z: integrated into gaid-hub-editing; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First resume met another task transaction; a retry succeeded in the same printed worktree.

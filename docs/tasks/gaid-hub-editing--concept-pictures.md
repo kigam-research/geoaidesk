@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-20T09:03:11Z
+status: done
+updated: 2026-10-20T09:41:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"5c402641-eeba-4c12-a6be-b069a47e1c65","pid":2591591,"provider":"codex","session":"01a15878-02e3-7323-bd65-a0ecc4e205b2","start":"37356139","token":"c6605471e5500279f067b0899e0c46ac29e0916207a150fc5b23163d3f308bf6"}
 branch: task/gaid-hub-editing--concept-pictures
 target: task/gaid-hub-editing
@@ -100,7 +100,7 @@ Korean section for the parent's canonical report (humanizer file-mode prose revi
 서버 시험 31개와 화면 시험 10개, 양쪽 타입 검사와 문구·UI 검사를 통과했습니다. 한국어 화면을 1440×900과 1280×800에서 확인했습니다. 화면의 그림은 합성 시험 자료이며, 실제 구독으로 그림을 생성하거나 편집하는 시험은 하지 않았습니다.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-20T09:03:11Z: ready; the parent gaid-hub-editing integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-20T09:41:45Z: integrated into gaid-hub-editing; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial server typecheck found a local parameter/result variable name collision; renamed the input to priorImage.
