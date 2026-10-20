@@ -5,12 +5,12 @@
  * (the upstream Lab Notebook timeline) one click behind. List → note detail inside the tab, because the preview
  * column is narrow; the note file itself also opens as an ordinary file tab for editing.
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftIcon, BookOpenIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon } from "lucide-react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { ArrowLeftIcon, BookOpenIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { apiFetch } from "@/lib/projects";
-import { prefillChat } from "@/lib/chat-prefill";
+import { prefillChat, type ChatPrefillResult } from "@/lib/chat-prefill";
 import { rawFileUrl } from "@/lib/use-sandbox";
 import { cn } from "@/lib/utils";
 import { geoLocale, t } from "@/geo/i18n";
@@ -18,6 +18,7 @@ import type {
   ResearchNoteDecision, ResearchNoteListResponse, ResearchNoteResponse, ResearchNoteStatus, ResearchNoteSummary,
 } from "@/geo/contracts/research-notes";
 import { noteBody, plainText, splitDecisions } from "./note-markdown";
+import { answeredCount, answersMessage, type DecisionAnswer, type DecisionAnswers } from "./decision-answers";
 
 /**
  * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
@@ -33,8 +34,9 @@ const TONE: Record<ResearchNoteStatus | "decision" | "format", string> = {
   format: "border-border bg-muted/50 text-muted-foreground",
 };
 
-/** Time for a just-opened chat tab to become active and listen for the composer prefill. */
-const ANSWER_PREFILL_DELAY_MS = 400;
+/** A just-opened chat tab needs a moment to become active and listen; answers are offered to it until it takes them. */
+const ANSWER_RETRY_MS = 250;
+const ANSWER_TRIES = 20;
 
 type View = { kind: "list" } | { kind: "note"; id: string; focusDecisions?: boolean } | { kind: "record" };
 
@@ -355,12 +357,20 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   };
 
   const chat = note?.sessions.at(-1);
-  // An answer goes to the chat that wrote the note, where its analysis context is; else to the active chat.
-  const answer = (text: string) => {
-    if (chat && onOpenChat && note) {
-      onOpenChat(chat, note.title);
-      window.setTimeout(() => prefillChat(text), ANSWER_PREFILL_DELAY_MS);
-    } else prefillChat(text);
+  // Answers go to the chat that wrote the note, where its analysis context is; else to the active chat.
+  const sendAnswers = (text: string): Promise<ChatPrefillResult | null> => {
+    if (!(chat && onOpenChat && note)) return Promise.resolve(prefillChat(text, { send: true }));
+    onOpenChat(chat, note.title);
+    return new Promise((resolve) => {
+      let tries = 0;
+      const offer = () => {
+        const result = prefillChat(text, { send: true, sessionId: chat });
+        if (result) resolve(result);
+        else if (++tries >= ANSWER_TRIES) resolve(null);
+        else window.setTimeout(offer, ANSWER_RETRY_MS);
+      };
+      offer();
+    });
   };
   const meta = note ? [
     formatDate(note.date),
@@ -394,7 +404,8 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
                 </Button>
               )}
               {note.status === "pending" && (
-                <Button size="sm" disabled={saving} onClick={() => void setStatus("confirmed")}>{t("notes.detail.confirm.button")}</Button>
+                // With decisions to answer, 답변 보내기 is the view's one primary action (UI guide B1).
+                <Button variant={note.decisions.length ? "outline" : "default"} size="sm" disabled={saving} onClick={() => void setStatus("confirmed")}>{t("notes.detail.confirm.button")}</Button>
               )}
               {note.status === "confirmed" && (
                 <Button variant="outline" size="sm" disabled={saving} onClick={() => void setStatus("pending")}>{t("notes.detail.unconfirm.button")}</Button>
@@ -424,7 +435,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
                 {data.note.decisions.length ? (
-                  <DecisionCards note={data.note} onAnswer={answer} />
+                  <DecisionCards note={data.note} onSend={sendAnswers} />
                 ) : (
                   <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
                 )}
@@ -438,42 +449,106 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   );
 }
 
-function DecisionCards({ note, onAnswer }: { note: ResearchNoteSummary; onAnswer: (text: string) => void }) {
+function DecisionCards({ note, onSend }: { note: ResearchNoteSummary; onSend: (text: string) => Promise<ChatPrefillResult | null> }) {
+  const [answers, setAnswers] = useState<DecisionAnswers>({});
+  const [state, setState] = useState<"idle" | "sending" | ChatPrefillResult | "failed">("idle");
+  const answered = answeredCount(note, answers);
+  const message = answersMessage(note, answers);
+  const choose = (number: number, answer: DecisionAnswer) => { setAnswers((prev) => ({ ...prev, [number]: answer })); setState("idle"); };
+  const send = async () => {
+    if (!message) return;
+    setState("sending");
+    // Answers stay selected when no chat took them, so the researcher can send again.
+    const result = await onSend(message);
+    if (result) { setAnswers({}); setState(result); } else setState("failed");
+  };
   return (
     <section aria-label={t("notes.decision.title")}>
       <h2 className="mb-3 text-base font-semibold">{t("notes.decision.title")}</h2>
       <div className="space-y-3">
-        {note.decisions.map((decision) => <DecisionCard key={decision.number} note={note} decision={decision} onAnswer={onAnswer} />)}
+        {note.decisions.map((decision) => (
+          <DecisionCard key={decision.number} decision={decision} answer={answers[decision.number]} onChoose={(answer) => choose(decision.number, answer)} />
+        ))}
+      </div>
+      {/* Kept in view while the decisions scroll, so the one primary action stays reachable (UI guide L6). */}
+      <div className="sticky -bottom-4 z-10 -mx-4 mt-4 flex flex-wrap items-center justify-end gap-3 border-t bg-background px-4 py-3">
+        <p role={state === "failed" ? "alert" : undefined} aria-live="polite"
+          className={cn("mr-auto text-xs", state === "failed" ? "text-destructive" : "text-muted-foreground")}>
+          {state === "failed"
+            ? t("notes.decision.sendFailed")
+            : state === "sent" || state === "filled"
+              ? t(state === "sent" ? "notes.decision.sent" : "notes.decision.filled")
+              : answered
+                ? t("notes.decision.progress", { answered, count: note.decisions.length })
+                : t("notes.decision.sendBlocked")}
+        </p>
+        <Button size="sm" disabled={!message || state === "sending"} onClick={() => void send()} title={t("notes.decision.sendTip")}>
+          <SendIcon aria-hidden />{t(state === "sending" ? "notes.decision.sending" : "notes.decision.send.button")}
+        </Button>
       </div>
     </section>
   );
 }
 
-function DecisionCard({ note, decision, onAnswer }: { note: ResearchNoteSummary; decision: ResearchNoteDecision; onAnswer: (text: string) => void }) {
+const OPTION_CARD = "rounded-md border bg-background transition-colors";
+const OPTION_ROW = "flex w-full items-start gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+function DecisionCard({ decision, answer, onChoose }: {
+  decision: ResearchNoteDecision;
+  answer: DecisionAnswer | undefined;
+  onChoose: (answer: DecisionAnswer) => void;
+}) {
+  const id = useId();
   const options = [...decision.options].sort((a, b) => Number(b.recommended) - Number(a.recommended));
+  const instruction = answer?.kind === "instruction" ? answer.text : "";
   return (
     <div className="rounded-md border border-[var(--gaid-warning)]/40 p-3">
-      <p className="text-sm font-semibold">{decision.number}. {plainText(decision.question)}</p>
-      <div className="mt-2 space-y-1.5">
-        {options.map((option) => (
-          <button
-            key={option.label}
-            type="button"
-            title={t("notes.decision.answerTip")}
-            onClick={() => onAnswer(t("notes.decision.prompt", {
-              title: note.title, number: decision.number, label: option.label, text: option.text, path: note.path,
-            }))}
-            className="flex w-full items-start gap-2 rounded-md border bg-background px-3 py-2 text-left text-sm hover:bg-muted/40"
-          >
-            <span className="font-medium">{option.label})</span>
-            <span className="min-w-0 flex-1">
-              <span className="block">{plainText(option.text)}</span>
-              {option.recommended && option.reason && <span className="mt-0.5 block text-xs text-muted-foreground">{plainText(option.reason)}</span>}
-            </span>
-            {option.recommended && <span className={cn(PILL, TONE.pending, "shrink-0")}>{t("notes.decision.recommended")}</span>}
+      <p id={id} className="text-sm font-semibold">{decision.number}. {plainText(decision.question)}</p>
+      <div role="radiogroup" aria-labelledby={id} className="mt-2 space-y-1.5">
+        {options.map((option) => {
+          const selected = answer?.kind === "option" && answer.label === option.label;
+          return (
+            <div key={option.label} className={cn(OPTION_CARD, selected && "border-primary bg-primary/5 ring-1 ring-primary")}>
+              <button type="button" role="radio" aria-checked={selected} onClick={() => onChoose({ kind: "option", label: option.label })} className={OPTION_ROW}>
+                <RadioDot selected={selected} />
+                <span className="font-medium">{option.label})</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block">{plainText(option.text)}</span>
+                  {option.recommended && option.reason && <span className="mt-0.5 block text-xs text-muted-foreground">{plainText(option.reason)}</span>}
+                </span>
+                {option.recommended && <span className={cn(PILL, TONE.pending, "shrink-0")}>{t("notes.decision.recommended")}</span>}
+              </button>
+            </div>
+          );
+        })}
+        <div className={cn(OPTION_CARD, answer?.kind === "instruction" && "border-primary bg-primary/5 ring-1 ring-primary")}>
+          <button type="button" role="radio" aria-checked={answer?.kind === "instruction"} onClick={() => onChoose({ kind: "instruction", text: instruction })} className={OPTION_ROW}>
+            <RadioDot selected={answer?.kind === "instruction"} />
+            <span className="font-medium">{t("notes.decision.instruction.label")}</span>
           </button>
-        ))}
+          {answer?.kind === "instruction" && (
+            <div className="px-3 pb-3 pl-9">
+              <textarea
+                autoFocus
+                rows={3}
+                aria-label={t("notes.decision.instruction.field", { number: decision.number })}
+                placeholder={t("notes.decision.instruction.placeholder")}
+                value={instruction}
+                onChange={(event) => onChoose({ kind: "instruction", text: event.target.value })}
+                className="w-full min-w-0 resize-y rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
+  );
+}
+
+function RadioDot({ selected }: { selected: boolean }) {
+  return (
+    <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border", selected && "border-primary")}>
+      {selected && <span className="size-2 rounded-full bg-primary" />}
+    </span>
   );
 }

@@ -825,9 +825,30 @@ function ChatInput({
   // because its identity changes on every keystroke.
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
+  // GeoAIDesk (gaid-note-decisions): a prefill addressed to another chat is
+  // left for that chat's tab. A `send` prefill (research-note answers) goes
+  // out as its own message with the pinned context, queued behind a running
+  // turn instead of steering it; the composer draft is left alone. When the
+  // tab cannot send, the text lands in the composer as before.
+  const prefillSendRef = useRef({ sessionId: null as string | null, blocked: false, send: (_text: string) => Promise.resolve(false) });
+  prefillSendRef.current = {
+    sessionId: currentSessionId,
+    blocked: budgetBlocked || !modelAvailable,
+    send: (text: string) => onSend(text + buildDatabaseContext(selectedDbs) + buildSkillsContext(selectedSkills), "queue", []),
+  };
   useEffect(() => {
     if (!isActiveTab) return;
-    return onChatPrefill((text) => appendToComposer(controllerRef.current.textInput, text, "\n"));
+    return onChatPrefill((text, options) => {
+      const target = prefillSendRef.current;
+      if (options.sessionId && options.sessionId !== target.sessionId) return false;
+      const fill = () => appendToComposer(controllerRef.current.textInput, text, "\n");
+      if (!options.send || target.blocked) {
+        fill();
+        return "filled";
+      }
+      void target.send(text).then((accepted) => { if (!accepted) fill(); }, fill);
+      return "sent";
+    });
   }, [isActiveTab]);
 
   // Steer failures and Stop restore undelivered text into this composer;

@@ -89,8 +89,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   first by the lead agent with ordinary write/edit (`RESEARCH_NOTE_RULE` in GEO_INSTRUCTIONS) and editable by the researcher; the
   file is the master. `server/src/geo/notes/` parses notes, maps note → chats in `.kady/geo/notes.json` from a write/edit hook and
   serves `GET /geo/notes`, `GET /geo/notes/:id`, `POST /geo/notes/:id/status` (contract `web/src/geo/contracts/research-notes.ts`);
-  screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail with answerable decisions that prefill the
-  chat, 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
+  screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail where the researcher picks an option or writes a
+  별도 지시 for each decision and sends all answers at once with 답변 보내기 to the chat that wrote the note (gaid-note-decisions,
+  `send` prefill in `web/src/lib/chat-prefill.ts`), 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`

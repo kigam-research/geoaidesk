@@ -84,6 +84,11 @@ Rules:
   writes a note in the same turn before its final reply, or updates the note of the same question when the chat
   continues it. A new question gets a new note; a note that replaces an older conclusion names it in `supersedes`.
 - The researcher can ask at any time with **노트 정리** (prefills the chat with a request; normal chat billing).
+- Decisions are answered in the note view (gaid-note-decisions, user request 2026-10-20): for each decision the researcher
+  picks an option or **별도 지시 (직접 입력)** and writes an instruction; choosing sends nothing. **답변 보내기** sends all
+  answers as one message to the chat that wrote the note (else the active chat), queued after a running turn; unanswered
+  decisions are named as left open. When that chat cannot be opened (for example the tab limit) the answers stay selected;
+  when it cannot send (budget, disconnected model) the message lands in its chat box.
 - No note for chit-chat, setup, failed starts with no result, or questions answered without analysis.
 - Notebook entries keep being logged as before; the note does not replace them.
 

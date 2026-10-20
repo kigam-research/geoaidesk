@@ -140,7 +140,7 @@
       "path": "web/src/components/chat-tab.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -769,6 +769,12 @@
       "owner": "gaid-notebook-review",
       "status": "edited",
       "responsibility": "Register the requested notebook-review owner for maintained research-note and work-record seams"
+    },
+    {
+      "path": "web/src/lib/chat-prefill.ts",
+      "owner": "gaid-notebook-review",
+      "status": "edited",
+      "responsibility": "gaid-note-decisions: optional send flag and target chat on the prefill handoff; prefillChat reports whether a chat tab took it (research-note answers)"
     }
   ],
   "notTouched": [
