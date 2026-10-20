@@ -33,7 +33,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
-- skill_hub install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills opens the configured site (`geo/distribution.json` `skillHub.sites`) and previews a skill-page URL or uploaded `.tar.gz` through the existing acknowledgement/install gate. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`): Settings → Skills searches the shared GAID hub first, then previews the selected registered revision through the existing acknowledgement/install gate (origin `gaid-hub`). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; producer contract skill_hub
   `docs/specs/gaid-method-package.md` v1): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
   레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
@@ -55,7 +55,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`): one input file or analysis condition per step under a
   grouped step rail (입력 파일 → 분석 조건 → 요약), readiness blockers with their fix on step 1 and the summary, a summary with
   Edit links and the one primary action; a recipe or method default opens at the summary. The start draft lists the
-  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" checks a `.geo-start.json`
+  researcher's settings before the saved Workflow prompt and says they take precedence. "레시피 가져오기" searches GAID hub recipes first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.

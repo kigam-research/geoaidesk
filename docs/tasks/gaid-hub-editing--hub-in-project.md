@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-20T08:40:28Z
+updated: 2026-10-20T08:55:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c359215c-e879-4d90-a057-edcee1bddc36","pid":2584475,"provider":"codex","session":"01a15877-cef2-7143-9188-68e06ebafa16","start":"37354718","token":"8691512afe8ffc731b44bed2379aa7dd89fc4e8eded71cb9167c4bdbd3dfa27d"}
 branch: task/gaid-hub-editing--hub-in-project
 target: task/gaid-hub-editing
@@ -70,21 +70,91 @@ also copied to reports/2026-10-20-gaid-hub-editing/figures/ with names p1-*.png)
 parent's report.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented both requested entry points. RecipeAdd defaults to a searchable GAID hub recipe list; selection pins the shown revision, asks for the existing code-execution acknowledgement, installs into the current project and invokes the existing method setup handoff (which reloads method rows). Already installed methods open their saved recipe without reinstalling; disabled or recipe-less copies open their method details instead. The file check/save/open-once route remains the second option.
+
+Settings → Skills previews registered GAID hub entries through the unchanged SkillsPanel trust/staging-token/install gate. Previous site/URL/archive inputs mount only when "이전 skill_hub" is expanded. The server reads the selected immutable shared revision, checks archive SHA/size and method identity/revision/digest, and stages it with origin kind `gaid-hub` plus entry id/revision. Existing package limits and tree checks remain. No edits to parent-owned hub/authoring/shared service code or settled interfaces.
+
+Verification (2026-10-20):
+- `cd server && npm run typecheck` passed.
+- `cd server && npx vitest run test/geo-skill-hub.test.ts test/geo-methods.test.ts`: 27 passed.
+- `cd web && npx tsc --noEmit` passed.
+- `cd web && npx vitest run src/geo/hub-picker/hub-picker.test.tsx src/geo/skill-hub/skill-hub.test.tsx src/geo/workspace/workspace.test.tsx src/geo/methods/methods.test.tsx src/components/skills-panel.test.tsx`: 69 passed.
+- `node geo/copy/validate-copy.mjs web/src/geo/locales`: 0 errors; 61 existing warnings, none in hubPicker.
+- `node geo/ui/check-ui.mjs`: 0 errors; 89 existing accepted debt, unchanged.
+- `git diff --check` passed.
+- Isolated trial UI/API on 3381/18381 used `~/data/geoaidesk/work/gaid-hub-editing--hub-in-project/home`; copied projects, catalogue cache and hub records from the parent's trial (no credentials/config copied). Real browser: installed entry `entry-ap-a135f290-1c4` revision 2 into copied `review-note-style`, saw the method rows refresh and its setup open, and previewed the same entry in SkillsPanel with trust and install still required. No chat/model call or environment preparation was started. Browser console: 0 errors.
+- Screenshots (Korean): `reports/2026-10-20-gaid-hub-editing/figures/p1-recipe-list-{1440,1280}.png`, `p1-recipe-selected-{1440,1280}.png`, `p1-skills-{1440,1280}.png`. Originals: `~/data/geoaidesk/work/gaid-hub-editing--hub-in-project/playwright/` (same names). Each is under 180 KB. Visually checked at 1440×900 and 1280×800; selected actions fit without scrolling, lists scroll internally, no horizontal page overflow. UI guide: P1–P4, P6, L6, T1, S1/S3/S5, B1/B2, D2/D3, G1–G3, F1/F3/F4, A1–A3/A5, W1–W6, R1/R2. No new accepted debt. Keyboard focus remains visible; controls have accessible names; source selection uses aria-pressed and a border, not colour alone.
+
+Report-ready Korean prose (polished in file mode with humanizer Korean rules; scope and verification preserved):
+
+### 프로젝트에서 GAID 허브의 레시피와 스킬 가져오기
+
+레시피 가져오기를 열면 GAID 허브의 레시피 목록이 먼저 표시됩니다. 분석 방법을 선택하고 코드 실행에 동의하면 현재 프로젝트에 선택한 판을 설치한 뒤 레시피의 시작 설정을 엽니다. 이미 설치된 방법은 다시 설치하지 않고 프로젝트에 저장된 레시피를 엽니다. 비활성화됐거나 레시피가 없는 방법은 상세 화면에서 상태를 확인합니다. 저장한 파일을 가져오는 기존 경로도 유지했습니다.
+
+설정의 스킬 추가에서도 GAID 허브를 먼저 검색합니다. 선택한 판의 패키지를 미리 확인한 뒤 기존 소스 신뢰 확인과 설치 절차를 따릅니다. 이전 사이트와 URL·파일 입력은 접힌 “이전 skill_hub”에서 열 수 있습니다. 서버는 등록한 판의 패키지 해시와 파일 목록을 확인합니다.
+
+관련 프런트엔드 시험 69개와 백엔드 시험 27개, 양쪽 형식 검사, 문자열 검사와 UI 검사가 통과했습니다. 별도 시험용 앱에서도 레시피 설치 후 시작 설정 열기와 스킬 미리보기를 확인했습니다. 한국어 화면은 1440×900과 1280×800에서 확인했습니다. 실제 분석이나 모델 호출은 실행하지 않았습니다. 전체 검사와 배포는 상위 작업에서 진행합니다.
+
 ## Next steps
-1. (the next session's first action)
+1. Save the reviewed files and finish this child; parent integrates with `task complete gaid-hub-editing--hub-in-project`, runs full `scripts/check`, and adds the prose/screenshots to its canonical report.
 ## Failed approaches
+- First resume met another task transaction; a retry succeeded in the same printed worktree.
+- Dependencies were absent (`tsc: not found`); ran `npm ci` in server/web, with no lockfile changes.
+- First frontend run had one obsolete legacy test mock returning a preview object for the new listing route; corrected the fixture and retained the legacy gate test. All later focused checks passed.
+- Codegraph exists but this exact worktree has no index; followed its fallback to direct local reads, with no indexing.
+- One screenshot attempt timed out after development HMR closed the dialog; inspected the UI state, reopened Settings and recaptured both Skills screenshots. The final six PNGs were inspected.
+
+The isolated browser and both trial services were stopped after verification. Data/logs remain outside Git for reproduction; no deployment was changed.
 ## Notes and decisions
+This child owns hub-picker, RecipeAdd, skill-hub preview UI/server, their tests, locale namespace registration and concise AGENTS documentation. The parent owns hub screens and shared-hub service. Work is tightly coupled and done by this writer; no further child units. Integration order: preview contract → picker → entry points → tests and screenshots.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+
+### String catalogue delta
+
+All ids below are new; before = absent in ko/en. Existing workspace and skillHub strings are unchanged and reused. The hub recipe description is selected only on the new hub route; the previous description remains on file import.
+
+| Id | Korean after | English after |
+|---|---|---|
+| `hubPicker.search.label` | GAID 허브 검색 | Search GAID hub |
+| `hubPicker.search.placeholder` | 이름이나 분석 주제 검색 | Search by name or research topic |
+| `hubPicker.loading` | 허브 목록을 읽는 중입니다. | Reading hub entries. |
+| `hubPicker.error` | 허브 목록을 읽지 못했습니다. 다시 읽으세요. | Could not read hub entries. Reload the list. |
+| `hubPicker.retry.button` | 목록 다시 읽기 | Reload list |
+| `hubPicker.empty` | 조건에 맞는 항목이 없습니다. 검색어를 바꾸세요. | No entries match. Change the search term. |
+| `hubPicker.emptyRecipes` | 조건에 맞는 레시피가 없습니다. 검색어를 바꾸거나 파일에서 가져오세요. | No recipes match. Change the search term or import a file. |
+| `hubPicker.results` | 허브 검색 결과 | Hub search results |
+| `hubPicker.stars` | ★ {count} | ★ {count} |
+| `hubPicker.revision` | 판 {count} | Revision {count} |
+| `hubPicker.kind.skill` | 스킬 | Skill |
+| `hubPicker.kind.workflow` | Workflow | Workflow |
+| `hubPicker.kindTip` | 허브에 등록된 분석 방법의 유형입니다. | The type of research method registered in the hub. |
+| `hubPicker.recipe` | 레시피 | Recipe |
+| `hubPicker.recipeTip` | Workflow에 저장된 시작 설정이 있습니다. | The Workflow has saved start settings. |
+| `hubPicker.browse.button` | GAID 허브에서 찾기 | Find in GAID hub |
+| `hubPicker.file.button` | 파일에서 가져오기 | Import from file |
+| `hubPicker.description` | GAID 허브의 레시피를 찾거나 저장한 파일을 가져옵니다. | Find recipes in GAID hub or import a saved file. |
+| `hubPicker.back.button` | 목록으로 돌아가기 | Back to list |
+| `hubPicker.installHelp` | 현재 프로젝트에 분석 방법을 설치하고 레시피의 시작 설정을 엽니다. | Install the research method into the current project and open the recipe's start settings. |
+| `hubPicker.consent` | 설치할 방법이 프로젝트에서 코드를 실행할 수 있음을 확인했습니다. | I understand that the method to install can run code in the project. |
+| `hubPicker.install.button` | 설치 후 시작 설정 열기 | Install and open start settings |
+| `hubPicker.installing` | 분석 방법을 설치하는 중입니다. | Installing the research method. |
+| `hubPicker.installError` | 분석 방법을 설치하지 못했습니다. 허브에서 선택한 판을 확인한 뒤 다시 시도하세요. | Could not install the research method. Check the selected revision in the hub and try again. |
+| `hubPicker.installed` | 프로젝트에서 이미 사용할 수 있습니다. 저장된 시작 설정을 엽니다. | Already available in the project. Open its saved start settings. |
+| `hubPicker.installedNeedsCheck` | 이미 설치된 분석 방법입니다. 분석 방법을 열어 사용 상태와 레시피를 확인하세요. | This method is already installed. Open it to check its availability and recipes. |
+| `hubPicker.method.button` | 분석 방법 열기 | Open research method |
+| `hubPicker.open.button` | 시작 설정 열기 | Open start settings |
+| `hubPicker.methodsError` | 설치된 분석 방법을 읽지 못했습니다. 대화창을 닫고 다시 여세요. | Could not read installed methods. Close and reopen the dialog. |
+| `hubPicker.skillTitle` | GAID 허브에서 스킬 찾기 | Find skills in GAID hub |
+| `hubPicker.skillHelp` | 스킬을 선택한 뒤 포함 파일을 미리 확인합니다. | Select a skill, then preview its included files. |
+| `hubPicker.preview.button` | 패키지 미리보기 | Preview package |
+| `hubPicker.legacy` | 이전 skill_hub | Previous skill_hub |
+| `hubPicker.previewSource` | GAID 허브 · {title} · 판 {count} | GAID hub · {title} · revision {count} |
+
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child unit contributes the report-ready prose and tracked `p1-*.png` figures above to the parent's canonical report `reports/2026-10-20-gaid-hub-editing/index.md`; no separate child report.
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

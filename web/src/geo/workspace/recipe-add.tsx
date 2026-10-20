@@ -16,6 +16,7 @@ import {
 } from "@/geo/contracts/workspace";
 import { request, RequestError, text } from "./api";
 import { fieldClass } from "./task-setup";
+import { RecipeHub } from "@/geo/hub-picker/recipe-hub";
 
 type Setup = NonNullable<GeoRecipeCheckResponse["setup"]>;
 const NEW_CATEGORY = "__new__";
@@ -41,6 +42,7 @@ export function RecipeAdd({ projectId, workflows, categories, onSaved, onOpen }:
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
+  const [source, setSource] = useState<"hub" | "file">("hub");
   const [busy, setBusy] = useState(false);
   const [recipe, setRecipe] = useState<{ value: unknown; setup: Setup; file: string } | null>(null);
   const [issues, setIssues] = useState<GeoRecipeIssue[]>([]);
@@ -85,10 +87,15 @@ export function RecipeAdd({ projectId, workflows, categories, onSaved, onOpen }:
   const canSave = !!recipe && !busy && title.trim().length > 0 && (category !== NEW_CATEGORY || newCategory.trim().length > 0);
   return <>
     <Button size="sm" variant="outline" className="shrink-0" onClick={() => setOpen(true)}>{t("workspace.recipe.import")}</Button>
-    <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) reset(); }}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto break-words sm:max-w-lg">
+    <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) { reset(); setSource("hub"); } }}>
+      <DialogContent className="max-h-[85dvh] overflow-y-auto break-words sm:max-w-xl">
         <DialogTitle>{t("workspace.recipe.import")}</DialogTitle>
-        <DialogDescription>{t("workspace.recipe.description")}</DialogDescription>
+        <DialogDescription>{t(source === "hub" ? "hubPicker.description" : "workspace.recipe.description")}</DialogDescription>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("workspace.recipe.import")}>
+          <Button variant="outline" size="sm" className="aria-pressed:border-primary aria-pressed:bg-muted" aria-pressed={source === "hub"} disabled={busy} onClick={() => setSource("hub")}>{t("hubPicker.browse.button")}</Button>
+          <Button variant="outline" size="sm" className="aria-pressed:border-primary aria-pressed:bg-muted" aria-pressed={source === "file"} disabled={busy} onClick={() => setSource("file")}>{t("hubPicker.file.button")}</Button>
+        </div>
+        {source === "hub" ? <RecipeHub key={projectId} projectId={projectId} onDone={() => { reset(); setOpen(false); }} /> : <>
         <div className="space-y-3 text-sm">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" disabled={busy} onClick={() => input.current?.click()}>{t(busy && !recipe ? "workspace.recipe.checking" : "workspace.recipe.choose")}</Button>
@@ -131,6 +138,7 @@ export function RecipeAdd({ projectId, workflows, categories, onSaved, onOpen }:
           <Button variant="outline" disabled={!recipe || busy} onClick={() => { const setup = recipe!.setup; reset(); setOpen(false); onOpen(setup); }}>{t("workspace.recipe.openOnce")}</Button>
           <Button disabled={!canSave} onClick={() => void save()}>{t(busy && recipe ? "workspace.recipe.saving" : "workspace.recipe.save")}</Button>
         </div>
+        </>}
       </DialogContent>
     </Dialog>
   </>;
