@@ -142,7 +142,7 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
           <div className="flex flex-col gap-2 pt-1">
             {check.projects.length > 0 && <p className="text-xs text-muted-foreground">{L("check.projects", { names: check.projects.map((p) => p.name).join(", ") })}</p>}
             {issues.length === 0 ? (
-              <p className="flex items-center gap-1.5 text-sm"><CheckCircle2Icon className="size-4 text-emerald-600" aria-hidden />{L("check.none", { n: check.items })}</p>
+              <p className="flex items-center gap-1.5 text-sm"><CheckCircle2Icon className="size-4 text-[var(--gaid-success)]" aria-hidden />{L("check.none", { n: check.items })}</p>
             ) : issues.map((g) => (
               <div key={g.kind} className="flex flex-col gap-1">
                 <p className="text-sm font-medium">{L(`issue.${g.kind}`, { n: g.rows.length })}</p>

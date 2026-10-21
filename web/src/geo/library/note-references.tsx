@@ -30,9 +30,9 @@ export function NoteReferences({ content }: { content: string }) {
             {r.reference ? (
               <span>
                 {r.reference}
-                {r.outsideScope && <span className="ml-1.5 text-amber-700 dark:text-amber-300">· {t("library.references.outside")}</span>}
+                {r.outsideScope && <span className="ml-1.5 text-[var(--gaid-warning)]">· {t("library.references.outside")}</span>}
               </span>
-            ) : <span className="text-amber-700 dark:text-amber-300">{t("library.references.unknown")}</span>}
+            ) : <span className="text-[var(--gaid-warning)]">{t("library.references.unknown")}</span>}
           </li>
         ))}
       </ol>

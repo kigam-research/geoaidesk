@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:14:41Z
+updated: 2026-10-21T14:15:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"aa34d06c-a9c2-4a59-baa0-d91256af0ef9","pid":2570334,"provider":"claude","session":"43dfe263-7ab9-4d66-80b7-22ec0fd4febe","start":"47548693","token":"39b963f62ebfc6e5708f59cfe1e2e4742108fb924ff80b895da73bd72a987fa2"}
 branch: task/gaid-library-folders
 target: main
@@ -59,6 +59,10 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
   (port 23139, stopped): folder send created 3 collections/3 items/3 PDFs (sha256 equal), merged 1 duplicate, resend
   created nothing; evidence ~/data/geoaidesk/work/gaid-library-folders/real-zotero-check.json. Screens in
   ~/data/geoaidesk/work/gaid-library-folders/playwright/.
+- Design coordination (routed request design-dir-gaid-library-folders, gaid-design-identity direction 라)): new library UI
+  uses role variables only; replaced the two hue utilities this unit added (`text-emerald-600` -> `--gaid-success`,
+  `text-amber-*` -> `--gaid-warning` in note references). Pre-existing phase-1 tones in library-screen.tsx
+  (SOURCE_TONE/COVERAGE_TONE) were left for gaid-design-identity's token pass.
 - Incident: ports 3330/18330 belonged to gaid-design-identity--system's preview app; this writer stopped it by mistake;
   hub notified (request 30c36f22b468).
 ## Next steps
