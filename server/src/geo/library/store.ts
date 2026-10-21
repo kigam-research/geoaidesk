@@ -317,5 +317,6 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): 
     tags: item.tags,
     used,
     metadataConfirmed: item.metadataConfirmed,
+    addedAt: item.addedAt,
   };
 }

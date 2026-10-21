@@ -250,9 +250,9 @@
     },
     {
       "path": "web/src/components/project-view.tsx",
-      "owner": "gaid-korean-workspace",
+      "owner": "gaid-research-hub",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link; gaid-hub: Projects/GAID hub header switch and the GAID hub entry card (optional onOpenHub prop)"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link; gaid-hub: Projects/GAID hub header switch and the GAID hub entry card (optional onOpenHub prop); 내 연구 tab bar (프로젝트/서재) and the library screen in place of the project list (gaid-research-hub)"
     },
     {
       "path": "web/src/components/sandbox-panel.tsx",
