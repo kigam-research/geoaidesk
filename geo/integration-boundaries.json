@@ -811,6 +811,18 @@
       "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "commandPreview names a Workflow start (`<workflow>` block) \"Workflow · <title>\" in tab and history labels, with the researcher's first line"
+    },
+    {
+      "path": "server/test/geo-library-zotero.test.ts",
+      "owner": "gaid-research-hub--zotero",
+      "status": "added",
+      "responsibility": "Synthetic Zotero v3 Local/Web API connector regression coverage; no user library data"
+    },
+    {
+      "path": "server/test/fixtures/geo-zotero-server.ts",
+      "owner": "gaid-research-hub--zotero",
+      "status": "added",
+      "responsibility": "Synthetic Zotero v3 Local/Web API connector regression coverage; no user library data"
     }
   ],
   "notTouched": [

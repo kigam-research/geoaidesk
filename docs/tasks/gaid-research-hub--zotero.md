@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:24:52Z
+updated: 2026-10-21T11:37:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e61bf52d-9268-4d06-84a2-99fbdf1887bf","pid":1532697,"provider":"codex","session":"01a15e34-d40a-7262-97ac-59bb6d8bed03","start":"46982181","token":"1fdd4903634b060370661f31b814e1d918a83246483d200dcfc62cb55ea81402"}
 branch: task/gaid-research-hub--zotero
 target: task/gaid-research-hub
@@ -72,12 +72,30 @@ Evidence for your finish: test output summary, typecheck result, the module's pu
 anything you could not verify (e.g. `citationKey` presence in real Web API JSON).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Implemented the standalone connector under `server/src/geo/library/zotero/` (public index + README): Local/Web v3 clients, owner-injected secret storage, server-ID partitioning, 100-object pagination, incremental sync/304/deletions, deterministic mapping, bounded attachments/fulltext, narrow confirmed writes, conflict reporting and deep links.
+- Targeted fake-HTTP Vitest: 25/25 passed (2026-10-21). Backend `npx tsc --noEmit` passed on the final source. No shared library-contract edits, dependencies, routes, UI or persistent library-store implementation.
+- Real isolated **headless** Zotero 10.0.6 smoke passed: own `citationKey`, CSL export normalization, full + unchanged incremental sync (1 then 0 upserts), 609-byte PDF and indexed/total page coverage 1/1. No personal library or `zotero.sqlite` was read. Sandbox stopped successfully.
+- Parent integration contract is documented in `server/src/geo/library/zotero/README.md`; `zoteroRefKey` supports the parent's original-ID lookup. `addItemToInbox` returns the created/updated item key, version and partition.
+- Real Web API keys/permissions and Web `citationKey`, authorization dialog flow, Better BibTeX generation and Windows/WSL connectivity remain unverified. Confirmed writes are tested against fake HTTP; real sandbox provisioning used installed `oat-zotero`, not this connector's authorization dialog.
+
 ## Next steps
-1. (the next session's first action)
+1. Publish the reviewed final snapshot and run `task finish`; parent owns integration with `task complete`.
+2. Parent integrates routes/store and canonical report, using complete key manifests when the Local API lacks `/deleted`.
+
 ## Failed approaches
+- The initial fake mirrored `/deleted` for both APIs. Real Zotero 10.0.6 returned 404 there, so Local sync now tries it once and falls back to full key/version manifests while retaining incremental object bodies. Regression test added.
+- The first mapper assumed `include=csljson` returns an object. Real Local API returned a JSON string containing a one-item array. The mapper and fixture now handle that actual export shape. Both assumptions were tested directly in the real sandbox before further fixes.
+- One backend typecheck found an optional-version mismatch in the fallback result; corrected its explicit type and rechecked.
+
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Ownership/integration: this child changed only connector modules, declared synthetic tests, append-only test boundary entries and this task document. Parent owns routes, store, UI and the canonical report. Tightly coupled implementation/testing needed no independent worker.
+- Parent accepted API plan and requested stable lookup by connection/server/library/item plus a created-item ref for in-place source transition; both are implemented. No shared-contract change was needed.
+- New `/deleted` fallback result fields `sourceItemKeys`/`sourceCollectionKeys` are complete source manifests. Parent must reconcile missing collections against the latter (not only `removedCollectionKeys`), and atomically save the cursor only after successful sync. `reset` means a full snapshot/partition reconciliation. Changing followed collections requires clearing `lastSyncAt`.
+- The Local write key is scoped by base URL and server ID. Local authorization requires the server-ID header; key rejection never automatically reopens a dialog. A single-use key can stop a multi-step inbox action after its first confirmed write; repeated actions discover that same inbox rather than duplicating it.
+- Scope limit sent to parent: new-CSL send-to-Zotero creates metadata, not PDF uploads. The parent must keep GAID-managed PDFs accessible until an explicit attachment-upload path exists; no transfer is claimed here.
+- Official sources verified 2026-10-21: https://www.zotero.org/support/dev/web_api/v3/local_api ; https://www.zotero.org/support/dev/web_api/v3/syncing ; https://www.zotero.org/support/dev/web_api/v3/write_requests ; https://www.zotero.org/support/dev/web_api/v3/basics .
+- Smoke evidence: `pc74:~/data/geoaidesk/work/gaid-research-hub--zotero/smoke.json`, SHA-256 `d690e66e291821d8b6654892f7d1574204e5961672a9e8df6715976b72df604b`. Synthetic PDF SHA-256 `7165ad0ade4f4512e50ff444c9e774d384e51ac5ccefb7c01725de3d899dab89`. Sandbox directory is external to Git and stopped.
+- Public functions and one-line responsibilities are listed in the connector README's Entry points table.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

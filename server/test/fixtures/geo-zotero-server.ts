@@ -1,0 +1,124 @@
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import type { AddressInfo } from "node:net";
+import type { ZoteroObject } from "../../src/geo/library/zotero/types.ts";
+
+export interface RecordedRequest { method: string; url: URL; headers: IncomingMessage["headers"]; body: unknown }
+export interface FakeZotero {
+  baseUrl: string;
+  connection: "local" | "web";
+  serverId: string;
+  version: number;
+  apiOff: boolean;
+  keyRejected: boolean;
+  requests: RecordedRequest[];
+  items: Map<string, ZoteroObject>;
+  collections: Map<string, ZoteroObject>;
+  deletedItems: Map<string, number>;
+  deletedCollections: Map<string, number>;
+  before?: (request: RecordedRequest, response: ServerResponse) => boolean | Promise<boolean>;
+  attachmentUrl: string;
+  file: Buffer;
+  addItem: (key: string, data?: Record<string, unknown>) => ZoteroObject;
+  addCollection: (key: string, name: string) => ZoteroObject;
+  removeItem: (key: string) => void;
+  close: () => Promise<void>;
+}
+
+export async function fakeZotero(connection: "local" | "web" = "local"): Promise<FakeZotero> {
+  let sequence = 0;
+  const fake: FakeZotero = {
+    baseUrl: "", connection, serverId: "server-A", version: 1, apiOff: false, keyRejected: false, requests: [],
+    items: new Map(), collections: new Map(), deletedItems: new Map(), deletedCollections: new Map(), attachmentUrl: "", file: Buffer.from("%PDF-1.7\nsynthetic\n"),
+    addItem(key, data = {}) {
+      const object = { key, version: ++fake.version, data: { itemType: "journalArticle", title: `Paper ${key}`, collections: [], tags: [], dateAdded: "2026-01-01T00:00:00Z", ...data }, csljson: { type: "article-journal", title: `Paper ${key}`, DOI: "10.1234/example" } };
+      fake.items.set(key, object);
+      return object;
+    },
+    addCollection(key, name) {
+      const object = { key, version: ++fake.version, data: { name, parentCollection: false } };
+      fake.collections.set(key, object);
+      return object;
+    },
+    removeItem(key) { fake.items.delete(key); fake.deletedItems.set(key, ++fake.version); },
+    async close() { await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); },
+  };
+  const server = createServer(async (request, response) => {
+    try {
+      const chunks: Buffer[] = [];
+      for await (const chunk of request) chunks.push(chunk);
+      const text = Buffer.concat(chunks).toString();
+      const rec = { method: request.method ?? "GET", url: new URL(request.url!, fake.baseUrl), headers: request.headers, body: text ? JSON.parse(text) : undefined };
+      fake.requests.push(rec);
+      const path = rec.url.pathname.replace(/^\/api/, "").replace(/\/$/, "");
+      const query = rec.url.searchParams;
+      if (connection === "local") response.setHeader("Zotero-Server-ID", fake.serverId);
+      response.setHeader("Last-Modified-Version", fake.version);
+      response.setHeader("Content-Type", "application/json");
+      const reply = (status: number, body?: unknown) => { response.statusCode = status; response.end(body === undefined ? undefined : JSON.stringify(body)); };
+      const exported = (object: ZoteroObject) => query.get("include")?.includes("csljson") ? { ...object, csljson: JSON.stringify([object.csljson]) } : object;
+      if (fake.before && await fake.before(rec, response)) return;
+      if (fake.apiOff) return reply(403);
+      if (fake.keyRejected && (connection === "web" || rec.method !== "GET")) return reply(connection === "local" ? 401 : 403);
+      if (connection === "local" && rec.headers["zotero-server-id"] && rec.headers["zotero-server-id"] !== fake.serverId) return reply(412);
+      if (connection === "local" && rec.method !== "GET" && rec.headers["zotero-server-id"] !== fake.serverId) return reply(428);
+      if (path === "/local/authorize") return reply(200, { key: "local-synthetic-secret", remember: true });
+      if (connection === "web" && rec.headers["zotero-api-key"] !== "web-synthetic-secret") return reply(403);
+      if (path === "/keys/current") return reply(200, { key: "web-synthetic-secret", userID: 123, username: "synthetic", access: { user: { library: true, write: true }, groups: { "456": { library: true, write: false } } } });
+      if (path === "/users/123/groups") return reply(200, [{ id: 456, data: { name: "Synthetic group" } }]);
+      if (path === "/storage/paper.pdf") { response.setHeader("Content-Type", "application/pdf"); response.end(fake.file); return; }
+      const match = path.match(/^\/(?:users|groups)\/\d+\/(items|collections|deleted)(?:\/([A-Z0-9]{8}))?(.*)$/);
+      if (!match) return reply(404);
+      const [, kind, key, suffix] = match;
+      if (kind === "deleted") {
+        const since = Number(query.get("since") ?? 0);
+        return reply(200, { items: [...fake.deletedItems].filter(([, version]) => version > since).map(([key]) => key), collections: [...fake.deletedCollections].filter(([, version]) => version > since).map(([key]) => key) });
+      }
+      const objects = kind === "items" ? fake.items : fake.collections;
+      const object = key ? objects.get(key) : undefined;
+      if (key && !object) return reply(404);
+      if (rec.method === "GET") {
+        if (suffix === "/fulltext") return reply(200, { content: "Synthetic full text", indexedPages: 2, totalPages: 3 });
+        if (suffix === "/file/view/url") { response.setHeader("Content-Type", "text/plain"); response.end(fake.attachmentUrl); return; }
+        if (suffix === "/file") { response.statusCode = 302; response.setHeader("Location", `${fake.baseUrl}storage/paper.pdf`); response.end(); return; }
+        if (object && !suffix) { response.setHeader("Last-Modified-Version", object.version); return reply(200, exported(object)); }
+        if (Number(rec.headers["if-modified-since-version"]) >= fake.version) return reply(304);
+        let list = suffix === "/children" ? [...fake.items.values()].filter((o) => o.data.parentItem === key) : [...objects.values()];
+        if (query.get("includeTrashed") !== "1") list = list.filter((object) => !object.data.deleted);
+        if (query.has("since")) list = list.filter((object) => object.version > Number(query.get("since")));
+        list.sort((a, b) => a.version - b.version);
+        const start = Number(query.get("start") ?? 0), limit = Number(query.get("limit") ?? 25);
+        response.setHeader("Total-Results", list.length);
+        const page = list.slice(start, start + limit);
+        return reply(200, query.get("format") === "versions" ? Object.fromEntries(page.map((object) => [object.key, object.version])) : page.map(exported));
+      }
+      if (connection === "local" && rec.headers["zotero-api-key"] !== "local-synthetic-secret") return reply(401);
+      const expected = Number(rec.headers["if-unmodified-since-version"]);
+      if (expected !== (rec.method === "PATCH" ? object?.version : fake.version)) return reply(412);
+      if (rec.method === "PATCH" && object) {
+        object.data = { ...object.data, ...rec.body as Record<string, unknown> };
+        object.version = ++fake.version;
+        response.setHeader("Last-Modified-Version", fake.version);
+        return reply(204);
+      }
+      if (rec.method === "POST") {
+        const list = rec.body as Record<string, unknown>[];
+        if (list.length > 50) return reply(413);
+        const success: Record<string, string> = {};
+        for (const [index, data] of list.entries()) {
+          const newKey = `NEW${String(++sequence).padStart(5, "0")}`;
+          const created = kind === "items" ? fake.addItem(newKey, data) : fake.addCollection(newKey, String(data.name));
+          success[index] = created.key;
+        }
+        response.setHeader("Last-Modified-Version", fake.version);
+        return reply(200, { success, failed: {}, unchanged: {} });
+      }
+      return reply(405);
+    } catch {
+      response.statusCode = 500;
+      response.end("fixture failure");
+    }
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  fake.baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/${connection === "local" ? "api/" : ""}`;
+  return fake;
+}
