@@ -13,7 +13,9 @@
     "error": "서재를 읽지 못했습니다. 잠시 뒤 다시 여세요.",
     "empty": "서재에 논문이 없습니다. PDF나 DOI로 첫 논문을 넣으세요.",
     "noMatch": "조건에 맞는 논문이 없습니다.",
-    "state": "조건에 맞는 논문 {shown} / 전체 {total}"
+    "state": "조건에 맞는 논문 {shown} / 전체 {total}",
+    "searchFolder": "{name}에서 찾기",
+    "stateFolder": "조건에 맞는 논문 {shown} / 폴더 {total}"
   },
   "add": {
     "button": "논문 넣기"
@@ -171,7 +173,7 @@
       "button": "웹 키로 연결"
     },
     "webKey": "Zotero 웹 API 키",
-    "webKeyHint": "zotero.org 설정의 Security에서 읽기 권한으로 만든 키입니다. GAID는 키를 서재 설정에만 저장하고 화면에 다시 보여 주지 않습니다.",
+    "webKeyHint": "zotero.org 설정의 Security에서 만든 키입니다. 읽기 권한이면 가져오기만 하고, Zotero로 보내려면 쓰기 권한도 필요합니다. 키는 화면에 다시 보이지 않습니다.",
     "save": {
       "button": "키 저장"
     },
@@ -187,13 +189,21 @@
       "key-rejected": "Zotero가 연결을 거절했습니다. 키나 승인을 확인하세요.",
       "unreachable": "Zotero에 닿지 못했습니다. 잠시 뒤 다시 시도하세요."
     },
-    "hint": "Zotero에서 수집한 논문이 서재에 같이 보입니다. GAID는 연구자가 고른 논문을 GAID 수집함에 넣을 때만 Zotero에 씁니다."
+    "hint": "Zotero에서 수집한 논문이 서재에 같이 보입니다. GAID는 연구자가 Zotero로 보내거나 이어진 폴더에 넣을 때만 Zotero에 씁니다."
   },
   "send": {
     "button": "Zotero로 보내기",
-    "done": "Zotero의 GAID 수집함에 보냈습니다",
     "failed": "Zotero로 보내지 못했습니다. Zotero 연결을 확인하세요.",
-    "confirm": "Zotero에서 승인 창이 뜨면 허용하세요."
+    "confirm": "Zotero에서 승인 창이 뜨면 \"항상 허용\"을 고르세요.",
+    "created": "새 논문 {n}편",
+    "merged": "이미 있던 논문 {n}편",
+    "added": "컬렉션에 넣은 논문 {n}편",
+    "pdfs": "PDF {n}개",
+    "nothing": "새로 보낼 논문이 없었습니다.",
+    "stopped": "Zotero가 다음 쓰기를 거절해 멈췄습니다. 보낸 것: {done}. Zotero 승인 창에서 \"항상 허용\"을 고른 뒤 다시 보내세요.",
+    "skipped": "{done} · 보내지 못한 논문 {n}편",
+    "toast": "Zotero로 보냈습니다",
+    "busy": "Zotero로 보내는 중입니다."
   },
   "read": {
     "button": "본문 읽기",
@@ -208,6 +218,116 @@
   },
   "references": {
     "title": "참고문헌",
-    "unknown": "확인 안 됨 · 서재에 없는 인용 키입니다"
+    "unknown": "확인 안 됨 · 서재에 없는 인용 키입니다",
+    "outside": "프로젝트 인용 폴더 밖"
+  },
+  "folders": {
+    "title": "폴더",
+    "all": "전체 논문",
+    "empty": "폴더가 없습니다. 논문 주제나 원고별로 폴더를 만드세요.",
+    "collapse": "{name} 접기",
+    "expand": "{name} 펼치기",
+    "linkedHint": "Zotero 컬렉션과 이어진 폴더입니다. 이름과 위치는 Zotero에서 바꿉니다.",
+    "new": {
+      "button": "새 폴더",
+      "title": "새 폴더",
+      "subTitle": "{parent} 안에 새 폴더",
+      "hint": "한 논문을 여러 폴더에 넣을 수 있습니다.",
+      "label": "폴더 이름",
+      "placeholder": "예: 2026 동해 광상 원고",
+      "failed": "폴더를 만들지 못했습니다. 이름을 확인한 뒤 다시 만드세요.",
+      "save": {
+        "button": "폴더 만들기"
+      }
+    },
+    "rename": {
+      "title": "폴더 이름 바꾸기",
+      "button": "이름 바꾸기"
+    },
+    "added": "{name}에 넣었습니다",
+    "addedZotero": "{name}에 넣고 Zotero에도 넣었습니다",
+    "addFailed": "폴더에 넣지 못했습니다. 다시 시도하세요.",
+    "removed": "폴더에서 뺐습니다",
+    "removeInZotero": "Zotero 컬렉션의 논문입니다. Zotero에서 빼면 GAID에도 반영됩니다.",
+    "emptyFolder": "폴더에 논문이 없습니다. 표의 논문을 폴더로 끌어 놓거나 논문 상세에서 폴더에 넣으세요.",
+    "itemTitle": "폴더",
+    "itemNone": "아직 폴더에 넣지 않았습니다.",
+    "add": {
+      "button": "폴더에 넣기"
+    },
+    "remove": {
+      "action": "{name}에서 빼기"
+    }
+  },
+  "folder": {
+    "more": "폴더 메뉴",
+    "linked": "Zotero 컬렉션과 이어진 폴더",
+    "gaid": "GAID 폴더",
+    "papers": "논문 {n}편 · 하위 폴더 포함",
+    "linkedRule": "Zotero 논문의 폴더 소속은 Zotero를 따릅니다. GAID에서 넣으면 Zotero 컬렉션에도 넣습니다.",
+    "sub": {
+      "button": "하위 폴더 만들기"
+    },
+    "rename": {
+      "button": "이름 바꾸기"
+    },
+    "delete": {
+      "button": "폴더 삭제",
+      "title": "{name} 폴더 삭제",
+      "body": "하위 폴더도 함께 지웁니다. 논문은 서재에 그대로 남습니다.",
+      "toast": "폴더를 지웠습니다",
+      "failed": "폴더를 지우지 못했습니다."
+    },
+    "cite": {
+      "title": "인용 관리",
+      "body": "원고에 인용할 논문을 폴더에 모읍니다. 참고문헌 내보내기와 점검은 하위 폴더를 포함합니다."
+    },
+    "export": {
+      "button": "참고문헌 내보내기",
+      "bibtex": "BibTeX (.bib)",
+      "ris": "RIS (.ris) · EndNote",
+      "csl": "CSL-JSON (.json)",
+      "text": "참고문헌 목록 (.txt)"
+    },
+    "attach": {
+      "button": "프로젝트에 붙이기",
+      "hint": "붙인 프로젝트의 연구노트와 AI agent는 폴더의 논문을 인용 범위로 씁니다.",
+      "toast": "{name}의 인용 범위에 붙였습니다",
+      "failed": "프로젝트에 붙이지 못했습니다. 다시 시도하세요."
+    },
+    "check": {
+      "button": "참고문헌 점검",
+      "busy": "참고문헌을 점검하는 중입니다.",
+      "failed": "점검하지 못했습니다. 다시 시도하세요.",
+      "projects": "인용 범위로 쓰는 프로젝트: {names}",
+      "none": "논문 {n}편에서 고칠 점을 찾지 못했습니다.",
+      "add": {
+        "action": "폴더에 넣기"
+      },
+      "added": "폴더에 넣었습니다",
+      "more": "외 {n}편"
+    },
+    "issue": {
+      "retracted": "철회 기록 {n}편",
+      "cited-outside": "폴더 밖 인용 {n}건",
+      "duplicate": "같은 논문으로 보이는 묶음 {n}개",
+      "removed-from-zotero": "Zotero에서 지워진 논문 {n}편",
+      "unconfirmed": "서지 정보 확인 전 {n}편",
+      "no-doi": "DOI 없음 {n}편",
+      "no-year": "연도 없음 {n}편",
+      "no-authors": "저자 없음 {n}편",
+      "unread": "본문을 읽지 못한 논문 {n}편",
+      "citedLine": "@{key} · 연구노트 「{note}」 ({project})"
+    },
+    "zotero": {
+      "title": "Zotero",
+      "body": "폴더와 하위 폴더를 Zotero 컬렉션으로 만들고 GAID 논문과 PDF를 보냅니다.",
+      "linkedBody": "아직 Zotero에 없는 논문과 PDF를 이어진 Zotero 컬렉션에 보냅니다.",
+      "offline": "Zotero를 연결하면 폴더를 Zotero로 보낼 수 있습니다."
+    },
+    "send": {
+      "title": "{name} 폴더를 Zotero로 보내기",
+      "body": "논문 {n}편을 보냅니다. Zotero에 같은 논문이 있으면 새로 만들지 않고 컬렉션에만 넣습니다. Zotero 승인 창이 뜨면 \"항상 허용\"을 고르세요."
+    }
   }
 }

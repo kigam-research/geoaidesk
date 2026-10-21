@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T12:59:55Z
+updated: 2026-10-21T13:18:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"aa34d06c-a9c2-4a59-baa0-d91256af0ef9","pid":2570334,"provider":"claude","session":"43dfe263-7ab9-4d66-80b7-22ec0fd4febe","start":"47548693","token":"39b963f62ebfc6e5708f59cfe1e2e4742108fb924ff80b895da73bd72a987fa2"}
 branch: task/gaid-library-folders
 target: main
@@ -45,11 +45,37 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
 ~/.geoaidesk. Outside check: no outside check (app work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-21: plan and interfaces settled (Notes). Child `gaid-library-folders--zotero-writes` (writer 8efa9960, Paseo wks_03dd19e0495248f5) owns the connector write
+  additions; this unit owns contract, store, sync glue, routes, agent/note scope and UI.
 ## Next steps
-1. (the next session's first action)
+1. Implement folders in contract/store/sync glue/routes; then UI; integrate the child; real-app + Zotero sandbox check.
 ## Failed approaches
 ## Notes and decisions
+- Folder model (decision, recorded in a new ADR amending 2026-10-21 decision 3): nested folders (Zotero collections are
+  nested; 1:1 mapping needs it). A folder is a `LibraryCollection`; an item can be in many. A folder view, search scope,
+  citation scope and export include subfolders. A folder may be linked to one Zotero collection (`zotero` field):
+  mirrored Zotero collections are linked by definition; a GAID folder becomes linked (same GAID id) when sent to Zotero.
+  Linked folders take name/parent from Zotero.
+- Membership rule per (item, folder): folder linked to collection C in library L and item is a Zotero item of L ->
+  Zotero is the source (sync overwrites); adding in GAID writes "add to collection C" to Zotero after confirmation;
+  removing in GAID is refused (remove in Zotero). Any other pair (unlinked folder, GAID item, item of another library)
+  is GAID-local membership, kept across syncs. Write-back stays narrow: create a collection (only when sending a
+  folder), add item to collection, create item + PDF attachment (+ full text) when sending. Never rename/delete/remove
+  membership/edit metadata in Zotero.
+- Send to Zotero: sync first; dedupe against the mirror of the same Zotero library (normalized DOI, else normalized
+  title + year + first author); a match merges the GAID item into the mirrored one (aliases keep old id/key resolving),
+  no Zotero write but membership; otherwise create item in all linked collections it belongs to, then attach the stored
+  PDF. Sending a folder creates/links the folder and its subfolders (reuse an existing same-name collection under the
+  same parent) and sends its items. Re-running after a crash finds the created item via the sync (idempotent).
+- Citation scope: the project's attached folders (+ single attached items) are its citation scope: agent library tools
+  (already), the note citation hook and the note reference list flag keys outside the scope. Per folder: export
+  BibTeX/RIS/CSL-JSON/formatted list (APA-like, not full CSL) and a reference check.
+- Work packages: (A) child `gaid-library-folders--zotero-writes`: `server/src/geo/library/zotero/**`, its tests and
+  fixture (fake server), sandbox smoke. Interface below. (B) this unit: everything else. Integration: merge child, then
+  wire `zotero-service.ts` send paths to its functions.
+- Child interface (zotero/writes.ts): `ensureCollection(client, library, {name, parentKey?})`, `createItem(client,
+  library, {csl, collectionKeys, tags?})`, `addItemToCollections(client, ref, collectionKeys)`, `uploadAttachment(client,
+  library, parentKey, {bytes, filename, contentType, title?, fullText?})`; `addItemToInbox` keeps working.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
