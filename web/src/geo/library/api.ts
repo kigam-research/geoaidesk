@@ -1,6 +1,10 @@
 /** Client for `/geo/library/*` (contract: web/src/geo/contracts/library.ts). */
 import type {
   CreateLibraryItemBody,
+  CslItem,
+  ImportPreview,
+  LookupBody,
+  LookupResponse,
   LibraryItem,
   LibraryItemResponse,
   LibraryListQuery,
@@ -83,3 +87,9 @@ export const connectWebZotero = (key: string) => call<{ libraries: ZoteroLibrary
 export const syncZotero = () => call<{ libraries: ZoteroLibraryState[] }>("/zotero/sync", { method: "POST" });
 export const readItemText = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/read`, { method: "POST" });
 export const sendItemToZotero = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });
+
+// --- Reference details and bibliography files ------------------------------------------------------------------------
+export const lookupReference = (body: LookupBody) => call<LookupResponse>("/lookup", { method: "POST", body: JSON.stringify(body) });
+export const previewImport = (text: string, format: "bibtex" | "ris" | "csl-json") => call<ImportPreview>("/import", { method: "POST", body: JSON.stringify({ text, format }) });
+export const confirmImport = (items: CslItem[]) => call<{ added: number; duplicates: number; failed: number }>("/import/confirm", { method: "POST", body: JSON.stringify({ items }) });
+export const exportUrl = (format: "bibtex" | "ris" | "csl-json") => withApiToken(`${API_BASE}/geo/library/export?format=${format}`);

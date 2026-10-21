@@ -51,7 +51,9 @@
     "fullHint": "Every page of the PDF was read.",
     "partialHint": "Some pages had no readable text: scanned pages or pages with figures only.",
     "abstractHint": "Only the abstract and reference details were read.",
-    "noneHint": "There is no readable PDF. Add the PDF so GAID can read the full text."
+    "noneHint": "There is no readable PDF. Add the PDF so GAID can read the full text.",
+    "retracted": "Retracted",
+    "retractedHint": "Crossref or OpenAlex has a retraction record for this paper."
   },
   "side": {
     "statusTitle": "Library status",
@@ -125,7 +127,40 @@
     "saving": "Adding to your library.",
     "duplicate": "A paper with the same DOI is already in your library.",
     "failed": "Could not add the paper. Check the details and try again.",
-    "added": "Added to your library"
+    "added": "Added to your library",
+    "find": {
+      "button": "Find details"
+    },
+    "lookupLabel": "DOI or paper URL",
+    "lookupBusy": "Looking up reference details.",
+    "candidates": "Reference details found · choose the matching one",
+    "pick": {
+      "action": "Use details"
+    },
+    "notes": {
+      "pdf-no-text": "No text could be read from the PDF. If it is a scan, search by DOI or title.",
+      "no-doi": "No DOI was found. Search by title or enter the details.",
+      "provider-error": "Some reference services did not respond.",
+      "not-found": "No matching reference details were found. Enter them yourself."
+    },
+    "retracted": "This paper has a retraction record. Check the retraction notice before adding it.",
+    "corrected": "This paper has a correction record.",
+    "origin": "Source: {origin}",
+    "tabs": {
+      "paper": "One paper",
+      "file": "Bibliography file"
+    },
+    "importLabel": "BibTeX, RIS or CSL-JSON file",
+    "importPick": {
+      "button": "Choose bibliography file"
+    },
+    "importPreview": "Read {n} papers.",
+    "importErrors": "{n} entries could not be read",
+    "importSave": {
+      "button": "Add {n} papers"
+    },
+    "importDone": "Added {added} papers. Skipped {duplicates} already in your library.",
+    "importFailed": "Could not read the bibliography file. Check its format."
   },
   "zotero": {
     "title": "Zotero",
@@ -164,5 +199,11 @@
     "button": "Read full text",
     "done": "Full text read",
     "failed": "Could not read the PDF."
+  },
+  "export": {
+    "button": "Export references",
+    "bibtex": "BibTeX (.bib)",
+    "ris": "RIS (.ris)",
+    "csl": "CSL-JSON (.json)"
   }
 }

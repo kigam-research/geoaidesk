@@ -15,6 +15,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { KADY_PI_AGENT_DIR } from "../../config.ts";
+import { citationKeyFor } from "./formats/index.ts";
 import type {
   CslItem,
   LibraryCollection,
@@ -83,17 +84,14 @@ function validCsl(value: unknown): CslItem {
   return csl;
 }
 
-/** Citation key for a GAID item: first author family (ASCII letters) + year + a/b/c…, unique among `taken`. */
+/** Citation key for an item without one: the formats unit's rule (first author family + year + a/b/c…), unique among `taken`. */
 export function defaultCitationKey(csl: CslItem, taken: Set<string>): string {
-  const family = (csl.author?.[0]?.family || csl.author?.[0]?.literal || "anon")
-    .normalize("NFKD").replace(/[^A-Za-z0-9]/g, "").toLowerCase() || "ref";
-  const base = `${family}${cslYear(csl) ?? "nd"}`;
-  if (!taken.has(base)) return base;
-  for (let i = 0; i < 26 * 26; i++) {
-    const suffix = i < 26 ? String.fromCharCode(97 + i) : String.fromCharCode(97 + Math.floor(i / 26) - 1) + String.fromCharCode(97 + (i % 26));
-    if (!taken.has(base + suffix)) return base + suffix;
-  }
-  return `${base}-${randomUUID().slice(0, 4)}`;
+  return citationKeyFor(csl, taken);
+}
+
+/** True when the update evidence says this paper itself was retracted (not a notice that retracts another paper). */
+export function isRetracted(signals: LibraryItem["signals"]): boolean {
+  return (signals ?? []).some((s) => s.kind === "retraction" && !s.relation.startsWith("update-to"));
 }
 
 export class LibraryStore {
@@ -170,7 +168,7 @@ export class LibraryStore {
   }
 
   /** Adds a GAID-managed item whose metadata the researcher confirmed. Duplicate DOIs are refused (409). */
-  async addGaidItem(input: { csl: unknown; metadataOrigin: MetadataOrigin; collectionIds?: string[]; tags?: string[]; pdfSha256?: string }): Promise<LibraryItem> {
+  async addGaidItem(input: { csl: unknown; metadataOrigin: MetadataOrigin; collectionIds?: string[]; tags?: string[]; pdfSha256?: string; signals?: LibraryItem["signals"] }): Promise<LibraryItem> {
     await this.load();
     const csl = validCsl(input.csl);
     if (this.items.size >= LIBRARY_LIMITS.items) throw new LibraryError("Library is full", 413);
@@ -203,6 +201,7 @@ export class LibraryStore {
       read: { coverage: "none" },
       addedAt: at,
       updatedAt: at,
+      ...(Array.isArray(input.signals) && input.signals.length ? { signals: input.signals.slice(0, 20) } : {}),
     };
     return this.put(item);
   }
@@ -318,5 +317,6 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): 
     used,
     metadataConfirmed: item.metadataConfirmed,
     addedAt: item.addedAt,
+    ...(isRetracted(item.signals) ? { retracted: true } : {}),
   };
 }

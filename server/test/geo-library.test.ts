@@ -61,7 +61,7 @@ describe("library store", () => {
   it("makes unique citation keys from the first author and year", () => {
     const taken = new Set(["hong2026"]);
     expect(defaultCitationKey(csl("x", "Hong", 2026), taken)).toBe("hong2026a");
-    expect(defaultCitationKey({ type: "book", title: "x" }, new Set())).toBe("anonnd");
+    expect(defaultCitationKey({ type: "book", title: "x" }, new Set())).toBe("refnd");
   });
 
   it("adds a confirmed GAID item, refuses a duplicate DOI and keeps Zotero items read-only", async () => {
@@ -136,6 +136,23 @@ describe("library routes, reading and uses", () => {
     const result = (await handler!({ toolName: "write", input: { path: "연구노트/2026-10-21-a/index.md" }, isError: false, content: [{ type: "text", text: "ok" }] })) as { content: { text: string }[] };
     expect(result.content[1].text).toContain("@ghost2019 not in the researcher's library");
     expect(await handler!({ toolName: "write", input: { path: "notes.md" }, isError: false, content: [] })).toBeUndefined();
+    await server.close();
+  });
+
+  it("previews and confirms a BibTeX import, skips duplicates and exports with library keys", async () => {
+    const server = await app();
+    const bib = "@article{a1, title={Grid PU}, author={Hong, Gil}, year={2024}, journal={NRR}, doi={10.5555/grid}}\n@article{b2, title={Second}, author={Kim, S}, year={2023}}\n@article{broken, title={x}";
+    const preview = (await server.inject({ method: "POST", url: "/geo/library/import", payload: { text: bib, format: "bibtex" } })).json();
+    expect(preview.items).toHaveLength(2);
+    expect(preview.errors.length).toBeGreaterThan(0);
+    const first = (await server.inject({ method: "POST", url: "/geo/library/import/confirm", payload: { items: preview.items } })).json();
+    expect(first).toEqual({ added: 2, duplicates: 0, failed: 0 });
+    expect((await server.inject({ method: "POST", url: "/geo/library/import/confirm", payload: { items: preview.items.slice(0, 1) } })).json()).toMatchObject({ duplicates: 1 });
+    const exported = await server.inject({ method: "GET", url: "/geo/library/export?format=bibtex" });
+    expect(exported.headers["content-disposition"]).toContain("gaid-library.bib");
+    expect(exported.body).toContain("@article{hong2024");
+    const imported = (await store.all()).find((i) => i.citationKey === "hong2024");
+    expect(imported).toMatchObject({ metadataOrigin: "import", source: "gaid" });
     await server.close();
   });
 });

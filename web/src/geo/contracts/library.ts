@@ -120,6 +120,8 @@ export interface LibraryItem {
   sentToZoteroAt?: string;
   /** Set when the item disappeared from its Zotero library; kept so existing citations and links still resolve. */
   removedFromSourceAt?: string;
+  /** Retraction/correction evidence seen when the metadata was looked up (Crossref, OpenAlex). */
+  signals?: UpdateSignal[];
 }
 
 export interface LibraryCollection {
@@ -232,6 +234,8 @@ export interface LibraryItemSummary {
   used: { notes: number; workflows: number; projects: number };
   metadataConfirmed: boolean;
   addedAt: string;
+  /** True when a retraction notice was seen for this paper. */
+  retracted?: boolean;
 }
 
 export interface LibraryListQuery {
@@ -271,6 +275,7 @@ export interface CreateLibraryItemBody {
   tags?: string[];
   /** Content hash of a PDF uploaded before (`POST /geo/library/files`), attached to the new item. */
   pdfSha256?: string;
+  signals?: UpdateSignal[];
 }
 
 export interface UploadedLibraryFile {
@@ -287,4 +292,44 @@ export interface CitationResolution {
   title?: string;
   /** One plain reference line for the note's reference list. */
   reference?: string;
+}
+
+/** Update evidence from Crossref/OpenAlex (retraction, correction); never a verdict on the paper. */
+export interface UpdateSignal {
+  kind: "retraction" | "correction" | "update";
+  relation: string;
+  doi?: string;
+  source: MetadataOrigin;
+  label?: string;
+  updatedAt?: string;
+}
+
+/** A looked-up reference the researcher confirms before it enters the library. */
+export interface MetadataCandidate {
+  csl: CslItem;
+  metadataOrigin: MetadataOrigin;
+  signals: UpdateSignal[];
+  score?: number;
+}
+
+/** `POST /geo/library/lookup` with one of doi, url, title, or a stored PDF hash. */
+export interface LookupBody {
+  doi?: string;
+  url?: string;
+  title?: string;
+  author?: string;
+  pdfSha256?: string;
+}
+
+export interface LookupResponse {
+  candidates: MetadataCandidate[];
+  /** What the lookup could not do, worded by the screen: no text in the PDF (scan), no DOI found, a provider failed. */
+  notes: ("pdf-no-text" | "no-doi" | "provider-error" | "not-found")[];
+  titleGuess?: string;
+}
+
+/** `POST /geo/library/import` preview; nothing is stored until `/import/confirm`. */
+export interface ImportPreview {
+  items: CslItem[];
+  errors: { index: number; message: string }[];
 }

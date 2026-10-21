@@ -51,7 +51,9 @@
     "fullHint": "PDF의 모든 쪽을 읽었습니다.",
     "partialHint": "글자를 읽지 못한 쪽이 있습니다. 스캔본이거나 그림만 있는 쪽입니다.",
     "abstractHint": "초록과 서지 정보만 읽었습니다.",
-    "noneHint": "읽을 수 있는 PDF가 없습니다. PDF를 넣으면 본문을 읽습니다."
+    "noneHint": "읽을 수 있는 PDF가 없습니다. PDF를 넣으면 본문을 읽습니다.",
+    "retracted": "철회됨",
+    "retractedHint": "Crossref·OpenAlex에 해당 논문의 철회 기록이 있습니다."
   },
   "side": {
     "statusTitle": "서재 상태",
@@ -125,7 +127,40 @@
     "saving": "서재에 넣는 중입니다.",
     "duplicate": "같은 DOI의 논문이 이미 서재에 있습니다.",
     "failed": "서재에 넣지 못했습니다. 입력을 확인한 뒤 다시 넣으세요.",
-    "added": "서재에 넣었습니다"
+    "added": "서재에 넣었습니다",
+    "find": {
+      "button": "정보 찾기"
+    },
+    "lookupLabel": "DOI 또는 논문 주소",
+    "lookupBusy": "서지 정보를 찾는 중입니다.",
+    "candidates": "찾은 서지 정보 · 맞는 것을 고르세요",
+    "pick": {
+      "action": "서지 정보 쓰기"
+    },
+    "notes": {
+      "pdf-no-text": "PDF에서 글자를 읽지 못했습니다. 스캔본이면 DOI나 제목으로 찾으세요.",
+      "no-doi": "DOI를 찾지 못했습니다. 제목으로 찾거나 직접 입력하세요.",
+      "provider-error": "일부 서지 서비스가 응답하지 않았습니다.",
+      "not-found": "맞는 서지 정보를 찾지 못했습니다. 직접 입력하세요."
+    },
+    "retracted": "철회 기록이 있는 논문입니다. 철회 공지를 확인한 뒤 넣으세요.",
+    "corrected": "정정 기록이 있습니다.",
+    "origin": "출처: {origin}",
+    "tabs": {
+      "paper": "논문 한 편",
+      "file": "서지 파일"
+    },
+    "importLabel": "BibTeX, RIS, CSL-JSON 파일",
+    "importPick": {
+      "button": "서지 파일 고르기"
+    },
+    "importPreview": "{n}편을 읽었습니다.",
+    "importErrors": "읽지 못한 항목 {n}개",
+    "importSave": {
+      "button": "{n}편 넣기"
+    },
+    "importDone": "{added}편을 넣었습니다. 이미 있던 논문 {duplicates}편은 건너뛰었습니다.",
+    "importFailed": "서지 파일을 읽지 못했습니다. 형식을 확인하세요."
   },
   "zotero": {
     "title": "Zotero",
@@ -164,5 +199,11 @@
     "button": "본문 읽기",
     "done": "본문을 읽었습니다",
     "failed": "PDF를 읽지 못했습니다."
+  },
+  "export": {
+    "button": "서지 내보내기",
+    "bibtex": "BibTeX (.bib)",
+    "ris": "RIS (.ris)",
+    "csl": "CSL-JSON (.json)"
   }
 }

@@ -6,7 +6,7 @@
  * selected paper's detail ("내 연구에서 쓰인 곳", read coverage, next actions).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BookOpenIcon, ExternalLinkIcon, FileTextIcon, FolderIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from "lucide-react";
+import { BookOpenIcon, DownloadIcon, ExternalLinkIcon, FileTextIcon, FolderIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,7 +15,7 @@ import { listProjects, type Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { t } from "@/geo/i18n";
 import type { LibraryItemResponse, LibraryItemSummary, LibraryListQuery, LibraryListResponse, LibraryUse, ReadCoverage } from "@/geo/contracts/library";
-import { attachToProject, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, sendItemToZotero, startWorkflowFromItem, zoteroSelectUrl } from "./api";
+import { attachToProject, exportUrl, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, sendItemToZotero, startWorkflowFromItem, zoteroSelectUrl } from "./api";
 import { AddPaperDialog } from "./add-paper-dialog";
 import { ZoteroCard } from "./zotero-card";
 
@@ -100,6 +100,14 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           <h1 className="text-xl font-semibold">{L("screen.title")}</h1>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{zoteroLine}</span>
+            <Popover>
+              <PopoverTrigger asChild><Button variant="outline"><DownloadIcon data-icon="inline-start" />{L("export.button")}</Button></PopoverTrigger>
+              <PopoverContent align="end" className="w-52 p-1.5">
+                {(["bibtex", "ris", "csl-json"] as const).map((f) => (
+                  <a key={f} href={exportUrl(f)} className="block rounded-md px-2 py-1.5 text-sm hover:bg-muted">{L(`export.${f === "csl-json" ? "csl" : f}`)}</a>
+                ))}
+              </PopoverContent>
+            </Popover>
             <Button onClick={() => setAdding(true)}><PlusIcon data-icon="inline-start" />{L("add.button")}</Button>
           </div>
         </div>
@@ -152,7 +160,11 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
                       </td>
                       <td className="gaid-numeric px-2 py-2.5 text-right">{row.year ?? ""}</td>
                       <td className="px-2 py-2.5"><Badge label={L(`source.${row.source}`)} hint={L(`source.${row.source}Hint`)} tone={SOURCE_TONE[row.source]} /></td>
-                      <td className="px-2 py-2.5"><Badge label={L(`coverage.${row.coverage}`)} hint={L(`coverage.${row.coverage}Hint`)} tone={COVERAGE_TONE[row.coverage]} /></td>
+                      <td className="px-2 py-2.5">
+                        {row.retracted
+                          ? <Badge label={L("coverage.retracted")} hint={L("coverage.retractedHint")} tone="border-destructive/40 bg-destructive/10 text-destructive" />
+                          : <Badge label={L(`coverage.${row.coverage}`)} hint={L(`coverage.${row.coverage}Hint`)} tone={COVERAGE_TONE[row.coverage]} />}
+                      </td>
                       <td className="px-2 py-2.5 text-muted-foreground">{usedLine(row)}</td>
                     </tr>
                   ))}
@@ -169,7 +181,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           <SidePanel data={data} onSelect={setSelected} onChanged={load} />
         )}
       </aside>
-      <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => { void load(); setSelected(item.id); }} />
+      <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => { void load(); if (item) setSelected(item.id); }} />
     </div>
   );
 }

@@ -20,6 +20,9 @@ import { buildUsesIndex, projectItems, readProjectLiterature, writeProjectLitera
 import { AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
+import { identifyPdf, lookupDoi, resolveUrl, searchByTitle, type MetadataRecord } from "../library/metadata/index.ts";
+import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
+import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { addSource } from "../authoring/sources.ts";
 
@@ -30,15 +33,16 @@ export interface LibraryRouteOptions {
   zotero?: (store: LibraryStore) => ZoteroService;
 }
 
-/** One plain APA-like reference line (the metadata unit's formatter replaces this when integrated). */
+/** One plain APA-like reference line for a note's reference list (formats unit; not a full CSL style). */
 export function referenceLine(item: LibraryItem): string {
-  const year = cslYear(item.csl);
-  const parts = [shortAuthors(item.csl, "en"), year ? `(${year})` : "(n.d.)", item.csl.title.replace(/\.$/, "") + "."];
-  if (typeof item.csl["container-title"] === "string") parts.push(item.csl["container-title"] + ".");
-  const doi = normalizeDoi(item.csl.DOI);
-  if (doi) parts.push(`https://doi.org/${doi}`);
-  return parts.filter(Boolean).join(" ");
+  return formatReference(item.csl, "ko");
 }
+
+const candidate = (r: MetadataRecord & { score?: number }): MetadataCandidate => ({
+  csl: r.csl, metadataOrigin: r.metadataOrigin, signals: r.signals.map((x) => ({ kind: x.kind, relation: x.relation, source: x.source, ...(x.doi ? { doi: x.doi } : {}), ...(x.label ? { label: x.label } : {}), ...(x.updatedAt ? { updatedAt: x.updatedAt } : {}) })),
+  ...(r.score !== undefined ? { score: r.score } : {}),
+});
+const FORMATS: BibliographyFormat[] = ["bibtex", "ris", "csl-json"];
 
 // Library item -> hub authoring drafts made from it. Kept in the library directory so the authoring contract stays as is.
 function linksFile(store: LibraryStore) { return path.join(store.root, "links.json"); }
@@ -137,6 +141,65 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const stored = await storeOf().storePdf(Buffer.from(req.body.contentBase64, "base64"));
       reply.code(201);
       return { ...stored, mediaType: "application/pdf" };
+    });
+
+    /** Looks up reference details by DOI, URL, title or an uploaded PDF; the researcher confirms one candidate. */
+    scope.post<{ Body: LookupBody }>("/geo/library/lookup", { bodyLimit: 16 * 1024 }, async (req): Promise<LookupResponse> => {
+      const body = req.body ?? {};
+      const notes: LookupResponse["notes"] = [];
+      let titleGuess: string | undefined;
+      let dois: string[] = [];
+      if (typeof body.doi === "string" && body.doi.trim()) dois = [body.doi.trim()];
+      else if (typeof body.url === "string" && body.url.trim()) dois = (await resolveUrl(body.url.trim())).doiCandidates;
+      else if (typeof body.pdfSha256 === "string") {
+        const id = await identifyPdf(storeOf().filePath(body.pdfSha256));
+        if (!id.textFound) notes.push("pdf-no-text");
+        dois = id.doiCandidates;
+        titleGuess = id.titleGuess;
+      }
+      const candidates: MetadataCandidate[] = [];
+      for (const doi of dois.slice(0, 3)) {
+        try { candidates.push(candidate(await lookupDoi(doi))); } catch { notes.push("provider-error"); }
+      }
+      const title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : !candidates.length ? titleGuess : undefined;
+      if (!dois.length && !title) notes.push("no-doi");
+      if (!candidates.length && title) {
+        const found = await searchByTitle(title, typeof body.author === "string" ? body.author : undefined);
+        candidates.push(...found.candidates.slice(0, 5).map(candidate));
+        if (found.errors.length) notes.push("provider-error");
+      }
+      if (!candidates.length && !notes.includes("pdf-no-text")) notes.push("not-found");
+      return { candidates, notes: [...new Set(notes)], ...(titleGuess ? { titleGuess } : {}) };
+    });
+
+    /** Bibliography file preview (BibTeX, RIS, CSL-JSON); nothing is stored. */
+    scope.post<{ Body: { text?: unknown; format?: unknown } }>("/geo/library/import", { bodyLimit: 9 * 1024 * 1024 }, async (req): Promise<ImportPreview> => {
+      const format = req.body?.format as BibliographyFormat;
+      if (typeof req.body?.text !== "string" || !FORMATS.includes(format)) throw new LibraryError("text and format (bibtex, ris, csl-json) are required");
+      const parsed = parseBibliography(req.body.text, format);
+      return { items: parsed.items, errors: parsed.errors };
+    });
+    /** Adds the previewed entries the researcher kept; duplicates (same DOI) are skipped and counted. */
+    scope.post<{ Body: { items?: unknown } }>("/geo/library/import/confirm", { bodyLimit: 9 * 1024 * 1024 }, async (req) => {
+      if (!Array.isArray(req.body?.items)) throw new LibraryError("items is required");
+      const store = storeOf();
+      let added = 0, duplicates = 0, failed = 0;
+      for (const csl of req.body.items.slice(0, 10_000)) {
+        try { await store.addGaidItem({ csl, metadataOrigin: "import" }); added++; }
+        catch (e) { if (e instanceof LibraryError && e.status === 409) duplicates++; else failed++; }
+      }
+      return { added, duplicates, failed };
+    });
+    scope.get<{ Querystring: { format?: string; ids?: string } }>("/geo/library/export", async (req, reply) => {
+      const format = (req.query?.format ?? "bibtex") as BibliographyFormat;
+      if (!FORMATS.includes(format)) throw new LibraryError("format must be bibtex, ris or csl-json");
+      const wanted = new Set((req.query?.ids ?? "").split(",").filter(Boolean));
+      const items = (await storeOf().all()).filter((i) => !i.removedFromSourceAt && (!wanted.size || wanted.has(i.id)));
+      const text = exportBibliography(items.map((i) => ({ ...i.csl, ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
+      const ext = format === "csl-json" ? "json" : format === "bibtex" ? "bib" : "ris";
+      reply.header("Content-Type", format === "csl-json" ? "application/json" : "text/plain; charset=utf-8");
+      reply.header("Content-Disposition", `attachment; filename="gaid-library.${ext}"`);
+      return text;
     });
 
     scope.post<{ Body: CreateLibraryItemBody }>("/geo/library/items", async (req, reply) => {

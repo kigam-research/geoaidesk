@@ -46,7 +46,7 @@ describe("Zotero service", () => {
     expect((await store.collections()).map((c) => c.name)).toEqual(["광상"]);
     // No Better BibTeX key in Zotero: a GAID alias key, stable across syncs.
     const second = items.find((i) => i.zotero?.itemKey === "PAPER002")!;
-    expect(second.citationKey).toMatch(/^anonnd/);
+    expect(second.citationKey).toMatch(/^refnd/);
     expect(first.collectionIds).toEqual([(await store.collections())[0].id]);
 
     fake.removeItem("PAPER002");
