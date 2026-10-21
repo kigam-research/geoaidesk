@@ -48,8 +48,8 @@ export function GeoTaskCatalogue(props: { projectId: string; availableFiles: str
   return <TaskCatalogue key={props.projectId} {...props} />;
 }
 
-const GEO_CATEGORY_TONE = { color: "text-amber-700 dark:text-amber-400", bg: "bg-amber-700/10 hover:bg-amber-700/15 border-amber-700/25" };
-const USER_CATEGORY_TONE = { color: "text-foreground", bg: "bg-muted/40 hover:bg-muted/70 border-border" };
+const GEO_CATEGORY_TONE = { color: "text-foreground", bg: "bg-transparent hover:bg-accent border-border" };
+const USER_CATEGORY_TONE = { color: "text-foreground", bg: "bg-transparent hover:bg-accent border-border" };
 
 /** Row icon from the workflow's first discipline (skill_hub taxonomy ids). */
 const DISCIPLINE_ICON: Record<string, LucideIcon> = {
@@ -64,12 +64,12 @@ const DISCIPLINE_ICON: Record<string, LucideIcon> = {
 };
 const iconFor = (workflow: GeoWorkflowSummary): LucideIcon => DISCIPLINE_ICON[workflow.disciplines[0] ?? ""] ?? MountainIcon;
 
-const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-xs font-medium";
+const PILL = "inline-flex items-center gap-0.5 rounded-sm border px-1.5 py-px text-xs font-medium";
 const TONE = {
-  ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  warn: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  ok: "border-border bg-gaid-pending-bg text-muted-foreground",
+  warn: "border-gaid-warning/30 bg-gaid-warning-bg text-gaid-warning",
   bad: "border-destructive/30 bg-destructive/10 text-destructive",
-  muted: "border-border bg-muted/50 text-muted-foreground",
+  muted: "border-border bg-gaid-pending-bg text-muted-foreground",
 };
 
 export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {

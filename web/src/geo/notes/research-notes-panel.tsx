@@ -6,7 +6,7 @@
  * column is narrow; the note file itself also opens as an ordinary file tab for editing.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftIcon, BookOpenIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
+import { ArrowLeftIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { apiFetch } from "@/lib/projects";
@@ -26,12 +26,12 @@ import { NoteReferences } from "@/geo/library/note-references";
  * The shared renderer promotes the top heading level, so a note's `##` sections arrive as h1.
  */
 const NOTE_PROSE = "[&_h1]:mt-6 [&_h1]:mb-2 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-sm [&_h3]:font-semibold";
-const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium";
+const PILL = "inline-flex items-center rounded-sm border px-2 py-px text-xs font-medium";
 const TONE: Record<ResearchNoteStatus | "decision" | "format", string> = {
-  pending: "border-primary/30 bg-primary/10 text-primary",
+  pending: "border-border bg-gaid-pending-bg text-muted-foreground",
   confirmed: "border-[var(--gaid-success)]/40 bg-[var(--gaid-success)]/10 text-[var(--gaid-success)]",
   superseded: "border-border bg-muted/50 text-muted-foreground",
-  decision: "border-[var(--gaid-warning)]/40 bg-[var(--gaid-warning)]/10 text-[var(--gaid-warning)]",
+  decision: "border-border bg-gaid-pending-bg text-muted-foreground",
   format: "border-border bg-muted/50 text-muted-foreground",
 };
 
@@ -61,7 +61,7 @@ export function ResearchNotesPanel({ projectId, streaming, recordFocusToken, onO
 
   if (view.kind === "record") {
     return (
-      <div className="flex h-full min-h-0 flex-col">
+      <div className="flex h-full min-h-0 flex-col bg-background">
         <div className="flex items-center gap-2 border-b px-3 py-2">
           <Button variant="ghost" size="sm" onClick={() => setView({ kind: "list" })} title={t("notes.record.hint")}>
             <ArrowLeftIcon aria-hidden />{t("notes.record.back")}
@@ -156,11 +156,11 @@ function NoteList({ state, onOpen, onRecord }: {
   }), [list, live]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <header className="flex items-start justify-between gap-3 border-b px-4 py-3">
-        <div className="min-w-0">
+    <div className="flex h-full min-h-0 flex-col bg-background">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b bg-gaid-frame px-6 py-4">
+        <div className="min-w-[160px] flex-1">
           <h2 className="flex items-center gap-2 text-base font-semibold">
-            <BookOpenIcon className="size-4 text-primary" aria-hidden />{t("notes.panel.title")}
+            {t("notes.panel.title")}
           </h2>
           {list && (
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -178,7 +178,7 @@ function NoteList({ state, onOpen, onRecord }: {
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
         {error && !list ? (
           <LoadError message={error} onRetry={() => void state.reload()} />
         ) : !list ? (
@@ -197,7 +197,7 @@ function NoteList({ state, onOpen, onRecord }: {
                     key={`${note.id}#${decision.number}`}
                     type="button"
                     onClick={() => onOpen(note.id, true)}
-                    className="flex w-full items-center gap-3 rounded-md border border-[var(--gaid-warning)]/40 bg-background px-3 py-2 text-left hover:bg-muted/40"
+                    className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{plainText(decision.question)}</span>
@@ -238,8 +238,8 @@ function NoteList({ state, onOpen, onRecord }: {
 function Group({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section aria-label={label}>
-      <h3 className="mb-2 text-xs font-semibold text-muted-foreground">{label}</h3>
-      <div className="space-y-2">{children}</div>
+      <h3 className="mb-2 text-sm font-semibold text-gaid-body">{label}</h3>
+      <div className="divide-y border-y border-border">{children}</div>
     </section>
   );
 }
@@ -249,19 +249,15 @@ function NoteRow({ note, onOpen }: { note: ResearchNoteSummary; onOpen: (id: str
     <button
       type="button"
       onClick={() => onOpen(note.id)}
-      className="flex w-full items-start gap-3 rounded-md border bg-background px-3 py-2.5 text-left hover:bg-muted/40"
+      className="flex w-full items-start gap-4 bg-card px-4 py-4 text-left transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
     >
-      {note.cover ? (
+      {note.cover && (
         // eslint-disable-next-line @next/next/no-img-element -- sandbox file through the authenticated raw route
-        <img src={rawFileUrl(note.cover)} alt="" className="size-14 shrink-0 rounded border object-cover" />
-      ) : (
-        <span className="flex size-14 shrink-0 items-center justify-center rounded border bg-muted/40">
-          <FileTextIcon className="size-5 text-muted-foreground" aria-hidden />
-        </span>
+        <img src={rawFileUrl(note.cover)} alt="" className="size-14 shrink-0 border object-contain" />
       )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold">{plainText(note.title)}</span>
-        {note.headline && <span className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{plainText(note.headline)}</span>}
+        {note.headline && <span className="mt-0.5 line-clamp-2 text-sm text-gaid-body">{plainText(note.headline)}</span>}
         <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <span>{formatDate(note.date)}</span>
           <StatusBadge status={note.status} />
@@ -380,8 +376,8 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   ].filter(Boolean).join(" · ") : "";
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <header className="border-b px-4 py-3">
+    <div className="flex h-full min-h-0 flex-col bg-background">
+      <header className="border-b bg-gaid-frame px-6 py-3">
         <Button variant="ghost" size="sm" className="-ml-2" onClick={onBack}>
           <ArrowLeftIcon aria-hidden />{t("notes.detail.back")}
         </Button>
@@ -425,13 +421,13 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
         )}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 text-sm">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-background px-6 py-6 text-sm">
         {error && !data ? (
           <LoadError message={error} onRetry={() => void load()} />
         ) : !data || !parts ? (
           <p className="text-muted-foreground">{t("notes.panel.loading")}</p>
         ) : (
-          <div className="mx-auto max-w-[960px]">
+          <div className="mx-auto max-w-[800px] border border-border bg-card px-6 pb-6">
             <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.before}</MessageResponse>
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
@@ -492,7 +488,7 @@ function DecisionCards({ note, onSend }: { note: ResearchNoteSummary; onSend: (t
   );
 }
 
-const OPTION_CARD = "rounded-md border bg-background transition-colors";
+const OPTION_CARD = "rounded-md border border-input bg-background transition-colors";
 const OPTION_ROW = "flex w-full items-start gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 function DecisionCard({ decision, answer, onChoose }: {
@@ -504,13 +500,13 @@ function DecisionCard({ decision, answer, onChoose }: {
   const options = [...decision.options].sort((a, b) => Number(b.recommended) - Number(a.recommended));
   const instruction = answer?.kind === "instruction" ? answer.text : "";
   return (
-    <div className="rounded-md border border-[var(--gaid-warning)]/40 p-3">
+    <div className="border-t border-border py-4">
       <p id={id} className="text-sm font-semibold">{decision.number}. {plainText(decision.question)}</p>
       <div role="radiogroup" aria-labelledby={id} className="mt-2 space-y-1.5">
         {options.map((option) => {
           const selected = answer?.kind === "option" && answer.label === option.label;
           return (
-            <div key={option.label} className={cn(OPTION_CARD, selected && "border-primary bg-primary/5 ring-1 ring-primary")}>
+            <div key={option.label} className={cn(OPTION_CARD, selected && "border-gaid-link bg-accent text-accent-foreground")}>
               <button type="button" role="radio" aria-checked={selected} onClick={() => onChoose({ kind: "option", label: option.label })} className={OPTION_ROW}>
                 <RadioDot selected={selected} />
                 <span className="font-medium">{option.label})</span>
@@ -523,7 +519,7 @@ function DecisionCard({ decision, answer, onChoose }: {
             </div>
           );
         })}
-        <div className={cn(OPTION_CARD, answer?.kind === "instruction" && "border-primary bg-primary/5 ring-1 ring-primary")}>
+        <div className={cn(OPTION_CARD, answer?.kind === "instruction" && "border-gaid-link bg-accent text-accent-foreground")}>
           <button type="button" role="radio" aria-checked={answer?.kind === "instruction"} onClick={() => onChoose({ kind: "instruction", text: instruction })} className={OPTION_ROW}>
             <RadioDot selected={answer?.kind === "instruction"} />
             <span className="font-medium">{t("notes.decision.instruction.label")}</span>
@@ -549,7 +545,7 @@ function DecisionCard({ decision, answer, onChoose }: {
 
 function RadioDot({ selected }: { selected: boolean }) {
   return (
-    <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border", selected && "border-primary")}>
+    <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-input", selected && "border-primary")}>
       {selected && <span className="size-2 rounded-full bg-primary" />}
     </span>
   );

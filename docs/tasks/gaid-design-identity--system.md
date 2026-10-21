@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:55:33Z
+updated: 2026-10-21T14:09:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e73f31b2-928f-4e58-a430-49186ac0f645","pid":1071582,"provider":"codex","session":"01a15ebe-4cf0-74d2-b30f-13e606b0b188","start":"47883007","token":"281236167c9f58c78e6908aa70ba51bc35bc9b17393c11fb2cefbff9f2d1f4c5"}
 branch: task/gaid-design-identity--system
 target: task/gaid-design-identity
@@ -73,21 +73,35 @@ task document. Do not write reports; the parent integrates your screenshots and 
 Network: raw.githubusercontent.com is blocked.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the Research Register system screens: aligned project rows; neutral Workflow lists/categories; amber preparation states and neutral untested/review chips; frame/work/paper note surfaces; 12 px header chips; shared control outline/focus/geometry. All data, strings and actions remain. New workspace defaults are tree 256 px / chat 400 px; saved widths remain unchanged.
+
+Scoped checks passed: frontend typecheck, seven affected test files (72 tests), three follow-up files including workspace persistence (21 tests), production build/typecheck, UI checker and impeccable detector. Extra lint has seven baseline set-state-in-effect findings, independently reproduced from 1454b63f; no new errors. Parent's new slop scan has zero owned-file findings.
+
+Final Korean screenshots: 16 PNGs in `/home/seongin3/data/geoaidesk/work/gaid-design-identity--system/shots/`, named `{projects,workspace,note,setup}-{light,dark}-{1440,1280}.png`. Manifest with SHA-256: `.../screenshot-manifest.json`; contrast evidence: `.../role-contrast.json`. App unit stopped and browser closed. Parent integration and full scripts/check remain with the parent; no deployment.
+
 ## Next steps
-1. (the next session's first action)
+1. Parent runs `task complete gaid-design-identity--system`, integrates the hub sibling and records these results/screenshots in the canonical parent report.
+2. Parent runs full `scripts/check` and the integrated visual pass (our screenshots intentionally still show the old hub-owned banner/nav/method badges).
 ## Failed approaches
+- First screenshot matrix captured theme transitions before they settled. Those early captures are not delivery evidence; final capture waits for the theme.
+- Routed notice 30c36f22b468 identifies the preview interruption: gaid-library-folders stopped our frontend/backend during a 3330/18330 port collision, then moved its instance to 3340/18340. We had already restarted our systemd instance, completed the final screenshots and stopped it. No code or user action is needed.
+- Initial resume waited for another task transaction; retry succeeded without altering the other task.
+- Running `npx tsc` at repo root selected the unrelated npm shim because dependencies were absent. Installed locked web dependencies and ran from web; typecheck passed.
+- Initial app start inherited copied config port; stopped it before startup completed and restarted with KADY_ENV_FILE=/dev/null as directed by parent.
 ## Notes and decisions
+- Final visual QA: both viewport sizes/themes have no horizontal page overflow; setup minimum visible text is 12 px; both header lockups use their correct asset on bg-gaid-header (dark rgb(23,31,36)). Original note cover/figure pixels are unfiltered. Role-pair contrast: light text ≥ 4.93:1, dark text ≥ 6.53:1; input boundaries ≥ 3.15:1 / 4.25:1. Header note actions fit at 1280 after the width correction. No analysis, model, registration, send-answer or status-changing action was run.
+- Rule coverage: P2/P3/P4/P5, L2/L4/L6/L7, T1/T5, S1/S4/S6/S7/S8, V2–V8, G5/B6, A1/A2. No copy ids changed. Existing lint findings: seven react-hooks/set-state-in-effect errors, reproduced from baseline 1454b63f with eslint stdin; no behavior refactor in this visual task.
+- Parent approved additional owned header files: resource-monitor.tsx, session-cost-pill.tsx, project-switcher.tsx; parent records their integration boundaries. Hub banner remains with the hub child.
+- Sequential decisions: preserve supplied tokens and logo; keep all controls and data paths; omit absent descriptions and decorative thumbnails rather than adding copy.
+- Owned files/interfaces: task contract above. No independent child packages (nested children unsupported); this coupled workspace pass is implemented by the single writer. Integration order: shared primitives, project/header, workflow/setup, notes, then browser verification.
+- Checks are the scoped frontend/UI checks in the child contract; the parent owns full scripts/check and integration.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None for this child. Existing lint debt and parent/hub-owned visual seams are recorded above; no new decision or approval is required.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Contributes to parent report `reports/2026-10-21-gaid-design-identity/index.md`; no separate child report.
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

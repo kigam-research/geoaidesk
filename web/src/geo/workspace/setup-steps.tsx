@@ -63,8 +63,8 @@ export function StepRail({ steps, index, done, onSelect }: { steps: SetupStep[];
     const current = i === index;
     return <button key={i} type="button" role="tab" aria-selected={current} aria-label={t("workspace.setup.stepLabel", { n: i + 1, name: stepName(steps[i]) })}
       title={stepName(steps[i])} onClick={() => onSelect(i)}
-      className={cn("inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full border px-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        current ? "border-primary bg-primary text-primary-foreground" : done(i) ? "border-primary/30 bg-primary/5 text-primary" : "text-muted-foreground hover:border-foreground/30")}>
+      className={cn("inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-sm border px-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        current ? "border-primary bg-primary text-primary-foreground" : done(i) ? "border-primary/30 bg-primary/5 text-primary" : "border-input text-muted-foreground hover:border-gaid-link")}>
       {done(i) && !current && i !== last ? <CheckIcon className="size-3.5" aria-hidden /> : null}
       {label}
     </button>;
@@ -81,10 +81,10 @@ export function StepRail({ steps, index, done, onSelect }: { steps: SetupStep[];
 
 /** One selectable row of a radio group (Q2 radio card). */
 function OptionCard({ selected, onSelect, title, hint, badge, children }: { selected: boolean; onSelect: () => void; title: ReactNode; hint?: ReactNode; badge?: ReactNode; children?: ReactNode }) {
-  return <div className={cn("rounded-lg border transition-colors", selected ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:border-primary/50")}>
+  return <div className={cn("rounded-md border border-input transition-colors", selected ? "border-gaid-link bg-accent text-accent-foreground" : "hover:border-primary/50")}>
     <button type="button" role="radio" aria-checked={selected} onClick={onSelect}
-      className="flex w-full min-w-0 items-start gap-3 rounded-lg px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border", selected && "border-primary")}>
+      className="flex w-full min-w-0 items-start gap-3 rounded-md px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border border-input", selected && "border-primary")}>
         {selected && <span className="size-2 rounded-full bg-primary" />}
       </span>
       <span className="flex min-w-0 flex-col gap-0.5">
@@ -125,7 +125,7 @@ export function InputStep({ role, files, answer, onAnswer }: { role: WorkflowInp
   const otherPath = answer?.mode === "other" ? answer.path : "";
   return <section aria-labelledby={id} className="space-y-4">
     <StepHeading id={id} title={text(role.label)} lines={[t(role.required ? "workspace.setup.input.required" : "workspace.setup.input.optional", { formats }), role.requiredWhen ? t("workspace.setup.when", { condition: text(role.requiredWhen) }) : null]} />
-    {fitting.length === 0 && <p className="rounded-lg bg-muted px-3 py-2 text-sm">{t("workspace.setup.input.empty")}</p>}
+    {fitting.length === 0 && <p className="rounded-md bg-muted px-3 py-2 text-sm">{t("workspace.setup.input.empty")}</p>}
     <div role="radiogroup" aria-labelledby={id} className="space-y-2">
       {fitting.map((path) => <OptionCard key={path} selected={answer?.mode === "file" && answer.path === path} onSelect={() => onAnswer({ mode: "file", path })}
           title={<span className="font-mono">{baseName(path)}</span>} hint={folderName(path)} />)}
@@ -174,7 +174,7 @@ export function choiceValue(choice: WorkflowChoice, answer: ChoiceAnswer | undef
 export type SummaryRow = { step: number; label: string; value: string | null; muted?: boolean; title?: string };
 
 export function SummaryRows({ rows, onEdit }: { rows: SummaryRow[]; onEdit: (step: number) => void }) {
-  return <dl className="divide-y rounded-lg border">
+  return <dl className="divide-y border-y">
     {rows.map((row) => <div key={row.step} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] items-center gap-3 px-3 py-2 text-sm">
       <dt className="truncate text-muted-foreground" title={row.label}>{row.label}</dt>
       <dd className={cn("min-w-0 truncate", row.value === null ? "text-destructive" : row.muted ? "text-muted-foreground" : "font-medium")} title={row.title ?? row.value ?? undefined}>

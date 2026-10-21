@@ -5,7 +5,6 @@ import {
   ArchiveRestoreIcon,
   ArrowUpRightIcon,
   ChevronRightIcon,
-  FolderIcon,
   MoreHorizontalIcon,
   MoonIcon,
   PlusIcon,
@@ -25,15 +24,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -258,9 +248,9 @@ export function ProjectView({
   );
 
   return (
-    <div className="flex min-h-dvh flex-col bg-muted/20">
+    <div className="flex min-h-dvh flex-col bg-gaid-frame">
       {confirmDialog}
-      <header className="flex items-center justify-between border-b bg-background/90 px-6 py-3 backdrop-blur">
+      <header className="relative flex h-14 items-center justify-between border-b border-gaid-line-strong bg-gaid-header px-6">
         <a
           href="https://github.com/kigam-research/geoaidesk"
           target="_blank"
@@ -273,7 +263,7 @@ export function ProjectView({
           <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
           <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
           {isVersioned && (
-            <span className="text-[11px] text-muted-foreground/60">
+            <span className="text-xs text-muted-foreground">
               v{APP_VERSION}
             </span>
           )}
@@ -314,12 +304,12 @@ export function ProjectView({
 
       {onOpenHub && <ResearchTabs value={researchTab} onChange={setResearchTab} />}
       {onOpenHub && researchTab === "library" && <LibraryScreen onOpenProject={handleOpen} />}
-      <main className={cn("mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10", onOpenHub && researchTab === "library" && "hidden")}>
+      <main className={cn("mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-6 py-8", onOpenHub && researchTab === "library" && "hidden")}>
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div className="flex max-w-2xl flex-col gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+          <div className="flex max-w-[960px] flex-col gap-2">
+            <h1 className="text-xl font-semibold leading-snug">
               {appText("projects.choose_a_project")}</h1>
-            <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+            <p className="text-sm leading-relaxed text-gaid-body">
               {appText("projects.each_project_keeps_its_files_chats_notebook")}</p>
           </div>
           <Button onClick={openCreate}>
@@ -466,15 +456,13 @@ function ProjectSection({
 }: ProjectSectionProps) {
   const content =
     projects.length === 0 ? (
-      <Card className="border-dashed bg-background/50">
-        <CardContent className="text-sm text-muted-foreground">
+      <div className="border-y px-4 py-6 text-sm text-muted-foreground">
           {emptyMessage ?? appText("projects.no_projects")}
-        </CardContent>
-      </Card>
+      </div>
     ) : (
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div role="list" className="divide-y border-y border-border">
         {projects.map((project) => (
-          <ProjectCard
+          <ProjectRow
             key={project.id}
             project={project}
             activity={projectActivities[project.id]}
@@ -501,7 +489,7 @@ function ProjectSection({
                 aria-label={appText("projects.archivedToggle", { state: open ? "hide" : "show", count: projects.length })}
               >
                 <ChevronRightIcon className="transition-transform group-data-[state=open]:rotate-90" />
-                <span className="text-xs font-semibold uppercase tracking-wider">
+                <span className="text-sm font-semibold">
                   {title}
                 </span>
                 <Badge variant="secondary">{projects.length}</Badge>
@@ -519,18 +507,18 @@ function ProjectSection({
       <div className="flex items-center gap-3">
         <h2
           id={`${title}-heading`}
-          className="text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+          className="text-sm font-semibold text-foreground"
         >
           {title}
         </h2>
-        <span className="text-xs text-muted-foreground/60">{projects.length}</span>
+        <span className="text-xs text-muted-foreground">{projects.length}</span>
       </div>
       {content}
     </section>
   );
 }
 
-interface ProjectCardProps {
+interface ProjectRowProps {
   project: Project;
   activity?: ProjectActivitySummary;
   active: boolean;
@@ -540,7 +528,7 @@ interface ProjectCardProps {
   onDelete: () => void;
 }
 
-function ProjectCard({
+function ProjectRow({
   project,
   activity,
   active,
@@ -548,54 +536,39 @@ function ProjectCard({
   onEdit,
   onToggleArchive,
   onDelete,
-}: ProjectCardProps) {
-  const hasAttention = Boolean(
-    activity &&
-      (activity.needsInput > 0 || activity.errors > 0 || activity.blocked > 0),
-  );
-  const isRunning = Boolean(activity && activity.running > 0);
-  const isDone = Boolean(
-    activity &&
-      !hasAttention &&
-      !isRunning &&
-      activity.done > 0,
-  );
+}: ProjectRowProps) {
   const visibleTagLimit = project.spendLimitUsd == null ? 3 : 2;
 
   return (
-    <Card
-      className={cn(
-        "group/card relative gap-3 overflow-hidden bg-background py-4 transition-[border-color,box-shadow] hover:border-foreground/20 hover:shadow-md",
-        activity?.errors ? "border-red-500/50" : "",
-        !activity?.errors && activity?.needsInput ? "border-amber-500/50" : "",
-        !activity?.errors && !activity?.needsInput && activity?.blocked
-          ? "border-orange-500/50"
-          : "",
-        !hasAttention && isRunning ? "border-blue-500/50" : "",
-        isDone ? "border-emerald-500/50" : "",
-      )}
-    >
+    <div role="listitem" className="group/project relative grid grid-cols-[minmax(0,1fr)_176px_32px] items-center gap-6 px-4 py-4 transition-colors hover:bg-accent/50">
       <button
         type="button"
-        className="absolute inset-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="absolute inset-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
         aria-label={appText("projects.openNamed", { name: project.name })}
         onClick={onOpen}
       />
-      <CardHeader className="pointer-events-none gap-1.5 px-4">
-        <div className="mb-1 flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover/card:text-foreground">
-          <FolderIcon className="size-4" />
-        </div>
-        <CardTitle className="flex min-w-0 items-center gap-1.5 text-sm">
+      <div className="pointer-events-none min-w-0 space-y-1.5">
+        <div className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <span className="truncate">{project.name}</span>
           {active && <Badge variant="secondary">{appText("projects.current")}</Badge>}
-        </CardTitle>
-        <CardDescription className="line-clamp-2 min-h-8 text-xs leading-relaxed">
-          {project.description || appText("projects.no_description_yet")}
-        </CardDescription>
-        {activity && (
-          <ProjectActivityBadges activity={activity} />
+        </div>
+        {project.description && <p className="line-clamp-1 text-sm text-gaid-body">{project.description}</p>}
+        {(project.tags.length > 0 || project.spendLimitUsd != null) && (
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {project.spendLimitUsd != null && <span>{projectBudgetLabel(project.spendLimitUsd)}</span>}
+            {project.tags.slice(0, visibleTagLimit).map((tag) => <span key={tag}>{tag}</span>)}
+            {project.tags.length > visibleTagLimit && <span>+{project.tags.length - visibleTagLimit}</span>}
+          </div>
         )}
-        <CardAction className="pointer-events-auto relative z-10">
+      </div>
+      <div className="pointer-events-none flex flex-col items-start gap-1.5">
+        {activity && <ProjectActivityBadges activity={activity} />}
+        <span className="text-xs text-muted-foreground">{projectActivityLabel(project)}</span>
+        <span className="flex items-center gap-1 text-xs font-medium text-gaid-link">
+          {appText("projects.open")}<ArrowUpRightIcon className="size-3.5" />
+        </span>
+      </div>
+      <div className="relative z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -627,38 +600,8 @@ function ProjectCard({
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </CardAction>
-      </CardHeader>
-
-      {(project.tags.length > 0 || project.spendLimitUsd != null) && (
-        <CardContent className="pointer-events-none flex min-h-5 flex-wrap gap-1 px-4">
-          {project.spendLimitUsd != null && (
-            <Badge variant="secondary">
-              {projectBudgetLabel(project.spendLimitUsd)}
-            </Badge>
-          )}
-          {project.tags.slice(0, visibleTagLimit).map((tag) => (
-            <Badge key={tag} variant="outline">
-              {tag}
-            </Badge>
-          ))}
-          {project.tags.length > visibleTagLimit && (
-            <Badge variant="outline">
-              +{project.tags.length - visibleTagLimit}
-            </Badge>
-          )}
-        </CardContent>
-      )}
-
-      <CardFooter className="pointer-events-none mt-auto justify-between gap-3 px-4">
-        <span className="truncate text-xs text-muted-foreground">
-          {projectActivityLabel(project)}
-        </span>
-        <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover/card:text-foreground">
-          {appText("projects.open")}<ArrowUpRightIcon className="size-3.5 transition-transform group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5" />
-        </span>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -680,40 +623,35 @@ function ProjectActivityBadges({
             activity.needsInput === 1
               ? appText("projects.needs_your_input")
               : appText("projects.needsInput", { count: activity.needsInput }),
-          className: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-          dot: "bg-amber-500 animate-pulse",
+          className: "border-gaid-warning/30 bg-gaid-warning-bg text-gaid-warning",
         }
       : null,
     activity.errors > 0
       ? {
           key: "error",
           label: activity.errors === 1 ? appText("projects.error") : appText("projects.errors", { count: activity.errors }),
-          className: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
-          dot: "bg-red-500",
+          className: "border-destructive/30 bg-destructive/10 text-destructive",
         }
       : null,
     activity.blocked > 0
       ? {
           key: "blocked",
           label: activity.blocked === 1 ? appText("projects.blocked") : appText("projects.blockedCount", { count: activity.blocked }),
-          className: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300",
-          dot: "bg-orange-500",
+          className: "border-gaid-warning/30 bg-gaid-warning-bg text-gaid-warning",
         }
       : null,
     activity.running > 0
       ? {
           key: "running",
           label: activity.running === 1 ? appText("projects.running") : appText("projects.runningCount", { count: activity.running }),
-          className: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
-          dot: "bg-blue-500 animate-pulse",
+          className: "border-border bg-gaid-pending-bg text-muted-foreground",
         }
       : null,
     !activeOrAttention && activity.done > 0
       ? {
           key: "done",
           label: appText("projects.done"),
-          className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-          dot: "bg-emerald-500",
+          className: "border-border bg-gaid-pending-bg text-muted-foreground",
         }
       : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null);
@@ -721,13 +659,12 @@ function ProjectActivityBadges({
   if (items.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1.5" aria-label={appText("projects.project_activity")}>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <Badge
           key={item.key}
           variant="outline"
-          className={cn("gap-1.5", item.className)}
+          className={cn("gap-1.5", index === 0 ? item.className : "border-border bg-gaid-pending-bg text-muted-foreground")}
         >
-          <span className={cn("size-1.5 rounded-full", item.dot)} aria-hidden />
           {item.label}
         </Badge>
       ))}
