@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-21T14:37:47Z
-writer: {"host":"seongin3","reserved":"2bdb9bbe3697d1aed3710ff379c4e9911149eb4cf734f8bc0d299d98901f9fa3"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"db2f7129-57f9-4fa6-9097-90b13452fe46","pid":3154881,"provider":"claude","session":"cd9289a9-65a8-44df-8345-9053511b897a","start":"48141488","token":"2bdb9bbe3697d1aed3710ff379c4e9911149eb4cf734f8bc0d299d98901f9fa3"}
 branch: task/gaid-library-next
 target: main
 parent: 
