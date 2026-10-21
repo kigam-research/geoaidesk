@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:38:36Z
+updated: 2026-10-21T14:58:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"db2f7129-57f9-4fa6-9097-90b13452fe46","pid":3154881,"provider":"claude","session":"cd9289a9-65a8-44df-8345-9053511b897a","start":"48141488","token":"2bdb9bbe3697d1aed3710ff379c4e9911149eb4cf734f8bc0d299d98901f9fa3"}
 branch: task/gaid-library-next
 target: main
@@ -35,13 +35,42 @@ see ~/data/geoaidesk/work/hub/fded6f8b87d6.md) for any UI. Own GAID_HOME under ~
 do not modify ~/.geoaidesk. Outside check: no outside check (app work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Plan (2026-10-21): three independent items, no child writers (each is small or tightly coupled to a running app).
+  - #9 BBT: checked 2026-10-21 with gh api — latest release v9.0.71 (2026-10-07) still says "compatible with Zotero 8
+    and Zotero 9 beta" (no Zotero 10 statement); #3602 (slows Zotero 10) and #3626 (CAYW empty on Zotero 10.0.6 /
+    BBT 9.0.71) still open; no newer Zotero 10 issue since 10-08; last commits 10-17 (citeproc). Condition unmet →
+    nothing built; item stays [대기] (re-recorded under Open items).
+  - #8 literature skills: the catalogue archive is skill_hub's export (registry/byok/releases/<v>.yaml +
+    web/scripts/export-byok.ts). Request bbaae80a7640 sent to the skill_hub hub (2026-10-21) for release 0.3.0 =
+    0.2.1 + k-dense/{paper-lookup,citation-management,literature-review,pyzotero} from the pinned K-Dense commit
+    92ace75a (request text: ~/data/geoaidesk/work/gaid-library-next/skill_hub-request.md). GAID side after the asset
+    arrives: repin geo/distribution.json + configs/inputs.toml (version, sha256, manifest_sha256, size_bytes, download
+    URL), update geo-catalogue tests that name 0.2.x/13 skills, provisioning adds new skills once per pinned label
+    (pyzotero lands disabled: DEFAULT_DISABLED_SKILLS), publish the release asset with geo/catalogue-release.mjs.
+  - #7 real chat check: own instance `gaid-library-next-app` (systemd user unit, ports 3330/18330,
+    GAID_HOME ~/data/geoaidesk/work/gaid-library-next/home, kigam-qwen provider copied from gaid-note-style's
+    models.json). Real papers in ~/data/geoaidesk/work/gaid-library-next/papers/ (Ploton 2020 Nat Commun CC-BY,
+    Valavi blockCV bioRxiv 2018, Meyer & Pebesma AOA arXiv 2005.07939) + asset authoring_preview_paper (user's MPM R3
+    manuscript). Put them in a library folder, attach to a project, ask page-evidence questions with institute Qwen,
+    check library_* tool calls, `[@key, p. N]` citations against the PDF pages, note citation check; then a short
+    checklist for the user's own chats.
+  - #7 done (2026-10-21): 4 real papers seeded (bin/seed-library.mjs), session 01a15eed; q1 40 tool calls, q2 23; 34/34
+    checked page citations found on the cited page (pdftotext pages); Roberts 2017 (not in library) → no fake key,
+    web AAM cited by line numbers; note references resolve (4 keys; roberts2017 not in library). One wrong inference
+    (inner vs outer folds both spatial). UI gaps (not fixed, optional): chat citations not clickable, wide tables clip
+    the last column. Report draft reports/2026-10-21-gaid-library-next/index.md (§3.3 and checks pending).
 ## Next steps
-1. (the next session's first action)
+1. #8: on skill_hub's reply, repin geo/distribution.json + configs/inputs.toml, update catalogue tests, check
+   provisioning in the instance, publish release asset, fill report §3.3/§5, run scripts/check, humanizer, finish.
+Blocked: waiting for the skill_hub hub's reply to request bbaae80a7640 (catalogue 0.3.0).
 ## Failed approaches
 ## Notes and decisions
+Closes: gaid-research-hub#7
+Closes: gaid-research-hub#9
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [확인] 사용자 본인 논문·질문으로 실제 채팅에서 쪽 인용을 확인 — 가) 보고서 3.2절 체크리스트로 확인 — 나) 확인 생략 — 권장: 가) 시험은 공개 논문과 원고 하나, 질문 둘이었음 — 막힌 일: 근거 답변 기능의 완료 판단 — 근거: reports/2026-10-21-gaid-library-next#3.2
+- [대기] Better BibTeX 기능(원고 인용으로 Zotero 컬렉션, 인용 키 고정) — 가) Zotero 10 호환이 명시되고 #3602·#3626이 닫힌 뒤 검토 — 나) 지금 시험 — 권장: 가) 2026-10-21 재확인에서도 조건 그대로 — 막힌 일: 해당 기능 — 조건: BBT가 Zotero 10 호환을 명시 — 근거: reports/2026-10-21-gaid-library-next#3.4
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
