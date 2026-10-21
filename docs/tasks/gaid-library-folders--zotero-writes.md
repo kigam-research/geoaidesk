@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:04:47Z
+updated: 2026-10-21T13:10:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8efa9960-157f-4f0e-b907-50fa7ca9186a","pid":2619537,"provider":"codex","session":"01a15e90-4520-7db2-8f1f-5d78d5373035","start":"47581455","token":"245fd43eee5872c64898ddf1d2632eb44ca2341c85e6360286ab326912a17bae"}
 branch: task/gaid-library-folders--zotero-writes
 target: task/gaid-library-folders
@@ -69,11 +69,51 @@ Evidence for your finish: test summary, typecheck result, the new functions with
 sha256, and what you could not verify (e.g. Web storage upload against the real api.zotero.org).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+The connector now exports ensureCollection, createItem, addItemToCollections (including actually-added keys), and
+uploadAttachment through the existing index.ts exports. Inbox operations remain compatible. Forms and credential-free
+storage upload share the existing four-request gate/backoff; 412 re-reads without overwriting and consumed keys stop
+the operation without reauthorization.
+
+Verified: 50 connector tests plus 5 existing Zotero-service tests passed; server `npx tsc --noEmit` and `git diff --check`
+passed. Real headless Zotero 10.0.6 passed nested/reused collections, metadata in two collections, additive/no-op
+membership, PDF upload/read with equal SHA-256, and fulltext PUT/read. The isolated sandbox was stopped.
+
+Evidence: /home/seongin3/data/geoaidesk/work/zotero-writes/smoke.json
+SHA-256: 22b43c3dfde37e6fc93b99996d5dc2ecdea4484110e2765c9bfb3641c9787bd4
+Real Web storage/account behavior and Windows/WSL networking remain unverified (fake Web protocol passed).
+Parent service/UI integration and final project checks belong to gaid-library-folders.
 ## Next steps
-1. (the next session's first action)
+1. Finish this checked child snapshot; the parent runs task complete to integrate it and wires its service/UI.
 ## Failed approaches
+- Initial npx tsc/vitest had missing local dependencies (not a source failure); installing the lockfile dependencies.
+- The external smoke script first used .ts outside a package.json and tsx chose CJS, rejecting top-level await before
+  any API operation. Renamed it to .mts; the smoke then passed without any connector workaround.
 ## Notes and decisions
+Sequential decisions: preserve the existing four-request gate and backoff; support form encoding only in the narrow
+file-authorization/registration methods; storage POST has no API credentials and manual redirects. Collection identity
+is exact (name,parent), and membership updates only append. Parent owns deduplication/ref→GAID identity persistence.
+Owned files: zotero/{types,client,writes,attachments}.ts, zotero/README.md, geo-library-zotero.test.ts and its fake fixture.
+No independent worker package is needed in this bounded child unit. Integration order: connector/API types → protocol
+fixture/tests → real Local smoke → parent service wiring (parent-owned). Existing index.ts export-stars expose the additions.
+Knowledge lookup: exact worktree codegraph is unavailable (no index); used native reads of the selected files and the
+live parent's task Notes and decisions. Official file-upload documentation and installed office_tool attach_file were read.
+- Parent follow-up accepted: addItemToCollections returns ZoteroItemRef & {added:string[]}; the list includes only
+  unique memberships appended by this call and is empty for a no-op. It does not appear in Zotero request bodies.
+- Functions for parent integration:
+  - ensureCollection: exact name/parent reuse or library-precondition create; returns key/library version/created.
+  - createItem: one CSL-derived metadata creation with unique collections/string tags and re-read reference.
+  - addItemToCollections: preserve existing memberships, append only, enforce partition/version, return added keys.
+  - uploadAttachment: create imported_file child; MD5 form authorization; credential-free multipart storage POST;
+    form registration; optional supplied PDF text PUT. At most 64 MiB file + 1 MiB framing, no storage redirects.
+- Checks (2026-10-21): `cd server && npx vitest run test/geo-library-zotero.test.ts test/geo-library-zotero-service.test.ts`
+  passed 55/55; `cd server && npx tsc --noEmit` passed. `git diff --check` passed. Full scripts/check is parent-owned.
+- Smoke reproduction: only against a freshly started isolated headless sandbox, run
+  `cd server && npx tsx /home/seongin3/data/geoaidesk/work/zotero-writes/smoke.mts`, then stop the sandbox. The script
+  reads only its seeded sandbox-profile key into memory; never prints it. It generates a valid synthetic 604-byte PDF
+  whose upload/download SHA-256 is dac21cd9da9c8198a797abb59108ba74dd9f5f9b0c9aeb5470e9da5c8183867d. The supplied
+  text had 29 characters and one indexed/total page. Never rerun creation against a user's library or reuse its key.
+- No new dependencies, shared-contract/store/service/route/UI edits, user-library writes, or database access.
+  Existing test paths already have integration-boundary entries; no new files were added in the repo.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

@@ -7,6 +7,7 @@ import { fakeZotero, type FakeZotero } from "./fixtures/geo-zotero-server.ts";
 import {
   LocalZoteroClient, WebZoteroClient, ZoteroConflictError, ZoteroError,
   addItemToInbox, addResearchNoteLink, addTags, ensureInboxCollection,
+  addItemToCollections, createItem, ensureCollection, uploadAttachment, MAX_ATTACHMENT_BYTES,
   getAttachmentFile, getAttachmentFullText, mapZoteroItem, openPdfLink, probeZoteroLibrary,
   selectItemLink, syncZoteroLibrary, zoteroRefKey, type ZoteroLibraryState, type ZoteroSecretStore,
 } from "../src/geo/library/zotero/index.ts";
@@ -341,5 +342,135 @@ describe("attachment reads and deep links", () => {
     expect(openPdfLink({ libraryType: "group", libraryId: "456" }, "ATTACH01", 2)).toContain("groups/456/items/ATTACH01?page=2");
     expect(() => openPdfLink(library, "ATTACH01", 0)).toThrow();
     expect(() => selectItemLink({ ...library, itemKey: "../../bad" })).toThrow();
+  });
+});
+
+const uploadInput = { bytes: Buffer.from("%PDF-1.7\nsynthetic upload\n"), filename: "연구 paper.pdf", contentType: "application/pdf", fullText: { content: "Synthetic indexed PDF text", indexedPages: 1, totalPages: 2 } };
+
+describe.each(["local", "web"] as const)("folder and attachment writes (%s)", (connection) => {
+  async function writable() {
+    const context = await setup(connection);
+    if (context.client instanceof LocalZoteroClient) await context.client.authorize();
+    return context;
+  }
+
+  it("matches exact collection names and parents, creates missing nested collections once", async () => {
+    const { fake, client } = await writable();
+    fake.addCollection("PARENT01", "Research");
+    fake.addCollection("TOPIC001", "Topic");
+    const nested = await ensureCollection(client, library, { name: "Topic", parentKey: "PARENT01" });
+    expect(nested.created).toBe(true);
+    expect(fake.collections.get(nested.key)!.data.parentCollection).toBe("PARENT01");
+    expect(await ensureCollection(client, library, { name: "Topic", parentKey: "PARENT01" })).toMatchObject({ key: nested.key, created: false });
+    expect(await ensureCollection(client, library, { name: "Topic" })).toMatchObject({ key: "TOPIC001", created: false });
+    delete fake.collections.get("TOPIC001")!.data.parentCollection;
+    expect((await ensureCollection(client, library, { name: "Topic" })).key).toBe("TOPIC001");
+    const writes = fake.requests.filter((r) => r.method === "POST" && r.url.pathname.endsWith("collections"));
+    expect(writes).toHaveLength(1);
+    expect(writes[0].headers["if-unmodified-since-version"]).toBeDefined();
+  });
+
+  it("creates CSL items in multiple collections and adds memberships idempotently without removing any", async () => {
+    const { fake, client } = await writable();
+    const created = await createItem(client, library, { csl: { type: "article-journal", title: "New synthetic paper" }, collectionKeys: ["FOLDER01", "FOLDER02", "FOLDER01"], tags: ["topic", "topic"] });
+    expect(created).toMatchObject({ connection, ...library });
+    expect(fake.items.get(created.itemKey)!.data).toMatchObject({ collections: ["FOLDER01", "FOLDER02"], tags: [{ tag: "topic" }] });
+    expect(fake.requests.filter((r) => r.method === "POST" && r.url.pathname.endsWith("items"))).toHaveLength(1);
+    const updated = await addItemToCollections(client, created, ["FOLDER03", "FOLDER02", "FOLDER03"]);
+    expect(updated.added).toEqual(["FOLDER03"]);
+    expect(fake.items.get(created.itemKey)!.data.collections).toEqual(["FOLDER01", "FOLDER02", "FOLDER03"]);
+    expect(await addItemToCollections(client, updated, ["FOLDER03"])).toEqual({ ...updated, added: [] });
+    expect(fake.requests.filter((r) => r.method === "PATCH")).toHaveLength(1);
+    await expect(addItemToCollections(client, created, ["FOLDER04"])).rejects.toBeInstanceOf(ZoteroConflictError);
+    await expect(addItemToCollections(client, { ...updated, connection: connection === "local" ? "web" : "local" }, ["FOLDER04"])).rejects.toMatchObject({ code: "wrong-item-partition" });
+    if (connection === "local") await expect(addItemToCollections(client, { ...updated, serverId: "other" }, ["FOLDER04"])).rejects.toMatchObject({ code: "wrong-item-partition" });
+  });
+
+  it("uploads the file as form-authorized multipart bytes, registers it, and writes PDF text", async () => {
+    const { fake, client } = await writable(); fake.addItem("PAPER001");
+    const result = await uploadAttachment(client, library, "PAPER001", uploadInput);
+    expect(result).toMatchObject({ uploaded: true, indexedChars: uploadInput.fullText.content.length });
+    expect(fake.items.get(result.attachmentKey)!.data).toMatchObject({ itemType: "attachment", linkMode: "imported_file", parentItem: "PAPER001", filename: uploadInput.filename, contentType: "application/pdf" });
+    expect(fake.uploadedFiles.get(result.attachmentKey)).toEqual(uploadInput.bytes);
+    expect(fake.fullTexts.get(result.attachmentKey)).toEqual(uploadInput.fullText);
+    const fileCalls = fake.requests.filter((r) => r.method === "POST" && r.url.pathname.endsWith("/file"));
+    expect(fileCalls).toHaveLength(2);
+    expect(fileCalls[0].body).toMatchObject({ filename: uploadInput.filename, filesize: String(uploadInput.bytes.length), md5: expect.stringMatching(/^[a-f0-9]{32}$/), mtime: expect.stringMatching(/^\d{13}$/) });
+    expect(fileCalls[1].body).toEqual({ upload: `upload-${result.attachmentKey}` });
+    for (const call of fileCalls) {
+      expect(call.headers["if-none-match"]).toBe("*");
+      expect(call.headers["content-type"]).toBe("application/x-www-form-urlencoded");
+    }
+    const storage = fake.requests.find((r) => r.url.pathname.includes("/storage/upload/"))!;
+    expect(storage.headers["zotero-api-key"]).toBeUndefined();
+    expect(storage.headers["zotero-server-id"]).toBeUndefined();
+  });
+
+  it("skips storage and registration when the existing file is associated; indexes PDFs only", async () => {
+    const { fake, client } = await writable(); fake.addItem("PAPER001"); fake.fileExists = true;
+    expect(await uploadAttachment(client, library, "PAPER001", uploadInput)).toMatchObject({ uploaded: false, indexedChars: uploadInput.fullText.content.length });
+    const plain = await uploadAttachment(client, library, "PAPER001", { ...uploadInput, filename: "paper.txt", contentType: "text/plain" });
+    expect(plain.indexedChars).toBeUndefined();
+    expect(fake.uploadedFiles.size).toBe(0);
+    expect(fake.requests.filter((r) => r.method === "POST" && r.url.pathname.endsWith("/file"))).toHaveLength(2);
+    expect(fake.fullTexts.size).toBe(1);
+  });
+
+  it.each(["collections", "membership", "create", "authorization", "registration", "fulltext"])("re-reads a %s 412 once without retrying the write", async (step) => {
+    const { fake, client } = await writable(); fake.addItem("PAPER001");
+    const matches = (r: FakeZotero["requests"][number]) => step === "collections" ? r.method === "POST" && r.url.pathname.endsWith("collections")
+      : step === "membership" ? r.method === "PATCH"
+      : step === "create" ? r.method === "POST" && r.url.pathname.endsWith("items")
+      : step === "fulltext" ? r.method === "PUT"
+      : r.method === "POST" && r.url.pathname.endsWith("/file") && (!!(r.body as { upload?: string }).upload === (step === "registration"));
+    fake.before = (r, response) => { if (!matches(r)) return false; response.statusCode = 412; response.end(); return true; };
+    const action = step === "collections" ? ensureCollection(client, library, { name: "Conflict" })
+      : step === "membership" ? addItemToCollections(client, ref(fake, "PAPER001"), ["FOLDER01"])
+      : step === "create" ? createItem(client, library, { csl: { type: "book", title: "Conflict" }, collectionKeys: [] })
+      : uploadAttachment(client, library, "PAPER001", uploadInput);
+    await expect(action).rejects.toBeInstanceOf(ZoteroConflictError);
+    expect(fake.requests.filter(matches)).toHaveLength(1);
+    expect(fake.requests.at(-1)!.method).toBe("GET");
+  });
+});
+
+describe("upload boundaries", () => {
+  it.each(["authorization", "registration", "fulltext"])("stops when the Local key is consumed at %s without reauthorizing", async (step) => {
+    const { fake, client, store } = await setup(); await (client as LocalZoteroClient).authorize(); fake.addItem("PAPER001");
+    fake.before = (r) => {
+      if ((step === "fulltext" && r.method === "PUT") || (r.method === "POST" && r.url.pathname.endsWith("/file") && (!!(r.body as { upload?: string }).upload === (step === "registration")) && step !== "fulltext")) fake.keyRejected = true;
+      return false;
+    };
+    await expect(uploadAttachment(client, library, "PAPER001", uploadInput)).rejects.toMatchObject({ state: "key-rejected", status: 401 });
+    expect(store.values.size).toBe(0);
+    expect(fake.requests.filter((r) => r.url.pathname.endsWith("authorize"))).toHaveLength(1);
+    expect(fake.requests.at(-1)!.url.pathname).toMatch(step === "fulltext" ? /fulltext$/ : /file$/);
+  });
+
+  it("rejects oversized files before creating an attachment and refuses foreign HTTP storage URLs", async () => {
+    const { fake, client } = await setup("web"); fake.addItem("PAPER001");
+    await expect(uploadAttachment(client, library, "PAPER001", { ...uploadInput, bytes: Buffer.alloc(MAX_ATTACHMENT_BYTES + 1) })).rejects.toMatchObject({ code: "upload-too-large" });
+    expect(fake.requests).toHaveLength(0);
+    fake.uploadUrl = "http://127.0.0.1:9/storage";
+    await expect(uploadAttachment(client, library, "PAPER001", uploadInput)).rejects.toMatchObject({ code: "invalid-upload-url" });
+    expect(fake.requests.at(-1)!.url.pathname).toMatch(/file$/);
+  });
+
+  it("uses the four-request gate and shared backoff for HTTPS storage without sending credentials", async () => {
+    let now = 0, active = 0, max = 0, first = true;
+    const sleeps: number[] = [];
+    const client = new WebZoteroClient({ secrets: secrets(), now: () => now, sleep: async (ms) => { sleeps.push(ms); now += ms; }, fetch: async (url, init) => {
+      expect(String(url)).toBe("https://storage.example/upload");
+      expect(new Headers(init?.headers).has("Zotero-API-Key")).toBe(false);
+      expect(init?.redirect).toBe("manual");
+      active++; max = Math.max(max, active); await new Promise((resolve) => setTimeout(resolve, 2)); active--;
+      if (first) { first = false; return new Response(null, { status: 429, headers: { "Retry-After": "2" } }); }
+      return new Response(null, { status: 201, headers: { Backoff: "1" } });
+    } });
+    await client.setKey("never-to-storage");
+    await client.uploadFile("https://storage.example/upload", "application/pdf", uploadInput.bytes);
+    await Promise.all(Array.from({ length: 12 }, () => client.uploadFile("https://storage.example/upload", "application/pdf", uploadInput.bytes)));
+    expect(max).toBe(4); expect(sleeps[0]).toBe(2000); expect(sleeps).toContain(1000);
+    await expect(client.uploadFile("https://user:secret@storage.example/upload", "application/pdf", uploadInput.bytes)).rejects.toMatchObject({ code: "invalid-upload-url" });
   });
 });
