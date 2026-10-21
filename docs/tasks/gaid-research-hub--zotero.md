@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T11:37:36Z
+status: active
+updated: 2026-10-21T11:50:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e61bf52d-9268-4d06-84a2-99fbdf1887bf","pid":1532697,"provider":"codex","session":"01a15e34-d40a-7262-97ac-59bb6d8bed03","start":"46982181","token":"1fdd4903634b060370661f31b814e1d918a83246483d200dcfc62cb55ea81402"}
 branch: task/gaid-research-hub--zotero
 target: task/gaid-research-hub
