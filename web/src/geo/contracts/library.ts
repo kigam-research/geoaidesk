@@ -231,6 +231,7 @@ export interface LibraryItemSummary {
   tags: string[];
   used: { notes: number; workflows: number; projects: number };
   metadataConfirmed: boolean;
+  addedAt: string;
 }
 
 export interface LibraryListQuery {

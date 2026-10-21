@@ -1,0 +1,130 @@
+{
+  "tabs": {
+    "label": "My research views",
+    "projects": "Projects",
+    "library": "Library"
+  },
+  "screen": {
+    "title": "Library",
+    "zoteroSynced": "Zotero updated {when}",
+    "zoteroNone": "Zotero not connected",
+    "search": "Search your library · e.g. nickel prospectivity spatial cross-validation",
+    "loading": "Reading your library.",
+    "error": "Could not read your library. Open it again in a moment.",
+    "empty": "Your library has no papers yet. Add the first one from a PDF or a DOI.",
+    "noMatch": "No paper matches these conditions.",
+    "state": "Papers matching {shown} / total {total}"
+  },
+  "add": {
+    "button": "Add paper"
+  },
+  "filter": {
+    "label": "Filter",
+    "all": "All {n}",
+    "zotero": "Zotero {n}",
+    "gaid": "GAID {n}",
+    "unread": "Not read {n}",
+    "cited": "Cited in notes {n}"
+  },
+  "table": {
+    "paper": "Paper",
+    "year": "Year",
+    "source": "Source",
+    "read": "Read",
+    "used": "Used in",
+    "usedNotes": "{n} notes",
+    "usedWorkflows": "{n} Workflows",
+    "usedProjects": "{n} projects",
+    "none": "—"
+  },
+  "source": {
+    "zotero": "Zotero",
+    "gaid": "GAID",
+    "zoteroHint": "This paper is in Zotero. Edit its reference details in Zotero.",
+    "gaidHint": "This paper was added to the GAID library. You can edit it in GAID."
+  },
+  "coverage": {
+    "full": "Full text",
+    "partial": "Partly",
+    "abstract": "Abstract only",
+    "none": "No PDF",
+    "fullHint": "Every page of the PDF was read.",
+    "partialHint": "Some pages had no readable text: scanned pages or pages with figures only.",
+    "abstractHint": "Only the abstract and reference details were read.",
+    "noneHint": "There is no readable PDF. Add the PDF so GAID can read the full text."
+  },
+  "side": {
+    "statusTitle": "Library status",
+    "papers": "{n} papers",
+    "unread": "{n} papers without read full text",
+    "recentTitle": "Recently added"
+  },
+  "detail": {
+    "close": "Close details",
+    "attach": {
+      "button": "Attach to project"
+    },
+    "workflow": {
+      "button": "Make a Workflow from the paper"
+    },
+    "pdf": {
+      "button": "Open PDF"
+    },
+    "zotero": {
+      "button": "Open in Zotero"
+    },
+    "usesTitle": "Used in your research",
+    "usesEmpty": "Not used in a note, Workflow or project yet.",
+    "useNote": "Research note “{title}”",
+    "useWorkflow": "Workflow “{title}”",
+    "useProject": "Project “{name}”",
+    "open": {
+      "note": {
+        "action": "Open note"
+      },
+      "workflow": {
+        "action": "Open Workflow"
+      },
+      "project": {
+        "action": "Open project"
+      }
+    },
+    "readTitle": "What was read",
+    "readFull": "All {pages} pages read",
+    "readPartial": "{read} of {total} pages read · not readable: {pages}",
+    "readNone": "No text has been read.",
+    "doi": "DOI {doi}",
+    "workflowNeedsPdf": "To make a Workflow, GAID needs the paper's PDF.",
+    "workflowStarted": "Workflow draft created",
+    "attachTitle": "Project to attach to",
+    "attached": "Attached to {name}",
+    "attachFailed": "Could not attach to the project. Try again."
+  },
+  "dialog": {
+    "title": "Add paper",
+    "body": "Upload the PDF, check the reference details and add it to your library. A paper with only a DOI can be added too.",
+    "pdf": "PDF file",
+    "pdfPick": {
+      "button": "Choose PDF"
+    },
+    "pdfChosen": "{name} uploaded",
+    "pdfUploading": "Uploading the PDF.",
+    "pdfFailed": "Could not upload the PDF. Check that it is a PDF of 64 MB or less.",
+    "titleLabel": "Title",
+    "authorsLabel": "Authors (comma-separated, family name first)",
+    "yearLabel": "Year",
+    "journalLabel": "Journal or source",
+    "doiLabel": "DOI",
+    "check": "I checked that the reference details are correct",
+    "cancel": {
+      "button": "Cancel"
+    },
+    "save": {
+      "button": "Add to library"
+    },
+    "saving": "Adding to your library.",
+    "duplicate": "A paper with the same DOI is already in your library.",
+    "failed": "Could not add the paper. Check the details and try again.",
+    "added": "Added to your library"
+  }
+}
