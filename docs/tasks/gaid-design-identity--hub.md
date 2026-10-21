@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:29:42Z
+updated: 2026-10-21T14:46:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e3423a72-7472-4e57-ad64-7b7af68d8b04","pid":1024923,"provider":"codex","session":"01a15ebd-f21c-75a3-acb8-bed850e7227a","start":"47880771","token":"c6c81568434110b18d55cffb1d1710ded8914bb8b12f012ac7eedcc3d6246168"}
 branch: task/gaid-design-identity--hub
 target: task/gaid-design-identity
@@ -69,7 +69,7 @@ task document. Do not write reports; the parent integrates your screenshots and 
 Network: raw.githubusercontent.com is blocked.
 
 ## Current state
-- Active implementation in the resumed worktree. Shared navigation, hub entry rail, recommended/authored/shared registers, avatars and authoring surface vocabulary changed to direction 라.
+- Implemented and verified in the resumed worktree. Shared navigation, hub entry rail, recommended/authored/shared registers, avatars and authoring surface vocabulary changed to direction 라.
 - Decisions: sequentially establish role-token surfaces, then register anatomy, then checks/browser evidence. No independent owned package exists within this child; work remains with this single writer. Parent owns globals/tokens, UI rules, reports and integration boundaries.
 - No routes, data contracts or locale values changed. Existing hub.io.generated text labels concept previews without adding copy.
 - Verification passed: `cd web && npx tsc --noEmit -p .`; `npm test -- --run src/geo/hub src/geo/hub-picker src/geo/workflow` (13 files, 67 tests); `node geo/ui/check-ui.mjs` (0 errors, 89 existing accepted debt); impeccable detector over owned directories returned `[]`; `git diff --check` clean.
@@ -89,17 +89,19 @@ Network: raw.githubusercontent.com is blocked.
   - `picker`: actual project Workflow import dialog.
   - `projects`: shared GaidHubEntry rail on project list (other project-list styling belongs to the system child).
 - Evidence manifests/logs beside shots: `shots.sha256`, `final-capture.log`, `browser-checks.log`, `impeccable-detect.json`. No screenshots copied into reports here; parent selects/integrates them.
-- Full `scripts/check` belongs to the parent integration; child checks are the exact requested targeted set.
+- Full `scripts/check` also passed after syncing parent/system changes: backend 182 files passed/1 skipped (2,034 tests passed/8 skipped); frontend 175 files and 1,142 tests passed; GAID 49 tests passed/1 skipped; UI copy/guide, environments, launcher and production start/stop/restart passed. Current UI checker: 0 errors, 17 resolved hub baseline entries (parent removes these).
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-21T14:05:59Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First `task finish` at c07059d3 failed full checks after target refresh. Backend: 182 files passed/1 skipped, 2,034 tests passed/8 skipped. Frontend: 175 files and 1,142 tests passed. GAID: 47 passed/1 skipped/2 failed. Failures are parent/system-owned: (1) 132 slop findings in `workspace/task-catalogue.tsx`, `app/page.tsx`, `components/project-view.tsx`, `components/workflows-panel.tsx` awaiting sibling integration; (2) integration boundaries entry combines `web/src/app/globals.css, web/public/fonts/` into one non-existing path. No owned hub findings. Check log: `/home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-70f_n07u.log`; check artifact: `/home/seongin3/data/geoaidesk/work/checks/c07059d3c79e-20261021T140559.940442Z`. Resolved after parent integrated sibling/boundary fixes; sync full checks passed.
 - First two `task resume` attempts saw a transient parent task-start transaction; successful third resume returned the same worktree.
 - `task job run -- npm --prefix web ci` refused dirty source before creating a job; the authorized app launcher installed local dependencies instead.
 - First isolated app startup used copied `config.env`, overriding API port to the parent's 18310. No configuration content read or edited. Restarted with `KADY_ENV_FILE=/dev/null` so explicit ports take precedence.
 ## Notes and decisions
 - Parent confirmed the first visual batch matches the chosen direction; requested dark-logo/background verification is recorded above.
+- The successful sync repeated the full check after parent source advanced to 58b9d1bf during publication; both runs reached production-smoke PASS. Parent was asked to keep the target stable through finish.
 - No copy changes, schema changes, model calls, backend changes or report ownership changes.
 ## Open items
 None.
