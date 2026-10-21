@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T14:15:22Z
+status: done
+updated: 2026-10-21T14:16:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"aa34d06c-a9c2-4a59-baa0-d91256af0ef9","pid":2570334,"provider":"claude","session":"43dfe263-7ab9-4d66-80b7-22ec0fd4febe","start":"47548693","token":"39b963f62ebfc6e5708f59cfe1e2e4742108fb924ff80b895da73bd72a987fa2"}
 branch: task/gaid-library-folders
 target: main
@@ -66,7 +66,9 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
 - Incident: ports 3330/18330 belonged to gaid-design-identity--system's preview app; this writer stopped it by mistake;
   hub notified (request 30c36f22b468).
 ## Next steps
-1. task finish (full scripts/check). Stop unit gaid-library-folders-app and remove build caches before close.
+<!-- task:closed -->
+Closed 2026-10-21T14:16:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-library-folders.md.
+
 ## Failed approaches
 ## Notes and decisions
 - Folder model (decision, recorded in a new ADR amending 2026-10-21 decision 3): nested folders (Zotero collections are
@@ -100,8 +102,8 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 선택 기능(Windows 탐색기 PDF 폴더를 서재 폴더로 가져오기, EndNote XML 가져오기)을 만들지 — 가) 지금은 만들지 않고 1단계 시험 뒤 정함 — 나) PDF 폴더 가져오기를 만듦 — 다) 나)와 EndNote XML 가져오기를 만듦 — 권장: 가) Windows 연결을 아직 시험하지 않았고 EndNote는 RIS로 주고받을 수 있음 — 막힌 일: 없음 — 조건: 1단계 시험 결과 — 근거: reports/2026-10-21-gaid-library-folders/index.md#6-결정할-일
-- [확인] Windows PC의 Zotero(PC 연결, 승인 창의 "항상 허용"), WSL→Windows Zotero, 실제 Zotero 웹 키로 폴더 보내기를 시험 — 근거: reports/2026-10-21-gaid-library-folders/index.md#5-한계
+- [결정 gaid-library-folders#1] 선택 기능(Windows 탐색기 PDF 폴더를 서재 폴더로 가져오기, EndNote XML 가져오기)을 만들지 — 가) 지금은 만들지 않고 1단계 시험 뒤 정함 — 나) PDF 폴더 가져오기를 만듦 — 다) 나)와 EndNote XML 가져오기를 만듦 — 권장: 가) Windows 연결을 아직 시험하지 않았고 EndNote는 RIS로 주고받을 수 있음 — 막힌 일: 없음 — 조건: 1단계 시험 결과 — 근거: reports/2026-10-21-gaid-library-folders/index.md#6-결정할-일
+- [확인 gaid-library-folders#2] Windows PC의 Zotero(PC 연결, 승인 창의 "항상 허용"), WSL→Windows Zotero, 실제 Zotero 웹 키로 폴더 보내기를 시험 — 근거: reports/2026-10-21-gaid-library-folders/index.md#5-한계
 ## Report
 Report: reports/2026-10-21-gaid-library-folders/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
