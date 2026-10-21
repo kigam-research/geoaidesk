@@ -132,7 +132,7 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
   const selectedWorkflow = selectedMethod?.workflows.find((workflow) => workflow.id === setup?.workflowId);
   const selectedRecipe = selectedMethod?.recipes.find((recipe) => recipe.id === setup?.recipeId);
   const detailMethod = methods.find((method) => method.key === detailKey);
-  const category: WorkflowPanelCategory = { id: METHOD_CATEGORY, label: t("methods.category"), color: "text-sky-700 dark:text-sky-400", bg: "bg-sky-700/10 hover:bg-sky-700/15 border-sky-700/25" };
+  const category: WorkflowPanelCategory = { id: METHOD_CATEGORY, label: t("methods.category"), color: "text-foreground", bg: "bg-transparent hover:bg-accent border-border" };
   // Status only when it says something (loading, error, none installed); a full list needs no notice (UI guide P3).
   const notice = (error || !data || methods.length === 0) && <div className="flex flex-wrap items-center gap-2">
     {error ? <p role="alert" className="text-xs text-destructive break-words">{error}</p> : !data ? <p role="status" className="text-xs">{t("methods.loading")}</p> : <p className="text-xs text-muted-foreground">{t("methods.empty")}</p>}
@@ -220,7 +220,7 @@ export function TrialCard({ trial, projectId }: { trial: MethodTrial; projectId:
   return <article className="space-y-2 rounded-md border p-3">
     <p>{t("methods.trials.started", { at: when(trial.startedAt) })}</p>
     <p>{t("methods.trials.workflow", { id: trial.workflowId, revision: trial.revision ?? t("methods.unknown") })}</p>
-    {trial.methodChanged && <p className="text-amber-700 dark:text-amber-400">{t("methods.trials.changed")}</p>}
+    {trial.methodChanged && <p className="text-gaid-warning">{t("methods.trials.changed")}</p>}
     <p>{t("methods.trials.calls", { calls: trial.observed.toolCalls, failed: trial.observed.failedToolCalls })}</p>
     <p>{t("methods.trials.models", { models: trial.observed.models.join(", ") || t("methods.trials.none") })}</p>
     {trial.observed.degradedSteps > 0 && <p>{t("methods.trials.degraded", { count: trial.observed.degradedSteps })}</p>}
