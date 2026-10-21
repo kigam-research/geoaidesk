@@ -13,7 +13,7 @@ import { parseCitations, type LibraryItem } from "../../../../web/src/geo/contra
 import { RESEARCH_NOTES_DIR, RESEARCH_NOTE_FILE } from "../../../../web/src/geo/contracts/research-notes.ts";
 import { cslYear, libraryStore, shortAuthors, type LibraryStore } from "./store.ts";
 import { pageText, searchPages, storedPdf } from "./reader.ts";
-import { projectItems, readProjectLiterature } from "./uses.ts";
+import { hasScope, projectItems, readProjectLiterature } from "./uses.ts";
 
 const MAX_TOOL_BYTES = 24 * 1024;
 const MAX_READ_PAGES = 5;
@@ -51,12 +51,12 @@ export function parsePages(spec: string | undefined, total: number): number[] {
 export function makeLibraryTools(paths: ProjectPaths, storeOf: () => LibraryStore = libraryStore): ToolDefinition<any, any>[] {
   async function available(): Promise<{ items: LibraryItem[]; attached: boolean }> {
     const all = (await storeOf().all()).filter((i) => !i.removedFromSourceAt);
-    const attached = projectItems(readProjectLiterature(paths), all);
+    const attached = projectItems(readProjectLiterature(paths), all, await storeOf().collections());
     return { items: attached, attached: attached.length > 0 };
   }
   async function find(ref: string): Promise<LibraryItem | undefined> {
     const key = ref.replace(/^\[?@/, "").replace(/\]$/, "");
-    return (await available()).items.find((i) => i.citationKey === key || i.id === key);
+    return (await available()).items.find((i) => i.citationKey === key || i.id === key || i.aliases?.citationKeys?.includes(key));
   }
 
   const searchParams = Type.Object({ query: Type.String({ description: "Words to find in titles, authors, abstracts and page text" }), limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 10 })) });
@@ -116,7 +116,10 @@ export function makeLibraryTools(paths: ProjectPaths, storeOf: () => LibraryStor
   return [searchTool, readTool];
 }
 
-/** After a lead write/edit of a research note, list citation keys that are not in the library (never blocks). */
+/**
+ * After a lead write/edit of a research note, list citation keys that are not in the library, and keys outside the
+ * project's citation scope (its attached folders and papers) when it has one. Never blocks.
+ */
 export function makeNoteCitationExtension(paths: ProjectPaths, storeOf: () => LibraryStore = libraryStore): ExtensionFactory {
   return (pi) => {
     pi.on("tool_result", async (event) => {
@@ -131,10 +134,20 @@ export function makeNoteCitationExtension(paths: ProjectPaths, storeOf: () => Li
         if (st.size > 2 * 1024 * 1024) return;
         const keys = [...new Set(parseCitations(fs.readFileSync(abs, "utf8")).map((c) => c.key))];
         if (!keys.length) return;
-        const store = storeOf(), missing = [];
-        for (const key of keys) if (!(await store.byCitationKey(key))) missing.push(key);
-        if (!missing.length) return;
-        return { content: [...event.content, { type: "text" as const, text: `Citation check: ${missing.map((k) => `@${k}`).join(", ")} not in the researcher's library. Cite only keys from library_search, or write the source as plain text marked as not in the library.` }] };
+        const store = storeOf(), missing = [], outside = [];
+        const literature = readProjectLiterature(paths);
+        const scope = hasScope(literature) ? new Set(projectItems(literature, await store.all(), await store.collections()).map((i) => i.id)) : undefined;
+        for (const key of keys) {
+          const item = await store.byCitationKey(key);
+          if (!item) missing.push(key);
+          else if (scope && !scope.has(item.id)) outside.push(key);
+        }
+        if (!missing.length && !outside.length) return;
+        const lines = [
+          missing.length ? `Citation check: ${missing.map((k) => `@${k}`).join(", ")} not in the researcher's library. Cite only keys from library_search, or write the source as plain text marked as not in the library.` : "",
+          outside.length ? `Citation check: ${outside.map((k) => `@${k}`).join(", ")} in the library but outside this project's citation folders. Ask the researcher before citing it, or ask them to add the paper to the folder.` : "",
+        ].filter(Boolean);
+        return { content: [...event.content, { type: "text" as const, text: lines.join("\n") }] };
       } catch {
         return; // A failed check never changes the tool's own result.
       }
