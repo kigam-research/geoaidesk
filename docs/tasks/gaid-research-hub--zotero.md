@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:50:01Z
+updated: 2026-10-21T11:56:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e61bf52d-9268-4d06-84a2-99fbdf1887bf","pid":1532697,"provider":"codex","session":"01a15e34-d40a-7262-97ac-59bb6d8bed03","start":"46982181","token":"1fdd4903634b060370661f31b814e1d918a83246483d200dcfc62cb55ea81402"}
 branch: task/gaid-research-hub--zotero
 target: task/gaid-research-hub
@@ -83,6 +83,7 @@ anything you could not verify (e.g. `citationKey` presence in real Web API JSON)
 Closed 2026-10-21T11:37:36Z: ready; the parent gaid-research-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Full finish check first stopped at the distribution seam-owner allowlist. Parent added the owners in ba6f396b; `task sync` merged it (12ceebbb). That full recheck passed backend 2009 tests (8 skipped), then hit only unchanged frontend CSV pagination's 5-second timeout (1141 frontend passed, 1 failed). Host load average was about 38 on 32 CPUs with concurrent suites; rerun uses four-CPU affinity rather than altering the unrelated test.
 - First `task finish` fetched parent changes and stopped on an append-only conflict in `geo/integration-boundaries.json`; preserved all three Zotero/parent test entries. No code conflicts.
 - The initial fake mirrored `/deleted` for both APIs. Real Zotero 10.0.6 returned 404 there, so Local sync now tries it once and falls back to full key/version manifests while retaining incremental object bodies. Regression test added.
 - The first mapper assumed `include=csljson` returns an object. Real Local API returned a JSON string containing a one-item array. The mapper and fixture now handle that actual export shape. Both assumptions were tested directly in the real sandbox before further fixes.
