@@ -8,7 +8,7 @@ import { readZoteroPages } from "./sync.ts";
 /** Persist this non-secret result in the parent's library store; partition it with the sync cursor. */
 export interface InboxCollection { key: string; version: number; serverId?: string }
 
-async function conflict<T>(client: ZoteroClient, path: string, action: () => Promise<T>): Promise<T> {
+export async function conflict<T>(client: ZoteroClient, path: string, action: () => Promise<T>): Promise<T> {
   try { return await action(); }
   catch (error) {
     if (!(error instanceof ZoteroError) || error.status !== 412 || error instanceof ZoteroServerChangedError) throw error;
@@ -18,14 +18,21 @@ async function conflict<T>(client: ZoteroClient, path: string, action: () => Pro
 }
 
 /** Explicit confirmed action only. Caller can persist `key`; full listing also avoids duplicates after restart. */
-export async function ensureInboxCollection(client: ZoteroClient, library: ZoteroLibrary): Promise<InboxCollection> {
+export async function ensureCollection(client: ZoteroClient, library: ZoteroLibrary, input: { name: string; parentKey?: string }): Promise<{ key: string; version: number; created: boolean }> {
+  if (!input.name.trim()) throw new Error("Collection name is required");
+  const parent = input.parentKey === undefined ? false : itemKey(input.parentKey);
   const path = `${libraryPath(library)}/collections`;
   const listed = await readZoteroPages<ZoteroObject>(client, path);
-  const existing = listed.objects.find((object) => object.data.name === ZOTERO_INBOX_COLLECTION && !object.data.parentCollection);
-  if (existing) return { key: existing.key, version: listed.version!, serverId: client.serverId };
+  const existing = listed.objects.find((object) => object.data.name === input.name && (object.data.parentCollection || false) === parent);
   if (listed.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
-  const created = await conflict(client, path, () => client.create(library, "collections", [{ name: ZOTERO_INBOX_COLLECTION, parentCollection: false }], listed.version!));
-  return { key: created.data[0], version: created.version!, serverId: client.serverId };
+  if (existing) return { key: existing.key, version: listed.version, created: false };
+  const created = await conflict(client, path, () => client.create(library, "collections", [{ name: input.name, parentCollection: parent }], listed.version!));
+  return { key: created.data[0], version: created.version!, created: true };
+}
+
+export async function ensureInboxCollection(client: ZoteroClient, library: ZoteroLibrary): Promise<InboxCollection> {
+  const { key, version } = await ensureCollection(client, library, { name: ZOTERO_INBOX_COLLECTION });
+  return { key, version, serverId: client.serverId };
 }
 
 /** Conservative CSL → editable Zotero JSON. Unsupported types fail before writing, rather than losing metadata. */
@@ -65,22 +72,40 @@ export async function addItemToInbox(client: ZoteroClient, library: ZoteroLibrar
     checkPartition(client, input.existing);
     if (input.existing.libraryType !== library.libraryType || input.existing.libraryId !== library.libraryId) throw new Error("Wrong Zotero library");
   }
-  const data = "csl" in input ? cslToZotero(input.csl) : undefined;
+  // Validate the CSL type before any collection write.
+  if ("csl" in input) cslToZotero(input.csl);
   const inbox = await ensureInboxCollection(client, library);
-  if (data) {
-    const created = await conflict(client, `${libraryPath(library)}/items`, () => client.create(library, "items", [{ ...data, collections: [inbox.key] }], inbox.version));
-    const object = await client.read<ZoteroObject>(`${libraryPath(library)}/items/${itemKey(created.data[0])}`);
-    return { connection: client.connection, serverId: client.serverId, ...library, itemKey: object.data.key, version: object.data.version };
-  }
-  const ref = (input as { existing: ZoteroItemRef }).existing;
-  const path = `${libraryPath(library)}/items/${itemKey(ref.itemKey)}`;
+  if ("csl" in input) return createItem(client, library, { csl: input.csl, collectionKeys: [inbox.key] });
+  const { added: _added, ...ref } = await addItemToCollections(client, input.existing, [inbox.key]);
+  return ref;
+}
+
+/** Creates one new metadata item; the caller owns ref→GAID ID persistence and duplicate prevention. */
+export async function createItem(client: ZoteroClient, library: ZoteroLibrary, input: { csl: CslItem; collectionKeys: string[]; tags?: string[] }): Promise<ZoteroItemRef> {
+  const data = { ...cslToZotero(input.csl), collections: [...new Set(input.collectionKeys.map(itemKey))], tags: [...new Set(input.tags ?? [])].map((tag) => ({ tag })) };
+  const path = `${libraryPath(library)}/items`;
+  const snapshot = await client.read(path, { query: { limit: 1 } });
+  if (snapshot.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
+  const created = await conflict(client, path, () => client.create(library, "items", [data], snapshot.version!));
+  const object = await client.read<ZoteroObject>(`${path}/${itemKey(created.data[0])}`);
+  return { connection: client.connection, serverId: client.serverId, ...library, itemKey: object.data.key, version: object.data.version };
+}
+
+export async function addItemToCollections(client: ZoteroClient, ref: ZoteroItemRef, collectionKeys: string[]): Promise<ZoteroItemRef & { added: string[] }> {
+  const additions = collectionKeys.map(itemKey);
+  if (client.connection === "local" && !client.serverId) await client.read(`${libraryPath(ref)}/items`, { discover: true, query: { limit: 1 } });
+  checkPartition(client, ref);
+  const path = `${libraryPath(ref)}/items/${itemKey(ref.itemKey)}`;
   const current = await client.read<ZoteroObject>(path);
   if (current.data.version !== ref.version) throw new ZoteroConflictError(current.data);
   if (current.data.data.itemType === "annotation") throw new Error("Annotation writes are not supported");
   const collections = Array.isArray(current.data.data.collections) ? current.data.data.collections as string[] : [];
-  if (!collections.includes(inbox.key)) await conflict(client, path, () => client.patchLinks(library, ref.itemKey, { collections: [...collections, inbox.key] }, ref.version));
+  const added = [...new Set(additions)].filter((key) => !collections.includes(key));
+  const merged = [...collections, ...added];
+  if (!added.length) return { ...ref, added: [] };
+  await conflict(client, path, () => client.patchLinks(ref, ref.itemKey, { collections: merged }, ref.version));
   const updated = await client.read<ZoteroObject>(path);
-  return { ...ref, version: updated.data.version };
+  return { ...ref, version: updated.data.version, added };
 }
 
 /** Link is provided by parent, escaped as text and attribute; never stores note content in Zotero. */
