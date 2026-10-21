@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:57:59Z
+updated: 2026-10-21T14:58:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -50,45 +50,26 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
   three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
   if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
-Blocked: waiting for child finishes (gaid-design-identity--hub and --system are running task finish with full scripts/check); then `task complete` each.
-Phase 2 (implementation of direction 라, light + dark). Orchestration:
-- Sequential, done by the writer first (shared interface): tokens in `web/src/app/globals.css` (light `:root`, `.dark`,
-  `--gaid-*` surface/role variables + Tailwind `*-gaid-*` colours), self-hosted Pretendard (`web/public/fonts/`), UI guide v2
-  (sections 4, 4a, G4/G5, F6/F7, Q7, B6, S6–S8, V1–V10, checklist 11–12), `geo/ui/ui-rules.json`, boundaries entries.
-- Independent packages (child writers, "general work"), file ownership:
-  - `hub`: `web/src/geo/hub/**`, `web/src/geo/hub-picker/**`, `web/src/geo/workflow/**`, hub locales only if a string must
-    change (no copy changes planned).
-  - `system`: `web/src/app/page.tsx` (header/workspace chrome), `web/src/components/project-view.tsx`,
-    `web/src/components/workflows-panel.tsx`, `web/src/geo/workspace/**`, `web/src/geo/notes/**`, `web/src/components/ui/{button,badge,card,tabs,input}.tsx`.
-  - writer: `geo/ui/check-ui.mjs` slop checks + `ui-rules.json` slop block + `ui-baseline.json`, guide, tokens, report,
-    final screenshots (light/dark, 1440×900 + 1280×800).
-  - Integration order: writer tokens/guide (saved) → children in parallel → `task complete` each → slop baseline → checks.
-- Exploration (reader, non-blocking): further logo refinement / new logo design per the user's 3(다) remark.
-Workers: child `gaid-design-identity--hub` writer e3423a72 (worktree ~/worktrees/geoaidesk/gaid-design-identity--hub,
-app 3320/18320); child `--system` writer e73f31b2 (3330/18330; also owns resource-monitor, session-cost-pill,
-project-switcher); reader a2a44d17 (Codex 고급검토) logo exploration round 2 → `logo-explore/`.
-Done by the writer: tokens + Pretendard + guide v2 (3c069f11), slop check + tests + library baseline + neutral
-methods/context/skill-hub (4ba70475), AGENTS.md UI-guide bullet.
-1. Next action: when each child finishes, `task complete gaid-design-identity--<child>`; then rerun `scripts/check`
-   (repo ui test fails until both children land), screenshots light/dark 1440×900 + 1280×800 from my instance, add
-   phase-2 results to the report (§3.6), logo exploration results, humanizer, review-copy, `task finish`.
-
-- Reader a2a44d17 done: `logo-explore/review.md` + `sheet.png`: keep current logo; A "Clear orbit" (wider teal lower
-  contour, on-dark #A4BCFF/#68C9C2) best refinement, C "Stratum G" (faceted G with a dipping teal horizon) best new
-  direction; B open orbit, D survey G weaker. Constraint found: current on-dark lettering #4D7FFF is 4.6:1 on the dark
-  header #171F24 but 4.0:1 on #202B32, and light blue lettering is 4.3:1 on frame #E6EBED → keep the lockup on the
-  header surface (light #F7F9FA, dark #171F24). Goes into report §3.5 as an open logo option, not a change.
-
-- gaid-library-folders route result (design-dir): its new folder UI uses role variables only; the older
-  SOURCE_TONE / COVERAGE_TONE hue badges in web/src/geo/library/library-screen.tsx (from gaid-research-hub) are left to
-  this unit. They stay as slop baseline debt while gaid-library-folders is open (edit conflict risk); replace with
-  role tokens (S7/S8) after it lands, here if still open, else as a follow-up item.
+1. Build One UI-based design drafts (mockups, light + dark, hub + workspace) from the One UI digest
+   (`~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`) and the guide; review against impeccable/taste/brand; Codex
+   고급검토 review; report section + review-copy; ask the user to choose explicitly.
+2. After an explicit choice: retarget tokens/guide/screens on this branch, notify the hub, finish. Route
+   design-oneui-20261021 must get `task route-report` before finishing.
+- Done: children hub + system integrated and closed; temporary hub baseline removed; library tone debt remains.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
   short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
 - playwright-cli cannot render `file://` mockups (blank page); serve them over http.
 ## Notes and decisions
+- CORRECTION 2026-10-21 (hub route design-oneui-20261021, user-confirmed): direction 라 was the writer's interpretation,
+  not a user decision. User (verbatim): "새로운 디자인을 oneui가이드에 따라 생성하자." → create a new design that follows the
+  One UI guide, avoid AI slop, give GAID a recognisable identity, expert stance (impeccable + taste + brand guide); 2번 (가)
+  dark theme and 3번 (가) logo unchanged stay. Do not land the 라 tokens/guide as the chosen direction; show real screen
+  mockups via review-copy and get an explicit choice (ask back on ambiguity) before landing tokens; then notify the hub.
+  The branch already holds the 라 implementation (tokens 3c069f11, children hub 0921aebb and system a0286ff4): it is
+  provisional until the user chooses; direction-independent parts (anti-slop rules and check, role variables, unfiltered
+  figures, Sparkles removal, Pretendard self-hosting, dark plan) are kept unless the One UI basis changes them.
 - USER DECISIONS 2026-10-21 (verbatim): "1번 라로 하거나 현재 방식 유지다. 새로 제안한 디자인이 적절한 것이 없다. 2번 (가) 3번 (가)로
   하고 (다)로 더 다듬거나 새롭게 디자인하는 것도 고려하자. 디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서
   디자인해야한다." Interpreted (told the user, correction invited): direction = 라) 연구 등록부 (Codex `codex/dir-d.css`),
