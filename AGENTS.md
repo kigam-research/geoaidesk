@@ -169,9 +169,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   환경·성능·비용을 쓰지 않는다. 변경 보고에 문자열 id와 한·영 변경 전후를 적는다.
 - UI guide (gaid-ui-guide; v2 visual identity gaid-design-identity): `docs/design/ui-guide.md` is the standard for every
   visible GAID screen (adapted from Samsung One UI principles plus TDS Mobile patterns; values in `geo/ui/ui-rules.json`).
-  Visual identity is direction 라 "연구 등록부" (user decision 2026-10-21): tokens for light and dark in
-  `web/src/app/globals.css` (frame / work surface / paper, one action blue, amber only for action-needed states, category
-  as text), self-hosted Pretendard (`web/public/fonts/`), rules S6–S8 and V1–V10. Design every screen, mockup or logo as an
+  The GAID visual identity is being redesigned (gaid-design-identity; no direction adopted yet as of 2026-10-22: the user
+  rejected all earlier drafts). Until the user confirms one, the token values in `web/src/app/globals.css` and guide sections
+  4/4a are provisional. User rules that hold regardless: colours only through tokens, original pixels for figures/maps/PDFs,
+  no Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an
   impeccable + design-taste-frontend + brand-guide expert (user rule 2026-10-21; skills in skill_hub `.claude/skills/`). Before UI work, read its sections 1 and 9 and those
   for the components you touch. A change report lists the rule ids it follows or breaks (with reason) and includes
   Korean screenshots at 1440×900 and 1280×800 checked against its section 10. `scripts/check` runs

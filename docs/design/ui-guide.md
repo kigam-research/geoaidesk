@@ -1,9 +1,10 @@
 # GAID UI/UX guide v2
 
 Status: v1 structure, rules and default values approved by the user on 2026-10-16 ("승인한다."); before/after screens and
-visual review in gaid-ui-guide. v2 (gaid-design-identity, 2026-10-21) adds the GAID visual identity: direction 라
-"연구 등록부" chosen by the user, light and dark themes, the brand and anti-slop rules (section 4 and 4a) and the TDS
-Mobile adaptations (G5, F6, F7, Q7, B6). Machine-readable values: `geo/ui/ui-rules.json`. Checks:
+visual review in gaid-ui-guide. Provisional v2 additions (gaid-design-identity, 2026-10-21): light and dark themes, the
+brand and anti-slop rules (sections 4 and 4a) and TDS Mobile adaptations (G5, F6, F7, Q7, B6). The palette and surface
+values in section 4 describe a draft direction ("라") that the user did NOT adopt (2026-10-22: all drafts rejected); the
+guide is being redesigned from One UI + Apple HIG by gaid-design-identity--fresh and these values will be replaced. Machine-readable values: `geo/ui/ui-rules.json`. Checks:
 `node geo/ui/check-ui.mjs` (run by `scripts/check`). Copy voice and wording stay in `geo/copy/gaid-writing.md` and
 `geo/copy/terminology.csv`. Colour, font, radius and motion tokens live in `web/src/app/globals.css` (`:root` light,
 `.dark` dark); `geo/copy/gaid-app.css` is the vendored WP00 kit and is no longer the source of app values. Logo use:
@@ -15,9 +16,7 @@ ui/ux 가이드를 개선하자. 현재는 에이전트가 스스로 판단하�
 
 User request for v2 (2026-10-21, verbatim): "GAID 허브와 GAID 시스템에서 디자인 가이드와 관련하여 ONEUI 가이드를 기반으로 작성된
 것으로 이해하고 있다. 추가 디자인 가이드로 https://tossmini-docs.toss.im/tds-mobile/ 가 있으며, 현재 GAID 허브와 GAID 시스템의
-디자인에서 AISlop을 피하면서 독자적인 브랜딩으로 ui/ux시스템이 인식 될 수 있게 디자인을 개선하고 싶다." Decision (verbatim): "1번 라로
-하거나 현재 방식 유지다. 새로 제안한 디자인이 적절한 것이 없다. 2번 (가) 3번 (가)로 하고 (다)로 더 다듬거나 새롭게 디자인하는 것도
-고려하자. 디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서 디자인해야한다." Evidence and alternatives:
+디자인에서 AISlop을 피하면서 독자적인 브랜딩으로 ui/ux시스템이 인식 될 수 있게 디자인을 개선하고 싶다." Later decisions (verbatim): "새로운 디자인을 oneui가이드에 따라 생성하자." (2026-10-21), then "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와 https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게 재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자." (2026-10-22). Evidence and alternatives:
 `reports/2026-10-21-gaid-design-identity/index.md`.
 
 Earlier user requirements this guide carries (verbatim):
