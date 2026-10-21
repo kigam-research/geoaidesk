@@ -72,14 +72,17 @@ describe("Zotero service", () => {
     const pdf = await store.storePdf(makePdf(["Nickel prospectivity sparse labels page text long enough for reading"]));
     const gaid = await store.addGaidItem({ csl: { type: "article-journal", title: "Sent paper", author: [{ family: "Kim" }], issued: { "date-parts": [[2025]] } }, metadataOrigin: "manual", pdfSha256: pdf.sha256 });
     const sent = await service.sendToZotero(gaid.id);
-    expect(sent).toMatchObject({ id: gaid.id, source: "zotero", citationKey: "kim2025" });
-    expect(sent.sentToZoteroAt).toBeTruthy();
+    expect(sent).toMatchObject({ created: 1, merged: 0, attachments: 1, skipped: [], item: { id: gaid.id, source: "zotero", citationKey: "kim2025" } });
+    expect(sent.item?.sentToZoteroAt).toBeTruthy();
+    expect(fake.uploadedFiles.size).toBe(1);
     const inbox = [...fake.collections.values()].find((c) => c.data.name === "GAID 수집함");
     expect(inbox).toBeTruthy();
     await service.syncAll();
     const synced = await store.get(gaid.id);
     expect(synced.source).toBe("zotero");
     expect(synced.attachments.some((a) => a.stored?.sha256 === pdf.sha256)).toBe(true);
+    // The uploaded PDF and GAID's stored copy are one attachment, not two.
+    expect(synced.attachments.filter((a) => a.kind === "pdf")).toHaveLength(1);
     expect(fake.requests.some((r) => r.method !== "GET" && r.url.pathname.includes("/items/") && r.method === "DELETE")).toBe(false);
   });
 

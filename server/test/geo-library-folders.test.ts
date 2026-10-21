@@ -8,10 +8,26 @@ import { withActiveProject } from "../src/scope.ts";
 import { registerGeoLibraryRoutes } from "../src/geo/routes/library.ts";
 import { LibraryStore, samePaper } from "../src/geo/library/store.ts";
 import { makeNoteCitationExtension } from "../src/geo/library/tools.ts";
+import { readStoredPdf } from "../src/geo/library/reader.ts";
 import { writeProjectLiterature } from "../src/geo/library/uses.ts";
-import { reconcileFolders } from "../src/geo/library/zotero-service.ts";
+import { ZoteroService, reconcileFolders } from "../src/geo/library/zotero-service.ts";
+import { fakeZotero, type FakeZotero } from "./fixtures/geo-zotero-server.ts";
 import { zoteroCollectionId } from "../src/geo/library/zotero/index.ts";
 import type { LibraryCollection, LibraryItem } from "../../web/src/geo/contracts/library.ts";
+
+/** A minimal one-font text PDF for pdftotext. */
+function makePdf(pages: string[]): Buffer {
+  const objs: string[] = ["<< /Type /Catalog /Pages 2 0 R >>", `<< /Type /Pages /Kids [${pages.map((_, i) => `${4 + i * 2} 0 R`).join(" ")}] /Count ${pages.length} >>`, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"];
+  pages.forEach((text, i) => {
+    const stream = `BT /F1 12 Tf 72 720 Td (${text}) Tj ET`;
+    objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents ${5 + i * 2} 0 R >>`, `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+  });
+  let out = "%PDF-1.4\n"; const off: number[] = [];
+  objs.forEach((o, i) => { off.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const x = out.length;
+  out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n${off.map((o) => `${String(o).padStart(10, "0")} 00000 n \n`).join("")}trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF\n`;
+  return Buffer.from(out, "latin1");
+}
 
 const csl = (title: string, family: string, year: number, doi?: string) => ({ type: "article-journal", title, author: [{ family, given: "A" }], issued: { "date-parts": [[year]] }, ...(doi ? { DOI: doi } : {}) });
 
@@ -153,5 +169,83 @@ describe("folder reconciliation after a Zotero sync", () => {
     const result = reconcileFolders([gone, held, sent], { ...empty, removedCollectionKeys: ["GONE0001", "HELD0001", "SENT0002"] }, partition, [gaidPaper]);
     expect(result.collections.map((c) => [c.id, c.source, Boolean(c.zotero)])).toEqual([[held.id, "gaid", false], ["lc-bbbbbbbbbbbb", "gaid", false]]);
     expect(result.linked.size).toBe(0);
+  });
+});
+
+describe("sending folders to Zotero (fake Local API)", () => {
+  let fake: FakeZotero, service: ZoteroService;
+  beforeEach(async () => {
+    fake = await fakeZotero("local");
+    service = new ZoteroService(store, { localBaseUrl: fake.baseUrl });
+  });
+  afterEach(async () => { await fake.close(); });
+  /** The fake exports one fixed CSL record; give created/seeded items their own metadata, as real Zotero does. */
+  const realCsl = () => { for (const o of fake.items.values()) if (o.data.itemType !== "attachment") o.csljson = { type: "article-journal", title: String(o.data.title), ...(o.data.DOI ? { DOI: String(o.data.DOI) } : {}) }; };
+
+  it("links the folder tree, creates new papers with PDFs, merges a duplicate and does not repeat on a second send", async () => {
+    fake.addCollection("COLLECT1", "광상");
+    fake.addItem("PAPER001", { title: "Already in Zotero", DOI: "10.5555/dup", collections: ["COLLECT1"] });
+    realCsl();
+    await service.connectLocal();
+    const mirrored = (await store.all()).find((i) => i.zotero?.itemKey === "PAPER001")!;
+    const ms = await store.addGaidCollection("원고 A");
+    const method = await store.addGaidCollection("방법", ms.id);
+    const pdf = await store.storePdf(makePdf(["Nickel prospectivity page text long enough for the reader to keep it"]));
+    const fresh = await store.addGaidItem({ csl: { type: "article-journal", title: "New GAID paper", author: [{ family: "Kim" }], issued: { "date-parts": [[2025]] } }, metadataOrigin: "manual", pdfSha256: pdf.sha256, collectionIds: [method.id] });
+    const read = await readStoredPdf(store, pdf.sha256); // as POST /geo/library/items does
+    await store.mutate(fresh.id, (next) => { next.read = read; });
+    // Added in GAID before the same paper arrived from Zotero (addGaidItem refuses a known DOI).
+    const dup: LibraryItem = { ...(await store.get(fresh.id)), id: "li-dddddddddddd", csl: { type: "article-journal", title: "Already in Zotero", DOI: "10.5555/dup" }, citationKey: "dup2020", attachments: [], read: { coverage: "none" }, collectionIds: [ms.id] };
+    await store.put(dup);
+    await service.setMembership(ms.id, [mirrored.id], "add"); // unlinked folder: GAID's own membership
+    expect(fake.requests.filter((r) => r.method !== "GET")).toHaveLength(0);
+
+    const result = await service.sendFolderToZotero(ms.id);
+    expect(result).toMatchObject({ folders: 2, created: 1, merged: 1, attachments: 1, skipped: [] });
+    expect(result.stopped).toBeUndefined();
+    const zc = [...fake.collections.values()];
+    const msKey = zc.find((c) => c.data.name === "원고 A")!.key, methodKey = zc.find((c) => c.data.name === "방법")!.key;
+    expect(zc.find((c) => c.key === methodKey)!.data.parentCollection).toBe(msKey);
+    const created = [...fake.items.values()].find((o) => o.data.title === "New GAID paper")!;
+    expect(created.data.collections).toEqual([methodKey]);
+    expect([...fake.uploadedFiles.values()][0].equals(fs.readFileSync(store.filePath(pdf.sha256)))).toBe(true);
+    expect([...fake.fullTexts.values()][0]).toMatchObject({ indexedPages: 1, totalPages: 1 });
+    expect(fake.items.get("PAPER001")!.data.collections).toEqual(expect.arrayContaining(["COLLECT1", msKey]));
+
+    // Ids and keys stay: the sent paper keeps its id, the merged one resolves to the Zotero copy.
+    realCsl();
+    await service.syncAll();
+    const sent = await store.get(fresh.id);
+    expect(sent).toMatchObject({ source: "zotero", citationKey: "kim2025", collectionIds: [method.id] });
+    expect(sent.attachments.filter((a) => a.kind === "pdf")).toHaveLength(1);
+    expect((await store.get(dup.id)).id).toBe(mirrored.id);
+    expect((await store.byCitationKey("dup2020"))?.id).toBe(mirrored.id);
+    expect((await store.get(mirrored.id)).collectionIds.sort()).toEqual([ms.id, zoteroCollectionId({ connection: "local", serverId: "server-A", libraryType: "user", libraryId: "0" }, "COLLECT1")].sort());
+    expect((await store.collections()).filter((c) => c.id === ms.id || c.id === method.id).every((c) => c.source === "zotero" && c.zotero)).toBe(true);
+
+    const items = fake.items.size, collections = fake.collections.size;
+    const again = await service.sendFolderToZotero(ms.id);
+    expect(again).toMatchObject({ folders: 0, created: 0, merged: 0, attachments: 0 });
+    expect([fake.items.size, fake.collections.size]).toEqual([items, collections]);
+
+    // Renamed in Zotero: the GAID folder keeps its id and follows the name.
+    fake.collections.get(msKey)!.data.name = "원고 A (투고)";
+    fake.collections.get(msKey)!.version = ++fake.version;
+    await service.syncAll();
+    expect((await store.collection(ms.id)).name).toBe("원고 A (투고)");
+  });
+
+  it("writes membership of a Zotero paper in a linked folder to Zotero and leaves removal to Zotero", async () => {
+    fake.addCollection("COLLECT1", "광상");
+    fake.addItem("PAPER001", { title: "Zotero paper" });
+    realCsl();
+    await service.connectLocal();
+    const folder = (await store.collections())[0];
+    const paper = (await store.all())[0];
+    expect(await service.setMembership(folder.id, [paper.id], "add")).toEqual({ changed: 1, writtenToZotero: 1, removeInZotero: [] });
+    expect(fake.items.get("PAPER001")!.data.collections).toEqual(["COLLECT1"]);
+    expect(await service.setMembership(folder.id, [paper.id], "remove")).toEqual({ changed: 0, writtenToZotero: 0, removeInZotero: [paper.id] });
+    await service.syncAll();
+    expect((await store.get(paper.id)).collectionIds).toEqual([folder.id]);
   });
 });
