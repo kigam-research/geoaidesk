@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T14:05:58Z
+status: ready
+updated: 2026-10-21T14:05:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e3423a72-7472-4e57-ad64-7b7af68d8b04","pid":1024923,"provider":"codex","session":"01a15ebd-f21c-75a3-acb8-bed850e7227a","start":"47880771","token":"c6c81568434110b18d55cffb1d1710ded8914bb8b12f012ac7eedcc3d6246168"}
 branch: task/gaid-design-identity--hub
 target: task/gaid-design-identity
@@ -91,7 +91,9 @@ Network: raw.githubusercontent.com is blocked.
 - Evidence manifests/logs beside shots: `shots.sha256`, `final-capture.log`, `browser-checks.log`, `impeccable-detect.json`. No screenshots copied into reports here; parent selects/integrates them.
 - Full `scripts/check` belongs to the parent integration; child checks are the exact requested targeted set.
 ## Next steps
-1. Isolated app/browser stopped; finish this child. Parent integrates with `task complete gaid-design-identity--hub` and performs aggregate checks.
+<!-- task:closed -->
+Closed 2026-10-21T14:05:59Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First two `task resume` attempts saw a transient parent task-start transaction; successful third resume returned the same worktree.
 - `task job run -- npm --prefix web ci` refused dirty source before creating a job; the authorized app launcher installed local dependencies instead.
