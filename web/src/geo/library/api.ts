@@ -3,7 +3,11 @@ import type {
   CitationResolution,
   CreateLibraryItemBody,
   CslItem,
+  ExportFormat,
+  FolderCheckResponse,
+  FolderMembershipResult,
   ImportPreview,
+  LibraryCollection,
   LookupBody,
   LookupResponse,
   LibraryItem,
@@ -11,6 +15,7 @@ import type {
   LibraryListQuery,
   LibraryListResponse,
   ProjectLiterature,
+  SendToZoteroResult,
   UploadedLibraryFile,
   ZoteroLibraryState,
 } from "@/geo/contracts/library";
@@ -66,6 +71,22 @@ export async function attachToProject(projectId: string, itemId: string): Promis
   return call<ProjectLiterature>("/project", { method: "PUT", body: JSON.stringify({ collectionIds: current.collectionIds, itemIds: [...current.itemIds, itemId] }) }, projectId);
 }
 
+/** Adds a folder to a project's citation scope (its attached folders). */
+export async function attachFolderToProject(projectId: string, folderId: string): Promise<ProjectLiterature> {
+  const current = await call<ProjectLiterature>("/project", undefined, projectId);
+  if (current.collectionIds.includes(folderId)) return current;
+  return call<ProjectLiterature>("/project", { method: "PUT", body: JSON.stringify({ collectionIds: [...current.collectionIds, folderId], itemIds: current.itemIds }) }, projectId);
+}
+
+// --- Folders -----------------------------------------------------------------------------------------------------------
+export const createFolder = (name: string, parentId?: string) => call<LibraryCollection>("/collections", { method: "POST", body: JSON.stringify({ name, ...(parentId ? { parentId } : {}) }) });
+export const renameFolder = (id: string, name: string) => call<LibraryCollection>(`/collections/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ name }) });
+export const deleteFolder = (id: string) => call<{ folders: number }>(`/collections/${encodeURIComponent(id)}`, { method: "DELETE" });
+export const setFolderItems = (id: string, itemIds: string[], action: "add" | "remove") =>
+  call<FolderMembershipResult>(`/collections/${encodeURIComponent(id)}/items`, { method: "POST", body: JSON.stringify({ itemIds, action }) });
+export const checkFolder = (id: string) => call<FolderCheckResponse>(`/collections/${encodeURIComponent(id)}/check`);
+export const sendFolderToZotero = (id: string) => call<SendToZoteroResult>(`/collections/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });
+
 export const startWorkflowFromItem = (id: string) => call<{ authoringId: string }>(`/items/${encodeURIComponent(id)}/authoring`, { method: "POST" });
 
 export const libraryPdfUrl = (id: string) => withApiToken(`${API_BASE}/geo/library/items/${encodeURIComponent(id)}/pdf`);
@@ -87,11 +108,17 @@ export const connectLocalZotero = () => call<ZoteroLibraryState>("/zotero/local"
 export const connectWebZotero = (key: string) => call<{ libraries: ZoteroLibraryState[] }>("/zotero/web", { method: "POST", body: JSON.stringify({ key }) });
 export const syncZotero = () => call<{ libraries: ZoteroLibraryState[] }>("/zotero/sync", { method: "POST" });
 export const readItemText = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/read`, { method: "POST" });
-export const sendItemToZotero = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });
+export const sendItemToZotero = (id: string) => call<SendToZoteroResult>(`/items/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });
 
 // --- Reference details and bibliography files ------------------------------------------------------------------------
 export const lookupReference = (body: LookupBody) => call<LookupResponse>("/lookup", { method: "POST", body: JSON.stringify(body) });
 export const previewImport = (text: string, format: "bibtex" | "ris" | "csl-json") => call<ImportPreview>("/import", { method: "POST", body: JSON.stringify({ text, format }) });
 export const confirmImport = (items: CslItem[]) => call<{ added: number; duplicates: number; failed: number }>("/import/confirm", { method: "POST", body: JSON.stringify({ items }) });
-export const exportUrl = (format: "bibtex" | "ris" | "csl-json") => withApiToken(`${API_BASE}/geo/library/export?format=${format}`);
+/** Bibliography download: the whole library, or one folder with its subfolders. */
+export function exportUrl(format: ExportFormat, folderId?: string, lang?: "ko" | "en"): string {
+  const params = new URLSearchParams({ format });
+  if (folderId) params.set("collectionId", folderId);
+  if (lang) params.set("lang", lang);
+  return withApiToken(`${API_BASE}/geo/library/export?${params}`);
+}
 export const resolveCitations = (keys: string[]) => call<CitationResolution[]>(`/citations?keys=${encodeURIComponent(keys.join(","))}`);

@@ -2,7 +2,8 @@
 
 /**
  * 참고문헌 under a research note: the note's Pandoc citations (`[@key, p. 12]`) resolved against the researcher's
- * library. A key the library does not have is shown as 확인 안 됨, never dropped (ADR decision 6).
+ * library. A key the library does not have is shown as 확인 안 됨, never dropped (ADR decision 6); a key outside the
+ * project's citation folders is marked (gaid-library-folders).
  */
 import { useEffect, useMemo, useState } from "react";
 import { t } from "@/geo/i18n";
@@ -26,7 +27,12 @@ export function NoteReferences({ content }: { content: string }) {
         {rows.map((r) => (
           <li key={r.key} className="flex gap-2">
             <span className="shrink-0 font-mono text-xs text-muted-foreground">@{r.key}</span>
-            {r.reference ? <span>{r.reference}</span> : <span className="text-amber-700 dark:text-amber-300">{t("library.references.unknown")}</span>}
+            {r.reference ? (
+              <span>
+                {r.reference}
+                {r.outsideScope && <span className="ml-1.5 text-[var(--gaid-warning)]">· {t("library.references.outside")}</span>}
+              </span>
+            ) : <span className="text-[var(--gaid-warning)]">{t("library.references.unknown")}</span>}
           </li>
         ))}
       </ol>

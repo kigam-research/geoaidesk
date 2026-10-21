@@ -1,4 +1,4 @@
-import type { LibraryCollection } from "../../../../../web/src/geo/contracts/library.ts";
+import { numericCslDates, type LibraryCollection } from "../../../../../web/src/geo/contracts/library.ts";
 import {
   ZoteroError, ZoteroServerChangedError, libraryPath, itemKey, zoteroRefKey,
   type ZoteroClient, type ZoteroObject, type ZoteroItemRef, type LibraryItem, type ZoteroLibraryState,
@@ -29,7 +29,7 @@ export function mapZoteroItem(object: ZoteroObject, options: MapItemOptions): Li
   const existing = options.existing;
   return {
     id: options.id, owner: options.owner, source: "zotero", zotero: { ...options.ref, itemKey: object.key, version: object.version },
-    csl: { ...structuredClone(csl), title: typeof csl.title === "string" ? csl.title : typeof data.title === "string" ? data.title : "" },
+    csl: numericCslDates({ ...structuredClone(csl), title: typeof csl.title === "string" ? csl.title : typeof data.title === "string" ? data.title : "" }),
     ...(typeof data.citationKey === "string" && data.citationKey ? { citationKey: data.citationKey } : {}),
     metadataOrigin: "zotero", metadataConfirmed: true,
     collectionIds: (Array.isArray(data.collections) ? data.collections : []).filter((key): key is string => typeof key === "string").map((key) => zoteroCollectionId(options.ref, key)),

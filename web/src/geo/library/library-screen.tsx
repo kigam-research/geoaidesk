@@ -2,11 +2,12 @@
 
 /**
  * 서재 (gaid-research-hub; layout chosen 2026-10-21: draft 다안 first screen + 나안 table + 가안 detail pane).
- * Left: large search, filter chips, the library table. Right: library status and recent papers, replaced by the
- * selected paper's detail ("내 연구에서 쓰인 곳", read coverage, next actions).
+ * Left: the folder tree (gaid-library-folders). Middle: large search, filter chips, the library table of all papers or
+ * of the selected folder (subfolders included). Right: library status and recent papers, the selected folder's 인용 관리,
+ * or the selected paper's detail ("내 연구에서 쓰인 곳", folders, read coverage, next actions).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BookOpenIcon, DownloadIcon, ExternalLinkIcon, FileTextIcon, FolderIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from "lucide-react";
+import { BookOpenIcon, DownloadIcon, ExternalLinkIcon, FileTextIcon, FolderIcon, FolderPlusIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -14,10 +15,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { listProjects, type Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { t } from "@/geo/i18n";
-import type { LibraryItemResponse, LibraryItemSummary, LibraryListQuery, LibraryListResponse, LibraryUse, ReadCoverage } from "@/geo/contracts/library";
-import { attachToProject, exportUrl, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, sendItemToZotero, startWorkflowFromItem, zoteroSelectUrl } from "./api";
+import type { LibraryCollection, LibraryItemResponse, LibraryItemSummary, LibraryListQuery, LibraryListResponse, LibraryUse, ReadCoverage } from "@/geo/contracts/library";
+import { attachToProject, createFolder, exportUrl, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, renameFolder, sendItemToZotero, setFolderItems, startWorkflowFromItem, zoteroSelectUrl, zoteroState } from "./api";
 import { AddPaperDialog } from "./add-paper-dialog";
 import { ZoteroCard } from "./zotero-card";
+import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
+import { FolderPanel, sendResultLine } from "./folder-panel";
+import { FolderNameDialog } from "./folder-name-dialog";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
@@ -59,9 +63,11 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const [folderId, setFolderId] = useState<string | null>(null);
+  const [naming, setNaming] = useState<{ mode: "create" | "rename"; parentId?: string } | null>(null);
 
   const load = useCallback(async () => {
-    const q: LibraryListQuery = { q: query.trim() || undefined };
+    const q: LibraryListQuery = { q: query.trim() || undefined, collectionId: folderId ?? undefined };
     if (filter === "zotero" || filter === "gaid") q.source = filter;
     if (filter === "unread" || filter === "cited") q.filter = filter;
     try {
@@ -70,7 +76,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
     } catch {
       setError(true);
     }
-  }, [query, filter]);
+  }, [query, filter, folderId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void load(), 200);
@@ -82,7 +88,26 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
     return synced ? L("screen.zoteroSynced", { when: new Date(synced).toLocaleTimeString() }) : L("screen.zoteroNone");
   }, [data]);
 
+  const collections = data?.collections ?? [];
+  const folder = folderId ? collections.find((c) => c.id === folderId) : undefined;
+  const zoteroConnected = (data?.zotero ?? []).some((z) => z.state === "ok");
   const counts = data?.counts;
+  const addToFolder = async (target: string, itemId: string) => {
+    try {
+      const r = await setFolderItems(target, [itemId], "add");
+      const name = collections.find((c) => c.id === target)?.name ?? "";
+      if (r.changed) toast.success(r.writtenToZotero ? L("folders.addedZotero", { name }) : L("folders.added", { name }));
+      void load();
+    } catch (error) {
+      const state = zoteroState(error);
+      toast.error(state ? t(`library.zotero.states.${state}`) : L("folders.addFailed"));
+    }
+  };
+  const submitName = async (name: string) => {
+    if (naming?.mode === "rename" && folderId) await renameFolder(folderId, name);
+    else { const made = await createFolder(name, naming?.parentId); setFolderId(made.id); setSelected(null); }
+    await load();
+  };
   const chips: { id: Filter; label: string }[] = counts
     ? [
         { id: "all", label: L("filter.all", { n: counts.all }) },
@@ -94,17 +119,19 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
     : [];
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-6 px-4 py-6 sm:px-8">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-4 py-6 sm:px-6">
+      <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={counts?.all ?? 0} selected={folderId}
+        onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className="flex min-w-0 flex-1 flex-col gap-3" aria-label={L("screen.title")}>
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold">{L("screen.title")}</h1>
+          <h1 className="min-w-0 truncate text-xl font-semibold">{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{zoteroLine}</span>
             <Popover>
               <PopoverTrigger asChild><Button variant="outline"><DownloadIcon data-icon="inline-start" />{L("export.button")}</Button></PopoverTrigger>
               <PopoverContent align="end" className="w-52 p-1.5">
                 {(["bibtex", "ris", "csl-json"] as const).map((f) => (
-                  <a key={f} href={exportUrl(f)} className="block rounded-md px-2 py-1.5 text-sm hover:bg-muted">{L(`export.${f === "csl-json" ? "csl" : f}`)}</a>
+                  <a key={f} href={exportUrl(f, folderId ?? undefined)} className="block rounded-md px-2 py-1.5 text-sm hover:bg-muted">{L(`export.${f === "csl-json" ? "csl" : f}`)}</a>
                 ))}
               </PopoverContent>
             </Popover>
@@ -113,7 +140,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
         </div>
         <label className="flex h-11 items-center gap-2 rounded-lg border bg-background px-3 focus-within:ring-2 focus-within:ring-ring">
           <SearchIcon className="size-4 text-muted-foreground" aria-hidden />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={L("screen.search")} aria-label={L("screen.search")} className="h-full flex-1 bg-transparent text-[15px] outline-none" />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={folder ? L("screen.searchFolder", { name: folder.name }) : L("screen.search")} aria-label={folder ? L("screen.searchFolder", { name: folder.name }) : L("screen.search")} className="h-full flex-1 bg-transparent text-[15px] outline-none" />
         </label>
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-1.5" role="group" aria-label={L("filter.label")}>
@@ -127,6 +154,8 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           <p className="py-8 text-sm text-muted-foreground">{L("screen.error")}</p>
         ) : !data ? (
           <p className="py-8 text-sm text-muted-foreground">{L("screen.loading")}</p>
+        ) : folder && data.total === 0 && !query.trim() && filter === "all" ? (
+          <p className="py-8 text-sm text-muted-foreground">{L("folders.emptyFolder")}</p>
         ) : data.counts.all === 0 ? (
           <div className="flex flex-col items-start gap-3 py-8">
             <p className="text-sm text-muted-foreground">{L("screen.empty")}</p>
@@ -134,7 +163,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           </div>
         ) : (
           <>
-            <p className="text-xs text-muted-foreground">{L("screen.state", { shown: data.total, total: data.counts.all })}</p>
+            <p className="text-xs text-muted-foreground">{folder ? L("screen.stateFolder", { shown: data.total, total: data.folderCounts[folder.id] ?? 0 }) : L("screen.state", { shown: data.total, total: data.counts.all })}</p>
             <div className="min-h-0 flex-1 overflow-auto">
               <table className="w-full border-collapse text-sm">
                 <thead className="sticky top-0 bg-background">
@@ -153,6 +182,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
                   {data.items.map((row) => (
                     <tr key={row.id} onClick={() => setSelected(row.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(row.id); } }}
                       tabIndex={0} aria-selected={selected === row.id} aria-label={row.title}
+                      draggable onDragStart={(e) => { e.dataTransfer.setData(ITEM_DRAG_TYPE, row.id); e.dataTransfer.effectAllowed = "copy"; }}
                       className={cn("cursor-pointer border-b align-top outline-none hover:bg-muted/50 focus-visible:bg-muted", selected === row.id && "bg-primary/5")}>
                       <td className="px-2 py-2.5">
                         <div className="font-medium text-foreground">{row.title}</div>
@@ -174,14 +204,24 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           </>
         )}
       </section>
-      <aside className="flex w-[380px] shrink-0 flex-col gap-3">
+      <aside className="flex w-[340px] shrink-0 flex-col gap-3">
         {selected ? (
-          <ItemDetail id={selected} zoteroConnected={(data?.zotero ?? []).some((z) => z.state === "ok")} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onChanged={load} />
+          <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onChanged={load} />
+        ) : folder ? (
+          <FolderPanel folder={folder} collections={collections} count={data?.folderCounts[folder.id] ?? 0} zoteroConnected={zoteroConnected}
+            onSelectItem={setSelected} onCreateSub={() => setNaming({ mode: "create", parentId: folder.id })} onRename={() => setNaming({ mode: "rename" })}
+            onDeleted={() => { setFolderId(null); void load(); }} onChanged={load} />
         ) : (
           <SidePanel data={data} onSelect={setSelected} onChanged={load} />
         )}
       </aside>
-      <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => { void load(); if (item) setSelected(item.id); }} />
+      <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => {
+        if (item && folderId) void addToFolder(folderId, item.id); else void load();
+        if (item) setSelected(item.id);
+      }} />
+      <FolderNameDialog mode={naming?.mode ?? null} initialName={naming?.mode === "rename" ? folder?.name : undefined}
+        parentName={naming?.parentId ? collections.find((c) => c.id === naming.parentId)?.name : undefined}
+        onClose={() => setNaming(null)} onSubmit={submitName} />
     </div>
   );
 }
@@ -217,12 +257,14 @@ function useLabel(use: LibraryUse): string {
   return L("detail.useProject", { name: use.projectName });
 }
 
-function ItemDetail({ id, zoteroConnected, onClose, onOpenProject, onChanged }: { id: string; zoteroConnected: boolean; onClose: () => void; onOpenProject: (projectId: string) => void; onChanged: () => void }) {
+function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, onChanged }: { id: string; collections: LibraryCollection[]; zoteroConnected: boolean; onClose: () => void; onOpenProject: (projectId: string) => void; onChanged: () => void }) {
   const [data, setData] = useState<LibraryItemResponse | null>(null);
+  const [sendNote, setSendNote] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
   useEffect(() => {
     let live = true;
     setData(null);
+    setSendNote(null);
     getLibraryItem(id).then((r) => live && setData(r)).catch(() => live && setData(null));
     return () => { live = false; };
   }, [id]);
@@ -254,10 +296,33 @@ function ItemDetail({ id, zoteroConnected, onClose, onOpenProject, onChanged }: 
     catch { toast.error(L("read.failed")); }
   };
   const send = async () => {
-    toast.info(L("send.confirm"));
-    try { await sendItemToZotero(item.id); toast.success(L("send.done")); setData(await getLibraryItem(item.id)); onChanged(); }
-    catch { toast.error(L("send.failed")); }
+    setSendNote(L("send.confirm"));
+    try {
+      const r = await sendItemToZotero(item.id);
+      setSendNote(r.stopped ? L("send.stopped", { done: sendResultLine(r) }) : r.skipped.length ? L("send.skipped", { done: sendResultLine(r), n: r.skipped.length }) : sendResultLine(r));
+      if (!r.stopped) toast.success(L("send.toast"));
+      // A paper merged into its Zotero copy now lives under that item's id.
+      setData(await getLibraryItem(r.item?.id ?? item.id));
+      onChanged();
+    } catch (error) {
+      const state = zoteroState(error);
+      setSendNote(state ? t(`library.zotero.states.${state}`) : L("send.failed"));
+    }
   };
+  const changeFolder = async (folderId: string, action: "add" | "remove") => {
+    try {
+      const r = await setFolderItems(folderId, [item.id], action);
+      if (r.removeInZotero.length) toast.info(L("folders.removeInZotero"));
+      else if (r.changed) toast.success(action === "add" ? L(r.writtenToZotero ? "folders.addedZotero" : "folders.added", { name: collections.find((c) => c.id === folderId)?.name ?? "" }) : L("folders.removed"));
+      setData(await getLibraryItem(item.id));
+      onChanged();
+    } catch (error) {
+      const state = zoteroState(error);
+      toast.error(state ? t(`library.zotero.states.${state}`) : L("folders.addFailed"));
+    }
+  };
+  const inFolders = item.collectionIds.filter((c) => collections.some((x) => x.id === c));
+  const otherFolders = collections.filter((c) => !item.collectionIds.includes(c.id)).map((c) => ({ id: c.id, path: folderPath(collections, c.id) })).sort((a, b) => a.path.localeCompare(b.path));
   const makeWorkflow = async () => {
     try {
       const { authoringId } = await startWorkflowFromItem(item.id);
@@ -295,6 +360,30 @@ function ItemDetail({ id, zoteroConnected, onClose, onOpenProject, onChanged }: 
         {canRead && <Button variant="outline" onClick={() => void readText()}><BookOpenIcon data-icon="inline-start" />{L("read.button")}</Button>}
         {item.source === "gaid" && zoteroConnected && <Button variant="outline" onClick={() => void send()}><ExternalLinkIcon data-icon="inline-start" />{L("send.button")}</Button>}
         {zotero && <Button variant="outline" asChild><a href={zotero}><ExternalLinkIcon data-icon="inline-start" />{L("detail.zotero.button")}</a></Button>}
+      </div>
+      {sendNote && <p className="text-sm" role="status">{sendNote}</p>}
+      <div className="flex flex-col gap-2 rounded-xl border p-4">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-base font-semibold">{L("folders.itemTitle")}</h3>
+          <Popover>
+            <PopoverTrigger asChild><Button variant="ghost" size="sm" disabled={!otherFolders.length}><FolderPlusIcon data-icon="inline-start" />{L("folders.add.button")}</Button></PopoverTrigger>
+            <PopoverContent align="end" className="max-h-72 w-64 overflow-auto p-1.5">
+              {otherFolders.map((f) => (
+                <button key={f.id} type="button" onClick={() => void changeFolder(f.id, "add")} className="block w-full truncate rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted">{f.path}</button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+        {inFolders.length === 0 ? <p className="text-sm text-muted-foreground">{L("folders.itemNone")}</p> : (
+          <ul className="flex flex-wrap gap-1.5">
+            {inFolders.map((fid) => (
+              <li key={fid} className={cn(PILL, "gap-1 text-foreground")}>
+                <FolderIcon className="size-3" aria-hidden />{folderPath(collections, fid)}
+                <button type="button" aria-label={L("folders.remove.action", { name: collections.find((c) => c.id === fid)?.name ?? "" })} onClick={() => void changeFolder(fid, "remove")} className="rounded text-muted-foreground hover:text-foreground"><XIcon className="size-3" /></button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="flex flex-col gap-2 rounded-xl border p-4">
         <h3 className="text-base font-semibold">{L("detail.usesTitle")}</h3>
