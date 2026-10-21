@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T13:26:49Z
+status: active
+updated: 2026-10-21T13:34:33Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8efa9960-157f-4f0e-b907-50fa7ca9186a","pid":2619537,"provider":"codex","session":"01a15e90-4520-7db2-8f1f-5d78d5373035","start":"47581455","token":"245fd43eee5872c64898ddf1d2632eb44ca2341c85e6360286ab326912a17bae"}
 branch: task/gaid-library-folders--zotero-writes
 target: task/gaid-library-folders
@@ -82,13 +82,14 @@ Evidence: /home/seongin3/data/geoaidesk/work/zotero-writes/smoke.json
 SHA-256: 22b43c3dfde37e6fc93b99996d5dc2ecdea4484110e2765c9bfb3641c9787bd4
 Real Web storage/account behavior and Windows/WSL networking remain unverified (fake Web protocol passed).
 Initial full scripts/check passed (backend 2059 passed/8 skipped, frontend 1142 passed, production smoke PASS).
-task finish merged parent checkpoint 8278864c and rechecked the merged tree; one parent-owned service test is stale:
-geo-library-zotero-service.test.ts:75 expects the old sendToZotero item return, but the parent changed it to a result
-containing item. 2064 other backend tests passed/8 skipped. The parent fixed the assertion and added upload-count
-coverage in pushed checkpoint 0ea99a74. Rerunning task finish will merge that fix and recheck the final tree.
+After integrating parent APIs/tests, two full-check failures were parent-owned declaration mismatches: the old service
+return-shape assertion (fixed at 0ea99a74) and a missing boundary owner in the distribution-test whitelist (fixed at
+f1665188). Latest merged backend tests passed 2067/8 skipped and frontend tests passed 1144. Direct verification of
+the parent's fixed distribution test passed 7/7; current merged copy/UI checks passed with no errors. Final full
+task finish recheck remains, including environment and production smoke after the latest parent changes.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-21T13:26:49Z: ready; the parent gaid-library-folders integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Rerun task finish in place to merge parent whitelist fix f1665188 and recheck the final tree. No resume or save.
+2. Parent runs task complete after the finish completion notice.
 
 ## Failed approaches
 - Initial npx tsc/vitest had missing local dependencies (not a source failure); installing the lockfile dependencies.
@@ -97,6 +98,11 @@ Closed 2026-10-21T13:26:49Z: ready; the parent gaid-library-folders integrates i
 - First merged finish check failed on the parent-owned service test's old return shape; connector tests passed.
   Log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-89g1v4k3.log. Parent informed directly;
   no speculative connector edit is appropriate for this API-consumer assertion mismatch.
+- Next merged finish check (14359868) passed all backend/frontend tests, then failed the parent's missing allowed
+  owner in geo/tests/distribution.test.mjs:91. Log: check-117xe34a.log in the same external check-log directory.
+  Shared premise across the integration failures: new parent declarations and consumer tests were assumed to match
+  the new APIs. Tested that premise directly: parent's fixed distribution tests 7/7, current copy validator 0 errors
+  (61 existing warnings), UI validator 0 errors (89 accepted debt). Parent-owned fix is pushed at f1665188.
 ## Notes and decisions
 Sequential decisions: preserve the existing four-request gate and backoff; support form encoding only in the narrow
 file-authorization/registration methods; storage POST has no API credentials and manual redirects. Collection identity
@@ -115,7 +121,8 @@ live parent's task Notes and decisions. Official file-upload documentation and i
   - uploadAttachment: create imported_file child; MD5 form authorization; credential-free multipart storage POST;
     form registration; optional supplied PDF text PUT. At most 64 MiB file + 1 MiB framing, no storage redirects.
 - Checks (2026-10-21): `cd server && npx vitest run test/geo-library-zotero.test.ts test/geo-library-zotero-service.test.ts`
-  passed 55/55; `cd server && npx tsc --noEmit` passed. `git diff --check` passed. Full scripts/check is parent-owned.
+  passed 55/55 before parent integration; `cd server && npx tsc --noEmit` passed. `git diff --check` passed.
+  task finish automatically runs full scripts/check, including rechecks after target movement.
 - Smoke reproduction: only against a freshly started isolated headless sandbox, run
   `cd server && npx tsx /home/seongin3/data/geoaidesk/work/zotero-writes/smoke.mts`, then stop the sandbox. The script
   reads only its seeded sandbox-profile key into memory; never prints it. It generates a valid synthetic 604-byte PDF
