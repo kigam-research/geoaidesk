@@ -205,5 +205,9 @@
     "bibtex": "BibTeX (.bib)",
     "ris": "RIS (.ris)",
     "csl": "CSL-JSON (.json)"
+  },
+  "references": {
+    "title": "References",
+    "unknown": "Not in your library · check this citation key"
   }
 }

@@ -205,5 +205,9 @@
     "bibtex": "BibTeX (.bib)",
     "ris": "RIS (.ris)",
     "csl": "CSL-JSON (.json)"
+  },
+  "references": {
+    "title": "참고문헌",
+    "unknown": "확인 안 됨 · 서재에 없는 인용 키입니다"
   }
 }

@@ -1,5 +1,6 @@
 /** Client for `/geo/library/*` (contract: web/src/geo/contracts/library.ts). */
 import type {
+  CitationResolution,
   CreateLibraryItemBody,
   CslItem,
   ImportPreview,
@@ -93,3 +94,4 @@ export const lookupReference = (body: LookupBody) => call<LookupResponse>("/look
 export const previewImport = (text: string, format: "bibtex" | "ris" | "csl-json") => call<ImportPreview>("/import", { method: "POST", body: JSON.stringify({ text, format }) });
 export const confirmImport = (items: CslItem[]) => call<{ added: number; duplicates: number; failed: number }>("/import/confirm", { method: "POST", body: JSON.stringify({ items }) });
 export const exportUrl = (format: "bibtex" | "ris" | "csl-json") => withApiToken(`${API_BASE}/geo/library/export?format=${format}`);
+export const resolveCitations = (keys: string[]) => call<CitationResolution[]>(`/citations?keys=${encodeURIComponent(keys.join(","))}`);

@@ -27,6 +27,8 @@ export function parseAuthors(text: string): CslItem["author"] {
 
 const retracted = (signals: UpdateSignal[]) => signals.some((s) => s.kind === "retraction" && !s.relation.startsWith("update-to"));
 const corrected = (signals: UpdateSignal[]) => signals.some((s) => s.kind === "correction");
+/** Service names as written by the services themselves (shown in both locales). */
+const ORIGIN_NAME: Record<string, string> = { crossref: "Crossref", openalex: "OpenAlex", kci: "KCI", zotero: "Zotero" };
 const formatOf = (name: string) => (/\.ris$/i.test(name) ? "ris" : /\.json$/i.test(name) ? "csl-json" : "bibtex");
 
 export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onAdded: (item?: LibraryItem) => void }) {
@@ -142,7 +144,7 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{L("dialog.title")}</DialogTitle>
           <DialogDescription>{L("dialog.body")}</DialogDescription>
@@ -153,6 +155,7 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
               className={cn("-mb-px border-b-2 px-3 py-1.5 text-sm", tab === id ? "border-primary font-medium" : "border-transparent text-muted-foreground")}>{L(`dialog.tabs.${id}`)}</button>
           ))}
         </div>
+        <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
         {tab === "paper" ? (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3 rounded-lg border p-3 text-sm">
@@ -178,7 +181,7 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
                     <div className="min-w-0">
                       <div className="font-medium">{c.csl.title}</div>
                       <div className="text-xs text-muted-foreground">
-                        {[(c.csl.author ?? []).slice(0, 3).map((a) => a.family ?? a.literal).join(", "), c.csl.issued?.["date-parts"]?.[0]?.[0], c.csl["container-title"] as string | undefined, L("dialog.origin", { origin: c.metadataOrigin })].filter(Boolean).join(" · ")}
+                        {[(c.csl.author ?? []).slice(0, 3).map((a) => a.family ?? a.literal).join(", "), c.csl.issued?.["date-parts"]?.[0]?.[0], c.csl["container-title"] as string | undefined, L("dialog.origin", { origin: ORIGIN_NAME[c.metadataOrigin] ?? c.metadataOrigin })].filter(Boolean).join(" · ")}
                       </div>
                       {retracted(c.signals) && <p className="mt-1 text-xs text-destructive">{L("dialog.retracted")}</p>}
                       {!retracted(c.signals) && corrected(c.signals) && <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">{L("dialog.corrected")}</p>}
@@ -211,7 +214,8 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
             {preview && preview.items.slice(0, 5).map((c, i) => <p key={i} className="truncate text-sm">{c.title}</p>)}
           </div>
         )}
-        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        {error && <p className="mt-3 text-sm text-destructive" role="alert">{error}</p>}
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{L("dialog.cancel.button")}</Button>
           {tab === "paper" ? (
