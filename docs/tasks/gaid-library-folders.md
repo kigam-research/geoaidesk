@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:46:39Z
+updated: 2026-10-21T14:14:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"aa34d06c-a9c2-4a59-baa0-d91256af0ef9","pid":2570334,"provider":"claude","session":"43dfe263-7ab9-4d66-80b7-22ec0fd4febe","start":"47548693","token":"39b963f62ebfc6e5708f59cfe1e2e4742108fb924ff80b895da73bd72a987fa2"}
 branch: task/gaid-library-folders
 target: main
@@ -45,14 +45,24 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
 ~/.geoaidesk. Outside check: no outside check (app work).
 
 ## Current state
-- 2026-10-21: plan and interfaces settled (Notes). Child `gaid-library-folders--zotero-writes` (writer 8efa9960, Paseo wks_03dd19e0495248f5) owns the connector write
-  additions; this unit owns contract, store, sync glue, routes, agent/note scope and UI.
+- Done: nested folders, folder membership/Zotero linking rule, folder-scoped export (BibTeX/RIS/CSL-JSON/text) and
+  reference check, project citation scope (agent tools, note hook, note references), send item/folder to Zotero with
+  PDFs + full text and duplicate merge (aliases), folder UI (tree, panel, detail folders, drag-and-drop), ADR
+  docs/adr/2026-10-21-library-folders.md, AGENTS.md library bullet, glossary terms. Child gaid-library-folders--zotero-writes
+  integrated (0a2f8ebc) and closed.
+- Fixed during the real-app check: Zotero 10 CSL exports string date parts -> years blank and BibTeX/RIS export 500 for
+  libraries with Zotero items (phase-1 defect); `numericCslDates` in the contract, used in mapping and export; tests added.
+- Verified: server library tests 76 passed (`cd server && npx vitest run test/geo-library-folders.test.ts
+  test/geo-library-zotero.test.ts test/geo-library-zotero-service.test.ts test/geo-library.test.ts
+  test/geo-library-formats.test.ts`), web `npx vitest run src/geo src/components/project-view` 233 passed, both tsc clean,
+  copy/UI validators 0 errors. Real app (unit gaid-library-folders-app, ports 3340/18340) + headless Zotero 10.0.6 sandbox
+  (port 23139, stopped): folder send created 3 collections/3 items/3 PDFs (sha256 equal), merged 1 duplicate, resend
+  created nothing; evidence ~/data/geoaidesk/work/gaid-library-folders/real-zotero-check.json. Screens in
+  ~/data/geoaidesk/work/gaid-library-folders/playwright/.
+- Incident: ports 3330/18330 belonged to gaid-design-identity--system's preview app; this writer stopped it by mistake;
+  hub notified (request 30c36f22b468).
 ## Next steps
-1. Implement folders in contract/store/sync glue/routes; then UI; integrate the child; real-app + Zotero sandbox check.
-   Done up to "integrate the child" (parent commits up to f1665188). Next: `task complete gaid-library-folders--zotero-writes`,
-   restart unit gaid-library-folders-app from this worktree (ports 3330/18330, GAID_HOME ~/data/geoaidesk/work/gaid-library-folders/home,
-   GAID_ZOTERO_LOCAL_URL -> headless sandbox 23139 in ~/data/geoaidesk/work/gaid-library-folders/zotero-sandbox, already seeded with
-   collection 광상 탐사 + 2 items), run bin/seed.mjs and bin/seed-zotero-key.mjs there, browser check + screenshots, report.
+1. task finish (full scripts/check). Stop unit gaid-library-folders-app and remove build caches before close.
 ## Failed approaches
 ## Notes and decisions
 - Folder model (decision, recorded in a new ADR amending 2026-10-21 decision 3): nested folders (Zotero collections are
@@ -86,7 +96,10 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 선택 기능(Windows 탐색기 PDF 폴더를 서재 폴더로 가져오기, EndNote XML 가져오기)을 만들지 — 가) 지금은 만들지 않고 1단계 시험 뒤 정함 — 나) PDF 폴더 가져오기를 만듦 — 다) 나)와 EndNote XML 가져오기를 만듦 — 권장: 가) Windows 연결을 아직 시험하지 않았고 EndNote는 RIS로 주고받을 수 있음 — 막힌 일: 없음 — 조건: 1단계 시험 결과 — 근거: reports/2026-10-21-gaid-library-folders/index.md#6-결정할-일
+- [확인] Windows PC의 Zotero(PC 연결, 승인 창의 "항상 허용"), WSL→Windows Zotero, 실제 Zotero 웹 키로 폴더 보내기를 시험 — 근거: reports/2026-10-21-gaid-library-folders/index.md#5-한계
 ## Report
+Report: reports/2026-10-21-gaid-library-folders/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

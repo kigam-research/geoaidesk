@@ -119,7 +119,7 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
         <p className="text-sm text-muted-foreground">{L("cite.body")}</p>
         <div className="flex flex-wrap gap-2">
           <Popover>
-            <PopoverTrigger asChild><Button><DownloadIcon data-icon="inline-start" />{L("export.button")}</Button></PopoverTrigger>
+            <PopoverTrigger asChild><Button variant="outline"><DownloadIcon data-icon="inline-start" />{L("export.button")}</Button></PopoverTrigger>
             <PopoverContent align="start" className="w-60 p-1.5">
               {EXPORTS.map((f) => (
                 <a key={f} href={exportUrl(f, folder.id, lang)} className="block rounded-md px-2 py-1.5 text-sm hover:bg-muted">{L(`export.${f === "csl-json" ? "csl" : f}`)}</a>

@@ -6,13 +6,13 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createProject, deleteProject, resolvePaths, type ProjectPaths } from "../src/projects.ts";
 import { withActiveProject } from "../src/scope.ts";
 import { registerGeoLibraryRoutes } from "../src/geo/routes/library.ts";
-import { LibraryStore, samePaper } from "../src/geo/library/store.ts";
+import { LibraryStore, cslYear, samePaper } from "../src/geo/library/store.ts";
 import { makeNoteCitationExtension } from "../src/geo/library/tools.ts";
 import { readStoredPdf } from "../src/geo/library/reader.ts";
 import { writeProjectLiterature } from "../src/geo/library/uses.ts";
 import { ZoteroService, reconcileFolders } from "../src/geo/library/zotero-service.ts";
 import { fakeZotero, type FakeZotero } from "./fixtures/geo-zotero-server.ts";
-import { zoteroCollectionId } from "../src/geo/library/zotero/index.ts";
+import { mapZoteroItem, zoteroCollectionId } from "../src/geo/library/zotero/index.ts";
 import type { LibraryCollection, LibraryItem } from "../../web/src/geo/contracts/library.ts";
 
 /** A minimal one-font text PDF for pdftotext. */
@@ -92,6 +92,11 @@ describe("library folders", () => {
     const bib = await server.inject({ url: `/geo/library/export?format=bibtex&collectionId=${sub.id}` });
     expect(bib.body).toContain("@article{kim2024,");
     expect(bib.body).not.toContain("hong2026");
+    // A Zotero mirror synced with string date parts still exports.
+    await store.mutate(b.id, (next) => { next.csl.issued = { "date-parts": [["2024" as unknown as number]] }; });
+    const all = await server.inject({ url: "/geo/library/export?format=bibtex" });
+    expect(all.statusCode).toBe(200);
+    expect(all.body).toContain("year = {2024}");
 
     const removed = (await server.inject({ method: "POST", url: `/geo/library/collections/${sub.id}/items`, payload: { itemIds: [b.id], action: "remove" } })).json();
     expect(removed.changed).toBe(1);
@@ -138,6 +143,11 @@ describe("library folders", () => {
     await store.mutate(item.id, (next) => { next.aliases = { ids: ["li-aaaaaaaaaaaa"], citationKeys: ["old2026"] }; });
     expect((await store.get("li-aaaaaaaaaaaa")).id).toBe(item.id);
     expect((await store.byCitationKey("old2026"))?.id).toBe(item.id);
+    // Zotero 10's CSL export writes years as strings.
+    const ref = { connection: "local" as const, serverId: "s", libraryType: "user" as const, libraryId: "0", itemKey: "AAAA1111", version: 1 };
+    const mapped = mapZoteroItem({ key: "AAAA1111", version: 1, data: { title: "T" }, csljson: JSON.stringify([{ type: "article-journal", title: "T", issued: { "date-parts": [["2023", "05"]] } }]) }, { ref, owner: "local", id: "li-eeeeeeeeeeee", now: "2026-10-21T00:00:00Z" });
+    expect(mapped.csl.issued).toEqual({ "date-parts": [[2023, 5]] });
+    expect(cslYear({ type: "book", title: "x", issued: { "date-parts": [["2021" as unknown as number]] } })).toBe(2021);
     expect(samePaper(csl("A title!", "Hong", 2026), csl("a  TITLE", "hong", 2026))).toBe(true);
     expect(samePaper(csl("A", "Hong", 2026, "10.1234/x"), csl("B", "Kim", 2020, "https://doi.org/10.1234/X"))).toBe(true);
     expect(samePaper(csl("A", "Hong", 2026, "10.1234/x"), csl("A", "Hong", 2026, "10.1234/y"))).toBe(false);

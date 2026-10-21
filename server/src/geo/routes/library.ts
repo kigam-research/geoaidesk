@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
 import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
-import { folderSubtree } from "../../../../web/src/geo/contracts/library.ts";
+import { folderSubtree, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
 import type {
   CitationResolution,
   ExportFormat,
@@ -225,7 +225,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const items = (await store.all()).filter((i) => !i.removedFromSourceAt && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
       const text = format === "text"
         ? referenceList(items, req.query?.lang === "en" ? "en" : "ko")
-        : exportBibliography(items.map((i) => ({ ...i.csl, ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
+        : exportBibliography(items.map((i) => ({ ...numericCslDates(i.csl), ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
       const ext = format === "csl-json" ? "json" : format === "bibtex" ? "bib" : format === "ris" ? "ris" : "txt";
       reply.header("Content-Type", format === "csl-json" ? "application/json" : "text/plain; charset=utf-8");
       reply.header("Content-Disposition", `attachment; filename="gaid-library.${ext}"; filename*=UTF-8''${encodeURIComponent(`${name}.${ext}`)}`);

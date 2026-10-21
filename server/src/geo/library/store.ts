@@ -65,8 +65,10 @@ export function shortAuthors(csl: CslItem, locale: "ko" | "en" = "ko"): string {
   return locale === "ko" ? `${names[0]} 외` : `${names[0]} et al.`;
 }
 
+/** First year of `issued`; Zotero's CSL export writes date parts as strings ("2023"). */
 export const cslYear = (csl: CslItem): number | undefined => {
-  const y = csl.issued?.["date-parts"]?.[0]?.[0];
+  const raw: unknown = csl.issued?.["date-parts"]?.[0]?.[0];
+  const y = typeof raw === "string" && /^-?\d{1,4}$/.test(raw.trim()) ? Number(raw) : raw;
   return typeof y === "number" && Number.isFinite(y) ? y : undefined;
 };
 

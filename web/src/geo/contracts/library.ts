@@ -149,6 +149,17 @@ export interface LibraryCollection {
   createdAt?: string;
 }
 
+/** CSL with numeric date parts: Zotero's CSL export writes them as strings ("2023"); CSL-JSON and GAID use numbers. */
+export function numericCslDates<T extends CslItem>(csl: T): T {
+  const out = { ...csl };
+  for (const field of ["issued", "accessed"] as const) {
+    const date = out[field] as { "date-parts"?: unknown[][] } | undefined;
+    if (!date || !Array.isArray(date["date-parts"])) continue;
+    (out as Record<string, unknown>)[field] = { ...date, "date-parts": date["date-parts"].map((parts) => (Array.isArray(parts) ? parts.map((p) => (typeof p === "string" && /^-?\d+$/.test(p.trim()) ? Number(p) : p)) : parts)) };
+  }
+  return out;
+}
+
 /** Folder ids of `id` and all its subfolders (cycle-safe). */
 export function folderSubtree(collections: Pick<LibraryCollection, "id" | "parentId">[], id: string): Set<string> {
   const out = new Set<string>([id]);
