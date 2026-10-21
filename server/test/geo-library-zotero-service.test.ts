@@ -44,6 +44,9 @@ describe("Zotero service", () => {
     const first = items.find((i) => i.zotero?.itemKey === "PAPER001")!;
     expect(first).toMatchObject({ source: "zotero", citationKey: "hong2026", metadataOrigin: "zotero" });
     expect((await store.collections()).map((c) => c.name)).toEqual(["광상"]);
+    // No Better BibTeX key in Zotero: a GAID alias key, stable across syncs.
+    const second = items.find((i) => i.zotero?.itemKey === "PAPER002")!;
+    expect(second.citationKey).toMatch(/^anonnd/);
     expect(first.collectionIds).toEqual([(await store.collections())[0].id]);
 
     fake.removeItem("PAPER002");
@@ -53,6 +56,9 @@ describe("Zotero service", () => {
     expect(after.find((i) => i.zotero?.itemKey === "PAPER002")?.removedFromSourceAt).toBeTruthy();
     expect(after.find((i) => i.zotero?.itemKey === "PAPER001")?.id).toBe(first.id);
     expect(after.filter((i) => !i.removedFromSourceAt)).toHaveLength(2);
+    fake.addItem("PAPER001", { collections: ["COLLECT1"], citationKey: "hong2026" }); // edited in Zotero
+    await service.syncAll();
+    expect((await store.get(first.id)).citationKey).toBe("hong2026");
   });
 
   it("reports a closed Zotero or a disabled local API without touching the library", async () => {

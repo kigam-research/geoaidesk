@@ -10,7 +10,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { LibraryCollection, LibraryItem, ZoteroLibraryState } from "../../../../web/src/geo/contracts/library.ts";
-import { LibraryError, libraryOwner, newItemId, zoteroLibraryKey, type LibraryStore } from "./store.ts";
+import { LibraryError, defaultCitationKey, libraryOwner, newItemId, zoteroLibraryKey, type LibraryStore } from "./store.ts";
 import { readStoredPdf } from "./reader.ts";
 import {
   LocalZoteroClient,
@@ -131,7 +131,17 @@ export class ZoteroService {
       // Items: upsert, then mark removed ones (and, on a full snapshot, the ones the snapshot no longer has).
       const upserted = new Set(result.upserts.map((i) => i.id));
       const previous = new Map(all.map((i) => [i.id, i]));
-      for (const item of result.upserts) await this.store.put({ ...keepGaidFiles(item, previous.get(item.id)), removedFromSourceAt: undefined });
+      // Zotero's own citation-key field is empty without Better BibTeX: give such items a stable GAID alias key
+      // (kept across syncs) so research notes can still cite them.
+      const taken = new Set(all.map((i) => i.citationKey).filter((k): k is string => Boolean(k)));
+      for (const item of result.upserts) {
+        const kept = keepGaidFiles(item, previous.get(item.id));
+        if (!kept.citationKey) {
+          kept.citationKey = previous.get(item.id)?.citationKey ?? defaultCitationKey(kept.csl, taken);
+          taken.add(kept.citationKey);
+        }
+        await this.store.put({ ...kept, removedFromSourceAt: undefined });
+      }
       const removedKeys = new Set(result.removals.map((r) => r.itemKey));
       const manifest = result.sourceItemKeys ? new Set(result.sourceItemKeys) : undefined;
       for (const item of all) {

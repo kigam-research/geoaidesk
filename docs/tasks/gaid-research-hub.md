@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T12:12:42Z
+updated: 2026-10-21T12:15:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -128,10 +128,9 @@ Blocked: child units gaid-research-hub--metadata and --zotero are in `task finis
   interfaces (library/publication data model, contracts under web/src/geo/contracts/) are settled.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+- [선택] 노트↔논문 관계 종류를 몇 가지로 고정할지 — 가) 지지함·반박함·조건을 붙임 3가지 — 나) 시험 연구자와 5가지 이하로 정함 — 권장: 가) ORKG처럼 자유 속성이 중복되는 문제를 피하고 화면이 단순함 — 막힌 일: 관계 표시 기능(나중 단계) — 근거: reports/2026-10-21-gaid-research-hub#3.12
+- [확인] RISS·DBpia를 국내 자료원으로 추가할 수 있는지(기관 이용 조건, API) — 가) 이용 조건 확인 후 추가 — 나) KCI·ScienceON·NTIS만 유지 — 권장: 가) 국내 문헌이 상용 도구의 빈 곳이지만 DBpia는 조사 근거가 없음 — 막힌 일: 국내 자료원 확대(3단계) — 근거: reports/2026-10-21-gaid-research-hub#3.12
+- [대기] Better BibTeX에 기대는 기능(원고 인용으로 Zotero 컬렉션 만들기, 인용 키 고정) — 가) Zotero 10 호환이 명시되고 #3602·#3626이 닫힌 뒤 검토 — 나) 지금 시험 — 권장: 가) 현재 열린 문제가 있음 — 막힌 일: 해당 기능 — 조건: BBT가 Zotero 10 호환을 명시 — 근거: reports/2026-10-21-gaid-research-hub#4
 ## Report
 Report: reports/2026-10-21-gaid-research-hub/index.md
 ## Running jobs
