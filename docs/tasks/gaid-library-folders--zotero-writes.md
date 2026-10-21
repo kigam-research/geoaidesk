@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T13:34:33Z
+status: ready
+updated: 2026-10-21T13:34:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8efa9960-157f-4f0e-b907-50fa7ca9186a","pid":2619537,"provider":"codex","session":"01a15e90-4520-7db2-8f1f-5d78d5373035","start":"47581455","token":"245fd43eee5872c64898ddf1d2632eb44ca2341c85e6360286ab326912a17bae"}
 branch: task/gaid-library-folders--zotero-writes
 target: task/gaid-library-folders
@@ -88,8 +88,8 @@ f1665188). Latest merged backend tests passed 2067/8 skipped and frontend tests 
 the parent's fixed distribution test passed 7/7; current merged copy/UI checks passed with no errors. Final full
 task finish recheck remains, including environment and production smoke after the latest parent changes.
 ## Next steps
-1. Rerun task finish in place to merge parent whitelist fix f1665188 and recheck the final tree. No resume or save.
-2. Parent runs task complete after the finish completion notice.
+<!-- task:closed -->
+Closed 2026-10-21T13:34:36Z: ready; the parent gaid-library-folders integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial npx tsc/vitest had missing local dependencies (not a source failure); installing the lockfile dependencies.
