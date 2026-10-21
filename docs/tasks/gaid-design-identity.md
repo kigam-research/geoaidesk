@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:14:07Z
+updated: 2026-10-21T14:17:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -78,6 +78,11 @@ methods/context/skill-hub (4ba70475), AGENTS.md UI-guide bullet.
   direction; B open orbit, D survey G weaker. Constraint found: current on-dark lettering #4D7FFF is 4.6:1 on the dark
   header #171F24 but 4.0:1 on #202B32, and light blue lettering is 4.3:1 on frame #E6EBED → keep the lockup on the
   header surface (light #F7F9FA, dark #171F24). Goes into report §3.5 as an open logo option, not a change.
+
+- gaid-library-folders route result (design-dir): its new folder UI uses role variables only; the older
+  SOURCE_TONE / COVERAGE_TONE hue badges in web/src/geo/library/library-screen.tsx (from gaid-research-hub) are left to
+  this unit. They stay as slop baseline debt while gaid-library-folders is open (edit conflict risk); replace with
+  role tokens (S7/S8) after it lands, here if still open, else as a follow-up item.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
