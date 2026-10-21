@@ -1,0 +1,11 @@
+export { identifyPdf, type PdfIdentification } from "./pdf.ts";
+export { doiCandidates, arxivCandidates, normalizeDoi } from "./identifiers.ts";
+export { createMetadataClient } from "./client.ts";
+export * from "./types.ts";
+import { createMetadataClient } from "./client.ts";
+let shared: ReturnType<typeof createMetadataClient> | undefined;
+const client = () => shared ??= createMetadataClient();
+export const lookupDoi: ReturnType<typeof createMetadataClient>["lookupDoi"] = (...args) => client().lookupDoi(...args);
+export const searchByTitle: ReturnType<typeof createMetadataClient>["searchByTitle"] = (...args) => client().searchByTitle(...args);
+export const searchKci: ReturnType<typeof createMetadataClient>["searchKci"] = (...args) => client().searchKci(...args);
+export const resolveUrl: ReturnType<typeof createMetadataClient>["resolveUrl"] = (...args) => client().resolveUrl(...args);

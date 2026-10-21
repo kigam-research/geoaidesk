@@ -36,6 +36,8 @@ import hubHandoffEn from "./hubHandoff/en.json";
 // gaid-ui-locale: upstream K-Dense screens
 import settingsKo from "./settings/ko.json";
 import settingsEn from "./settings/en.json";
+import libraryKo from "./library/ko.json";
+import libraryEn from "./library/en.json";
 import notebookKo from "./notebook/ko.json";
 import notebookEn from "./notebook/en.json";
 import researchKo from "./research/ko.json";
@@ -87,6 +89,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
   notes: pair(notesKo, notesEn),
+  library: pair(libraryKo, libraryEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),
   workflowCli: pair(workflowCliKo, workflowCliEn),

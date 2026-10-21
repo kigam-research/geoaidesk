@@ -19,6 +19,7 @@ import type {
 } from "@/geo/contracts/research-notes";
 import { noteBody, plainText, splitDecisions } from "./note-markdown";
 import { answeredCount, answersMessage, type DecisionAnswer, type DecisionAnswers } from "./decision-answers";
+import { NoteReferences } from "@/geo/library/note-references";
 
 /**
  * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
@@ -442,6 +443,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
               </div>
             )}
             {parts.after.trim() && <div className="mt-6"><MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.after}</MessageResponse></div>}
+            <NoteReferences content={data.content} />
           </div>
         )}
       </div>

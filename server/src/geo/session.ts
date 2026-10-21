@@ -5,7 +5,8 @@
  *   - `appendSystemPromptOverride` (concise geo guidance, instructions.ts)
  *   - extension factories (read hints for unsuitable large-file reads,
  *     Markdown image-path and research-note format checks after write/edit)
- *   - custom tools (geo inspection and bounded windows)
+ *   - custom tools (geo inspection and bounded windows; library search/read of the project's attached papers)
+ *   - the research-note citation check (keys must be in the researcher's library)
  *   - the research-note style skill, seeded before Pi loads skills (note-style.ts)
  */
 import type { ExtensionFactory, ToolDefinition } from "@earendil-works/pi-coding-agent";
@@ -17,6 +18,7 @@ import { makeGeoReadHintExtension } from "./read-hints.ts";
 import { markdownImageExtension } from "./markdown-images.ts";
 import { makeResearchNoteExtension } from "./notes/extension.ts";
 import { makeGeoTools } from "./tools.ts";
+import { makeLibraryTools, makeNoteCitationExtension } from "./library/tools.ts";
 import { seedNoteStyleSkill } from "./note-style.ts";
 
 export interface GeoSessionContext {
@@ -58,9 +60,10 @@ export function geoSessionParts(ctx: GeoSessionContext): GeoSessionParts {
       makeGeoReadHintExtension(ctx.projectId, ctx.paths),
       markdownImageExtension,
       makeResearchNoteExtension(ctx.paths, ctx.sessionId),
+      makeNoteCitationExtension(ctx.paths),
     ].filter(
       (factory): factory is ExtensionFactory => factory !== null,
     ),
-    customTools: makeGeoTools(ctx.projectId, ctx.paths),
+    customTools: [...makeGeoTools(ctx.projectId, ctx.paths), ...makeLibraryTools(ctx.paths)],
   };
 }

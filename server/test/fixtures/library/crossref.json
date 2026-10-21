@@ -1,0 +1,36 @@
+{
+  "message": {
+    "DOI": "10.1038/nphys1170",
+    "type": "journal-article",
+    "title": [
+      "Measured measurement"
+    ],
+    "author": [
+      {
+        "family": "Aspelmeyer",
+        "given": "Markus"
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2009,
+          1
+        ]
+      ]
+    },
+    "container-title": [
+      "Nature Physics"
+    ],
+    "volume": "5",
+    "issue": "1",
+    "page": "11-12",
+    "publisher": "Springer Science and Business Media LLC",
+    "URL": "https://doi.org/10.1038/nphys1170",
+    "ISSN": [
+      "1745-2473",
+      "1745-2481"
+    ],
+    "language": "en"
+  }
+}
