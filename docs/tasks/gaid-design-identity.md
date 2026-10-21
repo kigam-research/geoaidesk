@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:58:05Z
+updated: 2026-10-21T15:01:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -56,6 +56,10 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
 2. After an explicit choice: retarget tokens/guide/screens on this branch, notify the hub, finish. Route
    design-oneui-20261021 must get `task route-report` before finishing.
 - Done: children hub + system integrated and closed; temporary hub baseline removed; library tone debt remains.
+- One UI drafts (writer): `~/data/geoaidesk/work/gaid-design-identity/oneui/` (`oneui.html?v=a|b&s=hub|work&t=light|dark`,
+  `oneui.css`, `png/`): 가) One UI focus blocks (rounded 22 px blocks, pill buttons, grouped lists with inset dividers,
+  blue subheaders, 34 px viewing-area title, monotone #EEF0F2 ground / dark #0C0E10); 나) same structure with blocks and
+  controls cut by the G's chamfer (no radius). Reader f980bd78 (Codex 고급검토) builds its own One UI draft in `codex-oneui/`.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
