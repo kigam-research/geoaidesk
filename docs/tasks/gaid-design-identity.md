@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:34:26Z
+updated: 2026-10-21T13:43:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -44,12 +44,17 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
 - Mockups: `~/data/geoaidesk/work/gaid-design-identity/mockups/` (`screens.html?d=a|b|c&s=hub|work`, `base.css`,
   `dir-{a,b,c}.css`, rendered `png/`, `shoot.sh`; served by transient unit `gdi-mock-http` on :3399).
 - Reader 8021eb25 (task reader, general work) delivered the TDS Mobile digest `.../gaid-design-identity/tds-notes.md` (+ `tds-pages/`).
-- Proposal report written (diagnosis 10 signs, TDS adopt/skip table, three directions, 2 decisions), humanizer applied.
+- Proposal report written and revised after the user's feedback: diagnosis, TDS table, directions 가 3판/라(Codex)/나/다
+  with light+dark, dark-theme surface contract, logo candidates (writer v2 + Codex), 3 decisions.
+- Codex 고급검토 readers done: e90b5a1e (`codex/review.md`: prefers its own 라) 연구 등록부, A best of the original
+  three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
+  if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
-1. When the two Codex 고급검토 readers finish (e90b5a1e: direction review + own direction in `codex/`; efc66f40: logo
-   review + own logo candidates in `codex-logo/`), fold their results into the report: revised §3.3 (가 v2, dark theme,
-   Codex direction), new logo-candidate section with figures, updated decisions; humanizer; task review-copy; ask the user.
-2. After the choice: tell the hub (gaid-research-visuals, gaid-library-folders follow new tokens); phase 2 implements.
+1. Wait for the user's answers to report §6 (direction 가 3판 / 라 Codex / 나·다 / 섞기; dark theme now or later; logo keep /
+   Codex teal orbit / refine others). Revised report + `compare/` sent with task review-copy 2026-10-21.
+2. After the choice: tell the hub (gaid-research-visuals, gaid-library-folders follow new tokens); phase 2 implements
+   tokens + guide + hub/system screens + anti-slop checks, applying the Codex rules (no image filters, category by text,
+   amber only for action-needed states, no decorative placeholders) whichever direction is chosen.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
