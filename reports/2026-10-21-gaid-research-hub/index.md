@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/03-app-library.png
 supersedes:
+reviewed: 2026-10-21
 ---
 # 논문 수집에서 연구노트·Workflow까지 잇는 GAID 서재: 설계와 1단계 구현
 
