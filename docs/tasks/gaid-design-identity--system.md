@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T14:09:52Z
+status: ready
+updated: 2026-10-21T14:09:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e73f31b2-928f-4e58-a430-49186ac0f645","pid":1071582,"provider":"codex","session":"01a15ebe-4cf0-74d2-b30f-13e606b0b188","start":"47883007","token":"281236167c9f58c78e6908aa70ba51bc35bc9b17393c11fb2cefbff9f2d1f4c5"}
 branch: task/gaid-design-identity--system
 target: task/gaid-design-identity
@@ -80,8 +80,9 @@ Scoped checks passed: frontend typecheck, seven affected test files (72 tests), 
 Final Korean screenshots: 16 PNGs in `/home/seongin3/data/geoaidesk/work/gaid-design-identity--system/shots/`, named `{projects,workspace,note,setup}-{light,dark}-{1440,1280}.png`. Manifest with SHA-256: `.../screenshot-manifest.json`; contrast evidence: `.../role-contrast.json`. App unit stopped and browser closed. Parent integration and full scripts/check remain with the parent; no deployment.
 
 ## Next steps
-1. Parent runs `task complete gaid-design-identity--system`, integrates the hub sibling and records these results/screenshots in the canonical parent report.
-2. Parent runs full `scripts/check` and the integrated visual pass (our screenshots intentionally still show the old hub-owned banner/nav/method badges).
+<!-- task:closed -->
+Closed 2026-10-21T14:09:53Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First screenshot matrix captured theme transitions before they settled. Those early captures are not delivery evidence; final capture waits for the theme.
 - Routed notice 30c36f22b468 identifies the preview interruption: gaid-library-folders stopped our frontend/backend during a 3330/18330 port collision, then moved its instance to 3340/18340. We had already restarted our systemd instance, completed the final screenshots and stopped it. No code or user action is needed.
