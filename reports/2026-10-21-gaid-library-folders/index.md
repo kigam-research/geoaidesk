@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-folder-panel-1440.png
 supersedes:
+reviewed: 2026-10-21
 ---
 # GAID 서재 폴더와 Zotero 보내기
 
