@@ -24,6 +24,7 @@ import { registerGeoHubSharedRoutes } from "./routes/hub-shared.ts";
 import { registerGeoWorkflowViewRoutes } from "./routes/workflow-view.ts";
 import { registerGeoNoteRoutes } from "./routes/notes.ts";
 import { registerGeoCliExportRoutes } from "./routes/cli-export.ts";
+import { registerGeoLibraryRoutes } from "./routes/library.ts";
 
 export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoCatalogueRoutes(app);
@@ -44,4 +45,5 @@ export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoHubSharedRoutes(app);
   await registerGeoNoteRoutes(app);
   await registerGeoCliExportRoutes(app);
+  await registerGeoLibraryRoutes(app);
 }

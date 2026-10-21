@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic response shaped by the official KCI articleSearch field table; not a recorded keyed API call. -->
+<MetaData><result><total>1</total></result><outputData><record>
+  <journalInfo><journal-name>합성 학술지</journal-name><publisher-name>합성 학회</publisher-name><pub-year>2024</pub-year><volume>2</volume><issue>1</issue></journalInfo>
+  <articleInfo article-id="synthetic"><title-group><article-title lang="original"><![CDATA[지질 연구]]></article-title><article-title lang="english">Geological research</article-title></title-group>
+    <author-group><author english="Kim, Research">김연구(합성연구원)</author></author-group><fpage>1</fpage><lpage>10</lpage><doi>10.1000/synthetic</doi><url>https://example.org/synthetic</url>
+  </articleInfo>
+</record></outputData></MetaData>
