@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:58:23Z
+updated: 2026-10-21T14:14:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -50,6 +50,7 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
   three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
   if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
+Blocked: waiting for child finishes (gaid-design-identity--hub and --system are running task finish with full scripts/check); then `task complete` each.
 Phase 2 (implementation of direction 라, light + dark). Orchestration:
 - Sequential, done by the writer first (shared interface): tokens in `web/src/app/globals.css` (light `:root`, `.dark`,
   `--gaid-*` surface/role variables + Tailwind `*-gaid-*` colours), self-hosted Pretendard (`web/public/fonts/`), UI guide v2
@@ -71,6 +72,12 @@ methods/context/skill-hub (4ba70475), AGENTS.md UI-guide bullet.
 1. Next action: when each child finishes, `task complete gaid-design-identity--<child>`; then rerun `scripts/check`
    (repo ui test fails until both children land), screenshots light/dark 1440×900 + 1280×800 from my instance, add
    phase-2 results to the report (§3.6), logo exploration results, humanizer, review-copy, `task finish`.
+
+- Reader a2a44d17 done: `logo-explore/review.md` + `sheet.png`: keep current logo; A "Clear orbit" (wider teal lower
+  contour, on-dark #A4BCFF/#68C9C2) best refinement, C "Stratum G" (faceted G with a dipping teal horizon) best new
+  direction; B open orbit, D survey G weaker. Constraint found: current on-dark lettering #4D7FFF is 4.6:1 on the dark
+  header #171F24 but 4.0:1 on #202B32, and light blue lettering is 4.3:1 on frame #E6EBED → keep the lockup on the
+  header surface (light #F7F9FA, dark #171F24). Goes into report §3.5 as an open logo option, not a change.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
