@@ -871,6 +871,18 @@
       "owner": "gaid-research-hub--metadata",
       "status": "added",
       "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "web/src/app/globals.css, web/public/fonts/",
+      "owner": "gaid-design-identity",
+      "status": "edited",
+      "responsibility": "Direction 라 palette mapped onto the shadcn role variables (light :root, .dark), GAID surface/role variables and their Tailwind colour mappings, self-hosted Pretendard 1.3.9 (OFL) @font-face, themed selection/scrollbars"
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/components/project-view.tsx, web/src/components/workflows-panel.tsx, web/src/components/ui/button.tsx, web/src/components/ui/badge.tsx, web/src/components/ui/card.tsx, web/src/components/ui/tabs.tsx, web/src/components/ui/input.tsx",
+      "owner": "gaid-design-identity",
+      "status": "edited",
+      "responsibility": "Visual identity (UI guide sections 4/4a): surfaces, register rows, removal of AI symbols, gradients, hue utilities and decorative tiles on the GAID primary path; behaviour and copy unchanged"
     }
   ],
   "notTouched": [

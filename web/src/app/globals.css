@@ -28,6 +28,16 @@
   background: rgba(59, 130, 246, 0.35);
 }
 
+/* Pretendard 1.3.9 variable (SIL OFL 1.1, licence in web/public/fonts/PRETENDARD-LICENSE.txt); self-hosted so
+   every OS renders the same brand face. */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations"), url("/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -43,6 +53,20 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-gaid-frame: var(--gaid-frame);
+  --color-gaid-header: var(--gaid-header);
+  --color-gaid-paper: var(--gaid-paper);
+  --color-gaid-body: var(--gaid-body);
+  --color-gaid-link: var(--gaid-link);
+  --color-gaid-line-strong: var(--gaid-line-strong);
+  --color-gaid-success: var(--gaid-success);
+  --color-gaid-warning: var(--gaid-warning);
+  --color-gaid-warning-bg: var(--gaid-warning-bg);
+  --color-gaid-danger: var(--gaid-danger);
+  --color-gaid-pending-bg: var(--gaid-pending-bg);
+  --color-gaid-untested: var(--gaid-untested);
+  --color-gaid-nodata: var(--gaid-nodata);
+  --color-gaid-brand-hover: var(--gaid-brand-hover);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -73,46 +97,64 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* GAID visual identity (gaid-design-identity, direction 라 "연구 등록부", user decision 2026-10-21).
+   Surface contract: --gaid-frame = navigation/tool panes and hub ground; --background = work surface;
+   --card/--gaid-paper = the researcher's own content (notes, documents, result summaries); imported figures,
+   PDFs and maps keep their original pixels. One action blue; amber only for states that need an action.
+   Rules and rationale: docs/design/ui-guide.md section 4. */
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  --background: #f7f9fa;
+  --foreground: #192a32;
   --card: #ffffff;
-  --card-foreground: #0a0a0a;
+  --card-foreground: #192a32;
   --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
+  --popover-foreground: #192a32;
   --primary: #1f5eff;
   --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #0a0a0a;
-  --muted: #f8fafc;
-  --muted-foreground: #71717a;
-  --accent: #eef3ff;
-  --accent-foreground: #3f3f46;
-  --destructive: #b91c1c;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #1f5eff;
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #3f3f46;
+  --secondary: #e6ebed;
+  --secondary-foreground: #192a32;
+  --muted: #e6ebed;
+  --muted-foreground: #536771;
+  --accent: #dce6ff;
+  --accent-foreground: #174ed2;
+  --destructive: #b42318;
+  --border: #c4ced3;
+  --input: #74868f;
+  --ring: #174ed2;
+  --chart-1: #1f5eff;
+  --chart-2: #0b8a7a;
+  --chart-3: #b86e00;
+  --chart-4: #6b5bd2;
+  --chart-5: #c2410c;
+  --sidebar: #e6ebed;
+  --sidebar-foreground: #192a32;
   --sidebar-primary: #1f5eff;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef3ff;
-  --sidebar-accent-foreground: #0a0a0a;
-  --sidebar-border: #e4e4e7;
-  --sidebar-ring: #1f5eff;
-  --radius: 10px;
+  --sidebar-accent: #dce6ff;
+  --sidebar-accent-foreground: #174ed2;
+  --sidebar-border: #c4ced3;
+  --sidebar-ring: #174ed2;
+  --radius: 6px;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --gaid-ink: #0a0a0a;
-  --gaid-body: #3f3f46;
-  --gaid-muted: #71717a;
-  --gaid-subtle-alt: #f6f7f9;
+  --gaid-frame: #e6ebed;
+  --gaid-header: #f7f9fa;
+  --gaid-paper: #ffffff;
+  --gaid-ink: #192a32;
+  --gaid-body: #384f59;
+  --gaid-muted: #536771;
+  --gaid-link: #174ed2;
+  --gaid-line-strong: #536771;
+  --gaid-subtle-alt: #eef2f4;
   --gaid-brand-hover: #1749cc;
+  --gaid-brand-on-dark: #4d7fff;
   --gaid-success: #15803d;
-  --gaid-warning: #a16207;
-  --gaid-danger: #b91c1c;
-  --gaid-untested: #71717a;
-  --gaid-nodata: #a1a1aa;
+  --gaid-warning: #854400;
+  --gaid-warning-bg: #f7e9d7;
+  --gaid-danger: #b42318;
+  --gaid-pending-bg: #e1e7ea;
+  --gaid-untested: #536771;
+  --gaid-nodata: #5f7079;
   --gaid-body-size: 14px;
   --gaid-h1-size: 20px;
   --gaid-h2-size: 16px;
@@ -123,40 +165,59 @@
   --gaid-motion-fast: 150ms;
   --gaid-motion-base: 200ms;
   --gaid-easing: cubic-bezier(0.2, 0, 0, 1);
+  color-scheme: light;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #202b32;
+  --foreground: #edf2f4;
+  --card: #27343c;
+  --card-foreground: #edf2f4;
+  --popover: #27343c;
+  --popover-foreground: #edf2f4;
+  --primary: #a4bcff;
+  --primary-foreground: #142137;
+  --secondary: #171f24;
+  --secondary-foreground: #edf2f4;
+  --muted: #171f24;
+  --muted-foreground: #abbcc5;
+  --accent: #303f5d;
+  --accent-foreground: #d7e2ff;
+  --destructive: #ffa59c;
+  --border: #465963;
+  --input: #8298a4;
+  --ring: #a4bcff;
+  --chart-1: #a4bcff;
+  --chart-2: #5fcfbf;
+  --chart-3: #f1c789;
+  --chart-4: #b9aef5;
+  --chart-5: #ffa77a;
+  --sidebar: #171f24;
+  --sidebar-foreground: #edf2f4;
+  --sidebar-primary: #a4bcff;
+  --sidebar-primary-foreground: #142137;
+  --sidebar-accent: #303f5d;
+  --sidebar-accent-foreground: #d7e2ff;
+  --sidebar-border: #465963;
+  --sidebar-ring: #a4bcff;
+  --gaid-frame: #171f24;
+  --gaid-header: #171f24;
+  --gaid-paper: #27343c;
+  --gaid-ink: #edf2f4;
+  --gaid-body: #c8d3d8;
+  --gaid-muted: #abbcc5;
+  --gaid-link: #a4bcff;
+  --gaid-line-strong: #abbcc5;
+  --gaid-subtle-alt: #26323a;
+  --gaid-brand-hover: #c1d1ff;
+  --gaid-success: #7fd3a0;
+  --gaid-warning: #f1c789;
+  --gaid-warning-bg: #493b29;
+  --gaid-danger: #ffa59c;
+  --gaid-pending-bg: #35454e;
+  --gaid-untested: #abbcc5;
+  --gaid-nodata: #9aabb4;
+  color-scheme: dark;
 }
 
 @layer base {
@@ -200,3 +261,7 @@ body {
 }
 pre, code, kbd { word-break: normal; overflow-wrap: anywhere; }
 table, .gaid-numeric { font-variant-numeric: tabular-nums; }
+
+/* Browser surfaces follow the palette (impeccable craft floor). */
+::selection { background: var(--accent); color: var(--accent-foreground); }
+* { scrollbar-color: var(--input) transparent; }

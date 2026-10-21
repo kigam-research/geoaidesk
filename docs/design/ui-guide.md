@@ -1,13 +1,24 @@
-# GAID UI/UX guide v1
+# GAID UI/UX guide v2
 
-Status: structure, rules and default values approved by the user on 2026-10-16 ("승인한다."); before/after screens and visual review in gaid-ui-guide. Machine-readable values: `geo/ui/ui-rules.json`. Checks:
+Status: v1 structure, rules and default values approved by the user on 2026-10-16 ("승인한다."); before/after screens and
+visual review in gaid-ui-guide. v2 (gaid-design-identity, 2026-10-21) adds the GAID visual identity: direction 라
+"연구 등록부" chosen by the user, light and dark themes, the brand and anti-slop rules (section 4 and 4a) and the TDS
+Mobile adaptations (G5, F6, F7, Q7, B6). Machine-readable values: `geo/ui/ui-rules.json`. Checks:
 `node geo/ui/check-ui.mjs` (run by `scripts/check`). Copy voice and wording stay in `geo/copy/gaid-writing.md` and
-`geo/copy/terminology.csv`; colours, fonts, radius and motion tokens stay in `geo/copy/gaid-app.css` (vendored WP00
-kit). This guide decides layout, density, components, states and what a researcher sees.
+`geo/copy/terminology.csv`. Colour, font, radius and motion tokens live in `web/src/app/globals.css` (`:root` light,
+`.dark` dark); `geo/copy/gaid-app.css` is the vendored WP00 kit and is no longer the source of app values. Logo use:
+`geo/brand/README.md`. This guide decides layout, density, components, states, visual identity and what a researcher sees.
 
 User request (2026-10-16, verbatim): "현재 gaid ui/ux 시스템과 관련하여 https://developer.samsung.com/one-ui 를 적극 참고하여
 ui/ux 가이드를 개선하자. 현재는 에이전트가 스스로 판단하여 개발하였지만 이제부터는 올바른 가이드를 기반으로 해서 시스템을 구축하게
 하고 싶다."
+
+User request for v2 (2026-10-21, verbatim): "GAID 허브와 GAID 시스템에서 디자인 가이드와 관련하여 ONEUI 가이드를 기반으로 작성된
+것으로 이해하고 있다. 추가 디자인 가이드로 https://tossmini-docs.toss.im/tds-mobile/ 가 있으며, 현재 GAID 허브와 GAID 시스템의
+디자인에서 AISlop을 피하면서 독자적인 브랜딩으로 ui/ux시스템이 인식 될 수 있게 디자인을 개선하고 싶다." Decision (verbatim): "1번 라로
+하거나 현재 방식 유지다. 새로 제안한 디자인이 적절한 것이 없다. 2번 (가) 3번 (가)로 하고 (다)로 더 다듬거나 새롭게 디자인하는 것도
+고려하자. 디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서 디자인해야한다." Evidence and alternatives:
+`reports/2026-10-21-gaid-design-identity/index.md`.
 
 Earlier user requirements this guide carries (verbatim):
 - "항상 새로운 시스템을 이용자는 너무 많은 정보량이 플랫폼이나 시스템에서 제공되면 역치를 넘어서지 못하고 포기하거나 유입에서
@@ -27,7 +38,11 @@ adapts; section 11 lists where GAID deliberately differs.
 
 ## How agents use this guide
 
-1. Before any change to visible UI, read sections 1 and 9 and the sections for the components you touch.
+1. Before any change to visible UI, read sections 1, 4, 4a and 9 and the sections for the components you touch.
+   Design as an impeccable + design-taste-frontend + brand-guide expert (user rule 2026-10-21): read the impeccable
+   craft floor and critique criteria and the taste anti-tell sections (skill_hub `.claude/skills/impeccable/`,
+   `.claude/skills/design-taste-frontend/`; taste governs discovery screens such as the hub, not dense tool panes) and
+   `geo/brand/README.md`, and review the result against them before reporting.
 2. In the change report, list the rule ids the change follows (for example `P1 Q1–Q5 R1`) and any rule it breaks,
    with the reason. Accepted debt goes in `geo/ui/ui-baseline.json` only with that reason.
 3. Visual review (changes to layout, density, components or states; a pure wording change needs none): screenshot the
@@ -35,7 +50,7 @@ adapts; section 11 lists where GAID deliberately differs.
    screenshots to the report.
 4. Run `node geo/ui/check-ui.mjs` (part of `scripts/check`).
 
-Rule ids: P principles, L layout, T type, S colour and states, B buttons, N navigation and tabs, D dialogs and
+Rule ids: P principles, L layout, T type, S colour and states, V visual identity and anti-slop, B buttons, N navigation and tabs, D dialogs and
 popovers, Q questions, G lists and cards, X tables, MAP map panels, F feedback (progress, toasts, empty and error
 states), M motion, A accessibility, W copy length and density, R what researchers never see.
 
@@ -65,7 +80,10 @@ states), M motion, A accessibility, W copy length and density, R what researcher
 
 ## 3. Typography
 
-Font: Pretendard (open licence) as set in `gaid-app.css`; D2Coding for code and paths. GAID does not use One UI Sans.
+Font: Pretendard Variable 1.3.9 (SIL OFL 1.1), self-hosted from `web/public/fonts/` through `@font-face` in
+`globals.css`, so every OS renders the same face; it is the only visible typeface (direction 라). Code and paths use the
+monospace stack (D2Coding when installed). Tabular figures come from Pretendard's numeric feature, not a second font.
+GAID does not use One UI Sans or Toss Product Sans.
 
 | Id | Rule | One UI source |
 |---|---|---|
@@ -76,19 +94,63 @@ Font: Pretendard (open licence) as set in `gaid-app.css`; D2Coding for code and 
 | T5 | **Numbers** in tables, coordinates and statistics use tabular figures (`table, .gaid-numeric`). | — (GAID) |
 | T6 | **Text scales to 200%** (browser zoom) without lost content or overlapping controls; long labels wrap or truncate with a tooltip, never clip silently. | Accessibility / Layout and typography "Scalable text", "Large text layout" |
 
-## 4. Colour and states
+## 4. Colour, surfaces and states
 
-Colours come from `gaid-app.css` by role; components never hard-code hex values (`check-ui.mjs` styles check). Data
-palettes for maps and depth tracks are the exception (`ui-rules.json` `styles.hexAllowFiles`).
+Colours come from `globals.css` by role; components never hard-code hex values or Tailwind hue utilities
+(`check-ui.mjs` styles and slop checks). Data palettes for maps and depth tracks are the exception
+(`ui-rules.json` `styles.hexAllowFiles`).
 
-| Id | Rule | One UI source |
+**Surface contract (direction 라, "연구 등록부").** Three surfaces, one meaning each, in both themes:
+
+| Surface | Token (Tailwind) | Light | Dark | Holds |
+|---|---|---|---|---|
+| Frame | `--gaid-frame` (`bg-gaid-frame`), also `--muted`, `--sidebar` | #E6EBED | #171F24 | Navigation, file tree, Workflow list, tool panels, hub ground |
+| Work surface | `--background` (`bg-background`), header `--gaid-header` | #F7F9FA | #202B32 | Central work pane, inputs, tables, dialogs' body |
+| Paper | `--card` / `--gaid-paper` (`bg-card`) | #FFFFFF | #27343C | The researcher's own content: research notes, documents, result summaries |
+
+Imported figures, PDFs, rasters and basemaps are content, not surfaces: they keep their original pixels in both themes
+inside a neutral frame (V6). Separation comes from 1 px lines (`--border` #C4CED3 / #465963 for items,
+`--gaid-line-strong` for one major boundary per view) and from the surface steps, not from shadows or cards.
+
+| Id | Rule | Source |
 |---|---|---|
-| S1 | **Roles.** Text `--foreground`; secondary text `--muted-foreground`; surfaces `--background`/`--muted`; action `--primary` (hover `--gaid-brand-hover`); focus `--ring`; borders `--border`; meaning `--gaid-success`, `--gaid-warning`, `--gaid-danger`, `--gaid-untested`, `--gaid-nodata`. | Color / Color system "Basic system color", "Informative color" |
-| S2 | **Calm large areas, colour on small areas.** Backgrounds and cards stay neutral; the accent marks the primary action, the selection and focus. No gradients in work areas. Use at most one coloured status badge per row. | Color / Color system "Background color" (calm colours for large areas, bright ones only for small areas), "Focus block color" |
-| S3 | **Meaning never by colour alone.** Every status colour has a text label or icon; check the screen in greyscale. Status colours keep the same meaning in light and dark themes. | Accessibility / Color and contrast "Use of color"; Color system "Informative color" |
-| S4 | **Contrast.** Text ≥ 4.5:1, large text (≥ 24 px, or ≥ 18.7 px bold) ≥ 3:1, control boundaries and focus rings ≥ 3:1. | Accessibility / Color and contrast "Minimum contrast ratio" (thresholds expressed in WCAG CSS px, not dp) |
-| S5 | **States.** Every interactive element has default, hover, focus-visible (2 px `--ring`), pressed/selected, disabled. A disabled primary action shows why it is disabled next to it (one line). Loading replaces the label with progress text, keeps the width. | Accessibility / Screen reader (status is part of every element); Interaction and control |
-| S6 | **Dark mode** is checked before release for any screen that shows images or maps; map basemaps may stay light. | Color / Theme |
+| S1 | **Roles.** Text `--foreground` (#192A32 / #EDF2F4); secondary text `--gaid-body`; metadata `--muted-foreground`; action `--primary` (#1F5EFF / #A4BCFF, text `--primary-foreground`); link, active tab and focus `--gaid-link` / `--ring` (#174ED2 / #A4BCFF); selection `--accent` + `--accent-foreground`; control outline `--input`; meaning `--gaid-success`, `--gaid-warning` (+ `--gaid-warning-bg`), `--gaid-danger`, `--gaid-untested`, `--gaid-nodata`, neutral state chips `--gaid-pending-bg`. | One UI Color system "Basic system color", "Informative color"; TDS background roles |
+| S2 | **Calm large areas, colour on small areas.** Surfaces stay neutral; the one blue marks the primary action, the active place and focus. No gradients anywhere in the app UI. At most one coloured status badge per row. | One UI Color system "Background color" |
+| S3 | **Meaning never by colour alone.** Every status colour has a text label; check the screen in greyscale. Status colours keep the same meaning in both themes. | One UI Accessibility "Use of color" |
+| S4 | **Contrast.** Text ≥ 4.5:1 (also secondary and metadata text on every surface it sits on), large text ≥ 3:1, control boundaries and focus rings ≥ 3:1. | One UI Accessibility "Minimum contrast ratio" |
+| S5 | **States.** Every interactive element has default, hover, focus-visible (2 px `--ring`, 2–3 px offset), pressed/selected, disabled. A disabled primary action shows why it is disabled next to it (one line). Loading replaces the label with progress text and keeps the width. | One UI Accessibility; TDS Button (stable-width loading) |
+| S6 | **Light and dark themes.** Both are supported (`next-themes`: light, dark, system; the choice persists). Dark keeps the same hierarchy, not the same hex values: frame darkest, paper one step lighter. Never invert or filter images, PDFs or maps for dark mode; a white figure or light basemap inside a dark frame is correct. Check every changed screen in both themes. | One UI Color / Theme; user decision 2026-10-21 (dark theme in phase 2) |
+| S7 | **Amber means "act".** `--gaid-warning` on `--gaid-warning-bg` is only for states the researcher must resolve (`환경 준비 필요`). Routine states (`미시험`, `검토 전`, `결정 3`) use neutral text or a `--gaid-pending-bg` chip; success green only for a verified positive outcome. | Codex review 2026-10-21 (report §3.3) |
+| S8 | **Category is text.** Workflow families, folders and topics are named in text (`광상 부존 가능성`), not colour-coded with stripes, tinted cards or per-category icon colours. Colour may encode a category only inside a data visualisation that needs comparison. | report §3.3 (direction 라) |
+
+## 4a. Visual identity and anti-slop (V)
+
+GAID is recognised by its register layout (flat rails of aligned rows beside a paper surface for the researcher's
+content), the one blue, Pretendard, precise 1 px lines and the angular orbital G, not by decoration. These rules apply
+the impeccable craft floor and the taste anti-tells to GAID; `check-ui.mjs` (`slop`) enforces the mechanical ones.
+
+| Id | Rule |
+|---|---|
+| V1 | **Logo.** The angular G + tilted orbit lockup is the only brand graphic (`geo/brand/README.md`: colour on light, on-dark on dark, ≥ 24 px in UI, never recoloured, cropped, animated or used as a bullet/selection icon). |
+| V2 | **No generic AI symbols.** No Sparkles, Wand, Bot, BrainCircuit or similar "AI" icons, no emoji as icons. Places are named by text or a functional icon (`lucide` at 16 px, one stroke weight). |
+| V3 | **No decorative surfaces.** No gradients, glass/backdrop blur, glow, coloured shadows, noise textures or animated backgrounds. Depth is surface step + 1 px line. |
+| V4 | **Register, not card grids.** Lists are rows on the frame separated by 1 px lines with aligned metadata columns. No grids of same-size icon + heading + text cards, no nested cards, no icon tile before every row. A card (paper surface) is allowed for one featured item or the researcher's own content. |
+| V5 | **Headings speak for themselves.** No eyebrow/kicker label above a heading; no icon before section headings unless it is the control; no section numbers unless the sequence matters. |
+| V6 | **Images are evidence.** Show original pixels (`object-fit: contain`, no CSS `filter`, opacity or blend on images, figures, PDFs, maps). An absent image stays absent: no contour, pattern or icon placeholder that suggests data. Concept pictures carry the `개념도` label. |
+| V7 | **Lines and radius.** 1 px item and control lines, 2 px active tab baseline, 3 px active top-navigation baseline; no coloured left/right borders wider than 1 px on rows or callouts. Radius: 0 for panes and rows, 2–4 px (`--radius-sm`/`--radius-md`) for controls and chips, 6 px (`--radius-lg`) only for floating surfaces (popover, dialog, menu). |
+| V8 | **Type.** Pretendard only, weights 400/500/600–650, sizes from T1; hub titles may use 24 px. Monospace only for code, paths and raw values, never as a "technical" costume. |
+| V9 | **Browser surfaces are themed.** Selection, scrollbars, focus rings and caret follow the palette (`globals.css`). |
+| V10 | **Concept pictures.** Generated pictures are labelled concepts, never data. Prefer a real output preview when one exists. |
+
+TDS Mobile adaptations (read 2026-10-21; patterns only, no Toss assets, palette values or Toss Product Sans):
+
+| Id | Rule | TDS source |
+|---|---|---|
+| G5 | **Row anatomy.** A list row has three slots: optional leading identifier (file type icon, avatar), title + one secondary line, trailing state or action. Metadata aligns in columns across rows. | ListRow, TableRow |
+| F6 | **Result pattern.** Empty, error and completion panes state the outcome as a title, one line of explanation and one next action; no generic success art. | Result |
+| F7 | **Skeleton vs loader.** Use a skeleton shaped like the final rows when the structure is known; a named progress line (F1) when it is not. Keep existing content visible while refreshing. | Skeleton, Loader |
+| Q7 | **Labels and units.** Inputs keep a persistent label above the field; units are a suffix (`km`, `m`); help and error text sit under the field. Read-only values look different from disabled ones. | TextField |
+| B6 | **Badge weight.** Routine state = weak chip (neutral background, text); exceptional state = the S7 amber chip. Never more than one filled chip per row. | Badge |
 
 ## 5. Components
 
@@ -141,7 +203,7 @@ picker or stepper component page; Q1–Q6 apply its Writing principles and the u
 | G1 | List row title ≤ 30 Korean / 60 English characters on one line (noun or short verb phrase); one line of secondary text at most; details open on click (detail pane or popover). | Components / Lists "Main text" (≤ 31 characters; subtext on the detail page) |
 | G2 | Toggles sit at the right of the row; status badges at most 3 per row (W5), short nouns, each with a tooltip saying what it means. The researcher's own assessment (`수정 필요`) is shown as an assessment line, not as a badge next to package properties. | Lists; Layout / Basic layout "Text + Controller" |
 | G3 | Long lists get search with recent and suggested entries when empty, and subheaders for groups ordered by use. | Components / Search; Lists "Subheader" |
-| G4 | Cards in a grid show title, one line of description (clamped) and at most one action; the rest is in the detail view. | Layout / Basic layout "Multiple card type" |
+| G4 | Discovery lists (hub catalogue, recommendations) are register rows (V4): title, one clamped line, aligned metadata, at most one action; a small labelled concept preview may sit at the row end. Same-size card grids are not used. | Layout / Basic layout "Multiple card type"; impeccable craft floor |
 
 ### Tables (X)
 
@@ -249,6 +311,8 @@ Use for every UI change (author) and every review (reviewer), with screenshots a
 8. Tables: sort/filter per column, ≤ 8 columns by default, state line (X1–X4).
 9. Colour roles only, status has text, contrast, greyscale check (S1–S4).
 10. Keyboard path through the change; focus ring visible; names on icon buttons (A1–A3).
+11. Both themes: the screen in light and dark, images unfiltered, amber only for action-needed states (S6, S7, V6).
+12. Identity: no AI symbols, gradients, eyebrows, card grids, coloured side stripes or decorative placeholders (V2–V7).
 
 ## 11. Where GAID deliberately differs from One UI
 
@@ -260,15 +324,23 @@ Use for every UI change (author) and every review (reviewer), with screenshots a
 | Confirmations phrased as questions (Writing / Empowering) | Statement titles; action-named buttons | GAID copy rule (gaid-writing.md), user-approved WP00 kit |
 | Motion up to 500 ms; lively, 3D and decorative animation (Motion basics) | ≤ 300 ms, functional motion only | Research work tool; repeated use; reduced distraction |
 | One button style per screen; flat buttons inside dialogs and toolbars (Buttons) | Mixed emphasis levels with exactly one filled primary per view, also in dialogs (B1) | Desktop dialogs need a clear default action; one primary keeps the focus rule |
-| Samsung blue palette (#0072de, #3e91ff, #0381fe) and One UI Sans | GAID WP00 colours (`--primary` #1f5eff) and Pretendard | No Samsung assets or proprietary fonts; GAID brand kit |
-| Button corner radius 18 dp (pill) in the Android sample | `--radius-md` (8 px) | GAID token set; dense desktop controls |
+| Samsung blue palette (#0072de, #3e91ff, #0381fe) and One UI Sans | GAID palette (section 4: action #1F5EFF, cool neutral frame) and self-hosted Pretendard | No Samsung or Toss assets or proprietary fonts; GAID brand kit |
+| Button corner radius 18 dp (pill) in the Android sample | `--radius-md` (4 px) | Direction 라: register rows and precise controls (V7) |
 | Toast up to 3 lines | Toast ≤ 2 lines, prefer 1 | Korean strings wrap sooner at desktop toast width |
 | List main text ≤ 31 characters (English) | 30 Korean / 60 English | Korean characters carry more meaning per character |
 | No minimum target size stated | 24×24 px minimum (WCAG 2.2) | One UI gives only 8 dp spacing |
 | Alternative gradients for backgrounds and focus blocks (Color system "Background color") | Neutral surfaces, no gradients in work areas (S2) | Data colours on maps and charts need a calm, neutral ground |
-| Dark mode as a primary comfort feature | Light theme first (WP00 v1), dark mode checked for maps/images | WP00 tokens ship light mode only in v1 |
+| Dark mode as a primary comfort feature | Light and dark themes with the same surface contract; images never inverted (S6) | User decision 2026-10-21 |
 
 ## 12. Source pages
+
+v2 sources (2026-10-21): TDS Mobile https://tossmini-docs.toss.im/tds-mobile/ (start, foundation/colors,
+foundation/typography and 34 component pages; digest with per-page URLs and hashes outside Git:
+`~/data/geoaidesk/work/gaid-design-identity/tds-notes.md`); impeccable 4.3.1 and design-taste-frontend skills
+(skill_hub `.claude/skills/`); Codex 고급검토 reviews `~/data/geoaidesk/work/gaid-design-identity/codex/review.md` and
+`codex-logo/review.md`.
+
+v1 sources:
 
 All read on 2026-10-16. Digest with per-page notes (not in Git): `~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`.
 Independent cross-check (ChatGPT Pro web research, same date) agreed on the cited values and found no One UI type scale,

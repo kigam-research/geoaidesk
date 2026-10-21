@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:43:36Z
+updated: 2026-10-21T13:53:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -50,17 +50,31 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
   three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
   if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
-1. Wait for the user's answers to report §6 (direction 가 3판 / 라 Codex / 나·다 / 섞기; dark theme now or later; logo keep /
-   Codex teal orbit / refine others). Revised report + `compare/` sent with task review-copy 2026-10-21.
-2. After the choice: tell the hub (gaid-research-visuals, gaid-library-folders follow new tokens); phase 2 implements
-   tokens + guide + hub/system screens + anti-slop checks, applying the Codex rules (no image filters, category by text,
-   amber only for action-needed states, no decorative placeholders) whichever direction is chosen.
+Phase 2 (implementation of direction 라, light + dark). Orchestration:
+- Sequential, done by the writer first (shared interface): tokens in `web/src/app/globals.css` (light `:root`, `.dark`,
+  `--gaid-*` surface/role variables + Tailwind `*-gaid-*` colours), self-hosted Pretendard (`web/public/fonts/`), UI guide v2
+  (sections 4, 4a, G4/G5, F6/F7, Q7, B6, S6–S8, V1–V10, checklist 11–12), `geo/ui/ui-rules.json`, boundaries entries.
+- Independent packages (child writers, "general work"), file ownership:
+  - `hub`: `web/src/geo/hub/**`, `web/src/geo/hub-picker/**`, `web/src/geo/workflow/**`, hub locales only if a string must
+    change (no copy changes planned).
+  - `system`: `web/src/app/page.tsx` (header/workspace chrome), `web/src/components/project-view.tsx`,
+    `web/src/components/workflows-panel.tsx`, `web/src/geo/workspace/**`, `web/src/geo/notes/**`, `web/src/components/ui/{button,badge,card,tabs,input}.tsx`.
+  - writer: `geo/ui/check-ui.mjs` slop checks + `ui-rules.json` slop block + `ui-baseline.json`, guide, tokens, report,
+    final screenshots (light/dark, 1440×900 + 1280×800).
+  - Integration order: writer tokens/guide (saved) → children in parallel → `task complete` each → slop baseline → checks.
+- Exploration (reader, non-blocking): further logo refinement / new logo design per the user's 3(다) remark.
+1. Next action: save the shared interface, start children `hub` and `system`, implement slop checks meanwhile.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
   short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
 - playwright-cli cannot render `file://` mockups (blank page); serve them over http.
 ## Notes and decisions
+- USER DECISIONS 2026-10-21 (verbatim): "1번 라로 하거나 현재 방식 유지다. 새로 제안한 디자인이 적절한 것이 없다. 2번 (가) 3번 (가)로
+  하고 (다)로 더 다듬거나 새롭게 디자인하는 것도 고려하자. 디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서
+  디자인해야한다." Interpreted (told the user, correction invited): direction = 라) 연구 등록부 (Codex `codex/dir-d.css`),
+  not the 섞기 option that shared the label; dark theme in phase 2; logo kept, with further refinement/new logo design as
+  an exploration. Design lens rule → UI guide (repo) + memory. Hub notified (request fded6f8b87d6, kind route).
 - User 2026-10-21 after the first proposal (verbatim): "가 도면은 권장하는데 여전히 흰색 배경이 작동하는 부분들이 있지 않나? 그리고
   다크테마는 어떻게 할 것인지도 고민해야한다. impeccable 스킬과 taste 스킬로 검토해볼 필요가 있다. codex 고급검토에게 검토도 받고 codex가
   시각방향을 제안하게도 해보아야 한다. 로고의 경우 그대로 두어도 된다. 그런데 후보군으로 KIGAM로고의 G에 위치한 3가지 색상을 로고에

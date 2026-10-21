@@ -1,10 +1,10 @@
 {
   "version": 1,
   "guide": "docs/design/ui-guide.md",
-  "note": "Machine-readable part of the GAID UI guide. check-ui.mjs reads locales, copyLength, internals and styles; tokens and components are the values the guide states, for agents and mockups. Colours, fonts, radius and motion come from geo/copy/gaid-app.css (vendored WP00 tokens) and are referenced by CSS variable, not repeated.",
+  "note": "Machine-readable part of the GAID UI guide. check-ui.mjs reads locales, copyLength, internals, styles and slop; tokens and components are the values the guide states, for agents and mockups. Colours, fonts, radius and motion come from web/src/app/globals.css (:root light, .dark dark; direction 라 since gaid-design-identity) and are referenced by CSS variable, not repeated.",
   "locales": { "dir": "web/src/geo/locales", "locales": ["ko", "en"] },
   "tokens": {
-    "source": "geo/copy/gaid-app.css",
+    "source": "web/src/app/globals.css", "themes": ["light", "dark"], "font": "Pretendard Variable 1.3.9 (OFL), self-hosted in web/public/fonts/, the only visible typeface",
     "spacing": { "unitPx": 4, "scalePx": [4, 8, 12, 16, 24, 32, 48], "tailwind": ["1", "2", "3", "4", "6", "8", "12"] },
     "type": {
       "captionPx": 12, "bodyPx": "var(--gaid-body-size)", "subtitlePx": "var(--gaid-h2-size)", "titlePx": "var(--gaid-h1-size)",
@@ -15,11 +15,13 @@
       "roles": {
         "text": "--foreground", "textSecondary": "--muted-foreground", "surface": "--background", "surfaceSubtle": "--muted",
         "action": "--primary", "actionHover": "--gaid-brand-hover", "focus": "--ring", "border": "--border",
-        "success": "--gaid-success", "warning": "--gaid-warning", "danger": "--gaid-danger", "untested": "--gaid-untested", "noData": "--gaid-nodata"
+        "success": "--gaid-success", "warning": "--gaid-warning", "danger": "--gaid-danger", "untested": "--gaid-untested", "noData": "--gaid-nodata",
+        "frame": "--gaid-frame", "workSurface": "--background", "paper": "--card", "header": "--gaid-header", "textBody": "--gaid-body", "link": "--gaid-link",
+        "selection": "--accent", "controlLine": "--input", "strongLine": "--gaid-line-strong", "warningBg": "--gaid-warning-bg", "pendingBg": "--gaid-pending-bg"
       },
       "contrastMin": { "text": 4.5, "largeText": 3, "uiComponent": 3 }
     },
-    "radius": { "control": "var(--radius-md)", "card": "var(--radius-lg)", "popup": "var(--radius-lg)" },
+    "radius": { "pane": "0", "control": "var(--radius-md)", "chip": "var(--radius-sm)", "card": "var(--radius-lg)", "popup": "var(--radius-lg)" },
     "control": { "heightPx": 32, "minTargetPx": 24, "iconPx": 16 },
     "motion": { "fast": "var(--gaid-motion-fast)", "base": "var(--gaid-motion-base)", "easing": "var(--gaid-easing)", "maxMs": 300 },
     "layout": {
