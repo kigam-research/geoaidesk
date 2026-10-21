@@ -97,6 +97,23 @@
       "web/src/geo/viewers/map/index.tsx:text-[11px]"
     ],
     "slop": [
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:bg-amber-50",
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:border-amber-300",
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:dark:bg-amber-950",
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:dark:border-amber-700",
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:dark:text-amber-400",
+      "web/src/geo/hub/flow-diagram.tsx:hue-utility:text-amber-700",
+      "web/src/geo/hub/hub-home.tsx:side-stripe:border-l-4",
+      "web/src/geo/hub/hub-shell.tsx:glass:backdrop-blur",
+      "web/src/geo/hub/shared-method.tsx:ai-icon:SparklesIcon",
+      "web/src/geo/hub/shared-method.tsx:glass:backdrop-blur",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-amber-600",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-emerald-600",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-rose-600",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-sky-600",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-teal-600",
+      "web/src/geo/hub/shared-method.tsx:hue-utility:bg-violet-600",
+      "web/src/geo/hub/top-nav.tsx:ai-icon:SparklesIcon",
       "web/src/geo/library/add-paper-dialog.tsx:hue-utility:dark:text-amber-300",
       "web/src/geo/library/add-paper-dialog.tsx:hue-utility:text-amber-700",
       "web/src/geo/library/library-screen.tsx:hue-utility:bg-amber-50",
@@ -124,5 +141,5 @@
       "web/src/geo/library/zotero-card.tsx:hue-utility:text-amber-700"
     ]
   },
-  "slopNote": "slop entries: web/src/geo/library/* belongs to gaid-library-folders (running on 2026-10-21 when the slop check landed, gaid-design-identity); it was told through the hub to use role tokens, and removes these entries when it reworks the screen."
+  "slopNote": "slop entries: web/src/geo/library/* belongs to gaid-library-folders (running on 2026-10-21 when the slop check landed, gaid-design-identity); it was told through the hub to use role tokens, and removes these entries when it reworks the screen. Temporary: web/src/geo/hub/* entries let the sibling child gaid-design-identity--system finish before gaid-design-identity--hub (which fixes them) is integrated; the parent removes them right after."
 }

@@ -113,10 +113,10 @@ function defaultTabTitle(index: number): string {
 function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
   return (
     <div
-      className="group relative z-10 flex w-1 shrink-0 cursor-col-resize items-center justify-center bg-border hover:bg-blue-400 active:bg-blue-500 transition-colors"
+      className="group relative z-10 flex w-px shrink-0 cursor-col-resize items-center justify-center bg-border transition-colors before:absolute before:inset-y-0 before:-inset-x-1 hover:bg-gaid-link active:bg-gaid-link"
       onMouseDown={onMouseDown}
     >
-      <div className="h-8 w-0.5 rounded-full bg-muted-foreground/20 group-hover:bg-blue-400 transition-colors" />
+      <div className="h-8 w-0.5 rounded-full bg-muted-foreground/20 group-hover:bg-gaid-link transition-colors" />
     </div>
   );
 }
@@ -534,10 +534,10 @@ function WorkspacePage({
   }, [anyStreaming, isActive, sandboxFetchTree, sandboxRefreshOpenTabs]);
 
   const [treeWidth, setTreeWidth] = useState(
-    () => initialState?.treeWidth ?? 320,
+    () => initialState?.treeWidth ?? 256,
   );
   const [chatWidth, setChatWidth] = useState(
-    () => initialState?.chatWidth ?? 640,
+    () => initialState?.chatWidth ?? 400,
   );
   const [isResizing, setIsResizing] = useState(false);
   const dragging = useRef<"tree" | "chat" | null>(null);
@@ -952,10 +952,10 @@ function WorkspacePage({
   );
 
   return (
-    <div className="flex h-dvh min-w-0 flex-col">
+    <div className="flex h-dvh min-w-0 flex-col bg-background">
       {/* Header */}
-      <header className="relative flex flex-wrap items-center justify-between gap-2 border-b px-3 py-3 sm:px-6">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <header className="relative flex min-h-14 items-center justify-between gap-3 border-b border-gaid-line-strong bg-gaid-header px-4 py-2">
+        <div className="flex min-w-0 items-center gap-2">
           <button
             type="button"
             onClick={onOpenProjectView}
@@ -978,7 +978,7 @@ function WorkspacePage({
                 </>
               }
             >
-              <span className="text-[11px] text-muted-foreground/60 cursor-help">
+              <span className="text-xs text-muted-foreground cursor-help">
                 v{APP_VERSION}
               </span>
             </InfoTooltip>
@@ -989,7 +989,7 @@ function WorkspacePage({
                 href={process.env.NEXT_PUBLIC_RELEASES_URL ?? "https://github.com/K-Dense-AI/k-dense-byok"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] font-medium text-blue-500 hover:text-blue-400 transition-colors"
+                className="text-xs font-medium text-gaid-link hover:underline transition-colors"
               >
                 {appText("header.update_available")}</a>
             </InfoTooltip>
@@ -998,10 +998,10 @@ function WorkspacePage({
           {onOpenHub && <GaidTopNav current="projects" onNavigate={(place) => (place === "hub" ? onOpenHub() : onOpenProjectView())} />}
           <ProjectSwitcher onOpenProjectView={onOpenProjectView} />
         </div>
-        <p className="absolute left-1/2 hidden -translate-x-1/2 text-[11px] text-muted-foreground/60 tracking-wide select-none 2xl:block">
+        <p className="absolute left-1/2 hidden -translate-x-1/2 text-xs text-muted-foreground tracking-wide select-none 2xl:block">
           {appText("header.attribution")}
         </p>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {isActive && <ResourceMonitor />}
           <SessionCostPill
             summary={costSummary}
@@ -1017,10 +1017,9 @@ function WorkspacePage({
                 type="button"
                 onClick={() => handleViewCompute()}
                 aria-label={appText("header.openCompute", { count: activeModalJobCount })}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/10 px-2 py-1.5 text-[11px] font-medium text-violet-700 transition-colors hover:bg-violet-500/15 dark:text-violet-300"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-gaid-pending-bg px-2 py-1.5 text-xs font-medium text-gaid-body transition-colors hover:bg-accent"
               >
                 <ServerCogIcon className="size-3.5" />
-                <span className="size-1.5 animate-pulse rounded-full bg-violet-500" />
                 {activeModalJobCount}
               </button>
             </InfoTooltip>
@@ -1029,7 +1028,7 @@ function WorkspacePage({
           ) : null}
           {/* Panel visibility — collapse either side panel to give the center
               pane (file preview / LaTeX editor) more room. */}
-          <div className="flex items-center gap-0.5 rounded-lg border bg-muted/30 p-0.5">
+          <div className="flex items-center gap-0.5 rounded-md border bg-muted/30 p-0.5">
             <InfoTooltip
               content={
                 <>
@@ -1045,7 +1044,7 @@ function WorkspacePage({
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
                   sandboxOpen
-                    ? "bg-background text-foreground shadow-sm"
+                    ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -1067,7 +1066,7 @@ function WorkspacePage({
                 className={cn(
                   "rounded-md p-1.5 transition-colors",
                   chatOpen
-                    ? "bg-background text-foreground shadow-sm"
+                    ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -1089,7 +1088,7 @@ function WorkspacePage({
                 setSettingsOpen(true);
               }}
               aria-label={appText("header.open_settings")}
-              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <SettingsIcon className="size-4" />
             </button>
@@ -1109,7 +1108,7 @@ function WorkspacePage({
                     ? appText("header.switch_to_light_mode")
                     : appText("header.switch_to_dark_mode")
                 }
-                className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 {resolvedTheme === "dark" ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
               </button>
@@ -1129,7 +1128,7 @@ function WorkspacePage({
 
         {/* Left: file tree */}
         {isActive && sandboxOpen && (
-          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
+          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden bg-gaid-frame xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
             <FileTreePanel
               tree={sandbox.tree}
               selectedPath={sandbox.activeTabPath}
@@ -1156,7 +1155,7 @@ function WorkspacePage({
 
         {/* Middle: file preview with tabs — always shown; it is the pane the
             side panels make room for (e.g. the LaTeX editor + PDF). */}
-        <div className="min-h-0 flex-1 min-w-0 overflow-hidden">
+        <div className="min-h-0 flex-1 min-w-0 overflow-hidden bg-background">
             <FilePreviewPanel
               projectId={projectId}
               isActive={isActive}
@@ -1212,7 +1211,7 @@ function WorkspacePage({
             collapsed) so background chat streams keep running. */}
         <div
           className={cn(
-            "col-span-full flex min-h-0 min-w-0 flex-col border-l overflow-hidden shrink-0 xl:w-[var(--chat-width)]",
+            "col-span-full flex min-h-0 min-w-0 flex-col border-l bg-gaid-frame overflow-hidden shrink-0 xl:w-[var(--chat-width)]",
             !chatOpen && "hidden",
           )}
           style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}

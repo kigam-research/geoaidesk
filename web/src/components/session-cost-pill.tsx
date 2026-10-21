@@ -86,10 +86,10 @@ export function SessionCostPill({
           variant="outline"
           size="sm"
           className={cn(
-            "h-auto gap-2 px-2.5 py-1 font-mono text-[11px] tabular-nums",
+            "h-auto gap-2 px-2.5 py-1 text-xs tabular-nums",
             loading && "opacity-70",
             warnTone &&
-              "border-amber-500/60 text-amber-600 dark:text-amber-400",
+              "border-gaid-warning text-gaid-warning",
             blockedTone &&
               "border-destructive/60 text-destructive",
             className,
@@ -151,7 +151,7 @@ export function SessionCostPill({
                   blockedTone
                     ? "bg-destructive"
                     : warnTone
-                      ? "bg-amber-500"
+                      ? "bg-gaid-warning"
                       : "bg-primary",
                 )}
                 style={{ width: `${Math.round(ratio * 100)}%` }}
@@ -163,14 +163,14 @@ export function SessionCostPill({
       <HoverCardContent align="end" className="w-96 p-0">
         {projectSummary && (
           <div className="border-b p-4">
-            <div className="text-muted-foreground text-xs uppercase tracking-wide">
+            <div className="text-muted-foreground text-xs font-medium">
               {workText("session_cost_pill.project_billable_spend")}</div>
             <div className="mt-1 flex items-baseline gap-2">
-              <div className="font-mono text-2xl font-semibold tabular-nums">
+              <div className="text-2xl font-semibold tabular-nums">
                 {formatUsd(projectTotal)}
               </div>
               {limitUsd !== null && (
-                <div className="text-muted-foreground font-mono text-sm tabular-nums">
+                <div className="text-muted-foreground text-sm tabular-nums">
                   / {formatUsd(limitUsd)}
                 </div>
               )}
@@ -196,7 +196,7 @@ export function SessionCostPill({
                     blockedTone
                       ? "bg-destructive"
                       : warnTone
-                        ? "bg-amber-500"
+                        ? "bg-gaid-warning"
                         : "bg-primary",
                   )}
                   style={{ width: `${Math.round(ratio * 100)}%` }}
@@ -208,16 +208,16 @@ export function SessionCostPill({
                 {workText("session_cost_pill.spend_limit_reached_new_billable_api_and_compute_work_is_blocked_until_the_limit_is_raised_prov")}</div>
             )}
             {warnTone && (
-              <div className="mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-700 dark:text-amber-400">
+              <div className="mt-2 rounded-md border border-gaid-warning/40 bg-gaid-warning-bg px-2 py-1.5 text-xs text-gaid-warning">
                 {workText("session_cost_pill.approaching_the_spend_limit_80")}</div>
             )}
           </div>
         )}
 
         <div className="border-b p-4">
-          <div className="text-muted-foreground text-xs uppercase tracking-wide">
+          <div className="text-muted-foreground text-xs font-medium">
             {workText("session_cost_pill.this_session")}</div>
-          <div className="mt-1 font-mono text-xl font-semibold tabular-nums">
+          <div className="mt-1 text-xl font-semibold tabular-nums">
             {formatUsd(sessionTotal)}
           </div>
           <div className="text-muted-foreground mt-0.5 text-xs">
@@ -234,7 +234,7 @@ export function SessionCostPill({
             {(summary.subscriptionTokens ?? 0) > 0 ? (
               <div className="flex items-baseline justify-between py-1 text-sm">
                 <span className="text-muted-foreground">{workText("session_cost_pill.subscription_usage")}</span>
-                <span className="font-mono tabular-nums">
+                <span className="tabular-nums">
                   {workText("session_cost_pill.tokens_value", { tokens: formatTokens(summary.subscriptionTokens ?? 0) })}</span>
               </div>
             ) : null}
@@ -262,14 +262,14 @@ function CostRow({ label, costUsd }: { label: string; costUsd: number }) {
   return (
     <div className="flex items-baseline justify-between py-1 text-sm">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-mono tabular-nums">{formatUsd(costUsd)}</span>
+      <span className="tabular-nums">{formatUsd(costUsd)}</span>
     </div>
   );
 }
 
 function EntryRow({ entry }: { entry: CostEntry }) {
   return (
-    <li className="text-muted-foreground flex items-center justify-between gap-2 px-2 py-1 text-[11px]">
+    <li className="text-muted-foreground flex items-center justify-between gap-2 px-2 py-1 text-xs">
       <span
         className="flex min-w-0 items-center gap-1 truncate"
         title={`${workLabel("role", entry.role)} · ${entry.model}`}
@@ -278,16 +278,16 @@ function EntryRow({ entry }: { entry: CostEntry }) {
           className={cn(
             "inline-block h-1.5 w-1.5 shrink-0 rounded-full",
             entry.role === "agent"
-              ? "bg-sky-500"
+              ? "bg-muted-foreground"
               : entry.role === "compute"
-                ? "bg-violet-500"
-                : "bg-amber-500",
+                ? "bg-muted-foreground"
+                : "bg-gaid-warning",
           )}
           aria-hidden
         />
         <span className="truncate">{shortModel(entry.model)}</span>
       </span>
-      <span className="shrink-0 font-mono tabular-nums">
+      <span className="shrink-0 tabular-nums">
         {formatTokens(entry.totalTokens)} ·{" "}
         {entry.billingMode === "subscription"
           ? workText("session_cost_pill.subscription")
