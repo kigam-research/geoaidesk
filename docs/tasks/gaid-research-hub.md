@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T07:52:18Z
+updated: 2026-10-21T09:06:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -69,15 +69,30 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
   scientific-writing, venue-templates, markitdown) are absent in geo mode. Paperclip = remote MCP (key or OAuth).
   Subagent roster has literature-researcher, citation-checker, hypothesis-generator, manuscript-editor.
 ## Next steps
-1. Proposal report written and pushed; review copy made. Wait for the user's answers to report §6 (four decisions +
-   three fact checks) in this tab.
-2. After the user's answers: record them under Notes and decisions, write the ADR for IA/storage, settle contracts,
-   then screen drafts (2-3) before implementation of the agreed first phase.
+1. Phase-1 design: contracts for library item/source, evidence anchor and project literature (web/src/geo/contracts/),
+   then 2-3 screen drafts for the library + project literature + note citation (UI guide sections 1 and 9; design
+   references per the 2026-10-15 user feedback), review-copy them and let the user pick.
+2. Get the user's answers on report §6 (account timing, default model) and the four fact checks.
+3. After the draft is picked: split implementation into packages (Zotero connector, GAID-managed items + metadata
+   lookup, notes citation hook/rendering, hub authoring from library item, catalogue literature skills) and start child
+   writers once the contracts are fixed.
 ## Failed approaches
 - oracle q1 (Pro) timed out after 40 min of stale UI; `oracle session i-am-designing-a-research --harvest` recovered the
   completed answer (~/data/geoaidesk/work/gaid-research-hub/oracle/q1.harvest.md). `task research-save` reports
   skipped:1 for this session (also with --since); vault copy not made, local harvest + ChatGPT URL cited instead.
 ## Notes and decisions
+- User decisions 2026-10-21 (this tab, verbatim start: "모두 권장으로 하고 싶다. 그런데 중요한 점은 zotero와 gaid의 연동이
+  원활해야한다는 것이고, zotero를 사용하지 않고 GAID 기관 허브에 서지를 관리하고 싶은 이용자들도 이용할 수 있게 하는
+  하이브리드형 시스템이 구축되어야 한다."): report §6 1-가 (personal under 내 연구, hub = shared + 논문으로 찾기),
+  2-가 (PC GAID first, institute server after accounts), 3-가 (phase 1 = library + grounded answers + note citations +
+  paper→Workflow), 4-가 amended to a hybrid library: Zotero-linked items (Zotero is source, smooth sync, narrow
+  write-back) + GAID-managed items for non-Zotero users (web search + PDF only). ADR docs/adr/2026-10-21-research-hub-library.md.
+  The user also pasted a second Claude survey; key points in ~/data/geoaidesk/work/gaid-research-hub/inputs/claude-research-2-notes.md.
+- Open after these: (a) when to build institute accounts (rec. right after the phase-1 pilot, before 내 논문, because
+  web-only non-Zotero users get a library only with accounts); (b) default model for unpublished manuscripts/reviews/ideas
+  (rec. institute-internal model by default). Report §6.
+- API reachability from PC74 2026-10-21: Zotero Web API, Crossref, OpenAlex, KCI, ORCID OK; Semantic Scholar keyless 429;
+  arXiv export API timed out (arxiv.org web OK).
 - Orchestration (phase 1): sequential — research → proposal → user discussion. Independent packages now: web
   research (oracle), GAID inventory (read-only). No child writers until the user agrees on scope and the shared
   interfaces (library/publication data model, contracts under web/src/geo/contracts/) are settled.
