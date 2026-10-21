@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T14:00:44Z
+updated: 2026-10-21T14:05:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e3423a72-7472-4e57-ad64-7b7af68d8b04","pid":1024923,"provider":"codex","session":"01a15ebd-f21c-75a3-acb8-bed850e7227a","start":"47880771","token":"c6c81568434110b18d55cffb1d1710ded8914bb8b12f012ac7eedcc3d6246168"}
 branch: task/gaid-design-identity--hub
 target: task/gaid-design-identity
@@ -74,24 +74,35 @@ Network: raw.githubusercontent.com is blocked.
 - No routes, data contracts or locale values changed. Existing hub.io.generated text labels concept previews without adding copy.
 - Verification passed: `cd web && npx tsc --noEmit -p .`; `npm test -- --run src/geo/hub src/geo/hub-picker src/geo/workflow` (13 files, 67 tests); `node geo/ui/check-ui.mjs` (0 errors, 89 existing accepted debt); impeccable detector over owned directories returned `[]`; `git diff --check` clean.
 - Rules followed: S1–S8, V1–V10, G4/G5, N2, B1/B6. Existing content/controls preserved. No new UI debt or copy ids.
-- Isolated app uses UI 3320/API 18320 and its own copied GAID_HOME; startup building production UI.
+- Final production build succeeded after the bounded visual-fix batch. Repeated TypeScript and all 67 targeted tests passed; UI validator remains 0 errors. No scientific analysis, installation, publication or model calls were triggered during browser checks.
+- Browser checks passed: empty search recovery, retained query across catalogue/mine tabs, retained local answer across Previous/Next, visible keyboard focus. Browser console: 0 errors/0 warnings. All 36 captures have no horizontal page overflow.
+- Dark header computed evidence: `web/src/geo/hub/hub-shell.tsx` renders `/brand/gaid-compact-on-dark.svg` on `rgb(23, 31, 36)` (#171F24). Light uses the separate colour lockup. Logo geometry/files unchanged.
+- Visual inspection followed UI guide section 10 and impeccable/taste anti-tells: row anatomy, single primary, neutral states, readable category text, original concept pixels, no image placeholder, no tinted icon tiles, no blur, no generic AI symbols. Small-radius shared Badge overrides and stronger question radio boundaries were the one final fix batch. The source/trial workflow and existing content remain unchanged; long source forms continue to scroll internally.
+- Screenshots (final build, Korean, 2026-10-21): `/home/seongin3/data/geoaidesk/work/gaid-design-identity--hub/shots/`. Each basename below has `-light-1440.png`, `-light-1280.png`, `-dark-1440.png`, `-dark-1280.png` (1440×900 and 1280×800):
+  - `hub`: hub home/recommended/shared register.
+  - `mine`: authored register/folders/stages.
+  - `entry`: registered Workflow detail with real concept image.
+  - `sources`: authoring source inputs.
+  - `questions`: one-question/option/Other flow.
+  - `draft`: draft overview/steps/trial preparation.
+  - `trial`: optional trial page (copied draft has no installed trial).
+  - `picker`: actual project Workflow import dialog.
+  - `projects`: shared GaidHubEntry rail on project list (other project-list styling belongs to the system child).
+- Evidence manifests/logs beside shots: `shots.sha256`, `final-capture.log`, `browser-checks.log`, `impeccable-detect.json`. No screenshots copied into reports here; parent selects/integrates them.
+- Full `scripts/check` belongs to the parent integration; child checks are the exact requested targeted set.
 ## Next steps
-1. Run targeted TypeScript/tests/UI checks, start isolated app, batch Korean screenshots in both themes and viewport sizes; fix observed issues, then stop app and finish.
+1. Isolated app/browser stopped; finish this child. Parent integrates with `task complete gaid-design-identity--hub` and performs aggregate checks.
 ## Failed approaches
 - First two `task resume` attempts saw a transient parent task-start transaction; successful third resume returned the same worktree.
 - `task job run -- npm --prefix web ci` refused dirty source before creating a job; the authorized app launcher installed local dependencies instead.
 - First isolated app startup used copied `config.env`, overriding API port to the parent's 18310. No configuration content read or edited. Restarted with `KADY_ENV_FILE=/dev/null` so explicit ports take precedence.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Parent confirmed the first visual batch matches the chosen direction; requested dark-logo/background verification is recorded above.
+- No copy changes, schema changes, model calls, backend changes or report ownership changes.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Parent canonical report: `reports/2026-10-21-gaid-design-identity/index.md`. This child supplies implementation notes and external screenshots for that report.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

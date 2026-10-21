@@ -103,11 +103,11 @@ export function DraftStep({
         <header className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-xl font-semibold">{localText(profile.title)}</h2>
-            <Badge variant="secondary">{text("draft.private")}</Badge>
-            <Badge variant="outline">
+            <Badge variant="secondary" className="rounded-sm">{text("draft.private")}</Badge>
+            <Badge variant="outline" className="rounded-sm">
               {trialCount > 0 ? text("draft.tested", { count: trialCount }) : text("draft.untested")}
             </Badge>
-            <Badge variant="outline">
+            <Badge variant="outline" className="rounded-sm">
               {text(draft.codeFiles.length ? "draft.implementation.implemented" : "draft.implementation.descriptive")}
             </Badge>
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>

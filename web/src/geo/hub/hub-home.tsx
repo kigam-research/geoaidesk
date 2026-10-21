@@ -182,7 +182,7 @@ export function HubHome({
                 className="group flex h-full min-h-24 w-full items-start gap-4 border-b border-border py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <span className="line-clamp-1 text-base font-semibold">{card.title}</span>
+                  <span className="line-clamp-1 text-base font-semibold" title={card.title}>{card.title}</span>
                   <span className="line-clamp-1 text-sm text-muted-foreground" title={card.line}>
                     {card.line}
                   </span>

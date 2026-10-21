@@ -339,13 +339,13 @@ function QuestionCard({
                   aria-checked={selected}
                   onClick={() => onChange({ optionId: option.id })}
                   className={cn(
-                    "flex items-start gap-3 rounded-sm border px-4 py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground",
+                    "flex items-start gap-3 rounded-sm border border-input px-4 py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground",
                     selected && "border-gaid-link bg-accent text-accent-foreground",
                   )}
                 >
                   <span
                     className={cn(
-                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
+                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-input",
                       selected && "border-primary bg-primary text-primary-foreground",
                     )}
                   >
@@ -354,7 +354,7 @@ function QuestionCard({
                   <span className="flex flex-col gap-1">
                     <span className="flex flex-wrap items-center gap-2 font-medium">
                       {option.label}
-                      {recommended && <Badge variant="secondary">{text("questions.recommended")}</Badge>}
+                      {recommended && <Badge variant="secondary" className="rounded-sm">{text("questions.recommended")}</Badge>}
                     </span>
                     {option.hint && <span className="text-sm text-muted-foreground">{option.hint}</span>}
                     {recommended && question.recommendedWhy && (
@@ -441,7 +441,7 @@ function ReviewPanel({
                   {!done && <CircleDashedIcon className="mr-1 inline size-3.5" aria-hidden />}
                   {answerLabel(q, answers[q.id])}
                   {changed.has(q.id) && (
-                    <Badge variant="outline" className="ml-2 align-middle">
+                    <Badge variant="outline" className="rounded-sm ml-2 align-middle">
                       {text("questions.changedBadge")}
                     </Badge>
                   )}

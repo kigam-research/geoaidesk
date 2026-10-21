@@ -167,11 +167,11 @@ export function TrialStep({
                         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                           <span className="flex flex-wrap items-center gap-2">
                             {trial.assessment ? (
-                              <Badge variant={trial.assessment.outcome === "useful" ? "default" : "secondary"}>
+                              <Badge variant={trial.assessment.outcome === "useful" ? "default" : "secondary"} className="rounded-sm">
                                 {text(`trial.outcome.${trial.assessment.outcome}`)}
                               </Badge>
                             ) : (
-                              <Badge variant="outline">{text("trial.unrated")}</Badge>
+                              <Badge variant="outline" className="rounded-sm">{text("trial.unrated")}</Badge>
                             )}
                             <span className="text-xs text-muted-foreground">{when(trial.startedAt)}</span>
                             <span className="text-xs text-muted-foreground">

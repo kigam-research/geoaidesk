@@ -49,9 +49,6 @@ export function GaidTopNav({
 export function GaidHubEntry({ onOpen }: { onOpen: () => void }) {
   return (
     <section className="flex flex-col gap-3 border-y border-gaid-line-strong py-4 sm:flex-row sm:items-center">
-      <span className="flex shrink-0 items-center text-muted-foreground">
-        <LibraryIcon className="size-4" aria-hidden />
-      </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <h2 className="font-semibold">{text("entry.title")}</h2>
         <p className="text-sm text-muted-foreground">{text("entry.body")}</p>

@@ -142,7 +142,7 @@ export function SourceStep({
           onFiles(Array.from(e.dataTransfer.files));
         }}
         className={cn(
-          "flex flex-col items-center gap-3 rounded-none border-2 border-dashed p-8 text-center",
+          "flex flex-col items-center gap-3 rounded-none border border-input border-dashed p-8 text-center",
           over && "border-primary bg-background",
         )}
       >
