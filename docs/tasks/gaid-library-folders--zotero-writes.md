@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T13:26:47Z
+status: ready
+updated: 2026-10-21T13:26:49Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8efa9960-157f-4f0e-b907-50fa7ca9186a","pid":2619537,"provider":"codex","session":"01a15e90-4520-7db2-8f1f-5d78d5373035","start":"47581455","token":"245fd43eee5872c64898ddf1d2632eb44ca2341c85e6360286ab326912a17bae"}
 branch: task/gaid-library-folders--zotero-writes
 target: task/gaid-library-folders
@@ -87,9 +87,8 @@ geo-library-zotero-service.test.ts:75 expects the old sendToZotero item return, 
 containing item. 2064 other backend tests passed/8 skipped. The parent fixed the assertion and added upload-count
 coverage in pushed checkpoint 0ea99a74. Rerunning task finish will merge that fix and recheck the final tree.
 ## Next steps
-1. Rerun task finish in place (no resume) to merge the pushed parent's service-test fix (0ea99a74) and recheck.
-   Do not use task save after this failed published finish.
-2. The parent runs task complete after finish succeeds.
+<!-- task:closed -->
+Closed 2026-10-21T13:26:49Z: ready; the parent gaid-library-folders integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial npx tsc/vitest had missing local dependencies (not a source failure); installing the lockfile dependencies.
