@@ -823,6 +823,12 @@
       "owner": "gaid-research-hub--zotero",
       "status": "added",
       "responsibility": "Synthetic Zotero v3 Local/Web API connector regression coverage; no user library data"
+    },
+    {
+      "path": "server/test/geo-library.test.ts",
+      "owner": "gaid-research-hub",
+      "status": "added",
+      "responsibility": "Personal library store, routes, page reading, note citation check and agent library tools"
     }
   ],
   "notTouched": [

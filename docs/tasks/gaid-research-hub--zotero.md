@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:37:01Z
+updated: 2026-10-21T11:37:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e61bf52d-9268-4d06-84a2-99fbdf1887bf","pid":1532697,"provider":"codex","session":"01a15e34-d40a-7262-97ac-59bb6d8bed03","start":"46982181","token":"1fdd4903634b060370661f31b814e1d918a83246483d200dcfc62cb55ea81402"}
 branch: task/gaid-research-hub--zotero
 target: task/gaid-research-hub
@@ -79,10 +79,11 @@ anything you could not verify (e.g. `citationKey` presence in real Web API JSON)
 - Real Web API keys/permissions and Web `citationKey`, authorization dialog flow, Better BibTeX generation and Windows/WSL connectivity remain unverified. Confirmed writes are tested against fake HTTP; real sandbox provisioning used installed `oat-zotero`, not this connector's authorization dialog.
 
 ## Next steps
-1. Publish the reviewed final snapshot and run `task finish`; parent owns integration with `task complete`.
+1. Rerun `task finish` after the routine append-only boundary conflict was resolved; parent owns integration with `task complete`.
 2. Parent integrates routes/store and canonical report, using complete key manifests when the Local API lacks `/deleted`.
 
 ## Failed approaches
+- First `task finish` fetched parent changes and stopped on an append-only conflict in `geo/integration-boundaries.json`; preserved all three Zotero/parent test entries. No code conflicts.
 - The initial fake mirrored `/deleted` for both APIs. Real Zotero 10.0.6 returned 404 there, so Local sync now tries it once and falls back to full key/version manifests while retaining incremental object bodies. Regression test added.
 - The first mapper assumed `include=csljson` returns an object. Real Local API returned a JSON string containing a one-item array. The mapper and fixture now handle that actual export shape. Both assumptions were tested directly in the real sandbox before further fixes.
 - One backend typecheck found an optional-version mismatch in the fallback result; corrected its explicit type and rechecked.
