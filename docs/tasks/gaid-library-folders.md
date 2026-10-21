@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:33:53Z
+updated: 2026-10-21T13:46:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"aa34d06c-a9c2-4a59-baa0-d91256af0ef9","pid":2570334,"provider":"claude","session":"43dfe263-7ab9-4d66-80b7-22ec0fd4febe","start":"47548693","token":"39b963f62ebfc6e5708f59cfe1e2e4742108fb924ff80b895da73bd72a987fa2"}
 branch: task/gaid-library-folders
 target: main
@@ -49,6 +49,10 @@ in shared tokens so the restyle is cheap. Own GAID_HOME under ~/data/geoaidesk/w
   additions; this unit owns contract, store, sync glue, routes, agent/note scope and UI.
 ## Next steps
 1. Implement folders in contract/store/sync glue/routes; then UI; integrate the child; real-app + Zotero sandbox check.
+   Done up to "integrate the child" (parent commits up to f1665188). Next: `task complete gaid-library-folders--zotero-writes`,
+   restart unit gaid-library-folders-app from this worktree (ports 3330/18330, GAID_HOME ~/data/geoaidesk/work/gaid-library-folders/home,
+   GAID_ZOTERO_LOCAL_URL -> headless sandbox 23139 in ~/data/geoaidesk/work/gaid-library-folders/zotero-sandbox, already seeded with
+   collection 광상 탐사 + 2 items), run bin/seed.mjs and bin/seed-zotero-key.mjs there, browser check + screenshots, report.
 ## Failed approaches
 ## Notes and decisions
 - Folder model (decision, recorded in a new ADR amending 2026-10-21 decision 3): nested folders (Zotero collections are
