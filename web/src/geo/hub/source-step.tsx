@@ -142,8 +142,8 @@ export function SourceStep({
           onFiles(Array.from(e.dataTransfer.files));
         }}
         className={cn(
-          "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed p-8 text-center",
-          over && "border-primary bg-primary/5",
+          "flex flex-col items-center gap-3 rounded-none border-2 border-dashed p-8 text-center",
+          over && "border-primary bg-background",
         )}
       >
         <UploadIcon className="size-6 text-muted-foreground" aria-hidden />
@@ -174,7 +174,7 @@ export function SourceStep({
       {(project.sources.length > 0 || uploading || urls.length > 0) && (
         <ul className="flex flex-col gap-2">
           {project.sources.map((s) => (
-            <li key={s.id} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+            <li key={s.id} className="flex items-center gap-3 rounded-none border px-3 py-2 text-sm">
               {s.kind === "code" ? (
                 <FileArchiveIcon className="size-4 text-muted-foreground" aria-hidden />
               ) : s.kind === "web" ? (
@@ -196,7 +196,7 @@ export function SourceStep({
             </li>
           ))}
           {urls.map((u) => (
-            <li key={u.url} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+            <li key={u.url} className="flex items-center gap-3 rounded-none border px-3 py-2 text-sm">
               <GlobeIcon className="size-4 text-muted-foreground" aria-hidden />
               <span className="min-w-0 flex-1 truncate">{u.title ?? u.url}</span>
               <span className="shrink-0 text-xs text-muted-foreground">
@@ -206,7 +206,7 @@ export function SourceStep({
             </li>
           ))}
           {uploading && (
-            <li className="flex items-center gap-3 rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground">
+            <li className="flex items-center gap-3 rounded-none border border-dashed px-3 py-2 text-sm text-muted-foreground">
               <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
               {text("sources.uploading", { name: uploading })}
             </li>
@@ -220,7 +220,7 @@ export function SourceStep({
       </label>
       <fieldset className="flex flex-col gap-1.5">
         <legend className="mb-1.5 text-sm font-medium">{text("sources.target")}</legend>
-        <div className="flex gap-1 rounded-lg bg-muted p-1">
+        <div className="flex gap-2 border-b">
           {targets.map((t) => (
             <button
               key={t.id}
@@ -228,8 +228,8 @@ export function SourceStep({
               aria-pressed={target === t.id}
               onClick={() => onTarget(t.id)}
               className={cn(
-                "h-8 flex-1 rounded-md text-sm font-medium",
-                target === t.id ? "bg-background shadow-sm" : "text-muted-foreground",
+                "h-8 flex-1 border-b-2 border-transparent text-sm font-medium",
+                target === t.id ? "border-gaid-link text-gaid-link" : "text-muted-foreground",
               )}
             >
               {t.label}
@@ -238,7 +238,7 @@ export function SourceStep({
         </div>
       </fieldset>
       {analyzed && onNext && (
-        <div className="flex flex-col gap-2 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="flex flex-col gap-2 rounded-none border border-border bg-background p-4">
           <p className="text-sm">{text("sources.readDone")}</p>
           <Button size="lg" onClick={onNext}>
             {text("sources.next")}
@@ -294,18 +294,18 @@ export function WorkingPanel({
   return (
     <section className="mx-auto flex w-full max-w-xl flex-col gap-5 py-10" aria-live="polite">
       <div className="flex items-center gap-3">
-        <LoaderCircleIcon className="size-6 animate-spin text-primary" aria-hidden />
+        <LoaderCircleIcon className="size-6 animate-spin text-gaid-link" aria-hidden />
         <h2 className="text-xl font-semibold">{title}</h2>
       </div>
       <ol className="flex flex-col gap-2 text-sm">
         {done.map((line) => (
           <li key={line} className="flex items-center gap-2">
-            <CheckIcon className="size-4 text-primary" aria-hidden />
+            <CheckIcon className="size-4 text-gaid-link" aria-hidden />
             {line}
           </li>
         ))}
         <li className="flex items-center gap-2 font-medium">
-          <LoaderCircleIcon className="size-4 animate-spin text-primary" aria-hidden />
+          <LoaderCircleIcon className="size-4 animate-spin text-gaid-link" aria-hidden />
           {attempt.op === "analyze" ? text("reading.analysis") : title}
           <span className="font-normal text-muted-foreground">
             · {text("reading.elapsed", elapsed(attempt.startedAt, now))}
@@ -335,8 +335,8 @@ export function ReadingView({
   if (!pdf) return <WorkingPanel project={project} attempt={attempt} title={title} note={note} />;
   return (
     <div className="grid h-full min-h-0 gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-      <section className="flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-xl border">
-        <header className="flex items-center gap-2 border-b bg-muted/40 px-3 py-2 text-sm font-medium">
+      <section className="flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-none border">
+        <header className="flex items-center gap-2 border-b bg-background px-3 py-2 text-sm font-medium">
           <FileTextIcon className="size-4" aria-hidden />
           <span className="truncate">{pdf.name}</span>
         </header>

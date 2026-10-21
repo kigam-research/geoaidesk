@@ -58,9 +58,9 @@ export function OverviewBand({ profile, doc }: { profile: DraftProfile; doc?: im
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)_auto_minmax(0,1fr)] md:items-stretch">
       <BandCell icon={<FileInputIcon className="size-4" aria-hidden />} title={text("overview.in")} items={inputs} />
       <BandArrow />
-      <div className="flex flex-col justify-center gap-2 rounded-lg border bg-card p-4">
+      <div className="flex flex-col justify-center gap-2 border-y border-border bg-transparent py-4">
         <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <ListOrderedIcon className="size-4 text-primary" aria-hidden />
+          <ListOrderedIcon className="size-4 text-gaid-link" aria-hidden />
           {text("overview.process")}
         </p>
         <p className="text-xl font-semibold">{text("overview.steps", { count: steps })}</p>
@@ -97,9 +97,9 @@ function BandCell({
 }) {
   const shown = items.slice(0, 4);
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-card p-4">
+    <div className="flex flex-col gap-2 border-y border-border bg-transparent py-4">
       <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <span className="text-primary">{icon}</span>
+        <span className="text-gaid-link">{icon}</span>
         {title}
       </p>
       <ul className="flex flex-col gap-1">
@@ -150,7 +150,7 @@ export function SummaryPoints({ summary }: { summary: string }) {
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="self-start text-sm text-primary underline-offset-4 hover:underline"
+          className="self-start text-sm text-gaid-link underline-offset-4 hover:underline"
         >
           {open ? text("overview.aboutLess") : text("overview.aboutMore")}
         </button>
@@ -170,7 +170,7 @@ export function LimitsCard({ profile }: { profile: DraftProfile }) {
   return (
     <section
       id="method-limits"
-      className="flex scroll-mt-20 flex-col gap-3 rounded-lg border bg-card p-4"
+      className="flex scroll-mt-20 flex-col gap-3 border-y border-border bg-transparent py-4"
       aria-label={text("draft.limits")}
     >
       <h3 className="flex items-center gap-2 text-base font-semibold">
@@ -205,7 +205,7 @@ export function LimitsCard({ profile }: { profile: DraftProfile }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="self-start text-sm text-primary underline-offset-4 hover:underline"
+          className="self-start text-sm text-gaid-link underline-offset-4 hover:underline"
         >
           {open ? text("draft.showLess") : text("draft.showAll", { count: items.length })}
         </button>

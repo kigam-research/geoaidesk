@@ -1,24 +1,17 @@
 "use client";
 /**
- * GAID hub home: recommended Workflows as picture cards on top; below, "나의 스킬 · Workflow" with the researcher's
- * topic folders on the left and the methods of the chosen folder as cards on the right.
+ * GAID hub home: recommended Workflows as register rows; topic folders stay beside the shared and authored registers.
  */
 import {
   BookOpenIcon,
-  DatabaseIcon,
   FileTextIcon,
-  DropletsIcon,
-  FlaskConicalIcon,
   FolderIcon,
   FolderPlusIcon,
   LoaderCircleIcon,
-  MapIcon,
   PlusIcon,
   SearchIcon,
   StarIcon,
-  WorkflowIcon,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SharedBrowse } from "./shared-browse";
@@ -31,37 +24,13 @@ import { cn } from "@/lib/utils";
 import { TechnicalDetail } from "./technical";
 const text = geoText("hub");
 
-const STAGE_TONE: Record<ProjectSummary["stage"], { stripe: string; chip: string }> = {
-  sources: { stripe: "border-l-border", chip: "bg-muted text-muted-foreground" },
-  analysis: { stripe: "border-l-border", chip: "bg-muted text-muted-foreground" },
-  questions: {
-    stripe: "border-l-[var(--gaid-warning)]",
-    chip: "border border-[var(--gaid-warning)]/40 text-[var(--gaid-warning)]",
-  },
-  draft: { stripe: "border-l-primary", chip: "bg-primary/10 text-primary" },
-  package: {
-    stripe: "border-l-[var(--gaid-success)]",
-    chip: "border border-[var(--gaid-success)]/40 text-[var(--gaid-success)]",
-  },
+const STAGE_TONE: Record<ProjectSummary["stage"], string> = {
+  sources: "bg-gaid-pending-bg text-muted-foreground",
+  analysis: "bg-gaid-pending-bg text-muted-foreground",
+  questions: "bg-gaid-warning-bg text-gaid-warning",
+  draft: "bg-gaid-pending-bg text-gaid-body",
+  package: "bg-gaid-pending-bg text-gaid-body",
 };
-
-/** A card without a picture: a neutral band with an icon that matches the Workflow's subject (UI guide S2). */
-function CardArt({ title }: { title: string }) {
-  const Icon = /지도|좌표|map|crs/i.test(title)
-    ? MapIcon
-    : /양수|수위|지하수|pump|well/i.test(title)
-      ? DropletsIcon
-      : /분석값|조성|화학|assay|geochem/i.test(title)
-        ? FlaskConicalIcon
-        : /자료|검색|공개|data|search/i.test(title)
-          ? DatabaseIcon
-          : WorkflowIcon;
-  return (
-    <span className="absolute inset-0 flex items-center justify-center bg-muted" aria-hidden>
-      <Icon className="size-8 text-primary" strokeWidth={1.5} />
-    </span>
-  );
-}
 
 const GLOSSARY = ["workflow", "skill", "recipe", "draft", "revision", "trial"] as const;
 
@@ -156,19 +125,19 @@ export function HubHome({
 }) {
   const [listTab, setListTab] = useState("browse");
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 overflow-y-auto px-6 py-8">
-      <section className="flex flex-col gap-4">
+    <main className="mx-auto flex w-full max-w-[1328px] flex-1 flex-col gap-6 overflow-y-auto px-8 py-8 xl:px-12">
+      <section className="flex flex-col gap-6 border-b border-gaid-line-strong pb-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex max-w-[640px] flex-col gap-1">
-            <h1 className="text-xl font-semibold">{text("home.title")}</h1>
+            <h1 className="text-2xl font-semibold">{text("home.title")}</h1>
             <p className="text-sm text-muted-foreground">{text("home.body")}</p>
           </div>
           <HubGlossary />
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
-              <SearchIcon className="size-5" aria-hidden />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="flex items-center gap-3">
+            <span className="flex shrink-0 items-center text-muted-foreground">
+              <SearchIcon className="size-4" aria-hidden />
             </span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="text-sm font-semibold">{text("home.route.use.title")}</span>
@@ -184,9 +153,9 @@ export function HubHome({
               {text("home.route.use.button")}
             </Button>
           </div>
-          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <FileTextIcon className="size-5" aria-hidden />
+          <div className="flex items-center gap-3">
+            <span className="flex shrink-0 items-center text-muted-foreground">
+              <FileTextIcon className="size-4" aria-hidden />
             </span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="text-sm font-semibold">{text("home.route.make.title")}</span>
@@ -200,35 +169,25 @@ export function HubHome({
         </div>
       </section>
 
-      <section className="flex flex-col gap-3" aria-labelledby="hub-recommended">
+      <section className="grid gap-6 border-b border-gaid-line-strong pb-6 md:grid-cols-[11rem_minmax(0,1fr)]" aria-labelledby="hub-recommended">
         <h2 id="hub-recommended" className="text-base font-semibold">
           {text("home.recommended")}
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid gap-x-6 md:grid-cols-2">
           {recommended.slice(0, 4).map((card) => (
             <li key={card.id}>
               <button
                 type="button"
                 onClick={() => onOpenRecommended?.(card.id)}
-                className="group flex h-full w-full flex-col overflow-hidden rounded-lg border bg-card text-left transition-colors hover:border-primary/60"
+                className="group flex h-full min-h-24 w-full items-start gap-4 border-b border-border py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
               >
-                <span className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
-                  {card.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={card.image} alt="" className="size-full object-cover" />
-                  ) : (
-                    <CardArt title={card.title} />
-                  )}
-                </span>
-                <span className="flex flex-1 flex-col gap-2 p-3">
-                  <span className="line-clamp-2 text-sm font-semibold">{card.title}</span>
+                <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <span className="line-clamp-1 text-base font-semibold">{card.title}</span>
                   <span className="line-clamp-1 text-sm text-muted-foreground" title={card.line}>
                     {card.line}
                   </span>
                   <span className="mt-auto flex items-center gap-2 pt-1 text-xs text-muted-foreground">
-                    <Badge variant="secondary">
-                      {card.source === "catalogue" ? text("home.catalogue") : text("home.shared")}
-                    </Badge>
+                    <span>{card.source === "catalogue" ? text("home.catalogue") : text("home.shared")}</span>
                     <span className="inline-flex items-center gap-0.5">
                       <StarIcon className="size-3.5" aria-hidden />
                       {card.stars}
@@ -236,6 +195,11 @@ export function HubHome({
                     {card.author && <span className="truncate">{card.author}</span>}
                   </span>
                 </span>
+                {card.image && <span className="flex w-24 shrink-0 flex-col gap-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={card.image} alt="" className="h-16 w-full border bg-card object-contain" />
+                  <span className="text-xs text-muted-foreground">{text("io.generated")}</span>
+                </span>}
               </button>
             </li>
           ))}
@@ -243,7 +207,7 @@ export function HubHome({
       </section>
 
       <Tabs id="hub-lists" value={listTab} onValueChange={setListTab} className="scroll-mt-4 gap-4">
-        <TabsList aria-label={text("home.browse.tabs")}>
+        <TabsList variant="line" className="rounded-none p-0 [&_[data-slot=tabs-trigger]]:rounded-none [&_[data-slot=tabs-trigger]]:px-4 [&_[data-slot=tabs-trigger]]:text-sm [&_[data-slot=tabs-trigger][data-state=active]]:text-gaid-link [&_[data-slot=tabs-trigger]]:after:bg-gaid-link" aria-label={text("home.browse.tabs")}>
           <TabsTrigger value="browse">{text("home.browse.title")}</TabsTrigger>
           <TabsTrigger value="mine">{text("home.mine")}</TabsTrigger>
         </TabsList>
@@ -270,8 +234,8 @@ export function HubHome({
                 aria-current={f.id === folderId ? "true" : undefined}
                 onClick={() => onFolder(f.id)}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm",
-                  f.id === folderId ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted",
+                  "flex items-center gap-2 px-3 py-2 text-left text-sm",
+                  f.id === folderId ? "bg-accent font-medium text-accent-foreground" : "hover:bg-muted",
                 )}
               >
                 <FolderIcon className="size-4 shrink-0" aria-hidden />
@@ -283,7 +247,7 @@ export function HubHome({
               <button
                 type="button"
                 onClick={onNewFolder}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
+                className="flex items-center gap-2 px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
               >
                 <FolderPlusIcon className="size-4" aria-hidden />
                 {text("home.newFolder")}
@@ -299,12 +263,12 @@ export function HubHome({
             <button
               type="button"
               onClick={onCreate}
-              className="rounded-xl border-2 border-dashed p-10 text-center text-sm text-muted-foreground hover:border-primary/60"
+              className="border border-dashed p-6 text-left text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               {text("home.empty")}
             </button>
           ) : (
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="flex flex-col divide-y border-y border-border">
               {projects.map((p) => (
                 <li key={p.id}>
                   <button
@@ -312,22 +276,21 @@ export function HubHome({
                     onClick={() => onOpen(p.id)}
                     aria-label={text("home.open", { title: p.methodTitle ?? p.title })}
                     className={cn(
-                      "flex h-full w-full flex-col gap-2 rounded-lg border border-l-4 bg-card p-4 text-left transition-colors hover:border-primary/60",
-                      STAGE_TONE[p.stage].stripe,
+                      "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-3 py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground",
                     )}
                   >
                     <span
                       className={cn(
-                        "inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
-                        STAGE_TONE[p.stage].chip,
+                        "col-start-2 row-start-1 inline-flex w-fit items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-medium",
+                        STAGE_TONE[p.stage],
                       )}
                     >
                       {p.busy && <LoaderCircleIcon className="size-3 animate-spin" aria-hidden />}
                       {registered[p.id] && !p.busy ? text("stage.registered") : stageLabel(p)}
                     </span>
-                    <span className="text-sm font-semibold">{p.methodTitle ?? p.title}</span>
-                    {p.methodTitle && <span className="line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
-                    <span className="mt-auto flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="col-start-1 row-start-1 truncate text-sm font-semibold">{p.methodTitle ?? p.title}</span>
+                    {p.methodTitle && <span className="col-start-1 line-clamp-1 text-sm text-muted-foreground">{p.title}</span>}
+                    <span className="col-span-2 flex items-center gap-2 text-xs text-muted-foreground">
                       {text("home.byUpdated", { author: p.author ?? text("home.noAuthor"), when: when(p.updatedAt) })}
                       {registered[p.id] && (
                         <span
@@ -343,7 +306,7 @@ export function HubHome({
                               onOpenEntry?.(registered[p.id].entryId);
                             }
                           }}
-                          className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary hover:underline"
+                          className="ml-auto inline-flex items-center gap-1 rounded-sm bg-accent px-2 py-0.5 font-medium text-gaid-link hover:underline"
                         >
                           {text("home.registered", { n: registered[p.id].revision })}
                           <StarIcon className="size-3" aria-hidden />

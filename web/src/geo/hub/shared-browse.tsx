@@ -75,8 +75,8 @@ export function SharedBrowse({ onOpen }: { onOpen: (id: string) => void }) {
               key={f.id}
               aria-current={folder === f.id ? "true" : undefined}
               onClick={() => { if (folder !== f.id) changeFolder(f.id); }}
-              className={cn("flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm", focus,
-                folder === f.id ? "bg-primary/10 font-medium text-primary" : "hover:bg-muted")}
+              className={cn("flex items-center gap-2 rounded-none px-3 py-2 text-left text-sm", focus,
+                folder === f.id ? "bg-accent font-medium text-accent-foreground" : "hover:bg-muted")}
             >
               <FolderIcon className="size-4 shrink-0" aria-hidden />
               <span className="min-w-0 flex-1 truncate" title={f.name}>{f.name}</span>
@@ -98,7 +98,7 @@ export function SharedBrowse({ onOpen }: { onOpen: (id: string) => void }) {
               <TechnicalDetail detail={error} />
             </div>
           ) : entries.length === 0 ? (
-            <div role="status" className="flex flex-col items-start gap-3 rounded-lg border border-dashed p-6">
+            <div role="status" className="flex flex-col items-start gap-3 rounded-none border border-dashed p-6">
               <p className="text-sm text-muted-foreground">
                 {text(filtered ? "home.browse.noResults" : "home.browse.empty")}
               </p>
@@ -106,7 +106,7 @@ export function SharedBrowse({ onOpen }: { onOpen: (id: string) => void }) {
               {filtered ? (
                 <Button variant="outline" onClick={reset}>{text("home.browse.reset.button")}</Button>
               ) : (
-                <button type="button" onClick={() => document.getElementById("hub-recommended")?.scrollIntoView({ behavior: "instant", block: "start" })} className={cn("rounded text-sm text-primary underline", focus)}>
+                <button type="button" onClick={() => document.getElementById("hub-recommended")?.scrollIntoView({ behavior: "instant", block: "start" })} className={cn("rounded text-sm text-gaid-link underline", focus)}>
                   {text("home.browse.recommended.action")}
                 </button>
               )}
@@ -114,22 +114,20 @@ export function SharedBrowse({ onOpen }: { onOpen: (id: string) => void }) {
           ) : (
             <>
               <p role="status" className="mb-3 text-xs text-muted-foreground">{text("home.browse.count", { count: entries.length })}</p>
-              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="flex flex-col divide-y border-y border-border">
                 {entries.map((entry) => (
                   <li key={entry.id}>
                     <button type="button" onClick={() => onOpen(entry.id)}
                       aria-label={text("home.browse.open", { title: entry.title })}
-                      className={cn("flex h-full w-full flex-col gap-2 rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary/60", focus)}>
-                      <span className="block w-full truncate text-sm font-semibold" title={entry.title}>{entry.title}</span>
-                      <span className="line-clamp-1 text-sm text-muted-foreground" title={entry.tagline || entry.summary}>{entry.tagline || entry.summary}</span>
-                      <span className="mt-auto flex w-full items-center gap-2 pt-1 text-xs text-muted-foreground">
-                        <span className="min-w-0 flex-1 truncate" title={entry.author}>{entry.author}</span>
-                        <span className="inline-flex shrink-0 items-center gap-1" aria-label={text("home.browse.stars", { count: entry.stars })}>
-                          <StarIcon className="size-3.5" aria-hidden />{entry.stars}
-                        </span>
-                      </span>
-                      <span className="w-full truncate text-xs text-muted-foreground" title={folders.find((f) => f.id === entry.folderId)?.name}>
+                      className={cn("grid w-full grid-cols-[minmax(0,1fr)_9rem_8rem_3rem] items-center gap-x-4 gap-y-1 px-3 py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground", focus)}>
+                      <span className="col-start-1 row-start-1 block truncate text-sm font-semibold" title={entry.title}>{entry.title}</span>
+                      <span className="col-start-1 row-start-2 line-clamp-1 text-sm text-muted-foreground" title={entry.tagline || entry.summary}>{entry.tagline || entry.summary}</span>
+                      <span className="col-start-2 row-span-2 row-start-1 truncate text-xs text-muted-foreground" title={folders.find((f) => f.id === entry.folderId)?.name}>
                         {folders.find((f) => f.id === entry.folderId)?.name}
+                      </span>
+                      <span className="col-start-3 row-span-2 row-start-1 truncate text-xs text-muted-foreground" title={entry.author}>{entry.author}</span>
+                      <span className="col-start-4 row-span-2 row-start-1 inline-flex items-center justify-end gap-1 text-xs tabular-nums text-muted-foreground" aria-label={text("home.browse.stars", { count: entry.stars })}>
+                        <StarIcon className="size-3.5" aria-hidden />{entry.stars}
                       </span>
                     </button>
                   </li>

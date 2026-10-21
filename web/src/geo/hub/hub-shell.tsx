@@ -26,8 +26,8 @@ export function HubShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-background">
-      <header className="flex items-center justify-between gap-4 border-b bg-background/90 px-6 py-2.5 backdrop-blur">
+    <div className="flex h-dvh min-h-0 flex-col bg-gaid-frame">
+      <header className="relative flex h-14 shrink-0 items-center justify-between gap-4 border-b border-gaid-line-strong bg-gaid-frame px-6">
         <div className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
@@ -73,7 +73,7 @@ export function ProjectBar({
   const steps: HubStep[] = ["sources", "questions", "draft", "publish"];
   const currentIndex = steps.indexOf(step);
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b px-6 py-3">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b bg-background px-6 py-3">
       <button
         type="button"
         onClick={onBack}
@@ -101,14 +101,14 @@ export function ProjectBar({
                 }
                 onClick={() => onStep(s)}
                 className={cn(
-                  "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium transition-colors disabled:opacity-40",
-                  s === step ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                  "inline-flex h-8 items-center gap-1.5 rounded-none border-b-2 border-transparent px-3 text-sm font-medium transition-colors disabled:opacity-40",
+                  s === step ? "border-gaid-link text-gaid-link" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <span
                   className={cn(
-                    "flex size-5 items-center justify-center rounded-full text-xs",
-                    s === step ? "bg-primary-foreground/20" : "bg-muted",
+                    "flex size-5 items-center justify-center text-xs",
+                    s === step ? "bg-accent" : "bg-muted",
                   )}
                 >
                   {done ? <CheckIcon className="size-3" aria-hidden /> : i + 1}
@@ -125,8 +125,8 @@ export function ProjectBar({
           aria-current={step === "trial" ? "page" : undefined}
           onClick={() => onStep("trial")}
           className={cn(
-            "inline-flex h-8 items-center gap-1 rounded-full border border-dashed px-3 text-sm",
-            step === "trial" ? "border-primary text-primary" : "text-muted-foreground hover:text-foreground",
+            "inline-flex h-8 items-center gap-1 rounded-sm border border-dashed px-3 text-sm",
+            step === "trial" ? "border-primary text-gaid-link" : "text-muted-foreground hover:text-foreground",
           )}
         >
           {text("steps.trialOptional")}

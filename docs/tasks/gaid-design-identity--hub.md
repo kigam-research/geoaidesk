@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:55:06Z
+updated: 2026-10-21T14:00:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e3423a72-7472-4e57-ad64-7b7af68d8b04","pid":1024923,"provider":"codex","session":"01a15ebd-f21c-75a3-acb8-bed850e7227a","start":"47880771","token":"c6c81568434110b18d55cffb1d1710ded8914bb8b12f012ac7eedcc3d6246168"}
 branch: task/gaid-design-identity--hub
 target: task/gaid-design-identity
@@ -69,10 +69,18 @@ task document. Do not write reports; the parent integrates your screenshots and 
 Network: raw.githubusercontent.com is blocked.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Active implementation in the resumed worktree. Shared navigation, hub entry rail, recommended/authored/shared registers, avatars and authoring surface vocabulary changed to direction 라.
+- Decisions: sequentially establish role-token surfaces, then register anatomy, then checks/browser evidence. No independent owned package exists within this child; work remains with this single writer. Parent owns globals/tokens, UI rules, reports and integration boundaries.
+- No routes, data contracts or locale values changed. Existing hub.io.generated text labels concept previews without adding copy.
+- Verification passed: `cd web && npx tsc --noEmit -p .`; `npm test -- --run src/geo/hub src/geo/hub-picker src/geo/workflow` (13 files, 67 tests); `node geo/ui/check-ui.mjs` (0 errors, 89 existing accepted debt); impeccable detector over owned directories returned `[]`; `git diff --check` clean.
+- Rules followed: S1–S8, V1–V10, G4/G5, N2, B1/B6. Existing content/controls preserved. No new UI debt or copy ids.
+- Isolated app uses UI 3320/API 18320 and its own copied GAID_HOME; startup building production UI.
 ## Next steps
-1. (the next session's first action)
+1. Run targeted TypeScript/tests/UI checks, start isolated app, batch Korean screenshots in both themes and viewport sizes; fix observed issues, then stop app and finish.
 ## Failed approaches
+- First two `task resume` attempts saw a transient parent task-start transaction; successful third resume returned the same worktree.
+- `task job run -- npm --prefix web ci` refused dirty source before creating a job; the authorized app launcher installed local dependencies instead.
+- First isolated app startup used copied `config.env`, overriding API port to the parent's 18310. No configuration content read or edited. Restarted with `KADY_ENV_FILE=/dev/null` so explicit ports take precedence.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items

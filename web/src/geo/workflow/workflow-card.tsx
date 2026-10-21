@@ -26,7 +26,7 @@ export function WorkflowBlockCard({ block }: { block: ParsedWorkflowBlock }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex w-fit max-w-full items-center gap-1.5 rounded-md border bg-background/60 px-2 py-1 text-sm font-medium",
+          "inline-flex w-fit max-w-full items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-sm font-medium",
           "hover:bg-background",
         )}
         aria-expanded={open}
@@ -37,7 +37,7 @@ export function WorkflowBlockCard({ block }: { block: ParsedWorkflowBlock }) {
         {open ? <ChevronDownIcon className="size-3 shrink-0" aria-hidden /> : <ChevronRightIcon className="size-3 shrink-0" aria-hidden />}
       </button>
       {open && (
-        <div className={cn("max-h-96 overflow-auto rounded-md border bg-background/60 px-3 py-2 text-sm", DOC_TEXT)}>
+        <div className={cn("max-h-96 overflow-auto rounded-md border bg-background px-3 py-2 text-sm", DOC_TEXT)}>
           <MessageResponse>{block.body}</MessageResponse>
         </div>
       )}
@@ -63,7 +63,7 @@ export function PendingWorkflowChip({ block, onRemove }: { block: string; onRemo
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex min-w-0 items-center gap-1.5 rounded-md border bg-background/60 px-2 py-1 text-sm font-medium hover:bg-background"
+          className="inline-flex min-w-0 items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-sm font-medium hover:bg-background"
           aria-expanded={open}
           aria-label={`${label}: ${t(open ? "workflowDoc.card.collapse" : "workflowDoc.card.expand")}`}
         >
@@ -79,7 +79,7 @@ export function PendingWorkflowChip({ block, onRemove }: { block: string; onRemo
       </div>
       <p className="text-sm text-muted-foreground">{t("workflowDoc.card.pendingHint")}</p>
       {open && (
-        <div className={cn("max-h-72 overflow-auto rounded-md border bg-background/60 px-3 py-2 text-sm", DOC_TEXT)}>
+        <div className={cn("max-h-72 overflow-auto rounded-md border bg-background px-3 py-2 text-sm", DOC_TEXT)}>
           <MessageResponse>{parsed.body}</MessageResponse>
         </div>
       )}

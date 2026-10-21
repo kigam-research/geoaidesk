@@ -34,7 +34,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
     <section className="space-y-3">
       {showStepsHeading && <h3 className="text-base font-semibold">{text("steps")}</h3>}
       {profile ? <MethodFlow profile={profile} doc={doc} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} stepDetail={(stepId) => <StepFacts doc={doc} stepId={stepId} />} /> : <ol className="space-y-2">
-        {doc.steps.map((step, i) => <li key={step.id} className="rounded-lg border p-3">
+        {doc.steps.map((step, i) => <li key={step.id} className="rounded-none border p-3">
           <details open={i === 0}>
             <summary className="cursor-pointer font-semibold">{i + 1}. {localText(step.title)}</summary>
             <p className="mt-2">{localText(step.does)}</p>
@@ -44,7 +44,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
       </ol>}
       {doc.steps.length === 0 && <p className="text-muted-foreground">{text("noSteps")}</p>}
     </section>
-    <details className="rounded-lg border p-3">
+    <details className="rounded-none border p-3">
       <summary className="cursor-pointer font-medium">{text("skills", { count: doc.skills.length })}</summary>
       <ul className="mt-3 space-y-3">
         {doc.skills.map((skill) => {
@@ -62,7 +62,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
         })}
       </ul>
     </details>
-    <details className="rounded-lg border p-3">
+    <details className="rounded-none border p-3">
       <summary className="cursor-pointer font-medium">{text("inputsChoices")}</summary>
       <div className="mt-3 space-y-3">
         <h4 className="font-medium">{text("inputs")}</h4>
@@ -76,7 +76,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
         </li>)}</ul>
       </div>
     </details>
-    <details className="rounded-lg border p-3">
+    <details className="rounded-none border p-3">
       <summary className="cursor-pointer font-medium">{text("resultsLimits")}</summary>
       <ul className="mt-3 list-disc space-y-1 pl-5">{doc.artifacts.map((artifact) => <li key={artifact.id}>{localText(artifact.label)} · {text(artifact.required ? "required" : "optional")}{artifact.files?.length ? <p>{artifact.files.join(", ")}</p> : null}{artifact.requiredWhen && <p>{localText(artifact.requiredWhen)}</p>}</li>)}</ul>
       {doc.boundary && <p className="mt-3 text-muted-foreground">{localText(doc.boundary)}</p>}
@@ -90,7 +90,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
 export function WorkflowInstructions({ doc, target = "preview", settings }: { doc: WorkflowDoc; target?: WorkflowDocTarget; settings?: WorkflowDocSettings }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const body = workflowDocText(doc, target, settings);
-  return <details className="rounded-lg border p-3 text-sm">
+  return <details className="rounded-none border p-3 text-sm">
     <summary className="cursor-pointer font-medium">{text("agentInstructions")}</summary>
     <div className="mt-3 space-y-2">
       <Button variant="outline" size="sm" onClick={async () => {
@@ -98,7 +98,7 @@ export function WorkflowInstructions({ doc, target = "preview", settings }: { do
         catch { setCopyState("failed"); }
       }}>{text("copy.button")}</Button>
       <span role="status" className="ml-2 text-muted-foreground">{copyState !== "idle" ? text(`copy.${copyState}`) : ""}</span>
-      <pre className="max-h-[55vh] overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted/40 p-3 font-sans text-sm">{body}</pre>
+      <pre className="max-h-[55vh] overflow-auto whitespace-pre-wrap break-words rounded-md bg-background p-3 font-sans text-sm">{body}</pre>
     </div>
   </details>;
 }
@@ -125,7 +125,7 @@ function RemoteSkillSource({ name, load, onBack }: { name: string; load: SkillSo
     void load(name).then((r) => { if (alive) setContent(r.content); }).catch(() => { if (alive) setFailed(true); });
     return () => { alive = false; };
   }, [name, load]);
-  return <section className="space-y-2 rounded-lg border p-3">
+  return <section className="space-y-2 rounded-none border p-3">
     <Button variant="outline" size="sm" onClick={onBack}>{text("close.button")}</Button>
     {failed ? <p role="alert">{text("sourceError")}</p> : content === null ? <p role="status">{text("loading")}</p> : <pre aria-label="SKILL.md" className="max-h-[55vh] overflow-auto whitespace-pre-wrap break-words text-sm">{content}</pre>}
   </section>;

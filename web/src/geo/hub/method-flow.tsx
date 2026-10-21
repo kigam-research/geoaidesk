@@ -157,15 +157,15 @@ function StepBox({
       onClick={onSelect}
       aria-current={active ? "step" : undefined}
       className={cn(
-        "group flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-left text-sm transition-colors hover:border-primary/60",
+        "group flex items-center gap-2 border-b bg-transparent px-3 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
         gate && !active && "border-[var(--gaid-warning)]/40",
-        active && "border-primary bg-primary text-primary-foreground",
+        active && "border-gaid-link bg-accent text-accent-foreground",
       )}
     >
       <span
         className={cn(
-          "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-          active ? "bg-primary-foreground text-primary" : "bg-primary/10 text-primary",
+          "flex size-6 shrink-0 items-center justify-center text-xs font-semibold",
+          active ? "text-accent-foreground" : "text-muted-foreground",
         )}
       >
         {index + 1}
@@ -175,7 +175,7 @@ function StepBox({
         <span
           className={cn(
             "inline-flex shrink-0 items-center gap-1 text-xs font-medium",
-            active ? "text-primary-foreground" : "text-[var(--gaid-warning)]",
+            active ? "text-accent-foreground" : "text-[var(--gaid-warning)]",
           )}
         >
           <UserRoundCheckIcon className="size-3.5" aria-hidden />
@@ -184,12 +184,12 @@ function StepBox({
       )}
       {Icon && (
         <Icon
-          className={cn("size-4 shrink-0", active ? "text-primary-foreground/80" : "text-muted-foreground")}
+          className={cn("size-4 shrink-0", active ? "text-accent-foreground" : "text-muted-foreground")}
           aria-hidden
         />
       )}
       <ChevronRightIcon
-        className={cn("size-4 shrink-0", active ? "text-primary-foreground" : "text-muted-foreground")}
+        className={cn("size-4 shrink-0", active ? "text-accent-foreground" : "text-muted-foreground")}
         aria-hidden
       />
     </button>
@@ -223,11 +223,11 @@ function StepDetail({
   const decisions = documentMode ? [] : (profile.userDecisions ?? []).filter((d) => d.at === node.id);
   return (
     <section
-      className="flex min-w-0 flex-col gap-4 self-start rounded-lg border bg-card p-4 md:sticky md:top-16"
+      className="flex min-w-0 flex-col gap-4 self-start rounded-none border bg-card p-4 md:sticky md:top-16"
       aria-live="polite"
     >
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-semibold tracking-wide text-primary">
+        <p className="text-xs font-semibold tracking-wide text-gaid-link">
           {text("flow.stepOf", { n: index + 1, total })}
         </p>
         <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold">
@@ -254,8 +254,8 @@ function StepDetail({
             <p className="text-xs font-semibold text-muted-foreground">{text("draft.checks")}</p>
             <ul className="flex flex-wrap gap-1.5">
               {node.checks.map((c, i) => (
-                <li key={i} className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs">
-                  <CircleIcon className="size-3 text-primary" aria-hidden />
+                <li key={i} className="inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs">
+                  <CircleIcon className="size-3 text-gaid-link" aria-hidden />
                   {localText(c)}
                 </li>
               ))}
@@ -267,7 +267,7 @@ function StepDetail({
       {visual && (
         <figure className="flex flex-col gap-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={visual.src} alt="" className="max-h-56 w-full rounded-lg border object-contain" />
+          <img src={visual.src} alt="" className="max-h-56 w-full rounded-none border object-contain" />
           <figcaption className="text-xs text-muted-foreground">
             {visual.caption} · {visual.kind === "paper" ? text("io.paperFigure") : text("io.generated")}
           </figcaption>
@@ -304,7 +304,7 @@ function PortHeading({ kind, label }: { kind: "in" | "out"; label: string }) {
         <span
           className={cn(
             "rounded px-1.5 py-0.5 text-xs font-semibold",
-            kind === "in" ? "bg-primary/10 text-primary" : "bg-muted text-foreground",
+            kind === "in" ? "bg-accent text-gaid-link" : "bg-muted text-foreground",
           )}
         >
           {kind === "in" ? text("draft.inputs") : text("draft.outputs")}

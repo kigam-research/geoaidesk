@@ -56,7 +56,7 @@ function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
   const [index, setIndex] = useState(0);
   const figure = figures[Math.min(index, figures.length - 1)];
   return (
-    <figure className="flex min-h-0 flex-col gap-2 rounded-xl border bg-card p-3">
+    <figure className="flex min-h-0 flex-col gap-2 rounded-none border bg-card p-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={figure.src} alt={figure.label} className="max-h-[46vh] w-full rounded-md border object-contain" />
       <figcaption className="flex flex-col gap-1 text-sm">
@@ -65,7 +65,7 @@ function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
           {figure.page ? ` · ${text("questions.page", { page: figure.page })}` : ""}
         </span>
         <span className="line-clamp-3 text-muted-foreground">{figure.caption}</span>
-        {figure.note && <span className="text-primary/90">{figure.note}</span>}
+        {figure.note && <span className="text-gaid-body">{figure.note}</span>}
       </figcaption>
       {figures.length > 1 && (
         <div className="flex gap-1.5">
@@ -77,7 +77,7 @@ function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
               onClick={() => setIndex(i)}
               className={cn(
                 "rounded-md border px-2 py-1 text-xs",
-                i === index ? "border-primary text-primary" : "text-muted-foreground",
+                i === index ? "border-primary text-gaid-link" : "text-muted-foreground",
               )}
             >
               {f.label}
@@ -139,11 +139,11 @@ export function QuestionStep({
                 aria-label={text("questions.tab", { n: i + 1 })}
                 onClick={() => go(i)}
                 className={cn(
-                  "inline-flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border px-3 text-sm font-medium transition-colors",
+                  "inline-flex h-9 min-w-9 items-center justify-center gap-1 rounded-none border-b-2 border-transparent px-3 text-sm font-medium transition-colors",
                   i === index
-                    ? "border-primary bg-primary text-primary-foreground"
+                    ? "border-gaid-link text-gaid-link"
                     : done
-                      ? "border-primary/30 bg-primary/5 text-primary"
+                      ? "border-transparent text-gaid-body"
                       : "text-muted-foreground hover:border-foreground/30",
                 )}
               >
@@ -160,9 +160,9 @@ export function QuestionStep({
             aria-selected={reviewing}
             onClick={() => go(questions.length)}
             className={cn(
-              "inline-flex h-9 items-center rounded-full border px-3 text-sm font-medium transition-colors",
+              "inline-flex h-9 items-center rounded-none border-b-2 border-transparent px-3 text-sm font-medium transition-colors",
               reviewing
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-gaid-link text-gaid-link"
                 : "text-muted-foreground hover:border-foreground/30",
             )}
           >
@@ -283,11 +283,11 @@ function QuestionCard({
   return (
     <section className="flex flex-col gap-4 py-1" aria-labelledby={`${otherId}-q`}>
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-primary">{text("questions.tab", { n: number })}</span>
+        <span className="text-sm font-medium text-gaid-link">{text("questions.tab", { n: number })}</span>
         <h2 id={`${otherId}-q`} className="text-xl font-semibold leading-snug">
           {question.text}
         </h2>
-        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 rounded-lg bg-muted/50 px-3 py-2 text-sm">
+        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 rounded-none bg-background px-3 py-2 text-sm">
           <dt className="font-medium text-muted-foreground">{text("questions.intent")}</dt>
           <dd>{question.reason}</dd>
           <dt className="font-medium text-muted-foreground">{text("questions.link")}</dt>
@@ -307,7 +307,7 @@ function QuestionCard({
                       <q className="text-foreground">{e.quote}</q>
                       <button
                         type="button"
-                        className="self-start text-primary underline-offset-4 hover:underline"
+                        className="self-start text-gaid-link underline-offset-4 hover:underline"
                         onClick={() => onOpenPage?.(e.sourceId, e.page!)}
                       >
                         {text("questions.page", { page: e.page ?? "" })}
@@ -339,8 +339,8 @@ function QuestionCard({
                   aria-checked={selected}
                   onClick={() => onChange({ optionId: option.id })}
                   className={cn(
-                    "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
-                    selected && "border-primary bg-primary/5 ring-1 ring-primary",
+                    "flex items-start gap-3 rounded-sm border px-4 py-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground",
+                    selected && "border-gaid-link bg-accent text-accent-foreground",
                   )}
                 >
                   <span
@@ -354,11 +354,11 @@ function QuestionCard({
                   <span className="flex flex-col gap-1">
                     <span className="flex flex-wrap items-center gap-2 font-medium">
                       {option.label}
-                      {recommended && <Badge>{text("questions.recommended")}</Badge>}
+                      {recommended && <Badge variant="secondary">{text("questions.recommended")}</Badge>}
                     </span>
                     {option.hint && <span className="text-sm text-muted-foreground">{option.hint}</span>}
                     {recommended && question.recommendedWhy && (
-                      <span className="text-sm text-primary/90">{question.recommendedWhy}</span>
+                      <span className="text-sm text-gaid-body">{question.recommendedWhy}</span>
                     )}
                   </span>
                 </button>
@@ -399,7 +399,7 @@ function QuestionCard({
           {text("questions.defer")}
         </button>
       {recorded && (
-        <p className={cn("text-sm", changed ? "font-medium text-primary" : "text-muted-foreground")}>
+        <p className={cn("text-sm", changed ? "font-medium text-gaid-link" : "text-muted-foreground")}>
           {changed ? text("questions.changedNote") : text("questions.recordedEditable")}
         </p>
       )}
@@ -427,12 +427,12 @@ function ReviewPanel({
         <h2 className="text-xl font-semibold">{text("questions.reviewTitle")}</h2>
         <p className="text-sm text-muted-foreground">{revising ? text("questions.reviewBodyRevise") : text("questions.reviewBody")}</p>
       </div>
-      <ol className="flex flex-col divide-y rounded-xl border">
+      <ol className="flex flex-col divide-y rounded-none border">
         {questions.map((q, i) => {
           const done = isAnswered(answers[q.id]);
           return (
             <li key={q.id} className="flex items-start gap-3 p-3">
-              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center bg-muted text-xs font-semibold">
                 {i + 1}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">

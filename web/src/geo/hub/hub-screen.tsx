@@ -918,8 +918,8 @@ function HubProject({
 /** Which registered method this draft edits (next revision) or copies (separate entry naming the original). */
 function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"]> }) {
   return (
-    <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
-      <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
+    <p className="mb-4 flex items-center gap-2 rounded-none border border-border bg-background px-3 py-2 text-sm">
+      <PencilIcon className="size-4 shrink-0 text-gaid-link" aria-hidden />
       {link.mode === "edit"
         ? text("editing.edit", { revision: link.revision, next: link.revision + 1 })
         : text("editing.copy", { author: link.author, title: link.title, revision: link.revision })}
@@ -931,7 +931,7 @@ function FailedNotice({ outcome, message, onRetry }: { outcome: string; message?
   return (
     <div
       role="alert"
-      className="mx-auto mb-4 flex max-w-2xl flex-col gap-2 rounded-lg border border-destructive/30 p-3 text-sm"
+      className="mx-auto mb-4 flex max-w-2xl flex-col gap-2 rounded-none border border-destructive/30 p-3 text-sm"
     >
       <div className="flex items-center justify-between gap-3">
         <span>{outcome === "interrupted" ? text("reading.interrupted") : text("reading.failed")}</span>
