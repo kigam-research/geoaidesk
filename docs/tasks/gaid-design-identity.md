@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T23:28:12Z
+updated: 2026-10-21T23:29:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -50,22 +50,26 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
   three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
   if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
-1. Waiting for the user's explicit choice among the One UI drafts (report §3.6/§6: 가 Codex O recommended, 나 GAID
-   chamfered blocks, 다 One UI focus blocks, 라 redraw). Drafts sent via review-copy 2026-10-22; route
-   design-oneui-20261021 reported --blocked (needs this choice). Ask back on an ambiguous answer.
-2. After an explicit choice: retarget tokens/guide/screens on this branch, notify the hub, finish. Route
-   design-oneui-20261021 must get `task route-report` before finishing.
-- Done: children hub + system integrated and closed; temporary hub baseline removed; library tone debt remains.
-- One UI drafts (writer): `~/data/geoaidesk/work/gaid-design-identity/oneui/` (`oneui.html?v=a|b&s=hub|work&t=light|dark`,
-  `oneui.css`, `png/`): 가) One UI focus blocks (rounded 22 px blocks, pill buttons, grouped lists with inset dividers,
-  blue subheaders, 34 px viewing-area title, monotone #EEF0F2 ground / dark #0C0E10); 나) same structure with blocks and
-  controls cut by the G's chamfer (no radius). Reader f980bd78 (Codex 고급검토) builds its own One UI draft in `codex-oneui/`.
+Blocked: waiting for child gaid-design-identity--fresh (writer bd409835, Claude Opus 5.5 max, verified) to redesign the guide
+from One UI + Apple HIG, show mockups to the user in its tab and get an explicit choice; then it lands and finishes.
+1. On the child's finish: `task complete gaid-design-identity--fresh` (clear build caches if close is pending), check the
+   integrated branch (scripts/check), replace the report's rejected-draft sections with the adopted design (supersede note),
+   humanizer, review-copy, tell the hub the confirmed direction (`task hub --send --kind route`), `task route-report
+   design-fresh-20261022`, `task finish`.
+2. If the user rejects everything again: record it; ask the hub/user how to close (the branch still carries the provisional 라
+   styling, which must not land as an adopted direction).
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
   short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
 - playwright-cli cannot render `file://` mockups (blank page); serve them over http.
 ## Notes and decisions
+- 2026-10-22 hub route design-fresh-20261022 (user, verbatim): "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와
+  https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게
+  재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자." → none of 라 / One UI 가·나·O land.
+  Child `gaid-design-identity--fresh` started with a bias-free brief (`~/data/geoaidesk/work/gaid-design-identity/child-fresh.md`:
+  inputs = origin/main guide + rules, One UI digest, Apple HIG, current main screenshots/code, logo; earlier drafts, reports and
+  tokens excluded). AGENTS.md and the guide now say 라 was not adopted (980eab58).
 - CORRECTION 2026-10-21 (hub route design-oneui-20261021, user-confirmed): direction 라 was the writer's interpretation,
   not a user decision. User (verbatim): "새로운 디자인을 oneui가이드에 따라 생성하자." → create a new design that follows the
   One UI guide, avoid AI slop, give GAID a recognisable identity, expert stance (impeccable + taste + brand guide); 2번 (가)
