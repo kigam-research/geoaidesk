@@ -19,7 +19,7 @@ Import `server/src/geo/library/metadata/index.ts`:
 | `doiCandidates`, `normalizeDoi`, `arxivCandidates` | Pure identifier helpers. |
 
 `MetadataRecord` contains `csl`, `metadataOrigin`, `metadataConfirmed: false`, `signals`.
-Signals preserve direction (`update-to:retraction`, `is-corrected-by`, `update-type:correction`, `is_retracted`). A
+Signals preserve direction (`update-to:retraction`, `updated-by:correction`, `is-corrected-by`, `update-type:correction`, `is_retracted`). Crossref update assertions also retain their source, record ID, label and effective timestamp when supplied. A
 retraction notice referring to another paper is not treated as a definitive assertion about the notice itself.
 
 Crossref uses `CROSSREF_MAILTO` or the explicit `mailto` option; no address is invented. `OPENALEX_API_KEY` is optional
@@ -28,7 +28,9 @@ key explicitly disables it). The module-level convenience functions lazily creat
 The embedding server's configured global dispatcher supplies proxy support. Errors do not contain key-bearing URLs.
 
 Per-client requests serialize, including body consumption. Crossref `x-rate-limit-limit` and
-`x-rate-limit-interval` pace subsequent requests; `Retry-After` seconds or HTTP dates set a host cooldown. One
+`x-rate-limit-interval` pace subsequent requests in separate singleton/list buckets; a fast DOI lookup cannot reset a
+search cooldown. Headerless defaults use the documented public/polite rates (singleton 5/10 per second, list 1/3 per
+second). `Retry-After` seconds or HTTP dates set a host cooldown. One
 429/503 retry is allowed. A wait over the configured budget (default 60 seconds) returns a provider error instead of
 requesting early. Publisher redirects reuse authoring's loopback/link-local validator, check every hop, stop after
 five hops, cap bodies at 4 MiB and use a 30-second fetch deadline. Provider bodies have the same 4 MiB cap.
@@ -51,15 +53,21 @@ Primary references:
 
 - Crossref REST: https://www.crossref.org/documentation/retrieve-metadata/rest-api/tips-for-using-the-crossref-rest-api/
 - Crossref API schema: https://github.com/CrossRef/rest-api-doc
+- Crossref request-limit update: https://community.crossref.org/t/refining-rest-api-limits-for-improved-stability-and-reliability/16137
+- Crossref update direction: https://www.crossref.org/documentation/register-maintain-records/maintaining-your-metadata/registering-updates/
 - OpenAlex authentication: https://help.openalex.org/api/authentication/
 - KCI basic-article API field table: https://www.kci.go.kr/kciportal/po/openapi/openDataView.kci?datasetBean.dtstSeqNo=1
+- KCI official endpoint example: https://www.kci.go.kr/kciportal/po/openapi/openApiConnSamp.kci
 
 KCI's public table documents `key`, `apiCode=articleSearch`, required UTF-8 `title`, optional `author`, `doi`, page and
 `displayCount` (maximum 100). It lists XML `record`, `journalInfo/journal-name`, `pub-year`, `articleInfo/title-group/
 article-title[lang=original]`, `author-group/author`, `doi`, `fpage`, `lpage`, and `url`. The adapter targets
-`https://www.kci.go.kr/kciportal/po/openapi/openApiSearch.kci`. No KCI key was used in this task: the keyed endpoint,
+`https://open.kci.go.kr/po/openapi/openApiSearch.kci`, as shown in the official usage example. No KCI key was used in this task: the keyed endpoint,
 real XML envelope and account entitlement are not live-verified; the XML fixture is explicitly synthetic. KCI service
 failure is a separate error and cannot silently approve a candidate.
+
+API documentation research: `웹 조사/geoaidesk/2026-10-21-verify-official-crossref-rest-rate--bf1af91b90.md`
+in the PC74 Obsidian vault. Its endpoint/update-direction findings were reread against the primary pages above.
 
 ## Live smoke
 

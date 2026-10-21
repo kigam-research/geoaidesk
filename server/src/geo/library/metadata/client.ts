@@ -17,25 +17,30 @@ export function createMetadataClient(options: MetadataClientOptions = {}) {
   const sleep = options.sleep ?? ((ms: number) => delay(ms));
   const maxWait = options.maxRateWaitMs ?? 60_000;
   const cooldown = new Map<string, number>();
-  let crossrefSpacing = 0;
+  const rateNext = new Map<string, number>();
+  const spacing = new Map<string, number>();
   let queue: Promise<unknown> = Promise.resolve();
 
   async function request(url: URL): Promise<string> {
+    // Crossref applies separate singleton/list quotas. A fast singleton response must not reset list pacing.
+    const isCrossref = url.host === "api.crossref.org";
+    const isList = url.pathname === "/works";
+    const bucket = isCrossref ? `${url.host}:${isList ? "list" : "singleton"}` : url.host;
+    const defaultSpacing = isCrossref ? Math.ceil(1000 / (isList ? mailto ? 3 : 1 : mailto ? 10 : 5)) : 0;
     // Serialize this client's provider requests, including backoff and stream consumption.
     const call = queue.then(async () => {
       for (let attempt = 0; ; attempt++) {
-        const wait = Math.max(0, (cooldown.get(url.host) ?? 0) - now());
+        const wait = Math.max(0, Math.max(cooldown.get(url.host) ?? 0, rateNext.get(bucket) ?? 0) - now());
         if (wait > maxWait) throw new Error("Provider cooldown exceeds request wait budget");
         if (wait) await sleep(wait);
         const response = await fetcher(url, { redirect: "error", signal: AbortSignal.timeout(timeout), headers: {
-          Accept: url.host === "www.kci.go.kr" ? "application/xml, text/xml" : "application/json",
+          Accept: url.host === "open.kci.go.kr" ? "application/xml, text/xml" : "application/json",
           "User-Agent": `GAID-metadata/1${mailto ? ` (mailto:${mailto})` : ""}`,
         } });
         const interval = /^(\d+(?:\.\d+)?)s?$/.exec(response.headers.get("x-rate-limit-interval") ?? "");
         const limit = Number(response.headers.get("x-rate-limit-limit"));
-        if (url.host === "api.crossref.org" && interval && limit > 0)
-          crossrefSpacing = Math.ceil(Number(interval[1]) * 1000 / limit);
-        if (url.host === "api.crossref.org") cooldown.set(url.host, now() + crossrefSpacing);
+        if (isCrossref && interval && limit > 0) spacing.set(bucket, Math.ceil(Number(interval[1]) * 1000 / limit));
+        if (isCrossref) rateNext.set(bucket, now() + (spacing.get(bucket) ?? defaultSpacing));
         const retry = response.headers.get("retry-after");
         if (retry || [429, 503].includes(response.status)) {
           const ms = retry && /^\d+(?:\.\d+)?$/.test(retry) ? Number(retry) * 1000 : retry ? Math.max(0, Date.parse(retry) - now()) : 1000;
@@ -74,7 +79,7 @@ export function createMetadataClient(options: MetadataClientOptions = {}) {
   async function searchKci(title: string, authorHint?: string): Promise<SearchResult & { skipped: boolean }> {
     if (!kciKey) return { candidates: [], errors: [], requiresSelection: true, skipped: true };
     if (!title.trim() || title.length > 2000) throw new Error("Title must contain 1–2000 characters");
-    const url = new URL("https://www.kci.go.kr/kciportal/po/openapi/openApiSearch.kci");
+    const url = new URL("https://open.kci.go.kr/po/openapi/openApiSearch.kci");
     url.searchParams.set("key", kciKey); url.searchParams.set("apiCode", "articleSearch");
     url.searchParams.set("title", title.trim()); url.searchParams.set("displayCount", "10");
     if (authorHint) url.searchParams.set("author", authorHint);

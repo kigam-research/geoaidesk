@@ -6,6 +6,10 @@ export interface MetadataSignal {
   relation: string;
   doi?: string;
   source: MetadataOrigin;
+  assertionSource?: string;
+  recordId?: string;
+  updatedAt?: string;
+  label?: string;
 }
 
 export interface MetadataRecord {

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:35:39Z
+updated: 2026-10-21T11:41:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3af53966-052e-46c3-8a2d-2c8d41a23668","pid":1527917,"provider":"codex","session":"01a15e34-6c95-7c51-97f7-fd1699ddd9db","start":"46979518","token":"3b29a99f8472c13cc91477b88811c27fdf13e9ca7893426b125e2c2824d09462"}
 branch: task/gaid-research-hub--metadata
 target: task/gaid-research-hub
@@ -65,15 +65,16 @@ you could not verify.
 
 ## Current state
 Implemented the owned server adapters and pure formats; no routes, store, UI, shared contract or dependencies changed.
-- Focused vitest: 18/18 passed (2 files), latest run 2026-10-21 20:34 KST. Global fetch is forbidden; all API requests are injected.
+- Focused vitest: 19/19 passed (2 files), latest run 2026-10-21 20:40 KST. Global fetch is forbidden; all API requests are injected.
 - Server typecheck: npx tsc --noEmit passed after final code changes. git diff --check passed.
 - PC74 live smoke: two DOIs, Crossref and OpenAlex each, 4/4 successful; both titles matched the requested DOI and all records remained metadataConfirmed:false. OpenAlex used no key.
 - Recorded fields live in server/test/fixtures/library; PDF fixtures are generated in OS temp storage. KCI XML is synthetic, not a keyed response.
-- Remaining: the recorded Oracle API-documentation job is still running. No code verification remains; reconcile its source details when the relay reports completion, then finish.
+- Oracle API-documentation job exited successfully (0). Reconciled its primary sources: corrected KCI to open.kci.go.kr, added Crossref updated-by assertions and retained source/record/date details, and split singleton/list rate buckets. The added interleaved-rate regression test passed.
+- Ready for task finish and parent integration. Full-app checks/deployment remain with the parent; this child does not claim them.
 
 ## Next steps
-1. On the recorded job completion, read its log/result and reconcile any verified API detail (especially KCI endpoint). Do not relaunch the job.
-2. Save any documentation-only update and run task finish. Parent owns integration with task complete and the final full-app check.
+1. Run task finish with the checked snapshot. Parent owns integration with task complete and the final full-app check.
+2. After finish, wait for the final completion notice; do not archive this writer.
 
 ## Work packages and integration order
 - Completed sequentially: CSL result shapes, identifier/PDF/URL adapters, provider mapping/backoff, bibliography functions, fixture coverage and smoke.
@@ -103,9 +104,10 @@ Implemented the owned server adapters and pure formats; no routes, store, UI, sh
 - Every metadata result stays unconfirmed. Directional update evidence is retained; absence of signals is not proof that a paper is not retracted.
 - No Korean romanisation dependency exists here: supplied Kim becomes kim2024, Korean-only family/name becomes ref2024. Never invent a surname; persist the assigned key.
 - BibTeX/RIS cover common bibliographic fields and retain uninterpreted original-format fields. Arbitrary CSL extension properties are lossless in CSL-JSON only. Full APA/CSL style support remains a parent-level choice, not a done criterion.
-- KCI public request/response field table was read. No KCI key was used; keyed endpoint, actual XML envelope and entitlement remain live-unverified. Adapter failures are explicit, never silent acceptance.
+- KCI public request/response field table and official endpoint example were read. No KCI key was used; keyed endpoint, actual XML envelope and entitlement remain live-unverified. Adapter failures are explicit, never silent acceptance.
 - Opt-in smoke command (from server): GAID_METADATA_LIVE_SMOKE=1 npx tsx src/geo/library/metadata/live-smoke.ts /home/seongin3/data/geoaidesk/work/gaid-research-hub--metadata/live-smoke
 - Live responses: /home/seongin3/data/geoaidesk/work/gaid-research-hub--metadata/live-smoke (external, metadata only). Smoke succeeded for 10.1038/nphys1170 and 10.1371/journal.pone.0000308 against both providers.
+- Oracle evidence: job-geoaidesk-gaid-research-hub--metadata-1 exited 0. Saved note: 웹 조사/geoaidesk/2026-10-21-verify-official-crossref-rest-rate--bf1af91b90.md (PC74 vault). Primary endpoint example: https://www.kci.go.kr/kciportal/po/openapi/openApiConnSamp.kci; Crossref update direction: https://www.crossref.org/documentation/register-maintain-records/maintaining-your-metadata/registering-updates/; rate update: https://community.crossref.org/t/refining-rest-api-limits-for-improved-stability-and-reliability/16137.
 - Focused checks, not scripts/check, are this child contract. Parent owns full application integration/checks.
 
 ## Open items

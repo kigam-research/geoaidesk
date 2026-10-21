@@ -31,9 +31,11 @@ export function fromCrossref(value: unknown): MetadataRecord {
   const title = first(w.title);
   if (!title) throw new Error("Crossref record has no title");
   const signals: MetadataSignal[] = [];
-  for (const u of list(w["update-to"]).map(object)) {
-    const relation = `update-to:${str(u.type) || "update"}`;
-    signals.push({ kind: kind(relation), relation, doi: doiCandidates(str(u.DOI))[0], source: "crossref" });
+  for (const direction of ["update-to", "updated-by"]) for (const u of list(w[direction]).map(object)) {
+    const relation = `${direction}:${str(u.type) || "update"}`;
+    signals.push(compact({ kind: kind(relation), relation, doi: doiCandidates(str(u.DOI))[0], source: "crossref",
+      assertionSource: str(u.source), recordId: str(u["record-id"]), updatedAt: str(object(u.updated)["date-time"]), label: str(u.label),
+    }));
   }
   for (const [relation, entries] of Object.entries(object(w.relation))) {
     if (!/retract|withdraw|correct|errat|update/i.test(relation)) continue;

@@ -22,6 +22,8 @@ describe("metadata services", () => {
   it("maps recorded Crossref metadata, polite mailto and update signals", async () => {
     const value = await fixture("crossref");
     value.message["update-to"] = [{ DOI: "10.1000/original", type: "retraction" }];
+    value.message["updated-by"] = [{ DOI: "10.1000/notice", type: "correction", source: "publisher", "record-id": "42",
+      updated: { "date-time": "2024-01-01T00:00:00Z" }, label: "Correction" }];
     value.message.relation = { "is-corrected-by": [{ id: "10.1000/correction", "id-type": "doi" }] };
     value.message["update-type"] = "correction";
     const f = mockFetch((url, init) => {
@@ -33,7 +35,8 @@ describe("metadata services", () => {
     expect(r.csl.title).toBe("Measured measurement");
     expect(r.csl.author?.[0].family).toBe("Aspelmeyer");
     expect(r.metadataOrigin).toBe("crossref"); expect(r.metadataConfirmed).toBe(false);
-    expect(r.signals.map((s) => s.kind)).toEqual(["retraction", "correction", "correction"]);
+    expect(r.signals.map((s) => s.kind)).toEqual(["retraction", "correction", "correction", "correction"]);
+    expect(r.signals[1]).toMatchObject({ relation: "updated-by:correction", assertionSource: "publisher", recordId: "42", updatedAt: "2024-01-01T00:00:00Z" });
   });
 
   it("falls back to OpenAlex after Crossref fails, keyless or with an optional key", async () => {
@@ -65,6 +68,17 @@ describe("metadata services", () => {
     const secret = "do-not-print";
     await expect(createMetadataClient({ fetch: mockFetch(() => { throw new Error(`https://api.openalex.org/?api_key=${secret}`); }) }).lookupDoi("10.1038/nphys1170"))
       .rejects.not.toThrow(secret);
+  });
+
+  it("keeps the list rate bucket when singleton requests intervene", async () => {
+    const value = await fixture("crossref"); let now = 0;
+    const sleep = vi.fn(async (ms: number) => { now += ms; });
+    const f = mockFetch((url) => url.host === "api.openalex.org" ? json({ results: [] }) : url.pathname === "/works"
+      ? json({ message: { items: [value.message] } }, 200, { "x-rate-limit-limit": "1", "x-rate-limit-interval": "1s" })
+      : json(value, 200, { "x-rate-limit-limit": "10", "x-rate-limit-interval": "1s" }));
+    const c = createMetadataClient({ fetch: f, now: () => now, sleep, kciApiKey: "" });
+    await c.searchByTitle("Measured measurement"); await c.lookupDoi("10.1038/nphys1170"); await c.searchByTitle("Measured measurement");
+    expect(sleep.mock.calls).toEqual([[1000]]);
   });
 
   it("ranks title candidates but requires selection and retains provider failures", async () => {
@@ -99,7 +113,7 @@ describe("metadata services", () => {
 
   it("skips KCI without a key and maps the documented XML fields when enabled", async () => {
     const xml = await readFile(new URL("./fixtures/library/kci.xml", import.meta.url), "utf8");
-    const f = mockFetch((url) => { expect(url.searchParams.get("apiCode")).toBe("articleSearch"); expect(url.searchParams.get("title")).toBe("지질 연구"); return new Response(xml); });
+    const f = mockFetch((url) => { expect(url.origin + url.pathname).toBe("https://open.kci.go.kr/po/openapi/openApiSearch.kci"); expect(url.searchParams.get("apiCode")).toBe("articleSearch"); expect(url.searchParams.get("title")).toBe("지질 연구"); return new Response(xml); });
     expect((await createMetadataClient({ fetch: f, kciApiKey: "" }).searchKci("지질 연구")).skipped).toBe(true); expect(f).not.toHaveBeenCalled();
     const r = await createMetadataClient({ fetch: f, kciApiKey: "fixture" }).searchKci("지질 연구");
     expect(r.candidates[0].csl.title).toBe("지질 연구"); expect(r.candidates[0].csl.author?.[0].literal).toBe("김연구");
