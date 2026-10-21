@@ -811,6 +811,42 @@
       "owner": "gaid-workflow-model",
       "status": "edited",
       "responsibility": "commandPreview names a Workflow start (`<workflow>` block) \"Workflow · <title>\" in tab and history labels, with the researcher's first line"
+    },
+    {
+      "path": "server/test/geo-library-metadata.test.ts",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "server/test/geo-library-formats.test.ts",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "server/test/fixtures/library/crossref.json",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "server/test/fixtures/library/openalex.json",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "server/test/fixtures/library/kci.xml",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "server/test/fixtures/library/README.md",
+      "owner": "gaid-research-hub--metadata",
+      "status": "added",
+      "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
     }
   ],
   "notTouched": [
