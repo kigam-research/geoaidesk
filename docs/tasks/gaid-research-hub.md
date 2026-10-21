@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T06:36:27Z
+updated: 2026-10-21T07:52:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -39,11 +39,48 @@ Scope (research → discuss → implement; same pattern as gaid-notebook-review 
 Outside check: no outside check (product design and app work; researcher-value judgement is discussed with the user).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Phase 1 (research and design proposal) in progress since 2026-10-21. No product code changed.
+- Web research running through oracle-search: q1 researcher tools survey (Pro), q2 IA/data-model benchmark (xhigh).
+  Prompts and raw outputs: ~/data/geoaidesk/work/gaid-research-hub/oracle/{q1-tools.md,q2-design.md,q1.out,q2.out}.
+- GAID inventory (upstream K-Dense literature/grant Workflows and skills, Paperclip, hub, notes) by a native read-only
+  sub-agent.
+- Operator context (qmd, cmds-main vault): the vault convention reserves `80. References/Zotero` and the llm-wiki
+  paper-analysis rule recovers page locators from Zotero PDFs, but PC74 has no Zotero data dir and only
+  `80. References/81. Attachment` exists; PC71 (Windows desktop, RMA) unreachable. Actual Zotero use by the user and
+  colleagues is unconfirmed: ask in the proposal.
+- User-supplied input (2026-10-21): Claude web survey "GAID 연구 허브 도구 현황 조사 (2026-10)", 16 pp, copy at
+  ~/data/geoaidesk/work/gaid-research-hub/inputs/claude-web-survey.pdf (sha256 50e99f45…21758, text extracted beside it).
+  It agrees with oracle q1 on: Zotero 10 as the only realistic library target (Local API read+write locally, Web API v3
+  per-user key on a server), no headless Zotero, PaperQA2 / GROBID+Docling as integration candidates, build the
+  own-papers pipeline and library-grounded QA saved to notes, ideas only as evidence-backed candidates. Conflicts:
+  OpenAlex key requirement resolved 2026-10-21 (official auth page + keyless request HTTP 200: basic queries keyless,
+  key = 10x daily budget and needed for cursor paging); Crossref limit dates (2025-12-01 vs 2026-07-21) unchecked.
+- q2 done (vault `웹 조사/geoaidesk/2026-10-21-benchmark-design-question-please-cite--45e2be4f0d.md`): adds A/B/C
+  architecture range (Zotero sidecar → project-centric hub → institute platform), citekey as alias (link by Zotero
+  item key), ReviewRound/SubmissionEvent with status source, PDFs referenced not copied, novelty "not found" ≠ novel.
+  Folded into the report. Spot checks: 6 candidate repos' latest release/license re-queried via gh api (match);
+  Zotero local API write (Zotero 10+) confirmed on the official page.
+- GAID inventory (2026-10-21): no reference library, bibliography or literature entry exists anywhere (notebook entry
+  types hypothesis/method/observation/decision/note; research notes have no citation field; hub sources carry a
+  free-text DOI). Upstream Workflows: paper(15), literature(11), grants(12) in web/src/data/workflows.json (prompts only,
+  no skill field). GAID catalogue 0.2.1 has 13 geo skills and none for literature; upstream literature skills
+  (paper-lookup, citation-management, literature-review, pyzotero [default-disabled], paperzilla, open-notebook,
+  hypothesis-generation, scientific-brainstorming, research-grants [US agencies + Taiwan NSTC only], peer-review,
+  scientific-writing, venue-templates, markitdown) are absent in geo mode. Paperclip = remote MCP (key or OAuth).
+  Subagent roster has literature-researcher, citation-checker, hypothesis-generator, manuscript-editor.
 ## Next steps
-1. (the next session's first action)
+1. Proposal report written and pushed; review copy made. Wait for the user's answers to report §6 (four decisions +
+   three fact checks) in this tab.
+2. After the user's answers: record them under Notes and decisions, write the ADR for IA/storage, settle contracts,
+   then screen drafts (2-3) before implementation of the agreed first phase.
 ## Failed approaches
+- oracle q1 (Pro) timed out after 40 min of stale UI; `oracle session i-am-designing-a-research --harvest` recovered the
+  completed answer (~/data/geoaidesk/work/gaid-research-hub/oracle/q1.harvest.md). `task research-save` reports
+  skipped:1 for this session (also with --since); vault copy not made, local harvest + ChatGPT URL cited instead.
 ## Notes and decisions
+- Orchestration (phase 1): sequential — research → proposal → user discussion. Independent packages now: web
+  research (oracle), GAID inventory (read-only). No child writers until the user agrees on scope and the shared
+  interfaces (library/publication data model, contracts under web/src/geo/contracts/) are settled.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -51,9 +88,7 @@ Outside check: no outside check (product design and app work; researcher-value j
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-21-gaid-research-hub/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
