@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T12:13:54Z
+updated: 2026-10-21T12:57:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -50,9 +50,39 @@ Use your own GAID_HOME under ~/data/geoaidesk/work/gaid-research-visuals/; do no
 Outside check: no outside check (product design and app work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Phase 1 (research → proposal), 2026-10-21.
+- Read the four inputs. Confirmed: none names a figure-generation tool (only Docling figure extraction, figure-level
+  evidence anchors, figures linked to review items). Visualization tools covered: citation maps (Connected Papers,
+  Litmaps/ResearchRabbit, Inciteful), ORKG comparison tables, Logseq/Obsidian graphs; all three surveys say "do not build
+  a citation-graph UI; link out; build the paper–claim–experiment–note–manuscript–Workflow graph inside".
+- Sibling gaid-research-hub (read-only, ADR 2026-10-21-research-hub-library) already plans: idea candidates (⑧, phase 3,
+  stored as research notes), citation-map link-out and "highly cited papers missing from my library" (phase 3),
+  "내 연구에서 쓰인 곳" per library item (phase 1), review items linked to figures (phase 2). This unit must not duplicate
+  those; it adds figures and a connection view over that data.
+- Web research for figures/journal/AI-image policy/diagram tools/QA/graph UI components: Oracle xhigh run, prompt
+  `~/data/geoaidesk/work/gaid-research-visuals/oracle/q1-figures.md`, output `oracle/q1.out` (running).
+- Oracle q1 (vault 웹 조사/geoaidesk/2026-10-21-ai-geoaidesk-gaid-python-markdown--aa555d9439.md) covered C (AI image
+  policy) and B (journal figure specs), then stopped mid-A. Verified directly: Elsevier GenAI policy (explanatory images
+  allowed with caption disclosure; data visualizations only when derived from data reproducibly; "General-purpose
+  generative AI image tools must not be used to create graphical abstracts"); Copernicus AI policy (illustrations and
+  schematics permitted when the tool is cited) and figure guideline (CVD check, Scientific colour maps 7.0 recommended,
+  300 dpi, panels in one file). gh api: Cytoscape.js MIT 3.34.4, xyflow MIT (@xyflow/react 12.12.0), sigma MIT 4.0.3,
+  Excalidraw MIT 0.18.1, tldraw custom licence needing a licence key in production (exclude), JSON Canvas MIT spec,
+  SciencePlots MIT 2.2.2, PyGMT BSD-3 0.19.0, UltraPlot MIT 2.7.2, showyourwork MIT 0.4.3 (2023), Mermaid MIT,
+  draw.io Apache-2.0, DeTikZify Apache-2.0 0.3.0.
+- GAID inventory (Explore, 2026-10-21): geo catalogue 0.2.1 has 13 skills, no general plotting/writing/citation/diagram
+  skill; upstream K-Dense skills are fully replaced in geo mode. Upstream `scientific-visualization` (MIT, v1.4,
+  2026-10-01) has publisher profiles (nature, science, cell, plos, elsevier, ieee, bmc, acs — no AGU/Copernicus/GSA/KR),
+  export_plan/figure_export/palette_audit/image_metadata scripts; `scientific-schematics` uses Nano Banana via OpenRouter.
+  Upstream visual Workflows (graphical-abstract, publication-figure, poster, schematic, …) are prompt-only, shown folded
+  under 일반 Workflow. `generate_image` is available in geo mode (OpenRouter). Hub concept pictures = gpt-image-2, labelled
+  "개념 그림 (분석 자료가 아닙니다)". Provenance walkLineage already walks figure → script → data; UI is an indented list
+  (provenance-panel.tsx LineageTree). Web has no graph library (only @streamdown/mermaid); hub flow diagram is hand-built.
+  Geo env has matplotlib; no cmcrameri/pygmt/cartopy/seaborn. Notes copy figures into figures/ (RESEARCH_NOTE_RULE).
 ## Next steps
-1. (the next session's first action)
+1. Collect the Oracle answer and the inventory; write the proposal report reports/2026-10-21-gaid-research-visuals/index.md
+   (humanizer, task review-copy) and discuss with the user. Implement only the agreed scope.
+Blocked: waiting for the Oracle follow-up (background shell, output oracle/q1-cont2.out; first answer stopped after sections C, B and part of A).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
