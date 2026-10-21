@@ -1,7 +1,7 @@
 # ADR 2026-10-21: A hybrid personal library under "내 연구"; Zotero stays the source for Zotero items
 
-Status: accepted 2026-10-21 (user chose the recommended option for all four questions and added the hybrid requirement,
-gaid-research-hub). Context: reports/2026-10-21-gaid-research-hub §3.5–3.10, §6.
+Status: accepted 2026-10-21 (user chose the recommended option for all questions, added the hybrid requirement and
+combined the layout drafts, gaid-research-hub). Context: reports/2026-10-21-gaid-research-hub §3.5–3.10, §6.
 
 ## Context
 
@@ -46,8 +46,13 @@ Many intended GAID users do not use Zotero or Obsidian and work only with web se
    quote, file hash, verified) generalise the hub authoring `Anchor`; anchors are rechecked when the PDF is reopened.
    PDFs are referenced, never copied to the shared hub.
 5. **Where it runs first.** Phase 1 runs on the researcher's own GAID (PC). The institute server hosts personal
-   libraries only after accounts, per-user storage and per-user Zotero keys exist (timing: open decision in the report
-   §6).
+   libraries only after accounts, per-user storage and per-user Zotero keys exist; the user chose to build them right
+   after the phase-1 pilot, before "내 논문" (2026-10-21).
+7. **Default model for unpublished material.** Work on unpublished manuscripts, review comments and ideas defaults to
+   the institute-internal model connected to GAID; the researcher can switch, and GAID says so before sending such
+   material to an external provider (user decision 2026-10-21).
+8. **Library screen.** First screen = large search, "이번 주" and new papers (draft 다안); the list is a table (나안)
+   and the selected paper opens the detail pane with "내 연구에서 쓰인 곳" (가안) (user decision 2026-10-21).
 6. **Citations the agent may write** are library items or DOIs whose metadata resolved; anything else is shown as
    "확인 안 됨". Paper text is untrusted input (prompt injection); literature-reading work runs without file writes or
    outbound connections beyond the configured services.

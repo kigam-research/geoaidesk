@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T09:13:25Z
+updated: 2026-10-21T11:23:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -69,18 +69,23 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
   scientific-writing, venue-templates, markitdown) are absent in geo mode. Paperclip = remote MCP (key or OAuth).
   Subagent roster has literature-researcher, citation-checker, hypothesis-generator, manuscript-editor.
 ## Next steps
-1. Wait for the user's choice among the library layout drafts (가안 three-pane, 나안 tabs+table+side panel, 다안
-   search-centred cards + this week; recommended 다안 first screen + 가안 detail pane). Drafts and comparison:
-   ~/data/geoaidesk/work/gaid-research-hub/drafts/ (HTML + 1440x900 PNG), vault copy
-   `연구 보고서/geoaidesk/2026-10-21-drafts/index.md`. Also pending: report §6 (account timing, default model for
-   unpublished material) and four fact checks.
-2. Then: review/adjust the draft contract web/src/geo/contracts/library.ts (written 2026-10-21: LibraryItem with
-   source zotero|gaid, ZoteroItemRef per connection/serverId, CslItem, ReadState, EvidenceAnchor, ProjectLiterature in
-   .kady/geo/literature.json, ZoteroWrite = add-to-inbox|add-note-link|add-tags, parseCitations for Pandoc citations;
-   `cd web && npx vitest run src/geo/contracts/library.test.ts` 4 passed, `npx tsc --noEmit` clean); polish the
-   chosen layout with the 2026-10-15 design references; split implementation into packages (Zotero connector,
-   GAID-managed items + metadata lookup, note citation hook/rendering, hub authoring from library item, catalogue
-   literature skills) and start child writers once the contracts are fixed.
+1. Phase-1 implementation (agreed scope). Orchestration:
+   - Sequential: contract web/src/geo/contracts/library.ts (draft done) -> store + routes (parent) -> UI (parent, after
+     routes) -> integration check (scripts/check) -> report §3/§4 update with 1440x900 + 1280x800 screenshots.
+   - Child writers (Codex "general work"), owned files only:
+     - gaid-research-hub--zotero: server/src/geo/library/zotero/**, server/test/geo-library-zotero.test.ts (+ fixture);
+       prompt ~/data/geoaidesk/work/gaid-research-hub/prompts/zotero.md
+     - gaid-research-hub--metadata: server/src/geo/library/metadata/**, formats/**, tests geo-library-{metadata,formats};
+       prompt ~/data/geoaidesk/work/gaid-research-hub/prompts/metadata.md
+   - Parent (tightly coupled): server/src/geo/library/{store,routes,reader,tools,citations}.ts, project literature
+     (.kady/geo/literature.json), agent tools library_search/library_read (lead only), note citation hook + note
+     references, hub authoring from a library item, web/src/geo/library/** screens (서재 = 다안 first screen + 나안
+     table + 가안 detail pane; 내 연구 tabs 프로젝트/서재), locales.
+   - Integration order: metadata/formats -> zotero -> parent wiring; `task complete <child>` each before own finish.
+   - Shared files with one owner: geo/integration-boundaries.json (children append only their test entries),
+     web/src/geo/contracts/library.ts (children add optional fields only).
+   - Later decision: full CSL style formatting (citeproc-js is CPAL/AGPL); phase 1 uses one APA-like formatter.
+2. Phase 1-2 (accounts) and phase 2 (내 논문) come after the phase-1 pilot; not in this unit unless the user extends it.
 ## Failed approaches
 - oracle q1 (Pro) timed out after 40 min of stale UI; `oracle session i-am-designing-a-research --harvest` recovered the
   completed answer (~/data/geoaidesk/work/gaid-research-hub/oracle/q1.harvest.md). `task research-save` reports
@@ -93,7 +98,13 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
   paper→Workflow), 4-가 amended to a hybrid library: Zotero-linked items (Zotero is source, smooth sync, narrow
   write-back) + GAID-managed items for non-Zotero users (web search + PDF only). ADR docs/adr/2026-10-21-research-hub-library.md.
   The user also pasted a second Claude survey; key points in ~/data/geoaidesk/work/gaid-research-hub/inputs/claude-research-2-notes.md.
-- Open after these: (a) when to build institute accounts (rec. right after the phase-1 pilot, before 내 논문, because
+- User decisions 2026-10-21 (verbatim): "1번은 다안의 첫화면에 가안의 상세칸에 나안의 표형식으로 하자. 2,3번은 권장으로
+  하자." → library screen = 다안 first screen + 가안 detail pane + 나안 table list; institute accounts right after the
+  phase-1 pilot, before 내 논문; default model for unpublished manuscripts/reviews/ideas = institute-internal model.
+  ADR updated (decisions 5–8). No open decisions; four fact checks remain (report §6).
+- PC74 has Zotero desktop (`zotero`) and `oat-zotero` (zotero skill) installed; Zotero not running, no ~/Zotero data
+  dir (2026-10-21). Usable for Local API integration tests with a separate profile; do not open it on the user's screen.
+- (superseded) Open after these: (a) when to build institute accounts (rec. right after the phase-1 pilot, before 내 논문, because
   web-only non-Zotero users get a library only with accounts); (b) default model for unpublished manuscripts/reviews/ideas
   (rec. institute-internal model by default). Report §6.
 - API reachability from PC74 2026-10-21: Zotero Web API, Crossref, OpenAlex, KCI, ORCID OK; Semantic Scholar keyless 429;
