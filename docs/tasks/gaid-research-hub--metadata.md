@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T11:50:02Z
+status: active
+updated: 2026-10-21T11:57:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3af53966-052e-46c3-8a2d-2c8d41a23668","pid":1527917,"provider":"codex","session":"01a15e34-6c95-7c51-97f7-fd1699ddd9db","start":"46979518","token":"3b29a99f8472c13cc91477b88811c27fdf13e9ca7893426b125e2c2824d09462"}
 branch: task/gaid-research-hub--metadata
 target: task/gaid-research-hub
@@ -71,7 +71,9 @@ Implemented the owned server adapters and pure formats; no routes, store, UI, sh
 - Recorded fields live in server/test/fixtures/library; PDF fixtures are generated in OS temp storage. KCI XML is synthetic, not a keyed response.
 - Oracle API-documentation job exited successfully (0). Reconciled its primary sources: corrected KCI to open.kci.go.kr, added Crossref updated-by assertions and retained source/record/date details, and split singleton/list rate buckets. The added interleaved-rate regression test passed.
 - task finish created e9fa2f53 and automatically ran scripts/check. Backend: 180 files passed, 1 skipped; 2003 tests passed, 8 skipped. Frontend: 175 files /1142 tests passed. Distribution: 47 passed, 1 failed, 1 skipped. Failure is the hard-coded owner allowlist in geo/tests/distribution.test.mjs:88, which omits gaid-research-hub and gaid-research-hub--metadata. Later check phases did not run. No full-check or deployment success is claimed.
-- Parent fixed the allowlist in ba6f396b (own metadata and sibling Zotero owners included); parent focused distribution check passed 7/7. Take the parent fix through the next task finish merge; do not edit that test in this child.
+- Parent allowlist fix ba6f396b is merged. Its focused distribution check passed 7/7. The next automatic full run passed backend 2003/8 skipped, but upstream CSV pagination hit the 5-second timeout in the frontend suite. This same test passed in the prior run. Host load was 37.98 on 32 CPUs.
+- Tested the contention premise directly: csv-viewer.test.tsx alone passed 4/4 in 1.99 seconds; the full frontend with taskset -c 0-7 passed 175 files /1142 tests in 49.71 seconds. Vitest uses availableParallelism()-1 workers; taskset gives 8 CPUs and thus 7 frontend workers. No timeout or upstream source/test change.
+- Retry full finish with the same temporary 8-CPU affinity; it applies only to this check invocation, not as project policy.
 
 ## Next steps
 <!-- task:closed -->
@@ -96,6 +98,7 @@ Closed 2026-10-21T11:50:02Z: ready; the parent gaid-research-hub integrates it. 
 - Details and limitations: server/src/geo/library/metadata/README.md and formats/README.md.
 
 ## Failed approaches
+- Third finish attempt (51d14e28) failed only the upstream CSV pagination 5-second timeout after all 2003 backend tests passed. Source unchanged; isolated and constrained-worker rechecks passed as recorded above. Log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-_vc0xonl.log.
 - Second task finish ran scripts/check and failed the distribution owner allowlist after all backend/frontend tests passed. Log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-ttp3cmbv.log. Output: /home/seongin3/data/geoaidesk/work/checks/e9fa2f5303f4-20261021T114223.304265Z. This is not a metadata API/format test failure.
 - First task finish checkpointed child commit 7c8ae83d, then merged parent 15a16bbf and stopped on append-only geo/integration-boundaries.json conflict. Preserved all parent entries/edits and appended the six owned metadata test seams; no source-code conflict. Rechecking the combined state before rerunning finish; do not resume or task save between finish attempts.
 - Initial Oracle job launch refused the dirty source before starting. Saved the task document, then launched the one recorded job; no empty recorded job was restarted.
