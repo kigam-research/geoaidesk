@@ -117,7 +117,7 @@ export function GeoPromptBudget({
           aria-label={t("title")}
           className={cn(
             "inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-2 font-mono text-[11px] tabular-nums text-muted-foreground hover:bg-muted",
-            low && "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+            low && "bg-gaid-warning-bg text-gaid-warning",
             exhausted && "bg-destructive/10 text-destructive",
           )}
         >
@@ -152,14 +152,14 @@ export function GeoPromptBudget({
           {budget.remainingTokens !== null && (
             <>
               <dt className="text-muted-foreground">{t("remaining")}</dt>
-              <dd className={cn("text-right", low && "text-amber-700 dark:text-amber-400", exhausted && "text-destructive")}>
+              <dd className={cn("text-right", low && "text-gaid-warning", exhausted && "text-destructive")}>
                 {formatCompactTokens(Math.max(0, budget.remainingTokens))}
                 {fraction !== null && ` (${Math.max(0, Math.round(fraction * 100))}%)`}
               </dd>
             </>
           )}
         </dl>
-        {low && <p className="text-amber-700 dark:text-amber-400">{t("remainingWarn")}</p>}
+        {low && <p className="text-gaid-warning">{t("remainingWarn")}</p>}
         <p className="text-muted-foreground">
           {t("tools", { count: budget.initialPrompt.tools })} ·{" "}
           {t("skills", { exposed: budget.skills.exposed, installed: budget.skills.installed })}

@@ -95,6 +95,34 @@
       "web/src/geo/authoring-preview/source-input.tsx:#1f5eff",
       "web/src/geo/context/prompt-budget.tsx:text-[11px]",
       "web/src/geo/viewers/map/index.tsx:text-[11px]"
+    ],
+    "slop": [
+      "web/src/geo/library/add-paper-dialog.tsx:hue-utility:dark:text-amber-300",
+      "web/src/geo/library/add-paper-dialog.tsx:hue-utility:text-amber-700",
+      "web/src/geo/library/library-screen.tsx:hue-utility:bg-amber-50",
+      "web/src/geo/library/library-screen.tsx:hue-utility:bg-emerald-50",
+      "web/src/geo/library/library-screen.tsx:hue-utility:bg-red-50",
+      "web/src/geo/library/library-screen.tsx:hue-utility:border-amber-200",
+      "web/src/geo/library/library-screen.tsx:hue-utility:border-emerald-200",
+      "web/src/geo/library/library-screen.tsx:hue-utility:border-red-200",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:bg-amber-950",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:bg-emerald-950",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:bg-red-950",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:border-amber-900",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:border-emerald-900",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:border-red-900",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:text-amber-300",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:text-emerald-300",
+      "web/src/geo/library/library-screen.tsx:hue-utility:dark:text-red-300",
+      "web/src/geo/library/library-screen.tsx:hue-utility:text-amber-700",
+      "web/src/geo/library/library-screen.tsx:hue-utility:text-emerald-700",
+      "web/src/geo/library/library-screen.tsx:hue-utility:text-red-700",
+      "web/src/geo/library/library-screen.tsx:side-stripe:border-l-2",
+      "web/src/geo/library/note-references.tsx:hue-utility:dark:text-amber-300",
+      "web/src/geo/library/note-references.tsx:hue-utility:text-amber-700",
+      "web/src/geo/library/zotero-card.tsx:hue-utility:dark:text-amber-300",
+      "web/src/geo/library/zotero-card.tsx:hue-utility:text-amber-700"
     ]
-  }
+  },
+  "slopNote": "slop entries: web/src/geo/library/* belongs to gaid-library-folders (running on 2026-10-21 when the slop check landed, gaid-design-identity); it was told through the hub to use role tokens, and removes these entries when it reworks the screen."
 }
