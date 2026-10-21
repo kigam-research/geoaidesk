@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T15:02:22Z
+updated: 2026-10-21T15:03:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -90,12 +90,13 @@ Blocked: waiting for the user's decisions on the proposal (report §6).
 ## Failed approaches
 ## Notes and decisions
 - UI constraint from gaid-design-identity (routed request design-dir-gaid-research-visuals, 2026-10-21; until its tokens
-  land on main): visual direction 라) "Research Register / 연구 등록부" (light + dark, logo unchanged). Any UI or mockup in
+  land on main). CORRECTED by routed request design-note-gaid-research-visuals: direction 라) "연구 등록부" was NOT confirmed;
+  the user decided "새로운 디자인을 oneui가이드에 따라 생성하자." gaid-design-identity will propose a new One UI-based design;
+  use no 라)-specific palette or tokens. The general rules below still apply. Any UI or mockup in
   this unit: no hard-coded colours, no Tailwind hue utilities (violet/purple/sky/emerald/...), no gradients, glass/blur,
   Sparkles/Wand/Bot icons, eyebrow labels above headings, coloured left borders > 1 px or equal icon+heading card grids;
-  use the CSS role variables (--background, --foreground, --muted, --muted-foreground, --primary, --border,
-  --gaid-warning ...): cool neutral frame, white/paper surface only for researcher content, one blue action colour, amber
-  only for action-needed states, category as text. Figures, maps, images and PDFs show original pixels (no CSS colour
+  use the CSS role variables only (--background, --foreground, --muted, --muted-foreground, --primary, --border,
+  --gaid-warning ...). Figures, maps, images and PDFs show original pixels (no CSS colour
   filters or inversion in either theme) — applies directly to figure records, connection map and idea board. Design work
   follows the impeccable and design-taste-frontend skills (skill_hub .claude/skills) and geo/brand/README.md; the UI guide
   update lands with gaid-design-identity, which will notify again.
