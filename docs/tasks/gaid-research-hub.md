@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T12:24:43Z
+updated: 2026-10-21T12:29:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -39,6 +39,23 @@ Scope (research → discuss → implement; same pattern as gaid-notebook-review 
 Outside check: no outside check (product design and app work; researcher-value judgement is discussed with the user).
 
 ## Current state
+Result (2026-10-21): phase 1 of the GAID research hub (personal library) is implemented on task/gaid-research-hub.
+"내 연구" has 프로젝트/서재 tabs; the library mixes Zotero-linked items (Local API of the running Zotero or a Web key;
+read mirror, removed items kept as "출처에서 빠짐", "Zotero로 보내기" into "GAID 수집함") and GAID-managed items (PDF
+upload with DOI/title detection, DOI/URL lookup via Crossref/OpenAlex/KCI-if-key, BibTeX/RIS/CSL-JSON import preview,
+export). Detail pane shows uses (research notes with page locators, Workflow drafts, projects); "Workflow 만들기" opens
+hub authoring with the PDF preloaded; retraction/correction records are shown. Lead agent tools library_search /
+library_read work only on papers attached to the project; a write/edit hook flags note citation keys not in the
+library; research notes show a 참고문헌 list. Children gaid-research-hub--zotero and --metadata completed and closed.
+Checks: server geo-library (5), geo-library-zotero-service (5), geo-library-zotero (23), geo-library-metadata/formats
+(19), web contracts (4) + notes/project-view tests pass; server/web tsc clean; copy validator and check-ui 0 errors;
+children's full scripts/check passed; parent full scripts/check runs in task finish. Browser check in the isolated app
+(unit gaid-research-hub-app, ports 3320/18320, GAID_HOME ~/data/geoaidesk/work/gaid-research-hub/home): screens in the
+report §3.12. Not verified: a real model chat using the library tools, real researcher Zotero/Web key/KCI key,
+literature skills not in the catalogue, accounts (phase 1-2). Report: reports/2026-10-21-gaid-research-hub/index.md;
+ADR docs/adr/2026-10-21-research-hub-library.md. Route rh-gaps-20261021 reported.
+
+Earlier notes (history of this phase):
 Phase 1 (research and design proposal) in progress since 2026-10-21. No product code changed.
 - Web research running through oracle-search: q1 researcher tools survey (Pro), q2 IA/data-model benchmark (xhigh).
   Prompts and raw outputs: ~/data/geoaidesk/work/gaid-research-hub/oracle/{q1-tools.md,q2-design.md,q1.out,q2.out}.
@@ -80,26 +97,9 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
   with the PDF preloaded, add-paper dialog. Screens in ~/data/geoaidesk/work/gaid-research-hub/playwright/lib-*.png.
   Restart the unit after code changes (production build).
 ## Next steps
-1. Phase-1 implementation (agreed scope). Orchestration:
-   - Sequential: contract web/src/geo/contracts/library.ts (draft done) -> store + routes (parent) -> UI (parent, after
-     routes) -> integration check (scripts/check) -> report §3/§4 update with 1440x900 + 1280x800 screenshots.
-   - Child writers (Codex "general work"), owned files only:
-     - gaid-research-hub--zotero: server/src/geo/library/zotero/**, server/test/geo-library-zotero.test.ts (+ fixture);
-       prompt ~/data/geoaidesk/work/gaid-research-hub/prompts/zotero.md
-     - gaid-research-hub--metadata: server/src/geo/library/metadata/**, formats/**, tests geo-library-{metadata,formats};
-       prompt ~/data/geoaidesk/work/gaid-research-hub/prompts/metadata.md
-   - Parent (tightly coupled): server/src/geo/library/{store,routes,reader,tools,citations}.ts, project literature
-     (.kady/geo/literature.json), agent tools library_search/library_read (lead only), note citation hook + note
-     references, hub authoring from a library item, web/src/geo/library/** screens (서재 = 다안 first screen + 나안
-     table + 가안 detail pane; 내 연구 tabs 프로젝트/서재), locales.
-   - Started 2026-10-21: gaid-research-hub--metadata (Paseo agent 3af53966, worktree ~/worktrees/geoaidesk/gaid-research-hub--metadata),
-     gaid-research-hub--zotero (Paseo agent e61bf52d, worktree ~/worktrees/geoaidesk/gaid-research-hub--zotero).
-   - Integration order: metadata/formats -> zotero -> parent wiring; `task complete <child>` each before own finish.
-   - Shared files with one owner: geo/integration-boundaries.json (children append only their test entries),
-     web/src/geo/contracts/library.ts (children add optional fields only).
-   - Later decision: full CSL style formatting (citeproc-js is CPAL/AGPL); phase 1 uses one APA-like formatter.
-Blocked: child units gaid-research-hub--metadata and --zotero are in `task finish` (their scripts/check runs); integrate with `task complete` after their finish notices.
-2. Phase 1-2 (accounts) and phase 2 (내 논문) come after the phase-1 pilot; not in this unit unless the user extends it.
+1. `task finish` (runs scripts/check). Then the hub's completion report.
+2. After the user reviews: phase 1 pilot with 4-6 researchers (Zotero users and PDF-only users), then phase 1-2
+   institute accounts, then phase 2 (내 논문). Not in this unit unless the user extends it.
 ## Failed approaches
 - oracle q1 (Pro) timed out after 40 min of stale UI; `oracle session i-am-designing-a-research --harvest` recovered the
   completed answer (~/data/geoaidesk/work/gaid-research-hub/oracle/q1.harvest.md). `task research-save` reports
@@ -128,8 +128,14 @@ Blocked: child units gaid-research-hub--metadata and --zotero are in `task finis
   interfaces (library/publication data model, contracts under web/src/geo/contracts/) are settled.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+- [확인] 동료 연구자가 실제로 쓰는 서지 도구 — 가) Zotero가 많음 — 나) EndNote·Mendeley·없음이 많음 — 권장: 가) 확인 후 시험 연구자 구성 — 막힌 일: 1단계 시험 연구자 구성, Zotero 연결 우선순위 — 근거: reports/2026-10-21-gaid-research-hub#6
+- [확인] KIGAM의 연차 실적·성과 보고 방식과 입력 시스템 — 가) 담당 부서에 확인 — 나) 연구자 한 명의 실제 보고서로 확인 — 권장: 가) 내보내기 형식을 정확히 맞춤 — 막힌 일: 2단계 성과 목록 내보내기 — 근거: reports/2026-10-21-gaid-research-hub#6
+- [확인] 1단계를 함께 시험할 연구자 4–6명(Zotero 사용자와 PDF만 쓰는 연구자를 함께) — 가) 같은 부서에서 구성 — 나) 여러 부서에서 구성 — 권장: 가) 동료 사용이 도구 선택의 가장 큰 이유 — 막힌 일: 1단계 시험 — 근거: reports/2026-10-21-gaid-research-hub#3.10
+- [확인] 연구자 PC에서 GAID를 Windows와 WSL 가운데 어디에서 실행하는지 — 가) Windows — 나) WSL — 권장: 가) WSL 기본 네트워크에서는 Windows의 Zotero에 닿지 못할 수 있음 — 막힌 일: PC의 Zotero 연결 안내 — 근거: reports/2026-10-21-gaid-research-hub#3.5
 - [선택] 노트↔논문 관계 종류를 몇 가지로 고정할지 — 가) 지지함·반박함·조건을 붙임 3가지 — 나) 시험 연구자와 5가지 이하로 정함 — 권장: 가) ORKG처럼 자유 속성이 중복되는 문제를 피하고 화면이 단순함 — 막힌 일: 관계 표시 기능(나중 단계) — 근거: reports/2026-10-21-gaid-research-hub#3.12
 - [확인] RISS·DBpia를 국내 자료원으로 추가할 수 있는지(기관 이용 조건, API) — 가) 이용 조건 확인 후 추가 — 나) KCI·ScienceON·NTIS만 유지 — 권장: 가) 국내 문헌이 상용 도구의 빈 곳이지만 DBpia는 조사 근거가 없음 — 막힌 일: 국내 자료원 확대(3단계) — 근거: reports/2026-10-21-gaid-research-hub#3.12
+- [확인] 실제 모델 채팅에서 에이전트가 서재 도구로 쪽 근거를 찾아 인용하는지 — 가) 1단계 시험 연구자 채팅으로 확인 — 나) 연결된 모델로 지금 별도 확인 — 권장: 가) 실제 문헌과 질문이 필요함 — 막힌 일: 근거 답변 기능의 완료 판단 — 근거: reports/2026-10-21-gaid-research-hub#3.12
+- [부채] 문헌 스킬(논문 검색, 서지 정리, 문헌 고찰, Zotero 연결)이 배포 스킬 목록에 없음 — 가) 카탈로그 새 판에 넣음 — 나) GAID 서재 도구만 씀 — 권장: 가) 원래 문헌 Workflow 문장이 이 스킬을 전제로 함 — 막힌 일: 문헌 Workflow의 검색 품질 — 근거: reports/2026-10-21-gaid-research-hub#3.12
 - [대기] Better BibTeX에 기대는 기능(원고 인용으로 Zotero 컬렉션 만들기, 인용 키 고정) — 가) Zotero 10 호환이 명시되고 #3602·#3626이 닫힌 뒤 검토 — 나) 지금 시험 — 권장: 가) 현재 열린 문제가 있음 — 막힌 일: 해당 기능 — 조건: BBT가 Zotero 10 호환을 명시 — 근거: reports/2026-10-21-gaid-research-hub#4
 ## Report
 Report: reports/2026-10-21-gaid-research-hub/index.md
