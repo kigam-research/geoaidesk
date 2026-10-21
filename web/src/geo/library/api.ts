@@ -7,15 +7,18 @@ import type {
   LibraryListResponse,
   ProjectLiterature,
   UploadedLibraryFile,
+  ZoteroLibraryState,
 } from "@/geo/contracts/library";
 import { API_BASE, apiFetch } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 
 export class LibraryApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  zoteroState?: ZoteroLibraryState["state"];
+  constructor(message: string, status: number, zoteroState?: ZoteroLibraryState["state"]) {
     super(message);
     this.status = status;
+    this.zoteroState = zoteroState;
   }
 }
 
@@ -27,7 +30,8 @@ async function call<T>(path: string, init?: RequestInit, projectId?: string): Pr
   const body = res.status === 204 ? null : await res.json().catch(() => null);
   if (!res.ok) {
     const message = body && typeof body === "object" && "error" in body && typeof body.error === "string" ? body.error : `HTTP ${res.status}`;
-    throw new LibraryApiError(message, res.status);
+    const state = body && typeof body === "object" && "state" in body && typeof body.state === "string" ? (body.state as ZoteroLibraryState["state"]) : undefined;
+    throw new LibraryApiError(message, res.status, state);
   }
   return body as T;
 }
@@ -67,3 +71,15 @@ export function zoteroSelectUrl(item: LibraryItem): string | undefined {
   if (!z) return undefined;
   return z.libraryType === "group" ? `zotero://select/groups/${z.libraryId}/items/${z.itemKey}` : `zotero://select/library/items/${z.itemKey}`;
 }
+
+// --- Zotero (`/geo/library/zotero*`) ---------------------------------------------------------------------------------
+
+/** A refused Zotero call carries a research-language state (`zotero-closed`, `local-api-off`, …). */
+export function zoteroState(error: unknown): ZoteroLibraryState["state"] | undefined {
+  return error instanceof LibraryApiError && error.zoteroState ? error.zoteroState : undefined;
+}
+export const connectLocalZotero = () => call<ZoteroLibraryState>("/zotero/local", { method: "POST" });
+export const connectWebZotero = (key: string) => call<{ libraries: ZoteroLibraryState[] }>("/zotero/web", { method: "POST", body: JSON.stringify({ key }) });
+export const syncZotero = () => call<{ libraries: ZoteroLibraryState[] }>("/zotero/sync", { method: "POST" });
+export const readItemText = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/read`, { method: "POST" });
+export const sendItemToZotero = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });

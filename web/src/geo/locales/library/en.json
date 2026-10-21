@@ -126,5 +126,43 @@
     "duplicate": "A paper with the same DOI is already in your library.",
     "failed": "Could not add the paper. Check the details and try again.",
     "added": "Added to your library"
+  },
+  "zotero": {
+    "title": "Zotero",
+    "connectLocal": {
+      "button": "Connect Zotero on this PC"
+    },
+    "connectWeb": {
+      "button": "Connect with web key"
+    },
+    "webKey": "Zotero web API key",
+    "webKeyHint": "A read key made under Security in your zotero.org settings. GAID keeps it in the library settings only and never shows it again.",
+    "save": {
+      "button": "Save key"
+    },
+    "sync": {
+      "button": "Update now"
+    },
+    "syncing": "Reading from Zotero.",
+    "ok": "Connected · updated {when}",
+    "notSynced": "Connected · not updated yet",
+    "states": {
+      "zotero-closed": "Zotero is not running. Open Zotero and connect again.",
+      "local-api-off": "In Zotero Settings → Advanced, turn on \"Allow other applications to communicate\", then connect again.",
+      "key-rejected": "Zotero refused the connection. Check the key or the approval.",
+      "unreachable": "Could not reach Zotero. Try again in a moment."
+    },
+    "hint": "Papers you collect in Zotero appear in your library too. GAID writes to Zotero only when you send a paper to GAID 수집함."
+  },
+  "send": {
+    "button": "Send to Zotero",
+    "done": "Sent to GAID 수집함 in Zotero",
+    "failed": "Could not send to Zotero. Check the Zotero connection.",
+    "confirm": "When Zotero shows an approval window, allow it."
+  },
+  "read": {
+    "button": "Read full text",
+    "done": "Full text read",
+    "failed": "Could not read the PDF."
   }
 }

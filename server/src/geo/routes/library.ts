@@ -18,6 +18,8 @@ import { LibraryError, libraryStore, normalizeDoi, shortAuthors, cslYear, summar
 import { readStoredPdf, storedPdf } from "../library/reader.ts";
 import { buildUsesIndex, projectItems, readProjectLiterature, writeProjectLiterature } from "../library/uses.ts";
 import { AuthoringStore } from "../authoring/store.ts";
+import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
+import { ZoteroError } from "../library/zotero/index.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
 import { addSource } from "../authoring/sources.ts";
 
@@ -25,6 +27,7 @@ export interface LibraryRouteOptions {
   store?: () => LibraryStore;
   paths?: () => ProjectPaths;
   authoring?: () => AuthoringStore;
+  zotero?: (store: LibraryStore) => ZoteroService;
 }
 
 /** One plain APA-like reference line (the metadata unit's formatter replaces this when integrated). */
@@ -51,6 +54,7 @@ function writeLinks(store: LibraryStore, authoring: Record<string, string[]>) {
 export async function registerGeoLibraryRoutes(app: FastifyInstance, options: LibraryRouteOptions = {}): Promise<void> {
   const storeOf = options.store ?? libraryStore;
   const pathsOf = options.paths ?? activePaths;
+  const zoteroOf = options.zotero ?? zoteroService;
   // The authoring routes' own store instance (one owner per directory); a fresh one only when they are not registered.
   const authoringOf = options.authoring ?? (() => { try { return getAuthoringStore(app); } catch { return new AuthoringStore(); } });
 
@@ -74,6 +78,8 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
       if (error instanceof LibraryError) return reply.code(error.status).send({ error: error.message });
+      // Research-language Zotero states (never response bodies or keys); the screen words them.
+      if (error instanceof ZoteroError) return reply.code(error.state === "key-rejected" ? 403 : 502).send({ error: "zotero", state: error.state });
       if ((error as { code?: string }).code === "FST_ERR_CTP_BODY_TOO_LARGE") return reply.code(413).send({ error: "요청이 너무 큽니다." });
       if ((error as { statusCode?: number }).statusCode === 400) return reply.code(400).send({ error: "요청 형식을 확인해 주세요." });
       scope.log.error(error);
@@ -83,6 +89,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
 
     scope.get<{ Querystring: Record<string, string | undefined> }>("/geo/library", async (req): Promise<LibraryListResponse> => {
       const store = storeOf(), q = req.query ?? {};
+      zoteroOf(store).refreshIfStale();
       const all = (await store.all()).filter((i) => !i.removedFromSourceAt);
       const uses = buildUsesIndex(all, await workflowUses(store));
       const inProject = q.filter === "project" ? new Set(projectItems(readProjectLiterature(pathsOf()), all).map((i) => i.id)) : undefined;
@@ -166,8 +173,28 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const store = storeOf(), all = await store.all(), collections = await store.collections();
       const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id): id is string => typeof id === "string" && all.some((i) => i.id === id)) : [];
       const collectionIds = Array.isArray(req.body?.collectionIds) ? req.body.collectionIds.filter((id): id is string => typeof id === "string" && collections.some((c) => c.id === id)) : [];
-      return writeProjectLiterature(pathsOf(), { collectionIds, itemIds });
+      const saved = writeProjectLiterature(pathsOf(), { collectionIds, itemIds });
+      // Read the PDFs of attached Zotero items in the background so the agent can cite pages (bounded).
+      const pending = projectItems(saved, all).filter((i) => i.source === "zotero" && i.read.coverage === "none" && i.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey)).slice(0, 20);
+      void (async () => { for (const item of pending) { try { await zoteroOf(store).readZoteroPdf(item); } catch { /* shown as not read */ } } })();
+      return saved;
     });
+
+    scope.get("/geo/library/zotero", async () => ({ libraries: await zoteroOf(storeOf()).libraries() }));
+    scope.post("/geo/library/zotero/local", async () => zoteroOf(storeOf()).connectLocal());
+    scope.post<{ Body: { key?: unknown } }>("/geo/library/zotero/web", { bodyLimit: 4096 }, async (req) => {
+      if (typeof req.body?.key !== "string") throw new LibraryError("key is required");
+      return { libraries: await zoteroOf(storeOf()).connectWeb(req.body.key.trim()) };
+    });
+    scope.post("/geo/library/zotero/sync", async () => {
+      await zoteroOf(storeOf()).syncAll();
+      return { libraries: await zoteroOf(storeOf()).libraries() };
+    });
+    scope.post<{ Params: { id: string } }>("/geo/library/items/:id/read", async (req) => {
+      const store = storeOf(), item = await store.get(req.params.id);
+      return item.source === "zotero" ? zoteroOf(store).readZoteroPdf(item) : item;
+    });
+    scope.post<{ Params: { id: string } }>("/geo/library/items/:id/send-to-zotero", async (req) => zoteroOf(storeOf()).sendToZotero(req.params.id));
 
     /** Resolution of note citation keys (note view reference list). */
     scope.get<{ Querystring: { keys?: string } }>("/geo/library/citations", async (req): Promise<CitationResolution[]> => {

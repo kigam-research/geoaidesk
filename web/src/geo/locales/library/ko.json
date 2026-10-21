@@ -126,5 +126,43 @@
     "duplicate": "같은 DOI의 논문이 이미 서재에 있습니다.",
     "failed": "서재에 넣지 못했습니다. 입력을 확인한 뒤 다시 넣으세요.",
     "added": "서재에 넣었습니다"
+  },
+  "zotero": {
+    "title": "Zotero",
+    "connectLocal": {
+      "button": "PC의 Zotero 연결"
+    },
+    "connectWeb": {
+      "button": "웹 키로 연결"
+    },
+    "webKey": "Zotero 웹 API 키",
+    "webKeyHint": "zotero.org 설정의 Security에서 읽기 권한으로 만든 키입니다. GAID는 키를 서재 설정에만 저장하고 화면에 다시 보여 주지 않습니다.",
+    "save": {
+      "button": "키 저장"
+    },
+    "sync": {
+      "button": "지금 갱신"
+    },
+    "syncing": "Zotero에서 가져오는 중입니다.",
+    "ok": "연결됨 · {when} 갱신",
+    "notSynced": "연결됨 · 아직 갱신 전",
+    "states": {
+      "zotero-closed": "Zotero가 꺼져 있습니다. Zotero를 연 뒤 다시 연결하세요.",
+      "local-api-off": "Zotero 설정 → 고급에서 \"다른 프로그램과 통신 허용\"을 켠 뒤 다시 연결하세요.",
+      "key-rejected": "Zotero가 연결을 거절했습니다. 키나 승인을 확인하세요.",
+      "unreachable": "Zotero에 닿지 못했습니다. 잠시 뒤 다시 시도하세요."
+    },
+    "hint": "Zotero에서 수집한 논문이 서재에 같이 보입니다. GAID는 연구자가 고른 논문을 GAID 수집함에 넣을 때만 Zotero에 씁니다."
+  },
+  "send": {
+    "button": "Zotero로 보내기",
+    "done": "Zotero의 GAID 수집함에 보냈습니다",
+    "failed": "Zotero로 보내지 못했습니다. Zotero 연결을 확인하세요.",
+    "confirm": "Zotero에서 승인 창이 뜨면 허용하세요."
+  },
+  "read": {
+    "button": "본문 읽기",
+    "done": "본문을 읽었습니다",
+    "failed": "PDF를 읽지 못했습니다."
   }
 }

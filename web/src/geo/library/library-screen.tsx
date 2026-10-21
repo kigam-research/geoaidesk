@@ -15,8 +15,9 @@ import { listProjects, type Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { t } from "@/geo/i18n";
 import type { LibraryItemResponse, LibraryItemSummary, LibraryListQuery, LibraryListResponse, LibraryUse, ReadCoverage } from "@/geo/contracts/library";
-import { attachToProject, getLibraryItem, libraryPdfUrl, listLibrary, startWorkflowFromItem, zoteroSelectUrl } from "./api";
+import { attachToProject, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, sendItemToZotero, startWorkflowFromItem, zoteroSelectUrl } from "./api";
 import { AddPaperDialog } from "./add-paper-dialog";
+import { ZoteroCard } from "./zotero-card";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
@@ -163,9 +164,9 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
       </section>
       <aside className="flex w-[380px] shrink-0 flex-col gap-3">
         {selected ? (
-          <ItemDetail id={selected} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onChanged={load} />
+          <ItemDetail id={selected} zoteroConnected={(data?.zotero ?? []).some((z) => z.state === "ok")} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onChanged={load} />
         ) : (
-          <SidePanel data={data} onSelect={setSelected} />
+          <SidePanel data={data} onSelect={setSelected} onChanged={load} />
         )}
       </aside>
       <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => { void load(); setSelected(item.id); }} />
@@ -173,7 +174,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   );
 }
 
-function SidePanel({ data, onSelect }: { data: LibraryListResponse | null; onSelect: (id: string) => void }) {
+function SidePanel({ data, onSelect, onChanged }: { data: LibraryListResponse | null; onSelect: (id: string) => void; onChanged: () => void }) {
   if (!data) return null;
   const byAdded = [...data.items].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
   return (
@@ -183,6 +184,7 @@ function SidePanel({ data, onSelect }: { data: LibraryListResponse | null; onSel
         <p className="text-sm">{L("side.papers", { n: data.counts.all })}</p>
         {data.counts.unread > 0 && <p className="text-sm text-muted-foreground">{L("side.unread", { n: data.counts.unread })}</p>}
       </div>
+      <ZoteroCard libraries={data.zotero} onChanged={onChanged} />
       {byAdded.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl border p-4">
           <h2 className="text-base font-semibold">{L("side.recentTitle")}</h2>
@@ -203,7 +205,7 @@ function useLabel(use: LibraryUse): string {
   return L("detail.useProject", { name: use.projectName });
 }
 
-function ItemDetail({ id, onClose, onOpenProject, onChanged }: { id: string; onClose: () => void; onOpenProject: (projectId: string) => void; onChanged: () => void }) {
+function ItemDetail({ id, zoteroConnected, onClose, onOpenProject, onChanged }: { id: string; zoteroConnected: boolean; onClose: () => void; onOpenProject: (projectId: string) => void; onChanged: () => void }) {
   const [data, setData] = useState<LibraryItemResponse | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
   useEffect(() => {
@@ -233,6 +235,16 @@ function ItemDetail({ id, onClose, onOpenProject, onChanged }: { id: string; onC
     } catch {
       toast.error(L("detail.attachFailed"));
     }
+  };
+  const canRead = item.source === "zotero" && !hasPdf && item.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey);
+  const readText = async () => {
+    try { await readItemText(item.id); toast.success(L("read.done")); setData(await getLibraryItem(item.id)); onChanged(); }
+    catch { toast.error(L("read.failed")); }
+  };
+  const send = async () => {
+    toast.info(L("send.confirm"));
+    try { await sendItemToZotero(item.id); toast.success(L("send.done")); setData(await getLibraryItem(item.id)); onChanged(); }
+    catch { toast.error(L("send.failed")); }
   };
   const makeWorkflow = async () => {
     try {
@@ -268,6 +280,8 @@ function ItemDetail({ id, onClose, onOpenProject, onChanged }: { id: string; onC
           <WorkflowIcon data-icon="inline-start" />{L("detail.workflow.button")}
         </Button>
         {hasPdf && <Button variant="outline" asChild><a href={libraryPdfUrl(item.id)} target="_blank" rel="noreferrer"><FileTextIcon data-icon="inline-start" />{L("detail.pdf.button")}</a></Button>}
+        {canRead && <Button variant="outline" onClick={() => void readText()}><BookOpenIcon data-icon="inline-start" />{L("read.button")}</Button>}
+        {item.source === "gaid" && zoteroConnected && <Button variant="outline" onClick={() => void send()}><ExternalLinkIcon data-icon="inline-start" />{L("send.button")}</Button>}
         {zotero && <Button variant="outline" asChild><a href={zotero}><ExternalLinkIcon data-icon="inline-start" />{L("detail.zotero.button")}</a></Button>}
       </div>
       <div className="flex flex-col gap-2 rounded-xl border p-4">

@@ -29,7 +29,8 @@ export function readProjectLiterature(paths: ProjectPaths): ProjectLiterature {
   return { schema: PROJECT_LITERATURE_SCHEMA, collectionIds: [], itemIds: [] };
 }
 
-const isId = (v: unknown): v is string => typeof v === "string" && /^l[ic]-[a-z0-9]{12}$/.test(v);
+// GAID item/collection ids, and partition-scoped Zotero collection ids from the connector (`zc-…`).
+const isId = (v: unknown): v is string => typeof v === "string" && (/^l[ic]-[a-z0-9]{12}$/.test(v) || /^zc-[A-Za-z0-9%._~-]{8,400}$/.test(v));
 
 export function writeProjectLiterature(paths: ProjectPaths, value: { collectionIds: string[]; itemIds: string[] }): ProjectLiterature {
   const next: ProjectLiterature = {

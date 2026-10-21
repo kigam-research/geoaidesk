@@ -829,6 +829,12 @@
       "owner": "gaid-research-hub",
       "status": "added",
       "responsibility": "Personal library store, routes, page reading, note citation check and agent library tools"
+    },
+    {
+      "path": "server/test/geo-library-zotero-service.test.ts",
+      "owner": "gaid-research-hub",
+      "status": "added",
+      "responsibility": "Zotero mirror commit, removal marking, send-to-Zotero in place and Zotero PDF page reading against the fake Zotero server"
     }
   ],
   "notTouched": [
