@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T13:19:07Z
+status: active
+updated: 2026-10-21T13:26:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8efa9960-157f-4f0e-b907-50fa7ca9186a","pid":2619537,"provider":"codex","session":"01a15e90-4520-7db2-8f1f-5d78d5373035","start":"47581455","token":"245fd43eee5872c64898ddf1d2632eb44ca2341c85e6360286ab326912a17bae"}
 branch: task/gaid-library-folders--zotero-writes
 target: task/gaid-library-folders
@@ -81,15 +81,23 @@ membership, PDF upload/read with equal SHA-256, and fulltext PUT/read. The isola
 Evidence: /home/seongin3/data/geoaidesk/work/zotero-writes/smoke.json
 SHA-256: 22b43c3dfde37e6fc93b99996d5dc2ecdea4484110e2765c9bfb3641c9787bd4
 Real Web storage/account behavior and Windows/WSL networking remain unverified (fake Web protocol passed).
-Parent service/UI integration and final project checks belong to gaid-library-folders.
+Initial full scripts/check passed (backend 2059 passed/8 skipped, frontend 1142 passed, production smoke PASS).
+task finish merged parent checkpoint 8278864c and rechecked the merged tree; one parent-owned service test is stale:
+geo-library-zotero-service.test.ts:75 expects the old sendToZotero item return, but the parent changed it to a result
+containing item. 2064 other backend tests passed/8 skipped. The parent fixed the assertion and added upload-count
+coverage in pushed checkpoint 0ea99a74. Rerunning task finish will merge that fix and recheck the final tree.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-21T13:19:07Z: ready; the parent gaid-library-folders integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Rerun task finish in place (no resume) to merge the pushed parent's service-test fix (0ea99a74) and recheck.
+   Do not use task save after this failed published finish.
+2. The parent runs task complete after finish succeeds.
 
 ## Failed approaches
 - Initial npx tsc/vitest had missing local dependencies (not a source failure); installing the lockfile dependencies.
 - The external smoke script first used .ts outside a package.json and tsx chose CJS, rejecting top-level await before
   any API operation. Renamed it to .mts; the smoke then passed without any connector workaround.
+- First merged finish check failed on the parent-owned service test's old return shape; connector tests passed.
+  Log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-89g1v4k3.log. Parent informed directly;
+  no speculative connector edit is appropriate for this API-consumer assertion mismatch.
 ## Notes and decisions
 Sequential decisions: preserve the existing four-request gate and backoff; support form encoding only in the narrow
 file-authorization/registration methods; storage POST has no API credentials and manual redirects. Collection identity
