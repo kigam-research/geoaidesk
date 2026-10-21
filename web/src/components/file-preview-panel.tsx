@@ -200,7 +200,7 @@ function TabBar({
             : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
         )}
       >
-        <BookOpenIcon className="size-3.5 shrink-0 text-orange-500" />
+        <BookOpenIcon className="size-3.5 shrink-0 text-muted-foreground" />
         <span className="whitespace-nowrap font-medium">{appText("preview.lab_notebook")}</span>
       </button>
 
@@ -237,7 +237,7 @@ function TabBar({
               : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
           )}
         >
-          <AlarmClockIcon className="size-3.5 shrink-0 text-emerald-500" />
+          <AlarmClockIcon className="size-3.5 shrink-0 text-muted-foreground" />
           <span className="whitespace-nowrap font-medium">{appText("preview.automation")}</span>
         </button>
       )}
@@ -742,7 +742,7 @@ function NotebookViewer({
     <div ref={scrollerRef} className="h-full overflow-auto">
       {/* Notebook meta bar */}
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/95 px-4 py-2 backdrop-blur">
-        <BookOpenIcon className="size-4 text-orange-500 shrink-0" />
+        <BookOpenIcon className="size-4 text-muted-foreground shrink-0" />
         <span className="text-sm font-semibold">{kernelName}</span>
         <span className="text-xs text-muted-foreground">{filesText("file_preview_panel.notebook_counts", { count: cells.length, code: codeCells, markdown: mdCells })}</span>
       </div>
