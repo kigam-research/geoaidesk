@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-21T11:56:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e61bf52d-9268-4d06-84a2-99fbdf1887bf","pid":1532697,"provider":"codex","session":"01a15e34-d40a-7262-97ac-59bb6d8bed03","start":"46982181","token":"1fdd4903634b060370661f31b814e1d918a83246483d200dcfc62cb55ea81402"}
 branch: task/gaid-research-hub--zotero
@@ -80,7 +80,7 @@ anything you could not verify (e.g. `citationKey` presence in real Web API JSON)
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-21T11:37:36Z: ready; the parent gaid-research-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-21T11:56:29Z: ready; the parent gaid-research-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Full finish check first stopped at the distribution seam-owner allowlist. Parent added the owners in ba6f396b; `task sync` merged it (12ceebbb). That full recheck passed backend 2009 tests (8 skipped), then hit only unchanged frontend CSV pagination's 5-second timeout (1141 frontend passed, 1 failed). Host load average was about 38 on 32 CPUs with concurrent suites; rerun uses four-CPU affinity rather than altering the unrelated test.
