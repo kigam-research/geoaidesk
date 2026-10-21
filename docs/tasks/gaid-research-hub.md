@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:40:17Z
+updated: 2026-10-21T11:40:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -68,6 +68,17 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
   hypothesis-generation, scientific-brainstorming, research-grants [US agencies + Taiwan NSTC only], peer-review,
   scientific-writing, venue-templates, markitdown) are absent in geo mode. Paperclip = remote MCP (key or OAuth).
   Subagent roster has literature-researcher, citation-checker, hypothesis-generator, manuscript-editor.
+- Phase-1 parent work done 2026-10-21 (pushed): server/src/geo/library/{store,uses,reader,tools}.ts,
+  server/src/geo/routes/library.ts (registered in geo/routes.ts), library tools + note citation check wired in
+  geo/session.ts; web/src/geo/library/{api,library-screen,add-paper-dialog,research-tabs}.tsx, locales library/,
+  project-view.tsx seam (tabs 프로젝트/서재, `#library`). Checks: server `npx vitest run test/geo-library.test.ts`
+  4 passed; geo-notes/markdown-images/context/tools/read-hints/authoring 58 passed; web project-view + contracts 17 passed;
+  both tsc clean; copy validator 0 errors (no library warnings); check-ui 0 errors.
+- Isolated app: systemd user unit `gaid-research-hub-app` (start-gaid.sh, GAID_HOME ~/data/geoaidesk/work/gaid-research-hub/home,
+  ports 3320/18320, log ~/data/geoaidesk/work/gaid-research-hub/app.log); seeded by bin/seed.mjs (example items only).
+  Browser check: library first screen, detail pane (uses incl. note locator p. 9), Workflow 만들기 opens hub authoring
+  with the PDF preloaded, add-paper dialog. Screens in ~/data/geoaidesk/work/gaid-research-hub/playwright/lib-*.png.
+  Restart the unit after code changes (production build).
 ## Next steps
 1. Phase-1 implementation (agreed scope). Orchestration:
    - Sequential: contract web/src/geo/contracts/library.ts (draft done) -> store + routes (parent) -> UI (parent, after
