@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:24:27Z
+updated: 2026-10-21T11:25:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3af53966-052e-46c3-8a2d-2c8d41a23668","pid":1527917,"provider":"codex","session":"01a15e34-6c95-7c51-97f7-fd1699ddd9db","start":"46979518","token":"3b29a99f8472c13cc91477b88811c27fdf13e9ca7893426b125e2c2824d09462"}
 branch: task/gaid-research-hub--metadata
 target: task/gaid-research-hub
@@ -64,9 +64,15 @@ Evidence for your finish: test summary, typecheck, live smoke output, public fun
 you could not verify.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation started. Read the contract, ADR and existing PDF/URL intake code. The worktree has no codegraph index; exact native reads are the fallback. Dependencies are installing. No routes/store/UI changes.
 ## Next steps
-1. (the next session's first action)
+1. Implement injectable metadata clients and pure bibliography functions; add fixture-based tests.
+2. Run focused vitest, server typecheck and opt-in DOI smoke; publish checked snapshot with task finish.
+## Work packages and integration order
+- Sequential: settle CSL result shapes, then provider mapping and text/bibliography adapters, then fixtures and checks.
+- Owned: metadata/**, formats/**, two server tests and fixtures; append only test seams to boundaries.
+- No independent child packages: this is already a child writer and interfaces are tightly coupled.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
