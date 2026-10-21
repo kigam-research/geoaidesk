@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T15:07:13Z
+updated: 2026-10-21T15:08:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -50,9 +50,9 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
   three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
   if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
 ## Next steps
-1. Build One UI-based design drafts (mockups, light + dark, hub + workspace) from the One UI digest
-   (`~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`) and the guide; review against impeccable/taste/brand; Codex
-   고급검토 review; report section + review-copy; ask the user to choose explicitly.
+1. Waiting for the user's explicit choice among the One UI drafts (report §3.6/§6: 가 Codex O recommended, 나 GAID
+   chamfered blocks, 다 One UI focus blocks, 라 redraw). Drafts sent via review-copy 2026-10-22; route
+   design-oneui-20261021 reported --blocked (needs this choice). Ask back on an ambiguous answer.
 2. After an explicit choice: retarget tokens/guide/screens on this branch, notify the hub, finish. Route
    design-oneui-20261021 must get `task route-report` before finishing.
 - Done: children hub + system integrated and closed; temporary hub baseline removed; library tone debt remains.
