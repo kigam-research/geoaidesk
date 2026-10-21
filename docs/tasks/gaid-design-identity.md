@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T13:14:36Z
+updated: 2026-10-21T13:34:26Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -46,12 +46,32 @@ Phase 1 (proposal, no product code) in progress, 2026-10-21.
 - Reader 8021eb25 (task reader, general work) delivered the TDS Mobile digest `.../gaid-design-identity/tds-notes.md` (+ `tds-pages/`).
 - Proposal report written (diagnosis 10 signs, TDS adopt/skip table, three directions, 2 decisions), humanizer applied.
 ## Next steps
-1. Wait for the user's choice (report §6: direction 가/나/다/섞기; logo keep or revise). Proposal sent with
-   task review-copy on 2026-10-21 (report + mockups/compare.md).
+1. When the two Codex 고급검토 readers finish (e90b5a1e: direction review + own direction in `codex/`; efc66f40: logo
+   review + own logo candidates in `codex-logo/`), fold their results into the report: revised §3.3 (가 v2, dark theme,
+   Codex direction), new logo-candidate section with figures, updated decisions; humanizer; task review-copy; ask the user.
 2. After the choice: tell the hub (gaid-research-visuals, gaid-library-folders follow new tokens); phase 2 implements.
+
 ## Failed approaches
+- Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
+  short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
 - playwright-cli cannot render `file://` mockups (blank page); serve them over http.
 ## Notes and decisions
+- User 2026-10-21 after the first proposal (verbatim): "가 도면은 권장하는데 여전히 흰색 배경이 작동하는 부분들이 있지 않나? 그리고
+  다크테마는 어떻게 할 것인지도 고민해야한다. impeccable 스킬과 taste 스킬로 검토해볼 필요가 있다. codex 고급검토에게 검토도 받고 codex가
+  시각방향을 제안하게도 해보아야 한다. 로고의 경우 그대로 두어도 된다. 그런데 후보군으로 KIGAM로고의 G에 위치한 3가지 색상을 로고에
+  반영하거나 유사한 방식의 디자인적으로 어색하지 않은 방식으로 반영할 수 있다면 후보군으로 다듬어서 제시하는 것도 필요하다." Then:
+  "로고 디자인도 생성되면 고급 codex에게 검토 받고 해당 codex가 시안을 생성할 수 있게 해보자." and "현재 제안한 후보 로고는 색상을
+  그대로 사용해서인지 어색한 감이 있다. 그리고 GAID허브와 GAID시스템의 색상과도 일관성이 있어야 하며, 꼭 KIGAM 로고의 3개 색상을 다
+  사용할 필요도 없으며, 디지털 형식으로 반영해도 된다." → Logo: keeping the current logo is acceptable; candidates are extra.
+  The user explicitly asked for Codex 고급검토 here (overrides the 2026-10-16 default of not using that profile).
+- impeccable/taste review (writer): 가) v1 warm paper #F4F2EC sits in taste's banned "warm paper/cream" default family;
+  eyebrow labels, coloured left borders > 1 px (가 todo, 나 bands) and four equal cards are impeccable craft-floor bans.
+  Changes: shared hub = one featured Workflow + compact list; eyebrow removed; 가) v2 = cool grey-green frame #ECEEEB,
+  white sheet #FCFCFB with 1 px ink neatline only for researcher content (concept figure, notes, documents, map canvas),
+  lists on the frame with hairlines, no left borders; dark theme for all three (`&t=dark`). 나) keeps its colour bands
+  as its defining device (flagged). v1 kept as `mockups/screens-v1.html`, `dir-a-v1.css`.
+- Logo v2 candidates (`logo/`, `make_logos2.py`, `sheet.png`): one KIGAM-derived green tuned to GAID (#0B9A6A, 3.6:1 on
+  white; #35C08A on dark) with brand blue: A two-colour orbit, B stepped digital orbit, C pixel orbit end.
 - Diagnosis facts (evidence in shots/ and code): Pretendard and D2Coding are declared but never loaded (no @font-face,
   no package; Linux renders Noto Sans CJK JP, Windows would render Malgun Gothic); Sparkles icon is the GAID hub symbol
   (top-nav, home banner, hub entry); shadcn zinc neutrals and 10 px radius unmodified; upstream Tailwind hues
