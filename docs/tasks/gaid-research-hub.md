@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:40:39Z
+updated: 2026-10-21T11:49:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3bc30c7e-b450-462c-8c00-b17877a5c133","pid":2981735,"provider":"claude","session":"cdfedfaa-588d-43b6-9770-bdd6b9d70a65","start":"45246184","token":"61f95d84aad4187c55e866862d9c3219f3e0125a0467796adb84c101b79dfcce"}
 branch: task/gaid-research-hub
 target: main
@@ -98,6 +98,7 @@ Phase 1 (research and design proposal) in progress since 2026-10-21. No product 
    - Shared files with one owner: geo/integration-boundaries.json (children append only their test entries),
      web/src/geo/contracts/library.ts (children add optional fields only).
    - Later decision: full CSL style formatting (citeproc-js is CPAL/AGPL); phase 1 uses one APA-like formatter.
+Blocked: child units gaid-research-hub--metadata and --zotero are in `task finish` (their scripts/check runs); integrate with `task complete` after their finish notices.
 2. Phase 1-2 (accounts) and phase 2 (내 논문) come after the phase-1 pilot; not in this unit unless the user extends it.
 ## Failed approaches
 - oracle q1 (Pro) timed out after 40 min of stale UI; `oracle session i-am-designing-a-research --harvest` recovered the
