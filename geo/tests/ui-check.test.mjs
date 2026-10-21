@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { checkCopyLength, checkInternals, checkStyles, run, visibleLength } from "../ui/check-ui.mjs";
+import { checkCopyLength, checkInternals, checkSlop, checkStyles, run, visibleLength } from "../ui/check-ui.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const rules = JSON.parse(fs.readFileSync(path.join(root, "geo/ui/ui-rules.json"), "utf-8"));
@@ -50,6 +50,33 @@ test("styles check finds hard-coded colours and text below the scale", () => {
   fs.writeFileSync(path.join(dir, "web/src/geo/x/a.test.tsx"), `const c = "#000000";`);
   const keys = checkStyles(dir, rules).map((f) => f.key).sort();
   assert.deepEqual(keys, ["web/src/geo/x/a.tsx:#1f5eff", "web/src/geo/x/a.tsx:text-[11px]"]);
+});
+
+test("slop check finds AI icons, hue utilities, glass, filters, stripes, emoji and a missing brand font", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gaid-slop-"));
+  fs.mkdirSync(path.join(dir, "web/src/geo/x"), { recursive: true });
+  fs.mkdirSync(path.join(dir, "web/src/app"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "web/src/geo/x/a.tsx"), [
+    'import { FolderIcon, SparklesIcon, Bot as Robot } from "lucide-react";',
+    '<div className="bg-violet-500/10 dark:text-sky-400 backdrop-blur border-l-4 border-l bg-gradient-to-r" />',
+    '<img className="dark:invert object-contain" />',
+    '<p className="text-gaid-warning bg-gaid-warning-bg border-border" />',
+  ].join("\n"));
+  fs.writeFileSync(path.join(dir, "web/src/geo/x/a.test.tsx"), 'const c = "bg-violet-500";');
+  fs.writeFileSync(path.join(dir, "web/src/app/globals.css"), ":root { --font-sans: x; }");
+  const keys = checkSlop(dir, rules, [s("hub.title", "허브 ✨"), s("hub.ok", "허브")]).map((f) => f.key).sort();
+  assert.deepEqual(keys, [
+    "ko:hub.title:emoji",
+    "web/src/app/globals.css:font-face",
+    "web/src/geo/x/a.tsx:ai-icon:Bot",
+    "web/src/geo/x/a.tsx:ai-icon:SparklesIcon",
+    "web/src/geo/x/a.tsx:glass:backdrop-blur",
+    "web/src/geo/x/a.tsx:gradient:bg-gradient-t",
+    "web/src/geo/x/a.tsx:hue-utility:bg-violet-500",
+    "web/src/geo/x/a.tsx:hue-utility:dark:text-sky-400",
+    "web/src/geo/x/a.tsx:image-filter:dark:invert",
+    "web/src/geo/x/a.tsx:side-stripe:border-l-4",
+  ]);
 });
 
 test("the repository passes with its recorded baseline", () => {
