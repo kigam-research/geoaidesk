@@ -727,12 +727,12 @@ export const FileTreePanel = memo(function FileTreePanel({
             </div>
             <div className="space-y-0.5">
               <p className="text-xs font-medium text-muted-foreground">{appText("files.no_files_yet")}</p>
-              <p className="text-[11px] text-muted-foreground/60">{appText("files.drop_files_or_folders_here_or_use")}</p>
+              <p className="text-xs text-muted-foreground">{appText("files.drop_files_or_folders_here_or_use")}</p>
             </div>
           </div>
         ) : (
           <div
-            className="relative rounded-lg bg-background font-mono text-sm"
+            className="relative rounded-lg bg-background text-sm"
             style={{ height: range.totalHeight }}
           >
             {visibleRows.slice(range.start, range.end).map((row, index) => (
