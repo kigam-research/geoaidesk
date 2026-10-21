@@ -66,6 +66,8 @@ import type { ProjectActivitySummary } from "@/lib/project-activity";
 import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { GaidHubEntry, GaidTopNav } from "@/geo/hub/top-nav";
+import { LibraryScreen } from "@/geo/library/library-screen";
+import { ResearchTabs, useResearchTab } from "@/geo/library/research-tabs";
 import { cn } from "@/lib/utils";
 import { APP_VERSION, isVersioned } from "@/lib/version";
 
@@ -157,6 +159,8 @@ export function ProjectView({
   const { resolvedTheme, setTheme } = useTheme();
   const { confirm, dialog: confirmDialog } = useConfirm();
   const [mounted, setMounted] = useState(false);
+  // GAID (gaid-research-hub): 내 연구 has a 프로젝트 / 서재 tab bar; 서재 replaces the project list below it.
+  const [researchTab, setResearchTab] = useResearchTab();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsRequest, setSettingsRequest] = useState<OpenSettingsRequest | null>(null);
   const [search, setSearch] = useState("");
@@ -308,7 +312,9 @@ export function ProjectView({
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10">
+      {onOpenHub && <ResearchTabs value={researchTab} onChange={setResearchTab} />}
+      {onOpenHub && researchTab === "library" && <LibraryScreen onOpenProject={handleOpen} />}
+      <main className={cn("mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10", onOpenHub && researchTab === "library" && "hidden")}>
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="flex max-w-2xl flex-col gap-2">
             <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">

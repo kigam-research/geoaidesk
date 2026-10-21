@@ -212,3 +212,79 @@ function maskCode(text: string): string {
   const blank = (s: string) => s.replace(/[^\n]/g, " ");
   return text.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, blank).replace(/`[^`\n]*`/g, blank);
 }
+
+// --- Routes (`/geo/library/*`; the project comes from the usual X-Project-Id scope) ---------------------------------
+
+/** One row of the library table (나안 columns: paper, year, source, read coverage, used in). */
+export interface LibraryItemSummary {
+  id: string;
+  source: LibrarySource;
+  title: string;
+  /** "홍길동 외" style short author line, already shortened by the server. */
+  authors: string;
+  year?: number;
+  container?: string;
+  citationKey?: string;
+  coverage: ReadCoverage;
+  hasPdf: boolean;
+  collectionIds: string[];
+  tags: string[];
+  used: { notes: number; workflows: number; projects: number };
+  metadataConfirmed: boolean;
+  addedAt: string;
+}
+
+export interface LibraryListQuery {
+  q?: string;
+  source?: LibrarySource;
+  collectionId?: string;
+  /** `unread` = coverage none/abstract; `cited` = cited in at least one research note. */
+  filter?: "unread" | "cited" | "project";
+  limit?: number;
+  offset?: number;
+}
+
+export interface LibraryListResponse {
+  items: LibraryItemSummary[];
+  total: number;
+  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number };
+  collections: LibraryCollection[];
+  zotero: ZoteroLibraryState[];
+}
+
+/** Where an item is used (가안 detail pane "내 연구에서 쓰인 곳"). */
+export type LibraryUse =
+  | { kind: "note"; projectId: string; projectName: string; noteId: string; title: string; locators: string[] }
+  | { kind: "workflow"; entryId?: string; authoringId?: string; title: string; revision?: number }
+  | { kind: "project"; projectId: string; projectName: string };
+
+export interface LibraryItemResponse {
+  item: LibraryItem;
+  uses: LibraryUse[];
+}
+
+/** Add a GAID-managed item after the researcher confirmed the looked-up or typed metadata. */
+export interface CreateLibraryItemBody {
+  csl: CslItem;
+  metadataOrigin: MetadataOrigin;
+  collectionIds?: string[];
+  tags?: string[];
+  /** Content hash of a PDF uploaded before (`POST /geo/library/files`), attached to the new item. */
+  pdfSha256?: string;
+}
+
+export interface UploadedLibraryFile {
+  sha256: string;
+  size: number;
+  mediaType: string;
+  pages?: number;
+}
+
+/** Resolution of note citation keys against the library (note view, write/edit hook). */
+export interface CitationResolution {
+  key: string;
+  itemId?: string;
+  title?: string;
+  /** One plain reference line for the note's reference list. */
+  reference?: string;
+}

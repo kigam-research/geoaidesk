@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T11:41:20Z
+updated: 2026-10-21T11:42:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3af53966-052e-46c3-8a2d-2c8d41a23668","pid":1527917,"provider":"codex","session":"01a15e34-6c95-7c51-97f7-fd1699ddd9db","start":"46979518","token":"3b29a99f8472c13cc91477b88811c27fdf13e9ca7893426b125e2c2824d09462"}
 branch: task/gaid-research-hub--metadata
 target: task/gaid-research-hub
@@ -66,7 +66,7 @@ you could not verify.
 ## Current state
 Implemented the owned server adapters and pure formats; no routes, store, UI, shared contract or dependencies changed.
 - Focused vitest: 19/19 passed (2 files), latest run 2026-10-21 20:40 KST. Global fetch is forbidden; all API requests are injected.
-- Server typecheck: npx tsc --noEmit passed after final code changes. git diff --check passed.
+- Server typecheck: npx tsc --noEmit passed after final code changes and again after merging parent 15a16bbf. Combined targeted vitest (the two owned files plus parent geo-library.test.ts): 23/23 passed, 3 files, 2026-10-21 20:42 KST. git diff --check passed.
 - PC74 live smoke: two DOIs, Crossref and OpenAlex each, 4/4 successful; both titles matched the requested DOI and all records remained metadataConfirmed:false. OpenAlex used no key.
 - Recorded fields live in server/test/fixtures/library; PDF fixtures are generated in OS temp storage. KCI XML is synthetic, not a keyed response.
 - Oracle API-documentation job exited successfully (0). Reconciled its primary sources: corrected KCI to open.kci.go.kr, added Crossref updated-by assertions and retained source/record/date details, and split singleton/list rate buckets. The added interleaved-rate regression test passed.
@@ -95,6 +95,7 @@ Implemented the owned server adapters and pure formats; no routes, store, UI, sh
 - Details and limitations: server/src/geo/library/metadata/README.md and formats/README.md.
 
 ## Failed approaches
+- First task finish checkpointed child commit 7c8ae83d, then merged parent 15a16bbf and stopped on append-only geo/integration-boundaries.json conflict. Preserved all parent entries/edits and appended the six owned metadata test seams; no source-code conflict. Rechecking the combined state before rerunning finish; do not resume or task save between finish attempts.
 - Initial Oracle job launch refused the dirty source before starting. Saved the task document, then launched the one recorded job; no empty recorded job was restarted.
 - One initial URL-size test failed because Response(string) defaults to text/plain; it hit the HTML-type guard before the size guard. Corrected the test fixture Content-Type to text/html; the bounded-stream test passed.
 - Exact worktree has no codegraph index; used the instructed native source-read fallback.
