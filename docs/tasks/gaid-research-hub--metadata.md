@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-21T11:57:40Z
+status: ready
+updated: 2026-10-21T11:57:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"3af53966-052e-46c3-8a2d-2c8d41a23668","pid":1527917,"provider":"codex","session":"01a15e34-6c95-7c51-97f7-fd1699ddd9db","start":"46979518","token":"3b29a99f8472c13cc91477b88811c27fdf13e9ca7893426b125e2c2824d09462"}
 branch: task/gaid-research-hub--metadata
 target: task/gaid-research-hub
@@ -77,7 +77,7 @@ Implemented the owned server adapters and pure formats; no routes, store, UI, sh
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-21T11:50:02Z: ready; the parent gaid-research-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-21T11:57:42Z: ready; the parent gaid-research-hub integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Work packages and integration order
 - Completed sequentially: CSL result shapes, identifier/PDF/URL adapters, provider mapping/backoff, bibliography functions, fixture coverage and smoke.
