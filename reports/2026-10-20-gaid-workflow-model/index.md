@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/12-chat-workflow-card.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GAID를 Workflow 중심으로 정리하고 Workflow를 지침 문서로 AI agent에게 보냄
 
