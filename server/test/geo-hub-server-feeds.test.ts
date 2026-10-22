@@ -2,7 +2,7 @@
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FEED_LIMITS, type FeedSourceDefinition } from "../../web/src/geo/contracts/hub-feeds.ts";
 import { buildHubServer, HubDatabase, type HubServerApp } from "../src/geo/hub-server/index.ts";
 import { backupHub, checkBackup } from "../src/geo/hub-server/backup.ts";
@@ -48,10 +48,14 @@ describe("feed parsing", () => {
     const long = item(source, { title: "🌍".repeat(310), summary: "한".repeat(410), link: "https://example.org" }, at)!;
     expect([...long.title]).toHaveLength(300); expect([...long.summary]).toHaveLength(400); expect(long.title.endsWith("…")).toBe(true);
     expect(plain("<script>no</script><p>A &amp; B</p>")).toBe("A & B");
+    expect(plain("CO<sub>2</sub> and 지질<b>모델</b>링.")).toBe("CO2 and 지질모델링.");
     expect(() => parseFeed("<html>not a feed</html>", source, at)).toThrow(/피드/);
   });
   it("preserves boundaries in Atom XHTML content", () => {
     expect(parseFeed(`<feed><entry><title>Test</title><link href="https://example.org/1"/><content type="xhtml"><div><p>First</p><p>second</p></div></content></entry></feed>`, source, at)[0].summary).toBe("First second");
+  });
+  it("preserves inline scientific notation in XML titles", () => {
+    expect(parseFeed(`<rss><channel><item><title>CO<sub>2</sub> uptake</title><link>https://example.org/1</link></item></channel></rss>`, source, at)[0].title).toBe("CO2 uptake");
   });
   it("matches short ASCII words as words and other terms as case-insensitive substrings", () => {
     expect(matches({ match: ["AI"] }, "rainfall", "")).toBe(false);
@@ -106,6 +110,28 @@ describe("source validation and bounded transport", () => {
     expect(repos).toHaveLength(1); expect(repos[0].github).toEqual({ repo: "o/r", stars: 23 });
   });
 });
+it.each(["byte-cap", "prereleases-only"])("falls back to one stable GitHub release on %s", async (trigger) => {
+  const { url: _url, ...base } = source;
+  const seen: string[] = [];
+  const release = { name: "Stable", tag_name: "v1", body: "Release notes", html_url: "https://github.com/o/r/releases/v1", published_at: at };
+  const stub = asFetch((url) => {
+    seen.push(String(url));
+    if (String(url).endsWith("/latest")) return Response.json(release);
+    return trigger === "byte-cap" ? new Response(null, { headers: { "content-length": String(FEED_LIMITS.responseBytes + 1) } }) : Response.json([{ ...release, prerelease: true }]);
+  });
+  const values = await collectSource({ ...base, kind: "github-releases", repo: "o/r", skipPrereleases: true }, at, { feedFetch: stub });
+  expect(seen).toEqual(["https://api.github.com/repos/o/r/releases?per_page=10", "https://api.github.com/repos/o/r/releases/latest"]);
+  expect(values).toHaveLength(1); expect(values[0].github?.release).toBe("v1");
+});
+it("keeps the byte cap for the latest release too and does not fall back on unrelated failures", async () => {
+  const { url: _url, ...base } = source;
+  const oversized = asFetch(() => new Response(null, { headers: { "content-length": String(FEED_LIMITS.responseBytes + 1) } }));
+  await expect(collectSource({ ...base, kind: "github-releases", repo: "o/r", skipPrereleases: true }, at, { feedFetch: oversized })).rejects.toThrow(/크기/);
+  expect(oversized).toHaveBeenCalledTimes(2);
+  const unavailable = asFetch(() => new Response(null, { status: 503 }));
+  await expect(collectSource({ ...base, kind: "github-releases", repo: "o/r", skipPrereleases: true }, at, { feedFetch: unavailable })).rejects.toThrow(/503/);
+  expect(unavailable).toHaveBeenCalledTimes(1);
+});
 async function user(a: HubServerApp, role: "admin" | "member") {
   const invite = a.accounts.invite({ email: `${role}@example.org`, role });
   const response = await a.inject({ method: "POST", url: "/hub/v1/auth/invites/accept", payload: { code: invite.code, displayName: role, password: "correct password 123", device: "test" } });
@@ -145,7 +171,7 @@ describe("approval, persistence and serving", () => {
     const stub = asFetch((url) => String(url).includes("fail") || fail ? new Response("no", { status: 503 }) : new Response(rss(110)));
     const feeds = new HubFeeds(hub, { proposals: [{ ...source, id: "fail-source", url: "https://fail.example/rss" }, source], feedFetch: stub });
     for (const s of feeds.sources()) feeds.decide(s.id, { state: "approved" }, actor);
-    const result = await feeds.fetch(); expect(result.results.map((r) => r.ok)).toEqual([false, true]); expect(feeds.list().items).toHaveLength(100);
+    const result = await feeds.fetch(); expect(result.results.map((r) => r.ok)).toEqual([false, true]); expect(feeds.list({ category: "papers" }).items).toHaveLength(100);
     const before = feeds.list().items[0];
     hub.run("UPDATE feed_items SET fetched_at=?,record=? WHERE id=?", "2026-10-20T01:00:00.000Z", JSON.stringify({ ...before, fetchedAt: "2026-10-20T01:00:00.000Z" }), before.id);
     await feeds.fetch({ sourceId: source.id }); expect(feeds.list().items[0].fetchedAt).toBe("2026-10-20T01:00:00.000Z");
@@ -154,6 +180,22 @@ describe("approval, persistence and serving", () => {
     hub.run("INSERT INTO feed_items VALUES (?,?,?,?,?)", old.id, source.id, JSON.stringify(old), old.publishedAt, old.fetchedAt);
     fail = false; await feeds.fetch(); expect(hub.get("SELECT id FROM feed_items WHERE id=?", old.id)).toBeUndefined();
     const manifest = backupHub(hub, join(home(), "backup")); expect(checkBackup(join(roots.at(-1)!, "backup")).rows).toEqual(manifest.rows);
+  });
+  it("limits an unfiltered list to ten per source without limiting filtered lists", async () => {
+    const hub = db();
+    const feeds = new HubFeeds(hub, { proposals: [source, { ...source, id: "dated-source", url: "https://dated.example/rss" }], feedFetch: asFetch((url) =>
+      new Response(String(url).includes("dated") ? rss(20) : rss(110).replace(/<pubDate>.*?<\/pubDate>/g, ""))) });
+    for (const s of feeds.sources()) feeds.decide(s.id, { state: "approved" }, actor);
+    await feeds.fetch();
+    const all = feeds.list().items;
+    expect(all).toHaveLength(20);
+    expect(all.filter((i) => i.sourceId === source.id)).toHaveLength(10);
+    expect(all.filter((i) => i.sourceId === "dated-source")).toHaveLength(10);
+    expect(feeds.list({ category: "papers" }).items).toHaveLength(120);
+    expect(feeds.list({ field: "general" }).items).toHaveLength(120);
+    expect(feeds.list({ q: "Summary" }).items).toHaveLength(120);
+    expect(feeds.list({ limit: 12 }).items).toHaveLength(12);
+    expect(feeds.list({ q: "" }).items).toHaveLength(20);
   });
   it("does not fetch a stopped next source or resurrect one stopped during its read", async () => {
     const hub = db(); let feeds: HubFeeds;

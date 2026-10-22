@@ -5,6 +5,9 @@ import { HubServerError, object } from "../core.ts";
 import { item, parseFeed } from "./parse.ts";
 import { httpUrl } from "./sources.ts";
 const version = (JSON.parse(readFileSync(new URL("../../../../../geo/distribution.json", import.meta.url), "utf8")) as { version: string }).version;
+export class FeedResponseTooLarge extends HubServerError {
+  constructor() { super("출처 응답이 허용 크기를 넘었습니다."); }
+}
 export interface FeedFetchOptions { feedFetch?: typeof fetch; githubToken?: () => string | undefined }
 export async function readResponse(address: string, options: FeedFetchOptions = {}): Promise<string> {
   let url = httpUrl(address);
@@ -32,7 +35,7 @@ export async function readResponse(address: string, options: FeedFetchOptions = 
       }
       if (!response.ok) { await response.body?.cancel(); throw new HubServerError(`출처가 HTTP ${response.status} 오류를 반환했습니다.`); }
       if (Number(response.headers.get("content-length")) > FEED_LIMITS.responseBytes) {
-        await response.body?.cancel(); throw new HubServerError("출처 응답이 허용 크기를 넘었습니다.");
+        await response.body?.cancel(); throw new FeedResponseTooLarge();
       }
       if (!response.body) return "";
       const reader = response.body.getReader();
@@ -43,7 +46,7 @@ export async function readResponse(address: string, options: FeedFetchOptions = 
           const { value, done } = await reader.read();
           if (done) break;
           size += value.byteLength;
-          if (size > FEED_LIMITS.responseBytes) { await reader.cancel(); throw new HubServerError("출처 응답이 허용 크기를 넘었습니다."); }
+          if (size > FEED_LIMITS.responseBytes) { await reader.cancel(); throw new FeedResponseTooLarge(); }
           chunks.push(value);
         }
       } finally { reader.releaseLock(); }
@@ -62,14 +65,28 @@ export async function collectSource(source: FeedSourceDefinition, at: string, op
   if (source.kind === "feed") return parseFeed(await readResponse(source.url!, options), source, at);
   const out: FeedItem[] = [];
   if (source.kind === "github-releases") {
-    const releases = await json(`https://api.github.com/repos/${source.repo}/releases?per_page=10`, options);
-    if (!Array.isArray(releases)) throw new HubServerError("GitHub 릴리스 목록을 읽지 못했습니다.");
-    for (const release of releases) {
-      if (!object(release) || release.draft || (source.skipPrereleases && release.prerelease) || typeof release.tag_name !== "string" || typeof release.html_url !== "string") continue;
-      const value = item(source, { title: typeof release.name === "string" && release.name.trim() ? release.name : `${source.repo!.split("/")[1]} ${release.tag_name}`,
-        summary: typeof release.body === "string" ? release.body : "", link: release.html_url, date: release.published_at ?? release.created_at,
-        github: { repo: source.repo!, release: release.tag_name } }, at);
-      if (value) out.push(value);
+    const addReleases = (releases: unknown[]) => {
+      for (const release of releases) {
+        if (!object(release) || release.draft || (source.skipPrereleases && release.prerelease) || typeof release.tag_name !== "string" || typeof release.html_url !== "string") continue;
+        const value = item(source, { title: typeof release.name === "string" && release.name.trim() ? release.name : `${source.repo!.split("/")[1]} ${release.tag_name}`,
+          summary: typeof release.body === "string" ? release.body : "", link: release.html_url, date: release.published_at ?? release.created_at,
+          github: { repo: source.repo!, release: release.tag_name } }, at);
+        if (value) out.push(value);
+      }
+    };
+    try {
+      const releases = await json(`https://api.github.com/repos/${source.repo}/releases?per_page=10`, options);
+      if (!Array.isArray(releases)) throw new HubServerError("GitHub 릴리스 목록을 읽지 못했습니다.");
+      addReleases(releases);
+    } catch (error) {
+      if (!source.skipPrereleases || !(error instanceof FeedResponseTooLarge)) throw error;
+    }
+    // Asset-heavy release lists can exceed the cap, or the latest ten can all be alphas.
+    // Keep the same byte cap and obtain one stable release rather than increasing the read bound.
+    if (source.skipPrereleases && !out.length) {
+      const latest = await json(`https://api.github.com/repos/${source.repo}/releases/latest`, options);
+      if (!object(latest)) throw new HubServerError("GitHub 최신 릴리스를 읽지 못했습니다.");
+      addReleases([latest]);
     }
   } else {
     const seen = new Set<string>();

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:42:20Z
+updated: 2026-10-22T14:45:49Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -86,15 +86,19 @@ Report back (final message, English): files changed, the live smoke table, anyth
 ## Current state
 Implemented migration 3, approved-source snapshots/audit, bounded RSS/RDF/Atom and GitHub collection, serialized batches,
 retention, authenticated feed/admin routes, CLI commands and configurable startup/interval schedule. Operator guide added.
-Verified: server `npx tsc --noEmit`; focused Vitest suite passed 69 tests in 3 files (2026-10-22 KST).
-Live smoke is running as recorded job job-geoaidesk-gaid-hub-feeds--server-1 against b2bca1005fad.
-The script starts a temporary HTTP hub, explicitly approves all 18 proposals by CLI, fetches by CLI and checks the authenticated list.
+Verified after follow-ups: server `npx tsc --noEmit`; focused Vitest suite passed 74 tests in 3 files (2026-10-22 KST).
+Live smoke job job-geoaidesk-gaid-hub-feeds--server-1 exited 0 (b2bca1005fad): 17/18 sources succeeded; authenticated list
+returned HTTP 200 with 300 items. Codex release list exceeded the 4 MiB cap. Evidence is the recorded job's out/live-smoke.json.
+Parent accepted two in-scope follow-ups: latest-stable fallback for skipPrereleases sources on byte cap/zero kept releases;
+and ten items per source in the unfiltered list (filtered lists unchanged). Implemented and fixture-checked, including both fallback triggers.
+Inline scientific notation now remains joined when HTML is stripped (CO<sub>2</sub> becomes CO2).
+First live collection span: 18.076 s (first stored fetchedAt to final attempt at); job metadata launch-to-exit span about 21.4 s.
 No deployment or integration claimed yet.
 ## Next steps
-1. On the recorded job exit notice, read its receipt and live-smoke.json output (do not start another smoke).
-2. Inspect per-source counts/errors, address material implementation issues, rerun focused checks only after changes.
-3. Deliver the smoke evidence to parent and finish this child; parent integrates and runs full scripts/check.
+1. Save the checked follow-ups and run the recorded Codex-only recheck in the same temporary home.
+2. Record final source counts and live timing; send evidence to parent and task finish. Parent integrates and runs full scripts/check.
 ## Failed approaches
+- Initial Codex list read exceeded the fixed byte cap. Do not increase the cap or retry unchanged; the accepted fallback requests one stable release.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items

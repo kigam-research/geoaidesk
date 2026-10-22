@@ -2,6 +2,8 @@ import { FEED_CATEGORIES, FEED_FIELDS, FEED_LIMITS, HUB_FEEDS_SCHEMA, type FeedF
 import { HubDatabase, HubServerError, object, type AuditActor } from "../core.ts";
 import { collectSource, type FeedFetchOptions } from "./fetch.ts";
 import { definition, shippedSources, sourceId } from "./sources.ts";
+// Shared FEED_LIMITS.perSourceUnfiltered is being added by the parent in parallel.
+const PER_SOURCE_UNFILTERED = 10;
 interface SourceRow { id: string; record: string; last_success: string | null }
 export interface FeedActor extends AuditActor { name: string }
 export class HubFeeds {
@@ -60,9 +62,16 @@ export class HubFeeds {
     const sources = this.sources().filter((s) => s.state === "approved");
     const ids = new Set(sources.map((s) => s.id));
     const needle = (query.q as string | undefined)?.toLowerCase() ?? "";
+    const perSource = new Map<string, number>();
+    const unfiltered = !category && !field && !needle;
     const items = this.hub.all<{ record: string }>("SELECT record FROM feed_items ORDER BY COALESCE(published_at,fetched_at) DESC,id ASC")
       .map((row) => JSON.parse(row.record) as FeedItem).filter((i) => ids.has(i.sourceId) && (!category || i.category === category) && (!field || i.field === field) &&
-        (!needle || `${i.title}\n${i.summary}`.toLowerCase().includes(needle))).slice(0, limit);
+        (!needle || `${i.title}\n${i.summary}`.toLowerCase().includes(needle))).filter((i) => {
+          if (!unfiltered) return true;
+          const count = perSource.get(i.sourceId) ?? 0;
+          perSource.set(i.sourceId, count + 1);
+          return count < PER_SOURCE_UNFILTERED;
+        }).slice(0, limit);
     const latest = this.hub.all<SourceRow>("SELECT * FROM feed_sources WHERE last_success IS NOT NULL").filter((s) => ids.has(s.id)).map((s) => s.last_success!).sort().at(-1) ?? null;
     return { schema: HUB_FEEDS_SCHEMA, connected: true, items, sources: sources.map(({ id, title, publisher, homepage, category, field, lastFetch }) =>
       ({ id, title, publisher, homepage, category, field, ...(lastFetch ? { lastFetch } : {}) })), collectedAt: latest };

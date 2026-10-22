@@ -225,12 +225,20 @@ a failure leaves other sources collectable. Sources and concurrent fetch request
 `0` disables scheduled collection without disabling manual fetch. The timer is cleared when the server closes. The source
 list records the last attempt and its error, while the researcher's list reports the latest successful collection.
 
+The unfiltered list shows at most ten items from each source, then applies the global newest-first order and list limit.
+Choosing a category, field or search term removes that per-source display cap. Stored retention is unchanged.
+
 Only original titles, feed-provided summaries and links are stored: titles up to 300 characters and summaries up to 400.
 There are no model calls or linked-page/full-text requests. RSS 2.0, RSS 1.0/RDF and Atom are supported. GitHub release
 notes and repository descriptions use the same text bounds. Optional source match words filter title/summary; ASCII words
 of up to three letters match whole words. Each response is limited to 4 MiB, 20 seconds and three redirects. Up to 100 items
 per source remain, and items older than 180 days (publication time, otherwise first collection time) are removed after a
 successful collection. No automatic translation, scientific assessment or recommendation quality check is implied.
+
+GitHub releases first request the latest ten published releases and apply the source's prerelease choice. For a source
+that excludes prereleases, if that response exceeds 4 MiB or keeps no releases, the hub requests one latest stable release
+instead (`/releases/latest`), with the same 4 MiB limit. This handles repositories with many binary assets or frequent alpha
+releases without expanding the response bound.
 
 GitHub requests use the public API. To raise the unauthenticated rate limit, supply `GAID_HUB_FEEDS_GITHUB_TOKEN` to the
 hub process through its service environment. This optional token is never stored in the hub database, returned to GAID or

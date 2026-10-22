@@ -4,12 +4,17 @@ import { FEED_LIMITS, type FeedItem, type FeedSourceDefinition } from "../../../
 import { HubServerError, sha256 } from "../core.ts";
 import { httpUrl } from "./sources.ts";
 interface Element { name: string; attrs: Record<string, string>; children: Element[]; parts: (string | Element)[] }
-const content = (node: Element): string => node.parts.map((p) => typeof p === "string" ? p : ` ${content(p)} `).join("");
+const BLOCKS = new Set(["p", "div", "br", "li", "ul", "ol", "blockquote", "section", "table", "tr", "td", "th", "pre", "hr", "h1", "h2", "h3", "h4", "h5", "h6"]);
+const content = (node: Element): string => node.parts.map((p) => {
+  if (typeof p === "string") return p;
+  if (["script", "style"].includes(p.name)) return "";
+  return BLOCKS.has(p.name) ? ` ${content(p)} ` : content(p);
+}).join("");
 export function plain(input: string): string {
   let out = "";
   let hidden = 0;
-  const parser = new Parser({ onopentag(name) { if (["script", "style"].includes(name)) hidden++; else if (!hidden) out += " "; },
-    onclosetag(name) { if (["script", "style"].includes(name)) hidden = Math.max(0, hidden - 1); else if (!hidden) out += " "; },
+  const parser = new Parser({ onopentag(name) { if (["script", "style"].includes(name)) hidden++; else if (!hidden && BLOCKS.has(name)) out += " "; },
+    onclosetag(name) { if (["script", "style"].includes(name)) hidden = Math.max(0, hidden - 1); else if (!hidden && BLOCKS.has(name)) out += " "; },
     ontext(value) { if (!hidden) out += value; } }, { decodeEntities: true });
   parser.end(input);
   return out.replace(/\s+/gu, " ").trim();
