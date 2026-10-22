@@ -128,7 +128,8 @@ function workflow(value: unknown, index: number, runtimeName: string, issues: Me
   return issues.length === before ? (raw as unknown as GeoWorkflow) : null;
 }
 
-const SKILL_SOURCES = ["catalogue", "bundled", "imported"];
+const SKILL_SOURCES = ["catalogue", "bundled", "imported", "hub"];
+const TREE_HASH = /^[a-f0-9]{64}$/;
 const MAX_STEPS = 30;
 
 /**
@@ -147,6 +148,12 @@ function gaidWorkflowParts(raw: Record<string, unknown>, runtimeName: string, ad
     if (skill.source === "bundled" && skill.name !== runtimeName) add(`skills[${n}].name`, `a bundled skill must be this package's skill (${runtimeName})`);
     if (skill.role !== "primary" && skill.role !== "supporting") add(`skills[${n}].role`, "role must be primary|supporting");
     if (skill.ref !== undefined && (typeof skill.ref !== "string" || skill.ref.length > 500)) add(`skills[${n}].ref`, "ref must be text");
+    // A hub skill is pinned by revision and tree hash (ADR docs/adr/2026-10-22-hub-managed-skills.md); its hub id is its name.
+    if (skill.source === "hub") {
+      const hub = skill.hub as Record<string, unknown> | null | undefined;
+      if (!hub || typeof hub !== "object" || hub.skillId !== skill.name || !Number.isSafeInteger(hub.revision) || (hub.revision as number) < 1 || typeof hub.treeHash !== "string" || !TREE_HASH.test(hub.treeHash))
+        add(`skills[${n}].hub`, "a hub skill needs hub {skillId (= name), revision >= 1, treeHash}");
+    } else if (skill.hub !== undefined) add(`skills[${n}].hub`, "hub is only for source hub");
     for (const field of ["purpose", "title"] as const) {
       if (skill[field] !== undefined && !localized(skill[field])) add(`skills[${n}].${field}`, `${field} must be {ko, en?} text`);
     }

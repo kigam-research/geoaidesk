@@ -1,3 +1,5 @@
+import hubSkillsKo from "./hubSkills/ko.json";
+import hubSkillsEn from "./hubSkills/en.json";
 /**
  * GAID locale catalogues: one directory per namespace, `<namespace>/{ko,en}.json`.
  * Ids are `<namespace>.<dotted key>` (see ../i18n.ts). Adding a namespace = one
@@ -92,6 +94,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  hubSkills: pair(hubSkillsKo, hubSkillsEn),
   connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
   figures: pair(figuresKo, figuresEn),

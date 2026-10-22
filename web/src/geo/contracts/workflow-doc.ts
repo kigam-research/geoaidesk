@@ -11,8 +11,18 @@ import type { Localized, WorkflowArtifact, WorkflowChoice } from "./workspace";
 
 export const WORKFLOW_DOC_SCHEMA = "gaid-workflow/v1";
 
-/** Where a skill comes from. `bundled` ships inside the Workflow's package; `imported` came from GitHub or similar. */
-export type WorkflowSkillSource = "catalogue" | "bundled" | "imported";
+/**
+ * Where a skill comes from. `bundled` ships inside the Workflow's package; `imported` came from GitHub or similar;
+ * `hub` is a hub-managed skill pinned by revision (contracts/hub-skills.ts, ADR docs/adr/2026-10-22-hub-managed-skills.md).
+ */
+export type WorkflowSkillSource = "catalogue" | "bundled" | "imported" | "hub";
+
+/** Pin of a hub-managed skill revision (same shape as `HubSkillRef` in hub-skills.ts). */
+export interface WorkflowHubSkillPin {
+  skillId: string;
+  revision: number;
+  treeHash: string;
+}
 
 export interface WorkflowDocSkill {
   /** Runtime skill name (the SKILL.md folder name the agent sees). */
@@ -21,6 +31,8 @@ export interface WorkflowDocSkill {
   source: WorkflowSkillSource;
   /** For `imported`: where it came from (`owner/repo`, Git URL) and the ref, so readiness can offer to import it. */
   ref?: string | null;
+  /** For `hub`: the pinned hub skill revision. */
+  hub?: WorkflowHubSkillPin | null;
   role: "primary" | "supporting";
   /** What the Workflow uses it for. */
   purpose?: Localized | null;
@@ -150,6 +162,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
       const usedIn = doc.steps.flatMap((step, i) => (step.skill === skill.name ? [i + 1] : []));
       const parts = [say(`source.${skill.source}`)];
       if (skill.source === "imported" && skill.ref) parts.push(skill.ref);
+      if (skill.source === "hub" && skill.hub) parts.push(say("skill.hubRevision", { revision: skill.hub.revision }));
       if (skill.role === "primary") parts.push(say("skill.primary"));
       const what = p(skill.purpose) || p(skill.title);
       const where = usedIn.length ? say("skill.usedIn", { steps: usedIn.join(", ") }) : "";
@@ -255,7 +268,7 @@ export interface LegacyWorkflowInput {
   boundary: Localized | null;
   revision?: number | null;
   /** The Workflow's skills in `skillIds` order (primary first), resolved to runtime names. */
-  skills: { name: string; title?: Localized | null; source: WorkflowSkillSource; ref?: string | null }[];
+  skills: { name: string; title?: Localized | null; source: WorkflowSkillSource; ref?: string | null; hub?: WorkflowHubSkillPin | null }[];
   /** The primary skill's procedure; absent when unknown. */
   procedure?: SkillProcedureStep[] | null;
 }

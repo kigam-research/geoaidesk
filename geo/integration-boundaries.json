@@ -949,6 +949,18 @@
       "owner": "gaid-ui-v2-debts",
       "status": "edited",
       "responsibility": "UI guide v2 L1/L2/N2/N6: chat pane as an overlay sheet at 1024–1279 px, pane borders as keyboard-resizable separators within the guide's width ranges, ⌘\\ / Ctrl \\ file list toggle, ⌘K / Ctrl K search (file-name filter in the file tree, project and hub search fields marked as targets)"
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx",
+      "owner": "gaid-hub-skills",
+      "status": "edited",
+      "responsibility": "Narrow hub skill route props, InstalledHubSkill type, shelf install source and explicit revision update states; focused UI regressions"
+    },
+    {
+      "path": "server/src/api/skills.ts",
+      "owner": "gaid-hub-skills",
+      "status": "edited",
+      "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
     }
   ],
   "notTouched": [
