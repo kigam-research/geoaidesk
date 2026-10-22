@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:17:57Z
+updated: 2026-10-22T06:24:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -65,11 +65,13 @@ run the full `npm test` in server once. Write a short section for the parent rep
 document (what exists, how verified, limits); no report of your own. Finish with `task finish`.
 
 ## Current state
-Implemented the immutable skill shelf, three-source registration preview, licence/findings scanner, per-revision review and visibility, bounded read-only views, Workflow usedBy, acknowledged revision installs and GET /skills annotations.
-Verified server TypeScript check and 30 targeted tests (13 shelf + 14 shared hub + 3 origin), including anonymous install and the exact authoring licence placeholder. Full server job 1 at ee4b980af331 completed: 180 test files passed, 3 failed, 2 skipped; 2020 tests passed, 10 failed, 60 skipped. The failed map suite and tables/Office tests report missing Python helper dependencies in the fresh job snapshot. This is an environment setup gap, not a demonstrated shelf regression. No app deployment or parent integration is claimed.
+Server shelf implementation is complete and pushed: immutable revisions, three-source preview/registration, licence/findings, review/visibility, Workflow usedBy, read-only files, acknowledged revision installs and installed skill-row metadata. Parent integration and deployment remain separate.
+Verification: server TypeScript check and 30 targeted tests passed. Full server job 2 at f1dd6c30178b succeeded (exit 0): 184 files and 2082 tests passed; 1 file and 8 tests skipped. The failed helper-less job 1 is superseded by job 2; no source workaround was needed.
+Stable integration API: server/src/geo/hub-skills/index.ts exports HubSkillStore, readHubSkillRevision -> {skill, revision, archive}, installHubSkillRevision and listHubSkills. No contract changes.
+
 ## Next steps
-1. Wait for recorded job-geoaidesk-gaid-hub-skills--store-2 (f1dd6c30178b); it prepares frozen Python helpers, installs locked npm dependencies, then runs the full server suite. Do not duplicate it.
-2. Read the recorded result on its exit notice and finish the child once checks are satisfied.
+1. Finish this child unit. The parent integrates it with task complete gaid-hub-skills--store and owns the combined UI/Workflow checks and final report.
+
 ## Failed approaches
 - Full-suite job 1 omitted helper environment setup. All reported failures are missing geopandas/table/Office helper dependencies. Correct the job command before repeating; do not edit unrelated source code.
 - New /skills/all test initially wrapped app.inject with withActiveProject; Fastify request context did not inherit it. Replaced it with the same onRequest scope hook used by the server; all 13 shelf tests passed.
@@ -90,11 +92,12 @@ Parent report notes (no separate child report):
 - Public reads hide restricted/unknown latest revisions from other names and keep older non-shareable revisions hidden after a later release. Public skill installation works without a display name; author-only installs require the author's name. The exact generated authoring PRIVATE marker is not an external licence declaration.
 - Installs use the existing preview/acknowledgement and atomic install engine, never fetch GitHub, reject suspended revisions, and preserve foreign or edited project skills. Reinstalling the same unedited hub tree writes nothing. GET /skills and /skills/all include the installed pin, current shelf revision/state and edited flag.
 - TypeScript check and 30 targeted tests passed at ee4b980af331. Tests use temporary stores/projects and the real skills CLI with local sources, not network access. Coverage includes source changes after registration, archive/tree/inventory tampering, two Workflow revisions pinning different skill revisions, old-revision installs, suspension, visibility/review, source choice, text/path/size gates, metadata extraction, deterministic long/Unicode/empty-folder archives, reverted-tree origin stability and real skill-row annotations.
-- Full server suite job 1: 2020 passed, 10 failed, 60 skipped; three files failed because the fresh snapshot had no Python helper dependencies. Job 2 at f1dd6c30178b prepares the frozen helper environment first and is running. Scanner findings are bounded heuristics (200 findings; 160-character excerpts), not a safety verdict. Licence detection uses a known SPDX list, not a legal opinion; unsupported declarations remain author-only. The skills CLI exposes no resolved commit on this path, so the origin does not invent one. UI and Workflow authoring/readiness are owned by the parent/sibling, not this child.
+- Full server suite job 2 at f1dd6c30178b passed: 184 files, 2082 tests; 1 file and 8 tests skipped. Frozen Python helpers were prepared first. The initial helper-less job failed only in dependency-dependent maps/tables/Office tests and is superseded by job 2. Scanner findings are bounded heuristics (200 findings; 160-character excerpts), not a safety verdict. Licence detection uses a known SPDX list, not a legal opinion; unsupported declarations remain author-only. The skills CLI exposes no resolved commit on this path, so the origin does not invent one. UI and Workflow authoring/readiness are owned by the parent/sibling, not this child.
 
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061227.637852Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061750.108769Z/log"],"reason":"The first full-suite snapshot omitted frozen Python helper setup; the replacement ran the same code with the scripts/check helper setup and passed all enabled server tests.","recorded":"2026-10-22T06:24:19Z","replacement":"/home/seongin3/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061750.108769Z/receipt.json","state":"superseded"}
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061750.108769Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
