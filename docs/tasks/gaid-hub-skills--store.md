@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:24:38Z
+status: active
+updated: 2026-10-22T06:33:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -65,8 +65,9 @@ run the full `npm test` in server once. Write a short section for the parent rep
 document (what exists, how verified, limits); no report of your own. Finish with `task finish`.
 
 ## Current state
-Server shelf implementation is complete and pushed: immutable revisions, three-source preview/registration, licence/findings, review/visibility, Workflow usedBy, read-only files, acknowledged revision installs and installed skill-row metadata. Parent integration and deployment remain separate.
+Server shelf implementation is complete and pushed: immutable revisions, three-source preview/registration, licence/findings, review/visibility, Workflow usedBy, read-only files, acknowledged revision installs and installed skill-row metadata. Parent branch changes were merged by task finish; integration of this child into the parent and deployment remain separate.
 Verification: server TypeScript check and 30 targeted tests passed. Full server job 2 at f1dd6c30178b succeeded (exit 0): 184 files and 2082 tests passed; 1 file and 8 tests skipped. The failed helper-less job 1 is superseded by job 2; no source workaround was needed.
+First task finish required check (c950770ccedb): server TypeScript and 2085 tests passed (8 skipped), web 1156 tests passed. Only distribution ownership metadata failed; correction is in progress.
 Stable integration API: server/src/geo/hub-skills/index.ts exports HubSkillStore, readHubSkillRevision -> {skill, revision, archive}, installHubSkillRevision and listHubSkills. No contract changes.
 
 ## Next steps
@@ -74,12 +75,14 @@ Stable integration API: server/src/geo/hub-skills/index.ts exports HubSkillStore
 Closed 2026-10-22T06:24:38Z: ready; the parent gaid-hub-skills integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish merged parent f962590b and ran scripts/check. Server: 2085 passed, 8 skipped; web: 1156 passed. Distribution failed only because concatenating two owner ids in integration-boundaries.json is not a valid allowlisted owner. Restore the historical seam and add a separate shelf-owned seam; use unit-level owner gaid-hub-skills and merge parent allowlist commit 349f50a6163e (do not edit the test in this child). Fix in place and rerun task finish, without task save/resume in between.
 - Full-suite job 1 omitted helper environment setup. All reported failures are missing geopandas/table/Office helper dependencies. Correct the job command before repeating; do not edit unrelated source code.
 - New /skills/all test initially wrapped app.inject with withActiveProject; Fastify request context did not inherit it. Replaced it with the same onRequest scope hook used by the server; all 13 shelf tests passed.
 ## Notes and decisions
 - Sequential work: store and archive interfaces first, then registration, install/routes, row annotations, acceptance tests. All owned files stay with this writer; no child writers.
 - Public exports agreed with parent in server/src/geo/hub-skills/index.ts; readHubSkillRevision returns {skill, revision, archive}.
 - Archive gzip comments carry a deterministic revision identity. Reverting to an older tree cannot overwrite that older installed revision's package-origin record.
+- Parent boundary decision: keep the historical gaid-workflow-model seam unchanged and add a separate server/src/api/skills.ts seam owned by gaid-hub-skills. Parent owns the allowlist update (349f50a6163e).
 - Parent authorized the same one-line PRIVATE export in authoring/package.ts as its commit 580d4339b331; applied locally to avoid importing unrelated parent authoring changes before full tests.
 - Parent decisions: the builder's exact PRIVATE marker is absent for licence detection (import its constant); any other unknown declaration stays unknown. Install/install-preview do not require a display name, but anonymous users can install only publicly visible revisions. Other mutations retain the name gate.
 - Latest non-shareable licences hide the entire skill from other names; old non-shareable revisions remain hidden after a later release.
