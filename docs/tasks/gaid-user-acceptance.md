@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:02:17Z
+updated: 2026-10-22T09:07:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -62,6 +62,11 @@ Outside check: no outside check.
   (project "검토용 - 수용 시험 ChatGPT 로그인 경로", connection passed at start), job-…-2 api-key minimax/MiniMax-M3 $1 cap
   (project "검토용 - 수용 시험 개인 API 키 경로").
 - Asked the user (this tab) to save a valid Zotero web key with write access.
+- Check 4, ChatGPT sign-in: PASSED. job-1 record ~/data/geoaidesk/runs/gaid-user-acceptance-20261022T085938.208885Z/out/record.json
+  (sha256 442686a4…9cf): connection GAID_ROUTE_OK 5.6 s; task well-log-qc passed in 390 s, 23 turns / 29 tool calls, all
+  artifacts present, ledger 1 row subscription $0 (list price $0.306), 61.4k in / 8.4k out tokens, context peak 21% of 272k;
+  project chatgpt-0488e0. The agent read gaid-figures SKILL.md; one recovered tool error: check_figure.py run without
+  `--journals` (exit 5), then rerun.
 ## Next steps
 1. On job exits: read out/record.json of both runs; on tester finish: verify every claim (cited pages via pdftotext, figure check
    rerun, Zotero state via GET /geo/library/zotero); if the key is renewed, tell the tester to repeat goal C.
