@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:15:49Z
+status: ready
+updated: 2026-10-22T02:15:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4874820d-e04e-4b0a-8c95-5b14723b8837","pid":2241389,"provider":"codex","session":"01a16154-8f16-7ec1-b5d4-47eff4a5d82e","start":"52223294","token":"be246d461f2ed7bd44b287cdfd4990cbdc0b3a21c25094032face66d42c55fe1"}
 branch: task/gaid-ui-v2-debts--map
 target: task/gaid-ui-v2-debts
@@ -147,9 +147,8 @@ All additions below are new ids (no previous value). Existing `subset`, `figureN
 | `map.tableResize` | — → 지도와 속성표 높이 조절 | — → Resize map and attribute table |
 
 ## Next steps
-
-1. Run `task finish` for the checked snapshot; parent runs `task complete gaid-ui-v2-debts--map` and the full integration checks.
-2. Parent incorporates the rule/copy evidence and selected screenshot(s) into its canonical report. Keep the isolated map CSS block when integrating its separate globals changes.
+<!-- task:closed -->
+Closed 2026-10-22T02:15:50Z: ready; the parent gaid-ui-v2-debts integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 
