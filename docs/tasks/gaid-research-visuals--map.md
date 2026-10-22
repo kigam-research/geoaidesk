@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:48:56Z
+status: ready
+updated: 2026-10-22T02:48:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"38934232-bc69-4c6e-85ce-d9508ca7b59d","pid":2583953,"provider":"codex","session":"01a1616f-fbe3-7443-b1ed-dcbcf3b16315","start":"52403024","token":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
 branch: task/gaid-research-visuals--map
 target: task/gaid-research-visuals
@@ -94,7 +94,7 @@ Synthetic GET evidence (depth 2): note focus returns 6 nodes/5 edges; figure foc
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T02:41:29Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T02:48:57Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish stopped at geo/tests/distribution.test.mjs because the new required seam owner was not in its static allow-list. Parent authorization (2026-10-22) extended ownership to that single allow-list registration and its boundary entry; no test expectations for application behavior changed.
