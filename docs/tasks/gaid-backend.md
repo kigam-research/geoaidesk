@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:09:02Z
+updated: 2026-10-22T06:27:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -57,6 +57,8 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
    `~/data/geoaidesk/work/gaid-backend/hub-home`, a GAID on PC74 and one on PC70 if PC70 reaches PC74 on the LAN.
 3. Import the 5 review-instance entries into a test hub home (read-only source `~/.geoaidesk`), report §3 results,
    screenshots, `scripts/check`, `task finish`.
+Blocked: waiting for the three child units' `task finish` (each runs scripts/check); e2e test drafted in
+server/test/geo-hub-e2e.test.ts (runs after P1+P2 are integrated).
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 on report §6 (verbatim): "2번 다, 4번 나로 하고 나머지는 권장으로 하자." → 1 가 institute GAID
