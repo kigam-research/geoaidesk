@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:17:53Z
+status: done
+updated: 2026-10-22T02:45:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd317c8f-ab1d-4414-aede-87515135d35e","pid":1749537,"provider":"claude","session":"d6996044-f57f-4278-9026-e0c4ac7a513a","start":"51919497","token":"14d69b3c7eed337fb37e61430d3c92ac27abbc46325a901f3d075f6110313cc6"}
 branch: task/gaid-concept-pictures
 target: main
@@ -38,18 +38,19 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-concept-pictures/; do not modify 
 user's OpenAI Codex (legacy) login: ask before spending it. Outside check: no outside check (design/app work).
 
 ## Current state
+- 2026-10-22: implemented and integrated with main (sync d87a86f2, scripts/check passed). Real app from this worktree
+  (start-gaid.sh, GAID_HOME ~/data/geoaidesk/work/gaid-concept-pictures/home, ports 3361/18361) captured in
+  `.../app-shots/` (hub, entry, draft × 계측/도폭 × light/dark × 1440/1280). Registry-list thumbnails (shared-browse.tsx, new in
+  guide v2) also use ConceptPicture.
 - 2026-10-22: research sent to Oracle (xhigh; prompt `~/data/geoaidesk/work/gaid-concept-pictures/oracle-prompt.md`, log
   `oracle-1.log`). Current code read: prompt fixes `white background` (`server/src/geo/authoring/visuals.ts:113`), request
   1536x1024 medium (`codex-images.ts:95-98`); pictures render in `hub-home.tsx` (featured card), `method-flow.tsx` (step/output),
   `draft-step.tsx` (cover), `io-examples.tsx`. gaid-design-identity--fresh guide v2 draft rule I6 puts white-background pictures on a
   light mat in dark mode (`--pic-mat`/`--img-mat`, dark `#eef0f3`); its hub dark mockup shows the bright block the user dislikes.
 ## Next steps
-1. `task sync` (scripts/check) running in this session after merging main (gaid-design-identity landed: guide v2, 계측/도폭
-   tokens; conflicts in ui-guide.md, globals.css, hub-home.tsx resolved onto main's versions and re-applied).
-2. Then: start the app from this worktree with GAID_HOME `~/data/geoaidesk/work/gaid-concept-pictures/home` (seeded by
-   `tools/seed.py` + authoring project ap-b232edf4-30a: themed cover/zone map, older white block-size picture), ports
-   3361/18361; capture Korean screenshots 1440×900 and 1280×800, light/dark × 계측/도폭 (hub home, shared entry, draft);
-   write `reports/2026-10-22-gaid-concept-pictures/index.md`, humanizer, review-copy, `task finish`.
+<!-- task:closed -->
+Closed 2026-10-22T02:45:35Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Research (Oracle xhigh, 2026-10-22): vault `웹 조사/geoaidesk/2026-10-22-geoaidesk-gaid-ai-gaid-hub--dc8af4523f.md`.
@@ -77,6 +78,7 @@ user's OpenAI Codex (legacy) login: ask before spending it. Outside check: no ou
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-22-gaid-concept-pictures/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
