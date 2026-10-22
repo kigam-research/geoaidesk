@@ -183,8 +183,31 @@ export interface ZoteroLibraryState {
   libraryVersion: number;
   lastSyncAt?: string;
   /** Research-language state for the screen; raw errors stay behind 기술 정보 (UI guide R2). */
-  state: "ok" | "zotero-closed" | "local-api-off" | "key-rejected" | "unreachable";
+  state: ZoteroState;
+  /** When the last refresh failed (cleared by the next successful one). */
+  failedAt?: string;
+  /** Technical detail of that failure: an error code and HTTP status only, never response bodies or keys. */
+  detail?: string;
 }
+
+/**
+ * Why Zotero could not be read, worded per state on the screen. `zotero-closed`/`local-api-off` are the PC (Local API)
+ * states; `key-invalid`/`no-library-access` the web-key ones; `unreachable` is a network failure or time-out only.
+ */
+export type ZoteroState =
+  | "ok"
+  | "zotero-closed"
+  | "local-api-off"
+  | "key-rejected"
+  | "key-invalid"
+  | "no-library-access"
+  | "library-not-found"
+  | "rate-limited"
+  | "server-error"
+  | "library-changing"
+  | "certificate-untrusted"
+  | "unreachable"
+  | "failed";
 
 /** The only writes GAID makes to Zotero, each after the researcher confirms (ADR decision 3). */
 export type ZoteroWrite =
