@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:28:15Z
+updated: 2026-10-22T02:41:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"813b374f-6081-4e35-bb00-2a85b20c78b0","pid":2577995,"provider":"codex","session":"01a1616f-ac32-7212-a099-657c660972dd","start":"52400975","token":"036c33bc715fc3253d6171a7b69b7e96a7088ceff337e24a0d8d0d1cf2cffa5f"}
 branch: task/gaid-research-visuals--records
 target: task/gaid-research-visuals
@@ -82,11 +82,77 @@ Common rules for this child of gaid-research-visuals (GeoAIDesk, repo kigam-rese
   `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the figure-record server and independent NoteFigures component. Provenance resolves script-drawn copies
+by observed copy edges or matching recorded hashes, preserves consumed versions, derives kinds, detects input/figure
+changes, and supplies caption-grounded AI disclosure drafts. Kind overrides are path+hash-scoped; target journal and
+exact-byte checks are persisted separately. Missing skill/profile files degrade to a clear 503 / empty profile list.
+The hidden CVD preview endpoint serves only fixed hash+variant filenames. No contract changes.
+
+Focused checks pass: server 10 tests, component 5 tests; related suites pass (server 65 total, web 11 total). Both
+TypeScript checks and UI/copy validators pass. Seventeen Korean fixture screenshots cover both styles, both themes,
+1440x900 and 1280x800 (origin/check plus AI detail). Parent note-panel wiring and actual sibling checker execution
+remain integration work, not verified here. The parent should consume this child with task complete after finish.
 ## Next steps
-1. (the next session's first action)
+1. Run task finish with the owned new files; parent then integrates using task complete.
+2. Parent mounts NoteFigures in the note detail and verifies the actual sibling skill/checker plus its full scripts/check.
 ## Failed approaches
+- The initial copy recognizer failed to match cp at the opening quote of JSON-serialized arguments; corrected the token
+  boundary and verified both observed-edge and hash-copy cases, including a hash match to another copied figure.
+- The external screenshot fixture initially missed Tailwind source scanning and the public font directory; fixed the
+  fixture's explicit sources/publicDir and recaptured. This was a QA harness issue, not an app styling workaround.
+- Dependency job commands were refused before a receipt because the source was dirty. No job started. Local npm ci
+  completed for both packages; no package manifests or locks changed.
 ## Notes and decisions
+Owned interfaces: the FigureRecord contract remains unchanged. Server implementation precedes the component; shared
+checker CLI is consumed from the sibling skill unit. This child does not create nested writers. No independent package
+remains that warrants a reader; provenance and UI work are tightly coupled within this unit.
+
+### Delivered interfaces and files
+- Server: server/src/geo/figures/{store,check}.ts; server/src/geo/routes/figures.ts and its geo registration seam.
+- Web: web/src/geo/figures/ (NoteFigures, redraw-message, fixed preview URL builder, export and usage README).
+- Locales: new figures namespace and its locale aggregator entry. All figures.* strings are new (before: absent);
+  no existing locale value changed. Examples: figures.redraw = 다시 그리기 / Redraw figure;
+  figures.redrawTarget = 저널 크기로 다시 그리기 / Redraw at journal size;
+  figures.runCheck = 그림 점검하기 / Check figure; figures.view.record = 기록 보기 / View record.
+  Full Korean/English values are in web/src/geo/locales/figures/{ko,en}.json.
+- Tests: server/test/geo-figures.test.ts and web/src/geo/figures/note-figures.test.tsx.
+- The IO-free contracts were not changed. Extra additive route, requested by the parent:
+  GET /geo/figures/check-preview?sha256=<64 lowercase hex>&variant=deuteranopia|protanopia|tritanopia.
+  It reads only .kady/geo/figure-checks/<sha>-cvd-<variant>.png, with project scope and normal auth; no arbitrary path.
+- UI guide: P2/P3/P4/P9, I6, S1, L6/L7, R1/R2/R4 and V1/V6. One filled action in origin/check; record/model/disclosure
+  facts stay behind View record; no image filtering or theme branching. White corner samples choose the existing
+  primary-foreground light mat token. No new accepted UI debt.
+
+### Verification evidence
+- npm test --prefix server -- --run test/geo-figures.test.ts: 10 passed. Synthetic GET /geo/figures?note=2026-10-22-analysis
+  returns (a) plot.png: data-figure, script draw.py, copyMatch edge, origin chat-a; (b) ai.png: ai-picture,
+  generating model retained behind record and purpose from caption; (c) unknown.png: unknown, origin null, disclosure null.
+  The tests also cover hash copies, consumed-version input changes, figure staleness, kind/target mutation, missing files,
+  the 200-figure bound, hidden/escaped/symlink paths, malformed-state preservation, helper exit mapping and fixed CVD names.
+- npm test --prefix server -- --run test/geo-figures.test.ts test/provenance-lineage.test.ts test/geo-notes.test.ts:
+  65 passed across 3 files. Own tests passed again after caption/record refinements.
+- npm test --prefix web -- --run src/geo/figures/note-figures.test.tsx src/geo/notes/research-notes-panel.test.tsx:
+  11 passed across 2 files. Own 5 tests passed again after refinements. Covers composer-only redraw, journal width,
+  changed inputs, measured/required check results, hidden disclosure, kind override, scoped fetches and tokenized previews.
+- npm run typecheck --prefix server: pass. cd web && npx tsc --noEmit: pass.
+- node geo/ui/check-ui.mjs: 0 errors, 112 pre-existing accepted debt, no new debt.
+- node geo/copy/validate-copy.mjs web/src/geo/locales: 0 errors, 61 existing warnings outside figures.
+- git diff --check: pass. Focused web ESLint: 0 errors (native img warning is intentional: original figure pixels).
+- Browser fixture uses the real component, globals.css, tokens and font with mocked API data. 17 screenshots under
+  /home/seongin3/data/geoaidesk/work/gaid-research-visuals--records/visual-qa/. Original/check views cover the full
+  style/theme/size matrix; AI view additionally captured at 1280x800 mapsheet dark. Inspected for section 12:
+  no horizontal overflow; one primary in actionable views; visible labels and focusable native controls; record details
+  collapsed; original pixels (computed filter none); white mats remain rgb(255,255,255); font loaded.
+  Representative files and sha256:
+  - 1280-instrument-dark-check.png: 4cc4639747e50db8aec02e019dd48cac5a4fd5850835a153e4f06a9a576edee0
+  - 1440-mapsheet-light-origin.png: 04d9c4af2a25d81ea1d83ea168aff70488b1a812c8b518010d3a8d9c86605577
+
+### Integration limits
+- The skill directory does not exist in this child snapshot. Actual Python/journal/CVD execution is not verified here;
+  helper invocation/output handling uses a fixture and mocked runner. Parent integrates the skill sibling and checks it.
+- No note-panel, library, catalogue, deployment or upstream file was modified. Parent owns actual application wiring,
+  full scripts/check, report screenshots in the canonical report and publication.
+- The temporary browser fixture is external; its transient service and browser are stopped before finish.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
