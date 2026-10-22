@@ -18,7 +18,7 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 | `geo/` | Distribution manifest, upstream lock, integration boundaries, release manifest script, `tests/` (unit + production smoke) |
 | `server/src/geo/` | GAID backend modules: distribution manifest, catalogue staging/provisioning, task exposure and prompt budget, environments, inspection + tools + read hints, local model, routes (`/geo/*`) |
 | `web/src/geo/` | GAID UI modules: inspection contract, viewer registry seam + generic inspection viewer, start-prompt budget chip, local-model Settings card, `defineGeoStrings` |
-| `configs/inputs.toml` | Named inputs: `geo_catalogue` (pc74:~/assets/geo-catalogue/0.2.1, skill_hub catalogue archive; public copy on the geoaidesk release `geo-catalogue-0.2.1`) |
+| `configs/inputs.toml` | Named inputs: `geo_catalogue` (pc74:~/assets/geo-catalogue/<version>, built by `geo/catalogue-build.mjs`; public copy on the geoaidesk release `geo-catalogue-<version>`), `k_dense_scientific_agent_skills` (source of imported K-Dense skills) |
 | `NOTICE.md`, `THIRD_PARTY_NOTICES.md` | Fork attribution, third-party and excluded sources |
 | `docs/` | Upstream user documentation; `docs/cloud-policy.md` hosted-cloud work policy; `docs/tasks/` task documents |
 | `scripts/check` | Declared checks (upstream CI steps on Linux + GAID checks and production smoke) |

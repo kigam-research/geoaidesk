@@ -4,8 +4,8 @@
  * of this repository (gaid-runtime#2: the launcher downloads
  * `catalogue.download.url` and keeps it only when the sha256 matches).
  *
- *   node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.2.1           # check files, print the command
- *   node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.2.1 --publish # create the release (gh CLI)
+ *   node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.3.0           # check files, print the command
+ *   node geo/catalogue-release.mjs --dir ~/assets/geo-catalogue/0.3.0 --publish # create the release (gh CLI)
  *   node geo/catalogue-release.mjs --verify-remote                              # download the URL, check sha256
  *
  * The release is a prerelease named after `catalogue.download.release`, so it
@@ -46,7 +46,7 @@ export function releaseTarget(cat = catalogue, repository = distribution.reposit
 
 function notes() {
   return [
-    `GeoAIDesk skill catalogue ${catalogue.version}, exported from kigam-research/skill_hub \`${catalogue.sourceCommit}\`.`,
+    `GeoAIDesk skill catalogue ${catalogue.version}, built from kigam-research/geoaidesk \`${catalogue.sourceCommit}\` (geo/catalogue-build.mjs).`,
     "",
     "The GeoAIDesk launcher downloads this archive into `<GAID_HOME>/catalogue/` and keeps it only when its sha256",
     `matches \`geo/distribution.json\`: \`${catalogue.sha256}\`.`,

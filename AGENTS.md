@@ -24,8 +24,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   automatically (`catalogue.excludedSources`, applied in `server/src/config.ts`); automatic catalogue refresh is off
   in the distribution (`KADY_SKILLS_AUTO_SYNC=0`).
 - Modal remote compute is off in the GAID distribution (`features.remoteCompute: false`): no tools, child bridges, compute UI or startup recovery; existing `.kady/modal/` data is preserved. Upstream/development launchers retain Modal.
-- Geo catalogue (WP03 `gaid-runtime`): `geo/distribution.json` `catalogue` pins one skill_hub archive by version and
-  sha256 (asset `geo_catalogue` in `configs/inputs.toml`). `server/src/geo/catalogue.ts` finds it
+- Geo catalogue (WP03 `gaid-runtime`): `geo/distribution.json` `catalogue` pins one catalogue archive by version and
+  sha256 (asset `geo_catalogue` in `configs/inputs.toml`). GAID builds it (ADR `docs/adr/2026-10-22-gaid-builds-catalogue.md`;
+  0.2.x came from skill_hub, now legacy): `geo/catalogue-build.mjs --release geo/catalogue-src/releases/<v>.json` takes the
+  previous verified archive as base, adds imported skills from a pinned source asset (hashes in
+  `geo/catalogue-src/sources.lock.json`) with GAID-owned Korean profiles (`geo/catalogue-src/imports/`) and optional
+  environments; `geo/tests/catalogue-build.test.mjs` rebuilds the pinned archive byte for byte when the assets are present.
+  0.3.0 adds the K-Dense literature skills `paper-lookup`, `citation-management`, `literature-review`, `pyzotero`
+  (seeded disabled: `DEFAULT_DISABLED_SKILLS`) and the optional `geo-literature` environment (requests, pyzotero). `server/src/geo/catalogue.ts` finds it
   (`GAID_CATALOGUE_ARCHIVE` → `<GAID_HOME>/catalogue/` → `geo/catalogue/` (ignored) → `~/assets/geo-catalogue/<v>/`),
   verifies the archive, every file and every `packageDigest`, and stages it in the skills cache; in geo mode
   (`GEO_CATALOGUE_MODE`: a pin, `GAID_CATALOGUE` not `off`, no `KADY_SKILLS_REPO`) `fetchCatalogue()` returns it and

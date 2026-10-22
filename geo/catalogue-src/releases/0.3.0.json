@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "gaid-catalogue-build/v1",
+  "catalogueVersion": "0.3.0",
+  "note": "0.2.1 unchanged + four K-Dense literature skills (gaid-research-hub#8, user answer 2026-10-21: 카탈로그 새 판에 넣음) and the optional geo-literature environment. Built in GAID (docs/adr/2026-10-22-gaid-builds-catalogue.md).",
+  "base": {
+    "version": "0.2.1",
+    "sha256": "e9f506068a4cb2e0b2f207ccc2db760db7641e624fa08ba729604421c6ef55f5",
+    "examplesSha256": "619c930d4313e160215bbff67df679e6b495d39ec8b0a881395cd71600f6d4f5"
+  },
+  "sources": {
+    "k-dense": {
+      "input": "k_dense_scientific_agent_skills",
+      "assetPath": "k-dense-scientific-agent-skills/92ace75a",
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "notices": ["LICENSE.md", "CITATION.cff"]
+    }
+  },
+  "add": [
+    { "id": "k-dense/paper-lookup", "source": "k-dense", "path": "skills/paper-lookup", "profile": "imports/k-dense/paper-lookup.yaml", "pythonImports": [], "environmentIds": ["geo-core"] },
+    { "id": "k-dense/citation-management", "source": "k-dense", "path": "skills/citation-management", "profile": "imports/k-dense/citation-management.yaml", "pythonImports": ["requests", "scholarly"], "environmentIds": ["geo-literature"] },
+    { "id": "k-dense/literature-review", "source": "k-dense", "path": "skills/literature-review", "profile": "imports/k-dense/literature-review.yaml", "pythonImports": ["requests"], "environmentIds": ["geo-literature"] },
+    { "id": "k-dense/pyzotero", "source": "k-dense", "path": "skills/pyzotero", "profile": "imports/k-dense/pyzotero.yaml", "pythonImports": [], "environmentIds": ["geo-literature"] }
+  ],
+  "environments": {
+    "add": [
+      {
+        "id": "geo-literature",
+        "extends": "geo-core",
+        "title": { "ko": "문헌 환경", "en": "Literature environment" },
+        "purpose": {
+          "ko": "논문 검색·인용 정리·문헌 고찰 스크립트와 Zotero 연결(pyzotero)에 필요한 추가 패키지입니다.",
+          "en": "Additional packages for the paper search, citation and literature review scripts and the Zotero client (pyzotero)."
+        },
+        "optional": true,
+        "targets": ["project"],
+        "packages": [
+          { "name": "requests", "version": ">=2.32", "imports": ["requests"] },
+          { "name": "pyzotero", "version": ">=1.15.2,<1.16", "imports": ["pyzotero"] }
+        ]
+      }
+    ]
+  }
+}
