@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:18:31Z
+status: active
+updated: 2026-10-22T06:26:19Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -65,7 +65,7 @@ Run `cd web && npx vitest run` for your tests, `npx tsc --noEmit`, `node geo/cop
 ## Current state
 Implemented the institute hub connection/account/admin UI, account-aware named actions and ownership, and the library sync line. No backend contract changed. No application data or real accounts were touched. Narrow Settings seam: ServicesPanel mounts HubServerCard.
 
-Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite job 2 passed: 181 files, 1173 tests, exit 0 (67.32s), at source c94189b2b7d4. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. scripts/check has not been run in this child; parent owns integrated backend/end-to-end verification.
+Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite job 2 passed: 181 files, 1173 tests, exit 0 (67.32s), at source c94189b2b7d4. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. task finish automatically ran scripts/check: backend typecheck passed, backend 2069 passed/8 skipped (183 files passed/1 skipped), frontend 1173 passed, launcher --check passed. Distribution tests: 48 passed, 1 failed, 1 skipped; the only failure is a missing gaid-backend owner in geo/tests/distribution.test.mjs owners allowlist. Parent explicitly authorized the one-line owners Set addition on 2026-10-22; it is now added and all 7 focused distribution tests pass. Remaining checks did not run after the initial failure; rerun finish.
 
 Screenshots: 24 mocked-backend PNGs at ~/data/geoaidesk/work/gaid-backend--hub-ui/screens/ (Settings logged out, Settings admin with members open, library sync; instrument/mapsheet, light/dark, 1440x900 and 1280x800). Horizontal overflow false in every screenshot; Settings cards fit within 1280x800. Vite fixture, API mock and capture.js are external to Git. Four representative 1280px PNGs are under the parent report figures/; report text unchanged.
 
@@ -79,9 +79,13 @@ Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel
 Closed 2026-10-22T06:18:31Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Disposing failed job 1 as superseded after failed finish was refused: terminal task; disposition requires an open owning task. No job rerun or metadata edit. Job 2 is the successful replacement, documented above; finish treats the old failure as advisory.
+- First task finish full scripts/check failed only on missing gaid-backend owner in distribution test allowlist (not on application behavior). No workaround; update the registry for the declared seam.
 - Job job-geoaidesk-gaid-backend--hub-ui-1 exited 127: immutable job source has no node_modules (vitest not found). Fix the job environment by including npm ci before tests; no source workaround.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Parent message 2026-10-22 explicitly authorizes adding gaid-backend to geo/tests/distribution.test.mjs owners Set (ancillary one-line change outside original owned files).
+
 ### UI guide conformance
 
 Followed: P2/P3 (one selected auth task, details for address/account/admin), P9 (connection vs account vs sync states), I2/I7/I8/I12/I13 (role tokens and existing style rules), T1 (new prose/control labels at 13/15px; card legend 17px), B3 (next-action labels), F4/F5/R2 (actionable failures with collapsed technical details and copy), A1/A2/A5 (labels, keyboard controls, pressed/busy state, status/alert), W1-W6 (short copy and progressive disclosure), V1-V9 (no new banned decorations or hard-coded colors). No new UI baseline exceptions. Member management uses grouped list rows, not a data table. Logged-in account overview has only secondary actions until the researcher opens a form; avoids an arbitrary destructive/default filled action (B1 interpretation).
