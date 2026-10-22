@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T09:03:55Z
+status: ready
+updated: 2026-10-22T09:04:08Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"296db605-1ded-4568-85a9-d88131ee086d","pid":1897852,"provider":"codex","session":"01a162d3-531f-74e0-a6cc-70513e565e83","start":"54731792","token":"31944935f7308d8bb3ccfd634f7b22d86730ddd9cc5fac4b5b0e8ab3ad5685f0"}
 branch: task/gaid-visuals-next--journals
 target: task/gaid-visuals-next
@@ -58,8 +58,9 @@ lockfile, server figure tests passed all 10 tests. git diff --check passed; a st
 HEAD confirmed every profile other than agu/eeg is identical. Both named browser sessions are closed.
 No UI/locales, test files, dependency manifests or locks changed. Ready to save and finish.
 ## Next steps
-1. task save the reviewed journals.json and task document, then task finish.
-2. The parent integrates this child and includes the findings in its canonical report.
+<!-- task:closed -->
+Closed 2026-10-22T09:04:08Z: ready; the parent gaid-visuals-next integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Default headless user agent: AGU returned Cloudflare 403 and EEG returned a web-firewall message. Both
   succeeded after Chrome DevTools Network.setUserAgentOverride used a normal Linux Chrome user agent.
