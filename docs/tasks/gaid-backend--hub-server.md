@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:08:07Z
+updated: 2026-10-22T06:19:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb2d31aa-1e53-44fb-bc41-429c1eec3733","pid":214565,"provider":"codex","session":"01a16239-1e42-73b2-a1e3-4e088ec201a3","start":"53721186","token":"7929be5dae8e6ce4050b1260c2d83a48b5bd832aedf7e77cb23115d43d1fb6a6"}
 branch: task/gaid-backend--hub-server
 target: task/gaid-backend
@@ -77,11 +77,30 @@ Build:
 Report in the final message: routes implemented, CLI usage, test counts, anything deferred.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the standalone hub server under server/src/geo/hub-server/ (buildHubServer in index.ts), geo/hub-server.mjs,
+and docs/geo/hub-server.md. The existing protocol.ts and UI contracts are unchanged. Includes numbered SQLite migrations,
+content-addressed blobs, scrypt accounts, single-use invites, sliding hashed sessions, persisted login throttling, admin
+rules/audit, account-owned immutable hub revision/file rules, separate stars/comments/installs, per-account library sync,
+consistent backup plus restore checking, and dry-run-first/idempotent legacy import. No service deployed; production
+homes were not accessed.
+Verified: server npm ci; npx tsc --noEmit -p .; npx vitest run test/geo-hub-server.test.ts (37 passed), including a real
+launcher HTTP serve/health/browser-refusal/SIGTERM test and CLI invite/users/backup/check-backup smoke. Tests use temporary
+homes under ~/data/geoaidesk/work/gaid-backend--hub-server/tests and remove them. Operator prose reviewed in humanizer file
+mode. No user-facing UI strings or UI components changed.
+Safe re-verification: cd server && GAID_CATALOGUE=off npx vitest run test/geo-hub-server.test.ts; npx tsc --noEmit -p .
 ## Next steps
-1. (the next session's first action)
+1. Save the reviewed implementation and run scripts/check as a recorded task job.
+2. Inspect the overall check result, record any environmental/unrelated failures, then task finish with all new paths.
+3. Parent integrates P1, connects the P2 remote client and runs its cross-GAID tests. No persistent deployment in this child.
 ## Failed approaches
+- Initial focused suite: default general folder was not first when its creation time tied a new folder. Fixed SQL ordering
+  to keep general first; the 37-test suite passed afterward. One file-write command used the server working directory with
+  a root-relative path and failed without writing; corrected the working directory immediately.
 ## Notes and decisions
+Sequential decisions: use the accepted wire contract without semantic changes; keep the hub process independent of the
+agent runtime/config and its data; perform record/version/audit mutations in the same SQLite transaction; publish blobs
+before referencing them. This child owns only its listed server, launcher, tests and operator-guide files. The work is
+tightly coupled and stays with this single writer. Parent integrates P1 before P2/P3. No nested writers.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
