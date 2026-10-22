@@ -1,7 +1,7 @@
 /** Standalone hub storage. No imports from the researcher's config, credentials or agent runtime. */
 import { createHash, randomBytes } from "node:crypto";
 import { chmodSync, existsSync, mkdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 
 export class HubServerError extends Error {
@@ -42,7 +42,7 @@ export function dataHome(input: string): string {
   let ancestor = absolute;
   const tail: string[] = [];
   while (!existsSync(ancestor)) {
-    tail.unshift(ancestor.slice(dirname(ancestor).length + (dirname(ancestor) === "/" ? 0 : 1)));
+    tail.unshift(basename(ancestor));
     const parent = dirname(ancestor);
     if (parent === ancestor) break;
     ancestor = parent;

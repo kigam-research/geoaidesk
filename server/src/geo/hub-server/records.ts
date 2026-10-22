@@ -80,8 +80,7 @@ export class SQLiteHubStore implements HubRecordStore {
       if ((!previous && e.latestRevision !== 1) || (previous && e.latestRevision !== oldN && e.latestRevision !== oldN + 1))
         throw new HubServerError("바로 다음 판만 등록할 수 있습니다.", 409);
       if (previous) {
-        for (const key of ["id", "methodId", "slug", "kind", "basedOn"] as const)
-          if (!isDeepStrictEqual(e[key], previous.entry[key])) throw new HubServerError("등록 식별자와 원본 관계는 바꿀 수 없습니다.", 409);
+        if (!isDeepStrictEqual(e.basedOn, previous.entry.basedOn)) throw new HubServerError("원본 관계는 바꿀 수 없습니다.", 409);
         if (!isDeepStrictEqual(e.revisions.slice(0, oldN), previous.entry.revisions) ||
             Array.from({ length: oldN }, (_, i) => String(i + 1)).some((n) => !isDeepStrictEqual(record.snapshots[n], previous.snapshots[n])))
           throw new HubServerError("이전 판의 기록과 파일 정보는 바꿀 수 없습니다.", 409);

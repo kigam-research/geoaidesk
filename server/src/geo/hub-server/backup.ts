@@ -1,6 +1,6 @@
 /** Consistent database snapshot and immutable, content-addressed blobs. */
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { dataHome, HASH, HUB_TABLES, HubDatabase, HubServerError, object, sha256 } from "./core.ts";
 
@@ -11,7 +11,7 @@ interface BackupManifest {
   rows: Record<string, number>;
   files: { path: string; sha256: string; size: number }[];
 }
-const inside = (base: string, target: string) => { const rel = relative(base, target); return !rel || (!rel.startsWith("..") && !rel.startsWith("/")); };
+const inside = (base: string, target: string) => { const rel = relative(base, target); return !rel || (!rel.startsWith("..") && !isAbsolute(rel)); };
 const hashes = (db: DatabaseSync) => db.prepare("SELECT sha256 FROM hub_files UNION SELECT sha256 FROM library_files ORDER BY sha256").all() as { sha256: string }[];
 function databaseCheck(db: DatabaseSync) {
   const integrity = db.prepare("PRAGMA integrity_check").all();

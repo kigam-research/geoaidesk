@@ -1,6 +1,6 @@
 /** Read-only migration from SharedHubStore's on-disk format; never initializes or changes the source. */
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import type { HubComment, HubFolder } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import type { Actor } from "../hub-shared/records.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
@@ -26,7 +26,7 @@ export async function importHub(hub: HubDatabase, options: ImportOptions): Promi
     const file = join(source, path);
     if (optional && !existsSync(file)) return null;
     const rel = relative(source, realpathSync(file));
-    if (rel.startsWith("..") || !lstatSync(file).isFile()) throw new HubServerError("가져올 파일 경로를 확인해 주세요.", 409);
+    if (rel.startsWith("..") || isAbsolute(rel) || !lstatSync(file).isFile()) throw new HubServerError("가져올 파일 경로를 확인해 주세요.", 409);
     return readFileSync(file);
   };
   const folders = JSON.parse(read("folders.json")!.toString("utf8")) as HubFolder[];

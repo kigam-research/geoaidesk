@@ -218,6 +218,8 @@ describe("hub records and files", () => {
     expect((await put(u.headers, second)).statusCode).toBe(409);
     expect((await upload(u.headers, first.entry.id, "packages/2.tar.gz", bytes)).statusCode).toBe(204);
     time += 1000;
+    second.entry.slug = "renamed-workflow"; second.entry.methodId = "local/renamed-workflow";
+    second.snapshots["2"].package.slug = second.entry.slug; second.snapshots["2"].package.methodId = second.entry.methodId;
     const response = await put(u.headers, second);
     expect(response.statusCode, response.body).toBe(200);
     const saved = response.json<StoredEntry>();
@@ -231,11 +233,11 @@ describe("hub records and files", () => {
     const changedRevision = structuredClone(first); changedRevision.entry.revisions[0].note = "바꾼 이력";
     expect((await put(u.headers, changedRevision)).statusCode).toBe(409);
   });
-  it("rejects skipped revisions, deleted history, identity and basedOn changes", async () => {
+  it("rejects skipped revisions, deleted history and basedOn changes", async () => {
     const u = await user(); const first = await publish(u.headers);
     const skip = nextRevision(nextRevision(first));
     expect((await put(u.headers, skip)).statusCode).toBe(409);
-    for (const patch of [{ latestRevision: 0 }, { methodId: "different" }, { basedOn: { entryId: "entry-another", revision: 1, title: "original", author: "other" } }]) {
+    for (const patch of [{ latestRevision: 0 }, { basedOn: { entryId: "entry-another", revision: 1, title: "original", author: "other" } }]) {
       const r = structuredClone(first); Object.assign(r.entry, patch);
       expect((await put(u.headers, r)).statusCode).toBe(409);
     }
