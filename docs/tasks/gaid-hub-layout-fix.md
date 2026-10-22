@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T03:49:05Z
+updated: 2026-10-22T03:57:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6539b6c9-5957-440e-9fed-4ac3ddc50082","pid":3359328,"provider":"claude","session":"e1193689-5d34-43fe-a468-597c9a2d50b0","start":"52884028","token":"ea331793c1373217fa254345a44f114b47defad1bea78ef444303ba67d7e3444"}
 branch: task/gaid-hub-layout-fix
 target: main
@@ -30,8 +30,13 @@ scripts/check, then task finish. No other changes. Outside check: no outside che
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
+- Restored web/src/geo/hub/hub-sidebar.tsx and reports/2026-10-22-gaid-hub-layout/ (index.md + 6 figures) from
+  ~/data/geoaidesk/work/hub/recover/gaid-hub-layout/; sha256 of the recovered copies matched the request.
+- hub-sidebar.tsx exports HubView, HubSidebarFolder, sameView, useHubSidebarCollapsed, HubSidebarToggle, HubSidebar;
+  props match the calls in hub-screen.tsx, hub-home.tsx (type HubView) and shared-browse.test.tsx.
+- scripts/check passed 2026-10-22 (server 2069 passed/8 skipped, web 1156 passed, geo tests 0 fail, production smoke PASS; log ~/data/geoaidesk/work/gaid-hub-layout-fix/check.log).
 ## Next steps
-1. (the next session's first action)
+1. task finish (paths saved).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
