@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:19:13Z
+updated: 2026-10-22T02:21:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"12220668-2f56-4301-9ceb-1da6022ea8f7","pid":2196945,"provider":"claude","session":"f484fa94-7306-4cbf-a4a9-9e4e13cb3b0b","start":"52201100","token":"e6aadc1b7993109484dd94e6a03a7519df103e802549703adee2f16a87cdcd3c"}
 branch: task/gaid-ui-v2-debts
 target: main
