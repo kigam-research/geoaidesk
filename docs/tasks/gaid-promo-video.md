@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:55:41Z
+updated: 2026-10-22T15:05:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -60,14 +60,15 @@ platform. Plus a report for review and the repo checks that apply.
 ## Current state
 - Plan and capture contract written (`geo/promo/CONTRACT.md`). Capture child to be started.
 ## Next steps
-1. Start child `gaid-promo-video--capture` (Claude Opus 5.5 high, fast mode, per the user's "opus 5.5 high fast").
+1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
 2. Parent: extract real chart numbers (`geo/promo/data/`), build HTML/CSS motion scenes (`geo/promo/scene/`) and
    `geo/promo/render.py` (Playwright Chrome frame stepping → imageio-ffmpeg H.264, reference: ccs_transport
    `scripts/testbed_motion/render.py`). Preview stills, then show the storyboard + stills to the user before the final render.
 3. Integrate capture-v1, final render as `task job run`, verify, report, registry entry.
 ## Failed approaches
 ## Notes and decisions
-- Format (not specified by the user; recorded): 1920×1080, 30 fps, 2,700 frames, H.264, silent, like both references.
+- Format: 1920×1080, 30 fps, 2,700 frames, H.264. User decision (2026-10-22, via hub): "무음이고 내부검토용 영상이다."
+  → silent (no music, no narration) and an internal review video; no public release intended.
 - References read: ccs_transport `reports/2026-10-22-testbed-motion-video` (Chrome/Playwright deterministic frame
   renderer, real UI take with drawn pointer and ripple, user approved the composition before the final render);
   seoul_geomodel `reports/2026-10-21-viewer-v2-video` (workflow stages then real system operation; real data in every
