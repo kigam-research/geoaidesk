@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:56:14Z
+status: done
+updated: 2026-10-22T02:56:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"12220668-2f56-4301-9ceb-1da6022ea8f7","pid":2196945,"provider":"claude","session":"f484fa94-7306-4cbf-a4a9-9e4e13cb3b0b","start":"52201100","token":"e6aadc1b7993109484dd94e6a03a7519df103e802549703adee2f16a87cdcd3c"}
 branch: task/gaid-ui-v2-debts
 target: main
@@ -59,12 +59,9 @@ Plan (2026-10-22):
   Screenshots ~/data/geoaidesk/work/gaid-ui-v2-debts/shots/ (lib, dec, ws × 2 styles × 2 themes × 1440/1280/1180),
   contact sheets in .../sheets/; script .../shot.sh.
 ## Next steps
-1. `task finish` (report declared; dev app unit `gaid-ui-debts-app` stopped before finish).
-- 2026-10-22: map child gaid-ui-v2-debts--map completed and closed (ready commit 2d81e83d, integrated 4546bc27; build caches
-  removed from its worktree before `task close`). After integration: layer-row padding, adaptive default table height
-  (≤ 40% of map body, 184–240 px until resized; 1280×800 map 181→237 px). scripts/check on 2ec9e8e2: all passed
-  (backend 2067 + 8 skipped, web 1151, distribution, copy 0 errors, UI 0 errors, production smoke), log
-  ~/data/geoaidesk/work/gaid-ui-v2-debts/logs/check.log. Final map screenshots shots/map-final-*.png (8).
+<!-- task:closed -->
+Closed 2026-10-22T02:56:34Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-ui-v2-debts.md.
+
 ## Failed approaches
 - After merging the map child, the running dev server kept the old globals.css (map body rendered as block, panel below
   the map); restarting the dev app fixed it. Not a code issue.
@@ -75,7 +72,7 @@ Closes: gaid-design-identity--fresh#1
 Closes: gaid-design-identity--fresh#2
 Closes: gaid-design-identity--fresh#3
 ## Open items
-- [결정] 지도·표처럼 높이가 필요한 파일을 열었을 때 위의 'Workflow 제안' 칸(약 155 px)을 접을지 — 가) 한 줄 요약과 펼치기로 접고 펼치면 지금처럼 보임 — 나) 지금처럼 모든 파일에서 펼쳐 둠 — 권장: 가) 1280×800에서 지도가 약 120 px 커지고 Workflow 시작은 한 번 더 누르면 됨 — 막힌 일: 없음 — 근거: reports/2026-10-22-gaid-ui-v2-debts#6-결정할-일
+- [결정 gaid-ui-v2-debts#1] 지도·표처럼 높이가 필요한 파일을 열었을 때 위의 'Workflow 제안' 칸(약 155 px)을 접을지 — 가) 한 줄 요약과 펼치기로 접고 펼치면 지금처럼 보임 — 나) 지금처럼 모든 파일에서 펼쳐 둠 — 권장: 가) 1280×800에서 지도가 약 120 px 커지고 Workflow 시작은 한 번 더 누르면 됨 — 막힌 일: 없음 — 근거: reports/2026-10-22-gaid-ui-v2-debts#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
