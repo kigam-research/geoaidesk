@@ -19,6 +19,7 @@ import type { LibraryCollection, LibraryItemResponse, LibraryItemSummary, Librar
 import { attachToProject, createFolder, exportUrl, getLibraryItem, libraryPdfUrl, listLibrary, readItemText, renameFolder, sendItemToZotero, setFolderItems, startWorkflowFromItem, zoteroSelectUrl, zoteroState } from "./api";
 import { AddPaperDialog } from "./add-paper-dialog";
 import { ZoteroCard } from "./zotero-card";
+import { zoteroStatus } from "./zotero-status";
 import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
 import { FolderPanel, sendResultLine } from "./folder-panel";
 import { FolderNameDialog } from "./folder-name-dialog";
@@ -84,9 +85,13 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
     return () => window.clearTimeout(timer);
   }, [load]);
 
+  // Same status as the Zotero card (zoteroStatus): a failed refresh is never shown as connected or not connected.
   const zoteroLine = useMemo(() => {
-    const synced = data?.zotero.map((z) => z.lastSyncAt).filter(Boolean).sort().at(-1);
-    return synced ? L("screen.zoteroSynced", { when: new Date(synced).toLocaleTimeString() }) : L("screen.zoteroNone");
+    const status = zoteroStatus(data?.zotero ?? []);
+    if (status.kind === "synced") return L("screen.zoteroSynced", { when: new Date(status.at).toLocaleTimeString() });
+    if (status.kind === "not-synced") return L("screen.zoteroNotSynced");
+    if (status.kind === "failed") return L("screen.zoteroFailed");
+    return L("screen.zoteroNone");
   }, [data]);
 
   const collections = data?.collections ?? [];

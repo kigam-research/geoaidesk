@@ -24,7 +24,7 @@ export async function ensureCollection(client: ZoteroClient, library: ZoteroLibr
   const path = `${libraryPath(library)}/collections`;
   const listed = await readZoteroPages<ZoteroObject>(client, path);
   const existing = listed.objects.find((object) => object.data.name === input.name && (object.data.parentCollection || false) === parent);
-  if (listed.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
+  if (listed.version === undefined) throw new ZoteroError("failed", "missing-library-version");
   if (existing) return { key: existing.key, version: listed.version, created: false };
   const created = await conflict(client, path, () => client.create(library, "collections", [{ name: input.name, parentCollection: parent }], listed.version!));
   return { key: created.data[0], version: created.version!, created: true };
@@ -62,7 +62,7 @@ export function cslToZotero(csl: CslItem): Record<string, unknown> {
 }
 
 function checkPartition(client: ZoteroClient, ref: ZoteroItemRef) {
-  if (ref.connection !== client.connection || (client.connection === "local" && client.serverId !== ref.serverId)) throw new ZoteroError("unreachable", "wrong-item-partition");
+  if (ref.connection !== client.connection || (client.connection === "local" && client.serverId !== ref.serverId)) throw new ZoteroError("failed", "wrong-item-partition");
 }
 
 export async function addItemToInbox(client: ZoteroClient, library: ZoteroLibrary, input: { existing: ZoteroItemRef } | { csl: CslItem }): Promise<ZoteroItemRef> {
@@ -85,7 +85,7 @@ export async function createItem(client: ZoteroClient, library: ZoteroLibrary, i
   const data = { ...cslToZotero(input.csl), collections: [...new Set(input.collectionKeys.map(itemKey))], tags: [...new Set(input.tags ?? [])].map((tag) => ({ tag })) };
   const path = `${libraryPath(library)}/items`;
   const snapshot = await client.read(path, { query: { limit: 1 } });
-  if (snapshot.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
+  if (snapshot.version === undefined) throw new ZoteroError("failed", "missing-library-version");
   const created = await conflict(client, path, () => client.create(library, "items", [data], snapshot.version!));
   const object = await client.read<ZoteroObject>(`${path}/${itemKey(created.data[0])}`);
   return { connection: client.connection, serverId: client.serverId, ...library, itemKey: object.data.key, version: object.data.version };
@@ -120,7 +120,7 @@ export async function addResearchNoteLink(client: ZoteroClient, ref: ZoteroItemR
   if (parent.data.data.itemType === "annotation") throw new Error("Annotation writes are not supported");
   // Multi-object creation needs the library's version, not the parent's object version.
   const snapshot = await client.read(`${libraryPath(ref)}/items`, { query: { limit: 1 } });
-  if (snapshot.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
+  if (snapshot.version === undefined) throw new ZoteroError("failed", "missing-library-version");
   const created = await conflict(client, `${libraryPath(ref)}/items`, () => client.create(ref, "items", [{ itemType: "note", parentItem: ref.itemKey, note: `<p><a href="${escape(url.href)}">${escape(link.title)}</a></p>`, tags: [] }], snapshot.version!));
   const note = await client.read<ZoteroObject>(`${libraryPath(ref)}/items/${itemKey(created.data[0])}`);
   return { ...ref, itemKey: note.data.key, version: note.data.version };

@@ -12,17 +12,17 @@ export interface ZoteroFullText {
 }
 
 async function attachmentPath(client: ZoteroClient, ref: ZoteroItemRef): Promise<string> {
-  if (ref.connection !== client.connection) throw new ZoteroError("unreachable", "wrong-item-partition");
+  if (ref.connection !== client.connection) throw new ZoteroError("failed", "wrong-item-partition");
   if (client.connection === "local") {
     if (!client.serverId) await client.read(`${libraryPath(ref)}/items`, { discover: true, query: { limit: 1 } });
-    if (client.serverId !== ref.serverId) throw new ZoteroError("unreachable", "wrong-item-partition");
+    if (client.serverId !== ref.serverId) throw new ZoteroError("failed", "wrong-item-partition");
   }
   return `${libraryPath(ref)}/items/${itemKey(ref.itemKey)}`;
 }
 
 export async function getAttachmentFullText(client: ZoteroClient, ref: ZoteroItemRef): Promise<ZoteroFullText> {
   const { data } = await client.read<ZoteroFullText>(`${await attachmentPath(client, ref)}/fulltext`);
-  if (typeof data.content !== "string") throw new ZoteroError("unreachable", "invalid-fulltext");
+  if (typeof data.content !== "string") throw new ZoteroError("failed", "invalid-fulltext");
   return data;
 }
 
@@ -36,13 +36,13 @@ export async function uploadAttachment(client: ZoteroClient, library: ZoteroLibr
 }): Promise<{ attachmentKey: string; uploaded: boolean; indexedChars?: number }> {
   const path = `${libraryPath(library)}/items`;
   itemKey(parentKey);
-  if (input.bytes.byteLength > MAX_ATTACHMENT_BYTES) throw new ZoteroError("unreachable", "upload-too-large");
+  if (input.bytes.byteLength > MAX_ATTACHMENT_BYTES) throw new ZoteroError("failed", "upload-too-large");
   if (!input.filename || /[/\\\x00-\x1f]/.test(input.filename) || !input.contentType || /[\r\n]/.test(input.contentType)) throw new Error("Invalid attachment metadata");
   const fullText = input.contentType === "application/pdf" ? input.fullText : undefined;
   if (fullText && (typeof fullText.content !== "string" || !Number.isSafeInteger(fullText.indexedPages) || fullText.indexedPages < 0 || !Number.isSafeInteger(fullText.totalPages) || fullText.totalPages < fullText.indexedPages)) throw new Error("Invalid PDF full text");
   const bytes = Buffer.from(input.bytes);
   const snapshot = await client.read(path, { query: { limit: 1 } });
-  if (snapshot.version === undefined) throw new ZoteroError("unreachable", "missing-library-version");
+  if (snapshot.version === undefined) throw new ZoteroError("failed", "missing-library-version");
   const created = await conflict(client, path, () => client.create(library, "items", [{
     itemType: "attachment", linkMode: "imported_file", parentItem: parentKey,
     contentType: input.contentType, filename: input.filename, title: input.title ?? input.filename, tags: [], relations: {},
@@ -54,7 +54,7 @@ export async function uploadAttachment(client: ZoteroClient, library: ZoteroLibr
   }));
   const uploaded = !("exists" in auth);
   if (uploaded && "url" in auth) {
-    if (Buffer.byteLength(auth.prefix) + Buffer.byteLength(auth.suffix) > 1024 * 1024) throw new ZoteroError("unreachable", "upload-too-large");
+    if (Buffer.byteLength(auth.prefix) + Buffer.byteLength(auth.suffix) > 1024 * 1024) throw new ZoteroError("failed", "upload-too-large");
     await client.uploadFile(auth.url, auth.contentType, Buffer.concat([Buffer.from(auth.prefix), bytes, Buffer.from(auth.suffix)]));
     await conflict(client, attachmentPath, () => client.registerUpload(library, attachmentKey, auth.uploadKey));
   }

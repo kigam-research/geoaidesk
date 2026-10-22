@@ -26,6 +26,7 @@ import {
   probeZoteroLibrary,
   syncZoteroLibrary,
   zoteroCollectionId,
+  zoteroErrorDetail,
   zoteroRefKey,
   type ZoteroClient,
   type ZoteroSecretStore,
@@ -94,7 +95,17 @@ export class ZoteroService {
     try { found = await web.discoverLibraries(); }
     catch (error) { await web.clearKey(); throw error; }
     const personal = found.filter((l) => l.libraryType === "user");
-    for (const lib of personal) await this.upsertLibrary({ connection: "web", libraryType: lib.libraryType, libraryId: lib.libraryId, name: lib.name, follow: "all", libraryVersion: 0, state: "ok" });
+    // A key without read access to the personal library would save nothing and leave the card unchanged.
+    if (!personal.length) { await web.clearKey(); throw new ZoteroError("no-library-access", "no-personal-library-access"); }
+    // One web key at a time: a personal library of a previous key can no longer be read, so it stops being followed
+    // (its papers stay in the library). A library already followed keeps its sync cursor.
+    const z = await this.store.zotero();
+    const keep = (l: ZoteroLibraryState) => l.connection !== "web" || l.libraryType !== "user" || personal.some((p) => p.libraryId === l.libraryId);
+    if (!z.libraries.every(keep)) await this.store.saveZotero({ ...z, libraries: z.libraries.filter(keep) });
+    for (const lib of personal) {
+      const known = (await this.libraries()).find((l) => l.connection === "web" && l.libraryType === "user" && l.libraryId === lib.libraryId);
+      await this.upsertLibrary({ ...(known ?? { follow: "all" as const, libraryVersion: 0 }), connection: "web", libraryType: lib.libraryType, libraryId: lib.libraryId, name: lib.name, state: "ok", failedAt: undefined, detail: undefined });
+    }
     await this.syncAll();
     return this.libraries();
   }
@@ -111,10 +122,14 @@ export class ZoteroService {
     return this.syncing;
   }
 
-  /** Background refresh when the last sync is older than `maxAgeMs` (used by the library list). */
+  /**
+   * Background refresh when the last attempt is older than `maxAgeMs` (used by the library list). A failed attempt
+   * counts too, so a refused key is not retried on every list load; "지금 갱신" retries at once.
+   */
   refreshIfStale(maxAgeMs = 30_000): void {
     void this.libraries().then((libs) => {
-      if (libs.some((l) => !l.lastSyncAt || Date.now() - Date.parse(l.lastSyncAt) > maxAgeMs)) void this.syncAll().catch(() => undefined);
+      const last = (l: ZoteroLibraryState) => Math.max(l.lastSyncAt ? Date.parse(l.lastSyncAt) : 0, l.failedAt ? Date.parse(l.failedAt) : 0);
+      if (libs.some((l) => Date.now() - last(l) > maxAgeMs)) void this.syncAll().catch(() => undefined);
     });
   }
 
@@ -128,7 +143,8 @@ export class ZoteroService {
       try {
         result = await syncZoteroLibrary(client, prior, { owner: libraryOwner(), now, existingItems: all.filter((i) => i.source === "zotero"), idForItem: (ref) => byRef.get(zoteroRefKey(ref)) ?? newItemId() });
       } catch (error) {
-        await this.upsertLibrary({ ...prior, state: error instanceof ZoteroError ? error.state : "unreachable" });
+        // Kept with the library so the header and the Zotero card show the same failure and its cause.
+        await this.upsertLibrary({ ...prior, state: error instanceof ZoteroError ? error.state : "failed", failedAt: now, detail: zoteroErrorDetail(prior.connection, error) });
         continue;
       }
       const partition: Partition = { connection: result.state.connection, serverId: result.state.serverId, libraryType: result.state.libraryType, libraryId: result.state.libraryId };
@@ -282,7 +298,7 @@ export class ZoteroService {
     // already mirrored, so a second send does not create it again.
     await this.syncAll();
     const fresh = (await this.libraries()).find((l) => zoteroLibraryKey(l) === zoteroLibraryKey(lib) || (l.connection === lib.connection && l.libraryType === lib.libraryType && l.libraryId === lib.libraryId));
-    if (!fresh || fresh.state !== "ok") throw new ZoteroError(fresh?.state ?? "unreachable", "sync-before-send");
+    if (!fresh || fresh.state !== "ok") throw new ZoteroError(fresh?.state ?? "failed", "sync-before-send");
     const w = this.writer(fresh);
     const partition: Partition = { connection: fresh.connection, serverId: w.client.serverId ?? fresh.serverId, libraryType: fresh.libraryType, libraryId: fresh.libraryId };
     try {

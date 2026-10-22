@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T04:41:51Z
+updated: 2026-10-22T04:58:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bee7d319-703a-4565-a0c9-1d69e94cd031","pid":3762934,"provider":"claude","session":"870398d4-3eab-430b-ae47-a9f6c6604ea1","start":"53200219","token":"cb3fe81ab18b49eee1407e968dd49a72031d140445992e9a34169e97d8776bc3"}
 branch: task/gaid-zotero-web-fix
 target: main
@@ -36,11 +36,41 @@ consistent, tests added for the error mapping, scripts/check passes, UI per guid
 Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Root cause found and reproduced without a key (2026-10-22): Zotero Web API answers `304 Not Modified` with no
+  `Last-Modified-Version` header (checked with curl on public group 1). `syncZoteroLibrary`'s final check reads
+  `items?limit=1` with `If-Modified-Since-Version` and requires `final.version === libraryVersion`; on Web it is
+  `undefined`, so every attempt throws SnapshotChanged, three attempts end in `library-kept-changing`, and
+  `runSync` stores only `state: "unreachable"`. Reproduction: the real sync code against `groups/1` with the key
+  header stripped: 12 requests, ~4 s (matches the review-app log: POST /geo/library/zotero/web 200 in 4030 ms).
+  The fake server in tests set the header on 304, so tests never saw it. Incremental reads (`since` +
+  If-Modified-Since-Version) had the same flaw.
+- Status mismatch: the header derived "연결 안 됨" from `lastSyncAt` only; the card said "연결됨 · 아직 갱신 전"
+  from the library list and the warning from `state`.
+- Implemented (uncommitted until task save): client 304 fallback + sync without If-Modified-Since; error states
+  (contract `ZoteroState`, `failedAt`, `detail`); runSync records them; connectWeb refuses keys without personal
+  library access and drops the previous key's web user library; route sends `detail`; full syncs take children from
+  the snapshot (no per-paper /children: group 1000, 169 papers, 9 requests / 7 s instead of ~180).
+  UI: `web/src/geo/library/zotero-status.ts` shared by header and card; card shows connection, cause, 기술 정보,
+  new-key input for web-key states, PC note.
+- Verified: real Web API reproduction script (/tmp/zrepro.mts; public groups 1/100/1000, key header stripped) now
+  syncs fully and incrementally; old code fails the new web-sync test with `library-kept-changing`; server tsc,
+  zotero tests (53 + 7), web tsc + library tests, copy validator (0 errors), check-ui (0 errors).
+- Test app: `systemd-run --user` unit `gaid-zotero-web-fix-app`, UI http://localhost:3360, backend :18360,
+  GAID_HOME ~/data/geoaidesk/work/gaid-zotero-web-fix/home, log ~/data/geoaidesk/work/gaid-zotero-web-fix/app.log.
 ## Next steps
-1. (the next session's first action)
+1. Screenshots (2 styles × 2 themes, 1440×900 and 1280×800), user key test in the test app, scripts/check, report.
 ## Failed approaches
 ## Notes and decisions
+- Plan (all done by the top writer; small and tightly coupled, no children):
+  1. client: a 304 read without the header keeps the caller's `ifModifiedSince` version; sync stops using
+     If-Modified-Since-Version (`since` only, final check is a plain read) so `/collections` 304 semantics do not matter.
+  2. Error mapping: richer `ZoteroLibraryState.state` (key-invalid, no-library-access, library-not-found,
+     rate-limited, server-error, library-changing, failed) + `failedAt` + `detail` (code/HTTP status only, never
+     bodies or keys) recorded by runSync; `unreachable` only for network/timeout. connectWeb refuses a key without
+     personal-library read access instead of silently saving nothing.
+  3. UI: one derived status (`web/src/geo/library/zotero-status.ts`) used by header and card; card names the
+     connection (PC Zotero / web key), shows reason + next action, technical detail behind 기술 정보, allows saving a
+     new key when the web key fails; PC copy says it works only while the Zotero app is running.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
