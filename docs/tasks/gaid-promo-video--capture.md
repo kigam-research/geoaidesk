@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:57:10Z
+updated: 2026-10-22T15:40:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64e63574-788e-4fa7-880a-079234fc05e8","pid":3054752,"provider":"claude","session":"202d69c3-1eb5-4ac7-97f3-bf5f44b6e100","start":"56892497","token":"cc78fa674759f3fec1f8f3937f349bf22c0068400c3f89dd13ffad712b1d9e05"}
 branch: task/gaid-promo-video--capture
 target: task/gaid-promo-video
@@ -48,12 +48,29 @@ after). Commit only `geo/promo/capture*.py`, `geo/promo/CAPTURE.md` and your tas
 Write your task document and commits in English.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Done. Take `~/data/geoaidesk/work/gaid-promo-video/capture-v1/` (outside Git): 10 shots, 1,380 frames (46.0 s) at
+2880×1620 (1280×720 CSS @ 2.25), `capture.json` (schema gaid-promo-capture-v1, actions, 1–4 focus rects per shot, cuts,
+data provenance, adaptations), 11 stills (element crops + 3 real result figures), `contact-sheet.jpg`.
+Shots per parent's shot list v2 (2026-10-23): H1, R1, R2, R3, R5, M1, M2, L1, R6, L2; H3 skipped (no hub skill records).
+Details, deviations and adaptations: `geo/promo/CAPTURE.md`.
+Verified: per-shot frame count/size check in `capture.json` → `verification`; browser errors none; blocked requests none;
+instance `gaid-promo-capture` stopped (ports 3320/18320 free); `~/.geoaidesk` file list + size + mtime identical before and
+after (`~/data/geoaidesk/work/gaid-promo-video/capture-evidence/geoaidesk-{before,after}.tsv`, empty diff).
+Re-verify: `uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py` (reads capture.json).
 ## Next steps
-1. (the next session's first action)
+1. Parent integrates; recapture single shots with `capture.py --only <id>` after restarting the instance (CAPTURE.md).
 ## Failed approaches
+- Copied Pi sessions were not listed: Pi filters by the session header `cwd`; capture_data.py rewrites that one field.
+- Playwright route handlers receive (route, request): a `sid=sid` default argument got the Request object.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Contract changes from the parent (user feedback 2026-10-23): viewport 1280×720 CSS at scale 2.25 (frames stay
+  2880×1620), focus rects essential, prefer screens without large empty areas; shot list v2 replaces v1 (H2, R4 dropped;
+  H3, M1, M2, L1, L2 added; library and SHP viewer emphasised).
+- User instruction in this tab (2026-10-23): "맵뷰어는 lithoname으로 분류색이 입혀지는것을 사용하고 배경맵에 kigam
+  1:5만지질도와 위성영상이 사용가능함을 보여야한다" → M1 uses LITHONAME categorical colours on NGII 바로e맵 영상지도 and
+  toggles the KIGAM 1:5만 지질도 overlay (keys read server-side only).
+- Closest real alternatives: R2 uses the method-started chat (no `<workflow>` block chat exists); L1 has no nested
+  folders/Zotero items in the data.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
