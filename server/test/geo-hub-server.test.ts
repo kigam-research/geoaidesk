@@ -93,7 +93,10 @@ describe("home and process surface", () => {
     symlinkSync(repo, join(root, "alias"));
     expect(() => new HubDatabase({ home: join(repo, "a/b") })).toThrow(/Git/);
     expect(() => new HubDatabase({ home: join(root, "alias", "data") })).toThrow(/Git/);
-    expect(() => new HubDatabase({ home: resolve(".") })).toThrow(/Git/);
+    // Recorded jobs run an exported source tree without .git. Cover a real worktree marker without relying on cwd.
+    const worktree = join(root, "fake-worktree"); mkdirSync(worktree);
+    writeFileSync(join(worktree, ".git"), "gitdir: /unused-test-gitdir\n");
+    expect(() => new HubDatabase({ home: join(worktree, "data") })).toThrow(/Git/);
   });
 });
 describe("accounts and invites", () => {

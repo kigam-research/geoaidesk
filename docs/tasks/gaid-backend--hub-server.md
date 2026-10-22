@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:30:43Z
+status: active
+updated: 2026-10-22T06:44:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb2d31aa-1e53-44fb-bc41-429c1eec3733","pid":214565,"provider":"codex","session":"01a16239-1e42-73b2-a1e3-4e088ec201a3","start":"53721186","token":"7929be5dae8e6ce4050b1260c2d83a48b5bd832aedf7e77cb23115d43d1fb6a6"}
 branch: task/gaid-backend--hub-server
 target: task/gaid-backend
@@ -77,6 +77,9 @@ Build:
 Report in the final message: routes implemented, CLI usage, test counts, anything deferred.
 
 ## Current state
+Parent resolved the target ordering issue in b7893fe24aeb: P2 hub-client/routes are integrated and the premature e2e
+suite is removed. Verified remote target and its tree. Retrying task finish in place with the Git-free test fixture fix.
+The parent will hold its target branch stable until P1/P3 finish. Owner allowlist registration is fixed (7 focused tests).
 Implemented the standalone hub server under server/src/geo/hub-server/ (buildHubServer in index.ts), geo/hub-server.mjs,
 and docs/geo/hub-server.md. The existing protocol.ts and UI contracts are unchanged. Includes numbered SQLite migrations,
 content-addressed blobs, scrypt accounts, single-use invites, sliding hashed sessions, persisted login throttling, admin
@@ -91,12 +94,25 @@ Safe re-verification: cd server && GAID_CATALOGUE=off npx vitest run test/geo-hu
 First task-finish check on 61d1afab: backend 2107 passed / 8 skipped; frontend 1156 passed; launcher check passed.
 Distribution checks reached 48 passed / 1 skipped / 1 failed: the hard-coded seam owner allowlist omitted gaid-backend.
 Registered that owner (plus the distribution-test seam); focused distribution tests: 7 passed. Retrying task finish.
-The original recorded job also ended with exit 1 at that same check; retained it, did not relaunch it.
+Correction after reading the recorded job's actual log and output on its exit notice: the original b61bf500 job failed
+in the home-refusal test, not the owner allowlist. The test assumed cwd was a Git checkout, but recorded jobs export a
+Git-free source tree. That job had 2105 passed / 8 skipped / 1 failed, stopped in backend tests, and produced only the
+unrelated remote-compute-prompt-budget.json check artifact (inspected). Replaced the cwd-dependent assertion with a
+self-contained .git worktree-file fixture, complementing the existing .git-directory and symlink cases. Job retained;
+not relaunched. After the fixture fix, all 38 focused tests pass both in the task worktree and in a separate Git-free
+export at ~/data/geoaidesk/work/gaid-backend--hub-server/gitfree-check-poCsoz (same explicit Vitest file). The separate
+export verifies the failed premise directly without repeating the full job.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-22T06:30:43Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
-
+1. Run task finish against the now-coherent b7893fe2 parent target (no resume or task save after failed finish).
+2. Keep the original recorded check job; do not relaunch it. It failed at the now-fixed Git-free test assumption. Its
+   terminal disposition can cite the final successful check as evidence, once that check exists.
+3. Parent integrates P1/P3 after P2 and performs cross-GAID tests/deployment. No production service deployed by this child.
 ## Failed approaches
+- Recorded job b61bf500 (2105 passed / 8 skipped / 1 failed) exposed a cwd/.git assumption in our test. Fixed the test
+  with explicit temporary directory/file Git markers; no runtime change. Earlier statements conflated that job with
+  the separate first finish check owner-allowlist failure; this entry corrects the record.
+- Finish attempt 2: parent draft e2e suite imported missing P2 modules. This is a target ordering issue; do not weaken
+  runtime/tests or add placeholder modules in P1. Requested a coherent target from the parent before retrying.
 - First finish failed on the new seam owner's missing allowlist registration, not a hub runtime/test failure. Added the
   exact owner to geo/tests/distribution.test.mjs; all other owner/file/status assertions remain intact. This minimal
   distribution glue extends the owned-file list only as necessary to satisfy the repository's declared check.
