@@ -1,5 +1,6 @@
 "use client";
 
+import { HubSkillInstall } from "@/geo/hub-skills/install";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TechnicalDetail } from "@/geo/hub/technical";
@@ -108,7 +109,11 @@ function EnableSkills({ value, projectId, onEnabled }: { value: WorkflowReadines
     </div>)}
     {hubBlocked.map((skill) => <div key={skill.id} className="space-y-1">
       <p>{t("workspace.skills.hub", { name: skill.runtimeName ?? skill.id, revision: skill.hub!.revision })} {t(`workflowView.hubState.${skill.hub!.state}`)}</p>
-      <a className="underline" href={`#hub/s/${encodeURIComponent(skill.hub!.skillId)}`}>{t("workflowView.hubOpen")}</a>
+      {skill.hub!.state === "missing"
+        ? <details><summary className="cursor-pointer">{t("workspace.skills.hubInstall", { revision: skill.hub!.revision })}</summary>
+          <div className="mt-2"><HubSkillInstall skillId={skill.hub!.skillId} revision={skill.hub!.revision} projectId={projectId} onInstalled={() => void onEnabled()} /></div>
+        </details>
+        : <a className="underline" href={`#hub/s/${encodeURIComponent(skill.hub!.skillId)}`}>{t("workflowView.hubOpen")}</a>}
     </div>)}
     {error && <div role="alert" className="space-y-1"><p className="text-destructive">{t("workspace.skills.error")}</p><TechnicalDetail detail={error} /></div>}
   </div>;
