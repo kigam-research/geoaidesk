@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T09:53:55Z
+status: active
+updated: 2026-10-22T10:00:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9f458bbf-4f8e-4cff-a5a0-2274bd08a13e","pid":2326360,"provider":"codex","session":"01a162fc-d2d3-7e42-b4e9-2a978b405909","start":"55003761","token":"df6541df10ed933c083367568e359ab1265179d732259db251292c83dae0b600"}
 branch: task/gaid-orcid--ui
 target: task/gaid-orcid
@@ -85,6 +85,7 @@ results with commands, anything not verified. Then `task finish`.
 ## Current state
 - Implemented the ORCID phase-1 UI: public-record link, unauthenticated iD display, import picker with new / existing / similar states, optional GAID folder, 200-work confirmation cap, persistent choices/in-flight results on close, result summary, and library refresh. The mine filter remains available after unlinking when marked papers exist. No OAuth or hub code changed.
 - Official authenticated and unauthenticated SVG assets are unmodified, vendored with source/licence notices. Only the unauthenticated icon is displayed.
+- First full scripts/check: backend 195 files / 2191 tests passed (8 skipped), frontend 188 files / 1207 tests passed. Distribution checks caught the new boundary owner missing from the test allowlist; added gaid-orcid and the focused distribution suite passed 7/7. Full finish retry is next.
 - Frontend typecheck passed. The full frontend suite passed (187 files / 1205 tests, before the additional card tests); final ORCID checks passed (2 files / 5 tests). Copy and UI validators have no errors. The existing copy warnings remain; the ORCID batch warning is justified by the enforced 200-item request bound.
 - Live isolated app: public test iD 0000-0002-1825-0097 linked as Josiah Carberry; six works previewed and imported into the ORCID test folder; result added=6, marked=0, failed=0. All six have own-work marks. Re-reading disables all six already-own checkboxes. The mine query returns six; unlinking preserves all six marks. Re-linking by Enter and opening/closing the picker by Enter/Escape restore focus to Import works. Browser console has no errors.
 - Screenshot matrix: 24 Korean PNGs (unlinked, linked, import × Instrument/Map sheet × light/dark × 1440×900/1280×800), each below 180 KB. UI guide section 12 checked: primary sheet action remains visible, scrolling is internal, no clipped ORCID text, original asset colours, legible light/dark surfaces and focus return. Existing library table/sidebar design was kept.
@@ -95,6 +96,7 @@ results with commands, anything not verified. Then `task finish`.
 Closed 2026-10-22T09:53:55Z: ready; the parent gaid-orcid integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First finish failed only because geo/tests/distribution.test.mjs did not yet list gaid-orcid as a boundary owner. Added the actual owner to its explicit allowlist; focused distribution tests passed. No application code changed for this fix.
 - The first official asset Download click opened a format-choice dialog rather than starting a browser download; selected Original in that dialog and downloaded successfully.
 - Initial screenshots captured colour transitions immediately after theme changes; replaced them with settled-state screenshots after 350 ms.
 - A browser script expected the previous result view after a dev hot reload had remounted the dialog. Inspected the actual preview, verified six disabled own-work rows, then continued. No repeated import was issued.
@@ -102,7 +104,7 @@ Closed 2026-10-22T09:53:55Z: ready; the parent gaid-orcid integrates it. No furt
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ### UI handoff for the parent
 
-Changed files: web/src/geo/orcid/{api,id-display,selection,import-dialog,orcid-card} plus two test files; library/library-screen.tsx; locales/orcid/{ko,en}.json and namespace registration; three library locale keys; public/geo/orcid/*.svg; THIRD_PARTY_NOTICES.md; geo/integration-boundaries.json; this task document; report figures.
+Changed files: geo/tests/distribution.test.mjs (boundary-owner allowlist); web/src/geo/orcid/{api,id-display,selection,import-dialog,orcid-card} plus two test files; library/library-screen.tsx; locales/orcid/{ko,en}.json and namespace registration; three library locale keys; public/geo/orcid/*.svg; THIRD_PARTY_NOTICES.md; geo/integration-boundaries.json; this task document; report figures.
 
 Checks:
 - cd web && npx tsc --noEmit: passed on final implementation.
