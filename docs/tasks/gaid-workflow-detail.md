@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T05:01:32Z
+status: done
+updated: 2026-10-22T05:01:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f0f8b936-04ba-445e-8692-977c00c3f2ca","pid":3727117,"provider":"claude","session":"0108f72c-c60f-4f11-aa8e-848e1936429e","start":"53182089","token":"50a39945d0d6bb4b5db11aca3fce31f50cb45aede646d1658cbd771f06add8e2"}
 branch: task/gaid-workflow-detail
 target: main
@@ -45,8 +45,9 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-workflow-detail/; do not modify ~
   `~/data/geoaidesk/work/gaid-workflow-detail/shots/final/` (SHA256SUMS); 4 small copies in the report's figures/. Dev unit
   stopped. Report written (humanizer applied).
 ## Next steps
-1. `task finish` (scripts/check passed 2026-10-22: "All geoaidesk checks passed.", exit 0; log
-   `~/data/geoaidesk/work/gaid-workflow-detail/check.log`).
+<!-- task:closed -->
+Closed 2026-10-22T05:01:48Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
