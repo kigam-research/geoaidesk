@@ -4,8 +4,10 @@
  * and bring them into their own research projects ("내 연구") to use or try. Personal GAID projects are the research
  * space; the hub is the sharing and discussion space.
  *
- * Identity: one shared server, researchers identified by the display name they enter once (header `X-GAID-User`,
- * URL-encoded UTF-8); no accounts yet. Server side: server/src/geo/hub-shared/ imports this IO-free file.
+ * Identity (ADR docs/adr/2026-10-22-gaid-hub-server.md): with an institute GAID hub server configured, the researcher's
+ * account (logged in through their own GAID, `web/src/geo/contracts/hub-server.ts`); without one, the local store and the
+ * display name entered once (header `X-GAID-User`, URL-encoded UTF-8). Server side: server/src/geo/hub-shared/ imports
+ * this IO-free file.
  */
 import type { WorkflowDoc } from "./workflow-doc";
 import type { DraftProfile, MethodText } from "./authoring";
@@ -29,7 +31,10 @@ export interface HubEntryRevision {
   packageSha256: string;
   packageDigest: string;
   registeredAt: string;
+  /** Display name of who registered it. */
   registeredBy: string;
+  /** Account id of who registered it (hub server records only). */
+  registeredById?: string;
   /** The author's note to other researchers for this revision. */
   note: string;
 }
@@ -49,7 +54,12 @@ export interface HubEntry {
   /** The latest registered snapshot carries a Workflow with 레시피 defaults (start settings); older servers omit it. */
   recipe?: boolean;
   tags: string[];
+  /** Display name of the author. */
   author: string;
+  /** Account id of the author (hub server records); ownership uses it when present, else `author`. */
+  authorId?: string;
+  /** The requesting researcher is the author (edit vs. copy, "내 Workflow"). Older servers omit it. */
+  mine?: boolean;
   /** The registered method this one was copied from ("복사해서 고치기"). */
   basedOn?: { entryId: string; revision: number; title: string; author: string };
   folderId: string;
@@ -70,7 +80,10 @@ export interface HubEntry {
 export interface HubComment {
   id: string;
   entryId: string;
+  /** Display name. */
   author: string;
+  /** Account id (hub server records only). */
+  authorId?: string;
   body: string;
   /** Entry revision the comment was written on. */
   revision: number;
@@ -113,9 +126,10 @@ export interface HubRecommendation {
   ref: string;
 }
 
-// --- HTTP API (`/geo/hub`, shared, not project-scoped; the user name comes from X-GAID-User) ---------------
+// --- HTTP API (`/geo/hub`, not project-scoped). With a hub server the researcher's own GAID answers these routes for
+// the logged-in account (X-GAID-User is ignored); without one the user name comes from X-GAID-User. -------------
 //
-// GET    /geo/hub/me                                   → { name: string | null }
+// GET    /geo/hub/me                                   → HubMe
 // GET    /geo/hub/folders                              → { folders: (HubFolder & { entries: number })[] }
 // POST   /geo/hub/folders                              { name } → HubFolder
 // GET    /geo/hub/entries?folder=&q=                   → { entries: HubEntry[] }
@@ -129,6 +143,12 @@ export interface HubRecommendation {
 // POST   /geo/hub/entries/:id/edit                     {} → EditEntryResult (author: edit; others: own copy)
 // POST   /geo/hub/entries/:id/install                  SharedInstallBody → InstallResult (authoring.ts)
 // GET    /geo/hub/recommended                          → { cards: HubRecommendation[] } (3-4 cards)
+
+/** Who the hub sees: `account: true` when a hub server account is logged in (no display-name prompt then). */
+export interface HubMe {
+  name: string | null;
+  account?: boolean;
+}
 
 /** Install a registered method; `revision` pins the revision the researcher looked at (default: latest). */
 export interface SharedInstallBody {
@@ -146,10 +166,12 @@ export interface RegisterBody {
 }
 
 /**
- * "방법 고치기" / "복사해서 고치기": the draft to open. The registering author (same display name) edits the entry: its
+ * "방법 고치기" / "복사해서 고치기": the draft to open. The registering author (same account, or same display name without
+ * a hub server) edits the entry: its
  * linked draft, or a draft seeded from the latest registered revision when that draft is not on this server; registering
  * it adds the next revision. Anyone else gets their own copy (reused on a repeat), registered as a separate entry with
- * `basedOn`. Display names are not accounts: this keeps the latest revision with whoever registered the method first.
+ * `basedOn`. Without a hub server display names are not accounts: the latest revision stays with whoever registered the
+ * method first.
  */
 export interface EditEntryResult {
   authoringProjectId: string;

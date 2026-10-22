@@ -951,6 +951,24 @@
       "responsibility": "UI guide v2 L1/L2/N2/N6: chat pane as an overlay sheet at 1024–1279 px, pane borders as keyboard-resizable separators within the guide's width ranges, ⌘\\ / Ctrl \\ file list toggle, ⌘K / Ctrl K search (file-name filter in the file tree, project and hub search fields marked as targets)"
     },
     {
+      "path": "server/test/geo-hub-server.test.ts",
+      "owner": "gaid-backend",
+      "status": "added",
+      "responsibility": "Standalone institute hub account, ownership, revision, library isolation, backup and legacy import integration coverage"
+    },
+    {
+      "path": "geo/tests/distribution.test.mjs",
+      "owner": "gaid-backend",
+      "status": "edited",
+      "responsibility": "Register the gaid-backend owner for the standalone hub integration seams without relaxing ownership validation"
+    },
+    {
+      "path": "web/src/components/settings/services-panel.tsx",
+      "owner": "gaid-backend",
+      "status": "edited",
+      "responsibility": "Mount the institute hub connection/account Settings card; all hub UI stays in web/src/geo/hub-server/"
+    },
+    {
       "path": "web/src/app/page.tsx, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx",
       "owner": "gaid-hub-skills",
       "status": "edited",

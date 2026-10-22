@@ -11,7 +11,7 @@ import { CatalogueWorkflowScreen } from "@/geo/hub/catalogue-workflow";
 import { fixtureDraft } from "@/geo/hub/fixtures";
 import { apiFetch } from "@/lib/projects";
 const { shared, hub } = vi.hoisted(() => ({ shared: { entry: vi.fn(), folders: vi.fn(), catalogue: vi.fn(), skillSource: vi.fn(), catalogueSkillSource: vi.fn() }, hub: { workflow: vi.fn() } }));
-vi.mock("@/geo/hub/shared-api", () => ({ sharedHub: shared, hubUserName: () => "연구자" }));
+vi.mock("@/geo/hub/shared-api", () => ({ sharedHub: shared, hubUserName: () => "연구자", hubIdentity: () => null, refreshHubIdentity: async () => ({ configured: false, account: false, name: "연구자" }), HUB_IDENTITY_CHANGED: "gaid:hub-identity-changed" }));
 vi.mock("@/geo/hub/api", () => ({ hubApi: hub }));
 vi.mock("@/lib/projects", async (original) => ({ ...await original<typeof import("@/lib/projects")>(), apiFetch: vi.fn() }));
 vi.mock("@/lib/use-projects", () => ({ useProjects: () => ({ create: vi.fn() }) }));

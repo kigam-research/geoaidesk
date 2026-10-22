@@ -61,6 +61,8 @@ import previewMethodKo from "./previewMethod/ko.json";
 import previewMethodEn from "./previewMethod/en.json";
 import hubKo from "./hub/ko.json";
 import hubEn from "./hub/en.json";
+import hubServerKo from "./hubServer/ko.json";
+import hubServerEn from "./hubServer/en.json";
 // gaid-notebook-review: research notes
 import notesKo from "./notes/ko.json";
 import notesEn from "./notes/en.json";
@@ -94,6 +96,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  hubServer: pair(hubServerKo, hubServerEn),
   hubSkills: pair(hubSkillsKo, hubSkillsEn),
   connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
