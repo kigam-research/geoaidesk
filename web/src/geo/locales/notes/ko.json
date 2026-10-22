@@ -105,6 +105,14 @@
     },
     "next": {
       "button": "다음 결정"
+    },
+    "deliveredStatus": "결정 {count}건 중 {delivered}건의 답을 보냈습니다. 답을 바꾸면 다시 보낼 수 있습니다.",
+    "delivered": {
+      "sent": "보냄",
+      "filled": "입력창에 넣음",
+      "changed": "바꾼 답, 보내기 전",
+      "sentAt": "보낸 시각 {time}",
+      "filledAt": "채팅 입력창에 넣은 시각 {time}"
     }
   }
 }

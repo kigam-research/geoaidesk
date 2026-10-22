@@ -105,6 +105,14 @@
     },
     "next": {
       "button": "Next decision"
+    },
+    "deliveredStatus": "Answers sent for {delivered} of {count} decisions. Change an answer to send it again.",
+    "delivered": {
+      "sent": "Sent",
+      "filled": "In chat box",
+      "changed": "Changed, not sent",
+      "sentAt": "Sent {time}",
+      "filledAt": "Put in the chat box {time}"
     }
   }
 }

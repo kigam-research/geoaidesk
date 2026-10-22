@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:55:11Z
+updated: 2026-10-22T02:06:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"12220668-2f56-4301-9ceb-1da6022ea8f7","pid":2196945,"provider":"claude","session":"f484fa94-7306-4cbf-a4a9-9e4e13cb3b0b","start":"52201100","token":"e6aadc1b7993109484dd94e6a03a7519df103e802549703adee2f16a87cdcd3c"}
 branch: task/gaid-ui-v2-debts
 target: main
@@ -35,12 +35,25 @@ library screen. Avoid editing their owned files; coordinate through the hub if a
 Own GAID_HOME under ~/data/geoaidesk/work/gaid-ui-v2-debts/; do not modify ~/.geoaidesk. Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Plan (2026-10-22):
+- Packages: (A) map screen MAP1–MAP6 → child `gaid-ui-v2-debts--map` (writer 4874820d, "general work"; prompt
+  ~/data/geoaidesk/work/gaid-ui-v2-debts/child-map-prompt.md; owns web/src/geo/viewers/map/**, locales/map/**, one map
+  block in globals.css, map baseline entries). (B) workspace layout L1/L2/N2/N6 in web/src/app/page.tsx (+ shell) — parent.
+  (C) library hue utilities → role tokens, library baseline entries removed — parent. (D) RN3 '보냄' state on decision
+  cards in web/src/geo/notes/ — parent.
+- Integration order: C, D, B on this branch; then `task sync`/merge of the map child; then screenshots (2 styles × 2 themes ×
+  1440/1280, 1024–1279 for L1), scripts/check, report.
+- Data home: ~/data/geoaidesk/work/gaid-ui-v2-debts/home (copy of gaid-design-identity--fresh home); parent dev app ports
+  18370/3370, child 18360/3360.
 ## Next steps
-1. (the next session's first action)
+1. Implement C, D, B; then integrate the map child.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-design-identity#1
+Closes: gaid-design-identity--fresh#1
+Closes: gaid-design-identity--fresh#2
+Closes: gaid-design-identity--fresh#3
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

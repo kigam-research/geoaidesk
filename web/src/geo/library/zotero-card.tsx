@@ -62,7 +62,7 @@ export function ZoteroCard({ libraries, onChanged }: { libraries: ZoteroLibraryS
           )}
         </>
       )}
-      {shown && shown !== "ok" && <p className="text-sm text-amber-700 dark:text-amber-300" role="status">{L(`zotero.states.${shown}`)}</p>}
+      {shown && shown !== "ok" && <p className="text-sm text-gaid-warning" role="status">{L(`zotero.states.${shown}`)}</p>}
     </div>
   );
 }
