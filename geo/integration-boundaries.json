@@ -907,6 +907,24 @@
       "owner": "gaid-design-identity--fresh",
       "status": "edited",
       "responsibility": "UI guide v2 functional layer: chrome tone and frame lines for the file tree, open-file tab strip and chat bar; sans file names; ink icons instead of hue icons"
+    },
+    {
+      "path": "web/package.json",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
+    },
+    {
+      "path": "web/package-lock.json",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
+    },
+    {
+      "path": "server/test/geo-connections.test.ts",
+      "owner": "gaid-research-visuals",
+      "status": "added",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
     }
   ],
   "notTouched": [

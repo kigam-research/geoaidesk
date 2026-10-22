@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:28:26Z
+updated: 2026-10-22T02:41:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"38934232-bc69-4c6e-85ce-d9508ca7b59d","pid":2583953,"provider":"codex","session":"01a1616f-fbe3-7443-b1ed-dcbcf3b16315","start":"52403024","token":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
 branch: task/gaid-research-visuals--map
 target: task/gaid-research-visuals
@@ -75,11 +75,36 @@ Common rules for this child of gaid-research-visuals (GeoAIDesk, repo kigam-rese
   `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the connection-map API and reusable pane/button. No settled contract changes. Existing note/library/provenance/trial sources stay read-only; no graph master store or model calls were added.
+
+- GET /geo/connections supports 1/2 hops and 80 returned nodes. It resolves citation aliases, omits unresolved citations, joins note chats and local images (including missing covers), reads version-aware lineage, preserves inferred confidence, omits model-declared edges, and marks changed/missing/retracted items. Invisible/outside-sandbox paths are rejected. An 81-artifact lineage lookup safety budget also marks a response truncated when exhausted.
+- Library Workflow links use the packaged methodId when present, joining trial identity; otherwise the existing entryId/authoringId is retained. Chat history names come from SessionManager.list; missing history gets a localized neutral label and recorded date, never an identifier as its title.
+- Web: LR dagre layout with React Flow, centre/index cue, one-line titles and one attention readout, dashed inferred links, depth switch, selected-item actions, recentering, keyboard zoom controls, accessible list/tab switching, loading/retry/empty/truncation states. Button opens a non-modal side pane with Escape/focus restoration. Theme and style are token-driven, not branched. React Flow attribution remains visible.
+
+Checks completed:
+- server: npx vitest run test/geo-connections.test.ts — 6 passed; npm run typecheck — passed.
+- web: focused layout/pane vitest files — 3 passed; npx eslint src/geo/connections/*.ts src/geo/connections/*.tsx — passed; npx tsc --noEmit — passed (including the final font adjustment).
+- node geo/ui/check-ui.mjs — 0 errors, unchanged 112 accepted debt entries.
+- node geo/copy/validate-copy.mjs web/src/geo/locales — 0 errors, 62 warnings. One new warning is the expressly requested centre.button wording, “이 항목 중심으로 보기”; retained intentionally.
+- git diff --check — passed.
+- Browser standalone harness imports the real pane/button and serves a captured synthetic GET response. Keyboard selection does not navigate; explicit file open calls its callback; arrow-key map/list switch, list selection, Escape and trigger focus restoration passed. Fresh browser reload: 0 errors, 0 warnings. Korean screenshots cover both styles × both themes × 1440×900/1280×800; all 8 checks show visible/no-scroll legend and no pane overflow. Integrated note/library/figure entry points and full scripts/check remain the parent's checks.
+
+Synthetic GET evidence (depth 2): note focus returns 6 nodes/5 edges; figure focus 6/5; paper focus 4/3; all truncated=false. Re-run the server test with CONNECTION_EVIDENCE_DIR to capture exact JSON. External evidence folder: /home/seongin3/data/geoaidesk/work/gaid-research-visuals--map/evidence/ (note.json, figure.json, paper.json, browser-check.log, copy-check.log). Screenshot folder: /home/seongin3/data/geoaidesk/work/gaid-research-visuals--map/playwright/; files instrument|mapsheet-light|dark-WIDTHxHEIGHT.png and list-keyboard-1280x800.png. Parent should copy decision-relevant small images into its canonical report, then run humanizer/review-copy there.
+
 ## Next steps
-1. (the next session's first action)
+1. Finish this checked child; parent then runs task complete gaid-research-visuals--map.
+2. Parent wires ConnectionMapButton or ConnectionMapPane callbacks into note, figure and library entry points and runs full integration checks.
+3. Parent adds the MIT dependency notices for React Flow 12.12.0 and dagre 3.1.1 and the implementation result/screenshots to its canonical report. This child intentionally did not edit THIRD_PARTY_NOTICES.md to avoid overlap with child A.
 ## Failed approaches
+- Initial web import named a nonexistent useProjectId; corrected to existing useProjectScopeId. Effect-based reset failed the React lint rule; keyed per-entry state plus request-keyed asynchronous results now pass without suppressions. Initial component test assumed whitespace between adjacent spans; explicit localized accessible labels fixed the ambiguity. A test-evidence command was first run from repo root with server-relative include rules, found no tests, then was rerun successfully from server/.
 ## Notes and decisions
+UI rules followed: D1/D2 (non-modal pane), S1/S3/S7 (role colours, labelled attention/selection, states), G1/G6 (compact titles/index cue), N6/A1–A3 (keyboard and accessible list), MAP1 (adjacent visible legend), R1/R2 (no internal identifiers in titles or edge accessible names; no raw error). No new baseline debt. Zoomable graph labels use 15–16 px source text; the list retains ordinary UI text when zoomed out.
+
+Copy: all connections.* ids are additions (before: absent); after values are the paired ko/en catalogues. Primary additions: connections.show.button = 연결 지도 열기 / Open connection map; connections.centre.button = 이 항목 중심으로 보기 / Centre on item; connections.truncated.limit = 80개를 넘는 항목은 표시하지 않습니다. 다른 항목을 중심으로 범위를 좁히세요. / Only up to 80 items are shown. Centre on another item to narrow the range. No existing copy changed.
+
+Integration: import from web/src/geo/connections/index.ts. ConnectionMapButton retains focus,label and adds optional projectId and onOpenNote/File/Chat/Paper/Workflow callbacks; pass all applicable callbacks. Workflow refs are packaged methodIds where available, else existing hub entry/draft ids. No callback is guessed and no navigation occurs on a single card click.
+Sequential ownership: this child owns server connections, the route registration seam, web connections/locales and web dependency locks. Shared contracts stay unchanged. No nested writers; the server and web are tightly coupled and implemented here. Parent owns note/library/figure entry points, full checks and the canonical report.
+Dependency pins selected from npm registry metadata: @xyflow/react 12.12.0 and @dagrejs/dagre 3.1.1, both MIT. Third-party notice additions will be reported to the parent to avoid overlapping child A.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
