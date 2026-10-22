@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:45:52Z
+updated: 2026-10-22T10:16:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -65,11 +65,13 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 - Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-Blocked: waiting for the user to create the admin account (invite code given in this tab; GAID or terminal route).
+Blocked: route acceptance-done-20261022 (review app free since ~19:10): waiting for the hub's answer on the Zotero rerun
+(request 0aa3ea49efca) before setting the review app's hub address; then the user accepts the invite there. Review app config
+backed up to `~/data/geoaidesk/hub-server/backups/2026-10-22-review-app-before-hub-connect`.
 1. After the account exists: `import-hub --from ~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/shared
    --authors .../authors.json` dry-run, then `--apply` (run from the deployed snapshot with GAID_HUB_SERVER_HOME set); backup +
    check-backup; fill the report (§3.1, §4, commit) and finish.
-2. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
+2. After connecting: tell the hub the review app points at the server; `task route-report acceptance-done-20261022` (final).
 3. Pending cleanup after finish: old snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6…` (kept for rollback).
 ## Failed approaches
 ## Notes and decisions
