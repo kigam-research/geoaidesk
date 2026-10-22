@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T02:51:19Z
+status: active
+updated: 2026-10-22T03:02:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -100,19 +100,24 @@ content-keyed FigureCheck JSON, CVD previews and seven dated journal profiles. S
 receipt and user edits/deletion/disablement; ignores Python caches; both shipped skills stay offered. Added FIGURE_RULE,
 cmcrameri/SciencePlots/pypdf and notices (including the map child's React Flow/dagre). No contract change.
 
-Verified: 43 focused server tests, 8 synthetic checker tests, server typecheck, web tsc, both environment smoke targets,
-UI checker (0 errors/112 existing debt), copy validator (0 errors/61 existing warnings), skill validator and all retained
-helper CLIs. Full scripts/check belongs to the parent; no UI components changed.
+Verified: 43 focused server tests, 8 synthetic checker tests; full backend 2,077 passed/8 skipped, frontend 1,144
+passed, GAID Node 57 passed/1 skipped; typechecks, both environment smoke targets, UI/copy checks, skill validator and
+retained helper CLIs. Direct production smoke passes after updating its obsolete singleton-skill assertion. All
+individual checks have passed; task finish reruns the complete gate on the final snapshot. No UI components changed.
 
 Official sources were curled on 2026-10-22. Verified Elsevier/Copernicus/Geosciences Journal/GSA/JGSK; AGU pages returned
 403 and EEG pages returned empty replies, so their unverified rules remain null/unknown. GSA full width/page height
 remain null due to conflicting units. Source list, limitations and synthetic evidence are below.
 
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-22T02:51:19Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
-
+1. Direct production smoke exited 0. Run task finish in place; parent completes/integrates the checked child.
 ## Failed approaches
+- Second task finish passed backend (2,077 passed, 8 skipped), frontend (1,144 passed), GAID Node tests (57 passed,
+  1 skipped), UI/copy/environment/launcher checks, and actual production start/stop/restart. It failed only the old
+  production-smoke singleton assumption: the new gaid-figures skill was treated as upstream catalogue leakage.
+  Updated the related test to require and exclude exactly both app-shipped skills; no catalogue-leakage relaxation.
+  The direct production-smoke recheck reports PASS (13 pinned skills, both shipped skills, excluded document skills
+  absent, restart preserves data/build). Full log: check-8v7zp_md.log under the same check-log folder below.
 - First task finish failed at the distribution owner allow-list (the same independently confirmed failure as the map
   child); parent explicitly authorised adding gaid-research-visuals. Added only that owner, no boundary relaxation.
   Full check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-y6nzbawi.log.
