@@ -48,6 +48,20 @@ function Workspace(props: ViewerProps) {
   const canvas = useRef<CanvasHandle>(null);
   const tablePane = useRef<HTMLDivElement>(null);
   const [tableHeight, setTableHeight] = useState(240);
+  // Until the researcher resizes it, the table takes at most 40% of the map body so the map stays the larger part
+  // when the window is short (e.g. 1280×800 with the file's Workflow suggestions above the viewer).
+  const mapBody = useRef<HTMLDivElement>(null);
+  const tableSized = useRef(false);
+  useEffect(() => {
+    const element = mapBody.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (tableSized.current || !entry) return;
+      setTableHeight(Math.max(184, Math.min(240, Math.round(entry.contentRect.height * 0.4))));
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ready, fallback]);
   const [tableFocus, setTableFocus] = useState(0);
   const sequence = useRef(0);
   const overlayRequest = useRef<AbortController | null>(null);
@@ -218,7 +232,7 @@ function Workspace(props: ViewerProps) {
     </div>
     {error && <div role="alert" className="shrink-0 px-3 py-1 text-xs text-gaid-danger">{publicError}{publicError !== error && <details><summary>{t("technical")}</summary><p>{error}</p></details>}</div>}
     {catalog.error && <details className="shrink-0 px-3 text-xs"><summary>{t("basemapStatus")}</summary>{catalog.error}</details>}
-    <div className="gaid-map-body min-h-0 flex-1">
+    <div ref={mapBody} className="gaid-map-body min-h-0 flex-1">
       <div className="flex min-h-0 min-w-0 flex-col">
         <div className="relative min-h-40 min-w-0 flex-1">
           <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} backgroundLayers={backgroundLayers} attributions={attributions} fitVersion={fitVersion} fields={colorFields} selected={selection} popup={popup} onViewport={onViewport} onError={setError} onPick={select} onCoordinate={readPixel} onClosePopup={closePopup} />
@@ -226,8 +240,8 @@ function Workspace(props: ViewerProps) {
         </div>
         {active && data?.kind === "vector" && <div ref={tablePane} className="gaid-map-table-pane flex max-h-[calc(100%-160px)] shrink-0 flex-col overflow-hidden border-t border-gaid-frame" style={{ height: tableHeight }}>
           <div role="separator" tabIndex={0} aria-label={t("tableResize")} aria-orientation="horizontal" aria-valuemin={184} aria-valuemax={520} aria-valuenow={tableHeight} className="h-2 shrink-0 cursor-row-resize bg-gaid-chrome outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-            onKeyDown={e => { if (["ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) { e.preventDefault(); setTableHeight(h => e.key === "Home" ? 184 : e.key === "End" ? 520 : Math.max(184, Math.min(520, h + (e.key === "ArrowUp" ? 36 : -36)))); } }}
-            onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) { const bottom = e.currentTarget.parentElement?.getBoundingClientRect().bottom; if (bottom) setTableHeight(Math.max(184, Math.min(520, bottom - e.clientY))); } }} onPointerUp={e => e.currentTarget.releasePointerCapture(e.pointerId)} /><AttributeTable key={`table:${active.id}:${active.source.layer ?? ""}`} focusVersion={tableFocus} data={data} full={active.vectorMode === "full"} offset={active.offset} loading={active.loading} selectedRow={selection?.layerId === active.id ? selection.row : undefined} onSelect={row => select(active.id, row)} onOffset={offset => update(active.id, { offset })} /></div>}
+            onKeyDown={e => { if (["ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) { e.preventDefault(); tableSized.current = true; setTableHeight(h => e.key === "Home" ? 184 : e.key === "End" ? 520 : Math.max(184, Math.min(520, h + (e.key === "ArrowUp" ? 36 : -36)))); } }}
+            onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) { const bottom = e.currentTarget.parentElement?.getBoundingClientRect().bottom; if (bottom) { tableSized.current = true; setTableHeight(Math.max(184, Math.min(520, bottom - e.clientY))); } } }} onPointerUp={e => e.currentTarget.releasePointerCapture(e.pointerId)} /><AttributeTable key={`table:${active.id}:${active.source.layer ?? ""}`} focusVersion={tableFocus} data={data} full={active.vectorMode === "full"} offset={active.offset} loading={active.loading} selectedRow={selection?.layerId === active.id ? selection.row : undefined} onSelect={row => select(active.id, row)} onOffset={offset => update(active.id, { offset })} /></div>}
       </div>
       <aside aria-label={t("panel")} className="min-h-0 overflow-auto border-l border-gaid-frame bg-gaid-face p-3">
         <MapSidePanel layers={layers} active={active} crs={crs} colorFields={colorFields} fields={fields} pathToAdd={pathToAdd} adding={adding} onPathToAdd={setPathToAdd} onAdd={() => void addLayer()}

@@ -37,7 +37,7 @@ export default function MapSidePanel(p: Props) {
         <input className={`${input} min-w-0 flex-1`} aria-label={t("addPath")} placeholder={t("addPath")} value={p.pathToAdd} onChange={e => p.onPathToAdd(e.target.value)} />
         <MapButton type="submit" disabled={p.adding || !p.pathToAdd.trim()}>{t("add")}</MapButton>
       </form></PopoverContent></Popover>}>
-      <ul className="max-h-36 space-y-1 overflow-auto pl-3">{p.layers.map((l, index) => <li key={l.id} data-layer-row={l.source.path} className={`relative space-y-1 py-1 ${active?.id === l.id ? "gaid-index bg-gaid-signal-tint" : ""}`}>
+      <ul className="max-h-36 space-y-1 overflow-auto pl-3">{p.layers.map((l, index) => <li key={l.id} data-layer-row={l.source.path} className={`relative space-y-1 rounded-md px-2 py-1 ${active?.id === l.id ? "gaid-index bg-gaid-signal-tint" : ""}`}>
         <div className="flex items-center gap-1.5">
           <input type="checkbox" aria-label={t("visible")} title={t("visible")} checked={l.visible} onChange={e => p.onUpdate(l.id, { visible: e.target.checked, loading: false })} />
           <MapButton variant="ghost" className="min-w-0 flex-1 justify-start truncate px-0 text-left font-medium" title={l.source.path} aria-pressed={active?.id === l.id} aria-label={`${t("select")}: ${l.source.path}`} onClick={() => p.onSelect(l.id)}>{baseName(l.source.path)}</MapButton>
