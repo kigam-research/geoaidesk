@@ -479,7 +479,7 @@
     });
     // steps on a graduated vertical scale
     const st = h('div', 'face', layer);
-    box(st, 1260, 230, 560, 760);
+    box(st, 1260, 210, 560, 750);
     text(st, 'h3', 36, 28, 'Workflow 초안', { fontSize: '28px' });
     const ssvg = sv('svg', { width: 560, height: 760 }, st);
     ssvg.style.position = 'absolute'; ssvg.style.left = '0'; ssvg.style.top = '0';
@@ -495,7 +495,7 @@
       return { mark, lab, pl, i };
     });
     const nRes = E.steps.filter(s => s.researcher).length;
-    const foot = text(st, 'label', 36, 680, `단계 ${E.steps.length} · 연구자 결정 ${nRes} · 산출물 ${E.outputs.length}`, { color: 'var(--ink)', fontWeight: 650 });
+    const foot = text(st, 'label', 36, 676, `단계 ${E.steps.length} · 연구자 결정 ${nRes} · 산출물 ${E.outputs.length}`, { color: 'var(--ink)', fontWeight: 650 });
     return t => {
       const o = win(t, 29.8, 37.6, 0.5, 0.5);
       put(layer, { o });

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:05:04Z
+updated: 2026-10-22T15:06:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -58,7 +58,12 @@ platform. Plus a report for review and the repo checks that apply.
 - The 03:00 KST work-hours rule applies to starting new work, not to this unit continuing.
 
 ## Current state
-- Plan and capture contract written (`geo/promo/CONTRACT.md`). Capture child to be started.
+- Plan and capture contract written (`geo/promo/CONTRACT.md`); capture child running.
+- Parent pipeline works with placeholders: `geo/promo/prepare_data.py` → `~/data/geoaidesk/work/gaid-promo-video/data-v1/data.json`
+  (catalogue 0.3.0: 7 기본 Workflow, 17 skills (KIGAM 8, K-Dense 9), 21 data sources; hub entry
+  `entry-ap-a135f290-1c4`: 10 steps (2 researcher), 8 start choices, 55 code files, 판 2, 4 installs, 4 stars, 4 comments;
+  acceptance citation check 212 units / 1 not on page / 0 contradicted). `geo/promo/render.py --stills-only` renders
+  15 stills (preview-01/02 under the work dir); ≈0.16 s per frame without footage.
 ## Next steps
 1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
 2. Parent: extract real chart numbers (`geo/promo/data/`), build HTML/CSS motion scenes (`geo/promo/scene/`) and
