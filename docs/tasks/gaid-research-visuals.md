@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T03:51:37Z
+updated: 2026-10-22T04:26:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -69,7 +69,8 @@ Done 2026-10-22 (phase 1+2 implemented and integrated on task/gaid-research-visu
 Not done (by scope): idea board (JSON Canvas, phase 3), analysis flowchart, publication map export; library-item entry to
 the connection map; real-model chat check.
 ## Next steps
-1. `task finish`; stop the user unit gaid-visuals-app after finish (`systemctl --user stop gaid-visuals-app`).
+1. `task finish` (second run after main fix d66762a7; first run hit merge conflicts, resolved in 7f899082). App unit
+   gaid-visuals-app already stopped.
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
