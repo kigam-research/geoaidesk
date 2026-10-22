@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T09:10:52Z
+status: ready
+updated: 2026-10-22T09:18:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ea29dd8e-e163-4285-9af2-1aac21c96dfa","pid":1968478,"provider":"codex","session":"01a162d8-d0bb-7e81-b02f-224c6e0dcbbf","start":"54767775","token":"4d7a2652360ec828d71dd5cc78a2e5098093c044936d8b4a229d502998c372fe"}
 branch: task/gaid-hub-server-trial--skills-server
 target: task/gaid-hub-server-trial
@@ -78,11 +78,14 @@ message the parent (task CLI / your task document) instead of changing it.
 - Extended CLI import for optional local skills, explicit author/registrant maps, mapped or stable legacy social identities, preserved historical times and unverified reviews, source digests and dry-run rollback. ImportResult adds skills, skillsImported, skillsSkipped, skillArchives, skillComments, skillStars.
 - Backup includes skill archives (including reserved unpublished uploads). Version-1 backups remain checkable by comparing snapshot row counts before temporary migration. Updated the English operator guide.
 - Verified in this worktree: `cd server && npx tsc --noEmit` (exit 0); `cd server && npx vitest run test/geo-hub-server*` (52 tests passed: 38 existing + 14 skill tests); `git diff --check` (exit 0).
-- Running PC74 service, its database, and user GAID homes were not accessed or changed. Full scripts/check, application integration and rollout remain with the parent.
+- Running PC74 service, its database, and user GAID homes were not accessed or changed. Application integration and rollout remain with the parent.
+- First `task finish` synced parent changes and ran full scripts/check: backend TypeScript passed; backend tests had 2200 passed, 8 skipped and one parent e2e failure (custom install agent dir versus default annotation store). Parent fixed the fixture at ae5118cf and reported 14 related tests passed; retrying finish to integrate that fix and recheck.
 ## Next steps
-1. Finish this child for parent integration with `task complete gaid-hub-server-trial--skills-server`.
-2. Parent integrates local/remote stores, updates the AGENTS.md summary and its canonical report, runs full checks and handles deployment separately.
+<!-- task:closed -->
+Closed 2026-10-22T09:18:02Z: ready; the parent gaid-hub-server-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
+- First finish full check stopped at geo-hub-skills-e2e.test.ts:138. Read-only diagnosis found the test injected a custom package store but installedHubSkill used the production default. Parent agreed and corrected its test at ae5118cf; no server-store changes were needed.
 - Initial TypeScript invocation found no installed server compiler. Installed locked server dependencies with `npm ci --prefix server`, then TypeScript passed; lockfiles did not change.
 - First skill-suite run: 50/51 passed; the restore test opened the backup itself before testing missing blob references, changing the backup database. Isolated restore into a separate copy. Added a v1-backup compatibility case. Final suite: 52/52 passed.
 ## Notes and decisions
