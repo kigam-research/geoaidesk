@@ -171,7 +171,7 @@
       "responsibility": "Layout, theme, metadata and brand assets (WP00 tokens, Korean-first copy in web/src/geo/locales/). gaid-korean-workspace: GAID compact lockups web/public/brand/gaid-compact-{color,on-dark}.svg in the workspace and projects headers; app/icon.svg (adaptive favicon) and app/apple-icon.png from geo/brand/ replace the upstream favicon.ico and icon.png; the upstream kdense-logo PNGs stay in web/public/brand/ unused"
     },
     {
-      "path": "server/package.json, server/package-lock.json, web/package.json, web/package-lock.json, server/src/helpers/pyproject.toml, server/src/helpers/uv.lock",
+      "path": "server/package.json, server/package-lock.json, web/package.json, web/package-lock.json",
       "owner": "gaid-runtime",
       "status": "edited",
       "responsibility": "Dependency locks: one package at a time adds dependencies. gaid-runtime added the geo-core + geo-gis helper packages to server/src/helpers/pyproject.toml (uv environments limited to the four shipped platforms with Python >= 3.12) and relocked uv.lock; the owner returns to the next package that needs a change"
@@ -907,6 +907,18 @@
       "owner": "gaid-design-identity--fresh",
       "status": "edited",
       "responsibility": "UI guide v2 functional layer: chrome tone and frame lines for the file tree, open-file tab strip and chat bar; sans file names; ink icons instead of hue icons"
+    },
+    {
+      "path": "server/src/helpers/pyproject.toml, server/src/helpers/uv.lock",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Dependency-lock owner: add cmcrameri, SciencePlots and pypdf for shipped journal figures; retain Python metadata and four-platform resolution."
+    },
+    {
+      "path": "server/test/geo-shipped-skills.test.ts, server/test/geo-note-style.test.ts, server/test/geo-environments.test.ts, server/test/geo-provision.test.ts",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Focused tests of shipped figure/note skills, legacy receipts and figure environment packages."
     }
   ],
   "notTouched": [

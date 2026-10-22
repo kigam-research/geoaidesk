@@ -132,6 +132,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`
   seeds into each geo project's `.pi/skills/` (unedited copies follow new versions; deleted/disabled stay) and
   `applyExposure` always offers. Sources and licences: `THIRD_PARTY_NOTICES.md`.
+- Journal figures (gaid-research-visuals): `geo/skills/gaid-figures/` ships with the note-style skill via `server/src/geo/shipped-skills.ts` (legacy note-style receipts preserved); `assets/journals.json` holds dated, official-source rules and explicit unknowns. `scripts/check_figure.py` writes content-keyed FigureCheck JSON and hidden CVD previews; checks never certify journal compliance.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit

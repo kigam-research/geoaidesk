@@ -1,0 +1,403 @@
+{
+  "schema": "gaid-journal-figures/v1",
+  "profiles": [
+    {
+      "id": "elsevier",
+      "name": "Elsevier (general artwork)",
+      "publisher": "Elsevier",
+      "covers": [],
+      "widths": [
+        {
+          "id": "single",
+          "label": "1단",
+          "mm": 90
+        },
+        {
+          "id": "one-half",
+          "label": "1.5단",
+          "mm": 140
+        },
+        {
+          "id": "double",
+          "label": "2단",
+          "mm": 190
+        }
+      ],
+      "minFontPt": 7,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": 300,
+        "combination": 500,
+        "lineArt": 1000
+      },
+      "formats": {
+        "vector": [
+          "eps",
+          "pdf"
+        ],
+        "raster": [
+          "tiff",
+          "jpeg"
+        ]
+      },
+      "colour": {
+        "mode": "RGB",
+        "cvdRequired": null,
+        "colourMapAdvice": null
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "disclose",
+        "code-diagram": "allowed",
+        "ai-picture": "disclose",
+        "ai-graphical-abstract": "forbidden",
+        "image-edit": "forbidden"
+      },
+      "aiDisclosure": [
+        "caption",
+        "methods",
+        "statement"
+      ],
+      "sources": [
+        {
+          "url": "https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-sizing",
+          "title": "Artwork sizing",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-formats-checklist",
+          "title": "Artwork formats checklist",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.elsevier.com/about/policies-and-standards/generative-ai-policies-for-journals",
+          "title": "Generative AI policies for journals",
+          "checkedAt": "2026-10-22"
+        }
+      ],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "Publisher-general guidance; the exact journal Guide for Authors overrides it.",
+        "7 pt normal text / 6 pt subscript and superscript is a rule of thumb, not an absolute prohibition; minFontPt uses the normal-text planning floor.",
+        "RGB is preferred, not a universal prohibition on other colour spaces. Office files are also accepted; this profile lists image export formats only.",
+        "AI explanatory illustrations require caption and general AI-statement disclosure. AI-assisted data figures must derive directly from data with reproducible methods and disclosure in Methods. Code diagrams do not automatically require an AI-picture declaration.",
+        "image-edit is conservatively forbidden for primary observed/experimental images; exceptions for research methods require reproducible Methods reporting. The broad kind cannot distinguish these cases.",
+        "AI graphical abstracts are forbidden; AI cover art requires prior editor/publisher permission (cover use is not modelled by FigureKind).",
+        "maxHeightMm, CVD requirement and panelsInOneFile were not verified."
+      ]
+    },
+    {
+      "id": "copernicus",
+      "name": "Copernicus (EGU journals)",
+      "publisher": "Copernicus Publications",
+      "covers": [],
+      "widths": [
+        {
+          "id": "minimum",
+          "label": "최소 폭",
+          "mm": 80
+        }
+      ],
+      "minFontPt": null,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": 300,
+        "combination": 300,
+        "lineArt": 300
+      },
+      "formats": {
+        "vector": [
+          "pdf",
+          "ps",
+          "eps"
+        ],
+        "raster": [
+          "jpeg",
+          "png",
+          "tiff"
+        ]
+      },
+      "colour": {
+        "mode": null,
+        "cvdRequired": true,
+        "colourMapAdvice": "Use CVD-readable colour schemes; Scientific colour maps 7.0 recommended; cite Crameri et al. (2020)."
+      },
+      "panelsInOneFile": true,
+      "aiPolicy": {
+        "data-figure": "disclose",
+        "code-diagram": "allowed",
+        "ai-picture": "disclose",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [
+        "methods",
+        "acknowledgements"
+      ],
+      "sources": [
+        {
+          "url": "https://publications.copernicus.org/for_authors/manuscript_preparation.html",
+          "title": "Manuscript preparation",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://publications.copernicus.org/for_authors/ai_policy.html",
+          "title": "AI policy",
+          "checkedAt": "2026-10-22"
+        }
+      ],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "80 mm is a minimum figure width, not a fixed column width.",
+        "All figures should have 300 dpi; multi-panel figures are combined into one file. Fonts in figure compositions must be embedded.",
+        "AI illustration/schematic generation is permitted with tool name, purpose and extent in Methods or Acknowledgements; never hallucinate/unverifiable data. The data-figure rule records disclosure of generative AI assistance, not permission to invent observations.",
+        "No explicit graphical-abstract or AI image-edit rule was verified: those remain unknown.",
+        "Minimum font point size, maximum height and required colour mode were not specified in the opened pages."
+      ]
+    },
+    {
+      "id": "agu",
+      "name": "AGU journals",
+      "publisher": "American Geophysical Union",
+      "covers": [],
+      "widths": [
+        {
+          "id": "single",
+          "label": "확인 안 됨",
+          "mm": null
+        }
+      ],
+      "minFontPt": null,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": null,
+        "combination": null,
+        "lineArt": null
+      },
+      "formats": {
+        "vector": [],
+        "raster": []
+      },
+      "colour": {
+        "mode": null,
+        "cvdRequired": null,
+        "colourMapAdvice": null
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "unknown",
+        "code-diagram": "unknown",
+        "ai-picture": "unknown",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [],
+      "sources": [],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+      ]
+    },
+    {
+      "id": "springer",
+      "name": "Geosciences Journal (Springer artwork)",
+      "publisher": "Springer Nature",
+      "covers": [
+        "Geosciences Journal"
+      ],
+      "widths": [
+        {
+          "id": "single",
+          "label": "대형 판형 1단",
+          "mm": 84
+        },
+        {
+          "id": "double",
+          "label": "대형 판형 전체 폭",
+          "mm": 174
+        }
+      ],
+      "minFontPt": 8,
+      "maxHeightMm": 234,
+      "dpi": {
+        "photo": 300,
+        "combination": 600,
+        "lineArt": 1200
+      },
+      "formats": {
+        "vector": [
+          "eps"
+        ],
+        "raster": [
+          "tiff"
+        ]
+      },
+      "colour": {
+        "mode": "RGB",
+        "cvdRequired": null,
+        "colourMapAdvice": "Use patterns in addition to colour so distinctions do not depend on colour alone."
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "unknown",
+        "code-diagram": "unknown",
+        "ai-picture": "unknown",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [
+        "methods"
+      ],
+      "sources": [
+        {
+          "url": "https://link.springer.com/journal/12303/submission-guidelines",
+          "title": "Submission guidelines | Geosciences Journal",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.springer.com/us/editorial-policies/artificial-intelligence--ai-/25428500",
+          "title": "Editorial policies: Artificial intelligence (AI)",
+          "checkedAt": "2026-10-22"
+        }
+      ],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "The actual Geosciences Journal page lists 84 / 174 mm and maximum 234 mm for large-format journals. It does not establish 39 / 129 mm; those values are not shipped. Confirm the journal layout before selecting the large-format width.",
+        "The same page separately lists 119 mm width / 195 mm height for small-format journals; these alternatives are not represented by this large-format profile.",
+        "The 8–12 pt lettering range is recommended (usually about 2–3 mm), not an absolute minimum. minFontPt is a planning floor.",
+        "EPS and TIFF are preferred; MSOffice files are also acceptable. Image export lists do not establish exhaustive format prohibitions.",
+        "AI policy link redirects to a risk framework: verifiable assistive use is allowed; unverifiable output/deepfakes are not. It does not settle each FigureKind, so all per-kind verdicts remain unknown; the journal page requires Methods documentation of LLM use.",
+        "CVD simulation requirement and panelsInOneFile were not verified."
+      ]
+    },
+    {
+      "id": "gsa",
+      "name": "GSA journals",
+      "publisher": "Geological Society of America",
+      "covers": [],
+      "widths": [
+        {
+          "id": "single",
+          "label": "확인 안 됨",
+          "mm": null
+        }
+      ],
+      "minFontPt": null,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": null,
+        "combination": null,
+        "lineArt": null
+      },
+      "formats": {
+        "vector": [],
+        "raster": []
+      },
+      "colour": {
+        "mode": null,
+        "cvdRequired": null,
+        "colourMapAdvice": null
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "unknown",
+        "code-diagram": "unknown",
+        "ai-picture": "unknown",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [],
+      "sources": [],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+      ]
+    },
+    {
+      "id": "jgsk",
+      "name": "대한지질학회지 / Journal of the Geological Society of Korea",
+      "publisher": "대한지질학회",
+      "covers": [],
+      "widths": [
+        {
+          "id": "single",
+          "label": "확인 안 됨",
+          "mm": null
+        }
+      ],
+      "minFontPt": null,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": null,
+        "combination": null,
+        "lineArt": null
+      },
+      "formats": {
+        "vector": [],
+        "raster": []
+      },
+      "colour": {
+        "mode": null,
+        "cvdRequired": null,
+        "colourMapAdvice": null
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "unknown",
+        "code-diagram": "unknown",
+        "ai-picture": "unknown",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [],
+      "sources": [],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+      ]
+    },
+    {
+      "id": "eeg",
+      "name": "자원환경지질 / Economic and Environmental Geology",
+      "publisher": "대한자원환경지질학회",
+      "covers": [],
+      "widths": [
+        {
+          "id": "single",
+          "label": "확인 안 됨",
+          "mm": null
+        }
+      ],
+      "minFontPt": null,
+      "maxHeightMm": null,
+      "dpi": {
+        "photo": null,
+        "combination": null,
+        "lineArt": null
+      },
+      "formats": {
+        "vector": [],
+        "raster": []
+      },
+      "colour": {
+        "mode": null,
+        "cvdRequired": null,
+        "colourMapAdvice": null
+      },
+      "panelsInOneFile": null,
+      "aiPolicy": {
+        "data-figure": "unknown",
+        "code-diagram": "unknown",
+        "ai-picture": "unknown",
+        "ai-graphical-abstract": "unknown",
+        "image-edit": "unknown"
+      },
+      "aiDisclosure": [],
+      "sources": [],
+      "rulesCheckedAt": "2026-10-22",
+      "notes": [
+        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+      ]
+    }
+  ]
+}

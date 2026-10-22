@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:27:55Z
+updated: 2026-10-22T02:39:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -95,23 +95,58 @@ Common rules for this child of gaid-research-visuals (GeoAIDesk, repo kigam-rese
   `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the shipped gaid-figures skill, checker and journal snapshots (final source verification still in progress).
+Generalised note-style seeding into SHIPPED_SKILLS with old receipt compatibility, independent state, and Python cache
+exclusion so executing a helper does not mark the project copy as user-edited. Both skills are always offered; explicit
+model invocation disablement is preserved. Added FIGURE_RULE and cmcrameri/SciencePlots/pypdf to helper/new-project environments.
+
+Verified so far: 43 tests across geo-note-style, geo-shipped-skills, geo-environments, geo-provision and geo-context;
+8 node figure-helper tests; server typecheck; web tsc; environment smoke (all required modules including the three new
+packages imported in helper and new sandbox); UI checker (0 errors, 112 existing debt); copy validator (0 errors, 61
+existing warnings); skill quick_validate (helper environment); exporter demo and palette-audit CLI. Full scripts/check
+belongs to the parent. No UI component changed or screenshots required for this child.
+
+Synthetic evidence under /home/seongin3/data/geoaidesk/work/gaid-research-visuals--skill/synthetic/:
+- jet.png: nominal 90 mm / 300 dpi, actual 1062×590 px, 299.7 effective dpi, 9 pt plot metadata, rainbow/jet warning,
+  three CVD previews; PNG format fails the Elsevier submission-format snapshot as expected.
+- small.svg: 5 pt live text, fails the 7 pt planning floor, unembedded live SVG fonts warn.
+- vector.pdf: 9 pt live text, embedded PDF fonts and PDF format pass; raster DPI/CVD remain not-measured.
+All three are data-figure checks against Elsevier single width; AI-use disclosure remains a warning. Font figures are
+synthetic and do not demonstrate real-journal compliance.
+
 ## Next steps
-1. (the next session's first action)
+1. Waiting for recorded discovery job job-geoaidesk-gaid-research-visuals--skill-1 (Oracle session
+   find-only-current-official-author); do not rerun or poll it. When its relay notice arrives, read its result,
+   curl every adopted page and remove
+   temporary in-progress notes from profiles. Record unknowns and opened URLs in this document.
+2. Re-run focused checker tests and typechecks after final fixes, review the complete diff, then task finish.
 ## Failed approaches
+- Initial focused-test invocation lacked installed npm dependencies (vitest not found); npm ci completed successfully in both targets.
+  All tests/typechecks ran. The initial provisioning count assertion still expected
+  one shipped skill; updated it to two, then all 43 focused tests passed.
+- Skill validator in a no-project Python lacked PyYAML; reran using the helper environment, where it passed.
+- The official Machado matrix-table URL returned HTTP 403 via curl and timed out through web.open. The implementation
+  uses the published standard full-severity coefficients and records that limitation; no runtime network fetch exists.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Phase plan: keep the settled FigureCheck/JournalProfile interfaces; source verification and helper implementation
+are independent of shipped-skill plumbing. This child owns only the files enumerated in the goal (plus focused tests).
+Integration order: shipped-skill plumbing → dependency locks → skill/checker/profiles → focused checks. The work is
+tightly coupled enough to implement here without additional workers. The parent runs the full scripts/check.
+Parent instruction adopted: CVD previews use `<sha256>-cvd-{deuteranopia,protanopia,tritanopia}.png` beside the check JSON
+(default `.kady/geo/figure-checks/<sha256>.json`); no contract change. THIRD_PARTY_NOTICES also includes the map child's
+React Flow 12.12.0 and dagre 3.1.1. Added --artwork as an optional CLI-only DPI-class selector (FigureKind is not a DPI
+class); absent classification is checked conservatively against every verified resolution floor. pypdf is an additive
+pure-Python dependency to make PDF checks available in the default helper, not an optional permanently missing feature.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Evidence is recorded here for the parent to integrate into its canonical report; this child has no separate report.
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-research-visuals--skill-20261022T022833.455464Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

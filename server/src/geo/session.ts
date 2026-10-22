@@ -19,7 +19,7 @@ import { markdownImageExtension } from "./markdown-images.ts";
 import { makeResearchNoteExtension } from "./notes/extension.ts";
 import { makeGeoTools } from "./tools.ts";
 import { makeLibraryTools, makeNoteCitationExtension } from "./library/tools.ts";
-import { seedNoteStyleSkill } from "./note-style.ts";
+import { seedShippedSkills } from "./shipped-skills.ts";
 
 export interface GeoSessionContext {
   projectId: string;
@@ -45,7 +45,7 @@ export interface GeoSessionParts {
 
 export function geoSessionParts(ctx: GeoSessionContext): GeoSessionParts {
   const geoMode = geoCatalogueActive();
-  if (geoMode) seedNoteStyleSkill(ctx.paths);
+  if (geoMode) seedShippedSkills(ctx.paths);
   let exposure: SessionExposure | null = null;
   try {
     exposure = ctx.sessionId ? resolveSessionExposure(ctx.paths, ctx.sessionId, { isNew: ctx.isNew, mode: ctx.mode }) : null;
