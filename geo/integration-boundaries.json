@@ -55,7 +55,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession)"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -390,7 +390,7 @@
       "path": "web/src/components/skills-panel.tsx",
       "owner": "gaid-workflow-catalog",
       "status": "edited",
-      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation."
+      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation. gaid-hub-feeds: a pending import request (web/src/geo/skills/import-request.ts, from Workflow readiness and 자료 소식) is read after mount, not during render."
     },
     {
       "path": "web/src/components/workflows-panel.tsx",

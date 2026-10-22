@@ -1,3 +1,5 @@
+import hubFeedsKo from "./hubFeeds/ko.json";
+import hubFeedsEn from "./hubFeeds/en.json";
 import hubSkillsKo from "./hubSkills/ko.json";
 import hubSkillsEn from "./hubSkills/en.json";
 /**
@@ -98,6 +100,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   hub: pair(hubKo, hubEn),
   hubServer: pair(hubServerKo, hubServerEn),
   hubSkills: pair(hubSkillsKo, hubSkillsEn),
+  hubFeeds: pair(hubFeedsKo, hubFeedsEn),
   connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
   figures: pair(figuresKo, figuresEn),

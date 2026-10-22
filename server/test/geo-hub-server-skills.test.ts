@@ -71,18 +71,18 @@ describe("skill storage and account visibility", () => {
     const u = await user();
     const folder = await app.store.addFolder("이전 주제", { id: u.account.id, name: u.account.displayName });
     const serverId = app.hub.server.serverId;
-    app.hub.db.exec("DROP TABLE hub_skill_comments; DROP TABLE hub_skill_stars; DROP TABLE hub_skill_archives; DROP TABLE hub_skill_imports; DROP TABLE hub_skills; DELETE FROM schema_migrations WHERE version=2");
+    app.hub.db.exec("DROP TABLE feed_items; DROP TABLE feed_sources; DROP TABLE hub_skill_comments; DROP TABLE hub_skill_stars; DROP TABLE hub_skill_archives; DROP TABLE hub_skill_imports; DROP TABLE hub_skills; DELETE FROM schema_migrations WHERE version>=2");
     await app.close();
     app = buildHubServer({ home: join(root, "hub"), now: () => time });
     expect(app.hub.server.serverId).toBe(serverId);
-    expect(app.hub.counts()).toMatchObject({ accounts: 1, schema_migrations: 2, hub_skills: 0, hub_skill_archives: 0 });
+    expect(app.hub.counts()).toMatchObject({ accounts: 1, schema_migrations: 3, hub_skills: 0, hub_skill_archives: 0 });
     expect((await app.inject({ url: "/hub/v1/auth/me", headers: u.headers })).json().account.id).toBe(u.account.id);
     expect(await app.store.folders()).toContainEqual(folder);
     await publish(u.headers);
     await app.close();
     app = buildHubServer({ home: join(root, "hub"), now: () => time });
     expect((await get(u.headers)).json().id).toBe("test-skill");
-    expect(app.hub.counts().schema_migrations).toBe(2);
+    expect(app.hub.counts().schema_migrations).toBe(3);
   });
   it("sets account identity, times and derived fields; preserves old revisions and reviews on append", async () => {
     const author = await user();
@@ -248,9 +248,10 @@ describe("skill backup and local-store import", () => {
     const manifest = backupHub(app.hub, target);
     const database = join(target, "hub.sqlite");
     const db = new DatabaseSync(database);
-    db.exec("DROP TABLE hub_skill_comments; DROP TABLE hub_skill_stars; DROP TABLE hub_skill_archives; DROP TABLE hub_skill_imports; DROP TABLE hub_skills; DELETE FROM schema_migrations WHERE version=2");
+    db.exec("DROP TABLE feed_items; DROP TABLE feed_sources; DROP TABLE hub_skill_comments; DROP TABLE hub_skill_stars; DROP TABLE hub_skill_archives; DROP TABLE hub_skill_imports; DROP TABLE hub_skills; DELETE FROM schema_migrations WHERE version>=2");
     db.close();
     for (const table of ["hub_skill_comments", "hub_skill_stars", "hub_skill_archives", "hub_skill_imports", "hub_skills"]) delete manifest.rows[table];
+    delete manifest.rows.feed_items; delete manifest.rows.feed_sources;
     manifest.rows.schema_migrations = 1;
     const bytes = readFileSync(database);
     const file = manifest.files.find((f) => f.path === "hub.sqlite")!; file.sha256 = sha256(bytes); file.size = bytes.length;
