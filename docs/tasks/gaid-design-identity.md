@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:38:46Z
+updated: 2026-10-22T01:39:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -113,7 +113,7 @@ Services: this unit's `gaid-design-identity-app` (3310/18310), `gdi-mock-http` (
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [부채] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스 25건으로 남아 UI 검사 허용 목록에 있습니다 — 가) gaid-library-folders가 끝난 뒤 그 화면을 다시 만질 때 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 실행 중인 작업과 같은 파일을 동시에 고치지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
+- [부채] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스로 남아 UI 검사 허용 목록에 있습니다 — 가) 서재 화면을 다시 만지는 다음 작업에서 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 서재 화면 작업과 함께 하면 화면 확인을 한 번에 끝냄 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
 ## Report
 Report: reports/2026-10-21-gaid-design-identity/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
