@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: done
 updated: 2026-10-22T04:26:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
@@ -69,8 +69,9 @@ Done 2026-10-22 (phase 1+2 implemented and integrated on task/gaid-research-visu
 Not done (by scope): idea board (JSON Canvas, phase 3), analysis flowchart, publication map export; library-item entry to
 the connection map; real-model chat check.
 ## Next steps
-1. `task finish` (second run after main fix d66762a7; first run hit merge conflicts, resolved in 7f899082). App unit
-   gaid-visuals-app already stopped.
+<!-- task:closed -->
+Closed 2026-10-22T04:26:44Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-research-visuals.md.
+
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
@@ -105,9 +106,9 @@ the connection map; real-model chat check.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [확인] 실제 모델 채팅에서 AI agent가 그림 스킬(gaid-figures)을 읽고 목표 저널의 최종 폭·글자 크기로 그린 뒤 점검을 돌리는지 — 가) 모델이 연결된 GAID에서 그림 하나를 그리게 해 확인 — 나) 시험 연구자 사용 때 확인 — 권장: 가) 스킬과 지시문의 효과는 실제 모델로만 알 수 있음 — 막힌 일: 그림 스킬의 완료 판단 — 근거: reports/2026-10-21-gaid-research-visuals#5
-- [확인] AGU와 자원환경지질의 그림 요건(폭, 글자, 해상도, AI 그림 정책) — 가) 실제 브라우저로 공식 페이지를 열어 journals.json을 채움 — 나) 연구자가 투고할 때까지 "확인 안 됨"으로 둠 — 권장: 가) 두 곳 모두 지구과학 연구자의 주요 투고처임 — 막힌 일: 두 저널의 그림 점검 — 근거: reports/2026-10-21-gaid-research-visuals#3.1
-- [확인] 서재 논문에서 연결 지도를 여는 입구(서재는 모든 프로젝트에 걸치고 지도는 프로젝트 하나 안의 연결) — 가) 논문이 쓰인 프로젝트를 골라 여는 입구를 서재 다음 작업에서 만듦 — 나) 정리 노트와 그림에서만 엶 — 권장: 가) 논문에서 출발하는 질문("이 논문을 근거로 쓴 노트·그림")이 연결 지도의 주된 쓰임임 — 막힌 일: 서재 쪽 입구 — 근거: reports/2026-10-21-gaid-research-visuals#5
+- [확인 gaid-research-visuals#1] 실제 모델 채팅에서 AI agent가 그림 스킬(gaid-figures)을 읽고 목표 저널의 최종 폭·글자 크기로 그린 뒤 점검을 돌리는지 — 가) 모델이 연결된 GAID에서 그림 하나를 그리게 해 확인 — 나) 시험 연구자 사용 때 확인 — 권장: 가) 스킬과 지시문의 효과는 실제 모델로만 알 수 있음 — 막힌 일: 그림 스킬의 완료 판단 — 근거: reports/2026-10-21-gaid-research-visuals#5
+- [확인 gaid-research-visuals#2] AGU와 자원환경지질의 그림 요건(폭, 글자, 해상도, AI 그림 정책) — 가) 실제 브라우저로 공식 페이지를 열어 journals.json을 채움 — 나) 연구자가 투고할 때까지 "확인 안 됨"으로 둠 — 권장: 가) 두 곳 모두 지구과학 연구자의 주요 투고처임 — 막힌 일: 두 저널의 그림 점검 — 근거: reports/2026-10-21-gaid-research-visuals#3.1
+- [확인 gaid-research-visuals#3] 서재 논문에서 연결 지도를 여는 입구(서재는 모든 프로젝트에 걸치고 지도는 프로젝트 하나 안의 연결) — 가) 논문이 쓰인 프로젝트를 골라 여는 입구를 서재 다음 작업에서 만듦 — 나) 정리 노트와 그림에서만 엶 — 권장: 가) 논문에서 출발하는 질문("이 논문을 근거로 쓴 노트·그림")이 연결 지도의 주된 쓰임임 — 막힌 일: 서재 쪽 입구 — 근거: reports/2026-10-21-gaid-research-visuals#5
 ## Report
 Report: reports/2026-10-21-gaid-research-visuals/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
