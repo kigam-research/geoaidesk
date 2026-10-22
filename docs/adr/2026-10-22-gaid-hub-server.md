@@ -59,11 +59,15 @@ outside and needs permission for port opening/VPNs (user, 2026-09-14). PC74 has 
    conflict the newer `updatedAt` wins and the replaced local copy is kept under the library's `sync/conflicts/`. Zotero
    items are synced like GAID items; a pulled Zotero item that matches a local one by Zotero library and item key (any
    connection) keeps the pulled id and records the local id as an alias. Zotero connection state (`zotero.json`) and Zotero
-   keys stay local. Private material never enters the shared hub (decision 1 of the library ADR holds).
+   keys stay local. Private material never enters the shared hub (decision 1 of the library ADR holds). Amended during
+   implementation: a deletion carries no time, so a deletion on one side and an edit on the other resolve to whichever the
+   server recorded first; folders take the server's version on conflict.
 8. **Migration and operations.** `geo/hub-server.mjs import-hub --from <shared dir> --authors <map>` moves an existing
    local shared hub (the review instance has 5 entries) into the server; authors are mapped to accounts explicitly, never by
    matching names. `backup --to <dir>` writes a consistent SQLite copy (`VACUUM INTO`) plus the blobs and a manifest with
    hashes; `check-backup <dir>` restores it into a temporary directory and verifies. Every mutation writes an audit row.
+   Stars and comments by names that are not mapped stay as "이전 사용자 · <name>" placeholders rather than being attached to
+   an account.
 
 ## Alternatives considered
 

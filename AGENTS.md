@@ -93,8 +93,8 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
   together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
-  `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
-  `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
+  `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
+  store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,
   recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
   settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
   `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
@@ -115,6 +115,21 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   is shown as a notice (user directions 2026-10-16). "Sign in with ChatGPT" tokens cannot generate images. MiniMax
   `MiniMax-M3.1-Flash-Preview` is added to Pi's `minimax` provider at startup (`server/src/geo/providers.ts`). Never PDF
   page crops.
+- Institute hub server (gaid-backend, ADR `docs/adr/2026-10-22-gaid-hub-server.md`; user decision 2026-10-22: "2번 다, 4번 나로
+  하고 나머지는 권장으로 하자."): `node geo/hub-server.mjs serve|invite|users|backup|check-backup|import-hub` runs a separate
+  Fastify process (`server/src/geo/hub-server/`, `/hub/v1`, wire `protocol.ts`; operator guide `docs/geo/hub-server.md`) with
+  accounts (admin invites, email + password, scrypt, hashed sessions), the shared hub records and per-account library sync in
+  SQLite (`node:sqlite`) + `blobs/<sha256>` under `GAID_HUB_SERVER_HOME` (default `~/.geoaidesk-hub`); no agent, shell, projects
+  or web UI, and it refuses browser requests. Plain HTTP on the institute LAN is the accepted pilot setting. Researchers' GAIDs
+  connect in Settings → 서비스 → 기관 GAID 허브 (`web/src/geo/hub-server/`, contract `web/src/geo/contracts/hub-server.ts`, routes
+  `/geo/hub-server/*` and `/geo/library/sync` in `server/src/geo/routes/hub-server.ts`; token in
+  `<agentDir>/hub-server/connection.json`, never sent to the browser; `GAID_HUB_SERVER_URL` fixes the address). The `/geo/hub/*`
+  routes resolve per request (`server/src/geo/hub-shared/active.ts`): logged in → `RemoteHubStore` (`server/src/geo/hub-client/`)
+  and the account as `Actor`, else the local `SharedHubStore` and `X-GAID-User`; all three stores implement `HubRecordStore`
+  (`hub-shared/records.ts`), ownership by `authorId`, `HubEntry.mine`. Library sync (`server/src/geo/library/sync/`) keeps the
+  local library as the working copy (pull → push with base versions, newer `updatedAt` wins, replaced copies in
+  `<library>/sync/conflicts/`, deletions win over edits, Zotero items deduplicated by library + item key; `zotero.json` stays
+  local). `server/test/geo-hub-e2e.test.ts` runs a real HTTP hub server with two accounts and two PCs of one account.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Research notes (gaid-notebook-review, `docs/geo/research-notes.md`; user decision 2026-10-18): the notebook tab opens on
   research notes (정리 노트), one Markdown note per analysis at `연구노트/<YYYY-MM-DD>-<topic>/index.md` (+ `figures/`), written result

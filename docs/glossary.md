@@ -9,3 +9,4 @@
 | 일반 Workflow | general Workflow | 단계와 스킬 없이 지시문으로 시작하는 Workflow입니다. | — |
 | 폴더 (서재) | library folder | 서재의 논문을 주제나 원고별로 묶는 곳입니다. 하위 폴더를 둘 수 있고, 한 논문이 여러 폴더에 들어갈 수 있습니다. Zotero 컬렉션과 이어질 수 있습니다. | 모음, 컬렉션 (GAID 쪽 이름으로) |
 | 인용 범위 | citation scope | 프로젝트에 붙인 폴더(하위 폴더 포함)와 논문입니다. AI agent와 연구노트 인용 점검이 이 범위 밖 인용을 따로 표시합니다. | — |
+| GAID 허브 서버 | GAID hub server | 여러 연구자의 GAID가 함께 쓰는 원내 서버입니다. 계정, 공유 허브(등록된 Workflow, 판, 폴더, 별, 댓글)와 계정별 서재 동기화를 맡습니다. AI agent, 명령 실행, 프로젝트는 없습니다. | 공유 GAID, 중앙 GAID |

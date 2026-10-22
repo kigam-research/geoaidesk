@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:55:44Z
+updated: 2026-10-22T07:05:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -36,32 +36,25 @@ Creating external accounts or paid plans needs the user's approval. UI follows d
 ~/data/geoaidesk/work/gaid-backend/; do not modify ~/.geoaidesk. Outside check: no outside check (architecture/app work).
 
 ## Current state
-Phase 3 (implementation) started 2026-10-22 after the user's decisions (see Notes). Done by the top writer (P0, shared
-interfaces), verified with `cd server && npx tsc --noEmit -p .` and the hub tests (geo-hub-shared, -search, -handoff,
-cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`):
-- ADR `docs/adr/2026-10-22-gaid-hub-server.md`.
-- `server/src/geo/hub-shared/records.ts` (HubRecordStore, Actor), `active.ts` (resolveHub, setRemoteHubProvider,
-  localHubStore); SharedHubStore implements it; routes.ts/edit.ts/skill-hub.ts/cli-export use per-request store + actor;
-  install records through `recordInstall`; entry views carry `mine`.
-- Contracts: `web/src/geo/contracts/hub-server.ts` (local GAID routes for the UI), `server/src/geo/hub-server/protocol.ts`
-  (`/hub/v1` wire), hub-shared.ts gains `authorId`, `registeredById`, comment `authorId`, `mine`, `HubMe`.
-- Dependencies installed in the worktree (server, web `npm ci`).
-- Integrated 2026-10-22: P2 hub-client (closed), P1 hub-server (closed; its interim check job disposed as cancelled,
-  test assumed a .git cwd), P3 hub-ui (merge conflict in geo/integration-boundaries.json resolved keeping both entries;
-  duplicate owner line in geo/tests/distribution.test.mjs removed, 7/7 pass). E2E `server/test/geo-hub-e2e.test.ts`
-  passes against a real HTTP hub server: two accounts share/star/comment/copy/install; A's library (item, folder, PDF)
-  syncs to A's second PC, a two-sided edit keeps the newer and stores a conflict copy, B sees nothing of A's library.
-- Children started 2026-10-22: gaid-backend--hub-server (P1), gaid-backend--hub-client (P2), gaid-backend--hub-ui (P3),
-  all "general work"; prompts in `~/data/geoaidesk/work/gaid-backend/prompts/child{1,2,3}.md`.
-- LAN check 2026-10-22: PC70 (10.13.15.70, Node v22.22.1) reached a test HTTP listener on PC74 10.13.15.74:8700
-  (`curl` from PC70 returned ok), so a PC74 hub server is reachable from PC70.
+Result (2026-10-22): the institute GAID hub server chosen by the user is implemented and verified; report
+reports/2026-10-22-gaid-backend/index.md. Phase 1 = accounts (admin invites, email + password), shared hub records on the
+server (register, revisions, folders, stars, comments, edit/copy by account, pinned install), per-account library sync
+(items, folders, PDFs; conflicts kept), backup + check-backup, import of an existing local hub. Researchers connect in
+Settings → 서비스 → 기관 GAID 허브; without a hub server GAID keeps the local hub. Plain HTTP on the LAN (user decision).
+Verification:
+- Children P1/P2/P3 integrated and closed (their checks: hub-server 38, hub-client 24, hub-ui 17 new tests; full suites
+  passed in their finishes). E2E `server/test/geo-hub-e2e.test.ts` passes (real HTTP hub, two accounts, two PCs of one
+  account, conflict, isolation). Re-verify: `cd server && GAID_CATALOGUE=off npx vitest run test/geo-hub-e2e.test.ts
+  test/geo-hub-server.test.ts test/geo-hub-client.test.ts test/geo-library-sync.test.ts test/geo-hub-shared.test.ts`.
+- Real LAN run (report §3.2): hub server on PC74 :8700 (test home `~/data/geoaidesk/work/gaid-backend/hub-home`, test
+  accounts seongin-admin@test.gaid / researcher@test.gaid, passwords in `.../logs/*password.txt` mode 600), test GAID on
+  PC74 (GAID_HOME `.../gaid-home`, ports 3420/18420) connected via http://10.13.15.74:8700, member joined from PC70 by curl,
+  5 legacy entries imported (idempotent), library synced and pulled from PC70, isolation and backup verified. Both test
+  services were stopped (transient units gaid-backend-app, gaid-backend-hubtest); data kept under the work dir.
+- No persistent deployment; deployed SHAs unchanged.
 ## Next steps
-1. Children running (see Work packages); keep the task doc current; `task complete` each child when it finishes.
-2. Integrate in order P1 → P2 → P3; end-to-end test: in-process hub server + two local GAIDs (register, star, comment,
-   edit/copy, install, library sync both ways, conflict); then a real run: hub server on PC74 under
-   `~/data/geoaidesk/work/gaid-backend/hub-home`, a GAID on PC74 and one on PC70 if PC70 reaches PC74 on the LAN.
-3. Import the 5 review-instance entries into a test hub home (read-only source `~/.geoaidesk`), report §3 results,
-   screenshots, `scripts/check`, `task finish`.
+1. `task finish` (runs scripts/check). Then the user's open decision: start the pilot (persistent hub server on PC74 from
+   ~/deploy at the merged SHA, admin invite for the user, import the 5 entries with the user's author mapping).
 ## Failed approaches
 - 2026-10-22: committing the e2e test before P1 was integrated broke `task complete gaid-backend--hub-client`'s check
   (missing module); parked the test outside the repo.
@@ -95,6 +88,8 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
   three options. Under option 가 entry metadata becomes DB rows rather than JSON files; the shape carries over. Phase 1
   should keep entry storage generic enough to add a skill entry kind and a reviewer role later. No reply sent.
 ## Open items
+- [결정] 연구자가 쓰는 시험 운영 시작 — 가) PC74에서 허브 서버를 병합한 판으로 고정 서비스로 띄우고, 사용자 관리자 계정 초대 코드를 드린 뒤, 검토용 허브의 Workflow 5건을 사용자가 정한 작성자 연결로 옮김 — 나) 기관 서버나 다른 원내 PC가 정해질 때까지 대기 — 권장: 가) 기능 시험은 끝났고 실제 연구자 사용으로 알림·부하·운영 문제를 알 수 있음 — 막힌 일: 연구자 시험 운영 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
+- [부채] 원내 HTTP로 비밀번호·로그인 열쇠·Workflow·서재 PDF가 암호화 없이 원내망을 지남(사용자 결정 4 나) — 가) 시험 그룹보다 넓히기 전에 HTTPS(리버스 프록시 또는 인증서) 적용 — 나) 유지 — 권장: 가) 자료 변경 없이 설정으로 바꿀 수 있음 — 막힌 일: 시험 그룹 밖 사용 — 근거: reports/2026-10-22-gaid-backend#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
