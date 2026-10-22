@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-22T02:28:02Z
-writer: {"host":"seongin3","reserved":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"38934232-bc69-4c6e-85ce-d9508ca7b59d","pid":2583953,"provider":"codex","session":"01a1616f-fbe3-7443-b1ed-dcbcf3b16315","start":"52403024","token":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
 branch: task/gaid-research-visuals--map
 target: task/gaid-research-visuals
 parent: gaid-research-visuals
