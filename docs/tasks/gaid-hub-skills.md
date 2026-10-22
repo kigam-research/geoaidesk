@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:12:32Z
+updated: 2026-10-22T06:15:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -53,7 +53,13 @@ Phase 2 (implementation) started 2026-10-22 after the user chose all recommended
    `hubSuspended` map at `routes/methods.ts` + `routes/workspace.ts`; hub CLI export fetches pinned archives.
 2. Then tell ui to `task sync` and test against the real API; on its finish `task complete gaid-hub-skills--ui`.
 3. scripts/check, real-app run with own GAID_HOME, report §3.9+ (implementation result), humanizer, review-copy, finish.
-Blocked: waiting for child store (agent 719ab3a6) to finish; C1 and authoring parts are pushed (580d4339b331).
+C2 code is written locally, uncommitted until store is integrated (imports server/src/geo/hub-skills/index.ts): new
+`server/src/geo/methods/hub-pin-install.ts` (pins, preview, install, suspended lookup, registration problems); edits in
+`authoring/{install,hub-skills}.ts`, `hub-shared/routes.ts`, `routes/{methods,workspace}.ts`, `skill-hub.ts`, `cli-export.ts`,
+`web/src/geo/contracts/authoring.ts`, `web/src/geo/skill-hub/install-preview.tsx`, locale skillHub. After completing store:
+typecheck, add tests (Workflow install pulls a pinned revision; registration refuses suspended/changed pin), push.
+ui child (checkpoint 3ea0e60818f8) waits for my integration notice to `task sync` and run the real API check.
+Blocked: waiting for child store (agent 719ab3a6) to finish its full server test run.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (verbatim "모두 권장안으로 진행하자."): 1 가) hub skill shelf, revisions pinned by Workflows;
