@@ -7,7 +7,9 @@ Configure the hub address in each researcher's GAID, not in the browser address 
 
 The design is recorded in `docs/adr/2026-10-22-gaid-hub-server.md`. Plain HTTP on the institute LAN is the accepted
 pilot setting. Passwords, session tokens, Workflows and synchronized PDFs travel unencrypted. Before expanding beyond the pilot,
-review that choice. HTTPS can be added with a reverse proxy without converting the stored data.
+review that choice: the user decided (gaid-backend#2 가) to switch to HTTPS before widening beyond the test group. The
+hub serves HTTPS itself (`serve --tls-cert/--tls-key`) or behind a reverse proxy (`--trust-proxy`) without converting the
+stored data; the procedure is `docs/geo/hub-server-https.md`.
 
 ## Install and create the first admin
 

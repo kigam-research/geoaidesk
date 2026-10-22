@@ -11,12 +11,21 @@ import { HUB_API as API, HUB_FILE_LIMIT, HUB_SERVER_SCHEMA, LIBRARY_FILE_LIMIT, 
   type InstallRequest, type LibraryPushRequest, type LoginRequest, type ReviewInput, type StoredHubSkill, type StoredEntry } from "./protocol.ts";
 
 export type HubServerApp = FastifyInstance & { hub: HubDatabase; accounts: HubAccounts; store: SQLiteHubStore; library: HubLibrary };
-export function buildHubServer(options: HubServerOptions): HubServerApp {
+export interface HubServeOptions extends HubServerOptions {
+  /** Serve HTTPS only (docs/geo/hub-server-https.md way A). PEM key and certificate chain. */
+  https?: { key: Buffer; cert: Buffer };
+  /** Behind a reverse proxy on this PC: take the client address from X-Forwarded-For set by a loopback proxy. */
+  trustProxy?: boolean;
+}
+export function buildHubServer(options: HubServeOptions): HubServerApp {
   const hub = new HubDatabase(options);
   const accounts = new HubAccounts(hub);
   const store = new SQLiteHubStore(hub);
   const library = new HubLibrary(hub);
-  const app = Fastify({ logger: false, bodyLimit: 64 * 1024, exposeHeadRoutes: false, requestTimeout: 120_000 }) as unknown as HubServerApp;
+  const app = Fastify({ logger: false, bodyLimit: 64 * 1024, exposeHeadRoutes: false, requestTimeout: 120_000,
+    // Login failure limits count per client address; only a proxy on this PC may set it.
+    trustProxy: options.trustProxy ? ["127.0.0.1", "::1"] : false,
+    ...(options.https ? { https: options.https } : {}) }) as unknown as HubServerApp;
   app.decorate("hub", hub); app.decorate("accounts", accounts); app.decorate("store", store); app.decorate("library", library);
   app.addHook("onClose", async () => hub.close());
   const authentication = new WeakMap<FastifyRequest, Authenticated>();
