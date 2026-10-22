@@ -42,6 +42,7 @@ it("opens the map of the only project directly, centred on the paper, with that 
   fireEvent.click(screen.getByRole("button", { name: /^[^,]+, 정리 노트$/ }));
   fireEvent.click(screen.getByRole("button", { name: "프로젝트 열기" }));
   expect(onOpenProject).toHaveBeenCalledWith("a");
+  await waitFor(() => expect(screen.queryByRole("dialog", { name: "연결 지도" })).toBeNull());
 });
 
 it("asks for the project first when several use the paper", async () => {

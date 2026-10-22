@@ -54,6 +54,6 @@ export function PaperMapEntry({ itemId, uses, onOpenProject, onOpenPaper }: { it
     {project && <ConnectionMapDialog open onOpenChange={(o) => { if (!o) setProject(null); }}
       projectId={project.projectId} projectName={project.projectName} focus={`paper:${itemId}`}
       onOpenPaper={(id) => { setProject(null); onOpenPaper(id); }}
-      onOpenProject={() => onOpenProject(project.projectId)} />}
+      onOpenProject={() => { setProject(null); onOpenProject(project.projectId); }} />}
   </>;
 }
