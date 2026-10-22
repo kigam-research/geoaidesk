@@ -1,7 +1,7 @@
 ---
 format: 1
-status: waiting
-updated: 2026-10-22T04:37:54Z
+status: active
+updated: 2026-10-22T04:38:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f0f8b936-04ba-445e-8692-977c00c3f2ca","pid":3727117,"provider":"claude","session":"0108f72c-c60f-4f11-aa8e-848e1936429e","start":"53182089","token":"50a39945d0d6bb4b5db11aca3fce31f50cb45aede646d1658cbd771f06add8e2"}
 branch: task/gaid-workflow-detail
 target: main
