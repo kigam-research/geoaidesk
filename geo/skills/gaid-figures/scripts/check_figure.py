@@ -316,7 +316,9 @@ def check(args):
     fmt = {'.jpg': 'jpeg', '.tif': 'tiff'}.get(ext, ext[1:])
     allowed = profile['formats']['raster' if ext in RASTER else 'vector'] if profile else []
     allowed = [{'jpg': 'jpeg', 'tif': 'tiff'}.get(v.lower().lstrip('.'), v.lower().lstrip('.')) for v in allowed]
-    items.append(item('format', 'ok' if fmt in allowed else 'fail' if allowed else 'not-measured', fmt.upper(), ', '.join(allowed) or None))
+    # Profiles include preferred/non-exhaustive formats (e.g. JGSK recommends JPG).
+    # Absence is not a verified prohibition: warn rather than inventing one.
+    items.append(item('format', 'ok' if fmt in allowed else 'warn' if allowed else 'not-measured', fmt.upper(), ', '.join(allowed) or None))
     ramp = rgb is not None and rainbow_ramp(rgb, np)
     items.append(item('colour-map', 'warn' if ramp else 'not-measured',
                       'Rainbow/jet-like hue ramp (heuristic)' if ramp else 'No hue-ramp lead in sampled pixels; palette not identified' if rgb is not None else None))

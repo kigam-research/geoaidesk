@@ -48,7 +48,7 @@
       "panelsInOneFile": null,
       "aiPolicy": {
         "data-figure": "disclose",
-        "code-diagram": "allowed",
+        "code-diagram": "disclose",
         "ai-picture": "disclose",
         "ai-graphical-abstract": "forbidden",
         "image-edit": "forbidden"
@@ -80,7 +80,7 @@
         "Publisher-general guidance; the exact journal Guide for Authors overrides it.",
         "7 pt normal text / 6 pt subscript and superscript is a rule of thumb, not an absolute prohibition; minFontPt uses the normal-text planning floor.",
         "RGB is preferred, not a universal prohibition on other colour spaces. Office files are also accepted; this profile lists image export formats only.",
-        "AI explanatory illustrations require caption and general AI-statement disclosure. AI-assisted data figures must derive directly from data with reproducible methods and disclosure in Methods. Code diagrams do not automatically require an AI-picture declaration.",
+        "AI explanatory illustrations require caption and general AI-statement disclosure. AI-assisted data figures must derive directly from data with reproducible methods and disclosure in Methods. AI-assisted code diagrams also need disclosure of the assistance; this does not classify them as AI-generated pictures. Manually authored code has no AI use to disclose.",
         "image-edit is conservatively forbidden for primary observed/experimental images; exceptions for research methods require reproducible Methods reporting. The broad kind cannot distinguish these cases.",
         "AI graphical abstracts are forbidden; AI cover art requires prior editor/publisher permission (cover use is not modelled by FigureKind).",
         "maxHeightMm, CVD requirement and panelsInOneFile were not verified."
@@ -125,7 +125,7 @@
       "panelsInOneFile": true,
       "aiPolicy": {
         "data-figure": "disclose",
-        "code-diagram": "allowed",
+        "code-diagram": "disclose",
         "ai-picture": "disclose",
         "ai-graphical-abstract": "unknown",
         "image-edit": "unknown"
@@ -152,7 +152,8 @@
         "All figures should have 300 dpi; multi-panel figures are combined into one file. Fonts in figure compositions must be embedded.",
         "AI illustration/schematic generation is permitted with tool name, purpose and extent in Methods or Acknowledgements; never hallucinate/unverifiable data. The data-figure rule records disclosure of generative AI assistance, not permission to invent observations.",
         "No explicit graphical-abstract or AI image-edit rule was verified: those remain unknown.",
-        "Minimum font point size, maximum height and required colour mode were not specified in the opened pages."
+        "Minimum font point size, maximum height and required colour mode were not specified in the opened pages.",
+        "For code-diagram, disclose applies when generative AI assisted diagram creation; manually authored code has no AI use to disclose. It is not an AI-picture classification."
       ]
     },
     {
@@ -192,10 +193,18 @@
         "image-edit": "unknown"
       },
       "aiDisclosure": [],
-      "sources": [],
+      "sources": [
+        {
+          "url": "https://www.wiley.com/en-us/publishing/article/ai-guidelines",
+          "title": "Using AI tools in your research",
+          "checkedAt": "2026-10-22"
+        }
+      ],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+        "AGU Text & Graphics Requirements (https://www.agu.org/publications/authors/journals/text-graphics-requirements) and Resources & FAQs (https://www.agu.org/Publications/Authors/Resources-FAQs) both returned HTTP 403 during direct curl on 2026-10-22. AGU-specific widths, font sizes, height, DPI, formats, colour, panel and per-kind AI rules remain unverified.",
+        "The readable Wiley publisher AI page requires disclosure of AI visual creation/editing and prohibits AI-edited research photographs. It is provided as related publisher guidance, not substituted for blocked AGU-specific policy; the per-kind verdicts stay unknown.",
+        "Historical AGU graphics guidance and general Wiley figure sizes are not confirmed as current AGU requirements and were not imported. Nulls and empty format lists mean unverified, not unrestricted."
       ]
     },
     {
@@ -278,39 +287,80 @@
       "widths": [
         {
           "id": "single",
-          "label": "확인 안 됨",
+          "label": "3단 판형 1단",
+          "mm": 59
+        },
+        {
+          "id": "double",
+          "label": "3단 판형 2단",
+          "mm": 122.8
+        },
+        {
+          "id": "near-full",
+          "label": "캡션 옆 배치 폭",
+          "mm": 148.2
+        },
+        {
+          "id": "full",
+          "label": "전체 폭 (원문 단위 불일치)",
           "mm": null
         }
       ],
-      "minFontPt": null,
+      "minFontPt": 7,
       "maxHeightMm": null,
       "dpi": {
-        "photo": null,
+        "photo": 300,
         "combination": null,
-        "lineArt": null
+        "lineArt": 1200
       },
       "formats": {
-        "vector": [],
-        "raster": []
+        "vector": [
+          "eps",
+          "pdf",
+          "ai",
+          "cdr"
+        ],
+        "raster": [
+          "tiff",
+          "jpeg",
+          "psd",
+          "raw"
+        ]
       },
       "colour": {
         "mode": null,
         "cvdRequired": null,
-        "colourMapAdvice": null
+        "colourMapAdvice": "Avoid rainbow maps; use distinguishable colours plus labels, patterns and differing line forms."
       },
       "panelsInOneFile": null,
       "aiPolicy": {
-        "data-figure": "unknown",
-        "code-diagram": "unknown",
-        "ai-picture": "unknown",
+        "data-figure": "disclose",
+        "code-diagram": "disclose",
+        "ai-picture": "disclose",
         "ai-graphical-abstract": "unknown",
         "image-edit": "unknown"
       },
-      "aiDisclosure": [],
-      "sources": [],
+      "aiDisclosure": [
+        "statement"
+      ],
+      "sources": [
+        {
+          "url": "https://www.geosociety.org/publications/author-information/figure-guidelines",
+          "title": "Figure Guidelines",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.geosociety.org/publications/policies/ai-policy",
+          "title": "Authorship and Artificial Intelligence Tools Policy",
+          "checkedAt": "2026-10-22"
+        }
+      ],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+        "Journal widths use the table centimetre values: 59 / 122.8 / 148.2 mm. The full-width row says 7.125 inches and 18.5 cm, which disagree, so full width stays null. The page-height row also has inconsistent units; maxHeightMm stays null.",
+        "7–12 pt lettering; panel letters A/B/C should be 13–16 pt at final size. Photos 300–600 ppi; raster line art at least 1200 ppi. No separate combination floor was specified.",
+        "The profile lists publication-quality/native formats: after acceptance supply a native file plus EPS, TIFF or PDF. Initial submission instead allows PDF (preferred), TIFF, GIF and JPEG. CMYK/RGB and a mandatory CVD simulation were not specified; CVD-readable design and avoiding rainbow maps are explicit advice.",
+        "AI tools used to create text, images, tables or data analysis must be disclosed in a separate section, naming tools, use and affected portions. disclose records that obligation, not unconditional acceptance. Explicit AI image-edit and graphical-abstract permissions were not verified."
       ]
     },
     {
@@ -334,7 +384,9 @@
       },
       "formats": {
         "vector": [],
-        "raster": []
+        "raster": [
+          "jpeg"
+        ]
       },
       "colour": {
         "mode": null,
@@ -343,17 +395,34 @@
       },
       "panelsInOneFile": null,
       "aiPolicy": {
-        "data-figure": "unknown",
-        "code-diagram": "unknown",
-        "ai-picture": "unknown",
+        "data-figure": "disclose",
+        "code-diagram": "disclose",
+        "ai-picture": "disclose",
         "ai-graphical-abstract": "unknown",
         "image-edit": "unknown"
       },
-      "aiDisclosure": [],
-      "sources": [],
+      "aiDisclosure": [
+        "methods",
+        "acknowledgements",
+        "statement"
+      ],
+      "sources": [
+        {
+          "url": "https://www.jgsk.or.kr/_common/do.php?a=html&b=31",
+          "title": "Instructions for Authors",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://jgsk.or.kr/_common/do.php?a=html&b=32",
+          "title": "Ethics Guideline",
+          "checkedAt": "2026-10-22"
+        }
+      ],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+        "Figures must fit A4 paper and remain legible after reduction. No numerical final width, font point size, height or DPI was specified, so those fields remain null; an A4 paper size is not a figure-width requirement.",
+        "JPG is recommended, not an exhaustive allowed-format list. Captions must be in English. Colour mode, CVD simulation and panelsInOneFile were not specified.",
+        "AI use during research/manuscript preparation must disclose purpose, scope and method in Main Text, Methods or Acknowledgements; human authors remain responsible for AI text, images and analysis. disclose records that obligation, not unconditional acceptance of every generated image. Explicit image-edit or graphical-abstract permission was not verified."
       ]
     },
     {
@@ -396,7 +465,9 @@
       "sources": [],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "Official source discovery is in progress; unverified numerical values, formats and AI-policy rules remain unknown."
+        "Direct curl on 2026-10-22 returned an empty reply (curl exit 52) for all identified official pages: https://www.kseeg.org/content/authors/guide_for_authors.html ; https://www.kseeg.org/content/authors/publication_ethics.html ; https://www.kseeg.or.kr/content/journal/editor_rule.php . No rules were directly verified; rulesCheckedAt records the attempted snapshot date only.",
+        "All numeric rules, formats, colour/panel requirements and per-kind AI permissions remain unverified. Nulls, unknown policies and empty format lists are not permission.",
+        "Discovery identified a possible disagreement between the journal English and society Korean PDF-figure rules; neither page could be read directly, so neither claim was adopted."
       ]
     }
   ]

@@ -74,7 +74,7 @@ test('90 mm / 300 dpi jet PNG: physical DPI, plot-font metadata, advisory hue ra
   assert.equal(line(r, 'min-font').status, 'ok');
   assert.match(line(r, 'min-font').measured, /metadata; not OCR/);
   assert.equal(line(r, 'colour-map').status, 'warn');
-  assert.equal(line(r, 'format').status, 'fail'); // PNG is a display companion, not an Elsevier submission format.
+  assert.equal(line(r, 'format').status, 'warn'); // PNG is not in this submission-format snapshot; confirm the exact journal.
   assert.equal(r.cvdPreviews.length, 3);
   for (const f of r.cvdPreviews) assert.ok(fs.statSync(path.join(dir, f)).size > 100);
   const inspect = uv(['-c', `from PIL import Image; import json; print(json.dumps([list(Image.open(p).getpixel((600,260))) for p in ${JSON.stringify(r.cvdPreviews)}]))`]);

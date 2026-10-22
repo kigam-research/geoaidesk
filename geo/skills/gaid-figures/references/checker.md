@@ -36,8 +36,9 @@ are named `<sha256>-cvd-{deuteranopia,protanopia,tritanopia}.png`.
   in **linear** sRGB using the Machado 2009 severity-1 matrices. Three PNGs next to the JSON
   illustrate protanopia, deuteranopia and tritanopia. Their presence warns for manual review;
   it does not establish readability. Colour-managed print/CMYK behaviour is not simulated.
-- Axis units and panel labels require human review; always unmeasured. File format uses the
-  profile's known allow-list; an empty list means unknown, not unrestricted. AI policy follows
+- Axis units and panel labels require human review; always unmeasured. File format compares with
+  the profile's known/preferred formats; a non-listed format warns (some lists are not exhaustive),
+  and an empty list means unknown, not unrestricted. AI policy follows
   the declared kind/use and the dated profile, not image-content detection. `image-edit` rules
   may be conservative for primary research images; read profile notes and the actual policy.
 

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:39:11Z
+updated: 2026-10-22T02:44:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -95,31 +95,22 @@ Common rules for this child of gaid-research-visuals (GeoAIDesk, repo kigam-rese
   `task finish`.
 
 ## Current state
-Implemented the shipped gaid-figures skill, checker and journal snapshots (final source verification still in progress).
-Generalised note-style seeding into SHIPPED_SKILLS with old receipt compatibility, independent state, and Python cache
-exclusion so executing a helper does not mark the project copy as user-edited. Both skills are always offered; explicit
-model invocation disablement is preserved. Added FIGURE_RULE and cmcrameri/SciencePlots/pypdf to helper/new-project environments.
+Delivered gaid-figures: final-mm/pt plotting guidance, scientific colour maps, editable vector/raster export,
+content-keyed FigureCheck JSON, CVD previews and seven dated journal profiles. Seed/update keeps the legacy note-style
+receipt and user edits/deletion/disablement; ignores Python caches; both shipped skills stay offered. Added FIGURE_RULE,
+cmcrameri/SciencePlots/pypdf and notices (including the map child's React Flow/dagre). No contract change.
 
-Verified so far: 43 tests across geo-note-style, geo-shipped-skills, geo-environments, geo-provision and geo-context;
-8 node figure-helper tests; server typecheck; web tsc; environment smoke (all required modules including the three new
-packages imported in helper and new sandbox); UI checker (0 errors, 112 existing debt); copy validator (0 errors, 61
-existing warnings); skill quick_validate (helper environment); exporter demo and palette-audit CLI. Full scripts/check
-belongs to the parent. No UI component changed or screenshots required for this child.
+Verified: 43 focused server tests, 8 synthetic checker tests, server typecheck, web tsc, both environment smoke targets,
+UI checker (0 errors/112 existing debt), copy validator (0 errors/61 existing warnings), skill validator and all retained
+helper CLIs. Full scripts/check belongs to the parent; no UI components changed.
 
-Synthetic evidence under /home/seongin3/data/geoaidesk/work/gaid-research-visuals--skill/synthetic/:
-- jet.png: nominal 90 mm / 300 dpi, actual 1062×590 px, 299.7 effective dpi, 9 pt plot metadata, rainbow/jet warning,
-  three CVD previews; PNG format fails the Elsevier submission-format snapshot as expected.
-- small.svg: 5 pt live text, fails the 7 pt planning floor, unembedded live SVG fonts warn.
-- vector.pdf: 9 pt live text, embedded PDF fonts and PDF format pass; raster DPI/CVD remain not-measured.
-All three are data-figure checks against Elsevier single width; AI-use disclosure remains a warning. Font figures are
-synthetic and do not demonstrate real-journal compliance.
+Official sources were curled on 2026-10-22. Verified Elsevier/Copernicus/Geosciences Journal/GSA/JGSK; AGU pages returned
+403 and EEG pages returned empty replies, so their unverified rules remain null/unknown. GSA full width/page height
+remain null due to conflicting units. Source list, limitations and synthetic evidence are below.
 
 ## Next steps
-1. Waiting for recorded discovery job job-geoaidesk-gaid-research-visuals--skill-1 (Oracle session
-   find-only-current-official-author); do not rerun or poll it. When its relay notice arrives, read its result,
-   curl every adopted page and remove
-   temporary in-progress notes from profiles. Record unknowns and opened URLs in this document.
-2. Re-run focused checker tests and typechecks after final fixes, review the complete diff, then task finish.
+1. Final checker verification (8/8) and diff review passed after official-source adoption. Submit with task finish;
+   the parent runs task complete and integration.
 ## Failed approaches
 - Initial focused-test invocation lacked installed npm dependencies (vitest not found); npm ci completed successfully in both targets.
   All tests/typechecks ran. The initial provisioning count assertion still expected
@@ -128,6 +119,65 @@ synthetic and do not demonstrate real-journal compliance.
 - The official Machado matrix-table URL returned HTTP 403 via curl and timed out through web.open. The implementation
   uses the published standard full-severity coefficients and records that limitation; no runtime network fetch exists.
 ## Notes and decisions
+
+### Source verification (2026-10-22)
+Discovery job job-geoaidesk-gaid-research-visuals--skill-1 completed successfully (exit 0); its answer was used only to
+locate official pages. Oracle session: find-only-current-official-author. Saved evidence:
+`웹 조사/geoaidesk/2026-10-22-find-only-current-official-author--71831fdbdd.md` in the cmd-main vault.
+Direct curl, not the discovery answer, determined adopted profile values.
+
+Opened and read official pages (all checkedAt 2026-10-22):
+
+- elsevier: Artwork sizing — https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-sizing (2026-10-22).
+- elsevier: Artwork formats checklist — https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-formats-checklist (2026-10-22).
+- elsevier: Generative AI policies for journals — https://www.elsevier.com/about/policies-and-standards/generative-ai-policies-for-journals (2026-10-22).
+- copernicus: Manuscript preparation — https://publications.copernicus.org/for_authors/manuscript_preparation.html (2026-10-22).
+- copernicus: AI policy — https://publications.copernicus.org/for_authors/ai_policy.html (2026-10-22).
+- agu: Using AI tools in your research — https://www.wiley.com/en-us/publishing/article/ai-guidelines (2026-10-22).
+- springer: Submission guidelines | Geosciences Journal — https://link.springer.com/journal/12303/submission-guidelines (2026-10-22).
+- springer: Editorial policies: Artificial intelligence (AI) — https://www.springer.com/us/editorial-policies/artificial-intelligence--ai-/25428500 (2026-10-22).
+- gsa: Figure Guidelines — https://www.geosociety.org/publications/author-information/figure-guidelines (2026-10-22).
+- gsa: Authorship and Artificial Intelligence Tools Policy — https://www.geosociety.org/publications/policies/ai-policy (2026-10-22).
+- jgsk: Instructions for Authors — https://www.jgsk.or.kr/_common/do.php?a=html&b=31 (2026-10-22).
+- jgsk: Ethics Guideline — https://jgsk.or.kr/_common/do.php?a=html&b=32 (2026-10-22).
+
+Unknowns and scope:
+- Elsevier: max height, mandatory CVD simulation and panel composition unknown; 7 pt is a normal-text rule of thumb
+  (6 pt subscripts), not an absolute prohibition. RGB is preferred. Journal-specific guides override the snapshot.
+- Copernicus: 80 mm is a minimum, not a column class. Font floor, max height, required colour mode, AI image-edit and
+  graphical-abstract rules unknown. CVD checking, 300 dpi and combined panels verified.
+- AGU: both https://www.agu.org/publications/authors/journals/text-graphics-requirements and
+  https://www.agu.org/Publications/Authors/Resources-FAQs returned HTTP 403. All AGU-specific numeric/format/colour/panel
+  and per-kind policy fields remain unverified. Readable Wiley publisher AI guidance is linked as related guidance only;
+  it was not promoted to an AGU-specific verdict. Historical AGU/Wiley general dimensions were not imported.
+- Springer: the actual Geosciences Journal page lists 84/174 mm and 234 mm height for large-format journals, not the
+  proposal's 39/84/129/174. Small format is separately 119×195 mm, noted but not mixed into this large-format profile.
+  The 8–12 pt range is recommended. CVD simulation/panels and per-kind AI verdicts remain unverified under the linked
+  publisher risk framework. EPS/TIFF are preferred; format lists are not exhaustive prohibitions.
+- GSA: 59/122.8/148.2 mm, 7–12 pt, photo 300–600 ppi and line-art 1200 ppi verified. Full width 7.125 in versus 18.5 cm
+  conflicts, as does page height 9.5 in versus 22.5 cm: full mm/maxHeightMm stay null. Combination DPI, colour mode,
+  mandatory CVD simulation/panel composition and explicit AI edit/graphical-abstract permissions unknown. Disclosure
+  of AI-created figures in a separate section is verified, not unconditional acceptance.
+- JGSK: JPG is recommended; A4 fit/legibility and English captions verified. Width/font/DPI/height/colour/CVD/panels
+  have no numeric rules in the opened page. AI-use purpose/scope/method disclosure verified; no specific AI image-edit
+  or graphical-abstract permission is inferred.
+- EEG: https://www.kseeg.org/content/authors/guide_for_authors.html ,
+  https://www.kseeg.org/content/authors/publication_ethics.html and
+  https://www.kseeg.or.kr/content/journal/editor_rule.php all returned curl 52 (empty reply). Every numerical/format/
+  colour/panel/AI rule stays unknown; the required rulesCheckedAt string records only the attempted snapshot date,
+  explicitly noted in the profile. The discovered possible English/Korean PDF-policy disagreement was not adopted as
+  a verified fact. Empty format lists mean unverified, never unrestricted.
+
+### Synthetic check evidence
+Files and JSON reports are under /home/seongin3/data/geoaidesk/work/gaid-research-visuals--skill/synthetic/ (not Git).
+- jet.png: nominal 90 mm / 300 dpi, actual 1062×590 px, 299.7 effective dpi, 9 pt plot metadata. A rainbow/jet-like
+  ramp warns; three CVD previews exist. PNG is not in the Elsevier snapshot, so format warns rather than claiming a ban.
+- small.svg: 5 pt live text fails the 7 pt planning floor; live unembedded fonts warn. Raster DPI/CVD stay unmeasured.
+- vector.pdf: 9 pt live text, embedded font programs and PDF format pass; raster DPI/CVD stay unmeasured.
+All three are synthetic data-figure checks against Elsevier single width; AI-use disclosure warns. They do not
+establish real-journal compliance. The report's axis units and panel labels stay unmeasured for manual review.
+
+### Implementation decisions
 Phase plan: keep the settled FigureCheck/JournalProfile interfaces; source verification and helper implementation
 are independent of shipped-skill plumbing. This child owns only the files enumerated in the goal (plus focused tests).
 Integration order: shipped-skill plumbing → dependency locks → skill/checker/profiles → focused checks. The work is
@@ -136,12 +186,12 @@ Parent instruction adopted: CVD previews use `<sha256>-cvd-{deuteranopia,protano
 (default `.kady/geo/figure-checks/<sha256>.json`); no contract change. THIRD_PARTY_NOTICES also includes the map child's
 React Flow 12.12.0 and dagre 3.1.1. Added --artwork as an optional CLI-only DPI-class selector (FigureKind is not a DPI
 class); absent classification is checked conservatively against every verified resolution floor. pypdf is an additive
-pure-Python dependency to make PDF checks available in the default helper, not an optional permanently missing feature.
+pure-Python dependency to make PDF checks available in the default helper. The checker uses a warning for formats absent
+from a profile because several official lists are preferred/non-exhaustive. Failure would invent a prohibition.
+CVD matrices preserve neutral endpoints; vector-only raster DPI/CVD remain unmeasured without adding a renderer.
+Four-platform uv resolution succeeded; runtime imports were tested on Linux only. Existing sandboxes are not rewritten.
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None requiring a user decision for this child. Unknown journal rules are explicitly represented as unknown, as requested.
 ## Report
 Evidence is recorded here for the parent to integrate into its canonical report; this child has no separate report.
 ## Running jobs
