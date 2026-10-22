@@ -36,7 +36,7 @@
         "targets": ["project"],
         "packages": [
           { "name": "requests", "version": ">=2.32", "imports": ["requests"] },
-          { "name": "pyzotero", "version": ">=1.15.2,<1.16", "imports": ["pyzotero"] }
+          { "name": "pyzotero", "version": ">=1.15.2", "imports": ["pyzotero"] }
         ]
       }
     ]

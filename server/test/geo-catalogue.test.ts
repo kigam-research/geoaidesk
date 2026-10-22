@@ -12,6 +12,7 @@ import {
   resetGeoCatalogueCache,
   stagingDirFor,
 } from "../src/geo/catalogue.ts";
+import { packageSpec } from "../src/geo/environments.ts";
 import { readDistributionCatalogue } from "../src/geo/distribution.ts";
 import { readTarGz, safeEntryPath } from "../src/geo/tar.ts";
 import { REPO_ROOT } from "../src/config.ts";
@@ -163,6 +164,8 @@ describe("pinned catalogue of this distribution", () => {
     expect(catalogue.environments?.environments.map((e) => e.id)).toEqual(
       expect.arrayContaining(["geo-core", "geo-gis", "geo-literature"]),
     );
+    // Every package spec is one the environment service accepts (GET /geo/environments fails otherwise).
+    for (const env of catalogue.environments?.environments ?? []) for (const pkg of env.packages) expect(() => packageSpec(pkg)).not.toThrow();
     // Runtime names are SKILL.md names, never rewritten (gaid-interfaces.md §3).
     for (const [name, dir] of geoCatalogueSkillDirs(catalogue)) {
       expect(fs.readFileSync(path.join(dir, "SKILL.md"), "utf-8")).toMatch(new RegExp(`^name: ${name}$`, "m"));

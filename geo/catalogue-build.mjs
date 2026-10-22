@@ -246,6 +246,11 @@ export function buildCatalogue({ releaseFile, out, writeLock = false, sourceRoot
       const envs = JSON.parse(fs.readFileSync(envFile, "utf-8"));
       for (const env of release.environments.add) {
         if (envs.environments.some((e) => e.id === env.id)) throw new Error(`Environment ${env.id} exists in the base`);
+        // Same rules as server/src/geo/environments.ts packageSpec: valid name, lower bound only.
+        for (const pkg of env.packages ?? []) {
+          if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(pkg.name)) throw new Error(`Environment ${env.id}: invalid distribution ${pkg.name}`);
+          if (pkg.version && !/^>=\d+(?:\.\d+)*(?:[a-zA-Z0-9.!+-]*)$/.test(pkg.version)) throw new Error(`Environment ${env.id}: ${pkg.name} needs a lower bound (>=x), got ${pkg.version}`);
+        }
         if (env.extends && !envs.environments.some((e) => e.id === env.extends)) throw new Error(`Environment ${env.id} extends unknown ${env.extends}`);
         envs.environments.push(env);
       }
