@@ -62,7 +62,7 @@ export class HubFeeds {
     const needle = (query.q as string | undefined)?.toLowerCase() ?? "";
     const perSource = new Map<string, number>();
     const unfiltered = !category && !field && !needle;
-    const items = this.hub.all<{ record: string }>("SELECT record FROM feed_items ORDER BY COALESCE(published_at,fetched_at) DESC,id ASC")
+    const items = this.hub.all<{ record: string }>("SELECT record FROM feed_items ORDER BY sort_at DESC,id ASC")
       .map((row) => JSON.parse(row.record) as FeedItem).filter((i) => ids.has(i.sourceId) && (!category || i.category === category) && (!field || i.field === field) &&
         (!needle || `${i.title}\n${i.summary}`.toLowerCase().includes(needle))).filter((i) => {
           if (!unfiltered) return true;
@@ -97,12 +97,17 @@ export class HubFeeds {
           // A stop/delete during fetch must not re-approve or recreate the source.
           const current = this.sources().find((s) => s.id === source.id);
           if (!current || current.state !== "approved" || current.decidedAt !== source.decidedAt) return;
-          for (const value of values) {
-            const old = this.hub.get<{ fetched_at: string }>("SELECT fetched_at FROM feed_items WHERE id=?", value.id);
+          // Undated items of a source's first collection are older posts we happened to see now: keep them below dated
+          // items (in feed order) instead of letting their collection time put them first.
+          const first = !this.hub.get<{ last_success: string | null }>("SELECT last_success FROM feed_sources WHERE id=?", source.id)?.last_success;
+          values.forEach((value, index) => {
+            const old = this.hub.get<{ fetched_at: string; sort_at: string }>("SELECT fetched_at,sort_at FROM feed_items WHERE id=?", value.id);
             if (old) value.fetchedAt = old.fetched_at;
-            this.hub.run(`INSERT INTO feed_items(id,source_id,record,published_at,fetched_at) VALUES (?,?,?,?,?)
-              ON CONFLICT(id) DO UPDATE SET record=excluded.record,published_at=excluded.published_at`, value.id, source.id, JSON.stringify(value), value.publishedAt, value.fetchedAt);
-          }
+            const sortAt = value.publishedAt ?? old?.sort_at ?? (first ? new Date(-1000 * (index + 1)).toISOString() : value.fetchedAt);
+            this.hub.run(`INSERT INTO feed_items(id,source_id,record,published_at,fetched_at,sort_at) VALUES (?,?,?,?,?,?)
+              ON CONFLICT(id) DO UPDATE SET record=excluded.record,published_at=excluded.published_at,sort_at=excluded.sort_at`,
+              value.id, source.id, JSON.stringify(value), value.publishedAt, value.fetchedAt, sortAt);
+          });
           this.write({ ...current, lastFetch: result });
           this.hub.run("UPDATE feed_sources SET last_success=? WHERE id=?", result.at, source.id);
           this.prune(source.id);
@@ -120,7 +125,7 @@ export class HubFeeds {
     const cutoff = new Date(Date.parse(this.hub.now()) - FEED_LIMITS.maxAgeDays * 86400_000).toISOString();
     this.hub.run("DELETE FROM feed_items WHERE source_id=? AND COALESCE(published_at,fetched_at) < ?", id, cutoff);
     this.hub.run(`DELETE FROM feed_items WHERE source_id=? AND id NOT IN
-      (SELECT id FROM feed_items WHERE source_id=? ORDER BY COALESCE(published_at,fetched_at) DESC,id ASC LIMIT ?)`, id, id, FEED_LIMITS.itemsPerSource);
+      (SELECT id FROM feed_items WHERE source_id=? ORDER BY sort_at DESC,id ASC LIMIT ?)`, id, id, FEED_LIMITS.itemsPerSource);
   }
   async close() { this.closed = true; await this.queue; }
 }

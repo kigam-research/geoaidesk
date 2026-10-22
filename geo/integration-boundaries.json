@@ -390,7 +390,7 @@
       "path": "web/src/components/skills-panel.tsx",
       "owner": "gaid-workflow-catalog",
       "status": "edited",
-      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation."
+      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation. gaid-hub-feeds: a pending import request (web/src/geo/skills/import-request.ts, from Workflow readiness and 자료 소식) is read after mount, not during render."
     },
     {
       "path": "web/src/components/workflows-panel.tsx",

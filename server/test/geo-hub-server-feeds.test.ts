@@ -166,6 +166,21 @@ describe("approval, persistence and serving", () => {
     const changed = new HubFeeds(a.hub, { proposals: [{ ...source, url: "https://changed.example/rss" }] });
     expect(changed.sources()[0].url).toBe(source.url);
   });
+  it("keeps undated items of a first collection below dated ones; later undated items sort by collection time", async () => {
+    let now = at;
+    const hub = new HubDatabase({ home: home(), now: () => now }); databases.push(hub);
+    const undated = (ids: number[]) => `<rss><channel>${ids.map((i) => `<item><title>Undated ${i}</title><link>https://undated.example/${i}</link></item>`).join("")}</channel></rss>`;
+    let body = undated([1, 2]);
+    const feeds = new HubFeeds(hub, { proposals: [source, { ...source, id: "undated", url: "https://undated.example/rss" }],
+      feedFetch: asFetch((url) => new Response(String(url).includes("undated") ? body : rss(1))) });
+    for (const s of feeds.sources()) feeds.decide(s.id, { state: "approved" }, actor);
+    await feeds.fetch();
+    expect(feeds.list().items.map((i) => i.title)).toEqual(["Title 0", "Undated 1", "Undated 2"]);
+    now = "2026-10-23T01:00:00.000Z"; body = undated([3, 1, 2]);
+    await feeds.fetch();
+    expect(feeds.list().items.map((i) => i.title)).toEqual(["Undated 3", "Title 0", "Undated 1", "Undated 2"]);
+    expect(feeds.list().items[0].fetchedAt).toBe(now);
+  });
   it("isolates failures, keeps first fetchedAt, prunes age/count, and records latest success despite later failures", async () => {
     const hub = db(); let fail = false;
     const stub = asFetch((url) => String(url).includes("fail") || fail ? new Response("no", { status: 503 }) : new Response(rss(110)));
@@ -177,7 +192,7 @@ describe("approval, persistence and serving", () => {
     await feeds.fetch({ sourceId: source.id }); expect(feeds.list().items[0].fetchedAt).toBe("2026-10-20T01:00:00.000Z");
     fail = true; await feeds.fetch(); expect(feeds.list().collectedAt).toBe(at); expect(feeds.sources()[1].lastFetch?.ok).toBe(false);
     const old = item(source, { title: "Old", link: "https://example.org/old", date: "2020-01-01" }, at)!;
-    hub.run("INSERT INTO feed_items VALUES (?,?,?,?,?)", old.id, source.id, JSON.stringify(old), old.publishedAt, old.fetchedAt);
+    hub.run("INSERT INTO feed_items VALUES (?,?,?,?,?,?)", old.id, source.id, JSON.stringify(old), old.publishedAt, old.fetchedAt, old.publishedAt ?? old.fetchedAt);
     fail = false; await feeds.fetch(); expect(hub.get("SELECT id FROM feed_items WHERE id=?", old.id)).toBeUndefined();
     const manifest = backupHub(hub, join(home(), "backup")); expect(checkBackup(join(roots.at(-1)!, "backup")).rows).toEqual(manifest.rows);
   });

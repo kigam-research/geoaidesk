@@ -111,8 +111,10 @@ CREATE TABLE hub_skill_imports (source TEXT NOT NULL, skill_id TEXT NOT NULL, di
   { version: 3, sql: `
 CREATE TABLE feed_sources (id TEXT PRIMARY KEY, record TEXT NOT NULL, last_success TEXT);
 CREATE TABLE feed_items (id TEXT PRIMARY KEY, source_id TEXT NOT NULL REFERENCES feed_sources(id), record TEXT NOT NULL,
- published_at TEXT, fetched_at TEXT NOT NULL);
-CREATE INDEX feed_items_source_time ON feed_items(source_id,COALESCE(published_at,fetched_at) DESC);
+ published_at TEXT, fetched_at TEXT NOT NULL, sort_at TEXT NOT NULL);
+-- sort_at: publishedAt; undated items from a source's first collection sort below every dated item (backfill), later
+-- undated items by the time they were first collected.
+CREATE INDEX feed_items_source_time ON feed_items(source_id,sort_at DESC);
 ` },
 ];
 export const HUB_TABLES = ["schema_migrations", "accounts", "sessions", "invites", "audit_events", "login_failures",
