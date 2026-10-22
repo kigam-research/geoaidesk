@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/skills-shelf-instrument-light.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GAID 허브에 스킬 선반을 만들고 Workflow가 스킬의 판을 고정해 쓰게 함
 
