@@ -2,29 +2,22 @@
 import type { HubSkill, HubSkillRevision } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import { AuthoringError } from "../authoring/store.ts";
 import { digest, fileList, readArchive, treeHash } from "./archive.ts";
-import { shareable } from "./scan.ts";
-import { HubSkillStore, revisionState, type StoredHubSkill } from "./store.ts";
+import { isSkillAuthor, skillOwnerId, visibleSkill, type HubSkillRecordStore, type StoredHubSkill } from "./records.ts";
 
+export { visibleSkill };
 export function revisionOf(skill: StoredHubSkill, revision = skill.latestRevision) {
   const r = skill.revisions.find((r) => r.revision === revision);
   if (!Number.isSafeInteger(revision) || !r) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
   return r;
 }
-/** Visibility applies per revision too: a later licence must not expose earlier restricted files. */
-export function visibleSkill(skill: StoredHubSkill, user?: string | null): StoredHubSkill | null {
-  if (skill.author !== user && !shareable(revisionOf(skill).licence)) return null;
-  const revisions = skill.revisions.filter((r) => skill.author === user || shareable(r.licence));
-  if (!revisions.length) return null;
-  const latest = revisions.at(-1)!;
-  return { ...skill, revisions, latestRevision: latest.revision, description: latest.description, state: revisionState(latest), visibility: shareable(latest.licence) ? "hub" : "author" };
-}
-export async function requireVisible(store: HubSkillStore, id: string, user?: string | null, revision?: number) {
-  const skill = visibleSkill(await store.read(id), user);
+/** `actorId`: account id on a hub server, display name in the local shelf. */
+export async function requireVisible(store: HubSkillRecordStore, id: string, actorId?: string | null, revision?: number) {
+  const skill = visibleSkill(await store.read(id), actorId);
   if (!skill) throw new AuthoringError("스킬을 찾을 수 없습니다.", 404);
   revisionOf(skill, revision);
   return skill;
 }
-export async function skillView(store: HubSkillStore, skill: StoredHubSkill, user?: string | null): Promise<HubSkill> {
+export async function skillView(store: HubSkillRecordStore, skill: StoredHubSkill, actorId?: string | null): Promise<HubSkill> {
   const [stars, comments, entries] = await Promise.all([store.stars(skill.id), store.comments(skill.id), store.shared.list()]);
   const allowed = new Set(skill.revisions.map((r) => r.revision));
   const usedBy: HubSkill["usedBy"] = [];
@@ -38,9 +31,9 @@ export async function skillView(store: HubSkillStore, skill: StoredHubSkill, use
         usedBy.push({ entryId: e.entry.id, revision: Number(n), title: e.entry.title, skillRevision: pin.revision });
     }
   }
-  return { ...skill, usedBy, stars: Object.keys(stars).length, starredByMe: !!user && Object.hasOwn(stars, user), comments: comments.filter((c) => allowed.has(c.revision)).length };
+  return { ...skill, usedBy, mine: isSkillAuthor(skill, actorId), stars: Object.keys(stars).length, starredByMe: !!actorId && Object.hasOwn(stars, actorId), comments: comments.filter((c) => allowed.has(c.revision)).length };
 }
-export async function listHubSkills(store: HubSkillStore, options: { q?: string; user?: string | null } = {}): Promise<HubSkill[]> {
+export async function listHubSkills(store: HubSkillRecordStore, options: { q?: string; user?: string | null } = {}): Promise<HubSkill[]> {
   const query = options.q?.trim().toLocaleLowerCase();
   const records = (await store.list()).map((s) => visibleSkill(s, options.user)).filter((s): s is StoredHubSkill => !!s)
     .filter((s) => !query || [s.name, s.description, s.author, ...s.tags, ...s.formats].join(" ").toLocaleLowerCase().includes(query));
@@ -48,7 +41,7 @@ export async function listHubSkills(store: HubSkillStore, options: { q?: string;
   return views.sort((a, b) => b.stars - a.stars || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
 }
 /** Internal trusted read; HTTP callers must apply requireVisible first. No GitHub fetches. */
-export async function readHubSkillRevision(store: HubSkillStore, id: string, revision: number): Promise<{ skill: HubSkill; revision: HubSkillRevision; archive: Buffer }> {
+export async function readHubSkillRevision(store: HubSkillRecordStore, id: string, revision: number): Promise<{ skill: HubSkill; revision: HubSkillRevision; archive: Buffer }> {
   const skill = await store.read(id);
   const r = revisionOf(skill, revision);
   const archive = await store.archive(id, r.revision);
@@ -58,5 +51,5 @@ export async function readHubSkillRevision(store: HubSkillStore, id: string, rev
   const actual = fileList(entries);
   if (treeHash(entries) !== r.treeHash || JSON.stringify(actual) !== JSON.stringify([...r.files].sort((a, b) => a.path.localeCompare(b.path))))
     throw new AuthoringError("스킬 파일이 등록된 파일 목록이나 내용 지문과 맞지 않습니다.", 409);
-  return { skill: await skillView(store, skill, skill.author), revision: r, archive };
+  return { skill: await skillView(store, skill, skillOwnerId(skill)), revision: r, archive };
 }

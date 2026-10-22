@@ -1,6 +1,8 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { HubClient } from "../hub-client/client.ts";
 import { RemoteHubStore } from "../hub-client/remote-store.ts";
+import { RemoteHubSkillStore } from "../hub-client/remote-skills.ts";
+import { forgetRemoteSkills, setRemoteHubSkillProvider } from "../hub-skills/active.ts";
 import { setRemoteHubProvider } from "../hub-shared/active.ts";
 import { LibrarySync } from "../library/sync/index.ts";
 import { libraryStore, type LibraryStore } from "../library/store.ts";
@@ -22,6 +24,15 @@ export async function registerGeoHubServerRoutes(app: FastifyInstance, options: 
     const c = client.connection.current;
     const identity = client.identity;
     return identity && c.account ? { store: remote.forIdentity(identity), actor: { id: c.account.id, name: c.account.displayName } } : null;
+  });
+  const remoteSkills = new RemoteHubSkillStore(client, remote);
+  let skillsIdentity: string | null = null;
+  setRemoteHubSkillProvider(() => {
+    const c = client.connection.current;
+    const identity = client.identity;
+    // Records cached for Settings → Skills belong to one login on one server.
+    if (identity !== skillsIdentity) { forgetRemoteSkills(); skillsIdentity = identity; }
+    return identity && c.account ? { store: remoteSkills.forIdentity(identity, remote.forIdentity(identity)), actor: { id: c.account.id, name: c.account.displayName } } : null;
   });
   const background = () => {
     if (options.backgroundSync === false) return;
