@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-22T02:44:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
@@ -109,8 +109,9 @@ Official sources were curled on 2026-10-22. Verified Elsevier/Copernicus/Geoscie
 remain null due to conflicting units. Source list, limitations and synthetic evidence are below.
 
 ## Next steps
-1. Final checker verification (8/8) and diff review passed after official-source adoption. Submit with task finish;
-   the parent runs task complete and integration.
+<!-- task:closed -->
+Closed 2026-10-22T02:44:03Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial focused-test invocation lacked installed npm dependencies (vitest not found); npm ci completed successfully in both targets.
   All tests/typechecks ran. The initial provisioning count assertion still expected
