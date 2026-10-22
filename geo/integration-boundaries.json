@@ -784,9 +784,9 @@
     },
     {
       "path": "server/src/api/skills.ts, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, server/test/geo-hub-shared.test.ts",
-      "owner": "gaid-workflow-model",
+      "owner": "gaid-workflow-model, gaid-hub-skills--store",
       "status": "edited",
-      "responsibility": "Workflow terminology, skill origin/read-only file details, registration gate and installation preview regression checks."
+      "responsibility": "Workflow terminology, skill origin/read-only file details, registration gate and installation preview regression checks. Hub shelf installed-revision annotations on GET /skills and /skills/all."
     },
     {
       "path": "web/src/components/skills-panel.tsx",
