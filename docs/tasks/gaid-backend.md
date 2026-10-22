@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T04:47:04Z
+updated: 2026-10-22T05:25:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -57,6 +57,11 @@ Phases 1-2 done and proposal written, 2026-10-22; no code changes yet. Waiting f
   [세션] 01a09e72-00e4-7c51-8654-650c96c01f0e:29): outside the intranet the internal IPs are unreachable; port opening or
   a VPN such as Tailscale needs separate permission (tailcat via DERP worked).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Coordination 2026-10-22 (route 0095d2a0c339, from gaid-hub-skills): its four storage/auth assumptions (immutable
+  sha256 skill archives like Workflow packages; skill entry metadata moves with hub entries; author/reviewer identity
+  from accounts, display name "not verified" until then; installation stays client-side) do not conflict with any of the
+  three options. Under option 가 entry metadata becomes DB rows rather than JSON files; the shape carries over. Phase 1
+  should keep entry storage generic enough to add a skill entry kind and a reviewer role later. No reply sent.
 ## Open items
 - [결정] 공유 백엔드 구성 — 가) 원내 GAID 허브 서버 — 나) 원내 PocketBase — 다) Supabase Free 서울 — 권장: 가) 비용 없음, 지금 허브 코드 재사용, 미공개 자료 원내 유지, 기관 서버 이전이 가장 쉬움 — 막힌 일: 1단계 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
 - [결정] 1단계 범위 — 가) 계정 + 공유 허브 이전 + 기존 허브 자료 5건 + 백업 — 나) 가) + 앱 안 알림 — 다) 가) + 개인 서재 동기화 — 권장: 가) 공유가 실제로 되는 최소 범위 — 막힌 일: 1단계 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
