@@ -124,6 +124,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         .filter((i) => !inFolder || i.collectionIds.some((c) => inFolder.has(c)))
         .filter((i) => q.filter !== "unread" || unread(i))
         .filter((i) => q.filter !== "cited" || uses.counts(i).notes > 0)
+        .filter((i) => q.filter !== "mine" || Boolean(i.ownWork))
         .filter((i) => !inProject || inProject.has(i.id))
         .filter((i) => {
           if (!terms.length) return true;
@@ -143,6 +144,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
           gaid: all.filter((i) => i.source === "gaid").length,
           unread: all.filter(unread).length,
           cited: all.filter((i) => uses.counts(i).notes > 0).length,
+          mine: all.filter((i) => i.ownWork).length,
         },
         collections,
         folderCounts: Object.fromEntries(collections.map((c) => {

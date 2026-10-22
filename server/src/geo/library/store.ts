@@ -186,7 +186,7 @@ export class LibraryStore {
   }
 
   /** Adds a GAID-managed item whose metadata the researcher confirmed. Duplicate DOIs are refused (409). */
-  async addGaidItem(input: { csl: unknown; metadataOrigin: MetadataOrigin; collectionIds?: string[]; tags?: string[]; pdfSha256?: string; signals?: LibraryItem["signals"] }): Promise<LibraryItem> {
+  async addGaidItem(input: { csl: unknown; metadataOrigin: MetadataOrigin; collectionIds?: string[]; tags?: string[]; pdfSha256?: string; signals?: LibraryItem["signals"]; ownWork?: LibraryItem["ownWork"] }): Promise<LibraryItem> {
     await this.load();
     const csl = validCsl(input.csl);
     if (this.items.size >= LIBRARY_LIMITS.items) throw new LibraryError("Library is full", 413);
@@ -220,6 +220,7 @@ export class LibraryStore {
       addedAt: at,
       updatedAt: at,
       ...(Array.isArray(input.signals) && input.signals.length ? { signals: input.signals.slice(0, 20) } : {}),
+      ...(input.ownWork ? { ownWork: input.ownWork } : {}),
     };
     return this.put(item);
   }
@@ -405,5 +406,6 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): 
     metadataConfirmed: item.metadataConfirmed,
     addedAt: item.addedAt,
     ...(isRetracted(item.signals) ? { retracted: true } : {}),
+    ...(item.ownWork ? { ownWork: true } : {}),
   };
 }

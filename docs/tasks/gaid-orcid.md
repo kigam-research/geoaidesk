@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:11:55Z
+updated: 2026-10-22T09:40:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -35,11 +35,55 @@ parallel. gaid-user-acceptance is testing in the review app (PC74 :3000) — do 
 Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Phase 1 (feasibility) running. PC74 reachability checked 2026-10-22 (curl, HTTP 200): orcid.org, pub.orcid.org
+  (anonymous /v3.0/<iD>/works returns JSON with DOIs), sandbox.orcid.org, pub.sandbox.orcid.org, OpenAlex, Crossref.
+- Oracle xhigh research done 2026-10-22: session `i-am-building-an-orcid`, vault note
+  `웹 조사/geoaidesk/2026-10-22-i-am-building-an-orcid--e234c882d8.md` (prompt/output also in
+  ~/data/geoaidesk/work/gaid-orcid/oracle-q1.{md,out}).
+- Feasibility findings (official ORCID pages, checked 2026-10-22):
+  - Free Public API covers everything requested: authenticated iD (`/authenticate` or OIDC `openid`), public
+    works/employment/education read. Member API only adds writing to ORCID / read-limited data — not needed.
+  - Limits: anonymous 12 req/s, burst 40, 25,000 reads/day/IP; registered public client 100,000/day. No polling
+    (Public API ToS 2024-10-23). Public credentials belong to one individual (one set per person, not shareable);
+    client_secret must stay server-side; non-commercial use.
+  - OIDC discovery (fetched): code / id_token / id_token token, `client_secret_post` only, no PKCE advertised,
+    claims sub/name/given_name/family_name (no email). Redirect URI FAQ: "only HTTPS URIs are accepted in production.
+    You can test using HTTP URIs" (sandbox). Whether Developer Tools accepts http://127.0.0.1 for a production public
+    client is unverified — only a real registration settles it.
+  - Anonymous `GET https://pub.orcid.org/v3.0/<iD>/works` works from PC74 (HTTP 200 JSON with DOIs, verified curl).
+  - Korea: KISTI is a member (Korea DOI Center auto-update); no Korean consortium or KIGAM membership confirmed.
+  - Display guidelines: official iD icon + https://orcid.org/<iD> link; an iD not proven by OAuth must be shown
+    as unauthenticated.
+- Existing hooks: library import preview/confirm (`/geo/library/import`), metadata client
+  (`server/src/geo/library/metadata/`), hub account contract `web/src/geo/contracts/hub-server.ts` (owned by gaid-hub-server-trial).
 ## Next steps
-1. (the next session's first action)
+1. Read the Oracle answer, `task research-save i-am-building-an-orcid`, write a short plan and ask the user to confirm scope.
+Blocked: waiting for the Oracle research run (session i-am-building-an-orcid) started 2026-10-22.
 ## Failed approaches
 ## Notes and decisions
+- User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
+  owner "제 개인 ORCID 계정 (Recommended)".
+  - Phase 1 (now, no user action): researcher enters an ORCID iD (shown as unauthenticated per ORCID display
+    guidelines), "ORCID에서 내 논문 가져오기" reads public works anonymously from pub.orcid.org, fills metadata by DOI
+    (Crossref → OpenAlex, else the ORCID record), shows new / already in library / possible duplicate, and adds only
+    what the researcher keeps; kept and matched items are marked as the researcher's own works (basis of 내 논문).
+  - Phase 2 (after the user registers a sandbox, then production, public API client): authenticated iD via OIDC,
+    client secret only in hub server config, iD on hub account/entries — interface agreed through the hub with
+    gaid-hub-server-trial. Not in phase 1.
+  - Not built: writing to ORCID (Member API), periodic sync/polling (ToS), ORCID as hub login, institute-wide
+    discovery.
+- Phase 1 design (contract `web/src/geo/contracts/orcid.ts`):
+  - User-level profile `<library root>/orcid.json` (local, like zotero.json; not synced).
+  - Routes `server/src/geo/routes/orcid.ts`: GET/PUT/DELETE `/geo/orcid`, POST `/geo/orcid/works` (preview from
+    ORCID only, fast), POST `/geo/orcid/works/confirm` (enrich chosen DOIs, bulk-read non-DOI details, add or mark).
+  - Library: `MetadataOrigin` gains `orcid`; `LibraryItem.ownWork {orcid, putCode, markedAt}`; list filter `mine` and
+    count; Zotero mirror refresh and merge keep `ownWork`.
+- Packages / owners / integration order:
+  1. Contract + server (writer, me): `web/src/geo/contracts/orcid.ts`, `server/src/geo/orcid/`,
+     `server/src/geo/routes/orcid.ts`, library store/routes/zotero-service small edits, server tests.
+  2. UI (child writer after the contract is pushed): `web/src/geo/orcid/`, library screen seam, locales
+     `web/src/geo/locales/orcid/`, ORCID icons (official assets), screenshots per ui-guide §12.
+  3. Integrate, scripts/check, report.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
