@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-figure-check.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # 분석 결과를 논문 그림으로, 연구 연결을 지도로: 그림 기록·저널 그림 점검·연결 지도
 
