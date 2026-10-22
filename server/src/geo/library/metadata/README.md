@@ -12,11 +12,11 @@ Import `server/src/geo/library/metadata/index.ts`:
 |---|---|
 | `identifyPdf(file)` | First three pages only: DOI candidates, arXiv IDs, first-page title guess, `textFound`, read/empty pages, tool version, optional extraction error. No OCR or arXiv request. |
 | `createMetadataClient(options)` | Reusable client accepting `fetch`, `mailto`, optional keys, deadline, clock/sleep and maximum cooldown wait. Reuse it so rate state survives across requests. |
-| `lookupDoi(doi, provider?)` | Crossref CSL mapping, then OpenAlex fallback; optional provider forces one for smoke checks. Throws `MetadataLookupError` with redacted provider errors if none resolves the exact DOI. |
+| `lookupDoi(doi, provider?)` | Crossref CSL mapping, then OpenAlex, then DataCite CSL (DataCite first for arXiv `10.48550/*` DOIs, mapped as preprints; OpenAlex answers those with the later journal DOI); optional provider forces one for smoke checks. Throws `MetadataLookupError` with redacted provider errors if none resolves the exact DOI. |
 | `searchByTitle(title, authorHint?)` | Crossref bibliographic query, OpenAlex search and optional KCI; ranked candidates, partial-provider errors and `requiresSelection: true`. Same DOI from different sources stays separate so disagreements remain visible. |
 | `searchKci(title, authorHint?)` | KCI title search, or `skipped: true` and no request when the key is absent. |
 | `resolveUrl(url)` | DOI candidates from path/DOI query parameters, else bounded HTML `citation_doi`, `dc.identifier`, `prism.doi` tags; URL, method, no inferred title metadata. |
-| `doiCandidates`, `normalizeDoi`, `arxivCandidates` | Pure identifier helpers. |
+| `doiCandidates`, `normalizeDoi`, `arxivCandidates`, `arxivDoi` | Pure identifier helpers (`arxivDoi`: arXiv id → its DataCite DOI; the PDF lookup route uses it when a PDF has an arXiv id and no DOI). |
 
 `MetadataRecord` contains `csl`, `metadataOrigin`, `metadataConfirmed: false`, `signals`.
 Signals preserve direction (`update-to:retraction`, `updated-by:correction`, `is-corrected-by`, `update-type:correction`, `is_retracted`). Crossref update assertions also retain their source, record ID, label and effective timestamp when supplied. A

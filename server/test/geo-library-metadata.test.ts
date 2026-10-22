@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createMetadataClient, doiCandidates, identifyPdf, normalizeDoi } from "../src/geo/library/metadata/index.ts";
+import { arxivDoi, createMetadataClient, doiCandidates, identifyPdf, normalizeDoi } from "../src/geo/library/metadata/index.ts";
 
 const fixture = async (name: string) => JSON.parse(await readFile(new URL(`./fixtures/library/${name}.json`, import.meta.url), "utf8"));
 const json = (v: unknown, status = 200, headers = {}) => new Response(JSON.stringify(v), { status, headers: { "content-type": "application/json", ...headers } });
@@ -48,6 +48,35 @@ describe("metadata services", () => {
     expect(new URL(String(vi.mocked(f).mock.calls[1][0])).searchParams.get("api_key")).toBe("fixture-key");
     await createMetadataClient({ fetch: mockFetch((url) => { expect(url.searchParams.has("api_key")).toBe(false); return json(value); }), openAlexApiKey: "" })
       .lookupDoi("10.1038/nphys1170", "openalex");
+  });
+
+  // gaid-first-use-fixes: an arXiv PDF got five unrelated title-search suggestions. Its DataCite DOI names the preprint;
+  // OpenAlex answers that DOI with the later journal article (a different DOI), which must not be offered as this PDF.
+  it("looks up an arXiv identifier through DataCite as a preprint, before Crossref and OpenAlex", async () => {
+    expect(arxivDoi("2005.07939v1")).toBe("10.48550/arxiv.2005.07939");
+    expect(arxivDoi("hep-th/9901001v2")).toBe("10.48550/arxiv.hep-th/9901001");
+    const record = { type: "article-journal", DOI: "10.48550/ARXIV.2005.07939", "container-title": "arXiv", publisher: "arXiv", version: "1",
+      title: "Predicting into unknown space? Estimating the area of applicability of spatial prediction models",
+      author: [{ family: "Meyer", given: "Hanna" }, { family: "Pebesma", given: "Edzer" }], issued: { "date-parts": [[2020]] },
+      URL: "https://arxiv.org/abs/2005.07939" };
+    const f = mockFetch((url) => url.host === "api.datacite.org" ? json(record) : json({}, 404));
+    const r = await createMetadataClient({ fetch: f }).lookupDoi(arxivDoi("2005.07939v1"));
+    expect(new URL(String(vi.mocked(f).mock.calls[0][0])).host).toBe("api.datacite.org");
+    expect(f).toHaveBeenCalledTimes(1);
+    expect(r).toMatchObject({ metadataOrigin: "datacite", metadataConfirmed: false, csl: { type: "article", DOI: "10.48550/arxiv.2005.07939",
+      "container-title": "arXiv", author: [{ family: "Meyer", given: "Hanna" }, { family: "Pebesma", given: "Edzer" }] } });
+    const journal = { title: record.title, doi: "https://doi.org/10.1111/2041-210x.13650", publication_year: 2021 };
+    const later = mockFetch((url) => url.host === "api.datacite.org" ? json({}, 404) : url.host === "api.openalex.org" ? json(journal) : json({}, 404));
+    await expect(createMetadataClient({ fetch: later }).lookupDoi(arxivDoi("2005.07939"))).rejects.toThrow(/datacite: HTTP 404/);
+  });
+
+  it("asks DataCite last for a DOI that Crossref and OpenAlex do not know", async () => {
+    const f = mockFetch((url) => url.host === "api.datacite.org"
+      ? json({ type: "dataset", DOI: "10.1594/PANGAEA.123", title: "Core logs", author: [{ literal: "Survey team" }], publisher: "PANGAEA" })
+      : json({}, 404));
+    const r = await createMetadataClient({ fetch: f }).lookupDoi("10.1594/pangaea.123");
+    expect(vi.mocked(f).mock.calls.map(([u]) => new URL(String(u)).host)).toEqual(["api.crossref.org", "api.openalex.org", "api.datacite.org"]);
+    expect(r.csl).toMatchObject({ type: "dataset", author: [{ literal: "Survey team" }], publisher: "PANGAEA" });
   });
 
   it("paces Crossref from response headers and obeys Retry-After without live waiting", async () => {

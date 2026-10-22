@@ -372,14 +372,20 @@ function MarkdownViewer({
   path,
   content,
   projectId,
+  onOpenFile,
 }: {
   path: string;
   content: string;
   projectId: string;
+  onOpenFile?: (path: string) => void;
 }) {
+  // GeoAIDesk (gaid-first-use-fixes): links resolve against the file's own folder, like its images, and open in the
+  // file panel.
   return (
     <div className="h-full overflow-auto p-6 text-sm [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-      <MessageResponse>{resolveMarkdownImageUrls(content, path, projectId)}</MessageResponse>
+      <MessageResponse baseDir={path.substring(0, path.lastIndexOf("/") + 1)} onOpenFile={onOpenFile}>
+        {resolveMarkdownImageUrls(content, path, projectId)}
+      </MessageResponse>
     </div>
   );
 }
@@ -389,10 +395,12 @@ const LOAD_ERROR_MARKER = /^\[(?:Error|오류):\s*/;
 
 function FileViewer({
   path, name, content, loading, projectId, onRetry, onSave, revealLine, revealCell, revealToken, previewLimited, onDownload,
+  onOpenFile,
 }: {
   path: string; name: string | null; content: string | null; loading: boolean;
   projectId: string;
   onRetry?: () => void;
+  onOpenFile?: (path: string) => void;
   previewLimited?: boolean;
   onDownload?: () => void;
   onSave?: (content: string) => Promise<boolean>;
@@ -452,7 +460,7 @@ function FileViewer({
   }
   if (content === null) return null;
   if (cat === "markdown") {
-    return <MarkdownViewer path={path} content={content} projectId={projectId} />;
+    return <MarkdownViewer path={path} content={content} projectId={projectId} onOpenFile={onOpenFile} />;
   }
   if (cat === "csv") return <CsvViewer key={path} content={content} />;
   if (cat === "notebook") return (
@@ -2018,6 +2026,7 @@ export function FilePreviewPanel({
               loading={loadingFile}
               previewLimited={activeTab?.previewLimited}
               onDownload={() => onDownload(selectedPath)}
+              onOpenFile={onTabSelect}
               onRetry={onRetry ? () => onRetry(selectedPath) : undefined}
               onSave={(content) => onSaveText(selectedPath, content)}
               revealLine={
