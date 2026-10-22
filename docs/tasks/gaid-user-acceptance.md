@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T08:59:46Z
+updated: 2026-10-22T09:02:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -55,8 +55,17 @@ Outside check: no outside check.
   api-key minimax/MiniMax-M3, $1 cap, workflow well-log-qc), verify the tester's claims (open cited PDF pages myself,
   run the figure check myself, read Zotero state through the API), write the report.
 - No child writers: no code changes beyond the harness option.
+- Started 2026-10-22 ~18:00 KST: tester reader 401323b8-45d4-4d1f-a59d-f9d39e885e29 (codex gpt-6.1-sol high, fast; verified),
+  prompt ~/data/geoaidesk/work/gaid-user-acceptance/tester-prompt.md, materials …/materials/ (3 public PDFs: Ploton 2020
+  Nat Commun, Meyer & Pebesma 2020 arXiv, Valavi 2018 bioRxiv; 25_9-1.las), its notes/screens …/tester/.
+- Route-trial jobs (attach to :18000, data home ~/.geoaidesk, workflow well-log-qc): job-…-1 chatgpt-signin openai/gpt-6.1-sol
+  (project "검토용 - 수용 시험 ChatGPT 로그인 경로", connection passed at start), job-…-2 api-key minimax/MiniMax-M3 $1 cap
+  (project "검토용 - 수용 시험 개인 API 키 경로").
+- Asked the user (this tab) to save a valid Zotero web key with write access.
 ## Next steps
-1. Start the tester reader; start the two route-trial jobs; ask the user for a valid Zotero web key.
+1. On job exits: read out/record.json of both runs; on tester finish: verify every claim (cited pages via pdftotext, figure check
+   rerun, Zotero state via GET /geo/library/zotero); if the key is renewed, tell the tester to repeat goal C.
+2. Write reports/2026-10-22-gaid-user-acceptance/index.md; tell the hub testing is done (gaid-hub-server-trial waits).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -72,6 +81,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-user-acceptance-20261022T085938.208885Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-user-acceptance-20261022T085952.464306Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
