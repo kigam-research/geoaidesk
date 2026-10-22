@@ -60,7 +60,8 @@ async function as(name: string) {
   const app = Fastify();
   apps.push(app);
   await registerGeoHubServerRoutes(app, { client, library: new LibraryStore(join(dir, "library")), backgroundSync: false });
-  await registerHubSkillRoutes(app, { agentDir: join(dir, "install-agent"), catalogue });
+  // Default agentDir: the Settings → Skills annotation reads package origins from it, as in the live routes.
+  await registerHubSkillRoutes(app, { catalogue });
   await app.ready();
   const call = async (method: "GET" | "POST" | "PUT", path: string, payload?: unknown) => {
     const res = await app.inject({ method, url: path, ...(payload === undefined ? {} : { payload: payload as object }) });
