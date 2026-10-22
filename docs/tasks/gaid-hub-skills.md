@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:02:02Z
+updated: 2026-10-22T06:03:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -33,9 +33,12 @@ Phase 2 (implementation) started 2026-10-22 after the user chose all recommended
   `skill.hubRevision`), `WorkflowSkillState.hub`, package origin kind `gaid-hub-skill` + `hubSkill`
   (`server/src/geo/methods/package-origin.ts`, `MethodOrigin`), pure pin state `server/src/geo/methods/hub-pins.ts`.
 - ADR docs/adr/2026-10-22-hub-managed-skills.md; glossary/terminology "허브 스킬".
-- Children: see Notes and decisions (work packages); IDs recorded there once started.
+- Children running (started 2026-10-22): A `gaid-hub-skills--store` (Paseo agent 719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e,
+  worktree ~/worktrees/geoaidesk/gaid-hub-skills--store, prompt ~/data/geoaidesk/work/gaid-hub-skills/child-store.md);
+  B `gaid-hub-skills--ui` (agent af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188, worktree ~/worktrees/geoaidesk/gaid-hub-skills--ui,
+  prompt .../child-ui.md). On each finish notice: `task complete gaid-hub-skills--<child>`.
 ## Next steps
-1. Start children A (hub-skill-store) and B (hub-skill-ui); while they run, do C1 (Workflow runtime pieces that need only
+1. While A and B run, do C1 (Workflow runtime pieces that need only
    the shared interface: exposure, CLI export, workflow-view, readiness rendering of hub states).
 2. After A completes: C2 myself (Workflow install pulls pinned hub skills, readiness uses A's store for `suspended`,
    registration validates hub refs, authoring suggestions), then sync B, real-app check, scripts/check, report §3.9+.
