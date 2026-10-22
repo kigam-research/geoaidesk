@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:40:01Z
+updated: 2026-10-22T09:42:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -54,11 +54,23 @@ Outside check: no outside check.
   - Korea: KISTI is a member (Korea DOI Center auto-update); no Korean consortium or KIGAM membership confirmed.
   - Display guidelines: official iD icon + https://orcid.org/<iD> link; an iD not proven by OAuth must be shown
     as unauthenticated.
+- Phase 1 server done and pushed (d47244486e34 + follow-up): contract `web/src/geo/contracts/orcid.ts`,
+  `server/src/geo/orcid/{client,works,service}.ts`, routes `server/src/geo/routes/orcid.ts`, library `ownWork` / filter
+  `mine` / origin `orcid`, Zotero refresh+merge keep `ownWork`. Verified: `cd server && npx tsc --noEmit -p .`;
+  `npx vitest run test/geo-library*.test.ts test/geo-orcid.test.ts test/geo-hub-e2e.test.ts` (9 files, 110 tests pass);
+  own-work Zotero test fails without the keep line (checked). Live smoke (real pub.orcid.org + Crossref, test iD
+  0000-0002-1825-0097, temp library under ~/data/geoaidesk/work/gaid-orcid/smoke/): link → 6 works → 6 added from Crossref.
+- UI: child gaid-orcid--ui started 2026-10-22 (general work).
 - Existing hooks: library import preview/confirm (`/geo/library/import`), metadata client
   (`server/src/geo/library/metadata/`), hub account contract `web/src/geo/contracts/hub-server.ts` (owned by gaid-hub-server-trial).
 ## Next steps
-1. Read the Oracle answer, `task research-save i-am-building-an-orcid`, write a short plan and ask the user to confirm scope.
-Blocked: waiting for the Oracle research run (session i-am-building-an-orcid) started 2026-10-22.
+1. Wait for child gaid-orcid--ui (writer 9f458bbf-4f8e-4cff-a5a0-2274bd08a13e, worktree ~/worktrees/geoaidesk/gaid-orcid--ui,
+   brief ~/data/geoaidesk/work/gaid-orcid/child-ui.md); on its finish notice run `task complete gaid-orcid--ui`, review
+   the UI diff, integrate (`task sync` if needed), run scripts/check.
+2. Write report reports/2026-10-22-gaid-orcid/index.md (phase 1 result, screenshots from the child, phase 2 steps for
+   the user), humanizer pass, `task review-copy`.
+3. Phase 2 after the user's ORCID client registration (sandbox first): ask in this tab; agree the hub account interface
+   with gaid-hub-server-trial through the hub.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app

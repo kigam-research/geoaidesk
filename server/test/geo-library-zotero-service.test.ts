@@ -56,9 +56,12 @@ describe("Zotero service", () => {
     expect(after.find((i) => i.zotero?.itemKey === "PAPER002")?.removedFromSourceAt).toBeTruthy();
     expect(after.find((i) => i.zotero?.itemKey === "PAPER001")?.id).toBe(first.id);
     expect(after.filter((i) => !i.removedFromSourceAt)).toHaveLength(2);
+    // An own-work mark from ORCID (gaid-orcid) is GAID-side and survives the Zotero refresh.
+    await store.mutate(first.id, (next) => { next.ownWork = { orcid: "0000-0002-1825-0097", putCode: 7, markedAt: "2026-10-22T00:00:00.000Z" }; });
     fake.addItem("PAPER001", { collections: ["COLLECT1"], citationKey: "hong2026" }); // edited in Zotero
     await service.syncAll();
     expect((await store.get(first.id)).citationKey).toBe("hong2026");
+    expect((await store.get(first.id)).ownWork).toMatchObject({ putCode: 7 });
   });
 
   it("reports a closed Zotero or a disabled local API without touching the library", async () => {
