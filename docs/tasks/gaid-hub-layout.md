@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T03:38:54Z
+status: done
+updated: 2026-10-22T03:38:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"849a23ad-50f2-46d5-a50d-429f6e051f84","pid":3074695,"provider":"claude","session":"3c8f1177-4ae1-4859-8c7e-ac80e5eff692","start":"52649086","token":"0f5c55bfa3a4a46f74e8582d253c36414bdd254b78e1e7147c11f4a48355f209"}
 branch: task/gaid-hub-layout
 target: main
@@ -35,7 +35,9 @@ Brief report with screenshots. Own GAID_HOME under ~/data/geoaidesk/work/gaid-hu
 - Re-verify: `cd web && npx vitest run src/geo/hub/`; `scripts/check` (log ~/data/geoaidesk/work/gaid-hub-layout/logs/check.log).
 - Data: GAID_HOME ~/data/geoaidesk/work/gaid-hub-layout/home (skill-hub copied from ~/.geoaidesk, read-only source).
 ## Next steps
-1. task finish (scripts/check passed: EXIT=0; server 2069 passed/8 skipped, web 1156, geo 49).
+<!-- task:closed -->
+Closed 2026-10-22T03:38:55Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
