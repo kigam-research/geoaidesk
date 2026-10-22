@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/real-hub-list.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GAID 공유 백엔드: 계정과 원내 GAID 허브 서버
 
