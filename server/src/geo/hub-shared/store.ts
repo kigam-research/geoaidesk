@@ -10,6 +10,7 @@ import type {
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import type { HubComment, HubEntry, HubFolder } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { AuthoringError, newId, now } from "../authoring/store.ts";
+import type { Actor, HubRecordStore } from "./records.ts";
 
 export const sharedDir = () =>
   resolve(process.env.GAID_HUB_SHARED_DIR || join(KADY_PI_AGENT_DIR, "skill-hub", "shared"));
@@ -38,7 +39,9 @@ export interface StoredEntry {
 
 const missing = (e: unknown) => (e as NodeJS.ErrnoException).code === "ENOENT";
 
-export class SharedHubStore {
+/** Local file store (development / single PC); trusts the caller's actor like before accounts existed. */
+export class SharedHubStore implements HubRecordStore {
+  readonly kind = "local" as const;
   readonly root: string;
   private queues = new Map<string, Promise<unknown>>();
   constructor(root = sharedDir()) {
@@ -71,11 +74,11 @@ export class SharedHubStore {
   async folders(): Promise<HubFolder[]> {
     return this.json<HubFolder[]>(join(this.root, "folders.json"));
   }
-  async addFolder(name: string, user: string): Promise<HubFolder> {
+  async addFolder(name: string, actor: Actor): Promise<HubFolder> {
     return this.serial("folders", async () => {
       const folders = await this.folders();
       if (folders.some((f) => f.name === name)) throw new AuthoringError("같은 이름의 폴더가 있습니다.", 409);
-      const folder = { id: newId("folder"), name, createdBy: user, createdAt: now() };
+      const folder = { id: newId("folder"), name, createdBy: actor.name, createdAt: now() };
       folders.push(folder);
       await this.atomic(join(this.root, "folders.json"), folders);
       return folder;
@@ -121,8 +124,15 @@ export class SharedHubStore {
       (a, b) => b.entry.updatedAt.localeCompare(a.entry.updatedAt) || a.entry.id.localeCompare(b.entry.id),
     );
   }
-  async write(record: StoredEntry) {
+  async write(record: StoredEntry, _actor?: Actor) {
     await this.atomic(join(this.entryDir(record.entry.id), "entry.json"), record);
+  }
+  async recordInstall(id: string, install: AuthoringInstall, _actor?: Actor) {
+    await this.serial(id, async () => {
+      const record = await this.read(id);
+      record.installs.push(install);
+      await this.write(record);
+    });
   }
   async bytes(id: string, file: string): Promise<Buffer> {
     try {
@@ -132,7 +142,7 @@ export class SharedHubStore {
       throw e;
     }
   }
-  async immutableBytes(id: string, file: string, bytes: Buffer) {
+  async immutableBytes(id: string, file: string, bytes: Buffer, _actor?: Actor) {
     const target = this.within(id, file);
     await mkdir(dirname(target), { recursive: true });
     const tmp = `${target}.${randomUUID()}.tmp`;
@@ -162,14 +172,15 @@ export class SharedHubStore {
       throw e;
     }
   }
-  async addComment(id: string, user: string, body: string): Promise<HubComment> {
+  async addComment(id: string, actor: Actor, body: string): Promise<HubComment> {
     return this.serial(id, async () => {
       const record = await this.read(id);
       await this.comments(id); // Never append to a malformed/truncated log.
       const comment = {
         id: newId("comment"),
         entryId: id,
-        author: user,
+        author: actor.name,
+        ...(actor.id !== actor.name ? { authorId: actor.id } : {}),
         body,
         revision: record.entry.latestRevision,
         at: now(),
@@ -186,7 +197,8 @@ export class SharedHubStore {
       throw e;
     }
   }
-  async star(id: string, user: string, on: boolean) {
+  async star(id: string, actor: Actor, on: boolean) {
+    const user = actor.id;
     return this.serial(id, async () => {
       await this.read(id);
       const stars = Object.assign(Object.create(null) as Record<string, true>, await this.stars(id));

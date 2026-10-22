@@ -1,4 +1,8 @@
-/** Institute-shared method registry. Display-name identity is intentionally not account authentication. */
+/**
+ * Shared hub routes. The record store and the actor come per request from `resolveHub` (ADR
+ * docs/adr/2026-10-22-gaid-hub-server.md): a logged-in institute hub server account, or the local store with the display
+ * name from X-GAID-User (not account authentication).
+ */
 import { procedureSteps, workflowDocFor } from "../workflow-doc.ts";
 import { gunzipSync } from "node:zlib";
 import { readTar } from "../tar.ts";
@@ -15,7 +19,6 @@ import type {
   RegisterBody,
   SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
-import { HUB_USER_HEADER } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
 import { structuredDraft } from "../authoring/workflow.ts";
@@ -28,31 +31,25 @@ import { geoCatalogueActive, loadGeoCatalogue } from "../catalogue.ts";
 import type { GeoWorkflow } from "../catalogue-types.ts";
 import { countRegisteredMethodTrials } from "../methods/trials.ts";
 import { openEntryForEdit } from "./edit.ts";
-import { SharedHubStore, type RegisteredSnapshot, type StoredEntry } from "./store.ts";
+import type { RegisteredSnapshot, StoredEntry } from "./store.ts";
+import { hubUser, localHubStore, resolveHub, type ResolvedHub } from "./active.ts";
+import { isEntryAuthor, type Actor, type HubRecordStore } from "./records.ts";
+
+export { hubUser };
 import { hubSearchFields, matchesHubSearch } from "./search.ts";
 
 export interface SharedHubOptions extends InstallDeps {
-  store?: SharedHubStore;
+  /** A fixed store (tests); default: per request, the hub server account or the local store. */
+  store?: HubRecordStore;
   authoringStore?: AuthoringStore;
   vocabulary?: Vocabulary;
   /** Tests can supply catalogue cards without enabling/fetching a catalogue. */
   catalogueWorkflows?: () => GeoWorkflow[];
 }
 
-export function hubUser(req: FastifyRequest): string | null {
-  const header = req.headers[HUB_USER_HEADER.toLowerCase()];
-  if (typeof header !== "string") return null;
-  try {
-    const name = decodeURIComponent(header).trim();
-    return name && [...name].length <= 40 && !/[\u0000-\u001f\u007f]/.test(name) ? name : null;
-  } catch {
-    return null;
-  }
-}
-const userRequired = (req: FastifyRequest) => {
-  const name = hubUser(req);
-  if (!name) throw new AuthoringError("허브에서 사용할 이름을 1–40자로 입력해 주세요.", 401);
-  return name;
+const actorRequired = (hub: ResolvedHub): Actor => {
+  if (!hub.actor) throw new AuthoringError("허브에서 사용할 이름을 1–40자로 입력해 주세요.", 401);
+  return hub.actor;
 };
 const text = (v: unknown, label: string, max: number, optional = false) => {
   if (optional && v === undefined) return "";
@@ -78,12 +75,12 @@ const snapshotOf = (record: StoredEntry, revision?: string): RegisteredSnapshot 
 export async function registerSharedHubRoutes(
   app: FastifyInstance,
   options: SharedHubOptions = {},
-): Promise<SharedHubStore> {
-  const store = options.store ?? new SharedHubStore();
+): Promise<HubRecordStore> {
   const authoring = options.authoringStore ?? getAuthoringStore(app);
-  await store.initialize();
+  await (options.store ?? localHubStore()).initialize();
+  const hubOf = (req: FastifyRequest) => resolveHub(req, options.store);
 
-  const entryView = async (record: StoredEntry, user: string | null): Promise<HubEntry> => {
+  const entryView = async (store: HubRecordStore, record: StoredEntry, actor: Actor | null): Promise<HubEntry> => {
     const [stars, comments] = await Promise.all([store.stars(record.entry.id), store.comments(record.entry.id)]);
     const identities = new Map<string, Set<string>>();
     for (const snapshot of Object.values(record.snapshots)) {
@@ -109,7 +106,8 @@ export async function registerSharedHubRoutes(
       implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       recipe: Boolean(snapshotOf(record).draft.workflow && snapshotOf(record).draft.recipe),
       stars: Object.keys(stars).length,
-      starredByMe: user !== null && Object.hasOwn(stars, user),
+      starredByMe: actor !== null && Object.hasOwn(stars, actor.id),
+      mine: isEntryAuthor(record.entry, actor),
       comments: comments.length,
       trials,
     };
@@ -127,22 +125,27 @@ export async function registerSharedHubRoutes(
       reply.header("Cache-Control", "no-store");
       return payload;
     });
-    // All shared mutations require an explicitly supplied valid display name, before body parsing.
+    // All shared mutations require a named actor (account or valid display name), before body parsing.
     scope.addHook("onRequest", async (req) => {
-      if (req.method !== "GET" && req.method !== "HEAD") userRequired(req);
+      if (req.method !== "GET" && req.method !== "HEAD") actorRequired(hubOf(req));
     });
 
-    scope.get("/geo/hub/me", async (req) => ({ name: hubUser(req) }));
-    scope.get("/geo/hub/folders", async () => {
+    scope.get("/geo/hub/me", async (req) => {
+      const hub = hubOf(req);
+      return { name: hub.actor?.name ?? null, ...(hub.account ? { account: true } : {}) };
+    });
+    scope.get("/geo/hub/folders", async (req) => {
+      const { store } = hubOf(req);
       const [folders, entries] = await Promise.all([store.folders(), store.list()]);
       return {
         folders: folders.map((f) => ({ ...f, entries: entries.filter((e) => e.entry.folderId === f.id).length })),
       };
     });
     scope.post<{ Body: { name: string } }>("/geo/hub/folders", async (req, reply) =>
-      reply.code(201).send(await store.addFolder(text(req.body?.name, "폴더 이름", 80), userRequired(req))),
+      reply.code(201).send(await hubOf(req).store.addFolder(text(req.body?.name, "폴더 이름", 80), actorRequired(hubOf(req)))),
     );
     scope.get<{ Querystring: { folder?: string; q?: string } }>("/geo/hub/entries", async (req) => {
+      const { store, actor } = hubOf(req);
       const query = req.query.q?.trim().toLocaleLowerCase();
       const taxonomy = (options.vocabulary ?? loadVocabulary()).taxonomy;
       const labels = new Map(Object.values(taxonomy).flat().map((term) => [
@@ -156,13 +159,15 @@ export async function registerSharedHubRoutes(
           return matchesHubSearch(query, hubSearchFields(e, snapshotOf(record).draft, labels));
         },
       );
-      const entries = await Promise.all(records.map((r) => entryView(r, hubUser(req))));
+      const entries = await Promise.all(records.map((r) => entryView(store, r, actor)));
       entries.sort((a, b) => b.stars - a.stars || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
       return { entries };
     });
     scope.post<{ Body: RegisterBody }>("/geo/hub/entries", async (req, reply) => {
       const body = req.body;
-      const user = userRequired(req);
+      const hub = hubOf(req);
+      const { store } = hub;
+      const actor = actorRequired(hub);
       const projectId = text(body?.authoringProjectId, "방법 작업 식별자", 64);
       // Validates the authoring id before it can determine an entry path. A draft opened with "방법 고치기" adds the next
       // revision of the entry it edits; any other draft (also a copy) registers as its own entry.
@@ -175,7 +180,7 @@ export async function registerSharedHubRoutes(
         throw new AuthoringError("주제 폴더를 찾을 수 없습니다.", 404);
       const result = await store.serial(id, async () => {
         const previous = await store.find(id);
-        if (previous && previous.entry.author !== user)
+        if (previous && !isEntryAuthor(previous.entry, actor))
           throw new AuthoringError("등록한 연구자만 새 판을 등록할 수 있습니다.", 403);
         if (link?.mode === "edit" && !previous) throw new AuthoringError("고치던 등록 방법을 찾을 수 없습니다.", 404);
         const original = link?.mode === "copy" ? await store.find(link.entryId) : null;
@@ -206,7 +211,7 @@ export async function registerSharedHubRoutes(
           const archive = await authoring.readFile(project.id, pkg.archive);
           if (createHash("sha256").update(archive).digest("hex") !== pkg.sha256)
             throw new AuthoringError("패키지 파일이 저장된 해시와 맞지 않습니다.", 409);
-          await store.immutableBytes(id, `packages/${revision}.tar.gz`, archive);
+          await store.immutableBytes(id, `packages/${revision}.tar.gz`, archive, actor);
           const visuals: RegisteredSnapshot["visuals"] = {};
           // Pictures shown on the draft: those of this revision or earlier whose step, output or cover still exists.
           const keys = new Set([
@@ -228,7 +233,7 @@ export async function registerSharedHubRoutes(
               const bytes = await authoring.readFile(project.id, source);
               const sha = createHash("sha256").update(bytes).digest("hex");
               const file = `visuals/${revision}/${sha}${extname(source).toLowerCase()}`;
-              await store.immutableBytes(id, file, bytes);
+              await store.immutableBytes(id, file, bytes, actor);
               return { file, mediaType };
             };
             const light = await copy(visual.file);
@@ -260,7 +265,8 @@ export async function registerSharedHubRoutes(
             tags: [
               ...new Set([...(draft.profile.taxonomy?.tasks ?? []), ...(draft.profile.taxonomy?.methods ?? [])]),
             ].slice(0, 6),
-            author: previous?.entry.author ?? user,
+            author: previous?.entry.author ?? actor.name,
+            ...(previous ? (previous.entry.authorId ? { authorId: previous.entry.authorId } : {}) : actor.id !== actor.name ? { authorId: actor.id } : {}),
             ...(previous?.entry.basedOn
               ? { basedOn: previous.entry.basedOn }
               : link?.mode === "copy"
@@ -289,7 +295,8 @@ export async function registerSharedHubRoutes(
                 packageSha256: pkg.sha256,
                 packageDigest: pkg.packageDigest,
                 registeredAt: at,
-                registeredBy: user,
+                registeredBy: actor.name,
+                ...(actor.id !== actor.name ? { registeredById: actor.id } : {}),
                 note,
               },
             ],
@@ -298,17 +305,19 @@ export async function registerSharedHubRoutes(
           snapshots: { ...previous?.snapshots, [revision]: { draft, package: pkg, visuals } },
           installs: previous?.installs ?? [],
         };
-        await store.write(entry);
-        return { entry };
+        await store.write(entry, actor);
+        return { entry: (await store.find(id)) ?? entry };
       });
       if ("check" in result) return reply.code(409).send(result.check);
-      return reply.code(201).send(await entryView(result.entry, user));
+      return reply.code(201).send(await entryView(store, result.entry, actor));
     });
     scope.post<{ Params: { id: string } }>("/geo/hub/entries/:id/edit", async (req, reply) => {
-      const result = await openEntryForEdit(store, authoring, req.params.id, userRequired(req));
+      const hub = hubOf(req);
+      const result = await openEntryForEdit(hub.store, authoring, req.params.id, actorRequired(hub));
       return reply.code(result.created ? 201 : 200).send(result);
     });
     scope.get<{ Params: { id: string } }>("/geo/hub/entries/:id", async (req): Promise<HubEntryDetail> => {
+      const { store, actor } = hubOf(req);
       const record = await store.read(req.params.id);
       const snapshot = snapshotOf(record);
       const images = Object.fromEntries(
@@ -329,7 +338,7 @@ export async function registerSharedHubRoutes(
           .map(([key, image]) => [key.slice(7), image]),
       );
       return {
-        entry: await entryView(record, hubUser(req)),
+        entry: await entryView(store, record, actor),
         profile: snapshot.draft.profile,
         visuals,
         outputImages,
@@ -346,20 +355,24 @@ export async function registerSharedHubRoutes(
     });
     scope.post<{ Params: { id: string }; Body: { on: boolean } }>("/geo/hub/entries/:id/star", async (req) => {
       if (typeof req.body?.on !== "boolean") throw new AuthoringError("별표 상태를 선택해 주세요.");
-      return store.star(req.params.id, userRequired(req), req.body.on);
+      const hub = hubOf(req);
+      return hub.store.star(req.params.id, actorRequired(hub), req.body.on);
     });
     scope.get<{ Params: { id: string } }>("/geo/hub/entries/:id/comments", async (req) => {
+      const { store } = hubOf(req);
       await store.read(req.params.id);
       return { comments: await store.comments(req.params.id) };
     });
     scope.post<{ Params: { id: string }; Body: { body: string } }>(
       "/geo/hub/entries/:id/comments",
-      async (req, reply) =>
-        reply
+      async (req, reply) => {
+        const hub = hubOf(req);
+        return reply
           .code(201)
-          .send(await store.addComment(req.params.id, userRequired(req), text(req.body?.body, "댓글", 4000))),
+          .send(await hub.store.addComment(req.params.id, actorRequired(hub), text(req.body?.body, "댓글", 4000)));
+      },
     );
-    const sendImage = async (id: string, revision: string | undefined, key?: string, theme?: string) => {
+    const sendImage = async (store: HubRecordStore, id: string, revision: string | undefined, key?: string, theme?: string) => {
       const snapshot = snapshotOf(await store.read(id), revision);
       const visual =
         key === undefined
@@ -374,20 +387,21 @@ export async function registerSharedHubRoutes(
     scope.get<{ Params: { id: string }; Querystring: { revision?: string; theme?: string } }>(
       "/geo/hub/entries/:id/cover",
       async (req, reply) => {
-        const image = await sendImage(req.params.id, req.query.revision, undefined, req.query.theme);
+        const image = await sendImage(hubOf(req).store, req.params.id, req.query.revision, undefined, req.query.theme);
         return reply.type(image.mediaType).send(image.bytes);
       },
     );
     scope.get<{ Params: { id: string; key: string }; Querystring: { revision?: string; theme?: string } }>(
       "/geo/hub/entries/:id/visuals/:key",
       async (req, reply) => {
-        const image = await sendImage(req.params.id, req.query.revision, req.params.key, req.query.theme);
+        const image = await sendImage(hubOf(req).store, req.params.id, req.query.revision, req.params.key, req.query.theme);
         return reply.type(image.mediaType).send(image.bytes);
       },
     );
     scope.get<{ Params: { id: string }; Querystring: { revision?: string } }>(
       "/geo/hub/entries/:id/package.tar.gz",
       async (req, reply) => {
+        const { store } = hubOf(req);
         const record = await store.read(req.params.id);
         const snapshot = snapshotOf(record, req.query.revision);
         const revision = req.query.revision === undefined ? record.entry.latestRevision : Number(req.query.revision);
@@ -400,7 +414,10 @@ export async function registerSharedHubRoutes(
     scope.post<{ Params: { id: string }; Body: SharedInstallBody }>(
       "/geo/hub/entries/:id/install",
       async (req, reply) => {
-        const result = await store.serial(req.params.id, async () => {
+        const hub = hubOf(req);
+        const { store } = hub;
+        const actor = actorRequired(hub);
+        const result = await store.serial(`install:${req.params.id}`, async () => {
           const record = await store.read(req.params.id);
           // Install the revision the researcher looked at (immutable snapshot), not whatever is latest now.
           const asked = req.body?.revision;
@@ -414,14 +431,14 @@ export async function registerSharedHubRoutes(
             req.body ?? ({} as InstallBody),
             { ...options, hubEntry: { id: record.entry.id, revision } },
           );
-          record.installs.push(result.install);
-          await store.write(record);
+          await store.recordInstall(record.entry.id, result.install, actor);
           return result;
         });
         return reply.code(201).send(result);
       },
     );
     scope.get<{ Params: { id: string }; Querystring: { revision?: string; name?: string } }>("/geo/hub/entries/:id/skill-source", async (req) => {
+      const { store } = hubOf(req);
       const record = await store.read(req.params.id);
       const snapshot = snapshotOf(record, req.query.revision);
       if (req.query.name !== snapshot.package.slug) throw new AuthoringError("스킬 지침을 찾을 수 없습니다.", 404);
@@ -455,7 +472,8 @@ export async function registerSharedHubRoutes(
       return { doc };
     });
     scope.get("/geo/hub/recommended", async (req) => {
-      const entries = await Promise.all((await store.list()).map((r) => entryView(r, hubUser(req))));
+      const { store, actor } = hubOf(req);
+      const entries = await Promise.all((await store.list()).map((r) => entryView(store, r, actor)));
       const cards: HubRecommendation[] = entries
         .filter((e) => e.stars >= 1)
         .sort((a, b) => b.stars - a.stars || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id))
@@ -498,5 +516,5 @@ export async function registerSharedHubRoutes(
       return { cards };
     });
   });
-  return store;
+  return options.store ?? localHubStore();
 }

@@ -14,7 +14,7 @@ import { catalogueProcedure, packageProcedure, procedureSteps, workflowDocFor, w
 import { renderWorkflowDocument, type WorkflowDoc } from "../../../web/src/geo/contracts/workflow-doc.ts";
 import { SKILL_HUB_LIMITS } from "./skill-hub.ts";
 import { readTar, safeEntryPath } from "./tar.ts";
-import { SharedHubStore } from "./hub-shared/store.ts";
+import type { HubRecordStore } from "./hub-shared/records.ts";
 
 // Only targets verified with their real PC74 CLI are offered (task evidence records versions and probes).
 export const CLI_TARGETS = ["pi", "claude"] as const;
@@ -119,7 +119,7 @@ export function projectCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | 
   if (!workflow || !catalogue) throw new CliExportError("Workflow was not found", 404);
   return resolveFiles(workflowDocFor(workflow, { skills: skillsFor(workflow, catalogue), procedure: catalogueProcedure(catalogue, workflow.skillIds[0] ?? "") }), paths, catalogue);
 }
-export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: SharedHubStore, id: string): Promise<CliSource> {
+export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string): Promise<CliSource> {
   const record = await store.read(id);
   const snapshot = record.snapshots[record.entry.latestRevision];
   if (!snapshot?.draft.workflow) throw new CliExportError("Workflow was not found", 404);

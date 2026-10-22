@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T05:25:31Z
+updated: 2026-10-22T06:06:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -36,20 +36,41 @@ Creating external accounts or paid plans needs the user's approval. UI follows d
 ~/data/geoaidesk/work/gaid-backend/; do not modify ~/.geoaidesk. Outside check: no outside check (architecture/app work).
 
 ## Current state
-Phases 1-2 done and proposal written, 2026-10-22; no code changes yet. Waiting for the user's decisions in this tab.
-- Diagnosis (Explore over base 79fb145d; notes `~/data/geoaidesk/work/gaid-backend/diagnosis.md`): no accounts; the
-  shared hub is a per-instance file store reached same-origin, identity = unchecked `X-GAID-User`; exposing one GAID on the
-  LAN shares one `KADY_AUTH_TOKEN` that also drives the agent shell; no remote-hub client for stars/comments/registration;
-  library owner "local"; no notifications. 5 entries in the review instance hub (`~/.geoaidesk`, read only).
-- Research: Oracle Pro note `웹 조사/geoaidesk/2026-10-22-research-question-2026-10-22--a9eaa9446b.md` (27 min).
-- PC74: no docker/postgres/caddy, sudo needs a password, disk 88% (196 GB free), LAN IP 10.13.15.74, Node v24.21.0.
-- Proposal: `reports/2026-10-22-gaid-backend/index.md` (options 가 원내 GAID 허브 서버 [recommended] / 나 PocketBase /
-  다 Supabase Free Seoul; 5 decisions in §6 + 2 confirmations).
+Phase 3 (implementation) started 2026-10-22 after the user's decisions (see Notes). Done by the top writer (P0, shared
+interfaces), verified with `cd server && npx tsc --noEmit -p .` and the hub tests (geo-hub-shared, -search, -handoff,
+cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`):
+- ADR `docs/adr/2026-10-22-gaid-hub-server.md`.
+- `server/src/geo/hub-shared/records.ts` (HubRecordStore, Actor), `active.ts` (resolveHub, setRemoteHubProvider,
+  localHubStore); SharedHubStore implements it; routes.ts/edit.ts/skill-hub.ts/cli-export use per-request store + actor;
+  install records through `recordInstall`; entry views carry `mine`.
+- Contracts: `web/src/geo/contracts/hub-server.ts` (local GAID routes for the UI), `server/src/geo/hub-server/protocol.ts`
+  (`/hub/v1` wire), hub-shared.ts gains `authorId`, `registeredById`, comment `authorId`, `mine`, `HubMe`.
+- Dependencies installed in the worktree (server, web `npm ci`).
 ## Next steps
-1. Take the user's answers to report §6 here; record them under Notes and decisions; write ADR
-   `docs/adr/2026-10-22-gaid-hub-server.md`; then plan phase-1 work packages (shared contract first) and implement.
+1. Children running (see Work packages); keep the task doc current; `task complete` each child when it finishes.
+2. Integrate in order P1 → P2 → P3; end-to-end test: in-process hub server + two local GAIDs (register, star, comment,
+   edit/copy, install, library sync both ways, conflict); then a real run: hub server on PC74 under
+   `~/data/geoaidesk/work/gaid-backend/hub-home`, a GAID on PC74 and one on PC70 if PC70 reaches PC74 on the LAN.
+3. Import the 5 review-instance entries into a test hub home (read-only source `~/.geoaidesk`), report §3 results,
+   screenshots, `scripts/check`, `task finish`.
 ## Failed approaches
 ## Notes and decisions
+- User decision 2026-10-22 on report §6 (verbatim): "2번 다, 4번 나로 하고 나머지는 권장으로 하자." → 1 가 institute GAID
+  hub server, 2 다 phase 1 = accounts + shared hub + 5 existing entries + backup + personal library sync, 3 가 admin
+  invite + email/password, 4 나 plain HTTP on the LAN, 5 가 SQLite. Confirmations (SSO/SMTP/certificates, PC74 as host) not
+  answered: unknown; PC74 is the pilot host. ADR docs/adr/2026-10-22-gaid-hub-server.md.
+- Work packages (shared interfaces settled first, P0 above). Integration order P1 → P2 → P3.
+  - P1 `hub-server` (child, general work): server/src/geo/hub-server/** except protocol.ts semantics, geo/hub-server.mjs,
+    server/test/geo-hub-server*.test.ts, docs/geo/hub-server.md. SQLite, accounts, sessions, invites, admin, browser refusal,
+    hub records with server-side write rules, files, library sync server, audit, CLI (serve/invite/users/backup/
+    check-backup/import-hub).
+  - P2 `hub-client` (child, general work): server/src/geo/hub-client/**, server/src/geo/library/sync/**,
+    server/src/geo/routes/hub-server.ts + one registration line in server/src/geo/routes.ts, server/test/geo-hub-client*,
+    geo-library-sync*. Connection store, RemoteHubStore, provider registration, /geo/hub-server/*, /geo/library/sync.
+  - P3 `hub-ui` (child, general work): web/src/geo/hub-server/**, locales namespace hubServer, identity edits in
+    web/src/geo/hub/{shared-api.ts,shared-entry.tsx,hub-screen.tsx,hub-dialogs.tsx}, library sync status in
+    web/src/geo/library/, Settings seam, web tests, screenshots.
+  - Top writer: contracts, integration, e2e test, real run, import of existing entries, report, checks.
 - Plan (sequential): diagnose → research → proposal → user decision → ADR → implement phase 1. Work packages for
   implementation are decided after the user picks the architecture (shared interface first, then children if large).
 - Existing services (knowledge-lookup, 2026-10-22): no past record of Supabase/Firebase/Cloudflare/Neon/PocketBase/
@@ -63,11 +84,6 @@ Phases 1-2 done and proposal written, 2026-10-22; no code changes yet. Waiting f
   three options. Under option 가 entry metadata becomes DB rows rather than JSON files; the shape carries over. Phase 1
   should keep entry storage generic enough to add a skill entry kind and a reviewer role later. No reply sent.
 ## Open items
-- [결정] 공유 백엔드 구성 — 가) 원내 GAID 허브 서버 — 나) 원내 PocketBase — 다) Supabase Free 서울 — 권장: 가) 비용 없음, 지금 허브 코드 재사용, 미공개 자료 원내 유지, 기관 서버 이전이 가장 쉬움 — 막힌 일: 1단계 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
-- [결정] 1단계 범위 — 가) 계정 + 공유 허브 이전 + 기존 허브 자료 5건 + 백업 — 나) 가) + 앱 안 알림 — 다) 가) + 개인 서재 동기화 — 권장: 가) 공유가 실제로 되는 최소 범위 — 막힌 일: 1단계 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
-- [결정] 로그인 방식 — 가) 관리자 초대 + 이메일·비밀번호 — 나) 처음부터 기관 SSO — 권장: 가) 메일 서버·기관 협조 없이 시작, SSO는 같은 계정에 나중에 연결 — 막힌 일: 계정 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
-- [결정] 원내망 접속 보호 — 가) 원내 HTTPS(자체 인증서, PC마다 한 번 설치) — 나) 원내 HTTP — 다) 기관 도메인·인증서 — 권장: 가) 비밀번호와 로그인 열쇠 암호화 — 막힌 일: 배포 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
-- [결정] 허브 DB — 가) SQLite 파일 — 나) PostgreSQL — 권장: 가) PC74에 관리자 설치 없이 시작, 표준 SQL로 나중에 이전 — 막힌 일: 서버 구현 — 근거: reports/2026-10-22-gaid-backend#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
