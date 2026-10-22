@@ -84,6 +84,7 @@ test("integration boundaries list existing seams with an owner", () => {
     "gaid-notebook-review",
     "gaid-workflow-model",
     "gaid-research-hub",
+    "gaid-research-visuals",
     "gaid-research-hub--metadata",
     "gaid-research-hub--zotero",
     "gaid-design-identity",

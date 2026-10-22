@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T02:44:03Z
+status: active
+updated: 2026-10-22T02:51:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -113,6 +113,9 @@ remain null due to conflicting units. Source list, limitations and synthetic evi
 Closed 2026-10-22T02:44:03Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish failed at the distribution owner allow-list (the same independently confirmed failure as the map
+  child); parent explicitly authorised adding gaid-research-visuals. Added only that owner, no boundary relaxation.
+  Full check log: /home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-y6nzbawi.log.
 - Initial focused-test invocation lacked installed npm dependencies (vitest not found); npm ci completed successfully in both targets.
   All tests/typechecks ran. The initial provisioning count assertion still expected
   one shipped skill; updated it to two, then all 43 focused tests passed.
@@ -182,7 +185,9 @@ establish real-journal compliance. The report's axis units and panel labels stay
 Phase plan: keep the settled FigureCheck/JournalProfile interfaces; source verification and helper implementation
 are independent of shipped-skill plumbing. This child owns only the files enumerated in the goal (plus focused tests).
 Integration order: shipped-skill plumbing → dependency locks → skill/checker/profiles → focused checks. The work is
-tightly coupled enough to implement here without additional workers. The parent runs the full scripts/check.
+tightly coupled enough to implement here without additional workers. Although the planned full check belonged to the
+parent, task finish automatically ran scripts/check for this child. The owner allow-list fix is also in this child
+under the parent's explicit instruction (2026-10-22); identical-line integration is owned by the parent.
 Parent instruction adopted: CVD previews use `<sha256>-cvd-{deuteranopia,protanopia,tritanopia}.png` beside the check JSON
 (default `.kady/geo/figure-checks/<sha256>.json`); no contract change. THIRD_PARTY_NOTICES also includes the map child's
 React Flow 12.12.0 and dagre 3.1.1. Added --artwork as an optional CLI-only DPI-class selector (FigureKind is not a DPI
