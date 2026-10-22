@@ -10,11 +10,11 @@ import { originOfSource, packageStore, writePackageOrigin } from "../methods/pac
 import { methodTreeHash, removeRegenerableCaches } from "../methods/tree-hash.ts";
 import { stageSkillHubPackage } from "../skill-hub.ts";
 import { projectPaths } from "./register.ts";
-import { HubSkillStore, revisionState } from "./store.ts";
+import { revisionState, type HubSkillRecordStore } from "./records.ts";
 import { readHubSkillRevision } from "./view.ts";
 
 export interface HubSkillInstallDeps { agentDir?: string }
-export async function previewHubSkillInstall(store: HubSkillStore, skillId: string, revision: number, projectId: string, deps: HubSkillInstallDeps = {}): Promise<InstallSkillPreview> {
+export async function previewHubSkillInstall(store: HubSkillRecordStore, skillId: string, revision: number, projectId: string, deps: HubSkillInstallDeps = {}): Promise<InstallSkillPreview> {
   const { skill, revision: r } = await readHubSkillRevision(store, skillId, revision);
   const root = projectSkillRoot(projectPaths(projectId));
   let project = hubSkillInstallState(root, { skillId, revision, treeHash: r.treeHash }, { ...deps, suspended: revisionState(r) === "suspended" });
@@ -24,7 +24,7 @@ export async function previewHubSkillInstall(store: HubSkillStore, skillId: stri
   return { name: skill.name, revision, files: r.files.map((f) => f.path), hasCode: r.files.some((f) => /(?:^scripts\/|\.(?:py|sh|js|mjs|ts|ps1|r|bat|cmd)$)/i.test(f.path)), licence: r.licence, findings: r.findings, state: revisionState(r), project };
 }
 export async function installHubSkillRevision(
-  store: HubSkillStore,
+  store: HubSkillRecordStore,
   body: { skillId: string; revision: number; projectId: string; acknowledged: boolean },
   deps: HubSkillInstallDeps = {},
 ): Promise<InstallSkillResult> {

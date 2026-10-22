@@ -12,7 +12,8 @@ import { originOfSource, packageStore } from "../methods/package-origin.ts";
 import { skillHubCatalogue } from "../skill-hub.ts";
 import { buildArchive, digest, fileList, readArchive, snapshotDirectory, treeHash } from "./archive.ts";
 import { scanSkill, shareable } from "./scan.ts";
-import { HubSkillStore, validName, type StoredHubSkill } from "./store.ts";
+import { displayNameActor, type Actor } from "../hub-shared/records.ts";
+import { isSkillAuthor, validName, type HubSkillRecordStore, type StoredHubSkill } from "./records.ts";
 import { revisionOf, skillView } from "./view.ts";
 
 export interface RegistrationDeps {
@@ -31,7 +32,7 @@ const sourceText = (s: unknown) => {
   if (typeof s !== "string" || !s.trim() || s.length > 4000) throw new AuthoringError("스킬 원본 경로를 확인해 주세요.");
   return s.trim();
 };
-async function sourceSnapshot(store: HubSkillStore, body: RegisterSkillSource, deps: RegistrationDeps) {
+async function sourceSnapshot(store: HubSkillRecordStore, body: RegisterSkillSource, deps: RegistrationDeps) {
   if (body?.from === "project") {
     nameRequired(body.name);
     const root = projectSkillRoot(projectPaths(body.projectId));
@@ -76,7 +77,7 @@ async function sourceSnapshot(store: HubSkillStore, body: RegisterSkillSource, d
   }
   throw new AuthoringError("등록할 스킬 원본을 선택해 주세요.");
 }
-async function prepare(store: HubSkillStore, body: RegisterSkillSource, user: string, deps: RegistrationDeps) {
+async function prepare(store: HubSkillRecordStore, body: RegisterSkillSource, actor: Actor, deps: RegistrationDeps) {
   const snapshot = await sourceSnapshot(store, body, deps);
   if ("choices" in snapshot) {
     const preview: RegisterSkillPreview = { name: "", description: "", files: [], treeHash: "", origin: { kind: "github", source: body.from === "source" ? body.source : "" }, licence: { state: "unknown" }, findings: [], choices: snapshot.choices };
@@ -90,19 +91,21 @@ async function prepare(store: HubSkillStore, body: RegisterSkillSource, user: st
   let blocked = !catalogue.available ? "기본 스킬 목록을 읽지 못했습니다. 목록을 준비한 뒤 다시 등록하세요." : undefined;
   if (catalogue.skills.some((s) => s.runtimeName === snapshot.name)) blocked = "기본 스킬과 같은 이름으로 등록할 수 없습니다. 프로젝트에서 이름을 바꾼 뒤 등록하세요.";
   if (scanned.findings.some((f) => f.kind === "format")) blocked = "SKILL.md 형식을 고친 뒤 다시 확인하세요.";
-  if (previous && previous.author !== user) blocked = "다른 연구자가 같은 이름의 스킬을 등록했습니다. 프로젝트에서 이름을 바꾼 뒤 등록하세요.";
+  const own = !!previous && isSkillAuthor(previous, actor.id);
+  if (previous && !own) blocked = "다른 연구자가 같은 이름의 스킬을 등록했습니다. 프로젝트에서 이름을 바꾼 뒤 등록하세요.";
   const sameTree = previous ? revisionOf(previous).treeHash === hash : false;
-  if (previous?.author === user && sameTree) blocked = "최신 판과 내용이 같습니다. 스킬을 고친 뒤 새 판을 등록하세요.";
+  if (own && sameTree) blocked = "최신 판과 내용이 같습니다. 스킬을 고친 뒤 새 판을 등록하세요.";
   const preview: RegisterSkillPreview = {
     name: snapshot.name, description: scanned.description, files: fileList(snapshot.entries), treeHash: hash,
     origin: snapshot.origin, licence: scanned.licence, findings: scanned.findings,
-    ...(previous ? { existing: { id: previous.id, latestRevision: previous.latestRevision, mode: previous.author === user ? "next" : "taken", sameTree } as const } : {}),
+    ...(previous ? { existing: { id: previous.id, latestRevision: previous.latestRevision, mode: own ? "next" : "taken", sameTree } as const } : {}),
     ...(blocked ? { blocked } : {}),
   };
   return { preview, snapshot };
 }
-export async function previewHubSkill(store: HubSkillStore, body: RegisterSkillSource, user: string, deps: RegistrationDeps = {}) {
-  return (await prepare(store, body, user, deps)).preview;
+const actorOf = (user: Actor | string): Actor => typeof user === "string" ? displayNameActor(user) : user;
+export async function previewHubSkill(store: HubSkillRecordStore, body: RegisterSkillSource, user: Actor | string, deps: RegistrationDeps = {}) {
+  return (await prepare(store, body, actorOf(user), deps)).preview;
 }
 const texts = (values: unknown, label: string): string[] => {
   if (values === undefined) return [];
@@ -110,29 +113,31 @@ const texts = (values: unknown, label: string): string[] => {
     throw new AuthoringError(`${label} 형식을 확인해 주세요.`);
   return [...new Set(values.map((s: string) => s.trim()))];
 };
-export async function registerHubSkill(store: HubSkillStore, body: RegisterSkillBody, user: string, deps: RegistrationDeps = {}) {
+export async function registerHubSkill(store: HubSkillRecordStore, body: RegisterSkillBody, user: Actor | string, deps: RegistrationDeps = {}) {
+  const actor = actorOf(user);
   if (typeof body?.treeHash !== "string" || !/^[a-f0-9]{64}$/.test(body.treeHash)) throw new AuthoringError("스킬을 먼저 확인해 주세요.");
   if (typeof body.note !== "string" || body.note.length > 4000) throw new AuthoringError("바뀐 점은 4000자 이내로 입력해 주세요.");
   if (!(await store.shared.folders()).some((f) => f.id === body.folderId)) throw new AuthoringError("주제 폴더를 찾을 수 없습니다.", 404);
   const tags = texts(body.tags, "태그"), formats = texts(body.formats, "자료 형식");
-  const { preview, snapshot } = await prepare(store, body, user, deps);
+  const { preview, snapshot } = await prepare(store, body, actor, deps);
   if (!snapshot) throw new AuthoringError("등록할 스킬을 하나 선택해 주세요.");
   if (preview.blocked) throw new AuthoringError(preview.blocked, 409);
   if (preview.treeHash !== body.treeHash) throw new AuthoringError("확인한 뒤 원본 스킬이 바뀌었습니다. 다시 확인해 주세요.", 409);
   return store.serial(preview.name, async () => {
     const previous = await store.find(preview.name);
-    if (previous && previous.author !== user) throw new AuthoringError("등록한 연구자만 새 판을 등록할 수 있습니다.", 403);
+    if (previous && !isSkillAuthor(previous, actor.id)) throw new AuthoringError("등록한 연구자만 새 판을 등록할 수 있습니다.", 403);
     if (previous && revisionOf(previous).treeHash === preview.treeHash) throw new AuthoringError("최신 판과 내용이 같습니다.", 409);
     const revision = (previous?.latestRevision ?? 0) + 1;
     const archive = buildArchive(preview.name, snapshot.entries, revision);
     const at = now();
     const record: StoredHubSkill = {
-      id: preview.name, name: preview.name, description: preview.description, author: previous?.author ?? user,
+      id: preview.name, name: preview.name, description: preview.description, author: previous?.author ?? actor.name, authorId: previous ? previous.authorId : actor.id,
       tags, formats, folderId: body.folderId, latestRevision: revision, state: "unreviewed", visibility: shareable(preview.licence) ? "hub" : "author", updatedAt: at,
-      revisions: [...(previous?.revisions ?? []), { revision, archiveSha256: digest(archive), size: archive.length, treeHash: preview.treeHash, files: preview.files, description: preview.description, note: body.note.trim(), registeredAt: at, registeredBy: user, origin: preview.origin, licence: preview.licence, findings: preview.findings, reviews: [] }],
+      revisions: [...(previous?.revisions ?? []), { revision, archiveSha256: digest(archive), size: archive.length, treeHash: preview.treeHash, files: preview.files, description: preview.description, note: body.note.trim(), registeredAt: at, registeredBy: actor.name, registeredById: actor.id, origin: preview.origin, licence: preview.licence, findings: preview.findings, reviews: [] }],
     };
-    await store.publish(record.id, revision, archive);
-    await store.write(record);
-    return skillView(store, record, user);
+    await store.publish(record.id, revision, archive, actor);
+    await store.write(record, actor);
+    // A hub server stores its own registrant fields and times; show what was stored.
+    return skillView(store, store.kind === "local" ? record : await store.read(record.id), actor.id);
   });
 }

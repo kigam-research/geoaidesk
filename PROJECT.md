@@ -34,7 +34,11 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 - Smoke runs keep their logs under `~/data/geoaidesk/work/<slug>/` when `GAID_SMOKE_DIR` points there.
 - Institute hub server data: `GAID_HUB_SERVER_HOME` (default `~/.geoaidesk-hub`: `hub.sqlite`, `blobs/`, `server.json`). Test
   instance of gaid-backend: `pc74:~/data/geoaidesk/work/gaid-backend/hub-home` (test accounts only).
-- Deployed SHAs: none yet.
+- Institute hub server service (gaid-hub-server-trial): `pc74` user unit `gaid-hub-server.service`, `0.0.0.0:8700` (plain HTTP
+  pilot; HTTPS switch in `docs/geo/hub-server-https.md`), pinned snapshot `~/deploy/geoaidesk-hub-server/<sha>/`, home
+  `pc74:~/data/geoaidesk/hub-server/home`, log `.../hub-server/logs/hub-server.log`, backups `.../hub-server/backups/`, frozen
+  import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`.
+- Deployed SHAs: hub server `8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a` (2026-10-22).
 
 ## Upstream
 - Remote `upstream` = `https://github.com/K-Dense-AI/k-dense-byok.git`; integration base
