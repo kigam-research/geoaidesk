@@ -43,10 +43,11 @@ function Workspace(props: ViewerProps) {
   const [colorFields, setColorFields] = useState<Record<string, string>>({});
   // A selection names the response it indexes: a newer page of the same layer drops it instead of pointing at another feature.
   const [selected, setSelected] = useState<{ layerId: string; row: number; coordinate?: number[]; data?: MapData }>();
-  const [pixel, setPixel] = useState<{ coordinate: number[]; text: string }>();
+  const [pixel, setPixel] = useState<{ coordinate: number[]; text: string; technical?: string }>();
   const [exporting, setExporting] = useState(false);
   const canvas = useRef<CanvasHandle>(null);
   const tablePane = useRef<HTMLDivElement>(null);
+  const [tableHeight, setTableHeight] = useState(240);
   const [tableFocus, setTableFocus] = useState(0);
   const sequence = useRef(0);
   const overlayRequest = useRef<AbortController | null>(null);
@@ -154,7 +155,7 @@ function Workspace(props: ViewerProps) {
     const ac = new AbortController(); pixelRequest.current = ac;
     void mapPost<RasterPoint>("/geo/raster-point", { path: active.source.path, band: active.source.band, displayCrs: crs, coordinate }, props.projectId, ac.signal)
       .then(point => { if (!ac.signal.aborted) setPixel({ coordinate, text: point.inside ? t("sourcePixel", { row: point.row ?? 0, col: point.col ?? 0, value: point.value ?? t("nodata") }) : t("outsidePixel") }); })
-      .catch(e => { if (!ac.signal.aborted) setPixel({ coordinate, text: e instanceof Error ? e.message : t("requestError") }); });
+      .catch(e => { if (!ac.signal.aborted) setPixel({ coordinate, text: t("requestError"), technical: e instanceof Error ? e.message : undefined }); });
   }
   async function addLayer() {
     if (!pathToAdd.trim()) return;
@@ -202,8 +203,9 @@ function Workspace(props: ViewerProps) {
   const properties = selection && selectedLayer?.data?.kind === "vector" ? selectedLayer.data.features.features[selection.row]?.properties : undefined;
   const closePopup = () => { setSelected(undefined); setPixel(undefined); pixelRequest.current?.abort(); };
   const popup = properties && selectedLayer
-    ? { at: "selected" as const, content: <MapPopup title={t("properties")} subtitle={t("featureIdentity", { layer: selectedLayer.source.layer ?? selectedLayer.source.path.split("/").pop() ?? "", id: selectedLayer.data?.kind === "vector" ? selectedLayer.data.features.features[selection!.row]?.id ?? selection!.row + 1 : selection!.row + 1 })} onClose={closePopup}><dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5">{Object.entries(properties).slice(0, 8).map(([key, value]) => <Fragment key={key}><dt className="text-muted-foreground">{key}</dt><dd className="[overflow-wrap:anywhere]">{textValue(value)}</dd></Fragment>)}</dl><MapButton variant="ghost" className="mt-2 w-full" onClick={() => { setTableFocus(n => n + 1); tablePane.current?.querySelector<HTMLElement>('[data-map-table-scroller]')?.focus(); }}>{t("allAttributes")}</MapButton></MapPopup> }
-    : pixel ? { at: pixel.coordinate, content: <MapPopup title={t("pixelTitle")} subtitle={active?.source.path ?? ""} onClose={closePopup}><p role="status">{pixel.text}</p></MapPopup> } : undefined;
+    ? { at: "selected" as const, content: <MapPopup title={t("properties")} subtitle={t("featureIdentity", { layer: selectedLayer.source.layer ?? selectedLayer.source.path.split("/").pop() ?? "", id: selectedLayer.data?.kind === "vector" ? selectedLayer.data.features.features[selection!.row]?.id ?? selection!.row + 1 : selection!.row + 1 })} onClose={closePopup} footer={<MapButton variant="ghost" className="w-full" onClick={() => { setTableFocus(n => n + 1); tablePane.current?.querySelector<HTMLElement>('[data-map-table-scroller]')?.focus(); }}>{t("allAttributes")}</MapButton>}><dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-0.5">{Object.entries(properties).slice(0, 8).map(([key, value]) => <Fragment key={key}><dt className="text-muted-foreground">{key}</dt><dd className="[overflow-wrap:anywhere]">{textValue(value)}</dd></Fragment>)}</dl></MapPopup> }
+    : pixel ? { at: pixel.coordinate, content: <MapPopup title={t("pixelTitle")} subtitle={active?.source.path ?? ""} onClose={closePopup}><p role="status">{pixel.text}</p>{pixel.technical && <details><summary>{t("technical")}</summary>{pixel.technical}</details>}</MapPopup> } : undefined;
+  const publicError = ["overlayBlocked", "invalidManifest", "addTiff", "mapError", "pngError", "requestError"].some(key => t(key) === error) ? error : t("requestError");
   return <div className="gaid-map-workspace flex h-full min-h-0 flex-col bg-gaid-face text-sm text-gaid-ink" data-testid="geo-map-viewer">
     <header className="flex shrink-0 items-center gap-2 border-b border-gaid-edge bg-gaid-chrome px-3 py-2">
       <h2 className="mr-auto min-w-0 truncate font-semibold" title={manifest?.title ?? props.name}>{manifest?.title ?? props.name}</h2>
@@ -214,7 +216,7 @@ function Workspace(props: ViewerProps) {
       {crs !== "native" ? <label className="flex min-w-0 items-center gap-2">{t("displayCrs")} <MapSelect aria-label={t("displayCrs")} className="max-w-56" value={crs} onChange={value => { setDisplayTarget(value); setViewport(undefined); }}>{[...new Set([...crsChoices, crs])].map(code => <option key={code} value={code}>{code === WEB_MERCATOR ? t("webMercator") : t("crsOption", { crs: code })}</option>)}</MapSelect></label> : <span>{t("native")}</span>}
       <BasemapPicker providers={catalog.providers} value={basemap} onChange={setBasemap} disabled={crs === "native"} />
     </div>
-    {error && <div role="alert" className="shrink-0 px-3 py-1 text-xs text-gaid-danger">{t("requestError")}<details><summary>{t("technical")}</summary><p>{error}</p></details></div>}
+    {error && <div role="alert" className="shrink-0 px-3 py-1 text-xs text-gaid-danger">{publicError}{publicError !== error && <details><summary>{t("technical")}</summary><p>{error}</p></details>}</div>}
     {catalog.error && <details className="shrink-0 px-3 text-xs"><summary>{t("basemapStatus")}</summary>{catalog.error}</details>}
     <div className="gaid-map-body min-h-0 flex-1">
       <div className="flex min-h-0 min-w-0 flex-col">
@@ -222,7 +224,10 @@ function Workspace(props: ViewerProps) {
           <MapCanvas ref={canvas} layers={layers} activeId={active?.id ?? ""} crs={crs} projectId={props.projectId} backgroundLayers={backgroundLayers} attributions={attributions} fitVersion={fitVersion} fields={colorFields} selected={selection} popup={popup} onViewport={onViewport} onError={setError} onPick={select} onCoordinate={readPixel} onClosePopup={closePopup} />
           <BasemapAttributions providers={catalog.providers} value={basemap} disabled={crs === "native"} className="pointer-events-auto absolute bottom-8 right-2 max-w-[70%] bg-gaid-face px-2 py-1 text-right text-xs text-gaid-ink" />
         </div>
-        {active && data?.kind === "vector" && <div ref={tablePane} className="gaid-map-table-pane h-80 shrink-0 overflow-hidden border-t border-gaid-frame"><AttributeTable key={`table:${active.id}:${active.source.layer ?? ""}`} focusVersion={tableFocus} data={data} full={active.vectorMode === "full"} offset={active.offset} loading={active.loading} selectedRow={selection?.layerId === active.id ? selection.row : undefined} onSelect={row => select(active.id, row)} onOffset={offset => update(active.id, { offset })} /></div>}
+        {active && data?.kind === "vector" && <div ref={tablePane} className="gaid-map-table-pane flex max-h-[calc(100%-160px)] shrink-0 flex-col overflow-hidden border-t border-gaid-frame" style={{ height: tableHeight }}>
+          <div role="separator" tabIndex={0} aria-label={t("tableResize")} aria-orientation="horizontal" aria-valuemin={184} aria-valuemax={520} aria-valuenow={tableHeight} className="h-2 shrink-0 cursor-row-resize bg-gaid-chrome outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+            onKeyDown={e => { if (["ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) { e.preventDefault(); setTableHeight(h => e.key === "Home" ? 184 : e.key === "End" ? 520 : Math.max(184, Math.min(520, h + (e.key === "ArrowUp" ? 36 : -36)))); } }}
+            onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) { const bottom = e.currentTarget.parentElement?.getBoundingClientRect().bottom; if (bottom) setTableHeight(Math.max(184, Math.min(520, bottom - e.clientY))); } }} onPointerUp={e => e.currentTarget.releasePointerCapture(e.pointerId)} /><AttributeTable key={`table:${active.id}:${active.source.layer ?? ""}`} focusVersion={tableFocus} data={data} full={active.vectorMode === "full"} offset={active.offset} loading={active.loading} selectedRow={selection?.layerId === active.id ? selection.row : undefined} onSelect={row => select(active.id, row)} onOffset={offset => update(active.id, { offset })} /></div>}
       </div>
       <aside aria-label={t("panel")} className="min-h-0 overflow-auto border-l border-gaid-frame bg-gaid-face p-3">
         <MapSidePanel layers={layers} active={active} crs={crs} colorFields={colorFields} fields={fields} pathToAdd={pathToAdd} adding={adding} onPathToAdd={setPathToAdd} onAdd={() => void addLayer()}
@@ -236,12 +241,12 @@ function Workspace(props: ViewerProps) {
   </div>;
 }
 /** Mini popup drawn on the map at the selected feature or clicked pixel. */
-function MapPopup({ title, subtitle, onClose, children }: { title: string; subtitle: string; onClose(): void; children: ReactNode }) {
-  return <div role="dialog" aria-label={title} className="w-72 max-w-[min(288px,60vw)] rounded-md border bg-popover text-xs text-popover-foreground shadow-lg">
-    <div className="flex items-start gap-2 border-b px-2 py-1.5">
+function MapPopup({ title, subtitle, onClose, children, footer }: { title: string; subtitle: string; onClose(): void; children: ReactNode; footer?: ReactNode }) {
+  return <div role="dialog" aria-label={title} className="flex max-h-[var(--gaid-map-popup-height,320px)] w-72 max-w-[min(288px,60vw)] flex-col rounded-md border bg-popover text-xs text-popover-foreground shadow-lg">
+    <div className="flex shrink-0 items-start gap-2 border-b px-2 py-1.5">
       <div className="min-w-0 flex-1"><p className="font-semibold">{title}</p><p className="truncate text-muted-foreground" title={subtitle}>{subtitle}</p></div>
       <MapButton variant="ghost" className="size-7 p-0" aria-label={t("closePopup")} onClick={onClose}><X aria-hidden className="size-3.5" /></MapButton>
     </div>
-    <div className="max-h-64 overflow-auto px-2 py-1.5">{children}</div>
+    <div className="min-h-0 overflow-auto px-2 py-1.5">{children}</div>{footer && <div className="shrink-0 border-t border-gaid-edge px-2 py-1">{footer}</div>}
   </div>;
 }

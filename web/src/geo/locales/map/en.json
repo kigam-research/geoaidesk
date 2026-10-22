@@ -132,5 +132,6 @@
   "onlineBasemap": "Online basemap in use",
   "basemapCrsLimit": "Basemap: source CRS required",
   "basemapStatus": "View basemap status",
-  "technical": "Technical details"
+  "technical": "Technical details",
+  "tableResize": "Resize map and attribute table"
 }

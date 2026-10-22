@@ -11,7 +11,7 @@ const EMPTY = "__map_empty__";
 export function MapSelect({ value, onChange, children, className = "", ...props }: Omit<ComponentProps<"select">, "onChange" | "size" | "multiple" | "defaultValue"> & { onChange(value: string): void }) {
   const options = Children.toArray(children).filter(isValidElement) as ReactElement<ComponentProps<"option">>[];
   return <Select value={String(value ?? "") || EMPTY} onValueChange={v => onChange(v === EMPTY ? "" : v)} disabled={props.disabled}>
-    <SelectTrigger aria-label={props["aria-label"]} id={props.id} className={`h-7 min-w-0 max-w-full px-2 text-xs ${className}`}><SelectValue /></SelectTrigger>
+    <SelectTrigger aria-label={props["aria-label"]} id={props.id} className={`data-[size=default]:h-7 min-w-0 max-w-full px-2 py-0 text-xs ${className}`}><SelectValue /></SelectTrigger>
     <SelectContent position="popper">{options.map((option, n) => {
       const key = String(option.props.value ?? option.props.children ?? "");
       return <SelectItem key={`${key}:${n}`} value={key || EMPTY} disabled={option.props.disabled} className="text-xs">{option.props.children}</SelectItem>;

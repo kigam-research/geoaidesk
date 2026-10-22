@@ -8,7 +8,6 @@ import { distinctValues, isActive, MISSING_KEY, nextSort, tableRows, valueKey, t
 import { MapButton, mapInput } from "./controls";
 import { mapText as t } from "./strings";
 
-const button = "";
 export const textValue = (value: unknown) => value == null ? t("nodata") : typeof value === "object" ? JSON.stringify(value) : String(value);
 interface Props {
   data: VectorPage; full: boolean; offset: number; loading?: boolean;
@@ -50,13 +49,12 @@ export default function AttributeTable({ data, full, offset, loading, selectedRo
     if (!box || !row) return;
     const header = box.querySelector("thead")?.offsetHeight ?? 0;
     if (row.offsetTop < box.scrollTop + header || row.offsetTop + row.offsetHeight > box.scrollTop + box.clientHeight) box.scrollTop = Math.max(0, row.offsetTop - header - box.clientHeight / 3);
-  }, [selectedRow, pageStart]);
+  }, [selectedRow, pageStart, rows]);
   useEffect(() => {
     if (!focusVersion || selectedRow === undefined) return;
     // The popup's link must reveal the complete record even when filters hide it.
-    setFilters({}); setVisibleFields(data.fields);
-    const position = rows.indexOf(selectedRow);
-    if (full && position >= 0) setStart(Math.floor(selectedRow / VECTOR_LIMIT) * VECTOR_LIMIT);
+    setFilters({}); setSort(undefined); setVisibleFields(data.fields);
+    if (full) setStart(Math.floor(selectedRow / VECTOR_LIMIT) * VECTOR_LIMIT);
     scroller.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusVersion]);
@@ -69,7 +67,7 @@ export default function AttributeTable({ data, full, offset, loading, selectedRo
       <span>{t("rowsSummary", { matched: rows.length, total: features.length })}</span>
       {full && rows.length > 0 && <span>{t("rowsRange", { from: pageStart + 1, to: pageStart + shown.length })}</span>}
       {!full && <span>{t("offset", { offset })}</span>}
-      {(filtered || sort) && <MapButton className={button} onClick={() => { setFilters({}); changeSort(undefined); }}>{t("clearFilters")}</MapButton>}
+      {(filtered || sort) && <MapButton onClick={() => { setFilters({}); changeSort(undefined); }}>{t("clearFilters")}</MapButton>}
     </div>
     <div ref={scroller} data-map-table-scroller tabIndex={0} aria-label={title} className="relative min-h-0 flex-1 overflow-auto border border-gaid-edge outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <table className="w-full text-left text-xs">
@@ -99,8 +97,8 @@ export default function AttributeTable({ data, full, offset, loading, selectedRo
       {!features.length ? <p className="p-2">{t("empty")}</p> : !rows.length ? <p className="p-2">{t("noMatch")}</p> : null}
     </div>
     <div className="flex shrink-0 gap-2">{full
-      ? <><MapButton className={button} disabled={pageStart === 0} onClick={() => setStart(Math.max(0, pageStart - VECTOR_LIMIT))}>{t("previous")}</MapButton><MapButton className={button} disabled={pageStart + VECTOR_LIMIT >= rows.length} onClick={() => setStart(pageStart + VECTOR_LIMIT)}>{t("next")}</MapButton></>
-      : <><MapButton className={button} disabled={offset === 0 || loading} onClick={() => onOffset(Math.max(0, offset - VECTOR_LIMIT))}>{t("previous")}</MapButton><MapButton className={button} disabled={data.nextOffset === null || loading} onClick={() => onOffset(data.nextOffset!)}>{t("next")}</MapButton></>}
+      ? <><MapButton disabled={pageStart === 0} onClick={() => setStart(Math.max(0, pageStart - VECTOR_LIMIT))}>{t("previous")}</MapButton><MapButton disabled={pageStart + VECTOR_LIMIT >= rows.length} onClick={() => setStart(pageStart + VECTOR_LIMIT)}>{t("next")}</MapButton></>
+      : <><MapButton disabled={offset === 0 || loading} onClick={() => onOffset(Math.max(0, offset - VECTOR_LIMIT))}>{t("previous")}</MapButton><MapButton disabled={data.nextOffset === null || loading} onClick={() => onOffset(data.nextOffset!)}>{t("next")}</MapButton></>}
     </div>
   </section>;
 }
@@ -116,9 +114,9 @@ function ColumnMenu({ field, features, filter, direction, onSort, onFilter }: { 
   return <>
     <p className="font-semibold">{field}</p>
     <div className="flex flex-wrap gap-1">
-      <MapButton className={button} aria-pressed={direction === "asc"} onClick={() => onSort("asc")}>{t("sortAsc")}</MapButton>
-      <MapButton className={button} aria-pressed={direction === "desc"} onClick={() => onSort("desc")}>{t("sortDesc")}</MapButton>
-      {direction && <MapButton className={button} onClick={() => onSort(undefined)}>{t("sortClear")}</MapButton>}
+      <MapButton aria-pressed={direction === "asc"} onClick={() => onSort("asc")}>{t("sortAsc")}</MapButton>
+      <MapButton aria-pressed={direction === "desc"} onClick={() => onSort("desc")}>{t("sortDesc")}</MapButton>
+      {direction && <MapButton onClick={() => onSort(undefined)}>{t("sortClear")}</MapButton>}
     </div>
     <label className="flex flex-col gap-1">{t("filterText")}<input className={mapInput} value={filter?.text ?? ""} onChange={e => onFilter({ ...filter, text: e.target.value })} /></label>
     <fieldset className="space-y-1"><legend className="mb-1">{t("filterValues")}</legend>
@@ -127,6 +125,6 @@ function ColumnMenu({ field, features, filter, direction, onSort, onFilter }: { 
         <span className="min-w-0 flex-1 truncate" title={textValue(v.value)}>{v.key === MISSING_KEY ? t("nodata") : textValue(v.value)}</span><span className="text-muted-foreground">{v.count}</span></label></li>)}</ul>
       {more && <p className="text-muted-foreground">{t("moreValues", { limit: values.length })}</p>}
     </fieldset>
-    <MapButton className={button} disabled={!isActive(filter)} onClick={() => onFilter(undefined)}>{t("clearFilter")}</MapButton>
+    <MapButton disabled={!isActive(filter)} onClick={() => onFilter(undefined)}>{t("clearFilter")}</MapButton>
   </>;
 }

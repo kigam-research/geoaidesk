@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:01:15Z
+updated: 2026-10-22T02:15:49Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4874820d-e04e-4b0a-8c95-5b14723b8837","pid":2241389,"provider":"codex","session":"01a16154-8f16-7ec1-b5d4-47eff4a5d82e","start":"52223294","token":"be246d461f2ed7bd44b287cdfd4990cbdc0b3a21c25094032face66d42c55fe1"}
 branch: task/gaid-ui-v2-debts--map
 target: task/gaid-ui-v2-debts
@@ -89,26 +89,92 @@ ko/en before → after, check output, screenshot paths. No report of your own; t
 `task finish`.
 
 ## Current state
-- Resumed in the printed worktree; clean starting tree. Exact-worktree codegraph is unavailable (unindexed); relevant source read directly.
-- Sequential decisions: keep existing requests/data contracts; compose a height-bounded map + 320 px inspector first, then compact layer/legend/info, then popup/table controls and canvas readouts; verify behavior before real-app visual review.
-- Owned files/interfaces: map viewer folder, map locale catalogs, one isolated map CSS block if needed, map baseline entries only. No child writers (nested units unsupported); changes are tightly coupled.
-- Integration order: implementation, focused typecheck/tests, UI/copy checks, real-app screenshot matrix, task finish for parent integration.
+
+Implemented MAP1–MAP6 in the map viewer without changing server routes, data contracts or source data. TypeScript, all 34 map tests (6 files), UI and copy checks pass. The 16 real-app Korean screenshots cover vector + raster, both identities, both themes and both required sizes. Parent integration and its full `scripts/check` remain separate from this child result.
+
+### Delivered behavior and rule evidence
+
+- MAP1 / L7 / P3: height-bounded viewer with a 320 px inspector from viewport width 1024 px. Its order is layers, legend, basic information. Layer addition opens a local popover; the layer list scrolls independently. Legends show their total count, two preview entries and explicit Show all for longer lists. In the 1280×800 vector captures the inspector is 320 px wide, legend bottom is 621 px and basic-info bottom is 796 px; no page overflow. Raster information also fits.
+- MAP2 / W5 / W6 / F6: basic information has four rows (source, named CRS + authority when known, value unit, feature/pixel count). Extent, coordinate units, CRS status, sampling, source-resolution/display hints, preview/PNG scope notices and issues remain available behind Details. Projection-method-only names such as `Transverse_Mercator` are explicitly labelled `투영법만 기록됨`. Original limitations were moved, not removed or softened.
+- MAP3 / D4: layer + source feature id, maximum eight attributes, independently scrolling popup body, fixed View all attributes footer, close button/Escape (including focus on the canvas). Position and height are constrained to the map on resize without panning viewport data merely to fit the popup. View all attributes clears table filters/sort, exposes all fields, reveals the selected page and focuses the table; the selected feature stays highlighted.
+- MAP4 / B2 / N / F5: compact labelled CRS/basemap group; PNG and More in the header, reload in More; canvas zoom/fit controls. Shared shadcn Button/Select/DropdownMenu/Popover, with map-local 28 px wrappers in `controls.tsx`. Network copy appears only for an active online provider; native-coordinate view keeps its CRS requirement. Known actionable map errors stay visible; unknown technical errors are disclosed.
+- MAP5 / X1–X5 / A3: table below the canvas, pointer splitter plus ArrowUp/ArrowDown/Home/End keyboard alternative (default 240 px, requested range 184–520 px, constrained by canvas space). This uses MAP5's resizable-split alternative rather than claiming six rows at every size. Sticky sort/filter headers, one state line with scope tooltip, default eight columns with column picker, native CSS column resizing, 36 px rows, right-aligned numeric/tabular values and explicit missing-value colour. No changes to filtering scope, paging or area calculations.
+- MAP6 / I6 / V6: scale line for declared CRS, cursor coordinates in display CRS, zoom/zoom-to-layer and unchanged selected-feature highlight. No fabricated metric scale for native/unknown CRS. The checkerboard came from `map-canvas.tsx`'s repeating-conic-gradient and was replaced by `bg-gaid-face-2`. Raster data palettes, nearest-neighbour tiles, source-pixel reads, vector styles and analysis inputs are unchanged; no image filters or theme-specific component branches.
+- S1 / I7–I15 / G6 / V1–V8: selected layer uses the shared `.gaid-index` marker (instrument pointer / mapsheet frame); role tokens only for chrome, local map CSS is one isolated block at the end of `globals.css`. Removed the resolved map tiny-text baseline item; no new accepted debt. No intentional rule breaks. The existing outer file Workflow suggestions consume space but are outside this unit's scope; screenshots retain them and hide chat with the existing app-bar action.
+
+### Verification
+
+- `cd web && npx tsc --noEmit`: exit 0. Log: `/home/seongin3/data/geoaidesk/work/gaid-ui-v2-debts--map/typecheck.log`.
+- `cd web && npx vitest run src/geo/viewers/map`: 6 files, 34 tests passed. Includes existing request/scope, layer order/opacity/visibility, manifest, fallback, source band, basemap and area behavior; one added regression covers a filtered-out feature on page 2, eight-column default/eight-attribute popup and complete-record link. Log: same work folder `map-tests.log`.
+- `node geo/ui/check-ui.mjs`: 12,630 strings, 0 errors, 111 accepted pre-existing debt entries, no new exceptions.
+- `node geo/copy/validate-copy.mjs web/src/geo/locales`: 28 catalogues, 0 errors, 61 pre-existing warnings. Log: same work folder `copy-check.log`.
+- Impeccable's one final detector pass returned `[]`; log: same work folder `impeccable-detect.json`.
+- Real app used this worktree and a separate rsync copy of the parent's prepared home, ports 18360/3360. No model actions or user-home writes. The screenshot browser and temporary dev service are stopped after capture. Browser console error query returned zero errors. Raster source read returned row 436 / col 590 / -219.20448303222656, and PNG download completed with no failure (`raster-export.png`). Actual vector View all attributes changed 8 → 22 columns and focused the table while preserving selection; Show all displayed all 5 legend classes.
+- All 16 screenshots were visually read against guide §12. The final captures include the shared layer index marker. Browser assertions also checked 320 px inspector, no page overflow, visible legend/info, bounded popup and no patterned map background at every combination. Vector screenshots use the keyboard splitter's 184 px table setting; the table remains resizable. Raster source name/code is visible (`GEOCENTRIC DATUM of AUSTRALIA (EPSG:4283)`).
+
+### Screenshot handoff to parent
+
+Folder: `/home/seongin3/data/geoaidesk/work/gaid-ui-v2-debts/map-shots/`.
+
+Files: `map-<vector|raster>-<instrument|mapsheet>-<light|dark>-<1440|1280>.png` (16 captures). Supporting `vector-evidence.log`, `raster-evidence.log` and `manifest.json` contain measured layout and SHA-256 values. Useful unmodified report figures are `map-vector-instrument-light-1280.png` and `map-raster-mapsheet-dark-1280.png` (already ≤1600 px wide). No separate child report or composed figure is needed; the parent owns the canonical report and review copy.
+
+### Copy changes (Korean first; existing strings retain their exact text)
+
+All additions below are new ids (no previous value). Existing `subset`, `figureNotice`, sampling/hint/limit text and table scope copy moved behind disclosures/tooltips without wording changes. Existing basemap catalogue strings are reused unchanged; the new concise notices live in the map catalogue.
+
+| Id | Korean before → after | English before → after |
+|---|---|---|
+| `map.legendCount` | — → 범례 {count}개 | — → Legend: {count} classes |
+| `map.showAll` | — → 모두 보기 | — → Show all |
+| `map.projectionOnly` | — → 투영법만 기록됨 | — → Projection method only |
+| `map.details` | — → 자세히 | — → Details |
+| `map.pixelCount` | — → 픽셀 수 | — → Pixel count |
+| `map.missing` | — → 결측값 | — → Missing value |
+| `map.allAttributes` | — → 모든 속성 보기 | — → View all attributes |
+| `map.featureIdentity` | — → {layer} · 피처 {id} | — → {layer} · feature {id} |
+| `map.more` | — → 더 보기 | — → More actions |
+| `map.mapDisplay` | — → 지도 표시 | — → Map display |
+| `map.cursorCoordinates` | — → 커서 좌표 | — → Cursor coordinates |
+| `map.coordinateReadout` | — → {crs} · {x}, {y} | — → {crs} · {x}, {y} |
+| `map.coordinateHint` | — → {crs} · 지도 위에서 좌표 확인 | — → {crs} · move over map for coordinates |
+| `map.nativeShort` | — → 원본 좌표 | — → Native coordinates |
+| `map.columns` | — → 표시할 열 | — → Choose columns |
+| `map.areaDetails` | — → 면적 계산 기준 보기 | — → View area calculation rules |
+| `map.onlineBasemap` | — → 온라인 배경지도 사용 중 | — → Online basemap in use |
+| `map.basemapCrsLimit` | — → 배경지도: 원본 CRS 필요 | — → Basemap: source CRS required |
+| `map.basemapStatus` | — → 배경지도 상태 보기 | — → View basemap status |
+| `map.technical` | — → 기술 정보 | — → Technical details |
+| `map.tableResize` | — → 지도와 속성표 높이 조절 | — → Resize map and attribute table |
+
 ## Next steps
-1. Implement the map/inspector layout and disclosure hierarchy; preserve data requests and original map pixels.
+
+1. Run `task finish` for the checked snapshot; parent runs `task complete gaid-ui-v2-debts--map` and the full integration checks.
+2. Parent incorporates the rule/copy evidence and selected screenshot(s) into its canonical report. Keep the isolated map CSS block when integrating its separate globals changes.
+
 ## Failed approaches
+
+- Initial dependency job was refused because source was dirty; saved the implementation and controls, then launched the one recorded npm-ci job. It completed with exit 0. No stopped-before-start job was restarted manually.
+- Initial rsync destination lacked its parent directory; created the task-owned directory and repeated the copy successfully.
+- Old tests assumed native select DOM and always-open sections. Updated them to use shared Select options and the real disclosure paths while retaining request and behavior assertions. Follow-up assertions assumed the label `None`; reread the catalogue (`No basemap`) before correcting them. The added focus regression waits for Radix's menu-close focus restoration before the next user action.
+- Hot refresh briefly detached an OpenLayers popup node; included popup node identity in the map lifecycle dependency and verified a fresh mount plus viewport resize. No backend changes were used as workarounds.
+
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+
+- The work is tightly coupled; no nested child writer or reader was needed. Ownership and integration order were recorded before implementation.
+- The exact-worktree codegraph was unindexed, so source was read directly. Impeccable Operate/distill guidance applied; design-taste-frontend explicitly excludes data-table/product-operation surfaces, so no marketing styling was introduced. The adopted UI guide and brand assets are the brand authority.
+- No new requirements, decisions or debt are proposed. No source data or `.geomap.json` manifest format was modified.
+
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+
+None for this child. Parent integration/full check is the parent's existing responsibility, not a new open item.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+
+No separate child report. The parent owns the canonical `gaid-ui-v2-debts` report and embeds the map result there.
+
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ui-v2-debts--map-20261022T020123.965959Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

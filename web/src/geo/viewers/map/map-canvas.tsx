@@ -47,6 +47,7 @@ interface Props {
 }
 const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref) {
   const [cursor, setCursor] = useState<number[]>();
+  const [canvasSize, setCanvasSize] = useState("");
   const target = useRef<HTMLDivElement>(null);
   const mapRef = useRef<OlMap | null>(null);
   const current = useRef(props);
@@ -125,11 +126,15 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
       if (!hit) current.current.onCoordinate(event.coordinate);
     });
     if (popupElement) { overlay.current = new Overlay({ element: popupElement, stopEvent: true, offset: [0, 0] }); map.addOverlay(overlay.current); }
-    const observer = new ResizeObserver(() => map.updateSize());
+    const observer = new ResizeObserver(() => {
+      map.updateSize();
+      setCanvasSize(map.getSize()?.join(":") ?? "");
+      target.current?.parentElement?.style.setProperty("--gaid-map-popup-height", `${Math.max(96, (map.getSize()?.[1] ?? 320) - 16)}px`);
+    });
     observer.observe(target.current);
     return () => { observer.disconnect(); map.setTarget(undefined); map.dispose(); mapRef.current = null; overlay.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.crs]);
+  }, [props.crs, popupElement]);
   // OpenLayers layers are kept per layer identity: a tile layer keeps its tile cache across
   // re-renders (selection, opacity, order); only a new style/CRS/data object replaces it.
   const built = useRef(new Map<string, { key: unknown; layer: BaseLayer }>());
@@ -189,16 +194,20 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     if (!position) return;
     // Open away from the nearest map edges so the popup stays inside the map without panning it.
     const pixel = map.getPixelFromCoordinate(position); const size = map.getSize();
-    const below = !pixel || !size || pixel[1] < size[1] / 2;
-    const side = !pixel || !size ? "center" : pixel[0] < size[0] / 3 ? "left" : pixel[0] > (size[0] * 2) / 3 ? "right" : "center";
-    o.setPositioning(`${below ? "top" : "bottom"}-${side}`);
-    o.setOffset([side === "left" ? -12 : side === "right" ? 12 : 0, below ? 12 : -12]);
-  }, [popupAt, props.selected, props.layers, props.crs]);
+    if (!pixel || !size || !popupElement) return;
+    const width = popupElement.offsetWidth;
+    const height = popupElement.offsetHeight;
+    const left = pixel[0] + width + 20 <= size[0] ? pixel[0] + 12 : pixel[0] - width - 12;
+    const top = pixel[1] + height + 20 <= size[1] ? pixel[1] + 12 : pixel[1] - height - 12;
+    o.setPositioning("top-left");
+    o.setOffset([Math.max(8, Math.min(size[0] - width - 8, left)) - pixel[0], Math.max(8, Math.min(size[1] - height - 8, top)) - pixel[1]]);
+  }, [popupAt, props.selected, props.layers, props.crs, canvasSize]);
   useEffect(() => {
-    if (!popupElement) return;
+    const element = target.current;
+    if (!element) return;
     const close = (e: KeyboardEvent) => { if (e.key === "Escape") current.current.onClosePopup?.(); };
-    popupElement.addEventListener("keydown", close);
-    return () => popupElement.removeEventListener("keydown", close);
+    element.addEventListener("keydown", close);
+    return () => element.removeEventListener("keydown", close);
   }, [popupElement]);
   useEffect(() => () => { for (const entry of built.current.values()) entry.layer.dispose(); built.current.clear(); }, [props.crs]);
   return <div className="relative h-full min-h-40 w-full bg-gaid-face-2">

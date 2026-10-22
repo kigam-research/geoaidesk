@@ -36,12 +36,12 @@ export default function AreaPanel({ layer, projectId, fields }: { layer: LayerSt
     <details><summary className="cursor-pointer text-gaid-ink-2">{t("areaDetails")}</summary><p className="pt-2">{t("areaHint")}</p></details>
     {!hasCrs(sourceCrs(layer)) && <p>{t("nativeLimit")}</p>}
     <div className="flex flex-wrap gap-3">
-      <label>{t("classField")} <MapSelect value={classField} onChange={value => { invalidate(); setClassField(value); }}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</MapSelect></label>
-      <label>{t("method")} <MapSelect value={method} onChange={value => { invalidate(); setMethod(value); }}><option value="">{t("chooseMethod")}</option><option value="geodesic">{t("geodesic")}</option><option value="projected">{t("projected")}</option></MapSelect></label>
+      <label>{t("classField")} <MapSelect aria-label={t("classField")} value={classField} onChange={value => { invalidate(); setClassField(value); }}><option value="">{t("noField")}</option>{fields.map(f => <option key={f}>{f}</option>)}</MapSelect></label>
+      <label>{t("method")} <MapSelect aria-label={t("method")} value={method} onChange={value => { invalidate(); setMethod(value); }}><option value="">{t("chooseMethod")}</option><option value="geodesic">{t("geodesic")}</option><option value="projected">{t("projected")}</option></MapSelect></label>
       {method === "projected" && <label>{t("areaCrs")} <input className={mapInput} value={crs} placeholder="EPSG:5186" onChange={e => { invalidate(); setCrs(e.target.value); }} /></label>}
       <MapButton disabled={!request || busy} onClick={calculate}>{t("runArea")}</MapButton>
     </div>
-    {busy && <p role="status">{t("loading")}</p>}{error && <p role="alert">{error}</p>}
+    {busy && <p role="status">{t("loading")}</p>}{error && <div role="alert">{t("areaError")}<details><summary>{t("technical")}</summary>{error}</details></div>}
     {table && <div className="space-y-2">
       <p>{t("fullLayer", { method: table.method, crs: table.areaCrs ?? t("geodesic") })}</p>
       <p>{t("totalArea", { area: table.totalArea, count: table.featureCount, empty: table.emptyCount })}</p>

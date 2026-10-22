@@ -93,8 +93,7 @@
       "web/src/geo/authoring-preview/app.tsx:#f8fafc",
       "web/src/geo/authoring-preview/source-input.tsx:#174bd1",
       "web/src/geo/authoring-preview/source-input.tsx:#1f5eff",
-      "web/src/geo/context/prompt-budget.tsx:text-[11px]",
-      "web/src/geo/viewers/map/index.tsx:text-[11px]"
+      "web/src/geo/context/prompt-budget.tsx:text-[11px]"
     ],
     "slop": [
       "web/src/geo/library/add-paper-dialog.tsx:hue-utility:dark:text-amber-300",

@@ -12,7 +12,7 @@ vi.mock("./map-canvas", async () => {
   const { forwardRef, useImperativeHandle } = await import("react");
   return { default: forwardRef(function MockCanvas(props: { onViewport(v: unknown): void; onCoordinate(c: number[]): void; onPick(id: string, row: number, c: number[]): void; popup?: { at: unknown; content: React.ReactNode } }, ref) {
     useImperativeHandle(ref, () => ({ fit: vi.fn(), exportPng: vi.fn().mockResolvedValue(undefined) }));
-    return <div><button onClick={() => props.onViewport({ bbox: [0, 0, 10, 10], width: 1000, height: 800 })}>pan-map</button><button onClick={() => props.onCoordinate([5, 15])}>pixel-zero</button><button onClick={() => props.onCoordinate([15, 15])}>pixel-null</button><button onClick={() => props.onPick("0", 0, [1, 1])}>pick-feature</button><div data-testid="map-popup" data-at={JSON.stringify(props.popup?.at ?? null)}>{props.popup?.content}</div></div>;
+    return <div><button onClick={() => props.onViewport({ bbox: [0, 0, 10, 10], width: 1000, height: 800 })}>pan-map</button><button onClick={() => props.onCoordinate([5, 15])}>pixel-zero</button><button onClick={() => props.onCoordinate([15, 15])}>pixel-null</button><button onClick={() => props.onPick("0", 0, [1, 1])}>pick-feature</button><button onClick={() => props.onPick("0", 500, [1, 1])}>pick-feature-later</button><div data-testid="map-popup" data-at={JSON.stringify(props.popup?.at ?? null)}>{props.popup?.content}</div></div>;
   }) };
 });
 const mockFetch = vi.mocked(apiFetch);
@@ -27,6 +27,13 @@ beforeEach(() => {
   Object.defineProperty(navigator, "languages", { configurable: true, value: ["en"] });
   mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection(JSON.parse(String(init?.body)).path)) : respond(page()));
 });
+function expand(name: string) {
+  fireEvent.click(screen.getAllByText(name).find(el => el.tagName === "SUMMARY")!);
+}
+async function choose(label: string, option: string) {
+  fireEvent.keyDown(screen.getByRole("combobox", { name: label }), { key: "ArrowDown" });
+  fireEvent.click(await screen.findByRole("option", { name: option }));
+}
 describe("map viewer", () => {
   it("inspects before paging, uses selected GPKG layer, bounds and explicit project scope", async () => {
     render(<MapViewer {...props} />);
@@ -40,14 +47,14 @@ describe("map viewer", () => {
     expect(body(second)).toMatchObject({ layer: "rocks", limit: 500, offset: 0, displayCrs: "EPSG:3857" }); expect(second[2]).toBe("project-a");
     // Basic information sits in the panel next to the map.
     const info = within(screen.getByRole("complementary", { name: "Map information" })).getByRole("region", { name: "Layer information" });
-    expect(info).toHaveTextContent("Source CRSEPSG:5186"); expect(info).toHaveTextContent("Display CRSEPSG:3857");
+    expect(info).toHaveTextContent("Source CRSEPSG:5186"); expect(info).toHaveTextContent("Display CRS: EPSG:3857");
     const basemaps = screen.getByRole("region", { name: /basemap/i });
-    expect(within(basemaps).getByRole("combobox")).toBeEnabled(); expect(within(basemaps).getByRole("combobox")).toHaveValue("none");
+    expect(within(basemaps).getByRole("combobox")).toBeEnabled(); expect(within(basemaps).getByRole("combobox")).toHaveTextContent("No basemap");
     fireEvent.click(screen.getByText("Next page"));
     await waitFor(() => expect(mockFetch.mock.calls.some(c => c[0] === "/geo/vector-page" && body(c).offset === 500)).toBe(true));
     fireEvent.click(screen.getByText("pan-map"));
     await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").at(-1)!)).toMatchObject({ bbox: [0, 0, 10, 10], offset: 0 }));
-    fireEvent.change(screen.getByLabelText("GeoPackage layer"), { target: { value: "faults" } });
+    expand("Display settings"); await choose("GeoPackage layer", "faults");
     await waitFor(() => expect(body(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page").at(-1)!)).toMatchObject({ layer: "faults", offset: 0 }));
     await screen.findAllByRole("cell", { name: "granite" });
     fireEvent.click(screen.getByText("pick-feature"));
@@ -60,28 +67,31 @@ describe("map viewer", () => {
   it("keeps unknown CRS native, blocks overlay, and disables analytical area", async () => {
     mockFetch.mockImplementation((url, init) => url === "/geo/inspect" ? respond(inspection(JSON.parse(String(init?.body)).path, true)) : respond({ ...page(), displayCrs: "native", sourceCrs: { status: "unknown" } }));
     render(<MapViewer {...props} />);
-    await screen.findByText(/Native coordinates \(no geographic placement\)/);
+    await screen.findAllByText(/Native coordinates \(no geographic placement\)/);
     // The native-coordinate notice comes from inspection; the page request may follow it under load.
     await waitFor(() => expect(mockFetch.mock.calls.some(c => c[0] === "/geo/vector-page")).toBe(true));
     expect(body(mockFetch.mock.calls.find(c => c[0] === "/geo/vector-page")!).displayCrs).toBe("native");
+    expand("Full-layer area table");
     expect(screen.getByText("Calculate full-layer area")).toBeDisabled();
     // Basemaps need a declared CRS: the picker stays visible but disabled, "none" selected.
     const basemaps = screen.getByRole("region", { name: /basemap/i });
-    expect(within(basemaps).getByRole("combobox")).toBeDisabled(); expect(within(basemaps).getByRole("combobox")).toHaveValue("none");
-    fireEvent.change(screen.getByLabelText("Sandbox-relative path"), { target: { value: "other.gpkg" } }); fireEvent.click(screen.getByText("Add layer"));
+    expect(within(basemaps).getByRole("combobox")).toBeDisabled(); expect(within(basemaps).getByRole("combobox")).toHaveTextContent("No basemap");
+    fireEvent.click(screen.getByRole("button", { name: "Add layer" }));
+    fireEvent.change(screen.getByLabelText("Sandbox-relative path"), { target: { value: "other.gpkg" } }); fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Add layer" }));
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
     await screen.findByText(/Sources with missing or conflicting CRS cannot overlay/);
     expect(screen.queryByRole("button", { name: "Select layer: other.gpkg" })).not.toBeInTheDocument();
   });
   it("calculates a full-layer numerical table only after explicit method selection", async () => {
     mockFetch.mockImplementation(url => url === "/geo/inspect" ? respond(inspection()) : url === "/geo/area-table" ? respond({ scope: "full-layer", unit: "m²", rows: [{ class: "granite", featureCount: 600, area: 1234.5, percent: 100 }], path: "rocks.gpkg", classField: "class", method: "geodesic", totalArea: 1234.5, featureCount: 600, emptyCount: 0, limitations: [] }) : respond(page()));
-    render(<MapViewer {...props} />); await screen.findByRole("heading", { name: "Full-layer area table" });
+    render(<MapViewer {...props} />); await screen.findByText("pan-map"); expand("Full-layer area table"); await screen.findByRole("heading", { name: "Full-layer area table" });
     fireEvent.click(screen.getByText("pan-map"));
-    fireEvent.change(screen.getByLabelText("Area class field"), { target: { value: "class" } });
+    await choose("Area class field", "class");
     expect(screen.getByText("Calculate full-layer area")).toBeDisabled();
-    fireEvent.change(screen.getByLabelText("Area method"), { target: { value: "projected" } });
+    await choose("Area method", "Projected CRS area");
     fireEvent.change(screen.getByLabelText("Area CRS (EPSG code)"), { target: { value: "EPSG:3857" } });
     expect(screen.getByText("Calculate full-layer area")).toBeDisabled();
-    fireEvent.change(screen.getByLabelText("Area method"), { target: { value: "geodesic" } });
+    await choose("Area method", "Ellipsoidal geodesic area");
     fireEvent.click(screen.getByText("Calculate full-layer area"));
     await screen.findByText(/Total area: 1234.5 m²/);
     const request = body(mockFetch.mock.calls.find(c => c[0] === "/geo/area-table")!);
@@ -123,7 +133,7 @@ describe("map viewer", () => {
     const styles = () => mockFetch.mock.calls.filter(c => c[0] === "/geo/raster-style");
     fireEvent.click(screen.getByText("pan-map"));
     expect(styles()).toHaveLength(1); expect(mockFetch.mock.calls.some(c => c[0] === "/geo/raster-window")).toBe(false);
-    fireEvent.change(screen.getByLabelText("Band"), { target: { value: "2" } }); await waitFor(() => expect(body(styles().at(-1)!).band).toBe(2));
+    expand("Display settings"); await choose("Band", "2"); await waitFor(() => expect(body(styles().at(-1)!).band).toBe(2));
   });
   it("preserves ordinary TIFF fallback and initializes artifact layers/analysis paths", async () => {
     mockFetch.mockImplementation(() => respond({ ...inspection(), asset: { ...inspection().asset, format: "tiff", family: "raster" } }));
@@ -133,8 +143,9 @@ describe("map viewer", () => {
     mockFetch.mockImplementation(url => url === "/geo/result" ? respond(artifact) : respond({ ...page(), full: true, nextOffset: null }));
     render(<MapViewer {...props} path="result.geomap.json" />);
     await screen.findByRole("heading", { name: "Result" });
+    expand("Analysis artifacts"); expand("Display settings");
     expect(screen.getByRole("button", { name: "Select layer: two.gpkg" })).toBeInTheDocument(); expect(screen.getByText("Full analysis table: results/area.csv")).toBeInTheDocument(); expect(screen.getByText("Analysis script: scripts/area.py")).toBeInTheDocument();
-    expect(screen.getByLabelText("Categorical colors")).toBeChecked(); expect(screen.getByLabelText("Color class field")).toHaveValue("class");
+    expect(screen.getByLabelText("Categorical colors")).toBeChecked(); expect(screen.getByLabelText("Color class field")).toHaveTextContent("class");
     expect(geoFileCategory("RESULT.GEOMAP.JSON")).toBe("geo-map"); expect(geoFileCategory("other.json")).toBeNull();
     expect(within(screen.getByRole("region", { name: "Layers" })).getAllByRole("slider")).toHaveLength(2);
     await waitFor(() => expect(mockFetch.mock.calls.filter(c => c[0] === "/geo/vector-page")).toHaveLength(2));
@@ -154,7 +165,7 @@ describe("map viewer", () => {
     mockFetch.mockImplementation(url => url === "/geo/inspect" ? respond(inspection()) : respond(full));
     render(<MapViewer {...props} />);
     const table = await screen.findByRole("region", { name: "Layer attribute table" });
-    expect(table).toHaveTextContent("Sort and filters apply to every feature of the layer");
+    expect(within(table).getByRole("heading")).toHaveAttribute("title", expect.stringContaining("Sort and filters apply to every feature of the layer"));
     const firstColumn = () => within(table).getAllByRole("row").slice(1).map(r => within(r).getAllByRole("cell")[0].textContent);
     expect(firstColumn()).toEqual(["granite", "gneiss", "alluvium"]);
     fireEvent.click(within(table).getByRole("button", { name: "age" }));
@@ -177,4 +188,25 @@ describe("map viewer", () => {
     expect(screen.getByTestId("map-popup")).toHaveAttribute("data-at", '"selected"');
     expect(within(screen.getByTestId("map-popup")).getByRole("dialog", { name: "Selected feature properties" })).toHaveTextContent("classgneissageNo data");
   });
+  it("reveals a filtered-out selected record on a later page with every attribute", async () => {
+    const fields = ["class", ...Array.from({ length: 9 }, (_, i) => `field${i}`)];
+    const full: VectorPage = { ...page(), full: true, nextOffset: null, fields,
+      features: { type: "FeatureCollection", features: Array.from({ length: 501 }, (_, row) => ({ type: "Feature", geometry: null, properties: Object.fromEntries(fields.map(field => [field, field === "class" ? `rock-${row}` : row])) })) } };
+    mockFetch.mockImplementation(url => url === "/geo/inspect" ? respond(inspection()) : respond(full));
+    render(<MapViewer {...props} />);
+    const table = await screen.findByRole("region", { name: "Layer attribute table" });
+    expect(within(table).getAllByRole("columnheader")).toHaveLength(8);
+    fireEvent.click(within(table).getByRole("button", { name: "Sort and filter column class" }));
+    fireEvent.change(within(screen.getByRole("dialog")).getByLabelText("Contains"), { target: { value: "no-matching-rock" } });
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    await waitFor(() => expect(within(table).getByRole("button", { name: "Sort and filter column class" })).toHaveFocus());
+    fireEvent.click(screen.getByText("pick-feature-later"));
+    const popup = within(screen.getByTestId("map-popup"));
+    expect(popup.getAllByRole("term")).toHaveLength(8);
+    fireEvent.click(popup.getByRole("button", { name: "View all attributes" }));
+    await waitFor(() => expect(within(table).getAllByRole("columnheader")).toHaveLength(10));
+    expect(within(table).getByRole("row", { selected: true })).toHaveTextContent("rock-500");
+    expect(table.querySelector("[data-map-table-scroller]")).toHaveFocus();
+  });
+
 });

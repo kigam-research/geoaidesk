@@ -132,5 +132,6 @@
   "onlineBasemap": "온라인 배경지도 사용 중",
   "basemapCrsLimit": "배경지도: 원본 CRS 필요",
   "basemapStatus": "배경지도 상태 보기",
-  "technical": "기술 정보"
+  "technical": "기술 정보",
+  "tableResize": "지도와 속성표 높이 조절"
 }
