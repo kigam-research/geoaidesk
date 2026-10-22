@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T02:47:39Z
+status: active
+updated: 2026-10-22T02:50:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"813b374f-6081-4e35-bb00-2a85b20c78b0","pid":2577995,"provider":"codex","session":"01a1616f-ac32-7212-a099-657c660972dd","start":"52400975","token":"036c33bc715fc3253d6171a7b69b7e96a7088ceff337e24a0d8d0d1cf2cffa5f"}
 branch: task/gaid-research-visuals--records
 target: task/gaid-research-visuals
@@ -100,6 +100,10 @@ Closed 2026-10-22T02:47:39Z: ready; the parent gaid-research-visuals integrates 
 - First task finish full check: 2076 backend tests passed, 8 skipped; the sole failure was win-portability's source
   conformance check because the preview normalizer used path.relative directly. Replaced it with apiRelative, the
   repository's wire-format choke point. Focused portability + figure tests: 30 passed across 2 files; retrying finish.
+- Stopped the second finish check's own process group before changing code: the final screenshot review found
+  gaid-seg attached to the active tab rather than its wrapper, which missed the shared mapsheet selection rule.
+  Corrected the wrapper, rechecked the 5 component tests and UI validator, and recaptured the complete matrix at
+  settled CSS-transition states. No unrelated process was stopped.
 - The initial copy recognizer failed to match cp at the opening quote of JSON-serialized arguments; corrected the token
   boundary and verified both observed-edge and hash-copy cases, including a hash match to another copied figure.
 - The external screenshot fixture initially missed Tailwind source scanning and the public font directory; fixed the
@@ -148,8 +152,8 @@ remains that warrants a reader; provenance and UI work are tightly coupled withi
   no horizontal overflow; one primary in actionable views; visible labels and focusable native controls; record details
   collapsed; original pixels (computed filter none); white mats remain rgb(255,255,255); font loaded.
   Representative files and sha256:
-  - 1280-instrument-dark-check.png: 4cc4639747e50db8aec02e019dd48cac5a4fd5850835a153e4f06a9a576edee0
-  - 1440-mapsheet-light-origin.png: 04d9c4af2a25d81ea1d83ea168aff70488b1a812c8b518010d3a8d9c86605577
+  - 1280-instrument-dark-check.png: 3eaa44e4119096a9b13c403f00c42f5efa42449879be0e2c6fb995b5f03c637c
+  - 1440-mapsheet-light-origin.png: 6d4acdfc5cda89544bd4c6da8fa66ed16b7554a4eb60d0ae6ce1dd663c165513
 
 ### Integration limits
 - The skill directory does not exist in this child snapshot. Actual Python/journal/CVD execution is not verified here;
