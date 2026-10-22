@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:09:06Z
+updated: 2026-10-22T15:18:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ae22402c-3c23-4d4f-a3f2-53a34a33fd4e","pid":2316190,"provider":"claude","session":"a84ff37e-f54b-47e9-b216-7e2a5ce01bc0","start":"56712264","token":"2910bef256a9caa5c7498bb6d9647f32045f60a92a90aded98a1e4fdbf68e513"}
 branch: task/gaid-hub-feeds
 target: main
@@ -68,10 +68,10 @@ Meaning of the decisions (they answer the hub's four questions):
 - Verified: server feeds/e2e/hub tests 76 + web hub tests pass; GAID ↔ real hub server e2e `server/test/geo-hub-feeds-e2e.test.ts`;
   live: local hub on 127.0.0.1:8711 (home ~/data/geoaidesk/work/gaid-hub-feeds/hub-home), 18/18 sources collected (~21 s),
   default list 154 items; browser checks + 14 screenshots in ~/data/geoaidesk/work/gaid-hub-feeds/playwright/ (SHA256SUMS).
-- Temporary services (stop at finish): user units `gaid-hub-feeds-app` (GAID 3110/8110, data under the work dir) and
+- Temporary services (stopped 2026-10-23): user units `gaid-hub-feeds-app` (GAID 3110/8110, data under the work dir) and
   `gaid-hub-feeds-hub` (hub 8711).
 ## Next steps
-1. Record the scripts/check result in the report appendix, stop the two temporary units, `task finish`.
+1. scripts/check passed (exit 0 at a45657f6; log ~/data/geoaidesk/work/gaid-hub-feeds/logs/check.log). Stop the two temporary units, review-copy, `task finish`.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: sequential = contract → (child server ∥ parent GAID/web) → integration. Owned files: child =
