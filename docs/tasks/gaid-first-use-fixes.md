@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T12:58:31Z
+status: done
+updated: 2026-10-22T12:58:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c7c994c8-9104-4a2d-91ca-02598ddfa51c","pid":3710652,"provider":"claude","session":"71412738-bdac-483a-bb75-b3200c12f5e4","start":"55874657","token":"7300838461defcef07e6e5adf36f6fd631e6d0e4dc5860a2c9bdad6b1f73a570"}
 branch: task/gaid-first-use-fixes
 target: main
@@ -67,7 +67,9 @@ scripts/check passed on the rerun (log `~/data/geoaidesk/work/gaid-first-use-fix
 Overlap: gaid-orcid edits `MetadataOrigin` in `web/src/geo/contracts/library.ts` and library locales (`filter.unread`
 is adjacent to its `filter.mine`); resolve at merge.
 ## Next steps
-1. task finish (check passed, report filled, review copy made).
+<!-- task:closed -->
+Closed 2026-10-22T12:58:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-first-use-fixes.md.
+
 ## Failed approaches
 - Table cells with `overflow-wrap:anywhere` fit 6 columns at the default chat width but split names ("Pebes ma");
   replaced by whole-word wrapping (fits when the chat is widened; narrower scrolls inside the table, guide X2).
@@ -81,7 +83,7 @@ Closes: gaid-user-acceptance#1
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [확인] 검토용 앱 반영 뒤 모델 선택 창에서 GPT-6.1 Sol 등이 한 번씩만 보이는지 확인 — 가) 한 번씩 보임 — 나) 아직 두 번 보임 — 권장: 가) 시험 앱 목록으로 자동 시험은 통과 — 막힌 일: 없음 — 조건: 검토용 앱이 이 수정으로 갱신된 뒤 — 근거: reports/2026-10-22-gaid-first-use-fixes#3.2
+- [확인 gaid-first-use-fixes#1] 검토용 앱 반영 뒤 모델 선택 창에서 GPT-6.1 Sol 등이 한 번씩만 보이는지 확인 — 가) 한 번씩 보임 — 나) 아직 두 번 보임 — 권장: 가) 시험 앱 목록으로 자동 시험은 통과 — 막힌 일: 없음 — 조건: 검토용 앱이 이 수정으로 갱신된 뒤 — 근거: reports/2026-10-22-gaid-first-use-fixes#3.2
 ## Report
 Report: reports/2026-10-22-gaid-first-use-fixes/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
