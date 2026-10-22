@@ -64,15 +64,17 @@ describe("Shared hub browse", () => {
     expect(screen.getByRole("button", { name: "지질 지도 확인 열기" })).toBeTruthy();
   });
 
-  it("defaults home to browse and keeps search when switching to personal drafts and back", async () => {
-    render(<HubHome recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />);
-    expect(screen.getByRole("tab", { name: "허브에 등록된 Workflow" }).getAttribute("aria-selected")).toBe("true");
+  it("opens on 추천 Workflow with the registry list and keeps the search when switching to personal drafts and back", async () => {
+    render(<HubHome recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} registryFolders={[{ id: "geo", name: "지질", count: 1 }]} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "추천 Workflow" }).getAttribute("aria-current")).toBe("page");
     await loaded();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "지도" } });
-    fireEvent.mouseDown(screen.getByRole("tab", { name: /내가 만든 Workflow/ }), { button: 0, ctrlKey: false });
+    fireEvent.click(screen.getByRole("button", { name: /초안과 등록한 것/ }));
     expect(screen.queryByRole("searchbox")).toBeNull();
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "허브에 등록된 Workflow" }), { button: 0, ctrlKey: false });
+    fireEvent.click(screen.getByRole("button", { name: "추천 Workflow" }));
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("지도");
     await loaded();
+    fireEvent.click(screen.getByRole("button", { name: /^지질\s*1$/ }));
+    await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", "지도"));
   });
 });

@@ -1,0 +1,127 @@
+---
+format: 1
+status: done
+updated: 2026-10-22T01:39:59Z
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
+branch: task/gaid-design-identity
+target: main
+parent: 
+---
+# gaid-design-identity
+
+## Goal and done criteria
+Request from the starter:
+
+# Request: gaid-design-identity
+
+User request (verbatim, 2026-10-21, to the geoaidesk hub):
+"GAID 허브와 GAID 시스템에서 디자인 가이드와 관련하여 ONEUI 가이드를 기반으로 작성된 것으로 이해하고 있다. 추가 디자인 가이드로 https://tossmini-docs.toss.im/tds-mobile/ 가 있으며, 현재 GAID 허브와 GAID 시스템의 디자인에서 AISlop을 피하면서 독자적인 브랜딩으로 ui/ux시스템이 인식 될 수 있게 디자인을 개선하고 싶다."
+After the hub's proposal: "gaid-design-identity 는 진행하자."
+
+Scope confirmed with the user (hub proposal):
+1. Diagnose the current UI guide (docs/design/ui-guide.md, One UI based; geo/ui/ui-rules.json; geo/ui/check-ui.mjs) and the
+   real GAID hub and GAID system screens; list "AI slop" signs with evidence (generic purple/blue gradients, unmodified
+   component-library cards/badges, ubiquitous icons and fonts, decoration without meaning, etc.).
+2. Benchmark TDS Mobile (https://tossmini-docs.toss.im/tds-mobile/): principles, colour/type/spacing tokens, components,
+   writing rules. GAID is a desktop research tool: adopt only what fits; decide how it merges with the One UI guide.
+3. Brand system proposal: colour, typography, iconography, logo usage (angular orbital G, geo/brand), concept-picture style,
+   motion. Show 2–3 distinct visual directions as real screen mockups; the user chooses.
+4. Implement the chosen direction: tokens + UI guide update, applied to hub and system screens; add anti-slop rules to the
+   UI check in scripts/check.
+Constraints: do not take Toss-proprietary assets (Toss Product Sans, icons, images); fonts with open licences only.
+Logo changes are asked separately in the proposal (relates to open item gaid-release-proof#2, brand approval).
+Coordination: gaid-research-visuals (running) and gaid-library-folders (starting now) build UI later; once a direction is
+chosen, tell the hub so their UI follows the new tokens. Phase 1 here changes no product code.
+Use task review-copy for the proposal and mockups. Own GAID_HOME under ~/data/geoaidesk/work/gaid-design-identity/;
+do not modify ~/.geoaidesk. Outside check: no outside check (design work).
+
+## Current state
+Result (2026-10-22): GAID UI/UX guide v2 (One UI + Apple HIG) is implemented on task/gaid-design-identity: default identity 계측
+(Instrument), user-selectable 도폭 (Map sheet) style in Settings → 화면 표시 → 화면 스타일, light and dark for both, logo unchanged.
+Built by child gaid-design-identity--fresh (Claude Opus 5.5 max; landed 465b1cd1, finished a86f6dbc, completed into this branch)
+after the user rejected the earlier drafts (라, One UI 가/나/O). Kept from this unit: slop UI check (check-ui.mjs `slop`), self-hosted
+Pretendard, boundaries owners. Verified after integration: `node geo/ui/check-ui.mjs` 0 errors (114 baseline), `node --test
+'geo/tests/*.test.mjs'` 49 pass / 1 skipped; the child's finish ran full scripts/check (pass). Report:
+reports/2026-10-21-gaid-design-identity/index.md (rewritten result-first; rejected drafts in §7). Follow-ups are the child's open items
+gaid-design-identity--fresh#1–#5 (map screen to MAP rules, compact-width/keyboard rules, kept answers, corner-shape outside Chromium,
+notes list placement) plus this unit's library tone debt below. Hub informed of the confirmed direction.
+Re-verify: `node geo/ui/check-ui.mjs`; `node --test 'geo/tests/*.test.mjs'`; screenshots in
+`~/data/geoaidesk/work/gaid-design-identity--fresh/app-shots/`.
+Services: this unit's `gaid-design-identity-app` (3310/18310), `gdi-mock-http` (3399), `gdi-work-http` (3397) are to be stopped before finish.
+
+## Next steps
+<!-- task:closed -->
+Closed 2026-10-22T01:39:59Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-design-identity.md.
+
+## Failed approaches
+- Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
+  short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
+- playwright-cli cannot render `file://` mockups (blank page); serve them over http.
+## Notes and decisions
+- 2026-10-22 USER DECISION in the fresh child's tab (relayed verbatim by writer bd409835): proposal guide v2 with identity
+  options 계측 (Instrument), 도폭 (Map sheet), 표준 (Desktop standard); user: "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수
+  있게 할 수 있나?" then, on 가) a 화면 스타일 setting (계측 default, 도폭 optional, independent of 시스템/밝은/어두운, per browser) vs
+  나) 계측 only: "가로 진행하자." → 계측 default + 도폭 selectable style; 표준 not adopted. Proposal review copy:
+  vault `연구 보고서/geoaidesk/2026-10-22-gaid-ui-guide-v2-proposal/`, source `~/data/geoaidesk/work/gaid-design-identity--fresh/proposal/`.
+  The child is landing it; tell the hub after integration.
+- 2026-10-22 hub route design-fresh-20261022 (user, verbatim): "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와
+  https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게
+  재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자." → none of 라 / One UI 가·나·O land.
+  Child `gaid-design-identity--fresh` started with a bias-free brief (`~/data/geoaidesk/work/gaid-design-identity/child-fresh.md`:
+  inputs = origin/main guide + rules, One UI digest, Apple HIG, current main screenshots/code, logo; earlier drafts, reports and
+  tokens excluded). AGENTS.md and the guide now say 라 was not adopted (980eab58).
+- CORRECTION 2026-10-21 (hub route design-oneui-20261021, user-confirmed): direction 라 was the writer's interpretation,
+  not a user decision. User (verbatim): "새로운 디자인을 oneui가이드에 따라 생성하자." → create a new design that follows the
+  One UI guide, avoid AI slop, give GAID a recognisable identity, expert stance (impeccable + taste + brand guide); 2번 (가)
+  dark theme and 3번 (가) logo unchanged stay. Do not land the 라 tokens/guide as the chosen direction; show real screen
+  mockups via review-copy and get an explicit choice (ask back on ambiguity) before landing tokens; then notify the hub.
+  The branch already holds the 라 implementation (tokens 3c069f11, children hub 0921aebb and system a0286ff4): it is
+  provisional until the user chooses; direction-independent parts (anti-slop rules and check, role variables, unfiltered
+  figures, Sparkles removal, Pretendard self-hosting, dark plan) are kept unless the One UI basis changes them.
+- USER DECISIONS 2026-10-21 (verbatim): "1번 라로 하거나 현재 방식 유지다. 새로 제안한 디자인이 적절한 것이 없다. 2번 (가) 3번 (가)로
+  하고 (다)로 더 다듬거나 새롭게 디자인하는 것도 고려하자. 디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서
+  디자인해야한다." Interpreted (told the user, correction invited): direction = 라) 연구 등록부 (Codex `codex/dir-d.css`),
+  not the 섞기 option that shared the label; dark theme in phase 2; logo kept, with further refinement/new logo design as
+  an exploration. Design lens rule → UI guide (repo) + memory. Hub notified (request fded6f8b87d6, kind route).
+- User 2026-10-21 after the first proposal (verbatim): "가 도면은 권장하는데 여전히 흰색 배경이 작동하는 부분들이 있지 않나? 그리고
+  다크테마는 어떻게 할 것인지도 고민해야한다. impeccable 스킬과 taste 스킬로 검토해볼 필요가 있다. codex 고급검토에게 검토도 받고 codex가
+  시각방향을 제안하게도 해보아야 한다. 로고의 경우 그대로 두어도 된다. 그런데 후보군으로 KIGAM로고의 G에 위치한 3가지 색상을 로고에
+  반영하거나 유사한 방식의 디자인적으로 어색하지 않은 방식으로 반영할 수 있다면 후보군으로 다듬어서 제시하는 것도 필요하다." Then:
+  "로고 디자인도 생성되면 고급 codex에게 검토 받고 해당 codex가 시안을 생성할 수 있게 해보자." and "현재 제안한 후보 로고는 색상을
+  그대로 사용해서인지 어색한 감이 있다. 그리고 GAID허브와 GAID시스템의 색상과도 일관성이 있어야 하며, 꼭 KIGAM 로고의 3개 색상을 다
+  사용할 필요도 없으며, 디지털 형식으로 반영해도 된다." → Logo: keeping the current logo is acceptable; candidates are extra.
+  The user explicitly asked for Codex 고급검토 here (overrides the 2026-10-16 default of not using that profile).
+- impeccable/taste review (writer): 가) v1 warm paper #F4F2EC sits in taste's banned "warm paper/cream" default family;
+  eyebrow labels, coloured left borders > 1 px (가 todo, 나 bands) and four equal cards are impeccable craft-floor bans.
+  Changes: shared hub = one featured Workflow + compact list; eyebrow removed; 가) v2 = cool grey-green frame #ECEEEB,
+  white sheet #FCFCFB with 1 px ink neatline only for researcher content (concept figure, notes, documents, map canvas),
+  lists on the frame with hairlines, no left borders; dark theme for all three (`&t=dark`). 나) keeps its colour bands
+  as its defining device (flagged). v1 kept as `mockups/screens-v1.html`, `dir-a-v1.css`.
+- Logo v2 candidates (`logo/`, `make_logos2.py`, `sheet.png`): one KIGAM-derived green tuned to GAID (#0B9A6A, 3.6:1 on
+  white; #35C08A on dark) with brand blue: A two-colour orbit, B stepped digital orbit, C pixel orbit end.
+- Diagnosis facts (evidence in shots/ and code): Pretendard and D2Coding are declared but never loaded (no @font-face,
+  no package; Linux renders Noto Sans CJK JP, Windows would render Malgun Gothic); Sparkles icon is the GAID hub symbol
+  (top-nav, home banner, hub entry); shadcn zinc neutrals and 10 px radius unmodified; upstream Tailwind hues
+  (401 `text-<hue>-<n>` uses, 66 in web/src/geo; violet pill in app/page.tsx; avatar palette sky/emerald/violet/amber/
+  rose/teal in shared-method.tsx); peach category cards for 기본 Workflow; brand blue is the only identity colour and
+  also tints concept pictures; icon before nearly every label; `text-[11px]` header chips.
+- Directions drafted: 가) 도면 (map-sheet: warm paper chrome, ink neatlines, legend swatches, IBM Plex Mono numerals),
+  나) 지층 (strata: family colour bands, workflow-size strata bar, NanumSquare headings), 다) 차분한 목록 (TDS-adapted:
+  grey ground, borderless islands, big type, orbit marker). Logo unchanged in all three.
+(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+## Open items
+(user decisions, checks and accepted debt that outlive this unit, one line each:
+`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
+kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
+the project hub answers or closes them with `task item`)
+- [부채 gaid-design-identity#1] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스로 남아 UI 검사 허용 목록에 있습니다 — 가) 서재 화면을 다시 만지는 다음 작업에서 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 서재 화면 작업과 함께 하면 화면 확인을 한 번에 끝냄 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
+## Report
+Report: reports/2026-10-21-gaid-design-identity/index.md
+(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
+written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
+child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+## Running jobs
+<!-- task:jobs -->
+<!-- /task:jobs -->
+<!-- task:cloud -->
+<!-- /task:cloud -->

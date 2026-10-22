@@ -19,6 +19,7 @@
     "boundary": "Interpretation limits: {boundary}",
     "empty": "No Geo tasks are registered.",
     "category": "Built-in Workflows",
+    "categoryAllUntested": "Built-in Workflows · all untested",
     "search": "Search workflows",
     "showOther": "Show {count} general Workflows",
     "hideOther": "Hide general Workflows"

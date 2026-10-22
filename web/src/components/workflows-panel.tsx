@@ -69,7 +69,7 @@ import {
   SendIcon,
   ShieldIcon,
   SigmaIcon,
-  SparklesIcon,
+  LightbulbIcon,
   SproutIcon,
   StarIcon,
   StethoscopeIcon,
@@ -206,7 +206,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Send: SendIcon,
   Shield: ShieldIcon,
   Sigma: SigmaIcon,
-  Sparkles: SparklesIcon,
+  Sparkles: LightbulbIcon,
   Sprout: SproutIcon,
   Star: StarIcon,
   Stethoscope: StethoscopeIcon,
@@ -224,28 +224,28 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 const CATEGORIES: { id: string; label: string; color: string }[] = [
-  { id: "paper", get label() { return workflowText("categories.paper"); }, color: "text-blue-500" },
-  { id: "visual", get label() { return workflowText("categories.visual"); }, color: "text-rose-500" },
-  { id: "data", get label() { return workflowText("categories.data"); }, color: "text-emerald-500" },
-  { id: "literature", get label() { return workflowText("categories.literature"); }, color: "text-violet-500" },
-  { id: "grants", get label() { return workflowText("categories.grants"); }, color: "text-amber-500" },
-  { id: "scicomm", get label() { return workflowText("categories.scicomm"); }, color: "text-cyan-500" },
-  { id: "genomics", get label() { return workflowText("categories.genomics"); }, color: "text-teal-500" },
-  { id: "proteomics", get label() { return workflowText("categories.proteomics"); }, color: "text-indigo-500" },
-  { id: "cellbio", get label() { return workflowText("categories.cellbio"); }, color: "text-fuchsia-500" },
-  { id: "chemistry", get label() { return workflowText("categories.chemistry"); }, color: "text-orange-500" },
-  { id: "drugdiscovery", get label() { return workflowText("categories.drugdiscovery"); }, color: "text-red-500" },
-  { id: "physics", get label() { return workflowText("categories.physics"); }, color: "text-yellow-600" },
-  { id: "materials", get label() { return workflowText("categories.materials"); }, color: "text-slate-500" },
-  { id: "clinical", get label() { return workflowText("categories.clinical"); }, color: "text-green-500" },
-  { id: "neuro", get label() { return workflowText("categories.neuro"); }, color: "text-purple-500" },
-  { id: "ecology", get label() { return workflowText("categories.ecology"); }, color: "text-lime-600" },
-  { id: "finance", get label() { return workflowText("categories.finance"); }, color: "text-sky-500" },
-  { id: "social", get label() { return workflowText("categories.social"); }, color: "text-pink-500" },
-  { id: "math", get label() { return workflowText("categories.math"); }, color: "text-stone-500" },
-  { id: "ml", get label() { return workflowText("categories.ml"); }, color: "text-blue-600" },
-  { id: "engineering", get label() { return workflowText("categories.engineering"); }, color: "text-zinc-500" },
-  { id: "astro", get label() { return workflowText("categories.astro"); }, color: "text-violet-600" },
+  { id: "paper", get label() { return workflowText("categories.paper"); }, color: "text-gaid-ink-2" },
+  { id: "visual", get label() { return workflowText("categories.visual"); }, color: "text-gaid-ink-2" },
+  { id: "data", get label() { return workflowText("categories.data"); }, color: "text-gaid-ink-2" },
+  { id: "literature", get label() { return workflowText("categories.literature"); }, color: "text-gaid-ink-2" },
+  { id: "grants", get label() { return workflowText("categories.grants"); }, color: "text-gaid-ink-2" },
+  { id: "scicomm", get label() { return workflowText("categories.scicomm"); }, color: "text-gaid-ink-2" },
+  { id: "genomics", get label() { return workflowText("categories.genomics"); }, color: "text-gaid-ink-2" },
+  { id: "proteomics", get label() { return workflowText("categories.proteomics"); }, color: "text-gaid-ink-2" },
+  { id: "cellbio", get label() { return workflowText("categories.cellbio"); }, color: "text-gaid-ink-2" },
+  { id: "chemistry", get label() { return workflowText("categories.chemistry"); }, color: "text-gaid-ink-2" },
+  { id: "drugdiscovery", get label() { return workflowText("categories.drugdiscovery"); }, color: "text-gaid-ink-2" },
+  { id: "physics", get label() { return workflowText("categories.physics"); }, color: "text-gaid-ink-2" },
+  { id: "materials", get label() { return workflowText("categories.materials"); }, color: "text-gaid-ink-2" },
+  { id: "clinical", get label() { return workflowText("categories.clinical"); }, color: "text-gaid-ink-2" },
+  { id: "neuro", get label() { return workflowText("categories.neuro"); }, color: "text-gaid-ink-2" },
+  { id: "ecology", get label() { return workflowText("categories.ecology"); }, color: "text-gaid-ink-2" },
+  { id: "finance", get label() { return workflowText("categories.finance"); }, color: "text-gaid-ink-2" },
+  { id: "social", get label() { return workflowText("categories.social"); }, color: "text-gaid-ink-2" },
+  { id: "math", get label() { return workflowText("categories.math"); }, color: "text-gaid-ink-2" },
+  { id: "ml", get label() { return workflowText("categories.ml"); }, color: "text-gaid-ink-2" },
+  { id: "engineering", get label() { return workflowText("categories.engineering"); }, color: "text-gaid-ink-2" },
+  { id: "astro", get label() { return workflowText("categories.astro"); }, color: "text-gaid-ink-2" },
 ];
 
 /** Upstream categories, for hosts that let the user file their own rows under one (GAID seam). */
@@ -290,54 +290,29 @@ export type WorkflowPanelExtension = {
   collapseUpstream?: { showLabel: (count: number) => string; hideLabel: string };
 };
 
-const CATEGORY_BG: Record<string, string> = {
-  paper: "bg-blue-500/10 hover:bg-blue-500/15 border-blue-500/20",
-  visual: "bg-rose-500/10 hover:bg-rose-500/15 border-rose-500/20",
-  data: "bg-emerald-500/10 hover:bg-emerald-500/15 border-emerald-500/20",
-  literature: "bg-violet-500/10 hover:bg-violet-500/15 border-violet-500/20",
-  grants: "bg-amber-500/10 hover:bg-amber-500/15 border-amber-500/20",
-  scicomm: "bg-cyan-500/10 hover:bg-cyan-500/15 border-cyan-500/20",
-  genomics: "bg-teal-500/10 hover:bg-teal-500/15 border-teal-500/20",
-  proteomics: "bg-indigo-500/10 hover:bg-indigo-500/15 border-indigo-500/20",
-  cellbio: "bg-fuchsia-500/10 hover:bg-fuchsia-500/15 border-fuchsia-500/20",
-  chemistry: "bg-orange-500/10 hover:bg-orange-500/15 border-orange-500/20",
-  drugdiscovery: "bg-red-500/10 hover:bg-red-500/15 border-red-500/20",
-  physics: "bg-yellow-500/10 hover:bg-yellow-500/15 border-yellow-500/20",
-  materials: "bg-slate-500/10 hover:bg-slate-500/15 border-slate-500/20",
-  clinical: "bg-green-500/10 hover:bg-green-500/15 border-green-500/20",
-  neuro: "bg-purple-500/10 hover:bg-purple-500/15 border-purple-500/20",
-  ecology: "bg-lime-500/10 hover:bg-lime-500/15 border-lime-500/20",
-  finance: "bg-sky-500/10 hover:bg-sky-500/15 border-sky-500/20",
-  social: "bg-pink-500/10 hover:bg-pink-500/15 border-pink-500/20",
-  math: "bg-stone-500/10 hover:bg-stone-500/15 border-stone-500/20",
-  ml: "bg-blue-600/10 hover:bg-blue-600/15 border-blue-600/20",
-  engineering: "bg-zinc-500/10 hover:bg-zinc-500/15 border-zinc-500/20",
-  astro: "bg-violet-600/10 hover:bg-violet-600/15 border-violet-600/20",
-};
-
 const CATEGORY_ICON_COLOR: Record<string, string> = {
-  paper: "text-blue-500",
-  visual: "text-rose-500",
-  data: "text-emerald-500",
-  literature: "text-violet-500",
-  grants: "text-amber-500",
-  scicomm: "text-cyan-500",
-  genomics: "text-teal-500",
-  proteomics: "text-indigo-500",
-  cellbio: "text-fuchsia-500",
-  chemistry: "text-orange-500",
-  drugdiscovery: "text-red-500",
-  physics: "text-yellow-600",
-  materials: "text-slate-500",
-  clinical: "text-green-500",
-  neuro: "text-purple-500",
-  ecology: "text-lime-600",
-  finance: "text-sky-500",
-  social: "text-pink-500",
-  math: "text-stone-500",
-  ml: "text-blue-600",
-  engineering: "text-zinc-500",
-  astro: "text-violet-600",
+  paper: "text-gaid-ink-2",
+  visual: "text-gaid-ink-2",
+  data: "text-gaid-ink-2",
+  literature: "text-gaid-ink-2",
+  grants: "text-gaid-ink-2",
+  scicomm: "text-gaid-ink-2",
+  genomics: "text-gaid-ink-2",
+  proteomics: "text-gaid-ink-2",
+  cellbio: "text-gaid-ink-2",
+  chemistry: "text-gaid-ink-2",
+  drugdiscovery: "text-gaid-ink-2",
+  physics: "text-gaid-ink-2",
+  materials: "text-gaid-ink-2",
+  clinical: "text-gaid-ink-2",
+  neuro: "text-gaid-ink-2",
+  ecology: "text-gaid-ink-2",
+  finance: "text-gaid-ink-2",
+  social: "text-gaid-ink-2",
+  math: "text-gaid-ink-2",
+  ml: "text-gaid-ink-2",
+  engineering: "text-gaid-ink-2",
+  astro: "text-gaid-ink-2",
 };
 
 function WorkflowIcon({ name, className }: { name: string; className?: string }) {
@@ -615,7 +590,7 @@ export function WorkflowsPanel({
               onChange={(e) => setSearch(e.target.value)}
               placeholder={extension?.searchPlaceholder ?? workflowText("panel.search")}
               aria-label={extension?.searchPlaceholder ?? workflowText("panel.search")}
-              className="w-full rounded-lg border bg-background py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary placeholder:text-muted-foreground/50"
+              className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary"
             />
           </div>
           {extension?.headerAction}
@@ -626,12 +601,9 @@ export function WorkflowsPanel({
             <button
               key={cat.id}
               onClick={() => scrollToCategory(cat.id)}
-              className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
-                cat.bg ?? CATEGORY_BG[cat.id]
-              )}
+              className="shrink-0 rounded-md border border-gaid-edge bg-gaid-face px-2.5 py-1 text-xs font-medium text-gaid-ink-2 transition-colors hover:bg-gaid-hover hover:text-gaid-ink"
             >
-              <span className={cat.color}>{cat.label}</span>
+              <span>{cat.label}</span>
             </button>
           ))}
         </div>
@@ -646,30 +618,32 @@ export function WorkflowsPanel({
             if (!workflows || workflows.length === 0) return null;
             return (
               <section key={cat.id} data-category={cat.id}>
-                <h3 className={cn("mb-2.5 text-xs font-semibold", cat.color)}>
+                <h3 className="mb-1.5 px-1 text-sm font-semibold text-gaid-ink">
                   {cat.label}
-                  <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-                    ({workflows.length})
+                  <span className="ml-1.5 text-xs font-medium tabular-nums text-gaid-ink-3">
+                    {workflows.length}
                   </span>
                 </h3>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-0.5">
                   {workflows.map((w) => {
                     if ("onSelect" in w) {
                       const Icon = w.icon;
                       // GAID rows: one line of description (UI guide G1); details open from the row's own action.
                       return (
-                        <div key={w.id} className={cn("flex items-start rounded-xl border transition-all", cat.bg ?? CATEGORY_BG[cat.id])}>
+                        <div key={w.id} className="flex items-start rounded-md transition-colors hover:bg-gaid-hover">
                           <button
                             onClick={w.onSelect}
-                            className="flex min-w-0 flex-1 items-start gap-3 rounded-xl px-3.5 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="flex min-w-0 flex-1 items-start gap-3 rounded-md px-2.5 py-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
-                            <Icon className={cn("mt-0.5 size-4 shrink-0", cat.color)} />
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-gaid-edge bg-gaid-face text-gaid-ink-2">
+                              <Icon className="size-4" />
+                            </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="text-sm font-medium text-foreground">{w.name}</span>
+                                <span className="text-sm font-semibold text-foreground">{w.name}</span>
                                 {w.badges}
                               </div>
-                              <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-1" title={w.description}>
+                              <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground" title={w.description}>
                                 {w.description}
                               </p>
                             </div>
@@ -680,7 +654,7 @@ export function WorkflowsPanel({
                               onClick={w.detail.onSelect}
                               aria-label={w.detail.label}
                               title={w.detail.label}
-                              className="m-2 shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-background/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              className="m-1.5 shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             >
                               <InfoIcon className="size-4" aria-hidden />
                             </button>
@@ -688,25 +662,22 @@ export function WorkflowsPanel({
                         </div>
                       );
                     }
-                    const bgClass = CATEGORY_BG[w.category] ?? "";
-                    const iconColor = CATEGORY_ICON_COLOR[w.category] ?? "text-muted-foreground";
                     return (
                       <button
                         key={w.id}
                         onClick={() => setSelectedWorkflow(w)}
-                        className={cn(
-                          "flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
-                          bgClass
-                        )}
+                        className="flex items-start gap-3 rounded-md px-2.5 py-2.5 text-left transition-colors hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        <WorkflowIcon name={w.icon} className={cn("mt-0.5 size-4 shrink-0", iconColor)} />
+                        <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-gaid-edge bg-gaid-face text-gaid-ink-2">
+                          <WorkflowIcon name={w.icon} className="size-4" />
+                        </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-medium text-foreground">{workflowDisplayText(w, "name", w.name)}</span>
                             <SourceBadge source={UPSTREAM_APP_SOURCE} asText />
                             {w.requiresFiles && (
-                              <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-px text-[9px] font-medium text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                <DatabaseIcon className="size-2.5" />
+                              <span className="inline-flex items-center gap-1 rounded-sm bg-gaid-warning-tint px-1.5 py-px text-xs font-medium text-gaid-warning">
+                                <DatabaseIcon className="size-3" />
                                 {workflowText("panel.needs_data")}
                               </span>
                             )}
@@ -727,7 +698,7 @@ export function WorkflowsPanel({
               type="button"
               onClick={() => setUpstreamOpen(!upstreamOpen)}
               aria-expanded={upstreamOpen}
-              className="w-full rounded-xl border border-dashed px-3.5 py-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted/50"
+              className="w-full rounded-md border border-dashed border-gaid-control-edge px-3 py-2.5 text-left text-sm text-gaid-ink-2 transition-colors hover:bg-gaid-hover"
             >
               {upstreamOpen ? extension.collapseUpstream.hideLabel : extension.collapseUpstream.showLabel(ALL_WORKFLOWS.length)}
             </button>

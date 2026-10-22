@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GeoRuntimeBoundary } from "@/geo/authoring-preview/runtime-boundary";
+import { GAID_STYLE_INIT_SCRIPT } from "@/geo/appearance/style-init";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,6 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        {/* GeoAIDesk screen style (계측 default, 도폭 optional): applied before first paint so the page does not flash. */}
+        <script dangerouslySetInnerHTML={{ __html: GAID_STYLE_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased">
         {/* ThemeProvider stays outside GeoLocaleRoot: its inline theme script must be server-rendered. */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

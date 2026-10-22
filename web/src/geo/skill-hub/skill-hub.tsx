@@ -21,7 +21,7 @@ export function SkillHubPreviewNotes({ preview }: { preview: SkillHubPreview }) 
   if (!hub) return null;
   return <div className="space-y-2 break-words text-xs" aria-live="polite">
     {hub.draft && <p>{t("skillHub.methodDraft", { id: hub.draft.methodId, revision: hub.draft.revision, lifecycle: t(`methods.lifecycle.${hub.draft.lifecycle}`) })}</p>}
-    {hub.catalogueNames.length > 0 && <p className="rounded-md border border-amber-500/50 p-2">{t("skillHub.catalogue", { names: hub.catalogueNames.join(", ") })}</p>}
+    {hub.catalogueNames.length > 0 && <p className="rounded-md border border-gaid-warning/50 bg-gaid-warning-tint/40 p-2">{t("skillHub.catalogue", { names: hub.catalogueNames.join(", ") })}</p>}
     {!hub.catalogueAvailable && <p>{t("skillHub.catalogueUnavailable")}</p>}
     <p className="text-muted-foreground">{t("skillHub.snapshot", { digest: hub.sha256 })}</p>
   </div>;

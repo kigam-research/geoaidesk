@@ -206,7 +206,7 @@ const VirtualTreeRow = memo(function VirtualTreeRow({
     return (
       <div
         className={cn(
-          "group/folder absolute inset-x-0 top-0 flex cursor-pointer items-center gap-1 rounded pr-2 text-left transition-colors hover:bg-muted/50",
+          "group/folder absolute inset-x-0 top-0 flex cursor-pointer items-center gap-1 rounded pr-2 text-left transition-colors hover:bg-sidebar-accent",
           isSelected && "bg-muted",
           dropTargetPath === node.path && "ring-2 ring-primary/40",
         )}
@@ -326,7 +326,7 @@ const VirtualTreeRow = memo(function VirtualTreeRow({
   return (
     <div
       className={cn(
-        "group/file absolute inset-x-0 top-0 flex cursor-pointer items-center gap-1 rounded pr-2 transition-colors hover:bg-muted/50",
+        "group/file absolute inset-x-0 top-0 flex cursor-pointer items-center gap-1 rounded pr-2 transition-colors hover:bg-sidebar-accent",
         isSelected && "bg-muted",
       )}
       role="treeitem"
@@ -598,7 +598,7 @@ export const FileTreePanel = memo(function FileTreePanel({
 
   return (
     <div
-      className="relative flex h-full flex-col border-r"
+      className="relative flex h-full flex-col border-r border-gaid-frame bg-gaid-chrome"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -613,7 +613,7 @@ export const FileTreePanel = memo(function FileTreePanel({
         </div>
       )}
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-1 border-b px-3 py-2.5">
+      <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-1 border-b border-gaid-frame py-1 pl-3 pr-1.5">
         <div className="flex items-center gap-2">
           <InfoTooltip
             content={
@@ -624,17 +624,17 @@ export const FileTreePanel = memo(function FileTreePanel({
             }
           >
             <div className="flex items-center gap-2 cursor-help">
-              <FolderOpenIcon className="size-4 text-blue-500" />
-              <span className="font-semibold text-sm">{appText("files.sandbox")}</span>
+              <FolderOpenIcon className="size-4 text-gaid-ink-2" />
+              <span className="text-sm font-semibold">{appText("files.sandbox")}</span>
               {totalFiles > 0 && (
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600 tabular-nums">
+                <span className="text-xs font-medium tabular-nums text-gaid-ink-3">
                   {totalFiles}
                 </span>
               )}
             </div>
           </InfoTooltip>
         </div>
-        <div className="flex flex-wrap items-center gap-0.5">
+        <div className="flex items-center">
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileChange} />
           {/* @ts-expect-error -- webkitdirectory is non-standard but supported in all major browsers */}
           <input ref={dirInputRef} type="file" webkitdirectory="" className="hidden" onChange={handleFileChange} />
@@ -651,7 +651,7 @@ export const FileTreePanel = memo(function FileTreePanel({
                 </>
               }
             >
-              <button onClick={onDownloadAll} aria-label={appText("files.download_all_as_zip")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+              <button onClick={onDownloadAll} aria-label={appText("files.download_all_as_zip")} className="rounded-md p-1.5 text-gaid-ink-2 transition-colors hover:bg-sidebar-accent hover:text-gaid-ink">
                 <ArchiveIcon className="size-3.5" />
               </button>
             </InfoTooltip>
@@ -664,7 +664,7 @@ export const FileTreePanel = memo(function FileTreePanel({
                 {appText("files.create_a_subdirectory_at_the_sandbox_root")}</>
             }
           >
-            <button onClick={() => setCreatingDirIn("")} aria-label={appText("files.new_folder")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button onClick={() => setCreatingDirIn("")} aria-label={appText("files.new_folder")} className="rounded-md p-1.5 text-gaid-ink-2 transition-colors hover:bg-sidebar-accent hover:text-gaid-ink">
               <FolderPlusIcon className="size-3.5" />
             </button>
           </InfoTooltip>
@@ -678,7 +678,7 @@ export const FileTreePanel = memo(function FileTreePanel({
               }
             >
               <DropdownMenuTrigger asChild>
-                <button disabled={uploading} aria-label={appText("files.upload_files_or_folder")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50">
+                <button disabled={uploading} aria-label={appText("files.upload_files_or_folder")} className="rounded-md p-1.5 text-gaid-ink-2 transition-colors hover:bg-sidebar-accent hover:text-gaid-ink disabled:opacity-50">
                   {uploading ? <LoaderIcon className="size-3.5 animate-spin" /> : <UploadIcon className="size-3.5" />}
                 </button>
               </DropdownMenuTrigger>
@@ -700,12 +700,12 @@ export const FileTreePanel = memo(function FileTreePanel({
                 {appText("files.reload_the_file_tree_from_disk_useful")}</>
             }
           >
-            <button onClick={onRefresh} aria-label={appText("files.refresh")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button onClick={onRefresh} aria-label={appText("files.refresh")} className="rounded-md p-1.5 text-gaid-ink-2 transition-colors hover:bg-sidebar-accent hover:text-gaid-ink">
               <RefreshCwIcon className="size-3.5" />
             </button>
           </InfoTooltip>
           <InfoTooltip content={appText("files.hide_the_sandbox_panel")}>
-            <button onClick={onClose} aria-label={appText("files.close_sandbox_panel")} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button onClick={onClose} aria-label={appText("files.close_sandbox_panel")} className="rounded-md p-1.5 text-gaid-ink-2 transition-colors hover:bg-sidebar-accent hover:text-gaid-ink">
               <XIcon className="size-3.5" />
             </button>
           </InfoTooltip>
@@ -732,7 +732,7 @@ export const FileTreePanel = memo(function FileTreePanel({
           </div>
         ) : (
           <div
-            className="relative rounded-lg bg-background font-mono text-sm"
+            className="relative rounded-lg font-sans text-sm"
             style={{ height: range.totalHeight }}
           >
             {visibleRows.slice(range.start, range.end).map((row, index) => (

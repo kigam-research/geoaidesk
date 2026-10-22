@@ -48,8 +48,9 @@ export function GeoTaskCatalogue(props: { projectId: string; availableFiles: str
   return <TaskCatalogue key={props.projectId} {...props} />;
 }
 
-const GEO_CATEGORY_TONE = { color: "text-amber-700 dark:text-amber-400", bg: "bg-amber-700/10 hover:bg-amber-700/15 border-amber-700/25" };
-const USER_CATEGORY_TONE = { color: "text-foreground", bg: "bg-muted/40 hover:bg-muted/70 border-border" };
+// Categories carry no colour of their own (UI guide v2 S2: colour marks the signal and status only).
+const GEO_CATEGORY_TONE = { color: "text-gaid-ink", bg: "" };
+const USER_CATEGORY_TONE = { color: "text-gaid-ink", bg: "" };
 
 /** Row icon from the workflow's first discipline (skill_hub taxonomy ids). */
 const DISCIPLINE_ICON: Record<string, LucideIcon> = {
@@ -64,26 +65,27 @@ const DISCIPLINE_ICON: Record<string, LucideIcon> = {
 };
 const iconFor = (workflow: GeoWorkflowSummary): LucideIcon => DISCIPLINE_ICON[workflow.disciplines[0] ?? ""] ?? MountainIcon;
 
-const PILL = "inline-flex items-center gap-0.5 rounded-full border px-1.5 py-px text-xs font-medium";
+const PILL = "inline-flex items-center gap-0.5 rounded-sm border px-1.5 py-px text-xs font-medium";
 const TONE = {
-  ok: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  warn: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  bad: "border-destructive/30 bg-destructive/10 text-destructive",
-  muted: "border-border bg-muted/50 text-muted-foreground",
+  ok: "border-transparent bg-gaid-success-tint text-gaid-success",
+  warn: "border-transparent bg-gaid-warning-tint text-gaid-warning",
+  bad: "border-transparent bg-gaid-danger-tint text-gaid-danger",
+  muted: "border-gaid-edge bg-gaid-face text-gaid-ink-2",
 };
 
-export function WorkflowBadges({ workflow }: { workflow: GeoWorkflowSummary }) {
-  return <ReadinessBadges readiness={workflow.readiness} />;
+export function WorkflowBadges({ workflow, untestedInGroup }: { workflow: GeoWorkflowSummary; untestedInGroup?: boolean }) {
+  return <ReadinessBadges readiness={workflow.readiness} untestedInGroup={untestedInGroup} />;
 }
 
-export function ReadinessBadges({ readiness }: { readiness: GeoWorkflowSummary["readiness"] }) {
+/** `untestedInGroup`: the group title already says every row is untested, so rows do not repeat it (UI guide v2 W5, F6). */
+export function ReadinessBadges({ readiness, untestedInGroup }: { readiness: GeoWorkflowSummary["readiness"]; untestedInGroup?: boolean }) {
   const state = readiness.state;
   const tone = state === "ready" ? TONE.ok : state === "unavailable" ? TONE.bad : TONE.warn;
   // First view keeps only what changes a decision (gaid-qwen-authoring-trial): readiness when it is not ready,
   // and the untested limit. "Needs your data" was on nearly every row; the setup dialog lists the inputs.
   return <>
     {state !== "ready" && <span className={cn(PILL, tone)}>{t("workspace.badge.readiness", { state })}</span>}
-    {readiness.runRecord === "none" && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
+    {readiness.runRecord === "none" && !untestedInGroup && <span className={cn(PILL, TONE.muted)} title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</span>}
   </>;
 }
 
@@ -119,13 +121,14 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
   const ready = data?.catalogue.state === "ready";
   const workflows = useMemo(() => (ready ? data!.workflows : []), [data, ready]);
   const byId = useMemo(() => new Map(workflows.map((workflow) => [workflow.id, workflow])), [workflows]);
+  const allUntested = workflows.length > 1 && workflows.every((workflow) => workflow.readiness.runRecord === "none");
 
   // Geoscience first, then the user's own categories, then upstream's.
   const leadingCategories = useMemo<WorkflowPanelCategory[]>(() => [
     methods.category,
-    { id: GEO_RECIPE_CATEGORY, label: t("workspace.catalogue.category"), ...GEO_CATEGORY_TONE },
+    { id: GEO_RECIPE_CATEGORY, label: t(allUntested ? "workspace.catalogue.categoryAllUntested" : "workspace.catalogue.category"), ...GEO_CATEGORY_TONE },
     ...saved.categories.map((category) => ({ ...category, ...USER_CATEGORY_TONE })),
-  ], [methods.category, saved.categories]);
+  ], [methods.category, saved.categories, allUntested]);
 
   const rows = useMemo<WorkflowPanelRow[]>(() => {
     const known = new Set([GEO_RECIPE_CATEGORY, ...WORKFLOW_CATEGORIES.map((category) => category.id), ...saved.categories.map((category) => category.id)]);
@@ -135,7 +138,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       name: text(workflow.title),
       description: text(workflow.description),
       icon: iconFor(workflow),
-      badges: <WorkflowBadges workflow={workflow} />,
+      badges: <WorkflowBadges workflow={workflow} untestedInGroup={allUntested} />,
       searchText: [workflow.id, ...workflow.disciplines, ...workflow.inputRoles.flatMap((role) => role.extensions)].join(" "),
       onSelect: () => setSelected({ workflowId: workflow.id }),
       detail: workflow.doc ? { label: t("workflowView.detail.button"), onSelect: () => setDetail(workflow) } : undefined,

@@ -8,6 +8,8 @@
 //   internals     researcher-facing strings that interpolate raw errors, model names or internal ids
 //                 (guide "What researchers never see")
 //   styles        hard-coded colours and text smaller than the type scale in GAID components (guide "Tokens")
+//   slop          AI-slop proxies on the GAID primary path (guide v2 section 11): Tailwind hue utilities, gradients, glass,
+//                 image filters, side stripes >= 2px, generic AI icons, emoji in copy, missing brand @font-face
 // Findings recorded in geo/ui/ui-baseline.json are accepted debt: they are counted, not failed. A new finding
 // fails; a baseline entry that no longer occurs is reported so the baseline can shrink. The script only reports.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
@@ -129,9 +131,60 @@ export function checkStyles(root, rules) {
   return [...new Map(findings.map((f) => [f.key, f])).values()]
 }
 
+const EMOJI = /\p{Extended_Pictographic}/u
+
+function aiIconImports(source, names) {
+  const found = []
+  for (const m of source.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*["']lucide-react["']/g)) {
+    for (const raw of m[1].split(',')) {
+      const name = raw.trim().split(/\s+as\s+/)[0]
+      if (names.includes(name.replace(/Icon$/, ''))) found.push(name)
+    }
+  }
+  return found
+}
+
+export function checkSlop(root, rules, strings = []) {
+  const slop = rules.slop
+  if (!slop) return []
+  const skip = matcher(slop.skipFiles)
+  const patterns = slop.patterns.map((p) => ({ ...p, re: new RegExp(p.regex, 'g') }))
+  const findings = []
+  const files = []
+  for (const base of slop.roots) {
+    const abs = path.join(root, base)
+    if (!existsSync(abs)) continue
+    if (statSync(abs).isDirectory()) files.push(...walk(abs, slop.extensions))
+    else files.push(abs)
+  }
+  for (const file of files) {
+    const rel = path.relative(root, file).split(path.sep).join('/')
+    if (skip(rel)) continue
+    const source = readFileSync(file, 'utf8')
+    for (const name of aiIconImports(source, slop.aiIcons ?? [])) {
+      findings.push({ check: 'slop', key: `${rel}:ai-icon:${name}`, detail: 'generic AI symbol (V2)' })
+    }
+    for (const p of patterns) {
+      for (const m of source.matchAll(p.re)) findings.push({ check: 'slop', key: `${rel}:${p.id}:${m[0]}`, detail: `${p.id} (${p.rule})` })
+    }
+  }
+  if (slop.emojiInCopy) {
+    for (const { id, locale, text } of strings) {
+      if (EMOJI.test(text)) findings.push({ check: 'slop', key: `${locale}:${id}:emoji`, detail: 'emoji in copy (V2)' })
+    }
+  }
+  if (slop.fontFace) {
+    const css = path.join(root, slop.fontFace.css)
+    const source = existsSync(css) ? readFileSync(css, 'utf8') : ''
+    const declared = [...source.matchAll(/@font-face\s*\{([^}]*)\}/g)].some((m) => m[1].includes(slop.fontFace.family))
+    if (!declared) findings.push({ check: 'slop', key: `${slop.fontFace.css}:font-face`, detail: `no @font-face for ${slop.fontFace.family} (V8)` })
+  }
+  return [...new Map(findings.map((f) => [f.key, f])).values()]
+}
+
 export function run({ root, rules, baseline }) {
   const strings = loadCatalogues(path.join(root, rules.locales.dir), rules.locales.locales)
-  const findings = [...checkCopyLength(strings, rules), ...checkInternals(strings, rules), ...checkStyles(root, rules)]
+  const findings = [...checkCopyLength(strings, rules), ...checkInternals(strings, rules), ...checkStyles(root, rules), ...checkSlop(root, rules, strings)]
   const accepted = new Set(Object.entries(baseline.debt ?? {}).flatMap(([check, keys]) => keys.map((key) => `${check}|${key}`)))
   const seen = new Set(findings.map((f) => `${f.check}|${f.key}`))
   return {

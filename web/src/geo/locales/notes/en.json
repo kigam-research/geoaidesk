@@ -96,6 +96,15 @@
       "instruction": "Decision {number} (separate instruction): {instruction}",
       "open": "Not answered yet: decision {numbers}. Leave them open.",
       "tail": "Continue the work according to these answers and update the note."
+    },
+    "steps": "Decision steps",
+    "step": "Decision {number}",
+    "counter": "{current} / {count}",
+    "prev": {
+      "button": "Previous decision"
+    },
+    "next": {
+      "button": "Next decision"
     }
   }
 }
