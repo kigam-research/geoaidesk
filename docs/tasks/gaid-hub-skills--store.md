@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T06:24:36Z
+status: ready
+updated: 2026-10-22T06:24:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -70,7 +70,8 @@ Verification: server TypeScript check and 30 targeted tests passed. Full server 
 Stable integration API: server/src/geo/hub-skills/index.ts exports HubSkillStore, readHubSkillRevision -> {skill, revision, archive}, installHubSkillRevision and listHubSkills. No contract changes.
 
 ## Next steps
-1. Finish this child unit. The parent integrates it with task complete gaid-hub-skills--store and owns the combined UI/Workflow checks and final report.
+<!-- task:closed -->
+Closed 2026-10-22T06:24:38Z: ready; the parent gaid-hub-skills integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Full-suite job 1 omitted helper environment setup. All reported failures are missing geopandas/table/Office helper dependencies. Correct the job command before repeating; do not edit unrelated source code.
