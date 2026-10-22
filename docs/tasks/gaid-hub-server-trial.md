@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:15:20Z
+updated: 2026-10-22T18:00:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -31,6 +31,14 @@ gaid-hub-skills-2 (reviewer roles, admin disable, reports, GitHub upstream compa
 for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outside check.
 
 ## Current state
+- PAUSED 2026-10-23 03:00 KST (route pause-0300-gaid-hub-server-trial). Resume only on the user's resume instruction via the hub.
+  Nothing running (no job, worker or child). Exact next action on resume: run `node ~/deploy/geoaidesk-hub-server/cb63b118…/geo/hub-server.mjs
+  users` with `GAID_HUB_SERVER_HOME=~/data/geoaidesk/hub-server/home`; if the admin account seongin@kigam.re.kr exists, run
+  `import-hub --from ~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/shared --authors .../authors.json` (dry-run,
+  then `--apply`), backup + check-backup, fill the report (§3.1/§4/commit), tell the hub the review app points at the server and
+  the 5 Workflows are imported, final `task route-report acceptance-done-20261022`, `task finish`. If no account yet: the user
+  is connecting from outside via `devtunnel connect interesting-dog-fz9w0jg.jpe1` (Windows, GitHub login) to accept the invite
+  in the review app (its hub address is already set to http://10.13.15.74:8700).
 - Hub server deployed on PC74 (item 1, first pass): pinned snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a`
   (`git archive` of origin/main), user unit `~/.config/systemd/user/gaid-hub-server.service` (enabled, `0.0.0.0:8700`,
   Restart=on-failure, UMask 0077), home `~/data/geoaidesk/hub-server/home`, log `~/data/geoaidesk/hub-server/logs/hub-server.log`.
