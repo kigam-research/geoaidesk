@@ -360,7 +360,7 @@
       "path": "web/src/app/globals.css",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-concept-pictures: concept-picture frame tokens --gaid-pic-well (light/dark, equal to PICTURE_WELL) and --gaid-pic-mat"
     },
     {
       "path": "web/src/components/settings/primitives.tsx",

@@ -60,7 +60,7 @@ export async function registerGeoAuthoringExtraRoutes(
       void completion.finally(() => pending.delete(completion));
       return reply.code(202).send(operation);
     });
-    scope.get<{ Params: { id: string; key: string } }>(
+    scope.get<{ Params: { id: string; key: string }; Querystring: { theme?: string } }>(
       "/geo/authoring/projects/:id/visuals/:key",
       async (req, reply) => {
         const project = await store.read(req.params.id);
@@ -68,12 +68,13 @@ export async function registerGeoAuthoringExtraRoutes(
           ? project.visuals![req.params.key]
           : undefined;
         if (!visual) throw new AuthoringError("개념 그림을 찾을 수 없습니다.", 404);
+        const file = req.query.theme === "dark" && visual.dark ? visual.dark : visual.file;
         reply.header(
           "Content-Type",
-          visual.file.endsWith(".webp") ? "image/webp" : visual.file.endsWith(".jpg") ? "image/jpeg" : "image/png",
+          file.endsWith(".webp") ? "image/webp" : file.endsWith(".jpg") ? "image/jpeg" : "image/png",
         );
         reply.header("X-Content-Type-Options", "nosniff");
-        return reply.send(await store.readFile(project.id, visual.file));
+        return reply.send(await store.readFile(project.id, file));
       },
     );
   });

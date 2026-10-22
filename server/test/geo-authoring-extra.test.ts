@@ -8,7 +8,11 @@ import { AuthoringError, AuthoringStore } from "../src/geo/authoring/store.ts";
 import { UsageLimitError } from "../src/geo/authoring/codex-images.ts";
 import { addUrlSource, readableHtml, validateSourceUrl } from "../src/geo/authoring/url-sources.ts";
 import { pageText, SOURCE_LIMIT_BYTES } from "../src/geo/authoring/sources.ts";
+import { readFileSync } from "node:fs";
 import {
+  ADAPT_PROMPT,
+  DARK_VARIANT_PROMPT,
+  PICTURE_WELL,
   prepareRuntimeImageGenerator,
   startVisuals,
   VISUALS_LEDGER_SESSION,
@@ -302,13 +306,46 @@ describe("Concept illustrations", () => {
     expect(after.visuals!.prepare.file).not.toBe(before.visuals!.prepare.file);
     expect(await store.readFile(projectId, before.visuals!.prepare.file)).toEqual(PNG);
     expect(after.visualOperations!["picture-edit"]).toMatchObject({ keys: ["prepare"], completed: ["prepare"], instruction: request, status: "complete" });
-    const call = vi.mocked(generator.generate).mock.calls.at(-1)!;
-    expect(call[0]).toContain(request);
-    expect(call[0]).toContain("not data");
-    expect(call[1]).toEqual({ bytes: PNG, mimeType: "image/png" });
+    // The light picture is edited from the previous one with the request; the dark picture is edited from the new light one.
+    const [lightCall, darkCall] = vi.mocked(generator.generate).mock.calls.slice(-2);
+    expect(lightCall[0]).toContain(request);
+    expect(lightCall[0]).toContain("not data");
+    expect(lightCall[1]).toEqual({ bytes: PNG, mimeType: "image/png" });
+    expect(darkCall[0]).toBe(DARK_VARIANT_PROMPT);
+    expect(after.visuals!.prepare.dark).toMatch(/^visuals\/picture-edit\/0-dark\.png$/);
     await startVisuals(store, projectId, 1, { opId: "picture-edit", keys: ["cover"] }, async () => { throw Error("retry must not prepare"); });
     await (await startVisuals(store, projectId, 1, { opId: "picture-redo", keys: ["prepare"] }, async () => generator)).completion;
-    expect(vi.mocked(generator.generate).mock.calls.at(-1)![1]).toBeUndefined();
+    expect(vi.mocked(generator.generate).mock.calls.at(-2)![1]).toBeUndefined();
+  });
+
+  it("keeps the web well token equal to the colours pictures are generated on", () => {
+    const css = readFileSync(new URL("../../web/src/app/globals.css", import.meta.url), "utf8");
+    const block = (start: string) => css.slice(css.indexOf(start), css.indexOf("\n}", css.indexOf(start)));
+    expect(block(":root {")).toContain(`--gaid-pic-well: ${PICTURE_WELL.light};`);
+    expect(block(".dark {")).toContain(`--gaid-pic-well: ${PICTURE_WELL.dark};`);
+  });
+
+  it("fits an older white picture to the screen themes by editing it, keeping its caption", async () => {
+    const { store, projectId } = await drafted();
+    await store.writeFile(projectId, "visuals/old/0.png", PNG);
+    await store.mutate(projectId, (p) => {
+      p.visuals = { cover: { file: "visuals/old/0.png", caption: "예전 표지", model: "gaid-hub", draftRevision: 1 } };
+    });
+    const generator = fakeGenerator();
+    const run = await startVisuals(store, projectId, 1, { opId: "picture-adapt", keys: ["cover"], adapt: true }, async () => generator);
+    await run.completion;
+    const p = await store.read(projectId);
+    expect(p.visualOperations!["picture-adapt"]).toMatchObject({ adapt: true, completed: ["cover"], status: "complete" });
+    expect(p.visuals!.cover).toMatchObject({ caption: "예전 표지", file: "visuals/picture-adapt/0.png", dark: "visuals/picture-adapt/0-dark.png" });
+    expect(vi.mocked(generator.generate).mock.calls.map((c) => c[0])).toEqual([ADAPT_PROMPT, DARK_VARIANT_PROMPT]);
+    expect(vi.mocked(generator.generate).mock.calls[0][1]).toEqual({ bytes: PNG, mimeType: "image/png" });
+    expect(await store.readFile(projectId, "visuals/old/0.png")).toEqual(PNG);
+    await expect(
+      startVisuals(store, projectId, 1, { opId: "picture-adapt-again", keys: ["cover"], adapt: true }, async () => generator),
+    ).rejects.toThrow("이미 화면 테마에 맞춘 그림");
+    await expect(
+      startVisuals(store, projectId, 1, { opId: "picture-adapt-edit", keys: ["cover"], adapt: true, instruction: "x" }, async () => generator),
+    ).rejects.toMatchObject({ status: 400 });
   });
 
   it("validates targeted keys and instructions before preparing a generator", async () => {
@@ -319,6 +356,7 @@ describe("Concept illustrations", () => {
       { keys: ["cover"], steps: [] }, { keys: ["cover"], instruction: "a".repeat(501) },
       { keys: ["cover"], instruction: "   " }, { instruction: "edit" }, { keys: ["cover"], instruction: "edit" },
       { keys: "cover" }, { instruction: 3 }, { keys: [null] },
+      { keys: ["cover"], adapt: true }, { adapt: true }, { keys: ["cover"], adapt: "yes" },
     ]) {
       await expect(startVisuals(store, projectId, 1, { opId: "invalid-selection", ...selection } as never, prepare)).rejects.toMatchObject({ status: 400 });
     }
@@ -341,15 +379,21 @@ describe("Concept illustrations", () => {
       status: "complete",
       completed: ["cover", "prepare", "evaluate", "report"],
     });
-    expect(generator.generate).toHaveBeenCalledTimes(4);
+    expect(generator.generate).toHaveBeenCalledTimes(8);
     expect(p.visuals!.evaluate).toMatchObject({
       model: "test/image",
       draftRevision: 1,
+      file: "visuals/visual-op-1/2.png",
+      dark: "visuals/visual-op-1/2-dark.png",
     });
     expect(p.visuals!.evaluate.caption).toContain("분석 자료가 아닙니다");
     expect(await store.readFile(projectId, p.visuals!.cover.file)).toEqual(PNG);
     const prompt = vi.mocked(generator.generate).mock.calls[0][0];
-    expect(prompt).toContain("#1f5eff");
+    expect(prompt).toContain("#1F5EFF");
+    expect(prompt).toContain(`exactly ${PICTURE_WELL.light.toUpperCase()}`);
+    expect(prompt).not.toContain("white background");
+    expect(DARK_VARIANT_PROMPT).toContain(`exactly ${PICTURE_WELL.dark.toUpperCase()}`);
+    expect(vi.mocked(generator.generate).mock.calls[1]).toEqual([DARK_VARIANT_PROMPT, { bytes: PNG, mimeType: "image/png" }]);
     expect(prompt).toContain("not data");
     expect(prompt).toContain("PU nested CV 방법");
     await startVisuals(store, projectId, 1, { opId: "visual-op-1" }, async () => {
@@ -368,7 +412,7 @@ describe("Concept illustrations", () => {
     const generator = fakeGenerator();
     const run = await startVisuals(store, projectId, 1, { opId: "visual-cap" }, async () => generator);
     await run.completion;
-    expect(generator.generate).toHaveBeenCalledTimes(7);
+    expect(generator.generate).toHaveBeenCalledTimes(14);
     await expect(
       startVisuals(store, projectId, 1, { opId: "visual-bad", steps: ["absent"] }, async () => generator),
     ).rejects.toThrow("단계 식별자");
@@ -400,11 +444,11 @@ describe("Concept illustrations", () => {
       "output:zone",
       "output:curve",
     ]);
-    expect(generator.generate).toHaveBeenCalledTimes(7);
+    expect(generator.generate).toHaveBeenCalledTimes(14);
     expect(p.visuals!["output:zone"].caption).toContain("후보 구역");
     expect(p.visuals!["output:scores"]).toBeUndefined();
     expect(p.visuals!["output:report"]).toBeUndefined();
-    expect(vi.mocked(generator.generate).mock.calls[5][0]).toContain("never an actual result");
+    expect(vi.mocked(generator.generate).mock.calls[10][0]).toContain("never an actual result");
     await expect(
       startVisuals(
         store,
@@ -420,6 +464,8 @@ describe("Concept illustrations", () => {
     const generate = vi
       .fn()
       .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
+      .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
+      .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
       .mockRejectedValueOnce(Error("provider failure"));
     const run = await startVisuals(store, projectId, 1, { opId: "visual-fail" }, async () => fakeGenerator(generate));
     await run.completion;
@@ -428,7 +474,10 @@ describe("Concept illustrations", () => {
       status: "failed",
       completed: ["cover"],
     });
-    expect(p.visuals!.cover).toBeTruthy();
+    expect(p.visuals!.cover.dark).toBeTruthy();
+    // The second picture's light file is kept without a dark-mode picture; it shows on the paper mat.
+    expect(p.visuals!.prepare).toMatchObject({ file: "visuals/visual-fail/1.png" });
+    expect(p.visuals!.prepare.dark).toBeUndefined();
     await startVisuals(store, projectId, 1, { opId: "visual-fail" }, async () => {
       throw Error("must not run");
     });
@@ -466,6 +515,7 @@ describe("Concept illustrations", () => {
     const generate = vi
       .fn()
       .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
+      .mockResolvedValueOnce({ bytes: PNG, mimeType: "image/png" })
       .mockRejectedValueOnce(new UsageLimitError("2026-10-16T12:00:00.000Z"));
     const run = await startVisuals(store, projectId, 1, { opId: "visual-limit" }, async () => fakeGenerator(generate));
     await run.completion;
@@ -476,7 +526,7 @@ describe("Concept illustrations", () => {
       usageLimit: { resetsAt: "2026-10-16T12:00:00.000Z" },
     });
     expect(op.error).toContain("사용량 한도");
-    expect(generate).toHaveBeenCalledTimes(2);
+    expect(generate).toHaveBeenCalledTimes(3);
   });
   it("shares the registered store; routes serve bytes, return 202 and report a missing Codex login as Korean 400", async () => {
     const { store, projectId } = await drafted();
@@ -503,6 +553,13 @@ describe("Concept illustrations", () => {
     });
     expect(image.headers["content-type"]).toBe("image/png");
     expect(image.rawPayload).toEqual(PNG);
+    const darkBytes = Buffer.from("dark-picture");
+    await store.writeFile(projectId, (await store.read(projectId)).visuals!.cover.dark!, darkBytes);
+    const dark = await app2.inject({ url: `/geo/authoring/projects/${projectId}/visuals/cover?theme=dark` });
+    expect(dark.rawPayload).toEqual(darkBytes);
+    await store.mutate(projectId, (p) => { delete p.visuals!.cover.dark; });
+    const older = await app2.inject({ url: `/geo/authoring/projects/${projectId}/visuals/cover?theme=dark` });
+    expect(older.rawPayload).toEqual(PNG);
     mocks.codex = false;
     const noModel = await app2.inject({
       method: "POST",
