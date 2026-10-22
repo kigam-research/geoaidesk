@@ -1,7 +1,7 @@
 ---
 format: 1
 status: done
-updated: 2026-10-22T07:20:13Z
+updated: 2026-10-22T07:29:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bee7d319-703a-4565-a0c9-1d69e94cd031","pid":3762934,"provider":"claude","session":"870398d4-3eab-430b-ae47-a9f6c6604ea1","start":"53200219","token":"cb3fe81ab18b49eee1407e968dd49a72031d140445992e9a34169e97d8776bc3"}
 branch: task/gaid-zotero-web-fix
 target: main
@@ -66,7 +66,7 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: n
   forgets the web key, mirrored papers stay) so a researcher can switch to the PC connection.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T07:20:13Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-zotero-web-fix.md.
+Closed 2026-10-22T07:29:09Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-zotero-web-fix.md.
 
 ## Failed approaches
 ## Notes and decisions
