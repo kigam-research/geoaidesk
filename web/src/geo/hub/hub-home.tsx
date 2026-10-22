@@ -307,7 +307,8 @@ export function HubHome({
                 <Input
                   type="search"
                   className="h-10 pl-9"
-                  aria-label={text("home.browse.search.label")}
+                  data-gaid-search=""
+            aria-label={text("home.browse.search.label")}
                   placeholder={text("home.browse.search.placeholder")}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
