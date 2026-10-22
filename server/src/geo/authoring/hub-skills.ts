@@ -4,6 +4,7 @@
  * draft as `source: "hub"` supporting skills pinned to the revision current when the draft was written.
  */
 import type { AuthoringProject, Question } from "../../../../web/src/geo/contracts/authoring.ts";
+import { HubSkillStore, listHubSkills } from "../hub-skills/index.ts";
 
 export const HUB_SKILLS_KEY = "hub-skills";
 const NONE = "none";
@@ -54,6 +55,10 @@ export function chosenHubSkills(project: AuthoringProject, candidates: HubSkillC
 }
 
 /** Visible shelf skills whose latest revision is usable (not suspended or deprecated). */
-export async function loadHubSkillCandidates(): Promise<HubSkillCandidate[]> {
-  return []; // wired to the hub skill store after it is integrated (gaid-hub-skills--store)
+export async function loadHubSkillCandidates(store = new HubSkillStore()): Promise<HubSkillCandidate[]> {
+  return (await listHubSkills(store, { user: null })).flatMap((skill) => {
+    const latest = skill.revisions.find((r) => r.revision === skill.latestRevision);
+    if (!latest || skill.visibility !== "hub" || skill.state === "suspended" || skill.state === "deprecated") return [];
+    return [{ name: skill.name, description: latest.description, revision: latest.revision, treeHash: latest.treeHash }];
+  });
 }
