@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T15:03:56Z
+updated: 2026-10-22T01:50:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -101,6 +101,16 @@ Blocked: waiting for the user's decisions on the proposal (report §6).
   follows the impeccable and design-taste-frontend skills (skill_hub .claude/skills) and geo/brand/README.md; the UI guide
   update lands with gaid-design-identity, which will notify again.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Design direction CONFIRMED (routed request design-ok-gaid-research-visuals, 2026-10-22; user words in gaid-design-identity:
+  "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수 있게 할 수 있나?" then "가로 진행하자."): GAID UI/UX guide v2
+  (One UI + Apple HIG). Default identity 계측 (Instrument); 도폭 (Map sheet) is a per-browser style (`gaid:style`,
+  `<html data-style="mapsheet">`) independent of light/dark/system; logo unchanged. task/gaid-design-identity is NOT on main
+  yet: read its docs/design/ui-guide.md v2 and web/src/app/globals.css tokens read-only from origin/task/gaid-design-identity
+  for planning/mockups; do not copy its files; build production UI only after it merges (hub will notify; then `task sync`).
+  Then: read ui-guide v2 §0–2 (I1–I15), components, V bans, review checklist; use `--gaid-*` role tokens / Tailwind `gaid-*`
+  utilities and web/src/geo/shell/ parts (GaidAppBar, SidebarGroup/SidebarItem, StepScale); never branch on style in
+  component code; review every UI change in 2 styles × 2 themes; figures/maps/PDFs keep original pixels;
+  `node geo/ui/check-ui.mjs` (incl. slop checks) must pass. Supersedes the 라) and "One UI new design pending" notes above.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
