@@ -1,0 +1,109 @@
+{
+  "title": "연결 지도",
+  "hint": "기록된 연결만 표시합니다. 항목을 고른 뒤 열 수 있습니다.",
+  "show": {
+    "button": "연결 지도 열기"
+  },
+  "close": {
+    "button": "연결 지도 닫기"
+  },
+  "retry": {
+    "button": "연결 다시 읽기"
+  },
+  "centre": {
+    "button": "이 항목 중심으로 보기"
+  },
+  "focus": "중심",
+  "depth": {
+    "1": "1단계",
+    "2": "2단계",
+    "label": "연결 범위"
+  },
+  "view": {
+    "label": "연결 표시",
+    "map": "지도",
+    "list": "목록"
+  },
+  "kind": {
+    "paper": "논문",
+    "note": "정리 노트",
+    "figure": "그림",
+    "file": "파일",
+    "chat": "채팅",
+    "workflow": "Workflow"
+  },
+  "edge": {
+    "cites": "인용함",
+    "wrote": "씀",
+    "contains": "그림을 담음",
+    "drew": "그림",
+    "used": "자료로 씀",
+    "started-from": "시작함",
+    "made-from": "방법을 가져옴"
+  },
+  "attention": {
+    "changed": "파일이 바뀜",
+    "missing": "파일 없음",
+    "retracted": "철회 알림 있음"
+  },
+  "legend": {
+    "title": "연결 범례"
+  },
+  "observed": "기록된 연결",
+  "inferred": "추정 연결",
+  "list": {
+    "label": "연결 항목"
+  },
+  "links": {
+    "title": "항목 사이의 연결"
+  },
+  "relation": "{from} → {relation} → {to}",
+  "open": {
+    "note": {
+      "button": "정리 노트 열기"
+    },
+    "paper": {
+      "button": "논문 열기"
+    },
+    "figure": {
+      "button": "그림 열기"
+    },
+    "file": {
+      "button": "파일 열기"
+    },
+    "chat": {
+      "button": "채팅 열기"
+    },
+    "workflow": {
+      "button": "Workflow 열기"
+    },
+    "unavailable": "현재 화면에서는 항목을 열 수 없습니다."
+  },
+  "loading": "연결을 읽는 중입니다.",
+  "error": "연결을 읽지 못했습니다. 다시 읽으세요.",
+  "empty": "기록된 주변 연결이 없습니다.",
+  "count": "항목 {count}개",
+  "truncated": {
+    "limit": "80개를 넘는 항목은 표시하지 않습니다. 다른 항목을 중심으로 범위를 좁히세요."
+  },
+  "item": {
+    "label": "{title}, {kind}"
+  },
+  "zoom": {
+    "in": {
+      "button": "지도 확대"
+    },
+    "out": {
+      "button": "지도 축소"
+    },
+    "fit": {
+      "button": "전체 연결 보기"
+    }
+  },
+  "relationInferred": "{from} → {relation} → {to} (추정 연결)",
+  "keyboard": {
+    "hint": "항목을 선택한 뒤 열기 버튼을 누르세요.",
+    "links": "항목 사이의 연결입니다. 목록에서도 읽을 수 있습니다.",
+    "handle": "연결점"
+  }
+}

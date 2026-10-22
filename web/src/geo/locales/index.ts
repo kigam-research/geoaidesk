@@ -4,6 +4,8 @@
  * directory plus two lines here; the copy validator (geo/copy/validate-copy.mjs)
  * checks every directory under locales/.
  */
+import connectionsKo from "./connections/ko.json";
+import connectionsEn from "./connections/en.json";
 import appKo from "./app/ko.json";
 import appEn from "./app/en.json";
 import workspaceKo from "./workspace/ko.json";
@@ -88,6 +90,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
   library: pair(libraryKo, libraryEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
