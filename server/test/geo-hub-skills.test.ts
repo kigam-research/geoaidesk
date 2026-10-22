@@ -16,6 +16,7 @@ import { hubSkillInstallState } from "../src/geo/methods/hub-pins.ts";
 import { skillWorkflow } from "../src/geo/skill-details.ts";
 import { installedHubSkill } from "../src/geo/hub-skills/installed.ts";
 import { HubSkillStore, previewHubSkill, registerHubSkill, readHubSkillRevision, listHubSkills, installHubSkillRevision, registerHubSkillRoutes } from "../src/geo/hub-skills/index.ts";
+import { PRIVATE } from "../src/geo/authoring/package.ts";
 import { reviewHubSkill } from "../src/geo/hub-skills/review.ts";
 import { buildArchive, digest, fileList, readArchive, snapshotDirectory, treeHash } from "../src/geo/hub-skills/archive.ts";
 import { scanSkill } from "../src/geo/hub-skills/scan.ts";
@@ -157,10 +158,12 @@ describe("immutable hub skill shelf", () => {
     const f = await setup();
     await writeFile(join(f.dir, "gaid-method.json"), "{}"); await writeFile(join(f.dir, "atlas.yaml"), "x: y");
     await mkdir(join(f.dir, "references")); await writeFile(join(f.dir, "references", "data.md"), "Original");
+    await writeFile(join(f.dir, "SKILL.md"), skill("shelf-test", "Registered Workflow instructions", PRIVATE));
     const archive = buildArchive("shelf-test", snapshotDirectory(f.dir));
     const record = { schemaVersion: "gaid-hub-entry/v1", entry: { id: "entry-extract", title: "Research", latestRevision: 1, updatedAt: "2026-10-22" }, snapshots: { 1: { package: { slug: "shelf-test", sha256: digest(archive), manifest: {} } } }, installs: [] } as unknown as StoredEntry;
     await f.store.shared.immutableBytes("entry-extract", "packages/1.tar.gz", archive); await f.store.shared.write(record);
     const r = await f.register({ from: "workflow", entryId: "entry-extract", revision: 1 });
+    expect(r.revisions[0].licence.state).toBe("institute");
     expect(r.revisions[0].origin.kind).toBe("workflow"); expect(r.revisions[0].files.map((f) => f.path)).toEqual(["references/data.md", "SKILL.md"]);
     expect((await f.store.shared.bytes("entry-extract", "packages/1.tar.gz")).equals(archive)).toBe(true);
   });
@@ -200,6 +203,7 @@ describe("hub skill HTTP visibility and review", () => {
     expect((await get("/geo/hub/skills")).json().skills).toEqual([]);
     for (const suffix of ["", "/file?path=SKILL.md", "/package.tar.gz", "/comments"]) expect((await get(`/geo/hub/skills/private-skill${suffix}`)).statusCode).toBe(404);
     expect((await get("/geo/hub/skills/private-skill", "Author")).statusCode).toBe(200);
+    expect((await app.inject({ method: "POST", url: "/geo/hub/skills/private-skill/install", payload: { projectId: f.p.id, revision: 1, acknowledged: true } })).statusCode).toBe(404);
     await writeFile(join(dir, "SKILL.md"), skill("private-skill", "Restricted", "proprietary")); await f.register(source);
     expect((await get("/geo/hub/skills/private-skill", "Other")).statusCode).toBe(404);
     for (const action of ["install-preview", "install"]) expect((await app.inject({ method: "POST", url: `/geo/hub/skills/private-skill/${action}`, headers: headers("Other"), payload: { projectId: f.p.id, revision: 1, acknowledged: true } })).statusCode).toBe(404);
@@ -221,7 +225,8 @@ describe("hub skill HTTP visibility and review", () => {
     for (const [path, status] of [["../x", 400], ["/etc/passwd", 400], ["binary.bin", 415], ["large.txt", 413], ["SKILL.md", 200]] as const)
       expect((await app.inject({ method: "GET", url: `/geo/hub/skills/shelf-test/file?path=${encodeURIComponent(path)}` })).statusCode).toBe(status);
     const target = project(); expect((await post("install-preview", { projectId: target.id, revision: 1 })).json().project).toBe("missing");
-    expect((await post("install", { projectId: target.id, revision: 1, acknowledged: true })).statusCode).toBe(201);
+    expect((await app.inject({ method: "POST", url: "/geo/hub/skills/shelf-test/install-preview", payload: { projectId: target.id, revision: 1 } })).statusCode).toBe(200);
+    expect((await app.inject({ method: "POST", url: "/geo/hub/skills/shelf-test/install", payload: { projectId: target.id, revision: 1, acknowledged: true } })).statusCode).toBe(201);
   });
 
   it("annotates installed hub skills without mistaking them for Workflows", async () => {
@@ -232,7 +237,9 @@ describe("hub skill HTTP visibility and review", () => {
     const root = projectSkillRoot(resolvePaths(p.id)), source = getSkillProvenance(root, "shelf-test")?.source;
     expect(installedHubSkill(root, "shelf-test", source)).toMatchObject({ revision: 1, latestRevision: 1, edited: false });
     expect(skillWorkflow(root, "shelf-test", source)).toBeUndefined();
-    const app = Fastify(); apps.push(app); await registerSkillRoutes(app); await app.ready();
+    const app = Fastify(); apps.push(app);
+    app.addHook("onRequest", (_req, _reply, done) => withActiveProject(p.id, done));
+    await registerSkillRoutes(app); await app.ready();
     const rows = await withActiveProject(p.id, () => app.inject({ method: "GET", url: "/skills/all?scope=project" }));
     expect(rows.json().enabled.find((s: { name: string }) => s.name === "shelf-test").hubSkill).toMatchObject({ revision: 1, latestRevision: 1, edited: false });
     await writeFile(join(findSkillDir(root, "shelf-test")!, "edit.md"), "Edit");

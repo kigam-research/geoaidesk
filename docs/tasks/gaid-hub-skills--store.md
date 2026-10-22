@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:10:42Z
+updated: 2026-10-22T06:12:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -66,15 +66,18 @@ document (what exists, how verified, limits); no report of your own. Finish with
 
 ## Current state
 Implemented the immutable skill shelf, three-source registration preview, licence/findings scanner, per-revision review and visibility, bounded read-only views, Workflow usedBy, acknowledged revision installs and GET /skills annotations.
-Verified server TypeScript check and 29 targeted tests; added a revert-to-earlier-tree origin regression and real /skills/all annotation coverage since that run. Re-run targeted checks, then full server tests.
+Verified server TypeScript check and 30 targeted tests (13 shelf + 14 shared hub + 3 origin), including anonymous install and the exact authoring licence placeholder. Full server tests remain.
 ## Next steps
 1. Finish current targeted checks and run full server tests through a recorded job.
 2. Record the parent report notes, save reviewed files, and finish the child unit.
 ## Failed approaches
+- New /skills/all test initially wrapped app.inject with withActiveProject; Fastify request context did not inherit it. Replaced it with the same onRequest scope hook used by the server; all 13 shelf tests passed.
 ## Notes and decisions
 - Sequential work: store and archive interfaces first, then registration, install/routes, row annotations, acceptance tests. All owned files stay with this writer; no child writers.
 - Public exports agreed with parent in server/src/geo/hub-skills/index.ts; readHubSkillRevision returns {skill, revision, archive}.
 - Archive gzip comments carry a deterministic revision identity. Reverting to an older tree cannot overwrite that older installed revision's package-origin record.
+- Parent authorized the same one-line PRIVATE export in authoring/package.ts as its commit 580d4339b331; applied locally to avoid importing unrelated parent authoring changes before full tests.
+- Parent decisions: the builder's exact PRIVATE marker is absent for licence detection (import its constant); any other unknown declaration stays unknown. Install/install-preview do not require a display name, but anonymous users can install only publicly visible revisions. Other mutations retain the name gate.
 - Latest non-shareable licences hide the entire skill from other names; old non-shareable revisions remain hidden after a later release.
 - Workflow extraction removes root gaid-method.json and atlas.yaml, which the current builder generates as Workflow metadata; scripts, references, notices and SKILL.md remain.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

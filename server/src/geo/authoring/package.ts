@@ -51,7 +51,7 @@ export interface DraftFile {
   content: string;
   encoding: "utf8" | "base64";
 }
-const PRIVATE = "Private draft; sharing terms not chosen yet";
+export const PRIVATE = "Private draft; sharing terms not chosen yet";
 const CHECKS: CheckId[] = ["schema", "atlas", "taxonomy", "portability", "workflow", "claims"];
 const digest = (bytes: string | Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 const bytesOf = (f: DraftFile) => Buffer.from(f.content, f.encoding);

@@ -1,6 +1,7 @@
 /** Heuristic findings are reading aids, never a safety verdict or a legal opinion. */
 import { basename } from "node:path";
 import { parse } from "yaml";
+import { PRIVATE } from "../authoring/package.ts";
 import type { HubSkillFinding, HubSkillLicence, HubSkillOrigin } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import type { TarEntry } from "../tar.ts";
 
@@ -42,7 +43,8 @@ export function scanSkill(name: string, entries: TarEntry[], origin: HubSkillOri
     typeof meta.description !== "string" || !meta.description.trim() || meta.description.length > 1024 || textOf(Buffer.from(content)) === null)
     add("format", "SKILL.md", "SKILL.md needs matching name and a description (1–1024 characters) in YAML frontmatter.");
   const declarations: { file: string; value: string }[] = [];
-  if (meta?.license !== undefined) declarations.push({ file: "SKILL.md", value: String(meta.license) });
+  // The builder's exact placeholder is not an external licence declaration.
+  if (meta?.license !== undefined && meta.license !== PRIVATE) declarations.push({ file: "SKILL.md", value: String(meta.license) });
   for (const e of entries) if (e.type === "file" && /^(LICENSE|COPYING)(?:[._-].*)?$/i.test(basename(e.path)))
     declarations.push({ file: e.path, value: e.data.toString("utf8") });
   const decision = declarations.map((d) => ({ ...d, spdx: recognized(d.value) }));

@@ -34,7 +34,10 @@ export async function registerHubSkillRoutes(app: FastifyInstance, options: HubS
       if ((error as { statusCode?: number }).statusCode === 400) return reply.code(400).send({ error: "JSON 형식을 확인해 주세요." });
       scope.log.error(error); return reply.code(500).send({ error: "처리하지 못했습니다. 서버 기록을 확인해 주세요." });
     });
-    scope.addHook("onRequest", async (req) => { if (req.method !== "GET" && req.method !== "HEAD") userRequired(req); });
+    scope.addHook("onRequest", async (req) => {
+      const install = /^\/geo\/hub\/skills\/[^/]+\/(?:install|install-preview)(?:\?|$)/.test(req.url);
+      if (req.method !== "GET" && req.method !== "HEAD" && !install) userRequired(req);
+    });
     scope.addHook("onSend", async (_req, reply, payload) => { reply.header("Cache-Control", "no-store"); return payload; });
     scope.get<{ Querystring: { q?: string; folder?: string } }>("/geo/hub/skills", async (req) => ({ skills: (await listHubSkills(store, { q: req.query.q, user: hubUser(req) })).filter((s) => !req.query.folder || s.folderId === req.query.folder) }));
     scope.post<{ Body: RegisterSkillSource }>("/geo/hub/skills/preview", (req) => previewHubSkill(store, req.body, userRequired(req), options));
@@ -95,12 +98,12 @@ export async function registerHubSkillRoutes(app: FastifyInstance, options: HubS
     });
     scope.post<{ Params: Params; Body: { projectId: string; revision: number } }>("/geo/hub/skills/:id/install-preview", async (req) => {
       const revision = revisionNumber(req.body?.revision);
-      const skill = await requireVisible(store, req.params.id, userRequired(req), revision);
+      const skill = await requireVisible(store, req.params.id, hubUser(req), revision);
       return previewHubSkillInstall(store, skill.id, revision ?? skill.latestRevision, req.body?.projectId, options);
     });
     scope.post<{ Params: Params; Body: InstallSkillBody }>("/geo/hub/skills/:id/install", async (req, reply) => {
       const revision = revisionNumber(req.body?.revision);
-      const skill = await requireVisible(store, req.params.id, userRequired(req), revision);
+      const skill = await requireVisible(store, req.params.id, hubUser(req), revision);
       return reply.code(201).send(await installHubSkillRevision(store, { skillId: skill.id, revision: revision ?? skill.latestRevision, projectId: req.body?.projectId, acknowledged: req.body?.acknowledged }, options));
     });
   });
