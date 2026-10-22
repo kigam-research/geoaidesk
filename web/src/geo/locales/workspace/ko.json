@@ -175,7 +175,8 @@
     "enable": "스킬 켜기",
     "enabling": "스킬 켜는 중",
     "notInstalled": "프로젝트에 설치되지 않은 스킬: {names}. 설정 → 스킬에서 설치하세요.",
-    "error": "스킬을 켜지 못했습니다. 설정 → 스킬에서 다시 켜세요."
+    "error": "스킬을 켜지 못했습니다. 설정 → 스킬에서 다시 켜세요.",
+    "hub": "허브 스킬 {name} ({revision}판):"
   },
   "badge": {
     "readiness": "{state, select, ready {준비됨} missing-skills {스킬 필요} needs-environment {환경 준비 필요} unavailable {사용 불가} other {상태 미확인}}",

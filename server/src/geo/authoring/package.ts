@@ -67,8 +67,10 @@ const textList = { type: "array", items: textSchema };
 const idList = { type: "array", uniqueItems: true, items: { type: "string", pattern: "^[a-z0-9][a-z0-9._-]*$" } };
 workflowProperties.skills = { type: "array", minItems: 1, maxItems: 100, items: {
   type: "object", required: ["name", "source", "role"], additionalProperties: false,
-  properties: { name: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, source: { enum: ["bundled", "catalogue"] },
-    role: { enum: ["primary", "supporting"] }, title: textSchema, purpose: textSchema },
+  properties: { name: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, source: { enum: ["bundled", "catalogue", "hub"] },
+    role: { enum: ["primary", "supporting"] }, title: textSchema, purpose: textSchema,
+    hub: { type: "object", required: ["skillId", "revision", "treeHash"], additionalProperties: false, properties: {
+      skillId: { type: "string" }, revision: { type: "integer", minimum: 1 }, treeHash: { type: "string", pattern: "^[a-f0-9]{64}$" } } } },
 } };
 workflowProperties.steps = { type: "array", minItems: 3, maxItems: 12, items: {
   type: "object", required: ["id", "title", "does"], additionalProperties: false,

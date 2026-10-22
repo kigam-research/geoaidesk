@@ -1,4 +1,5 @@
 /** Portable Workflow documents and bounded Agent Skills ZIPs. No installation or model calls. */
+import { methodTreeHash } from "./methods/tree-hash.ts";
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
@@ -89,8 +90,13 @@ function resolveFiles(doc: WorkflowDoc, paths: ProjectPaths, catalogue: GeoCatal
       dir = path.join(catalogue.root, safeEntryPath(entry.packageRef));
     else if (skill.source === "bundled" && bundled?.name === skill.name) dir = bundled.dir;
     else if (skill.source === "imported") dir = path.join(paths.skillsDir, skill.name);
+    else if (skill.source === "hub" && skill.hub) {
+      // A hub skill is exported only as its pinned revision: the project copy when it is that exact tree.
+      const local = path.join(paths.skillsDir, skill.name);
+      if (fs.existsSync(path.join(local, "SKILL.md")) && methodTreeHash(local) === skill.hub.treeHash) dir = local;
+    }
     if (!dir || !fs.existsSync(dir)) {
-      if (skill.source === "imported") { missing.push(skill.name); continue; }
+      if (skill.source === "imported" || skill.source === "hub") { missing.push(skill.name); continue; }
       throw new CliExportError(`Required skill is unavailable: ${skill.name}`);
     }
     files.set(skill.name, tree(dir, b));
