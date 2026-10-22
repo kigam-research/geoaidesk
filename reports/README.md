@@ -7,6 +7,8 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-22-gaid-user-acceptance/figures/01-page-citations.png" width="120"> | 2026-10-22 19:17 | [GAID를 처음 쓰는 연구자 역할의 수용 시험](2026-10-22-gaid-user-acceptance/index.md) | 서재 쪽 인용, 저널 그림, ChatGPT 로그인·개인 API 키 경로는 통과했고, Zotero 웹 서재 시험은 저장된 웹 키를 Zotero가 거부해 막혔습니다. | 검토 전 | 미정 | 1 |
+| — | 2026-10-22 18:45 | [기관 GAID 허브 서버 시험 운영 시작: 고정 서비스, 허브 스킬 공유, HTTPS 준비](2026-10-22-gaid-hub-server-trial/index.md) | PC74에서 기관 GAID 허브 서버가 고정 서비스로 돌기 시작했고, 허브 스킬도 서버로 공유됩니다. HTTPS는 준비만 해 두었고 시험 그룹을 넓히기 전에 켭니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-visuals-next/figures/02-paper-map.png" width="120"> | 2026-10-22 18:32 | [서재 논문에서 여는 연결 지도, AGU·자원환경지질 그림 요건](2026-10-22-gaid-visuals-next/index.md) | 서재의 논문에서 그 논문을 쓴 프로젝트를 골라 연결 지도를 열 수 있습니다. AGU와 자원환경지질의 그림 요건은 공식 페이지에서 읽은 값만 그림 스킬에 넣었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-zotero-web-fix/figures/01-web-key-failure.png" width="120"> | 2026-10-22 16:46 | [Zotero 웹 키 갱신 실패 원인과 상태 표시 수정](2026-10-22-gaid-zotero-web-fix/index.md) | 웹 키 갱신이 매번 실패하던 원인(Zotero 웹 API 응답 차이)을 고쳤고, 서재 머리글과 Zotero 카드가 같은 상태와 실제 원인을 보여 줍니다. | 검토함 10-22 | 미정 | 0 |
 | <img src="2026-10-22-gaid-backend/figures/real-hub-list.png" width="120"> | 2026-10-22 16:37 | [GAID 공유 백엔드: 계정과 원내 GAID 허브 서버](2026-10-22-gaid-backend/index.md) | 원내 GAID 허브 서버가 생겼습니다. 연구자는 초대 코드로 계정을 만들어 Workflow를 공유하고, 개인 서재를 여러 PC에서 동기화합니다. | 검토함 10-22 | 미정 | 1 |
