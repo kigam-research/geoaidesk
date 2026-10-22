@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-22T12:06:39Z
-writer: {"host":"seongin3","reserved":"7300838461defcef07e6e5adf36f6fd631e6d0e4dc5860a2c9bdad6b1f73a570"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c7c994c8-9104-4a2d-91ca-02598ddfa51c","pid":3710652,"provider":"claude","session":"71412738-bdac-483a-bb75-b3200c12f5e4","start":"55874657","token":"7300838461defcef07e6e5adf36f6fd631e6d0e4dc5860a2c9bdad6b1f73a570"}
 branch: task/gaid-first-use-fixes
 target: main
 parent: 
