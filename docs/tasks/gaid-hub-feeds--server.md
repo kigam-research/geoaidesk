@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:45:49Z
+updated: 2026-10-22T14:47:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -84,23 +84,57 @@ by then, save, write the state in your task document and report what is left.
 Report back (final message, English): files changed, the live smoke table, anything in the contract that should change.
 
 ## Current state
-Implemented migration 3, approved-source snapshots/audit, bounded RSS/RDF/Atom and GitHub collection, serialized batches,
-retention, authenticated feed/admin routes, CLI commands and configurable startup/interval schedule. Operator guide added.
-Verified after follow-ups: server `npx tsc --noEmit`; focused Vitest suite passed 74 tests in 3 files (2026-10-22 KST).
-Live smoke job job-geoaidesk-gaid-hub-feeds--server-1 exited 0 (b2bca1005fad): 17/18 sources succeeded; authenticated list
-returned HTTP 200 with 300 items. Codex release list exceeded the 4 MiB cap. Evidence is the recorded job's out/live-smoke.json.
-Parent accepted two in-scope follow-ups: latest-stable fallback for skipPrereleases sources on byte cap/zero kept releases;
-and ten items per source in the unfiltered list (filtered lists unchanged). Implemented and fixture-checked, including both fallback triggers.
-Inline scientific notation now remains joined when HTML is stripped (CO<sub>2</sub> becomes CO2).
-First live collection span: 18.076 s (first stored fetchedAt to final attempt at); job metadata launch-to-exit span about 21.4 s.
-No deployment or integration claimed yet.
+Server feed collection is implemented and checked: migration 3, administrator approval snapshots/audit, bounded RSS/RDF/Atom
+and GitHub reads, retention, authenticated routes, operator CLI and configurable scheduling. No shared type/protocol file was changed.
+Server `npx tsc --noEmit` and 74 focused Vitest tests passed. Initial full live collection succeeded for 17/18 sources;
+Codex exceeded the byte cap. The accepted stable-release fallback fixed Codex, confirmed by a Codex-only live recheck
+(1 item, 3.249 s). All 18 sources now have a successful last fetch; 326 items are retained. The final authenticated default
+list returned HTTP 200, 163 items and 18 sources with no source exceeding ten displayed items.
+Initial full collection span was 18.076 s; job launch-to-exit metadata span about 21.4 s, below the Fastify 120 s setting.
+Implementation is saved on this child branch; parent integration, full scripts/check and deployment are not claimed here.
+Safe recheck: the declared focused TypeScript/Vitest commands. Do not rerun the recorded live jobs; their evidence is below.
 ## Next steps
-1. Save the checked follow-ups and run the recorded Codex-only recheck in the same temporary home.
-2. Record final source counts and live timing; send evidence to parent and task finish. Parent integrates and runs full scripts/check.
+1. Send the checked final snapshot and live evidence to parent; run task finish.
+2. Parent runs task complete, integrates the child and switches the local PER_SOURCE_UNFILTERED constant to the new shared FEED_LIMITS.perSourceUnfiltered; parent owns full scripts/check and final report.
 ## Failed approaches
 - Initial Codex list read exceeded the fixed byte cap. Do not increase the cap or retry unchanged; the accepted fallback requests one stable release.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+### Live smoke evidence (2026-10-22, PC74)
+- Initial job: job-geoaidesk-gaid-hub-feeds--server-1, exit 0, source b2bca1005fad; temporary HTTP server, all 18 proposals explicitly approved by CLI, CLI fetch, authenticated HTTP list.
+- Follow-up job: job-geoaidesk-gaid-hub-feeds--server-2, exit 0, source 6d129080f723; same temporary home, only Codex fetched, authenticated default list checked after diversity limit.
+- First raw evidence: `/home/seongin3/data/geoaidesk/runs/gaid-hub-feeds--server-20261022T144156.666055Z/out/live-smoke.json`, sha256 `a55fe324e947b238ff5a75a6df733a105332fb4236bcc66925979f21e47d0b5c`.
+- Follow-up raw evidence: `/home/seongin3/data/geoaidesk/runs/gaid-hub-feeds--server-20261022T144607.843014Z/out/codex-recheck.json`, sha256 `32a7c13bd382be0e9efab63667ed26dbfa7b07fe653818d19fd4d29f05a11428`.
+- The initial list returned 300 items before the accepted diversity change. Final list returned 163 (at most 10/source), without refetching the other 17 sources.
+- Collected counts below are the first successful attempt, except Codex from the follow-up. Retained counts include the 180-day retention rule; one GitHub search repository was too old.
+
+| Source | Collected | Retained | Final result |
+|---|---:|---:|---|
+| nature-geoscience | 8 | 8 | OK |
+| nature | 6 | 6 | OK |
+| eos | 15 | 15 | OK |
+| solid-earth | 20 | 20 | OK |
+| hess | 20 | 20 | OK |
+| nhess | 20 | 20 | OK |
+| ocean-science | 20 | 20 | OK |
+| carbon-brief | 12 | 12 | OK |
+| nasa-earth-observatory | 10 | 10 | OK |
+| ore-geology-reviews | 100 | 100 | OK |
+| geeknews | 8 | 8 | OK |
+| pi-releases | 10 | 10 | OK |
+| pi-subagents-releases | 10 | 10 | OK |
+| pi-web-access-releases | 10 | 10 | OK |
+| skills-cli-releases | 10 | 10 | OK |
+| claude-code-releases | 10 | 10 | OK |
+| codex-releases | 1 | 1 | OK (stable fallback; initial byte-cap error) |
+| github-geo-skills | 37 | 36 | OK |
+
+### Accepted follow-ups and final integration note
+- Parent accepted latest-stable fallback only for skipPrereleases sources when the list hits the byte cap or keeps zero releases; both paths keep the 4 MiB cap and have fixtures.
+- Parent accepted ten items per source in the unfiltered display. Filtered lists retain existing behavior. Parent owns the shared contract constant/comment; the child uses local PER_SOURCE_UNFILTERED=10 until integration.
+- HTML stripping preserves inline notation and Korean word joins; block boundaries, feed summary bounds and unsupported-link rejection remain checked.
+- Humanizer applied in file mode to the added operator prose; commands, paths, limits and behavior preserved.
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -113,6 +147,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-hub-feeds--server-20261022T144156.666055Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-feeds--server-20261022T144607.843014Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

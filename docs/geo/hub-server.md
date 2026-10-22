@@ -197,11 +197,10 @@ Do not replace a live home's files. Stop its server first and retain the old hom
 
 ## Approved information sources
 
-The hub collects information feeds for logged-in GAIDs. A GAID without a hub account shows no collected items. The
-shipped list in `geo/feeds/sources.json` contains proposals, not permission to contact those sources. Nothing is read
-until an administrator approves it. The approved definition is stored in SQLite, so an updated shipped proposal cannot
-silently change the address an administrator approved. Existing hub homes gain migration 3 automatically; backups count
-both `feed_sources` and `feed_items`.
+The hub collects information feeds for GAIDs logged into a hub account. Without a login, GAID shows no collected items.
+Sources in `geo/feeds/sources.json` remain proposed until an administrator approves them; the hub does not contact them
+before approval. SQLite stores the approved definition, so a later update to a shipped proposal cannot change the approved
+address. Existing hub homes gain migration 3 automatically. Backups count both `feed_sources` and `feed_items`.
 
 Review the proposals in GAID's administrator source list, or use the local operator CLI with the same hub home:
 
@@ -217,13 +216,13 @@ node geo/hub-server.mjs feeds fetch --source nature-geoscience
 `--all-proposed` explicitly approves every currently proposed source. CLI decisions appear as `operator (CLI)` and
 write audit events. An administrator can also add an approved source or stop one in GAID; shipped sources cannot be
 deleted. Stopping a source immediately hides its items but retains the records. Deleting an administrator addition removes
-its items too. The administrator fetch action and `feeds fetch` collect immediately and report each source's result;
-a failure leaves other sources collectable. Sources and concurrent fetch requests run sequentially.
+its items too. The administrator fetch action and `feeds fetch` collect immediately and report each source's result.
+A failed source does not stop the rest. Sources and concurrent fetch requests run sequentially.
 
 `serve` collects approved sources about 30 seconds after startup, then waits six hours between completed batches. Set
 `GAID_HUB_FEEDS_INTERVAL_HOURS` or `serve --feeds-interval-hours HOURS` to change the interval; the flag takes precedence.
-`0` disables scheduled collection without disabling manual fetch. The timer is cleared when the server closes. The source
-list records the last attempt and its error, while the researcher's list reports the latest successful collection.
+`0` disables scheduled collection; manual fetch still works. Closing the server clears the timer. The source list records
+the last attempt and any error. The researcher's list reports the latest successful collection.
 
 The unfiltered list shows at most ten items from each source, then applies the global newest-first order and list limit.
 Choosing a category, field or search term removes that per-source display cap. Stored retention is unchanged.
@@ -235,10 +234,10 @@ of up to three letters match whole words. Each response is limited to 4 MiB, 20 
 per source remain, and items older than 180 days (publication time, otherwise first collection time) are removed after a
 successful collection. No automatic translation, scientific assessment or recommendation quality check is implied.
 
-GitHub releases first request the latest ten published releases and apply the source's prerelease choice. For a source
-that excludes prereleases, if that response exceeds 4 MiB or keeps no releases, the hub requests one latest stable release
-instead (`/releases/latest`), with the same 4 MiB limit. This handles repositories with many binary assets or frequent alpha
-releases without expanding the response bound.
+For GitHub releases, the hub first requests the latest ten releases and applies the source's prerelease choice. If a source
+excludes prereleases and that response exceeds 4 MiB or leaves no releases, the hub requests one latest stable release
+(`/releases/latest`). The same 4 MiB limit applies. This fallback covers repositories with many binary assets or frequent
+alpha releases.
 
 GitHub requests use the public API. To raise the unauthenticated rate limit, supply `GAID_HUB_FEEDS_GITHUB_TOKEN` to the
 hub process through its service environment. This optional token is never stored in the hub database, returned to GAID or
