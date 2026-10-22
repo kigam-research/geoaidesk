@@ -247,9 +247,10 @@ try {
       return [];
     }
   });
-  // GAID's own research-note style skill is seeded into every geo project (gaid-output-style).
-  assert.ok(all.includes("gaid-note-style"), "GAID note style skill seeded");
-  const installed = all.filter((name) => name !== "gaid-note-style");
+  // These are app-shipped, not a fallback to the upstream skill catalogue.
+  const shipped = ["gaid-note-style", "gaid-figures"];
+  for (const name of shipped) assert.ok(all.includes(name), `GAID shipped skill ${name} seeded`);
+  const installed = all.filter((name) => !shipped.includes(name));
   const catalogue = JSON.parse(catalogueText);
   const pinned = catalogue.skills.map((skill) => skill.runtimeName).sort();
   if (catalogue.status.state === "ready") {

@@ -157,7 +157,10 @@
     "match": "Matching input: {role}",
     "error": "Could not read the project file list. Open the start settings again.",
     "signal": "{kind, select, element-columns {Element and oxide columns} time-drawdown-columns {Time and drawdown columns} xy-label-columns {Coordinate and label columns} categorical-field {Categorical fields} other {Matched columns}}: {columns}",
-    "title": "Workflows you can start with the open file"
+    "title": "Workflows you can start with the open file",
+    "summary": "{count, plural, one {# Workflow you can start with the open file} other {# Workflows you can start with the open file}}",
+    "expand": "Show",
+    "collapse": "Hide"
   },
   "skill": {
     "open": "Make reusable skill",

@@ -4,7 +4,7 @@ date: 2026-10-22
 project: geoaidesk
 task: gaid-ui-v2-debts
 headline: 지도 화면을 MAP 규칙대로 다시 짰고, 좁은 창의 대화 시트와 키보드 조작, 보낸 결정 답 표시, 서재 배지 역할 색을 넣었습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-map-vector-1280.png
 supersedes:

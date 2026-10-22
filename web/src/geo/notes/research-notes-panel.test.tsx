@@ -7,6 +7,9 @@ import { ResearchNotesPanel } from "./research-notes-panel";
 
 vi.mock("@/lib/projects", () => ({ apiFetch: vi.fn() }));
 vi.mock("@/lib/chat-prefill", () => ({ prefillChat: vi.fn() }));
+// The figure record and connection map have their own tests; here they only need to be mounted with the note's scope.
+vi.mock("@/geo/figures", () => ({ NoteFigures: ({ noteId }: { noteId: string }) => <div data-testid="note-figures">{noteId}</div> }));
+vi.mock("@/geo/connections", () => ({ ConnectionMapButton: ({ focus }: { focus: string }) => <button type="button" data-testid="map-button">{focus}</button> }));
 vi.mock("@/components/ai-elements/message", () => ({ MessageResponse: ({ children }: { children: string }) => <div data-testid="md">{children}</div> }));
 
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
@@ -58,6 +61,9 @@ it("opens a note, renders its body around answerable decision cards and confirms
   const bodies = await screen.findAllByTestId("md");
   expect(bodies[0].textContent).toContain("## 결과");
   expect(bodies[0].textContent).not.toContain("title:");
+  // The note detail mounts the connection map for the note and the figure records of this note.
+  expect(screen.getByTestId("map-button")).toHaveTextContent(/^note:/);
+  expect(screen.getByTestId("note-figures")).toBeInTheDocument();
   expect(bodies.at(-1)!.textContent).toContain("](results/t.csv)");
   // Recommended option first, with its reason; choosing answers sends nothing until 답변 보내기.
   const option = screen.getByRole("radio", { name: /시료 표를 올려 다시 실행/ });

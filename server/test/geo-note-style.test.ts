@@ -58,10 +58,10 @@ describe("output style rules", () => {
   });
 
   it("keeps the skill offered under any task selection", () => {
-    const skills = [{ name: "geo-map-and-crs" }, { name: "other" }, { name: NOTE_STYLE_SKILL }];
+    const skills = [{ name: "geo-map-and-crs" }, { name: "other" }, { name: NOTE_STYLE_SKILL }, { name: "gaid-figures" }];
     const out = applyExposure(skills, { schemaVersion: "gaid-exposure/v1", mode: "workflow:x", skills: ["geo-map-and-crs"], recordedAt: "" });
     expect(out.map((s) => [s.name, Boolean((s as { disableModelInvocation?: boolean }).disableModelInvocation)])).toEqual([
-      ["geo-map-and-crs", false], ["other", true], [NOTE_STYLE_SKILL, false],
+      ["geo-map-and-crs", false], ["other", true], [NOTE_STYLE_SKILL, false], ["gaid-figures", false],
     ]);
   });
 });
