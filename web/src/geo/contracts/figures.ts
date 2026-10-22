@@ -102,7 +102,18 @@ export interface FigureCheckItem {
   measured?: string;
   /** Required value from the journal profile, when the profile has one. */
   required?: string;
+  /** Language-neutral qualifiers the UI words for the researcher (FIGURE_CHECK_NOTES); never free text. */
+  notes?: FigureCheckNote[];
 }
+
+/** Codes the check script attaches to an item; the web locale `figures.checkNote.<code>` words each one. */
+export const FIGURE_CHECK_NOTES = [
+  "artwork-unclassified", "artwork-photo", "artwork-combination", "artwork-lineArt", "vector-container",
+  "plot-metadata", "partial", "fonts-embedded", "fonts-not-embedded", "rainbow-like", "no-hue-ramp",
+  "cvd-previews", "cvd-vector", "policy-allowed", "policy-disclose", "policy-forbidden", "policy-permission",
+  "policy-unknown", "where-caption", "where-methods", "where-acknowledgements", "where-statement",
+] as const;
+export type FigureCheckNote = (typeof FIGURE_CHECK_NOTES)[number];
 
 /** `.kady/geo/figure-checks/<sha256>.json`, written by the gaid-figures check script. */
 export interface FigureCheck {

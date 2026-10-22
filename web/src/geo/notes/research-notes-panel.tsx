@@ -21,6 +21,8 @@ import { noteBody, plainText, splitDecisions } from "./note-markdown";
 import { answersMessage, isAnswered, loadDelivered, sameAnswer, saveDelivered, type DecisionAnswer, type DecisionAnswers, type DeliveredAnswer, type DeliveredAnswers } from "./decision-answers";
 import { StepScale } from "@/geo/shell/step-scale";
 import { NoteReferences } from "@/geo/library/note-references";
+import { NoteFigures } from "@/geo/figures";
+import { ConnectionMapButton } from "@/geo/connections";
 
 /**
  * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
@@ -405,6 +407,13 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
                   <MessageSquareIcon aria-hidden />{t("notes.detail.openChat.button")}
                 </Button>
               )}
+              <ConnectionMapButton
+                focus={`note:${note.id}`}
+                projectId={projectId}
+                onOpenNote={onOpenNote}
+                onOpenFile={onOpenFile}
+                onOpenChat={onOpenChat ? (session) => onOpenChat(session, note.title) : undefined}
+              />
               {note.status === "pending" && (
                 // With decisions to answer, 답변 보내기 is the view's one primary action (UI guide B1).
                 <Button variant={note.decisions.length ? "outline" : "default"} size="sm" disabled={saving} onClick={() => void setStatus("confirmed")}>{t("notes.detail.confirm.button")}</Button>
@@ -445,6 +454,24 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
             )}
             {parts.after.trim() && <div className="mt-6"><MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.after}</MessageResponse></div>}
             <NoteReferences content={data.content} />
+            <div className="mt-8 border-t border-gaid-edge pt-6">
+              <NoteFigures
+                key={data.note.updatedAt}
+                projectId={projectId}
+                noteId={id}
+                onOpenFile={onOpenFile}
+                onOpenChat={onOpenChat}
+                renderFigureActions={(figure) => (
+                  <ConnectionMapButton
+                    focus={`figure:${figure.path}`}
+                    projectId={projectId}
+                    onOpenNote={onOpenNote}
+                    onOpenFile={onOpenFile}
+                    onOpenChat={onOpenChat ? (session) => onOpenChat(session, figure.caption ?? data.note.title) : undefined}
+                  />
+                )}
+              />
+            </div>
           </div>
         )}
       </div>

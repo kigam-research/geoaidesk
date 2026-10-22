@@ -10,6 +10,17 @@ import type { GeoEnvironment, GeoEnvironmentPackage, GeoEnvironmentTool, GeoEnvi
 export type EnvironmentTarget = "helper" | "project";
 const normalized = (name: string) => name.toLowerCase().replace(/[-_.]+/g, "-");
 
+/** Requirements of the app-shipped figure skill, independent of the pinned catalogue archive. */
+export const FIGURE_PACKAGES: GeoEnvironmentPackage[] = [
+  { name: "cmcrameri", version: ">=1.10", imports: ["cmcrameri.cm"] },
+  { name: "SciencePlots", version: ">=2.2.2", imports: ["scienceplots"] },
+  { name: "pypdf", version: ">=6.21.2", imports: ["pypdf"] },
+];
+const figureEnvironment = (): GeoEnvironment => ({
+  id: "gaid-figures", title: { ko: "논문 그림", en: "Journal figures" }, targets: ["helper", "project"],
+  packages: FIGURE_PACKAGES.map((pkg) => ({ ...pkg, imports: [...pkg.imports] })),
+});
+
 export function packageSpec(pkg: GeoEnvironmentPackage): string {
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(pkg.name)) throw new Error(`Invalid distribution: ${pkg.name}`);
   if (pkg.version && !/^>=\d+(?:\.\d+)*(?:[a-zA-Z0-9.!+-]*)$/.test(pkg.version)) {
@@ -74,11 +85,11 @@ export const resolvedPackageSpec = (pkg: GeoEnvironmentPackage): string => pkg.n
 export function loadGeoEnvironments(options: LoadGeoCatalogueOptions = {}): GeoEnvironments {
   const data = loadGeoCatalogue(options).environments;
   if (!data || data.schemaVersion !== "geo-environments/v1") throw new Error("Catalogue has no geo-environments/v1 data");
-  return data;
+  return { ...data, environments: [...data.environments, figureEnvironment()] };
 }
 
 export function projectPyproject(data: GeoEnvironments): string {
-  const packages = environmentPackages(requiredEnvironments(data, "project"));
+  const packages = environmentPackages([...requiredEnvironments(data, "project"), figureEnvironment()]);
   return `[project]\nname = "geoaidesk-sandbox"\nversion = "0.1.0"\ndescription = "GeoAIDesk project sandbox (managed by uv)"\nrequires-python = ${JSON.stringify(data.python)}\ndependencies = [\n${packages.map((pkg) => `    ${JSON.stringify(resolvedPackageSpec(pkg))},`).join("\n")}\n]\n`;
 }
 

@@ -73,6 +73,9 @@ describe("catalogue environment resolution and project seeding", () => {
   it("generates required-only geo dependencies and falls back when off or unavailable", () => {
     const text = projectPyproject(data);
     expect(text).toContain('requires-python = ">=3.12"');
+    expect(text).toContain('"cmcrameri>=1.10"');
+    expect(text).toContain('"SciencePlots>=2.2.2"');
+    expect(text).toContain('"pypdf>=6.21.2"');
     expect(text).toContain('"numpy>=2.0"'); expect(text).toContain('"rasterio>=1.4"'); expect(text).not.toContain('"pillow"');
     vi.spyOn(catalogue, "geoCatalogueActive").mockReturnValue(false);
     expect(seededProjectPyproject("upstream")).toBe("upstream");

@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:17:14Z
+status: done
+updated: 2026-10-22T04:42:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -50,59 +50,28 @@ Use your own GAID_HOME under ~/data/geoaidesk/work/gaid-research-visuals/; do no
 Outside check: no outside check (product design and app work).
 
 ## Current state
-Phase 1 (research → proposal), 2026-10-21.
-- Read the four inputs. Confirmed: none names a figure-generation tool (only Docling figure extraction, figure-level
-  evidence anchors, figures linked to review items). Visualization tools covered: citation maps (Connected Papers,
-  Litmaps/ResearchRabbit, Inciteful), ORKG comparison tables, Logseq/Obsidian graphs; all three surveys say "do not build
-  a citation-graph UI; link out; build the paper–claim–experiment–note–manuscript–Workflow graph inside".
-- Sibling gaid-research-hub (read-only, ADR 2026-10-21-research-hub-library) already plans: idea candidates (⑧, phase 3,
-  stored as research notes), citation-map link-out and "highly cited papers missing from my library" (phase 3),
-  "내 연구에서 쓰인 곳" per library item (phase 1), review items linked to figures (phase 2). This unit must not duplicate
-  those; it adds figures and a connection view over that data.
-- Web research for figures/journal/AI-image policy/diagram tools/QA/graph UI components: Oracle xhigh run, prompt
-  `~/data/geoaidesk/work/gaid-research-visuals/oracle/q1-figures.md`, output `oracle/q1.out` (running).
-- Oracle q2 (session ai-geoaidesk-gaid-python-markdown-2) stalled after 2 h mid-E-1; partial answer kept at
-  oracle/q2.harvest.md (A, D, E-1); research-save refused (status error). E-2/E-3/F not covered; F licences checked via gh api.
-- Oracle q1 (vault 웹 조사/geoaidesk/2026-10-21-ai-geoaidesk-gaid-python-markdown--aa555d9439.md) covered C (AI image
-  policy) and B (journal figure specs), then stopped mid-A. Verified directly: Elsevier GenAI policy (explanatory images
-  allowed with caption disclosure; data visualizations only when derived from data reproducibly; "General-purpose
-  generative AI image tools must not be used to create graphical abstracts"); Copernicus AI policy (illustrations and
-  schematics permitted when the tool is cited) and figure guideline (CVD check, Scientific colour maps 7.0 recommended,
-  300 dpi, panels in one file). gh api: Cytoscape.js MIT 3.34.4, xyflow MIT (@xyflow/react 12.12.0), sigma MIT 4.0.3,
-  Excalidraw MIT 0.18.1, tldraw custom licence needing a licence key in production (exclude), JSON Canvas MIT spec,
-  SciencePlots MIT 2.2.2, PyGMT BSD-3 0.19.0, UltraPlot MIT 2.7.2, showyourwork MIT 0.4.3 (2023), Mermaid MIT,
-  draw.io Apache-2.0, DeTikZify Apache-2.0 0.3.0.
-- GAID inventory (Explore, 2026-10-21): geo catalogue 0.2.1 has 13 skills, no general plotting/writing/citation/diagram
-  skill; upstream K-Dense skills are fully replaced in geo mode. Upstream `scientific-visualization` (MIT, v1.4,
-  2026-10-01) has publisher profiles (nature, science, cell, plos, elsevier, ieee, bmc, acs — no AGU/Copernicus/GSA/KR),
-  export_plan/figure_export/palette_audit/image_metadata scripts; `scientific-schematics` uses Nano Banana via OpenRouter.
-  Upstream visual Workflows (graphical-abstract, publication-figure, poster, schematic, …) are prompt-only, shown folded
-  under 일반 Workflow. `generate_image` is available in geo mode (OpenRouter). Hub concept pictures = gpt-image-2, labelled
-  "개념 그림 (분석 자료가 아닙니다)". Provenance walkLineage already walks figure → script → data; UI is an indented list
-  (provenance-panel.tsx LineageTree). Web has no graph library (only @streamdown/mermaid); hub flow diagram is hand-built.
-  Geo env has matplotlib; no cmcrameri/pygmt/cartopy/seaborn. Notes copy figures into figures/ (RESEARCH_NOTE_RULE).
+Done 2026-10-22 (phase 1+2 implemented and integrated on task/gaid-research-visuals; awaiting task finish checks):
+- Children A skill, B records, C map: each passed full scripts/check on its branch, `task complete`d and closed.
+- Writer integration: NoteFigures (figure records) at the end of the note detail and ConnectionMapButton in the note header
+  and per figure (web/src/geo/notes/research-notes-panel.tsx); figure section hidden when a note has no figures; check
+  items carry language-neutral `notes` codes (contract FIGURE_CHECK_NOTES, locale figures.checkNote.*) instead of English
+  text; result column no-wrap; map edges bezier + dagre label room + fit minZoom 0.75; new edge kind `copied` (identical
+  image copy) and no chat→figure "drew" edge on copies; "drew" label 그림을 그림; centre button 선택한 항목 중심으로 보기;
+  English disclosure draft from the recorded step; copy source dropped from figure inputs.
+- Checks run after integration: server geo-figures (10) + geo-connections (7) + shipped-skills; web figures/connections/notes
+  (18); node --test geo/tests/figures-helper.test.mjs; server and web tsc; check-ui (0 errors); copy validator (0 errors).
+  Full scripts/check runs in task finish.
+- Real app: task GAID_HOME ~/data/geoaidesk/work/gaid-research-visuals/home, user unit gaid-visuals-app (ports 3310/18310,
+  start-gaid.sh, log .../app/launcher.log), synthetic analysis from .../seed/seed.ts; 24 screenshots (2 styles × 2 themes ×
+  1440×900/1280×800 × check/ai/map) in .../playwright/matrix/; report figures 01–03 copied from there.
+- Report rewritten as design + implementation (reports/2026-10-21-gaid-research-visuals/index.md), glossary and
+  terminology.csv gained 그림 기록, 그림 점검, 연결 지도.
+Not done (by scope): idea board (JSON Canvas, phase 3), analysis flowchart, publication map export; library-item entry to
+the connection map; real-model chat check.
 ## Next steps
-Phase 2 (implementation), started 2026-10-22 after the user's decision. Sequential decisions done: ADR
-docs/adr/2026-10-22-figure-records-and-connection-map.md; contracts web/src/geo/contracts/figures.ts and connections.ts.
-Work packages (child writers, "general work"), owned files:
-- A `gaid-research-visuals--skill`: geo/skills/gaid-figures/** (adapted K-Dense scientific-visualization, MIT; journals.json
-  per JournalProfile with official sources + checkedAt; scripts/check_figure.py writing FigureCheck JSON), shipped-skill
-  generalisation server/src/geo/shipped-skills.ts (+ note-style.ts, provision.ts, session.ts, context.ts seams),
-  FIGURE_RULE in server/src/geo/instructions.ts, cmcrameri (+ SciencePlots) in seeded project pyproject / helper venv
-  (dependency-lock owner for server/src/helpers/pyproject.toml + uv.lock), THIRD_PARTY_NOTICES entries.
-- B `gaid-research-visuals--records`: server/src/geo/figures/** (derive records from notes + provenance, copy resolution by
-  edge then sha256, kind derivation, overrides, target, POST check via helper python running A's script), routes in
-  server/src/geo/routes/figures.ts registered in geo/routes.ts; web/src/geo/figures/** (note figure list + record pane,
-  journal target picker, actions as chat prefills), locales web/src/geo/locales/figures/; NO edit of research-notes-panel.tsx
-  (exports a component; the writer wires it).
-- C `gaid-research-visuals--map`: server/src/geo/connections/** + route; web/src/geo/connections/** (React Flow
-  @xyflow/react + @dagrejs/dagre; web/package.json + lock owner), locales web/src/geo/locales/connections/; exports
-  ConnectionMapButton/ConnectionMapPane; no edits outside its dirs except the route registration line and deps.
-Integration order: A (check script + journals.json) → B uses them (B can stub until A lands); C independent. Writer wires
-seams (research-notes-panel.tsx note detail: figures + map entry; figure record → map; library detail entry via the hub /
-gaid-library-next owner), then check-ui, scripts/check, screenshots (2 styles × 2 themes, 1440×900 + 1280×800, Korean),
-report update (design + implementation), task finish.
-1. Wait for task sync (scripts/check running) to finish, save ADR + contracts, start children A, B, C.
+<!-- task:closed -->
+Closed 2026-10-22T04:42:40Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-research-visuals.md.
+
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
@@ -137,6 +106,9 @@ report update (design + implementation), task finish.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [확인 gaid-research-visuals#1] 실제 모델 채팅에서 AI agent가 그림 스킬(gaid-figures)을 읽고 목표 저널의 최종 폭·글자 크기로 그린 뒤 점검을 돌리는지 — 가) 모델이 연결된 GAID에서 그림 하나를 그리게 해 확인 — 나) 시험 연구자 사용 때 확인 — 권장: 가) 스킬과 지시문의 효과는 실제 모델로만 알 수 있음 — 막힌 일: 그림 스킬의 완료 판단 — 근거: reports/2026-10-21-gaid-research-visuals#5
+- [확인 gaid-research-visuals#2] AGU와 자원환경지질의 그림 요건(폭, 글자, 해상도, AI 그림 정책) — 가) 실제 브라우저로 공식 페이지를 열어 journals.json을 채움 — 나) 연구자가 투고할 때까지 "확인 안 됨"으로 둠 — 권장: 가) 두 곳 모두 지구과학 연구자의 주요 투고처임 — 막힌 일: 두 저널의 그림 점검 — 근거: reports/2026-10-21-gaid-research-visuals#3.1
+- [확인 gaid-research-visuals#3] 서재 논문에서 연결 지도를 여는 입구(서재는 모든 프로젝트에 걸치고 지도는 프로젝트 하나 안의 연결) — 가) 논문이 쓰인 프로젝트를 골라 여는 입구를 서재 다음 작업에서 만듦 — 나) 정리 노트와 그림에서만 엶 — 권장: 가) 논문에서 출발하는 질문("이 논문을 근거로 쓴 노트·그림")이 연결 지도의 주된 쓰임임 — 막힌 일: 서재 쪽 입구 — 근거: reports/2026-10-21-gaid-research-visuals#5
 ## Report
 Report: reports/2026-10-21-gaid-research-visuals/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
