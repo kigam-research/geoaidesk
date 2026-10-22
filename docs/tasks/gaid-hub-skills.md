@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:11:30Z
+updated: 2026-10-22T06:12:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -33,15 +33,27 @@ Phase 2 (implementation) started 2026-10-22 after the user chose all recommended
   `skill.hubRevision`), `WorkflowSkillState.hub`, package origin kind `gaid-hub-skill` + `hubSkill`
   (`server/src/geo/methods/package-origin.ts`, `MethodOrigin`), pure pin state `server/src/geo/methods/hub-pins.ts`.
 - ADR docs/adr/2026-10-22-hub-managed-skills.md; glossary/terminology "허브 스킬".
+- C1 done and pushed: readiness hub states (`local-methods.ts`, test `server/test/geo-hub-pins.test.ts`), exposure, CLI
+  export of pinned tree, Workflow view (hub revision, state, 허브에서 보기, SKILL.md from hub), readiness explanation.
+  Authoring: standard question `hub-skills` (`authoring/hub-skills.ts`), chosen skills bound as hub pins, prompt
+  `gaid-draft/2026-10-22.1`, package schema allows `hub`; `loadHubSkillCandidates` still returns [] until store lands.
+- Store decisions sent: authoring PRIVATE licence marker = absent (workflow/own stay institute); install/install-preview
+  work without X-GAID-User (anonymous = hub-visible only). UI: installer sends the header when known; HubSkillInstall
+  exported from web/src/geo/hub-skills/install.tsx for readiness.
 - Children running (started 2026-10-22): A `gaid-hub-skills--store` (Paseo agent 719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e,
   worktree ~/worktrees/geoaidesk/gaid-hub-skills--store, prompt ~/data/geoaidesk/work/gaid-hub-skills/child-store.md);
   B `gaid-hub-skills--ui` (agent af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188, worktree ~/worktrees/geoaidesk/gaid-hub-skills--ui,
   prompt .../child-ui.md). On each finish notice: `task complete gaid-hub-skills--<child>`.
 ## Next steps
-1. While A and B run, do C1 (Workflow runtime pieces that need only
-   the shared interface: exposure, CLI export, workflow-view, readiness rendering of hub states).
-2. After A completes: C2 myself (Workflow install pulls pinned hub skills, readiness uses A's store for `suspended`,
-   registration validates hub refs, authoring suggestions), then sync B, real-app check, scripts/check, report §3.9+.
+1. On store's finish notice: `task complete gaid-hub-skills--store`, then C2 against `server/src/geo/hub-skills/index.ts`:
+   fill `loadHubSkillCandidates` (authoring/hub-skills.ts: listHubSkills, latest revision not suspended/deprecated);
+   Workflow install hook in `authoring/install.ts` (install missing pinned hub skills via installHubSkillRevision, report
+   per skill in InstallResult, blocked ones do not fail the Workflow; preview lists them; web install-preview line);
+   registration check in `hub-shared/routes.ts` (pin exists, treeHash equal, not suspended, hub-visible);
+   `hubSuspended` map at `routes/methods.ts` + `routes/workspace.ts`; hub CLI export fetches pinned archives.
+2. Then tell ui to `task sync` and test against the real API; on its finish `task complete gaid-hub-skills--ui`.
+3. scripts/check, real-app run with own GAID_HOME, report §3.9+ (implementation result), humanizer, review-copy, finish.
+Blocked: waiting for child store (agent 719ab3a6) to finish; C1 and authoring parts are pushed (580d4339b331).
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (verbatim "모두 권장안으로 진행하자."): 1 가) hub skill shelf, revisions pinned by Workflows;
