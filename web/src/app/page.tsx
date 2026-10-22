@@ -10,13 +10,12 @@ import { ChatTabsBar, type ChatTabDescriptor } from "@/components/chat-tabs-bar"
 import { ProjectSwitcher } from "@/components/project-switcher";
 import { ProjectView } from "@/components/project-view";
 import { SessionCostPill } from "@/components/session-cost-pill";
-import { ResourceMonitor } from "@/components/resource-monitor";
 import { useSessionCost } from "@/lib/use-session-cost";
 import { useProjectCost } from "@/lib/use-project-cost";
 import { useProjectActivities } from "@/lib/use-project-activities";
 import { useModalJobs } from "@/lib/use-modal-jobs";
 import { useProjects } from "@/lib/use-projects";
-import { APP_VERSION, isVersioned, useUpdateCheck } from "@/lib/version";
+import { useUpdateCheck } from "@/lib/version";
 import { useSkills } from "@/lib/use-skills";
 import { flattenFiles, flattenFolders, useSandbox } from "@/lib/use-sandbox";
 import { ProjectScopeProvider } from "@/lib/projects";
@@ -38,10 +37,7 @@ import {
   PanelRightIcon,
   SettingsIcon,
   ServerCogIcon,
-  SunIcon,
-  MoonIcon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -64,7 +60,9 @@ import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
-import { GaidTopNav } from "@/geo/hub/top-nav";
+import { GaidAppBar } from "@/geo/shell/app-bar";
+import { SystemResourcesButton } from "@/geo/shell/system-resources";
+import { Button } from "@/components/ui/button";
 import {
   useCallback,
   useEffect,
@@ -113,10 +111,9 @@ function defaultTabTitle(index: number): string {
 function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
   return (
     <div
-      className="group relative z-10 flex w-px shrink-0 cursor-col-resize items-center justify-center bg-border transition-colors before:absolute before:inset-y-0 before:-inset-x-1 hover:bg-gaid-link active:bg-gaid-link"
+      className="group relative z-10 flex w-px shrink-0 cursor-col-resize items-center justify-center bg-gaid-frame transition-colors before:absolute before:inset-y-0 before:-left-1 before:-right-1 hover:bg-gaid-signal active:bg-gaid-signal"
       onMouseDown={onMouseDown}
     >
-      <div className="h-8 w-0.5 rounded-full bg-muted-foreground/20 group-hover:bg-gaid-link transition-colors" />
     </div>
   );
 }
@@ -344,8 +341,6 @@ function WorkspacePage({
   const { updateAvailable } = useUpdateCheck();
   const { skills: allSkills, loading: skillsLoading } = useSkills();
   const { projects: projectDirectory } = useProjects();
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [sandboxOpen, setSandboxOpen] = useState(
     () => initialState?.sandboxOpen ?? true,
   );
@@ -505,7 +500,6 @@ function WorkspacePage({
     sandboxRefreshOpenTabs();
   }, [sandboxFetchTree, sandboxRefreshOpenTabs]);
 
-  useEffect(() => setMounted(true), []);
 
   // Drive sandbox polling cadence off the active tab's streaming state
   // (the live-poll mode used to be hard-wired to the single chat).
@@ -534,10 +528,11 @@ function WorkspacePage({
   }, [anyStreaming, isActive, sandboxFetchTree, sandboxRefreshOpenTabs]);
 
   const [treeWidth, setTreeWidth] = useState(
-    () => initialState?.treeWidth ?? 256,
+    // UI guide v2 L2: the content face is the widest pane (research first); side panes start narrow.
+    () => initialState?.treeWidth ?? 272,
   );
   const [chatWidth, setChatWidth] = useState(
-    () => initialState?.chatWidth ?? 400,
+    () => initialState?.chatWidth ?? 440,
   );
   const [isResizing, setIsResizing] = useState(false);
   const dragging = useRef<"tree" | "chat" | null>(null);
@@ -910,6 +905,10 @@ function WorkspacePage({
   );
   const { summary: projectCost, loading: projectCostLoading } =
     useProjectCost(costRefreshKey);
+  const showCost =
+    projectCost.limitUsd != null ||
+    (projectCost.spentUsd ?? projectCost.totalUsd ?? 0) > 0 ||
+    (costSummary.totalUsd ?? 0) > 0;
   const directorySpendLimit = projectDirectory.find(
     (project) => project.id === projectId,
   )?.spendLimitUsd;
@@ -952,83 +951,58 @@ function WorkspacePage({
   );
 
   return (
-    <div className="flex h-dvh min-w-0 flex-col bg-background">
-      {/* Header */}
-      <header className="relative flex min-h-14 items-center justify-between gap-3 border-b border-gaid-line-strong bg-gaid-header px-4 py-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={onOpenProjectView}
-            aria-label={appText("header.back_to_projects")}
-            className="flex items-center gap-2"
-          >{/* GAID compact lockup (WP00 design/assets, vendored in geo/brand/); the button's aria-label names it. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
-            <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
-          </button>
-          {isVersioned && (
-            <InfoTooltip
-              content={
-                <>
-                  <b>{appText("header.version", { version: APP_VERSION })}</b>
-                  <br />
-                  {appText("header.attribution")}
-                </>
-              }
-            >
-              <span className="text-xs text-muted-foreground cursor-help">
-                v{APP_VERSION}
-              </span>
-            </InfoTooltip>
-          )}
-          {updateAvailable && (
-            <InfoTooltip content={appText("header.a_newer_version_is_available_on_github")}>
-              <a
-                href={process.env.NEXT_PUBLIC_RELEASES_URL ?? "https://github.com/K-Dense-AI/k-dense-byok"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-medium text-gaid-link hover:underline transition-colors"
-              >
-                {appText("header.update_available")}</a>
-            </InfoTooltip>
-          )}
-          <span className="mx-1 h-4 w-px bg-border/60" aria-hidden />
-          {onOpenHub && <GaidTopNav current="projects" onNavigate={(place) => (place === "hub" ? onOpenHub() : onOpenProjectView())} />}
-          <ProjectSwitcher onOpenProjectView={onOpenProjectView} />
-        </div>
-        <p className="absolute left-1/2 hidden -translate-x-1/2 text-xs text-muted-foreground tracking-wide select-none 2xl:block">
-          {appText("header.attribution")}
-        </p>
-        <div className="flex shrink-0 items-center gap-2">
-          {isActive && <ResourceMonitor />}
-          <SessionCostPill
-            summary={costSummary}
-            projectSummary={projectCost}
-            limitUsd={projectCost.limitUsd}
-            loading={costLoading || projectCostLoading}
-          />
-          {activeModalJobCount > 0 ? (
-            <InfoTooltip
-              content={appText("header.computeRunning", { count: activeModalJobCount })}
-            >
-              <button
-                type="button"
-                onClick={() => handleViewCompute()}
-                aria-label={appText("header.openCompute", { count: activeModalJobCount })}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-gaid-pending-bg px-2 py-1.5 text-xs font-medium text-gaid-body transition-colors hover:bg-accent"
-              >
-                <ServerCogIcon className="size-3.5" />
-                {activeModalJobCount}
-              </button>
-            </InfoTooltip>
-          ) : modalJobsLoading ? (
-            <span className="sr-only" aria-live="polite">{appText("header.checking_compute_jobs")}</span>
-          ) : null}
-          {/* Panel visibility — collapse either side panel to give the center
-              pane (file preview / LaTeX editor) more room. */}
-          <div className="flex items-center gap-0.5 rounded-md border bg-muted/30 p-0.5">
+    <div className="flex h-dvh min-w-0 flex-col">
+      {/* GAID app bar (UI guide v2 L2): mark, place switch, project; status and panel toggles; settings. */}
+      <GaidAppBar
+        place="projects"
+        onNavigate={onOpenHub ? (place) => (place === "hub" ? onOpenHub() : onOpenProjectView()) : undefined}
+        onHome={onOpenProjectView}
+        leading={
+          <>
+            <span className="h-5 w-px bg-gaid-edge" aria-hidden />
+            <ProjectSwitcher onOpenProjectView={onOpenProjectView} />
+            {updateAvailable && (
+              <InfoTooltip content={appText("header.a_newer_version_is_available_on_github")}>
+                <a
+                  href={process.env.NEXT_PUBLIC_RELEASES_URL ?? "https://github.com/K-Dense-AI/k-dense-byok"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-gaid-signal-ink hover:underline"
+                >
+                  {appText("header.update_available")}</a>
+              </InfoTooltip>
+            )}
+          </>
+        }
+        trailing={
+          <>
+            {showCost && (
+              <SessionCostPill
+                summary={costSummary}
+                projectSummary={projectCost}
+                limitUsd={projectCost.limitUsd}
+                loading={costLoading || projectCostLoading}
+              />
+            )}
+            {activeModalJobCount > 0 ? (
+              <InfoTooltip content={appText("header.computeRunning", { count: activeModalJobCount })}>
+                <button
+                  type="button"
+                  onClick={() => handleViewCompute()}
+                  aria-label={appText("header.openCompute", { count: activeModalJobCount })}
+                  className="inline-flex h-7 items-center gap-1.5 rounded-md bg-gaid-signal-tint px-2 text-xs font-medium text-gaid-signal-ink transition-colors hover:bg-gaid-signal-tint/80"
+                >
+                  <span className="gaid-orbit" aria-hidden />
+                  <ServerCogIcon className="size-3.5" aria-hidden />
+                  <span className="tabular-nums">{activeModalJobCount}</span>
+                </button>
+              </InfoTooltip>
+            ) : modalJobsLoading ? (
+              <span className="sr-only" aria-live="polite">{appText("header.checking_compute_jobs")}</span>
+            ) : null}
+            {isActive && <SystemResourcesButton />}
+            <span className="mx-1 h-5 w-px bg-gaid-edge" aria-hidden />
+            {/* Panel visibility: collapse either side panel to give the center pane more room (UI guide v2 L2, D6). */}
             <InfoTooltip
               content={
                 <>
@@ -1037,19 +1011,16 @@ function WorkspacePage({
                   {appText("header.collapse_the_left_file_tree_to_widen")}</>
               }
             >
-              <button
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={toggleSandbox}
                 aria-label={sandboxOpen ? appText("header.hide_file_browser") : appText("header.show_file_browser")}
                 aria-pressed={sandboxOpen}
-                className={cn(
-                  "rounded-md p-1.5 transition-colors",
-                  sandboxOpen
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
+                className={cn(sandboxOpen && "bg-gaid-hover text-gaid-ink")}
               >
-                <PanelLeftIcon className="size-4" />
-              </button>
+                <PanelLeftIcon />
+              </Button>
             </InfoTooltip>
             <InfoTooltip
               content={
@@ -1059,63 +1030,24 @@ function WorkspacePage({
                   {appText("header.collapse_the_right_chat_panel_to_widen")}</>
               }
             >
-              <button
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={toggleChat}
                 aria-label={chatOpen ? appText("header.hide_chat") : appText("header.show_chat")}
                 aria-pressed={chatOpen}
-                className={cn(
-                  "rounded-md p-1.5 transition-colors",
-                  chatOpen
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
+                className={cn(chatOpen && "bg-gaid-hover text-gaid-ink")}
               >
-                <PanelRightIcon className="size-4" />
-              </button>
+                <PanelRightIcon />
+              </Button>
             </InfoTooltip>
-          </div>
-          <InfoTooltip
-            content={
-              <>
-                <b>{appText("header.settings")}</b>
-                <br />
-                {appText("header.model_providers_and_defaults_this_project_s")}</>
-            }
-          >
-            <button
-              onClick={() => {
-                setSettingsRequest(null);
-                setSettingsOpen(true);
-              }}
-              aria-label={appText("header.open_settings")}
-              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <SettingsIcon className="size-4" />
-            </button>
-          </InfoTooltip>
-          {mounted && (
-            <InfoTooltip
-              content={
-                resolvedTheme === "dark"
-                  ? appText("header.switch_to_light_mode")
-                  : appText("header.switch_to_dark_mode")
-              }
-            >
-              <button
-                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                aria-label={
-                  resolvedTheme === "dark"
-                    ? appText("header.switch_to_light_mode")
-                    : appText("header.switch_to_dark_mode")
-                }
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                {resolvedTheme === "dark" ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-              </button>
-            </InfoTooltip>
-          )}
-        </div>
-      </header>
+          </>
+        }
+        onOpenSettings={() => {
+          setSettingsRequest(null);
+          setSettingsOpen(true);
+        }}
+      />
 
       {/* Main content area — three columns: file tree | preview | chat */}
       <div
@@ -1128,7 +1060,7 @@ function WorkspacePage({
 
         {/* Left: file tree */}
         {isActive && sandboxOpen && (
-          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden bg-gaid-frame xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
+          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
             <FileTreePanel
               tree={sandbox.tree}
               selectedPath={sandbox.activeTabPath}
@@ -1155,7 +1087,7 @@ function WorkspacePage({
 
         {/* Middle: file preview with tabs — always shown; it is the pane the
             side panels make room for (e.g. the LaTeX editor + PDF). */}
-        <div className="min-h-0 flex-1 min-w-0 overflow-hidden bg-background">
+        <div className="min-h-0 flex-1 min-w-0 overflow-hidden">
             <FilePreviewPanel
               projectId={projectId}
               isActive={isActive}
@@ -1211,7 +1143,7 @@ function WorkspacePage({
             collapsed) so background chat streams keep running. */}
         <div
           className={cn(
-            "col-span-full flex min-h-0 min-w-0 flex-col border-l bg-gaid-frame overflow-hidden shrink-0 xl:w-[var(--chat-width)]",
+            "col-span-full flex min-h-0 min-w-0 flex-col border-l overflow-hidden shrink-0 xl:w-[var(--chat-width)]",
             !chatOpen && "hidden",
           )}
           style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}

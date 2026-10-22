@@ -109,7 +109,7 @@ export function FilesDialog({
         </DialogHeader>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <div className="grid min-h-0 flex-1 grid-cols-[16rem_minmax(0,1fr)] gap-3">
-          <ul className="min-h-0 overflow-y-auto rounded-none border p-1 text-sm">
+          <ul className="min-h-0 overflow-y-auto rounded-lg border p-1 text-sm">
             {(files ?? []).map((f, i) => (
               <li key={f.path}>
                 <button
@@ -117,7 +117,7 @@ export function FilesDialog({
                   onClick={() => setSelected(i)}
                   className={cn(
                     "w-full truncate rounded px-2 py-1 text-left font-mono text-xs",
-                    i === selected ? "bg-accent text-gaid-link" : "hover:bg-muted",
+                    i === selected ? "bg-primary/10 text-primary" : "hover:bg-muted",
                   )}
                 >
                   {f.path}
@@ -125,7 +125,7 @@ export function FilesDialog({
               </li>
             ))}
           </ul>
-          <pre className="min-h-0 overflow-auto rounded-none border bg-background p-3 font-mono text-xs whitespace-pre-wrap">
+          <pre className="min-h-0 overflow-auto rounded-lg border bg-muted/40 p-3 font-mono text-xs whitespace-pre-wrap">
             {file ? (file.encoding === "utf8" ? file.content : (decodeText(file.content) ?? `(${file.encoding})`)) : ""}
           </pre>
         </div>
@@ -209,7 +209,7 @@ function IssueGroups({ findings }: { findings: CheckResult["findings"] }) {
   return (
     <div className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto text-sm">
       {[...groups].map(([sentence, items]) => (
-        <div key={sentence} className="rounded-none border border-destructive/40 p-3">
+        <div key={sentence} className="rounded-lg border border-destructive/40 p-3">
           <p>
             {sentence}
             {items.length > 1 && (
@@ -257,7 +257,7 @@ export function AgentRecordDialog({ open, onOpenChange, attempts }: DialogProps 
             .slice()
             .reverse()
             .map((a) => (
-              <li key={a.id} className="rounded-none border p-3">
+              <li key={a.id} className="rounded-lg border p-3">
                 <p className="font-medium">
                   {text("detail.outcome", {
                     op: text(`detail.op.${a.op}`),
@@ -301,7 +301,7 @@ export function SourcePageDialog({
             {name} · {text("questions.page", { page })}
           </DialogTitle>
         </DialogHeader>
-        <div className="min-h-0 flex-1 overflow-hidden rounded-none border">
+        <div className="min-h-0 flex-1 overflow-hidden rounded-lg border">
           <PdfViewer
             path={name}
             sourceUrl={url}
@@ -392,7 +392,7 @@ export function RegisterDialog({
             placeholder={text("register.notePlaceholder")}
           />
         </label>
-        <ul className="flex flex-col gap-1 rounded-none bg-background p-3 text-sm">
+        <ul className="flex flex-col gap-1 rounded-lg bg-muted/50 p-3 text-sm">
           <li>{text("register.shared")}</li>
           <li className="text-muted-foreground">{text("register.notShared")}</li>
         </ul>

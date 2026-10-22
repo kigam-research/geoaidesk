@@ -370,7 +370,7 @@ export function NotebookEntryChip({
       data-tool-call-id={item.id}
       className="my-1 flex w-full items-center gap-2 rounded-md border border-orange-500/25 bg-orange-500/5 px-2.5 py-1.5 text-xs"
     >
-      <BookOpenIcon className="size-3.5 shrink-0 text-muted-foreground" />
+      <BookOpenIcon className="size-3.5 shrink-0 text-orange-500" />
       <span className="font-medium text-foreground">{appText("chat.tools.notebookType", { type: typeLabel })}</span>
       {title && (
         <span className="min-w-0 flex-1 truncate text-muted-foreground">{title}</span>

@@ -163,11 +163,11 @@ describe("SessionCostPill", () => {
     expect(button).toHaveTextContent("/ $10.00");
     // The only destructive classes on a non-exceeded button come from default
     // shadcn base styles (aria-invalid:*). Our budget-specific override
-    // strings (text-destructive, border-destructive/60, border-gaid-warning)
+    // strings (text-destructive, border-destructive/60, border-amber-500/60)
     // must not be present.
     expect(button.className).not.toContain("text-destructive");
     expect(button.className).not.toContain("border-destructive/60");
-    expect(button.className).not.toContain("border-gaid-warning");
+    expect(button.className).not.toContain("border-amber-500/60");
   });
 
   it("applies the warn tone when usage is between 80% and 100%", () => {
@@ -185,7 +185,7 @@ describe("SessionCostPill", () => {
       />,
     );
     const button = screen.getByRole("button");
-    expect(button.className).toContain("border-gaid-warning");
+    expect(button.className).toContain("border-amber-500/60");
   });
 
   it("counts compute reservations and in-flight runs toward the displayed cap", async () => {
@@ -216,7 +216,7 @@ describe("SessionCostPill", () => {
     const button = screen.getByRole("button");
     expect(button).toHaveTextContent("$9.00");
     expect(button).toHaveAccessibleName(/held for work in progress/i);
-    expect(button.className).toContain("border-gaid-warning");
+    expect(button.className).toContain("border-amber-500/60");
 
     await user.hover(button);
     expect(await screen.findByText(/\$2\.00 recorded/)).toBeInTheDocument();

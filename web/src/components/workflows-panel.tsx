@@ -1,7 +1,91 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { InfoIcon, PencilIcon, PlayIcon, SearchIcon, type LucideIcon } from "lucide-react";
+import {
+  ActivityIcon,
+  AtomIcon,
+  InfoIcon,
+  BarChart3Icon,
+  BinaryIcon,
+  BookOpenIcon,
+  BoxIcon,
+  BrainIcon,
+  BuildingIcon,
+  CalculatorIcon,
+  CircleDotIcon,
+  ClipboardCheckIcon,
+  CloudIcon,
+  CogIcon,
+  CpuIcon,
+  CrosshairIcon,
+  DatabaseIcon,
+  DnaIcon,
+  DollarSignIcon,
+  DropletIcon,
+  EyeIcon,
+  FileCheck2Icon,
+  FileSearchIcon,
+  FileTextIcon,
+  FilterIcon,
+  FingerprintIcon,
+  FlameIcon,
+  FlaskConicalIcon,
+  GaugeIcon,
+  GemIcon,
+  GitBranchIcon,
+  GitCompareIcon,
+  GlobeIcon,
+  GraduationCapIcon,
+  HeartIcon,
+  HeartPulseIcon,
+  HexagonIcon,
+  ImageIcon,
+  LayersIcon,
+  LayoutGridIcon,
+  LeafIcon,
+  LineChartIcon,
+  ListChecksIcon,
+  MapIcon,
+  MegaphoneIcon,
+  MessageCircleIcon,
+  MicroscopeIcon,
+  MountainIcon,
+  NetworkIcon,
+  NewspaperIcon,
+  PaletteIcon,
+  PencilIcon,
+  PieChartIcon,
+  PlayIcon,
+  PresentationIcon,
+  RefreshCwIcon,
+  ReplyIcon,
+  RocketIcon,
+  RouteIcon,
+  RssIcon,
+  SatelliteIcon,
+  ScaleIcon,
+  ScanIcon,
+  SearchIcon,
+  SendIcon,
+  ShieldIcon,
+  SigmaIcon,
+  LightbulbIcon,
+  SproutIcon,
+  StarIcon,
+  StethoscopeIcon,
+  TargetIcon,
+  TelescopeIcon,
+  ThermometerIcon,
+  TimerIcon,
+  TreePineIcon,
+  TrendingUpIcon,
+  UsersIcon,
+  WavesIcon,
+  WindIcon,
+  WrenchIcon,
+  ZapIcon,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,29 +140,112 @@ export function workflowMatchesSearch(workflow: Workflow, query: string): boolea
 
 const ALL_WORKFLOWS = workflowsData as Workflow[];
 
+const ICON_MAP: Record<string, LucideIcon> = {
+  Activity: ActivityIcon,
+  Atom: AtomIcon,
+  BarChart3: BarChart3Icon,
+  Binary: BinaryIcon,
+  BookOpen: BookOpenIcon,
+  Box: BoxIcon,
+  Brain: BrainIcon,
+  Building: BuildingIcon,
+  Calculator: CalculatorIcon,
+  CircleDot: CircleDotIcon,
+  ClipboardCheck: ClipboardCheckIcon,
+  Cloud: CloudIcon,
+  Cog: CogIcon,
+  Cpu: CpuIcon,
+  Crosshair: CrosshairIcon,
+  Database: DatabaseIcon,
+  Dna: DnaIcon,
+  DollarSign: DollarSignIcon,
+  Droplet: DropletIcon,
+  Eye: EyeIcon,
+  FileCheck: FileCheck2Icon,
+  FileSearch: FileSearchIcon,
+  FileText: FileTextIcon,
+  Filter: FilterIcon,
+  Fingerprint: FingerprintIcon,
+  Flame: FlameIcon,
+  FlaskConical: FlaskConicalIcon,
+  Gauge: GaugeIcon,
+  Gem: GemIcon,
+  GitBranch: GitBranchIcon,
+  GitCompare: GitCompareIcon,
+  Globe: GlobeIcon,
+  GraduationCap: GraduationCapIcon,
+  Heart: HeartIcon,
+  HeartPulse: HeartPulseIcon,
+  Hexagon: HexagonIcon,
+  Image: ImageIcon,
+  Layers: LayersIcon,
+  LayoutGrid: LayoutGridIcon,
+  Leaf: LeafIcon,
+  LineChart: LineChartIcon,
+  ListChecks: ListChecksIcon,
+  Map: MapIcon,
+  Megaphone: MegaphoneIcon,
+  MessageCircle: MessageCircleIcon,
+  Microscope: MicroscopeIcon,
+  Mountain: MountainIcon,
+  Network: NetworkIcon,
+  Newspaper: NewspaperIcon,
+  Palette: PaletteIcon,
+  Pencil: PencilIcon,
+  PieChart: PieChartIcon,
+  Presentation: PresentationIcon,
+  RefreshCw: RefreshCwIcon,
+  Reply: ReplyIcon,
+  Rocket: RocketIcon,
+  Route: RouteIcon,
+  Rss: RssIcon,
+  Satellite: SatelliteIcon,
+  Scale: ScaleIcon,
+  Scan: ScanIcon,
+  Search: SearchIcon,
+  Send: SendIcon,
+  Shield: ShieldIcon,
+  Sigma: SigmaIcon,
+  Sparkles: LightbulbIcon,
+  Sprout: SproutIcon,
+  Star: StarIcon,
+  Stethoscope: StethoscopeIcon,
+  Target: TargetIcon,
+  Telescope: TelescopeIcon,
+  Thermometer: ThermometerIcon,
+  Timer: TimerIcon,
+  TreePine: TreePineIcon,
+  TrendingUp: TrendingUpIcon,
+  Users: UsersIcon,
+  Waves: WavesIcon,
+  Wind: WindIcon,
+  Wrench: WrenchIcon,
+  Zap: ZapIcon,
+};
+
 const CATEGORIES: { id: string; label: string; color: string }[] = [
-  { id: "paper", get label() { return workflowText("categories.paper"); }, color: "text-muted-foreground" },
-  { id: "visual", get label() { return workflowText("categories.visual"); }, color: "text-muted-foreground" },
-  { id: "data", get label() { return workflowText("categories.data"); }, color: "text-muted-foreground" },
-  { id: "literature", get label() { return workflowText("categories.literature"); }, color: "text-muted-foreground" },
-  { id: "grants", get label() { return workflowText("categories.grants"); }, color: "text-muted-foreground" },
-  { id: "scicomm", get label() { return workflowText("categories.scicomm"); }, color: "text-muted-foreground" },
-  { id: "genomics", get label() { return workflowText("categories.genomics"); }, color: "text-muted-foreground" },
-  { id: "proteomics", get label() { return workflowText("categories.proteomics"); }, color: "text-muted-foreground" },
-  { id: "cellbio", get label() { return workflowText("categories.cellbio"); }, color: "text-muted-foreground" },
-  { id: "chemistry", get label() { return workflowText("categories.chemistry"); }, color: "text-muted-foreground" },
-  { id: "drugdiscovery", get label() { return workflowText("categories.drugdiscovery"); }, color: "text-muted-foreground" },
-  { id: "physics", get label() { return workflowText("categories.physics"); }, color: "text-muted-foreground" },
-  { id: "materials", get label() { return workflowText("categories.materials"); }, color: "text-muted-foreground" },
-  { id: "clinical", get label() { return workflowText("categories.clinical"); }, color: "text-muted-foreground" },
-  { id: "neuro", get label() { return workflowText("categories.neuro"); }, color: "text-muted-foreground" },
-  { id: "ecology", get label() { return workflowText("categories.ecology"); }, color: "text-muted-foreground" },
-  { id: "finance", get label() { return workflowText("categories.finance"); }, color: "text-muted-foreground" },
-  { id: "social", get label() { return workflowText("categories.social"); }, color: "text-muted-foreground" },
-  { id: "math", get label() { return workflowText("categories.math"); }, color: "text-muted-foreground" },
-  { id: "ml", get label() { return workflowText("categories.ml"); }, color: "text-muted-foreground" },
-  { id: "engineering", get label() { return workflowText("categories.engineering"); }, color: "text-muted-foreground" },
-  { id: "astro", get label() { return workflowText("categories.astro"); }, color: "text-muted-foreground" },
+  { id: "paper", get label() { return workflowText("categories.paper"); }, color: "text-gaid-ink-2" },
+  { id: "visual", get label() { return workflowText("categories.visual"); }, color: "text-gaid-ink-2" },
+  { id: "data", get label() { return workflowText("categories.data"); }, color: "text-gaid-ink-2" },
+  { id: "literature", get label() { return workflowText("categories.literature"); }, color: "text-gaid-ink-2" },
+  { id: "grants", get label() { return workflowText("categories.grants"); }, color: "text-gaid-ink-2" },
+  { id: "scicomm", get label() { return workflowText("categories.scicomm"); }, color: "text-gaid-ink-2" },
+  { id: "genomics", get label() { return workflowText("categories.genomics"); }, color: "text-gaid-ink-2" },
+  { id: "proteomics", get label() { return workflowText("categories.proteomics"); }, color: "text-gaid-ink-2" },
+  { id: "cellbio", get label() { return workflowText("categories.cellbio"); }, color: "text-gaid-ink-2" },
+  { id: "chemistry", get label() { return workflowText("categories.chemistry"); }, color: "text-gaid-ink-2" },
+  { id: "drugdiscovery", get label() { return workflowText("categories.drugdiscovery"); }, color: "text-gaid-ink-2" },
+  { id: "physics", get label() { return workflowText("categories.physics"); }, color: "text-gaid-ink-2" },
+  { id: "materials", get label() { return workflowText("categories.materials"); }, color: "text-gaid-ink-2" },
+  { id: "clinical", get label() { return workflowText("categories.clinical"); }, color: "text-gaid-ink-2" },
+  { id: "neuro", get label() { return workflowText("categories.neuro"); }, color: "text-gaid-ink-2" },
+  { id: "ecology", get label() { return workflowText("categories.ecology"); }, color: "text-gaid-ink-2" },
+  { id: "finance", get label() { return workflowText("categories.finance"); }, color: "text-gaid-ink-2" },
+  { id: "social", get label() { return workflowText("categories.social"); }, color: "text-gaid-ink-2" },
+  { id: "math", get label() { return workflowText("categories.math"); }, color: "text-gaid-ink-2" },
+  { id: "ml", get label() { return workflowText("categories.ml"); }, color: "text-gaid-ink-2" },
+  { id: "engineering", get label() { return workflowText("categories.engineering"); }, color: "text-gaid-ink-2" },
+  { id: "astro", get label() { return workflowText("categories.astro"); }, color: "text-gaid-ink-2" },
 ];
 
 /** Upstream categories, for hosts that let the user file their own rows under one (GAID seam). */
@@ -122,6 +289,36 @@ export type WorkflowPanelExtension = {
    */
   collapseUpstream?: { showLabel: (count: number) => string; hideLabel: string };
 };
+
+const CATEGORY_ICON_COLOR: Record<string, string> = {
+  paper: "text-gaid-ink-2",
+  visual: "text-gaid-ink-2",
+  data: "text-gaid-ink-2",
+  literature: "text-gaid-ink-2",
+  grants: "text-gaid-ink-2",
+  scicomm: "text-gaid-ink-2",
+  genomics: "text-gaid-ink-2",
+  proteomics: "text-gaid-ink-2",
+  cellbio: "text-gaid-ink-2",
+  chemistry: "text-gaid-ink-2",
+  drugdiscovery: "text-gaid-ink-2",
+  physics: "text-gaid-ink-2",
+  materials: "text-gaid-ink-2",
+  clinical: "text-gaid-ink-2",
+  neuro: "text-gaid-ink-2",
+  ecology: "text-gaid-ink-2",
+  finance: "text-gaid-ink-2",
+  social: "text-gaid-ink-2",
+  math: "text-gaid-ink-2",
+  ml: "text-gaid-ink-2",
+  engineering: "text-gaid-ink-2",
+  astro: "text-gaid-ink-2",
+};
+
+function WorkflowIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICON_MAP[name] ?? FileTextIcon;
+  return <Icon className={className} />;
+}
 
 export function WorkflowLaunchDialog({
   workflow,
@@ -194,11 +391,14 @@ export function WorkflowLaunchDialog({
     setIsEditingPrompt(false);
   }, [finalPrompt, model, inputFiles, onLaunch, onOpenChange, uploading, canLaunch, selectedBudgetBlocked, modelAvailable]);
 
+  const iconColor = CATEGORY_ICON_COLOR[workflow.category] ?? "text-muted-foreground";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
+            <WorkflowIcon name={workflow.icon} className={cn("size-5", iconColor)} />
             {workflowDisplayText(workflow, "name", workflow.name)}
           </DialogTitle>
           <DialogDescription>{workflowDisplayText(workflow, "description", workflow.description)}</DialogDescription>
@@ -238,7 +438,7 @@ export function WorkflowLaunchDialog({
                     value={placeholderValues[ph.key] ?? ""}
                     onChange={(e) => updatePlaceholder(ph.key, e.target.value)}
                     placeholder={workflowDisplayText(workflow, `inputs.${ph.key}`, ph.label)}
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground"
+                    className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/50"
                   />
                 </div>
               ))}
@@ -258,7 +458,7 @@ export function WorkflowLaunchDialog({
                   }
                   setIsEditingPrompt(!isEditingPrompt);
                 }}
-                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <PencilIcon className="size-3" />
                 {isEditingPrompt ? workflowText("dialog.done") : workflowText("dialog.edit")}
@@ -268,10 +468,10 @@ export function WorkflowLaunchDialog({
               <textarea
                 value={editedPrompt ?? assembledPrompt}
                 onChange={(e) => setEditedPrompt(e.target.value)}
-                className="max-h-48 min-h-[5rem] w-full resize-y rounded-md border bg-background px-3 py-2 text-xs leading-relaxed outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
+                className="max-h-48 min-h-[5rem] w-full resize-y rounded-lg border bg-background px-3 py-2 text-xs leading-relaxed outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
               />
             ) : (
-              <div className="max-h-32 overflow-y-auto rounded-md border bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+              <div className="max-h-32 overflow-y-auto rounded-lg border bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
                 {finalPrompt}
               </div>
             )}
@@ -379,7 +579,7 @@ export function WorkflowsPanel({
   }, []);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-gaid-frame">
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* Search + category pills */}
       <div className="shrink-0 border-b px-4 py-3 space-y-2.5">
         <div className="flex items-center gap-2">
@@ -390,7 +590,7 @@ export function WorkflowsPanel({
               onChange={(e) => setSearch(e.target.value)}
               placeholder={extension?.searchPlaceholder ?? workflowText("panel.search")}
               aria-label={extension?.searchPlaceholder ?? workflowText("panel.search")}
-              className="w-full rounded-md border border-input bg-background py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary placeholder:text-muted-foreground"
+              className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary"
             />
           </div>
           {extension?.headerAction}
@@ -401,7 +601,7 @@ export function WorkflowsPanel({
             <button
               key={cat.id}
               onClick={() => scrollToCategory(cat.id)}
-              className="shrink-0 rounded-sm border border-input bg-background px-2.5 py-1 text-xs font-medium text-gaid-body transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
+              className="shrink-0 rounded-md border border-gaid-edge bg-gaid-face px-2.5 py-1 text-xs font-medium text-gaid-ink-2 transition-colors hover:bg-gaid-hover hover:text-gaid-ink"
             >
               <span>{cat.label}</span>
             </button>
@@ -418,28 +618,32 @@ export function WorkflowsPanel({
             if (!workflows || workflows.length === 0) return null;
             return (
               <section key={cat.id} data-category={cat.id}>
-                <h3 className="mb-2.5 text-sm font-semibold text-foreground">
+                <h3 className="mb-1.5 px-1 text-sm font-semibold text-gaid-ink">
                   {cat.label}
-                  <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-                    ({workflows.length})
+                  <span className="ml-1.5 text-xs font-medium tabular-nums text-gaid-ink-3">
+                    {workflows.length}
                   </span>
                 </h3>
-                <div className="divide-y border-y border-border">
+                <div className="grid grid-cols-1 gap-0.5">
                   {workflows.map((w) => {
                     if ("onSelect" in w) {
+                      const Icon = w.icon;
                       // GAID rows: one line of description (UI guide G1); details open from the row's own action.
                       return (
-                        <div key={w.id} className="flex items-start transition-colors hover:bg-accent/50">
+                        <div key={w.id} className="flex items-start rounded-md transition-colors hover:bg-gaid-hover">
                           <button
                             onClick={w.onSelect}
-                            className="flex min-w-0 flex-1 items-start gap-3 rounded-none px-3.5 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="flex min-w-0 flex-1 items-start gap-3 rounded-md px-2.5 py-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-gaid-edge bg-gaid-face text-gaid-ink-2">
+                              <Icon className="size-4" />
+                            </span>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="text-sm font-medium text-foreground">{w.name}</span>
+                                <span className="text-sm font-semibold text-foreground">{w.name}</span>
                                 {w.badges}
                               </div>
-                              <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed line-clamp-1" title={w.description}>
+                              <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground" title={w.description}>
                                 {w.description}
                               </p>
                             </div>
@@ -450,7 +654,7 @@ export function WorkflowsPanel({
                               onClick={w.detail.onSelect}
                               aria-label={w.detail.label}
                               title={w.detail.label}
-                              className="m-2 shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-background/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              className="m-1.5 shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             >
                               <InfoIcon className="size-4" aria-hidden />
                             </button>
@@ -462,14 +666,18 @@ export function WorkflowsPanel({
                       <button
                         key={w.id}
                         onClick={() => setSelectedWorkflow(w)}
-                        className="flex items-start gap-3 px-3.5 py-3 text-left transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                        className="flex items-start gap-3 rounded-md px-2.5 py-2.5 text-left transition-colors hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
+                        <span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-gaid-edge bg-gaid-face text-gaid-ink-2">
+                          <WorkflowIcon name={w.icon} className="size-4" />
+                        </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-medium text-foreground">{workflowDisplayText(w, "name", w.name)}</span>
                             <SourceBadge source={UPSTREAM_APP_SOURCE} asText />
                             {w.requiresFiles && (
-                              <span className="inline-flex items-center rounded-sm border border-border bg-gaid-pending-bg px-1.5 py-px text-xs font-medium text-muted-foreground">
+                              <span className="inline-flex items-center gap-1 rounded-sm bg-gaid-warning-tint px-1.5 py-px text-xs font-medium text-gaid-warning">
+                                <DatabaseIcon className="size-3" />
                                 {workflowText("panel.needs_data")}
                               </span>
                             )}
@@ -490,7 +698,7 @@ export function WorkflowsPanel({
               type="button"
               onClick={() => setUpstreamOpen(!upstreamOpen)}
               aria-expanded={upstreamOpen}
-              className="w-full rounded-none border border-dashed px-3.5 py-3 text-left text-xs text-muted-foreground transition-colors hover:bg-muted/50"
+              className="w-full rounded-md border border-dashed border-gaid-control-edge px-3 py-2.5 text-left text-sm text-gaid-ink-2 transition-colors hover:bg-gaid-hover"
             >
               {upstreamOpen ? extension.collapseUpstream.hideLabel : extension.collapseUpstream.showLabel(ALL_WORKFLOWS.length)}
             </button>

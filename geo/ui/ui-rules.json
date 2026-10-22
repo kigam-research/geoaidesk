@@ -1,84 +1,433 @@
 {
-  "version": 1,
+  "version": 2,
   "guide": "docs/design/ui-guide.md",
-  "note": "Machine-readable part of the GAID UI guide. check-ui.mjs reads locales, copyLength, internals, styles and slop; tokens and components are the values the guide states, for agents and mockups. Colours, fonts, radius and motion come from web/src/app/globals.css (:root light, .dark dark; direction 라 since gaid-design-identity) and are referenced by CSS variable, not repeated.",
-  "locales": { "dir": "web/src/geo/locales", "locales": ["ko", "en"] },
+  "note": "Machine-readable part of the GAID UI guide v2 (adopted 2026-10-22). check-ui.mjs reads locales, copyLength, internals, styles and slop; tokens, identity and components are the values the guide states, for agents and mockups. Colours, radius and motion come from web/src/app/globals.css (identity 계측 on :root/.dark, 도폭 on [data-style=\"mapsheet\"]) and are referenced by CSS variable, not repeated in components.",
+  "locales": {
+    "dir": "web/src/geo/locales",
+    "locales": [
+      "ko",
+      "en"
+    ]
+  },
   "tokens": {
-    "source": "web/src/app/globals.css", "themes": ["light", "dark"], "font": "Pretendard Variable 1.3.9 (OFL), self-hosted in web/public/fonts/, the only visible typeface",
-    "spacing": { "unitPx": 4, "scalePx": [4, 8, 12, 16, 24, 32, 48], "tailwind": ["1", "2", "3", "4", "6", "8", "12"] },
+    "source": "web/src/app/globals.css",
+    "spacing": {
+      "unitPx": 4,
+      "scalePx": [
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        32,
+        40,
+        48,
+        64
+      ],
+      "tailwind": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "8",
+        "10",
+        "12",
+        "16"
+      ]
+    },
     "type": {
-      "captionPx": 12, "bodyPx": "var(--gaid-body-size)", "subtitlePx": "var(--gaid-h2-size)", "titlePx": "var(--gaid-h1-size)",
-      "minPx": 12, "weights": { "body": 400, "emphasis": 500, "heading": "var(--gaid-heading-weight)" },
-      "lineHeight": { "body": 1.5, "heading": 1.3 }, "measureCh": { "ko": 40, "en": 75 }
+      "family": "Pretendard Variable (the logo lettering face; self-hosted, OFL)",
+      "microPx": 12,
+      "captionPx": 13,
+      "bodyPx": 15,
+      "subtitlePx": 17,
+      "titlePx": 20,
+      "pageTitlePx": 26,
+      "minPx": 12,
+      "tailwind": {
+        "text-xs": 13,
+        "text-sm": 15,
+        "text-base": 16,
+        "text-lg": 17,
+        "text-xl": 20,
+        "text-2xl": 26
+      },
+      "weights": {
+        "body": 400,
+        "emphasis": 500,
+        "heading": 650,
+        "pageTitle": 700
+      },
+      "lineHeight": {
+        "body": 1.6,
+        "heading": 1.3
+      },
+      "measurePx": 680,
+      "measureCh": {
+        "ko": 42,
+        "en": 75
+      }
     },
     "colour": {
       "roles": {
-        "text": "--foreground", "textSecondary": "--muted-foreground", "surface": "--background", "surfaceSubtle": "--muted",
-        "action": "--primary", "actionHover": "--gaid-brand-hover", "focus": "--ring", "border": "--border",
-        "success": "--gaid-success", "warning": "--gaid-warning", "danger": "--gaid-danger", "untested": "--gaid-untested", "noData": "--gaid-nodata",
-        "frame": "--gaid-frame", "workSurface": "--background", "paper": "--card", "header": "--gaid-header", "textBody": "--gaid-body", "link": "--gaid-link",
-        "selection": "--accent", "controlLine": "--input", "strongLine": "--gaid-line-strong", "warningBg": "--gaid-warning-bg", "pendingBg": "--gaid-pending-bg"
+        "face": "--gaid-face",
+        "face2": "--gaid-face-2",
+        "chrome": "--gaid-chrome",
+        "edge": "--gaid-edge",
+        "frame": "--gaid-frame",
+        "controlEdge": "--gaid-control-edge",
+        "text": "--gaid-ink",
+        "textSecondary": "--gaid-ink-2",
+        "textTertiary": "--gaid-ink-3",
+        "signal": "--gaid-signal",
+        "signalText": "--gaid-signal-ink",
+        "selection": "--gaid-signal-tint",
+        "hover": "--gaid-hover",
+        "focus": "--ring",
+        "success": "--gaid-success",
+        "warning": "--gaid-warning",
+        "danger": "--gaid-danger",
+        "untested": "--gaid-untested",
+        "noData": "--gaid-nodata"
       },
-      "contrastMin": { "text": 4.5, "largeText": 3, "uiComponent": 3 }
+      "shadcn": "--background/--card/--popover = face, --foreground = ink, --primary = signal, --muted = face-2, --muted-foreground = ink-2, --accent = hover, --border = edge, --input = control-edge, --sidebar = chrome",
+      "contrastMin": {
+        "bodyText": 7,
+        "text": 4.5,
+        "largeText": 3,
+        "uiComponent": 3
+      }
     },
-    "radius": { "pane": "0", "control": "var(--radius-md)", "chip": "var(--radius-sm)", "card": "var(--radius-lg)", "popup": "var(--radius-lg)" },
-    "control": { "heightPx": 32, "minTargetPx": 24, "iconPx": 16 },
-    "motion": { "fast": "var(--gaid-motion-fast)", "base": "var(--gaid-motion-base)", "easing": "var(--gaid-easing)", "maxMs": 300 },
+    "radius": {
+      "base": "var(--radius)",
+      "control": "var(--radius-md)",
+      "card": "var(--radius-lg)",
+      "dialog": "var(--radius-xl)",
+      "corner": "var(--gaid-corner)"
+    },
+    "control": {
+      "heightPx": 32,
+      "toolbarHeightPx": 28,
+      "primaryStepHeightPx": 40,
+      "minTargetPx": 24,
+      "iconButtonPx": 28,
+      "iconPx": 16,
+      "iconStroke": 1.75
+    },
+    "motion": {
+      "fastMs": 120,
+      "baseMs": 200,
+      "maxMs": 300,
+      "easing": "cubic-bezier(0.22, 0.25, 0, 1)",
+      "loops": [
+        "gaid-orbit"
+      ]
+    },
     "layout": {
-      "minViewportPx": 1024, "headerPx": 56, "sidePanelPx": { "min": 280, "default": 320, "max": 400 },
-      "dialogPx": { "small": 400, "medium": 560, "large": 720 }, "contentMaxPx": 960, "dialogMaxHeightVh": 85
+      "minViewportPx": 1024,
+      "regularMinPx": 1280,
+      "appBarPx": 52,
+      "sidebarPx": {
+        "min": 220,
+        "default": 272,
+        "max": 360
+      },
+      "inspectorPx": {
+        "min": 360,
+        "default": 440,
+        "max": 640
+      },
+      "contentMinPx": 560,
+      "listDetailRatio": [
+        38,
+        62
+      ],
+      "sheetPx": {
+        "small": 480,
+        "medium": 640,
+        "large": 720
+      },
+      "sheetMaxHeightVh": 85
     }
+  },
+  "identity": {
+    "default": "instrument",
+    "styles": {
+      "instrument": {
+        "label": {
+          "ko": "계측",
+          "en": "Instrument"
+        },
+        "corner": "bevel",
+        "radiusPx": 8,
+        "functionalLayer": "chrome tone",
+        "selection": "index mark",
+        "steps": "graduated scale"
+      },
+      "mapsheet": {
+        "label": {
+          "ko": "도폭",
+          "en": "Map sheet"
+        },
+        "corner": "round",
+        "radiusPx": 0,
+        "functionalLayer": "ink neat lines",
+        "selection": "ink frame",
+        "steps": "scale bar",
+        "attribute": "html[data-style=mapsheet]",
+        "storageKey": "gaid:style"
+      }
+    },
+    "shared": [
+      "logo once (I1)",
+      "signal blue only (I2)",
+      "Pretendard (I3)",
+      "orbit while the AI agent works (I4)",
+      "tabular numerals (I5)",
+      "original pixels (I6)"
+    ]
   },
   "components": {
     "dialogMaxActions": 3,
     "primaryActionsPerView": 1,
-    "questionOptions": { "min": 2, "max": 5, "recommendedFirst": true, "otherInput": true, "oneQuestionPerStep": true },
-    "firstView": { "maxBodyChars": { "ko": 300, "en": 600 }, "maxParagraphsBeforeAction": 2, "maxBadgesPerRow": 3 },
+    "headerMaxActions": 3,
+    "questionOptions": {
+      "min": 2,
+      "max": 5,
+      "recommendedFirst": true,
+      "otherInput": true,
+      "oneQuestionPerStep": true
+    },
+    "firstView": {
+      "maxBodyChars": {
+        "ko": 300,
+        "en": 600
+      },
+      "maxParagraphsBeforeAction": 2,
+      "maxBadgesPerRow": 3
+    },
     "tableMaxVisibleColumns": 8,
-    "toastMaxChars": { "ko": 40, "en": 80 }
+    "toastMaxChars": {
+      "ko": 40,
+      "en": 80
+    }
   },
   "copyLength": {
     "note": "A role applies only to ids matching its patterns (new button labels: <area>.<thing>.button or .action); all other ids get the text limit. Visible characters after ICU arguments count as argumentChars each and plural/select blocks as their longest branch. The first role whose ids match an id decides its limit.",
     "argumentChars": 4,
-    "exemptIds": ["*.command", "*.command.*", "*.code", "*.code.*", "*.path", "*.path.*", "*.citation", "*.citation.*", "*.userData", "*.userData.*", "*.question", "*.prompt", "*.prompt.*", "*.template", "*.template.*"],
+    "exemptIds": [
+      "*.command",
+      "*.command.*",
+      "*.code",
+      "*.code.*",
+      "*.path",
+      "*.path.*",
+      "*.citation",
+      "*.citation.*",
+      "*.userData",
+      "*.userData.*",
+      "*.question",
+      "*.prompt",
+      "*.prompt.*",
+      "*.template",
+      "*.template.*"
+    ],
     "roles": [
-      { "id": "cta", "ids": ["*.button", "*.button.*", "*.cta", "*.cta.*", "*.action", "*.action.*"], "max": { "ko": 16, "en": 32 } },
-      { "id": "title", "ids": ["*.title", "*.heading", "*.h1", "*.h2", "*.name"], "max": { "ko": 30, "en": 60 } },
-      { "id": "toast", "ids": ["*.toast", "*.toast.*", "*.saved", "*.copied"], "max": { "ko": 40, "en": 80 } },
-      { "id": "text", "ids": ["*"], "max": { "ko": 140, "en": 280 } }
+      {
+        "id": "cta",
+        "ids": [
+          "*.button",
+          "*.button.*",
+          "*.cta",
+          "*.cta.*",
+          "*.action",
+          "*.action.*"
+        ],
+        "max": {
+          "ko": 16,
+          "en": 32
+        }
+      },
+      {
+        "id": "title",
+        "ids": [
+          "*.title",
+          "*.heading",
+          "*.h1",
+          "*.h2",
+          "*.name"
+        ],
+        "max": {
+          "ko": 30,
+          "en": 60
+        }
+      },
+      {
+        "id": "toast",
+        "ids": [
+          "*.toast",
+          "*.toast.*",
+          "*.saved",
+          "*.copied"
+        ],
+        "max": {
+          "ko": 40,
+          "en": 80
+        }
+      },
+      {
+        "id": "text",
+        "ids": [
+          "*"
+        ],
+        "max": {
+          "ko": 140,
+          "en": 280
+        }
+      }
     ]
   },
   "internals": {
     "note": "Researcher-facing strings must not interpolate raw errors, model names or internal ids. Model names are allowed only where the researcher chooses or configures a model; raw detail only behind a technical-details disclosure (ids ending .technical).",
-    "surfaces": ["*"],
-    "allowedIds": ["app.chat.models.*", "app.settings.*", "settings.*", "localModel.*", "*.technical", "*.technical.*", "*.record", "*.record.*"],
-    "forbiddenArguments": ["detail", "error", "message", "stderr", "stack", "model", "models", "sessionId", "chatId", "runId", "toolCallId", "requestId"],
+    "surfaces": [
+      "*"
+    ],
+    "allowedIds": [
+      "app.chat.models.*",
+      "app.settings.*",
+      "settings.*",
+      "localModel.*",
+      "*.technical",
+      "*.technical.*",
+      "*.record",
+      "*.record.*"
+    ],
+    "forbiddenArguments": [
+      "detail",
+      "error",
+      "message",
+      "stderr",
+      "stack",
+      "model",
+      "models",
+      "sessionId",
+      "chatId",
+      "runId",
+      "toolCallId",
+      "requestId"
+    ],
     "forbiddenText": {
-      "ko": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED", "채팅 ID", "세션 ID", "종료 코드", "HTTP \\{status\\}"],
-      "en": ["stack trace", "traceback", "stderr", "toolCallId", "sessionId", "ECONNREFUSED", "chat ID", "session ID", "exit code", "HTTP \\{status\\}"]
+      "ko": [
+        "stack trace",
+        "traceback",
+        "stderr",
+        "toolCallId",
+        "sessionId",
+        "ECONNREFUSED",
+        "채팅 ID",
+        "세션 ID",
+        "종료 코드",
+        "HTTP \\{status\\}"
+      ],
+      "en": [
+        "stack trace",
+        "traceback",
+        "stderr",
+        "toolCallId",
+        "sessionId",
+        "ECONNREFUSED",
+        "chat ID",
+        "session ID",
+        "exit code",
+        "HTTP \\{status\\}"
+      ]
     }
   },
   "styles": {
-    "roots": ["web/src/geo"],
-    "extensions": [".tsx", ".ts"],
-    "skipFiles": ["*.test.ts", "*.test.tsx", "web/src/geo/locales/*"],
-    "hexAllowFiles": ["web/src/geo/viewers/map/colors.ts", "web/src/geo/viewers/map/map-canvas.tsx", "web/src/geo/viewers/depth/tracks.tsx"],
+    "roots": [
+      "web/src/geo"
+    ],
+    "extensions": [
+      ".tsx",
+      ".ts"
+    ],
+    "skipFiles": [
+      "*.test.ts",
+      "*.test.tsx",
+      "web/src/geo/locales/*"
+    ],
+    "hexAllowFiles": [
+      "web/src/geo/viewers/map/colors.ts",
+      "web/src/geo/viewers/map/map-canvas.tsx",
+      "web/src/geo/viewers/depth/tracks.tsx"
+    ],
     "minFontPx": 12
   },
   "slop": {
-    "note": "UI guide sections 4 and 4a (V2-V7, S2, S8): mechanical anti-slop proxies on the GAID primary path. Reviewers still judge eyebrows, card grids and placeholders on screen.",
-    "roots": ["web/src/geo", "web/src/app/page.tsx", "web/src/components/project-view.tsx", "web/src/components/workflows-panel.tsx"],
-    "extensions": [".tsx", ".ts"],
-    "skipFiles": ["*.test.ts", "*.test.tsx", "web/src/geo/locales/*", "web/src/geo/viewers/map/*", "web/src/geo/viewers/depth/*", "web/src/geo/authoring-preview/*"],
-    "aiIcons": ["Sparkles", "Sparkle", "WandSparkles", "Wand", "Wand2", "Bot", "BotMessageSquare", "BrainCircuit", "Stars"],
+    "note": "UI guide v2 section 11 (V1-V8): mechanical proxies on the GAID primary path. Reviewers still judge eyebrows, card grids and placeholders on screen.",
+    "roots": [
+      "web/src/geo",
+      "web/src/app/page.tsx",
+      "web/src/components/project-view.tsx",
+      "web/src/components/workflows-panel.tsx"
+    ],
+    "extensions": [
+      ".tsx",
+      ".ts"
+    ],
+    "skipFiles": [
+      "*.test.ts",
+      "*.test.tsx",
+      "web/src/geo/locales/*",
+      "web/src/geo/viewers/map/*",
+      "web/src/geo/viewers/depth/*",
+      "web/src/geo/authoring-preview/*"
+    ],
+    "aiIcons": [
+      "Sparkles",
+      "Sparkle",
+      "WandSparkles",
+      "Wand",
+      "Wand2",
+      "Bot",
+      "BotMessageSquare",
+      "BrainCircuit",
+      "Stars"
+    ],
     "patterns": [
-      { "id": "hue-utility", "rule": "S1/S8", "regex": "\\b(?:[a-z]+:)*(?:text|bg|border|ring|fill|stroke|from|via|to|outline|decoration|divide|shadow|accent|caret)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d{2,3}\\b" },
-      { "id": "gradient", "rule": "V3", "regex": "\\bbg-(?:gradient|linear|radial|conic)-[a-z]|(?:linear|radial|conic)-gradient\\(" },
-      { "id": "glass", "rule": "V3", "regex": "\\bbackdrop-(?:blur|saturate)\\b|backdrop-filter" },
-      { "id": "image-filter", "rule": "V6", "regex": "\\b(?:[a-z]+:)*(?:invert|grayscale|sepia|saturate-\\d+|hue-rotate-\\d+|mix-blend-[a-z-]+)\\b" },
-      { "id": "side-stripe", "rule": "V7", "regex": "\\bborder-[lr]-(?:2|4|8|\\[(?:[2-9]|\\d{2,})px\\])(?![\\w-])" }
+      {
+        "id": "hue-utility",
+        "rule": "V1",
+        "regex": "\\b(?:[a-z]+:)*(?:text|bg|border|ring|fill|stroke|from|via|to|outline|decoration|divide|shadow|accent|caret)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d{2,3}\\b"
+      },
+      {
+        "id": "gradient",
+        "rule": "V3",
+        "regex": "\\bbg-(?:gradient|linear|radial|conic)-[a-z]|(?:linear|radial|conic)-gradient\\("
+      },
+      {
+        "id": "glass",
+        "rule": "V3",
+        "regex": "\\bbackdrop-(?:blur|saturate)\\b|backdrop-filter"
+      },
+      {
+        "id": "image-filter",
+        "rule": "V6",
+        "regex": "\\b(?:[a-z]+:)*(?:invert|grayscale|sepia|saturate-\\d+|hue-rotate-\\d+|mix-blend-[a-z-]+)\\b"
+      },
+      {
+        "id": "side-stripe",
+        "rule": "V7",
+        "regex": "\\bborder-[lr]-(?:2|4|8|\\[(?:[2-9]|\\d{2,})px\\])(?![\\w-])"
+      }
     ],
     "emojiInCopy": true,
-    "fontFace": { "css": "web/src/app/globals.css", "family": "Pretendard Variable" }
+    "fontFace": {
+      "css": "web/src/app/globals.css",
+      "family": "Pretendard Variable"
+    }
   }
 }

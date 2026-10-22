@@ -88,7 +88,7 @@ describe("ProjectView", () => {
     await user.click(screen.getByRole("button", { name: /archived projects/i }));
     expect(screen.getByText("Old study")).toBeInTheDocument();
 
-    const card = screen.getByText("RNA pilot").closest('[role="listitem"]');
+    const card = screen.getByText("RNA pilot").closest('[data-slot="card"]');
     expect(card).not.toBeNull();
     await user.click(
       within(card as HTMLElement).getByRole("button", {
@@ -151,7 +151,7 @@ describe("ProjectView", () => {
     ).toEqual(["Alpha", "Zeta"]);
   });
 
-  it("shows runtime indicators for projects needing attention", async () => {
+  it("shows colored runtime indicators for projects needing attention", async () => {
     const user = userEvent.setup();
     render(
       <ProjectView
@@ -175,7 +175,7 @@ describe("ProjectView", () => {
       />,
     );
 
-    const activeCard = screen.getByText("RNA pilot").closest('[role="listitem"]');
+    const activeCard = screen.getByText("RNA pilot").closest('[data-slot="card"]');
     expect(activeCard).not.toBeNull();
     expect(
       within(activeCard as HTMLElement).getByText("Needs your input"),
@@ -185,7 +185,7 @@ describe("ProjectView", () => {
     expect(within(activeCard as HTMLElement).getByText("Running")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /archived projects/i }));
-    const doneCard = screen.getByText("Old study").closest('[role="listitem"]');
+    const doneCard = screen.getByText("Old study").closest('[data-slot="card"]');
     expect(doneCard).not.toBeNull();
     expect(within(doneCard as HTMLElement).getByText("Done")).toBeInTheDocument();
   });

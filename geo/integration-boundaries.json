@@ -874,15 +874,33 @@
     },
     {
       "path": "web/src/app/globals.css, web/public/fonts/",
-      "owner": "gaid-design-identity",
+      "owner": "gaid-design-identity--fresh",
       "status": "edited",
-      "responsibility": "Direction 라 palette mapped onto the shadcn role variables (light :root, .dark), GAID surface/role variables and their Tailwind colour mappings, self-hosted Pretendard 1.3.9 (OFL) @font-face, themed selection/scrollbars"
+      "responsibility": "UI guide v2 identity tokens: 계측 (default) on :root/.dark and 도폭 on [data-style=\"mapsheet\"], mapped onto the shadcn role variables; Pretendard @font-face (logo lettering face); type scale; chamfered corners (corner-shape); orbit, index mark, segmented and step-scale styles"
     },
     {
-      "path": "web/src/app/page.tsx, web/src/components/project-view.tsx, web/src/components/workflows-panel.tsx, web/src/components/resource-monitor.tsx, web/src/components/session-cost-pill.tsx, web/src/components/project-switcher.tsx, web/src/components/ui/button.tsx, web/src/components/ui/badge.tsx, web/src/components/ui/card.tsx, web/src/components/ui/tabs.tsx, web/src/components/ui/input.tsx",
-      "owner": "gaid-design-identity",
+      "path": "web/src/app/page.tsx, web/src/components/project-view.tsx, web/src/components/workflows-panel.tsx",
+      "owner": "gaid-design-identity--fresh",
       "status": "edited",
-      "responsibility": "Visual identity (UI guide sections 4/4a): surfaces, register rows, removal of AI symbols, gradients, hue utilities and decorative tiles on the GAID primary path; behaviour and copy unchanged"
+      "responsibility": "UI guide v2: GAID app bar in the workspace and project list (no theme switch, resources behind a popover, budget chip only with a cap or spend), default pane widths, neutral Workflow panel rows and categories, project cards without decorative status colours"
+    },
+    {
+      "path": "web/src/app/layout.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "Inline <head> script that applies the stored GAID screen style (도폭) before first paint"
+    },
+    {
+      "path": "web/src/components/settings/appearance-panel.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "화면 스타일 choice (계측 default, 도폭) next to the theme choice (UI guide v2 section 2)"
+    },
+    {
+      "path": "web/src/components/sandbox-panel.tsx, web/src/components/ai-elements/file-tree.tsx, web/src/components/file-preview-panel.tsx, web/src/components/chat-tabs-bar.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "UI guide v2 functional layer: chrome tone and frame lines for the file tree, open-file tab strip and chat bar; sans file names; ink icons instead of hue icons"
     }
   ],
   "notTouched": [

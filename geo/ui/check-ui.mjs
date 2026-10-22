@@ -8,7 +8,7 @@
 //   internals     researcher-facing strings that interpolate raw errors, model names or internal ids
 //                 (guide "What researchers never see")
 //   styles        hard-coded colours and text smaller than the type scale in GAID components (guide "Tokens")
-//   slop          AI-slop proxies on the GAID primary path (guide 4/4a): Tailwind hue utilities, gradients, glass,
+//   slop          AI-slop proxies on the GAID primary path (guide v2 section 11): Tailwind hue utilities, gradients, glass,
 //                 image filters, side stripes >= 2px, generic AI icons, emoji in copy, missing brand @font-face
 // Findings recorded in geo/ui/ui-baseline.json are accepted debt: they are counted, not failed. A new finding
 // fails; a baseline entry that no longer occurs is reported so the baseline can shrink. The script only reports.

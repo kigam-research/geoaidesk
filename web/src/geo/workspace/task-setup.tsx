@@ -132,8 +132,8 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const undecided = workflow.requiredScientificChoices.filter((choice) => !(choice.id in values)).length;
 
   return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="bg-background flex h-[min(680px,85dvh)] flex-col gap-0 p-0 sm:max-w-[720px]">
-      <div className="space-y-4 border-b bg-gaid-frame px-6 pt-5 pb-4">
+    <DialogContent className="flex h-[min(680px,85dvh)] flex-col gap-0 p-0 sm:max-w-[720px]">
+      <div className="space-y-4 border-b px-6 pt-5 pb-4">
         <div className="space-y-1 pr-8">
           <div className="flex flex-wrap items-center gap-2">
             <DialogTitle className="text-xl leading-snug break-words">{recipe?.title ?? text(workflow.title)}</DialogTitle>
@@ -161,19 +161,19 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
           {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values }} />}
           <details className="text-sm">
             <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
-            <div className="mt-2 rounded-md bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>
+            <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>
           </details>
         </section>}
         {index === 0 && <details className="text-sm">
           <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreAbout")}</summary>
-          <div className="mt-2 space-y-2 rounded-md bg-muted/60 px-3 py-2 text-xs break-words">
+          <div className="mt-2 space-y-2 rounded-lg bg-muted/60 px-3 py-2 text-xs break-words">
             {workflow.description && <p>{text(workflow.description)}</p>}
             <p>{t("workspace.catalogue.inputs", { formats: [...new Set(workflow.inputRoles.flatMap((role) => role.extensions))].join(", ") })}</p>
           </div>
         </details>}
       </div>
 
-      <div className="space-y-2 border-t bg-gaid-frame px-6 py-3">
+      <div className="space-y-2 border-t px-6 py-3">
         {error && <div role="alert" className="space-y-1 text-sm text-destructive"><p>{error.message}</p><TechnicalDetail detail={error.detail} /></div>}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-muted-foreground tabular-nums">{t("workspace.setup.counter", { n: index + 1, total: steps.length })}</span>

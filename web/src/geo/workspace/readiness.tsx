@@ -23,8 +23,8 @@ export function Readiness({ value }: { value: WorkflowReadiness }) {
     : value.state === "needs-environment" ? t("workspace.readiness.environment", { name: environment })
     : t("workspace.readiness.unavailable", { reason: unavailableReason(value) });
   return <div className="flex flex-wrap gap-1 text-xs">
-    <span className={value.state === "needs-environment" || value.state === "missing-skills" ? "rounded-sm border border-gaid-warning/30 bg-gaid-warning-bg px-2 py-1 text-gaid-warning break-words" : "rounded-sm border bg-gaid-pending-bg px-2 py-1 break-words"}>{label}</span>
-    {value.runRecord === "none" && <span className="rounded-sm border bg-gaid-pending-bg px-2 py-1 text-muted-foreground">{t("workspace.readiness.untested")}</span>}
+    <span className="rounded border px-2 py-1 break-words">{label}</span>
+    {value.runRecord === "none" && <span className="rounded border px-2 py-1">{t("workspace.readiness.untested")}</span>}
   </div>;
 }
 
@@ -70,7 +70,7 @@ export function ReadinessNotice({ value, projectId, onPrepared }: { value: Workf
     : value.state === "unavailable" ? t("workspace.setup.ready.unavailable")
     : t("workspace.setup.ready.done");
   // One row: the blocker and the action that fixes it (UI guide Q4); results wrap below.
-  return <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md border bg-muted/50 px-4 py-2.5 text-sm">
+  return <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-muted/50 px-4 py-2.5 text-sm">
     {message && <p className="min-w-0 flex-1 break-words">{message}</p>}
     {value.state === "unavailable" ? <TechnicalDetail detail={unavailableReason(value)} /> : <PrepareEnvironment value={value} projectId={projectId} onPrepared={onPrepared} />}
   </div>;

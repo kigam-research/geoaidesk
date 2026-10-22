@@ -139,7 +139,7 @@ export function ProjectSwitcher({ onOpenProjectView }: ProjectSwitcherProps) {
               variant="ghost"
               size="sm"
               aria-label={appText("projects.switcher.switch_project")}
-              className="h-7 gap-1.5 px-2 text-xs font-medium text-foreground hover:text-foreground"
+              className="h-7 gap-1.5 px-2 text-xs font-medium text-foreground/80 hover:text-foreground"
             >
               <FolderIcon className="size-3.5" />
               <span className="max-w-[140px] truncate">
@@ -285,7 +285,7 @@ function ProjectRow({
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-sm">{project.name}</span>
         {project.description && (
-          <span className="truncate text-xs text-muted-foreground">
+          <span className="truncate text-[11px] text-muted-foreground">
             {project.description}
           </span>
         )}

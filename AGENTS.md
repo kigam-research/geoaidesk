@@ -167,18 +167,25 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   쓴다. 버튼은 다음 동작을 쓴다(한국어 목적어+동작, 영어 동사+목적어). 질문형 제목, 추상적 변환 문장, 과장 형용사, 장식 이모지를
   쓰지 않는다. 실행 완료를 검증 완료로 바꾸지 않는다. 추정·미시험·검토 전 같은 한계를 지우지 않는다. 확인되지 않은 기능·지원
   환경·성능·비용을 쓰지 않는다. 변경 보고에 문자열 id와 한·영 변경 전후를 적는다.
-- UI guide (gaid-ui-guide; v2 visual identity gaid-design-identity): `docs/design/ui-guide.md` is the standard for every
-  visible GAID screen (adapted from Samsung One UI principles plus TDS Mobile patterns; values in `geo/ui/ui-rules.json`).
-  The GAID visual identity is being redesigned (gaid-design-identity; no direction adopted yet as of 2026-10-22: the user
-  rejected all earlier drafts). Until the user confirms one, the token values in `web/src/app/globals.css` and guide sections
-  4/4a are provisional. User rules that hold regardless: colours only through tokens, original pixels for figures/maps/PDFs,
-  no Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an
-  impeccable + design-taste-frontend + brand-guide expert (user rule 2026-10-21; skills in skill_hub `.claude/skills/`). Before UI work, read its sections 1 and 9 and those
-  for the components you touch. A change report lists the rule ids it follows or breaks (with reason) and includes
-  Korean screenshots at 1440×900 and 1280×800 checked against its section 10. `scripts/check` runs
-  `node geo/ui/check-ui.mjs` (copy length, agent internals in researcher views, hard-coded colours/small text, AI-slop
-  proxies: hue utilities, gradients, glass, image filters, side stripes, AI icons, emoji, brand @font-face); accepted
-  debt lives in `geo/ui/ui-baseline.json`, added only with the reason in the report.
+- UI guide v2 (gaid-design-identity--fresh, adopted 2026-10-22): `docs/design/ui-guide.md` is the standard for every
+  visible GAID screen, rebuilt from Samsung One UI and Apple HIG for the GAID hub and system (values in
+  `geo/ui/ui-rules.json`). Identity from the fixed logo (octagonal G, orbit ring, brand blue, Pretendard lettering): **계측**
+  (Instrument) is the default (chrome functional layer around white faces, 45° chamfered corners via `corner-shape`, index
+  mark, graduated step scale); **도폭** (Map sheet) is a style a researcher may choose in Settings → 화면 표시 → 화면 스타일
+  (`<html data-style="mapsheet">`, stored as `gaid:style`; paper ground, ink neat lines, square corners, scale-bar steps).
+  User decision verbatim: "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수 있게 할 수 있나?" → "가로 진행하자."
+  Tokens and both styles live in `web/src/app/globals.css` (role tokens `--gaid-face/-chrome/-edge/-frame/-ink/-signal…`,
+  also as Tailwind `bg-gaid-*`/`text-gaid-*`); components use roles, never branch on the style. Shared parts:
+  `web/src/geo/shell/` (`GaidAppBar`: mark once, 내 연구/GAID 허브 switch, settings, no theme switch; `SidebarGroup`/
+  `SidebarItem`; `StepScale`; `SystemResourcesButton`), `.gaid-orbit` (the AI agent is working; the one loop), `.gaid-index`,
+  `.gaid-seg`. User rules that hold: colours only through tokens, original pixels for figures/maps/PDFs, no
+  Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an impeccable +
+  design-taste-frontend + brand-guide expert (user rule 2026-10-21; skills in skill_hub `.claude/skills/`). Before UI work,
+  read guide sections 1, 2 and 10 and those for the components you touch. A change report lists the rule ids it follows or
+  breaks (with reason) and includes Korean screenshots in both styles and both themes at 1440×900 and 1280×800 checked
+  against section 12. `scripts/check` runs `node geo/ui/check-ui.mjs` (copy length, agent internals in researcher views,
+  hard-coded colours/small text, AI-slop proxies: hue utilities, gradients, glass, image filters, side stripes, AI icons,
+  emoji, brand @font-face); accepted debt lives in `geo/ui/ui-baseline.json`, added only with the reason in the report.
 - Names in visible copy (gaid-brand-copy, user decision 2026-10-15): the assistant is "AI agent" and the app is GAID;
   "Kady"/"K-Dense"/"BYOK" stay only in code identifiers, env vars, routes, model-facing text and the upstream attribution
   line. Content taken from K-Dense shows its source where it is shown: catalogue skills via `SkillInfo.upstream`

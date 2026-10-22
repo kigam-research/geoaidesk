@@ -7,6 +7,7 @@
  */
 import {
   FileTextIcon,
+  FlaskConicalIcon,
   ImageIcon,
   LoaderCircleIcon,
   PencilLineIcon,
@@ -103,11 +104,11 @@ export function DraftStep({
         <header className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-xl font-semibold">{localText(profile.title)}</h2>
-            <Badge variant="secondary" className="rounded-sm">{text("draft.private")}</Badge>
-            <Badge variant="outline" className="rounded-sm">
+            <Badge variant="secondary">{text("draft.private")}</Badge>
+            <Badge variant="outline">
               {trialCount > 0 ? text("draft.tested", { count: trialCount }) : text("draft.untested")}
             </Badge>
-            <Badge variant="outline" className="rounded-sm">
+            <Badge variant="outline">
               {text(draft.codeFiles.length ? "draft.implementation.implemented" : "draft.implementation.descriptive")}
             </Badge>
             <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
@@ -117,8 +118,8 @@ export function DraftStep({
             <p className="text-sm text-muted-foreground">{text("draft.implementation.descriptiveHint")}</p>
           )}
           {onRegister && (
-            <div className="flex flex-wrap items-center gap-3 rounded-none border border-border bg-background p-3">
-              <Share2Icon className="size-5 text-gaid-link" aria-hidden />
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
+              <Share2Icon className="size-5 text-primary" aria-hidden />
               <p className="min-w-0 flex-1 text-sm">
                 {registered ? text("register.registeredLine", { n: registered }) : text("register.line")}
               </p>
@@ -159,11 +160,11 @@ export function DraftStep({
               </div>
             )}
           </div>
-          {visualAction && <section aria-label={text("visuals.title")} className="flex flex-col gap-2 rounded-none border bg-background p-3">
+          {visualAction && <section aria-label={text("visuals.title")} className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3">
             <h4 className="text-sm font-semibold">{text("visuals.title")}</h4>
             <p className="max-w-[640px] text-sm">{text("visuals.explanation")}</p>
             <details className="text-sm">
-              <summary className="cursor-pointer text-gaid-link">{text("visuals.how")}</summary>
+              <summary className="cursor-pointer text-primary">{text("visuals.how")}</summary>
               <p className="mt-2 max-w-[640px] text-sm text-muted-foreground">{text("visuals.source.record")}</p>
             </details>
             {visualAction.connected !== true && <div className="flex flex-wrap items-center gap-2">
@@ -171,11 +172,11 @@ export function DraftStep({
               <Button variant="outline" size="sm" onClick={() => openSettings({ tab: "providers" })}>{text("visuals.connect.action")}</Button>
             </div>}
             <details className="text-sm">
-              <summary className="cursor-pointer text-gaid-link">{text("visuals.cover")}</summary>
+              <summary className="cursor-pointer text-primary">{text("visuals.cover")}</summary>
               <div className="mt-2 flex flex-col gap-2">
                 {cover && <figure className="flex flex-col gap-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cover} alt="" className="max-h-40 w-full rounded-none border object-contain" />
+                  <img src={cover} alt="" className="max-h-40 w-full rounded-lg border object-contain" />
                   <figcaption className="text-xs text-muted-foreground">{text("visuals.note")}</figcaption>
                 </figure>}
                 <PictureControls pictureKey="cover" label={text("visuals.cover")} hasPicture={Boolean(cover)} action={pictureAction} />
@@ -234,7 +235,7 @@ export function NewProject({ onCreate }: { onCreate: (name: string) => Promise<v
   const [failed, setFailed] = useState<string | null>(null);
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="self-start text-sm text-gaid-link underline">
+      <button type="button" onClick={() => setOpen(true)} className="self-start text-sm text-primary underline">
         {text("trial.newProject.action")}
       </button>
     );
@@ -307,8 +308,9 @@ export function TrialCard({
 }) {
   const [previewReady, setPreviewReady] = useState(false);
   return (
-    <section className="flex flex-col gap-4 rounded-none border bg-card p-4">
+    <section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
       <div className="flex items-center gap-2">
+        <FlaskConicalIcon className="size-5 text-primary" aria-hidden />
         <h3 className="font-semibold">{text("trial.title")}</h3>
       </div>
       <p className="text-sm text-muted-foreground">{text("trial.body")}</p>
@@ -351,7 +353,7 @@ export function TrialCard({
           {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
         </>
       )}
-      {installedIn && <p className="text-sm text-gaid-link">{text("trial.installed", { project: installedIn })}</p>}
+      {installedIn && <p className="text-sm text-primary">{text("trial.installed", { project: installedIn })}</p>}
     </section>
   );
 }

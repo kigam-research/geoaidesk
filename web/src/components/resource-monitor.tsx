@@ -31,13 +31,13 @@ function toneFor(pct: number): "ok" | "warn" | "hot" {
 
 const TEXT_TONE = {
   ok: "text-foreground",
-  warn: "text-gaid-warning",
+  warn: "text-amber-600 dark:text-amber-400",
   hot: "text-destructive",
 } as const;
 
 const BAR_TONE = {
   ok: "bg-primary",
-  warn: "bg-gaid-warning",
+  warn: "bg-amber-500",
   hot: "bg-destructive",
 } as const;
 
@@ -83,7 +83,7 @@ export function ResourceMonitor({ className }: { className?: string }) {
           variant="outline"
           size="sm"
           className={cn(
-            "h-auto gap-2.5 px-2.5 py-1.5 text-xs tabular-nums",
+            "h-auto gap-2.5 px-2.5 py-1.5 font-mono text-[11px] tabular-nums",
             className,
           )}
           aria-label={workText("resource_monitor.resources", { cpu: cpuPct, memory: memPct, gpu: gpuPct !== null ? `, GPU ${gpuPct}%` : "" })}
@@ -94,7 +94,7 @@ export function ResourceMonitor({ className }: { className?: string }) {
         </Button>
       </HoverCardTrigger>
       <HoverCardContent align="end" className="w-80 p-4">
-        <div className="text-muted-foreground text-xs font-medium">
+        <div className="text-muted-foreground text-xs uppercase tracking-wide">
           {workText("resource_monitor.system_resources")}</div>
         <div className="mt-3 space-y-3">
           <MeterRow
@@ -136,7 +136,7 @@ export function ResourceMonitor({ className }: { className?: string }) {
             />
           )}
         </div>
-        <div className="text-muted-foreground mt-3 text-xs">
+        <div className="text-muted-foreground/70 mt-3 text-[11px]">
           {workText("resource_monitor.machine_wide_usage_sampled_every_few_seconds_app_is_the_kady_backend_process")}</div>
       </HoverCardContent>
     </HoverCard>
@@ -172,7 +172,7 @@ function MeterRow({
           <Icon className="text-muted-foreground size-3.5 shrink-0" aria-hidden />
           <span className="truncate">{label}</span>
         </span>
-        <span className={cn("text-xs tabular-nums", TEXT_TONE[tone])}>
+        <span className={cn("font-mono text-xs tabular-nums", TEXT_TONE[tone])}>
           {pct}%
         </span>
       </div>
@@ -182,7 +182,7 @@ function MeterRow({
           style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
         />
       </div>
-      <div className="text-muted-foreground mt-0.5 text-xs">{detail}</div>
+      <div className="text-muted-foreground mt-0.5 text-[11px]">{detail}</div>
     </div>
   );
 }

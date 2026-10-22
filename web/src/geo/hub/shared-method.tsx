@@ -4,7 +4,7 @@
  * star and "use in my research"; the method at a glance (input → steps → result); the summary as points; the steps;
  * the limits; comments (GitHub-like feedback). The registration preview shows the same page with a sticky bar.
  */
-import { DownloadIcon, FolderIcon, HistoryIcon, PencilIcon, LibraryIcon, StarIcon } from "lucide-react";
+import { DownloadIcon, EyeIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, StarIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -66,11 +66,12 @@ function jumpTo(id: string) {
 
 /** Initial-letter avatar for a researcher's display name. */
 export function Avatar({ name, className }: { name: string; className?: string }) {
+  // One neutral plate for every name (UI guide v2 S2): colour is not decoration.
   return (
     <span
       aria-hidden
       className={cn(
-        "inline-flex size-7 shrink-0 items-center justify-center rounded-sm border border-border bg-gaid-pending-bg text-xs font-semibold text-foreground",
+        "inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-gaid-edge bg-gaid-face-2 text-xs font-semibold text-gaid-ink-2",
         className,
       )}
     >
@@ -108,8 +109,8 @@ export function SharedMethod({
   return (
     <div className={cn("mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-10", !preview && "pt-6")}>
       {preview && (
-        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b bg-gaid-frame px-6 py-3 text-sm">
-          <LibraryIcon className="size-4 text-gaid-link" aria-hidden />
+        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b border-gaid-frame bg-gaid-chrome px-6 py-3 text-sm">
+          <EyeIcon className="size-4 text-gaid-signal-ink" aria-hidden />
           <span className="min-w-0 flex-1 font-medium">{text("register.previewBanner")}</span>
           <Button variant="outline" size="sm" onClick={preview.onBack}>
             {text("register.backToDraft")}
@@ -120,25 +121,25 @@ export function SharedMethod({
         </div>
       )}
 
-      <header className="border-b border-gaid-line-strong py-6">
+      <header className="rounded-lg border bg-card p-6">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_16rem] md:items-start">
           <div className="flex min-w-0 flex-col gap-3">
-            <h2 className="text-xl font-semibold text-balance">{method.title}</h2>
             <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
-              <span className="text-muted-foreground">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
                 {method.kind === "workflow" ? text("draft.workflow") : text("draft.skill")}
               </span>
-              <span className="rounded-sm border px-2 py-1 text-muted-foreground">
+              <span className="rounded-full border px-2 py-1 text-muted-foreground">
                 {text("draft.revision", { n: method.revision })}
               </span>
               {method.folder && (
-                <span className="inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-muted-foreground">
                   <FolderIcon className="size-4" aria-hidden />
                   {method.folder}
                 </span>
               )}
             </div>
-            {method.tagline && <p className="max-w-[640px] text-sm text-pretty text-gaid-body">{method.tagline}</p>}
+            <h2 className="text-xl font-semibold text-balance">{method.title}</h2>
+            {method.tagline && <p className="max-w-[640px] text-base text-pretty">{method.tagline}</p>}
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Avatar name={method.author} />
               <span className="font-medium text-foreground">{method.author}</span>
@@ -155,7 +156,7 @@ export function SharedMethod({
                 <button
                   type="button"
                   onClick={method.basedOn.onOpen}
-                  className="text-gaid-link underline-offset-4 hover:underline"
+                  className="text-primary underline-offset-4 hover:underline"
                 >
                   {text("shared.openOriginal")}
                 </button>
@@ -179,7 +180,7 @@ export function SharedMethod({
               <button
                 type="button"
                 onClick={() => jumpTo("method-flow")}
-                className="text-gaid-link underline-offset-4 hover:underline"
+                className="text-primary underline-offset-4 hover:underline"
               >
                 {text("overview.jumpFlow")}
               </button>
@@ -187,7 +188,7 @@ export function SharedMethod({
                 <button
                   type="button"
                   onClick={() => jumpTo("method-limits")}
-                  className="text-gaid-link underline-offset-4 hover:underline"
+                  className="text-primary underline-offset-4 hover:underline"
                 >
                   {text("overview.jumpLimits")}
                 </button>
@@ -196,7 +197,7 @@ export function SharedMethod({
                 <button
                   type="button"
                   onClick={() => jumpTo("shared-comments")}
-                  className="text-gaid-link underline-offset-4 hover:underline"
+                  className="text-primary underline-offset-4 hover:underline"
                 >
                   {text("overview.jumpComments", { count: method.comments.length })}
                 </button>
@@ -205,15 +206,12 @@ export function SharedMethod({
           </div>
           <div className="flex flex-col gap-3">
             {method.image && (
-              <figure className="space-y-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={method.image}
                 alt=""
-                className="aspect-[16/10] w-full border bg-card object-contain"
+                className="aspect-[16/10] w-full rounded-lg border bg-background object-cover"
               />
-              <figcaption className="text-xs text-muted-foreground">{text("io.generated")}</figcaption>
-              </figure>
             )}
             <Button variant={preview ? "outline" : "default"} onClick={onTry} className="w-full">
               <DownloadIcon data-icon="inline-start" />
@@ -227,7 +225,7 @@ export function SharedMethod({
                 aria-pressed={method.starred}
                 className="flex flex-1 items-center justify-center gap-2 px-3 py-2 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <StarIcon className={cn("size-4", method.starred && "fill-current text-gaid-link")} aria-hidden />
+                <StarIcon className={cn("size-4", method.starred && "fill-current text-primary")} aria-hidden />
                 {method.starred ? text("shared.starred") : text("shared.star")}
               </button>
               <span className="flex items-center border-l px-3 text-sm font-semibold tabular-nums">{method.stars}</span>
@@ -269,7 +267,7 @@ export function SharedMethod({
       <LimitsCard profile={profile} />
 
       {method.revisions && method.revisions.length > 1 && (
-        <details className="max-w-4xl rounded-none border px-4 py-3 text-sm">
+        <details className="max-w-4xl rounded-xl border px-4 py-3 text-sm">
           <summary className="flex cursor-pointer items-center gap-2 font-medium">
             <HistoryIcon className="size-4" aria-hidden />
             {text("shared.revisions.title", { count: method.revisions.length })}
@@ -293,17 +291,18 @@ export function SharedMethod({
         aria-labelledby="shared-comments"
       >
         <h3 id="shared-comments" className="flex scroll-mt-20 items-center gap-2 text-base font-semibold">
+          <MessageSquareIcon className="size-5" aria-hidden />
           {text("shared.comments", { count: method.comments.length })}
         </h3>
         <ul className="flex max-w-4xl flex-col gap-3">
           {method.comments.map((c) => (
             <li key={c.id} className="flex gap-3">
               <Avatar name={c.author} className="mt-1 size-8" />
-              <div className="min-w-0 flex-1 overflow-hidden rounded-none border">
-                <p className="flex flex-wrap items-center gap-2 border-b bg-background px-3 py-2 text-sm">
+              <div className="min-w-0 flex-1 overflow-hidden rounded-xl border">
+                <p className="flex flex-wrap items-center gap-2 border-b bg-muted/40 px-3 py-2 text-sm">
                   <span className="font-semibold">{c.author}</span>
                   <span className="text-xs text-muted-foreground">{c.at}</span>
-                  <span className="ml-auto rounded-sm border px-2 py-0.5 text-xs text-muted-foreground">
+                  <span className="ml-auto rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
                     {text("draft.revision", { n: c.revision })}
                   </span>
                 </p>
@@ -313,11 +312,11 @@ export function SharedMethod({
           ))}
         </ul>
         {preview ? (
-          <p className="rounded-none border border-dashed p-4 text-sm text-muted-foreground">
+          <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
             {text("shared.afterRegister")}
           </p>
         ) : (
-          <div className="flex max-w-4xl flex-col gap-2 rounded-none border p-3">
+          <div className="flex max-w-4xl flex-col gap-2 rounded-xl border p-3">
             <Textarea
               rows={3}
               value={draft}
@@ -325,7 +324,7 @@ export function SharedMethod({
               placeholder={text("shared.commentPlaceholder")}
             />
             <Button
-              variant="outline" className="self-end"
+              className="self-end"
               disabled={!draft.trim()}
               onClick={() => {
                 onComment(draft.trim());

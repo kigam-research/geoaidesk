@@ -3,7 +3,7 @@
  * Trial step: where the draft is installed, the GAID trials of that method (from the project's trial records,
  * observed by GAID, never from model prose) and a way to revise the draft from a trial.
  */
-import { PencilLineIcon } from "lucide-react";
+import { FlaskConicalIcon, PencilLineIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -115,10 +115,11 @@ export function TrialStep({
   return (
     <section className="mx-auto flex w-full max-w-2xl flex-col gap-5 py-2">
       <div className="flex items-center gap-2">
+        <FlaskConicalIcon className="size-5 text-primary" aria-hidden />
         <h2 className="text-xl font-semibold">{text("trial.title")}</h2>
       </div>
       {latestDraft > installedDraft && installedDraft > 0 && (
-        <div className="flex items-center gap-3 rounded-none border border-border bg-background p-3 text-sm">
+        <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm">
           <span className="flex-1">{text("trial.newer", { n: latestDraft, installed: installedDraft })}</span>
           <Button size="sm" onClick={onDraft}>
             {text("trial.toDraft")}
@@ -132,7 +133,7 @@ export function TrialStep({
           {[...latestByProject.values()].map((install) => {
             const list = trials[install.projectId] ?? [];
             return (
-              <li key={install.projectId} className="flex flex-col gap-3 rounded-none border p-4">
+              <li key={install.projectId} className="flex flex-col gap-3 rounded-xl border p-4">
                 <div className="flex items-center gap-3">
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="font-medium">
@@ -161,17 +162,17 @@ export function TrialStep({
                     onOpenSetup={() => onOpen(install)}
                   />
                 ) : (
-                  <ul className="flex flex-col divide-y rounded-none border text-sm">
+                  <ul className="flex flex-col divide-y rounded-lg border text-sm">
                     {list.slice(0, 3).map((trial) => (
                       <li key={trial.sessionId} className="flex items-center gap-3 p-3">
                         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                           <span className="flex flex-wrap items-center gap-2">
                             {trial.assessment ? (
-                              <Badge variant={trial.assessment.outcome === "useful" ? "default" : "secondary"} className="rounded-sm">
+                              <Badge variant={trial.assessment.outcome === "useful" ? "default" : "secondary"}>
                                 {text(`trial.outcome.${trial.assessment.outcome}`)}
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="rounded-sm">{text("trial.unrated")}</Badge>
+                              <Badge variant="outline">{text("trial.unrated")}</Badge>
                             )}
                             <span className="text-xs text-muted-foreground">{when(trial.startedAt)}</span>
                             <span className="text-xs text-muted-foreground">

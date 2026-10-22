@@ -63,13 +63,13 @@ export function FlowDiagram({
               onClick={() => onSelect?.(node.id)}
               aria-pressed={selected === node.id}
               className={cn(
-                "flex h-full w-full flex-col gap-1.5 border-b bg-transparent p-3 text-left transition-colors hover:bg-accent hover:text-accent-foreground",
-                gate && "border-border bg-gaid-pending-bg",
-                selected === node.id && "border-gaid-link bg-accent text-accent-foreground",
+                "flex h-full w-full flex-col gap-1.5 rounded-xl border bg-card p-3 text-left transition-colors hover:border-primary/60",
+                gate && "border-gaid-warning/50 bg-gaid-warning-tint/50",
+                selected === node.id && "border-primary ring-2 ring-primary/20",
               )}
             >
               <span className="flex items-center gap-2">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-accent text-xs font-semibold text-gaid-link">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                   {index + 1}
                 </span>
                 <span className="text-sm font-semibold leading-tight">{localText(node.label)}</span>

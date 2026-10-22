@@ -123,10 +123,10 @@ export function InputPrep({
         {workflow.inputRoles.map((role) => {
           const matches = files.filter((f) => accepts(f, role.extensions));
           return (
-            <li key={role.id} className="flex min-w-0 flex-col gap-1.5 rounded-none border p-2.5 text-sm">
+            <li key={role.id} className="flex min-w-0 flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
               <span className="flex items-center gap-2">
                 {matches.length ? (
-                  <CheckIcon className="size-4 text-gaid-link" aria-hidden />
+                  <CheckIcon className="size-4 text-primary" aria-hidden />
                 ) : (
                   <CircleDashedIcon className="size-4 text-muted-foreground" aria-hidden />
                 )}
@@ -174,10 +174,10 @@ export function InputPrep({
           );
         })}
       </ul>
-      <div className="flex flex-col gap-1.5 rounded-none border p-2.5 text-sm">
+      <div className="flex flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
         <span className="flex items-center gap-2">
           {envReady ? (
-            <CheckIcon className="size-4 text-gaid-link" aria-hidden />
+            <CheckIcon className="size-4 text-primary" aria-hidden />
           ) : (
             <CircleDashedIcon className="size-4 text-muted-foreground" aria-hidden />
           )}

@@ -1,375 +1,411 @@
 # GAID UI/UX guide v2
 
-Status: v1 structure, rules and default values approved by the user on 2026-10-16 ("승인한다."); before/after screens and
-visual review in gaid-ui-guide. Provisional v2 additions (gaid-design-identity, 2026-10-21): light and dark themes, the
-brand and anti-slop rules (sections 4 and 4a) and TDS Mobile adaptations (G5, F6, F7, Q7, B6). The palette and surface
-values in section 4 describe a draft direction ("라") that the user did NOT adopt (2026-10-22: all drafts rejected); the
-guide is being redesigned from One UI + Apple HIG by gaid-design-identity--fresh and these values will be replaced. Machine-readable values: `geo/ui/ui-rules.json`. Checks:
-`node geo/ui/check-ui.mjs` (run by `scripts/check`). Copy voice and wording stay in `geo/copy/gaid-writing.md` and
-`geo/copy/terminology.csv`. Colour, font, radius and motion tokens live in `web/src/app/globals.css` (`:root` light,
-`.dark` dark); `geo/copy/gaid-app.css` is the vendored WP00 kit and is no longer the source of app values. Logo use:
-`geo/brand/README.md`. This guide decides layout, density, components, states, visual identity and what a researcher sees.
+Status: adopted 2026-10-22 (gaid-design-identity--fresh). It replaces guide v1 (One UI only, approved 2026-10-16). The
+user chose the identity in section 2 after the comparison of three options (계측, 도폭, 표준), verbatim: "계측을 기본으로 하고
+도폭을 사용자 설정 테마에서 설정할 수 있게 할 수 있나?" and, after the answer that it is feasible, "가로 진행하자." 계측 is the
+default identity; 도폭 is a style a researcher may choose in Settings → 화면 표시; 표준 was not adopted. Machine-readable values:
+`geo/ui/ui-rules.json`. Checks: `node geo/ui/check-ui.mjs` (run by `scripts/check`). Copy voice and wording stay in
+`geo/copy/gaid-writing.md` and `geo/copy/terminology.csv`. Implementation: tokens and identity styles in
+`web/src/app/globals.css`; the style switch in `web/src/geo/appearance/`; shared parts in `web/src/geo/shell/` (app bar,
+sidebar, step scale, resources popover).
 
-User request (2026-10-16, verbatim): "현재 gaid ui/ux 시스템과 관련하여 https://developer.samsung.com/one-ui 를 적극 참고하여
-ui/ux 가이드를 개선하자. 현재는 에이전트가 스스로 판단하여 개발하였지만 이제부터는 올바른 가이드를 기반으로 해서 시스템을 구축하게
-하고 싶다."
+User request (2026-10-22, verbatim): "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와
+https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게
+재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자."
+Standing user rule (verbatim): "디자인은 항상 impeccable과 taste와 브랜딩 가이드 전문가 입장에서 디자인해야한다."
 
-User request for v2 (2026-10-21, verbatim): "GAID 허브와 GAID 시스템에서 디자인 가이드와 관련하여 ONEUI 가이드를 기반으로 작성된
-것으로 이해하고 있다. 추가 디자인 가이드로 https://tossmini-docs.toss.im/tds-mobile/ 가 있으며, 현재 GAID 허브와 GAID 시스템의
-디자인에서 AISlop을 피하면서 독자적인 브랜딩으로 ui/ux시스템이 인식 될 수 있게 디자인을 개선하고 싶다." Later decisions (verbatim): "새로운 디자인을 oneui가이드에 따라 생성하자." (2026-10-21), then "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와 https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게 재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자." (2026-10-22). Evidence and alternatives:
-`reports/2026-10-21-gaid-design-identity/index.md`.
-
-Earlier user requirements this guide carries (verbatim):
+Earlier user requirements this guide keeps (verbatim, from v1):
 - "항상 새로운 시스템을 이용자는 너무 많은 정보량이 플랫폼이나 시스템에서 제공되면 역치를 넘어서지 못하고 포기하거나 유입에서
   빠져나올 수 있는 점을 고려하고 UI/UX에서도 너무 많은 글자 수자 정보량이 보이는 것은 유의해야한다."
 - "사람 이용자들이 읽어야 하는 글자량이 너무 많으며, 스크롤이 한없이 아래로 내려가게 되어 있어 불친절하고 처음 사용자의 유입을
   떨어뜨리게 한다. 그리고 가급적 현재 사용자가 에이전트 작업하는 방식처럼 질문에 대해서는 권장 옵션을 포함한 선택지가 제공되어야
   하고, ... 기타 입력란을 제공하는 방식으로 하고 한번에 한 개의 질문을 하며, 질문은 탭으로 이전/다음으로 이동할 수 있게 ...
   흐름도 및 명료한 설명으로 인지부하를 낮추면서도 의도가 잘 반영될 수 있게"
-- Map panels: legend and basic information beside the map without scrolling; attribute tables with column filter and
-  sort; feature information as a map popup. Agent-internal details (model names, run logs, raw errors) are not shown
-  to researchers.
+- "시스템에 글자가 너무 많으며, 폰트도 작고 사람 연구자가 어디에 집중해야 할지도 불분명해진다." (2026-10-17)
+- Map panels: legend and basic information beside the map without scrolling; attribute tables with column filter and sort;
+  feature information as a map popup. Agent internals (model names, run logs, raw errors) are not shown to researchers.
 
-Source basis: Samsung One UI design guidelines (https://developer.samsung.com/one-ui/index.html, read 2026-10-16; the
-pages show no version number). GAID adapts principles only. It does not copy Samsung assets, images, icons or the
-proprietary One UI Sans font, and it does not use Samsung colours. Each rule names the One UI page and section it
-adapts; section 11 lists where GAID deliberately differs.
+Sources: Samsung One UI design guidelines (read 2026-10-16; digest `~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`) and
+Apple Human Interface Guidelines (read 2026-10-22 from developer.apple.com, design principles page dated June 8, 2026; Layout
+updated September 9, 2026; digest `~/data/geoaidesk/work/gaid-design-identity--fresh/hig/md/`). GAID adapts principles and
+measurements only. It uses no Samsung or Apple assets, icons, colours, materials or fonts (no One UI Sans, SF Pro, SF Symbols,
+Liquid Glass). Each rule names its sources in short form: `OneUI <page>` or `HIG <page>`; `GAID` marks GAID's own rule.
+Section 13 lists where GAID deliberately differs from both.
 
-## How agents use this guide
+## 0. How agents use this guide
 
-1. Before any change to visible UI, read sections 1, 4, 4a and 9 and the sections for the components you touch.
-   Design as an impeccable + design-taste-frontend + brand-guide expert (user rule 2026-10-21): read the impeccable
-   craft floor and critique criteria and the taste anti-tell sections (skill_hub `.claude/skills/impeccable/`,
-   `.claude/skills/design-taste-frontend/`; taste governs discovery screens such as the hub, not dense tool panes) and
-   `geo/brand/README.md`, and review the result against them before reporting.
-2. In the change report, list the rule ids the change follows (for example `P1 Q1–Q5 R1`) and any rule it breaks,
-   with the reason. Accepted debt goes in `geo/ui/ui-baseline.json` only with that reason.
-3. Visual review (changes to layout, density, components or states; a pure wording change needs none): screenshot the
-   changed screen in Korean at 1440×900 and at 1280×800, check it against the checklist in section 10, and attach the
-   screenshots to the report.
+1. Before changing visible UI, read sections 1, 2 and 10, and the parts of 3–9 for what you touch. Use the shared parts
+   (`GaidAppBar`, `SidebarGroup`/`SidebarItem`, `StepScale`, `.gaid-orbit`, `.gaid-index`, `.gaid-seg`) instead of
+   re-drawing them.
+2. In the change report, list the rule ids the change follows (`P2 L4 Q1`) and any it breaks, with the reason. Accepted
+   debt goes in `geo/ui/ui-baseline.json` only with that reason.
+3. Visual review (layout, density, component or state changes; a pure wording change needs none): screenshot the changed
+   screen in Korean in both styles (계측, 도폭) and both themes (light, dark), at 1440×900 and 1280×800, and check it
+   against section 12.
 4. Run `node geo/ui/check-ui.mjs` (part of `scripts/check`).
 
-Rule ids: P principles, L layout, T type, S colour and states, V visual identity and anti-slop, B buttons, N navigation and tabs, D dialogs and
-popovers, Q questions, G lists and cards, X tables, MAP map panels, F feedback (progress, toasts, empty and error
-states), M motion, A accessibility, W copy length and density, R what researchers never see.
+Rule ids: P principles, I identity, L layout, T type, S colour, materials and states, B buttons, N navigation and
+toolbars, D dialogs, sheets, popovers and menus, Q questions and start settings, G lists and cards, X tables, MAP maps,
+C chat and composer, RN research notes, F feedback, M motion, A accessibility, W copy length and density, R what
+researchers never see, V visual bans.
 
 ## 1. Principles
 
-| Id | Rule | One UI source |
-|---|---|---|
-| P1 | **One task per screen.** Each screen or dialog serves one task with one primary action. A second task opens in its own view; it is not stacked under the first. | Overview "Focus on the task at hand"; Writing / Focused and purposeful "Make a choice" |
-| P2 | **Viewing area, then interaction area.** Every view has a short header zone (title, current state, at most one line of context) and a work zone where the controls sit next to the content they change. Actions are grouped in one place per view, in a logical order. | Layout / Basic layout "Viewing area", "Interaction area" |
-| P3 | **Show less first.** The first view shows what the researcher needs to decide or act. Explanations, limits detail, provenance and technical information move behind a disclosure, a popover or the next step. A first view stays within the density budget (W5). | Writing / Focused and purposeful (text must help choose, act or understand, otherwise leave it out); Writing / Empowering "Entice users to explore" |
-| P4 | **Stay in context.** Short inputs and details open next to what triggered them (popover, side panel), not as a new page. Lists and their detail sit side by side on wide windows. | Large screen / Designing for large screens "Get things done without leaving the screen", "Multi-pane layout"; Layout design for large screens "Avoid switching context" |
-| P5 | **Visibly comfortable.** Calm neutral surfaces, one accent colour, readable contrast, text that scales to 200%. | Overview "Be visibly comfortable"; Color / Theme; Accessibility / Color and contrast |
-| P6 | **Researchers see research, not machinery.** Screens describe data, methods, results, states and next actions in research terms. Agent internals stay out of researcher views (section 9). | Writing / Simple and human "Show benefits and possibilities" (skip behind-the-scenes technical detail) |
-| P7 | **Design screens for human researchers.** Lead with figures, maps and short labels; text explains them, it does not replace them. Use readable type sizes (T1, nothing below 12 px) and keep agent evidence (commit SHAs, check receipts, run logs) out of the main view (R1, R4). This rule sums up P3, P6, T1, W5 and R1 for screens agents build; it adds no new limit. | — (GAID; user decision 2026-10-17, backbone lesson-harvest-1#4, from user remarks 2026-10-03..10-16 such as "시스템에 글자가 너무 많으며, 폰트도 작고 사람 연구자가 어디에 집중해야 할지도 불분명해진다.") |
-
-## 2. Layout and spacing
-
-| Id | Rule | One UI source |
-|---|---|---|
-| L1 | **Desktop window classes.** Design for 1280–1920 px wide windows; 1024 px is the minimum that must work without horizontal page scroll. Narrow windows (~390 px) are unsupported for the workspace (`geo/compatibility.json`). | Large screen / Layout design "Windows size classes" (Expanded ≥ 840 dp is the desktop baseline) |
-| L2 | **Panes.** The workspace is sidebar + main + optional side panel. List/detail views use two panes with roughly 38:62 width from 960 px; side panels are 280–400 px (default 320 px); the app header is 56 px; reading-width content (forms, documents) is at most 960 px wide. Never stretch one text column across a wide window: body text keeps a readable measure (T4). | Large screen / Designing for large screens "Multi-pane layout" (42:58 at 600–960 dp, 38:62 from 960 dp) |
-| L3 | **Navigation stays visible** next to content on desktop widths (sidebar, tabs); do not hide it behind a menu button. | Large screen / Layout design "Show menus together with content"; Designing for large screens "Make navigation controls fit the screen" |
-| L4 | **Spacing scale.** 4 px unit; use 4, 8, 12, 16, 24, 32, 48 px (Tailwind `1 2 3 4 6 8 12`). Inside a control or row: 4–8. Between related items: 8–12. Between groups/sections: 16–24. Page and panel inset: at least 16 px, 24 px for main content areas. | Layout / Grid system "Keyline and margin" (24 dp minimum side margin). The 4 px unit and scale are GAID's; One UI states no base grid |
-| L5 | **Group into focus blocks.** Related content goes in one card or grouped list with a short subheader; use few block types per screen. Text-only cards when the content is more than three lines. | Layout / Basic layout "Focus block" |
-| L6 | **Keep the first action visible.** The primary action of a view is visible at 1280×800 without scrolling. Long content scrolls inside its own region (list, table, panel), with header and actions fixed. Dialogs are at most 85% of the viewport height with a fixed footer. | Layout / Basic layout "Interaction area"; Large screen "Keep things reachable" |
-| L7 | **Continuity.** Resizing, collapsing a panel or switching tabs keeps scroll position, selection and unsent input. | Large screen / Designing for foldables "App continuity and responsive layouts"; App bar (state restored on return) |
-
-## 3. Typography
-
-Font: Pretendard Variable 1.3.9 (SIL OFL 1.1), self-hosted from `web/public/fonts/` through `@font-face` in
-`globals.css`, so every OS renders the same face; it is the only visible typeface (direction 라). Code and paths use the
-monospace stack (D2Coding when installed). Tabular figures come from Pretendard's numeric feature, not a second font.
-GAID does not use One UI Sans or Toss Product Sans.
-
-| Id | Rule | One UI source |
-|---|---|---|
-| T1 | **Scale.** Caption 12 px, body 14 px (`--gaid-body-size`), subtitle 16 px (`--gaid-h2-size`), title 20 px (`--gaid-h1-size`). Weights 400 body, 500 emphasis, 600 headings (`--gaid-heading-weight`). Nothing below 12 px; no `text-[10px]`/`text-[11px]`. | One UI states no type scale; the scale is GAID's WP00 token set. Accessibility / Layout and typography "Scalable text" |
-| T2 | **One title per view**, then subtitles for sections. Do not use more than three sizes in one view. | Layout / Basic layout "Typography for spatial design" (text recognisable at a glance); the three-size limit is GAID's |
-| T3 | **Line height** 1.5 for body, 1.3 for headings. Korean uses `word-break: keep-all` (already global). | — (GAID) |
-| T4 | **Measure.** Body text blocks are at most ~40 Korean characters or ~75 Latin characters per line (about 640 px at 14 px). | Large screen "Multi-pane layout" (stretched single columns are hard to read) |
-| T5 | **Numbers** in tables, coordinates and statistics use tabular figures (`table, .gaid-numeric`). | — (GAID) |
-| T6 | **Text scales to 200%** (browser zoom) without lost content or overlapping controls; long labels wrap or truncate with a tooltip, never clip silently. | Accessibility / Layout and typography "Scalable text", "Large text layout" |
-
-## 4. Colour, surfaces and states
-
-Colours come from `globals.css` by role; components never hard-code hex values or Tailwind hue utilities
-(`check-ui.mjs` styles and slop checks). Data palettes for maps and depth tracks are the exception
-(`ui-rules.json` `styles.hexAllowFiles`).
-
-**Surface contract (direction 라, "연구 등록부").** Three surfaces, one meaning each, in both themes:
-
-| Surface | Token (Tailwind) | Light | Dark | Holds |
-|---|---|---|---|---|
-| Frame | `--gaid-frame` (`bg-gaid-frame`), also `--muted`, `--sidebar` | #E6EBED | #171F24 | Navigation, file tree, Workflow list, tool panels, hub ground |
-| Work surface | `--background` (`bg-background`), header `--gaid-header` | #F7F9FA | #202B32 | Central work pane, inputs, tables, dialogs' body |
-| Paper | `--card` / `--gaid-paper` (`bg-card`) | #FFFFFF | #27343C | The researcher's own content: research notes, documents, result summaries |
-
-Imported figures, PDFs, rasters and basemaps are content, not surfaces: they keep their original pixels in both themes
-inside a neutral frame (V6). Separation comes from 1 px lines (`--border` #C4CED3 / #465963 for items,
-`--gaid-line-strong` for one major boundary per view) and from the surface steps, not from shadows or cards.
+GAID is a desktop research tool (impeccable mode: Operate). The researcher's question, data and decision are the subject;
+the interface is the instrument that serves them.
 
 | Id | Rule | Source |
 |---|---|---|
-| S1 | **Roles.** Text `--foreground` (#192A32 / #EDF2F4); secondary text `--gaid-body`; metadata `--muted-foreground`; action `--primary` (#1F5EFF / #A4BCFF, text `--primary-foreground`); link, active tab and focus `--gaid-link` / `--ring` (#174ED2 / #A4BCFF); selection `--accent` + `--accent-foreground`; control outline `--input`; meaning `--gaid-success`, `--gaid-warning` (+ `--gaid-warning-bg`), `--gaid-danger`, `--gaid-untested`, `--gaid-nodata`, neutral state chips `--gaid-pending-bg`. | One UI Color system "Basic system color", "Informative color"; TDS background roles |
-| S2 | **Calm large areas, colour on small areas.** Surfaces stay neutral; the one blue marks the primary action, the active place and focus. No gradients anywhere in the app UI. At most one coloured status badge per row. | One UI Color system "Background color" |
-| S3 | **Meaning never by colour alone.** Every status colour has a text label; check the screen in greyscale. Status colours keep the same meaning in both themes. | One UI Accessibility "Use of color" |
-| S4 | **Contrast.** Text ≥ 4.5:1 (also secondary and metadata text on every surface it sits on), large text ≥ 3:1, control boundaries and focus rings ≥ 3:1. | One UI Accessibility "Minimum contrast ratio" |
-| S5 | **States.** Every interactive element has default, hover, focus-visible (2 px `--ring`, 2–3 px offset), pressed/selected, disabled. A disabled primary action shows why it is disabled next to it (one line). Loading replaces the label with progress text and keeps the width. | One UI Accessibility; TDS Button (stable-width loading) |
-| S6 | **Light and dark themes.** Both are supported (`next-themes`: light, dark, system; the choice persists). Dark keeps the same hierarchy, not the same hex values: frame darkest, paper one step lighter. Never invert or filter images, PDFs or maps for dark mode; a white figure or light basemap inside a dark frame is correct. Check every changed screen in both themes. | One UI Color / Theme; user decision 2026-10-21 (dark theme in phase 2) |
-| S7 | **Amber means "act".** `--gaid-warning` on `--gaid-warning-bg` is only for states the researcher must resolve (`환경 준비 필요`). Routine states (`미시험`, `검토 전`, `결정 3`) use neutral text or a `--gaid-pending-bg` chip; success green only for a verified positive outcome. | Codex review 2026-10-21 (report §3.3) |
-| S8 | **Category is text.** Workflow families, folders and topics are named in text (`광상 부존 가능성`), not colour-coded with stripes, tinted cards or per-category icon colours. Colour may encode a category only inside a data visualisation that needs comparison. | report §3.3 (direction 라) |
+| P1 | **Research first.** Each view exists for a research question, a result or a decision. Data, maps and figures carry the colour; the interface stays calm around them. | HIG Design principles "Purpose", Branding "Ensure branding always defers to content"; OneUI Overview "Focus on the task at hand" |
+| P2 | **One task, one primary action per view.** A second task opens in its own pane or step, not stacked under the first. | OneUI Writing "Make a choice"; HIG Buttons "prominent visual style for the most likely action" |
+| P3 | **Show less first.** The first view holds what the researcher needs to decide or act; explanations, provenance and technical detail sit behind a disclosure, popover or the next step (W5 budget). | HIG Layout "Use progressive disclosure", Design principles "Simplicity"; OneUI Writing "Entice users to explore" |
+| P4 | **Stay in context.** Detail opens beside its trigger (popover, inspector, pane), lists and detail sit side by side, and short tasks never leave the window. Modality only when interruption protects the researcher (D1). | HIG Modality, Split views, Popovers; OneUI Large screen "Get things done without leaving the screen" |
+| P5 | **The researcher decides.** The AI agent proposes; the researcher chooses, can undo, can stop a run, and is told what is happening. Nothing important dismisses itself on a timer. | HIG Design principles "Agency", Undo and redo, Accessibility "Minimize use of time-boxed interface elements"; OneUI Accessibility "Interaction and control" |
+| P6 | **Familiar desktop conventions.** Sidebar, toolbar, content and inspector; keyboard shortcuts; standard controls behaving the standard way. Identity lives in precise details (section 2), never in reinvented affordances. | HIG Design principles "Familiarity", Designing for macOS; impeccable Operate "earned familiarity" |
+| P7 | **Researchers see research, not machinery** (section 10). | OneUI Writing "Show benefits and possibilities"; HIG Design principles "Responsibility" |
+| P8 | **Comfortable for long sessions.** Readable sizes (T1), calm surfaces, light and dark themes that follow the system, text that scales to 200%. | OneUI Overview "Be visibly comfortable"; HIG Dark Mode, Typography, Accessibility |
+| P9 | **Honest states.** Execution, review and verification stay separate states with separate words and marks (`실행 완료` ≠ `검토 완료`); estimates and untested routes keep their limit words. | GAID (`geo/copy/gaid-writing.md`); HIG Design principles "Be fully transparent about what your product does" |
 
-## 4a. Visual identity and anti-slop (V)
+## 2. Identity (what GAID-specific means)
 
-GAID is recognised by its register layout (flat rails of aligned rows beside a paper surface for the researcher's
-content), the one blue, Pretendard, precise 1 px lines and the angular orbital G, not by decoration. These rules apply
-the impeccable craft floor and the taste anti-tells to GAID; `check-ui.mjs` (`slop`) enforces the mechanical ones.
+The logo is the only fixed element (`geo/brand/`, unchanged). Its two shapes and its lettering are the identity sources:
+the **octagonal G**, a solid form with 45° chamfered corners, the **orbit ring** sweeping around it, the **brand blue**
+`#1f5eff` (`#4d7fff` on dark), and the **lettering**, which is outlined Pretendard (`geo/brand/licenses/`). Both styles
+keep these four.
+
+Rules for both styles:
+
+| Id | Rule | Source |
+|---|---|---|
+| I1 | **The mark appears once.** The 24 px compact mark sits at the leading end of the top bar; the full lockup appears only on the project list empty state and the about view. No logo watermarks, no logo in toolbars, dialogs or empty panes. Clear space and minimum sizes follow `geo/brand/README.md`. | HIG Branding "Resist the temptation to display your logo throughout"; brand README |
+| I2 | **Blue is the signal.** The brand blue marks the primary action, the current selection, focus and the AI agent's activity, nothing else. It never fills large areas and never decorates. Status colours are separate (S4). | HIG Branding "Apply your app's accent color judiciously", Color "Avoid using the same color to mean different things"; OneUI Color system "calm colours for large areas" |
+| I3 | **Pretendard is the brand face** because the logo lettering is Pretendard. One family, self-hosted (`@font-face`, OFL licence in `web/public/fonts/`), carries every role; code and paths use the monospace stack. No second display face. | HIG Typography "Minimize the number of typefaces"; brand README |
+| I4 | **The orbit means "the AI agent is working".** A small orbit (`.gaid-orbit`: an 18×10 px ellipse with a travelling point in the signal blue) is the one looping animation in GAID. It appears where work runs (chat header, the running note, a running step) and stops when work stops. Reduced motion shows the point at rest plus the text state. | GAID (logo); HIG Motion "Add motion purposefully"; OneUI Motion "Icon animation" |
+| I5 | **Numbers are part of the identity.** Counts, revisions (판), coordinates, depths and areas use tabular figures, align on their decimals and keep their units; they never become decoration (no `01 / 02` section numbers). | GAID; impeccable craft floor (tabular numerals) |
+| I6 | **Images keep their pixels.** Figures, maps, PDFs and concept pictures are never tinted, filtered, blended or recoloured for a theme; in dark mode they sit on a light mat only when their own background is white (HIG "Soften the color of white backgrounds" is applied by the mat, not by filtering the image). | GAID user rule; HIG Dark Mode |
+
+### 계측 (Instrument), the default identity
+
+World: field and survey instruments (geologist's compass, total station, engraved scales, machined bodies). The octagonal G
+reads as a machined part and the orbit as a graduated ring; instruments report values with their uncertainty, which is how
+GAID reports results (P9). Brand lives in precise details, never in costume (impeccable Operate).
 
 | Id | Rule |
 |---|---|
-| V1 | **Logo.** The angular G + tilted orbit lockup is the only brand graphic (`geo/brand/README.md`: colour on light, on-dark on dark, ≥ 24 px in UI, never recoloured, cropped, animated or used as a bullet/selection icon). |
-| V2 | **No generic AI symbols.** No Sparkles, Wand, Bot, BrainCircuit or similar "AI" icons, no emoji as icons. Places are named by text or a functional icon (`lucide` at 16 px, one stroke weight). |
-| V3 | **No decorative surfaces.** No gradients, glass/backdrop blur, glow, coloured shadows, noise textures or animated backgrounds. Depth is surface step + 1 px line. |
-| V4 | **Register, not card grids.** Lists are rows on the frame separated by 1 px lines with aligned metadata columns. No grids of same-size icon + heading + text cards, no nested cards, no icon tile before every row. A card (paper surface) is allowed for one featured item or the researcher's own content. |
-| V5 | **Headings speak for themselves.** No eyebrow/kicker label above a heading; no icon before section headings unless it is the control; no section numbers unless the sequence matters. |
-| V6 | **Images are evidence.** Show original pixels (`object-fit: contain`, no CSS `filter`, opacity or blend on images, figures, PDFs, maps). An absent image stays absent: no contour, pattern or icon placeholder that suggests data. Concept pictures carry the `개념도` label. |
-| V7 | **Lines and radius.** 1 px item and control lines, 2 px active tab baseline, 3 px active top-navigation baseline; no coloured left/right borders wider than 1 px on rows or callouts. Radius: 0 for panes and rows, 2–4 px (`--radius-sm`/`--radius-md`) for controls and chips, 6 px (`--radius-lg`) only for floating surfaces (popover, dialog, menu). |
-| V8 | **Type.** Pretendard only, weights 400/500/600–650, sizes from T1; hub titles may use 24 px. Monospace only for code, paths and raw values, never as a "technical" costume. |
-| V9 | **Browser surfaces are themed.** Selection, scrollbars, focus rings and caret follow the palette (`globals.css`). |
-| V10 | **Concept pictures.** Generated pictures are labelled concepts, never data. Prefer a real output preview when one exists. |
+| I7 | **Two tones.** A cool aluminium functional layer (`--gaid-chrome`: top bar, sidebars, tab strips, toolbars) around white content faces (`--gaid-face`); hairlines `--gaid-edge`. |
+| I8 | **Chamfered corners.** Every rounded box gets a 45° chamfer (`corner-shape: bevel` from `--gaid-corner`, applied in `globals.css` to `rounded-*` classes except `rounded-full`): 4–6 px controls, 8 px containers, 12 px dialogs. Browsers without `corner-shape` show round corners; nothing depends on the bevel. |
+| I9 | **Index mark.** The current item in a sidebar or list carries `.gaid-index`: a small signal-blue pointer at the pane edge, plus tint and weight. |
+| I10 | **Graduated scale.** Step progress (start settings, research-note decisions) is drawn by `StepScale`: a scale with a major tick per step, minor ticks between, filled to the current step, a pointer above it. Scales appear only where they show a position; never as decoration. |
+| I11 | **Readouts.** Counts that need the researcher (`결정 3`) are short tinted plates with tabular figures. |
 
-TDS Mobile adaptations (read 2026-10-21; patterns only, no Toss assets, palette values or Toss Product Sans):
+| Token (light / dark) | Value |
+|---|---|
+| `--gaid-face` | #ffffff / #16191f |
+| `--gaid-face-2` | #f6f7f9 / #1b1f26 |
+| `--gaid-chrome` | #f1f3f6 / #20242c |
+| `--gaid-edge` | #dce0e6 / #2e333c |
+| `--gaid-control-edge` | #878f9d / #6b7382 (≥ 3:1) |
+| `--gaid-ink`, `--gaid-ink-2`, `--gaid-ink-3` | #171b23, #525a68, #646c7a / #e7e9ee, #b3b9c4, #98a0ad |
+| `--gaid-signal` (fill), `--gaid-signal-ink` (text) | #1f5eff, #1d4fd8 / #3366e8, #7fa2ff |
+| `--gaid-signal-tint` | #e8eeff / #1e2b4d |
+| status (`success`, `warning`, `danger` with `-tint`) | #1e7a46, #8a5300, #c2261d / #4cc38a, #f0b44c, #ff7a6e |
 
-| Id | Rule | TDS source |
+Contrast (computed): body 17.3:1 light, 14.5:1 dark; secondary 7.0:1 / 8.9:1; placeholders 5.3:1 / 6.7:1; blue text 6.6:1 /
+7.1:1; white on blue buttons 5.1:1 / 5.0:1; control boundaries 3.3:1 / 3.7:1.
+
+### 도폭 (Map sheet), the style a researcher may choose
+
+Settings → 화면 표시 → 화면 스타일: `계측 (기본)` or `도폭`, independent of the theme, stored in the browser
+(`gaid:style`) and applied as `<html data-style="mapsheet">` before first paint. The structure, behaviour and copy are the
+same; only these change:
+
+| Id | Rule |
+|---|---|
+| I12 | **One paper ground.** Chrome and face are the same paper (`#ffffff` / `#0f1113`); the functional layer is separated by ink neat lines (`--gaid-frame`: `#15171a` / `#d9dce0`), not by tone. |
+| I13 | **Square corners** (`--radius: 0`), round elements stay round. |
+| I14 | **Selection in ink.** The current item is framed in ink (`.gaid-index` draws an inset ink frame); the selected segment of a segmented control is inverted (`.gaid-seg`). |
+| I15 | **Scale bar.** `StepScale` draws a cartographic scale bar: done steps solid ink, the current step in the signal blue, the rest open. |
+
+Every screen change is reviewed in both styles (section 0). A component never branches on the style in code; it uses the
+roles (`--gaid-frame`, `--gaid-chrome`, radius classes) and the shared parts, and `globals.css` draws the difference.
+
+## 3. Layout and spacing
+
+| Id | Rule | Source |
 |---|---|---|
-| G5 | **Row anatomy.** A list row has three slots: optional leading identifier (file type icon, avatar), title + one secondary line, trailing state or action. Metadata aligns in columns across rows. | ListRow, TableRow |
-| F6 | **Result pattern.** Empty, error and completion panes state the outcome as a title, one line of explanation and one next action; no generic success art. | Result |
-| F7 | **Skeleton vs loader.** Use a skeleton shaped like the final rows when the structure is known; a named progress line (F1) when it is not. Keep existing content visible while refreshing. | Skeleton, Loader |
-| Q7 | **Labels and units.** Inputs keep a persistent label above the field; units are a suffix (`km`, `m`); help and error text sit under the field. Read-only values look different from disabled ones. | TextField |
-| B6 | **Badge weight.** Routine state = weak chip (neutral background, text); exceptional state = the S7 amber chip. Never more than one filled chip per row. | Badge |
+| L1 | **Window classes.** Regular desktop ≥ 1280 px wide (design at 1440×900, check at 1280×800); compact desktop 1024–1279 px (the inspector becomes an overlay sheet, the sidebar may collapse to a 48 px rail); below 1024 px the workspace is unsupported (`geo/compatibility.json`), hub pages reflow to one column. Functionality is the same in every class; only how much is visible changes. | HIG Layout "Keep functionality the same as size classes change"; OneUI Large screen "Windows size classes" |
+| L2 | **App frame.** Top bar 52 px (global: mark, place switch 내 연구 / GAID 허브, project switcher, help, settings). Workspace: sidebar 272 px (220–360, collapsible, state kept), content (min 560 px), inspector 440 px (360–640, resizable, collapsible); the content face is the widest pane. Pane dividers are 1 px lines with an 8 px drag target and a keyboard resize alternative. | HIG Split views "Set reasonable defaults for minimum and maximum pane sizes", "Prefer the thin divider style", Sidebars; OneUI Large screen "Multi-pane layout" |
+| L3 | **Functional layer and content layer.** Top bar, sidebar, toolbars and pane headers form the functional layer, drawn in the chrome tone; content (notes, files, tables, maps, chat transcript) sits on the face tone. Controls are not drawn on a solid band inside the content; a toolbar over scrolling content shows a 1 px edge only once content is under it (scroll-edge line). | HIG Materials "Liquid Glass forms a distinct functional layer", Layout "Differentiate controls from content", Scroll views (scroll edge effect); OneUI Structure "Visual depth" |
+| L4 | **Reading order and alignment.** The most important item is top-leading. Align to one left edge per pane; indent only to show hierarchy. Group with space first, then a hairline, then a container; never a container inside a container. | HIG Layout "Visual hierarchy"; OneUI Layout "Focus block" |
+| L5 | **Spacing scale.** 4 px unit: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. Inside a control 4–8; related items 8–12; groups 20–24; sections 32–40, with more space above a heading than below it. Pane insets: content 24 (16 in compact class), sidebar 12, inspector 16. Every size is a whole number of 4 px cells. | OneUI Grid "Keyline and margin" (24 dp); HIG Accessibility (12 pt padding around bezelled controls); impeccable craft floor |
+| L6 | **Measure.** Prose is at most 680 px wide (about 42 Korean characters at 15 px, 75 Latin characters); tables and maps may use the full pane. List/detail panes split 38:62 from 960 px. | OneUI Large screen "Multi-pane layout" (38:62); HIG Layout guides (readable width) |
+| L7 | **First action visible.** The primary action of a view is visible at 1280×800 without scrolling. Long content scrolls inside its own region with the header and actions fixed; sheets and dialogs are at most 85% of the viewport height with a fixed footer. | OneUI Layout "Interaction area"; HIG Sheets "Present a sheet in a reasonable default size" |
+| L8 | **No critical control at the bottom of a page.** Page-level actions sit in the header or next to the content they change. Exceptions: the chat composer (C1) and the footer of a fixed-height sheet or step (Q4). | HIG Layout (macOS) "Avoid placing controls or critical information at the bottom of a window", Sidebars |
+| L9 | **Continuity.** Resizing, collapsing a pane, switching tabs or themes keeps scroll position, selection, expansion state and unsent input. | OneUI Foldables "App continuity"; HIG Split views, Outline views "Retain people's expansion choices" |
 
-## 5. Components
+## 4. Typography
+
+| Id | Rule | Source |
+|---|---|---|
+| T1 | **Scale (px / line height / weight).** micro 12/16/500 (tick numerals, units in table headers, nothing longer than 3 words); caption 13/18/400–500 (labels, metadata); body 15/24/400 (prose; controls use 15/20); subtitle 17/26/600; title 20/28/650; page title 26/34/700 (hub and 내 연구 pages only). Nothing below 12 px; no `text-[10px]`/`text-[11px]` (`globals.css` raises any left in upstream code to 12 px). Tailwind `text-xs`/`sm`/`lg`/`xl`/`2xl` map to 13/15/17/20/26 px. | HIG Typography "Use font sizes that most people can read easily" (macOS default 13 pt, minimum 10 pt; GAID raises both for Korean and the user's 2026-10-17 remark) |
+| T2 | **Hierarchy by weight and size, at most four sizes per view** (three in dialogs and sheets). One title per view. Avoid weights below 400. | HIG Typography "Conveying hierarchy", "avoid light font weights" |
+| T3 | **Korean setting.** `word-break: keep-all`; no letter-spacing on Hangul; Latin capitals in labels may take +0.02 em; line height 1.6 for prose, 1.3 for headings. English technical terms stay in English inside Korean sentences (gaid-writing.md). | GAID; gaid-writing.md "Technical terms" |
+| T4 | **Numerals.** Tabular figures (`font-variant-numeric: tabular-nums`) in tables, counts, coordinates, sizes and readouts; units after a thin space or in the column header (I5). | GAID; HIG Lists and tables |
+| T5 | **Text scales to 200%** (browser zoom) without lost content or overlap; adjacent items stack when space runs out; long labels wrap or truncate with a tooltip that shows the whole text, never clip silently. | HIG Typography "Dynamic Type", Text fields "expansion tooltip"; OneUI Accessibility "Scalable text" |
+| T6 | **Monospace only for code, paths, commands and raw values**, never as a costume for "technical". | impeccable craft floor; taste skill |
+
+## 5. Colour, materials and states
+
+Colours come from tokens in `web/src/app/globals.css` by role. Components never hard-code colours or use Tailwind hue
+utilities (V1). Data palettes for maps and depth tracks are the exception (`ui-rules.json` `styles.hexAllowFiles`).
+
+| Id | Rule | Source |
+|---|---|---|
+| S1 | **Roles.** `--face` content background, `--face-2` quiet content panels (table headers, code), `--chrome` functional layer, `--edge` hairlines, `--control-edge` input and control boundaries (≥ 3:1), `--ink` text, `--ink-2` secondary text, `--ink-3` placeholders and disabled text (≥ 4.5:1), `--signal` primary fill, `--signal-ink` blue text and links, `--signal-tint` selection, `--on-signal` text on blue; status `--gaid-success`, `--gaid-warning`, `--gaid-danger`, `--gaid-untested`, `--gaid-nodata` with `-tint` backgrounds. shadcn variables (`--background`, `--primary`, …) map onto these roles. | HIG Color "dynamic system colors … semantically defined by purpose"; OneUI Color system |
+| S2 | **Calm large areas, colour on small areas.** Surfaces stay neutral; colour marks only the primary action, selection, focus, agent activity and status. At most one coloured status mark per row. No gradients, glass or blur in work areas (V3). | OneUI Color system "Background color"; HIG Color "Liquid Glass color: apply color sparingly" |
+| S3 | **Same colour, same meaning.** Blue never marks status; status colours never mark interactivity; meaning is never carried by colour alone (text, icon or pattern too; check in greyscale). | HIG Color "Avoid using the same color to mean different things", Accessibility "Convey information with more than color alone"; OneUI Accessibility "Use of color" |
+| S4 | **Contrast.** Body text ≥ 7:1 on its surface; secondary text, captions and placeholders ≥ 4.5:1; large text (≥ 24 px, or ≥ 18.7 px bold) ≥ 3:1; control boundaries and focus rings ≥ 3:1. Checked in light and dark. | HIG Dark Mode "strive for a contrast ratio of 7:1, especially in small text", Accessibility (WCAG AA); OneUI Accessibility "Minimum contrast ratio" |
+| S5 | **Light and dark follow the system.** The app follows `prefers-color-scheme` by default (`시스템 테마`); Settings → 화면 표시 may override it (`밝은 테마` / `어두운 테마`), and the header carries no theme switch. Dark surfaces are dimmer, foreground brighter; elevated overlays are lighter than the base. Both themes ship and are reviewed for every changed screen. | HIG Dark Mode "Avoid offering an app-specific appearance setting", iOS "base and elevated"; OneUI Color "Theme" |
+| S6 | **Three plies of depth.** Ply 0 chrome and face (flat; separated by tone and hairlines); ply 1 raised controls only where they need it (none by default); ply 2 overlays (popover, menu, sheet, toast) with one soft shadow and a 1 px edge. Cards never cast shadows. A modal dims the window (one dim level); a related overlay gets the shadow without dim; never both stacked. | OneUI Structure "Visual depth" (dim for unrelated, shadow for related, never both); HIG Materials (functional vs content layer) |
+| S7 | **States.** Every interactive element has default, hover, pressed, focus-visible (2 px `--ring` with 2 px offset), selected, disabled and, where it applies, loading and error. A disabled primary action says why on one line beside it. Loading replaces the label with progress text and keeps the width. Selection is shown by tint plus a non-colour cue (weight, index mark or check). | HIG Buttons "Always include a press state", Feedback "Show people when a command can't be carried out"; OneUI Accessibility "Screen reader" |
+| S8 | **Browser surfaces carry the design.** Text selection, caret, scrollbars (thin, `--edge`/`--ink-3` thumb), focus rings, link underlines (offset 3 px) and placeholder text are themed from the tokens in both themes. | impeccable craft floor "Browser surfaces" |
+| S9 | **Increased contrast.** Under `prefers-contrast: more`, hairlines become `--control-edge`, `--ink-2` becomes `--ink`, and tints double their strength. | HIG Color "an increased contrast option for each variant", Accessibility |
+
+## 6. Components
 
 ### Buttons (B)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| B1 | Three emphasis levels: filled primary (high), outline/secondary (medium), ghost/text (low). **One filled primary per view**; dialogs and toolbars use medium/low except their one primary. | Components / Buttons (flat, contained gray, contained colour; one style per screen; flat inside dialogs and toolbars) |
-| B2 | Height 32 px (`--gaid-button-height`), radius `--radius-md`, icon 16 px. Icon-only buttons have a tooltip and an accessible name. Adjacent targets keep ≥ 8 px gap. | Buttons; Toasts "Label toast (Tool tip)"; Accessibility / Layout and typography "Touch target spacing" |
-| B3 | Labels name the next action: Korean object + action (`결과 저장`), English verb + object (`Save result`); never a bare `열기`/`확인` (gaid-writing.md). | Writing / Focused and purposeful "Take an action" |
-| B4 | A view header carries at most **3 actions**; the rest go in a "더 보기" (More) menu, where on/off items show a checkbox. | Components / App bar "Action button", "More option" |
-| B5 | Order: primary action last (right) in a button row; destructive actions use `--destructive` and are never the default focus. | Dialog (choice/confirmation) |
+| B1 | Three levels: **filled** (signal; the one most likely action of a view), **bordered** (secondary actions), **plain** (tertiary, inline, toolbars). Exactly one filled button per view; a destructive action is never the filled default (it uses the danger style and needs confirmation or undo). | HIG Buttons "Use style, not size, to distinguish the preferred choice", "Don't assign the primary role to a button that performs a destructive action"; OneUI Buttons (three emphasis levels) |
+| B2 | Height 32 px (28 in toolbars, 40 for the primary action of a sheet or start step); horizontal padding 12–16; icon 16 px with 1.75 px stroke (lucide, one family); label 15 px/500. Icon-only buttons are 28×28 or larger, have a tooltip and an accessible name; adjacent targets keep ≥ 8 px gap. | HIG Accessibility "Offer sufficiently sized controls" (macOS 28×28 default, 20×20 minimum), Offering help (tooltips); OneUI Accessibility "Touch target spacing" |
+| B3 | Labels name the next action: Korean object + action (`결과 저장`), English verb + object (`Save result`); never bare `열기`/`확인`. A button that opens another view or step before acting ends with `…` only in menus, not in button labels. | HIG Writing "Be action oriented", Menus (ellipsis); gaid-writing.md |
+| B4 | A view header holds at most **three** actions; the rest go in a `더 보기` (⋯) menu, where on/off items show a check. | OneUI App bar "Action button" (≤ 3), "More option"; HIG Toolbars "Add a More menu" |
+| B5 | In a button row the primary action is last (trailing). Cancel is always available in sheets and dialogs and responds to Escape. | HIG Alerts "Place buttons where people expect", Sheets; OneUI Dialog |
+| B6 | A button whose action takes time shows its own progress (label → progress text, width kept) and can be stopped when the work can be stopped. | HIG Buttons "display an activity indicator", Progress indicators "let people halt processing" |
 
-### Navigation and tabs (N)
+### Navigation, toolbars and tabs (N)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| N1 | Tabs are text labels (noun), ideally 3 or fewer and never more than 5 in one tab bar; more destinations go in the sidebar or a list. Open-file tabs in the workspace are documents, not navigation, and are not limited by N1. | Components / Bottom navigation (fewer than 4 tabs, at most 5 if necessary, text only) |
-| N2 | Switching tabs never loses input (L7). Selected tab is announced as "Tab n of m" (`role="tab"`, `aria-selected`). | Accessibility / Screen reader announcement table |
-| N3 | A contextual selection bar appears only after multi-select, holds 2–5 actions with icon + text, and overflows into More after four. | Components / Bottom bar |
+| N1 | **Place switch.** `내 연구` and `GAID 허브` are the two places, a segmented control in the top bar, always visible. | HIG Segmented controls; OneUI Large screen "Show menus together with content" |
+| N2 | **Sidebars** list areas and collections, at most two levels, with short group titles; the current item shows tint + index cue; nothing critical at the sidebar bottom; the sidebar can be hidden by a button and a shortcut. | HIG Sidebars; OneUI Large screen "Make navigation controls fit the screen" |
+| N3 | **Tabs** switch closely related content in one pane: noun labels, 2–5 tabs (open-file tabs are documents and are not limited). Selected tab is announced "Tab n of m". Switching keeps input (L9). Segmented controls change a setting or a filter, not the page. | HIG Tab views (≤ 6), Segmented controls "Use a tab view … for view switching"; OneUI Bottom navigation (≤ 5) |
+| N4 | **Toolbars** carry the few frequent commands for their pane, grouped by function; the pane title names the content (file name, note title), never the app. At most three visible actions plus `더 보기` (B4). | HIG Toolbars "Provide a useful title", "Don't title windows with your app name", "Choose items deliberately" |
+| N5 | **Search** gets a primary position where finding is the main task (GAID 허브, file tree filter); it shows its scope in the placeholder and suggests recent or matching items when empty. | HIG Searching "give it a primary position", "Clearly display the current scope"; OneUI Search |
+| N6 | **Keyboard.** Every command reachable by pointer is reachable by keyboard; common ones have shortcuts shown in menus and tooltips (`⌘K`/`Ctrl K` search, `⌘\` sidebar, `⌘Enter` send). Never override browser or OS shortcuts. | HIG Designing for macOS "Handle keyboard shortcuts", Accessibility "Let people use the keyboard alone" |
 
-### Dialogs and popovers (D)
+### Dialogs, sheets, popovers and menus (D)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| D1 | **Use a modal dialog only to** enter required data, confirm a destructive or irreversible action, get consent to send data outside the PC, or show information the researcher must read before continuing. Everything else uses a popover, side panel, inline message or toast. | Writing / Simple and human "Only interrupt for important things"; Components / Dialog |
-| D2 | A dialog has a title (statement, not a question), at most two short paragraphs, and at most **3 actions** (footer task buttons such as 취소 / 이전 단계 / 다음 단계; step tabs, option rows, disclosures and the close button do not count). Sizes 400/560/720 px. It closes by its actions, Escape or the close button; destructive confirmations do not close on outside click. | Dialog (purpose, dismissal); the 3-action cap is GAID's, extended from App bar "Action button" (≤ 3 per page). One UI states no dialog button count |
-| D3 | **One overlay level.** Never open a dialog over a dialog. Modal = dim backdrop; related overlays (popover, side sheet, map popup) = light shadow, no dim. Never dim and shadow together. | Structure / Visual depth |
-| D4 | Popovers open next to their trigger, hold one small task or one record, and close with Escape, outside click or a close button; focus returns to the trigger. | Large screen "Get things done without leaving the screen" |
-| D5 | Context menus are untitled lists opened by right-click or a ⋯ button; every item also exists in visible UI or the More menu. | Components / Dialog (context menu) |
+| D1 | **Modal only when interruption protects the researcher:** required input that blocks everything else, a destructive or irreversible step, consent to send data outside the PC, or information that must be read before continuing. Everything else is inline, a popover, a pane or a toast. | OneUI Writing "Only interrupt for important things"; HIG Modality "Present content modally only when there's a clear benefit", Alerts "Use alerts sparingly" |
+| D2 | **Sheets** hold one short scoped task (≤ 3 footer actions; title states the task; 480/640/720 px wide; ≤ 85% height), such as the Workflow start settings (3–7 steps). Longer or open-ended work uses a pane. Never a sheet over a sheet. | HIG Sheets "For complex or prolonged user flows, consider alternatives", "Display only one sheet at a time"; OneUI Dialog |
+| D3 | **Alerts** are for destructive or irreversible actions people did not obviously choose: a statement title, one sentence of consequence, a named destructive button and `취소`. No alert for undoable actions (use undo instead), none at startup, none that scrolls. | HIG Alerts; OneUI Writing "Remove defensive text" |
+| D4 | **Popovers** open beside their trigger, hold one small task or one record, close with Escape, outside click or the trigger, and return focus. One popover at a time; never a warning in a popover. | HIG Popovers; OneUI Large screen |
+| D5 | **Context menus** (right-click or ⋯) hold a small set of relevant actions, one submenu level at most; every item also exists in visible UI or the `더 보기` menu; unavailable items are hidden in context menus and dimmed in `더 보기`. | HIG Context menus, Menus; OneUI Dialog (context menu) |
+| D6 | **Inspector.** The trailing pane shows the AI agent (chat and Workflow) or the selection's properties; it can be hidden and reopened by a button and a shortcut, and keeps its width. | HIG Panels "Consider using a panel to present inspector functionality", Split views "Provide multiple ways to reveal hidden panes" |
+| D7 | **Confirm before losing work.** Closing a sheet, pane or step with unsent input asks to keep or discard, or keeps the draft automatically. | HIG Modality "help people avoid data loss", Popovers "Always save work when automatically closing" |
 
-### Questions and option pickers (Q)
+### Questions and Workflow start settings (Q)
 
-The pattern for any multi-field setup (workflow start, recipe import, method trial, interview questions). One UI has no
-picker or stepper component page; Q1–Q6 apply its Writing principles and the user's requirement.
+The pattern for every multi-step setup: Workflow start settings, hub authoring questions, method trial, interview questions
+and research-note decisions.
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| Q1 | **One question per step.** A setup with more than two decisions becomes a stepper: one question, its options, a one-line reason why it matters. | Writing / Focused and purposeful "Make a choice" (one choice and one task at a time, even if it adds steps) |
-| Q2 | **Options, recommended first.** Offer 2–5 options as selectable rows (radio cards). Mark an option `권장` only when the method, catalogue or the researcher's data gives a reason, and show that reason in one line; the recommended option is first and pre-selected. A scientific parameter without such a source gets no pre-selection. A question with only one real option shows it as a fact, not as `권장`. Other options state their trade-off in one line. | Writing / Focused and purposeful "Understand what's happening" (benefits and trade-offs) |
-| Q3 | **기타 input.** The last option is `기타 (직접 입력)` with a text field, so the researcher is never forced into a listed answer; for a file input it opens the project file list or file chooser, not a path field. "Decide later" is allowed only where the method allows it, as its own option. | Writing / Empowering "Provide help, not limits" |
-| Q4 | **Move with tabs and Previous/Next.** A step indicator (tabs or a numbered rail with short step names) shows where the researcher is and lets them go back; Previous/Next buttons sit at the bottom right; Next is disabled with a one-line reason until the step is valid. Answers persist when moving between steps. Readiness blockers (missing skills, environment) appear on the first step with the action that fixes them (`필요한 스킬 켜기`), not only beside the final action. A setup opened from a recipe or an earlier run starts at the summary step. | Components / Bottom navigation (tabs, no swipe-only switching); Accessibility / Focus order |
-| Q5 | **Flow first, summary last.** The workflow is shown as one short flow (3–6 named stages, e.g. 입력 → 확인 → 분석 → 결과) instead of a paragraph. Show one sequence only: when the step tabs are the flow, they carry the stage names; a separate analysis flow on the first step uses the same words as the steps and results. The last step is a summary of all answers with Edit links and the one primary action. | Motion / Motion basics "Transitions harmonized with logical spatial structure"; Writing "Take an action" |
-| Q6 | Free-text questions say what a good answer contains in the placeholder or a one-line hint, not a paragraph. | Accessibility / Interaction and control (describe input fields) |
+| Q1 | **One question per step.** A setup with more than two decisions is a stepper: one question, its options, one line on why it matters. | OneUI Writing "Make a choice"; HIG Accessibility (Assistive Access) "Break up multistep workflows so people can focus on a single interaction" |
+| Q2 | **Options, recommended first.** 2–5 options as selectable rows (radio rows). `권장` only when the method, the catalogue or the researcher's data gives a reason, shown on one line; the recommended option is first and pre-selected. A scientific parameter without such a reason gets no pre-selection; a question with one real option shows it as a fact. Other options state their trade-off in one line. | OneUI Writing "Understand what's happening" (benefits and trade-offs); HIG Toggles "Prefer a set of radio buttons for mutually exclusive options" |
+| Q3 | **기타 (직접 입력)** is the last option with a text field; for a file input it opens the project file list. `작업 중 결정` appears only where the Workflow allows it, as its own option. | OneUI Writing "Provide help, not limits" |
+| Q4 | **Step scale and Previous/Next.** A step indicator at the top names every step (short nouns) and shows the current one; earlier steps are clickable. `이전 단계` and `다음 단계` sit at the bottom right of the fixed step footer; `다음 단계` is disabled with a one-line reason until the step is valid. Answers persist across steps. Readiness blockers (missing skill, environment, input) appear on the first step with the action that fixes them. A setup opened from saved start settings or an earlier run starts at the summary. | HIG Writing "consistent language throughout processes with multiple steps"; OneUI Bottom navigation (tabs, no swipe-only switching) |
+| Q5 | **Flow first, summary last.** The Workflow's steps are shown as one short flow (3–6 named stages) using the same words as the step scale. The last step is a summary of all answers with `수정` links and the one primary action. | OneUI Motion "Transitions harmonized with logical spatial structure"; HIG Writing ("Get Started" … "Done") |
+| Q6 | Free-text questions say what a good answer contains in the hint (`값과 근거를 한 줄로 적으세요`), not in a paragraph. | HIG Text fields "Show a hint", Writing "Show hints in text fields" |
+| Q7 | Start settings open as one sheet over the workspace (D2); answers persist when it is closed and reopened, and the Workflow list stays where it was. | HIG Sheets "A sheet helps people perform a scoped task that's closely related to their current context"; P4 |
 
-### Lists and cards (G)
+### Lists, cards and Workflow rows (G)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| G1 | List row title ≤ 30 Korean / 60 English characters on one line (noun or short verb phrase); one line of secondary text at most; details open on click (detail pane or popover). | Components / Lists "Main text" (≤ 31 characters; subtext on the detail page) |
-| G2 | Toggles sit at the right of the row; status badges at most 3 per row (W5), short nouns, each with a tooltip saying what it means. The researcher's own assessment (`수정 필요`) is shown as an assessment line, not as a badge next to package properties. | Lists; Layout / Basic layout "Text + Controller" |
-| G3 | Long lists get search with recent and suggested entries when empty, and subheaders for groups ordered by use. | Components / Search; Lists "Subheader" |
-| G4 | Discovery lists (hub catalogue, recommendations) are register rows (V4): title, one clamped line, aligned metadata, at most one action; a small labelled concept preview may sit at the row end. Same-size card grids are not used. | Layout / Basic layout "Multiple card type"; impeccable craft floor |
+| G1 | Row title ≤ 30 Korean / 60 English characters on one line; at most one secondary line; detail opens on click in the detail pane or a popover. Rows are 40 px (one line) or 56 px (two lines). | OneUI Lists "Main text" (≤ 31 characters); HIG Lists and tables "Keep item text succinct" |
+| G2 | **Every Workflow row carries the same fields in the same places:** name; one-line purpose; source (기본 / 공유 / 내 초안) with 판; state (준비됨, 환경 준비 필요, 미시험 …). At most three badges, each with a tooltip. The researcher's own assessment (`수정 필요`) is a line, not a badge. | GAID (Workflow model); OneUI Layout "Text + Controller"; taste "one label per intent" |
+| G3 | Cards only where elevation or an image carries real hierarchy (featured Workflows with concept pictures, project tiles with a cover). Otherwise group rows with space and hairlines. No identical icon + heading + text card grids as page structure. | impeccable craft floor "Refuse: same-size cards"; HIG Collections "Consider using a table instead of a collection for text" |
+| G4 | Long lists get search, a sort control and group headers ordered by use; empty search states suggest the next query or `전체 보기`. | OneUI Search, Lists "Subheader"; HIG Searching "Provide suggestions" |
+| G5 | Toggles at the trailing end of a settings row; elsewhere a checkbox or a toggle-style button. | HIG Toggles "Use the switch toggle style only in a list row"; OneUI Lists |
+| G6 | Selection shows tint plus the identity's index cue (section 2) and is announced; selection persists while another pane changes. | HIG Split views "persistently highlight the current selection" |
 
 ### Tables (X)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| X1 | Sticky header; each column header has sort and filter; numbers right-aligned with tabular figures; units in the header, not in every cell. | Lists (scan and search); T5 |
-| X2 | Show ≤ 8 columns by default; other columns are chosen from a column menu. Wide tables scroll inside their own region. | Large screen "Adjust grids for large screens" (no column numbers); 8 is the user-approved GAID default |
-| X3 | Selecting a row opens its record in a popover or the side panel (D4); it does not navigate away. | Large screen "Avoid switching context" |
-| X4 | Above the table, one line of state: `조건에 맞는 행 133 / 전체 133`. Explanations of filtering scope go in a tooltip. | P3 |
+| X1 | Sticky header; every column header sorts and filters; numbers right-aligned with tabular figures; units in the header, not in cells. | HIG Lists and tables "let people click a column heading to sort", "Use descriptive column headings"; T4 |
+| X2 | ≤ 8 columns visible by default; others chosen from a column menu; columns resizable; wide tables scroll inside their region. | HIG Lists and tables "Let people resize columns"; user default 8 |
+| X3 | Selecting a row opens its record in a popover or the inspector; it does not navigate away. | HIG Split views; OneUI Large screen "Avoid switching context" |
+| X4 | One state line above the table: `조건에 맞는 행 133 / 전체 133`; filter scope explanations in a tooltip. Missing values show `결측값` in `--gaid-nodata`, never 0 or a raw code. | P3; gaid-writing.md "missing values never shown as 0" |
+| X5 | Rows 36 px; zebra striping only above 8 columns; hairlines between rows, never both above and below every row. | HIG Lists and tables "Consider using alternating row colors"; taste "no border-t + border-b on every row" |
 
-### Map side panels and popups (MAP)
+### Maps (MAP)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| MAP1 | Map + side panel (320 px) side by side from 1024 px; the panel holds, in order, **레이어**, **범례**, **기본 정보**; legend and basic information are visible without scrolling the page at 1280×800 (the panel may scroll inside). The legend uses the panel's free height; when it still cannot show every class it shows the count (`범례 14개`) and a `모두 보기` control, never a silently clipped list. | Large screen "Multi-pane layout", "Show menus together with content" |
-| MAP2 | Basic information shows at most 5 rows (source file name, CRS, unit, feature or pixel count, extent on demand). A CRS is named by name and authority code when known (`Korea 2000 / Central Belt (EPSG:5186)`); a projection method alone (`Transverse_Mercator`) is labelled as such (`투영법만 기록됨`). Sampling method, tile details and display-only notes go behind `자세히` or a tooltip. | P3; Writing / Simple and human "Show benefits" |
-| MAP3 | Clicking a feature or pixel opens a map popup next to the point: title (layer + feature id), up to 8 attribute rows with readable labels, `모든 속성 보기` to open the full record in the attribute table. Missing values show `결측값` in `--gaid-nodata`, not raw codes. | Large screen "Get things done without leaving the screen"; Visual depth (shadow, no dim) |
-| MAP4 | Map toolbar: at most 3 visible actions (B4). Display CRS and basemap are one compact control group above the map, each with a short label; the network note for online basemaps appears only when an online basemap is chosen. Overlays such as the KIGAM 1:5만 지질도 and `레이어 추가` stay one click away in the panel. | App bar "Action button"; Writing / Simple and human "Remove defensive text" |
-| MAP6 | The map canvas shows a scale bar, cursor coordinates in the display CRS, zoom-to-layer, and a visible highlight on the selected feature. | — (GAID; desktop GIS convention) |
-| MAP5 | The attribute table sits below the map in its own region (at least 6 rows visible, or a draggable map/table split) and follows X1–X4. | — |
+| MAP1 | Map and a 320 px side panel side by side from 1024 px. The panel holds, in order, **레이어**, **범례**, **기본 정보**; legend and basic information are visible without page scroll at 1280×800 (the panel may scroll inside). When the legend cannot show every class it shows the count (`범례 14개`) and `모두 보기`; never a silently clipped list. | OneUI Large screen "Multi-pane layout"; HIG Charting data "Keep a chart simple, letting people choose when they want additional details" |
+| MAP2 | Basic information: at most 5 rows (source file, CRS, unit, feature or pixel count, extent on demand). A CRS is named by name and code when known (`Korea 2000 / Central Belt (EPSG:5186)`); a projection method alone is labelled `투영법만 기록됨`. Display-only notes go behind `자세히`. | P3; gaid-writing.md (CRS) |
+| MAP3 | Clicking a feature opens a popup next to the point: layer + feature id, up to 8 attributes with readable labels, `모든 속성 보기` to the table. | OneUI Large screen; HIG Popovers |
+| MAP4 | Map toolbar: display CRS and basemap as one compact group with labels; `지도 PNG 저장`; at most three visible actions. The network note for online basemaps appears only when one is chosen. | OneUI App bar; HIG Toolbars |
+| MAP5 | The attribute table sits below the map (≥ 6 rows visible or a draggable split) and follows X1–X5. | GAID |
+| MAP6 | The canvas shows a scale bar, cursor coordinates in the display CRS, zoom and zoom-to-layer, and a visible highlight on the selected feature. Map colours are data (V1 exception). | GAID (desktop GIS convention) |
 
-### Feedback: progress, toasts, empty and error states (F)
+### Chat with the AI agent and the composer (C)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| F1 | **Progress** names the current research step in plain words (`입력 확인 중`, `격자 표 만드는 중 2/5`), determinate when the count is known. No logs, tool names or command lines in progress text (R1). | One UI has no progress component rules (Dialog only places progress popups centrally); adapted from Motion basics "Real-time feedback response" and Writing "Understand what's happening" |
-| F2 | **Toasts** confirm minor results in one line (≤ 40 Korean / 80 English characters; never more than two lines) and may carry one follow-up action (`되돌리기`). Errors that block work, data loss or anything that needs a choice is never only a toast. Toasts do not hide important information on a timer. | Components / Toasts ("about one line, never more than three"; snack bar); Accessibility / Interaction and control |
-| F3 | **Empty states** say what is missing in one line and offer one primary action (`파일 올리기`), or a clear way back. | Writing / Focused and purposeful "Take an action" |
-| F4 | **Error states** say what did not happen and what the researcher can do next, in research terms: `지도 자료를 읽지 못했습니다. 파일 형식을 확인한 뒤 다시 읽으세요.` Raw messages, codes and stack traces go only in a collapsed `기술 정보` disclosure with a copy button (R2). Focus moves to the fix after an error. | Writing / Simple and human "Remove defensive text"; Empowering "Provide help, not limits"; Accessibility / Interaction and control |
-| F5 | Warnings appear when the condition occurs, next to what they concern; no blanket disclaimers above every view. Required limits (추정, 미시험, 검토 전) stay, in one line, with detail behind `자세히` (gaid-writing.md protected wording). The visible line is the most specific, decision-relevant limit (`Yilgarn Ni 사례에서만 검증했습니다.`), not a generic one. Disclosure labels say what they open (`해석 한계 보기`), not a bare `자세히` when several disclosures share a view. | Writing / Simple and human "Remove defensive text" |
+| C1 | The composer docks at the bottom of the AI agent pane (the one bottom exception, L8): text field with a hint naming what can be asked, attach (`참고 자료 추가`), the model chip (configuration, R1 allows the model name here), send (`⌘Enter`). While the agent works, send becomes `중지`. | GAID; HIG Buttons, Progress indicators "let people halt processing" |
+| C2 | The transcript shows research: requests, answers, results with their files, questions from the agent as Q-pattern forms, and progress as plain step text (F1). Tool calls, commands and logs collapse into one `작업 내용 보기` disclosure per answer. | P7; HIG Disclosure controls "hide details until they're relevant" |
+| C3 | A Workflow started from the panel appears as one block card (title, 판, the researcher's settings) at the top of its chat; the full 지침 opens on demand. | GAID (Workflow model) |
+| C4 | The AI agent's running state uses the orbit (I4) with the current step in words; a finished answer shows `실행 완료` and never `검토 완료` (P9). | GAID; HIG Feedback "integrate status feedback into your interface" |
+| C5 | Messages from the agent are left-aligned on the face tone without bubbles; the researcher's messages sit in a tinted block. Long answers keep the prose measure (L6). | GAID; HIG Typography (readability) |
+| C6 | Mid-run steering and queued messages are visible as such (`다음 요청으로 보냄`); nothing typed is lost when a run ends or fails (L9). | P5; HIG Modality "help people avoid data loss" |
 
-## 6. Motion
+### Research notes and decisions (RN)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| M1 | Durations `--gaid-motion-fast` (150 ms) for hover/press/small fades and `--gaid-motion-base` (200 ms) for popovers, panels and dialogs; nothing longer than 300 ms. | Motion / Motion basics "Duration" (100–500 ms) |
-| M2 | Easing `--gaid-easing` (fast start, gentle settle) for movement; linear only for opacity; exits may use ease-in. | Motion basics "Speed type and attributes" |
-| M3 | Motion explains a change (panel opening from its edge, popover from its trigger); no decorative or looping animation; running jobs may use one small animated status icon. `prefers-reduced-motion` disables transitions (already global). | Motion / Introduction; Motion basics "Lively animations" (icon animation) |
-| M4 | When text changes in place, the old text disappears before the new text appears; no overlapping text cross-fades. | Motion basics "Non-interrupted motion and interaction" |
+| RN1 | The notes view opens on research notes grouped `결정할 일`, `검토 전`, `확인함`; each row shows title, one-line headline result and the state; decisions show their count as a readout. | GAID (`docs/geo/research-notes.md`); OneUI Lists "Subheader" |
+| RN2 | A note reads result first: headline, figure or table, how far it can be trusted, then decisions; method detail and the work record sit behind disclosures. | P1, P3; HIG Writing "put the most important information first" |
+| RN3 | Each decision is a Q-pattern card (Q2–Q3: options with `권장` and reason, `별도 지시 (직접 입력)`). All answers go together with one `답변 보내기`; answered decisions stay visible with the chosen option. | Q-rules; user requirement (one question at a time, recommended option, 기타) |
+| RN4 | `확인함으로 표시` is the researcher's review mark, separate from `실행 완료` (P9); it is reversible (`검토 전으로 되돌리기`). | P9; HIG Undo and redo |
 
-## 7. Accessibility
+### Feedback: progress, activity, toasts, empty and error states (F)
 
-| Id | Rule | One UI source |
+| Id | Rule | Source |
 |---|---|---|
-| A1 | Every control has an accessible name; state is exposed (`aria-checked`, `aria-expanded`, `aria-selected`, `aria-disabled`); decorative icons are `aria-hidden`. Names do not repeat the role ("결과 저장", not "결과 저장 버튼"). | Accessibility / Screen reader (status, name, type, hint; principles 1–2) |
-| A2 | Keyboard: logical tab order, visible focus ring, no focus on decoration, related controls grouped as one stop where possible; focus stays where a repeatable action happened. | Accessibility / Focus order |
-| A3 | Click targets at least 24×24 px with ≥ 8 px between adjacent targets. | Accessibility / Layout and typography "Touch target spacing" (8 dp from figure; One UI states no minimum size, so 24 px is WCAG 2.2 2.5.8) |
-| A4 | Every drag action (layer order, file move) has a button or menu alternative. Nothing important auto-hides; moving content longer than 5 s has a pause control. | Accessibility / Interaction and control |
-| A5 | Live regions announce results of actions (added/deleted, n selected, step changes, errors). Instructions name controls by label, not by colour or position ("`지도 PNG 저장`을 누르세요", not "오른쪽 위 버튼"). | Screen reader principle 6; Accessibility / Content |
+| F1 | **Progress** names the current research step in plain words (`입력 확인 중`, `격자 표 만드는 중 2/5`), determinate when the count is known, in one consistent place per pane. No logs, tool names or command lines (R1). | HIG Progress indicators "use a determinate progress indicator", "Display a progress indicator in a consistent location"; OneUI Writing "Understand what's happening" |
+| F2 | **Loading** shows the structure immediately (skeleton rows in the final layout) and lets the researcher keep working elsewhere; no full-pane spinners. | HIG Loading "Show something as soon as possible", "Let people do other things"; impeccable Operate |
+| F3 | **Toasts** confirm minor results in one line (≤ 40 Korean / 80 English characters, never more than two lines), may carry one follow-up (`되돌리기`), stay until dismissed when they carry an action, and never carry errors that block work or need a choice. | OneUI Toasts; HIG Accessibility "Minimize use of time-boxed interface elements" |
+| F4 | **Empty states** say what is missing in one line and offer one action (`파일 올리기`) or a way back. | HIG Writing "Provide clear next steps on any blank screens"; OneUI Writing "Take an action" |
+| F5 | **Errors** say what did not happen and what to do next, in research terms, next to the problem: `지도 자료를 읽지 못했습니다. 파일 형식을 확인한 뒤 다시 읽으세요.` Raw messages, codes and stack traces only in a collapsed `기술 정보` disclosure with a copy button (R2). Focus moves to the fix. | HIG Writing "Write clear error messages … display it as close to the problem as possible, avoid blame"; OneUI Writing "Remove defensive text" |
+| F6 | **Limits** appear where they apply, in one line (`Yilgarn Ni 사례에서만 검증했습니다.`), with detail behind a disclosure that says what it opens (`해석 한계 보기`). Required limit words (추정, 미시험, 검토 전) are never removed. | OneUI Writing "Remove defensive text"; gaid-writing.md protected wording |
+| F7 | **Completion** of a significant task is confirmed where the work happened (the note, the step, the file), not only in a toast. | HIG Feedback "confirm that a significant action or task has completed" |
 
-## 8. Copy length and information density (W)
+## 7. Motion
 
-Voice, terminology and banned patterns: `geo/copy/gaid-writing.md`. This section adds limits. Limits count visible
-characters (an ICU argument counts as 4); English limits are double the Korean ones.
+| Id | Rule | Source |
+|---|---|---|
+| M1 | Durations: 120 ms for hover, press and small fades; 200 ms for popovers, panes and sheets; nothing over 300 ms. Frequent interactions (typing, row hover, tab switch) get no animation beyond colour. | OneUI Motion basics "Duration" (100–500 ms); HIG Motion "avoid adding motion to UI interactions that occur frequently" |
+| M2 | Easing `cubic-bezier(0.22, 0.25, 0, 1)` for entering movement (fast start, gentle settle); linear for opacity; ease-in for exits. | OneUI Motion basics (Basic Path Interpolator 0.22, 0.25, 0.00, 1.00); impeccable craft floor (exponential ease-out) |
+| M3 | Motion explains a change (a pane from its edge, a popover from its trigger, a step sliding in the direction of travel); the orbit (I4) is the only loop. No decorative entrances or page-load choreography. | HIG Motion "Add motion purposefully"; OneUI Motion "Introduction" |
+| M4 | Text that changes in place fades out before the new text fades in; images may cross-fade. | OneUI Motion basics "Non-interrupted motion" |
+| M5 | People never wait for an animation; input during a transition is accepted. | HIG Motion "Let people cancel motion" |
+| M6 | `prefers-reduced-motion` replaces movement with fades and stops the orbit. | HIG Accessibility "Replacing transitions … with fades"; OneUI Accessibility |
 
-| Id | Rule | Limit (ko / en) | One UI source |
+## 8. Accessibility
+
+| Id | Rule | Source |
+|---|---|---|
+| A1 | Every control has an accessible name; state is exposed (`aria-checked/expanded/selected/disabled`); decorative icons are `aria-hidden`; names do not repeat the role. | OneUI Accessibility "Screen reader"; HIG Accessibility "Describe your app's interface" |
+| A2 | Logical tab order, visible focus ring, no focus on decoration, related controls as one stop where possible; focus stays where a repeatable action happened. Full keyboard operation (N6). | OneUI Accessibility "Focus order"; HIG Accessibility "Let people use the keyboard alone" |
+| A3 | Targets ≥ 24×24 px (28×28 for icon buttons, B2) with ≥ 8 px between adjacent targets. | HIG Accessibility (macOS 28×28 / 20×20); OneUI "Touch target spacing"; WCAG 2.2 2.5.8 |
+| A4 | Every drag (layer order, file move, pane resize) has a button, menu or keyboard alternative. Nothing important auto-hides; moving content longer than 5 s has a pause. | HIG Drag and drop "Offer alternative ways"; OneUI Accessibility "Interaction and control" |
+| A5 | Live regions announce results (added/deleted, n selected, step changes, run finished, errors). Instructions name controls by label, never by colour or position. | OneUI Accessibility "Screen reader" principle 6, "Content"; HIG Accessibility |
+| A6 | Colour-only distinctions get a second channel (text, icon, pattern). Charts and maps provide a text summary of their main message. | HIG Charting data "Make every chart accessible", "Aid comprehension by adding descriptive text"; OneUI "Use of color" |
+| A7 | Respect `prefers-reduced-motion`, `prefers-contrast` and `forced-colors`. | HIG Accessibility; S9 |
+
+## 9. Copy length and information density (W)
+
+Voice, terminology and banned patterns: `geo/copy/gaid-writing.md`. Limits count visible characters (an ICU argument counts
+as 4); English limits are double the Korean ones.
+
+| Id | Rule | Limit (ko / en) | Source |
 |---|---|---|---|
-| W1 | Buttons and actions | 16 / 32 | Buttons; Writing "Take an action" |
-| W2 | Titles, headings, list row names | 30 / 60 | Lists "Main text" (≤ 31 characters) |
-| W3 | Toasts and saved/copied notices | 40 / 80 | Toasts (about one line) |
-| W4 | Any other single string (description, hint, message) | 140 / 280 | Writing / Focused and purposeful |
-| W5 | **First-view budget** (a view = the focused surface: the open dialog, or the main work area of a tab, excluding app header, sidebar and tab bar): body text visible in a view before any interaction ≤ 300 / 600 characters, excluding data the researcher brought (file names, table values, map labels); at most 2 paragraphs before the first action; at most 3 badges per row. | per view | Writing / Focused and purposeful; Empowering "Entice users to explore" |
-| W6 | One line of context under a title; longer explanation goes behind `자세히` (disclosure), a tooltip or documentation. Do not repeat the same limit sentence in several places of one view. One term per concept across screens (one name for the setup flow, its draft and its start action; check `geo/copy/terminology.csv`). | — | Writing / Simple and human |
+| W1 | Buttons and actions | 16 / 32 | OneUI Buttons; HIG Writing "Be action oriented" |
+| W2 | Titles, headings, list row names | 30 / 60 | OneUI Lists "Main text" |
+| W3 | Toasts and saved/copied notices | 40 / 80 | OneUI Toasts |
+| W4 | Any other single string | 140 / 280 | OneUI Writing; HIG Writing "Be clear" |
+| W5 | **First-view budget** per view (the focused pane or the open sheet, without the top bar and sidebar): body text before any interaction ≤ 300 / 600 characters, excluding the researcher's own data; at most 2 paragraphs before the first action; at most 3 badges per row. | per view | OneUI Writing; HIG Design principles "Simplicity" |
+| W6 | One line of context under a title; longer explanation behind a disclosure or tooltip. One term per concept across screens (`geo/copy/terminology.csv`). Tooltips describe the action and do not repeat the control's name. | — | HIG Offering help "avoid repeating a control's name in its tooltip"; OneUI Writing |
 
-W2–W4 are checked per string by `check-ui.mjs` (`copy-length`): a role applies only to locale ids that match its
-pattern in `ui-rules.json` (W1 `*.button`, `*.cta`, `*.action`; W2 `*.title`, `*.heading`, `*.name`; W3 `*.toast`,
-`*.saved`, `*.copied`); every other id gets the W4 limit. Existing catalogues have no `*.button` ids, so W1 is checked only
-for new strings that follow this convention: key new button labels `<area>.<thing>.button` (or `.action`). W5–W6 are
-checked in visual review.
+W2–W4 are checked per string by `check-ui.mjs` (`copy-length`) for ids matching each role's patterns in `ui-rules.json`
+(W1 `*.button`, `*.cta`, `*.action`; W2 `*.title`, `*.heading`, `*.name`; W3 `*.toast`, `*.saved`, `*.copied`); every other id gets
+the W4 limit. W5–W6 are checked in visual review. Titles and buttons are statements and actions; only a yes/no dialog body
+may ask (gaid-writing.md). Pronouns: no `우리`/"we" in system messages (HIG Writing "Avoid using we").
 
-One UI phrases confirmations as questions (Writing / Empowering "Engage users with questions"); GAID keeps its copy rule:
-titles and buttons are statements and actions, and only a yes/no dialog body may ask (gaid-writing.md).
+## 10. What researchers never see (R)
 
-## 9. What researchers never see (R)
-
-Researcher views are the workspace, chat, workflow and method screens, viewers, results, notebook, automation and
-hub screens. Settings (the whole `settings.*` and `app.settings.*` namespaces), the model picker and the local model card
-are configuration views where the model the researcher chose is content.
+Researcher views are the workspace, chat, Workflow and method screens, viewers, results, notes, automation and hub
+screens. Settings (`settings.*`, `app.settings.*`), the model picker and the local model card are configuration views where
+the chosen model is content.
 
 | Id | Rule |
 |---|---|
-| R1 | **No agent machinery in researcher views**: model or provider names (outside configuration views, the model picker and the R4 record view), session/chat/run/tool-call ids, commit SHAs and check receipts, token counts, prompts and system instructions, tool names and arguments, command lines, run logs, exit codes, internal state keys (`needs-environment`, `whole layer for display`), internal paths (`.kady/`, `.pi/`, cache directories), English enum values in Korean UI. |
-| R2 | **Raw errors** (exception text, HTTP status, stack traces, stderr) appear only inside a collapsed `기술 정보` disclosure with a copy button; the visible message follows F4. Locale ids for that disclosure end in `.technical` (allowed by the check; `.details` is an ordinary id and is checked). |
-| R3 | **Translate internal facts into research facts**: `도구 호출 42회 · 실패 10회` → `분석 단계 42개 중 10개를 다시 시도했습니다` only if that is true, otherwise leave it out; `채팅 ID` → a link `채팅 열기`; `revision 1` → `버전 1`. |
-| R4 | Provenance, environment and trial records keep their full data, but the researcher view shows a summary (what was used, when, result) with the full record behind `기록 보기`. The record view is where a researcher cites a result: it shows the model used, read-only and copyable, and links to the chat (`채팅 열기`). Locale ids for that view end in `.record` and may name the model. |
-| R5 | Costs: budget and spend appear only in the budget chip and project settings, never inside results or method screens. |
+| R1 | **No agent machinery in researcher views:** model or provider names (outside configuration views, the model chip in the composer and the R4 record view), session/chat/run/tool-call ids, commit SHAs and check receipts, token counts, prompts and system instructions, tool names and arguments, command lines, run logs, exit codes, internal state keys, internal paths (`.kady/`, `.pi/`, caches), English enum values in Korean UI, CPU/GPU/memory percentages outside a dedicated system popover. |
+| R2 | **Raw errors** only inside a collapsed `기술 정보` disclosure with a copy button; the visible message follows F5. Locale ids for it end in `.technical`. |
+| R3 | **Translate internal facts into research facts** or leave them out: `채팅 ID` → `채팅 열기`; `revision 1` → `1판`. |
+| R4 | Provenance, environment and trial records keep their full data; the researcher view shows a summary (what was used, when, result) with the record behind `기록 보기`. The record view may name the model; its locale ids end in `.record`. |
+| R5 | Costs appear only in the budget chip (shown when a cap is set or spend is non-zero) and project settings, never inside results or method screens. |
 
 `check-ui.mjs` (`internals`) blocks locale strings outside configuration views that interpolate `{detail}`, `{error}`,
-`{message}`, `{stderr}`, `{stack}`, `{model}`, `{models}` or internal ids, and literal "stack trace"/"traceback"/"stderr". Code
-paths that show `error.message` directly, and strings using generic argument names (`{id}`, `{status}`, `{code}`,
-`{tokens}`), are found in review, not by the check; the literal labels `채팅 ID`, `세션 ID`, `종료 코드` and `HTTP {status}` are
-checked.
+`{message}`, `{stderr}`, `{stack}`, `{model}`, `{models}` or internal ids, and the literal labels listed in `ui-rules.json`.
 
-## 10. Visual review checklist
+## 11. Visual bans (V)
 
-Use for every UI change (author) and every review (reviewer), with screenshots at 1440×900 and 1280×800, Korean.
+Checked mechanically by `check-ui.mjs` (`styles`, `slop`) where a proxy exists; reviewers judge the rest on screen.
 
-1. One task, one primary action visible without scrolling (P1, L6, B1).
-2. First view within the budget: count body characters; ≤ 2 paragraphs before the first action (W5).
-3. Header zone has title + at most one line; actions grouped; ≤ 3 header actions (P2, B4).
-4. Details, limits detail and technical information behind a disclosure or popover (P3, F5, R2).
-5. Nothing from section 9 visible.
-6. Setup flows: one question per step, recommended first, 기타 input, Previous/Next, summary (Q1–Q5).
-7. Maps: legend and basic information beside the map without page scroll; popup for features (MAP1–MAP3).
-8. Tables: sort/filter per column, ≤ 8 columns by default, state line (X1–X4).
-9. Colour roles only, status has text, contrast, greyscale check (S1–S4).
-10. Keyboard path through the change; focus ring visible; names on icon buttons (A1–A3).
-11. Both themes: the screen in light and dark, images unfiltered, amber only for action-needed states (S6, S7, V6).
-12. Identity: no AI symbols, gradients, eyebrows, card grids, coloured side stripes or decorative placeholders (V2–V7).
-
-## 11. Where GAID deliberately differs from One UI
-
-| One UI | GAID | Why |
+| Id | Ban | Check |
 |---|---|---|
-| Viewing area is the top third of a phone screen, centred large title, controls in the lower thumb zone (Basic layout) | Left-aligned compact header zone; controls next to the content they change | Desktop mouse/keyboard use; no thumb reach |
-| Choice and confirmation dialogs at the bottom of the screen (Dialog) | Centred modal dialogs; popovers anchored to the trigger | Desktop convention; One UI's own large-screen guidance anchors popovers near the trigger |
-| Bottom navigation and bottom bars | Sidebar, top tabs, selection bar above the list | Desktop layout (L3) |
-| Confirmations phrased as questions (Writing / Empowering) | Statement titles; action-named buttons | GAID copy rule (gaid-writing.md), user-approved WP00 kit |
-| Motion up to 500 ms; lively, 3D and decorative animation (Motion basics) | ≤ 300 ms, functional motion only | Research work tool; repeated use; reduced distraction |
-| One button style per screen; flat buttons inside dialogs and toolbars (Buttons) | Mixed emphasis levels with exactly one filled primary per view, also in dialogs (B1) | Desktop dialogs need a clear default action; one primary keeps the focus rule |
-| Samsung blue palette (#0072de, #3e91ff, #0381fe) and One UI Sans | GAID palette (section 4: action #1F5EFF, cool neutral frame) and self-hosted Pretendard | No Samsung or Toss assets or proprietary fonts; GAID brand kit |
-| Button corner radius 18 dp (pill) in the Android sample | `--radius-md` (4 px) | Direction 라: register rows and precise controls (V7) |
-| Toast up to 3 lines | Toast ≤ 2 lines, prefer 1 | Korean strings wrap sooner at desktop toast width |
-| List main text ≤ 31 characters (English) | 30 Korean / 60 English | Korean characters carry more meaning per character |
-| No minimum target size stated | 24×24 px minimum (WCAG 2.2) | One UI gives only 8 dp spacing |
-| Alternative gradients for backgrounds and focus blocks (Color system "Background color") | Neutral surfaces, no gradients in work areas (S2) | Data colours on maps and charts need a calm, neutral ground |
-| Dark mode as a primary comfort feature | Light and dark themes with the same surface contract; images never inverted (S6) | User decision 2026-10-21 |
+| V1 | Hard-coded colours and Tailwind hue utilities (`text-blue-600`, `bg-slate-50`) in components; colours come from tokens. Data palettes are the listed exception. | `styles` hex, `slop` hue-utility |
+| V2 | Generic AI symbols (sparkles, wands, robots, brain circuits, stars as "AI") and emoji in copy. The AI agent is shown by its name and the orbit (I4). | `slop` ai-icon, emoji |
+| V3 | Gradients, glass, backdrop blur and glow as decoration. | `slop` gradient, glass |
+| V4 | Eyebrows/kickers above headings, section numbers (`01`), decorative status dots, decorative grid lines and crosshairs. | review |
+| V5 | Identical icon + heading + text card grids as page structure; cards inside cards. | review |
+| V6 | CSS filters, blend modes or recolouring on figures, maps and images. | `slop` image-filter |
+| V7 | Coloured side stripes (`border-left`/`border-right` ≥ 2 px) on cards, rows, callouts or alerts. | `slop` side-stripe |
+| V8 | A missing brand font face: Pretendard must be declared with `@font-face` in `globals.css`. | `slop` fontFace |
+| V9 | Em dashes and en dashes as separators in visible copy; middle dots at most one per line. | review (copy validator warns on em-dash cadence) |
 
-## 12. Source pages
+## 12. Visual review checklist
 
-v2 sources (2026-10-21): TDS Mobile https://tossmini-docs.toss.im/tds-mobile/ (start, foundation/colors,
-foundation/typography and 34 component pages; digest with per-page URLs and hashes outside Git:
-`~/data/geoaidesk/work/gaid-design-identity/tds-notes.md`); impeccable 4.3.1 and design-taste-frontend skills
-(skill_hub `.claude/skills/`); Codex 고급검토 reviews `~/data/geoaidesk/work/gaid-design-identity/codex/review.md` and
-`codex-logo/review.md`.
+With screenshots in Korean, light and dark, at 1440×900 and 1280×800:
 
-v1 sources:
+1. One task and one filled primary action per view, visible without scrolling (P2, L7, B1).
+2. First view within the budget; ≤ 2 paragraphs before the first action (W5).
+3. Functional layer and content layer distinct; header has a title, at most one line and ≤ 3 actions (L3, B4, N4).
+4. Detail, limits and technical information behind disclosures (P3, F6, R2); nothing from section 10 visible.
+5. Setup flows: one question per step, recommended first with its reason, 기타, Previous/Next, summary (Q1–Q5).
+6. Maps: legend and basic information beside the map without page scroll; feature popup (MAP1–MAP3).
+7. Tables: sort and filter per column, ≤ 8 columns, state line, 결측값 (X1–X4).
+8. Colour roles only; status has text or icon; contrast passes in both themes; greyscale check (S1–S4).
+9. Identity: the mark once; blue only as signal; Pretendard; the orbit only while work runs; checked in 계측 and 도폭,
+   light and dark (I1–I15).
+10. Keyboard path through the change; focus ring visible; names on icon buttons (A1–A3).
 
-All read on 2026-10-16. Digest with per-page notes (not in Git): `~/data/geoaidesk/work/gaid-ui-guide/oneui-notes.md`.
-Independent cross-check (ChatGPT Pro web research, same date) agreed on the cited values and found no One UI type scale,
-base grid, minimum target size, picker, progress or dialog button-count rules; the guide marks those as GAID's own.
-Vault note: `웹 조사/geoaidesk/2026-10-16-i-am-writing-a-ui--0230c8af23.md`.
+## 13. Where GAID differs from One UI and HIG
 
-- Overview: https://developer.samsung.com/one-ui/index.html
-- Structure / Visual depth: https://developer.samsung.com/one-ui/structure/visual-depth.html
-- Layout / Basic layout: https://developer.samsung.com/one-ui/layout/basic.html
-- Layout / Grid system: https://developer.samsung.com/one-ui/layout/grid.html
-- Components / App bar: https://developer.samsung.com/one-ui/comp/app-bar.html
-- Components / Bottom bar: https://developer.samsung.com/one-ui/comp/bottom-bar.html
-- Components / Bottom navigation: https://developer.samsung.com/one-ui/comp/bottom-navigation.html
-- Components / Buttons: https://developer.samsung.com/one-ui/comp/button.html
-- Components / Dialog: https://developer.samsung.com/one-ui/comp/dialog.html
-- Components / Lists: https://developer.samsung.com/one-ui/comp/list.html
-- Components / Search: https://developer.samsung.com/one-ui/comp/search.html
-- Components / Toasts: https://developer.samsung.com/one-ui/comp/toast.html
-- Color / Color system: https://developer.samsung.com/one-ui/color/system.html
-- Color / Theme: https://developer.samsung.com/one-ui/color/theme.html
-- Motion / Introduction: https://developer.samsung.com/one-ui/motion/intro.html
-- Motion / Motion basics: https://developer.samsung.com/one-ui/motion/basic.html
-- Writing / Focused and purposeful: https://developer.samsung.com/one-ui/writing/focused-and-purposeful.html
-- Writing / Simple and human: https://developer.samsung.com/one-ui/writing/simple-and-human.html
-- Writing / Empowering and engaging: https://developer.samsung.com/one-ui/writing/empowering.html
-- Accessibility (introduction, screen reader, focus order, colour and contrast, layout and typography, interaction and
-  control, content): https://developer.samsung.com/one-ui/accessibility/intro.html and its sibling pages
-- Large screen / Designing for large screens: https://developer.samsung.com/one-ui/largescreen-and-foldable/intro.html
-- Large screen / Layout design: https://developer.samsung.com/one-ui/largescreen-and-foldable/large_screen_layout.html
-- Large screen / Designing for foldables: https://developer.samsung.com/one-ui/largescreen-and-foldable/designing_for_foldable.html
+| Source says | GAID does | Why |
+|---|---|---|
+| OneUI: viewing area on top, controls in the lower thumb zone; centred large titles | Leading-aligned compact headers; controls next to what they change; nothing critical at the bottom (L8) | Desktop mouse and keyboard; HIG macOS bottom-edge rule |
+| OneUI: choice dialogs at the bottom of the screen | Centred sheets and alerts; popovers at the trigger | Desktop convention (HIG Sheets, Popovers) |
+| OneUI: confirmations phrased as questions | Statement titles and action buttons; only a yes/no dialog body asks | GAID copy rule (gaid-writing.md) |
+| OneUI: motion up to 500 ms, lively and 3D animation | ≤ 300 ms, functional motion, one loop (the orbit) | Repeated use in a research tool; HIG Motion "frequent interactions" |
+| OneUI: one button style per screen; flat buttons in dialogs | One filled primary per view, bordered and plain for the rest (B1) | A clear default action in desktop sheets (HIG Buttons) |
+| HIG: Liquid Glass for the functional layer; blur and vibrancy | Opaque chrome tone and hairlines; no glass or blur (V3) | Apple-proprietary material; legibility over maps and figures; GAID slop ban |
+| HIG: system fonts (SF Pro, New York) and SF Symbols | Pretendard (the logo's lettering) and lucide icons (ISC, already a project dependency) at 16 px with a 1.75 px stroke | No proprietary fonts or symbols; brand continuity |
+| HIG: macOS body 13 pt, minimum 10 pt | Body 15 px, minimum 12 px | Korean glyph density; the user's remark on small type |
+| HIG: avoid app-specific appearance settings | Follow the system by default; an override in Settings only (S5) | Browsers may not reflect the researcher's preference; no header theme switch |
+| HIG: menu bar for every command | Commands in toolbars, `더 보기` menus and the command palette (`⌘K`) | Web app in a browser window has no app menu bar |
+| HIG and OneUI: system blue accents and colours | The GAID brand blue as the only signal (I2) | Brand; no platform colours |
+| OneUI: toast up to 3 lines; list main text ≤ 31 characters | Toast ≤ 2 lines; 30 Korean / 60 English characters | Korean strings wrap sooner at desktop widths |
 
-Iconography pages (app launcher icons) and Sound & Haptic were read or skipped as not applicable; GAID uses lucide
-icons at 16 px with consistent stroke weight.
+## 14. Source pages
+
+Apple HIG (read 2026-10-22; JSON data from `https://developer.apple.com/tutorials/data/design/human-interface-guidelines/<page>.json`):
+design-principles, designing-for-macos, designing-for-ipados, layout, color, dark-mode, materials, typography, motion,
+writing, accessibility, branding, icons, images, inclusion, charting-data, drag-and-drop, entering-data, feedback,
+file-management, loading, modality, multitasking, offering-help, onboarding, searching, settings, undo-and-redo,
+collaboration-and-sharing, managing-notifications, charts, collections, disclosure-controls, labels, lists-and-tables,
+outline-views, split-views, tab-views, buttons, context-menus, menus, pop-up-buttons, pull-down-buttons, toolbars,
+the-menu-bar, path-controls, search-fields, sidebars, tab-bars, token-fields, alerts, panels, popovers, scroll-views,
+sheets, windows, combo-boxes, pickers, segmented-controls, sliders, steppers, text-fields, toggles, gauges,
+progress-indicators, text-views, web-views, image-views. Korean landing page:
+https://developer.apple.com/kr/design/human-interface-guidelines/
+
+Samsung One UI (read 2026-10-16): the pages listed in guide v1 section 12 (overview, structure, layout, components, colour,
+motion, writing, accessibility, large screen and foldable).

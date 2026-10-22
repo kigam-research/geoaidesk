@@ -34,7 +34,7 @@ export function HubPicker({ recipesOnly = false, disabled, onSelect }: {
     {loading ? <p role="status" className="text-sm text-muted-foreground">{t("hubPicker.loading")}</p>
       : failed ? <div role="alert" className="space-y-2 text-sm"><p>{t("hubPicker.error")}</p><Button size="sm" variant="outline" onClick={() => setRetry((value) => value + 1)}>{t("hubPicker.retry.button")}</Button></div>
       : rows.length === 0 ? <p role="status" className="text-sm text-muted-foreground">{t(recipesOnly ? "hubPicker.emptyRecipes" : "hubPicker.empty")}</p>
-      : <ul className="max-h-64 overflow-y-auto divide-y border-y border-border" aria-label={t("hubPicker.results")}>
+      : <ul className="max-h-64 overflow-y-auto divide-y rounded-md border" aria-label={t("hubPicker.results")}>
         {rows.map((entry) => <li key={entry.id}>
           <button type="button" disabled={disabled} className="w-full min-w-0 space-y-1 p-3 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50" onClick={() => onSelect(entry)}>
             <span className="block truncate text-sm font-medium" title={entry.title}>{entry.title}</span>
@@ -43,8 +43,8 @@ export function HubPicker({ recipesOnly = false, disabled, onSelect }: {
               <span className="max-w-40 truncate">{entry.author}</span>
               <span>{t("hubPicker.stars", { count: entry.stars })}</span>
               <span>{t("hubPicker.revision", { count: entry.latestRevision })}</span>
-              <span className="rounded-sm border px-1.5 py-px" title={t("hubPicker.kindTip")}>{t(`hubPicker.kind.${entry.kind}`)}</span>
-              {entry.recipe && <span className="rounded-sm border px-1.5 py-px" title={t("hubPicker.recipeTip")}>{t("hubPicker.recipe")}</span>}
+              <span className="rounded-full border px-1.5 py-px" title={t("hubPicker.kindTip")}>{t(`hubPicker.kind.${entry.kind}`)}</span>
+              {entry.recipe && <span className="rounded-full border px-1.5 py-px" title={t("hubPicker.recipeTip")}>{t("hubPicker.recipe")}</span>}
             </span>
           </button>
         </li>)}

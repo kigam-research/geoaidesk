@@ -132,7 +132,7 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
   const selectedWorkflow = selectedMethod?.workflows.find((workflow) => workflow.id === setup?.workflowId);
   const selectedRecipe = selectedMethod?.recipes.find((recipe) => recipe.id === setup?.recipeId);
   const detailMethod = methods.find((method) => method.key === detailKey);
-  const category: WorkflowPanelCategory = { id: METHOD_CATEGORY, label: t("methods.category"), color: "text-foreground", bg: "bg-transparent hover:bg-accent border-border" };
+  const category: WorkflowPanelCategory = { id: METHOD_CATEGORY, label: t("methods.category"), color: "text-gaid-ink", bg: "" };
   // Status only when it says something (loading, error, none installed); a full list needs no notice (UI guide P3).
   const notice = (error || !data || methods.length === 0) && <div className="flex flex-wrap items-center gap-2">
     {error ? <p role="alert" className="text-xs text-destructive break-words">{error}</p> : !data ? <p role="status" className="text-xs">{t("methods.loading")}</p> : <p className="text-xs text-muted-foreground">{t("methods.empty")}</p>}

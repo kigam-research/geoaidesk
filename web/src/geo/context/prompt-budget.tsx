@@ -117,7 +117,7 @@ export function GeoPromptBudget({
           aria-label={t("title")}
           className={cn(
             "inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-2 font-mono text-[11px] tabular-nums text-muted-foreground hover:bg-muted",
-            low && "bg-gaid-warning-bg text-gaid-warning",
+            low && "bg-gaid-warning-tint text-gaid-warning",
             exhausted && "bg-destructive/10 text-destructive",
           )}
         >

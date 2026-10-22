@@ -43,7 +43,7 @@ export function TableExample({ port }: { port: InputPort }) {
   const columns = exampleColumns(port);
   return (
     <figure className="flex flex-col gap-1.5">
-      <div className="overflow-x-auto rounded-none border">
+      <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-xs">
           <thead className="bg-muted/60">
             <tr>
@@ -80,7 +80,7 @@ export function BoundaryExample({ port }: { port: InputPort }) {
     <figure className="flex flex-col gap-1.5">
       <svg
         viewBox="0 0 240 150"
-        className="w-full rounded-none border bg-background text-gaid-link"
+        className="w-full rounded-lg border bg-muted/30 text-primary"
         role="img"
         aria-label={localText(port.label)}
       >
@@ -182,7 +182,7 @@ export function resultExampleRows(label: string): { columns: string[]; rows: str
 function ResultTable({ port }: { port: OutputPort }) {
   const { columns, rows } = resultExampleRows(localText(port.label));
   return (
-    <div className="overflow-x-auto rounded-none border">
+    <div className="overflow-x-auto rounded-lg border">
       <table className="w-full text-xs">
         <thead className="bg-muted/60">
           <tr>
@@ -225,7 +225,7 @@ export function ResultExample({
         <ResultTable port={port} />
       ) : image ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="" className="w-full rounded-none border object-contain" />
+        <img src={image} alt="" className="w-full rounded-lg border object-contain" />
       ) : null}
       <figcaption className="text-xs text-muted-foreground">
         {tabular
