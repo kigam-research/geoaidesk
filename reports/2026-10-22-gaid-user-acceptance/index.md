@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-page-citations.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GAID를 처음 쓰는 연구자 역할의 수용 시험
 
