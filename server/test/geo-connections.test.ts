@@ -72,6 +72,17 @@ describe("connection neighbourhood", () => {
     await app.close();
   });
 
+  it("draws a copied figure as a copy of its source, not as a new drawing by the chat", async () => {
+    const copy = "연구노트/" + noteId + "/figures/copy.png";
+    write(copy, "png bytes");
+    appendStep({ schemaVersion: PROVENANCE_SCHEMA_VERSION, id: "copy", sessionId: chatId, timestamp: Date.now() + 1000, toolName: "bash", role: "agent",
+      inputs: [ref(figure)], outputs: [{ ...ref(copy), change: "created" }] }, paths.id);
+    const map = await connectionMap(paths, "figure:" + copy, 2, options());
+    expect(map.edges).toContainEqual({ from: "figure:" + figure, to: "figure:" + copy, kind: "copied", confidence: "observed" });
+    expect(map.edges.some(e => e.from === "chat:" + chatId && e.to === "figure:" + copy)).toBe(false);
+    expect(map.edges).toContainEqual({ from: "file:plot.py", to: "figure:" + figure, kind: "drew", confidence: "observed" });
+  });
+
   it("marks changed inputs and missing figures, including boundary nodes, without rewriting note bytes", async () => {
     const original = fs.readFileSync(path.join(paths.sandbox, notePath), "utf8");
     write("data.csv", "new");

@@ -183,15 +183,19 @@ export async function connectionMap(paths: ProjectPaths, focus: string, depth = 
     try { record = artifactProvenance(paths.id, p); } catch { return; }
     fileNode(p, record.staleness === "stale" ? "changed" : null);
     for (const n of record.lineage.nodes) fileNode(n.path, !n.current ? "missing" : n.changedSinceUse ? "changed" : null);
+    // An image whose bytes equal its image input is a copy (e.g. a result figure copied into a note), not a new drawing.
+    const shaOf = new Map(record.lineage.nodes.map(n => [n.path, n.current?.sha256]));
+    const isCopy = (from: string, to: string) => image(from) && image(to) && !!shaOf.get(to) && shaOf.get(from) === shaOf.get(to);
     for (const e of record.lineage.edges) {
       if (e.confidence === "declared") continue;
       const from = fileNode(e.from), to = fileNode(e.to);
-      if (from && to) link(from, to, image(e.to) && script(e.from) ? "drew" : "used", e.confidence === "observed" ? "observed" : "inferred");
+      const kind = isCopy(e.from, e.to) ? "copied" : image(e.to) && script(e.from) ? "drew" : "used";
+      if (from && to) link(from, to, kind, e.confidence === "observed" ? "observed" : "inferred");
     }
     for (const n of record.lineage.nodes) {
       if (!image(n.path) || !n.stepId) continue;
       const step = record.lineage.steps[n.stepId];
-      if (!step || step.role === "user" || record.lineage.edges.some(e => e.to === n.path && script(e.from))) continue;
+      if (!step || step.role === "user" || record.lineage.edges.some(e => e.to === n.path && (script(e.from) || isCopy(e.from, e.to)))) continue;
       const chat = chatNode(step.sessionId, new Date(step.timestamp).toISOString()), figure = fileNode(n.path);
       if (chat && figure) link(chat, figure, "drew");
     }

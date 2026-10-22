@@ -17,10 +17,11 @@ export const CONNECTION_NODE_KINDS: readonly ConnectionNodeKind[] = ["paper", "n
  * - `contains`: note → figure (the note shows the figure).
  * - `drew`: file (script) → figure, or chat → figure when no script was recorded.
  * - `used`: file (data) → figure or file → file (a recorded input of the step that wrote it).
+ * - `copied`: figure → figure (an identical copy, e.g. a result figure copied into a note).
  * - `started-from`: workflow → chat (the chat was started from the Workflow).
  * - `made-from`: paper → workflow (the Workflow was authored from the paper).
  */
-export type ConnectionEdgeKind = "cites" | "wrote" | "contains" | "drew" | "used" | "started-from" | "made-from";
+export type ConnectionEdgeKind = "cites" | "wrote" | "contains" | "drew" | "used" | "copied" | "started-from" | "made-from";
 
 /** Focus id forms: `paper:<libraryItemId>`, `note:<noteId>`, `figure:<path>`, `file:<path>`, `chat:<sessionId>`, `workflow:<methodId>`. */
 export type ConnectionFocus = `${ConnectionNodeKind}:${string}`;
