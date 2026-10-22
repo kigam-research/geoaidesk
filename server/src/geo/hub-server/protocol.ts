@@ -161,3 +161,21 @@ export interface LibraryPushResponse {
   /** Refused because `baseVersion` is stale; the client pulls and retries. A pushed item must name only stored files. */
   conflicts: { kind: LibraryObjectKind; id: string; version: number; reason: "stale" | "missing-file" }[];
 }
+
+// --- Information feeds (gaid-hub-feeds, web/src/geo/contracts/hub-feeds.ts) ------------------------------------------
+//   GET    /feeds?category=&field=&q=&limit=   → FeedListResponse (`connected: true`; approved sources only)
+//   GET    /admin/feeds/sources                → FeedSourcesResponse (shipped proposals + additions, every state) [admin]
+//   POST   /admin/feeds/sources                FeedSourceAddBody → 201 { source: FeedSource } (approved)      [admin]
+//   PATCH  /admin/feeds/sources/:id            FeedSourceDecision → { source: FeedSource }                     [admin]
+//   DELETE /admin/feeds/sources/:id            → 204; administrator additions only (shipped ones: 409)          [admin]
+//   POST   /admin/feeds/fetch                  FeedFetchBody → FeedFetchResponse (collects now)                [admin]
+// `serve` collects every approved source every FEED_LIMITS.intervalHours (GAID_HUB_FEEDS_INTERVAL_HOURS, 0 = off).
+export type {
+  FeedFetchBody,
+  FeedFetchResponse,
+  FeedListResponse,
+  FeedSource,
+  FeedSourceAddBody,
+  FeedSourceDecision,
+  FeedSourcesResponse,
+} from "../../../../web/src/geo/contracts/hub-feeds.ts";
