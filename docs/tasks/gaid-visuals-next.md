@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:07:23Z
+updated: 2026-10-22T09:07:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8bae3bd9-1847-436d-918d-15c77aff84a1","pid":1865557,"provider":"claude","session":"04b52e98-aed3-4749-b725-5863794d4095","start":"54718151","token":"c1146656906ed1e52af0dcf6a76b7d8f0f6adc197b1e4b98254b697d47eb5959"}
 branch: task/gaid-visuals-next
 target: main
@@ -57,9 +57,11 @@ Child A: gaid-visuals-next--journals (writer 296db605), running; reported AGU/EE
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
-## Open items
 Closes: gaid-research-visuals#2
 Closes: gaid-research-visuals#3
+- No catalogue release: gaid-figures is a shipped skill; unedited project copies follow the new hash.
+- Library map open actions: paper → library detail; note/figure/file/chat → "프로젝트 열기" (no cross-project note deep link).
+## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
