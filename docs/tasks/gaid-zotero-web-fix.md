@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:00:04Z
+updated: 2026-10-22T07:19:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bee7d319-703a-4565-a0c9-1d69e94cd031","pid":3762934,"provider":"claude","session":"870398d4-3eab-430b-ae47-a9f6c6604ea1","start":"53200219","token":"cb3fe81ab18b49eee1407e968dd49a72031d140445992e9a34169e97d8776bc3"}
 branch: task/gaid-zotero-web-fix
 target: main
@@ -65,11 +65,10 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: n
   Added: state `certificate-untrusted`, empty-web-library note, "Zotero 연결 해제" (POST /geo/library/zotero/disconnect;
   forgets the web key, mirrored papers stay) so a researcher can switch to the PC connection.
 ## Next steps
-1. After the user's PC-connection check (disconnect web key → connect PC Zotero in the test app): update report §3/§5,
-   stop the test app, run scripts/check (it reinstalls node_modules, so not while the app runs), humanizer on the
-   report, review-copy, task finish.
-Blocked: waiting for the user's PC-connection check in the test app (http://localhost:3360/#library).
-Done: screenshots (8 + 2 in ~/data/geoaidesk/work/gaid-zotero-web-fix/shots/), user web-key test, report draft.
+1. task finish (all checks done).
+- User PC-connection check passed (2026-10-22): web key disconnected, PC Zotero connected, 1 Zotero paper mirrored
+  (backend :18360 state local ok). Test app stopped. scripts/check passed (exit 0; log
+  ~/data/geoaidesk/work/gaid-zotero-web-fix/check.log). Report humanized.
 ## Failed approaches
 ## Notes and decisions
 - Plan (all done by the top writer; small and tightly coupled, no children):
@@ -88,6 +87,7 @@ Done: screenshots (8 + 2 in ~/data/geoaidesk/work/gaid-zotero-web-fix/shots/), u
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [확인] 웹 키로 논문 갱신과 Zotero로 보내기를 실제 논문이 있는 웹 서재로 시험 — 막힌 일: 사용자 웹 서재가 비어 있음(Zotero 앱이 KIGAM 인증서를 신뢰하지 않아 zotero.org와 동기화하지 못함) — 조건: Zotero 앱에 KIGAM 인증서를 등록해 동기화하거나 논문이 있는 다른 웹 서재 — 근거: reports/2026-10-22-gaid-zotero-web-fix/index.md#5-한계
 ## Report
 Report: reports/2026-10-22-gaid-zotero-web-fix/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
