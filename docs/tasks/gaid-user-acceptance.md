@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:20:07Z
+updated: 2026-10-22T09:56:33Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -71,6 +71,21 @@ Outside check: no outside check.
   (sha256 72a5d5e2…67a): connection GAID_ROUTE_OK 10.3 s; task passed in 999 s, 60 turns / 61 tool calls, artifacts present,
   ledger payg $0.274 (92.3k in, 24.7k out, 3.61M cache-read tokens), context peak 9% of 1M; project api-80e71c. Two
   recovered edit mismatches; it also read gaid-figures SKILL.md. Claude sign-in: not connected, optional, not run.
+- Tester finished (A done, B done, C blocked by key, D done). Evidence ~/data/geoaidesk/work/gaid-user-acceptance/tester/
+  (notes.md, citation-table.md 46 rows, screens 01–44). Projects: proj-ca300f 문헌 근거, proj-bc576f 그림, proj-a3e5fb 모델 경로;
+  library folder lc-bdc922024384 "수용 시험 - 공간 검증" with meyer2020/ploton2020/valavi2018 (stored files = materials sha).
+- Check 2 verified by me: session read gaid-figures SKILL.md, journals.json, references/checker.md; fetched Elsevier official
+  pages; wrote its own profile `computers-geosciences` (90 mm, 7 pt, lineArt 1000 dpi; adds png to raster formats, which the
+  captured formats page does not list); ran check_figure.py on svg/pdf/png/tiff. My rerun (bundled `elsevier` profile and the
+  agent's profile; outputs verify/figure/): no fail; warn = ai-policy, cvd (png/tiff), and png format under the bundled profile.
+  PDF page 255.1×453.5 pt = 90×160 mm, DejaVuSans embedded. RDEP 450–1000 m smooth curve = linear ramp in the source LAS
+  (step ≤0.0004, 2nd diff ≤2.4e-7), plotted faithfully, not flagged in the figure.
+- Citation verification reader f66405e9-854c-4930-a0ef-1562b41a3592 (general work) running; output verify/citation-verification.md.
+- Findings for the report (from tester, not yet fix work): new chat defaults to GPT-6 Astra "연결 안 됨" although ChatGPT
+  sign-in works; duplicate "GPT-6.1 Sol" under ChatGPT subscription and Codex (legacy); Meyer arXiv metadata suggestions
+  unrelated; library says "본문 N쪽 모두 읽음" (= text extracted) right after import; all notes "형식 확인 필요"; streamed note
+  link "[blocked]" (Blocked URL: undefined), report-relative links in B "[blocked]"; Japanese progress cards; wide tables need
+  horizontal scroll; PDF opens in browser viewer tab; A used 0.9–2.0M tokens per question (subscription).
 ## Next steps
 1. On job exits: read out/record.json of both runs; on tester finish: verify every claim (cited pages via pdftotext, figure check
    rerun, Zotero state via GET /geo/library/zotero); if the key is renewed, tell the tester to repeat goal C.
