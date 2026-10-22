@@ -101,7 +101,9 @@ describe("task catalogue and setup", () => {
   });
   it("asks one question per step, keeps answers after close/reopen, hands off answers, files, skill and exposure, then clears", async () => {
     catalogue(); let dialog = await openSetup();
-    expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument(); expect(within(dialog).queryByText("심도 기준")).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument();
+    // The step scale names every step (UI guide v2 Q4); the next question itself is not asked yet.
+    expect(within(dialog).queryByRole("heading", { name: "심도 기준" })).not.toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole("button", { name: "다음 단계" }));
     expect(within(dialog).getByRole("heading", { name: "심도 기준" })).toBeInTheDocument(); expect(within(dialog).getByText("심도 기준을 유지합니다.")).toBeInTheDocument();
     // Known catalogue option ids get a readable label; nothing is preselected without a source (UI guide Q2).

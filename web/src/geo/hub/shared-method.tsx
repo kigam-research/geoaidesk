@@ -4,7 +4,7 @@
  * star and "use in my research"; the method at a glance (input → steps → result); the summary as points; the steps;
  * the limits; comments (GitHub-like feedback). The registration preview shows the same page with a sticky bar.
  */
-import { DownloadIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, SparklesIcon, StarIcon } from "lucide-react";
+import { DownloadIcon, EyeIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, StarIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -66,14 +66,12 @@ function jumpTo(id: string) {
 
 /** Initial-letter avatar for a researcher's display name. */
 export function Avatar({ name, className }: { name: string; className?: string }) {
-  const palette = ["bg-sky-600", "bg-emerald-600", "bg-violet-600", "bg-amber-600", "bg-rose-600", "bg-teal-600"];
-  const hue = [...name].reduce((sum, ch) => sum + ch.codePointAt(0)!, 0) % palette.length;
+  // One neutral plate for every name (UI guide v2 S2): colour is not decoration.
   return (
     <span
       aria-hidden
       className={cn(
-        "inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white",
-        palette[hue],
+        "inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-gaid-edge bg-gaid-face-2 text-xs font-semibold text-gaid-ink-2",
         className,
       )}
     >
@@ -111,8 +109,8 @@ export function SharedMethod({
   return (
     <div className={cn("mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-10", !preview && "pt-6")}>
       {preview && (
-        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b bg-muted/95 px-6 py-3 text-sm backdrop-blur">
-          <SparklesIcon className="size-4 text-primary" aria-hidden />
+        <div className="sticky -top-5 z-10 -mx-6 -mt-5 flex flex-wrap items-center gap-3 border-b border-gaid-frame bg-gaid-chrome px-6 py-3 text-sm">
+          <EyeIcon className="size-4 text-gaid-signal-ink" aria-hidden />
           <span className="min-w-0 flex-1 font-medium">{text("register.previewBanner")}</span>
           <Button variant="outline" size="sm" onClick={preview.onBack}>
             {text("register.backToDraft")}

@@ -19,6 +19,7 @@
     "boundary": "해석 한계: {boundary}",
     "empty": "등록된 Geo 작업이 없습니다.",
     "category": "기본 Workflow",
+    "categoryAllUntested": "기본 Workflow · 모두 미시험",
     "search": "Workflow 검색",
     "showOther": "일반 Workflow {count}개 보기",
     "hideOther": "일반 Workflow 접기"

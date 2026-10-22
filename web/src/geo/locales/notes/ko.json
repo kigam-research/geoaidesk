@@ -96,6 +96,15 @@
       "instruction": "결정 {number}(별도 지시): {instruction}",
       "open": "결정 {numbers}에는 아직 답하지 않았습니다. 그대로 두세요.",
       "tail": "답에 맞게 작업을 이어 가고 노트를 고쳐 주세요."
+    },
+    "steps": "결정할 일 단계",
+    "step": "결정 {number}",
+    "counter": "{current} / {count}",
+    "prev": {
+      "button": "이전 결정"
+    },
+    "next": {
+      "button": "다음 결정"
     }
   }
 }

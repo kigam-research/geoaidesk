@@ -64,7 +64,7 @@ export function FlowDiagram({
               aria-pressed={selected === node.id}
               className={cn(
                 "flex h-full w-full flex-col gap-1.5 rounded-xl border bg-card p-3 text-left transition-colors hover:border-primary/60",
-                gate && "border-amber-300 bg-amber-50/60 dark:border-amber-700 dark:bg-amber-950/30",
+                gate && "border-gaid-warning/50 bg-gaid-warning-tint/50",
                 selected === node.id && "border-primary ring-2 ring-primary/20",
               )}
             >
@@ -79,7 +79,7 @@ export function FlowDiagram({
                 {localText(node.summary)}
               </span>
               {gate && (
-                <span className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+                <span className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-gaid-warning">
                   <UserRoundCheckIcon className="size-3.5" aria-hidden />
                   {text("draft.you")}
                 </span>

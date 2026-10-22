@@ -30,11 +30,34 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* GAID brand face: the logo lettering is outlined Pretendard (geo/brand/licenses), so the UI uses the same family
+   (UI guide v2, I3). Self-hosted, OFL licence in web/public/fonts/PRETENDARD-LICENSE.txt. */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations"), url("/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Type scale aligned with UI guide v2 T1: caption 13, body 15, subtitle 17, title 20, page title 26. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 2.125rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -64,99 +87,189 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* GAID roles (UI guide v2 S1) as Tailwind colours: bg-gaid-chrome, text-gaid-ink-2, border-gaid-frame, … */
+  --color-gaid-face: var(--gaid-face);
+  --color-gaid-face-2: var(--gaid-face-2);
+  --color-gaid-chrome: var(--gaid-chrome);
+  --color-gaid-edge: var(--gaid-edge);
+  --color-gaid-frame: var(--gaid-frame);
+  --color-gaid-control-edge: var(--gaid-control-edge);
+  --color-gaid-ink: var(--gaid-ink);
+  --color-gaid-ink-2: var(--gaid-ink-2);
+  --color-gaid-ink-3: var(--gaid-ink-3);
+  --color-gaid-signal: var(--gaid-signal);
+  --color-gaid-signal-ink: var(--gaid-signal-ink);
+  --color-gaid-signal-tint: var(--gaid-signal-tint);
+  --color-gaid-hover: var(--gaid-hover);
+  --color-gaid-success: var(--gaid-success);
+  --color-gaid-success-tint: var(--gaid-success-tint);
+  --color-gaid-warning: var(--gaid-warning);
+  --color-gaid-warning-tint: var(--gaid-warning-tint);
+  --color-gaid-danger: var(--gaid-danger);
+  --color-gaid-danger-tint: var(--gaid-danger-tint);
+  --color-gaid-untested: var(--gaid-untested);
+  --color-gaid-nodata: var(--gaid-nodata);
+  --color-gaid-brand-hover: var(--gaid-brand-hover);
+  --radius-sm: max(0px, calc(var(--radius) - 4px));
+  --radius-md: max(0px, calc(var(--radius) - 2px));
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3);
 }
 
+/* UI guide v2, identity 계측 (Instrument), the default style: a cool aluminium functional layer (chrome) around white
+   content faces, graphite ink, the logo blue as the one signal, 45° chamfered corners from the octagonal G. */
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #1f5eff;
-  --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #0a0a0a;
-  --muted: #f8fafc;
-  --muted-foreground: #71717a;
-  --accent: #eef3ff;
-  --accent-foreground: #3f3f46;
-  --destructive: #b91c1c;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #1f5eff;
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #3f3f46;
-  --sidebar-primary: #1f5eff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef3ff;
-  --sidebar-accent-foreground: #0a0a0a;
-  --sidebar-border: #e4e4e7;
-  --sidebar-ring: #1f5eff;
-  --radius: 10px;
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  --font-mono: D2Coding, "Nanum Gothic Coding", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --gaid-ink: #0a0a0a;
-  --gaid-body: #3f3f46;
-  --gaid-muted: #71717a;
-  --gaid-subtle-alt: #f6f7f9;
+  --gaid-face: #ffffff;
+  --gaid-face-2: #f6f7f9;
+  --gaid-chrome: #f1f3f6;
+  --gaid-edge: #dce0e6;
+  --gaid-frame: #dce0e6;
+  --gaid-control-edge: #878f9d;
+  --gaid-ink: #171b23;
+  --gaid-ink-2: #525a68;
+  --gaid-ink-3: #646c7a;
+  --gaid-signal: #1f5eff;
+  --gaid-signal-ink: #1d4fd8;
+  --gaid-signal-tint: #e8eeff;
+  --gaid-hover: #e9ecf1;
   --gaid-brand-hover: #1749cc;
-  --gaid-success: #15803d;
-  --gaid-warning: #a16207;
-  --gaid-danger: #b91c1c;
-  --gaid-untested: #71717a;
-  --gaid-nodata: #a1a1aa;
-  --gaid-body-size: 14px;
+  --gaid-brand-on-dark: #4d7fff;
+  --gaid-success: #1e7a46;
+  --gaid-success-tint: #e3f3e9;
+  --gaid-warning: #8a5300;
+  --gaid-warning-tint: #fff2d9;
+  --gaid-danger: #c2261d;
+  --gaid-danger-tint: #fde9e7;
+  --gaid-untested: #646c7a;
+  --gaid-nodata: #8e96a4;
+  --gaid-scale-tick: #9aa1ad;
+  --gaid-corner: bevel;
+  --gaid-shadow-overlay: 0 14px 34px -10px rgb(16 24 40 / 0.26), 0 2px 6px rgb(16 24 40 / 0.08);
+
+  --background: var(--gaid-face);
+  --foreground: var(--gaid-ink);
+  --card: var(--gaid-face);
+  --card-foreground: var(--gaid-ink);
+  --popover: var(--gaid-face);
+  --popover-foreground: var(--gaid-ink);
+  --primary: var(--gaid-signal);
+  --primary-foreground: #ffffff;
+  --secondary: var(--gaid-face-2);
+  --secondary-foreground: var(--gaid-ink);
+  --muted: var(--gaid-face-2);
+  --muted-foreground: var(--gaid-ink-2);
+  --accent: var(--gaid-hover);
+  --accent-foreground: var(--gaid-ink);
+  --destructive: var(--gaid-danger);
+  --border: var(--gaid-edge);
+  --input: var(--gaid-control-edge);
+  --ring: var(--gaid-signal);
+  --sidebar: var(--gaid-chrome);
+  --sidebar-foreground: var(--gaid-ink);
+  --sidebar-primary: var(--gaid-signal);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e4e8ee;
+  --sidebar-accent-foreground: var(--gaid-ink);
+  --sidebar-border: var(--gaid-edge);
+  --sidebar-ring: var(--gaid-signal);
+  --chart-1: #1f5eff;
+  --chart-2: #1e7a46;
+  --chart-3: #b26b00;
+  --chart-4: #7a4bd1;
+  --chart-5: #c2261d;
+  --radius: 8px;
+  --gaid-body-size: 15px;
   --gaid-h1-size: 20px;
-  --gaid-h2-size: 16px;
-  --gaid-heading-weight: 600;
+  --gaid-h2-size: 17px;
+  --gaid-heading-weight: 650;
   --gaid-button-radius: var(--radius-md);
   --gaid-button-height: 32px;
   --gaid-button-height-secondary: 32px;
-  --gaid-motion-fast: 150ms;
+  --gaid-motion-fast: 120ms;
   --gaid-motion-base: 200ms;
-  --gaid-easing: cubic-bezier(0.2, 0, 0, 1);
+  --gaid-easing: cubic-bezier(0.22, 0.25, 0, 1);
+  color-scheme: light;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --gaid-face: #16191f;
+  --gaid-face-2: #1b1f26;
+  --gaid-chrome: #20242c;
+  --gaid-edge: #2e333c;
+  --gaid-frame: #2e333c;
+  --gaid-control-edge: #6b7382;
+  --gaid-ink: #e7e9ee;
+  --gaid-ink-2: #b3b9c4;
+  --gaid-ink-3: #98a0ad;
+  --gaid-signal: #3366e8;
+  --gaid-signal-ink: #7fa2ff;
+  --gaid-signal-tint: #1e2b4d;
+  --gaid-hover: #262b34;
+  --gaid-brand-hover: #2b5ad6;
+  --gaid-success: #4cc38a;
+  --gaid-success-tint: #12301f;
+  --gaid-warning: #f0b44c;
+  --gaid-warning-tint: #3a2c12;
+  --gaid-danger: #ff7a6e;
+  --gaid-danger-tint: #3b1715;
+  --gaid-untested: #98a0ad;
+  --gaid-nodata: #6b7382;
+  --gaid-scale-tick: #6b7382;
+  --gaid-shadow-overlay: 0 18px 44px -10px rgb(0 0 0 / 0.7), 0 0 0 1px #2e333c;
+
+  --popover: #1e2229;
+  --primary-foreground: #ffffff;
+  --sidebar-accent: #2a2f38;
+  --chart-1: #7fa2ff;
+  --chart-2: #4cc38a;
+  --chart-3: #f0b44c;
+  --chart-4: #b79cff;
+  --chart-5: #ff7a6e;
+  color-scheme: dark;
+}
+
+/* UI guide v2, identity 도폭 (Map sheet), the alternate style a researcher may choose in Settings → 화면 표시:
+   one paper ground, panes framed by ink neat lines, square cut corners. Set by <html data-style="mapsheet">. */
+:root[data-style="mapsheet"] {
+  --gaid-face: #ffffff;
+  --gaid-face-2: #f5f6f7;
+  --gaid-chrome: #ffffff;
+  --gaid-edge: #d6d9de;
+  --gaid-frame: #15171a;
+  --gaid-control-edge: #6e737b;
+  --gaid-ink: #15171a;
+  --gaid-ink-2: #4b5058;
+  --gaid-ink-3: #62676f;
+  --gaid-signal-tint: #eaf0ff;
+  --gaid-hover: #eef0f2;
+  --gaid-corner: round;
+  --gaid-shadow-overlay: 0 0 0 1px #15171a, 0 12px 28px -10px rgb(21 23 26 / 0.3);
+  --sidebar-accent: #eef0f2;
+  --radius: 0px;
+}
+:root[data-style="mapsheet"].dark {
+  --gaid-face: #0f1113;
+  --gaid-face-2: #16191c;
+  --gaid-chrome: #0f1113;
+  --gaid-edge: #2a2e33;
+  --gaid-frame: #d9dce0;
+  --gaid-control-edge: #8a9099;
+  --gaid-ink: #ecedef;
+  --gaid-ink-2: #a3a8b0;
+  --gaid-ink-3: #8d939c;
+  --gaid-signal-tint: #1b2747;
+  --gaid-hover: #1d2024;
+  --gaid-shadow-overlay: 0 0 0 1px #d9dce0, 0 16px 40px -10px rgb(0 0 0 / 0.8);
+  --popover: #16191c;
+  --sidebar-accent: #1d2024;
+}
+
+/* Increased contrast (UI guide v2 S9). */
+@media (prefers-contrast: more) {
+  :root { --gaid-edge: var(--gaid-control-edge); --gaid-ink-2: var(--gaid-ink); --muted-foreground: var(--gaid-ink); }
 }
 
 @layer base {
@@ -192,11 +305,91 @@
   }
 }
 
-/* WP00 approved Korean-first UI tokens; dark overrides above remain in force. */
+
+/* Korean-first body text (UI guide v2 T1, T3). */
 body {
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-family: var(--font-sans);
   font-size: var(--gaid-body-size);
+  line-height: 1.6;
   word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
 }
 pre, code, kbd { word-break: normal; overflow-wrap: anywhere; }
 table, .gaid-numeric { font-variant-numeric: tabular-nums; }
+/* T1: nothing below 12 px, also in upstream components that set 10–11 px. */
+[class~="text-[10px]"], [class~="text-[11px]"], [class~="text-[10.5px]"], [class~="text-[11.5px]"] { font-size: 12px !important; }
+
+/* Identity corners (UI guide v2 section 2): 계측 chamfers every rounded box (the octagonal G); round elements stay round. */
+[class*="rounded-"]:not([class*="rounded-full"]):not([class*="rounded-none"]) { corner-shape: var(--gaid-corner); }
+
+/* Browser surfaces carry the design (S8). */
+::selection { background: var(--gaid-signal-tint); color: var(--gaid-ink); }
+* { scrollbar-width: thin; scrollbar-color: var(--gaid-ink-3) transparent; }
+a { text-underline-offset: 3px; }
+::placeholder { color: var(--gaid-ink-3); opacity: 1; }
+
+/* The orbit (I4): the AI agent is working. The only looping animation in GAID. */
+.gaid-orbit { position: relative; display: inline-block; width: 18px; height: 18px; flex: none; }
+.gaid-orbit::before {
+  content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 10px; border: 1.5px solid var(--gaid-signal);
+  border-radius: 50%; transform: rotate(-24deg); opacity: 0.55;
+}
+.gaid-orbit::after {
+  content: ""; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--gaid-signal);
+  offset-path: path("M 1 12 A 8 4.4 -24 1 1 17 6 A 8 4.4 -24 1 1 1 12"); offset-rotate: 0deg; offset-distance: 28%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gaid-orbit::after { animation: gaid-orbit 1.6s linear infinite; }
+}
+@keyframes gaid-orbit { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+
+/* The index mark (계측): a dial pointer at the pane edge points at the current item. Hidden in 도폭, which frames the
+   current item in ink instead. Components add .gaid-index to the selected row (position: relative). */
+.gaid-index::before {
+  content: ""; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 6px solid var(--gaid-signal);
+}
+:root[data-style="mapsheet"] .gaid-index::before { display: none; }
+:root[data-style="mapsheet"] .gaid-index { box-shadow: inset 0 0 0 1px var(--gaid-frame); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Segmented controls (place switch, view switches): 도폭 draws the selected segment in ink (UI guide v2 section 2). */
+:root[data-style="mapsheet"] .gaid-seg { border-color: var(--gaid-frame); background: var(--gaid-face); }
+:root[data-style="mapsheet"] .gaid-seg > [aria-current="page"],
+:root[data-style="mapsheet"] .gaid-seg > [aria-pressed="true"],
+:root[data-style="mapsheet"] .gaid-seg > [aria-selected="true"],
+:root[data-style="mapsheet"] .gaid-seg > [data-state="active"] { background: var(--gaid-ink); color: var(--gaid-face); box-shadow: none; }
+
+/* Step scale (UI guide v2 Q4; web/src/geo/shell/step-scale.tsx). 계측: a graduated scale, filled up to the current step,
+   a pointer above it. 도폭: a cartographic scale bar. */
+.gaid-step-track { position: relative; display: block; height: 12px; border-bottom: 1px solid var(--gaid-scale-tick); }
+.gaid-step-ticks {
+  position: absolute; inset: 0 0 0 14px; background-color: var(--gaid-scale-tick);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Crect x='0' y='7' width='1' height='5'/%3E%3C/svg%3E") repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='12'%3E%3Crect x='0' y='7' width='1' height='5'/%3E%3C/svg%3E") repeat-x;
+}
+.gaid-step-track::before { content: ""; position: absolute; left: 0; bottom: -1px; width: 1.5px; height: 13px; background: var(--gaid-ink-2); }
+.gaid-step[data-state="done"] .gaid-step-track { border-bottom: 2px solid var(--gaid-signal); }
+.gaid-step[data-state="done"] .gaid-step-track::before,
+.gaid-step[data-state="current"] .gaid-step-track::before { background: var(--gaid-signal); }
+.gaid-step[data-state="current"] .gaid-step-track::after {
+  content: ""; position: absolute; left: -4.25px; top: -9px;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--gaid-signal);
+}
+.gaid-step:last-child .gaid-step-track { border-bottom-color: transparent; }
+.gaid-step:last-child .gaid-step-ticks { display: none; }
+.gaid-steps { padding-top: 10px; }
+.gaid-step-label { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 13px; line-height: 18px; color: var(--gaid-ink-2); min-width: 0; }
+.gaid-step[data-state="current"] .gaid-step-label { color: var(--gaid-ink); font-weight: 600; }
+
+:root[data-style="mapsheet"] .gaid-steps { padding-top: 0; }
+:root[data-style="mapsheet"] .gaid-step-track { height: 8px; border: 1px solid var(--gaid-frame); border-right-width: 0; background: var(--gaid-face); }
+:root[data-style="mapsheet"] .gaid-step:last-child .gaid-step-track { border-right-width: 1px; border-bottom-color: var(--gaid-frame); }
+:root[data-style="mapsheet"] .gaid-step[data-state="done"] .gaid-step-track { background: var(--gaid-frame); }
+:root[data-style="mapsheet"] .gaid-step[data-state="current"] .gaid-step-track { background: var(--gaid-signal); }
+:root[data-style="mapsheet"] .gaid-step-ticks,
+:root[data-style="mapsheet"] .gaid-step-track::before,
+:root[data-style="mapsheet"] .gaid-step-track::after { display: none; }
