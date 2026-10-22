@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T09:18:00Z
+status: ready
+updated: 2026-10-22T09:18:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ea29dd8e-e163-4285-9af2-1aac21c96dfa","pid":1968478,"provider":"codex","session":"01a162d8-d0bb-7e81-b02f-224c6e0dcbbf","start":"54767775","token":"4d7a2652360ec828d71dd5cc78a2e5098093c044936d8b4a229d502998c372fe"}
 branch: task/gaid-hub-server-trial--skills-server
 target: task/gaid-hub-server-trial
@@ -82,7 +82,7 @@ message the parent (task CLI / your task document) instead of changing it.
 - First `task finish` synced parent changes and ran full scripts/check: backend TypeScript passed; backend tests had 2200 passed, 8 skipped and one parent e2e failure (custom install agent dir versus default annotation store). Parent fixed the fixture at ae5118cf and reported 14 related tests passed; retrying finish to integrate that fix and recheck.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T09:11:08Z: ready; the parent gaid-hub-server-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T09:18:02Z: ready; the parent gaid-hub-server-trial integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First finish full check stopped at geo-hub-skills-e2e.test.ts:138. Read-only diagnosis found the test injected a custom package store but installedHubSkill used the production default. Parent agreed and corrected its test at ae5118cf; no server-store changes were needed.
