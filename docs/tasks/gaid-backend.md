@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:27:46Z
+updated: 2026-10-22T06:55:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -46,6 +46,11 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
 - Contracts: `web/src/geo/contracts/hub-server.ts` (local GAID routes for the UI), `server/src/geo/hub-server/protocol.ts`
   (`/hub/v1` wire), hub-shared.ts gains `authorId`, `registeredById`, comment `authorId`, `mine`, `HubMe`.
 - Dependencies installed in the worktree (server, web `npm ci`).
+- Integrated 2026-10-22: P2 hub-client (closed), P1 hub-server (closed; its interim check job disposed as cancelled,
+  test assumed a .git cwd), P3 hub-ui (merge conflict in geo/integration-boundaries.json resolved keeping both entries;
+  duplicate owner line in geo/tests/distribution.test.mjs removed, 7/7 pass). E2E `server/test/geo-hub-e2e.test.ts`
+  passes against a real HTTP hub server: two accounts share/star/comment/copy/install; A's library (item, folder, PDF)
+  syncs to A's second PC, a two-sided edit keeps the newer and stores a conflict copy, B sees nothing of A's library.
 - Children started 2026-10-22: gaid-backend--hub-server (P1), gaid-backend--hub-client (P2), gaid-backend--hub-ui (P3),
   all "general work"; prompts in `~/data/geoaidesk/work/gaid-backend/prompts/child{1,2,3}.md`.
 - LAN check 2026-10-22: PC70 (10.13.15.70, Node v22.22.1) reached a test HTTP listener on PC74 10.13.15.74:8700
@@ -57,8 +62,6 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
    `~/data/geoaidesk/work/gaid-backend/hub-home`, a GAID on PC74 and one on PC70 if PC70 reaches PC74 on the LAN.
 3. Import the 5 review-instance entries into a test hub home (read-only source `~/.geoaidesk`), report §3 results,
    screenshots, `scripts/check`, `task finish`.
-Blocked: waiting for the three child units' `task finish` (each runs scripts/check); e2e test drafted, parked at
-~/data/geoaidesk/work/gaid-backend/geo-hub-e2e.test.ts until P1 is integrated (it imports P1 modules).
 ## Failed approaches
 - 2026-10-22: committing the e2e test before P1 was integrated broke `task complete gaid-backend--hub-client`'s check
   (missing module); parked the test outside the repo.
