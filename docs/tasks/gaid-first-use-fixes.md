@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T13:04:53Z
+status: done
+updated: 2026-10-22T13:04:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c7c994c8-9104-4a2d-91ca-02598ddfa51c","pid":3710652,"provider":"claude","session":"71412738-bdac-483a-bb75-b3200c12f5e4","start":"55874657","token":"7300838461defcef07e6e5adf36f6fd631e6d0e4dc5860a2c9bdad6b1f73a570"}
 branch: task/gaid-first-use-fixes
 target: main
@@ -68,7 +68,7 @@ Overlap: gaid-orcid edits `MetadataOrigin` in `web/src/geo/contracts/library.ts`
 is adjacent to its `filter.mine`); resolve at merge.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T12:58:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-first-use-fixes.md.
+Closed 2026-10-22T13:04:54Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-first-use-fixes.md.
 
 ## Failed approaches
 - Table cells with `overflow-wrap:anywhere` fit 6 columns at the default chat width but split names ("Pebes ma");
