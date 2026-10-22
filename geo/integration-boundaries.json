@@ -925,6 +925,12 @@
       "owner": "gaid-backend",
       "status": "edited",
       "responsibility": "Register the gaid-backend owner for the standalone hub integration seams without relaxing ownership validation"
+    },
+    {
+      "path": "web/src/components/settings/services-panel.tsx",
+      "owner": "gaid-backend",
+      "status": "edited",
+      "responsibility": "Mount the institute hub connection/account Settings card; all hub UI stays in web/src/geo/hub-server/"
     }
   ],
   "notTouched": [
