@@ -26,6 +26,7 @@ import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
+import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 
 import { fileBase64, hubApi, newOpId } from "./api";
 import { DraftStep, TrialCard } from "./draft-step";
@@ -212,6 +213,11 @@ function useHubIndex(listShown: boolean): HubIndex {
     if (e.status === "fulfilled") setEntries(e.value.entries);
     if (r.status === "fulfilled") setCards(r.value.cards);
   }, []);
+  useEffect(() => {
+    const changed = () => void reloadShared();
+    window.addEventListener(HUB_CONNECTION_CHANGED, changed);
+    return () => window.removeEventListener(HUB_CONNECTION_CHANGED, changed);
+  }, [reloadShared]);
   useEffect(() => {
     let live = true;
     const load = () =>

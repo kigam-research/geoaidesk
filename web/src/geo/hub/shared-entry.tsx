@@ -126,6 +126,9 @@ export function SharedEntryScreen({
   }, [entryId]);
   useEffect(() => {
     void load();
+    const changed = () => void load();
+    window.addEventListener(HUB_CONNECTION_CHANGED, changed);
+    return () => window.removeEventListener(HUB_CONNECTION_CHANGED, changed);
   }, [load]);
 
   if (!detail)

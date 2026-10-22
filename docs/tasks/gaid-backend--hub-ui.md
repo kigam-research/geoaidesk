@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:14:37Z
+updated: 2026-10-22T06:16:12Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -71,6 +71,7 @@ Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel
 ## Next steps
 1. Finish mocked interaction tests, run TypeScript and web tests, capture both styles/themes/sizes, then finish.
 ## Failed approaches
+- Job job-geoaidesk-gaid-backend--hub-ui-1 exited 127: immutable job source has no node_modules (vitest not found). Fix the job environment by including npm ci before tests; no source workaround.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
@@ -84,6 +85,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-backend--hub-ui-20261022T061449.842101Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
