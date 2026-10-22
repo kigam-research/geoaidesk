@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:07:18Z
+updated: 2026-10-22T09:10:19Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -42,8 +42,18 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
   seongin@kigam.re.kr). Import waits for the admin account to exist (the user accepts the invite in a GAID).
 - Item 2 interface settled: `server/src/geo/hub-skills/records.ts` (`HubSkillRecordStore`), wire section in
   `server/src/geo/hub-server/protocol.ts`, contract fields `authorId`/`mine`/`registeredById`/review `byId` + `verified: boolean`.
+- Package A done on this branch: per-request shelf (`hub-skills/active.ts`), `RemoteHubSkillStore`, actor ids in
+  register/review/view/routes, consumers use `activeHubSkillStore()`, Settings annotation reads the remote record cache, web
+  detail uses `mine`/`verified`. Checked: server `npx tsc --noEmit`, `npx vitest run test/geo-hub-skills.test.ts
+  test/geo-hub-skill-workflows.test.ts test/geo-hub-shared.test.ts test/geo-hub-e2e.test.ts` (30/30), web `npx tsc --noEmit`,
+  `npx vitest run src/geo/hub-skills` (13/13).
+- Package C: GAID side `GAID_HUB_SERVER_CA` (`hubTransport`), test `server/test/geo-hub-client-tls.test.ts` (openssl CA, pass);
+  guide `docs/geo/hub-server-https.md` written; server flags `--tls-cert/--tls-key/--trust-proxy` still to add after B merges
+  (they touch `hub-server/index.ts`, owned by B until then).
+- New e2e `server/test/geo-hub-skills-e2e.test.ts` written; runs after B merges (assumes table `hub_skills`).
 ## Next steps
-1. Child `gaid-hub-server-trial--skills-server` (package B) builds the server side; I build package A (client) and C (HTTPS docs).
+1. Child `gaid-hub-server-trial--skills-server` (package B; Paseo agent ea29dd8e-e163-4285-9af2-1aac21c96dfa) builds the
+   server side; on its finish: `task complete gaid-hub-server-trial--skills-server`, `task sync`/merge into this branch.
 2. After the user accepts the invite: dry-run then `--apply` import from the frozen source; backup + check-backup.
 3. Integrate B, e2e test with two accounts (extend `server/test/geo-hub-e2e.test.ts`), `scripts/check`, then redeploy the
    service at the merged SHA (migration 2 applies on start) and re-run import for skills (none today).
