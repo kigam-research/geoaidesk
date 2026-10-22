@@ -55,7 +55,7 @@ The colour-vision previews implement the full-severity matrices of Machado, Oliv
 | Source | Reason | Effect |
 |---|---|---|
 | `anthropics/skills`: `docx`, `pdf`, `pptx`, `xlsx` | Their license files restrict use outside Anthropic's services and redistribution (skill_hub `docs/specs/geo-byok-plan.md` §2.6) | Not bundled and not fetched automatically (`geo/distribution.json` `catalogue.excludedSources`). A user may still install a skill manually from Settings, under that skill's own terms. The built-in Office viewers are separate code and are not affected. |
-# ORCID iD icons
+## ORCID iD icons
 
 `web/public/geo/orcid/ORCID-iD_icon_vector.svg` and
 `web/public/geo/orcid/ORCID-iD_icon_unauth_vector.svg` are official, unmodified ORCID icons, downloaded on

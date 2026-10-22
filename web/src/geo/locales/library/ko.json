@@ -106,7 +106,7 @@
     "attachTitle": "붙일 프로젝트",
     "attached": "{name}에 붙였습니다",
     "attachFailed": "프로젝트에 붙이지 못했습니다. 다시 시도하세요.",
-    "ownWork": "ORCID에서 가져온 내 논문",
+    "ownWork": "ORCID에서 선택한 내 논문",
     "orcidOrigin": "서지 정보 출처: ORCID"
   },
   "dialog": {

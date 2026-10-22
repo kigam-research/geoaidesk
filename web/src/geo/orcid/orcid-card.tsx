@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ export function OrcidCard({ status, loadError, onStatus, onChanged, onRetry, onI
   const [problem, setProblem] = useState<unknown>(null);
   const [invalid, setInvalid] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
+  const unlinkButton = useRef<HTMLButtonElement>(null);
   const profile = status?.profile;
   const run = async (work: () => Promise<OrcidStatus>) => {
     setBusy(true); setProblem(null);
@@ -41,7 +42,7 @@ export function OrcidCard({ status, loadError, onStatus, onChanged, onRetry, onI
         {profile.lastImportAt && <p className="text-xs text-gaid-ink-2">{text("card.lastImport", { when: new Date(profile.lastImportAt).toLocaleDateString(geoLocale()) })}</p>}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" disabled={busy} onClick={onImport}>{text("card.import.button")}</Button>
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => { setProblem(null); setUnlinking(true); }}>{text("card.unlink.button")}</Button>
+          <Button ref={unlinkButton} size="sm" variant="ghost" disabled={busy} onClick={() => { setProblem(null); setUnlinking(true); }}>{text("card.unlink.button")}</Button>
         </div>
       </> : <>
         <p className="text-sm text-gaid-ink-2">{text("card.hint")}</p>
@@ -61,7 +62,7 @@ export function OrcidCard({ status, loadError, onStatus, onChanged, onRetry, onI
       </>}
     {problem != null && !unlinking && <><p role="alert" className="text-sm text-gaid-warning">{text(`error.${orcidProblem(problem)}`)}</p><TechnicalDetail detail={problem instanceof Error ? problem.message : undefined} /></>}
     <Dialog open={unlinking} onOpenChange={(open) => { if (!busy) setUnlinking(open); }}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[480px]" onCloseAutoFocus={(e) => { e.preventDefault(); unlinkButton.current?.focus(); }}>
         <DialogHeader><DialogTitle>{text("unlink.title")}</DialogTitle><DialogDescription>{text("unlink.hint")}</DialogDescription></DialogHeader>
         {problem != null && <p role="alert" className="text-sm text-gaid-warning">{text(`error.${orcidProblem(problem)}`)}</p>}
         <DialogFooter><Button variant="outline" disabled={busy} onClick={() => setUnlinking(false)}>{text("cancel.button")}</Button><Button variant="outline" disabled={busy} onClick={() => void run(unlinkOrcid)}>{text("card.unlink.button")}</Button></DialogFooter>

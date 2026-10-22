@@ -106,7 +106,7 @@
     "attachTitle": "Project to attach to",
     "attached": "Attached to {name}",
     "attachFailed": "Could not attach to the project. Try again.",
-    "ownWork": "Own work imported from ORCID",
+    "ownWork": "Own work selected from ORCID",
     "orcidOrigin": "Reference details from ORCID"
   },
   "dialog": {

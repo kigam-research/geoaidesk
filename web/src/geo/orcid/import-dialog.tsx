@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TechnicalDetail } from "@/geo/hub/technical";
@@ -25,6 +25,9 @@ export function OrcidImportDialog({ open, onOpenChange, collections, onImported 
   const [problem, setProblem] = useState<unknown>(null);
   const [result, setResult] = useState<OrcidConfirmResult | null>(null);
   const [reload, setReload] = useState(0);
+  const trigger = useRef<HTMLElement | null>(null);
+  const imported = useRef(onImported);
+  useEffect(() => { imported.current = onImported; }, [onImported]);
 
   useEffect(() => {
     let live = true;
@@ -42,7 +45,7 @@ export function OrcidImportDialog({ open, onOpenChange, collections, onImported 
     setSaving(true); setProblem(null);
     try {
       setResult(await confirmOrcidWorks({ putCodes: selected, collectionId: folder || undefined }));
-      onImported();
+      imported.current();
     } catch (e) { setProblem(e); }
     finally { setSaving(false); }
   };
@@ -50,7 +53,9 @@ export function OrcidImportDialog({ open, onOpenChange, collections, onImported 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-[720px]" onInteractOutside={(e) => e.preventDefault()}>
+      <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-[720px]" onInteractOutside={(e) => e.preventDefault()}
+        onOpenAutoFocus={() => { trigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null; }}
+        onCloseAutoFocus={(e) => { e.preventDefault(); trigger.current?.focus(); }}>
         <DialogHeader>
           <DialogTitle>{text("import.title")}</DialogTitle>
           <DialogDescription>{saving ? text("import.saving") : text("import.hint")}</DialogDescription>

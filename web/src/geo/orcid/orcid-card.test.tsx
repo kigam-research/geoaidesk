@@ -1,0 +1,30 @@
+import { fireEvent, render, screen, waitFor, cleanup } from "@testing-library/react";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { OrcidCard } from "./orcid-card";
+import { linkOrcid, unlinkOrcid } from "./api";
+vi.mock("./api", async (importOriginal) => ({ ...await importOriginal<typeof import("./api")>(), linkOrcid: vi.fn(), unlinkOrcid: vi.fn() }));
+const props = { onStatus: vi.fn(), onChanged: vi.fn(), onRetry: vi.fn(), onImport: vi.fn(), loadError: false };
+beforeEach(() => { localStorage.setItem("gaid:locale", "ko"); });
+afterEach(() => { cleanup(); vi.clearAllMocks(); });
+it("validates iDs locally and normalizes a pasted record URL before linking", async () => {
+  vi.mocked(linkOrcid).mockResolvedValue({ profile: null, ownWorks: 0 });
+  render(<OrcidCard {...props} status={{ profile: null, ownWorks: 0 }} />);
+  fireEvent.change(screen.getByLabelText("ORCID iD 또는 주소"), { target: { value: "0000-0002-1825-0098" } });
+  fireEvent.click(screen.getByRole("button", { name: "iD 연결" }));
+  expect(screen.getByRole("alert")).toHaveTextContent("iD가 올바르지 않습니다");
+  expect(linkOrcid).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText("ORCID iD 또는 주소"), { target: { value: "https://orcid.org/0000-0002-1825-0097" } });
+  fireEvent.click(screen.getByRole("button", { name: "iD 연결" }));
+  await waitFor(() => expect(linkOrcid).toHaveBeenCalledWith("0000-0002-1825-0097"));
+});
+it("shows the unauthenticated iD and confirms unlinking before changing the link", async () => {
+  vi.mocked(unlinkOrcid).mockResolvedValue({ profile: null, ownWorks: 0 });
+  render(<OrcidCard {...props} status={{ profile: { schema: "gaid-orcid/v1", orcid: "0000-0002-1825-0097", authenticated: false, linkedAt: "2026-10-22", name: "Josiah Carberry" }, ownWorks: 3 }} />);
+  expect(screen.getByText("(인증 안 됨)")).toBeInTheDocument();
+  expect(screen.getByRole("link")).toHaveAttribute("href", "https://orcid.org/0000-0002-1825-0097");
+  fireEvent.click(screen.getByRole("button", { name: "연결 해제" }));
+  expect(unlinkOrcid).not.toHaveBeenCalled();
+  expect(screen.getByText(/내 논문 표시는 유지합니다/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "연결 해제" }));
+  await waitFor(() => expect(unlinkOrcid).toHaveBeenCalledTimes(1));
+});
