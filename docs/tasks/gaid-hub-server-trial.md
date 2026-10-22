@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:22:18Z
+updated: 2026-10-22T09:24:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -54,8 +54,13 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
   `skills/`; child checks: server tsc, `vitest run test/geo-hub-server*` 52/52.
 - e2e `server/test/geo-hub-skills-e2e.test.ts` passes (first full check failed it: the fixture installed with a custom agentDir
   that `installedHubSkill` does not read; fixed at ae5118cf).
+- PC74 TLS files prepared (not active): `~/data/geoaidesk/hub-server/tls/` (CA key in `ca/`, `gaid-hub-ca.crt` sha256
+  57621a32…cee2, `hub.crt` SAN IP:10.13.15.74, expires 2029-01-24). Throwaway TLS instance on 10.13.15.74:8701 with a temp
+  home: HTTPS health OK with the CA, plain HTTP and no-CA refused; stopped and removed.
+- Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
+Blocked: waiting for the background full `scripts/check` (started 18:19) and for the user to create the admin account.
 1. Full `scripts/check` running on 59a8fbe4 (code identical to 179f8fac): log `~/data/geoaidesk/work/gaid-hub-server-trial/check-1.log`.
 2. After the user creates the admin account (invite code given in this tab; terminal or GAID route): dry-run then `--apply`
    import from the frozen source with `authors.json`; backup + check-backup.
@@ -92,6 +97,7 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-22-gaid-hub-server-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
