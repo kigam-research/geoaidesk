@@ -101,3 +101,19 @@ it("reports pinned hub skill states in readiness and offers the skill to the Wor
 
   expect(methodExposedSkills(paths, "method:grid-method:run", catalogue, [])).toEqual(["grid-method", "las-qc"]);
 }, 30_000);
+
+it("asks the hub-skill question once with matching shelf skills and binds only chosen ones", async () => {
+  const { standardQuestions } = await import("../src/geo/authoring/agent.ts");
+  const { chosenHubSkills, HUB_SKILLS_KEY } = await import("../src/geo/authoring/hub-skills.ts");
+  const candidates = ["las-qc", "raster-stats", "grid-merge", "kriging-cv"].map((name) => ({ name, description: `${name.replace("-", " ")} tool`, revision: 1, treeHash: "b".repeat(64) }));
+  const project = { title: "LAS QC for wells", goal: "check las curves", findings: [], decisions: [], questions: [], sources: [], extractions: {}, drafts: [] } as never;
+  const questions = standardQuestions(project, [], "a1", candidates);
+  const hub = questions.find((q) => q.key === HUB_SKILLS_KEY)!;
+  expect(hub.options.map((o) => o.id)).toEqual(["las-qc", "none"]);
+  expect(hub.recommendedOptionId).toBeUndefined();
+  const decided = { ...(project as object), decisions: [{ key: HUB_SKILLS_KEY, optionId: undefined, response: "las-qc 와 grid-merge 를 씁니다", status: "answered" }] } as never;
+  expect(chosenHubSkills(decided, candidates).map((c) => c.name)).toEqual(["las-qc", "grid-merge"]);
+  const none = { ...(project as object), decisions: [{ key: HUB_SKILLS_KEY, optionId: "none", response: "새 스킬만 쓰기", status: "answered" }] } as never;
+  expect(chosenHubSkills(none, candidates)).toEqual([]);
+  expect(standardQuestions({ ...(project as object), questions: [hub] } as never, [], "a2", candidates).some((q) => q.key === HUB_SKILLS_KEY)).toBe(false);
+});

@@ -34,6 +34,8 @@ export interface Vocabulary {
   catalogueIds: Set<string>;
   /** Slugs already packaged by other authoring projects. */
   hubNames?: Set<string>;
+  /** Hub shelf skills the researcher chose for this draft (gaid-hub-skills); bound as `source: "hub"` pins. */
+  hubChosen?: { name: string; description: string; revision: number; treeHash: string }[];
 }
 
 export const HUB_INPUTS_DIR = path.join(REPO_ROOT, "geo", "hub");
@@ -111,5 +113,8 @@ export function vocabularyText(v: Vocabulary): string {
       .join(" | ")}`,
     `catalogue skill ids (runtime name = final path segment): ${[...v.catalogueIds].sort().join(", ")}`,
     `existing catalogue skill names (slug must differ): ${[...v.catalogueNames].sort().join(", ")}`,
+    ...(v.hubChosen?.length
+      ? [`hub skills the researcher chose (add each as source "hub", role "supporting"; name it in the steps that use it): ${v.hubChosen.map((s) => `${s.name}: ${s.description}`).join(" | ")}`]
+      : []),
   ].join("\n");
 }

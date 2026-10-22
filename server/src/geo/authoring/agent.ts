@@ -22,6 +22,7 @@ import { distributionOf, pythonImports, pythonStdlib, withBundled, type PackageF
 import { checkMethod } from "./package.ts";
 import { quoteFound, readablePage } from "./anchors.ts";
 import { modelConfig, preflight, runtimeChat, type ChatFn, type ChatMessage, type ModelConfig } from "./model.ts";
+import { chosenHubSkills, hubSkillQuestion, HUB_SKILLS_KEY, loadHubSkillCandidates, type HubSkillCandidate } from "./hub-skills.ts";
 import { loadVocabulary, vocabularyText, type TaxonomyFacet, type Vocabulary } from "./vocabulary.ts";
 import {
   ANALYZE_PROMPT_VERSION,
@@ -45,6 +46,8 @@ export interface AgentDeps {
   config?: ModelConfig;
   /** Tests: a fixed vocabulary instead of the pinned catalogue. */
   vocabulary?: Vocabulary;
+  /** Hub shelf skills offered to authoring (default: the shared hub's visible, usable skills). */
+  hubSkills?: () => Promise<HubSkillCandidate[]>;
 }
 
 const FINDING_KINDS: FindingKind[] = [
@@ -331,7 +334,7 @@ export const RUN_SCALE_CHOICE = "run-scale";
  * computation such as variograms must be reducible for a first trial; include the original code when supplied). They are
  * skipped when already decided or open, or when the model asked the same thing under a similar key.
  */
-export function standardQuestions(project: AuthoringProject, proposed: Question[], attemptId: string): Question[] {
+export function standardQuestions(project: AuthoringProject, proposed: Question[], attemptId: string, hubCandidates: HubSkillCandidate[] = []): Question[] {
   const live = new Set([
     ...project.decisions.filter((d) => !d.supersededBy).map((d) => d.key),
     ...project.questions.filter((q) => q.status === "open").map((q) => q.key),
@@ -384,6 +387,8 @@ export function standardQuestions(project: AuthoringProject, proposed: Question[
       recommendedOptionId: "quick-and-full",
       recommendedWhy: "새 자료에서는 짧은 시험으로 흐름을 먼저 확인해야 긴 계산을 헛되이 돌리지 않습니다.",
     });
+  const hubQuestion = live.has(HUB_SKILLS_KEY) ? null : hubSkillQuestion(project, hubCandidates);
+  if (hubQuestion) out.push({ ...base, materiality: "optional", id: newId("q"), ...hubQuestion });
   return out;
 }
 
@@ -872,13 +877,19 @@ export function validateDraft(
     };
     const skills = arr(w.skills).filter(isObj).map((x, i) => {
       const name = str(x.name, 64);
-      const source = x.source === "bundled" ? "bundled" as const : "catalogue" as const;
+      const source = x.source === "bundled" ? "bundled" as const : x.source === "hub" ? "hub" as const : "catalogue" as const;
       if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(name)) errors.push(`workflow.skills[${i}].name must be a runtime skill name`);
-      if (x.source !== "bundled" && x.source !== "catalogue") errors.push(`workflow.skills[${i}].source must be bundled|catalogue`);
+      if (x.source !== "bundled" && x.source !== "catalogue" && x.source !== "hub") errors.push(`workflow.skills[${i}].source must be bundled|catalogue|hub`);
+      // Hub skills only as the researcher chose them, pinned to the revision offered (never a model-supplied pin).
+      const hub = source === "hub" ? v.hubChosen?.find((c) => c.name === name) : undefined;
+      if (source === "hub" && !hub) errors.push(`workflow.skills[${i}]: ${name} is not a hub skill the researcher chose`);
       if (x.role !== "primary" && x.role !== "supporting") errors.push(`workflow.skills[${i}].role must be primary|supporting`);
       if (source === "bundled" && name !== slug) errors.push(`workflow.skills[${i}]: only ${slug} is bundled`);
       if (source === "catalogue" && !v.catalogueNames.has(name)) errors.push(`workflow.skills[${i}]: unknown catalogue skill ${name}`);
-      return { name, source, role: x.role === "primary" ? "primary" as const : "supporting" as const, purpose: loc(str(x.purpose, 1200)) };
+      return {
+        name, source, role: x.role === "primary" ? "primary" as const : "supporting" as const, purpose: loc(str(x.purpose, 1200)),
+        ...(hub ? { hub: { skillId: hub.name, revision: hub.revision, treeHash: hub.treeHash } } : {}),
+      };
     });
     const ids = (raw: unknown) => arr(raw).map((x) => str(x, 64)).filter(Boolean);
     const steps = arr(w.steps).filter(isObj).map((x, i) => ({
@@ -890,7 +901,8 @@ export function validateDraft(
     }));
     workflow.skills = skills;
     workflow.steps = steps;
-    workflow.skillIds = skills.map((s) => s.source === "bundled" ? localSkill(slug) :
+    // Hub skills are named in skills[] only (like imported ones); skillIds stay local/catalogue ids.
+    workflow.skillIds = skills.filter((s) => s.source !== "hub").map((s) => s.source === "bundled" ? localSkill(slug) :
       [...v.catalogueIds].find((id) => id.split("/").at(-1) === s.name) ?? s.name);
     errors.push(...workflowProblems(workflow, slug));
     procedure = procedureFor(workflow);
@@ -1163,6 +1175,9 @@ async function execute(
     const project = await store.read(projectId);
     const ctx = await sourceContext(store, project);
     const v = attempt.op === "analyze" ? undefined : structuredClone(deps.vocabulary ?? loadVocabulary());
+    // A shelf that cannot be read only means no hub-skill question or binding; authoring itself goes on.
+    const hubCandidates = await (deps.hubSkills ?? loadHubSkillCandidates)().catch(() => [] as HubSkillCandidate[]);
+    if (v) v.hubChosen = chosenHubSkills(project, hubCandidates);
     if (v) {
       v.hubNames = new Set<string>();
       for (const id of await store.ids())
@@ -1292,7 +1307,7 @@ async function execute(
         const decided = new Set(p.decisions.filter((d) => !d.supersededBy).map((d) => d.key));
         const open = new Set(p.questions.filter((q) => q.status === "open").map((q) => q.key));
         const fresh = analysis!.questions.filter((q) => !decided.has(q.key) && !open.has(q.key));
-        p.questions.push(...fresh, ...standardQuestions(p, fresh, attempt.id));
+        p.questions.push(...fresh, ...standardQuestions(p, fresh, attempt.id, hubCandidates));
         a.result = {
           findings: analysis!.findings.length,
           questions: analysis!.questions.length,
