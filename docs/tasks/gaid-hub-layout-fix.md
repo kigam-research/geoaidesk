@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T03:57:55Z
+status: done
+updated: 2026-10-22T03:58:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6539b6c9-5957-440e-9fed-4ac3ddc50082","pid":3359328,"provider":"claude","session":"e1193689-5d34-43fe-a468-597c9a2d50b0","start":"52884028","token":"ea331793c1373217fa254345a44f114b47defad1bea78ef444303ba67d7e3444"}
 branch: task/gaid-hub-layout-fix
 target: main
@@ -36,7 +36,9 @@ scripts/check, then task finish. No other changes. Outside check: no outside che
   props match the calls in hub-screen.tsx, hub-home.tsx (type HubView) and shared-browse.test.tsx.
 - scripts/check passed 2026-10-22 (server 2069 passed/8 skipped, web 1156 passed, geo tests 0 fail, production smoke PASS; log ~/data/geoaidesk/work/gaid-hub-layout-fix/check.log).
 ## Next steps
-1. task finish (paths saved).
+<!-- task:closed -->
+Closed 2026-10-22T03:58:25Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Routed request 4a40cdf4a1d2 (original writer's facts) consumed: its copy ~/data/geoaidesk/work/gaid-hub-layout/missing/
