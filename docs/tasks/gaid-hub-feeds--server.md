@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:41:23Z
+updated: 2026-10-22T14:42:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -87,9 +87,11 @@ Report back (final message, English): files changed, the live smoke table, anyth
 Implemented migration 3, approved-source snapshots/audit, bounded RSS/RDF/Atom and GitHub collection, serialized batches,
 retention, authenticated feed/admin routes, CLI commands and configurable startup/interval schedule. Operator guide added.
 Verified: server `npx tsc --noEmit`; focused Vitest suite passed 69 tests in 3 files (2026-10-22 KST).
-Live smoke is next; no deployment or integration claimed yet.
+Live smoke is running as recorded job job-geoaidesk-gaid-hub-feeds--server-1 against b2bca1005fad.
+The script starts a temporary HTTP hub, explicitly approves all 18 proposals by CLI, fetches by CLI and checks the authenticated list.
+No deployment or integration claimed yet.
 ## Next steps
-1. Save this checked implementation; run one recorded live smoke with a temporary home and explicit CLI approval of all proposals.
+1. On the recorded job exit notice, read its receipt and live-smoke.json output (do not start another smoke).
 2. Inspect per-source counts/errors, address material implementation issues, rerun focused checks only after changes.
 3. Deliver the smoke evidence to parent and finish this child; parent integrates and runs full scripts/check.
 ## Failed approaches
@@ -106,6 +108,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-feeds--server-20261022T144156.666055Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
