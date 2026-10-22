@@ -144,6 +144,18 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   HTTPS (user decision gaid-backend#2 가, before widening beyond the test group): `serve --tls-cert/--tls-key` or a reverse proxy
   with `--trust-proxy`; GAIDs trust an internal CA with `GAID_HUB_SERVER_CA` in `config.env` (`hubTransport` in
   `hub-client/client.ts`); procedure `docs/geo/hub-server-https.md`.
+- Research feeds (gaid-hub-feeds; user decisions 2026-10-22: "1번 관리자 승인방식, 원문제목과 피드요약만, 첫목록도 권장하는 각
+  지구과학 분야로 10개를 스스로 선정하여라."): the institute hub server collects only administrator-approved sources
+  (`server/src/geo/hub-server/feeds/`, migration 3, `/hub/v1/feeds`, `/hub/v1/admin/feeds/*`, CLI `feeds list|approve|stop|fetch`,
+  every `GAID_HUB_FEEDS_INTERVAL_HOURS` = 6 by default) and keeps the original title, the feed's own summary (≤ 400 chars, plain
+  text) and the link; no model calls, never full text. Shipped proposals `geo/feeds/sources.json` (10 geoscience sources by field,
+  GeekNews, releases of Pi, pi-subagents, pi-web-access, skills CLI, Claude Code, Codex, a GitHub geoscience skill search) stay
+  `proposed` until an administrator approves them (Settings → 기관 GAID 허브 → 허브 서버 관리 → 자료 소식 출처, or the CLI).
+  Contract `web/src/geo/contracts/hub-feeds.ts`; GAID proxies `GET /geo/hub/feeds` and `/geo/hub-server/admin/feeds/*`
+  (`server/src/geo/routes/hub-server.ts`); the hub place 자료 소식 (`#hub/feeds`, `web/src/geo/hub-feeds/`, namespace `hubFeeds`)
+  marks items 검토 전, filters by category/field/words, and hands a GitHub skill repository to Settings → Skills of a chosen
+  project (`requestSkillImport`; preview and consent there, never auto-installed). Without a hub server login it shows no items,
+  only where to connect.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Research notes (gaid-notebook-review, `docs/geo/research-notes.md`; user decision 2026-10-18): the notebook tab opens on
   research notes (정리 노트), one Markdown note per analysis at `연구노트/<YYYY-MM-DD>-<topic>/index.md` (+ `figures/`), written result
