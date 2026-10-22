@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T09:23:04Z
+status: done
+updated: 2026-10-22T09:23:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8bae3bd9-1847-436d-918d-15c77aff84a1","pid":1865557,"provider":"claude","session":"04b52e98-aed3-4749-b725-5863794d4095","start":"54718151","token":"c1146656906ed1e52af0dcf6a76b7d8f0f6adc197b1e4b98254b697d47eb5959"}
 branch: task/gaid-visuals-next
 target: main
@@ -53,7 +53,9 @@ opened-project); console errors 0. Found and fixed in the real app: the map stay
 Child A: gaid-visuals-next--journals completed and closed (integrated c297fd79): agu/eeg profiles from 9 official pages
 read with playwright-cli (normal Chrome UA); evidence table in docs/tasks/gaid-visuals-next--journals.md. App unit stopped.
 ## Next steps
-1. task finish (scripts/check runs there).
+<!-- task:closed -->
+Closed 2026-10-22T09:23:13Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
