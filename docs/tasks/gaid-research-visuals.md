@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:50:24Z
+updated: 2026-10-22T02:17:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -82,13 +82,34 @@ Phase 1 (research → proposal), 2026-10-21.
   (provenance-panel.tsx LineageTree). Web has no graph library (only @streamdown/mermaid); hub flow diagram is hand-built.
   Geo env has matplotlib; no cmcrameri/pygmt/cartopy/seaborn. Notes copy figures into figures/ (RESEARCH_NOTE_RULE).
 ## Next steps
-1. Proposal report written, humanized and review-copied (vault 연구 보고서/geoaidesk/2026-10-21-gaid-research-visuals).
-   Waiting for the user's answers to the 5 decisions in §6 (also under Open items). Then: ADR for the agreed architecture
-   (figure record data, connection-map component, idea-board file format, shipped-skill mechanism), split into packages,
-   implement only the agreed scope.
-Blocked: waiting for the user's decisions on the proposal (report §6).
+Phase 2 (implementation), started 2026-10-22 after the user's decision. Sequential decisions done: ADR
+docs/adr/2026-10-22-figure-records-and-connection-map.md; contracts web/src/geo/contracts/figures.ts and connections.ts.
+Work packages (child writers, "general work"), owned files:
+- A `gaid-research-visuals--skill`: geo/skills/gaid-figures/** (adapted K-Dense scientific-visualization, MIT; journals.json
+  per JournalProfile with official sources + checkedAt; scripts/check_figure.py writing FigureCheck JSON), shipped-skill
+  generalisation server/src/geo/shipped-skills.ts (+ note-style.ts, provision.ts, session.ts, context.ts seams),
+  FIGURE_RULE in server/src/geo/instructions.ts, cmcrameri (+ SciencePlots) in seeded project pyproject / helper venv
+  (dependency-lock owner for server/src/helpers/pyproject.toml + uv.lock), THIRD_PARTY_NOTICES entries.
+- B `gaid-research-visuals--records`: server/src/geo/figures/** (derive records from notes + provenance, copy resolution by
+  edge then sha256, kind derivation, overrides, target, POST check via helper python running A's script), routes in
+  server/src/geo/routes/figures.ts registered in geo/routes.ts; web/src/geo/figures/** (note figure list + record pane,
+  journal target picker, actions as chat prefills), locales web/src/geo/locales/figures/; NO edit of research-notes-panel.tsx
+  (exports a component; the writer wires it).
+- C `gaid-research-visuals--map`: server/src/geo/connections/** + route; web/src/geo/connections/** (React Flow
+  @xyflow/react + @dagrejs/dagre; web/package.json + lock owner), locales web/src/geo/locales/connections/; exports
+  ConnectionMapButton/ConnectionMapPane; no edits outside its dirs except the route registration line and deps.
+Integration order: A (check script + journals.json) → B uses them (B can stub until A lands); C independent. Writer wires
+seams (research-notes-panel.tsx note detail: figures + map entry; figure record → map; library detail entry via the hub /
+gaid-library-next owner), then check-ui, scripts/check, screenshots (2 styles × 2 themes, 1440×900 + 1280×800, Korean),
+report update (design + implementation), task finish.
+1. Wait for task sync (scripts/check running) to finish, save ADR + contracts, start children A, B, C.
 ## Failed approaches
 ## Notes and decisions
+- User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
+  1 가) phases 1+2 (figure records and journal figures + connection map), 2 가) keep AI pictures, mark kind + target
+  journal policy + disclosure draft, 3 가) Elsevier, Copernicus, AGU, Springer (incl. Geosciences Journal), GSA,
+  대한지질학회지, 자원환경지질, 4 가) idea board as JSON Canvas file (phase 3, format only), 5 가) GAID shipped skill,
+  generalised for the literature skills too. Recorded in ADR 2026-10-22-figure-records-and-connection-map.
 - UI constraint from gaid-design-identity (routed request design-dir-gaid-research-visuals, 2026-10-21; until its tokens
   land on main). CORRECTED by routed request design-note-gaid-research-visuals: direction 라) "연구 등록부" was NOT confirmed;
   the user decided "새로운 디자인을 oneui가이드에 따라 생성하자." gaid-design-identity will propose a new One UI-based design;
@@ -116,11 +137,6 @@ Blocked: waiting for the user's decisions on the proposal (report §6).
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 이 작업에서 구현할 범위 — 가) 1단계(그림 기록과 저널 그림)와 2단계(연결 지도) — 나) 1단계만 — 다) 1–3단계 모두 — 권장: 가) 그림은 다른 도구가 비워 둔 곳이고 연결 지도는 이미 쌓인 서재·계보 자료를 바로 씀 — 막힌 일: 구현 시작 — 근거: reports/2026-10-21-gaid-research-visuals#6
-- [결정] 이미지 생성 모델이 만든 그림의 처리 — 가) 그대로 두고 "AI 개념 그림"과 목표 저널 허용 여부를 표시하며 공개 문구 초안을 만듦 — 나) 논문용 그림 흐름에서는 이미지 생성을 쓰지 않음 — 권장: 가) 공개하면 쓸 수 있는 저널(Copernicus, AGU)이 있고 금지된 곳은 표시로 막음 — 막힌 일: ⑦ AI 그림 표시 — 근거: reports/2026-10-21-gaid-research-visuals#6
-- [결정] 먼저 넣을 저널 그림 요건 — 가) Elsevier, Copernicus, AGU, Springer(Geosciences Journal 포함), GSA, 대한지질학회지, 자원환경지질 — 나) 사용자가 실제 투고 저널 목록을 알려 줌 — 권장: 가) 지구과학 연구자가 많이 투고하고 K-Dense 묶음에 없음 — 막힌 일: ③ 저널에 맞춘 그림 — 근거: reports/2026-10-21-gaid-research-visuals#6
-- [결정] 아이디어 보드 저장 형식 — 가) 프로젝트 안의 Obsidian Canvas 형식 파일 — 나) GAID 안에만 저장 — 권장: 가) 연구노트처럼 파일이 원본이고 Obsidian에서도 열림 — 막힌 일: ⑨ 아이디어 보드 — 근거: reports/2026-10-21-gaid-research-visuals#6
-- [결정] 그림 스킬을 배포판에 넣는 방식 — 가) GAID와 함께 배포하는 스킬로 넣고 문헌 스킬도 같은 방식을 쓸 수 있게 함 — 나) 지구과학 카탈로그 새 판에 넣음 — 권장: 가) 연구노트 문장 스킬이 이미 이 방식이고 카탈로그 새 판이 필요 없음 — 막힌 일: ③④ 그림 스킬 — 근거: reports/2026-10-21-gaid-research-visuals#6
 ## Report
 Report: reports/2026-10-21-gaid-research-visuals/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
