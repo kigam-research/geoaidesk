@@ -200,6 +200,7 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
           title: c.title,
           line: c.line,
           image: hubImage(c.image),
+          imageThemed: c.imageThemed,
           source: c.source,
           stars: c.stars,
           author: c.author,
@@ -256,17 +257,21 @@ function draftVisuals(project: AuthoringProject, draft: MethodDraft | undefined)
   const steps: Record<string, StepVisual> = {};
   const outputs: Record<string, StepVisual> = {};
   let cover: string | null = null;
-  if (!draft) return { steps, outputs, cover };
+  let coverThemed = false;
+  if (!draft) return { steps, outputs, cover, coverThemed };
   const nodeIds = new Set(draft.profile.procedure.nodes.map((n) => n.id));
   const outputIds = new Set(draft.profile.outputs.map((o) => o.id));
   for (const [key, v] of Object.entries(project.visuals ?? {})) {
     const src = withApiToken(`${API_BASE}${hubApi.visualUrl(project.id, key)}`);
-    const visual: StepVisual = { src, kind: "generated", caption: v.caption };
-    if (key === "cover") cover = src;
+    const visual: StepVisual = { src, kind: "generated", caption: v.caption, themed: Boolean(v.dark) };
+    if (key === "cover") {
+      cover = src;
+      coverThemed = Boolean(v.dark);
+    }
     else if (key.startsWith("output:") && outputIds.has(key.slice(7))) outputs[key.slice(7)] = visual;
     else if (nodeIds.has(key)) steps[key] = visual;
   }
-  return { steps, outputs, cover };
+  return { steps, outputs, cover, coverThemed };
 }
 
 function emptyProject(): AuthoringProject {
@@ -553,11 +558,11 @@ function HubProject({
     }
   };
 
-  const makeVisuals = async (keys?: string[], instruction?: string) => {
+  const makeVisuals = async (keys?: string[], instruction?: string, adapt?: boolean) => {
     if (!draft) return;
     setVisualsBusy(true);
     try {
-      await hubApi.visuals(id, draft.revision, { keys, instruction });
+      await hubApi.visuals(id, draft.revision, { keys, instruction, ...(adapt ? { adapt: true } : {}) });
       await reload();
     } catch (e) {
       toast.error((e as Error).message);
@@ -729,6 +734,7 @@ function HubProject({
           starred: false,
           trials: trialCount ?? 0,
           image: pictures.cover,
+          imageThemed: pictures.coverThemed,
           comments: [],
         }}
         profile={draft.profile}
@@ -747,6 +753,7 @@ function HubProject({
         visuals={pictures.steps}
         outputImages={pictures.outputs}
         cover={pictures.cover}
+        coverThemed={pictures.coverThemed}
         visualAction={{
           busy: visualsBusy || Boolean(visualRun),
           progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
@@ -754,7 +761,7 @@ function HubProject({
           error: lastVisualError,
           errorDetail: lastVisualDetail,
           usageLimit: Boolean(usageLimit),
-          onMake: (keys, instruction) => void makeVisuals(keys, instruction),
+          onMake: (keys, instruction, adapt) => void makeVisuals(keys, instruction, adapt),
           connected: visualSource?.available ?? null,
         }}
         trialCount={trialCount ?? 0}

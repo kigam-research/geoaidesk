@@ -20,6 +20,8 @@ export interface StoredVisual {
   file: string;
   caption: string;
   mediaType: string;
+  /** The dark-mode picture (gaid-concept-pictures); absent for older white-background pictures. */
+  dark?: { file: string; mediaType: string };
 }
 export interface RegisteredSnapshot {
   draft: MethodDraft;

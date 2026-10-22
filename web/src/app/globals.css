@@ -123,6 +123,10 @@
   --gaid-motion-fast: 150ms;
   --gaid-motion-base: 200ms;
   --gaid-easing: cubic-bezier(0.2, 0, 0, 1);
+  /* Concept pictures (gaid-concept-pictures): the well is the colour pictures are generated on (PICTURE_WELL in
+     geo/contracts/authoring.ts); older white-background pictures sit on the white mat in both themes. */
+  --gaid-pic-well: #f2f3f6;
+  --gaid-pic-mat: #ffffff;
 }
 
 .dark {
@@ -157,6 +161,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --gaid-pic-well: #1a1d23;
 }
 
 @layer base {

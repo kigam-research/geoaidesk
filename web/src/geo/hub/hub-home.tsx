@@ -29,6 +29,7 @@ import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
 import { TechnicalDetail } from "./technical";
+import { ConceptPicture } from "./concept-picture";
 const text = geoText("hub");
 
 const STAGE_TONE: Record<ProjectSummary["stage"], { stripe: string; chip: string }> = {
@@ -113,6 +114,8 @@ export interface RecommendedCard {
   title: string;
   line: string;
   image: string | null;
+  /** The image has a dark-mode version (generated concept picture). */
+  imageThemed?: boolean;
   source: "catalogue" | "shared";
   stars: number;
   author?: string;
@@ -214,8 +217,13 @@ export function HubHome({
               >
                 <span className="relative aspect-[16/7] w-full overflow-hidden bg-muted">
                   {card.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={card.image} alt="" className="size-full object-cover" />
+                    <ConceptPicture
+                      src={card.image}
+                      themed={card.imageThemed}
+                      fit="cover"
+                      className="size-full rounded-none border-0"
+                      imageClassName="h-full"
+                    />
                   ) : (
                     <CardArt title={card.title} />
                   )}

@@ -89,6 +89,7 @@ palettes for maps and depth tracks are the exception (`ui-rules.json` `styles.he
 | S4 | **Contrast.** Text ≥ 4.5:1, large text (≥ 24 px, or ≥ 18.7 px bold) ≥ 3:1, control boundaries and focus rings ≥ 3:1. | Accessibility / Color and contrast "Minimum contrast ratio" (thresholds expressed in WCAG CSS px, not dp) |
 | S5 | **States.** Every interactive element has default, hover, focus-visible (2 px `--ring`), pressed/selected, disabled. A disabled primary action shows why it is disabled next to it (one line). Loading replaces the label with progress text, keeps the width. | Accessibility / Screen reader (status is part of every element); Interaction and control |
 | S6 | **Dark mode** is checked before release for any screen that shows images or maps; map basemaps may stay light. | Color / Theme |
+| S7 | **Concept pictures follow the theme by asset, never by filter.** Each generated concept picture has a light file drawn on the picture-well colour and a dark-mode file edited from it; `ConceptPicture` (`web/src/geo/hub/concept-picture.tsx`) frames it with `--gaid-pic-well` and loads the file for the current theme. Older white-background pictures sit on `--gaid-pic-mat` until the researcher fits them ("화면 테마에 맞추기"). No CSS filters, blend modes or recolouring on images. | Color / Theme; Apple HIG Dark Mode (separate image assets) |
 
 ## 5. Components
 

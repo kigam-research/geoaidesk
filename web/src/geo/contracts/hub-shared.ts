@@ -55,6 +55,8 @@ export interface HubEntry {
   folderId: string;
   /** Cover image URL (`/geo/hub/entries/:id/cover`), when the draft has one. */
   cover: string | null;
+  /** The cover has a dark-mode picture (`?theme=dark`) and sits on the picture-well colour; absent: older white picture. */
+  coverThemed?: boolean;
   latestRevision: number;
   revisions: HubEntryRevision[];
   stars: number;
@@ -75,13 +77,20 @@ export interface HubComment {
   at: string;
 }
 
+/** A registered concept picture; `themed`: a dark-mode picture is served with `?theme=dark`. */
+export interface HubPicture {
+  src: string;
+  caption: string;
+  themed?: boolean;
+}
+
 /** What the shared page shows: the entry, its method (flow and IO from the registered draft), comments. */
 export interface HubEntryDetail {
   entry: HubEntry;
   profile: DraftProfile;
   /** Concept images per procedure node id (URLs), when the draft has them. */
-  visuals: Record<string, { src: string; caption: string }>;
-  outputImages: Record<string, { src: string; caption: string }>;
+  visuals: Record<string, HubPicture>;
+  outputImages: Record<string, HubPicture>;
   workflowTitle: MethodText | null;
   /** The Workflow 지침 the agent receives (gaid-workflow-model); null for an entry without a Workflow. */
   workflowDoc: WorkflowDoc | null;
@@ -96,6 +105,8 @@ export interface HubRecommendation {
   line: string;
   /** Cover image URL or null. */
   image: string | null;
+  /** The cover image has a dark-mode picture (see `HubEntry.coverThemed`). */
+  imageThemed?: boolean;
   stars: number;
   author?: string;
   /** `shared`: hub entry id; `catalogue`: catalogue workflow id. */
@@ -113,7 +124,7 @@ export interface HubRecommendation {
 // POST   /geo/hub/entries/:id/star                     { on: boolean } → { stars, starredByMe }
 // GET    /geo/hub/entries/:id/comments                 → { comments: HubComment[] }
 // POST   /geo/hub/entries/:id/comments                 { body } → HubComment
-// GET    /geo/hub/entries/:id/cover                    image bytes
+// GET    /geo/hub/entries/:id/cover                    image bytes (?theme=dark: the dark picture when there is one)
 // GET    /geo/hub/entries/:id/package.tar.gz           latest package bytes (?revision=n)
 // POST   /geo/hub/entries/:id/edit                     {} → EditEntryResult (author: edit; others: own copy)
 // POST   /geo/hub/entries/:id/install                  SharedInstallBody → InstallResult (authoring.ts)

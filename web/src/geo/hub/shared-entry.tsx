@@ -111,13 +111,13 @@ export function SharedEntryScreen({
   const visuals: Record<string, StepVisual> = Object.fromEntries(
     Object.entries(detail.visuals).map(([k, v]) => [
       k,
-      { src: hubImage(v.src)!, kind: "generated" as const, caption: v.caption },
+      { src: hubImage(v.src)!, kind: "generated" as const, caption: v.caption, themed: Boolean(v.themed) },
     ]),
   );
   const outputImages: Record<string, StepVisual> = Object.fromEntries(
     Object.entries(detail.outputImages).map(([k, v]) => [
       k,
-      { src: hubImage(v.src)!, kind: "generated" as const, caption: v.caption },
+      { src: hubImage(v.src)!, kind: "generated" as const, caption: v.caption, themed: Boolean(v.themed) },
     ]),
   );
   return (
@@ -148,6 +148,7 @@ export function SharedEntryScreen({
           starred: e.starredByMe,
           trials: e.trials,
           image: hubImage(e.cover),
+          imageThemed: Boolean(e.coverThemed),
           basedOn:
             e.basedOn && onOpenEntry
               ? { ...e.basedOn, onOpen: () => onOpenEntry(e.basedOn!.entryId) }

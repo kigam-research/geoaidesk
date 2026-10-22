@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { LimitsCard, OverviewBand, SummaryPoints } from "./method-overview";
 import { TASK_LABELS } from "./taxonomy";
 import { localText } from "./text";
+import { ConceptPicture } from "./concept-picture";
 
 const text = geoText("hub");
 
@@ -49,6 +50,8 @@ export interface SharedMethodView {
   starred: boolean;
   trials: number;
   image: string | null;
+  /** The image has a dark-mode version (generated concept picture). */
+  imageThemed?: boolean;
   comments: SharedComment[];
   /** The registered method this one was copied from. */
   basedOn?: { title: string; author: string; revision: number; onOpen: () => void };
@@ -208,11 +211,12 @@ export function SharedMethod({
           </div>
           <div className="flex flex-col gap-3">
             {method.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <ConceptPicture
                 src={method.image}
-                alt=""
-                className="aspect-[16/10] w-full rounded-lg border bg-background object-cover"
+                themed={method.imageThemed}
+                fit="cover"
+                className="aspect-[16/10] w-full"
+                imageClassName="h-full"
               />
             )}
             <Button variant={preview ? "outline" : "default"} onClick={onTry} className="w-full">

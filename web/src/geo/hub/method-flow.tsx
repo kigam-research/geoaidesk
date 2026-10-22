@@ -14,6 +14,7 @@ import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
 import { orderedNodes } from "./flow-diagram";
+import { ConceptPicture } from "./concept-picture";
 import { InputExample, ResultExample } from "./io-examples";
 import { shortLabel } from "./method-overview";
 import { localText } from "./text";
@@ -25,18 +26,23 @@ export interface StepVisual {
   src: string;
   kind: "paper" | "generated";
   caption: string;
+  /** A generated picture with a dark-mode version, drawn on the picture-well colour. */
+  themed?: boolean;
 }
 
 export interface PictureAction {
   disabled: boolean;
-  onMake: (keys?: string[], instruction?: string) => void;
+  /** `adapt`: fit older pictures to the screen themes without changing what they show. */
+  onMake: (keys?: string[], instruction?: string, adapt?: boolean) => void;
 }
 
 /** An instruction edits the previous image; an unprompted redo starts a fresh picture. */
-export function PictureControls({ pictureKey, label, hasPicture, action }: {
+export function PictureControls({ pictureKey, label, hasPicture, themed, action }: {
   pictureKey: string;
   label: string;
   hasPicture: boolean;
+  /** False for an older white-background picture: offers fitting it to the screen themes. */
+  themed?: boolean;
   action?: PictureAction;
 }) {
   const [editing, setEditing] = useState<string | null>(null);
@@ -57,7 +63,13 @@ export function PictureControls({ pictureKey, label, hasPicture, action }: {
             {text("visuals.revise")}
           </Button>
         )}
+        {hasPicture && themed === false && (
+          <Button variant="outline" size="sm" disabled={action.disabled} onClick={() => action.onMake([pictureKey], undefined, true)}>
+            {text("visuals.adapt")}
+          </Button>
+        )}
       </div>
+      {hasPicture && themed === false && <p className="text-xs text-muted-foreground">{text("visuals.adaptHint")}</p>}
       {editing === pictureKey && (
         <form className="flex flex-col gap-2" onSubmit={(e) => {
           e.preventDefault();
@@ -266,14 +278,13 @@ function StepDetail({
       {extra}
       {visual && (
         <figure className="flex flex-col gap-1.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={visual.src} alt="" className="max-h-56 w-full rounded-lg border object-contain" />
+          <ConceptPicture src={visual.src} themed={visual.themed} imageClassName="max-h-56" />
           <figcaption className="text-xs text-muted-foreground">
             {visual.caption} · {visual.kind === "paper" ? text("io.paperFigure") : text("io.generated")}
           </figcaption>
         </figure>
       )}
-      <PictureControls pictureKey={node.id} label={localText(node.label)} hasPicture={visual?.kind === "generated"} action={pictureAction} />
+      <PictureControls pictureKey={node.id} label={localText(node.label)} hasPicture={visual?.kind === "generated"} themed={Boolean(visual?.themed)} action={pictureAction} />
       {(inputs.length > 0 || outputs.length > 0) && (
         <div className="grid gap-4 lg:grid-cols-2">
           {inputs.map((p) => (
@@ -285,8 +296,8 @@ function StepDetail({
           {outputs.map((p) => (
             <div key={p.id} className="flex flex-col gap-1.5">
               <PortHeading kind="out" label={localText(p.label)} />
-              <ResultExample port={p} image={outputImages[p.id]?.src} imageKind={outputImages[p.id]?.kind} />
-              <PictureControls pictureKey={`output:${p.id}`} label={localText(p.label)} hasPicture={outputImages[p.id]?.kind === "generated"} action={pictureAction} />
+              <ResultExample port={p} image={outputImages[p.id]?.src} imageKind={outputImages[p.id]?.kind} imageThemed={outputImages[p.id]?.themed} />
+              <PictureControls pictureKey={`output:${p.id}`} label={localText(p.label)} hasPicture={outputImages[p.id]?.kind === "generated"} themed={Boolean(outputImages[p.id]?.themed)} action={pictureAction} />
             </div>
           ))}
         </div>
