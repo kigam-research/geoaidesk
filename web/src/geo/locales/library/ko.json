@@ -28,7 +28,8 @@
     "zotero": "Zotero {n}",
     "gaid": "GAID {n}",
     "unread": "읽지 않음 {n}",
-    "cited": "노트에 인용 {n}"
+    "cited": "노트에 인용 {n}",
+    "mine": "내 논문 {n}"
   },
   "table": {
     "paper": "논문",
@@ -104,7 +105,9 @@
     "workflowStarted": "Workflow 초안을 만들었습니다",
     "attachTitle": "붙일 프로젝트",
     "attached": "{name}에 붙였습니다",
-    "attachFailed": "프로젝트에 붙이지 못했습니다. 다시 시도하세요."
+    "attachFailed": "프로젝트에 붙이지 못했습니다. 다시 시도하세요.",
+    "ownWork": "ORCID에서 가져온 내 논문",
+    "orcidOrigin": "서지 정보 출처: ORCID"
   },
   "dialog": {
     "title": "논문 넣기",

@@ -1,3 +1,5 @@
+import orcidKo from "./orcid/ko.json";
+import orcidEn from "./orcid/en.json";
 import hubSkillsKo from "./hubSkills/ko.json";
 import hubSkillsEn from "./hubSkills/en.json";
 /**
@@ -102,6 +104,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   notes: pair(notesKo, notesEn),
   figures: pair(figuresKo, figuresEn),
   library: pair(libraryKo, libraryEn),
+  orcid: pair(orcidKo, orcidEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),
   workflowCli: pair(workflowCliKo, workflowCliEn),
