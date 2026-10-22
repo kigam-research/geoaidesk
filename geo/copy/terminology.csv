@@ -28,7 +28,8 @@ CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the 
 모델 연결,model connection,"The configured route to a language model: subscription sign-in, personal API key or local endpoint.",모델 접속,,
 연결 방식,connection method,"One of the supported routes for a model connection.",접속 방식,,
 로컬 모델,local model,"A model served on the user's own computer (for example via Ollama).",온디바이스 모델,on-device model,
-스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬이 있습니다.",,,Keep SKILL.md untranslated.
+스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬, 허브 스킬이 있습니다.",,,Keep SKILL.md untranslated.
+허브 스킬,hub skill,"GAID 허브의 스킬 선반에 판마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 판을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
 작업 예제,worked example,"A recorded task with data, steps and outputs that a user can run.",데모,demo,
 실행 기록,run record,"The stored inputs, code, outputs and settings of one run.",실행 로그,run log,
 결과 파일,output file,"A file written by a run.",산출 파일,result file,

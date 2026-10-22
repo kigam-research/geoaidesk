@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T05:25:56Z
+updated: 2026-10-22T06:02:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -26,22 +26,34 @@ gaid-backend through the hub for storage/auth assumptions. UI follows docs/desig
 ~/data/geoaidesk/work/gaid-hub-skills/; do not modify ~/.geoaidesk. Outside check: no outside check.
 
 ## Current state
-Phase 1 proposal written and sent for user review, 2026-10-22. No product code changes.
-- Report: reports/2026-10-22-gaid-hub-skills/index.md (humanizer pass done; review copy in vault
-  `연구 보고서/geoaidesk/2026-10-22-gaid-hub-skills`). Recommendation 가) hub skill shelf with immutable revisions,
-  Workflows pin revisions; 3 decisions (§6, mirrored under Open items).
-- Diagnosis by code reading (Explore map, refs in report Appendix A); no app run.
-- Web research: vault `웹 조사/geoaidesk/2026-10-22-research-question-answer-in-english-2--6b8718a6fe.md`
-  (oracle session research-question-answer-in-english-2).
-- Backend assumptions (report §3.8) checked by gaid-backend, route 0095d2a0c339 completed 2026-10-22: all four compatible with
-  its proposal (recommended 가: institute GAID hub server, SQLite rows + write-once hash-addressed files; member/admin roles,
-  reviewer role addable for phase 2). gaid-backend itself still awaits the user's 5 decisions.
+Phase 2 (implementation) started 2026-10-22 after the user chose all recommended options.
+- Shared interface done by the writer (typechecks clean, method-file/workflow-doc tests pass):
+  `web/src/geo/contracts/hub-skills.ts` (records, states, HTTP API), gaid-workflow/v1 `skills[].source: "hub"` with
+  `hub {skillId, revision, treeHash}` (method-file validation, server/web 지침 renderer, locale `workflowDoc.source.hub`,
+  `skill.hubRevision`), `WorkflowSkillState.hub`, package origin kind `gaid-hub-skill` + `hubSkill`
+  (`server/src/geo/methods/package-origin.ts`, `MethodOrigin`), pure pin state `server/src/geo/methods/hub-pins.ts`.
+- ADR docs/adr/2026-10-22-hub-managed-skills.md; glossary/terminology "허브 스킬".
+- Children: see Notes and decisions (work packages); IDs recorded there once started.
 ## Next steps
-1. Discuss the proposal with the user in this tab; record the 3 answers under Notes and decisions.
-2. Then ADR `docs/adr/2026-10-22-hub-managed-skills.md`, shared contract (skill entry + `skills[].source: hub` ref) first,
-   then implementation packages per the chosen scope (children if large), UI drafts per docs/design/ui-guide.md v2.
+1. Start children A (hub-skill-store) and B (hub-skill-ui); while they run, do C1 (Workflow runtime pieces that need only
+   the shared interface: exposure, CLI export, workflow-view, readiness rendering of hub states).
+2. After A completes: C2 myself (Workflow install pulls pinned hub skills, readiness uses A's store for `suspended`,
+   registration validates hub refs, authoring suggestions), then sync B, real-app check, scripts/check, report §3.9+.
 ## Failed approaches
 ## Notes and decisions
+- User decisions 2026-10-22 (verbatim "모두 권장안으로 진행하자."): 1 가) hub skill shelf, revisions pinned by Workflows;
+  2 가) GitHub imports visible at once as "검토 전"; 3 가) implement all of phase 1 now, phase 2 after gaid-backend accounts.
+- Work packages (phase 1). Shared interface settled first (above). Integration order: A → C2 → B sync → checks.
+  - A `hub-skill-store` (child, general work): owns new `server/src/geo/hub-skills/**`, route registration in
+    `server/src/geo/routes/hub-shared.ts`, `GET /skills` row field `hubSkill` (`server/src/api/skills.ts`, boundaries entry),
+    `server/src/geo/skill-details.ts` hub-skill rows, tests `server/test/geo-hub-skills*.test.ts`. Exports for C2:
+    store class, `installHubSkillRevision`, revision reader, `listHubSkills` (search) usable by authoring.
+  - B `hub-skill-ui` (child, general work): owns new `web/src/geo/hub-skills/**`, locale namespace `hubSkills`, seams in
+    `web/src/geo/hub/{hub-sidebar,hub-screen,location,hub-shell}.tsx`, Settings → Skills "GAID 허브에서" + installed
+    revision/new-revision notice (`web/src/components/skills-panel.tsx` seam), screenshots per UI guide v2 §12.
+  - C (writer): Workflow side. C1 now: `local-methods.ts` exposure, `cli-export.ts`, `workflow-view.tsx`,
+    `readiness.tsx`, `workspace/workflows.ts`. C2 after A: `authoring/install.ts` (pinned hub skills with a Workflow),
+    `hub-shared/routes.ts` registration checks, authoring (`authoring/{agent,package,prompts}.ts` + question step).
 - Plan (sequential): diagnose → research → proposal → user decision → ADR → implement. Implementation packages are decided
   after the user picks the scope; shared contract (skill entry schema, Workflow `skills[].source: hub` ref) first.
 - Inputs read: ADR docs/adr/2026-10-20-workflow-runtime-form.md; reports/2026-10-20-gaid-workflow-model §3.6, §3.13;
@@ -49,9 +61,6 @@ Phase 1 proposal written and sent for user review, 2026-10-22. No product code c
   non-coders; institute "second brain"); gaid-backend diagnosis notes (hub-shared store is one process, X-GAID-User unchecked).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-- [결정] 허브에서 스킬을 어떻게 다룰지 — 가) 허브에 스킬 선반을 두고 스킬마다 판과 출처를 기록하며 Workflow가 판을 고정해 가리킴 — 나) 허브에는 추천 GitHub 주소 목록만 둠 — 다) 스킬은 지금처럼 Workflow 안에서만 나누고 다른 Workflow의 스킬을 가리킬 수 있게만 함 — 권장: 가) 기관 안에서 같은 사본을 나누고 GitHub 접속 없이 설치되며 Workflow 중심 구조를 유지 — 막힌 일: ADR과 구현 — 근거: reports/2026-10-22-gaid-hub-skills#6-결정할-일
-- [결정] GitHub 등에서 들인 스킬을 다른 연구자에게 언제 보일지 — 가) 올리면 바로 보이되 "검토 전"으로 표시하고 확인한 사람이 "확인함"으로 바꿈 — 나) 관리자가 확인하기 전에는 올린 사람에게만 보임 — 권장: 가) 계정이 없는 1단계에서 승인 절차를 두면 아무도 쓰지 못함; 설치 전 미리보기와 신뢰 확인은 그대로 — 막힌 일: 1단계 구현 — 근거: reports/2026-10-22-gaid-hub-skills#6-결정할-일
-- [결정] 1단계 범위 — 가) 3.7의 1단계 전체를 이번 작업에서 구현하고 2단계는 gaid-backend 계정 뒤 별도 작업 — 나) 스킬 선반(올리기, 상세, 설치)만 먼저 하고 Workflow·허브 작성 연결은 다음 작업 — 권장: 가) 지금 저장소로 되는 부분을 먼저 써 보고 검토 역할은 계정과 함께 정함 — 막힌 일: 구현 계획 — 근거: reports/2026-10-22-gaid-hub-skills#37-단계-나누기
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
