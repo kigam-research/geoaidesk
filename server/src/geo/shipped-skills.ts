@@ -1,35 +1,17 @@
 /** GAID-owned skills: seed once, follow unedited versions, preserve user edits/deletion/disablement. */
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 import { REPO_ROOT } from "../config.ts";
 import type { ProjectPaths } from "../projects.ts";
 import { skillsDisabledDir } from "../agent/skills.ts";
+import { hashDirectory } from "../agent/skills-sync.ts";
+import { isRegenerableCache } from "./regenerable-cache.ts";
 import { atomicJson } from "../atomic-json.ts";
 
 export const SHIPPED_SKILLS = ["gaid-note-style", "gaid-figures"] as const;
 export type ShippedSkill = typeof SHIPPED_SKILLS[number];
 export type ShippedSkillSeed = "seeded" | "updated" | "current" | "kept" | "absent" | "unavailable";
 interface SkillState { schemaVersion: string; sha256: string }
-
-const generatedPython = (name: string) => name === "__pycache__" || /\.py[co]$/.test(name);
-
-/** Same tree format as the legacy hashDirectory receipt, ignoring generated Python caches. */
-function hashShippedTree(root: string): string {
-  const hash = crypto.createHash("sha256").update("kady-skill-tree-v1\0");
-  const walk = (dir: string, prefix: string): void => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      if (generatedPython(entry.name)) continue;
-      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-      const absolute = path.join(dir, entry.name);
-      if (entry.isDirectory()) { hash.update(`d\0${relative}\0`); walk(absolute, relative); }
-      else if (entry.isFile()) { hash.update(`f\0${relative}\0`).update(fs.readFileSync(absolute)).update("\0"); }
-      else if (entry.isSymbolicLink()) hash.update(`l\0${relative}\0${fs.readlinkSync(absolute)}\0`);
-    }
-  };
-  walk(root, "");
-  return hash.digest("hex");
-}
 
 export function shippedSkillSource(skill: ShippedSkill, repoRoot = REPO_ROOT): string {
   return path.join(repoRoot, "geo", "skills", skill);
@@ -53,7 +35,7 @@ function install(source: string, target: string): void {
   const old = `${staging}.old`;
   fs.mkdirSync(path.dirname(target), { recursive: true });
   try {
-    fs.cpSync(source, staging, { recursive: true, filter: (file) => !generatedPython(path.basename(file)) });
+    fs.cpSync(source, staging, { recursive: true, filter: (file) => !isRegenerableCache(path.basename(file)) });
     if (fs.existsSync(target)) fs.renameSync(target, old);
     try { fs.renameSync(staging, target); }
     catch (error) { if (fs.existsSync(old)) fs.renameSync(old, target); throw error; }
@@ -68,7 +50,7 @@ export function seedShippedSkill(paths: ProjectPaths, skill: ShippedSkill, repoR
   try {
     const source = shippedSkillSource(skill, repoRoot);
     if (!fs.existsSync(path.join(source, "SKILL.md"))) return "unavailable";
-    const shipped = hashShippedTree(source);
+    const shipped = hashDirectory(source);
     const target = path.join(paths.skillsDir, skill);
     const state = readState(paths, skill);
     const present = fs.existsSync(target);
@@ -81,7 +63,7 @@ export function seedShippedSkill(paths: ProjectPaths, skill: ShippedSkill, repoR
     }
     if (!present) return "absent";
     if (state.sha256 === shipped) return "current";
-    if (hashShippedTree(target) !== state.sha256) return "kept";
+    if (hashDirectory(target) !== state.sha256) return "kept";
     install(source, target);
     atomicJson(stateFile(paths, skill), { schemaVersion: schema(skill), sha256: shipped });
     return "updated";

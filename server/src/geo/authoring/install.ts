@@ -16,7 +16,7 @@ import type {
 import { installStagedSkills, previewSkillSource } from "../../agent/skills-install.ts";
 import { findSkillDir, projectSkillRoot } from "../../agent/skills.ts";
 import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent/skills-sync.ts";
-import { removePythonCaches } from "../methods/tree-hash.ts";
+import { removeRegenerableCaches } from "../methods/tree-hash.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { readMethodFile, verifyMethodTree } from "../methods/method-file.ts";
 import { originOfSource, packageStore, writePackageOrigin } from "../methods/package-origin.ts";
@@ -95,7 +95,7 @@ export async function installPackageBytes(
     // A researcher's edits to the installed copy are never overwritten by a reinstall.
     const base = getSkillBaseHash(root, pkg.slug);
     // Bytecode caches from running the method's scripts are not edits; they are regenerated after the reinstall.
-    removePythonCaches(existingDir!);
+    removeRegenerableCaches(existingDir!);
     checkedHash = hashDirectory(existingDir!);
     if (!base || checkedHash !== base)
       throw new AuthoringError(

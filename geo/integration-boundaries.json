@@ -378,7 +378,7 @@
       "path": "server/src/agent/skills-sync.ts",
       "owner": "gaid-release-proof",
       "status": "edited",
-      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged. gaid-hub-integration: added getSkillBaseHash (read-only) so LocalMethod can report local edits; existing functions unchanged"
+      "responsibility": "Directory renames of the skill install/archive go through renameSyncWithRetry (server/src/geo/rename-retry.ts), which retries transient Windows EPERM/EACCES/EBUSY locks; other platforms unchanged. gaid-hub-integration: added getSkillBaseHash (read-only) so LocalMethod can report local edits; existing functions unchanged. gaid-skill-cache-hash: hashDirectory skips regenerable caches (isRegenerableCache in server/src/geo/regenerable-cache.ts: __pycache__, *.pyc/*.pyo, .pytest_cache, .mypy_cache, .ruff_cache, .ipynb_checkpoints) so a run skill still updates; cache-free trees hash as before"
     },
     {
       "path": "server/pi-packages/kady-child-runtime/index.ts",

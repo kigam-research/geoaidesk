@@ -7,7 +7,7 @@ import { getSkillBaseHash, getSkillProvenance, hashDirectory } from "../../agent
 import { AuthoringError, now } from "../authoring/store.ts";
 import { hubSkillInstallState } from "../methods/hub-pins.ts";
 import { originOfSource, packageStore, writePackageOrigin } from "../methods/package-origin.ts";
-import { methodTreeHash, removePythonCaches } from "../methods/tree-hash.ts";
+import { methodTreeHash, removeRegenerableCaches } from "../methods/tree-hash.ts";
 import { stageSkillHubPackage } from "../skill-hub.ts";
 import { projectPaths } from "./register.ts";
 import { HubSkillStore, revisionState } from "./store.ts";
@@ -45,7 +45,7 @@ export async function installHubSkillRevision(
       if (!base || methodTreeHash(existingDir) !== base)
         throw new AuthoringError(`프로젝트에서 고친 ${skill.name} 스킬이 있어 덮어쓰지 않았습니다. 고친 내용을 옮겨 두거나 그 스킬을 지운 뒤 다시 설치하세요.`, 409);
       if (base === r.treeHash) return { name: skill.name, revision: r.revision, installed: false };
-      removePythonCaches(existingDir);
+      removeRegenerableCaches(existingDir);
       checkedHash = hashDirectory(existingDir);
     }
     let staged: ReturnType<typeof stageSkillHubPackage>;
