@@ -2,8 +2,6 @@ import { FEED_CATEGORIES, FEED_FIELDS, FEED_LIMITS, HUB_FEEDS_SCHEMA, type FeedF
 import { HubDatabase, HubServerError, object, type AuditActor } from "../core.ts";
 import { collectSource, type FeedFetchOptions } from "./fetch.ts";
 import { definition, shippedSources, sourceId } from "./sources.ts";
-// Shared FEED_LIMITS.perSourceUnfiltered is being added by the parent in parallel.
-const PER_SOURCE_UNFILTERED = 10;
 interface SourceRow { id: string; record: string; last_success: string | null }
 export interface FeedActor extends AuditActor { name: string }
 export class HubFeeds {
@@ -70,7 +68,7 @@ export class HubFeeds {
           if (!unfiltered) return true;
           const count = perSource.get(i.sourceId) ?? 0;
           perSource.set(i.sourceId, count + 1);
-          return count < PER_SOURCE_UNFILTERED;
+          return count < FEED_LIMITS.perSourceUnfiltered;
         }).slice(0, limit);
     const latest = this.hub.all<SourceRow>("SELECT * FROM feed_sources WHERE last_success IS NOT NULL").filter((s) => ids.has(s.id)).map((s) => s.last_success!).sort().at(-1) ?? null;
     return { schema: HUB_FEEDS_SCHEMA, connected: true, items, sources: sources.map(({ id, title, publisher, homepage, category, field, lastFetch }) =>
