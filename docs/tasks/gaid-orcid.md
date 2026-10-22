@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T10:12:53Z
+updated: 2026-10-22T14:15:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -75,6 +75,8 @@ Outside check: no outside check.
    gaid-hub-server-trial (`task hub --send`), implement, add a phase-2 section to the report.
 3. If the user prefers to close phase 1 first: add a `[대기]` open item for phase 2 and run `task finish`.
 Blocked: waiting for the user's ORCID client registration result (phase 2).
+Work hours (hub instruction 2026-10-22): do not start phase 2 work at or after 2026-10-23 03:00 KST without a resume
+instruction from the user to the project hub; check `TZ=Asia/Seoul date` first.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
