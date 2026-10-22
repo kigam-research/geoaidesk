@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T16:01:59Z
+status: done
+updated: 2026-10-22T16:02:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -73,14 +73,9 @@ platform. Plus a report for review and the repo checks that apply.
   1920×1080, 30 fps, 2,700 frames, 90.00 s, no audio stream; 18 transition frames checked (qa-v1/encoded-transitions.jpg).
   Report figures extracted from the final file. Registry entry `gaid-promo-video-v1` (review). Humanizer applied.
 ## Next steps
-1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
-   User (verbatim, 2026-10-23): "이해하였다. 알림오면 작업 자동으로진행하여라." → on the child's finish notice, continue
-   without asking: `task complete`, integrate capture-v1 (zoom keys from focus rects), stills check, final render job,
-   verification, report, registry, `task finish`.
-2. Parent: extract real chart numbers (`geo/promo/data/`), build HTML/CSS motion scenes (`geo/promo/scene/`) and
-   `geo/promo/render.py` (Playwright Chrome frame stepping → imageio-ffmpeg H.264, reference: ccs_transport
-   `scripts/testbed_motion/render.py`). Preview stills, then show the storyboard + stills to the user before the final render.
-3. Integrate capture-v1, final render as `task job run`, verify, report, registry entry.
+<!-- task:closed -->
+Closed 2026-10-22T16:02:56Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Format: 1920×1080, 30 fps, 2,700 frames, H.264. User decision (2026-10-22, via hub): "무음이고 내부검토용 영상이다."
