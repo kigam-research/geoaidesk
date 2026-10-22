@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:06:10Z
+updated: 2026-10-22T15:10:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -78,6 +78,10 @@ platform. Plus a report for review and the repo checks that apply.
   renderer, real UI take with drawn pointer and ripple, user approved the composition before the final render);
   seoul_geomodel `reports/2026-10-21-viewer-v2-video` (workflow stages then real system operation; real data in every
   scene except one labelled concept card).
+- User feedback (verbatim, 2026-10-23): "영상에서 카드박스나 글자가 너무작아도 안된다. 시인성을 생각하고 공간여백을 너무
+  크게두어서 어색한부분이 생기는것을 조심해야한다." → rules: film text ≥ 24 px at 1080p (headlines 56–64, primary
+  labels ≥ 30), cards sized to their content and filling the layout, no large empty areas; footage mostly shown zoomed
+  into focus rects (1.3–1.8×); capture viewport changed to 1280×720 @2.25 (child told by message).
 - Visual language: GAID 계측 identity (UI guide v2): white faces on aluminium chrome, 45° chamfers, graduated scales,
   orbit = AI agent working, brand blue only as signal, Pretendard, tabular figures; no gradients/glow/AI icons/emoji.
 - Real footage from a separate instance with a curated copy of the review app data (`~/.geoaidesk`, read-only); no
@@ -88,17 +92,21 @@ platform. Plus a report for review and the repo checks that apply.
   Packages: capture child owns `geo/promo/capture*.py`, `geo/promo/CAPTURE.md`, `capture-v1/`; parent owns the rest.
   Integration order: child finish → `task complete` → render.
 
-### Storyboard v1 (90 s)
+### Storyboard v2 (90 s; v1 replaced after the user's 2026-10-23 requests on legibility, 서재, latest features, shp viewer)
+User (verbatim, 2026-10-23): "그리고 서재기능도 강조되어야한다. 최신기능들이 반영되어있어야한다." · "Gaid시스템에서 shp형식의
+맵데이터 뷰어기능들도 소개되어야한다."
 | t (s) | Scene | Content |
 |---|---|---|
-| 0–6 | Opening | Orbit ring draws around the octagonal G; GAID lockup; one line: 지구과학 연구자를 위한 AI agent 작업 공간 |
-| 6–18 | Background | Papers, code, data and notes scattered per researcher; methods stay in papers; general chat leaves no reusable method. Minimal text. |
-| 18–30 | Purpose loop | Orbit loop: 자료·논문 → Workflow → AI agent 실행 → 연구노트 → GAID 허브 → next researcher. Chart: real catalogue composition. |
-| 30–50 | GAID hub | Motion: paper → questions with recommended options → Workflow steps (real entry) → 판 1 → 판 2; real footage H1, H2; chart: entry readouts (steps, skills, installs, revisions). |
-| 50–75 | Researcher support | Real footage R1–R6: start settings, Workflow chat, research-note decisions, map, LAS, page citations; chart: citation check from the 2026-10-22 acceptance test. |
-| 75–84 | Original points | Instrument-panel summary of what is GAID-specific (paper→Workflow, institute hub, geo viewers, notes with decisions, observed provenance, local models). |
-| 84–90 | Closing | Lockup, one line, hold. |
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+| 0–5 | Opening | Orbit ring + octagonal G, GAID lockup, one line |
+| 5–14 | Background | Files scattered per researcher (개념도); real: 55 code files behind one hub Workflow |
+| 14–24 | Purpose loop | 서재·자료 → Workflow → AI agent 실행 → 연구노트 → GAID 허브; chart: catalogue 0.3.0 counts |
+| 24–41 | GAID hub | Authoring motion (real entry: sources, 8 start choices, 10 steps / 2 researcher); footage H1, H3 (skill shelf); revisions/installs timeline |
+| 41–55 | Research run | R1 start settings, R2 Workflow chat, R3 note decisions (Seoul lithology note), R5 LAS |
+| 55–64 | Shapefile maps | M1 Seoul 1:250K lithology shp on basemap, M2 attribute/area table; chart: real area by lithology (133 polygons, 2,012.9 km²) |
+| 64–78 | 서재 | L1 library folders, R6 page citations + chart (two real checks: 2026-10-21 institute Qwen 34/34, 2026-10-22 acceptance 212 units, 0 wrong page), L2 connection map |
+| 78–85 | Eight points | Eight segments around the octagonal G (paper→Workflow, hub, institute hub server, library+citations, notes+decisions, maps/LAS/tables, journal figure check, local model) |
+| 85–90 | Closing | Lockup, line, 내부 검토용 |
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
