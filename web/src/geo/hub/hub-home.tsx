@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 
 import { SharedBrowse } from "./shared-browse";
 import { TechnicalDetail } from "./technical";
+import { ConceptPicture } from "./concept-picture";
 
 const text = geoText("hub");
 
@@ -113,6 +114,8 @@ export interface RecommendedCard {
   title: string;
   line: string;
   image: string | null;
+  /** The image has a dark-mode version (generated concept picture). */
+  imageThemed?: boolean;
   source: "catalogue" | "shared";
   stars: number;
   author?: string;
@@ -152,14 +155,18 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
         onClick={() => onOpen?.(lead.id)}
         className="group flex min-h-64 overflow-hidden rounded-lg border border-gaid-edge bg-gaid-face text-left transition-colors hover:border-gaid-control-edge focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        <span className="flex w-[58%] shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-2.5">
-          {lead.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={lead.image} alt="" className="max-h-full w-full object-contain" />
-          ) : (
+        {lead.image ? (
+          <ConceptPicture
+            src={lead.image}
+            themed={lead.imageThemed}
+            className="flex w-[58%] shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-2.5"
+            imageClassName="max-h-full"
+          />
+        ) : (
+          <span className="flex w-[58%] shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-2.5">
             <CardArt title={lead.title} />
-          )}
-        </span>
+          </span>
+        )}
         <span className="flex min-w-0 flex-1 flex-col gap-2 p-5">
           <span className="text-xl font-semibold leading-7">{lead.title}</span>
           <span className="line-clamp-4 text-sm text-gaid-ink-2" title={lead.line}>{lead.line}</span>
@@ -175,14 +182,18 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
               onClick={() => onOpen?.(card.id)}
               className="flex min-h-32 overflow-hidden rounded-lg border border-gaid-edge bg-gaid-face text-left transition-colors hover:border-gaid-control-edge focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <span className="flex w-40 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
-                {card.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={card.image} alt="" className="max-h-full w-full object-contain" />
-                ) : (
+              {card.image ? (
+                <ConceptPicture
+                  src={card.image}
+                  themed={card.imageThemed}
+                  className="flex w-40 shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-1.5"
+                  imageClassName="max-h-full"
+                />
+              ) : (
+                <span className="flex w-40 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
                   <CardArt title={card.title} />
-                )}
-              </span>
+                </span>
+              )}
               <span className="flex min-w-0 flex-1 flex-col gap-1.5 p-4">
                 <span className="line-clamp-2 font-semibold">{card.title}</span>
                 <span className="line-clamp-2 text-sm text-gaid-ink-2" title={card.line}>{card.line}</span>

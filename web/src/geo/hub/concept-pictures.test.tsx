@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ConceptPicture, themedSrc } from "./concept-picture";
 import { DraftStep } from "./draft-step";
 import { fixtureDraft } from "./fixtures";
 import { MethodFlow } from "./method-flow";
@@ -56,5 +57,33 @@ describe("concept pictures in a draft", () => {
     const d = draft();
     render(<MethodFlow profile={d.profile} visuals={{ [d.profile.procedure.nodes[0].id]: visual }} />);
     expect(screen.queryByRole("button", { name: "다시 만들기" })).toBeNull();
+  });
+});
+
+describe("concept pictures and screen themes", () => {
+  it("offers fitting an older white picture to the screen themes, and not for a themed picture", () => {
+    const d = draft();
+    const first = d.profile.procedure.nodes[0];
+    const a = action();
+    render(<DraftStep draft={d} trialCount={0} checkIssues={null} rail={null} visualAction={a}
+      cover="/cover.png" coverThemed visuals={{ [first.id]: visual }} />);
+    const cover = within(screen.getByRole("group", { name: "대표 그림 개념 그림 동작", hidden: true }));
+    expect(cover.queryByRole("button", { name: "화면 테마에 맞추기", hidden: true })).toBeNull();
+    const step = within(screen.getByRole("group", { name: `${first.label} 개념 그림 동작` }));
+    expect(step.getByText(/흰 바탕으로 만든 예전 그림입니다/)).toBeTruthy();
+    fireEvent.click(step.getByRole("button", { name: "화면 테마에 맞추기" }));
+    expect(a.onMake).toHaveBeenLastCalledWith([first.id], undefined, true);
+  });
+
+  it("frames a themed picture with the well colour and asks for the dark-mode file in dark mode", () => {
+    expect(themedSrc("/p.png?revision=2", true, true)).toBe("/p.png?revision=2&theme=dark");
+    expect(themedSrc("/p.png", true, true)).toBe("/p.png?theme=dark");
+    expect(themedSrc("/p.png", false, true)).toBe("/p.png");
+    expect(themedSrc("/p.png", true, false)).toBe("/p.png");
+    const { container } = render(<><ConceptPicture src="/a.png" themed /><ConceptPicture src="/b.png" /></>);
+    const [themed, older] = container.querySelectorAll("span");
+    expect(themed.className).toContain("bg-[var(--gaid-pic-well)]");
+    expect(older.className).toContain("bg-[var(--gaid-pic-mat)]");
+    expect(container.querySelector("img")!.getAttribute("style")).toBeNull();
   });
 });

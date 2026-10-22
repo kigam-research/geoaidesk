@@ -8,6 +8,7 @@ import type { InputPort, OutputPort } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 
 import { localText } from "./text";
+import { ConceptPicture } from "./concept-picture";
 
 const text = geoText("hub");
 
@@ -213,10 +214,12 @@ export function ResultExample({
   port,
   image,
   imageKind,
+  imageThemed,
 }: {
   port: OutputPort;
   image?: string | null;
   imageKind?: "paper" | "generated";
+  imageThemed?: boolean;
 }) {
   const tabular = !image && (port.kind === "table" || port.kind === "report");
   return (
@@ -224,8 +227,7 @@ export function ResultExample({
       {tabular ? (
         <ResultTable port={port} />
       ) : image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="" className="w-full rounded-lg border object-contain" />
+        <ConceptPicture src={image} themed={imageThemed} />
       ) : null}
       <figcaption className="text-xs text-muted-foreground">
         {tabular

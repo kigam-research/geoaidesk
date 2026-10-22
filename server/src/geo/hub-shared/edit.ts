@@ -98,10 +98,16 @@ async function seedFromEntry(
   const visuals: NonNullable<AuthoringProject["visuals"]> = {};
   let index = 0;
   for (const [key, visual] of Object.entries(snapshot.visuals)) {
-    const file = `visuals/hub-${revision}/${index++}${extname(visual.file).toLowerCase()}`;
+    const n = index++;
+    const file = `visuals/hub-${revision}/${n}${extname(visual.file).toLowerCase()}`;
     await authoring.writeFile(project.id, file, await store.bytes(record.entry.id, visual.file));
+    let dark: string | undefined;
+    if (visual.dark) {
+      dark = `visuals/hub-${revision}/${n}-dark${extname(visual.dark.file).toLowerCase()}`;
+      await authoring.writeFile(project.id, dark, await store.bytes(record.entry.id, visual.dark.file));
+    }
     Object.defineProperty(visuals, key, {
-      value: { file, caption: visual.caption, model: "gaid-hub", draftRevision: 1 },
+      value: { file, ...(dark ? { dark } : {}), caption: visual.caption, model: "gaid-hub", draftRevision: 1 },
       enumerable: true,
     });
   }
