@@ -176,35 +176,55 @@
         "lineArt": null
       },
       "formats": {
-        "vector": [],
-        "raster": []
+        "vector": [
+          "eps",
+          "pdf"
+        ],
+        "raster": [
+          "jpeg",
+          "tiff"
+        ]
       },
       "colour": {
         "mode": null,
         "cvdRequired": null,
-        "colourMapAdvice": null
+        "colourMapAdvice": "Use high-contrast, CVD-readable colours with patterns or symbols; rainbow-like and red-green palettes can be difficult to distinguish."
       },
-      "panelsInOneFile": null,
+      "panelsInOneFile": true,
       "aiPolicy": {
-        "data-figure": "unknown",
-        "code-diagram": "unknown",
-        "ai-picture": "unknown",
+        "data-figure": "disclose",
+        "code-diagram": "disclose",
+        "ai-picture": "disclose",
         "ai-graphical-abstract": "unknown",
         "image-edit": "unknown"
       },
-      "aiDisclosure": [],
+      "aiDisclosure": [
+        "methods"
+      ],
       "sources": [
         {
-          "url": "https://www.wiley.com/en-us/publishing/article/ai-guidelines",
-          "title": "Using AI tools in your research",
+          "url": "https://www.agu.org/publications/authors/journals/text-graphics-requirements",
+          "title": "Text & Graphics Requirements | AGU Publications",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.agu.org/publications/authors/journals/submission-checklists",
+          "title": "Journals Submission Checklists | AGU Publications",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.agu.org/Publications/Authors/Resources-FAQs",
+          "title": "Resources & FAQs | AGU",
           "checkedAt": "2026-10-22"
         }
       ],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "AGU Text & Graphics Requirements (https://www.agu.org/publications/authors/journals/text-graphics-requirements) and Resources & FAQs (https://www.agu.org/Publications/Authors/Resources-FAQs) both returned HTTP 403 during direct curl on 2026-10-22. AGU-specific widths, font sizes, height, DPI, formats, colour, panel and per-kind AI rules remain unverified.",
-        "The readable Wiley publisher AI page requires disclosure of AI visual creation/editing and prohibits AI-edited research photographs. It is provided as related publisher guidance, not substituted for blocked AGU-specific policy; the per-kind verdicts stay unknown.",
-        "Historical AGU graphics guidance and general Wiley figure sizes are not confirmed as current AGU requirements and were not imported. Nulls and empty format lists mean unverified, not unrestricted."
+        "AGU-specific guidance verified in Chrome with a normal user agent on 2026-10-22. Initial submissions include figures in the manuscript; revisions require separate complete figure files with all panels combined. Panel labels use lowercase letters.",
+        "The revision checklist lists EPS, PDF, JPG and TIF; the in-depth guide also recommends PS. The profile uses the formats common to both lists, not an exhaustive prohibition on other formats.",
+        "CVD-accessible figures are strongly encouraged, with contrast, patterns/symbols and suitable colour maps. No mandatory CVD simulation or required RGB/CMYK mode was specified, so cvdRequired and mode remain null.",
+        "AI use for images, graphical elements, data collection or analysis must disclose the tool and how it was used in Materials and Methods or a similar section. disclose records this obligation, not unconditional permission. For code-diagram it applies to AI-assisted creation; manually authored code has no AI use to disclose. Explicit AI graphical-abstract and image-edit permissions were not verified and remain unknown.",
+        "Final figure width, minimum font point size, maximum height and numerical DPI floors were not specified in the opened AGU pages; they remain null. Historical dimensions and generic Wiley values were not imported."
       ]
     },
     {
@@ -440,13 +460,18 @@
       "minFontPt": null,
       "maxHeightMm": null,
       "dpi": {
-        "photo": null,
-        "combination": null,
-        "lineArt": null
+        "photo": 300,
+        "combination": 500,
+        "lineArt": 1000
       },
       "formats": {
-        "vector": [],
-        "raster": []
+        "vector": [
+          "eps"
+        ],
+        "raster": [
+          "tiff",
+          "jpeg"
+        ]
       },
       "colour": {
         "mode": null,
@@ -462,12 +487,45 @@
         "image-edit": "unknown"
       },
       "aiDisclosure": [],
-      "sources": [],
+      "sources": [
+        {
+          "url": "https://www.kseeg.org/content/authors/guide_for_authors.html",
+          "title": "Guide for Authors | Economic and Environmental Geology",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.kseeg.org/content/authors/publication_ethics.html",
+          "title": "Publication Ethics | Economic and Environmental Geology",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.kseeg.or.kr/content/journal/editor_rule.php",
+          "title": "규정안내 | 대한자원환경지질학회",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.kseeg.or.kr/content/journal/file/rule01_2026.pdf",
+          "title": "투고 규정 (2026 linked PDF)",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.kseeg.or.kr/content/journal/file/rule03.pdf",
+          "title": "편집 규정",
+          "checkedAt": "2026-10-22"
+        },
+        {
+          "url": "https://www.kseeg.or.kr/content/journal/file/rule04.pdf",
+          "title": "대한자원환경지질학회 연구윤리 규정",
+          "checkedAt": "2026-10-22"
+        }
+      ],
       "rulesCheckedAt": "2026-10-22",
       "notes": [
-        "Direct curl on 2026-10-22 returned an empty reply (curl exit 52) for all identified official pages: https://www.kseeg.org/content/authors/guide_for_authors.html ; https://www.kseeg.org/content/authors/publication_ethics.html ; https://www.kseeg.or.kr/content/journal/editor_rule.php . No rules were directly verified; rulesCheckedAt records the attempted snapshot date only.",
-        "All numeric rules, formats, colour/panel requirements and per-kind AI permissions remain unverified. Nulls, unknown policies and empty format lists are not permission.",
-        "Discovery identified a possible disagreement between the journal English and society Korean PDF-figure rules; neither page could be read directly, so neither claim was adopted."
+        "Official English author/ethics pages and society Korean rules were verified through Chrome with a normal user agent on 2026-10-22; linked PDFs were read from browser-fetched files, including the scanned editorial rules.",
+        "The English guide requires at least 300 dpi for photographs, 1000 dpi for bitmapped line drawings and 500 dpi for bitmapped line/halftone combinations. It specifies EPS/PDF for vectors with fonts embedded or text converted to graphics, and TIFF/JPG for rasters.",
+        "The English guide accepts PDF vector figures, but section 3(f) of the society-linked Korean rule01_2026.pdf requires figure files other than PDF. This profile lists the unambiguous common formats EPS, TIFF and JPEG; PDF submission needs confirmation from the journal, not an inferred approval.",
+        "The English guide names single, 1.5 and 2-column images without numerical widths. The Korean rules limit a printed figure to one page and require legibility after reduction, but give no numerical final width, height or font point size. These stay null; manuscript A4/margin settings are not figure dimensions.",
+        "Colour mode, CVD requirement/advice and combined-panel files were not specified in the opened sources. Per-kind AI permissions and disclosure locations were not verified in the author guide or English/Korean ethics rules; all five policies remain unknown. General research-integrity rules are not inferred AI permission."
       ]
     }
   ]
