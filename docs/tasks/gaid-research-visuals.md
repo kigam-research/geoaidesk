@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:28:37Z
+updated: 2026-10-22T03:00:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -110,7 +110,26 @@ gaid-concept-pictures (hub concept pictures: ai-picture records may show them). 
 A owns server/src/helpers/pyproject.toml + uv.lock in this unit; check main for concurrent lock edits at integration.
 1. While children run: prepare the note-detail seam plan (figures section + map entry) and the library-detail map entry
    (library files now on main from gaid-library-next; ask the hub before editing web/src/geo/library/**).
+Integration notes from children: C pins @xyflow/react 12.12.0 and @dagrejs/dagre 3.1.1 (MIT) — writer adds both to
+   THIRD_PARTY_NOTICES.md after A merges; ConnectionMapButton takes projectId + onOpenNote/File/Chat/Paper/Workflow; workflow
+   nodes from trials carry methodId, paper→Workflow nodes carry hub entryId or authoringId (resolve both at wiring). A adds
+   cmcrameri, SciencePlots, pypdf to the helper venv; checker has optional --artwork photo|combination|lineArt; Geosciences
+   Journal official page lists 84/174 mm only.
+Decided 2026-10-22 (sent to A and B): CVD previews stay hidden at `.kady/geo/figure-checks/<sha256>-cvd-{deuteranopia,
+   protanopia,tritanopia}.png`, listed in FigureCheck.cvdPreviews; B serves them via GET /geo/figures/check-preview?sha256=
+   &variant= (fixed names only). A adds the React Flow/dagre notices. B usage: `import { NoteFigures } from '@/geo/figures'`
+   (projectId, noteId, onOpenFile, onOpenChat?(sessionId,title), onPrefill(text,{send:false})); side-by-side at 960 px via an
+   ancestor @container.
+Map child screenshots reviewed (~/data/geoaidesk/work/gaid-research-visuals--map/playwright/): fix at integration —
+   edge labels sit on shared vertical bus lines and collide ("인용함", "그림을 담음", "자료로 씀" overlap lines); the
+   `drew` label "그림" is ambiguous (use a verb phrase such as "그림을 그림"/"그림을 만듦" per terminology).
+Skill child journal sources: Elsevier, Copernicus, Springer/Geosciences Journal, GSA (59/122.8/148.2 mm, 7 pt, 300 photo /
+   1200 line; full width and page height conflict between pages → null) and JGSK verified by curl; AGU pages answered 403 and
+   자원환경지질 (EEG) pages returned empty replies → their rules stay unknown. Possible follow-up: open AGU/EEG pages in a real
+   browser (aside or playwright-cli) and fill the profiles. Non-listed formats warn (lists are recommendations).
 2. On each child finish: review its branch, `task complete gaid-research-visuals--<child>`, integrate (`task sync`).
+Blocked: the three children are in `task finish` (their scripts/check runs, started 2026-10-22); wait for their finish
+  notices, then review and `task complete` each.
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
