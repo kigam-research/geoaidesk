@@ -406,3 +406,45 @@ describe("SkillsPanel user-invoked only", () => {
     await waitFor(() => expect(toggle).toHaveBeenCalledWith("qc", false, "project"));
   });
 });
+
+describe("hub skill Settings rows", () => {
+  afterEach(() => localStorage.removeItem("gaid:locale"));
+  it("shows pinned revision, edited content, newer revision and suspended state without auto-updating", async () => {
+    localStorage.setItem("gaid:locale", "ko"); stubProjects();
+    vi.spyOn(caps, "getAllSkills").mockResolvedValue(listing({ enabled: [skill("table-check", "표 확인", { origin: "registry", source: "/internal/package.tar.gz", hubSkill: { id: "table-check", revision: 1, latestRevision: 2, edited: true, state: "suspended" } })] }));
+    const update = vi.spyOn(caps, "updateSkillFromUpstream");
+    render(<SkillsPanel />);
+    await screen.findByText("허브 스킬 · 1판");
+    expect(screen.getByText("고친 내용 있음")).toBeInTheDocument();
+    expect(screen.getByText("새 판: 2판")).toBeInTheDocument();
+    expect(screen.getByText(/사용 중지된 판입니다/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "2판으로 바꾸기" })).toBeInTheDocument();
+    expect(screen.queryByText("/internal/package.tar.gz")).not.toBeInTheDocument();
+    expect(update).not.toHaveBeenCalled();
+  });
+  it("does not offer an update when the installed revision is current", async () => {
+    localStorage.setItem("gaid:locale", "ko"); stubProjects();
+    vi.spyOn(caps, "getAllSkills").mockResolvedValue(listing({ enabled: [skill("table-check", "표 확인", { hubSkill: { id: "table-check", revision: 2, latestRevision: 2, edited: false, state: "checked" } })] }));
+    render(<SkillsPanel />); await screen.findByText("허브 스킬 · 2판");
+    expect(screen.queryByText("고친 내용 있음")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /판으로 바꾸기/ })).not.toBeInTheDocument();
+  });
+});
+
+describe("explicit hub revision update", () => {
+  afterEach(() => localStorage.removeItem("gaid:locale"));
+  it("opens the pinned install preview and preserves edited project content", async () => {
+    localStorage.setItem("gaid:locale", "ko"); stubProjects();
+    vi.spyOn(caps, "getAllSkills").mockResolvedValue(listing({ enabled: [skill("table-check", "表確認", { origin: "registry", hubSkill: { id: "table-check", revision: 1, latestRevision: 2, edited: true, state: "checked" } })] }));
+    const { hubSkills } = await import("@/geo/hub-skills/api");
+    const { installFixture } = await import("@/geo/hub-skills/fixtures");
+    const preview = vi.spyOn(hubSkills, "installPreview").mockResolvedValue(installFixture({ project: "edited" }));
+    const install = vi.spyOn(hubSkills, "install");
+    render(<SkillsPanel />);
+    await userEvent.click(await screen.findByRole("button", { name: "2판으로 바꾸기" }));
+    await waitFor(() => expect(preview).toHaveBeenCalledWith("table-check", "p1", 2));
+    expect(await screen.findByRole("checkbox")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "프로젝트에 설치" })).toBeDisabled();
+    expect(install).not.toHaveBeenCalled();
+  });
+});

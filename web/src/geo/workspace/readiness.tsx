@@ -1,5 +1,6 @@
 "use client";
 
+import { HubSkillInstall } from "@/geo/hub-skills/install";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TechnicalDetail } from "@/geo/hub/technical";
@@ -85,7 +86,9 @@ function EnableSkills({ value, projectId, onEnabled }: { value: WorkflowReadines
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const disabled = value.skills.filter((skill) => skill.installed && !skill.enabled && skill.runtimeName);
-  const absent = value.skills.filter((skill) => !skill.installed);
+  // Hub skills that cannot be used are explained by their pin state below, not as plain missing names.
+  const hubBlocked = value.skills.filter((skill) => skill.source === "hub" && skill.hub && !skill.installed);
+  const absent = value.skills.filter((skill) => !skill.installed && skill.source !== "hub");
   const enable = async () => {
     setBusy(true); setError(null);
     try {
@@ -103,6 +106,14 @@ function EnableSkills({ value, projectId, onEnabled }: { value: WorkflowReadines
     {absent.filter((skill) => skill.source === "imported" && skill.ref).map((skill) => <div key={skill.id} className="space-y-1">
       <p>{t("workflowView.importRef", { ref: skill.ref! })}</p>
       <Button size="sm" variant="outline" onClick={() => requestSkillImport(projectId, skill.ref!)}>{t("workflowView.import.button")}</Button>
+    </div>)}
+    {hubBlocked.map((skill) => <div key={skill.id} className="space-y-1">
+      <p>{t("workspace.skills.hub", { name: skill.runtimeName ?? skill.id, revision: skill.hub!.revision })} {t(`workflowView.hubState.${skill.hub!.state}`)}</p>
+      {skill.hub!.state === "missing"
+        ? <details><summary className="cursor-pointer">{t("workspace.skills.hubInstall", { revision: skill.hub!.revision })}</summary>
+          <div className="mt-2"><HubSkillInstall skillId={skill.hub!.skillId} revision={skill.hub!.revision} projectId={projectId} onInstalled={() => void onEnabled()} /></div>
+        </details>
+        : <a className="underline" href={`#hub/s/${encodeURIComponent(skill.hub!.skillId)}`}>{t("workflowView.hubOpen")}</a>}
     </div>)}
     {error && <div role="alert" className="space-y-1"><p className="text-destructive">{t("workspace.skills.error")}</p><TechnicalDetail detail={error} /></div>}
   </div>;

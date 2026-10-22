@@ -31,12 +31,14 @@
   "source": {
     "catalogue": "built-in skill",
     "bundled": "skill bundled with this Workflow",
-    "imported": "imported skill"
+    "imported": "imported skill",
+    "hub": "hub skill"
   },
   "skill": {
     "primary": "primary skill",
     "usedIn": "Used in step {steps}.",
-    "readRule": "Before you start a step that uses a skill, read that skill's instruction file (SKILL.md)."
+    "readRule": "Before you start a step that uses a skill, read that skill's instruction file (SKILL.md).",
+    "hubRevision": "revision {revision}"
   },
   "steps": {
     "legacy": "This Workflow uses the earlier format. For the detailed method of each step, follow the procedure in the instructions of skill {skill}."

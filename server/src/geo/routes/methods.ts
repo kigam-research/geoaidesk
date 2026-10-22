@@ -7,6 +7,8 @@
  * Installation stays in the existing skill preview/acknowledgement/install gate;
  * none of these routes installs, prepares an environment or sends a prompt.
  */
+import { hubSuspendedLookup } from "../methods/hub-pin-install.ts";
+import { installedMethods } from "../methods/local-methods.ts";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { activePaths, type ProjectPaths } from "../../projects.ts";
 import type { LocalMethodsResponse, MethodTrialsResponse } from "../../../../web/src/geo/contracts/methods.ts";
@@ -40,7 +42,7 @@ export async function registerGeoMethodRoutes(app: FastifyInstance, options: Geo
   };
 
   app.get("/geo/methods", async (): Promise<LocalMethodsResponse> => ({
-    methods: await listLocalMethods(pathsOf(), catalogueOf(), service),
+    methods: await listLocalMethods(pathsOf(), catalogueOf(), service, { hubSuspended: await hubSuspendedLookup(installedMethods(pathsOf()).map((m) => m.file.method)) }),
   }));
 
   app.get<{ Querystring: { skill?: string } }>("/geo/methods/trials", async (req): Promise<MethodTrialsResponse> => ({

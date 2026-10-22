@@ -1,4 +1,6 @@
 /** Portable Workflow documents and bounded Agent Skills ZIPs. No installation or model calls. */
+import { HubSkillStore, readHubSkillRevision } from "./hub-skills/index.ts";
+import { methodTreeHash } from "./methods/tree-hash.ts";
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
@@ -71,7 +73,7 @@ function tree(dir: string, b: ReturnType<typeof budget>): SkillFiles {
   if (!files.some(f => f.path === "SKILL.md")) throw new CliExportError("Skill has no SKILL.md");
   return files;
 }
-function resolveFiles(doc: WorkflowDoc, paths: ProjectPaths, catalogue: GeoCatalogue | null, bundled?: { name: string; dir?: string; files?: SkillFiles }): CliSource {
+function resolveFiles(doc: WorkflowDoc, paths: ProjectPaths, catalogue: GeoCatalogue | null, bundled?: { name: string; dir?: string; files?: SkillFiles }, hubFiles = new Map<string, SkillFiles>()): CliSource {
   const files: CliSource["files"] = new Map();
   const missing: string[] = [];
   const b = budget();
@@ -83,14 +85,25 @@ function resolveFiles(doc: WorkflowDoc, paths: ProjectPaths, catalogue: GeoCatal
       files.set(skill.name, bundled.files);
       continue;
     }
+    const pinned = skill.source === "hub" ? hubFiles.get(skill.name) : undefined;
+    if (pinned) {
+      for (const f of pinned) account(b, f.data.length);
+      files.set(skill.name, pinned);
+      continue;
+    }
     const entry = catalogue?.index.skills.find(s => s.runtimeName === skill.name || s.id === skill.name);
     let dir: string | undefined;
     if (skill.source === "catalogue" && entry && catalogue)
       dir = path.join(catalogue.root, safeEntryPath(entry.packageRef));
     else if (skill.source === "bundled" && bundled?.name === skill.name) dir = bundled.dir;
     else if (skill.source === "imported") dir = path.join(paths.skillsDir, skill.name);
+    else if (skill.source === "hub" && skill.hub) {
+      // A hub skill is exported only as its pinned revision: the project copy when it is that exact tree.
+      const local = path.join(paths.skillsDir, skill.name);
+      if (fs.existsSync(path.join(local, "SKILL.md")) && methodTreeHash(local) === skill.hub.treeHash) dir = local;
+    }
     if (!dir || !fs.existsSync(dir)) {
-      if (skill.source === "imported") { missing.push(skill.name); continue; }
+      if (skill.source === "imported" || skill.source === "hub") { missing.push(skill.name); continue; }
       throw new CliExportError(`Required skill is unavailable: ${skill.name}`);
     }
     files.set(skill.name, tree(dir, b));
@@ -119,7 +132,24 @@ export function projectCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | 
   if (!workflow || !catalogue) throw new CliExportError("Workflow was not found", 404);
   return resolveFiles(workflowDocFor(workflow, { skills: skillsFor(workflow, catalogue), procedure: catalogueProcedure(catalogue, workflow.skillIds[0] ?? "") }), paths, catalogue);
 }
-export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string): Promise<CliSource> {
+/** The exact pinned hub skill revisions (gaid-hub-skills), read from the hub store; an unreadable pin is left missing. */
+async function pinnedHubFiles(doc: WorkflowDoc, store: HubSkillStore): Promise<Map<string, SkillFiles>> {
+  const out = new Map<string, SkillFiles>();
+  for (const skill of doc.skills) {
+    if (skill.source !== "hub" || !skill.hub) continue;
+    try {
+      const { revision, archive } = await readHubSkillRevision(store, skill.hub.skillId, skill.hub.revision);
+      if (revision.treeHash !== skill.hub.treeHash) continue;
+      const entries = readTar(zlib.gunzipSync(archive, { maxOutputLength: SKILL_HUB_LIMITS.expanded }));
+      const prefix = `${skill.name}/`;
+      out.set(skill.name, entries.filter((e) => e.type === "file" && e.path.startsWith(prefix)).map((e) => ({ ...e, path: e.path.slice(prefix.length) })));
+    } catch {
+      // Reported as a missing skill in the export README.
+    }
+  }
+  return out;
+}
+export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string, hubStore = new HubSkillStore()): Promise<CliSource> {
   const record = await store.read(id);
   const snapshot = record.snapshots[record.entry.latestRevision];
   if (!snapshot?.draft.workflow) throw new CliExportError("Workflow was not found", 404);
@@ -141,7 +171,7 @@ export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue 
   if (!files.some(f => f.path === "SKILL.md")) throw new CliExportError("Package has no SKILL.md");
   const workflow = snapshot.draft.workflow as unknown as GeoWorkflow;
   const doc = workflowDocFor(workflow, { revision: record.entry.latestRevision, skills: skillsFor(workflow, catalogue, slug), procedure: procedureSteps(snapshot.draft.profile) });
-  return resolveFiles(doc, paths, catalogue, { name: slug, files });
+  return resolveFiles(doc, paths, catalogue, { name: slug, files }, await pinnedHubFiles(doc, hubStore));
 }
 export function buildCliZip(source: CliSource, target: CliTarget, locale: "ko" | "en", limits = SKILL_HUB_LIMITS): Buffer {
   if (!CLI_TARGETS.includes(target)) throw new CliExportError("CLI target has not been verified", 400);

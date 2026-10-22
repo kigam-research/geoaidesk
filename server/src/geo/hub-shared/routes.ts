@@ -3,6 +3,7 @@
  * docs/adr/2026-10-22-gaid-hub-server.md): a logged-in institute hub server account, or the local store with the display
  * name from X-GAID-User (not account authentication).
  */
+import { hubPinProblems } from "../methods/hub-pin-install.ts";
 import { procedureSteps, workflowDocFor } from "../workflow-doc.ts";
 import { gunzipSync } from "node:zlib";
 import { readTar } from "../tar.ts";
@@ -192,6 +193,9 @@ export async function registerSharedHubRoutes(
           if (!selectedDraft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
           const draft = structuredDraft(selectedDraft);
           if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
+          // Pinned hub skills must be installable by every researcher who installs this Workflow.
+          const pinProblems = await hubPinProblems(draft.workflow.skills ?? []);
+          if (pinProblems.length) throw new AuthoringError(pinProblems.join(" "), 409);
           let pkg = project.packages.find((p) => p.draftRevision === draft.revision &&
             ((p.manifest as { workflows?: GeoWorkflow[] } | null)?.workflows ?? []).some((w) => w.id === draft.workflow!.id && w.schemaVersion === "gaid-workflow/v1"));
           if (!pkg) {

@@ -4,12 +4,12 @@
  * 내 Workflow) stay beside the home lists, a registered or built-in Workflow, and a Workflow being made. On a detail
  * screen the list it was opened from stays marked. Hidden, it becomes a 48 px rail with the same places as icons.
  */
-import { FolderIcon, FolderPlusIcon, ListIcon, PanelLeftIcon, PencilIcon, StarIcon } from "lucide-react";
+import { BookOpenIcon, FolderIcon, FolderPlusIcon, ListIcon, PanelLeftIcon, PencilIcon, StarIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { geoText } from "@/geo/i18n";
+import { geoText, t } from "@/geo/i18n";
 import { SidebarGroup, SidebarItem } from "@/geo/shell/sidebar";
 import { shortcutLabel } from "@/geo/shell/shortcuts";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const text = geoText("hub");
 
 /** The list the hub shows (or, on a detail screen, the list the researcher came from). */
-export type HubView = { kind: "home" } | { kind: "registry"; folder: string } | { kind: "mine" };
+export type HubView = { kind: "home" } | { kind: "registry"; folder: string } | { kind: "mine" } | { kind: "skills" };
 
 export interface HubSidebarFolder {
   id: string;
@@ -134,6 +134,7 @@ export function HubSidebar({
           onClick={() => onView({ kind: "registry", folder: "all" })}
         />
         <RailItem icon={PencilIcon} label={text("home.mineTitle")} selected={is({ kind: "mine" })} onClick={() => onView({ kind: "mine" })} />
+        <RailItem icon={BookOpenIcon} label={t("hubSkills.nav")} selected={is({ kind: "skills" })} onClick={() => onView({ kind: "skills" })} />
       </nav>
     );
   return (
@@ -176,6 +177,7 @@ export function HubSidebar({
       <SidebarGroup title={text("home.mineTitle")}>
         <SidebarItem icon={PencilIcon} label={text("home.mineItem")} count={mineCount} selected={is({ kind: "mine" })} onClick={() => onView({ kind: "mine" })} />
       </SidebarGroup>
+      <SidebarGroup title={t("hubSkills.nav")}><SidebarItem icon={BookOpenIcon} label={t("hubSkills.all")} selected={is({ kind: "skills" })} onClick={() => onView({ kind: "skills" })} /></SidebarGroup>
     </nav>
   );
 }

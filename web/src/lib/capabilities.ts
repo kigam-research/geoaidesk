@@ -1,4 +1,5 @@
 "use client";
+import type { InstalledHubSkill } from "@/geo/contracts/hub-skills";
 
 /**
  * Skills capability client for the Settings hub.
@@ -17,6 +18,7 @@ export type SkillScope = "project" | "global";
 export type SkillOrigin = "catalogue" | "registry" | "local";
 
 export interface SkillInfo {
+  hubSkill?: InstalledHubSkill;
   id: string;
   name: string;
   description: string;
