@@ -22,6 +22,10 @@ export interface ConnectionMapPaneProps extends ConnectionOpenActions {
   projectId: string;
   focus: ConnectionFocus;
   onClose: () => void;
+  /** Shown in the header when the map opens outside its project (the library). */
+  projectName?: string;
+  /** Outside the project, items without their own open action open the project instead. */
+  onOpenProject?: () => void;
 }
 
 function ConnectionCard({ data, selected }: NodeProps<ConnectionFlowNode>) {
@@ -51,7 +55,7 @@ function ViewportControls() {
 
 const nodeTypes = { connection: ConnectionCard };
 
-function ConnectionMapContent({ projectId, focus, onClose, ...actions }: ConnectionMapPaneProps) {
+function ConnectionMapContent({ projectId, focus, onClose, projectName, onOpenProject, ...actions }: ConnectionMapPaneProps) {
   const [centre, setCentre] = useState<ConnectionFocus>(focus);
   const [depth, setDepth] = useState<1 | 2>(1);
   const [view, setView] = useState<"map" | "list">("map");
@@ -81,7 +85,7 @@ function ConnectionMapContent({ projectId, focus, onClose, ...actions }: Connect
     <header className="flex shrink-0 items-center justify-between gap-4 border-b border-gaid-edge bg-gaid-chrome px-5 py-4">
       <div className="min-w-0">
         <h2 className="truncate text-lg font-semibold">{t("connections.title")}</h2>
-        <p className="mt-1 text-sm text-gaid-ink-2">{t("connections.hint")}</p>
+        <p className="mt-1 text-sm text-gaid-ink-2">{projectName ? t("connections.hintProject", { project: projectName }) : t("connections.hint")}</p>
       </div>
       <Button variant="ghost" onClick={onClose}>{t("connections.close.button")}</Button>
     </header>
@@ -141,8 +145,10 @@ function ConnectionMapContent({ projectId, focus, onClose, ...actions }: Connect
             {item.detail && <p className="mt-2 line-clamp-2 break-words text-sm text-gaid-ink-2">{item.detail}</p>}
             {item.attention && <p className="mt-2 text-sm text-gaid-warning">{t("connections.attention." + item.attention)}</p>}
             <div className="mt-4 flex flex-col gap-2">
-              <Button disabled={!handlers[item.open.kind] || item.attention === "missing"} onClick={() => handlers[item.open.kind]?.(item.open.ref)}>{t("connections.open." + item.kind + ".button")}</Button>
-              {!handlers[item.open.kind] && <p className="text-xs text-gaid-ink-2">{t("connections.open.unavailable")}</p>}
+              {!handlers[item.open.kind] && onOpenProject
+                ? <Button onClick={onOpenProject}>{t("connections.open.project.button")}</Button>
+                : <Button disabled={!handlers[item.open.kind] || item.attention === "missing"} onClick={() => handlers[item.open.kind]?.(item.open.ref)}>{t("connections.open." + item.kind + ".button")}</Button>}
+              {!handlers[item.open.kind] && !onOpenProject && <p className="text-xs text-gaid-ink-2">{t("connections.open.unavailable")}</p>}
               <Button variant="outline" disabled={item.id === data?.focus} onClick={() => setCentre(item.id as ConnectionFocus)}>{t("connections.centre.button")}</Button>
             </div>
           </>}
