@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T06:33:27Z
+status: ready
+updated: 2026-10-22T06:33:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -72,7 +72,7 @@ Stable integration API: server/src/geo/hub-skills/index.ts exports HubSkillStore
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T06:24:38Z: ready; the parent gaid-hub-skills integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T06:33:29Z: ready; the parent gaid-hub-skills integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish merged parent f962590b and ran scripts/check. Server: 2085 passed, 8 skipped; web: 1156 passed. Distribution failed only because concatenating two owner ids in integration-boundaries.json is not a valid allowlisted owner. Restore the historical seam and add a separate shelf-owned seam; use unit-level owner gaid-hub-skills and merge parent allowlist commit 349f50a6163e (do not edit the test in this child). Fix in place and rerun task finish, without task save/resume in between.
