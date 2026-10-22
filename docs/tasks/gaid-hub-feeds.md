@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:07:06Z
+updated: 2026-10-22T15:09:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ae22402c-3c23-4d4f-a3f2-53a34a33fd4e","pid":2316190,"provider":"claude","session":"a84ff37e-f54b-47e9-b216-7e2a5ce01bc0","start":"56712264","token":"2910bef256a9caa5c7498bb6d9647f32045f60a92a90aded98a1e4fdbf68e513"}
 branch: task/gaid-hub-feeds
 target: main
@@ -58,16 +58,20 @@ Meaning of the decisions (they answer the hub's four questions):
 - Done: the user's outcome above plus the repo checks (`scripts/check`). Anything beyond that is "Optional".
 
 ## Current state
-- Shared interfaces settled and pushed (6871f5a8): contract `web/src/geo/contracts/hub-feeds.ts`, shipped proposals
-  `geo/feeds/sources.json` (10 geoscience + GeekNews + 6 GitHub release sources + 1 GitHub skill search; all 18 URLs
-  answered 200 from PC74 on 2026-10-22), routes in `server/src/geo/hub-server/protocol.ts` "Information feeds".
-- Child `gaid-hub-feeds--server` (writer 80c56972, Paseo general work) builds the hub-server side; started 2026-10-22 23:58 KST.
+- Integrated: child gaid-hub-feeds--server completed and closed (hub server: migration 3, feeds/{sources,parse,fetch,store,
+  schedule}.ts, routes, CLI `feeds list|approve|stop|fetch`, operator guide; 2 live receipts in ~/data/geoaidesk/runs/).
+- Parent: GAID proxies (`/geo/hub/feeds`, `/geo/hub-server/admin/feeds/*`, 10-min timeout for collect-now), web 자료 소식 place
+  (`#hub/feeds`, sidebar group, filters, GitHub skill handoff), admin "자료 소식 출처" tab, locales hubFeeds, AGENTS.md section.
+- Integration fixes: shared FEED_LIMITS.perSourceUnfiltered; `feed_items.sort_at` (undated items of a source's first
+  collection sort below dated ones, later undated items by first collection time; migration 3 is unreleased, edited in place);
+  skills-panel reads a pending import request after mount (first-open handoff lost it; affects Workflow readiness too).
+- Verified: server feeds/e2e/hub tests 76 + web hub tests pass; GAID ↔ real hub server e2e `server/test/geo-hub-feeds-e2e.test.ts`;
+  live: local hub on 127.0.0.1:8711 (home ~/data/geoaidesk/work/gaid-hub-feeds/hub-home), 18/18 sources collected (~21 s),
+  default list 154 items; browser checks + 14 screenshots in ~/data/geoaidesk/work/gaid-hub-feeds/playwright/ (SHA256SUMS).
+- Temporary services (stop at finish): user units `gaid-hub-feeds-app` (GAID 3110/8110, data under the work dir) and
+  `gaid-hub-feeds-hub` (hub 8711).
 ## Next steps
-1. Parent: GAID routes (`server/src/geo/routes/hub-feeds.ts`, `/geo/hub/feeds`, admin proxies under
-   `/geo/hub-server/admin/feeds/*`), web `web/src/geo/hub-feeds/` (feed screen at `#hub/feeds`, sidebar place, admin
-   sources section in Settings → 기관 GAID 허브), locales `hubFeeds`, docs, report with screenshots.
-2. When the child finishes: `task complete gaid-hub-feeds--server`, integrate, end-to-end check against a real hub server,
-   then `scripts/check`.
+1. Record the scripts/check result in the report appendix, stop the two temporary units, `task finish`.
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: sequential = contract → (child server ∥ parent GAID/web) → integration. Owned files: child =
@@ -87,7 +91,9 @@ Meaning of the decisions (they answer the hub's four questions):
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 기관 허브 서버를 gaid-hub-feeds 변경으로 갱신한 뒤 제안 출처를 승인하는 범위 — 가) 18곳 모두 승인 — 나) 일부만 승인 — 권장: 가) PC74에서 18곳 모두 수집을 확인했고 필요 없는 출처는 나중에 멈출 수 있음 — 막힌 일: 연구자 화면의 자료 소식 — 조건: 시험 운영 허브 서버(PC74:8700)를 main으로 갱신한 뒤, 관리자 계정으로 설정 → 기관 GAID 허브 → 허브 서버 관리 → 자료 소식 출처 — 근거: reports/2026-10-22-gaid-hub-feeds/index.md#6-결정할-일
 ## Report
+Report: reports/2026-10-22-gaid-hub-feeds/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
