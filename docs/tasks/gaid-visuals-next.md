@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:06:00Z
+updated: 2026-10-22T09:07:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8bae3bd9-1847-436d-918d-15c77aff84a1","pid":1865557,"provider":"claude","session":"04b52e98-aed3-4749-b725-5863794d4095","start":"54718151","token":"c1146656906ed1e52af0dcf6a76b7d8f0f6adc197b1e4b98254b697d47eb5959"}
 branch: task/gaid-visuals-next
 target: main
@@ -58,14 +58,14 @@ Child A: gaid-visuals-next--journals (writer 296db605), running; reported AGU/EE
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
+Closes: gaid-research-visuals#2
+Closes: gaid-research-visuals#3
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-22-gaid-visuals-next/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
