@@ -21,6 +21,7 @@ import { getProject, resolvePaths } from "../../projects.ts";
 import { readMethodFile, verifyMethodTree } from "../methods/method-file.ts";
 import { originOfSource, packageStore, writePackageOrigin } from "../methods/package-origin.ts";
 import { stageSkillHubPackage } from "../skill-hub.ts";
+import { installPinnedHubSkills, previewPinnedHubSkills } from "../methods/hub-pin-install.ts";
 import { AuthoringError, now, type AuthoringStore } from "./store.ts";
 
 export interface InstallDeps {
@@ -130,7 +131,12 @@ export async function installPackageBytes(
     installedAt: now(),
   };
   const manifest = pkg.manifest as { workflows?: { id: string }[]; recipes?: { id: string }[] };
-  return { install, workflowId: manifest.workflows?.[0]?.id ?? null, recipeId: manifest.recipes?.[0]?.id ?? null };
+  // Hub skills the Workflow pins come along from the hub store under the same acknowledgement (never from GitHub).
+  const hubSkills = await installPinnedHubSkills(paths, file.method, { agentDir: deps.agentDir });
+  return {
+    install, workflowId: manifest.workflows?.[0]?.id ?? null, recipeId: manifest.recipes?.[0]?.id ?? null,
+    ...(hubSkills.length ? { hubSkills } : {}),
+  };
 }
 
 /** Preview the exact built bytes before consent; installation remains an explicit separate action. */
@@ -142,5 +148,6 @@ export async function previewPackageBytes(archive: Buffer, pkg: Pick<MethodPacka
   if (!file || verifyMethodTree(dir, file).length || file.methodId !== pkg.methodId || file.revision !== pkg.revision)
     throw new AuthoringError("설치할 Workflow 파일이 검사한 내용과 맞지 않습니다. 초안을 다시 검사하세요.", 422);
   const preview = await previewSkillSource(resolvePaths(projectId), { source: staged.source, scope: "project" });
-  return { ...preview, contents: [{ name: pkg.slug, files: ["gaid-method.json", ...(file.files ?? []).map((f) => f.path)], hasCode: file.implementation === "implemented", prompts: file.workflows.map((w) => w.prompt) }] };
+  const hubSkills = await previewPinnedHubSkills(resolvePaths(projectId), file, { agentDir: deps.agentDir });
+  return { ...preview, contents: [{ name: pkg.slug, files: ["gaid-method.json", ...(file.files ?? []).map((f) => f.path)], hasCode: file.implementation === "implemented", prompts: file.workflows.map((w) => w.prompt) }], ...(hubSkills.length ? { hubSkills } : {}) };
 }

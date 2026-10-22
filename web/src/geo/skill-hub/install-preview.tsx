@@ -6,10 +6,13 @@ import { text } from "@/geo/workspace/api";
 import type { Localized } from "@/geo/contracts/workspace";
 import { apiFetch } from "@/lib/projects";
 import { hubApi } from "@/geo/hub/api";
+import type { HubSkillInstallState } from "@/geo/contracts/hub-skills";
 
 export interface InstallPreviewData {
   skills: { name: string; files: number }[];
   contents: { name: string; files: string[]; hasCode: boolean; prompts: Localized[] }[];
+  /** Hub skills the Workflow pins (gaid-hub-skills), with their state in the target project. */
+  hubSkills?: { name: string; revision: number; state: HubSkillInstallState }[];
 }
 
 /** The three install routes share one bounded preview, above the consent checkbox. */
@@ -50,6 +53,19 @@ export function InstallPreview({ projectId, entryId, revision, authoringId, onRe
         <p className="text-xs text-muted-foreground">{t("skillHub.previewRun")}</p>
         <details><summary className="cursor-pointer text-xs">{t("skillHub.previewPrompt")}</summary>{skill.prompts.map((p, i) => <pre key={i} className="mt-2 max-h-36 overflow-auto whitespace-pre-wrap text-xs">{text(p)}</pre>)}</details>
       </div>)}
+      <HubSkillLines skills={data.hubSkills ?? []} />
     </>}
   </section>;
+}
+
+/** Pinned hub skills: the missing ones come along; others are already there or cannot be installed. */
+function HubSkillLines({ skills }: { skills: NonNullable<InstallPreviewData["hubSkills"]> }) {
+  const label = (s: { name: string; revision: number }) => t("skillHub.previewHubSkill", { name: s.name, revision: s.revision });
+  const coming = skills.filter((s) => s.state === "missing");
+  const blocked = skills.filter((s) => s.state === "conflict" || s.state === "edited" || s.state === "suspended");
+  if (!coming.length && !blocked.length) return null;
+  return <div className="space-y-1">
+    {coming.length > 0 && <p>{t("skillHub.previewHubSkills", { names: coming.map(label).join(", ") })}</p>}
+    {blocked.length > 0 && <p>{t("skillHub.previewHubBlocked", { names: blocked.map(label).join(", ") })}</p>}
+  </div>;
 }

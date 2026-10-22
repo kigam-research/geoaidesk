@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:15:08Z
+updated: 2026-10-22T06:56:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188","pid":177398,"provider":"codex","session":"01a16234-e5b9-72e1-ad05-708c154db748","start":"53693527","token":"b43fd525741ba4dfc4306e8a53ecc93b452a07e41bd222c5e954043676b60fc0"}
 branch: task/gaid-hub-skills--ui
 target: task/gaid-hub-skills
@@ -60,7 +60,7 @@ Implemented the shelf, read-only detail/file views, per-revision reviews, three-
 
 Captured 32 Korean screenshots (4 screens × 2 styles × 2 themes × 2 viewport sizes) with intercepted contract fixtures. All have no horizontal overflow; inspected first-action visibility, layout, type, contrast, disclosures and states. Four small representative images are in the parent report figures folder. Full captures, hashes and fixture/capture scripts are under /home/seongin3/data/geoaidesk/work/gaid-hub-skills--ui/; visual-evidence.json records the capture matrix. Real-store verification is not yet done. Codegraph has no index for this exact worktree; bounded native source reads were used.
 ## Next steps
-Blocked: Waiting for the parent to integrate the store sibling and send the integration notice. UI code and mock verification are pushed at 3ea0e60818f8.
+Parent integrated store at ba8d70d37c3d. task sync encountered one append-only boundary conflict; retained both seams with the authorized parent owner gaid-hub-skills. Completing the merge through task save, then running the real isolated API/browser check.
 1. After the parent integrates store and sends a notice, run task sync and inspect the integrated API before running the real-server check.
 2. Check registration, exact-revision installation, file reads and review with a dedicated GAID_HOME/KADY_PROJECTS_ROOT, rerun declared focused checks, then task finish.
 3. Frontend gaid-hub-skills-ui-web.service and playwright-cli session hubskills were stopped after visual QA. Restart the isolated frontend (:3117, API :8117) only for the real-store browser check. Both server and web locked npm dependencies are installed; no package/lock edits. Logs and capture scripts remain in the external task data directory.

@@ -10,6 +10,7 @@ import { SkillInstructions } from "@/geo/skills/skill-instructions";
 import { MethodFlow, type PictureAction, type StepVisual } from "@/geo/hub/method-flow";
 import { localText } from "@/geo/hub/text";
 import { workflowDocText } from "./render";
+import { loadHubSkillSource } from "./hub-skill-source";
 
 const text = geoText("workflowView");
 export type SkillSourceLoader = (name: string) => Promise<{ content: string }>;
@@ -49,13 +50,22 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
       <ul className="mt-3 space-y-3">
         {doc.skills.map((skill) => {
           const installed = readiness?.skills.some((s) => s.runtimeName === skill.name && s.installed);
-          const readable = Boolean(loadSkillSource && skill.source !== "imported") || Boolean(projectId && installed);
+          // A hub skill is read as its pinned revision from the hub, whatever copy the project has.
+          const hub = skill.source === "hub" && skill.hub ? skill.hub : null;
+          const hubState = hub ? readiness?.skills.find((s) => s.runtimeName === skill.name)?.hub?.state : undefined;
+          const readable = Boolean(hub) || Boolean(loadSkillSource && skill.source !== "imported") || Boolean(projectId && installed);
           return <li key={skill.name} className="space-y-1">
             <p className="font-medium">{localText(skill.title) || skill.name}</p>
-            <p className="text-muted-foreground">{text(`source.${skill.source}`)}{skill.ref ? ` · ${skill.ref}` : ""}</p>
+            <p className="text-muted-foreground">{text(`source.${skill.source}`)}{skill.ref ? ` · ${skill.ref}` : ""}{hub ? ` · ${text("hubRevision", { revision: hub.revision })}` : ""}</p>
+            {hubState && hubState !== "installed" && <p>{text(`hubState.${hubState}`)}</p>}
             {skill.purpose && <p>{localText(skill.purpose)}</p>}
-            {readable && <Button variant="outline" size="sm" onClick={() => setReading(skill.name)}>{text("instructions.button")}</Button>}
-            {reading === skill.name && (skill.source !== "imported" && loadSkillSource
+            <div className="flex flex-wrap gap-2">
+              {readable && <Button variant="outline" size="sm" onClick={() => setReading(skill.name)}>{text("instructions.button")}</Button>}
+              {hub && <Button variant="ghost" size="sm" asChild><a href={`#hub/s/${encodeURIComponent(hub.skillId)}`}>{text("hubOpen")}</a></Button>}
+            </div>
+            {reading === skill.name && (hub
+              ? <RemoteSkillSource key={skill.name} name={skill.name} load={() => loadHubSkillSource(hub.skillId, hub.revision)} onBack={() => setReading(null)} />
+              : skill.source !== "imported" && loadSkillSource
               ? <RemoteSkillSource key={skill.name} name={skill.name} load={loadSkillSource} onBack={() => setReading(null)} />
               : projectId && <SkillInstructions key={skill.name} name={skill.name} scope="project" projectId={projectId} onBack={() => setReading(null)} />)}
           </li>;

@@ -1,4 +1,5 @@
 /** skill_hub packages are durable local sources for the existing preview/install gate. */
+import { previewPinnedHubSkills } from "./methods/hub-pin-install.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -255,7 +256,9 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   });
   const preview = await (deps.preview ?? previewSkillSource)(paths, { source: staged.source, scope: input.scope });
   const catalogue = deps.catalogue ?? skillHubCatalogue();
-  return { ...preview, contents, skillHub: {
+  const methodFiles = fs.readdirSync(staged.source).map((entry) => readMethodFile(path.join(staged.source, entry), entry).method);
+  const hubSkills = (await Promise.all(methodFiles.map((file) => previewPinnedHubSkills(paths, file, { agentDir: deps.agentDir })))).flat();
+  return { ...preview, contents, ...(hubSkills.length ? { hubSkills } : {}), skillHub: {
     sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
     ...(ref ? { hubEntry: { ...ref, title: record!.entry.title } } : {}),
     ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),

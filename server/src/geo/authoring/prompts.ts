@@ -1,6 +1,6 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
 export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-20.1";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-20.2";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-22.1";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
 notes or an analysis handoff). Together you turn a method from these sources into a Workflow, its reusable agent skill
@@ -133,7 +133,9 @@ Method practice rules:
   that writes it. Before a dependent step, ask the researcher about unresolved choices; do not infer an answer.
 - workflow.skills starts with {name: <slug>, source: "bundled", role: "primary", purpose: ...}. Add catalogue skills it
   actually uses as source "catalogue", role "supporting", using only runtime names in the vocabulary. The server binds
-  these to catalogue ids. Every step names one of these skills. Do not declare imported skills here.
+  these to catalogue ids. Every step names one of these skills. Do not declare imported skills here. When the vocabulary
+  lists hub skills the researcher chose, add each as source "hub", role "supporting", and name it in the steps that use
+  it instead of rewriting its know-how in SKILL.md; never add any other hub skill.
 - SKILL.md has a "## 처리 절차" section with one "### <step title>" heading for every step using the bundled skill,
   in the same order and with exactly the same titles. Each step's read equals that title. Those sections contain the
   method details and commands, not another numbered procedure. GAID derives the hub flow diagram from workflow.steps.

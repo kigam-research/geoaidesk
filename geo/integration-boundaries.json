@@ -916,9 +916,15 @@
     },
     {
       "path": "web/src/app/page.tsx, web/src/lib/capabilities.ts, web/src/components/skills-panel.tsx, web/src/components/skills-panel.test.tsx",
-      "owner": "gaid-hub-skills--ui",
+      "owner": "gaid-hub-skills",
       "status": "edited",
       "responsibility": "Narrow hub skill route props, InstalledHubSkill type, shelf install source and explicit revision update states; focused UI regressions"
+    },
+    {
+      "path": "server/src/api/skills.ts",
+      "owner": "gaid-hub-skills",
+      "status": "edited",
+      "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
     }
   ],
   "notTouched": [

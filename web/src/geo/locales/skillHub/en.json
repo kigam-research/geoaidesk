@@ -46,5 +46,8 @@
   "previewCode": "{code, select, yes {Execution code included} other {Instructions only}}",
   "previewRun": "Installation does not run code. After you set inputs and conditions and start, the AI agent follows the request below and the skill instructions.",
   "previewPrompt": "Request sent when starting",
-  "previewRetry": "Reload preview"
+  "previewRetry": "Reload preview",
+  "previewHubSkill": "{name} revision {revision}",
+  "previewHubSkills": "The hub skills this Workflow uses are installed with it: {names}",
+  "previewHubBlocked": "Hub skills that cannot be installed with it: {names}. After installing, readiness shows why."
 }
