@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:55:51Z
+updated: 2026-10-22T02:17:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd317c8f-ab1d-4414-aede-87515135d35e","pid":1749537,"provider":"claude","session":"d6996044-f57f-4278-9026-e0c4ac7a513a","start":"51919497","token":"14d69b3c7eed337fb37e61430d3c92ac27abbc46325a901f3d075f6110313cc6"}
 branch: task/gaid-concept-pictures
 target: main
@@ -44,16 +44,12 @@ user's OpenAI Codex (legacy) login: ask before spending it. Outside check: no ou
   `draft-step.tsx` (cover), `io-examples.tsx`. gaid-design-identity--fresh guide v2 draft rule I6 puts white-background pictures on a
   light mat in dark mode (`--pic-mat`/`--img-mat`, dark `#eef0f3`); its hub dark mockup shows the bright block the user dislikes.
 ## Next steps
-1. Read Oracle result; build mockups (static HTML on the fresh unit's mockup CSS, copied read-only into this unit's work dir):
-   가) mat baseline, 나) theme-matched light+dark variants, 다) transparent single picture; 계측/도폭 × light/dark; review-copy; ask.
-   Mockups done 2026-10-22: `~/data/geoaidesk/work/gaid-concept-pictures/mockups/pictures.html?p=mat|pair|svg&v=instrument|mapsheet&t=light|dark`
-   (static server unit `gaid-cp-static`, 127.0.0.1:3352; shots via `tools/shot.sh`, sheets `compare/compare-{mat,pair,svg}.png`;
-   pair/transparent pictures are pixel simulations from `tools/simulate.py`, not model output).
-   Oracle done; comparison written: `~/data/geoaidesk/work/gaid-concept-pictures/compare/index.md` (humanizer applied), review copy
-   `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-22-compare/`. Asked the user (2026-10-22): which option (가 mat / 나 theme
-   pair, recommended / 다 transparent) and whether to spend 4–6 real generations on the Codex (legacy) login to check first.
-   Waiting for the user's answer in this tab.
-2. Implement only the chosen option (server prompt/variants + web rendering + locales/tests), checks, finish.
+1. `task sync` (scripts/check) running in this session after merging main (gaid-design-identity landed: guide v2, 계측/도폭
+   tokens; conflicts in ui-guide.md, globals.css, hub-home.tsx resolved onto main's versions and re-applied).
+2. Then: start the app from this worktree with GAID_HOME `~/data/geoaidesk/work/gaid-concept-pictures/home` (seeded by
+   `tools/seed.py` + authoring project ap-b232edf4-30a: themed cover/zone map, older white block-size picture), ports
+   3361/18361; capture Korean screenshots 1440×900 and 1280×800, light/dark × 계측/도폭 (hub home, shared entry, draft);
+   write `reports/2026-10-22-gaid-concept-pictures/index.md`, humanizer, review-copy, `task finish`.
 ## Failed approaches
 ## Notes and decisions
 - Research (Oracle xhigh, 2026-10-22): vault `웹 조사/geoaidesk/2026-10-22-geoaidesk-gaid-ai-gaid-hub--dc8af4523f.md`.
@@ -62,6 +58,16 @@ user's OpenAI Codex (legacy) login: ask before spending it. Outside check: no ou
   GitHub/Apple HIG use separate light/dark assets; public API price ~$0.041 per 1536x1024 medium picture. Oracle recommended mat
   default + optional transparent + diagrams for step pictures; this writer recommends the theme pair because the user rejected the
   mat look in dark mode.
+- User decision (verbatim, 2026-10-22, this tab): "1은 나로 하고 2는 가로 하자." → 나) theme pair; 가) check with real
+  generations first.
+- Real trial 2026-10-22 (4 image calls on the user's OpenAI Codex (legacy) login, token read-only from
+  ~/.geoaidesk/pi-agent/auth.json, no refresh/write): cover + zone map, light then dark edit; outputs
+  `~/data/geoaidesk/work/gaid-concept-pictures/trial/`. Dark edits kept composition/objects/arrows; border band median light
+  #f2f3f6 (asked #f5f6f8), dark #1a1d23/#1a1d24 (asked #1a1d23), p95 deviation ≤1. The zone map came out in rainbow colours
+  despite "one blue accent" (pre-existing prompt behaviour, out of scope). PICTURE_WELL light set to #f2f3f6 accordingly.
+- Implementation: server `visuals.ts` (PICTURE_WELL, light prompt on the well, DARK_VARIANT_PROMPT edit, ADAPT_PROMPT for older
+  pictures via `adapt`), `?theme=dark` on picture routes, `dark` carried through hub registration/edit; web `ConceptPicture`
+  frames + theme file choice at all picture sites; tokens `--gaid-pic-well`/`--gaid-pic-mat`; guide v2 I6 extended.
 - Plan: sequential (research → mockups → user choice → implementation); no child writers before the choice. Implementation is
   small and coupled (visuals.ts/codex-images.ts + picture render sites), so this writer does it.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
