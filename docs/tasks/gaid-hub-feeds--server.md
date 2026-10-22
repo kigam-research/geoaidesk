@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T14:47:30Z
+status: ready
+updated: 2026-10-22T14:47:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -94,8 +94,9 @@ Initial full collection span was 18.076 s; job launch-to-exit metadata span abou
 Implementation is saved on this child branch; parent integration, full scripts/check and deployment are not claimed here.
 Safe recheck: the declared focused TypeScript/Vitest commands. Do not rerun the recorded live jobs; their evidence is below.
 ## Next steps
-1. Send the checked final snapshot and live evidence to parent; run task finish.
-2. Parent runs task complete, integrates the child and switches the local PER_SOURCE_UNFILTERED constant to the new shared FEED_LIMITS.perSourceUnfiltered; parent owns full scripts/check and final report.
+<!-- task:closed -->
+Closed 2026-10-22T14:47:31Z: ready; the parent gaid-hub-feeds integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial Codex list read exceeded the fixed byte cap. Do not increase the cap or retry unchanged; the accepted fallback requests one stable release.
 ## Notes and decisions
