@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:15:25Z
+updated: 2026-10-22T18:00:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -35,6 +35,9 @@ parallel. gaid-user-acceptance is testing in the review app (PC74 :3000) — do 
 Outside check: no outside check.
 
 ## Current state
+- PAUSED 2026-10-23 03:00 KST (hub pause-0300-gaid-orcid). Nothing running (no job, worker or child). Exact next action
+  after the user's resume instruction via the project hub: read the user's answer on phase 2 (ORCID client IDs + whether
+  production accepted the loopback redirect) or their choice to close phase 1 first, then follow Next steps 2 or 3.
 - Phase 1 (feasibility) running. PC74 reachability checked 2026-10-22 (curl, HTTP 200): orcid.org, pub.orcid.org
   (anonymous /v3.0/<iD>/works returns JSON with DOIs), sandbox.orcid.org, pub.sandbox.orcid.org, OpenAlex, Crossref.
 - Oracle xhigh research done 2026-10-22: session `i-am-building-an-orcid`, vault note
