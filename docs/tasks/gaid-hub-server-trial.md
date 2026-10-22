@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:18:41Z
+updated: 2026-10-22T09:22:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -48,17 +48,21 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
   test/geo-hub-skill-workflows.test.ts test/geo-hub-shared.test.ts test/geo-hub-e2e.test.ts` (30/30), web `npx tsc --noEmit`,
   `npx vitest run src/geo/hub-skills` (13/13).
 - Package C: GAID side `GAID_HUB_SERVER_CA` (`hubTransport`), test `server/test/geo-hub-client-tls.test.ts` (openssl CA, pass);
-  guide `docs/geo/hub-server-https.md` written; server flags `--tls-cert/--tls-key/--trust-proxy` still to add after B merges
-  (they touch `hub-server/index.ts`, owned by B until then).
-- New e2e `server/test/geo-hub-skills-e2e.test.ts` written; runs after B merges (assumes table `hub_skills`).
+  guide `docs/geo/hub-server-https.md` written.
+- Package B integrated (child gaid-hub-server-trial--skills-server completed at 179f8fac): `hub-server/skills.ts`
+  (`SQLiteHubSkillStore`), migration 2, `/hub/v1/skills` routes, backup/check-backup cover skill archives, `import-hub` imports
+  `skills/`; child checks: server tsc, `vitest run test/geo-hub-server*` 52/52.
+- e2e `server/test/geo-hub-skills-e2e.test.ts` passes (first full check failed it: the fixture installed with a custom agentDir
+  that `installedHubSkill` does not read; fixed at ae5118cf).
+- Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-1. Child `gaid-hub-server-trial--skills-server` (package B; Paseo agent ea29dd8e-e163-4285-9af2-1aac21c96dfa) builds the
-   server side; on its finish: `task complete gaid-hub-server-trial--skills-server`, `task sync`/merge into this branch.
-   Blocked: the child's `task finish` is running scripts/check (2026-10-22 18:12); its finish notice arrives here.
-2. After the user accepts the invite: dry-run then `--apply` import from the frozen source; backup + check-backup.
-3. Integrate B, e2e test with two accounts (extend `server/test/geo-hub-e2e.test.ts`), `scripts/check`, then redeploy the
-   service at the merged SHA (migration 2 applies on start) and re-run import for skills (none today).
-4. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
+1. Full `scripts/check` running on 59a8fbe4 (code identical to 179f8fac): log `~/data/geoaidesk/work/gaid-hub-server-trial/check-1.log`.
+2. After the user creates the admin account (invite code given in this tab; terminal or GAID route): dry-run then `--apply`
+   import from the frozen source with `authors.json`; backup + check-backup.
+3. Redeploy the service at this branch's merged main SHA (migration 2 applies on start), prepare the TLS files on PC74 and test
+   a throwaway TLS instance (not the live data); keep the live service on HTTP for the test group.
+4. Report `reports/2026-10-22-gaid-hub-server-trial/index.md`.
+5. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
