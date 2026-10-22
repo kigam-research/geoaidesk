@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T08:29:32Z
+status: done
+updated: 2026-10-22T08:29:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"496b2f44-908a-4be7-acf6-b2ea8de5da17","pid":1509732,"provider":"claude","session":"16c18294-79a0-451e-a810-42626e1f84b5","start":"54460954","token":"18351797fc7f149b8797432d41774a4511f50beb995e2b13701d1bc58c5bc54b"}
 branch: task/gaid-skill-cache-hash
 target: main
@@ -48,7 +48,9 @@ one skill was kept only because of a cache folder. scripts/check passes; brief r
   Typecheck + affected suites (99 tests) pass. scripts/check run 2 passed ("All geoaidesk checks passed."; server
   2184 passed / 8 skipped, web 1202 passed; log ~/data/geoaidesk/work/gaid-skill-cache-hash/check.log).
 ## Next steps
-1. task finish (checks passed).
+<!-- task:closed -->
+Closed 2026-10-22T08:29:44Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
