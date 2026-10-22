@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:56:39Z
+updated: 2026-10-22T16:01:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -68,6 +68,10 @@ platform. Plus a report for review and the repo checks that apply.
   capture-v1: 10 shots, 1,380 frames (H3 skill shelf skipped: no hub skill records). Integrated with zoom keys, full-screen
   area and citation charts; preview-10..12 stills checked. Final render job job-geoaidesk-gaid-promo-video-1 launched
   (source 537a917e). Report draft written; job paths/hashes and figures to fill after the job.
+- 2026-10-23: render job job-geoaidesk-gaid-promo-video-1 succeeded (exit 0): `out/gaid-promo-v1.mp4`, 20,210,783 bytes,
+  sha256 8cbb2d57525fc7d9241f7b51f173962e40c5042d4a733c87d12d19ed329fcdc7; post-encode probe (qa-v1/probe.json): H.264,
+  1920×1080, 30 fps, 2,700 frames, 90.00 s, no audio stream; 18 transition frames checked (qa-v1/encoded-transitions.jpg).
+  Report figures extracted from the final file. Registry entry `gaid-promo-video-v1` (review). Humanizer applied.
 ## Next steps
 1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
    User (verbatim, 2026-10-23): "이해하였다. 알림오면 작업 자동으로진행하여라." → on the child's finish notice, continue

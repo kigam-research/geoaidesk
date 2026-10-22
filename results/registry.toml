@@ -99,3 +99,14 @@ files = [
 ]
 report = "reports/2026-10-20-gaid-workflow-model/index.md"
 replicas = []
+
+[[result]]
+id = "gaid-promo-video-v1"
+title = "GAID 90초 홍보 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-20261022T155452.185441Z/out"
+source_sha = "537a917e0919dba1a14565eb670ea0370a598e51"
+inputs = ["assets:geo-catalogue/0.3.0", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video/data-v3/data.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video/capture-v1/capture.json", "user:2026-10-22-gaid-promo-video"]
+files = [{ path = "gaid-promo-v1.mp4", sha256 = "8cbb2d57525fc7d9241f7b51f173962e40c5042d4a733c87d12d19ed329fcdc7" }, { path = "manifest.json", sha256 = "8dcf92700f0f0d53540e43f5a913d9514980f364e070ec3b94f30a5f7539326e" }]
+report = "reports/2026-10-23-gaid-promo-video/index.md"
+replicas = []
