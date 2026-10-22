@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:18:00Z
+updated: 2026-10-22T06:18:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -65,7 +65,7 @@ Run `cd web && npx vitest run` for your tests, `npx tsc --noEmit`, `node geo/cop
 ## Current state
 Implemented the institute hub connection/account/admin UI, account-aware named actions and ownership, and the library sync line. No backend contract changed. No application data or real accounts were touched. Narrow Settings seam: ServicesPanel mounts HubServerCard.
 
-Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite runs in recorded job 2 with npm ci; result pending. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. scripts/check has not been run in this child; parent owns integrated backend/end-to-end verification.
+Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite job 2 passed: 181 files, 1173 tests, exit 0 (67.32s), at source c94189b2b7d4. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. scripts/check has not been run in this child; parent owns integrated backend/end-to-end verification.
 
 Screenshots: 24 mocked-backend PNGs at ~/data/geoaidesk/work/gaid-backend--hub-ui/screens/ (Settings logged out, Settings admin with members open, library sync; instrument/mapsheet, light/dark, 1440x900 and 1280x800). Horizontal overflow false in every screenshot; Settings cards fit within 1280x800. Vite fixture, API mock and capture.js are external to Git. Four representative 1280px PNGs are under the parent report figures/; report text unchanged.
 
@@ -75,7 +75,7 @@ Sequential decisions: keep existing researcher-backend contracts; distinguish co
 
 Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel mount only; existing hub identity seams and library sync mount. Integration order: Settings/account components -> identity -> sync -> mocked tests -> screenshots -> task finish. No child workers (tightly coupled UI).
 ## Next steps
-1. Read full web suite job 2 result on relay notice, fix any relevant regression, record final outcome, then task finish.
+1. task finish; parent integrates with task complete. No implementation work remains in this child.
 ## Failed approaches
 - Job job-geoaidesk-gaid-backend--hub-ui-1 exited 127: immutable job source has no node_modules (vitest not found). Fix the job environment by including npm ci before tests; no source workaround.
 ## Notes and decisions
@@ -86,7 +86,7 @@ Followed: P2/P3 (one selected auth task, details for address/account/admin), P9 
 
 ### String additions (previously absent)
 
-All IDs below are hubServer-prefixed; no existing Korean/English string changed.
+All 72 IDs below are hubServer-prefixed; no existing Korean/English string changed.
 
 | ID | Korean | English |
 |---|---|---|
