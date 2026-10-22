@@ -342,6 +342,8 @@ export const MessageBranchPage = ({
 
 export type MessageResponseProps = ComponentProps<typeof Streamdown> & {
   onOpenFile?: (path: string) => void;
+  /** Sandbox folder that relative links and images are resolved against (a Markdown file's own folder). */
+  baseDir?: string;
 };
 
 const OpenMarkdownFileContext = createContext<((path: string) => void) | undefined>(undefined);
@@ -470,21 +472,52 @@ const WorkflowAwareBlock = memo((props: BlockProps) => {
 });
 WorkflowAwareBlock.displayName = "WorkflowAwareBlock";
 
+/**
+ * GeoAIDesk (gaid-first-use-fixes): Streamdown's header cells never wrap and both cell kinds carry 16 px side padding,
+ * so a six-column answer table ran past the chat width and hid its last (citation) column. Headers wrap and padding is
+ * tighter; words stay whole, so a table that still does not fit scrolls inside its region (UI guide X2).
+ */
+function TableHeaderCell({ children, className, node: _node, ...rest }: Record<string, unknown> & { children?: ReactNode; className?: string; node?: unknown }) {
+  return (
+    <th
+      {...(rest as React.ThHTMLAttributes<HTMLTableCellElement>)}
+      className={cn("px-2 py-2 text-left align-bottom text-sm font-semibold break-words", className)}
+      data-streamdown="table-header-cell"
+    >
+      {children}
+    </th>
+  );
+}
+
+function TableCell({ children, className, node: _node, ...rest }: Record<string, unknown> & { children?: ReactNode; className?: string; node?: unknown }) {
+  return (
+    <td
+      {...(rest as React.TdHTMLAttributes<HTMLTableCellElement>)}
+      className={cn("px-2 py-2 align-top text-sm break-words", className)}
+      data-streamdown="table-cell"
+    >
+      {children}
+    </td>
+  );
+}
+
 const streamdownComponents = {
   p: SafeParagraph,
   img: SandboxImage,
   a: SandboxLink,
+  th: TableHeaderCell,
+  td: TableCell,
 } as unknown as ComponentProps<typeof Streamdown>["components"];
 
 export const MessageResponse = memo(
-  ({ className, children, onOpenFile, ...props }: MessageResponseProps) => {
+  ({ className, children, onOpenFile, baseDir, ...props }: MessageResponseProps) => {
     const projectId = useProjectScopeId();
-    const rehypePlugins = useMemo(() => [
+    const rehypePlugins = useMemo<NonNullable<ComponentProps<typeof Streamdown>["rehypePlugins"]>>(() => [
       defaultRehypePlugins.raw,
       defaultRehypePlugins.sanitize,
-      sandboxMarkdownUrls(projectId),
+      [sandboxMarkdownUrls, { projectId, baseDir: baseDir ?? "" }] as [typeof sandboxMarkdownUrls, Parameters<typeof sandboxMarkdownUrls>[0]],
       defaultRehypePlugins.harden,
-    ], [projectId]);
+    ], [projectId, baseDir]);
     return (
       <OpenMarkdownFileContext.Provider value={onOpenFile}>
         <Streamdown

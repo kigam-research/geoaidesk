@@ -71,7 +71,8 @@ export interface CslItem {
 }
 
 /** Where the metadata of an item came from; `gaid` items are confirmed by the researcher before they count as checked. */
-export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "import" | "manual";
+/** `datacite`: DOIs Crossref does not register, such as arXiv preprints (`10.48550/arXiv.*`) and data repositories. */
+export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "import" | "manual";
 
 export interface LibraryAttachment {
   id: string;

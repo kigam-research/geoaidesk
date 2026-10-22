@@ -2,7 +2,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { Parser } from "htmlparser2";
 import { doiCandidates, normalizeDoi } from "./identifiers.ts";
 import { boundedText, fetchPublisherHtml } from "./http.ts";
-import { fromCrossref, fromOpenAlex, list, object, titleSimilarity } from "./mapping.ts";
+import { fromCrossref, fromDataCite, fromOpenAlex, list, object, titleSimilarity } from "./mapping.ts";
 import { parseKciXml } from "./kci.ts";
 import { MetadataLookupError, type MetadataClientOptions, type MetadataRecord, type ProviderError, type SearchCandidate, type SearchResult } from "./types.ts";
 
@@ -59,15 +59,21 @@ export function createMetadataClient(options: MetadataClientOptions = {}) {
   function openalex(path: string) { const u = new URL(`https://api.openalex.org${path}`); if (openAlexKey) u.searchParams.set("api_key", openAlexKey); return u; }
   // Do not surface fetch error text: it may contain a key-bearing URL.
   const error = (provider: ProviderError["provider"], e: unknown): ProviderError => ({ provider,
-    message: e instanceof Error && /^(?:HTTP \d+|Provider cooldown|Crossref record|OpenAlex record|KCI returned|Unrecognised KCI|Metadata response)/.test(e.message)
+    message: e instanceof Error && /^(?:HTTP \d+|Provider cooldown|Crossref record|OpenAlex record|DataCite record|KCI returned|Unrecognised KCI|Metadata response)/.test(e.message)
       ? e.message : "Metadata service unavailable or response invalid" });
 
-  async function lookupDoi(input: string, provider?: "crossref" | "openalex"): Promise<MetadataRecord> {
+  // DataCite registers the DOIs Crossref does not (arXiv `10.48550/arXiv.*`, Zenodo, PANGAEA); OpenAlex resolves an arXiv
+  // DOI to the later journal version, which the DOI check below refuses.
+  function datacite(doi: string) { return new URL(`https://api.datacite.org/application/vnd.citationstyles.csl+json/${encodeURIComponent(doi)}`); }
+
+  async function lookupDoi(input: string, provider?: "crossref" | "openalex" | "datacite"): Promise<MetadataRecord> {
     const doi = normalizeDoi(input), errors: ProviderError[] = [];
-    for (const p of provider ? [provider] : ["crossref", "openalex"] as const) {
+    const order = doi.startsWith("10.48550/") ? ["datacite", "crossref", "openalex"] as const : ["crossref", "openalex", "datacite"] as const;
+    for (const p of provider ? [provider] : order) {
       try {
-        const value = JSON.parse(await request(p === "crossref" ? crossref(`/works/${encodeURIComponent(doi)}`) : openalex(`/works/doi:${encodeURIComponent(doi)}`)));
-        const item = p === "crossref" ? fromCrossref(object(value).message) : fromOpenAlex(value);
+        const value = JSON.parse(await request(p === "crossref" ? crossref(`/works/${encodeURIComponent(doi)}`)
+          : p === "openalex" ? openalex(`/works/doi:${encodeURIComponent(doi)}`) : datacite(doi)));
+        const item = p === "crossref" ? fromCrossref(object(value).message) : p === "openalex" ? fromOpenAlex(value) : fromDataCite(value);
         // A successful response for another work must not confirm the requested DOI.
         if (item.csl.DOI !== doi) throw new Error("DOI mismatch");
         return item;

@@ -1,5 +1,5 @@
 export { identifyPdf, type PdfIdentification } from "./pdf.ts";
-export { doiCandidates, arxivCandidates, normalizeDoi } from "./identifiers.ts";
+export { doiCandidates, arxivCandidates, arxivDoi, normalizeDoi } from "./identifiers.ts";
 export { createMetadataClient } from "./client.ts";
 export * from "./types.ts";
 import { createMetadataClient } from "./client.ts";

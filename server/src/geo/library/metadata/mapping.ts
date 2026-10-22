@@ -19,7 +19,7 @@ const date = (v: unknown): CslItem["issued"] => {
 const compact = <T extends object>(v: T): T => Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined && x !== "")) as T;
 function names(v: unknown): CslName[] | undefined {
   const result = list(v).map(object).map((n) => compact({ family: plain(n.family) || undefined, given: plain(n.given) || undefined,
-    literal: plain(n.name) || undefined })).filter((n) => n.family || n.given || n.literal);
+    literal: plain(n.name || n.literal) || undefined })).filter((n) => n.family || n.given || n.literal);
   return result.length ? result : undefined;
 }
 function kind(relation: string): MetadataSignal["kind"] {
@@ -77,6 +77,22 @@ export function fromOpenAlex(value: unknown): MetadataRecord {
   });
   return { csl, metadataOrigin: "openalex", metadataConfirmed: false,
     signals: w.is_retracted === true ? [{ kind: "retraction", relation: "is_retracted", source: "openalex" }] : [] };
+}
+
+/** DataCite's CSL-JSON rendering (`api.datacite.org/application/vnd.citationstyles.csl+json/<doi>`). */
+export function fromDataCite(value: unknown): MetadataRecord {
+  const w = object(value);
+  const title = first(w.title);
+  if (!title) throw new Error("DataCite record has no title");
+  const DOI = doiCandidates(str(w.DOI))[0];
+  // An arXiv record is a preprint, whatever type the repository registered (DataCite says "article-journal").
+  const arxiv = DOI?.startsWith("10.48550/arxiv.");
+  const csl: CslItem = compact({
+    type: arxiv ? "article" : str(w.type) || "article", title, author: names(w.author), issued: date(w.issued),
+    "container-title": first(w["container-title"]), publisher: plain(w.publisher), DOI, URL: str(w.URL),
+    language: str(w.language), abstract: plain(w.abstract), version: str(w.version),
+  });
+  return { csl, metadataOrigin: "datacite", metadataConfirmed: false, signals: [] };
 }
 
 /** Unicode word/character bigrams cover Korean as well as Latin titles without a language model. */
