@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:17:47Z
+status: done
+updated: 2026-10-22T07:07:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0f9f23bb-d4fa-414a-ac24-013ec75bf859","pid":218011,"provider":"codex","session":"01a16239-46ad-76b2-bf26-1542518695ff","start":"53722223","token":"0368e1fa931ceaf97724ae961a53cdcf30c486f1aa68991fa847a4db622d36e9"}
 branch: task/gaid-backend--hub-client
 target: task/gaid-backend
@@ -77,7 +77,7 @@ Report in the final message: modules, routes, test counts, assumptions about P1'
 - Safe re-verification: from server/, run `GAID_CATALOGUE=off npx vitest run test/geo-hub-client.test.ts test/geo-hub-client-integration.test.ts test/geo-library-sync.test.ts test/geo-hub-shared.test.ts` and `npx tsc --noEmit -p .`. Use VITEST_PI_AGENT_DIR, VITEST_PROJECTS_ROOT and VITEST_SKILLS_CACHE_DIR under ~/data/geoaidesk/work/gaid-backend--hub-client/ when running tests.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T06:17:47Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T07:07:18Z: integrated into gaid-backend; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial integration test expected 200 for a newly created copy; the existing route correctly returns 201. Corrected the expectation. Fixed its SkillRoot assertion to use the actual ProjectPaths API; installation itself had already succeeded.

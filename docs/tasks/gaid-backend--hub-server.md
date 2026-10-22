@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:44:22Z
+status: done
+updated: 2026-10-22T07:07:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb2d31aa-1e53-44fb-bc41-429c1eec3733","pid":214565,"provider":"codex","session":"01a16239-1e42-73b2-a1e3-4e088ec201a3","start":"53721186","token":"7929be5dae8e6ce4050b1260c2d83a48b5bd832aedf7e77cb23115d43d1fb6a6"}
 branch: task/gaid-backend--hub-server
 target: task/gaid-backend
@@ -104,7 +104,7 @@ export at ~/data/geoaidesk/work/gaid-backend--hub-server/gitfree-check-poCsoz (s
 export verifies the failed premise directly without repeating the full job.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T06:44:22Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T07:07:18Z: integrated into gaid-backend; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Recorded job b61bf500 (2105 passed / 8 skipped / 1 failed) exposed a cwd/.git assumption in our test. Fixed the test
