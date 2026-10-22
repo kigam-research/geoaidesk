@@ -1,0 +1,54 @@
+import Fastify from "fastify";
+import { afterEach, expect, it } from "vitest";
+import { join } from "node:path";
+import { AuthoringStore } from "../src/geo/authoring/store.ts";
+import { addSource } from "../src/geo/authoring/sources.ts";
+import { runOperation } from "../src/geo/authoring/agent.ts";
+import { registerSharedHubRoutes } from "../src/geo/hub-shared/routes.ts";
+import { setRemoteHubProvider } from "../src/geo/hub-shared/active.ts";
+import { registerGeoHubServerRoutes } from "../src/geo/routes/hub-server.ts";
+import { LibraryStore } from "../src/geo/library/store.ts";
+import { createProject, deleteProject, resolvePaths } from "../src/projects.ts";
+import { projectSkillRoot } from "../src/agent/skills.ts";
+import { account, fakeHub } from "./geo-hub-client-fake.ts";
+import { analysis, config, draftReply, pdf, PAPER, reply, testVocabulary } from "./helpers/geo-authoring.ts";
+import { readFile } from "node:fs/promises";
+
+const cleanup: (() => Promise<unknown>)[] = [];
+afterEach(async () => { setRemoteHubProvider(null); for (const clean of cleanup.splice(0)) await clean(); });
+
+it("registers, stars, comments, edits/copies by account and installs through unchanged /geo/hub routes", async () => {
+  const f = await fakeHub(); cleanup.push(f.clean);
+  const authoring = new AuthoringStore(join(f.root, "authoring")); await authoring.initialize();
+  const project = await authoring.create({ title: "Research workflow", author: account.displayName, goal: "reuse" });
+  await addSource(authoring, project.id, { name: "paper.pdf", mediaType: "application/pdf", contentBase64: pdf(PAPER).toString("base64") });
+  const deps = (content: unknown) => ({ chat: reply(content), config, vocabulary: testVocabulary() });
+  await runOperation(authoring, project.id, "analyze", "client-analyze", deps(analysis));
+  const drafted = await runOperation(authoring, project.id, "draft", "client-draft", deps(draftReply));
+  expect(drafted.outcome).toMatch(/accepted|repaired/);
+  const local = Fastify(); cleanup.unshift(() => local.close());
+  const oldShared = process.env.GAID_HUB_SHARED_DIR; process.env.GAID_HUB_SHARED_DIR = join(f.root, "local-shared");
+  cleanup.push(async () => { if (oldShared === undefined) delete process.env.GAID_HUB_SHARED_DIR; else process.env.GAID_HUB_SHARED_DIR = oldShared; });
+  await registerGeoHubServerRoutes(local, { client: f.client, library: new LibraryStore(join(f.root, "library")), backgroundSync: false });
+  await registerSharedHubRoutes(local, { authoringStore: authoring, agentDir: join(f.root, "install-agent"), vocabulary: testVocabulary() });
+  await f.login(); await local.ready();
+  const registered = await local.inject({ method: "POST", url: "/geo/hub/entries", headers: { "X-GAID-User": "spoofed" }, payload: { authoringProjectId: project.id, folderId: "general", note: "Trial workflow" } });
+  expect(registered.statusCode, registered.body).toBe(201);
+  const entry = registered.json(); expect(entry.authorId).toBe(account.id); expect(entry.mine).toBe(true); expect(entry.author).toBe(account.displayName);
+  expect((await local.inject("/geo/hub/me")).json()).toMatchObject({ name: account.displayName, account: true });
+  const star = await local.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/star`, payload: { on: true } }); expect(star.json()).toEqual({ stars: 1, starredByMe: true });
+  const comment = await local.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/comments`, payload: { body: "I will use this" } });
+  expect(comment.json()).toMatchObject({ authorId: account.id, author: account.displayName, body: "I will use this" });
+  const edit = await local.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/edit`, payload: {} }); expect(edit.json()).toMatchObject({ mode: "edit", authoringProjectId: project.id });
+  // Same display name, different account: must copy, not edit the original.
+  await f.client.connection.save({ ...f.client.connection.current, account: { ...account, id: "acc-other" } });
+  const copy = await local.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/edit`, payload: {} });
+  expect(copy.statusCode, copy.body).toBe(201); expect(copy.json().mode).toBe("copy"); expect(copy.json().authoringProjectId).not.toBe(project.id);
+  await f.login();
+  const target = createProject({ name: "Remote install test" }); cleanup.unshift(async () => deleteProject(target.id));
+  const installed = await local.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/install`, payload: { projectId: target.id, acknowledged: true, revision: 1 } });
+  expect(installed.statusCode, installed.body).toBe(201);
+  expect((await f.records.read(entry.id)).installs).toHaveLength(1);
+  expect(await readFile(join(projectSkillRoot(resolvePaths(target.id)).skillsDir, draftReply.slug, "SKILL.md"), "utf8")).toContain("nested CV");
+  expect((await local.inject(`/geo/hub/entries/${entry.id}`)).json().entry).toMatchObject({ stars: 1, comments: 1, mine: true });
+});

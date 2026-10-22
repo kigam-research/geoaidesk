@@ -1,4 +1,5 @@
 /** skill_hub packages are durable local sources for the existing preview/install gate. */
+import { previewPinnedHubSkills } from "./methods/hub-pin-install.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +12,8 @@ import { readTar } from "./tar.ts";
 import { GAID_HUB_PACKAGE_SCHEMA, type MethodLifecycle } from "../../../web/src/geo/contracts/methods.ts";
 import { readMethodFile, verifyMethodTree } from "./methods/method-file.ts";
 import { packageStore, writePackageOrigin } from "./methods/package-origin.ts";
-import { SharedHubStore } from "./hub-shared/store.ts";
+import { activeHubStore } from "./hub-shared/active.ts";
+import type { HubRecordStore } from "./hub-shared/records.ts";
 
 export const SKILL_HUB_LIMITS = { compressed: 20 * 1024 * 1024, expanded: 64 * 1024 * 1024, entries: 10_000 };
 /** `authoring`: path under the site of hub draft descriptors (`gaid-hub-package/v1`), when the hub serves drafts. */
@@ -209,13 +211,13 @@ export function skillHubCatalogue() {
 
 export async function previewSkillHub(paths: ProjectPaths, input: { url?: string; archive?: Buffer; hubEntry?: { id: string; revision: number }; scope?: string }, deps: {
   sites?: SkillHubSite[]; agentDir?: string; fetcher?: typeof fetch; preview?: typeof previewSkillSource;
-  sharedStore?: SharedHubStore;
+  sharedStore?: HubRecordStore;
   catalogue?: ReturnType<typeof skillHubCatalogue>;
 } = {}) {
   if ([input.url, input.archive, input.hubEntry].filter((v) => v !== undefined).length !== 1 || (input.scope !== undefined && input.scope !== "project" && input.scope !== "global")) return fail("input", "Provide one URL, package or hub entry and a valid scope");
   const ref = input.hubEntry;
   if (ref && (typeof ref.id !== "string" || !Number.isSafeInteger(ref.revision) || ref.revision < 1)) return fail("input", "Provide a hub entry and a positive revision");
-  const store = ref ? deps.sharedStore ?? new SharedHubStore() : null;
+  const store = ref ? activeHubStore(deps.sharedStore) : null;
   const record = ref ? await store!.read(ref.id) : null;
   const snapshot = ref && record ? record.snapshots[String(ref.revision)] : undefined;
   if (ref && !snapshot) return fail("input", "Hub entry revision was not found; search the hub again");
@@ -255,7 +257,9 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   });
   const preview = await (deps.preview ?? previewSkillSource)(paths, { source: staged.source, scope: input.scope });
   const catalogue = deps.catalogue ?? skillHubCatalogue();
-  return { ...preview, contents, skillHub: {
+  const methodFiles = fs.readdirSync(staged.source).map((entry) => readMethodFile(path.join(staged.source, entry), entry).method);
+  const hubSkills = (await Promise.all(methodFiles.map((file) => previewPinnedHubSkills(paths, file, { agentDir: deps.agentDir })))).flat();
+  return { ...preview, contents, ...(hubSkills.length ? { hubSkills } : {}), skillHub: {
     sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
     ...(ref ? { hubEntry: { ...ref, title: record!.entry.title } } : {}),
     ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),

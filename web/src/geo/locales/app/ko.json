@@ -650,5 +650,13 @@
   "customModels.acceptedReasoningLevels": "서버가 받는 추론량",
   "customModels.reasoningLevelsHelp": "고르지 않은 추론량은 그보다 낮은 값 중 가장 가까운 받는 값으로 보냅니다. 낮은 값이 없으면 가장 가까운 높은 값으로 보냅니다. 아무것도 고르지 않으면 앱의 기본 처리대로 보냅니다. \"사용 안 함\"은 항상 고를 수 있습니다.",
   "chat.thinking.mappedLevel": "{selected} → {sentAs}",
-  "chat.thinking.sentAs": "선택한 서버에는 {level} 값으로 보냅니다."
+  "chat.thinking.sentAs": "선택한 서버에는 {level} 값으로 보냅니다.",
+  "header.chat_overlays_in_narrow_windows": "창 너비가 1280 px보다 좁으면 대화가 미리보기 위에 겹쳐 열립니다.",
+  "header.resize_file_browser": "파일 목록 너비 조절",
+  "header.resize_chat": "대화 너비 조절",
+  "files.filter.label": "파일 이름으로 찾기",
+  "files.filter.placeholder": "파일 이름으로 찾기 ({shortcut})",
+  "files.filter.count": "{count, plural, other {이름이 맞는 항목 #개}}",
+  "files.filter.empty": "이름이 맞는 파일이 없습니다.",
+  "files.filter.clear": "찾기 지우기"
 }

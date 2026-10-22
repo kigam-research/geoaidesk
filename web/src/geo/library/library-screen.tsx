@@ -22,15 +22,17 @@ import { ZoteroCard } from "./zotero-card";
 import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
 import { FolderPanel, sendResultLine } from "./folder-panel";
 import { FolderNameDialog } from "./folder-name-dialog";
+import { LibrarySyncLine } from "./sync-line";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
-const SOURCE_TONE = { zotero: "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300", gaid: "border-primary/30 bg-primary/10 text-primary" } as const;
+// Source is provenance, not status: both stay neutral (guide v2 I2, S3); read coverage is the row's one status mark (S2).
+const SOURCE_TONE = { zotero: "border-gaid-control-edge text-gaid-ink-2", gaid: "border-gaid-edge bg-gaid-face-2 text-gaid-ink-2" } as const;
 const COVERAGE_TONE: Record<ReadCoverage, string> = {
-  full: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
-  partial: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  abstract: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  none: "border-border text-muted-foreground",
+  full: "border-transparent bg-gaid-success-tint text-gaid-success",
+  partial: "border-transparent bg-gaid-warning-tint text-gaid-warning",
+  abstract: "border-transparent bg-gaid-warning-tint text-gaid-warning",
+  none: "border-gaid-edge text-gaid-ink-3",
 };
 type Filter = "all" | "zotero" | "gaid" | "unread" | "cited";
 
@@ -123,6 +125,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
       <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={counts?.all ?? 0} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className="flex min-w-0 flex-1 flex-col gap-3" aria-label={L("screen.title")}>
+        <LibrarySyncLine onSynced={load} refreshKey={data} />
         <div className="flex items-center justify-between gap-3">
           <h1 className="min-w-0 truncate text-xl font-semibold">{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">
@@ -241,7 +244,7 @@ function SidePanel({ data, onSelect, onChanged }: { data: LibraryListResponse | 
         <div className="flex flex-col gap-2 rounded-xl border p-4">
           <h2 className="text-base font-semibold">{L("side.recentTitle")}</h2>
           {byAdded.slice(0, 4).map((row) => (
-            <button key={row.id} type="button" onClick={() => onSelect(row.id)} className="border-l-2 border-primary pl-2.5 text-left text-sm hover:text-primary">
+            <button key={row.id} type="button" onClick={() => onSelect(row.id)} className="-mx-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <span className="line-clamp-2 font-medium">{row.title}</span>
             </button>
           ))}

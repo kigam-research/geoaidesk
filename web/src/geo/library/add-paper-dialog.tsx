@@ -184,7 +184,7 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
                         {[(c.csl.author ?? []).slice(0, 3).map((a) => a.family ?? a.literal).join(", "), c.csl.issued?.["date-parts"]?.[0]?.[0], c.csl["container-title"] as string | undefined, L("dialog.origin", { origin: ORIGIN_NAME[c.metadataOrigin] ?? c.metadataOrigin })].filter(Boolean).join(" · ")}
                       </div>
                       {retracted(c.signals) && <p className="mt-1 text-xs text-destructive">{L("dialog.retracted")}</p>}
-                      {!retracted(c.signals) && corrected(c.signals) && <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">{L("dialog.corrected")}</p>}
+                      {!retracted(c.signals) && corrected(c.signals) && <p className="mt-1 text-xs text-gaid-warning">{L("dialog.corrected")}</p>}
                     </div>
                     <Button size="sm" variant="outline" onClick={() => use(c)}>{L("dialog.pick.action")}</Button>
                   </div>
@@ -210,7 +210,7 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
               <Button variant="outline" size="sm" onClick={() => bibRef.current?.click()}><FileUpIcon data-icon="inline-start" />{L("dialog.importPick.button")}</Button>
               <input ref={bibRef} type="file" accept=".bib,.ris,.json,text/plain,application/json" className="hidden" onChange={(e) => void readBib(e.target.files?.[0])} />
             </div>
-            {preview && preview.errors.length > 0 && <p className="text-sm text-amber-700 dark:text-amber-300">{L("dialog.importErrors", { n: preview.errors.length })}</p>}
+            {preview && preview.errors.length > 0 && <p className="text-sm text-gaid-warning">{L("dialog.importErrors", { n: preview.errors.length })}</p>}
             {preview && preview.items.slice(0, 5).map((c, i) => <p key={i} className="truncate text-sm">{c.title}</p>)}
           </div>
         )}

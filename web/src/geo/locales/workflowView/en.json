@@ -6,7 +6,8 @@
   "source": {
     "catalogue": "Built in",
     "imported": "Imported skill",
-    "bundled": "Skill bundled with the Workflow"
+    "bundled": "Skill bundled with the Workflow",
+    "hub": "hub skill"
   },
   "instructions": {
     "button": "Read instructions"
@@ -36,11 +37,17 @@
   "detail": {
     "button": "View Workflow details"
   },
-  "back": {
-    "button": "View hub list"
-  },
   "import": {
     "button": "Import from GitHub or elsewhere"
   },
-  "importRef": "Source to import: {ref}"
+  "importRef": "Source to import: {ref}",
+  "hubRevision": "revision {revision}",
+  "hubOpen": "Open in hub",
+  "hubState": {
+    "missing": "Not installed yet.",
+    "other-revision": "Another revision is installed. This Workflow uses its pinned revision.",
+    "edited": "An edited copy is installed in this project.",
+    "conflict": "Another skill with the same name is installed, so this one cannot be installed.",
+    "suspended": "This revision is suspended in the hub. Tell the Workflow author."
+  }
 }

@@ -93,12 +93,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - GAID hub (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
   Backend `server/src/geo/authoring/` (`/geo/authoring/*`, user-level store under `<agentDir>/skill-hub/authoring/`; model
   calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
-  (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, entry on the project list and a
-  Projects/GAID hub header switch): one question at a time with a recommended option and "기타", all answers applied
+  (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, `#hub/e/<entry>`, `#hub/c/<catalogue Workflow>`,
+  `#hub/<authoring id>`; entry on the project list and a Projects/GAID hub header switch; gaid-hub-layout: every hub screen
+  keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,
+  default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
   together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
-  `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
-  `X-GAID-User`, no accounts), topic folders, registration of a checked draft (preview first), stars, comments,
+  `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
+  store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,
   recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
   settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
   `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
@@ -107,13 +109,33 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   registers as a separate entry with `basedOn`; drafts carry `hubEntry`. Registration keeps pictures whose cover, step or
   output still exists. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
   (`answersFeedback`). Concept pictures can be redone one at a time or revised by a researcher instruction (≤ 500 chars,
-  previous picture as input to `codex/images/edits`); older picture files stay. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
+  previous picture as input to `codex/images/edits`); older picture files stay. Each picture is two files
+  (gaid-concept-pictures, user decision 2026-10-22): the light one generated on the picture-well colour (`PICTURE_WELL` in
+  `server/src/geo/authoring/visuals.ts` = token `--gaid-pic-well`) and a dark-mode one edited from it (`ConceptVisual.dark`,
+  `StoredVisual.dark`; two image calls per picture); picture routes take `?theme=dark`, `ConceptPicture` picks the file for
+  the theme and never filters pixels. Older white pictures (no `dark`) sit on `--gaid-pic-mat`; "화면 테마에 맞추기"
+  (`GenerateVisualsBody.adapt`) edits them into both files without changing what they show. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
   `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and
   is shown as a notice (user directions 2026-10-16). "Sign in with ChatGPT" tokens cannot generate images. MiniMax
   `MiniMax-M3.1-Flash-Preview` is added to Pi's `minimax` provider at startup (`server/src/geo/providers.ts`). Never PDF
   page crops.
+- Institute hub server (gaid-backend, ADR `docs/adr/2026-10-22-gaid-hub-server.md`; user decision 2026-10-22: "2번 다, 4번 나로
+  하고 나머지는 권장으로 하자."): `node geo/hub-server.mjs serve|invite|users|backup|check-backup|import-hub` runs a separate
+  Fastify process (`server/src/geo/hub-server/`, `/hub/v1`, wire `protocol.ts`; operator guide `docs/geo/hub-server.md`) with
+  accounts (admin invites, email + password, scrypt, hashed sessions), the shared hub records and per-account library sync in
+  SQLite (`node:sqlite`) + `blobs/<sha256>` under `GAID_HUB_SERVER_HOME` (default `~/.geoaidesk-hub`); no agent, shell, projects
+  or web UI, and it refuses browser requests. Plain HTTP on the institute LAN is the accepted pilot setting. Researchers' GAIDs
+  connect in Settings → 서비스 → 기관 GAID 허브 (`web/src/geo/hub-server/`, contract `web/src/geo/contracts/hub-server.ts`, routes
+  `/geo/hub-server/*` and `/geo/library/sync` in `server/src/geo/routes/hub-server.ts`; token in
+  `<agentDir>/hub-server/connection.json`, never sent to the browser; `GAID_HUB_SERVER_URL` fixes the address). The `/geo/hub/*`
+  routes resolve per request (`server/src/geo/hub-shared/active.ts`): logged in → `RemoteHubStore` (`server/src/geo/hub-client/`)
+  and the account as `Actor`, else the local `SharedHubStore` and `X-GAID-User`; all three stores implement `HubRecordStore`
+  (`hub-shared/records.ts`), ownership by `authorId`, `HubEntry.mine`. Library sync (`server/src/geo/library/sync/`) keeps the
+  local library as the working copy (pull → push with base versions, newer `updatedAt` wins, replaced copies in
+  `<library>/sync/conflicts/`, deletions win over edits, Zotero items deduplicated by library + item key; `zotero.json` stays
+  local). `server/test/geo-hub-e2e.test.ts` runs a real HTTP hub server with two accounts and two PCs of one account.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Research notes (gaid-notebook-review, `docs/geo/research-notes.md`; user decision 2026-10-18): the notebook tab opens on
   research notes (정리 노트), one Markdown note per analysis at `연구노트/<YYYY-MM-DD>-<topic>/index.md` (+ `figures/`), written result
@@ -138,6 +160,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`
   seeds into each geo project's `.pi/skills/` (unedited copies follow new versions; deleted/disabled stay) and
   `applyExposure` always offers. Sources and licences: `THIRD_PARTY_NOTICES.md`.
+- Journal figures (gaid-research-visuals): `geo/skills/gaid-figures/` ships with the note-style skill via `server/src/geo/shipped-skills.ts` (legacy note-style receipts preserved); `assets/journals.json` holds dated, official-source rules and explicit unknowns. `scripts/check_figure.py` writes content-keyed FigureCheck JSON and hidden CVD previews; checks never certify journal compliance.
 - Environments (`server/src/geo/environments.ts`): the catalogue's non-optional `geo-core` + `geo-gis` packages are
   in the helper venv (`server/src/helpers/pyproject.toml`, Python >= 3.12) and in the pyproject seeded into new geo
   project sandboxes (existing ones are never rewritten); `GET /geo/environments`, explicit

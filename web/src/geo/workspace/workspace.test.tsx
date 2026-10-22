@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoSuggestion, GeoWorkflowSummary, WorkflowReadinessState } from "@/geo/contracts/workspace";
 import { GeoTaskCatalogue } from "./task-catalogue";
 import { WorkflowsPanel } from "@/components/workflows-panel";
-import { GeoFileActions } from "./file-actions";
+import { GeoFileActions, WORKFLOW_STRIP_KEY } from "./file-actions";
 import { GeoResultBody } from "./result-card";
 import { onStartGeoTask } from "./events";
 import { onChatPrefill } from "@/lib/chat-prefill";
@@ -40,7 +40,8 @@ let saved: { categories: { id: string; label: string }[]; recipes: unknown[] };
 const okRecipe = { schemaVersion: "geo-start/v1", workflowId: "well-qc", catalogueVersion: "0.2.0", skillIds: ["geo/well"], choices: { depth: "MD" }, unresolvedChoices: ["units"] };
 const okSetup = { workflowId: "well-qc", choices: { depth: "MD" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null };
 beforeEach(() => {
-  window.localStorage.clear(); Object.defineProperty(navigator, "languages", { configurable: true, value: ["ko-KR"] });
+  // These tests read the suggestion rows; the one-line start above tall files is tested in file-actions.test.tsx.
+  window.localStorage.clear(); window.localStorage.setItem(WORKFLOW_STRIP_KEY, "open"); Object.defineProperty(navigator, "languages", { configurable: true, value: ["ko-KR"] });
   rows = [workflow()]; suggestions = rows.map(suggestion); catalogueState = "ready";
   recipeResult = { ok: false, issues: [{ code: "catalogue-version", subject: "0.1.0", message: "Version does not match" }] }; prepareResult = null; saved = { categories: [], recipes: [] };
   apiFetch.mockReset().mockImplementation(async (path: string, init?: RequestInit) => {

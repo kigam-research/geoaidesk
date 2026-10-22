@@ -26,11 +26,14 @@ import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
 import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
+import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 
 import { fileBase64, hubApi, newOpId } from "./api";
 import { DraftStep, TrialCard } from "./draft-step";
 import { AgentRecordDialog, FeedbackDialog, FilesDialog, IssuesDialog, SourcePageDialog } from "./hub-dialogs";
 import { HubHome } from "./hub-home";
+import { HubSidebar, HubSidebarToggle, useHubSidebarCollapsed, type HubView } from "./hub-sidebar";
+import { useShortcut } from "@/geo/shell/shortcuts";
 import { HubShell, ProjectBar, type HubStep } from "./hub-shell";
 import type { HubLocation } from "./location";
 import { QuestionStep, sameAnswer, type DraftAnswer } from "./question-step";
@@ -45,14 +48,21 @@ import { openMethodSetup } from "./handoff";
 import type { HubEntry, HubFolder, HubRecommendation } from "@/geo/contracts/hub-shared";
 import { hubUserName, sharedHub } from "./shared-api";
 import { CatalogueWorkflowScreen } from "./catalogue-workflow";
-import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
+import { hubImage, SharedEntryScreen, useHubIdentity, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
+
+import { SkillShelf } from "@/geo/hub-skills/shelf";
+import { SkillDetail } from "@/geo/hub-skills/detail";
+import { RegisterSkill } from "@/geo/hub-skills/register";
 
 const text = geoText("hub");
 
 export function GaidHub({
   authoringId,
   entryId = null,
+  catalogueId = null,
+  skills = false,
+  skillId = null,
   onNavigate,
   onOpenProjects,
   onOpenProject,
@@ -60,6 +70,10 @@ export function GaidHub({
   authoringId: string | null;
   /** A registered entry of the shared hub to show. */
   entryId?: string | null;
+  /** A built-in (catalogue) Workflow to show. */
+  catalogueId?: string | null;
+  skills?: boolean;
+  skillId?: string | null;
   onNavigate: (next: HubLocation) => void;
   onOpenProjects: () => void;
   onOpenProject: (projectId: string) => void;
@@ -76,8 +90,29 @@ export function GaidHub({
       }),
     [],
   );
-  const { projects, setActive } = useProjects();
+  const { projects, setActive, create } = useProjects();
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
+  const [registerSkill, setRegisterSkill] = useState(false);
+  const skillPlace = skills || !!skillId;
+  const listShown = !skillPlace && !entryId && !catalogueId && authoringId === null;
+  const index = useHubIndex(listShown);
+  // The list the hub shows; on a detail screen, the list it was opened from (a registered Workflow opened by a link
+  // belongs to 등록된 Workflow).
+  const [view, setView] = useState<HubView>(() => (skillPlace ? { kind: "skills" } : entryId ? { kind: "registry", folder: "all" } : { kind: "home" }));
+  const [mineFolder, setMineFolder] = useState("all");
+  const [newFolder, setNewFolder] = useState(false);
+  const named = useNamedAction();
+  const [collapsed, toggleCollapsed] = useHubSidebarCollapsed();
+  useShortcut("sidebar", toggleCollapsed);
+  // A Workflow being made is one of mine; built-in Workflows are shown under 추천.
+  const marked: HubView = skillPlace ? { kind: "skills" } : authoringId !== null ? { kind: "mine" } : catalogueId ? { kind: "home" } : view;
+  const openList = (next: HubView) => {
+    setRegisterSkill(false);
+    setView(next);
+    if (next.kind === "skills") { onNavigate({ open: true, projectId: null, skills: true }); return; }
+    if (!listShown) onNavigate({ open: true, projectId: null });
+  };
+  const toList = () => onNavigate({ open: true, projectId: null, ...(view.kind === "skills" ? { skills: true } : {}) });
   return (
     <HubShell
       onNavigate={(place) => place === "projects" && onOpenProjects()}
@@ -85,36 +120,75 @@ export function GaidHub({
         setSettingsRequest(null);
         setSettingsOpen(true);
       }}
+      actions={<HubSidebarToggle collapsed={collapsed} onToggle={toggleCollapsed} />}
     >
-      {entryId ? (
-        <SharedEntryScreen
-          key={entryId}
-          entryId={entryId}
-          projects={hubProjects}
-          onBack={() => onNavigate({ open: true, projectId: null })}
-          onOpenDraft={(id) => onNavigate({ open: true, projectId: id })}
-          onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
-          onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
-            setActive(projectId);
-            onOpenProject(projectId);
-            openMethodSetup({ projectId, methodKey, workflowId, recipeId });
-          }}
+      <div className="flex min-h-0 flex-1">
+        <HubSidebar
+          view={marked}
+          folders={index.folders.map((f) => ({ id: f.id, name: f.name, count: f.entries }))}
+          registryTotal={index.folders.reduce((n, f) => n + f.entries, 0)}
+          mineCount={index.mine.length}
+          collapsed={collapsed}
+          onView={openList}
+          onNewFolder={() => named.run(() => setNewFolder(true))}
         />
-      ) : authoringId === null ? (
-        <HubList
-          onOpen={(id) => onNavigate({ open: true, projectId: id })}
-          onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
-        />
-      ) : (
-        <HubProject
-          key={authoringId}
-          id={authoringId}
-          onBack={() => onNavigate({ open: true, projectId: null })}
-          onCreated={(id) => onNavigate({ open: true, projectId: id })}
-          onRegistered={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
-          onOpenProject={onOpenProject}
-        />
-      )}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {skillPlace ? (
+            skillId ? <SkillDetail key={skillId} id={skillId} projects={hubProjects} onCreateProject={(name) => create({ name })} onBack={() => onNavigate({ open: true, projectId: null, skills: true })} onWorkflow={(entryId) => onNavigate({ open: true, projectId: null, entryId })} />
+            : registerSkill ? <RegisterSkill projects={hubProjects} folders={index.folders} onBack={() => setRegisterSkill(false)} onRegistered={(skill) => { setRegisterSkill(false); onNavigate({ open: true, projectId: null, skillId: skill.id }); }} />
+            : <SkillShelf folders={index.folders} onOpen={(skillId) => onNavigate({ open: true, projectId: null, skillId })} onRegister={() => named.run(() => setRegisterSkill(true))} />
+          ) : entryId ? (
+            <SharedEntryScreen
+              key={entryId}
+              entryId={entryId}
+              projects={hubProjects}
+              onBack={toList}
+              onOpenDraft={(id) => onNavigate({ open: true, projectId: id })}
+              onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
+              onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
+                setActive(projectId);
+                onOpenProject(projectId);
+                openMethodSetup({ projectId, methodKey, workflowId, recipeId });
+              }}
+            />
+          ) : catalogueId ? (
+            <CatalogueWorkflowScreen key={catalogueId} id={catalogueId} onBack={toList} />
+          ) : authoringId === null ? (
+            <HubList
+              index={index}
+              view={view.kind === "skills" ? { kind: "home" } : view}
+              onView={setView}
+              mineFolder={mineFolder}
+              onMineFolder={setMineFolder}
+              onOpen={(id) => onNavigate({ open: true, projectId: id })}
+              onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
+              onOpenCatalogue={(id) => onNavigate({ open: true, projectId: null, catalogueId: id })}
+            />
+          ) : (
+            <HubProject
+              key={authoringId}
+              id={authoringId}
+              onBack={toList}
+              onCreated={(id) => onNavigate({ open: true, projectId: id })}
+              onRegistered={(id) => {
+                setView({ kind: "mine" });
+                onNavigate({ open: true, projectId: null, entryId: id });
+              }}
+              onOpenProject={onOpenProject}
+            />
+          )}
+        </div>
+      </div>
+      <NewFolderDialog
+        open={newFolder}
+        onOpenChange={setNewFolder}
+        onCreate={async (name) => {
+          const f = await sharedHub.createFolder(name);
+          await index.reloadShared();
+          setMineFolder(f.id);
+        }}
+      />
+      {named.dialog}
       {settingsOpen && (
         <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
       )}
@@ -125,24 +199,41 @@ export function GaidHub({
 /** `#hub/new` is a project not yet created: it is created with the first uploaded source. */
 export const NEW_ID = "new-method";
 
-function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpenEntry: (id: string) => void }) {
+interface HubIndex {
+  /** My methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name. */
+  mine: ProjectSummary[];
+  entries: HubEntry[];
+  folders: (HubFolder & { entries: number })[];
+  cards: HubRecommendation[];
+  loading: boolean;
+  error: string | null;
+  reloadShared: () => Promise<void>;
+}
+
+/**
+ * What the hub lists (my methods, registered entries, topic folders, recommendations), shared by the sidebar and the
+ * home lists. Read on entering the hub and on every return to the list; my methods refresh every 10 s while it shows.
+ */
+function useHubIndex(listShown: boolean): HubIndex {
+  const identity = useHubIdentity();
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [entries, setEntries] = useState<HubEntry[]>([]);
   const [folders, setFolders] = useState<(HubFolder & { entries: number })[]>([]);
   const [cards, setCards] = useState<HubRecommendation[]>([]);
-  const [folderId, setFolderId] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [catalogueId, setCatalogueId] = useState<string | null>(null);
-  const [newFolder, setNewFolder] = useState(false);
-  const named = useNamedAction();
-  const loadShared = useCallback(async () => {
+  const reloadShared = useCallback(async () => {
     // The shared hub may be unavailable (older server): my methods still list.
     const [f, e, r] = await Promise.allSettled([sharedHub.folders(), sharedHub.entries(), sharedHub.recommended()]);
     if (f.status === "fulfilled") setFolders(f.value.folders);
     if (e.status === "fulfilled") setEntries(e.value.entries);
     if (r.status === "fulfilled") setCards(r.value.cards);
   }, []);
+  useEffect(() => {
+    const changed = () => void reloadShared();
+    window.addEventListener(HUB_CONNECTION_CHANGED, changed);
+    return () => window.removeEventListener(HUB_CONNECTION_CHANGED, changed);
+  }, [reloadShared]);
   useEffect(() => {
     let live = true;
     const load = () =>
@@ -152,32 +243,57 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         .catch((e: Error) => live && setError(e.message))
         .finally(() => live && setLoading(false));
     void load();
-    void loadShared();
-    const timer = window.setInterval(load, 10_000);
+    void reloadShared();
+    const timer = listShown ? window.setInterval(load, 10_000) : undefined;
     return () => {
       live = false;
       window.clearInterval(timer);
     };
-  }, [loadShared]);
+  }, [listShown, reloadShared]);
+  const me = identity?.account ? identity.name : hubUserName();
+  const mine = useMemo(() => (me ? projects.filter((p) => !p.author || p.author === me) : projects), [projects, me]);
+  return { mine, entries, folders, cards, loading, error, reloadShared };
+}
+
+function HubList({
+  index,
+  view,
+  onView,
+  mineFolder,
+  onMineFolder,
+  onOpen,
+  onOpenEntry,
+  onOpenCatalogue,
+}: {
+  index: HubIndex;
+  view: HubView;
+  onView: (view: HubView) => void;
+  mineFolder: string;
+  onMineFolder: (id: string) => void;
+  onOpen: (id: string) => void;
+  onOpenEntry: (id: string) => void;
+  onOpenCatalogue: (id: string) => void;
+}) {
+  const { mine, entries, folders, cards } = index;
+  const named = useNamedAction();
   const entryOf = (p: ProjectSummary) =>
     entries.find(
       (e) =>
         (p.hubEntry?.mode === "edit" && e.id === p.hubEntry.entryId) ||
         e.revisions.some((r) => r.authoringProjectId === p.id),
     );
-  // "My" methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name.
-  const me = hubUserName();
-  const mine = me ? projects.filter((p) => !p.author || p.author === me) : projects;
-  const shown = folderId === "all" ? mine : mine.filter((p) => entryOf(p)?.folderId === folderId);
-  if (catalogueId) return <CatalogueWorkflowScreen key={catalogueId} id={catalogueId} onBack={() => setCatalogueId(null)} />;
+  const shown = mineFolder === "all" ? mine : mine.filter((p) => entryOf(p)?.folderId === mineFolder);
   return (
     <>
       <HubHome
+        view={view}
+        onView={onView}
         recommended={cards.map((c) => ({
           id: c.id,
           title: c.title,
           line: c.line,
           image: hubImage(c.image),
+          imageThemed: c.imageThemed,
           source: c.source,
           stars: c.stars,
           author: c.author,
@@ -190,12 +306,10 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
             count: mine.filter((p) => entryOf(p)?.folderId === f.id).length,
           })),
         ]}
-        folderId={folderId}
-        onFolder={setFolderId}
-        onNewFolder={() => named.run(() => setNewFolder(true))}
+        folderId={mineFolder}
+        onFolder={onMineFolder}
         registryFolders={folders.map((f) => ({ id: f.id, name: f.name, count: f.entries }))}
         projects={shown}
-        mineCount={mine.length}
         registered={Object.fromEntries(
           mine.flatMap((p) => {
             const e = entryOf(p);
@@ -204,24 +318,15 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
               : [];
           }),
         )}
-        loading={loading}
-        error={error}
+        loading={index.loading}
+        error={index.error}
         onCreate={() => named.run(() => onOpen(NEW_ID))}
         onOpen={onOpen}
         onOpenEntry={onOpenEntry}
         onOpenRecommended={(id) => {
           const card = cards.find((c) => c.id === id);
           if (card?.source === "shared") onOpenEntry(card.ref);
-          else if (card) setCatalogueId(card.ref);
-        }}
-      />
-      <NewFolderDialog
-        open={newFolder}
-        onOpenChange={setNewFolder}
-        onCreate={async (name) => {
-          const f = await sharedHub.createFolder(name);
-          await loadShared();
-          setFolderId(f.id);
+          else if (card) onOpenCatalogue(card.ref);
         }}
       />
       {named.dialog}
@@ -236,17 +341,21 @@ function draftVisuals(project: AuthoringProject, draft: MethodDraft | undefined)
   const steps: Record<string, StepVisual> = {};
   const outputs: Record<string, StepVisual> = {};
   let cover: string | null = null;
-  if (!draft) return { steps, outputs, cover };
+  let coverThemed = false;
+  if (!draft) return { steps, outputs, cover, coverThemed };
   const nodeIds = new Set(draft.profile.procedure.nodes.map((n) => n.id));
   const outputIds = new Set(draft.profile.outputs.map((o) => o.id));
   for (const [key, v] of Object.entries(project.visuals ?? {})) {
     const src = withApiToken(`${API_BASE}${hubApi.visualUrl(project.id, key)}`);
-    const visual: StepVisual = { src, kind: "generated", caption: v.caption };
-    if (key === "cover") cover = src;
+    const visual: StepVisual = { src, kind: "generated", caption: v.caption, themed: Boolean(v.dark) };
+    if (key === "cover") {
+      cover = src;
+      coverThemed = Boolean(v.dark);
+    }
     else if (key.startsWith("output:") && outputIds.has(key.slice(7))) outputs[key.slice(7)] = visual;
     else if (nodeIds.has(key)) steps[key] = visual;
   }
-  return { steps, outputs, cover };
+  return { steps, outputs, cover, coverThemed };
 }
 
 function emptyProject(): AuthoringProject {
@@ -533,11 +642,11 @@ function HubProject({
     }
   };
 
-  const makeVisuals = async (keys?: string[], instruction?: string) => {
+  const makeVisuals = async (keys?: string[], instruction?: string, adapt?: boolean) => {
     if (!draft) return;
     setVisualsBusy(true);
     try {
-      await hubApi.visuals(id, draft.revision, { keys, instruction });
+      await hubApi.visuals(id, draft.revision, { keys, instruction, ...(adapt ? { adapt: true } : {}) });
       await reload();
     } catch (e) {
       toast.error((e as Error).message);
@@ -709,6 +818,7 @@ function HubProject({
           starred: false,
           trials: trialCount ?? 0,
           image: pictures.cover,
+          imageThemed: pictures.coverThemed,
           comments: [],
         }}
         profile={draft.profile}
@@ -727,6 +837,7 @@ function HubProject({
         visuals={pictures.steps}
         outputImages={pictures.outputs}
         cover={pictures.cover}
+        coverThemed={pictures.coverThemed}
         visualAction={{
           busy: visualsBusy || Boolean(visualRun),
           progress: visualRun ? { done: visualRun.completed.length, total: visualRun.keys.length } : null,
@@ -734,7 +845,7 @@ function HubProject({
           error: lastVisualError,
           errorDetail: lastVisualDetail,
           usageLimit: Boolean(usageLimit),
-          onMake: (keys, instruction) => void makeVisuals(keys, instruction),
+          onMake: (keys, instruction, adapt) => void makeVisuals(keys, instruction, adapt),
           connected: visualSource?.available ?? null,
         }}
         trialCount={trialCount ?? 0}

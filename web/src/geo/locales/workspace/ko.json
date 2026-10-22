@@ -157,7 +157,10 @@
     "match": "일치한 입력: {role}",
     "error": "프로젝트 파일 목록을 읽지 못했습니다. 시작 설정을 다시 여세요.",
     "signal": "{kind, select, element-columns {원소·산화물 열} time-drawdown-columns {시간·수위 강하 열} xy-label-columns {좌표·label 열} categorical-field {범주 필드} other {일치한 열}}: {columns}",
-    "title": "열린 파일로 시작할 수 있는 Workflow"
+    "title": "열린 파일로 시작할 수 있는 Workflow",
+    "summary": "열린 파일로 시작할 수 있는 Workflow {count}개",
+    "expand": "펼치기",
+    "collapse": "접기"
   },
   "skill": {
     "open": "재사용 스킬 만들기",
@@ -175,7 +178,9 @@
     "enable": "스킬 켜기",
     "enabling": "스킬 켜는 중",
     "notInstalled": "프로젝트에 설치되지 않은 스킬: {names}. 설정 → 스킬에서 설치하세요.",
-    "error": "스킬을 켜지 못했습니다. 설정 → 스킬에서 다시 켜세요."
+    "error": "스킬을 켜지 못했습니다. 설정 → 스킬에서 다시 켜세요.",
+    "hub": "허브 스킬 {name} ({revision}판):",
+    "hubInstall": "허브에서 {revision}판 설치하기"
   },
   "badge": {
     "readiness": "{state, select, ready {준비됨} missing-skills {스킬 필요} needs-environment {환경 준비 필요} unavailable {사용 불가} other {상태 미확인}}",

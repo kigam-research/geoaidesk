@@ -6,7 +6,8 @@
   "source": {
     "catalogue": "기본 제공",
     "imported": "가져온 스킬",
-    "bundled": "Workflow에 딸린 스킬"
+    "bundled": "Workflow에 딸린 스킬",
+    "hub": "허브 스킬"
   },
   "instructions": {
     "button": "지침 보기"
@@ -36,11 +37,17 @@
   "detail": {
     "button": "Workflow 상세 보기"
   },
-  "back": {
-    "button": "허브 목록 보기"
-  },
   "import": {
     "button": "GitHub 등에서 가져오기"
   },
-  "importRef": "가져올 출처: {ref}"
+  "importRef": "가져올 출처: {ref}",
+  "hubRevision": "{revision}판",
+  "hubOpen": "허브에서 보기",
+  "hubState": {
+    "missing": "아직 설치하지 않았습니다.",
+    "other-revision": "다른 판이 설치되어 있습니다. Workflow는 고정한 판을 씁니다.",
+    "edited": "프로젝트에서 고친 사본이 설치되어 있습니다.",
+    "conflict": "같은 이름의 다른 스킬이 있어 설치할 수 없습니다.",
+    "suspended": "허브에서 사용 중지한 판입니다. Workflow 작성자에게 알려 주세요."
+  }
 }

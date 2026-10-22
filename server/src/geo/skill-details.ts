@@ -7,6 +7,7 @@ import { readMethodFile } from "./methods/method-file.ts";
 import { originOfSource } from "./methods/package-origin.ts";
 
 export function skillWorkflow(root: SkillRoot, name: string, source?: string) {
+  // A standalone gaid-hub-skill is not a Workflow, even if its folder includes old method metadata.
   if (originOfSource(source).origin.kind !== "gaid-hub") return undefined;
   const dir = findSkillDir(root, name);
   const method = dir ? readMethodFile(dir, name).method : null;

@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/03-setup-choice.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # Workflow 시작 설정을 단계 화면으로 다시 만들고 GAID 작업 화면을 화면 가이드에 맞춤
 

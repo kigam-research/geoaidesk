@@ -10,6 +10,7 @@
  */
 
 import type { WorkflowDoc, WorkflowSkillSource } from "./workflow-doc";
+import type { HubSkillInstallState } from "./hub-skills";
 
 export interface Localized {
   ko: string;
@@ -61,6 +62,8 @@ export interface WorkflowSkillState {
   /** gaid-workflow-model: where the skill comes from; `ref` is the import source of an `imported` skill. */
   source?: WorkflowSkillSource;
   ref?: string | null;
+  /** `hub` source: the pinned revision and its state in this project (contracts/hub-skills.ts). */
+  hub?: { skillId: string; revision: number; treeHash: string; state: HubSkillInstallState } | null;
 }
 
 export interface WorkflowEnvironmentState {

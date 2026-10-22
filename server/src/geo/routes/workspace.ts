@@ -9,6 +9,8 @@
  *   DELETE /geo/recipes/:id      remove a saved recipe
  * None of them starts a task, prepares an environment or sends a prompt.
  */
+import { hubSuspendedLookup } from "../methods/hub-pin-install.ts";
+import { installedMethods } from "../methods/local-methods.ts";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { activePaths, type ProjectPaths } from "../../projects.ts";
 import { currentProjectId } from "../../scope.ts";
@@ -87,7 +89,7 @@ export async function registerGeoWorkspaceRoutes(app: FastifyInstance, options: 
     if (!format) return { path: rel, format: null, suggestions: [] };
     const [workflows, methods] = await Promise.all([
       catalogue ? listWorkflows(pathsOf(), catalogue, service) : [],
-      listLocalMethods(pathsOf(), catalogue, service),
+      listLocalMethods(pathsOf(), catalogue, service, { hubSuspended: await hubSuspendedLookup(installedMethods(pathsOf()).map((m) => m.file.method)) }),
     ]);
     // Pi resolves project methods before global methods of the same name.
     const seen = new Set<string>();

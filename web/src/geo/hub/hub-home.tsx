@@ -1,8 +1,8 @@
 "use client";
 /**
- * GAID hub home (UI guide v2: L2, L3, N2, N5, G2, G3). A sidebar in the functional layer lists the hub's places
- * (추천, 등록된 Workflow, topic folders, 내 Workflow); the content face holds the title, the one primary action
- * (Workflow 만들기), the search and the chosen list. Featured Workflows show their concept pictures at their own
+ * GAID hub home (UI guide v2: L2, L3, N2, N5, G2, G3). The hub sidebar (hub-sidebar.tsx, drawn by GaidHub beside every
+ * hub screen) picks the list; the content face holds the title, the one primary action (Workflow 만들기), the search
+ * and the chosen list. Featured Workflows show their concept pictures at their own
  * aspect ratio; registered Workflows are rows with the same fields in the same places.
  */
 import {
@@ -11,12 +11,8 @@ import {
   DatabaseIcon,
   DropletsIcon,
   FlaskConicalIcon,
-  FolderIcon,
-  FolderPlusIcon,
-  ListIcon,
   LoaderCircleIcon,
   MapIcon,
-  PencilIcon,
   PlusIcon,
   SearchIcon,
   StarIcon,
@@ -28,11 +24,12 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { ProjectSummary } from "@/geo/contracts/authoring";
 import { geoLocale, geoText } from "@/geo/i18n";
-import { SidebarGroup, SidebarItem } from "@/geo/shell/sidebar";
 import { cn } from "@/lib/utils";
 
+import type { HubView } from "./hub-sidebar";
 import { SharedBrowse } from "./shared-browse";
 import { TechnicalDetail } from "./technical";
+import { ConceptPicture } from "./concept-picture";
 
 const text = geoText("hub");
 
@@ -113,6 +110,8 @@ export interface RecommendedCard {
   title: string;
   line: string;
   image: string | null;
+  /** The image has a dark-mode version (generated concept picture). */
+  imageThemed?: boolean;
   source: "catalogue" | "shared";
   stars: number;
   author?: string;
@@ -124,7 +123,6 @@ export interface HubFolder {
   count: number;
 }
 
-type HubView = { kind: "home" } | { kind: "registry"; folder: string } | { kind: "mine" };
 
 function CardMeta({ card }: { card: RecommendedCard }) {
   return (
@@ -152,14 +150,18 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
         onClick={() => onOpen?.(lead.id)}
         className="group flex min-h-64 overflow-hidden rounded-lg border border-gaid-edge bg-gaid-face text-left transition-colors hover:border-gaid-control-edge focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        <span className="flex w-[58%] shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-2.5">
-          {lead.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={lead.image} alt="" className="max-h-full w-full object-contain" />
-          ) : (
+        {lead.image ? (
+          <ConceptPicture
+            src={lead.image}
+            themed={lead.imageThemed}
+            className="flex w-[58%] shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-2.5"
+            imageClassName="max-h-full"
+          />
+        ) : (
+          <span className="flex w-[58%] shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-2.5">
             <CardArt title={lead.title} />
-          )}
-        </span>
+          </span>
+        )}
         <span className="flex min-w-0 flex-1 flex-col gap-2 p-5">
           <span className="text-xl font-semibold leading-7">{lead.title}</span>
           <span className="line-clamp-4 text-sm text-gaid-ink-2" title={lead.line}>{lead.line}</span>
@@ -175,14 +177,18 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
               onClick={() => onOpen?.(card.id)}
               className="flex min-h-32 overflow-hidden rounded-lg border border-gaid-edge bg-gaid-face text-left transition-colors hover:border-gaid-control-edge focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <span className="flex w-40 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
-                {card.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={card.image} alt="" className="max-h-full w-full object-contain" />
-                ) : (
+              {card.image ? (
+                <ConceptPicture
+                  src={card.image}
+                  themed={card.imageThemed}
+                  className="flex w-40 shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-1.5"
+                  imageClassName="max-h-full"
+                />
+              ) : (
+                <span className="flex w-40 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
                   <CardArt title={card.title} />
-                )}
-              </span>
+                </span>
+              )}
               <span className="flex min-w-0 flex-1 flex-col gap-1.5 p-4">
                 <span className="line-clamp-2 font-semibold">{card.title}</span>
                 <span className="line-clamp-2 text-sm text-gaid-ink-2" title={card.line}>{card.line}</span>
@@ -197,14 +203,14 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
 }
 
 export function HubHome({
+  view,
+  onView,
   recommended,
   folders,
   folderId,
   onFolder,
-  onNewFolder,
   registryFolders = [],
   projects,
-  mineCount,
   loading,
   error,
   onCreate,
@@ -213,6 +219,9 @@ export function HubHome({
   registered = {},
   onOpenEntry,
 }: {
+  /** The list to show, chosen in the hub sidebar (hub-sidebar.tsx). */
+  view: HubView;
+  onView: (view: HubView) => void;
   /** My methods already registered in the shared hub, by authoring project id. */
   registered?: Record<string, { entryId: string; stars: number; comments: number; revision: number }>;
   onOpenEntry?: (entryId: string) => void;
@@ -221,21 +230,16 @@ export function HubHome({
   folders: HubFolder[];
   folderId: string;
   onFolder: (id: string) => void;
-  onNewFolder?: () => void;
-  /** Topic folders of the shared registry with their entry counts (sidebar). */
+  /** Topic folders of the shared registry with their entry counts (titles of the registry list). */
   registryFolders?: HubFolder[];
   projects: ProjectSummary[];
-  /** All my methods, before the folder filter. */
-  mineCount?: number;
   loading?: boolean;
   error?: string | null;
   onCreate: () => void;
   onOpen: (id: string) => void;
   onOpenRecommended?: (id: string) => void;
 }) {
-  const [view, setView] = useState<HubView>({ kind: "home" });
   const [query, setQuery] = useState("");
-  const registryTotal = registryFolders.reduce((n, f) => n + f.count, 0);
   const registryFolder = view.kind === "registry" ? view.folder : "all";
   const folderTitle =
     view.kind === "registry" && view.folder !== "all"
@@ -243,49 +247,7 @@ export function HubHome({
       : text("home.browse.title");
 
   return (
-    <div className="flex min-h-0 flex-1">
-      <nav
-        aria-label={text("home.nav")}
-        className="flex w-[248px] shrink-0 flex-col gap-5 overflow-y-auto border-r border-gaid-frame bg-gaid-chrome px-2.5 py-3"
-      >
-        <SidebarGroup>
-          <SidebarItem icon={StarIcon} label={text("home.recommended")} selected={view.kind === "home"} onClick={() => setView({ kind: "home" })} />
-          <SidebarItem
-            icon={ListIcon}
-            label={text("home.browse.title")}
-            count={registryTotal}
-            selected={view.kind === "registry" && view.folder === "all"}
-            onClick={() => setView({ kind: "registry", folder: "all" })}
-          />
-        </SidebarGroup>
-        <SidebarGroup
-          title={text("home.foldersTitle")}
-          action={
-            onNewFolder && (
-              <Button variant="ghost" size="icon-xs" aria-label={text("home.newFolder")} title={text("home.newFolder")} onClick={onNewFolder}>
-                <FolderPlusIcon />
-              </Button>
-            )
-          }
-        >
-          {registryFolders.map((f) => (
-            <SidebarItem
-              key={f.id}
-              icon={FolderIcon}
-              label={f.name}
-              title={f.name}
-              count={f.count}
-              selected={view.kind === "registry" && view.folder === f.id}
-              onClick={() => setView({ kind: "registry", folder: f.id })}
-            />
-          ))}
-        </SidebarGroup>
-        <SidebarGroup title={text("home.mineTitle")}>
-          <SidebarItem icon={PencilIcon} label={text("home.mineItem")} count={mineCount ?? projects.length} selected={view.kind === "mine"} onClick={() => setView({ kind: "mine" })} />
-        </SidebarGroup>
-      </nav>
-
-      <main className="min-w-0 flex-1 overflow-y-auto">
+    <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8 px-8 pb-12 pt-7">
           <header className="flex flex-col gap-5">
             <div className="flex items-start justify-between gap-6">
@@ -307,7 +269,8 @@ export function HubHome({
                 <Input
                   type="search"
                   className="h-10 pl-9"
-                  aria-label={text("home.browse.search.label")}
+                  data-gaid-search=""
+            aria-label={text("home.browse.search.label")}
                   placeholder={text("home.browse.search.placeholder")}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -335,7 +298,7 @@ export function HubHome({
                 onOpen={(id) => onOpenEntry?.(id)}
                 onReset={() => {
                   setQuery("");
-                  setView({ kind: "registry", folder: "all" });
+                  onView({ kind: "registry", folder: "all" });
                 }}
               />
             </section>
@@ -421,7 +384,6 @@ export function HubHome({
             </section>
           )}
         </div>
-      </main>
-    </div>
+    </main>
   );
 }

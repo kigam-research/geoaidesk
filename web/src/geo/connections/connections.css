@@ -1,0 +1,43 @@
+/* React Flow base.css supplies geometry only; all painted roles follow GAID. */
+.connection-pane .connection-card { box-shadow: none; }
+.connection-pane .connection-handle {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  min-height: 6px;
+  border: 1px solid var(--gaid-ink-3);
+  background: var(--gaid-face);
+}
+.connection-pane .react-flow__node-connection { border-radius: var(--radius); }
+.connection-pane .react-flow__edge-path { stroke: var(--gaid-ink-3); }
+
+.connection-pane .gaid-seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--gaid-edge);
+  border-radius: var(--radius);
+  background: var(--gaid-chrome);
+}
+.connection-pane .gaid-seg > button {
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  color: var(--gaid-ink-2);
+}
+.connection-pane .gaid-seg > button:hover { background: var(--gaid-face); }
+.connection-pane .gaid-seg > button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.connection-pane .gaid-seg > [aria-pressed="true"],
+.connection-pane .gaid-seg > [aria-selected="true"] {
+  background: var(--gaid-signal-tint);
+  color: var(--gaid-signal-ink);
+  font-weight: 600;
+}
+.connection-pane .react-flow__attribution {
+  background: var(--gaid-face);
+  color: var(--gaid-ink-2);
+  font-size: 12px;
+}
+
+.connection-pane .react-flow__attribution a { color: var(--gaid-ink-2); }

@@ -1,6 +1,7 @@
 "use client";
 
 import { REMOTE_COMPUTE_ENABLED } from "@/geo/features";
+import { HubServerCard } from "@/geo/hub-server/card";
 import { SettingsMessage } from "@/components/settings/primitives";
 import { geoText } from "@/geo/i18n";
 
@@ -526,6 +527,8 @@ export function ServicesPanel() {
       />
 
       <SettingsError>{error}</SettingsError>
+
+      <HubServerCard />
 
       {loading ? (
         <p className="text-xs text-muted-foreground">{settingsText("services.loading")}</p>

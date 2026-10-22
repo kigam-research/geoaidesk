@@ -1,7 +1,8 @@
 /**
- * Editing a registered hub method (gaid-hub-editing). Display names are not accounts, so the latest revision stays with
- * the researcher who registered the method: that name edits in place (next revision), anyone else edits a copy that is
- * registered as a separate entry naming its original. Opening never changes the entry's registered revisions.
+ * Editing a registered hub method (gaid-hub-editing). The latest revision stays with the researcher who registered the
+ * method (the same hub server account, or the same display name in the local store): they edit in place (next revision),
+ * anyone else edits a copy that is registered as a separate entry naming its original. Opening never changes the entry's
+ * registered revisions.
  */
 import { cp } from "node:fs/promises";
 import { extname } from "node:path";
@@ -10,19 +11,20 @@ import type { EditEntryResult } from "../../../../web/src/geo/contracts/hub-shar
 import { structuredDraft } from "../authoring/workflow.ts";
 import { addSource } from "../authoring/sources.ts";
 import { AuthoringError, now, type AuthoringStore } from "../authoring/store.ts";
-import type { SharedHubStore, StoredEntry } from "./store.ts";
+import type { StoredEntry } from "./store.ts";
+import { isEntryAuthor, type Actor, type HubRecordStore } from "./records.ts";
 
 const readable = async (authoring: AuthoringStore, id: string) => authoring.read(id).catch(() => null);
 
 export async function openEntryForEdit(
-  store: SharedHubStore,
+  store: HubRecordStore,
   authoring: AuthoringStore,
   entryId: string,
-  user: string,
+  actor: Actor,
 ): Promise<EditEntryResult> {
   return store.serial(entryId, async () => {
     const record = await store.read(entryId);
-    const mode = record.entry.author === user ? "edit" : "copy";
+    const mode = isEntryAuthor(record.entry, actor) ? "edit" : "copy";
     const link: HubEntryLink = {
       entryId,
       revision: record.entry.latestRevision,
@@ -35,14 +37,14 @@ export async function openEntryForEdit(
     if (mode === "copy") {
       // A repeated "복사해서 고치기" reopens the researcher's own copy instead of making another.
       for (const summary of await authoring.list())
-        if (summary.hubEntry?.entryId === entryId && summary.hubEntry.mode === "copy" && summary.author === user)
+        if (summary.hubEntry?.entryId === entryId && summary.hubEntry.mode === "copy" && summary.author === actor.name)
           return { authoringProjectId: summary.id, mode, created: false };
     }
-    const created = await seedFromEntry(store, authoring, record, linked, user, link);
+    const created = await seedFromEntry(store, authoring, record, linked, actor.name, link);
     if (mode === "edit") {
       // The seeded draft is now the entry's linked draft: a second "방법 고치기" reopens it.
       record.authoringProjectId = created.id;
-      await store.write(record);
+      await store.write(record, actor);
     }
     return { authoringProjectId: created.id, mode, created: true };
   });
@@ -54,7 +56,7 @@ export async function openEntryForEdit(
  * package becomes the code source the snapshot's code files point to.
  */
 async function seedFromEntry(
-  store: SharedHubStore,
+  store: HubRecordStore,
   authoring: AuthoringStore,
   record: StoredEntry,
   original: AuthoringProject | null,
@@ -98,10 +100,16 @@ async function seedFromEntry(
   const visuals: NonNullable<AuthoringProject["visuals"]> = {};
   let index = 0;
   for (const [key, visual] of Object.entries(snapshot.visuals)) {
-    const file = `visuals/hub-${revision}/${index++}${extname(visual.file).toLowerCase()}`;
+    const n = index++;
+    const file = `visuals/hub-${revision}/${n}${extname(visual.file).toLowerCase()}`;
     await authoring.writeFile(project.id, file, await store.bytes(record.entry.id, visual.file));
+    let dark: string | undefined;
+    if (visual.dark) {
+      dark = `visuals/hub-${revision}/${n}-dark${extname(visual.dark.file).toLowerCase()}`;
+      await authoring.writeFile(project.id, dark, await store.bytes(record.entry.id, visual.dark.file));
+    }
     Object.defineProperty(visuals, key, {
-      value: { file, caption: visual.caption, model: "gaid-hub", draftRevision: 1 },
+      value: { file, ...(dark ? { dark } : {}), caption: visual.caption, model: "gaid-hub", draftRevision: 1 },
       enumerable: true,
     });
   }
@@ -133,7 +141,7 @@ async function seedFromEntry(
 }
 
 /** `<slug>-copy`, `<slug>-copy-2`, … not used by any draft, package or registered method on this server. */
-async function freeSlug(store: SharedHubStore, authoring: AuthoringStore, slug: string): Promise<string> {
+async function freeSlug(store: HubRecordStore, authoring: AuthoringStore, slug: string): Promise<string> {
   const used = new Set<string>();
   for (const id of await authoring.ids()) {
     const p = await authoring.read(id);

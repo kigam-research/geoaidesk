@@ -4,6 +4,10 @@
     "hub": "GAID hub",
     "label": "GAID screens"
   },
+  "sidebar": {
+    "hide": "Hide hub sections",
+    "show": "Show hub sections"
+  },
   "entry": {
     "title": "GAID hub",
     "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
@@ -424,7 +428,7 @@
     "explanation": "Illustrations of the Workflow, not analysis data or results. They appear in the draft and hub registration.",
     "how": "View generation Workflow",
     "source": {
-      "record": "Pictures are generated with gpt-image-2 through your OpenAI Codex (legacy) login only when you request them. They use that subscription's image quota, with no other picture source as a fallback. Sign in with ChatGPT does not support picture generation."
+      "record": "Made with gpt-image-2 through your OpenAI Codex (legacy) login only when you request it. Each picture has light-screen and dark-screen versions, so it uses two images of that subscription's quota, with no other source. Sign in with ChatGPT does not support pictures."
     },
     "connect": {
       "action": "Open provider settings"
@@ -434,6 +438,8 @@
     "actions": "{name} concept picture actions",
     "redo": "Remake picture",
     "revise": "Revise picture",
+    "adapt": "Fit to screen themes",
+    "adaptHint": "An older picture made on a white background. Remakes it for light and dark screens without changing what it shows, using two images from the picture quota.",
     "makeOne": "Make picture",
     "instruction": "Picture revision request",
     "placeholder": "e.g. larger blocks, a single colour",

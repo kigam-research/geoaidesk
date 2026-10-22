@@ -1,3 +1,4 @@
+import { installedHubSkill } from "../geo/hub-skills/installed.ts";
 import { skillWorkflow, skillFileList } from "../geo/skill-details.ts";
 import { seedSubagentResources } from "../agent/subagent-resources.ts";
 /**
@@ -95,6 +96,7 @@ export async function registerSkillRoutes(app: FastifyInstance): Promise<void> {
       ...(provenance?.ref ? { ref: provenance.ref } : {}),
       ...(upstream ? { upstream } : {}),
       workflow: skillWorkflow(root, skill.name, provenance?.source),
+      hubSkill: installedHubSkill(root, skill.name, provenance?.source),
     };
   };
 

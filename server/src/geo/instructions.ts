@@ -1,6 +1,8 @@
 import { MARKDOWN_IMAGE_RULE } from "./markdown-images.ts";
 import { NOTE_STYLE_SKILL } from "./note-style.ts";
 
+export const FIGURE_RULE = "Before drawing a figure for a research note, paper or slide, read the `gaid-figures` skill. Draw data figures from data at the target journal's final width and text size, use scientific colour maps, export editable vector plus raster, and run its figure checker. Disclose AI image generation in the note caption; a check is not journal compliance.";
+
 /**
  * Reply language (gaid-ui-locale): the user's instructions or the language of
  * the request decide it, never the app's display language, which is a browser
@@ -35,6 +37,7 @@ export const GEO_INSTRUCTIONS = `## GeoAIDesk data handling
 - An unknown CRS stays unknown: ask for it or work in native coordinates instead of guessing.
 - ${MARKDOWN_IMAGE_RULE}
 - ${RESEARCH_NOTE_RULE}
+- ${FIGURE_RULE}
 - The skills listed for this chat are a task selection; others stay installed and the user can start a chat with them.
 - Work inside this project. Do not change the app's installation, its catalogue, shared data folders or other projects, and do not edit an installed catalogue skill unless the user asks for that file; read files outside the project only when the user points to them.
 - A skill you write goes in \`.pi/skills/<name>/\` with a \`SKILL.md\` that states inputs, steps and limits and marks what was not tested. Do not claim a publisher, a published state or a verification you did not do.

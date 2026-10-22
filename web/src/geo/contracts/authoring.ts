@@ -14,6 +14,7 @@
 
 // --- Atlas profile subset (skill_hub web/shared/atlas/types.ts, atlas-profile/v1) ---
 
+import type { HubSkillInstallState } from "./hub-skills";
 import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
 export interface AtlasText {
   ko: string;
@@ -479,8 +480,12 @@ export interface AuthoringProject {
   folderId?: string;
   /** A registered hub method this draft edits (`edit`: registering adds its next revision) or was copied from (`copy`). */
   hubEntry?: HubEntryLink;
-  /** Concept images keyed by procedure node id, cover, or output:<outputId> (files under visuals/). */
-  visuals?: Record<string, { file: string; caption: string; model: string; draftRevision: number }>;
+  /**
+   * Concept images keyed by procedure node id, cover, or output:<outputId> (files under visuals/). `file` is drawn on the
+   * light picture-well colour, `dark` (when present) is the same picture edited for dark mode; pictures without `dark`
+   * are older white-background pictures, shown on a paper mat (gaid-concept-pictures).
+   */
+  visuals?: Record<string, ConceptVisual>;
   visualOperations?: Record<string, VisualOperation>;
   createdAt: string;
   updatedAt: string;
@@ -553,7 +558,7 @@ export const liveQuestions = (p: AuthoringProject): Question[] =>
 // POST   /geo/authoring/projects/:id/sources           AddSourceBody → { source, extraction }
 // POST   /geo/authoring/projects/:id/sources/url       AddUrlSourceBody → { source, extraction }
 // POST   /geo/authoring/projects/:id/drafts/:rev/visuals GenerateVisualsBody → 202 VisualOperation
-// GET    /geo/authoring/projects/:id/visuals/:key       PNG/WebP/JPEG bytes
+// GET    /geo/authoring/projects/:id/visuals/:key       PNG/WebP/JPEG bytes (?theme=dark: the dark picture when there is one)
 // GET    /geo/authoring/visual-source                   → VisualSourceInfo
 // GET    /geo/authoring/projects/:id/sources/:sid/original      original bytes (PDF inline)
 // GET    /geo/authoring/projects/:id/sources/:sid/pages/:page   → { page, text }
@@ -601,6 +606,9 @@ export interface VisualOperation {
   keys: string[];
   /** Researcher's revision request, preserved verbatim (up to 500 characters). */
   instruction?: string;
+  /** Fitting older pictures to the screen themes (two edits per picture, content unchanged). */
+  adapt?: true;
+  /** Keys whose light and dark-mode pictures are both done. */
   completed: string[];
   status: "running" | "complete" | "failed" | "interrupted";
   startedAt: string;
@@ -619,6 +627,14 @@ export interface VisualSourceInfo {
   model: string | null;
 }
 
+export interface ConceptVisual {
+  file: string;
+  dark?: string;
+  caption: string;
+  model: string;
+  draftRevision: number;
+}
+
 export interface GenerateVisualsBody {
   opId: string;
   /** Exact pictures to generate: cover, procedure node id, output:<outputId>; 1–6 unique keys. */
@@ -627,6 +643,11 @@ export interface GenerateVisualsBody {
   instruction?: string;
   /** Optional step ids; eligible output ports reserve slots within the six-image shared cap. */
   steps?: string[];
+  /**
+   * Fit the selected existing pictures to the screen themes without changing what they show: the light picture is
+   * edited onto the picture-well colour and a dark-mode picture is edited from it. Not combined with `instruction`.
+   */
+  adapt?: boolean;
 }
 
 export interface AddSourceBody {
@@ -702,4 +723,6 @@ export interface InstallResult {
   /** Workflow/recipe to open in TaskSetup in that project. */
   workflowId: string | null;
   recipeId: string | null;
+  /** Hub skills the Workflow pins (gaid-hub-skills): installed now, already present, or blocked (readiness explains). */
+  hubSkills?: { name: string; revision: number; state: HubSkillInstallState; outcome?: "installed" | "present" | "blocked" }[];
 }

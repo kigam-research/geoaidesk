@@ -10,6 +10,8 @@ import type { ProjectPaths } from "../../projects.ts";
 import { globalSkillRoot, projectSkillRoot, type SkillRoot } from "../../agent/skills.ts";
 import { getSkillBaseHash, getSkillProvenance } from "../../agent/skills-sync.ts";
 import { methodTreeHash } from "./tree-hash.ts";
+import { hubSkillInstallState } from "./hub-pins.ts";
+import type { HubSkillRef } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import type {
   LocalMethodSummary,
   LocalMethodWorkflow,
@@ -87,7 +89,10 @@ export function findInstalledMethod(paths: ProjectPaths, runtimeName: string, ro
   return installedMethods(paths, roots).find((method) => method.runtimeName === runtimeName) ?? null;
 }
 
-function skillStates(paths: ProjectPaths, catalogue: GeoCatalogue | null, method: InstalledMethod, file: MethodFile, workflow: GeoWorkflow): WorkflowSkillState[] {
+/** Hub skill revision lookup for readiness: whether a pinned revision is suspended in the hub (C2 passes the store). */
+export type HubSuspended = (skillId: string, revision: number) => boolean;
+
+function skillStates(paths: ProjectPaths, catalogue: GeoCatalogue | null, method: InstalledMethod, file: MethodFile, workflow: GeoWorkflow, hubSuspended?: HubSuspended): WorkflowSkillState[] {
   const states: WorkflowSkillState[] = workflow.skillIds.map((id) => {
     if (id.startsWith(LOCAL_SKILL_PREFIX)) {
       return { id, runtimeName: method.runtimeName, title: file.title, installed: true, enabled: method.enabled, source: "bundled" as const };
@@ -110,6 +115,24 @@ function skillStates(paths: ProjectPaths, catalogue: GeoCatalogue | null, method
       ref: typeof skill.ref === "string" ? skill.ref : null,
     });
   }
+  // Hub skills (ADR docs/adr/2026-10-22-hub-managed-skills.md) are pinned by revision: only the pinned tree, another
+  // unedited hub revision or the researcher's edited copy count as installed; missing, foreign or suspended ones block.
+  for (const skill of (workflow.skills ?? []) as { name?: unknown; source?: unknown; hub?: Partial<HubSkillRef> }[]) {
+    if (skill?.source !== "hub" || typeof skill.name !== "string" || !skill.hub || typeof skill.hub.treeHash !== "string" || !Number.isSafeInteger(skill.hub.revision)) continue;
+    const pin: HubSkillRef = { skillId: skill.name, revision: skill.hub.revision!, treeHash: skill.hub.treeHash };
+    const state = hubSkillInstallState(projectSkillRoot(paths), pin, { suspended: hubSuspended?.(pin.skillId, pin.revision) });
+    const usable = state === "installed" || state === "other-revision" || state === "edited";
+    const present = projectSkillState(paths, skill.name);
+    states.push({
+      id: `hub:${skill.name}`,
+      runtimeName: skill.name,
+      title: null,
+      installed: usable && present.installed,
+      enabled: usable && present.enabled,
+      source: "hub",
+      hub: { ...pin, state },
+    });
+  }
   return states;
 }
 
@@ -117,7 +140,7 @@ export async function listLocalMethods(
   paths: ProjectPaths,
   catalogue: GeoCatalogue | null,
   service: Pick<GeoEnvironmentService, "readiness">,
-  options: { roots?: SkillRoot[]; store?: string } = {},
+  options: { roots?: SkillRoot[]; store?: string; hubSuspended?: HubSuspended } = {},
 ): Promise<LocalMethodSummary[]> {
   const methods = installedMethods(paths, options.roots);
   const trials = trialCounts(paths);
@@ -142,7 +165,7 @@ export async function listLocalMethods(
     // Only a hub descriptor's value counts; the package's own claim never promotes it.
     const lifecycle: MethodLifecycle = origin.kind === "skill-hub" && record?.hub?.lifecycle ? record.hub.lifecycle : "draft";
     const workflows: LocalMethodWorkflow[] = (file?.workflows ?? []).map((workflow) => {
-      const skills = skillStates(paths, catalogue, method, file!, workflow);
+      const skills = skillStates(paths, catalogue, method, file!, workflow, options.hubSuspended);
       const environment = catalogue
         ? environmentState(catalogue, workflow.environmentProfile, probes.get(workflow.environmentProfile))
         : { id: workflow.environmentProfile, title: null, state: "unknown" as const, missing: [], detail: "The geo catalogue is not active" };
@@ -211,9 +234,9 @@ export function methodExposedSkills(paths: ProjectPaths, mode: string, catalogue
       if (name) names.add(name);
     }
   }
-  // gaid-workflow/v1: skills imported from GitHub and similar sources are named in `skills[]` only.
+  // gaid-workflow/v1: skills imported from GitHub and similar sources, and hub skills, are named in `skills[]` only.
   for (const skill of (workflow?.skills ?? []) as { name?: unknown; source?: unknown }[]) {
-    if (skill?.source === "imported" && typeof skill.name === "string") names.add(skill.name);
+    if ((skill?.source === "imported" || skill?.source === "hub") && typeof skill.name === "string") names.add(skill.name);
   }
   return [...names].sort();
 }

@@ -17,6 +17,7 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 | `start-gaid.sh`, `start-gaid.cmd`, `geo/start.mjs` | GeoAIDesk entry points: production build, user data under `GAID_HOME` |
 | `geo/` | Distribution manifest, upstream lock, integration boundaries, release manifest script, `tests/` (unit + production smoke) |
 | `server/src/geo/` | GAID backend modules: distribution manifest, catalogue staging/provisioning, task exposure and prompt budget, environments, inspection + tools + read hints, local model, routes (`/geo/*`) |
+| `server/src/geo/hub-server/`, `geo/hub-server.mjs` | Institute GAID hub server (accounts, shared hub records, library sync; SQLite); guide `docs/geo/hub-server.md` |
 | `web/src/geo/` | GAID UI modules: inspection contract, viewer registry seam + generic inspection viewer, start-prompt budget chip, local-model Settings card, `defineGeoStrings` |
 | `configs/inputs.toml` | Named inputs: `geo_catalogue` (pc74:~/assets/geo-catalogue/<version>, built by `geo/catalogue-build.mjs`; public copy on the geoaidesk release `geo-catalogue-<version>`), `k_dense_scientific_agent_skills` (source of imported K-Dense skills) |
 | `NOTICE.md`, `THIRD_PARTY_NOTICES.md` | Fork attribution, third-party and excluded sources |
@@ -31,6 +32,8 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
   `KADY_PROJECTS_ROOT` (default `<checkout>/projects`, ignored), Pi agent config/auth under `~/.kady/pi-agent`
   (`PI_CODING_AGENT_DIR`), credentials in `.env`. Never read or stage env/credential files.
 - Smoke runs keep their logs under `~/data/geoaidesk/work/<slug>/` when `GAID_SMOKE_DIR` points there.
+- Institute hub server data: `GAID_HUB_SERVER_HOME` (default `~/.geoaidesk-hub`: `hub.sqlite`, `blobs/`, `server.json`). Test
+  instance of gaid-backend: `pc74:~/data/geoaidesk/work/gaid-backend/hub-home` (test accounts only).
 - Deployed SHAs: none yet.
 
 ## Upstream

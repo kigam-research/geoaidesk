@@ -62,6 +62,7 @@ import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
 import { GaidAppBar } from "@/geo/shell/app-bar";
 import { SystemResourcesButton } from "@/geo/shell/system-resources";
+import { focusSearchTarget, shortcutLabel, useShortcut } from "@/geo/shell/shortcuts";
 import { Button } from "@/components/ui/button";
 import {
   useCallback,
@@ -107,12 +108,51 @@ function defaultTabTitle(index: number): string {
   return appText("chat.tabs.numbered", { count: index + 1 });
 }
 
-// Thin vertical drag handle between two panels
-function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+// Pane sizes (UI guide v2 L2): sidebar 272 (220–360), inspector 440 (360–640). Saved widths outside the range are clamped.
+const TREE_WIDTH = { min: 220, max: 360, initial: 272 } as const;
+const CHAT_WIDTH = { min: 360, max: 640, initial: 440 } as const;
+const clampWidth = (value: number, range: { min: number; max: number }) => Math.max(range.min, Math.min(range.max, Math.round(value)));
+/** Arrow keys move a pane border by 16 px (Shift: 64 px); Home and End go to the limits. */
+const KEY_STEP = 16;
+const KEY_STEP_LARGE = 64;
+
+/**
+ * Thin vertical pane border (UI guide v2 L2, A4): 1 px line with an 8 px drag target, focusable as a separator and
+ * resizable from the keyboard. `grows` says which arrow widens the pane it sizes.
+ */
+function ResizeHandle({ label, value, range, grows, onMouseDown, onResize }: {
+  label: string;
+  value: number;
+  range: { min: number; max: number };
+  grows: "right" | "left";
+  onMouseDown: (e: React.MouseEvent) => void;
+  onResize: (width: number) => void;
+}) {
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    const step = event.shiftKey ? KEY_STEP_LARGE : KEY_STEP;
+    const sign = grows === "right" ? 1 : -1;
+    let next: number | null = null;
+    if (event.key === "ArrowRight") next = value + sign * step;
+    else if (event.key === "ArrowLeft") next = value - sign * step;
+    else if (event.key === "Home") next = range.min;
+    else if (event.key === "End") next = range.max;
+    if (next === null) return;
+    event.preventDefault();
+    onResize(clampWidth(next, range));
+  };
   return (
     <div
-      className="group relative z-10 flex w-px shrink-0 cursor-col-resize items-center justify-center bg-gaid-frame transition-colors before:absolute before:inset-y-0 before:-left-1 before:-right-1 hover:bg-gaid-signal active:bg-gaid-signal"
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={label}
+      aria-valuenow={value}
+      aria-valuemin={range.min}
+      aria-valuemax={range.max}
+      tabIndex={0}
+      title={label}
+      className="group relative z-10 flex w-px shrink-0 cursor-col-resize items-center justify-center bg-gaid-frame transition-colors before:absolute before:inset-y-0 before:-left-1 before:-right-1 hover:bg-gaid-signal active:bg-gaid-signal focus-visible:bg-gaid-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       onMouseDown={onMouseDown}
+      onKeyDown={onKeyDown}
     >
     </div>
   );
@@ -249,12 +289,18 @@ export default function HomePage() {
     return () => window.removeEventListener("pagehide", flush);
   }, [openedProjectIds, screen, workspaceHydrated]);
 
+  // ⌘K / Ctrl K on the hub and the project list focuses their search field (UI guide v2 N6); the workspace has its own.
+  useShortcut("search", () => focusSearchTarget(), hub.open || screen === "projects");
+
   return (
     <>
       {hub.open && (
         <GaidHub
           authoringId={hub.projectId}
           entryId={hub.entryId ?? null}
+          catalogueId={hub.catalogueId ?? null}
+          skills={hub.skills}
+          skillId={hub.skillId}
           onNavigate={(next) => setHub(next)}
           onOpenProjects={() => {
             setHub({ open: false, projectId: null });
@@ -349,6 +395,15 @@ function WorkspacePage({
   );
   const toggleSandbox = useCallback(() => setSandboxOpen((value) => !value), []);
   const toggleChat = useCallback(() => setChatOpen((value) => !value), []);
+  // UI guide v2 N2, N6: ⌘\ / Ctrl \ hides or shows the file list; ⌘K / Ctrl K focuses its filter, opening it first.
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  useShortcut("sidebar", toggleSandbox, isActive);
+  useShortcut("search", () => {
+    if (sandboxOpen && workspaceRef.current && focusSearchTarget(workspaceRef.current)) return;
+    setSandboxOpen(true);
+    // The filter mounts with the list: focus it once the list is drawn.
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (workspaceRef.current) focusSearchTarget(workspaceRef.current); }));
+  }, isActive);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsRequest, setSettingsRequest] = useState<OpenSettingsRequest | null>(null);
   const [showNotebook, setShowNotebook] = useState(
@@ -529,10 +584,10 @@ function WorkspacePage({
 
   const [treeWidth, setTreeWidth] = useState(
     // UI guide v2 L2: the content face is the widest pane (research first); side panes start narrow.
-    () => initialState?.treeWidth ?? 272,
+    () => clampWidth(initialState?.treeWidth ?? TREE_WIDTH.initial, TREE_WIDTH),
   );
   const [chatWidth, setChatWidth] = useState(
-    () => initialState?.chatWidth ?? 440,
+    () => clampWidth(initialState?.chatWidth ?? CHAT_WIDTH.initial, CHAT_WIDTH),
   );
   const [isResizing, setIsResizing] = useState(false);
   const dragging = useRef<"tree" | "chat" | null>(null);
@@ -552,9 +607,9 @@ function WorkspacePage({
       if (!dragging.current) return;
       const delta = e.clientX - dragStartX.current;
       if (dragging.current === "tree") {
-        setTreeWidth(Math.max(150, Math.min(480, dragStartWidth.current + delta)));
+        setTreeWidth(clampWidth(dragStartWidth.current + delta, TREE_WIDTH));
       } else {
-        setChatWidth(Math.max(280, Math.min(720, dragStartWidth.current - delta)));
+        setChatWidth(clampWidth(dragStartWidth.current - delta, CHAT_WIDTH));
       }
     };
     const onUp = () => {
@@ -1007,6 +1062,7 @@ function WorkspacePage({
               content={
                 <>
                   <b>{appText(sandboxOpen ? "header.hide_file_browser" : "header.show_file_browser")}</b>
+                  <kbd className="ml-2 font-sans text-xs opacity-80">{shortcutLabel("sidebar")}</kbd>
                   <br />
                   {appText("header.collapse_the_left_file_tree_to_widen")}</>
               }
@@ -1027,7 +1083,8 @@ function WorkspacePage({
                 <>
                   <b>{appText(chatOpen ? "header.hide_chat" : "header.show_chat")}</b>
                   <br />
-                  {appText("header.collapse_the_right_chat_panel_to_widen")}</>
+                  {appText("header.collapse_the_right_chat_panel_to_widen")}
+                  <span className="xl:hidden"><br />{appText("header.chat_overlays_in_narrow_windows")}</span></>
               }
             >
               <Button
@@ -1049,18 +1106,16 @@ function WorkspacePage({
         }}
       />
 
-      {/* Main content area — three columns: file tree | preview | chat */}
+      {/* Main content area — three columns: file tree | preview | chat. Compact desktop (1024–1279 px, UI guide v2 L1):
+          the chat pane becomes a sheet over the preview instead of a third column. */}
       <div
-        className={cn("grid min-h-0 flex-1 overflow-hidden xl:flex", isResizing && "select-none")}
-        style={{
-          gridTemplateColumns: sandboxOpen ? `min(${treeWidth}px, 30vw) minmax(0, 1fr)` : "minmax(0, 1fr)",
-          gridTemplateRows: chatOpen ? "minmax(0, 1fr) minmax(0, 1fr)" : "minmax(0, 1fr)",
-        }}
+        ref={workspaceRef}
+        className={cn("relative flex min-h-0 flex-1 overflow-hidden", isResizing && "select-none")}
       >
 
         {/* Left: file tree */}
         {isActive && sandboxOpen && (
-          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
+          <div className="min-h-0 min-w-0 shrink-0 overflow-hidden w-[min(var(--tree-width),30vw)] xl:w-[var(--tree-width)]" style={{ "--tree-width": `${treeWidth}px` } as CSSProperties}>
             <FileTreePanel
               tree={sandbox.tree}
               selectedPath={sandbox.activeTabPath}
@@ -1083,7 +1138,11 @@ function WorkspacePage({
         )}
 
         {/* Drag handle: tree ↔ preview */}
-        {isActive && sandboxOpen && <div className="hidden xl:flex"><ResizeHandle onMouseDown={startDrag("tree")} /></div>}
+        {isActive && sandboxOpen && (
+          <div className="flex">
+            <ResizeHandle label={appText("header.resize_file_browser")} value={treeWidth} range={TREE_WIDTH} grows="right" onMouseDown={startDrag("tree")} onResize={setTreeWidth} />
+          </div>
+        )}
 
         {/* Middle: file preview with tabs — always shown; it is the pane the
             side panels make room for (e.g. the LaTeX editor + PDF). */}
@@ -1137,13 +1196,20 @@ function WorkspacePage({
         </div>
 
         {/* Drag handle: preview ↔ chat */}
-        {isActive && chatOpen && <div className="hidden xl:flex"><ResizeHandle onMouseDown={startDrag("chat")} /></div>}
+        {isActive && chatOpen && (
+          <div className="hidden xl:flex">
+            <ResizeHandle label={appText("header.resize_chat")} value={chatWidth} range={CHAT_WIDTH} grows="left" onMouseDown={startDrag("chat")} onResize={setChatWidth} />
+          </div>
+        )}
 
         {/* Right: chat / workflows. Kept mounted (hidden via CSS when
             collapsed) so background chat streams keep running. */}
         <div
           className={cn(
-            "col-span-full flex min-h-0 min-w-0 flex-col border-l overflow-hidden shrink-0 xl:w-[var(--chat-width)]",
+            "flex min-h-0 min-w-0 flex-col overflow-hidden shrink-0 bg-gaid-face",
+            // Compact: a sheet over the preview (ply 2: one soft shadow and a 1 px edge, no dim; UI guide v2 S6, D6).
+            "absolute inset-y-0 right-0 z-30 w-[min(var(--chat-width),calc(100%-48px))] border-l border-gaid-edge shadow-[var(--gaid-shadow-overlay)]",
+            "xl:static xl:z-auto xl:w-[var(--chat-width)] xl:shadow-none",
             !chatOpen && "hidden",
           )}
           style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}
