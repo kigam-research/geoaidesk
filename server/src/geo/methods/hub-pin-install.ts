@@ -7,7 +7,7 @@
 import type { HubSkillInstallState, HubSkillRef } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import { projectSkillRoot } from "../../agent/skills.ts";
 import type { ProjectPaths } from "../../projects.ts";
-import { HubSkillStore, installHubSkillRevision, readHubSkillRevision, revisionState } from "../hub-skills/index.ts";
+import { activeHubSkillStore, installHubSkillRevision, readHubSkillRevision, revisionState, type HubSkillRecordStore } from "../hub-skills/index.ts";
 import { hubSkillInstallState } from "./hub-pins.ts";
 import type { MethodFile } from "./method-file.ts";
 
@@ -32,7 +32,7 @@ export function pinnedHubSkills(file: MethodFile | null): HubSkillRef[] {
   return [...pins.values()];
 }
 
-async function suspended(store: HubSkillStore, pin: HubSkillRef): Promise<boolean> {
+async function suspended(store: HubSkillRecordStore, pin: HubSkillRef): Promise<boolean> {
   try {
     const { revision } = await readHubSkillRevision(store, pin.skillId, pin.revision);
     return revisionState(revision) === "suspended" || revision.treeHash !== pin.treeHash;
@@ -41,8 +41,8 @@ async function suspended(store: HubSkillStore, pin: HubSkillRef): Promise<boolea
   }
 }
 
-export async function previewPinnedHubSkills(paths: ProjectPaths, file: MethodFile | null, options: { store?: HubSkillStore; agentDir?: string } = {}): Promise<PinnedHubSkill[]> {
-  const store = options.store ?? new HubSkillStore();
+export async function previewPinnedHubSkills(paths: ProjectPaths, file: MethodFile | null, options: { store?: HubSkillRecordStore; agentDir?: string } = {}): Promise<PinnedHubSkill[]> {
+  const store = options.store ?? activeHubSkillStore();
   return Promise.all(pinnedHubSkills(file).map(async (pin) => ({
     name: pin.skillId,
     revision: pin.revision,
@@ -50,8 +50,8 @@ export async function previewPinnedHubSkills(paths: ProjectPaths, file: MethodFi
   })));
 }
 
-export async function installPinnedHubSkills(paths: ProjectPaths, file: MethodFile | null, options: { store?: HubSkillStore; agentDir?: string } = {}): Promise<PinnedHubSkill[]> {
-  const store = options.store ?? new HubSkillStore();
+export async function installPinnedHubSkills(paths: ProjectPaths, file: MethodFile | null, options: { store?: HubSkillRecordStore; agentDir?: string } = {}): Promise<PinnedHubSkill[]> {
+  const store = options.store ?? activeHubSkillStore();
   const out: PinnedHubSkill[] = [];
   for (const pin of pinnedHubSkills(file)) {
     const before = hubSkillInstallState(projectSkillRoot(paths), pin, { agentDir: options.agentDir, suspended: await suspended(store, pin) });
@@ -70,7 +70,7 @@ export async function installPinnedHubSkills(paths: ProjectPaths, file: MethodFi
 }
 
 /** Synchronous `suspended` lookup for readiness, from one read of every pinned revision. */
-export async function hubSuspendedLookup(files: (MethodFile | null)[], store = new HubSkillStore()): Promise<(skillId: string, revision: number) => boolean> {
+export async function hubSuspendedLookup(files: (MethodFile | null)[], store: HubSkillRecordStore = activeHubSkillStore()): Promise<(skillId: string, revision: number) => boolean> {
   const blocked = new Set<string>();
   const pins = new Map(files.flatMap((f) => pinnedHubSkills(f)).map((p) => [`${p.skillId}@${p.revision}`, p]));
   await Promise.all([...pins.values()].map(async (pin) => { if (await suspended(store, pin)) blocked.add(`${pin.skillId}@${pin.revision}`); }));
@@ -78,7 +78,7 @@ export async function hubSuspendedLookup(files: (MethodFile | null)[], store = n
 }
 
 /** Why a Workflow's hub pins cannot be registered for everyone (missing, changed, suspended or not shareable), in Korean. */
-export async function hubPinProblems(skills: { name: string; source: string; hub?: HubSkillRef | null }[], store = new HubSkillStore()): Promise<string[]> {
+export async function hubPinProblems(skills: { name: string; source: string; hub?: HubSkillRef | null }[], store: HubSkillRecordStore = activeHubSkillStore()): Promise<string[]> {
   const problems: string[] = [];
   for (const skill of skills) {
     if (skill.source !== "hub") continue;

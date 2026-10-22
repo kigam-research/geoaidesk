@@ -6,8 +6,9 @@
  * Workflow that pinned an older one. Researchers install a revision into a project through the existing preview and
  * acknowledgement gate; installs never fetch GitHub.
  *
- * Identity is the shared hub's display name (`X-GAID-User`, see hub-shared.ts) until gaid-backend adds accounts, so every
- * review carries `verified: false` and the UI says the name is not verified. IO-free; the server imports this file.
+ * Identity follows the shared hub (gaid-hub-server-trial): with an institute hub server the researcher's account (reviews
+ * carry `byId` and `verified: true`), otherwise the local store's display name (`X-GAID-User`, see hub-shared.ts) with
+ * `verified: false`, which the UI shows as an unverified name. IO-free; the server imports this file.
  */
 import type { HubComment } from "./hub-shared";
 
@@ -74,9 +75,12 @@ export type HubSkillReviewState = "unreviewed" | "checked" | "deprecated" | "sus
 
 export interface HubSkillReview {
   state: Exclude<HubSkillReviewState, "unreviewed">;
+  /** Display name of the reviewer. */
   by: string;
-  /** Always false until accounts exist (display names are not verified). */
-  verified: false;
+  /** Account id on a hub server; the display name in the local store (absent in older records). */
+  byId?: string;
+  /** True only when `by` is an authenticated hub server account; local display names are not verified. */
+  verified: boolean;
   at: string;
   note: string;
   replacement?: string;
@@ -102,6 +106,8 @@ export interface HubSkillRevision {
   note: string;
   registeredAt: string;
   registeredBy: string;
+  /** Account id of the registrant on a hub server (absent in local/older records: then `registeredBy` is the identity). */
+  registeredById?: string;
   origin: HubSkillOrigin;
   licence: HubSkillLicence;
   findings: HubSkillFinding[];
@@ -126,8 +132,12 @@ export interface HubSkill {
   /** Taxonomy format ids the skill reads (optional, from the registration form). */
   formats: string[];
   folderId: string;
-  /** Registrant of revision 1; only this display name adds revisions. */
+  /** Display name of the registrant of revision 1; only this researcher adds revisions. */
   author: string;
+  /** Account id of the author on a hub server (absent in local/older records: then `author` is the identity). */
+  authorId?: string;
+  /** View only: the calling researcher is the author. */
+  mine?: boolean;
   latestRevision: number;
   /** Current review state of the latest revision. */
   state: HubSkillReviewState;
@@ -177,7 +187,7 @@ export interface InstalledHubSkill {
   state: HubSkillReviewState;
 }
 
-// --- HTTP API (`/geo/hub/skills`, shared, not project-scoped; the user name comes from X-GAID-User) ---------------
+// --- HTTP API (`/geo/hub/skills`, shared, not project-scoped; the hub server account when logged in, else X-GAID-User) ---
 //
 // GET    /geo/hub/skills?q=&folder=                    → { skills: HubSkill[] }   (author-only rows only for their author)
 // GET    /geo/hub/skills/:id?revision=n                → HubSkillDetail

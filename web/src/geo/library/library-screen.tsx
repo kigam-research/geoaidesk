@@ -24,6 +24,7 @@ import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
 import { FolderPanel, sendResultLine } from "./folder-panel";
 import { FolderNameDialog } from "./folder-name-dialog";
 import { LibrarySyncLine } from "./sync-line";
+import { PaperMapEntry } from "./paper-map-entry";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
@@ -214,7 +215,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
       </section>
       <aside className="flex w-[340px] shrink-0 flex-col gap-3">
         {selected ? (
-          <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onChanged={load} />
+          <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onSelect={setSelected} onChanged={load} />
         ) : folder ? (
           <FolderPanel folder={folder} collections={collections} count={data?.folderCounts[folder.id] ?? 0} zoteroConnected={zoteroConnected}
             onSelectItem={setSelected} onCreateSub={() => setNaming({ mode: "create", parentId: folder.id })} onRename={() => setNaming({ mode: "rename" })}
@@ -265,7 +266,7 @@ function useLabel(use: LibraryUse): string {
   return L("detail.useProject", { name: use.projectName });
 }
 
-function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, onChanged }: { id: string; collections: LibraryCollection[]; zoteroConnected: boolean; onClose: () => void; onOpenProject: (projectId: string) => void; onChanged: () => void }) {
+function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, onSelect, onChanged }: { id: string; collections: LibraryCollection[]; zoteroConnected: boolean; onClose: () => void; onOpenProject: (projectId: string) => void; onSelect: (id: string) => void; onChanged: () => void }) {
   const [data, setData] = useState<LibraryItemResponse | null>(null);
   const [sendNote, setSendNote] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
@@ -394,7 +395,10 @@ function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, 
         )}
       </div>
       <div className="flex flex-col gap-2 rounded-xl border p-4">
-        <h3 className="text-base font-semibold">{L("detail.usesTitle")}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-base font-semibold">{L("detail.usesTitle")}</h3>
+          <PaperMapEntry itemId={item.id} uses={uses} onOpenProject={onOpenProject} onOpenPaper={onSelect} />
+        </div>
         {uses.length === 0 && <p className="text-sm text-muted-foreground">{L("detail.usesEmpty")}</p>}
         {uses.map((use, i) => (
           <div key={i} className="flex items-start justify-between gap-3 text-sm">
