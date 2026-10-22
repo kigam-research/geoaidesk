@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:54:57Z
+updated: 2026-10-22T15:56:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -64,6 +64,10 @@ platform. Plus a report for review and the repo checks that apply.
   `entry-ap-a135f290-1c4`: 10 steps (2 researcher), 8 start choices, 55 code files, 판 2, 4 installs, 4 stars, 4 comments;
   acceptance citation check 212 units / 1 not on page / 0 contradicted). `geo/promo/render.py --stills-only` renders
   15 stills (preview-01/02 under the work dir); ≈0.16 s per frame without footage.
+- 2026-10-23: capture child completed and closed (`task complete` integrated a688c115; build caches removed, `task close`).
+  capture-v1: 10 shots, 1,380 frames (H3 skill shelf skipped: no hub skill records). Integrated with zoom keys, full-screen
+  area and citation charts; preview-10..12 stills checked. Final render job job-geoaidesk-gaid-promo-video-1 launched
+  (source 537a917e). Report draft written; job paths/hashes and figures to fill after the job.
 ## Next steps
 1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
    User (verbatim, 2026-10-23): "이해하였다. 알림오면 작업 자동으로진행하여라." → on the child's finish notice, continue
@@ -120,9 +124,7 @@ User (verbatim, 2026-10-23): "그리고 서재기능도 강조되어야한다. �
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-23-gaid-promo-video/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-20261022T155452.185441Z/receipt.json
