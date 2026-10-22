@@ -919,6 +919,30 @@
       "owner": "gaid-research-visuals",
       "status": "edited",
       "responsibility": "Focused tests of shipped figure/note skills, legacy receipts and figure environment packages."
+    },
+    {
+      "path": "web/package.json",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
+    },
+    {
+      "path": "web/package-lock.json",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
+    },
+    {
+      "path": "server/test/geo-connections.test.ts",
+      "owner": "gaid-research-visuals",
+      "status": "added",
+      "responsibility": "Connection map React Flow/dagre dependency-lock ownership and synthetic graph route coverage (gaid-research-visuals--map)."
+    },
+    {
+      "path": "geo/tests/distribution.test.mjs",
+      "owner": "gaid-research-visuals",
+      "status": "edited",
+      "responsibility": "Parent-authorized registration of the gaid-research-visuals seam owner in the existing distribution-check allow-list."
     }
   ],
   "notTouched": [

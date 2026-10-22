@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T03:02:45Z
+status: active
+updated: 2026-10-22T03:12:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -114,6 +114,9 @@ remain null due to conflicting units. Source list, limitations and synthetic evi
 Closed 2026-10-22T03:02:45Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Third finish passed the complete declared check including production smoke, then stopped while merging parent
+  commit 1473fe6b: both units appended to geo/integration-boundaries.json. Resolved mechanically by preserving both
+  helper/test ownership entries and map dependency/route/distribution entries; no runtime code was changed by resolution.
 - Second task finish passed backend (2,077 passed, 8 skipped), frontend (1,144 passed), GAID Node tests (57 passed,
   1 skipped), UI/copy/environment/launcher checks, and actual production start/stop/restart. It failed only the old
   production-smoke singleton assumption: the new gaid-figures skill was treated as upstream catalogue leakage.

@@ -46,4 +46,5 @@ export async function registerGeoRoutes(app: FastifyInstance): Promise<void> {
   await registerGeoNoteRoutes(app);
   await registerGeoCliExportRoutes(app);
   await registerGeoLibraryRoutes(app);
+  await (await import("./routes/connections.ts")).registerGeoConnectionRoutes(app);
 }
