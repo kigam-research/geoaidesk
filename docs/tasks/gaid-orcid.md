@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:43:34Z
+updated: 2026-10-22T10:12:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -60,22 +60,21 @@ Outside check: no outside check.
   `npx vitest run test/geo-library*.test.ts test/geo-orcid.test.ts test/geo-hub-e2e.test.ts` (9 files, 110 tests pass);
   own-work Zotero test fails without the keep line (checked). Live smoke (real pub.orcid.org + Crossref, test iD
   0000-0002-1825-0097, temp library under ~/data/geoaidesk/work/gaid-orcid/smoke/): link → 6 works → 6 added from Crossref.
-- UI: child gaid-orcid--ui started 2026-10-22 (general work).
+- UI: child gaid-orcid--ui (general work) finished, completed and closed 2026-10-22 (integrated 87924824): ORCID card,
+  import dialog, mine filter, official ORCID icons (THIRD_PARTY_NOTICES), 24 screenshots in the report folder; boundary
+  seam `web/public/geo/orcid/` owned by gaid-orcid. Full scripts/check passed on tree 9d9a8a4aaa46 (backend 2191 passed /
+  8 skipped, frontend 1207, distribution/copy/UI checks). Reviewed diff and two screenshots.
 - Existing hooks: library import preview/confirm (`/geo/library/import`), metadata client
   (`server/src/geo/library/metadata/`), hub account contract `web/src/geo/contracts/hub-server.ts` (owned by gaid-hub-server-trial).
 ## Next steps
-1. Wait for child gaid-orcid--ui (writer 9f458bbf-4f8e-4cff-a5a0-2274bd08a13e, worktree ~/worktrees/geoaidesk/gaid-orcid--ui,
-   brief ~/data/geoaidesk/work/gaid-orcid/child-ui.md); on its finish notice run `task complete gaid-orcid--ui`, review
-   the UI diff, integrate (`task sync` if needed), run scripts/check.
-2. Write report reports/2026-10-22-gaid-orcid/index.md (phase 1 result, screenshots from the child, phase 2 steps for
-   the user), humanizer pass, `task review-copy`.
-3. Phase 2 after the user's ORCID client registration (sandbox first): asked in this tab 2026-10-22 (sandbox client +
-   a production registration attempt with redirect `http://127.0.0.1:8000/geo/orcid/callback`; user sends client IDs and
-   whether production accepted http loopback; secrets never in chat). Planned shape: authorization code flow, browser
-   returns to the researcher's own GAID backend (loopback), which hands code + state to the hub server; the hub server
-   holds client id/secret (hub server config, entered by the operator, never in Git), exchanges the code, verifies the
-   id_token (RS256, ORCID JWKS, aud, nonce) and records the authenticated iD on the account. Agree the hub account
-   interface with gaid-hub-server-trial through the hub before editing hub server code.
+1. Phase 1 complete and integrated on task/gaid-orcid (tree 9d9a8a4aaa46 passed full scripts/check in the child finish;
+   report reports/2026-10-22-gaid-orcid/index.md). Waiting for the user's ORCID client registration (asked in this tab
+   2026-10-22: sandbox client + production attempt with redirect `http://127.0.0.1:8000/geo/orcid/callback`; client IDs
+   only, no secrets).
+2. When the answer comes: design phase 2 per the plan below, send the hub-account interface proposal to the hub for
+   gaid-hub-server-trial (`task hub --send`), implement, add a phase-2 section to the report.
+3. If the user prefers to close phase 1 first: add a `[대기]` open item for phase 2 and run `task finish`.
+Blocked: waiting for the user's ORCID client registration result (phase 2).
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
@@ -111,6 +110,7 @@ the project hub answers or closes them with `task item`)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-22-gaid-orcid/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
