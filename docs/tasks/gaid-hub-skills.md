@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T07:10:55Z
+updated: 2026-10-22T07:13:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -26,38 +26,26 @@ gaid-backend through the hub for storage/auth assumptions. UI follows docs/desig
 ~/data/geoaidesk/work/gaid-hub-skills/; do not modify ~/.geoaidesk. Outside check: no outside check.
 
 ## Current state
-Phase 2 (implementation) started 2026-10-22 after the user chose all recommended options.
-- Shared interface done by the writer (typechecks clean, method-file/workflow-doc tests pass):
-  `web/src/geo/contracts/hub-skills.ts` (records, states, HTTP API), gaid-workflow/v1 `skills[].source: "hub"` with
-  `hub {skillId, revision, treeHash}` (method-file validation, server/web 지침 renderer, locale `workflowDoc.source.hub`,
-  `skill.hubRevision`), `WorkflowSkillState.hub`, package origin kind `gaid-hub-skill` + `hubSkill`
-  (`server/src/geo/methods/package-origin.ts`, `MethodOrigin`), pure pin state `server/src/geo/methods/hub-pins.ts`.
-- ADR docs/adr/2026-10-22-hub-managed-skills.md; glossary/terminology "허브 스킬".
-- C1 done and pushed: readiness hub states (`local-methods.ts`, test `server/test/geo-hub-pins.test.ts`), exposure, CLI
-  export of pinned tree, Workflow view (hub revision, state, 허브에서 보기, SKILL.md from hub), readiness explanation.
-  Authoring: standard question `hub-skills` (`authoring/hub-skills.ts`), chosen skills bound as hub pins, prompt
-  `gaid-draft/2026-10-22.1`, package schema allows `hub`; `loadHubSkillCandidates` still returns [] until store lands.
-- Store decisions sent: authoring PRIVATE licence marker = absent (workflow/own stay institute); install/install-preview
-  work without X-GAID-User (anonymous = hub-visible only). UI: installer sends the header when known; HubSkillInstall
-  exported from web/src/geo/hub-skills/install.tsx for readiness.
-- Store child integrated 2026-10-22 (c073a2a24223, closed): `server/src/geo/hub-skills/` (store, register, scan,
-  review, install, routes, installed rows), test `server/test/geo-hub-skills.test.ts`; its full server job passed
-  (receipt ~/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061750.108769Z/receipt.json; first job superseded:
-  helper venv not prepared). C2 pushed (8c7224a93ce5, ba8d70d37c3d): pinned hub skills install with the Workflow,
-  preview lists them, registration refuses missing/changed/suspended/unshareable pins, readiness suspended lookup,
-  hub CLI export from the hub store, authoring candidates from the shelf. Checks after integration: server+web tsc
-  clean; server geo tests 54 files/477 pass; web geo tests 45 files/239 pass.
-- Children running (started 2026-10-22): A `gaid-hub-skills--store` (Paseo agent 719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e,
-  worktree ~/worktrees/geoaidesk/gaid-hub-skills--store, prompt ~/data/geoaidesk/work/gaid-hub-skills/child-store.md);
-  B `gaid-hub-skills--ui` (agent af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188, worktree ~/worktrees/geoaidesk/gaid-hub-skills--ui,
-  prompt .../child-ui.md). On each finish notice: `task complete gaid-hub-skills--<child>`.
+Phase 1 of hub-managed skills is implemented on task/gaid-hub-skills (user chose all recommended options 2026-10-22).
+- Result: hub skill shelf (#hub/skills, #hub/s/<id>), three ways in (project skill, hub Workflow's bundled skill, GitHub
+  or other skills CLI source staged only), immutable revisions with tree hash/files/origin/licence/findings/review
+  history, licence gate (restricted/unknown → registrant only), unverified display-name reviews, install with preview +
+  consent (no GitHub), Settings → Skills "GAID 허브에서" + installed revision/new revision/edited/suspended rows.
+  Workflows pin hub skill revisions (gaid-workflow/v1 `source: "hub"`): installed with the Workflow, checked at
+  registration, readiness states with in-place install, chat exposure, 지침 text, CLI export from the hub store,
+  authoring question `hub-skills` binding chosen skills. Phase 2 (reviewer/admin roles, reports, upstream candidates)
+  waits for gaid-backend accounts (open item).
+- Children integrated and closed: store (c073a2a2), ui (95a70b6f).
+- Verification: server full suite 184 files/2082 tests pass (store job receipt
+  ~/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061750.108769Z/receipt.json); ui child's finish ran scripts/check
+  on its tree; after integration server geo 54 files/477 and web geo 45 files/239 pass, web workspace tests pass,
+  UI and copy checks 0 errors. Real isolated app path checked by ui child (evidence ~/data/geoaidesk/work/gaid-hub-skills--ui/).
+  Not run: live GitHub fetch registration, Workflow extraction and Workflow-with-pin install in the browser (tests only),
+  model-driven authoring with the hub-skills answer.
+- Re-verify: `cd server && npx vitest run test/geo-hub-skills.test.ts test/geo-hub-pins.test.ts test/geo-hub-skill-workflows.test.ts`;
+  `cd web && npx vitest run src/geo/hub-skills src/geo/workspace`; `scripts/check`.
 ## Next steps
-1. On ui's finish notice: `task complete gaid-hub-skills--ui` (remove scripts/check caches in its worktree if close
-   reports unknown ignored files, then `task close`).
-2. Then: use `HubSkillInstall` (web/src/geo/hub-skills/install.tsx) in readiness for missing hub pins; scripts/check;
-   real-app pass with own GAID_HOME under ~/data/geoaidesk/work/gaid-hub-skills/ (register, install, Workflow pin);
-   report §3.9 implementation result (ui child's prose + screenshots), humanizer, review-copy; task finish.
-Blocked: waiting for child ui (agent af5e8cdb) to sync, run its real API/browser check and finish.
+1. `task finish` (runs scripts/check); then relay the hub's final report.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (verbatim "모두 권장안으로 진행하자."): 1 가) hub skill shelf, revisions pinned by Workflows;
@@ -79,7 +67,9 @@ Blocked: waiting for child ui (agent af5e8cdb) to sync, run its real API/browser
   reports/2026-10-15-gaid-researcher-ecosystem (user goal: researchers make skills/Workflows from their papers and share;
   non-coders; institute "second brain"); gaid-backend diagnosis notes (hub-shared store is one process, X-GAID-User unchecked).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-workflow-model#1
 ## Open items
+- [대기] 허브 스킬 2단계(검토자 역할 구분, 관리자 사용 중지 권한, 문제 신고, GitHub 원본이 바뀌었을 때 새 판 후보와 비교) — 가) gaid-backend 계정이 생긴 뒤 별도 작업으로 시작 — 나) 지금 표시 이름으로 시작 — 권장: 가) 검토 표시는 검토자를 확인할 수 있어야 믿을 수 있음 (사용자 2026-10-22 결정 3 가) — 막힌 일: 2단계 전체 — 조건: gaid-backend 계정 도입 — 근거: reports/2026-10-22-gaid-hub-skills#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
