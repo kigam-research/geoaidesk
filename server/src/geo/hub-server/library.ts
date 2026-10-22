@@ -20,7 +20,12 @@ export class HubLibrary {
       if (!object(c) || !["item", "folder"].includes(c.kind) || typeof c.id !== "string" ||
           !Number.isSafeInteger(c.baseVersion) || c.baseVersion < 0 || typeof c.deleted !== "boolean" || (!c.deleted && !object(c.data)))
         throw new HubServerError("서재 변경 기록을 확인해 주세요.");
-      text(c.id, "서재 식별자", 200);
+      // Zotero folder ids encode the full connection/library identity as JSON (zotero/sync.ts).
+      // Keep that opaque key intact: it contains percent escapes and may be longer than local li-/lc- ids.
+      const zoteroFolder = c.id.startsWith("zc-");
+      text(c.id, "서재 식별자", zoteroFolder ? 1024 : 200);
+      if (zoteroFolder && !/^zc-(?:[A-Za-z0-9_.!~*'()-]|%[A-Fa-f0-9]{2})+$/.test(c.id))
+        throw new HubServerError("Zotero 폴더 식별자를 확인해 주세요.");
       const key = JSON.stringify([c.kind, c.id]);
       if (seen.has(key)) throw new HubServerError("같은 서재 항목은 한 번만 보내세요.");
       seen.add(key);

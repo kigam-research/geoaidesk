@@ -10,6 +10,7 @@ import { backupHub, checkBackup } from "../src/geo/hub-server/backup.ts";
 import { importHub } from "../src/geo/hub-server/import.ts";
 import { sha256 } from "../src/geo/hub-server/core.ts";
 import { SharedHubStore, type StoredEntry } from "../src/geo/hub-shared/store.ts";
+import { zoteroCollectionId } from "../src/geo/library/zotero/sync.ts";
 import { HUB_FILE_LIMIT, LIBRARY_FILE_LIMIT } from "../src/geo/hub-server/protocol.ts";
 const API = "/hub/v1";
 const work = join(homedir(), "data/geoaidesk/work/gaid-backend--hub-server/tests");
@@ -305,6 +306,28 @@ describe("hub records and files", () => {
   });
 });
 describe("per-account library synchronization", () => {
+  it("preserves real Zotero collection ids, including encoded connection identities longer than 200 characters", async () => {
+    const u = await user();
+    const ids = [
+      zoteroCollectionId({ connection: "local", serverId: "zotero-pc70", libraryType: "user", libraryId: "123456" }, "ABCD1234"),
+      zoteroCollectionId({ connection: "local", serverId: `http://pc70:23119/${"연구 서재 ".repeat(4)}?workspace=A&B=1`, libraryType: "user", libraryId: "123456" }, "EFGH5678"),
+    ];
+    expect(ids[1].length).toBeGreaterThan(200);
+    expect(ids[1].length).toBeLessThan(1024);
+    const push = (changes: unknown[]) => app.inject({ method: "POST", url: `${API}/library/changes`, headers: u.headers, payload: { changes } });
+    const changes = ids.map((id) => ({ kind: "folder", id, baseVersion: 0, deleted: false, data: { id, name: "Zotero 서재" } }));
+    const item = { kind: "item", id: "li-zotero-member", baseVersion: 0, deleted: false, data: { collectionIds: ids, attachments: [] } };
+    const created = await push([...changes, item]);
+    expect(created.statusCode, created.body).toBe(200);
+    expect(created.json().conflicts).toEqual([]);
+    expect(created.json().applied.map((c: { id: string }) => c.id)).toEqual([...ids, item.id]);
+    const pulled = (await app.inject({ url: `${API}/library/changes?since=0`, headers: u.headers })).json();
+    expect(pulled.changes.slice(0, 2).map((c: { id: string }) => c.id)).toEqual(ids);
+    expect(pulled.changes[2].data.collectionIds).toEqual(ids);
+    expect((await push([{ ...changes[1], baseVersion: 2, deleted: true }])).json().applied[0]).toEqual({ kind: "folder", id: ids[1], version: 4 });
+    expect((await app.inject({ url: `${API}/library/changes?since=3`, headers: u.headers })).json().changes).toEqual([{ kind: "folder", id: ids[1], version: 4, deleted: true }]);
+    for (const id of ["zc-" + "x".repeat(1022), "zc-%invalid"]) expect((await push([{ ...changes[0], id }])).statusCode).toBe(400);
+  });
   it("pushes versions, pulls incrementally, conflicts stale changes and retains tombstones", async () => {
     const u = await user();
     const push = (changes: unknown[]) => app.inject({ method: "POST", url: `${API}/library/changes`, headers: u.headers, payload: { changes } });
