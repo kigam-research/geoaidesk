@@ -41,18 +41,18 @@
   },
   "catalogue": {
     "status": "pinned",
-    "note": "Pinned geo catalogue archive exported from kigam-research/skill_hub (docs/specs/gaid-interfaces.md). The backend stages it from GAID_CATALOGUE_ARCHIVE, <GAID_HOME>/catalogue/, geo/catalogue/ next to the checkout, or the named asset (configs/inputs.toml), and verifies the sha256 and every package digest. When none of these has it, the launcher (geo/start.mjs) downloads download.url (GAID_CATALOGUE_URL overrides it; GAID_CATALOGUE_DOWNLOAD=0 turns it off) into <GAID_HOME>/catalogue/ and keeps it only if the sha256 matches. Without the archive no catalogue skills are installed (no fallback to the upstream sources) and GET /geo/catalogue reports where the archive was looked for.",
-    "version": "0.2.1",
-    "archive": "geo-catalogue-0.2.1.tar.gz",
-    "sha256": "e9f506068a4cb2e0b2f207ccc2db760db7641e624fa08ba729604421c6ef55f5",
-    "sourceCommit": "2abfc6df8d46dbf49a2edcb1d0f4b05a756dd8b2",
+    "note": "Pinned geo catalogue archive built in this repository by geo/catalogue-build.mjs from geo/catalogue-src/releases/<version>.json (docs/adr/2026-10-22-gaid-builds-catalogue.md; contract skill_hub docs/specs/gaid-interfaces.md). The backend stages it from GAID_CATALOGUE_ARCHIVE, <GAID_HOME>/catalogue/, geo/catalogue/ next to the checkout, or the named asset (configs/inputs.toml), and verifies the sha256 and every package digest. When none of these has it, the launcher (geo/start.mjs) downloads download.url (GAID_CATALOGUE_URL overrides it; GAID_CATALOGUE_DOWNLOAD=0 turns it off) into <GAID_HOME>/catalogue/ and keeps it only if the sha256 matches. Without the archive no catalogue skills are installed (no fallback to the upstream sources) and GET /geo/catalogue reports where the archive was looked for.",
+    "version": "0.3.0",
+    "archive": "geo-catalogue-0.3.0.tar.gz",
+    "sha256": "d09d5311b7be44d700d40b0bc52a53c9d1ca08a7099ce47bcab1df7d6d4c6598",
+    "sourceCommit": "64e2f756cc9f58ef4cea0436adfab474eca2bdd2",
     "download": {
-      "release": "geo-catalogue-0.2.1",
-      "url": "https://github.com/kigam-research/geoaidesk/releases/download/geo-catalogue-0.2.1/geo-catalogue-0.2.1.tar.gz"
+      "release": "geo-catalogue-0.3.0",
+      "url": "https://github.com/kigam-research/geoaidesk/releases/download/geo-catalogue-0.3.0/geo-catalogue-0.3.0.tar.gz"
     },
     "examples": {
-      "archive": "geo-examples-0.2.1.tar.gz",
-      "sha256": "619c930d4313e160215bbff67df679e6b495d39ec8b0a881395cd71600f6d4f5"
+      "archive": "geo-examples-0.3.0.tar.gz",
+      "sha256": "66eeb190bf33782d34fc3043f06d9ffee9e44ee7ff3ed0799f324f3367acd29f"
     },
     "excludedSources": [
       {

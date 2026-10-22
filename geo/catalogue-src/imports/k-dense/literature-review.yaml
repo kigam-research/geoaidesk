@@ -1,0 +1,79 @@
+schemaVersion: atlas-profile/v1
+id: k-dense/literature-review
+source:
+  kind: import
+  path: skills/literature-review
+  repository: K-Dense-AI/scientific-agent-skills
+  commit: 92ace75ac21efe19a620434e0ca4e356081fe807
+  upstreamVersion: '1.11'
+release:
+  atlasVersion: 1.0.0
+  state: published
+  date: '2026-10-22'
+kind: reporting
+title: { ko: 문헌 고찰 }
+tagline: { ko: "검색어와 선별 기준을 기록하며 체계적·범위·서술 문헌 고찰을 씁니다" }
+summary: { ko: "질문과 포함·제외 기준을 정하고, 여러 서비스에서 검색한 기록을 남기고, 선별 건수를 세어 PRISMA 흐름을 만듭니다. 연구별 내용을 추출해 종합하고 모든 인용을 원문과 대조합니다." }
+taxonomy:
+  disciplines: [foundation]
+  tasks: [data-discovery, interpretation, reporting]
+  dataTypes: [document]
+  formats: [markdown, pdf]
+inputs:
+- id: question
+  label: { ko: "고찰 질문과 포함·제외 기준" }
+  semanticType: document
+  formats: [markdown]
+  required: true
+procedure:
+  nodes:
+  - { id: s1, code: S1, label: { ko: 질문과 범위 }, type: input, summary: { ko: "질문, 포함·제외 기준, 기간과 분야를 정합니다" } }
+  - { id: s2, code: S2, label: { ko: 검색 기록 }, type: analysis, summary: { ko: "서비스별 검색어와 날짜를 남기며 검색합니다" } }
+  - { id: s3, code: S3, label: { ko: 선별 }, type: decision, summary: { ko: "제목·초록, 전문 순으로 고르고 단계별 건수를 셉니다" } }
+  - { id: s4, code: S4, label: { ko: 추출과 품질 평가 }, type: analysis, summary: { ko: "연구별 내용을 표로 추출하고 근거의 질을 평가합니다" } }
+  - { id: s5, code: S5, label: { ko: 종합 }, type: analysis, summary: { ko: "주제별 또는 정량 종합을 쓰고 근거의 한계를 적습니다" } }
+  - { id: s6, code: S6, label: { ko: 인용 대조와 문서 }, type: output, summary: { ko: "모든 인용을 원문과 대조하고 참고문헌이 있는 문서를 만듭니다" } }
+  edges:
+  - { from: s1, to: s2, relation: next }
+  - { from: s2, to: s3, relation: next }
+  - { from: s3, to: s4, relation: next }
+  - { from: s4, to: s5, relation: next }
+  - { from: s5, to: s6, relation: next }
+outputs:
+- id: review
+  label: { ko: "문헌 고찰 문서와 검색·선별 기록" }
+  kind: report
+  formats: [markdown]
+limitations:
+- { kind: condition, text: { ko: "검색 스크립트는 인터넷 연결과 Python requests 패키지가 필요합니다(선택 환경 '문헌 환경'). KIGAM 망(PC74, 2026-10-21 확인)에서 Semantic Scholar는 키 없이 요청 한도(429)에 걸렸고 arXiv 검색 API는 응답하지 않았습니다." } }
+- { kind: condition, text: { ko: "PDF 출력은 Pandoc과 XeLaTeX, Parallel 검색 CLI는 Parallel 인증, AI 도식은 OPENROUTER_API_KEY가 필요합니다. GAID는 이들을 설치하지 않습니다." } }
+- { kind: not-for, text: { ko: "메타분석 계산 도구는 없습니다. 계획까지만 돕습니다." } }
+credits:
+  publisher: K-Dense Inc.
+  authors:
+  - name: K-Dense Inc.
+    role: author
+  profileAuthors:
+  - name: KIGAM
+    role: profile-author
+  citation: "cff-version: 1.2.0\nmessage: >-\n  If you use Scientific Agent Skills in your research or project, please cite\n  the paper listed under preferred-citation. To pin the exact skill set an\n  analysis ran against, also cite this repository and record the release tag\n  or commit you used.\ntype: software\ntitle: Scientific Agent Skills\nabstract: >-\n  An open library of 163 ready-to-use Agent Skills for science and research,\n  covering genomics, cheminformatics, medical imaging, study design, scientific\n  communication, and more, for any AI agent that supports the open Agent Skills\n  standard.\nauthors:\n  - name: K-Dense Inc.\n    website: https://www.k-dense.ai\nrepository-code: https://github.com/K-Dense-AI/scientific-agent-skills\nurl: https://github.com/K-Dense-AI/scientific-agent-skills\nlicense: MIT\nkeywords:\n  - agent-skills\n  - science\n  - research\n  - bioinformatics\n  - cheminformatics\n  - biology\n  - chemistry\n  - medicine\npreferred-citation:\n  type: generic\n  title: \"Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents\"\n  authors:\n    - family-names: Kassis\n      given-names: Timothy\n    - family-names: Agarwal\n      given-names: Vinayak\n    - family-names: He\n      given-names: Yuhuan\n    - family-names: Patel\n      given-names: Darshil\n    - family-names: Brueckner\n      given-names: Aubrey M.\n  year: 2026\n  month: 8\n  date-published: 2026-08-30\n  doi: 10.48550/arXiv.2609.00065\n  url: https://arxiv.org/abs/2609.00065\n  identifiers:\n    - type: other\n      value: \"arXiv:2609.00065\"\n      description: arXiv preprint identifier\n  notes: arXiv preprint, primary class cs.CL\n"
+licenses:
+- component: skill-text
+  declared: MIT
+  spdx: MIT
+  note: { ko: "원저작: K-Dense Inc. (MIT)" }
+  noticeFile: LICENSE.md
+- component: code
+  declared: MIT
+  spdx: MIT
+  noticeFile: LICENSE.md
+reference:
+  files:
+  - SKILL.md
+network: required
+dependencies:
+- { name: requests, kind: required, verificationOrigin: upstream-declared }
+- { name: pandoc, kind: optional, verificationOrigin: upstream-declared }
+prompts:
+- title: { ko: 범위 문헌 고찰 }
+  prompt: { ko: "{question}에 대한 범위 문헌 고찰을 계획하고, 검색어와 선별 기준을 먼저 보여 주세요." }
