@@ -1,6 +1,7 @@
 {
   "title": "Connection map",
   "hint": "Only recorded links are shown. Select an item before opening it.",
+  "hintProject": "Only links recorded in the {project} project are shown. Select an item before opening it.",
   "show": {
     "button": "Open connection map"
   },
@@ -78,7 +79,10 @@
     "workflow": {
       "button": "Open Workflow"
     },
-    "unavailable": "The item cannot be opened from the current view."
+    "unavailable": "The item cannot be opened from the current view.",
+    "project": {
+      "button": "Open project"
+    }
   },
   "loading": "Reading connections.",
   "error": "Could not read connections. Reload them.",

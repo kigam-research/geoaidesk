@@ -348,5 +348,11 @@
       "title": "Send folder {name} to Zotero",
       "body": "Sends {n} papers. A paper already in Zotero is not created again; it is only added to the collection. When Zotero asks for approval, choose \"Always Allow\"."
     }
+  },
+  "map": {
+    "button": "Open connection map",
+    "pickTitle": "Project to open the map in",
+    "notes": "Cited in {n} notes",
+    "attached": "Attached to the project"
   }
 }

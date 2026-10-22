@@ -1,2 +1,2 @@
 export { ConnectionMapPane, type ConnectionMapPaneProps, type ConnectionOpenActions } from "./connection-map-pane";
-export { ConnectionMapButton } from "./connection-map-button";
+export { ConnectionMapButton, ConnectionMapDialog } from "./connection-map-button";
