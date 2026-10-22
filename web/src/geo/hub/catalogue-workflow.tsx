@@ -1,4 +1,5 @@
 "use client";
+import { ChevronLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { WorkflowDoc } from "@/geo/contracts/workflow-doc";
@@ -7,6 +8,7 @@ import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { sharedHub } from "./shared-api";
 import { localText } from "./text";
 const text = geoText("workflowView");
+const hubText = geoText("hub");
 
 /** A built-in recommendation opens the same final Workflow form as its project detail. */
 export function CatalogueWorkflowScreen({ id, onBack }: { id: string; onBack: () => void }) {
@@ -18,7 +20,7 @@ export function CatalogueWorkflowScreen({ id, onBack }: { id: string; onBack: ()
     return () => { alive = false; };
   }, [id]);
   return <main className="min-h-0 flex-1 overflow-y-auto"><div className="mx-auto max-w-6xl space-y-4 px-6 py-4">
-    <Button variant="ghost" size="sm" onClick={onBack}>{text("back.button")}</Button>
+    <Button variant="ghost" size="sm" onClick={onBack}><ChevronLeftIcon data-icon="inline-start" />{hubText("shared.back")}</Button>
     {doc ? <><h1 className="text-xl font-semibold">{localText(doc.title)}</h1>{doc.purpose && <p className="max-w-[640px] text-sm text-muted-foreground">{localText(doc.purpose)}</p>}<WorkflowView doc={doc} loadSkillSource={(name) => sharedHub.catalogueSkillSource(id, name)} /></> : <p role={failed ? "alert" : "status"} className="text-sm">{text(failed ? "error" : "loading")}</p>}
   </div></main>;
 }

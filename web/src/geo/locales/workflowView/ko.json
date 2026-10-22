@@ -36,9 +36,6 @@
   "detail": {
     "button": "Workflow 상세 보기"
   },
-  "back": {
-    "button": "허브 목록 보기"
-  },
   "import": {
     "button": "GitHub 등에서 가져오기"
   },

@@ -136,6 +136,8 @@ describe("GAID hub location and hand-off", () => {
     expect(parseHubHash("#hub/ap-a135f290-1c4")).toEqual({ open: true, projectId: "ap-a135f290-1c4" });
     expect(parseHubHash("#hub/../x")).toEqual({ open: false, projectId: null });
     expect(parseHubHash("")).toEqual({ open: false, projectId: null });
+    expect(parseHubHash("#hub/c/map-check%2Fv2")).toEqual({ open: true, projectId: null, catalogueId: "map-check/v2" });
+    expect(parseHubHash("#hub/c/%E0%A4%A")).toEqual({ open: true, projectId: null });
   });
 
   it("keeps a setup request until the target project's workspace takes it once", () => {
