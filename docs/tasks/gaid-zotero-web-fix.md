@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T04:58:50Z
+updated: 2026-10-22T05:58:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bee7d319-703a-4565-a0c9-1d69e94cd031","pid":3762934,"provider":"claude","session":"870398d4-3eab-430b-ae47-a9f6c6604ea1","start":"53200219","token":"cb3fe81ab18b49eee1407e968dd49a72031d140445992e9a34169e97d8776bc3"}
 branch: task/gaid-zotero-web-fix
 target: main
@@ -57,6 +57,13 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: n
   zotero tests (53 + 7), web tsc + library tests, copy validator (0 errors), check-ui (0 errors).
 - Test app: `systemd-run --user` unit `gaid-zotero-web-fix-app`, UI http://localhost:3360, backend :18360,
   GAID_HOME ~/data/geoaidesk/work/gaid-zotero-web-fix/home, log ~/data/geoaidesk/work/gaid-zotero-web-fix/app.log.
+- User key test (2026-10-22): web key connected and refreshed (header and card agree, "웹 키로 연결 · 오후 2:52:43 갱신"),
+  0 papers. Cause: the zotero.org library is empty (libraryVersion 1) because the user's Ubuntu Zotero app cannot sync:
+  KIGAM TLS inspection (api.zotero.org issuer "KIGAM SSL"), Zotero's own NSS store does not trust it
+  (SEC_ERROR_UNKNOWN_ISSUER). Not a PC/web conflict. GAID's Node trusts it via NODE_EXTRA_CA_CERTS
+  (/usr/local/share/ca-certificates/KIGAM.crt); without it Node reports SELF_SIGNED_CERT_IN_CHAIN.
+  Added: state `certificate-untrusted`, empty-web-library note, "Zotero 연결 해제" (POST /geo/library/zotero/disconnect;
+  forgets the web key, mirrored papers stay) so a researcher can switch to the PC connection.
 ## Next steps
 1. Screenshots (2 styles × 2 themes, 1440×900 and 1280×800), user key test in the test app, scripts/check, report.
 ## Failed approaches

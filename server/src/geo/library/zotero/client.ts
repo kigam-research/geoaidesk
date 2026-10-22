@@ -131,6 +131,8 @@ abstract class HttpZoteroClient implements ZoteroClient {
         } catch (error) {
           const cause = (error as { cause?: { code?: string } })?.cause;
           const timedOut = (error as { name?: string })?.name === "TimeoutError";
+          // A TLS-inspecting institute network (KIGAM SSL) whose CA Node does not trust: SELF_SIGNED_CERT_IN_CHAIN etc.
+          if (cause?.code && /CERT|UNABLE_TO_(GET|VERIFY)/.test(cause.code)) throw new ZoteroError("certificate-untrusted", `certificate:${cause.code}`);
           throw new ZoteroError(this.connection === "local" && cause?.code === "ECONNREFUSED" ? "zotero-closed" : "unreachable", timedOut ? "timed-out" : cause?.code ? `connection-failed:${cause.code}` : "connection-failed");
         }
         const server = response.headers.get("Zotero-Server-ID") ?? undefined;

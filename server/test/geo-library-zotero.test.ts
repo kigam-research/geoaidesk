@@ -139,6 +139,10 @@ describe("Zotero clients and connection states", () => {
     const slow = new WebZoteroClient({ secrets: secrets(), fetch: async () => { throw new DOMException("timed out", "TimeoutError"); } });
     await slow.setKey("web-synthetic-secret");
     expect(await probeZoteroLibrary(slow, web)).toMatchObject({ state: "unreachable", detail: "web · timed-out" });
+    // KIGAM's TLS inspection without the institute CA in Node: Node reports SELF_SIGNED_CERT_IN_CHAIN (seen on PC74).
+    const inspected = new WebZoteroClient({ secrets: secrets(), fetch: async () => { throw new TypeError("fetch failed", { cause: { code: "SELF_SIGNED_CERT_IN_CHAIN" } }); } });
+    await inspected.setKey("web-synthetic-secret");
+    expect(await probeZoteroLibrary(inspected, web)).toMatchObject({ state: "certificate-untrusted", detail: "web · certificate:SELF_SIGNED_CERT_IN_CHAIN" });
   });
 
   it("keeps the requested version for a Web 304 that has no Last-Modified-Version", async () => {

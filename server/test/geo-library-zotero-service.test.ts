@@ -87,6 +87,12 @@ describe("Zotero service", () => {
       expect(recovered.state).toBe("ok");
       expect(recovered.failedAt).toBeUndefined();
       expect(recovered.detail).toBeUndefined();
+      // Disconnecting forgets the key and the library state; mirrored papers stay.
+      expect(await svc.disconnect("web")).toEqual([]);
+      expect((await store.all()).map((i) => i.zotero?.itemKey)).toEqual(["PAPER001"]);
+      await svc.syncAll();
+      expect(await svc.libraries()).toEqual([]);
+      expect(fs.readFileSync(fs.readdirSync(path.join(dir, "library", "secrets")).map((f) => path.join(dir, "library", "secrets", f))[0], "utf8")).toBe("{}");
     } finally { await web.close(); }
   });
 

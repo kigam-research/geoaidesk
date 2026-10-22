@@ -110,6 +110,17 @@ export class ZoteroService {
     return this.libraries();
   }
 
+  /**
+   * Stops following one connection (PC or web key) so the other can be used; a web key is forgotten. Papers already
+   * mirrored stay in the library.
+   */
+  async disconnect(connection: "local" | "web"): Promise<ZoteroLibraryState[]> {
+    const z = await this.store.zotero();
+    await this.store.saveZotero({ ...z, libraries: z.libraries.filter((l) => l.connection !== connection) });
+    if (connection === "web") await (this.client("web") as WebZoteroClient).clearKey();
+    return this.libraries();
+  }
+
   private async upsertLibrary(state: ZoteroLibraryState): Promise<void> {
     const z = await this.store.zotero();
     const others = z.libraries.filter((l) => !(l.connection === state.connection && l.libraryType === state.libraryType && l.libraryId === state.libraryId));

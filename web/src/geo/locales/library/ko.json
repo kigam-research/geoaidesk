@@ -195,6 +195,7 @@
       "rate-limited": "Zotero가 요청을 잠시 제한했습니다. 몇 분 뒤 다시 갱신하세요.",
       "server-error": "Zotero 서버가 응답하지 못했습니다. 잠시 뒤 다시 갱신하세요.",
       "library-changing": "갱신하는 동안 Zotero 서재가 계속 바뀌었습니다. Zotero에서 편집을 마친 뒤 다시 갱신하세요.",
+      "certificate-untrusted": "기관 네트워크가 Zotero 연결을 중계하는데, GAID가 기관 보안 인증서를 신뢰하지 않아 연결하지 못했습니다. 기관 인증서 파일을 `NODE_EXTRA_CA_CERTS`로 지정한 뒤 GAID를 다시 시작하세요.",
       "unreachable": "Zotero에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 갱신하세요.",
       "failed": "Zotero 서재를 가져오지 못했습니다. 다시 갱신해도 같으면 기술 정보를 복사해 전달하세요."
     },
@@ -202,7 +203,12 @@
     "failed": "{connection, select, local {PC의 Zotero} other {웹 키}}로 연결 · 갱신 실패",
     "failedSince": "{connection, select, local {PC의 Zotero} other {웹 키}}로 연결 · 갱신 실패 · 마지막 갱신 {when}",
     "localNote": "PC의 Zotero는 Zotero 앱이 켜져 있을 때만 갱신됩니다. 앱을 닫아도 마지막으로 갱신한 논문은 서재에 남습니다.",
-    "newKey": "새 Zotero 웹 API 키"
+    "newKey": "새 Zotero 웹 API 키",
+    "emptyWeb": "zotero.org 웹 서재에 논문이 없습니다. 웹 키는 Zotero 앱이 zotero.org와 동기화한 논문만 읽습니다. PC의 Zotero에 있는 논문은 웹 키 연결을 해제한 뒤 PC의 Zotero로 연결하면 보입니다.",
+    "disconnect": {
+      "button": "Zotero 연결 해제",
+      "hint": "연결을 해제해도 서재에 가져온 논문은 남습니다. 웹 키는 지워집니다."
+    }
   },
   "send": {
     "button": "Zotero로 보내기",

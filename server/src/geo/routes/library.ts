@@ -341,6 +341,11 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       if (typeof req.body?.key !== "string") throw new LibraryError("key is required");
       return { libraries: await zoteroOf(storeOf()).connectWeb(req.body.key.trim()) };
     });
+    scope.post<{ Body: { connection?: unknown } }>("/geo/library/zotero/disconnect", { bodyLimit: 1024 }, async (req) => {
+      const connection = req.body?.connection;
+      if (connection !== "local" && connection !== "web") throw new LibraryError("connection must be local or web");
+      return { libraries: await zoteroOf(storeOf()).disconnect(connection) };
+    });
     scope.post("/geo/library/zotero/sync", async () => {
       await zoteroOf(storeOf()).syncAll();
       return { libraries: await zoteroOf(storeOf()).libraries() };

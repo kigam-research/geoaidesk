@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { TechnicalDetail } from "@/geo/hub/technical";
 import { t } from "@/geo/i18n";
 import type { ZoteroLibraryState, ZoteroState } from "@/geo/contracts/library";
-import { connectLocalZotero, connectWebZotero, syncZotero, zoteroDetail, zoteroState } from "./api";
+import { connectLocalZotero, connectWebZotero, disconnectZotero, syncZotero, zoteroDetail, zoteroState } from "./api";
 import { WEB_KEY_STATES, zoteroStatus, type ZoteroStatus } from "./zotero-status";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
@@ -23,7 +23,8 @@ function statusLine(status: Exclude<ZoteroStatus, { kind: "none" }>): string {
   return status.lastSyncAt ? L("zotero.failedSince", { connection, when: new Date(status.lastSyncAt).toLocaleTimeString() }) : L("zotero.failed", { connection });
 }
 
-export function ZoteroCard({ libraries, onChanged }: { libraries: ZoteroLibraryState[]; onChanged: () => void }) {
+/** `papers`: Zotero papers in the library, to explain an empty web library (a Zotero app that never synced). */
+export function ZoteroCard({ libraries, papers, onChanged }: { libraries: ZoteroLibraryState[]; papers: number; onChanged: () => void }) {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [showKey, setShowKey] = useState(false);
@@ -47,6 +48,7 @@ export function ZoteroCard({ libraries, onChanged }: { libraries: ZoteroLibraryS
   const usesWebKey = status.kind === "none" ? showKey : status.connection === "web";
   const keyForm = (status.kind === "none" && showKey) || (usesWebKey && shown !== null && WEB_KEY_STATES.includes(shown.state));
   const usesPc = status.kind === "none" || libraries.some((l) => l.connection === "local");
+  const emptyWeb = status.kind === "synced" && status.connection === "web" && papers === 0;
   const saveKey = () => void run(async () => { await connectWebZotero(key.trim()); setKey(""); setShowKey(false); return undefined; });
 
   return (
@@ -88,7 +90,16 @@ export function ZoteroCard({ libraries, onChanged }: { libraries: ZoteroLibraryS
           <p className="text-xs text-muted-foreground">{L("zotero.webKeyHint")}</p>
         </div>
       )}
+      {emptyWeb && !shown && <p className="text-sm text-muted-foreground">{L("zotero.emptyWeb")}</p>}
       {usesPc && <p className="text-xs text-muted-foreground">{L("zotero.localNote")}</p>}
+      {status.kind !== "none" && (
+        <div className="flex flex-col items-start gap-1">
+          <Button variant="ghost" size="sm" className="-ml-3" disabled={busy} onClick={() => void run(async () => { await disconnectZotero(status.connection); return undefined; })}>
+            {L("zotero.disconnect.button")}
+          </Button>
+          <p className="text-xs text-muted-foreground">{L("zotero.disconnect.hint")}</p>
+        </div>
+      )}
     </div>
   );
 }

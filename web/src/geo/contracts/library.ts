@@ -205,6 +205,7 @@ export type ZoteroState =
   | "rate-limited"
   | "server-error"
   | "library-changing"
+  | "certificate-untrusted"
   | "unreachable"
   | "failed";
 

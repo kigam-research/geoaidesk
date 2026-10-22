@@ -195,6 +195,7 @@
       "rate-limited": "Zotero is limiting requests. Wait several minutes, then update again.",
       "server-error": "The Zotero server did not respond. Update again in a moment.",
       "library-changing": "The Zotero library kept changing during the update. Finish editing in Zotero, then update again.",
+      "certificate-untrusted": "The institute network relays the Zotero connection, and GAID does not trust its security certificate, so it could not connect. Set the institute certificate file in `NODE_EXTRA_CA_CERTS`, then restart GAID.",
       "unreachable": "Could not connect to Zotero. Check the network connection, then update again.",
       "failed": "Could not read the Zotero library. If updating again fails the same way, copy the technical details and pass them on."
     },
@@ -202,7 +203,12 @@
     "failed": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · update failed",
     "failedSince": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · update failed · last updated {when}",
     "localNote": "Zotero on this PC updates only while the Zotero app is running. Papers from the last update stay in the library when the app is closed.",
-    "newKey": "New Zotero web API key"
+    "newKey": "New Zotero web API key",
+    "emptyWeb": "The zotero.org web library has no papers. A web key reads only papers the Zotero app has synced to zotero.org. To see papers in Zotero on this PC, disconnect the web key, then connect Zotero on this PC.",
+    "disconnect": {
+      "button": "Disconnect Zotero",
+      "hint": "Papers already in the library stay after you disconnect. The web key is deleted."
+    }
   },
   "send": {
     "button": "Send to Zotero",

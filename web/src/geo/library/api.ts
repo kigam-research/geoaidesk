@@ -115,6 +115,7 @@ export function zoteroDetail(error: unknown): string | undefined {
 }
 export const connectLocalZotero = () => call<ZoteroLibraryState>("/zotero/local", { method: "POST" });
 export const connectWebZotero = (key: string) => call<{ libraries: ZoteroLibraryState[] }>("/zotero/web", { method: "POST", body: JSON.stringify({ key }) });
+export const disconnectZotero = (connection: ZoteroLibraryState["connection"]) => call<{ libraries: ZoteroLibraryState[] }>("/zotero/disconnect", { method: "POST", body: JSON.stringify({ connection }) });
 export const syncZotero = () => call<{ libraries: ZoteroLibraryState[] }>("/zotero/sync", { method: "POST" });
 export const readItemText = (id: string) => call<LibraryItem>(`/items/${encodeURIComponent(id)}/read`, { method: "POST" });
 export const sendItemToZotero = (id: string) => call<SendToZoteroResult>(`/items/${encodeURIComponent(id)}/send-to-zotero`, { method: "POST" });

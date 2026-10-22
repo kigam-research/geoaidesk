@@ -242,7 +242,7 @@ function SidePanel({ data, onSelect, onChanged }: { data: LibraryListResponse | 
         <p className="text-sm">{L("side.papers", { n: data.counts.all })}</p>
         {data.counts.unread > 0 && <p className="text-sm text-muted-foreground">{L("side.unread", { n: data.counts.unread })}</p>}
       </div>
-      <ZoteroCard libraries={data.zotero} onChanged={onChanged} />
+      <ZoteroCard libraries={data.zotero} papers={data.counts.zotero} onChanged={onChanged} />
       {byAdded.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl border p-4">
           <h2 className="text-base font-semibold">{L("side.recentTitle")}</h2>
