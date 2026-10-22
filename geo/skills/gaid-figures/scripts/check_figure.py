@@ -56,9 +56,10 @@ def relative(file):
     return Path(os.path.relpath(file, Path.cwd())).as_posix()
 
 
-def item(id, status, measured=None, required=None):
+def item(id, status, measured=None, required=None, notes=None):
+    # measured/required carry numbers and units only; wording comes from `notes` codes (contract FIGURE_CHECK_NOTES).
     return dict(id=id, status=status, **({'measured': measured} if measured is not None else {}),
-                **({'required': required} if required is not None else {}))
+                **({'required': required} if required is not None else {}), **({'notes': notes} if notes else {}))
 
 
 def length(value, default='px'):
@@ -297,22 +298,23 @@ def check(args):
         if args.artwork:
             required = requirements.get(args.artwork)
             status = 'ok' if required and dpi + .5 >= required else 'fail' if required else 'not-measured'
-            req = f'{required:g} dpi ({args.artwork})' if required else None
+            req = f'{required:g} dpi' if required else None
+            dpi_notes = [f'artwork-{args.artwork}']
         elif known:
             status = 'fail' if dpi + .5 < min(known) else 'ok' if len(known) == 3 and dpi + .5 >= max(known) else 'warn'
-            req = '; '.join(f'{k}: {v:g} dpi' for k, v in requirements.items() if v is not None) + ' (artwork type unclassified)'
-        else: status, req = 'not-measured', None
-        items.append(item('dpi', status, f'{dpi:.1f} dpi at {width_mm:g} mm', req))
+            req = ' / '.join(f'{v:g}' for v in requirements.values() if v is not None) + ' dpi'
+            dpi_notes = ['artwork-unclassified']
+        else: status, req, dpi_notes = 'not-measured', None, []
+        items.append(item('dpi', status, f'{dpi:.1f} dpi ({width_mm:g} mm)', req, dpi_notes))
     else:
-        items.append(item('dpi', 'not-measured', 'Vector container; embedded raster resolution not measured' if ext in VECTOR else None))
+        items.append(item('dpi', 'not-measured', None, None, ['vector-container'] if ext in VECTOR else None))
     required_font = profile['minFontPt'] if profile else None
     font_status = 'not-measured' if min_font is None else 'fail' if required_font and min_font + .01 < required_font else 'warn' if partial or not required_font else 'ok'
     font_note = f'{min_font:.2f} pt' if min_font is not None else None
-    if font_note and ext in RASTER: font_note += ' (plot metadata; not OCR)'
-    if font_note and partial: font_note += ' (partial measurement)'
-    items.append(item('min-font', font_status, font_note, f'{required_font:g} pt' if required_font else None))
-    items.append(item('fonts-embedded', 'ok' if embedded is True else 'warn' if embedded is False else 'not-measured',
-                      'Embedded font programs' if embedded is True else 'Live fonts not embedded' if embedded is False else None))
+    font_notes = (['plot-metadata'] if font_note and ext in RASTER else []) + (['partial'] if font_note and partial else [])
+    items.append(item('min-font', font_status, font_note, f'{required_font:g} pt' if required_font else None, font_notes))
+    items.append(item('fonts-embedded', 'ok' if embedded is True else 'warn' if embedded is False else 'not-measured', None, None,
+                      ['fonts-embedded'] if embedded is True else ['fonts-not-embedded'] if embedded is False else None))
     fmt = {'.jpg': 'jpeg', '.tif': 'tiff'}.get(ext, ext[1:])
     allowed = profile['formats']['raster' if ext in RASTER else 'vector'] if profile else []
     allowed = [{'jpg': 'jpeg', 'tif': 'tiff'}.get(v.lower().lstrip('.'), v.lower().lstrip('.')) for v in allowed]
@@ -320,18 +322,19 @@ def check(args):
     # Absence is not a verified prohibition: warn rather than inventing one.
     items.append(item('format', 'ok' if fmt in allowed else 'warn' if allowed else 'not-measured', fmt.upper(), ', '.join(allowed) or None))
     ramp = rgb is not None and rainbow_ramp(rgb, np)
-    items.append(item('colour-map', 'warn' if ramp else 'not-measured',
-                      'Rainbow/jet-like hue ramp (heuristic)' if ramp else 'No hue-ramp lead in sampled pixels; palette not identified' if rgb is not None else None))
+    items.append(item('colour-map', 'warn' if ramp else 'not-measured', None, None,
+                      ['rainbow-like'] if ramp else ['no-hue-ramp'] if rgb is not None else None))
     out.parent.mkdir(parents=True, exist_ok=True)
     if rgb is not None: cvd = previews(rgb, out, sha, np, Image)
-    items.append(item('cvd', 'warn' if cvd else 'not-measured', 'Three simulated previews; inspect manually' if cvd else 'Vector rendering unavailable; check the raster companion'))
+    items.append(item('cvd', 'warn' if cvd else 'not-measured', None, None, ['cvd-previews'] if cvd else ['cvd-vector']))
     items += [item('axis-units', 'not-measured'), item('panel-labels', 'not-measured')]
     kind = args.kind
     if args.use == 'graphical-abstract' and kind in ('ai-picture', 'ai-graphical-abstract', 'image-edit'):
         kind = 'ai-graphical-abstract'
     policy = profile['aiPolicy'].get(kind, 'unknown') if profile else 'unknown'
+    where = [f'where-{w}' for w in (profile['aiDisclosure'] if profile and policy == 'disclose' else []) if w in ('caption', 'methods', 'acknowledgements', 'statement')]
     items.append(item('ai-policy', {'allowed': 'ok', 'disclose': 'warn', 'permission': 'warn', 'forbidden': 'fail', 'unknown': 'not-measured'}[policy],
-                      policy, 'Disclosure locations (depend on use): ' + ', '.join(profile['aiDisclosure']) if profile and policy == 'disclose' else None))
+                      None, None, [f'policy-{policy}'] + where))
     result = dict(schema='gaid-figure-check/v1', sha256=sha, path=relative(file), checkedAt=datetime.now(timezone.utc).isoformat(),
                   target=dict(journalId=profile['id'], width=args.width or '', widthMm=width_mm) if profile else None,
                   rulesCheckedAt=profile['rulesCheckedAt'] if profile else None, kind=kind, items=items, cvdPreviews=cvd)

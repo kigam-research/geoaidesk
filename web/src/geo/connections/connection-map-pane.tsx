@@ -108,7 +108,7 @@ function ConnectionMapContent({ projectId, focus, onClose, ...actions }: Connect
           <div className="h-20 w-56 rounded-md border border-gaid-edge bg-gaid-chrome" />
           <div className="ml-20 h-20 w-56 rounded-md border border-gaid-edge bg-gaid-chrome" />
         </div> : view === "map" ? <ReactFlow key={data.focus + depth} nodes={layout.nodes.map(n => ({ ...n, selected: n.id === selected }))} edges={layout.edges} nodeTypes={nodeTypes}
-          fitView fitViewOptions={{ padding: 0.2, minZoom: 0.35, maxZoom: 1 }} minZoom={0.2} maxZoom={1.5}
+          fitView fitViewOptions={{ padding: 0.12, minZoom: 0.75, maxZoom: 1 }} minZoom={0.3} maxZoom={1.5}
           nodesDraggable={false} nodesConnectable={false} nodesFocusable={false} edgesFocusable={false} elementsSelectable={false}
           onNodeClick={(_e, node) => select(node.id)} onNodeDoubleClick={e => e.preventDefault()}
           ariaLabelConfig={{ "node.a11yDescription.default": t("connections.keyboard.hint"), "node.a11yDescription.keyboardDisabled": t("connections.keyboard.hint"), "edge.a11yDescription.default": t("connections.keyboard.links"), "handle.ariaLabel": t("connections.keyboard.handle") }} aria-label={t("connections.view.map")}><ViewportControls /></ReactFlow> :

@@ -3,7 +3,6 @@
   "list": "Note figures",
   "inspector": "Figure detail",
   "loading": "Reading figure records.",
-  "empty": "No figures are linked in this note.",
   "error": "Could not read or save figure records. Try again.",
   "error.technical": "Technical details",
   "copyTechnical": "Copy technical details",
@@ -91,5 +90,29 @@
   "incomplete": "Some input records are missing or exceed the trace limit.",
   "truncated": "At most 200 figures are shown.",
   "reload": "Reload figure records",
-  "noChat": "Open a chat for the instructions and try again."
+  "noChat": "Open a chat for the instructions and try again.",
+  "checkNote": {
+    "artwork-unclassified": "Artwork type (photo, combination, line art) not set. Thresholds in that order",
+    "artwork-photo": "Photo threshold",
+    "artwork-combination": "Combination threshold",
+    "artwork-lineArt": "Line art threshold",
+    "vector-container": "Vector file; resolution not measured",
+    "plot-metadata": "Measured from the plot's saved information",
+    "partial": "Partly measured",
+    "fonts-embedded": "Fonts embedded",
+    "fonts-not-embedded": "Fonts not embedded",
+    "rainbow-like": "Looks like a rainbow (jet) colour map; automatic estimate",
+    "no-hue-ramp": "No rainbow colour map found; colour map name not checked",
+    "cvd-previews": "Three colour-vision previews; review them yourself",
+    "cvd-vector": "Check vector figures with a raster copy",
+    "policy-allowed": "Allowed",
+    "policy-disclose": "Allowed with disclosure",
+    "policy-forbidden": "Not allowed",
+    "policy-permission": "Needs editor permission",
+    "policy-unknown": "Not checked",
+    "where-caption": "Disclose in the caption",
+    "where-methods": "Disclose in Methods",
+    "where-acknowledgements": "Disclose in Acknowledgements",
+    "where-statement": "Disclose in the AI-use statement"
+  }
 }

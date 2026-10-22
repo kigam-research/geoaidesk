@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState, type ReactNode, type SyntheticEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/projects";
 import { rawFileUrl } from "@/lib/use-sandbox";
@@ -17,6 +17,8 @@ export interface NoteFiguresProps {
   onOpenChat?: (sessionId: string, title: string) => void;
   /** Compose only. The parent can focus the chat before forwarding this to prefillChat. */
   onPrefill?: (text: string, options: ChatPrefillOptions) => unknown;
+  /** Extra actions for the selected figure, shown next to 파일 열기 (the parent passes the connection map button). */
+  renderFigureActions?: (figure: FigureRecord) => ReactNode;
 }
 
 /** Only white-backed figures receive a light mat. This reads pixels; it never changes them (I6). */
@@ -40,7 +42,7 @@ function FigureThumbnail({ figure, projectId }: { figure: FigureRecord; projectI
   </span> : <span className="flex h-20 w-28 shrink-0 items-center justify-center bg-gaid-face-2 text-xs text-gaid-ink-2">{t(figure.exists ? "figures.previewUnavailable" : "figures.missing")}</span>;
 }
 
-export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefill = prefillChat }: NoteFiguresProps) {
+export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefill = prefillChat, renderFigureActions }: NoteFiguresProps) {
   const [data, setData] = useState<FigureListResponse | null>(null);
   const [journals, setJournals] = useState<JournalSummary[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
@@ -90,12 +92,13 @@ export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefi
   }
   const currentCheck = figure?.check;
   const mismatch = currentCheck && ((currentCheck.target?.journalId ?? null) !== (target?.journalId ?? null) || (currentCheck.target?.width ?? null) !== (target?.width ?? null) || currentCheck.kind !== figure.kind);
+  // A note without figures shows nothing here: the record is only for figures the note holds.
+  if (data && !error && data.figures.length === 0) return null;
   return <section aria-label={t("figures.title")} className="@container space-y-3 text-sm text-gaid-ink">
     <h3 className="text-lg font-semibold">{t("figures.title")}</h3>
     {error && <div role="alert" className="space-y-2"><p>{t("figures.error")}</p><Button variant="outline" onClick={() => setReload(v => v + 1)}>{t("figures.reload")}</Button><details><summary>{t("figures.error.technical")}</summary><pre className="whitespace-pre-wrap break-all text-xs">{error}</pre><Button variant="ghost" onClick={() => void navigator.clipboard.writeText(error)}>{t("figures.copyTechnical")}</Button></details></div>}
     {notice && <p role="status" className="text-gaid-ink-2">{notice}</p>}
     {!data && !error && <p role="status">{t("figures.loading")}</p>}
-    {data?.figures.length === 0 && <p className="text-gaid-ink-2">{t("figures.empty")}</p>}
     {figure && <div className="grid gap-4 @min-[960px]:grid-cols-[minmax(0,38fr)_minmax(0,62fr)]">
       <div aria-label={t("figures.list")} className="max-h-96 space-y-1 overflow-y-auto">
         {data!.figures.map(f => <button key={f.path} type="button" disabled={busy} aria-pressed={f.path === figure.path} onClick={() => { setSelected(f.path); setNotice(null); if (tab === "ai" && !kindIsAiMade(f.kind)) setTab("origin"); }} className={`flex w-full gap-3 rounded p-3 text-left hover:bg-gaid-face-2 focus-visible:outline-2 focus-visible:outline-gaid-signal ${f.path === figure.path ? "gaid-index bg-gaid-signal-tint font-medium" : ""}`}>
@@ -107,7 +110,7 @@ export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefi
         {data!.truncated && <p className="text-xs text-gaid-ink-2">{t("figures.truncated")}</p>}
       </div>
       <aside aria-label={t("figures.inspector")} className="min-w-0 space-y-4 border-t border-gaid-edge pt-4 @min-[960px]:border-t-0 @min-[960px]:pt-0">
-        <header className="flex flex-wrap items-center justify-between gap-2"><span className="font-medium">{figure.caption ?? figure.path.split("/").at(-1)}</span><Button variant="ghost" onClick={() => onOpenFile(figure.path)}>{t("figures.openFile")}</Button></header>
+        <header className="flex flex-wrap items-center justify-between gap-2"><span className="font-medium">{figure.caption ?? figure.path.split("/").at(-1)}</span><span className="flex flex-wrap items-center gap-2">{renderFigureActions?.(figure)}<Button variant="ghost" onClick={() => onOpenFile(figure.path)}>{t("figures.openFile")}</Button></span></header>
         <div role="tablist" aria-label={t("figures.inspector")} className="gaid-seg flex flex-wrap gap-2">
           {(["origin", "check", ...(kindIsAiMade(figure.kind) ? ["ai"] : [])] as const).map(key => <Button key={key} role="tab" aria-selected={tab === key} variant="ghost" className={tab === key ? "bg-gaid-signal-tint font-semibold" : ""} onClick={() => setTab(key as typeof tab)}>{t(`figures.tab.${key}`)}</Button>)}
         </div>
@@ -130,9 +133,10 @@ export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefi
             {currentCheck ? <>
               <p className="text-xs text-gaid-ink-2">{t("figures.checked", { date: currentCheck.checkedAt.slice(0, 10) })}</p>
               {mismatch && <p className="text-gaid-warning">{t("figures.checkMismatch")}</p>}
-              <table className="w-full text-left text-xs tabular-nums"><thead><tr><th className="py-2">{t("figures.checkItem")}</th><th>{t("figures.measured")}</th><th>{t("figures.required")}</th><th>{t("figures.result")}</th></tr></thead><tbody>{currentCheck.items.map(item => <tr key={item.id} className="border-t border-gaid-edge"><td className="py-2">{t(`figures.item.${item.id}`)}</td><td>{item.measured ?? t("figures.notMeasured")}</td><td>{item.required ?? t("figures.unknown")}</td><td className={item.status === "fail" ? "text-gaid-danger" : "text-gaid-ink-2"}>{t(`figures.status.${item.status}`)}</td></tr>)}</tbody></table>
+              <table className="w-full text-left text-xs tabular-nums"><thead><tr><th className="py-2">{t("figures.checkItem")}</th><th>{t("figures.measured")}</th><th>{t("figures.required")}</th><th>{t("figures.result")}</th></tr></thead><tbody>{currentCheck.items.map(item => <tr key={item.id} className="border-t border-gaid-edge"><td className="py-2 pr-2 align-top">{t(`figures.item.${item.id}`)}</td><td className="py-2 pr-2 align-top">{item.measured ?? (item.notes?.length ? null : t("figures.notMeasured"))}{item.notes?.map(note => <span key={note} className="block text-gaid-ink-2">{t(`figures.checkNote.${note}`)}</span>)}</td><td className="py-2 pr-2 align-top">{item.required ?? t("figures.unknown")}</td><td className={`whitespace-nowrap py-2 align-top ${item.status === "fail" ? "text-gaid-danger" : "text-gaid-ink-2"}`}>{t(`figures.status.${item.status}`)}</td></tr>)}</tbody></table>
               {!!currentCheck.cvdPreviews.length && <details><summary>{t("figures.cvdPreviews")}</summary><div className="mt-2 space-y-3">{currentCheck.cvdPreviews.map((p, i) => {
                 const variant = /-cvd-(deuteranopia|protanopia|tritanopia)\.png$/.exec(p)?.[1];
+                // eslint-disable-next-line @next/next/no-img-element -- authenticated API image, not a static asset
                 return variant ? <img key={p} src={checkPreviewUrl(projectId, currentCheck.sha256, variant)} alt={t("figures.cvdPreview", { number: i + 1 })} className="max-w-full" /> : null;
               })}</div></details>}
               {!!currentCheck.advice?.length && <details><summary>{t("figures.advice.limit")}</summary><ul>{currentCheck.advice.map((a, i) => <li key={i}>{a}</li>)}</ul></details>}

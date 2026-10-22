@@ -11,7 +11,7 @@
     "button": "연결 다시 읽기"
   },
   "centre": {
-    "button": "이 항목 중심으로 보기"
+    "button": "선택한 항목 중심으로 보기"
   },
   "focus": "중심",
   "depth": {
@@ -36,7 +36,7 @@
     "cites": "인용함",
     "wrote": "씀",
     "contains": "그림을 담음",
-    "drew": "그림",
+    "drew": "그림을 그림",
     "used": "자료로 씀",
     "started-from": "시작함",
     "made-from": "방법을 가져옴"

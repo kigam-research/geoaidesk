@@ -18,7 +18,7 @@ it("selects without navigation, opens explicitly, recentres and changes depth fr
   expect(onOpenPaper).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "논문 열기" }));
   expect(onOpenPaper).toHaveBeenCalledWith("p");
-  fireEvent.click(screen.getByRole("button", { name: "이 항목 중심으로 보기" }));
+  fireEvent.click(screen.getByRole("button", { name: "선택한 항목 중심으로 보기" }));
   await waitFor(() => expect(fetchConnections).toHaveBeenLastCalledWith("project-a", "paper:p", 1, expect.any(AbortSignal)));
   fireEvent.click(screen.getByRole("button", { name: "2단계" }));
   await waitFor(() => expect(fetchConnections).toHaveBeenLastCalledWith("project-a", "paper:p", 2, expect.any(AbortSignal)));

@@ -56,7 +56,7 @@ describe("research-note figure records", () => {
     expect(plot).toMatchObject({ caption: "그림 1. 자료 그림", kind: "data-figure", staleness: "current", inputsChanged: false, origin: { copiedFrom: "out.png", copyMatch: "edge", sessionId: "chat-a", script: "draw.py" } });
     expect(plot.origin?.inputs).toEqual(expect.arrayContaining([expect.objectContaining({ path: "data.csv", role: "data", changedSinceUse: false }), expect.objectContaining({ path: "draw.py", role: "script" })]));
     expect(ai).toMatchObject({ kind: "ai-picture", origin: { record: { model: "image-provider/image-model" } } });
-    expect(ai.disclosure).toContain("generate_image");
+    expect(ai.disclosure).toContain("generated with an AI image tool");
     expect(unknown).toMatchObject({ kind: "unknown", staleness: "unknown", origin: null, disclosure: null });
     write("hash-copy.png", "plot");
     expect(figureRecord(project, "hash-copy.png", null, null, skillDir)).toMatchObject({ kind: "data-figure", origin: { copyMatch: "hash", copiedFrom: "out.png", script: "draw.py" } });
@@ -85,7 +85,7 @@ describe("research-note figure records", () => {
     expect(target.statusCode).toBe(200);
     const changed = await app.inject({ method: "PUT", url: "/geo/figures/kind", payload: { path: ai.path, sha256: ai.sha256, kind: "ai-graphical-abstract" } });
     expect(changed.json().figure).toMatchObject({ kind: "ai-graphical-abstract", kindSource: "researcher", policy: { policy: "forbidden" } });
-    expect(changed.json().figure.disclosure).toContain("purpose: 그림 2. 개념 그림");
+    expect(changed.json().figure.disclosure).toContain("to illustrate: 그림 2. 개념 그림");
     expect((await app.inject({ method: "PUT", url: "/geo/figures/kind", payload: { path: ai.path, sha256: ai.sha256, kind: null } })).json().figure.kind).toBe("ai-picture");
     write(ai.path, "new picture");
     expect((await app.inject({ method: "PUT", url: "/geo/figures/kind", payload: { path: ai.path, sha256: ai.sha256, kind: "unknown" } })).statusCode).toBe(409);

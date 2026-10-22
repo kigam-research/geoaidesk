@@ -150,7 +150,7 @@ export function figureRecord(paths: ProjectPaths, requested: string, caption: st
     seen.add(next); source = next; copyMatch ??= "edge";
     step = Object.values(lineage.steps).find(s => s.id === lineage.nodes.find(n => n.path === source)?.stepId)!;
   }
-  const inputs: FigureInput[] = lineage.nodes.filter(n => n.path !== relative && (copyMatch === "edge" || n.path !== source)).flatMap(n => {
+  const inputs: FigureInput[] = lineage.nodes.filter(n => n.path !== relative && n.path !== source).flatMap(n => {
     try { const abs = safePath(n.path, paths.sandbox); if (!isUserVisible(abs, paths.sandbox)) return []; } catch { return []; }
     const edges = lineage.edges.filter(e => e.from === n.path);
     return [{ path: n.path, role: roleOf(n.path), confidence: edges.every(e => e.confidence === "observed") ? "observed" as const : "inferred" as const, changedSinceUse: n.changedSinceUse ?? null, exists: n.current !== null }];
@@ -168,8 +168,20 @@ export function figureRecord(paths: ProjectPaths, requested: string, caption: st
     path: relative, caption, noteId, exists: provenance.exists, sha256: sha, kind, kindSource: override ? "researcher" : "derived",
     staleness: provenance.staleness, inputsChanged: inputs.some(i => i.changedSinceUse === true), origin,
     check: readFigureCheck(paths, sha), policy: target ? { journalId: target.journalId, policy: kind === "unknown" ? "unknown" : journal?.aiPolicy[kind] ?? "unknown", sourceUrl: journal?.sources[0]?.url ?? null } : null,
-    disclosure: kindIsAiMade(kind) && step ? `AI image tool: ${step.toolName}; model: ${step.model ?? "not recorded"}; date: ${new Date(step.timestamp).toISOString().slice(0, 10)}; purpose: ${caption ?? path.basename(relative)}. Researcher review is required before submission.` : null,
+    disclosure: kindIsAiMade(kind) && step ? disclosureDraft(kind, step, caption ?? path.basename(relative)) : null,
   };
+}
+
+/**
+ * Caption/AI-statement draft in English (the language most journals ask for), from the recorded step only.
+ * The researcher edits it; the record pane says it is a draft (figures.disclosure.limit).
+ */
+function disclosureDraft(kind: FigureKind, step: ProvenanceStep, purpose: string): string {
+  const what = kind === "image-edit" ? "was edited with an AI image tool" : "was generated with an AI image tool";
+  const model = step.model ? ` (model: ${step.model})` : " (model not recorded)";
+  const date = new Date(step.timestamp).toISOString().slice(0, 10);
+  const note = kind === "image-edit" ? "" : " It is not derived from research data.";
+  return `This figure ${what}${model} on ${date} to illustrate: ${purpose}.${note}`;
 }
 
 export function setFigureKind(paths: ProjectPaths, requested: unknown, sha: unknown, kind: unknown, skillDir = SKILL_DIR): FigureRecord {

@@ -13,9 +13,10 @@ export function edgeLabel(kind: ConnectionEdgeKind): string { return t("connecti
 /** Deterministic LR layout, never mutates the server response. */
 export function layoutConnections(map: ConnectionMapResponse, select: (id: string) => void): { nodes: ConnectionFlowNode[]; edges: Edge[] } {
   const graph = new dagre.graphlib.Graph({ multigraph: true }).setDefaultEdgeLabel(() => ({}));
-  graph.setGraph({ rankdir: "LR", ranksep: 112, nodesep: 44, marginx: 32, marginy: 32 });
+  graph.setGraph({ rankdir: "LR", ranksep: 140, nodesep: 48, marginx: 32, marginy: 32 });
   for (const item of map.nodes) graph.setNode(item.id, { ...CONNECTION_CARD });
-  map.edges.forEach((edge, i) => graph.setEdge(edge.from, edge.to, {}, String(i)));
+  // Reserve room for each label so dagre spreads parallel edges instead of stacking their labels.
+  map.edges.forEach((edge, i) => graph.setEdge(edge.from, edge.to, { width: 96, height: 24, labelpos: "c" }, String(i)));
   dagre.layout(graph);
   const nodes: ConnectionFlowNode[] = map.nodes.map(item => {
     const p = graph.node(item.id);
@@ -28,7 +29,8 @@ export function layoutConnections(map: ConnectionMapResponse, select: (id: strin
     };
   });
   const edges: Edge[] = map.edges.map((e, i) => ({
-    id: "connection-" + i, source: e.from, target: e.to, type: "smoothstep",
+    // Bezier edges: smoothstep edges from one card share a vertical run, which put their labels on top of each other.
+    id: "connection-" + i, source: e.from, target: e.to, type: "default",
     label: edgeLabel(e.kind),
     ariaLabel: t(e.confidence === "inferred" ? "connections.relationInferred" : "connections.relation", {
       from: map.nodes.find(n => n.id === e.from)?.title ?? "",

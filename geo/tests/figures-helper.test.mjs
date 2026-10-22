@@ -72,7 +72,9 @@ test('90 mm / 300 dpi jet PNG: physical DPI, plot-font metadata, advisory hue ra
   assert.equal(line(r, 'dpi').status, 'ok');
   assert.match(line(r, 'dpi').measured, /300\.0|299\.7/);
   assert.equal(line(r, 'min-font').status, 'ok');
-  assert.match(line(r, 'min-font').measured, /metadata; not OCR/);
+  assert.match(line(r, 'min-font').measured, /pt$/);
+  assert.deepEqual(line(r, 'min-font').notes, ['plot-metadata']);
+  assert.deepEqual(line(r, 'colour-map').notes, ['rainbow-like']);
   assert.equal(line(r, 'colour-map').status, 'warn');
   assert.equal(line(r, 'format').status, 'warn'); // PNG is not in this submission-format snapshot; confirm the exact journal.
   assert.equal(r.cvdPreviews.length, 3);

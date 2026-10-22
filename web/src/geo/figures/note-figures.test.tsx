@@ -83,7 +83,8 @@ it("shows empty/error states and does not reuse a note after project switch", as
   const view = panel(); await screen.findByText("스크립트");
   vi.mocked(apiFetch).mockImplementation(async () => json({ figures: [], target: null, truncated: false, journals: [] }));
   view.rerender(<NoteFigures projectId="project-b" noteId="new" onOpenFile={vi.fn()} />);
-  expect(await screen.findByText("노트에 연결된 그림이 없습니다.")).toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole("region", { name: "그림 기록" })).not.toBeInTheDocument());
+  expect(screen.queryByText("스크립트")).not.toBeInTheDocument();
   vi.mocked(apiFetch).mockImplementation(async () => json({ detail: "technical failure" }, 503));
   view.rerender(<NoteFigures projectId="project-c" noteId="new" onOpenFile={vi.fn()} />);
   expect(await screen.findByRole("alert")).toHaveTextContent("그림 기록을 읽거나 저장하지 못했습니다.");
