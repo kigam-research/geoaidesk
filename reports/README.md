@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-promo-video/figures/01-motion.png" width="120"> | 2026-10-23 01:11 | [GAID 90초 홍보 영상 (내부 검토용)](2026-10-23-gaid-promo-video/index.md) | 모션그래픽과 실제 GAID 화면을 섞은 90초 무음 영상을 만들었습니다. 서재, shp 지도 뷰어, GAID 허브를 실제 화면으로 보여 주고, 차트의 수치는 모두 실제 기록에서 가져왔습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-hub-feeds/figures/01-feeds.png" width="120"> | 2026-10-22 | [GAID 허브 자료 소식: 관리자가 승인한 출처의 논문·도구·스킬 소식](2026-10-22-gaid-hub-feeds/index.md) | 기관 허브 서버가 관리자가 승인한 출처 18곳을 6시간마다 읽고, 연구자는 GAID 허브의 "자료 소식"에서 원문 제목과 피드 요약을 봅니다. 기관 허브 서버를 이번 변경으로 갱신하고 출처를 승인하는 일이 남았습니다. | 검토 전 | 미정 | 1 |
 | <img src="2026-10-22-gaid-first-use-fixes/figures/01-table-before-after.png" width="120"> | 2026-10-22 22:13 | [처음 쓰는 연구자가 막힌 화면 문제 8건 수정](2026-10-22-gaid-first-use-fixes/index.md) | 수용 시험에서 처음 쓰는 연구자가 막힌 화면 문제 8건의 원인을 찾아 고쳤고, 7건은 실제 앱 화면에서, 같은 이름 모델 1건은 시험 앱의 모델 목록을 넣은 자동 시험으로 확인했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-user-acceptance/figures/01-page-citations.png" width="120"> | 2026-10-22 19:17 | [GAID를 처음 쓰는 연구자 역할의 수용 시험](2026-10-22-gaid-user-acceptance/index.md) | 서재 쪽 인용, 저널 그림, ChatGPT 로그인·개인 API 키 경로는 통과했고, Zotero 웹 서재 시험은 저장된 웹 키를 Zotero가 거부해 막혔습니다. | 검토함 10-22 | 채택 | 1 |
