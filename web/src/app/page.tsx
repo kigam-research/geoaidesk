@@ -299,6 +299,8 @@ export default function HomePage() {
           authoringId={hub.projectId}
           entryId={hub.entryId ?? null}
           catalogueId={hub.catalogueId ?? null}
+          skills={hub.skills}
+          skillId={hub.skillId}
           onNavigate={(next) => setHub(next)}
           onOpenProjects={() => {
             setHub({ open: false, projectId: null });

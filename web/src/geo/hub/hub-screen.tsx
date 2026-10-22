@@ -50,12 +50,18 @@ import { CatalogueWorkflowScreen } from "./catalogue-workflow";
 import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
+import { SkillShelf } from "@/geo/hub-skills/shelf";
+import { SkillDetail } from "@/geo/hub-skills/detail";
+import { RegisterSkill } from "@/geo/hub-skills/register";
+
 const text = geoText("hub");
 
 export function GaidHub({
   authoringId,
   entryId = null,
   catalogueId = null,
+  skills = false,
+  skillId = null,
   onNavigate,
   onOpenProjects,
   onOpenProject,
@@ -65,6 +71,8 @@ export function GaidHub({
   entryId?: string | null;
   /** A built-in (catalogue) Workflow to show. */
   catalogueId?: string | null;
+  skills?: boolean;
+  skillId?: string | null;
   onNavigate: (next: HubLocation) => void;
   onOpenProjects: () => void;
   onOpenProject: (projectId: string) => void;
@@ -81,25 +89,29 @@ export function GaidHub({
       }),
     [],
   );
-  const { projects, setActive } = useProjects();
+  const { projects, setActive, create } = useProjects();
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
-  const listShown = !entryId && !catalogueId && authoringId === null;
+  const [registerSkill, setRegisterSkill] = useState(false);
+  const skillPlace = skills || !!skillId;
+  const listShown = !skillPlace && !entryId && !catalogueId && authoringId === null;
   const index = useHubIndex(listShown);
   // The list the hub shows; on a detail screen, the list it was opened from (a registered Workflow opened by a link
   // belongs to 등록된 Workflow).
-  const [view, setView] = useState<HubView>(() => (entryId ? { kind: "registry", folder: "all" } : { kind: "home" }));
+  const [view, setView] = useState<HubView>(() => (skillPlace ? { kind: "skills" } : entryId ? { kind: "registry", folder: "all" } : { kind: "home" }));
   const [mineFolder, setMineFolder] = useState("all");
   const [newFolder, setNewFolder] = useState(false);
   const named = useNamedAction();
   const [collapsed, toggleCollapsed] = useHubSidebarCollapsed();
   useShortcut("sidebar", toggleCollapsed);
   // A Workflow being made is one of mine; built-in Workflows are shown under 추천.
-  const marked: HubView = authoringId !== null ? { kind: "mine" } : catalogueId ? { kind: "home" } : view;
+  const marked: HubView = skillPlace ? { kind: "skills" } : authoringId !== null ? { kind: "mine" } : catalogueId ? { kind: "home" } : view;
   const openList = (next: HubView) => {
+    setRegisterSkill(false);
     setView(next);
+    if (next.kind === "skills") { onNavigate({ open: true, projectId: null, skills: true }); return; }
     if (!listShown) onNavigate({ open: true, projectId: null });
   };
-  const toList = () => onNavigate({ open: true, projectId: null });
+  const toList = () => onNavigate({ open: true, projectId: null, ...(view.kind === "skills" ? { skills: true } : {}) });
   return (
     <HubShell
       onNavigate={(place) => place === "projects" && onOpenProjects()}
@@ -120,7 +132,11 @@ export function GaidHub({
           onNewFolder={() => named.run(() => setNewFolder(true))}
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {entryId ? (
+          {skillPlace ? (
+            skillId ? <SkillDetail key={skillId} id={skillId} projects={hubProjects} onCreateProject={(name) => create({ name })} onBack={() => onNavigate({ open: true, projectId: null, skills: true })} onWorkflow={(entryId) => onNavigate({ open: true, projectId: null, entryId })} />
+            : registerSkill ? <RegisterSkill projects={hubProjects} folders={index.folders} onBack={() => setRegisterSkill(false)} onRegistered={(skill) => { setRegisterSkill(false); onNavigate({ open: true, projectId: null, skillId: skill.id }); }} />
+            : <SkillShelf folders={index.folders} onOpen={(skillId) => onNavigate({ open: true, projectId: null, skillId })} onRegister={() => named.run(() => setRegisterSkill(true))} />
+          ) : entryId ? (
             <SharedEntryScreen
               key={entryId}
               entryId={entryId}
@@ -139,7 +155,7 @@ export function GaidHub({
           ) : authoringId === null ? (
             <HubList
               index={index}
-              view={view}
+              view={view.kind === "skills" ? { kind: "home" } : view}
               onView={setView}
               mineFolder={mineFolder}
               onMineFolder={setMineFolder}

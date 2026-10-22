@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:03:30Z
+updated: 2026-10-22T06:14:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188","pid":177398,"provider":"codex","session":"01a16234-e5b9-72e1-ad05-708c154db748","start":"53693527","token":"b43fd525741ba4dfc4306e8a53ecc93b452a07e41bd222c5e954043676b60fc0"}
 branch: task/gaid-hub-skills--ui
 target: task/gaid-hub-skills
@@ -56,11 +56,21 @@ your own. Checks before finish: `cd web && npx tsc --noEmit && npx vitest run sr
 the two node checks above. Finish with `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented the shelf, read-only detail/file views, per-revision reviews, three-source registration, reusable pinned install gate, and hub/Settings seams. TypeScript, 32 focused UI tests and 16 existing hub regressions pass (48 tests total); scoped ESLint passes. UI and copy validators have zero errors and no baseline changes. The 3 new copy warnings flag factual automatic-check/name-not-verified wording; wording is required by the contract and is retained.
+
+Captured 32 Korean screenshots (4 screens × 2 styles × 2 themes × 2 viewport sizes) with intercepted contract fixtures. All have no horizontal overflow; inspected first-action visibility, layout, type, contrast, disclosures and states. Four small representative images are in the parent report figures folder. Full captures, hashes and fixture/capture scripts are under /home/seongin3/data/geoaidesk/work/gaid-hub-skills--ui/; visual-evidence.json records the capture matrix. Real-store verification is not yet done. Codegraph has no index for this exact worktree; bounded native source reads were used.
 ## Next steps
-1. (the next session's first action)
+1. After the parent integrates store and sends a notice, run task sync and inspect the integrated API before running the real-server check.
+2. Check registration, exact-revision installation, file reads and review with a dedicated GAID_HOME/KADY_PROJECTS_ROOT, rerun declared focused checks, then task finish.
+3. Stop the transient frontend service gaid-hub-skills-ui-web.service and close playwright-cli session hubskills before finish. The service uses :3117, API :8117, with logs under the external task data directory.
 ## Failed approaches
+- Initial npx tsc ran before npm dependencies existed. Installed the locked web dependencies with npm ci, then TypeScript passed. No source workaround or dependency edits.
+- Initial Next browser build caught a type import before the existing use-client directive; moved the import below the directive and browser build succeeded.
+- Browser fixture Settings startup initially lacked the unrelated local-model response; corrected only the external mock fixture, not product code.
 ## Notes and decisions
+Implementation order: shared API/presentation primitives → reusable install gate → shelf/detail/register → hub and Settings seams → tests/visual QA → real-store integration. All UI files have one writer (this unit); server/store and Workflow readiness remain sibling/parent-owned. No independent writer packages exist within this tightly coupled UI child.
+Parent approved additional narrow seams in app/page.tsx, lib/capabilities.ts, locales/index.ts and skills-panel.test.tsx. Parent requested a reusable HubSkillInstall for its readiness screen.
+The precisely specified extension inherits UI guide v2; no new visual-world or taste decision is needed. Impeccable context and craft floor were read. design-taste-frontend explicitly excludes multi-step product UI; its landing-page rules are not applied.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
@@ -68,9 +78,148 @@ the two node checks above. Finish with `task finish`.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-22-gaid-hub-skills/index.md
+No separate child report. Parent owns the canonical report; the following is its implementation handoff.
+
+### UI handoff for parent report
+
+Implemented: #hub/skills and #hub/s/<id>; the Skills sidebar group follows all Workflow groups. Detail reads SKILL.md as Markdown, lists/reads text files, separates origin/licence/findings/revision/review records and links pinned consuming Workflows. Review names say 이름 확인 안 됨; checked is unavailable to the revision registrant. Stars/comments reuse shared display names. Installation is project selection (including existing NewProject creation), exact-revision preview, optional instruction/text-file inspection and explicit acknowledgement. Settings rows show installed revision, edited content, suspended state and a newer-revision action. Generic upstream update/check actions are hidden for hub rows.
+
+Registration: project skill / hub Workflow revision / external source. External multi-skill sources are previewed again with a chosen name. The preview shows licence, author-only visibility when restricted/unknown, grouped places to read, files, next revision, taken name, same-tree and blocked states. Metadata is entered only after a registerable preview; treeHash is sent on registration. No Workflow detail extra action was added: that optional entry point was skipped to preserve its existing three-action header.
+
+Reusable export: web/src/geo/hub-skills/install.tsx HubSkillInstall({ skillId, revision, projectId, onInstalled? }). The gate resets consent immediately on project/id/revision change and blocks edited/conflict/suspended. No display-name gate: parent confirmed preview/install allow anonymous access to hub-visible revisions, with the known name header sent for author-only visibility.
+
+UI guide rules followed: P2 P3 P4 P5 P7 P9; I3 I5 I7–I15; L1 L3–L9; T1; S1–S5; B1–B6; N2 N5 N6; D2; Q1 Q4–Q6; G1 G3 G4 G6; F2 F4–F7; A1–A3 A5 A6; W1–W6; R1–R4; V1–V9. No new rule exception or baseline entry. Existing Settings frame/row styling is preserved outside the narrow seam. Impeccable detect returned [] for changed targets. Registration uses the established StepScale; no new visual-world decision was introduced.
+
+Figures (synthetic UI fixtures, not research results): figures/skills-shelf-instrument-light.png, figures/skills-detail-mapsheet-dark.png, figures/skills-register-instrument-light.png, figures/skills-settings-instrument-light.png. Each is ≤1440 px wide. The full matrix is external; hashes in visual-evidence.json. The report prose below was reviewed in humanizer file mode with its Korean reference; status/data/locale strings were preserved.
+
+Report-ready prose:
+
+허브 왼쪽 목록의 Workflow 묶음 아래에 스킬 묶음을 추가했습니다. 스킬은 검색하거나 주제 폴더로 좁혀 찾습니다. 상세에서는 지침과 파일을 읽고, 출처와 이용 조건, 자동 검사가 짚은 볼 곳, 각 판의 검토 기록을 확인합니다. 검토자 표시 이름에는 “이름 확인 안 됨”을 함께 표시합니다.
+
+스킬은 프로젝트, 등록된 Workflow 또는 GitHub 등에서 올립니다. 등록 전에 파일과 이용 조건을 확인하며, 공유 가능한 조건을 확인하지 못한 판은 올린 사람에게만 보입니다. 이미 있는 이름은 다음 판으로 올릴지, 이름이 다른 사람의 것인지 구분해 표시합니다.
+
+프로젝트에 설치할 때는 판을 지정하고 미리보기와 동의를 거칩니다. 새 판은 자동으로 적용하지 않습니다. 설정에는 설치한 판, 새 판, 프로젝트에서 고친 상태와 사용 중지를 표시합니다. 프로젝트에서 고친 파일이나 같은 이름의 다른 스킬은 덮어쓰지 않습니다.
+
+### String changes (new ids; previous ko/en value: absent)
+
+| New id | Korean | English |
+|---|---|---|
+| hubSkills.title | 허브 스킬 | Hub skills |
+| hubSkills.nav | 스킬 | Skills |
+| hubSkills.all | 전체 스킬 | All skills |
+| hubSkills.search | 허브 스킬 검색 | Search hub skills |
+| hubSkills.folder | 주제 폴더 | Topic folder |
+| hubSkills.allFolders | 전체 폴더 | All folders |
+| hubSkills.sort | 정렬 | Sort |
+| hubSkills.recent | 최근 수정순 | Recently updated |
+| hubSkills.popular | 별표 많은 순 | Most starred |
+| hubSkills.register | 스킬 올리기 | Register skill |
+| hubSkills.back | 스킬 목록 보기 | View skill shelf |
+| hubSkills.cancel | 취소 | Cancel |
+| hubSkills.retry | 다시 읽기 | Read again |
+| hubSkills.loading | 스킬을 읽는 중입니다. | Reading skills. |
+| hubSkills.empty | 조건에 맞는 스킬이 없습니다. 검색어나 폴더를 바꾸세요. | No skills match. Change the search term or folder. |
+| hubSkills.count | 스킬 {count}개 | {count} skills |
+| hubSkills.revision | {revision}판 | Revision {revision} |
+| hubSkills.state.unreviewed | 검토 전 | Unreviewed |
+| hubSkills.state.checked | 확인함 | Checked |
+| hubSkills.state.deprecated | 더 쓰지 않음 | Deprecated |
+| hubSkills.state.suspended | 사용 중지 | Suspended |
+| hubSkills.error | 내용을 읽거나 저장하지 못했습니다. 다시 시도하세요. | Could not read or save the content. Try again. |
+| hubSkills.installed | {name} {revision}판을 설치했습니다. | Installed {name} revision {revision}. |
+| hubSkills.install | 프로젝트에 설치 | Install in project |
+| hubSkills.project | 설치할 프로젝트 | Project to install in |
+| hubSkills.chooseProject | 프로젝트 선택 | Select project |
+| hubSkills.preview | 설치 내용 미리보기 | Installation preview |
+| hubSkills.consent | 지침과 파일을 읽었으며 프로젝트에 설치하는 데 동의합니다. | I have read the instructions and files and agree to install them in the project. |
+| hubSkills.code | 실행 코드: {code, select, yes {있음} other {없음}} | Executable code: {code, select, yes {present} other {none}} |
+| hubSkills.runNotice | 설치 후 AI agent가 지침에 따라 파일과 코드를 사용할 수 있습니다. | After installation the AI agent can use the files and code according to the instructions. |
+| hubSkills.installState.installed | 같은 판이 이미 설치되어 있습니다. 파일을 바꾸지 않습니다. | The same revision is already installed. No files will change. |
+| hubSkills.installState.missing | 프로젝트에 스킬을 새로 설치합니다. | Installs a new skill in the project. |
+| hubSkills.installState.other-revision | 프로젝트의 기존 판을 선택한 판으로 바꿉니다. | Replaces the project’s existing revision with the selected revision. |
+| hubSkills.installState.edited | 프로젝트에서 고친 스킬은 덮어쓰지 않습니다. 고친 내용을 따로 보관한 뒤 다시 시도하세요. | Edited project skills are not overwritten. Keep your changes separately and try again. |
+| hubSkills.installState.conflict | 같은 이름의 다른 스킬이 있습니다. 프로젝트의 스킬 이름을 바꾼 뒤 다시 시도하세요. | Another skill has the same name. Rename the project skill and try again. |
+| hubSkills.installState.suspended | 사용 중지된 판은 설치할 수 없습니다. 다른 판을 확인하세요. | Suspended revisions cannot be installed. Check another revision. |
+| hubSkills.instructions | 지침 | Instructions |
+| hubSkills.files | 파일 {count}개 | {count} files |
+| hubSkills.file | 파일 내용 | File content |
+| hubSkills.sourceTitle | 출처와 이용 조건 | Origin and licence |
+| hubSkills.origin.own | 직접 작성 | Written by researcher |
+| hubSkills.origin.workflow | Workflow에서 꺼냄: {title} {revision}판 | Taken from Workflow: {title}, revision {revision} |
+| hubSkills.origin.github | 외부에서 가져옴: {source} | Fetched from external source: {source} |
+| hubSkills.sourceRecord | 출처 기록 보기 | View origin record |
+| hubSkills.ref | 가져온 기준 | Requested ref |
+| hubSkills.commit | 가져온 버전 기록 | Resolved commit |
+| hubSkills.fetched | 가져온 날짜 | Fetched date |
+| hubSkills.licence.institute | 기관 내부 작성 | Written within the institute |
+| hubSkills.licence.declared | 명시된 라이선스: {name} | Declared licence: {name} |
+| hubSkills.licence.restricted | 재배포 제한 문구 있음 | Redistribution restrictions found |
+| hubSkills.licence.unknown | 라이선스 확인 안 됨 | Licence not identified |
+| hubSkills.authorOnly | 다른 연구자에게 공유할 수 있는 이용 조건을 확인하지 못해 올린 사람에게만 보입니다. | Only the registrant can see this because shareable licence terms have not been identified. |
+| hubSkills.findings | 볼 곳 | Places to read |
+| hubSkills.findingsNone | 자동 검사에서 짚은 곳이 없습니다. 사람의 검토를 대신하지 않습니다. | No places were flagged automatically. This does not replace a person’s review. |
+| hubSkills.findingsHint | 자동 검사가 짚은 문구입니다. 파일의 앞뒤 내용을 함께 읽으세요. | Automatically flagged text. Read it in the surrounding file context. |
+| hubSkills.finding.format | 지침 형식 | Instruction format |
+| hubSkills.finding.hidden-text | 숨은 문구 | Hidden text |
+| hubSkills.finding.network | 외부 접속 | Network access |
+| hubSkills.finding.shell | 명령 실행 | Command execution |
+| hubSkills.finding.package-install | 프로그램 설치 | Package installation |
+| hubSkills.finding.credentials | 인증 정보 경로 | Credential paths |
+| hubSkills.finding.outside-write | 작업 폴더 밖에 쓰기 | Writes outside the working folder |
+| hubSkills.line | {file} {line}행 | {file}, line {line} |
+| hubSkills.history | 판 기록과 검토 | Revisions and reviews |
+| hubSkills.unverified | 이름 확인 안 됨 | Name not verified |
+| hubSkills.review | 검토 기록 남기기 | Record review |
+| hubSkills.note | 살펴본 내용 또는 바뀐 점 | What was read or changed |
+| hubSkills.replacement | 대신 쓸 스킬 (선택) | Replacement skill (optional) |
+| hubSkills.saveReview | 검토 기록 저장 | Save review |
+| hubSkills.reviewSaved | 검토 기록을 저장했습니다. | Review recorded. |
+| hubSkills.usedBy | 쓰는 Workflow | Used by Workflows |
+| hubSkills.unused | 등록된 Workflow에서 아직 쓰지 않습니다. | No registered Workflow uses this yet. |
+| hubSkills.star | 별표 {count}개 | {count} stars |
+| hubSkills.starAction | 별표 표시 바꾸기 | Toggle star |
+| hubSkills.comments | 댓글 | Comments |
+| hubSkills.comment | 댓글 내용 | Comment text |
+| hubSkills.postComment | 댓글 올리기 | Post comment |
+| hubSkills.noComments | 댓글이 없습니다. | No comments yet. |
+| hubSkills.steps.source | 가져올 곳 | Source |
+| hubSkills.steps.select | 스킬 선택 | Select skill |
+| hubSkills.steps.preview | 내용 확인 | Preview |
+| hubSkills.steps.register | 등록 내용 | Registration |
+| hubSkills.stepsLabel | 스킬 등록 단계 | Skill registration steps |
+| hubSkills.previous | 이전 단계 | Previous step |
+| hubSkills.next | 다음 단계 | Next step |
+| hubSkills.source.project | 내 프로젝트의 스킬 | Skill from my project |
+| hubSkills.source.workflow | 허브 Workflow에서 꺼내기 | Take from a hub Workflow |
+| hubSkills.source.source | GitHub 등에서 | From GitHub or similar |
+| hubSkills.recommended | 권장 | Recommended |
+| hubSkills.projectReason | 프로젝트에서 쓰던 파일을 그대로 확인합니다. | Inspect the exact files used in your project. |
+| hubSkills.sourceInput | GitHub 저장소 또는 Git URL | GitHub repository or Git URL |
+| hubSkills.skillName | 스킬 이름 | Skill name |
+| hubSkills.workflow | 허브 Workflow | Hub Workflow |
+| hubSkills.previewAction | 가져올 내용 확인 | Preview source content |
+| hubSkills.registerPreview | 올릴 내용 미리보기 | Registration preview |
+| hubSkills.nextRevision | 같은 이름이 있어 {revision}판으로 올립니다. | This name exists; adds revision {revision}. |
+| hubSkills.taken | 다른 사람이 올린 이름입니다. 프로젝트에서 이름을 바꾼 뒤 올리세요. | Another registrant owns this name. Rename it in your project before registering. |
+| hubSkills.sameTree | 최신 판과 내용이 같아 새 판으로 올릴 수 없습니다. | The content matches the latest revision, so a new revision cannot be registered. |
+| hubSkills.blocked | 올릴 수 없는 내용입니다. 원본 지침과 이름을 확인하세요. | This content cannot be registered. Check the source instructions and name. |
+| hubSkills.tags | 태그 (쉼표로 구분, 선택) | Tags (comma-separated, optional) |
+| hubSkills.formats | 파일 형식 (쉼표로 구분, 선택) | File formats (comma-separated, optional) |
+| hubSkills.registerNote | 올리는 이유나 바뀐 점을 한 줄로 적으세요. | Describe why you are registering or what changed in one line. |
+| hubSkills.noSourceSkills | 올릴 수 있는 스킬이 없습니다. 다른 곳을 선택하세요. | No skills are available here. Choose another source. |
+| hubSkills.registered | 스킬을 올렸습니다. | Skill registered. |
+| hubSkills.settingsSource | GAID 허브에서 | From GAID hub |
+| hubSkills.githubSource | GitHub 등에서 | From GitHub or similar |
+| hubSkills.installedRevision | 허브 스킬 · {revision}판 | Hub skill · revision {revision} |
+| hubSkills.edited | 고친 내용 있음 | Locally edited |
+| hubSkills.newRevision | 새 판: {revision}판 | New revision: {revision} |
+| hubSkills.update | {revision}판으로 바꾸기 | Switch to revision {revision} |
+| hubSkills.suspended | 사용 중지된 판입니다. 새 설치와 Workflow 사용이 막힙니다. | This revision is suspended. New installs and Workflow use are blocked. |
+| hubSkills.settingsBack | 설치한 스킬 보기 | View installed skills |
+| hubSkills.projectOnly | 허브 스킬은 프로젝트에 설치합니다. 적용 범위를 프로젝트로 바꾸세요. | Hub skills install into a project. Change the scope to project. |
+| hubSkills.unchanged | {name} {revision}판이 이미 설치되어 있어 파일을 바꾸지 않았습니다. | {name} revision {revision} is already installed. No files were changed. |
+
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

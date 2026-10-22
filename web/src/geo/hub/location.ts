@@ -6,6 +6,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 export interface HubLocation {
+  skills?: boolean;
+  skillId?: string | null;
   open: boolean;
   projectId: string | null;
   /** A registered hub entry to show. */
@@ -15,6 +17,9 @@ export interface HubLocation {
 }
 
 export function parseHubHash(hash: string): HubLocation {
+  if (hash === "#hub/skills") return { open: true, projectId: null, skills: true };
+  const skill = /^#hub\/s\/([a-z0-9][a-z0-9._-]{0,119})$/.exec(hash);
+  if (skill) return { open: true, projectId: null, skillId: skill[1] };
   const e = /^#hub\/e\/([A-Za-z0-9][A-Za-z0-9._-]{2,119})$/.exec(hash);
   if (e) return { open: true, projectId: null, entryId: e[1] };
   const c = /^#hub\/c\/([^/#?]{1,200})$/.exec(hash);
@@ -43,7 +48,11 @@ export function useHubLocation(): [HubLocation, (next: HubLocation) => void] {
   }, []);
   const navigate = useCallback((next: HubLocation) => {
     const hash = next.open
-      ? next.entryId
+      ? next.skillId
+        ? `#hub/s/${encodeURIComponent(next.skillId)}`
+        : next.skills
+          ? "#hub/skills"
+          : next.entryId
         ? `#hub/e/${next.entryId}`
         : next.catalogueId
           ? `#hub/c/${encodeURIComponent(next.catalogueId)}`
