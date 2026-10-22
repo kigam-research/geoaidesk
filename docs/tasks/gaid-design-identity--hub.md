@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T14:46:54Z
+status: done
+updated: 2026-10-22T01:39:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e3423a72-7472-4e57-ad64-7b7af68d8b04","pid":1024923,"provider":"codex","session":"01a15ebd-f21c-75a3-acb8-bed850e7227a","start":"47880771","token":"c6c81568434110b18d55cffb1d1710ded8914bb8b12f012ac7eedcc3d6246168"}
 branch: task/gaid-design-identity--hub
 target: task/gaid-design-identity
@@ -92,7 +92,7 @@ Network: raw.githubusercontent.com is blocked.
 - Full `scripts/check` also passed after syncing parent/system changes: backend 182 files passed/1 skipped (2,034 tests passed/8 skipped); frontend 175 files and 1,142 tests passed; GAID 49 tests passed/1 skipped; UI copy/guide, environments, launcher and production start/stop/restart passed. Current UI checker: 0 errors, 17 resolved hub baseline entries (parent removes these).
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-21T14:46:54Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T01:39:59Z: integrated into gaid-design-identity; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First `task finish` at c07059d3 failed full checks after target refresh. Backend: 182 files passed/1 skipped, 2,034 tests passed/8 skipped. Frontend: 175 files and 1,142 tests passed. GAID: 47 passed/1 skipped/2 failed. Failures are parent/system-owned: (1) 132 slop findings in `workspace/task-catalogue.tsx`, `app/page.tsx`, `components/project-view.tsx`, `components/workflows-panel.tsx` awaiting sibling integration; (2) integration boundaries entry combines `web/src/app/globals.css, web/public/fonts/` into one non-existing path. No owned hub findings. Check log: `/home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-70f_n07u.log`; check artifact: `/home/seongin3/data/geoaidesk/work/checks/c07059d3c79e-20261021T140559.940442Z`. Resolved after parent integrated sibling/boundary fixes; sync full checks passed.

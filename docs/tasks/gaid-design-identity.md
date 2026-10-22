@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: done
 updated: 2026-10-22T01:39:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
@@ -50,7 +50,8 @@ Re-verify: `node geo/ui/check-ui.mjs`; `node --test 'geo/tests/*.test.mjs'`; scr
 Services: this unit's `gaid-design-identity-app` (3310/18310), `gdi-mock-http` (3399), `gdi-work-http` (3397) are to be stopped before finish.
 
 ## Next steps
-1. Finish: stop services, task finish (scripts/check), give the hub's final report to the user.
+<!-- task:closed -->
+Closed 2026-10-22T01:39:59Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-design-identity.md.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
@@ -113,7 +114,7 @@ Services: this unit's `gaid-design-identity-app` (3310/18310), `gdi-mock-http` (
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [부채] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스로 남아 UI 검사 허용 목록에 있습니다 — 가) 서재 화면을 다시 만지는 다음 작업에서 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 서재 화면 작업과 함께 하면 화면 확인을 한 번에 끝냄 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
+- [부채 gaid-design-identity#1] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스로 남아 UI 검사 허용 목록에 있습니다 — 가) 서재 화면을 다시 만지는 다음 작업에서 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 서재 화면 작업과 함께 하면 화면 확인을 한 번에 끝냄 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
 ## Report
 Report: reports/2026-10-21-gaid-design-identity/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,

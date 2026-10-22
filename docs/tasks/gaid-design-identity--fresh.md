@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T01:24:35Z
+status: done
+updated: 2026-10-22T01:39:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bd409835-dc4c-4400-847a-3f8beaa61c9a","pid":1237487,"provider":"claude","session":"58808060-bb53-414c-986e-b1ee6b2e2fd6","start":"51328705","token":"003a20f7e47c2f54520d7ddef3360844301264383ed9c2a9dd3ed03b14f4f628"}
 branch: task/gaid-design-identity--fresh
 target: task/gaid-design-identity
@@ -118,7 +118,7 @@ If the user rejects everything again, record that and stop without landing.
 - Services of this unit (dev app `gaid-fresh-app` on 3350/18350, static server `gaid-fresh-static` on 3351) are stopped.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T01:24:35Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-design-identity--fresh.md.
+Closed 2026-10-22T01:39:59Z: integrated into gaid-design-identity; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-design-identity--fresh.md.
 
 ## Failed approaches
 ## Notes and decisions

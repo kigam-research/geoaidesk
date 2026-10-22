@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-21T14:18:19Z
+status: done
+updated: 2026-10-22T01:39:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e73f31b2-928f-4e58-a430-49186ac0f645","pid":1071582,"provider":"codex","session":"01a15ebe-4cf0-74d2-b30f-13e606b0b188","start":"47883007","token":"281236167c9f58c78e6908aa70ba51bc35bc9b17393c11fb2cefbff9f2d1f4c5"}
 branch: task/gaid-design-identity--system
 target: task/gaid-design-identity
@@ -81,7 +81,7 @@ Final Korean screenshots: 16 PNGs in `/home/seongin3/data/geoaidesk/work/gaid-de
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-21T14:18:19Z: ready; the parent gaid-design-identity integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T01:39:59Z: integrated into gaid-design-identity; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First screenshot matrix captured theme transitions before they settled. Those early captures are not delivery evidence; final capture waits for the theme.
