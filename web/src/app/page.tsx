@@ -298,6 +298,7 @@ export default function HomePage() {
         <GaidHub
           authoringId={hub.projectId}
           entryId={hub.entryId ?? null}
+          catalogueId={hub.catalogueId ?? null}
           onNavigate={(next) => setHub(next)}
           onOpenProjects={() => {
             setHub({ open: false, projectId: null });

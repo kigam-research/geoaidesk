@@ -4,6 +4,10 @@
     "hub": "GAID 허브",
     "label": "GAID 화면"
   },
+  "sidebar": {
+    "hide": "허브 목록 숨기기",
+    "show": "허브 목록 표시"
+  },
   "entry": {
     "title": "GAID 허브",
     "body": "연구자들이 등록한 Workflow를 내 자료로 쓰거나, 내 논문·코드로 새 Workflow를 만듭니다.",

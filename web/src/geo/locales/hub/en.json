@@ -4,6 +4,10 @@
     "hub": "GAID hub",
     "label": "GAID screens"
   },
+  "sidebar": {
+    "hide": "Hide hub sections",
+    "show": "Show hub sections"
+  },
   "entry": {
     "title": "GAID hub",
     "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
