@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-map-vector-1280.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # UI 가이드 v2 부채 네 건 처리
 
