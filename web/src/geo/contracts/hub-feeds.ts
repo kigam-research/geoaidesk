@@ -140,7 +140,10 @@ export interface FeedListResponse {
   collectedAt: string | null;
 }
 
-/** Query of the list routes; every field optional. */
+/**
+ * Query of the list routes; every field optional. Without category, field and q the list keeps at most
+ * FEED_LIMITS.perSourceUnfiltered items per source, so one large or undated source cannot fill the first view.
+ */
 export interface FeedListQuery {
   category?: FeedCategory;
   field?: FeedField;
@@ -183,6 +186,7 @@ export const FEED_LIMITS = {
   /** Default collection interval of `serve`. */
   intervalHours: 6,
   listLimit: 300,
+  perSourceUnfiltered: 10,
 } as const;
 
 export const FEED_SOURCE_ID = /^[a-z0-9][a-z0-9-]{1,47}$/;
