@@ -13,7 +13,9 @@
     "error": "Could not read your library. Open it again in a moment.",
     "empty": "Your library has no papers yet. Add the first one from a PDF or a DOI.",
     "noMatch": "No paper matches these conditions.",
-    "state": "Papers matching {shown} / total {total}"
+    "state": "Papers matching {shown} / total {total}",
+    "searchFolder": "Search {name}",
+    "stateFolder": "{shown} matching papers / {total} in the folder"
   },
   "add": {
     "button": "Add paper"
@@ -171,7 +173,7 @@
       "button": "Connect with web key"
     },
     "webKey": "Zotero web API key",
-    "webKeyHint": "A read key made under Security in your zotero.org settings. GAID keeps it in the library settings only and never shows it again.",
+    "webKeyHint": "A key made under Security in zotero.org settings. A read-only key imports only; sending to Zotero also needs write access. The key is not shown again.",
     "save": {
       "button": "Save key"
     },
@@ -187,13 +189,21 @@
       "key-rejected": "Zotero refused the connection. Check the key or the approval.",
       "unreachable": "Could not reach Zotero. Try again in a moment."
     },
-    "hint": "Papers you collect in Zotero appear in your library too. GAID writes to Zotero only when you send a paper to GAID 수집함."
+    "hint": "Papers collected in Zotero appear in the library too. GAID writes to Zotero only when you send papers or add them to a linked folder."
   },
   "send": {
     "button": "Send to Zotero",
-    "done": "Sent to GAID 수집함 in Zotero",
     "failed": "Could not send to Zotero. Check the Zotero connection.",
-    "confirm": "When Zotero shows an approval window, allow it."
+    "confirm": "When Zotero asks for approval, choose \"Always Allow\".",
+    "created": "{n} new papers",
+    "merged": "{n} already in Zotero",
+    "added": "{n} added to collections",
+    "pdfs": "{n} PDFs",
+    "nothing": "There was nothing new to send.",
+    "stopped": "Zotero refused the next write, so sending stopped. Sent: {done}. Choose \"Always Allow\" in Zotero's approval window, then send again.",
+    "skipped": "{done} · {n} papers not sent",
+    "toast": "Sent to Zotero",
+    "busy": "Sending to Zotero."
   },
   "read": {
     "button": "Read full text",
@@ -208,6 +218,116 @@
   },
   "references": {
     "title": "References",
-    "unknown": "Not in your library · check this citation key"
+    "unknown": "Not in your library · check this citation key",
+    "outside": "outside the project's citation folders"
+  },
+  "folders": {
+    "title": "Folders",
+    "all": "All papers",
+    "empty": "No folders yet. Make one per topic or manuscript.",
+    "collapse": "Collapse {name}",
+    "expand": "Expand {name}",
+    "linkedHint": "Linked to a Zotero collection. Rename or move it in Zotero.",
+    "new": {
+      "button": "New folder",
+      "title": "New folder",
+      "subTitle": "New folder in {parent}",
+      "hint": "A paper can be in several folders.",
+      "label": "Folder name",
+      "placeholder": "e.g. 2026 East Sea deposit manuscript",
+      "failed": "The folder was not created. Check the name and try again.",
+      "save": {
+        "button": "Create folder"
+      }
+    },
+    "rename": {
+      "title": "Rename folder",
+      "button": "Rename folder"
+    },
+    "added": "Added to {name}",
+    "addedZotero": "Added to {name} and to Zotero",
+    "addFailed": "The paper was not added. Try again.",
+    "removed": "Removed from the folder",
+    "removeInZotero": "This paper is in the Zotero collection. Remove it in Zotero; GAID follows.",
+    "emptyFolder": "No papers in the folder. Drag papers from the table onto it, or add them from the paper details.",
+    "itemTitle": "Folders",
+    "itemNone": "Not in a folder yet.",
+    "add": {
+      "button": "Add to folder"
+    },
+    "remove": {
+      "action": "Remove from {name}"
+    }
+  },
+  "folder": {
+    "more": "Folder menu",
+    "linked": "Folder linked to a Zotero collection",
+    "gaid": "GAID folder",
+    "papers": "{n} papers · subfolders included",
+    "linkedRule": "For Zotero papers, folder membership follows Zotero. Adding a paper in GAID also adds it to the Zotero collection.",
+    "sub": {
+      "button": "Create subfolder"
+    },
+    "rename": {
+      "button": "Rename folder"
+    },
+    "delete": {
+      "button": "Delete folder",
+      "title": "Delete folder {name}",
+      "body": "Its subfolders are deleted too. The papers stay in the library.",
+      "toast": "Folder deleted",
+      "failed": "The folder was not deleted."
+    },
+    "cite": {
+      "title": "Citations",
+      "body": "Collect the papers a manuscript cites in a folder. Export and the reference check include subfolders."
+    },
+    "export": {
+      "button": "Export references",
+      "bibtex": "BibTeX (.bib)",
+      "ris": "RIS (.ris) · EndNote",
+      "csl": "CSL-JSON (.json)",
+      "text": "Reference list (.txt)"
+    },
+    "attach": {
+      "button": "Attach to project",
+      "hint": "Research notes and the AI agent of the attached project cite from the folder's papers.",
+      "toast": "Attached to the citation scope of {name}",
+      "failed": "The folder was not attached. Try again."
+    },
+    "check": {
+      "button": "Check references",
+      "busy": "Checking references.",
+      "failed": "The check did not run. Try again.",
+      "projects": "Projects citing from it: {names}",
+      "none": "Nothing to fix found in {n} papers.",
+      "add": {
+        "action": "Add to folder"
+      },
+      "added": "Added to the folder",
+      "more": "{n} more"
+    },
+    "issue": {
+      "retracted": "Retraction notices: {n}",
+      "cited-outside": "Citations outside the folder: {n}",
+      "duplicate": "Likely duplicate groups: {n}",
+      "removed-from-zotero": "Deleted in Zotero: {n}",
+      "unconfirmed": "Details not confirmed: {n}",
+      "no-doi": "No DOI: {n}",
+      "no-year": "No year: {n}",
+      "no-authors": "No authors: {n}",
+      "unread": "Full text not read: {n}",
+      "citedLine": "@{key} · research note “{note}” ({project})"
+    },
+    "zotero": {
+      "title": "Zotero",
+      "body": "Creates the folder and its subfolders as Zotero collections and sends the GAID papers with their PDFs.",
+      "linkedBody": "Sends papers and PDFs not yet in Zotero to the linked Zotero collection.",
+      "offline": "Connect Zotero to send the folder to Zotero."
+    },
+    "send": {
+      "title": "Send folder {name} to Zotero",
+      "body": "Sends {n} papers. A paper already in Zotero is not created again; it is only added to the collection. When Zotero asks for approval, choose \"Always Allow\"."
+    }
   }
 }

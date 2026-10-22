@@ -7,9 +7,11 @@ import path from "node:path";
 import { listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
 import { RESEARCH_NOTES_DIR, RESEARCH_NOTE_FILE } from "../../../../web/src/geo/contracts/research-notes.ts";
 import {
+  folderSubtree,
   parseCitations,
   PROJECT_LITERATURE_FILE,
   PROJECT_LITERATURE_SCHEMA,
+  type LibraryCollection,
   type LibraryItem,
   type LibraryUse,
   type ProjectLiterature,
@@ -46,11 +48,24 @@ export function writeProjectLiterature(paths: ProjectPaths, value: { collectionI
   return next;
 }
 
-/** Items a project uses: attached items plus every item of an attached collection. */
-export function projectItems(literature: ProjectLiterature, items: LibraryItem[]): LibraryItem[] {
-  const ids = new Set(literature.itemIds), cols = new Set(literature.collectionIds);
-  return items.filter((i) => !i.removedFromSourceAt && (ids.has(i.id) || i.collectionIds.some((c) => cols.has(c))));
+/** Folder ids of the attached folders and all their subfolders. */
+export function scopeFolders(literature: ProjectLiterature, collections: Pick<LibraryCollection, "id" | "parentId">[]): Set<string> {
+  const out = new Set<string>();
+  for (const id of literature.collectionIds) for (const f of folderSubtree(collections, id)) out.add(f);
+  return out;
 }
+
+/**
+ * Items a project uses (its citation scope): attached items plus every item of an attached folder or one of its
+ * subfolders. An item merged into another keeps counting through `aliases.ids`.
+ */
+export function projectItems(literature: ProjectLiterature, items: LibraryItem[], collections: Pick<LibraryCollection, "id" | "parentId">[] = []): LibraryItem[] {
+  const ids = new Set(literature.itemIds), cols = scopeFolders(literature, collections);
+  return items.filter((i) => !i.removedFromSourceAt && (ids.has(i.id) || (i.aliases?.ids ?? []).some((a) => ids.has(a)) || i.collectionIds.some((c) => cols.has(c))));
+}
+
+/** True when the project has attached anything (otherwise the whole library counts for its citations). */
+export const hasScope = (literature: ProjectLiterature) => literature.itemIds.length > 0 || literature.collectionIds.length > 0;
 
 interface NoteCitations {
   mtimeMs: number;
@@ -103,8 +118,9 @@ export interface UsesIndex {
  * One pass over all projects. `workflowUses` supplies hub authoring links (drafts made from a library item); it is
  * injected so this module does not depend on the authoring store.
  */
-export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => []): UsesIndex {
+export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => [], collections: Pick<LibraryCollection, "id" | "parentId">[] = []): UsesIndex {
   const byKey = new Map<string, LibraryItem>();
+  for (const item of items) for (const key of item.aliases?.citationKeys ?? []) byKey.set(key, item);
   for (const item of items) if (item.citationKey) byKey.set(item.citationKey, item);
   const uses = new Map<string, LibraryUse[]>();
   const push = (id: string, use: LibraryUse) => uses.set(id, [...(uses.get(id) ?? []), use]);
@@ -112,7 +128,7 @@ export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: Librar
     let paths: ProjectPaths;
     try { paths = resolvePaths(project.id); } catch { continue; }
     const literature = readProjectLiterature(paths);
-    for (const item of projectItems(literature, items)) push(item.id, { kind: "project", projectId: project.id, projectName: project.name });
+    for (const item of projectItems(literature, items, collections)) push(item.id, { kind: "project", projectId: project.id, projectName: project.name });
     for (const note of projectNoteCitations(paths)) {
       const locators = new Map<string, string[]>();
       for (const c of note.citations) {

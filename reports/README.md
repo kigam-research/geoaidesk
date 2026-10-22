@@ -7,6 +7,8 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-21-gaid-design-identity/figures/result-01-app-instrument.png" width="120"> | 2026-10-22 10:48 | [GAID UI/UX 가이드 v2: 계측 기본 디자인과 도폭 선택 스타일](2026-10-21-gaid-design-identity/index.md) | One UI와 Apple HIG로 다시 쓴 가이드 v2를 적용해, GAID 허브와 작업 공간이 로고에서 끌어낸 계측 디자인(기본)과 설정에서 고르는 도폭 스타일로 바뀌었습니다. | 검토 전 | 미정 | 0 |
+| <img src="2026-10-21-gaid-library-folders/figures/01-folder-panel-1440.png" width="120"> | 2026-10-21 23:35 | [GAID 서재 폴더와 Zotero 보내기](2026-10-21-gaid-library-folders/index.md) | 서재에 주제·원고별 하위 폴더가 생겼고, 폴더 단위로 참고문헌을 내보내고 점검하며, GAID 논문과 폴더를 PDF와 함께 Zotero로 중복 없이 보냅니다. | 검토함 10-21 | 미정 | 1 |
 | <img src="2026-10-21-gaid-research-hub/figures/03-app-library.png" width="120"> | 2026-10-21 21:37 | [논문 수집에서 연구노트·Workflow까지 잇는 GAID 서재: 설계와 1단계 구현](2026-10-21-gaid-research-hub/index.md) | Zotero와 이어지고 PDF만으로도 쓰는 하이브리드 서재를 "내 연구"에 만들었고, 서재 논문을 에이전트 근거 답변·연구노트 참고문헌·허브 Workflow 제작에 연결했습니다. | 검토함 10-21 | 미정 | 0 |
 | <img src="2026-10-20-gaid-workflow-model/figures/12-chat-workflow-card.png" width="120"> | 2026-10-20 | [GAID를 Workflow 중심으로 정리하고 Workflow를 지침 문서로 AI agent에게 보냄](2026-10-20-gaid-workflow-model/index.md) | GAID의 허브 단위와 Workflow 패널의 줄을 모두 Workflow로 부르고, Workflow를 단계·사용 스킬·결과가 적힌 하나의 지침 문서로 AI agent에게 보냅니다. 허브와 프로젝트에서 보는 지침이 곧 채팅에 가는 글이며, 기관 Qwen 실제 대화에서 AI agent가 지침대로 스킬 지침부터 읽고 1단계를 수행했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-20-gaid-hub-editing/figures/p3-entry-edit.png" width="120"> | 2026-10-20 18:55 | [GAID 허브 개선: 방법 고치기, 답 다시 고르기, 허브 연동, 개념 그림](2026-10-20-gaid-hub-editing/index.md) | 등록한 방법을 새 판으로 고치거나 복사해 고칠 수 있고, 답한 질문을 다시 고를 수 있으며, 레시피·스킬을 GAID 허브에서 찾고 개념 그림을 한 장씩 다시 만들 수 있습니다. | 검토함 10-20 | 채택 | 1 |

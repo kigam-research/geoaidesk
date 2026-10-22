@@ -67,8 +67,10 @@ it("opens a note, renders its body around answerable decision cards and confirms
   fireEvent.click(option);
   expect(option).toHaveAttribute("aria-checked", "true");
   expect(screen.getByText("결정 2건 중 1건에 답했습니다.")).toBeInTheDocument();
-  // The second decision gets a separate instruction instead of a listed option.
-  const instruction = screen.getAllByRole("radio", { name: "별도 지시 (직접 입력)" })[1];
+  // One decision at a time: the second decision is one step on, and gets a separate instruction instead of an option.
+  fireEvent.click(screen.getByRole("button", { name: "다음 결정" }));
+  expect(screen.queryByRole("radio", { name: /시료 표를 올려 다시 실행/ })).toBeNull();
+  const instruction = screen.getByRole("radio", { name: "별도 지시 (직접 입력)" });
   fireEvent.click(instruction);
   // An empty instruction is not an answer yet.
   expect(screen.getByText("결정 2건 중 1건에 답했습니다.")).toBeInTheDocument();
@@ -85,7 +87,8 @@ it("opens a note, renders its body around answerable decision cards and confirms
   expect(text).toContain("- 결정 1: 가) 시료 표를 올려 다시 실행");
   expect(text).toContain("- 결정 2(별도 지시): 면적은 km²와 ha를 함께 표시");
   expect(await screen.findByText("답변을 채팅으로 보냈습니다.")).toBeInTheDocument();
-  expect(option).toHaveAttribute("aria-checked", "false");
+  // Sent answers are cleared and the stepper returns to the first decision.
+  expect(screen.getByRole("radio", { name: /시료 표를 올려 다시 실행/ })).toHaveAttribute("aria-checked", "false");
   onOpenChat.mockClear();
   fireEvent.click(screen.getByRole("button", { name: /채팅 열기/ }));
   expect(onOpenChat).toHaveBeenCalledWith("s1", "다원소 분석값 점검");

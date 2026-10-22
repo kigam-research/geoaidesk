@@ -8,7 +8,8 @@
  *   files/<sha256>         PDFs of GAID-managed items, content-addressed (never copied to the shared hub)
  *
  * One process owns the directory; writes are serialized through one queue. Zotero items are written only by the
- * Zotero sync; the researcher edits GAID items only.
+ * Zotero sync; the researcher edits GAID items only. Folder membership follows the rule in the contract: a Zotero item's
+ * membership in a folder linked to its own Zotero library comes from Zotero, every other membership is GAID's.
  */
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -16,6 +17,7 @@ import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/p
 import { join, resolve } from "node:path";
 import { KADY_PI_AGENT_DIR } from "../../config.ts";
 import { citationKeyFor } from "./formats/index.ts";
+import { folderSubtree } from "../../../../web/src/geo/contracts/library.ts";
 import type {
   CslItem,
   LibraryCollection,
@@ -63,8 +65,10 @@ export function shortAuthors(csl: CslItem, locale: "ko" | "en" = "ko"): string {
   return locale === "ko" ? `${names[0]} 외` : `${names[0]} et al.`;
 }
 
+/** First year of `issued`; Zotero's CSL export writes date parts as strings ("2023"). */
 export const cslYear = (csl: CslItem): number | undefined => {
-  const y = csl.issued?.["date-parts"]?.[0]?.[0];
+  const raw: unknown = csl.issued?.["date-parts"]?.[0]?.[0];
+  const y = typeof raw === "string" && /^-?\d{1,4}$/.test(raw.trim()) ? Number(raw) : raw;
   return typeof y === "number" && Number.isFinite(y) ? y : undefined;
 };
 
@@ -136,17 +140,31 @@ export class LibraryStore {
     return [...this.items.values()];
   }
 
+  /** The item, also by an earlier id that was merged into it (`aliases.ids`). */
   async get(id: string): Promise<LibraryItem> {
     await this.load();
-    const item = ITEM_ID.test(id) ? this.items.get(id) : undefined;
+    let item = ITEM_ID.test(id) ? this.items.get(id) : undefined;
+    if (!item && ITEM_ID.test(id)) item = [...this.items.values()].find((i) => i.aliases?.ids?.includes(id));
     if (!item) throw new LibraryError("Library item not found", 404);
     return item;
   }
 
+  /** Current key first, then earlier keys kept as aliases. */
   async byCitationKey(key: string): Promise<LibraryItem | undefined> {
     await this.load();
     for (const item of this.items.values()) if (item.citationKey === key) return item;
+    for (const item of this.items.values()) if (item.aliases?.citationKeys?.includes(key)) return item;
     return undefined;
+  }
+
+  /** Removes an item file without the source checks (merge of a sent GAID item into its Zotero copy). */
+  async drop(id: string): Promise<void> {
+    await this.load();
+    if (!ITEM_ID.test(id)) throw new LibraryError("Invalid item id");
+    await this.serial(async () => {
+      await rm(join(this.root, "items", `${id}.json`), { force: true });
+      this.items.delete(id);
+    });
   }
 
   /** Writes one item as given (used by the Zotero sync and by mutate). */
@@ -178,7 +196,7 @@ export class LibraryStore {
       if (existing) throw new LibraryError(`Already in the library: ${existing.id}`, 409);
     }
     const collections = await this.collections();
-    const collectionIds = (input.collectionIds ?? []).filter((id) => collections.some((c) => c.id === id && c.source === "gaid"));
+    const collectionIds = [...new Set((input.collectionIds ?? []).filter((id) => collections.some((c) => c.id === id)))];
     const attachments: LibraryItem["attachments"] = [];
     if (input.pdfSha256 !== undefined) {
       if (!SHA.test(input.pdfSha256) || !existsSync(this.filePath(input.pdfSha256))) throw new LibraryError("Unknown uploaded file", 404);
@@ -215,7 +233,7 @@ export class LibraryStore {
     return this.mutate(id, (next) => {
       if (csl) next.csl = csl;
       if (Array.isArray(patch.tags)) next.tags = [...new Set(patch.tags.map((t) => String(t).trim()).filter(Boolean))].slice(0, 50);
-      if (Array.isArray(patch.collectionIds)) next.collectionIds = patch.collectionIds.map(String).filter((cid) => collections.some((c) => c.id === cid && c.source === "gaid"));
+      if (Array.isArray(patch.collectionIds)) next.collectionIds = [...new Set(patch.collectionIds.map(String).filter((cid) => collections.some((c) => c.id === cid)))];
     });
   }
 
@@ -266,14 +284,62 @@ export class LibraryStore {
     await this.serial(() => this.writeJson(join(this.root, "collections.json"), collections));
   }
 
+  async collection(id: string): Promise<LibraryCollection> {
+    const found = (await this.collections()).find((c) => c.id === id);
+    if (!found) throw new LibraryError("Folder not found", 404);
+    return found;
+  }
+
+  /** A new GAID folder, top level or inside any folder (also a linked one; the new folder itself is unlinked). */
   async addGaidCollection(name: unknown, parentId?: unknown): Promise<LibraryCollection> {
-    const label = typeof name === "string" ? name.trim() : "";
-    if (!label || [...label].length > 80) throw new LibraryError("Collection name must be 1-80 characters");
+    const label = folderName(name);
     const collections = await this.collections();
-    const parent = typeof parentId === "string" ? collections.find((c) => c.id === parentId && c.source === "gaid") : undefined;
-    const collection: LibraryCollection = { id: newCollectionId(), owner: libraryOwner(), name: label, source: "gaid", ...(parent ? { parentId: parent.id } : {}) };
+    if (collections.length >= 2000) throw new LibraryError("Too many folders", 413);
+    let parent: LibraryCollection | undefined;
+    if (typeof parentId === "string" && parentId) {
+      parent = collections.find((c) => c.id === parentId);
+      if (!parent) throw new LibraryError("Parent folder not found", 404);
+    }
+    const collection: LibraryCollection = { id: newCollectionId(), owner: libraryOwner(), name: label, source: "gaid", ...(parent ? { parentId: parent.id } : {}), createdAt: now() };
     await this.saveCollections([...collections, collection]);
     return collection;
+  }
+
+  /** Renames or moves an unlinked GAID folder; a linked folder is renamed or moved in Zotero (409). */
+  async editGaidCollection(id: string, patch: { name?: unknown; parentId?: unknown }): Promise<LibraryCollection> {
+    const collections = await this.collections();
+    const current = collections.find((c) => c.id === id);
+    if (!current) throw new LibraryError("Folder not found", 404);
+    if (current.source !== "gaid") throw new LibraryError("Rename or move this folder in Zotero", 409);
+    const next = { ...current };
+    if (patch.name !== undefined) next.name = folderName(patch.name);
+    if (patch.parentId !== undefined) {
+      if (patch.parentId === null || patch.parentId === "") delete next.parentId;
+      else {
+        const parent = collections.find((c) => c.id === patch.parentId);
+        if (!parent) throw new LibraryError("Parent folder not found", 404);
+        if (folderSubtree(collections, id).has(parent.id)) throw new LibraryError("A folder cannot move into itself", 409);
+        next.parentId = parent.id;
+      }
+    }
+    await this.saveCollections(collections.map((c) => (c.id === id ? next : c)));
+    return next;
+  }
+
+  /**
+   * Deletes an unlinked GAID folder and its subfolders; the papers stay in the library. Refused (409) when the subtree
+   * holds a folder linked to Zotero, which is deleted in Zotero.
+   */
+  async removeGaidCollection(id: string): Promise<{ folders: number }> {
+    const collections = await this.collections();
+    if (!collections.some((c) => c.id === id)) throw new LibraryError("Folder not found", 404);
+    const subtree = folderSubtree(collections, id);
+    if (collections.some((c) => subtree.has(c.id) && c.source !== "gaid")) throw new LibraryError("This folder or a subfolder is linked to Zotero; delete it in Zotero", 409);
+    for (const item of await this.all()) {
+      if (item.collectionIds.some((c) => subtree.has(c))) await this.mutate(item.id, (next) => { next.collectionIds = next.collectionIds.filter((c) => !subtree.has(c)); });
+    }
+    await this.saveCollections(collections.filter((c) => !subtree.has(c.id)));
+    return { folders: subtree.size };
   }
 
   async zotero(): Promise<ZoteroFile> {
@@ -298,6 +364,27 @@ export function libraryStore(): LibraryStore {
   const root = libraryDir();
   if (!shared || shared.root !== root) shared = new LibraryStore(root);
   return shared;
+}
+
+function folderName(value: unknown): string {
+  const label = typeof value === "string" ? value.trim() : "";
+  if (!label || [...label].length > 80) throw new LibraryError("Folder name must be 1-80 characters");
+  return label;
+}
+
+/** Normalized title for duplicate checks (case, punctuation and spacing ignored). */
+export function titleKey(title: unknown): string {
+  return typeof title === "string" ? title.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "") : "";
+}
+
+/** Same paper by DOI, else by title + year + first author family (both must be present). */
+export function samePaper(a: CslItem, b: CslItem): boolean {
+  const da = normalizeDoi(a.DOI), db = normalizeDoi(b.DOI);
+  if (da && db) return da === db;
+  const ta = titleKey(a.title);
+  if (!ta || ta !== titleKey(b.title)) return false;
+  const fam = (c: CslItem) => (c.author?.[0]?.family ?? c.author?.[0]?.literal ?? "").normalize("NFKC").toLowerCase();
+  return cslYear(a) === cslYear(b) && fam(a) === fam(b);
 }
 
 export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): LibraryItemSummary {

@@ -423,7 +423,7 @@
       "responsibility": "gaid-ui-locale (files): visible strings read through t() from web/src/geo/locales/files/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. File tree and preview panel, scientific viewers, LaTeX editor, PDF viewer, Office workspace; lib helpers with visible timeout, fallback, autocomplete and spelling text (sci-fetch, latex api/completions/outline/spellcheck)"
     },
     {
-      "path": "web/src/components/automation-panel.tsx, web/src/components/modal-jobs-panel.tsx, web/src/components/modal-job-detail.tsx, web/src/components/subagent-fleet-panel.tsx, web/src/components/session-cost-pill.tsx, web/src/components/delegate-picker.tsx, web/src/components/interview-form.tsx, web/src/components/permission-card.tsx, web/src/components/system-card.tsx, web/src/components/research-picker.tsx, web/src/components/database-selector.tsx, web/src/components/resource-monitor.tsx, web/src/components/skills-selector.tsx, web/src/components/citation-badge.tsx, web/src/components/ai-elements/message.tsx, web/src/components/ai-elements/prompt-input.tsx, web/src/components/ui/carousel.tsx, web/src/components/ui/dialog.tsx, web/src/components/ui/spinner.tsx, web/src/components/chat-tab.tsx, web/src/components/tool-activity.tsx, web/src/components/model-selector.tsx, web/src/components/project-switcher.tsx, web/src/components/lazy-surfaces.tsx, web/src/components/compute-selector.tsx, web/src/components/context-chips.tsx, web/src/components/chat-tabs-bar.tsx",
+      "path": "web/src/components/automation-panel.tsx, web/src/components/modal-jobs-panel.tsx, web/src/components/modal-job-detail.tsx, web/src/components/subagent-fleet-panel.tsx, web/src/components/session-cost-pill.tsx, web/src/components/delegate-picker.tsx, web/src/components/interview-form.tsx, web/src/components/permission-card.tsx, web/src/components/system-card.tsx, web/src/components/research-picker.tsx, web/src/components/database-selector.tsx, web/src/components/resource-monitor.tsx, web/src/components/skills-selector.tsx, web/src/components/citation-badge.tsx, web/src/components/ai-elements/message.tsx, web/src/components/ai-elements/prompt-input.tsx, web/src/components/ui/carousel.tsx, web/src/components/ui/dialog.tsx, web/src/components/ui/spinner.tsx, web/src/components/chat-tab.tsx, web/src/components/tool-activity.tsx, web/src/components/model-selector.tsx, web/src/components/project-switcher.tsx, web/src/components/sandbox-panel.tsx, web/src/components/ai-elements/file-tree.tsx, web/src/components/file-preview-panel.tsx, web/src/components/lab-notebook-header.tsx, web/src/components/tool-activity.tsx, web/src/components/lazy-surfaces.tsx, web/src/components/compute-selector.tsx, web/src/components/context-chips.tsx, web/src/components/chat-tabs-bar.tsx",
       "owner": "gaid-ui-locale",
       "status": "edited",
       "responsibility": "gaid-ui-locale (work): visible strings read through t() from web/src/geo/locales/work/; English catalogue text equals the upstream string so English mode and upstream tests are unchanged. Chat window, composer, tabs, tool activity, automation, Modal jobs, specialist fleet, cost pill, pickers, project screens and shared UI primitives"
@@ -837,6 +837,12 @@
       "responsibility": "Zotero mirror commit, removal marking, send-to-Zotero in place and Zotero PDF page reading against the fake Zotero server"
     },
     {
+      "path": "server/test/geo-library-folders.test.ts",
+      "owner": "gaid-library-folders",
+      "status": "added",
+      "responsibility": "Library folders, folder-scoped export/check/citations, aliases and folder reconciliation after a Zotero sync"
+    },
+    {
       "path": "server/test/geo-library-metadata.test.ts",
       "owner": "gaid-research-hub--metadata",
       "status": "added",
@@ -871,6 +877,36 @@
       "owner": "gaid-research-hub--metadata",
       "status": "added",
       "responsibility": "Fixture-based library metadata and bibliography format verification; no live network in vitest"
+    },
+    {
+      "path": "web/src/app/globals.css, web/public/fonts/",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "UI guide v2 identity tokens: 계측 (default) on :root/.dark and 도폭 on [data-style=\"mapsheet\"], mapped onto the shadcn role variables; Pretendard @font-face (logo lettering face); type scale; chamfered corners (corner-shape); orbit, index mark, segmented and step-scale styles"
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/components/project-view.tsx, web/src/components/workflows-panel.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "UI guide v2: GAID app bar in the workspace and project list (no theme switch, resources behind a popover, budget chip only with a cap or spend), default pane widths, neutral Workflow panel rows and categories, project cards without decorative status colours"
+    },
+    {
+      "path": "web/src/app/layout.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "Inline <head> script that applies the stored GAID screen style (도폭) before first paint"
+    },
+    {
+      "path": "web/src/components/settings/appearance-panel.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "화면 스타일 choice (계측 default, 도폭) next to the theme choice (UI guide v2 section 2)"
+    },
+    {
+      "path": "web/src/components/sandbox-panel.tsx, web/src/components/ai-elements/file-tree.tsx, web/src/components/file-preview-panel.tsx, web/src/components/chat-tabs-bar.tsx",
+      "owner": "gaid-design-identity--fresh",
+      "status": "edited",
+      "responsibility": "UI guide v2 functional layer: chrome tone and frame lines for the file tree, open-file tab strip and chat bar; sans file names; ink icons instead of hue icons"
     }
   ],
   "notTouched": [

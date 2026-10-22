@@ -28,6 +28,10 @@ export interface ReadOptions {
 }
 export type NewZoteroObject = Record<string, unknown> & { itemType?: string; name?: string };
 
+export type ZoteroUploadAuthorization = { exists: 1 } | { url: string; contentType: string; prefix: string; suffix: string; uploadKey: string };
+export interface ZoteroUploadMetadata { md5: string; filename: string; filesize: string; mtime: string }
+export interface ZoteroFullTextInput { content: string; indexedPages: number; totalPages: number }
+
 /** One interface shared by Local and Web API. No deletion or annotation-write operation. */
 export interface ZoteroClient {
   readonly connection: "local" | "web";
@@ -36,6 +40,10 @@ export interface ZoteroClient {
   create(library: ZoteroLibrary, kind: "items" | "collections", objects: NewZoteroObject[], version: number): Promise<ApiResult<string[]>>;
   patchLinks(library: ZoteroLibrary, key: string, patch: { collections?: string[]; tags?: { tag: string; type?: number }[] }, version: number): Promise<ApiResult<null>>;
   download(path: string, maxBytes: number): Promise<Buffer>;
+  authorizeUpload(library: ZoteroLibrary, key: string, metadata: ZoteroUploadMetadata): Promise<ZoteroUploadAuthorization>;
+  uploadFile(url: string, contentType: string, bytes: Buffer): Promise<void>;
+  registerUpload(library: ZoteroLibrary, key: string, uploadKey: string): Promise<void>;
+  putFullText(library: ZoteroLibrary, key: string, fullText: ZoteroFullTextInput): Promise<void>;
 }
 
 export class ZoteroError extends Error {
