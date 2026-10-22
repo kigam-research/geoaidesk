@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-local-98k-map.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GeoAIDesk 0.1.0 출시 검증 — 설치·업데이트·모델 경로 증거
 
