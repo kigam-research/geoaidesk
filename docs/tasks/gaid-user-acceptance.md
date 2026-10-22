@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:07:09Z
+updated: 2026-10-22T09:20:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -67,6 +67,10 @@ Outside check: no outside check.
   artifacts present, ledger 1 row subscription $0 (list price $0.306), 61.4k in / 8.4k out tokens, context peak 21% of 272k;
   project chatgpt-0488e0. The agent read gaid-figures SKILL.md; one recovered tool error: check_figure.py run without
   `--journals` (exit 5), then rerun.
+- Check 4, personal API key (MiniMax-M3): PASSED. job-2 record ~/data/geoaidesk/runs/gaid-user-acceptance-20261022T085952.464306Z/out/record.json
+  (sha256 72a5d5e2…67a): connection GAID_ROUTE_OK 10.3 s; task passed in 999 s, 60 turns / 61 tool calls, artifacts present,
+  ledger payg $0.274 (92.3k in, 24.7k out, 3.61M cache-read tokens), context peak 9% of 1M; project api-80e71c. Two
+  recovered edit mismatches; it also read gaid-figures SKILL.md. Claude sign-in: not connected, optional, not run.
 ## Next steps
 1. On job exits: read out/record.json of both runs; on tester finish: verify every claim (cited pages via pdftotext, figure check
    rerun, Zotero state via GET /geo/library/zotero); if the key is renewed, tell the tester to repeat goal C.
