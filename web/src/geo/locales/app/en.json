@@ -650,5 +650,13 @@
   "customModels.acceptedReasoningLevels": "Reasoning levels the server accepts",
   "customModels.reasoningLevelsHelp": "A level that is not selected is sent as the nearest lower accepted level, or the nearest higher one if none is lower. With none selected, levels are sent with the app's default handling. Off is always available.",
   "chat.thinking.mappedLevel": "{selected} → {sentAs}",
-  "chat.thinking.sentAs": "Sent to this server as {level}."
+  "chat.thinking.sentAs": "Sent to this server as {level}.",
+  "header.chat_overlays_in_narrow_windows": "In windows narrower than 1280 px, the chat opens over the preview.",
+  "header.resize_file_browser": "Resize file list",
+  "header.resize_chat": "Resize chat",
+  "files.filter.label": "Find by file name",
+  "files.filter.placeholder": "Find by file name ({shortcut})",
+  "files.filter.count": "{count, plural, one {# matching item} other {# matching items}}",
+  "files.filter.empty": "No file names match.",
+  "files.filter.clear": "Clear search"
 }

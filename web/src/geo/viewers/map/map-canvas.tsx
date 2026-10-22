@@ -1,8 +1,11 @@
 "use client";
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import OlMap from "ol/Map";
 import Overlay from "ol/Overlay";
+import ScaleLine from "ol/control/ScaleLine";
+import { LocateFixed, Minus, Plus } from "lucide-react";
+import { MapButton } from "./controls";
 import type Feature from "ol/Feature";
 import type { Geometry, LineString, MultiPolygon, Point, Polygon } from "ol/geom";
 import { containsCoordinate, getCenter } from "ol/extent";
@@ -43,6 +46,8 @@ interface Props {
   onClosePopup?(): void;
 }
 const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref) {
+  const [cursor, setCursor] = useState<number[]>();
+  const [canvasSize, setCanvasSize] = useState("");
   const target = useRef<HTMLDivElement>(null);
   const mapRef = useRef<OlMap | null>(null);
   const current = useRef(props);
@@ -101,8 +106,10 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
   useEffect(() => {
     if (!target.current) return;
     fitted.current = false;
-    const map = new OlMap({ target: target.current, controls: [], layers: [], view: createMapView(props.crs) });
+    const map = new OlMap({ target: target.current, controls: props.crs === "native" ? [] : [new ScaleLine({ units: "metric" })], layers: [], view: createMapView(props.crs) });
     mapRef.current = map;
+    setCursor(undefined);
+    map.on("pointermove", event => { if (!event.dragging) setCursor(event.coordinate.slice(0, 2)); });
     map.on("moveend", () => {
       if (!fitted.current) return;
       const size = map.getSize();
@@ -119,11 +126,15 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
       if (!hit) current.current.onCoordinate(event.coordinate);
     });
     if (popupElement) { overlay.current = new Overlay({ element: popupElement, stopEvent: true, offset: [0, 0] }); map.addOverlay(overlay.current); }
-    const observer = new ResizeObserver(() => map.updateSize());
+    const observer = new ResizeObserver(() => {
+      map.updateSize();
+      setCanvasSize(map.getSize()?.join(":") ?? "");
+      target.current?.parentElement?.style.setProperty("--gaid-map-popup-height", `${Math.max(96, (map.getSize()?.[1] ?? 320) - 16)}px`);
+    });
     observer.observe(target.current);
     return () => { observer.disconnect(); map.setTarget(undefined); map.dispose(); mapRef.current = null; overlay.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.crs]);
+  }, [props.crs, popupElement]);
   // OpenLayers layers are kept per layer identity: a tile layer keeps its tile cache across
   // re-renders (selection, opacity, order); only a new style/CRS/data object replaces it.
   const built = useRef(new Map<string, { key: unknown; layer: BaseLayer }>());
@@ -183,24 +194,30 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     if (!position) return;
     // Open away from the nearest map edges so the popup stays inside the map without panning it.
     const pixel = map.getPixelFromCoordinate(position); const size = map.getSize();
-    const below = !pixel || !size || pixel[1] < size[1] / 2;
-    const side = !pixel || !size ? "center" : pixel[0] < size[0] / 3 ? "left" : pixel[0] > (size[0] * 2) / 3 ? "right" : "center";
-    o.setPositioning(`${below ? "top" : "bottom"}-${side}`);
-    o.setOffset([side === "left" ? -12 : side === "right" ? 12 : 0, below ? 12 : -12]);
-  }, [popupAt, props.selected, props.layers, props.crs]);
+    if (!pixel || !size || !popupElement) return;
+    const width = popupElement.offsetWidth;
+    const height = popupElement.offsetHeight;
+    const left = pixel[0] + width + 20 <= size[0] ? pixel[0] + 12 : pixel[0] - width - 12;
+    const top = pixel[1] + height + 20 <= size[1] ? pixel[1] + 12 : pixel[1] - height - 12;
+    o.setPositioning("top-left");
+    o.setOffset([Math.max(8, Math.min(size[0] - width - 8, left)) - pixel[0], Math.max(8, Math.min(size[1] - height - 8, top)) - pixel[1]]);
+  }, [popupAt, props.selected, props.layers, props.crs, canvasSize]);
   useEffect(() => {
-    if (!popupElement) return;
+    const element = target.current;
+    if (!element) return;
     const close = (e: KeyboardEvent) => { if (e.key === "Escape") current.current.onClosePopup?.(); };
-    popupElement.addEventListener("keydown", close);
-    return () => popupElement.removeEventListener("keydown", close);
+    element.addEventListener("keydown", close);
+    return () => element.removeEventListener("keydown", close);
   }, [popupElement]);
   useEffect(() => () => { for (const entry of built.current.values()) entry.layer.dispose(); built.current.clear(); }, [props.crs]);
-  return <div className="relative h-full min-h-[320px] w-full bg-white" style={{ backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%)", backgroundSize: "16px 16px" }}>
+  return <div className="relative h-full min-h-40 w-full bg-gaid-face-2">
     <div ref={target} role="region" aria-label={t("map")} className="h-full w-full" tabIndex={0} />
-    <div className="absolute left-2 top-2 flex flex-col gap-1 text-black">
-      <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomIn")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) + 1); }}>+</button>
-      <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomOut")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) - 1); }}>−</button>
+    <div className="absolute left-2 top-2 flex flex-col gap-1">
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("zoomIn")} title={t("zoomIn")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) + 1); }}><Plus aria-hidden className="size-4" /></MapButton>
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("zoomOut")} title={t("zoomOut")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) - 1); }}><Minus aria-hidden className="size-4" /></MapButton>
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("fit")} title={t("fit")} onClick={fit}><LocateFixed aria-hidden className="size-4" /></MapButton>
     </div>
+    <output aria-label={t("cursorCoordinates")} className="pointer-events-none absolute bottom-2 right-2 max-w-[70%] truncate bg-gaid-face px-2 py-1 text-xs tabular-nums text-gaid-ink-2">{cursor ? t("coordinateReadout", { crs: props.crs === "native" ? t("nativeShort") : props.crs, x: cursor[0].toFixed(props.crs === "EPSG:4326" ? 5 : 1), y: cursor[1].toFixed(props.crs === "EPSG:4326" ? 5 : 1) }) : t("coordinateHint", { crs: props.crs === "native" ? t("nativeShort") : props.crs })}</output>
     {popupElement && props.popup && createPortal(props.popup.content, popupElement)}
   </div>;
 });

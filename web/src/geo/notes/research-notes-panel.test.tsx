@@ -25,6 +25,7 @@ const note = (over: Partial<ResearchNoteSummary> = {}): ResearchNoteSummary => (
 const CONTENT = "---\ntitle: 다원소 분석값 점검\n---\n# 다원소 분석값 점검\n\n## 결과\n\n![m](figures/m.png)\n\n## 결정할 일\n\n1. 시료 자료로 다시 분석할지\n\n## 근거\n\n- [t](../../results/t.csv)\n";
 
 beforeEach(() => {
+  localStorage.clear();
   localStorage.setItem("gaid:locale", "ko");
   vi.mocked(prefillChat).mockReset().mockReturnValue("sent");
   vi.mocked(apiFetch).mockReset().mockImplementation(async (path, init) => {
@@ -87,8 +88,22 @@ it("opens a note, renders its body around answerable decision cards and confirms
   expect(text).toContain("- 결정 1: 가) 시료 표를 올려 다시 실행");
   expect(text).toContain("- 결정 2(별도 지시): 면적은 km²와 ha를 함께 표시");
   expect(await screen.findByText("답변을 채팅으로 보냈습니다.")).toBeInTheDocument();
-  // Sent answers are cleared and the stepper returns to the first decision.
-  expect(screen.getByRole("radio", { name: /시료 표를 올려 다시 실행/ })).toHaveAttribute("aria-checked", "false");
+  // Sent answers stay on the cards as 보냄 (RN3); nothing new to send until an answer changes.
+  expect(screen.getByRole("radio", { name: "별도 지시 (직접 입력)" })).toHaveAttribute("aria-checked", "true");
+  expect(screen.getByText("보냄")).toBeInTheDocument();
+  expect(send).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "이전 결정" }));
+  expect(screen.getByRole("radio", { name: /시료 표를 올려 다시 실행/ })).toHaveAttribute("aria-checked", "true");
+  expect(screen.getByText("보냄")).toBeInTheDocument();
+  // Changing one answer sends only that one; the other is neither repeated nor named as open.
+  fireEvent.click(screen.getByRole("radio", { name: /시연으로 마무리/ }));
+  expect(screen.getByText("바꾼 답, 보내기 전")).toBeInTheDocument();
+  fireEvent.click(send);
+  await waitFor(() => expect(prefillChat).toHaveBeenCalledTimes(2));
+  const resent = vi.mocked(prefillChat).mock.calls[1][0];
+  expect(resent).toContain("- 결정 1: 나) 시연으로 마무리");
+  expect(resent).not.toContain("결정 2");
+  expect(await screen.findByText("보냄")).toBeInTheDocument();
   onOpenChat.mockClear();
   fireEvent.click(screen.getByRole("button", { name: /채팅 열기/ }));
   expect(onOpenChat).toHaveBeenCalledWith("s1", "다원소 분석값 점검");
@@ -135,6 +150,30 @@ it("keeps the answers and says so when no chat takes them", async () => {
   }
 });
 
+it("keeps sent answers when the note is opened again and drops them when the decision changed", async () => {
+  const first = panel();
+  fireEvent.click(await screen.findByText("지정 입력은 시료 자료가 아닙니다."));
+  fireEvent.click(await screen.findByRole("radio", { name: /시연으로 마무리/ }));
+  fireEvent.click(screen.getByRole("button", { name: /답변 보내기/ }));
+  expect(await screen.findByText("보냄")).toBeInTheDocument();
+  first.unmount();
+  const second = panel();
+  fireEvent.click(await screen.findByText("지정 입력은 시료 자료가 아닙니다."));
+  expect(await screen.findByRole("radio", { name: /시연으로 마무리/ })).toHaveAttribute("aria-checked", "true");
+  expect(screen.getByText("결정 2건 중 1건의 답을 보냈습니다.")).toBeInTheDocument();
+  second.unmount();
+  // The agent rewrote decision 1: the old mark no longer applies.
+  const revised = note({ decisions: [{ ...note().decisions[0], question: "시료 자료로 다시 분석할지 (수정)" }, note().decisions[1]] });
+  vi.mocked(apiFetch).mockImplementation(async (path) => {
+    if (path === "/geo/notes") return json({ dir: "연구노트", notes: [revised] });
+    return json({ note: revised, content: CONTENT });
+  });
+  panel();
+  fireEvent.click(await screen.findByText("지정 입력은 시료 자료가 아닙니다."));
+  expect(await screen.findByRole("radio", { name: /시연으로 마무리/ })).toHaveAttribute("aria-checked", "false");
+  expect(screen.queryByText("보냄")).toBeNull();
+});
+
 it("says when the chat put the answers in its chat box instead of sending", async () => {
   vi.mocked(prefillChat).mockReturnValue("filled");
   panel();
@@ -142,4 +181,7 @@ it("says when the chat put the answers in its chat box instead of sending", asyn
   fireEvent.click(await screen.findByRole("radio", { name: /시연으로 마무리/ }));
   fireEvent.click(screen.getByRole("button", { name: /답변 보내기/ }));
   expect(await screen.findByText("채팅에서 지금 보낼 수 없어 답변을 채팅 입력창에 넣었습니다. 채팅에서 확인한 뒤 보내세요.")).toBeInTheDocument();
+  // Not marked as sent: the chat box still holds it.
+  expect(screen.getByText("입력창에 넣음")).toBeInTheDocument();
+  expect(screen.queryByText("보냄")).toBeNull();
 });

@@ -185,6 +185,7 @@ export function SharedBrowse({
           <Input
             type="search"
             className="pl-9"
+            data-gaid-search=""
             aria-label={text("home.browse.search.label")}
             placeholder={text("home.browse.search.placeholder")}
             value={query}

@@ -6,7 +6,7 @@
  * column is narrow; the note file itself also opens as an ordinary file tab for editing.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftIcon, BookOpenIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
+import { ArrowLeftIcon, BookOpenIcon, CheckIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { apiFetch } from "@/lib/projects";
@@ -18,7 +18,7 @@ import type {
   ResearchNoteDecision, ResearchNoteListResponse, ResearchNoteResponse, ResearchNoteStatus, ResearchNoteSummary,
 } from "@/geo/contracts/research-notes";
 import { noteBody, plainText, splitDecisions } from "./note-markdown";
-import { answeredCount, answersMessage, isAnswered, type DecisionAnswer, type DecisionAnswers } from "./decision-answers";
+import { answersMessage, isAnswered, loadDelivered, sameAnswer, saveDelivered, type DecisionAnswer, type DecisionAnswers, type DeliveredAnswer, type DeliveredAnswers } from "./decision-answers";
 import { StepScale } from "@/geo/shell/step-scale";
 import { NoteReferences } from "@/geo/library/note-references";
 
@@ -437,7 +437,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
                 {data.note.decisions.length ? (
-                  <DecisionCards note={data.note} onSend={sendAnswers} />
+                  <DecisionCards key={data.note.id} projectId={projectId} note={data.note} onSend={sendAnswers} />
                 ) : (
                   <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
                 )}
@@ -452,23 +452,56 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   );
 }
 
-function DecisionCards({ note, onSend }: { note: ResearchNoteSummary; onSend: (text: string) => Promise<ChatPrefillResult | null> }) {
-  const [answers, setAnswers] = useState<DecisionAnswers>({});
+function DecisionCards({ projectId, note, onSend }: { projectId: string; note: ResearchNoteSummary; onSend: (text: string) => Promise<ChatPrefillResult | null> }) {
+  // Drafts are the researcher's current choices; delivered answers stay on the cards as 보냄 (UI guide v2 RN3).
+  const [drafts, setDrafts] = useState<DecisionAnswers>({});
+  const [delivered, setDelivered] = useState<DeliveredAnswers>(() => loadDelivered(projectId, note));
   const [current, setCurrent] = useState(0);
   const [state, setState] = useState<"idle" | "sending" | ChatPrefillResult | "failed">("idle");
   const decisions = note.decisions;
   const index = Math.min(current, decisions.length - 1);
   const decision = decisions[index];
-  const answered = answeredCount(note, answers);
-  const message = answersMessage(note, answers);
-  const choose = (number: number, answer: DecisionAnswer) => { setAnswers((prev) => ({ ...prev, [number]: answer })); setState("idle"); };
+  // A draft equal to what was already delivered is not new; only new or changed answers are sent.
+  const pending = useMemo(() => {
+    const result: DecisionAnswers = {};
+    for (const item of decisions) {
+      const draft = drafts[item.number];
+      if (isAnswered(draft) && !sameAnswer(draft, delivered[item.number]?.answer)) result[item.number] = draft;
+    }
+    return result;
+  }, [decisions, drafts, delivered]);
+  const settled = useMemo(() => new Set(Object.keys(delivered).map(Number)), [delivered]);
+  const message = answersMessage(note, pending, settled);
+  const pendingCount = Object.keys(pending).length;
+  const deliveredCount = settled.size;
+  const shown = (number: number) => drafts[number] ?? delivered[number]?.answer;
+  const choose = (number: number, answer: DecisionAnswer) => { setDrafts((prev) => ({ ...prev, [number]: answer })); setState("idle"); };
   const send = async () => {
     if (!message) return;
     setState("sending");
     // Answers stay selected when no chat took them, so the researcher can send again.
     const result = await onSend(message);
-    if (result) { setAnswers({}); setCurrent(0); setState(result); } else setState("failed");
+    if (!result) { setState("failed"); return; }
+    const at = new Date().toISOString();
+    const next: DeliveredAnswers = { ...delivered };
+    for (const item of decisions) {
+      const answer = pending[item.number];
+      if (answer) next[item.number] = { question: item.question, answer, via: result, at };
+    }
+    saveDelivered(projectId, note.id, next);
+    setDelivered(next);
+    setDrafts({});
+    setState(result);
   };
+  const status = state === "failed"
+    ? t("notes.decision.sendFailed")
+    : state === "sent" || state === "filled"
+      ? t(state === "sent" ? "notes.decision.sent" : "notes.decision.filled")
+      : pendingCount
+        ? t("notes.decision.progress", { answered: decisions.filter((item) => isAnswered(shown(item.number))).length, count: decisions.length })
+        : deliveredCount
+          ? t("notes.decision.deliveredStatus", { delivered: deliveredCount, count: decisions.length })
+          : t("notes.decision.sendBlocked");
   // One decision at a time with a step scale and Previous/Next; all answers go together (UI guide v2 RN3, Q1, Q4).
   return (
     <section aria-label={t("notes.decision.title")} className="rounded-lg border border-gaid-control-edge bg-gaid-face">
@@ -484,23 +517,23 @@ function DecisionCards({ note, onSend }: { note: ResearchNoteSummary; onSend: (t
             numbered={false}
             current={index}
             onStep={setCurrent}
-            steps={decisions.map((item) => ({ label: t("notes.decision.step", { number: item.number }), done: isAnswered(answers[item.number]) }))}
+            steps={decisions.map((item) => ({ label: t("notes.decision.step", { number: item.number }), done: isAnswered(shown(item.number)) }))}
           />
         )}
       </div>
       <div className="px-4 pb-4 pt-3">
-        <DecisionCard key={decision.number} decision={decision} answer={answers[decision.number]} onChoose={(answer) => choose(decision.number, answer)} />
+        <DecisionCard
+          key={decision.number}
+          decision={decision}
+          answer={shown(decision.number)}
+          delivered={delivered[decision.number]}
+          onChoose={(answer) => choose(decision.number, answer)}
+        />
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2 border-t border-gaid-edge px-4 py-3">
         <p role={state === "failed" ? "alert" : undefined} aria-live="polite"
           className={cn("mr-auto text-xs", state === "failed" ? "text-destructive" : "text-gaid-ink-2")}>
-          {state === "failed"
-            ? t("notes.decision.sendFailed")
-            : state === "sent" || state === "filled"
-              ? t(state === "sent" ? "notes.decision.sent" : "notes.decision.filled")
-              : answered
-                ? t("notes.decision.progress", { answered, count: decisions.length })
-                : t("notes.decision.sendBlocked")}
+          {status}
         </p>
         {decisions.length > 1 && (
           <>
@@ -520,13 +553,30 @@ function DecisionCards({ note, onSend }: { note: ResearchNoteSummary; onSend: (t
   );
 }
 
+/** Readout plate for an answer that left the note: 보냄, or 입력창에 넣음 when the chat only took it into its chat box. */
+function DeliveredPlate({ delivered, changed }: { delivered: DeliveredAnswer; changed: boolean }) {
+  const label = changed ? t("notes.decision.delivered.changed") : t(delivered.via === "sent" ? "notes.decision.delivered.sent" : "notes.decision.delivered.filled");
+  const when = new Date(delivered.at);
+  const time = Number.isNaN(when.getTime()) ? "" : when.toLocaleString(geoLocale(), { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return (
+    <span
+      className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-gaid-edge bg-gaid-face-2 px-1.5 text-xs font-medium leading-5 text-gaid-ink-2"
+      title={time ? t(delivered.via === "sent" ? "notes.decision.delivered.sentAt" : "notes.decision.delivered.filledAt", { time }) : undefined}
+    >
+      {!changed && <CheckIcon aria-hidden className="size-3" />}
+      {label}
+    </span>
+  );
+}
+
 const OPTION_CARD = "rounded-md border border-gaid-edge bg-gaid-face transition-colors hover:border-gaid-control-edge";
 const OPTION_ROW = "flex w-full items-start gap-2.5 rounded-md px-3 py-2.5 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const OPTION_ON = "border-gaid-signal bg-gaid-signal-tint/40";
 
-function DecisionCard({ decision, answer, onChoose }: {
+function DecisionCard({ decision, answer, delivered, onChoose }: {
   decision: ResearchNoteDecision;
   answer: DecisionAnswer | undefined;
+  delivered?: DeliveredAnswer;
   onChoose: (answer: DecisionAnswer) => void;
 }) {
   const id = useId();
@@ -534,7 +584,10 @@ function DecisionCard({ decision, answer, onChoose }: {
   const instruction = answer?.kind === "instruction" ? answer.text : "";
   return (
     <div>
-      <p id={id} className="text-[15px] font-semibold leading-6">{plainText(decision.question)}</p>
+      <div className="flex items-start gap-2">
+        <p id={id} className="min-w-0 flex-1 text-[15px] font-semibold leading-6">{plainText(decision.question)}</p>
+        {delivered && <DeliveredPlate delivered={delivered} changed={!sameAnswer(answer, delivered.answer)} />}
+      </div>
       <div role="radiogroup" aria-labelledby={id} className="mt-3 space-y-1.5">
         {options.map((option) => {
           const selected = answer?.kind === "option" && answer.label === option.label;
