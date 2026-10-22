@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:18:47Z
+updated: 2026-10-22T02:19:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"12220668-2f56-4301-9ceb-1da6022ea8f7","pid":2196945,"provider":"claude","session":"f484fa94-7306-4cbf-a4a9-9e4e13cb3b0b","start":"52201100","token":"e6aadc1b7993109484dd94e6a03a7519df103e802549703adee2f16a87cdcd3c"}
 branch: task/gaid-ui-v2-debts
 target: main
@@ -45,8 +45,23 @@ Plan (2026-10-22):
   1440/1280, 1024–1279 for L1), scripts/check, report.
 - Data home: ~/data/geoaidesk/work/gaid-ui-v2-debts/home (copy of gaid-design-identity--fresh home); parent dev app ports
   18370/3370, child 18360/3360.
+- Done on this branch (2026-10-22, pushed 932190d7): C library badges → role tokens (source neutral, read coverage
+  success/warning tint, recent-list side stripe removed; 23 baseline entries removed, slop list empty); D RN3 delivered
+  answers (`web/src/geo/notes/decision-answers.ts` load/saveDelivered in localStorage `gaid:note-answers:<project>:<note>`,
+  keyed by question text; plates 보냄 / 입력창에 넣음 / 바꾼 답, 보내기 전; only new or changed answers are sent again);
+  B layout: chat pane overlay sheet below 1280 px, separators keyboard-resizable (16/64 px, Home/End) within L2 ranges
+  (tree 220–360, chat 360–640, saved widths clamped), Ctrl/⌘ \ file list toggle, Ctrl/⌘ K search (new file-name filter in
+  the file tree; project list and hub search fields marked `data-gaid-search`), shared `web/src/geo/shell/shortcuts.ts`.
+- Checks so far: web vitest 177 files / 1148 tests passed before the RN3 copy tweak (notes 11/11 after); tsc clean;
+  check-ui 0 errors; copy validator 0 errors; distribution test passes with the new seam owner.
+- Real-app check (dev app ports 18370/3370, data home above + library fixture copied from gaid-library-folders home):
+  Ctrl K focus/filter/Escape, Ctrl \ hide then Ctrl K reopen+focus, chat separator 440→456→520, End 640, Home 360.
+  Screenshots ~/data/geoaidesk/work/gaid-ui-v2-debts/shots/ (lib, dec, ws × 2 styles × 2 themes × 1440/1280/1180),
+  contact sheets in .../sheets/; script .../shot.sh.
 ## Next steps
-1. Implement C, D, B; then integrate the map child.
+1. When the map child finishes: `task complete gaid-ui-v2-debts--map`, `task sync`, rerun web tests + scripts/check,
+   screenshots of the map screen, write the report reports/2026-10-22-gaid-ui-v2-debts/index.md, stop the dev app unit
+   `gaid-ui-debts-app`, `task finish`.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
