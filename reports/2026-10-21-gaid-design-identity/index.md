@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/result-01-app-instrument.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # GAID UI/UX 가이드 v2: 계측 기본 디자인과 도폭 선택 스타일
 
