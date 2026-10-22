@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T14:36:29Z
+updated: 2026-10-22T14:41:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -84,9 +84,14 @@ by then, save, write the state in your task document and report what is left.
 Report back (final message, English): files changed, the live smoke table, anything in the contract that should change.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented migration 3, approved-source snapshots/audit, bounded RSS/RDF/Atom and GitHub collection, serialized batches,
+retention, authenticated feed/admin routes, CLI commands and configurable startup/interval schedule. Operator guide added.
+Verified: server `npx tsc --noEmit`; focused Vitest suite passed 69 tests in 3 files (2026-10-22 KST).
+Live smoke is next; no deployment or integration claimed yet.
 ## Next steps
-1. (the next session's first action)
+1. Save this checked implementation; run one recorded live smoke with a temporary home and explicit CLI approval of all proposals.
+2. Inspect per-source counts/errors, address material implementation issues, rerun focused checks only after changes.
+3. Deliver the smoke evidence to parent and finish this child; parent integrates and runs full scripts/check.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -104,3 +109,10 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
+
+### Implementation checkpoint
+- Sequential decisions: preserve the settled shared contract; add migration 3, then source validation/parsing/collection/store, route and CLI wiring, then fixture-based checks and the live smoke.
+- Owned interfaces/files: only the listed child scope. No child writers (nested children unsupported); tightly coupled implementation stays with this writer.
+- Integration order: database + feed module first, routes/CLI next, then focused tests; parent owns full scripts/check and final report.
+- Existing migration-count/v1-fixture assertions need adaptation; parent notified because those test files are outside the original owned scope.
+- Parent authorized migration-compatibility-only edits to server/test/geo-hub-server.test.ts and server/test/geo-hub-server-skills.test.ts; these are now owned by this child. Parent will not touch them.

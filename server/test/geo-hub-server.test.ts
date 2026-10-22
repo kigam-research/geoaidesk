@@ -72,7 +72,7 @@ describe("home and process surface", () => {
     expect((await app.inject(`${API}/health`)).json().serverId).toBe(first.serverId);
     expect(app.hub.get("PRAGMA journal_mode")).toMatchObject({ journal_mode: "wal" });
     expect(app.hub.get("PRAGMA foreign_keys")).toMatchObject({ foreign_keys: 1 });
-    expect(app.hub.counts().schema_migrations).toBe(2);
+    expect(app.hub.counts().schema_migrations).toBe(3);
   });
   it.each([{ origin: "http://localhost" }, { origin: "" }, { "sec-fetch-site": "none" }])("refuses browser headers before routing: %j", async (headers) => {
     for (const url of [`${API}/health`, "/projects", `${API}/auth/login`]) {
