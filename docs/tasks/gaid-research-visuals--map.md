@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T02:41:29Z
+status: active
+updated: 2026-10-22T02:48:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"38934232-bc69-4c6e-85ce-d9508ca7b59d","pid":2583953,"provider":"codex","session":"01a1616f-fbe3-7443-b1ed-dcbcf3b16315","start":"52403024","token":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
 branch: task/gaid-research-visuals--map
 target: task/gaid-research-visuals
@@ -75,13 +75,14 @@ Common rules for this child of gaid-research-visuals (GeoAIDesk, repo kigam-rese
   `task finish`.
 
 ## Current state
-Implemented the connection-map API and reusable pane/button. No settled contract changes. Existing note/library/provenance/trial sources stay read-only; no graph master store or model calls were added.
+Implemented the connection-map API and reusable pane/button. Final CLI publication awaits a full declared-check retry after the parent-authorized distribution-owner registration fix. No settled contract changes. Existing note/library/provenance/trial sources stay read-only; no graph master store or model calls were added.
 
 - GET /geo/connections supports 1/2 hops and 80 returned nodes. It resolves citation aliases, omits unresolved citations, joins note chats and local images (including missing covers), reads version-aware lineage, preserves inferred confidence, omits model-declared edges, and marks changed/missing/retracted items. Invisible/outside-sandbox paths are rejected. An 81-artifact lineage lookup safety budget also marks a response truncated when exhausted.
 - Library Workflow links use the packaged methodId when present, joining trial identity; otherwise the existing entryId/authoringId is retained. Chat history names come from SessionManager.list; missing history gets a localized neutral label and recorded date, never an identifier as its title.
 - Web: LR dagre layout with React Flow, centre/index cue, one-line titles and one attention readout, dashed inferred links, depth switch, selected-item actions, recentering, keyboard zoom controls, accessible list/tab switching, loading/retry/empty/truncation states. Button opens a non-modal side pane with Escape/focus restoration. Theme and style are token-driven, not branched. React Flow attribution remains visible.
 
 Checks completed:
+- First task finish ran the full declared suite automatically: backend 184 files passed/1 skipped, 2073 tests passed/8 skipped; frontend 178 files/1147 tests passed; launcher check passed. Distribution checks stopped on the missing gaid-research-visuals owner in the fixed allow-list. The parent explicitly authorized adding that owner and the test seam in this child; the focused distribution test passed (7/7), followed by task finish in place. Remaining full distribution/environment/production checks are not yet passed.
 - server: npx vitest run test/geo-connections.test.ts — 6 passed; npm run typecheck — passed.
 - web: focused layout/pane vitest files — 3 passed; npx eslint src/geo/connections/*.ts src/geo/connections/*.tsx — passed; npx tsc --noEmit — passed (including the final font adjustment).
 - node geo/ui/check-ui.mjs — 0 errors, unchanged 112 accepted debt entries.
@@ -96,6 +97,7 @@ Synthetic GET evidence (depth 2): note focus returns 6 nodes/5 edges; figure foc
 Closed 2026-10-22T02:41:29Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish stopped at geo/tests/distribution.test.mjs because the new required seam owner was not in its static allow-list. Parent authorization (2026-10-22) extended ownership to that single allow-list registration and its boundary entry; no test expectations for application behavior changed.
 - Initial web import named a nonexistent useProjectId; corrected to existing useProjectScopeId. Effect-based reset failed the React lint rule; keyed per-entry state plus request-keyed asynchronous results now pass without suppressions. Initial component test assumed whitespace between adjacent spans; explicit localized accessible labels fixed the ambiguity. A test-evidence command was first run from repo root with server-relative include rules, found no tests, then was rerun successfully from server/.
 ## Notes and decisions
 UI rules followed: D1/D2 (non-modal pane), S1/S3/S7 (role colours, labelled attention/selection, states), G1/G6 (compact titles/index cue), N6/A1–A3 (keyboard and accessible list), MAP1 (adjacent visible legend), R1/R2 (no internal identifiers in titles or edge accessible names; no raw error). No new baseline debt. Zoomable graph labels use 15–16 px source text; the list retains ordinary UI text when zoomed out.
