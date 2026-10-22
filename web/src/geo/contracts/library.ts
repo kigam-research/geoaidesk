@@ -11,7 +11,12 @@
  * and does not depend on the source. A project stores references only (`.kady/geo/literature.json`). Research notes
  * cite with Pandoc syntax (`[@key, p. 12]`); `parseCitations` is the one parser for the server hook and the note view.
  *
- * Draft contract: no server module or screen uses it yet. IO-free; the server imports it.
+ * Folders (gaid-library-folders; ADR docs/adr/2026-10-21-library-folders.md): nested topic folders; an item can be in
+ * several. A folder may be linked to one Zotero collection; for a Zotero item of that library, membership in a linked
+ * folder comes from Zotero, every other membership is kept by GAID. A folder (with its subfolders) is a citation scope:
+ * export, reference check and, when attached to a project, the project's citations.
+ *
+ * IO-free; the server imports it.
  */
 
 export const LIBRARY_SCHEMA = "gaid-library/v1";
@@ -120,17 +125,50 @@ export interface LibraryItem {
   sentToZoteroAt?: string;
   /** Set when the item disappeared from its Zotero library; kept so existing citations and links still resolve. */
   removedFromSourceAt?: string;
+  /**
+   * Earlier ids and citation keys that still resolve to this item: a GAID item merged into the Zotero copy of the same
+   * paper when it was sent, or a citation key that changed when Zotero (Better BibTeX) assigned its own.
+   */
+  aliases?: { ids?: string[]; citationKeys?: string[] };
   /** Retraction/correction evidence seen when the metadata was looked up (Crossref, OpenAlex). */
   signals?: UpdateSignal[];
 }
 
+/**
+ * A folder. `source: "gaid"` = made in GAID and not linked; `source: "zotero"` = linked to a Zotero collection, either
+ * mirrored from Zotero (`zc-` id) or a GAID folder sent to Zotero (keeps its `lc-` id). A linked folder takes its name
+ * and parent from Zotero; GAID renames, moves or deletes unlinked folders only.
+ */
 export interface LibraryCollection {
   id: string;
   owner: string;
   name: string;
   source: LibrarySource;
   parentId?: string;
-  zotero?: { connection: ZoteroConnectionKind; libraryType: "user" | "group"; libraryId: string; collectionKey: string };
+  zotero?: { connection: ZoteroConnectionKind; serverId?: string; libraryType: "user" | "group"; libraryId: string; collectionKey: string };
+  createdAt?: string;
+}
+
+/** CSL with numeric date parts: Zotero's CSL export writes them as strings ("2023"); CSL-JSON and GAID use numbers. */
+export function numericCslDates<T extends CslItem>(csl: T): T {
+  const out = { ...csl };
+  for (const field of ["issued", "accessed"] as const) {
+    const date = out[field] as { "date-parts"?: unknown[][] } | undefined;
+    if (!date || !Array.isArray(date["date-parts"])) continue;
+    (out as Record<string, unknown>)[field] = { ...date, "date-parts": date["date-parts"].map((parts) => (Array.isArray(parts) ? parts.map((p) => (typeof p === "string" && /^-?\d+$/.test(p.trim()) ? Number(p) : p)) : parts)) };
+  }
+  return out;
+}
+
+/** Folder ids of `id` and all its subfolders (cycle-safe). */
+export function folderSubtree(collections: Pick<LibraryCollection, "id" | "parentId">[], id: string): Set<string> {
+  const out = new Set<string>([id]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const c of collections) if (c.parentId && out.has(c.parentId) && !out.has(c.id)) { out.add(c.id); grew = true; }
+  }
+  return out;
 }
 
 /** Sync cursor and status of one Zotero library GAID follows. */
@@ -176,6 +214,11 @@ export interface ProjectLiterature {
   collectionIds: string[];
   itemIds: string[];
 }
+
+/**
+ * `.kady/geo/literature.json` lists folders and single items; together (folders with their subfolders) they are the
+ * project's citation scope. An empty file means no scope: the whole library counts.
+ */
 
 /** One Pandoc citation in Markdown: `[@key]`, `[@key, p. 12]`, `[see @a, pp. 3-5; @b]`. */
 export interface NoteCitation {
@@ -253,6 +296,8 @@ export interface LibraryListResponse {
   total: number;
   counts: { all: number; zotero: number; gaid: number; unread: number; cited: number };
   collections: LibraryCollection[];
+  /** Items per folder, subfolders included. */
+  folderCounts: Record<string, number>;
   zotero: ZoteroLibraryState[];
 }
 
@@ -292,6 +337,61 @@ export interface CitationResolution {
   title?: string;
   /** One plain reference line for the note's reference list. */
   reference?: string;
+  /** In the library but outside the project's citation scope (attached folders and items). */
+  outsideScope?: boolean;
+}
+
+// --- Folders ---------------------------------------------------------------------------------------------------------
+
+/** `POST /geo/library/collections/:id/items`: add or remove items. */
+export interface FolderMembershipBody {
+  itemIds: string[];
+  action: "add" | "remove";
+}
+
+export interface FolderMembershipResult {
+  changed: number;
+  /** Zotero items added to the linked Zotero collection (written to Zotero). */
+  writtenToZotero: number;
+  /** Zotero items whose membership in a linked folder can only be removed in Zotero. */
+  removeInZotero: string[];
+}
+
+/** Bibliography export formats; `text` is a plain APA-like reference list, not a full CSL style. */
+export type ExportFormat = "bibtex" | "ris" | "csl-json" | "text";
+
+/** One finding of a folder's reference check; never a verdict on a paper. */
+export type FolderIssue =
+  | { kind: "retracted" | "no-doi" | "unconfirmed" | "no-year" | "no-authors" | "unread" | "removed-from-zotero"; itemId: string; title: string }
+  | { kind: "duplicate"; itemIds: string[]; title: string }
+  /** A research note in a project that uses this folder cites a key outside the folder (or not in the library). */
+  | { kind: "cited-outside"; key: string; itemId?: string; title?: string; projectId: string; projectName: string; noteId: string; noteTitle: string };
+
+export interface FolderCheckResponse {
+  folderId: string;
+  items: number;
+  /** Projects whose citation scope includes this folder. */
+  projects: { id: string; name: string }[];
+  issues: FolderIssue[];
+}
+
+/** Result of "Zotero로 보내기" for one item or a folder. */
+export interface SendToZoteroResult {
+  /** New Zotero items created from GAID items. */
+  created: number;
+  /** GAID items that were already in Zotero: merged into the Zotero copy, no new Zotero item. */
+  merged: number;
+  /** Existing Zotero items added to a linked collection. */
+  addedToCollections: number;
+  /** PDFs uploaded to Zotero. */
+  attachments: number;
+  /** Folders created in or linked to Zotero. */
+  folders: number;
+  /** Items not sent, with a research-language reason id for the screen. */
+  skipped: { itemId: string; reason: "unsupported-type" | "pdf-failed" | "other-library" }[];
+  /** Set when Zotero refused further writes (single-use key spent, key revoked); earlier steps are kept. */
+  stopped?: ZoteroLibraryState["state"];
+  item?: LibraryItem;
 }
 
 /** Update evidence from Crossref/OpenAlex (retraction, correction); never a verdict on the paper. */

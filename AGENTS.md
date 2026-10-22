@@ -117,6 +117,16 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail where the researcher picks an option or writes a
   별도 지시 for each decision and sends all answers at once with 답변 보내기 to the chat that wrote the note (gaid-note-decisions,
   `send` prefill in `web/src/lib/chat-prefill.ts`), 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
+- Personal library (gaid-research-hub, ADR `docs/adr/2026-10-21-research-hub-library.md`; folders gaid-library-folders,
+  ADR `docs/adr/2026-10-21-library-folders.md`): "내 연구" → 서재, user-level store `server/src/geo/library/` (contract
+  `web/src/geo/contracts/library.ts`, routes `/geo/library/*`, screens `web/src/geo/library/`). Items are Zotero-linked
+  (mirrored, Zotero is the source) or GAID-managed. Nested folders (`LibraryCollection`, subfolders included in views,
+  export, check and scope); a folder may be linked to a Zotero collection (a Zotero item's membership in a linked folder of
+  its library comes from Zotero, all other membership is GAID's). Narrow confirmed Zotero writes only (create collection
+  when sending a folder, add to collection, create item + PDF + full text, tags, note link; `zotero/writes.ts`); sending
+  syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
+  papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
+  and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`

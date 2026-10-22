@@ -118,8 +118,6 @@
       "web/src/geo/library/library-screen.tsx:hue-utility:text-emerald-700",
       "web/src/geo/library/library-screen.tsx:hue-utility:text-red-700",
       "web/src/geo/library/library-screen.tsx:side-stripe:border-l-2",
-      "web/src/geo/library/note-references.tsx:hue-utility:dark:text-amber-300",
-      "web/src/geo/library/note-references.tsx:hue-utility:text-amber-700",
       "web/src/geo/library/zotero-card.tsx:hue-utility:dark:text-amber-300",
       "web/src/geo/library/zotero-card.tsx:hue-utility:text-amber-700"
     ]

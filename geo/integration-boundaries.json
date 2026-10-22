@@ -837,6 +837,12 @@
       "responsibility": "Zotero mirror commit, removal marking, send-to-Zotero in place and Zotero PDF page reading against the fake Zotero server"
     },
     {
+      "path": "server/test/geo-library-folders.test.ts",
+      "owner": "gaid-library-folders",
+      "status": "added",
+      "responsibility": "Library folders, folder-scoped export/check/citations, aliases and folder reconciliation after a Zotero sync"
+    },
+    {
       "path": "server/test/geo-library-metadata.test.ts",
       "owner": "gaid-research-hub--metadata",
       "status": "added",

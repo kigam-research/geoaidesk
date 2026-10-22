@@ -5,18 +5,22 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
-import { activePaths, type ProjectPaths } from "../../projects.ts";
+import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
+import { folderSubtree, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
 import type {
   CitationResolution,
+  ExportFormat,
+  FolderCheckResponse,
+  FolderIssue,
   CreateLibraryItemBody,
   LibraryItem,
   LibraryListResponse,
   LibraryUse,
   UploadedLibraryFile,
 } from "../../../../web/src/geo/contracts/library.ts";
-import { LibraryError, libraryStore, normalizeDoi, shortAuthors, cslYear, summarize, type LibraryStore } from "../library/store.ts";
+import { LibraryError, libraryStore, normalizeDoi, cslYear, samePaper, summarize, type LibraryStore } from "../library/store.ts";
 import { readStoredPdf, storedPdf } from "../library/reader.ts";
-import { buildUsesIndex, projectItems, readProjectLiterature, writeProjectLiterature } from "../library/uses.ts";
+import { buildUsesIndex, hasScope, projectItems, projectNoteCitations, readProjectLiterature, scopeFolders, writeProjectLiterature } from "../library/uses.ts";
 import { AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
@@ -43,6 +47,13 @@ const candidate = (r: MetadataRecord & { score?: number }): MetadataCandidate =>
   ...(r.score !== undefined ? { score: r.score } : {}),
 });
 const FORMATS: BibliographyFormat[] = ["bibtex", "ris", "csl-json"];
+const EXPORTS: ExportFormat[] = [...FORMATS, "text"];
+
+/** Plain reference list sorted by first author and year (`text` export; APA-like, not a full CSL style). */
+export function referenceList(items: LibraryItem[], locale: "ko" | "en"): string {
+  const sortKey = (i: LibraryItem) => `${(i.csl.author?.[0]?.family ?? i.csl.author?.[0]?.literal ?? i.csl.title).toLowerCase()} ${cslYear(i.csl) ?? 0}`;
+  return [...items].sort((a, b) => sortKey(a).localeCompare(sortKey(b), locale)).map((i) => formatReference(i.csl, locale)).join("\n") + "\n";
+}
 
 // Library item -> hub authoring drafts made from it. Kept in the library directory so the authoring contract stays as is.
 function linksFile(store: LibraryStore) { return path.join(store.root, "links.json"); }
@@ -95,13 +106,16 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const store = storeOf(), q = req.query ?? {};
       zoteroOf(store).refreshIfStale();
       const all = (await store.all()).filter((i) => !i.removedFromSourceAt);
-      const uses = buildUsesIndex(all, await workflowUses(store));
-      const inProject = q.filter === "project" ? new Set(projectItems(readProjectLiterature(pathsOf()), all).map((i) => i.id)) : undefined;
+      const collections = await store.collections();
+      const uses = buildUsesIndex(all, await workflowUses(store), collections);
+      const inProject = q.filter === "project" ? new Set(projectItems(readProjectLiterature(pathsOf()), all, collections).map((i) => i.id)) : undefined;
+      // A folder shows its subfolders' papers too.
+      const inFolder = q.collectionId ? folderSubtree(collections, q.collectionId) : undefined;
       const terms = (q.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
       const unread = (i: LibraryItem) => i.read.coverage === "none" || i.read.coverage === "abstract";
       const rows = all
         .filter((i) => !q.source || i.source === q.source)
-        .filter((i) => !q.collectionId || i.collectionIds.includes(q.collectionId))
+        .filter((i) => !inFolder || i.collectionIds.some((c) => inFolder.has(c)))
         .filter((i) => q.filter !== "unread" || unread(i))
         .filter((i) => q.filter !== "cited" || uses.counts(i).notes > 0)
         .filter((i) => !inProject || inProject.has(i.id))
@@ -124,14 +138,18 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
           unread: all.filter(unread).length,
           cited: all.filter((i) => uses.counts(i).notes > 0).length,
         },
-        collections: await store.collections(),
+        collections,
+        folderCounts: Object.fromEntries(collections.map((c) => {
+          const sub = folderSubtree(collections, c.id);
+          return [c.id, all.filter((i) => i.collectionIds.some((x) => sub.has(x))).length];
+        })),
         zotero: z.libraries,
       };
     });
 
     scope.get<{ Params: { id: string } }>("/geo/library/items/:id", async (req) => {
       const store = storeOf(), item = await store.get(req.params.id);
-      const uses = buildUsesIndex(await store.all(), await workflowUses(store));
+      const uses = buildUsesIndex(await store.all(), await workflowUses(store), await store.collections());
       return { item, uses: uses.usesOf(item) };
     });
 
@@ -190,15 +208,27 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       }
       return { added, duplicates, failed };
     });
-    scope.get<{ Querystring: { format?: string; ids?: string } }>("/geo/library/export", async (req, reply) => {
-      const format = (req.query?.format ?? "bibtex") as BibliographyFormat;
-      if (!FORMATS.includes(format)) throw new LibraryError("format must be bibtex, ris or csl-json");
+    /** Bibliography of the whole library, chosen items, or one folder with its subfolders (a manuscript's references). */
+    scope.get<{ Querystring: { format?: string; ids?: string; collectionId?: string; lang?: string } }>("/geo/library/export", async (req, reply) => {
+      const format = (req.query?.format ?? "bibtex") as ExportFormat;
+      if (!EXPORTS.includes(format)) throw new LibraryError("format must be bibtex, ris, csl-json or text");
+      const store = storeOf();
       const wanted = new Set((req.query?.ids ?? "").split(",").filter(Boolean));
-      const items = (await storeOf().all()).filter((i) => !i.removedFromSourceAt && (!wanted.size || wanted.has(i.id)));
-      const text = exportBibliography(items.map((i) => ({ ...i.csl, ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
-      const ext = format === "csl-json" ? "json" : format === "bibtex" ? "bib" : "ris";
+      let folder: Set<string> | undefined, name = "gaid-library";
+      if (req.query?.collectionId) {
+        const collections = await store.collections();
+        const c = collections.find((x) => x.id === req.query.collectionId);
+        if (!c) throw new LibraryError("Folder not found", 404);
+        folder = folderSubtree(collections, c.id);
+        name = c.name.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").slice(0, 60) || "folder";
+      }
+      const items = (await store.all()).filter((i) => !i.removedFromSourceAt && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
+      const text = format === "text"
+        ? referenceList(items, req.query?.lang === "en" ? "en" : "ko")
+        : exportBibliography(items.map((i) => ({ ...numericCslDates(i.csl), ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
+      const ext = format === "csl-json" ? "json" : format === "bibtex" ? "bib" : format === "ris" ? "ris" : "txt";
       reply.header("Content-Type", format === "csl-json" ? "application/json" : "text/plain; charset=utf-8");
-      reply.header("Content-Disposition", `attachment; filename="gaid-library.${ext}"`);
+      reply.header("Content-Disposition", `attachment; filename="gaid-library.${ext}"; filename*=UTF-8''${encodeURIComponent(`${name}.${ext}`)}`);
       return text;
     });
 
@@ -230,15 +260,71 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
 
     scope.post<{ Body: { name?: unknown; parentId?: unknown } }>("/geo/library/collections", async (req, reply) =>
       reply.code(201).send(await storeOf().addGaidCollection(req.body?.name, req.body?.parentId)));
+    scope.patch<{ Params: { id: string }; Body: { name?: unknown; parentId?: unknown } }>("/geo/library/collections/:id", async (req) =>
+      storeOf().editGaidCollection(req.params.id, req.body ?? {}));
+    scope.delete<{ Params: { id: string } }>("/geo/library/collections/:id", async (req) => storeOf().removeGaidCollection(req.params.id));
+    /** Adds or removes papers; a Zotero item added to a folder linked to its library is also added in Zotero. */
+    scope.post<{ Params: { id: string }; Body: { itemIds?: unknown; action?: unknown } }>("/geo/library/collections/:id/items", async (req) => {
+      const ids = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((x): x is string => typeof x === "string") : [];
+      const action = req.body?.action === "remove" ? "remove" : req.body?.action === "add" ? "add" : undefined;
+      if (!ids.length || !action) throw new LibraryError("itemIds and action (add, remove) are required");
+      return zoteroOf(storeOf()).setMembership(req.params.id, ids, action);
+    });
+    scope.post<{ Params: { id: string } }>("/geo/library/collections/:id/send-to-zotero", async (req) => zoteroOf(storeOf()).sendFolderToZotero(req.params.id));
+
+    /** Reference check of a folder (with subfolders): gaps and signals per paper, and note citations outside it. */
+    scope.get<{ Params: { id: string } }>("/geo/library/collections/:id/check", async (req): Promise<FolderCheckResponse> => {
+      const store = storeOf(), collections = await store.collections();
+      if (!collections.some((c) => c.id === req.params.id)) throw new LibraryError("Folder not found", 404);
+      const sub = folderSubtree(collections, req.params.id);
+      const all = await store.all();
+      const items = all.filter((i) => i.collectionIds.some((c) => sub.has(c)));
+      const issues: FolderIssue[] = [];
+      const one = (kind: Extract<FolderIssue, { itemId: string }>["kind"], i: LibraryItem) => issues.push({ kind, itemId: i.id, title: i.csl.title });
+      for (const i of items) {
+        if (i.removedFromSourceAt) { one("removed-from-zotero", i); continue; }
+        if ((i.signals ?? []).some((s) => s.kind === "retraction" && !s.relation.startsWith("update-to"))) one("retracted", i);
+        if (!normalizeDoi(i.csl.DOI)) one("no-doi", i);
+        if (cslYear(i.csl) === undefined) one("no-year", i);
+        if (!(i.csl.author ?? []).length) one("no-authors", i);
+        if (!i.metadataConfirmed) one("unconfirmed", i);
+        if (i.read.coverage === "none") one("unread", i);
+      }
+      const live = items.filter((i) => !i.removedFromSourceAt);
+      const grouped = new Set<string>();
+      for (const a of live) {
+        if (grouped.has(a.id)) continue;
+        const same = live.filter((b) => b.id !== a.id && !grouped.has(b.id) && samePaper(a.csl, b.csl));
+        if (same.length) { [a, ...same].forEach((x) => grouped.add(x.id)); issues.push({ kind: "duplicate", itemIds: [a.id, ...same.map((x) => x.id)], title: a.csl.title }); }
+      }
+      const inFolder = new Set(live.map((i) => i.id));
+      const projects: FolderCheckResponse["projects"] = [];
+      for (const project of listProjects()) {
+        let paths: ProjectPaths;
+        try { paths = resolvePaths(project.id); } catch { continue; }
+        const literature = readProjectLiterature(paths);
+        if (![...scopeFolders(literature, collections)].some((c) => sub.has(c))) continue;
+        projects.push({ id: project.id, name: project.name });
+        for (const note of projectNoteCitations(paths)) {
+          for (const key of new Set(note.citations.map((c) => c.key))) {
+            const item = await store.byCitationKey(key);
+            if (item && inFolder.has(item.id)) continue;
+            issues.push({ kind: "cited-outside", key, ...(item ? { itemId: item.id, title: item.csl.title } : {}), projectId: project.id, projectName: project.name, noteId: note.noteId, noteTitle: note.title });
+          }
+        }
+      }
+      return { folderId: req.params.id, items: live.length, projects, issues };
+    });
 
     scope.get("/geo/library/project", async () => readProjectLiterature(pathsOf()));
     scope.put<{ Body: { collectionIds?: unknown; itemIds?: unknown } }>("/geo/library/project", async (req) => {
       const store = storeOf(), all = await store.all(), collections = await store.collections();
-      const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id): id is string => typeof id === "string" && all.some((i) => i.id === id)) : [];
+      const known = (id: string) => all.some((i) => i.id === id || i.aliases?.ids?.includes(id));
+      const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id): id is string => typeof id === "string" && known(id)) : [];
       const collectionIds = Array.isArray(req.body?.collectionIds) ? req.body.collectionIds.filter((id): id is string => typeof id === "string" && collections.some((c) => c.id === id)) : [];
       const saved = writeProjectLiterature(pathsOf(), { collectionIds, itemIds });
       // Read the PDFs of attached Zotero items in the background so the agent can cite pages (bounded).
-      const pending = projectItems(saved, all).filter((i) => i.source === "zotero" && i.read.coverage === "none" && i.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey)).slice(0, 20);
+      const pending = projectItems(saved, all, collections).filter((i) => i.source === "zotero" && i.read.coverage === "none" && i.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey)).slice(0, 20);
       void (async () => { for (const item of pending) { try { await zoteroOf(store).readZoteroPdf(item); } catch { /* shown as not read */ } } })();
       return saved;
     });
@@ -259,13 +345,19 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     });
     scope.post<{ Params: { id: string } }>("/geo/library/items/:id/send-to-zotero", async (req) => zoteroOf(storeOf()).sendToZotero(req.params.id));
 
-    /** Resolution of note citation keys (note view reference list). */
+    /** Resolution of note citation keys (note view reference list), marked when outside the project's citation scope. */
     scope.get<{ Querystring: { keys?: string } }>("/geo/library/citations", async (req): Promise<CitationResolution[]> => {
       const store = storeOf();
       const keys = [...new Set((req.query?.keys ?? "").split(",").map((k) => k.trim()).filter(Boolean))].slice(0, 200);
+      let scope: Set<string> | undefined;
+      try {
+        const literature = readProjectLiterature(pathsOf());
+        if (hasScope(literature)) scope = new Set(projectItems(literature, await store.all(), await store.collections()).map((i) => i.id));
+      } catch { /* no project scope */ }
       return Promise.all(keys.map(async (key) => {
         const item = await store.byCitationKey(key);
-        return item && !item.removedFromSourceAt ? { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item) } : { key };
+        if (!item || item.removedFromSourceAt) return { key };
+        return { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item), ...(scope && !scope.has(item.id) ? { outsideScope: true } : {}) };
       }));
     });
 

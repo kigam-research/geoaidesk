@@ -4,6 +4,7 @@ import {
   ZoteroError, ZoteroServerChangedError, libraryPath, itemKey,
   type ApiResult, type ReadOptions, type ZoteroClient, type ZoteroLibrary,
   type ZoteroSecretStore, type NewZoteroObject,
+  type ZoteroUploadAuthorization, type ZoteroUploadMetadata, type ZoteroFullTextInput,
 } from "./types.ts";
 
 export interface ClientOptions {
@@ -90,7 +91,7 @@ abstract class HttpZoteroClient implements ZoteroClient {
     return url;
   }
 
-  protected async request(path: string, method: string, options: ReadOptions = {}, body?: unknown, authorize = false, maxBytes = JSON_LIMIT): Promise<ApiResult<Buffer>> {
+  protected async request(path: string, method: string, options: ReadOptions & { ifNoneMatch?: "*" } = {}, body?: unknown, authorize = false, maxBytes = JSON_LIMIT): Promise<ApiResult<Buffer>> {
     const url = this.url(path);
     for (const [key, value] of Object.entries(options.query ?? {})) url.searchParams.set(key, String(value));
     const write = method !== "GET";
@@ -103,15 +104,16 @@ abstract class HttpZoteroClient implements ZoteroClient {
         const headers = new Headers({ "Zotero-API-Version": "3" });
         if (expectedServer && this.connection === "local") headers.set("Zotero-Server-ID", expectedServer);
         if (options.ifModifiedSince !== undefined) headers.set(write ? "If-Unmodified-Since-Version" : "If-Modified-Since-Version", String(options.ifModifiedSince));
+        if (options.ifNoneMatch) headers.set("If-None-Match", options.ifNoneMatch);
         if ((this.connection === "web" || write) && !authorize) {
           const key = await this.secrets.get(this.secretSlot());
           if (!key) throw new ZoteroError("key-rejected", "key-required");
           headers.set("Zotero-API-Key", key);
         }
-        if (body !== undefined) headers.set("Content-Type", "application/json");
+        if (body !== undefined) headers.set("Content-Type", body instanceof URLSearchParams ? "application/x-www-form-urlencoded" : "application/json");
         let response: Response;
         try {
-          response = await this.fetcher(url, { method, headers, ...(body === undefined ? {} : { body: JSON.stringify(body) }), redirect: "manual", signal: AbortSignal.timeout(this.timeoutMs) });
+          response = await this.fetcher(url, { method, headers, ...(body === undefined ? {} : { body: body instanceof URLSearchParams ? body.toString() : JSON.stringify(body) }), redirect: "manual", signal: AbortSignal.timeout(this.timeoutMs) });
         } catch (error) {
           const cause = (error as { cause?: { code?: string } })?.cause;
           throw new ZoteroError(this.connection === "local" && cause?.code === "ECONNREFUSED" ? "zotero-closed" : "unreachable", "connection-failed");
@@ -178,6 +180,60 @@ abstract class HttpZoteroClient implements ZoteroClient {
     const result = await this.request(`${libraryPath(library)}/items/${itemKey(key)}`, "PATCH", { ifModifiedSince: version }, patch);
     if (result.status === 412) throw new ZoteroError("ok", "version-conflict", 412);
     return { ...result, data: null };
+  }
+
+  async authorizeUpload(library: ZoteroLibrary, key: string, metadata: ZoteroUploadMetadata): Promise<ZoteroUploadAuthorization> {
+    const result = await this.request(`${libraryPath(library)}/items/${itemKey(key)}/file`, "POST", { ifNoneMatch: "*" }, new URLSearchParams({ ...metadata }));
+    if (result.status === 412) throw new ZoteroError("ok", "version-conflict", 412);
+    if (result.status !== 200) throw new ZoteroError("unreachable", "upload-authorization-failed", result.status);
+    let data: ZoteroUploadAuthorization;
+    try { data = JSON.parse(result.data.toString()); } catch { throw new ZoteroError("unreachable", "invalid-upload-response"); }
+    if (!data || typeof data !== "object" || ("exists" in data ? data.exists !== 1 :
+      !["url", "contentType", "prefix", "suffix", "uploadKey"].every((field) => typeof (data as unknown as Record<string, unknown>)[field] === "string"))) {
+      throw new ZoteroError("unreachable", "invalid-upload-response");
+    }
+    return data;
+  }
+
+  /** Storage is deliberately separate: never forwards API credentials or follows a POST redirect. */
+  async uploadFile(location: string, contentType: string, bytes: Buffer): Promise<void> {
+    let url: URL;
+    try { url = new URL(location); } catch { throw new ZoteroError("unreachable", "invalid-upload-url"); }
+    if (url.username || url.password || url.hash || (url.protocol !== "https:" && !(url.protocol === "http:" && url.origin === this.base.origin))) throw new ZoteroError("unreachable", "invalid-upload-url");
+    // Multipart framing is bounded separately from the 64 MiB file itself.
+    if (bytes.length > MAX_ATTACHMENT_BYTES + 1024 * 1024) throw new ZoteroError("unreachable", "upload-too-large");
+    await this.gate.enter();
+    try {
+      for (let attempt = 0;; attempt++) {
+        while (this.backoffUntil > this.now()) await this.sleep(this.backoffUntil - this.now());
+        let response: Response;
+        try {
+          response = await this.fetcher(url, { method: "POST", headers: { "Content-Type": contentType }, body: new Uint8Array(bytes), redirect: "manual", signal: AbortSignal.timeout(this.timeoutMs) });
+        } catch { throw new ZoteroError("unreachable", "file-upload-failed"); }
+        const seconds = (value: string | null) => value === null ? 0 : /^\d+(\.\d+)?$/.test(value) ? Number(value) * 1000 : Math.max(0, Date.parse(value) - this.now()) || 0;
+        const wait = Math.max(seconds(response.headers.get("Backoff")), seconds(response.headers.get("Retry-After")));
+        this.backoffUntil = Math.max(this.backoffUntil, this.now() + wait);
+        await response.body?.cancel();
+        if (response.status === 429 && attempt < this.retries) {
+          this.backoffUntil = Math.max(this.backoffUntil, this.now() + (wait || 1000 * 2 ** attempt));
+          continue;
+        }
+        if (![200, 201, 204].includes(response.status)) throw new ZoteroError("unreachable", "file-upload-failed", response.status);
+        return;
+      }
+    } finally { this.gate.leave(); }
+  }
+
+  async registerUpload(library: ZoteroLibrary, key: string, uploadKey: string): Promise<void> {
+    const result = await this.request(`${libraryPath(library)}/items/${itemKey(key)}/file`, "POST", { ifNoneMatch: "*" }, new URLSearchParams({ upload: uploadKey }));
+    if (result.status === 412) throw new ZoteroError("ok", "version-conflict", 412);
+    if (result.status !== 204) throw new ZoteroError("unreachable", "upload-registration-failed", result.status);
+  }
+
+  async putFullText(library: ZoteroLibrary, key: string, fullText: ZoteroFullTextInput): Promise<void> {
+    const result = await this.request(`${libraryPath(library)}/items/${itemKey(key)}/fulltext`, "PUT", {}, fullText);
+    if (result.status === 412) throw new ZoteroError("ok", "version-conflict", 412);
+    if (result.status !== 204) throw new ZoteroError("unreachable", "fulltext-write-failed", result.status);
   }
 
   async download(path: string, maxBytes: number): Promise<Buffer> {
