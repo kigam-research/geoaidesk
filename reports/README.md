@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-22-gaid-visuals-next/figures/02-paper-map.png" width="120"> | 2026-10-22 18:32 | [서재 논문에서 여는 연결 지도, AGU·자원환경지질 그림 요건](2026-10-22-gaid-visuals-next/index.md) | 서재의 논문에서 그 논문을 쓴 프로젝트를 골라 연결 지도를 열 수 있습니다. AGU와 자원환경지질의 그림 요건은 공식 페이지에서 읽은 값만 그림 스킬에 넣었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-zotero-web-fix/figures/01-web-key-failure.png" width="120"> | 2026-10-22 16:46 | [Zotero 웹 키 갱신 실패 원인과 상태 표시 수정](2026-10-22-gaid-zotero-web-fix/index.md) | 웹 키 갱신이 매번 실패하던 원인(Zotero 웹 API 응답 차이)을 고쳤고, 서재 머리글과 Zotero 카드가 같은 상태와 실제 원인을 보여 줍니다. | 검토함 10-22 | 미정 | 0 |
 | <img src="2026-10-22-gaid-backend/figures/real-hub-list.png" width="120"> | 2026-10-22 16:37 | [GAID 공유 백엔드: 계정과 원내 GAID 허브 서버](2026-10-22-gaid-backend/index.md) | 원내 GAID 허브 서버가 생겼습니다. 연구자는 초대 코드로 계정을 만들어 Workflow를 공유하고, 개인 서재를 여러 PC에서 동기화합니다. | 검토함 10-22 | 미정 | 1 |
 | <img src="2026-10-22-gaid-hub-skills/figures/skills-shelf-instrument-light.png" width="120"> | 2026-10-22 16:24 | [GAID 허브에 스킬 선반을 만들고 Workflow가 스킬의 판을 고정해 쓰게 함](2026-10-22-gaid-hub-skills/index.md) | GAID 허브에 스킬 선반을 만들었습니다. 연구자는 내 프로젝트의 스킬, 허브 Workflow에 딸린 스킬, GitHub 등의 스킬을 판마다 사본으로 올리고, 출처·라이선스·자동 검사·검토 기록을 본 뒤 프로젝트에 설치합니다. Workflow는 허브 스킬의 판을 고정해 쓰고, Workflow를 설치하면 그 판도 함께 설치됩니다. | 검토함 10-22 | 미정 | 0 |
