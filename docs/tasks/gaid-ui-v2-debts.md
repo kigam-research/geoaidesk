@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:21:32Z
+updated: 2026-10-22T02:22:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"12220668-2f56-4301-9ceb-1da6022ea8f7","pid":2196945,"provider":"claude","session":"f484fa94-7306-4cbf-a4a9-9e4e13cb3b0b","start":"52201100","token":"e6aadc1b7993109484dd94e6a03a7519df103e802549703adee2f16a87cdcd3c"}
 branch: task/gaid-ui-v2-debts
 target: main
@@ -59,6 +59,7 @@ Plan (2026-10-22):
   Screenshots ~/data/geoaidesk/work/gaid-ui-v2-debts/shots/ (lib, dec, ws × 2 styles × 2 themes × 1440/1280/1180),
   contact sheets in .../sheets/; script .../shot.sh.
 ## Next steps
+Blocked: map child (4874820d) is rerunning `task finish`; its first full check failed only on the load-dependent web test file-preview-panel.test.tsx (passes 8/8 in isolation), ready commit 2d81e83d.
 1. When the map child finishes: `task complete gaid-ui-v2-debts--map`, `task sync`, rerun web tests + scripts/check,
    screenshots of the map screen, write the report reports/2026-10-22-gaid-ui-v2-debts/index.md, stop the dev app unit
    `gaid-ui-debts-app`, `task finish`.
