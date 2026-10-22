@@ -16,6 +16,8 @@ export interface RequestOptions {
   auth?: boolean;
   /** Pins a multi-request operation to the original login and server. */
   identity?: string;
+  /** Overrides the JSON/file timeout (e.g. an administrator's "collect feeds now", which reads many outside sources). */
+  timeoutMs?: number;
 }
 const failure = (status: number) => new AuthoringError(
   status === 401 ? "허브 서버에 다시 로그인해 주세요." :
@@ -97,7 +99,7 @@ export class HubClient {
         ...(auth && c.token ? { Authorization: `Bearer ${c.token}` } : {}) };
       const response = await this.transport(`${c.url}${HUB_API}${path}`, {
         method: options.method ?? "GET", headers, body, redirect: "error",
-        signal: AbortSignal.timeout(options.file ? this.timeouts.file : this.timeouts.json),
+        signal: AbortSignal.timeout(options.timeoutMs ?? (options.file ? this.timeouts.file : this.timeouts.json)),
       });
       if (options.identity) this.assertIdentity(options.identity);
       this.reachable = true;
