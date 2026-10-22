@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T00:26:02Z
+updated: 2026-10-22T00:37:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bd409835-dc4c-4400-847a-3f8beaa61c9a","pid":1237487,"provider":"claude","session":"58808060-bb53-414c-986e-b1ee6b2e2fd6","start":"51328705","token":"003a20f7e47c2f54520d7ddef3360844301264383ed9c2a9dd3ed03b14f4f628"}
 branch: task/gaid-design-identity--fresh
 target: task/gaid-design-identity
@@ -96,17 +96,11 @@ If the user rejects everything again, record that and stop without landing.
 - Static mockup server for this unit: `systemd-run --user` unit `gaid-fresh-static` (python http.server, 127.0.0.1:3351,
   root `~/data/geoaidesk/work/gaid-design-identity--fresh`); stop with `systemctl --user stop gaid-fresh-static`.
 ## Next steps
-1. Waiting for the user's explicit identity choice (asked in this tab on 2026-10-22): 가) 계측 (recommended) / 나) 도폭 /
-   다) 표준, or a reason to redo. On an ambiguous answer, ask back. Then send the verbatim answer to the parent (agent
-   558fe5e2-cb7e-422f-9ad6-cb76328ebdac, Paseo send_agent_prompt, notifyOnFinish false) and record it under Notes and decisions.
-2. After the choice, land: guide (`docs/design/ui-guide.md` from guide/ui-guide-v2.md with only the chosen identity table),
-   `geo/ui/ui-rules.json` (v2 values; slop rules keep; fontFace rule), tokens in `web/src/app/globals.css` (from the chosen
-   mockup theme), hub and workspace screens (start from origin/main component code; this branch's draft styling may be replaced),
-   AGENTS.md UI-guide bullet, integration-boundaries entries + owner `gaid-design-identity--fresh` in
-   `geo/tests/distribution.test.mjs`; real-app screenshots (light/dark, 1440×900 and 1280×800); impeccable detect once;
-   `scripts/check`; `task finish`. Section 5 of the proposal lists IA moves to settle while landing (resource and cost display
-   destinations, notes list in the sidebar, start settings in the content pane).
-3. If the user rejects all options, record that verbatim and stop without landing.
+1. Land (in order): tokens + style switch foundation (`web/src/app/globals.css` with 계측 default and `[data-style="mapsheet"]`,
+   light/dark; Settings → 화면 표시 "화면 스타일"), app header, hub home, workspace (project view, notes, Workflow panel, start
+   settings), then guide (`docs/design/ui-guide.md`) and `geo/ui/ui-rules.json`, AGENTS.md bullet, boundaries + owner list.
+2. Real-app screenshots in Korean: 2 styles × light/dark × 1440×900 and 1280×800; impeccable detect once; `scripts/check`;
+   `task finish`.
 
 ## Failed approaches
 ## Notes and decisions
@@ -121,6 +115,11 @@ If the user rejects everything again, record that and stop without landing.
   the HIG/One UI desktop standard played straight. All six catalogue challengers were judged declined (Ikeda datamatics,
   labanotation, Emigre bitmap specimen, acetate manual tab board, Crouwel grid specimen, character goods catalogue); their
   disciplines are carried as named raises on the assigned direction.
+- User decision (verbatim, 2026-10-22, this tab): "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수 있게 할 수 있나?"
+  → answered feasible (Settings → 화면 표시 "화면 스타일": 계측 default, 도폭 optional; independent of 시스템/밝은/어두운 테마;
+  stored per browser; every UI change reviewed in 2 styles × 2 themes) and asked 가) do that / 나) 계측 only.
+  User (verbatim): "가로 진행하자." → 계측 = default identity, 도폭 = user-selectable alternate style, 표준 not adopted.
+  Sent verbatim to the parent (agent 558fe5e2…, send_agent_prompt, notifyOnFinish false) on 2026-10-22.
 - Brand reasoning: the fixed logo's lettering is outlined Pretendard (geo/brand/licenses), so Pretendard stays the UI family
   for brand continuity, not by default; the octagonal G (chamfered facets) and the orbit ring are the identity sources.
 ## Open items
