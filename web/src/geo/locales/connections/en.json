@@ -1,0 +1,110 @@
+{
+  "title": "Connection map",
+  "hint": "Only recorded links are shown. Select an item before opening it.",
+  "show": {
+    "button": "Open connection map"
+  },
+  "close": {
+    "button": "Close connection map"
+  },
+  "retry": {
+    "button": "Reload connections"
+  },
+  "centre": {
+    "button": "Centre on item"
+  },
+  "focus": "Centre",
+  "depth": {
+    "1": "1 hop",
+    "2": "2 hops",
+    "label": "Connection range"
+  },
+  "view": {
+    "label": "Connection view",
+    "map": "Map",
+    "list": "List"
+  },
+  "kind": {
+    "paper": "Paper",
+    "note": "Research note",
+    "figure": "Figure",
+    "file": "File",
+    "chat": "Chat",
+    "workflow": "Workflow"
+  },
+  "edge": {
+    "cites": "cites",
+    "wrote": "wrote",
+    "contains": "contains figure",
+    "drew": "drew",
+    "used": "used as data",
+    "started-from": "started",
+    "made-from": "method taken from",
+    "copied": "copied"
+  },
+  "attention": {
+    "changed": "File changed",
+    "missing": "File missing",
+    "retracted": "Retraction notice"
+  },
+  "legend": {
+    "title": "Connection legend"
+  },
+  "observed": "Recorded link",
+  "inferred": "Inferred link",
+  "list": {
+    "label": "Connected items"
+  },
+  "links": {
+    "title": "Links between items"
+  },
+  "relation": "{from} → {relation} → {to}",
+  "open": {
+    "note": {
+      "button": "Open research note"
+    },
+    "paper": {
+      "button": "Open paper"
+    },
+    "figure": {
+      "button": "Open figure"
+    },
+    "file": {
+      "button": "Open file"
+    },
+    "chat": {
+      "button": "Open chat"
+    },
+    "workflow": {
+      "button": "Open Workflow"
+    },
+    "unavailable": "The item cannot be opened from the current view."
+  },
+  "loading": "Reading connections.",
+  "error": "Could not read connections. Reload them.",
+  "empty": "No surrounding links are recorded.",
+  "count": "{count} items",
+  "truncated": {
+    "limit": "Only up to 80 items are shown. Centre on another item to narrow the range."
+  },
+  "item": {
+    "label": "{title}, {kind}"
+  },
+  "zoom": {
+    "in": {
+      "button": "Zoom in"
+    },
+    "out": {
+      "button": "Zoom out"
+    },
+    "fit": {
+      "button": "Fit connections"
+    }
+  },
+  "relationInferred": "{from} → {relation} → {to} (inferred link)",
+  "keyboard": {
+    "hint": "Select an item, then use its open button.",
+    "links": "A connection between items. Also available in the list.",
+    "handle": "Connection point"
+  }
+}

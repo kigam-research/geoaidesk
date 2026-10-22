@@ -31,6 +31,9 @@ dependencies = [
     "shapely>=2.0",
     "pyogrio",
     "geopandas",
+    "cmcrameri>=1.10",
+    "scienceplots>=2.2.2",
+    "pypdf>=6.21.2",
 ]
 
 # Resolve binary-only packages (notably RDKit) for every shipped platform.
