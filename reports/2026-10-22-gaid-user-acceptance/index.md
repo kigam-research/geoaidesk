@@ -4,7 +4,7 @@ date: 2026-10-22
 project: geoaidesk
 task: gaid-user-acceptance
 headline: 서재 쪽 인용, 저널 그림, ChatGPT 로그인·개인 API 키 경로는 통과했고, Zotero 웹 서재 시험은 저장된 웹 키를 Zotero가 거부해 막혔습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-page-citations.png
 supersedes:
