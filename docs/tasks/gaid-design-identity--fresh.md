@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T23:40:44Z
+updated: 2026-10-22T00:26:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bd409835-dc4c-4400-847a-3f8beaa61c9a","pid":1237487,"provider":"claude","session":"58808060-bb53-414c-986e-b1ee6b2e2fd6","start":"51328705","token":"003a20f7e47c2f54520d7ddef3360844301264383ed9c2a9dd3ed03b14f4f628"}
 branch: task/gaid-design-identity--fresh
 target: task/gaid-design-identity
@@ -76,12 +76,53 @@ treat origin/main as the current product). You may replace all of that draft sty
 If the user rejects everything again, record that and stop without landing.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-22: inputs read. One UI digest, origin/main guide v1 + ui-rules.json, Apple HIG (71 pages fetched as DocC JSON from
+  `developer.apple.com/tutorials/data/design/human-interface-guidelines/<page>.json`, converted to Markdown in
+  `~/data/geoaidesk/work/gaid-design-identity--fresh/hig/md/`; HIG principles page dated June 8, 2026, layout Sept 9, 2026),
+  current-app shots 01–06 and their accessibility snapshots, origin/main screen code/locales, geo/brand logo (rendered sheet in
+  `.../gaid-design-identity--fresh/logo/sheet.png`), impeccable (SKILL, craft-floor, operate, critique, new-work) and
+  design-taste-frontend.
+- impeccable direction roll (code-led: no image generation in this harness): `concept-seed --scope direction --mode operate`,
+  seed key `8d611e0e`, assigned index 5 of the grounded list below; output saved in `.../concept-seed-direction.txt`.
+- Guide v2 draft: `~/data/geoaidesk/work/gaid-design-identity--fresh/guide/ui-guide-v2.md` (374 lines; sections 0–14, rule ids P I L
+  T S B N D Q G X MAP C RN F M A W R V; identity options table in section 2).
+- Mockups (static HTML/CSS, real project data): `.../mockups/{hub,workspace,setup,map}.html` with `?v=instrument|mapsheet|standard&t=light|dark`;
+  themes `theme-instrument.css`, `theme-mapsheet.css`, `theme-standard.css`; 48 captures in `.../mockups/shots/`
+  (`<screen>-<variant>-<theme>-<width>.png`), re-render with `tools/shot.sh <screen> <variant> <theme> <w> <h>` (playwright-cli
+  session `mock`, static server below). Contrast computed with `tools/contrast.py` (values in the proposal section 4).
+- Proposal (Korean, report-template sections, humanizer applied): `.../proposal/index.md` + 13 figures (≤1600 px) + `guide/`;
+  review copy at `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-22-gaid-ui-guide-v2-proposal/` (task review-copy printed the
+  obsidian-sync service as inactive; the Obsidian desktop app syncs the vault).
+- Static mockup server for this unit: `systemd-run --user` unit `gaid-fresh-static` (python http.server, 127.0.0.1:3351,
+  root `~/data/geoaidesk/work/gaid-design-identity--fresh`); stop with `systemctl --user stop gaid-fresh-static`.
 ## Next steps
-1. (the next session's first action)
+1. Waiting for the user's explicit identity choice (asked in this tab on 2026-10-22): 가) 계측 (recommended) / 나) 도폭 /
+   다) 표준, or a reason to redo. On an ambiguous answer, ask back. Then send the verbatim answer to the parent (agent
+   558fe5e2-cb7e-422f-9ad6-cb76328ebdac, Paseo send_agent_prompt, notifyOnFinish false) and record it under Notes and decisions.
+2. After the choice, land: guide (`docs/design/ui-guide.md` from guide/ui-guide-v2.md with only the chosen identity table),
+   `geo/ui/ui-rules.json` (v2 values; slop rules keep; fontFace rule), tokens in `web/src/app/globals.css` (from the chosen
+   mockup theme), hub and workspace screens (start from origin/main component code; this branch's draft styling may be replaced),
+   AGENTS.md UI-guide bullet, integration-boundaries entries + owner `gaid-design-identity--fresh` in
+   `geo/tests/distribution.test.mjs`; real-app screenshots (light/dark, 1440×900 and 1280×800); impeccable detect once;
+   `scripts/check`; `task finish`. Section 5 of the proposal lists IA moves to settle while landing (resource and cost display
+   destinations, notes list in the sidebar, start settings in the content pane).
+3. If the user rejects all options, record that verbatim and stop without landing.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- No upfront question to the user: the user asked for an unbiased free hand ("편견없이 작업할수 있게하자") and the order puts the
+  choice at step 3; impeccable's interview step is replaced by the comparison document, and its decision page by
+  `task review-copy` + the user's answer in this tab (backbone draft-comparison procedure).
+- Grounded candidate worlds, ordered by resonance before the roll: 1 geological map sheet margins (도폭: neat line, marginal
+  legend, title block), 2 well-log strip / depth-track sheet, 3 journal figure plate and caption system, 4 field notebook (야장),
+  5 survey and measuring instruments (compass dial, total station, engraved scales), 6 core-tray labels and sample tags,
+  7 petrographic microscope view. Roll assigned 5 (instruments); impeccable's pick card is 1 (map sheet); the standing exit is
+  the HIG/One UI desktop standard played straight. All six catalogue challengers were judged declined (Ikeda datamatics,
+  labanotation, Emigre bitmap specimen, acetate manual tab board, Crouwel grid specimen, character goods catalogue); their
+  disciplines are carried as named raises on the assigned direction.
+- Brand reasoning: the fixed logo's lettering is outlined Pretendard (geo/brand/licenses), so Pretendard stays the UI family
+  for brand continuity, not by default; the octagonal G (chamfered facets) and the orbit ring are the identity sources.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
