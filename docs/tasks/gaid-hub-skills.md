@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T07:13:53Z
+status: done
+updated: 2026-10-22T07:14:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -45,7 +45,9 @@ Phase 1 of hub-managed skills is implemented on task/gaid-hub-skills (user chose
 - Re-verify: `cd server && npx vitest run test/geo-hub-skills.test.ts test/geo-hub-pins.test.ts test/geo-hub-skill-workflows.test.ts`;
   `cd web && npx vitest run src/geo/hub-skills src/geo/workspace`; `scripts/check`.
 ## Next steps
-1. `task finish` (runs scripts/check); then relay the hub's final report.
+<!-- task:closed -->
+Closed 2026-10-22T07:14:50Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-skills.md.
+
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (verbatim "모두 권장안으로 진행하자."): 1 가) hub skill shelf, revisions pinned by Workflows;
@@ -69,7 +71,7 @@ Phase 1 of hub-managed skills is implemented on task/gaid-hub-skills (user chose
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 Closes: gaid-workflow-model#1
 ## Open items
-- [대기] 허브 스킬 2단계(검토자 역할 구분, 관리자 사용 중지 권한, 문제 신고, GitHub 원본이 바뀌었을 때 새 판 후보와 비교) — 가) gaid-backend 계정이 생긴 뒤 별도 작업으로 시작 — 나) 지금 표시 이름으로 시작 — 권장: 가) 검토 표시는 검토자를 확인할 수 있어야 믿을 수 있음 (사용자 2026-10-22 결정 3 가) — 막힌 일: 2단계 전체 — 조건: gaid-backend 계정 도입 — 근거: reports/2026-10-22-gaid-hub-skills#5-한계
+- [대기 gaid-hub-skills#1] 허브 스킬 2단계(검토자 역할 구분, 관리자 사용 중지 권한, 문제 신고, GitHub 원본이 바뀌었을 때 새 판 후보와 비교) — 가) gaid-backend 계정이 생긴 뒤 별도 작업으로 시작 — 나) 지금 표시 이름으로 시작 — 권장: 가) 검토 표시는 검토자를 확인할 수 있어야 믿을 수 있음 (사용자 2026-10-22 결정 3 가) — 막힌 일: 2단계 전체 — 조건: gaid-backend 계정 도입 — 근거: reports/2026-10-22-gaid-hub-skills#5-한계
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
