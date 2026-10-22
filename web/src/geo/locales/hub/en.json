@@ -96,7 +96,19 @@
       }
     },
     "byUpdated": "{author} · updated {when}",
-    "noAuthor": "Maker unknown"
+    "noAuthor": "Maker unknown",
+    "nav": "Hub sections",
+    "foldersTitle": "Topic folders",
+    "mineTitle": "My Workflows",
+    "mineItem": "Drafts and registered",
+    "list": {
+      "name": "Name",
+      "folder": "Folder",
+      "author": "Researcher",
+      "revision": "Rev.",
+      "stars": "Stars",
+      "updated": "Updated"
+    }
   },
   "stage": {
     "sources": "Sources received",

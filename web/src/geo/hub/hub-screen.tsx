@@ -4,8 +4,7 @@
  * Workflow (authoring service `/geo/authoring/*`) and tries it in a project. One screen per
  * step; panels scroll inside, the page does not.
  */
-import { MoonIcon, PencilIcon, SettingsIcon, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes";
+import { PencilIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -49,7 +48,6 @@ import { CatalogueWorkflowScreen } from "./catalogue-workflow";
 import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
-const appText = geoText("app");
 const text = geoText("hub");
 
 export function GaidHub({
@@ -80,34 +78,14 @@ export function GaidHub({
   );
   const { projects, setActive } = useProjects();
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
-  const { resolvedTheme, setTheme } = useTheme();
-  const actions = (
-    <>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={appText("projects.open_settings")}
-        onClick={() => {
-          setSettingsRequest(null);
-          setSettingsOpen(true);
-        }}
-      >
-        <SettingsIcon />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={
-          resolvedTheme === "dark" ? appText("projects.switch_to_light_mode") : appText("projects.switch_to_dark_mode")
-        }
-        onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      >
-        {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
-      </Button>
-    </>
-  );
   return (
-    <HubShell onNavigate={(place) => place === "projects" && onOpenProjects()} actions={actions}>
+    <HubShell
+      onNavigate={(place) => place === "projects" && onOpenProjects()}
+      onOpenSettings={() => {
+        setSettingsRequest(null);
+        setSettingsOpen(true);
+      }}
+    >
       {entryId ? (
         <SharedEntryScreen
           key={entryId}
@@ -216,7 +194,9 @@ function HubList({ onOpen, onOpenEntry }: { onOpen: (id: string) => void; onOpen
         folderId={folderId}
         onFolder={setFolderId}
         onNewFolder={() => named.run(() => setNewFolder(true))}
+        registryFolders={folders.map((f) => ({ id: f.id, name: f.name, count: f.entries }))}
         projects={shown}
+        mineCount={mine.length}
         registered={Object.fromEntries(
           mine.flatMap((p) => {
             const e = entryOf(p);

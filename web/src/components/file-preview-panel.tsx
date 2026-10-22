@@ -183,7 +183,7 @@ function TabBar({
   return (
     <div
       ref={scrollRef}
-      className="flex overflow-x-auto border-b bg-muted/20 shrink-0"
+      className="flex h-10 overflow-x-auto border-b border-gaid-frame bg-gaid-chrome shrink-0"
       style={{ scrollbarWidth: "none" }}
     >
       {/* Pinned Lab Notebook tab — always first, never closable */}
@@ -194,13 +194,13 @@ function TabBar({
         title={appText("preview.lab_notebook")}
         className={cn(
           "group relative flex shrink-0 cursor-pointer select-none",
-          "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
+          "items-center gap-1.5 border-r border-gaid-edge px-3 py-1.5 text-sm transition-colors",
           showNotebook
             ? "bg-background text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
             : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
         )}
       >
-        <BookOpenIcon className="size-3.5 shrink-0 text-orange-500" />
+        <BookOpenIcon className="size-3.5 shrink-0 text-gaid-ink-2" />
         <span className="whitespace-nowrap font-medium">{appText("preview.lab_notebook")}</span>
       </button>
 
@@ -212,13 +212,13 @@ function TabBar({
         title={appText("preview.modal_compute")}
         className={cn(
           "group relative flex shrink-0 select-none",
-          "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
+          "items-center gap-1.5 border-r border-gaid-edge px-3 py-1.5 text-sm transition-colors",
           showCompute
             ? "bg-background text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
             : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
         )}
       >
-        <ServerCogIcon className="size-3.5 shrink-0 text-violet-500" />
+        <ServerCogIcon className="size-3.5 shrink-0 text-gaid-ink-2" />
         <span className="whitespace-nowrap font-medium">{appText("preview.compute")}</span>
       </button>}
 
@@ -231,13 +231,13 @@ function TabBar({
           title={appText("preview.schedules_and_missions")}
           className={cn(
             "group relative flex shrink-0 select-none",
-            "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
+            "items-center gap-1.5 border-r border-gaid-edge px-3 py-1.5 text-sm transition-colors",
             showAutomation
               ? "bg-background text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
               : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
           )}
         >
-          <AlarmClockIcon className="size-3.5 shrink-0 text-emerald-500" />
+          <AlarmClockIcon className="size-3.5 shrink-0 text-gaid-ink-2" />
           <span className="whitespace-nowrap font-medium">{appText("preview.automation")}</span>
         </button>
       )}
@@ -268,7 +268,7 @@ function TabBar({
             }}
             className={cn(
               "group relative flex min-w-0 max-w-[200px] shrink-0 cursor-pointer select-none",
-              "items-center gap-1.5 border-r px-3 py-1.5 text-xs transition-colors",
+              "items-center gap-1.5 border-r border-gaid-edge px-3 py-1.5 text-sm transition-colors",
               isActive
                 ? "bg-background text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
                 : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
@@ -346,7 +346,7 @@ function FileLoadError({
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
       <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10">
-        <AlertCircleIcon className="size-5 text-amber-600" />
+        <AlertCircleIcon className="size-5 text-gaid-warning" />
       </div>
       <div className="space-y-1">
         <p className="text-sm font-medium">{appText("preview.could_not_load_file")}</p>
@@ -742,7 +742,7 @@ function NotebookViewer({
     <div ref={scrollerRef} className="h-full overflow-auto">
       {/* Notebook meta bar */}
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b bg-background/95 px-4 py-2 backdrop-blur">
-        <BookOpenIcon className="size-4 text-orange-500 shrink-0" />
+        <BookOpenIcon className="size-4 text-gaid-ink-2 shrink-0" />
         <span className="text-sm font-semibold">{kernelName}</span>
         <span className="text-xs text-muted-foreground">{filesText("file_preview_panel.notebook_counts", { count: cells.length, code: codeCells, markdown: mdCells })}</span>
       </div>

@@ -96,7 +96,19 @@
       }
     },
     "byUpdated": "{author} · {when} 수정",
-    "noAuthor": "작성자 미기록"
+    "noAuthor": "작성자 미기록",
+    "nav": "허브 목록",
+    "foldersTitle": "주제 폴더",
+    "mineTitle": "내 Workflow",
+    "mineItem": "초안과 등록한 것",
+    "list": {
+      "name": "이름",
+      "folder": "주제 폴더",
+      "author": "연구자",
+      "revision": "판",
+      "stars": "star",
+      "updated": "수정"
+    }
   },
   "stage": {
     "sources": "자료 받음",

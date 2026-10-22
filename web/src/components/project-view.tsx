@@ -5,17 +5,13 @@ import {
   ArchiveRestoreIcon,
   ArrowUpRightIcon,
   ChevronRightIcon,
-  FolderIcon,
   MoreHorizontalIcon,
-  MoonIcon,
   PlusIcon,
   SearchIcon,
   SettingsIcon,
-  SunIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -65,11 +61,11 @@ import { DEFAULT_PROJECT_ID, type Project } from "@/lib/projects";
 import type { ProjectActivitySummary } from "@/lib/project-activity";
 import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
-import { GaidHubEntry, GaidTopNav } from "@/geo/hub/top-nav";
+import { GaidHubEntry } from "@/geo/hub/top-nav";
+import { GaidAppBar } from "@/geo/shell/app-bar";
 import { LibraryScreen } from "@/geo/library/library-screen";
 import { ResearchTabs, useResearchTab } from "@/geo/library/research-tabs";
 import { cn } from "@/lib/utils";
-import { APP_VERSION, isVersioned } from "@/lib/version";
 
 const appText = geoText("app");
 
@@ -156,9 +152,7 @@ export function ProjectView({
     update,
     remove,
   } = useProjects();
-  const { resolvedTheme, setTheme } = useTheme();
   const { confirm, dialog: confirmDialog } = useConfirm();
-  const [mounted, setMounted] = useState(false);
   // GAID (gaid-research-hub): 내 연구 has a 프로젝트 / 서재 tab bar; 서재 replaces the project list below it.
   const [researchTab, setResearchTab] = useResearchTab();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -167,8 +161,6 @@ export function ProjectView({
   const [sort, setSort] = useState<ProjectSort>("recent");
   const [archivedOpen, setArchivedOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   // Deep links into Settings while the Projects view is on screen.
   useEffect(() => {
@@ -258,68 +250,25 @@ export function ProjectView({
   );
 
   return (
-    <div className="flex min-h-dvh flex-col bg-muted/20">
+    <div className="flex min-h-dvh flex-col bg-background">
       {confirmDialog}
-      <header className="flex items-center justify-between border-b bg-background/90 px-6 py-3 backdrop-blur">
-        <a
-          href="https://github.com/kigam-research/geoaidesk"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={appText("header.productName")}
-          className="flex items-center gap-2"
-        >{/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/gaid-compact-on-dark.svg" alt="" width={73} height={24} className="hidden h-6 w-auto dark:block" />
-          <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
-          {isVersioned && (
-            <span className="text-[11px] text-muted-foreground/60">
-              v{APP_VERSION}
-            </span>
-          )}
-        </a>
-
-        {onOpenHub && <GaidTopNav current="projects" className="absolute left-1/2 -translate-x-1/2" onNavigate={(place) => place === "hub" && onOpenHub()} />}
-
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={appText("projects.open_settings")}
-            onClick={() => {
-              setSettingsRequest(null);
-              setSettingsOpen(true);
-            }}
-          >
-            <SettingsIcon />
-          </Button>
-          {mounted && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={
-                resolvedTheme === "dark"
-                  ? appText("projects.switch_to_light_mode")
-                  : appText("projects.switch_to_dark_mode")
-              }
-              onClick={() =>
-                setTheme(resolvedTheme === "dark" ? "light" : "dark")
-              }
-            >
-              {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </Button>
-          )}
-        </div>
-      </header>
+      <GaidAppBar
+        place="projects"
+        onNavigate={onOpenHub ? (place) => place === "hub" && onOpenHub() : undefined}
+        onOpenSettings={() => {
+          setSettingsRequest(null);
+          setSettingsOpen(true);
+        }}
+      />
 
       {onOpenHub && <ResearchTabs value={researchTab} onChange={setResearchTab} />}
       {onOpenHub && researchTab === "library" && <LibraryScreen onOpenProject={handleOpen} />}
-      <main className={cn("mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10", onOpenHub && researchTab === "library" && "hidden")}>
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <main className={cn("mx-auto flex w-full max-w-[1180px] flex-1 flex-col gap-6 px-8 pb-12 pt-7", onOpenHub && researchTab === "library" && "hidden")}>
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div className="flex max-w-2xl flex-col gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="text-2xl font-bold tracking-[-0.01em]">
               {appText("projects.choose_a_project")}</h1>
-            <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+            <p className="text-sm text-muted-foreground">
               {appText("projects.each_project_keeps_its_files_chats_notebook")}</p>
           </div>
           <Button onClick={openCreate}>
@@ -501,7 +450,7 @@ function ProjectSection({
                 aria-label={appText("projects.archivedToggle", { state: open ? "hide" : "show", count: projects.length })}
               >
                 <ChevronRightIcon className="transition-transform group-data-[state=open]:rotate-90" />
-                <span className="text-xs font-semibold uppercase tracking-wider">
+                <span className="text-sm font-semibold">
                   {title}
                 </span>
                 <Badge variant="secondary">{projects.length}</Badge>
@@ -517,13 +466,10 @@ function ProjectSection({
   return (
     <section className="flex flex-col gap-4" aria-labelledby={`${title}-heading`}>
       <div className="flex items-center gap-3">
-        <h2
-          id={`${title}-heading`}
-          className="text-sm font-semibold uppercase tracking-wider text-muted-foreground"
-        >
+        <h2 id={`${title}-heading`} className="text-lg font-semibold">
           {title}
         </h2>
-        <span className="text-xs text-muted-foreground/60">{projects.length}</span>
+        <span className="text-xs font-medium tabular-nums text-gaid-ink-3">{projects.length}</span>
       </div>
       {content}
     </section>
@@ -549,30 +495,13 @@ function ProjectCard({
   onToggleArchive,
   onDelete,
 }: ProjectCardProps) {
-  const hasAttention = Boolean(
-    activity &&
-      (activity.needsInput > 0 || activity.errors > 0 || activity.blocked > 0),
-  );
-  const isRunning = Boolean(activity && activity.running > 0);
-  const isDone = Boolean(
-    activity &&
-      !hasAttention &&
-      !isRunning &&
-      activity.done > 0,
-  );
   const visibleTagLimit = project.spendLimitUsd == null ? 3 : 2;
 
   return (
     <Card
       className={cn(
-        "group/card relative gap-3 overflow-hidden bg-background py-4 transition-[border-color,box-shadow] hover:border-foreground/20 hover:shadow-md",
-        activity?.errors ? "border-red-500/50" : "",
-        !activity?.errors && activity?.needsInput ? "border-amber-500/50" : "",
-        !activity?.errors && !activity?.needsInput && activity?.blocked
-          ? "border-orange-500/50"
-          : "",
-        !hasAttention && isRunning ? "border-blue-500/50" : "",
-        isDone ? "border-emerald-500/50" : "",
+        "group/card relative gap-3 overflow-hidden bg-background py-4 shadow-none transition-colors hover:border-gaid-control-edge",
+        active && "border-gaid-control-edge",
       )}
     >
       <button
@@ -582,16 +511,15 @@ function ProjectCard({
         onClick={onOpen}
       />
       <CardHeader className="pointer-events-none gap-1.5 px-4">
-        <div className="mb-1 flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors group-hover/card:text-foreground">
-          <FolderIcon className="size-4" />
-        </div>
         <CardTitle className="flex min-w-0 items-center gap-1.5 text-sm">
           <span className="truncate">{project.name}</span>
           {active && <Badge variant="secondary">{appText("projects.current")}</Badge>}
         </CardTitle>
-        <CardDescription className="line-clamp-2 min-h-8 text-xs leading-relaxed">
-          {project.description || appText("projects.no_description_yet")}
-        </CardDescription>
+        {project.description && (
+          <CardDescription className="line-clamp-2 text-sm">
+            {project.description}
+          </CardDescription>
+        )}
         {activity && (
           <ProjectActivityBadges activity={activity} />
         )}
@@ -654,9 +582,7 @@ function ProjectCard({
         <span className="truncate text-xs text-muted-foreground">
           {projectActivityLabel(project)}
         </span>
-        <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover/card:text-foreground">
-          {appText("projects.open")}<ArrowUpRightIcon className="size-3.5 transition-transform group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5" />
-        </span>
+        <ArrowUpRightIcon className="size-4 shrink-0 text-muted-foreground transition-colors group-hover/card:text-foreground" aria-hidden />
       </CardFooter>
     </Card>
   );
@@ -680,40 +606,40 @@ function ProjectActivityBadges({
             activity.needsInput === 1
               ? appText("projects.needs_your_input")
               : appText("projects.needsInput", { count: activity.needsInput }),
-          className: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-          dot: "bg-amber-500 animate-pulse",
+          className: "border-transparent bg-gaid-warning-tint text-gaid-warning",
+          orbit: false,
         }
       : null,
     activity.errors > 0
       ? {
           key: "error",
           label: activity.errors === 1 ? appText("projects.error") : appText("projects.errors", { count: activity.errors }),
-          className: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
-          dot: "bg-red-500",
+          className: "border-transparent bg-gaid-danger-tint text-gaid-danger",
+          orbit: false,
         }
       : null,
     activity.blocked > 0
       ? {
           key: "blocked",
           label: activity.blocked === 1 ? appText("projects.blocked") : appText("projects.blockedCount", { count: activity.blocked }),
-          className: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300",
-          dot: "bg-orange-500",
+          className: "border-transparent bg-gaid-warning-tint text-gaid-warning",
+          orbit: false,
         }
       : null,
     activity.running > 0
       ? {
           key: "running",
           label: activity.running === 1 ? appText("projects.running") : appText("projects.runningCount", { count: activity.running }),
-          className: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
-          dot: "bg-blue-500 animate-pulse",
+          className: "border-transparent bg-gaid-signal-tint text-gaid-signal-ink",
+          orbit: true,
         }
       : null,
     !activeOrAttention && activity.done > 0
       ? {
           key: "done",
           label: appText("projects.done"),
-          className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-          dot: "bg-emerald-500",
+          className: "border-transparent bg-gaid-success-tint text-gaid-success",
+          orbit: false,
         }
       : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null);
@@ -727,7 +653,7 @@ function ProjectActivityBadges({
           variant="outline"
           className={cn("gap-1.5", item.className)}
         >
-          <span className={cn("size-1.5 rounded-full", item.dot)} aria-hidden />
+          {item.orbit && <span className="gaid-orbit" aria-hidden />}
           {item.label}
         </Badge>
       ))}

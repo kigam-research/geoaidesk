@@ -282,7 +282,7 @@ export function ChatTabsBar({
   };
 
   return (
-    <div className="flex shrink-0 items-center gap-1 border-b px-3 py-1.5">
+    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-gaid-frame bg-gaid-chrome px-3">
       {/* Tabs + plus live in a scrollable region. Without this isolation the
           Workflows pill (after `ml-auto`) gets pushed to the far right of
           the scroll container — off-screen — once the tab strip overflows. */}

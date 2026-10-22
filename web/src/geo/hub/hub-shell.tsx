@@ -1,50 +1,39 @@
 "use client";
 /**
- * Frame shared by every GAID hub screen: the app header (logo, Projects/GAID hub switch,
- * settings and theme like the project list), then a page area that fills the window so
- * screens scroll inside their own panels, not the page.
+ * Frame shared by every GAID hub screen: the GAID app bar (mark, 내 연구 / GAID 허브 switch, settings), then a page
+ * area that fills the window so screens scroll inside their own panels, not the page.
  */
 import { CheckIcon, ChevronLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { geoText } from "@/geo/i18n";
+import { GaidAppBar } from "@/geo/shell/app-bar";
 import { cn } from "@/lib/utils";
-import { APP_VERSION, isVersioned } from "@/lib/version";
 
-import { GaidTopNav, type GaidPlace } from "./top-nav";
+import type { GaidPlace } from "./top-nav";
 
-const appText = geoText("app");
 const text = geoText("hub");
 
 export function HubShell({
   onNavigate,
+  onOpenSettings,
   actions,
   children,
 }: {
   onNavigate: (place: GaidPlace) => void;
+  onOpenSettings: () => void;
   actions?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-background">
-      <header className="flex items-center justify-between gap-4 border-b bg-background/90 px-6 py-2.5 backdrop-blur">
-        <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/gaid-compact-color.svg" alt="" width={73} height={24} className="h-6 w-auto dark:hidden" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/gaid-compact-on-dark.svg"
-            alt=""
-            width={73}
-            height={24}
-            className="hidden h-6 w-auto dark:block"
-          />
-          <span className="hidden text-sm font-semibold sm:inline">{appText("header.productName")}</span>
-          {isVersioned && <span className="text-xs text-muted-foreground">v{APP_VERSION}</span>}
-        </div>
-        <GaidTopNav current="hub" className="absolute left-1/2 -translate-x-1/2" onNavigate={onNavigate} />
-        <div className="flex items-center gap-1">{actions}</div>
-      </header>
+      <GaidAppBar
+        place="hub"
+        onNavigate={onNavigate}
+        onHome={() => onNavigate("projects")}
+        trailing={actions}
+        onOpenSettings={onOpenSettings}
+      />
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </div>
   );
