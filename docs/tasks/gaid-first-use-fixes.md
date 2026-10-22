@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-22T12:58:43Z
+status: active
+updated: 2026-10-22T13:04:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c7c994c8-9104-4a2d-91ca-02598ddfa51c","pid":3710652,"provider":"claude","session":"71412738-bdac-483a-bb75-b3200c12f5e4","start":"55874657","token":"7300838461defcef07e6e5adf36f6fd631e6d0e4dc5860a2c9bdad6b1f73a570"}
 branch: task/gaid-first-use-fixes
 target: main
@@ -74,6 +74,7 @@ Closed 2026-10-22T12:58:43Z: finished; task finish integrates it into main. No f
 - Table cells with `overflow-wrap:anywhere` fit 6 columns at the default chat width but split names ("Pebes ma");
   replaced by whole-word wrapping (fits when the chat is widened; narrower scrolls inside the table, guide X2).
 ## Notes and decisions
+- First `task finish` check failed once in `server/test/provenance.test.ts` ("declared write" got change `modified` instead of `created`); untouched code, passed in both scripts/check runs and 5/5 isolated reruns: timing flake under load, finish retried.
 - Restored chats (opened from history) are left as they are: the client does not restore a session's model and still
   shows the new-tab default; noted as a limit in the report.
 Closes: gaid-user-acceptance#1
