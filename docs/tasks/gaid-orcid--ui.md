@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-22T09:41:31Z
-writer: {"host":"seongin3","reserved":"df6541df10ed933c083367568e359ab1265179d732259db251292c83dae0b600"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9f458bbf-4f8e-4cff-a5a0-2274bd08a13e","pid":2326360,"provider":"codex","session":"01a162fc-d2d3-7e42-b4e9-2a978b405909","start":"55003761","token":"df6541df10ed933c083367568e359ab1265179d732259db251292c83dae0b600"}
 branch: task/gaid-orcid--ui
 target: task/gaid-orcid
 parent: gaid-orcid
