@@ -53,7 +53,7 @@ export class ZoteroError extends Error {
   }
 }
 export class ZoteroServerChangedError extends ZoteroError {
-  constructor() { super("unreachable", "server-changed", 412); }
+  constructor() { super("failed", "server-changed", 412); }
 }
 export class ZoteroConflictError extends ZoteroError {
   constructor(public readonly current: unknown) { super("ok", "version-conflict", 412); }
@@ -71,4 +71,11 @@ export function itemKey(key: string): string {
 /** Version deliberately excluded: stable identity across incremental updates. */
 export function zoteroRefKey(ref: Omit<ZoteroItemRef, "version">): string {
   return JSON.stringify([ref.connection, ref.serverId ?? "", ref.libraryType, ref.libraryId, ref.itemKey]);
+}
+
+/** Technical detail for 기술 정보: connection, error code and HTTP status only, never response bodies or keys. */
+export function zoteroErrorDetail(connection: "local" | "web", error: unknown): string {
+  if (error instanceof ZoteroError) return [connection, error.code, error.status ? `HTTP ${error.status}` : ""].filter(Boolean).join(" · ");
+  // GAID's own errors (e.g. an item key Zotero should never send); their messages hold no Zotero bodies or keys.
+  return [connection, error instanceof Error ? `${error.name}: ${error.message.slice(0, 160)}` : "error"].join(" · ");
 }

@@ -1,6 +1,6 @@
 import { numericCslDates, type LibraryCollection } from "../../../../../web/src/geo/contracts/library.ts";
 import {
-  ZoteroError, ZoteroServerChangedError, libraryPath, itemKey, zoteroRefKey,
+  ZoteroError, ZoteroServerChangedError, libraryPath, itemKey, zoteroRefKey, zoteroErrorDetail,
   type ZoteroClient, type ZoteroObject, type ZoteroItemRef, type LibraryItem, type ZoteroLibraryState,
 } from "./types.ts";
 
@@ -22,10 +22,10 @@ export function mapZoteroItem(object: ZoteroObject, options: MapItemOptions): Li
   const data = object.data;
   let exported = object.csljson;
   if (typeof exported === "string") {
-    try { exported = JSON.parse(exported); } catch { throw new ZoteroError("unreachable", "invalid-csl-json"); }
+    try { exported = JSON.parse(exported); } catch { throw new ZoteroError("failed", "invalid-csl-json"); }
   }
   const csl = Array.isArray(exported) ? exported.length === 1 ? exported[0] : undefined : typeof exported === "string" ? undefined : exported;
-  if (!csl || typeof csl.type !== "string") throw new ZoteroError("unreachable", "missing-csl-json");
+  if (!csl || typeof csl.type !== "string") throw new ZoteroError("failed", "missing-csl-json");
   const existing = options.existing;
   return {
     id: options.id, owner: options.owner, source: "zotero", zotero: { ...options.ref, itemKey: object.key, version: object.version },
@@ -78,7 +78,7 @@ async function readKeyManifest(client: ZoteroClient, path: string) {
     const result = await client.read<Record<string, number>>(path, { query: { format: "versions", includeTrashed: 0, limit: 100, start, sort: "dateModified", direction: "asc" } });
     if (version !== undefined && version !== result.version) throw new SnapshotChanged();
     version = result.version;
-    if (!result.data || Array.isArray(result.data) || typeof result.data !== "object") throw new ZoteroError("unreachable", "invalid-version-manifest");
+    if (!result.data || Array.isArray(result.data) || typeof result.data !== "object") throw new ZoteroError("failed", "invalid-version-manifest");
     const page = Object.keys(result.data);
     keys.push(...page);
     if (page.length < 100) return { keys, version };
@@ -90,14 +90,13 @@ export async function readZoteroPages<T>(client: ZoteroClient, path: string, sin
   const objects: T[] = [];
   let version: number | undefined;
   for (let start = 0; ; start += 100) {
-    const result = await client.read<T[]>(path, {
-      query: { ...extra, limit: 100, start, ...(since === undefined ? {} : { since }) },
-      ...(since === undefined ? {} : { ifModifiedSince: since }),
-    });
+    // `since` alone, no If-Modified-Since-Version: a 200 always carries the library version, while a Web 304 has no
+    // version header and its meaning for /collections differs from /items.
+    const result = await client.read<T[]>(path, { query: { ...extra, limit: 100, start, ...(since === undefined ? {} : { since }) } });
     if (version !== undefined && result.version !== version) throw new SnapshotChanged();
     version = result.version;
     if (result.status === 304) return { objects, version };
-    if (!Array.isArray(result.data)) throw new ZoteroError("unreachable", "invalid-list-response");
+    if (!Array.isArray(result.data)) throw new ZoteroError("failed", "invalid-list-response");
     objects.push(...result.data);
     if (result.data.length < 100) return { objects, version };
   }
@@ -162,6 +161,15 @@ export async function syncZoteroLibrary(client: ZoteroClient, prior: ZoteroLibra
           objects.set(key, parent.data);
         }
       }
+      // A full snapshot already holds every child (the items endpoint is not /top), so only an incremental sync reads
+      // /children per changed parent; one request per paper made a first Web sync of a large library take minutes.
+      const snapshotChildren = new Map<string, ZoteroObject[]>();
+      if (reset) {
+        for (const object of items.objects) {
+          const parent = object.data.parentItem;
+          if (typeof parent === "string" && !object.data.deleted) snapshotChildren.set(parent, [...snapshotChildren.get(parent) ?? [], object]);
+        }
+      }
       const upserts: LibraryItem[] = [];
       for (const object of objects.values()) {
         if (["attachment", "note", "annotation"].includes(String(object.data.itemType)) || object.data.parentItem) continue;
@@ -170,16 +178,20 @@ export async function syncZoteroLibrary(client: ZoteroClient, prior: ZoteroLibra
           removed.add(object.key);
           continue;
         }
-        const children = await readZoteroPages<ZoteroObject>(client, `${path}/items/${itemKey(object.key)}/children`);
-        if (children.version !== libraryVersion) throw new SnapshotChanged();
+        let children = snapshotChildren.get(object.key) ?? [];
+        if (!reset) {
+          const read = await readZoteroPages<ZoteroObject>(client, `${path}/items/${itemKey(object.key)}/children`);
+          if (read.version !== libraryVersion) throw new SnapshotChanged();
+          children = read.objects;
+        }
         const old = existing.get(zoteroRefKey(ref));
-        upserts.push(mapZoteroItem(object, { ref, owner: options.owner, id: old?.id ?? options.idForItem(ref), now: options.now, attachments: children.objects, existing: old }));
+        upserts.push(mapZoteroItem(object, { ref, owner: options.owner, id: old?.id ?? options.idForItem(ref), now: options.now, attachments: children, existing: old }));
       }
       // Parent/children reads can race the initial snapshot. Check the library once more before committing.
-      const final = await client.read<ZoteroObject[]>(`${path}/items`, { ifModifiedSince: libraryVersion, query: { limit: 1 } });
+      const final = await client.read<Record<string, number>>(`${path}/items`, { query: { format: "versions", limit: 1 } });
       if (final.version !== libraryVersion) throw new SnapshotChanged();
       return {
-        state: { ...prior, ...refBase, serverId: client.serverId, libraryVersion, state: "ok", lastSyncAt: options.now }, reset,
+        state: { ...prior, ...refBase, serverId: client.serverId, libraryVersion, state: "ok", lastSyncAt: options.now, failedAt: undefined, detail: undefined }, reset,
         upserts,
         removals: [...removed].map((key) => ({ ...refBase, itemKey: key, version: libraryVersion })),
         collections: collections.objects.map((object) => ({
@@ -192,10 +204,10 @@ export async function syncZoteroLibrary(client: ZoteroClient, prior: ZoteroLibra
       };
     } catch (error) {
       if ((error instanceof ZoteroServerChangedError || error instanceof SnapshotChanged) && attempt < 2) continue;
-      throw error instanceof SnapshotChanged ? new ZoteroError("unreachable", "library-kept-changing") : error;
+      throw error instanceof SnapshotChanged ? new ZoteroError("library-changing", "library-kept-changing") : error;
     }
   }
-  throw new ZoteroError("unreachable", "sync-failed");
+  throw new ZoteroError("failed", "sync-failed");
 }
 
 /** A status probe never changes an existing sync cursor on failure. */
@@ -203,8 +215,8 @@ export async function probeZoteroLibrary(client: ZoteroClient, state: ZoteroLibr
   try {
     await client.read(`${libraryPath(state)}/items`, { discover: true, query: { limit: 1 } });
     const changed = state.connection !== client.connection || state.serverId !== client.serverId;
-    return { ...state, connection: client.connection, serverId: client.serverId, state: "ok", ...(changed ? { libraryVersion: 0, lastSyncAt: undefined } : {}) };
+    return { ...state, connection: client.connection, serverId: client.serverId, state: "ok", failedAt: undefined, detail: undefined, ...(changed ? { libraryVersion: 0, lastSyncAt: undefined } : {}) };
   } catch (error) {
-    return { ...state, state: error instanceof ZoteroError ? error.state : "unreachable" };
+    return { ...state, state: error instanceof ZoteroError ? error.state : "failed", failedAt: new Date().toISOString(), detail: zoteroErrorDetail(client.connection, error) };
   }
 }

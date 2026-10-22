@@ -51,7 +51,7 @@ describe("Zotero clients and connection states", () => {
     fake.apiOff = false;
     const web = await setup("web");
     web.fake.keyRejected = true;
-    expect((await probeZoteroLibrary(web.client, state("web"))).state).toBe("key-rejected");
+    expect((await probeZoteroLibrary(web.client, state("web"))).state).toBe("key-invalid");
     const refused = await fakeZotero();
     await refused.close();
     const closed = new LocalZoteroClient({ baseUrl: refused.baseUrl, secrets: secrets() });
@@ -111,6 +111,46 @@ describe("Zotero clients and connection states", () => {
     fake.before = (_r, response) => { response.statusCode = 500; response.end("web-synthetic-secret"); return true; };
     await expect(client.discoverAccess()).rejects.toThrow("Zotero http-error");
   });
+
+  it("names Web refusals and server answers by cause; only a failed connection is unreachable", async () => {
+    const { fake, client } = await setup("web");
+    const web = state("web");
+    const probe = async () => { const s = await probeZoteroLibrary(client, web); return [s.state, s.detail]; };
+    fake.keyRejected = true;
+    expect(await probe()).toEqual(["key-invalid", "web · invalid-key · HTTP 403"]);
+    fake.keyRejected = false;
+    fake.libraryForbidden = true;
+    expect(await probe()).toEqual(["no-library-access", "web · access-denied · HTTP 403"]);
+    fake.libraryForbidden = false;
+    for (const [status, expected] of [[404, "library-not-found"], [500, "server-error"], [400, "failed"]] as const) {
+      fake.before = (_r, response) => { response.statusCode = status; response.end("web-synthetic-secret"); return true; };
+      const [name, detail] = await probe();
+      expect(name).toBe(expected);
+      expect(detail).toBe(`web · http-error · HTTP ${status}`);
+    }
+    const limited = new WebZoteroClient({ baseUrl: fake.baseUrl, secrets: secrets(), maxRetries: 0 });
+    await limited.setKey("web-synthetic-secret");
+    fake.before = (_r, response) => { response.statusCode = 429; response.end(); return true; };
+    expect((await probeZoteroLibrary(limited, web)).state).toBe("rate-limited");
+    fake.before = undefined;
+    const offline = new WebZoteroClient({ secrets: secrets(), fetch: async () => { throw new TypeError("fetch failed", { cause: { code: "ENOTFOUND" } }); } });
+    await offline.setKey("web-synthetic-secret");
+    expect(await probeZoteroLibrary(offline, web)).toMatchObject({ state: "unreachable", detail: "web · connection-failed:ENOTFOUND" });
+    const slow = new WebZoteroClient({ secrets: secrets(), fetch: async () => { throw new DOMException("timed out", "TimeoutError"); } });
+    await slow.setKey("web-synthetic-secret");
+    expect(await probeZoteroLibrary(slow, web)).toMatchObject({ state: "unreachable", detail: "web · timed-out" });
+    // KIGAM's TLS inspection without the institute CA in Node: Node reports SELF_SIGNED_CERT_IN_CHAIN (seen on PC74).
+    const inspected = new WebZoteroClient({ secrets: secrets(), fetch: async () => { throw new TypeError("fetch failed", { cause: { code: "SELF_SIGNED_CERT_IN_CHAIN" } }); } });
+    await inspected.setKey("web-synthetic-secret");
+    expect(await probeZoteroLibrary(inspected, web)).toMatchObject({ state: "certificate-untrusted", detail: "web · certificate:SELF_SIGNED_CERT_IN_CHAIN" });
+  });
+
+  it("keeps the requested version for a Web 304 that has no Last-Modified-Version", async () => {
+    const { fake, client } = await setup("web");
+    fake.addItem("PAPER001");
+    const result = await client.read("users/0/items", { ifModifiedSince: fake.version, query: { limit: 1 } });
+    expect(result).toMatchObject({ status: 304, version: fake.version });
+  });
 });
 
 describe("incremental mirror", () => {
@@ -132,10 +172,27 @@ describe("incremental mirror", () => {
     expect(next.reset).toBe(false);
     expect(next.upserts).toHaveLength(1);
     expect(next.upserts[0]).toMatchObject({ id: "li-sent-original", read: { coverage: "partial", pagesRead: 2 } });
-    expect(fake.requests.some((r) => r.url.searchParams.get("since") === String(first.state.libraryVersion) && r.headers["if-modified-since-version"] === String(first.state.libraryVersion))).toBe(true);
+    expect(fake.requests.some((r) => r.url.searchParams.get("since") === String(first.state.libraryVersion))).toBe(true);
+    // Sync never relies on a 304: a Web 304 has no version header.
+    expect(fake.requests.some((r) => r.headers["if-modified-since-version"] !== undefined)).toBe(false);
     const unchanged = await syncZoteroLibrary(client, next.state, { ...options, existingItems: first.upserts });
     expect(unchanged.upserts).toEqual([]);
     expect(unchanged.state.libraryVersion).toBe(fake.version);
+  });
+
+  it("mirrors a Web library fully, incrementally and unchanged (the review-app failure: Web 304s have no version)", async () => {
+    const { fake, client } = await setup("web");
+    fake.addItem("PAPER001");
+    fake.addItem("ATTACH01", { itemType: "attachment", parentItem: "PAPER001", contentType: "application/pdf", title: "PDF" });
+    const first = await syncZoteroLibrary(client, state("web"), options);
+    expect(first.upserts.map((i) => [i.zotero!.itemKey, i.attachments.map((a) => a.zoteroAttachmentKey)])).toEqual([["PAPER001", ["ATTACH01"]]]);
+    // The full snapshot already holds children: no per-paper /children request.
+    expect(fake.requests.some((r) => r.url.pathname.endsWith("/children"))).toBe(false);
+    fake.addItem("PAPER002");
+    const next = await syncZoteroLibrary(client, first.state, { ...options, existingItems: first.upserts });
+    expect(next.upserts.map((i) => i.zotero!.itemKey)).toEqual(["PAPER002"]);
+    const unchanged = await syncZoteroLibrary(client, next.state, { ...options, existingItems: [...first.upserts, ...next.upserts] });
+    expect(unchanged).toMatchObject({ upserts: [], state: { state: "ok", libraryVersion: fake.version } });
   });
 
   it("filters followed collections and returns moved-out items/deletions without dropping citations", async () => {

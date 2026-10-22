@@ -8,6 +8,8 @@
     "title": "Library",
     "zoteroSynced": "Zotero updated {when}",
     "zoteroNone": "Zotero not connected",
+    "zoteroNotSynced": "Zotero connected · not updated yet",
+    "zoteroFailed": "Zotero update failed",
     "search": "Search your library · e.g. nickel prospectivity spatial cross-validation",
     "loading": "Reading your library.",
     "error": "Could not read your library. Open it again in a moment.",
@@ -181,15 +183,32 @@
       "button": "Update now"
     },
     "syncing": "Reading from Zotero.",
-    "ok": "Connected · updated {when}",
-    "notSynced": "Connected · not updated yet",
+    "ok": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · updated {when}",
+    "notSynced": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · not updated yet",
     "states": {
-      "zotero-closed": "Zotero is not running. Open Zotero and connect again.",
+      "zotero-closed": "Zotero is not running on this PC. Open the Zotero app, then update again.",
       "local-api-off": "In Zotero Settings → Advanced, turn on \"Allow other applications to communicate\", then connect again.",
-      "key-rejected": "Zotero refused the connection. Check the key or the approval.",
-      "unreachable": "Could not reach Zotero. Try again in a moment."
+      "key-rejected": "Zotero refused the connection. Check the web key's permissions or the Zotero approval prompt.",
+      "key-invalid": "Zotero rejected the web key. It was deleted or mistyped. Check the key under Security in zotero.org settings, then save a new key.",
+      "no-library-access": "The web key cannot read your personal library. Turn on \"Allow library access\" for the key under Security in zotero.org settings, then update again.",
+      "library-not-found": "Zotero could not find the library. Check which account made the web key, then save a new key.",
+      "rate-limited": "Zotero is limiting requests. Wait several minutes, then update again.",
+      "server-error": "The Zotero server did not respond. Update again in a moment.",
+      "library-changing": "The Zotero library kept changing during the update. Finish editing in Zotero, then update again.",
+      "certificate-untrusted": "The institute network relays the Zotero connection, and GAID does not trust its security certificate, so it could not connect. Set the institute certificate file in `NODE_EXTRA_CA_CERTS`, then restart GAID.",
+      "unreachable": "Could not connect to Zotero. Check the network connection, then update again.",
+      "failed": "Could not read the Zotero library. If updating again fails the same way, copy the technical details and pass them on."
     },
-    "hint": "Papers collected in Zotero appear in the library too. GAID writes to Zotero only when you send papers or add them to a linked folder."
+    "hint": "Papers collected in Zotero appear in the library too. GAID writes to Zotero only when you send papers or add them to a linked folder.",
+    "failed": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · update failed",
+    "failedSince": "Connected via {connection, select, local {Zotero on this PC} other {web key}} · update failed · last updated {when}",
+    "localNote": "Zotero on this PC updates only while the Zotero app is running. Papers from the last update stay in the library when the app is closed.",
+    "newKey": "New Zotero web API key",
+    "emptyWeb": "The zotero.org web library has no papers. A web key reads only papers the Zotero app has synced to zotero.org. To see papers in Zotero on this PC, disconnect the web key, then connect Zotero on this PC.",
+    "disconnect": {
+      "button": "Disconnect Zotero",
+      "hint": "Papers already in the library stay after you disconnect. The web key is deleted."
+    }
   },
   "send": {
     "button": "Send to Zotero",

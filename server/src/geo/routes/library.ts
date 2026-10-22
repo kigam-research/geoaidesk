@@ -24,6 +24,9 @@ import { buildUsesIndex, hasScope, projectItems, projectNoteCitations, readProje
 import { AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
+
+/** Error code and HTTP status only (never Zotero bodies or keys), shown behind 기술 정보. */
+const zoteroErrorDetail = (error: ZoteroError) => [error.code, error.status ? `HTTP ${error.status}` : ""].filter(Boolean).join(" · ");
 import { identifyPdf, lookupDoi, resolveUrl, searchByTitle, type MetadataRecord } from "../library/metadata/index.ts";
 import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
 import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
@@ -94,7 +97,10 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     scope.setErrorHandler((error, _req, reply) => {
       if (error instanceof LibraryError) return reply.code(error.status).send({ error: error.message });
       // Research-language Zotero states (never response bodies or keys); the screen words them.
-      if (error instanceof ZoteroError) return reply.code(error.state === "key-rejected" ? 403 : 502).send({ error: "zotero", state: error.state });
+      if (error instanceof ZoteroError) {
+        const refused = error.state === "key-rejected" || error.state === "key-invalid" || error.state === "no-library-access";
+        return reply.code(refused ? 403 : 502).send({ error: "zotero", state: error.state, detail: zoteroErrorDetail(error) });
+      }
       if ((error as { code?: string }).code === "FST_ERR_CTP_BODY_TOO_LARGE") return reply.code(413).send({ error: "요청이 너무 큽니다." });
       if ((error as { statusCode?: number }).statusCode === 400) return reply.code(400).send({ error: "요청 형식을 확인해 주세요." });
       scope.log.error(error);
@@ -334,6 +340,11 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     scope.post<{ Body: { key?: unknown } }>("/geo/library/zotero/web", { bodyLimit: 4096 }, async (req) => {
       if (typeof req.body?.key !== "string") throw new LibraryError("key is required");
       return { libraries: await zoteroOf(storeOf()).connectWeb(req.body.key.trim()) };
+    });
+    scope.post<{ Body: { connection?: unknown } }>("/geo/library/zotero/disconnect", { bodyLimit: 1024 }, async (req) => {
+      const connection = req.body?.connection;
+      if (connection !== "local" && connection !== "web") throw new LibraryError("connection must be local or web");
+      return { libraries: await zoteroOf(storeOf()).disconnect(connection) };
     });
     scope.post("/geo/library/zotero/sync", async () => {
       await zoteroOf(storeOf()).syncAll();

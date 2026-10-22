@@ -10,6 +10,11 @@ export interface FakeZotero {
   version: number;
   apiOff: boolean;
   keyRejected: boolean;
+  /** Web: the key exists but may not read this library (403 "Forbidden"). */
+  libraryForbidden: boolean;
+  /** Web: `access.user.library` of /keys/current. */
+  personalLibraryAccess: boolean;
+  webKey: string;
   requests: RecordedRequest[];
   items: Map<string, ZoteroObject>;
   collections: Map<string, ZoteroObject>;
@@ -31,7 +36,7 @@ export interface FakeZotero {
 export async function fakeZotero(connection: "local" | "web" = "local"): Promise<FakeZotero> {
   let sequence = 0;
   const fake: FakeZotero = {
-    baseUrl: "", connection, serverId: "server-A", version: 1, apiOff: false, keyRejected: false, requests: [],
+    baseUrl: "", connection, serverId: "server-A", version: 1, apiOff: false, keyRejected: false, libraryForbidden: false, personalLibraryAccess: true, webKey: "web-synthetic-secret", requests: [],
     items: new Map(), collections: new Map(), deletedItems: new Map(), deletedCollections: new Map(), attachmentUrl: "", file: Buffer.from("%PDF-1.7\nsynthetic\n"),
     fileExists: false, uploadedFiles: new Map(), fullTexts: new Map(),
     addItem(key, data = {}) {
@@ -63,6 +68,8 @@ export async function fakeZotero(connection: "local" | "web" = "local"): Promise
       response.setHeader("Last-Modified-Version", fake.version);
       response.setHeader("Content-Type", "application/json");
       const reply = (status: number, body?: unknown) => { response.statusCode = status; response.end(body === undefined ? undefined : JSON.stringify(body)); };
+      // Real Web API text bodies: a revoked/unknown key is "Invalid key", a key without access "Forbidden".
+      const refuse = (text: string) => { response.statusCode = 403; response.setHeader("Content-Type", "text/plain"); response.end(text); };
       const exported = (object: ZoteroObject) => query.get("include")?.includes("csljson") ? { ...object, csljson: JSON.stringify([object.csljson]) } : object;
       if (fake.before && await fake.before(rec, response)) return;
       if (path.startsWith("/storage/upload/")) {
@@ -74,12 +81,14 @@ export async function fakeZotero(connection: "local" | "web" = "local"): Promise
         return reply(201);
       }
       if (fake.apiOff) return reply(403);
-      if (fake.keyRejected && (connection === "web" || rec.method !== "GET")) return reply(connection === "local" ? 401 : 403);
+      if (fake.keyRejected && connection === "web") return refuse("Invalid key");
+      if (fake.keyRejected && rec.method !== "GET") return reply(401);
       if (connection === "local" && rec.headers["zotero-server-id"] && rec.headers["zotero-server-id"] !== fake.serverId) return reply(412);
       if (connection === "local" && rec.method !== "GET" && rec.headers["zotero-server-id"] !== fake.serverId) return reply(428);
       if (path === "/local/authorize") return reply(200, { key: "local-synthetic-secret", remember: true });
-      if (connection === "web" && rec.headers["zotero-api-key"] !== "web-synthetic-secret") return reply(403);
-      if (path === "/keys/current") return reply(200, { key: "web-synthetic-secret", userID: 123, username: "synthetic", access: { user: { library: true, write: true }, groups: { "456": { library: true, write: false } } } });
+      if (connection === "web" && rec.headers["zotero-api-key"] !== fake.webKey) return refuse("Invalid key");
+      if (path === "/keys/current") return reply(200, { key: fake.webKey, userID: 123, username: "synthetic", access: { user: { library: fake.personalLibraryAccess, write: true }, groups: { "456": { library: true, write: false } } } });
+      if (connection === "web" && fake.libraryForbidden && /^\/(users|groups)\/\d+\/(items|collections|deleted)/.test(path)) return refuse("Forbidden");
       if (path === "/users/123/groups") return reply(200, [{ id: 456, data: { name: "Synthetic group" } }]);
       if (path === "/storage/paper.pdf") { response.setHeader("Content-Type", "application/pdf"); response.end(fake.file); return; }
       const match = path.match(/^\/(?:users|groups)\/\d+\/(items|collections|deleted)(?:\/([A-Z0-9]{8}))?(.*)$/);
@@ -97,7 +106,11 @@ export async function fakeZotero(connection: "local" | "web" = "local"): Promise
         if (suffix === "/file/view/url") { response.setHeader("Content-Type", "text/plain"); response.end(fake.attachmentUrl); return; }
         if (suffix === "/file") { response.statusCode = 302; response.setHeader("Location", `${fake.baseUrl}storage/paper.pdf`); response.end(); return; }
         if (object && !suffix) { response.setHeader("Last-Modified-Version", object.version); return reply(200, exported(object)); }
-        if (Number(rec.headers["if-modified-since-version"]) >= fake.version) return reply(304);
+        if (Number(rec.headers["if-modified-since-version"]) >= fake.version) {
+          // The real Web API sends no Last-Modified-Version with a 304 (checked on api.zotero.org, 2026-10-22).
+          if (connection === "web") response.removeHeader("Last-Modified-Version");
+          return reply(304);
+        }
         let list = suffix === "/children" ? [...fake.items.values()].filter((o) => o.data.parentItem === key) : [...objects.values()];
         if (query.get("includeTrashed") !== "1") list = list.filter((object) => !object.data.deleted);
         if (query.has("since")) list = list.filter((object) => object.version > Number(query.get("since")));

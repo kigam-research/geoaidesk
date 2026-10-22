@@ -67,6 +67,49 @@ describe("Zotero service", () => {
     expect(await service.libraries()).toEqual([]);
   });
 
+  it("connects a web key, records why a refresh failed with the library, and clears it once a refresh works", async () => {
+    const web = await fakeZotero("web");
+    web.webKey = "SyntheticWebKey0123456789";
+    try {
+      const svc = new ZoteroService(store, { webBaseUrl: web.baseUrl });
+      web.addItem("PAPER001");
+      const [connected] = await svc.connectWeb(web.webKey);
+      expect(connected).toMatchObject({ connection: "web", libraryId: "123", state: "ok", lastSyncAt: expect.any(String) });
+      expect((await store.all()).map((i) => i.zotero?.itemKey)).toEqual(["PAPER001"]);
+      web.libraryForbidden = true;
+      await svc.syncAll();
+      const [failed] = await svc.libraries();
+      expect(failed).toMatchObject({ state: "no-library-access", failedAt: expect.any(String), detail: "web · access-denied · HTTP 403", lastSyncAt: connected.lastSyncAt });
+      expect(JSON.stringify(failed)).not.toContain(web.webKey);
+      web.libraryForbidden = false;
+      await svc.syncAll();
+      const [recovered] = await svc.libraries();
+      expect(recovered.state).toBe("ok");
+      expect(recovered.failedAt).toBeUndefined();
+      expect(recovered.detail).toBeUndefined();
+      // Disconnecting forgets the key and the library state; mirrored papers stay.
+      expect(await svc.disconnect("web")).toEqual([]);
+      expect((await store.all()).map((i) => i.zotero?.itemKey)).toEqual(["PAPER001"]);
+      await svc.syncAll();
+      expect(await svc.libraries()).toEqual([]);
+      expect(fs.readFileSync(fs.readdirSync(path.join(dir, "library", "secrets")).map((f) => path.join(dir, "library", "secrets", f))[0], "utf8")).toBe("{}");
+    } finally { await web.close(); }
+  });
+
+  it("refuses a web key that cannot read the personal library and does not keep it", async () => {
+    const web = await fakeZotero("web");
+    web.webKey = "SyntheticWebKey0123456789";
+    web.personalLibraryAccess = false;
+    try {
+      const svc = new ZoteroService(store, { webBaseUrl: web.baseUrl });
+      await expect(svc.connectWeb(web.webKey)).rejects.toMatchObject({ state: "no-library-access" });
+      expect(await svc.libraries()).toEqual([]);
+      web.personalLibraryAccess = true;
+      await expect(svc.connectWeb("SomeOtherKey0123456789")).rejects.toMatchObject({ state: "key-invalid" });
+      expect(fs.readFileSync(fs.readdirSync(path.join(dir, "library", "secrets")).map((f) => path.join(dir, "library", "secrets", f))[0], "utf8")).toBe("{}");
+    } finally { await web.close(); }
+  });
+
   it("sends a GAID item to Zotero in place and keeps its PDF and citation key across syncs", async () => {
     await service.connectLocal();
     const pdf = await store.storePdf(makePdf(["Nickel prospectivity sparse labels page text long enough for reading"]));
