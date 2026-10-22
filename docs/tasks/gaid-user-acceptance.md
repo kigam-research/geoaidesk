@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T10:07:52Z
+status: done
+updated: 2026-10-22T10:08:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -92,8 +92,9 @@ Outside check: no outside check.
   link "[blocked]" (Blocked URL: undefined), report-relative links in B "[blocked]"; Japanese progress cards; wide tables need
   horizontal scroll; PDF opens in browser viewer tab; A used 0.9–2.0M tokens per question (subscription).
 ## Next steps
-1. task review-copy the report, task finish. If the user saves a new Zotero key first: rerun goal C (tester or me through the
-   UI), update report 3.3 and the open item.
+<!-- task:closed -->
+Closed 2026-10-22T10:08:28Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-user-acceptance.md.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -108,8 +109,8 @@ Closes: gaid-zotero-web-fix#1
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 수용 시험에서 처음 쓰는 연구자가 겪은 화면 문제 8건(새 대화 기본 모델 미연결, 같은 이름 모델 두 개, "[blocked]" 링크, 넓은 표 인용 열, arXiv 서지 추천, "모두 읽음" 문구, "형식 확인 필요" 남발, 일본어 진행 카드)을 고칠지 — 가) 후속 작업 하나로 묶어 고침 — 나) 기본 모델과 "[blocked]" 링크만 먼저 고침 — 다) 지금은 고치지 않음 — 권장: 가) 대화 시작과 결과 열기 같은 첫 단계에서 막히는 문제가 들어 있음 — 막힌 일: 처음 쓰는 연구자의 첫 사용 — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#35-처음-쓰는-사용자가-막히거나-헷갈린-점
-- [대기] Zotero 웹 서재 갱신과 GAID 폴더 보내기 재시험 — 막힌 일: Zotero 웹 연결의 완료 판단(gaid-zotero-web-fix) — 조건: 사용자가 읽기·쓰기 권한이 있는 새 Zotero 웹 키를 검토용 앱 서재에 저장(저장된 키는 zotero.org가 invalid key로 거부) — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#33-zotero-웹-서재
+- [결정 gaid-user-acceptance#1] 수용 시험에서 처음 쓰는 연구자가 겪은 화면 문제 8건(새 대화 기본 모델 미연결, 같은 이름 모델 두 개, "[blocked]" 링크, 넓은 표 인용 열, arXiv 서지 추천, "모두 읽음" 문구, "형식 확인 필요" 남발, 일본어 진행 카드)을 고칠지 — 가) 후속 작업 하나로 묶어 고침 — 나) 기본 모델과 "[blocked]" 링크만 먼저 고침 — 다) 지금은 고치지 않음 — 권장: 가) 대화 시작과 결과 열기 같은 첫 단계에서 막히는 문제가 들어 있음 — 막힌 일: 처음 쓰는 연구자의 첫 사용 — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#35-처음-쓰는-사용자가-막히거나-헷갈린-점
+- [대기 gaid-user-acceptance#2] Zotero 웹 서재 갱신과 GAID 폴더 보내기 재시험 — 막힌 일: Zotero 웹 연결의 완료 판단(gaid-zotero-web-fix) — 조건: 사용자가 읽기·쓰기 권한이 있는 새 Zotero 웹 키를 검토용 앱 서재에 저장(저장된 키는 zotero.org가 invalid key로 거부) — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#33-zotero-웹-서재
 ## Report
 Report: reports/2026-10-22-gaid-user-acceptance/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
