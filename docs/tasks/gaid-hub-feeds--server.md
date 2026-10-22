@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T14:47:31Z
+status: done
+updated: 2026-10-22T15:18:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"80c56972-fb1c-4772-8d6a-0aff1507bcd2","pid":2748886,"provider":"codex","session":"01a1640a-9683-7250-88e1-fd32f5a623a3","start":"56771685","token":"fdf77feb4e49f6d0188b2ab0078c1bc3dc304fbd1395538e883631d3c7bc86fc"}
 branch: task/gaid-hub-feeds--server
 target: task/gaid-hub-feeds
@@ -95,7 +95,7 @@ Implementation is saved on this child branch; parent integration, full scripts/c
 Safe recheck: the declared focused TypeScript/Vitest commands. Do not rerun the recorded live jobs; their evidence is below.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T14:47:31Z: ready; the parent gaid-hub-feeds integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T15:18:07Z: integrated into gaid-hub-feeds; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial Codex list read exceeded the fixed byte cap. Do not increase the cap or retry unchanged; the accepted fallback requests one stable release.

@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T15:18:06Z
+status: done
+updated: 2026-10-22T15:18:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ae22402c-3c23-4d4f-a3f2-53a34a33fd4e","pid":2316190,"provider":"claude","session":"a84ff37e-f54b-47e9-b216-7e2a5ce01bc0","start":"56712264","token":"2910bef256a9caa5c7498bb6d9647f32045f60a92a90aded98a1e4fdbf68e513"}
 branch: task/gaid-hub-feeds
 target: main
@@ -71,7 +71,9 @@ Meaning of the decisions (they answer the hub's four questions):
 - Temporary services (stopped 2026-10-23): user units `gaid-hub-feeds-app` (GAID 3110/8110, data under the work dir) and
   `gaid-hub-feeds-hub` (hub 8711).
 ## Next steps
-1. scripts/check passed (exit 0 at a45657f6; log ~/data/geoaidesk/work/gaid-hub-feeds/logs/check.log). Stop the two temporary units, review-copy, `task finish`.
+<!-- task:closed -->
+Closed 2026-10-22T15:18:07Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-feeds.md.
+
 ## Failed approaches
 ## Notes and decisions
 - Orchestration: sequential = contract → (child server ∥ parent GAID/web) → integration. Owned files: child =
@@ -91,7 +93,7 @@ Meaning of the decisions (they answer the hub's four questions):
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 기관 허브 서버를 gaid-hub-feeds 변경으로 갱신한 뒤 제안 출처를 승인하는 범위 — 가) 18곳 모두 승인 — 나) 일부만 승인 — 권장: 가) PC74에서 18곳 모두 수집을 확인했고 필요 없는 출처는 나중에 멈출 수 있음 — 막힌 일: 연구자 화면의 자료 소식 — 조건: 시험 운영 허브 서버(PC74:8700)를 main으로 갱신한 뒤, 관리자 계정으로 설정 → 기관 GAID 허브 → 허브 서버 관리 → 자료 소식 출처 — 근거: reports/2026-10-22-gaid-hub-feeds/index.md#6-결정할-일
+- [결정 gaid-hub-feeds#1] 기관 허브 서버를 gaid-hub-feeds 변경으로 갱신한 뒤 제안 출처를 승인하는 범위 — 가) 18곳 모두 승인 — 나) 일부만 승인 — 권장: 가) PC74에서 18곳 모두 수집을 확인했고 필요 없는 출처는 나중에 멈출 수 있음 — 막힌 일: 연구자 화면의 자료 소식 — 조건: 시험 운영 허브 서버(PC74:8700)를 main으로 갱신한 뒤, 관리자 계정으로 설정 → 기관 GAID 허브 → 허브 서버 관리 → 자료 소식 출처 — 근거: reports/2026-10-22-gaid-hub-feeds/index.md#6-결정할-일
 ## Report
 Report: reports/2026-10-22-gaid-hub-feeds/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
