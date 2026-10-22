@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T03:02:44Z
+status: ready
+updated: 2026-10-22T03:02:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"36df4108-f453-465d-a831-81e522b2aacb","pid":2574688,"provider":"codex","session":"01a1616f-6d1d-7983-b8a8-befed5c6ce74","start":"52399367","token":"a17b856789d20005e88c5a087fb7ac9f7714ba77d14d07c5d05c814580c51853"}
 branch: task/gaid-research-visuals--skill
 target: task/gaid-research-visuals
@@ -110,7 +110,9 @@ Official sources were curled on 2026-10-22. Verified Elsevier/Copernicus/Geoscie
 remain null due to conflicting units. Source list, limitations and synthetic evidence are below.
 
 ## Next steps
-1. Direct production smoke exited 0. Run task finish in place; parent completes/integrates the checked child.
+<!-- task:closed -->
+Closed 2026-10-22T03:02:45Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Second task finish passed backend (2,077 passed, 8 skipped), frontend (1,144 passed), GAID Node tests (57 passed,
   1 skipped), UI/copy/environment/launcher checks, and actual production start/stop/restart. It failed only the old
