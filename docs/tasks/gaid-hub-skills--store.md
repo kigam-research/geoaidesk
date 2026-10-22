@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:12:15Z
+updated: 2026-10-22T06:12:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"719ab3a6-fd9a-45bf-bd3d-4ba793a8be7e","pid":173800,"provider":"codex","session":"01a16234-aa5a-7a41-8b21-6fc2461e73fb","start":"53692003","token":"fa04026f43f744274997d89765e602222bba852a5f0ef3258ad98fc0e4a91a66"}
 branch: task/gaid-hub-skills--store
 target: task/gaid-hub-skills
@@ -66,10 +66,10 @@ document (what exists, how verified, limits); no report of your own. Finish with
 
 ## Current state
 Implemented the immutable skill shelf, three-source registration preview, licence/findings scanner, per-revision review and visibility, bounded read-only views, Workflow usedBy, acknowledged revision installs and GET /skills annotations.
-Verified server TypeScript check and 30 targeted tests (13 shelf + 14 shared hub + 3 origin), including anonymous install and the exact authoring licence placeholder. Full server tests remain.
+Verified server TypeScript check and 30 targeted tests (13 shelf + 14 shared hub + 3 origin), including anonymous install and the exact authoring licence placeholder. Full server tests are running from pushed snapshot ee4b980af331 in job-geoaidesk-gaid-hub-skills--store-1 (receipt below). No app deployment or parent integration is claimed.
 ## Next steps
-1. Finish current targeted checks and run full server tests through a recorded job.
-2. Record the parent report notes, save reviewed files, and finish the child unit.
+1. On the recorded job exit notice, read its result; do not rerun or duplicate the job.
+2. If full server tests pass, record totals and finish this child with task finish. If they fail, inspect concrete failures before changing code.
 ## Failed approaches
 - New /skills/all test initially wrapped app.inject with withActiveProject; Fastify request context did not inherit it. Replaced it with the same onRequest scope hook used by the server; all 13 shelf tests passed.
 ## Notes and decisions
@@ -80,18 +80,20 @@ Verified server TypeScript check and 30 targeted tests (13 shelf + 14 shared hub
 - Parent decisions: the builder's exact PRIVATE marker is absent for licence detection (import its constant); any other unknown declaration stays unknown. Install/install-preview do not require a display name, but anonymous users can install only publicly visible revisions. Other mutations retain the name gate.
 - Latest non-shareable licences hide the entire skill from other names; old non-shareable revisions remain hidden after a later release.
 - Workflow extraction removes root gaid-method.json and atlas.yaml, which the current builder generates as Workflow metadata; scripts, references, notices and SKILL.md remain.
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Parent report notes (no separate child report):
+- The server shelf stores immutable, hash-checked skill revisions with source provenance, file inventories, licence records, findings and unverified display-name reviews. A researcher can register a project skill, extract the bundled skill from a registered Workflow, or stage a skills CLI source without installing it.
+- Public reads hide restricted/unknown latest revisions from other names and keep older non-shareable revisions hidden after a later release. Public skill installation works without a display name; author-only installs require the author's name. The exact generated authoring PRIVATE marker is not an external licence declaration.
+- Installs use the existing preview/acknowledgement and atomic install engine, never fetch GitHub, reject suspended revisions, and preserve foreign or edited project skills. Reinstalling the same unedited hub tree writes nothing. GET /skills and /skills/all include the installed pin, current shelf revision/state and edited flag.
+- TypeScript check and 30 targeted tests passed at ee4b980af331. Tests use temporary stores/projects and the real skills CLI with local sources, not network access. Coverage includes source changes after registration, archive/tree/inventory tampering, two Workflow revisions pinning different skill revisions, old-revision installs, suspension, visibility/review, source choice, text/path/size gates, metadata extraction, deterministic long/Unicode/empty-folder archives, reverted-tree origin stability and real skill-row annotations.
+- Full server suite: pending the recorded job below. Scanner findings are bounded heuristics (200 findings; 160-character excerpts), not a safety verdict. Licence detection uses a known SPDX list, not a legal opinion; unsupported declarations remain author-only. The skills CLI exposes no resolved commit on this path, so the origin does not invent one. UI and Workflow authoring/readiness are owned by the parent/sibling, not this child.
+
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-hub-skills--store-20261022T061227.637852Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
