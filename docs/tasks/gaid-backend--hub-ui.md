@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T06:26:19Z
+status: ready
+updated: 2026-10-22T06:26:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -76,7 +76,7 @@ Sequential decisions: keep existing researcher-backend contracts; distinguish co
 Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel mount only; existing hub identity seams and library sync mount. Integration order: Settings/account components -> identity -> sync -> mocked tests -> screenshots -> task finish. No child workers (tightly coupled UI).
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T06:18:31Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-22T06:26:21Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Disposing failed job 1 as superseded after failed finish was refused: terminal task; disposition requires an open owning task. No job rerun or metadata edit. Job 2 is the successful replacement, documented above; finish treats the old failure as advisory.
