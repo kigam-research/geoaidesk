@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:41:45Z
+status: ready
+updated: 2026-10-22T02:41:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"813b374f-6081-4e35-bb00-2a85b20c78b0","pid":2577995,"provider":"codex","session":"01a1616f-ac32-7212-a099-657c660972dd","start":"52400975","token":"036c33bc715fc3253d6171a7b69b7e96a7088ceff337e24a0d8d0d1cf2cffa5f"}
 branch: task/gaid-research-visuals--records
 target: task/gaid-research-visuals
@@ -93,8 +93,9 @@ TypeScript checks and UI/copy validators pass. Seventeen Korean fixture screensh
 1440x900 and 1280x800 (origin/check plus AI detail). Parent note-panel wiring and actual sibling checker execution
 remain integration work, not verified here. The parent should consume this child with task complete after finish.
 ## Next steps
-1. Run task finish with the owned new files; parent then integrates using task complete.
-2. Parent mounts NoteFigures in the note detail and verifies the actual sibling skill/checker plus its full scripts/check.
+<!-- task:closed -->
+Closed 2026-10-22T02:41:46Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - The initial copy recognizer failed to match cp at the opening quote of JSON-serialized arguments; corrected the token
   boundary and verified both observed-edge and hash-copy cases, including a hash match to another copied figure.
