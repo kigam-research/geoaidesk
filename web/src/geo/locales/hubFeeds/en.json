@@ -1,5 +1,6 @@
 {
   "nav": "Research feeds",
+  "all": "All feeds",
   "title": "Research feeds",
   "context": "Original titles and summaries collected from {count} administrator-approved sources. Not reviewed.",
   "collectedAt": "Last collected {when}",
@@ -38,6 +39,7 @@
     "button": "Copy technical details"
   },
   "published": "Published {when}",
+  "updated": "Repository updated {when}",
   "fetched": "Collected {when}",
   "stars": "{count} stars",
   "release": "Release {tag}",

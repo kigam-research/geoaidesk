@@ -1,5 +1,6 @@
 {
   "nav": "자료 소식",
+  "all": "전체 소식",
   "title": "자료 소식",
   "context": "관리자가 승인한 출처 {count}곳에서 모은 원문 제목과 요약입니다. 내용은 검토 전입니다.",
   "collectedAt": "마지막 수집 {when}",
@@ -38,6 +39,7 @@
     "button": "기술 정보 복사"
   },
   "published": "게시 {when}",
+  "updated": "저장소 갱신 {when}",
   "fetched": "가져온 때 {when}",
   "stars": "별 {count}개",
   "release": "{tag} 판",

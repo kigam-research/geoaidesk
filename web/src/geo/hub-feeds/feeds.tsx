@@ -163,7 +163,8 @@ function FeedRow({ item, projects }: { item: FeedItem; projects: { id: string; n
   const meta = [
     item.sourceTitle,
     text(`field.${item.field}`),
-    published ? text("published", { when: published }) : text("fetched", { when: feedDate(item.fetchedAt) }),
+    // A repository found by search carries its last update, not a publication date.
+    published ? text(item.github && !item.github.release ? "updated" : "published", { when: published }) : text("fetched", { when: feedDate(item.fetchedAt) }),
     item.github?.release ? text("release", { tag: item.github.release }) : null,
     item.github?.stars !== undefined ? text("stars", { count: item.github.stars }) : null,
   ].filter(Boolean);

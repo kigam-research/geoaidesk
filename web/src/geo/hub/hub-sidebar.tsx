@@ -179,8 +179,8 @@ export function HubSidebar({
         <SidebarItem icon={PencilIcon} label={text("home.mineItem")} count={mineCount} selected={is({ kind: "mine" })} onClick={() => onView({ kind: "mine" })} />
       </SidebarGroup>
       <SidebarGroup title={t("hubSkills.nav")}><SidebarItem icon={BookOpenIcon} label={t("hubSkills.all")} selected={is({ kind: "skills" })} onClick={() => onView({ kind: "skills" })} /></SidebarGroup>
-      <SidebarGroup>
-        <SidebarItem icon={NewspaperIcon} label={t("hubFeeds.nav")} selected={is({ kind: "feeds" })} onClick={() => onView({ kind: "feeds" })} />
+      <SidebarGroup title={t("hubFeeds.nav")}>
+        <SidebarItem icon={NewspaperIcon} label={t("hubFeeds.all")} selected={is({ kind: "feeds" })} onClick={() => onView({ kind: "feeds" })} />
       </SidebarGroup>
     </nav>
   );
