@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T02:41:28Z
+status: ready
+updated: 2026-10-22T02:41:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"38934232-bc69-4c6e-85ce-d9508ca7b59d","pid":2583953,"provider":"codex","session":"01a1616f-fbe3-7443-b1ed-dcbcf3b16315","start":"52403024","token":"d0d836486e1bf422e38ed51e1a06432ed72a99c80a8e5ce015532b50e7faf79f"}
 branch: task/gaid-research-visuals--map
 target: task/gaid-research-visuals
@@ -92,9 +92,9 @@ Checks completed:
 Synthetic GET evidence (depth 2): note focus returns 6 nodes/5 edges; figure focus 6/5; paper focus 4/3; all truncated=false. Re-run the server test with CONNECTION_EVIDENCE_DIR to capture exact JSON. External evidence folder: /home/seongin3/data/geoaidesk/work/gaid-research-visuals--map/evidence/ (note.json, figure.json, paper.json, browser-check.log, copy-check.log). Screenshot folder: /home/seongin3/data/geoaidesk/work/gaid-research-visuals--map/playwright/; files instrument|mapsheet-light|dark-WIDTHxHEIGHT.png and list-keyboard-1280x800.png. Parent should copy decision-relevant small images into its canonical report, then run humanizer/review-copy there.
 
 ## Next steps
-1. Finish this checked child; parent then runs task complete gaid-research-visuals--map.
-2. Parent wires ConnectionMapButton or ConnectionMapPane callbacks into note, figure and library entry points and runs full integration checks.
-3. Parent adds the MIT dependency notices for React Flow 12.12.0 and dagre 3.1.1 and the implementation result/screenshots to its canonical report. This child intentionally did not edit THIRD_PARTY_NOTICES.md to avoid overlap with child A.
+<!-- task:closed -->
+Closed 2026-10-22T02:41:29Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial web import named a nonexistent useProjectId; corrected to existing useProjectScopeId. Effect-based reset failed the React lint rule; keyed per-entry state plus request-keyed asynchronous results now pass without suppressions. Initial component test assumed whitespace between adjacent spans; explicit localized accessible labels fixed the ambiguity. A test-evidence command was first run from repo root with server-relative include rules, found no tests, then was rerun successfully from server/.
 ## Notes and decisions
