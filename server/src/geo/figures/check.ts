@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { ProjectPaths } from "../../projects.ts";
-import { safePath } from "../../sandbox-fs.ts";
+import { apiRelative, safePath } from "../../sandbox-fs.ts";
 import { runHelperScript } from "../../api/sci-helpers.ts";
 import { FIGURE_CHECKS_DIR, type FigureCheckBody, type FigureRecord } from "../../../../web/src/geo/contracts/figures.ts";
 import { FigureError, SKILL_DIR, figurePath, figureRecord, figureTarget, journalProfiles, readFigureCheck, writeFigureState } from "./store.ts";
@@ -34,7 +34,7 @@ export async function checkFigure(paths: ProjectPaths, body: FigureCheckBody, sk
   check.path = relative;
   check.cvdPreviews = check.cvdPreviews.flatMap(p => {
     try {
-      const rel = (path.isAbsolute(p) ? path.relative(paths.sandbox, p) : p).split(path.sep).join("/");
+      const rel = path.isAbsolute(p) ? apiRelative(paths.sandbox, p) : p;
       return ["deuteranopia", "protanopia", "tritanopia"].some(v => rel === `${FIGURE_CHECKS_DIR}/${figure.sha256}-cvd-${v}.png`) ? [rel] : [];
     } catch { return []; }
   });

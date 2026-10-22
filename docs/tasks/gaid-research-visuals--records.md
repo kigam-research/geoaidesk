@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T02:41:46Z
+status: active
+updated: 2026-10-22T02:47:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"813b374f-6081-4e35-bb00-2a85b20c78b0","pid":2577995,"provider":"codex","session":"01a1616f-ac32-7212-a099-657c660972dd","start":"52400975","token":"036c33bc715fc3253d6171a7b69b7e96a7088ceff337e24a0d8d0d1cf2cffa5f"}
 branch: task/gaid-research-visuals--records
 target: task/gaid-research-visuals
@@ -97,6 +97,9 @@ remain integration work, not verified here. The parent should consume this child
 Closed 2026-10-22T02:41:46Z: ready; the parent gaid-research-visuals integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish full check: 2076 backend tests passed, 8 skipped; the sole failure was win-portability's source
+  conformance check because the preview normalizer used path.relative directly. Replaced it with apiRelative, the
+  repository's wire-format choke point. Focused portability + figure tests: 30 passed across 2 files; retrying finish.
 - The initial copy recognizer failed to match cp at the opening quote of JSON-serialized arguments; corrected the token
   boundary and verified both observed-edge and hash-copy cases, including a hash match to another copied figure.
 - The external screenshot fixture initially missed Tailwind source scanning and the public font directory; fixed the
