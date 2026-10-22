@@ -5,7 +5,7 @@ project: geoaidesk
 task: gaid-library-next
 headline: 기관 Qwen이 서재의 실제 논문 4편에서 쪽 근거를 찾아 인용했고, 확인한 인용 34개가 모두 맞았습니다. 문헌 스킬 4개를 넣은 카탈로그 0.3.0을 GAID 안에서 만들어 고정했습니다. Better BibTeX는 Zotero 10 조건이 풀리지 않아 기다립니다.
 review_status: pending
-decisions: 1
+decisions: 0
 cover: figures/02-note-references.png
 supersedes:
 ---
@@ -18,7 +18,7 @@ supersedes:
 | 요청 | 서재 개선 작업 뒤에 남은 서재 항목 세 가지를 진행합니다. |
 | 결론 | 기관 Qwen 실제 채팅에서 AI agent가 서재 도구로 논문 4편을 찾아 읽고 수치마다 쪽 인용을 붙였습니다. 제가 확인한 34개 인용이 모두 해당 쪽에 있었고, 서재에 없는 논문에는 인용 키를 만들지 않았습니다. 문헌 스킬 4개(논문 찾기, 인용 정리, 문헌 고찰, Zotero 연결)를 넣은 카탈로그 0.3.0을 GAID 저장소에서 만들어 앱에 고정했습니다. 새 프로젝트와 기존 프로젝트 모두에 들어가고, 기관 Qwen이 논문 찾기 스킬로 DOI를 조회했습니다. Better BibTeX 기능은 조건이 그대로라 만들지 않았습니다. |
 | 믿을 수 있는 정도 | 채팅 한 번(질문 두 개)과 제 대조 결과입니다. 연구자 본인의 논문과 질문으로 하는 확인은 남아 있습니다(체크리스트 3.2절). |
-| 결정할 일 | 1건 (6절): 카탈로그 0.3.0 파일을 GitHub 릴리스로 공개할지 정합니다. 사용자 확인 1건은 3.2절 체크리스트로 합니다. |
+| 결정할 일 | 없음. 카탈로그 0.3.0 공개는 사용자가 2026-10-22에 가)로 정해 공개했습니다(6절). 사용자 확인 1건은 3.2절 체크리스트로 합니다. |
 
 ## 1. 요청한 것
 
@@ -149,14 +149,11 @@ GAID는 지금처럼 Zotero의 인용 키 칸만 읽습니다. 이 항목은 기
 - 문헌 스킬 본문은 미국·생의학 서비스 중심입니다. KCI, RISS 같은 국내 자료원은 다루지 않습니다.
 - `pyzotero` 스킬은 pyzotero 1.15.2 기준으로 검토된 글인데, 문헌 환경은 하한만 적어 1.16.0이 설치됐습니다. Zotero에 쓰는 기능은 실제 Zotero로 시험하지 않았습니다.
 - 인용 정리와 문헌 고찰 스킬은 실제 채팅으로 시험하지 않았습니다. 논문 찾기만 기관 Qwen으로 한 번 시험했습니다.
-- 0.3.0을 쓰는 새 설치는 공개 릴리스에서 묶음을 내려받습니다. 릴리스를 공개하기 전까지는 묶음이 있는 PC(자산 폴더 또는 GAID 자료 폴더)에서만 동작합니다.
+- 0.3.0을 쓰는 새 설치는 공개 릴리스에서 묶음을 내려받습니다. 공개한 릴리스를 PC74에서 다시 내려받아 지문을 확인했지만, 다른 PC에서 새로 설치하는 시험은 하지 않았습니다.
 
 ## 6. 결정할 일
 
-1. 카탈로그 0.3.0 파일을 GitHub 릴리스(시험판, 이름 geo-catalogue-0.3.0)로 공개할지 정합니다.
-   - 가) 지금 공개합니다. 새로 설치하거나 업데이트한 GAID가 이 파일을 내려받아 해시가 맞을 때만 씁니다. 0.2.1 때와 같은 방식입니다.
-   - 나) 공개하지 않습니다. 묶음이 있는 PC에서만 0.3.0을 쓰고, 다른 PC는 카탈로그 스킬 없이 시작합니다.
-   - 권장: 가). 앱의 고정값이 이미 0.3.0을 가리키므로, 공개하지 않으면 다른 PC의 새 설치에서 카탈로그 스킬이 빠집니다.
+정할 일은 없습니다. 카탈로그 0.3.0 파일을 GitHub 릴리스(시험판 geo-catalogue-0.3.0)로 공개할지 물었고, 사용자가 2026-10-22에 "가로 진행하자."라고 답했습니다. 같은 날 공개했고, 공개한 파일을 다시 내려받아 지문이 앱 설정과 같은 것을 확인했습니다.
 
 남은 확인, 기다림, 부채:
 
@@ -195,6 +192,7 @@ GAID는 지금처럼 Zotero의 인용 키 칸만 읽습니다. 이 항목은 기
 | skill_hub 요청과 철회 | 요청 `bbaae80a7640`, 철회 `e50e5d58661c` (skill_hub 허브가 2026-10-22 철회 확인), 본문 pc74:~/data/geoaidesk/work/gaid-library-next/skill_hub-{request,withdraw}.md |
 | 카탈로그 빌드 | ADR `docs/adr/2026-10-22-gaid-builds-catalogue.md`, 도구 `geo/catalogue-build.mjs`, 판 정의 `geo/catalogue-src/releases/0.3.0.json`, 한국어 설명 `geo/catalogue-src/imports/k-dense/*.yaml`, 원본 해시 `geo/catalogue-src/sources.lock.json`, 재현 시험 `geo/tests/catalogue-build.test.mjs` |
 | 카탈로그 0.3.0 자산 | pc74:~/assets/geo-catalogue/0.3.0/ (MANIFEST.sha256 b39fd31e…df0f), 묶음 sha256 d09d5311b7be44d700d40b0bc52a53c9d1ca08a7099ce47bcab1df7d6d4c6598, 예시 sha256 66eeb190…d29f, 빌드 commit 64e2f756 |
+| 카탈로그 공개 | https://github.com/kigam-research/geoaidesk/releases/tag/geo-catalogue-0.3.0 (시험판, `node geo/catalogue-release.mjs --verify-remote` 통과, 2026-10-22) |
 | 원본 자산 | `k_dense_scientific_agent_skills` = pc74:~/assets/k-dense-scientific-agent-skills/92ace75a (K-Dense-AI/scientific-agent-skills@92ace75a, MIT) |
 | 문헌 스킬 시험 채팅 | 시험 앱 프로젝트 `lit-check-dccd5c`, 세션 `01a161e9-a806-7143-b515-0de38b4358c0`, 출력 pc74:~/data/geoaidesk/work/gaid-library-next/runs/lit1.log |
 | Better BibTeX | `gh api repos/retorquere/zotero-better-bibtex/releases`, `issues/3602`, `issues/3626`, `commits` (2026-10-21) |
