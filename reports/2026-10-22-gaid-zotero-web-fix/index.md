@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/01-web-key-failure.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # Zotero 웹 키 갱신 실패 원인과 상태 표시 수정
 
