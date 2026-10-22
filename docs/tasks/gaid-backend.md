@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:06:24Z
+updated: 2026-10-22T06:09:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"42c1d2eb-e8f7-49ac-b219-57ca9a2a1563","pid":3555477,"provider":"claude","session":"16841b69-907f-41ff-a4bd-8c87d2613dbe","start":"53044540","token":"3b49ca809aad8a333d258181d137a929d513d7ef1ea2d3c8ee82dda27c379e91"}
 branch: task/gaid-backend
 target: main
@@ -46,6 +46,10 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
 - Contracts: `web/src/geo/contracts/hub-server.ts` (local GAID routes for the UI), `server/src/geo/hub-server/protocol.ts`
   (`/hub/v1` wire), hub-shared.ts gains `authorId`, `registeredById`, comment `authorId`, `mine`, `HubMe`.
 - Dependencies installed in the worktree (server, web `npm ci`).
+- Children started 2026-10-22: gaid-backend--hub-server (P1), gaid-backend--hub-client (P2), gaid-backend--hub-ui (P3),
+  all "general work"; prompts in `~/data/geoaidesk/work/gaid-backend/prompts/child{1,2,3}.md`.
+- LAN check 2026-10-22: PC70 (10.13.15.70, Node v22.22.1) reached a test HTTP listener on PC74 10.13.15.74:8700
+  (`curl` from PC70 returned ok), so a PC74 hub server is reachable from PC70.
 ## Next steps
 1. Children running (see Work packages); keep the task doc current; `task complete` each child when it finishes.
 2. Integrate in order P1 → P2 → P3; end-to-end test: in-process hub server + two local GAIDs (register, star, comment,
