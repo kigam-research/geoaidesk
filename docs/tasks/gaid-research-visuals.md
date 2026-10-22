@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T02:17:14Z
+updated: 2026-10-22T02:28:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2cceca91-be2c-417d-91fa-2a00abf81f69","pid":1932750,"provider":"claude","session":"e8de1a21-2787-4813-95a5-2b6a9c27ca47","start":"47273338","token":"501f86af919f32bb08716719b3c938d6acf50b8cfd0b76739f71dbd3db63e5b0"}
 branch: task/gaid-research-visuals
 target: main
@@ -102,7 +102,15 @@ Integration order: A (check script + journals.json) → B uses them (B can stub 
 seams (research-notes-panel.tsx note detail: figures + map entry; figure record → map; library detail entry via the hub /
 gaid-library-next owner), then check-ui, scripts/check, screenshots (2 styles × 2 themes, 1440×900 + 1280×800, Korean),
 report update (design + implementation), task finish.
-1. Wait for task sync (scripts/check running) to finish, save ADR + contracts, start children A, B, C.
+Children started 2026-10-22 (profile "general work"; prompts ~/data/geoaidesk/work/gaid-research-visuals/prompts/full-*.md):
+A gaid-research-visuals--skill (Paseo 36df4108-f453-465d-a831-81e522b2aacb), B gaid-research-visuals--records
+(813b374f-6081-4e35-bb00-2a85b20c78b0), C gaid-research-visuals--map (38934232-bc69-4c6e-85ce-d9508ca7b59d).
+Other active units to watch for overlap: gaid-ui-v2-debts (+ --map: map viewer rebuild; library-screen tones),
+gaid-concept-pictures (hub concept pictures: ai-picture records may show them). Dependency locks: C owns web/package.json,
+A owns server/src/helpers/pyproject.toml + uv.lock in this unit; check main for concurrent lock edits at integration.
+1. While children run: prepare the note-detail seam plan (figures section + map entry) and the library-detail map entry
+   (library files now on main from gaid-library-next; ask the hub before editing web/src/geo/library/**).
+2. On each child finish: review its branch, `task complete gaid-research-visuals--<child>`, integrate (`task sync`).
 ## Failed approaches
 ## Notes and decisions
 - User decision 2026-10-22 (verbatim, writer tab): "gaid-research-visuals 설계안 5건 권장 방안으로 진행하자." = report §6
