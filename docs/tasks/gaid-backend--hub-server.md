@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T06:22:49Z
+status: ready
+updated: 2026-10-22T06:22:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb2d31aa-1e53-44fb-bc41-429c1eec3733","pid":214565,"provider":"codex","session":"01a16239-1e42-73b2-a1e3-4e088ec201a3","start":"53721186","token":"7929be5dae8e6ce4050b1260c2d83a48b5bd832aedf7e77cb23115d43d1fb6a6"}
 branch: task/gaid-backend--hub-server
 target: task/gaid-backend
@@ -89,12 +89,9 @@ homes under ~/data/geoaidesk/work/gaid-backend--hub-server/tests and remove them
 mode. No user-facing UI strings or UI components changed.
 Safe re-verification: cd server && GAID_CATALOGUE=off npx vitest run test/geo-hub-server.test.ts; npx tsc --noEmit -p .
 ## Next steps
-1. scripts/check is running as recorded job job-geoaidesk-gaid-backend--hub-server-1 (snapshot b61bf500f1c8). It started
-   successfully; dependencies/helper environment initialized. Wait for its relay notification, then read the receipt/log.
-2. Inspect the overall check result, record any environmental/unrelated failures, then task finish. Do not relaunch the job.
-   After the snapshot, path checks were made platform-neutral and metadata editing was aligned with the contract (slug,
-   methodId and kind may change; basedOn and old snapshots stay fixed). The focused 38 tests passed again on these changes, including the P2 Zotero-id integration regression.
-3. Parent integrates P1, connects the P2 remote client and runs its cross-GAID tests. No persistent deployment in this child.
+<!-- task:closed -->
+Closed 2026-10-22T06:22:50Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Initial focused suite: default general folder was not first when its creation time tied a new folder. Fixed SQL ordering
   to keep general first; the 37-test suite passed afterward. One file-write command used the server working directory with
