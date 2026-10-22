@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-22-gaid-backend/figures/real-hub-list.png" width="120"> | 2026-10-22 16:37 | [GAID 공유 백엔드: 계정과 원내 GAID 허브 서버](2026-10-22-gaid-backend/index.md) | 원내 GAID 허브 서버가 생겼습니다. 연구자는 초대 코드로 계정을 만들어 Workflow를 공유하고, 개인 서재를 여러 PC에서 동기화합니다. | 검토 전 | 미정 | 1 |
 | <img src="2026-10-22-gaid-hub-skills/figures/skills-shelf-instrument-light.png" width="120"> | 2026-10-22 16:24 | [GAID 허브에 스킬 선반을 만들고 Workflow가 스킬의 판을 고정해 쓰게 함](2026-10-22-gaid-hub-skills/index.md) | GAID 허브에 스킬 선반을 만들었습니다. 연구자는 내 프로젝트의 스킬, 허브 Workflow에 딸린 스킬, GitHub 등의 스킬을 판마다 사본으로 올리고, 출처·라이선스·자동 검사·검토 기록을 본 뒤 프로젝트에 설치합니다. Workflow는 허브 스킬의 판을 고정해 쓰고, Workflow를 설치하면 그 판도 함께 설치됩니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-workflow-strip/figures/01-map-collapsed-vs-expanded-1280.png" width="120"> | 2026-10-22 14:19 | [지도·표 위 Workflow 제안 칸을 한 줄로 접기](2026-10-22-gaid-workflow-strip/index.md) | 지도·표처럼 높이가 필요한 파일을 열면 Workflow 제안 칸이 한 줄로 접혀, 1280×800에서 지도와 속성표 영역이 127 px 커졌습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-workflow-detail/figures/trials-instrument-light-1440.png" width="120"> | 2026-10-22 14:09 | [Workflow 상세의 시험 기록과 허브 검사를 연구자용 요약으로 정리](2026-10-22-gaid-workflow-detail/index.md) | 허브에서 설치한 Workflow의 상세 창이 시험 결과와 허브 검사를 연구자 말로 요약하고, 원래 기록은 기록 보기 안에 그대로 둡니다. | 검토 전 | 미정 | 0 |
