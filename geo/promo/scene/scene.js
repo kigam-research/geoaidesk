@@ -100,7 +100,7 @@
   }
 
   // ---------- film position bar (no text; chapter ticks only) ----------
-  const CHAPTERS = [5, 14, 24, 41, 55, 64, 78, 85];
+  const CHAPTERS = [5, 14, 24, 38.4, 53.7, 64, 78, 85];
   function buildScale() {
     const layer = h('div', 'layer');
     const svg = sv('svg', { width: 1920, height: 1080 }, layer);
@@ -187,8 +187,8 @@
     if (!r) return null;
     let [x, y, w, hh] = [r[0] - pad, r[1] - pad, r[2] + 2 * pad, r[3] + 2 * pad];
     if (w / hh > 16 / 9) { const nh = (w * 9) / 16; y -= (nh - hh) / 2; hh = nh; } else { const nw = (hh * 16) / 9; x -= (nw - w) / 2; w = nw; }
-    // never zoom beyond 1.8× (frames are 2.25× the CSS size) and never show outside the frame
-    w = clamp(w, VW / 1.8, VW); hh = (w * 9) / 16;
+    // at most 1.5× so the zoomed region keeps its context; never show outside the frame
+    w = clamp(w, VW / 1.5, VW); hh = (w * 9) / 16;
     x = clamp(x, 0, VW - w); y = clamp(y, 0, VH - hh);
     return [x, y, w, hh];
   };
@@ -196,7 +196,10 @@
   function shotKeys(id) {
     const info = shotInfo(id);
     if (!info || !info.focus || !info.focus.length) return null;
-    return info.focus.map(f => ({ t: Math.max(0.6, f.t), rect: fit169([f.rect.x, f.rect.y, f.rect.width, f.rect.height]) }));
+    // pointer-sized targets (buttons, single rows) would crop away their context; frame only regions
+    const regions = info.focus.filter(f => f.rect.width >= 300 && f.rect.height >= 120);
+    if (!regions.length) return null;
+    return regions.map(f => ({ t: Math.max(0.6, f.t), rect: fit169([f.rect.x, f.rect.y, f.rect.width, f.rect.height]) }));
   }
 
   // ================= scenes =================
@@ -486,11 +489,11 @@
     };
   });
 
-  // S4c revisions and installs timeline 38.2–41.3 (real hub record)
+  // S4c revisions and installs timeline 35.0–38.1 (real hub record)
   scenes.push(() => {
     const E = D.hubEntry;
     const layer = h('div', 'layer');
-    const head = headline(layer, 110, 96, [[38.4, 41.3, '등록한 Workflow는 판으로 쌓이고, 다른 프로젝트가 가져다 씁니다']]);
+    const head = headline(layer, 110, 96, [[35.2, 38.6, '등록한 Workflow는 판으로 쌓이고, 다른 프로젝트가 가져다 씁니다']]);
     const panel = h('div', 'face', layer);
     box(panel, 90, 236, 1740, 760);
     const svg = sv('svg', { width: 1740, height: 760 }, panel);
@@ -542,37 +545,34 @@
     text(panel, 'small', 1250, 690, '검토용 허브 기록 · 시험 계정 포함');
     const sweep = sv('line', { x1: 300, x2: 300, y1: 130, y2: axisY, stroke: BLUE, 'stroke-width': 2, opacity: 0.5 }, svg);
     return t => {
-      const o = win(t, 38.2, 41.3, 0.45, 0.4);
+      const o = win(t, 35.0, 38.7, 0.45, 0.4);
       put(layer, { o });
       if (o <= 0) return;
       head(t);
-      const pf = ramp(t, 38.2, 38.8);
+      const pf = ramp(t, 35.0, 35.6);
       put(panel, { o: pf, y: 20 * (1 - pf) });
-      const now = lerp(t0, t1, ramp(t, 38.6, 40.4, inOut));
+      const now = lerp(t0, t1, ramp(t, 35.4, 37.2, inOut));
       sweep.setAttribute('x1', X(now));
       sweep.setAttribute('x2', X(now));
       for (const e of events) e.g.setAttribute('opacity', clamp((now - e.ms) / 3600000 / 3));
-      put(reads, { o: ramp(t, 40.1, 40.6, lin) });
+      put(reads, { o: ramp(t, 36.9, 37.4, lin) });
     };
   });
 
-  // Footage segments: a/b film seconds; side = a chart beside a narrower window.
+  // Footage segments: a/b film seconds; consecutive shots overlap by 0.2 s.
   const SEG = [
-    { shot: 'H1', a: 30.1, b: 35.0, cap: ['GAID 허브', '등록된 Workflow와 단계를 봅니다'] },
-    { shot: 'H3', a: 34.8, b: 38.4, cap: ['허브 스킬 선반', '출처·라이선스·검사 기록을 보고 설치합니다'] },
-    { shot: 'R1', a: 41.1, b: 45.4, cap: ['Workflow 시작 설정', '입력 파일 → 분석 조건 → 요약'] },
-    { shot: 'R2', a: 45.2, b: 49.0, cap: ['Workflow로 시작한 대화', 'AI agent가 지침대로 분석합니다'] },
-    { shot: 'R3', a: 48.8, b: 52.6, cap: ['연구노트', 'AI agent가 제안하고 연구자가 정합니다'] },
-    { shot: 'R5', a: 52.4, b: 55.4, cap: ['LAS 검층 보기', '깊이 트랙을 원본 값으로'] },
-    { shot: 'M1', a: 55.2, b: 59.6, cap: ['shp 지도 보기', '암상별 색 구분 · 1:5만 지질도와 위성영상 배경'] },
-    { shot: 'M2', a: 59.4, b: 64.3, cap: ['속성과 면적 표', '암상별 면적을 표로'], side: 'area' },
-    { shot: 'L1', a: 64.1, b: 68.6, cap: ['서재', '논문을 폴더로 모으고 Zotero와 잇습니다'] },
-    { shot: 'R6', a: 68.4, b: 74.4, cap: ['쪽 인용', '서재의 논문을 쪽 번호까지 인용합니다'], side: 'cite' },
-    { shot: 'L2', a: 74.2, b: 78.4, cap: ['논문과 프로젝트 연결', '이 논문을 쓴 프로젝트를 지도로'] },
+    { shot: 'H1', a: 30.1, b: 35.2, cap: ['GAID 허브', '등록된 Workflow와 단계를 봅니다'] },
+    { shot: 'R1', a: 38.4, b: 43.0, cap: ['Workflow 시작 설정', '입력 파일 → 분석 조건 → 요약'], zoom: [{ t: 1.0, rect: [300, 40, 960, 540] }, { t: 3.3, rect: [300, 180, 960, 540] }] },
+    { shot: 'R2', a: 42.8, b: 46.8, cap: ['Workflow로 시작한 대화', '결과와 그림을 대화 안에서 확인합니다'] },
+    { shot: 'R3', a: 46.6, b: 50.6, cap: ['연구노트', 'AI agent가 제안하고 연구자가 정합니다'] },
+    { shot: 'R5', a: 50.4, b: 53.9, cap: ['LAS 검층 보기', '깊이 트랙을 원본 값으로'], zoom: [{ t: 0.8, rect: [60, 150, 960, 540] }] },
+    { shot: 'M1', a: 53.7, b: 59.3, cap: ['shp 지도 보기', '암상별 색 구분 · 1:5만 지질도와 위성영상 배경'] },
+    { shot: 'M2', a: 59.1, b: 62.0, cap: ['속성과 면적 표', '레이어 전체의 암상별 면적'], skip: 1.0, zoom: [{ t: 1.8, rect: [427, 230, 853, 480] }] },
+    { shot: 'L1', a: 64.1, b: 69.1, cap: ['서재', '논문을 폴더로 모으고 쓰인 곳을 봅니다'] },
+    { shot: 'R6', a: 68.9, b: 72.4, cap: ['쪽 인용', '서재의 논문을 쪽 번호까지 인용합니다'], zoom: [{ t: 0.8, rect: [284, 170, 984, 553] }] },
+    { shot: 'L2', a: 74.7, b: 78.4, cap: ['논문과 프로젝트 연결', '연결 지도로 이어서 봅니다'], zoom: [{ t: 1.6, rect: [140, 60, 960, 540] }] },
   ];
   const WIN_FULL = { x: 180, y: 166, w: 1560 };
-  const WIN_SIDE = { x: 70, y: 236, w: 1180 };
-  const mixWin = (a, b, f) => ({ x: lerp(a.x, b.x, f), y: lerp(a.y, b.y, f), w: lerp(a.w, b.w, f) });
 
   scenes.push(() => {
     const layer = h('div', 'layer');
@@ -582,51 +582,6 @@
       el.innerHTML = `<span>${sg.cap[0]}</span><span class="sub">${sg.cap[1]}</span>`;
       return { el, sg };
     });
-    // side chart: area by lithology (real research-note table)
-    const Lt = D.litho;
-    const area = h('div', 'face', layer);
-    box(area, 1280, 166, 570, 860);
-    text(area, 'h3', 36, 30, '암상별 면적');
-    text(area, 'label', 36, 82, `폴리곤 ${fmt(Lt.polygons)}개 · 합계 ${fmt(Lt.totalKm2, 1)} km²`);
-    const top = Lt.classes.slice(0, 6);
-    const rest = Lt.classes.slice(6);
-    const rows = [...top.map(c => ({ label: c.label, km2: c.areaKm2, pct: c.percent })),
-      { label: `그 외 ${rest.length}개 분류`, km2: rest.reduce((s, c) => s + c.areaKm2, 0), pct: rest.reduce((s, c) => s + c.percent, 0), muted: true }];
-    const maxA = Math.max(...rows.map(r => r.km2));
-    const aRows = rows.map((r, i) => {
-      const y = 140 + i * 96;
-      const lab = text(area, 'label', 36, y, r.label.replace(/^서산층군 경기변성암복합체 /, '경기변성암복합체 '), { color: 'var(--ink)', fontSize: '25px', maxWidth: '500px', overflow: 'hidden', textOverflow: 'ellipsis' });
-      const bar = h('div', 'abs', area);
-      Object.assign(bar.style, { left: '36px', top: `${y + 40}px`, height: '28px', background: r.muted ? '#878f9d' : BLUE, borderRadius: '3px' });
-      const val = text(area, 'label', 0, y + 38, `${fmt(r.km2, 1)} km² ${fmt(r.pct, 1)}%`, { color: 'var(--ink)', fontWeight: 650, fontSize: '24px' });
-      return { lab, bar, val, w: (250 * r.km2) / maxA, i };
-    });
-    text(area, 'small', 36, 818, '선언된 좌표계의 평면 면적 · 연구노트 2026-10-18');
-    // side chart: page-citation checks (two real tests)
-    const A = D.acceptance, Q = D.libraryNext;
-    const cite = h('div', 'face', layer);
-    box(cite, 1280, 166, 570, 860);
-    text(cite, 'h3', 36, 30, '쪽 인용 대조');
-    const day = s => `${Number(s.slice(5, 7))}월 ${Number(s.slice(8, 10))}일`;
-    const qBlock = h('div', 'abs', cite);
-    Object.assign(qBlock.style, { left: '36px', top: '92px' });
-    qBlock.innerHTML = `<div class="label" style="color:var(--ink)">${day(Q.date)} · ${Q.model} · 논문 ${Q.papers}편</div><div style="display:flex;align-items:baseline;gap:12px;margin-top:6px"><span class="num" style="font-size:64px">${Q.onPage}</span><span class="h3" style="font-size:30px;color:var(--ink-2)">/ ${Q.citations} 인용이 해당 쪽에</span></div>`;
-    const qsvg = sv('svg', { width: 500, height: 60 }, cite);
-    Object.assign(qsvg.style, { position: 'absolute', left: '36px', top: '222px' });
-    const qCells = [];
-    for (let i = 0; i < Q.citations; i++) qCells.push(sv('rect', { x: (i % 17) * 29, y: Math.floor(i / 17) * 29, width: 24, height: 24, rx: 2, fill: '#e8eeff' }, qsvg));
-    const aBlock = h('div', 'abs', cite);
-    Object.assign(aBlock.style, { left: '36px', top: '312px' });
-    const onPage = A.units - A.notOnPage - A.contradicted;
-    aBlock.innerHTML = `<div class="label" style="color:var(--ink)">${day(A.date)} · 수용 시험 · 논문 ${A.papers}편</div><div style="display:flex;align-items:baseline;gap:12px;margin-top:6px"><span class="num" style="font-size:64px">${onPage}</span><span class="h3" style="font-size:30px;color:var(--ink-2)">/ ${A.units} 확인 단위</span></div>`;
-    const asvg = sv('svg', { width: 500, height: 330 }, cite);
-    Object.assign(asvg.style, { position: 'absolute', left: '36px', top: '442px' });
-    const aCells = [];
-    for (let i = 0; i < A.units; i++) aCells.push(sv('rect', { x: (i % 18) * 27.5, y: Math.floor(i / 18) * 27.5, width: 23, height: 23, rx: 2, fill: '#e8eeff' }, asvg));
-    const legend = h('div', 'abs', cite);
-    Object.assign(legend.style, { left: '36px', top: '784px', display: 'flex', gap: '22px', alignItems: 'center' });
-    legend.innerHTML = [[BLUE, '해당 쪽', ''], ['#8a5300', '쪽에 없음', A.notOnPage], ['#c2261d', '어긋남', A.contradicted]].map(([c, l, n]) =>
-      `<span style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;background:${c};border-radius:2px"></span><span class="label" style="font-size:24px;color:var(--ink)">${l} ${n}</span></span>`).join('');
     return t => {
       const any = SEG.some(s => t >= s.a - 0.05 && t <= s.b + 0.05);
       put(layer, { o: any ? 1 : 0 });
@@ -634,42 +589,114 @@
       let drawn = false;
       SEG.forEach((sg, idx) => {
         if (t < sg.a || t > sg.b) return;
-        const local = t - sg.a, dur = sg.b - sg.a;
+        const local = t - sg.a + (sg.skip || 0), dur = sg.b - sg.a + (sg.skip || 0);
         const first = idx === 0 || SEG[idx - 1].b < sg.a;
         const last = idx === SEG.length - 1 || SEG[idx + 1].a > sg.b;
-        const prevSide = !first && SEG[idx - 1].side;
-        // window geometry eases between the full and side layouts at shot boundaries
-        let g = sg.side ? WIN_SIDE : WIN_FULL;
-        if (sg.side && !prevSide) g = mixWin(WIN_FULL, WIN_SIDE, ramp(t, sg.a, sg.a + 0.8, inOut));
-        if (!sg.side && prevSide) g = mixWin(WIN_SIDE, WIN_FULL, ramp(t, sg.a, sg.a + 0.8, inOut));
+        const g = WIN_FULL;
         const o = (first ? ramp(t, sg.a, sg.a + 0.45, lin) : 1) * (last ? 1 - ramp(t, sg.b - 0.35, sg.b, lin) : 1);
         const dy = first ? 24 * (1 - ramp(t, sg.a, sg.a + 0.7)) : 0;
-        main.draw({ x: g.x, y: g.y + dy, w: g.w, o, shot: sg.shot, local, view: viewAt(shotKeys(sg.shot), local, dur) });
+        main.draw({ x: g.x, y: g.y + dy, w: g.w, o, shot: sg.shot, local, view: viewAt(sg.zoom ? sg.zoom.map(k => ({ t: k.t, rect: fit169(k.rect, 0) })) : shotKeys(sg.shot), local, dur) });
         drawn = true;
       });
       if (!drawn) main.draw({});
       for (const c of caps) {
-        put(c.el, { o: win(t, c.sg.a + 0.1, c.sg.b, 0.4, 0.3), y: 12 * (1 - ramp(t, c.sg.a + 0.1, c.sg.a + 0.7)) });
-        c.el.style.left = `${c.sg.side ? WIN_SIDE.x : WIN_FULL.x}px`;
-        c.el.style.top = c.sg.side ? '150px' : '70px';
+        put(c.el, { o: win(t, c.sg.a + 0.1, c.sg.b - 0.15, 0.4, 0.25), y: 12 * (1 - ramp(t, c.sg.a + 0.1, c.sg.a + 0.7)) });
+        c.el.style.left = `${WIN_FULL.x}px`;
+        c.el.style.top = '70px';
       }
-      const m2 = SEG.find(s => s.side === 'area');
-      put(area, { o: win(t, m2.a + 0.5, m2.b, 0.5, 0.35), x: 40 * (1 - ramp(t, m2.a + 0.5, m2.a + 1.2)) });
-      aRows.forEach(r => {
-        const f = ramp(t, m2.a + 0.9 + r.i * 0.18, m2.a + 1.8 + r.i * 0.18);
-        r.bar.style.width = `${r.w * f}px`;
-        r.val.style.left = `${36 + r.w * f + 14}px`;
-        put(r.val, { o: f });
-        put(r.lab, { o: ramp(t, m2.a + 0.8 + r.i * 0.18, m2.a + 1.3 + r.i * 0.18, lin) });
+    };
+  });
+
+  // Area by lithology, full screen 61.8–64.3 (real research-note table of the shapefile in M1/M2)
+  scenes.push(() => {
+    const Lt = D.litho;
+    const layer = h('div', 'layer');
+    const head = headline(layer, 110, 90, [[61.9, 64.3, '서울 1:25만 암상도의 암상별 면적']]);
+    const panel = h('div', 'face', layer);
+    box(panel, 90, 230, 1740, 740);
+    const reads = h('div', 'abs', panel);
+    Object.assign(reads.style, { left: '56px', top: '56px', display: 'flex', flexDirection: 'column', gap: '44px' });
+    reads.innerHTML = [[fmt(Lt.polygons), '폴리곤'], [fmt(Lt.totalKm2, 1), '합계 km²'], [fmt(Lt.classes.length), '암상 분류']].map(([n, l]) =>
+      `<div><div class="num" style="font-size:84px;line-height:1">${n}</div><div class="h3" style="font-size:30px;color:var(--ink-2);margin-top:8px">${l}</div></div>`).join('');
+    const top = Lt.classes.slice(0, 6);
+    const rest = Lt.classes.slice(6);
+    const rows = [...top.map(c => ({ label: c.label, km2: c.areaKm2, pct: c.percent })),
+      { label: `그 외 ${rest.length}개 분류`, km2: rest.reduce((a, c) => a + c.areaKm2, 0), pct: rest.reduce((a, c) => a + c.percent, 0), muted: true }];
+    const maxA = Math.max(...rows.map(r => r.km2));
+    const X0 = 960, BW = 440;
+    const bars = rows.map((r, i) => {
+      const y = 50 + i * 96;
+      const lab = text(panel, 'h3', 0, y + 8, r.label, { fontSize: '30px', width: `${X0 - 60 - 420}px`, textAlign: 'right', left: '420px', overflow: 'hidden', textOverflow: 'ellipsis' });
+      const bar = h('div', 'abs', panel);
+      Object.assign(bar.style, { left: `${X0}px`, top: `${y + 8}px`, height: '42px', background: r.muted ? '#878f9d' : BLUE, borderRadius: '3px' });
+      const val = text(panel, 'h3', 0, y + 10, `${fmt(r.km2, 1)} km² · ${fmt(r.pct, 1)}%`, { fontSize: '30px' });
+      return { lab, bar, val, w: (BW * r.km2) / maxA, i };
+    });
+    text(panel, 'small', 56, 690, '파일에 선언된 좌표계의 평면 면적 · 연구노트 2026-10-18 · 측지 면적과 분류마다 0.007 km² 이내');
+    return t => {
+      const o = win(t, 61.8, 64.3, 0.4, 0.35);
+      put(layer, { o });
+      if (o <= 0) return;
+      head(t);
+      const pf = ramp(t, 61.8, 62.3);
+      put(panel, { o: pf, y: 20 * (1 - pf) });
+      bars.forEach(b => {
+        const f = ramp(t, 62.1 + b.i * 0.12, 62.9 + b.i * 0.12);
+        b.bar.style.width = `${b.w * f}px`;
+        b.val.style.left = `${X0 + b.w * f + 18}px`;
+        put(b.val, { o: f });
+        put(b.lab, { o: ramp(t, 62.0 + b.i * 0.12, 62.4 + b.i * 0.12, lin) });
       });
-      const r6 = SEG.find(s => s.side === 'cite');
-      put(cite, { o: win(t, r6.a + 0.5, r6.b, 0.5, 0.35), x: 40 * (1 - ramp(t, r6.a + 0.5, r6.a + 1.2)) });
-      const qf = ramp(t, r6.a + 0.9, r6.a + 2.0, lin) * Q.citations;
-      qCells.forEach((c, i) => c.setAttribute('fill', i < qf ? BLUE : '#e8eeff'));
-      const af = ramp(t, r6.a + 2.0, r6.a + 4.0, lin) * A.units;
-      const bad = 9 * 18 + 7; // the one not-on-page unit, placed inside the grid
-      aCells.forEach((c, i) => c.setAttribute('fill', i < af ? (i === bad && A.notOnPage ? '#8a5300' : BLUE) : '#e8eeff'));
-      put(legend, { o: ramp(t, r6.a + 3.8, r6.a + 4.3, lin) });
+    };
+  });
+
+  // Page-citation checks, full screen 72.2–74.9 (two real checks)
+  scenes.push(() => {
+    const A = D.acceptance, Q = D.libraryNext;
+    const layer = h('div', 'layer');
+    const head = headline(layer, 110, 90, [[72.3, 74.9, '인용한 쪽에 그 내용이 있는지 대조했습니다']]);
+    const day = s => `${Number(s.slice(5, 7))}월 ${Number(s.slice(8, 10))}일`;
+    const card = (x, w, title, num, unit) => {
+      const el = h('div', 'face', layer);
+      box(el, x, 230, w, 720);
+      text(el, 'h3', 48, 40, title, { fontSize: '32px' });
+      const n = h('div', 'abs', el);
+      Object.assign(n.style, { left: '48px', top: '100px', display: 'flex', alignItems: 'baseline', gap: '16px' });
+      n.innerHTML = `<span class="num" style="font-size:120px;line-height:1">${num}</span><span class="h3" style="font-size:36px;color:var(--ink-2)">${unit}</span>`;
+      return el;
+    };
+    const onPage = A.units - A.notOnPage - A.contradicted;
+    const qc = card(90, 640, `${day(Q.date)} · ${Q.model} · 논문 ${Q.papers}편`, `${Q.onPage}`, `/ ${Q.citations} 인용이 해당 쪽에`);
+    const ac = card(770, 1060, `${day(A.date)} · 수용 시험 · 논문 ${A.papers}편`, `${onPage}`, `/ ${A.units} 확인 단위가 해당 쪽에`);
+    const qsvg = sv('svg', { width: 560, height: 260 }, qc);
+    Object.assign(qsvg.style, { position: 'absolute', left: '48px', top: '290px' });
+    const qCells = [];
+    for (let i = 0; i < Q.citations; i++) qCells.push(sv('rect', { x: (i % 9) * 60, y: Math.floor(i / 9) * 60, width: 50, height: 50, rx: 3, fill: '#e8eeff' }, qsvg));
+    const asvg = sv('svg', { width: 980, height: 420 }, ac);
+    Object.assign(asvg.style, { position: 'absolute', left: '48px', top: '290px' });
+    const aCells = [];
+    const COLS = 27;
+    for (let i = 0; i < A.units; i++) aCells.push(sv('rect', { x: (i % COLS) * 35.5, y: Math.floor(i / COLS) * 35.5, width: 30, height: 30, rx: 3, fill: '#e8eeff' }, asvg));
+    const legend = h('div', 'abs', ac);
+    Object.assign(legend.style, { left: '48px', top: '585px', display: 'flex', gap: '36px', alignItems: 'center' });
+    legend.innerHTML = [[BLUE, '해당 쪽에 있음', onPage], ['#8a5300', '해당 쪽에 없음', A.notOnPage], ['#c2261d', '원문과 어긋남', A.contradicted]].map(([c, l, n]) =>
+      `<span style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;background:${c};border-radius:3px"></span><span class="h3" style="font-size:28px">${l} ${n}</span></span>`).join('');
+    text(qc, 'label', 48, 650, 'PDF 본문의 해당 쪽에서 하나씩 대조', { fontSize: '26px' });
+    text(ac, 'label', 48, 650, `인용 ${A.citations}건을 확인 단위로 나누어 PDF 원문 쪽과 대조`, { fontSize: '26px' });
+    return t => {
+      const o = win(t, 72.2, 74.9, 0.4, 0.35);
+      put(layer, { o });
+      if (o <= 0) return;
+      head(t);
+      const f1 = ramp(t, 72.2, 72.7), f2 = ramp(t, 72.4, 72.9);
+      put(qc, { o: f1, y: 20 * (1 - f1) });
+      put(ac, { o: f2, y: 20 * (1 - f2) });
+      const qn = ramp(t, 72.6, 73.4, lin) * Q.citations;
+      qCells.forEach((c, i) => c.setAttribute('fill', i < qn ? BLUE : '#e8eeff'));
+      const an = ramp(t, 72.8, 74.0, lin) * A.units;
+      const bad = 4 * COLS + 13;
+      aCells.forEach((c, i) => c.setAttribute('fill', i < an ? (i === bad && A.notOnPage ? '#8a5300' : BLUE) : '#e8eeff'));
+      put(legend, { o: ramp(t, 73.9, 74.3, lin) });
     };
   });
 
