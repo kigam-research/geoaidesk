@@ -4,6 +4,8 @@
  * directory plus two lines here; the copy validator (geo/copy/validate-copy.mjs)
  * checks every directory under locales/.
  */
+import connectionsKo from "./connections/ko.json";
+import connectionsEn from "./connections/en.json";
 import appKo from "./app/ko.json";
 import appEn from "./app/en.json";
 import workspaceKo from "./workspace/ko.json";
@@ -60,6 +62,8 @@ import hubEn from "./hub/en.json";
 // gaid-notebook-review: research notes
 import notesKo from "./notes/ko.json";
 import notesEn from "./notes/en.json";
+import figuresKo from "./figures/ko.json";
+import figuresEn from "./figures/en.json";
 // gaid-workflow-model: the Workflow 지침 (rendered for the agent, the hub and the CLI)
 import workflowDocKo from "./workflowDoc/ko.json";
 import workflowDocEn from "./workflowDoc/en.json";
@@ -88,7 +92,9 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
+  figures: pair(figuresKo, figuresEn),
   library: pair(libraryKo, libraryEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),

@@ -91,3 +91,7 @@ library; the library unit already computes note citations and "쓰인 곳" per l
 - `THIRD_PARTY_NOTICES.md` gains the K-Dense skill adaptation, cmcrameri, React Flow, dagre.
 - Figure kind detection is heuristic; `unknown` is shown as such and the researcher can set it.
 - Open: AGU and the Korean journals have few verified numbers; their profile fields stay `null` until checked.
+- As built (2026-10-22): the map opens from the note detail and from each figure record; the library-item entry is not
+  built (the library is user-level, the map is per project, so it needs a project choice; open item). Check items carry
+  language-neutral `notes` codes (FIGURE_CHECK_NOTES) worded by the web locale; edge kind `copied` marks identical image
+  copies. AGU and 자원환경지질 profiles stay unknown (official pages refused automated access).
