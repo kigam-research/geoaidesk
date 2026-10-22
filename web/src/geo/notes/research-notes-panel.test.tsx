@@ -160,7 +160,7 @@ it("keeps sent answers when the note is opened again and drops them when the dec
   const second = panel();
   fireEvent.click(await screen.findByText("지정 입력은 시료 자료가 아닙니다."));
   expect(await screen.findByRole("radio", { name: /시연으로 마무리/ })).toHaveAttribute("aria-checked", "true");
-  expect(screen.getByText("결정 2건 중 1건의 답을 보냈습니다. 답을 바꾸면 다시 보낼 수 있습니다.")).toBeInTheDocument();
+  expect(screen.getByText("결정 2건 중 1건의 답을 보냈습니다.")).toBeInTheDocument();
   second.unmount();
   // The agent rewrote decision 1: the old mark no longer applies.
   const revised = note({ decisions: [{ ...note().decisions[0], question: "시료 자료로 다시 분석할지 (수정)" }, note().decisions[1]] });
