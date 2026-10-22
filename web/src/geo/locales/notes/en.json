@@ -106,7 +106,7 @@
     "next": {
       "button": "Next decision"
     },
-    "deliveredStatus": "Answers sent for {delivered} of {count} decisions. Change an answer to send it again.",
+    "deliveredStatus": "Answers sent for {delivered} of {count} decisions.",
     "delivered": {
       "sent": "Sent",
       "filled": "In chat box",
