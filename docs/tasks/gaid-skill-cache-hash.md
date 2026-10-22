@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-22T08:11:03Z
-writer: {"host":"seongin3","reserved":"18351797fc7f149b8797432d41774a4511f50beb995e2b13701d1bc58c5bc54b"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"496b2f44-908a-4be7-acf6-b2ea8de5da17","pid":1509732,"provider":"claude","session":"16c18294-79a0-451e-a810-42626e1f84b5","start":"54460954","token":"18351797fc7f149b8797432d41774a4511f50beb995e2b13701d1bc58c5bc54b"}
 branch: task/gaid-skill-cache-hash
 target: main
 parent: 
