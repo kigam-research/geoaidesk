@@ -6,6 +6,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 export interface HubLocation {
+  /** 자료 소식 (gaid-hub-feeds). */
+  feeds?: boolean;
   skills?: boolean;
   skillId?: string | null;
   open: boolean;
@@ -18,6 +20,7 @@ export interface HubLocation {
 
 export function parseHubHash(hash: string): HubLocation {
   if (hash === "#hub/skills") return { open: true, projectId: null, skills: true };
+  if (hash === "#hub/feeds") return { open: true, projectId: null, feeds: true };
   const skill = /^#hub\/s\/([a-z0-9][a-z0-9._-]{0,119})$/.exec(hash);
   if (skill) return { open: true, projectId: null, skillId: skill[1] };
   const e = /^#hub\/e\/([A-Za-z0-9][A-Za-z0-9._-]{2,119})$/.exec(hash);
@@ -52,6 +55,8 @@ export function useHubLocation(): [HubLocation, (next: HubLocation) => void] {
         ? `#hub/s/${encodeURIComponent(next.skillId)}`
         : next.skills
           ? "#hub/skills"
+          : next.feeds
+          ? "#hub/feeds"
           : next.entryId
         ? `#hub/e/${next.entryId}`
         : next.catalogueId

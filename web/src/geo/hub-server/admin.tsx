@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { HUB_ACCOUNT_RULES, type HubAccount, type HubInvite, type HubRole } from "@/geo/contracts/hub-server";
 import { hubServer, HubServerError } from "./api";
 import { dateLabel, ErrorNotice, Field, fieldClass, text } from "./parts";
+import { FeedSourcesAdmin } from "@/geo/hub-feeds/admin-sources";
 
 export function AdminSettings({ onAccountChange }: { onAccountChange: () => void }) {
-  const [view, setView] = useState<"users" | "invites">("users");
+  const [view, setView] = useState<"users" | "invites" | "feeds">("users");
   const [users, setUsers] = useState<HubAccount[]>([]);
   const [invites, setInvites] = useState<HubInvite[]>([]);
   const [email, setEmail] = useState("");
@@ -38,15 +39,15 @@ export function AdminSettings({ onAccountChange }: { onAccountChange: () => void
   return <div className="mt-4 flex flex-col gap-4">
     <div className="flex flex-wrap justify-between gap-3">
       <div className="gaid-seg flex w-fit gap-1" role="group" aria-label={text("admin.title")}>
-        {(["users", "invites"] as const).map(value => <Button key={value} type="button" variant="ghost" disabled={busy} aria-pressed={view === value}
+        {(["users", "invites", "feeds"] as const).map(value => <Button key={value} type="button" variant="ghost" disabled={busy} aria-pressed={view === value}
           className={view === value ? "bg-gaid-signal-tint font-semibold text-gaid-signal-ink" : "text-gaid-ink-2"}
           onClick={() => setView(value)}>{text(`admin.${value}.title`)}</Button>)}
       </div>
-      <Button type="button" variant="outline" disabled={busy} onClick={() => void run(load)}>{text("refresh.button")}</Button>
+      {view !== "feeds" && <Button type="button" variant="outline" disabled={busy} onClick={() => void run(load)}>{text("refresh.button")}</Button>}
     </div>
     <ErrorNotice error={error} fallback={lastAdmin ? "admin.lastAdmin" : "admin.failed"} />
     {busy && <p role="status" className="text-[13px] text-gaid-ink-2">{text("working")}</p>}
-    {view === "users" ? <ul className="divide-y divide-gaid-edge">
+    {view === "feeds" ? <FeedSourcesAdmin /> : view === "users" ? <ul className="divide-y divide-gaid-edge">
       {users.map(user => <li key={user.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
         <div className="min-w-0"><p className="break-words font-medium">{user.displayName}</p><p className="break-all text-[13px] text-gaid-ink-2">{text("accountLine", { email: user.email, role: text(`role.${user.role}`) })}</p>
           {user.disabledAt && <p className="text-[13px] text-gaid-danger">{text("admin.disabled")}</p>}

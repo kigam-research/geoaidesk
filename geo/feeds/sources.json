@@ -1,0 +1,212 @@
+{
+  "schema": "gaid-hub-feed-sources/v1",
+  "checked": "2026-10-22: every feed URL answered HTTP 200 with RSS/RDF/Atom from PC74 (KIGAM network); GitHub sources through api.github.com.",
+  "sources": [
+    {
+      "id": "nature-geoscience",
+      "kind": "feed",
+      "title": "Nature Geoscience",
+      "publisher": "Springer Nature",
+      "homepage": "https://www.nature.com/ngeo/",
+      "url": "https://www.nature.com/ngeo.rss",
+      "category": "papers",
+      "field": "general",
+      "reason": "지구과학 전 분야를 다루는 Nature 계열 대표 학술지입니다. 고체지구, 기후, 해양, 지표 과정 연구를 한 곳에서 봅니다."
+    },
+    {
+      "id": "nature",
+      "kind": "feed",
+      "title": "Nature",
+      "publisher": "Springer Nature",
+      "homepage": "https://www.nature.com/nature/",
+      "url": "https://www.nature.com/nature.rss",
+      "category": "papers",
+      "field": "general",
+      "match": ["earthquake", "seismic", "fault", "volcan", "magma", "mantle", "crust", "tecton", "geolog", "geochem", "geophys", "sediment", "mineral", "ore", "lithium", "rare earth", "groundwater", "aquifer", "river", "flood", "drought", "precipitation", "monsoon", "climate", "warming", "ocean", "sea level", "sea-level", "glacier", "ice sheet", "ice shelf", "permafrost", "CO2", "carbon dioxide", "methane", "atmospher", "landslide", "tsunami", "typhoon", "hurricane", "wildfire", "satellite", "palaeo", "paleo", "Earth's"],
+      "reason": "사용자가 지정한 Nature 본지입니다. 전 분야 학술지라 지구과학 관련 단어가 제목이나 요약에 있는 글만 남깁니다."
+    },
+    {
+      "id": "eos",
+      "kind": "feed",
+      "title": "Eos",
+      "publisher": "American Geophysical Union (AGU)",
+      "homepage": "https://eos.org/",
+      "url": "https://eos.org/feed",
+      "category": "news",
+      "field": "general",
+      "reason": "AGU가 내는 지구·우주과학 소식지입니다. 연구 해설, 편집자 추천 논문, 학계 소식을 지구과학 전 분야에 걸쳐 다룹니다."
+    },
+    {
+      "id": "solid-earth",
+      "kind": "feed",
+      "title": "Solid Earth",
+      "publisher": "European Geosciences Union (EGU) / Copernicus",
+      "homepage": "https://www.solid-earth.net/",
+      "url": "https://se.copernicus.org/articles/xml/rss2_0.xml",
+      "category": "papers",
+      "field": "geology",
+      "reason": "EGU의 공개 접근 학술지로 지질, 구조지질, 지구물리, 지구화학을 다룹니다. 지질·지구물리 분야의 대표 출처로 골랐습니다."
+    },
+    {
+      "id": "hess",
+      "kind": "feed",
+      "title": "Hydrology and Earth System Sciences (HESS)",
+      "publisher": "European Geosciences Union (EGU) / Copernicus",
+      "homepage": "https://www.hydrology-and-earth-system-sciences.net/",
+      "url": "https://hess.copernicus.org/articles/xml/rss2_0.xml",
+      "category": "papers",
+      "field": "hydrology",
+      "reason": "수문학 분야의 대표 공개 접근 학술지입니다. 지하수, 하천, 수문 모델링 연구를 다룹니다."
+    },
+    {
+      "id": "nhess",
+      "kind": "feed",
+      "title": "Natural Hazards and Earth System Sciences (NHESS)",
+      "publisher": "European Geosciences Union (EGU) / Copernicus",
+      "homepage": "https://www.natural-hazards-and-earth-system-sciences.net/",
+      "url": "https://nhess.copernicus.org/articles/xml/rss2_0.xml",
+      "category": "papers",
+      "field": "hazards",
+      "reason": "지진, 산사태, 홍수 같은 자연재해 연구의 대표 공개 접근 학술지입니다."
+    },
+    {
+      "id": "ocean-science",
+      "kind": "feed",
+      "title": "Ocean Science",
+      "publisher": "European Geosciences Union (EGU) / Copernicus",
+      "homepage": "https://www.ocean-science.net/",
+      "url": "https://os.copernicus.org/articles/xml/rss2_0.xml",
+      "category": "papers",
+      "field": "ocean",
+      "reason": "물리·화학 해양학을 다루는 EGU 공개 접근 학술지입니다. 해양 분야 출처로 골랐습니다."
+    },
+    {
+      "id": "carbon-brief",
+      "kind": "feed",
+      "title": "Carbon Brief",
+      "publisher": "Carbon Brief",
+      "homepage": "https://www.carbonbrief.org/",
+      "url": "https://www.carbonbrief.org/feed",
+      "category": "news",
+      "field": "climate",
+      "reason": "기후과학 연구와 정책을 해설하는 영국의 전문 매체입니다. 새 논문과 보고서를 연구자 인터뷰와 함께 다루어 기후·대기 분야 블로그 출처로 골랐습니다."
+    },
+    {
+      "id": "nasa-earth-observatory",
+      "kind": "feed",
+      "title": "NASA Earth Observatory",
+      "publisher": "NASA",
+      "homepage": "https://science.nasa.gov/earth/earth-observatory/",
+      "url": "https://earthobservatory.nasa.gov/feeds/earth-observatory.rss",
+      "category": "news",
+      "field": "remote-sensing",
+      "reason": "NASA가 위성 영상으로 지표 변화와 재해를 설명하는 글입니다. 원격탐사 분야 출처로 골랐습니다."
+    },
+    {
+      "id": "ore-geology-reviews",
+      "kind": "feed",
+      "title": "Ore Geology Reviews",
+      "publisher": "Elsevier",
+      "homepage": "https://www.sciencedirect.com/journal/ore-geology-reviews",
+      "url": "https://rss.sciencedirect.com/publication/science/01691368",
+      "category": "papers",
+      "field": "resources",
+      "reason": "광상학과 광물자원 탐사를 다루는 대표 학술지입니다. 피드에는 초록 없이 제목, 권호, 저자만 있습니다."
+    },
+    {
+      "id": "geeknews",
+      "kind": "feed",
+      "title": "GeekNews",
+      "publisher": "GeekNews (news.hada.io)",
+      "homepage": "https://news.hada.io/",
+      "url": "https://news.hada.io/rss/news",
+      "category": "tools",
+      "field": "ai-tools",
+      "match": ["Claude", "Codex", "Anthropic", "OpenAI", "Gemini", "LLM", "MCP", "에이전트", "agent", "스킬", "skill", "AI 코딩", "코딩 AI", "GIS", "지리", "geospatial", "위성"],
+      "reason": "사용자가 지정한 한국어 기술 소식 모음입니다. AI 에이전트, 코딩 도구, 스킬, 지리공간 관련 글만 남깁니다."
+    },
+    {
+      "id": "pi-releases",
+      "kind": "github-releases",
+      "title": "Pi",
+      "publisher": "Earendil Works (GitHub)",
+      "homepage": "https://github.com/earendil-works/pi",
+      "repo": "earendil-works/pi",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "GAID의 AI agent가 쓰는 Pi SDK입니다. 새 판이 GAID 업데이트의 출발점입니다."
+    },
+    {
+      "id": "pi-subagents-releases",
+      "kind": "github-releases",
+      "title": "pi-subagents",
+      "publisher": "nicobailon (GitHub)",
+      "homepage": "https://github.com/nicobailon/pi-subagents",
+      "repo": "nicobailon/pi-subagents",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "GAID의 하위 에이전트와 Workflow 실행을 맡는 Pi 확장입니다."
+    },
+    {
+      "id": "pi-web-access-releases",
+      "kind": "github-releases",
+      "title": "pi-web-access",
+      "publisher": "nicobailon (GitHub)",
+      "homepage": "https://github.com/nicobailon/pi-web-access",
+      "repo": "nicobailon/pi-web-access",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "GAID의 웹 검색·문서 가져오기 도구를 제공하는 Pi 확장입니다."
+    },
+    {
+      "id": "skills-cli-releases",
+      "kind": "github-releases",
+      "title": "skills CLI",
+      "publisher": "Vercel Labs (GitHub)",
+      "homepage": "https://github.com/vercel-labs/skills",
+      "repo": "vercel-labs/skills",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "설정 → 스킬에서 GitHub 스킬을 가져올 때 GAID가 쓰는 도구입니다."
+    },
+    {
+      "id": "claude-code-releases",
+      "kind": "github-releases",
+      "title": "Claude Code",
+      "publisher": "Anthropic (GitHub)",
+      "homepage": "https://github.com/anthropics/claude-code",
+      "repo": "anthropics/claude-code",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "\"CLI에서 쓰기\"로 내보낸 Workflow를 실행하는 코딩 에이전트입니다."
+    },
+    {
+      "id": "codex-releases",
+      "kind": "github-releases",
+      "title": "Codex CLI",
+      "publisher": "OpenAI (GitHub)",
+      "homepage": "https://github.com/openai/codex",
+      "repo": "openai/codex",
+      "skipPrereleases": true,
+      "category": "tools",
+      "field": "ai-tools",
+      "reason": "OpenAI의 코딩 에이전트입니다. 알파 판이 하루에도 여러 번 나와 정식 판만 남깁니다."
+    },
+    {
+      "id": "github-geo-skills",
+      "kind": "github-search",
+      "title": "GitHub 지구과학 스킬 검색",
+      "publisher": "GitHub",
+      "homepage": "https://github.com/topics/agent-skills",
+      "queries": ["topic:agent-skills geospatial", "topic:agent-skills gis", "agent skills geology", "claude skills earth science", "SKILL.md geospatial"],
+      "category": "skills",
+      "field": "general",
+      "reason": "agent-skills 저장소 가운데 지리공간·지질·지구과학 단어로 찾은 것입니다. 자동 검색 결과라 가져오기 전에 내용을 확인해야 합니다."
+    }
+  ]
+}

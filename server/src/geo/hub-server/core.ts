@@ -108,10 +108,18 @@ CREATE TABLE hub_skill_comments (id TEXT PRIMARY KEY, skill_id TEXT NOT NULL REF
 CREATE TABLE hub_skill_imports (source TEXT NOT NULL, skill_id TEXT NOT NULL, digest TEXT NOT NULL, at TEXT NOT NULL,
  PRIMARY KEY(source,skill_id));
 ` },
+  { version: 3, sql: `
+CREATE TABLE feed_sources (id TEXT PRIMARY KEY, record TEXT NOT NULL, last_success TEXT);
+CREATE TABLE feed_items (id TEXT PRIMARY KEY, source_id TEXT NOT NULL REFERENCES feed_sources(id), record TEXT NOT NULL,
+ published_at TEXT, fetched_at TEXT NOT NULL, sort_at TEXT NOT NULL);
+-- sort_at: publishedAt; undated items from a source's first collection sort below every dated item (backfill), later
+-- undated items by the time they were first collected.
+CREATE INDEX feed_items_source_time ON feed_items(source_id,sort_at DESC);
+` },
 ];
 export const HUB_TABLES = ["schema_migrations", "accounts", "sessions", "invites", "audit_events", "login_failures",
   "hub_folders", "hub_entries", "hub_files", "hub_stars", "hub_comments", "hub_installs", "library_versions",
-  "library_objects", "library_files", "hub_imports", "hub_skills", "hub_skill_archives", "hub_skill_stars", "hub_skill_comments", "hub_skill_imports"] as const;
+  "library_objects", "library_files", "hub_imports", "hub_skills", "hub_skill_archives", "hub_skill_stars", "hub_skill_comments", "hub_skill_imports", "feed_sources", "feed_items"] as const;
 
 export class HubDatabase {
   readonly home: string;

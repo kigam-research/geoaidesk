@@ -1,0 +1,120 @@
+{
+  "nav": "Research feeds",
+  "all": "All feeds",
+  "title": "Research feeds",
+  "context": "Original titles and summaries collected from {count} administrator-approved sources. Not reviewed.",
+  "collectedAt": "Last collected {when}",
+  "notCollected": "Nothing has been collected yet.",
+  "category": {
+    "all": "All",
+    "tools": "Tool releases",
+    "papers": "Papers",
+    "news": "News and commentary",
+    "skills": "GitHub skills"
+  },
+  "categoryGroup": "Category",
+  "field": {
+    "label": "Field",
+    "all": "All fields",
+    "general": "General geoscience",
+    "geology": "Geology and geophysics",
+    "hydrology": "Hydrology",
+    "climate": "Climate and atmosphere",
+    "remote-sensing": "Remote sensing",
+    "hazards": "Natural hazards",
+    "ocean": "Ocean",
+    "resources": "Mineral and energy resources",
+    "modelling": "Modelling and software",
+    "ai-tools": "AI tools"
+  },
+  "search": "Search titles and summaries",
+  "count": "{count} items",
+  "loading": "Reading research feeds.",
+  "empty": "No items match. Change the category, field or search words.",
+  "emptyAll": "Approved sources have no collected items yet. Once an administrator approves sources, the hub server collects them on a schedule.",
+  "failed": "Could not read the research feeds.",
+  "retry": "Read again",
+  "technical": "Technical details",
+  "copyTechnical": {
+    "button": "Copy technical details"
+  },
+  "published": "Published {when}",
+  "updated": "Repository updated {when}",
+  "fetched": "Collected {when}",
+  "stars": "{count} stars",
+  "release": "Release {tag}",
+  "openOriginal": "Opens the original in a new tab",
+  "noSummary": "The feed gives no summary.",
+  "sources": {
+    "show": "Show {count} sources",
+    "ok": "Collected {when}",
+    "failed": "Last collection failed {when}",
+    "never": "Not collected yet"
+  },
+  "import": {
+    "button": "Import into a project",
+    "project": "Project to import into",
+    "choose": "Choose a project",
+    "open": {
+      "button": "Import in Settings"
+    },
+    "note": "Fills {repo} into the GitHub import of Settings → Skills. Nothing is installed until you preview it and agree.",
+    "noProjects": "There is no project to import into. Create a project first."
+  },
+  "offline": {
+    "title": "Log in to the institute GAID hub to see research feeds",
+    "body": "The institute hub server collects the sources an administrator approved. Log in under Settings → Services → Institute GAID hub.",
+    "button": "Open hub server settings"
+  },
+  "admin": {
+    "intro": "The hub server reads approved sources only, every {hours} hours. It stores the original title, the feed summary and the link.",
+    "approveProposed": {
+      "button": "Approve all proposals"
+    },
+    "fetch": {
+      "button": "Collect now"
+    },
+    "fetching": "Reading the sources. This can take a few minutes.",
+    "fetched": "Read {count} sources. {failed} failed.",
+    "state": {
+      "proposed": "Proposed",
+      "approved": "Approved",
+      "stopped": "Stopped"
+    },
+    "approve": {
+      "button": "Approve"
+    },
+    "stop": {
+      "button": "Stop"
+    },
+    "delete": {
+      "button": "Delete"
+    },
+    "reason": "Why it was chosen",
+    "lastOk": "Collected {when}, {count} items",
+    "lastFailed": "Last collection failed {when}",
+    "never": "Not collected yet",
+    "decided": "{name}, {when}",
+    "empty": "There are no sources.",
+    "failed": "Could not read or change the source list.",
+    "add": {
+      "title": "Add a source",
+      "kind": "Kind",
+      "kinds": {
+        "feed": "RSS or Atom feed",
+        "github-releases": "GitHub releases",
+        "github-search": "GitHub repository search"
+      },
+      "id": "Identifier (lowercase letters, digits, -)",
+      "name": "Source name",
+      "publisher": "Publisher",
+      "homepage": "Source home page URL",
+      "url": "Feed URL",
+      "repo": "Repository (owner/name)",
+      "queries": "Search queries (one per line, up to 5)",
+      "match": "Words to keep (comma-separated; empty keeps all)",
+      "reasonField": "Why it was chosen",
+      "button": "Add source"
+    }
+  }
+}
