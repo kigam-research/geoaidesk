@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:56:33Z
+updated: 2026-10-22T10:07:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -80,25 +80,38 @@ Outside check: no outside check.
   agent's profile; outputs verify/figure/): no fail; warn = ai-policy, cvd (png/tiff), and png format under the bundled profile.
   PDF page 255.1×453.5 pt = 90×160 mm, DejaVuSans embedded. RDEP 450–1000 m smooth curve = linear ramp in the source LAS
   (step ≤0.0004, 2nd diff ≤2.4e-7), plotted faithfully, not flagged in the figure.
-- Citation verification reader f66405e9-854c-4930-a0ef-1562b41a3592 (general work) running; output verify/citation-verification.md.
+- Check 1 verified: reader f66405e9 (general work) checked all 46 rows / 212 atoms against the PDFs
+  (verify/citation-verification.md, sha256 4961707e…b390): 29 supported, 6 derived (arithmetic correct), 10 interpretation
+  (grounded), 1 partly (row 6: 19%/26% denominator = mean AGB is on p.8, not the cited pp.4–5), 0 wrong pages, 0 contradicted.
+  I re-found key atoms myself (Ploton p2 120 km, p5 26%/150 km, p8 mean 296, p10 Roberts ref; Meyer p6/p12 .95 quantile,
+  p7 0.039; Valavi p12 median/isotropic). Check 1 PASSED.
+- Hub told testing on the review app is done (request 44908615d7df). Report written; humanizer applied.
 - Findings for the report (from tester, not yet fix work): new chat defaults to GPT-6 Astra "연결 안 됨" although ChatGPT
   sign-in works; duplicate "GPT-6.1 Sol" under ChatGPT subscription and Codex (legacy); Meyer arXiv metadata suggestions
   unrelated; library says "본문 N쪽 모두 읽음" (= text extracted) right after import; all notes "형식 확인 필요"; streamed note
   link "[blocked]" (Blocked URL: undefined), report-relative links in B "[blocked]"; Japanese progress cards; wide tables need
   horizontal scroll; PDF opens in browser viewer tab; A used 0.9–2.0M tokens per question (subscription).
 ## Next steps
-1. On job exits: read out/record.json of both runs; on tester finish: verify every claim (cited pages via pdftotext, figure check
-   rerun, Zotero state via GET /geo/library/zotero); if the key is renewed, tell the tester to repeat goal C.
-2. Write reports/2026-10-22-gaid-user-acceptance/index.md; tell the hub testing is done (gaid-hub-server-trial waits).
+1. task review-copy the report, task finish. If the user saves a new Zotero key first: rerun goal C (tester or me through the
+   UI), update report 3.3 and the open item.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Checks 1, 2, 4 passed with evidence; check 3 blocked by the rejected key and carried as a new waiting item.
+- Model for checks 1–3 was ChatGPT sign-in GPT-6.1 Sol (user: paid subscription approved), not 기관 Qwen as in the old checklist.
+Closes: gaid-library-next#1
+Closes: gaid-research-visuals#1
+Closes: gaid-release-proof#1
+Closes: gaid-zotero-web-fix#1
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정] 수용 시험에서 처음 쓰는 연구자가 겪은 화면 문제 8건(새 대화 기본 모델 미연결, 같은 이름 모델 두 개, "[blocked]" 링크, 넓은 표 인용 열, arXiv 서지 추천, "모두 읽음" 문구, "형식 확인 필요" 남발, 일본어 진행 카드)을 고칠지 — 가) 후속 작업 하나로 묶어 고침 — 나) 기본 모델과 "[blocked]" 링크만 먼저 고침 — 다) 지금은 고치지 않음 — 권장: 가) 대화 시작과 결과 열기 같은 첫 단계에서 막히는 문제가 들어 있음 — 막힌 일: 처음 쓰는 연구자의 첫 사용 — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#35-처음-쓰는-사용자가-막히거나-헷갈린-점
+- [대기] Zotero 웹 서재 갱신과 GAID 폴더 보내기 재시험 — 막힌 일: Zotero 웹 연결의 완료 판단(gaid-zotero-web-fix) — 조건: 사용자가 읽기·쓰기 권한이 있는 새 Zotero 웹 키를 검토용 앱 서재에 저장(저장된 키는 zotero.org가 invalid key로 거부) — 근거: reports/2026-10-22-gaid-user-acceptance/index.md#33-zotero-웹-서재
 ## Report
+Report: reports/2026-10-22-gaid-user-acceptance/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
