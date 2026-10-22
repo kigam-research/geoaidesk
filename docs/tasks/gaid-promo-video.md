@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:18:27Z
+updated: 2026-10-22T15:36:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -66,6 +66,9 @@ platform. Plus a report for review and the repo checks that apply.
   15 stills (preview-01/02 under the work dir); ≈0.16 s per frame without footage.
 ## Next steps
 1. Child `gaid-promo-video--capture` running (writer 64e63574-788e-4fa7-880a-079234fc05e8, Claude Opus 5.5 high, fast_mode; worktree ~/worktrees/geoaidesk/gaid-promo-video--capture). When it finishes: `task complete gaid-promo-video--capture`.
+   User (verbatim, 2026-10-23): "이해하였다. 알림오면 작업 자동으로진행하여라." → on the child's finish notice, continue
+   without asking: `task complete`, integrate capture-v1 (zoom keys from focus rects), stills check, final render job,
+   verification, report, registry, `task finish`.
 2. Parent: extract real chart numbers (`geo/promo/data/`), build HTML/CSS motion scenes (`geo/promo/scene/`) and
    `geo/promo/render.py` (Playwright Chrome frame stepping → imageio-ffmpeg H.264, reference: ccs_transport
    `scripts/testbed_motion/render.py`). Preview stills, then show the storyboard + stills to the user before the final render.
