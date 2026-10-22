@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T00:37:51Z
+updated: 2026-10-22T01:24:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bd409835-dc4c-4400-847a-3f8beaa61c9a","pid":1237487,"provider":"claude","session":"58808060-bb53-414c-986e-b1ee6b2e2fd6","start":"51328705","token":"003a20f7e47c2f54520d7ddef3360844301264383ed9c2a9dd3ed03b14f4f628"}
 branch: task/gaid-design-identity--fresh
 target: task/gaid-design-identity
@@ -76,31 +76,48 @@ treat origin/main as the current product). You may replace all of that draft sty
 If the user rejects everything again, record that and stop without landing.
 
 ## Current state
-- 2026-10-22: inputs read. One UI digest, origin/main guide v1 + ui-rules.json, Apple HIG (71 pages fetched as DocC JSON from
-  `developer.apple.com/tutorials/data/design/human-interface-guidelines/<page>.json`, converted to Markdown in
-  `~/data/geoaidesk/work/gaid-design-identity--fresh/hig/md/`; HIG principles page dated June 8, 2026, layout Sept 9, 2026),
-  current-app shots 01–06 and their accessibility snapshots, origin/main screen code/locales, geo/brand logo (rendered sheet in
-  `.../gaid-design-identity--fresh/logo/sheet.png`), impeccable (SKILL, craft-floor, operate, critique, new-work) and
-  design-taste-frontend.
-- impeccable direction roll (code-led: no image generation in this harness): `concept-seed --scope direction --mode operate`,
-  seed key `8d611e0e`, assigned index 5 of the grounded list below; output saved in `.../concept-seed-direction.txt`.
-- Guide v2 draft: `~/data/geoaidesk/work/gaid-design-identity--fresh/guide/ui-guide-v2.md` (374 lines; sections 0–14, rule ids P I L
-  T S B N D Q G X MAP C RN F M A W R V; identity options table in section 2).
-- Mockups (static HTML/CSS, real project data): `.../mockups/{hub,workspace,setup,map}.html` with `?v=instrument|mapsheet|standard&t=light|dark`;
-  themes `theme-instrument.css`, `theme-mapsheet.css`, `theme-standard.css`; 48 captures in `.../mockups/shots/`
-  (`<screen>-<variant>-<theme>-<width>.png`), re-render with `tools/shot.sh <screen> <variant> <theme> <w> <h>` (playwright-cli
-  session `mock`, static server below). Contrast computed with `tools/contrast.py` (values in the proposal section 4).
-- Proposal (Korean, report-template sections, humanizer applied): `.../proposal/index.md` + 13 figures (≤1600 px) + `guide/`;
-  review copy at `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-22-gaid-ui-guide-v2-proposal/` (task review-copy printed the
-  obsidian-sync service as inactive; the Obsidian desktop app syncs the vault).
-- Static mockup server for this unit: `systemd-run --user` unit `gaid-fresh-static` (python http.server, 127.0.0.1:3351,
-  root `~/data/geoaidesk/work/gaid-design-identity--fresh`); stop with `systemctl --user stop gaid-fresh-static`.
+- 2026-10-22, result (this branch; the parent integrates it into its report): guide v2 adopted and landed with the user's
+  choice (계측 = default identity; 도폭 = style a researcher may pick in Settings → 화면 표시 → 화면 스타일; 표준 not adopted).
+  - Guide: `docs/design/ui-guide.md` v2 (sections 0–14; identity rules I1–I15 in section 2; review checklist for 2 styles ×
+    2 themes), `geo/ui/ui-rules.json` v2, AGENTS.md UI-guide bullet. `geo/integration-boundaries.json` entries for every
+    upstream file edited (owner `gaid-design-identity--fresh`, also in `geo/tests/distribution.test.mjs`).
+  - Tokens and styles: `web/src/app/globals.css` (role tokens `--gaid-*` mapped to the shadcn variables and Tailwind
+    `gaid-*` utilities; type scale 13/15/16/17/20/26 px with a 12 px floor; Pretendard Variable; 계측 in `:root`/`.dark`,
+    도폭 in `:root[data-style="mapsheet"]` and its `.dark`; chamfer through `corner-shape: var(--gaid-corner)`; `.gaid-orbit`,
+    `.gaid-index`, `.gaid-seg`, `.gaid-step-*`). Style switch `web/src/geo/appearance/` (`gaid:style` in localStorage, set
+    before paint by an inline head script in `web/src/app/layout.tsx`); Settings card in
+    `web/src/components/settings/appearance-panel.tsx`.
+  - Shared parts `web/src/geo/shell/`: `GaidAppBar`, `SidebarGroup`/`SidebarItem`, `StepScale`, `SystemResourcesButton`.
+  - Screens: one app bar on the project list, hub and workspace (theme choice only in Settings; resource monitor behind a
+    popover; cost pill only with a spend limit or spend); hub home with a sidebar (추천 Workflow, 허브에 등록된 Workflow, 주제
+    폴더, 내 Workflow), a featured block and a fixed-column registry list; project cards; workspace panes 272 / content /
+    440 with 1 px dividers and chrome-tone headers; neutral Workflow panel rows (category label "기본 Workflow · 모두
+    미시험" instead of a 미시험 badge per row); start settings on `StepScale` tabs; research-note decisions one at a time
+    (이전 결정 / 다음 결정, one 답변 보내기); hue utilities in hub, methods, skill-hub and context replaced by tokens.
+    Components that carried the parent's unadopted draft styling and needed no new design are back to origin/main.
+  - New strings (ko/en): app `settings.appearance.style`, `styleHint`, `styleInstrument`, `styleMapsheet`,
+    `header.systemResources`; hub `home.nav`, `home.foldersTitle`, `home.mineTitle`, `home.mineItem`, `home.list.*`; notes
+    `decision.steps`, `decision.step`, `decision.counter`, `decision.prev.button`, `decision.next.button`; workspace
+    `catalogue.categoryAllUntested`.
+  - Checks before finish (2026-10-22): web `tsc --noEmit` clean; web vitest 175 files / 1142 tests pass;
+    `node geo/ui/check-ui.mjs` 0 errors (114 accepted baseline entries, unchanged); `node --test 'geo/tests/*.test.mjs'` 49
+    pass, 1 skipped; copy validator 0 errors (61 existing warnings, none on the new keys); impeccable detect 0 findings.
+    `scripts/check` runs in `task finish`.
+  - Real-app screenshots (Korean, dev app on a copied data home):
+    `~/data/geoaidesk/work/gaid-design-identity--fresh/app-shots/<screen>-<style>-<theme>-<width>.png` for hub, wsdec (note
+    decisions) and wssetup (start settings) × instrument/mapsheet × light/dark × 1440/1280, plus home, ws, wsnote, wsmap,
+    wswf and settings at 1440 light. Composed figures for the parent's report (≤ 1600 px):
+    `.../result-figures/01-app-instrument.png`, `02-app-mapsheet-settings.png`, `03-app-1280-and-panel.png`.
+  - Not done here: see Open items (map viewer, compact class and keyboard rules, kept answers, corner-shape outside
+    Chromium, notes list in the sidebar).
+- Earlier steps: inputs (One UI digest, origin/main guide v1, Apple HIG 71 pages as DocC JSON converted to Markdown in
+  `.../hig/md/`, current-app shots 01–06, geo/brand); impeccable direction roll `concept-seed --scope direction --mode operate`
+  seed `8d611e0e`, index 5 (`.../concept-seed-direction.txt`); guide draft `.../guide/ui-guide-v2.md`; mockups
+  `.../mockups/` (48 captures); proposal `.../proposal/index.md`, review copy
+  `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-22-gaid-ui-guide-v2-proposal/`.
+- Services of this unit (dev app `gaid-fresh-app` on 3350/18350, static server `gaid-fresh-static` on 3351) are stopped.
 ## Next steps
-1. Land (in order): tokens + style switch foundation (`web/src/app/globals.css` with 계측 default and `[data-style="mapsheet"]`,
-   light/dark; Settings → 화면 표시 "화면 스타일"), app header, hub home, workspace (project view, notes, Workflow panel, start
-   settings), then guide (`docs/design/ui-guide.md`) and `geo/ui/ui-rules.json`, AGENTS.md bullet, boundaries + owner list.
-2. Real-app screenshots in Korean: 2 styles × light/dark × 1440×900 and 1280×800; impeccable detect once; `scripts/check`;
-   `task finish`.
+1. None in this unit after `task finish`; the parent integrates the result and tells the hub. Follow-ups are the open items.
 
 ## Failed approaches
 ## Notes and decisions
@@ -127,6 +144,11 @@ If the user rejects everything again, record that and stop without landing.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [부채] 지도 화면(WP05)은 가이드 v2 MAP1–MAP6대로 다시 짜지 않았습니다. 색과 글꼴 토큰만 바뀌었고 긴 설명 문단, 체커보드 배경, 범례·기본 정보 배치는 이전과 같습니다 — 가) 다음 지도 화면 작업에서 MAP 규칙대로 정리 — 나) 지금 화면 유지 — 권장: 가) 범례와 기본 정보를 스크롤 없이 보는 것은 연구자 요구사항 — 막힌 일: 없음 — 근거: docs/design/ui-guide.md#maps-map
+- [부채] 가이드 v2의 창 크기·키보드 규칙 일부가 없습니다: 1024–1279 px에서 오른쪽 패널을 덮는 시트로 바꾸기(L1), 패널 경계 키보드 크기 조절(L2), 사이드바 숨기기와 검색 단축키(N2, N6) — 가) 작업 공간 레이아웃 후속 작업에서 구현 — 나) 가이드 규칙을 지금 구현 범위로 줄임 — 권장: 가) 데스크톱 관례이고 접근성 규칙(A)과 이어짐 — 막힌 일: 없음 — 근거: docs/design/ui-guide.md#3-layout-and-spacing
+- [부채] 결정에 답을 보낸 뒤 고른 선택지가 화면에 남지 않습니다(RN3 마지막 문장, main과 같은 동작) — 가) 보낸 답을 결정 카드에 '보냄' 상태로 남김 — 나) 에이전트가 노트를 고칠 때까지 지금처럼 비움 — 권장: 가) 무엇을 골랐는지 연구자가 다시 확인할 수 있음 — 막힌 일: 없음 — 근거: docs/design/ui-guide.md#research-notes-and-decisions-rn
+- [확인] 모서리 깎기(corner-shape: bevel)는 Chrome 계열(HeadlessChrome 156)에서만 확인했습니다. Firefox·Safari는 둥근 모서리로 보입니다 — 가) 연구자 PC 브라우저에서 한 번 확인 — 나) 둥근 모서리 대체를 그대로 받아들임 — 권장: 나) 모양만 다르고 기능은 같음(I8) — 막힌 일: 없음 — 근거: docs/design/ui-guide.md#2-identity-what-gaid-specific-means
+- [부채] 연구 노트 목록을 목업처럼 왼쪽 사이드바로 옮기지 않았습니다. 노트는 가운데 '연구 노트' 탭에 그대로 있습니다(노트북 탭이 연구 노트로 열린다는 2026-10-18 결정 유지) — 가) 파일 트리와 노트 목록을 한 사이드바에 두는 구조를 별도 작업으로 설계 — 나) 지금 구조 유지 — 권장: 나) 272 px 사이드바를 둘이 나눠 쓰면 둘 다 좁아짐 — 막힌 일: 없음 — 근거: docs/design/ui-guide.md#research-notes-and-decisions-rn
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
