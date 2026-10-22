@@ -8,6 +8,7 @@ review_status: pending
 decisions: 0
 cover: figures/02-note-references.png
 supersedes:
+reviewed: 2026-10-22
 ---
 # 서재 남은 항목 세 가지: 실제 모델의 쪽 인용 확인, 문헌 스킬 배포, Better BibTeX 상태
 
