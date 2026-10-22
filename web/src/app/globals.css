@@ -393,3 +393,12 @@ a { text-underline-offset: 3px; }
 :root[data-style="mapsheet"] .gaid-step-ticks,
 :root[data-style="mapsheet"] .gaid-step-track::before,
 :root[data-style="mapsheet"] .gaid-step-track::after { display: none; }
+
+/* GAID map workspace — MAP1–MAP6. Data canvases are never themed or filtered. */
+.gaid-map-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; overflow: hidden; }
+.gaid-map-workspace .ol-scale-line { background: var(--gaid-face); color: var(--gaid-ink); bottom: 8px; left: 8px; border-radius: 0; }
+.gaid-map-workspace .ol-scale-line-inner { color: var(--gaid-ink); border-color: var(--gaid-ink); font-family: inherit; font-size: 12px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1023px) {
+  .gaid-map-body { grid-template-columns: minmax(0, 1fr); overflow: auto; }
+  .gaid-map-body > div { min-height: 560px; }
+}

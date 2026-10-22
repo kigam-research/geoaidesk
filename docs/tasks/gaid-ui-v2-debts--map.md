@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:58:24Z
+updated: 2026-10-22T02:01:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4874820d-e04e-4b0a-8c95-5b14723b8837","pid":2241389,"provider":"codex","session":"01a16154-8f16-7ec1-b5d4-47eff4a5d82e","start":"52223294","token":"be246d461f2ed7bd44b287cdfd4990cbdc0b3a21c25094032face66d42c55fe1"}
 branch: task/gaid-ui-v2-debts--map
 target: task/gaid-ui-v2-debts
@@ -89,9 +89,12 @@ ko/en before → after, check output, screenshot paths. No report of your own; t
 `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the printed worktree; clean starting tree. Exact-worktree codegraph is unavailable (unindexed); relevant source read directly.
+- Sequential decisions: keep existing requests/data contracts; compose a height-bounded map + 320 px inspector first, then compact layer/legend/info, then popup/table controls and canvas readouts; verify behavior before real-app visual review.
+- Owned files/interfaces: map viewer folder, map locale catalogs, one isolated map CSS block if needed, map baseline entries only. No child writers (nested units unsupported); changes are tightly coupled.
+- Integration order: implementation, focused typecheck/tests, UI/copy checks, real-app screenshot matrix, task finish for parent integration.
 ## Next steps
-1. (the next session's first action)
+1. Implement the map/inspector layout and disclosure hierarchy; preserve data requests and original map pixels.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

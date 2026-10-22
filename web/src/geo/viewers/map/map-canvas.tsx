@@ -1,8 +1,11 @@
 "use client";
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import OlMap from "ol/Map";
 import Overlay from "ol/Overlay";
+import ScaleLine from "ol/control/ScaleLine";
+import { LocateFixed, Minus, Plus } from "lucide-react";
+import { MapButton } from "./controls";
 import type Feature from "ol/Feature";
 import type { Geometry, LineString, MultiPolygon, Point, Polygon } from "ol/geom";
 import { containsCoordinate, getCenter } from "ol/extent";
@@ -43,6 +46,7 @@ interface Props {
   onClosePopup?(): void;
 }
 const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref) {
+  const [cursor, setCursor] = useState<number[]>();
   const target = useRef<HTMLDivElement>(null);
   const mapRef = useRef<OlMap | null>(null);
   const current = useRef(props);
@@ -101,8 +105,10 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
   useEffect(() => {
     if (!target.current) return;
     fitted.current = false;
-    const map = new OlMap({ target: target.current, controls: [], layers: [], view: createMapView(props.crs) });
+    const map = new OlMap({ target: target.current, controls: props.crs === "native" ? [] : [new ScaleLine({ units: "metric" })], layers: [], view: createMapView(props.crs) });
     mapRef.current = map;
+    setCursor(undefined);
+    map.on("pointermove", event => { if (!event.dragging) setCursor(event.coordinate.slice(0, 2)); });
     map.on("moveend", () => {
       if (!fitted.current) return;
       const size = map.getSize();
@@ -195,12 +201,14 @@ const MapCanvas = forwardRef<CanvasHandle, Props>(function MapCanvas(props, ref)
     return () => popupElement.removeEventListener("keydown", close);
   }, [popupElement]);
   useEffect(() => () => { for (const entry of built.current.values()) entry.layer.dispose(); built.current.clear(); }, [props.crs]);
-  return <div className="relative h-full min-h-[320px] w-full bg-white" style={{ backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%)", backgroundSize: "16px 16px" }}>
+  return <div className="relative h-full min-h-40 w-full bg-gaid-face-2">
     <div ref={target} role="region" aria-label={t("map")} className="h-full w-full" tabIndex={0} />
-    <div className="absolute left-2 top-2 flex flex-col gap-1 text-black">
-      <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomIn")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) + 1); }}>+</button>
-      <button className="rounded border bg-white px-2 py-1" aria-label={t("zoomOut")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) - 1); }}>−</button>
+    <div className="absolute left-2 top-2 flex flex-col gap-1">
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("zoomIn")} title={t("zoomIn")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) + 1); }}><Plus aria-hidden className="size-4" /></MapButton>
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("zoomOut")} title={t("zoomOut")} onClick={() => { const v = mapRef.current?.getView(); if (v) v.setZoom((v.getZoom() ?? 2) - 1); }}><Minus aria-hidden className="size-4" /></MapButton>
+      <MapButton className="size-7 bg-gaid-face p-0" aria-label={t("fit")} title={t("fit")} onClick={fit}><LocateFixed aria-hidden className="size-4" /></MapButton>
     </div>
+    <output aria-label={t("cursorCoordinates")} className="pointer-events-none absolute bottom-2 right-2 max-w-[70%] truncate bg-gaid-face px-2 py-1 text-xs tabular-nums text-gaid-ink-2">{cursor ? t("coordinateReadout", { crs: props.crs === "native" ? t("nativeShort") : props.crs, x: cursor[0].toFixed(props.crs === "EPSG:4326" ? 5 : 1), y: cursor[1].toFixed(props.crs === "EPSG:4326" ? 5 : 1) }) : t("coordinateHint", { crs: props.crs === "native" ? t("nativeShort") : props.crs })}</output>
     {popupElement && props.popup && createPortal(props.popup.content, popupElement)}
   </div>;
 });
