@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T08:59:48Z
+updated: 2026-10-22T09:07:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8bae3bd9-1847-436d-918d-15c77aff84a1","pid":1865557,"provider":"claude","session":"04b52e98-aed3-4749-b725-5863794d4095","start":"54718151","token":"c1146656906ed1e52af0dcf6a76b7d8f0f6adc197b1e4b98254b697d47eb5959"}
 branch: task/gaid-visuals-next
 target: main
@@ -41,20 +41,33 @@ Plan (2026-10-22):
   web/src/geo/connections/* (button/project picker), locales library/connections.
 - Integration order: B on this branch; A merged via `task complete`; then scripts/check, screenshots (2 styles × 2
   themes, 1440×900 and 1280×800) with own GAID_HOME under ~/data/geoaidesk/work/gaid-visuals-next/, brief report.
+Package B done (commits up to ddd00b23): web/src/geo/library/paper-map-entry.tsx (+test), ConnectionMapDialog
+(controlled) in web/src/geo/connections/connection-map-button.tsx, pane props projectName/onOpenProject, locales
+library.map.* and connections.hintProject / connections.open.project.button. Checks: web vitest library/connections/notes
+(23), web tsc, check-ui 0 errors, copy validator 0 errors. Real app: user unit gaid-visuals-next-app (ports 3320/18320,
+GAID_HOME ~/data/geoaidesk/work/gaid-visuals-next/home copied from gaid-research-visuals; seeded 2 GAID papers kim2024 and
+park2021 cited in the Default note, kim2024 attached to project 화강암 풍화대 조사); 17 screenshots in
+~/data/geoaidesk/work/gaid-visuals-next/playwright/matrix/ (2 styles × 2 themes × 1440/1280 × picker/map, plus
+opened-project); console errors 0. Found and fixed in the real app: the map stayed open over the workspace after
+"프로젝트 열기".
+Child A: gaid-visuals-next--journals (writer 296db605), running; reported AGU/EEG pages readable with a normal Chrome UA.
 ## Next steps
-1. Implement package B; complete child A.
+1. When child A finishes: `task complete gaid-visuals-next--journals`, fill report section on journals, scripts/check,
+   stop unit gaid-visuals-next-app, task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-research-visuals#2
+Closes: gaid-research-visuals#3
+- No catalogue release: gaid-figures is a shipped skill; unedited project copies follow the new hash.
+- Library map open actions: paper → library detail; note/figure/file/chat → "프로젝트 열기" (no cross-project note deep link).
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-22-gaid-visuals-next/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
