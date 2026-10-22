@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:56:40Z
+updated: 2026-10-22T06:59:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"af5e8cdb-d43f-4b44-8ee5-e1ceba4aa188","pid":177398,"provider":"codex","session":"01a16234-e5b9-72e1-ad05-708c154db748","start":"53693527","token":"b43fd525741ba4dfc4306e8a53ecc93b452a07e41bd222c5e954043676b60fc0"}
 branch: task/gaid-hub-skills--ui
 target: task/gaid-hub-skills
@@ -56,15 +56,17 @@ your own. Checks before finish: `cd web && npx tsc --noEmit && npx vitest run sr
 the two node checks above. Finish with `task finish`.
 
 ## Current state
-Implemented the shelf, read-only detail/file views, per-revision reviews, three-source registration, reusable pinned install gate, and hub/Settings seams. TypeScript, 32 focused UI tests and 16 existing hub regressions pass (48 tests total); scoped ESLint passes. UI and copy validators have zero errors and no baseline changes. The 3 new copy warnings flag factual automatic-check/name-not-verified wording; wording is required by the contract and is retained.
+Delivered shelf/detail/three-source registration screens, reusable pinned-revision installer and Settings row/source seams. Parent store integrated (ba8d70d37c3d); the only merge conflict was append-only boundaries and both entries are retained under gaid-hub-skills. No parent/store code mismatch found.
 
-Captured 32 Korean screenshots (4 screens × 2 styles × 2 themes × 2 viewport sizes) with intercepted contract fixtures. All have no horizontal overflow; inspected first-action visibility, layout, type, contrast, disclosures and states. Four small representative images are in the parent report figures folder. Full captures, hashes and fixture/capture scripts are under /home/seongin3/data/geoaidesk/work/gaid-hub-skills--ui/; visual-evidence.json records the capture matrix. Real-store verification is not yet done. Codegraph has no index for this exact worktree; bounded native source reads were used.
+Real isolated API/browser checks passed: project-skill registration; SKILL.md/text-file reads; star/comment; other-name checked review with unverified-name text; consent-gated revision 1 install; newer-revision notice and explicit revision 2 update; edited-file install refused with unchanged SHA-256; suspended revision refused and Settings warning rendered. No model calls or existing user data used. Catalogue was active. Evidence/scripts/logs: /home/seongin3/data/geoaidesk/work/gaid-hub-skills--ui/. Real backend fixtures are not research results.
+
+Integrated focused checks passed: TypeScript, 32 UI tests, distribution 7 tests, UI/copy 0 errors. Earlier broader UI/hub run: 48 pass; scoped ESLint passes. Required 32 style/theme/viewport screenshots plus 4 chosen report PNGs are saved. Full workflow check runs during task finish.
 ## Next steps
-Parent integrated store at ba8d70d37c3d. task sync encountered one append-only boundary conflict; retained both seams with the authorized parent owner gaid-hub-skills. Completing the merge through task save, then running the real isolated API/browser check.
-1. After the parent integrates store and sends a notice, run task sync and inspect the integrated API before running the real-server check.
-2. Check registration, exact-revision installation, file reads and review with a dedicated GAID_HOME/KADY_PROJECTS_ROOT, rerun declared focused checks, then task finish.
-3. Frontend gaid-hub-skills-ui-web.service and playwright-cli session hubskills were stopped after visual QA. Restart the isolated frontend (:3117, API :8117) only for the real-store browser check. Both server and web locked npm dependencies are installed; no package/lock edits. Logs and capture scripts remain in the external task data directory.
+1. Run task finish and fix only relevant failures in place. Parent completes and integrates this child.
+2. Isolated services and browser have been stopped; no further rollout belongs to this child.
 ## Failed approaches
+- task sync had an append-only boundaries conflict. Kept both entries and parent owner gaid-hub-skills. A path-restricted task save rejected merge-staged files; unrestricted task save completed the merge and verified its push.
+- Real-browser custom-port CORS initially blocked requests. Set KADY_FRONTEND_PORT=3117 in the isolated service; no source edit.
 - Initial npx tsc ran before npm dependencies existed. Installed the locked web dependencies with npm ci, then TypeScript passed. No source workaround or dependency edits.
 - Initial Next browser build caught a type import before the existing use-client directive; moved the import below the directive and browser build succeeded.
 - Browser fixture Settings startup initially lacked the unrelated local-model response; corrected only the external mock fixture, not product code.
@@ -101,6 +103,18 @@ Report-ready prose:
 스킬은 프로젝트, 등록된 Workflow 또는 GitHub 등에서 올립니다. 등록 전에 파일과 이용 조건을 확인하며, 공유 가능한 조건을 확인하지 못한 판은 올린 사람에게만 보입니다. 이미 있는 이름은 다음 판으로 올릴지, 이름이 다른 사람의 것인지 구분해 표시합니다.
 
 프로젝트에 설치할 때는 판을 지정하고 미리보기와 동의를 거칩니다. 새 판은 자동으로 적용하지 않습니다. 설정에는 설치한 판, 새 판, 프로젝트에서 고친 상태와 사용 중지를 표시합니다. 프로젝트에서 고친 파일이나 같은 이름의 다른 스킬은 덮어쓰지 않습니다.
+
+### Real-server evidence for parent report
+
+All server/user-data locations are isolated under /home/seongin3/data/geoaidesk/work/gaid-hub-skills--ui/: home, projects, shared, home/pi-agent and home/skills-cache. The pinned named catalogue asset is active. API :8117 and Next :3117; KADY_FRONTEND_PORT=3117 lets the real browser reach the API without mocks. No provider/model calls occurred.
+
+Browser scripts real-browser.cjs, real-review.cjs and real-settings.cjs exercised registration → detail/file → stars/comments → project picker → preview/consent → install, other-name review and explicit newer-revision update. Results: registered/fileRead/starred/commented true; consentRequired true; installed revision 1 then 2; unverified review names shown; Settings remained one dialog. API evidence real-api-evidence.json records edited preview, 409 refusal, unchanged file SHA-256, suspended preview/state and 409 refusal. Final /skills/all annotation: revision 2, latestRevision 2, state suspended, edited true. Browser rendered both edited and suspended row states. External real-settings screenshot uses 1440×900.
+
+The local real-API path used a project source. External GitHub network fetching and Workflow extraction were not manually repeated; mocked UI source-selection tests and the integrated parent/store tests cover their contracts. No additional user decision is needed.
+
+보고서용 추가 문장 (humanizer 한국어 규칙으로 검토함):
+
+격리된 시험 서버에서 프로젝트 스킬을 올리고 파일을 읽은 뒤, 동의와 함께 설치하는 경로를 확인했습니다. 새 판을 올리자 설정에 알림이 나타났으며, 연구자가 선택한 뒤에만 설치한 판이 바뀌었습니다. 프로젝트에서 고친 파일은 설치를 거절한 뒤에도 해시가 같았습니다. 사용 중지한 판도 설치를 거절했고 설정에 경고를 표시했습니다.
 
 ### String changes (new ids; previous ko/en value: absent)
 
