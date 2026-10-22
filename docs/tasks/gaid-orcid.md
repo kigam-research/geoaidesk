@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:42:42Z
+updated: 2026-10-22T09:43:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -69,8 +69,13 @@ Outside check: no outside check.
    the UI diff, integrate (`task sync` if needed), run scripts/check.
 2. Write report reports/2026-10-22-gaid-orcid/index.md (phase 1 result, screenshots from the child, phase 2 steps for
    the user), humanizer pass, `task review-copy`.
-3. Phase 2 after the user's ORCID client registration (sandbox first): ask in this tab; agree the hub account interface
-   with gaid-hub-server-trial through the hub.
+3. Phase 2 after the user's ORCID client registration (sandbox first): asked in this tab 2026-10-22 (sandbox client +
+   a production registration attempt with redirect `http://127.0.0.1:8000/geo/orcid/callback`; user sends client IDs and
+   whether production accepted http loopback; secrets never in chat). Planned shape: authorization code flow, browser
+   returns to the researcher's own GAID backend (loopback), which hands code + state to the hub server; the hub server
+   holds client id/secret (hub server config, entered by the operator, never in Git), exchanges the code, verifies the
+   id_token (RS256, ORCID JWKS, aud, nonce) and records the authenticated iD on the account. Agree the hub account
+   interface with gaid-hub-server-trial through the hub before editing hub server code.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
