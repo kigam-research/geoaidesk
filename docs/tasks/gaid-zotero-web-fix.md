@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T05:58:05Z
+updated: 2026-10-22T06:00:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bee7d319-703a-4565-a0c9-1d69e94cd031","pid":3762934,"provider":"claude","session":"870398d4-3eab-430b-ae47-a9f6c6604ea1","start":"53200219","token":"cb3fe81ab18b49eee1407e968dd49a72031d140445992e9a34169e97d8776bc3"}
 branch: task/gaid-zotero-web-fix
 target: main
@@ -65,7 +65,11 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: n
   Added: state `certificate-untrusted`, empty-web-library note, "Zotero 연결 해제" (POST /geo/library/zotero/disconnect;
   forgets the web key, mirrored papers stay) so a researcher can switch to the PC connection.
 ## Next steps
-1. Screenshots (2 styles × 2 themes, 1440×900 and 1280×800), user key test in the test app, scripts/check, report.
+1. After the user's PC-connection check (disconnect web key → connect PC Zotero in the test app): update report §3/§5,
+   stop the test app, run scripts/check (it reinstalls node_modules, so not while the app runs), humanizer on the
+   report, review-copy, task finish.
+Blocked: waiting for the user's PC-connection check in the test app (http://localhost:3360/#library).
+Done: screenshots (8 + 2 in ~/data/geoaidesk/work/gaid-zotero-web-fix/shots/), user web-key test, report draft.
 ## Failed approaches
 ## Notes and decisions
 - Plan (all done by the top writer; small and tightly coupled, no children):
@@ -85,6 +89,7 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-zotero-web-fix/. Outside check: n
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-22-gaid-zotero-web-fix/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
