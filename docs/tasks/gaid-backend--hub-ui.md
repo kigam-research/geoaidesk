@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:35:27Z
+status: active
+updated: 2026-10-22T06:44:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -65,7 +65,7 @@ Run `cd web && npx vitest run` for your tests, `npx tsc --noEmit`, `node geo/cop
 ## Current state
 Implemented the institute hub connection/account/admin UI, account-aware named actions and ownership, and the library sync line. No backend contract changed. No application data or real accounts were touched. Narrow Settings seam: ServicesPanel mounts HubServerCard.
 
-Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite job 2 passed: 181 files, 1173 tests, exit 0 (67.32s), at source c94189b2b7d4. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. task finish automatically ran scripts/check: backend typecheck passed, backend 2069 passed/8 skipped (183 files passed/1 skipped), frontend 1173 passed, launcher --check passed. Distribution tests: 48 passed, 1 failed, 1 skipped; the only failure is a missing gaid-backend owner in geo/tests/distribution.test.mjs owners allowlist. Parent explicitly authorized the one-line owners Set addition on 2026-10-22; it is now added and all 7 focused distribution tests pass. Remaining checks did not run after the initial failure; rerun finish.
+Verified: 17 new interaction tests plus existing seam tests (31 tests in 6 files) pass; web TypeScript passes; focused ESLint passes; copy validator passes (0 errors, 61 existing warnings); UI validator passes (0 errors, 88 existing accepted debts, none added). Full web suite job 2 passed: 181 files, 1173 tests, exit 0 (67.32s), at source c94189b2b7d4. Keyboard path email -> password -> sign-in preserves focus-visible. Browser console has 0 errors after loading all fixture screens; fixture service and browser have been stopped. task finish automatically ran scripts/check: backend typecheck passed, backend 2069 passed/8 skipped (183 files passed/1 skipped), frontend 1173 passed, launcher --check passed. Distribution tests: 48 passed, 1 failed, 1 skipped; the only failure is a missing gaid-backend owner in geo/tests/distribution.test.mjs owners allowlist. Parent explicitly authorized the one-line owners Set addition on 2026-10-22; it is now added and all 7 focused distribution tests pass. Post-fix full check reached production smoke successfully; then changed parent target triggered automatic recheck and failed on its new missing-P2-import suite (see Failed approaches). Parent resolved the missing-P2-import blocker at target b7893fe2 (P2 integrated, draft e2e removed) and committed to holding its target stable through child finishes. Rerunning finish.
 
 Screenshots: 24 mocked-backend PNGs at ~/data/geoaidesk/work/gaid-backend--hub-ui/screens/ (Settings logged out, Settings admin with members open, library sync; instrument/mapsheet, light/dark, 1440x900 and 1280x800). Horizontal overflow false in every screenshot; Settings cards fit within 1280x800. Vite fixture, API mock and capture.js are external to Git. Four representative 1280px PNGs are under the parent report figures/; report text unchanged.
 
@@ -79,12 +79,15 @@ Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel
 Closed 2026-10-22T06:35:27Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Second finish passed the post-owner-fix full check through production smoke, then automatically merged changed parent target 2c131a23 and repeated checks. That target adds an e2e test whose top-level imports require still-absent P2 modules; suite import failed at server/test/geo-hub-e2e.test.ts:17. 183 server files/2069 tests otherwise passed, 8 skipped. Parent was notified; no changes made to its test or dependencies.
 - Disposing failed job 1 as superseded after failed finish was refused: terminal task; disposition requires an open owning task. No job rerun or metadata edit. Job 2 is the successful replacement, documented above; finish treats the old failure as advisory.
 - First task finish full scripts/check failed only on missing gaid-backend owner in distribution test allowlist (not on application behavior). No workaround; update the registry for the declared seam.
 - Job job-geoaidesk-gaid-backend--hub-ui-1 exited 127: immutable job source has no node_modules (vitest not found). Fix the job environment by including npm ci before tests; no source workaround.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 - Parent message 2026-10-22 explicitly authorizes adding gaid-backend to geo/tests/distribution.test.mjs owners Set (ancillary one-line change outside original owned files).
+
+- Parent message 2026-10-22 confirms coherent target b7893fe2, P2 integrated and premature e2e removed; target publication paused until P1/P3 finishes return.
 
 ### UI guide conformance
 
