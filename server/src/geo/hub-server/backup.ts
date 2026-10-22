@@ -12,7 +12,7 @@ interface BackupManifest {
   files: { path: string; sha256: string; size: number }[];
 }
 const inside = (base: string, target: string) => { const rel = relative(base, target); return !rel || (!rel.startsWith("..") && !isAbsolute(rel)); };
-const hashes = (db: DatabaseSync) => db.prepare("SELECT sha256 FROM hub_files UNION SELECT sha256 FROM library_files ORDER BY sha256").all() as { sha256: string }[];
+const hashes = (db: DatabaseSync) => db.prepare("SELECT sha256 FROM hub_files UNION SELECT sha256 FROM library_files UNION SELECT sha256 FROM hub_skill_archives ORDER BY sha256").all() as { sha256: string }[];
 function databaseCheck(db: DatabaseSync) {
   const integrity = db.prepare("PRAGMA integrity_check").all();
   if (integrity.length !== 1 || Object.values(integrity[0])[0] !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length)
@@ -71,11 +71,21 @@ export function checkBackup(directory: string): { serverId: string; files: numbe
       copyFileSync(from, join(temporary, f.path));
     }
     if (!names.has("hub.sqlite") || !names.has("server.json")) throw new HubServerError("백업에 필수 파일이 없습니다.", 409);
+    // Compare the snapshot before HubDatabase upgrades it. Backups made by a version-1 server stay verifiable.
+    const snapshot = new DatabaseSync(join(temporary, "hub.sqlite"), { readOnly: true });
+    let actual: Record<string, number>;
+    try {
+      databaseCheck(snapshot);
+      const tables = new Set((snapshot.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]).map((r) => r.name));
+      actual = Object.fromEntries(HUB_TABLES.filter((table) => tables.has(table)).map((table) =>
+        [table, (snapshot.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n]));
+      if (Object.keys(actual).length !== Object.keys(manifest.rows).length || Object.entries(actual).some(([table, n]) => n !== manifest.rows[table]))
+        throw new HubServerError("복원한 데이터의 행 수가 맞지 않습니다.", 409);
+    } finally { snapshot.close(); }
     const restored = new HubDatabase({ home: temporary });
     try {
       databaseCheck(restored.db);
-      const actual = restored.counts();
-      if (restored.server.serverId !== manifest.serverId || HUB_TABLES.some((table) => actual[table] !== manifest.rows[table]))
+      if (restored.server.serverId !== manifest.serverId)
         throw new HubServerError("복원한 데이터의 식별자 또는 행 수가 맞지 않습니다.", 409);
       for (const row of hashes(restored.db)) {
         if (!names.has(`blobs/${row.sha256}`)) throw new HubServerError("백업에서 참조한 파일이 빠졌습니다.", 409);

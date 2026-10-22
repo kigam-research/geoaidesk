@@ -6,22 +6,33 @@ import { HubAccounts, type Authenticated } from "./accounts.ts";
 import { HubDatabase, HubServerError, hashValue, sha256, type HubServerOptions } from "./core.ts";
 import { HubLibrary } from "./library.ts";
 import { SQLiteHubStore } from "./records.ts";
+import { SQLiteHubSkillStore } from "./skills.ts";
 import { HUB_API as API, HUB_FILE_LIMIT, HUB_SERVER_SCHEMA, LIBRARY_FILE_LIMIT, type AcceptInviteRequest,
-  type InstallRequest, type LibraryPushRequest, type LoginRequest, type StoredEntry } from "./protocol.ts";
+  type InstallRequest, type LibraryPushRequest, type LoginRequest, type ReviewInput, type StoredHubSkill, type StoredEntry } from "./protocol.ts";
 
 export type HubServerApp = FastifyInstance & { hub: HubDatabase; accounts: HubAccounts; store: SQLiteHubStore; library: HubLibrary };
-export function buildHubServer(options: HubServerOptions): HubServerApp {
+export interface HubServeOptions extends HubServerOptions {
+  /** Serve HTTPS only (docs/geo/hub-server-https.md way A). PEM key and certificate chain. */
+  https?: { key: Buffer; cert: Buffer };
+  /** Behind a reverse proxy on this PC: take the client address from X-Forwarded-For set by a loopback proxy. */
+  trustProxy?: boolean;
+}
+export function buildHubServer(options: HubServeOptions): HubServerApp {
   const hub = new HubDatabase(options);
   const accounts = new HubAccounts(hub);
   const store = new SQLiteHubStore(hub);
   const library = new HubLibrary(hub);
-  const app = Fastify({ logger: false, bodyLimit: 64 * 1024, exposeHeadRoutes: false, requestTimeout: 120_000 }) as unknown as HubServerApp;
+  const app = Fastify({ logger: false, bodyLimit: 64 * 1024, exposeHeadRoutes: false, requestTimeout: 120_000,
+    // Login failure limits count per client address; only a proxy on this PC may set it.
+    trustProxy: options.trustProxy ? ["127.0.0.1", "::1"] : false,
+    ...(options.https ? { https: options.https } : {}) }) as unknown as HubServerApp;
   app.decorate("hub", hub); app.decorate("accounts", accounts); app.decorate("store", store); app.decorate("library", library);
   app.addHook("onClose", async () => hub.close());
   const authentication = new WeakMap<FastifyRequest, Authenticated>();
   const auth = (req: FastifyRequest) => authentication.get(req)!;
   const records = (req: FastifyRequest) => new SQLiteHubStore(hub, auth(req).device);
   const actor = (req: FastifyRequest) => ({ id: auth(req).id, name: auth(req).account.displayName });
+  const skills = (req: FastifyRequest) => new SQLiteHubSkillStore(hub, actor(req), auth(req).device);
   const admin = (req: FastifyRequest) => {
     if (auth(req).account.role !== "admin") throw new HubServerError("관리자만 사용할 수 있습니다.", 403);
     return auth(req);
@@ -92,6 +103,31 @@ export function buildHubServer(options: HubServerOptions): HubServerApp {
   app.get<{ Params: { id: string } }>(`${API}/entries/:id/stars`, async (req) => ({ stars: await store.stars(req.params.id) }));
   app.post<{ Params: { id: string }; Body: { on: boolean } }>(`${API}/entries/:id/star`, (req) => records(req).star(req.params.id, actor(req), req.body?.on));
 
+  app.get(`${API}/skills`, async (req) => ({ skills: await skills(req).list() }));
+  app.get<{ Params: { id: string } }>(`${API}/skills/:id`, (req) => skills(req).read(req.params.id));
+  app.put<{ Params: { id: string }; Body: StoredHubSkill }>(`${API}/skills/:id`, { bodyLimit: 4 * 1024 * 1024 }, async (req) => {
+    if (req.body?.id !== req.params.id) throw new HubServerError("스킬 식별자가 경로와 맞지 않습니다.");
+    const db = skills(req);
+    await db.write(req.body, actor(req));
+    return db.read(req.params.id);
+  });
+  app.get<{ Params: { id: string; rev: string } }>(`${API}/skills/:id/revisions/:rev/archive`, async (req, reply) =>
+    reply.type("application/gzip").send(await skills(req).archive(req.params.id, Number(req.params.rev))));
+  app.put<{ Params: { id: string; rev: string }; Body: Buffer }>(`${API}/skills/:id/revisions/:rev/archive`, { bodyLimit: HUB_FILE_LIMIT }, async (req, reply) => {
+    const expected = req.headers["x-content-sha256"];
+    hashValue(expected);
+    if (!Buffer.isBuffer(req.body) || sha256(req.body) !== expected) throw new HubServerError("파일 내용과 해시가 맞지 않습니다.");
+    await skills(req).publish(req.params.id, Number(req.params.rev), req.body, actor(req));
+    return reply.code(204).send();
+  });
+  app.post<{ Params: { id: string; rev: string }; Body: ReviewInput }>(`${API}/skills/:id/revisions/:rev/reviews`, (req) =>
+    skills(req).review(req.params.id, Number(req.params.rev), req.body, actor(req)));
+  app.get<{ Params: { id: string } }>(`${API}/skills/:id/comments`, async (req) => ({ comments: await skills(req).comments(req.params.id) }));
+  app.post<{ Params: { id: string }; Body: { body: string } }>(`${API}/skills/:id/comments`, async (req, reply) =>
+    reply.code(201).send(await skills(req).addComment(req.params.id, actor(req), req.body?.body)));
+  app.get<{ Params: { id: string } }>(`${API}/skills/:id/stars`, async (req) => ({ stars: await skills(req).stars(req.params.id) }));
+  app.post<{ Params: { id: string }; Body: { on: boolean } }>(`${API}/skills/:id/star`, (req) => skills(req).star(req.params.id, actor(req), req.body?.on));
+
   app.get<{ Querystring: { since?: string } }>(`${API}/library/changes`, async (req) => {
     const since = req.query.since ?? "0";
     if (!/^\d+$/.test(since)) throw new HubServerError("서재 동기화 판 번호를 확인해 주세요.");
@@ -112,3 +148,4 @@ export function buildHubServer(options: HubServerOptions): HubServerApp {
 export { HubAccounts } from "./accounts.ts";
 export { HubDatabase, HubServerError } from "./core.ts";
 export { SQLiteHubStore } from "./records.ts";
+export { SQLiteHubSkillStore } from "./skills.ts";

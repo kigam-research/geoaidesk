@@ -1,5 +1,5 @@
 /** Portable Workflow documents and bounded Agent Skills ZIPs. No installation or model calls. */
-import { HubSkillStore, readHubSkillRevision } from "./hub-skills/index.ts";
+import { activeHubSkillStore, readHubSkillRevision, type HubSkillRecordStore } from "./hub-skills/index.ts";
 import { methodTreeHash } from "./methods/tree-hash.ts";
 import fs from "node:fs";
 import path from "node:path";
@@ -133,7 +133,7 @@ export function projectCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | 
   return resolveFiles(workflowDocFor(workflow, { skills: skillsFor(workflow, catalogue), procedure: catalogueProcedure(catalogue, workflow.skillIds[0] ?? "") }), paths, catalogue);
 }
 /** The exact pinned hub skill revisions (gaid-hub-skills), read from the hub store; an unreadable pin is left missing. */
-async function pinnedHubFiles(doc: WorkflowDoc, store: HubSkillStore): Promise<Map<string, SkillFiles>> {
+async function pinnedHubFiles(doc: WorkflowDoc, store: HubSkillRecordStore): Promise<Map<string, SkillFiles>> {
   const out = new Map<string, SkillFiles>();
   for (const skill of doc.skills) {
     if (skill.source !== "hub" || !skill.hub) continue;
@@ -149,7 +149,7 @@ async function pinnedHubFiles(doc: WorkflowDoc, store: HubSkillStore): Promise<M
   }
   return out;
 }
-export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string, hubStore = new HubSkillStore()): Promise<CliSource> {
+export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string, hubStore: HubSkillRecordStore = activeHubSkillStore()): Promise<CliSource> {
   const record = await store.read(id);
   const snapshot = record.snapshots[record.entry.latestRevision];
   if (!snapshot?.draft.workflow) throw new CliExportError("Workflow was not found", 404);

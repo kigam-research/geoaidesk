@@ -136,6 +136,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   local library as the working copy (pull → push with base versions, newer `updatedAt` wins, replaced copies in
   `<library>/sync/conflicts/`, deletions win over edits, Zotero items deduplicated by library + item key; `zotero.json` stays
   local). `server/test/geo-hub-e2e.test.ts` runs a real HTTP hub server with two accounts and two PCs of one account.
+  The hub skill shelf follows the same choice (gaid-hub-server-trial): `HubSkillRecordStore` (`server/src/geo/hub-skills/records.ts`)
+  with the local `HubSkillStore`, `RemoteHubSkillStore` (`hub-client/remote-skills.ts`) and the server's `SQLiteHubSkillStore`
+  (`hub-server/skills.ts`, `/hub/v1/skills`, migration 2); `hub-skills/active.ts` resolves it per request, ownership by
+  `authorId`/`registeredById`, reviews by an account carry `verified: true`, the server filters restricted-licence revisions
+  per account and enforces the review rule; `import-hub` also moves `skills/`; `server/test/geo-hub-skills-e2e.test.ts`.
+  HTTPS (user decision gaid-backend#2 가, before widening beyond the test group): `serve --tls-cert/--tls-key` or a reverse proxy
+  with `--trust-proxy`; GAIDs trust an internal CA with `GAID_HUB_SERVER_CA` in `config.env` (`hubTransport` in
+  `hub-client/client.ts`); procedure `docs/geo/hub-server-https.md`.
 - Source-first authoring preview (`gaid-improve`, `/authoring-preview`, `docs/design/authoring-preview-runtime.md`): isolated frontend-only PDF/source → prepared-example method → draft/trial-preparation flow. The route skips project/auth providers; no model calls, installation, project writes or publication. A fixed sample PDF endpoint is opt-in (`GAID_AUTHORING_PREVIEW_SAMPLE=1`) and verifies the external named input `authoring_preview_paper`; local PDFs remain browser-only, URLs are metadata-only. Browser save stores preview metadata/decisions, not file contents. This is not the proposed durable authoring backend.
 - Research notes (gaid-notebook-review, `docs/geo/research-notes.md`; user decision 2026-10-18): the notebook tab opens on
   research notes (정리 노트), one Markdown note per analysis at `연구노트/<YYYY-MM-DD>-<topic>/index.md` (+ `figures/`), written result

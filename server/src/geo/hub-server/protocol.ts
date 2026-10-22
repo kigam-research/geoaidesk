@@ -17,6 +17,7 @@ import type {
   HubUpdateUserBody,
 } from "../../../../web/src/geo/contracts/hub-server.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
+import type { ReviewInput, StoredHubSkill } from "../hub-skills/records.ts";
 
 export { HUB_SERVER_SCHEMA } from "../../../../web/src/geo/contracts/hub-server.ts";
 export const HUB_API = "/hub/v1";
@@ -90,6 +91,30 @@ export interface InstallRequest {
   install: AuthoringInstall;
 }
 export type { HubComment, HubFolder, StoredEntry };
+
+// --- Hub skill shelf (HubSkillRecordStore over HTTP, server/src/geo/hub-skills/records.ts) ----------------------------
+// GET    /hub/v1/skills                              → { skills: StoredHubSkill[] }    (visible to this account, newest first)
+// GET    /hub/v1/skills/:id                          → StoredHubSkill                  (404 missing or not visible)
+// PUT    /hub/v1/skills/:id                          StoredHubSkill → StoredHubSkill (as stored; author/registrant fields from
+//                                                    the account; 403 not the author; 404 folder; 409 revision rules or
+//                                                    archive missing / hash or size mismatch)
+// GET    /hub/v1/skills/:id/revisions/:rev/archive   bytes (application/gzip)          (404 missing or not visible)
+// PUT    /hub/v1/skills/:id/revisions/:rev/archive   raw bytes, header `X-Content-SHA256` → 204 (409 different bytes;
+//                                                    403 skill owned or reserved by someone else; 413 over 20 MiB)
+// POST   /hub/v1/skills/:id/revisions/:rev/reviews   ReviewInput → HubSkillRevision    (403 registrant marking `checked`;
+//                                                    400 state/note/replacement; 404 revision not visible)
+// GET    /hub/v1/skills/:id/comments                 → { comments: HubComment[] }      (`entryId` holds the skill id)
+// POST   /hub/v1/skills/:id/comments                 { body } → HubComment             (403 latest revision not visible)
+// GET    /hub/v1/skills/:id/stars                    → { stars: Record<accountId, true> }
+// POST   /hub/v1/skills/:id/star                     { on: boolean } → { stars, starredByMe }
+//
+// `:id` is the skill name (`validName`). Review permissions go through one server check so a later reviewer role
+// (gaid-hub-skills-2) can narrow who may mark `checked`/`deprecated`/`suspended` without changing the wire format.
+
+export interface SkillsResponse {
+  skills: StoredHubSkill[];
+}
+export type { ReviewInput, StoredHubSkill };
 
 // --- Personal library sync -------------------------------------------------------------------------------------------
 // GET    /hub/v1/library/changes?since=<n>           → LibraryChangesResponse (objects changed after version n, 0 = all)

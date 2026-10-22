@@ -1,13 +1,15 @@
 # Institute GAID hub server
 
-The hub server is a separate process for accounts, shared Workflow records and per-account library sync. Researchers
+The hub server is a separate process for accounts, shared Workflow and skill records, and per-account library sync. Researchers
 continue to run their own GAID workspace. The hub has no agent, shell, project filesystem, model credentials, Zotero
 connection keys or web UI. Its only API is `/hub/v1`; any request carrying `Origin` or `Sec-Fetch-Site` is refused.
 Configure the hub address in each researcher's GAID, not in the browser address bar.
 
 The design is recorded in `docs/adr/2026-10-22-gaid-hub-server.md`. Plain HTTP on the institute LAN is the accepted
 pilot setting. Passwords, session tokens, Workflows and synchronized PDFs travel unencrypted. Before expanding beyond the pilot,
-review that choice. HTTPS can be added with a reverse proxy without converting the stored data.
+review that choice: the user decided (gaid-backend#2 가) to switch to HTTPS before widening beyond the test group. The
+hub serves HTTPS itself (`serve --tls-cert/--tls-key`) or behind a reverse proxy (`--trust-proxy`) without converting the
+stored data; the procedure is `docs/geo/hub-server-https.md`.
 
 ## Install and create the first admin
 
@@ -60,7 +62,7 @@ The home contains:
 | `server.json` | Persistent server identity and creation time |
 | `hub.sqlite` | Accounts, hashed passwords/tokens/invites, records, audit events and library versions |
 | `hub.sqlite-wal`, `hub.sqlite-shm` | Live SQLite WAL files; do not copy the database alone while running |
-| `blobs/<sha256>` | Content-checked Workflow archives, pictures and library PDFs |
+| `blobs/<sha256>` | Content-checked Workflow archives, skill revision archives, pictures and library PDFs |
 
 SQLite uses WAL, foreign keys, a busy timeout and numbered migrations. Database/file operations commit audit events with
 their mutations. Blob publication precedes its database reference. A failed import can leave an unreferenced blob; backup
@@ -86,6 +88,26 @@ Existing revisions are immutable. A registration can append one next revision; a
 revision unchanged. Every referenced package and light/dark picture must already be stored. Retrying identical file bytes
 is allowed; overwriting an entry file with different bytes is refused.
 
+## Shared skill shelf
+
+The `/hub/v1/skills` API stores named skills, immutable revision archives, origin/licence information, per-revision reviews,
+comments and stars in the same hub as Workflows. Database migration 2 upgrades existing version-1 homes automatically at
+startup; accounts, Workflows, libraries and their files stay in place. No separate service or database is needed.
+
+Only the author can append exactly the next revision. Earlier revisions and reviews are kept from the server, not from
+client-supplied history. A new revision starts unreviewed. The archive must already be stored and match its declared
+SHA-256 and size. Archive uploads are limited to 20 MiB and are write-once: identical retries succeed, different bytes
+are refused. The first upload reserves an unpublished skill name for that account.
+
+Only revisions with an `institute` or `declared` licence are shared. Restricted or unknown licences stay author-only.
+A later shareable revision does not expose earlier restricted archives or their comments. If the latest revision is
+restricted, other accounts cannot see the skill at all. Admins use the same visibility rules.
+
+Any account that can see a revision can review it; its registrant cannot mark that revision `checked`. Reviews record
+the authenticated account, display name and server time with `verified: true`. A replacement can be named only for a
+`deprecated` review and must be another existing skill. Comments bind to the latest revision. Stars belong to account
+ids, so changing a display name does not transfer ownership or create another star. These mutations are audited.
+
 ## Personal library sync
 
 Library objects and stored PDFs are scoped to the authenticated account. Admins have no API to read another account's
@@ -97,8 +119,8 @@ zero for a new object). A mismatch returns `stale`; a missing stored PDF returns
 the item. Deletions are tombstones and remain in subsequent full pulls. The client handles merging and retained conflict
 copies; the server does not choose between conflicting research content.
 
-File limits are 20 MiB for a Workflow archive/picture and 64 MiB for a library PDF. Library files must begin with `%PDF-`
-and match their SHA-256. Standard JSON requests are limited to 64 KiB, login/accept-invite to 16 KiB, and record/library
+File limits are 20 MiB for a Workflow archive/picture or skill revision archive and 64 MiB for a library PDF. Library files
+must begin with `%PDF-` and match their SHA-256. Standard JSON requests are limited to 64 KiB, login/accept-invite to 16 KiB, and record/library
 change requests to 4 MiB. A library batch contains at most 500 changes. A batch may apply some objects and return conflicts
 for others; malformed batches roll back. The library is a synchronized copy, not a replacement for the local working copy.
 
@@ -112,19 +134,20 @@ node geo/hub-server.mjs check-backup /srv/gaid-backups/2026-10-22
 ```
 
 `backup` can run while the hub serves requests. It uses `VACUUM INTO` to snapshot committed database state, then copies
-exactly the immutable blobs referenced by that snapshot, plus `server.json`. `manifest.json` records every copied file's
-SHA-256 and size, the server identity and table row counts. Nonempty destinations are refused. Protect backups like the
+exactly the immutable blobs referenced by that snapshot (Workflow files, skill archives and library PDFs), plus
+`server.json`. `manifest.json` records every copied file's SHA-256 and size, the server identity and table row counts. Nonempty destinations are refused. Protect backups like the
 live data: they include account/session hashes and private PDFs. Copy a verified backup to separate storage using the
 institute's existing backup process.
 
 `check-backup` copies the listed files into a temporary sibling directory, checks hashes, opens the restored database,
 checks SQLite integrity and foreign keys, checks row counts and verifies every referenced blob. It prints a JSON summary
 only after these checks pass and removes the temporary restore. The backup directory remains unchanged. An unsuccessful
-check exits nonzero. These checks verify the backup files, not the scientific content of the stored Workflows or PDFs.
+check exits nonzero. Version-1 backups remain checkable: row counts are compared before the temporary restore is upgraded.
+These checks verify the backup files, not the scientific content of the stored Workflows, skills or PDFs.
 
 ## Import an existing local hub
 
-Create the destination accounts first. Prepare a JSON file mapping every entry author and revision registrar's old display
+Create the destination accounts first. Prepare a JSON file mapping every Workflow/skill author and revision registrar's old display
 name to an existing account email. The mapping is explicit; names are never matched automatically:
 
 ```json
@@ -134,7 +157,7 @@ name to an existing account email. The mapping is explicit; names are never matc
 }
 ```
 
-The source is the local shared-store directory containing `folders.json` and `entries/`, usually the researcher's agent
+The source is the local shared-store directory containing `folders.json`, `entries/` and optionally `skills/`, usually the researcher's agent
 directory followed by `skill-hub/shared`. Inspect the source location in that GAID's configuration. Do not pass the entire
 GAID home. The import reads the source without initializing or writing it:
 
@@ -144,13 +167,17 @@ node geo/hub-server.mjs import-hub --from /srv/old-agent/skill-hub/shared --auth
 ```
 
 The first command is a dry-run. It validates the real record rules and rolls back database changes without publishing
-blobs. The result reports source entry/file/comment/star counts. `--apply` imports all entries in one transaction, with
-original revision times, packages, light/dark pictures, folders, comments, stars and install records. Unmapped authors
-stop the import. If intentionally assigning all remaining authors to one account, add `--unmapped-to EMAIL` explicitly.
-Unmapped comment/star names receive stable `legacy-…` identities and comments display `이전 사용자 · <old name>`.
+blobs. The result reports source entry/file/comment/star counts and `skills`, `skillsImported`, `skillsSkipped`, `skillArchives`,
+`skillComments` and `skillStars`. `--apply` imports all entries in one transaction, with
+original revision times, packages, light/dark pictures, folders, comments, stars and install records. It also imports
+`skills/<name>/skill.json`, `packages/<revision>.tar.gz`, `comments.jsonl` and `stars.json` when present. Skill revision and
+review times are preserved. Reviewers receive account ids when explicitly mapped, otherwise stable legacy ids. Imported
+reviews remain `verified: false`, even for a mapped name: the original review was recorded without account authentication.
+Unmapped authors stop the import. If intentionally assigning all remaining authors to one account, add `--unmapped-to EMAIL` explicitly.
+Unmapped reviewer/comment/star names receive stable `legacy-…` identities and comments display `이전 사용자 · <old name>`.
 
 Repeating an applied import from the same source path and unchanged bytes skips existing imports. Changed source records
-or colliding destination entry ids are refused. The server keeps source digests in its import ledger. Do not modify the
+or colliding destination Workflow/skill ids are refused. The server keeps source digests in its import ledger. Do not modify the
 source between dry-run and apply. After importing, inspect entries and authors in GAID, run a backup and check that backup.
 
 ## Move to another PC or recover
