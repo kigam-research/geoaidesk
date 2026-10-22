@@ -57,9 +57,11 @@ cli-export, methods, workflow-views, skill-hub: 91 passed, `GAID_CATALOGUE=off`)
    `~/data/geoaidesk/work/gaid-backend/hub-home`, a GAID on PC74 and one on PC70 if PC70 reaches PC74 on the LAN.
 3. Import the 5 review-instance entries into a test hub home (read-only source `~/.geoaidesk`), report §3 results,
    screenshots, `scripts/check`, `task finish`.
-Blocked: waiting for the three child units' `task finish` (each runs scripts/check); e2e test drafted in
-server/test/geo-hub-e2e.test.ts (runs after P1+P2 are integrated).
+Blocked: waiting for the three child units' `task finish` (each runs scripts/check); e2e test drafted, parked at
+~/data/geoaidesk/work/gaid-backend/geo-hub-e2e.test.ts until P1 is integrated (it imports P1 modules).
 ## Failed approaches
+- 2026-10-22: committing the e2e test before P1 was integrated broke `task complete gaid-backend--hub-client`'s check
+  (missing module); parked the test outside the repo.
 ## Notes and decisions
 - User decision 2026-10-22 on report §6 (verbatim): "2번 다, 4번 나로 하고 나머지는 권장으로 하자." → 1 가 institute GAID
   hub server, 2 다 phase 1 = accounts + shared hub + 5 existing entries + backup + personal library sync, 3 가 admin
