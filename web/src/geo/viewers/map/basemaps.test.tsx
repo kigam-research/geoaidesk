@@ -64,15 +64,19 @@ describe("basemap layer factory", () => {
 });
 
 describe("picker and catalogue", () => {
-  it("lists None first, disables unavailable entries with reasons, and keeps overlay selection independent", () => {
+  it("lists None first, disables unavailable entries with reasons, and keeps overlay selection independent", async () => {
     localStorage.setItem("gaid:locale", "en");
     const onChange = vi.fn();
     render(<BasemapPicker providers={providers.map(p => p.id === "ngii-base" ? { ...p, available: false, reason: "missing-referer" } : p.id === "ngii-white" ? { ...p, available: false, reason: "missing-key" } : p)} value={{ base: "none", overlays: [] }} onChange={onChange} disabled={false} />);
-    const select = screen.getByRole("combobox", { name: "Basemap" }) as HTMLSelectElement;
-    expect(select.options[0].value).toBe("none");
-    expect(screen.getByRole("option", { name: /standard.*registered/ })).toBeDisabled();
-    expect(screen.getByRole("option", { name: /white.*API key/ })).toBeDisabled();
-    fireEvent.change(select, { target: { value: "osm" } });
+    const select = screen.getByRole("combobox", { name: "Basemap" });
+    expect(select).toHaveTextContent("No basemap");
+    expect(screen.queryByText("Online basemap in use")).not.toBeInTheDocument();
+    fireEvent.keyDown(select, { key: "ArrowDown" });
+    await screen.findByRole("option", { name: "No basemap" });
+    expect(screen.getAllByRole("option")[0]).toHaveTextContent("No basemap");
+    expect(screen.getByRole("option", { name: /standard.*registered/ })).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("option", { name: /white.*API key/ })).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(screen.getByRole("option", { name: "OpenStreetMap" }));
     expect(onChange).toHaveBeenLastCalledWith({ base: "osm", overlays: [] });
     fireEvent.click(screen.getByRole("checkbox"));
     expect(onChange).toHaveBeenLastCalledWith({ base: "none", overlays: ["kigam-geology"] });
@@ -81,7 +85,7 @@ describe("picker and catalogue", () => {
     localStorage.setItem("gaid:locale", "en");
     render(<BasemapPicker providers={providers} value={{ base: "osm", overlays: ["kigam-geology"] }} onChange={vi.fn()} disabled />);
     expect(screen.getByRole("combobox")).toBeDisabled(); expect(screen.getByRole("checkbox")).toBeDisabled();
-    expect(screen.getByText(/require a declared source CRS/)).toBeInTheDocument();
+    expect(screen.getByText("Basemap: source CRS required")).toHaveAttribute("title", expect.stringContaining("require a declared source CRS"));
     render(<BasemapAttributions providers={providers} value={{ base: "osm", overlays: ["kigam-geology"] }} disabled />);
     expect(screen.queryByText("© OpenStreetMap contributors")).not.toBeInTheDocument();
   });

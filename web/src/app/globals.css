@@ -192,6 +192,10 @@
   --gaid-motion-base: 200ms;
   --gaid-easing: cubic-bezier(0.22, 0.25, 0, 1);
   color-scheme: light;
+  /* Concept pictures (gaid-concept-pictures): the well is the colour pictures are generated on (PICTURE_WELL in
+     server/src/geo/authoring/visuals.ts), the same in both styles; older white-background pictures sit on the white mat. */
+  --gaid-pic-well: #f2f3f6;
+  --gaid-pic-mat: #ffffff;
 }
 
 .dark {
@@ -229,6 +233,7 @@
   --chart-4: #b79cff;
   --chart-5: #ff7a6e;
   color-scheme: dark;
+  --gaid-pic-well: #1a1d23;
 }
 
 /* UI guide v2, identity 도폭 (Map sheet), the alternate style a researcher may choose in Settings → 화면 표시:
@@ -393,3 +398,12 @@ a { text-underline-offset: 3px; }
 :root[data-style="mapsheet"] .gaid-step-ticks,
 :root[data-style="mapsheet"] .gaid-step-track::before,
 :root[data-style="mapsheet"] .gaid-step-track::after { display: none; }
+
+/* GAID map workspace — MAP1–MAP6. Data canvases are never themed or filtered. */
+.gaid-map-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; overflow: hidden; }
+.gaid-map-workspace .ol-scale-line { background: var(--gaid-face); color: var(--gaid-ink); bottom: 8px; left: 8px; border-radius: 0; }
+.gaid-map-workspace .ol-scale-line-inner { color: var(--gaid-ink); border-color: var(--gaid-ink); font-family: inherit; font-size: 12px; font-variant-numeric: tabular-nums; }
+@media (max-width: 1023px) {
+  .gaid-map-body { grid-template-columns: minmax(0, 1fr); overflow: auto; }
+  .gaid-map-body > div { min-height: 560px; }
+}

@@ -20,13 +20,22 @@ export function answeredCount(note: ResearchNoteSummary, answers: DecisionAnswer
   return note.decisions.filter((decision) => isAnswered(answers[decision.number])).length;
 }
 
-/** The chat message for all sendable answers, or null when none is sendable. Unanswered decisions stay open. */
-export function answersMessage(note: ResearchNoteSummary, answers: DecisionAnswers): string | null {
+/** The same answer (instruction text compared trimmed). */
+export function sameAnswer(a: DecisionAnswer | undefined, b: DecisionAnswer | undefined): boolean {
+  if (!a || !b || a.kind !== b.kind) return false;
+  return a.kind === "option" ? a.label === (b as typeof a).label : a.text.trim() === (b as typeof a).text.trim();
+}
+
+/**
+ * The chat message for all sendable answers, or null when none is sendable. Unanswered decisions stay open;
+ * decisions in `settled` (answered in an earlier message) are neither sent again nor named as open.
+ */
+export function answersMessage(note: ResearchNoteSummary, answers: DecisionAnswers, settled: ReadonlySet<number> = new Set()): string | null {
   const lines: string[] = [];
   const open: number[] = [];
   for (const decision of note.decisions) {
     const answer = answers[decision.number];
-    if (!isAnswered(answer)) { open.push(decision.number); continue; }
+    if (!isAnswered(answer)) { if (!settled.has(decision.number)) open.push(decision.number); continue; }
     if (answer.kind === "instruction") {
       lines.push(t("notes.decision.prompt.instruction", { number: decision.number, instruction: answer.text.trim().replace(/\s*\n\s*/g, " ") }));
       continue;
@@ -44,4 +53,34 @@ export function answersMessage(note: ResearchNoteSummary, answers: DecisionAnswe
     lines.map((line) => `- ${line}`).join("\n"),
     closing.filter(Boolean).join(" "),
   ].join("\n\n");
+}
+
+/**
+ * An answer that left the note (UI guide v2 RN3): `sent` when the chat sent it, `filled` when the chat only put it in its
+ * chat box. Kept per browser and note; the question text ties it to the decision, so a revised note drops stale marks.
+ */
+export interface DeliveredAnswer { question: string; answer: DecisionAnswer; via: "sent" | "filled"; at: string }
+export type DeliveredAnswers = Record<number, DeliveredAnswer>;
+
+const deliveredKey = (projectId: string, noteId: string) => `gaid:note-answers:${projectId}:${noteId}`;
+
+/** Delivered answers still matching the note's current decisions. */
+export function loadDelivered(projectId: string, note: ResearchNoteSummary): DeliveredAnswers {
+  let stored: DeliveredAnswers = {};
+  try {
+    const raw = window.localStorage.getItem(deliveredKey(projectId, note.id));
+    if (raw) stored = JSON.parse(raw) as DeliveredAnswers;
+  } catch { return {}; }
+  const result: DeliveredAnswers = {};
+  for (const decision of note.decisions) {
+    const item = stored[decision.number];
+    if (!item || item.question !== decision.question || !isAnswered(item.answer)) continue;
+    if (item.answer.kind === "option" && !decision.options.some((option) => option.label === (item.answer as { label: string }).label)) continue;
+    result[decision.number] = item;
+  }
+  return result;
+}
+
+export function saveDelivered(projectId: string, noteId: string, delivered: DeliveredAnswers): void {
+  try { window.localStorage.setItem(deliveredKey(projectId, noteId), JSON.stringify(delivered)); } catch { /* storage full or blocked: the mark lasts this view only */ }
 }

@@ -87,8 +87,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - GAID hub (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
   Backend `server/src/geo/authoring/` (`/geo/authoring/*`, user-level store under `<agentDir>/skill-hub/authoring/`; model
   calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
-  (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, entry on the project list and a
-  Projects/GAID hub header switch): one question at a time with a recommended option and "기타", all answers applied
+  (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, `#hub/e/<entry>`, `#hub/c/<catalogue Workflow>`,
+  `#hub/<authoring id>`; entry on the project list and a Projects/GAID hub header switch; gaid-hub-layout: every hub screen
+  keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,
+  default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
   together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): one institute GAID used by many researchers (display name in
@@ -101,7 +103,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   registers as a separate entry with `basedOn`; drafts carry `hubEntry`. Registration keeps pictures whose cover, step or
   output still exists. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
   (`answersFeedback`). Concept pictures can be redone one at a time or revised by a researcher instruction (≤ 500 chars,
-  previous picture as input to `codex/images/edits`); older picture files stay. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
+  previous picture as input to `codex/images/edits`); older picture files stay. Each picture is two files
+  (gaid-concept-pictures, user decision 2026-10-22): the light one generated on the picture-well colour (`PICTURE_WELL` in
+  `server/src/geo/authoring/visuals.ts` = token `--gaid-pic-well`) and a dark-mode one edited from it (`ConceptVisual.dark`,
+  `StoredVisual.dark`; two image calls per picture); picture routes take `?theme=dark`, `ConceptPicture` picks the file for
+  the theme and never filters pixels. Older white pictures (no `dark`) sit on `--gaid-pic-mat`; "화면 테마에 맞추기"
+  (`GenerateVisualsBody.adapt`) edits them into both files without changing what they show. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
   `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and

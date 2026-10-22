@@ -42,6 +42,7 @@ const PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=",
   "base64",
 );
+const DARK = Buffer.from("dark-mode picture");
 async function drafted(slug = draftReply.slug) {
   const f = await fixture();
   await runOperation(f.store, f.projectId, "analyze", "hub-analyze", deps(analysis));
@@ -122,10 +123,11 @@ describe("shared GAID hub", () => {
   it("registers once per project, freezes draft/visual/package snapshots and keeps old revisions downloadable", async () => {
     const f = await setup();
     await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
+    await f.store.writeFile(f.projectId, "visuals/cover-dark.png", DARK);
     await f.store.mutate(f.projectId, (p) => {
       p.visuals = {
         prepare: { file: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 1 },
-        cover: { file: "visuals/prepare.png", caption: "대표 그림", model: "test", draftRevision: 1 },
+        cover: { file: "visuals/prepare.png", dark: "visuals/cover-dark.png", caption: "대표 그림", model: "test", draftRevision: 1 },
         "output:scores": { file: "visuals/prepare.png", caption: "점수 결과", model: "test", draftRevision: 1 },
       };
     });
@@ -144,10 +146,14 @@ describe("shared GAID hub", () => {
       tags: ["modeling"],
     });
     expect(entry.cover).toContain("revision=1");
+    expect(entry.coverThemed).toBe(true);
+    expect((await f.app.inject(`${entry.cover!}&theme=dark`)).rawPayload).toEqual(DARK);
     const detail = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
     expect(detail.profile.title).toEqual({ ko: draftReply.title });
     expect(detail.workflowTitle).toEqual({ ko: draftReply.workflow.title });
     expect(detail.visuals.prepare.caption).toBe("입력 개념");
+    expect(detail.visuals.prepare.themed).toBeUndefined();
+    expect((await f.app.inject(`${detail.visuals.prepare.src}&theme=dark`)).rawPayload).toEqual(PNG);
     expect(Object.keys(detail.visuals)).toEqual(["prepare"]);
     expect(detail.outputImages.scores.caption).toBe("점수 결과");
     expect((await f.app.inject(detail.outputImages.scores.src)).rawPayload).toEqual(PNG);
@@ -574,7 +580,7 @@ describe("editing a registered method (gaid-hub-editing)", () => {
       contentBase64: (await readFile(join(codeDir, "code.tar.gz"))).toString("base64"),
     });
     await f.store.mutate(f.projectId, (p) => {
-      p.visuals = { prepare: { file: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 2 } };
+      p.visuals = { prepare: { file: "visuals/prepare.png", dark: "visuals/prepare.png", caption: "입력 개념", model: "test", draftRevision: 2 } };
       p.drafts.push(editDraft(p, { baseRevision: 1, title: "코드 포함 판" }));
       p.drafts.at(-1)!.codeFiles.push({ path: "scripts/run.py", sourceId: code.source.id, sourcePath: "run.py" });
     });
@@ -594,6 +600,7 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(seeded.drafts).toHaveLength(1);
     expect(seeded.drafts[0]).toMatchObject({ revision: 1, origin: "researcher", slug: draftReply.slug });
     expect(await f.store.readFile(authoringProjectId, seeded.visuals!.prepare.file)).toEqual(PNG);
+    expect(await f.store.readFile(authoringProjectId, seeded.visuals!.prepare.dark!)).toEqual(PNG);
     // The registered package is the code source; the seeded draft's code files resolve inside it.
     const check = (await f.app.inject(`/geo/authoring/projects/${authoringProjectId}/drafts/1/check`)).json();
     expect(check.findings.filter((x: { code: string }) => x.code === "draft-files")).toEqual([]);

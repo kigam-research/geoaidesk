@@ -360,7 +360,7 @@
       "path": "web/src/app/globals.css",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-concept-pictures: concept-picture frame tokens --gaid-pic-well (light/dark, equal to PICTURE_WELL) and --gaid-pic-mat"
     },
     {
       "path": "web/src/components/settings/primitives.tsx",
@@ -943,6 +943,12 @@
       "owner": "gaid-research-visuals",
       "status": "edited",
       "responsibility": "Parent-authorized registration of the gaid-research-visuals seam owner in the existing distribution-check allow-list."
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/components/sandbox-panel.tsx, web/src/components/project-view.tsx",
+      "owner": "gaid-ui-v2-debts",
+      "status": "edited",
+      "responsibility": "UI guide v2 L1/L2/N2/N6: chat pane as an overlay sheet at 1024–1279 px, pane borders as keyboard-resizable separators within the guide's width ranges, ⌘\\ / Ctrl \\ file list toggle, ⌘K / Ctrl K search (file-name filter in the file tree, project and hub search fields marked as targets)"
     }
   ],
   "notTouched": [

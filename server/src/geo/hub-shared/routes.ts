@@ -222,14 +222,23 @@ export async function registerSharedHubRoutes(
               !visual.file.startsWith("visuals/")
             )
               continue;
-            const mediaType = imageTypes[extname(visual.file).toLowerCase()];
-            if (!mediaType) continue;
-            const bytes = await authoring.readFile(project.id, visual.file);
-            const sha = createHash("sha256").update(bytes).digest("hex");
-            const file = `visuals/${revision}/${sha}${extname(visual.file).toLowerCase()}`;
-            await store.immutableBytes(id, file, bytes);
+            const copy = async (source: string) => {
+              const mediaType = imageTypes[extname(source).toLowerCase()];
+              if (!mediaType) return null;
+              const bytes = await authoring.readFile(project.id, source);
+              const sha = createHash("sha256").update(bytes).digest("hex");
+              const file = `visuals/${revision}/${sha}${extname(source).toLowerCase()}`;
+              await store.immutableBytes(id, file, bytes);
+              return { file, mediaType };
+            };
+            const light = await copy(visual.file);
+            if (!light) continue;
+            const dark =
+              visual.dark && safeRelative(visual.dark) && visual.dark.startsWith("visuals/")
+                ? await copy(visual.dark)
+                : null;
             Object.defineProperty(visuals, key, {
-              value: { file, caption: visual.caption, mediaType },
+              value: { ...light, caption: visual.caption, ...(dark ? { dark } : {}) },
               enumerable: true,
             });
           }
@@ -266,6 +275,9 @@ export async function registerSharedHubRoutes(
                 : {}),
             folderId,
             cover: Object.keys(visuals).length ? `/geo/hub/entries/${id}/cover?revision=${revision}` : null,
+            ...(Object.keys(visuals).length && (visuals.cover ?? Object.values(visuals)[0]).dark
+              ? { coverThemed: true }
+              : {}),
             latestRevision: revision,
             revisions: [
               ...(previous?.entry.revisions ?? []),
@@ -305,6 +317,7 @@ export async function registerSharedHubRoutes(
           {
             src: `/geo/hub/entries/${record.entry.id}/visuals/${encodeURIComponent(key)}?revision=${record.entry.latestRevision}`,
             caption: v.caption,
+            ...(v.dark ? { themed: true } : {}),
           },
         ]),
       );
@@ -346,7 +359,7 @@ export async function registerSharedHubRoutes(
           .code(201)
           .send(await store.addComment(req.params.id, userRequired(req), text(req.body?.body, "댓글", 4000))),
     );
-    const sendImage = async (id: string, revision: string | undefined, key?: string) => {
+    const sendImage = async (id: string, revision: string | undefined, key?: string, theme?: string) => {
       const snapshot = snapshotOf(await store.read(id), revision);
       const visual =
         key === undefined
@@ -355,19 +368,20 @@ export async function registerSharedHubRoutes(
             ? snapshot.visuals[key]
             : null;
       if (!visual) throw new AuthoringError("등록한 그림을 찾을 수 없습니다.", 404);
-      return { bytes: await store.bytes(id, visual.file), mediaType: visual.mediaType };
+      const shown = theme === "dark" && visual.dark ? visual.dark : visual;
+      return { bytes: await store.bytes(id, shown.file), mediaType: shown.mediaType };
     };
-    scope.get<{ Params: { id: string }; Querystring: { revision?: string } }>(
+    scope.get<{ Params: { id: string }; Querystring: { revision?: string; theme?: string } }>(
       "/geo/hub/entries/:id/cover",
       async (req, reply) => {
-        const image = await sendImage(req.params.id, req.query.revision);
+        const image = await sendImage(req.params.id, req.query.revision, undefined, req.query.theme);
         return reply.type(image.mediaType).send(image.bytes);
       },
     );
-    scope.get<{ Params: { id: string; key: string }; Querystring: { revision?: string } }>(
+    scope.get<{ Params: { id: string; key: string }; Querystring: { revision?: string; theme?: string } }>(
       "/geo/hub/entries/:id/visuals/:key",
       async (req, reply) => {
-        const image = await sendImage(req.params.id, req.query.revision, req.params.key);
+        const image = await sendImage(req.params.id, req.query.revision, req.params.key, req.query.theme);
         return reply.type(image.mediaType).send(image.bytes);
       },
     );
@@ -452,6 +466,7 @@ export async function registerSharedHubRoutes(
           title: e.title,
           line: e.summary,
           image: e.cover,
+          ...(e.coverThemed ? { imageThemed: true } : {}),
           stars: e.stars,
           author: e.author,
           ref: e.id,

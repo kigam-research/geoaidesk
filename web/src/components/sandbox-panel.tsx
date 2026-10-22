@@ -42,7 +42,11 @@ import {
   Trash2Icon,
   WandSparklesIcon,
   PencilIcon,
+  SearchIcon,
 } from "lucide-react";
+// GAID: name filter for the file tree, focused by ⌘K / Ctrl K (UI guide v2 N5, N6).
+import { filterTree } from "@/geo/workspace/file-filter";
+import { SEARCH_TARGET, shortcutLabel } from "@/geo/shell/shortcuts";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const appText = geoText("app");
@@ -452,6 +456,7 @@ export const FileTreePanel = memo(function FileTreePanel({
   const [renamingPath, setRenamingPath] = useState<string | null>(null);
   const [creatingDirIn, setCreatingDirIn] = useState<string | null>(null);
   const [dropTargetPath, setDropTargetPath] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
 
   const hasOsFiles = useCallback((e: React.DragEvent) => {
     return e.dataTransfer.types.includes(appText("files.files")) && !e.dataTransfer.types.includes(FILE_DRAG_TYPE);
@@ -561,14 +566,19 @@ export const FileTreePanel = memo(function FileTreePanel({
   const handleCancelRename = useCallback(() => setRenamingPath(null), []);
   const handleCancelCreateDir = useCallback(() => setCreatingDirIn(null), []);
 
+  const filtered = useMemo(() => filterTree(tree?.children ?? [], filter), [filter, tree]);
+  const rowExpandedPaths = useMemo(
+    () => (filtered.expanded.size ? new Set([...visibleExpandedPaths, ...filtered.expanded]) : visibleExpandedPaths),
+    [filtered.expanded, visibleExpandedPaths],
+  );
   const visibleRows = useMemo(
     () =>
       flattenVisibleTree(
-        tree?.children ?? [],
-        visibleExpandedPaths,
+        filtered.nodes,
+        rowExpandedPaths,
         creatingDirIn,
       ),
-    [creatingDirIn, tree, visibleExpandedPaths],
+    [creatingDirIn, filtered.nodes, rowExpandedPaths],
   );
   const treeViewportRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
@@ -712,6 +722,27 @@ export const FileTreePanel = memo(function FileTreePanel({
         </div>
       </div>
 
+      {totalFiles > 0 && (
+        <div className="relative border-b border-gaid-frame px-2 py-1.5">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 size-3.5 -translate-y-1/2 text-gaid-ink-3" aria-hidden />
+          <input
+            type="search"
+            {...{ [SEARCH_TARGET]: "" }}
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && filter) { event.preventDefault(); event.stopPropagation(); setFilter(""); }
+            }}
+            aria-label={appText("files.filter.label")}
+            placeholder={appText("files.filter.placeholder", { shortcut: shortcutLabel("search") })}
+            className="h-7 w-full min-w-0 rounded-md border border-gaid-control-edge bg-gaid-face pl-7 pr-2 text-sm text-gaid-ink placeholder:text-gaid-ink-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          {filter.trim() && (
+            <p className="sr-only" aria-live="polite">{appText("files.filter.count", { count: filtered.matches })}</p>
+          )}
+        </div>
+      )}
+
       {/* Tree: flatten expanded branches, then mount only the viewport rows. */}
       <div
         ref={treeViewportRef}
@@ -720,7 +751,14 @@ export const FileTreePanel = memo(function FileTreePanel({
         aria-label={appText("files.sandbox_files")}
         onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
       >
-        {!tree || ((tree.children ?? []).length === 0 && creatingDirIn === null) ? (
+        {tree && filter.trim() && filtered.nodes.length === 0 ? (
+          <div className="flex flex-col items-start gap-2 p-3">
+            <p className="text-sm text-gaid-ink-2">{appText("files.filter.empty")}</p>
+            <button type="button" onClick={() => setFilter("")} className="rounded-md text-sm font-medium text-gaid-signal-ink underline-offset-[3px] hover:underline">
+              {appText("files.filter.clear")}
+            </button>
+          </div>
+        ) : !tree || ((tree.children ?? []).length === 0 && creatingDirIn === null) ? (
           <div className="flex flex-col items-center justify-center gap-3 p-8 text-center">
             <div className="flex size-10 items-center justify-center rounded-xl bg-muted/60">
               <FolderOpenIcon className="size-5 text-muted-foreground/50" />
@@ -756,7 +794,7 @@ export const FileTreePanel = memo(function FileTreePanel({
                 onCreateDir={handleCreateDir}
                 onCancelCreateDir={handleCancelCreateDir}
                 onStartCreateDir={handleStartCreateDir}
-                expandedPaths={visibleExpandedPaths}
+                expandedPaths={rowExpandedPaths}
                 onToggleDirectory={handleToggleDirectory}
               />
             ))}

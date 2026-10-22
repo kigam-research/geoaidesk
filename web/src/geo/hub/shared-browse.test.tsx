@@ -4,6 +4,19 @@ import type { HubEntry } from "@/geo/contracts/hub-shared";
 import { SharedBrowse } from "./shared-browse";
 import { sharedHub } from "./shared-api";
 import { HubHome } from "./hub-home";
+import { HubSidebar, useHubSidebarCollapsed, type HubView } from "./hub-sidebar";
+import { useState } from "react";
+
+/** The hub as GaidHub draws it: the sidebar beside the home lists, one view state. */
+function Hub() {
+  const [view, setView] = useState<HubView>({ kind: "home" });
+  return (
+    <>
+      <HubSidebar view={view} onView={setView} folders={[{ id: "geo", name: "지질", count: 1 }]} registryTotal={1} mineCount={0} />
+      <HubHome view={view} onView={setView} recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} registryFolders={[{ id: "geo", name: "지질", count: 1 }]} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />
+    </>
+  );
+}
 
 vi.mock("./shared-api", () => ({ sharedHub: { folders: vi.fn(), entries: vi.fn() } }));
 const folder = { id: "geo", name: "지질", entries: 1, createdBy: "김 연구원", createdAt: "2026-10-18" };
@@ -65,7 +78,7 @@ describe("Shared hub browse", () => {
   });
 
   it("opens on 추천 Workflow with the registry list and keeps the search when switching to personal drafts and back", async () => {
-    render(<HubHome recommended={[]} folders={[]} folderId="all" onFolder={vi.fn()} registryFolders={[{ id: "geo", name: "지질", count: 1 }]} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} onOpenEntry={vi.fn()} />);
+    render(<Hub />);
     expect(screen.getByRole("button", { name: "추천 Workflow" }).getAttribute("aria-current")).toBe("page");
     await loaded();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "지도" } });
@@ -76,5 +89,47 @@ describe("Shared hub browse", () => {
     await loaded();
     fireEvent.click(screen.getByRole("button", { name: /^지질\s*1$/ }));
     await waitFor(() => expect(sharedHub.entries).toHaveBeenLastCalledWith("geo", "지도"));
+  });
+
+  it("marks the list a detail screen came from and keeps the places in the hidden (rail) sidebar", () => {
+    const onView = vi.fn();
+    const { rerender } = render(
+      <HubSidebar view={{ kind: "mine" }} onView={onView} folders={[{ id: "geo", name: "지질", count: 1 }]} registryTotal={1} mineCount={2} />,
+    );
+    expect(screen.getByRole("button", { name: /초안과 등록한 것/ }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "추천 Workflow" }).getAttribute("aria-current")).toBeNull();
+    rerender(
+      <HubSidebar collapsed view={{ kind: "registry", folder: "geo" }} onView={onView} folders={[{ id: "geo", name: "지질", count: 1 }]} registryTotal={1} mineCount={2} />,
+    );
+    expect(screen.getByRole("button", { name: "허브에 등록된 Workflow" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(screen.getByRole("button", { name: "추천 Workflow" }));
+    expect(onView).toHaveBeenCalledWith({ kind: "home" });
+  });
+});
+
+describe("Hub sidebar visibility", () => {
+  function Probe() {
+    const [collapsed, toggle] = useHubSidebarCollapsed();
+    return <button type="button" onClick={toggle}>{collapsed ? "rail" : "open"}</button>;
+  }
+  const media = (matches: boolean) =>
+    vi.stubGlobal("matchMedia", (q: string) => ({ matches, media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  afterEach(() => { vi.unstubAllGlobals(); localStorage.removeItem("gaid:hub-sidebar"); });
+
+  it("starts as the rail below 1280 px until the researcher chooses, then keeps the choice", () => {
+    media(true);
+    const { unmount } = render(<Probe />);
+    fireEvent.click(screen.getByRole("button", { name: "rail" }));
+    expect(screen.getByRole("button", { name: "open" })).toBeTruthy();
+    expect(localStorage.getItem("gaid:hub-sidebar")).toBe("open");
+    unmount();
+    render(<Probe />);
+    expect(screen.getByRole("button", { name: "open" })).toBeTruthy();
+  });
+
+  it("starts expanded in a regular window", () => {
+    media(false);
+    render(<Probe />);
+    expect(screen.getByRole("button", { name: "open" })).toBeTruthy();
   });
 });

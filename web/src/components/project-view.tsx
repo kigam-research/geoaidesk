@@ -284,6 +284,7 @@ export function ProjectView({
               <SearchIcon />
             </InputGroupAddon>
             <InputGroupInput
+              data-gaid-search=""
               aria-label={appText("projects.search_projects")}
               placeholder={appText("projects.search_projects_2")}
               value={search}

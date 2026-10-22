@@ -9,6 +9,7 @@ import { geoLocale, geoText } from "@/geo/i18n";
 import { withApiToken } from "@/lib/api-auth";
 import { API_BASE } from "@/lib/projects";
 import { cn } from "@/lib/utils";
+import { ConceptPicture } from "./concept-picture";
 import { sharedHub } from "./shared-api";
 import { TechnicalDetail } from "./technical";
 
@@ -140,14 +141,19 @@ export function SharedBrowse({
                     aria-label={text("home.browse.open", { title: entry.title })}
                     className={cn(ROW, "min-h-16 w-full px-3 py-2.5 text-left transition-colors hover:bg-gaid-hover/60", focus)}
                   >
-                    <span className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-gaid-edge bg-gaid-face-2 text-gaid-ink-2">
-                      {cover ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={cover} alt="" className="size-full object-cover" />
-                      ) : (
+                    {cover ? (
+                      <ConceptPicture
+                        src={cover}
+                        themed={entry.coverThemed}
+                        fit="cover"
+                        className="size-11 rounded-md border-gaid-edge"
+                        imageClassName="h-full"
+                      />
+                    ) : (
+                      <span className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-gaid-edge bg-gaid-face-2 text-gaid-ink-2">
                         <Grid3x3Icon className="size-5" aria-hidden />
-                      )}
-                    </span>
+                      </span>
+                    )}
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold" title={entry.title}>{entry.title}</span>
                       <span className="truncate text-sm text-gaid-ink-2" title={entry.tagline || entry.summary}>{entry.tagline || entry.summary}</span>
@@ -179,6 +185,7 @@ export function SharedBrowse({
           <Input
             type="search"
             className="pl-9"
+            data-gaid-search=""
             aria-label={text("home.browse.search.label")}
             placeholder={text("home.browse.search.placeholder")}
             value={query}

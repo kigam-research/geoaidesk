@@ -4,6 +4,10 @@
     "hub": "GAID 허브",
     "label": "GAID 화면"
   },
+  "sidebar": {
+    "hide": "허브 목록 숨기기",
+    "show": "허브 목록 표시"
+  },
   "entry": {
     "title": "GAID 허브",
     "body": "연구자들이 등록한 Workflow를 내 자료로 쓰거나, 내 논문·코드로 새 Workflow를 만듭니다.",
@@ -424,7 +428,7 @@
     "explanation": "Workflow를 설명하는 그림입니다. 분석 자료나 결과가 아니며, 초안과 hub 등록 화면에 표시됩니다.",
     "how": "생성 방식 보기",
     "source": {
-      "record": "만들기를 누를 때만 OpenAI Codex (legacy) 로그인의 gpt-image-2로 생성합니다. 해당 구독의 그림 생성 한도를 사용하며, 다른 소스는 쓰지 않습니다. Sign in with ChatGPT 로그인은 그림 생성을 지원하지 않습니다."
+      "record": "요청할 때만 OpenAI Codex (legacy) 로그인의 gpt-image-2로 만듭니다. 그림마다 밝은 화면용과 어두운 화면용 2장이라 구독 한도를 2회씩 쓰며, 다른 소스는 없습니다. Sign in with ChatGPT는 지원하지 않습니다."
     },
     "connect": {
       "action": "제공사 설정 열기"
@@ -434,6 +438,8 @@
     "actions": "{name} 개념 그림 동작",
     "redo": "다시 만들기",
     "revise": "고쳐 만들기",
+    "adapt": "화면 테마에 맞추기",
+    "adaptHint": "흰 바탕으로 만든 예전 그림입니다. 내용은 그대로 두고 밝은 화면용과 어두운 화면용으로 고쳐 만들며, 그림 생성 한도를 2회 사용합니다.",
     "makeOne": "그림 만들기",
     "instruction": "그림 수정 요청",
     "placeholder": "예: 블록을 더 크게, 색은 단색으로",

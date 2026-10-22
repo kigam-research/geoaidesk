@@ -36,9 +36,6 @@
   "detail": {
     "button": "View Workflow details"
   },
-  "back": {
-    "button": "View hub list"
-  },
   "import": {
     "button": "Import from GitHub or elsewhere"
   },

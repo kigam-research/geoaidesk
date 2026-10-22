@@ -28,6 +28,7 @@ import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { hubApi } from "./api";
 import { InstallPreview } from "@/geo/skill-hub/install-preview";
 import { MethodFlow, PictureControls, type StepVisual } from "./method-flow";
+import { ConceptPicture } from "./concept-picture";
 import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
 
@@ -49,6 +50,7 @@ export function DraftStep({
   outputImages,
   visualAction,
   cover,
+  coverThemed,
 }: {
   /** Concept pictures through the OpenAI Codex subscription only (no fallback); explicit action only. */
   visualAction?: {
@@ -60,7 +62,7 @@ export function DraftStep({
     errorDetail: string | null;
     /** The last batch stopped at the subscription's usage limit. */
     usageLimit: boolean;
-    onMake: (keys?: string[], instruction?: string) => void;
+    onMake: (keys?: string[], instruction?: string, adapt?: boolean) => void;
     /** The OpenAI Codex login is connected (null while unknown). */
     connected: boolean | null;
   };
@@ -70,6 +72,8 @@ export function DraftStep({
   registered?: number | null;
   visuals?: Record<string, StepVisual>;
   cover?: string | null;
+  /** The cover has a dark-mode picture (see `ConceptPicture`). */
+  coverThemed?: boolean;
   outputImages?: Record<string, StepVisual>;
   draft: MethodDraft;
   authoringId?: string;
@@ -175,11 +179,10 @@ export function DraftStep({
               <summary className="cursor-pointer text-primary">{text("visuals.cover")}</summary>
               <div className="mt-2 flex flex-col gap-2">
                 {cover && <figure className="flex flex-col gap-1.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cover} alt="" className="max-h-40 w-full rounded-lg border object-contain" />
+                  <ConceptPicture src={cover} themed={coverThemed} imageClassName="max-h-40" />
                   <figcaption className="text-xs text-muted-foreground">{text("visuals.note")}</figcaption>
                 </figure>}
-                <PictureControls pictureKey="cover" label={text("visuals.cover")} hasPicture={Boolean(cover)} action={pictureAction} />
+                <PictureControls pictureKey="cover" label={text("visuals.cover")} hasPicture={Boolean(cover)} themed={Boolean(coverThemed)} action={pictureAction} />
               </div>
             </details>
           </section>}

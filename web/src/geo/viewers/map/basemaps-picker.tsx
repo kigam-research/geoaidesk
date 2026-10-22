@@ -1,4 +1,6 @@
 "use client";
+import { MapSelect } from "./controls";
+import { mapText } from "./strings";
 import { geoText } from "../../i18n";
 import { basemapAttribution, OFFLINE_BASEMAP_PROVIDERS, type BaseId, type BasemapProvider, type BasemapSelection, type OverlayId } from "./basemaps";
 
@@ -17,21 +19,21 @@ export function BasemapPicker({ providers, value, onChange, disabled }: Props) {
   const bases = [OFFLINE_BASEMAP_PROVIDERS[0], ...providers.filter(p => p.kind === "base" && p.id !== "none")];
   const overlays = providers.filter(p => p.kind === "overlay");
   const reason = (p: BasemapProvider) => !p.available ? t(p.reason === "missing-referer" ? "missingReferer" : "missingKey") : "";
-  return <section aria-label={t("title")} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+  return <section aria-label={t("title")} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
     <label className="flex items-center gap-2">{t("base")}
-      <select className="rounded border bg-background p-1" value={value.base} disabled={disabled}
-        onChange={e => onChange({ ...value, base: e.target.value as BaseId })}>
+      <MapSelect aria-label={t("base")} value={value.base} disabled={disabled}
+        onChange={base => onChange({ ...value, base: base as BaseId })}>
         {bases.map(p => <option key={p.id} value={p.id} disabled={!p.available}>
           {t(`provider.${p.id}`)}{p.available ? "" : ` (${reason(p)})`}
         </option>)}
-      </select>
+      </MapSelect>
     </label>
     {overlays.map(p => <label key={p.id} className="flex items-center gap-2" title={reason(p) || undefined}><input type="checkbox" disabled={disabled || !p.available}
         checked={value.overlays.includes(p.id as OverlayId)} onChange={e => onChange({ ...value,
           overlays: e.target.checked ? [...new Set([...value.overlays, p.id as OverlayId])] : value.overlays.filter(id => id !== p.id) })} />
         {t(`provider.${p.id}`)}{p.available ? "" : ` (${reason(p)})`}
       </label>)}
-    <p className="basis-full text-xs text-muted-foreground">{disabled ? t("crsRequired") : t("onlineNotice")}</p>
+    {disabled ? <span className="text-xs text-gaid-ink-2" title={t("crsRequired")}>{mapText("basemapCrsLimit")}</span> : activeProviders({ providers, value, disabled }).length > 0 ? <span className="text-xs text-gaid-ink-2" title={t("onlineNotice")}>{mapText("onlineBasemap")}</span> : null}
   </section>;
 }
 /** Credits of the shown basemaps, drawn in the map's corner so they stay visible with the map. */
