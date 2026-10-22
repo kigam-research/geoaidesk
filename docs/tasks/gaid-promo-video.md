@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T15:17:52Z
+updated: 2026-10-22T15:18:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"40606807-71e7-4fa7-a7d3-48f1bbb9cf2c","pid":2972364,"provider":"claude","session":"120e18a1-d9c3-4ad3-b0e8-3ef66952f5e1","start":"56860506","token":"8cb86e941951c14177e4b5acb771aa3d0cbd945ff54669e5475e00c2472b7c76"}
 branch: task/gaid-promo-video
 target: main
@@ -91,6 +91,10 @@ platform. Plus a report for review and the repo checks that apply.
 - Orchestration: sequential = contract → capture + motion in parallel → integration → final render job.
   Packages: capture child owns `geo/promo/capture*.py`, `geo/promo/CAPTURE.md`, `capture-v1/`; parent owns the rest.
   Integration order: child finish → `task complete` → render.
+
+- User to the capture writer (verbatim, 2026-10-23): "맵뷰어는 lithoname으로 분류색이 입혀지는것을 사용하고 배경맵에 kigam
+  1:5만지질도와 위성영상이 사용가능함을 보여야한다" → M1 shows LITHONAME class colours and switches basemaps to the KIGAM
+  1:50K geology and satellite imagery; M1 caption updated.
 
 ### Storyboard v2 (90 s; v1 replaced after the user's 2026-10-23 requests on legibility, 서재, latest features, shp viewer)
 User (verbatim, 2026-10-23): "그리고 서재기능도 강조되어야한다. 최신기능들이 반영되어있어야한다." · "Gaid시스템에서 shp형식의
