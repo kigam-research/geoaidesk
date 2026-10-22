@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:02:30Z
+updated: 2026-10-22T09:10:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ea29dd8e-e163-4285-9af2-1aac21c96dfa","pid":1968478,"provider":"codex","session":"01a162d8-d0bb-7e81-b02f-224c6e0dcbbf","start":"54767775","token":"4d7a2652360ec828d71dd5cc78a2e5098093c044936d8b4a229d502998c372fe"}
 branch: task/gaid-hub-server-trial--skills-server
 target: task/gaid-hub-server-trial
@@ -74,21 +74,24 @@ message the parent (task CLI / your task document) instead of changing it.
 - Agent-facing text in English; user-visible server error strings stay Korean like the existing ones.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Implemented migration 2 and all `/hub/v1/skills` routes with account-scoped SQLiteHubSkillStore. Author-only next revisions, stored history/reviews, empty new reviews, readable matching archives, first-uploader reservation, licence visibility, authenticated review rules, latest-revision comments, account stars and mutation audits are enforced.
+- Extended CLI import for optional local skills, explicit author/registrant maps, mapped or stable legacy social identities, preserved historical times and unverified reviews, source digests and dry-run rollback. ImportResult adds skills, skillsImported, skillsSkipped, skillArchives, skillComments, skillStars.
+- Backup includes skill archives (including reserved unpublished uploads). Version-1 backups remain checkable by comparing snapshot row counts before temporary migration. Updated the English operator guide.
+- Verified in this worktree: `cd server && npx tsc --noEmit` (exit 0); `cd server && npx vitest run test/geo-hub-server*` (52 tests passed: 38 existing + 14 skill tests); `git diff --check` (exit 0).
+- Running PC74 service, its database, and user GAID homes were not accessed or changed. Full scripts/check, application integration and rollout remain with the parent.
 ## Next steps
-1. (the next session's first action)
+1. Finish this child for parent integration with `task complete gaid-hub-server-trial--skills-server`.
+2. Parent integrates local/remote stores, updates the AGENTS.md summary and its canonical report, runs full checks and handles deployment separately.
 ## Failed approaches
+- Initial TypeScript invocation found no installed server compiler. Installed locked server dependencies with `npm ci --prefix server`, then TypeScript passed; lockfiles did not change.
+- First skill-suite run: 50/51 passed; the restore test opened the backup itself before testing missing blob references, changing the backup database. Isolated restore into a separate copy. Added a v1-backup compatibility case. Final suite: 52/52 passed.
 ## Notes and decisions
+- Sequential integration: storage and routes first, import/backup second, then focused checks. All owned server files are tightly coupled and remain with this writer; no additional worker is needed. Parent owns local/remote skill integration and final full checks.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+No separate child report. The parent incorporates this unit's Current state and check evidence into its canonical report.
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
