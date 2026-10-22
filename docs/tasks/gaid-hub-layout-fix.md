@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-22T03:58:25Z
+status: active
+updated: 2026-10-22T04:04:30Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6539b6c9-5957-440e-9fed-4ac3ddc50082","pid":3359328,"provider":"claude","session":"e1193689-5d34-43fe-a468-597c9a2d50b0","start":"52884028","token":"ea331793c1373217fa254345a44f114b47defad1bea78ef444303ba67d7e3444"}
 branch: task/gaid-hub-layout-fix
 target: main
@@ -41,6 +41,8 @@ Closed 2026-10-22T03:58:25Z: finished; task finish integrates it into main. No f
 
 ## Failed approaches
 ## Notes and decisions
+- First task finish check failed on web/src/components/file-preview-panel.test.tsx ("retains a.tex draft across ...",
+  timing under full-suite load); unrelated to this change, passed in the earlier scripts/check and 5/5 runs alone. Retried finish.
 - Routed request 4a40cdf4a1d2 (original writer's facts) consumed: its copy ~/data/geoaidesk/work/gaid-hub-layout/missing/
   has the same sha256 for all 8 files as the restored ones; its suggested quick check is covered by the full scripts/check pass.
   Review app update waits until main has the files (hub-owned).
