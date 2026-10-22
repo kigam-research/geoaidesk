@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T00:37:54Z
+updated: 2026-10-22T01:38:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -36,28 +36,21 @@ Use task review-copy for the proposal and mockups. Own GAID_HOME under ~/data/ge
 do not modify ~/.geoaidesk. Outside check: no outside check (design work).
 
 ## Current state
-Phase 1 (proposal, no product code) in progress, 2026-10-21.
-- Own app instance from this worktree: systemd unit `gaid-design-identity-app` (ports UI 3310 / API 18310),
-  GAID_HOME `~/data/geoaidesk/work/gaid-design-identity/home` = copy of ~/.geoaidesk without credentials
-  (config.env, auth.json, models*.json, web-search*, mcp-auth excluded; absolute paths rewritten). Log: `launcher.log` there.
-- Current-screen shots (1440×900): `~/data/geoaidesk/work/gaid-design-identity/shots/0[1-6]-*.png`.
-- Mockups: `~/data/geoaidesk/work/gaid-design-identity/mockups/` (`screens.html?d=a|b|c&s=hub|work`, `base.css`,
-  `dir-{a,b,c}.css`, rendered `png/`, `shoot.sh`; served by transient unit `gdi-mock-http` on :3399).
-- Reader 8021eb25 (task reader, general work) delivered the TDS Mobile digest `.../gaid-design-identity/tds-notes.md` (+ `tds-pages/`).
-- Proposal report written and revised after the user's feedback: diagnosis, TDS table, directions 가 3판/라(Codex)/나/다
-  with light+dark, dark-theme surface contract, logo candidates (writer v2 + Codex), 3 decisions.
-- Codex 고급검토 readers done: e90b5a1e (`codex/review.md`: prefers its own 라) 연구 등록부, A best of the original
-  three; blockers fixed in 가 3판: no image filters/inversion) and efc66f40 (`codex-logo/review.md`: keep current logo;
-  if colour, teal orbit #087E8B / #46C5C8 on the existing lower-left orbit contour).
+Result (2026-10-22): GAID UI/UX guide v2 (One UI + Apple HIG) is implemented on task/gaid-design-identity: default identity 계측
+(Instrument), user-selectable 도폭 (Map sheet) style in Settings → 화면 표시 → 화면 스타일, light and dark for both, logo unchanged.
+Built by child gaid-design-identity--fresh (Claude Opus 5.5 max; landed 465b1cd1, finished a86f6dbc, completed into this branch)
+after the user rejected the earlier drafts (라, One UI 가/나/O). Kept from this unit: slop UI check (check-ui.mjs `slop`), self-hosted
+Pretendard, boundaries owners. Verified after integration: `node geo/ui/check-ui.mjs` 0 errors (114 baseline), `node --test
+'geo/tests/*.test.mjs'` 49 pass / 1 skipped; the child's finish ran full scripts/check (pass). Report:
+reports/2026-10-21-gaid-design-identity/index.md (rewritten result-first; rejected drafts in §7). Follow-ups are the child's open items
+gaid-design-identity--fresh#1–#5 (map screen to MAP rules, compact-width/keyboard rules, kept answers, corner-shape outside Chromium,
+notes list placement) plus this unit's library tone debt below. Hub informed of the confirmed direction.
+Re-verify: `node geo/ui/check-ui.mjs`; `node --test 'geo/tests/*.test.mjs'`; screenshots in
+`~/data/geoaidesk/work/gaid-design-identity--fresh/app-shots/`.
+Services: this unit's `gaid-design-identity-app` (3310/18310), `gdi-mock-http` (3399), `gdi-work-http` (3397) are to be stopped before finish.
+
 ## Next steps
-Blocked: waiting for child gaid-design-identity--fresh (writer bd409835, Claude Opus 5.5 max, verified) to redesign the guide
-from One UI + Apple HIG, show mockups to the user in its tab and get an explicit choice; then it lands and finishes.
-1. On the child's finish: `task complete gaid-design-identity--fresh` (clear build caches if close is pending), check the
-   integrated branch (scripts/check), replace the report's rejected-draft sections with the adopted design (supersede note),
-   humanizer, review-copy, tell the hub the confirmed direction (`task hub --send --kind route`), `task route-report
-   design-fresh-20261022`, `task finish`.
-2. If the user rejects everything again: record it; ask the hub/user how to close (the branch still carries the provisional 라
-   styling, which must not land as an adopted direction).
+1. Finish: stop services, task finish (scripts/check), give the hub's final report to the user.
 
 ## Failed approaches
 - Logo candidates v1 with raw KIGAM hexes (`logo/v1/`): blue G + green/yellow/red orbit reads as Google's palette; a
@@ -120,6 +113,7 @@ from One UI + Apple HIG, show mockups to the user in its tab and get an explicit
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [부채] 서재 화면의 출처·범위 배지(SOURCE_TONE, COVERAGE_TONE)가 Tailwind 원색 클래스 25건으로 남아 UI 검사 허용 목록에 있습니다 — 가) gaid-library-folders가 끝난 뒤 그 화면을 다시 만질 때 역할 색 변수로 바꾸고 허용 항목을 지움 — 나) 지금 별도 작업으로 바꿈 — 권장: 가) 실행 중인 작업과 같은 파일을 동시에 고치지 않음 — 막힌 일: 없음 — 근거: reports/2026-10-21-gaid-design-identity#5-한계
 ## Report
 Report: reports/2026-10-21-gaid-design-identity/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
