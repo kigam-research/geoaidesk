@@ -140,12 +140,17 @@ function artifacts(workflow: GeoWorkflow): WorkflowArtifact[] {
 /** gaid-workflow/v1 `skills[]` as written; unknown entries are dropped. */
 function ownSkills(workflow: GeoWorkflow): WorkflowDocSkill[] {
   return ((workflow.skills ?? []) as Record<string, unknown>[]).flatMap((skill) => {
-    if (typeof skill?.name !== "string" || !["catalogue", "bundled", "imported"].includes(skill.source as string)) return [];
+    if (typeof skill?.name !== "string" || !["catalogue", "bundled", "imported", "hub"].includes(skill.source as string)) return [];
+    const hub = skill.hub as { skillId?: unknown; revision?: unknown; treeHash?: unknown } | undefined;
+    const pin = skill.source === "hub" && typeof hub?.skillId === "string" && Number.isSafeInteger(hub.revision) && typeof hub.treeHash === "string"
+      ? { skillId: hub.skillId, revision: hub.revision as number, treeHash: hub.treeHash } : null;
+    if (skill.source === "hub" && !pin) return [];
     return [{
       name: skill.name,
       source: skill.source as WorkflowSkillSource,
       role: skill.role === "primary" ? "primary" as const : "supporting" as const,
       ...(typeof skill.ref === "string" ? { ref: skill.ref } : {}),
+      ...(pin ? { hub: pin } : {}),
       ...(text(skill.purpose) ? { purpose: text(skill.purpose) } : {}),
       ...(text(skill.title) ? { title: text(skill.title) } : {}),
     }];

@@ -14,8 +14,11 @@ import type { MethodLifecycle, MethodOrigin } from "../../../../web/src/geo/cont
 export interface PackageOriginRecord {
   schemaVersion: "gaid-package-origin/v1";
   sha256: string;
-  /** `gaid-hub`: built by the GAID hub authoring service in this app (gaid-hub). */
-  kind: "skill-hub" | "upload" | "gaid-hub";
+  /**
+   * `gaid-hub`: built by the GAID hub authoring service in this app (gaid-hub). `gaid-hub-skill`: one revision of a
+   * hub-managed skill (gaid-hub-skills, contracts/hub-skills.ts); the archive holds the skill folder only.
+   */
+  kind: "skill-hub" | "upload" | "gaid-hub" | "gaid-hub-skill";
   siteId?: string;
   pageUrl?: string;
   descriptorUrl?: string;
@@ -23,6 +26,8 @@ export interface PackageOriginRecord {
   hubEntry?: { id: string; revision: number };
   /** From the hub descriptor, never from the package's own files. */
   hub?: { methodId?: string; revision?: number; lifecycle?: MethodLifecycle; pageUrl?: string };
+  /** `gaid-hub-skill`: the hub skill revision these bytes are (set by the hub skill install, never from the archive). */
+  hubSkill?: { id: string; revision: number; treeHash: string };
   fetchedAt: string;
 }
 
@@ -49,7 +54,7 @@ export function readPackageOrigin(store: string, sha256: string): PackageOriginR
 /** A hub fetch replaces the record; an upload never downgrades an existing hub record. */
 export function writePackageOrigin(store: string, record: Omit<PackageOriginRecord, "schemaVersion">): void {
   const existing = readPackageOrigin(store, record.sha256);
-  if ((existing?.kind === "skill-hub" || existing?.kind === "gaid-hub") && record.kind === "upload") return;
+  if ((existing?.kind === "skill-hub" || existing?.kind === "gaid-hub" || existing?.kind === "gaid-hub-skill") && record.kind === "upload") return;
   const target = originFile(store, record.sha256);
   fs.mkdirSync(store, { recursive: true });
   const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
@@ -73,6 +78,7 @@ export function originOfSource(source: string | undefined, store = packageStore(
     origin: {
       kind: record.kind,
       ...(record.hubEntry ? { hubEntry: record.hubEntry } : {}),
+      ...(record.hubSkill ? { hubSkill: record.hubSkill } : {}),
       packageSha256: sha,
       ...(record.siteId ? { siteId: record.siteId } : {}),
       ...(record.pageUrl ?? record.hub?.pageUrl ? { pageUrl: record.pageUrl ?? record.hub?.pageUrl } : {}),

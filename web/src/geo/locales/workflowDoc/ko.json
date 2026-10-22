@@ -31,12 +31,14 @@
   "source": {
     "catalogue": "기본 제공 스킬",
     "bundled": "Workflow에 딸린 스킬",
-    "imported": "가져온 스킬"
+    "imported": "가져온 스킬",
+    "hub": "허브 스킬"
   },
   "skill": {
     "primary": "주 스킬",
     "usedIn": "{steps}단계에서 씁니다.",
-    "readRule": "스킬은 해당 스킬을 쓰는 단계를 시작하기 전에 지침 파일(SKILL.md)을 읽으세요."
+    "readRule": "스킬은 해당 스킬을 쓰는 단계를 시작하기 전에 지침 파일(SKILL.md)을 읽으세요.",
+    "hubRevision": "{revision}판"
   },
   "steps": {
     "legacy": "이전 형식의 Workflow입니다. 단계별 자세한 방법은 스킬 {skill}의 지침에 있는 처리 절차를 따르세요."

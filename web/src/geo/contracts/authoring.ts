@@ -14,6 +14,7 @@
 
 // --- Atlas profile subset (skill_hub web/shared/atlas/types.ts, atlas-profile/v1) ---
 
+import type { HubSkillInstallState } from "./hub-skills";
 import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
 export interface AtlasText {
   ko: string;
@@ -722,4 +723,6 @@ export interface InstallResult {
   /** Workflow/recipe to open in TaskSetup in that project. */
   workflowId: string | null;
   recipeId: string | null;
+  /** Hub skills the Workflow pins (gaid-hub-skills): installed now, already present, or blocked (readiness explains). */
+  hubSkills?: { name: string; revision: number; state: HubSkillInstallState; outcome?: "installed" | "present" | "blocked" }[];
 }

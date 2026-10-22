@@ -14,7 +14,7 @@ import { geoText, geoLocale } from "@/geo/i18n";
  * every project.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useProjects } from "@/lib/use-projects";
 import {
   checkSkillUpdate,
@@ -68,6 +68,10 @@ import { t } from "@/geo/i18n";
 import { text as localizedText } from "@/geo/workspace/api";
 import { SkillInstructions } from "@/geo/skills/skill-instructions";
 
+import { SkillShelf } from "@/geo/hub-skills/shelf";
+import { HubSkillInstall } from "@/geo/hub-skills/install";
+import { InstalledSkillState } from "@/geo/hub-skills/settings";
+
 const settingsText = geoText("settings");
 
 interface Row extends SkillInfo {
@@ -85,6 +89,11 @@ type Pane = "none" | "install" | "create" | "edit";
 import { onSkillImport, takeSkillImport } from "@/geo/skills/import-request";
 
 export function SkillsPanel() {
+  const hubLookup = useRef(0);
+  const [hubSource, setHubSource] = useState(false);
+  const [hubInstall, setHubInstall] = useState<{ skillId: string; revision: number } | null>(null);
+  const [hubError, setHubError] = useState<string | null>(null);
+  const [hubBusy, setHubBusy] = useState(false);
   const [reading, setReading] = useState<string | null>(null);
   const { activeProject, activeProjectId } = useProjects();
   const [importSource] = useState(() => takeSkillImport(activeProjectId));
@@ -391,6 +400,15 @@ export function SkillsPanel() {
 
   const shadowedSet = useMemo(() => new Set(shadowed), [shadowed]);
 
+  if (hubSource || hubInstall) return <section className="space-y-4">
+    <Button variant="outline" onClick={() => { ++hubLookup.current; setHubSource(false); setHubInstall(null); setHubError(null); setHubBusy(false); }}>{t("hubSkills.settingsBack")}</Button>
+    {hubError && <p role="alert">{t("hubSkills.error")}</p>}
+    {hubInstall ? <HubSkillInstall key={activeProjectId} skillId={hubInstall.skillId} revision={hubInstall.revision} projectId={activeProjectId} onInstalled={() => { void load(scope); }} /> : <SkillShelf onOpen={(id) => {
+      if (hubBusy) return; const request = ++hubLookup.current; setHubBusy(true); setHubError(null);
+      void import("@/geo/hub-skills/api").then(({ hubSkills }) => hubSkills.detail(id)).then((detail) => { if (request === hubLookup.current) setHubInstall({ skillId: id, revision: detail.revision }); }).catch(() => { if (request === hubLookup.current) setHubError(t("hubSkills.error")); }).finally(() => { if (request === hubLookup.current) setHubBusy(false); });
+    }} />}
+  </section>;
+
   if (reading) return <SkillInstructions key={`${activeProjectId}:${scope}:${reading}`} name={reading} scope={scope} projectId={activeProjectId} onBack={() => setReading(null)} />;
 
   return (
@@ -470,6 +488,8 @@ export function SkillsPanel() {
       {pane === "install" && (
         <div className="flex flex-col gap-3 rounded-lg border p-3">
           <div className="text-xs font-medium">{settingsText("skills.add_skills_from_a_source")}</div>
+          <div className="flex items-center gap-3"><Button variant="outline" disabled={scope !== "project"} onClick={() => { setHubSource(true); setHubInstall(null); }}>{t("hubSkills.settingsSource")}</Button><span className="text-sm">{t("hubSkills.githubSource")}</span></div>
+          {scope !== "project" && <p className="text-sm text-gaid-ink-2">{t("hubSkills.projectOnly")}</p>}
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
               value={source}
@@ -759,7 +779,7 @@ export function SkillsPanel() {
         <div className="flex flex-col gap-1.5">
           {filtered.map((r) => {
             const origin = r.origin ?? "catalogue";
-            const updateAvailable = syncStatus.updatesAvailable.includes(r.name);
+            const updateAvailable = !r.hubSkill && syncStatus.updatesAvailable.includes(r.name);
             const orphaned = syncStatus.orphaned.includes(r.name);
             const customized = syncStatus.customized.includes(r.name);
             const rowBusy = busy?.endsWith(`:${r.name}`) ?? false;
@@ -773,7 +793,7 @@ export function SkillsPanel() {
                     <span>{r.name}</span>
                     <Badge variant="secondary" className="h-5 text-[10px]">
                       {/* Catalogue skills from a named source other than the configured catalogue name it. */}
-                      {r.builtin
+                      {r.hubSkill ? t("hubSkills.revision", { revision: r.hubSkill.revision }) : r.builtin
                         ? settingsText("skills.origin_builtin")
                         : origin === "catalogue" && r.source
                           ? r.source
@@ -809,7 +829,7 @@ export function SkillsPanel() {
                   <div className="truncate text-[11px] text-muted-foreground">
                     {r.description}
                   </div>
-                  {r.workflow ? (
+                  {r.hubSkill ? <InstalledSkillState skill={r.hubSkill} onUpdate={scope === "project" ? () => { setHubSource(false); setHubInstall({ skillId: r.hubSkill!.id, revision: r.hubSkill!.latestRevision! }); } : undefined} /> : r.workflow ? (
                     <div className="truncate text-xs text-muted-foreground" title={t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}>{t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}</div>
                   ) : r.source && origin === "registry" && (
                     <div className="truncate text-[10px] text-muted-foreground/80">
@@ -840,7 +860,7 @@ export function SkillsPanel() {
                     {settingsText("skills.use_upstream")}
                   </Button>
                 )}
-                {origin === "registry" && !updateAvailable && (
+                {origin === "registry" && !r.hubSkill && !updateAvailable && (
                   <Button
                     type="button"
                     size="sm"
