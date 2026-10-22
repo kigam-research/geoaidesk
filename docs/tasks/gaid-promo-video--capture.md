@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T15:40:51Z
+status: ready
+updated: 2026-10-22T15:41:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64e63574-788e-4fa7-880a-079234fc05e8","pid":3054752,"provider":"claude","session":"202d69c3-1eb5-4ac7-97f3-bf5f44b6e100","start":"56892497","token":"cc78fa674759f3fec1f8f3937f349bf22c0068400c3f89dd13ffad712b1d9e05"}
 branch: task/gaid-promo-video--capture
 target: task/gaid-promo-video
@@ -58,7 +58,9 @@ instance `gaid-promo-capture` stopped (ports 3320/18320 free); `~/.geoaidesk` fi
 after (`~/data/geoaidesk/work/gaid-promo-video/capture-evidence/geoaidesk-{before,after}.tsv`, empty diff).
 Re-verify: `uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py` (reads capture.json).
 ## Next steps
-1. Parent integrates; recapture single shots with `capture.py --only <id>` after restarting the instance (CAPTURE.md).
+<!-- task:closed -->
+Closed 2026-10-22T15:41:07Z: ready; the parent gaid-promo-video integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Copied Pi sessions were not listed: Pi filters by the session header `cwd`; capture_data.py rewrites that one field.
 - Playwright route handlers receive (route, request): a `sid=sid` default argument got the Request object.
