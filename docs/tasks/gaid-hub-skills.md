@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T05:12:14Z
+updated: 2026-10-22T05:25:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1feaee6d-25a2-4f86-8c96-6168fa426401","pid":3729624,"provider":"claude","session":"72093558-35de-4f81-99ef-1a6be8c11c3a","start":"53183203","token":"0f77e2794014ac0980c71fe32598208e9e17d14839428a13a9aca7f1f070e2fc"}
 branch: task/gaid-hub-skills
 target: main
@@ -33,7 +33,9 @@ Phase 1 proposal written and sent for user review, 2026-10-22. No product code c
 - Diagnosis by code reading (Explore map, refs in report Appendix A); no app run.
 - Web research: vault `웹 조사/geoaidesk/2026-10-22-research-question-answer-in-english-2--6b8718a6fe.md`
   (oracle session research-question-answer-in-english-2).
-- Backend assumptions sent to gaid-backend via hub route request 0095d2a0c339 (information only; reply only on conflict).
+- Backend assumptions (report §3.8) checked by gaid-backend, route 0095d2a0c339 completed 2026-10-22: all four compatible with
+  its proposal (recommended 가: institute GAID hub server, SQLite rows + write-once hash-addressed files; member/admin roles,
+  reviewer role addable for phase 2). gaid-backend itself still awaits the user's 5 decisions.
 ## Next steps
 1. Discuss the proposal with the user in this tab; record the 3 answers under Notes and decisions.
 2. Then ADR `docs/adr/2026-10-22-hub-managed-skills.md`, shared contract (skill entry + `skills[].source: hub` ref) first,
