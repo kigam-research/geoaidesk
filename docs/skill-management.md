@@ -16,7 +16,7 @@ their existing skill set. Global skills also reach specialist processes.
 
 | Origin | Update policy |
 |---|---|
-| Catalogue | Sync at launch and daily, or **Sync catalogue**. Untouched skills update; local edits are preserved and flagged; upstream removals are archived. |
+| Catalogue | Sync at launch and daily, or **Sync catalogue**. Untouched skills update; local edits are preserved and flagged (regenerable caches such as `__pycache__/`, `*.pyc`, `.pytest_cache/` are not edits); upstream removals are archived. |
 | Installed source | No automatic updates. Check the source with refresh, then choose **Use upstream** to accept changes. |
 | Local | No upstream update. |
 

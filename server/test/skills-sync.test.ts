@@ -6,6 +6,7 @@ import {
   getSkillOrigins,
   getSkillProvenance,
   getSkillSyncStatus,
+  hashDirectory,
   markSkillRemoved,
   recordSkillOrigin,
   replaceProjectSkillFromCatalogue,
@@ -111,6 +112,56 @@ describe("skill catalogue synchronization", () => {
     );
     expect(replaced.updatesAvailable).not.toContain("literature-review");
     expect(replaced.customized).not.toContain("literature-review");
+  });
+
+  it("updates a skill whose scripts were only run, and keeps a real script edit", () => {
+    const paths = ensureProjectExists("cache-project");
+    const catalogue = path.join(PROJECTS_ROOT, "catalogue");
+    const withScript = (base: string, name: string, version: string) => {
+      writeSkill(base, name, version);
+      fs.mkdirSync(path.join(base, name, "scripts"), { recursive: true });
+      fs.writeFileSync(path.join(base, name, "scripts", "run.py"), `print("${version}")\n`);
+    };
+    withScript(catalogue, "was-run", "v1");
+    withScript(catalogue, "was-edited", "v1");
+    syncProjectSkillsFromCatalogue(paths, catalogue, "commit-1");
+
+    // Running and testing the scripts leaves only regenerable caches behind.
+    const run = path.join(paths.skillsDir, "was-run");
+    fs.mkdirSync(path.join(run, "scripts", "__pycache__"));
+    fs.writeFileSync(path.join(run, "scripts", "__pycache__", "run.cpython-312.pyc"), "bytecode");
+    fs.writeFileSync(path.join(run, "scripts", "run.pyc"), "bytecode");
+    fs.mkdirSync(path.join(run, ".pytest_cache", "v"), { recursive: true });
+    fs.writeFileSync(path.join(run, ".pytest_cache", "v", "lastfailed"), "{}");
+    const edited = path.join(paths.skillsDir, "was-edited");
+    fs.mkdirSync(path.join(edited, "scripts", "__pycache__"));
+    fs.writeFileSync(path.join(edited, "scripts", "__pycache__", "run.cpython-312.pyc"), "bytecode");
+    fs.appendFileSync(path.join(edited, "scripts", "run.py"), "# local fix\n");
+
+    fs.rmSync(catalogue, { recursive: true, force: true });
+    withScript(catalogue, "was-run", "v2");
+    withScript(catalogue, "was-edited", "v2");
+    const second = syncProjectSkillsFromCatalogue(paths, catalogue, "commit-2");
+
+    expect(second.counts).toMatchObject({ updated: 1, preserved: 1 });
+    expect(skillBody(paths.skillsDir, "was-run")).toContain("v2");
+    expect(fs.existsSync(path.join(run, "scripts", "__pycache__"))).toBe(false);
+    expect(fs.readFileSync(path.join(edited, "scripts", "run.py"), "utf-8")).toContain("# local fix");
+    expect(second.customized).toEqual(["was-edited"]);
+    expect(second.updatesAvailable).toEqual(["was-edited"]);
+  });
+
+  it("hashes a cache-free tree exactly as manifests recorded it before caches were skipped", () => {
+    const dir = path.join(PROJECTS_ROOT, "golden");
+    fs.mkdirSync(path.join(dir, "scripts"), { recursive: true });
+    fs.writeFileSync(path.join(dir, "SKILL.md"), "---\nname: golden\ndescription: golden\n---\n");
+    fs.writeFileSync(path.join(dir, "scripts", "run.py"), "print(1)\n");
+    // Digest from the previous hashDirectory (no cache exclusion) for this tree.
+    const recorded = "f6d4e6ec1a9e950dd07f1e245576a759b55a980949a0d0d8d1910a960e5eb0cb";
+    expect(hashDirectory(dir)).toBe(recorded);
+    fs.mkdirSync(path.join(dir, "scripts", "__pycache__"));
+    fs.writeFileSync(path.join(dir, "scripts", "__pycache__", "run.cpython-312.pyc"), "bytecode");
+    expect(hashDirectory(dir)).toBe(recorded);
   });
 
   it("baselines exact legacy copies but does not overwrite untracked differences", () => {

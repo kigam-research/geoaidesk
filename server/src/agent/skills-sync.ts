@@ -24,6 +24,7 @@ import {
   type SkillScopeRef,
 } from "./skills.ts";
 import { renameSyncWithRetry } from "../geo/rename-retry.ts";
+import { isRegenerableCache } from "../geo/regenerable-cache.ts";
 
 const MANIFEST_VERSION = 2;
 const DEFAULT_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -355,6 +356,7 @@ export function getSkillProvenance(
   };
 }
 
+/** GeoAIDesk (gaid-skill-cache-hash): regenerable caches are skipped; cache-free trees hash as before. */
 export function hashDirectory(root: string): string {
   const hash = crypto.createHash("sha256");
   hash.update("kady-skill-tree-v1\0");
@@ -364,6 +366,7 @@ export function hashDirectory(root: string): string {
       .readdirSync(dir, { withFileTypes: true })
       .sort((a, b) => a.name.localeCompare(b.name));
     for (const entry of entries) {
+      if (isRegenerableCache(entry.name)) continue;
       const relative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name;
       const absolute = path.join(dir, entry.name);
       if (entry.isDirectory()) {

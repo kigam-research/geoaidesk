@@ -1,14 +1,12 @@
 /**
- * Installed method trees without Python bytecode caches (gaid-hub-followups re-trial: running a method's scripts from
+ * Installed method trees without regenerable caches (gaid-hub-followups re-trial: running a method's scripts from
  * its skill folder created `__pycache__/`, and GAID then reported the method as edited and changed since its trial).
- * Same format as skills-sync `hashDirectory`, so a tree without caches has the same hash as the stored base hash.
+ * Same format and cache list as skills-sync `hashDirectory`, so both give one tree the same hash.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-
-const isCache = (entry: fs.Dirent) =>
-  (entry.isDirectory() && entry.name === "__pycache__") || (entry.isFile() && /\.py[co]$/.test(entry.name));
+import { isRegenerableCache } from "../regenerable-cache.ts";
 
 export function methodTreeHash(root: string): string {
   const hash = crypto.createHash("sha256");
@@ -16,7 +14,7 @@ export function methodTreeHash(root: string): string {
   const walk = (dir: string, relativeDir: string): void => {
     const entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
     for (const entry of entries) {
-      if (isCache(entry)) continue;
+      if (isRegenerableCache(entry.name)) continue;
       const relative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name;
       const absolute = path.join(dir, entry.name);
       if (entry.isDirectory()) {
@@ -35,12 +33,12 @@ export function methodTreeHash(root: string): string {
   return hash.digest("hex");
 }
 
-/** Removes `__pycache__/` folders and `.pyc` files (regenerated on the next run); links are not followed. */
-export function removePythonCaches(root: string): void {
+/** Removes regenerable caches (`__pycache__/`, `.pyc`, test/lint caches); links are not followed. */
+export function removeRegenerableCaches(root: string): void {
   const walk = (dir: string): void => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const absolute = path.join(dir, entry.name);
-      if (isCache(entry)) fs.rmSync(absolute, { recursive: true, force: true });
+      if (isRegenerableCache(entry.name)) fs.rmSync(absolute, { recursive: true, force: true });
       else if (entry.isDirectory()) walk(absolute);
     }
   };
