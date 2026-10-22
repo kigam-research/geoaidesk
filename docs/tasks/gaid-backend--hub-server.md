@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T06:22:50Z
+status: active
+updated: 2026-10-22T06:30:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"eb2d31aa-1e53-44fb-bc41-429c1eec3733","pid":214565,"provider":"codex","session":"01a16239-1e42-73b2-a1e3-4e088ec201a3","start":"53721186","token":"7929be5dae8e6ce4050b1260c2d83a48b5bd832aedf7e77cb23115d43d1fb6a6"}
 branch: task/gaid-backend--hub-server
 target: task/gaid-backend
@@ -88,11 +88,18 @@ launcher HTTP serve/health/browser-refusal/SIGTERM test and CLI invite/users/bac
 homes under ~/data/geoaidesk/work/gaid-backend--hub-server/tests and remove them. Operator prose reviewed in humanizer file
 mode. No user-facing UI strings or UI components changed.
 Safe re-verification: cd server && GAID_CATALOGUE=off npx vitest run test/geo-hub-server.test.ts; npx tsc --noEmit -p .
+First task-finish check on 61d1afab: backend 2107 passed / 8 skipped; frontend 1156 passed; launcher check passed.
+Distribution checks reached 48 passed / 1 skipped / 1 failed: the hard-coded seam owner allowlist omitted gaid-backend.
+Registered that owner (plus the distribution-test seam); focused distribution tests: 7 passed. Retrying task finish.
+The original recorded job also ended with exit 1 at that same check; retained it, did not relaunch it.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-22T06:22:50Z: ready; the parent gaid-backend integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First finish failed on the new seam owner's missing allowlist registration, not a hub runtime/test failure. Added the
+  exact owner to geo/tests/distribution.test.mjs; all other owner/file/status assertions remain intact. This minimal
+  distribution glue extends the owned-file list only as necessary to satisfy the repository's declared check.
 - Initial focused suite: default general folder was not first when its creation time tied a new folder. Fixed SQL ordering
   to keep general first; the 37-test suite passed afterward. One file-write command used the server working directory with
   a root-relative path and failed without writing; corrected the working directory immediately.

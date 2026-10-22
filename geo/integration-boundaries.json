@@ -919,6 +919,12 @@
       "owner": "gaid-backend",
       "status": "added",
       "responsibility": "Standalone institute hub account, ownership, revision, library isolation, backup and legacy import integration coverage"
+    },
+    {
+      "path": "geo/tests/distribution.test.mjs",
+      "owner": "gaid-backend",
+      "status": "edited",
+      "responsibility": "Register the gaid-backend owner for the standalone hub integration seams without relaxing ownership validation"
     }
   ],
   "notTouched": [
