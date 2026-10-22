@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T08:54:41Z
+updated: 2026-10-22T08:55:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8bae3bd9-1847-436d-918d-15c77aff84a1","pid":1865557,"provider":"claude","session":"04b52e98-aed3-4749-b725-5863794d4095","start":"54718151","token":"c1146656906ed1e52af0dcf6a76b7d8f0f6adc197b1e4b98254b697d47eb5959"}
 branch: task/gaid-visuals-next
 target: main
@@ -28,9 +28,21 @@ Coordination: gaid-user-acceptance is testing in the review app (PC74 :3000) —
 (catalogue built in this repo, user approves publication). scripts/check passes; brief report. Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Plan (2026-10-22):
+- Package A (child writer `gaid-visuals-next--journals`, "general work"): AGU and EEG profiles in
+  geo/skills/gaid-figures/assets/journals.json from official pages opened in a real browser (playwright-cli; aside on
+  PC71 if login/headless block; PC71 MCP currently times out). Owns journals.json (agu, eeg only) and the matching
+  test expectations in geo/tests/figures-helper.test.mjs if any. No catalogue release: gaid-figures is a shipped skill
+  (server/src/geo/shipped-skills.ts, hash-followed for unedited copies), so the edit reaches projects without one.
+- Package B (this writer): library paper → connection map entry. Library item detail (web/src/geo/library/
+  library-screen.tsx ItemDetail) gets "연결 지도 열기"; projects come from the item's existing `uses` (note + project
+  kinds). One project → opens directly; several → pick the project first; none → no entry, short reason. The map pane is
+  the existing ConnectionMapPane with projectId=<chosen>, focus=`paper:<itemId>`. Owns web/src/geo/library/*,
+  web/src/geo/connections/* (button/project picker), locales library/connections.
+- Integration order: B on this branch; A merged via `task complete`; then scripts/check, screenshots (2 styles × 2
+  themes, 1440×900 and 1280×800) with own GAID_HOME under ~/data/geoaidesk/work/gaid-visuals-next/, brief report.
 ## Next steps
-1. (the next session's first action)
+1. Implement package B; complete child A.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
