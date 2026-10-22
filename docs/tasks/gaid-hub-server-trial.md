@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T10:16:54Z
+updated: 2026-10-22T14:15:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -76,6 +76,9 @@ backed up to `~/data/geoaidesk/hub-server/backups/2026-10-22-review-app-before-h
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Work hours (route workhours-gaid-hub-server-trial, user via backbone hub 2026-10-22 23:00 KST): until 2026-10-23 03:00 KST work
+  normally; check `TZ=Asia/Seoul date` before any new job/phase/worker and start none at or after 03:00; then stop at the next
+  safe point (task save, exact next action in Current state) and resume only on the user's resume instruction to the hub.
 - User decisions 2026-10-22 (asked in this tab): author mapping "모두 내 계정 (권장)" — all 5 review-hub Workflows go to the
   admin account; admin email "seongin@kigam.re.kr". Comments/stars by the mapped names collapse to that account (star counts
   drop where several test names starred one entry).
