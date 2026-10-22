@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T01:08:17Z
+updated: 2026-10-22T01:28:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"dd317c8f-ab1d-4414-aede-87515135d35e","pid":1749537,"provider":"claude","session":"d6996044-f57f-4278-9026-e0c4ac7a513a","start":"51919497","token":"14d69b3c7eed337fb37e61430d3c92ac27abbc46325a901f3d075f6110313cc6"}
 branch: task/gaid-concept-pictures
 target: main
@@ -38,11 +38,32 @@ Own GAID_HOME under ~/data/geoaidesk/work/gaid-concept-pictures/; do not modify 
 user's OpenAI Codex (legacy) login: ask before spending it. Outside check: no outside check (design/app work).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-22: research sent to Oracle (xhigh; prompt `~/data/geoaidesk/work/gaid-concept-pictures/oracle-prompt.md`, log
+  `oracle-1.log`). Current code read: prompt fixes `white background` (`server/src/geo/authoring/visuals.ts:113`), request
+  1536x1024 medium (`codex-images.ts:95-98`); pictures render in `hub-home.tsx` (featured card), `method-flow.tsx` (step/output),
+  `draft-step.tsx` (cover), `io-examples.tsx`. gaid-design-identity--fresh guide v2 draft rule I6 puts white-background pictures on a
+  light mat in dark mode (`--pic-mat`/`--img-mat`, dark `#eef0f3`); its hub dark mockup shows the bright block the user dislikes.
 ## Next steps
-1. (the next session's first action)
+1. Read Oracle result; build mockups (static HTML on the fresh unit's mockup CSS, copied read-only into this unit's work dir):
+   가) mat baseline, 나) theme-matched light+dark variants, 다) transparent single picture; 계측/도폭 × light/dark; review-copy; ask.
+   Mockups done 2026-10-22: `~/data/geoaidesk/work/gaid-concept-pictures/mockups/pictures.html?p=mat|pair|svg&v=instrument|mapsheet&t=light|dark`
+   (static server unit `gaid-cp-static`, 127.0.0.1:3352; shots via `tools/shot.sh`, sheets `compare/compare-{mat,pair,svg}.png`;
+   pair/transparent pictures are pixel simulations from `tools/simulate.py`, not model output).
+   Oracle done; comparison written: `~/data/geoaidesk/work/gaid-concept-pictures/compare/index.md` (humanizer applied), review copy
+   `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-22-compare/`. Asked the user (2026-10-22): which option (가 mat / 나 theme
+   pair, recommended / 다 transparent) and whether to spend 4–6 real generations on the Codex (legacy) login to check first.
+   Waiting for the user's answer in this tab.
+2. Implement only the chosen option (server prompt/variants + web rendering + locales/tests), checks, finish.
 ## Failed approaches
 ## Notes and decisions
+- Research (Oracle xhigh, 2026-10-22): vault `웹 조사/geoaidesk/2026-10-22-geoaidesk-gaid-ai-gaid-hub--dc8af4523f.md`.
+  gpt-image-2 documents `background: "transparent"` (preview, png/webp); not verified on the ChatGPT Codex backend
+  (openai/codex #40572 reports fake checkerboards); transparent fixes only the background, dark lines/labels vanish on dark;
+  GitHub/Apple HIG use separate light/dark assets; public API price ~$0.041 per 1536x1024 medium picture. Oracle recommended mat
+  default + optional transparent + diagrams for step pictures; this writer recommends the theme pair because the user rejected the
+  mat look in dark mode.
+- Plan: sequential (research → mockups → user choice → implementation); no child writers before the choice. Implementation is
+  small and coupled (visuals.ts/codex-images.ts + picture render sites), so this writer does it.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
