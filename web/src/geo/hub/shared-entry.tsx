@@ -13,6 +13,9 @@ import type { HubEntryDetail } from "@/geo/contracts/hub-shared";
 import { geoText } from "@/geo/i18n";
 import { withApiToken } from "@/lib/api-auth";
 import { API_BASE } from "@/lib/projects";
+import { openSettings } from "@/lib/settings-nav";
+import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
+import { text as hubServerText } from "@/geo/hub-server/parts";
 import { useProjects } from "@/lib/use-projects";
 
 import { HubUserDialog } from "./hub-dialogs";
@@ -23,7 +26,7 @@ import { CliExportButton } from "@/geo/workflow/cli-export";
 import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { MethodFlow, type StepVisual } from "./method-flow";
 import { SharedMethod } from "./shared-method";
-import { hubUserName, sharedHub } from "./shared-api";
+import { HUB_IDENTITY_CHANGED, hubIdentity, hubUserName, refreshHubIdentity, sharedHub } from "./shared-api";
 import { TechnicalDetail } from "./technical";
 import { localText } from "./text";
 
@@ -43,10 +46,19 @@ function when(iso: string): string {
 /** Run `action` once the researcher has a display name (asks for it the first time). */
 export function useNamedAction() {
   const [pending, setPending] = useState<null | (() => void)>(null);
-  const run = (action: () => void) => (hubUserName() ? action() : setPending(() => action));
+  const identity = useHubIdentity();
+  const run = (action: () => void) => {
+    void refreshHubIdentity().then(me => {
+      if (me.configured && !me.account) {
+        setPending(null);
+        openSettings({ tab: "services", section: "gaid-hub-server" });
+      } else if (me.account || hubUserName()) action();
+      else setPending(() => action);
+    }).catch(() => toast.error(hubServerText("identity.failed")));
+  };
   const dialog = (
     <HubUserDialog
-      open={pending !== null}
+      open={pending !== null && !identity?.configured}
       onOpenChange={(o) => !o && setPending(null)}
       onSaved={() => {
         const action = pending;
@@ -56,6 +68,23 @@ export function useNamedAction() {
     />
   );
   return { run, dialog };
+}
+
+/** Account changes update name-based previews and ownership affordances without a page reload. */
+export function useHubIdentity() {
+  const [identity, setIdentity] = useState(hubIdentity);
+  useEffect(() => {
+    const changed = () => setIdentity(hubIdentity());
+    const refresh = () => { void refreshHubIdentity().catch(() => undefined); };
+    window.addEventListener(HUB_IDENTITY_CHANGED, changed);
+    window.addEventListener(HUB_CONNECTION_CHANGED, refresh);
+    refresh();
+    return () => {
+      window.removeEventListener(HUB_IDENTITY_CHANGED, changed);
+      window.removeEventListener(HUB_CONNECTION_CHANGED, refresh);
+    };
+  }, []);
+  return identity;
 }
 
 export function SharedEntryScreen({
@@ -190,8 +219,8 @@ export function SharedEntryScreen({
         onEdit={
           onOpenDraft
             ? {
-                // Display names are not accounts: the registering name edits the entry, any other name edits a copy.
-                mode: hubUserName() === e.author ? "edit" : "copy",
+                // Stable account ownership wins, including an explicit false for identical display names.
+                mode: (e.mine ?? (hubUserName() === e.author)) ? "edit" : "copy",
                 busy: opening,
                 run: () =>
                   named.run(() => {

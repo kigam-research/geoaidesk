@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T06:08:43Z
+updated: 2026-10-22T06:14:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"edaeb9e4-ff55-462d-8fd3-fe7b95285c4b","pid":224911,"provider":"codex","session":"01a16239-b9a5-7411-a110-2e2802b598b6","start":"53725166","token":"4f2b949910fa0fe4f0fbfdb3636e45b6b5bb0bf443db7cd1d6f17ff91402cb0c"}
 branch: task/gaid-backend--hub-ui
 target: task/gaid-backend
@@ -63,9 +63,13 @@ Run `cd web && npx vitest run` for your tests, `npx tsc --noEmit`, `node geo/cop
 `node geo/ui/check-ui.mjs`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress: connection/account/admin components, hubServer locales, Settings service seam, account-aware named actions, and library sync line are added. Dependencies installed with npm ci in web/. Copy validator and UI validator pass (existing warnings/debt unchanged).
+
+Sequential decisions: keep existing researcher-backend contracts; distinguish configured-but-logged-out through status before named actions; use account ownership entry.mine, not display names. No contract changes.
+
+Owned interfaces: web/src/geo/hub-server/** and hubServer locales; ServicesPanel mount only; existing hub identity seams and library sync mount. Integration order: Settings/account components -> identity -> sync -> mocked tests -> screenshots -> task finish. No child workers (tightly coupled UI).
 ## Next steps
-1. (the next session's first action)
+1. Finish mocked interaction tests, run TypeScript and web tests, capture both styles/themes/sizes, then finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

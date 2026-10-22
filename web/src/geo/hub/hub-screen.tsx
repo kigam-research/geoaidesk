@@ -47,7 +47,7 @@ import { openMethodSetup } from "./handoff";
 import type { HubEntry, HubFolder, HubRecommendation } from "@/geo/contracts/hub-shared";
 import { hubUserName, sharedHub } from "./shared-api";
 import { CatalogueWorkflowScreen } from "./catalogue-workflow";
-import { hubImage, SharedEntryScreen, useNamedAction } from "./shared-entry";
+import { hubImage, SharedEntryScreen, useHubIdentity, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 
 const text = geoText("hub");
@@ -198,6 +198,7 @@ interface HubIndex {
  * home lists. Read on entering the hub and on every return to the list; my methods refresh every 10 s while it shows.
  */
 function useHubIndex(listShown: boolean): HubIndex {
+  const identity = useHubIdentity();
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [entries, setEntries] = useState<HubEntry[]>([]);
   const [folders, setFolders] = useState<(HubFolder & { entries: number })[]>([]);
@@ -227,7 +228,7 @@ function useHubIndex(listShown: boolean): HubIndex {
       window.clearInterval(timer);
     };
   }, [listShown, reloadShared]);
-  const me = hubUserName();
+  const me = identity?.account ? identity.name : hubUserName();
   const mine = useMemo(() => (me ? projects.filter((p) => !p.author || p.author === me) : projects), [projects, me]);
   return { mine, entries, folders, cards, loading, error, reloadShared };
 }
