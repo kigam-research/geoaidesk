@@ -16,7 +16,7 @@ import { catalogueProcedure, packageProcedure, procedureSteps, workflowDocFor, w
 import { renderWorkflowDocument, type WorkflowDoc } from "../../../web/src/geo/contracts/workflow-doc.ts";
 import { SKILL_HUB_LIMITS } from "./skill-hub.ts";
 import { readTar, safeEntryPath } from "./tar.ts";
-import { SharedHubStore } from "./hub-shared/store.ts";
+import type { HubRecordStore } from "./hub-shared/records.ts";
 
 // Only targets verified with their real PC74 CLI are offered (task evidence records versions and probes).
 export const CLI_TARGETS = ["pi", "claude"] as const;
@@ -149,7 +149,7 @@ async function pinnedHubFiles(doc: WorkflowDoc, store: HubSkillStore): Promise<M
   }
   return out;
 }
-export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: SharedHubStore, id: string, hubStore = new HubSkillStore()): Promise<CliSource> {
+export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | null, store: HubRecordStore, id: string, hubStore = new HubSkillStore()): Promise<CliSource> {
   const record = await store.read(id);
   const snapshot = record.snapshots[record.entry.latestRevision];
   if (!snapshot?.draft.workflow) throw new CliExportError("Workflow was not found", 404);

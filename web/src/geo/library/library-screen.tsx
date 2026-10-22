@@ -23,6 +23,7 @@ import { zoteroStatus } from "./zotero-status";
 import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
 import { FolderPanel, sendResultLine } from "./folder-panel";
 import { FolderNameDialog } from "./folder-name-dialog";
+import { LibrarySyncLine } from "./sync-line";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
@@ -129,6 +130,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
       <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={counts?.all ?? 0} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className="flex min-w-0 flex-1 flex-col gap-3" aria-label={L("screen.title")}>
+        <LibrarySyncLine onSynced={load} refreshKey={data} />
         <div className="flex items-center justify-between gap-3">
           <h1 className="min-w-0 truncate text-xl font-semibold">{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">

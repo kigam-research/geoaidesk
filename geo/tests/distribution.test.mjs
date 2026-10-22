@@ -79,6 +79,7 @@ test("integration boundaries list existing seams with an owner", () => {
     "gaid-improve--source-preview",
     "gaid-hub-integration",
     "gaid-hub",
+    "gaid-backend",
     "gaid-qwen-authoring-trial",
     "gaid-brand-copy",
     "gaid-notebook-review",
