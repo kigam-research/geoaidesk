@@ -85,11 +85,13 @@ test("integration boundaries list existing seams with an owner", () => {
     "gaid-notebook-review",
     "gaid-workflow-model",
     "gaid-research-hub",
+    "gaid-research-visuals",
     "gaid-research-hub--metadata",
     "gaid-research-hub--zotero",
     "gaid-design-identity",
     "gaid-design-identity--fresh",
     "gaid-library-folders",
+    "gaid-research-visuals",
     "gaid-ui-v2-debts",
   ]);
   for (const seam of boundaries.seams) {

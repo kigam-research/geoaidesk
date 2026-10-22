@@ -32,7 +32,7 @@ import {
   type SkillSyncResult,
 } from "../agent/skills-sync.ts";
 import type { CatalogueSkill } from "../agent/skills-fetch.ts";
-import { NOTE_STYLE_SKILL, seedNoteStyleSkill } from "./note-style.ts";
+import { SHIPPED_SKILLS, seedShippedSkills } from "./shipped-skills.ts";
 
 export interface GeoProvisionResult {
   /** `applied`: synced now; `current`: already on the pinned catalogue. */
@@ -72,8 +72,8 @@ export async function provisionProjectSkills(
   options: LoadGeoCatalogueOptions = {},
 ): Promise<number> {
   if (!geoCatalogueActive(options.env, options.repoRoot)) return seedProjectSkills(paths, allowRemote);
-  // The note style skill may already be there (a chat seeds it); it does not make a project non-fresh.
-  const fresh = [...listProjectSkills(paths), ...listDisabledSkills(paths)].every((skill) => skill.name === NOTE_STYLE_SKILL);
+  // A chat may already seed the shipped skills; they do not make a project non-fresh.
+  const fresh = [...listProjectSkills(paths), ...listDisabledSkills(paths)].every((skill) => (SHIPPED_SKILLS as readonly string[]).includes(skill.name));
   const outcome = provisionGeoCatalogue(paths, options);
   if (outcome.state === "unavailable") {
     console.warn(`[gaid] geo catalogue unavailable for project ${paths.id}: ${outcome.error}`);
@@ -85,7 +85,7 @@ export async function provisionProjectSkills(
   }
   applyDefaultSkillStates(paths);
   if (fresh && outcome.state === "applied") enableWorkflowSkills(paths, options);
-  seedNoteStyleSkill(paths, options.repoRoot);
+  seedShippedSkills(paths, options.repoRoot);
   return listProjectSkills(paths).length + listDisabledSkills(paths).length;
 }
 
