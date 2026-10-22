@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T08:54:19Z
+updated: 2026-10-22T08:59:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"710474d1-9809-4533-b0b1-5a0edc17bbfe","pid":1859784,"provider":"claude","session":"f4e07cfa-88db-4747-9ba1-fc8c58c82256","start":"54715930","token":"a780e9fad0fb5b0384caeffe705dafe12ce274e9137acdb948d6f60822ba6255"}
 branch: task/gaid-user-acceptance
 target: main
@@ -40,9 +40,23 @@ Report each check as passed / failed (with evidence and screenshots) / blocked (
 Outside check: no outside check.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Review app: gaid-review active, ~/deploy/geoaidesk at 52d8ca9d, :3000/:18000 healthy (2026-10-22 17:55 KST).
+- Connected in the review app: ChatGPT sign-in (`openai`, oauth; also legacy openai-codex), MiniMax API key (`minimax`, payg,
+  MiniMax-M3 $0.3/$1.2 per M). Claude sign-in not connected (optional, skipped unless the user signs in).
+- Zotero web connection (user library 22256213): state `key-invalid` ("web · invalid-key · HTTP 403", failedAt
+  2026-10-22T08:55:42Z); library has 0 items, 0 folders. Check 3 needs the user to save a valid web key (read+write).
+- route-trial.mjs gained `--project-name` so attach-mode trial projects follow the "검토용 - 수용 시험 …" naming.
+
+## Plan (sequential decisions, packages, order)
+- Tester: one `task reader` on "general work" (GPT 6.1 sol high) acting as a first-time researcher, UI-only through
+  playwright-cli against http://localhost:3000; it runs checks 1–3 and a UI-level model-route use for check 4.
+  Its prompt carries no repo paths or GAID internals. Model for chats: ChatGPT sign-in (subscription, approved).
+- Writer (me): run route-trial.mjs in attach mode for check 4 (two jobs: chatgpt-signin openai/gpt-6.1-sol,
+  api-key minimax/MiniMax-M3, $1 cap, workflow well-log-qc), verify the tester's claims (open cited PDF pages myself,
+  run the figure check myself, read Zotero state through the API), write the report.
+- No child writers: no code changes beyond the harness option.
 ## Next steps
-1. (the next session's first action)
+1. Start the tester reader; start the two route-trial jobs; ask the user for a valid Zotero web key.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

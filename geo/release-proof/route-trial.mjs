@@ -22,7 +22,7 @@ export function options(args) {
     'max-tokens': { type: 'string', default: '16384' }, thinking: { type: 'string', default: 'off' },
     'thinking-probe': { type: 'string', default: '' }, 'also-connect': { type: 'string', default: '' },
     permission: { type: 'string', default: 'deny' }, 'allow-missing-skills': { type: 'boolean', default: false },
-    'reasoning-levels': { type: 'string', default: '' },
+    'reasoning-levels': { type: 'string', default: '' }, 'project-name': { type: 'string' },
   } });
   if (o.help) return o;
   if (!['local','custom-server','api-key','chatgpt-signin'].includes(o.route)) throw new Error('Unknown route');
@@ -203,7 +203,7 @@ export async function main(args = process.argv.slice(2)) {
       record.route = { ...record.route, provider, modelId: model.slice(provider.length+1), appContextTokens: selected.context_length,
         billingMode: selected.billingMode, pricingUsdPerMillionTokens: selected.pricing };
     }
-    const project = await json('POST','/projects', { body: { name: `Route trial ${o.workflow} ${o.context}`, spendLimitUsd: o.spendLimit } });
+    const project = await json('POST','/projects', { body: { name: o['project-name'] ?? `Route trial ${o.workflow} ${o.context}`, spendLimitUsd: o.spendLimit } });
     record.projectId = project.id;
     const sandbox = path.join(dataHome,'projects',project.id,'sandbox');
     if (!fs.existsSync(sandbox)) throw new Error('Attach data home does not match the API project storage');
