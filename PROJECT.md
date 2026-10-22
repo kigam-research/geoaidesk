@@ -38,7 +38,7 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
   pilot; HTTPS switch in `docs/geo/hub-server-https.md`), pinned snapshot `~/deploy/geoaidesk-hub-server/<sha>/`, home
   `pc74:~/data/geoaidesk/hub-server/home`, log `.../hub-server/logs/hub-server.log`, backups `.../hub-server/backups/`, frozen
   import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`.
-- Deployed SHAs: hub server `8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a` (2026-10-22).
+- Deployed SHAs: hub server `cb63b1184f8839e3d0fc34b9f5981e59614350f1` (2026-10-22; schema migration 2).
 
 ## Upstream
 - Remote `upstream` = `https://github.com/K-Dense-AI/k-dense-byok.git`; integration base

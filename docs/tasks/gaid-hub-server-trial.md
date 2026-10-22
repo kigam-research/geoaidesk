@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T09:24:01Z
+updated: 2026-10-22T09:45:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -57,17 +57,20 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 - PC74 TLS files prepared (not active): `~/data/geoaidesk/hub-server/tls/` (CA key in `ca/`, `gaid-hub-ca.crt` sha256
   57621a32…cee2, `hub.crt` SAN IP:10.13.15.74, expires 2029-01-24). Throwaway TLS instance on 10.13.15.74:8701 with a temp
   home: HTTPS health OK with the CA, plain HTTP and no-CA refused; stopped and removed.
+- Full `scripts/check` passed on 59a8fbe4 (backend 2203 passed/8 skipped, web 1202 passed, GAID checks; log check-1.log);
+  `task sync` integrated into main (PR #71, main cb63b118).
+- Redeployed the service at main `cb63b1184f8839e3d0fc34b9f5981e59614350f1` (snapshot `~/deploy/geoaidesk-hub-server/cb63b118…`,
+  unit updated, restarted): health same serverId, `schema_migrations` 1 and 2, the admin invite still unused. Backup before the
+  switch `~/data/geoaidesk/hub-server/backups/2026-10-22-before-cb63b118` passed check-backup.
 - Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-Blocked: waiting for the background full `scripts/check` (started 18:19) and for the user to create the admin account.
-1. Full `scripts/check` running on 59a8fbe4 (code identical to 179f8fac): log `~/data/geoaidesk/work/gaid-hub-server-trial/check-1.log`.
-2. After the user creates the admin account (invite code given in this tab; terminal or GAID route): dry-run then `--apply`
-   import from the frozen source with `authors.json`; backup + check-backup.
-3. Redeploy the service at this branch's merged main SHA (migration 2 applies on start), prepare the TLS files on PC74 and test
-   a throwaway TLS instance (not the live data); keep the live service on HTTP for the test group.
-4. Report `reports/2026-10-22-gaid-hub-server-trial/index.md`.
-5. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
+Blocked: waiting for the user to create the admin account (invite code given in this tab; GAID or terminal route).
+1. After the account exists: `import-hub --from ~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/shared
+   --authors .../authors.json` dry-run, then `--apply` (run from the deployed snapshot with GAID_HUB_SERVER_HOME set); backup +
+   check-backup; fill the report (§3.1, §4, commit) and finish.
+2. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
+3. Pending cleanup after finish: old snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6…` (kept for rollback).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

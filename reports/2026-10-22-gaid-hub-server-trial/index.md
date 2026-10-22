@@ -94,8 +94,8 @@ supersedes:
   - 서버 쪽 시험 52건(데이터베이스 2차 변경, 계정별 숨김, 파일 한 번 저장, 검토 규칙, 백업과 복원 확인, 스킬 가져오기)이 통과했습니다.
   - 내부 인증기관으로 만든 인증서로 실제 허브 서버에 HTTPS 로그인까지 되고, 인증기관 파일이 없으면 거부되고, HTTPS 포트에 일반 HTTP 요청은 실패함을 시험했습니다. 프록시 뒤에서 로그인 실패 제한이 연구자 주소별로 따로 세어짐도 확인했습니다.
   - PC74에서 준비한 인증서로 임시 서버를 띄워 원내망 주소로 HTTPS 응답, 일반 HTTP 거부, 인증기관 없이 접속 거부를 확인하고 지웠습니다.
-  - 저장소 전체 검사: [결과 기입 예정]
-  - 운영 서버: 원내망 주소로 상태 응답을 확인했습니다.
+  - 저장소 전체 검사: 백엔드 시험 2203건 통과(8건 건너뜀), 화면 시험 1202건 통과, GAID 검사 모두 통과했습니다.
+  - 운영 서버: 합친 판으로 다시 배포한 뒤 원내망 주소로 상태 응답, 같은 서버 식별자, 데이터베이스 2차 변경 적용을 확인했습니다. 바꾸기 전 백업은 백업 검사를 통과했습니다.
 
 ## 5. 한계
 
@@ -128,8 +128,8 @@ supersedes:
 | 항목 | 위치 |
 |---|---|
 | 서비스 | pc74 사용자 유닛 `~/.config/systemd/user/gaid-hub-server.service`, `0.0.0.0:8700`, 원내망 주소 `http://10.13.15.74:8700` |
-| 배포 판 | `~/deploy/geoaidesk-hub-server/<sha>/` (처음 배포 `8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a`) |
-| 서버 데이터 | `pc74:~/data/geoaidesk/hub-server/home`, 기록 `.../logs/hub-server.log`, 백업 `.../backups/` |
+| 배포 판 | `~/deploy/geoaidesk-hub-server/cb63b1184f8839e3d0fc34b9f5981e59614350f1/` (main, PR #71; 처음 배포 `8a9fc2f6…`, 되돌리기용으로 보관) |
+| 서버 데이터 | `pc74:~/data/geoaidesk/hub-server/home`, 기록 `.../logs/hub-server.log`, 백업 `.../backups/2026-10-22-before-cb63b118` (검사 통과) |
 | 가져올 원본 사본 | `pc74:~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/` (`shared/`, `SHA256SUMS`, `authors.json`) |
 | HTTPS 준비 파일 | `pc74:~/data/geoaidesk/hub-server/tls/` (`hub.crt`, `hub.key`, `gaid-hub-ca.crt` sha256 `57621a32d6d1d9ed1f1afe3c1991c2111310005d31d76d846f165be02e63cee2`, 인증기관 키 `ca/`), 인증서 만료 2029-01-24 |
 | 운영 문서 | `docs/geo/hub-server.md`, `docs/geo/hub-server-https.md` |
