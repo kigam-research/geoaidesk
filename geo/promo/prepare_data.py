@@ -3,9 +3,11 @@
 Sources, all read-only:
 - the pinned geo catalogue archive (configs/inputs.toml `geo_catalogue`),
 - one registered GAID hub entry from a hub store (the capture copy or the review app data),
-- the citation check of the 2026-10-22 acceptance test (reports/2026-10-22-gaid-user-acceptance, section 3.1).
+- the citation checks of 2026-10-21 (reports/2026-10-21-gaid-library-next) and 2026-10-22
+  (reports/2026-10-22-gaid-user-acceptance, section 3.1),
+- the lithology area table of the research note `2026-10-18-seoul-250k-litho-area-map` (review project).
 
-Run: uv run --no-project python geo/promo/prepare_data.py --hub <skill-hub/shared> --out <dir>/data.json
+Run: uv run --no-project python geo/promo/prepare_data.py --hub <skill-hub/shared> --litho <csv> --out <dir>/data.json
 """
 
 from __future__ import annotations
@@ -42,6 +44,16 @@ ACCEPTANCE = {
     "recomputed": 6,
     "recomputedCorrect": 6,
     "source": "reports/2026-10-22-gaid-user-acceptance/index.md#31",
+}
+# reports/2026-10-21-gaid-library-next/index.md, 0 and 3.1: institute Qwen chat, 4 library papers,
+# 34 checked citations (24 + 10), all on the cited page.
+LIBRARY_NEXT = {
+    "date": "2026-10-21",
+    "model": "기관 Qwen",
+    "papers": 4,
+    "citations": 34,
+    "onPage": 34,
+    "source": "reports/2026-10-21-gaid-library-next/index.md",
 }
 
 
@@ -123,9 +135,30 @@ def hub_entry(shared: Path) -> dict:
     }
 
 
+def litho(path: Path) -> dict:
+    import csv
+
+    with path.open(encoding="utf-8-sig") as f:
+        rows = list(csv.DictReader(f))
+    classes = [
+        {"label": r["display_name"], "polygons": int(r["features"]), "areaKm2": float(r["area_km2"]),
+         "percent": float(r["percent"])}
+        for r in rows
+    ]
+    return {
+        "path": str(path),
+        "sha256": sha256(path),
+        "basis": "planar area in the file's declared projected CRS (research note 2026-10-18)",
+        "classes": classes,
+        "polygons": sum(c["polygons"] for c in classes),
+        "totalKm2": sum(c["areaKm2"] for c in classes),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hub", type=Path, required=True, help="skill-hub/shared directory")
+    parser.add_argument("--litho", type=Path, required=True, help="lithoname_area_table.csv of the note")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     data = {
@@ -133,6 +166,8 @@ def main():
         "catalogue": catalogue(),
         "hubEntry": hub_entry(args.hub),
         "acceptance": ACCEPTANCE,
+        "libraryNext": LIBRARY_NEXT,
+        "litho": litho(args.litho),
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
