@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-21T23:29:37Z
+updated: 2026-10-22T00:37:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"558fe5e2-cb7e-422f-9ad6-cb76328ebdac","pid":2568444,"provider":"claude","session":"1639b691-a088-419c-8bbc-66a4d53f73b4","start":"47547554","token":"d521c3ca9d43df5991d2cadb1375287877325a1ec3980f2ea347174bb29303cb"}
 branch: task/gaid-design-identity
 target: main
@@ -64,6 +64,12 @@ from One UI + Apple HIG, show mockups to the user in its tab and get an explicit
   short tricolour band reads as flag stripes at 16–32 px; the user found raw colours awkward (2026-10-21).
 - playwright-cli cannot render `file://` mockups (blank page); serve them over http.
 ## Notes and decisions
+- 2026-10-22 USER DECISION in the fresh child's tab (relayed verbatim by writer bd409835): proposal guide v2 with identity
+  options 계측 (Instrument), 도폭 (Map sheet), 표준 (Desktop standard); user: "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수
+  있게 할 수 있나?" then, on 가) a 화면 스타일 setting (계측 default, 도폭 optional, independent of 시스템/밝은/어두운, per browser) vs
+  나) 계측 only: "가로 진행하자." → 계측 default + 도폭 selectable style; 표준 not adopted. Proposal review copy:
+  vault `연구 보고서/geoaidesk/2026-10-22-gaid-ui-guide-v2-proposal/`, source `~/data/geoaidesk/work/gaid-design-identity--fresh/proposal/`.
+  The child is landing it; tell the hub after integration.
 - 2026-10-22 hub route design-fresh-20261022 (user, verbatim): "모두 마음에 들지 않는다. Opus 5.5 max 에이전트에게 현재 있는 oneui와
   https://developer.apple.com/kr/design/human-interface-guidelines/ 를 바탕으로 UI/UX가이드를 현재 GAID허브 GAID시스템에 맞게
   재설계한 후 UI UX디자인을 새롭게 하게하자. 로고 이미지외에는 편견없이 작업할수 있게하자." → none of 라 / One UI 가·나·O land.
