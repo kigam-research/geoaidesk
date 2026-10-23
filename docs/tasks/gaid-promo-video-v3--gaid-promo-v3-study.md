@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:27:46Z
+updated: 2026-10-23T16:29:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"adb2ab89-1fbb-4c78-a0dd-7f7c70629ef4","pid":2303809,"provider":"codex","session":"01a16996-cf85-7350-b292-4c272df13a59","start":"66079249","token":"32267624b2afdfc6f7ebf2d7e8d792357f39de990d56d3aff620847226568c4e"}
 branch: task/gaid-promo-video-v3--gaid-promo-v3-study
 target: task/gaid-promo-video-v3
@@ -53,10 +53,14 @@ Before you finish, `task save` your capture* files and CAPTURE.md, then `task fi
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
+- 2026-10-24: resumed in the printed worktree; read the v3 contract, v2 capture notes, parent structure, writer procedure and applicable app rules. No study records created yet. Exact worktree has no codegraph index; bounded source reads are the supported fallback.
 ## Next steps
-1. (the next session's first action)
+1. Start one recorded v3 capture controller, inventory current records, then create the study folder and draft through the review app.
+2. Capture the live interview and analysis moments, finish one bounded real run, then revisit stable states for the remaining takes and validate the deliverables.
 ## Failed approaches
 ## Notes and decisions
+- Sequence and ownership: this child alone owns capture helpers, CAPTURE.md and its task document; external payload root is ~/data/geoaidesk/work/gaid-promo-video-v3/. All app writes stay within the new study records. The parent alone owns film design and integration. No child workers: the record mutations and live captures are tightly coupled.
+- The v3 contract requires a new hub entry and a later real improvement/version; its stricter own-record boundary takes precedence over the parent structure's optional existing-entry reuse.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
