@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-23T07:36:50Z
-writer: {"host":"seongin3","reserved":"58f1a24e303320d9c3e5923b48745944bb113f45060027b125d1f22014065274"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f75e7f74-2f75-4d5d-b96b-137e0a14db9e","pid":2754815,"provider":"claude","session":"93327dd7-0b61-40a2-83ee-249e0e597909","start":"62895788","token":"58f1a24e303320d9c3e5923b48745944bb113f45060027b125d1f22014065274"}
 branch: task/gaid-library-pdf-panel
 target: main
 parent: 
