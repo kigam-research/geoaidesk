@@ -53,7 +53,10 @@ export function DraftStep({
   cover,
   coverThemed,
   examples,
+  stageNotice,
 }: {
+  /** Analysis-flow stage warning with its revise action (gaid-workflow-stages), shown above the flow. */
+  stageNotice?: ReactNode;
   /** Example data per Workflow input (gaid-workflow-example); each change returns the new draft revision. */
   examples?: {
     project: Pick<AuthoringProject, "id" | "sources" | "extractions">;
@@ -171,6 +174,7 @@ export function DraftStep({
               </div>
             )}
           </div>
+          {stageNotice}
           {visualAction && <section aria-label={text("visuals.title")} className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3">
             <h4 className="text-sm font-semibold">{text("visuals.title")}</h4>
             <p className="max-w-[640px] text-sm">{text("visuals.explanation")}</p>
