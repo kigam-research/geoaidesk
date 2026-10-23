@@ -54,7 +54,17 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 const post = <T>(path: string, body: unknown) => call<T>(path, { method: "POST", body: JSON.stringify(body) });
 const pid = (id: string) => `/projects/${encodeURIComponent(id)}`;
 
-export const newOpId = () => `op-${crypto.randomUUID()}`;
+/** crypto.randomUUID exists only in secure contexts; the LAN review app is plain http, where getRandomValues still works. */
+const randomId = (): string => {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+};
+
+export const newOpId = () => `op-${randomId()}`;
 
 export const hubApi = {
   health: () => call<AuthoringHealth>("/health"),

@@ -1,9 +1,38 @@
 "use client";
 /** The agent model for reading sources and writing the draft: the app default or a connected model (e.g. Qwen, MiniMax). */
+import { AUTHORING_THINKING_LEVELS, type AuthoringThinkingLevel } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { useModels } from "@/lib/use-models";
 
 const text = geoText("hub");
+
+/** Reasoning level for the same model calls ("" = the server default, medium). */
+export function AgentThinkingSelect({
+  value,
+  onChange,
+}: {
+  value: AuthoringThinkingLevel | "";
+  onChange: (level: AuthoringThinkingLevel | "") => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5 text-sm font-medium">
+      {text("sources.agentThinking")}
+      <select
+        className="h-9 rounded-md border bg-background px-2 text-sm font-normal"
+        value={value}
+        onChange={(e) => onChange(e.target.value as AuthoringThinkingLevel | "")}
+      >
+        <option value="">{text("sources.agentThinkingDefault")}</option>
+        {AUTHORING_THINKING_LEVELS.map((l) => (
+          <option key={l} value={l}>
+            {text(`sources.agentThinking_${l}`)}
+          </option>
+        ))}
+      </select>
+      <span className="text-xs font-normal text-muted-foreground">{text("sources.agentThinkingHint")}</span>
+    </label>
+  );
+}
 
 export function AgentModelSelect({ value, onChange }: { value: string; onChange: (ref: string) => void }) {
   const { providerModels, directProviderModels } = useModels();

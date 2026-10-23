@@ -5,9 +5,11 @@ import { dirname, join, resolve, sep } from "node:path";
 import { KADY_PI_AGENT_DIR } from "../../config.ts";
 import {
   AUTHORING_PROJECT_SCHEMA,
+  AUTHORING_THINKING_LEVELS,
   projectStage,
   runningAttempt,
   type AuthoringProject,
+  type AuthoringThinkingLevel,
   type CreateProjectBody,
   type ProjectSummary,
 } from "../../../../web/src/geo/contracts/authoring.ts";
@@ -135,6 +137,9 @@ export class AuthoringStore {
       ...(input.goal?.trim() ? { goal: input.goal.trim() } : {}),
       ...(input.target ? { target: input.target } : {}),
       ...(input.model?.trim() ? { model: input.model.trim() } : {}),
+      ...(AUTHORING_THINKING_LEVELS.includes(input.thinkingLevel as AuthoringThinkingLevel)
+        ? { thinkingLevel: input.thinkingLevel }
+        : {}),
       createdAt: t,
       updatedAt: t,
       sourceRevision: 0,

@@ -395,13 +395,14 @@ export function standardQuestions(project: AuthoringProject, proposed: Question[
       id: newId("q"),
       key: TRIAL_SCALE_KEY,
       text: "빠른 첫 시험용 줄인 설정을 함께 만들까요?",
-      reason: "무거운 계산을 줄이면 첫 시험이 몇 분 안에 끝나지만, 그 결과는 흐름 확인용입니다.",
+      reason:
+        "해상도·표본 수·반복 횟수·허용 오차를 줄이면 첫 실행이 몇 분 안에 끝납니다. 분석 단계와 비교는 줄이지 않으며, 결과는 낮춘 해상도만큼만 해석합니다.",
       affects: "시작 설정과 계산 단계",
       options: [
         {
           id: "quick-and-full",
           label: "줄인 설정 포함",
-          hint: "표본 수·반복 횟수·탐색을 줄인 설정으로 먼저 시험하고, 전체 설정도 고를 수 있습니다.",
+          hint: "격자·표본 수·반복 횟수·허용 오차를 줄인 설정으로 먼저 실행하고, 전체 설정도 고를 수 있습니다.",
         },
         { id: "full-only", label: "전체 설정만", hint: "원본 연구와 같은 규모로만 실행합니다." },
       ],
@@ -420,6 +421,7 @@ function draftRequest(
   project: AuthoringProject,
   ctx: SourceContext,
   v: Vocabulary,
+  includeSources = true,
 ): { text: string; findingIds: Map<string, string> } {
   const findingIds = new Map<string, string>();
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
@@ -434,7 +436,7 @@ function draftRequest(
       const q = project.questions.find((x) => x.id === d.questionId);
       return d.status === "deferred"
         ? `- ${d.key}: "${q?.text}" → deferred (unresolved)`
-        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId})` : ""}`;
+        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId}: ${q?.options.find((o) => o.id === d.optionId)?.label ?? ""})` : ""}`;
     });
   const open = project.questions.filter((q) => q.status === "open").map((q) => `- ${q.key}: ${q.text} (unanswered)`);
   const code = project.sources
@@ -465,6 +467,9 @@ function draftRequest(
         : "## Supplied code files\n(none: the skill is descriptive)",
       previous ? `## Current draft slug\n${previous.slug} (keep it)` : "",
       `## Vocabularies\n${vocabularyText(v)}`,
+      // The findings are a bounded index; the method's full procedure (every processing step, parameter, comparison and
+      // interpretation criterion) is in the sources, so the first draft reads them too (same budget as analyze/revise).
+      includeSources ? `## Sources (the full method; findings above are an index, not the whole method)\n${ctx.text}` : "",
     ]
       .filter(Boolean)
       .join("\n\n"),
@@ -490,7 +495,7 @@ function reviseRequest(
   v: Vocabulary,
   feedback: string,
 ): { text: string; findingIds: Map<string, string> } {
-  const base = draftRequest(project, ctx, v);
+  const base = draftRequest(project, ctx, v, false);
   const d = structuredDraft(project.drafts.at(-1)!);
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
   const current = {

@@ -82,7 +82,9 @@ describe("GAID hub question step", () => {
     expect(screen.getByText(/답을 바꾸려면 질문 번호를 눌러/)).toBeTruthy();
     fireEvent.click(screen.getByRole("tab", { name: "질문 1" }));
     expect(screen.getByText(/초안에 반영된 답입니다/)).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("기타"), { target: { value: "다른 지역 격자도 받기" } });
+    // Words typed next to a chosen option are added to it; the option stays chosen.
+    fireEvent.change(screen.getByLabelText("고른 답에 덧붙일 말"), { target: { value: "다른 지역 격자도 받기" } });
+    expect(screen.getByRole("radio", { checked: true })).toBeTruthy();
     expect(screen.getByText(/반영된 답과 다릅니다/)).toBeTruthy();
     fireEvent.click(screen.getByRole("tab", { name: "답 확인" }));
     expect(screen.getByText("바꾼 답 1개")).toBeTruthy();
