@@ -109,7 +109,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `#hub/<authoring id>`; entry on the project list and a Projects/GAID hub header switch; gaid-hub-layout: every hub screen
   keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,
   default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
-  together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
+  together (plus the standard `code-use`/`trial-scale` questions), each question beside a side viewer of the passages it and its
+  options cite (gaid-authoring-evidence-view, `web/src/geo/hub/evidence/`: PDF page through pdf.js with the quote marked from
+  text-item coordinates, web page text, code/note file lines, data-file summary; `QuestionOption.evidence`, and anchors the server
+  did not find are kept as `verified: false` and shown as unconfirmed), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
   store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,

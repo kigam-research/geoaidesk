@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:13:01Z
+updated: 2026-10-23T07:45:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"18d7f503-0e2f-44c7-a932-c7055bd2c385","pid":2512963,"provider":"claude","session":"44724507-b03c-4f81-8a86-8ba8fb6c63a4","start":"62748122","token":"95149b68f88f25b2cc88125567a9d482dea12e9e0e8824d13a7f22052038e299"}
 branch: task/gaid-authoring-evidence-view
 target: main
@@ -48,9 +48,19 @@ C gaid-authoring-sources, D gaid-pocheon-trial (authoring prompts/agent model). 
 onto them when they merge first.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented (2026-10-23), by this writer alone (no child units):
+- Contract `QuestionOption.evidence?: Anchor[]`; question/option anchors keep `verified: false` when the server does not
+  find the quote (server `citeAnchor` in `server/src/geo/authoring/agent.ts`, prompt asks for option evidence).
+- Side viewer `web/src/geo/hub/evidence/` wired into `question-step.tsx` / `hub-screen.tsx`: PDF page via pdf.js with
+  quote boxes from text-item coordinates (merged per line), web page text, file lines, data summary (table preview),
+  honest states; option choice moves the viewer; "PDF 전체 보기" opens the existing SourcePageDialog.
+- Locale `hub.evidence.*` (ko/en), `questions.evidence` removed. AGENTS.md (GAID hub bullet) and boundaries updated
+  (`pdf-viewer.tsx` exports `loadPdfjs`).
+- Verified: server geo-authoring tests (17), web hub tests (99), copy + UI checks clean; screenshots 48 (2 styles x 2 themes x
+  2 sizes x 6 scenes) from an own instance (ports 18131/3131, units gaev-api/gaev-web, stopped), seed and shots in
+  ~/data/geoaidesk/work/gaid-authoring-evidence-view/. scripts/check: running at last update (log there, logs/check.log).
 ## Next steps
-1. (the next session's first action)
+1. Confirm scripts/check passes; task save; review-copy the report; task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -60,9 +70,7 @@ onto them when they merge first.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-23-gaid-authoring-evidence-view/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->

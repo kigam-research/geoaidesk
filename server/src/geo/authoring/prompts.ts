@@ -49,7 +49,11 @@ Task: read the sources and report
    - text: one Korean sentence (the question itself);
    - reason: one short sentence on why the answer changes the result; affects: a few words naming the dependent step;
    - options: 2-4 options, each {"id": kebab-case, "label": a few words, "hint": optional one short sentence on what
-     choosing it means}. The screen always adds a free-text "기타" field, so do not add an "other" option;
+     choosing it means, "evidence": optional 1-2 anchors to the passage the option comes from (the variant the paper
+     compares, the code path, the data column)}. The screen always adds a free-text "기타" field, so do not add an
+     "other" option;
+   - evidence: 1-3 anchors to the passages the question is about. The researcher reads them in a viewer next to the
+     question to understand it, so cite the passage that explains the choice, not a general statement;
    - recommended: the id of the option you suggest, with recommendedWhy: one short sentence citing the source or the
      researcher's goal. A recommendation is only a suggestion and is never stored as an answer. Recommend only
      methodological choices, and prefer the option that keeps the source's whole method (its processing steps, data
@@ -76,7 +80,8 @@ JSON format:
   "questions": [
     {"key": "scope", "text": "Korean question, one sentence", "reason": "Korean, one sentence", "affects": "Korean, short",
      "answerType": "choice-or-text|text",
-     "options": [{"id": "reproduction", "label": "Korean, few words", "hint": "optional Korean, one sentence"}],
+     "options": [{"id": "reproduction", "label": "Korean, few words", "hint": "optional Korean, one sentence",
+                  "evidence": [{"source": "S1", "page": 4, "quote": "verbatim"}]}],
      "materiality": "required|optional", "recommended": "option id", "recommendedWhy": "Korean, one sentence",
      "evidence": [{"source": "S1", "page": 2, "quote": "verbatim"}]}
   ]

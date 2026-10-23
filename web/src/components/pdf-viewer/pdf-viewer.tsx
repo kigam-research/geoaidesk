@@ -132,7 +132,7 @@ async function buildWorkerUrl(): Promise<string> {
   }
 }
 
-function loadPdfjs(): Promise<PdfjsModule> {
+export function loadPdfjs(): Promise<PdfjsModule> {
   if (pdfjsPromise) return pdfjsPromise;
   pdfjsPromise = (async () => {
     installMapUpsertPolyfill();

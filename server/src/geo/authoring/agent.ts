@@ -233,6 +233,29 @@ function checkAnchor(raw: unknown, ctx: SourceContext, errors: string[], where: 
   return { sourceId: id, path, quote, verified: true };
 }
 
+/**
+ * Evidence a question or option cites. A verified anchor as above; otherwise, when the source is known and the quote long
+ * enough, the citation is kept as `verified: false` (with the page or file only when it exists) so the screen can say
+ * that the passage was not found instead of hiding that the coauthor relied on it.
+ */
+function citeAnchor(raw: unknown, ctx: SourceContext): Anchor | undefined {
+  const checked = checkAnchor(raw, ctx, [], "");
+  if (checked || !isObj(raw)) return checked;
+  const id = ctx.aliases.get(str(raw.source, 10));
+  const quote = str(raw.quote, 400);
+  if (!id || quote.length < 8) return undefined;
+  const pages = ctx.pages.get(id);
+  const page = Number(raw.page);
+  const path = str(raw.path, 400);
+  return {
+    sourceId: id,
+    ...(pages && Number.isInteger(page) && page >= 1 && page <= pages.length ? { page } : {}),
+    ...(!pages && ctx.files.get(id)?.has(path) ? { path } : {}),
+    quote,
+    verified: false,
+  };
+}
+
 // ------------------------------------------------------------------------------------------------
 // Analyze
 
@@ -299,7 +322,16 @@ export function validateAnalysis(
       .filter(isObj)
       .map((o) => {
         const hint = str(o.hint, 200);
-        return { id: str(o.id, 48), label: str(o.label, 120), ...(hint ? { hint } : {}) };
+        const evidence = arr(o.evidence)
+          .slice(0, 2)
+          .map((a) => citeAnchor(a, ctx))
+          .filter((a): a is Anchor => !!a);
+        return {
+          id: str(o.id, 48),
+          label: str(o.label, 120),
+          ...(hint ? { hint } : {}),
+          ...(evidence.length ? { evidence } : {}),
+        };
       })
       .filter((o) => KEY.test(o.id) && o.label && !/^(other|기타)$/i.test(o.id))
       .slice(0, 4);
@@ -307,7 +339,7 @@ export function validateAnalysis(
       return errors.push(`${where}: a choice question needs at least two options with kebab-case ids`);
     const evidence = arr(q.evidence)
       .slice(0, 3)
-      .map((a, j) => checkAnchor(a, ctx, [], `${where}.evidence[${j}]`))
+      .map((a) => citeAnchor(a, ctx))
       .filter((a): a is Anchor => !!a);
     // The recommendation must name one of the options (by id, or by its exact label).
     const rec = str(q.recommended, 200);
