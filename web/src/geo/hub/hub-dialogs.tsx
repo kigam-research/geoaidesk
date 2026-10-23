@@ -323,24 +323,25 @@ export function SourcePageDialog({
  * entry can download them. Listed per file before the researcher registers; remote examples record only their address.
  */
 function SharedExamples({ examples }: { examples: DraftInputExample[] }) {
-  const bundled = examples.flatMap((example) => example.files.filter((file) => !file.url).map((file) => ({ example, file })));
+  const groups = examples.map((example) => ({ example, files: example.files.filter((file) => !file.url) })).filter((group) => group.files.length);
   const remote = examples.filter((example) => example.files.some((file) => file.url));
-  if (!bundled.length && !remote.length) return null;
-  const total = bundled.reduce((sum, { file }) => sum + file.size, 0);
+  if (!groups.length && !remote.length) return null;
+  const count = groups.reduce((sum, group) => sum + group.files.length, 0);
+  const total = groups.reduce((sum, group) => sum + group.files.reduce((n, file) => n + file.size, 0), 0);
   return <>
-    {bundled.length > 0 && <li>
-      {text("register.examples.shared", { count: bundled.length, size: sizeText(total) })}
-      <ul className="mt-1 flex flex-col gap-1 border-l border-gaid-edge pl-3 text-[13px] leading-[18px]">
-        {bundled.map(({ example, file }) => <li key={`${localText(example.title)}/${file.name}`} className="min-w-0">
-          <span className="font-mono text-xs break-all">{file.name}</span>
-          <span className="text-muted-foreground"> · {sizeText(file.size)}{example.synthetic ? ` · ${text("register.examples.synthetic")}` : ""}</span>
-          <span className="block text-muted-foreground">
-            {text("register.examples.source", { source: localText(example.source) || text("register.examples.unstated") })}
-            {" · "}{text("register.examples.license", { license: example.license?.trim() || text("register.examples.unstated") })}
+    {groups.length > 0 && <li>
+      {text("register.examples.shared", { count, size: sizeText(total) })}
+      <span className="block text-[13px] leading-[18px]">{text("register.examples.who")}</span>
+      <ul className="mt-1.5 flex flex-col gap-1.5 border-l border-gaid-edge pl-3 text-[13px] leading-[18px]">
+        {groups.map(({ example, files }, i) => <li key={i} className="min-w-0">
+          <span className="block">
+            {files.map((file, n) => <span key={file.name}>{n > 0 && ", "}<span className="font-mono text-xs break-all">{file.name}</span> <span className="text-muted-foreground">{sizeText(file.size)}</span></span>)}
+            {example.synthetic && <span className="text-muted-foreground"> · {text("register.examples.synthetic")}</span>}
           </span>
+          <span className="block line-clamp-2 text-muted-foreground" title={localText(example.source)}>{text("register.examples.source", { source: localText(example.source) || text("register.examples.unstated") })}</span>
+          <span className="block line-clamp-1 text-muted-foreground" title={example.license}>{text("register.examples.license", { license: example.license?.trim() || text("register.examples.unstated") })}</span>
         </li>)}
       </ul>
-      <span className="mt-1 block text-[13px] leading-[18px]">{text("register.examples.who")}</span>
     </li>}
     {remote.length > 0 && <li>{text("register.examples.remote", { titles: remote.map((example) => localText(example.title)).join(", ") })}</li>}
   </>;
