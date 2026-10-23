@@ -4,7 +4,7 @@ date: 2026-10-22
 project: geoaidesk
 task: gaid-backend
 headline: 원내 GAID 허브 서버가 생겼습니다. 연구자는 초대 코드로 계정을 만들어 Workflow를 공유하고, 개인 서재를 여러 PC에서 동기화합니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/real-hub-list.png
 supersedes:
