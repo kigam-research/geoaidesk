@@ -75,14 +75,19 @@
       "upload": "내 파일 올리기",
       "uploading": "파일 올리는 중",
       "uploadFailed": "파일을 올리지 못했습니다. 다시 올리세요.",
-      "emptyExample": "프로젝트에 맞는 형식의 파일이 없습니다. 내 파일을 올리거나 아래 예제 자료를 쓰세요."
+      "emptyExample": "프로젝트에 맞는 형식의 파일이 없습니다. 내 파일을 올리거나 아래 예제 자료를 쓰세요.",
+      "many": "여러 파일을 고를 수 있습니다",
+      "files": "{first} 외 {rest}개",
+      "addOther": "다른 프로젝트 파일 더하기",
+      "showAll": "다른 파일 고르기"
     },
     "choice": {
       "other": "기타 (직접 입력)",
       "free": "직접 입력",
       "placeholder": "값과 근거를 한 줄로 적으세요",
       "deferHint": "채팅에서 분석 전에 다시 묻습니다.",
-      "recipe": "저장한 시작 설정 값"
+      "recipe": "저장한 시작 설정 값",
+      "default": "기본값"
     },
     "next": "다음 단계",
     "toSummary": "요약 보기",
@@ -218,7 +223,10 @@
     "intro": "Workflow 소개",
     "group": {
       "input": "입력 자료",
-      "choice": "분석 조건"
+      "choice": "분석 조건",
+      "stage": "분석 단계",
+      "settings": "시작 설정",
+      "default": "기본값이 있는 조건"
     },
     "position": "{group} {n} / {total}",
     "toInputs": "입력 자료 고르기",
@@ -272,6 +280,16 @@
       "note": "K-Dense에서 가져온 작업 지시입니다. 만드는 결과와 진행 단계는 기록되어 있지 않습니다."
     },
     "version": "version {version}",
+    "otherChoices": "다른 조건",
+    "hint": {
+      "inputs": "{count, plural, other {자료 #개}}",
+      "choices": "{count, plural, other {조건 #개}}",
+      "defaults": "{count, plural, other {기본값 #개}}"
+    },
+    "defaults": "{count, plural, other {기본값이 있는 조건 #개}}",
+    "defaultsHint": "바꾸지 않으면 기본값으로 진행합니다.",
+    "defaultsChanged": "{count, plural, other {#개를 기본값과 다르게 정했습니다.}}",
+    "choicesDefaults": "{count, plural, other {기본값이 있는 조건 #개는 바꾸지 않으면 기본값으로 진행합니다.}}",
     "papers": {
       "state": {
         "attached": "인용 범위에 있음",

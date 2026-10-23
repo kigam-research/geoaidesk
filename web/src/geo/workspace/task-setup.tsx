@@ -13,12 +13,13 @@ import { WorkflowInstructions } from "@/geo/workflow/workflow-view";
 import { workflowStartMessage } from "@/geo/workflow/render";
 import { ReadinessNotice } from "./readiness";
 import { DeleteRecipe } from "./recipe-add";
-import { ChoiceStep, InputStep, SummaryRows, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, nameMatches, setupSteps, sizeText, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
+import { StagePage, SummaryRows, answerPaths, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, nameMatches, pageChoices, setupSteps, sizeText, stageHint, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
 import { StartWindow, introNextLabel, type StartStep } from "./start-window";
 import { GeoIntro } from "./start-intro";
 import { citablePapers, useWorkflowPapers } from "./source-papers";
 import { localText } from "@/geo/hub/text";
 import { isExamplePath, type PrepareExamplesResponse } from "@/geo/contracts/workflow-examples";
+import { hasDefault } from "@/geo/contracts/workflow-stages";
 
 export const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -41,16 +42,18 @@ export function initialInputs(workflow: GeoWorkflowSummary, files: string[], ini
     // had to be picked by hand). An optional input starts unused; it is not a scientific parameter (UI guide Q2).
     // gaid-workflow-example: with no file of the researcher's own, an input with example data starts on the example.
     const fitting = own.filter((path) => accepts(path, role.extensions));
+    // A `multiple` input (gaid-workflow-stages) holds its files as a list, also when one file starts bound.
+    const file = (path: string): InputAnswer => role.multiple ? { mode: "files", paths: [path] } : { mode: accepts(path, role.extensions) ? "file" : "other", path };
     if (bound && role.example && bound === role.example.path && exampleUsable(role)) answers[role.id] = { mode: "example" };
-    else if (bound) answers[role.id] = { mode: accepts(bound, role.extensions) ? "file" : "other", path: bound };
-    else if (role.required && fitting.length === 1) answers[role.id] = { mode: "file", path: fitting[0] };
-    else if (matched[role.id]) answers[role.id] = { mode: "file", path: matched[role.id] };
+    else if (bound) answers[role.id] = file(bound);
+    else if (role.required && fitting.length === 1) answers[role.id] = file(fitting[0]);
+    else if (matched[role.id]) answers[role.id] = file(matched[role.id]);
     else if (role.required && exampleUsable(role)) answers[role.id] = { mode: "example" };
     else if (!role.required) answers[role.id] = { mode: "none" };
   }
   // Example data of different inputs belongs together (one example area). An optional input follows the run: on its
   // example when no input uses the researcher's own file.
-  const ownData = Object.values(answers).some((answer) => answer.mode === "file" || answer.mode === "other");
+  const ownData = Object.values(answers).some((answer) => answerPaths(answer).length > 0);
   for (const role of workflow.inputRoles)
     if (!role.required && !initialBindings[role.id] && exampleUsable(role) && !ownData) answers[role.id] = { mode: "example" };
   return answers;
@@ -60,7 +63,8 @@ function initialChoices(workflow: GeoWorkflowSummary, setup: GeoRecipeCheckRespo
   const answers: Record<string, ChoiceAnswer> = {};
   for (const choice of workflow.requiredScientificChoices) {
     // A choice the recipe left unresolved stays open even when it also carries a value (geo-start/v1 `choice-state`).
-    const value = setup?.choices[choice.id];
+    // A saved value wins over the Workflow's default (gaid-workflow-stages); a parameter otherwise starts on its default.
+    const value = setup?.choices[choice.id] || (hasDefault(choice) ? choice.default!.trim() : undefined);
     if (setup?.unresolvedChoices.includes(choice.id)) answers[choice.id] = { mode: "defer" };
     else if (value) answers[choice.id] = { mode: choice.options?.includes(value) ? "option" : "other", value };
   }
@@ -68,8 +72,9 @@ function initialChoices(workflow: GeoWorkflowSummary, setup: GeoRecipeCheckRespo
 }
 
 /**
- * Workflow start settings (UI guide Q1–Q6): one input file or analysis condition per step, a grouped step rail,
- * a summary with Edit links and one primary action that puts a start draft into a new chat (never sent).
+ * Workflow start settings (UI guide Q1–Q6): one page per analysis-flow stage with its input files and conditions
+ * (gaid-workflow-stages), a step rail of at most 7 entries, a summary with Edit links and one primary action that puts
+ * a start draft into a new chat (never sent).
  */
 export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe, exposure, source, resume = false }: {
   workflow: GeoWorkflowSummary; projectId: string; availableFiles: string[]; open: boolean; onOpenChange: (open: boolean) => void; onRefresh: () => void | Promise<void>;
@@ -88,18 +93,32 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const summary = steps.length - 1;
   const [inputs, setInputs] = useState(() => initialInputs(workflow, files, initialBindings));
   const [choices, setChoices] = useState(() => initialChoices(workflow, initialSetup));
+  const flow = steps.some((step) => step.kind === "stage" && step.page.kind === "flow");
+  // A stage page is done when its inputs have files and its conditions are answered (defaults count as answered).
+  const stageMissing = (i: number) => {
+    const step = steps[i];
+    return step.kind === "stage" ? step.page.roles.filter((role) => role.required && !inputDone(inputs[role.id])) : [];
+  };
   const done = (i: number) => {
     const step = steps[i];
-    if (step.kind === "intro") return i < index;
-    return step.kind === "input" ? inputDone(inputs[step.role.id]) : step.kind === "choice" ? choiceDone(choices[step.choice.id]) : false;
+    if (step.kind !== "stage") return false;
+    return step.page.roles.every((role) => inputDone(inputs[role.id])) && pageChoices(step.page).every((choice) => choiceDone(choices[choice.id]));
   };
   // Every Workflow opens on what it does (gaid-workflow-start-ui), also with a Workflow's own default settings. Only the
-  // researcher's saved start settings resume at the first open required input, else the summary (Q4).
+  // researcher's saved start settings resume at the first page with an open required input, else the summary (Q4).
   const [index, setIndex] = useState(() => {
     if (!recipe && !resume) return 0;
-    const open = steps.findIndex((step) => step.kind === "input" && step.role.required && !inputDone(inputs[step.role.id]));
+    const open = steps.findIndex((_, i) => stageMissing(i).length > 0);
     return open < 0 ? summary : open;
   });
+  // Stage pages whose "기본값" fold is open, and the item the summary's Edit leads to.
+  const [openDefaults, setOpenDefaults] = useState<Set<string>>(() => new Set());
+  const [focus, setFocus] = useState<string | null>(null);
+  const goTo = (i: number, target?: string) => {
+    const page = steps[i]?.kind === "stage" ? (steps[i] as Extract<typeof steps[number], { kind: "stage" }>).page : null;
+    if (page && target && page.defaults.some((choice) => choice.id === target)) setOpenDefaults((previous) => new Set(previous).add(page.id));
+    setFocus(target ?? null); setIndex(i);
+  };
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
   const [busy, setBusy] = useState(false);
   // Keep the readiness notice on step 1 after its fix succeeded, so the researcher sees the result (F1).
@@ -113,17 +132,19 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     : missingInputs.length ? t("workspace.setup.blockedInput", { roles: missingInputs.map((role) => text(role.label)).join(", ") })
     : null;
   const step = steps[index];
-  const nextBlocked = step.kind === "input" && step.role.required && !inputDone(inputs[step.role.id]) ? t("workspace.setup.nextBlocked") : null;
+  const nextBlocked = stageMissing(index).length ? t("workspace.setup.nextBlocked") : null;
 
   // Example inputs are bound to the project path the server writes them to (known before it is written).
   const exampleRoles = workflow.inputRoles.filter((role) => inputs[role.id]?.mode === "example" && role.example);
-  const bindings: Record<string, string> = Object.fromEntries(workflow.inputRoles.flatMap((role) => {
+  // A `multiple` input binds its list of files (gaid-workflow-stages); every other input one path.
+  const bindings: Record<string, string | string[]> = Object.fromEntries(workflow.inputRoles.flatMap((role) => {
     const answer = inputs[role.id];
     if (answer?.mode === "example") return role.example ? [[role.id, role.example.path]] : [];
-    return answer && (answer.mode === "file" || answer.mode === "other") && answer.path ? [[role.id, answer.path]] : [];
+    const paths = answerPaths(answer);
+    return paths.length ? [[role.id, role.multiple ? paths : paths[0]]] : [];
   }));
   const examples = exampleRoles.map((role) => role.id);
-  const mixed = examples.length > 0 && Object.values(inputs).some((answer) => answer.mode === "file" || answer.mode === "other");
+  const mixed = examples.length > 0 && Object.values(inputs).some((answer) => answerPaths(answer).length > 0);
   const download = exampleRoles.reduce((sum, role) => sum + (role.example?.download ?? 0), 0);
   const method = exposure?.startsWith("method:") ? exposure.split(":")[1] : null;
   const papers = useWorkflowPapers(projectId, method);
@@ -165,32 +186,43 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         draft = taskDraft(workflow, bindings, values);
       }
       const result = startGeoTask({ title: text(workflow.title), text: draft, ...(workflowBlock ? { workflowBlock } : {}),
-        attachedFiles: [...new Set(Object.values(bindings))], skills, geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
+        attachedFiles: [...new Set(Object.values(bindings).flat())], skills, geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
       if (result !== "opened") { setError({ message: t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`) }); return; }
       if (examples.length) void onRefresh();
-      setInputs(initialInputs(workflow, files, {})); setChoices({}); setIndex(0); onOpenChange(false);
+      setInputs(initialInputs(workflow, files, {})); setChoices(initialChoices(workflow, undefined)); setOpenDefaults(new Set()); setIndex(0); onOpenChange(false);
     } catch (error) { setError({ message: t(examples.length ? "workspace.setup.example.failed" : "workspace.setup.error"), detail: (error as Error).message }); }
     finally { setBusy(false); }
   };
 
   const ownFiles = files.filter((path) => !isExamplePath(path));
-  const rows: SummaryRow[] = steps.flatMap((row, i): SummaryRow[] => {
-    if (row.kind === "input") {
-      const answer = inputs[row.role.id];
-      // F17: an optional input left unused while the project holds a fitting file is pointed out, not hidden.
-      const unusedFit = answer?.mode === "none" && ownFiles.some((path) => accepts(path, row.role.extensions));
-      return [{ step: i, group: t("workspace.start.group.input"), label: text(row.role.label), value: inputValue(answer, row.role), muted: answer?.mode === "none", title: bindings[row.role.id], note: unusedFit ? t("workspace.start.unusedFit") : undefined }];
-    }
-    return row.kind === "choice" ? [{ step: i, group: t("workspace.start.group.choice"), label: text(row.choice.label), value: choiceValue(row.choice, choices[row.choice.id]), muted: !(row.choice.id in values) }] : [];
+  // Summary: input files, then conditions, then parameters with a default in their own group, each with Edit to its page.
+  const pageOf = (id: string) => steps.findIndex((row) => row.kind === "stage" && (row.page.roles.some((role) => role.id === id) || pageChoices(row.page).some((choice) => choice.id === id)));
+  const inputRows: SummaryRow[] = workflow.inputRoles.map((role) => {
+    const answer = inputs[role.id];
+    // F17: an optional input left unused while the project holds a fitting file is pointed out, not hidden.
+    const unusedFit = answer?.mode === "none" && ownFiles.some((path) => accepts(path, role.extensions));
+    const bound = bindings[role.id];
+    return { step: pageOf(role.id), target: role.id, group: t("workspace.start.group.input"), label: text(role.label), value: inputValue(answer, role), muted: answer?.mode === "none",
+      title: Array.isArray(bound) ? bound.join("\n") : bound, note: unusedFit ? t("workspace.start.unusedFit") : undefined };
   });
+  const choiceRow = (group: string) => (choice: GeoWorkflowSummary["requiredScientificChoices"][number]): SummaryRow =>
+    ({ step: pageOf(choice.id), target: choice.id, group, label: text(choice.label), value: choiceValue(choice, choices[choice.id]), muted: !(choice.id in values),
+      hint: hasDefault(choice) && values[choice.id] === choice.default!.trim() ? t("workspace.setup.choice.default") : undefined });
+  const rows: SummaryRow[] = [
+    ...inputRows,
+    ...workflow.requiredScientificChoices.filter((choice) => !hasDefault(choice)).map(choiceRow(t("workspace.start.group.choice"))),
+    ...workflow.requiredScientificChoices.filter(hasDefault).map(choiceRow(t("workspace.start.group.default"))),
+  ].filter((row) => row.step >= 0);
   const untested = workflow.readiness.runRecord === "none";
   const undecided = workflow.requiredScientificChoices.filter((choice) => !(choice.id in values)).length;
 
   const startSteps: StartStep[] = steps.map((row, i) => ({
     group: row.kind,
     label: stepName(row),
+    hint: row.kind === "stage" ? stageHint({ inputs: row.page.roles.length, choices: row.page.groups.reduce((sum, group) => sum + group.choices.length, 0), defaults: row.page.defaults.length }) : undefined,
     done: row.kind === "intro" ? index > 0 : row.kind === "summary" ? false : done(i),
   }));
+  const first = steps[1]?.kind === "stage" ? (steps[1].page.roles.length ? "input" : "choice") : null;
   const purpose = localText(workflow.doc?.purpose) || text(workflow.description);
   const meta = <>
     {source && <span>{source}</span>}
@@ -201,25 +233,29 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
 
   return <StartWindow open={open} onOpenChange={onOpenChange} title={recipe?.title ?? text(workflow.title)} meta={meta}
     purpose={recipe ? t("workspace.saved.based", { title: text(workflow.title) }) : purpose}
-    steps={startSteps} index={index} onIndex={setIndex} error={error}
+    steps={startSteps} flow={flow} index={index} onIndex={(i) => goTo(i)} error={error}
     reason={index === summary ? blocked : nextBlocked}
     leading={recipe && index === summary ? <DeleteRecipe onDelete={recipe.onDelete} /> : null}
     actions={<>
-      {index > 0 && <Button variant="outline" onClick={() => setIndex(index - 1)}>{t("workspace.setup.prev")}</Button>}
+      {index > 0 && <Button variant="outline" onClick={() => goTo(index - 1)}>{t("workspace.setup.prev")}</Button>}
       {index < summary
-        ? <Button disabled={Boolean(nextBlocked)} onClick={() => setIndex(index + 1)}>{index === 0 ? introNextLabel(startSteps) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
+        ? <Button disabled={Boolean(nextBlocked)} onClick={() => goTo(index + 1)}>{index === 0 ? introNextLabel(first) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
         : <Button disabled={busy || Boolean(blocked)} onClick={() => void start()}>{t(busy ? (examples.length ? "workspace.setup.example.preparing" : "workspace.setup.creating") : "workspace.setup.create")}</Button>}
     </>}>
     {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} papers={papers} />}
-    {step.kind === "input" && <InputStep key={step.role.id} role={step.role} files={files} answer={inputs[step.role.id]} onAnswer={(answer) => setInputs({ ...inputs, [step.role.id]: answer })} onUpload={uploadFiles} />}
-    {step.kind === "choice" && <ChoiceStep key={step.choice.id} choice={step.choice} answer={choices[step.choice.id]} recipeValue={initialSetup?.choices[step.choice.id]} onAnswer={(answer) => setChoices({ ...choices, [step.choice.id]: answer })} />}
+    {step.kind === "stage" && <StagePage key={step.page.id} page={step.page} files={files} inputs={inputs} choices={choices} recipeChoices={initialSetup?.choices}
+      onInput={(id, answer) => setInputs((previous) => ({ ...previous, [id]: answer }))} onChoice={(id, answer) => setChoices((previous) => ({ ...previous, [id]: answer }))}
+      onUpload={uploadFiles} focus={focus}
+      defaultsOpen={openDefaults.has(step.page.id)} onDefaultsOpen={(value) => setOpenDefaults((previous) => {
+        const next = new Set(previous); if (value) next.add(step.page.id); else next.delete(step.page.id); return next;
+      })} />}
     {step.kind === "summary" && <section aria-labelledby="gaid-setup-summary" className="space-y-4">
       <div className="space-y-1">
         <h3 id="gaid-setup-summary" className="text-base font-semibold">{t("workspace.setup.summaryTitle")}</h3>
         <p className="text-sm text-muted-foreground">{t("workspace.setup.summaryBody")}</p>
       </div>
       {state !== "ready" && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
-      {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
+      {rows.length > 0 && <SummaryRows rows={rows} onEdit={goTo} />}
       {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
       {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
       {mixed && <p className="text-sm text-gaid-ink-2">{t("workspace.setup.example.mixed")}</p>}

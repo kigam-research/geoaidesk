@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T13:32:30Z
+status: done
+updated: 2026-10-23T15:08:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0ed51a7-eda2-4b04-a7c8-d0bb4bae10b4","pid":792913,"provider":"claude","session":"b0051d7c-7ad4-43d6-acf2-ed583190496c","start":"64609653","token":"45e701729c20935a809ee5c0dc969917a87d51fda09f45623643a3747ef33df8"}
 branch: task/gaid-workflow-stages--gaid-stages-authoring
 target: task/gaid-workflow-stages
@@ -95,7 +95,7 @@ raw.githubusercontent.com (use `gh api` or codeload).
 - Observed (optional, not done): the model marks every input `multiple: true`; some defaults are long parameter bundles.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T13:32:30Z: ready; the parent gaid-workflow-stages integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T15:08:44Z: integrated into gaid-workflow-stages; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish: scripts/check failed on one web test outside this unit's files (settings-dialog "saves Modal credentials", 1281/1282 passed); it passed 3/3 when run alone and this unit does not touch web/src/components, so finish was rerun once.

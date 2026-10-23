@@ -2,7 +2,8 @@
 /**
  * 일반 Workflow (upstream BYOK) in the one GAID start window (gaid-workflow-start-ui). Same parts as a GAID Workflow:
  * 소개 from what the upstream Workflow records (description, data, placeholders; no outputs or steps are recorded, so
- * none are shown), 자료 with the researcher's own data first, one step per placeholder, and a summary whose action
+ * none are shown), 자료 with the researcher's own data first, one page with every placeholder (gaid-workflow-stages:
+ * pages by what they hold, never one per item), and a summary whose action
  * puts a start draft into a new chat (user decision 2026-10-23: no model choice in this window; the composer's model
  * applies). The English instructions sit collapsed under "AI agent가 받는 지침" and stay editable.
  */
@@ -24,7 +25,8 @@ const inputText = geoText("workflows");
 const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const baseName = (path: string) => path.split("/").pop() || path;
 
-type Step = { kind: "intro" } | { kind: "data" } | { kind: "text"; key: string; label: string; required: boolean } | { kind: "summary" };
+type Field = { key: string; label: string; required: boolean };
+type Step = { kind: "intro" } | { kind: "data" } | { kind: "text"; fields: Field[] } | { kind: "summary" };
 
 export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [], availableFolders = [], filesReady = true, onUploadFiles }: {
   workflow: Workflow; open: boolean; onOpenChange: (open: boolean) => void;
@@ -34,7 +36,7 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
   const steps: Step[] = useMemo(() => [
     { kind: "intro" },
     { kind: "data" },
-    ...workflow.placeholders.map((ph): Step => ({ kind: "text", key: ph.key, label: workflowDisplayText(workflow, `inputs.${ph.key}`, ph.label), required: ph.required })),
+    ...(workflow.placeholders.length ? [{ kind: "text", fields: workflow.placeholders.map((ph) => ({ key: ph.key, label: workflowDisplayText(workflow, `inputs.${ph.key}`, ph.label), required: ph.required })) } satisfies Step] : []),
     { kind: "summary" },
   ], [workflow]);
   const summary = steps.length - 1;
@@ -53,14 +55,17 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
   const hasData = files.length + folders.length > 0 || sources.trim().length > 0;
   const dataDone = hasData || !workflow.requiresFiles;
   const textDone = (key: string) => Boolean(values[key]?.trim());
+  const fields = steps.flatMap((s) => s.kind === "text" ? s.fields : []);
+  const missing = fields.filter((field) => field.required && !textDone(field.key)).map((field) => field.label);
   const done = (i: number) => {
     const step = steps[i];
-    return step.kind === "intro" ? index > 0 : step.kind === "data" ? hasData || (!workflow.requiresFiles && i < index) : step.kind === "text" ? textDone(step.key) || (!step.required && i < index) : false;
+    if (step.kind === "intro") return index > 0;
+    if (step.kind === "data") return hasData || (!workflow.requiresFiles && i < index);
+    return step.kind === "text" ? !missing.length && (step.fields.some((field) => textDone(field.key)) || i < index) : false;
   };
   const step = steps[index];
   const nextBlocked = step.kind === "data" && !dataDone ? t("workspace.start.upstream.needData")
-    : step.kind === "text" && step.required && !textDone(step.key) ? t("workspace.start.upstream.needText") : null;
-  const missing = steps.filter((s): s is Extract<Step, { kind: "text" }> => s.kind === "text" && s.required && !textDone(s.key)).map((s) => s.label);
+    : step.kind === "text" && missing.length ? t("workspace.start.upstream.needText") : null;
   const blocked = !dataDone ? t("workspace.start.upstream.needData")
     : missing.length ? t("workspace.start.upstream.blockedText", { names: missing.join(", ") }) : null;
 
@@ -73,8 +78,9 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
   };
 
   const startSteps: StartStep[] = steps.map((s, i) => ({
-    group: s.kind === "data" ? "input" : s.kind === "text" ? "choice" : s.kind,
-    label: s.kind === "intro" ? t("workspace.start.intro") : s.kind === "data" ? inputText("dialog.data") : s.kind === "text" ? s.label : t("workspace.setup.summaryTab"),
+    group: s.kind === "data" || s.kind === "text" ? "stage" : s.kind,
+    label: s.kind === "intro" ? t("workspace.start.intro") : s.kind === "data" ? inputText("dialog.data") : s.kind === "text" ? t("workspace.start.group.choice") : t("workspace.setup.summaryTab"),
+    hint: s.kind === "text" ? t("workspace.start.hint.choices", { count: s.fields.length }) : undefined,
     done: s.kind !== "summary" && done(i),
   }));
 
@@ -110,7 +116,7 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
         : locations ? t("workspace.start.upstream.locations", { count: locations }) : t("workspace.setup.notChosen");
       return [{ step: i, group: t("workspace.start.group.input"), label: inputText("dialog.data"), value, muted: !hasData, title: [...folders, ...files].join("\n") || undefined }];
     }
-    if (s.kind === "text") return [{ step: i, group: t("workspace.start.group.choice"), label: s.label, value: values[s.key]?.trim() || t("workspace.setup.notChosen"), muted: !textDone(s.key) }];
+    if (s.kind === "text") return s.fields.map((field) => ({ step: i, target: field.key, group: t("workspace.start.group.choice"), label: field.label, value: values[field.key]?.trim() || t("workspace.setup.notChosen"), muted: !textDone(field.key) }));
     return [];
   });
 
@@ -124,14 +130,14 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
     actions={<>
       {index > 0 && <Button variant="outline" onClick={() => setIndex(index - 1)}>{t("workspace.setup.prev")}</Button>}
       {index < summary
-        ? <Button disabled={Boolean(nextBlocked)} onClick={() => setIndex(index + 1)}>{index === 0 ? introNextLabel(startSteps) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
+        ? <Button disabled={Boolean(nextBlocked)} onClick={() => setIndex(index + 1)}>{index === 0 ? introNextLabel("input") : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
         : <Button disabled={Boolean(blocked)} onClick={start}>{t("workspace.setup.create")}</Button>}
     </>}>
     {step.kind === "intro" && <section aria-label={t("workspace.start.intro")}><IntroFacts rows={introRows} />{instructions(false)}</section>}
     {step.kind === "data" && <DataStep required={workflow.requiresFiles} files={files} folders={folders} sources={sources}
       availableFiles={availableFiles} availableFolders={availableFolders} filesReady={filesReady} onUploadFiles={onUploadFiles}
       onFiles={setFiles} onFolders={setFolders} onSources={setSources} />}
-    {step.kind === "text" && <TextStep key={step.key} label={step.label} required={step.required} value={values[step.key] ?? ""} onChange={(value) => setValues({ ...values, [step.key]: value })} />}
+    {step.kind === "text" && <TextPage fields={step.fields} values={values} onChange={(key, value) => setValues({ ...values, [key]: value })} />}
     {step.kind === "summary" && <section aria-labelledby="gaid-upstream-summary" className="space-y-4">
       <div className="space-y-1">
         <h3 id="gaid-upstream-summary" className="text-base font-semibold">{t("workspace.setup.summaryTitle")}</h3>
@@ -144,11 +150,15 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
   </StartWindow>;
 }
 
-function TextStep({ label, required, value, onChange }: { label: string; required: boolean; value: string; onChange: (value: string) => void }) {
+/** Every placeholder of the Workflow on one page, one labelled line each. */
+function TextPage({ fields, values, onChange }: { fields: Field[]; values: Record<string, string>; onChange: (key: string, value: string) => void }) {
   const id = useId();
-  return <section aria-labelledby={id} className="space-y-4">
-    <StepHeading id={id} title={label} lines={[t(required ? "workspace.start.upstream.textRequired" : "workspace.start.upstream.textOptional")]} />
-    <input autoFocus aria-labelledby={id} className={fieldClass} value={value} onChange={(event) => onChange(event.target.value)} placeholder={label} />
+  return <section aria-labelledby={id} className="space-y-6">
+    <StepHeading id={id} title={t("workspace.start.group.choice")} lines={[]} />
+    {fields.map((field, i) => <div key={field.key} className="space-y-3 border-t border-gaid-edge pt-5">
+      <StepHeading id={`${id}-${field.key}`} level={4} title={field.label} lines={[t(field.required ? "workspace.start.upstream.textRequired" : "workspace.start.upstream.textOptional")]} />
+      <input autoFocus={i === 0} aria-labelledby={`${id}-${field.key}`} className={fieldClass} value={values[field.key] ?? ""} onChange={(event) => onChange(field.key, event.target.value)} placeholder={field.label} />
+    </div>)}
   </section>;
 }
 

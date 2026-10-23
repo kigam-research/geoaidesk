@@ -1,6 +1,7 @@
 import { apiFetch } from "@/lib/projects";
 import { geoLocale, t } from "@/geo/i18n";
 import type { Localized, GeoWorkflowSummary } from "@/geo/contracts/workspace";
+import { settingPaths } from "@/geo/contracts/workflow-doc";
 
 export const text = (value: Localized | null | undefined) => value ? (geoLocale() === "en" ? value.en ?? value.ko : value.ko) : "";
 
@@ -24,9 +25,9 @@ export const accepts = (path: string, extensions: string[]) => extensions.some((
  * The start draft put into a new chat (never sent). The researcher's settings come first and take precedence: a
  * method's saved Workflow prompt may carry its author's example values (gaid-hub-novice-review, round 1).
  */
-export function taskDraft(workflow: GeoWorkflowSummary, bindings: Record<string, string>, choices: Record<string, string>): string {
+export function taskDraft(workflow: GeoWorkflowSummary, bindings: Record<string, string | string[]>, choices: Record<string, string>): string {
   const d = (key: string, values?: Record<string, string>) => t(`workspace.setup.draft.${key}`, values);
-  const inputs = workflow.inputRoles.filter((role) => bindings[role.id]).map((role) => t("workspace.setup.inputLine", { role: text(role.label), path: bindings[role.id] })).join("\n") || t("workspace.setup.none");
+  const inputs = workflow.inputRoles.filter((role) => settingPaths(bindings[role.id])).map((role) => t("workspace.setup.inputLine", { role: text(role.label), path: settingPaths(bindings[role.id]) })).join("\n") || t("workspace.setup.none");
   const chosen = workflow.requiredScientificChoices.filter((choice) => choices[choice.id]?.trim()).map((choice) => t("workspace.setup.choiceLine", { choice: text(choice.label), answer: choice.optionLabels?.[choices[choice.id].trim()] ? `${text(choice.optionLabels[choices[choice.id].trim()])} (${choices[choice.id].trim()})` : choices[choice.id].trim() })).join("\n") || t("workspace.setup.none");
   const unresolved = workflow.requiredScientificChoices.filter((choice) => !choices[choice.id]?.trim()).map((choice) => text(choice.label)).join(", ") || t("workspace.setup.none");
   return [
