@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T13:20:39Z
+status: active
+updated: 2026-10-23T13:32:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0ed51a7-eda2-4b04-a7c8-d0bb4bae10b4","pid":792913,"provider":"claude","session":"b0051d7c-7ad4-43d6-acf2-ed583190496c","start":"64609653","token":"45e701729c20935a809ee5c0dc969917a87d51fda09f45623643a3747ef33df8"}
 branch: task/gaid-workflow-stages--gaid-stages-authoring
 target: task/gaid-workflow-stages
@@ -98,6 +98,7 @@ raw.githubusercontent.com (use `gh api` or codeload).
 Closed 2026-10-23T13:20:39Z: ready; the parent gaid-workflow-stages integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish: scripts/check failed on one web test outside this unit's files (settings-dialog "saves Modal credentials", 1281/1282 passed); it passed 3/3 when run alone and this unit does not touch web/src/components, so finish was rerun once.
 - First runs (att-15490c60-7db, att-2c2e3549-102) were rejected only for slug collision: both project copies sat in one authoring store, so each saw the other's package slug as another hub method. Records kept in ~/data/geoaidesk/work/gaid-stages-authoring/rejected-1/; their stage shape already passed (4 and 5 steps, 5 and 6 required choices, all inputs mapped). Rerun with the copy in its own store.
 - ~/.kady/pi-agent has no OpenAI login, so the first instance could not call GPT-6.1 Sol.
 ## Notes and decisions
