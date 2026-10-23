@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:02:46Z
+updated: 2026-10-23T01:06:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9c871e42-f08d-4084-805b-aa4958eac902","pid":2393155,"provider":"claude","session":"b2eda6a9-60b9-413a-beca-e844bbb3f536","start":"60526576","token":"e9030db486b261cf9fb91c9d4af7a9aa8f225ada86c78b31dd759dd66adee37e"}
 branch: task/gaid-hub-feeds-rollout
 target: main
@@ -44,12 +44,34 @@ after updating the trial hub server (PC74:8700) to main. Source: reports/2026-10
 Outside check: none. Ask the user only for things needing their access or a judgment (e.g. a failed migration).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Done 2026-10-23 (all four done items; ops change only, no ADR, no report):
+1. Hub server: backup `~/data/geoaidesk/hub-server/backups/2026-10-23-before-982389c5` (+ old unit file copy), `check-backup`
+   passed (accounts 1, hub_entries 5, hub_files 17, library_objects 4, library_files 3). Snapshot of origin/main
+   `982389c59f5cda2b666fc9893d0d27a8017cad6c` via `git archive` + `npm ci` in `~/deploy/geoaidesk-hub-server/982389c5…`;
+   unit file repointed, daemon-reload, restart. Health OK (same serverId), migration 3 applied 2026-10-23T01:03:38Z, row
+   counts unchanged. Old snapshot `cb63b118…` kept; rollback = restore the unit file copy from the backup folder + restart.
+2. Approved all 18 proposed sources as admin seongin@kigam.re.kr through the review app proxy
+   (`PATCH /geo/hub-server/admin/feeds/sources/:id`; audit `feeds.approve` with the admin account id), then one fetch
+   (`POST /geo/hub-server/admin/feeds/fetch`): all 18 ok, no failures. Items per source: nature-geoscience 8, nature 6,
+   eos 15, solid-earth 20, hess 20, nhess 20, ocean-science 20, carbon-brief 12, nasa-earth-observatory 10,
+   ore-geology-reviews 100, geeknews 9, pi-releases 10, pi-subagents-releases 10, pi-web-access-releases 10,
+   skills-cli-releases 10, claude-code-releases 10, codex-releases 1, github-geo-skills 36 (sum 327; feed_items holds 326).
+   Scheduled collection continues every 6 h.
+3. Review app: config backup `~/data/geoaidesk/work/review-app/config-backup-20261023T100357` (config.env + pi-agent
+   without packages/sessions); stopped, detached ~/deploy/geoaidesk at 982389c5, restarted with the recorded recipe
+   (absolute script path). `~/.geoaidesk` and `pi-agent/hub-server/connection.json` untouched; `/geo/hub-server/status`
+   shows the admin account, reachable. playwright-cli at 1440x900 `#hub/feeds`: heading 자료 소식, "승인한 출처 18곳",
+   항목 164개 (unfiltered per-source cap 10), last collection 10:05, 0 console errors
+   (screenshot `~/data/geoaidesk/work/gaid-hub-feeds-rollout/playwright/feeds-1440.png`). `/geo/hub/skills` answers `[]`
+   (server shelf is empty; local shelf has no skills dir either).
+4. PROJECT.md deployed SHAs updated.
+Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `curl -s http://127.0.0.1:18000/geo/hub/feeds | head -c 300`.
 ## Next steps
-1. (the next session's first action)
+1. None; task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-hub-feeds#1
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
