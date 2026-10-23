@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T01:06:15Z
+status: done
+updated: 2026-10-23T01:06:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9c871e42-f08d-4084-805b-aa4958eac902","pid":2393155,"provider":"claude","session":"b2eda6a9-60b9-413a-beca-e844bbb3f536","start":"60526576","token":"e9030db486b261cf9fb91c9d4af7a9aa8f225ada86c78b31dd759dd66adee37e"}
 branch: task/gaid-hub-feeds-rollout
 target: main
@@ -67,7 +67,9 @@ Done 2026-10-23 (all four done items; ops change only, no ADR, no report):
 4. PROJECT.md deployed SHAs updated.
 Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `curl -s http://127.0.0.1:18000/geo/hub/feeds | head -c 300`.
 ## Next steps
-1. None; task finish.
+<!-- task:closed -->
+Closed 2026-10-23T01:06:28Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
