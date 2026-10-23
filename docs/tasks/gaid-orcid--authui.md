@@ -1,7 +1,7 @@
 ---
 format: 1
 status: ready
-updated: 2026-10-23T01:56:58Z
+updated: 2026-10-23T02:05:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b35bb8b9-c459-4233-ba31-c386537b4e3f","pid":2832900,"provider":"codex","session":"01a16669-3557-7520-b2f1-bc790350ad04","start":"60747240","token":"59f55a1303c7beb853fef07784bf6e29821f7eac7b1cfd62eca996fdd7606311"}
 branch: task/gaid-orcid--authui
 target: task/gaid-orcid
@@ -91,7 +91,7 @@ with commands, anything not verified. Then `task finish`.
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T01:56:58Z: ready; the parent gaid-orcid integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T02:05:53Z: ready; the parent gaid-orcid integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - RESOLVED by parent fix 0007ad5165d0 and final live recheck: local-iD DELETE after auth unlink hung; direct source reread confirmed a backend deadlock: link/unlink hold serial() while returning status(), which now enters serial() again for hub-ready reconciliation. Parent notified with concrete reproduction and asked to own the backend fix. Rebuilt the QA app with the fix and recaptured the final matrix; status/local unlink now return.
