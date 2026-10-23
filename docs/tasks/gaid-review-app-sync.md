@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T04:04:34Z
+updated: 2026-10-23T04:08:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"037fe804-20b3-4b8d-9e0c-c1be1dd8fd8c","pid":489203,"provider":"claude","session":"22c1f103-16a1-439b-abc6-3bf6b0e57fc0","start":"61617457","token":"dac1280ed95fd7a5b9961c7cfbcb087bf7a31151fc22f6199affc785e973e137"}
 branch: task/gaid-review-app-sync
 target: main
@@ -50,9 +50,26 @@ Do NOT redeploy the institute hub server (PC74 :8700) — user decision, open it
 Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Result: the review app runs current main a8d35c6b24ee8cb9bb131a93c7221b29336afac9 (ORCID phase 1+2, project workspace
+state) since 13:05 KST 2026-10-23, on the institute LAN as before (http://10.13.15.74:3000 with the fixed token). The
+institute hub server was not touched (still 982389c5, active since 10:03 KST).
+- Config backup first: `~/data/geoaidesk/work/review-app/config-backup-20261023T130459` (config.env + pi-agent.tar without
+  packages/sessions; includes `pi-agent/hub-server/connection.json`). No agent run was active before the stop.
+- Restarted with the recorded recipe and environment (KADY_PORT=18000, KADY_HOST=0.0.0.0,
+  NEXT_PUBLIC_ADK_API_URL=http://10.13.15.74:18000, fixed KADY_AUTH_TOKEN); UI rebuilt; no error-level log lines since.
+- Verified over the LAN address (curl + playwright-cli, screenshots in `~/data/geoaidesk/work/review-app/playwright/`):
+  API without token → 401; `/geo/hub-server/status` shows admin seongin, reachable; 자료 소식 (`#hub/feeds`) lists items from
+  18 approved sources (API 164 items); 서재 ORCID card shows "허브에 ORCID 연결이 설정되지 않았습니다. 허브 관리자에게 문의하세요."
+  (intended, hub server not redeployed), typing 0000-0002-1825-0097 linked it as "(인증 안 됨)" and 논문 가져오기 previewed
+  6 public works; nothing imported, the iD was unlinked again (`GET /geo/orcid` → profile null). Workspace state: in a
+  temporary project `tmp-ws-check` a composer draft was saved to `/geo/workspace-state` and restored in a fresh browser
+  profile; the temporary project was deleted afterwards (204). The user's own projects were not opened, so no browser
+  record overwrote theirs.
+- PROJECT.md records review app a8d35c6b and its LAN environment; hub server 982389c5 unchanged (gaid-orcid#1).
+- Re-verify: `systemctl --user status gaid-review`; `git -C ~/deploy/geoaidesk rev-parse HEAD`;
+  `curl -s -o /dev/null -w '%{http_code}' http://10.13.15.74:18000/projects/activity` (401).
 ## Next steps
-1. (the next session's first action)
+1. None; finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
