@@ -43,8 +43,11 @@ import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
   deletePersistedChatState,
+  flushServerProjectWorkspaceState,
+  loadServerProjectWorkspaceState,
   loadWorkspaceSnapshot,
   pruneDeletedProjectState,
+  revokeProjectObjectUrls,
   revokeSnapshotObjectUrls,
   saveProjectWorkspaceState,
   saveWorkspaceShellState,
@@ -207,6 +210,31 @@ export default function HomePage() {
     };
   }, []);
 
+  // gaid-project-resume: a project's workspace mounts once its last state was
+  // read from the GAID server (any PC or browser saves it there); without a
+  // server record the browser's own copy is used and uploaded by the next save.
+  const [serverStateChecked, setServerStateChecked] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const serverStateRequested = useRef(new Set<string>());
+  useEffect(() => {
+    if (!workspaceHydrated) return;
+    for (const projectId of openedProjectIds) {
+      if (serverStateRequested.current.has(projectId)) continue;
+      serverStateRequested.current.add(projectId);
+      void loadServerProjectWorkspaceState(projectId).then((state) => {
+        if (state) {
+          setRestoredProjects((prev) => {
+            const previous = prev[projectId];
+            if (previous) revokeProjectObjectUrls(previous);
+            return { ...prev, [projectId]: state };
+          });
+        }
+        setServerStateChecked((prev) => new Set(prev).add(projectId));
+      });
+    }
+  }, [openedProjectIds, workspaceHydrated]);
+
   const rememberProject = useCallback((projectId: string) => {
     setOpenedProjectIds((prev) => (
       prev.includes(projectId) ? prev : [...prev, projectId]
@@ -325,6 +353,7 @@ export default function HomePage() {
         />
       </div>
       {projectDirectoryHydrated && openedProjectIds.map((projectId) => {
+        if (!serverStateChecked.has(projectId)) return null;
         const isActive = !hub.open && screen === "workspace" && projectId === activeProjectId;
         return (
           <ProjectScopeProvider key={projectId} value={projectId}>
@@ -675,6 +704,7 @@ function WorkspacePage({
   useEffect(() => {
     if (!hydrated) return;
     const flush = () => {
+      flushServerProjectWorkspaceState(projectId, projectWorkspaceStateRef.current);
       void saveProjectWorkspaceState(projectId, projectWorkspaceStateRef.current);
     };
     window.addEventListener("pagehide", flush);
