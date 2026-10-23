@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-authoring-sources/figures/01-sources.png" width="120"> | 2026-10-23 15:56 | [Workflow 만들기에 여러 자료와 자료 파일, 서재 논문, 연구 노트 넣기](2026-10-23-gaid-authoring-sources/index.md) | GAID 허브의 Workflow 만들기가 자료 파일, 서재 논문, 연구 노트를 여러 개 함께 받고, AI agent는 자료 파일을 GAID 자료 검사 요약으로 읽습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-orcid/figures/orcid-import-instrument-light-1440.png" width="120"> | 2026-10-22 | [ORCID 연결, 내 논문 가져오기, 본인 확인](2026-10-22-gaid-orcid/index.md) | 서재에서 ORCID 공개 논문을 골라 "내 논문"으로 넣고, 기관 허브 계정으로 ORCID 본인 확인을 마친 iD를 허브 Workflow 작성자 옆에 표시합니다. 실제 ORCID로 끝까지 확인했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-hub-feeds/figures/01-feeds.png" width="120"> | 2026-10-22 | [GAID 허브 자료 소식: 관리자가 승인한 출처의 논문·도구·스킬 소식](2026-10-22-gaid-hub-feeds/index.md) | 기관 허브 서버가 관리자가 승인한 출처 18곳을 6시간마다 읽고, 연구자는 GAID 허브의 "자료 소식"에서 원문 제목과 피드 요약을 봅니다. 기관 허브 서버를 이번 변경으로 갱신하고 출처를 승인하는 일이 남았습니다. | 검토함 10-23 | 채택 | 1 |
