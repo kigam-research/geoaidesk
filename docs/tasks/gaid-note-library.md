@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:45:23Z
+updated: 2026-10-23T06:57:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64631b91-f6bd-4f6d-ad02-2996e80f1f79","pid":1743744,"provider":"claude","session":"5414cf7f-13a5-428a-ae32-343cc6475005","start":"62319888","token":"b8608a00206a30d58748fdcf6af8f6920102d148e2631acb42ae68af6fd45eee"}
 branch: task/gaid-note-library
 target: main
@@ -74,10 +74,15 @@ Recommended answers the user accepted:
 - Verified: typechecks; new server (6) and web (3) tests; related suites (server 143, web 109); copy validator and
   check-ui 0 errors; trial app (pc74 :13610/:18610, data ~/data/geoaidesk/work/gaid-note-library/home, unit
   gaid-note-library-app stopped) walked add → list → detail → open in project → add from note view; 8 UI-guide shots.
-- scripts/check run 1: backend 2260/2269 pass, 1 timeout in geo-hub-server launcher CLI test (passes alone, 38/38);
-  the run stopped there. Run 2 started after the UI fixes (log check-2.log).
+- scripts/check: run 1 stopped at one backend timeout (geo-hub-server launcher CLI test; passes alone 38/38). Run 2
+  (check-2.log): backend 2261 pass / 8 skipped; frontend stopped at one settings-dialog Modal test (passes alone 5/5).
+  Remaining steps run in check order (check-3-rest.log): frontend 1239/1239, start.sh --check, geo tests 58 pass / 1
+  skipped, copy and UI 0 errors, environments smoke, start-gaid --check, production smoke PASS.
+- Route a-workflow-button (from D via hub): fixed in e72dda34 and reported with task route-report.
+- Report review copy: Obsidian vault 연구 보고서/geoaidesk/2026-10-23-gaid-note-library (sync service inactive).
 ## Next steps
-1. Read check-2.log (route a-workflow-button done and reported, e72dda34); if green, review copy of the report, remove build caches (.next etc.), then `task finish`.
+1. `task finish` (build caches removed first; trial app unit gaid-note-library-app is stopped, its data stays in
+   ~/data/geoaidesk/work/gaid-note-library/).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
