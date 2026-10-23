@@ -27,7 +27,7 @@ function shortDate(iso: string | undefined): string {
 }
 
 /** Column layout shared by the header and the rows (UI guide v2 G2: every Workflow row has the same fields in the same places). */
-const ROW = "grid grid-cols-[44px_minmax(0,1fr)_minmax(0,9rem)_6rem_3.5rem_3.5rem_5.5rem] items-center gap-4";
+const ROW = "grid grid-cols-[44px_minmax(0,1fr)_minmax(0,9rem)_8rem_3.5rem_3.5rem_5.5rem] items-center gap-4";
 
 /**
  * Browse the institute registry, independently of the researcher's authoring projects. On the hub page the folder and
