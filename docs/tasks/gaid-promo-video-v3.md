@@ -1,7 +1,7 @@
 ---
 format: 1
-status: waiting
-updated: 2026-10-23T16:22:45Z
+status: active
+updated: 2026-10-23T16:23:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
