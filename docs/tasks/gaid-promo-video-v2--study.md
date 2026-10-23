@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:32:58Z
+updated: 2026-10-23T02:49:00Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
 target: task/gaid-promo-video-v2
@@ -65,8 +65,16 @@ not appear). Then task save / task finish your unit.
 - Sequential work: preserve before evidence; create library paper/folder; author and register Workflow; create project and run quick trial; answer note; revisit library and capture stored states.
 - Owned files: capture*.py, CAPTURE.md, this task document. No workers needed: live UI state and recording are tightly coupled.
 ## Next steps
-1. Start the recorded capture session job; inspect the access gate and continue through the real UI.
+1. Continue authoring ap-33965983-5f2 when draft retry completes; capture A3 and registration. If the retry fails for provider availability again, stop model steps and notify parent.
+2. Keep using capture controller http://127.0.0.1:18329 (recorded job, do not relaunch). Browser globals: page/authorpage, libpage, study, api_get.
+3. Register, create one project, quick trial, note decision, library return; record IDs in external study.json.
+- Created paper li-9c9d1be4e0ca (ahn2026), folder lc-0a58cae5488a (광상 부존 가능성), draft ap-33965983-5f2. External study.json records them.
+- A1, A2, L1 and L1b captured (120, 135, 180 and 120 frames). Initial gate take discarded outside shots; entered the launcher's normal startup URL through UI (never read credential files).
+- Parent authorized already connected subscription model via per-action picker after two default-model failures. Selected openai-codex/gpt-6.1-sol for authoring; analysis accepted (25,645 input / 6,776 output, costUsd 0); four answers submitted. First draft attempt failed on provider overload after one validation repair; retry running with same model. No Settings change.
+- Created project yilgarn-cd7814; uploaded user_data/Yilgarn_GIS_DB.csv via UI and attached only new library folder. Selected GPT-6.1 Sol subscription row (제공사의 구독 한도 적용) in chat. No chat request sent yet.
 ## Failed approaches
+- Default authoring model twice failed with OpenRouter not configured. Stopped and escalated before choosing a model; parent sent explicit authorization.
+- Initial task job launch refused dirty source; saved once, then launched recorded job 1.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
@@ -80,6 +88,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v2--study-20261023T023311.018639Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

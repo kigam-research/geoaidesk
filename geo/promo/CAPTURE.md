@@ -1,67 +1,44 @@
-# GAID promo capture (`capture-v1`)
+# GAID review-app study capture (`capture-v2`)
 
-Real-system takes for the promo film (contract `geo/promo/CONTRACT.md`, shot list v2 of 2026-10-23). Frames, stills and
-`capture.json` live in `~/data/geoaidesk/work/gaid-promo-video/capture-v1/` (outside Git).
+The study runs in the existing review app, not a curated copy. Contract: `geo/promo/CONTRACT.md` v2. Outputs remain
+outside Git under `~/data/geoaidesk/work/gaid-promo-video-v2/`. The parent owns the film and its canonical report.
+The v1 capture procedure is retained in Git history; `capture.py` still implements its original takes.
 
-## Reproduce
+## Session and capture method
 
-1. Curated data copy (read-only from `~/.geoaidesk`, no credentials):
-   `uv run --no-project python geo/promo/capture_data.py` → `~/data/geoaidesk/work/gaid-promo-video/home` and
-   `capture-v1-data.json` (copied paths, adaptations, source digests).
-2. Instance from this worktree on free ports:
-   `systemd-run --user --unit gaid-promo-capture --working-directory=<worktree> --setenv=GAID_HOME=<home>
-   --setenv=KADY_PORT=18320 --setenv=KADY_FRONTEND_PORT=3320 --setenv=PATH=$PATH --setenv=HOME=$HOME
-   -p StandardOutput=append:<log> -p StandardError=append:<log> /bin/bash <worktree>/start-gaid.sh`.
-   Basemap keys are read by the server from `~/.config/map_env/map-keys.env` (never copied or printed).
-3. Takes: `uv run --no-project --with playwright==1.63.0 --with pillow==12.3.0 python geo/promo/capture.py [--only M1,R3]`
-   (installed Google Chrome, 1280×720 CSS px at scale 2.25 → 2880×1620 frames, 30 fps film time; one shot per run
-   merges into `capture.json`).
-4. Contact sheet: `uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py`.
-5. Stop: `systemctl --user stop gaid-promo-capture`.
+1. Save the capture helper, then launch with `task job run -- uv run --no-project --with playwright==1.63.0
+   --with pillow==12.3.0 python geo/promo/capture_study.py`. Resume an existing receipt instead of relaunching it.
+2. The controller listens only on `127.0.0.1:18329`; POST bounded Python UI commands to `/exec`. `page`, `ctx`,
+   `StudyTake`, `OUT`, and `WORK` are available. Use actual UI clicks and file inputs for study writes. This is an
+   operator-controlled capture session, not an unattended replay of record creation.
+3. Chrome: installed `/usr/bin/google-chrome`; 1280x720 CSS pixels, scale 2.25, Korean, light, instrument style.
+   `StudyTake` reuses v1's drawn pointer, real mouse interpolation and click ripple. It does **not** use v1's request
+   mutation guard, disconnected-state masking, curated home or display-name replacements.
+4. `StudyTake(page, OUT, id, print)` captures a shot. `hold`, `move`, and `click` record film frames; `finish(beats)`
+   appends the `gaid-promo-capture-v2` manifest. Static holds repeat one captured frame; all changing pointer and
+   click-ripple frames are captured individually. No scroll is recorded inside a shot. Omitted waits are listed in
+   `cuts`; a screen change after an off-camera scroll must be an explicit cut.
+5. Access-token gate: use the normal startup link in the review app's launcher log through the UI. Never print or
+   save the token. Do not open credential files, change providers, restart the app, or change its defaults.
+6. Verify frames and beats with `uv run --no-project --with pillow==12.3.0 python geo/promo/capture_verify.py`.
+   Build the contact sheet with `capture_sheet.py --take <capture-v2-directory>` using the same uv dependencies.
 
-`capture_explore.py` is the exploration helper (screenshot + visible text of one screen).
+## Study records and state
 
-## Shots (v2)
+The authoritative IDs, model, observed usage, timing and deviations are in external `study.json`. The before/after
+stat inventories cover project metadata, library records and local hub records; remote hub entries have separate
+API snapshots. Compare existing item records separately from expected collection/link/sync bookkeeping changes.
+The app may refresh Zotero connection status automatically; no Zotero setting is changed by this study.
 
-| id | frames | content | source |
-|---|---|---|---|
-| H1 | 150 | GAID 허브 home → registered Workflow (concept picture, 2판) → Workflow 단계 with step detail and skill | hub entry `entry-ap-a135f290-1c4` |
-| R1 | 135 | Workflow panel → start settings: 입력 파일 → 분석 조건 (실행 규모) → 요약 보기 → hover 시작 초안 만들기 (not pressed) | project Yilgarn 니켈 탐사 우선순위 (`proj-035916`) |
-| R2 | 120 | Stored chat started from a hub Workflow: AI agent result card (QC checks) with the result figure `outputs/variogram_fit.png` open | `proj-035916` session `01a14daa…` |
-| R3 | 120 | Notes list (결정할 일, 검토 전) → note 서울 1:25만 암상도 … 면적표 → decision block, 권장 option picked (not sent) | `review-notebook` |
-| R5 | 105 | LAS depth viewer, `25_9-1.las` (GR, RHOB, NPHI, DTC), pointer along the tracks | `proj-bc576f` |
-| M1 | 165 | Shapefile viewer, `Seoul_Geology_250K_Litho.shp` coloured by LITHONAME on NGII 바로e맵 영상지도; KIGAM 1:5만 지질도 overlay switched on and off; polygon click → attributes | `review-notebook` |
-| M2 | 120 | Same layer: attribute table, 전체 레이어 면적표 for LITHONAME with 타원체 측지 면적 computed (`/geo/area-table`) | `review-notebook` |
-| L1 | 150 | 내 연구 → 서재: folder 공간 검증 → paper → 내 연구에서 쓰인 곳 (project and notes with pages) | library copy |
-| R6 | 180 | Research note with page citations `[@valavi2018, pp. 11–12]` → reference list built from the library | `proj-ca300f` |
-| L2 | 135 | Library paper → 연결 지도 (1단계 → 2단계) | library + `proj-ca300f` |
+Current completed captures: L1 (folder and paper), L1b (PDF/DOI import and bibliography export), A1 (paper to source),
+A2 (live interview choice). Further shots and the final evidence summary are added after the research cycle.
 
-Total 1,380 frames (46.0 s). Each shot starts and ends with ≥ 0.4 s of hold.
+## Deviations and observed failures
 
-## Deviations from the contract
-
-- H3 (hub skill shelf) skipped: the review data has no hub skill records (`pi-agent/skill-hub/shared/skills/` is empty).
-- R2: no stored chat starts with a `<workflow>` block (all method chats predate the block form). The closest real chat
-  is the one started from the installed hub Workflow's start settings (exposure `method:pu-conformal-zone-priority`);
-  its first message is the older plain start text.
-- R3: the note list has no 확인함 group (no note is marked confirmed in the data).
-- L1: the library has one folder and three GAID-managed papers; no nested folders or Zotero items exist in the data.
-- M1: the Fault and boundary layers were not added (time); basemap is NGII 영상지도 (satellite) with the KIGAM 1:5만 overlay.
-
-## Adaptations (copy-only, recorded in `capture.json` → `data.adaptations`)
-
-- Project names without `검토용 - ` / `수용 시험`: 문헌 근거 공간 교차검증, 25/9-1 검층 그림, 25/9-1 LAS 점검,
-  Yilgarn 니켈 탐사 우선순위, 서울 지질도 암상 면적; other review projects hidden.
-- Test personas 새연구자/새연구자2/새연구자3/Test → 연구자 이/박/최/정 (exact string values only).
-- Authoring draft title `my-paper` → PU 학습 광상 부존 가능성 논문; library folder `수용 시험 - 공간 검증` → 공간 검증.
-- Pi session header `cwd` rewritten to the copied sandbox (Pi lists only sessions whose header matches).
-- DOM: the status words `연결 안 됨` (composer model chip) and `Zotero 연결 안 됨` are hidden, because the capture
-  instance has no credentials or Zotero connection file.
-- Never copied: `auth.json`, `config.env`, `mcp-auth.json`, `connection.json`, `.venv`, library `secrets/`, `zotero.json`.
-
-## Verification (2026-10-23)
-
-All frames exist at 2880×1620 (checked per shot in `capture.json` → `verification`); browser errors: none; blocked
-requests: none (non-GET calls were only `/geo/inspect`, `/geo/suggestions`, `/geo/vector-page`, `/geo/series-window`,
-`/geo/area-table`); instance stopped; `~/.geoaidesk` file list with sizes and mtimes identical before and after
-(`capture-evidence/geoaidesk-{before,after}.tsv`, empty diff).
+- The app's authoring default twice returned `OpenRouter is not configured`. The parent then authorized selection
+  of an already connected subscription model in each action's picker, without changing Settings or credentials.
+  Selected `openai-codex/gpt-6.1-sol`; its analyze attempt succeeded. Chat shows `제공사의 구독 한도 적용`.
+- An initial A1 take encountered the API access gate and was discarded outside `shots/`. The completed A1 uses the
+  normal startup-link flow and contains no access gate. The token was never copied into study artifacts.
+- The existing Zotero web-key failure is left intact. Library scenes use the new folder and detail pane to keep its
+  explanatory card outside the frame where possible; the header status remains truthful.

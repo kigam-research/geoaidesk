@@ -9,6 +9,7 @@ import json
 import time
 import traceback
 import contextlib
+import shutil
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -25,8 +26,24 @@ class StudyTake(Take):
         self.page.screenshot(path=str(self.dir / f'frame-{self.k:05d}.png'), animations='disabled')
         self.k += 1
 
+    def hold(self, n):
+        """Keep a captured static state; render changing click-ripple frames individually."""
+        dynamic = min(n, max(0, 14 - (self.k - self.last_click)))
+        for _ in range(dynamic):
+            self.frame()
+        if n > dynamic:
+            self.frame()
+            source = self.dir / f'frame-{self.k-1:05d}.png'
+            for _ in range(n - dynamic - 1):
+                shutil.copyfile(source, self.dir / f'frame-{self.k:05d}.png')
+                self.k += 1
+
     def finish(self, beats):
         rec = self.record(self.page.url)
+        for beat in beats:
+            r = beat['rect']
+            r['width'] = min(r['width'], CSS_W - r['x'])
+            r['height'] = min(r['height'], CSS_H - r['y'])
         rec['beats'] = beats
         rec['cuts'] = [{'frame': round(c['t'] * FPS), 'removedSeconds': c['omitted_wall_s'], 'why': c['after']} for c in self.cuts]
         dest = OUT / 'capture.json'
@@ -57,7 +74,8 @@ def evidence(name):
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     (OUT/'stills').mkdir(exist_ok=True)
-    evidence('before')
+    if not (WORK / 'evidence-before.json').exists():
+        evidence('before')
     errors=[]
     with sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True, executable_path='/usr/bin/google-chrome', args=['--no-sandbox','--disable-dev-shm-usage'])
