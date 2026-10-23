@@ -22,6 +22,7 @@ import { addSource } from "../src/geo/authoring/sources.ts";
 import { registerSharedHubRoutes } from "../src/geo/hub-shared/routes.ts";
 import { DEFAULT_FOLDER, SharedHubStore } from "../src/geo/hub-shared/store.ts";
 import { readTarGz } from "../src/geo/tar.ts";
+import { parseMethodFile } from "../src/geo/methods/method-file.ts";
 import { analysis, cleanup, config, draftReply, fixture, reply, testVocabulary, work } from "./helpers/geo-authoring.ts";
 
 const apps: FastifyInstance[] = [];
@@ -121,6 +122,8 @@ describe("hub authoring example data", () => {
     expect(declared.files[0]).toEqual({ name: "grid table.csv", sha256: sha(CSV), size: CSV.length, path: "examples/grid/grid table.csv" });
     expect(exampleProblems(declared, "grid")).toEqual([]);
     expect(manifest.files).toContainEqual({ path: "examples/grid/grid table.csv", sha256: sha(CSV), size: CSV.length });
+    // The installed side accepts what the authoring side packages.
+    expect(parseMethodFile(manifest, draft.slug).issues).toEqual([]);
   });
 
   it("keeps packages of Workflows without examples byte-identical", async () => {
