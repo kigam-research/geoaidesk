@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-23T08:36:52Z
-writer: {"host":"seongin3","reserved":"96268dc30643485eaa762b4dfbb47ec9211b079885bf6e4624511700c1495289"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"63c6aa87-c4a4-4624-9c99-d7f3096d74a3","pid":3356915,"provider":"claude","session":"abfb67d2-5d61-4efb-96c3-d2f9ec8416bb","start":"63255981","token":"96268dc30643485eaa762b4dfbb47ec9211b079885bf6e4624511700c1495289"}
 branch: task/gaid-hub-rollout-versions
 target: main
 parent: 
