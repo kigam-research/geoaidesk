@@ -37,9 +37,13 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 - Institute hub server service (gaid-hub-server-trial): `pc74` user unit `gaid-hub-server.service`, `0.0.0.0:8700` (plain HTTP
   pilot; HTTPS switch in `docs/geo/hub-server-https.md`), pinned snapshot `~/deploy/geoaidesk-hub-server/<sha>/`, home
   `pc74:~/data/geoaidesk/hub-server/home`, log `.../hub-server/logs/hub-server.log`, backups `.../hub-server/backups/`, frozen
-  import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`.
+  import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`
+  on the institute LAN (`KADY_HOST=0.0.0.0`, `NEXT_PUBLIC_ADK_API_URL=http://10.13.15.74:18000`, fixed `KADY_AUTH_TOKEN` from
+  `~/data/geoaidesk/work/review-app/access-token`), data `~/.geoaidesk`, log `~/data/geoaidesk/work/review-app/launcher.log`.
 - Deployed SHAs: hub server `982389c59f5cda2b666fc9893d0d27a8017cad6c` (2026-10-23; schema migration 3, 18 feed sources
-  approved; previous snapshot `cb63b1184f8839e3d0fc34b9f5981e59614350f1` kept for rollback); review app `982389c5` (2026-10-23).
+  approved; previous snapshot `cb63b1184f8839e3d0fc34b9f5981e59614350f1` kept for rollback; ORCID phase 2 not deployed,
+  open item gaid-orcid#1); review app `a8d35c6b24ee8cb9bb131a93c7221b29336afac9` (2026-10-23; ORCID phase 1+2 and
+  project workspace state; config backup `~/data/geoaidesk/work/review-app/config-backup-20261023T130459`).
 
 ## Upstream
 - Remote `upstream` = `https://github.com/K-Dense-AI/k-dense-byok.git`; integration base
