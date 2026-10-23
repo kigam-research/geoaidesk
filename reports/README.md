@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-note-library/figures/01-library-notes.png" width="120"> | 2026-10-23 16:35 | [정리 노트를 서재에 넣고 다시 프로젝트에서 열기](2026-10-23-gaid-note-library/index.md) | 정리 노트를 논문과 따로 나뉜 종류로 서재에 넣고, 폴더에 넣고, 프로젝트에서 다시 열 수 있습니다. 노트 파일이 원본입니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-example/figures/01-setup-input.png" width="120"> | 2026-10-23 16:25 | [Workflow 예제 자료, 내 자료가 없어도 분석 시작하기](2026-10-23-gaid-workflow-example/index.md) | Workflow가 입력마다 예제 자료를 함께 제공하고, 연구자가 자기 파일을 고르지 않으면 예제 자료로 분석을 시작하며 그 사실을 지침과 채팅에 적습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-authoring-sources/figures/01-sources.png" width="120"> | 2026-10-23 15:56 | [Workflow 만들기에 여러 자료와 자료 파일, 서재 논문, 연구 노트 넣기](2026-10-23-gaid-authoring-sources/index.md) | GAID 허브의 Workflow 만들기가 자료 파일, 서재 논문, 연구 노트를 여러 개 함께 받고, AI agent는 자료 파일을 GAID 자료 검사 요약으로 읽습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | 검토 전 | 미정 | 0 |
