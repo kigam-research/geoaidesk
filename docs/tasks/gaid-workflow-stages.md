@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-23T12:14:47Z
-writer: {"host":"seongin3","reserved":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0704ce16-3a7d-4ced-a70b-cb0992d87a4f","pid":723936,"provider":"claude","session":"231b3e23-b5c2-477a-8474-f49634f8b127","start":"64563772","token":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
 branch: task/gaid-workflow-stages
 target: main
 parent: 
