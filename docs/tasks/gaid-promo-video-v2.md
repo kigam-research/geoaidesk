@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:23:24Z
+updated: 2026-10-23T02:26:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -97,14 +97,20 @@ Length ≈ 105 s (over the 90 s default: six demo steps plus the second-brain sc
 User 2026-10-23: "가와 관련해서 검토용 앱으로 하면 매번 인증을 다시 할 이유가 없지 않나? 답변먼저 하자. 그리고 마무리 절 전에 해당 순환을 통해 지구과학 에이전트 생태계가 활성화되면서 개념적인 KIGAM의 Second brain화 되는 모션 그래픽이 추가되었으면 한다."
 Answer given: the review app avoids re-login; it was excluded only by the v1 rule (keep review data unchanged). Using it
 leaves the study records in `~/.geoaidesk`, and since the review app is connected to the institute hub server (PC74
-:8700), registering the Workflow is a real shared registration. Waiting for the user's choice.
+:8700), registering the Workflow is a real shared registration. User answer 2026-10-23: "검토용 앱에서 연구를 진행하고 Workflow를 기관 허브 서버에 등록해도 된다."
 
 ## Next steps
-1. User choice pending: run the coherent study in the review app (existing login; records stay; Workflow registered
-   on the institute hub server) or in a separate capture instance (one model login), or existing records only.
-2. Then: data/study run → capture (full-frame, feature tags) → scenes (background, cycle, second brain) → render job.
+1. Child `gaid-promo-video-v2--study` runs the study in the review app and records capture-v2 (contract
+   `geo/promo/CONTRACT.md` v2). Parent meanwhile rebuilds `scene/` (background, cycle, demo chrome with cycle strip
+   and feature tags, second brain, closing) and `render.py` (~105 s).
+2. Integrate capture-v2 beats into the demo segments, stills review, render job, report.
 ## Failed approaches
 ## Notes and decisions
+- Packages: (P) parent owns scene/, render.py, prepare_data.py, README, report, integration; (C) child
+  `--study` owns the review-app study, capture*.py, CAPTURE.md, capture-v2 data. Interface: `capture.json` v2 beats
+  (rect + Korean tag label per feature). Integration order: scenes with placeholders → capture-v2 → beats wired → render.
+- Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
+  it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
