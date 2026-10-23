@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:39:50Z
+updated: 2026-10-23T16:42:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"adb2ab89-1fbb-4c78-a0dd-7f7c70629ef4","pid":2303809,"provider":"codex","session":"01a16996-cf85-7350-b292-4c272df13a59","start":"66079249","token":"32267624b2afdfc6f7ebf2d7e8d792357f39de990d56d3aff620847226568c4e"}
 branch: task/gaid-promo-video-v3--gaid-promo-v3-study
 target: task/gaid-promo-video-v3
@@ -53,11 +53,13 @@ Before you finish, `task save` your capture* files and CAPTURE.md, then `task fi
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
-- 2026-10-24: resumed in the printed worktree; read the v3 contract, v2 capture notes, parent structure, writer procedure and applicable app rules. No study records created yet. Exact worktree has no codegraph index; bounded source reads are the supported fallback.
+- 2026-10-24: resumed in the printed worktree; read the v3 contract, v2 capture notes, parent structure, writer procedure and applicable app rules. Exact worktree has no codegraph index; bounded source reads are the supported fallback.
 - Controller job 1 is running on 127.0.0.1:18339 (receipt below). Own records: library folder lc-0b809e67ade8, authoring draft ap-574620c7-44d. Both source papers are in the new folder; draft has two library PDFs, ESM code and six example input files. First analysis attempt att-81c3b674-cd8 is running on openai-codex/gpt-6.1-sol, high. L1/L2/A1: 420 frames, geometry/timing validation passed and six beat midpoint bounds visually checked. External study.json is the ID/event record; before inventories saved before study mutations.
 - Authoring attempt was still running after five minutes, with no reported error. Read-only capture_wait.py will notify on its terminal state while the controller retains the browser. Job 2 runs the declared scripts/check suite independently. Deployment SHA read back as 7650e012ebf3c0bcb20eed9ff115c2fb10c23553. Explicit input file hashes are saved externally in input-files.json; truth/ was not read or uploaded.
+- Watcher job 3 succeeded. Attempt att-81c3b674-cd8 was accepted at 16:39:14Z (336 s); usage input 41,164, output 14,015, costUsd 0. It generated 38 findings, one scientific question and the two standard questions. The scientific question has three verified source anchors, shown beside the card with a marked PDF quote. Initial validation/retry findings remain recorded in the attempt; final scientific-question anchors are verified. A2 is captured during the actual answer; its options have no own anchors, so the second PDF reference is selected manually rather than attributing an automatic viewer change to the option.
+- All three questions answered through the UI: sample-cells, include, quick-and-full. Trial-scale addition explicitly retains preprocessing, conventional inversion, PGI-full/PGI-none, both ore-boundary criteria and low-sensitivity evaluation within one <=10 min compute cycle; no upscaled rerun. Draft attempt att-8e46fd29-b50 started at 16:42:02Z, same model/high. Four shots (L1/L2/A1/A2) now exist.
 ## Next steps
-1. On the authoring watcher notification, read external study.json and authoring-current.json. Continue the existing controller on 18339, capture A2 live, answer through the UI and make the draft. Do not repeat record creation, the model request or the controller.
+1. On the draft watcher notification, read external study.json and authoring-current.json. Continue the existing controller on 18339; inspect the real draft for 3–5 stages, attach its examples through the UI, run the format check and register a new entry. Do not repeat record creation, model requests or the controller.
 2. Capture the live interview and analysis moments, finish one bounded real run, then revisit stable states for the remaining takes and validate the deliverables.
 ## Failed approaches
 ## Notes and decisions
