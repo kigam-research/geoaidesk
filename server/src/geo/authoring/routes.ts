@@ -16,6 +16,7 @@ import type {
   OperationBody,
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
+import { AUTHORING_THINKING_LEVELS } from "../../../../web/src/geo/contracts/authoring.ts";
 import { structuredDraft } from "./workflow.ts";
 import { startOperation } from "./agent.ts";
 import { installPackage, previewPackageBytes } from "./install.ts";
@@ -181,6 +182,17 @@ export async function registerAuthoringRoutes(
     ...(options.chat ? { chat: options.chat } : {}),
   });
   const id = (params: unknown) => String((params as { id: string }).id);
+  /** The model and reasoning level a call names become the project's, so a reopened screen and later calls keep them. */
+  const rememberModel = async (projectId: string, body: OperationBody | AnswersBody | undefined) => {
+    const model = typeof body?.model === "string" ? body.model.trim() : undefined;
+    const level = AUTHORING_THINKING_LEVELS.find((l) => l === body?.thinkingLevel);
+    if (model === undefined && !level) return;
+    await store.mutate(projectId, (p) => {
+      if (model) p.model = model;
+      else if (model === "") delete p.model;
+      if (level) p.thinkingLevel = level;
+    });
+  };
 
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
@@ -334,16 +346,19 @@ export async function registerAuthoringRoutes(
           }
           if (body.target === "skill" || body.target === "workflow" || body.target === "auto") p.target = body.target;
         });
+      await rememberModel(projectId, body);
       const project = await store.read(projectId);
       return reply.code(202).send(await startOperation(store, projectId, "analyze", body.opId, deps(body, project)));
     });
     scope.post<{ Body: OperationBody }>("/geo/authoring/projects/:id/draft", async (req, reply) => {
+      await rememberModel(id(req.params), req.body);
       const project = await store.read(id(req.params));
       return reply
         .code(202)
         .send(await startOperation(store, project.id, "draft", req.body?.opId, deps(req.body, project)));
     });
     scope.post<{ Body: OperationBody }>("/geo/authoring/projects/:id/revise", async (req, reply) => {
+      await rememberModel(id(req.params), req.body);
       const project = await store.read(id(req.params));
       return reply.code(202).send(
         await startOperation(store, project.id, "revise", req.body?.opId, {
@@ -366,6 +381,7 @@ export async function registerAuthoringRoutes(
         return out;
       });
       if (!body.draft) return reply.code(201).send({ decisions });
+      await rememberModel(projectId, body);
       const project = await store.read(projectId);
       const op = project.drafts.length ? "revise" : "draft";
       const attempt = await startOperation(store, projectId, op, `${body.opId}-draft`, {
