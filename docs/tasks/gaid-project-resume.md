@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T03:22:29Z
+status: done
+updated: 2026-10-23T03:22:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24ac6438-9d3c-40bf-aed3-558f9bb47f6f","pid":3710210,"provider":"claude","session":"5e080e46-115a-40f8-bbc8-5648ad5fea05","start":"61251758","token":"54f15532caa6f0bb44aa2320e3a60c342b9ddac56953f1cfc70157047cf250d7"}
 branch: task/gaid-project-resume
 target: main
@@ -64,7 +64,9 @@ Implemented (single writer, no child units; the change is one tightly coupled se
   browser 1 did not overwrite it (revision unchanged); ProjectSwitcher Alpha → Beta → Alpha kept the Alpha workspace mounted.
 - `scripts/check` passed (exit 0): server vitest 2255 passed / 8 skipped, web vitest 1236 passed, GAID checks and production smoke PASS.
 ## Next steps
-1. None in this unit; the hub updates the review app after integration.
+<!-- task:closed -->
+Closed 2026-10-23T03:22:48Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Two browsers on one project: the last save wins. A browser sends a save only when its state differs from what it last read
