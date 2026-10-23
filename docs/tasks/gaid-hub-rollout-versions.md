@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:40:46Z
+updated: 2026-10-23T08:41:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"63c6aa87-c4a4-4624-9c99-d7f3096d74a3","pid":3356915,"provider":"claude","session":"abfb67d2-5d61-4efb-96c3-d2f9ec8416bb","start":"63255981","token":"96268dc30643485eaa762b4dfbb47ec9211b079885bf6e4624511700c1495289"}
 branch: task/gaid-hub-rollout-versions
 target: main
@@ -66,7 +66,10 @@ Main at request time: 7703739a.
 3. PROJECT.md: hub SHA, backup, loopback mode recorded; review app SHA to update after step 2.
 Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `systemctl --user cat gaid-hub-server | grep WorkingDirectory`.
 ## Next steps
-1. When the hub or D says the review app is free: back up ~/.geoaidesk config, update the review app to the main SHA
+1. Routed request `rollout-review-app-free` (consumed): D reports the review app free; wait for the hub's next message with the
+   main SHA containing D's sync (F8, F18), deploy the review app there (not an older main), then `task route-report` so the hub
+   starts D's second pass. Hub server stays at 7703739a unless that SHA changes hub-server code.
+2. When that SHA arrives: back up ~/.geoaidesk config, update the review app to the main SHA
    7703739a (or current main if the hub server is moved with it) with the loopback recipe, browser checks, PROJECT.md, finish.
 ## Failed approaches
 ## Notes and decisions
