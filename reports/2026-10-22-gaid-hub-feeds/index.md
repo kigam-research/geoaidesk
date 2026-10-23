@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-feeds.png
 supersedes:
+reviewed: 2026-10-23
 ---
 # GAID 허브 자료 소식: 관리자가 승인한 출처의 논문·도구·스킬 소식
 
