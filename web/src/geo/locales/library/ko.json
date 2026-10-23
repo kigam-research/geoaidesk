@@ -429,7 +429,12 @@
         "button": "서재에 넣기 {n}건"
       },
       "added": "정리 노트 {n}건을 서재에 넣었습니다",
-      "partly": "{total}건 가운데 {n}건만 넣었습니다"
-    }
+      "partly": "{total}건 가운데 {n}건만 넣었습니다",
+      "saveNone": {
+        "button": "서재에 넣기"
+      }
+    },
+    "allFolder": "전체 정리 노트",
+    "recentTitle": "최근 넣은 정리 노트"
   }
 }

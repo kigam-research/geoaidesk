@@ -429,7 +429,12 @@
         "button": "Put {n} in library"
       },
       "added": "Put {n} research notes in the library",
-      "partly": "Put {n} of {total} in the library"
-    }
+      "partly": "Put {n} of {total} in the library",
+      "saveNone": {
+        "button": "Put in library"
+      }
+    },
+    "allFolder": "All research notes",
+    "recentTitle": "Recently added research notes"
   }
 }

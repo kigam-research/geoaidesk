@@ -57,7 +57,7 @@ describe("research notes in the library", () => {
     expect(item).toMatchObject({ kind: "note", source: "gaid", metadataOrigin: "note", csl: { type: "document", title: "포천 자력 역산", issued: { "date-parts": [[2026, 10, 23]] } }, attachments: [] });
     expect(item.citationKey).toBeUndefined();
     expect(item.note).toMatchObject({ projectId, projectName: "포천 자철석", noteId: "2026-10-23-pocheon", status: "pending", headline: "자력 이상과 시추 대자율이 맞습니다." });
-    expect(item.note!.citations).toEqual([{ key: "hong2026", itemId: p.id, locators: ["p. 4"] }, { key: "missing2020", locators: [] }]);
+    expect(item.note!.citations).toEqual([{ key: "hong2026", itemId: p.id, title: "Magnetite inversion", locators: ["p. 4"] }, { key: "missing2020", locators: [] }]);
 
     const again = await server.inject({ method: "POST", url: "/geo/library/notes", payload: { noteId: "2026-10-23-pocheon" } });
     expect(again.statusCode).toBe(200);

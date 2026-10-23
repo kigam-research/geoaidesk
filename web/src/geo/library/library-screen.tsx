@@ -161,7 +161,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-4 py-6 sm:px-6">
-      <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : counts?.all) ?? 0} selected={folderId}
+      <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : counts?.all) ?? 0} allLabel={notes ? L("notes.allFolder") : undefined} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className="flex min-w-0 flex-1 flex-col gap-3" aria-label={L("screen.title")}>
         <LibrarySyncLine onSynced={load} refreshKey={data} />
@@ -278,8 +278,8 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
             onDeleted={() => { setFolderId(null); void load(); }} onChanged={load} />
         ) : (
           <>
-            <OrcidCard status={orcid} loadError={orcidError} onStatus={setOrcid} onChanged={refreshAfterOrcid} onRetry={() => void loadOrcid()} onImport={() => { setOrcidStarted(true); setOrcidOpen(true); }} />
-            <SidePanel data={data} onSelect={setSelected} onChanged={load} />
+            {!notes && <OrcidCard status={orcid} loadError={orcidError} onStatus={setOrcid} onChanged={refreshAfterOrcid} onRetry={() => void loadOrcid()} onImport={() => { setOrcidStarted(true); setOrcidOpen(true); }} />}
+            <SidePanel data={data} notes={notes} onSelect={setSelected} onChanged={load} />
           </>
         )}
       </aside>
@@ -296,7 +296,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   );
 }
 
-function SidePanel({ data, onSelect, onChanged }: { data: LibraryListResponse | null; onSelect: (id: string) => void; onChanged: () => void }) {
+function SidePanel({ data, notes, onSelect, onChanged }: { data: LibraryListResponse | null; notes: boolean; onSelect: (id: string) => void; onChanged: () => void }) {
   if (!data) return null;
   const byAdded = [...data.items].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
   return (
@@ -307,10 +307,11 @@ function SidePanel({ data, onSelect, onChanged }: { data: LibraryListResponse | 
         {data.counts.notes > 0 && <p className="text-sm">{L("notes.side", { n: data.counts.notes })}</p>}
         {data.counts.unread > 0 && <p className="text-sm text-muted-foreground">{L("side.unread", { n: data.counts.unread })}</p>}
       </div>
-      <ZoteroCard libraries={data.zotero} papers={data.counts.zotero} onChanged={onChanged} />
+      {/* Research notes never go to Zotero; its card belongs to the papers. */}
+      {!notes && <ZoteroCard libraries={data.zotero} papers={data.counts.zotero} onChanged={onChanged} />}
       {byAdded.length > 0 && (
         <div className="flex flex-col gap-2 rounded-xl border p-4">
-          <h2 className="text-base font-semibold">{L("side.recentTitle")}</h2>
+          <h2 className="text-base font-semibold">{L(notes ? "notes.recentTitle" : "side.recentTitle")}</h2>
           {byAdded.slice(0, 4).map((row) => (
             <button key={row.id} type="button" onClick={() => onSelect(row.id)} className="-mx-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <span className="line-clamp-2 font-medium">{row.title}</span>

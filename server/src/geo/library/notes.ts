@@ -62,7 +62,8 @@ async function resolveCitations(store: LibraryStore, keys: { key: string; locato
   const out: LibraryNoteRef["citations"] = [];
   for (const { key, locators } of keys) {
     const item = await store.byCitationKey(key);
-    out.push({ key, ...(item && !item.removedFromSourceAt && !isNoteItem(item) ? { itemId: item.id } : {}), locators });
+    const paper = item && !item.removedFromSourceAt && !isNoteItem(item) ? item : undefined;
+    out.push({ key, ...(paper ? { itemId: paper.id, title: paper.csl.title.slice(0, 300) } : {}), locators });
   }
   return out;
 }

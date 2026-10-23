@@ -113,8 +113,8 @@ export interface LibraryNoteRef {
   contentSha256: string;
   fileUpdatedAt: string;
   refreshedAt: string;
-  /** Citation keys in the note and the library items they resolved to at the last refresh. */
-  citations: { key: string; itemId?: string; locators: string[] }[];
+  /** Citation keys in the note and the library papers (id, title) they resolved to at the last refresh. */
+  citations: { key: string; itemId?: string; title?: string; locators: string[] }[];
   /** Set when the note file (or its project) was not found at the last refresh; cleared when it is back. */
   missingAt?: string;
 }

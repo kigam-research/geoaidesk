@@ -27,7 +27,7 @@ const STATUS_TONE: Record<LibraryNoteStatus, string> = {
   confirmed: "border-transparent bg-gaid-success-tint text-gaid-success",
   superseded: "border-gaid-edge text-gaid-ink-3",
 };
-const NOTE_PROSE = "[&_h2]:mt-4 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h2]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-sm [&_h3]:font-semibold";
+const NOTE_PROSE = "[&_h1]:mt-4 [&_h1]:mb-1.5 [&_h1]:text-sm [&_h1]:font-semibold [&_h2]:mt-4 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h2]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-sm [&_h3]:font-semibold";
 
 function formatDate(date: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
@@ -52,10 +52,10 @@ export function NoteTable({ rows, selected, onSelect }: { rows: LibraryItemSumma
       <thead className="sticky top-0 bg-background">
         <tr className="border-b text-left text-xs text-muted-foreground">
           <th className="w-[50%] px-2 py-2 font-medium">{L("table.note")}</th>
-          <th className="px-2 py-2 font-medium">{L("table.date")}</th>
+          <th className="whitespace-nowrap px-2 py-2 font-medium">{L("table.date")}</th>
           <th className="px-2 py-2 font-medium">{L("table.project")}</th>
           <th className="px-2 py-2 font-medium">{L("table.status")}</th>
-          <th className="px-2 py-2 text-right font-medium">{L("table.cites")}</th>
+          <th className="whitespace-nowrap px-2 py-2 text-right font-medium">{L("table.cites")}</th>
         </tr>
       </thead>
       <tbody>
@@ -69,9 +69,9 @@ export function NoteTable({ rows, selected, onSelect }: { rows: LibraryItemSumma
               <div className="font-medium text-foreground">{row.title}</div>
               {row.note?.headline && <div className="line-clamp-1 text-xs text-muted-foreground">{row.note.headline}</div>}
             </td>
-            <td className="gaid-numeric whitespace-nowrap px-2 py-2.5">{row.note ? formatDate(row.note.date) : ""}</td>
+            <td className="gaid-numeric whitespace-nowrap px-2 py-2.5">{row.note?.date ?? ""}</td>
             <td className="px-2 py-2.5">
-              <div className="line-clamp-1">{row.note?.projectName}</div>
+              <div className="line-clamp-1" title={row.note?.projectName}>{row.note?.projectName}</div>
               {row.note && !row.note.local && <div className="text-xs text-muted-foreground">{row.note.missing ? L("missingShort") : L("otherPc", { name: row.note.originLabel })}</div>}
             </td>
             <td className="px-2 py-2.5">{row.note && <NoteStatusBadge status={row.note.status} />}</td>
@@ -146,8 +146,8 @@ export function NoteItemDetail({ data, collections, onClose, onOpenNote, onSelec
         {cited.map((c) => (
           <div key={c.key} className="flex items-start justify-between gap-3 text-sm">
             <span className="min-w-0">
-              <span className="font-mono text-xs">@{c.key}</span>
-              {c.locators.length > 0 && <span className="text-muted-foreground"> · {c.locators.join(", ")}</span>}
+              <span className="line-clamp-2">{c.title ?? `@${c.key}`}</span>
+              <span className="text-xs text-muted-foreground">{[`@${c.key}`, ...c.locators].join(" · ")}</span>
             </span>
             <button type="button" onClick={() => onSelect(c.itemId!)} className="shrink-0 text-primary hover:underline">{L("openPaper.action")}</button>
           </div>
@@ -232,7 +232,7 @@ export function AddNotesDialog({ open, onOpenChange, folder, onAdded }: { open: 
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{t("library.dialog.cancel.button")}</Button>
-          <Button disabled={!chosen.size || saving} onClick={() => void save()}>{saving ? L("dialog.saving") : L("dialog.save.button", { n: chosen.size })}</Button>
+          <Button disabled={!chosen.size || saving} onClick={() => void save()}>{saving ? L("dialog.saving") : chosen.size ? L("dialog.save.button", { n: chosen.size }) : L("dialog.saveNone.button")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
