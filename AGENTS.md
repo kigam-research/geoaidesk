@@ -181,8 +181,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `server/src/geo/routes/orcid.ts`, contract `web/src/geo/contracts/orcid.ts`; `GAID_ORCID_API_URL` points at the sandbox). Preview
   first; confirm re-reads the record, fills by DOI (Crossref → OpenAlex) else from the ORCID work (`metadataOrigin: "orcid"`), marks
   a same-DOI or earlier-imported item instead of adding (`LibraryItem.ownWork`, kept across Zotero refresh/merge; list filter `mine`);
-  a similar title never merges. Nothing is written to ORCID and nothing is polled (Public API terms). Phase 2 (authenticated iD via
-  OIDC, client secret only in hub server config, iD on hub accounts) waits for the user's ORCID client registration.
+  a similar title never merges. Nothing is written to ORCID and nothing is polled (Public API terms). Phase 2 (ADR
+  `docs/adr/2026-10-23-orcid-authenticated-link.md`): the hub server holds the ORCID client (`orcid-client set`, secret at a
+  hidden prompt, `<GAID_HUB_SERVER_HOME>/orcid-client.json` mode 600, not in backups; `server/src/geo/hub-server/orcid.ts`,
+  `/hub/v1/orcid*`, migration v4); "ORCID로 본인 확인" starts an OIDC code flow whose redirect returns to the researcher's GAID
+  (`/geo/orcid/callback`, registered as `http://127.0.0.1:8000/geo/orcid/callback`), which hands code + state to the hub; the hub
+  verifies the ID token (RS256/JWKS, iss, aud, nonce, exp) and records `HubAccount.orcid`; hub entries carry the author's
+  current `authorOrcid`. Callback code/state are redacted from request logs. Sandbox verified end to end 2026-10-23;
+  production loopback redirect unverified.
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`

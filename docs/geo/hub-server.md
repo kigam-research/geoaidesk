@@ -88,6 +88,33 @@ Existing revisions are immutable. A registration can append one next revision; a
 revision unchanged. Every referenced package and light/dark picture must already be stored. Retrying identical file bytes
 is allowed; overwriting an entry file with different bytes is refused.
 
+## ORCID sign-in (authenticated iD)
+
+Researchers can prove their ORCID iD in GAID's library (서재 → ORCID → "ORCID로 본인 확인"); the hub records it on the
+account and shows it next to the author of their hub Workflows (ADR `docs/adr/2026-10-23-orcid-authenticated-link.md`).
+The hub holds one ORCID public API client. Public API credentials belong to one person (ORCID Public API terms); register
+them with the operator's own ORCID account in Developer Tools, with this redirect URI exactly:
+
+```
+http://127.0.0.1:8000/geo/orcid/callback
+```
+
+Store the client on the hub PC (the secret is asked for at a hidden prompt; never put it in a command line, Git, chat or
+mail):
+
+```bash
+node geo/hub-server.mjs orcid-client set --client-id APP-XXXXXXXXXXXXXXXX            # production
+node geo/hub-server.mjs orcid-client set --client-id APP-XXXXXXXXXXXXXXXX --sandbox  # ORCID test server
+node geo/hub-server.mjs orcid-client show    # environment, client id, redirect URI; never the secret
+node geo/hub-server.mjs orcid-client clear   # turns ORCID sign-in off; linked iDs stay on their accounts
+```
+
+It writes `<GAID_HUB_SERVER_HOME>/orcid-client.json` (mode 600) and takes effect without a restart. The file is not part of
+`backup`; after a restore or a move, run `orcid-client set` again. One iD can be linked to one account; a researcher removes
+their own link in GAID. The researcher's GAID must run its backend at `127.0.0.1:8000` (the default) for the redirect to
+reach it, and the browser must run on the same PC. Whether ORCID production accepts this loopback HTTP redirect is not yet
+verified (the sandbox does); see the ADR.
+
 ## Shared skill shelf
 
 The `/hub/v1/skills` API stores named skills, immutable revision archives, origin/licence information, per-revision reviews,

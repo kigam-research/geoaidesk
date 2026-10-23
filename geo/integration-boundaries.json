@@ -981,6 +981,12 @@
       "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
     },
     {
+      "path": "server/src/index.ts",
+      "owner": "gaid-orcid",
+      "status": "edited",
+      "responsibility": "Request-log serializer also redacts ORCID's one-time code/state on /geo/orcid/callback (server/src/geo/orcid/log.ts)."
+    },
+    {
       "path": "web/public/geo/orcid/",
       "owner": "gaid-orcid",
       "status": "edited",

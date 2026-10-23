@@ -218,3 +218,26 @@ describe("researcher GAID callback", () => {
     expect(after.hub).toEqual({ state: "ready", environment: "sandbox" });
   });
 });
+
+describe("researcher GAID with a reachable hub", () => {
+  it("links and unlinks a typed iD without waiting on itself (hub ready and linked)", async () => {
+    let link: { id: string; environment: "sandbox"; authenticatedAt: string } | null = null;
+    const port: OrcidHubPort = {
+      status: async () => ({ configured: true, environment: "sandbox", link }),
+      start: async () => ({ authorizeUrl: "https://sandbox.orcid.org/oauth/authorize", expiresAt: "" }),
+      finish: async () => { throw new Error("unused"); },
+      unlink: async () => { link = null; },
+    };
+    const person = { name: { "given-names": { value: "Josiah" }, "family-name": { value: "Carberry" } } };
+    const client = { person: async () => person, works: async () => ({ group: [] }), workDetails: async () => [] };
+    const store = new LibraryStore(join(root, "library"));
+    const service = new OrcidService(store, { hub: () => port, client, lookupDoi: async () => { throw new Error("unused"); } });
+    const within = <T>(p: Promise<T>) => Promise.race([p, new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timed out")), 2_000))]);
+    expect((await within(service.link(ID))).profile).toMatchObject({ orcid: ID, authenticated: false });
+    expect((await within(service.unlink())).profile).toBeNull();
+    link = { id: ID, environment: "sandbox", authenticatedAt: "2026-10-23T01:00:00.000Z" };
+    expect((await within(service.link("0000-0002-1694-233X"))).profile).toMatchObject({ orcid: ID, authenticated: true });
+    expect((await within(service.authUnlink())).profile).toMatchObject({ orcid: ID, authenticated: false });
+    expect((await within(service.status())).hub).toEqual({ state: "ready", environment: "sandbox" });
+  });
+});

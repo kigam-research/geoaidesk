@@ -189,3 +189,12 @@ describe("ORCID routes", () => {
     expect(fs.existsSync(path.join(store.root, "orcid.json"))).toBe(false);
   });
 });
+
+describe("ORCID callback logging", () => {
+  it("redacts the one-time code and state only on the callback", async () => {
+    const { redactOrcidCallback } = await import("../src/geo/orcid/log.ts");
+    expect(redactOrcidCallback("/geo/orcid/callback?code=67nYnA&state=abc")).toBe("/geo/orcid/callback?code=[redacted]&state=[redacted]");
+    expect(redactOrcidCallback("/geo/orcid/callback?error=access_denied&state=abc")).toBe("/geo/orcid/callback?error=access_denied&state=[redacted]");
+    expect(redactOrcidCallback("/geo/library?code=x")).toBe("/geo/library?code=x");
+  });
+});

@@ -157,8 +157,8 @@ export class OrcidService {
   }
 
   /** Links a typed iD after checking that a public record exists; re-linking the same iD keeps its dates. */
-  link(input: unknown): Promise<OrcidStatus> {
-    return this.serial(async () => {
+  async link(input: unknown): Promise<OrcidStatus> {
+    await this.serial(async () => {
       const orcid = typeof input === "string" ? normalizeOrcidId(input) : null;
       if (!orcid) throw new LibraryError("ORCID iD 형식이 맞지 않습니다.", 400);
       const name = personName(await this.client.person(orcid));
@@ -172,13 +172,15 @@ export class OrcidService {
         ...(previous?.orcid === orcid && previous.lastReadAt ? { lastReadAt: previous.lastReadAt } : {}),
         ...(previous?.orcid === orcid && previous.lastImportAt ? { lastImportAt: previous.lastImportAt } : {}),
       });
-      return this.status();
     });
+    // Outside the queue: status() reconciles with the hub through the same queue.
+    return this.status();
   }
 
   /** Removes the link; items keep their own-work marks (they record the iD they came from). */
-  unlink(): Promise<OrcidStatus> {
-    return this.serial(async () => { this.save(null); return this.status(); });
+  async unlink(): Promise<OrcidStatus> {
+    await this.serial(async () => { this.save(null); });
+    return this.status();
   }
 
   private linked(): OrcidProfile {
