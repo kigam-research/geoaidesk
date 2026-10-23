@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:48:00Z
+updated: 2026-10-23T01:48:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b35bb8b9-c459-4233-ba31-c386537b4e3f","pid":2832900,"provider":"codex","session":"01a16669-3557-7520-b2f1-bc790350ad04","start":"60747240","token":"59f55a1303c7beb853fef07784bf6e29821f7eac7b1cfd62eca996fdd7606311"}
 branch: task/gaid-orcid--authui
 target: task/gaid-orcid
@@ -89,6 +89,7 @@ with commands, anything not verified. Then `task finish`.
 ## Next steps
 1. Run focused tests/typecheck, then real-app states and screenshot matrix, full required checks, report section and finish.
 ## Failed approaches
+- QA job restart initially rejected a dirty source tree. Tracked disposition changes were saved, but the repeated rejection shared the premise that untracked screenshot files were allowed. Direct `git status --short` showed only untracked screenshots; save their draft evidence paths before starting the final snapshot.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
