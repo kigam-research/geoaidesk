@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:49:57Z
+updated: 2026-10-23T08:53:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -177,6 +177,14 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   required input (`settings.runThrough`, `web/src/geo/contracts/workflow-doc.ts`). Also seen: after the interview
   expired the agent stopped the run anyway (it asked for the three answers in its final message) although the tool
   result told it to proceed with its recommendations.
+- F19 — first-pass interpretation depth — with the paper's GMM proportions (0.9/0.075/0.025, chosen on purpose in the
+  start settings) PGI-none lowered the learned ore mean 0.290 → 0.143 SI (the paper's rose 0.2828 → 0.3752). The GAID
+  note records the drop and that volume differences mix model and threshold changes, but does not look at the cause
+  (proportions are cell-volume fractions over a padded mesh, so 2.5 % ore is far more volume than the ore body) and
+  proposes checking the susceptibility upper bound instead. Not an execution error; the method knowledge is not in the
+  paper, so source-grounded authoring cannot add it by itself. Like-for-like, GAID ≥ the writer's reference (same
+  settings: reference ore mean 0.036, PGI-none property 7.9×). The writer's adjusted-proportion run (0.985/0.01/0.005)
+  is a diagnosis, not a comparison baseline. — open (second pass: researcher feedback may add a proportion check).
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
