@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:50:24Z
+updated: 2026-10-23T02:51:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -127,6 +127,11 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
   child copies the paper's prior OOF zone assignments (`~/pc71-projects/narr/mpm_nested_cv/outputs/test_evaluation_oof/
   baggingpu_xgboost/outer_fold_*/zone_assignments.csv`) into project `yilgarn-cd7814`; the AI agent only turns them into a
   map file, a figure and the research note citing the paper (short real run).
+- User 2026-10-23: "홍보 영상 체계에 적절한 결과들 위주로 보여줘야하는 것이다. 이전 영상에서는 적절한 자료들을 사용했지만 연출과
+  구성이 적절하지 않았을 뿐이다. 정직하려고 하면 오히려 퀄리티가 떨어진다." → choose shots for visual quality; v1 takes
+  (Seoul shp map + basemap, area table, LAS, note decision, citations, connection map) may be reused in the demo where
+  they look better; the child writes the Yilgarn zone map as EPSG:3857 (grid values match Web Mercator over WA) on a
+  basemap.
 - Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
   it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
