@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:28:27Z
+updated: 2026-10-23T07:31:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -64,6 +64,13 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
 1. Record the user's answers under Notes and decisions. Unit B is on main (1580ad11) and merged into this branch (merge commit, no rebase: no history rewrite).
 2. After B is on main: rebase, implement the chosen design (plan in Notes), checks, §12 screenshots, report.
 Blocked: waiting for the user's answer to the two mockup questions (asked 2026-10-23).
+- F17 (from gaid-pocheon-trial via hub request h-f17, 2026-10-23) accepted into the implementation, inside decision 3
+  (file candidates): unit B already starts inputs on example data when the researcher has no own file. Still to do here:
+  (a) order each input's candidates by how well the file name matches the role (role id and label tokens, e.g.
+  `aeromag-lines` ↔ `aeromag_lines.csv`), best match first; (b) an optional input starts on a fitting project file whose
+  name matches the role (exactly one such match), instead of "사용하지 않음"; (c) the summary flags an optional input left
+  unused while a fitting project file exists ("맞는 파일이 있지만 쓰지 않음"), so a recipe-default start is not silently a reduced
+  method. Column-based matching is not planned (it would read file contents in the browser); name matching only.
 ## Failed approaches
 ## Notes and decisions
 - Plan (2026-10-23): sequential. Design → user approval → wait for B on main → implement. Implementation is tightly coupled
