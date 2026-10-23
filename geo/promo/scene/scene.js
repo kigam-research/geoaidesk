@@ -359,9 +359,9 @@
   // ---------- S3 the research cycle 19.9–28.4 ----------
   const RING = { cx: 960, cy: 646, rx: 560, ry: 290 };
   scenes.push(() => {
-    const A = 19.9, B = 28.5;
+    const A = 19.9, B = 28.25;
     const layer = h('div', 'layer');
-    const head = headline(layer, 110, 92, [[20.2, 28.3, '내 연구가 Workflow가 되고, 다시 내 연구로 돌아옵니다']]);
+    const head = headline(layer, 110, 92, [[20.2, 28.1, '내 연구가 Workflow가 되고, 다시 내 연구로 돌아옵니다']]);
     const svg = sv('svg', { width: 1920, height: 1080 }, layer);
     svg.style.position = 'absolute';
     const ell = sv('ellipse', { cx: RING.cx, cy: RING.cy, rx: RING.rx, ry: RING.ry, fill: 'none', stroke: '#9aa3b0', 'stroke-width': 2.5, pathLength: 1, 'stroke-dasharray': '0 1' }, svg);
@@ -384,7 +384,7 @@
     const pan = h('div', 'plate', layer, '');
     pan.style.fontSize = '30px';
     return t => {
-      const o = win(t, A, B, 0.45, 0.4);
+      const o = win(t, A, B, 0.45, 0.35);
       put(layer, { o });
       if (o <= 0) return;
       head(t);
@@ -464,7 +464,7 @@
     const tagEl = h('div', 'abs', over);
     Object.assign(tagEl.style, { background: BLUE, color: '#fff', fontSize: '32px', fontWeight: 700, padding: '8px 20px', borderRadius: '8px', cornerShape: 'bevel', whiteSpace: 'nowrap', letterSpacing: '-0.01em' });
     return t => {
-      const o = win(t, DEMO.a - 0.1, DEMO.b + 0.1, 0.5, 0.45);
+      const o = win(t, DEMO.a - 0.05, DEMO.b + 0.05, 0.45, 0.4);
       put(layer, { o });
       if (o <= 0) return;
       // chapter state
@@ -530,10 +530,10 @@
 
   // ---------- S4 ecosystem → KIGAM second brain 91.9–100.4 (conceptual) ----------
   scenes.push(() => {
-    const A = 91.9, B = 100.5;
+    const A = 91.6, B = 100.5;
     const layer = h('div', 'layer');
     const head = headline(layer, 110, 92, [
-      [92.2, 96.0, '연구자마다 고리가 돌면 지구과학 AI agent 생태계가 자랍니다'],
+      [91.8, 96.0, '연구자마다 고리가 돌면 지구과학 AI agent 생태계가 자랍니다'],
       [96.2, 100.3, '논문, Workflow, 연구노트가 이어져 KIGAM의 Second brain이 됩니다'],
     ]);
     const tag = h('div', 'note-tag', layer, '개념도');
@@ -595,10 +595,10 @@
       put(layer, { o });
       if (o <= 0) return;
       head(t);
-      put(tag, { o: ramp(t, 92.3, 92.8, lin) });
+      put(tag, { o: ramp(t, 91.9, 92.4, lin) });
       const gather = ramp(t, 96.0, 97.6, inOut);
       for (const r of rings) {
-        const f = ramp(t, 92.3 + r.i * 0.22, 92.9 + r.i * 0.22);
+        const f = ramp(t, 91.9 + r.i * 0.22, 92.5 + r.i * 0.22);
         r.g.setAttribute('opacity', f);
         put(r.u, { o: f });
         const lap = (t - 92.3) / 2.2 + r.phase;

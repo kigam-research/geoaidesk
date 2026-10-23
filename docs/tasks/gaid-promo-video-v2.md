@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T03:19:41Z
+updated: 2026-10-23T03:53:12Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -113,6 +113,8 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
    started 2026-10-23) runs the study in the review app and records capture-v2 (contract
    `geo/promo/CONTRACT.md` v2). Parent meanwhile rebuilds `scene/` (background, cycle, demo chrome with cycle strip
    and feature tags, second brain, closing) and `render.py` (~105 s).
+Blocked: final R2 retake (DOM staging of staging-revealing chat text) and the child's task finish (scripts/check) are
+   running in the child; then `task complete gaid-promo-video-v2--study`.
 2. Integrate capture-v2 beats into the demo segments, stills review, render job, report.
 ## Failed approaches
 ## Notes and decisions
