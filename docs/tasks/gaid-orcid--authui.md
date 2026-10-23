@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:48:23Z
+updated: 2026-10-23T01:52:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b35bb8b9-c459-4233-ba31-c386537b4e3f","pid":2832900,"provider":"codex","session":"01a16669-3557-7520-b2f1-bc790350ad04","start":"60747240","token":"59f55a1303c7beb853fef07784bf6e29821f7eac7b1cfd62eca996fdd7606311"}
 branch: task/gaid-orcid--authui
 target: task/gaid-orcid
@@ -87,11 +87,40 @@ with commands, anything not verified. Then `task finish`.
 - Sequential decisions: preserve the fixed server contracts; implement the shared iD renderer first, then card and tiny propagation seams, then behavior tests, own real-app smoke/screenshots, report and task finish. No independent package warrants a reader or child writer.
 - Owned interfaces: web/src/geo/orcid/, orcid locales; small shared-entry/library-screen propagation seams notified to parent. No backend edits.
 ## Next steps
-1. Run focused tests/typecheck, then real-app states and screenshot matrix, full required checks, report section and finish.
+1. Integrate the parent-owned nested-serial backend fix with the agreed task workflow, restart own QA, recheck typed local link/unlink under a connected hub and recapture stable ready/no-account/account frames. Finalize report/check receipts and task finish.
+Blocked: final live QA depends on the parent backend fix for link/unlink nested status() serialization.
 ## Failed approaches
+- Live local-iD DELETE after auth unlink hung; direct source reread confirmed a backend deadlock: link/unlink hold serial() while returning status(), which now enters serial() again for hub-ready reconciliation. Parent notified with concrete reproduction and asked to own the backend fix. Do not retry the hanging local mutations in the current app. Rebuild QA from parent fix and recapture ready/no-account/account screenshots (the later failed flow could leave a dialog visible).
 - QA job restart initially rejected a dirty source tree. Tracked disposition changes were saved, but the repeated rejection shared the premise that untracked screenshot files were allowed. Direct `git status --short` showed only untracked screenshots; save their draft evidence paths before starting the final snapshot.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+### Phase-2 UI delivery details
+
+Changed files: web/src/geo/orcid/{api.ts,id-display.tsx,orcid-card.tsx,orcid-card.test.tsx,import-dialog.tsx}; web/src/geo/hub/{shared-method.tsx,shared-entry.tsx,shared-browse.tsx,shared-method.test.tsx,shared-browse.test.tsx}; web/src/geo/hub-server/account.tsx; web/src/geo/library/library-screen.tsx; web/src/geo/locales/orcid/{ko,en}.json. Parent notified of the minimal shared-entry/library-screen propagation seams. No server/contracts/icon changes.
+
+UI rules followed: P2/P3/P5/P9 (existing library remains primary; honest typed/authenticated/test states); I2/I6/I7/I8/I12/I13 (roles and unchanged official pixels); L4/L7; B1/B2/B3/B5 (outline secondary auth actions preserve Add paper as primary); D2/D3 (explicitly requested auth-unlink confirmation with retained-data consequence); F5/R2 (plain errors, raw error collapsed); A1/A2/A3/A5 (native links/buttons, focus, status announcements); W1-W6; R1/R3; V1/V2/V3/V6. No new exceptions or baseline debt. Compact author links are separate siblings of the row action, not links nested in a button; 28px target and accessible full iD name. Both table/header author columns widened to 8rem.
+
+Strings below are all additions (before: absent); no existing ko/en string was changed.
+
+| String id | Korean | English |
+|---|---|---|
+| orcid.id.authenticatedLink | 인증된 ORCID iD: {url} | Authenticated ORCID iD: {url} |
+| orcid.id.link | ORCID iD: {url} | ORCID iD: {url} |
+| orcid.id.sandbox | ORCID 시험 환경 (시험용 기록) | ORCID sandbox (test records) |
+| orcid.auth.hint | ORCID에서 로그인한 뒤 GAID로 돌아오세요. | Sign in on ORCID, then return to GAID. |
+| orcid.auth.start.button | ORCID로 본인 확인 | Verify iD with ORCID |
+| orcid.auth.starting.button | ORCID 연결 중 | Opening ORCID |
+| orcid.auth.waiting | ORCID에서 본인 확인을 마치면 돌아와 연결을 확인하세요. | After verifying on ORCID, return here to check the link. |
+| orcid.auth.open.button | ORCID 로그인 열기 | Open ORCID sign-in |
+| orcid.auth.noAccount | ORCID 본인 확인에는 기관 GAID 허브 로그인이 필요합니다. | To verify your ORCID iD, log in to the institute GAID hub. |
+| orcid.auth.settings.button | 기관 허브 설정 열기 | Open institute hub settings |
+| orcid.auth.notConfigured | 허브에 ORCID 연결이 설정되지 않았습니다. 허브 관리자에게 문의하세요. | ORCID is not set up on this hub. Ask the hub administrator. |
+| orcid.auth.unreachable | 기관 GAID 허브에 연결하지 못했습니다. 연결 상태를 다시 읽으세요. | Could not reach the institute GAID hub. Read the connection status again. |
+| orcid.auth.unlink.button | 본인 확인 연결 해제 | Unlink verified iD |
+| orcid.auth.unlink.title | ORCID 본인 확인 연결 해제 | Unlink verified ORCID iD |
+| orcid.auth.unlink.hint | 허브 계정의 본인 확인 연결을 해제합니다. iD는 인증 안 된 상태로 남고, 가져온 논문과 내 논문 표시는 유지합니다. | Remove the verified link from your hub account. The iD stays as unauthenticated; imported works and own-work marks stay. |
+| orcid.error.auth | 본인 확인 연결을 처리하지 못했습니다. 연결 상태를 다시 읽고 시도하세요. | Could not process the verified link. Read the connection status again and retry. |
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -108,6 +137,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014353.337542Z/receipt.json
   - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-orcid-auth-ui/playwright"],"reason":"QA app stopped to rebuild the final URL wrap and author-column layout snapshot; live state checks passed.","recorded":"2026-10-23T01:47:41Z","state":"cancelled"}
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014402.188704Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014832.992699Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-orcid-auth-ui/status-after-auth-unlink.json"],"reason":"Own QA instance stopped after reproducing the nested serial/status local-link deadlock; parent owns the backend fix. Restart with the fixed snapshot before final matrix.","recorded":"2026-10-23T01:52:33Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

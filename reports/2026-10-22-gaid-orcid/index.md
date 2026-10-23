@@ -89,6 +89,16 @@ supersedes:
 | 허브 계정과 허브 Workflow에 iD 표시 | 2단계로 미룸(사용자 결정) | 5절 |
 | 자동 검사 통과 | 충족 | 4절 |
 
+### 3.1 본인 확인 연결 화면 (2단계, 2026-10-23)
+
+기관 GAID 허브에 로그인한 연구자는 서재에서 “ORCID로 본인 확인”을 눌러 ORCID 로그인 탭을 엽니다. 본인 확인을 마치고 돌아오면 GAID가 연결 상태를 다시 읽습니다. 탭이 차단된 경우에는 로그인 링크를 제공합니다.
+
+인증된 iD에는 ORCID의 인증용 아이콘을 붙이고 “인증 안 됨” 표시는 붙이지 않습니다. 시험 환경은 “ORCID 시험 환경 (시험용 기록)”으로 구분합니다. 허브 Workflow의 작성자 이름 옆과 기관 허브 계정에도 인증된 iD를 표시합니다. 직접 입력한 iD는 기존처럼 인증 안 된 상태로 표시합니다.
+
+본인 확인 연결을 해제하기 전에는 확인 창이 열립니다. 해제하면 허브 계정의 인증 연결이 없어지고, iD는 인증 안 된 상태로 남습니다. 가져온 논문과 내 논문 표시는 유지합니다. 허브에 로그인하지 않았거나 운영자가 ORCID 연결을 설정하지 않은 경우에는 그 상태와 다음 동작을 안내합니다.
+
+화면: [인증된 iD와 시험 환경 표시](figures/orcid2-linked-mapsheet-dark-1280.png), [Workflow 작성자 표시](figures/orcid2-author-instrument-light-1440.png), [기관 허브 계정 표시](figures/orcid2-account-instrument-light-1440.png).
+
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 이 기능은 서지 정보를 옮기며 연구 결과를 계산하지 않습니다. 가져온 서지 정보가 맞는지는 Crossref·OpenAlex·ORCID 기록에 기대며, GAID가 따로 검증하지 않습니다.
@@ -105,6 +115,14 @@ supersedes:
 - 화면 확인: 연결 전·연결 후·가져오기 창을 두 스타일(계측, 도폭), 두 테마, 두 크기(1440×900, 1280×800)에서 한국어로 찍은 24장을 UI 가이드 12절 기준으로 확인했습니다.
   - 확인한 항목: 실행 단추가 보이는지, 창 안에서만 스크롤되는지, 글자가 잘리지 않는지, ORCID 아이콘 색이 원래대로인지, 키보드 초점이 돌아오는지.
   - UI 가이드에서 벗어난 점이 하나 있습니다(규칙 G1). 논문 고르기 목록의 한 줄은 일반 목록보다 높습니다. 제목 전체, 연도·학술지, 상태를 한눈에 구별하도록 그렇게 했습니다.
+
+### 4.1 본인 확인 화면 확인 (2026-10-23)
+
+- 별도 시험 앱과 시험 허브에서 미로그인, ORCID 미설정, 본인 확인 준비, 시험용 인증 연결 상태를 확인했습니다. 설정으로 이동해 시험 계정의 초대를 수락하는 흐름도 확인했습니다.
+- 인증 연결 상태는 시험 허브의 데이터에 시험용 iD를 넣어 만들었습니다. 이 화면 확인은 실제 ORCID 로그인 성공을 입증하지 않습니다. 실제 로그인 확인은 상위 작업에서 따로 진행합니다.
+- 인증 연결 해제의 취소와 실행을 확인했습니다. 해제 뒤에도 같은 iD가 남고 “인증 안 됨”으로 바뀌었습니다. 허브 목록에서 ORCID 링크를 누르면 연구자 기록만 새 탭으로 열리고 Workflow는 열리지 않았습니다.
+- 자동 시험에서 로그인 탭을 먼저 열고 응답 뒤 이동하는 동작, 탭 차단 시 링크 제공, 실패 시 빈 탭 닫기, 돌아온 뒤 연결 상태 갱신, 인증 연결 해제와 기존 직접 입력 흐름을 확인했습니다.
+- 한국어 화면을 계측·도폭, 밝은·어두운 테마, 두 화면 크기로 확인했습니다. 공식 아이콘의 색을 바꾸지 않았으며, 긴 시험 환경 주소는 iD 전체가 같은 줄에 남도록 줄을 나눕니다.
 
 ## 5. 한계
 
@@ -151,6 +169,9 @@ supersedes:
 | 웹 조사 | Obsidian `웹 조사/geoaidesk/2026-10-22-i-am-building-an-orcid--e234c882d8.md` (Oracle Extra High, 2026-10-22) |
 | ORCID 공식 근거 | Public API 약관 https://info.orcid.org/public-client-terms-of-service/ · 사용 한도 https://info.orcid.org/ufaqs/what-are-the-api-limits/ · 되돌아올 주소 규칙 https://info.orcid.org/ufaqs/how-do-redirect-uris-work/ · iD 표시 규칙 https://info.orcid.org/documentation/integration-guide/orcid-id-display-guidelines/ · 시험 환경 https://info.orcid.org/documentation/integration-guide/sandbox-testing-server/ · OpenID 설정 https://orcid.org/.well-known/openid-configuration · KISTI 사례 https://info.orcid.org/pids-hand-in-hand-the-korea-doi-centers-orcid-auto-update/ |
 | 아이콘 출처 | ORCID 브랜드 자료실의 공식 아이콘, 수정하지 않음. `THIRD_PARTY_NOTICES.md` "ORCID iD icons" |
+| 2단계 화면 코드·문구·UI 규칙 | `docs/tasks/gaid-orcid--authui.md`의 Phase-2 UI delivery details와 문자열 표 |
+| 2단계 화면 사진 | `reports/2026-10-22-gaid-orcid/figures/orcid2-{no-account,ready,linked,author,browse,account}-{instrument,mapsheet}-{light,dark}-{1440,1280}.png` |
+| 2단계 화면 시험 | `web/src/geo/orcid/orcid-card.test.tsx`, `web/src/geo/hub/{shared-method,shared-browse}.test.tsx`; 별도 앱과 근거 `~/data/geoaidesk/work/gaid-orcid-auth-ui/` |
 | 하위 작업 기록 | `docs/tasks/gaid-orcid--ui.md` (바꾼 파일, 문구 id 한·영, UI 규칙 근거) |
 
 작성 시점: 2026-10-22, commit 87924824.
