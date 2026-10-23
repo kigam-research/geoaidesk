@@ -86,6 +86,43 @@ describe("GAID hub authoring", () => {
     expect(JSON.stringify(raw)).not.toContain('"reasoning"');
   });
 
+  it("keeps question and option evidence for the side viewer, marking quotes the server did not find", async () => {
+    const { store, projectId, source } = await fixture();
+    const [scope, code] = analysis.questions;
+    const cited = {
+      ...analysis,
+      questions: [
+        {
+          ...scope,
+          options: [
+            { ...scope.options[0], evidence: [{ source: "S1", page: 1, quote: "spatial blocks of 50 km" }] },
+            { ...scope.options[1], evidence: [{ source: "S9", page: 1, quote: "an unknown source alias" }] },
+          ],
+          evidence: [
+            { source: "S1", page: 1, quote: "treats unlabeled cells as unknown" },
+            { source: "S1", page: 1, quote: "random forest with 500 trees" },
+            { source: "S1", page: 7, quote: "separates tuning from outer testing" },
+            { source: "S1", page: 1, quote: "short" },
+          ],
+        },
+        code,
+      ],
+    };
+    await runOperation(store, projectId, "analyze", "op-evidence-1", deps(reply(cited)));
+    const q = (await store.read(projectId)).questions[0];
+    // Only the first three are read; the unfound quote stays, unconfirmed; a page outside the source is not kept.
+    expect(q.evidence).toEqual([
+      { sourceId: source.id, page: 1, quote: "treats unlabeled cells as unknown", verified: true },
+      { sourceId: source.id, page: 1, quote: "random forest with 500 trees", verified: false },
+      { sourceId: source.id, quote: "separates tuning from outer testing", verified: false },
+    ]);
+    expect(q.options[0].evidence).toEqual([
+      { sourceId: source.id, page: 1, quote: "spatial blocks of 50 km", verified: true },
+    ]);
+    // An unknown source cannot be shown at all: dropped.
+    expect(q.options[1].evidence).toBeUndefined();
+  });
+
   it("gives malformed output one repair; a second failure keeps the accepted state", async () => {
     const { store, projectId } = await fixture();
     const repaired = await runOperation(store, projectId, "analyze", "op-repair-1", deps(reply("not json", analysis)));

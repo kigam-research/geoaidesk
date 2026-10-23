@@ -170,7 +170,8 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     // A blank line ends the Markdown list, so these sentences do not join its last item.
     lines.push("");
     if (settings) lines.push(say("settings.unresolved", { list: unresolved.length ? unresolved.join(", ") : say("settings.none") }));
-    lines.push(say("settings.askBeforeStep"));
+    if (settings && !unresolved.length) lines.push(say("settings.runThrough"));
+    else lines.push(say("settings.askBeforeStep"));
     const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settings?.inputs[role.id]?.trim());
     if (exampleRoles.length) lines.push("", say("settings.examplesUsed", { labels: exampleRoles.map((role) => p(role.label)).join(", ") }), say("settings.exampleRule"));
   }

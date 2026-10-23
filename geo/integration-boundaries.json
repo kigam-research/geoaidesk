@@ -462,7 +462,7 @@
       "path": "web/src/components/pdf-viewer/pdf-viewer.tsx",
       "owner": "gaid-improve--source-preview",
       "status": "edited",
-      "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default. gaid-library-pdf-panel: optional renderError prop so a GAID pane (web/src/geo/pdf/pdf-pane.tsx) shows its own error with an open-in-new-tab fallback."
+      "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default. gaid-library-pdf-panel: optional renderError prop so a GAID pane (web/src/geo/pdf/pdf-pane.tsx) shows its own error with an open-in-new-tab fallback. gaid-authoring-evidence-view: `loadPdfjs` exported (unchanged) so the authoring evidence viewer renders single pages with the same pdf.js setup."
     },
     {
       "path": ".gitignore",
