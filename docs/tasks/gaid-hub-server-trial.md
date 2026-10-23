@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-22T18:00:57Z
+updated: 2026-10-23T00:47:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -31,14 +31,12 @@ gaid-hub-skills-2 (reviewer roles, admin disable, reports, GitHub upstream compa
 for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outside check.
 
 ## Current state
-- PAUSED 2026-10-23 03:00 KST (route pause-0300-gaid-hub-server-trial). Resume only on the user's resume instruction via the hub.
-  Nothing running (no job, worker or child). Exact next action on resume: run `node ~/deploy/geoaidesk-hub-server/cb63b118…/geo/hub-server.mjs
-  users` with `GAID_HUB_SERVER_HOME=~/data/geoaidesk/hub-server/home`; if the admin account seongin@kigam.re.kr exists, run
-  `import-hub --from ~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/shared --authors .../authors.json` (dry-run,
-  then `--apply`), backup + check-backup, fill the report (§3.1/§4/commit), tell the hub the review app points at the server and
-  the 5 Workflows are imported, final `task route-report acceptance-done-20261022`, `task finish`. If no account yet: the user
-  is connecting from outside via `devtunnel connect interesting-dog-fz9w0jg.jpe1` (Windows, GitHub login) to accept the invite
-  in the review app (its hub address is already set to http://10.13.15.74:8700).
+- Resumed 2026-10-23 09:45 KST on the user's direct message in this tab ("사용자가 seongin로 초대코드를 이용해 관리자 계정을
+  만들었다."). Admin account acc-6c937e14… (seongin@kigam.re.kr, display name seongin) exists. Import: source verified
+  against SHA256SUMS, dry-run then `--apply`: 5 entries, 17 files, 5 comments, stars 5 → 2 (collapsed), 0 skills. Backup
+  `~/data/geoaidesk/hub-server/backups/2026-10-23-after-import` passed check-backup. Review app (:18000) is logged in as the
+  admin account and lists the 5 Workflows as mine.
+- Removed the first snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6…` (the migrated database refuses that older server).
 - Hub server deployed on PC74 (item 1, first pass): pinned snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a`
   (`git archive` of origin/main), user unit `~/.config/systemd/user/gaid-hub-server.service` (enabled, `0.0.0.0:8700`,
   Restart=on-failure, UMask 0077), home `~/data/geoaidesk/hub-server/home`, log `~/data/geoaidesk/hub-server/logs/hub-server.log`.
@@ -73,17 +71,14 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 - Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-Blocked: route acceptance-done-20261022 (review app free since ~19:10): waiting for the hub's answer on the Zotero rerun
-(request 0aa3ea49efca) before setting the review app's hub address; then the user accepts the invite there. Review app config
-backed up to `~/data/geoaidesk/hub-server/backups/2026-10-22-review-app-before-hub-connect`.
-1. After the account exists: `import-hub --from ~/data/geoaidesk/hub-server/import-source/2026-10-22-review-hub/shared
-   --authors .../authors.json` dry-run, then `--apply` (run from the deployed snapshot with GAID_HUB_SERVER_HOME set); backup +
-   check-backup; fill the report (§3.1, §4, commit) and finish.
-2. After connecting: tell the hub the review app points at the server; `task route-report acceptance-done-20261022` (final).
-3. Pending cleanup after finish: old snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6…` (kept for rollback).
+1. Tell the hub: review app points at the server, 5 Workflows imported; the review app runs pre-trial code, so its hub skill
+   shelf stays local until its next update. Final `task route-report acceptance-done-20261022`; `task finish`.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-backend#1
+Closes: gaid-backend#2
+Closes: gaid-backend#3
 - Work hours (route workhours-gaid-hub-server-trial, user via backbone hub 2026-10-22 23:00 KST): until 2026-10-23 03:00 KST work
   normally; check `TZ=Asia/Seoul date` before any new job/phase/worker and start none at or after 03:00; then stop at the next
   safe point (task save, exact next action in Current state) and resume only on the user's resume instruction to the hub.
@@ -108,6 +103,7 @@ backed up to `~/data/geoaidesk/hub-server/backups/2026-10-22-review-app-before-h
   - Integration order: B merged into this branch → e2e (two accounts, skill register/review/star/comment/install over HTTP)
     → scripts/check → redeploy.
 ## Open items
+- [대기] 시험 그룹 밖으로 넓히기 전에 허브 서버 HTTPS를 켭니다(인증서 준비 완료, 절차 docs/geo/hub-server-https.md) — 막힌 일: 시험 그룹 밖 사용 — 조건: 시험 그룹 확대 결정 — 근거: reports/2026-10-22-gaid-hub-server-trial#3-결과
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
