@@ -4,7 +4,7 @@ date: 2026-10-22
 project: geoaidesk
 task: gaid-hub-feeds
 headline: 기관 허브 서버가 관리자가 승인한 출처 18곳을 6시간마다 읽고, 연구자는 GAID 허브의 "자료 소식"에서 원문 제목과 피드 요약을 봅니다. 기관 허브 서버를 이번 변경으로 갱신하고 출처를 승인하는 일이 남았습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-feeds.png
 supersedes:
