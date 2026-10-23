@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T06:25:35Z
+status: ready
+updated: 2026-10-23T06:25:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4c42e845-8f67-4730-bef3-80cdb81d7110","pid":1792787,"provider":"claude","session":"392284d0-7499-4d4c-b0f7-b1c1ce8069a8","start":"62352008","token":"2d56f19424431982ccd2351139ffe3d05c5dae7ca27d3386789c86c852889df2"}
 branch: task/gaid-workflow-example--example-authoring
 target: task/gaid-workflow-example
@@ -128,7 +128,8 @@ Evidence (2026-10-23, this worktree):
   style and 1280×800 not captured.
 
 ## Next steps
-1. Parent: integrate with `task complete`; embed the two figures in the parent report.
+<!-- task:closed -->
+Closed 2026-10-23T06:25:50Z: ready; the parent gaid-workflow-example integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
