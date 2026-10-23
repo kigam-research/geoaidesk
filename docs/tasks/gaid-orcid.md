@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:39:47Z
+updated: 2026-10-23T01:40:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -73,16 +73,20 @@ Outside check: no outside check.
 - Existing hooks: library import preview/confirm (`/geo/library/import`), metadata client
   (`server/src/geo/library/metadata/`), hub account contract `web/src/geo/contracts/hub-server.ts` (owned by gaid-hub-server-trial).
 ## Next steps
-1. Phase 1 complete and integrated on task/gaid-orcid (tree 9d9a8a4aaa46 passed full scripts/check in the child finish;
-   report reports/2026-10-22-gaid-orcid/index.md). Waiting for the user's ORCID client registration (asked in this tab
-   2026-10-22: sandbox client + production attempt with redirect `http://127.0.0.1:8000/geo/orcid/callback`; client IDs
-   only, no secrets).
-2. When the answer comes: design phase 2 per the plan below, send the hub-account interface proposal to the hub for
-   gaid-hub-server-trial (`task hub --send`), implement, add a phase-2 section to the report.
-3. If the user prefers to close phase 1 first: add a `[대기]` open item for phase 2 and run `task finish`.
-Blocked: waiting for the user's ORCID client registration result (phase 2).
-Work hours (hub instruction 2026-10-22): do not start phase 2 work at or after 2026-10-23 03:00 KST without a resume
-instruction from the user to the project hub; check `TZ=Asia/Seoul date` first.
+1. Phase 2 server done and pushed (d278514fb5a7): hub `orcid-client set|show|clear` CLI (secret from stdin, file mode 600,
+   not in backups), `/hub/v1/orcid{,/start,/finish}`, migration v4 (`account_orcid`, `orcid_states`), `HubAccount.orcid`,
+   `HubEntry.authorOrcid` joined at read; GAID `/geo/orcid/auth/start`, `/geo/orcid/callback` (static page),
+   `DELETE /geo/orcid/auth`, `OrcidStatus.hub`. Tests: geo-hub-orcid (fake ORCID signing RS256 tokens) + hub suites pass.
+2. Child gaid-orcid--authui (writer b35bb8b9-c459-4233-ba31-c386537b4e3f, brief ~/data/geoaidesk/work/gaid-orcid/child-auth-ui.md)
+   builds the phase 2 screens; on its finish: `task complete gaid-orcid--authui`, review, integrate.
+3. Real sandbox end-to-end (jobs 1 + 2 below: test hub http://127.0.0.1:8711 with home ~/data/geoaidesk/work/gaid-orcid/e2e/hub,
+   test GAID backend :8000 with GAID_HOME ~/data/geoaidesk/work/gaid-orcid/e2e/gaid-home, logged in as orcid-test@example.org):
+   waiting for the user to (a) confirm the sandbox redirect URI, (b) run
+   `node geo/hub-server.mjs orcid-client set --home ~/data/geoaidesk/work/gaid-orcid/e2e/hub --sandbox --client-id APP-NMSX0X5YG2CKUCUQ`
+   and type the secret, (c) open the authorize URL I generate (POST /geo/orcid/auth/start on :8000) in a browser on PC74 and
+   sign in with the sandbox account. Then check the callback page, `GET /geo/orcid` (linked) and stop both jobs.
+4. Production: still unknown whether ORCID production accepts the loopback redirect (user to try registering).
+5. After 2–3: full scripts/check, report section for phase 2, humanizer, review-copy, task finish.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
@@ -122,6 +126,7 @@ Report: reports/2026-10-22-gaid-orcid/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013942.970747Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013952.968887Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
