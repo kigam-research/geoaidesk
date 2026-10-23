@@ -88,6 +88,11 @@ export function workflowStageWarnings(workflow: LocalWorkflow): StageWarning[] {
 }
 
 const STAGE_FLOW = "자료 준비 → 처리·모델링 → 평가 → 해석·결과";
+/** Korean object/subject particle after a quoted name: by the last Hangul syllable's final consonant, else both forms. */
+const particle = (word: string, pair: [string, string]) => {
+  const code = word.trim().replace(/[」』)\]]+$/, "").slice(-1).charCodeAt(0) - 0xac00;
+  return code >= 0 && code <= 11171 ? pair[code % 28 ? 0 : 1] : `${pair[0]}(${pair[1]})`;
+};
 
 /** One researcher sentence per stage warning (package and registration check). */
 export function stageWarningText(workflow: LocalWorkflow, warning: StageWarning): string {
@@ -104,15 +109,17 @@ export function stageWarningText(workflow: LocalWorkflow, warning: StageWarning)
     case "item-split": {
       const ids = warning.detail.match(/^steps (.+) are one/)?.[1].split(", ") ?? [];
       const titles = ids.map((id) => `「${stepTitle(id)}」`).join(", ");
-      return `${titles ? `단계 ${titles}이(가)` : "여러 단계가"} 입력 자료나 조건 하나씩으로 나뉘어 있습니다. 항목별 절차가 아니라 ${STAGE_FLOW} 같은 분석 흐름으로 묶어 주세요.`;
+      const last = ids.length ? stepTitle(ids.at(-1)!) : "";
+      return `${titles ? `단계 ${titles}${particle(last, ["이", "가"])}` : "여러 단계가"} 입력 자료나 조건 하나씩으로 나뉘어 있습니다. 항목별 절차가 아니라 ${STAGE_FLOW} 같은 분석 흐름으로 묶어 주세요.`;
     }
     case "unmapped-input": {
       const id = warning.detail.match(/^input (\S+) /)?.[1] ?? "";
-      return `입력 자료 「${inputLabel(id)}」을(를) 어느 단계에서 쓰는지 정해져 있지 않습니다.`;
+      return `입력 자료 「${inputLabel(id)}」${particle(inputLabel(id), ["을", "를"])} 어느 단계에서 쓰는지 정해져 있지 않습니다.`;
     }
     case "unknown-input": {
       const m = warning.detail.match(/^workflow\.steps\.([^.]+)\.inputIds: unknown input (\S+)/);
-      return `단계 「${m ? stepTitle(m[1]) : "?"}」이(가) Workflow에 없는 입력 자료(${m?.[2] ?? "?"})를 가리킵니다.`;
+      const title = m ? stepTitle(m[1]) : "?";
+      return `단계 「${title}」${particle(title, ["이", "가"])} Workflow에 없는 입력 자료(${m?.[2] ?? "?"})를 가리킵니다.`;
     }
   }
 }

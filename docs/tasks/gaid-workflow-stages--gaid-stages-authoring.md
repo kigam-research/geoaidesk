@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:38:29Z
+updated: 2026-10-23T12:46:08Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0ed51a7-eda2-4b04-a7c8-d0bb4bae10b4","pid":792913,"provider":"claude","session":"b0051d7c-7ad4-43d6-acf2-ed583190496c","start":"64609653","token":"45e701729c20935a809ee5c0dc969917a87d51fda09f45623643a3747ef33df8"}
 branch: task/gaid-workflow-stages--gaid-stages-authoring
 target: task/gaid-workflow-stages
@@ -70,12 +70,36 @@ Edit owned files, run local instances and tests, `task save`, `task finish` of t
 raw.githubusercontent.com (use `gh api` or codeload).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Done and saved (030662091, 7e66ba3f, + particle follow-up): scope 1-4.
+  - prompts `gaid-analyze/2026-10-23.3`, `gaid-draft/2026-10-23.3` (stage rules, inputIds, multiple, default, 3-5 steps; revise
+    addendum regroups pre-stage drafts).
+  - `agent.ts`: inputIds/multiple/default parsed and validated (default must be an option id); stage warnings are repair errors
+    (`STAGE_ERROR_PREFIX`), always trigger the one repair round, never reject a draft; run-scale gets default quick; defaulted
+    choices leave `recipe.unresolvedChoices`.
+  - `workflow.ts`: `workflowProblems` checks inputIds refs and default ∈ options (3-12 steps still accepted for older drafts);
+    `workflowStageWarnings`, `stageWarningText` (Korean researcher sentences).
+  - `package.ts`: schema accepts steps.inputIds, inputRoles.multiple, choices.default; warning `workflow-stages` per stage warning
+    (receipt warnings, registration preview through the check).
+  - Hub: `web/src/geo/hub/stage-notice.tsx` on the draft and in the publish preview, action "분석 흐름으로 단계 나누기" = revise with
+    fixed feedback (`stagesFeedback`); strings `hub.stages.*`.
+  - `method-file.ts` validates multiple/default/inputIds; `summarizeWorkflow` and server `workflow-doc.ts` pass multiple/default;
+    `local-methods.ts` drops defaulted choices from recipes' unresolvedChoices (package file unchanged).
+- Checks run: server typecheck; `npx vitest run test/geo` 685 passed (incl. new test/geo-authoring-stages.test.ts); web tsc;
+  `vitest run src/geo/hub` 114 passed; copy validator 0 errors; check-ui 0 errors.
+- Scope 5 in progress: own backend `gaid-stages-authoring-api` (port 18610, transient user unit, log
+  ~/data/geoaidesk/work/gaid-stages-authoring/logs/api.log), projects copied from the review-app store: ap-43431e17-f09 (fresh draft,
+  attempt att-15490c60-7db) and ap-stages-regroup (revise of 0.2.0 rev 9, att-2c2e3549-102), GPT-6.1 Sol high. Model login: the
+  review app's agent dir shared once by user decision (see Notes). Stop the unit right after the runs.
 ## Next steps
-1. (the next session's first action)
+1. When both attempts end: save draft JSONs next to the data, run the package check, compare with 0.2.0, stop the instance,
+   write reports/2026-10-23-gaid-workflow-stages/authoring.md, task finish.
 ## Failed approaches
+- ~/.kady/pi-agent has no OpenAI login, so the first instance could not call GPT-6.1 Sol.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Stage warnings do not reject a model draft after the repair round (the package check and the draft screen show them); a hard
+  reject would throw away an otherwise usable draft. Same treatment as package-check findings.
+- 2026-10-23 user decision via parent (option B, "검토 앱 로그인을 이번만 공유"): this unit's instance used KADY_PI_AGENT_DIR=
+  ~/.geoaidesk/pi-agent for the one regeneration run; no credential file read or copied; authoring store stays in this unit's data.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
