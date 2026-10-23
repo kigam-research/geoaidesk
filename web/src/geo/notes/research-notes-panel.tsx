@@ -6,8 +6,11 @@
  * column is narrow; the note file itself also opens as an ordinary file tab for editing.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftIcon, BookOpenIcon, CheckIcon, ChevronRightIcon, FileTextIcon, MessageSquareIcon, NotebookPenIcon, SendIcon } from "lucide-react";
+import { ArrowLeftIcon, BookOpenIcon, CheckIcon, ChevronRightIcon, FileTextIcon, LibraryIcon, MessageSquareIcon, MoreHorizontalIcon, NotebookPenIcon, SendIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { addNoteToLibrary } from "@/geo/library/api";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { apiFetch } from "@/lib/projects";
 import { prefillChat, type ChatPrefillResult } from "@/lib/chat-prefill";
@@ -50,6 +53,8 @@ export interface ResearchNotesPanelProps {
   streaming: boolean;
   /** Changes when the chat deep-links into a work-record entry: the panel then shows the work record. */
   recordFocusToken?: number | null;
+  /** Changes when another place (서재) asks to open a note: the panel then shows that note. */
+  noteFocus?: { id: string; token: number } | null;
   onOpenFile: (path: string) => void;
   /** Opens (or focuses) the chat with this session id. */
   onOpenChat?: (sessionId: string, title: string) => void;
@@ -57,10 +62,12 @@ export interface ResearchNotesPanelProps {
   workRecord: ReactNode;
 }
 
-export function ResearchNotesPanel({ projectId, streaming, recordFocusToken, onOpenFile, onOpenChat, workRecord }: ResearchNotesPanelProps) {
-  const [view, setView] = useState<View>({ kind: "list" });
+export function ResearchNotesPanel({ projectId, streaming, recordFocusToken, noteFocus, onOpenFile, onOpenChat, workRecord }: ResearchNotesPanelProps) {
+  const [view, setView] = useState<View>(() => noteFocus ? { kind: "note", id: noteFocus.id } : { kind: "list" });
   const notes = useResearchNotes(projectId, streaming);
   useEffect(() => { if (recordFocusToken) setView({ kind: "record" }); }, [recordFocusToken]);
+  const noteFocusToken = noteFocus?.token, noteFocusId = noteFocus?.id;
+  useEffect(() => { if (noteFocusToken && noteFocusId) setView({ kind: "note", id: noteFocusId }); }, [noteFocusToken, noteFocusId]);
 
   if (view.kind === "record") {
     return (
@@ -360,6 +367,16 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
     }
   };
 
+  // gaid-note-library: the note joins the library's research notes; the file here stays the master.
+  const toLibrary = async () => {
+    try {
+      const r = await addNoteToLibrary({ projectId, noteId: id }, projectId);
+      toast.success(t(r.created ? "notes.detail.libraryAdded" : "notes.detail.libraryUpdated"));
+    } catch {
+      toast.error(t("notes.detail.libraryFailed"));
+    }
+  };
+
   const chat = note?.sessions.at(-1);
   // Answers go to the chat that wrote the note, where its analysis context is; else to the active chat.
   const sendAnswers = (text: string): Promise<ChatPrefillResult | null> => {
@@ -399,9 +416,6 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
               )}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => onOpenFile(note.path)}>
-                <FileTextIcon aria-hidden />{t("notes.detail.openFile.button")}
-              </Button>
               {chat && onOpenChat && (
                 <Button variant="outline" size="sm" onClick={() => onOpenChat(chat, note.title)}>
                   <MessageSquareIcon aria-hidden />{t("notes.detail.openChat.button")}
@@ -421,6 +435,16 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
               {note.status === "confirmed" && (
                 <Button variant="outline" size="sm" disabled={saving} onClick={() => void setStatus("pending")}>{t("notes.detail.unconfirm.button")}</Button>
               )}
+              {/* At most three header actions (UI guide B4); the file and the library are behind 더 보기. */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon-sm" aria-label={t("notes.detail.more")} title={t("notes.detail.more")}><MoreHorizontalIcon /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => onOpenFile(note.path)}><FileTextIcon aria-hidden />{t("notes.detail.openFile.button")}</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => void toLibrary()} title={t("notes.detail.toLibraryTip")}><LibraryIcon aria-hidden />{t("notes.detail.toLibrary.button")}</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             {statusError && <p role="alert" className="mt-1 text-xs text-destructive">{t("notes.error.status")}</p>}
             {note.supersededBy && (

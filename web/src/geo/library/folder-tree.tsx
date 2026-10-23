@@ -54,13 +54,15 @@ export interface FolderTreeProps {
   collections: LibraryCollection[];
   counts: Record<string, number>;
   total: number;
+  /** Label of the "all items" row (papers by default; 정리 노트 in that category). */
+  allLabel?: string;
   selected: string | null;
   onSelect: (id: string | null) => void;
   onCreate: () => void;
   onDropItem: (folderId: string, itemId: string) => void;
 }
 
-export function FolderTree({ collections, counts, total, selected, onSelect, onCreate, onDropItem }: FolderTreeProps) {
+export function FolderTree({ collections, counts, total, allLabel, selected, onSelect, onCreate, onDropItem }: FolderTreeProps) {
   const tree = useMemo(() => folderTree(collections), [collections]);
   const [closed, setClosed] = useState<Set<string>>(new Set());
   const [over, setOver] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function FolderTree({ collections, counts, total, selected, onSelect, onC
       <button type="button" onClick={() => onSelect(null)} aria-pressed={selected === null}
         className={cn("flex h-8 items-center gap-1.5 rounded-md px-2 text-sm", selected === null ? "bg-primary/10 text-primary" : "hover:bg-muted")}>
         <LibraryIcon className="size-4" aria-hidden />
-        <span className="flex-1 text-left">{L("all")}</span>
+        <span className="flex-1 text-left">{allLabel ?? L("all")}</span>
         <span className="gaid-numeric text-xs text-muted-foreground">{total}</span>
       </button>
       {tree.length === 0 ? (

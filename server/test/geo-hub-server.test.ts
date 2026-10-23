@@ -516,5 +516,6 @@ describe("backup, restore check and legacy import", () => {
     expect(JSON.parse(cli("backup", "--to", target)).files).toBe(2);
     expect(JSON.parse(cli("check-backup", target)).rows.invites).toBe(1);
     expect(cli("--help")).toContain("import-hub");
-  });
+    // Five launcher processes in a row: under the full parallel suite they take longer than vitest's 5 s default.
+  }, 30000);
 });

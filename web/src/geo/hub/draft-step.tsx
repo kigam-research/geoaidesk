@@ -19,7 +19,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { MethodDraft } from "@/geo/contracts/authoring";
+import type { AuthoringProject, MethodDraft } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { openSettings } from "@/lib/settings-nav";
 
@@ -33,6 +33,7 @@ import { LimitsCard, OverviewBand } from "./method-overview";
 import { localText } from "./text";
 
 import { TechnicalDetail } from "./technical";
+import { ExampleDataSection } from "./example-data";
 const text = geoText("hub");
 
 export function DraftStep({
@@ -51,7 +52,13 @@ export function DraftStep({
   visualAction,
   cover,
   coverThemed,
+  examples,
 }: {
+  /** Example data per Workflow input (gaid-workflow-example); each change returns the new draft revision. */
+  examples?: {
+    project: Pick<AuthoringProject, "id" | "sources" | "extractions">;
+    onChanged: (draft: MethodDraft) => void;
+  };
   /** Concept pictures through the OpenAI Codex subscription only (no fallback); explicit action only. */
   visualAction?: {
     busy: boolean;
@@ -202,6 +209,8 @@ export function DraftStep({
           {visualAction && !visualAction.busy && <TechnicalDetail detail={visualAction.errorDetail} />}
           {doc ? <WorkflowView showStepsHeading={false} doc={doc} profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} loadSkillSource={async () => ({ content: draft.instructions })} /> : authoringId && draft.workflow ? <p className="text-sm text-muted-foreground">{geoText("workflowView")(documentFailed ? "error" : "loading")}</p> : <MethodFlow profile={profile} visuals={visuals} outputImages={outputImages} pictureAction={pictureAction} />}
         </section>
+
+        {examples && draft.workflow && <ExampleDataSection draft={draft} project={examples.project} onChanged={examples.onChanged} />}
 
         <LimitsCard profile={profile} />
 

@@ -107,7 +107,11 @@
     "attached": "{name}에 붙였습니다",
     "attachFailed": "프로젝트에 붙이지 못했습니다. 다시 시도하세요.",
     "ownWork": "ORCID에서 선택한 내 논문",
-    "orcidOrigin": "서지 정보 출처: ORCID"
+    "orcidOrigin": "서지 정보 출처: ORCID",
+    "useNoteRemote": "연구노트 「{title}」 · 프로젝트 {name}",
+    "workflowNoPdf": "Workflow를 만들려면 논문 PDF가 있어야 합니다. Zotero에서 PDF를 붙이거나 PDF로 논문을 다시 넣으세요.",
+    "workflowReadsPdf": "Zotero의 PDF에서 본문 텍스트를 먼저 추출한 뒤 Workflow 초안을 만듭니다.",
+    "workflowReading": "본문 텍스트 추출 중"
   },
   "dialog": {
     "title": "논문 넣기",
@@ -357,5 +361,83 @@
     "pickTitle": "연결 지도를 열 프로젝트",
     "notes": "노트 {n}개에서 인용",
     "attached": "프로젝트에 붙임"
+  },
+  "category": {
+    "label": "서재 항목 종류",
+    "paper": "논문 {n}",
+    "note": "정리 노트 {n}"
+  },
+  "notes": {
+    "category": "정리 노트",
+    "add": {
+      "button": "정리 노트 가져오기"
+    },
+    "search": "정리 노트에서 찾기 · 제목, 한 줄 결과, 프로젝트, 본문",
+    "empty": "서재에 정리 노트가 없습니다. 프로젝트의 정리 노트를 가져오세요.",
+    "noMatch": "조건에 맞는 정리 노트가 없습니다.",
+    "state": "조건에 맞는 정리 노트 {shown} / 전체 {total}",
+    "stateFolder": "조건에 맞는 정리 노트 {shown} / 폴더 {total}",
+    "filter": {
+      "pending": "검토 전 {n}",
+      "confirmed": "확인함 {n}"
+    },
+    "side": "정리 노트 {n}건",
+    "date": "{year}년 {month}월 {day}일",
+    "table": {
+      "note": "정리 노트",
+      "date": "날짜",
+      "project": "프로젝트",
+      "status": "상태",
+      "cites": "인용 논문",
+      "none": "—"
+    },
+    "otherPc": "다른 PC({name})",
+    "otherPcLong": "노트의 프로젝트는 다른 PC({name})에 있습니다. 서재에는 마지막으로 읽은 내용이 있습니다.",
+    "missingShort": "노트 파일 없음",
+    "missing": "프로젝트에서 노트 파일을 찾지 못했습니다. 서재에는 마지막으로 읽은 내용이 있습니다.",
+    "project": "프로젝트 {name}",
+    "open": {
+      "button": "프로젝트에서 열기"
+    },
+    "remove": {
+      "button": "서재에서 빼기"
+    },
+    "removeConfirm": "서재에서만 뺍니다. 프로젝트의 노트 파일은 그대로 있습니다.",
+    "removeYes": {
+      "button": "서재에서 빼기"
+    },
+    "removed": "서재에서 뺐습니다",
+    "removeFailed": "서재에서 빼지 못했습니다. 다시 시도하세요.",
+    "citedTitle": "인용한 논문",
+    "citedNone": "인용한 논문이 없습니다.",
+    "citedMissing": "서재에서 찾지 못한 인용: {keys}",
+    "openPaper": {
+      "action": "논문 보기"
+    },
+    "content": {
+      "title": "노트 내용",
+      "read": "{when}에 노트 파일에서 읽은 내용입니다. 그림은 프로젝트에서 보세요.",
+      "readTruncated": "{when}에 노트 파일에서 읽은 내용의 앞부분입니다. 전체와 그림은 프로젝트에서 보세요."
+    },
+    "dialog": {
+      "title": "정리 노트 가져오기",
+      "body": "현재 PC의 프로젝트에 있는 정리 노트를 골라 서재에 넣습니다. 노트 파일은 프로젝트에 그대로 있고, 서재는 파일을 따라 갱신합니다.",
+      "bodyFolder": "고른 정리 노트를 서재와 폴더 {name}에 넣습니다. 노트 파일은 프로젝트에 그대로 있습니다.",
+      "loading": "프로젝트의 정리 노트를 읽는 중입니다.",
+      "failed": "정리 노트 목록을 읽지 못했습니다. 잠시 뒤 다시 여세요.",
+      "empty": "현재 PC의 프로젝트에 정리 노트가 없습니다.",
+      "inLibrary": "서재에 있음",
+      "saving": "서재에 넣는 중입니다.",
+      "save": {
+        "button": "서재에 넣기 {n}건"
+      },
+      "added": "정리 노트 {n}건을 서재에 넣었습니다",
+      "partly": "{total}건 가운데 {n}건만 넣었습니다",
+      "saveNone": {
+        "button": "서재에 넣기"
+      }
+    },
+    "allFolder": "전체 정리 노트",
+    "recentTitle": "최근 넣은 정리 노트"
   }
 }

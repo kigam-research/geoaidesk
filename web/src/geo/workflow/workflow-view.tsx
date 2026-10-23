@@ -10,6 +10,7 @@ import { SkillInstructions } from "@/geo/skills/skill-instructions";
 import { MethodFlow, type PictureAction, type StepVisual } from "@/geo/hub/method-flow";
 import { localText } from "@/geo/hub/text";
 import { workflowDocText } from "./render";
+import { sizeText } from "@/geo/contracts/workflow-examples";
 import { loadHubSkillSource } from "./hub-skill-source";
 
 const text = geoText("workflowView");
@@ -76,7 +77,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
       <summary className="cursor-pointer font-medium">{text("inputsChoices")}</summary>
       <div className="mt-3 space-y-3">
         <h4 className="font-medium">{text("inputs")}</h4>
-        <ul className="list-disc space-y-1 pl-5">{doc.inputRoles.map((role) => <li key={role.id}>{localText(role.label)} · {text(role.required ? "required" : "optional")}{role.formats.length ? ` · ${role.formats.join(", ")}` : ""}{role.requiredWhen && <p>{localText(role.requiredWhen)}</p>}</li>)}</ul>
+        <ul className="list-disc space-y-1 pl-5">{doc.inputRoles.map((role) => <li key={role.id}>{localText(role.label)} · {text(role.required ? "required" : "optional")}{role.formats.length ? ` · ${role.formats.join(", ")}` : ""}{role.requiredWhen && <p>{localText(role.requiredWhen)}</p>}{role.example && <p className="text-gaid-ink-2">{text(role.example.synthetic ? "exampleSynthetic" : "example", { title: localText(role.example.title), source: localText(role.example.source), size: sizeText(role.example.files.reduce((sum, file) => sum + file.size, 0)), where: text(role.example.files.some((file) => file.url) ? "exampleRemote" : "exampleBundled") })}</p>}</li>)}</ul>
         <h4 className="font-medium">{text("choices")}</h4>
         <ul className="space-y-3">{doc.choices.map((choice) => <li key={choice.id}>
           <p className="font-medium">{localText(choice.label)}</p>
