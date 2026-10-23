@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import zlib from "node:zlib";
+import { LibraryStore } from "../src/geo/library/store.ts";
 import Fastify, { type FastifyInstance } from "fastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolvePaths, type ProjectPaths } from "../src/projects.ts";
@@ -210,6 +211,28 @@ describe("analysis handoff", () => {
       const bad = await hub.inject({ method: "POST", url: "/geo/authoring/handoffs", payload: { sessionId, files: ["../bad"] } });
       expect(bad.statusCode).toBe(400);
       expect((await store.list()).length).toBe(1);
+    } finally { await hub.close(); }
+  });
+  it("hub-side receive: adds the project's research notes and library papers, and summarises data files in the bundle", async () => {
+    file("analysis.py", "print(1)"); file("out/grid.csv", "x,y,tmi_nT\n1,2,51000.5\n"); provenance(["analysis.py", "out/grid.csv"]);
+    file("연구노트/2026-10-23-grid/index.md", "---\ntitle: 격자 결과\n---\n# 격자 결과\n");
+    const dir = fs.mkdtempSync(path.join(paths.root, "authoring-"));
+    const library = new LibraryStore(path.join(dir, "library"));
+    const hub = Fastify();
+    hub.addHook("onRequest", (req, _reply, done) => withActiveProject(String(req.headers["x-project-id"] ?? paths.id), done));
+    const store = await registerAuthoringRoutes(hub, { store: new AuthoringStore(path.join(dir, "authoring")), library: () => library });
+    try {
+      const item = await library.addGaidItem({ csl: { type: "article-journal", title: "Aeromagnetic survey", abstract: "Line spacing 200 m." }, metadataOrigin: "manual" });
+      const sent = await hub.inject({ method: "POST", url: "/geo/authoring/handoffs", payload: { sessionId, files: ["analysis.py", "out/grid.csv"], notes: ["2026-10-23-grid", "2026-01-01-none"], libraryItemIds: [item.id] } });
+      expect(sent.statusCode).toBe(201);
+      expect(sent.json().skipped).toEqual([{ id: "2026-01-01-none", reason: expect.any(String) }]);
+      const project = await store.read(sent.json().projectId);
+      expect(project.sources.map((s) => s.kind)).toEqual(["gaid-analysis", "note", "text"]);
+      const bundle = project.extractions[project.sources[0].id].files!;
+      expect(bundle.find((f) => f.path.endsWith("grid.csv"))?.data?.columns?.map((c) => c.name)).toEqual(["x", "y", "tmi_nT"]);
+      expect(project.sources[2].library).toMatchObject({ itemId: item.id, category: "paper" });
+      const bad = await hub.inject({ method: "POST", url: "/geo/authoring/handoffs", payload: { sessionId, files: [], notes: "x" } });
+      expect(bad.statusCode).toBe(400);
     } finally { await hub.close(); }
   });
 });

@@ -1,5 +1,7 @@
 /** Client for `/geo/authoring/*` (contract: web/src/geo/contracts/authoring.ts). */
 import type {
+  AddLibrarySourcesBody,
+  AddLibrarySourcesResult,
   AddSourceBody,
   AddUrlSourceBody,
   GenerateVisualsBody,
@@ -89,9 +91,23 @@ export const hubApi = {
     post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}`, body),
   removeExample: (id: string, roleId: string, baseRevision: number) =>
     post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}/remove`, { baseRevision }),
+  removeSource: (id: string, sourceId: string) =>
+    call<null>(`${pid(id)}/sources/${encodeURIComponent(sourceId)}`, { method: "DELETE" }),
   originalUrl: (id: string, sourceId: string) =>
     `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
 };
+
+/** Papers and research notes from 서재 as sources (`/geo/library/authoring`). */
+export async function addLibrarySources(body: AddLibrarySourcesBody): Promise<AddLibrarySourcesResult> {
+  const res = await apiFetch("/geo/library/authoring", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && typeof data.error === "string" && data.error) || `HTTP ${res.status}`);
+  return data as AddLibrarySourcesResult;
+}
 
 /** Base64 of a File for `AddSourceBody.contentBase64`. */
 export async function fileBase64(file: File): Promise<string> {

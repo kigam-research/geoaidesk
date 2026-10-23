@@ -28,7 +28,9 @@ import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
 import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 
-import { fileBase64, hubApi, newOpId } from "./api";
+import { addLibrarySources, fileBase64, hubApi, newOpId } from "./api";
+import { LibrarySourcePicker } from "./library-picker";
+import { groupSourceFiles } from "./source-files";
 import { DraftStep, TrialCard } from "./draft-step";
 import { AgentRecordDialog, FeedbackDialog, FilesDialog, IssuesDialog, SourcePageDialog } from "./hub-dialogs";
 import { HubHome } from "./hub-home";
@@ -436,6 +438,7 @@ function HubProject({
   const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
   const [visualsBusy, setVisualsBusy] = useState(false);
   const [visualSource, setVisualSource] = useState<VisualSourceInfo | null>(null);
@@ -616,15 +619,25 @@ function HubProject({
     if (!files.length) return;
     try {
       const pid = await ensureProject();
-      for (const file of files) {
-        setUploading(file.name);
-        const kind = /\.(zip|tar\.gz|tgz)$/i.test(file.name) ? "code" : undefined;
-        await hubApi.addSource(pid, {
-          name: file.name,
-          mediaType: file.type || "application/octet-stream",
-          ...(kind ? { kind } : {}),
-          contentBase64: await fileBase64(file),
-        });
+      // Files read together (a shapefile set, a raster with its world file) become one source.
+      for (const upload of groupSourceFiles(files)) {
+        if ("single" in upload) {
+          const file = upload.single;
+          setUploading(file.name);
+          await hubApi.addSource(pid, {
+            name: file.name,
+            mediaType: file.type || "application/octet-stream",
+            contentBase64: await fileBase64(file),
+          });
+        } else {
+          setUploading(upload.name);
+          await hubApi.addSource(pid, {
+            name: upload.name,
+            mediaType: "",
+            contentBase64: "",
+            files: await Promise.all(upload.files.map(async (f) => ({ name: f.name, contentBase64: await fileBase64(f) }))),
+          });
+        }
       }
       if (pid !== id) onCreated(pid);
       else await reload();
@@ -632,6 +645,26 @@ function HubProject({
       toast.error((e as Error).message);
     } finally {
       setUploading(null);
+    }
+  };
+
+  const addFromLibrary = async (itemIds: string[]) => {
+    const pid = await ensureProject();
+    try {
+      const result = await addLibrarySources({ itemIds, authoringId: pid });
+      if (result.skipped.length) toast.error(text("library.skipped", { count: result.skipped.length }));
+    } finally {
+      if (pid !== id) onCreated(pid);
+      else await reload();
+    }
+  };
+
+  const removeSource = async (sourceId: string) => {
+    try {
+      await hubApi.removeSource(id, sourceId);
+      await reload();
+    } catch (e) {
+      toast.error((e as Error).message);
     }
   };
 
@@ -773,6 +806,8 @@ function HubProject({
           target={target}
           onTarget={setTarget}
           onFiles={addFiles}
+          onLibrary={() => setLibraryOpen(true)}
+          onRemove={isNew || running ? undefined : removeSource}
           onUrl={addUrl}
           urls={urls}
           agentModel={agentModel}
@@ -782,6 +817,7 @@ function HubProject({
           analyzed={project.findings.length > 0}
           onNext={project.findings.length > 0 ? () => setStep("questions") : undefined}
         />
+        <LibrarySourcePicker open={libraryOpen} onOpenChange={setLibraryOpen} onAdd={addFromLibrary} />
       </>
     );
   } else if (current === "questions") {

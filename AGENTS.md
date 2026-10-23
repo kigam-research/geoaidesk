@@ -144,7 +144,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `StoredVisual.dark`; two image calls per picture); picture routes take `?theme=dark`, `ConceptPicture` picks the file for
   the theme and never filters pixels. Older white pictures (no `dark`) sit on `--gaid-pic-mat`; "화면 테마에 맞추기"
   (`GenerateVisualsBody.adapt`) edits them into both files without changing what they show. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
-  `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
+  `gaid-analysis`; the dialog may add the project's research notes `notes[]` and papers `libraryItemIds[]`);
+  sources (gaid-authoring-sources): several at once, kinds `pdf|code|text|gaid-analysis|web|data|note`; data files (CSV,
+  XLSX, LAS, shapefile sets sent together as `AddSourceBody.files[]` or zipped, GeoTIFF, GeoPackage, NetCDF …) are stored
+  with sha256 per file and summarised through `inspectGeoFile` (`server/src/geo/authoring/data-files.ts`,
+  `CodeFileEntry.data`), also inside code archives and analysis bundles, and the coauthor sees only those summaries; papers
+  and research notes come from 서재 (`POST /geo/library/authoring`, `server/src/geo/authoring/library-sources.ts`; a note
+  whose project is on another PC enters as the library's Markdown copy) or from a project (`POST …/sources/notes`);
+  limits `AUTHORING_SOURCE_LIMITS` (30 MiB per source, 30 sources, 300 MiB per draft); `DELETE …/sources/:sid`; 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and
   is shown as a notice (user directions 2026-10-16). "Sign in with ChatGPT" tokens cannot generate images. MiniMax
