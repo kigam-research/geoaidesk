@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import models from "@/data/models.json";
 import { useModels } from "@/lib/use-models";
 import { openSettings } from "@/lib/settings-nav";
+import { isSupersededLegacyModel } from "@/geo/models/start-model";
 
 const workText = geoText("work");
 
@@ -207,6 +208,8 @@ export function ModelPickerList({
     for (const m of allModels) {
       if (excludeFusion && m.isFusion) continue;
       if (!matches(m)) continue;
+      // GeoAIDesk (gaid-first-use-fixes): one row per model when both OpenAI logins are connected.
+      if (m.id !== selected?.id && isSupersededLegacyModel(m, allModels)) continue;
       const sourceId = m.isFusion
         ? "fusion"
         : m.sourceId ??
@@ -237,7 +240,7 @@ export function ModelPickerList({
       groups,
       totalCount: groups.reduce((sum, group) => sum + group.models.length, 0),
     };
-  }, [allModels, excludeFusion, search]);
+  }, [allModels, excludeFusion, search, selected?.id]);
 
   const isRecommended = (m: Model): boolean => Boolean(m.default);
 

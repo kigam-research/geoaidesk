@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { hostname } from "node:os";
+import * as undici from "undici";
 import type { HubServerStatus } from "../../../../web/src/geo/contracts/hub-server.ts";
 import { AuthoringError } from "../authoring/store.ts";
 import { HUB_API, HUB_FILE_LIMIT, type HealthResponse, type SessionResponse } from "../hub-server/protocol.ts";
@@ -14,6 +16,8 @@ export interface RequestOptions {
   auth?: boolean;
   /** Pins a multi-request operation to the original login and server. */
   identity?: string;
+  /** Overrides the JSON/file timeout (e.g. an administrator's "collect feeds now", which reads many outside sources). */
+  timeoutMs?: number;
 }
 const failure = (status: number) => new AuthoringError(
   status === 401 ? "허브 서버에 다시 로그인해 주세요." :
@@ -26,11 +30,31 @@ const failure = (status: number) => new AuthoringError(
   status >= 500 ? "허브 서버에 연결하지 못했습니다. 서버 주소와 실행 상태를 확인해 주세요." :
   "입력한 내용을 확인해 주세요.", status >= 500 ? 502 : status);
 
+/**
+ * Transport for hub requests. `GAID_HUB_SERVER_CA` (a PEM file, usually set in `<GAID_HOME>/config.env`) makes hub requests
+ * trust exactly that certificate authority, for a hub server whose HTTPS certificate comes from an institute-internal CA;
+ * those requests then connect directly, without the HTTP(S)_PROXY dispatcher. Unset: Node's fetch and its built-in roots.
+ */
+export function hubTransport(env: NodeJS.ProcessEnv = process.env): typeof fetch {
+  const file = env.GAID_HUB_SERVER_CA?.trim();
+  if (!file) return fetch;
+  let dispatcher: undici.Agent | null = null;
+  return ((input: string, init?: RequestInit) => {
+    if (!dispatcher) {
+      let ca: string;
+      try { ca = readFileSync(file, "utf8"); }
+      catch { return Promise.reject(new AuthoringError("허브 서버 인증서 파일(GAID_HUB_SERVER_CA)을 읽지 못했습니다.", 502)); }
+      dispatcher = new undici.Agent({ connect: { ca } });
+    }
+    return undici.fetch(input, { ...(init as undici.RequestInit), dispatcher });
+  }) as unknown as typeof fetch;
+}
+
 export class HubClient {
   private healthInfo?: HealthResponse;
   private reachable: boolean | null = null;
   private lastError?: string;
-  constructor(readonly connection = new ConnectionStore(), private transport: typeof fetch = fetch,
+  constructor(readonly connection = new ConnectionStore(), private transport: typeof fetch = hubTransport(),
     private timeouts = { json: 10_000, file: 120_000 }) {}
   get identity(): string | null {
     const c = this.connection.current;
@@ -75,7 +99,7 @@ export class HubClient {
         ...(auth && c.token ? { Authorization: `Bearer ${c.token}` } : {}) };
       const response = await this.transport(`${c.url}${HUB_API}${path}`, {
         method: options.method ?? "GET", headers, body, redirect: "error",
-        signal: AbortSignal.timeout(options.file ? this.timeouts.file : this.timeouts.json),
+        signal: AbortSignal.timeout(options.timeoutMs ?? (options.file ? this.timeouts.file : this.timeouts.json)),
       });
       if (options.identity) this.assertIdentity(options.identity);
       this.reachable = true;

@@ -1,21 +1,29 @@
-/** One-process shared skill shelf. Public reads/install helpers are re-exported from index.ts. */
+/**
+ * Local (one-PC) skill shelf: the file implementation of `HubSkillRecordStore` (records.ts). Like the local Workflow store
+ * it trusts its caller for authorship (display names, `X-GAID-User`); registration and review rules that a hub server
+ * enforces itself are applied by register.ts and `review` here. Public reads/install helpers are re-exported from index.ts.
+ */
 import { randomUUID } from "node:crypto";
 import { appendFile, link, mkdir, readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { HUB_SKILL_SCHEMA, type HubSkill, type HubSkillRevision } from "../../../../web/src/geo/contracts/hub-skills.ts";
+import { HUB_SKILL_SCHEMA } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import type { HubComment } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { AuthoringError, newId, now } from "../authoring/store.ts";
+import type { Actor } from "../hub-shared/records.ts";
 import { SharedHubStore, sharedDir } from "../hub-shared/store.ts";
+import { revisionRegistrantId, validName, visibleSkill, type HubSkillRecordStore, type ReviewInput, type StoredHubSkill } from "./records.ts";
 
-export type StoredHubSkill = Omit<HubSkill, "usedBy" | "stars" | "starredByMe" | "comments">;
-export const validName = (s: unknown): s is string => typeof s === "string" && s.length <= 64 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+export { revisionState, validName, type StoredHubSkill } from "./records.ts";
 const missing = (e: unknown) => (e as NodeJS.ErrnoException).code === "ENOENT";
-export const revisionState = (r: HubSkillRevision) => r.reviews.at(-1)?.state ?? "unreviewed";
 
-export class HubSkillStore {
+export class HubSkillStore implements HubSkillRecordStore {
+  readonly kind = "local" as const;
   readonly root: string;
   readonly shared: SharedHubStore;
-  constructor(root = sharedDir()) { this.root = resolve(root); this.shared = new SharedHubStore(this.root); }
+  constructor(root = sharedDir(), shared?: SharedHubStore) {
+    this.root = resolve(root);
+    this.shared = shared && shared.root === this.root ? shared : new SharedHubStore(this.root);
+  }
   serial<T>(key: string, action: () => Promise<T>) { return this.shared.serial(`skills:${key}`, action); }
   async initialize() { await this.shared.initialize(); await mkdir(join(this.root, "skills"), { recursive: true }); }
   skillDir(id: string) {
@@ -48,12 +56,28 @@ export class HubSkillStore {
     for (const d of dirs) if (d.isDirectory() && validName(d.name)) { const record = await this.find(d.name); if (record) records.push(record); }
     return records.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
   }
-  async write(skill: StoredHubSkill) { await this.atomic(join(this.skillDir(skill.id), "skill.json"), { schemaVersion: HUB_SKILL_SCHEMA, skill }); }
+  async write(skill: StoredHubSkill, _actor?: Actor) {
+    const { mine: _mine, ...stored } = skill as StoredHubSkill & { mine?: boolean };
+    await this.atomic(join(this.skillDir(skill.id), "skill.json"), { schemaVersion: HUB_SKILL_SCHEMA, skill: stored });
+  }
+  async review(id: string, revision: number, input: ReviewInput, actor: Actor) {
+    return this.serial(id, async () => {
+      const skill = await this.read(id);
+      const r = skill.revisions.find((x) => x.revision === revision);
+      if (!r) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
+      if (input.state === "checked" && revisionRegistrantId(r) === actor.id) throw new AuthoringError("등록한 사람은 같은 판을 확인함으로 바꿀 수 없습니다. 다른 연구자의 검토가 필요합니다.", 403);
+      r.reviews.push({ state: input.state, by: actor.name, byId: actor.id, verified: false, at: now(), note: input.note, ...(input.replacement ? { replacement: input.replacement } : {}) });
+      if (skill.latestRevision === revision) skill.state = input.state;
+      skill.updatedAt = now();
+      await this.write(skill);
+      return r;
+    });
+  }
   async archive(id: string, revision: number) {
     try { return await readFile(this.packagePath(id, revision)); }
     catch (e) { if (missing(e)) throw new AuthoringError("저장된 스킬 파일을 찾을 수 없습니다.", 404); throw e; }
   }
-  async publish(id: string, revision: number, bytes: Buffer) {
+  async publish(id: string, revision: number, bytes: Buffer, _actor?: Actor) {
     const target = this.packagePath(id, revision);
     await mkdir(dirname(target), { recursive: true });
     const tmp = `${target}.${randomUUID()}.tmp`;
@@ -72,10 +96,12 @@ export class HubSkillStore {
       throw e;
     }
   }
-  async addComment(id: string, author: string, body: string) {
+  async addComment(id: string, actor: Actor, body: string) {
     return this.serial(id, async () => {
       const record = await this.read(id); await this.comments(id);
-      const comment: HubComment = { id: newId("comment"), entryId: id, author, body, revision: record.latestRevision, at: now() };
+      // A comment must not bind to a latest revision hidden from this researcher.
+      if (visibleSkill(record, actor.id)?.latestRevision !== record.latestRevision) throw new AuthoringError("최신 판의 라이선스를 확인할 수 없어 댓글을 달 수 없습니다.", 403);
+      const comment: HubComment = { id: newId("comment"), entryId: id, author: actor.name, body, revision: record.latestRevision, at: now() };
       await appendFile(join(this.skillDir(id), "comments.jsonl"), JSON.stringify(comment) + "\n");
       return comment;
     });
@@ -84,13 +110,13 @@ export class HubSkillStore {
     try { return await this.json(join(this.skillDir(id), "stars.json")); }
     catch (e) { if (missing(e)) return {}; throw e; }
   }
-  async star(id: string, user: string, on: boolean) {
+  async star(id: string, actor: Actor, on: boolean) {
     return this.serial(id, async () => {
       await this.read(id);
       const stars = Object.assign(Object.create(null) as Record<string, true>, await this.stars(id));
-      if (on) stars[user] = true; else delete stars[user];
+      if (on) stars[actor.id] = true; else delete stars[actor.id];
       await this.atomic(join(this.skillDir(id), "stars.json"), stars);
-      return { stars: Object.keys(stars).length, starredByMe: Object.hasOwn(stars, user) };
+      return { stars: Object.keys(stars).length, starredByMe: Object.hasOwn(stars, actor.id) };
     });
   }
   private async json<T>(file: string): Promise<T> {

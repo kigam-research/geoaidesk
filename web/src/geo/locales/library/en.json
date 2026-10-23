@@ -27,7 +27,7 @@
     "all": "All {n}",
     "zotero": "Zotero {n}",
     "gaid": "GAID {n}",
-    "unread": "Not read {n}",
+    "unread": "No full text {n}",
     "cited": "Cited in notes {n}",
     "mine": "My works {n}"
   },
@@ -35,7 +35,7 @@
     "paper": "Paper",
     "year": "Year",
     "source": "Source",
-    "read": "Read",
+    "read": "Full text",
     "used": "Used in",
     "usedNotes": "{n} notes",
     "usedWorkflows": "{n} Workflows",
@@ -49,21 +49,21 @@
     "gaidHint": "This paper was added to the GAID library. You can edit it in GAID."
   },
   "coverage": {
-    "full": "Full text",
+    "full": "All pages",
     "partial": "Partly",
     "abstract": "Abstract only",
     "none": "No PDF",
-    "fullHint": "Every page of the PDF was read.",
-    "partialHint": "Some pages had no readable text: scanned pages or pages with figures only.",
-    "abstractHint": "Only the abstract and reference details were read.",
-    "noneHint": "There is no readable PDF. Add the PDF so GAID can read the full text.",
+    "fullHint": "Text was extracted from every page of the PDF. The AI agent reads and cites the paper from this text.",
+    "partialHint": "Text could not be extracted from some pages: scanned pages or pages with figures only.",
+    "abstractHint": "Only the abstract and reference details are available. There is no full text.",
+    "noneHint": "There is no PDF to extract text from. Add the PDF and GAID extracts its full text.",
     "retracted": "Retracted",
     "retractedHint": "Crossref or OpenAlex has a retraction record for this paper."
   },
   "side": {
     "statusTitle": "Library status",
     "papers": "{n} papers",
-    "unread": "{n} papers without read full text",
+    "unread": "{n} papers without full text",
     "recentTitle": "Recently added"
   },
   "detail": {
@@ -96,10 +96,10 @@
         "action": "Open project"
       }
     },
-    "readTitle": "What was read",
-    "readFull": "All {pages} pages read",
-    "readPartial": "{read} of {total} pages read · not readable: {pages}",
-    "readNone": "No text has been read.",
+    "readTitle": "Full text the AI agent reads",
+    "readFull": "Text extracted from all {pages} pages.",
+    "readPartial": "Text extracted from {read} of {total} pages. Not extracted: {pages}",
+    "readNone": "No full text has been extracted.",
     "doi": "DOI {doi}",
     "workflowNeedsPdf": "To make a Workflow, GAID needs the paper's PDF.",
     "workflowStarted": "Workflow draft created",
@@ -145,7 +145,7 @@
       "action": "Use details"
     },
     "notes": {
-      "pdf-no-text": "No text could be read from the PDF. If it is a scan, search by DOI or title.",
+      "pdf-no-text": "Could not extract text from the PDF. If it is a scan, search by DOI or title.",
       "no-doi": "No DOI was found. Search by title or enter the details.",
       "provider-error": "Some reference services did not respond.",
       "not-found": "No matching reference details were found. Enter them yourself."
@@ -228,9 +228,9 @@
     "busy": "Sending to Zotero."
   },
   "read": {
-    "button": "Read full text",
-    "done": "Full text read",
-    "failed": "Could not read the PDF."
+    "button": "Extract full text",
+    "done": "Full text extracted",
+    "failed": "Could not extract text from the PDF."
   },
   "export": {
     "button": "Export references",
@@ -338,7 +338,7 @@
       "no-doi": "No DOI: {n}",
       "no-year": "No year: {n}",
       "no-authors": "No authors: {n}",
-      "unread": "Full text not read: {n}",
+      "unread": "Without full text: {n}",
       "citedLine": "@{key} · research note “{note}” ({project})"
     },
     "zotero": {
@@ -351,5 +351,11 @@
       "title": "Send folder {name} to Zotero",
       "body": "Sends {n} papers. A paper already in Zotero is not created again; it is only added to the collection. When Zotero asks for approval, choose \"Always Allow\"."
     }
+  },
+  "map": {
+    "button": "Open connection map",
+    "pickTitle": "Project to open the map in",
+    "notes": "Cited in {n} notes",
+    "attached": "Attached to the project"
   }
 }

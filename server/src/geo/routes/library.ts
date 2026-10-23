@@ -27,7 +27,7 @@ import { ZoteroError } from "../library/zotero/index.ts";
 
 /** Error code and HTTP status only (never Zotero bodies or keys), shown behind 기술 정보. */
 const zoteroErrorDetail = (error: ZoteroError) => [error.code, error.status ? `HTTP ${error.status}` : ""].filter(Boolean).join(" · ");
-import { identifyPdf, lookupDoi, resolveUrl, searchByTitle, type MetadataRecord } from "../library/metadata/index.ts";
+import { arxivDoi, identifyPdf, lookupDoi, resolveUrl, searchByTitle, type MetadataRecord } from "../library/metadata/index.ts";
 import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
 import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
@@ -180,7 +180,8 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       else if (typeof body.pdfSha256 === "string") {
         const id = await identifyPdf(storeOf().filePath(body.pdfSha256));
         if (!id.textFound) notes.push("pdf-no-text");
-        dois = id.doiCandidates;
+        // An arXiv PDF carries its identifier but no DOI; its DataCite DOI names the exact preprint (gaid-first-use-fixes).
+        dois = id.doiCandidates.length ? id.doiCandidates : id.arxivIds.slice(0, 1).map(arxivDoi);
         titleGuess = id.titleGuess;
       }
       const candidates: MetadataCandidate[] = [];

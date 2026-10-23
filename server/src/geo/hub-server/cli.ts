@@ -5,22 +5,31 @@ import { parseArgs } from "node:util";
 import { HubAccounts } from "./accounts.ts";
 import { backupHub, checkBackup } from "./backup.ts";
 import { HubDatabase, HubServerError } from "./core.ts";
+import { HubFeeds } from "./feeds/store.ts";
+import { intervalHours } from "./feeds/schedule.ts";
 import { importHub } from "./import.ts";
 import { buildHubServer } from "./index.ts";
 const HELP = `GAID hub server (Node >= 22.19)
-  node geo/hub-server.mjs serve [--host 0.0.0.0] [--port 8700]
+  node geo/hub-server.mjs serve [--host 0.0.0.0] [--port 8700] [--tls-cert PEM --tls-key PEM] [--trust-proxy] [--feeds-interval-hours 6]
+  node geo/hub-server.mjs feeds list
+  node geo/hub-server.mjs feeds approve ID... | --all-proposed
+  node geo/hub-server.mjs feeds stop ID
+  node geo/hub-server.mjs feeds fetch [--source ID]
   node geo/hub-server.mjs invite --email EMAIL [--role admin|member]
   node geo/hub-server.mjs users
   node geo/hub-server.mjs backup --to DIR
   node geo/hub-server.mjs check-backup DIR
   node geo/hub-server.mjs import-hub --from DIR --authors MAP.json [--unmapped-to EMAIL] [--apply]
 Every command: --home DIR, or GAID_HUB_SERVER_HOME (default ~/.geoaidesk-hub).
+TLS files may also come from GAID_HUB_SERVER_TLS_CERT / GAID_HUB_SERVER_TLS_KEY (docs/geo/hub-server-https.md).
 Import is a dry-run unless --apply is present. Run check-backup before restoring a backup.`;
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
     home: { type: "string" }, host: { type: "string" }, port: { type: "string" }, email: { type: "string" },
     role: { type: "string" }, to: { type: "string" }, from: { type: "string" }, authors: { type: "string" },
     "unmapped-to": { type: "string" }, apply: { type: "boolean" }, help: { type: "boolean" },
+    "all-proposed": { type: "boolean" }, source: { type: "string" }, "feeds-interval-hours": { type: "string" },
+    "tls-cert": { type: "string" }, "tls-key": { type: "string" }, "trust-proxy": { type: "boolean" },
   } });
   const [command, ...args] = positionals;
   if (!command || values.help) { console.log(HELP); return; }
@@ -30,12 +39,17 @@ async function main() {
     if (args.length !== 1) throw new Error("Usage: check-backup DIR");
     console.log(JSON.stringify(checkBackup(args[0]), null, 2)); return;
   }
-  if (args.length) throw new Error("Unexpected positional arguments");
+  if (args.length && command !== "feeds") throw new Error("Unexpected positional arguments");
   if (command === "serve") {
     const port = Number(values.port ?? 8700);
     if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error("Port must be 1–65535");
     const host = values.host ?? "0.0.0.0";
-    const app = buildHubServer({ home });
+    const certFile = values["tls-cert"] ?? process.env.GAID_HUB_SERVER_TLS_CERT?.trim() ?? "";
+    const keyFile = values["tls-key"] ?? process.env.GAID_HUB_SERVER_TLS_KEY?.trim() ?? "";
+    if (Boolean(certFile) !== Boolean(keyFile)) throw new Error("Give both --tls-cert and --tls-key (or neither)");
+    const https = certFile ? { cert: readFileSync(certFile), key: readFileSync(keyFile) } : undefined;
+    const app = buildHubServer({ home, https, trustProxy: values["trust-proxy"], feedsIntervalHours: intervalHours(values["feeds-interval-hours"]) });
+    const scheme = https ? "https" : "http";
     for (const signal of ["SIGINT", "SIGTERM"] as const) process.once(signal, () => {
       void app.close().then(() => { process.exitCode = 0; }).catch((e: Error) => { console.error(e.message); process.exitCode = 1; });
     });
@@ -44,15 +58,31 @@ async function main() {
     console.log(`GAID hub server ${app.hub.server.serverId}\nHome: ${app.hub.home}`);
     if (["0.0.0.0", "::"].includes(host)) {
       const ips = Object.values(networkInterfaces()).flatMap((entries) => entries ?? []).filter((e) => e.family === "IPv4" && !e.internal).map((e) => e.address);
-      for (const ip of ips) console.log(`GAID Settings → hub server URL: http://${ip}:${port}`);
-      if (!ips.length) console.log(`Listening: http://localhost:${port} (set a LAN hostname in researchers' GAIDs)`);
-    } else console.log(`GAID Settings → hub server URL: http://${host.includes(":") ? `[${host}]` : host}:${port}`);
-    console.log("Plain HTTP: credentials, tokens, Workflows and synced PDFs cross the LAN unencrypted (pilot setting).");
+      for (const ip of ips) console.log(`GAID Settings → hub server URL: ${scheme}://${ip}:${port}`);
+      if (!ips.length) console.log(`Listening: ${scheme}://localhost:${port} (set a LAN hostname in researchers' GAIDs)`);
+    } else console.log(`GAID Settings → hub server URL: ${scheme}://${host.includes(":") ? `[${host}]` : host}:${port}`);
+    console.log(https ? "HTTPS only: researchers' GAIDs need the issuing CA unless it is publicly trusted (GAID_HUB_SERVER_CA)."
+      : "Plain HTTP: credentials, tokens, Workflows and synced PDFs cross the LAN unencrypted (pilot setting).");
     return;
   }
-  if (!["invite", "users", "backup", "import-hub"].includes(command)) throw new Error(HELP);
+  if (!["invite", "users", "backup", "import-hub", "feeds"].includes(command)) throw new Error(HELP);
   const hub = new HubDatabase({ home });
   try {
+    if (command === "feeds") {
+      const feeds = new HubFeeds(hub);
+      const [operation, ...ids] = args;
+      const actor = { id: "operator", name: "operator (CLI)", device: "CLI" };
+      try {
+        if (operation === "list" && !ids.length) console.log(JSON.stringify({ sources: feeds.sources() }, null, 2));
+        else if (operation === "approve" && ((ids.length > 0 && !values["all-proposed"]) || (!ids.length && values["all-proposed"]))) {
+          const targets = values["all-proposed"] ? feeds.sources().filter((s) => s.state === "proposed").map((s) => s.id) : ids;
+          console.log(JSON.stringify({ sources: targets.map((id) => feeds.decide(id, { state: "approved" }, actor)) }, null, 2));
+        } else if (operation === "stop" && ids.length === 1) console.log(JSON.stringify({ source: feeds.decide(ids[0], { state: "stopped" }, actor) }, null, 2));
+        else if (operation === "fetch" && !ids.length) console.log(JSON.stringify(await feeds.fetch(values.source ? { sourceId: values.source } : {}), null, 2));
+        else throw new Error("Usage: feeds list | approve ID...|--all-proposed | stop ID | fetch [--source ID]");
+      } finally { await feeds.close(); }
+      return;
+    }
     const accounts = new HubAccounts(hub);
     if (command === "invite") {
       if (!values.email) throw new Error("Usage: invite --email EMAIL [--role admin|member]");

@@ -17,6 +17,7 @@ import type {
   HubUpdateUserBody,
 } from "../../../../web/src/geo/contracts/hub-server.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
+import type { ReviewInput, StoredHubSkill } from "../hub-skills/records.ts";
 
 export { HUB_SERVER_SCHEMA } from "../../../../web/src/geo/contracts/hub-server.ts";
 export const HUB_API = "/hub/v1";
@@ -91,6 +92,30 @@ export interface InstallRequest {
 }
 export type { HubComment, HubFolder, StoredEntry };
 
+// --- Hub skill shelf (HubSkillRecordStore over HTTP, server/src/geo/hub-skills/records.ts) ----------------------------
+// GET    /hub/v1/skills                              → { skills: StoredHubSkill[] }    (visible to this account, newest first)
+// GET    /hub/v1/skills/:id                          → StoredHubSkill                  (404 missing or not visible)
+// PUT    /hub/v1/skills/:id                          StoredHubSkill → StoredHubSkill (as stored; author/registrant fields from
+//                                                    the account; 403 not the author; 404 folder; 409 revision rules or
+//                                                    archive missing / hash or size mismatch)
+// GET    /hub/v1/skills/:id/revisions/:rev/archive   bytes (application/gzip)          (404 missing or not visible)
+// PUT    /hub/v1/skills/:id/revisions/:rev/archive   raw bytes, header `X-Content-SHA256` → 204 (409 different bytes;
+//                                                    403 skill owned or reserved by someone else; 413 over 20 MiB)
+// POST   /hub/v1/skills/:id/revisions/:rev/reviews   ReviewInput → HubSkillRevision    (403 registrant marking `checked`;
+//                                                    400 state/note/replacement; 404 revision not visible)
+// GET    /hub/v1/skills/:id/comments                 → { comments: HubComment[] }      (`entryId` holds the skill id)
+// POST   /hub/v1/skills/:id/comments                 { body } → HubComment             (403 latest revision not visible)
+// GET    /hub/v1/skills/:id/stars                    → { stars: Record<accountId, true> }
+// POST   /hub/v1/skills/:id/star                     { on: boolean } → { stars, starredByMe }
+//
+// `:id` is the skill name (`validName`). Review permissions go through one server check so a later reviewer role
+// (gaid-hub-skills-2) can narrow who may mark `checked`/`deprecated`/`suspended` without changing the wire format.
+
+export interface SkillsResponse {
+  skills: StoredHubSkill[];
+}
+export type { ReviewInput, StoredHubSkill };
+
 // --- Personal library sync -------------------------------------------------------------------------------------------
 // GET    /hub/v1/library/changes?since=<n>           → LibraryChangesResponse (objects changed after version n, 0 = all)
 // POST   /hub/v1/library/changes                     LibraryPushRequest → LibraryPushResponse
@@ -136,3 +161,21 @@ export interface LibraryPushResponse {
   /** Refused because `baseVersion` is stale; the client pulls and retries. A pushed item must name only stored files. */
   conflicts: { kind: LibraryObjectKind; id: string; version: number; reason: "stale" | "missing-file" }[];
 }
+
+// --- Information feeds (gaid-hub-feeds, web/src/geo/contracts/hub-feeds.ts) ------------------------------------------
+//   GET    /feeds?category=&field=&q=&limit=   → FeedListResponse (`connected: true`; approved sources only)
+//   GET    /admin/feeds/sources                → FeedSourcesResponse (shipped proposals + additions, every state) [admin]
+//   POST   /admin/feeds/sources                FeedSourceAddBody → 201 { source: FeedSource } (approved)      [admin]
+//   PATCH  /admin/feeds/sources/:id            FeedSourceDecision → { source: FeedSource }                     [admin]
+//   DELETE /admin/feeds/sources/:id            → 204; administrator additions only (shipped ones: 409)          [admin]
+//   POST   /admin/feeds/fetch                  FeedFetchBody → FeedFetchResponse (collects now)                [admin]
+// `serve` collects every approved source every FEED_LIMITS.intervalHours (GAID_HUB_FEEDS_INTERVAL_HOURS, 0 = off).
+export type {
+  FeedFetchBody,
+  FeedFetchResponse,
+  FeedListResponse,
+  FeedSource,
+  FeedSourceAddBody,
+  FeedSourceDecision,
+  FeedSourcesResponse,
+} from "../../../../web/src/geo/contracts/hub-feeds.ts";

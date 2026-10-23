@@ -71,8 +71,11 @@ export interface CslItem {
 }
 
 /** Where the metadata of an item came from; `gaid` items are confirmed by the researcher before they count as checked. */
-/** `orcid`: filled from the researcher's public ORCID record (a work without DOI metadata elsewhere). */
-export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "orcid" | "import" | "manual";
+/**
+ * `orcid`: filled from the researcher's public ORCID record (a work without DOI metadata elsewhere).
+ * `datacite`: DOIs Crossref does not register, such as arXiv preprints (`10.48550/arXiv.*`) and data repositories.
+ */
+export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "orcid" | "import" | "manual";
 
 export interface LibraryAttachment {
   id: string;

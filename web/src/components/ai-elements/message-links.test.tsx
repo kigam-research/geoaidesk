@@ -35,4 +35,34 @@ describe("Markdown research artifacts", () => {
     }
     expect(open).not.toHaveBeenCalled();
   });
+
+  // GeoAIDesk (gaid-first-use-fixes): a link still being written showed "[blocked]" until the answer finished.
+  it("shows a link that is still streaming as its text, not as a blocked link", () => {
+    const full = "끝.\n\n[쪽별 근거와 한계를 담은 연구노트](연구노트/2026-10-22-무작위/index.md)";
+    for (let n = 4; n < full.length; n += 5) {
+      const { container, unmount } = render(<ProjectScopeProvider value="p"><MessageResponse mode="streaming" isAnimating>
+        {full.slice(0, n)}
+      </MessageResponse></ProjectScopeProvider>);
+      expect(container.textContent).not.toMatch(/\[blocked\]/);
+      expect(container.querySelector("[title^='Blocked URL']")).toBeNull();
+      unmount();
+    }
+    render(<ProjectScopeProvider value="p"><MessageResponse mode="streaming">{full}</MessageResponse></ProjectScopeProvider>);
+    const url = new URL(screen.getByRole("link", { name: "쪽별 근거와 한계를 담은 연구노트" }).getAttribute("href")!);
+    expect(url.searchParams.get("path")).toBe("연구노트/2026-10-22-무작위/index.md");
+  });
+
+  it("resolves a Markdown file's links against its own folder without leaving the sandbox", () => {
+    const open = vi.fn();
+    render(<ProjectScopeProvider value="p"><MessageResponse mode="static" baseDir="results/log_25_9_1/" onOpenFile={open}>
+      {"[투고용 PDF](../../figures/Figure_1.pdf)\n\n[기록](rules/check.md)\n\n[밖](../../../secret.txt)"}
+    </MessageResponse></ProjectScopeProvider>);
+    fireEvent.click(screen.getByRole("link", { name: "투고용 PDF" }));
+    expect(open).toHaveBeenCalledWith("figures/Figure_1.pdf");
+    fireEvent.click(screen.getByRole("link", { name: "기록" }));
+    expect(open).toHaveBeenCalledWith("results/log_25_9_1/rules/check.md");
+    expect(screen.queryByRole("link", { name: "밖" })).not.toBeInTheDocument();
+    expect(screen.getByText("밖")).toBeInTheDocument();
+    expect(screen.queryByText(/\[blocked\]/)).not.toBeInTheDocument();
+  });
 });

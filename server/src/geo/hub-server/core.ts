@@ -96,10 +96,30 @@ CREATE TABLE library_files (account_id TEXT NOT NULL REFERENCES accounts(id), sh
 CREATE TABLE hub_imports (source TEXT NOT NULL, entry_id TEXT NOT NULL, digest TEXT NOT NULL, at TEXT NOT NULL,
  PRIMARY KEY(source,entry_id));
 ` },
+  { version: 2, sql: `
+CREATE TABLE hub_skills (id TEXT PRIMARY KEY, record TEXT NOT NULL, author_id TEXT NOT NULL REFERENCES accounts(id), updated_at TEXT NOT NULL);
+-- A first upload reserves the entire unpublished skill id for its uploader.
+CREATE TABLE hub_skill_archives (skill_id TEXT NOT NULL, revision INTEGER NOT NULL, sha256 TEXT NOT NULL, size INTEGER NOT NULL,
+ uploader_id TEXT NOT NULL REFERENCES accounts(id), PRIMARY KEY(skill_id,revision));
+CREATE TABLE hub_skill_stars (skill_id TEXT NOT NULL REFERENCES hub_skills(id), account_id TEXT NOT NULL, display_name TEXT NOT NULL,
+ PRIMARY KEY(skill_id,account_id));
+CREATE TABLE hub_skill_comments (id TEXT PRIMARY KEY, skill_id TEXT NOT NULL REFERENCES hub_skills(id), account_id TEXT NOT NULL,
+ record TEXT NOT NULL, at TEXT NOT NULL);
+CREATE TABLE hub_skill_imports (source TEXT NOT NULL, skill_id TEXT NOT NULL, digest TEXT NOT NULL, at TEXT NOT NULL,
+ PRIMARY KEY(source,skill_id));
+` },
+  { version: 3, sql: `
+CREATE TABLE feed_sources (id TEXT PRIMARY KEY, record TEXT NOT NULL, last_success TEXT);
+CREATE TABLE feed_items (id TEXT PRIMARY KEY, source_id TEXT NOT NULL REFERENCES feed_sources(id), record TEXT NOT NULL,
+ published_at TEXT, fetched_at TEXT NOT NULL, sort_at TEXT NOT NULL);
+-- sort_at: publishedAt; undated items from a source's first collection sort below every dated item (backfill), later
+-- undated items by the time they were first collected.
+CREATE INDEX feed_items_source_time ON feed_items(source_id,sort_at DESC);
+` },
 ];
 export const HUB_TABLES = ["schema_migrations", "accounts", "sessions", "invites", "audit_events", "login_failures",
   "hub_folders", "hub_entries", "hub_files", "hub_stars", "hub_comments", "hub_installs", "library_versions",
-  "library_objects", "library_files", "hub_imports"] as const;
+  "library_objects", "library_files", "hub_imports", "hub_skills", "hub_skill_archives", "hub_skill_stars", "hub_skill_comments", "hub_skill_imports", "feed_sources", "feed_items"] as const;
 
 export class HubDatabase {
   readonly home: string;

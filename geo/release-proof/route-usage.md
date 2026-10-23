@@ -2,7 +2,7 @@
 
 One invocation produces `gaid-route-evidence/v1` in `record.json`. Start mode uses the parent's `instance.mjs` and a
 fresh GAID home. Attach mode requires `--api` plus the matching `--data-home` on the same filesystem; it creates a
-new project and never stops the attached service. Do not point it at a production project store for qualification.
+new project (`--project-name` names it; default `Route trial <workflow> <context>`) and never stops the attached service. Do not point it at a production project store for qualification.
 
 ```sh
 task job run --gpu --input assets:geo-catalogue/0.2.1 --input assets:force2020-welllogs/c8d01ee9 -- node geo/release-proof/route-trial.mjs --context 65536 --workflow well-log-qc

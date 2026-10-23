@@ -28,7 +28,7 @@ export function parseAuthors(text: string): CslItem["author"] {
 const retracted = (signals: UpdateSignal[]) => signals.some((s) => s.kind === "retraction" && !s.relation.startsWith("update-to"));
 const corrected = (signals: UpdateSignal[]) => signals.some((s) => s.kind === "correction");
 /** Service names as written by the services themselves (shown in both locales). */
-const ORIGIN_NAME: Record<string, string> = { crossref: "Crossref", openalex: "OpenAlex", kci: "KCI", zotero: "Zotero" };
+const ORIGIN_NAME: Record<string, string> = { crossref: "Crossref", openalex: "OpenAlex", kci: "KCI", datacite: "DataCite", zotero: "Zotero" };
 const formatOf = (name: string) => (/\.ris$/i.test(name) ? "ris" : /\.json$/i.test(name) ? "csl-json" : "bibtex");
 
 export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onAdded: (item?: LibraryItem) => void }) {

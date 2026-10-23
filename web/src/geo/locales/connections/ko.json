@@ -1,6 +1,7 @@
 {
   "title": "연결 지도",
   "hint": "기록된 연결만 표시합니다. 항목을 고른 뒤 열 수 있습니다.",
+  "hintProject": "{project} 프로젝트에 기록된 연결만 표시합니다. 항목을 고른 뒤 열 수 있습니다.",
   "show": {
     "button": "연결 지도 열기"
   },
@@ -78,7 +79,10 @@
     "workflow": {
       "button": "Workflow 열기"
     },
-    "unavailable": "현재 화면에서는 항목을 열 수 없습니다."
+    "unavailable": "현재 화면에서는 항목을 열 수 없습니다.",
+    "project": {
+      "button": "프로젝트 열기"
+    }
   },
   "loading": "연결을 읽는 중입니다.",
   "error": "연결을 읽지 못했습니다. 다시 읽으세요.",
