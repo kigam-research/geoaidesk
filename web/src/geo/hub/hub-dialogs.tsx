@@ -453,7 +453,8 @@ export function RegisterDialog({
           <SharedExamples examples={examples} />
           <li className="text-muted-foreground">{text("register.notShared")}</li>
         </ul>
-        <DialogFooter>
+        {/* The list of shared example data can make the dialog scroll; the register action stays in view (UI guide P2). */}
+        <DialogFooter className="sticky -bottom-6 -mx-6 -mb-6 border-t border-gaid-edge bg-background px-6 py-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {text("draft.close")}
           </Button>
