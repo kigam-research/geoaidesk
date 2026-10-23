@@ -32,6 +32,7 @@ import {
   REPAIR,
   REVISE_ADDENDUM,
 } from "./prompts.ts";
+import { renderDataSummary } from "./data-files.ts";
 import { pageFile, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
@@ -67,6 +68,8 @@ const MAX_QUESTIONS = 5;
 const PAPER_BUDGET = 260_000;
 const CODE_BUDGET = 120_000;
 const CODE_FILE_BUDGET = 12_000;
+/** Data-file summaries (format, CRS, extent, columns …) across all sources. */
+const DATA_BUDGET = 40_000;
 
 type Json = Record<string, unknown>;
 const isObj = (v: unknown): v is Json => !!v && typeof v === "object" && !Array.isArray(v);
@@ -106,12 +109,13 @@ async function sourceContext(store: AuthoringStore, project: AuthoringProject): 
   const parts: string[] = [];
   let paperBudget = PAPER_BUDGET;
   let codeBudget = CODE_BUDGET;
+  let dataBudget = DATA_BUDGET;
   project.sources.forEach((s, i) => aliases.set(`S${i + 1}`, s.id));
   for (const [alias, id] of aliases) {
     const s = project.sources.find((x) => x.id === id)!;
     const x = project.extractions[id];
     const head = [
-      `### ${alias}: ${s.name} (${s.kind}${s.documentKind ? `; ${s.documentKind}` : ""}${s.doi ? `; DOI ${s.doi}` : ""})`,
+      `### ${alias}: ${s.name} (${s.kind}${s.documentKind ? `; ${s.documentKind}` : ""}${s.doi ? `; DOI ${s.doi}` : ""}${s.title && s.title !== s.name ? `; title "${s.title}"` : ""}${s.library ? `; from the researcher's library (${s.library.category})` : ""}${s.note ? `; GAID research note${s.note.snapshot ? " (library copy)" : ""}` : ""})`,
     ];
     if (x?.pages) {
       const texts: string[] = [];
@@ -154,8 +158,25 @@ async function sourceContext(store: AuthoringStore, project: AuthoringProject): 
               : /\.(py|r|m|jl|sh)$/i.test(p)
                 ? 3
                 : 4;
+      // Data files: the inspection summary stands for the file (anchors on the file are checked against it, plus the
+      // raw text of a text table); the bytes never enter the context.
+      const data = x.files.filter((f) => f.data);
+      const companions = x.files.filter((f) => f.companionOf).length;
+      if (data.length) {
+        parts.push(`Data files read through GAID's geo inspection: ${data.length}${companions ? ` (+${companions} companion files)` : ""}`);
+        for (const f of data) {
+          const summary = renderDataSummary(f.path, f.size, f.data!);
+          const raw = f.text ? (await store.readFile(project.id, sourceFile(id, f.path))).toString("utf8") : "";
+          map.set(f.path, raw ? `${summary}\n${raw}` : summary);
+          if (dataBudget <= 0) continue;
+          const chunk = summary.slice(0, dataBudget);
+          dataBudget -= chunk.length;
+          parts.push(`=== ${alias} data ${f.path} ===\n${chunk}`);
+        }
+        if (dataBudget <= 0) parts.push(`(${alias}: later data summaries omitted for length)`);
+      }
       for (const f of [...x.files]
-        .filter((f) => f.text)
+        .filter((f) => f.text && !f.data)
         .sort((a, b) => rank(a.path) - rank(b.path) || (a.path < b.path ? -1 : 1))) {
         const t = (await store.readFile(project.id, sourceFile(id, f.path))).toString("utf8");
         map.set(f.path, t);
@@ -777,7 +798,7 @@ export function validateDraft(
       const entry = sourceId ? project.extractions[sourceId]?.files?.find((f) => f.path === sourcePath) : undefined;
       if (!sourceId || !entry) return errors.push(`codeFiles[${i}]: ${str(x.source, 10)} has no file "${sourcePath}"`);
       // Data and binaries stay with the researcher (their own terms); only text code/config files enter a skill.
-      if (!entry.text)
+      if (!entry.text || entry.data)
         return errors.push(
           `codeFiles[${i}]: "${sourcePath}" is data or binary; include only code or config text files`,
         );

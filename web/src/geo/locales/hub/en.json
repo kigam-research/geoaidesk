@@ -136,7 +136,7 @@
   },
   "sources": {
     "title": "Upload sources",
-    "drop": "Drop a paper PDF or a code archive (.zip, .tar.gz).",
+    "drop": "Drop paper PDFs, code archives or data files. You can add several at once.",
     "pick": "Choose files",
     "goal": "What to make",
     "goalPlaceholder": "e.g. an exploration Workflow for grid data from another region",
@@ -176,7 +176,23 @@
     "agentThinking_xhigh": "Extra high",
     "agentThinkingHint": "Higher levels take longer and use more tokens.",
     "readDone": "The sources have been read. Next, answer the questions that decide the Workflow.",
-    "next": "Answer the questions"
+    "next": "Answer the questions",
+    "dropHint": "Data files: CSV, XLSX, LAS, Shapefile, GeoTIFF, GeoPackage, NetCDF. For a Shapefile, choose the .shp with its .shx, .dbf and .prj. Up to 30 MiB per source.",
+    "fromLibrary": "Add from library",
+    "addedData": "{name} · {count, plural, one {# data file} other {# data files}}",
+    "addedNote": "{name} · research note",
+    "addedNoteCopy": "{name} · research note (library copy)",
+    "addedLibraryPaper": "{name} · library paper, {pages} pages",
+    "addedLibraryAbstract": "{name} · library paper (abstract only)",
+    "unread": "The content could not be read.",
+    "fact_columns": "{count, plural, one {# column} other {# columns}}",
+    "fact_rows": "{count, plural, one {# row} other {# rows}}",
+    "fact_curves": "{count, plural, one {# curve} other {# curves}}",
+    "fact_bands": "{count, plural, one {# band} other {# bands}}",
+    "fact_features": "{count, plural, one {# feature} other {# features}}",
+    "crsUnknown": "No CRS",
+    "moreData": "{count} more data files",
+    "list": "Added sources"
   },
   "reading": {
     "title": "Reading sources",
@@ -188,7 +204,9 @@
     "note": "Reading continues if you close this screen. Reopen it from 'Workflows I made' on the hub home. A long paper takes several minutes or more.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
-    "retry": "Run analysis again"
+    "retry": "Run analysis again",
+    "dataFiles": "Read summaries of {count, plural, one {# data file} other {# data files}}",
+    "notes": "{count, plural, one {# research note} other {# research notes}} received"
   },
   "questions": {
     "title": "Answer questions",
@@ -470,5 +488,25 @@
   "editing": {
     "edit": "You are editing revision {revision} of your registered Workflow. Registering it in the hub makes revision {next}.",
     "copy": "Your copy of revision {revision} of “{title}” by {author}. Registered, it becomes a separate Workflow that names the original."
+  },
+  "library": {
+    "title": "Add sources from the library",
+    "description": "Papers go in with their PDF text, research notes with their text and figures. A paper without a PDF goes in with its reference and abstract only.",
+    "category": "Source type",
+    "papers": "Papers",
+    "notes": "Research notes",
+    "search": "Search by title, author or project",
+    "loading": "Loading the library.",
+    "noMatch": "No items match.",
+    "emptyPapers": "The library has no papers.",
+    "emptyNotes": "The library has no research notes. Bring them in from the research notes screen.",
+    "selected": "{count} selected",
+    "cancel": "Cancel",
+    "addAction": "Add {count}",
+    "adding": "Adding",
+    "skipped": "{count, plural, one {# item was} other {# items were}} not added.",
+    "otherPc": "Note on another PC",
+    "noPdf": "No PDF",
+    "addEmpty": "Add"
   }
 }
