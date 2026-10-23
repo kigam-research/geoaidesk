@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:46:08Z
+updated: 2026-10-23T13:20:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0ed51a7-eda2-4b04-a7c8-d0bb4bae10b4","pid":792913,"provider":"claude","session":"b0051d7c-7ad4-43d6-acf2-ed583190496c","start":"64609653","token":"45e701729c20935a809ee5c0dc969917a87d51fda09f45623643a3747ef33df8"}
 branch: task/gaid-workflow-stages--gaid-stages-authoring
 target: task/gaid-workflow-stages
@@ -86,14 +86,17 @@ raw.githubusercontent.com (use `gh api` or codeload).
     `local-methods.ts` drops defaulted choices from recipes' unresolvedChoices (package file unchanged).
 - Checks run: server typecheck; `npx vitest run test/geo` 685 passed (incl. new test/geo-authoring-stages.test.ts); web tsc;
   `vitest run src/geo/hub` 114 passed; copy validator 0 errors; check-ui 0 errors.
-- Scope 5 in progress: own backend `gaid-stages-authoring-api` (port 18610, transient user unit, log
-  ~/data/geoaidesk/work/gaid-stages-authoring/logs/api.log), projects copied from the review-app store: ap-43431e17-f09 (fresh draft,
-  attempt att-15490c60-7db) and ap-stages-regroup (revise of 0.2.0 rev 9, att-2c2e3549-102), GPT-6.1 Sol high. Model login: the
-  review app's agent dir shared once by user decision (see Notes). Stop the unit right after the runs.
+- Scope 5 done: reruns att-c5bc8d55-79a (fresh draft, repaired once: 4 single-option choices) and att-a6b6c15e-cc8 (0.2.0 regroup,
+  accepted first try), GPT-6.1 Sol high, both draft revision 10. Fresh draft: 5 steps, 16 choices / 4 required, 6/6 inputs mapped;
+  regroup: 5 steps, 15 / 6 required, 6/6 mapped (old 10 steps kept as #### sub-sections); both package checks 0 errors, 0
+  workflow-stages warnings; whole method kept (DVC, IGRF, terrain, resampling, GMM, PGI-full/none, property- and probability-based
+  boundaries, sensitivity screen, borehole-guided target, reference comparison, quick/full). Outputs + sha256 in the report appendix;
+  instances stopped; review app health 200 and OpenAI still connected afterwards.
+- Observed (optional, not done): the model marks every input `multiple: true`; some defaults are long parameter bundles.
 ## Next steps
-1. When both attempts end: save draft JSONs next to the data, run the package check, compare with 0.2.0, stop the instance,
-   write reports/2026-10-23-gaid-workflow-stages/authoring.md, task finish.
+1. task finish (done criteria met); parent integrates reports/2026-10-23-gaid-workflow-stages/authoring.md into its report.
 ## Failed approaches
+- First runs (att-15490c60-7db, att-2c2e3549-102) were rejected only for slug collision: both project copies sat in one authoring store, so each saw the other's package slug as another hub method. Records kept in ~/data/geoaidesk/work/gaid-stages-authoring/rejected-1/; their stage shape already passed (4 and 5 steps, 5 and 6 required choices, all inputs mapped). Rerun with the copy in its own store.
 - ~/.kady/pi-agent has no OpenAI login, so the first instance could not call GPT-6.1 Sol.
 ## Notes and decisions
 - Stage warnings do not reject a model draft after the repair round (the package check and the draft screen show them); a hard
@@ -106,6 +109,7 @@ raw.githubusercontent.com (use `gh api` or codeload).
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Section for the parent report: reports/2026-10-23-gaid-workflow-stages/authoring.md (no own report; child unit).
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
