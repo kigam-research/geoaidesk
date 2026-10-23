@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:47:15Z
+updated: 2026-10-23T07:59:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -172,7 +172,11 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   boreholes input had no ore-penetration column (paper Table 1 also has none; penetration comes from core logging,
   i.e. core_samples.csv classes), and interview guidance asks to block on missing authorization. — record; candidate
   fix: Workflow 지침 should state that details with a recommended default are recorded as assumptions, not asked,
-  once the start settings are complete (D, prompt) — open.
+  once the start settings are complete (D, prompt) — fixed: when the start settings leave no condition open, the
+  rendered 지침 says to record such details as assumptions and run through, stopping only for a missing or misfitting
+  required input (`settings.runThrough`, `web/src/geo/contracts/workflow-doc.ts`). Also seen: after the interview
+  expired the agent stopped the run anyway (it asked for the three answers in its final message) although the tool
+  result told it to proceed with its recommendations.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 

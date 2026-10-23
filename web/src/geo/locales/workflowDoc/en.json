@@ -18,6 +18,7 @@
     "none": "none",
     "unresolved": "Conditions not set: {list}",
     "askBeforeStep": "Ask the researcher about a condition that is not set before the step that uses it.",
+    "runThrough": "The researcher has set every condition. Record details that the settings and the instructions do not cover as assumptions taken from the instructions' recommendation or the source value, and carry on to the end. Stop and ask only when a required input is missing or its format or coordinate reference system (CRS) does not fit.",
     "choiceOptions": "{label}: chosen by the researcher (options: {options})",
     "choiceOpen": "{label}: set by the researcher",
     "inputAsk": "{label} ({need})",
