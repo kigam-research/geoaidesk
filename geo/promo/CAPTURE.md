@@ -48,8 +48,8 @@ is converted to prose; the parent explicitly accepted this badge.
 After two failures from the unconfigured default, the parent authorized the connected subscription picker.
 Authoring used `openai-codex/gpt-6.1-sol` (medium); chat used `openai/gpt-6.1-sol`, OAuth subscription, shown as
 `제공사의 구독 한도 적용`. Both resolve to GPT-6.1 Sol; the provider refs differ. Settings defaults and keys stayed
-unchanged. Authoring attempts recorded `costUsd: 0`. Final chat ledger: 3,904,532 subscription tokens,
-`totalUsd: 0`, `computeUsd: 0`; the separate list-price equivalent was USD 0.8187376, not a charge.
+unchanged. Authoring attempts recorded `costUsd: 0`. Final chat ledger: 4,107,981 subscription tokens,
+`totalUsd: 0`, `computeUsd: 0`; the separate list-price equivalent was USD 0.84117, not a charge.
 
 ## Accepted staging and deviations
 
@@ -62,9 +62,16 @@ unchanged. Authoring attempts recorded `costUsd: 0`. Final chat ledger: 3,904,53
 - R1 and the chat use existing Workflow `entry-ap-a135f290-1c4` revision 2 because new authoring was delayed.
   H1/H2 show the newly registered entry. The new draft's missing command examples were corrected through the
   normal authoring UI before registration. A temporary ineffective edit of its own cached record was restored.
-- R2 combines the Workflow start view, a later actual read-only citation-check run, and the already finished
+- R2 combines the Workflow start view, a fresh actual read-only citation-check run, and the already finished
   new figure. The clean working segment shows real library/read tools and the working indicator. Earlier failed
-  background-fetch steps are outside the chosen segment. This is an editorial sequence, not uninterrupted chronology.
+  background-fetch steps are outside the chosen segment. The figure was already open during the new citation check.
+- Parent-authorized R2 capture-only DOM substitutions: the initial Workflow message tail becomes
+  `Workflow 지침에 따라 Yilgarn 자료로 탐사 우선순위 구역 지도와 연구노트를 만들어 주세요.`;
+  the old final-check request becomes `서재 논문 인용을 확인해 주세요.`; the exact assistant sentence
+  `새 분석은 수행하지 않았습니다.` is removed from the rendered page. Stored messages remain unchanged.
+  `capture_retake.py` records this bounded retake and refuses to resend its citation request without inspection.
+  The fresh real request is `서재 논문 인용을 확인해 주세요. 한 문장으로 알려 주세요.`. It uses the same subscription
+  model and performs no training. M1/N1/N2 were checked again for visible demo/staging/no-new-analysis wording.
 - N1 cuts between the list, figure and decision panel; navigation and off-camera scrolling are excluded.
   L2/L3 were recorded before the redraw, so the graph's figure node has the earlier neutral filename.
 - A3 shows the actual step flow/detail; the format pass is verified by API, outside its viewport. H1 starts at
@@ -84,7 +91,8 @@ All 31 rectangles were drawn at scale 2.25 on their midpoint frames and visually
 N1's figure rectangle follows its visible UI-clipped image; L3 follows the graph canvas. A3, dialog and map bounds
 were corrected after animation/layout settling. No browser page errors were observed. Capture Chrome closed once
 before final A3 and was replaced within the existing job; neither the review service nor hub was restarted.
-The application test suite was not run: no application source changed. Python syntax and artifact checks passed.
+Python syntax and artifact checks passed. The first `task finish` was interrupted during its hidden full-suite check;
+its local ready commit was not published. The retry runs the declared suite; its completion record owns that result.
 
 ```sh
 uv run --no-project --with pillow==12.3.0 python geo/promo/capture_verify.py
