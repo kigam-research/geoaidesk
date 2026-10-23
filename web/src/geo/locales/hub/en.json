@@ -397,7 +397,7 @@
     "note": "Note for other researchers",
     "notePlaceholder": "e.g. Built for grid data from other regions. Please try it and leave feedback.",
     "shared": "Shared: Workflow description, steps and files, included code and concept pictures, file check summary",
-    "notShared": "Not shared: original uploaded PDFs and archives, research data, project run records and trial assessments",
+    "notShared": "Not shared: original uploaded PDFs and archives, research data not added as example data, project run records and trial assessments",
     "submit": "Register in hub",
     "line": "Registered Workflows can be viewed, starred and discussed by other researchers. Check how it will look first.",
     "registeredLine": "Version {version} is registered in the hub.",
@@ -417,7 +417,16 @@
     "mainRelease": "Small changes use patch; new functionality uses minor. Choosing a major release declares the main release, 1.0.0.",
     "versionHint": "Choose according to the scope of changes. A major release increases the first number.",
     "versionLoading": "Reading the current version.",
-    "versionFailed": "Could not read the current version. Close and reopen the registration dialog."
+    "versionFailed": "Could not read the current version. Close and reopen the registration dialog.",
+    "examples": {
+      "shared": "{count, plural, one {Shared: # example data file} other {Shared: # example data files}} ({size})",
+      "synthetic": "synthetic data",
+      "source": "Source: {source}",
+      "license": "Terms of use: {license}",
+      "unstated": "not stated",
+      "who": "Example data files go to the hub with the Workflow. Every researcher who can see the Workflow in the hub can download them.",
+      "remote": "Shared: address and hash of example data downloaded from a public address ({titles}). The files are not uploaded."
+    }
   },
   "shared": {
     "by": "{author} · {folder} · {when}",

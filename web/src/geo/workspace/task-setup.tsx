@@ -16,6 +16,7 @@ import { DeleteRecipe } from "./recipe-add";
 import { StagePage, SummaryRows, answerPaths, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, nameMatches, pageChoices, setupSteps, sizeText, stageHint, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
 import { StartWindow, introNextLabel, type StartStep } from "./start-window";
 import { GeoIntro } from "./start-intro";
+import { citablePapers, useWorkflowPapers } from "./source-papers";
 import { localText } from "@/geo/hub/text";
 import { isExamplePath, type PrepareExamplesResponse } from "@/geo/contracts/workflow-examples";
 import { hasDefault } from "@/geo/contracts/workflow-stages";
@@ -146,6 +147,8 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const mixed = examples.length > 0 && Object.values(inputs).some((answer) => answerPaths(answer).length > 0);
   const download = exampleRoles.reduce((sum, role) => sum + (role.example?.download ?? 0), 0);
   const method = exposure?.startsWith("method:") ? exposure.split(":")[1] : null;
+  const papers = useWorkflowPapers(projectId, method);
+  const unattachedPapers = (papers.papers ?? []).filter((p) => p.state === "in-library").length;
 
   const uploadFiles = async (list: FileList): Promise<string[]> => {
     const body = new FormData();
@@ -173,7 +176,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         Object.assign(bindings, prepared.inputs);
       }
       if (workflow.doc) {
-        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples);
+        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples, citablePapers(papers));
       } else {
         // /skills is the merged list the composer's picker uses, not /skills/all.
         const response = await request<SkillInfo[]>("/skills", projectId);
@@ -239,7 +242,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         ? <Button disabled={Boolean(nextBlocked)} onClick={() => goTo(index + 1)}>{index === 0 ? introNextLabel(first) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
         : <Button disabled={busy || Boolean(blocked)} onClick={() => void start()}>{t(busy ? (examples.length ? "workspace.setup.example.preparing" : "workspace.setup.creating") : "workspace.setup.create")}</Button>}
     </>}>
-    {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} />}
+    {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} papers={papers} />}
     {step.kind === "stage" && <StagePage key={step.page.id} page={step.page} files={files} inputs={inputs} choices={choices} recipeChoices={initialSetup?.choices}
       onInput={(id, answer) => setInputs((previous) => ({ ...previous, [id]: answer }))} onChoice={(id, answer) => setChoices((previous) => ({ ...previous, [id]: answer }))}
       onUpload={uploadFiles} focus={focus}
@@ -256,6 +259,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
       {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
       {mixed && <p className="text-sm text-gaid-ink-2">{t("workspace.setup.example.mixed")}</p>}
+      {unattachedPapers > 0 && <p className="text-sm text-gaid-ink-2">{t("workspace.start.papers.summary", { count: unattachedPapers })} <button type="button" onClick={() => setIndex(0)} className="text-gaid-signal-ink underline-offset-4 hover:underline">{t("workspace.start.papers.review")}</button></p>}
       <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
       {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples }} />}
       <details className="text-sm">

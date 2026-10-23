@@ -1043,6 +1043,7 @@ function HubProject({
         <div className="min-h-0 flex-1">{body}</div>
       </main>
       <RegisterDialog
+        examples={(draft?.workflow?.inputRoles ?? []).flatMap((role) => (role.example ? [role.example] : []))}
         initialFolder={entryFolder}
         currentVersion={registrationEntry ? hubVersionOf(registrationEntry) : null}
         versionPending={registrationLoading}

@@ -243,7 +243,8 @@
       "outputs": "What it makes",
       "steps": "Steps",
       "note": "Note",
-      "boundary": "Limits"
+      "boundary": "Limits",
+      "papers": "Source papers"
     },
     "exampleNone": "No example data. Choose a project file or upload your own.",
     "exampleSome": "Example data available: {titles}. Without a file of your own, the Workflow starts on the example data.",
@@ -288,6 +289,22 @@
     "defaults": "{count, plural, one {# condition with a default} other {# conditions with a default}}",
     "defaultsHint": "Unchanged conditions run on their default.",
     "defaultsChanged": "{count, plural, one {# set to a value other than its default.} other {# set to values other than their default.}}",
-    "choicesDefaults": "{count, plural, one {# condition with a default runs on it unless you change it.} other {# conditions with a default run on them unless you change them.}}"
+    "choicesDefaults": "{count, plural, one {# condition with a default runs on it unless you change it.} other {# conditions with a default run on them unless you change them.}}",
+    "papers": {
+      "state": {
+        "attached": "In the citation scope",
+        "in-library": "In the library",
+        "not-in-library": "Not in the library"
+      },
+      "byTitle": "matched by title",
+      "add": "Add to library",
+      "attach": "{count, plural, one {Attach # source paper} other {Attach # source papers}}",
+      "attachHint": "The AI agent can find, read and cite attached papers in research notes.",
+      "attachedNote": "The AI agent can find, read and cite them in research notes.",
+      "missingNote": "{count, plural, one {# paper is} other {# papers are}} not in the library. Add them to the library first to attach them.",
+      "failed": "Could not check the source papers in the library.",
+      "summary": "{count, plural, one {# source paper in the library is} other {# source papers in the library are}} not in the citation scope.",
+      "review": "View source papers"
+    }
   }
 }

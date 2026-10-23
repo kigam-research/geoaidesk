@@ -243,7 +243,8 @@
       "outputs": "만드는 결과",
       "steps": "진행 단계",
       "note": "알아둘 점",
-      "boundary": "해석 한계"
+      "boundary": "해석 한계",
+      "papers": "근거 논문"
     },
     "exampleNone": "예제 자료가 없습니다. 프로젝트의 파일을 고르거나 내 파일을 올립니다.",
     "exampleSome": "예제 자료가 있습니다: {titles}. 내 파일을 고르지 않으면 예제 자료로 시작합니다.",
@@ -288,6 +289,22 @@
     "defaults": "{count, plural, other {기본값이 있는 조건 #개}}",
     "defaultsHint": "바꾸지 않으면 기본값으로 진행합니다.",
     "defaultsChanged": "{count, plural, other {#개를 기본값과 다르게 정했습니다.}}",
-    "choicesDefaults": "{count, plural, other {기본값이 있는 조건 #개는 바꾸지 않으면 기본값으로 진행합니다.}}"
+    "choicesDefaults": "{count, plural, other {기본값이 있는 조건 #개는 바꾸지 않으면 기본값으로 진행합니다.}}",
+    "papers": {
+      "state": {
+        "attached": "인용 범위에 있음",
+        "in-library": "서재에 있음",
+        "not-in-library": "서재에 없음"
+      },
+      "byTitle": "제목으로 찾음",
+      "add": "서재에 넣기",
+      "attach": "근거 논문 {count}편 붙이기",
+      "attachHint": "붙인 논문은 AI agent가 찾아 읽고 연구 노트에 인용할 수 있습니다.",
+      "attachedNote": "AI agent가 찾아 읽고 연구 노트에 인용할 수 있습니다.",
+      "missingNote": "서재에 없는 논문 {count}편은 서재에 넣은 뒤 붙일 수 있습니다.",
+      "failed": "서재에서 근거 논문을 확인하지 못했습니다.",
+      "summary": "서재에 있는 근거 논문 {count}편이 인용 범위에 없습니다.",
+      "review": "근거 논문 보기"
+    }
   }
 }

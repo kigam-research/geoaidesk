@@ -163,4 +163,20 @@ describe("GAID hub registration", () => {
     fireEvent.click(submit);
     await vi.waitFor(() => expect(onRegister).toHaveBeenCalledWith("general", "", "patch"));
   });
+
+  it("lists bundled example data as shared before registering (F21)", () => {
+    const examples = [
+      { title: { ko: "합성 시추 코어" }, source: { ko: "작성자가 만든 합성 자료" }, synthetic: true, files: [{ name: "cores.csv", sha256: "a".repeat(64), size: 2048, path: "examples/cores/cores.csv" }] },
+      { title: { ko: "공개 항공자력 격자" }, source: { ko: "예시 기관" }, license: "CC-BY-4.0", files: [{ name: "tmi.tif", sha256: "b".repeat(64), size: 1000, url: "https://example.org/tmi.tif" }] },
+    ];
+    render(<RegisterDialog open onOpenChange={() => undefined} onRegister={vi.fn()} folders={[{ id: "general", name: "일반" }]} examples={examples} />);
+    expect(screen.getByText("공유: 예제 자료 파일 1개 (2.0 KB)")).toBeInTheDocument();
+    expect(screen.getByText("cores.csv")).toBeInTheDocument();
+    expect(screen.getByText("2.0 KB")).toBeInTheDocument();
+    expect(screen.getByText("· 합성 자료", { exact: false, selector: "span.text-muted-foreground" })).toBeInTheDocument();
+    expect(screen.getByText(/이용 조건: 적지 않음/)).toBeInTheDocument();
+    expect(screen.getByText(/허브에서 Workflow를 볼 수 있는 연구자는 누구나 내려받을 수 있습니다/)).toBeInTheDocument();
+    expect(screen.getByText(/공개 주소로 받는 예제 자료의 주소와 해시 \(공개 항공자력 격자\)/)).toBeInTheDocument();
+    expect(screen.getByText(/예제 자료로 넣지 않은 연구 자료/)).toBeInTheDocument();
+  });
 });

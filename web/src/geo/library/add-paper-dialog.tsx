@@ -31,7 +31,8 @@ const corrected = (signals: UpdateSignal[]) => signals.some((s) => s.kind === "c
 const ORIGIN_NAME: Record<string, string> = { crossref: "Crossref", openalex: "OpenAlex", kci: "KCI", datacite: "DataCite", zotero: "Zotero" };
 const formatOf = (name: string) => (/\.ris$/i.test(name) ? "ris" : /\.json$/i.test(name) ? "csl-json" : "bibtex");
 
-export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean; onOpenChange: (open: boolean) => void; onAdded: (item?: LibraryItem) => void }) {
+/** `initialDoi`: opened for a known paper (a Workflow's source paper): the DOI is looked up right away; the researcher still picks and checks the details. */
+export function AddPaperDialog({ open, onOpenChange, onAdded, initialDoi }: { open: boolean; onOpenChange: (open: boolean) => void; onAdded: (item?: LibraryItem) => void; initialDoi?: string }) {
   const [tab, setTab] = useState<"paper" | "file">("paper");
   const fileRef = useRef<HTMLInputElement>(null);
   const bibRef = useRef<HTMLInputElement>(null);
@@ -68,6 +69,12 @@ export function AddPaperDialog({ open, onOpenChange, onAdded }: { open: boolean;
       setLookingUp(false);
     }
   };
+  useEffect(() => {
+    if (!open || !initialDoi) return;
+    setLookupText(initialDoi);
+    void runLookup({ doi: initialDoi });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opening for that DOI
+  }, [open, initialDoi]);
 
   const pick = async (f: File | undefined) => {
     if (!f) return;
