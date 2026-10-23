@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:27:24Z
+updated: 2026-10-23T02:32:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
 target: task/gaid-promo-video-v2
@@ -60,9 +60,12 @@ updated for v2 (reproduce steps, deviations). Report deviations from the shot li
 not appear). Then task save / task finish your unit.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed on PC74 in the printed worktree; read contract v2 and v1 capture helpers.
+- Interface settled: capture-v2 at 2880x1620, 30 fps; reuse v1 pointer and click interpolation without its status masking or mutation guard.
+- Sequential work: preserve before evidence; create library paper/folder; author and register Workflow; create project and run quick trial; answer note; revisit library and capture stored states.
+- Owned files: capture*.py, CAPTURE.md, this task document. No workers needed: live UI state and recording are tightly coupled.
 ## Next steps
-1. (the next session's first action)
+1. Start the recorded capture session job; inspect the access gate and continue through the real UI.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
