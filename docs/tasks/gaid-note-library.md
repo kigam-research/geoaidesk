@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T06:57:15Z
+status: done
+updated: 2026-10-23T06:57:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64631b91-f6bd-4f6d-ad02-2996e80f1f79","pid":1743744,"provider":"claude","session":"5414cf7f-13a5-428a-ae32-343cc6475005","start":"62319888","token":"b8608a00206a30d58748fdcf6af8f6920102d148e2631acb42ae68af6fd45eee"}
 branch: task/gaid-note-library
 target: main
@@ -81,8 +81,9 @@ Recommended answers the user accepted:
 - Route a-workflow-button (from D via hub): fixed in e72dda34 and reported with task route-report.
 - Report review copy: Obsidian vault 연구 보고서/geoaidesk/2026-10-23-gaid-note-library (sync service inactive).
 ## Next steps
-1. `task finish` (build caches removed first; trial app unit gaid-note-library-app is stopped, its data stays in
-   ~/data/geoaidesk/work/gaid-note-library/).
+<!-- task:closed -->
+Closed 2026-10-23T06:57:16Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
