@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:13:55Z
+updated: 2026-10-23T07:21:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e1c6a78f-11ec-46f9-83ba-acc24d237672","pid":2123332,"provider":"claude","session":"328f1569-b8ae-42a5-b1df-4474b7414b05","start":"62565307","token":"531aa2e1e3ef35b52322f15aaf618da80fc168d4620d8ba20079dacaadf3241b"}
 branch: task/gaid-hub-versions
 target: main
@@ -75,6 +75,7 @@ Orchestration (2026-10-23):
    (`web/src/lib/command-blocks.ts`) accepts version, migration-5 fixtures, glossary `version` row, AGENTS.md and
    docs/geo/hub-server.md. Full server vitest: only helper-venv/geopandas/office environment failures remain locally
    (scripts/check prepares the helper venv).
+Blocked: waiting for child gaid-hub-versions--ui task finish (scripts/check running in its tab) before task complete.
 3. When the child finishes: `task complete`, integrate, scripts/check, AGENTS.md wording (판 → version), report.
 ## Failed approaches
 ## Notes and decisions
@@ -85,6 +86,8 @@ Orchestration (2026-10-23):
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-hub-versions/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
