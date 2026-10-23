@@ -400,8 +400,13 @@ export function recordedAnswers(p: AuthoringProject): Record<string, DraftAnswer
     if (q.status === "open") continue;
     const d = p.decisions.find((x) => x.questionId === q.id && !x.supersededBy);
     if (!d) continue;
+    const label = q.options.find((o) => o.id === d.optionId)?.label;
     out[q.id] =
-      d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
+      d.status === "deferred"
+        ? { defer: true }
+        : d.optionId
+          ? { optionId: d.optionId, ...(d.response && d.response !== label ? { response: d.response } : {}) }
+          : { response: d.response };
   }
   return out;
 }

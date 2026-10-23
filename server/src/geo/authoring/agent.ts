@@ -415,7 +415,7 @@ function draftRequest(
       const q = project.questions.find((x) => x.id === d.questionId);
       return d.status === "deferred"
         ? `- ${d.key}: "${q?.text}" → deferred (unresolved)`
-        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId})` : ""}`;
+        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId}: ${q?.options.find((o) => o.id === d.optionId)?.label ?? ""})` : ""}`;
     });
   const open = project.questions.filter((q) => q.status === "open").map((q) => `- ${q.key}: ${q.text} (unanswered)`);
   const code = project.sources

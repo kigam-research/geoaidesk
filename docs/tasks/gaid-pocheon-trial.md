@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:22:52Z
+updated: 2026-10-23T06:32:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -123,6 +123,20 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   trial continues with the same polyfill injected into the trial browser. Same class, minor: copy buttons use
   `navigator.clipboard` (undefined on insecure origins) in hub technical details, workflow-view, hub-feeds,
   hub-server admin/parts, note-figures — they throw or do nothing. — D (optional) — open.
+- F10 — first-pass questions (project ap-bab647f7-674, GPT-6.1 Sol high, 38 findings, 7 questions; the findings
+  covered the whole method and even caught that ESM1 overwrites the PGI-none settings with PGI-full) — the question
+  "Workflow의 입력은 어느 처리 단계부터 받을까요?" recommended "보정된 자력 자료부터" because "올린 코드가 관측 위치·관측값·
+  표준편차를 직접 읽으므로 … 역산과 광체 추정에 집중": the recommendation followed the supplied code's coverage and would
+  drop the paper's diurnal correction, Z-score rejection and IGRF removal. Cause: ANALYZE_SYSTEM asks for a
+  recommendation without saying it must keep the source's method. — D — fixed (ANALYZE_SYSTEM: prefer the option that
+  keeps the whole method; never narrow because code covers part). The researcher (writer) answered
+  "원자료와 보정 자료 모두".
+- F11 — question card (`web/src/geo/hub/question-step.tsx`) — an option and "기타" words are mutually exclusive in the UI
+  (typing in 기타 clears the option, choosing an option clears the text), although the API accepts `optionId` +
+  `response`. A researcher cannot pick the recommended option and add a condition (e.g. "all bodies, but mark the
+  one at the boreholes"). — D (optional) — open.
+- F12 — trial-scale question text on main says quick results are "흐름 확인용" (flow check only), which contradicts the
+  user's bar (coarse but paper-level, interpretable). — D — fixed with F3 (question reason/hint reworded).
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 

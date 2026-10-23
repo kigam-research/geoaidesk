@@ -197,6 +197,8 @@
     "recommended": "권장",
     "other": "기타",
     "otherPlaceholder": "다른 의견을 적으세요.",
+    "addToOption": "고른 답에 덧붙일 말",
+    "addToOptionPlaceholder": "조건이나 설명을 덧붙이세요. 비워 두어도 됩니다.",
     "answer": "답",
     "answerPlaceholder": "답을 적으세요.",
     "defer": "나중에 정하기",
