@@ -25,7 +25,7 @@ import type {
 import { LibraryError, libraryStore, normalizeDoi, cslYear, samePaper, summarize, type LibraryStore } from "../library/store.ts";
 import { readStoredPdf, storedPdf } from "../library/reader.ts";
 import { buildUsesIndex, hasScope, projectItems, projectNoteCitations, readProjectLiterature, scopeFolders, writeProjectLiterature } from "../library/uses.ts";
-import { AuthoringStore } from "../authoring/store.ts";
+import { AuthoringError, AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
 import { addNoteItem, libraryInstance, noteCandidates, noteIsLocal, noteSummary, refreshNoteItems } from "../library/notes.ts";
@@ -36,7 +36,8 @@ import { arxivDoi, identifyPdf, lookupDoi, resolveUrl, searchByTitle, type Metad
 import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
 import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
-import { addSource } from "../authoring/sources.ts";
+import { addLibrarySources, libraryDeps, linkLibraryAuthoring, readLinks } from "../authoring/library-sources.ts";
+import type { AddLibrarySourcesBody, AddLibrarySourcesResult } from "../../../../web/src/geo/contracts/authoring.ts";
 
 export interface LibraryRouteOptions {
   store?: () => LibraryStore;
@@ -63,16 +64,6 @@ export function referenceList(items: LibraryItem[], locale: "ko" | "en"): string
   return [...items].sort((a, b) => sortKey(a).localeCompare(sortKey(b), locale)).map((i) => formatReference(i.csl, locale)).join("\n") + "\n";
 }
 
-// Library item -> hub authoring drafts made from it. Kept in the library directory so the authoring contract stays as is.
-function linksFile(store: LibraryStore) { return path.join(store.root, "links.json"); }
-function readLinks(store: LibraryStore): Record<string, string[]> {
-  try { return JSON.parse(fs.readFileSync(linksFile(store), "utf8")).authoring ?? {}; } catch { return {}; }
-}
-function writeLinks(store: LibraryStore, authoring: Record<string, string[]>) {
-  const tmp = `${linksFile(store)}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify({ authoring }, null, 2) + "\n");
-  fs.renameSync(tmp, linksFile(store));
-}
 
 export async function registerGeoLibraryRoutes(app: FastifyInstance, options: LibraryRouteOptions = {}): Promise<void> {
   const storeOf = options.store ?? libraryStore;
@@ -101,6 +92,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
       if (error instanceof LibraryError) return reply.code(error.status).send({ error: error.message });
+      if (error instanceof AuthoringError) return reply.code(error.status).send({ error: error.message });
       // Research-language Zotero states (never response bodies or keys); the screen words them.
       if (error instanceof ZoteroError) {
         const refused = error.state === "key-rejected" || error.state === "key-invalid" || error.state === "no-library-access";
@@ -408,6 +400,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       }));
     });
 
+    const librarySourceDeps = (store: LibraryStore) => libraryDeps(store, zoteroOf(store));
     /** "이 논문으로 Workflow 만들기": a hub authoring draft with the item's PDF and DOI as its first source. */
     scope.post<{ Params: { id: string } }>("/geo/library/items/:id/authoring", async (req, reply) => {
       const store = storeOf(), item = await store.get(req.params.id), sha = storedPdf(item);
@@ -415,19 +408,32 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const authoring = authoringOf();
       await authoring.initialize();
       const project = await authoring.create({ title: item.csl.title.slice(0, 120) });
-      const doi = normalizeDoi(item.csl.DOI);
-      await addSource(authoring, project.id, {
-        name: `${item.citationKey ?? item.id}.pdf`,
-        mediaType: "application/pdf",
-        kind: "pdf",
-        documentKind: "paper",
-        contentBase64: fs.readFileSync(store.filePath(sha)).toString("base64"),
-        ...(doi ? { doi } : {}),
-      });
-      const links = readLinks(store);
-      links[item.id] = [...new Set([...(links[item.id] ?? []), project.id])];
-      writeLinks(store, links);
+      await addLibrarySources(authoring, project.id, [item.id], librarySourceDeps(store));
+      linkLibraryAuthoring(store, [item.id], project.id);
       return reply.code(201).send({ authoringId: project.id });
+    });
+
+    /**
+     * Several papers and research notes from 서재 as hub authoring sources (gaid-authoring-sources): added to
+     * `authoringId`, or to a new authoring project titled after the first item.
+     */
+    scope.post<{ Body: AddLibrarySourcesBody }>("/geo/library/authoring", async (req, reply): Promise<AddLibrarySourcesResult> => {
+      const body = req.body ?? ({} as AddLibrarySourcesBody);
+      const ids = body.itemIds;
+      if (!Array.isArray(ids) || !ids.length || ids.length > 30 || !ids.every((x) => typeof x === "string" && x.length <= 100) || new Set(ids).size !== ids.length)
+        throw new LibraryError("Choose 1-30 distinct library items", 400);
+      const store = storeOf(), authoring = authoringOf();
+      await authoring.initialize();
+      let authoringId = typeof body.authoringId === "string" ? body.authoringId : undefined;
+      if (authoringId) await authoring.read(authoringId);
+      else {
+        const first = await store.get(ids[0]);
+        authoringId = (await authoring.create({ title: first.csl.title.slice(0, 120) })).id;
+      }
+      const result = await addLibrarySources(authoring, authoringId, ids, librarySourceDeps(store));
+      linkLibraryAuthoring(store, result.added.map((a) => a.itemId), authoringId);
+      reply.code(body.authoringId ? 200 : 201);
+      return result;
     });
   });
 }

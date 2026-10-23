@@ -4,7 +4,10 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/projects";
 import { t } from "@/geo/i18n";
-import { authoringUrl, canSendDirect, checked, directHandoff, downloadHandoff, previewHandoff, saveDownload, sendToHub, type HandoffPreview, type HubSite } from "./client";
+import { authoringUrl, canSendDirect, checked, directHandoff, downloadHandoff, handoffExtras, previewHandoff, saveDownload, sendToHub, type HandoffExtras, type HandoffPreview, type HubSite } from "./client";
+
+/** At most this many notes and papers go along (server limit). */
+const EXTRA_LIMIT = 20;
 
 /** Preview text without Markdown markers (re-trial: "## 최종 보고" and "**…**" showed as raw text). The bundle keeps the original. */
 export function plainMarkdown(text: string): string {
@@ -21,6 +24,9 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
   const [sites, setSites] = useState<HubSite[]>([]);
   const [siteId, setSiteId] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [extras, setExtras] = useState<HandoffExtras>({ notes: [], papers: [] });
+  const [notes, setNotes] = useState<string[]>([]);
+  const [papers, setPapers] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -50,6 +56,17 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [projectId, sessionId, attempt]);
+  // The chat's research notes and the project's papers are offered for the GAID hub draft; a failed read offers none.
+  useEffect(() => {
+    let active = true;
+    void handoffExtras(projectId).then(found => {
+      if (!active) return;
+      setExtras(found);
+      setNotes(found.notes.filter(n => n.sessions.includes(sessionId)).map(n => n.id).slice(0, EXTRA_LIMIT));
+      setPapers(found.papers.map(p => p.id).slice(0, EXTRA_LIMIT));
+    });
+    return () => { active = false; };
+  }, [projectId, sessionId]);
   const size = preview?.files.filter(f => selected.includes(f.path)).reduce((sum, f) => sum + f.size, 0) ?? 0;
   const clearTransfer = () => { setDownloaded(false); setTransferPath(null); setDraftUrl(""); setHubDraft(""); };
   // The GAID hub is a place of this page (#hub/<draft>): the new draft opens there with the bundle attached.
@@ -57,7 +74,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
     if (busy || loading || isStreaming || !preview) return;
     setBusy(true); setError(""); clearTransfer();
     try {
-      const result = await sendToHub(projectId, sessionId, selected, note);
+      const result = await sendToHub(projectId, sessionId, selected, note, { notes, libraryItemIds: papers });
       if (!live.current) return;
       setHubDraft(result.projectId); setTransferPath("hub");
     } catch (err) { if (live.current) setError(err instanceof Error ? err.message : t("hubHandoff.errors.request")); }
@@ -116,6 +133,18 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
             </label>)}
           </div>
         </fieldset>
+        {(extras.notes.length > 0 || extras.papers.length > 0) && <fieldset disabled={busy || isStreaming} className="min-w-0 space-y-2">
+          <legend className="font-medium">{t("hubHandoff.extras")}</legend>
+          <p className="text-xs text-muted-foreground">{t("hubHandoff.extrasHelp", { limit: EXTRA_LIMIT })}</p>
+          <div className="max-h-52 space-y-2 overflow-y-auto">
+            {extras.notes.map(n => <ExtraRow key={`n-${n.id}`} checked={notes.includes(n.id)} disabled={!notes.includes(n.id) && notes.length >= EXTRA_LIMIT}
+              onChange={on => { setNotes(old => on ? [...old, n.id] : old.filter(x => x !== n.id)); clearTransfer(); }}
+              title={n.title} detail={t("hubHandoff.noteLine", { date: n.date })} />)}
+            {extras.papers.map(p => <ExtraRow key={`p-${p.id}`} checked={papers.includes(p.id)} disabled={!papers.includes(p.id) && papers.length >= EXTRA_LIMIT}
+              onChange={on => { setPapers(old => on ? [...old, p.id] : old.filter(x => x !== p.id)); clearTransfer(); }}
+              title={p.title} detail={t("hubHandoff.paperLine", { authors: p.authors || "-", year: p.year ?? "-" })} />)}
+          </div>
+        </fieldset>}
         {!!excluded && <p>{t("hubHandoff.excluded", { count: excluded })}</p>}
         {!!preview.excludedFiles?.length && <ul className="list-disc pl-5 text-xs [overflow-wrap:anywhere]">{preview.excludedFiles.map(file => <li key={file.path}>{t("hubHandoff.excludedFile", { path: file.path, reason: file.reason })}</li>)}</ul>}
         <p>{t("hubHandoff.selection", { count: selected.length, size: (size / 1024 / 1024).toFixed(2) })}</p>
@@ -143,4 +172,11 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
       </div>
     </DialogContent>
   </Dialog>;
+}
+
+function ExtraRow({ checked, disabled, onChange, title, detail }: { checked: boolean; disabled: boolean; onChange: (on: boolean) => void; title: string; detail: string }) {
+  return <label className="flex min-w-0 items-start gap-2">
+    <input type="checkbox" className="mt-1" checked={checked} disabled={disabled} onChange={e => onChange(e.target.checked)} />
+    <span className="min-w-0 [overflow-wrap:anywhere]">{title}<span className="block text-xs text-muted-foreground">{detail}</span></span>
+  </label>;
 }
