@@ -76,7 +76,7 @@ supersedes:
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 분석 방법이나 결과는 바꾸지 않았습니다. 시작 초안의 지침 내용은 지금과 같은 생성 방식을 씁니다.
-- 소프트웨어 검증: 웹 자동 시험에 새 시험 4개를 더했습니다. 이름 맞춤, 소개 단계, 파일 묶음과 요약 표시, 일반 Workflow의 단계 진행·지침 편집·새 채팅 전달을 확인합니다. 단계가 하나 늘어 바뀐 기존 시험 3개 파일도 고쳤습니다. 전체 검사 결과는 부록 A에 적었습니다. 실제 앱에서는 일반 Workflow를 끝까지 진행해, 새 채팅 입력창에 지침과 고른 파일이 들어가는 것을 확인했습니다.
+- 소프트웨어 검증: 웹 자동 시험에 새 시험 4개를 더했습니다. 이름 맞춤, 소개 단계, 파일 묶음과 요약 표시, 일반 Workflow의 단계 진행·지침 편집·새 채팅 전달을 확인합니다. 단계가 하나 늘어 바뀐 기존 시험 3개 파일도 고쳤습니다. 전체 검사(백엔드 시험 2,278개, 프론트엔드 시험 1,249개, 문구·UI 가이드 검사, 실제 배포 형태의 시작·종료 시험)를 통과했습니다. 실제 앱에서는 일반 Workflow를 끝까지 진행해, 새 채팅 입력창에 지침과 고른 파일이 들어가는 것을 확인했습니다.
 - UI 가이드: P2, P3, P9, B1, B3, B5, Q1–Q5, Q7, I9·I10·I14·I15(세로 눈금과 축척 막대로 그림), R1, S1, W6을 따릅니다. D2의 시트 너비(최대 720 px)는 시작 창만 920 px로 넓혔습니다. 단계 이름을 모두 보이게 하려는 사용자 결정이고, 가이드 D2·Q4와 규칙 파일에 이 예외를 적었습니다. W5(첫 화면 본문 300자)는 PU-컨포멀 소개에서 문단 글자 수가 이를 조금 넘을 수 있습니다. 긴 설명과 해석 한계는 두 줄로 줄이고 "더 보기"로 펼치게 했습니다.
 
 ## 5. 한계
@@ -115,7 +115,7 @@ supersedes:
 |---|---|
 | 코드 | `web/src/geo/workspace/{start-window,start-intro,upstream-start,task-setup,setup-steps}.tsx`, `web/src/geo/shell/step-list.tsx`, `web/src/app/globals.css` (`.gaid-steplist-*`), 상위 코드 연결점 `web/src/components/workflows-panel.tsx` (`extension.renderLaunch`) |
 | 시험 | `web/src/geo/workspace/start-window.test.tsx`, `workspace.test.tsx`, `task-setup-examples.test.tsx`, `web/src/geo/workflow/workflow-mounts.test.tsx` |
-| 전체 검사 | `scripts/check`, 기록 PC74 `~/data/geoaidesk/work/gaid-workflow-start-ui/check-1.log` |
+| 전체 검사 | `scripts/check`, 통과 기록 PC74 `~/data/geoaidesk/work/gaid-workflow-start-ui/check-2.log` |
 | 시안 | PC74 `~/data/geoaidesk/work/gaid-workflow-start-ui/mockups/start.html`, 비교 문서 `.../proposal/index.md` |
 | 실제 앱 화면 48장 | PC74 `~/data/geoaidesk/work/gaid-workflow-start-ui/app-shots/` (`appshot.sh <style> <theme> <w> <h>`로 다시 찍음; 앱은 포트 3392/18392, 자료 `.../home/`의 Yilgarn 프로젝트 사본) |
 | 가이드·규칙 | `docs/design/ui-guide.md` §0, D2, Q4; `geo/ui/ui-rules.json` `sheetPx.workflowStart`; `AGENTS.md` Workflow panel 항목 |
