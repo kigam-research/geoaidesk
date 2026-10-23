@@ -148,7 +148,8 @@
       "sheetPx": {
         "small": 480,
         "medium": 640,
-        "large": 720
+        "large": 720,
+        "workflowStart": 920
       },
       "sheetMaxHeightVh": 85
     }

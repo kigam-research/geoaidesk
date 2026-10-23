@@ -76,7 +76,7 @@ function catalogue() {
 async function openSetup(name: RegExp = /^Well log QC well-qc/) {
   await userEvent.click(await screen.findByRole("button", { name })); return screen.findByRole("dialog");
 }
-// Steps of the test workflow: 1 Well log, 2 심도 기준, 3 단위, 4 요약.
+// Steps of the test workflow: 1 Workflow 소개, 2 Well log, 3 심도 기준, 4 단위, 5 요약.
 async function step(dialog: HTMLElement, n: number) { await userEvent.click(within(dialog).getByRole("tab", { name: new RegExp(`^${n}단계:`) })); }
 const radio = (dialog: HTMLElement, name: string | RegExp) => within(dialog).getByRole("radio", { name });
 
@@ -94,14 +94,17 @@ describe("task catalogue and setup", () => {
     if (state === "needs-environment") expect(within(dialog).getByText("준비되지 않은 실행 환경: Geo core")).toBeInTheDocument();
     if (state === "unavailable") { expect(within(dialog).getByText("지금은 선택한 Workflow를 쓸 수 없습니다.")).toBeInTheDocument(); expect(within(dialog).getByText("uv unavailable")).not.toBeVisible(); }
     if (state === "ready") expect(within(dialog).queryByText(/환경이 아직|쓸 수 없습니다|설치되지 않은/)).not.toBeInTheDocument();
+    // The window opens on what the Workflow does (gaid-workflow-start-ui), before any file is asked for.
+    expect(within(dialog).getByRole("region", { name: "Workflow 소개" })).toBeInTheDocument(); await step(dialog, 2);
     // The only fitting file is preselected; a file of another format is not offered as a choice.
     expect(radio(dialog, /A\.LAS/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).queryByRole("radio", { name: /table\.csv/ })).not.toBeInTheDocument();
-    await step(dialog, 4);
+    await step(dialog, 5);
     const start = within(dialog).getByRole("button", { name: "시작 초안 만들기" });
     if (state === "ready") expect(start).toBeEnabled(); else expect(start).toBeDisabled();
   });
   it("asks one question per step, keeps answers after close/reopen, hands off answers, files, skill and exposure, then clears", async () => {
     catalogue(); let dialog = await openSetup();
+    await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
     expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument();
     // The step scale names every step (UI guide v2 Q4); the next question itself is not asked yet.
     expect(within(dialog).queryByRole("heading", { name: "심도 기준" })).not.toBeInTheDocument();
@@ -111,10 +114,10 @@ describe("task catalogue and setup", () => {
     expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "false"); await userEvent.click(radio(dialog, "측정 심도(MD)"));
     await userEvent.click(within(dialog).getByRole("button", { name: "대화상자 닫기" })); dialog = await openSetup();
     expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "true");
-    await step(dialog, 3); await userEvent.click(radio(dialog, "직접 입력")); await userEvent.type(within(dialog).getByRole("textbox", { name: "단위" }), "m");
+    await step(dialog, 4); await userEvent.click(radio(dialog, "직접 입력")); await userEvent.type(within(dialog).getByRole("textbox", { name: "단위" }), "m");
     await userEvent.click(within(dialog).getByRole("button", { name: "요약 보기" }));
     expect(within(dialog).getByText("A.LAS")).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument();
-    await userEvent.click(within(dialog).getByRole("button", { name: "단위 수정" })); await userEvent.click(radio(dialog, /^작업 중 결정/)); await step(dialog, 4);
+    await userEvent.click(within(dialog).getByRole("button", { name: "단위 수정" })); await userEvent.click(radio(dialog, /^작업 중 결정/)); await step(dialog, 5);
     expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
     const handoff = vi.fn(); const off = onStartGeoTask((detail) => { handoff(detail); detail.result = "opened"; });
     try {
@@ -124,7 +127,7 @@ describe("task catalogue and setup", () => {
       // The researcher's settings come before the saved Workflow prompt, which may hold its author's example values.
       const draft: string = handoff.mock.calls[0][0].text; expect(draft.indexOf("심도 기준: MD")).toBeLessThan(draft.indexOf("원본 Well log를 확인하세요."));
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument()); dialog = await openSetup();
-      expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument(); await step(dialog, 2); expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "false");
+      expect(within(dialog).getByRole("region", { name: "Workflow 소개" })).toBeInTheDocument(); await step(dialog, 3); expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "false");
       expect(apiFetch).toHaveBeenCalledWith("/skills", {}, "p1");
     } finally { off(); }
   });
@@ -132,14 +135,14 @@ describe("task catalogue and setup", () => {
     render(<GeoTaskCatalogue projectId="p1" availableFiles={["logs/A.LAS", "logs/B.las"]}>
       {(extension) => <WorkflowsPanel extension={extension} onLaunch={vi.fn()} availableFiles={[]} availableFolders={[]} filesReady />}
     </GeoTaskCatalogue>);
-    const dialog = await openSetup();
+    const dialog = await openSetup(); await step(dialog, 2);
     expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeDisabled(); expect(within(dialog).getByText("다음 단계로 가려면 파일을 고르세요.")).toBeInTheDocument();
     await userEvent.click(radio(dialog, /B\.las/)); expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeEnabled();
-    await step(dialog, 4); expect(within(dialog).getByText("B.las")).toBeInTheDocument();
+    await step(dialog, 5); expect(within(dialog).getByText("B.las")).toBeInTheDocument();
   });
   it("keeps inputs on tab limit and does not pin a skill absent from /skills", async () => {
     apiFetch.mockImplementation(async (path) => path === "/geo/workflows" ? json({ catalogue: { state: "ready" }, workflows: rows }) : path === "/geo/recipes" ? json(saved) : json([]));
-    catalogue(); const dialog = await openSetup(); await step(dialog, 4);
+    catalogue(); const dialog = await openSetup(); await step(dialog, 5);
     const off = onStartGeoTask((detail) => { expect(detail.skills).toEqual([]); detail.result = "tab-limit"; });
     try {
       await userEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" }));
@@ -176,7 +179,7 @@ describe("task catalogue and setup", () => {
   });
   it("says why the start draft cannot be created yet", async () => {
     rows = [workflow("needs-environment")];
-    catalogue(); const dialog = await openSetup(); await step(dialog, 4);
+    catalogue(); const dialog = await openSetup(); await step(dialog, 5);
     expect(within(dialog).getByText("먼저 환경을 준비하세요.")).toBeInTheDocument(); expect(within(dialog).getByText("준비되지 않은 실행 환경: Geo core")).toBeInTheDocument();
   });
   it("shows indeterminate progress while preparation is running", async () => {
@@ -218,7 +221,7 @@ describe("task catalogue and setup", () => {
     expect(within(dialog).getByText("기반 작업: Well log QC well-qc")).toBeInTheDocument();
     // A recipe opens at the summary (UI guide Q4); its values are labelled as recipe values on their step.
     expect(within(dialog).getByRole("heading", { name: "선택 내용 확인" })).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
-    await step(dialog, 2); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 4);
+    await step(dialog, 3); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 5);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제" }));
     expect(apiFetch.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제 확인" }));
@@ -253,7 +256,7 @@ describe("file actions and recipes", () => {
   it("caps suggestions at three, names the match and preselects the matching file", async () => {
     rows = ["one", "two", "three", "four"].map((id) => workflow("ready", id)); suggestions = rows.map(suggestion); render(<GeoFileActions path="logs/A.LAS" projectId="p1" />);
     const buttons = await screen.findAllByRole("button", { name: "시작 설정 열기" }); expect(buttons).toHaveLength(3); expect(screen.getAllByText("일치한 입력: Well log")).toHaveLength(3);
-    await userEvent.click(buttons[0]); const dialog = await screen.findByRole("dialog"); expect(radio(dialog, /A\.LAS/)).toHaveAttribute("aria-checked", "true"); expect(await within(dialog).findByRole("radio", { name: /other\.las/ })).toBeInTheDocument();
+    await userEvent.click(buttons[0]); const dialog = await screen.findByRole("dialog"); await step(dialog, 2); expect(radio(dialog, /A\.LAS/)).toHaveAttribute("aria-checked", "true"); expect(await within(dialog).findByRole("radio", { name: /other\.las/ })).toBeInTheDocument();
   });
   it.each(["off", "empty"])("renders no strip for %s", async (condition) => {
     if (condition === "off") catalogueState = "off"; else suggestions = []; const { container } = render(<GeoFileActions path="logs/A.LAS" projectId="p1" />);

@@ -103,6 +103,14 @@ export const hubApi = {
     post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}/remove`, { baseRevision }),
   removeSource: (id: string, sourceId: string) =>
     call<null>(`${pid(id)}/sources/${encodeURIComponent(sourceId)}`, { method: "DELETE" }),
+  /** Extracted text of one page of a PDF or web source (the evidence viewer). */
+  pageText: (id: string, sourceId: string, page: number) =>
+    call<{ page: number; text: string }>(`${pid(id)}/sources/${encodeURIComponent(sourceId)}/pages/${page}`),
+  /** A text file of a code, note or analysis source (the evidence viewer). */
+  fileText: (id: string, sourceId: string, path: string) =>
+    call<{ path: string; text: string }>(
+      `${pid(id)}/sources/${encodeURIComponent(sourceId)}/files/${path.split("/").map(encodeURIComponent).join("/")}`,
+    ),
   originalUrl: (id: string, sourceId: string) =>
     `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
 };

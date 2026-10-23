@@ -222,7 +222,6 @@
     "defer": "Decide later",
     "deferred": "Decide later",
     "why": "Why this matters",
-    "evidence": "Show evidence",
     "page": "p. {page}",
     "prev": "Previous question",
     "next": "Next question",
@@ -244,6 +243,43 @@
     "changedCount": "{count, plural, one {# changed answer} other {# changed answers}}",
     "applyChanged": "Apply changed answers",
     "reviewBodyRevise": "Applying answers revises the draft. Changed answers are marked."
+  },
+  "evidence": {
+    "title": "Evidence",
+    "count": "{count, plural, one {# passage} other {# passages}}",
+    "list": "Evidence list",
+    "standard": "GAID asks this question for every Workflow, so it cites no source passage.",
+    "none": "No source passage is linked to this question. Answer from its purpose.",
+    "forQuestion": "Question",
+    "forOption": "Option: {label}",
+    "unconfirmedTag": "Not confirmed",
+    "removedName": "Removed source",
+    "removed": "This source was removed from the draft, so its original cannot be shown.",
+    "unconfirmed": "The passage the AI agent cited was not found in the source. Check the original yourself.",
+    "unconfirmedNoPlace": "The passage and the place the AI agent cited were not found in the source. Check the original yourself.",
+    "noPlace": "The cited page or file is not in the source.",
+    "partial": "Only part of the quote was found and marked.",
+    "notLocated": "The quote could not be located in the original. Read the text shown to check it.",
+    "loading": "Reading the original.",
+    "loadFailed": "Could not load the original. Try again.",
+    "retry": {
+      "button": "Read again"
+    },
+    "window": "lines {first} to {last} of {total}",
+    "band": "Band {index}",
+    "dataSummary": "Summary: {summary}",
+    "moreFields": "{count, plural, one {# more field} other {# more fields}}",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "pageOf": "p. {page} of {pages}",
+    "backToCited": "Back to p. {page}",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "openFull": {
+      "button": "Open whole PDF"
+    },
+    "previewCaption": "First rows of the data",
+    "previewNote": "{count, plural, one {The first row} other {The first # rows}} GAID read."
   },
   "drafting": {
     "title": "Creating the draft",

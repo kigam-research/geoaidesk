@@ -43,7 +43,6 @@
   },
   "setup": {
     "open": "시작 설정 열기",
-    "description": "입력 파일과 분석 조건을 차례로 고르세요.",
     "required": "필수",
     "optional": "선택",
     "decideLater": "작업 중 결정",
@@ -62,12 +61,7 @@
     "blockedInput": "필수 입력 파일을 고르세요: {roles}",
     "steps": "시작 설정 단계",
     "stepLabel": "{n}단계: {name}",
-    "group": {
-      "inputs": "입력 파일",
-      "choices": "분석 조건"
-    },
     "summaryTab": "요약",
-    "counter": "{n} / {total}",
     "when": "필요한 경우: {condition}",
     "input": {
       "required": "필수 입력 · 형식 {formats}",
@@ -101,7 +95,6 @@
     "notChosen": "고르지 않음",
     "limitUntested": "미시험 Workflow입니다. 결과는 검토 전입니다.",
     "limit": "결과는 검토 전입니다.",
-    "moreAbout": "작업 내용과 입력 형식 보기",
     "moreResults": "예상 결과와 해석 한계 보기",
     "ready": {
       "skills": "필요한 스킬이 꺼져 있습니다: {names}",
@@ -220,5 +213,63 @@
   "run": {
     "elapsed": "{minutes}분 {seconds}초째 실행 중",
     "analysis": "분석 실행"
+  },
+  "start": {
+    "intro": "Workflow 소개",
+    "group": {
+      "input": "입력 자료",
+      "choice": "분석 조건"
+    },
+    "position": "{group} {n} / {total}",
+    "toInputs": "입력 자료 고르기",
+    "toChoices": "분석 조건 고르기",
+    "source": {
+      "catalogue": "기본 Workflow",
+      "hub": "허브 Workflow",
+      "upstream": "일반 Workflow"
+    },
+    "fact": {
+      "purpose": "하는 일",
+      "inputs": "넣는 자료",
+      "choices": "정할 조건",
+      "outputs": "만드는 결과",
+      "steps": "진행 단계",
+      "note": "알아둘 점",
+      "boundary": "해석 한계"
+    },
+    "exampleNone": "예제 자료가 없습니다. 프로젝트의 파일을 고르거나 내 파일을 올립니다.",
+    "exampleSome": "예제 자료가 있습니다: {titles}. 내 파일을 고르지 않으면 예제 자료로 시작합니다.",
+    "choicesMany": "{count}개 · {names} 외 {rest}개",
+    "choicesDefer": "정하지 않은 조건은 AI agent가 분석 전에 채팅에서 묻습니다.",
+    "decision": "결정",
+    "more": "더 보기",
+    "less": "접기",
+    "detail": "Workflow 자세히 보기",
+    "detailHint": "단계별 확인 사항, 스킬, AI agent가 받는 지침",
+    "mine": "내 자료",
+    "earlier": "이전 결과",
+    "nameMatch": "이름이 맞음",
+    "nameMatchTip": "파일 이름이 입력 이름과 맞습니다. 파일 내용은 확인하지 않았습니다.",
+    "unusedFit": "맞는 형식의 파일이 있지만 쓰지 않습니다",
+    "upstream": {
+      "english": "영어",
+      "edit": "지침 편집",
+      "editDone": "편집 마치기",
+      "dataKinds": "프로젝트 파일·폴더, 올린 파일, 호스트 경로·자료 URL",
+      "dataRequired": "필수 입력 · 여러 개를 고를 수 있습니다",
+      "dataOptional": "선택 입력 · 여러 개를 고를 수 있습니다",
+      "textRequired": "필수 입력 · 한 줄로 적으세요",
+      "textOptional": "선택 입력 · 한 줄로 적으세요",
+      "needData": "다음 단계로 가려면 자료를 고르세요.",
+      "needText": "다음 단계로 가려면 값을 적으세요.",
+      "blockedText": "필수 입력을 채우세요: {names}",
+      "dataMany": "{first} 외 {rest}개",
+      "locations": "{count, plural, other {자료 위치 #개}}",
+      "folder": "폴더 · {path}",
+      "uploadFiles": "파일 올리기",
+      "uploadFolder": "폴더 올리기",
+      "note": "K-Dense에서 가져온 작업 지시입니다. 만드는 결과와 진행 단계는 기록되어 있지 않습니다."
+    },
+    "version": "version {version}"
   }
 }

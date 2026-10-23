@@ -288,6 +288,11 @@ export type WorkflowPanelExtension = {
    * (GeoAIDesk keeps its own rows first; gaid-qwen-authoring-trial). Extension rows always show.
    */
   collapseUpstream?: { showLabel: (count: number) => string; hideLabel: string };
+  /**
+   * Opens a built-in workflow in the host's own start window instead of the launch dialog (GeoAIDesk: the one Workflow
+   * start window, gaid-workflow-start-ui). Receives the panel's file props.
+   */
+  renderLaunch?: (props: { workflow: Workflow; open: boolean; onOpenChange: (open: boolean) => void } & WorkflowInputProps) => ReactNode;
 };
 
 const CATEGORY_ICON_COLOR: Record<string, string> = {
@@ -706,7 +711,13 @@ export function WorkflowsPanel({
         </div>
       </div>
 
-      {selectedWorkflow && (
+      {selectedWorkflow && extension?.renderLaunch && extension.renderLaunch({
+        workflow: selectedWorkflow,
+        open: true,
+        onOpenChange: (open) => { if (!open) setSelectedWorkflow(null); },
+        onUploadFiles, availableFiles, availableFolders, filesReady, onRefreshFiles,
+      })}
+      {selectedWorkflow && !extension?.renderLaunch && (
         <WorkflowLaunchDialog
           workflow={selectedWorkflow}
           open={!!selectedWorkflow}
