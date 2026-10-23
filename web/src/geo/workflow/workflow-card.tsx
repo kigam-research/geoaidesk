@@ -34,6 +34,7 @@ export function WorkflowBlockCard({ block }: { block: ParsedWorkflowBlock }) {
       >
         <WorkflowIcon className="size-3.5 shrink-0" aria-hidden />
         <span className="truncate">{label}</span>
+        {block.example && <span className="shrink-0 rounded-sm border px-1 text-xs font-normal text-gaid-ink-2">{t("workflowDoc.card.example")}</span>}
         {open ? <ChevronDownIcon className="size-3 shrink-0" aria-hidden /> : <ChevronRightIcon className="size-3 shrink-0" aria-hidden />}
       </button>
       {open && (
@@ -69,6 +70,7 @@ export function PendingWorkflowChip({ block, onRemove }: { block: string; onRemo
         >
           <WorkflowIcon className="size-3.5 shrink-0" aria-hidden />
           <span className="truncate">{label}</span>
+          {parsed.example && <span className="shrink-0 rounded-sm border px-1 text-xs font-normal text-gaid-ink-2">{t("workflowDoc.card.example")}</span>}
           {open ? <ChevronDownIcon className="size-3 shrink-0" aria-hidden /> : <ChevronRightIcon className="size-3 shrink-0" aria-hidden />}
         </button>
         {onRemove && (

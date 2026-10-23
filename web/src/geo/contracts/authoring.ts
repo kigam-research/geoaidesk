@@ -16,6 +16,7 @@
 
 import type { HubSkillInstallState } from "./hub-skills";
 import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
+import type { WorkflowExampleFile, WorkflowInputExample } from "./workflow-examples";
 export interface AtlasText {
   ko: string;
   en?: string;
@@ -174,6 +175,8 @@ export interface LocalWorkflow {
     formats: string[];
     required: boolean;
     requiredWhen?: MethodText;
+    /** Default example data; attached by the researcher, never by the coauthor model (gaid-workflow-example). */
+    example?: DraftInputExample;
   }[];
   requiredScientificChoices: {
     id: string;
@@ -204,6 +207,19 @@ export interface LocalWorkflow {
   skills?: WorkflowDocSkill[];
   /** gaid-workflow/v1: the procedure the Workflow 지침 lists (single written source). */
   steps?: GaidWorkflowStep[];
+}
+
+/**
+ * A draft's example file: the package entry plus, for a bundled file, where its bytes are in the authoring store. The
+ * package carries `WorkflowExampleFile` only (`from` is dropped when packaging).
+ */
+export interface DraftExampleFile extends WorkflowExampleFile {
+  /** A data source file (`sources/<sourceId>/files/<sourcePath>`, unit C) or an upload kept at `examples/<sha256>`. */
+  from?: { sourceId: string; sourcePath: string } | { upload: true };
+}
+
+export interface DraftInputExample extends Omit<WorkflowInputExample, "files"> {
+  files: DraftExampleFile[];
 }
 
 export interface DraftRecipe {
@@ -813,4 +829,67 @@ export interface InstallResult {
   recipeId: string | null;
   /** Hub skills the Workflow pins (gaid-hub-skills): installed now, already present, or blocked (readiness explains). */
   hubSkills?: { name: string; revision: number; state: HubSkillInstallState; outcome?: "installed" | "present" | "blocked" }[];
+}
+
+// --- Example data of Workflow inputs (gaid-workflow-example) ------------------
+//
+// POST /geo/authoring/projects/:id/examples                    AttachExampleBody → MethodDraft (new researcher revision)
+// POST /geo/authoring/projects/:id/examples/:roleId            EditExampleBody → MethodDraft
+// POST /geo/authoring/projects/:id/examples/:roleId/remove     { baseRevision } → MethodDraft
+//
+// The researcher attaches, edits and removes examples; the coauthor model never writes them. Uploads and data-source
+// files are bundled in the package (`examples/<roleId>/<name>`); a public URL is fetched once to record sha256 and size,
+// its bytes are not kept.
+
+/** Where the example's files come from. */
+export type AttachExampleFrom =
+  /** Files chosen on the researcher's PC (base64; each ≤ EXAMPLE_LIMITS.bundledFile). */
+  | { kind: "upload"; files: { name: string; contentBase64: string }[] }
+  /** Files of a project source whose extraction lists them (`extractions[sourceId].files[].path`). */
+  | { kind: "source"; sourceId: string; paths: string[] }
+  /** Public https URLs; `name` defaults to the URL's last path segment. */
+  | { kind: "url"; files: { url: string; name?: string }[] };
+
+/** The researcher's description of an example (Korean text). */
+export interface ExampleText {
+  title: string;
+  source: string;
+  /** Empty string removes it. */
+  license?: string;
+  synthetic?: boolean;
+}
+
+export interface AttachExampleBody extends ExampleText {
+  /** The latest draft revision the researcher saw. */
+  baseRevision: number;
+  /** Workflow input role id; an existing example of that role is replaced. */
+  roleId: string;
+  from: AttachExampleFrom;
+}
+
+export interface EditExampleBody extends Partial<ExampleText> {
+  baseRevision: number;
+}
+
+/** A starting title and source for the form, from the chosen source document or URL; the researcher edits them. */
+export function suggestExampleText(
+  project: Pick<AuthoringProject, "sources">,
+  from: { kind: "upload" } | { kind: "source"; sourceId: string } | { kind: "url"; url: string },
+): { title: string; source: string } {
+  if (from.kind === "source") {
+    const source = project.sources.find((s) => s.id === from.sourceId);
+    if (!source) return { title: "", source: "" };
+    const title = source.title?.trim() || source.name;
+    return { title, source: [title, source.doi ? `doi:${source.doi}` : source.url].filter(Boolean).join(", ") };
+  }
+  if (from.kind === "url") {
+    try {
+      const url = new URL(from.url);
+      const name = decodeURIComponent(url.pathname.split("/").filter(Boolean).at(-1) ?? "");
+      return { title: name, source: url.host };
+    } catch {
+      return { title: "", source: "" };
+    }
+  }
+  return { title: "", source: "" };
 }

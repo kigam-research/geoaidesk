@@ -49,5 +49,9 @@
     "edited": "프로젝트에서 고친 사본이 설치되어 있습니다.",
     "conflict": "같은 이름의 다른 스킬이 있어 설치할 수 없습니다.",
     "suspended": "허브에서 사용 중지한 판입니다. Workflow 작성자에게 알려 주세요."
-  }
+  },
+  "example": "예제 자료: {title} · 출처: {source} · {size}, {where}",
+  "exampleSynthetic": "합성 예제 자료: {title} · 만든 방법: {source} · {size}, {where}",
+  "exampleBundled": "Workflow에 들어 있음",
+  "exampleRemote": "처음 쓸 때 내려받음"
 }

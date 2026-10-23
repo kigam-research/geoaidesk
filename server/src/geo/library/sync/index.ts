@@ -7,6 +7,7 @@ import { AuthoringError } from "../../authoring/store.ts";
 import { HubClient, type RequestOptions } from "../../hub-client/client.ts";
 import { LIBRARY_FILE_LIMIT, type LibraryChangesResponse, type LibraryObject, type LibraryPushChange, type LibraryPushResponse } from "../../hub-server/protocol.ts";
 import { LibraryStore } from "../store.ts";
+import { refreshNoteItems } from "../notes.ts";
 
 type Data = LibraryItem | LibraryCollection;
 interface ObjectState { version: number; hash: string | null }
@@ -22,6 +23,19 @@ const hash = (data?: Data) => data ? createHash("sha256").update(stable(data)).d
 const storedFiles = (data: Data | undefined): string[] => data && "attachments" in data ? [...new Set(data.attachments.flatMap((a) => a.stored ? [a.stored.sha256] : []))] : [];
 const missing = (e: unknown) => (e as NodeJS.ErrnoException).code === "ENOENT";
 const blankCounts = () => ({ items: 0, folders: 0, files: 0, deleted: 0 });
+/** The hub server takes ≤ 500 changes and a 4 MiB body per push; research-note snapshots make items larger. */
+const PUSH_BATCH = { changes: 500, bytes: 3 * 1024 * 1024 };
+export function pushBatches(changes: LibraryPushChange[]): LibraryPushChange[][] {
+  const out: LibraryPushChange[][] = [];
+  let batch: LibraryPushChange[] = [], bytes = 0;
+  for (const change of changes) {
+    const size = Buffer.byteLength(JSON.stringify(change));
+    if (batch.length && (batch.length >= PUSH_BATCH.changes || bytes + size > PUSH_BATCH.bytes)) { out.push(batch); batch = []; bytes = 0; }
+    batch.push(change); bytes += size;
+  }
+  if (batch.length) out.push(batch);
+  return out;
+}
 
 /** One working library, one sync at a time; the hub server remains authoritative for account isolation. */
 export class LibrarySync {
@@ -67,6 +81,7 @@ export class LibrarySync {
   }
   async status(): Promise<LibrarySyncStatus> {
     const c = this.context();
+    if (c) await refreshNoteItems(this.store).catch(() => undefined);
     const empty: LibrarySyncStatus = { available: Boolean(c), running: this.running, pending: { items: 0, folders: 0, files: 0 }, conflicts: 0 };
     if (!c) return empty;
     const state = await this.state(c.file);
@@ -94,6 +109,8 @@ export class LibrarySync {
       await writeFile(join(dir, `${context.prefix}-${new Date().toISOString().replace(/:/g, "-")}-${kind}-${id}-${randomUUID().slice(0, 8)}.json`), JSON.stringify(data, null, 2) + "\n", { mode: 0o600 });
     };
     try {
+      // Research notes follow their files; send what the files say now.
+      await refreshNoteItems(this.store).catch(() => undefined);
       const state = await this.state(context.file);
       const download = async (data: Data) => {
         for (const sha of storedFiles(data)) {
@@ -174,15 +191,19 @@ export class LibrarySync {
           }
           state.files = [...new Set([...(state.files ?? []), sha])];
         }
-        const response = await request<LibraryPushResponse>("/library/changes", { method: "POST", body: { changes } });
-        for (const applied of response.applied) {
-          const change = changes.find((c) => c.kind === applied.kind && c.id === applied.id);
-          if (!change) throw new AuthoringError("서재 동기화 응답 형식을 확인해 주세요.", 502);
-          state.objects[keyOf(change.kind, change.id)] = { version: applied.version, hash: change.deleted ? null : hash(change.data as Data) };
-          if (change.deleted) pushed.deleted++; else pushed[change.kind === "item" ? "items" : "folders"]++;
+        const response: Pick<LibraryPushResponse, "conflicts"> = { conflicts: [] };
+        for (const batch of pushBatches(changes)) {
+          const part = await request<LibraryPushResponse>("/library/changes", { method: "POST", body: { changes: batch } });
+          for (const applied of part.applied) {
+            const change = batch.find((c) => c.kind === applied.kind && c.id === applied.id);
+            if (!change) throw new AuthoringError("서재 동기화 응답 형식을 확인해 주세요.", 502);
+            state.objects[keyOf(change.kind, change.id)] = { version: applied.version, hash: change.deleted ? null : hash(change.data as Data) };
+            if (change.deleted) pushed.deleted++; else pushed[change.kind === "item" ? "items" : "folders"]++;
+          }
+          response.conflicts.push(...part.conflicts);
+          // Do not advance the pull cursor to push.version: unseen concurrent remote changes may precede our push.
+          await this.save(context.file, state);
         }
-        // Do not advance the pull cursor to push.version: unseen concurrent remote changes may precede our push.
-        await this.save(context.file, state);
         if (!response.conflicts.length) { await applyPull(); break; }
         if (response.conflicts.some((c) => c.reason === "missing-file")) throw new AuthoringError("허브 서버에서 서재 PDF를 확인하지 못했습니다. 다시 동기화해 주세요.", 409);
         if (attempt === 1) throw new AuthoringError("다른 기기에서 서재가 바뀌었습니다. 다시 동기화해 주세요.", 409);

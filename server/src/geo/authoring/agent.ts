@@ -37,6 +37,7 @@ import { pageFile, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
 import { procedureFor, structuredDraft, workflowProblems } from "./workflow.ts";
+import { carryExamples } from "./examples.ts";
 
 const localSkill = (slug: string) => `local:${slug}`;
 
@@ -545,6 +546,8 @@ function reviseRequest(
     workflow: d.workflow
       ? plain({
           ...d.workflow,
+          // Example data belongs to the researcher; the model neither sees nor writes it.
+          inputRoles: d.workflow.inputRoles.map(({ example: _example, ...role }) => role),
           requiredScientificChoices: d.workflow.requiredScientificChoices.map((c) => ({
             ...c,
             options: (c.options ?? []).map((o) => ({ id: o, label: c.optionLabels?.[o]?.ko ?? o })),
@@ -1391,6 +1394,8 @@ async function execute(
             ...(changed ? [`작성 중에 들어온 답 ${changed}개는 아직 반영되지 않았습니다.`] : []),
           ],
         };
+        // The researcher's example data stays with its input role; the model never writes examples.
+        carryExamples(p.drafts.at(-1), next);
         p.drafts.push(next);
         a.result = { draftRevision: next.revision };
       }

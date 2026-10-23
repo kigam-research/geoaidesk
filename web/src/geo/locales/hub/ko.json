@@ -385,7 +385,9 @@
     "environment": "실행 환경",
     "openProject": "프로젝트 열기",
     "extraPackages": "준비된 환경 밖의 Python 라이브러리: {packages}. 분석할 때 AI agent가 스킬 안내에 따라 설치합니다. 설치가 막힌 PC에서는 해당 단계가 멈춥니다.",
-    "optionalPackage": "{name}(선택 단계)"
+    "optionalPackage": "{name}(선택 단계)",
+    "example": "올린 파일이 없으면 예제 자료를 씁니다: {title}",
+    "exampleAlso": "시작 설정에서 예제 자료도 고를 수 있습니다: {title}"
   },
   "register": {
     "open": "허브 등록 미리보기",
@@ -524,6 +526,78 @@
   "editing": {
     "edit": "등록한 Workflow의 {revision}판을 고치고 있습니다. 허브에 등록하면 {next}판이 됩니다.",
     "copy": "{author}의 「{title}」 {revision}판을 복사한 내 Workflow입니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
+  },
+  "example": {
+    "heading": "예제 자료",
+    "line": "입력마다 예제 자료를 넣으면 시험하는 연구자가 자기 자료 없이도 Workflow를 실행해 볼 수 있습니다.",
+    "size": {
+      "mib": "{n} MiB",
+      "kib": "{n} KiB"
+    },
+    "synthetic": "합성 자료",
+    "bundled": {
+      "badge": "Workflow에 포함",
+      "tooltip": "파일을 Workflow와 함께 배포하고, 시작할 때 프로젝트로 복사합니다."
+    },
+    "remote": {
+      "badge": "처음 쓸 때 내려받음",
+      "tooltip": "공개 주소에서 처음 쓸 때 내려받고, 넣을 때 기록한 파일과 같은지 확인합니다."
+    },
+    "source": "출처: {source}",
+    "meta": "{size}, 파일 {files}개",
+    "license": "이용 조건: {license}",
+    "noLicense": "이용 조건을 적지 않았습니다.",
+    "removeAsk": "새 판에서 예제 자료를 뺍니다. 이전 판에는 남습니다.",
+    "remove": {
+      "action": "예제 자료 빼기",
+      "confirm": "예제 자료 뺀 판 만들기"
+    },
+    "cancel": "취소",
+    "edit": {
+      "action": "설명 고치기",
+      "title": "예제 자료 설명 고치기",
+      "save": "설명 저장"
+    },
+    "replace": {
+      "action": "다른 자료로 바꾸기"
+    },
+    "add": {
+      "action": "예제 자료 넣기",
+      "title": "예제 자료 넣기",
+      "save": "예제 자료 넣기"
+    },
+    "none": "예제 자료가 없습니다.",
+    "from": {
+      "label": "가져올 곳",
+      "upload": "내 PC 파일",
+      "source": "초안 자료에서",
+      "url": "공개 주소"
+    },
+    "upload": {
+      "label": "올릴 파일 (여러 개 고를 수 있음)",
+      "hint": "파일 하나는 {mib} MiB 이하입니다. 더 큰 자료는 공개 주소로 넣으세요.",
+      "tooLarge": "{mib} MiB를 넘는 파일이 있습니다. 큰 자료는 공개 주소로 넣으세요."
+    },
+    "sourceList": {
+      "pick": "자료",
+      "filter": "파일 이름으로 찾기",
+      "more": "파일 {count}개가 더 있습니다. 이름으로 찾아 고르세요.",
+      "none": "파일 목록이 있는 자료가 없습니다. 자료 단계에서 압축 파일이나 자료 묶음을 먼저 넣으세요."
+    },
+    "url": {
+      "label": "공개 주소 (한 줄에 하나)",
+      "hint": "로그인 없이 열리는 https 주소를 넣으세요. 지금 한 번 받아 크기와 확인값만 기록하고 파일은 보관하지 않습니다."
+    },
+    "field": {
+      "title": "제목",
+      "source": "출처",
+      "sourceHint": "제공 기관, 인용 정보 또는 만든 방법",
+      "license": "이용 조건 (선택)",
+      "licenseHint": "예: CC BY 4.0",
+      "synthetic": "모의 계산으로 만든 합성 자료입니다"
+    },
+    "checking": "주소 확인 중",
+    "saving": "저장 중"
   },
   "library": {
     "title": "서재에서 자료 추가",
