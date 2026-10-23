@@ -1,67 +1,120 @@
-# GAID promo capture (`capture-v1`)
+# GAID review-app study capture (`capture-v2`)
 
-Real-system takes for the promo film (contract `geo/promo/CONTRACT.md`, shot list v2 of 2026-10-23). Frames, stills and
-`capture.json` live in `~/data/geoaidesk/work/gaid-promo-video/capture-v1/` (outside Git).
+Completed: 14 shots, 1,950 PNG frames, 65 seconds at 30 fps. All 31 feature beats have annotated midpoint
+frames and visually checked bounds. The parent owns film integration and the canonical report.
 
-## Reproduce
+Artifacts: `~/data/geoaidesk/work/gaid-promo-video-v2/`:
 
-1. Curated data copy (read-only from `~/.geoaidesk`, no credentials):
-   `uv run --no-project python geo/promo/capture_data.py` → `~/data/geoaidesk/work/gaid-promo-video/home` and
-   `capture-v1-data.json` (copied paths, adaptations, source digests).
-2. Instance from this worktree on free ports:
-   `systemd-run --user --unit gaid-promo-capture --working-directory=<worktree> --setenv=GAID_HOME=<home>
-   --setenv=KADY_PORT=18320 --setenv=KADY_FRONTEND_PORT=3320 --setenv=PATH=$PATH --setenv=HOME=$HOME
-   -p StandardOutput=append:<log> -p StandardError=append:<log> /bin/bash <worktree>/start-gaid.sh`.
-   Basemap keys are read by the server from `~/.config/map_env/map-keys.env` (never copied or printed).
-3. Takes: `uv run --no-project --with playwright==1.63.0 --with pillow==12.3.0 python geo/promo/capture.py [--only M1,R3]`
-   (installed Google Chrome, 1280×720 CSS px at scale 2.25 → 2880×1620 frames, 30 fps film time; one shot per run
-   merges into `capture.json`).
-4. Contact sheet: `uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py`.
-5. Stop: `systemctl --user stop gaid-promo-capture`.
+- `capture-v2/capture.json`, `shots/`, `stills/`, `contact-sheet.jpg`, `beat-checks/index.json` and 31 check PNGs.
+- `study.json`: record IDs, models, usage, authoring attempts, timing, cuts, staging and output paths.
+- `evidence-{before,after}.json`, `evidence-comparison.json`, `hub-{before,after}.json`: local stat inventories
+  and remote hub snapshots. `prior-results.json` records copied input hashes. `note-final.json` records the final note.
+- Alternative takes and live segment sources remain outside `capture-v2/shots/`.
 
-`capture_explore.py` is the exploration helper (screenshot + visible text of one screen).
+## Delivered scenes
 
-## Shots (v2)
+| Shot | Seconds | Recorded content |
+|---|---:|---|
+| L1 | 6 | Library folder, paper and its detail actions |
+| L1b | 4 | PDF/DOI import dialog and bibliography export formats |
+| A1 | 4 | Paper to Workflow source |
+| A2 | 4.5 | Live interview question and actual selected answer |
+| A3 | 4 | Seven-step draft and selected step instructions, below the fixed header |
+| H1 | 4 | Actual registration dialog and newly registered Workflow |
+| H2 | 4 | Institute hub entry, revision 1, author and project trial action |
+| R1 | 6 | Installation consent, input preparation and Workflow start settings |
+| R2 | 6 | Workflow card, real active citation-check tools, then the finished new figure |
+| M1 | 5 | Neutral priority-zone map over OSM, legend and selected cell values |
+| N1 | 5.5 | New note list, figure and actual new decision answer being sent |
+| N2 | 3.5 | Note bibliography with the library paper resolved |
+| L2 | 4.5 | Paper's project and research-note use links |
+| L3 | 4 | Recorded library connection graph, one and two steps |
 
-| id | frames | content | source |
-|---|---|---|---|
-| H1 | 150 | GAID 허브 home → registered Workflow (concept picture, 2판) → Workflow 단계 with step detail and skill | hub entry `entry-ap-a135f290-1c4` |
-| R1 | 135 | Workflow panel → start settings: 입력 파일 → 분석 조건 (실행 규모) → 요약 보기 → hover 시작 초안 만들기 (not pressed) | project Yilgarn 니켈 탐사 우선순위 (`proj-035916`) |
-| R2 | 120 | Stored chat started from a hub Workflow: AI agent result card (QC checks) with the result figure `outputs/variogram_fit.png` open | `proj-035916` session `01a14daa…` |
-| R3 | 120 | Notes list (결정할 일, 검토 전) → note 서울 1:25만 암상도 … 면적표 → decision block, 권장 option picked (not sent) | `review-notebook` |
-| R5 | 105 | LAS depth viewer, `25_9-1.las` (GR, RHOB, NPHI, DTC), pointer along the tracks | `proj-bc576f` |
-| M1 | 165 | Shapefile viewer, `Seoul_Geology_250K_Litho.shp` coloured by LITHONAME on NGII 바로e맵 영상지도; KIGAM 1:5만 지질도 overlay switched on and off; polygon click → attributes | `review-notebook` |
-| M2 | 120 | Same layer: attribute table, 전체 레이어 면적표 for LITHONAME with 타원체 측지 면적 computed (`/geo/area-table`) | `review-notebook` |
-| L1 | 150 | 내 연구 → 서재: folder 공간 검증 → paper → 내 연구에서 쓰인 곳 (project and notes with pages) | library copy |
-| R6 | 180 | Research note with page citations `[@valavi2018, pp. 11–12]` → reference list built from the library | `proj-ca300f` |
-| L2 | 135 | Library paper → 연결 지도 (1단계 → 2단계) | library + `proj-ca300f` |
+## Study results
 
-Total 1,380 frames (46.0 s). Each shot starts and ends with ≥ 0.4 s of hold.
+The study created one folder (`lc-0a58cae5488a`), paper (`li-9c9d1be4e0ca`, key `ahn2026`), authoring draft
+(`ap-33965983-5f2`), institute hub entry (`entry-ap-33965983-5f2`, revision 1), project (`yilgarn-cd7814`) and chat
+(`01a166b1-256d-71f4-b5e3-53298806a36d`). Draft revision 2 passed the authoring check with no findings.
 
-## Deviations from the contract
+The final note is `연구노트/2026-10-23-yilgarn-priority/index.md`. Its figure is
+`outputs/yilgarn_priority_map.png`; the viewer opens `outputs/yilgarn_priority_zones.geomap.json`, backed by
+`outputs/yilgarn_priority_zones.gpkg`. Visible map title: `Yilgarn 탐사 우선순위 구역`.
+The researcher chose `가) 최우선·우선순위 구역부터 검토합니다.`; the agent reflected the answer.
+The bibliography resolves `ahn2026`. The app retains `형식 확인 필요` (`decision-format`) after the decision
+is converted to prose; the parent explicitly accepted this badge.
 
-- H3 (hub skill shelf) skipped: the review data has no hub skill records (`pi-agent/skill-hub/shared/skills/` is empty).
-- R2: no stored chat starts with a `<workflow>` block (all method chats predate the block form). The closest real chat
-  is the one started from the installed hub Workflow's start settings (exposure `method:pu-conformal-zone-priority`);
-  its first message is the older plain start text.
-- R3: the note list has no 확인함 group (no note is marked confirmed in the data).
-- L1: the library has one folder and three GAID-managed papers; no nested folders or Zotero items exist in the data.
-- M1: the Fault and boundary layers were not added (time); basemap is NGII 영상지도 (satellite) with the KIGAM 1:5만 overlay.
+### Models and usage
 
-## Adaptations (copy-only, recorded in `capture.json` → `data.adaptations`)
+After two failures from the unconfigured default, the parent authorized the connected subscription picker.
+Authoring used `openai-codex/gpt-6.1-sol` (medium); chat used `openai/gpt-6.1-sol`, OAuth subscription, shown as
+`제공사의 구독 한도 적용`. Both resolve to GPT-6.1 Sol; the provider refs differ. Settings defaults and keys stayed
+unchanged. Authoring attempts recorded `costUsd: 0`. Final chat ledger: 4,107,981 subscription tokens,
+`totalUsd: 0`, `computeUsd: 0`; the separate list-price equivalent was USD 0.84117, not a charge.
 
-- Project names without `검토용 - ` / `수용 시험`: 문헌 근거 공간 교차검증, 25/9-1 검층 그림, 25/9-1 LAS 점검,
-  Yilgarn 니켈 탐사 우선순위, 서울 지질도 암상 면적; other review projects hidden.
-- Test personas 새연구자/새연구자2/새연구자3/Test → 연구자 이/박/최/정 (exact string values only).
-- Authoring draft title `my-paper` → PU 학습 광상 부존 가능성 논문; library folder `수용 시험 - 공간 검증` → 공간 검증.
-- Pi session header `cwd` rewritten to the copied sandbox (Pi lists only sessions whose header matches).
-- DOM: the status words `연결 안 됨` (composer model chip) and `Zotero 연결 안 됨` are hidden, because the capture
-  instance has no credentials or Zotero connection file.
-- Never copied: `auth.json`, `config.env`, `mcp-auth.json`, `connection.json`, `.venv`, library `secrets/`, `zotero.json`.
+## Accepted staging and deviations
 
-## Verification (2026-10-23)
+- The user prohibited training and the full pipeline. Five existing paper `zone_assignments.csv` files were
+  copied byte-for-byte into this project's `user_data/prior_results/`. Source files were read-only.
+  The short real run wrote a map, figure and cited note; no BaggingPU or other model training ran.
+- The priority display retains classes 0–2: 588 immediate, 616 priority and 1,236 follow-up cells. Classes 3–4
+  remain in the source but are omitted from the display. EPSG:3857 follows the parent's display instruction;
+  it was not independently established from the CSV.
+- R1 and the chat use existing Workflow `entry-ap-a135f290-1c4` revision 2 because new authoring was delayed.
+  H1/H2 show the newly registered entry. The new draft's missing command examples were corrected through the
+  normal authoring UI before registration. A temporary ineffective edit of its own cached record was restored.
+- R2 combines the Workflow start view, a fresh actual read-only citation-check run, and the already finished
+  new figure. The clean working segment shows real library/read tools and the working indicator. Earlier failed
+  background-fetch steps are outside the chosen segment. The figure was already open during the new citation check.
+- Parent-authorized R2 capture-only DOM substitutions: the initial Workflow message tail becomes
+  `Workflow 지침에 따라 Yilgarn 자료로 탐사 우선순위 구역 지도와 연구노트를 만들어 주세요.`;
+  the old final-check request becomes `서재 논문 인용을 확인해 주세요.`; the exact assistant sentence
+  `새 분석은 수행하지 않았습니다.` is removed from the rendered page. Stored messages remain unchanged.
+  `capture_retake.py` records this bounded retake and refuses to resend its citation request without inspection.
+  The fresh real request is `서재 논문 인용을 확인해 주세요. 한 문장으로 알려 주세요.`. It uses the same subscription
+  model and performs no training. M1/N1/N2 were checked again for visible demo/staging/no-new-analysis wording.
+- N1 cuts between the list, figure and decision panel; navigation and off-camera scrolling are excluded.
+  L2/L3 were recorded before the redraw, so the graph's figure node has the earlier neutral filename.
+- A3 shows the actual step flow/detail; the format pass is verified by API, outside its viewport. H1 starts at
+  the registration dialog. L3 has five recorded nodes; the project is graph scope, not a separate node.
+- Measured click-settle waits appear in `cuts`. `removedSeconds: 0` with `durationKnown: false` marks an unmeasured
+  editorial cut, not zero waiting time. Authoring model waits are documented by attempt timestamps in `study.json`.
 
-All frames exist at 2880×1620 (checked per shot in `capture.json` → `verification`); browser errors: none; blocked
-requests: none (non-GET calls were only `/geo/inspect`, `/geo/suggestions`, `/geo/vector-page`, `/geo/series-window`,
-`/geo/area-table`); instance stopped; `~/.geoaidesk` file list with sizes and mtimes identical before and after
-(`capture-evidence/geoaidesk-{before,after}.tsv`, empty diff).
+## Evidence and checks
+
+All 27 pre-existing local domain/index records in the inventory have unchanged size and mtime. Expected new-folder,
+link and automatic sync/Zotero bookkeeping changed. No Zotero setting was fixed. The remote existing Workflow's trial
+count increased by one. An unrelated entry (`entry-ap-3b21b377-454`) changed from one star to zero during the session;
+the study never opened or mutated it. Attribution is unknown; the parent was notified and it was not restored.
+
+Artifact validation passed: all frame filenames and dimensions, shot/beat timing, Korean label lengths and CSS bounds.
+All 31 rectangles were drawn at scale 2.25 on their midpoint frames and visually inspected, with at most 8 CSS px slack.
+N1's figure rectangle follows its visible UI-clipped image; L3 follows the graph canvas. A3, dialog and map bounds
+were corrected after animation/layout settling. No browser page errors were observed. Capture Chrome closed once
+before final A3 and was replaced within the existing job; neither the review service nor hub was restarted.
+Python syntax and artifact checks passed. The first `task finish` was interrupted during its hidden full-suite check;
+its local ready commit was not published. The retry runs the declared suite; its completion record owns that result.
+
+```sh
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_verify.py
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_beat_checks.py
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py --take ~/data/geoaidesk/work/gaid-promo-video-v2/capture-v2
+```
+
+## Capture procedure
+
+The existing review app was `http://127.0.0.1:3000`, backend `:18000`, deployment
+`ad9399d1da4fdd79e71d8159f2ec60907c7e9487`. Do not replay study creation: the records already exist.
+
+1. The recorded controller job used `task job run -- uv run --no-project --with playwright==1.63.0
+   --with pillow==12.3.0 python geo/promo/capture_study.py`. Resume its receipt if interrupted before starting;
+   never launch a duplicate job. Its source snapshot predates the later helper fixes.
+2. The loopback `/exec` controller runs bounded Python on Playwright's owner thread. Use real UI clicks and file
+   inputs for study writes. The token gate uses the normal launcher link without printing or saving credentials.
+3. Chrome uses 1280×720 CSS px, scale 2.25, Korean, light, 계측. `StudyTake` reuses v1's drawn pointer, real mouse
+   interpolation and ripple. Static holds repeat one screenshot; changing pointer/ripple frames are captured separately.
+4. Stage screens before recording. Keep scrolling off-camera; record an explicit cut when the layout changes.
+   Measure beat bounds after animation, then inspect `capture_beat_checks.py` output. The frame set is 2880×1620.
+5. `capture_stage.py` creates a new priority-only vector display from prior results in the already prepared
+   project environment. It refuses to overwrite the vector file. Its CRS assignment is the instructed display choice.
+
+No provider changes, credential-file reads, service restart, other-record edits or concept-picture calls were needed.

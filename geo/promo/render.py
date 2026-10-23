@@ -1,7 +1,7 @@
-"""Render the GAID promo film (90 s, 1920x1080, 30 fps, silent) from the scene, data and capture.
+"""Render the GAID promo film (v2, 105 s, 1920x1080, 30 fps, silent) from the scene, data and capture.
 
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
-  python geo/promo/render.py --data <data.json> [--capture <capture-v1>] --out <new dir> [--stills-only] [--times 1,2]
+  python geo/promo/render.py [--capture <capture-v2>] --out <new dir> [--stills-only] [--times 1,2]
 
 The page draws film second t deterministically (window.motion.frame); each frame is a Chrome screenshot piped to
 H.264 (imageio-ffmpeg). The final video refuses to render without the real capture (no placeholder footage).
@@ -22,29 +22,33 @@ import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
-FPS, WIDTH, HEIGHT, SECONDS = 30, 1920, 1080, 90
+FPS, WIDTH, HEIGHT, SECONDS = 30, 1920, 1080, 105
 FRAMES = FPS * SECONDS
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 STILLS = {
     "01-opening": 4.2,
-    "02-background": 7.8,
-    "03-code-files": 11.2,
-    "04-loop": 21.5,
-    "05-authoring": 29.6,
-    "06-hub": 33.5,
-    "08-revisions": 37.6,
-    "09-start-settings": 42.0,
-    "10-workflow-chat": 45.8,
-    "11-note": 49.8,
-    "12-las": 52.8,
-    "13-shp-map": 56.0,
-    "14-area-table": 64.0,
-    "15-library": 67.5,
-    "16-citations": 74.5,
-    "17-paper-projects": 77.6,
-    "18-eight-points": 84.6,
-    "19-closing": 89.5,
+    "02-skills": 9.0,
+    "03-scattered": 13.6,
+    "04-gathered": 18.8,
+    "05-cycle": 26.0,
+    "06-library": 31.0,
+    "07-library-io": 36.5,
+    "08-from-paper": 40.5,
+    "09-questions": 45.0,
+    "10-draft": 49.0,
+    "11-register": 53.0,
+    "12-hub-entry": 57.0,
+    "13-start-settings": 61.5,
+    "14-agent-working": 67.0,
+    "15-map": 72.5,
+    "16-note": 78.0,
+    "17-references": 82.5,
+    "18-used-in": 86.5,
+    "19-connection-map": 90.5,
+    "20-network": 94.8,
+    "21-second-brain": 99.2,
+    "22-closing": 104.5,
 }
 
 
@@ -77,7 +81,7 @@ def serve(root: Path):
 
 def validate_capture(root: Path) -> dict:
     take = json.loads((root / "capture.json").read_text())
-    if take.get("schema") != "gaid-promo-capture-v1":
+    if take.get("schema") != "gaid-promo-capture-v2":
         raise ValueError("Unexpected capture schema")
     for shot in take["shots"]:
         for i in (0, shot["frames"] - 1):
@@ -86,7 +90,7 @@ def validate_capture(root: Path) -> dict:
     return take
 
 
-def prepare(root: Path, data: Path, capture: Path | None) -> tuple[dict, dict | None]:
+def prepare(root: Path, data: Path | None, capture: Path | None) -> tuple[dict, dict | None]:
     root.mkdir(parents=True, exist_ok=True)
     for name in ("scene.js", "scene.css", "icons"):
         src = HERE / "scene" / name
@@ -99,9 +103,7 @@ def prepare(root: Path, data: Path, capture: Path | None) -> tuple[dict, dict | 
     shutil.copy2(REPO / "web/public/fonts/PRETENDARD-LICENSE.txt", root / "fonts")
     (root / "brand").mkdir(exist_ok=True)
     shutil.copy2(REPO / "geo/brand/logo/horizontal-color.svg", root / "brand")
-    world = json.loads(data.read_text())
-    if world.get("schema") != "gaid-promo-data-v1":
-        raise ValueError("Expected gaid-promo-data-v1")
+    world = json.loads(data.read_text()) if data else {}
     take = validate_capture(capture) if capture else None
     link = root / "capture"
     if link.is_symlink():
@@ -134,7 +136,7 @@ def contact_sheet(stills: dict, out: Path) -> Path:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data", type=Path, required=True)
+    parser.add_argument("--data", type=Path, help="unused by the v2 scenes; kept for v1 reproduction")
     parser.add_argument("--capture", type=Path)
     parser.add_argument("--out", type=Path, default=Path(os.environ.get("TASK_OUTPUT_DIR", "")) or None)
     parser.add_argument("--stills-only", action="store_true")
@@ -146,10 +148,10 @@ def main():
     if not args.stills_only and not args.capture:
         parser.error("The film needs the real capture; no placeholder footage")
     out = args.out.resolve()
-    video = out / "gaid-promo-v1.mp4"
+    video = out / "gaid-promo-v2.mp4"
     if video.exists():
         raise FileExistsError("Use a new output directory")
-    world, take = prepare(out / "web", args.data.resolve(), args.capture.resolve() if args.capture else None)
+    world, take = prepare(out / "web", args.data.resolve() if args.data else None, args.capture.resolve() if args.capture else None)
 
     import imageio_ffmpeg
     from playwright.sync_api import sync_playwright
@@ -211,12 +213,12 @@ def main():
         raise RuntimeError("Browser errors: " + "; ".join(errors))
     sheet = contact_sheet(stills, out)
     manifest = {
-        "schema": "gaid-promo-video-v1",
+        "schema": "gaid-promo-video-v2",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_sha": os.environ.get("TASK_SOURCE_SHA", "unrecorded-preview"),
         "width": WIDTH, "height": HEIGHT, "fps": FPS, "seconds": SECONDS,
         "frames": 0 if args.stills_only else FRAMES, "audio": False,
-        "data": {"path": str(args.data), "sha256": digest(args.data)},
+        "data": None if not args.data else {"path": str(args.data), "sha256": digest(args.data)},
         "capture": None if not take else {
             "path": str(args.capture / "capture.json"), "sha256": digest(args.capture / "capture.json"),
         },
@@ -224,7 +226,6 @@ def main():
         "contact_sheet": str(sheet.relative_to(out)),
         "video": None if args.stills_only else {"path": video.name, "sha256": digest(video), "bytes": video.stat().st_size},
         "use": "Internal review video (user decision 2026-10-22: 무음이고 내부검토용 영상이다.)",
-        "catalogue": world["catalogue"]["version"],
     }
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     print(out / "manifest.json", flush=True)

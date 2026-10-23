@@ -110,3 +110,14 @@ inputs = ["assets:geo-catalogue/0.3.0", "pc74:/home/seongin3/data/geoaidesk/work
 files = [{ path = "gaid-promo-v1.mp4", sha256 = "8cbb2d57525fc7d9241f7b51f173962e40c5042d4a733c87d12d19ed329fcdc7" }, { path = "manifest.json", sha256 = "8dcf92700f0f0d53540e43f5a913d9514980f364e070ec3b94f30a5f7539326e" }]
 report = "reports/2026-10-23-gaid-promo-video/index.md"
 replicas = []
+
+[[result]]
+id = "gaid-promo-video-v2"
+title = "GAID 홍보 영상 v2 — 연구 순환으로 다시 짠 105초 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v2-20261023T040221.069950Z/out"
+source_sha = "3212415681fe7d9130855c68060dd44d1cb56b1b"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "user:2026-10-23-gaid-promo-video-v2"]
+files = [{ path = "gaid-promo-v2.mp4", sha256 = "82dfc3cc76a4e62662fab4fab03e6f8a0634ebc802a2d175a7fe3f440607cf63" }, { path = "manifest.json", sha256 = "bc1b788c46af3d1694415afa91bcc91dffb23d9a016ea6a1e2fe420b7e637826" }]
+report = "reports/2026-10-23-gaid-promo-video-v2/index.md"
+replicas = []

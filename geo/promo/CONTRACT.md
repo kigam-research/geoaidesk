@@ -1,80 +1,98 @@
-# GAID promo video production contract
+# GAID promo video production contract (v2)
 
-Task `gaid-promo-video`. Output: one 90-second promotional film, 1920×1080, 30 fps, exactly 2,700 frames, H.264,
-no audio (both references were silent; recorded decision). Internal review only until the institutional brand/logo
-approval (open item `gaid-release-proof#2`).
+Task `gaid-promo-video-v2` (v1 contract: git history of this file). Output: one ~105 s promotional film, 1920×1080,
+30 fps, H.264, silent, internal review only (open item `gaid-release-proof#2`). Structure: task document
+`docs/tasks/gaid-promo-video-v2.md` → "Structure draft v2".
 
 ## Ownership
 
-- Parent (`gaid-promo-video`): this contract, `render.py`, `scene/` (HTML/CSS/JS motion scenes), `data/` extraction,
-  README, task document, report, integration and the final video.
-- Capture child (`gaid-promo-video--capture`): `capture.py` (and helpers it needs, prefixed `capture_`), `CAPTURE.md`,
-  and the external directories below. The child does not edit the parent's files.
-- All payloads (copied app data, frames, video) stay outside Git under `~/data/geoaidesk/`.
+- Parent (`gaid-promo-video-v2`): this contract, `render.py`, `scene/`, `prepare_data.py`, README, task document,
+  report, integration and the final video.
+- Study-and-capture child (`gaid-promo-video-v2--study`): `capture*.py` (prefix `capture_` for helpers), `CAPTURE.md`,
+  the study run in the review app and the external directories below. It does not edit the parent's files.
+- Payloads (frames, video, copies) stay outside Git under `~/data/geoaidesk/work/gaid-promo-video-v2/`.
 
-## Capture instance
+## The study (user decision 2026-10-23: "검토용 앱에서 연구를 진행하고 Workflow를 기관 허브 서버에 등록해도 된다.")
 
-- A separate GAID instance started from the child's worktree with the GAID launcher, on free ports (not 3000/18000,
-  which the shared review app uses; check `ss -ltn` first). `GAID_HOME` (and so `KADY_PROJECTS_ROOT`) =
-  `~/data/geoaidesk/work/gaid-promo-video/home`. Run it with `systemd-run --user` and absolute paths, file logs; stop it
-  when the take is accepted.
-- Data: a curated copy of the review app's data (`~/.geoaidesk`, read-only source). Copy only what the shots need
-  (hub store `pi-agent/skill-hub/`, the library under `pi-agent/research/`, selected projects, `models.json` without keys).
-  Never copy or read `auth.json`, `config.env`, `mcp-auth.json`, `hub-server/connection.json`, `.venv`. No live model
-  calls are needed: shots show stored chats, notes and hub records. Copy-only adaptations are allowed and recorded:
-  project names without the `검토용 - ` prefix, a clean project list (hide test projects), test-persona names.
-  Never change values, results or content.
-- Korean UI, light theme, style 계측 (default). Viewport 1280×720 CSS px at device scale factor 2.25 (frames
-  2880×1620), so app text reads larger in the 1080p film and the parent can zoom up to ~1.8× without blur.
-- Legibility (user feedback 2026-10-23: "영상에서 카드박스나 글자가 너무작아도 안된다. 시인성을 생각하고 공간여백을 너무
-  크게두어서 어색한부분이 생기는것을 조심해야한다."): every shot gives 1–3 `focus` rects on the readable region the parent
-  zooms into; keep pointer actions inside them; prefer screens whose content fills the frame.
+One coherent research cycle, done for real in the review app (PC74 `http://127.0.0.1:3000`, backend `:18000`,
+`GAID_HOME=~/.geoaidesk`, already signed in to its models and to the institute hub server as the user's account):
 
-## Take interface (`capture-v1`)
+1. 서재: add the user's paper (author manuscript `~/assets/gaid-authoring-preview/20261015/author-manuscript.pdf`, DOI
+   `10.1007/s11053-026-10778-w`, Yilgarn Ni MPM with PU learning + conformal calibration) with "논문 넣기" (PDF + DOI),
+   into a new folder (e.g. `광상 부존 가능성`).
+2. Workflow from the paper: the paper's "Workflow 만들기" → 자료 → 질문 (answer each, normally the recommended option)
+   → 초안 → 형식 검사 통과 → (concept pictures only if the app offers them without a new login).
+3. 공유: "허브 등록 미리보기" → "허브에 등록" on the institute hub server (topic folder fitting MPM, a short note).
+4. 연구 분석: from the hub entry "내 프로젝트에서 시험" into a new project (name e.g. `Yilgarn 니켈 광상 부존 가능성`),
+   input prep with `~/assets/yilgarn-gis-db/20260911/Yilgarn_GIS_DB.csv`, attach the library folder to the project, start
+   settings (quick trial scale) → "시작 초안 만들기" → send. The researcher may add to the start message that the
+   priority zones are saved as a map file GAID's map viewer opens (GeoTIFF/GeoPackage; CRS only as far as verified,
+   otherwise stated unknown) and that the research note cites the library paper with `[@key]`.
+5. 연구노트: the AI agent's note (result first, with decisions); the researcher answers a decision with "답변 보내기".
+6. 다시 서재로: the paper's "내 연구에서 쓰인 곳" lists the note and the Workflow; "연결 지도 열기" shows paper →
+   Workflow → project → note.
 
-Directory `~/data/geoaidesk/work/gaid-promo-video/capture-v1/`:
+Rules: touch only what this study creates (one folder, one paper, one authoring draft, one hub entry, one project);
+never delete, rename or edit other records; never read or copy `auth.json`, `config.env`, `mcp-auth.json`,
+`hub-server/connection.json`; never restart or reconfigure `gaid-review` or the hub server. If the review app is
+restarted by someone else mid-run (another unit may update it), wait and continue from the recorded state. Record
+model, token/cost readings shown by GAID, timings and every id (library item, authoring id, entry id + 판, project id,
+session id, note id) in `study.json`.
 
-- `shots/<id>/frame-%05d.png`, 2880×1620. Frame index i = i/30 s of that shot (film time, not wall time; edit out
-  loading and waiting, record what was cut).
-- `capture.json`, schema `gaid-promo-capture-v1`: `fps: 30`, `width: 2880`, `height: 1620`, `css: {width:1280,
-  height:720, scale:2.25}`, and per shot `{id, frames, pattern, url, actions: [{t, kind, target, rect}], focus:
-  [{t, rect, label}]}` where rects are CSS-px boxes of the elements the parent may zoom to or highlight (cards, step rail,
-  decision block, map canvas, depth track, citation). Plus data provenance: copied paths, adaptations, app commit.
-- `stills/<name>.png` (2880×1620 or element crops at scale 2.25): clean frames and element crops the motion scenes reuse
-  (hub card, concept picture, Workflow flow diagram, step list, research-note decision block, map, depth track,
-  a real result figure from a project sandbox such as a PU zone map). List them in `capture.json` with their source.
-- Frames show a smooth drawn pointer (no OS cursor) and a subtle click ripple; hover states must be real (move the
-  real mouse along the same path). No full-frame camera jumps inside a shot; the parent does zooms.
+## Capture
 
-## Shot list v2 (durations are targets; ±1 s is fine)
+- Browser: installed Google Chrome via Playwright, viewport 1280×720 CSS px, device scale factor 2.25 (frames
+  2880×1620), Korean UI, light theme, style 계측. Frames show the drawn pointer and click ripple of v1 `capture.py`;
+  real hover (move the real mouse along the same path).
+- Film style (user feedback 2026-10-23): the parent shows each frame whole at one scale (no zoom, no pan). So inside a
+  shot there is no scrolling and no jump; pick window states where the explained feature is visible without scrolling.
+  A needed scroll becomes a cut between two shots.
+- Live moments that cannot be revisited (the authoring question step, the AI agent working in the chat, the note
+  decision being answered) are recorded while the study runs; waiting is cut out (record the cuts). Everything else
+  may be recorded afterwards by revisiting the stored state.
 
-User requests 2026-10-23: "그리고 서재기능도 강조되어야한다. 최신기능들이 반영되어있어야한다." and "Gaid시스템에서 shp형식의
-맵데이터 뷰어기능들도 소개되어야한다."
+## Take interface (`capture-v2`)
 
-| id | s | What the shot shows |
+Directory `~/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/`:
+
+- `shots/<id>/frame-%05d.png`, 2880×1620; frame i = i/30 s of shot time.
+- `capture.json`, schema `gaid-promo-capture-v2`: `fps`, `width`, `height`, `css: {width:1280,height:720,scale:2.25}`,
+  `app: {url, commit}`, and per shot `{id, frames, pattern, url, cuts: [{frame, removedSeconds, why}], actions: [{t,
+  kind, target, rect}], beats: [{t0, t1, rect, label}]}`. `beats` are the feature callouts the parent draws: `rect` in
+  CSS px of the region that shows the feature (a panel, card, dialog, step, map), `label` a short Korean tag (≤ 18
+  characters, e.g. `폴더로 논문 정리`), `t0..t1` shot seconds when that feature is being shown/used. 2–4 beats per
+  shot, each ≥ 1.5 s, non-overlapping in time.
+- `stills/<name>.png` (2880×1620 or element crops): a clean result map, the result figure, the Workflow flow diagram,
+  the connection map, with their source in `capture.json`.
+
+## Shot list v3 (targets; ±1 s fine; hold ≥ 0.4 s at start and end)
+
+| id | s | Shows |
 |---|---|---|
-| H1 | 5 | GAID 허브 home (sidebar, recommended cards) → the registered Workflow with concept pictures and 판 2 → its Workflow view. |
-| H3 | 3.5 | Hub skill shelf: skill list → one skill with source, licence, check and review record (skip with a note if no records). |
-| R1 | 4.5 | Workflow panel → start settings (입력 파일 → 분석 조건 → 요약), ends on the summary with the primary action highlighted (no send). |
-| R2 | 4 | A stored chat started from a Workflow: Workflow block card and the AI agent's reply with a result figure. |
-| R3 | 4 | Research notes → `2026-10-18-seoul-250k-litho-area-map` (review-notebook) with its decisions; pointer picks an option (no send). |
-| R5 | 3.5 | LAS depth viewer on `25_9-1.las`: hover the tracks. |
-| M1 | 5 | Shapefile map viewer: `Seoul_Geology_250K_Litho.shp` (+ fault/boundary layers if supported) on a basemap; pan/zoom, click a polygon for its attributes. Keys only server-side. |
-| M2 | 4 | The shapefile's attribute table / area table for LITHONAME (or the note's `lithoname_area_table.csv` in the table viewer). |
-| L1 | 5 | 내 연구 → 서재: nested folders, items (Zotero-linked or GAID-managed), a folder attached to a project. |
-| R6 | 6 | A stored answer or note with page citations `[@key, pp. x]` and the reference list from the library. |
-| L2 | 4.5 | Library paper → projects that used it → connection map (skip with a note if no data). |
+| L1 | 6 | 서재: folder tree with the new folder, paper table with the paper → click it → paper detail (bibliography, PDF, folders). |
+| L1b | 4 | 서재 import/export: "논문 넣기" dialog (PDF/DOI, 서지 파일) or the ORCID/Zotero cards, and "서지 내보내기" (BibTeX/RIS). |
+| A1 | 4 | Paper detail → "Workflow 만들기" → authoring 자료 step with the paper as source. |
+| A2 | 4.5 | 질문 step live: a question with the recommended option; the option is picked. |
+| A3 | 4 | 초안: Workflow flow diagram and "형식 검사 통과". |
+| H1 | 4 | 허브 등록 미리보기 → 허브에 등록 dialog (folder, note) → registered. |
+| H2 | 4 | The hub entry on the institute hub: title, 판 1, author, star/의견, "내 프로젝트에서 시험". |
+| R1 | 5 | Install → input prep with the CSV → start settings rail (입력 파일 → 분석 조건 → 요약) → "시작 초안 만들기". |
+| R2 | 6 | Chat: Workflow block card, the AI agent working (tool steps, orbit), a result figure appearing (waits cut). |
+| M1 | 5 | Result in the map viewer (priority zones), legend, a click showing a cell's value. |
+| N1 | 5.5 | 연구 노트 tab: list → the note (result first, figure) → decision block, option picked, "답변 보내기". |
+| N2 | 3.5 | The note's 참고문헌 with the library paper resolved. |
+| L2 | 4.5 | 서재 → the paper → "내 연구에서 쓰인 곳" (note, Workflow, project). |
+| L3 | 4 | "연결 지도 열기": paper → Workflow → project → note. |
 
-Total ≈ 49 s. Extra hold (≈ 0.5 s) at the start and end of each shot helps transitions.
+Total ≈ 64 s.
 
 ## Visible text rules
 
-Visible names "AI agent" and "GAID"; no Kady/K-Dense/BYOK in frames except upstream attribution badges the app shows.
-Hide nothing that changes meaning (status words, limits); hide machinery only where the app already would (UI guide
-section 10). No emoji, no fabricated responses.
+Visible names "AI agent" and "GAID"; no Kady/K-Dense/BYOK except upstream attribution badges the app shows. Hide
+nothing that changes meaning. No emoji, no fabricated responses: every message and result is the real one.
 
 ## Verification
 
-Every frame exists and has the declared size; first/last frames of each shot are clean (no spinner unless the shot is
-about running work); no browser page errors; the instance was stopped; the source data in `~/.geoaidesk` is unchanged
-(compare a file list + mtimes before/after).
+Every frame exists at 2880×1620; first/last frames clean; no browser page errors; `study.json` ids resolve in the
+review app; records outside the study unchanged (file list + mtimes of `~/.geoaidesk/projects/*/project.json`,
+library items and hub entries other than the new ones, before/after).
