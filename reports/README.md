@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-workflow-start-ui/figures/01-workflow-intro.png" width="120"> | 2026-10-23 18:58 | [모든 Workflow를 같은 시작 창으로 열고 먼저 무엇을 하는지 보여 주기](2026-10-23-gaid-workflow-start-ui/index.md) | 기본·허브·일반 Workflow가 모두 같은 시작 창으로 열리고, 자료를 묻기 전에 하는 일·넣는 자료·만드는 결과·진행 단계·해석 한계를 먼저 보여 줍니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-authoring-evidence-view/figures/01-question-pdf.png" width="120"> | 2026-10-23 17:53 | [Workflow 만들기 질문 옆에 논문 해당 부분과 근거 자료 보기](2026-10-23-gaid-authoring-evidence-view/index.md) | GAID 허브에서 Workflow를 만들 때 질문마다 옆 뷰어에 근거가 된 논문 쪽과 코드 줄, 자료 파일 요약이 열리고, 선택지를 고르면 그 선택지의 근거로 이동합니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-hub-versions/figures/register-version.png" width="120"> | 2026-10-23 17:25 | [GAID 허브 Workflow 제거·복원과 version 관리](2026-10-23-gaid-hub-versions/index.md) | 등록한 Workflow를 허브에서 제거하고 다시 복원할 수 있습니다. 다시 등록할 때는 등록한 연구자가 다음 version(patch·minor·major)을 고릅니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-library-pdf-panel/figures/01-pdf-pane-instrument-light.png" width="120"> | 2026-10-23 17:14 | [서재 PDF를 목록 옆 패널에서 보기](2026-10-23-gaid-library-pdf-panel/index.md) | 서재에서 "PDF 열기"를 누르면 새 브라우저 탭 대신 목록 옆 패널에 PDF가 열리고, 닫으면 논문 상세로 돌아옵니다. | 검토 전 | 미정 | 0 |
