@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T17:50:20Z
+status: ready
+updated: 2026-10-23T17:50:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"adb2ab89-1fbb-4c78-a0dd-7f7c70629ef4","pid":2303809,"provider":"codex","session":"01a16996-cf85-7350-b292-4c272df13a59","start":"66079249","token":"32267624b2afdfc6f7ebf2d7e8d792357f39de990d56d3aff620847226568c4e"}
 branch: task/gaid-promo-video-v3--gaid-promo-v3-study
 target: task/gaid-promo-video-v3
@@ -57,7 +57,9 @@ Before you finish, `task save` your capture* files and CAPTURE.md, then `task fi
 - Registered 0.1.1/draft 8: cores example warns of the observed inactive-cell mapping loss. Six example byte hashes unchanged; project retains 0.1.0. GPT-6.1 Sol/high subscription; final chat 11,598,271 tokens/USD 0; list-price estimate USD 2.2375468 is not a charge.
 - All frame/beat and visual checks passed; page errors zero. Old 18 projects/eight institute hub entries unchanged; allowed folder/use links and service retry metadata documented. Full scripts/check passed. Jobs 1–5 exited 0; logs read. Own controller closed normally; app/hub untouched.
 ## Next steps
-1. Review/save the final capture documentation, finish this child. Parent integrates with task complete and edits the film/report from the payload.
+<!-- task:closed -->
+Closed 2026-10-23T17:50:40Z: ready; the parent gaid-promo-video-v3 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Sequence and ownership: this child alone owns capture helpers, CAPTURE.md and its task document; external payload root is ~/data/geoaidesk/work/gaid-promo-video-v3/. All app writes stay within the new study records. The parent alone owns film design and integration. No child workers: the record mutations and live captures are tightly coupled.
