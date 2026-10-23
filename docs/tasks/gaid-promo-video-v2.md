@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T04:10:50Z
+updated: 2026-10-23T04:29:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -112,14 +112,16 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 :8700), registering the Workflow is a real shared registration. User answer 2026-10-23: "검토용 앱에서 연구를 진행하고 Workflow를 기관 허브 서버에 등록해도 된다."
 
 ## Next steps
-1. Child `gaid-promo-video-v2--study` (writer b0548dfd, worktree ~/worktrees/geoaidesk/gaid-promo-video-v2--study,
-   started 2026-10-23) runs the study in the review app and records capture-v2 (contract
-   `geo/promo/CONTRACT.md` v2). Parent meanwhile rebuilds `scene/` (background, cycle, demo chrome with cycle strip
-   and feature tags, second brain, closing) and `render.py` (~105 s).
-Blocked: final R2 retake (DOM staging of staging-revealing chat text) and the child's task finish (scripts/check) are
-   running in the child; then `task complete gaid-promo-video-v2--study`.
-2. Integrate capture-v2 beats into the demo segments, stills review, render job, report.
+1. Done: v2 film rendered and reported; child `gaid-promo-video-v2--study` integrated (5a7a6c16; its check suite passed:
+   backend 2240 + 8 skipped, frontend 1223, production smoke). Child close is pending only on "process liveness
+   unavailable" after its agent was archived; rerun `task close gaid-promo-video-v2--study` if the relay does not.
+2. The user reviews the film (report `reports/2026-10-23-gaid-promo-video-v2/index.md`); feedback becomes a new unit.
+
 ## Failed approaches
+- Separate capture instance: would need a new model login; replaced by the review-app study (user approval).
+- Full Workflow run with BaggingPU training: too slow; replaced by the paper's prior zone results (user direction).
+- First capture-v2 pass: staging-revealing names/texts and misaligned beat boxes; retaken and re-measured.
+- Review-app default model (OpenRouter, unconfigured) failed twice; a connected subscription model was picked per action.
 ## Notes and decisions
 - Packages: (P) parent owns scene/, render.py, prepare_data.py, README, report, integration; (C) child
   `--study` owns the review-app study, capture*.py, CAPTURE.md, capture-v2 data. Interface: `capture.json` v2 beats
