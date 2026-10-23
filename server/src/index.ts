@@ -19,6 +19,7 @@ import { DEFAULT_PROJECT_ID, HOST, PORT, modalConfigured } from "./config.ts";
 import { isCorsOriginAllowed, isExposedBind } from "./cors.ts";
 import { registerRequestGuard } from "./request-guard.ts";
 import { ensureAuthToken, redactAuthFromUrl, registerAuth } from "./auth.ts";
+import { redactOrcidCallback } from "./geo/orcid/log.ts";
 import { ensureProjectExists, getProject, listProjects } from "./projects.ts";
 import { recoverSubagentUsage } from "./agent/subagent-meter.ts";
 import { withActiveProject } from "./scope.ts";
@@ -89,7 +90,7 @@ export async function buildApp() {
         // Fastify's default, minus the access token a URL may carry.
         req: (req) => ({
           method: req.method,
-          url: redactAuthFromUrl(req.url),
+          url: redactOrcidCallback(redactAuthFromUrl(req.url)),
           host: req.host,
           remoteAddress: req.ip,
           remotePort: req.socket?.remotePort,

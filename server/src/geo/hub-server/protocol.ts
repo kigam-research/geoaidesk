@@ -15,6 +15,8 @@ import type {
   HubRole,
   HubUpdateMeBody,
   HubUpdateUserBody,
+  HubOrcidLink,
+  OrcidEnvironment,
 } from "../../../../web/src/geo/contracts/hub-server.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
 import type { ReviewInput, StoredHubSkill } from "../hub-skills/records.ts";
@@ -64,6 +66,31 @@ export interface AcceptInviteRequest {
   device?: string;
 }
 export type { HubAccount, HubInvite, HubInviteBody, HubRole, HubUpdateMeBody, HubUpdateUserBody };
+
+// --- Authenticated ORCID iD (gaid-orcid phase 2, ADR docs/adr/2026-10-23-orcid-authenticated-link.md) ---------------
+// GET    /hub/v1/orcid                               → OrcidHubStatus
+// POST   /hub/v1/orcid/start                         {} → OrcidStartResponse   (409 no ORCID client on this hub)
+// POST   /hub/v1/orcid/finish                        OrcidFinishRequest → { link: HubOrcidLink }
+//                                                    (400 unknown state or another account's; 410 expired; 409 iD on another
+//                                                    account; 502 ORCID refused the code or the ID token did not verify)
+// DELETE /hub/v1/orcid                               → 204 (removes this account's iD)
+// `HubAccount.orcid` and `StoredEntry.entry.authorOrcid` (the author's iD, joined at read time) carry the result.
+
+export interface OrcidHubStatus {
+  configured: boolean;
+  environment?: OrcidEnvironment;
+  link: HubOrcidLink | null;
+}
+export interface OrcidStartResponse {
+  /** ORCID sign-in URL (client id, registered redirect URI, single-use state and nonce). */
+  authorizeUrl: string;
+  expiresAt: string;
+}
+export interface OrcidFinishRequest {
+  code: string;
+  state: string;
+}
+export type { HubOrcidLink, OrcidEnvironment };
 
 // --- Hub records (HubRecordStore over HTTP) ----------------------------------------------------------------------------
 // GET    /hub/v1/folders                             → { folders: HubFolder[] }

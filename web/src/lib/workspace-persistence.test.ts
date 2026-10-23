@@ -4,6 +4,8 @@ import {
   WORKSPACE_SCHEMA_VERSION,
   WORKSPACE_STORAGE_KEY,
   deletePersistedChatState,
+  flushServerProjectWorkspaceState,
+  loadServerProjectWorkspaceState,
   loadWorkspaceSnapshot,
   parseWorkspaceMetadata,
   pruneDeletedProjectState,
@@ -363,5 +365,134 @@ describe("workspace persistence schema", () => {
     } finally {
       Reflect.deleteProperty(URL, "revokeObjectURL");
     }
+  });
+});
+
+describe("workspace state on the GAID server (gaid-project-resume)", () => {
+  type Call = { url: string; method: string; projectId: string | null; body: unknown; keepalive: boolean };
+  let calls: Call[];
+
+  function stubServer(records: Record<string, unknown>, answerFor?: (projectId: string) => string) {
+    calls = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit = {}) => {
+      const headers = new Headers(init.headers);
+      const projectId = headers.get("X-Project-Id");
+      const method = init.method ?? "GET";
+      calls.push({
+        url,
+        method,
+        projectId,
+        body: typeof init.body === "string" ? JSON.parse(init.body) : null,
+        keepalive: init.keepalive === true,
+      });
+      if (method === "GET") {
+        const answered = answerFor ? answerFor(projectId!) : projectId!;
+        return new Response(JSON.stringify({ projectId: answered, record: records[answered] ?? null }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ projectId, revision: 1, savedAt: "2026-10-23T00:00:00Z" }), { status: 200 });
+    }));
+  }
+
+  const record = (state: unknown) => ({
+    schemaVersion: "gaid-workspace-state/v1",
+    revision: 3,
+    savedAt: "2026-10-23T00:00:00Z",
+    clientId: "other-pc",
+    state,
+  });
+  const puts = () => calls.filter((call) => call.method === "PUT");
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it("restores a state saved on another PC and does not write it back unchanged", async () => {
+    stubServer({ "srv-a": record(projectState) });
+    const restored = await loadServerProjectWorkspaceState("srv-a");
+    expect(calls[0]).toMatchObject({ method: "GET", projectId: "srv-a" });
+    expect(calls[0].url).toContain("/geo/workspace-state");
+    expect(restored).toMatchObject({
+      activeTabId: "tab-1",
+      sandbox: { openPaths: ["notes.md", "figure.png"], activePath: "figure.png" },
+      tabs: [{ id: "tab-1", title: "Recovered chat", sessionId: "session-1" }],
+    });
+
+    // Mounting saves the same state: nothing is sent, so a browser that only
+    // has the project open never overwrites a newer save from elsewhere.
+    await saveProjectWorkspaceState("srv-a", restored!);
+    await settle();
+    flushServerProjectWorkspaceState("srv-a", restored!);
+    expect(puts()).toHaveLength(0);
+
+    // A real change is sent once, with this browser's id.
+    await saveProjectWorkspaceState("srv-a", { ...restored!, chatWidth: 500 });
+    await settle();
+    expect(puts()).toHaveLength(1);
+    expect(puts()[0]).toMatchObject({ projectId: "srv-a" });
+    const body = puts()[0].body as { clientId: string; state: { chatWidth: number } };
+    expect(body.state.chatWidth).toBe(500);
+    expect(body.clientId).toMatch(/^[A-Za-z0-9-]{1,64}$/);
+  });
+
+  it("uploads the browser copy when the server has no record yet", async () => {
+    stubServer({});
+    expect(await loadServerProjectWorkspaceState("srv-b")).toBeNull();
+    await saveProjectWorkspaceState("srv-b", projectState);
+    await settle();
+    expect(puts()).toHaveLength(1);
+    expect((puts()[0].body as { state: { activeTabId: string } }).state.activeTabId).toBe("tab-1");
+  });
+
+  it("flushes an unsent change on page hide with a keepalive request", async () => {
+    stubServer({ "srv-c": record(projectState) });
+    const restored = await loadServerProjectWorkspaceState("srv-c");
+    flushServerProjectWorkspaceState("srv-c", { ...restored!, treeWidth: 200 });
+    await settle();
+    expect(puts()).toHaveLength(1);
+    expect(puts()[0].keepalive).toBe(true);
+    // The save queued in the same page hide does not send it again.
+    await saveProjectWorkspaceState("srv-c", { ...restored!, treeWidth: 200 });
+    await settle();
+    expect(puts()).toHaveLength(1);
+  });
+
+  it("ignores a reply for another project and never writes to it", async () => {
+    stubServer({ default: record(projectState) }, () => "default");
+    expect(await loadServerProjectWorkspaceState("srv-gone")).toBeNull();
+    await saveProjectWorkspaceState("srv-gone", projectState);
+    await settle();
+    expect(puts()).toHaveLength(0);
+  });
+
+  it("drops a queued message whose images are not in this browser", async () => {
+    const queued = {
+      ...projectState,
+      tabs: [{
+        ...projectState.tabs[0],
+        chat: {
+          ...projectState.tabs[0].chat!,
+          queuedMessages: [
+            {
+              id: "1", rawText: "with image", text: "with image",
+              model: { id: "openrouter/test", label: "Test model" },
+              databases: [], skills: [], files: [],
+              images: [{ key: "srv-d:tab-1:queue:1:0", mediaType: "image/png" }],
+              computeTarget: null, thinkingLevel: null, timestamp: 1,
+            },
+            {
+              id: "2", rawText: "text only", text: "text only",
+              model: { id: "openrouter/test", label: "Test model" },
+              databases: [], skills: [], files: [], images: [],
+              computeTarget: null, thinkingLevel: null, timestamp: 2,
+            },
+          ],
+        },
+      }],
+    };
+    stubServer({ "srv-d": record(queued) });
+    const restored = await loadServerProjectWorkspaceState("srv-d");
+    expect(restored!.tabs[0].chat!.queuedMessages.map((message) => message.id)).toEqual(["2"]);
   });
 });

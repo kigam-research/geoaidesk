@@ -40,6 +40,11 @@ export class SQLiteHubStore implements HubRecordStore {
     const row = this.hub.get<{ record: string }>("SELECT record FROM hub_entries WHERE id=?", id);
     if (!row) return null;
     const record = JSON.parse(row.record) as StoredEntry;
+    // The author's current authenticated ORCID iD (gaid-orcid phase 2), never taken from the stored record.
+    delete record.entry.authorOrcid;
+    const orcid = record.entry.authorId ? this.hub.get<{ orcid: string; environment: "production" | "sandbox" }>(
+      "SELECT orcid, environment FROM account_orcid WHERE account_id=?", record.entry.authorId) : undefined;
+    if (orcid) record.entry.authorOrcid = { id: orcid.orcid, environment: orcid.environment };
     record.installs = this.hub.all<{ record: string }>("SELECT record FROM hub_installs WHERE entry_id=? ORDER BY at,id", id).map((r) => JSON.parse(r.record));
     return record;
   }
@@ -126,7 +131,7 @@ export class SQLiteHubStore implements HubRecordStore {
       e.authorId = actor.id;
       e.updatedAt = this.hub.now();
       // Views and installs are not authoritative metadata from a client.
-      for (const key of ["mine", "stars", "starredByMe", "comments", "trials", "implementation"]) delete (e as unknown as Record<string, unknown>)[key];
+      for (const key of ["mine", "stars", "starredByMe", "comments", "trials", "implementation", "authorOrcid"]) delete (e as unknown as Record<string, unknown>)[key];
       const { installs: _ignored, ...stored } = record;
       this.hub.run(`INSERT INTO hub_entries VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET record=excluded.record,updated_at=excluded.updated_at`,
         e.id, JSON.stringify(stored), actor.id, e.updatedAt);

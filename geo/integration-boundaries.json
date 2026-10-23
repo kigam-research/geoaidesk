@@ -10,6 +10,18 @@
       "responsibility": "Project-list regression expectation follows the approved My research heading"
     },
     {
+      "path": "server/test/geo-workspace-state.test.ts",
+      "owner": "gaid-project-resume",
+      "status": "added",
+      "responsibility": "Workspace state on the GAID server: per-project scoping through the app hooks, last save wins, malformed bodies/files, unknown-project fallback"
+    },
+    {
+      "path": "web/src/lib/workspace-persistence.test.ts",
+      "owner": "gaid-project-resume",
+      "status": "edited",
+      "responsibility": "Server copy of the workspace state: restore from another PC, no write-back of an unchanged state, upload of a browser copy, keepalive page-hide flush, foreign-project replies, queued messages without their images"
+    },
+    {
       "path": "server/test/geo-hub-handoff.test.ts",
       "owner": "gaid-hub-integration",
       "status": "added",
@@ -55,7 +67,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub; gaid-project-resume: a project workspace mounts after its last state was read from the GAID server (loadServerProjectWorkspaceState), and the page-hide flush also sends unsent changes there"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -216,7 +228,7 @@
       "path": "web/src/lib/workspace-persistence.ts, web/src/lib/use-agent.ts",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send; gaid-hub-integration: the sanitizer also accepts method:<name>:<workflow> exposures; gaid-workflow-model: ChatWorkspaceState.pendingWorkflow (a started Workflow's `<workflow>` block, persisted and sanitized)"
+      "responsibility": "ChatWorkspaceState.geoExposure (persisted, sanitized) and useAgent's sessionCreateBody, so a started task's tab creates its session with the task's skill exposure on the first send; gaid-hub-integration: the sanitizer also accepts method:<name>:<workflow> exposures; gaid-workflow-model: ChatWorkspaceState.pendingWorkflow (a started Workflow's `<workflow>` block, persisted and sanitized); gaid-project-resume: each project's workspace state is also kept on the GAID server (GET/PUT /geo/workspace-state, written only when this browser changed it; queued messages whose images are not in this browser are dropped on restore)"
     },
     {
       "path": "server/src/api/sessions.ts",
@@ -979,6 +991,12 @@
       "owner": "gaid-hub-skills",
       "status": "edited",
       "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
+    },
+    {
+      "path": "server/src/index.ts",
+      "owner": "gaid-orcid",
+      "status": "edited",
+      "responsibility": "Request-log serializer also redacts ORCID's one-time code/state on /geo/orcid/callback (server/src/geo/orcid/log.ts)."
     },
     {
       "path": "web/public/geo/orcid/",

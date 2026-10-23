@@ -80,6 +80,18 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/cli-export.ts`, `GET /geo/workflows/:id/cli-export`, `GET /geo/hub/entries/:id/cli-export`,
   `web/src/geo/workflow/cli-export.tsx`, namespace `workflowCli`) downloads the 지침 as a prompt/command file (`$ARGUMENTS`)
   plus the skill folders for Pi and Claude Code (verified with the real CLIs); Codex is not offered until verified.
+- Project workspace state (gaid-project-resume, user decision 2026-10-23: "ProjectSwitcher는 잘 동작하다. "마지막 작업 상태"는 나로
+  진행하자."): each project's last workspace (open chat tabs and the active one, per-tab composer settings and draft text, open
+  files, panel layout) is kept on the GAID server in `.kady/geo/workspace-state.json` (`GET/PUT /geo/workspace-state`, scoped by
+  X-Project-Id, reply echoes `projectId`; contract `web/src/geo/contracts/workspace-state.ts`, store
+  `server/src/geo/workspace/workspace-state.ts`), so any PC or browser reopens the project in that state. `page.tsx` mounts a
+  project's workspace after reading it (`loadServerProjectWorkspaceState`; no record or no server → the browser's own copy,
+  uploaded by the next save); `workspace-persistence.ts` sends a save only when it differs from what this browser last read or
+  wrote, so a browser that merely has the project open never overwrites a newer save. Two browsers on one project: the last
+  save wins; an already-mounted workspace is not refreshed from the server (live sync is out of scope). Binary drafts
+  (composer image attachments, queued-message images) stay in the browser's IndexedDB; elsewhere they are dropped, and a
+  queued message missing its images is dropped rather than sent without them. The "which projects were open" shell state
+  stays per browser.
 - Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
   `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
   and row style; one-line rows, at most three badges, an optional row detail icon); a row opens `TaskSetup`, the Workflow
@@ -181,8 +193,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `server/src/geo/routes/orcid.ts`, contract `web/src/geo/contracts/orcid.ts`; `GAID_ORCID_API_URL` points at the sandbox). Preview
   first; confirm re-reads the record, fills by DOI (Crossref → OpenAlex) else from the ORCID work (`metadataOrigin: "orcid"`), marks
   a same-DOI or earlier-imported item instead of adding (`LibraryItem.ownWork`, kept across Zotero refresh/merge; list filter `mine`);
-  a similar title never merges. Nothing is written to ORCID and nothing is polled (Public API terms). Phase 2 (authenticated iD via
-  OIDC, client secret only in hub server config, iD on hub accounts) waits for the user's ORCID client registration.
+  a similar title never merges. Nothing is written to ORCID and nothing is polled (Public API terms). Phase 2 (ADR
+  `docs/adr/2026-10-23-orcid-authenticated-link.md`): the hub server holds the ORCID client (`orcid-client set`, secret at a
+  hidden prompt, `<GAID_HUB_SERVER_HOME>/orcid-client.json` mode 600, not in backups; `server/src/geo/hub-server/orcid.ts`,
+  `/hub/v1/orcid*`, migration v4); "ORCID로 본인 확인" starts an OIDC code flow whose redirect returns to the researcher's GAID
+  (`/geo/orcid/callback`, registered as `http://127.0.0.1:8000/geo/orcid/callback`), which hands code + state to the hub; the hub
+  verifies the ID token (RS256/JWKS, iss, aud, nonce, exp) and records `HubAccount.orcid`; hub entries carry the author's
+  current `authorOrcid`. Callback code/state are redacted from request logs. Sandbox and production (loopback redirect accepted) verified
+  end to end 2026-10-23.
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`

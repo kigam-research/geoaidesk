@@ -221,10 +221,10 @@ describe("approval, persistence and serving", () => {
   });
   it("migrates a v2 home without losing its account/session identity", async () => {
     const a = app(); const headers = await user(a, "admin"); const identity = a.hub.server.serverId;
-    a.hub.db.exec("DROP TABLE feed_items; DROP TABLE feed_sources; DELETE FROM schema_migrations WHERE version=3");
+    a.hub.db.exec("DROP TABLE orcid_states; DROP TABLE account_orcid; DROP TABLE feed_items; DROP TABLE feed_sources; DELETE FROM schema_migrations WHERE version>=3");
     const path = a.hub.home; await a.close(); apps.splice(apps.indexOf(a), 1);
     const migrated = buildHubServer({ home: path, feedProposals: [source], feedFetch: fetchOK }); apps.push(migrated);
-    expect(migrated.hub.server.serverId).toBe(identity); expect(migrated.hub.counts()).toMatchObject({ schema_migrations: 3, feed_sources: 0, feed_items: 0, accounts: 1, sessions: 1 });
+    expect(migrated.hub.server.serverId).toBe(identity); expect(migrated.hub.counts()).toMatchObject({ schema_migrations: 4, feed_sources: 0, feed_items: 0, accounts: 1, sessions: 1 });
     expect((await migrated.inject({ url: "/hub/v1/auth/me", headers })).statusCode).toBe(200);
   });
 });

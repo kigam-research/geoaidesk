@@ -7,6 +7,8 @@ import type { ThinkingLevel } from "@/components/thinking-selector";
 import type { PromptImage } from "@/lib/image-attachments";
 import type { ModalComputeScope } from "@/lib/modal-jobs";
 import type { Skill } from "@/lib/use-skills";
+import { apiFetch } from "@/lib/projects";
+import type { GeoWorkspaceStateResponse } from "@/geo/contracts/workspace-state";
 import {
   normalizeDelegation,
   normalizeResearchRefs,
@@ -663,6 +665,10 @@ async function hydrateProject(stored: StoredProjectState): Promise<ProjectWorksp
           return blob ? blobToImage(blob) : null;
         }),
       )).filter((image): image is PromptImage => image !== null);
+      // Images stay in the browser that queued them. A message whose images
+      // are not all here (another PC, cleared storage) is dropped rather than
+      // sent later without them.
+      if (images.length !== message.images.length) continue;
       queuedMessages.push({ ...message, images });
     }
     tabs.push({
@@ -771,6 +777,7 @@ export async function saveProjectWorkspaceState(
   projectWriteVersions.set(projectId, version);
   const optimistic = sanitizeStoredProject(projectMetadataFromState(projectId, state));
   if (!optimistic) return;
+  queueServerSave(projectId, JSON.stringify(optimistic));
   const current = readMetadata();
   writeMetadata({
     ...current,
@@ -856,4 +863,175 @@ export async function pruneDeletedProjectState(validProjectIds: Iterable<string>
     removed.map((id) => enqueueProjectWrite(id, () => removeBlobPrefix(`${id}:`))),
   );
   await mutateMetadata((latest) => pruneWorkspaceMetadata(latest, valid));
+}
+
+// ---------------------------------------------------------------------------
+// GAID server copy (gaid-project-resume; web/src/geo/contracts/workspace-state.ts)
+//
+// The server keeps each project's last workspace state so any PC or browser
+// reopens the project where it was left. The page loads it before it mounts a
+// project's workspace (`loadServerProjectWorkspaceState`); from then on every
+// save of that project is also sent to the server, but only when it differs
+// from what this browser last read or wrote there, so a browser that merely
+// still has the project open never overwrites a newer save from elsewhere
+// (when it does change something, its save is the last one and wins).
+// Binary drafts stay in this browser: the record names them by the same keys
+// as the local blob store, and another browser drops what it does not have.
+// ---------------------------------------------------------------------------
+
+const CLIENT_ID_KEY = "gaid:workspace-client-id";
+const SERVER_LOAD_TIMEOUT_MS = 5_000;
+/** Browsers cap the body of a keepalive request at 64 KiB in total. */
+const KEEPALIVE_MAX_BYTES = 60_000;
+
+/** Projects whose server copy this page has read; only these are written back. */
+const serverTracked = new Set<string>();
+/** Last serialized state known to be on the server, per project. */
+const serverSynced = new Map<string, string>();
+const serverPending = new Map<string, string>();
+const serverChains = new Map<string, Promise<void>>();
+let clientId: string | null = null;
+
+function workspaceClientId(): string {
+  if (clientId) return clientId;
+  let id: string | null = null;
+  try {
+    id = window.localStorage.getItem(CLIENT_ID_KEY);
+  } catch {
+    id = null;
+  }
+  if (!id || !/^[A-Za-z0-9-]{1,64}$/.test(id)) {
+    id =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    try {
+      window.localStorage.setItem(CLIENT_ID_KEY, id);
+    } catch {
+      // A per-page id is enough when storage is blocked.
+    }
+  }
+  clientId = id;
+  return id;
+}
+
+function serverBody(json: string): string {
+  return `{"clientId":${JSON.stringify(workspaceClientId())},"state":${json}}`;
+}
+
+async function putServerState(projectId: string, json: string, keepalive = false): Promise<boolean> {
+  try {
+    const response = await apiFetch(
+      "/geo/workspace-state",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: serverBody(json),
+        ...(keepalive ? { keepalive: true } : {}),
+      },
+      projectId,
+    );
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+function queueServerSave(projectId: string, json: string): void {
+  if (!serverTracked.has(projectId)) return;
+  if (serverSynced.get(projectId) === json && !serverPending.has(projectId)) return;
+  serverPending.set(projectId, json);
+  if (serverChains.has(projectId)) return;
+  const run = async () => {
+    for (;;) {
+      const next = serverPending.get(projectId);
+      if (next === undefined) return;
+      serverPending.delete(projectId);
+      if (!serverTracked.has(projectId) || next === serverSynced.get(projectId)) continue;
+      if (await putServerState(projectId, next)) serverSynced.set(projectId, next);
+      // A failed save is retried with the next change or the page-hide flush.
+    }
+  };
+  const chain = run().finally(() => {
+    if (serverChains.get(projectId) === chain) serverChains.delete(projectId);
+  });
+  serverChains.set(projectId, chain);
+}
+
+/**
+ * Page-hide flush: send this project's state now if this browser changed it
+ * since its last server save. Uses a keepalive request when the body fits.
+ */
+export function flushServerProjectWorkspaceState(
+  projectId: string,
+  state: ProjectWorkspaceState,
+): void {
+  if (!serverTracked.has(projectId)) return;
+  const stored = sanitizeStoredProject(projectMetadataFromState(projectId, state));
+  if (!stored) return;
+  const json = JSON.stringify(stored);
+  if (serverSynced.get(projectId) === json) return;
+  const keepalive = new Blob([serverBody(json)]).size <= KEEPALIVE_MAX_BYTES;
+  const previous = serverSynced.get(projectId);
+  // Marked as sent up front so a save queued in the same page-hide does not
+  // send it a second time; restored when the request fails.
+  serverSynced.set(projectId, json);
+  serverPending.delete(projectId);
+  void putServerState(projectId, json, keepalive).then((ok) => {
+    if (ok || serverSynced.get(projectId) !== json) return;
+    if (previous === undefined) serverSynced.delete(projectId);
+    else serverSynced.set(projectId, previous);
+  });
+}
+
+/** Release the blob: URLs of one hydrated project (see `revokeSnapshotObjectUrls`). */
+export function revokeProjectObjectUrls(project: ProjectWorkspaceState): void {
+  revokeSnapshotObjectUrls({
+    version: WORKSPACE_SCHEMA_VERSION,
+    screen: "projects",
+    openedProjectIds: [],
+    projects: { project },
+  });
+}
+
+/**
+ * Read the project's last workspace state from the GAID server and hydrate it
+ * with the blobs this browser holds. Resolves `null` when the server has no
+ * record, cannot be reached in time, or answered for another project; the
+ * caller then keeps the browser's own copy, which the next save uploads.
+ */
+export async function loadServerProjectWorkspaceState(
+  projectId: string,
+): Promise<ProjectWorkspaceState | null> {
+  let stored: StoredProjectState | null = null;
+  let reachable = false;
+  try {
+    const controller = typeof AbortController === "undefined" ? null : new AbortController();
+    const timer = controller ? setTimeout(() => controller.abort(), SERVER_LOAD_TIMEOUT_MS) : null;
+    try {
+      const response = await apiFetch(
+        "/geo/workspace-state",
+        controller ? { signal: controller.signal } : {},
+        projectId,
+      );
+      if (response.ok) {
+        const body = (await response.json()) as Partial<GeoWorkspaceStateResponse>;
+        if (body?.projectId === projectId) {
+          reachable = true;
+          stored = body.record ? sanitizeStoredProject(body.record.state) : null;
+        }
+      }
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  } catch {
+    reachable = false;
+  }
+  // Only a project whose server copy was read is written back: a backend
+  // without the route, or one that answered for another project, is left alone.
+  if (!reachable) return null;
+  serverTracked.add(projectId);
+  if (!stored) return null;
+  serverSynced.set(projectId, JSON.stringify(stored));
+  return hydrateProject(stored);
 }

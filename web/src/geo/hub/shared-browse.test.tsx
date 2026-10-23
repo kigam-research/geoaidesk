@@ -133,3 +133,17 @@ describe("Hub sidebar visibility", () => {
     expect(screen.getByRole("button", { name: "open" })).toBeTruthy();
   });
 });
+
+it("keeps the author's ORCID link separate from the row's open action", async () => {
+  vi.mocked(sharedHub.entries).mockResolvedValueOnce({ entries: [{ ...entry, authorOrcid: { id: "0000-0002-1825-0097", environment: "production" } }] });
+  const open = vi.fn();
+  render(<SharedBrowse onOpen={open} />);
+  await loaded();
+  const link = screen.getByRole("link", { name: /인증된 ORCID iD/ });
+  expect(link.closest("button")).toBeNull();
+  expect(link.getAttribute("href")).toBe("https://orcid.org/0000-0002-1825-0097");
+  fireEvent.click(link);
+  expect(open).not.toHaveBeenCalled();
+  fireEvent.click(await loaded());
+  expect(open).toHaveBeenCalledWith(entry.id);
+});

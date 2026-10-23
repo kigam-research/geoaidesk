@@ -12,6 +12,9 @@
  */
 
 import type { CslItem, MetadataOrigin, OwnWorkMark, UpdateSignal } from "./library.ts";
+import type { HubOrcidLink, OrcidEnvironment } from "./hub-server.ts";
+
+export type { HubOrcidLink, OrcidEnvironment };
 
 export type { OwnWorkMark };
 
@@ -41,15 +44,19 @@ export function normalizeOrcidId(input: string): string | null {
   return orcidChecksumOk(id) ? id : null;
 }
 
-/** The record page of an iD, the form ORCID asks integrations to display. */
-export const orcidUrl = (id: string) => `https://orcid.org/${id}`;
+/** The record page of an iD, the form ORCID asks integrations to display (sandbox iDs live on ORCID's test server). */
+export const orcidUrl = (id: string, environment: OrcidEnvironment = "production") =>
+  `https://${environment === "sandbox" ? "sandbox." : ""}orcid.org/${id}`;
 
 /** The researcher's ORCID link, kept user-level next to the library (`<library>/orcid.json`, not synced). */
 export interface OrcidProfile {
   schema: typeof ORCID_SCHEMA;
   orcid: string;
-  /** False in phase 1: the iD was typed, not proven through ORCID sign-in. */
+  /** True once the researcher proved the iD through ORCID sign-in via the hub server (phase 2); typed iDs are false. */
   authenticated: boolean;
+  /** Environment of an authenticated iD (sandbox only in tests); typed iDs are production. */
+  environment?: OrcidEnvironment;
+  authenticatedAt?: string;
   /** Public name on the record when it was linked (credit name, else given + family); may be absent (private). */
   name?: string;
   linkedAt: string;
@@ -67,6 +74,25 @@ export interface OrcidStatus {
   profile: OrcidProfile | null;
   /** Items marked as the researcher's own works (`LibraryItem.ownWork`) for this iD. */
   ownWorks: number;
+  /** Whether "ORCID로 본인 확인" is possible here (needs a hub server account and an ORCID client on that hub). */
+  hub: OrcidHubState;
+}
+
+/**
+ * `no-account`: no hub server or not logged in. `unreachable`: the hub did not answer. `not-configured`: the hub has no
+ * ORCID client. `ready`: authentication can start. `linked`: the hub account has an authenticated iD.
+ */
+export type OrcidHubState =
+  | { state: "no-account" }
+  | { state: "unreachable" }
+  | { state: "not-configured" }
+  | { state: "ready"; environment: OrcidEnvironment }
+  | { state: "linked"; environment: OrcidEnvironment; link: HubOrcidLink };
+
+/** `POST /geo/orcid/auth/start`: open this URL in a new browser tab (ORCID sign-in). */
+export interface OrcidAuthStart {
+  authorizeUrl: string;
+  expiresAt: string;
 }
 
 /** Where a work already is in the library, decided by DOI first, else by title + year (never merged automatically). */
@@ -149,7 +175,11 @@ export interface OrcidItemDraft {
 // GET    /geo/orcid                 → OrcidStatus
 // PUT    /geo/orcid                 OrcidLinkBody → OrcidStatus   (400 invalid iD; 404 no such public record;
 //                                                                 502 ORCID unreachable)
-// DELETE /geo/orcid                 → OrcidStatus                 (unlinks; items keep their ownWork mark)
+// DELETE /geo/orcid                 → OrcidStatus                 (unlinks locally; items keep their ownWork mark;
+//                                                                 an authenticated hub link stays until /auth DELETE)
+// POST   /geo/orcid/auth/start      {} → OrcidAuthStart            (409 no hub account / not configured; 502 hub down)
+// GET    /geo/orcid/callback        ?code&state | ?error           (ORCID redirect target; HTML result page)
+// DELETE /geo/orcid/auth            → OrcidStatus                  (removes the authenticated iD from the hub account)
 // POST   /geo/orcid/works           {} → OrcidWorksPreview        (409 no iD linked; 502 ORCID unreachable)
 // POST   /geo/orcid/works/confirm   OrcidConfirmBody → OrcidConfirmResult
 //                                   (409 no iD linked; unknown put-codes fail with reason not-found)

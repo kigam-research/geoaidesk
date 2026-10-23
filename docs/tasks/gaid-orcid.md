@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T01:18:24Z
+status: done
+updated: 2026-10-23T02:50:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -73,16 +73,9 @@ Outside check: no outside check.
 - Existing hooks: library import preview/confirm (`/geo/library/import`), metadata client
   (`server/src/geo/library/metadata/`), hub account contract `web/src/geo/contracts/hub-server.ts` (owned by gaid-hub-server-trial).
 ## Next steps
-1. Phase 1 complete and integrated on task/gaid-orcid (tree 9d9a8a4aaa46 passed full scripts/check in the child finish;
-   report reports/2026-10-22-gaid-orcid/index.md). Waiting for the user's ORCID client registration (asked in this tab
-   2026-10-22: sandbox client + production attempt with redirect `http://127.0.0.1:8000/geo/orcid/callback`; client IDs
-   only, no secrets).
-2. When the answer comes: design phase 2 per the plan below, send the hub-account interface proposal to the hub for
-   gaid-hub-server-trial (`task hub --send`), implement, add a phase-2 section to the report.
-3. If the user prefers to close phase 1 first: add a `[대기]` open item for phase 2 and run `task finish`.
-Blocked: waiting for the user's ORCID client registration result (phase 2).
-Work hours (hub instruction 2026-10-22): do not start phase 2 work at or after 2026-10-23 03:00 KST without a resume
-instruction from the user to the project hub; check `TZ=Asia/Seoul date` first.
+<!-- task:closed -->
+Closed 2026-10-23T02:50:58Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-orcid.md.
+
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
@@ -114,6 +107,7 @@ instruction from the user to the project hub; check `TZ=Asia/Seoul date` first.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [대기 gaid-orcid#1] 기관 허브 서버(PC74)에 ORCID 본인 확인(2단계)을 배포하는 시점 — 가) 사용자가 정할 때 배포 작업을 시작하고, 배포 뒤 사용자가 허브 PC에서 실제 ORCID 앱 비밀값을 한 번 넣음 — 나) 계속 보류 — 권장: 가) 코드와 실제 ORCID 로그인 시험은 끝남 — 막힌 일: 기관 허브와 검토용 앱에서의 ORCID 본인 확인, 허브 Workflow 작성자 iD 표시 — 조건: 사용자 결정 2026-10-23 "아직은 기관 허브서브에 배포하지 않는다. 검토용 앱에 통합은 할 것이다." — 근거: reports/2026-10-22-gaid-orcid#6-결정할-일
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
@@ -121,6 +115,14 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 Report: reports/2026-10-22-gaid-orcid/index.md
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013942.970747Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive sandbox e2e service deliberately stopped after the successful ORCID sign-in (hub account linked 0009-0004-4407-0032, 2026-10-23 10:46 KST)","recorded":"2026-10-23T01:48:37Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013952.968887Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive sandbox e2e service deliberately stopped after the successful ORCID sign-in (hub account linked 0009-0004-4407-0032, 2026-10-23 10:46 KST)","recorded":"2026-10-23T01:48:39Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T015354.868333Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive production ORCID e2e service deliberately stopped after a successful production sign-in (loopback redirect accepted, 2026-10-23 10:57 KST); test link removed","recorded":"2026-10-23T01:57:53Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T015404.988330Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive production ORCID e2e service deliberately stopped after a successful production sign-in (loopback redirect accepted, 2026-10-23 10:57 KST); test link removed","recorded":"2026-10-23T01:57:55Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

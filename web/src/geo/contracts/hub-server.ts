@@ -11,6 +11,21 @@ export const HUB_SERVER_SCHEMA = "gaid-hub-server/v1";
 
 export type HubRole = "member" | "admin";
 
+/** ORCID environment of a hub's ORCID client: the real registry or ORCID's test server. */
+export type OrcidEnvironment = "production" | "sandbox";
+
+/**
+ * An ORCID iD proven through ORCID sign-in (OpenID Connect) and recorded on a hub account (gaid-orcid phase 2,
+ * ADR docs/adr/2026-10-23-orcid-authenticated-link.md). One account per iD.
+ */
+export interface HubOrcidLink {
+  id: string;
+  environment: OrcidEnvironment;
+  /** Name from the ORCID ID token at sign-in (may be absent when private). */
+  name?: string;
+  authenticatedAt: string;
+}
+
 export interface HubAccount {
   /** Stable account id (`acc-` + random); never changes. */
   id: string;
@@ -20,6 +35,8 @@ export interface HubAccount {
   createdAt: string;
   /** Set when an admin disabled the account; a disabled account cannot log in and its sessions end. */
   disabledAt?: string;
+  /** Authenticated ORCID iD of this account (gaid-orcid phase 2); older servers omit it. */
+  orcid?: HubOrcidLink;
 }
 
 /** Limits shared by the client checks and the server (server-side checks are authoritative). */

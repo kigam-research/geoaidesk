@@ -116,10 +116,18 @@ CREATE TABLE feed_items (id TEXT PRIMARY KEY, source_id TEXT NOT NULL REFERENCES
 -- undated items by the time they were first collected.
 CREATE INDEX feed_items_source_time ON feed_items(source_id,sort_at DESC);
 ` },
+  // gaid-orcid phase 2: authenticated ORCID iD per account (one account per iD and environment), single-use sign-in states.
+  { version: 4, sql: `
+CREATE TABLE account_orcid (account_id TEXT PRIMARY KEY REFERENCES accounts(id), orcid TEXT NOT NULL,
+ environment TEXT NOT NULL CHECK(environment IN ('production','sandbox')), name TEXT, authenticated_at TEXT NOT NULL,
+ UNIQUE(orcid, environment));
+CREATE TABLE orcid_states (state_sha256 TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id), nonce TEXT NOT NULL,
+ redirect_uri TEXT NOT NULL, created_at TEXT NOT NULL, expires_at TEXT NOT NULL);
+` },
 ];
 export const HUB_TABLES = ["schema_migrations", "accounts", "sessions", "invites", "audit_events", "login_failures",
   "hub_folders", "hub_entries", "hub_files", "hub_stars", "hub_comments", "hub_installs", "library_versions",
-  "library_objects", "library_files", "hub_imports", "hub_skills", "hub_skill_archives", "hub_skill_stars", "hub_skill_comments", "hub_skill_imports", "feed_sources", "feed_items"] as const;
+  "library_objects", "library_files", "hub_imports", "hub_skills", "hub_skill_archives", "hub_skill_stars", "hub_skill_comments", "hub_skill_imports", "feed_sources", "feed_items", "account_orcid", "orcid_states"] as const;
 
 export class HubDatabase {
   readonly home: string;
