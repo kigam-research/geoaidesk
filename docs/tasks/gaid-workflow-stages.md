@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:21:20Z
+updated: 2026-10-23T12:43:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0704ce16-3a7d-4ced-a70b-cb0992d87a4f","pid":723936,"provider":"claude","session":"231b3e23-b5c2-477a-8474-f49634f8b127","start":"64563772","token":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
 branch: task/gaid-workflow-stages
 target: main
@@ -68,8 +68,16 @@ Outside check: none.
 - Real data for checks: Pocheon 0.2.0 draft `~/data/geoaidesk/work/gaid-pocheon-trial/authoring-pass2-revise.json`
   (`drafts[-1].workflow`: 6 inputs, 15 choices, 10 steps / 8 with choiceIds → `grouped`, rail 4). PU-컨포멀 is a
   catalogue Workflow (pinned archive).
+- Children running (started 2026-10-23 12:22Z, Claude Opus 5.5 high, fast on; mode set to bypassPermissions after
+  start because `--writer` left "Always Ask"): A `gaid-workflow-stages--gaid-stages-window` (agent 08164288, worktree
+  ~/worktrees/geoaidesk/gaid-workflow-stages--gaid-stages-window); B `gaid-workflow-stages--gaid-stages-authoring`
+  (agent b0ed51a7). Prompts: ~/data/geoaidesk/work/gaid-workflow-stages/prompt-{a,b}.md.
+- B blocked on a model login for the Pocheon regeneration; user chose (2026-10-23) "검토 앱 로그인을 이번만 공유": B's
+  instance may use ~/.geoaidesk/pi-agent once (no credential file read/copied, instance stopped after). Sent to B.
 ## Next steps
-1. Start children A and B (below); while they run, prepare the report skeleton and AGENTS.md wording.
+1. When a child's finish arrives: `task complete <child>`; integrate B then A (`task sync`), run scripts/check.
+2. Meanwhile: report skeleton `reports/2026-10-23-gaid-workflow-stages/index.md`, AGENTS.md wording (Workflow model /
+   Workflow panel paragraphs).
 ## Failed approaches
 ## Notes and decisions
 - Orchestration (user: "작업은 opus 5.5 high fast writer들로 작업해야한다."): child writers are Claude Opus 5.5, thinking
