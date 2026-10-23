@@ -21,7 +21,7 @@ export function RemoveWorkflowDialog({ open, onOpenChange, entry, local, onRemov
   useEffect(() => { setReason(""); }, [entry.id]);
   useEffect(() => { if (open) setError(null); }, [open]);
   return <Dialog open={open} onOpenChange={(next) => { if (!busy) onOpenChange(next); }}>
-    <DialogContent className="sm:max-w-lg">
+    <DialogContent className="sm:max-w-[480px]">
       <DialogHeader>
         <DialogTitle>{text("remove.title")}</DialogTitle>
         <DialogDescription>{text("remove.body", { title: entry.title })}</DialogDescription>

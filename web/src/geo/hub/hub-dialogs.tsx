@@ -342,6 +342,8 @@ export function RegisterDialog({
   useEffect(() => { if (open) setBump("patch"); }, [open, currentVersion]);
   const versions = nextHubVersions(currentVersion);
   const [folder, setFolder] = useState(initialFolder ?? folders[0]?.id ?? "");
+  // The entry may arrive after the folder list. Apply its preset once, without clearing the note or later choices.
+  useEffect(() => { if (open && initialFolder) setFolder(initialFolder); }, [open, initialFolder]);
   // The folder list arrives after the dialog opens: select the preset (or first) folder once it is known.
   useEffect(() => {
     if (folders.length && !folders.some((f) => f.id === folder))
@@ -352,7 +354,7 @@ export function RegisterDialog({
   const [busy, setBusy] = useState(false);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>{text("register.title")}</DialogTitle>
         </DialogHeader>

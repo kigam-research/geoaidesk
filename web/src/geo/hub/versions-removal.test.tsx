@@ -94,4 +94,17 @@ describe("registration version choices", () => {
     expect(screen.getByRole("button", { name: "허브에 등록" })).toBeDisabled();
     expect(screen.queryByText(/처음 등록하면/)).not.toBeInTheDocument();
   });
+
+  it("keeps the entry's folder when it arrives after the folder list, without losing the note", () => {
+    const folders = [{ id: "general", name: "일반" }, { id: "geo", name: "Geoscience" }];
+    const save = vi.fn();
+    const { rerender } = render(<RegisterDialog {...props} folders={folders} versionPending onRegister={save} />);
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "남길 말" } });
+    rerender(<RegisterDialog {...props} folders={folders} initialFolder="geo" currentVersion="0.2.0" onRegister={save} />);
+    expect(screen.getByRole("combobox")).toHaveValue("geo");
+    expect(screen.getByRole("textbox")).toHaveValue("남길 말");
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "general" } });
+    rerender(<RegisterDialog {...props} folders={[...folders]} initialFolder="geo" currentVersion="0.2.0" onRegister={save} />);
+    expect(screen.getByRole("combobox")).toHaveValue("general");
+  });
 });

@@ -50,7 +50,7 @@
   },
   "sourceRecord": "출처 기록 보기",
   "ref": "가져온 기준",
-  "commit": "가져온 버전 기록",
+  "commit": "가져온 변경 기록",
   "fetched": "가져온 날짜",
   "licence": {
     "institute": "기관 내부 작성",

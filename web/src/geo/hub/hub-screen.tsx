@@ -866,6 +866,7 @@ function HubProject({
     const issues = check ? check.findings.filter((f) => f.level === "error").length : null;
     body = (
       <DraftStep
+        registered={registrationEntry ? hubVersionOf(registrationEntry) : null}
         draft={draft}
         authoringId={id}
         visuals={pictures.steps}
