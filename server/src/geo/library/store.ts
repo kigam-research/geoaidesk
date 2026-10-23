@@ -403,6 +403,7 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"], n
     ...(item.citationKey ? { citationKey: item.citationKey } : {}),
     coverage: item.read.coverage,
     hasPdf: item.attachments.some((a) => a.kind === "pdf"),
+    storedPdf: item.attachments.some((a) => a.kind === "pdf" && !!a.stored),
     collectionIds: item.collectionIds,
     tags: item.tags,
     used,

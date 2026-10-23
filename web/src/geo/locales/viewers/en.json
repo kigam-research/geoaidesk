@@ -57,5 +57,10 @@
   "oversize.state": "Sample of the first {rows} rows · {columns} columns{estimate, plural, =-1 {} other { · about # rows in total (estimate)}}",
   "oversize.lines": "Sample of the first {rows} lines",
   "oversize.allColumns": "Show all {count} columns",
-  "oversize.fewerColumns": "Show the first 8 columns"
+  "oversize.fewerColumns": "Show the first 8 columns",
+  "pdfPane.label": "PDF: {title}",
+  "pdfPane.close.button": "Close PDF",
+  "pdfPane.closeHint": "Return to the paper details (Esc)",
+  "pdfPane.error": "Could not display this PDF here. Open it in a new tab.",
+  "pdfPane.newTab.button": "Open in new tab"
 }
