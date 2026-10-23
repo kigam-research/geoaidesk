@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:50:30Z
+updated: 2026-10-23T07:04:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -51,11 +51,31 @@ A gaid-note-library, D gaid-pocheon-trial (uses the review app). Do not restart 
 screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Phase 1 (design) done, waiting for the user's answer (asked 2026-10-23). Mockups: `~/data/geoaidesk/work/gaid-workflow-start-ui/mockups/start.html`
+  (`?d=a|b&w=pu|paper&s=intro|input|choice|summary&v=instrument|mapsheet&t=light|dark`, built on the adopted v2 mockup kit;
+  served locally with `uv run --no-project python -m http.server 3391` in that folder; captures by `../shot.sh`, 33 in `../shots/`).
+  Proposal (Korean, humanizer applied): `~/data/geoaidesk/work/gaid-workflow-start-ui/proposal/index.md`, review copy
+  `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-23-gaid-workflow-start-ui-mockup/` (obsidian-sync service inactive).
+- Questions to the user: (1) step rail 가) grouped scale in the 720 px sheet vs 나) left list of every step name in a 920 px
+  sheet (recommended 나: Q4 names every step; breaks D2 width, to be reported); (2) 일반 Workflow start: 가) start draft in a
+  new chat like GAID Workflows, model chosen in the composer, no model chip in the window (recommended) vs 나) keep model
+  chip + immediate run (`Workflow 실행`).
 ## Next steps
-1. (the next session's first action)
+1. Record the user's answers under Notes and decisions; then wait for unit B (gaid-workflow-example) on main.
+2. After B is on main: rebase, implement the chosen design (plan in Notes), checks, §12 screenshots, report.
 ## Failed approaches
 ## Notes and decisions
+- Plan (2026-10-23): sequential. Design → user approval → wait for B on main → implement. Implementation is tightly coupled
+  (one shared start window used by TaskSetup and the upstream WorkflowLaunchDialog seam), so the writer does it alone; a
+  child writer only if the BYOK adapter turns out large. Owned files: `web/src/geo/workspace/{task-setup,setup-steps}.tsx`,
+  new `web/src/geo/workspace/start-intro.tsx` (Workflow 소개 step), `web/src/geo/shell/step-scale.tsx` (grouped scale),
+  locales `workspace`, upstream seam `web/src/components/workflows-panel.tsx` (WorkflowLaunchDialog → GAID start window;
+  add to `geo/integration-boundaries.json` before editing). Integration order: rebase onto B, then E if E merged.
+- Design principles for the mockup: one window for all kinds; step 0 "Workflow 소개" from WorkflowDoc (purpose, inputs +
+  example-data state, choices count, outputs, main steps, limits) or, for 일반 Workflow, from its description/placeholders
+  (missing sections are omitted, never invented); step scale grouped (소개 · 입력 자료 n · 분석 조건 n · 요약) so 11+ steps
+  stay readable; file candidates = fitting formats only, `user_data/` first, others under collapsed 이전 결과; 일반 Workflow
+  prompt collapsed under "AI agent가 받는 지침" with editing kept.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
