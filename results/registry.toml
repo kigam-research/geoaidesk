@@ -121,3 +121,15 @@ inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v
 files = [{ path = "gaid-promo-v2.mp4", sha256 = "82dfc3cc76a4e62662fab4fab03e6f8a0634ebc802a2d175a7fe3f440607cf63" }, { path = "manifest.json", sha256 = "bc1b788c46af3d1694415afa91bcc91dffb23d9a016ea6a1e2fe420b7e637826" }]
 report = "reports/2026-10-23-gaid-promo-video-v2/index.md"
 replicas = []
+
+[[result]]
+id = "gaid-promo-video-v3"
+title = "GAID 홍보 영상 v3 — 최종 앱에서 포천 연구 한 바퀴로 다시 찍은 105초 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v3-20261023T174817.846561Z/out"
+source_sha = "344c7e441d195607c7ff6a7548c8d695f6604293"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "user:2026-10-23-gaid-promo-video-v3"]
+files = [{ path = "gaid-promo-v3.mp4", sha256 = "1fe7371596ac2c53e6d18534cf43a0cc0e6f9c6e79f2f159c496d8c52572ea5f" }, { path = "manifest.json", sha256 = "b5af8724daf4eb2ce78c810784bc608d8f4076fd6d2eca5ff21a84681c81104e" }]
+report = "reports/2026-10-24-gaid-promo-video-v3/index.md"
+replicas = []
+supersedes = "gaid-promo-video-v2"
