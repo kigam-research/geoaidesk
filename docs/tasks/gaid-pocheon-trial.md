@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:59:29Z
+updated: 2026-10-23T07:47:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -114,8 +114,10 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 - F7 — 서재 paper detail (`web/src/geo/library/library-screen.tsx`) — "Workflow 만들기" is disabled until "본문 텍스트
   추출" has run, with no visible reason; a researcher sees a dead button. — A/C (library screen; C owns
   library→authoring) — to route.
-- F8 — authoring project created from a 서재 item has no `model` (project.model empty) — harmless because every call sends
-  the chosen model, but the record does not show the researcher's choice until the first call. — note only.
+- F8 — authoring project created from a 서재 item stores no `model`; the screen keeps the chosen model only in memory, so
+  after a reload (here: the review-app restart) the selector shows the default model and the next draft/revise quietly
+  runs on it. — D — fixed: analyze/draft/revise/answers store the model and reasoning level they name on the project
+  (`rememberModel` in `authoring/routes.ts`, test in `geo-authoring.test.ts`).
 - F9 — BLOCKER on the LAN review app: `newOpId()` (`web/src/geo/hub/api.ts`) calls `crypto.randomUUID`, which browsers
   expose only in secure contexts; the review app is plain http on 10.13.15.74 since 2026-10-23 11:35, so every hub
   authoring action (read sources, answers, draft, revise) fails with the toast "crypto.randomUUID is not a function"
@@ -158,8 +160,30 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   with the method. Cause: DRAFT_SYSTEM says to write code paths "in full from <skill>/" and nothing about where run-time
   files go. — D — fixed (DRAFT_SYSTEM: skill folder read-only; agent-written code and outputs in a named project work
   folder). Researcher feedback in the trial asked for `pgi_run/`.
+- F17 — Workflow start settings (review app b74950e7) — every optional input defaults to "사용하지 않음" even when a fitting
+  file is in the project; opened at the summary, one click would start the paper's method with only the DEM and a
+  README (6 of 8 inputs unused). CSV roles list every CSV as candidate. — B (start settings, example selection) —
+  routed 2026-10-23 16:31.
+- F18 — analysis run (project pgi-2c2f48, GPT-6.1 Sol high, started 16:29:59) — although the Workflow says to run
+  through and stop only for missing or malformed inputs, the agent opened an `interview` at ~16:31 with three detail
+  rules (borehole penetration marking, numeric preprocessing/statistics/boundary rules, IGRF height basis), each with a
+  sensible recommendation; nobody watched the chat, the form expired after 600 s and the agent went on with its
+  recommendations labelled as assumptions. ~10 minutes lost for a run whose start settings were complete. Cause: the
+  boreholes input had no ore-penetration column (paper Table 1 also has none; penetration comes from core logging,
+  i.e. core_samples.csv classes), and interview guidance asks to block on missing authorization. — record; candidate
+  fix: Workflow 지침 should state that details with a recommended default are recorded as assumptions, not asked,
+  once the start settings are complete (D, prompt) — open.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
+
+- 2026-10-23 16:11: interim sync → main b74950e7 (PR #85; F1/F2/F3/F9-F16 + example generator/asset), merged with C;
+  hub restarted the review app on b74950e7 at 16:12. Verified there without in-page patches: the reasoning selector
+  shows on the sources step and the revise attempt ran as openai/gpt-6.1-sol high from a LAN browser (F1, F9).
+- First pass so far: authoring ap-bab647f7-674 (서재 → Workflow 만들기; sources heo2025.pdf + ESM1 zip); analyze
+  (38 findings, 7 questions) → answers → draft 1 (package error, F13/F16) → revise 1 with researcher feedback
+  (passes the package check; quick run keeps the core window, 25 m, all data, 30 iterations) → revise 2 (feedback:
+  quick results interpretable at resolution; no per-step approval gates) running. Analysis project pgi-2c2f48
+  ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
 1. Finish the first authoring pass (review app, project ap-bab647f7-674, GPT-6.1 Sol high via an in-page fetch patch

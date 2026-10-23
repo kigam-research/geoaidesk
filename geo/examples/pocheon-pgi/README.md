@@ -22,8 +22,17 @@ uv run --no-project $DEPS python geo/examples/pocheon-pgi/pgi_reference.py \
   --data ~/assets/gaid-pocheon-pgi-example/2026-10-23 --out ~/data/geoaidesk/work/<slug>/ref-run
 ```
 
-Reference result on PC74 (2026-10-23, SimPEG 0.25.2): 82,807 active cells, 620 data, both variants in 218 s.
-PGI-full, property isovalue (ore mean): target body 578,125 m³ (truth 488,000 m³). PGI-none: the learned means
-collapse towards the host value (0.003 / 0.006 / 0.036 SI) with the paper's fixed proportions (0.9 / 0.075 / 0.025),
-so its isovalue selects several Mm³. This is a known sensitivity of mean learning without confidence in the prior
-(kappa = 0) and is reported, not tuned away.
+Reference results on PC74 (2026-10-23, SimPEG 0.25.2; 82,807 active cells of 25 m, 620 data; truth target body
+488,000 m³):
+
+| Run | Learned GMM means (SI) | Target body, property isovalue | Target body, P(ore) > 0.99 | Time |
+|---|---|---|---|---|
+| PGI-full, paper proportions 0.9/0.075/0.025 | fixed 0.0064 / 0.172 / 0.290 | 578,125 m³ | 109,375 m³ | 106 s |
+| PGI-none, paper proportions | 0.0032 / 0.0065 / 0.036 (collapsed) | 3.86 Mm³ (isovalue 0.036) | 250,000 m³ | 112 s |
+| PGI-none, proportions 0.985/0.01/0.005 (`--weights`) | 0.0034 / 0.017 / 0.208 | 1,359,375 m³ | 953,125 m³ | 128 s |
+
+The GMM proportions are volume fractions over the whole active mesh, padding included. With the paper's 2.5 % ore
+share the ore component has to hold far more volume than the ore body, so learning the means (kappa = 0) drags the
+ore mean down to the host level. A share closer to the expected ore fraction of the mesh keeps the learned means
+apart; the paper's own proportions worked on its data (anomaly > 3,000 nT). Core-sample fractions (136 / 36 / 99) are
+biased towards ore because the holes target it and are not a substitute.
