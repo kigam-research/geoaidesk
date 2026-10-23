@@ -13,7 +13,8 @@ export interface StepListGroup {
   title?: string;
   /** Shown after the title (number of steps). */
   count?: number;
-  items: { index: number; label: string; done?: boolean }[];
+  /** `hint`: one short line under the label (what a stage holds). */
+  items: { index: number; label: string; hint?: string; done?: boolean }[];
 }
 
 export function StepList({ groups, current, onStep, label, itemLabel, className }: {
@@ -36,9 +37,12 @@ export function StepList({ groups, current, onStep, label, itemLabel, className 
           data-state={state} disabled={!onStep} onClick={() => onStep?.(item.index)}
           className="gaid-steplist-item relative grid grid-cols-[14px_minmax(0,1fr)] items-start gap-2 rounded-md py-1 pr-2 pl-1 text-left text-[13.5px] leading-[19px] text-gaid-ink-2 hover:bg-gaid-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default">
           <span className="gaid-steplist-mark self-stretch" aria-hidden />
-          <span className="line-clamp-2 min-w-0 break-words">
-            {state === "done" && <CheckIcon className="mr-1 inline size-3.5 -translate-y-px text-gaid-success" aria-hidden />}
-            {item.label}
+          <span className="min-w-0">
+            <span className="line-clamp-2 break-words">
+              {state === "done" && <CheckIcon className="mr-1 inline size-3.5 -translate-y-px text-gaid-success" aria-hidden />}
+              {item.label}
+            </span>
+            {item.hint && <span className="block text-xs leading-4 font-normal text-gaid-ink-3 tabular-nums">{item.hint}</span>}
           </span>
         </button>;
       })}

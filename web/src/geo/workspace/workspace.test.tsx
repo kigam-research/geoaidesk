@@ -76,7 +76,7 @@ function catalogue() {
 async function openSetup(name: RegExp = /^Well log QC well-qc/) {
   await userEvent.click(await screen.findByRole("button", { name })); return screen.findByRole("dialog");
 }
-// Steps of the test workflow: 1 Workflow 소개, 2 Well log, 3 심도 기준, 4 단위, 5 요약.
+// Pages of the test workflow (no steps map its inputs, so grouped): 1 Workflow 소개, 2 입력 자료, 3 분석 조건 (심도 기준, 단위), 4 요약.
 async function step(dialog: HTMLElement, n: number) { await userEvent.click(within(dialog).getByRole("tab", { name: new RegExp(`^${n}단계:`) })); }
 const radio = (dialog: HTMLElement, name: string | RegExp) => within(dialog).getByRole("radio", { name });
 
@@ -98,26 +98,27 @@ describe("task catalogue and setup", () => {
     expect(within(dialog).getByRole("region", { name: "Workflow 소개" })).toBeInTheDocument(); await step(dialog, 2);
     // The only fitting file is preselected; a file of another format is not offered as a choice.
     expect(radio(dialog, /A\.LAS/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).queryByRole("radio", { name: /table\.csv/ })).not.toBeInTheDocument();
-    await step(dialog, 5);
+    await step(dialog, 4);
     const start = within(dialog).getByRole("button", { name: "시작 초안 만들기" });
     if (state === "ready") expect(start).toBeEnabled(); else expect(start).toBeDisabled();
   });
   it("asks one question per step, keeps answers after close/reopen, hands off answers, files, skill and exposure, then clears", async () => {
     catalogue(); let dialog = await openSetup();
     await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
-    expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument();
-    // The step scale names every step (UI guide v2 Q4); the next question itself is not asked yet.
+    expect(within(dialog).getByRole("heading", { name: "Well log" })).toBeInTheDocument(); expect(within(dialog).getByText("시작 설정 1 / 2")).toBeInTheDocument();
+    // One page per stage (gaid-workflow-stages): the conditions are on the next page, both on it.
     expect(within(dialog).queryByRole("heading", { name: "심도 기준" })).not.toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole("button", { name: "다음 단계" }));
-    expect(within(dialog).getByRole("heading", { name: "심도 기준" })).toBeInTheDocument(); expect(within(dialog).getByText("심도 기준을 유지합니다.")).toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { name: "심도 기준" })).toBeInTheDocument(); expect(within(dialog).getByRole("heading", { name: "단위" })).toBeInTheDocument();
+    expect(within(dialog).getByText("심도 기준을 유지합니다.")).toBeInTheDocument();
     // Known catalogue option ids get a readable label; nothing is preselected without a source (UI guide Q2).
     expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "false"); await userEvent.click(radio(dialog, "측정 심도(MD)"));
     await userEvent.click(within(dialog).getByRole("button", { name: "대화상자 닫기" })); dialog = await openSetup();
     expect(radio(dialog, "측정 심도(MD)")).toHaveAttribute("aria-checked", "true");
-    await step(dialog, 4); await userEvent.click(radio(dialog, "직접 입력")); await userEvent.type(within(dialog).getByRole("textbox", { name: "단위" }), "m");
+    await step(dialog, 3); await userEvent.click(radio(dialog, "직접 입력")); await userEvent.type(within(dialog).getByRole("textbox", { name: "단위" }), "m");
     await userEvent.click(within(dialog).getByRole("button", { name: "요약 보기" }));
     expect(within(dialog).getByText("A.LAS")).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument();
-    await userEvent.click(within(dialog).getByRole("button", { name: "단위 수정" })); await userEvent.click(radio(dialog, /^작업 중 결정/)); await step(dialog, 5);
+    await userEvent.click(within(dialog).getByRole("button", { name: "단위 수정" })); await userEvent.click(within(within(dialog).getByRole("region", { name: "단위" })).getByRole("radio", { name: /^작업 중 결정/ })); await step(dialog, 4);
     expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
     const handoff = vi.fn(); const off = onStartGeoTask((detail) => { handoff(detail); detail.result = "opened"; });
     try {
@@ -138,11 +139,11 @@ describe("task catalogue and setup", () => {
     const dialog = await openSetup(); await step(dialog, 2);
     expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeDisabled(); expect(within(dialog).getByText("다음 단계로 가려면 파일을 고르세요.")).toBeInTheDocument();
     await userEvent.click(radio(dialog, /B\.las/)); expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeEnabled();
-    await step(dialog, 5); expect(within(dialog).getByText("B.las")).toBeInTheDocument();
+    await step(dialog, 4); expect(within(dialog).getByText("B.las")).toBeInTheDocument();
   });
   it("keeps inputs on tab limit and does not pin a skill absent from /skills", async () => {
     apiFetch.mockImplementation(async (path) => path === "/geo/workflows" ? json({ catalogue: { state: "ready" }, workflows: rows }) : path === "/geo/recipes" ? json(saved) : json([]));
-    catalogue(); const dialog = await openSetup(); await step(dialog, 5);
+    catalogue(); const dialog = await openSetup(); await step(dialog, 4);
     const off = onStartGeoTask((detail) => { expect(detail.skills).toEqual([]); detail.result = "tab-limit"; });
     try {
       await userEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" }));
@@ -179,7 +180,7 @@ describe("task catalogue and setup", () => {
   });
   it("says why the start draft cannot be created yet", async () => {
     rows = [workflow("needs-environment")];
-    catalogue(); const dialog = await openSetup(); await step(dialog, 5);
+    catalogue(); const dialog = await openSetup(); await step(dialog, 4);
     expect(within(dialog).getByText("먼저 환경을 준비하세요.")).toBeInTheDocument(); expect(within(dialog).getByText("준비되지 않은 실행 환경: Geo core")).toBeInTheDocument();
   });
   it("shows indeterminate progress while preparation is running", async () => {
@@ -221,7 +222,7 @@ describe("task catalogue and setup", () => {
     expect(within(dialog).getByText("기반 작업: Well log QC well-qc")).toBeInTheDocument();
     // A recipe opens at the summary (UI guide Q4); its values are labelled as recipe values on their step.
     expect(within(dialog).getByRole("heading", { name: "선택 내용 확인" })).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
-    await step(dialog, 3); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 5);
+    await step(dialog, 3); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 4);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제" }));
     expect(apiFetch.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제 확인" }));

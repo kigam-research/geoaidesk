@@ -1,9 +1,10 @@
 "use client";
 /**
  * The one Workflow start window (gaid-workflow-start-ui; user decision 2026-10-23 "시안 및 선택 모두 권장대로 진행하자."):
- * 기본 Workflow, hub Workflows and 일반 Workflow (upstream BYOK) all open this sheet. It walks Workflow 소개 → 입력 자료 →
- * 분석 조건 → 요약 with every step named in a left step list (UI guide Q4; 920 px wide, a D2 width exception so long
- * Workflows keep readable step names). Hosts own the state and render the current step as children.
+ * 기본 Workflow, hub Workflows and 일반 Workflow (upstream BYOK) all open this sheet. It walks Workflow 소개 → one page per
+ * analysis-flow stage (gaid-workflow-stages: every input and condition of the stage on one page; older Workflows "입력
+ * 자료" and "분석 조건") → 요약, every entry named in a left step list (UI guide Q4; at most 7 entries; 920 px wide, a D2
+ * width exception so stage names stay readable). Hosts own the state and render the current page as children.
  */
 import type { ReactNode } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -11,28 +12,33 @@ import { TechnicalDetail } from "@/geo/hub/technical";
 import { t } from "@/geo/i18n";
 import { StepList, type StepListGroup } from "@/geo/shell/step-list";
 
-export type StartGroup = "intro" | "input" | "choice" | "summary";
-export interface StartStep { group: StartGroup; label: string; done?: boolean }
+export type StartGroup = "intro" | "stage" | "summary";
+export interface StartStep {
+  group: StartGroup;
+  label: string;
+  /** What the stage holds ("자료 2개 · 조건 3개"), one line under the label. */
+  hint?: string;
+  done?: boolean;
+}
 
-const GROUPS: StartGroup[] = ["intro", "input", "choice", "summary"];
+const GROUPS: StartGroup[] = ["intro", "stage", "summary"];
 
-/** Where the researcher is: "Workflow 소개", "입력 자료 1 / 2", "분석 조건 3 / 8" or "요약". */
-export function stepPosition(steps: StartStep[], index: number): string {
+/** Where the researcher is: "Workflow 소개", "분석 단계 2 / 4" (flow) or "시작 설정 1 / 2" (grouped), or "요약". */
+export function stepPosition(steps: StartStep[], index: number, flow: boolean): string {
   const step = steps[index];
   if (!step) return "";
   if (step.group === "intro") return t("workspace.start.intro");
   if (step.group === "summary") return t("workspace.setup.summaryTab");
-  const members = steps.flatMap((s, i) => (s.group === step.group ? [i] : []));
-  return t("workspace.start.position", { group: t(`workspace.start.group.${step.group}`), n: members.indexOf(index) + 1, total: members.length });
+  const members = steps.flatMap((s, i) => (s.group === "stage" ? [i] : []));
+  return t("workspace.start.position", { group: t(flow ? "workspace.start.group.stage" : "workspace.start.group.settings"), n: members.indexOf(index) + 1, total: members.length });
 }
 
-/** Label of the primary action on the introduction: names the next part of the window (UI guide B3). */
-export function introNextLabel(steps: StartStep[]): string {
-  const next = steps[1]?.group;
-  return t(next === "input" ? "workspace.start.toInputs" : next === "choice" ? "workspace.start.toChoices" : "workspace.setup.toSummary");
+/** Label of the primary action on the introduction: names what the first page asks for (UI guide B3). */
+export function introNextLabel(first: "input" | "choice" | null): string {
+  return t(first === "input" ? "workspace.start.toInputs" : first === "choice" ? "workspace.start.toChoices" : "workspace.setup.toSummary");
 }
 
-export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, index, onIndex, children, error, reason, leading, actions }: {
+export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, flow = false, index, onIndex, children, error, reason, leading, actions }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -41,6 +47,8 @@ export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, i
   /** One line of what the Workflow does, shown above the steps after the introduction. */
   purpose?: string;
   steps: StartStep[];
+  /** The stage pages follow the Workflow's analysis flow (titled "분석 단계" in the step list). */
+  flow?: boolean;
   index: number;
   onIndex: (index: number) => void;
   children: ReactNode;
@@ -53,10 +61,10 @@ export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, i
   actions: ReactNode;
 }) {
   const groups: StepListGroup[] = GROUPS.flatMap((group) => {
-    const items = steps.flatMap((step, i) => (step.group === group ? [{ index: i, label: step.label, done: step.done }] : []));
+    const items = steps.flatMap((step, i) => (step.group === group ? [{ index: i, label: step.label, hint: step.hint, done: step.done }] : []));
     if (!items.length) return [];
-    const titled = group === "input" || group === "choice";
-    return [{ title: titled ? t(`workspace.start.group.${group}`) : undefined, count: titled ? items.length : undefined, items }];
+    const titled = group === "stage" && flow;
+    return [{ title: titled ? t("workspace.start.group.stage") : undefined, count: titled ? items.length : undefined, items }];
   });
   const showPurpose = Boolean(purpose) && steps[index]?.group !== "intro";
   return <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,7 +89,7 @@ export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, i
       <div className="space-y-2 border-t px-6 py-3">
         {error && <div role="alert" className="space-y-1 text-sm text-destructive"><p>{error.message}</p><TechnicalDetail detail={error.detail} /></div>}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-muted-foreground tabular-nums">{stepPosition(steps, index)}</span>
+          <span className="text-sm text-muted-foreground tabular-nums">{stepPosition(steps, index, flow)}</span>
           {leading}
           <span className="ml-auto max-w-[50%] text-right text-sm text-muted-foreground break-words">{reason}</span>
           {actions}

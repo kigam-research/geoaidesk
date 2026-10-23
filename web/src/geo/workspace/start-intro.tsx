@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { WorkflowView } from "@/geo/workflow/workflow-view";
 import { localText } from "@/geo/hub/text";
 import { text } from "./api";
+import { hasDefault } from "@/geo/contracts/workflow-stages";
 
 export interface IntroRow { label: string; content: ReactNode }
 
@@ -58,7 +59,9 @@ export function GeoIntro({ workflow, projectId, notice }: { workflow: GeoWorkflo
   const purpose = localText(doc?.purpose) || text(workflow.description);
   const roles = workflow.inputRoles;
   const examples = roles.filter((role) => role.example && role.example.state !== "broken").map((role) => text(role.example!.title));
-  const choices = workflow.requiredScientificChoices.map((choice) => text(choice.label));
+  // Conditions the researcher answers; those with a default are counted, not listed (gaid-workflow-stages).
+  const choices = workflow.requiredScientificChoices.filter((choice) => !hasDefault(choice)).map((choice) => text(choice.label));
+  const defaults = workflow.requiredScientificChoices.filter(hasDefault).length;
   const outputs = workflow.expectedArtifacts.map((artifact) => text(artifact.label));
   const steps = doc?.steps ?? [];
   const boundary = localText(doc?.boundary) || text(workflow.boundary);
@@ -68,9 +71,10 @@ export function GeoIntro({ workflow, projectId, notice }: { workflow: GeoWorkflo
     {roles.map((role) => <span key={role.id} className="block">{text(role.label)}<IntroQual>{t(role.required ? "workspace.setup.required" : "workspace.setup.optional")}</IntroQual>{role.extensions.length > 0 && <IntroFormat>{role.extensions.join(", ")}</IntroFormat>}</span>)}
     <IntroNote>{examples.length ? t("workspace.start.exampleSome", { titles: [...new Set(examples)].join(", ") }) : t("workspace.start.exampleNone")}</IntroNote>
   </> });
-  if (choices.length) rows.push({ label: t("workspace.start.fact.choices"), content: <>
+  if (choices.length || defaults) rows.push({ label: t("workspace.start.fact.choices"), content: <>
     {choices.length > 3 ? t("workspace.start.choicesMany", { count: choices.length, names: choices.slice(0, 3).join(", "), rest: choices.length - 3 }) : choices.join(", ")}
-    <IntroNote>{t("workspace.start.choicesDefer")}</IntroNote>
+    {defaults > 0 && <IntroNote>{t("workspace.start.choicesDefaults", { count: defaults })}</IntroNote>}
+    {choices.length > 0 && <IntroNote>{t("workspace.start.choicesDefer")}</IntroNote>}
   </> });
   if (outputs.length) rows.push({ label: t("workspace.start.fact.outputs"), content: outputs.join(", ") });
   if (steps.length) rows.push({ label: t("workspace.start.fact.steps"), content:

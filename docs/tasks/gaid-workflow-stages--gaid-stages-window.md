@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:23:03Z
+updated: 2026-10-23T12:32:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"08164288-7806-46a6-9e82-956577998a76","pid":790060,"provider":"claude","session":"f9dbf0b8-76e0-462b-b70b-5ced3cf12897","start":"64608299","token":"7a4c953115a20fde3c930ab89ac5a15005cbbdc2c3a944e2bab8d7766326cb7a"}
 branch: task/gaid-workflow-stages--gaid-stages-window
 target: task/gaid-workflow-stages
@@ -66,9 +66,19 @@ Edit owned files, run local instances and tests, `task save`, `task finish` of t
 raw.githubusercontent.com (use `gh api` or codeload).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Start window is stage-based (code done, checks pass): `setupSteps` builds 소개 → `StagePage` per `workflowStages` stage → 요약.
+  Flow pages titled by the step (rail group "분석 단계", position "분석 단계 n / m"); grouped pages 입력 자료 / 분석 조건
+  (position "시작 설정 n / 2"; the conditions page sub-heads by doc step when > 3 conditions). Rail items carry a hint
+  ("자료 2개 · 조건 3개 · 기본값 1개"). `multiple` inputs: checkbox cards, `{mode:"files"}` answer, binding `string[]`,
+  start message joins paths (`workflowStartMessage` type widened in `web/src/geo/workflow/render.ts`, one line outside the
+  listed scope). Defaults: start answered, folded "기본값이 있는 조건 n개" per page, own summary group "기본값이 있는 조건",
+  value "(기본값)"; Edit on a default opens its page with the fold open and scrolls to it. 일반 Workflow: 소개 → 자료 →
+  분석 조건 (all placeholders on one page) → 요약.
+- Verified: `cd web && npx tsc --noEmit && npx vitest run src/geo` (69 files, 355 tests), `node geo/ui/check-ui.mjs` (0 errors),
+  `node geo/copy/validate-copy.mjs web/src/geo/locales` (0 errors, no workspace warnings).
 ## Next steps
-1. (the next session's first action)
+1. Screenshots (own app instance, data under ~/data/geoaidesk/work/gaid-stages-window/) and
+   `reports/2026-10-23-gaid-workflow-stages/start-window.md`; then `task finish`.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
