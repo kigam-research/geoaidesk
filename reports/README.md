@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-24-gaid-promo-video-v3/figures/02-demo-a.png" width="120"> | 2026-10-24 03:26 | [GAID 홍보 영상 v3: 최종 앱에서 포천 연구 한 바퀴로 다시 찍은 105초 영상 (내부 검토용)](2026-10-24-gaid-promo-video-v3/index.md) | v2의 구성과 연출은 그대로 두고, 시연을 최종 앱에서 포천 자철석 PGI 연구 한 바퀴로 다시 찍었습니다. 서재 옆 PDF, 여러 자료로 만드는 Workflow, 질문 옆 근거 뷰어, 단계별 시작 창과 예제 자료, 근거 논문 인용, 노트를 서재에 넣기, Workflow version이 순환 속 제자리에 나옵니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-24-gaid-ui-audit/figures/01-hub-headers.png" width="120"> | 2026-10-24 01:19 | [10월 22~23일에 바뀐 화면을 UI 가이드 v2로 점검하고 고침](2026-10-24-gaid-ui-audit/index.md) | 22~23일 작업으로 바뀐 화면 30여 개를 두 스타일·두 테마·두 창 크기로 찍어 가이드와 대조했습니다. 위반 31건 가운데 26건을 고쳤고, 남은 5건은 다듬기 수준이라 목록으로 남겼습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-stages/figures/start-stages-model.png" width="120"> | 2026-10-23 | [Workflow를 분석 흐름 단계로 나누고 시작 창 단계를 7칸 이하로 줄임](2026-10-23-gaid-workflow-stages/index.md) | Workflow는 이제 자료 준비 → 처리·모델링 → 평가 → 해석처럼 분석 흐름에 따라 3~5단계로 만들어지고, 시작 창은 소개·단계·요약을 7칸 이하로 보입니다. 포천 Workflow는 23칸에서 다시 만든 초안 기준 7칸이 되었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-cite-scope/figures/01-start-window-papers.png" width="120"> | 2026-10-23 23:31 | [Workflow의 근거 논문을 프로젝트 인용 범위에 붙여 서재·Workflow·노트를 잇기](2026-10-23-gaid-workflow-cite-scope/index.md) | 허브 Workflow를 시작할 때 근거 논문을 연구자 동의를 받아 인용 범위에 붙이고, 노트가 그 논문을 인용해 서재에서 논문·Workflow·노트가 서로 이어집니다. 허브 등록 창은 함께 공유되는 예제 자료를 파일별로 보여 줍니다. | 검토 전 | 미정 | 0 |
@@ -18,7 +19,6 @@
 | <img src="2026-10-23-gaid-note-library/figures/01-library-notes.png" width="120"> | 2026-10-23 16:35 | [정리 노트를 서재에 넣고 다시 프로젝트에서 열기](2026-10-23-gaid-note-library/index.md) | 정리 노트를 논문과 따로 나뉜 종류로 서재에 넣고, 폴더에 넣고, 프로젝트에서 다시 열 수 있습니다. 노트 파일이 원본입니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-example/figures/01-setup-input.png" width="120"> | 2026-10-23 16:25 | [Workflow 예제 자료, 내 자료가 없어도 분석 시작하기](2026-10-23-gaid-workflow-example/index.md) | Workflow가 입력마다 예제 자료를 함께 제공하고, 연구자가 자기 파일을 고르지 않으면 예제 자료로 분석을 시작하며 그 사실을 지침과 채팅에 적습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-authoring-sources/figures/01-sources.png" width="120"> | 2026-10-23 15:56 | [Workflow 만들기에 여러 자료와 자료 파일, 서재 논문, 연구 노트 넣기](2026-10-23-gaid-authoring-sources/index.md) | GAID 허브의 Workflow 만들기가 자료 파일, 서재 논문, 연구 노트를 여러 개 함께 받고, AI agent는 자료 파일을 GAID 자료 검사 요약으로 읽습니다. | 검토 전 | 미정 | 0 |
-| <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-orcid/figures/orcid-import-instrument-light-1440.png" width="120"> | 2026-10-22 | [ORCID 연결, 내 논문 가져오기, 본인 확인](2026-10-22-gaid-orcid/index.md) | 서재에서 ORCID 공개 논문을 골라 "내 논문"으로 넣고, 기관 허브 계정으로 ORCID 본인 확인을 마친 iD를 허브 Workflow 작성자 옆에 표시합니다. 실제 ORCID로 끝까지 확인했습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-22-gaid-hub-feeds/figures/01-feeds.png" width="120"> | 2026-10-22 | [GAID 허브 자료 소식: 관리자가 승인한 출처의 논문·도구·스킬 소식](2026-10-22-gaid-hub-feeds/index.md) | 기관 허브 서버가 관리자가 승인한 출처 18곳을 6시간마다 읽고, 연구자는 GAID 허브의 "자료 소식"에서 원문 제목과 피드 요약을 봅니다. 기관 허브 서버를 이번 변경으로 갱신하고 출처를 승인하는 일이 남았습니다. | 검토함 10-23 | 채택 | 1 |
 | <img src="2026-10-22-gaid-first-use-fixes/figures/01-table-before-after.png" width="120"> | 2026-10-22 22:13 | [처음 쓰는 연구자가 막힌 화면 문제 8건 수정](2026-10-22-gaid-first-use-fixes/index.md) | 수용 시험에서 처음 쓰는 연구자가 막힌 화면 문제 8건의 원인을 찾아 고쳤고, 7건은 실제 앱 화면에서, 같은 이름 모델 1건은 시험 앱의 모델 목록을 넣은 자동 시험으로 확인했습니다. | 검토 전 | 미정 | 0 |
@@ -68,10 +68,11 @@
 | <img src="2026-10-11-gaid-runtime/figures/01-start-prompt.png" width="120"> | 2026-10-11 13:35 | [GeoAIDesk 실행 기반 — 고정 카탈로그, 준비된 환경, 파일 요약, 로컬 모델 설정 (WP03 gaid-runtime)](2026-10-11-gaid-runtime/index.md) | 앱이 skill_hub 카탈로그 0.2.0을 해시로 확인해 설치하고, 지질 패키지를 미리 갖춘 환경과 파일 요약·대용량 읽기 안내를 제공하며, 채팅마다 시작 프롬프트 크기를 보여 줍니다. 다만 도구 설명만 약 19K 토큰이라 32K 로컬 모델은 여전히 부족합니다. | 검토함 10-11 | 채택 | 2 |
 | <img src="2026-10-11-gaid-fork-base/figures/01-workspace.png" width="120"> | 2026-10-11 11:35 | [GeoAIDesk 배포 기반 (WP02 gaid-fork-base)](2026-10-11-gaid-fork-base/index.md) | 새 checkout에서 한 줄 명령으로 설치·실행되고, 중지·재시작 후에도 프로젝트가 남으며, 사용자 자료는 소스 밖에 저장됩니다. | 검토함 10-11 | 미정 | 0 |
 
-<details><summary>대체된 보고서 1건</summary>
+<details><summary>대체된 보고서 2건</summary>
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | — | 대체됨 → 2026-10-24-gaid-promo-video-v3 | 0 |
 | <img src="2026-10-23-gaid-promo-video/figures/01-motion.png" width="120"> | 2026-10-23 01:11 | [GAID 90초 홍보 영상 (내부 검토용)](2026-10-23-gaid-promo-video/index.md) | 모션그래픽과 실제 GAID 화면을 섞은 90초 무음 영상을 만들었습니다. 서재, shp 지도 뷰어, GAID 허브를 실제 화면으로 보여 주고, 차트의 수치는 모두 실제 기록에서 가져왔습니다. | — | 대체됨 → 2026-10-23-gaid-promo-video-v2 | 0 |
 
 </details>
