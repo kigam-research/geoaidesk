@@ -136,7 +136,7 @@
   },
   "sources": {
     "title": "Upload sources",
-    "drop": "Drop a paper PDF or a code archive (.zip, .tar.gz).",
+    "drop": "Drop paper PDFs, code archives or data files. You can add several at once.",
     "pick": "Choose files",
     "goal": "What to make",
     "goalPlaceholder": "e.g. an exploration Workflow for grid data from another region",
@@ -168,8 +168,31 @@
     "agentModel": "Agent model",
     "agentModelDefault": "Default model from Settings",
     "agentModelHint": "Used to read the sources, ask questions and write the draft.",
+    "agentThinking": "Reasoning",
+    "agentThinkingDefault": "Default (medium)",
+    "agentThinking_low": "Low",
+    "agentThinking_medium": "Medium",
+    "agentThinking_high": "High",
+    "agentThinking_xhigh": "Extra high",
+    "agentThinkingHint": "Higher levels take longer and use more tokens.",
     "readDone": "The sources have been read. Next, answer the questions that decide the Workflow.",
-    "next": "Answer the questions"
+    "next": "Answer the questions",
+    "dropHint": "Data files: CSV, XLSX, LAS, Shapefile, GeoTIFF, GeoPackage, NetCDF. For a Shapefile, choose the .shp with its .shx, .dbf and .prj. Up to 30 MiB per source.",
+    "fromLibrary": "Add from library",
+    "addedData": "{name} · {count, plural, one {# data file} other {# data files}}",
+    "addedNote": "{name} · research note",
+    "addedNoteCopy": "{name} · research note (library copy)",
+    "addedLibraryPaper": "{name} · library paper, {pages} pages",
+    "addedLibraryAbstract": "{name} · library paper (abstract only)",
+    "unread": "The content could not be read.",
+    "fact_columns": "{count, plural, one {# column} other {# columns}}",
+    "fact_rows": "{count, plural, one {# row} other {# rows}}",
+    "fact_curves": "{count, plural, one {# curve} other {# curves}}",
+    "fact_bands": "{count, plural, one {# band} other {# bands}}",
+    "fact_features": "{count, plural, one {# feature} other {# features}}",
+    "crsUnknown": "No CRS",
+    "moreData": "{count} more data files",
+    "list": "Added sources"
   },
   "reading": {
     "title": "Reading sources",
@@ -181,7 +204,9 @@
     "note": "Reading continues if you close this screen. Reopen it from 'Workflows I made' on the hub home. A long paper takes several minutes or more.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
-    "retry": "Run analysis again"
+    "retry": "Run analysis again",
+    "dataFiles": "Read summaries of {count, plural, one {# data file} other {# data files}}",
+    "notes": "{count, plural, one {# research note} other {# research notes}} received"
   },
   "questions": {
     "title": "Answer questions",
@@ -190,6 +215,8 @@
     "recommended": "Recommended",
     "other": "Other",
     "otherPlaceholder": "Write a different answer.",
+    "addToOption": "Add to the chosen answer",
+    "addToOptionPlaceholder": "Add a condition or note. You can leave this empty.",
     "answer": "Your answer",
     "answerPlaceholder": "Write your answer.",
     "defer": "Decide later",
@@ -322,7 +349,9 @@
     "environment": "Run environment",
     "openProject": "Open the project",
     "extraPackages": "Python libraries outside the prepared environment: {packages}. The AI agent installs them during analysis following the skill instructions. If installation is blocked, that step stops.",
-    "optionalPackage": "{name} (optional step)"
+    "optionalPackage": "{name} (optional step)",
+    "example": "Without an uploaded file, the example data is used: {title}",
+    "exampleAlso": "The start settings also offer the example data: {title}"
   },
   "register": {
     "open": "Preview hub page",
@@ -496,5 +525,97 @@
     "busy": "Restoring",
     "failed": "Could not restore the Workflow. Check your permissions and connection, then try again.",
     "restored": "“{title}” is back in hub lists."
+  },
+  "example": {
+    "heading": "Example data",
+    "line": "Add example data to each input so researchers who try the Workflow can run it without their own data.",
+    "size": {
+      "mib": "{n} MiB",
+      "kib": "{n} KiB"
+    },
+    "synthetic": "Synthetic data",
+    "bundled": {
+      "badge": "Included in the Workflow",
+      "tooltip": "The files ship with the Workflow and are copied into the project at start."
+    },
+    "remote": {
+      "badge": "Downloaded on first use",
+      "tooltip": "Downloaded from the public URL on first use and checked against the file recorded when it was added."
+    },
+    "source": "Source: {source}",
+    "meta": "{size}, {files} files",
+    "license": "Terms of use: {license}",
+    "noLicense": "No terms of use given.",
+    "removeAsk": "The new draft drops this example data. Earlier drafts and registered versions keep it.",
+    "remove": {
+      "action": "Remove example data",
+      "confirm": "Make draft without it"
+    },
+    "cancel": "Cancel",
+    "edit": {
+      "action": "Edit description",
+      "title": "Edit example data description",
+      "save": "Save description"
+    },
+    "replace": {
+      "action": "Replace with other data"
+    },
+    "add": {
+      "action": "Add example data",
+      "title": "Add example data",
+      "save": "Add example data"
+    },
+    "none": "No example data.",
+    "from": {
+      "label": "Take from",
+      "upload": "Files on this PC",
+      "source": "Draft sources",
+      "url": "Public URL"
+    },
+    "upload": {
+      "label": "Files to upload (you can pick several)",
+      "hint": "Each file is at most {mib} MiB. Add larger data by public URL.",
+      "tooLarge": "A file is larger than {mib} MiB. Add larger data by public URL."
+    },
+    "sourceList": {
+      "pick": "Source",
+      "filter": "Find by file name",
+      "more": "{count} more files. Find them by name.",
+      "none": "No source lists files. Add an archive or data bundle in the sources step first."
+    },
+    "url": {
+      "label": "Public URLs (one per line)",
+      "hint": "Enter https URLs that open without a login. GAID downloads each once now, records its size and check value, and does not keep the file."
+    },
+    "field": {
+      "title": "Title",
+      "source": "Source",
+      "sourceHint": "Provider, citation or how it was made",
+      "license": "Terms of use (optional)",
+      "licenseHint": "e.g. CC BY 4.0",
+      "synthetic": "Synthetic data made by simulation"
+    },
+    "checking": "Checking URL",
+    "saving": "Saving"
+  },
+  "library": {
+    "title": "Add sources from the library",
+    "description": "Papers go in with their PDF text, research notes with their text and figures. A paper without a PDF goes in with its reference and abstract only.",
+    "category": "Source type",
+    "papers": "Papers",
+    "notes": "Research notes",
+    "search": "Search by title, author or project",
+    "loading": "Loading the library.",
+    "noMatch": "No items match.",
+    "emptyPapers": "The library has no papers.",
+    "emptyNotes": "The library has no research notes. Bring them in from the research notes screen.",
+    "selected": "{count} selected",
+    "cancel": "Cancel",
+    "addAction": "Add {count}",
+    "adding": "Adding",
+    "skipped": "{count, plural, one {# item was} other {# items were}} not added.",
+    "otherPc": "Note on another PC",
+    "noPdf": "No PDF",
+    "addEmpty": "Add"
   }
 }

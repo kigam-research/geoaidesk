@@ -27,6 +27,8 @@ import { GAID_METHOD_SCHEMA } from "../../../../web/src/geo/contracts/methods.ts
 import { lintProfile, type AtlasProfile, type LintFinding } from "./profile-lint.ts";
 import { headingMismatch, structuredDraft, workflowProblems } from "./workflow.ts";
 import { safeRelative, sourceFile } from "./sources.ts";
+import { bundledBytes, exampleFileBytes, packagedExample, packagedWorkflow } from "./examples.ts";
+import { EXAMPLE_LIMITS, exampleProblems } from "../../../../web/src/geo/contracts/workflow-examples.ts";
 import { AuthoringError, type AuthoringStore } from "./store.ts";
 import { HUB_INPUTS_DIR, type Vocabulary } from "./vocabulary.ts";
 
@@ -77,6 +79,16 @@ workflowProperties.steps = { type: "array", minItems: 3, maxItems: 12, items: {
   properties: { id: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, title: textSchema, does: textSchema,
     skill: { type: ["string", "null"] }, read: { anyOf: [textSchema, { type: "null" }] }, checks: textList, choiceIds: idList, outputs: idList },
 } };
+// gaid-workflow-example: an input role may carry default example data (contract workflow-examples.ts).
+const inputRoleProperties = (workflowProperties.inputRoles as { items: { properties: Record<string, unknown> } }).items.properties;
+inputRoleProperties.example = {
+  type: "object", required: ["title", "source", "files"], additionalProperties: false,
+  properties: { title: textSchema, source: textSchema, license: { type: "string", maxLength: 500 }, synthetic: { type: "boolean" },
+    files: { type: "array", minItems: 1, maxItems: EXAMPLE_LIMITS.files, items: {
+      type: "object", required: ["name", "sha256", "size"], additionalProperties: false,
+      properties: { name: { type: "string", minLength: 1, maxLength: 128 }, sha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
+        size: { type: "integer", minimum: 0 }, path: { type: "string" }, url: { type: "string", maxLength: 2048 } } } } },
+};
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 ajv.addSchema(atlasSchema);
 ajv.addSchema(methodSchema);
@@ -99,8 +111,13 @@ function inventory(files: DraftFile[]): PackageFile[] {
       path: f.path,
       sha256: digest(bytes),
       size: bytes.length,
+      // Example data is neither instructions nor code: no text-based checks read it.
       text:
-        f.encoding === "utf8" || /\.(?:py|md|ya?ml|txt|json|sh)$/i.test(f.path) ? bytes.toString("utf8") : undefined,
+        f.path.startsWith("examples/")
+          ? undefined
+          : f.encoding === "utf8" || /\.(?:py|md|ya?ml|txt|json|sh)$/i.test(f.path)
+            ? bytes.toString("utf8")
+            : undefined,
     };
   });
 }
@@ -266,6 +283,14 @@ export async function draftFiles(
       throw new AuthoringError(`원본과 코드 파일이 다릅니다: ${file.sourcePath}`);
     put(file.path, bytes);
   }
+  // Bundled example data of the Workflow's inputs, verified against the bytes recorded when it was attached.
+  for (const role of draft.workflow?.inputRoles ?? [])
+    for (const file of role.example?.files ?? [])
+      if (file.path) {
+        if (file.path !== `examples/${role.id}/${file.name}`)
+          throw new AuthoringError(`예제 자료 파일 경로를 확인해 주세요: ${file.path}`);
+        put(file.path, await exampleFileBytes(ctx.store, project, file));
+      }
   return files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 }
 
@@ -297,6 +322,9 @@ const PLAIN: Record<string, string> = {
   description: "스킬을 언제 쓰는지 설명이 필요합니다.",
   lines: "스킬 본문이 너무 깁니다.",
   "package-limit": "패키지 크기나 파일 수가 제한을 넘습니다.",
+  "example-invalid": "예제 자료의 제목·출처·파일 정보를 확인해 주세요.",
+  "example-total": "Workflow에 넣은 예제 자료가 모두 합쳐 15 MiB를 넘습니다. 큰 자료는 공개 주소로 바꿔 주세요.",
+  "example-file": "예제 자료 파일을 찾을 수 없거나 처음 넣은 파일과 다릅니다. 예제 자료를 다시 넣어 주세요.",
 };
 const withPlain = (findings: CheckFinding[]): CheckFinding[] =>
   findings.map((f) => (PLAIN[f.code] ? { ...f, plain: PLAIN[f.code] } : f));
@@ -323,6 +351,24 @@ export async function checkMethod(
     );
   if (!/^[a-z0-9][a-z0-9-]{1,62}$/.test(draft.slug))
     find("schema", "slug", "slug", "스킬 이름은 2~63자의 영문 소문자·숫자·하이픈이어야 합니다.");
+  // Example data first: a missing or changed file would otherwise surface as a generic file error.
+  let exampleBytesMissing = false;
+  for (const role of draft.workflow?.inputRoles ?? []) {
+    if (!role.example) continue;
+    const at = `workflow/inputRoles/${role.id}/example`;
+    for (const problem of exampleProblems(packagedExample(role.example), role.id)) find("workflow", "example-invalid", at, problem);
+    for (const file of role.example.files)
+      if (file.path)
+        try {
+          await exampleFileBytes(ctx.store, project, file);
+        } catch (e) {
+          exampleBytesMissing = true;
+          find("workflow", "example-file", at, (e as Error).message);
+        }
+  }
+  if (bundledBytes(draft.workflow) > EXAMPLE_LIMITS.bundledTotal)
+    find("workflow", "example-total", "workflow/inputRoles", `번들 예제 자료가 ${EXAMPLE_LIMITS.bundledTotal} 바이트를 넘습니다.`);
+  if (exampleBytesMissing) return withPlain(findings);
   let files: DraftFile[];
   try {
     files = await draftFiles(project, draft, ctx);
@@ -461,7 +507,7 @@ export async function checkMethod(
       if (headingMismatch(draft.instructions, w.steps ?? [], draft.slug))
         find("workflow", "workflow-headings", "SKILL.md#처리 절차", "Workflow 단계와 SKILL.md 처리 절차의 절 제목·순서가 다릅니다. 단계 이름과 읽을 절을 맞춰 주세요.", "warning");
     }
-    if (!validateWorkflow(w))
+    if (!validateWorkflow(packagedWorkflow(w)))
       for (const e of validateWorkflow.errors ?? [])
         find("workflow", "workflow-schema", `workflow${e.instancePath}`, `${e.message} ${JSON.stringify(e.params)}`);
     if (w.skillIds?.[0] !== `local:${draft.slug}`)
@@ -673,7 +719,7 @@ export async function buildPackage(
       ...(s.documentKind ? { documentKind: s.documentKind } : {}),
       ...(project.extractions[s.id]?.pages ? { pages: project.extractions[s.id].pages } : {}),
     })),
-    workflows: draft.workflow ? [draft.workflow] : [],
+    workflows: draft.workflow ? [packagedWorkflow(draft.workflow)] : [],
     recipes:
       draft.recipe && draft.workflow
         ? [

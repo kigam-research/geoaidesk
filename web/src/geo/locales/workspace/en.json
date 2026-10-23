@@ -77,7 +77,11 @@
       "other": "Other (another project file)",
       "otherField": "Project file",
       "pick": "Choose a file",
-      "none": "Do not use"
+      "none": "Do not use",
+      "upload": "Upload my files",
+      "uploading": "Uploading files",
+      "uploadFailed": "Could not upload the files. Upload them again.",
+      "emptyExample": "No project file has a matching format. Upload your own files or use the example data below."
     },
     "choice": {
       "other": "Other (type it)",
@@ -130,6 +134,23 @@
       "examples": "If example values in the instruction (target, resolution, data size) differ from the settings above or the input files, follow those and point out the difference first.",
       "boundary": "Interpretation limits: {boundary}",
       "review": "The results have not been reviewed. Do not label run completion as review completion."
+    },
+    "example": {
+      "use": "Use example data: {title}",
+      "badge": "Example data",
+      "synthetic": "Synthetic data",
+      "source": "Source: {source}",
+      "license": "Terms of use: {license}",
+      "bundled": "Included in the Workflow ({size}). Copied into the project on start.",
+      "download": "Downloads {size} on start and checks its hash.",
+      "present": "Already in the project ({size}).",
+      "broken": "The Workflow's example file is missing or differs from its record. Choose your own file.",
+      "value": "Example data: {title}",
+      "summary": "{count, plural, one {One input uses the Workflow's example data. The results and research note state that example data was used.} other {# inputs use the Workflow's example data. The results and research note state that example data was used.}}",
+      "summaryDownload": "Downloads {size} on start.",
+      "mixed": "Example data and your own data are used together. The example data covers the example area, so its area or CRS may differ from your data.",
+      "preparing": "Preparing example data",
+      "failed": "Could not prepare the example data. Try again or choose your own file."
     }
   },
   "recipe": {

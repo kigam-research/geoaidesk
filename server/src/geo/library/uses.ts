@@ -61,7 +61,8 @@ export function scopeFolders(literature: ProjectLiterature, collections: Pick<Li
  */
 export function projectItems(literature: ProjectLiterature, items: LibraryItem[], collections: Pick<LibraryCollection, "id" | "parentId">[] = []): LibraryItem[] {
   const ids = new Set(literature.itemIds), cols = scopeFolders(literature, collections);
-  return items.filter((i) => !i.removedFromSourceAt && (ids.has(i.id) || (i.aliases?.ids ?? []).some((a) => ids.has(a)) || i.collectionIds.some((c) => cols.has(c))));
+  // Research notes are not references, so never part of a citation scope.
+  return items.filter((i) => !i.removedFromSourceAt && i.kind !== "note" && (ids.has(i.id) || (i.aliases?.ids ?? []).some((a) => ids.has(a)) || i.collectionIds.some((c) => cols.has(c))));
 }
 
 /** True when the project has attached anything (otherwise the whole library counts for its citations). */
@@ -118,13 +119,27 @@ export interface UsesIndex {
  * One pass over all projects. `workflowUses` supplies hub authoring links (drafts made from a library item); it is
  * injected so this module does not depend on the authoring store.
  */
-export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => [], collections: Pick<LibraryCollection, "id" | "parentId">[] = []): UsesIndex {
+export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => [], collections: Pick<LibraryCollection, "id" | "parentId">[] = [], instanceId?: string): UsesIndex {
   const byKey = new Map<string, LibraryItem>();
   for (const item of items) for (const key of item.aliases?.citationKeys ?? []) byKey.set(key, item);
   for (const item of items) if (item.citationKey) byKey.set(item.citationKey, item);
   const uses = new Map<string, LibraryUse[]>();
   const push = (id: string, use: LibraryUse) => uses.set(id, [...(uses.get(id) ?? []), use]);
-  for (const project of listProjects()) {
+  // Research notes in the library: a local note's citing row links to its item; a note whose project is not here
+  // (another PC, through hub sync) cites through its item's last snapshot.
+  const noteItems = items.filter((i) => i.kind === "note" && i.note && !i.removedFromSourceAt);
+  const projects = listProjects();
+  const here = new Set(projects.map((p) => p.id));
+  const localNote = new Map<string, string>();
+  for (const n of noteItems) {
+    const ref = n.note!;
+    if (instanceId && ref.origin === instanceId && here.has(ref.projectId)) { localNote.set(`${ref.projectId}\u0000${ref.noteId.normalize("NFC")}`, n.id); continue; }
+    const locators = new Map<string, string[]>();
+    for (const c of ref.citations) if (c.itemId) locators.set(c.itemId, [...(locators.get(c.itemId) ?? []), ...c.locators]);
+    for (const [id, locs] of locators)
+      push(id, { kind: "note", projectId: ref.projectId, projectName: ref.projectName, noteId: ref.noteId, title: n.csl.title, locators: [...new Set(locs)], libraryItemId: n.id, remote: true });
+  }
+  for (const project of projects) {
     let paths: ProjectPaths;
     try { paths = resolvePaths(project.id); } catch { continue; }
     const literature = readProjectLiterature(paths);
@@ -136,8 +151,9 @@ export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: Librar
         if (!item) continue;
         locators.set(item.id, [...(locators.get(item.id) ?? []), ...(c.locator ? [c.locator] : [])]);
       }
+      const libraryItemId = localNote.get(`${project.id}\u0000${note.noteId}`);
       for (const [id, locs] of locators)
-        push(id, { kind: "note", projectId: project.id, projectName: project.name, noteId: note.noteId, title: note.title, locators: [...new Set(locs)] });
+        push(id, { kind: "note", projectId: project.id, projectName: project.name, noteId: note.noteId, title: note.title, locators: [...new Set(locs)], ...(libraryItemId ? { libraryItemId } : {}) });
     }
   }
   return {

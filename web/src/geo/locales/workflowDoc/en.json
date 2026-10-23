@@ -22,7 +22,15 @@
     "choiceOpen": "{label}: set by the researcher",
     "inputAsk": "{label} ({need})",
     "cliArguments": "The values after the command are the researcher's settings:",
-    "cliAsk": "Before you start, ask the researcher for any item below that those values do not give."
+    "cliAsk": "Before you start, ask the researcher for any item below that those values do not give.",
+    "syntheticTitle": "{title} (synthetic data)",
+    "researcherPicksExample": "chosen by the researcher. If none is chosen, the Workflow's example data is used: {title}",
+    "exampleUsed": "{path} (the Workflow's example data: {title}. Source: {source})",
+    "examplesUsed": "These inputs are not the researcher's data but example data supplied with the Workflow: {labels}",
+    "exampleRule": "When running on example data, state at the top of the answer, the result files and the research note that example data was used. Do not present results for the example area as conclusions about the researcher's study area.",
+    "cliExample": "If no value is given, use the Workflow's example data: {title} (source: {source}). Files: {files}",
+    "cliExampleBundled": "{path} in the folder of skill {skill}",
+    "cliExampleRemote": "{url} (after downloading, check size {size} bytes and sha256 {sha256})"
   },
   "need": {
     "required": "required",
@@ -60,6 +68,7 @@
     "expand": "Show instructions",
     "collapse": "Hide instructions",
     "remove": "Remove Workflow",
-    "pendingHint": "When you send, these Workflow instructions go first and what you type follows them."
+    "pendingHint": "When you send, these Workflow instructions go first and what you type follows them.",
+    "example": "Runs on example data"
   }
 }

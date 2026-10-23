@@ -4,8 +4,10 @@
  *   GET  /geo/methods/trials?skill=<name>     trials (chats started from a method workflow), newest first
  *   GET  /geo/methods/trials/:sessionId       one trial with observations from its provenance log
  *   PUT  /geo/methods/trials/:sessionId/assessment  { outcome, note } the researcher's assessment
+ *   POST /geo/methods/examples                { method, workflowId, roleIds } write a Workflow's example data into the
+ *                                            project (copy or bounded download, hash checked; gaid-workflow-example)
  * Installation stays in the existing skill preview/acknowledgement/install gate;
- * none of these routes installs, prepares an environment or sends a prompt.
+ * none of these routes installs a skill, prepares an environment or sends a prompt.
  */
 import { hubSuspendedLookup } from "../methods/hub-pin-install.ts";
 import { installedMethods } from "../methods/local-methods.ts";
@@ -15,12 +17,16 @@ import type { LocalMethodsResponse, MethodTrialsResponse } from "../../../../web
 import { geoCatalogueStatus, loadGeoCatalogue, type GeoCatalogue } from "../catalogue.ts";
 import { geoEnvironmentService, type GeoEnvironmentService } from "../environments.ts";
 import { listLocalMethods } from "../methods/local-methods.ts";
+import { ExampleError, prepareExamples } from "../methods/examples.ts";
+import { currentProjectId } from "../../scope.ts";
 import { assessMethodTrial, getMethodTrial, listMethodTrials, MethodTrialError } from "../methods/trials.ts";
 
 export interface GeoMethodRouteOptions {
   service?: Pick<GeoEnvironmentService, "readiness">;
   catalogue?: () => GeoCatalogue | null;
   paths?: () => ProjectPaths;
+  /** Download implementation for example data (tests). */
+  fetch?: typeof fetch;
 }
 
 function defaultCatalogue(): GeoCatalogue | null {
@@ -37,7 +43,7 @@ export async function registerGeoMethodRoutes(app: FastifyInstance, options: Geo
   const catalogueOf = options.catalogue ?? defaultCatalogue;
   const pathsOf = options.paths ?? activePaths;
   const failure = (reply: FastifyReply, err: unknown) => {
-    if (err instanceof MethodTrialError) return reply.code(err.statusCode).send({ detail: err.message });
+    if (err instanceof MethodTrialError || err instanceof ExampleError) return reply.code(err.statusCode).send({ detail: err.message });
     throw err;
   };
 
@@ -62,6 +68,15 @@ export async function registerGeoMethodRoutes(app: FastifyInstance, options: Geo
     try {
       return assessMethodTrial(pathsOf(), req.params.sessionId, body);
     } catch (err) {
+      return failure(reply, err);
+    }
+  });
+
+  app.post("/geo/methods/examples", { bodyLimit: 16 * 1024 }, async (req, reply) => {
+    try {
+      return await prepareExamples(pathsOf(), currentProjectId(), (req.body ?? {}) as Record<string, unknown>, { fetch: options.fetch });
+    } catch (err) {
+      if (err instanceof Error && err.name === "TimeoutError") return reply.code(504).send({ detail: "Example download timed out" });
       return failure(reply, err);
     }
   });

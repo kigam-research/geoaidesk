@@ -8,19 +8,26 @@ import type {
   AnswersBody,
   AuthoringProject,
   CreateProjectBody,
+  AttachExampleBody,
   Decision,
   EditDraftBody,
+  EditExampleBody,
+  AddNoteSourcesBody,
   InstallBody,
   MethodDraft,
   OperationBody,
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
-import { structuredDraft } from "./workflow.ts";
+import { AUTHORING_THINKING_LEVELS } from "../../../../web/src/geo/contracts/authoring.ts";
+import { attachExample, editExample, removeExample, researcherRevision } from "./examples.ts";
 import { startOperation } from "./agent.ts";
 import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
 import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./package.ts";
-import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
+import { addLibrarySources, addNoteSource, libraryDeps, linkLibraryAuthoring } from "./library-sources.ts";
+import { libraryStore, type LibraryStore } from "../library/store.ts";
+import { zoteroService } from "../library/zotero-service.ts";
+import { addSource, pageImage, pageText, pdftotextVersion, removeSource, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, AuthoringStore, authoringOwner, newId, now } from "./store.ts";
 import { loadVocabulary, type Vocabulary } from "./vocabulary.ts";
 import { activePaths } from "../../projects.ts";
@@ -33,7 +40,17 @@ export interface AuthoringOptions {
   /** Tests: fixed vocabulary and model transport. */
   vocabulary?: Vocabulary;
   chat?: import("./model.ts").ChatFn;
+  /** Tests: bounds of the one-time fetch of a URL example. */
+  remote?: import("./examples.ts").RemoteOptions;
+  /** Tests: the library the handoff reads papers from. */
+  library?: () => LibraryStore;
 }
+
+const HANDOFF_EXTRA = 20;
+const stringList = (v: unknown, max: number): string[] | undefined =>
+  Array.isArray(v) && v.length <= max && v.every((x) => typeof x === "string" && x.length > 0 && x.length <= 255) && new Set(v).size === v.length
+    ? (v as string[])
+    : undefined;
 
 const stores = new WeakMap<FastifyInstance, AuthoringStore>();
 /** The authoring store registered on this app (shared by the hub-shared and authoring-extra routes). */
@@ -47,16 +64,7 @@ const OP_ID = /^[\w-]{6,80}$/;
 
 /** Researcher edit: a new draft revision on top of the latest one; a stale base is refused. */
 export function editDraft(project: AuthoringProject, body: EditDraftBody): MethodDraft {
-  const latest = project.drafts.at(-1);
-  if (!latest) throw new AuthoringError("먼저 방법 초안을 만들어 주세요.", 409);
-  if (body.baseRevision !== latest.revision)
-    throw new AuthoringError("다른 곳에서 초안이 바뀌었습니다. 최신 초안을 다시 불러와 주세요.", 409);
-  const next: MethodDraft = structuredDraft(latest);
-  next.revision = latest.revision + 1;
-  next.baseRevision = latest.revision;
-  next.origin = "researcher";
-  delete next.attemptId;
-  next.createdAt = now();
+  const next: MethodDraft = researcherRevision(project, body.baseRevision);
   // Notes describe server changes still present in the content; keep them with the edited revision.
   const text = (v: unknown, max: number) => {
     if (typeof v !== "string" || !v.trim() || v.length > max)
@@ -76,7 +84,7 @@ export function editDraft(project: AuthoringProject, body: EditDraftBody): Metho
       if (
         !safeRelative(f.path) ||
         !f.path.startsWith("scripts/") ||
-        !extraction?.files?.some((e) => e.path === f.sourcePath && e.text)
+        !extraction?.files?.some((e) => e.path === f.sourcePath && e.text && !e.data)
       )
         throw new AuthoringError("제공한 코드에 없는 파일이거나 경로가 올바르지 않습니다.");
     }
@@ -164,11 +172,22 @@ export async function registerAuthoringRoutes(
   const vocabulary = () => options.vocabulary ?? loadVocabulary();
   const context = (): PackageContext => ({ store, vocabulary: vocabulary(), checker: "gaid-hub" });
   const deps = (body: OperationBody | AnswersBody | undefined, project?: AuthoringProject) => ({
-    config: modelConfig(body?.model ?? project?.model, body?.thinkingLevel),
+    config: modelConfig(body?.model ?? project?.model, body?.thinkingLevel ?? project?.thinkingLevel),
     ...(options.vocabulary ? { vocabulary: options.vocabulary } : {}),
     ...(options.chat ? { chat: options.chat } : {}),
   });
   const id = (params: unknown) => String((params as { id: string }).id);
+  /** The model and reasoning level a call names become the project's, so a reopened screen and later calls keep them. */
+  const rememberModel = async (projectId: string, body: OperationBody | AnswersBody | undefined) => {
+    const model = typeof body?.model === "string" ? body.model.trim() : undefined;
+    const level = AUTHORING_THINKING_LEVELS.find((l) => l === body?.thinkingLevel);
+    if (model === undefined && !level) return;
+    await store.mutate(projectId, (p) => {
+      if (model) p.model = model;
+      else if (model === "") delete p.model;
+      if (level) p.thinkingLevel = level;
+    });
+  };
 
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
@@ -199,28 +218,50 @@ export async function registerAuthoringRoutes(
       reply.code(201).send(await store.create(req.body ?? {})),
     );
     // Hub-side receive (gaid-hub-followups): the chat's "send to the hub draft" bundles the analysis of the request's
-    // project and starts a new method with that bundle as its first source (kind gaid-analysis).
-    scope.post<{ Body: { sessionId?: unknown; files?: unknown; note?: unknown } }>(
-      "/geo/authoring/handoffs",
-      async (req, reply) => {
-        let built: Awaited<ReturnType<typeof buildHandoff>>;
+    // project and starts a new method with that bundle as its first source (kind gaid-analysis). The researcher may add
+    // the project's research notes (`notes`, note ids) and papers from 서재 (`libraryItemIds`); they enter through the
+    // same source functions as in the authoring screen (gaid-authoring-sources).
+    scope.post<{
+      Body: { sessionId?: unknown; files?: unknown; note?: unknown; notes?: unknown; libraryItemIds?: unknown };
+    }>("/geo/authoring/handoffs", async (req, reply) => {
+      const body = req.body ?? {};
+      const notes = body.notes === undefined ? [] : stringList(body.notes, HANDOFF_EXTRA);
+      const itemIds = body.libraryItemIds === undefined ? [] : stringList(body.libraryItemIds, HANDOFF_EXTRA);
+      if (!notes || !itemIds)
+        return reply.code(400).send({ code: "input", error: `Select at most ${HANDOFF_EXTRA} distinct notes and papers` });
+      const paths = activePaths();
+      let built: Awaited<ReturnType<typeof buildHandoff>>;
+      try {
+        built = await buildHandoff(paths, body);
+      } catch (e) {
+        if (e instanceof HandoffError) return reply.code(e.status).send({ code: e.code, error: e.message });
+        throw e;
+      }
+      const note = typeof body.note === "string" ? body.note.trim() : "";
+      const project = await store.create({ title: "분석에서 시작한 방법", ...(note ? { goal: note.slice(0, 2000) } : {}) });
+      await addSource(store, project.id, {
+        name: built.filename,
+        mediaType: "application/gzip",
+        kind: "gaid-analysis",
+        contentBase64: built.archive.toString("base64"),
+      });
+      const skipped: { id: string; reason: string }[] = [];
+      for (const noteId of notes) {
         try {
-          built = await buildHandoff(activePaths(), req.body ?? {});
+          await addNoteSource(store, project.id, { projectId: paths.id, noteId }, undefined, paths);
         } catch (e) {
-          if (e instanceof HandoffError) return reply.code(e.status).send({ code: e.code, error: e.message });
-          throw e;
+          if (!(e instanceof AuthoringError)) throw e;
+          skipped.push({ id: noteId, reason: e.message });
         }
-        const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
-        const project = await store.create({ title: "분석에서 시작한 방법", ...(note ? { goal: note.slice(0, 2000) } : {}) });
-        await addSource(store, project.id, {
-          name: built.filename,
-          mediaType: "application/gzip",
-          kind: "gaid-analysis",
-          contentBase64: built.archive.toString("base64"),
-        });
-        return reply.code(201).send({ projectId: project.id });
-      },
-    );
+      }
+      if (itemIds.length) {
+        const library = (options.library ?? libraryStore)();
+        const added = await addLibrarySources(store, project.id, itemIds, libraryDeps(library, zoteroService(library)));
+        linkLibraryAuthoring(library, added.added.map((a) => a.itemId), project.id);
+        skipped.push(...added.skipped.map((x) => ({ id: x.itemId, reason: x.reason })));
+      }
+      return reply.code(201).send({ projectId: project.id, ...(skipped.length ? { skipped } : {}) });
+    });
     scope.get("/geo/authoring/projects/:id", async (req) => store.read(id(req.params)));
     scope.delete("/geo/authoring/projects/:id", async (req, reply) => {
       await store.archive(id(req.params));
@@ -230,6 +271,21 @@ export async function registerAuthoringRoutes(
     scope.post("/geo/authoring/projects/:id/sources", { bodyLimit: 42 * 1024 * 1024 }, async (req, reply) =>
       reply.code(201).send(await addSource(store, id(req.params), req.body as never)),
     );
+    scope.delete("/geo/authoring/projects/:id/sources/:sid", async (req, reply) => {
+      await removeSource(store, id(req.params), (req.params as { sid: string }).sid);
+      return reply.code(204).send();
+    });
+    // Research notes from GAID projects on this machine (index.md and the figures in the note folder), each one source.
+    scope.post<{ Body: AddNoteSourcesBody }>("/geo/authoring/projects/:id/sources/notes", async (req, reply) => {
+      const notes = req.body?.notes;
+      if (!Array.isArray(notes) || !notes.length || notes.length > 20)
+        throw new AuthoringError("연구 노트를 1~20개 골라 주세요.");
+      const projectId = id(req.params);
+      await store.read(projectId);
+      const added = [];
+      for (const ref of notes) added.push((await addNoteSource(store, projectId, ref)).source);
+      return reply.code(201).send({ sources: added });
+    });
     scope.get("/geo/authoring/projects/:id/sources/:sid/original", async (req, reply) => {
       const project = await store.read(id(req.params));
       const sid = (req.params as { sid: string }).sid;
@@ -285,16 +341,19 @@ export async function registerAuthoringRoutes(
           }
           if (body.target === "skill" || body.target === "workflow" || body.target === "auto") p.target = body.target;
         });
+      await rememberModel(projectId, body);
       const project = await store.read(projectId);
       return reply.code(202).send(await startOperation(store, projectId, "analyze", body.opId, deps(body, project)));
     });
     scope.post<{ Body: OperationBody }>("/geo/authoring/projects/:id/draft", async (req, reply) => {
+      await rememberModel(id(req.params), req.body);
       const project = await store.read(id(req.params));
       return reply
         .code(202)
         .send(await startOperation(store, project.id, "draft", req.body?.opId, deps(req.body, project)));
     });
     scope.post<{ Body: OperationBody }>("/geo/authoring/projects/:id/revise", async (req, reply) => {
+      await rememberModel(id(req.params), req.body);
       const project = await store.read(id(req.params));
       return reply.code(202).send(
         await startOperation(store, project.id, "revise", req.body?.opId, {
@@ -317,6 +376,7 @@ export async function registerAuthoringRoutes(
         return out;
       });
       if (!body.draft) return reply.code(201).send({ decisions });
+      await rememberModel(projectId, body);
       const project = await store.read(projectId);
       const op = project.drafts.length ? "revise" : "draft";
       const attempt = await startOperation(store, projectId, op, `${body.opId}-draft`, {
@@ -333,6 +393,24 @@ export async function registerAuthoringRoutes(
       });
       return reply.code(201).send(draft);
     });
+    // Example data of Workflow inputs (gaid-workflow-example): uploads are base64 in JSON, each file ≤ 10 MiB.
+    scope.post<{ Body: AttachExampleBody }>(
+      "/geo/authoring/projects/:id/examples",
+      { bodyLimit: 32 * 1024 * 1024 },
+      async (req, reply) => reply.code(201).send(await attachExample(store, id(req.params), req.body, options.remote)),
+    );
+    scope.post<{ Body: EditExampleBody }>("/geo/authoring/projects/:id/examples/:roleId", async (req, reply) =>
+      reply
+        .code(201)
+        .send(await editExample(store, id(req.params), String((req.params as { roleId: string }).roleId), req.body)),
+    );
+    scope.post<{ Body: { baseRevision?: number } }>(
+      "/geo/authoring/projects/:id/examples/:roleId/remove",
+      async (req, reply) =>
+        reply
+          .code(201)
+          .send(await removeExample(store, id(req.params), String((req.params as { roleId: string }).roleId), req.body ?? {})),
+    );
     const draftOf = (p: AuthoringProject, rev: unknown) => {
       const d = p.drafts.find((x) => x.revision === Number(rev));
       if (!d) throw new AuthoringError("초안 판을 찾을 수 없습니다.", 404);

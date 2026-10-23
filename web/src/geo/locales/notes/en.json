@@ -69,7 +69,15 @@
     "supersededBy": "A newer note replaces this note.",
     "openSuperseding": {
       "button": "Open newer note"
-    }
+    },
+    "toLibrary": {
+      "button": "Put in library"
+    },
+    "libraryAdded": "Put in the library",
+    "libraryUpdated": "Updated the note in the library",
+    "libraryFailed": "Could not put it in the library. Try again.",
+    "toLibraryTip": "Adds it to the library's research notes. The note file stays here, and the library follows the file.",
+    "more": "More"
   },
   "decision": {
     "title": "Decisions to make",

@@ -1738,6 +1738,8 @@ export interface FilePreviewPanelProps {
   onOpenNotebookFile: (path: string) => void;
   /** Deep-link target from a chat notebook chip (token forces re-focus). */
   notebookFocus?: { id: string; token: number } | null;
+  /** gaid-note-library: research note to open in the notebook tab (token forces re-focus). */
+  researchNoteFocus?: { id: string; token: number } | null;
   /** Scroll the chat transcript to a notebook entry's tool call. */
   onNotebookJumpToChat?: (entryId: string) => void;
   /** gaid-notebook-review: open the chat that wrote a research note. */
@@ -1777,6 +1779,7 @@ export function FilePreviewPanel({
   notebookSubagentCompletions,
   onOpenNotebookFile,
   notebookFocus,
+  researchNoteFocus,
   onNotebookJumpToChat,
   onOpenNotebookChat,
   onOpenNotebookEntry,
@@ -1947,6 +1950,7 @@ export function FilePreviewPanel({
           projectId={projectId}
           streaming={notebookStreaming}
           recordFocusToken={notebookFocus?.token ?? null}
+          noteFocus={researchNoteFocus ?? null}
           onOpenFile={onOpenNotebookFile}
           onOpenChat={onOpenNotebookChat}
           workRecord={

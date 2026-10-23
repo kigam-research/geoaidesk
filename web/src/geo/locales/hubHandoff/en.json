@@ -54,5 +54,9 @@
   "excludedFile": "{path}: {reason, select, policy {path not allowed} unavailable {could not be read} too-large {over 5 MiB} file-limit {over the file limit} other {left out}}",
   "sendHub": "Send to hub draft",
   "sendingHub": "Creating the hub draft.",
-  "openHubDraft": "Open hub draft"
+  "openHubDraft": "Open hub draft",
+  "extras": "Research notes and papers to include",
+  "extrasHelp": "Included only when sending to the GAID hub. The research notes this chat wrote and the library papers attached to the project are preselected. Up to {limit} of each.",
+  "noteLine": "Research note · {date}",
+  "paperLine": "Library paper · {authors} {year}"
 }

@@ -14,6 +14,7 @@ import {
   liveQuestions,
   runningAttempt,
   type AuthoringProject,
+  type AuthoringThinkingLevel,
   type CheckResult,
   type MethodDraft,
   type ProjectSummary,
@@ -28,7 +29,9 @@ import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
 import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 
-import { fileBase64, hubApi, newOpId, HubApiError } from "./api";
+import { addLibrarySources, fileBase64, hubApi, newOpId, HubApiError } from "./api";
+import { LibrarySourcePicker } from "./library-picker";
+import { groupSourceFiles } from "./source-files";
 import { DraftStep, TrialCard } from "./draft-step";
 import { AgentRecordDialog, FeedbackDialog, FilesDialog, IssuesDialog, SourcePageDialog } from "./hub-dialogs";
 import { HubHome } from "./hub-home";
@@ -420,8 +423,13 @@ export function recordedAnswers(p: AuthoringProject): Record<string, DraftAnswer
     if (q.status === "open") continue;
     const d = p.decisions.find((x) => x.questionId === q.id && !x.supersededBy);
     if (!d) continue;
+    const label = q.options.find((o) => o.id === d.optionId)?.label;
     out[q.id] =
-      d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
+      d.status === "deferred"
+        ? { defer: true }
+        : d.optionId
+          ? { optionId: d.optionId, ...(d.response && d.response !== label ? { response: d.response } : {}) }
+          : { response: d.response };
   }
   return out;
 }
@@ -456,7 +464,9 @@ function HubProject({
   const [goal, setGoal] = useState("");
   const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
+  const [agentThinking, setAgentThinking] = useState<AuthoringThinkingLevel | "">("");
   const [uploading, setUploading] = useState<string | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
   const [visualsBusy, setVisualsBusy] = useState(false);
   const [visualSource, setVisualSource] = useState<VisualSourceInfo | null>(null);
@@ -510,6 +520,7 @@ function HubProject({
       setGoal((g) => g || p.goal || "");
       setTarget("workflow");
       setAgentModel((m) => m || p.model || "");
+      setAgentThinking((t) => t || p.thinkingLevel || "");
     } catch (e) {
       setError((e as Error).message);
     }
@@ -627,7 +638,7 @@ function HubProject({
   const title = project.title || text("home.new");
 
   // "" = the app default, sent explicitly so a project created with another model can switch back to the default.
-  const withModel = { model: agentModel };
+  const withModel = { model: agentModel, ...(agentThinking ? { thinkingLevel: agentThinking } : {}) };
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
@@ -635,6 +646,7 @@ function HubProject({
       goal: goal || undefined,
       target,
       ...(agentModel ? { model: agentModel } : {}),
+      ...(agentThinking ? { thinkingLevel: agentThinking } : {}),
     });
     return created.id;
   };
@@ -643,15 +655,25 @@ function HubProject({
     if (!files.length) return;
     try {
       const pid = await ensureProject();
-      for (const file of files) {
-        setUploading(file.name);
-        const kind = /\.(zip|tar\.gz|tgz)$/i.test(file.name) ? "code" : undefined;
-        await hubApi.addSource(pid, {
-          name: file.name,
-          mediaType: file.type || "application/octet-stream",
-          ...(kind ? { kind } : {}),
-          contentBase64: await fileBase64(file),
-        });
+      // Files read together (a shapefile set, a raster with its world file) become one source.
+      for (const upload of groupSourceFiles(files)) {
+        if ("single" in upload) {
+          const file = upload.single;
+          setUploading(file.name);
+          await hubApi.addSource(pid, {
+            name: file.name,
+            mediaType: file.type || "application/octet-stream",
+            contentBase64: await fileBase64(file),
+          });
+        } else {
+          setUploading(upload.name);
+          await hubApi.addSource(pid, {
+            name: upload.name,
+            mediaType: "",
+            contentBase64: "",
+            files: await Promise.all(upload.files.map(async (f) => ({ name: f.name, contentBase64: await fileBase64(f) }))),
+          });
+        }
       }
       if (pid !== id) onCreated(pid);
       else await reload();
@@ -659,6 +681,26 @@ function HubProject({
       toast.error((e as Error).message);
     } finally {
       setUploading(null);
+    }
+  };
+
+  const addFromLibrary = async (itemIds: string[]) => {
+    const pid = await ensureProject();
+    try {
+      const result = await addLibrarySources({ itemIds, authoringId: pid });
+      if (result.skipped.length) toast.error(text("library.skipped", { count: result.skipped.length }));
+    } finally {
+      if (pid !== id) onCreated(pid);
+      else await reload();
+    }
+  };
+
+  const removeSource = async (sourceId: string) => {
+    try {
+      await hubApi.removeSource(id, sourceId);
+      await reload();
+    } catch (e) {
+      toast.error((e as Error).message);
     }
   };
 
@@ -800,15 +842,20 @@ function HubProject({
           target={target}
           onTarget={setTarget}
           onFiles={addFiles}
+          onLibrary={() => setLibraryOpen(true)}
+          onRemove={isNew || running ? undefined : removeSource}
           onUrl={addUrl}
           urls={urls}
           agentModel={agentModel}
           onAgentModel={setAgentModel}
+          agentThinking={agentThinking}
+          onAgentThinking={setAgentThinking}
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}
           onNext={project.findings.length > 0 ? () => setStep("questions") : undefined}
         />
+        <LibrarySourcePicker open={libraryOpen} onOpenChange={setLibraryOpen} onAdd={addFromLibrary} />
       </>
     );
   } else if (current === "questions") {
@@ -892,6 +939,7 @@ function HubProject({
         onShowFiles={() => setDialog("files")}
         onShowIssues={() => setDialog("issues")}
         onRegister={() => setStep("publish")}
+        examples={{ project, onChanged: () => void reload() }}
         rail={
           <TrialCard
             key={`${draft.revision}:${trialProject}`}

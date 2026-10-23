@@ -3,7 +3,7 @@
  * Parts of the Workflow start settings (UI guide Q1–Q6): the grouped step rail, option cards, one step per input
  * file or analysis condition, and the summary. State lives in TaskSetup; these components only render it.
  */
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,11 @@ import type { GeoWorkflowSummary, WorkflowChoice, WorkflowInputRole } from "@/ge
 import { hasGeoText, t } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 import { StepScale } from "@/geo/shell/step-scale";
+import { isExamplePath, sizeText } from "@/geo/contracts/workflow-examples";
 import { accepts, text } from "./api";
 
-/** An input role answer: a fitting file, another project file, or (optional roles only) not used. */
-export type InputAnswer = { mode: "file" | "other"; path: string } | { mode: "none" };
+/** An input role answer: a fitting file, another project file, the Workflow's example data, or (optional roles only) not used. */
+export type InputAnswer = { mode: "file" | "other"; path: string } | { mode: "example" } | { mode: "none" };
 /** An analysis condition answer: a listed option, own text, or decided in the chat (`defer`). */
 export type ChoiceAnswer = { mode: "option" | "other"; value: string } | { mode: "defer" };
 
@@ -37,7 +38,18 @@ export function stepName(step: SetupStep): string {
 
 /** A required input needs a file; an "other" answer needs its text. Unanswered conditions are decided in the chat. */
 export function inputDone(answer: InputAnswer | undefined): boolean {
-  return Boolean(answer && (answer.mode === "none" || answer.path));
+  return Boolean(answer && (answer.mode === "none" || answer.mode === "example" || answer.path));
+}
+
+/** Example data that can be selected (a broken bundled example cannot). */
+export function exampleUsable(role: WorkflowInputRole): boolean {
+  return Boolean(role.example && role.example.state !== "broken");
+}
+
+export { sizeText };
+
+export function exampleTitle(role: WorkflowInputRole): string {
+  return role.example ? text(role.example.title) : "";
 }
 export function choiceDone(answer: ChoiceAnswer | undefined): boolean {
   return Boolean(answer && (answer.mode === "defer" || answer.value.trim()));
@@ -103,18 +115,63 @@ function StepHeading({ id, title, lines }: { id: string; title: string; lines: (
   </div>;
 }
 
-export function InputStep({ role, files, answer, onAnswer }: { role: WorkflowInputRole; files: string[]; answer: InputAnswer | undefined; onAnswer: (answer: InputAnswer) => void }) {
+function ExampleHint({ role }: { role: WorkflowInputRole }) {
+  const example = role.example!;
+  const lines = [
+    t("workspace.setup.example.source", { source: text(example.source) }),
+    example.license ? t("workspace.setup.example.license", { license: example.license }) : null,
+    example.state === "broken" ? t("workspace.setup.example.broken")
+      : example.state === "remote" ? t("workspace.setup.example.download", { size: sizeText(example.download) })
+      : example.state === "present" ? t("workspace.setup.example.present", { size: sizeText(example.size) })
+      : t("workspace.setup.example.bundled", { size: sizeText(example.size) }),
+  ].filter((line): line is string => Boolean(line));
+  return <span className="flex flex-col gap-0.5">{lines.map((line) => <span key={line}>{line}</span>)}</span>;
+}
+
+export function InputStep({ role, files, answer, onAnswer, onUpload }: {
+  role: WorkflowInputRole; files: string[]; answer: InputAnswer | undefined; onAnswer: (answer: InputAnswer) => void;
+  /** Upload the researcher's own files into the project; resolves to the saved project paths. */
+  onUpload?: (files: FileList) => Promise<string[]>;
+}) {
   const id = useId();
-  const fitting = files.filter((path) => accepts(path, role.extensions));
-  const others = files.filter((path) => !accepts(path, role.extensions));
+  const picker = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(false);
+  // Files the server wrote from a Workflow's example data are offered as the example, not as the researcher's own file.
+  const own = files.filter((path) => !isExamplePath(path));
+  const fitting = own.filter((path) => accepts(path, role.extensions));
+  const others = own.filter((path) => !accepts(path, role.extensions));
   const formats = role.extensions.join(", ");
   const otherPath = answer?.mode === "other" ? answer.path : "";
+  const upload = async (list: FileList | null) => {
+    if (!list?.length || !onUpload) return;
+    setUploading(true); setUploadError(false);
+    try {
+      const saved = await onUpload(list);
+      const fit = saved.find((path) => accepts(path, role.extensions));
+      if (fit) onAnswer({ mode: "file", path: fit });
+    } catch { setUploadError(true); }
+    finally { setUploading(false); }
+  };
   return <section aria-labelledby={id} className="space-y-4">
     <StepHeading id={id} title={text(role.label)} lines={[t(role.required ? "workspace.setup.input.required" : "workspace.setup.input.optional", { formats }), role.requiredWhen ? t("workspace.setup.when", { condition: text(role.requiredWhen) }) : null]} />
-    {fitting.length === 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.input.empty")}</p>}
+    {fitting.length === 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t(role.example ? "workspace.setup.input.emptyExample" : "workspace.setup.input.empty")}</p>}
+    {onUpload && <div className="flex flex-wrap items-center gap-2">
+      <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => picker.current?.click()}>
+        {t(uploading ? "workspace.setup.input.uploading" : "workspace.setup.input.upload")}
+      </Button>
+      <input ref={picker} type="file" hidden multiple accept={role.extensions.map((extension) => `.${extension}`).join(",")}
+        aria-label={t("workspace.setup.input.upload")}
+        onChange={(event) => { void upload(event.target.files); event.target.value = ""; }} />
+      {uploadError && <span role="alert" className="text-sm text-destructive">{t("workspace.setup.input.uploadFailed")}</span>}
+    </div>}
     <div role="radiogroup" aria-labelledby={id} className="space-y-2">
       {fitting.map((path) => <OptionCard key={path} selected={answer?.mode === "file" && answer.path === path} onSelect={() => onAnswer({ mode: "file", path })}
           title={baseName(path)} hint={folderName(path)} />)}
+      {role.example && <OptionCard selected={answer?.mode === "example"} onSelect={() => exampleUsable(role) && onAnswer({ mode: "example" })}
+        title={t("workspace.setup.example.use", { title: exampleTitle(role) })}
+        badge={<><Badge variant="outline">{t("workspace.setup.example.badge")}</Badge>{role.example.synthetic && <Badge variant="outline">{t("workspace.setup.example.synthetic")}</Badge>}</>}
+        hint={<ExampleHint role={role} />} />}
       {others.length > 0 && <OptionCard selected={answer?.mode === "other"} onSelect={() => onAnswer({ mode: "other", path: otherPath })} title={t("workspace.setup.input.other")}>
         <select aria-label={t("workspace.setup.input.otherField")} className={fieldClass} value={otherPath} onChange={(event) => onAnswer({ mode: "other", path: event.target.value })}>
           <option value="">{t("workspace.setup.input.pick")}</option>
@@ -147,8 +204,9 @@ export function ChoiceStep({ choice, answer, recipeValue, onAnswer }: { choice: 
   </section>;
 }
 
-export function inputValue(answer: InputAnswer | undefined): string | null {
+export function inputValue(answer: InputAnswer | undefined, role?: WorkflowInputRole): string | null {
   if (!answer) return null;
+  if (answer.mode === "example") return t("workspace.setup.example.value", { title: role ? exampleTitle(role) : "" });
   return answer.mode === "none" ? t("workspace.setup.input.none") : answer.path ? baseName(answer.path) : null;
 }
 export function choiceValue(choice: WorkflowChoice, answer: ChoiceAnswer | undefined): string {

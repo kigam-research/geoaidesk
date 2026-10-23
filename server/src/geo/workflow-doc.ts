@@ -24,6 +24,7 @@ import {
   type WorkflowSkillSource,
 } from "../../../web/src/geo/contracts/workflow-doc.ts";
 import type { GeoCatalogue } from "./catalogue.ts";
+import { exampleProblems, type WorkflowInputExample } from "../../../web/src/geo/contracts/workflow-examples.ts";
 import type { GeoWorkflow } from "./catalogue-types.ts";
 
 const MAX_PROCEDURE_BYTES = 2 * 1024 * 1024;
@@ -108,7 +109,23 @@ function roles(workflow: GeoWorkflow): WorkflowDoc["inputRoles"] {
     formats: strings(role.formats),
     required: role.required === true,
     ...(text((role as { requiredWhen?: unknown }).requiredWhen) ? { requiredWhen: text((role as { requiredWhen?: unknown }).requiredWhen)! } : {}),
+    ...(roleExample(role.id, (role as { example?: unknown }).example)),
   }));
+}
+
+/** A valid declared example as the 지침 shows it; authoring-only fields (`from`) are dropped. Invalid ones are left out. */
+function roleExample(roleId: string, value: unknown): { example?: WorkflowInputExample } {
+  if (value === undefined || exampleProblems(value, roleId).length) return {};
+  const example = value as WorkflowInputExample;
+  return {
+    example: {
+      title: example.title,
+      source: example.source,
+      ...(example.license ? { license: example.license } : {}),
+      ...(example.synthetic ? { synthetic: true } : {}),
+      files: example.files.map(({ name, sha256, size, path, url }) => ({ name, sha256, size, ...(path ? { path } : {}), ...(url ? { url } : {}) })),
+    },
+  };
 }
 
 function choices(workflow: GeoWorkflow): WorkflowChoice[] {

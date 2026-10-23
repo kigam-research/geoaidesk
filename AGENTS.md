@@ -81,6 +81,23 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/cli-export.ts`, `GET /geo/workflows/:id/cli-export`, `GET /geo/hub/entries/:id/cli-export`,
   `web/src/geo/workflow/cli-export.tsx`, namespace `workflowCli`) downloads the 지침 as a prompt/command file (`$ARGUMENTS`)
   plus the skill folders for Pi and Claude Code (verified with the real CLIs); Codex is not offered until verified.
+- Workflow example data (gaid-workflow-example; contract `web/src/geo/contracts/workflow-examples.ts`): a gaid-workflow/v1
+  input role may carry `example` {title, source, license?, synthetic?, files[]}: files bundled in the package at exactly
+  `examples/<roleId>/<name>` (≤ 10 MiB each, ≤ 15 MiB per Workflow) or a public https `url` + sha256 + size (≤ 512 MiB),
+  validated in `method-file.ts`. `GET /geo/methods` reports each example's state (`present|bundled|remote|broken`,
+  `server/src/geo/methods/examples.ts`); `POST /geo/methods/examples` writes it into
+  `user_data/examples/<method>/<roleId>-<key>/` (content-addressed, never overwrites, bounded download, hash checked, recorded
+  as a user upload). The start settings offer it per input next to the researcher's files and an upload, select it when the
+  researcher has no fitting file of their own (optional inputs follow when no own data is used), warn when example and own
+  data are mixed, and the 지침 states which inputs are example data (`settings.examples`, block attribute `data="example"`,
+  card label 예제 자료로 실행). CLI export ships bundled examples inside the skill folder. Workflows without examples are unchanged.
+  Hub authoring (`server/src/geo/authoring/examples.ts`, screen `web/src/geo/hub/example-data.tsx`, namespace `hub.example`):
+  `POST /geo/authoring/projects/:id/examples` attaches an example to a draft input from an upload (bytes at
+  `examples/<sha256>`), a draft data source (`from.sourceId`, re-hashed) or a public URL (fetched once with bounds for
+  sha256/size, bytes not kept); `/examples/:roleId` edits text, `/examples/:roleId/remove` removes; each makes a researcher
+  revision. The coauthor model never sees or writes examples (`carryExamples` moves them by role id). The package puts
+  bundled bytes at `examples/<roleId>/<name>`, drops `from`, checks `example-invalid|example-total|example-file`; packages
+  without examples are byte-identical to before. Editing a registered entry restores bundled bytes from its package.
 - Project workspace state (gaid-project-resume, user decision 2026-10-23: "ProjectSwitcher는 잘 동작하다. "마지막 작업 상태"는 나로
   진행하자."): each project's last workspace (open chat tabs and the active one, per-tab composer settings and draft text, open
   files, panel layout) is kept on the GAID server in `.kady/geo/workspace-state.json` (`GET/PUT /geo/workspace-state`, scoped by
@@ -136,7 +153,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `StoredVisual.dark`; two image calls per picture); picture routes take `?theme=dark`, `ConceptPicture` picks the file for
   the theme and never filters pixels. Older white pictures (no `dark`) sit on `--gaid-pic-mat`; "화면 테마에 맞추기"
   (`GenerateVisualsBody.adapt`) edits them into both files without changing what they show. The chat's analysis bundle becomes a new hub draft through `POST /geo/authoring/handoffs` (source kind
-  `gaid-analysis`); 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
+  `gaid-analysis`; the dialog may add the project's research notes `notes[]` and papers `libraryItemIds[]`);
+  sources (gaid-authoring-sources): several at once, kinds `pdf|code|text|gaid-analysis|web|data|note`; data files (CSV,
+  XLSX, LAS, shapefile sets sent together as `AddSourceBody.files[]` or zipped, GeoTIFF, GeoPackage, NetCDF …) are stored
+  with sha256 per file and summarised through `inspectGeoFile` (`server/src/geo/authoring/data-files.ts`,
+  `CodeFileEntry.data`), also inside code archives and analysis bundles, and the coauthor sees only those summaries; papers
+  and research notes come from 서재 (`POST /geo/library/authoring`, `server/src/geo/authoring/library-sources.ts`; a note
+  whose project is on another PC enters as the library's Markdown copy) or from a project (`POST …/sources/notes`);
+  limits `AUTHORING_SOURCE_LIMITS` (30 MiB per source, 30 sources, 300 MiB per draft); `DELETE …/sources/:sid`; 레시피 defaults need a researcher decision behind them. Web URL sources (`authoring/url-sources.ts`, fetched server-side with bounds) and concept pictures
   (`authoring/visuals.ts`, explicit action only, ledgered as `gaid-hub-visuals`): only the OpenAI Codex (legacy) login,
   `gpt-image-2` on the ChatGPT Codex backend (`authoring/codex-images.ts`), no fallback; a usage limit stops the batch and
   is shown as a notice (user directions 2026-10-16). "Sign in with ChatGPT" tokens cannot generate images. MiniMax
@@ -196,6 +220,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
   and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+  Research notes in 서재 (gaid-note-library, user decision 2026-10-23: GAID library only, hub-synced, no Zotero writes): a note
+  item (`LibraryItem.kind: "note"`, `note: LibraryNoteRef`; `server/src/geo/library/notes.ts`) mirrors one
+  `연구노트/<id>/index.md` (title, date, status, headline, citations resolved to library papers, ≤ 64 KiB text snapshot); the
+  file stays the master and the GAID instance holding the project (`<library>/instance.json`) refreshes the item on library
+  reads and before hub sync (missing file → `missingAt`). Routes `POST /geo/library/notes`, `GET /geo/library/notes/candidates`,
+  list `?kind=note|paper`. Notes are not references: no citation key, not exported, not in folder checks, citation scope,
+  agent `library_*` tools or ORCID matching, never sent to Zotero. Screens: 서재 논문 / 정리 노트 switch
+  (`web/src/geo/library/note-items.tsx`), 정리 노트 가져오기, note detail 더 보기 → 서재에 넣기; 프로젝트에서 열기 goes through
+  `web/src/geo/notes/open-note.ts` (pending request taken by that project's workspace, which opens the notebook tab on the note).
 - ORCID (gaid-orcid phase 1, user decision 2026-10-22): the researcher types an ORCID iD in 서재 (`<library>/orcid.json`, local,
   `authenticated: false`, shown with ORCID's unauthenticated iD icon and "(인증 안 됨)" per ORCID display guidelines) and imports
   public works read anonymously from `https://pub.orcid.org/v3.0` (`server/src/geo/orcid/`, routes `/geo/orcid*` in

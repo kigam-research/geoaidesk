@@ -29,6 +29,7 @@ import { originOfSource, packageStore } from "./package-origin.ts";
 import { hubRefVersion } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { trialCounts } from "./trials.ts";
 import { packageProcedure, workflowDocFor } from "../workflow-doc.ts";
+import { exampleStates } from "./examples.ts";
 
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_METHODS = 200;
@@ -163,6 +164,11 @@ export async function listLocalMethods(
       probes.set(envId, error as Error);
     }
   }));
+  // Example data states per method and Workflow (gaid-workflow-example): hashes are cached, so unchanged files are not re-read.
+  const examples = new Map<string, Awaited<ReturnType<typeof exampleStates>>>();
+  for (const method of methods)
+    for (const workflow of method.file.method?.workflows ?? [])
+      examples.set(`${method.key}:${workflow.id}`, await exampleStates(paths, method, workflow));
   return methods.map((method): LocalMethodSummary => {
     const root = method.scope === "global" ? globalSkillRoot() : projectSkillRoot(paths);
     const provenance = getSkillProvenance(root, method.runtimeName);
@@ -180,8 +186,7 @@ export async function listLocalMethods(
       const readiness = readinessOf(workflow, skills, environment);
       // A local method's run record is GAID's own trial record (no catalogue install record exists), so every
       // screen that shows "untested" agrees with the trial count.
-      return {
-        ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }, workflowDocFor(workflow, {
+      const summary = summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }, workflowDocFor(workflow, {
           version: hubRefVersion(origin.hubEntry),
           skills: workflow.skillIds.map((id, i) => ({
             name: skills[i]?.runtimeName ?? id,
@@ -189,7 +194,11 @@ export async function listLocalMethods(
             source: id.startsWith(LOCAL_SKILL_PREFIX) ? "bundled" as const : "catalogue" as const,
           })),
           procedure: packageProcedure(method.dir),
-        })),
+        }));
+      const states = examples.get(`${method.key}:${workflow.id}`);
+      return {
+        ...summary,
+        inputRoles: summary.inputRoles.map((role) => (states?.has(role.id) ? { ...role, example: states.get(role.id)! } : role)),
         exposure: methodExposure(method.runtimeName, workflow.id),
         trials: tried,
         extraPackages: extraPackages(method.dir, catalogue, workflow.environmentProfile),

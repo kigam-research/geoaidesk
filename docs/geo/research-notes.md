@@ -107,3 +107,14 @@ and `server/src/geo/note-style.ts` copies it into each geo project's `.pi/skills
 provisioned. The copy is the project's: it follows a new shipped version only while unedited, and a deleted or
 disabled copy stays that way. `applyExposure` keeps it offered under every task selection. Chat answers follow
 `REPLY_STYLE_RULE` (a compact Attention Control rule) in the same system-prompt block.
+
+## In the library (서재)
+
+A note can be brought into the researcher's library as a **정리 노트** item, a category separate from papers (user decision
+2026-10-23, gaid-note-library). From the note view: 더 보기 → 서재에 넣기; from 서재: 정리 노트 → 정리 노트 가져오기 (notes of
+every project on this PC). The note file stays the master: the library item keeps the title, date, status, headline, the
+library papers the note cites and a text snapshot (first 64 KiB, no figures), and GAID re-reads the file when the library is
+opened and before institute hub sync. Only the GAID instance whose project holds the note refreshes it; on another PC (hub
+sync) the item shows its last snapshot and cannot be opened in a project. A deleted file keeps the item with "노트 파일 없음".
+Removing the item from the library never touches the file. Note items are never written to Zotero, never exported as
+references and never count as citation scope. 프로젝트에서 열기 opens the project's notebook tab on the note.

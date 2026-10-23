@@ -63,6 +63,7 @@ import { GeoTaskCatalogue } from "@/geo/workspace/task-catalogue";
 import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
+import { onOpenResearchNoteRequest, takeOpenResearchNote } from "@/geo/notes/open-note";
 import { GaidAppBar } from "@/geo/shell/app-bar";
 import { SystemResourcesButton } from "@/geo/shell/system-resources";
 import { focusSearchTarget, shortcutLabel, useShortcut } from "@/geo/shell/shortcuts";
@@ -924,6 +925,21 @@ function WorkspacePage({
     setShowNotebook(true);
     setNotebookFocus({ id: entryId, token: Date.now() });
   }, []);
+  // gaid-note-library: 서재 → "프로젝트에서 열기" opens the notebook tab on that research note.
+  const [researchNoteFocus, setResearchNoteFocus] = useState<{ id: string; token: number } | null>(null);
+  useEffect(() => {
+    if (!isActive) return;
+    const take = () => {
+      const request = takeOpenResearchNote(projectId);
+      if (!request) return;
+      setShowCompute(false);
+      setShowAutomation(false);
+      setShowNotebook(true);
+      setResearchNoteFocus({ id: request.noteId, token: Date.now() });
+    };
+    take();
+    return onOpenResearchNoteRequest(take);
+  }, [isActive, projectId]);
   const [computeFocus, setComputeFocus] = useState<{ id: string; token: number } | null>(null);
   const handleViewCompute = useCallback((jobId?: string) => {
     if (!REMOTE_COMPUTE_ENABLED) return;
@@ -1221,6 +1237,7 @@ function WorkspacePage({
               notebookSubagentCompletions={subagentCompletions}
               onOpenNotebookFile={handleFileSelect}
               notebookFocus={notebookFocus}
+              researchNoteFocus={researchNoteFocus}
               onNotebookJumpToChat={handleNotebookJumpToChat}
               onOpenNotebookChat={(sessionId, title) => { setChatOpen(true); openSession(sessionId, title); }}
               onOpenNotebookEntry={handleViewInNotebook}

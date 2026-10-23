@@ -20,6 +20,7 @@ import type {
 } from "../../../../web/src/geo/contracts/methods.ts";
 import { GAID_METHOD_FILE, GAID_METHOD_SCHEMA, LOCAL_SKILL_PREFIX } from "../../../../web/src/geo/contracts/methods.ts";
 import type { GeoWorkflow, LocalizedText } from "../catalogue-types.ts";
+import { EXAMPLE_LIMITS, exampleProblems } from "../../../../web/src/geo/contracts/workflow-examples.ts";
 
 const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const ATLAS_ID = /^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/;
@@ -125,6 +126,16 @@ function workflow(value: unknown, index: number, runtimeName: string, issues: Me
     add("schemaVersion", "schemaVersion must be geo-workflow/v1 or gaid-workflow/v1");
   }
   if (raw.schemaVersion === "gaid-workflow/v1") gaidWorkflowParts(raw, runtimeName, add);
+  // gaid-workflow-example: an input role may declare default example data (bundled under examples/ or a public URL).
+  let bundled = 0;
+  (list(raw.inputRoles) ?? []).forEach((row, n) => {
+    const role = row as { id?: unknown; example?: unknown } | null;
+    if (!role || role.example === undefined) return;
+    for (const problem of exampleProblems(role.example, String(role.id))) add(`inputRoles[${n}].${problem.split(" ")[0]}`, problem);
+    for (const file of ((role.example as { files?: unknown })?.files as { path?: unknown; size?: unknown }[] | undefined) ?? [])
+      if (file && typeof file.path === "string" && typeof file.size === "number") bundled += file.size;
+  });
+  if (bundled > EXAMPLE_LIMITS.bundledTotal) add("inputRoles", `bundled example files exceed ${EXAMPLE_LIMITS.bundledTotal} bytes`);
   return issues.length === before ? (raw as unknown as GeoWorkflow) : null;
 }
 

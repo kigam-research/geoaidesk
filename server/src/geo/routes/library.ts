@@ -6,8 +6,10 @@ import fs from "node:fs";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
 import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
-import { folderSubtree, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
+import { folderSubtree, isNoteItem, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
 import type {
+  AddLibraryNoteBody,
+  AddLibraryNoteResponse,
   CitationResolution,
   ExportFormat,
   FolderCheckResponse,
@@ -15,15 +17,18 @@ import type {
   CreateLibraryItemBody,
   LibraryItem,
   LibraryListResponse,
+  LibraryItemResponse,
+  LibraryNoteCandidatesResponse,
   LibraryUse,
   UploadedLibraryFile,
 } from "../../../../web/src/geo/contracts/library.ts";
 import { LibraryError, libraryStore, normalizeDoi, cslYear, samePaper, summarize, type LibraryStore } from "../library/store.ts";
 import { readStoredPdf, storedPdf } from "../library/reader.ts";
 import { buildUsesIndex, hasScope, projectItems, projectNoteCitations, readProjectLiterature, scopeFolders, writeProjectLiterature } from "../library/uses.ts";
-import { AuthoringStore } from "../authoring/store.ts";
+import { AuthoringError, AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
+import { addNoteItem, libraryInstance, noteCandidates, noteIsLocal, noteSummary, refreshNoteItems } from "../library/notes.ts";
 
 /** Error code and HTTP status only (never Zotero bodies or keys), shown behind 기술 정보. */
 const zoteroErrorDetail = (error: ZoteroError) => [error.code, error.status ? `HTTP ${error.status}` : ""].filter(Boolean).join(" · ");
@@ -31,7 +36,8 @@ import { arxivDoi, identifyPdf, lookupDoi, resolveUrl, searchByTitle, type Metad
 import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
 import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
-import { addSource } from "../authoring/sources.ts";
+import { addLibrarySources, libraryDeps, linkLibraryAuthoring, readLinks } from "../authoring/library-sources.ts";
+import type { AddLibrarySourcesBody, AddLibrarySourcesResult } from "../../../../web/src/geo/contracts/authoring.ts";
 
 export interface LibraryRouteOptions {
   store?: () => LibraryStore;
@@ -58,16 +64,6 @@ export function referenceList(items: LibraryItem[], locale: "ko" | "en"): string
   return [...items].sort((a, b) => sortKey(a).localeCompare(sortKey(b), locale)).map((i) => formatReference(i.csl, locale)).join("\n") + "\n";
 }
 
-// Library item -> hub authoring drafts made from it. Kept in the library directory so the authoring contract stays as is.
-function linksFile(store: LibraryStore) { return path.join(store.root, "links.json"); }
-function readLinks(store: LibraryStore): Record<string, string[]> {
-  try { return JSON.parse(fs.readFileSync(linksFile(store), "utf8")).authoring ?? {}; } catch { return {}; }
-}
-function writeLinks(store: LibraryStore, authoring: Record<string, string[]>) {
-  const tmp = `${linksFile(store)}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify({ authoring }, null, 2) + "\n");
-  fs.renameSync(tmp, linksFile(store));
-}
 
 export async function registerGeoLibraryRoutes(app: FastifyInstance, options: LibraryRouteOptions = {}): Promise<void> {
   const storeOf = options.store ?? libraryStore;
@@ -96,6 +92,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
       if (error instanceof LibraryError) return reply.code(error.status).send({ error: error.message });
+      if (error instanceof AuthoringError) return reply.code(error.status).send({ error: error.message });
       // Research-language Zotero states (never response bodies or keys); the screen words them.
       if (error instanceof ZoteroError) {
         const refused = error.state === "key-rejected" || error.state === "key-invalid" || error.state === "no-library-access";
@@ -111,16 +108,24 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     scope.get<{ Querystring: Record<string, string | undefined> }>("/geo/library", async (req): Promise<LibraryListResponse> => {
       const store = storeOf(), q = req.query ?? {};
       zoteroOf(store).refreshIfStale();
-      const all = (await store.all()).filter((i) => !i.removedFromSourceAt);
+      // Research notes follow their files (the master); a failed refresh keeps the last snapshot.
+      try { await refreshNoteItems(store); } catch (error) { scope.log.warn({ err: error }, "research-note refresh failed"); }
+      const everything = (await store.all()).filter((i) => !i.removedFromSourceAt);
       const collections = await store.collections();
-      const uses = buildUsesIndex(all, await workflowUses(store), collections);
+      const instance = libraryInstance(store), projectIds = new Set(listProjects().map((p) => p.id));
+      const uses = buildUsesIndex(everything, await workflowUses(store), collections, instance.id);
+      const kind = q.kind === "note" || q.kind === "paper" ? q.kind : undefined;
+      const notes = everything.filter(isNoteItem);
+      const all = everything.filter((i) => !isNoteItem(i));
+      const ofKind = kind === "note" ? notes : kind === "paper" ? all : everything;
       const inProject = q.filter === "project" ? new Set(projectItems(readProjectLiterature(pathsOf()), all, collections).map((i) => i.id)) : undefined;
       // A folder shows its subfolders' papers too.
       const inFolder = q.collectionId ? folderSubtree(collections, q.collectionId) : undefined;
       const terms = (q.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
       const unread = (i: LibraryItem) => i.read.coverage === "none" || i.read.coverage === "abstract";
-      const rows = all
+      const rows = ofKind
         .filter((i) => !q.source || i.source === q.source)
+        .filter((i) => !q.noteStatus || i.note?.status === q.noteStatus)
         .filter((i) => !inFolder || i.collectionIds.some((c) => inFolder.has(c)))
         .filter((i) => q.filter !== "unread" || unread(i))
         .filter((i) => q.filter !== "cited" || uses.counts(i).notes > 0)
@@ -128,7 +133,8 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         .filter((i) => !inProject || inProject.has(i.id))
         .filter((i) => {
           if (!terms.length) return true;
-          const hay = [i.csl.title, i.csl["container-title"], i.csl.abstract, i.citationKey, ...(i.csl.author ?? []).map((a) => `${a.given ?? ""} ${a.family ?? a.literal ?? ""}`), ...i.tags]
+          const hay = [i.csl.title, i.csl["container-title"], i.csl.abstract, i.citationKey, ...(i.csl.author ?? []).map((a) => `${a.given ?? ""} ${a.family ?? a.literal ?? ""}`), ...i.tags,
+            i.note?.projectName, i.note?.markdown]
             .filter((x): x is string => typeof x === "string").join(" ").toLowerCase();
           return terms.every((t) => hay.includes(t));
         })
@@ -136,7 +142,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const limit = Math.min(Math.max(Number(q.limit) || 100, 1), 500), offset = Math.max(Number(q.offset) || 0, 0);
       const z = await store.zotero();
       return {
-        items: rows.slice(offset, offset + limit).map((i) => summarize(i, uses.counts(i))),
+        items: rows.slice(offset, offset + limit).map((i) => summarize(i, uses.counts(i), noteSummary(i, noteIsLocal(i, instance.id, projectIds)))),
         total: rows.length,
         counts: {
           all: all.length,
@@ -145,21 +151,39 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
           unread: all.filter(unread).length,
           cited: all.filter((i) => uses.counts(i).notes > 0).length,
           mine: all.filter((i) => i.ownWork).length,
+          notes: notes.length,
+          notesPending: notes.filter((i) => i.note?.status === "pending").length,
+          notesConfirmed: notes.filter((i) => i.note?.status === "confirmed").length,
         },
         collections,
         folderCounts: Object.fromEntries(collections.map((c) => {
           const sub = folderSubtree(collections, c.id);
-          return [c.id, all.filter((i) => i.collectionIds.some((x) => sub.has(x))).length];
+          return [c.id, ofKind.filter((i) => i.collectionIds.some((x) => sub.has(x))).length];
         })),
         zotero: z.libraries,
       };
     });
 
-    scope.get<{ Params: { id: string } }>("/geo/library/items/:id", async (req) => {
-      const store = storeOf(), item = await store.get(req.params.id);
-      const uses = buildUsesIndex(await store.all(), await workflowUses(store), await store.collections());
-      return { item, uses: uses.usesOf(item) };
+    scope.get<{ Params: { id: string } }>("/geo/library/items/:id", async (req): Promise<LibraryItemResponse> => {
+      const store = storeOf();
+      let item = await store.get(req.params.id);
+      if (isNoteItem(item)) {
+        try { if (await refreshNoteItems(store, [item])) item = await store.get(item.id); } catch (error) { scope.log.warn({ err: error }, "research-note refresh failed"); }
+      }
+      const instance = libraryInstance(store);
+      const uses = buildUsesIndex(await store.all(), await workflowUses(store), await store.collections(), instance.id);
+      return { item, uses: uses.usesOf(item), ...(isNoteItem(item) ? { noteLocal: noteIsLocal(item, instance.id, new Set(listProjects().map((p) => p.id))) } : {}) };
     });
+
+    /** "서재에 넣기" for a research note; the project is the body's or the request scope's. */
+    scope.post<{ Body: AddLibraryNoteBody }>("/geo/library/notes", { bodyLimit: 16 * 1024 }, async (req, reply): Promise<AddLibraryNoteResponse> => {
+      const body = req.body ?? ({} as AddLibraryNoteBody);
+      const projectId = typeof body.projectId === "string" && body.projectId ? body.projectId : pathsOf().id;
+      const result = await addNoteItem(storeOf(), { projectId, noteId: body.noteId, collectionIds: body.collectionIds });
+      reply.code(result.created ? 201 : 200);
+      return result;
+    });
+    scope.get("/geo/library/notes/candidates", async (): Promise<LibraryNoteCandidatesResponse> => noteCandidates(storeOf()));
 
     // PDFs are base64 in JSON like hub authoring sources (64 MiB decoded max).
     scope.post<{ Body: { contentBase64?: unknown } }>("/geo/library/files", { bodyLimit: 90 * 1024 * 1024 }, async (req, reply): Promise<UploadedLibraryFile> => {
@@ -231,7 +255,8 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         folder = folderSubtree(collections, c.id);
         name = c.name.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").slice(0, 60) || "folder";
       }
-      const items = (await store.all()).filter((i) => !i.removedFromSourceAt && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
+      // Research notes are not references: never in a bibliography.
+      const items = (await store.all()).filter((i) => !i.removedFromSourceAt && !isNoteItem(i) && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
       const text = format === "text"
         ? referenceList(items, req.query?.lang === "en" ? "en" : "ko")
         : exportBibliography(items.map((i) => ({ ...numericCslDates(i.csl), ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
@@ -287,7 +312,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       if (!collections.some((c) => c.id === req.params.id)) throw new LibraryError("Folder not found", 404);
       const sub = folderSubtree(collections, req.params.id);
       const all = await store.all();
-      const items = all.filter((i) => i.collectionIds.some((c) => sub.has(c)));
+      const items = all.filter((i) => !isNoteItem(i) && i.collectionIds.some((c) => sub.has(c)));
       const issues: FolderIssue[] = [];
       const one = (kind: Extract<FolderIssue, { itemId: string }>["kind"], i: LibraryItem) => issues.push({ kind, itemId: i.id, title: i.csl.title });
       for (const i of items) {
@@ -375,6 +400,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       }));
     });
 
+    const librarySourceDeps = (store: LibraryStore) => libraryDeps(store, zoteroOf(store));
     /** "이 논문으로 Workflow 만들기": a hub authoring draft with the item's PDF and DOI as its first source. */
     scope.post<{ Params: { id: string } }>("/geo/library/items/:id/authoring", async (req, reply) => {
       const store = storeOf(), item = await store.get(req.params.id), sha = storedPdf(item);
@@ -382,19 +408,32 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const authoring = authoringOf();
       await authoring.initialize();
       const project = await authoring.create({ title: item.csl.title.slice(0, 120) });
-      const doi = normalizeDoi(item.csl.DOI);
-      await addSource(authoring, project.id, {
-        name: `${item.citationKey ?? item.id}.pdf`,
-        mediaType: "application/pdf",
-        kind: "pdf",
-        documentKind: "paper",
-        contentBase64: fs.readFileSync(store.filePath(sha)).toString("base64"),
-        ...(doi ? { doi } : {}),
-      });
-      const links = readLinks(store);
-      links[item.id] = [...new Set([...(links[item.id] ?? []), project.id])];
-      writeLinks(store, links);
+      await addLibrarySources(authoring, project.id, [item.id], librarySourceDeps(store));
+      linkLibraryAuthoring(store, [item.id], project.id);
       return reply.code(201).send({ authoringId: project.id });
+    });
+
+    /**
+     * Several papers and research notes from 서재 as hub authoring sources (gaid-authoring-sources): added to
+     * `authoringId`, or to a new authoring project titled after the first item.
+     */
+    scope.post<{ Body: AddLibrarySourcesBody }>("/geo/library/authoring", async (req, reply): Promise<AddLibrarySourcesResult> => {
+      const body = req.body ?? ({} as AddLibrarySourcesBody);
+      const ids = body.itemIds;
+      if (!Array.isArray(ids) || !ids.length || ids.length > 30 || !ids.every((x) => typeof x === "string" && x.length <= 100) || new Set(ids).size !== ids.length)
+        throw new LibraryError("Choose 1-30 distinct library items", 400);
+      const store = storeOf(), authoring = authoringOf();
+      await authoring.initialize();
+      let authoringId = typeof body.authoringId === "string" ? body.authoringId : undefined;
+      if (authoringId) await authoring.read(authoringId);
+      else {
+        const first = await store.get(ids[0]);
+        authoringId = (await authoring.create({ title: first.csl.title.slice(0, 120) })).id;
+      }
+      const result = await addLibrarySources(authoring, authoringId, ids, librarySourceDeps(store));
+      linkLibraryAuthoring(store, result.added.map((a) => a.itemId), authoringId);
+      reply.code(body.authoringId ? 200 : 201);
+      return result;
     });
   });
 }

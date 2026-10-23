@@ -136,7 +136,7 @@
   },
   "sources": {
     "title": "자료 올리기",
-    "drop": "논문 PDF나 코드 묶음(.zip, .tar.gz)을 끌어 놓으세요.",
+    "drop": "논문 PDF, 코드 묶음, 자료 파일을 끌어 놓으세요. 여러 개를 함께 올릴 수 있습니다.",
     "pick": "파일 선택",
     "goal": "만들고 싶은 것",
     "goalPlaceholder": "예: 다른 지역 격자 자료에 쓸 탐사 Workflow",
@@ -168,8 +168,31 @@
     "agentModel": "에이전트 모델",
     "agentModelDefault": "설정의 기본 모델",
     "agentModelHint": "자료 읽기, 질문, 초안 작성에 쓰는 모델입니다.",
+    "agentThinking": "추론량",
+    "agentThinkingDefault": "기본(보통)",
+    "agentThinking_low": "낮음",
+    "agentThinking_medium": "보통",
+    "agentThinking_high": "높음",
+    "agentThinking_xhigh": "매우 높음",
+    "agentThinkingHint": "높일수록 응답 시간과 토큰 사용량이 늘어납니다.",
     "readDone": "자료를 다 읽었습니다. 다음은 Workflow를 정하는 질문에 답할 차례입니다.",
-    "next": "질문에 답하기"
+    "next": "질문에 답하기",
+    "dropHint": "자료 파일은 CSV, XLSX, LAS, Shapefile, GeoTIFF, GeoPackage, NetCDF를 받습니다. Shapefile은 .shp와 함께 .shx, .dbf, .prj를 고르세요. 자료 하나는 30 MiB까지입니다.",
+    "fromLibrary": "서재에서 추가",
+    "addedData": "{name} · 자료 파일 {count}개",
+    "addedNote": "{name} · 연구 노트",
+    "addedNoteCopy": "{name} · 연구 노트(서재 사본)",
+    "addedLibraryPaper": "{name} · 서재 논문 {pages}쪽",
+    "addedLibraryAbstract": "{name} · 서재 논문(초록만)",
+    "unread": "내용을 읽지 못했습니다.",
+    "fact_columns": "열 {count}개",
+    "fact_rows": "행 {count}개",
+    "fact_curves": "curve {count}개",
+    "fact_bands": "밴드 {count}개",
+    "fact_features": "객체 {count}개",
+    "crsUnknown": "CRS 없음",
+    "moreData": "자료 {count}개 더",
+    "list": "올린 자료"
   },
   "reading": {
     "title": "자료를 읽고 있습니다",
@@ -181,7 +204,9 @@
     "note": "화면을 닫아도 계속 읽습니다. 허브 첫 화면의 '내가 만든 Workflow'에서 다시 열 수 있습니다. 논문이 길면 몇 분 넘게 걸립니다.",
     "failed": "자료를 분석하지 못했습니다. 다시 실행하세요.",
     "interrupted": "앱이 다시 시작되어 분석이 멈췄습니다. 다시 실행하세요.",
-    "retry": "분석 다시 실행"
+    "retry": "분석 다시 실행",
+    "dataFiles": "자료 파일 {count}개 요약 읽음",
+    "notes": "연구 노트 {count}개 받음"
   },
   "questions": {
     "title": "질문에 답하기",
@@ -190,6 +215,8 @@
     "recommended": "권장",
     "other": "기타",
     "otherPlaceholder": "다른 의견을 적으세요.",
+    "addToOption": "고른 답에 덧붙일 말",
+    "addToOptionPlaceholder": "조건이나 설명을 덧붙이세요. 비워 두어도 됩니다.",
     "answer": "답",
     "answerPlaceholder": "답을 적으세요.",
     "defer": "나중에 정하기",
@@ -322,7 +349,9 @@
     "environment": "실행 환경",
     "openProject": "프로젝트 열기",
     "extraPackages": "준비된 환경 밖의 Python 라이브러리: {packages}. 분석할 때 AI agent가 스킬 안내에 따라 설치합니다. 설치가 막힌 PC에서는 해당 단계가 멈춥니다.",
-    "optionalPackage": "{name}(선택 단계)"
+    "optionalPackage": "{name}(선택 단계)",
+    "example": "올린 파일이 없으면 예제 자료를 씁니다: {title}",
+    "exampleAlso": "시작 설정에서 예제 자료도 고를 수 있습니다: {title}"
   },
   "register": {
     "open": "허브 등록 미리보기",
@@ -496,5 +525,97 @@
     "busy": "복원 중",
     "failed": "Workflow를 복원하지 못했습니다. 권한과 연결 상태를 확인한 뒤 다시 시도하세요.",
     "restored": "「{title}」을 허브 목록에 복원했습니다."
+  },
+  "example": {
+    "heading": "예제 자료",
+    "line": "입력마다 예제 자료를 넣으면 시험하는 연구자가 자기 자료 없이도 Workflow를 실행해 볼 수 있습니다.",
+    "size": {
+      "mib": "{n} MiB",
+      "kib": "{n} KiB"
+    },
+    "synthetic": "합성 자료",
+    "bundled": {
+      "badge": "Workflow에 포함",
+      "tooltip": "파일을 Workflow와 함께 배포하고, 시작할 때 프로젝트로 복사합니다."
+    },
+    "remote": {
+      "badge": "처음 쓸 때 내려받음",
+      "tooltip": "공개 주소에서 처음 쓸 때 내려받고, 넣을 때 기록한 파일과 같은지 확인합니다."
+    },
+    "source": "출처: {source}",
+    "meta": "{size}, 파일 {files}개",
+    "license": "이용 조건: {license}",
+    "noLicense": "이용 조건을 적지 않았습니다.",
+    "removeAsk": "새 초안에서 예제 자료를 뺍니다. 이전 초안과 등록한 version에는 남습니다.",
+    "remove": {
+      "action": "예제 자료 빼기",
+      "confirm": "예제 자료 뺀 초안 만들기"
+    },
+    "cancel": "취소",
+    "edit": {
+      "action": "설명 고치기",
+      "title": "예제 자료 설명 고치기",
+      "save": "설명 저장"
+    },
+    "replace": {
+      "action": "다른 자료로 바꾸기"
+    },
+    "add": {
+      "action": "예제 자료 넣기",
+      "title": "예제 자료 넣기",
+      "save": "예제 자료 넣기"
+    },
+    "none": "예제 자료가 없습니다.",
+    "from": {
+      "label": "가져올 곳",
+      "upload": "내 PC 파일",
+      "source": "초안 자료에서",
+      "url": "공개 주소"
+    },
+    "upload": {
+      "label": "올릴 파일 (여러 개 고를 수 있음)",
+      "hint": "파일 하나는 {mib} MiB 이하입니다. 더 큰 자료는 공개 주소로 넣으세요.",
+      "tooLarge": "{mib} MiB를 넘는 파일이 있습니다. 큰 자료는 공개 주소로 넣으세요."
+    },
+    "sourceList": {
+      "pick": "자료",
+      "filter": "파일 이름으로 찾기",
+      "more": "파일 {count}개가 더 있습니다. 이름으로 찾아 고르세요.",
+      "none": "파일 목록이 있는 자료가 없습니다. 자료 단계에서 압축 파일이나 자료 묶음을 먼저 넣으세요."
+    },
+    "url": {
+      "label": "공개 주소 (한 줄에 하나)",
+      "hint": "로그인 없이 열리는 https 주소를 넣으세요. 지금 한 번 받아 크기와 확인값만 기록하고 파일은 보관하지 않습니다."
+    },
+    "field": {
+      "title": "제목",
+      "source": "출처",
+      "sourceHint": "제공 기관, 인용 정보 또는 만든 방법",
+      "license": "이용 조건 (선택)",
+      "licenseHint": "예: CC BY 4.0",
+      "synthetic": "모의 계산으로 만든 합성 자료입니다"
+    },
+    "checking": "주소 확인 중",
+    "saving": "저장 중"
+  },
+  "library": {
+    "title": "서재에서 자료 추가",
+    "description": "고른 논문은 PDF 본문으로, 연구 노트는 글과 그림으로 넣습니다. PDF가 없는 논문은 서지 정보와 초록만 넣습니다.",
+    "category": "자료 종류",
+    "papers": "논문",
+    "notes": "연구 노트",
+    "search": "제목, 저자, 프로젝트로 찾기",
+    "loading": "서재를 불러오는 중입니다.",
+    "noMatch": "맞는 항목이 없습니다.",
+    "emptyPapers": "서재에 논문이 없습니다.",
+    "emptyNotes": "서재에 연구 노트가 없습니다. 연구 노트 화면에서 서재로 가져오세요.",
+    "selected": "{count}개 고름",
+    "cancel": "취소",
+    "addAction": "{count}개 추가",
+    "adding": "추가하는 중",
+    "skipped": "{count}개 항목은 넣지 못했습니다.",
+    "otherPc": "다른 PC의 노트",
+    "noPdf": "PDF 없음",
+    "addEmpty": "추가"
   }
 }

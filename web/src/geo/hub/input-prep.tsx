@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import type { LocalMethodsResponse, LocalMethodWorkflow } from "@/geo/contracts/methods";
 import { geoText } from "@/geo/i18n";
 import { accepts, text as local } from "@/geo/workspace/api";
+import { isExamplePath } from "@/geo/contracts/workflow-examples";
 import { PrepareEnvironment } from "@/geo/workspace/readiness";
 import { apiFetch } from "@/lib/projects";
 import { flattenFiles, type TreeNode } from "@/lib/use-sandbox";
@@ -35,9 +36,11 @@ export function setupReady(workflow: LocalMethodWorkflow, files: string[]): bool
   return inputsReady(workflow, files) && workflow.readiness.state === "ready";
 }
 
-/** Required input roles that have at least one matching file. */
+/** Required input roles that have at least one matching file, or example data the start settings can use. */
 export function inputsReady(workflow: LocalMethodWorkflow, files: string[]): boolean {
-  return workflow.inputRoles.filter((r) => r.required).every((r) => files.some((f) => accepts(f, r.extensions)));
+  return workflow.inputRoles
+    .filter((r) => r.required)
+    .every((r) => files.some((f) => accepts(f, r.extensions)) || (r.example && r.example.state !== "broken"));
 }
 
 export function InputPrep({
@@ -121,11 +124,12 @@ export function InputPrep({
       <p className="text-sm font-medium">{text("prep.title", { project: projectName })}</p>
       <ul className="flex flex-col gap-2">
         {workflow.inputRoles.map((role) => {
-          const matches = files.filter((f) => accepts(f, role.extensions));
+          const matches = files.filter((f) => accepts(f, role.extensions) && !isExamplePath(f));
+          const example = role.example && role.example.state !== "broken" ? role.example : null;
           return (
             <li key={role.id} className="flex min-w-0 flex-col gap-1.5 rounded-lg border p-2.5 text-sm">
               <span className="flex items-center gap-2">
-                {matches.length ? (
+                {matches.length || example ? (
                   <CheckIcon className="size-4 text-primary" aria-hidden />
                 ) : (
                   <CircleDashedIcon className="size-4 text-muted-foreground" aria-hidden />
@@ -141,6 +145,11 @@ export function InputPrep({
                     .slice(0, 3)
                     .map((m) => m.split("/").at(-1))
                     .join(", ")}
+                </span>
+              )}
+              {example && (
+                <span className="pl-6 text-xs text-muted-foreground">
+                  {text(matches.length ? "prep.exampleAlso" : "prep.example", { title: local(example.title) })}
                 </span>
               )}
               <Button
