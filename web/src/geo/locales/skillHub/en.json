@@ -28,7 +28,7 @@
   "methodsError": "Could not read Workflows: {detail}",
   "methodPreview": "Preview archive",
   "methodCreated": "Created: {at}",
-  "methodDraft": "Workflow: {id} · revision {revision} · {lifecycle}",
+  "methodDraft": "Workflow: {id} · Draft",
   "chooseFile": "Choose archive",
   "noFile": "No file chosen",
   "workflowSkill": "Skill included with “{title}” Workflow · {version, select, draft {draft} other {version {version}}}",
@@ -47,7 +47,7 @@
   "previewRun": "Installation does not run code. After you set inputs and conditions and start, the AI agent follows the request below and the skill instructions.",
   "previewPrompt": "Request sent when starting",
   "previewRetry": "Reload preview",
-  "previewHubSkill": "{name} revision {revision}",
+  "previewHubSkill": "{name} version {revision}",
   "previewHubSkills": "The hub skills this Workflow uses are installed with it: {names}",
   "previewHubBlocked": "Hub skills that cannot be installed with it: {names}. After installing, readiness shows why."
 }

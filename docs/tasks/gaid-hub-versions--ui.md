@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:57:27Z
+updated: 2026-10-23T07:03:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"85dddf2d-e5cf-4fd4-9e09-1bd517612fc9","pid":2306567,"provider":"codex","session":"01a1678c-afff-7a90-bcc6-4c8ff80df8f6","start":"62657466","token":"439122785c0ef2741fb6290719f33f7d911ae7984a2150a314072fcd11f03a42"}
 branch: task/gaid-hub-versions--ui
 target: task/gaid-hub-versions
@@ -84,10 +84,20 @@ Evidence to return in your task document: changed files, string ids before→aft
 screenshot paths, open questions. Finish with `task finish`.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implementation in progress: removal dialog, removed Workflow list and hash route, sidebar visibility/counts, registration patch/minor/major choices, registered version display and draft labels. No server/contracts edits. Codegraph is unavailable for this exact worktree (unindexed); relevant native files were read.
+
+Sequential decisions: preserve revision numbers for transport, resolve registered display through hubVersionOf/hubRefVersion, never show package build versions as registered versions. This child owns web screens/locales plus terminology and page.tsx one-line seam; parent owns contracts/server/report. Integration order: UI implementation, web tests and typecheck, copy/UI checks, isolated screenshots, finish into parent. No delegated workers.
+
+Verification pending: this worktree has no web/server node_modules. Two tsc invocations found the unrelated npx tsc placeholder (root, then web); stop retrying compiler until npm ci installs the declared dependencies. task job refused dirty source; save this checkpoint before installing.
 ## Next steps
-1. (the next session's first action)
+1. Save reviewed checkpoint, install lockfile dependencies with task job, then run web typecheck/tests.
+2. Capture Korean screens in the isolated app; finish after declared checks.
 ## Failed approaches
+## Notes and decisions
+- `판` is not a globally forbidden glossary substring: unrelated strings use 판단, 판정, 출판. `버전` is a forbidden variant; the version contexts owned here use version.
+- Asked parent to supply HubEntry.basedOn.version (currently only revision); legacy mapping is not enough after minor/major updates. Trial headings will omit package numbers because MethodTrial has no registered version.
+- UI guide rules: P2/P3/P5/P9, I5/I7/I8/I9, B1/B3, D1/D2, A1/A2/A5, F5/F7, R1/R2, V1. New controls use existing tokens and dialog/button components.
+
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items

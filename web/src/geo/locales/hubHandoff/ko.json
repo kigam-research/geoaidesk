@@ -48,7 +48,7 @@
   },
   "followUps": "이후 요청 {count}개",
   "methodTrial": "Workflow 시험",
-  "methodTrialLine": "Workflow {method} · {revision}판 · {workflow}",
+  "methodTrialLine": "Workflow {method} · 초안 · {workflow}",
   "assessment": "연구자 평가: {outcome, select, useful {유용함} needs-revision {수정 필요} failed {실패} other {기록 없음}} · {note}",
   "noAssessment": "연구자 평가가 아직 없습니다. Workflow 상세의 시험 기록에서 평가를 저장하면 함께 보냅니다.",
   "excludedFile": "{path}: {reason, select, policy {보낼 수 없는 경로} unavailable {읽을 수 없음} too-large {5 MiB 초과} file-limit {파일 수 한도 초과} other {제외}}",

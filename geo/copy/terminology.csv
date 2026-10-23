@@ -29,7 +29,7 @@ CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the 
 연결 방식,connection method,"One of the supported routes for a model connection.",접속 방식,,
 로컬 모델,local model,"A model served on the user's own computer (for example via Ollama).",온디바이스 모델,on-device model,
 스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬, 허브 스킬이 있습니다.",,,Keep SKILL.md untranslated.
-허브 스킬,hub skill,"GAID 허브의 스킬 선반에 판마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 판을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
+허브 스킬,hub skill,"GAID 허브의 스킬 선반에 version마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 version을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
 작업 예제,worked example,"A recorded task with data, steps and outputs that a user can run.",데모,demo,
 실행 기록,run record,"The stored inputs, code, outputs and settings of one run.",실행 로그,run log,
 결과 파일,output file,"A file written by a run.",산출 파일,result file,
@@ -50,3 +50,4 @@ unlabeled 셀,unlabeled cell,"A PU cell without a recorded occurrence; not a con
 그림 기록,figure record,"One figure in a research note with its kind, the chat, script and data that made it, whether they changed since, the latest journal check and an AI-use disclosure draft. Derived from provenance; not stored.",그림 이력,figure history,gaid-research-visuals 2026-10-22
 그림 점검,figure check,"Comparison of a figure file with the target journal's figure rules (width, resolution, minimum text size, format, colour, AI-image policy). Not a compliance verdict.",규정 검증|적합 판정,compliance check,gaid-research-visuals 2026-10-22
 연결 지도,connection map,"View of the links around one chosen item (paper, research note, figure, file, chat, Workflow), built only from links GAID already records.",인용 지도,citation map,gaid-research-visuals 2026-10-22
+version,version,"Registered Workflow version; starts at 0.1.0; the registrant chooses patch/minor/major for updates; 1.0.0 is the main release.",버전,,"gaid-hub-versions 2026-10-23; 판 is not globally forbidden because the validator has no concept scope."

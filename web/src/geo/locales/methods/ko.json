@@ -12,7 +12,7 @@
   "recipes": "저장한 시작 설정",
   "sources": "출처",
   "questions": "허브에서 미해결인 질문",
-  "revision": "{revision}판",
+  "revision": "version {version}",
   "unknown": "기록 없음",
   "edited": "GAID에서 수정됨",
   "origin": "설치 출처: {origin}",
@@ -58,7 +58,7 @@
   "badge.stage": "{stage, select, draft {허브 초안} submitted {허브 제출됨} published {허브 공개됨} other {허브 단계 미확인}}",
   "badge.stageTip": "허브에 기록된 Workflow 파일 묶음의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.",
   "badge.codeTip": "Workflow 파일 묶음에 실행 코드가 들어 있는지 나타냅니다.",
-  "registered": "등록됨 · {revision}판",
+  "registered": "등록됨 · version {version}",
   "record.show": "기록 보기",
   "checks.passed": "허브 검사를 통과했습니다 · {at}",
   "checks.notes": "허브 검사를 통과했습니다 · {at} · 참고 사항 {count}개",
@@ -76,7 +76,7 @@
   "checks.record.item": "{id}: {status}{detail}",
   "checks.record.warning": "[{code}] {path}: {message}",
   "issues.summary": "Workflow 파일에서 읽지 못한 부분이 {count}곳 있습니다. 읽지 못한 Workflow와 시작 설정은 목록에 나오지 않습니다.",
-  "trials.heading": "{at} 시험 · {revision}판",
+  "trials.heading": "{at} 시험 · 초안",
   "trials.assessed": "연구자 평가: {outcome}",
   "trials.unassessed": "연구자 평가 전",
   "trials.expect.line": "{label} · {need} · {state}",
@@ -86,7 +86,7 @@
   "trials.expect.notDeclared": "파일 이름이 정해지지 않아 대조하지 않음",
   "trials.outputs.summary": "결과 파일 {count}개: {files}{more, plural, =0 {} other { 외 #개}}",
   "trials.outputs.none": "결과 파일이 생기지 않았습니다.",
-  "trials.record.workflow": "Workflow ID: {id} · {revision}판",
+  "trials.record.workflow": "Workflow ID: {id} · 초안 번호 {revision}",
   "trials.record.window": "시작 {at} · 마지막 단계 {last}",
   "trials.record.calls": "도구 호출 {calls}회 · 실패 {failed}회",
   "trials.record.models": "모델: {models}",
@@ -98,5 +98,6 @@
   "trials.record.found": "발견됨: {files}",
   "trials.record.missing": "파일 일치 없음: {files}",
   "trials.record.elsewhere": "다른 폴더에 저장됨: {files} (예상 위치: {expected})",
-  "trials.record.notDeclared": "결과 파일 이름이 정해지지 않아 대조하지 않았습니다."
+  "trials.record.notDeclared": "결과 파일 이름이 정해지지 않아 대조하지 않았습니다.",
+  "draft": "초안"
 }
