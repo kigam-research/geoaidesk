@@ -2,6 +2,7 @@ import { scrypt, timingSafeEqual } from "node:crypto";
 import { HUB_ACCOUNT_RULES as RULES } from "../../../../web/src/geo/contracts/hub-server.ts";
 import type { HubAccount, HubInvite, HubInviteBody, HubUpdateMeBody, HubUpdateUserBody } from "./protocol.ts";
 import { HubDatabase, HubServerError, object, sha256, text, type AuditActor } from "./core.ts";
+import { linkView, type OrcidRow } from "./orcid.ts";
 
 interface AccountRow {
   id: string; email: string; display_name: string; role: "member" | "admin";
@@ -13,8 +14,8 @@ interface InviteRow {
 }
 interface PasswordHash { N: number; r: number; p: number; salt: string; hash: string }
 export interface Authenticated extends AuditActor { account: HubAccount; tokenHash: string }
-const accountView = (r: AccountRow): HubAccount => ({ id: r.id, email: r.email, displayName: r.display_name,
-  role: r.role, createdAt: r.created_at, ...(r.disabled_at ? { disabledAt: r.disabled_at } : {}) });
+const baseView = (r: AccountRow, orcid?: OrcidRow): HubAccount => ({ id: r.id, email: r.email, displayName: r.display_name,
+  role: r.role, createdAt: r.created_at, ...(r.disabled_at ? { disabledAt: r.disabled_at } : {}), ...(orcid ? { orcid: linkView(orcid) } : {}) });
 const inviteView = (r: InviteRow): HubInvite => ({ id: r.id, email: r.email, role: r.role, createdBy: r.created_by,
   createdAt: r.created_at, expiresAt: r.expires_at, ...(r.used_at ? { usedAt: r.used_at } : {}) });
 const afterDays = (at: string, days: number) => new Date(Date.parse(at) + days * 86_400_000).toISOString();
@@ -56,7 +57,9 @@ async function verifyPassword(password: string, stored?: string): Promise<boolea
 
 export class HubAccounts {
   constructor(readonly hub: HubDatabase) {}
-  users(): HubAccount[] { return this.hub.all<AccountRow>("SELECT * FROM accounts ORDER BY created_at,id").map(accountView); }
+  private readonly accountView = (r: AccountRow): HubAccount =>
+    baseView(r, this.hub.get<OrcidRow>("SELECT * FROM account_orcid WHERE account_id=?", r.id));
+  users(): HubAccount[] { return this.hub.all<AccountRow>("SELECT * FROM accounts ORDER BY created_at,id").map(this.accountView); }
   invites(): HubInvite[] { return this.hub.all<InviteRow>("SELECT * FROM invites ORDER BY created_at DESC,id").map(inviteView); }
   account(id: string): AccountRow {
     const row = this.hub.get<AccountRow>("SELECT * FROM accounts WHERE id=?", id);
@@ -65,7 +68,7 @@ export class HubAccounts {
   }
   byEmail(email: string): HubAccount | null {
     const row = this.hub.get<AccountRow>("SELECT * FROM accounts WHERE email=?", emailValue(email));
-    return row ? accountView(row) : null;
+    return row ? this.accountView(row) : null;
   }
   invite(body: HubInviteBody, actor: AuditActor = { id: "operator", device: "CLI" }): HubInvite {
     const email = emailValue(body?.email);
@@ -121,7 +124,7 @@ export class HubAccounts {
     const expiresAt = afterDays(at, RULES.sessionDays);
     this.hub.run("INSERT INTO sessions VALUES (?,?,?,?,?,?)", sha256(token), row.id, device, at, at, expiresAt);
     this.hub.audit({ id: row.id, device }, "session.create", row.id);
-    return { token, expiresAt, account: accountView(row) };
+    return { token, expiresAt, account: this.accountView(row) };
   }
   async login(body: { email: string; password: string; device?: string }, ip: string) {
     const email = emailValue(body?.email);
@@ -171,7 +174,7 @@ export class HubAccounts {
       this.hub.run("UPDATE sessions SET last_used=?,expires_at=? WHERE token_sha256=?", this.hub.now(), afterDays(this.hub.now(), RULES.sessionDays), tokenHash);
       this.hub.audit({ id: row.id, device: session.device }, "session.touch", row.id);
     });
-    return { id: row.id, device: session.device, tokenHash, account: accountView(row) };
+    return { id: row.id, device: session.device, tokenHash, account: this.accountView(row) };
   }
   logout(auth: Authenticated) {
     this.hub.tx(() => {
@@ -198,7 +201,7 @@ export class HubAccounts {
       this.hub.run("UPDATE accounts SET display_name=?,password=? WHERE id=?", name, encoded, auth.id);
       if (body.password) this.hub.run("DELETE FROM sessions WHERE account_id=? AND token_sha256<>?", auth.id, auth.tokenHash);
       this.hub.audit(auth, "account.update", auth.id, { displayName: name, passwordChanged: Boolean(body.password) });
-      return accountView(this.account(auth.id));
+      return this.accountView(this.account(auth.id));
     });
   }
   updateUser(id: string, body: HubUpdateUserBody, actor: AuditActor): HubAccount {
@@ -215,7 +218,7 @@ export class HubAccounts {
       this.hub.run("UPDATE accounts SET role=?,disabled_at=? WHERE id=?", nextRole, disabled ? (old.disabled_at ?? this.hub.now()) : null, id);
       if (disabled) this.hub.run("DELETE FROM sessions WHERE account_id=?", id);
       this.hub.audit(actor, "account.admin-update", id, { role: nextRole, disabled });
-      return accountView(this.account(id));
+      return this.accountView(this.account(id));
     });
   }
 }

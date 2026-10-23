@@ -23,13 +23,23 @@ import {
 import { LibraryError, normalizeDoi, type LibraryStore } from "../library/store.ts";
 import { lookupDoi as defaultLookupDoi, type MetadataRecord } from "../library/metadata/index.ts";
 import { createOrcidClient, OrcidError, type OrcidClient } from "./client.ts";
+import { orcidHub as defaultHub, type OrcidHubPort } from "./hub.ts";
+import { AuthoringError } from "../authoring/store.ts";
+import type { OrcidAuthStart, OrcidHubState } from "../../../../web/src/geo/contracts/orcid.ts";
 import { cslFromWork, matchWork, parseWorks, personName } from "./works.ts";
 
 export interface OrcidServiceOptions {
   client?: OrcidClient;
   lookupDoi?: (doi: string) => Promise<MetadataRecord>;
   now?: () => Date;
+  /** Hub server ORCID port (phase 2); default: the logged-in hub server, if any. */
+  hub?: () => OrcidHubPort | null;
 }
+
+/** Outcome of the ORCID redirect, worded by the callback page. */
+export type OrcidCallbackResult =
+  | { ok: true; orcid: string; environment: "production" | "sandbox" }
+  | { ok: false; reason: "denied" | "no-account" | "expired" | "taken" | "not-configured" | "failed" | "unreachable" };
 
 const iso = (now: () => Date) => now().toISOString();
 
@@ -37,12 +47,14 @@ export class OrcidService {
   private client: OrcidClient;
   private lookupDoi: (doi: string) => Promise<MetadataRecord>;
   private now: () => Date;
+  private hub: () => OrcidHubPort | null;
   private queue: Promise<unknown> = Promise.resolve();
 
   constructor(private store: LibraryStore, options: OrcidServiceOptions = {}) {
     this.client = options.client ?? createOrcidClient();
     this.lookupDoi = options.lookupDoi ?? ((doi) => defaultLookupDoi(doi));
     this.now = options.now ?? (() => new Date());
+    this.hub = options.hub ?? defaultHub;
   }
 
   private get file() { return path.join(this.store.root, "orcid.json"); }
@@ -71,9 +83,77 @@ export class OrcidService {
   }
 
   async status(): Promise<OrcidStatus> {
+    const hub = await this.hubState();
+    // The hub account is the source of an authenticated iD: adopt it, or drop "authenticated" when it was removed there.
+    if (hub.state === "linked" || hub.state === "ready" || hub.state === "not-configured") await this.serial(async () => {
+      const current = this.profile();
+      if (hub.state === "linked") {
+        const link = hub.link;
+        if (!current || current.orcid !== link.id || !current.authenticated || current.environment !== link.environment) {
+          this.save({ schema: ORCID_SCHEMA, orcid: link.id, authenticated: true, environment: link.environment, authenticatedAt: link.authenticatedAt,
+            ...(link.name ? { name: link.name } : current?.orcid === link.id && current.name ? { name: current.name } : {}),
+            linkedAt: current?.orcid === link.id ? current.linkedAt : link.authenticatedAt,
+            ...(current?.orcid === link.id && current.lastReadAt ? { lastReadAt: current.lastReadAt } : {}),
+            ...(current?.orcid === link.id && current.lastImportAt ? { lastImportAt: current.lastImportAt } : {}) });
+        }
+      } else if (current?.authenticated) {
+        const { authenticatedAt: _a, environment: _e, ...rest } = current;
+        this.save({ ...rest, authenticated: false });
+      }
+    });
     const profile = this.profile();
     const ownWorks = profile ? (await this.store.all()).filter((i) => !i.removedFromSourceAt && i.ownWork?.orcid === profile.orcid).length : 0;
-    return { profile, ownWorks };
+    return { profile, ownWorks, hub };
+  }
+
+  private async hubState(): Promise<OrcidHubState> {
+    const port = this.hub();
+    if (!port) return { state: "no-account" };
+    try {
+      const s = await port.status();
+      if (s.link) return { state: "linked", environment: s.link.environment, link: s.link };
+      return s.configured && s.environment ? { state: "ready", environment: s.environment } : { state: "not-configured" };
+    } catch (error) {
+      return error instanceof AuthoringError && error.status === 401 ? { state: "no-account" } : { state: "unreachable" };
+    }
+  }
+
+  /** Starts ORCID sign-in through the hub server (phase 2); the screen opens the returned URL. */
+  async authStart(): Promise<OrcidAuthStart> {
+    const port = this.hub();
+    if (!port) throw new LibraryError("기관 GAID 허브에 로그인해야 ORCID 본인 확인을 할 수 있습니다.", 409);
+    try { return await port.start(); }
+    catch (error) {
+      if (error instanceof AuthoringError && error.status === 409) throw new LibraryError("기관 GAID 허브에 ORCID 연결이 설정되어 있지 않습니다.", 409);
+      if (error instanceof AuthoringError && error.status === 401) throw new LibraryError("기관 GAID 허브에 다시 로그인해 주세요.", 409);
+      throw new LibraryError("기관 GAID 허브에 연결하지 못했습니다.", 502);
+    }
+  }
+
+  /** ORCID's redirect (`?code&state` or `?error`): the hub exchanges and verifies; the local profile follows its result. */
+  async callback(query: Record<string, unknown>): Promise<OrcidCallbackResult> {
+    if (typeof query.error === "string") return { ok: false, reason: "denied" };
+    const code = typeof query.code === "string" ? query.code : "", state = typeof query.state === "string" ? query.state : "";
+    if (!code || !state || code.length > 200 || state.length > 200) return { ok: false, reason: "failed" };
+    const port = this.hub();
+    if (!port) return { ok: false, reason: "no-account" };
+    let link;
+    try { ({ link } = await port.finish({ code, state })); }
+    catch (error) {
+      const status = error instanceof AuthoringError ? error.status : 0;
+      return { ok: false, reason: status === 401 ? "no-account" : status === 410 || status === 400 ? "expired" : status === 409 ? "taken" : status === 502 ? "unreachable" : "failed" };
+    }
+    await this.status();
+    return { ok: true, orcid: link.id, environment: link.environment };
+  }
+
+  /** Removes the authenticated iD from the hub account; the local iD stays, unauthenticated. */
+  async authUnlink(): Promise<OrcidStatus> {
+    const port = this.hub();
+    if (!port) throw new LibraryError("기관 GAID 허브에 로그인해야 합니다.", 409);
+    try { await port.unlink(); }
+    catch { throw new LibraryError("기관 GAID 허브에 연결하지 못했습니다.", 502); }
+    return this.status();
   }
 
   /** Links a typed iD after checking that a public record exists; re-linking the same iD keeps its dates. */
