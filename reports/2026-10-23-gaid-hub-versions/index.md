@@ -45,7 +45,7 @@ supersedes:
 
 ![등록 창의 version 선택](figures/register-version.png)
 
-그림 1. 이미 0.2.0으로 등록한 Workflow를 다시 등록하는 창(계측 스타일, 어두운 테마). 볼 것: 작은 수정(patch) 0.2.1, 기능 추가(minor) 0.3.0, 주요 배포(major) 1.0.0 가운데 하나를 고르고, 기본값은 작은 수정입니다.
+그림 1. 이미 0.2.0으로 등록한 Workflow를 다시 등록하는 창(도폭 스타일, 어두운 테마, 1280×800). 볼 것: 작은 수정(patch) 0.2.1, 기능 추가(minor) 0.3.0, 주요 배포(major) 1.0.0 가운데 하나를 고르고, 기본값은 작은 수정입니다.
 
 ![Workflow 제거 확인 창](figures/remove-confirm.png)
 
