@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T14:11:50Z
+updated: 2026-10-23T15:06:59Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0704ce16-3a7d-4ced-a70b-cb0992d87a4f","pid":723936,"provider":"claude","session":"231b3e23-b5c2-477a-8474-f49634f8b127","start":"64563772","token":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
 branch: task/gaid-workflow-stages
 target: main
@@ -59,6 +59,10 @@ examples) — it touches the start settings and the registration preview; whoeve
 Outside check: none.
 
 ## Current state
+- Done 2026-10-24: A (5131e3be) and B (59baf023) integrated and closed; report
+  reports/2026-10-23-gaid-workflow-stages/index.md (humanizer applied). Rail counts computed with `workflowStages` on
+  real data: Pocheon 0.2.0 23→4, regenerated Pocheon draft 7 (5 stages, 4 required), regrouped 0.2.0 6, PU-컨포멀 0.1.0
+  12→4, catalogue PU 7→4. UI guide Q1/Q4/D2/§12.5 updated.
 - Shared contract settled and pushed (writer): `web/src/geo/contracts/workflow-stages.ts` (`workflowStages`,
   `stageWarnings`, limits MIN/MAX_STAGES 3/5, MAX_REQUIRED_CHOICES 6, MAX_RAIL 7) + test; `GaidWorkflowStep.inputIds`,
   `WorkflowDocStep.inputIds?`, `WorkflowInputRole.multiple?`, `WorkflowChoice.default?` (also in `LocalWorkflow`),
@@ -79,9 +83,8 @@ Outside check: none.
   finish. B report section: reports/2026-10-23-gaid-workflow-stages/authoring.md (Pocheon regenerated: 5 stages, 4 required
   choices, 6/6 inputs mapped; 0.2.0 regroup: 5 stages, 6 required; model marked all 6 inputs `multiple` — optional prompt fix).
 ## Next steps
-1. When a child's finish arrives: `task complete <child>`; integrate B then A (`task sync`), run scripts/check.
-2. Meanwhile: report skeleton `reports/2026-10-23-gaid-workflow-stages/index.md`, AGENTS.md wording (Workflow model /
-   Workflow panel paragraphs).
+1. `task finish`; the hub verifies and deploys (review app update is the hub's; no hub-server change needed — the stage
+   fields travel inside method packages, the hub server stores packages unchanged).
 ## Failed approaches
 ## Notes and decisions
 - Orchestration (user: "작업은 opus 5.5 high fast writer들로 작업해야한다."): child writers are Claude Opus 5.5, thinking
@@ -108,7 +111,9 @@ Outside check: none.
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [선택] Authoring prompt: mark an input `multiple` only when it naturally holds several files of one kind (both regenerated Pocheon drafts marked all 6 inputs) — 가) add the rule and re-check with one model run — 나) leave as is (single-file pick still renders the same 지침) — 권장: 가) the checkbox on a single-file input misleads researchers — 막힌 일: none — 조건: one GPT-6.1 Sol run with a usable login — 근거: reports/2026-10-23-gaid-workflow-stages/index.md#5-한계
 ## Report
+Report: reports/2026-10-23-gaid-workflow-stages/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
