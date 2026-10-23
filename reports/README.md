@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-workflow-stages/figures/start-stages-model.png" width="120"> | 2026-10-23 | [Workflow를 분석 흐름 단계로 나누고 시작 창 단계를 7칸 이하로 줄임](2026-10-23-gaid-workflow-stages/index.md) | Workflow는 이제 자료 준비 → 처리·모델링 → 평가 → 해석처럼 분석 흐름에 따라 3~5단계로 만들어지고, 시작 창은 소개·단계·요약을 7칸 이하로 보입니다. 포천 Workflow는 23칸에서 다시 만든 초안 기준 7칸이 되었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-cite-scope/figures/01-start-window-papers.png" width="120"> | 2026-10-23 23:31 | [Workflow의 근거 논문을 프로젝트 인용 범위에 붙여 서재·Workflow·노트를 잇기](2026-10-23-gaid-workflow-cite-scope/index.md) | 허브 Workflow를 시작할 때 근거 논문을 연구자 동의를 받아 인용 범위에 붙이고, 노트가 그 논문을 인용해 서재에서 논문·Workflow·노트가 서로 이어집니다. 허브 등록 창은 함께 공유되는 예제 자료를 파일별로 보여 줍니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-pocheon-trial/figures/01-orebody-3d.png" width="120"> | 2026-10-23 20:56 | [포천 자철석 PGI 논문으로 해 본 GAID 연구 흐름 실전 검증](2026-10-23-gaid-pocheon-trial/index.md) | 서재의 논문에서 Workflow를 만들어 허브에 등록하고, 예제 자료로 논문 수준의 PGI 분석과 연구 노트를 만든 뒤 노트를 서재로 가져오는 흐름이 실제 앱에서 이어졌습니다. 그 과정에서 찾은 문제 23건 가운데 13건을 이 작업에서 고쳤고 4건은 다른 단위가 해소했습니다. | 검토함 10-23 | 미정 | 1 |
 | <img src="2026-10-23-gaid-workflow-start-ui/figures/01-workflow-intro.png" width="120"> | 2026-10-23 18:58 | [모든 Workflow를 같은 시작 창으로 열고 먼저 무엇을 하는지 보여 주기](2026-10-23-gaid-workflow-start-ui/index.md) | 기본·허브·일반 Workflow가 모두 같은 시작 창으로 열리고, 자료를 묻기 전에 하는 일·넣는 자료·만드는 결과·진행 단계·해석 한계를 먼저 보여 줍니다. | 검토 전 | 미정 | 0 |
