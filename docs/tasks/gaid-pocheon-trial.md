@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:48:52Z
+updated: 2026-10-23T08:49:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -199,6 +199,7 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
+Blocked: second pass waits for the hub's review-app update to main 1684c887+ (requested 17:45 KST via d-final-pass-ready; unit gaid-hub-rollout-versions).
 1. Wait for the hub (unit gaid-hub-rollout-versions) to update the review app to main 1684c887+ (loopback-only,
    http://127.0.0.1:3000 on PC74 until the user re-enables LAN on 2026-10-26).
 2. Second pass on the new main: 서재 → Workflow 만들기 (GPT-6.1 Sol, 높음 from the screen) with paper + ESM1 + the six
