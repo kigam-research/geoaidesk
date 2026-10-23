@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:57:52Z
+updated: 2026-10-23T09:52:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -185,12 +185,22 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   paper, so source-grounded authoring cannot add it by itself. Like-for-like, GAID ≥ the writer's reference (same
   settings: reference ore mean 0.036, PGI-none property 7.9×). The writer's adjusted-proportion run (0.985/0.01/0.005)
   is a diagnosis, not a comparison baseline. — open (second pass: researcher feedback may add a proportion check).
+- F20 — minor, second pass: (a) the data-file summary reads the `#` comment line of orebody_reference.csv as the header
+  ("열 2개"); the analysis model noticed it and still read x, y, z, cell_m. — C (inspection) — note. (b) 서재 lists
+  "Uncertainty-Aware Mineral Prospectivity Mapping…" (Ahn 2026) twice in the authoring picker. — A — note.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
 - 2026-10-23 16:11: interim sync → main b74950e7 (PR #85; F1/F2/F3/F9-F16 + example generator/asset), merged with C;
   hub restarted the review app on b74950e7 at 16:12. Verified there without in-page patches: the reasoning selector
   shows on the sources step and the revise attempt ran as openai/gpt-6.1-sol high from a LAN browser (F1, F9).
+- Second pass (review app 3171c57c, loopback http://127.0.0.1:3000): 서재 → "Workflow 만들기" on the Zotero item
+  (enabled; A's fix) → authoring ap-43431e17-f09 with 10 sources (Pocheon paper, Astic et al. 2020 from 서재 via the new
+  picker, ESM1 zip, 7 example data files via upload; data files summarised: CSV columns/rows, GeoTIFF band/EPSG) →
+  analyze 18:39–18:50 (GPT-6.1 Sol high stored on the project — F8 verified; 38 findings incl. Appendix B volumetric
+  proportions and κ, the 0.5 SI upper bound below the synthetic 0.80 SI ore, ESM1's fixed IGRF date 2020-07-16 vs
+  survey 2022-05-17; 6 questions, recommendations keep the whole method — F10 verified; new trial-scale text — F12
+  verified) → answers with option + added words (F11 verified) → draft running from 18:52.
 - First pass done 17:24 KST: hub entry "PGI 기반 3차원 자철석 광체 추정" 1판 (registered 16:24 on the institute hub,
   folder 지구물리 역산, from authoring ap-bab647f7-674 draft 3); installed into project pgi-2c2f48; run 16:29 → interview
   expired (F18) → researcher answered at 16:45 → finished 17:24. Agent: wrote pgi_run/run_pgi_workflow.py, fixed two
@@ -207,9 +217,8 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
-Blocked: second pass waits for the hub's review-app update to main 1684c887+ (requested 17:45 KST via d-final-pass-ready; unit gaid-hub-rollout-versions).
-1. Wait for the hub (unit gaid-hub-rollout-versions) to update the review app to main 1684c887+ (loopback-only,
-   http://127.0.0.1:3000 on PC74 until the user re-enables LAN on 2026-10-26).
+1. Review app on main 3171c57c since 18:30 KST (loopback-only, http://127.0.0.1:3000 on PC74 until the user
+   re-enables LAN on 2026-10-26). Second pass started 18:3x.
 2. Second pass on the new main: 서재 → Workflow 만들기 (GPT-6.1 Sol, 높음 from the screen) with paper + ESM1 + the six
    example files as data sources (C), plus the PGI method paper from 서재 — Astic, Heagy & Oldenburg 2020 (GJI 224,
    doi 10.1093/gji/ggaa378, cited by Heo et al.; arXiv 2002.09515 preprint PDF, added 2026-10-23 17:5x as a GAID 서재
