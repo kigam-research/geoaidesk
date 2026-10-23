@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:39:02Z
+updated: 2026-10-23T02:50:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -121,6 +121,12 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 - 2026-10-23: the review app's default model (OpenRouter) is not configured; authoring failed twice. Parent told the
   child to pick an already connected model in the per-action picker (prefer a subscription login), same model for the
   whole study, no settings change (within the user's approval to run the study in the review app).
+- User 2026-10-23: "baggingPU까지 실행할 필요 없다. 홍보영상을 만드는 것이며, 실제 분석결과까지 모두 다 가져오는 모습을 보일
+  필요 없다. 필요하다면 유사한 기 작업 결과를 가져와도 되므로 모든 과정을 돌리지 말아라. 특히 BaggingPU는 계산이 오래걸린다." and
+  "정직한 영상을 원하는 것이 아니라 홍보용 영상을 원하는 것이다." → promotional film, staging allowed; no training run. The
+  child copies the paper's prior OOF zone assignments (`~/pc71-projects/narr/mpm_nested_cv/outputs/test_evaluation_oof/
+  baggingpu_xgboost/outer_fold_*/zone_assignments.csv`) into project `yilgarn-cd7814`; the AI agent only turns them into a
+  map file, a figure and the research note citing the paper (short real run).
 - Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
   it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
