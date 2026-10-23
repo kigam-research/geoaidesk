@@ -911,6 +911,7 @@ function HubProject({
         onShowFiles={() => setDialog("files")}
         onShowIssues={() => setDialog("issues")}
         onRegister={() => setStep("publish")}
+        examples={{ project, onChanged: () => void reload() }}
         rail={
           <TrialCard
             key={`${draft.revision}:${trialProject}`}

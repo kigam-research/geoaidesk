@@ -49,5 +49,9 @@
     "edited": "An edited copy is installed in this project.",
     "conflict": "Another skill with the same name is installed, so this one cannot be installed.",
     "suspended": "This revision is suspended in the hub. Tell the Workflow author."
-  }
+  },
+  "example": "Example data: {title} · source: {source} · {size}, {where}",
+  "exampleSynthetic": "Synthetic example data: {title} · made by: {source} · {size}, {where}",
+  "exampleBundled": "included in the Workflow",
+  "exampleRemote": "downloaded on first use"
 }

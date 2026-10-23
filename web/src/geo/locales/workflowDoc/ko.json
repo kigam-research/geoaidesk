@@ -22,7 +22,15 @@
     "choiceOpen": "{label}: 연구자가 정합니다",
     "inputAsk": "{label} ({need})",
     "cliArguments": "명령 뒤에 적은 값이 연구자의 설정입니다:",
-    "cliAsk": "아래 항목 가운데 위 값에 없는 것은 시작하기 전에 연구자에게 물으세요."
+    "cliAsk": "아래 항목 가운데 위 값에 없는 것은 시작하기 전에 연구자에게 물으세요.",
+    "syntheticTitle": "{title} (합성 자료)",
+    "researcherPicksExample": "연구자가 고릅니다. 고르지 않으면 Workflow의 예제 자료를 씁니다: {title}",
+    "exampleUsed": "{path} (Workflow의 예제 자료: {title}. 출처: {source})",
+    "examplesUsed": "다음 입력은 연구자의 자료가 아니라 Workflow가 제공한 예제 자료입니다: {labels}",
+    "exampleRule": "예제 자료로 실행할 때는 답변, 결과 파일과 연구 노트의 첫머리에 예제 자료로 실행했다고 적으세요. 예제 지역의 결과를 연구자의 대상 지역에 대한 결론으로 쓰지 마세요.",
+    "cliExample": "값이 없으면 Workflow의 예제 자료를 씁니다: {title} (출처: {source}). 파일: {files}",
+    "cliExampleBundled": "스킬 {skill} 폴더의 {path}",
+    "cliExampleRemote": "{url} (받은 뒤 크기 {size}바이트와 sha256 {sha256}을 확인)"
   },
   "need": {
     "required": "필수",
@@ -60,6 +68,7 @@
     "expand": "지침 펼치기",
     "collapse": "지침 접기",
     "remove": "Workflow 빼기",
-    "pendingHint": "보내면 Workflow 지침이 먼저 가고, 입력창에 쓴 내용이 뒤에 붙습니다."
+    "pendingHint": "보내면 Workflow 지침이 먼저 가고, 입력창에 쓴 내용이 뒤에 붙습니다.",
+    "example": "예제 자료로 실행"
   }
 }
