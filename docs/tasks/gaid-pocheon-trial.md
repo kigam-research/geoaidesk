@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T08:20:41Z
+status: done
+updated: 2026-10-23T11:47:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -177,23 +177,90 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   required input (`settings.runThrough`, `web/src/geo/contracts/workflow-doc.ts`). Also seen: after the interview
   expired the agent stopped the run anyway (it asked for the three answers in its final message) although the tool
   result told it to proceed with its recommendations.
+- F19 — first-pass interpretation depth — with the paper's GMM proportions (0.9/0.075/0.025, chosen on purpose in the
+  start settings) PGI-none lowered the learned ore mean 0.290 → 0.143 SI (the paper's rose 0.2828 → 0.3752). The GAID
+  note records the drop and that volume differences mix model and threshold changes, but does not look at the cause
+  (proportions are cell-volume fractions over a padded mesh, so 2.5 % ore is far more volume than the ore body) and
+  proposes checking the susceptibility upper bound instead. Not an execution error; the method knowledge is not in the
+  paper, so source-grounded authoring cannot add it by itself. Like-for-like, GAID ≥ the writer's reference (same
+  settings: reference ore mean 0.036, PGI-none property 7.9×). The writer's adjusted-proportion run (0.985/0.01/0.005)
+  is a diagnosis, not a comparison baseline. — open (second pass: researcher feedback may add a proportion check).
+- F20 — minor, second pass: (a) the data-file summary reads the `#` comment line of orebody_reference.csv as the header
+  ("열 2개"); the analysis model noticed it and still read x, y, z, cell_m. — C (inspection) — note. (b) 서재 lists
+  "Uncertainty-Aware Mineral Prospectivity Mapping…" (Ahn 2026) twice in the authoring picker. — A — note.
+- F21 — hub registration dialog (review app 3171c57c) — the list says "공유하지 않음: … 연구 자료" while the Workflow
+  carries six bundled example files (~1.8 MB) that are shared with it; the dialog does not mention example data. — B
+  (finished) — open item.
+- F22 — second-pass draft — the paper's crop step ("extract the magnetic responses only around our target area")
+  became a mesh choice "자료 범위에 맞춥니다" with no crop; with that choice the run covered the whole survey and the
+  quick setting coarsened cells to 37.5 m (the authoring model cannot know that 25 m on the paper's window ran in 8
+  min), leaving the 115 m wide target ~3 cells wide. Cause: the crop step was not carried as a method step, and the
+  quick-run floor in DRAFT_SYSTEM ("smallest target must span several cells") was met only nominally. — D (researcher
+  feedback in the trial; prompt rule already asks to keep every processing step) — revise 19:51.
+- F23 — the cycle does not close on the paper: installing a hub Workflow does not attach its source papers (in the
+  researcher's 서재) to the project's citation scope, so the final note shows "인용한 논문이 없습니다" in 서재 and the
+  papers do not list the note. — no owner (A/B/C finished) — routed to the hub 2026-10-23 20:45 (4ab5cec787cd).
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
 - 2026-10-23 16:11: interim sync → main b74950e7 (PR #85; F1/F2/F3/F9-F16 + example generator/asset), merged with C;
   hub restarted the review app on b74950e7 at 16:12. Verified there without in-page patches: the reasoning selector
   shows on the sources step and the revise attempt ran as openai/gpt-6.1-sol high from a LAN browser (F1, F9).
-- First pass so far: authoring ap-bab647f7-674 (서재 → Workflow 만들기; sources heo2025.pdf + ESM1 zip); analyze
+- Second pass (review app 3171c57c, loopback http://127.0.0.1:3000): 서재 → "Workflow 만들기" on the Zotero item
+  (enabled; A's fix) → authoring ap-43431e17-f09 with 10 sources (Pocheon paper, Astic et al. 2020 from 서재 via the new
+  picker, ESM1 zip, 7 example data files via upload; data files summarised: CSV columns/rows, GeoTIFF band/EPSG) →
+  analyze 18:39–18:50 (GPT-6.1 Sol high stored on the project — F8 verified; 38 findings incl. Appendix B volumetric
+  proportions and κ, the 0.5 SI upper bound below the synthetic 0.80 SI ore, ESM1's fixed IGRF date 2020-07-16 vs
+  survey 2022-05-17; 6 questions, recommendations keep the whole method — F10 verified; new trial-scale text — F12
+  verified) → answers with option + added words (F11 verified) → draft 1 accepted first try 18:59, package check
+  passed (9 steps; "초기 성분 부피 비율" as its own choice citing Astic 2020 p.40 "volumetric proportions instead of cell
+  counts", κ semantics, mean-change diagnostics in the convergence step; work folder pgi_run/; no approval gates; 16
+  combinations) → examples attached per input from the draft's data sources (B↔C; each attach makes a draft revision,
+  ended at 8; DEM marked real, the rest synthetic) → registered 19:03 on the institute hub, folder 지구물리 역산, entry
+  "항공자력·시추 코어 PGI 광체 추정" version 0.1.0 → "내 프로젝트에서 시험" with a new project pgi-2-ea1e81 ("포천 자철석 PGI
+  2차 검증") → start settings: all 6 inputs on the example without any action (F17 resolved for Workflows with
+  examples), 7 open conditions set by the researcher (proportions = code values on purpose, to test the diagnosis) →
+  start 19:05:59 on GPT-6.1 Sol high; example files written to user_data/examples/aeromag-core-pgi-volume/<role>-<key>/.
+  Run finished 19:49 with no interview (F18 verified): mesh over the whole survey (1,805 data, 122,540 active cells,
+  37.5×37.5×25 m quick cells), PGI-full 20 it 226 s, PGI-none 18 it 205 s; PGI-full found no hole-linked body
+  (property: 2 candidates not touching ore core cells; probability: none); PGI-none collapsed (ore-host mean gap
+  0.86 % of initial; property 17.5 Mm3 = 35.9× truth, not adopted). The note reports the collapse but does not tie it
+  to the proportions (F19 not closed). Outputs copied to ~/data/geoaidesk/work/gaid-pocheon-trial/pass2-run1/.
+  19:51 revise of ap-43431e17-f09 with researcher feedback (crop to the paper's target window, 25 m kept in quick,
+  conditional proportion check for a collapsed PGI-none) → draft 9 (new steps: target crop with the ESM1 window,
+  "PGI-none 성분 분리 점검"; examples carried) → registered 20:0x as version 0.2.0 (minor) → new project
+  pgi-2-0-2-0-84f252 → examples auto-selected, 9 open conditions set (proportions = code values, expected volume
+  fractions ore 0.005 / low 0.01) → run 20:04–20:40 with no interview: 25 m cells, 596 data, 80,499 active cells;
+  PGI-full 19 it 117 s, PGI-none 18 it 117 s, conditional PGI-none with expected fractions 18 it 120 s (354 s total).
+  Target vs truth 488,000 m3: full/property 218,750 (0.45×), full/probability none; none/property 4,140,625 (collapse,
+  ore-host gap 7.8 %), none/probability 31,250; expected-fraction rerun property 1,296,875 (2.66×), probability
+  390,625 (0.80×, IoU 0.271), gap recovered to 47.6 %. The agent tied the collapse to the proportions and flagged that
+  the researcher's 0.005 means ~26 Mm3 of the padded mesh (inconsistent with "hundreds of thousands m3"), without
+  changing it. F19 closed. Copies: pass2-run2-outputs/, pass2-run2-notes/.
+- Note → 서재 20:42: project notes → 더 보기 → 서재에 넣기; 서재 shows "정리 노트 1" separate from papers with project,
+  status, one-line result, 프로젝트에서 열기; "인용한 논문이 없습니다" → F23 (routed to the hub 20:45). Library sync to
+  the institute hub 20:43: 대기 0개.
+- Report reports/2026-10-23-gaid-pocheon-trial/index.md written, humanizer pass, review copy in the vault
+  (연구 보고서/geoaidesk/2026-10-23-gaid-pocheon-trial).
+- First pass done 17:24 KST: hub entry "PGI 기반 3차원 자철석 광체 추정" 1판 (registered 16:24 on the institute hub,
+  folder 지구물리 역산, from authoring ap-bab647f7-674 draft 3); installed into project pgi-2c2f48; run 16:29 → interview
+  expired (F18) → researcher answered at 16:45 → finished 17:24. Agent: wrote pgi_run/run_pgi_workflow.py, fixed two
+  SimPEG 0.25 incompatibilities of ESM1 (SaveEveryIteration abstract; masked DEM array), 758 data, 57,503 active
+  cells; PGI-full 23 iterations 235 s, PGI-none 25 iterations 241 s (inversion 479 s ≤ 10 min). Target body vs truth
+  488,000 m3: full/property 640,625 (IoU 0.34), full/probability 171,875 (0.17), none/property 1,625,000 (0.26),
+  none/probability 859,375 (0.35); PGI-none learned ore mean 0.290 → 0.143 SI; sensitivity cut-offs 0-0.05 identical.
+  Research note 연구노트/2026-10-23-PGI-입력확인/index.md (title "두 PGI 조건으로 복원한 합성 자철석 광체", 3 decisions).
+  Copies in ~/data/geoaidesk/work/gaid-pocheon-trial/pass1-run/. Note → 서재 not possible on b74950e7 (A not deployed).
+- First pass history: authoring ap-bab647f7-674 (서재 → Workflow 만들기; sources heo2025.pdf + ESM1 zip); analyze
   (38 findings, 7 questions) → answers → draft 1 (package error, F13/F16) → revise 1 with researcher feedback
   (passes the package check; quick run keeps the core window, 25 m, all data, 30 iterations) → revise 2 (feedback:
   quick results interpretable at resolution; no per-step approval gates) running. Analysis project pgi-2c2f48
   ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
-1. Finish the first authoring pass (review app, project ap-bab647f7-674, GPT-6.1 Sol high via an in-page fetch patch
-   for F1 and a randomUUID polyfill for F9); answer questions as a researcher; record steering findings.
-2. Reference PGI: tune the synthetic example until PGI behaves as in the paper (ore mean shift, both criteria);
-   time ≤ 10 min (run 2: 220 s for both variants on 82,807 active cells, 620 data).
+<!-- task:closed -->
+Closed 2026-10-23T11:47:39Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-pocheon-trial.md.
+
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-23: Example data = SYNTHETIC at the real site (decision 2 fallback, pending the Oracle survey for real
@@ -225,7 +292,10 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [결정 gaid-pocheon-trial#1] 허브의 포천 Workflow에 들어 있는 논문 보충 코드(Springer ESM1, 공개 이용 조건 미표시)의 공유 범위 — 가) 기관 허브 안 공유는 유지하고 기관 밖 공유 전에 저자에게 이용 허락을 받음 — 나) 보충 코드를 빼고 방법 설명과 GAID가 쓴 코드만 남김 — 권장: 가) 같은 기관 저자의 공개 보충 자료이고 허브는 기관 안에서만 쓰임 — 막힌 일: 기관 밖 공유 — 조건: 없음 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#6-결정할-일
+- [부채 gaid-pocheon-trial#2] 허브 등록 대화상자의 "공유하지 않음: 연구 자료" 문구가, Workflow에 들어 있는 예제 자료(입력별 파일)가 함께 공유된다는 사실을 알리지 않음 (F21) — 가) 등록 대화상자에 "공유: 예제 자료 N개(크기)"를 더함 — 나) 그대로 둠 — 권장: 가) 연구 자료 공유 여부는 연구자가 등록 전에 알아야 함 — 막힌 일: 없음 — 조건: gaid-workflow-example 이후 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#5-한계
 ## Report
+Report: reports/2026-10-23-gaid-pocheon-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
