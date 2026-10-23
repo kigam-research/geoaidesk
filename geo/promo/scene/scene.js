@@ -1,5 +1,7 @@
-/* GAID promo film v2 (~105 s, structure draft v2 in the task document). Deterministic: window.motion.frame(t) draws film second t.
- * Footage and feature tags from PROMO_CAPTURE (capture-v2); demo frames are shown whole at one scale.
+/* GAID promo film v3 (~100 s, structure draft v3 in the task document). Deterministic: window.motion.frame(t) draws film second t.
+ * Footage and feature tags from PROMO_CAPTURE (capture-v3); demo frames are shown whole at one scale.
+ * The motion scenes keep their v2 choreography on a v2 clock; timed() maps each onto its v3 slot, and the demo length
+ * (and so everything after it) follows the capture frame counts.
  * Illustrative scenes (scattered sources, second brain) carry an on-screen "개념도" tag.
  * Legibility rule (user, 2026-10-23): film text >= 22 px, primary labels >= 30 px, no large empty areas.
  */
@@ -188,9 +190,16 @@
 
   // ================= scenes =================
   const scenes = [];
+  // Run a scene written on the v2 clock [srcA, srcB] inside the v3 slot [dstA, dstB] (linear time map).
+  const timed = (src, dst, build) => scenes.push(() => {
+    const draw = build();
+    const k = (src[1] - src[0]) / (dst[1] - dst[0]);
+    return t => draw(src[0] + (t - dst[0]) * k);
+  });
 
-  // S1 opening 0–5.2
-  scenes.push(() => {
+  // S1 opening (v2 clock 0–5.2)
+  const SLOT = { opening: [0, 4.4], background: [4.1, 15.9], cycle: [15.6, 22.3] };
+  timed([0, 5.2], SLOT.opening, () => {
     const layer = h('div', 'layer');
     const dial = sv('svg', { width: 1920, height: 1080 }, layer);
     dial.style.position = 'absolute';
@@ -222,17 +231,17 @@
   });
 
 
-  // ================= timeline v2 (structure draft v2, task document) =================
-  const DURATION = 105;
+  // ================= timeline v3 (structure draft v3, task document) =================
   // Real-system segments: one shot each, whole app frame at one scale (no zoom, no pan; user feedback 2026-10-23).
   // a/b are film seconds; consecutive shots overlap by 0.1 s. Beats (feature tags) come from capture.json.
-  const SHOT_ORDER = ['L1', 'L1b', 'A1', 'A2', 'A3', 'H1', 'H2', 'R1', 'R2', 'M1', 'N1', 'N2', 'L2', 'L3'];
-  const SHOT_TARGET = { L1: 6, L1b: 4, A1: 4, A2: 4.5, A3: 4, H1: 4, H2: 4, R1: 6, R2: 6, M1: 5, N1: 5.5, N2: 3.5, L2: 4.5, L3: 4 };
+  const SHOT_ORDER = ['L1', 'L2', 'A1', 'A2', 'A3', 'A4', 'H1', 'H2', 'R1', 'R2', 'R3', 'M1', 'N1', 'L3', 'L4', 'L5'];
+  const SHOT_TARGET = { L1: 5, L2: 4, A1: 5, A2: 5, A3: 4, A4: 3.5, H1: 4.5, H2: 3.5, R1: 4.5, R2: 4.5, R3: 6, M1: 5, N1: 5.5, L3: 4, L4: 4, L5: 3.5 };
   const SEG = [];
   {
-    let at = 28.3;
+    let at = SLOT.cycle[1] + 0.05;
     for (const id of SHOT_ORDER) {
       const info = CAP && CAP.shots ? CAP.shots.find(s => s.id === id) : null;
+      if (CAP && CAP.shots && !info) continue; // a take the capture does not have (preview with older frames)
       const dur = info ? info.frames / FPS : SHOT_TARGET[id];
       SEG.push({ shot: id, a: at, b: at + dur });
       at += dur - 0.1;
@@ -245,25 +254,28 @@
     { icon: 'orbit', label: '연구 분석' },
     { icon: 'notebook-pen', label: '연구노트' },
   ];
-  const CHAPTERS_V2 = [
-    { st: 0, title: '내 서재', shots: ['L1', 'L1b'] },
-    { st: 1, title: '논문에서 Workflow 만들기', shots: ['A1', 'A2', 'A3'] },
+  const CHAPTERS = [
+    { st: 0, title: '내 서재', shots: ['L1', 'L2'] },
+    { st: 1, title: '논문에서 Workflow 만들기', shots: ['A1', 'A2', 'A3', 'A4'] },
     { st: 2, title: 'GAID 허브에 공유', shots: ['H1', 'H2'] },
-    { st: 3, title: 'Workflow로 연구 분석', shots: ['R1', 'R2', 'M1'] },
-    { st: 4, title: '연구노트로 정리', shots: ['N1', 'N2'] },
-    { st: 0, back: true, title: '다시 내 서재로', shots: ['L2', 'L3'] },
+    { st: 3, title: 'Workflow로 연구 분석', shots: ['R1', 'R2', 'R3', 'M1'] },
+    { st: 4, title: '연구노트로 정리', shots: ['N1'] },
+    { st: 0, back: true, title: '다시 내 서재로', shots: ['L3', 'L4', 'L5'] },
   ].map(c => {
     const segs = SEG.filter(s => c.shots.includes(s.shot));
-    return { ...c, a: segs[0].a, b: segs[segs.length - 1].b };
-  });
-  const DEMO = { a: CHAPTERS_V2[0].a, b: CHAPTERS_V2[CHAPTERS_V2.length - 1].b };
+    return segs.length ? { ...c, a: segs[0].a, b: segs[segs.length - 1].b } : null;
+  }).filter(Boolean);
+  const DEMO = { a: CHAPTERS[0].a, b: CHAPTERS[CHAPTERS.length - 1].b };
+  SLOT.brain = [DEMO.b - 0.25, DEMO.b - 0.25 + 7.8];
+  SLOT.closing = [SLOT.brain[1] - 0.3, SLOT.brain[1] - 0.3 + 4.3];
+  const DURATION = Math.ceil(SLOT.closing[1]);
 
   const stationIcon = (st, size, color) => (st.icon === 'orbit'
     ? `<span class="icon" style="width:${size * 1.5}px;height:${size}px;color:${color}">${ORBIT_ICON(size)}</span>`
     : icon(st.icon, size, color));
 
-  // ---------- S2 background 4.9–20.2: existing skill ecosystems, scattered sources, gathered by GAID ----------
-  scenes.push(() => {
+  // ---------- S2 background (v2 clock 4.9–20.2): existing skill ecosystems, scattered sources, gathered by GAID ----------
+  timed([4.9, 20.2], SLOT.background, () => {
     const A = 4.9, B = 20.2;
     const layer = h('div', 'layer');
     const head = headline(layer, 110, 92, [
@@ -356,9 +368,9 @@
     };
   });
 
-  // ---------- S3 the research cycle 19.9–28.4 ----------
+  // ---------- S3 the research cycle (v2 clock 19.9–28.25) ----------
   const RING = { cx: 960, cy: 646, rx: 560, ry: 290 };
-  scenes.push(() => {
+  timed([19.9, 28.25], SLOT.cycle, () => {
     const A = 19.9, B = 28.25;
     const layer = h('div', 'layer');
     const head = headline(layer, 110, 92, [[20.2, 28.1, '내 연구가 Workflow가 되고, 다시 내 연구로 돌아옵니다']]);
@@ -380,7 +392,7 @@
       const dot = sv('circle', { cx: px, cy: py, r: 11, fill: '#ffffff', stroke: '#525a68', 'stroke-width': 3 }, svg);
       return { el, px, py, i, dot, rel: i / 5, ico: el.querySelector('.icon') };
     });
-    // 판 grows on the Workflow station as the loop passes the hub
+    // the Workflow's version grows as the loop passes the hub (researcher-facing "version", gaid-hub-versions)
     const pan = h('div', 'plate', layer, '');
     pan.style.fontSize = '30px';
     return t => {
@@ -421,8 +433,8 @@
       if (loop >= 0.999) { st[0].el.style.borderColor = BLUE; }
       const W = st[1];
       const panN = loop >= 0.42 ? 2 : 1;
-      pan.textContent = `판 ${panN}`;
-      box(pan, W.px - 40, W.py - 150);
+      pan.textContent = `version 0.1.${panN - 1}`; // the study's real versions: 0.1.0, then the run-learned patch 0.1.1
+      box(pan, W.px - pan.offsetWidth / 2, W.py - 150);
       put(pan, { o: ramp(t, 22.6, 23.0, lin), s: loop >= 0.42 ? 1 + 0.12 * (1 - ramp(t, 24.0, 24.4)) : 1 });
     };
   });
@@ -451,7 +463,7 @@
     ssvg.insertBefore(prog, base.nextSibling);
     // return path from 연구노트 back to 내 서재 (above the strip)
     const back = sv('path', { d: `M ${X1} ${Y - 12} C ${X1} ${Y - 40}, ${X0} ${Y - 40}, ${X0} ${Y - 12}`, fill: 'none', stroke: BLUE, 'stroke-width': 3, pathLength: 1, 'stroke-dasharray': '0 1' }, ssvg);
-    const titles = CHAPTERS_V2.map(c => {
+    const titles = CHAPTERS.map(c => {
       const el = text(layer, 'h2', 112, 26, c.title, { fontSize: '48px' });
       return { el, c };
     });
@@ -468,8 +480,8 @@
       put(layer, { o });
       if (o <= 0) return;
       // chapter state
-      const ci = Math.max(0, CHAPTERS_V2.findIndex(c => t >= c.a - 0.05 && t < c.b - 0.05));
-      const cur = CHAPTERS_V2[ci === -1 ? CHAPTERS_V2.length - 1 : ci];
+      const ci = Math.max(0, CHAPTERS.findIndex(c => t >= c.a - 0.05 && t < c.b - 0.05));
+      const cur = CHAPTERS[ci === -1 ? CHAPTERS.length - 1 : ci];
       titles.forEach(({ el, c }) => put(el, { o: win(t, c.a, c.b, 0.35, 0.25), y: 12 * (1 - ramp(t, c.a, c.a + 0.6)) }));
       const fwd = cur.back ? 4 : cur.st;
       const fx = lerp(nodes[0].x, nodes[fwd].x, 1);
@@ -528,8 +540,8 @@
     };
   });
 
-  // ---------- S4 ecosystem → KIGAM second brain 91.9–100.4 (conceptual) ----------
-  scenes.push(() => {
+  // ---------- S4 ecosystem → KIGAM second brain (v2 clock 91.6–100.5, conceptual) ----------
+  timed([91.6, 100.5], SLOT.brain, () => {
     const A = 91.6, B = 100.5;
     const layer = h('div', 'layer');
     const head = headline(layer, 110, 92, [
@@ -627,8 +639,8 @@
     };
   });
 
-  // ---------- S5 closing 100.2–105 ----------
-  scenes.push(() => {
+  // ---------- S5 closing (v2 clock 100.2–104.8) ----------
+  timed([100.2, 104.8], SLOT.closing, () => {
     const A = 100.2;
     const layer = h('div', 'layer');
     const L = lockup(layer, 280);
@@ -649,16 +661,16 @@
 
   // ---------- film position bar (no text; chapter ticks only) ----------
   function buildScale() {
-    const TICKS = [20, ...CHAPTERS_V2.map(c => c.a), 92, 100.2];
+    const TICKS = [SLOT.cycle[0], ...CHAPTERS.map(c => c.a), SLOT.brain[0], SLOT.closing[0]];
     const layer = h('div', 'layer');
     const svg = sv('svg', { width: 1920, height: 1080 }, layer);
-    const x0 = 0, x1 = 1920, y = 1077, a = 5, b = 100.2;
+    const x0 = 0, x1 = 1920, y = 1077, a = SLOT.opening[1], b = SLOT.closing[0];
     const sx = t => lerp(x0, x1, (t - a) / (b - a));
     sv('line', { x1: x0, x2: x1, y1: y, y2: y, stroke: '#d5dae1', 'stroke-width': 6 }, svg);
     for (const t of TICKS) sv('line', { x1: sx(t), x2: sx(t), y1: y - 12, y2: y + 3, stroke: '#878f9d', 'stroke-width': 2 }, svg);
     const fill = sv('line', { x1: x0, x2: x0, y1: y, y2: y, stroke: BLUE, 'stroke-width': 6 }, svg);
     return t => {
-      put(layer, { o: win(t, 5.0, 100.4, 0.6, 0.6) });
+      put(layer, { o: win(t, a, b + 0.2, 0.6, 0.6) });
       fill.setAttribute('x2', sx(clamp(t, a, b)));
     };
   }
@@ -686,6 +698,17 @@
       ready: true,
       duration: DURATION,
       segments: SEG,
+      stills: {
+        '01-opening': 3.7,
+        '02-skills': lerp(...SLOT.background, 0.3),
+        '03-scattered': lerp(...SLOT.background, 0.6),
+        '04-gathered': lerp(...SLOT.background, 0.9),
+        '05-cycle': lerp(...SLOT.cycle, 0.75),
+        ...Object.fromEntries(SEG.map((sg, i) => [`${String(i + 6).padStart(2, '0')}-${sg.shot}`, +((sg.a + sg.b) / 2).toFixed(2)])),
+        [`${String(SEG.length + 6).padStart(2, '0')}-network`]: lerp(...SLOT.brain, 0.4),
+        [`${String(SEG.length + 7).padStart(2, '0')}-second-brain`]: lerp(...SLOT.brain, 0.85),
+        [`${String(SEG.length + 8).padStart(2, '0')}-closing`]: DURATION - 0.3,
+      },
       async frame(t) {
         pending.length = 0;
         for (const d of drawers) d(t);
