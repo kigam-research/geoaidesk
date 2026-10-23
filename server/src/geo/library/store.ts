@@ -23,6 +23,7 @@ import type {
   LibraryCollection,
   LibraryItem,
   LibraryItemSummary,
+  LibraryNoteSummary,
   MetadataOrigin,
   ZoteroLibraryState,
 } from "../../../../web/src/geo/contracts/library.ts";
@@ -192,7 +193,7 @@ export class LibraryStore {
     if (this.items.size >= LIBRARY_LIMITS.items) throw new LibraryError("Library is full", 413);
     const doi = normalizeDoi(csl.DOI);
     if (doi) {
-      const existing = [...this.items.values()].find((i) => !i.removedFromSourceAt && normalizeDoi(i.csl.DOI) === doi);
+      const existing = [...this.items.values()].find((i) => !i.removedFromSourceAt && i.kind !== "note" && normalizeDoi(i.csl.DOI) === doi);
       if (existing) throw new LibraryError(`Already in the library: ${existing.id}`, 409);
     }
     const collections = await this.collections();
@@ -229,6 +230,8 @@ export class LibraryStore {
   async editGaidItem(id: string, patch: { csl?: unknown; tags?: unknown; collectionIds?: unknown }): Promise<LibraryItem> {
     const item = await this.get(id);
     if (item.source !== "gaid") throw new LibraryError("Edit this item in Zotero", 409);
+    // A research note's title and date come from its file (the master).
+    if (item.kind === "note" && patch.csl !== undefined) throw new LibraryError("Edit the research note file instead", 409);
     const csl = patch.csl === undefined ? undefined : validCsl(patch.csl);
     const collections = await this.collections();
     return this.mutate(id, (next) => {
@@ -388,7 +391,7 @@ export function samePaper(a: CslItem, b: CslItem): boolean {
   return cslYear(a) === cslYear(b) && fam(a) === fam(b);
 }
 
-export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): LibraryItemSummary {
+export function summarize(item: LibraryItem, used: LibraryItemSummary["used"], note?: LibraryNoteSummary): LibraryItemSummary {
   const year = cslYear(item.csl);
   return {
     id: item.id,
@@ -407,5 +410,7 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"]): 
     addedAt: item.addedAt,
     ...(isRetracted(item.signals) ? { retracted: true } : {}),
     ...(item.ownWork ? { ownWork: true } : {}),
+    kind: item.kind === "note" ? "note" : "paper",
+    ...(note ? { note } : {}),
   };
 }
