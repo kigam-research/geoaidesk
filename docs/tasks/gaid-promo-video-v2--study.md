@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:49:00Z
+updated: 2026-10-23T03:48:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
 target: task/gaid-promo-video-v2
@@ -60,23 +60,25 @@ updated for v2 (reproduce steps, deviations). Report deviations from the shot li
 not appear). Then task save / task finish your unit.
 
 ## Current state
-- Resumed on PC74 in the printed worktree; read contract v2 and v1 capture helpers.
-- Interface settled: capture-v2 at 2880x1620, 30 fps; reuse v1 pointer and click interpolation without its status masking or mutation guard.
-- Sequential work: preserve before evidence; create library paper/folder; author and register Workflow; create project and run quick trial; answer note; revisit library and capture stored states.
-- Owned files: capture*.py, CAPTURE.md, this task document. No workers needed: live UI state and recording are tightly coupled.
+- Ready for parent integration: capture-v2 has 14 shots, 1,950 frames (65 s), 2880x1620 at 30 fps. All 31 beat rectangles were drawn on midpoint frames at scale 2.25 and visually checked; proofs in capture-v2/beat-checks/. A3 retaken below the fixed header.
+- Completed neutral-name M1, clean real-working R2, new Western Australia figure, and new N1/N2 note/decision takes. capture.json, study.json, contact sheet and CAPTURE.md finalized under ~/data/geoaidesk/work/gaid-promo-video-v2/.
+- New paper li-9c9d1be4e0ca (ahn2026), folder lc-0a58cae5488a, draft ap-33965983-5f2 (revision 2 check passed), registered entry entry-ap-33965983-5f2 revision 1, project yilgarn-cd7814, session 01a166b1-256d-71f4-b5e3-53298806a36d, note 2026-10-23-yilgarn-priority. New decision sent and reflected.
+- No training. Existing zone results reused; EPSG:3857 is parent-directed display assignment. R1/chat use older Workflow entry-ap-a135f290-1c4 revision 2; H1/H2 show new entry. R2's live citation-check segment is editorially combined with the earlier finished figure.
+- Checks: syntax, all frame dimensions/files and beat constraints passed; 27 existing local domain/index records unchanged. Remote unrelated star change remains unattributed and disclosed. No app source or service change; app suite not run.
 ## Next steps
-1. Continue authoring ap-33965983-5f2 when draft retry completes; capture A3 and registration. If the retry fails for provider availability again, stop model steps and notify parent.
-2. Keep using capture controller http://127.0.0.1:18329 (recorded job, do not relaunch). Browser globals: page/authorpage, libpage, study, api_get.
-3. Register, create one project, quick trial, note decision, library return; record IDs in external study.json.
-- Created paper li-9c9d1be4e0ca (ahn2026), folder lc-0a58cae5488a (광상 부존 가능성), draft ap-33965983-5f2. External study.json records them.
-- A1, A2, L1 and L1b captured (120, 135, 180 and 120 frames). Initial gate take discarded outside shots; entered the launcher's normal startup URL through UI (never read credential files).
-- Parent authorized already connected subscription model via per-action picker after two default-model failures. Selected openai-codex/gpt-6.1-sol for authoring; analysis accepted (25,645 input / 6,776 output, costUsd 0); four answers submitted. First draft attempt failed on provider overload after one validation repair; retry running with same model. No Settings change.
-- Created project yilgarn-cd7814; uploaded user_data/Yilgarn_GIS_DB.csv via UI and attached only new library folder. Selected GPT-6.1 Sol subscription row (제공사의 구독 한도 적용) in chat. No chat request sent yet.
+- Capture controller job exited 0; review app and hub left running. Save reviewed helpers/docs and task finish; parent integrates the film.
 ## Failed approaches
-- Default authoring model twice failed with OpenRouter not configured. Stopped and escalated before choosing a model; parent sent explicit authorization.
-- Initial task job launch refused dirty source; saved once, then launched recorded job 1.
+- Default authoring twice failed: OpenRouter not configured. Parent authorized per-action connected subscription picker; no defaults changed.
+- One provider-overload draft attempt failed; retry and normal UI revision succeeded. Missing-file examples removed; draft 2 check passed with no findings.
+- An ineffective direct edit to own cached authoring record was restored byte-for-byte, then normal UI revision used.
+- Capture Chrome exited before final A3; replaced only the capture browser inside the existing recorded job. Normal token gate used; app/hub not restarted.
 ## Notes and decisions
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- User direction (verbatim): "baggingPU까지 실행할 필요 없다. 홍보영상을 만드는 것이며, 실제 분석결과까지 모두 다 가져오는 모습을 보일 필요 없다. 필요하다면 유사한 기 작업 결과를 가져와도 되므로 모든 과정을 돌리지 말아라. 특히 BaggingPU는 계산이 오래걸린다." Also: "정직한 영상을 원하는 것이 아니라 홍보용 영상을 원하는 것이다."
+- Parent subsequently authorized EPSG:3857 and promotional staging, requested neutral names, new map/figure/note/R2 takes and every beat's midpoint-frame rect QA. All applied. No BaggingPU or other training ran.
+- Sequential decisions and ownership: reuse immutable prior results, stage own outputs, record real decision/citation work, then validate frames and callouts. Only capture*.py, CAPTURE.md and this task doc owned. No workers; live UI/capture state is tightly coupled.
+- Models: authoring openai-codex/gpt-6.1-sol (medium), chat openai/gpt-6.1-sol (OAuth subscription; 제공사의 구독 한도 적용). Same underlying model, different refs. Final chat: 3,904,532 subscription tokens, charged USD 0, compute USD 0; list-price equivalent USD 0.8187376. Settings/credentials unchanged.
+- Evidence: 27 old local domain/index files unchanged; automatic collection/link/sync bookkeeping changed. Existing trial count +1 expected. Unrelated remote entry-ap-3b21b377-454 star 1→0 was never opened/mutated by study commands; attribution unknown, parent notified, no restoration.
+- Remaining format badge is decision-format after the answered decision becomes prose; bibliography resolves ahn2026. Parent accepted the badge. All current staging deviations and superseded takes are documented in CAPTURE.md/study.json.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

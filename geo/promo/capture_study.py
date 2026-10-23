@@ -21,6 +21,8 @@ OUT = WORK / 'capture-v2'
 class StudyTake(Take):
     """Reuse v1 pointer/click interpolation, without v1's disconnected-state mask."""
     def frame(self):
+        if not (0 <= self.pt['x'] <= CSS_W and 0 <= self.pt['y'] <= CSS_H):
+            raise ValueError('Pointer target is outside the viewport; stage the screen before recording.')
         a = (self.k - self.last_click) / 14 if self.k - self.last_click < 14 else None
         self.page.evaluate(DRAW, [self.pt, a])
         self.page.screenshot(path=str(self.dir / f'frame-{self.k:05d}.png'), animations='disabled')
