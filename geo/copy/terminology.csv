@@ -31,6 +31,7 @@ CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the 
 스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬, 허브 스킬이 있습니다.",,,Keep SKILL.md untranslated.
 허브 스킬,hub skill,"GAID 허브의 스킬 선반에 판마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 판을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
 작업 예제,worked example,"A recorded task with data, steps and outputs that a user can run.",데모,demo,
+예제 자료,example data,"Data a Workflow supplies for an input (bundled or downloaded by URL with its hash) so it can run when the researcher gives no file; results describe the example area.",샘플 데이터|예시 데이터,sample data|demo data,"Label synthetic examples 합성 자료 / synthetic data."
 실행 기록,run record,"The stored inputs, code, outputs and settings of one run.",실행 로그,run log,
 결과 파일,output file,"A file written by a run.",산출 파일,result file,
 실행 완료,run complete,"The program finished; says nothing about scientific correctness.",,,
