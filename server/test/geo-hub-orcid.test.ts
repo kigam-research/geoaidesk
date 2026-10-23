@@ -241,3 +241,14 @@ describe("researcher GAID with a reachable hub", () => {
     expect((await within(service.status())).hub).toEqual({ state: "ready", environment: "sandbox" });
   });
 });
+
+describe("researcher GAID with a hub server older than ORCID support", () => {
+  it("reports not-configured, not unreachable, when the hub has no ORCID routes", async () => {
+    const missing = async () => { throw new AuthoringError("허브 서버에서 요청한 항목을 찾지 못했습니다.", 404); };
+    const port: OrcidHubPort = { status: missing, start: missing, finish: missing, unlink: missing };
+    const store = new LibraryStore(join(root, "library"));
+    const service = new OrcidService(store, { hub: () => port, lookupDoi: async () => { throw new Error("unused"); } });
+    expect((await service.status()).hub).toEqual({ state: "not-configured" });
+    await expect(service.authStart()).rejects.toMatchObject({ status: 409 });
+  });
+});

@@ -114,7 +114,10 @@ export class OrcidService {
       if (s.link) return { state: "linked", environment: s.link.environment, link: s.link };
       return s.configured && s.environment ? { state: "ready", environment: s.environment } : { state: "not-configured" };
     } catch (error) {
-      return error instanceof AuthoringError && error.status === 401 ? { state: "no-account" } : { state: "unreachable" };
+      if (error instanceof AuthoringError && error.status === 401) return { state: "no-account" };
+      // A hub server older than ORCID support has no /orcid route.
+      if (error instanceof AuthoringError && error.status === 404) return { state: "not-configured" };
+      return { state: "unreachable" };
     }
   }
 
@@ -124,7 +127,7 @@ export class OrcidService {
     if (!port) throw new LibraryError("기관 GAID 허브에 로그인해야 ORCID 본인 확인을 할 수 있습니다.", 409);
     try { return await port.start(); }
     catch (error) {
-      if (error instanceof AuthoringError && error.status === 409) throw new LibraryError("기관 GAID 허브에 ORCID 연결이 설정되어 있지 않습니다.", 409);
+      if (error instanceof AuthoringError && (error.status === 409 || error.status === 404)) throw new LibraryError("기관 GAID 허브에 ORCID 연결이 설정되어 있지 않습니다.", 409);
       if (error instanceof AuthoringError && error.status === 401) throw new LibraryError("기관 GAID 허브에 다시 로그인해 주세요.", 409);
       throw new LibraryError("기관 GAID 허브에 연결하지 못했습니다.", 502);
     }

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:17:24Z
+updated: 2026-10-23T02:19:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -90,8 +90,8 @@ Outside check: no outside check.
    account linked 0000-0003-2034-5770 (production). Afterwards: hub link removed (DELETE /geo/orcid/auth), local iD removed,
    client file cleared from the e2e hub, jobs 3/4 stopped and disposed (cancelled, deliberate stop). The institute hub
    (PC74 :8700) was not touched; configuring it with the production client is a rollout step for the operator.
-Blocked: waiting for child gaid-orcid--authui's `task finish` (its final scripts/check is running in the child session; checkpoint b231b17d).
-5. After 2–3: full scripts/check, report section for phase 2, humanizer, review-copy, task finish.
+5. Child authui completed/closed 2026-10-23 (integrated 8105d988). User decision 2026-10-23 (this tab, verbatim): "아직은 기관 허브서브에 배포하지 않는다. 검토용 앱에 통합은 할 것이다." → no institute hub deploy; old hubs (no /orcid route, 404) now show not-configured.
+6. Remaining: full scripts/check → task sync (main) → update the review app (~/deploy/geoaidesk, unit gaid-review, recipe in memory/PROJECT.md; back up config first, keep hub connection) and verify → PROJECT.md review-app SHA → humanizer + review-copy → task finish.
 ## Failed approaches
 ## Notes and decisions
 - User decisions 2026-10-22 (this tab, verbatim choices): scope "1단계 먼저, 2단계는 등록 후 (Recommended)"; ORCID app
@@ -123,7 +123,7 @@ Blocked: waiting for child gaid-orcid--authui's `task finish` (its final scripts
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 기관 허브 서버(PC74)에 ORCID 본인 확인을 배포할까요? — 가) 새 배포 작업으로 지금 진행하고, 배포 뒤 사용자가 허브 PC에서 실제 ORCID 앱 비밀값을 한 번 넣음 — 나) 시범 연구자 범위나 HTTPS 전환이 정해질 때까지 미룸 — 권장: 가) 코드와 시험·실제 ORCID 로그인 시험이 끝나 시범 연구자가 바로 쓸 수 있음 — 막힌 일: 기관 허브에서의 ORCID 본인 확인과 허브 Workflow 작성자 iD 표시 — 조건: 배포 시 허브 데이터베이스 변경 4단계가 한 번 적용됨 — 근거: reports/2026-10-22-gaid-orcid#6-결정할-일
+- [대기] 기관 허브 서버(PC74)에 ORCID 본인 확인(2단계)을 배포하는 시점 — 가) 사용자가 정할 때 배포 작업을 시작하고, 배포 뒤 사용자가 허브 PC에서 실제 ORCID 앱 비밀값을 한 번 넣음 — 나) 계속 보류 — 권장: 가) 코드와 실제 ORCID 로그인 시험은 끝남 — 막힌 일: 기관 허브와 검토용 앱에서의 ORCID 본인 확인, 허브 Workflow 작성자 iD 표시 — 조건: 사용자 결정 2026-10-23 "아직은 기관 허브서브에 배포하지 않는다. 검토용 앱에 통합은 할 것이다." — 근거: reports/2026-10-22-gaid-orcid#6-결정할-일
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
