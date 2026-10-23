@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:06:10Z
+updated: 2026-10-23T12:06:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"56c05725-7189-46a4-9615-7e1ddddb7ee0","pid":515641,"provider":"claude","session":"31d96ed7-e560-44e9-9232-a2b8aa7a787b","start":"64415659","token":"705a5edd3ea6c16b909c87cbd34aa6359cc9106a13b769c29f4592a9e6ef672d"}
 branch: task/gaid-workflow-cite-scope
 target: main
@@ -75,8 +75,9 @@ Plan (2026-10-23, writer; tightly coupled, done by the writer without child unit
   (project, Workflow title), next to the existing authoring-draft use.
 - F21: RegisterDialog lists the draft's bundled example files (name, size, licence/source, synthetic) and says they
   are shared with everyone who can see the entry; the "not shared" line no longer claims all 연구 자료.
-- D's F21 open item is item 2 of gaid-pocheon-trial (not yet in the ledger while D is active): add
-  `Closes: gaid-pocheon-trial#2` only if D has finished and numbered it by the time this unit finishes.
+- D's F21 open item is gaid-pocheon-trial#2 (hub confirmed it is on main, 2026-10-23); this unit's F21 change closes it:
+
+Closes: gaid-pocheon-trial#2
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
