@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-23T04:19:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
@@ -67,7 +67,7 @@ not appear). Then task save / task finish your unit.
 - Checks: syntax, all frame dimensions/files and beat constraints passed; 27 existing local domain/index records unchanged. Remote unrelated star change remains unattributed and disclosed. No app source or service change. Declared suite/publication result belongs to the task finish completion receipt.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T04:10:55Z: ready; the parent gaid-promo-video-v2 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T04:19:35Z: ready; the parent gaid-promo-video-v2 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First task finish was interrupted during hidden full-suite checking, leaving local ready commit a8999f86 unpublished. Parent correctly rejected task complete. No resume or task save used; fix and retry in place.
