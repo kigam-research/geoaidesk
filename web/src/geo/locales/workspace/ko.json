@@ -43,7 +43,6 @@
   },
   "setup": {
     "open": "시작 설정 열기",
-    "description": "입력 파일과 분석 조건을 차례로 고르세요.",
     "required": "필수",
     "optional": "선택",
     "decideLater": "작업 중 결정",
@@ -62,12 +61,7 @@
     "blockedInput": "필수 입력 파일을 고르세요: {roles}",
     "steps": "시작 설정 단계",
     "stepLabel": "{n}단계: {name}",
-    "group": {
-      "inputs": "입력 파일",
-      "choices": "분석 조건"
-    },
     "summaryTab": "요약",
-    "counter": "{n} / {total}",
     "when": "필요한 경우: {condition}",
     "input": {
       "required": "필수 입력 · 형식 {formats}",
@@ -101,7 +95,6 @@
     "notChosen": "고르지 않음",
     "limitUntested": "미시험 Workflow입니다. 결과는 검토 전입니다.",
     "limit": "결과는 검토 전입니다.",
-    "moreAbout": "작업 내용과 입력 형식 보기",
     "moreResults": "예상 결과와 해석 한계 보기",
     "ready": {
       "skills": "필요한 스킬이 꺼져 있습니다: {names}",

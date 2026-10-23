@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:47:26Z
+updated: 2026-10-23T08:49:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -51,17 +51,19 @@ A gaid-note-library, D gaid-pocheon-trial (uses the review app). Do not restart 
 screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside check: none.
 
 ## Current state
-- Phase 1 (design) done, waiting for the user's answer (asked 2026-10-23). Mockups: `~/data/geoaidesk/work/gaid-workflow-start-ui/mockups/start.html`
-  (`?d=a|b&w=pu|paper&s=intro|input|choice|summary&v=instrument|mapsheet&t=light|dark`, built on the adopted v2 mockup kit;
-  served locally with `uv run --no-project python -m http.server 3391` in that folder; captures by `../shot.sh`, 33 in `../shots/`).
-  Proposal (Korean, humanizer applied): `~/data/geoaidesk/work/gaid-workflow-start-ui/proposal/index.md`, review copy
-  `~/vaults/cmds-main/연구 보고서/geoaidesk/2026-10-23-gaid-workflow-start-ui-mockup/` (obsidian-sync service inactive).
-- Questions to the user: (1) step rail 가) grouped scale in the 720 px sheet vs 나) left list of every step name in a 920 px
-  sheet (recommended 나: Q4 names every step; breaks D2 width, to be reported); (2) 일반 Workflow start: 가) start draft in a
-  new chat like GAID Workflows, model chosen in the composer, no model chip in the window (recommended) vs 나) keep model
-  chip + immediate run (`Workflow 실행`).
+- Implemented on the branch (design approved 2026-10-23, unit B merged in at 5b724939): one start window for every Workflow
+  (`web/src/geo/workspace/start-window.tsx`, 920 px, left `StepList` `web/src/geo/shell/step-list.tsx` + `.gaid-steplist-*` in
+  globals.css), Workflow 소개 first (`start-intro.tsx`), file groups 내 자료/이전 결과 + F17 name matching and summary flag
+  (`setup-steps.tsx`, `task-setup.tsx`), 일반 Workflow adapter (`upstream-start.tsx`) through `extension.renderLaunch` in
+  `web/src/components/workflows-panel.tsx` (boundaries updated). Only researcher-saved start settings (`resume`) skip the intro.
+  Docs: AGENTS.md Workflow panel, ui-guide §0/D2/Q4, ui-rules `sheetPx.workflowStart`, glossary (2 terms).
+- Verified: web `npx tsc --noEmit` clean; `npx vitest run src/geo src/components/workflows-panel.test.tsx` all pass except the
+  map viewer test timing out under load 35 (passes alone, 9/9); copy 0 errors; check-ui 0 errors. Own app instance (ports
+  3392/18392, data `~/data/geoaidesk/work/gaid-workflow-start-ui/home/`, unit `gaid-wfsu-app`, stopped) with a Yilgarn project
+  copy: 48 screenshots `app-shots/` (both styles, both themes, 1440/1280) and a live 일반 Workflow start (draft + file in a new chat).
+- Full scripts/check run 1: `~/data/geoaidesk/work/gaid-workflow-start-ui/check-1.log` (result below when done).
 ## Next steps
-1. Implement (design approved 2026-10-23; unit B merged into this branch at 5b724939): the chosen design (plan in Notes), checks, §12 screenshots, report.
+1. Read check-1.log; fix failures; then task finish (report declared below).
 ## Failed approaches
 ## Notes and decisions
 - F17 (from gaid-pocheon-trial via hub request h-f17, 2026-10-23) accepted into the implementation, inside decision 3
@@ -92,6 +94,7 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-workflow-start-ui/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

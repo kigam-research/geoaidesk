@@ -43,7 +43,6 @@
   },
   "setup": {
     "open": "Open start settings",
-    "description": "Choose the input files and analysis conditions step by step.",
     "required": "required",
     "optional": "optional",
     "decideLater": "Decide during the task",
@@ -62,12 +61,7 @@
     "blockedInput": "Choose the required input files: {roles}",
     "steps": "Start settings steps",
     "stepLabel": "Step {n}: {name}",
-    "group": {
-      "inputs": "Input files",
-      "choices": "Analysis conditions"
-    },
     "summaryTab": "Summary",
-    "counter": "{n} / {total}",
     "when": "Needed when: {condition}",
     "input": {
       "required": "Required input · formats {formats}",
@@ -101,7 +95,6 @@
     "notChosen": "Not chosen",
     "limitUntested": "Untested Workflow. Results are not yet reviewed.",
     "limit": "Results are not yet reviewed.",
-    "moreAbout": "Show what it does and input formats",
     "moreResults": "Show expected results and limits",
     "ready": {
       "skills": "Required skills are turned off: {names}",
