@@ -10,6 +10,8 @@ import type { AuthoringProject, HubEntryLink, MethodDraft } from "../../../../we
 import type { EditEntryResult } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { structuredDraft } from "../authoring/workflow.ts";
 import { addSource } from "../authoring/sources.ts";
+import { restoreExampleBytes } from "../authoring/examples.ts";
+import { readTarGz } from "../tar.ts";
 import { AuthoringError, now, type AuthoringStore } from "../authoring/store.ts";
 import type { StoredEntry } from "./store.ts";
 import { isEntryAuthor, type Actor, type HubRecordStore } from "./records.ts";
@@ -81,6 +83,11 @@ async function seedFromEntry(
         recursive: true,
         errorOnExist: false,
       });
+    if (authoring.exists(original.id, "examples"))
+      await cp(authoring.within(original.id, "examples"), authoring.within(project.id, "examples"), {
+        recursive: true,
+        errorOnExist: false,
+      });
   } else if (draft.codeFiles.length) {
     const archive = await store.bytes(record.entry.id, `packages/${revision}.tar.gz`);
     const { source, extraction } = await addSource(authoring, project.id, {
@@ -97,6 +104,21 @@ async function seedFromEntry(
       sourcePath: listed.has(f.path) ? f.path : `${snapshot.package.slug}/${f.path}`,
     }));
   }
+  // Bundled example data travels in the package; the next package of this draft needs the bytes again.
+  await restoreExampleBytes(
+    authoring,
+    { ...project, ...(original ? { extractions: original.extractions } : {}) },
+    draft,
+    async () => {
+      const prefix = `${snapshot.package.slug}/`;
+      const archive = await store.bytes(record.entry.id, `packages/${revision}.tar.gz`);
+      return new Map(
+        readTarGz(archive)
+          .filter((e) => e.type === "file" && e.path.startsWith(prefix))
+          .map((e) => [e.path.slice(prefix.length), e.data]),
+      );
+    },
+  );
   const visuals: NonNullable<AuthoringProject["visuals"]> = {};
   let index = 0;
   for (const [key, visual] of Object.entries(snapshot.visuals)) {

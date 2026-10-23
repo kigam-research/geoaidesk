@@ -349,7 +349,9 @@
     "environment": "Run environment",
     "openProject": "Open the project",
     "extraPackages": "Python libraries outside the prepared environment: {packages}. The AI agent installs them during analysis following the skill instructions. If installation is blocked, that step stops.",
-    "optionalPackage": "{name} (optional step)"
+    "optionalPackage": "{name} (optional step)",
+    "example": "Without an uploaded file, the example data is used: {title}",
+    "exampleAlso": "The start settings also offer the example data: {title}"
   },
   "register": {
     "open": "Preview hub page",
@@ -488,6 +490,78 @@
   "editing": {
     "edit": "You are editing revision {revision} of your registered Workflow. Registering it in the hub makes revision {next}.",
     "copy": "Your copy of revision {revision} of “{title}” by {author}. Registered, it becomes a separate Workflow that names the original."
+  },
+  "example": {
+    "heading": "Example data",
+    "line": "Add example data to each input so researchers who try the Workflow can run it without their own data.",
+    "size": {
+      "mib": "{n} MiB",
+      "kib": "{n} KiB"
+    },
+    "synthetic": "Synthetic data",
+    "bundled": {
+      "badge": "Included in the Workflow",
+      "tooltip": "The files ship with the Workflow and are copied into the project at start."
+    },
+    "remote": {
+      "badge": "Downloaded on first use",
+      "tooltip": "Downloaded from the public URL on first use and checked against the file recorded when it was added."
+    },
+    "source": "Source: {source}",
+    "meta": "{size}, {files} files",
+    "license": "Terms of use: {license}",
+    "noLicense": "No terms of use given.",
+    "removeAsk": "The new revision drops this example data. Earlier revisions keep it.",
+    "remove": {
+      "action": "Remove example data",
+      "confirm": "Make revision without it"
+    },
+    "cancel": "Cancel",
+    "edit": {
+      "action": "Edit description",
+      "title": "Edit example data description",
+      "save": "Save description"
+    },
+    "replace": {
+      "action": "Replace with other data"
+    },
+    "add": {
+      "action": "Add example data",
+      "title": "Add example data",
+      "save": "Add example data"
+    },
+    "none": "No example data.",
+    "from": {
+      "label": "Take from",
+      "upload": "Files on this PC",
+      "source": "Draft sources",
+      "url": "Public URL"
+    },
+    "upload": {
+      "label": "Files to upload (you can pick several)",
+      "hint": "Each file is at most {mib} MiB. Add larger data by public URL.",
+      "tooLarge": "A file is larger than {mib} MiB. Add larger data by public URL."
+    },
+    "sourceList": {
+      "pick": "Source",
+      "filter": "Find by file name",
+      "more": "{count} more files. Find them by name.",
+      "none": "No source lists files. Add an archive or data bundle in the sources step first."
+    },
+    "url": {
+      "label": "Public URLs (one per line)",
+      "hint": "Enter https URLs that open without a login. GAID downloads each once now, records its size and check value, and does not keep the file."
+    },
+    "field": {
+      "title": "Title",
+      "source": "Source",
+      "sourceHint": "Provider, citation or how it was made",
+      "license": "Terms of use (optional)",
+      "licenseHint": "e.g. CC BY 4.0",
+      "synthetic": "Synthetic data made by simulation"
+    },
+    "checking": "Checking URL",
+    "saving": "Saving"
   },
   "library": {
     "title": "Add sources from the library",

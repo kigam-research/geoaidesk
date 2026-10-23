@@ -80,6 +80,23 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/cli-export.ts`, `GET /geo/workflows/:id/cli-export`, `GET /geo/hub/entries/:id/cli-export`,
   `web/src/geo/workflow/cli-export.tsx`, namespace `workflowCli`) downloads the 지침 as a prompt/command file (`$ARGUMENTS`)
   plus the skill folders for Pi and Claude Code (verified with the real CLIs); Codex is not offered until verified.
+- Workflow example data (gaid-workflow-example; contract `web/src/geo/contracts/workflow-examples.ts`): a gaid-workflow/v1
+  input role may carry `example` {title, source, license?, synthetic?, files[]}: files bundled in the package at exactly
+  `examples/<roleId>/<name>` (≤ 10 MiB each, ≤ 15 MiB per Workflow) or a public https `url` + sha256 + size (≤ 512 MiB),
+  validated in `method-file.ts`. `GET /geo/methods` reports each example's state (`present|bundled|remote|broken`,
+  `server/src/geo/methods/examples.ts`); `POST /geo/methods/examples` writes it into
+  `user_data/examples/<method>/<roleId>-<key>/` (content-addressed, never overwrites, bounded download, hash checked, recorded
+  as a user upload). The start settings offer it per input next to the researcher's files and an upload, select it when the
+  researcher has no fitting file of their own (optional inputs follow when no own data is used), warn when example and own
+  data are mixed, and the 지침 states which inputs are example data (`settings.examples`, block attribute `data="example"`,
+  card label 예제 자료로 실행). CLI export ships bundled examples inside the skill folder. Workflows without examples are unchanged.
+  Hub authoring (`server/src/geo/authoring/examples.ts`, screen `web/src/geo/hub/example-data.tsx`, namespace `hub.example`):
+  `POST /geo/authoring/projects/:id/examples` attaches an example to a draft input from an upload (bytes at
+  `examples/<sha256>`), a draft data source (`from.sourceId`, re-hashed) or a public URL (fetched once with bounds for
+  sha256/size, bytes not kept); `/examples/:roleId` edits text, `/examples/:roleId/remove` removes; each makes a researcher
+  revision. The coauthor model never sees or writes examples (`carryExamples` moves them by role id). The package puts
+  bundled bytes at `examples/<roleId>/<name>`, drops `from`, checks `example-invalid|example-total|example-file`; packages
+  without examples are byte-identical to before. Editing a registered entry restores bundled bytes from its package.
 - Project workspace state (gaid-project-resume, user decision 2026-10-23: "ProjectSwitcher는 잘 동작하다. "마지막 작업 상태"는 나로
   진행하자."): each project's last workspace (open chat tabs and the active one, per-tab composer settings and draft text, open
   files, panel layout) is kept on the GAID server in `.kady/geo/workspace-state.json` (`GET/PUT /geo/workspace-state`, scoped by
