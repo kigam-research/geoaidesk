@@ -7,7 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
-| <img src="2026-10-23-gaid-pocheon-trial/figures/01-orebody-3d.png" width="120"> | 2026-10-23 20:56 | [포천 자철석 PGI 논문으로 해 본 GAID 연구 흐름 실전 검증](2026-10-23-gaid-pocheon-trial/index.md) | 서재의 논문에서 Workflow를 만들어 허브에 등록하고, 예제 자료로 논문 수준의 PGI 분석과 연구 노트를 만든 뒤 노트를 서재로 가져오는 흐름이 실제 앱에서 이어졌습니다. 그 과정에서 찾은 문제 23건 가운데 13건을 이 작업에서 고쳤고 4건은 다른 단위가 해소했습니다. | 검토 전 | 미정 | 1 |
+| <img src="2026-10-23-gaid-pocheon-trial/figures/01-orebody-3d.png" width="120"> | 2026-10-23 20:56 | [포천 자철석 PGI 논문으로 해 본 GAID 연구 흐름 실전 검증](2026-10-23-gaid-pocheon-trial/index.md) | 서재의 논문에서 Workflow를 만들어 허브에 등록하고, 예제 자료로 논문 수준의 PGI 분석과 연구 노트를 만든 뒤 노트를 서재로 가져오는 흐름이 실제 앱에서 이어졌습니다. 그 과정에서 찾은 문제 23건 가운데 13건을 이 작업에서 고쳤고 4건은 다른 단위가 해소했습니다. | 검토함 10-23 | 미정 | 1 |
 | <img src="2026-10-23-gaid-workflow-start-ui/figures/01-workflow-intro.png" width="120"> | 2026-10-23 18:58 | [모든 Workflow를 같은 시작 창으로 열고 먼저 무엇을 하는지 보여 주기](2026-10-23-gaid-workflow-start-ui/index.md) | 기본·허브·일반 Workflow가 모두 같은 시작 창으로 열리고, 자료를 묻기 전에 하는 일·넣는 자료·만드는 결과·진행 단계·해석 한계를 먼저 보여 줍니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-authoring-evidence-view/figures/01-question-pdf.png" width="120"> | 2026-10-23 17:53 | [Workflow 만들기 질문 옆에 논문 해당 부분과 근거 자료 보기](2026-10-23-gaid-authoring-evidence-view/index.md) | GAID 허브에서 Workflow를 만들 때 질문마다 옆 뷰어에 근거가 된 논문 쪽과 코드 줄, 자료 파일 요약이 열리고, 선택지를 고르면 그 선택지의 근거로 이동합니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-hub-versions/figures/register-version.png" width="120"> | 2026-10-23 17:25 | [GAID 허브 Workflow 제거·복원과 version 관리](2026-10-23-gaid-hub-versions/index.md) | 등록한 Workflow를 허브에서 제거하고 다시 복원할 수 있습니다. 다시 등록할 때는 등록한 연구자가 다음 version(patch·minor·major)을 고릅니다. | 검토 전 | 미정 | 0 |

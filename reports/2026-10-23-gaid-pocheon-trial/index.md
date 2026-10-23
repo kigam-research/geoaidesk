@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-orebody-3d.png
 supersedes:
+reviewed: 2026-10-23
 ---
 # 포천 자철석 PGI 논문으로 해 본 GAID 연구 흐름 실전 검증
 
