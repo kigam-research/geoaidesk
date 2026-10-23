@@ -1,6 +1,6 @@
-/* GAID 90-second promo film (storyboard v2). Deterministic: window.motion.frame(t) draws film second t.
- * Numbers come from PROMO_DATA (geo/promo/prepare_data.py); footage from PROMO_CAPTURE (capture-v1).
- * The only illustrative scene (researchers' scattered files) carries an on-screen "개념도" tag.
+/* GAID promo film v2 (~105 s, structure draft v2 in the task document). Deterministic: window.motion.frame(t) draws film second t.
+ * Footage and feature tags from PROMO_CAPTURE (capture-v2); demo frames are shown whole at one scale.
+ * Illustrative scenes (scattered sources, second brain) carry an on-screen "개념도" tag.
  * Legibility rule (user, 2026-10-23): film text >= 22 px, primary labels >= 30 px, no large empty areas.
  */
 (() => {
@@ -97,22 +97,6 @@
     L.svg.style.top = `${cy - 32 * L.scale}px`;
     L.set({ lettersF: 0 });
     return L;
-  }
-
-  // ---------- film position bar (no text; chapter ticks only) ----------
-  const CHAPTERS = [5, 14, 24, 38.4, 53.7, 64, 78, 85];
-  function buildScale() {
-    const layer = h('div', 'layer');
-    const svg = sv('svg', { width: 1920, height: 1080 }, layer);
-    const x0 = 0, x1 = 1920, y = 1077, a = 5, b = 85;
-    const sx = t => lerp(x0, x1, (t - a) / (b - a));
-    sv('line', { x1: x0, x2: x1, y1: y, y2: y, stroke: '#d5dae1', 'stroke-width': 6 }, svg);
-    for (const t of CHAPTERS) sv('line', { x1: sx(t), x2: sx(t), y1: y - 12, y2: y + 3, stroke: '#878f9d', 'stroke-width': 2 }, svg);
-    const fill = sv('line', { x1: x0, x2: x0, y1: y, y2: y, stroke: BLUE, 'stroke-width': 6 }, svg);
-    return t => {
-      put(layer, { o: win(t, 5.0, 85.2, 0.6, 0.6) });
-      fill.setAttribute('x2', sx(clamp(t, a, b)));
-    };
   }
 
   // ---------- headline helper (M4: old text fades out before new text fades in) ----------
@@ -237,535 +221,399 @@
     };
   });
 
-  // S2 background 4.9–14.2 (illustrative files per researcher + one real count)
-  const ORBIT = { cx: 605, cy: 610, rx: 295, ry: 225 };
-  scenes.push(() => {
-    const layer = h('div', 'layer');
-    const head = headline(layer, 110, 96, [
-      [5.2, 8.7, '연구 방법은 논문과 개인 폴더에 흩어져 있습니다'],
-      [8.9, 11.7, '다시 쓰려면 남의 코드부터 읽어야 합니다'],
-      [11.9, 14.2, 'GAID는 그 방법을 Workflow로 만들어 함께 씁니다'],
-    ]);
-    const kinds = [['file-text', '논문'], ['code-xml', '코드'], ['map-gis', '자료'], ['notebook-pen', '노트']];
-    const cols = 5, x0 = 130, y0 = 270, dx = 345, dy = 178;
-    const tiles = [];
-    let seed = 11;
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < 4; r++) {
-        const el = h('div', 'face small', layer);
-        box(el, 0, 0, 290, 124);
-        Object.assign(el.style, { display: 'flex', alignItems: 'center', gap: '18px', padding: '0 28px' });
-        el.innerHTML = `${icon(kinds[r][0], 46)}<span class="h3" style="font-size:38px">${kinds[r][1]}</span>`;
-        tiles.push({ el, c, r, hx: x0 + c * dx + (rnd() - 0.5) * 60, hy: y0 + r * dy + (rnd() - 0.5) * 40, rot: (rnd() - 0.5) * 6, d: rnd() * 0.8 });
-      }
-    }
-    const tag = h('div', 'note-tag', layer, '개념도');
-    box(tag, 1700, 104);
-    // real count: original code files behind one registered hub Workflow
-    const codeN = D.hubEntry.codeFiles;
-    const waffle = h('div', 'face', layer);
-    box(waffle, 820, 236, 1000, 760);
-    const wsvg = sv('svg', { width: 1000, height: 760 }, waffle);
-    const cells = [];
-    for (let i = 0; i < codeN; i++) {
-      const cx = 64 + (i % 11) * 80, cy = 258 + Math.floor(i / 11) * 92;
-      const g = sv('g', { transform: `translate(${cx} ${cy})` }, wsvg);
-      sv('path', { d: 'M0 0 H40 L54 14 V68 H0 Z', fill: '#e8eeff', stroke: BLUE, 'stroke-width': 2 }, g);
-      cells.push(g);
-    }
-    const wt = sv('text', { x: 64, y: 150, 'font-size': 128, 'font-weight': 700, fill: '#171b23' }, wsvg);
-    const unit = sv('text', { x: 0, y: 150, 'font-size': 48, 'font-weight': 650, fill: '#525a68' }, wsvg);
-    unit.textContent = '개 파일';
-    const wl = sv('text', { x: 64, y: 210, 'font-size': 32, 'font-weight': 600, fill: '#525a68' }, wsvg);
-    wl.textContent = '허브 Workflow 1건이 담은 원본 코드';
-    return t => {
-      const o = win(t, 4.9, 14.3, 0.4, 0.4);
-      put(layer, { o });
-      if (o <= 0) return;
-      head(t);
-      const focus = ramp(t, 8.7, 9.6, inOut) * (1 - ramp(t, 11.6, 12.3, inOut));
-      const gather = ramp(t, 11.9, 14.0, inOut);
-      for (const tl of tiles) {
-        const appear = ramp(t, 5.2 + tl.d, 5.9 + tl.d);
-        // focus: the first two columns stay (the code row stays lit); gather: tiles fall onto the orbit of S3
-        const ang = ((tl.c * 4 + tl.r) / 20) * Math.PI * 2;
-        const tx = ORBIT.cx + ORBIT.rx * Math.cos(ang) - 145, ty = ORBIT.cy + ORBIT.ry * Math.sin(ang) - 62;
-        const x = lerp(tl.hx - focus * 30, tx, gather), y = lerp(tl.hy, ty, gather);
-        const dim = tl.r === 1 ? 1 : 1 - 0.6 * focus;
-        const keep = tl.c < 2 ? 1 : 1 - focus;
-        put(tl.el, { o: appear * dim * keep * (1 - ramp(t, 13.4, 14.1, lin)), x, y, s: lerp(1, 0.3, gather), r: tl.rot * (1 - gather) });
-      }
-      put(tag, { o: ramp(t, 5.6, 6.2, lin) * (1 - ramp(t, 11.7, 12.2, lin)) });
-      put(waffle, { o: win(t, 9.0, 11.8, 0.5, 0.4), x: 40 * (1 - ramp(t, 9.0, 9.8)) });
-      const shown = Math.round(codeN * ramp(t, 9.3, 10.8, lin));
-      cells.forEach((c, i) => c.setAttribute('opacity', i < shown ? 1 : 0));
-      wt.textContent = fmt(shown);
-      unit.setAttribute('x', 64 + wt.getComputedTextLength() + 14);
-    };
-  });
 
-  // S3 purpose loop 13.9–24.3
+  // ================= timeline v2 (structure draft v2, task document) =================
+  const DURATION = 105;
+  // Real-system segments: one shot each, whole app frame at one scale (no zoom, no pan; user feedback 2026-10-23).
+  // a/b are film seconds; consecutive shots overlap by 0.1 s. Beats (feature tags) come from capture.json.
+  const SEG = [
+    { shot: 'L1', a: 28.3, b: 34.5 }, { shot: 'L1b', a: 34.4, b: 38.6 },
+    { shot: 'A1', a: 38.5, b: 42.6 }, { shot: 'A2', a: 42.5, b: 47.0 }, { shot: 'A3', a: 46.9, b: 50.8 },
+    { shot: 'H1', a: 50.7, b: 54.8 }, { shot: 'H2', a: 54.7, b: 58.8 },
+    { shot: 'R1', a: 58.7, b: 63.8 }, { shot: 'R2', a: 63.7, b: 69.8 }, { shot: 'M1', a: 69.7, b: 74.8 },
+    { shot: 'N1', a: 74.7, b: 80.4 }, { shot: 'N2', a: 80.3, b: 84.4 },
+    { shot: 'L2', a: 84.3, b: 88.6 }, { shot: 'L3', a: 88.5, b: 92.2 },
+  ];
+  const STATIONS = [
+    { icon: 'library', label: '내 서재' },
+    { icon: 'file-text', label: 'Workflow 만들기' },
+    { icon: 'share-2', label: 'GAID 허브 공유' },
+    { icon: 'orbit', label: '연구 분석' },
+    { icon: 'notebook-pen', label: '연구노트' },
+  ];
+  const CHAPTERS_V2 = [
+    { st: 0, title: '내 서재', shots: ['L1', 'L1b'] },
+    { st: 1, title: '논문에서 Workflow 만들기', shots: ['A1', 'A2', 'A3'] },
+    { st: 2, title: 'GAID 허브에 공유', shots: ['H1', 'H2'] },
+    { st: 3, title: 'Workflow로 연구 분석', shots: ['R1', 'R2', 'M1'] },
+    { st: 4, title: '연구노트로 정리', shots: ['N1', 'N2'] },
+    { st: 0, back: true, title: '다시 내 서재로', shots: ['L2', 'L3'] },
+  ].map(c => {
+    const segs = SEG.filter(s => c.shots.includes(s.shot));
+    return { ...c, a: segs[0].a, b: segs[segs.length - 1].b };
+  });
+  const DEMO = { a: CHAPTERS_V2[0].a, b: CHAPTERS_V2[CHAPTERS_V2.length - 1].b };
+
+  const stationIcon = (st, size, color) => (st.icon === 'orbit'
+    ? `<span class="icon" style="width:${size * 1.5}px;height:${size}px;color:${color}">${ORBIT_ICON(size)}</span>`
+    : icon(st.icon, size, color));
+
+  // ---------- S2 background 4.9–20.2: existing skill ecosystems, scattered sources, gathered by GAID ----------
   scenes.push(() => {
+    const A = 4.9, B = 20.2;
     const layer = h('div', 'layer');
-    const head = headline(layer, 110, 96, [[14.3, 24.2, '한 연구자가 만든 Workflow를 다음 연구자가 이어 씁니다']]);
+    const head = headline(layer, 110, 92, [
+      [5.2, 10.0, 'AI agent가 쓸 과학 스킬은 이미 여러 곳에 공개되어 있습니다'],
+      [10.2, 15.0, '논문 속 방법, 기관 자료, 개인 폴더의 코드는 따로 흩어져 있습니다'],
+      [15.2, 20.0, 'GAID는 이것을 연구자가 쓰기 쉬운 한 곳으로 모읍니다'],
+    ]);
+    // Sources. Skill names are real: the K-Dense scientific agent skills and the KIGAM skills in GAID's catalogue.
+    const cards = [
+      ['code-xml', 'K-Dense AI 과학 스킬', ['geopandas', 'literature-review', 'citation-management', 'matplotlib'], 0],
+      ['map-gis', 'KIGAM 지구과학 스킬', ['geo-map-and-crs', 'well-log-qc-quicklook', 'spatial-pu-workflow'], 0],
+      ['git-branch', 'GitHub 공개 저장소의 스킬', ['저장소마다 따로 설치'], 0],
+      ['file-text', '논문 속 분석 방법', ['방법 절', '부록 코드'], 1],
+      ['database', '기관 자료', ['지질도', '시추·검층', '지구화학'], 1],
+      ['folder-open', '개인 폴더의 코드와 노트', ['스크립트', '분석 노트'], 1],
+    ].map(([ic, title, chips, phase], i) => {
+      const el = h('div', 'face', layer);
+      const col = i % 3, row = Math.floor(i / 3);
+      const W = 560, H = 290;
+      box(el, 0, 0, W, H);
+      el.innerHTML = `<div style="position:absolute;left:32px;top:28px;display:flex;align-items:center;gap:16px">${icon(ic, 44, 'var(--ink)')}<span class="h3" style="font-size:36px">${title}</span></div>`
+        + `<div style="position:absolute;left:32px;right:24px;top:100px;display:flex;flex-wrap:wrap;gap:12px 10px">${chips.map(c =>
+          `<span style="font-size:26px;font-weight:550;color:var(--ink-2);background:var(--face-2);border:1px solid var(--edge);padding:6px 14px;border-radius:6px;corner-shape:bevel">${c}</span>`).join('')}</div>`;
+      const hx = 90 + col * 600, hy = 236 + row * 360;
+      // scattered position (phase 2): pushed apart with a small tilt, deterministic
+      const sx = hx + [-50, 10, 60][col], sy = hy + [[-20, 30, -10], [40, -15, 25]][row][col];
+      const rot = [[-2.5, 1.5, 2.2], [1.8, -2.0, -1.2]][row][col];
+      return { el, i, phase, hx, hy, sx, sy, rot, W, H };
+    });
+    const tag = h('div', 'note-tag', layer, '개념도');
+    box(tag, 1700, 100);
+    // links between the published skill sources (phase 1); they break when the scene scatters
     const svg = sv('svg', { width: 1920, height: 1080 }, layer);
     svg.style.position = 'absolute';
-    const ell = sv('ellipse', { cx: ORBIT.cx, cy: ORBIT.cy, rx: ORBIT.rx, ry: ORBIT.ry, fill: 'none', stroke: '#9aa3b0', 'stroke-width': 2.5, pathLength: 1, 'stroke-dasharray': '0 1' }, svg);
-    const ticks = [];
-    for (let i = 0; i < 72; i++) {
-      const a = (i / 72) * Math.PI * 2;
-      const len = i % 6 === 0 ? 14 : 6;
-      const nx = Math.cos(a) / ORBIT.rx, ny = Math.sin(a) / ORBIT.ry, nn = Math.hypot(nx, ny);
-      const px = ORBIT.cx + ORBIT.rx * Math.cos(a), py = ORBIT.cy + ORBIT.ry * Math.sin(a);
-      ticks.push(sv('line', { x1: px, y1: py, x2: px - (nx / nn) * len, y2: py - (ny / nn) * len, stroke: '#9aa3b0', 'stroke-width': 1.5 }, svg));
-    }
-    const point = sv('circle', { r: 13, fill: BLUE }, svg);
-    const L = markAt(layer, ORBIT.cx, ORBIT.cy, 170);
-    const stations = [
-      ['book-open', '서재·자료', -150],
-      ['git-branch', 'Workflow', -82],
-      ['orbit', 'AI agent 실행', 32],
-      ['notebook-pen', '연구노트', 100],
-      ['users', 'GAID 허브', 150],
-    ].map(([ic, label, deg], i) => {
-      const a = (deg * Math.PI) / 180;
-      const px = ORBIT.cx + ORBIT.rx * Math.cos(a), py = ORBIT.cy + ORBIT.ry * Math.sin(a);
-      const el = h('div', 'face small', layer);
-      Object.assign(el.style, { display: 'flex', alignItems: 'center', gap: '14px', padding: '0 24px', height: '80px', left: '0px', top: '0px' });
-      el.innerHTML = `<span class="icon" style="width:${ic === 'orbit' ? 54 : 38}px;height:38px">${ic === 'orbit' ? ORBIT_ICON(36) : ICON[ic]}</span><span class="h3" style="font-size:34px">${label}</span>`;
-      const nx = Math.cos(a) / ORBIT.rx, ny = Math.sin(a) / ORBIT.ry, nn = Math.hypot(nx, ny);
-      const ux = nx / nn, uy = ny / nn;
-      const lead = sv('line', { x1: px + ux * 10, y1: py + uy * 10, x2: px + ux * 44, y2: py + uy * 44, stroke: '#9aa3b0', 'stroke-width': 2 }, svg);
-      const dot = sv('circle', { cx: px, cy: py, r: 9, fill: '#ffffff', stroke: '#525a68', 'stroke-width': 3 }, svg);
-      return { el, px, py, a, ux, uy, lead, dot, i, ico: el.querySelector('.icon') };
-    });
-    const C = D.catalogue;
+    const links = [[0, 1], [1, 2]].map(([p, q]) => sv('line', { stroke: '#9aa3b0', 'stroke-width': 3, 'stroke-dasharray': '10 10' }, svg));
+    // GAID: one place with shelves
     const panel = h('div', 'face', layer);
-    box(panel, 1220, 214, 640, 800);
-    text(panel, 'h3', 44, 36, 'GAID에 기본으로 들어 있는 것');
-    const reads = [[C.workflows.length, '기본 Workflow'], [C.skills, '스킬'], [C.dataSources, '공개 자료 출처']].map(([n, l], i) => {
-      const el = h('div', 'abs', panel);
-      Object.assign(el.style, { left: `${44 + i * 196}px`, top: '104px' });
-      el.innerHTML = `<div class="num" style="font-size:88px;line-height:1"><span>0</span></div><div class="label" style="margin-top:10px">${l}</div>`;
-      return { n, span: el.querySelector('span') };
+    box(panel, 460, 236, 1000, 760);
+    const mark = markAt(panel, 120, 104, 110);
+    text(panel, 'h2', 210, 72, 'GAID', { fontSize: '60px' });
+    const shelves = [
+      ['library', '서재', '논문과 서지'],
+      ['code-xml', '스킬', '기본 스킬과 가져온 스킬'],
+      ['workflow', 'Workflow', '논문에서 만든 분석 절차'],
+      ['map-gis', '자료와 지도', '지도·검층·표를 원본 그대로'],
+      ['notebook-pen', '연구노트', '결과와 연구자의 결정'],
+    ].map(([ic, name, sub], i) => {
+      const row = h('div', 'abs', panel);
+      Object.assign(row.style, { left: '64px', top: `${196 + i * 104}px`, width: '872px', height: '86px', display: 'flex', alignItems: 'center', gap: '22px', padding: '0 26px', border: '2px solid var(--edge)', borderRadius: '8px', cornerShape: 'bevel' });
+      row.innerHTML = `${icon(ic, 40, 'var(--ink-2)')}<span class="h3" style="font-size:36px;width:250px">${name}</span><span class="label" style="font-size:30px">${sub}</span>`;
+      return { row, i, ico: row.querySelector('.icon') };
     });
-    text(panel, 'h3', 44, 290, '공개 자료 출처의 분야', { fontSize: '30px' });
-    const groups = C.dataSourcesByGroup;
-    const maxN = Math.max(...groups.map(g => g.count));
-    const bars = groups.map((g, i) => {
-      const y = 350 + i * 58;
-      const lab = text(panel, 'label', 44, y, g.label, { color: 'var(--ink)' });
-      const bar = h('div', 'abs', panel);
-      Object.assign(bar.style, { left: '330px', top: `${y + 6}px`, height: '26px', background: BLUE, borderRadius: '3px' });
-      const val = text(panel, 'label', 0, y, String(g.count), { color: 'var(--ink)', fontWeight: 700 });
-      return { lab, bar, val, w: (250 * g.count) / maxN, i };
-    });
-    text(panel, 'small', 44, 758, `카탈로그 ${C.version} · KIGAM 스킬 ${C.skillsBySource.kigam} · K-Dense에서 가져온 스킬 ${C.skillsBySource['k-dense']}`);
     return t => {
-      const o = win(t, 13.9, 24.3, 0.5, 0.5);
+      const o = win(t, A, B, 0.4, 0.4);
       put(layer, { o });
       if (o <= 0) return;
       head(t);
-      ell.setAttribute('stroke-dasharray', `${ramp(t, 13.9, 15.3, inOut)} 1`);
-      ticks.forEach((tk, i) => tk.setAttribute('opacity', ramp(t, 14.2 + i * 0.01, 14.6 + i * 0.01, lin)));
-      const gi = ramp(t, 14.2, 15.0);
-      L.set({ ringF: ramp(t, 14.0, 15.1, inOut), gO: gi, gS: lerp(0.8, 1, gi), lettersF: 0 });
-      // the travelling point is the AI agent working; one loop starting at the first station
-      const start = (-150 * Math.PI) / 180;
-      const loop = ramp(t, 15.6, 23.0, lin);
-      const a = start + loop * Math.PI * 2;
-      point.setAttribute('cx', ORBIT.cx + ORBIT.rx * Math.cos(a));
-      point.setAttribute('cy', ORBIT.cy + ORBIT.ry * Math.sin(a));
-      point.setAttribute('opacity', ramp(t, 15.3, 15.7, lin));
-      for (const st of stations) {
-        const appear = ramp(t, 14.8 + st.i * 0.15, 15.5 + st.i * 0.15);
-        const rel = ((st.a - start) / (Math.PI * 2) + 1) % 1;
-        const lit = loop > 0 && loop >= rel - 0.004;
-        const cw = st.el.offsetWidth, ch = 80;
-        const ax = st.px + st.ux * 50, ay = st.py + st.uy * 50;
-        put(st.el, { o: appear, x: ax - cw / 2 + st.ux * (cw / 2), y: ay - ch / 2 + st.uy * (ch / 2) });
-        st.el.style.borderColor = lit ? BLUE : '#dce0e6';
-        st.ico.style.color = lit ? BLUE : '#525a68';
-        st.lead.setAttribute('opacity', appear);
-        st.lead.setAttribute('stroke', lit ? BLUE : '#9aa3b0');
-        st.dot.setAttribute('fill', lit ? BLUE : '#ffffff');
-        st.dot.setAttribute('stroke', lit ? BLUE : '#525a68');
-        st.dot.setAttribute('opacity', appear);
+      const scatter = ramp(t, 10.2, 11.4, inOut);
+      const gather = ramp(t, 15.2, 16.8, inOut);
+      for (const c of cards) {
+        const s0 = c.phase === 0 ? 5.5 + c.i * 0.35 : 10.6 + (c.i - 3) * 0.35;
+        const appear = ramp(t, s0, s0 + 0.6);
+        const lift = c.phase === 0 ? 170 * (1 - ramp(t, 10.0, 10.9, inOut)) : 0;
+        let x = lerp(c.hx, c.sx, scatter), y = lerp(c.hy, c.sy, scatter) + lift;
+        // gather into the shelves of the GAID panel
+        const tx = 460 + 500 - c.W * 0.15, ty = 236 + 196 + (c.i % 5) * 104 - 20;
+        x = lerp(x, tx, gather);
+        y = lerp(y, ty, gather);
+        put(c.el, { o: appear * (1 - ramp(t, 16.2, 16.8, lin)), x, y: y + 18 * (1 - appear), s: lerp(1, 0.3, gather), r: c.rot * scatter * (1 - gather) });
+        c.el.style.transformOrigin = '50% 50%';
       }
-      const po = ramp(t, 16.2, 16.9);
-      put(panel, { o: po, x: 40 * (1 - po) });
-      reads.forEach((r, i) => { r.span.textContent = fmt(r.n * ramp(t, 16.6 + i * 0.3, 18.0 + i * 0.3)); });
-      bars.forEach(b => {
-        const f = ramp(t, 18.2 + b.i * 0.16, 19.2 + b.i * 0.16);
-        b.bar.style.width = `${b.w * f}px`;
-        b.val.style.left = `${330 + b.w * f + 14}px`;
-        put(b.val, { o: f });
-        put(b.lab, { o: ramp(t, 18.0 + b.i * 0.16, 18.5 + b.i * 0.16, lin) });
+      [[0, 1], [1, 2]].forEach(([p, q], k) => {
+        const P = cards[p], Q = cards[q];
+        links[k].setAttribute('x1', P.hx + P.W); links[k].setAttribute('y1', P.hy + 170 + P.H / 2);
+        links[k].setAttribute('x2', Q.hx); links[k].setAttribute('y2', Q.hy + 170 + Q.H / 2);
+        links[k].setAttribute('opacity', ramp(t, 7.0 + k * 0.3, 7.6 + k * 0.3, lin) * (1 - scatter));
       });
+      put(tag, { o: ramp(t, 10.4, 11.0, lin) * (1 - ramp(t, 19.4, 19.9, lin)) });
+      const po = ramp(t, 15.9, 16.6);
+      put(panel, { o: po, s: lerp(0.96, 1, po) });
+      const gi = ramp(t, 16.0, 16.8);
+      mark.set({ ringF: ramp(t, 15.9, 16.9, inOut), gO: gi, gS: lerp(0.8, 1, gi), lettersF: 0 });
+      for (const s of shelves) {
+        const f = ramp(t, 16.6 + s.i * 0.28, 17.2 + s.i * 0.28);
+        put(s.row, { o: f, x: 24 * (1 - f) });
+        const lit = t > 17.0 + s.i * 0.28;
+        s.row.style.borderColor = lit ? BLUE : '#dce0e6';
+        s.ico.style.color = lit ? BLUE : '#525a68';
+      }
     };
   });
 
-  // S4a authoring motion 24.0–30.3 (real hub entry: sources, start choices, steps)
+  // ---------- S3 the research cycle 19.9–28.4 ----------
+  const RING = { cx: 960, cy: 646, rx: 560, ry: 290 };
   scenes.push(() => {
-    const E = D.hubEntry;
+    const A = 19.9, B = 28.5;
     const layer = h('div', 'layer');
-    const head = headline(layer, 110, 90, [[24.3, 30.2, '논문과 코드를 주면 AI agent가 묻고 Workflow 초안을 만듭니다']]);
-    const srcs = [['file-text', '논문 PDF', ''], ['code-xml', '코드', `${E.codeFiles}개 파일`], ['book-open', '참고문헌', `${E.references}편`]].map(([ic, l, n], i) => {
-      const el = h('div', 'face small', layer);
-      box(el, 90, 222 + i * 140, 470, 116);
-      Object.assign(el.style, { display: 'flex', alignItems: 'center', gap: '20px', padding: '0 30px' });
-      el.innerHTML = `${icon(ic, 44)}<span class="h3" style="font-size:36px">${l}</span><span class="h3" style="margin-left:auto;font-size:32px;color:var(--ink-2)">${n}</span>`;
-      return el;
-    });
-    const reading = h('div', 'face small', layer);
-    box(reading, 90, 662, 470, 104);
-    Object.assign(reading.style, { display: 'flex', alignItems: 'center', gap: '18px', padding: '0 30px' });
-    reading.innerHTML = `<svg width="62" height="36" viewBox="0 0 40 24"><ellipse cx="20" cy="12" rx="17" ry="9" fill="none" stroke="#9aa3b0" stroke-width="2"/><circle id="rpt" cx="37" cy="12" r="4" fill="${BLUE}"/></svg><span class="h3" style="font-size:32px">AI agent가 읽는 중</span>`;
-    const rpt = reading.querySelector('#rpt');
-    const q = h('div', 'face', layer);
-    box(q, 590, 222, 640, 790);
-    const qHead = text(q, 'label', 40, 34, '', { color: 'var(--ink-2)', fontSize: '28px' });
-    const asks = [0, 2, 5].map(i => E.choices[i]).filter(Boolean);
-    const qs = asks.map((c, k) => {
-      const g = h('div', 'abs', q);
-      Object.assign(g.style, { left: '40px', top: '96px', width: '560px' });
-      g.innerHTML = `<div class="h3" style="font-size:40px;white-space:normal;line-height:1.2">${c.label}</div>` + c.options.slice(0, 4).map(o =>
-        `<div class="opt" style="margin-top:16px;display:flex;align-items:center;gap:16px;padding:18px 22px;border:2px solid #dce0e6;border-radius:8px;corner-shape:bevel;font-size:29px;font-weight:550;color:#171b23"><span class="rad" style="width:26px;height:26px;border-radius:50%;border:2.5px solid #878f9d;flex:none"></span><span>${o}</span></div>`).join('') +
-        '<div style="margin-top:16px;padding:16px 22px;font-size:28px;color:#525a68;border:2px dashed #c9ced6;border-radius:8px;corner-shape:bevel">기타: 직접 쓰기</div>';
-      return { g, k, opts: [...g.querySelectorAll('.opt')], pick: k === 2 ? 1 : 0 };
-    });
-    const st = h('div', 'face', layer);
-    box(st, 1260, 222, 590, 790);
-    text(st, 'h3', 40, 32, 'Workflow 초안');
-    const ssvg = sv('svg', { width: 590, height: 790 }, st);
-    Object.assign(ssvg.style, { position: 'absolute', left: '0', top: '0' });
-    const top0 = 108, gap = 61;
-    const rail = sv('line', { x1: 52, x2: 52, y1: top0, y2: top0, stroke: BLUE, 'stroke-width': 3 }, ssvg);
-    const steps = E.steps.map((s, i) => {
-      const y = top0 + i * gap;
-      const mark = sv('rect', { x: 44, y: y + 9, width: 16, height: 16, fill: s.researcher ? '#ffffff' : BLUE, stroke: s.researcher ? '#171b23' : BLUE, 'stroke-width': 3, transform: `rotate(45 52 ${y + 17})` }, ssvg);
-      const lab = text(st, 'label', 84, y, s.label, { fontSize: '25px', color: 'var(--ink)', fontWeight: 550, maxWidth: s.researcher ? '330px' : '480px', overflow: 'hidden', textOverflow: 'ellipsis' });
-      const pl = s.researcher ? text(st, 'plate', 430, y - 3, '연구자 결정', { fontSize: '22px', background: '#171b23', color: '#fff' }) : null;
-      return { mark, lab, pl, i };
-    });
-    const nRes = E.steps.filter(s => s.researcher).length;
-    const foot = text(st, 'h3', 40, 726, `단계 ${E.steps.length} · 연구자 결정 ${nRes} · 산출물 ${E.outputs.length}`, { fontSize: '28px' });
-    return t => {
-      const o = win(t, 24.0, 30.3, 0.45, 0.45);
-      put(layer, { o });
-      if (o <= 0) return;
-      head(t);
-      srcs.forEach((el, i) => { const f = ramp(t, 24.4 + i * 0.18, 25.0 + i * 0.18); put(el, { o: f, x: -30 * (1 - f) }); });
-      put(reading, { o: ramp(t, 25.0, 25.4, lin) });
-      const ra = ((t - 25) / 1.1) * Math.PI * 2;
-      rpt.setAttribute('cx', 20 + 17 * Math.cos(ra));
-      rpt.setAttribute('cy', 12 + 9 * Math.sin(ra));
-      const qf = ramp(t, 25.3, 25.9);
-      put(q, { o: qf, y: 20 * (1 - qf) });
-      const per = 1.05;
-      qs.forEach(Q => {
-        const a = 25.6 + Q.k * per, b = a + per;
-        put(Q.g, { o: Q.k === qs.length - 1 ? ramp(t, a, a + 0.25, lin) : win(t, a, b, 0.25, 0.2) });
-        Q.opts.forEach((op, j) => {
-          const on = j === Q.pick && t > a + 0.6;
-          op.style.borderColor = on ? BLUE : '#dce0e6';
-          op.style.background = on ? '#e8eeff' : '#fff';
-          op.querySelector('.rad').style.border = on ? `8px solid ${BLUE}` : '2.5px solid #878f9d';
-        });
-      });
-      qHead.textContent = `연구자가 정할 조건 ${E.choices.length}개 중 ${Math.min(qs.length, Math.floor(clamp((t - 25.6) / per, 0, qs.length - 0.001)) + 1)}번째`;
-      const sf = ramp(t, 26.2, 26.8);
-      put(st, { o: sf, x: 30 * (1 - sf) });
-      const prog = ramp(t, 26.8, 29.4, lin) * steps.length;
-      rail.setAttribute('y2', top0 + 17 + Math.max(0, Math.min(steps.length - 1, prog - 1)) * gap);
-      steps.forEach(s => {
-        const f = clamp(prog - s.i);
-        s.mark.setAttribute('opacity', f);
-        put(s.lab, { o: f, x: 12 * (1 - f) });
-        if (s.pl) put(s.pl, { o: f });
-      });
-      put(foot, { o: ramp(t, 29.3, 29.8, lin) });
-    };
-  });
-
-  // S4c revisions and installs timeline 35.0–38.1 (real hub record)
-  scenes.push(() => {
-    const E = D.hubEntry;
-    const layer = h('div', 'layer');
-    const head = headline(layer, 110, 96, [[35.2, 38.6, '등록한 Workflow는 판으로 쌓이고, 다른 프로젝트가 가져다 씁니다']]);
-    const panel = h('div', 'face', layer);
-    box(panel, 90, 236, 1740, 760);
-    const svg = sv('svg', { width: 1740, height: 760 }, panel);
+    const head = headline(layer, 110, 92, [[20.2, 28.3, '내 연구가 Workflow가 되고, 다시 내 연구로 돌아옵니다']]);
+    const svg = sv('svg', { width: 1920, height: 1080 }, layer);
     svg.style.position = 'absolute';
-    const t0 = Date.parse('2026-10-16T00:00:00+09:00'), t1 = Date.parse('2026-10-19T00:00:00+09:00');
-    const X = ms => lerp(300, 1660, (ms - t0) / (t1 - t0));
-    const lanes = [['판', 200], ['프로젝트 설치', 410]];
-    for (const [l, y] of lanes) {
-      const tx = sv('text', { x: 50, y: y + 12, 'font-size': 34, 'font-weight': 650, fill: '#171b23' }, svg);
-      tx.textContent = l;
-      sv('line', { x1: 300, x2: 1660, y1: y, y2: y, stroke: '#dce0e6', 'stroke-width': 3 }, svg);
-    }
-    const axisY = 560;
-    sv('line', { x1: 300, x2: 1660, y1: axisY, y2: axisY, stroke: '#878f9d', 'stroke-width': 2 }, svg);
-    for (let d = 0; d <= 3; d++) {
-      const ms = t0 + d * 86400000;
-      sv('line', { x1: X(ms), x2: X(ms), y1: axisY, y2: axisY + 18, stroke: '#525a68', 'stroke-width': 2.5 }, svg);
-      const lab = sv('text', { x: X(ms), y: axisY + 56, 'font-size': 30, 'font-weight': 600, fill: '#525a68', 'text-anchor': 'middle' }, svg);
-      lab.textContent = `10월 ${16 + d}일`;
-      for (let hh = 6; hh < 24; hh += 6) {
-        const m = ms + hh * 3600000;
-        sv('line', { x1: X(m), x2: X(m), y1: axisY, y2: axisY + 9, stroke: '#b9c0ca', 'stroke-width': 1.5 }, svg);
-      }
-    }
-    const events = [];
-    E.revisions.forEach(r => {
-      const x = X(Date.parse(r.at));
-      const g = sv('g', {}, svg);
-      sv('rect', { x: x - 15, y: 185, width: 30, height: 30, fill: BLUE, transform: `rotate(45 ${x} 200)` }, g);
-      const tx = sv('text', { x: x + 30, y: 166, 'font-size': 38, 'font-weight': 700, fill: '#171b23' }, g);
-      tx.textContent = `판 ${r.revision}`;
-      if (r.note) {
-        const n = sv('text', { x: x + 30, y: 258, 'font-size': 28, 'font-weight': 550, fill: '#525a68' }, g);
-        n.textContent = r.note;
-      }
-      events.push({ g, ms: Date.parse(r.at) });
+    const ell = sv('ellipse', { cx: RING.cx, cy: RING.cy, rx: RING.rx, ry: RING.ry, fill: 'none', stroke: '#9aa3b0', 'stroke-width': 2.5, pathLength: 1, 'stroke-dasharray': '0 1' }, svg);
+    const trail = sv('path', { d: '', fill: 'none', stroke: BLUE, 'stroke-width': 5, 'stroke-linecap': 'round' }, svg);
+    const point = sv('circle', { r: 14, fill: BLUE }, svg);
+    const L = markAt(layer, RING.cx, RING.cy - 30, 150);
+    const who = text(layer, 'h3', 0, RING.cy + 70, '연구자 + AI agent', { width: '1920px', textAlign: 'center', fontSize: '36px' });
+    const START = -150;
+    const st = STATIONS.map((s, i) => {
+      const deg = START + i * 72;
+      const a = (deg * Math.PI) / 180;
+      const px = RING.cx + RING.rx * Math.cos(a), py = RING.cy + RING.ry * Math.sin(a);
+      const el = h('div', 'face small', layer);
+      Object.assign(el.style, { display: 'flex', alignItems: 'center', gap: '16px', padding: '0 28px', height: '92px', left: '0px', top: '0px' });
+      el.innerHTML = `${stationIcon(s, 40, '#525a68')}<span class="h3" style="font-size:38px">${s.label}</span>`;
+      const dot = sv('circle', { cx: px, cy: py, r: 11, fill: '#ffffff', stroke: '#525a68', 'stroke-width': 3 }, svg);
+      return { el, px, py, i, dot, rel: i / 5, ico: el.querySelector('.icon') };
     });
-    E.installs.forEach((ins, i) => {
-      const x = X(Date.parse(ins.at));
-      const g = sv('g', {}, svg);
-      sv('line', { x1: x, x2: x, y1: 428, y2: axisY, stroke: '#c9ced6', 'stroke-width': 1.5, 'stroke-dasharray': '4 5' }, g);
-      sv('circle', { cx: x, cy: 410, r: 15, fill: '#ffffff', stroke: BLUE, 'stroke-width': 5 }, g);
-      events.push({ g, ms: Date.parse(ins.at) + i });
-    });
-    const reads = h('div', 'abs', panel);
-    Object.assign(reads.style, { left: '300px', top: '650px', display: 'flex', gap: '64px', alignItems: 'baseline' });
-    reads.innerHTML = [[E.installs.length, '설치한 프로젝트'], [E.stars, '별'], [E.comments, '댓글']].map(([n, l]) =>
-      `<span><span class="num" style="font-size:64px">${n}</span><span class="h3" style="margin-left:14px;font-size:32px;color:var(--ink-2)">${l}</span></span>`).join('');
-    text(panel, 'small', 1250, 690, '검토용 허브 기록 · 시험 계정 포함');
-    const sweep = sv('line', { x1: 300, x2: 300, y1: 130, y2: axisY, stroke: BLUE, 'stroke-width': 2, opacity: 0.5 }, svg);
+    // 판 grows on the Workflow station as the loop passes the hub
+    const pan = h('div', 'plate', layer, '');
+    pan.style.fontSize = '30px';
     return t => {
-      const o = win(t, 35.0, 38.7, 0.45, 0.4);
+      const o = win(t, A, B, 0.45, 0.4);
       put(layer, { o });
       if (o <= 0) return;
       head(t);
-      const pf = ramp(t, 35.0, 35.6);
-      put(panel, { o: pf, y: 20 * (1 - pf) });
-      const now = lerp(t0, t1, ramp(t, 35.4, 37.2, inOut));
-      sweep.setAttribute('x1', X(now));
-      sweep.setAttribute('x2', X(now));
-      for (const e of events) e.g.setAttribute('opacity', clamp((now - e.ms) / 3600000 / 3));
-      put(reads, { o: ramp(t, 36.9, 37.4, lin) });
+      ell.setAttribute('stroke-dasharray', `${ramp(t, 20.0, 21.2, inOut)} 1`);
+      const gi = ramp(t, 20.3, 21.0);
+      L.set({ ringF: ramp(t, 20.1, 21.1, inOut), gO: gi, gS: lerp(0.8, 1, gi), lettersF: 0 });
+      put(who, { o: ramp(t, 20.9, 21.4, lin) });
+      const loop = ramp(t, 21.6, 27.4, lin);
+      const ang = ((START + loop * 360) * Math.PI) / 180;
+      point.setAttribute('cx', RING.cx + RING.rx * Math.cos(ang));
+      point.setAttribute('cy', RING.cy + RING.ry * Math.sin(ang));
+      point.setAttribute('opacity', ramp(t, 21.3, 21.7, lin));
+      const pts = [];
+      for (let k = 0; k <= 120 * loop; k++) {
+        const aa = ((START + (k / 120) * 360) * Math.PI) / 180;
+        pts.push(`${(RING.cx + RING.rx * Math.cos(aa)).toFixed(1)} ${(RING.cy + RING.ry * Math.sin(aa)).toFixed(1)}`);
+      }
+      pts.push(`${(RING.cx + RING.rx * Math.cos(ang)).toFixed(1)} ${(RING.cy + RING.ry * Math.sin(ang)).toFixed(1)}`);
+      trail.setAttribute('d', loop > 0 ? `M ${pts.join(' L ')}` : '');
+      for (const s of st) {
+        const appear = ramp(t, 20.6 + s.i * 0.14, 21.2 + s.i * 0.14);
+        const lit = loop > 0 && (loop >= s.rel - 0.003);
+        const cw = s.el.offsetWidth, ch = 92;
+        const ux = (s.px - RING.cx) / RING.rx, uy = (s.py - RING.cy) / RING.ry;
+        const x = s.px + ux * (cw / 2 + 26) - cw / 2, y = s.py + uy * (ch / 2 + 30) - ch / 2;
+        put(s.el, { o: appear, x, y });
+        s.el.style.borderColor = lit ? BLUE : '#dce0e6';
+        s.ico.style.color = lit ? BLUE : '#525a68';
+        s.dot.setAttribute('fill', lit ? BLUE : '#ffffff');
+        s.dot.setAttribute('stroke', lit ? BLUE : '#525a68');
+        s.dot.setAttribute('opacity', appear);
+      }
+      // the loop returning to 내 서재 lights it once more
+      if (loop >= 0.999) { st[0].el.style.borderColor = BLUE; }
+      const W = st[1];
+      const panN = loop >= 0.42 ? 2 : 1;
+      pan.textContent = `판 ${panN}`;
+      box(pan, W.px - 40, W.py - 150);
+      put(pan, { o: ramp(t, 22.6, 23.0, lin), s: loop >= 0.42 ? 1 + 0.12 * (1 - ramp(t, 24.0, 24.4)) : 1 });
     };
   });
 
-  // Footage segments: a/b film seconds; consecutive shots overlap by 0.2 s.
-  const SEG = [
-    { shot: 'H1', a: 30.1, b: 35.2, cap: ['GAID 허브', '등록된 Workflow와 단계를 봅니다'] },
-    { shot: 'R1', a: 38.4, b: 43.0, cap: ['Workflow 시작 설정', '입력 파일 → 분석 조건 → 요약'], zoom: [{ t: 1.0, rect: [300, 40, 960, 540] }, { t: 3.3, rect: [300, 180, 960, 540] }] },
-    { shot: 'R2', a: 42.8, b: 46.8, cap: ['Workflow로 시작한 대화', '결과와 그림을 대화 안에서 확인합니다'] },
-    { shot: 'R3', a: 46.6, b: 50.6, cap: ['연구노트', 'AI agent가 제안하고 연구자가 정합니다'] },
-    { shot: 'R5', a: 50.4, b: 53.9, cap: ['LAS 검층 보기', '깊이 트랙을 원본 값으로'], zoom: [{ t: 0.8, rect: [60, 150, 960, 540] }] },
-    { shot: 'M1', a: 53.7, b: 59.3, cap: ['shp 지도 보기', '암상별 색 구분 · 1:5만 지질도와 위성영상 배경'] },
-    { shot: 'M2', a: 59.1, b: 62.0, cap: ['속성과 면적 표', '레이어 전체의 암상별 면적'], skip: 1.0, zoom: [{ t: 1.8, rect: [427, 230, 853, 480] }] },
-    { shot: 'L1', a: 64.1, b: 69.1, cap: ['서재', '논문을 폴더로 모으고 쓰인 곳을 봅니다'] },
-    { shot: 'R6', a: 68.9, b: 72.4, cap: ['쪽 인용', '서재의 논문을 쪽 번호까지 인용합니다'], zoom: [{ t: 0.8, rect: [284, 170, 984, 553] }] },
-    { shot: 'L2', a: 74.7, b: 78.4, cap: ['논문과 프로젝트 연결', '연결 지도로 이어서 봅니다'], zoom: [{ t: 1.6, rect: [140, 60, 960, 540] }] },
-  ];
-  const WIN_FULL = { x: 180, y: 166, w: 1560 };
-
+  // ---------- demo: cycle strip, chapter title, whole-frame footage, feature tags ----------
+  const FRAME = { x: 112, y: 108, w: 1696 };
+  FRAME.k = FRAME.w / VW;
+  FRAME.h = VH * FRAME.k;
   scenes.push(() => {
     const layer = h('div', 'layer');
-    const main = footageWindow(layer);
-    const caps = SEG.map(sg => {
-      const el = h('div', 'caption', layer);
-      el.innerHTML = `<span>${sg.cap[0]}</span><span class="sub">${sg.cap[1]}</span>`;
-      return { el, sg };
+    // strip: five stations with the return arc
+    const strip = h('div', 'abs', layer);
+    Object.assign(strip.style, { left: '0px', top: '0px', width: '1920px', height: '104px' });
+    const ssvg = sv('svg', { width: 1920, height: 104 }, strip);
+    ssvg.style.position = 'absolute';
+    const X0 = 920, X1 = 1790, Y = 40;
+    const nodes = STATIONS.map((s, i) => {
+      const x = lerp(X0, X1, i / (STATIONS.length - 1));
+      const dot = sv('rect', { x: x - 9, y: Y - 9, width: 18, height: 18, fill: '#ffffff', stroke: '#878f9d', 'stroke-width': 3, transform: `rotate(45 ${x} ${Y})` }, ssvg);
+      const lab = text(strip, 'label', 0, Y + 18, s.label, { fontSize: '23px', width: '200px', textAlign: 'center', left: `${x - 100}px` });
+      return { x, dot, lab };
     });
+    const base = sv('line', { x1: X0, x2: X1, y1: Y, y2: Y, stroke: '#c9ced6', 'stroke-width': 3 }, ssvg);
+    ssvg.insertBefore(base, ssvg.firstChild);
+    const prog = sv('line', { x1: X0, x2: X0, y1: Y, y2: Y, stroke: BLUE, 'stroke-width': 4 }, ssvg);
+    ssvg.insertBefore(prog, base.nextSibling);
+    // return path from 연구노트 back to 내 서재 (above the strip)
+    const back = sv('path', { d: `M ${X1} ${Y - 12} C ${X1} ${Y - 40}, ${X0} ${Y - 40}, ${X0} ${Y - 12}`, fill: 'none', stroke: BLUE, 'stroke-width': 3, pathLength: 1, 'stroke-dasharray': '0 1' }, ssvg);
+    const titles = CHAPTERS_V2.map(c => {
+      const el = text(layer, 'h2', 112, 26, c.title, { fontSize: '48px' });
+      return { el, c };
+    });
+    const main = footageWindow(layer);
+    // feature tags: highlight frame + dim outside + label (all inside the frame box)
+    const over = h('div', 'abs', layer);
+    Object.assign(over.style, { overflow: 'hidden', borderRadius: '14px', cornerShape: 'bevel', pointerEvents: 'none' });
+    const hi = h('div', 'abs', over);
+    Object.assign(hi.style, { border: `4px solid ${BLUE}`, borderRadius: '10px', cornerShape: 'bevel', boxShadow: '0 0 0 3000px rgba(23,27,35,0.20)' });
+    const tagEl = h('div', 'abs', over);
+    Object.assign(tagEl.style, { background: BLUE, color: '#fff', fontSize: '32px', fontWeight: 700, padding: '8px 20px', borderRadius: '8px', cornerShape: 'bevel', whiteSpace: 'nowrap', letterSpacing: '-0.01em' });
     return t => {
-      const any = SEG.some(s => t >= s.a - 0.05 && t <= s.b + 0.05);
-      put(layer, { o: any ? 1 : 0 });
-      if (!any) return;
-      let drawn = false;
+      const o = win(t, DEMO.a - 0.1, DEMO.b + 0.1, 0.5, 0.45);
+      put(layer, { o });
+      if (o <= 0) return;
+      // chapter state
+      const ci = Math.max(0, CHAPTERS_V2.findIndex(c => t >= c.a - 0.05 && t < c.b - 0.05));
+      const cur = CHAPTERS_V2[ci === -1 ? CHAPTERS_V2.length - 1 : ci];
+      titles.forEach(({ el, c }) => put(el, { o: win(t, c.a, c.b, 0.35, 0.25), y: 12 * (1 - ramp(t, c.a, c.a + 0.6)) }));
+      const fwd = cur.back ? 4 : cur.st;
+      const fx = lerp(nodes[0].x, nodes[fwd].x, 1);
+      const prevX = fwd > 0 ? nodes[fwd - 1].x : nodes[0].x;
+      const grow = ramp(t, cur.a, cur.a + 0.7, inOut);
+      prog.setAttribute('x2', cur.back ? nodes[4].x : lerp(prevX, fx, grow));
+      back.setAttribute('stroke-dasharray', `${cur.back ? ramp(t, cur.a, cur.a + 1.0, inOut) : 0} 1`);
+      nodes.forEach((n, i) => {
+        const active = cur.back ? i === 0 : i === cur.st;
+        const done = cur.back ? true : i < cur.st;
+        n.dot.setAttribute('fill', active || done ? BLUE : '#ffffff');
+        n.dot.setAttribute('stroke', active || done ? BLUE : '#878f9d');
+        n.dot.setAttribute('transform', `rotate(45 ${n.x} ${Y}) translate(${n.x} ${Y}) scale(${active ? 1.35 : 1}) translate(${-n.x} ${-Y})`);
+        n.lab.style.color = active ? 'var(--ink)' : 'var(--ink-3)';
+        n.lab.style.fontWeight = active ? 700 : 550;
+      });
+      // footage
+      let drawn = null;
       SEG.forEach((sg, idx) => {
         if (t < sg.a || t > sg.b) return;
-        const local = t - sg.a + (sg.skip || 0), dur = sg.b - sg.a + (sg.skip || 0);
-        const first = idx === 0 || SEG[idx - 1].b < sg.a;
-        const last = idx === SEG.length - 1 || SEG[idx + 1].a > sg.b;
-        const g = WIN_FULL;
-        const o = (first ? ramp(t, sg.a, sg.a + 0.45, lin) : 1) * (last ? 1 - ramp(t, sg.b - 0.35, sg.b, lin) : 1);
+        const local = t - sg.a + (sg.skip || 0);
+        const first = idx === 0;
         const dy = first ? 24 * (1 - ramp(t, sg.a, sg.a + 0.7)) : 0;
-        main.draw({ x: g.x, y: g.y + dy, w: g.w, o, shot: sg.shot, local, view: viewAt(sg.zoom ? sg.zoom.map(k => ({ t: k.t, rect: fit169(k.rect, 0) })) : shotKeys(sg.shot), local, dur) });
-        drawn = true;
+        main.draw({ x: FRAME.x, y: FRAME.y + dy, w: FRAME.w, o: 1, shot: sg.shot, local, view: [0, 0, VW, VH] });
+        drawn = { sg, local, dy };
       });
-      if (!drawn) main.draw({});
-      for (const c of caps) {
-        put(c.el, { o: win(t, c.sg.a + 0.1, c.sg.b - 0.15, 0.4, 0.25), y: 12 * (1 - ramp(t, c.sg.a + 0.1, c.sg.a + 0.7)) });
-        c.el.style.left = `${WIN_FULL.x}px`;
-        c.el.style.top = '70px';
-      }
+      if (!drawn) { main.draw({}); put(over, { o: 0 }); return; }
+      box(over, FRAME.x, FRAME.y + drawn.dy, FRAME.w, FRAME.h);
+      const info = shotInfo(drawn.sg.shot);
+      const beats = (info && info.beats) || drawn.sg.beats || [];
+      const bt = beats.find(b => drawn.local >= b.t0 && drawn.local <= b.t1);
+      if (!bt) { put(over, { o: 0 }); return; }
+      const bo = win(drawn.local, bt.t0, bt.t1, 0.3, 0.25);
+      put(over, { o: bo });
+      const r = bt.rect;
+      const rx = r.x * FRAME.k, ry = r.y * FRAME.k, rw = r.width * FRAME.k, rh = r.height * FRAME.k;
+      box(hi, rx - 6, ry - 6, rw + 12, rh + 12);
+      tagEl.textContent = bt.label;
+      const tw = tagEl.offsetWidth, th = tagEl.offsetHeight;
+      // tag above the box when there is room, else inside its top-left corner
+      const tx = clamp(rx - 6, 12, FRAME.w - tw - 12);
+      const ty = ry - 6 - th - 10 >= 12 ? ry - 6 - th - 10 : ry + 10;
+      box(tagEl, tx, ty);
     };
   });
 
-  // Area by lithology, full screen 61.8–64.3 (real research-note table of the shapefile in M1/M2)
+  // ---------- S4 ecosystem → KIGAM second brain 91.9–100.4 (conceptual) ----------
   scenes.push(() => {
-    const Lt = D.litho;
+    const A = 91.9, B = 100.5;
     const layer = h('div', 'layer');
-    const head = headline(layer, 110, 90, [[61.9, 64.3, '서울 1:25만 암상도의 암상별 면적']]);
-    const panel = h('div', 'face', layer);
-    box(panel, 90, 230, 1740, 740);
-    const reads = h('div', 'abs', panel);
-    Object.assign(reads.style, { left: '56px', top: '56px', display: 'flex', flexDirection: 'column', gap: '44px' });
-    reads.innerHTML = [[fmt(Lt.polygons), '폴리곤'], [fmt(Lt.totalKm2, 1), '합계 km²'], [fmt(Lt.classes.length), '암상 분류']].map(([n, l]) =>
-      `<div><div class="num" style="font-size:84px;line-height:1">${n}</div><div class="h3" style="font-size:30px;color:var(--ink-2);margin-top:8px">${l}</div></div>`).join('');
-    const top = Lt.classes.slice(0, 6);
-    const rest = Lt.classes.slice(6);
-    const rows = [...top.map(c => ({ label: c.label, km2: c.areaKm2, pct: c.percent })),
-      { label: `그 외 ${rest.length}개 분류`, km2: rest.reduce((a, c) => a + c.areaKm2, 0), pct: rest.reduce((a, c) => a + c.percent, 0), muted: true }];
-    const maxA = Math.max(...rows.map(r => r.km2));
-    const X0 = 960, BW = 440;
-    const bars = rows.map((r, i) => {
-      const y = 50 + i * 96;
-      const lab = text(panel, 'h3', 0, y + 8, r.label, { fontSize: '30px', width: `${X0 - 60 - 420}px`, textAlign: 'right', left: '420px', overflow: 'hidden', textOverflow: 'ellipsis' });
-      const bar = h('div', 'abs', panel);
-      Object.assign(bar.style, { left: `${X0}px`, top: `${y + 8}px`, height: '42px', background: r.muted ? '#878f9d' : BLUE, borderRadius: '3px' });
-      const val = text(panel, 'h3', 0, y + 10, `${fmt(r.km2, 1)} km² · ${fmt(r.pct, 1)}%`, { fontSize: '30px' });
-      return { lab, bar, val, w: (BW * r.km2) / maxA, i };
-    });
-    text(panel, 'small', 56, 690, '파일에 선언된 좌표계의 평면 면적 · 연구노트 2026-10-18 · 측지 면적과 분류마다 0.007 km² 이내');
-    return t => {
-      const o = win(t, 61.8, 64.3, 0.4, 0.35);
-      put(layer, { o });
-      if (o <= 0) return;
-      head(t);
-      const pf = ramp(t, 61.8, 62.3);
-      put(panel, { o: pf, y: 20 * (1 - pf) });
-      bars.forEach(b => {
-        const f = ramp(t, 62.1 + b.i * 0.12, 62.9 + b.i * 0.12);
-        b.bar.style.width = `${b.w * f}px`;
-        b.val.style.left = `${X0 + b.w * f + 18}px`;
-        put(b.val, { o: f });
-        put(b.lab, { o: ramp(t, 62.0 + b.i * 0.12, 62.4 + b.i * 0.12, lin) });
-      });
-    };
-  });
-
-  // Page-citation checks, full screen 72.2–74.9 (two real checks)
-  scenes.push(() => {
-    const A = D.acceptance, Q = D.libraryNext;
-    const layer = h('div', 'layer');
-    const head = headline(layer, 110, 90, [[72.3, 74.9, '인용한 쪽에 그 내용이 있는지 대조했습니다']]);
-    const day = s => `${Number(s.slice(5, 7))}월 ${Number(s.slice(8, 10))}일`;
-    const card = (x, w, title, num, unit) => {
-      const el = h('div', 'face', layer);
-      box(el, x, 230, w, 720);
-      text(el, 'h3', 48, 40, title, { fontSize: '32px' });
-      const n = h('div', 'abs', el);
-      Object.assign(n.style, { left: '48px', top: '100px', display: 'flex', alignItems: 'baseline', gap: '16px' });
-      n.innerHTML = `<span class="num" style="font-size:120px;line-height:1">${num}</span><span class="h3" style="font-size:36px;color:var(--ink-2)">${unit}</span>`;
-      return el;
-    };
-    const onPage = A.units - A.notOnPage - A.contradicted;
-    const qc = card(90, 640, `${day(Q.date)} · ${Q.model} · 논문 ${Q.papers}편`, `${Q.onPage}`, `/ ${Q.citations} 인용이 해당 쪽에`);
-    const ac = card(770, 1060, `${day(A.date)} · 수용 시험 · 논문 ${A.papers}편`, `${onPage}`, `/ ${A.units} 확인 단위가 해당 쪽에`);
-    const qsvg = sv('svg', { width: 560, height: 260 }, qc);
-    Object.assign(qsvg.style, { position: 'absolute', left: '48px', top: '290px' });
-    const qCells = [];
-    for (let i = 0; i < Q.citations; i++) qCells.push(sv('rect', { x: (i % 9) * 60, y: Math.floor(i / 9) * 60, width: 50, height: 50, rx: 3, fill: '#e8eeff' }, qsvg));
-    const asvg = sv('svg', { width: 980, height: 420 }, ac);
-    Object.assign(asvg.style, { position: 'absolute', left: '48px', top: '290px' });
-    const aCells = [];
-    const COLS = 27;
-    for (let i = 0; i < A.units; i++) aCells.push(sv('rect', { x: (i % COLS) * 35.5, y: Math.floor(i / COLS) * 35.5, width: 30, height: 30, rx: 3, fill: '#e8eeff' }, asvg));
-    const legend = h('div', 'abs', ac);
-    Object.assign(legend.style, { left: '48px', top: '585px', display: 'flex', gap: '36px', alignItems: 'center' });
-    legend.innerHTML = [[BLUE, '해당 쪽에 있음', onPage], ['#8a5300', '해당 쪽에 없음', A.notOnPage], ['#c2261d', '원문과 어긋남', A.contradicted]].map(([c, l, n]) =>
-      `<span style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;background:${c};border-radius:3px"></span><span class="h3" style="font-size:28px">${l} ${n}</span></span>`).join('');
-    text(qc, 'label', 48, 650, 'PDF 본문의 해당 쪽에서 하나씩 대조', { fontSize: '26px' });
-    text(ac, 'label', 48, 650, `인용 ${A.citations}건을 확인 단위로 나누어 PDF 원문 쪽과 대조`, { fontSize: '26px' });
-    return t => {
-      const o = win(t, 72.2, 74.9, 0.4, 0.35);
-      put(layer, { o });
-      if (o <= 0) return;
-      head(t);
-      const f1 = ramp(t, 72.2, 72.7), f2 = ramp(t, 72.4, 72.9);
-      put(qc, { o: f1, y: 20 * (1 - f1) });
-      put(ac, { o: f2, y: 20 * (1 - f2) });
-      const qn = ramp(t, 72.6, 73.4, lin) * Q.citations;
-      qCells.forEach((c, i) => c.setAttribute('fill', i < qn ? BLUE : '#e8eeff'));
-      const an = ramp(t, 72.8, 74.0, lin) * A.units;
-      const bad = 4 * COLS + 13;
-      aCells.forEach((c, i) => c.setAttribute('fill', i < an ? (i === bad && A.notOnPage ? '#8a5300' : BLUE) : '#e8eeff'));
-      put(legend, { o: ramp(t, 73.9, 74.3, lin) });
-    };
-  });
-
-  // S6 eight points around the octagonal G 78.2–85.3
-  scenes.push(() => {
-    const layer = h('div', 'layer');
-    const head = headline(layer, 110, 90, [[78.5, 85.3, 'GAID가 연구자를 돕는 여덟 가지']]);
-    const cx = 960, cy = 620, R = 230;
+    const head = headline(layer, 110, 92, [
+      [92.2, 96.0, '연구자마다 고리가 돌면 지구과학 AI agent 생태계가 자랍니다'],
+      [96.2, 100.3, '논문, Workflow, 연구노트가 이어져 KIGAM의 Second brain이 됩니다'],
+    ]);
+    const tag = h('div', 'note-tag', layer, '개념도');
+    box(tag, 1700, 100);
     const svg = sv('svg', { width: 1920, height: 1080 }, layer);
     svg.style.position = 'absolute';
-    const L = markAt(layer, cx, cy, 170);
-    const items = [
-      ['file-text', '논문에서 Workflow로', '질문에 답하면 초안'],
-      ['users', 'GAID 허브', '판·별·댓글·스킬 선반'],
-      ['server', '기관 허브 서버', '계정과 서재 동기화'],
-      ['book-open', '서재와 쪽 인용', 'Zotero 연결'],
-      ['notebook-pen', '연구노트와 결정', '결정은 연구자가'],
-      ['map', '지도·검층·표', 'shp·LAS·CSV 그대로'],
-      ['table-2', '저널 그림 점검', '폭과 글자 크기'],
-      ['database', '기관 로컬 모델', '연구소 서버 모델'],
-    ];
-    const arcs = items.map(([ic, title, sub], i) => {
-      const deg0 = -90 + i * 45 - 22.5 + 3, deg1 = -90 + i * 45 + 22.5 - 3;
-      const a0 = (deg0 * Math.PI) / 180, a1 = (deg1 * Math.PI) / 180;
-      const d = `M ${cx + R * Math.cos(a0)} ${cy + R * Math.sin(a0)} A ${R} ${R} 0 0 1 ${cx + R * Math.cos(a1)} ${cy + R * Math.sin(a1)}`;
-      const base = sv('path', { d, fill: 'none', stroke: '#dce0e6', 'stroke-width': 16 }, svg);
-      const arc = sv('path', { d, fill: 'none', stroke: BLUE, 'stroke-width': 16, pathLength: 1, 'stroke-dasharray': '0 1' }, svg);
-      const am = ((-90 + i * 45) * Math.PI) / 180;
-      const diag = Math.abs(Math.cos(am)) > 0.3 && Math.abs(Math.sin(am)) > 0.3;
-      const lx = cx + (R + 50) * Math.cos(am) + (diag ? Math.sign(Math.cos(am)) * 70 : 0), ly = cy + (R + 50) * Math.sin(am);
-      const c = Math.cos(am), s = Math.sin(am);
-      const side = c > 0.3 ? 'right' : c < -0.3 ? 'left' : 'center';
-      const el = h('div', 'abs', layer);
-      const W = 520;
-      el.style.width = `${W}px`;
-      el.style.textAlign = side === 'right' ? 'left' : side === 'left' ? 'right' : 'center';
-      el.style.left = `${side === 'right' ? lx : side === 'left' ? lx - W : lx - W / 2}px`;
-      const blockH = 92;
-      el.style.top = `${s < -0.3 ? ly - blockH : s > 0.3 ? ly : ly - blockH / 2}px`;
-      const jc = side === 'right' ? 'flex-start' : side === 'left' ? 'flex-end' : 'center';
-      el.innerHTML = `<div style="display:flex;align-items:center;gap:14px;justify-content:${jc}">${icon(ic, 40, BLUE)}<span class="h3" style="font-size:38px">${title}</span></div><div class="label" style="margin-top:6px;font-size:28px">${sub}</div>`;
-      return { base, arc, el, i };
+    const C = { x: 960, y: 640 };
+    // researcher rings around the centre
+    const rings = [];
+    const N = 7;
+    for (let i = 0; i < N; i++) {
+      const a = (-90 + (i * 360) / N) * Math.PI / 180 + 0.2;
+      const x = C.x + 780 * Math.cos(a), y = C.y + 300 * Math.sin(a);
+      const g = sv('g', {}, svg);
+      const e = sv('ellipse', { cx: x, cy: y, rx: 92, ry: 52, fill: '#ffffff', stroke: '#9aa3b0', 'stroke-width': 2.5 }, g);
+      const p = sv('circle', { r: 8, fill: BLUE }, g);
+      const link = sv('line', { x1: x, y1: y, x2: x, y2: y, stroke: '#9aa3b0', 'stroke-width': 2, 'stroke-dasharray': '8 8' }, svg);
+      svg.insertBefore(link, svg.firstChild);
+      const u = h('div', 'abs', layer);
+      u.innerHTML = icon('user', 36, '#525a68');
+      box(u, x - 18, y - 18);
+      rings.push({ g, e, p, x, y, i, link, u, phase: (i * 0.37) % 1 });
+    }
+    // knowledge network at the centre (deterministic)
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const nodes = [];
+    const kinds = ['paper', 'workflow', 'note'];
+    for (let i = 0; i < 60; i++) {
+      const r = 80 + Math.sqrt(rnd()) * 230, a = rnd() * Math.PI * 2;
+      nodes.push({ x: C.x + r * Math.cos(a) * 1.6, y: C.y - 20 + r * Math.sin(a) * 0.75, kind: kinds[i % 3], d: i / 60 });
+    }
+    const edges = [];
+    nodes.forEach((n, i) => {
+      const near = nodes.map((m, j) => ({ j, dd: (m.x - n.x) ** 2 + (m.y - n.y) ** 2 })).filter(o => o.j !== i).sort((p, q) => p.dd - q.dd).slice(0, 2);
+      for (const o of near) if (o.j > i) edges.push({ a: n, b: nodes[o.j], d: Math.max(n.d, nodes[o.j].d) });
     });
-    const pt = sv('circle', { r: 12, fill: BLUE }, svg);
+    const eEls = edges.map(e => sv('line', { x1: e.a.x, y1: e.a.y, x2: e.b.x, y2: e.b.y, stroke: '#9aa3b0', 'stroke-width': 2 }, svg));
+    const nEls = nodes.map(n => {
+      if (n.kind === 'paper') return sv('circle', { cx: n.x, cy: n.y, r: 10, fill: '#ffffff', stroke: '#171b23', 'stroke-width': 3 }, svg);
+      if (n.kind === 'workflow') return sv('rect', { x: n.x - 9, y: n.y - 9, width: 18, height: 18, fill: BLUE, transform: `rotate(45 ${n.x} ${n.y})` }, svg);
+      return sv('rect', { x: n.x - 8, y: n.y - 8, width: 16, height: 16, fill: '#525a68' }, svg);
+    });
+    const hub = markAt(layer, C.x, C.y, 120);
+    const plate = h('div', 'abs', layer);
+    plate.className = 'face small';
+    plate.innerHTML = '<span class="h2" style="font-size:50px">KIGAM Second brain</span>';
+    Object.assign(plate.style, { padding: '14px 36px', whiteSpace: 'nowrap' });
+    box(plate, 0, C.y + 74);
+    const legend = h('div', 'abs', layer);
+    Object.assign(legend.style, { left: '110px', top: '980px', display: 'flex', gap: '40px', alignItems: 'center' });
+    legend.innerHTML = [
+      ['<svg width="26" height="26"><circle cx="13" cy="13" r="9" fill="#fff" stroke="#171b23" stroke-width="3"/></svg>', '논문'],
+      [`<svg width="26" height="26"><rect x="5" y="5" width="16" height="16" fill="${BLUE}" transform="rotate(45 13 13)"/></svg>`, 'Workflow'],
+      ['<svg width="26" height="26"><rect x="5" y="5" width="16" height="16" fill="#525a68"/></svg>', '연구노트'],
+    ].map(([sym, l]) => `<span style="display:flex;align-items:center;gap:12px">${sym}<span class="label" style="font-size:28px;color:var(--ink)">${l}</span></span>`).join('');
     return t => {
-      const o = win(t, 78.2, 85.3, 0.5, 0.5);
+      const o = win(t, A, B, 0.45, 0.4);
       put(layer, { o });
       if (o <= 0) return;
       head(t);
-      const gi = ramp(t, 78.5, 79.2);
-      L.set({ ringF: ramp(t, 78.3, 79.3, inOut), gO: gi, gS: lerp(0.8, 1, gi), lettersF: 0 });
-      const step = 0.62;
-      arcs.forEach(a => {
-        const s = 79.2 + a.i * step;
-        a.arc.setAttribute('stroke-dasharray', `${ramp(t, s, s + 0.55, inOut)} 1`);
-        a.base.setAttribute('opacity', ramp(t, 78.8, 79.3, lin));
-        const f = ramp(t, s + 0.15, s + 0.7);
-        put(a.el, { o: f, y: 10 * (1 - f) });
+      put(tag, { o: ramp(t, 92.3, 92.8, lin) });
+      const gather = ramp(t, 96.0, 97.6, inOut);
+      for (const r of rings) {
+        const f = ramp(t, 92.3 + r.i * 0.22, 92.9 + r.i * 0.22);
+        r.g.setAttribute('opacity', f);
+        put(r.u, { o: f });
+        const lap = (t - 92.3) / 2.2 + r.phase;
+        const a = lap * Math.PI * 2;
+        r.p.setAttribute('cx', r.x + 92 * Math.cos(a));
+        r.p.setAttribute('cy', r.y + 52 * Math.sin(a));
+        const lf = ramp(t, 94.0 + r.i * 0.12, 94.9 + r.i * 0.12, inOut);
+        r.link.setAttribute('x2', lerp(r.x, C.x, lf));
+        r.link.setAttribute('y2', lerp(r.y, C.y, lf));
+        r.link.setAttribute('stroke', lf >= 1 ? BLUE : '#9aa3b0');
+        r.e.setAttribute('stroke', lf >= 1 ? BLUE : '#9aa3b0');
+        r.link.setAttribute('opacity', 1 - 0.6 * gather);
+      }
+      const gi = ramp(t, 93.6, 94.4);
+      hub.set({ ringF: ramp(t, 93.4, 94.4, inOut), gO: gi, gS: lerp(0.8, 1, gi), lettersF: 0 });
+      const grow = ramp(t, 95.0, 99.0, lin);
+      nEls.forEach((el, i) => el.setAttribute('opacity', clamp((grow - nodes[i].d) * 8)));
+      eEls.forEach((el, i) => {
+        const f = clamp((grow - edges[i].d) * 8 - 0.4);
+        el.setAttribute('opacity', f);
+        el.setAttribute('stroke', grow > 0.9 ? '#7d8ba3' : '#9aa3b0');
       });
-      const prog = clamp((t - 79.2) / (step * 8));
-      const ang = ((-90 - 22.5 + prog * 360) * Math.PI) / 180;
-      pt.setAttribute('cx', cx + R * Math.cos(ang));
-      pt.setAttribute('cy', cy + R * Math.sin(ang));
-      pt.setAttribute('opacity', win(t, 79.1, 84.6, 0.2, 0.4));
+      plate.style.left = `${C.x - plate.offsetWidth / 2}px`;
+      put(plate, { o: ramp(t, 97.4, 98.0, lin), y: 14 * (1 - ramp(t, 97.4, 98.2)) });
+      put(legend, { o: ramp(t, 95.6, 96.1, lin) });
     };
   });
 
-  // S7 closing 85–90
+  // ---------- S5 closing 100.2–105 ----------
   scenes.push(() => {
+    const A = 100.2;
     const layer = h('div', 'layer');
     const L = lockup(layer, 280);
     L.svg.style.left = `${960 - L.width / 2}px`;
@@ -773,19 +621,36 @@
     const sub = text(layer, 'h2', 0, 660, '지구과학 연구자를 위한 AI agent 작업 공간', { width: '1920px', textAlign: 'center', fontSize: '50px', fontWeight: 600, color: 'var(--ink-2)' });
     const tag = text(layer, 'small', 0, 1000, '내부 검토용 영상', { width: '1840px', textAlign: 'right' });
     return t => {
-      const o = ramp(t, 85.0, 85.6, lin);
+      const o = ramp(t, A, A + 0.6, lin);
       put(layer, { o });
       if (o <= 0) return;
-      const gi = ramp(t, 85.2, 86.0);
-      L.set({ ringF: ramp(t, 85.0, 86.2, inOut), gO: gi, gS: lerp(0.85, 1, gi), lettersF: ramp(t, 85.8, 86.7, inOut) });
-      put(sub, { o: ramp(t, 86.6, 87.2, lin), y: 14 * (1 - ramp(t, 86.6, 87.4)) });
-      put(tag, { o: ramp(t, 87.0, 87.6, lin) });
+      const gi = ramp(t, A + 0.2, A + 1.0);
+      L.set({ ringF: ramp(t, A, A + 1.2, inOut), gO: gi, gS: lerp(0.85, 1, gi), lettersF: ramp(t, A + 0.8, A + 1.7, inOut) });
+      put(sub, { o: ramp(t, A + 1.6, A + 2.2, lin), y: 14 * (1 - ramp(t, A + 1.6, A + 2.4)) });
+      put(tag, { o: ramp(t, A + 2.0, A + 2.6, lin) });
     };
   });
 
+  // ---------- film position bar (no text; chapter ticks only) ----------
+  function buildScale() {
+    const TICKS = [20, ...CHAPTERS_V2.map(c => c.a), 92, 100.2];
+    const layer = h('div', 'layer');
+    const svg = sv('svg', { width: 1920, height: 1080 }, layer);
+    const x0 = 0, x1 = 1920, y = 1077, a = 5, b = 100.2;
+    const sx = t => lerp(x0, x1, (t - a) / (b - a));
+    sv('line', { x1: x0, x2: x1, y1: y, y2: y, stroke: '#d5dae1', 'stroke-width': 6 }, svg);
+    for (const t of TICKS) sv('line', { x1: sx(t), x2: sx(t), y1: y - 12, y2: y + 3, stroke: '#878f9d', 'stroke-width': 2 }, svg);
+    const fill = sv('line', { x1: x0, x2: x0, y1: y, y2: y, stroke: BLUE, 'stroke-width': 6 }, svg);
+    return t => {
+      put(layer, { o: win(t, 5.0, 100.4, 0.6, 0.6) });
+      fill.setAttribute('x2', sx(clamp(t, a, b)));
+    };
+  }
+
   // ---------- init ----------
   async function init() {
-    const names = ['file-text', 'code-xml', 'folder-open', 'notebook-pen', 'book-open', 'git-branch', 'server', 'map', 'database', 'table-2', 'quote', 'users', 'message-square-text', 'well-log', 'map-gis'];
+    const names = ['file-text', 'code-xml', 'folder-open', 'notebook-pen', 'book-open', 'git-branch', 'server', 'map', 'database', 'table-2', 'quote', 'users', 'message-square-text', 'well-log', 'map-gis',
+      'library', 'network', 'building-2', 'share-2', 'workflow', 'user', 'users-round', 'search'];
     await Promise.all(names.map(async n => {
       const txt = await (await fetch(`icons/${n}.svg`)).text();
       ICON[n] = txt.replace(/width="24"/, 'width="100%"').replace(/height="24"/, 'height="100%"');
@@ -803,7 +668,7 @@
     drawers.push(buildScale());
     window.motion = {
       ready: true,
-      duration: 90,
+      duration: DURATION,
       segments: SEG,
       async frame(t) {
         pending.length = 0;

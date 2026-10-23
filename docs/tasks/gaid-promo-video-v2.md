@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:26:31Z
+updated: 2026-10-23T02:31:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -100,7 +100,8 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 :8700), registering the Workflow is a real shared registration. User answer 2026-10-23: "검토용 앱에서 연구를 진행하고 Workflow를 기관 허브 서버에 등록해도 된다."
 
 ## Next steps
-1. Child `gaid-promo-video-v2--study` runs the study in the review app and records capture-v2 (contract
+1. Child `gaid-promo-video-v2--study` (writer b0548dfd, worktree ~/worktrees/geoaidesk/gaid-promo-video-v2--study,
+   started 2026-10-23) runs the study in the review app and records capture-v2 (contract
    `geo/promo/CONTRACT.md` v2). Parent meanwhile rebuilds `scene/` (background, cycle, demo chrome with cycle strip
    and feature tags, second brain, closing) and `render.py` (~105 s).
 2. Integrate capture-v2 beats into the demo segments, stills review, render job, report.
@@ -109,6 +110,9 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 - Packages: (P) parent owns scene/, render.py, prepare_data.py, README, report, integration; (C) child
   `--study` owns the review-app study, capture*.py, CAPTURE.md, capture-v2 data. Interface: `capture.json` v2 beats
   (rect + Korean tag label per feature). Integration order: scenes with placeholders → capture-v2 → beats wired → render.
+- User 2026-10-23: "모션그래픽 영상 작업은 writer가 직접 모두 수행하자. 워커는 자료 수집 정도로만 활용하자." → the writer does
+  all film work (scenes, tags, timing, render); the child only runs the study and records raw takes (its beat labels are
+  suggestions).
 - Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
   it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
