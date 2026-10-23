@@ -183,7 +183,7 @@ export const draftReply = {
   workflow: {
     skills: [{ name: "pu-nested-cv-method", source: "bundled", role: "primary", purpose: "PU 평가를 실행합니다." }],
     steps: [
-      { id: "prepare", title: "자료 준비", does: "격자 표를 확인합니다.", skill: "pu-nested-cv-method", read: "자료 준비", checks: ["양성 정의를 확인합니다."], choiceIds: ["label-def"], outputs: [] },
+      { id: "prepare", title: "자료 준비", does: "격자 표를 확인합니다.", skill: "pu-nested-cv-method", read: "자료 준비", checks: ["양성 정의를 확인합니다."], inputIds: ["grid"], choiceIds: ["label-def"], outputs: [] },
       { id: "evaluate", title: "nested CV", does: "공간 block으로 평가합니다.", skill: "pu-nested-cv-method", read: "nested CV", checks: [], choiceIds: ["block-size"], outputs: [] },
       { id: "report", title: "보고", does: "결과와 한계를 적습니다.", skill: "pu-nested-cv-method", read: "보고", checks: [], choiceIds: [], outputs: ["scores"] },
     ],

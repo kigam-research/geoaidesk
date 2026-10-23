@@ -129,6 +129,14 @@ function roleExample(roleId: string, value: unknown): { example?: WorkflowInputE
   };
 }
 
+/** The value a choice uses unless the researcher changes it (gaid-workflow-stages); an option id when it has options. */
+export function choiceDefault(choice: Record<string, unknown>): string | null {
+  const value = typeof choice.default === "string" ? choice.default.trim() : "";
+  if (!value) return null;
+  const options = strings(choice.options);
+  return options.length && !options.includes(value) ? null : value;
+}
+
 function choices(workflow: GeoWorkflow): WorkflowChoice[] {
   return (workflow.requiredScientificChoices ?? []).map((raw) => {
     const choice = raw as Record<string, unknown> & { id: string };
@@ -143,6 +151,7 @@ function choices(workflow: GeoWorkflow): WorkflowChoice[] {
       ...(text(choice.why) ? { why: text(choice.why)! } : {}),
       ...(strings(choice.options).length ? { options: strings(choice.options) } : {}),
       ...(Object.keys(labels).length ? { optionLabels: labels } : {}),
+      ...(choiceDefault(choice) ? { default: choiceDefault(choice)! } : {}),
     };
   });
 }
