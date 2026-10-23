@@ -25,3 +25,8 @@ export function arxivCandidates(text: string): string[] {
   return [...new Set([...text.matchAll(/(?:arxiv:\s*|arxiv\.org\/(?:abs|pdf)\/)((?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[A-Z]{2})?\/\d{7})(?:v\d+)?)/gi)]
     .map((m) => m[1]))];
 }
+
+/** The DataCite DOI arXiv registers for a paper (all versions): `2005.07939v1` → `10.48550/arxiv.2005.07939`. */
+export function arxivDoi(id: string): string {
+  return `10.48550/arxiv.${id.replace(/v\d+$/i, "")}`.toLowerCase();
+}

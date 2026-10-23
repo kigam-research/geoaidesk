@@ -21,7 +21,14 @@ function scalar(value: string): string {
   return text;
 }
 
+/** YAML's empty values (`cover: null`, `supersedes: ~`) mean "none", not a file or note named "null". */
+function optional(value: string | undefined): string {
+  const text = scalar(value ?? "");
+  return /^(?:null|~)$/i.test(text) && !/^["']/.test((value ?? "").trim()) ? "" : text;
+}
+
 function list(value: string): string[] {
+  if (!optional(value)) return [];
   const text = value.trim().replace(/^\[([\s\S]*)\]$/, "$1");
   return [...new Set(text.split(",").map(scalar).map(s => s.normalize("NFC")).filter(Boolean))];
 }
@@ -114,7 +121,7 @@ export function parseResearchNote(content: string, id: string): ParsedResearchNo
   }
   return {
     title, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : /^\d{4}-\d{2}-\d{2}/.exec(id)?.[0] ?? "",
-    status, headline: scalar(fields.headline ?? "") || null, cover: scalar(fields.cover ?? "") || null,
+    status, headline: optional(fields.headline) || null, cover: optional(fields.cover) || null,
     supersedes: list(fields.supersedes ?? ""), decisions: parseDecisions(sections.decisions ?? "", problems), problems,
   };
 }

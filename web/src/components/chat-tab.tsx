@@ -148,6 +148,7 @@ import { toast } from "sonner";
 import { SettingsLink } from "@/components/settings-link";
 import { ConnectModelCard } from "@/components/connect-model-card";
 import { computeInstanceFromDefault, useAppDefaults } from "@/lib/app-settings";
+import { pickStartModel } from "@/geo/models/start-model";
 import { openSettings } from "@/lib/settings-nav";
 import { workflowScriptsIn } from "@/lib/workflow-script";
 
@@ -1896,10 +1897,14 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
   // something on its chips. The model waits until its provider's list lands.
   const appDefaults = useAppDefaults();
   const chipsTouched = useRef(false);
+  // GeoAIDesk (gaid-first-use-fixes): a chat that has not run yet (copied tabs included) never starts on a model
+  // that cannot run when a connected source can; see pickStartModel.
   const defaultsPending = useRef({
-    model: !initialWorkspaceState && !initialSessionId,
+    model: !initialSessionId,
+    saved: !initialWorkspaceState && !initialSessionId,
     rest: !initialWorkspaceState && !initialSessionId,
   });
+  const initialModel = useRef(selectedModel);
   useEffect(() => {
     const pending = defaultsPending.current;
     if (!appDefaults || chipsTouched.current) return;
@@ -1910,17 +1915,16 @@ export const ChatTab = forwardRef<ChatTabHandle, ChatTabProps>(function ChatTab(
       if (REMOTE_COMPUTE_ENABLED && compute) setSelectedComputeTarget(compute);
     }
     if (pending.model) {
-      if (!appDefaults.model) {
-        pending.model = false;
-        return;
-      }
-      const model = knownModels.find((candidate) => candidate.id === appDefaults.model);
-      if (model) {
-        pending.model = false;
-        setSelectedModel(model);
-      }
+      // The saved default applies only to a tab with nothing to copy; it waits until its provider's list lands.
+      const savedId = pending.saved ? appDefaults.model : undefined;
+      const saved = savedId ? knownModels.find((candidate) => candidate.id === savedId) : undefined;
+      if (savedId && !saved && modelAvailability({ id: savedId }) === "checking") return;
+      const pick = pickStartModel(saved ?? initialModel.current, knownModels, modelAvailability);
+      if (pick === "wait") return;
+      pending.model = false;
+      if (pick && pick.id !== selectedModel.id) setSelectedModel(pick);
     }
-  }, [appDefaults, knownModels, modalCatalog]);
+  }, [appDefaults, knownModels, modalCatalog, modelAvailability, selectedModel.id]);
   const markChipsTouched = useCallback(() => {
     chipsTouched.current = true;
   }, []);

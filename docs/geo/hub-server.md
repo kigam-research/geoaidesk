@@ -194,3 +194,52 @@ source between dry-run and apply. After importing, inspect entries and authors i
 Restoring an older backup discards changes made after its snapshot. If researchers synchronized after that snapshot, use
 fresh client sync state or preserve/export those local changes before reconnecting; server versions may have moved back.
 Do not replace a live home's files. Stop its server first and retain the old home until the restored instance is checked.
+
+## Approved information sources
+
+The hub collects information feeds for GAIDs logged into a hub account. Without a login, GAID shows no collected items.
+Sources in `geo/feeds/sources.json` remain proposed until an administrator approves them; the hub does not contact them
+before approval. SQLite stores the approved definition, so a later update to a shipped proposal cannot change the approved
+address. Existing hub homes gain migration 3 automatically. Backups count both `feed_sources` and `feed_items`.
+
+Review the proposals in GAID's administrator source list, or use the local operator CLI with the same hub home:
+
+```bash
+node geo/hub-server.mjs feeds list
+node geo/hub-server.mjs feeds approve nature-geoscience hess
+node geo/hub-server.mjs feeds approve --all-proposed
+node geo/hub-server.mjs feeds stop hess
+node geo/hub-server.mjs feeds fetch
+node geo/hub-server.mjs feeds fetch --source nature-geoscience
+```
+
+`--all-proposed` explicitly approves every currently proposed source. CLI decisions appear as `operator (CLI)` and
+write audit events. An administrator can also add an approved source or stop one in GAID; shipped sources cannot be
+deleted. Stopping a source immediately hides its items but retains the records. Deleting an administrator addition removes
+its items too. The administrator fetch action and `feeds fetch` collect immediately and report each source's result.
+A failed source does not stop the rest. Sources and concurrent fetch requests run sequentially.
+
+`serve` collects approved sources about 30 seconds after startup, then waits six hours between completed batches. Set
+`GAID_HUB_FEEDS_INTERVAL_HOURS` or `serve --feeds-interval-hours HOURS` to change the interval; the flag takes precedence.
+`0` disables scheduled collection; manual fetch still works. Closing the server clears the timer. The source list records
+the last attempt and any error. The researcher's list reports the latest successful collection.
+
+The unfiltered list shows at most ten items from each source, then applies the global newest-first order and list limit.
+Choosing a category, field or search term removes that per-source display cap. Stored retention is unchanged.
+
+Only original titles, feed-provided summaries and links are stored: titles up to 300 characters and summaries up to 400.
+There are no model calls or linked-page/full-text requests. RSS 2.0, RSS 1.0/RDF and Atom are supported. GitHub release
+notes and repository descriptions use the same text bounds. Optional source match words filter title/summary; ASCII words
+of up to three letters match whole words. Each response is limited to 4 MiB, 20 seconds and three redirects. Up to 100 items
+per source remain, and items older than 180 days (publication time, otherwise first collection time) are removed after a
+successful collection. No automatic translation, scientific assessment or recommendation quality check is implied.
+
+For GitHub releases, the hub first requests the latest ten releases and applies the source's prerelease choice. If a source
+excludes prereleases and that response exceeds 4 MiB or leaves no releases, the hub requests one latest stable release
+(`/releases/latest`). The same 4 MiB limit applies. This fallback covers repositories with many binary assets or frequent
+alpha releases.
+
+GitHub requests use the public API. To raise the unauthenticated rate limit, supply `GAID_HUB_FEEDS_GITHUB_TOKEN` to the
+hub process through its service environment. This optional token is never stored in the hub database, returned to GAID or
+printed; it is sent only to `api.github.com`, not to feed hosts or cross-host redirects. Without it, rate-limit failures
+appear in the affected source's last fetch result and the next source is still attempted.

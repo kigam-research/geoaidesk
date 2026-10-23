@@ -300,6 +300,7 @@ export default function HomePage() {
           entryId={hub.entryId ?? null}
           catalogueId={hub.catalogueId ?? null}
           skills={hub.skills}
+          feeds={hub.feeds}
           skillId={hub.skillId}
           onNavigate={(next) => setHub(next)}
           onOpenProjects={() => {

@@ -37,6 +37,9 @@ const workText = geoText("work");
 
 const appText = geoText("app");
 
+const notebookText = geoText("notebook");
+const NOTEBOOK_TYPES = new Set(["hypothesis", "method", "observation", "decision", "note"]);
+
 function ToolIcon({ toolName }: { toolName?: string }) {
   const className = "size-3.5 shrink-0 text-muted-foreground";
   switch (toolName) {
@@ -360,10 +363,13 @@ export function NotebookEntryChip({
   onView?: (entryId: string) => void;
 }) {
   const args = (item.args ?? {}) as Record<string, unknown>;
+  // GeoAIDesk (gaid-first-use-fixes): the entry type in the catalogue language ("연구 노트 · 방법"), not "Method".
   const typeLabel =
-    typeof args.type === "string"
-      ? args.type.charAt(0).toUpperCase() + args.type.slice(1)
-      : appText("chat.tools.entry");
+    typeof args.type === "string" && NOTEBOOK_TYPES.has(args.type)
+      ? notebookText(`type.${args.type}`)
+      : typeof args.type === "string"
+        ? args.type.charAt(0).toUpperCase() + args.type.slice(1)
+        : appText("chat.tools.entry");
   const title = typeof args.title === "string" ? args.title : "";
   return (
     <div

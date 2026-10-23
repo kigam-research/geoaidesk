@@ -55,6 +55,17 @@ describe("pure research-note parser", () => {
     }
   });
 
+  // gaid-first-use-fixes: every note an agent wrote with `cover: null` showed "형식 확인 필요".
+  it("reads YAML empty values as absent, and a quoted \"null\" as text", () => {
+    for (const empty of ["null", "~", "Null", "NULL"]) {
+      const text = source().replace("cover:", `cover: ${empty}`).replace("supersedes:", `supersedes: ${empty}`);
+      expect(parseResearchNote(text, first)).toMatchObject({ cover: null, supersedes: [], problems: [] });
+    }
+    expect(parseResearchNote(source().replace("cover:", 'cover: "null"'), first).cover).toBe("null");
+    write(notePath(), source().replace("cover:", "cover: null").replace("supersedes:", "supersedes: null"));
+    expect(getResearchNote(paths, first).note).toMatchObject({ cover: null, supersedes: [], problems: [] });
+  });
+
   it("falls back to the first H1 and id date while reporting missing or invalid format", () => {
     const parsed = parseResearchNote("# My finding\n## Results\nFine", first);
     expect(parsed).toMatchObject({ title: "My finding", date: "2026-10-17", status: "pending" });

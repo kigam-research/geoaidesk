@@ -55,7 +55,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession)"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -140,7 +140,7 @@
       "path": "web/src/components/chat-tab.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip; the composer shows a started Workflow as PendingWorkflowChip and sends its block before the typed text (attached paths and context follow, so the block stays parseable); web/src/lib/command-blocks.ts commandPreview names a Workflow start \"Workflow · <title>\" in tab and history labels"
+      "responsibility": "gaid-runtime: GeoPromptBudget chip next to the context gauge. gaid-korean-workspace: GeoChatActions next to it, geoExposure passed to useAgent and kept in the reported tab state; WP07 primary-path catalogue copy and accessible localized controls; gaid-hub-followups: wrap composer controls for visible hub-draft label; gaid-note-decisions: the composer's prefill listener skips a handoff addressed to another chat and sends a `send` handoff (research-note answers) as a queued message, falling back to the composer; gaid-workflow-model: a user message that is a `<workflow>` block (a Workflow start) renders as WorkflowBlockCard (web/src/geo/workflow/) instead of plain text or a command chip; the composer shows a started Workflow as PendingWorkflowChip and sends its block before the typed text (attached paths and context follow, so the block stays parseable); web/src/lib/command-blocks.ts commandPreview names a Workflow start \"Workflow · <title>\" in tab and history labels; gaid-first-use-fixes: a chat that has not run yet moves an unconnected model to a connected one (pickStartModel)"
     },
     {
       "path": "web/src/components/settings/providers-panel.tsx",
@@ -186,7 +186,7 @@
       "path": "web/src/components/file-preview-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:); gaid-notebook-review: the pinned notebook tab renders ResearchNotesPanel (web/src/geo/notes/) with the Lab Notebook view as its work record, plus the onOpenNotebookChat prop"
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:); gaid-notebook-review: the pinned notebook tab renders ResearchNotesPanel (web/src/geo/notes/) with the Lab Notebook view as its work record, plus the onOpenNotebookChat prop; gaid-first-use-fixes: Markdown file links resolve against the file's folder and open in the file panel"
     },
     {
       "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
@@ -270,7 +270,7 @@
       "path": "web/src/components/model-selector.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-first-use-fixes: legacy OpenAI Codex rows hidden when Sign in with ChatGPT offers the same model"
     },
     {
       "path": "web/src/components/thinking-selector.tsx",
@@ -306,7 +306,7 @@
       "path": "web/src/components/tool-activity.tsx",
       "owner": "gaid-hub",
       "status": "edited",
-      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-hub-followups: Running activity elapsed feedback"
+      "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; gaid-hub-followups: Running activity elapsed feedback; gaid-first-use-fixes: notebook chip shows the entry type from the notebook catalogue"
     },
     {
       "path": "web/src/components/connect-model-card.tsx",
@@ -390,7 +390,7 @@
       "path": "web/src/components/skills-panel.tsx",
       "owner": "gaid-workflow-catalog",
       "status": "edited",
-      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation."
+      "responsibility": "Embed skill_hub URL/package preview controls and pass their result into the existing acknowledgement and install flow; preserve upstream source installation. gaid-hub-feeds: a pending import request (web/src/geo/skills/import-request.ts, from Workflow readiness and 자료 소식) is read after mount, not during render."
     },
     {
       "path": "web/src/components/workflows-panel.tsx",
@@ -979,6 +979,24 @@
       "owner": "gaid-hub-skills",
       "status": "edited",
       "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
+    },
+    {
+      "path": "web/src/components/ai-elements/message.tsx",
+      "owner": "gaid-first-use-fixes",
+      "status": "edited",
+      "responsibility": "Sandbox link plugin passed with its options (Streamdown caches processors by plugin name + options), baseDir prop for file-relative links, wrapping table header/data cells"
+    },
+    {
+      "path": "web/src/lib/sandbox-markdown.ts",
+      "owner": "gaid-first-use-fixes",
+      "status": "edited",
+      "responsibility": "File-relative link resolution bounded by the sandbox root; links without a target (streaming placeholder, refused path) render as text instead of \"[blocked]\""
+    },
+    {
+      "path": "web/src/components/ai-elements/message-links.test.tsx",
+      "owner": "gaid-first-use-fixes",
+      "status": "edited",
+      "responsibility": "Streaming-link and file-relative link regressions"
     }
   ],
   "notTouched": [
