@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:29:30Z
+updated: 2026-10-23T16:29:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
@@ -56,6 +56,11 @@ Request from the starter:
   (Pocheon note, pre-cite-scope), folders `광상 부존 가능성`, `GAID 수집함`; hub entry `entry-ap-43431e17-f09`
   "항공자력·시추 코어 PGI 광체 추정" (versions 0.1.0, 0.2.0, folder 지구물리 역산, authored before workflow-stages);
   Pocheon projects pgi-2c2f48, pgi-2-ea1e81, pgi-2-0-2-0-84f252 (before cite-scope: notes do not cite via the start window).
+- Scenes/render adapted to v3 (commit 99adefc7): motion scenes keep v2 choreography via `timed()` slots (opening 0–4.4,
+  background 4.1–17.2, cycle 16.9–24.4), demo from 24.45 for the take lengths, second brain 8.4 s and closing 4.6 s after
+  it; cycle plate shows `version 0.1.0 → 0.2.0`; render.py takes duration and stills from the page, writes
+  `gaid-promo-v3.mp4`. Preview with v2 frames as stand-ins: `~/data/geoaidesk/work/gaid-promo-video-v3/preview-01/`
+  (94 s with the 12 v2 shots that share ids; with all 16 v3 targets ≈ 100–105 s).
 - Structure draft v3 written below and shown to the user (2026-10-24). Hub notified (request a11aeb361b50) that the
   review app is in use. Child `gaid-promo-video-v3--gaid-promo-v3-study` started: Paseo agent adb2ab89 (codex gpt-6.1-sol
   high), worktree `~/worktrees/geoaidesk/gaid-promo-video-v3--gaid-promo-v3-study`, prompt
