@@ -53,10 +53,9 @@ Workflow 시작 창의 왼쪽 단계 목록이 입력·조건 하나마다 한 �
   - 포천: authoring-pass2-revise.json `drafts[-1].workflow`를 그대로 설치된 method 폴더로 넣었습니다.
   - 새 형식 예시: 같은 포천 내용을 4단계로 다시 묶고 측선 입력을 `multiple`, 조건 10개에 기본값을 준 사진용 Workflow입니다
     (`~/data/geoaidesk/work/gaid-stages-window/scripts/build_methods.py`). 허브에 등록하지 않았습니다.
-  - 주의: 이 시점(9949b08d 기준)의 서버는 `GET /geo/methods` 요약에 `inputRoles[].multiple`과
-    `requiredScientificChoices[].default`를 아직 싣지 않습니다(패키지 B 담당 매핑). 그래서 사진에서는 브라우저가 받는
-    `/geo/methods` 응답에 method 파일의 두 필드를 채워 넣었습니다(playwright route). 화면 코드는 계약대로 요약 필드만 읽습니다.
-    B가 통합된 뒤에는 이 대체 없이 같은 화면이 나와야 합니다.
+  - 새 형식 사진은 패키지 B를 통합한 상위 브랜치(3ff52ae5)를 병합한 뒤 다시 찍었습니다. 이때 서버의 `GET /geo/methods`
+    요약이 측선 입력의 `multiple`과 기본값 10개를 직접 싣는 것을 확인했고, 브라우저 응답을 고치지 않았습니다. 포천과 PU 사진은
+    두 필드가 없는 Workflow라 처음 찍은 것을 그대로 씁니다.
 
 ## UI 가이드 규칙
 

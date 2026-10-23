@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T13:29:29Z
+updated: 2026-10-23T14:53:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"08164288-7806-46a6-9e82-956577998a76","pid":790060,"provider":"claude","session":"f9dbf0b8-76e0-462b-b70b-5ced3cf12897","start":"64608299","token":"7a4c953115a20fde3c930ab89ac5a15005cbbdc2c3a944e2bab8d7766326cb7a"}
 branch: task/gaid-workflow-stages--gaid-stages-window
 target: task/gaid-workflow-stages
@@ -85,10 +85,8 @@ raw.githubusercontent.com (use `gh api` or codeload).
 <!-- task:closed -->
 Closed 2026-10-23T13:18:56Z: ready; the parent gaid-workflow-stages integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
-Blocked: `task finish` scripts/check fails 3 server tests outside this unit (geo-hub-shared x2, geo-authoring-package x1):
-the authoring Workflow schema in `server/src/geo/authoring/workflow.ts` (package B) rejects `steps[].inputIds`, which the
-parent contract commit 9949b08d adds in `workflowDocFor`. This unit changes no server/geo files. Rerun `task finish` once the
-parent branch carries B's schema update (log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-8ayiau8l.log).
+- Synced with the parent after B (3ff52ae5); the real `/geo/methods` summary carries `multiple`/`default`, stage shots retaken
+  without the route patch; finish rerun.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
