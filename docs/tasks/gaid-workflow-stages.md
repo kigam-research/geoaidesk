@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:23:11Z
+updated: 2026-10-23T12:43:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0704ce16-3a7d-4ced-a70b-cb0992d87a4f","pid":723936,"provider":"claude","session":"231b3e23-b5c2-477a-8474-f49634f8b127","start":"64563772","token":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
 branch: task/gaid-workflow-stages
 target: main
@@ -72,6 +72,8 @@ Outside check: none.
   start because `--writer` left "Always Ask"): A `gaid-workflow-stages--gaid-stages-window` (agent 08164288, worktree
   ~/worktrees/geoaidesk/gaid-workflow-stages--gaid-stages-window); B `gaid-workflow-stages--gaid-stages-authoring`
   (agent b0ed51a7). Prompts: ~/data/geoaidesk/work/gaid-workflow-stages/prompt-{a,b}.md.
+- B blocked on a model login for the Pocheon regeneration; user chose (2026-10-23) "검토 앱 로그인을 이번만 공유": B's
+  instance may use ~/.geoaidesk/pi-agent once (no credential file read/copied, instance stopped after). Sent to B.
 ## Next steps
 1. When a child's finish arrives: `task complete <child>`; integrate B then A (`task sync`), run scripts/check.
 2. Meanwhile: report skeleton `reports/2026-10-23-gaid-workflow-stages/index.md`, AGENTS.md wording (Workflow model /
