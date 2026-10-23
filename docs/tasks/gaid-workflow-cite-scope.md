@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:15:27Z
+updated: 2026-10-23T12:16:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"56c05725-7189-46a4-9615-7e1ddddb7ee0","pid":515641,"provider":"claude","session":"31d96ed7-e560-44e9-9232-a2b8aa7a787b","start":"64415659","token":"705a5edd3ea6c16b909c87cbd34aa6359cc9106a13b769c29f4592a9e6ef672d"}
 branch: task/gaid-workflow-cite-scope
 target: main
@@ -52,8 +52,22 @@ entry, before the researcher confirms. Close D's open item for F21 with a `Close
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
+- Code done and saved (F23 + F21, see the plan under Notes). Tests: server `test/geo-workflow-papers.test.ts` (3),
+  web `source-papers.test.tsx` (2), `workflow-card.test.tsx` (+1), `hub.test.tsx` (+1); related suites pass.
+  scripts/check job job-geoaidesk-gaid-workflow-cite-scope-1 passed at 02e10dfa ("All geoaidesk checks passed").
+- Own instance (not the review app): systemd user unit `gaid-cite-scope-app`, ports 3360/18360,
+  GAID_HOME ~/data/geoaidesk/work/gaid-workflow-cite-scope/home, seeded read-only from the review app's data: the two
+  서재 papers (heo2025 Zotero item, astic2020) with PDFs/page text, the Pocheon authoring project ap-43431e17-f09,
+  models.json (kigam-qwen). No credentials copied.
+- Real cycle so far: registered the Pocheon draft in the own local hub (0.1.0; the register dialog listed 6 example
+  files, 1.8 MB, with source/licence/synthetic) → 내 프로젝트에서 시험 → new project pgi-b937d9 → install through the
+  gate → start window 소개 showed 근거 논문 2편 "서재에 있음" (DOI match) → 근거 논문 2편 붙이기 → literature.json holds
+  both items, rows read "인용 범위에 있음" → start draft: the `<workflow>` block carries `## 근거 논문` with
+  `[@heo2025]`, `[@astic2020]` → sent with kigam-qwen/qwen3.8-flash-next (21:15 KST), run in progress.
 ## Next steps
-1. (the next session's first action)
+1. When the run ends: check the note cites the papers, 서재 item uses (note + project + Workflow), note item 인용한 논문,
+   connection map; then rebuild the instance and take UI-guide screenshots (start window 소개, register dialog; both
+   styles/themes, 1440×900 and 1280×800); report; rerun scripts/check on the final snapshot; stop the instance unit.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
