@@ -69,7 +69,7 @@ describe("workflow chat block", () => {
     const body = renderWorkflowDocument(doc, { ...ko, target: "chat", settings: { inputs: {}, choices: {} } });
     const message = `${workflowBlock(doc, body, "ko")}\n\n첫 시험은 북쪽 절반만 써 주세요.`;
     const parsed = parseWorkflowBlock(message);
-    expect(parsed).toEqual({ id: "conformal-grid-priority", revision: 1, title: "격자 탐사 우선순위", body, tail: "첫 시험은 북쪽 절반만 써 주세요." });
+    expect(parsed).toEqual({ id: "conformal-grid-priority", revision: 1, title: "격자 탐사 우선순위", body, tail: "첫 시험은 북쪽 절반만 써 주세요.", example: false });
   });
 
   it("keeps attribute values on one line without quotes", () => {

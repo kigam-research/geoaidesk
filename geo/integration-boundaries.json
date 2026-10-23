@@ -822,7 +822,7 @@
       "path": "web/src/lib/command-blocks.ts",
       "owner": "gaid-workflow-model",
       "status": "edited",
-      "responsibility": "commandPreview names a Workflow start (`<workflow>` block) \"Workflow · <title>\" in tab and history labels, with the researcher's first line"
+      "responsibility": "commandPreview names a Workflow start (`<workflow>` block) \"Workflow · <title>\" in tab and history labels, with the researcher's first line; gaid-workflow-example: the block may carry data=\"example\""
     },
     {
       "path": "server/test/geo-library-zotero.test.ts",
