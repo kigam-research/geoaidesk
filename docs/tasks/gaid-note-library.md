@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-23T06:57:16Z
+status: active
+updated: 2026-10-23T07:04:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64631b91-f6bd-4f6d-ad02-2996e80f1f79","pid":1743744,"provider":"claude","session":"5414cf7f-13a5-428a-ae32-343cc6475005","start":"62319888","token":"b8608a00206a30d58748fdcf6af8f6920102d148e2631acb42ae68af6fd45eee"}
 branch: task/gaid-note-library
 target: main
@@ -85,6 +85,9 @@ Recommended answers the user accepted:
 Closed 2026-10-23T06:57:16Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First `task finish`: its scripts/check run hit the same geo-hub-server launcher CLI timeout (7.7 s > 5 s) a second
+  time. Shared premise of both failures: the test's 5 s default does not fit five sequential launcher processes under the
+  full parallel suite. Fix: explicit 30 s timeout on that test (owner gaid-backend noted in the boundaries file).
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 
