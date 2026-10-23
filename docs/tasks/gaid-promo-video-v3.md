@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:23:32Z
+updated: 2026-10-23T16:26:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
@@ -50,11 +50,54 @@ Request from the starter:
 - Outputs outside Git (`~/data/geoaidesk/...`). Workers via `task start --parent` / `task reader`. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-24: read v2 (report, `geo/promo/`, v2 task doc "Structure draft v2") and the improvement reports. Review app
+  (gaid-review, main 7650e012) and hub server are up. Review-app records relevant to v3: library papers `heo2025`
+  (li-79b57a297a46, Pocheon PGI paper) and `astic2020` (li-a313027670f8, PGI method paper), note item li-16b92efeb9b4
+  (Pocheon note, pre-cite-scope), folders `광상 부존 가능성`, `GAID 수집함`; hub entry `entry-ap-43431e17-f09`
+  "항공자력·시추 코어 PGI 광체 추정" (versions 0.1.0, 0.2.0, folder 지구물리 역산, authored before workflow-stages);
+  Pocheon projects pgi-2c2f48, pgi-2-ea1e81, pgi-2-0-2-0-84f252 (before cite-scope: notes do not cite via the start window).
+- Structure draft v3 written below and shown to the user.
+
+### Structure draft v3 (to show the user)
+Kept from v2: logo, background (scattered skill ecosystems incl. K-Dense, no counts, 개념도), cycle ring, demo style
+(whole app frame at one scale, cycle strip on top, one blue box + Korean tag per feature, no zoom/scroll), second brain
+(개념도), closing. Changed: the demo follows one new study, the Pocheon magnetite PGI paper (Heo et al. 2025, institute
+geophysics), done again in the final review app so every improvement appears in its place in the loop; "판" becomes
+"version" everywhere (gaid-hub-versions).
+
+| # | s | Part | Content (improvement shown) |
+|---|---|---|---|
+| 0 | 0–4 | Opening | logo motion |
+| 1 | 4–17 | Background (motion, 개념도) | as v2, tightened |
+| 2 | 17–24 | Cycle (motion) | ring 내 서재 → Workflow 만들기 → GAID 허브 공유 → 연구 분석 → 연구노트 → 내 서재; version 0.1.0 → 0.2.0 |
+| 3a | 24–32 | Demo: 내 서재 | folder with the paper and the PGI method paper; paper detail; PDF opens in the side panel (library-pdf-panel) |
+| 3b | 32–46 | Demo: 논문에서 Workflow | several sources at once: two library papers + supplementary code + data files with data summaries (authoring-sources); a question with the evidence viewer beside it, PDF page with the quote marked, recommended option (authoring-evidence-view); draft as 3–5 analysis stages (workflow-stages); example data attached per input (workflow-example) |
+| 3c | 46–54 | Demo: GAID 허브 공유 | register dialog: next version (patch/minor/major) and the example data files shared (hub-versions, cite-scope); hub entry with version, author, stars/comments |
+| 3d | 54–72 | Demo: 연구 분석 | one start window: 소개 (purpose, inputs, outputs, 근거 논문 2편 붙이기) → stage pages with example data chosen → summary (workflow-start-ui, stages, example, cite-scope); chat: Workflow card "예제 자료로 실행", AI agent working; result in the map viewer (magnetic anomaly / susceptibility slice) and the 3D orebody figure |
+| 3e | 72–81 | Demo: 연구노트 | note result first with the figure, citations with page numbers to both papers, a decision answered |
+| 3f | 81–90 | Demo: 다시 내 서재로 | 서재에 넣기 → 서재 정리 노트 (note-library); paper → 내 연구에서 쓰인 곳 (Workflow, project, note); 연결 지도 |
+| 4 | 90–98 | KIGAM second brain (motion, 개념도) | as v2, version wording |
+| 5 | 98–103 | Closing | logo, 내부 검토용 영상 |
+
+Optional (not in the film unless the user picks it): one 자료 소식 beat (hub-feeds) in 3c; ORCID-verified author iD on
+the hub entry (orcid) if the hub account already shows one.
+
+Study (one real cycle in the review app, records created only by this study): new authoring draft from `heo2025` with
+`astic2020`, the supplementary code and the Pocheon example data as sources (GPT-6.1 Sol, connected subscription picked
+per action, no settings change) → registered as the next version of `entry-ap-43431e17-f09` (or a new entry if editing
+in place is refused) → new project, start window with example data and both papers attached → one real run, coarse
+(≤10 min compute, method kept whole), plus a GeoTIFF map the viewer opens → note with a decision → 서재에 넣기.
 ## Next steps
-1. (the next session's first action)
+1. Child `gaid-promo-video-v3--study` runs the study and capture-v3 (contract `geo/promo/CONTRACT.md` v3); parent adapts
+   `scene/` and `render.py` to structure v3 meanwhile (version wording, chapter timing, new chapter content).
 ## Failed approaches
 ## Notes and decisions
+- Packages (2026-10-24): (P) parent owns `scene/`, `render.py`, `prepare_data.py`, README, CONTRACT.md, report,
+  integration, render; (C) child `gaid-promo-video-v3--study` ("general work") owns the review-app study, `capture*.py`,
+  `CAPTURE.md`, `~/data/geoaidesk/work/gaid-promo-video-v3/` capture-v3 data. Interface: `capture.json` (v2 schema) beats.
+  Integration order: scenes with v2 frames as stand-ins → capture-v3 → beats wired → render → report.
+- v2 user rules kept: writer does all film work, worker only study/raw takes; promotional film, staging allowed and
+  recorded; no area table, no LAS viewer.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
