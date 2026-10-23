@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:42:18Z
+updated: 2026-10-23T01:43:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b35bb8b9-c459-4233-ba31-c386537b4e3f","pid":2832900,"provider":"codex","session":"01a16669-3557-7520-b2f1-bc790350ad04","start":"60747240","token":"59f55a1303c7beb853fef07784bf6e29821f7eac7b1cfd62eca996fdd7606311"}
 branch: task/gaid-orcid--authui
 target: task/gaid-orcid
@@ -82,7 +82,7 @@ Changed files, string ids with ko/en text, ui-guide rule ids followed/broken wit
 with commands, anything not verified. Then `task finish`.
 
 ## Current state
-- Implemented draft UI: authenticated/typed iD display, sign-in tab handoff and return refresh, confirmed auth unlink, all hub states; author/account display. Checks pending.
+- Implemented draft UI: authenticated/typed iD display, sign-in tab handoff and return refresh, confirmed auth unlink, all hub states; author/account display. Initial focused checks passed: frontend TypeScript and 23 tests (ORCID, shared method, shared browse). Copy/UI validators: no errors. Expanded author-link tests added; full checks pending.
 - Codegraph is not indexed for this exact worktree; native source reads used (knowledge-lookup fallback).
 - Sequential decisions: preserve the fixed server contracts; implement the shared iD renderer first, then card and tiny propagation seams, then behavior tests, own real-app smoke/screenshots, report and task finish. No independent package warrants a reader or child writer.
 - Owned interfaces: web/src/geo/orcid/, orcid locales; small shared-entry/library-screen propagation seams notified to parent. No backend edits.
@@ -103,6 +103,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014215.596995Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014224.083641Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

@@ -61,3 +61,12 @@ describe("editing a registered method", () => {
     expect(screen.getByText(/원본을 밝힌 별도 Workflow가 됩니다/)).toBeTruthy();
   });
 });
+
+it("links the authenticated author's iD with the official icon without an unauthenticated label", () => {
+  render(<SharedMethod method={{ ...base, authorOrcid: { id: "0000-0002-1825-0097", environment: "sandbox" } }}
+    profile={fixtureDraft().drafts[0].profile} flow={<div />} onStar={vi.fn()} onComment={vi.fn()} onTry={vi.fn()} />);
+  const link = screen.getByRole("link", { name: /인증된 ORCID iD/ });
+  expect(link.getAttribute("href")).toBe("https://sandbox.orcid.org/0000-0002-1825-0097");
+  expect(link.querySelector("img")?.getAttribute("src")).toBe("/geo/orcid/ORCID-iD_icon_vector.svg");
+  expect(screen.queryByText("(인증 안 됨)")).toBeNull();
+});

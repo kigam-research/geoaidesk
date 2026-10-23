@@ -8,6 +8,7 @@ import { TechnicalDetail } from "@/geo/hub/technical";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { normalizeOrcidId, type OrcidStatus } from "@/geo/contracts/orcid";
 import { openSettings } from "@/lib/settings-nav";
+import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 import { getOrcid, linkOrcid, orcidProblem, startOrcidAuth, unlinkOrcid, unlinkOrcidAuth } from "./api";
 import { OrcidId } from "./id-display";
 
@@ -47,8 +48,9 @@ export function OrcidCard({ status, loadError, onStatus, onChanged, onRetry, onI
       finally { refreshing = false; }
     };
     window.addEventListener("focus", refresh);
+    window.addEventListener(HUB_CONNECTION_CHANGED, refresh);
     document.addEventListener("visibilitychange", refresh);
-    return () => { live = false; window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+    return () => { live = false; window.removeEventListener("focus", refresh); window.removeEventListener(HUB_CONNECTION_CHANGED, refresh); document.removeEventListener("visibilitychange", refresh); };
   }, [busy, onStatus]);
 
   const run = async (work: () => Promise<OrcidStatus>) => {
