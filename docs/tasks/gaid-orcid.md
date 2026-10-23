@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:40:43Z
+updated: 2026-10-23T01:48:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -79,12 +79,12 @@ Outside check: no outside check.
    `DELETE /geo/orcid/auth`, `OrcidStatus.hub`. Tests: geo-hub-orcid (fake ORCID signing RS256 tokens) + hub suites pass.
 2. Child gaid-orcid--authui (writer b35bb8b9-c459-4233-ba31-c386537b4e3f, brief ~/data/geoaidesk/work/gaid-orcid/child-auth-ui.md)
    builds the phase 2 screens; on its finish: `task complete gaid-orcid--authui`, review, integrate.
-3. Real sandbox end-to-end (jobs 1 + 2 below: test hub http://127.0.0.1:8711 with home ~/data/geoaidesk/work/gaid-orcid/e2e/hub,
-   test GAID backend :8000 with GAID_HOME ~/data/geoaidesk/work/gaid-orcid/e2e/gaid-home, logged in as orcid-test@example.org):
-   waiting for the user to (a) confirm the sandbox redirect URI, (b) run
-   `node geo/hub-server.mjs orcid-client set --home ~/data/geoaidesk/work/gaid-orcid/e2e/hub --sandbox --client-id APP-NMSX0X5YG2CKUCUQ`
-   and type the secret, (c) open the authorize URL I generate (POST /geo/orcid/auth/start on :8000) in a browser on PC74 and
-   sign in with the sandbox account. Then check the callback page, `GET /geo/orcid` (linked) and stop both jobs.
+3. Real sandbox end-to-end DONE 2026-10-23 10:46 KST: user stored the sandbox secret with the CLI (hidden prompt), fixed the
+   sandbox redirect URI (first attempt: ORCID "redirect_uri ... does not match for registered client"), signed in with the
+   sandbox account; hub account linked `0009-0004-4407-0032` ("GAID TEST", sandbox); GAID profile authenticated; state row
+   consumed; audit has orcid.start/orcid.link; secret not in hub.sqlite. Backend request log held the one-time code/state →
+   added `server/src/geo/orcid/log.ts` redaction in the request serializer (seam server/src/index.ts, boundaries entry).
+   Both e2e services stopped and disposed as cancelled (deliberate stop).
 4. Production: still unknown whether ORCID production accepts the loopback redirect (user to try registering).
 5. After 2–3: full scripts/check, report section for phase 2, humanizer, review-copy, task finish.
 ## Failed approaches
@@ -126,7 +126,9 @@ Report: reports/2026-10-22-gaid-orcid/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013942.970747Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive sandbox e2e service deliberately stopped after the successful ORCID sign-in (hub account linked 0009-0004-4407-0032, 2026-10-23 10:46 KST)","recorded":"2026-10-23T01:48:37Z","state":"cancelled"}
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013952.968887Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive sandbox e2e service deliberately stopped after the successful ORCID sign-in (hub account linked 0009-0004-4407-0032, 2026-10-23 10:46 KST)","recorded":"2026-10-23T01:48:39Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
