@@ -15,6 +15,8 @@ export interface Actor {
   id: string;
   /** Display name shown with entries, revisions and comments. */
   name: string;
+  /** A hub server administrator (removes any registered Workflow, restores removed ones). Never set in the local store. */
+  admin?: boolean;
 }
 
 /** The local store's actor for an entered display name. */
@@ -34,11 +36,23 @@ export interface HubRecordStore {
   folders(): Promise<HubFolder[]>;
   addFolder(name: string, actor: Actor): Promise<HubFolder>;
 
-  /** 404 AuthoringError when missing; 409 when malformed. */
+  /** 404 AuthoringError when missing or removed; 409 when malformed. */
   read(id: string): Promise<StoredEntry>;
   find(id: string): Promise<StoredEntry | null>;
-  /** Newest first (updatedAt desc, id asc). */
+  /** Newest first (updatedAt desc, id asc); removed entries are left out. */
   list(): Promise<StoredEntry[]>;
+  /**
+   * Removes a registered Workflow from the hub (gaid-hub-versions decision 2): hidden from every list and read (404) until
+   * restored; records, files, comments and stars are kept, copies installed in projects are untouched. The registrant or a
+   * hub server administrator (403 otherwise); 409 when already removed. Further registrations and file uploads to a removed
+   * entry are refused (409). Audited.
+   */
+  remove(id: string, actor: Actor, reason: string): Promise<void>;
+  /** Removed entries `actor` may restore, each with `entry.removed`, latest removal first: an administrator all of them, in
+   * the local store (no administrators) the registrant their own, anyone else none. */
+  removed(actor: Actor | null): Promise<StoredEntry[]>;
+  /** Puts a removed entry back as it was; 404 when it is not removed, 403 when `actor` may not restore it. Audited. */
+  restore(id: string, actor: Actor): Promise<StoredEntry>;
   /**
    * Creates or replaces an entry record as `actor`. Stores other than the local one enforce: a new entry is owned by the
    * actor (author/authorId/registeredBy set from the actor); an existing one only by its author, who may append exactly the

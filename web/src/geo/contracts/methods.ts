@@ -62,8 +62,11 @@ export interface MethodOrigin {
   packageSha256?: string;
   /** `gaid-hub-skill`: the hub skill revision installed (contracts/hub-skills.ts). */
   hubSkill?: { id: string; revision: number; treeHash: string };
-  /** Shared-hub registration identity, independent of the draft/package revision. */
-  hubEntry?: { id: string; revision: number };
+  /**
+   * Shared-hub registration identity, independent of the draft/package revision. `version`: the registered version
+   * (gaid-hub-versions); older install records omit it (`legacyHubVersion(revision)`).
+   */
+  hubEntry?: { id: string; revision: number; version?: string };
   siteId?: string;
   pageUrl?: string;
   /** Hub descriptor (`gaid-hub-package/v1`) the package was fetched through, token removed. */
@@ -102,7 +105,10 @@ export interface LocalMethodSummary {
   /** Hub identity and revision from `gaid-method.json` (null when the file is invalid). */
   methodId: string | null;
   revision: number | null;
+  /** Package-internal semver from `gaid-method.json`; not shown to researchers (they see `hubVersion` or 초안). */
   version: string | null;
+  /** Registered hub version of an install from the GAID hub; null: not a hub registration (shown as 초안). */
+  hubVersion: string | null;
   title: Localized;
   summary: Localized | null;
   /**

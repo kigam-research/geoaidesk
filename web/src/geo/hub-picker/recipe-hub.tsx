@@ -1,5 +1,6 @@
 "use client";
 
+import { hubVersionOf } from "@/geo/contracts/hub-version";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { HubEntry } from "@/geo/contracts/hub-shared";
@@ -48,7 +49,7 @@ export function RecipeHub({ projectId, onDone }: { projectId: string; onDone: ()
   return <div className="space-y-4 text-sm">
     <div className="space-y-1">
       <h3 className="font-medium break-words">{entry.title}</h3>
-      <p className="text-xs text-muted-foreground">{entry.author} · {t("hubPicker.revision", { count: entry.latestRevision })}</p>
+      <p className="text-xs text-muted-foreground">{entry.author} · {t("hubPicker.revision", { version: hubVersionOf(entry) ?? "" })}</p>
     </div>
     {methodsFailed ? <p role="alert">{t("hubPicker.methodsError")}</p> : !methods ? <p role="status">{t("hubPicker.loading")}</p> : <>
       <p>{t(installed ? canOpenRecipe ? "hubPicker.installed" : "hubPicker.installedNeedsCheck" : "hubPicker.installHelp")}</p>

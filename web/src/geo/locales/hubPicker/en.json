@@ -12,7 +12,7 @@
   "emptyRecipes": "No Workflows with saved start settings match. Change the search term or import a file.",
   "results": "Hub search results",
   "stars": "★ {count}",
-  "revision": "Revision {count}",
+  "revision": "version {version}",
   "kind": {
     "skill": "Skill",
     "workflow": "Workflow"
@@ -36,7 +36,7 @@
     "button": "Install and open start settings"
   },
   "installing": "Installing the Workflow.",
-  "installError": "Could not install the Workflow. Check the selected revision in the hub and try again.",
+  "installError": "Could not install the Workflow. Check the selected version in the hub and try again.",
   "installed": "Already available in the project. Open its saved start settings.",
   "installedNeedsCheck": "This Workflow is already installed. Open it to check its availability and saved start settings.",
   "method": {
@@ -52,5 +52,5 @@
     "button": "Preview archive"
   },
   "legacy": "Previous skill_hub",
-  "previewSource": "GAID hub · {title} · revision {count}"
+  "previewSource": "GAID hub · {title} · version {version}"
 }

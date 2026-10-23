@@ -4,13 +4,14 @@
  * star and "use in my research"; the method at a glance (input → steps → result); the summary as points; the steps;
  * the limits; comments (GitHub-like feedback). The registration preview shows the same page with a sticky bar.
  */
-import { DownloadIcon, EyeIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, StarIcon } from "lucide-react";
+import { DownloadIcon, EyeIcon, FolderIcon, HistoryIcon, MessageSquareIcon, PencilIcon, StarIcon, Trash2Icon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { DraftProfile } from "@/geo/contracts/authoring";
 import { OrcidId } from "@/geo/orcid/id-display";
+import { legacyHubVersion } from "@/geo/contracts/hub-version";
 import type { HubEntry } from "@/geo/contracts/hub-shared";
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export interface SharedComment {
   body: string;
   /** Revision the comment was written on. */
   revision: number;
+  version?: string | null;
 }
 
 export interface SharedMethodView {
@@ -44,6 +46,7 @@ export interface SharedMethodView {
   /** Folder display name, or null before registration. */
   folder: string | null;
   revision: number;
+  version?: string | null;
   registeredAt: string;
   kind: "skill" | "workflow";
   /** Registration previews can supply this too; omitted by older callers. */
@@ -57,9 +60,9 @@ export interface SharedMethodView {
   imageThemed?: boolean;
   comments: SharedComment[];
   /** The registered method this one was copied from. */
-  basedOn?: { title: string; author: string; revision: number; onOpen: () => void };
+  basedOn?: { title: string; author: string; revision: number; version?: string | null; onOpen: () => void };
   /** Registered revisions, oldest first (shown behind the "판 기록" disclosure). */
-  revisions?: { revision: number; at: string; by: string; note: string }[];
+  revisions?: { version?: string | null; revision: number; at: string; by: string; note: string }[];
 }
 
 /**
@@ -94,11 +97,13 @@ export function SharedMethod({
   onComment,
   onTry,
   onEdit,
+  onRemove,
   preview,
   workflowDoc,
 }: {
   workflowDoc?: import("@/geo/contracts/workflow-doc").WorkflowDoc | null;
   /** "방법 고치기" (`edit`, the registering author) or "복사해서 고치기" (`copy`, anyone else). */
+  onRemove?: () => void;
   onEdit?: { mode: "edit" | "copy"; run: () => void; busy?: boolean };
   /** Preview before registration: how the method will look to other researchers, with the register action. */
   preview?: { onRegister: () => void; onBack: () => void };
@@ -135,7 +140,7 @@ export function SharedMethod({
                 {method.kind === "workflow" ? text("draft.workflow") : text("draft.skill")}
               </span>
               <span className="rounded-full border px-2 py-1 text-muted-foreground">
-                {text("draft.revision", { n: method.revision })}
+                {method.version ? text("shared.version", { version: method.version }) : text("draft.revision")}
               </span>
               {method.folder && (
                 <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-muted-foreground">
@@ -158,7 +163,7 @@ export function SharedMethod({
                 {text("shared.basedOn", {
                   author: method.basedOn.author,
                   title: method.basedOn.title,
-                  revision: method.basedOn.revision,
+                  version: method.basedOn.version ?? legacyHubVersion(method.basedOn.revision),
                 })}{" "}
                 <button
                   type="button"
@@ -225,6 +230,7 @@ export function SharedMethod({
               <DownloadIcon data-icon="inline-start" />
               {text("shared.try")}
             </Button>
+            {onRemove && <Button variant="ghost" className="text-destructive" onClick={onRemove}><Trash2Icon aria-hidden />{text("remove.action")}</Button>}
             <div className="flex items-stretch overflow-hidden rounded-md border bg-background">
               <button
                 type="button"
@@ -284,7 +290,7 @@ export function SharedMethod({
             {[...method.revisions].reverse().map((r) => (
               <li key={r.revision} className="flex flex-col gap-0.5 border-t pt-2 first:border-t-0 first:pt-0">
                 <span className="font-medium">
-                  {text("shared.revisions.row", { revision: r.revision, when: r.at, author: r.by })}
+                  {text("shared.revisions.row", { version: r.version ?? legacyHubVersion(r.revision), when: r.at, author: r.by })}
                 </span>
                 {r.note && <span className="text-muted-foreground">{r.note}</span>}
               </li>
@@ -311,7 +317,7 @@ export function SharedMethod({
                   <span className="font-semibold">{c.author}</span>
                   <span className="text-xs text-muted-foreground">{c.at}</span>
                   <span className="ml-auto rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
-                    {text("draft.revision", { n: c.revision })}
+                    {text("shared.version", { version: c.version ?? legacyHubVersion(c.revision) })}
                   </span>
                 </p>
                 <p className="px-3 py-2 text-sm whitespace-pre-wrap">{c.body}</p>

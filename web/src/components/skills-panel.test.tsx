@@ -414,20 +414,20 @@ describe("hub skill Settings rows", () => {
     vi.spyOn(caps, "getAllSkills").mockResolvedValue(listing({ enabled: [skill("table-check", "표 확인", { origin: "registry", source: "/internal/package.tar.gz", hubSkill: { id: "table-check", revision: 1, latestRevision: 2, edited: true, state: "suspended" } })] }));
     const update = vi.spyOn(caps, "updateSkillFromUpstream");
     render(<SkillsPanel />);
-    await screen.findByText("허브 스킬 · 1판");
+    await screen.findByText("허브 스킬 · version 1");
     expect(screen.getByText("고친 내용 있음")).toBeInTheDocument();
-    expect(screen.getByText("새 판: 2판")).toBeInTheDocument();
-    expect(screen.getByText(/사용 중지된 판입니다/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "2판으로 바꾸기" })).toBeInTheDocument();
+    expect(screen.getByText("새 version: version 2")).toBeInTheDocument();
+    expect(screen.getByText(/사용 중지된 version입니다/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "version 2으로 바꾸기" })).toBeInTheDocument();
     expect(screen.queryByText("/internal/package.tar.gz")).not.toBeInTheDocument();
     expect(update).not.toHaveBeenCalled();
   });
   it("does not offer an update when the installed revision is current", async () => {
     localStorage.setItem("gaid:locale", "ko"); stubProjects();
     vi.spyOn(caps, "getAllSkills").mockResolvedValue(listing({ enabled: [skill("table-check", "표 확인", { hubSkill: { id: "table-check", revision: 2, latestRevision: 2, edited: false, state: "checked" } })] }));
-    render(<SkillsPanel />); await screen.findByText("허브 스킬 · 2판");
+    render(<SkillsPanel />); await screen.findByText("허브 스킬 · version 2");
     expect(screen.queryByText("고친 내용 있음")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /판으로 바꾸기/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /version \d+으로 바꾸기/ })).not.toBeInTheDocument();
   });
 });
 
@@ -441,7 +441,7 @@ describe("explicit hub revision update", () => {
     const preview = vi.spyOn(hubSkills, "installPreview").mockResolvedValue(installFixture({ project: "edited" }));
     const install = vi.spyOn(hubSkills, "install");
     render(<SkillsPanel />);
-    await userEvent.click(await screen.findByRole("button", { name: "2판으로 바꾸기" }));
+    await userEvent.click(await screen.findByRole("button", { name: "version 2으로 바꾸기" }));
     await waitFor(() => expect(preview).toHaveBeenCalledWith("table-check", "p1", 2));
     expect(await screen.findByRole("checkbox")).toBeDisabled();
     expect(screen.getByRole("button", { name: "프로젝트에 설치" })).toBeDisabled();

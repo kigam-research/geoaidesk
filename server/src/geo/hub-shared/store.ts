@@ -8,9 +8,9 @@ import type {
   MethodDraft,
   MethodPackageRecord,
 } from "../../../../web/src/geo/contracts/authoring.ts";
-import type { HubComment, HubEntry, HubFolder } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import type { HubComment, HubEntry, HubFolder, HubRemoval } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { AuthoringError, newId, now } from "../authoring/store.ts";
-import type { Actor, HubRecordStore } from "./records.ts";
+import { isEntryAuthor, type Actor, type HubRecordStore } from "./records.ts";
 
 export const sharedDir = () =>
   resolve(process.env.GAID_HUB_SHARED_DIR || join(KADY_PI_AGENT_DIR, "skill-hub", "shared"));
@@ -38,6 +38,7 @@ export interface StoredEntry {
 }
 
 const missing = (e: unknown) => (e as NodeJS.ErrnoException).code === "ENOENT";
+export const REMOVED_ENTRY_MESSAGE = "허브에서 제거한 Workflow입니다. 복원한 뒤에 새 version을 등록할 수 있습니다.";
 
 /** Local file store (development / single PC); trusts the caller's actor like before accounts existed. */
 export class SharedHubStore implements HubRecordStore {
@@ -95,6 +96,10 @@ export class SharedHubStore implements HubRecordStore {
     return target;
   }
   async read(id: string): Promise<StoredEntry> {
+    if (await this.removal(id)) throw new AuthoringError("등록한 Workflow를 찾을 수 없습니다.", 404);
+    return this.readRecord(id);
+  }
+  private async readRecord(id: string): Promise<StoredEntry> {
     try {
       const record = await this.json<StoredEntry>(join(this.entryDir(id), "entry.json"));
       if (record.schemaVersion !== "gaid-hub-entry/v1")
@@ -125,7 +130,53 @@ export class SharedHubStore implements HubRecordStore {
     );
   }
   async write(record: StoredEntry, _actor?: Actor) {
+    if (await this.removal(record.entry.id)) throw new AuthoringError(REMOVED_ENTRY_MESSAGE, 409);
     await this.atomic(join(this.entryDir(record.entry.id), "entry.json"), record);
+  }
+  /** The removal marker (`removed.json`) of an entry, or null. */
+  private async removal(id: string): Promise<HubRemoval | null> {
+    try {
+      return await this.json<HubRemoval>(this.within(id, "removed.json"));
+    } catch (e) {
+      if (missing(e)) return null;
+      throw e;
+    }
+  }
+  /** Removal history (remove/restore events) next to the entry: the local store's audit trail. */
+  private async logRemoval(id: string, event: Record<string, unknown>) {
+    await appendFile(this.within(id, "removals.jsonl"), JSON.stringify(event) + "\n");
+  }
+  async remove(id: string, actor: Actor, reason: string) {
+    await this.serial(id, async () => {
+      const record = await this.readRecord(id);
+      if (await this.removal(id)) throw new AuthoringError("이미 허브에서 제거한 Workflow입니다.", 409);
+      if (!isEntryAuthor(record.entry, actor)) throw new AuthoringError("등록한 연구자만 Workflow를 허브에서 제거할 수 있습니다.", 403);
+      const removal: HubRemoval = { at: now(), by: actor.name, ...(actor.id !== actor.name ? { byId: actor.id } : {}), reason };
+      await this.atomic(this.within(id, "removed.json"), removal);
+      await this.logRemoval(id, { action: "remove", ...removal });
+    });
+  }
+  async removed(actor: Actor | null): Promise<StoredEntry[]> {
+    if (!actor) return [];
+    const out: StoredEntry[] = [];
+    for (const d of await readdir(join(this.root, "entries"), { withFileTypes: true })) {
+      if (!d.isDirectory() || !ID.test(d.name)) continue;
+      const removal = await this.removal(d.name);
+      if (!removal) continue;
+      const record = await this.readRecord(d.name).catch(() => null);
+      if (record && isEntryAuthor(record.entry, actor)) out.push({ ...record, entry: { ...record.entry, removed: removal } });
+    }
+    return out.sort((a, b) => b.entry.removed!.at.localeCompare(a.entry.removed!.at) || a.entry.id.localeCompare(b.entry.id));
+  }
+  async restore(id: string, actor: Actor): Promise<StoredEntry> {
+    return this.serial(id, async () => {
+      const record = await this.readRecord(id);
+      if (!(await this.removal(id))) throw new AuthoringError("제거한 Workflow가 아닙니다.", 404);
+      if (!isEntryAuthor(record.entry, actor)) throw new AuthoringError("등록한 연구자만 이 Workflow를 복원할 수 있습니다.", 403);
+      await unlink(this.within(id, "removed.json"));
+      await this.logRemoval(id, { action: "restore", at: now(), by: actor.name, ...(actor.id !== actor.name ? { byId: actor.id } : {}) });
+      return record;
+    });
   }
   async recordInstall(id: string, install: AuthoringInstall, _actor?: Actor) {
     await this.serial(id, async () => {
@@ -144,6 +195,7 @@ export class SharedHubStore implements HubRecordStore {
   }
   async immutableBytes(id: string, file: string, bytes: Buffer, _actor?: Actor) {
     const target = this.within(id, file);
+    if (await this.removal(id)) throw new AuthoringError(REMOVED_ENTRY_MESSAGE, 409);
     await mkdir(dirname(target), { recursive: true });
     const tmp = `${target}.${randomUUID()}.tmp`;
     await writeFile(tmp, bytes);

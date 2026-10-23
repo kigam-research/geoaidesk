@@ -4,7 +4,7 @@
  * 내 Workflow) stay beside the home lists, a registered or built-in Workflow, and a Workflow being made. On a detail
  * screen the list it was opened from stays marked. Hidden, it becomes a 48 px rail with the same places as icons.
  */
-import { BookOpenIcon, FolderIcon, NewspaperIcon, FolderPlusIcon, ListIcon, PanelLeftIcon, PencilIcon, StarIcon } from "lucide-react";
+import { BookOpenIcon, FolderIcon, NewspaperIcon, FolderPlusIcon, ListIcon, PanelLeftIcon, PencilIcon, StarIcon, Trash2Icon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const text = geoText("hub");
 
 /** The list the hub shows (or, on a detail screen, the list the researcher came from). */
-export type HubView = { kind: "home" } | { kind: "registry"; folder: string } | { kind: "mine" } | { kind: "skills" } | { kind: "feeds" };
+export type HubView = { kind: "home" } | { kind: "registry"; folder: string } | { kind: "mine" } | { kind: "skills" } | { kind: "feeds" } | { kind: "removed" };
 
 export interface HubSidebarFolder {
   id: string;
@@ -106,6 +106,8 @@ export function HubSidebar({
   registryTotal,
   mineCount,
   collapsed = false,
+  removedCount = 0,
+  showRemoved = false,
   onView,
   onNewFolder,
 }: {
@@ -116,6 +118,8 @@ export function HubSidebar({
   registryTotal: number;
   mineCount: number;
   collapsed?: boolean;
+  removedCount?: number;
+  showRemoved?: boolean;
   onView: (view: HubView) => void;
   onNewFolder?: () => void;
 }) {
@@ -135,6 +139,7 @@ export function HubSidebar({
         />
         <RailItem icon={PencilIcon} label={text("home.mineTitle")} selected={is({ kind: "mine" })} onClick={() => onView({ kind: "mine" })} />
         <RailItem icon={BookOpenIcon} label={t("hubSkills.nav")} selected={is({ kind: "skills" })} onClick={() => onView({ kind: "skills" })} />
+        {showRemoved && <RailItem icon={Trash2Icon} label={text("removed.title")} selected={is({ kind: "removed" })} onClick={() => onView({ kind: "removed" })} />}
         <RailItem icon={NewspaperIcon} label={t("hubFeeds.nav")} selected={is({ kind: "feeds" })} onClick={() => onView({ kind: "feeds" })} />
       </nav>
     );
@@ -179,6 +184,7 @@ export function HubSidebar({
         <SidebarItem icon={PencilIcon} label={text("home.mineItem")} count={mineCount} selected={is({ kind: "mine" })} onClick={() => onView({ kind: "mine" })} />
       </SidebarGroup>
       <SidebarGroup title={t("hubSkills.nav")}><SidebarItem icon={BookOpenIcon} label={t("hubSkills.all")} selected={is({ kind: "skills" })} onClick={() => onView({ kind: "skills" })} /></SidebarGroup>
+      {showRemoved && <SidebarGroup><SidebarItem icon={Trash2Icon} label={text("removed.title")} count={removedCount} selected={is({ kind: "removed" })} onClick={() => onView({ kind: "removed" })} /></SidebarGroup>}
       <SidebarGroup title={t("hubFeeds.nav")}>
         <SidebarItem icon={NewspaperIcon} label={t("hubFeeds.all")} selected={is({ kind: "feeds" })} onClick={() => onView({ kind: "feeds" })} />
       </SidebarGroup>

@@ -31,7 +31,7 @@ export class HubSkillStore implements HubSkillRecordStore {
     return join(this.root, "skills", id);
   }
   packagePath(id: string, revision: number) {
-    if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
+    if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("스킬 version을 찾을 수 없습니다.", 404);
     return join(this.skillDir(id), "packages", `${revision}.tar.gz`);
   }
   async read(id: string): Promise<StoredHubSkill> {
@@ -64,8 +64,8 @@ export class HubSkillStore implements HubSkillRecordStore {
     return this.serial(id, async () => {
       const skill = await this.read(id);
       const r = skill.revisions.find((x) => x.revision === revision);
-      if (!r) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
-      if (input.state === "checked" && revisionRegistrantId(r) === actor.id) throw new AuthoringError("등록한 사람은 같은 판을 확인함으로 바꿀 수 없습니다. 다른 연구자의 검토가 필요합니다.", 403);
+      if (!r) throw new AuthoringError("스킬 version을 찾을 수 없습니다.", 404);
+      if (input.state === "checked" && revisionRegistrantId(r) === actor.id) throw new AuthoringError("등록한 사람은 같은 version을 확인함으로 바꿀 수 없습니다. 다른 연구자의 검토가 필요합니다.", 403);
       r.reviews.push({ state: input.state, by: actor.name, byId: actor.id, verified: false, at: now(), note: input.note, ...(input.replacement ? { replacement: input.replacement } : {}) });
       if (skill.latestRevision === revision) skill.state = input.state;
       skill.updatedAt = now();
@@ -85,7 +85,7 @@ export class HubSkillStore implements HubSkillRecordStore {
     try { await link(tmp, target); }
     catch (e) {
       if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
-      if (!(await readFile(target)).equals(bytes)) throw new AuthoringError("스킬 판이 이미 다른 내용으로 저장되어 있습니다.", 409);
+      if (!(await readFile(target)).equals(bytes)) throw new AuthoringError("스킬 version이 이미 다른 내용으로 저장되어 있습니다.", 409);
     } finally { await unlink(tmp); }
   }
   async comments(id: string): Promise<HubComment[]> {

@@ -11,6 +11,7 @@
  */
 import type { WorkflowDoc } from "./workflow-doc";
 import type { DraftProfile, MethodText } from "./authoring";
+import type { HubVersionBump } from "./hub-version";
 
 export const HUB_USER_HEADER = "X-GAID-User";
 
@@ -24,6 +25,11 @@ export interface HubFolder {
 
 export interface HubEntryRevision {
   revision: number;
+  /**
+   * Semantic version the registrant chose (gaid-hub-versions): the first registration is 0.1.0, each update a patch, minor or
+   * major step (`bumpHubVersion`). Records made before versions omit it; views always fill it (`hubRevisionVersions`).
+   */
+  version?: string;
   /** Authoring project and draft revision it came from (on this server). */
   authoringProjectId: string;
   draftRevision: number;
@@ -62,8 +68,11 @@ export interface HubEntry {
   mine?: boolean;
   /** The author account's authenticated ORCID iD at read time (institute hub server only; gaid-orcid phase 2). */
   authorOrcid?: { id: string; environment: "production" | "sandbox" };
-  /** The registered method this one was copied from ("복사해서 고치기"). */
-  basedOn?: { entryId: string; revision: number; title: string; author: string };
+  /**
+   * The registered method this one was copied from ("복사해서 고치기"). `version`: the original's version that was copied;
+   * views always fill it (records made before versions: `legacyHubVersion(revision)`).
+   */
+  basedOn?: { entryId: string; revision: number; version?: string; title: string; author: string };
   folderId: string;
   /** Cover image URL (`/geo/hub/entries/:id/cover`), when the draft has one. */
   cover: string | null;
@@ -77,6 +86,18 @@ export interface HubEntry {
   /** Chats started from this entry's registered packages, not completed analyses or reviews. */
   trials: number;
   updatedAt: string;
+  /** Set only in the removed list (`GET /geo/hub/removed`): the entry is hidden from the hub until restored. */
+  removed?: HubRemoval;
+}
+
+/** Who removed a registered Workflow from the hub and why (gaid-hub-versions decision 2). */
+export interface HubRemoval {
+  at: string;
+  /** Display name. */
+  by: string;
+  /** Account id (hub server records only). */
+  byId?: string;
+  reason: string;
 }
 
 export interface HubComment {
@@ -145,11 +166,24 @@ export interface HubRecommendation {
 // POST   /geo/hub/entries/:id/edit                     {} → EditEntryResult (author: edit; others: own copy)
 // POST   /geo/hub/entries/:id/install                  SharedInstallBody → InstallResult (authoring.ts)
 // GET    /geo/hub/recommended                          → { cards: HubRecommendation[] } (3-4 cards)
+// POST   /geo/hub/entries/:id/remove                   RemoveEntryBody → 204 (registrant or hub server administrator;
+//                                                      hidden from every hub list, installed copies in projects untouched)
+// GET    /geo/hub/removed                              → { entries: HubEntry[] } with `removed` (what the caller may
+//                                                      restore: an administrator all, without a hub server the registrant
+//                                                      their own; others an empty list)
+// POST   /geo/hub/entries/:id/restore                  {} → HubEntry (same rule as the removed list)
 
 /** Who the hub sees: `account: true` when a hub server account is logged in (no display-name prompt then). */
 export interface HubMe {
   name: string | null;
   account?: boolean;
+  /** A hub server administrator: may remove any registered Workflow and restore removed ones. */
+  admin?: boolean;
+}
+
+export interface RemoveEntryBody {
+  /** Shown to administrators in the removed list; up to 500 characters, may be empty. */
+  reason?: string;
 }
 
 /** Install a registered method; `revision` pins the revision the researcher looked at (default: latest). */
@@ -165,7 +199,12 @@ export interface RegisterBody {
   draftRevision?: number;
   folderId: string;
   note: string;
+  /** Update of a registered Workflow: the version step (default `patch`). Ignored on the first registration (0.1.0). */
+  bump?: HubVersionBump;
 }
+
+// Versions (gaid-hub-versions): helpers and `HubVersionBump` live in hub-version.ts (import it directly; contracts carry no
+// extensionless value re-exports because the hub server loads them without a resolver).
 
 /**
  * "방법 고치기" / "복사해서 고치기": the draft to open. The registering author (same account, or same display name without
