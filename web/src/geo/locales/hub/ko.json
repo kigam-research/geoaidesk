@@ -136,7 +136,7 @@
   },
   "sources": {
     "title": "자료 올리기",
-    "drop": "논문 PDF나 코드 묶음(.zip, .tar.gz)을 끌어 놓으세요.",
+    "drop": "논문 PDF, 코드 묶음, 자료 파일을 끌어 놓으세요. 여러 개를 함께 올릴 수 있습니다.",
     "pick": "파일 선택",
     "goal": "만들고 싶은 것",
     "goalPlaceholder": "예: 다른 지역 격자 자료에 쓸 탐사 Workflow",
@@ -169,7 +169,22 @@
     "agentModelDefault": "설정의 기본 모델",
     "agentModelHint": "자료 읽기, 질문, 초안 작성에 쓰는 모델입니다.",
     "readDone": "자료를 다 읽었습니다. 다음은 Workflow를 정하는 질문에 답할 차례입니다.",
-    "next": "질문에 답하기"
+    "next": "질문에 답하기",
+    "dropHint": "자료 파일은 CSV, XLSX, LAS, Shapefile, GeoTIFF, GeoPackage, NetCDF를 받습니다. Shapefile은 .shp와 함께 .shx, .dbf, .prj를 고르세요. 자료 하나는 30 MiB까지입니다.",
+    "fromLibrary": "서재에서 추가",
+    "addedData": "{name} · 자료 파일 {count}개",
+    "addedNote": "{name} · 연구 노트",
+    "addedNoteCopy": "{name} · 연구 노트(서재 사본)",
+    "addedLibraryPaper": "{name} · 서재 논문 {pages}쪽",
+    "addedLibraryAbstract": "{name} · 서재 논문(초록만)",
+    "unread": "내용을 읽지 못했습니다.",
+    "fact_columns": "열 {count}개",
+    "fact_rows": "행 {count}개",
+    "fact_curves": "curve {count}개",
+    "fact_bands": "밴드 {count}개",
+    "fact_features": "객체 {count}개",
+    "crsUnknown": "CRS 없음",
+    "moreData": "자료 {count}개 더"
   },
   "reading": {
     "title": "자료를 읽고 있습니다",
@@ -181,7 +196,9 @@
     "note": "화면을 닫아도 계속 읽습니다. 허브 첫 화면의 '내가 만든 Workflow'에서 다시 열 수 있습니다. 논문이 길면 몇 분 넘게 걸립니다.",
     "failed": "자료를 분석하지 못했습니다. 다시 실행하세요.",
     "interrupted": "앱이 다시 시작되어 분석이 멈췄습니다. 다시 실행하세요.",
-    "retry": "분석 다시 실행"
+    "retry": "분석 다시 실행",
+    "dataFiles": "자료 파일 {count}개 요약 읽음",
+    "notes": "연구 노트 {count}개 받음"
   },
   "questions": {
     "title": "질문에 답하기",
@@ -461,5 +478,24 @@
   "editing": {
     "edit": "등록한 Workflow의 {revision}판을 고치고 있습니다. 허브에 등록하면 {next}판이 됩니다.",
     "copy": "{author}의 「{title}」 {revision}판을 복사한 내 Workflow입니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
+  },
+  "library": {
+    "title": "서재에서 자료 추가",
+    "description": "고른 논문은 PDF 본문으로, 연구 노트는 글과 그림으로 넣습니다. PDF가 없는 논문은 서지 정보와 초록만 넣습니다.",
+    "category": "자료 종류",
+    "papers": "논문",
+    "notes": "연구 노트",
+    "search": "제목, 저자, 프로젝트로 찾기",
+    "loading": "서재를 불러오는 중입니다.",
+    "noMatch": "맞는 항목이 없습니다.",
+    "emptyPapers": "서재에 논문이 없습니다.",
+    "emptyNotes": "서재에 연구 노트가 없습니다. 연구 노트 화면에서 서재로 가져오세요.",
+    "selected": "{count}개 고름",
+    "cancel": "취소",
+    "addAction": "{count}개 추가",
+    "adding": "추가하는 중",
+    "skipped": "{count}개 항목은 넣지 못했습니다.",
+    "otherPc": "다른 PC의 노트",
+    "noPdf": "PDF 없음"
   }
 }

@@ -1,10 +1,14 @@
 "use client";
 /** Sources: drop files, say what to make, start reading. While reading, show real progress only. */
 import {
+  BookOpenIcon,
   CheckIcon,
+  DatabaseIcon,
   FileArchiveIcon,
   FileTextIcon,
   GlobeIcon,
+  LibraryIcon,
+  NotebookTextIcon,
   LinkIcon,
   LoaderCircleIcon,
   UploadIcon,
@@ -20,6 +24,7 @@ import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
 import { AgentModelSelect } from "./agent-model";
+import { dataLineParts, SOURCE_ACCEPT } from "./source-files";
 
 const text = geoText("hub");
 
@@ -67,7 +72,19 @@ function UrlForm({ onAdd }: { onAdd: (url: string, kind: WebSourceKind) => void 
 
 export function sourceLine(project: AuthoringProject, source: SourceDocument): string {
   const x = project.extractions[source.id];
+  if (source.kind === "note")
+    return text(source.note?.snapshot ? "sources.addedNoteCopy" : "sources.addedNote", {
+      name: source.title ?? source.note?.title ?? source.name,
+    });
+  if (source.library?.category === "paper")
+    return source.kind === "pdf" && x?.pages
+      ? text("sources.addedLibraryPaper", { name: source.title ?? source.name, pages: x.pages })
+      : text("sources.addedLibraryAbstract", { name: source.title ?? source.name });
   if (source.kind === "pdf" && x?.pages) return text("sources.added", { name: source.name, pages: x.pages });
+  if (source.kind === "data" && x?.files) {
+    const count = x.files.filter((f) => !f.companionOf).length;
+    return text("sources.addedData", { name: source.name, count });
+  }
   if (source.kind === "code" && x?.files)
     return text("sources.addedCode", { name: source.name, count: x.files.length });
   if (source.kind === "web") {
@@ -80,6 +97,37 @@ export function sourceLine(project: AuthoringProject, source: SourceDocument): s
     return text("sources.addedWeb", { name: source.title ?? source.name, host });
   }
   return text("sources.addedPlain", { name: source.name });
+}
+
+/** Second line of a data source: format, counts and CRS of its first data file (null when there is none). */
+export function sourceDetail(project: AuthoringProject, source: SourceDocument): string | null {
+  const x = project.extractions[source.id];
+  if (source.status === "failed") return text("sources.unread");
+  if (source.kind !== "data" && source.kind !== "gaid-analysis" && source.kind !== "code") return null;
+  const parts = dataLineParts(x?.files);
+  if (!parts) return null;
+  return [
+    parts.format,
+    ...parts.facts.map((f) => text(`sources.fact_${f.key}`, { count: f.count })),
+    ...(parts.crs === null ? [] : [parts.crs || text("sources.crsUnknown")]),
+    ...(parts.more ? [text("sources.moreData", { count: parts.more })] : []),
+  ].join(" · ");
+}
+
+function SourceIcon({ source }: { source: SourceDocument }) {
+  const Icon =
+    source.kind === "note"
+      ? NotebookTextIcon
+      : source.library
+        ? BookOpenIcon
+        : source.kind === "data"
+          ? DatabaseIcon
+          : source.kind === "code" || source.kind === "gaid-analysis"
+            ? FileArchiveIcon
+            : source.kind === "web"
+              ? GlobeIcon
+              : FileTextIcon;
+  return <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />;
 }
 
 export function SourceStep({
@@ -99,7 +147,10 @@ export function SourceStep({
   urls = [],
   agentModel,
   onAgentModel,
+  onLibrary,
 }: {
+  /** Open the 서재 picker (papers and research notes). */
+  onLibrary?: () => void;
   /** Agent model for reading and drafting ("" = the app default). */
   agentModel?: string;
   onAgentModel?: (ref: string) => void;
@@ -148,15 +199,24 @@ export function SourceStep({
       >
         <UploadIcon className="size-6 text-muted-foreground" aria-hidden />
         <p className="text-sm text-muted-foreground">{text("sources.drop")}</p>
-        <Button variant="outline" size="sm" onClick={() => input.current?.click()}>
-          {text("sources.pick")}
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => input.current?.click()}>
+            {text("sources.pick")}
+          </Button>
+          {onLibrary && (
+            <Button variant="outline" size="sm" onClick={onLibrary}>
+              <LibraryIcon data-icon="inline-start" />
+              {text("sources.fromLibrary")}
+            </Button>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">{text("sources.dropHint")}</p>
         <input
           ref={input}
           type="file"
           multiple
           hidden
-          accept=".pdf,.zip,.tar.gz,.tgz,.md,.txt,.py,.r,.ipynb,application/pdf"
+          accept={SOURCE_ACCEPT}
           onChange={(e) => {
             onFiles(Array.from(e.target.files ?? []));
             e.target.value = "";
@@ -173,28 +233,29 @@ export function SourceStep({
       {!pdfText && <p className="text-sm text-muted-foreground">{text("sources.noPdfText")}</p>}
       {(project.sources.length > 0 || uploading || urls.length > 0) && (
         <ul className="flex flex-col gap-2">
-          {project.sources.map((s) => (
-            <li key={s.id} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
-              {s.kind === "code" ? (
-                <FileArchiveIcon className="size-4 text-muted-foreground" aria-hidden />
-              ) : s.kind === "web" ? (
-                <GlobeIcon className="size-4 text-muted-foreground" aria-hidden />
-              ) : (
-                <FileTextIcon className="size-4 text-muted-foreground" aria-hidden />
-              )}
-              <span className="min-w-0 flex-1 truncate">{sourceLine(project, s)}</span>
-              {onRemove && (
-                <button
-                  type="button"
-                  aria-label={text("sources.remove", { name: s.name })}
-                  onClick={() => onRemove(s.id)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <XIcon className="size-4" />
-                </button>
-              )}
-            </li>
-          ))}
+          {project.sources.map((s) => {
+            const detail = sourceDetail(project, s);
+            return (
+              <li key={s.id} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
+                <SourceIcon source={s} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{sourceLine(project, s)}</span>
+                  {detail && <span className="block truncate text-xs text-muted-foreground">{detail}</span>}
+                </span>
+                {onRemove && (
+                  <button
+                    type="button"
+                    aria-label={text("sources.remove", { name: s.title ?? s.name })}
+                    title={text("sources.remove", { name: s.title ?? s.name })}
+                    onClick={() => onRemove(s.id)}
+                    className="rounded-sm p-1 text-muted-foreground hover:text-foreground"
+                  >
+                    <XIcon className="size-4" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
           {urls.map((u) => (
             <li key={u.url} className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm">
               <GlobeIcon className="size-4 text-muted-foreground" aria-hidden />
@@ -286,10 +347,17 @@ export function WorkingPanel({
   const files = project.sources
     .filter((s) => s.kind === "code")
     .reduce((n, s) => n + (project.extractions[s.id]?.files?.length ?? 0), 0);
+  const dataFiles = project.sources.reduce(
+    (n, s) => n + (project.extractions[s.id]?.files?.filter((f) => f.data).length ?? 0),
+    0,
+  );
+  const notes = project.sources.filter((s) => s.kind === "note").length;
   const done = [
     text("reading.received", { count: project.sources.length }),
     ...(pages ? [text("reading.pages", { pages })] : []),
     ...(files ? [text("reading.files", { count: files })] : []),
+    ...(dataFiles ? [text("reading.dataFiles", { count: dataFiles })] : []),
+    ...(notes ? [text("reading.notes", { count: notes })] : []),
   ];
   return (
     <section className="mx-auto flex w-full max-w-xl flex-col gap-5 py-10" aria-live="polite">
