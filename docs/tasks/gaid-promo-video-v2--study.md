@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T03:48:44Z
+status: ready
+updated: 2026-10-23T03:48:58Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
 target: task/gaid-promo-video-v2
@@ -66,7 +66,9 @@ not appear). Then task save / task finish your unit.
 - No training. Existing zone results reused; EPSG:3857 is parent-directed display assignment. R1/chat use older Workflow entry-ap-a135f290-1c4 revision 2; H1/H2 show new entry. R2's live citation-check segment is editorially combined with the earlier finished figure.
 - Checks: syntax, all frame dimensions/files and beat constraints passed; 27 existing local domain/index records unchanged. Remote unrelated star change remains unattributed and disclosed. No app source or service change; app suite not run.
 ## Next steps
-- Capture controller job exited 0; review app and hub left running. Save reviewed helpers/docs and task finish; parent integrates the film.
+<!-- task:closed -->
+Closed 2026-10-23T03:48:58Z: ready; the parent gaid-promo-video-v2 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Default authoring twice failed: OpenRouter not configured. Parent authorized per-action connected subscription picker; no defaults changed.
 - One provider-overload draft attempt failed; retry and normal UI revision succeeded. Missing-file examples removed; draft 2 check passed with no findings.
