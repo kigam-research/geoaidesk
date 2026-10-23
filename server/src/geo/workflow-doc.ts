@@ -108,6 +108,7 @@ function roles(workflow: GeoWorkflow): WorkflowDoc["inputRoles"] {
     label: text(role.label) ?? { ko: role.id },
     formats: strings(role.formats),
     required: role.required === true,
+    ...((role as { multiple?: unknown }).multiple === true ? { multiple: true } : {}),
     ...(text((role as { requiredWhen?: unknown }).requiredWhen) ? { requiredWhen: text((role as { requiredWhen?: unknown }).requiredWhen)! } : {}),
     ...(roleExample(role.id, (role as { example?: unknown }).example)),
   }));
@@ -186,6 +187,7 @@ function ownSteps(workflow: GeoWorkflow): WorkflowDocStep[] {
       skill: typeof step.skill === "string" ? step.skill : null,
       read: text(step.read),
       checks: Array.isArray(step.checks) ? step.checks.map(text).filter((item): item is Localized => Boolean(item)) : [],
+      inputIds: strings(step.inputIds),
       choiceIds: strings(step.choiceIds),
       outputs: strings(step.outputs),
     }];

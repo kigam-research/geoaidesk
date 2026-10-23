@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:15:38Z
+updated: 2026-10-23T12:21:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"0704ce16-3a7d-4ced-a70b-cb0992d87a4f","pid":723936,"provider":"claude","session":"231b3e23-b5c2-477a-8474-f49634f8b127","start":"64563772","token":"799e471fc41f44a2c90af702d37a6ff5c16d31130fa1f1267804187c01e43247"}
 branch: task/gaid-workflow-stages
 target: main
@@ -59,11 +59,37 @@ examples) — it touches the start settings and the registration preview; whoeve
 Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Shared contract settled and pushed (writer): `web/src/geo/contracts/workflow-stages.ts` (`workflowStages`,
+  `stageWarnings`, limits MIN/MAX_STAGES 3/5, MAX_REQUIRED_CHOICES 6, MAX_RAIL 7) + test; `GaidWorkflowStep.inputIds`,
+  `WorkflowDocStep.inputIds?`, `WorkflowInputRole.multiple?`, `WorkflowChoice.default?` (also in `LocalWorkflow`),
+  `WorkflowDocSettings.inputs: Record<string, string | string[]>` with `settingPaths`; the 지침 lists a step's inputs
+  ("쓰는 입력") and a choice's default ("(기본값: …)") only when present, so older renders are unchanged. Server
+  `workflowDocFor` passes `inputIds` and `multiple`. Web/server typecheck and contract tests pass.
+- Real data for checks: Pocheon 0.2.0 draft `~/data/geoaidesk/work/gaid-pocheon-trial/authoring-pass2-revise.json`
+  (`drafts[-1].workflow`: 6 inputs, 15 choices, 10 steps / 8 with choiceIds → `grouped`, rail 4). PU-컨포멀 is a
+  catalogue Workflow (pinned archive).
 ## Next steps
-1. (the next session's first action)
+1. Start children A and B (below); while they run, prepare the report skeleton and AGENTS.md wording.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration (user: "작업은 opus 5.5 high fast writer들로 작업해야한다."): child writers are Claude Opus 5.5, thinking
+  high, fast mode (`--writer claude/claude-opus-5-5 --thinking high --feature fast_mode=true`).
+- Sequential decisions (writer, done): stage rule = Workflow steps; a step's page holds its `inputIds` and `choiceIds`
+  (first use); unnamed inputs → first page with inputs, unnamed choices → first page; steps with nothing to set get no
+  page; no mapping or > 5 pages → two pages 입력 자료 / 분석 조건 (display only). Choices with a `default` are parameters:
+  not counted in the 6, folded on their stage page and listed/editable in the summary. Multi-file input = role
+  `multiple: true`, binding = string[].
+- Package A `gaid-workflow-stages--start-window` (child, web): start window rail and stage pages, multi-file input,
+  defaults in summary, upstream 일반 Workflow kept working. Owns `web/src/geo/workspace/{setup-steps,task-setup,
+  start-window,start-intro,upstream-start,api}.ts(x)` + tests, `web/src/geo/shell/step-list.tsx`, locale namespace
+  `workspace`, screenshots.
+- Package B `gaid-workflow-stages--authoring` (child, server + hub UI): authoring prompt/repair, `workflowProblems`,
+  package/registration check warnings, method-file validation and summary mapping of `inputIds`/`multiple`/`default`,
+  hub draft warning + one-click regroup revise, regenerated Pocheon draft. Owns `server/src/geo/authoring/*`,
+  `server/src/geo/methods/*`, `server/src/geo/workspace/{workflows,recipes,suggestions}.ts`, `web/src/geo/hub/*`,
+  locale namespaces `hub*`.
+- Writer owns contracts (`web/src/geo/contracts/*`), task doc, report, AGENTS.md, final integration and scripts/check.
+  Integration order: B then A (A's real-data check uses B's summary mapping; A works on fixtures meanwhile).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

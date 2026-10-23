@@ -175,6 +175,8 @@ export interface LocalWorkflow {
     formats: string[];
     required: boolean;
     requiredWhen?: MethodText;
+    /** The input takes several files (gaid-workflow-stages). */
+    multiple?: boolean;
     /** Default example data; attached by the researcher, never by the coauthor model (gaid-workflow-example). */
     example?: DraftInputExample;
   }[];
@@ -186,6 +188,8 @@ export interface LocalWorkflow {
     /** Display labels of `options` (additive, gaid-method/v1). */
     optionLabels?: Record<string, MethodText>;
     requiredWhen?: MethodText;
+    /** Value used unless the researcher changes it (option id or text); not counted as a required choice (gaid-workflow-stages). */
+    default?: string;
   }[];
   /** The researcher's request to the agent (not a method description). */
   prompt: MethodText;
