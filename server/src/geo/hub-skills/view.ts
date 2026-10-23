@@ -7,7 +7,7 @@ import { isSkillAuthor, skillOwnerId, visibleSkill, type HubSkillRecordStore, ty
 export { visibleSkill };
 export function revisionOf(skill: StoredHubSkill, revision = skill.latestRevision) {
   const r = skill.revisions.find((r) => r.revision === revision);
-  if (!Number.isSafeInteger(revision) || !r) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
+  if (!Number.isSafeInteger(revision) || !r) throw new AuthoringError("스킬 version을 찾을 수 없습니다.", 404);
   return r;
 }
 /** `actorId`: account id on a hub server, display name in the local shelf. */

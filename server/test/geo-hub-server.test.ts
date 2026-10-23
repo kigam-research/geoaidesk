@@ -533,7 +533,7 @@ describe("backup, restore check and legacy import", () => {
     const u = await user("mapped@example.org"); const source = await legacy();
     const r = await source.read("entry-example"); r.entry.revisions[1].revision = 3;
     await source.write(r);
-    await expect(importHub(app.hub, { from: source.root, authors: { "이전 작성자": u.account.email }, apply: true })).rejects.toThrow(/등록 판/);
+    await expect(importHub(app.hub, { from: source.root, authors: { "이전 작성자": u.account.email }, apply: true })).rejects.toThrow(/등록 판/); // hub server operator message (CLI), not researcher copy
     expect(app.hub.counts().hub_entries).toBe(0);
     expect(app.hub.counts().hub_files).toBe(0);
   });

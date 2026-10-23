@@ -760,7 +760,7 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(own).toMatchObject({
       author: "박 연구원",
       latestRevision: 1,
-      basedOn: { entryId: entry.id, revision: 1, author: "김 연구원" },
+      basedOn: { entryId: entry.id, revision: 1, version: "0.1.0", author: "김 연구원" },
     });
     const untouched = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
     expect(untouched.entry.latestRevision).toBe(1);

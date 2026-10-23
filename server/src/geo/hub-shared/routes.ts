@@ -21,7 +21,7 @@ import type {
   RemoveEntryBody,
   SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
-import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
+import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRefVersion, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
 import { structuredDraft } from "../authoring/workflow.ts";
@@ -112,6 +112,7 @@ export async function registerSharedHubRoutes(
     return {
       ...record.entry,
       revisions: record.entry.revisions.map((r, i) => ({ ...r, version: versions[i] })),
+      ...(record.entry.basedOn ? { basedOn: { ...record.entry.basedOn, version: hubRefVersion(record.entry.basedOn)! } } : {}),
       tagline: korean(snapshotOf(record).draft.profile.tagline),
       implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       recipe: Boolean(snapshotOf(record).draft.workflow && snapshotOf(record).draft.recipe),
@@ -292,6 +293,7 @@ export async function registerSharedHubRoutes(
                     basedOn: {
                       entryId: link.entryId,
                       revision: link.revision,
+                      version: (original ? hubVersionOf(original.entry, link.revision) : null) ?? hubRefVersion(link)!,
                       title: original?.entry.title ?? link.title,
                       author: original?.entry.author ?? link.author,
                     },

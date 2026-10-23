@@ -60,7 +60,7 @@ export async function registerGeoHubServerRoutes(app: FastifyInstance, options: 
   const feedsRoute = async <T>(call: () => Promise<T>): Promise<T> => {
     try { return await call(); }
     catch (e) {
-      if (e instanceof AuthoringError && e.status === 404) throw new AuthoringError("연결한 허브 서버가 자료 소식을 지원하지 않습니다. 허브 서버를 최신 판으로 업데이트해 주세요.", 404);
+      if (e instanceof AuthoringError && e.status === 404) throw new AuthoringError("연결한 허브 서버가 자료 소식을 지원하지 않습니다. 허브 서버를 최신 version으로 업데이트해 주세요.", 404);
       throw e;
     }
   };
