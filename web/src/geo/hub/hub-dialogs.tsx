@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { AuthoringAttempt, CheckResult, DraftFileView } from "@/geo/contracts/authoring";
+import type { AuthoringAttempt, CheckResult, DraftFileView, DraftInputExample } from "@/geo/contracts/authoring";
+import { sizeText } from "@/geo/contracts/workflow-examples";
+import { localText } from "./text";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
@@ -316,6 +318,35 @@ export function SourcePageDialog({
   );
 }
 
+/**
+ * F21 (gaid-pocheon-trial): example data bundled with the Workflow go into the hub package, so everyone who can see the
+ * entry can download them. Listed per file before the researcher registers; remote examples record only their address.
+ */
+function SharedExamples({ examples }: { examples: DraftInputExample[] }) {
+  const groups = examples.map((example) => ({ example, files: example.files.filter((file) => !file.url) })).filter((group) => group.files.length);
+  const remote = examples.filter((example) => example.files.some((file) => file.url));
+  if (!groups.length && !remote.length) return null;
+  const count = groups.reduce((sum, group) => sum + group.files.length, 0);
+  const total = groups.reduce((sum, group) => sum + group.files.reduce((n, file) => n + file.size, 0), 0);
+  return <>
+    {groups.length > 0 && <li>
+      {text("register.examples.shared", { count, size: sizeText(total) })}
+      <span className="block text-[13px] leading-[18px]">{text("register.examples.who")}</span>
+      <ul className="mt-1.5 flex flex-col gap-1.5 border-l border-gaid-edge pl-3 text-[13px] leading-[18px]">
+        {groups.map(({ example, files }, i) => <li key={i} className="min-w-0">
+          <span className="block">
+            {files.map((file, n) => <span key={file.name}>{n > 0 && ", "}<span className="font-mono text-xs break-all">{file.name}</span> <span className="text-muted-foreground">{sizeText(file.size)}</span></span>)}
+            {example.synthetic && <span className="text-muted-foreground"> · {text("register.examples.synthetic")}</span>}
+          </span>
+          <span className="block line-clamp-2 text-muted-foreground" title={localText(example.source)}>{text("register.examples.source", { source: localText(example.source) || text("register.examples.unstated") })}</span>
+          <span className="block line-clamp-1 text-muted-foreground" title={example.license}>{text("register.examples.license", { license: example.license?.trim() || text("register.examples.unstated") })}</span>
+        </li>)}
+      </ul>
+    </li>}
+    {remote.length > 0 && <li>{text("register.examples.remote", { titles: remote.map((example) => localText(example.title)).join(", ") })}</li>}
+  </>;
+}
+
 /** Register a draft in the shared GAID hub: folder, a short note for other researchers, what is and is not shared. */
 export function RegisterDialog({
   currentVersion = null,
@@ -327,7 +358,10 @@ export function RegisterDialog({
   onCreateFolder,
   onRegister,
   initialFolder,
+  examples = [],
 }: DialogProps & {
+  /** The draft's example data per input (F21): bundled files are shared with the entry and listed before registering. */
+  examples?: DraftInputExample[];
   folders: { id: string; name: string }[];
   /** Folder to preselect (the entry's folder when registering its next revision). */
   initialFolder?: string;
@@ -416,9 +450,11 @@ export function RegisterDialog({
         </label>
         <ul className="flex flex-col gap-1 rounded-lg bg-muted/50 p-3 text-sm">
           <li>{text("register.shared")}</li>
+          <SharedExamples examples={examples} />
           <li className="text-muted-foreground">{text("register.notShared")}</li>
         </ul>
-        <DialogFooter>
+        {/* The list of shared example data can make the dialog scroll; the register action stays in view (UI guide P2). */}
+        <DialogFooter className="sticky -bottom-6 -mx-6 -mb-6 border-t border-gaid-edge bg-background px-6 py-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {text("draft.close")}
           </Button>

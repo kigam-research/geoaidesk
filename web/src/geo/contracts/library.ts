@@ -303,6 +303,39 @@ export interface ProjectLiterature {
 }
 
 /**
+ * One source paper of an installed Workflow (gaid-workflow-cite-scope): found in the researcher's library by DOI, else
+ * by exact title. `attached`: in the project's citation scope; `in-library`: can be attached; `not-in-library`: add it
+ * through 논문 넣기 first.
+ */
+export interface WorkflowPaper {
+  /** The package's own reference (DOI or file name). */
+  ref: string;
+  title: string;
+  doi?: string;
+  state: "attached" | "in-library" | "not-in-library";
+  itemId?: string;
+  itemTitle?: string;
+  citationKey?: string;
+  matchedBy?: "doi" | "title";
+}
+
+/** `GET /geo/library/workflow-papers?method=<runtimeName>` for the request's project. */
+export interface WorkflowPapersResponse {
+  method: string;
+  papers: WorkflowPaper[];
+}
+
+/** `POST /geo/library/workflow-papers/attach`: the researcher's explicit consent for these items. */
+export interface AttachWorkflowPapersBody {
+  method: string;
+  itemIds: string[];
+}
+
+export interface AttachWorkflowPapersResponse extends WorkflowPapersResponse {
+  added: string[];
+}
+
+/**
  * `.kady/geo/literature.json` lists folders and single items; together (folders with their subfolders) they are the
  * project's citation scope. An empty file means no scope: the whole library counts.
  */
@@ -418,7 +451,8 @@ export interface LibraryListResponse {
 export type LibraryUse =
   /** `libraryItemId`: the citing note is in the library; `remote`: known only from that item (project on another PC). */
   | { kind: "note"; projectId: string; projectName: string; noteId: string; title: string; locators: string[]; libraryItemId?: string; remote?: boolean }
-  | { kind: "workflow"; entryId?: string; authoringId?: string; title: string; revision?: number }
+  /** A hub draft made from the item (`authoringId`), or a Workflow installed in a project whose source papers include it (`projectId`). */
+  | { kind: "workflow"; entryId?: string; authoringId?: string; title: string; revision?: number; projectId?: string; projectName?: string }
   | { kind: "project"; projectId: string; projectName: string };
 
 export interface LibraryItemResponse {

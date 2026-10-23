@@ -115,11 +115,15 @@ export interface UsesIndex {
   counts(item: LibraryItem): { notes: number; workflows: number; projects: number };
 }
 
+/** Workflows installed in a project with the library items among their source papers (gaid-workflow-cite-scope). */
+export type ProjectWorkflowPapers = (paths: ProjectPaths, literature: ProjectLiterature) => { title: string; itemIds: string[] }[];
+
 /**
- * One pass over all projects. `workflowUses` supplies hub authoring links (drafts made from a library item); it is
- * injected so this module does not depend on the authoring store.
+ * One pass over all projects. `workflowUses` supplies hub authoring links (drafts made from a library item) and
+ * `projectWorkflows` the Workflows installed in each project; both are injected so this module does not depend on the
+ * authoring store or the installed methods.
  */
-export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => [], collections: Pick<LibraryCollection, "id" | "parentId">[] = [], instanceId?: string): UsesIndex {
+export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: LibraryItem) => LibraryUse[] = () => [], collections: Pick<LibraryCollection, "id" | "parentId">[] = [], instanceId?: string, projectWorkflows?: ProjectWorkflowPapers): UsesIndex {
   const byKey = new Map<string, LibraryItem>();
   for (const item of items) for (const key of item.aliases?.citationKeys ?? []) byKey.set(key, item);
   for (const item of items) if (item.citationKey) byKey.set(item.citationKey, item);
@@ -144,6 +148,8 @@ export function buildUsesIndex(items: LibraryItem[], workflowUses: (item: Librar
     try { paths = resolvePaths(project.id); } catch { continue; }
     const literature = readProjectLiterature(paths);
     for (const item of projectItems(literature, items, collections)) push(item.id, { kind: "project", projectId: project.id, projectName: project.name });
+    for (const workflow of projectWorkflows?.(paths, literature) ?? [])
+      for (const id of new Set(workflow.itemIds)) push(id, { kind: "workflow", title: workflow.title, projectId: project.id, projectName: project.name });
     for (const note of projectNoteCitations(paths)) {
       const locators = new Map<string, string[]>();
       for (const c of note.citations) {

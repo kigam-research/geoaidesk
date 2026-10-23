@@ -104,6 +104,11 @@ export interface WorkflowDocSettings {
   choices: Record<string, string>;
   /** Input role ids whose path is the Workflow's example data (gaid-workflow-example), not the researcher's own file. */
   examples?: string[];
+  /**
+   * The Workflow's source papers in the project's citation scope (gaid-workflow-cite-scope): citation key and title.
+   * Named in the chat start message so the agent can cite them in the research note.
+   */
+  papers?: { key: string; title: string }[];
 }
 
 /**
@@ -185,6 +190,13 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     else lines.push(say("settings.askBeforeStep"));
     const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settingPaths(settings?.inputs[role.id]));
     if (exampleRoles.length) lines.push("", say("settings.examplesUsed", { labels: exampleRoles.map((role) => p(role.label)).join(", ") }), say("settings.exampleRule"));
+  }
+
+  const papers = settings?.papers ?? [];
+  if (papers.length) {
+    lines.push("", `## ${say("section.papers")}`);
+    for (const paper of papers) lines.push(`- [@${paper.key}] ${paper.title}`);
+    lines.push("", say("papers.rule"));
   }
 
   // Skills.

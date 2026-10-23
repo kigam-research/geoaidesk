@@ -26,6 +26,14 @@ describe("Workflow start message", () => {
     expect(block!.body).toContain("1. 파일 확인: LAS 판과 단위를 확인합니다.");
   });
 
+  it("names the attached source papers with their citation keys (gaid-workflow-cite-scope)", () => {
+    const body = parseWorkflowBlock(workflowStartMessage(doc, { log: "logs/A.LAS" }, {}, [], [{ key: "heo2025", title: "PGI ore body" }]))!.body;
+    expect(body).toContain("## 근거 논문");
+    expect(body).toContain("- [@heo2025] PGI ore body");
+    expect(body).toContain("[@key] 형식으로 인용하세요");
+    expect(parseWorkflowBlock(workflowStartMessage(doc, {}, {}))!.body).not.toContain("근거 논문");
+  });
+
   it("shows the Workflow as a card that opens the 지침", async () => {
     const block = parseWorkflowBlock(`${workflowStartMessage(doc, {}, {})}\n\n북쪽 구간만 보세요.`)!;
     render(<WorkflowBlockCard block={block} />);

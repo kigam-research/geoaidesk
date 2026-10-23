@@ -344,7 +344,7 @@ function SidePanel({ data, notes, onSelect, onChanged }: { data: LibraryListResp
 
 function useLabel(use: LibraryUse): string {
   if (use.kind === "note") return use.remote ? L("detail.useNoteRemote", { title: use.title, name: use.projectName }) : L("detail.useNote", { title: use.title });
-  if (use.kind === "workflow") return L("detail.useWorkflow", { title: use.title });
+  if (use.kind === "workflow") return use.projectName ? L("detail.useWorkflowProject", { title: use.title, name: use.projectName }) : L("detail.useWorkflow", { title: use.title });
   return L("detail.useProject", { name: use.projectName });
 }
 
@@ -377,7 +377,8 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
   const r = item.read;
 
   const openUse = (use: LibraryUse) => {
-    if (use.kind === "workflow" && use.authoringId) window.location.hash = `#hub/${use.authoringId}`;
+    if (use.kind === "workflow" && use.projectId) onOpenProject(use.projectId);
+    else if (use.kind === "workflow" && use.authoringId) window.location.hash = `#hub/${use.authoringId}`;
     // A note whose project is on another PC opens as its library item; a local note opens in its project.
     else if (use.kind === "note") { if (use.remote && use.libraryItemId) onSelect(use.libraryItemId); else onOpenNote(use.projectId, use.noteId); }
     else if (use.kind === "project") onOpenProject(use.projectId);
@@ -476,7 +477,7 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
               {useLabel(use)}
               {use.kind === "note" && use.locators.length > 0 && <span className="text-muted-foreground"> · {use.locators.join(", ")}</span>}
             </span>
-            <button type="button" onClick={() => openUse(use)} className="shrink-0 text-primary hover:underline">{L(`detail.open.${use.kind}.action`)}</button>
+            <button type="button" onClick={() => openUse(use)} className="shrink-0 text-primary hover:underline">{L(`detail.open.${use.kind === "workflow" && use.projectId ? "project" : use.kind}.action`)}</button>
           </div>
         ))}
       </div>

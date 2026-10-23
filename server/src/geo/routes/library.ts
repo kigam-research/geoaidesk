@@ -24,7 +24,7 @@ import type {
 } from "../../../../web/src/geo/contracts/library.ts";
 import { LibraryError, libraryStore, normalizeDoi, cslYear, samePaper, summarize, type LibraryStore } from "../library/store.ts";
 import { readStoredPdf, storedPdf } from "../library/reader.ts";
-import { buildUsesIndex, hasScope, projectItems, projectNoteCitations, readProjectLiterature, scopeFolders, writeProjectLiterature } from "../library/uses.ts";
+import { buildUsesIndex, type ProjectWorkflowPapers, hasScope, projectItems, projectNoteCitations, readProjectLiterature, scopeFolders, writeProjectLiterature } from "../library/uses.ts";
 import { AuthoringError, AuthoringStore } from "../authoring/store.ts";
 import { zoteroService, type ZoteroService } from "../library/zotero-service.ts";
 import { ZoteroError } from "../library/zotero/index.ts";
@@ -36,6 +36,10 @@ import { arxivDoi, identifyPdf, lookupDoi, resolveUrl, searchByTitle, type Metad
 import { exportBibliography, formatReference, parseBibliography, type BibliographyFormat } from "../library/formats/index.ts";
 import type { ImportPreview, LookupBody, LookupResponse, MetadataCandidate } from "../../../../web/src/geo/contracts/library.ts";
 import { getAuthoringStore } from "../authoring/routes.ts";
+import { findInstalledMethod, installedMethods } from "../methods/local-methods.ts";
+import { projectSkillRoot } from "../../agent/skills.ts";
+import { resolveWorkflowPapers, withWorkflowPapers } from "../library/workflow-papers.ts";
+import type { AttachWorkflowPapersResponse, LibraryCollection, ProjectLiterature, WorkflowPapersResponse } from "../../../../web/src/geo/contracts/library.ts";
 import { addLibrarySources, libraryDeps, linkLibraryAuthoring, readLinks } from "../authoring/library-sources.ts";
 import type { AddLibrarySourcesBody, AddLibrarySourcesResult } from "../../../../web/src/geo/contracts/authoring.ts";
 
@@ -89,6 +93,29 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     });
   }
 
+  // Workflows installed in a project (project scope only) with the library items among their source papers.
+  const projectWorkflows = (items: LibraryItem[], collections: LibraryCollection[]): ProjectWorkflowPapers => (paths, literature) =>
+    installedMethods(paths, [projectSkillRoot(paths)]).flatMap((m) => {
+      const method = m.file.method;
+      if (!method?.sources.length) return [];
+      const itemIds = resolveWorkflowPapers(method.sources, items, literature, collections).flatMap((p) => (p.itemId ? [p.itemId] : []));
+      return itemIds.length ? [{ title: method.title.ko || method.title.en || m.runtimeName, itemIds }] : [];
+    });
+
+  /** Read the PDFs of attached Zotero items in the background so the agent can cite pages (bounded). */
+  const readAttachedPdfs = (store: LibraryStore, saved: ProjectLiterature, all: LibraryItem[], collections: LibraryCollection[]) => {
+    const pending = projectItems(saved, all, collections).filter((i) => i.source === "zotero" && i.read.coverage === "none" && i.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey)).slice(0, 20);
+    void (async () => { for (const item of pending) { try { await zoteroOf(store).readZoteroPdf(item); } catch { /* shown as not read */ } } })();
+  };
+
+  async function workflowPapers(methodName: unknown): Promise<{ method: string; papers: WorkflowPapersResponse["papers"]; store: LibraryStore; all: LibraryItem[]; collections: LibraryCollection[] }> {
+    if (typeof methodName !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(methodName)) throw new LibraryError("method is required");
+    const installed = findInstalledMethod(pathsOf(), methodName);
+    if (!installed?.file.method) throw new LibraryError("Workflow not installed in this project", 404);
+    const store = storeOf(), all = await store.all(), collections = await store.collections();
+    return { method: methodName, papers: resolveWorkflowPapers(installed.file.method.sources, all, readProjectLiterature(pathsOf()), collections), store, all, collections };
+  }
+
   app.register(async (scope) => {
     scope.setErrorHandler((error, _req, reply) => {
       if (error instanceof LibraryError) return reply.code(error.status).send({ error: error.message });
@@ -113,7 +140,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const everything = (await store.all()).filter((i) => !i.removedFromSourceAt);
       const collections = await store.collections();
       const instance = libraryInstance(store), projectIds = new Set(listProjects().map((p) => p.id));
-      const uses = buildUsesIndex(everything, await workflowUses(store), collections, instance.id);
+      const uses = buildUsesIndex(everything, await workflowUses(store), collections, instance.id, projectWorkflows(everything, collections));
       const kind = q.kind === "note" || q.kind === "paper" ? q.kind : undefined;
       const notes = everything.filter(isNoteItem);
       const all = everything.filter((i) => !isNoteItem(i));
@@ -170,8 +197,8 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       if (isNoteItem(item)) {
         try { if (await refreshNoteItems(store, [item])) item = await store.get(item.id); } catch (error) { scope.log.warn({ err: error }, "research-note refresh failed"); }
       }
-      const instance = libraryInstance(store);
-      const uses = buildUsesIndex(await store.all(), await workflowUses(store), await store.collections(), instance.id);
+      const instance = libraryInstance(store), all = await store.all(), collections = await store.collections();
+      const uses = buildUsesIndex(all, await workflowUses(store), collections, instance.id, projectWorkflows(all, collections));
       return { item, uses: uses.usesOf(item), ...(isNoteItem(item) ? { noteLocal: noteIsLocal(item, instance.id, new Set(listProjects().map((p) => p.id))) } : {}) };
     });
 
@@ -357,10 +384,23 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id): id is string => typeof id === "string" && known(id)) : [];
       const collectionIds = Array.isArray(req.body?.collectionIds) ? req.body.collectionIds.filter((id): id is string => typeof id === "string" && collections.some((c) => c.id === id)) : [];
       const saved = writeProjectLiterature(pathsOf(), { collectionIds, itemIds });
-      // Read the PDFs of attached Zotero items in the background so the agent can cite pages (bounded).
-      const pending = projectItems(saved, all, collections).filter((i) => i.source === "zotero" && i.read.coverage === "none" && i.attachments.some((a) => a.kind === "pdf" && a.zoteroAttachmentKey)).slice(0, 20);
-      void (async () => { for (const item of pending) { try { await zoteroOf(store).readZoteroPdf(item); } catch { /* shown as not read */ } } })();
+      readAttachedPdfs(store, saved, all, collections);
       return saved;
+    });
+
+    // An installed Workflow's source papers in this library (gaid-workflow-cite-scope); attaching needs the explicit request.
+    scope.get<{ Querystring: { method?: string } }>("/geo/library/workflow-papers", async (req): Promise<WorkflowPapersResponse> => {
+      const { method, papers } = await workflowPapers(req.query.method);
+      return { method, papers };
+    });
+    scope.post<{ Body: { method?: unknown; itemIds?: unknown } }>("/geo/library/workflow-papers/attach", { bodyLimit: 16 * 1024 }, async (req): Promise<AttachWorkflowPapersResponse> => {
+      const { method, papers, store, all, collections } = await workflowPapers(req.body?.method);
+      const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id): id is string => typeof id === "string") : [];
+      const next = withWorkflowPapers(readProjectLiterature(pathsOf()), papers, itemIds);
+      if (!next.added.length) return { method, papers, added: [] };
+      const saved = writeProjectLiterature(pathsOf(), next);
+      readAttachedPdfs(store, saved, all, collections);
+      return { method, papers: resolveWorkflowPapers(findInstalledMethod(pathsOf(), method)!.file.method!.sources, all, saved, collections), added: next.added };
     });
 
     scope.get("/geo/library/zotero", async () => ({ libraries: await zoteroOf(storeOf()).libraries() }));

@@ -13,6 +13,6 @@ export function workflowDocText(doc: WorkflowDoc, target: WorkflowDocTarget, set
 }
 
 /** The first message of a Workflow chat: the 지침 with the researcher's settings in a `<workflow>` block. */
-export function workflowStartMessage(doc: WorkflowDoc, inputs: Record<string, string>, choices: Record<string, string>, examples: string[] = []): string {
-  return workflowBlock(doc, workflowDocText(doc, "chat", { inputs, choices, ...(examples.length ? { examples } : {}) }), geoLocale(), { example: examples.length > 0 });
+export function workflowStartMessage(doc: WorkflowDoc, inputs: Record<string, string>, choices: Record<string, string>, examples: string[] = [], papers: { key: string; title: string }[] = []): string {
+  return workflowBlock(doc, workflowDocText(doc, "chat", { inputs, choices, ...(examples.length ? { examples } : {}), ...(papers.length ? { papers } : {}) }), geoLocale(), { example: examples.length > 0 });
 }
