@@ -397,7 +397,7 @@
     "note": "다른 연구자에게 남길 말",
     "notePlaceholder": "예: 다른 지역 격자 자료에 쓰도록 만들었습니다. 시험해 보고 의견을 남겨 주세요.",
     "shared": "공유: Workflow 설명·단계·파일, 포함 코드·개념 그림, 파일 검사 요약",
-    "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 연구 자료, 프로젝트 실행 기록과 시험 평가",
+    "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 예제 자료로 넣지 않은 연구 자료, 프로젝트 실행 기록과 시험 평가",
     "submit": "허브에 등록",
     "line": "허브에 등록하면 다른 연구자가 보고 star와 의견을 남길 수 있습니다. 등록 전 모습을 먼저 확인하세요.",
     "registeredLine": "version {version}이 허브에 등록되어 있습니다.",
@@ -417,7 +417,16 @@
     "mainRelease": "작은 수정은 patch, 기능 추가는 minor입니다. 주요 배포를 고르면 메인 배포인 1.0.0이 됩니다.",
     "versionHint": "수정 범위에 맞게 고르세요. 주요 배포는 첫 숫자를 올립니다.",
     "versionLoading": "현재 version을 읽는 중입니다.",
-    "versionFailed": "현재 version을 읽지 못했습니다. 등록창을 닫고 다시 여세요."
+    "versionFailed": "현재 version을 읽지 못했습니다. 등록창을 닫고 다시 여세요.",
+    "examples": {
+      "shared": "공유: 예제 자료 파일 {count}개 ({size})",
+      "synthetic": "합성 자료",
+      "source": "출처: {source}",
+      "license": "이용 조건: {license}",
+      "unstated": "적지 않음",
+      "who": "예제 자료 파일은 Workflow와 함께 허브에 올라갑니다. 허브에서 Workflow를 볼 수 있는 연구자는 누구나 내려받을 수 있습니다.",
+      "remote": "공유: 공개 주소로 받는 예제 자료의 주소와 해시 ({titles}). 파일은 올리지 않습니다."
+    }
   },
   "shared": {
     "by": "{author} · {folder} · {when}",

@@ -2,6 +2,7 @@
 import type {
   AddLibraryNoteBody,
   AddLibraryNoteResponse,
+  AttachWorkflowPapersResponse,
   CitationResolution,
   CreateLibraryItemBody,
   CslItem,
@@ -20,6 +21,7 @@ import type {
   ProjectLiterature,
   SendToZoteroResult,
   UploadedLibraryFile,
+  WorkflowPapersResponse,
   ZoteroLibraryState,
 } from "@/geo/contracts/library";
 import { API_BASE, apiFetch } from "@/lib/projects";
@@ -93,6 +95,14 @@ export async function attachFolderToProject(projectId: string, folderId: string)
   if (current.collectionIds.includes(folderId)) return current;
   return call<ProjectLiterature>("/project", { method: "PUT", body: JSON.stringify({ collectionIds: [...current.collectionIds, folderId], itemIds: current.itemIds }) }, projectId);
 }
+
+/** An installed Workflow's source papers in the library, with their state in the project's citation scope. */
+export const getWorkflowPapers = (projectId: string, method: string) =>
+  call<WorkflowPapersResponse>(`/workflow-papers?method=${encodeURIComponent(method)}`, undefined, projectId);
+
+/** Attaches the given source papers to the project's citation scope (the researcher's explicit action). */
+export const attachWorkflowPapers = (projectId: string, method: string, itemIds: string[]) =>
+  call<AttachWorkflowPapersResponse>("/workflow-papers/attach", { method: "POST", body: JSON.stringify({ method, itemIds }) }, projectId);
 
 // --- Folders -----------------------------------------------------------------------------------------------------------
 export const createFolder = (name: string, parentId?: string) => call<LibraryCollection>("/collections", { method: "POST", body: JSON.stringify({ name, ...(parentId ? { parentId } : {}) }) });

@@ -10,7 +10,8 @@
     "instructions": "Author's additional instructions",
     "artifacts": "Result files",
     "boundary": "Interpretation limits",
-    "closing": "When you finish"
+    "closing": "When you finish",
+    "papers": "Source papers (in the project's citation scope)"
   },
   "settings": {
     "researcherPicks": "chosen by the researcher",
@@ -71,5 +72,8 @@
     "remove": "Remove Workflow",
     "pendingHint": "When you send, these Workflow instructions go first and what you type follows them.",
     "example": "Runs on example data"
+  },
+  "papers": {
+    "rule": "The papers the Workflow is based on. Check them with library_search and library_read, and cite them as [@key] in the research note where a method or threshold comes from them."
   }
 }

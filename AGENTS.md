@@ -230,7 +230,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   when sending a folder, add to collection, create item + PDF + full text, tags, note link; `zotero/writes.ts`); sending
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
-  and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+  and the note reference list. Workflow source papers (gaid-workflow-cite-scope): an installed Workflow's `gaid-method.json` `sources[]` papers are found in the researcher's 서재 by DOI, else exact title (`server/src/geo/library/workflow-papers.ts`, `GET /geo/library/workflow-papers?method=`, `POST …/attach`); the start window's 소개 step shows them as 근거 논문 (`web/src/geo/workspace/source-papers.tsx`) and attaches them only on the researcher's action (papers not in 서재 open 논문 넣기 with the DOI); attached ones are named with their keys in the `<workflow>` start message, and 서재 uses/the connection map link each paper to the project-installed Workflow. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
   Research notes in 서재 (gaid-note-library, user decision 2026-10-23: GAID library only, hub-synced, no Zotero writes): a note
   item (`LibraryItem.kind: "note"`, `note: LibraryNoteRef`; `server/src/geo/library/notes.ts`) mirrors one
   `연구노트/<id>/index.md` (title, date, status, headline, citations resolved to library papers, ≤ 64 KiB text snapshot); the

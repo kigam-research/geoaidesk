@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T11:50:56Z
+updated: 2026-10-23T12:06:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"56c05725-7189-46a4-9615-7e1ddddb7ee0","pid":515641,"provider":"claude","session":"31d96ed7-e560-44e9-9232-a2b8aa7a787b","start":"64415659","token":"705a5edd3ea6c16b909c87cbd34aa6359cc9106a13b769c29f4592a9e6ef672d"}
 branch: task/gaid-workflow-cite-scope
 target: main
@@ -57,6 +57,26 @@ entry, before the researcher confirms. Close D's open item for F21 with a `Close
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+
+Plan (2026-10-23, writer; tightly coupled, done by the writer without child units):
+- F23 matching key: a package's `sources[]` keeps the DOI of a paper (`kind: "doi"`) and, for a paper without DOI, its
+  file name + title (`documentKind` "paper…"). Library item ids are personal, so a Workflow's papers are matched against
+  the installer's 서재 by normalised DOI, else by normalised exact title. No package format change; existing registered
+  packages (the Pocheon Workflow 0.2.0) work as they are.
+- Server: `server/src/geo/library/workflow-papers.ts` (resolve: attached | in-library | not-in-library);
+  `GET /geo/library/workflow-papers?method=<runtimeName>` and `POST /geo/library/workflow-papers/attach`
+  `{method, itemIds}` (only ids that resolve from that method's papers; merged into `.kady/geo/literature.json`).
+- Consent point: the Workflow start window's 소개 step (every install route opens it) shows the Workflow's 근거 논문 with
+  their state and one explicit 인용 범위에 붙이기 action; papers not in 서재 open the existing 논문 넣기 dialog with the DOI
+  prefilled (lookup + researcher check, unchanged). Nothing is attached without that action.
+- Start message: attached papers are named in the `<workflow>` 지침 (settings.papers, chat target only) with their
+  citation keys, so the agent cites them in the note; RESEARCH_NOTE_RULE asks to cite relied-on library papers.
+- 서재 uses: `buildUsesIndex` adds a `workflow` use per project-installed Workflow whose papers match the item
+  (project, Workflow title), next to the existing authoring-draft use.
+- F21: RegisterDialog lists the draft's bundled example files (name, size, licence/source, synthetic) and says they
+  are shared with everyone who can see the entry; the "not shared" line no longer claims all 연구 자료.
+- D's F21 open item is item 2 of gaid-pocheon-trial (not yet in the ledger while D is active): add
+  `Closes: gaid-pocheon-trial#2` only if D has finished and numbered it by the time this unit finishes.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

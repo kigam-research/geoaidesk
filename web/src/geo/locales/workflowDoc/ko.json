@@ -10,7 +10,8 @@
     "instructions": "작성자의 추가 지시",
     "artifacts": "결과 파일",
     "boundary": "해석 한계",
-    "closing": "끝낼 때"
+    "closing": "끝낼 때",
+    "papers": "근거 논문 (프로젝트 인용 범위에 있음)"
   },
   "settings": {
     "researcherPicks": "연구자가 고릅니다",
@@ -71,5 +72,8 @@
     "remove": "Workflow 빼기",
     "pendingHint": "보내면 Workflow 지침이 먼저 가고, 입력창에 쓴 내용이 뒤에 붙습니다.",
     "example": "예제 자료로 실행"
+  },
+  "papers": {
+    "rule": "Workflow가 근거로 삼은 논문입니다. library_search와 library_read로 확인하고, 연구 노트에서 방법이나 기준을 해당 논문에서 가져온 곳에 [@key] 형식으로 인용하세요."
   }
 }

@@ -10,7 +10,8 @@ import { readProjectSteps, USER_SESSION_ID } from "../../provenance/store.ts";
 import { listResearchNotes } from "../notes/store.ts";
 import { parseResearchNote } from "../notes/parser.ts";
 import { markdownImageTargets } from "../markdown-images.ts";
-import { projectNoteCitations } from "../library/uses.ts";
+import { projectNoteCitations, readProjectLiterature } from "../library/uses.ts";
+import { resolveWorkflowPapers } from "../library/workflow-papers.ts";
 import { LibraryStore, libraryStore, shortAuthors, cslYear, isRetracted } from "../library/store.ts";
 import { AuthoringStore } from "../authoring/store.ts";
 import { installedMethods } from "../methods/local-methods.ts";
@@ -156,6 +157,17 @@ export async function connectionMap(paths: ProjectPaths, focus: string, depth = 
       const chat = chatNode(trial.sessionId, trial.startedAt);
       if (chat) link(add("workflow", trial.methodId, methodTitles.get(trial.methodId) ?? fallback.workflow), chat, "started-from");
     } catch { /* Unreadable records stay untouched. */ }
+  }
+  // gaid-workflow-cite-scope: an installed Workflow links to the library papers among its recorded sources.
+  const literature = readProjectLiterature(paths), collections = await store.collections();
+  const itemById = new Map(items.map(i => [i.id, i]));
+  for (const m of methods) {
+    const method = m.file.method;
+    if (!method?.sources.length) continue;
+    for (const paper of resolveWorkflowPapers(method.sources, items, literature, collections)) {
+      const item = paper.itemId ? itemById.get(paper.itemId) : undefined;
+      if (item) link(paperNode(item), add("workflow", method.methodId, methodTitles.get(method.methodId) ?? fallback.workflow), "made-from");
+    }
   }
   const uses = options.workflowUses ? null : await paperWorkflowUses(store, options.authoring ?? new AuthoringStore());
   for (const item of items) {
