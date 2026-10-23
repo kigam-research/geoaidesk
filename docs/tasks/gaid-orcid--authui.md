@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:53:04Z
+updated: 2026-10-23T01:56:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b35bb8b9-c459-4233-ba31-c386537b4e3f","pid":2832900,"provider":"codex","session":"01a16669-3557-7520-b2f1-bc790350ad04","start":"60747240","token":"59f55a1303c7beb853fef07784bf6e29821f7eac7b1cfd62eca996fdd7606311"}
 branch: task/gaid-orcid--authui
 target: task/gaid-orcid
@@ -82,18 +82,30 @@ Changed files, string ids with ko/en text, ui-guide rule ids followed/broken wit
 with commands, anything not verified. Then `task finish`.
 
 ## Current state
-- Implemented draft UI: authenticated/typed iD display, sign-in tab handoff and return refresh, confirmed auth unlink, all hub states; author/account display. Initial focused checks passed: frontend TypeScript and 23 tests (ORCID, shared method, shared browse). Copy/UI validators: no errors. Expanded author-link tests added; full scripts/check job running at receipt gaid-orcid--authui-20261023T014402.188704Z. Live QA: no-account, settings deep link and invite acceptance, not-configured, ready and SQLite-seeded sandbox linked all reached on own app/hub (4318/18118/18718). Real ORCID sign-in remains parent-owned. Visual QA found a split trailing digit in the sandbox URL: renderer now wraps before the intact iD. Author column widened 6rem -> 8rem to keep a short name beside its link. Rebuild QA snapshot before final screenshots.
-- Codegraph is not indexed for this exact worktree; native source reads used (knowledge-lookup fallback).
-- Sequential decisions: preserve the fixed server contracts; implement the shared iD renderer first, then card and tiny propagation seams, then behavior tests, own real-app smoke/screenshots, report and task finish. No independent package warrants a reader or child writer.
-- Owned interfaces: web/src/geo/orcid/, orcid locales; small shared-entry/library-screen propagation seams notified to parent. No backend edits.
+- Delivered authenticated ORCID UI for all hub states, synchronous detached-tab sign-in with popup-blocked fallback, event-driven refresh on focus/visibility/hub-account changes, and confirmed auth unlink. Typed iD/public import remain available to unlinked researchers. Shared official iD renderer supplies authenticated author/account links and sandbox labeling; import dialog inherits profile/environment.
+- Parent backend fix 0007ad5165d07d0bad312e75d55c05d36a72c10d merged with authorization at 53d3d6d81d9c. Live own HTTP checks now complete for auth DELETE followed by local DELETE; response is profile null + hub ready. ORCID regression suites pass 15/15 after merge.
+- Checks: frontend TypeScript passed after the final URL-wrap/column-width changes; focused UI suites 4 files/23 tests passed. Full scripts/check passed on pre-parent-fix snapshot b2f2783d37ab (receipt gaid-orcid--authui-20261023T014402.188704Z; backend 2246 passed/8 skipped, frontend 1231 passed; copy/UI/distribution/environments/startup/restart all passed). Final integration checks will run through task finish.
+- Live own QA covers settings deep link and invite acceptance, no-account, not-configured, ready, seeded sandbox linked, author/detail/list/account links, actual auth unlink cancellation and execution; local unlink after the fix. Test account only, no ORCID account/client creation, real secret or real ORCID login. Parent owns real sandbox end-to-end sign-in (see updated parent task/AGENTS).
+- Sequential integration: common iD renderer -> card -> small propagation seams -> behavior/type/copy/UI checks -> independent real-app QA -> parent-owned backend regression fix -> final screenshots/report. No independent child package warranted delegation.
+- Codegraph is not indexed for the exact worktree; native source reads used under knowledge-lookup fallback.
+
 ## Next steps
-1. Integrate the parent-owned nested-serial backend fix with the agreed task workflow, restart own QA, recheck typed local link/unlink under a connected hub and recapture stable ready/no-account/account frames. Finalize report/check receipts and task finish.
-Blocked: final live QA depends on the parent backend fix for link/unlink nested status() serialization.
+1. Publish final reviewed evidence and task finish. Parent integrates with task complete.
 ## Failed approaches
-- Live local-iD DELETE after auth unlink hung; direct source reread confirmed a backend deadlock: link/unlink hold serial() while returning status(), which now enters serial() again for hub-ready reconciliation. Parent notified with concrete reproduction and asked to own the backend fix. Do not retry the hanging local mutations in the current app. Rebuild QA from parent fix and recapture ready/no-account/account screenshots (the later failed flow could leave a dialog visible).
+- RESOLVED by parent fix 0007ad5165d0 and final live recheck: local-iD DELETE after auth unlink hung; direct source reread confirmed a backend deadlock: link/unlink hold serial() while returning status(), which now enters serial() again for hub-ready reconciliation. Parent notified with concrete reproduction and asked to own the backend fix. Rebuilt the QA app with the fix and recaptured the final matrix; status/local unlink now return.
 - QA job restart initially rejected a dirty source tree. Tracked disposition changes were saved, but the repeated rejection shared the premise that untracked screenshot files were allowed. Direct `git status --short` showed only untracked screenshots; save their draft evidence paths before starting the final snapshot.
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+### Final verification and evidence
+
+- Screenshots: reports/2026-10-22-gaid-orcid/figures/orcid2-{no-account,ready,linked,author,browse,account}-{instrument,mapsheet}-{light,dark}-{1440,1280}.png (48 PNGs, all under 1 MB, expected viewport sizes checked). Section-12 review: card actions visible without scrolling, full iD wraps at the record path, no clipped text, theme/style roles and original icon colours retained, plain limits/test notices visible, one existing filled library action, compact author link distinct from row action. Keyboard/native-link and return-focus behavior covered by native semantics plus component/live action checks.
+- External evidence/launcher/Playwright snapshots and logs: /home/seongin3/data/geoaidesk/work/gaid-orcid-auth-ui/. SHA-256 manifest: screenshots.sha256. Final own test services (4318/18118/18718) stopped and browser session orcid2 closed. Zero console errors in final session. Test credentials are synthetic; never used a real client secret or user account.
+- `cd web && npx tsc --noEmit`: passed after final layout changes. `cd web && npx vitest run src/geo/orcid src/geo/hub/shared-browse.test.tsx src/geo/hub/shared-method.test.tsx`: 4 files/23 tests passed. Full `npm test` covered by the recorded scripts/check run: 191 files/1231 tests passed.
+- `cd server && npx vitest run test/geo-orcid.test.ts test/geo-hub-orcid.test.ts`: 2 files/15 tests passed after parent merge.
+- `node geo/copy/validate-copy.mjs web/src/geo/locales`: 0 errors, 69 warnings; four new warning hits on accurate authenticated/verified ORCID labels, retained after context review. `node geo/ui/check-ui.mjs`: 0 errors, 78 pre-existing accepted debt, no additions. `git diff --check`: passed.
+- Humanizer file mode applied to added report prose, using references/korean.md; preserved figures, paths, commands, numbers and uncertainty. Report additions limited to 3.1, 4.1 and appendix evidence rows; parent will update the phase-1 headline/limits for the full phase-2 delivery.
+- Not verified by this child: real ORCID OAuth (parent-owned), production redirect acceptance, real researcher account, live service 409/502 failures (component paths cover them). No extra required scope/open items.
+
 ### Phase-2 UI delivery details
 
 Changed files: web/src/geo/orcid/{api.ts,id-display.tsx,orcid-card.tsx,orcid-card.test.tsx,import-dialog.tsx}; web/src/geo/hub/{shared-method.tsx,shared-entry.tsx,shared-browse.tsx,shared-method.test.tsx,shared-browse.test.tsx}; web/src/geo/hub-server/account.tsx; web/src/geo/library/library-screen.tsx; web/src/geo/locales/orcid/{ko,en}.json. Parent notified of the minimal shared-entry/library-screen propagation seams. No server/contracts/icon changes.
@@ -127,6 +139,8 @@ Strings below are all additions (before: absent); no existing ko/en string was c
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-22-gaid-orcid/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
@@ -139,6 +153,8 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014402.188704Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T014832.992699Z/receipt.json
   - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-orcid-auth-ui/status-after-auth-unlink.json"],"reason":"Own QA instance stopped after reproducing the nested serial/status local-link deadlock; parent owns the backend fix. Restart with the fixed snapshot before final matrix.","recorded":"2026-10-23T01:52:33Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid--authui-20261023T015317.596352Z/receipt.json
+  - disposition: {"evidence":["/home/seongin3/data/geoaidesk/work/gaid-orcid-auth-ui/fixed-after-local-unlink.json"],"reason":"Own final QA completed: parent deadlock fix rechecked, stable no-account/ready/linked and account/author/list screenshots captured; browser closed and all own test services stopped.","recorded":"2026-10-23T01:56:29Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
