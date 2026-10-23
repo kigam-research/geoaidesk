@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T11:47:07Z
+status: done
+updated: 2026-10-23T11:47:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -258,8 +258,8 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
-1. Done: full cycle verified on the review app (3171c57c). Finish the unit; the hub handles the open items
-   (F21, the ESM1 sharing decision) and the routed F23.
+<!-- task:closed -->
+Closed 2026-10-23T11:47:39Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-pocheon-trial.md.
 
 ## Failed approaches
 ## Notes and decisions
@@ -292,8 +292,8 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [결정] 허브의 포천 Workflow에 들어 있는 논문 보충 코드(Springer ESM1, 공개 이용 조건 미표시)의 공유 범위 — 가) 기관 허브 안 공유는 유지하고 기관 밖 공유 전에 저자에게 이용 허락을 받음 — 나) 보충 코드를 빼고 방법 설명과 GAID가 쓴 코드만 남김 — 권장: 가) 같은 기관 저자의 공개 보충 자료이고 허브는 기관 안에서만 쓰임 — 막힌 일: 기관 밖 공유 — 조건: 없음 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#6-결정할-일
-- [부채] 허브 등록 대화상자의 "공유하지 않음: 연구 자료" 문구가, Workflow에 들어 있는 예제 자료(입력별 파일)가 함께 공유된다는 사실을 알리지 않음 (F21) — 가) 등록 대화상자에 "공유: 예제 자료 N개(크기)"를 더함 — 나) 그대로 둠 — 권장: 가) 연구 자료 공유 여부는 연구자가 등록 전에 알아야 함 — 막힌 일: 없음 — 조건: gaid-workflow-example 이후 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#5-한계
+- [결정 gaid-pocheon-trial#1] 허브의 포천 Workflow에 들어 있는 논문 보충 코드(Springer ESM1, 공개 이용 조건 미표시)의 공유 범위 — 가) 기관 허브 안 공유는 유지하고 기관 밖 공유 전에 저자에게 이용 허락을 받음 — 나) 보충 코드를 빼고 방법 설명과 GAID가 쓴 코드만 남김 — 권장: 가) 같은 기관 저자의 공개 보충 자료이고 허브는 기관 안에서만 쓰임 — 막힌 일: 기관 밖 공유 — 조건: 없음 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#6-결정할-일
+- [부채 gaid-pocheon-trial#2] 허브 등록 대화상자의 "공유하지 않음: 연구 자료" 문구가, Workflow에 들어 있는 예제 자료(입력별 파일)가 함께 공유된다는 사실을 알리지 않음 (F21) — 가) 등록 대화상자에 "공유: 예제 자료 N개(크기)"를 더함 — 나) 그대로 둠 — 권장: 가) 연구 자료 공유 여부는 연구자가 등록 전에 알아야 함 — 막힌 일: 없음 — 조건: gaid-workflow-example 이후 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#5-한계
 ## Report
 Report: reports/2026-10-23-gaid-pocheon-trial/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
