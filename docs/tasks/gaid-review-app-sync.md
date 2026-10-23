@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-23T04:03:48Z
-writer: {"host":"seongin3","reserved":"dac1280ed95fd7a5b9961c7cfbcb087bf7a31151fc22f6199affc785e973e137"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"037fe804-20b3-4b8d-9e0c-c1be1dd8fd8c","pid":489203,"provider":"claude","session":"22c1f103-16a1-439b-abc6-3bf6b0e57fc0","start":"61617457","token":"dac1280ed95fd7a5b9961c7cfbcb087bf7a31151fc22f6199affc785e973e137"}
 branch: task/gaid-review-app-sync
 target: main
 parent: 
