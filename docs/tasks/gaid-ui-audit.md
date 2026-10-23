@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:04:48Z
+updated: 2026-10-23T16:10:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"07ebb9d0-f814-4f6d-b9a5-645bc5f63caf","pid":1787710,"provider":"claude","session":"3df14864-ec0f-4f87-934c-dfb313401438","start":"65687147","token":"baba760f0e777618475bfc83f39f8b969255847d56462aba6ba7f9ef2c283e10"}
 branch: task/gaid-ui-audit
 target: main
@@ -71,11 +71,11 @@ checks only proxies (hard-coded colours, small text, copy length, slop proxies);
   tabs); guide text 판 → version (I5, G2, C3, R3); example-data attach form no longer a card in a card (V5); authoring sources
   footer sticks into the pane padding (1280 check). After shots: `shots/after/` (184, all variants), montages `shots/after-m*`.
 - Checks: web vitest for touched areas 33 files / 187 passed; check-ui 0 errors (78 accepted debt, none added); copy validator
-  0 errors (100 pre-existing warnings, none on changed strings); scripts/check: see `check-1.log` in the work folder.
+  0 errors (100 pre-existing warnings, none on changed strings); scripts/check passed (exit 0, `check-1.log` in the work folder).
 - Report written and humanized: reports/2026-10-24-gaid-ui-audit/index.md (31 deviations, 26 fixed, 5 left as debt).
 - Instance `gaid-audit-app` stopped before scripts/check (next build shares web/.next).
 ## Next steps
-1. Read check-1.log result; fix failures; review-copy; task save; task finish.
+1. task finish (checks passed, review copy made).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
