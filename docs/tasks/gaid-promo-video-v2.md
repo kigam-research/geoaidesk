@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:18:21Z
+updated: 2026-10-23T02:23:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -82,7 +82,8 @@ step, per feature one tag + highlight box + pointer; no zoom/scroll inside a bea
 | 3d | 58–74 | Demo: 연구 분석 | Workflow start settings → chat with the AI agent working (Workflow card, tool steps) → map viewer / work screen with the result |
 | 3e | 74–84 | Demo: 연구노트 | note list → note with result figure and a decision → 답변 보내기 |
 | 3f | 84–92 | Demo: back to 내 서재 | paper → 내 연구에서 쓰인 곳 (note, pages) → 연결 지도: the loop closes |
-| 4 | 92–100 | Closing (motion) | ring turns once more (판 grows), logo, 내부 검토용 |
+| 3g | 92–100 | Ecosystem → KIGAM second brain (motion, 개념도 tag) | user request 2026-10-23 (verbatim below): many researchers' cycles join through the GAID hub; papers, Workflows (판) and notes link into one growing network = KIGAM's second brain, conceptual |
+| 4 | 100–106 | Closing (motion) | ring turns once more (판 grows), logo, 내부 검토용 |
 
 Feature map (explorer, 2026-10-23): the library paper detail has "Workflow 만들기" (needs a stored PDF; creates the
 authoring project with the PDF as first source and links it under 쓰인 곳); authoring 자료 → 질문 → 초안 → 허브 등록;
@@ -91,11 +92,17 @@ hub entry "내 프로젝트에서 시험" → input prep → TaskSetup "시작 �
 through what exists: a note citing `[@key]` appears under the paper's "내 연구에서 쓰인 곳" and in 연결 지도 (paper →
 Workflow → project → note). No feature adds a note itself as a library item; the film must not claim one.
 
-Length ≈ 100 s (over the 90 s default because the demo now has six steps; record if kept).
+Length ≈ 105 s (over the 90 s default: six demo steps plus the second-brain scene; trim 1–2 s where possible).
+
+User 2026-10-23: "가와 관련해서 검토용 앱으로 하면 매번 인증을 다시 할 이유가 없지 않나? 답변먼저 하자. 그리고 마무리 절 전에 해당 순환을 통해 지구과학 에이전트 생태계가 활성화되면서 개념적인 KIGAM의 Second brain화 되는 모션 그래픽이 추가되었으면 한다."
+Answer given: the review app avoids re-login; it was excluded only by the v1 rule (keep review data unchanged). Using it
+leaves the study records in `~/.geoaidesk`, and since the review app is connected to the institute hub server (PC74
+:8700), registering the Workflow is a real shared registration. Waiting for the user's choice.
 
 ## Next steps
-1. Get the explorer's feature map (library→authoring, note→library), confirm the structure with the user and the
-   demo-data choice (existing mixed records vs one new coherent study run in a capture instance).
+1. User choice pending: run the coherent study in the review app (existing login; records stay; Workflow registered
+   on the institute hub server) or in a separate capture instance (one model login), or existing records only.
+2. Then: data/study run → capture (full-frame, feature tags) → scenes (background, cycle, second brain) → render job.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
