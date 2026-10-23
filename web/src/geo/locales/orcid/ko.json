@@ -50,5 +50,21 @@
   "error.failed": "요청을 마치지 못했습니다. 다시 시도하세요.",
   "retry.button": "다시 읽기",
   "cancel.button": "취소",
-  "close.button": "창 닫기"
+  "close.button": "창 닫기",
+  "id.authenticatedLink": "인증된 ORCID iD: {url}",
+  "id.link": "ORCID iD: {url}",
+  "id.sandbox": "ORCID 시험 환경 (시험용 기록)",
+  "auth.hint": "ORCID에서 로그인한 뒤 GAID로 돌아오세요.",
+  "auth.start.button": "ORCID로 본인 확인",
+  "auth.starting.button": "ORCID 연결 중",
+  "auth.waiting": "ORCID에서 본인 확인을 마치면 돌아와 연결을 확인하세요.",
+  "auth.open.button": "ORCID 로그인 열기",
+  "auth.noAccount": "ORCID 본인 확인에는 기관 GAID 허브 로그인이 필요합니다.",
+  "auth.settings.button": "기관 허브 설정 열기",
+  "auth.notConfigured": "허브에 ORCID 연결이 설정되지 않았습니다. 허브 관리자에게 문의하세요.",
+  "auth.unreachable": "기관 GAID 허브에 연결하지 못했습니다. 연결 상태를 다시 읽으세요.",
+  "auth.unlink.button": "본인 확인 연결 해제",
+  "auth.unlink.title": "ORCID 본인 확인 연결 해제",
+  "auth.unlink.hint": "허브 계정의 본인 확인 연결을 해제합니다. iD는 인증 안 된 상태로 남고, 가져온 논문과 내 논문 표시는 유지합니다.",
+  "error.auth": "본인 확인 연결을 처리하지 못했습니다. 연결 상태를 다시 읽고 시도하세요."
 }

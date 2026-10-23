@@ -4,6 +4,7 @@ import { RemoteHubStore } from "../hub-client/remote-store.ts";
 import { RemoteHubSkillStore } from "../hub-client/remote-skills.ts";
 import { forgetRemoteSkills, setRemoteHubSkillProvider } from "../hub-skills/active.ts";
 import { setRemoteHubProvider } from "../hub-shared/active.ts";
+import { hubClientOrcid, setOrcidHubProvider } from "../orcid/hub.ts";
 import { LibrarySync } from "../library/sync/index.ts";
 import { libraryStore, type LibraryStore } from "../library/store.ts";
 import { AuthoringError } from "../authoring/store.ts";
@@ -27,6 +28,7 @@ export async function registerGeoHubServerRoutes(app: FastifyInstance, options: 
     const identity = client.identity;
     return identity && c.account ? { store: remote.forIdentity(identity), actor: { id: c.account.id, name: c.account.displayName } } : null;
   });
+  setOrcidHubProvider(() => hubClientOrcid(client));
   const remoteSkills = new RemoteHubSkillStore(client, remote);
   let skillsIdentity: string | null = null;
   setRemoteHubSkillProvider(() => {

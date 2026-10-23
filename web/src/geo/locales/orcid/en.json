@@ -50,5 +50,21 @@
   "error.failed": "The request did not finish. Try again.",
   "retry.button": "Retry loading",
   "cancel.button": "Cancel",
-  "close.button": "Close window"
+  "close.button": "Close window",
+  "id.authenticatedLink": "Authenticated ORCID iD: {url}",
+  "id.link": "ORCID iD: {url}",
+  "id.sandbox": "ORCID sandbox (test records)",
+  "auth.hint": "Sign in on ORCID, then return to GAID.",
+  "auth.start.button": "Verify iD with ORCID",
+  "auth.starting.button": "Opening ORCID",
+  "auth.waiting": "After verifying on ORCID, return here to check the link.",
+  "auth.open.button": "Open ORCID sign-in",
+  "auth.noAccount": "To verify your ORCID iD, log in to the institute GAID hub.",
+  "auth.settings.button": "Open institute hub settings",
+  "auth.notConfigured": "ORCID is not set up on this hub. Ask the hub administrator.",
+  "auth.unreachable": "Could not reach the institute GAID hub. Read the connection status again.",
+  "auth.unlink.button": "Unlink verified iD",
+  "auth.unlink.title": "Unlink verified ORCID iD",
+  "auth.unlink.hint": "Remove the verified link from your hub account. The iD stays as unauthenticated; imported works and own-work marks stay.",
+  "error.auth": "Could not process the verified link. Read the connection status again and retry."
 }

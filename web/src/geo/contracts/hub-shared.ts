@@ -60,6 +60,8 @@ export interface HubEntry {
   authorId?: string;
   /** The requesting researcher is the author (edit vs. copy, "내 Workflow"). Older servers omit it. */
   mine?: boolean;
+  /** The author account's authenticated ORCID iD at read time (institute hub server only; gaid-orcid phase 2). */
+  authorOrcid?: { id: string; environment: "production" | "sandbox" };
   /** The registered method this one was copied from ("복사해서 고치기"). */
   basedOn?: { entryId: string; revision: number; title: string; author: string };
   folderId: string;

@@ -9,12 +9,13 @@ import type { FeedFetchOptions } from "./feeds/fetch.ts";
 import { intervalHours, scheduleFeeds } from "./feeds/schedule.ts";
 import type { FeedSourceDefinition } from "../../../../web/src/geo/contracts/hub-feeds.ts";
 import { HubLibrary } from "./library.ts";
+import { HubOrcid } from "./orcid.ts";
 import { SQLiteHubStore } from "./records.ts";
 import { SQLiteHubSkillStore } from "./skills.ts";
 import { HUB_API as API, HUB_FILE_LIMIT, HUB_SERVER_SCHEMA, LIBRARY_FILE_LIMIT, type AcceptInviteRequest,
   type InstallRequest, type LibraryPushRequest, type LoginRequest, type ReviewInput, type StoredHubSkill, type StoredEntry } from "./protocol.ts";
 
-export type HubServerApp = FastifyInstance & { hub: HubDatabase; accounts: HubAccounts; store: SQLiteHubStore; library: HubLibrary; feeds: HubFeeds };
+export type HubServerApp = FastifyInstance & { hub: HubDatabase; accounts: HubAccounts; store: SQLiteHubStore; library: HubLibrary; feeds: HubFeeds; orcid: HubOrcid };
 export interface HubServeOptions extends HubServerOptions, FeedFetchOptions {
   /** Set only by serve; tests/builders do not start collection implicitly. */
   feedsIntervalHours?: number;
@@ -23,6 +24,8 @@ export interface HubServeOptions extends HubServerOptions, FeedFetchOptions {
   https?: { key: Buffer; cert: Buffer };
   /** Behind a reverse proxy on this PC: take the client address from X-Forwarded-For set by a loopback proxy. */
   trustProxy?: boolean;
+  /** ORCID token/JWKS requests (tests pass a fake). */
+  orcidFetch?: typeof fetch;
 }
 export function buildHubServer(options: HubServeOptions): HubServerApp {
   const hours = options.feedsIntervalHours === undefined ? 0 : intervalHours(options.feedsIntervalHours);
@@ -30,13 +33,14 @@ export function buildHubServer(options: HubServeOptions): HubServerApp {
   const accounts = new HubAccounts(hub);
   const store = new SQLiteHubStore(hub);
   const library = new HubLibrary(hub);
+  const orcid = new HubOrcid(hub, { fetch: options.orcidFetch });
   const feeds = new HubFeeds(hub, { feedFetch: options.feedFetch, githubToken: options.githubToken, proposals: options.feedProposals });
   const app = Fastify({ logger: false, bodyLimit: 64 * 1024, exposeHeadRoutes: false, requestTimeout: 120_000,
     // Login failure limits count per client address; only a proxy on this PC may set it.
     trustProxy: options.trustProxy ? ["127.0.0.1", "::1"] : false,
     ...(options.https ? { https: options.https } : {}) }) as unknown as HubServerApp;
   app.decorate("hub", hub); app.decorate("accounts", accounts); app.decorate("store", store); app.decorate("library", library);
-  app.decorate("feeds", feeds);
+  app.decorate("feeds", feeds); app.decorate("orcid", orcid);
   const stopFeeds = scheduleFeeds(feeds, hours);
   app.addHook("onClose", async () => { stopFeeds(); await feeds.close(); hub.close(); });
   const authentication = new WeakMap<FastifyRequest, Authenticated>();
@@ -87,6 +91,10 @@ export function buildHubServer(options: HubServeOptions): HubServerApp {
   app.delete<{ Params: { id: string } }>(`${API}/admin/invites/:id`, async (req, reply) => {
     accounts.revokeInvite(req.params.id, admin(req)); return reply.code(204).send();
   });
+  app.get(`${API}/orcid`, async (req) => orcid.status(auth(req).id));
+  app.post(`${API}/orcid/start`, async (req) => orcid.start(auth(req)));
+  app.post(`${API}/orcid/finish`, { bodyLimit: 4 * 1024 }, async (req) => ({ link: await orcid.finish(auth(req), req.body) }));
+  app.delete(`${API}/orcid`, async (req, reply) => { orcid.unlink(auth(req)); return reply.code(204).send(); });
   const feedActor = (req: FastifyRequest) => {
     const a = admin(req); return { id: a.id, name: a.account.displayName, device: a.device };
   };

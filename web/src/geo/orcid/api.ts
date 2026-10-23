@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/projects";
-import type { OrcidConfirmBody, OrcidConfirmResult, OrcidStatus, OrcidWorksPreview } from "@/geo/contracts/orcid";
+import type { OrcidAuthStart, OrcidConfirmBody, OrcidConfirmResult, OrcidStatus, OrcidWorksPreview } from "@/geo/contracts/orcid";
 
 export class OrcidApiError extends Error {
   constructor(message: string, public status: number) { super(message); }
@@ -18,6 +18,8 @@ async function call<T>(path = "", init?: RequestInit): Promise<T> {
 export const getOrcid = () => call<OrcidStatus>();
 export const linkOrcid = (orcid: string) => call<OrcidStatus>("", { method: "PUT", body: JSON.stringify({ orcid }) });
 export const unlinkOrcid = () => call<OrcidStatus>("", { method: "DELETE" });
+export const startOrcidAuth = () => call<OrcidAuthStart>("/auth/start", { method: "POST", body: "{}" });
+export const unlinkOrcidAuth = () => call<OrcidStatus>("/auth", { method: "DELETE" });
 export const previewOrcidWorks = () => call<OrcidWorksPreview>("/works", { method: "POST", body: "{}" });
 // No short client timeout: enriching the selected DOIs can take tens of seconds.
 export const confirmOrcidWorks = (body: OrcidConfirmBody) => call<OrcidConfirmResult>("/works/confirm", { method: "POST", body: JSON.stringify(body) });

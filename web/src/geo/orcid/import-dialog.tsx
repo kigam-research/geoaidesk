@@ -7,14 +7,15 @@ import { TechnicalDetail } from "@/geo/hub/technical";
 import { folderPath } from "@/geo/library/folder-tree";
 import { geoText } from "@/geo/i18n";
 import type { LibraryCollection } from "@/geo/contracts/library";
-import { ORCID_LIMITS, type OrcidConfirmResult, type OrcidWorksPreview } from "@/geo/contracts/orcid";
+import { ORCID_LIMITS, type OrcidProfile, type OrcidConfirmResult, type OrcidWorksPreview } from "@/geo/contracts/orcid";
 import { confirmOrcidWorks, orcidProblem, previewOrcidWorks } from "./api";
 import { OrcidId } from "./id-display";
 import { alreadyOwn, defaultSelection, selectNew } from "./selection";
 
 const text = geoText("orcid");
 
-export function OrcidImportDialog({ open, onOpenChange, collections, onImported }: {
+export function OrcidImportDialog({ open, onOpenChange, collections, onImported, profile }: {
+  profile?: OrcidProfile;
   open: boolean; onOpenChange: (open: boolean) => void; collections: LibraryCollection[]; onImported: () => void;
 }) {
   const [preview, setPreview] = useState<OrcidWorksPreview | null>(null);
@@ -63,7 +64,7 @@ export function OrcidImportDialog({ open, onOpenChange, collections, onImported 
         <div className="min-h-0 overflow-y-auto" aria-busy={loading || saving}>
           {loading && <div className="space-y-3 py-4" role="status"><p className="text-sm text-gaid-ink-2">{text("import.loading")}</p>{[1, 2, 3].map((n) => <div key={n} className="h-16 rounded-md bg-gaid-face-2" />)}</div>}
           {preview && !result && <div className="flex flex-col gap-3">
-            <OrcidId id={preview.orcid} />
+            <OrcidId id={preview.orcid} authenticated={profile?.orcid === preview.orcid && profile.authenticated} environment={profile?.orcid === preview.orcid ? profile.environment : undefined} />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p role="status" className="text-sm tabular-nums">{text("import.selected", { n: selected.length, total: preview.works.length })}</p>
               <div className="flex gap-2">

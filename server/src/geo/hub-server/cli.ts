@@ -4,7 +4,8 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { HubAccounts } from "./accounts.ts";
 import { backupHub, checkBackup } from "./backup.ts";
-import { HubDatabase, HubServerError } from "./core.ts";
+import { dataHome, HubDatabase, HubServerError } from "./core.ts";
+import { readOrcidClient, removeOrcidClient, writeOrcidClient } from "./orcid.ts";
 import { HubFeeds } from "./feeds/store.ts";
 import { intervalHours } from "./feeds/schedule.ts";
 import { importHub } from "./import.ts";
@@ -17,6 +18,8 @@ const HELP = `GAID hub server (Node >= 22.19)
   node geo/hub-server.mjs feeds fetch [--source ID]
   node geo/hub-server.mjs invite --email EMAIL [--role admin|member]
   node geo/hub-server.mjs users
+  node geo/hub-server.mjs orcid-client set --client-id APP-… [--sandbox] [--redirect-uri URL]   (secret from standard input)
+  node geo/hub-server.mjs orcid-client show | clear
   node geo/hub-server.mjs backup --to DIR
   node geo/hub-server.mjs check-backup DIR
   node geo/hub-server.mjs import-hub --from DIR --authors MAP.json [--unmapped-to EMAIL] [--apply]
@@ -30,6 +33,7 @@ async function main() {
     "unmapped-to": { type: "string" }, apply: { type: "boolean" }, help: { type: "boolean" },
     "all-proposed": { type: "boolean" }, source: { type: "string" }, "feeds-interval-hours": { type: "string" },
     "tls-cert": { type: "string" }, "tls-key": { type: "string" }, "trust-proxy": { type: "boolean" },
+    "client-id": { type: "string" }, sandbox: { type: "boolean" }, "redirect-uri": { type: "string" },
   } });
   const [command, ...args] = positionals;
   if (!command || values.help) { console.log(HELP); return; }
@@ -39,7 +43,8 @@ async function main() {
     if (args.length !== 1) throw new Error("Usage: check-backup DIR");
     console.log(JSON.stringify(checkBackup(args[0]), null, 2)); return;
   }
-  if (args.length && command !== "feeds") throw new Error("Unexpected positional arguments");
+  if (args.length && command !== "feeds" && command !== "orcid-client") throw new Error("Unexpected positional arguments");
+  if (command === "orcid-client") { await orcidClientCommand(home, args, values); return; }
   if (command === "serve") {
     const port = Number(values.port ?? 8700);
     if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error("Port must be 1–65535");
@@ -102,5 +107,42 @@ async function main() {
         unmappedTo: values["unmapped-to"], apply: values.apply }), null, 2));
     }
   } finally { hub.close(); }
+}
+/** The secret is read from standard input (hidden at a terminal), never from arguments, files in Git or the environment. */
+async function orcidClientCommand(home: string, args: string[], values: { "client-id"?: string; sandbox?: boolean; "redirect-uri"?: string }) {
+  const [operation, ...rest] = args;
+  if (rest.length) throw new Error("Usage: orcid-client set|show|clear");
+  new HubDatabase({ home }).close(); // creates/validates the home like every other command
+  if (operation === "show") {
+    const c = readOrcidClient(dataHome(home));
+    console.log(JSON.stringify(c ? { environment: c.environment, clientId: c.clientId, redirectUri: c.redirectUri, updatedAt: c.updatedAt, secret: "(stored)" } : { configured: false }, null, 2));
+  } else if (operation === "clear") {
+    console.log(JSON.stringify({ removed: removeOrcidClient(dataHome(home)) }));
+  } else if (operation === "set") {
+    if (!values["client-id"]) throw new Error("Usage: orcid-client set --client-id APP-… [--sandbox] [--redirect-uri URL]");
+    const secret = await readSecret("ORCID Client secret: ");
+    const view = writeOrcidClient(dataHome(home), { environment: values.sandbox ? "sandbox" : "production", clientId: values["client-id"],
+      clientSecret: secret, ...(values["redirect-uri"] ? { redirectUri: values["redirect-uri"] } : {}) });
+    console.log(JSON.stringify({ ...view, secret: "(stored)" }, null, 2));
+    console.log("Restart is not needed; the hub reads this file on each ORCID request.");
+  } else throw new Error("Usage: orcid-client set|show|clear");
+}
+async function readSecret(prompt: string): Promise<string> {
+  const input = process.stdin;
+  if (!input.isTTY) { let data = ""; for await (const chunk of input) data += chunk; return data.split(/\r?\n/)[0] ?? ""; }
+  process.stderr.write(prompt);
+  input.setRawMode(true); input.resume(); input.setEncoding("utf8");
+  return new Promise((resolve, reject) => {
+    let value = "";
+    const done = (out: string | Error) => { input.setRawMode(false); input.pause(); input.off("data", onData); process.stderr.write("\n"); out instanceof Error ? reject(out) : resolve(out); };
+    const onData = (chunk: string) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n") return done(value);
+        if (ch === "\u0003") return done(new Error("Cancelled"));
+        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1); else value += ch;
+      }
+    };
+    input.on("data", onData);
+  });
 }
 main().catch((error: Error) => { console.error(error.message); process.exitCode = 1; });
