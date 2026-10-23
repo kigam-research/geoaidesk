@@ -43,6 +43,16 @@ describe("renderWorkflowDocument", () => {
     expect(text).not.toContain("$ARGUMENTS");
   });
 
+  it("tells the agent to run through when every condition is set", () => {
+    const choices = Object.fromEntries(doc.choices.map((c) => [c.id, c.options?.[0] ?? "x"]));
+    const all = renderWorkflowDocument(doc, { ...ko, target: "chat", settings: { inputs: {}, choices } });
+    expect(all).toContain("정하지 않은 조건: 없음");
+    expect(all).toContain("연구자가 조건을 모두 정했습니다.");
+    expect(all).not.toContain("정하지 않은 조건은 해당 조건을 쓰는 단계 전에");
+    const open = renderWorkflowDocument(doc, { ...ko, target: "chat", settings: { inputs: {}, choices: {} } });
+    expect(open).toContain("정하지 않은 조건은 해당 조건을 쓰는 단계 전에");
+  });
+
   it("shows choices with their options in a preview without settings", () => {
     const text = renderWorkflowDocument(doc, { ...ko, target: "preview" });
     expect(text).toContain("- 집계 격자 CSV: 연구자가 고릅니다");
