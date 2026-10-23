@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:30:37Z
+updated: 2026-10-23T07:47:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -164,6 +164,15 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   file is in the project; opened at the summary, one click would start the paper's method with only the DEM and a
   README (6 of 8 inputs unused). CSV roles list every CSV as candidate. — B (start settings, example selection) —
   routed 2026-10-23 16:31.
+- F18 — analysis run (project pgi-2c2f48, GPT-6.1 Sol high, started 16:29:59) — although the Workflow says to run
+  through and stop only for missing or malformed inputs, the agent opened an `interview` at ~16:31 with three detail
+  rules (borehole penetration marking, numeric preprocessing/statistics/boundary rules, IGRF height basis), each with a
+  sensible recommendation; nobody watched the chat, the form expired after 600 s and the agent went on with its
+  recommendations labelled as assumptions. ~10 minutes lost for a run whose start settings were complete. Cause: the
+  boreholes input had no ore-penetration column (paper Table 1 also has none; penetration comes from core logging,
+  i.e. core_samples.csv classes), and interview guidance asks to block on missing authorization. — record; candidate
+  fix: Workflow 지침 should state that details with a recommended default are recorded as assumptions, not asked,
+  once the start settings are complete (D, prompt) — open.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
