@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T16:10:53Z
+status: done
+updated: 2026-10-23T16:11:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"07ebb9d0-f814-4f6d-b9a5-645bc5f63caf","pid":1787710,"provider":"claude","session":"3df14864-ec0f-4f87-934c-dfb313401438","start":"65687147","token":"baba760f0e777618475bfc83f39f8b969255847d56462aba6ba7f9ef2c283e10"}
 branch: task/gaid-ui-audit
 target: main
@@ -75,7 +75,9 @@ checks only proxies (hard-coded colours, small text, copy length, slop proxies);
 - Report written and humanized: reports/2026-10-24-gaid-ui-audit/index.md (31 deviations, 26 fixed, 5 left as debt).
 - Instance `gaid-audit-app` stopped before scripts/check (next build shares web/.next).
 ## Next steps
-1. task finish (checks passed, review copy made).
+<!-- task:closed -->
+Closed 2026-10-23T16:11:02Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-ui-audit.md.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
@@ -86,7 +88,7 @@ Complete also closes every item that the hub answered with this unit as follow-u
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
-- [부채] UI 가이드 점검 후 남은 다듬기 5건(허브 저작 단계 표시가 StepScale과 다름, 브라우저 기본 선택 상자 63곳, 서재 오른쪽 열 글자량, 시험 기록의 "실패한 도구 호출" 문구, 시작 창 아래 줄 위치 표시 형식)을 언제 고칠지 — 가) 다음 UI 작업 단위에 묶어 고침 — 나) 지금 상태 유지 — 권장: 가) 모두 화면 불일치·다듬기 수준이라 한 단위로 묶는 편이 빠릅니다 — 막힌 일: 없음 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-audit#5-한계
+- [부채 gaid-ui-audit#1] UI 가이드 점검 후 남은 다듬기 5건(허브 저작 단계 표시가 StepScale과 다름, 브라우저 기본 선택 상자 63곳, 서재 오른쪽 열 글자량, 시험 기록의 "실패한 도구 호출" 문구, 시작 창 아래 줄 위치 표시 형식)을 언제 고칠지 — 가) 다음 UI 작업 단위에 묶어 고침 — 나) 지금 상태 유지 — 권장: 가) 모두 화면 불일치·다듬기 수준이라 한 단위로 묶는 편이 빠릅니다 — 막힌 일: 없음 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-audit#5-한계
 ## Report
 Report: reports/2026-10-24-gaid-ui-audit/index.md
 
