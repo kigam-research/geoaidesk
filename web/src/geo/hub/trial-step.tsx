@@ -119,7 +119,7 @@ export function TrialStep({
         <h2 className="text-xl font-semibold">{text("trial.title")}</h2>
       </div>
       {latestDraft > installedDraft && installedDraft > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm">
+        <div className="flex items-center gap-3 rounded-xl border border-gaid-edge bg-gaid-face-2 p-3 text-sm">
           <span className="flex-1">{text("trial.newer", { n: latestDraft, installed: installedDraft })}</span>
           <Button size="sm" onClick={onDraft}>
             {text("trial.toDraft")}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { HUB_ACCOUNT_RULES, type HubServerStatus } from "@/geo/contracts/hub-server";
 import { hubServer } from "./api";
 import { Field, text } from "./parts";
+import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 
 export function AuthForms({ busy, run }: { busy: boolean; run: (action: () => Promise<HubServerStatus>) => Promise<boolean> }) {
   const [mode, setMode] = useState<"login" | "invite">("login");
@@ -22,9 +23,9 @@ export function AuthForms({ busy, run }: { busy: boolean; run: (action: () => Pr
     }
   };
   return <div className="flex flex-col gap-4">
-    <div role="group" aria-label={text("auth.title")} className="gaid-seg flex w-fit gap-1">
+    <div role="group" aria-label={text("auth.title")} className={SEG_TRACK}>
       {(["login", "invite"] as const).map(value => <Button key={value} type="button" variant="ghost" aria-pressed={mode === value} disabled={busy}
-        className={mode === value ? "bg-gaid-signal-tint font-semibold text-gaid-signal-ink" : "text-gaid-ink-2"}
+        className={segItem(mode === value)}
         onClick={() => { setMode(value); setPassword(""); setConfirm(""); setMismatch(false); }}>{text(`auth.${value}.title`)}</Button>)}
     </div>
     <form onSubmit={submit}>

@@ -34,7 +34,7 @@ import { ConnectionMapButton } from "@/geo/connections";
 const NOTE_PROSE = "[&_h1]:mt-6 [&_h1]:mb-2 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-sm [&_h3]:font-semibold";
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium";
 const TONE: Record<ResearchNoteStatus | "decision" | "format", string> = {
-  pending: "border-primary/30 bg-primary/10 text-primary",
+  pending: "border-gaid-control-edge bg-gaid-face text-gaid-ink",
   confirmed: "border-[var(--gaid-success)]/40 bg-[var(--gaid-success)]/10 text-[var(--gaid-success)]",
   superseded: "border-border bg-muted/50 text-muted-foreground",
   decision: "border-[var(--gaid-warning)]/40 bg-[var(--gaid-warning)]/10 text-[var(--gaid-warning)]",

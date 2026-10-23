@@ -136,7 +136,7 @@ export function SharedMethod({
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_16rem] md:items-start">
           <div className="flex min-w-0 flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
-              <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
+              <span className="rounded-full border px-2 py-1 text-gaid-ink">
                 {method.kind === "workflow" ? text("draft.workflow") : text("draft.skill")}
               </span>
               <span className="rounded-full border px-2 py-1 text-muted-foreground">

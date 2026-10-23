@@ -27,8 +27,8 @@ export function LibrarySyncLine({ onSynced, refreshKey }: { onSynced?: () => voi
   }, [status?.running, load]);
   if (!status?.available) return null;
   const pending = status.pending.items + status.pending.folders + status.pending.files;
-  return <div className="flex flex-col gap-2 border-b border-gaid-edge pb-3 text-[13px] text-gaid-ink-2" aria-label={text("sync.title")}>
-    <div className="flex flex-wrap items-center justify-between gap-2">
+  return <div className="-mt-1 flex flex-col gap-2 text-[13px] text-gaid-ink-2" aria-label={text("sync.title")}>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <p role="status" className="tabular-nums">{text(status.lastSyncedAt ? "sync.summary" : "sync.never", { when: status.lastSyncedAt ? dateLabel(status.lastSyncedAt) : "", pending, conflicts: status.conflicts })}</p>
       <Button type="button" size="sm" variant="outline" disabled={busy || status.running} onClick={async () => {
         setBusy(true); setError(null);

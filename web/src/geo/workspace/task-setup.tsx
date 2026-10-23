@@ -132,7 +132,9 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     : missingInputs.length ? t("workspace.setup.blockedInput", { roles: missingInputs.map((role) => text(role.label)).join(", ") })
     : null;
   const step = steps[index];
-  const nextBlocked = stageMissing(index).length ? t("workspace.setup.nextBlocked") : null;
+  // The reason names the missing inputs, as the summary does, so a stage with many inputs needs no hunting (S7, Q4).
+  const stageGap = stageMissing(index);
+  const nextBlocked = stageGap.length ? t("workspace.setup.blockedInput", { roles: stageGap.map((role) => text(role.label)).join(", ") }) : null;
 
   // Example inputs are bound to the project path the server writes them to (known before it is written).
   const exampleRoles = workflow.inputRoles.filter((role) => inputs[role.id]?.mode === "example" && role.example);

@@ -167,7 +167,8 @@ export function SharedBrowse({
                       <span className="truncate" title={entry.author}>{entry.author}</span>
                       {entry.authorOrcid && <OrcidId id={entry.authorOrcid.id} environment={entry.authorOrcid.environment} authenticated compact />}
                     </span>
-                    <span className="pointer-events-none relative text-right text-sm tabular-nums text-gaid-ink-2">{entry.latestRevision ? text("shared.version", { version: entry.revisions ? hubVersionOf(entry) ?? "" : "" }) : ""}</span>
+                    {/* The column heading says "version", so the cell carries the number alone and stays on one line (X1, I5). */}
+                    <span className="pointer-events-none relative whitespace-nowrap text-right text-sm tabular-nums text-gaid-ink-2">{entry.latestRevision && entry.revisions ? hubVersionOf(entry) ?? "" : ""}</span>
                     <span className="pointer-events-none relative inline-flex items-center justify-end gap-1 text-sm tabular-nums text-gaid-ink-2" aria-label={text("home.browse.stars", { count: entry.stars })}>
                       <StarIcon className="size-3.5" aria-hidden />{entry.stars}
                     </span>

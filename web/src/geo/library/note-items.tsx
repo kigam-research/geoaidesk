@@ -21,9 +21,9 @@ import { ItemFolders } from "./item-folders";
 
 const L = (key: string, values?: Record<string, unknown>) => t(`library.notes.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
-// Same marks as the notes panel (RN1): 검토 전 is the signal, 확인함 the success state, 대체됨 neutral.
+// Same marks as the notes panel (RN1): 검토 전 is an outlined neutral mark (blue never marks status, S3), 확인함 the success state, 대체됨 faint.
 const STATUS_TONE: Record<LibraryNoteStatus, string> = {
-  pending: "border-primary/30 bg-primary/10 text-primary",
+  pending: "border-gaid-control-edge bg-gaid-face text-gaid-ink",
   confirmed: "border-transparent bg-gaid-success-tint text-gaid-success",
   superseded: "border-gaid-edge text-gaid-ink-3",
 };
@@ -69,7 +69,7 @@ export function NoteTable({ rows, selected, onSelect }: { rows: LibraryItemSumma
               <div className="font-medium text-foreground">{row.title}</div>
               {row.note?.headline && <div className="line-clamp-1 text-xs text-muted-foreground">{row.note.headline}</div>}
             </td>
-            <td className="gaid-numeric whitespace-nowrap px-2 py-2.5">{row.note?.date ?? ""}</td>
+            <td className="gaid-numeric whitespace-nowrap px-2 py-2.5">{row.note?.date ? formatDate(row.note.date) : ""}</td>
             <td className="px-2 py-2.5">
               <div className="line-clamp-1" title={row.note?.projectName}>{row.note?.projectName}</div>
               {row.note && !row.note.local && <div className="text-xs text-muted-foreground">{row.note.missing ? L("missingShort") : L("otherPc", { name: row.note.originLabel })}</div>}

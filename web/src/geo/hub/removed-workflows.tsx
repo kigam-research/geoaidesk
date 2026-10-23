@@ -9,6 +9,7 @@ import { hubVersionOf } from "@/geo/contracts/hub-version";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { sharedHub } from "./shared-api";
 import { TechnicalDetail } from "./technical";
+import { PageBody, PageHeader } from "@/geo/shell/page-header";
 
 const text = geoText("hub");
 
@@ -44,19 +45,15 @@ export function RemoveWorkflowDialog({ open, onOpenChange, entry, local, onRemov
   </Dialog>;
 }
 
-export function RemovedWorkflows({ entries, onRestored, onBack, loading = false, error: loadError = null }: {
-  loading?: boolean; error?: string | null; entries: HubEntry[]; onRestored: () => Promise<void>; onBack: () => void;
+export function RemovedWorkflows({ entries, onRestored, loading = false, error: loadError = null }: {
+  loading?: boolean; error?: string | null; entries: HubEntry[]; onRestored: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<{ id: string; detail: string } | null>(null);
   const [restored, setRestored] = useState<string | null>(null);
-  return <main className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-    <div className="mx-auto max-w-6xl space-y-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">{text("removed.title")}</h1>
-        <Button variant="outline" onClick={onBack}>{text("shared.back")}</Button>
-      </header>
-      <p className="text-sm text-muted-foreground">{text("removed.body")}</p>
+  // Same page header as every hub list page (PageHeader); the sidebar already leads back to the lists.
+  return <PageBody className="gap-5">
+      <PageHeader title={text("removed.title")} context={text("removed.body")} />
       {restored && <p role="status" className="text-sm">{text("removed.restored", { title: restored })}</p>}
       {loading && <p role="status" className="text-sm">{text("home.loading")}</p>}
       {loadError && <div role="alert" className="space-y-2 text-sm"><p>{text("home.browse.error")}</p><TechnicalDetail detail={loadError} /><Button variant="outline" onClick={() => void onRestored()}>{text("home.browse.retry.button")}</Button></div>}
@@ -80,6 +77,5 @@ export function RemovedWorkflows({ entries, onRestored, onBack, loading = false,
           }}>{text(busy === entry.id ? "removed.busy" : "removed.restore")}</Button>
         </li>)}
       </ul>
-    </div>
-  </main>;
+  </PageBody>;
 }

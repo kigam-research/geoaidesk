@@ -139,8 +139,6 @@ export function SourceStep({
   project,
   goal,
   onGoal,
-  target,
-  onTarget,
   onFiles,
   onRemove,
   uploading,
@@ -171,8 +169,7 @@ export function SourceStep({
   project: AuthoringProject;
   goal: string;
   onGoal: (value: string) => void;
-  target: Target;
-  onTarget: (value: Target) => void;
+  /** The hub makes Workflows only, so the kind is no longer asked (a question with one real option is not a question, Q2). */
   onFiles: (files: File[]) => void;
   onRemove?: (sourceId: string) => void;
   uploading?: string | null;
@@ -185,9 +182,6 @@ export function SourceStep({
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
-  const targets: { id: Target; label: string }[] = [
-    { id: "workflow", label: text("sources.targetWorkflow") },
-  ];
   return (
     <section className="mx-auto flex w-full max-w-2xl flex-col gap-6 py-2">
       <h2 className="text-xl font-semibold">{text("sources.title")}</h2>
@@ -296,42 +290,28 @@ export function SourceStep({
         {text("sources.goal")}
         <Input value={goal} onChange={(e) => onGoal(e.target.value)} placeholder={text("sources.goalPlaceholder")} />
       </label>
-      <fieldset className="flex flex-col gap-1.5">
-        <legend className="mb-1.5 text-sm font-medium">{text("sources.target")}</legend>
-        <div className="flex gap-1 rounded-lg bg-muted p-1">
-          {targets.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              aria-pressed={target === t.id}
-              onClick={() => onTarget(t.id)}
-              className={cn(
-                "h-8 flex-1 rounded-md text-sm font-medium",
-                target === t.id ? "bg-background shadow-sm" : "text-muted-foreground",
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
       {analyzed && onNext && (
-        <div className="flex flex-col gap-2 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-gaid-edge bg-gaid-face-2 p-4">
           <p className="text-sm">{text("sources.readDone")}</p>
           <Button size="lg" onClick={onNext}>
             {text("sources.next")}
           </Button>
         </div>
       )}
-      <Button
-        size="lg"
-        variant={analyzed ? "outline" : "default"}
-        onClick={onStart}
-        disabled={!project.sources.length || Boolean(uploading)}
-      >
-        {analyzed ? text("sources.reread") : text("sources.start")}
-      </Button>
-      {!project.sources.length && <p className="-mt-3 text-sm text-muted-foreground">{text("sources.needSource")}</p>}
+      {/* The step's action stays in a fixed footer, like the question step's 이전/다음 (L7, Q4): long source lists
+          never push it below the window. It sticks into the authoring pane's 20 px bottom padding (py-5) so no
+          content shows under it. */}
+      <div className="sticky -bottom-5 -mx-1 flex flex-col gap-1.5 border-t border-gaid-edge bg-gaid-face px-1 pb-9 pt-3">
+        <Button
+          size="lg"
+          variant={analyzed ? "outline" : "default"}
+          onClick={onStart}
+          disabled={!project.sources.length || Boolean(uploading)}
+        >
+          {analyzed ? text("sources.reread") : text("sources.start")}
+        </Button>
+        {!project.sources.length && <p className="text-sm text-muted-foreground">{text("sources.needSource")}</p>}
+      </div>
     </section>
   );
 }

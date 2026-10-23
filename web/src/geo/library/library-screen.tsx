@@ -177,9 +177,9 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
       <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : counts?.all) ?? 0} allLabel={notes ? L("notes.allFolder") : undefined} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
       <section className={cn("flex min-w-0 flex-col gap-3", reading ? "flex-[38]" : "flex-1")} aria-label={L("screen.title")}>
-        <LibrarySyncLine onSynced={load} refreshKey={data} />
+        {/* Title first, top-leading, at the 내 연구 page-title size; the hub sync state is the one context line under it (L4, T1, W6). */}
         <div className="flex items-center justify-between gap-3">
-          <h1 className="min-w-0 truncate text-xl font-semibold">{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
+          <h1 className="min-w-0 truncate text-2xl font-bold" title={folder ? folderPath(collections, folder.id) : undefined}>{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">
             {!notes && !reading && <span className="text-xs text-muted-foreground">{zoteroLine}</span>}
             {notes ? (
@@ -197,6 +197,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
             </>)}
           </div>
         </div>
+        <LibrarySyncLine onSynced={load} refreshKey={data} />
         <div className="gaid-seg flex w-fit items-center gap-0.5 rounded-lg border border-gaid-edge bg-gaid-hover p-0.5" role="group" aria-label={L("category.label")}>
           {(["paper", "note"] as const).map((k) => (
             <button key={k} type="button" aria-pressed={category === k}
@@ -473,7 +474,8 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
         {uses.length === 0 && <p className="text-sm text-muted-foreground">{L("detail.usesEmpty")}</p>}
         {uses.map((use, i) => (
           <div key={i} className="flex items-start justify-between gap-3 text-sm">
-            <span className="min-w-0">
+            {/* Long Workflow and paper titles stay on two lines with the whole name in the tooltip (G1, T5). */}
+            <span className="line-clamp-2 min-w-0" title={useLabel(use)}>
               {useLabel(use)}
               {use.kind === "note" && use.locators.length > 0 && <span className="text-muted-foreground"> · {use.locators.join(", ")}</span>}
             </span>

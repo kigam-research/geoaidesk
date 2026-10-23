@@ -125,15 +125,14 @@ export function DraftStep({
             <Badge variant="outline">
               {text(draft.codeFiles.length ? "draft.implementation.implemented" : "draft.implementation.descriptive")}
             </Badge>
-            <span className="text-xs text-muted-foreground">{text("draft.revision", { n: draft.revision })}</span>
           </div>
           <p className="max-w-[640px] text-base">{localText(profile.tagline)}</p>
           {!draft.codeFiles.length && (
             <p className="text-sm text-muted-foreground">{text("draft.implementation.descriptiveHint")}</p>
           )}
           {onRegister && (
-            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
-              <Share2Icon className="size-5 text-primary" aria-hidden />
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-gaid-edge bg-gaid-face-2 p-3">
+              <Share2Icon className="size-5 text-gaid-ink-2" aria-hidden />
               <p className="min-w-0 flex-1 text-sm">
                 {registered ? text("register.registeredLine", { version: registered }) : text("register.line")}
               </p>
@@ -366,10 +365,15 @@ export function TrialCard({
           <Button variant="outline" onClick={onInstall} disabled={!consent || !previewReady || installing || !projectId || Boolean(disabledReason)}>
             {installing ? text("trial.installing") : text("trial.install")}
           </Button>
-          {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
+          {/* A disabled primary action says why on one line beside it (S7). */}
+          {disabledReason ? (
+            <p className="text-sm text-muted-foreground">{disabledReason}</p>
+          ) : !installing && (!projectId || !consent) ? (
+            <p className="text-sm text-muted-foreground">{text(!projectId ? "trial.needProject" : "trial.needConsent")}</p>
+          ) : null}
         </>
       )}
-      {installedIn && <p className="text-sm text-primary">{text("trial.installed", { project: installedIn })}</p>}
+      {installedIn && <p className="text-sm text-gaid-success">{text("trial.installed", { project: installedIn })}</p>}
     </section>
   );
 }

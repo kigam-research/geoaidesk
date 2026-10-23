@@ -137,7 +137,7 @@ describe("task catalogue and setup", () => {
       {(extension) => <WorkflowsPanel extension={extension} onLaunch={vi.fn()} availableFiles={[]} availableFolders={[]} filesReady />}
     </GeoTaskCatalogue>);
     const dialog = await openSetup(); await step(dialog, 2);
-    expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeDisabled(); expect(within(dialog).getByText("다음 단계로 가려면 파일을 고르세요.")).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeDisabled(); expect(within(dialog).getByText(/^필수 입력 파일을 고르세요: /)).toBeInTheDocument();
     await userEvent.click(radio(dialog, /B\.las/)); expect(within(dialog).getByRole("button", { name: "다음 단계" })).toBeEnabled();
     await step(dialog, 4); expect(within(dialog).getByText("B.las")).toBeInTheDocument();
   });
@@ -221,7 +221,7 @@ describe("task catalogue and setup", () => {
     dialog = await openSetup(/^MD 기준 QC/);
     expect(within(dialog).getByText("기반 작업: Well log QC well-qc")).toBeInTheDocument();
     // A recipe opens at the summary (UI guide Q4); its values are labelled as recipe values on their step.
-    expect(within(dialog).getByRole("heading", { name: "선택 내용 확인" })).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { name: "요약" })).toBeInTheDocument(); expect(within(dialog).getByText("측정 심도(MD)")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument();
     await step(dialog, 3); expect(radio(dialog, /측정 심도\(MD\)/)).toHaveAttribute("aria-checked", "true"); expect(within(dialog).getByText("저장한 시작 설정 값")).toBeInTheDocument(); await step(dialog, 4);
     await userEvent.click(within(dialog).getByRole("button", { name: "저장한 시작 설정 삭제" }));
     expect(apiFetch.mock.calls.some(([, init]) => init?.method === "DELETE")).toBe(false);
