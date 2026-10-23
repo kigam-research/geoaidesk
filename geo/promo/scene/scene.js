@@ -505,9 +505,16 @@
       box(hi, rx - 6, ry - 6, rw + 12, rh + 12);
       tagEl.textContent = bt.label;
       const tw = tagEl.offsetWidth, th = tagEl.offsetHeight;
-      // tag above the box when there is room, else inside its top-left corner
-      const tx = clamp(rx - 6, 12, FRAME.w - tw - 12);
-      const ty = ry - 6 - th - 10 >= 12 ? ry - 6 - th - 10 : ry + 10;
+      // tag outside the box where it fits in the frame: above, below, right, left; last resort inside top-right
+      const m = 12, gap = 10, L0 = rx - 6, T0 = ry - 6, R0 = rx + rw + 6, B0 = ry + rh + 6;
+      const fits = (x, y) => x >= m && y >= m && x + tw <= FRAME.w - m && y + th <= FRAME.h - m;
+      const cands = [
+        [clamp(L0, m, FRAME.w - tw - m), T0 - th - gap],
+        [clamp(L0, m, FRAME.w - tw - m), B0 + gap],
+        [R0 + gap, clamp(T0, m, FRAME.h - th - m)],
+        [L0 - tw - gap, clamp(T0, m, FRAME.h - th - m)],
+      ];
+      const [tx, ty] = cands.find(([x, y]) => fits(x, y)) || [R0 - tw - 16, T0 + 16];
       box(tagEl, tx, ty);
     };
   });

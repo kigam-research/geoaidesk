@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:31:14Z
+updated: 2026-10-23T02:32:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -59,7 +59,12 @@ media-craft for video tools, outputs outside Git, small PNG key frames in the re
 
 ## Current state
 - 2026-10-23: read v1 sources/report and the seoul_geomodel reference (full app frame at constant scale, one feature
-  tag + highlight box per beat, pointer moves, no zoom). Structure draft v2 below; demo data question pending.
+  tag + highlight box per beat, pointer moves, no zoom). Structure draft v2 below.
+- Scenes v2 written (`scene/scene.js`): background (real skill names, no counts, 개념도), cycle ring, demo chrome
+  (chapter title + cycle strip, whole frame at k=1.325, highlight + dim + Korean tag placed outside the box), second
+  brain (개념도), closing; `render.py` 105 s, `gaid-promo-v2.mp4`, capture schema v2, data optional. Previews
+  `~/data/geoaidesk/work/gaid-promo-video-v2/preview-0{1..4}` (preview-03/04 use v1 frames as stand-ins via
+  `fake-capture/`, preview only).
 - v1 copy (`~/data/geoaidesk/work/gaid-promo-video/home`) holds records from different studies: library = 3 spatial
   validation papers (Ploton, Meyer, Valavi/blockCV) in folder 공간 검증; hub Workflow `entry-ap-a135f290-1c4`
   "PU-컨포멀 탐사 우선순위 존 분류" (판 2) authored from the user's NRR paper (Yilgarn Ni, PU + conformal); a Yilgarn chat
