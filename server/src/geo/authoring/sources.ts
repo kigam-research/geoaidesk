@@ -15,9 +15,11 @@ import type {
   SourceDocument,
   SourceKind,
 } from "../../../../web/src/geo/contracts/authoring.ts";
+import { AUTHORING_SOURCE_LIMITS } from "../../../../web/src/geo/contracts/authoring.ts";
+import { CODE_NAME, inspectDataFiles, isDataName, renderDataSummary } from "./data-files.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
-export const SOURCE_LIMIT_BYTES = 30 * 1024 * 1024;
+export const SOURCE_LIMIT_BYTES = AUTHORING_SOURCE_LIMITS.sourceBytes;
 const MAX_FILES = 2000;
 const TEXT_LIMIT = 512 * 1024;
 export const sha256 = (b: Uint8Array) => createHash("sha256").update(b).digest("hex");
@@ -65,7 +67,7 @@ export function figureCaptions(page: number, text: string): ExtractedFigure[] {
   return out;
 }
 
-function kindOf(body: AddSourceBody, bytes: Uint8Array): SourceKind {
+function kindOf(body: { kind?: SourceKind; name: string; mediaType?: string }, bytes: Uint8Array): SourceKind {
   if (body.kind) return body.kind;
   const name = body.name.toLowerCase();
   if (
@@ -78,8 +80,16 @@ function kindOf(body: AddSourceBody, bytes: Uint8Array): SourceKind {
   if (/^gaid-analysis-[a-z0-9-]+\.tar\.gz$/.test(name)) return "gaid-analysis";
   if (/\.(zip|tar\.gz|tgz)$/.test(name)) return "code";
   // A single script or notebook is code too, so a draft may include it (packaging accepts code sources only).
-  if (/\.(py|r|m|jl|js|ts|ipynb|sh)$/.test(name)) return "code";
+  if (CODE_NAME.test(name)) return "code";
+  if (isDataName(name)) return "data";
   return "text";
+}
+
+/** An archive without code files whose files include geo data is a data source (e.g. a zipped shapefile set). */
+function archiveKind(files: Map<string, Uint8Array>): SourceKind {
+  const names = [...files.keys()];
+  if (names.some((n) => CODE_NAME.test(n))) return "code";
+  return names.some((n) => isDataName(n)) ? "data" : "code";
 }
 
 export function safeRelative(path: string): boolean {
@@ -239,41 +249,121 @@ async function extractFiles(
   };
 }
 
-/** Store the original bytes, extract text or an inventory, and append the source to the project. */
-export async function addSource(
+/** What a source is made of before it is stored: one original file, or a set of files read together. */
+export interface SourceInput {
+  name: string;
+  mediaType?: string;
+  kind?: SourceKind;
+  /** The original bytes (absent for a file set). */
+  bytes?: Uint8Array;
+  /** A set of files forming one source, by relative path (shapefile set, note with figures). */
+  files?: Map<string, Uint8Array>;
+  documentKind?: string;
+  doi?: string;
+  title?: string;
+  library?: SourceDocument["library"];
+  note?: SourceDocument["note"];
+}
+
+const MiB = 1024 * 1024;
+
+/** The authoring project is full (source count or total bytes). */
+export class SourceCapacityError extends AuthoringError {}
+
+/** Refuse a source the project cannot take: too many sources or too many bytes in total. */
+async function checkCapacity(store: AuthoringStore, projectId: string, size: number) {
+  const project = await store.read(projectId);
+  if (project.sources.length >= AUTHORING_SOURCE_LIMITS.sources)
+    throw new SourceCapacityError(`자료는 한 작업에 ${AUTHORING_SOURCE_LIMITS.sources}개까지 넣을 수 있습니다.`, 409);
+  const used = project.sources.reduce((n, s) => n + s.size, 0);
+  if (used + size > AUTHORING_SOURCE_LIMITS.projectBytes)
+    throw new SourceCapacityError(`한 작업의 자료는 모두 합해 ${AUTHORING_SOURCE_LIMITS.projectBytes / MiB} MiB 이하만 넣을 수 있습니다.`, 413);
+}
+
+/** sha256sum-style list of a file set; its hash identifies the set. */
+const setManifest = (files: Map<string, Uint8Array>) =>
+  [...files]
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([p, d]) => `${sha256(d)}  ${p}`)
+    .join("\n") + "\n";
+
+/** Store the original bytes, extract text or an inventory (data files: an inspection summary), and append the source. */
+export async function storeSource(
   store: AuthoringStore,
   projectId: string,
-  body: AddSourceBody,
+  input: SourceInput,
 ): Promise<{ source: SourceDocument; extraction: ExtractionRecord }> {
-  if (!body || typeof body.name !== "string" || typeof body.contentBase64 !== "string")
-    throw new AuthoringError("파일 이름과 내용이 필요합니다.");
-  const name = body.name.split(/[\\/]/).pop()!.trim();
+  const name = input.name.split(/[\\/]/).pop()!.trim();
   if (!name || name.length > 200) throw new AuthoringError("파일 이름을 확인해 주세요.");
-  const bytes = Buffer.from(body.contentBase64, "base64");
-  if (!bytes.length) throw new AuthoringError("빈 파일입니다.");
-  if (bytes.length > SOURCE_LIMIT_BYTES) throw new AuthoringError("파일은 30 MiB 이하만 받을 수 있습니다.", 413);
-  await store.read(projectId);
-  const kind = kindOf({ ...body, name }, bytes);
+  const set = input.files;
+  if (set) {
+    if (!set.size) throw new AuthoringError("빈 파일입니다.");
+    if (set.size > AUTHORING_SOURCE_LIMITS.setFiles)
+      throw new AuthoringError(`함께 올리는 파일은 ${AUTHORING_SOURCE_LIMITS.setFiles}개 이하만 받을 수 있습니다.`, 413);
+    for (const [p, d] of set) {
+      if (!safeRelative(p)) throw new AuthoringError(`안전하지 않은 경로는 받을 수 없습니다: ${p}`);
+      if (!d.length) throw new AuthoringError(`빈 파일입니다: ${p}`);
+    }
+  }
+  const original: Uint8Array = set ? Buffer.from(setManifest(set)) : (input.bytes ?? new Uint8Array());
+  if (!original.length) throw new AuthoringError("빈 파일입니다.");
+  const size = set ? [...set.values()].reduce((n, d) => n + d.length, 0) : original.length;
+  if (size > SOURCE_LIMIT_BYTES)
+    throw new AuthoringError(`파일은 ${SOURCE_LIMIT_BYTES / MiB} MiB 이하만 받을 수 있습니다.`, 413);
+  await checkCapacity(store, projectId, size);
+  let files: Map<string, Uint8Array> | undefined = set;
+  let kind = input.kind;
+  // An archive is unpacked before its kind is known (code, data or the chat's analysis bundle); a failure is recorded
+  // on the extraction like any other read failure.
+  let unpackError: unknown;
+  if (!files && /\.(zip|tar\.gz|tgz)$/i.test(name) && kind !== "pdf" && kind !== "text" && kind !== "note") {
+    try {
+      files = unpack(name, original);
+    } catch (e) {
+      unpackError = e;
+    }
+  }
+  if (!kind)
+    kind = set
+      ? [...set.keys()].some((n) => CODE_NAME.test(n))
+        ? "code"
+        : "data"
+      : files
+        ? kindOf({ name, mediaType: input.mediaType }, original) === "gaid-analysis"
+          ? "gaid-analysis"
+          : archiveKind(files)
+        : kindOf({ name, mediaType: input.mediaType }, original);
   const source: SourceDocument = {
     id: newId("src"),
     kind,
     name,
-    mediaType: body.mediaType || "application/octet-stream",
-    sha256: sha256(bytes),
-    size: bytes.length,
+    mediaType: set ? "text/plain" : input.mediaType || "application/octet-stream",
+    sha256: sha256(original),
+    size,
     addedAt: now(),
     status: "received",
-    ...(body.documentKind?.trim() ? { documentKind: body.documentKind.trim().slice(0, 200) } : {}),
-    ...(body.doi?.trim() ? { doi: body.doi.trim().slice(0, 200) } : {}),
+    ...(input.documentKind?.trim() ? { documentKind: input.documentKind.trim().slice(0, 200) } : {}),
+    ...(input.doi?.trim() ? { doi: input.doi.trim().slice(0, 200) } : {}),
+    ...(input.title?.trim() ? { title: input.title.trim().slice(0, 300) } : {}),
+    ...(input.library ? { library: input.library } : {}),
+    ...(input.note ? { note: input.note } : {}),
   };
-  const original = await store.writeFile(projectId, `sources/${source.id}/original`, bytes);
+  const originalPath = await store.writeFile(projectId, `sources/${source.id}/original`, original);
   let extraction: ExtractionRecord;
   try {
-    if (kind === "pdf") extraction = await extractPdf(store, projectId, source, original);
-    else if (kind === "code" || kind === "gaid-analysis") {
-      const files = /\.(zip|tar\.gz|tgz)$/i.test(name) ? unpack(name, bytes) : new Map([[name, new Uint8Array(bytes)]]);
-      extraction = await extractFiles(store, projectId, source, files);
-    } else extraction = await extractFiles(store, projectId, source, new Map([[name, new Uint8Array(bytes)]]));
+    if (kind === "pdf") extraction = await extractPdf(store, projectId, source, originalPath);
+    else {
+      if (unpackError) throw unpackError;
+      extraction = await extractFiles(store, projectId, source, files ?? new Map([[name, new Uint8Array(original)]]));
+      const entries = extraction.files ?? [];
+      if (entries.some((e) => isDataName(e.path))) {
+        await inspectDataFiles(store.within(projectId, "sources", source.id, "files"), entries);
+        extraction.tool = "file inventory + geo inspection";
+        // A data file counts as read when the inspection described it.
+        for (const e of entries)
+          if (e.data && !e.text) extraction.characters += renderDataSummary(e.path, e.size, e.data).length;
+      }
+    }
   } catch (e) {
     extraction = {
       sourceId: source.id,
@@ -297,6 +387,55 @@ export async function addSource(
     p.sourceRevision += 1;
   });
   return { source, extraction };
+}
+
+/** `POST …/sources`: one file (base64) or a set of files read together (`files`). */
+export async function addSource(
+  store: AuthoringStore,
+  projectId: string,
+  body: AddSourceBody,
+): Promise<{ source: SourceDocument; extraction: ExtractionRecord }> {
+  if (!body || typeof body.name !== "string") throw new AuthoringError("파일 이름과 내용이 필요합니다.");
+  await store.read(projectId);
+  if (body.files !== undefined) {
+    if (!Array.isArray(body.files)) throw new AuthoringError("파일 목록을 확인해 주세요.");
+    const files = new Map<string, Uint8Array>();
+    let total = 0;
+    for (const f of body.files) {
+      if (!f || typeof f.name !== "string" || typeof f.contentBase64 !== "string")
+        throw new AuthoringError("파일 이름과 내용이 필요합니다.");
+      const n = f.name.split(/[\\/]/).pop()!.trim();
+      if (!n || n.length > 200 || files.has(n)) throw new AuthoringError("파일 이름을 확인해 주세요.");
+      const bytes = Buffer.from(f.contentBase64, "base64");
+      total += bytes.length;
+      if (total > SOURCE_LIMIT_BYTES)
+        throw new AuthoringError(`파일은 ${SOURCE_LIMIT_BYTES / MiB} MiB 이하만 받을 수 있습니다.`, 413);
+      files.set(n, new Uint8Array(bytes));
+    }
+    const { files: _list, ...meta } = body;
+    return storeSource(store, projectId, { ...meta, files });
+  }
+  if (typeof body.contentBase64 !== "string") throw new AuthoringError("파일 이름과 내용이 필요합니다.");
+  const bytes = Buffer.from(body.contentBase64, "base64");
+  if (!bytes.length) throw new AuthoringError("빈 파일입니다.");
+  if (bytes.length > SOURCE_LIMIT_BYTES)
+    throw new AuthoringError(`파일은 ${SOURCE_LIMIT_BYTES / MiB} MiB 이하만 받을 수 있습니다.`, 413);
+  const { files: _none, ...meta } = body;
+  return storeSource(store, projectId, { ...meta, bytes: new Uint8Array(bytes) });
+}
+
+/** Remove a source and its stored files; refused while a draft revision still uses one of its code files. */
+export async function removeSource(store: AuthoringStore, projectId: string, sourceId: string): Promise<void> {
+  await store.mutate(projectId, (p: AuthoringProject) => {
+    const index = p.sources.findIndex((s) => s.id === sourceId);
+    if (index < 0) throw new AuthoringError("자료를 찾을 수 없습니다.", 404);
+    if (p.drafts.some((d) => d.codeFiles?.some((c) => c.sourceId === sourceId)))
+      throw new AuthoringError("초안이 이 자료의 코드 파일을 쓰고 있어 뺄 수 없습니다.", 409);
+    p.sources.splice(index, 1);
+    delete p.extractions[sourceId];
+    p.sourceRevision += 1;
+  });
+  await rm(store.within(projectId, "sources", sourceId), { recursive: true, force: true });
 }
 
 export async function pageText(store: AuthoringStore, projectId: string, sourceId: string, page: number) {

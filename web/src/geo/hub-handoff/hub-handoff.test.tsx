@@ -155,6 +155,26 @@ describe("hub analysis handoff", () => {
     expect(window.location.hash).toBe("#hub/ap-12345678-abc");
     expect(saveDownload).not.toHaveBeenCalled();
   });
+  it("offers the chat's research notes and the project's papers for the hub draft", async () => {
+    const base = apiFetch.getMockImplementation()!;
+    apiFetch.mockImplementation(async (path: string, init?: RequestInit) => {
+      if (path === "/geo/notes") return json({ notes: [
+        { id: "2026-10-23-grid", title: "격자 결과", date: "2026-10-23", sessions: ["s1"] },
+        { id: "2026-10-01-old", title: "이전 노트", date: "2026-10-01", sessions: ["s0"] },
+      ] });
+      if (path.startsWith("/geo/library?")) return json({ items: [{ id: "li-1", title: "Magnetite inversion", authors: "Kim 외", year: 2025 }] });
+      return base(path, init);
+    });
+    render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
+    const dialog = await open();
+    expect(await dialog.findByRole("checkbox", { name: /격자 결과/ })).toBeChecked();
+    expect(dialog.getByRole("checkbox", { name: /이전 노트/ })).not.toBeChecked();
+    expect(dialog.getByRole("checkbox", { name: /Magnetite inversion/ })).toBeChecked();
+    await userEvent.click(dialog.getByRole("button", { name: "허브 초안으로 보내기" }));
+    await dialog.findByText("GAID 허브에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.");
+    const call = apiFetch.mock.calls.find(([path]) => path === "/geo/authoring/handoffs")!;
+    expect(JSON.parse(call[1].body)).toMatchObject({ notes: ["2026-10-23-grid"], libraryItemIds: ["li-1"] });
+  });
   it("shows the final answer without Markdown markers", () => {
     expect(plainMarkdown("## 최종 보고\n- **블록 크기**: `50 km` ([그림](outputs/v.png))")).toBe("최종 보고\n• 블록 크기: 50 km (그림)");
   });
