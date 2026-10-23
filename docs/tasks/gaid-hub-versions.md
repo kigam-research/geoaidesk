@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T08:04:28Z
+status: done
+updated: 2026-10-23T08:04:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e1c6a78f-11ec-46f9-83ba-acc24d237672","pid":2123332,"provider":"claude","session":"328f1569-b8ae-42a5-b1df-4474b7414b05","start":"62565307","token":"531aa2e1e3ef35b52322f15aaf618da80fc168d4620d8ba20079dacaadf3241b"}
 branch: task/gaid-hub-versions
 target: main
@@ -70,17 +70,9 @@ Orchestration (2026-10-23):
   hub-skills,workflow/workflow-view.tsx} and locales except workflowDoc, terminology.csv). Integration: child completes into
   this branch, then writer runs scripts/check and writes the report.
 ## Next steps
-1. Done: GAID-side tests (local removal/restore, register bump, older records), e2e remote removal, server version/removal/import tests. Child `gaid-hub-versions--ui` (writer 85dddf2d) runs the UI package.
-2. Done since: basedOn.version, HubSkillUse.version/HubSkillOrigin.workflow.version (child requests), chat label parser
-   (`web/src/lib/command-blocks.ts`) accepts version, migration-5 fixtures, glossary `version` row, AGENTS.md and
-   docs/geo/hub-server.md. Full server vitest: only helper-venv/geopandas/office environment failures remain locally
-   (scripts/check prepares the helper venv).
-3. Done: child completed and closed (f534c8da); scripts/check passed on the integrated branch (server 2260/8 skipped, web 1246,
-   copy/UI checks, production smoke). Report written, humanized, review-copied. First finish hit merge conflicts with main (units A-D merged first):
-   resolved in 932bc42f-amended merge (version + data="example" block attrs, locales, boundaries); typecheck, copy/UI checks,
-   affected web (688) and server tests pass. Next: rerun task finish. Rollout after merge
-   (hub): restart the institute hub server (PC74 :8700) on this code for migration 5; review app update.
-   Previously: `task complete`, integrate, scripts/check, AGENTS.md wording (판 → version), report.
+<!-- task:closed -->
+Closed 2026-10-23T08:04:29Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

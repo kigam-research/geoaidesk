@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T07:29:15Z
+status: done
+updated: 2026-10-23T08:04:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"85dddf2d-e5cf-4fd4-9e09-1bd517612fc9","pid":2306567,"provider":"codex","session":"01a1678c-afff-7a90-bcc6-4c8ff80df8f6","start":"62657466","token":"439122785c0ef2741fb6290719f33f7d911ae7984a2150a314072fcd11f03a42"}
 branch: task/gaid-hub-versions--ui
 target: task/gaid-hub-versions
@@ -111,7 +111,7 @@ Sequential decisions and integration: retain numeric revisions only for transpor
 
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T07:29:15Z: ready; the parent gaid-hub-versions integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T08:04:29Z: integrated into gaid-hub-versions; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First `task finish`: server (2260 tests) and web (1246 tests) passed. Distribution test rejected the new integration-boundary owner `gaid-hub-versions`, absent from its explicit allowlist. Added the actual package owner to `geo/tests/distribution.test.mjs`; targeted distribution suite: 7/7 passed. No runtime or UI source changed for this fix.
