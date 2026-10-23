@@ -48,6 +48,8 @@ describe("start settings with example data", () => {
   it("selects the example when the researcher has no file, prepares it on start and marks the chat", async () => {
     setup(workflow("bundled"));
     const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText(/예제 자료가 있습니다: 공개 항공자력 격자/)).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
     const card = within(dialog).getByRole("radio", { name: /예제 자료 사용: 공개 항공자력 격자/ });
     expect(card).toHaveAttribute("aria-checked", "true");
     expect(within(dialog).getByText("Workflow에 들어 있습니다 (2.0 KB). 시작할 때 프로젝트에 복사합니다.")).toBeInTheDocument();
@@ -80,6 +82,8 @@ describe("start settings with example data", () => {
   it("uploads the researcher's file from the input step and selects it", async () => {
     setup(workflow("remote"));
     const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText(/예제 자료가 있습니다: 공개 항공자력 격자/)).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
     expect(within(dialog).getByText("시작할 때 2.0 KB를 내려받고 해시를 확인합니다.")).toBeInTheDocument();
     const input = within(dialog).getByLabelText("내 파일 올리기", { selector: "input" });
     await userEvent.upload(input, new File(["x,y\n"], "my-grid.csv", { type: "text/csv" }));

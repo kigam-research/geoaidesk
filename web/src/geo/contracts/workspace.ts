@@ -267,8 +267,8 @@ export interface GeoStartTaskDetail {
   attachedFiles: string[];
   /** Skills pinned to the draft (`/skills` rows). */
   skills: { id: string; name: string; description: string }[];
-  /** Exposure the chat's session is created with on its first send. */
-  geoExposure: GeoExposureMode;
+  /** Exposure the chat's session is created with on its first send; absent: the project's default, as for any new chat. */
+  geoExposure?: GeoExposureMode;
   /** Set synchronously by the workspace page while it handles the event. */
   result?: "opened" | "tab-limit";
 }

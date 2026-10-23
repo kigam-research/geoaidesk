@@ -34,6 +34,11 @@ const trialsBadge = (workflow: LocalMethodWorkflow) => workflow.trials.count ===
 const stageBadge = (method: LocalMethodSummary, withCode: boolean) =>
   <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{method.origin.hubEntry ? t("methods.registered", { revision: method.origin.hubEntry.revision }) : t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
 
+/** The start window's source line: hub Workflow and its registered revision, or the hub stage of a draft. */
+const methodSource = (method: LocalMethodSummary) => method.origin.hubEntry
+  ? t("workspace.start.source.hub")
+  : t("methods.badge.stage", { stage: method.lifecycle });
+
 /** Method details: the package badges. Each Workflow card states its readiness and record in its readiness line. */
 export function MethodBadges({ method }: { method: LocalMethodSummary }) {
   return <>
@@ -142,6 +147,7 @@ export function useMethodRows(projectId: string, availableFiles: string[] = []) 
   const dialogs: ReactNode = <>
     {detailMethod && <MethodDetail key={`${projectId}:${detailMethod.key}`} method={detailMethod} projectId={projectId} onClose={() => setDetailKey(null)} onSetup={(workflow, recipe) => selectSetup(detailMethod, workflow, recipe)} />}
     {selectedMethod && selectedWorkflow && <TaskSetup key={`${projectId}:${selectedMethod.key}:${selectedWorkflow.id}:${selectedRecipe?.id ?? ""}`} workflow={selectedWorkflow} exposure={selectedWorkflow.exposure} projectId={projectId} availableFiles={availableFiles} open onOpenChange={(open) => { if (!open) setSetup(null); }} onRefresh={reload}
+      source={methodSource(selectedMethod)}
       initialSetup={selectedRecipe ? { workflowId: selectedWorkflow.id, choices: Object.fromEntries(Object.entries(selectedRecipe.choices).map(([id, value]) => [id, String(value)])), unresolvedChoices: selectedRecipe.unresolvedChoices, skillIds: selectedWorkflow.skillIds, exampleId: null } : undefined} />}
   </>;
   return { category, rows, dialogs, notice, reload };

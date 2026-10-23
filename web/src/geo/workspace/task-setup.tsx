@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { TechnicalDetail } from "@/geo/hub/technical";
 import { t } from "@/geo/i18n";
 import type { GeoWorkflowSummary, GeoRecipeCheckResponse, GeoExposureMode } from "@/geo/contracts/workspace";
 import type { SkillInfo } from "@/lib/capabilities";
@@ -15,7 +13,10 @@ import { WorkflowInstructions } from "@/geo/workflow/workflow-view";
 import { workflowStartMessage } from "@/geo/workflow/render";
 import { ReadinessNotice } from "./readiness";
 import { DeleteRecipe } from "./recipe-add";
-import { ChoiceStep, InputStep, StepRail, SummaryRows, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, setupSteps, sizeText, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
+import { ChoiceStep, InputStep, SummaryRows, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, nameMatches, setupSteps, sizeText, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
+import { StartWindow, introNextLabel, type StartStep } from "./start-window";
+import { GeoIntro } from "./start-intro";
+import { localText } from "@/geo/hub/text";
 import { isExamplePath, type PrepareExamplesResponse } from "@/geo/contracts/workflow-examples";
 
 export const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -30,6 +31,9 @@ export function WorkflowOutputs({ workflow }: { workflow: GeoWorkflowSummary }) 
 export function initialInputs(workflow: GeoWorkflowSummary, files: string[], initialBindings: Record<string, string>): Record<string, InputAnswer> {
   const answers: Record<string, InputAnswer> = {};
   const own = files.filter((path) => !isExamplePath(path));
+  // F17 (gaid-pocheon-trial): a project file whose name matches one input better than any other starts bound to it, so
+  // an optional input with the researcher's file is not silently left out of the run.
+  const matched = nameMatches(workflow.inputRoles.filter((role) => !initialBindings[role.id]), own);
   for (const role of workflow.inputRoles) {
     const bound = initialBindings[role.id];
     // A required input with exactly one fitting file in the project starts bound to it (gaid-hub trial: one CSV, still
@@ -39,6 +43,7 @@ export function initialInputs(workflow: GeoWorkflowSummary, files: string[], ini
     if (bound && role.example && bound === role.example.path && exampleUsable(role)) answers[role.id] = { mode: "example" };
     else if (bound) answers[role.id] = { mode: accepts(bound, role.extensions) ? "file" : "other", path: bound };
     else if (role.required && fitting.length === 1) answers[role.id] = { mode: "file", path: fitting[0] };
+    else if (matched[role.id]) answers[role.id] = { mode: "file", path: matched[role.id] };
     else if (role.required && exampleUsable(role)) answers[role.id] = { mode: "example" };
     else if (!role.required) answers[role.id] = { mode: "none" };
   }
@@ -65,12 +70,16 @@ function initialChoices(workflow: GeoWorkflowSummary, setup: GeoRecipeCheckRespo
  * Workflow start settings (UI guide Q1–Q6): one input file or analysis condition per step, a grouped step rail,
  * a summary with Edit links and one primary action that puts a start draft into a new chat (never sent).
  */
-export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe, exposure }: {
+export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenChange, onRefresh, initialBindings = {}, initialSetup, recipe, exposure, source, resume = false }: {
   workflow: GeoWorkflowSummary; projectId: string; availableFiles: string[]; open: boolean; onOpenChange: (open: boolean) => void; onRefresh: () => void | Promise<void>;
   initialBindings?: Record<string, string>; initialSetup?: GeoRecipeCheckResponse["setup"];
   exposure?: string;
   /** Set when the setup comes from a saved recipe (gaid-workflow-catalog). */
   recipe?: { title: string; onDelete: () => Promise<void> };
+  /** Where the Workflow comes from, shown above the title (기본 Workflow, 등록됨 n판, 허브 초안 …). */
+  source?: string;
+  /** Opened from the researcher's own saved start settings (a `.geo-start.json` file): skip the introduction. */
+  resume?: boolean;
 }) {
   const [uploaded, setUploaded] = useState<string[]>([]);
   const files = [...new Set([...availableFiles, ...uploaded, ...Object.values(initialBindings)])].sort();
@@ -80,13 +89,14 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const [choices, setChoices] = useState(() => initialChoices(workflow, initialSetup));
   const done = (i: number) => {
     const step = steps[i];
+    if (step.kind === "intro") return i < index;
     return step.kind === "input" ? inputDone(inputs[step.role.id]) : step.kind === "choice" ? choiceDone(choices[step.choice.id]) : false;
   };
-  // A setup opened with earlier answers (recipe, method defaults, file suggestion) starts at the first open required
-  // input, else the summary (Q4); a fresh setup starts at step 1.
+  // Every Workflow opens on what it does (gaid-workflow-start-ui), also with a Workflow's own default settings. Only the
+  // researcher's saved start settings resume at the first open required input, else the summary (Q4).
   const [index, setIndex] = useState(() => {
-    if (!recipe && !initialSetup) return 0;
-    const open = steps.findIndex((step, i) => step.kind === "input" && step.role.required && !done(i));
+    if (!recipe && !resume) return 0;
+    const open = steps.findIndex((step) => step.kind === "input" && step.role.required && !inputDone(inputs[step.role.id]));
     return open < 0 ? summary : open;
   });
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
@@ -160,73 +170,62 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     finally { setBusy(false); }
   };
 
+  const ownFiles = files.filter((path) => !isExamplePath(path));
   const rows: SummaryRow[] = steps.flatMap((row, i): SummaryRow[] => {
     if (row.kind === "input") {
       const answer = inputs[row.role.id];
-      return [{ step: i, label: text(row.role.label), value: inputValue(answer, row.role), muted: answer?.mode === "none", title: bindings[row.role.id] }];
+      // F17: an optional input left unused while the project holds a fitting file is pointed out, not hidden.
+      const unusedFit = answer?.mode === "none" && ownFiles.some((path) => accepts(path, row.role.extensions));
+      return [{ step: i, group: t("workspace.start.group.input"), label: text(row.role.label), value: inputValue(answer, row.role), muted: answer?.mode === "none", title: bindings[row.role.id], note: unusedFit ? t("workspace.start.unusedFit") : undefined }];
     }
-    return row.kind === "choice" ? [{ step: i, label: text(row.choice.label), value: choiceValue(row.choice, choices[row.choice.id]), muted: !(row.choice.id in values) }] : [];
+    return row.kind === "choice" ? [{ step: i, group: t("workspace.start.group.choice"), label: text(row.choice.label), value: choiceValue(row.choice, choices[row.choice.id]), muted: !(row.choice.id in values) }] : [];
   });
   const untested = workflow.readiness.runRecord === "none";
   const undecided = workflow.requiredScientificChoices.filter((choice) => !(choice.id in values)).length;
 
-  return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="flex h-[min(680px,85dvh)] flex-col gap-0 p-0 sm:max-w-[720px]">
-      <div className="space-y-4 border-b px-6 pt-5 pb-4">
-        <div className="space-y-1 pr-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <DialogTitle className="text-xl leading-snug break-words">{recipe?.title ?? text(workflow.title)}</DialogTitle>
-            {untested && <Badge variant="outline" title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</Badge>}
-          </div>
-          <DialogDescription className="break-words">{recipe ? t("workspace.saved.based", { title: text(workflow.title) }) : t("workspace.setup.description")}</DialogDescription>
-        </div>
-        <StepRail steps={steps} index={index} done={done} onSelect={setIndex} />
-      </div>
+  const startSteps: StartStep[] = steps.map((row, i) => ({
+    group: row.kind,
+    label: stepName(row),
+    done: row.kind === "intro" ? index > 0 : row.kind === "summary" ? false : done(i),
+  }));
+  const purpose = localText(workflow.doc?.purpose) || text(workflow.description);
+  const meta = <>
+    {source && <span>{source}</span>}
+    {workflow.doc?.revision ? <><span aria-hidden>·</span><span className="tabular-nums">{t("workspace.start.revision", { revision: workflow.doc.revision })}</span></> : null}
+    {untested && <Badge variant="outline" title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</Badge>}
+  </>;
+  const notice = (state !== "ready" || wasBlocked) ? <div className="mb-4"><ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} /></div> : null;
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
-        <p className="sr-only" aria-live="polite">{t("workspace.setup.stepLabel", { n: index + 1, name: stepName(step) })}</p>
-        {index === 0 && (state !== "ready" || wasBlocked) && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
-        {step.kind === "input" && <InputStep key={step.role.id} role={step.role} files={files} answer={inputs[step.role.id]} onAnswer={(answer) => setInputs({ ...inputs, [step.role.id]: answer })} onUpload={uploadFiles} />}
-        {step.kind === "choice" && <ChoiceStep key={step.choice.id} choice={step.choice} answer={choices[step.choice.id]} recipeValue={initialSetup?.choices[step.choice.id]} onAnswer={(answer) => setChoices({ ...choices, [step.choice.id]: answer })} />}
-        {step.kind === "summary" && <section aria-labelledby="gaid-setup-summary" className="space-y-4">
-          <div className="space-y-1">
-            <h3 id="gaid-setup-summary" className="text-base font-semibold">{t("workspace.setup.summaryTitle")}</h3>
-            <p className="text-sm text-muted-foreground">{t("workspace.setup.summaryBody")}</p>
-          </div>
-          {index !== 0 && state !== "ready" && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
-          {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
-          {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
-          {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
-          {mixed && <p className="text-sm text-gaid-ink-2">{t("workspace.setup.example.mixed")}</p>}
-          <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
-          {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples }} />}
-          <details className="text-sm">
-            <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
-            <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>
-          </details>
-        </section>}
-        {index === 0 && <details className="text-sm">
-          <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreAbout")}</summary>
-          <div className="mt-2 space-y-2 rounded-lg bg-muted/60 px-3 py-2 text-xs break-words">
-            {workflow.description && <p>{text(workflow.description)}</p>}
-            <p>{t("workspace.catalogue.inputs", { formats: [...new Set(workflow.inputRoles.flatMap((role) => role.extensions))].join(", ") })}</p>
-          </div>
-        </details>}
+  return <StartWindow open={open} onOpenChange={onOpenChange} title={recipe?.title ?? text(workflow.title)} meta={meta}
+    purpose={recipe ? t("workspace.saved.based", { title: text(workflow.title) }) : purpose}
+    steps={startSteps} index={index} onIndex={setIndex} error={error}
+    reason={index === summary ? blocked : nextBlocked}
+    leading={recipe && index === summary ? <DeleteRecipe onDelete={recipe.onDelete} /> : null}
+    actions={<>
+      {index > 0 && <Button variant="outline" onClick={() => setIndex(index - 1)}>{t("workspace.setup.prev")}</Button>}
+      {index < summary
+        ? <Button disabled={Boolean(nextBlocked)} onClick={() => setIndex(index + 1)}>{index === 0 ? introNextLabel(startSteps) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
+        : <Button disabled={busy || Boolean(blocked)} onClick={() => void start()}>{t(busy ? (examples.length ? "workspace.setup.example.preparing" : "workspace.setup.creating") : "workspace.setup.create")}</Button>}
+    </>}>
+    {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} />}
+    {step.kind === "input" && <InputStep key={step.role.id} role={step.role} files={files} answer={inputs[step.role.id]} onAnswer={(answer) => setInputs({ ...inputs, [step.role.id]: answer })} onUpload={uploadFiles} />}
+    {step.kind === "choice" && <ChoiceStep key={step.choice.id} choice={step.choice} answer={choices[step.choice.id]} recipeValue={initialSetup?.choices[step.choice.id]} onAnswer={(answer) => setChoices({ ...choices, [step.choice.id]: answer })} />}
+    {step.kind === "summary" && <section aria-labelledby="gaid-setup-summary" className="space-y-4">
+      <div className="space-y-1">
+        <h3 id="gaid-setup-summary" className="text-base font-semibold">{t("workspace.setup.summaryTitle")}</h3>
+        <p className="text-sm text-muted-foreground">{t("workspace.setup.summaryBody")}</p>
       </div>
-
-      <div className="space-y-2 border-t px-6 py-3">
-        {error && <div role="alert" className="space-y-1 text-sm text-destructive"><p>{error.message}</p><TechnicalDetail detail={error.detail} /></div>}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-muted-foreground tabular-nums">{t("workspace.setup.counter", { n: index + 1, total: steps.length })}</span>
-          {recipe && index === summary && <DeleteRecipe onDelete={recipe.onDelete} />}
-          <span className="ml-auto max-w-[50%] text-right text-xs text-muted-foreground break-words">{index === summary ? blocked : nextBlocked}</span>
-          {index > 0 && <Button variant="outline" onClick={() => setIndex(index - 1)}>{t("workspace.setup.prev")}</Button>}
-          {index < summary
-            ? <Button disabled={Boolean(nextBlocked)} onClick={() => setIndex(index + 1)}>{t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
-            : <Button disabled={busy || Boolean(blocked)} onClick={() => void start()}>{t(busy ? (examples.length ? "workspace.setup.example.preparing" : "workspace.setup.creating") : "workspace.setup.create")}</Button>}
-        </div>
-      </div>
-    </DialogContent>
-  </Dialog>;
+      {state !== "ready" && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
+      {rows.length > 0 && <SummaryRows rows={rows} onEdit={setIndex} />}
+      {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
+      {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
+      {mixed && <p className="text-sm text-gaid-ink-2">{t("workspace.setup.example.mixed")}</p>}
+      <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
+      {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples }} />}
+      <details className="text-sm">
+        <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
+        <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>
+      </details>
+    </section>}
+  </StartWindow>;
 }
-

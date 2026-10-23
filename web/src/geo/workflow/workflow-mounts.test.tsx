@@ -34,6 +34,8 @@ it("mounts the document in a project's Workflow detail and keeps the CLI action 
 });
 it("mounts the chat-target instruction disclosure in the start summary", () => {
   render(<TaskSetup workflow={workflow} projectId="p1" availableFiles={[]} open onOpenChange={vi.fn()} onRefresh={vi.fn()} />);
+  // No inputs or conditions: the introduction leads straight to the summary.
+  fireEvent.click(screen.getByRole("button", { name: "요약 보기" }));
   fireEvent.click(screen.getByText("AI agent가 받는 지침 보기"));
   expect(screen.getByText(/# Workflow: 화면 연결 시험/)).toHaveTextContent("정하지 않은 조건: 없음");
 });
