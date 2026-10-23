@@ -112,8 +112,8 @@ node geo/hub-server.mjs orcid-client clear   # turns ORCID sign-in off; linked i
 It writes `<GAID_HUB_SERVER_HOME>/orcid-client.json` (mode 600) and takes effect without a restart. The file is not part of
 `backup`; after a restore or a move, run `orcid-client set` again. One iD can be linked to one account; a researcher removes
 their own link in GAID. The researcher's GAID must run its backend at `127.0.0.1:8000` (the default) for the redirect to
-reach it, and the browser must run on the same PC. Whether ORCID production accepts this loopback HTTP redirect is not yet
-verified (the sandbox does); see the ADR.
+reach it, and the browser must run on the same PC. ORCID production and sandbox both accepted this loopback HTTP redirect in
+an end-to-end test on 2026-10-23 (see the ADR).
 
 ## Shared skill shelf
 

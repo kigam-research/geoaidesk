@@ -40,5 +40,6 @@ the hub server is a non-browser API on the institute LAN (it refuses requests wi
 - Authentication needs a hub server account and a configured hub; without them phase 1 (unauthenticated iD) still works.
 - The registered redirect URI fixes the GAID backend address (`http://127.0.0.1:8000/geo/orcid/callback`); a GAID on another
   port cannot authenticate until that URI is registered too.
-- Whether ORCID production accepts the loopback HTTP redirect is unverified; if it does not, production needs an HTTPS
-  redirect target and this ADR is revisited. Sandbox is the test environment until then.
+- ORCID accepts the loopback HTTP redirect in both environments: verified end to end on 2026-10-23 with the user's sandbox
+  client (10:46 KST) and production client (10:57 KST, the user's own iD; the test link was removed afterwards). If ORCID
+  later restricts it, production needs an HTTPS redirect target and this ADR is revisited.
