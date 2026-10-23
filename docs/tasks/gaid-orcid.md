@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:53:59Z
+updated: 2026-10-23T01:58:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -85,7 +85,11 @@ Outside check: no outside check.
    consumed; audit has orcid.start/orcid.link; secret not in hub.sqlite. Backend request log held the one-time code/state →
    added `server/src/geo/orcid/log.ts` redaction in the request serializer (seam server/src/index.ts, boundaries entry).
    Both e2e services stopped and disposed as cancelled (deliberate stop).
-4. Production: still unknown whether ORCID production accepts the loopback redirect (user to try registering).
+4. Production DONE 2026-10-23 10:57 KST: user registered production client APP-V8F0MWRKJYRFP1N8 ("GAID") with the loopback
+   redirect (form accepted it), stored the secret in the e2e test hub (hidden prompt), signed in with their own iD; hub
+   account linked 0000-0003-2034-5770 (production). Afterwards: hub link removed (DELETE /geo/orcid/auth), local iD removed,
+   client file cleared from the e2e hub, jobs 3/4 stopped and disposed (cancelled, deliberate stop). The institute hub
+   (PC74 :8700) was not touched; configuring it with the production client is a rollout step for the operator.
 5. After 2–3: full scripts/check, report section for phase 2, humanizer, review-copy, task finish.
 ## Failed approaches
 ## Notes and decisions
@@ -130,6 +134,9 @@ Report: reports/2026-10-22-gaid-orcid/index.md
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T013952.968887Z/receipt.json
   - disposition: {"evidence":[],"reason":"Interactive sandbox e2e service deliberately stopped after the successful ORCID sign-in (hub account linked 0009-0004-4407-0032, 2026-10-23 10:46 KST)","recorded":"2026-10-23T01:48:39Z","state":"cancelled"}
 - /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T015354.868333Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive production ORCID e2e service deliberately stopped after a successful production sign-in (loopback redirect accepted, 2026-10-23 10:57 KST); test link removed","recorded":"2026-10-23T01:57:53Z","state":"cancelled"}
+- /home/seongin3/data/geoaidesk/runs/gaid-orcid-20261023T015404.988330Z/receipt.json
+  - disposition: {"evidence":[],"reason":"Interactive production ORCID e2e service deliberately stopped after a successful production sign-in (loopback redirect accepted, 2026-10-23 10:57 KST); test link removed","recorded":"2026-10-23T01:57:55Z","state":"cancelled"}
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

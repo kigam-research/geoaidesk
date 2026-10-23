@@ -187,8 +187,8 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `/hub/v1/orcid*`, migration v4); "ORCID로 본인 확인" starts an OIDC code flow whose redirect returns to the researcher's GAID
   (`/geo/orcid/callback`, registered as `http://127.0.0.1:8000/geo/orcid/callback`), which hands code + state to the hub; the hub
   verifies the ID token (RS256/JWKS, iss, aud, nonce, exp) and records `HubAccount.orcid`; hub entries carry the author's
-  current `authorOrcid`. Callback code/state are redacted from request logs. Sandbox verified end to end 2026-10-23;
-  production loopback redirect unverified.
+  current `authorOrcid`. Callback code/state are redacted from request logs. Sandbox and production (loopback redirect accepted) verified
+  end to end 2026-10-23.
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`
