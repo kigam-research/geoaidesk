@@ -666,7 +666,7 @@
   // ---------- init ----------
   async function init() {
     const names = ['file-text', 'code-xml', 'folder-open', 'notebook-pen', 'book-open', 'git-branch', 'server', 'map', 'database', 'table-2', 'quote', 'users', 'message-square-text', 'well-log', 'map-gis',
-      'library', 'network', 'building-2', 'share-2', 'workflow', 'user', 'users-round', 'search'];
+      'library', 'share-2', 'workflow', 'user'];
     await Promise.all(names.map(async n => {
       const txt = await (await fetch(`icons/${n}.svg`)).text();
       ICON[n] = txt.replace(/width="24"/, 'width="100%"').replace(/height="24"/, 'height="100%"');
