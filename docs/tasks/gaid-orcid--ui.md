@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-22T10:00:55Z
+status: done
+updated: 2026-10-23T02:44:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9f458bbf-4f8e-4cff-a5a0-2274bd08a13e","pid":2326360,"provider":"codex","session":"01a162fc-d2d3-7e42-b4e9-2a978b405909","start":"55003761","token":"df6541df10ed933c083367568e359ab1265179d732259db251292c83dae0b600"}
 branch: task/gaid-orcid--ui
 target: task/gaid-orcid
@@ -93,7 +93,7 @@ results with commands, anything not verified. Then `task finish`.
 - Parent integration and full scripts/check remain pending. No release/deployment was performed.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-22T10:00:55Z: ready; the parent gaid-orcid integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T02:44:05Z: integrated into gaid-orcid; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - First finish failed only because geo/tests/distribution.test.mjs did not yet list gaid-orcid as a boundary owner. Added the actual owner to its explicit allowlist; focused distribution tests passed. No application code changed for this fix.
