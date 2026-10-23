@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T13:18:42Z
+status: ready
+updated: 2026-10-23T13:18:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"08164288-7806-46a6-9e82-956577998a76","pid":790060,"provider":"claude","session":"f9dbf0b8-76e0-462b-b70b-5ced3cf12897","start":"64608299","token":"7a4c953115a20fde3c930ab89ac5a15005cbbdc2c3a944e2bab8d7766326cb7a"}
 branch: task/gaid-workflow-stages--gaid-stages-window
 target: task/gaid-workflow-stages
@@ -82,9 +82,9 @@ raw.githubusercontent.com (use `gh api` or codeload).
   `multiple`/`default` because the server summary mapping is package B's (not in 9949b08d).
 - Report section: `reports/2026-10-23-gaid-workflow-stages/start-window.md` + `figures/start-*.png`.
 ## Next steps
-1. Done: figures copied, own instance stopped (unit gaid-stages-window-app), shot hashes in
-   `~/data/geoaidesk/work/gaid-stages-window/shots.sha256`. Parent: integrate after package B; update `docs/design/ui-guide.md`
-   Q1/Q4/D2 and checklist item 5 for stage pages (outside this unit's scope).
+<!-- task:closed -->
+Closed 2026-10-23T13:18:56Z: ready; the parent gaid-workflow-stages integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
