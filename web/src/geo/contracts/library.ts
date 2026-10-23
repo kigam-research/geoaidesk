@@ -359,6 +359,8 @@ export interface LibraryItemSummary {
   citationKey?: string;
   coverage: ReadCoverage;
   hasPdf: boolean;
+  /** A PDF stored in GAID, which 서재 can show in its PDF pane (`GET /geo/library/items/:id/pdf`); a Zotero-only PDF is not. */
+  storedPdf?: boolean;
   collectionIds: string[];
   tags: string[];
   used: { notes: number; workflows: number; projects: number };
