@@ -39,7 +39,7 @@ import { HubSidebar, HubSidebarToggle, useHubSidebarCollapsed, type HubView } fr
 import { useShortcut } from "@/geo/shell/shortcuts";
 import { HubShell, ProjectBar, type HubStep } from "./hub-shell";
 import type { HubLocation } from "./location";
-import { QuestionStep, sameAnswer, type DraftAnswer } from "./question-step";
+import { QuestionStep, sameAnswer, type DraftAnswer, type QuestionEvidence } from "./question-step";
 import { SourceStep, WorkingPanel, type Target, type WebSourceKind } from "./source-step";
 import { TrialStep, useTrialCount } from "./trial-step";
 import { SharedMethod } from "./shared-method";
@@ -62,6 +62,8 @@ import { hubVersionOf, hubRefVersion } from "@/geo/contracts/hub-version";
 import { FeedScreen } from "@/geo/hub-feeds/feeds";
 
 const text = geoText("hub");
+/** Questions GAID asks for every Workflow (server/src/geo/authoring/agent.ts CODE_USE_KEY, TRIAL_SCALE_KEY). */
+const STANDARD_QUESTION_KEYS = ["code-use", "trial-scale"] as const;
 
 export function GaidHub({
   authoringId,
@@ -630,6 +632,18 @@ function HubProject({
     );
 
   const questions = liveQuestions(project);
+  const authoringId = project.id;
+  const evidence: QuestionEvidence = {
+    sources: project.sources,
+    extractions: project.extractions,
+    standardKeys: STANDARD_QUESTION_KEYS,
+    access: {
+      pdfUrl: (sourceId) => withApiToken(`${API_BASE}${hubApi.originalUrl(authoringId, sourceId)}`),
+      pageText: (sourceId, p) => hubApi.pageText(authoringId, sourceId, p).then((r) => r.text),
+      fileText: (sourceId, path) => hubApi.fileText(authoringId, sourceId, path).then((r) => r.text),
+      openFull: (sourceId, p) => setPage({ sourceId, page: p }),
+    },
+  };
   const current = step ?? defaultStep(project);
   const reached: HubStep[] = ["sources"];
   // Analysis done (findings) also opens the questions step, so a run with zero questions can still create the draft.
@@ -872,7 +886,7 @@ function HubProject({
           onAnswer={(qid, a) => setAnswers((cur) => ({ ...cur, [qid]: a }))}
           onApply={applyAnswers}
           applying={Boolean(running)}
-          onOpenPage={(sourceId, p) => setPage({ sourceId, page: p })}
+          evidence={evidence}
         />
       </>
     );

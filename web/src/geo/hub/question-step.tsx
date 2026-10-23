@@ -4,18 +4,22 @@
  * each question offers its options with the recommended one marked, a free-text "기타"
  * field and "나중에 정하기". Nothing is sent until the researcher applies all answers.
  * Recorded answers stay editable (gaid-hub-editing): a changed one is sent with the next
- * round and the draft is revised to it.
+ * round and the draft is revised to it. With `evidence`, the passages of the sources the question and its options cite
+ * sit in a side viewer next to the card (gaid-authoring-evidence-view); choosing an option moves the viewer to its own
+ * passage.
  */
-import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, CircleDashedIcon, ClockIcon, QuoteIcon } from "lucide-react";
-import { useId, useState } from "react";
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, CircleDashedIcon, ClockIcon } from "lucide-react";
+import { useId, useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import type { AnswerItem, Question } from "@/geo/contracts/authoring";
+import type { AnswerItem, ExtractionRecord, Question, SourceDocument } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
+
+import { evidenceItems, optionItem } from "./evidence/evidence-items";
+import { EvidencePanel, type EvidenceAccess } from "./evidence/evidence-panel";
 
 const text = geoText("hub");
 
@@ -43,52 +47,13 @@ export function answerLabel(q: Question, a: DraftAnswer | undefined): string {
   return words && words !== option.label ? `${option.label} · ${words}` : option.label;
 }
 
-/** A figure of the source that a question refers to (page image and caption). */
-export interface QuestionFigure {
-  src: string;
-  label: string;
-  caption: string;
-  /** Source page, when the figure is the paper's own figure. */
-  page?: number;
-  /** One line on what the figure shows for this question (optional). */
-  note?: string;
-}
-
-function FigurePanel({ figures }: { figures: QuestionFigure[] }) {
-  const [index, setIndex] = useState(0);
-  const figure = figures[Math.min(index, figures.length - 1)];
-  return (
-    <figure className="flex min-h-0 flex-col gap-2 rounded-xl border bg-card p-3">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={figure.src} alt={figure.label} className="max-h-[46vh] w-full rounded-md border object-contain" />
-      <figcaption className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">
-          {figure.label}
-          {figure.page ? ` · ${text("questions.page", { page: figure.page })}` : ""}
-        </span>
-        <span className="line-clamp-3 text-muted-foreground">{figure.caption}</span>
-        {figure.note && <span className="text-primary/90">{figure.note}</span>}
-      </figcaption>
-      {figures.length > 1 && (
-        <div className="flex gap-1.5">
-          {figures.map((f, i) => (
-            <button
-              key={`${f.page}-${f.label}`}
-              type="button"
-              aria-pressed={i === index}
-              onClick={() => setIndex(i)}
-              className={cn(
-                "rounded-md border px-2 py-1 text-xs",
-                i === index ? "border-primary text-primary" : "text-muted-foreground",
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </figure>
-  );
+/** What the side viewer needs: the draft's sources and how to read them. */
+export interface QuestionEvidence {
+  sources: SourceDocument[];
+  extractions: Record<string, ExtractionRecord>;
+  access: EvidenceAccess;
+  /** Keys of the questions GAID asks for every Workflow (they cite no source passage). */
+  standardKeys?: readonly string[];
 }
 
 export function QuestionStep({
@@ -97,15 +62,14 @@ export function QuestionStep({
   onAnswer,
   onApply,
   applying,
-  onOpenPage,
   recorded = {},
-  figures,
+  evidence,
   needsDraft = false,
 }: {
   /** No draft exists yet: with every answer recorded (or no questions), offer to create it. */
   needsDraft?: boolean;
-  /** Figures of the sources related to a question (shown beside it). */
-  figures?: (question: Question) => QuestionFigure[];
+  /** Sources for the side viewer of each question's evidence. */
+  evidence?: QuestionEvidence;
   questions: Question[];
   answers: Record<string, DraftAnswer>;
   /** Answers the server already recorded; a question is sent again only when its answer differs from this. */
@@ -113,7 +77,6 @@ export function QuestionStep({
   onAnswer: (questionId: string, answer: DraftAnswer) => void;
   onApply: () => void;
   applying?: boolean;
-  onOpenPage?: (sourceId: string, page: number) => void;
 }) {
   const [index, setIndex] = useState(() => {
     const first = questions.findIndex((q) => !isAnswered(answers[q.id]));
@@ -125,9 +88,34 @@ export function QuestionStep({
   const pending = questions.filter((q) => !(q.id in recorded) || isChanged(q));
   const reviewing = index >= questions.length;
   const go = (i: number) => setIndex(Math.max(0, Math.min(questions.length, i)));
+  const current = reviewing ? undefined : questions[index];
+  const items = useMemo(
+    () => (current && evidence ? evidenceItems(current, evidence.sources, evidence.extractions) : []),
+    [current, evidence],
+  );
+  // The passage shown per question (kept while moving between questions).
+  const [shown, setShown] = useState<Record<string, string>>({});
+  const side = Boolean(evidence) && !reviewing;
+  const card = current && (
+    <QuestionCard
+      key={current.id}
+      number={index + 1}
+      question={current}
+      recorded={current.id in recorded}
+      changed={isChanged(current)}
+      answer={answers[current.id]}
+      onChange={(a) => {
+        onAnswer(current.id, a);
+        // A newly chosen option moves the viewer to its own passage; typing next to it does not.
+        const chosen = a.optionId && !a.defer && a.optionId !== answers[current.id]?.optionId;
+        const item = chosen ? optionItem(items, a.optionId!) : undefined;
+        if (item) setShown((cur) => ({ ...cur, [current.id]: item.key }));
+      }}
+    />
+  );
 
   return (
-    <div className={cn("mx-auto flex h-full min-h-0 w-full flex-col gap-4", figures ? "max-w-6xl" : "max-w-2xl")}>
+    <div className={cn("mx-auto flex h-full min-h-0 w-full flex-col gap-4", side ? "max-w-[1400px]" : "max-w-2xl")}>
       <div className="flex items-center justify-between gap-3">
         <div role="tablist" aria-label={text("questions.title")} className="flex flex-wrap items-center gap-1.5">
           {questions.map((q, i) => {
@@ -176,8 +164,8 @@ export function QuestionStep({
         </span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {reviewing ? (
+      {reviewing ? (
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <ReviewPanel
             questions={questions}
             answers={answers}
@@ -185,35 +173,25 @@ export function QuestionStep({
             revising={!needsDraft}
             onEdit={go}
           />
-        ) : figures && figures(questions[index]).length > 0 ? (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-            <FigurePanel key={`figure-${questions[index].id}`} figures={figures(questions[index])} />
-            <QuestionCard
-              key={questions[index].id}
-              number={index + 1}
-              question={questions[index]}
-              recorded={questions[index].id in recorded}
-              changed={isChanged(questions[index])}
-              answer={answers[questions[index].id]}
-              onChange={(a) => onAnswer(questions[index].id, a)}
-              onOpenPage={onOpenPage}
-            />
-          </div>
-        ) : (
-          <div className="mx-auto w-full max-w-2xl">
-            <QuestionCard
-              key={questions[index].id}
-              number={index + 1}
-              question={questions[index]}
-              recorded={questions[index].id in recorded}
-              changed={isChanged(questions[index])}
-              answer={answers[questions[index].id]}
-              onChange={(a) => onAnswer(questions[index].id, a)}
-              onOpenPage={onOpenPage}
-            />
-          </div>
-        )}
-      </div>
+        </div>
+      ) : side && current ? (
+        <div className="grid min-h-0 flex-1 gap-6 overflow-y-auto lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:overflow-visible">
+          <div className="min-h-0 lg:overflow-y-auto lg:pr-1">{card}</div>
+          <EvidencePanel
+            key={current.id}
+            items={items}
+            active={shown[current.id] ?? null}
+            onActive={(key) => setShown((cur) => ({ ...cur, [current.id]: key }))}
+            optionLabel={(id) => current.options.find((o) => o.id === id)?.label ?? id}
+            standard={evidence?.standardKeys?.includes(current.key) ?? false}
+            access={evidence!.access}
+          />
+        </div>
+      ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-2xl">{card}</div>
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-3 border-t pt-4">
         <Button variant="outline" onClick={() => go(index - 1)} disabled={index === 0}>
@@ -262,7 +240,6 @@ function QuestionCard({
   question,
   answer,
   onChange: change,
-  onOpenPage,
   recorded,
   changed,
 }: {
@@ -274,14 +251,12 @@ function QuestionCard({
   question: Question;
   answer: DraftAnswer | undefined;
   onChange: (a: DraftAnswer) => void;
-  onOpenPage?: (sourceId: string, page: number) => void;
 }) {
   const otherId = useId();
   const onChange = change;
   const choice = question.answerType !== "text";
   // Always offer "기타" (also for a stored choice-only question).
   const free = true;
-  const evidence = question.evidence.filter((e) => e.verified && e.page);
   return (
     <section className="flex flex-col gap-4 py-1" aria-labelledby={`${otherId}-q`}>
       <div className="flex flex-col gap-2">
@@ -295,32 +270,6 @@ function QuestionCard({
           <dt className="font-medium text-muted-foreground">{text("questions.link")}</dt>
           <dd>{question.affects}</dd>
         </dl>
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          {evidence.length > 0 && (
-            <Popover>
-              <PopoverTrigger className="inline-flex items-center gap-1 underline-offset-4 hover:underline">
-                <QuoteIcon className="size-3.5" aria-hidden />
-                {text("questions.evidence")}
-              </PopoverTrigger>
-              <PopoverContent className="w-96 text-sm leading-relaxed">
-                <ul className="flex flex-col gap-3">
-                  {evidence.map((e, i) => (
-                    <li key={i} className="flex flex-col gap-1">
-                      <q className="text-foreground">{e.quote}</q>
-                      <button
-                        type="button"
-                        className="self-start text-primary underline-offset-4 hover:underline"
-                        onClick={() => onOpenPage?.(e.sourceId, e.page!)}
-                      >
-                        {text("questions.page", { page: e.page ?? "" })}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </PopoverContent>
-            </Popover>
-          )}
-        </div>
       </div>
 
       {choice && (
