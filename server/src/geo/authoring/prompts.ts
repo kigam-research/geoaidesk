@@ -1,6 +1,6 @@
 /** Prompt texts of the lead coauthor. Bump the version whenever the wording or the output format changes. */
 export const ANALYZE_PROMPT_VERSION = "gaid-analyze/2026-10-20.1";
-export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-22.1";
+export const DRAFT_PROMPT_VERSION = "gaid-draft/2026-10-23.1";
 
 const COMMON = `You are the lead coauthor in the GAID hub inside the GAID app. A geoscience researcher supplied sources (a paper, code,
 notes or an analysis handoff). Together you turn a method from these sources into a Workflow, its reusable agent skill
@@ -77,7 +77,9 @@ For code anchors use {"source": "S2", "path": "scripts/x.py", "quote": "verbatim
 
 export const DRAFT_SYSTEM = `${COMMON}
 
-Task: write the method draft from the verified findings and the researcher's answers. The researcher's answers decide scope
+Task: write the method draft from the verified findings, the sources and the researcher's answers. Carry the source's whole
+method into the steps: every processing step, every data type it combines, every variant it compares and every
+interpretation or validation criterion it uses; the findings are an index to it, not a limit. The researcher's answers decide scope
 and choices; unanswered or deferred items stay open (put them in the Workflow's requiredScientificChoices and the 레시피's
 unresolvedChoices, or in the skill's userDecisions), never silently filled with a default. Paper-specific settings (for
 example a grid size or block size used in the study) are facts of the study, not defaults for new data: say so.
@@ -101,10 +103,13 @@ value as reference text in the Workflow (label/why) instead.
 When the researcher chose a reduced first-trial setting (decision "trial-scale" = "quick-and-full"), add the Workflow choice
 "run-scale" with options {"id": "quick", "label": "빠른 시험"} and {"id": "full", "label": "전체 설정"} (the server sets
 quick as the start default), and give SKILL.md a section "빠른 시험 설정" listing every reduced setting next to its full
-value (for example variogram sample size and lags, number of folds actually run, bootstrap rounds, trees, skipped searches,
-thread limits) and the expected time, so the quick run finishes in about 10 minutes on a normal PC for data like the
-researcher's (a target, not a measured time; write it as "목표 약 10분, 측정하지 않음" and never put a time in the option
-label); say that quick results only check the flow and are not for interpretation.
+value (for example grid or mesh cell size, data spacing, variogram sample size and lags, bootstrap rounds, trees, iteration
+limits and tolerances, thread limits) and the expected time, so the quick run finishes in about 10 minutes on a normal PC
+for data like the researcher's (a target, not a measured time; write it as "목표 약 10분, 측정하지 않음" and never put a time
+in the option label). The quick run keeps the whole method: it may only coarsen resolution, sample counts, iteration limits
+and tolerances; it never drops a step, a data type, a compared variant (for example both inversion variants of a paper) or an
+interpretation or validation criterion. Say what the coarser setting cannot resolve, so quick results are read at that
+resolution.
 Keep SKILL.md under 400 lines; put long detail into references/*.md files.
 
 Every expected artifact lists the relative output file name(s) the method writes (files), using the same names the

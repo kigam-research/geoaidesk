@@ -15,11 +15,16 @@ import { useEffect, useRef, useState } from "react";
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { AuthoringAttempt, AuthoringProject, SourceDocument } from "@/geo/contracts/authoring";
+import type {
+  AuthoringAttempt,
+  AuthoringProject,
+  AuthoringThinkingLevel,
+  SourceDocument,
+} from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
-import { AgentModelSelect } from "./agent-model";
+import { AgentModelSelect, AgentThinkingSelect } from "./agent-model";
 
 const text = geoText("hub");
 
@@ -99,10 +104,15 @@ export function SourceStep({
   urls = [],
   agentModel,
   onAgentModel,
+  agentThinking,
+  onAgentThinking,
 }: {
   /** Agent model for reading and drafting ("" = the app default). */
   agentModel?: string;
   onAgentModel?: (ref: string) => void;
+  /** Reasoning level for the same calls ("" = medium). */
+  agentThinking?: AuthoringThinkingLevel | "";
+  onAgentThinking?: (level: AuthoringThinkingLevel | "") => void;
   /** Add a web source (paper/article URL, blog, a web search result page); the server fetches it inside the institute network. */
   onUrl?: (url: string, kind: WebSourceKind) => void;
   /** Web sources already added (mockup until the server fetches URLs). */
@@ -213,7 +223,12 @@ export function SourceStep({
           )}
         </ul>
       )}
-      {onAgentModel && <AgentModelSelect value={agentModel ?? ""} onChange={onAgentModel} />}
+      {onAgentModel && (
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <AgentModelSelect value={agentModel ?? ""} onChange={onAgentModel} />
+          {onAgentThinking && <AgentThinkingSelect value={agentThinking ?? ""} onChange={onAgentThinking} />}
+        </div>
+      )}
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {text("sources.goal")}
         <Input value={goal} onChange={(e) => onGoal(e.target.value)} placeholder={text("sources.goalPlaceholder")} />

@@ -239,6 +239,26 @@ describe("GAID hub authoring", () => {
     expect(d.recipe).toEqual({ choices: { "block-size": "km50", "run-scale": "quick" }, unresolvedChoices: ["label-def"] });
   });
 
+  it("gives the first draft the source text and keeps the project's reasoning level", async () => {
+    const { store, projectId } = await fixture();
+    await runOperation(store, projectId, "analyze", "op-analyze-s", deps(reply(analysis)));
+    const seen: string[] = [];
+    const answer = reply(draftReply);
+    const capture: ChatFn = async (messages, c) => {
+      seen.push(messages.map((m) => m.content).join("\n"));
+      return answer(messages, c);
+    };
+    const attempt = await runOperation(store, projectId, "draft", "op-draft-s", deps(capture));
+    expect(attempt.outcome, JSON.stringify(attempt.validationErrors)).toBe("accepted");
+    // The findings are only an index; method details that did not become a finding must still reach the draft.
+    expect(seen[0]).toContain("## Sources (the full method");
+    expect(seen[0]).toContain(PAPER[0].slice(0, 40));
+    const created = await store.create({ title: "t", thinkingLevel: "high" });
+    expect(created.thinkingLevel).toBe("high");
+    const ignored = await store.create({ title: "t", thinkingLevel: "max" as never });
+    expect(ignored.thinkingLevel).toBeUndefined();
+  });
+
   it("drafts with vocabulary filtering, server-owned fields, a recipe and stale-base protection", async () => {
     const { store, projectId } = await fixture();
     await runOperation(store, projectId, "analyze", "op-analyze-d", deps(reply(analysis)));

@@ -14,6 +14,7 @@ import {
   liveQuestions,
   runningAttempt,
   type AuthoringProject,
+  type AuthoringThinkingLevel,
   type CheckResult,
   type MethodDraft,
   type ProjectSummary,
@@ -435,6 +436,7 @@ function HubProject({
   const [goal, setGoal] = useState("");
   const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
+  const [agentThinking, setAgentThinking] = useState<AuthoringThinkingLevel | "">("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
   const [visualsBusy, setVisualsBusy] = useState(false);
@@ -483,6 +485,7 @@ function HubProject({
       setGoal((g) => g || p.goal || "");
       setTarget("workflow");
       setAgentModel((m) => m || p.model || "");
+      setAgentThinking((t) => t || p.thinkingLevel || "");
     } catch (e) {
       setError((e as Error).message);
     }
@@ -600,7 +603,7 @@ function HubProject({
   const title = project.title || text("home.new");
 
   // "" = the app default, sent explicitly so a project created with another model can switch back to the default.
-  const withModel = { model: agentModel };
+  const withModel = { model: agentModel, ...(agentThinking ? { thinkingLevel: agentThinking } : {}) };
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
@@ -608,6 +611,7 @@ function HubProject({
       goal: goal || undefined,
       target,
       ...(agentModel ? { model: agentModel } : {}),
+      ...(agentThinking ? { thinkingLevel: agentThinking } : {}),
     });
     return created.id;
   };
@@ -777,6 +781,8 @@ function HubProject({
           urls={urls}
           agentModel={agentModel}
           onAgentModel={setAgentModel}
+          agentThinking={agentThinking}
+          onAgentThinking={setAgentThinking}
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}

@@ -164,7 +164,7 @@ export async function registerAuthoringRoutes(
   const vocabulary = () => options.vocabulary ?? loadVocabulary();
   const context = (): PackageContext => ({ store, vocabulary: vocabulary(), checker: "gaid-hub" });
   const deps = (body: OperationBody | AnswersBody | undefined, project?: AuthoringProject) => ({
-    config: modelConfig(body?.model ?? project?.model, body?.thinkingLevel),
+    config: modelConfig(body?.model ?? project?.model, body?.thinkingLevel ?? project?.thinkingLevel),
     ...(options.vocabulary ? { vocabulary: options.vocabulary } : {}),
     ...(options.chat ? { chat: options.chat } : {}),
   });
