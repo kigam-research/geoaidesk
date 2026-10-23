@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T00:47:21Z
+status: done
+updated: 2026-10-23T00:48:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -71,8 +71,9 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 - Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-1. Tell the hub: review app points at the server, 5 Workflows imported; the review app runs pre-trial code, so its hub skill
-   shelf stays local until its next update. Final `task route-report acceptance-done-20261022`; `task finish`.
+<!-- task:closed -->
+Closed 2026-10-23T00:48:09Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-server-trial.md.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -103,7 +104,7 @@ Closes: gaid-backend#3
   - Integration order: B merged into this branch → e2e (two accounts, skill register/review/star/comment/install over HTTP)
     → scripts/check → redeploy.
 ## Open items
-- [대기] 시험 그룹 밖으로 넓히기 전에 허브 서버 HTTPS를 켭니다(인증서 준비 완료, 절차 docs/geo/hub-server-https.md) — 막힌 일: 시험 그룹 밖 사용 — 조건: 시험 그룹 확대 결정 — 근거: reports/2026-10-22-gaid-hub-server-trial#3-결과
+- [대기 gaid-hub-server-trial#1] 시험 그룹 밖으로 넓히기 전에 허브 서버 HTTPS를 켭니다(인증서 준비 완료, 절차 docs/geo/hub-server-https.md) — 막힌 일: 시험 그룹 밖 사용 — 조건: 시험 그룹 확대 결정 — 근거: reports/2026-10-22-gaid-hub-server-trial#3-결과
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
