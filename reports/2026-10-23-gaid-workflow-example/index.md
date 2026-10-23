@@ -87,7 +87,7 @@ supersedes:
 - 소프트웨어 검증:
   - 자동 시험으로 확인한 것(작성 쪽): 내 PC 파일·초안 자료·로컬 공개 주소로 예제 넣기, 제목·출처 고치기, 크기 제한과 알 수 없는 입력 거부, 초안을 다시 만들 때 예제 유지, 패키지에 예제 파일이 들어가고 실행 쪽 검증을 통과함, 예제 없는 패키지가 이전과 같은 바이트임, 등록한 Workflow를 고칠 때 패키지에서 예제 파일을 되살림.
   - 자동 시험으로 확인한 것(실행 쪽): 선언 형식 검사, 예제 복사, 로컬 서버에서 내려받기, 해시가 다른 파일 거부, 선언보다 큰 내려받기 중단, 기존 파일을 덮어쓰지 않음, 지침 문장(채팅·미리보기·CLI), 시작 설정의 기본 선택과 업로드.
-  - 전체 검사: {{CHECK_RESULT}}
+  - 전체 검사: 프로젝트 전체 검사를 모두 통과했습니다. 서버 시험 2277건 가운데 2269건이 통과했고 8건은 원래 건너뛰는 시험입니다. 웹 시험 1241건, 문구 검사(오류 0), UI 검사(오류 0, 새 부채 0), 배포판 실행 확인도 통과했습니다. 통합 전 첫 전체 검사에서는 허브 서버 실행기 시험 1건이 PC 부하(load average 약 35)로 5초 제한을 넘겼습니다. 이 시험은 단독 재실행과 최종 검사에서 통과했습니다.
   - 개발 앱에서 확인한 것: 예제 입력 3개(Workflow 안 2개, 로컬 주소에서 받는 1개)를 가진 시험용 Workflow로 시작 설정을 열었습니다. 예제 자료가 선택됐고, 시작할 때 파일 4개가 입력별 폴더에 써졌습니다. 채팅 카드에는 "예제 자료로 실행"이 표시됐습니다. 계측·도폭 스타일과 밝은·어두운 테마를 1440×900, 1280×800에서 확인했습니다.
   - 기존 시험은 기대값 하나만 고쳤습니다. 지침 블록을 읽은 결과에 예제 여부 항목이 더해졌기 때문입니다. 나머지 기존 시험은 그대로 통과했습니다.
 
@@ -132,6 +132,6 @@ supersedes:
 | 문구 id (새로 추가) | `workspace.setup.example.*`, `workspace.setup.input.{upload,uploading,uploadFailed,emptyExample}`, `workflowDoc.settings.{syntheticTitle,researcherPicksExample,exampleUsed,examplesUsed,exampleRule,cliExample,cliExampleBundled,cliExampleRemote}`, `workflowDoc.card.example`, `workflowView.{example,exampleSynthetic,exampleBundled,exampleRemote}`, `hub.prep.{example,exampleAlso}`, `hub.example.*` (모두 새 문구로, 바꾼 기존 문구는 없음) |
 | UI 규칙 | 시작 설정: Q1, Q2(연구자 파일이 없을 때만 예제를 미리 고르고 이유를 표시), Q3, Q4, Q5. 초안 화면: B1, B3, F5, G1, G2, I2, V9, R1. 새로 받아들인 UI 부채 없음 |
 
-작성 시점: 2026-10-23, commit {{COMMIT}}.
+작성 시점: 2026-10-23, commit c2180e52.
 
 </details>
