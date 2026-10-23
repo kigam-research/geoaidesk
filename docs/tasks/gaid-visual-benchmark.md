@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:35:07Z
+updated: 2026-10-23T12:37:11Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"26afde7c-3d1a-468d-95dd-0bc61144c3fa","pid":970986,"provider":"codex","session":"01a168c1-c2ab-78f2-9ae9-dc1c2eaad85e","start":"64682980","token":"90a3e40fb9066b5b5c4954bc054f67e529051d61a73d19c80eafa019af455bb8"}
 branch: task/gaid-visual-benchmark
 target: main
@@ -58,21 +58,39 @@ backgrounds; 3 the same writer applies them; 4 writer GPT-6-Astra, reasoning max
 - Workers: create child writers only with `task start --parent`, readers with `task reader`. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed on PC74 in the printed worktree on 2026-10-23. No app implementation or service changes.
+- Read the task request, PROJECT.md, UI guide v2 and writer procedures. Exact-worktree codegraph has no index;
+  use bounded native reads, never another branch's index.
+- Phase 1 is research and approval-ready image mockups only. Code changes and adoption of image rules remain gated
+  on the user's approval AND the hub's confirmation that gaid-workflow-cite-scope and gaid-workflow-stages reached main.
 ## Next steps
-1. (the next session's first action)
+1. Research the four named sites and additional relevant geoscience services; capture public-page evidence outside Git.
+2. Generate original light assets, edit them into dark variants, and prepare 2–3 named layout/asset directions for review.
+3. Write the canonical report and proposed image-use rules (draft, not adopted), humanize file prose, copy to the vault,
+   and request the user's visual choice/approval on concrete mockups.
+4. After both gates pass, integrate fresh main, apply the selected design, verify both styles/themes and declared checks,
+   then finish through the task CLI. Do not deploy the review app or hub server.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+- Orchestration, phase 1: sequential decisions are evidence → image roles → two visual directions → user approval.
+  The main writer owns all design decisions, image generation, mockups, report and eventual UI implementation.
+  Native read-only worker `/root/screen_inventory` maps existing component seams and fixtures; no child writer is needed
+  before shared image roles and scope are approved. Oracle is a research source only, not the designer or implementer.
+  Integration order after approval: image rules and manifest → shared image presentation → hub → start/empty screens → QA.
+- Owned phase-1 repo files: this task document, the canonical report and its small original figures, and review registry
+  records. Research screenshots, full-size generations and disposable mockups stay in
+  `~/data/geoaidesk/work/gaid-visual-benchmark/`. Do not edit the adopted guide or app code during this phase.
+- Design read: an Operate-mode research desk for geoscience researchers, preserving GAID's instrument/mapsheet identity.
+  Taste dials for landing composition only: variance 3, motion 1, density 4. Existing tokens and Pretendard govern;
+  generated imagery must be content-relevant, original and spatially bounded, not a background for text or controls.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-23-gaid-visual-benchmark/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
