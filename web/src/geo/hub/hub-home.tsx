@@ -30,15 +30,17 @@ import type { HubView } from "./hub-sidebar";
 import { SharedBrowse } from "./shared-browse";
 import { TechnicalDetail } from "./technical";
 import { ConceptPicture } from "./concept-picture";
+import { PageHeader } from "@/geo/shell/page-header";
 
 const text = geoText("hub");
 
-/** Authoring stage of my methods: a text chip with a status tint, never a coloured side stripe (UI guide v2 V7). */
+/** Authoring stage of my methods: a text chip with a status tint, never a coloured side stripe (UI guide v2 V7) and never
+ * the signal blue (S3). A registered method always shows the success tint, whatever stage its draft is in. */
 const STAGE_TONE: Record<ProjectSummary["stage"], string> = {
   sources: "bg-gaid-face-2 text-gaid-ink-2",
   analysis: "bg-gaid-face-2 text-gaid-ink-2",
   questions: "bg-gaid-warning-tint text-gaid-warning",
-  draft: "bg-gaid-signal-tint text-gaid-signal-ink",
+  draft: "bg-gaid-face-2 text-gaid-ink",
   package: "bg-gaid-success-tint text-gaid-success",
 };
 
@@ -250,19 +252,17 @@ export function HubHome({
     <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-8 px-8 pb-12 pt-7">
           <header className="flex flex-col gap-5">
-            <div className="flex items-start justify-between gap-6">
-              <div className="flex max-w-[680px] flex-col gap-1.5">
-                <h1 className="text-2xl font-bold tracking-[-0.01em]">{text("home.title")}</h1>
-                <p className="text-sm text-gaid-ink-2">{text("home.body")}</p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2 pt-1">
+            <PageHeader
+              title={text("home.title")}
+              context={text("home.body")}
+              actions={<>
                 <HubGlossary />
                 <Button onClick={onCreate}>
                   <PlusIcon data-icon="inline-start" />
                   {text("home.new")}
                 </Button>
-              </div>
-            </div>
+              </>}
+            />
             {view.kind !== "mine" && (
               <div className="relative w-full max-w-[640px]">
                 <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gaid-ink-2" aria-hidden />
@@ -358,7 +358,7 @@ export function HubHome({
                           aria-label={text("home.open", { title: p.methodTitle ?? p.title })}
                           className="flex min-w-0 flex-1 items-center gap-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         >
-                          <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold", STAGE_TONE[p.stage])}>
+                          <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold", registered[p.id] && !p.busy ? STAGE_TONE.package : STAGE_TONE[p.stage])}>
                             {p.busy ? <LoaderCircleIcon className="size-3 animate-spin" aria-hidden /> : registered[p.id] ? <CheckIcon className="size-3" aria-hidden /> : null}
                             {registered[p.id] && !p.busy ? text("stage.registered") : stageLabel(p)}
                           </span>

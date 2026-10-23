@@ -177,7 +177,7 @@ function StepBox({
       <span
         className={cn(
           "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-          active ? "bg-primary-foreground text-primary" : "bg-primary/10 text-primary",
+          active ? "bg-primary-foreground text-primary" : "bg-gaid-face-2 text-gaid-ink-2",
         )}
       >
         {index + 1}
@@ -315,7 +315,7 @@ function PortHeading({ kind, label }: { kind: "in" | "out"; label: string }) {
         <span
           className={cn(
             "rounded px-1.5 py-0.5 text-xs font-semibold",
-            kind === "in" ? "bg-primary/10 text-primary" : "bg-muted text-foreground",
+            "bg-gaid-face-2 text-gaid-ink",
           )}
         >
           {kind === "in" ? text("draft.inputs") : text("draft.outputs")}

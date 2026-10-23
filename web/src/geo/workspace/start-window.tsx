@@ -44,7 +44,7 @@ export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, f
   title: string;
   /** Source, revision and record state, one line above the title. */
   meta?: ReactNode;
-  /** One line of what the Workflow does, shown above the steps after the introduction. */
+  /** What the Workflow does, one truncated line above the steps after the introduction (W6). */
   purpose?: string;
   steps: StartStep[];
   /** The stage pages follow the Workflow's analysis flow (titled "분석 단계" in the step list). */
@@ -74,7 +74,8 @@ export function StartWindow({ open, onOpenChange, title, meta, purpose, steps, f
       <div className="space-y-1 border-b px-6 pt-4 pb-3.5">
         {meta && <div className="flex flex-wrap items-center gap-2 pr-10 text-[13px] leading-[18px] text-gaid-ink-2">{meta}</div>}
         <DialogTitle className="pr-10 text-xl leading-snug break-words">{title}</DialogTitle>
-        <DialogDescription className={showPurpose ? "line-clamp-2 text-sm leading-[21px] break-words text-gaid-ink-2" : "sr-only"}>{purpose || title}</DialogDescription>
+        {/* One line of context under the title (W6); the full purpose is on Workflow 소개 and in the tooltip. */}
+        <DialogDescription className={showPurpose ? "truncate text-sm leading-[21px] text-gaid-ink-2" : "sr-only"} title={showPurpose ? purpose : undefined}>{purpose || title}</DialogDescription>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-[236px_minmax(0,1fr)]">
         <div className="min-h-0 overflow-y-auto border-r bg-gaid-chrome py-3.5 pr-2.5 pl-3.5">

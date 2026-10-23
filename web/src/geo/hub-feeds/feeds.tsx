@@ -4,7 +4,7 @@
  * Each row shows the original title (link), the feed's own summary and where and when it came from; nothing is
  * summarised or reviewed by GAID. GitHub skill rows hand the repository to Settings → Skills (preview + consent there).
  */
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { geoLocale, geoText } from "@/geo/i18n";
 import { requestSkillImport } from "@/geo/skills/import-request";
 import { cn } from "@/lib/utils";
 import { openSettings } from "@/lib/settings-nav";
+import { PageBody, PageHeader } from "@/geo/shell/page-header";
 
 import { hubFeeds } from "./api";
 
@@ -80,19 +81,17 @@ export function FeedScreen({ projects }: { projects: { id: string; name: string 
   const fields = FEED_FIELDS.filter((f) => sources.some((s) => s.field === f));
   const offline = data && !data.connected;
   return (
-    <section className="flex min-h-0 flex-1 flex-col text-gaid-ink" aria-labelledby="hub-feeds-title">
-      <header className="flex shrink-0 flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-gaid-edge bg-gaid-chrome px-6 py-4">
-        <div className="min-w-0">
-          <h1 id="hub-feeds-title" className="text-2xl font-bold">{text("title")}</h1>
-          {data?.connected && <p className="mt-1 max-w-[680px] text-sm text-gaid-ink-2">{text("context", { count: sources.length })}</p>}
-        </div>
-        {data?.connected && (
+    <PageBody labelledBy="hub-feeds-title" className="gap-5">
+      <PageHeader
+        titleId="hub-feeds-title"
+        title={text("title")}
+        context={data?.connected ? text("context", { count: sources.length }) : undefined}
+        actions={data?.connected ? (
           <p className="text-xs tabular-nums text-gaid-ink-2" role="status">
             {data.collectedAt ? text("collectedAt", { when: feedDate(data.collectedAt, true) }) : text("notCollected")}
           </p>
-        )}
-      </header>
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-auto bg-gaid-face p-6">
+        ) : undefined}
+      />
         {offline ? (
           <Offline />
         ) : (
@@ -118,7 +117,10 @@ export function FeedScreen({ projects }: { projects: { id: string; name: string 
                 <option value="all">{text("field.all")}</option>
                 {fields.map((f) => <option key={f} value={f}>{text(`field.${f}`)}</option>)}
               </select>
-              <Input data-gaid-search aria-label={text("search")} placeholder={text("search")} value={query} onChange={(e) => setQuery(e.target.value)} className="min-w-48 flex-1" />
+              <div className="relative min-w-48 flex-1">
+                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gaid-ink-2" aria-hidden />
+                <Input type="search" data-gaid-search aria-label={text("search")} placeholder={text("search")} value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" />
+              </div>
             </div>
             {error ? (
               <FeedFailure error={error} retry={() => setReload((n) => n + 1)} />
@@ -142,8 +144,7 @@ export function FeedScreen({ projects }: { projects: { id: string; name: string 
             ) : null}
           </>
         )}
-      </div>
-    </section>
+    </PageBody>
   );
 }
 

@@ -24,6 +24,7 @@ import { geoText } from "@/geo/i18n";
 
 import { fileBase64, hubApi } from "./api";
 import { localText } from "./text";
+import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 
 const text = geoText("hub");
 type Role = LocalWorkflow["inputRoles"][number];
@@ -227,12 +228,12 @@ function ExampleForm({
       (mode === "url" && urls.trim()));
 
   return (
-    <form onSubmit={submit} aria-label={text(edit ? "example.edit.title" : "example.add.title")} className="flex flex-col gap-3 rounded-lg border border-gaid-edge bg-gaid-face-2 p-3">
+    <form onSubmit={submit} aria-label={text(edit ? "example.edit.title" : "example.add.title")} className="flex flex-col gap-3 border-t border-gaid-edge pt-3">
       <h4 className="text-sm font-semibold">{text(edit ? "example.edit.title" : "example.add.title")}</h4>
       <fieldset disabled={busy} className="flex flex-col gap-3">
         {!edit && (
           <>
-            <div role="group" aria-label={text("example.from.label")} className="gaid-seg flex w-fit flex-wrap gap-1">
+            <div role="group" aria-label={text("example.from.label")} className={SEG_TRACK}>
               {(["upload", "source", "url"] as const).map((value) => (
                 <Button
                   key={value}
@@ -240,7 +241,7 @@ function ExampleForm({
                   variant="ghost"
                   size="sm"
                   aria-pressed={mode === value}
-                  className={mode === value ? "bg-gaid-signal-tint font-semibold text-gaid-signal-ink" : "text-gaid-ink-2"}
+                  className={segItem(mode === value)}
                   onClick={() => setMode(value)}
                 >
                   {text(`example.from.${value}`)}

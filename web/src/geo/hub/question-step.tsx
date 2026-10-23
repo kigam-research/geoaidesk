@@ -311,11 +311,12 @@ function QuestionCard({
                   <span className="flex flex-col gap-1">
                     <span className="flex flex-wrap items-center gap-2 font-medium">
                       {option.label}
-                      {recommended && <Badge>{text("questions.recommended")}</Badge>}
+                      {/* Same 권장 plate and reason line as research-note decisions (Q2, RN3); blue text is kept for links (I2). */}
+                      {recommended && <span className="rounded-sm border border-gaid-signal/40 bg-gaid-signal-tint px-1.5 text-xs font-semibold leading-5 text-gaid-signal-ink">{text("questions.recommended")}</span>}
                     </span>
                     {option.hint && <span className="text-sm text-muted-foreground">{option.hint}</span>}
                     {recommended && question.recommendedWhy && (
-                      <span className="text-sm text-primary/90">{question.recommendedWhy}</span>
+                      <span className="text-sm text-gaid-ink-2">{question.recommendedWhy}</span>
                     )}
                   </span>
                 </button>

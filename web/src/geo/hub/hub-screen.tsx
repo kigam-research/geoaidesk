@@ -153,7 +153,7 @@ export function GaidHub({
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {removed ? (
-            <RemovedWorkflows loading={index.removedLoading} error={index.removedError} entries={index.removed} onRestored={index.reloadShared} onBack={() => openList({ kind: "registry", folder: "all" })} />
+            <RemovedWorkflows loading={index.removedLoading} error={index.removedError} entries={index.removed} onRestored={index.reloadShared} />
           ) : feeds ? (
             <FeedScreen projects={hubProjects} />
           ) : skillPlace ? (
@@ -860,8 +860,6 @@ function HubProject({
           project={project}
           goal={goal}
           onGoal={setGoal}
-          target={target}
-          onTarget={setTarget}
           onFiles={addFiles}
           onLibrary={() => setLibraryOpen(true)}
           onRemove={isNew || running ? undefined : removeSource}
@@ -1121,8 +1119,8 @@ function HubProject({
 /** Which registered method this draft edits (next revision) or copies (separate entry naming the original). */
 function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"]> }) {
   return (
-    <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
-      <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
+    <p className="mb-4 flex items-center gap-2 rounded-lg border border-gaid-edge bg-gaid-face-2 px-3 py-2 text-sm">
+      <PencilIcon className="size-4 shrink-0 text-gaid-ink-2" aria-hidden />
       {link.mode === "edit"
         ? text("editing.edit", { version: hubRefVersion(link) ?? "" })
         : text("editing.copy", { author: link.author, title: link.title, version: hubRefVersion(link) ?? "" })}

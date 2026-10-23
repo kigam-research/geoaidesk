@@ -27,7 +27,7 @@ describe("hub skill navigation and shelf", () => {
     fireEvent.click(await screen.findByRole("button", { name: /table-check/ })); expect(onOpen).toHaveBeenCalledWith("table-check");
     fireEvent.change(screen.getByRole("combobox", { name: "주제 폴더" }), { target: { value: "tables" } });
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith(expect.stringContaining("folder=tables"), expect.anything()));
-    fireEvent.change(screen.getByRole("textbox", { name: "허브 스킬 검색" }), { target: { value: "missing" } });
+    fireEvent.change(screen.getByRole("searchbox", { name: "허브 스킬 검색" }), { target: { value: "missing" } });
     await screen.findByText("조건에 맞는 스킬이 없습니다. 검색어나 폴더를 바꾸세요.");
   });
 });

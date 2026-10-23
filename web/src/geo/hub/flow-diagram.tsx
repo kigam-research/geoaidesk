@@ -69,7 +69,7 @@ export function FlowDiagram({
               )}
             >
               <span className="flex items-center gap-2">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gaid-face-2 text-xs font-semibold tabular-nums text-gaid-ink-2">
                   {index + 1}
                 </span>
                 <span className="text-sm font-semibold leading-tight">{localText(node.label)}</span>

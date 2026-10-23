@@ -5,6 +5,7 @@ import { HUB_ACCOUNT_RULES, type HubAccount, type HubInvite, type HubRole } from
 import { hubServer, HubServerError } from "./api";
 import { dateLabel, ErrorNotice, Field, fieldClass, text } from "./parts";
 import { FeedSourcesAdmin } from "@/geo/hub-feeds/admin-sources";
+import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 
 export function AdminSettings({ onAccountChange }: { onAccountChange: () => void }) {
   const [view, setView] = useState<"users" | "invites" | "feeds">("users");
@@ -38,9 +39,9 @@ export function AdminSettings({ onAccountChange }: { onAccountChange: () => void
   };
   return <div className="mt-4 flex flex-col gap-4">
     <div className="flex flex-wrap justify-between gap-3">
-      <div className="gaid-seg flex w-fit gap-1" role="group" aria-label={text("admin.title")}>
+      <div className={SEG_TRACK} role="group" aria-label={text("admin.title")}>
         {(["users", "invites", "feeds"] as const).map(value => <Button key={value} type="button" variant="ghost" disabled={busy} aria-pressed={view === value}
-          className={view === value ? "bg-gaid-signal-tint font-semibold text-gaid-signal-ink" : "text-gaid-ink-2"}
+          className={segItem(view === value)}
           onClick={() => setView(value)}>{text(`admin.${value}.title`)}</Button>)}
       </div>
       {view !== "feeds" && <Button type="button" variant="outline" disabled={busy} onClick={() => void run(load)}>{text("refresh.button")}</Button>}

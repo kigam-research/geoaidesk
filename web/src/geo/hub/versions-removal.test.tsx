@@ -47,7 +47,7 @@ describe("Workflow removal and restoration", () => {
 
   it("shows the removal record and restores the registered version, then refreshes counts", async () => {
     const refresh = vi.fn(async () => undefined);
-    render(<RemovedWorkflows entries={[entry]} onRestored={refresh} onBack={vi.fn()} />);
+    render(<RemovedWorkflows entries={[entry]} onRestored={refresh} />);
     expect(screen.getByText("version 0.2.0 · 등록자")).toBeInTheDocument();
     expect(screen.getByText(/관리자 님이 .* 제거/)).toBeInTheDocument();
     expect(screen.getByText("제거 사유: 새 절차로 교체")).toBeInTheDocument();

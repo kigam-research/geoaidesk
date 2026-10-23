@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T15:22:52Z
+updated: 2026-10-23T16:04:48Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"07ebb9d0-f814-4f6d-b9a5-645bc5f63caf","pid":1787710,"provider":"claude","session":"3df14864-ec0f-4f87-934c-dfb313401438","start":"65687147","token":"baba760f0e777618475bfc83f39f8b969255847d56462aba6ba7f9ef2c283e10"}
 branch: task/gaid-ui-audit
 target: main
@@ -53,9 +53,29 @@ checks only proxies (hard-coded colours, small text, copy length, slop proxies);
   run, method kept whole (user rule). After this unit the hub updates the review app and starts promo video v3. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Own instance: unit `gaid-audit-app` (`~/data/geoaidesk/work/gaid-ui-audit/run-dev.sh`, next dev on 3410, backend 18410), data copied
+  from `~/.geoaidesk` to `~/data/geoaidesk/work/gaid-ui-audit/home` (logged in to the institute hub server as admin: read only, never
+  register/remove/restore from this instance). Capture harness `cap.mjs` + `scenarios.mjs` + `montage.py` in the same folder
+  (`node cap.mjs <out> <scenarios> all|base`); before shots `shots/before/`, explore `shots/explore*/`.
+- Inventory and first pass done (base + 4 variants of hub, feeds, skills, removed, drafts, entry, authoring sources/questions/draft,
+  register preview, remove dialog, library papers/detail/PDF/notes, workspace notes, start window Yilgarn + Pocheon, switcher,
+  settings hub card + admin).
+- Fixed so far (rule ids): S3/I2 blue on status/decoration (note 검토 전 badges, draft stage chip, registered chip colour, Workflow
+  kind pill, blue callouts in draft/source/trial/editing notice, flow number circles, method-flow chips, 권장 reason text);
+  hub page headers unified with `web/src/geo/shell/page-header.tsx` (feeds, skills, removed; hub home uses it; T3 no Hangul
+  tracking); registered list version cell number only (X1/I5); authoring sources: one-option 만들 종류 removed (Q2), sticky action
+  footer (L7); draft: duplicate 초안 label (W5), disabled install says why (S7), installed line success colour; copy: 에이전트 →
+  AI agent (terminology), hub → 허브, hub skills 별표 → star; start window: summary heading 요약 (Q4), purpose one line (W6),
+  stage reason names missing inputs (S7); library: title first at page-title size, sync line under it (L4/T1), uses clamp (G1/T5),
+  note table date format; segmented controls unified via `web/src/geo/shell/segmented.ts` (admin, auth, example source, figure
+  tabs); guide text 판 → version (I5, G2, C3, R3); example-data attach form no longer a card in a card (V5); authoring sources
+  footer sticks into the pane padding (1280 check). After shots: `shots/after/` (184, all variants), montages `shots/after-m*`.
+- Checks: web vitest for touched areas 33 files / 187 passed; check-ui 0 errors (78 accepted debt, none added); copy validator
+  0 errors (100 pre-existing warnings, none on changed strings); scripts/check: see `check-1.log` in the work folder.
+- Report written and humanized: reports/2026-10-24-gaid-ui-audit/index.md (31 deviations, 26 fixed, 5 left as debt).
+- Instance `gaid-audit-app` stopped before scripts/check (next build shares web/.next).
 ## Next steps
-1. (the next session's first action)
+1. Read check-1.log result; fix failures; review-copy; task save; task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
@@ -66,7 +86,10 @@ Complete also closes every item that the hub answered with this unit as follow-u
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [부채] UI 가이드 점검 후 남은 다듬기 5건(허브 저작 단계 표시가 StepScale과 다름, 브라우저 기본 선택 상자 63곳, 서재 오른쪽 열 글자량, 시험 기록의 "실패한 도구 호출" 문구, 시작 창 아래 줄 위치 표시 형식)을 언제 고칠지 — 가) 다음 UI 작업 단위에 묶어 고침 — 나) 지금 상태 유지 — 권장: 가) 모두 화면 불일치·다듬기 수준이라 한 단위로 묶는 편이 빠릅니다 — 막힌 일: 없음 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-audit#5-한계
 ## Report
+Report: reports/2026-10-24-gaid-ui-audit/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

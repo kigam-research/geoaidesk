@@ -14,6 +14,8 @@
   "retry": "Read again",
   "loading": "Reading skills.",
   "empty": "No skills match. Change the search term or folder.",
+  "emptyAll": "No skills have been added to the hub yet.",
+  "context": "Skills that Workflows pin by version, kept with their source, licence and review state.",
   "count": "{count} skills",
   "revision": "Version {revision}",
   "state": {

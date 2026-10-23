@@ -9,6 +9,7 @@ import { t } from "@/geo/i18n";
 import { FIGURE_KINDS, kindIsAiMade, type FigureRecord, type FigureListResponse, type FigureTarget, type JournalSummary } from "@/geo/contracts/figures";
 import { redrawMessage } from "./redraw-message";
 import { checkPreviewUrl } from "./preview-url";
+import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 
 export interface NoteFiguresProps {
   projectId: string;
@@ -111,8 +112,8 @@ export function NoteFigures({ projectId, noteId, onOpenFile, onOpenChat, onPrefi
       </div>
       <aside aria-label={t("figures.inspector")} className="min-w-0 space-y-4 border-t border-gaid-edge pt-4 @min-[960px]:border-t-0 @min-[960px]:pt-0">
         <header className="flex flex-wrap items-center justify-between gap-2"><span className="font-medium">{figure.caption ?? figure.path.split("/").at(-1)}</span><span className="flex flex-wrap items-center gap-2">{renderFigureActions?.(figure)}<Button variant="ghost" onClick={() => onOpenFile(figure.path)}>{t("figures.openFile")}</Button></span></header>
-        <div role="tablist" aria-label={t("figures.inspector")} className="gaid-seg flex flex-wrap gap-2">
-          {(["origin", "check", ...(kindIsAiMade(figure.kind) ? ["ai"] : [])] as const).map(key => <Button key={key} role="tab" aria-selected={tab === key} variant="ghost" className={tab === key ? "bg-gaid-signal-tint font-semibold" : ""} onClick={() => setTab(key as typeof tab)}>{t(`figures.tab.${key}`)}</Button>)}
+        <div role="tablist" aria-label={t("figures.inspector")} className={SEG_TRACK}>
+          {(["origin", "check", ...(kindIsAiMade(figure.kind) ? ["ai"] : [])] as const).map(key => <Button key={key} role="tab" aria-selected={tab === key} variant="ghost" className={segItem(tab === key)} onClick={() => setTab(key as typeof tab)}>{t(`figures.tab.${key}`)}</Button>)}
         </div>
         <div role="tabpanel" className="space-y-4">
           {tab === "origin" && <>
