@@ -8,14 +8,16 @@ import type {
   AnswersBody,
   AuthoringProject,
   CreateProjectBody,
+  AttachExampleBody,
   Decision,
   EditDraftBody,
+  EditExampleBody,
   InstallBody,
   MethodDraft,
   OperationBody,
   PackageBody,
 } from "../../../../web/src/geo/contracts/authoring.ts";
-import { structuredDraft } from "./workflow.ts";
+import { attachExample, editExample, removeExample, researcherRevision } from "./examples.ts";
 import { startOperation } from "./agent.ts";
 import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
@@ -33,6 +35,8 @@ export interface AuthoringOptions {
   /** Tests: fixed vocabulary and model transport. */
   vocabulary?: Vocabulary;
   chat?: import("./model.ts").ChatFn;
+  /** Tests: bounds of the one-time fetch of a URL example. */
+  remote?: import("./examples.ts").RemoteOptions;
 }
 
 const stores = new WeakMap<FastifyInstance, AuthoringStore>();
@@ -47,16 +51,7 @@ const OP_ID = /^[\w-]{6,80}$/;
 
 /** Researcher edit: a new draft revision on top of the latest one; a stale base is refused. */
 export function editDraft(project: AuthoringProject, body: EditDraftBody): MethodDraft {
-  const latest = project.drafts.at(-1);
-  if (!latest) throw new AuthoringError("먼저 방법 초안을 만들어 주세요.", 409);
-  if (body.baseRevision !== latest.revision)
-    throw new AuthoringError("다른 곳에서 초안이 바뀌었습니다. 최신 초안을 다시 불러와 주세요.", 409);
-  const next: MethodDraft = structuredDraft(latest);
-  next.revision = latest.revision + 1;
-  next.baseRevision = latest.revision;
-  next.origin = "researcher";
-  delete next.attemptId;
-  next.createdAt = now();
+  const next: MethodDraft = researcherRevision(project, body.baseRevision);
   // Notes describe server changes still present in the content; keep them with the edited revision.
   const text = (v: unknown, max: number) => {
     if (typeof v !== "string" || !v.trim() || v.length > max)
@@ -333,6 +328,24 @@ export async function registerAuthoringRoutes(
       });
       return reply.code(201).send(draft);
     });
+    // Example data of Workflow inputs (gaid-workflow-example): uploads are base64 in JSON, each file ≤ 10 MiB.
+    scope.post<{ Body: AttachExampleBody }>(
+      "/geo/authoring/projects/:id/examples",
+      { bodyLimit: 32 * 1024 * 1024 },
+      async (req, reply) => reply.code(201).send(await attachExample(store, id(req.params), req.body, options.remote)),
+    );
+    scope.post<{ Body: EditExampleBody }>("/geo/authoring/projects/:id/examples/:roleId", async (req, reply) =>
+      reply
+        .code(201)
+        .send(await editExample(store, id(req.params), String((req.params as { roleId: string }).roleId), req.body)),
+    );
+    scope.post<{ Body: { baseRevision?: number } }>(
+      "/geo/authoring/projects/:id/examples/:roleId/remove",
+      async (req, reply) =>
+        reply
+          .code(201)
+          .send(await removeExample(store, id(req.params), String((req.params as { roleId: string }).roleId), req.body ?? {})),
+    );
     const draftOf = (p: AuthoringProject, rev: unknown) => {
       const d = p.drafts.find((x) => x.revision === Number(rev));
       if (!d) throw new AuthoringError("초안 판을 찾을 수 없습니다.", 404);
