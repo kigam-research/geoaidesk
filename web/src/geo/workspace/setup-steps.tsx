@@ -1,16 +1,16 @@
 "use client";
 /**
- * Parts of the Workflow start settings (UI guide Q1–Q6): the grouped step rail, option cards, one step per input
- * file or analysis condition, and the summary. State lives in TaskSetup; these components only render it.
+ * Parts of the Workflow start settings (UI guide Q1–Q6): option cards, one step per input file or analysis condition,
+ * and the summary. State lives in TaskSetup and the window in StartWindow; these components only render a step.
  */
 import { useId, useRef, useState, type ReactNode } from "react";
+import { CheckIcon, ChevronRightIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { GeoWorkflowSummary, WorkflowChoice, WorkflowInputRole } from "@/geo/contracts/workspace";
 import { hasGeoText, t } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
-import { StepScale } from "@/geo/shell/step-scale";
 import { isExamplePath, sizeText } from "@/geo/contracts/workflow-examples";
 import { accepts, text } from "./api";
 
@@ -20,12 +20,14 @@ export type InputAnswer = { mode: "file" | "other"; path: string } | { mode: "ex
 export type ChoiceAnswer = { mode: "option" | "other"; value: string } | { mode: "defer" };
 
 export type SetupStep =
+  | { kind: "intro" }
   | { kind: "input"; role: WorkflowInputRole }
   | { kind: "choice"; choice: WorkflowChoice }
   | { kind: "summary" };
 
 export function setupSteps(workflow: GeoWorkflowSummary): SetupStep[] {
   return [
+    { kind: "intro" },
     ...workflow.inputRoles.map((role): SetupStep => ({ kind: "input", role })),
     ...workflow.requiredScientificChoices.map((choice): SetupStep => ({ kind: "choice", choice })),
     { kind: "summary" },
@@ -33,6 +35,7 @@ export function setupSteps(workflow: GeoWorkflowSummary): SetupStep[] {
 }
 
 export function stepName(step: SetupStep): string {
+  if (step.kind === "intro") return t("workspace.start.intro");
   return step.kind === "input" ? text(step.role.label) : step.kind === "choice" ? text(step.choice.label) : t("workspace.setup.summaryTab");
 }
 
@@ -64,27 +67,64 @@ export function optionLabel(choice: WorkflowChoice, option: string): string {
 const baseName = (path: string) => path.split("/").pop() || path;
 const folderName = (path: string) => path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : t("workspace.setup.input.root");
 
-/** The step scale of the start settings: every input and condition named in order, then the summary (UI guide v2 Q4, Q5). */
-export function StepRail({ steps, index, done, onSelect }: { steps: SetupStep[]; index: number; done: (i: number) => boolean; onSelect: (i: number) => void }) {
-  const last = steps.length - 1;
-  return <StepScale
-    tabs
-    label={t("workspace.setup.steps")}
-    current={index}
-    onStep={onSelect}
-    itemLabel={(i) => t("workspace.setup.stepLabel", { n: i + 1, name: stepName(steps[i]) })}
-    steps={steps.map((step, i) => ({ label: stepName(step), done: i !== last && done(i) }))}
-  />;
+/**
+ * Project files are grouped by folder (user decision gaid-workflow-start-ui #3): files under `user_data/` are the
+ * researcher's own data and come first; everything else (outputs/, 연구노트/, …) is an earlier result.
+ */
+export const isOwnData = (path: string) => path === "user_data" || path.startsWith("user_data/");
+
+const STOP_TOKENS = new Set(["data", "file", "files", "input", "inputs", "table", "the", "and", "raw", "layer", "map"]);
+const tokens = (value: string) => value.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length >= 3 && !STOP_TOKENS.has(token));
+
+/**
+ * How well a file name matches an input (F17, gaid-pocheon-trial): the input id's words (`aeromag-lines`) and its English
+ * label's words found in the file name (`aeromag_lines.csv`). Names only; file contents are not read.
+ */
+export function nameScore(role: WorkflowInputRole, path: string): number {
+  const words = new Set([...tokens(role.id), ...tokens(role.label.en ?? "")]);
+  const name = tokens(baseName(path).replace(/\.[^.]+$/, ""));
+  let score = 0;
+  for (const word of words) if (name.some((part) => part === word || (word.length >= 4 && part.length >= 4 && (part.startsWith(word) || word.startsWith(part))))) score += 1;
+  return score;
+}
+
+const depth = (path: string) => path.split("/").length;
+/** Fitting files of an input: best name match first, then files nearer the folder top (raw data), then by path. */
+export function rankFiles(role: WorkflowInputRole, files: string[]): string[] {
+  return [...files].sort((a, b) => nameScore(role, b) - nameScore(role, a) || depth(a) - depth(b) || a.localeCompare(b));
+}
+
+/**
+ * One file per input whose name matches it better than any other fitting file (F17): the strongest pairs are taken
+ * first and a file is used once.
+ */
+export function nameMatches(roles: WorkflowInputRole[], files: string[]): Record<string, string> {
+  const pairs = roles.flatMap((role) => {
+    const scored = files.filter((path) => accepts(path, role.extensions)).map((path) => ({ path, score: nameScore(role, path) })).filter((pair) => pair.score > 0);
+    const top = Math.max(0, ...scored.map((pair) => pair.score));
+    // A tie is settled only by the researcher's own data (user_data/) against earlier results; otherwise not guessed.
+    const tied = scored.filter((pair) => pair.score === top);
+    const best = tied.length > 1 ? tied.filter((pair) => isOwnData(pair.path)) : tied;
+    return best.length === 1 ? [{ role: role.id, path: best[0].path, score: top }] : [];
+  }).sort((a, b) => b.score - a.score);
+  const chosen: Record<string, string> = {};
+  const used = new Set<string>();
+  for (const pair of pairs) if (!used.has(pair.path)) { chosen[pair.role] = pair.path; used.add(pair.path); }
+  return chosen;
 }
 
 /** One selectable row of a radio group (Q2 radio card). */
-function OptionCard({ selected, onSelect, title, hint, badge, children }: { selected: boolean; onSelect: () => void; title: ReactNode; hint?: ReactNode; badge?: ReactNode; children?: ReactNode }) {
+export function OptionCard({ selected, onSelect, title, hint, badge, children, multiple = false }: { selected: boolean; onSelect: () => void; title: ReactNode; hint?: ReactNode; badge?: ReactNode; children?: ReactNode; multiple?: boolean }) {
   return <div className={cn("rounded-md border border-gaid-edge bg-gaid-face transition-colors", selected ? "border-gaid-signal bg-gaid-signal-tint/40" : "hover:border-gaid-control-edge")}>
-    <button type="button" role="radio" aria-checked={selected} onClick={onSelect}
-      className="flex w-full min-w-0 items-start gap-3 rounded-md px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-gaid-control-edge bg-gaid-face", selected && "border-gaid-signal")}>
-        {selected && <span className="size-2 rounded-full bg-gaid-signal" />}
-      </span>
+    <button type="button" role={multiple ? "checkbox" : "radio"} aria-checked={selected} onClick={onSelect}
+      className="flex w-full min-w-0 items-start gap-3 rounded-md px-4 py-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      {multiple
+        ? <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] border-gaid-control-edge bg-gaid-face text-white", selected && "border-gaid-signal bg-gaid-signal")}>
+          {selected && <CheckIcon className="size-3" strokeWidth={2.5} />}
+        </span>
+        : <span aria-hidden className={cn("mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-gaid-control-edge bg-gaid-face", selected && "border-gaid-signal")}>
+          {selected && <span className="size-2 rounded-full bg-gaid-signal" />}
+        </span>}
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="flex flex-wrap items-center gap-2 text-sm font-medium break-words">{title}{badge}</span>
         {hint && <span className="text-xs text-gaid-ink-2 break-words">{hint}</span>}
@@ -108,7 +148,7 @@ function ClampedLine({ value }: { value: string }) {
   </p>;
 }
 
-function StepHeading({ id, title, lines }: { id: string; title: string; lines: (string | null | undefined)[] }) {
+export function StepHeading({ id, title, lines }: { id: string; title: string; lines: (string | null | undefined)[] }) {
   return <div className="space-y-1">
     <h3 id={id} className="text-base font-semibold leading-snug break-words">{title}</h3>
     {lines.filter((line): line is string => Boolean(line)).map((line) => <ClampedLine key={line} value={line} />)}
@@ -139,8 +179,14 @@ export function InputStep({ role, files, answer, onAnswer, onUpload }: {
   const [uploadError, setUploadError] = useState(false);
   // Files the server wrote from a Workflow's example data are offered as the example, not as the researcher's own file.
   const own = files.filter((path) => !isExamplePath(path));
-  const fitting = own.filter((path) => accepts(path, role.extensions));
+  const fitting = rankFiles(role, own.filter((path) => accepts(path, role.extensions)));
+  const mine = fitting.filter(isOwnData);
+  const earlier = fitting.filter((path) => !isOwnData(path));
   const others = own.filter((path) => !accepts(path, role.extensions));
+  const matched = (path: string) => nameScore(role, path) > 0;
+  const card = (path: string) => <OptionCard key={path} selected={answer?.mode === "file" && answer.path === path} onSelect={() => onAnswer({ mode: "file", path })}
+    title={baseName(path)} hint={folderName(path)} badge={matched(path) ? <Badge variant="outline" title={t("workspace.start.nameMatchTip")}>{t("workspace.start.nameMatch")}</Badge> : undefined} />;
+  const earlierChosen = answer?.mode === "file" && earlier.includes(answer.path);
   const formats = role.extensions.join(", ");
   const otherPath = answer?.mode === "other" ? answer.path : "";
   const upload = async (list: FileList | null) => {
@@ -166,8 +212,15 @@ export function InputStep({ role, files, answer, onAnswer, onUpload }: {
       {uploadError && <span role="alert" className="text-sm text-destructive">{t("workspace.setup.input.uploadFailed")}</span>}
     </div>}
     <div role="radiogroup" aria-labelledby={id} className="space-y-2">
-      {fitting.map((path) => <OptionCard key={path} selected={answer?.mode === "file" && answer.path === path} onSelect={() => onAnswer({ mode: "file", path })}
-          title={baseName(path)} hint={folderName(path)} />)}
+      {mine.length > 0 && <p className="flex items-baseline gap-1.5 text-[13px] font-semibold text-gaid-ink-2">{t("workspace.start.mine")}<span className="font-medium text-gaid-ink-3 tabular-nums">{mine.length}</span></p>}
+      {mine.map(card)}
+      {earlier.length > 0 && <details open={earlierChosen} className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-md border border-dashed border-gaid-edge px-3 py-2 text-sm text-gaid-ink-2 select-none [&::-webkit-details-marker]:hidden">
+          <ChevronRightIcon className="size-3.5 transition-transform group-open:rotate-90" aria-hidden />
+          {t("workspace.start.earlier")}<span className="text-gaid-ink-3 tabular-nums">{earlier.length}</span>
+        </summary>
+        <div className="mt-2 space-y-2">{earlier.map(card)}</div>
+      </details>}
       {role.example && <OptionCard selected={answer?.mode === "example"} onSelect={() => exampleUsable(role) && onAnswer({ mode: "example" })}
         title={t("workspace.setup.example.use", { title: exampleTitle(role) })}
         badge={<><Badge variant="outline">{t("workspace.setup.example.badge")}</Badge>{role.example.synthetic && <Badge variant="outline">{t("workspace.setup.example.synthetic")}</Badge>}</>}
@@ -215,18 +268,22 @@ export function choiceValue(choice: WorkflowChoice, answer: ChoiceAnswer | undef
 }
 
 /** Summary rows with Edit links (Q5); the parent adds the limit line, disclosures and the one primary action. */
-export type SummaryRow = { step: number; label: string; value: string | null; muted?: boolean; title?: string };
+export type SummaryRow = { step: number; label: string; value: string | null; muted?: boolean; title?: string; group?: string; note?: string };
 
 export function SummaryRows({ rows, onEdit }: { rows: SummaryRow[]; onEdit: (step: number) => void }) {
-  return <dl className="divide-y rounded-lg border">
-    {rows.map((row) => <div key={row.step} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] items-center gap-3 px-3 py-2 text-sm">
+  return <div className="divide-y rounded-lg border">
+    {rows.map((row, i) => <div key={row.step}>
+      {row.group && row.group !== rows[i - 1]?.group && <p className="px-3 pt-2 text-xs font-semibold text-gaid-ink-3">{row.group}</p>}
+      <dl className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] items-center gap-3 px-3 py-1.5 text-sm">
       <dt className="truncate text-muted-foreground" title={row.label}>{row.label}</dt>
-      <dd className={cn("min-w-0 truncate", row.value === null ? "text-destructive" : row.muted ? "text-muted-foreground" : "font-medium")} title={row.title ?? row.value ?? undefined}>
-        {row.value ?? t("workspace.setup.notChosen")}
+      <dd className={cn("min-w-0", row.value === null ? "text-destructive" : row.muted ? "text-muted-foreground" : "font-medium")} title={row.title ?? row.value ?? undefined}>
+        <span className="block truncate">{row.value ?? t("workspace.setup.notChosen")}</span>
+        {row.note && <span className="block text-xs font-normal text-gaid-warning">{row.note}</span>}
       </dd>
       <Button variant="ghost" size="sm" className="h-7 px-2 text-primary" aria-label={t("workspace.setup.editLabel", { label: row.label })} onClick={() => onEdit(row.step)}>
         {t("workspace.setup.edit")}
       </Button>
+      </dl>
     </div>)}
-  </dl>;
+  </div>;
 }

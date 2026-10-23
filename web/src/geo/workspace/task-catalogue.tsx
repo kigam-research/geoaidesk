@@ -36,6 +36,7 @@ import {
 import { request, text } from "./api";
 import { RecipeAdd, RecipeProblem } from "./recipe-add";
 import { TaskSetup } from "./task-setup";
+import { UpstreamStart } from "./upstream-start";
 import { useMethodRows } from "../methods/methods";
 
 /**
@@ -179,6 +180,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     collapseUpstream: ready ? { showLabel: (count) => t("workspace.catalogue.showOther", { count }), hideLabel: t("workspace.catalogue.hideOther") } : undefined,
     headerAction: ready ? <RecipeAdd projectId={projectId} workflows={workflows} categories={saved.categories} onSaved={setSaved}
       onOpen={(setup) => { setOpened((previous) => ({ revision: (previous?.revision ?? 0) + 1, setup })); setSelected({ workflowId: setup.workflowId }); }} /> : null,
+    renderLaunch: (props) => <UpstreamStart key={props.workflow.id} {...props} />,
     notice: <>
       {status && <p role="status" className="text-xs text-muted-foreground break-words">{status}</p>}
       {error && data && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}
@@ -202,6 +204,8 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
         onOpenChange={(open) => setSelected(open ? { workflowId: workflow.id } : null)}
         onRefresh={load}
         initialSetup={once?.setup}
+        resume={Boolean(once)}
+        source={t("workspace.start.source.catalogue")}
       />;
     })}
     {recipe && recipeWorkflow && <TaskSetup
@@ -213,6 +217,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       onOpenChange={(open) => { if (!open) setSelected(null); }}
       onRefresh={load}
       initialSetup={recipe.check.setup}
+      source={t("workspace.start.source.catalogue")}
       recipe={{ title: recipe.title, onDelete: async () => { await removeRecipe(recipe); setSelected(null); } }}
     />}
     {detail?.doc && <Dialog open onOpenChange={(open) => { if (!open) setDetail(null); }}><DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-4xl"><DialogTitle>{text(detail.title)}</DialogTitle><DialogDescription>{text(detail.description)}</DialogDescription><WorkflowView doc={detail.doc} projectId={projectId} readiness={detail.readiness} /><Button onClick={() => { setSelected({ workflowId: detail.id }); setDetail(null); }}>{t("methods.setup")}</Button></DialogContent></Dialog>}

@@ -99,7 +99,7 @@ function FileActions({ path, projectId }: { path: string; projectId: string }) {
       const key = workflowKey(workflow.id, exposure);
       const suggested = visibleSuggestions.find((suggestion) => workflowKey(suggestion.workflowId, suggestion.exposure) === key);
       const role = suggested?.match.roleId;
-      return <TaskSetup key={`${key}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} exposure={exposure} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : suggested?.setup} open={selected === key} onOpenChange={(open) => setSelected(open ? key : null)} onRefresh={refresh} />;
+      return <TaskSetup key={`${key}:${recipe?.workflowId === workflow.id ? revision : 0}`} workflow={workflow} exposure={exposure} projectId={projectId} availableFiles={files} initialBindings={role ? { [role]: path } : {}} initialSetup={recipe?.workflowId === workflow.id ? recipe : suggested?.setup} resume={recipe?.workflowId === workflow.id} open={selected === key} onOpenChange={(open) => setSelected(open ? key : null)} onRefresh={refresh} />;
     })}
   </section>;
 }

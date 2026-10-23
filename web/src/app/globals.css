@@ -399,6 +399,27 @@ a { text-underline-offset: 3px; }
 :root[data-style="mapsheet"] .gaid-step-track::before,
 :root[data-style="mapsheet"] .gaid-step-track::after { display: none; }
 
+/* Vertical step list (UI guide v2 Q4; web/src/geo/shell/step-list.tsx, gaid-workflow-start-ui). 계측: a vertical graduated
+   scale, a major tick per step, filled in the signal colour for done steps, the index pointer at the current one. 도폭: a
+   vertical scale bar (done solid ink, current signal) and the current item framed in ink. */
+.gaid-steplist-mark { position: relative; }
+.gaid-steplist-mark::before { content: ""; position: absolute; left: 6px; top: -4px; bottom: -4px; width: 1px; background: var(--gaid-scale-tick); }
+.gaid-steplist-mark::after { content: ""; position: absolute; left: 3px; top: 8px; width: 7px; height: 1px; background: var(--gaid-scale-tick); }
+.gaid-steplist-item[data-state="done"] .gaid-steplist-mark::before { left: 5.5px; width: 2px; background: var(--gaid-signal); }
+.gaid-steplist-item[data-state="done"] .gaid-steplist-mark::after { background: var(--gaid-signal); }
+.gaid-steplist-item[data-state="current"] { background: var(--gaid-signal-tint); color: var(--gaid-ink); font-weight: 600; }
+.gaid-steplist-item[data-state="current"] .gaid-steplist-mark::after {
+  left: 0; top: 4px; width: 0; height: 0; background: none;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid var(--gaid-signal);
+}
+.gaid-steplist-item[data-state="later"] { color: var(--gaid-ink-3); }
+
+:root[data-style="mapsheet"] .gaid-steplist-mark::before { left: 4px; width: 6px; background: var(--gaid-face); border-left: 1px solid var(--gaid-frame); border-right: 1px solid var(--gaid-frame); }
+:root[data-style="mapsheet"] .gaid-steplist-mark::after { display: none; }
+:root[data-style="mapsheet"] .gaid-steplist-item[data-state="done"] .gaid-steplist-mark::before { left: 4px; width: 6px; background: var(--gaid-frame); }
+:root[data-style="mapsheet"] .gaid-steplist-item[data-state="current"] .gaid-steplist-mark::before { background: var(--gaid-signal); border-color: var(--gaid-signal); }
+:root[data-style="mapsheet"] .gaid-steplist-item[data-state="current"] { background: transparent; box-shadow: inset 0 0 0 1px var(--gaid-frame); }
+
 /* GAID map workspace — MAP1–MAP6. Data canvases are never themed or filtered. */
 .gaid-map-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; overflow: hidden; }
 .gaid-map-workspace .ol-scale-line { background: var(--gaid-face); color: var(--gaid-ink); bottom: 8px; left: 8px; border-radius: 0; }

@@ -113,9 +113,17 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Workflow panel (gaid-workflow-catalog): `web/src/geo/workspace/task-catalogue.tsx` feeds the catalogue workflows (category
   `geoscience`, first) and saved recipes into the upstream `WorkflowsPanel` through its `extension` prop (one search box, pills
   and row style; one-line rows, at most three badges, an optional row detail icon); a row opens `TaskSetup`, the Workflow
-  start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`): one input file or analysis condition per step under a
-  grouped step rail (입력 파일 → 분석 조건 → 요약), readiness blockers with their fix on step 1 and the summary, a summary with
-  Edit links and the one primary action; a recipe or method default opens at the summary. The start message is the
+  start settings (gaid-system-ui, `task-setup.tsx` + `setup-steps.tsx`). Every Workflow, 일반 Workflow included, opens the one
+  start window (gaid-workflow-start-ui, user decision 2026-10-23; `start-window.tsx`, a 920 px sheet with every step named in a
+  left `StepList`, `web/src/geo/shell/step-list.tsx`): Workflow 소개 first (`start-intro.tsx`: purpose, inputs and example data,
+  conditions, outputs, steps, limits from the WorkflowDoc; missing parts left out; full `WorkflowView` behind a disclosure;
+  readiness blockers with their fix), then one input file or analysis condition per step, then a summary with Edit links
+  and the one primary action. Only the researcher's own saved start settings (`.geo-start.json`) resume at the summary.
+  File candidates fit the input's formats; `user_data/` files come first ("내 자료"), others under a folded "이전 결과"; a file
+  whose name matches one input (`nameMatches`, names only) starts bound to it and is listed first, and the summary flags an
+  optional input left unused while a fitting file exists (F17). 일반 Workflow uses `upstream-start.tsx` through the panel's
+  `extension.renderLaunch` seam: its English instructions are folded under "AI agent가 받는 지침" (editable on the summary)
+  and the start action puts a draft into a new chat (no model choice in the window). The start message is the
   Workflow 지침 (see "Workflow model"), researcher's settings first and stated to take precedence. "허브에서 Workflow 가져오기" searches the GAID hub first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each

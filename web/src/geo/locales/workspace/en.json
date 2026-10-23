@@ -43,7 +43,6 @@
   },
   "setup": {
     "open": "Open start settings",
-    "description": "Choose the input files and analysis conditions step by step.",
     "required": "required",
     "optional": "optional",
     "decideLater": "Decide during the task",
@@ -62,12 +61,7 @@
     "blockedInput": "Choose the required input files: {roles}",
     "steps": "Start settings steps",
     "stepLabel": "Step {n}: {name}",
-    "group": {
-      "inputs": "Input files",
-      "choices": "Analysis conditions"
-    },
     "summaryTab": "Summary",
-    "counter": "{n} / {total}",
     "when": "Needed when: {condition}",
     "input": {
       "required": "Required input · formats {formats}",
@@ -101,7 +95,6 @@
     "notChosen": "Not chosen",
     "limitUntested": "Untested Workflow. Results are not yet reviewed.",
     "limit": "Results are not yet reviewed.",
-    "moreAbout": "Show what it does and input formats",
     "moreResults": "Show expected results and limits",
     "ready": {
       "skills": "Required skills are turned off: {names}",
@@ -220,5 +213,63 @@
   "run": {
     "elapsed": "Running for {minutes}m {seconds}s",
     "analysis": "Run analysis"
+  },
+  "start": {
+    "intro": "About this Workflow",
+    "group": {
+      "input": "Input data",
+      "choice": "Analysis conditions"
+    },
+    "position": "{group} {n} / {total}",
+    "toInputs": "Choose input data",
+    "toChoices": "Choose analysis conditions",
+    "source": {
+      "catalogue": "Built-in Workflow",
+      "hub": "Hub Workflow",
+      "upstream": "General Workflow"
+    },
+    "fact": {
+      "purpose": "What it does",
+      "inputs": "Data it takes",
+      "choices": "Conditions to set",
+      "outputs": "What it makes",
+      "steps": "Steps",
+      "note": "Note",
+      "boundary": "Limits"
+    },
+    "exampleNone": "No example data. Choose a project file or upload your own.",
+    "exampleSome": "Example data available: {titles}. Without a file of your own, the Workflow starts on the example data.",
+    "choicesMany": "{count} · {names} and {rest} more",
+    "choicesDefer": "The AI agent asks in the chat, before the analysis, about conditions you leave open.",
+    "decision": "Decision",
+    "more": "Show more",
+    "less": "Show less",
+    "detail": "Show Workflow details",
+    "detailHint": "Checks per step, skills, instructions the AI agent receives",
+    "mine": "Your data",
+    "earlier": "Earlier results",
+    "nameMatch": "Name matches",
+    "nameMatchTip": "The file name matches the input's name. The file contents were not checked.",
+    "unusedFit": "A file in a fitting format exists but is not used",
+    "upstream": {
+      "english": "English",
+      "edit": "Edit instructions",
+      "editDone": "Finish editing",
+      "dataKinds": "Project files and folders, uploaded files, host paths and data URLs",
+      "dataRequired": "Required · you can choose several",
+      "dataOptional": "Optional · you can choose several",
+      "textRequired": "Required · write one line",
+      "textOptional": "Optional · write one line",
+      "needData": "Choose data to go to the next step.",
+      "needText": "Enter a value to go to the next step.",
+      "blockedText": "Fill in the required inputs: {names}",
+      "dataMany": "{first} and {rest} more",
+      "locations": "{count, plural, one {# data location} other {# data locations}}",
+      "folder": "Folder · {path}",
+      "uploadFiles": "Upload files",
+      "uploadFolder": "Upload folder",
+      "note": "Task instructions taken from K-Dense. Outputs and steps are not recorded."
+    },
+    "version": "version {version}"
   }
 }
