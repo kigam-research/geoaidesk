@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:04:31Z
+updated: 2026-10-23T07:28:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -61,9 +61,9 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
   new chat like GAID Workflows, model chosen in the composer, no model chip in the window (recommended) vs 나) keep model
   chip + immediate run (`Workflow 실행`).
 ## Next steps
-1. Record the user's answers under Notes and decisions; then wait for unit B (gaid-workflow-example) on main.
+1. Record the user's answers under Notes and decisions. Unit B is on main (1580ad11) and merged into this branch (merge commit, no rebase: no history rewrite).
 2. After B is on main: rebase, implement the chosen design (plan in Notes), checks, §12 screenshots, report.
-Blocked: waiting for the user's answer to the two mockup questions (asked 2026-10-23) and for unit B gaid-workflow-example to merge.
+Blocked: waiting for the user's answer to the two mockup questions (asked 2026-10-23).
 ## Failed approaches
 ## Notes and decisions
 - Plan (2026-10-23): sequential. Design → user approval → wait for B on main → implement. Implementation is tightly coupled
