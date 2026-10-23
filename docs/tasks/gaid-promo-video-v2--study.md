@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T03:48:58Z
+status: active
+updated: 2026-10-23T04:02:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b0548dfd-27be-4dcf-ba69-b63776942d00","pid":3358183,"provider":"codex","session":"01a16695-6d46-7443-aaf0-ecd221dc6b01","start":"61037027","token":"7042b64b9f79c0eca93642c203a3d8ce58be59b44dd8e29c7c39be2aeb522c25"}
 branch: task/gaid-promo-video-v2--study
 target: task/gaid-promo-video-v2
@@ -60,25 +60,27 @@ updated for v2 (reproduce steps, deviations). Report deviations from the shot li
 not appear). Then task save / task finish your unit.
 
 ## Current state
-- Ready for parent integration: capture-v2 has 14 shots, 1,950 frames (65 s), 2880x1620 at 30 fps. All 31 beat rectangles were drawn on midpoint frames at scale 2.25 and visually checked; proofs in capture-v2/beat-checks/. A3 retaken below the fixed header.
+- Capture artifacts validated: capture-v2 has 14 shots, 1,950 frames (65 s), 2880x1620 at 30 fps. All 31 beat rectangles were drawn on midpoint frames at scale 2.25 and visually checked; proofs in capture-v2/beat-checks/. A3 retaken below the fixed header.
 - Completed neutral-name M1, clean real-working R2, new Western Australia figure, and new N1/N2 note/decision takes. capture.json, study.json, contact sheet and CAPTURE.md finalized under ~/data/geoaidesk/work/gaid-promo-video-v2/.
 - New paper li-9c9d1be4e0ca (ahn2026), folder lc-0a58cae5488a, draft ap-33965983-5f2 (revision 2 check passed), registered entry entry-ap-33965983-5f2 revision 1, project yilgarn-cd7814, session 01a166b1-256d-71f4-b5e3-53298806a36d, note 2026-10-23-yilgarn-priority. New decision sent and reflected.
 - No training. Existing zone results reused; EPSG:3857 is parent-directed display assignment. R1/chat use older Workflow entry-ap-a135f290-1c4 revision 2; H1/H2 show new entry. R2's live citation-check segment is editorially combined with the earlier finished figure.
-- Checks: syntax, all frame dimensions/files and beat constraints passed; 27 existing local domain/index records unchanged. Remote unrelated star change remains unattributed and disclosed. No app source or service change; app suite not run.
+- Checks: syntax, all frame dimensions/files and beat constraints passed; 27 existing local domain/index records unchanged. Remote unrelated star change remains unattributed and disclosed. No app source or service change. Declared suite/publication result belongs to the task finish completion receipt.
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-23T03:48:58Z: ready; the parent gaid-promo-video-v2 integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish was interrupted during hidden full-suite checking, leaving local ready commit a8999f86 unpublished. Parent correctly rejected task complete. No resume or task save used; fix and retry in place.
 - Default authoring twice failed: OpenRouter not configured. Parent authorized per-action connected subscription picker; no defaults changed.
 - One provider-overload draft attempt failed; retry and normal UI revision succeeded. Missing-file examples removed; draft 2 check passed with no findings.
 - An ineffective direct edit to own cached authoring record was restored byte-for-byte, then normal UI revision used.
 - Capture Chrome exited before final A3; replaced only the capture browser inside the existing recorded job. Normal token gate used; app/hub not restarted.
 ## Notes and decisions
+- Final parent R2 request applied: capture-only DOM natural request text, old final-check wording replaced, no-new-analysis sentence removed; stored messages unchanged. One fresh short citation request captured while really working on same connected model. M1/N1/N2 visible wording rechecked. All beat proofs refreshed.
 - User direction (verbatim): "baggingPU까지 실행할 필요 없다. 홍보영상을 만드는 것이며, 실제 분석결과까지 모두 다 가져오는 모습을 보일 필요 없다. 필요하다면 유사한 기 작업 결과를 가져와도 되므로 모든 과정을 돌리지 말아라. 특히 BaggingPU는 계산이 오래걸린다." Also: "정직한 영상을 원하는 것이 아니라 홍보용 영상을 원하는 것이다."
 - Parent subsequently authorized EPSG:3857 and promotional staging, requested neutral names, new map/figure/note/R2 takes and every beat's midpoint-frame rect QA. All applied. No BaggingPU or other training ran.
 - Sequential decisions and ownership: reuse immutable prior results, stage own outputs, record real decision/citation work, then validate frames and callouts. Only capture*.py, CAPTURE.md and this task doc owned. No workers; live UI/capture state is tightly coupled.
-- Models: authoring openai-codex/gpt-6.1-sol (medium), chat openai/gpt-6.1-sol (OAuth subscription; 제공사의 구독 한도 적용). Same underlying model, different refs. Final chat: 3,904,532 subscription tokens, charged USD 0, compute USD 0; list-price equivalent USD 0.8187376. Settings/credentials unchanged.
+- Models: authoring openai-codex/gpt-6.1-sol (medium), chat openai/gpt-6.1-sol (OAuth subscription; 제공사의 구독 한도 적용). Same underlying model, different refs. Final chat: 4,107,981 subscription tokens, charged USD 0, compute USD 0; list-price equivalent USD 0.84117. Settings/credentials unchanged.
 - Evidence: 27 old local domain/index files unchanged; automatic collection/link/sync bookkeeping changed. Existing trial count +1 expected. Unrelated remote entry-ap-3b21b377-454 star 1→0 was never opened/mutated by study commands; attribution unknown, parent notified, no restoration.
 - Remaining format badge is decision-format after the answered decision becomes prose; bibliography resolves ahn2026. Parent accepted the badge. All current staging deviations and superseded takes are documented in CAPTURE.md/study.json.
 ## Open items
