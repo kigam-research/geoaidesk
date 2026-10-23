@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:02:13Z
+updated: 2026-10-23T06:22:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -73,11 +73,89 @@ Recommended answers the user accepted:
 - Do not restart or change the review app except D as a user of it; the hub updates the review app after A–C merge.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-23 15:05 KST: started. Paper read from Zotero (item 2SUGC6Q2, attachment FYMLI68F; text in
+  ~/data/geoaidesk/work/gaid-pocheon-trial/paper.txt, not in Git). Sibling units A/B/C just started (no code yet).
+- Paper method (reference for the quality bar): drone TMI (25 m grid, 60 m terrain-following) → diurnal correction →
+  Z-score > 3 outlier removal → IGRF removal (ppigrf) → crop; 271 core samples, 3 classes (host 0.0045, low-grade
+  0.1587, ore 0.2828 SI; variances 2.04e-4, 3.00e-3, 7.56e-3) → 1D GMM; SimPEG PGI on 25 m cells with DEM topography,
+  sensitivity weighting, start = host mean; PGI-full (fixed GMM) and PGI-none (means learned); ore by property
+  isovalue (ore mean) and by P(ore) > 99 %; low-sensitivity cells excluded; volumes 453,125 / 1,046,870 m3 vs
+  drill-interpreted 468,853 m3; IGRF inc 55.102°, dec -8.850°, 51,473.6 nT; boreholes KM20-1/KM20-2/KM21-1 (Table 1).
+- SimPEG 0.25.2 + discretize 0.13.0 install with `uv run --no-project --with simpeg` (PC74).
+
+## Plan (orchestration)
+Sequential decisions: (1) analogue data choice (Oracle survey running) → (2) example dataset built and checked with a
+reference PGI run ≤ 10 min (mesh size, tolerances) → (3) authoring in the review app as a researcher (GPT-6.1 Sol high)
+→ (4) register on the institute hub → (5) run in a GAID project → (6) research note → (7) note → 서재 (unit A).
+Independent packages: reference PGI script + example data (D, ~/data, later bundled per unit B's interface);
+authoring-steering fixes inside D's scope (authoring prompts/questions) — decided after the first authoring pass.
+Owned files: findings list here; report reports/2026-10-23-gaid-pocheon-trial/; fixes touch
+server/src/geo/authoring/* prompt/question text only after checking A/B/C do not own them (C owns sources).
+Integration order: A, B, C merge first; D rebases, then verifies the whole cycle once more.
+
+## Findings (authoring/analysis steering, gaps)
+(id — where — what — why — owner unit — status)
+- F1 — authoring UI (`web/src/geo/hub/agent-model.tsx`, `source-step.tsx:216`; server `authoring/model.ts:237`) — the
+  researcher can pick the model but not the thinking level; the UI never sends `thinkingLevel`, so every UI authoring
+  run uses medium. The user's requirement "GPT 6.1 sol high" cannot be met from the screen. — D (fix: thinking selector
+  next to the agent model, stored per authoring project) — open.
+- F2 — first draft (`authoring/agent.ts:434-447` `draftRequest`) — the draft call gets only 10-40 verified findings
+  (one anchor each), decisions and code file names, never the paper text; any method detail that did not become a
+  finding is lost (e.g. Z-score rejection, sensitivity mask, two GMM-based extraction criteria). — D — open.
+- F3 — trial scale (`prompts.ts:101-107`, `agent.ts:935-942`) — the recommended `quick-and-full` makes "quick" the start
+  default without saying what quick may change; nothing forbids dropping method steps or data types to get there. —
+  D (prompt: quick may coarsen resolution/limits only, never drop a method step, data type or comparison) — open.
+- F4 — package content — the authoring model cannot write scripts; without researcher-supplied code the package is
+  descriptive and the run agent writes all code at run time. For this paper the authors' own SimPEG PGI script is
+  public (Springer ESM1, 11 KB, `12303_2025_67_MOESM1_ESM.py`, sha256 cf1b0e18…) and can be given as a code source;
+  it covers mesh → PGI only, not processing or interpretation. — record; licence of ESM is the publisher's (see Notes).
+- F5 — example data (`InputPort.exampleRef` never produced by authoring) — B's scope (gaid-workflow-example). — route
+  after B's interface is known.
+- F7 — 서재 paper detail (`web/src/geo/library/library-screen.tsx`) — "Workflow 만들기" is disabled until "본문 텍스트
+  추출" has run, with no visible reason; a researcher sees a dead button. — A/C (library screen; C owns
+  library→authoring) — to route.
+- F8 — authoring project created from a 서재 item has no `model` (project.model empty) — harmless because every call sends
+  the chosen model, but the record does not show the researcher's choice until the first call. — note only.
+- F9 — BLOCKER on the LAN review app: `newOpId()` (`web/src/geo/hub/api.ts`) calls `crypto.randomUUID`, which browsers
+  expose only in secure contexts; the review app is plain http on 10.13.15.74 since 2026-10-23 11:35, so every hub
+  authoring action (read sources, answers, draft, revise) fails with the toast "crypto.randomUUID is not a function"
+  for every researcher on the institute LAN. — D — fixed in D (getRandomValues fallback + `web/src/geo/hub/api.test.ts`);
+  trial continues with the same polyfill injected into the trial browser. Same class, minor: copy buttons use
+  `navigator.clipboard` (undefined on insecure origins) in hub technical details, workflow-view, hub-feeds,
+  hub-server admin/parts, note-figures — they throw or do nothing. — D (optional) — open.
+- F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
+  yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
+
 ## Next steps
-1. (the next session's first action)
+1. Finish the first authoring pass (review app, project ap-bab647f7-674, GPT-6.1 Sol high via an in-page fetch patch
+   for F1 and a randomUUID polyfill for F9); answer questions as a researcher; record steering findings.
+2. Reference PGI: tune the synthetic example until PGI behaves as in the paper (ore mean shift, both criteria);
+   time ≤ 10 min (run 2: 220 s for both variants on 82,807 active cells, 620 data).
 ## Failed approaches
 ## Notes and decisions
+- 2026-10-23: Example data = SYNTHETIC at the real site (decision 2 fallback, pending the Oracle survey for real
+  data): real terrain (Copernicus GLO-30 DSM tile N38 E127, downloaded from
+  copernicus-dem-30m.s3.eu-central-1.amazonaws.com — the global S3 endpoint times out here), real IGRF via ppigrf
+  (matches the paper: 55.102°, -8.850°, 51,473 nT → the paper's coordinates are EPSG:5186), the paper's borehole
+  table (collars moved onto the DSM, which is ~95-110 m above the paper's 350 m collars; vertical drop kept), the
+  paper's class statistics for 271 samples (99/36/136), synthetic ore lenses (target ~0.44 Mm3 near the holes +
+  a neighbouring lens), drone lines 55 m apart at 60 m AGL with a high-flown patch NE of the target, base-station
+  diurnal record, noise and spikes. Generator `~/data/geoaidesk/work/gaid-pocheon-trial/ref/make_example.py`,
+  output `example-v1/` (~1.1 MB). Max anomaly ~920 nT (paper > 3000 nT; real ore is shallower/thinner).
+- 2026-10-23: Oracle survey (Pro, 14m53s; vault `웹 조사/geoaidesk/2026-10-23-i-need-to-pick-a--f9401c05d3.md`): no
+  public Pocheon data (Shin 2021, Shin & Shin 2022, Kim 2021 publish summaries/figures only); best real magnetite
+  pairs are USGS Pea Ridge (CC0, but 400 m lines, deep IOA) and Iron Mountain–Menominee (CC0); it recommends the
+  Pocheon-inspired synthetic hybrid as the default example, labelled by provenance, scored against the known truth
+  (both volumes plus IoU/precision/recall), never tuned on the true volume. Decision: synthetic hybrid (decision 2
+  fallback); a real-data case stays optional.
+- 2026-10-23: B's example interface (writer of gaid-workflow-example, commit f6c29c3, not merged): one example per input
+  role, `workflow.inputRoles[].example = {title, source, license?, synthetic?, files:[{name, sha256, size, path|url}]}`,
+  bundled path `examples/<roleId>/<name>`, ≤ 10 MiB/file, ≤ 15 MiB per Workflow; different roles land in different
+  project folders. D splits the example by role (aeromagnetic lines + base station; DEM; drillholes + core samples).
+- 2026-10-23: C's interface: `sourceContext(store, project)` stays the source-text helper (now with data-file
+  summaries); C bumped both prompt versions to 2026-10-23.1 (D bumped DRAFT to the same value; trivial conflict).
+- 2026-10-23: The paper's supplementary script is public at Springer (ESM1). It is © the publisher/authors with no
+  open licence stated; use as a code source in a hub draft needs the user's view (institute-internal hub).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
