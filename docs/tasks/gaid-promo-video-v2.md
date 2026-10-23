@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:26:31Z
+updated: 2026-10-23T03:19:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -59,7 +59,16 @@ media-craft for video tools, outputs outside Git, small PNG key frames in the re
 
 ## Current state
 - 2026-10-23: read v1 sources/report and the seoul_geomodel reference (full app frame at constant scale, one feature
-  tag + highlight box per beat, pointer moves, no zoom). Structure draft v2 below; demo data question pending.
+  tag + highlight box per beat, pointer moves, no zoom). Structure draft v2 below.
+- Scenes v2 written (`scene/scene.js`): background (real skill names, no counts, 개념도), cycle ring, demo chrome
+  (chapter title + cycle strip, whole frame at k=1.325, highlight + dim + Korean tag placed outside the box), second
+  brain (개념도), closing; `render.py` 105 s, `gaid-promo-v2.mp4`, capture schema v2, data optional. Previews
+  `~/data/geoaidesk/work/gaid-promo-video-v2/preview-0{1..4}` (preview-03/04 use v1 frames as stand-ins via
+  `fake-capture/`, preview only).
+- capture-v2 first pass (14 shots, 1,950 frames) wired: SEG timing now comes from capture frame counts; preview-05 has
+  a still per beat. Parent asked the child for retakes (M1 without "promotional" names, R2 while the agent works,
+  promo-quality figure + note, N1/N2) and for beat rects re-measured against the frames (`beat-checks/`). Child noted
+  remote hub entry `entry-ap-3b21b377-454` stars 1→0 during the session, not caused by the study (unattributed).
 - v1 copy (`~/data/geoaidesk/work/gaid-promo-video/home`) holds records from different studies: library = 3 spatial
   validation papers (Ploton, Meyer, Valavi/blockCV) in folder 공간 검증; hub Workflow `entry-ap-a135f290-1c4`
   "PU-컨포멀 탐사 우선순위 존 분류" (판 2) authored from the user's NRR paper (Yilgarn Ni, PU + conformal); a Yilgarn chat
@@ -100,7 +109,8 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 :8700), registering the Workflow is a real shared registration. User answer 2026-10-23: "검토용 앱에서 연구를 진행하고 Workflow를 기관 허브 서버에 등록해도 된다."
 
 ## Next steps
-1. Child `gaid-promo-video-v2--study` runs the study in the review app and records capture-v2 (contract
+1. Child `gaid-promo-video-v2--study` (writer b0548dfd, worktree ~/worktrees/geoaidesk/gaid-promo-video-v2--study,
+   started 2026-10-23) runs the study in the review app and records capture-v2 (contract
    `geo/promo/CONTRACT.md` v2). Parent meanwhile rebuilds `scene/` (background, cycle, demo chrome with cycle strip
    and feature tags, second brain, closing) and `render.py` (~105 s).
 2. Integrate capture-v2 beats into the demo segments, stills review, render job, report.
@@ -109,6 +119,24 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
 - Packages: (P) parent owns scene/, render.py, prepare_data.py, README, report, integration; (C) child
   `--study` owns the review-app study, capture*.py, CAPTURE.md, capture-v2 data. Interface: `capture.json` v2 beats
   (rect + Korean tag label per feature). Integration order: scenes with placeholders → capture-v2 → beats wired → render.
+- User 2026-10-23: "모션그래픽 영상 작업은 writer가 직접 모두 수행하자. 워커는 자료 수집 정도로만 활용하자." → the writer does
+  all film work (scenes, tags, timing, render); the child only runs the study and records raw takes (its beat labels are
+  suggestions).
+- 2026-10-23: the review app's default model (OpenRouter) is not configured; authoring failed twice. Parent told the
+  child to pick an already connected model in the per-action picker (prefer a subscription login), same model for the
+  whole study, no settings change (within the user's approval to run the study in the review app).
+- User 2026-10-23: "baggingPU까지 실행할 필요 없다. 홍보영상을 만드는 것이며, 실제 분석결과까지 모두 다 가져오는 모습을 보일
+  필요 없다. 필요하다면 유사한 기 작업 결과를 가져와도 되므로 모든 과정을 돌리지 말아라. 특히 BaggingPU는 계산이 오래걸린다." and
+  "정직한 영상을 원하는 것이 아니라 홍보용 영상을 원하는 것이다." → promotional film, staging allowed; no training run. The
+  child copies the paper's prior OOF zone assignments (`~/pc71-projects/narr/mpm_nested_cv/outputs/test_evaluation_oof/
+  baggingpu_xgboost/outer_fold_*/zone_assignments.csv`) into project `yilgarn-cd7814`; the AI agent only turns them into a
+  map file, a figure and the research note citing the paper (short real run).
+- User 2026-10-23: "홍보 영상 체계에 적절한 결과들 위주로 보여줘야하는 것이다. 이전 영상에서는 적절한 자료들을 사용했지만 연출과
+  구성이 적절하지 않았을 뿐이다. 정직하려고 하면 오히려 퀄리티가 떨어진다." → choose shots for visual quality; v1 takes
+  (Seoul shp map + basemap, area table, LAS, note decision, citations, connection map) may be reused in the demo where
+  they look better; the child writes the Yilgarn zone map as EPSG:3857 (grid values match Web Mercator over WA) on a
+  basemap.
+- User 2026-10-23: "면적표와 LAS검층은 불필요 하다." → no area table, no LAS depth viewer in v2.
 - Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
   it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
