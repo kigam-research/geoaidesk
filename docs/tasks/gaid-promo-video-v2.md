@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:14:27Z
+updated: 2026-10-23T02:18:21Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -58,9 +58,44 @@ no proprietary assets/fonts, visible names "AI agent"/"GAID", K-Dense shown as t
 media-craft for video tools, outputs outside Git, small PNG key frames in the report, results registry as `review`).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- 2026-10-23: read v1 sources/report and the seoul_geomodel reference (full app frame at constant scale, one feature
+  tag + highlight box per beat, pointer moves, no zoom). Structure draft v2 below; demo data question pending.
+- v1 copy (`~/data/geoaidesk/work/gaid-promo-video/home`) holds records from different studies: library = 3 spatial
+  validation papers (Ploton, Meyer, Valavi/blockCV) in folder 공간 검증; hub Workflow `entry-ap-a135f290-1c4`
+  "PU-컨포멀 탐사 우선순위 존 분류" (판 2) authored from the user's NRR paper (Yilgarn Ni, PU + conformal); a Yilgarn chat
+  started from it (only `outputs/variogram_fit.png`); notes in `proj-ca300f` (spatial CV, cite library papers);
+  Seoul 1:250K litho shp note in `review-notebook`. The review app `~/.geoaidesk` holds the same records.
+
+### Structure draft v2 (to show the user)
+Centre: one researcher's research cycle with the AI agent; Workflows from papers are shared and improved (판).
+Demo style: whole app frame at one scale (1280×720 CSS → 1920×1080), a cycle strip on top marking the current
+step, per feature one tag + highlight box + pointer; no zoom/scroll inside a beat.
+
+| # | s (target) | Part | Content |
+|---|---|---|---|
+| 0 | 0–5 | Opening | logo motion (kept from v1) |
+| 1 | 5–20 | Background (motion) | existing skill ecosystems: K-Dense scientific agent skills (upstream source), geoscience skills on GitHub, methods in papers, data at institutes, notes in personal folders → scattered; GAID gathers them into one researcher-friendly place. No count charts. |
+| 2 | 20–28 | The cycle (motion) | ring: 내 서재 → Workflow 만들기 → GAID 허브 공유 → 연구 분석 → 연구노트 → 내 서재; researcher + AI agent at the centre; 판 1→2 shows improvement |
+| 3a | 28–38 | Demo: 내 서재 | folders, paper with bibliography/PDF, Zotero/ORCID import, attach a folder to a project |
+| 3b | 38–50 | Demo: Workflow from a paper | hub authoring: paper source → one question at a time (recommended option) → draft flow diagram → check |
+| 3c | 50–58 | Demo: 공유 | register (preview) → hub entry with 판, stars/comments → another researcher installs it |
+| 3d | 58–74 | Demo: 연구 분석 | Workflow start settings → chat with the AI agent working (Workflow card, tool steps) → map viewer / work screen with the result |
+| 3e | 74–84 | Demo: 연구노트 | note list → note with result figure and a decision → 답변 보내기 |
+| 3f | 84–92 | Demo: back to 내 서재 | paper → 내 연구에서 쓰인 곳 (note, pages) → 연결 지도: the loop closes |
+| 4 | 92–100 | Closing (motion) | ring turns once more (판 grows), logo, 내부 검토용 |
+
+Feature map (explorer, 2026-10-23): the library paper detail has "Workflow 만들기" (needs a stored PDF; creates the
+authoring project with the PDF as first source and links it under 쓰인 곳); authoring 자료 → 질문 → 초안 → 허브 등록;
+hub entry "내 프로젝트에서 시험" → input prep → TaskSetup "시작 초안 만들기"; chat `WorkflowBlockCard`; MapViewer for
+.shp/.gpkg/.geojson/.tif/.geomap.json; notes tab with decisions "답변 보내기", "연결 지도 열기", 참고문헌. Step 3f is shown
+through what exists: a note citing `[@key]` appears under the paper's "내 연구에서 쓰인 곳" and in 연결 지도 (paper →
+Workflow → project → note). No feature adds a note itself as a library item; the film must not claim one.
+
+Length ≈ 100 s (over the 90 s default because the demo now has six steps; record if kept).
+
 ## Next steps
-1. (the next session's first action)
+1. Get the explorer's feature map (library→authoring, note→library), confirm the structure with the user and the
+   demo-data choice (existing mixed records vs one new coherent study run in a capture instance).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
