@@ -226,7 +226,12 @@ export async function listLocalMethods(
       hubChecks: file?.checks ?? null,
       authoring: file?.authoring ?? null,
       workflows,
-      recipes: file?.recipes ?? [],
+      // A choice with a default is not still to decide (gaid-workflow-stages); the package file stays as installed.
+      recipes: (file?.recipes ?? []).map((recipe) => {
+        const workflow = workflows.find((w) => w.id === recipe.workflowId);
+        const defaulted = new Set((workflow?.requiredScientificChoices ?? []).filter((c) => c.default).map((c) => c.id));
+        return defaulted.size ? { ...recipe, unresolvedChoices: recipe.unresolvedChoices.filter((id) => !defaulted.has(id)) } : recipe;
+      }),
       issues: method.file.issues,
     };
   });

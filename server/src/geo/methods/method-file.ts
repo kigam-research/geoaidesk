@@ -116,6 +116,17 @@ function workflow(value: unknown, index: number, runtimeName: string, issues: Me
   if (raw.inputRoles !== undefined && list(raw.inputRoles)?.some((role) => !Array.isArray((role as { formats?: unknown }).formats))) {
     add("inputRoles", "every input role needs formats (taxonomy format ids)");
   }
+  // gaid-workflow-stages: an input may take several files; a choice's default is an option id (or text without options).
+  (list(raw.inputRoles) ?? []).forEach((row, n) => {
+    const multiple = (row as { multiple?: unknown } | null)?.multiple;
+    if (multiple !== undefined && typeof multiple !== "boolean") add(`inputRoles[${n}].multiple`, "multiple must be true or false");
+  });
+  (list(raw.requiredScientificChoices) ?? []).forEach((row, n) => {
+    const choice = row as { default?: unknown; options?: unknown } | null;
+    if (!choice || choice.default === undefined) return;
+    if (typeof choice.default !== "string" || !choice.default.trim() || choice.default.length > 200) add(`requiredScientificChoices[${n}].default`, "default must be non-empty text");
+    else if (Array.isArray(choice.options) && choice.options.length && !choice.options.includes(choice.default)) add(`requiredScientificChoices[${n}].default`, "default must be one of options");
+  });
   // gaid-workflow/v1: `prompt` holds only the author's additional instructions, so it may be empty ({ko: ""}).
   const emptyPrompt = raw.schemaVersion === "gaid-workflow/v1" && isEmptyText(raw.prompt);
   for (const field of ["description", "prompt", "boundary"] as const) {
@@ -174,6 +185,7 @@ function gaidWorkflowParts(raw: Record<string, unknown>, runtimeName: string, ad
   const ids = (field: string) => new Set((list(raw[field]) ?? []).map((row) => (row as { id?: unknown })?.id).filter((id): id is string => typeof id === "string"));
   const choiceIds = ids("requiredScientificChoices");
   const outputIds = ids("expectedArtifacts");
+  const inputIds = ids("inputRoles");
   const steps = list(raw.steps);
   if (!steps || steps.length === 0 || steps.length > MAX_STEPS) return add("steps", `steps must be a list of 1-${MAX_STEPS}`);
   const stepIds = new Set<string>();
@@ -189,9 +201,10 @@ function gaidWorkflowParts(raw: Record<string, unknown>, runtimeName: string, ad
     if (step.skill !== undefined && step.skill !== null && (typeof step.skill !== "string" || !names.has(step.skill))) add(`${at}.skill`, "skill must be one of skills[].name");
     const checks = step.checks === undefined ? [] : list(step.checks);
     if (!checks || checks.length > MAX_LIST || checks.some((check) => !localized(check))) add(`${at}.checks`, "checks must be a list of {ko, en?} text");
-    for (const [field, known] of [["choiceIds", choiceIds], ["outputs", outputIds]] as const) {
+    const targets = { inputIds: "inputRoles", choiceIds: "requiredScientificChoices", outputs: "expectedArtifacts" } as const;
+    for (const [field, known] of [["inputIds", inputIds], ["choiceIds", choiceIds], ["outputs", outputIds]] as const) {
       const refs = step[field] === undefined ? [] : list(step[field]);
-      if (!refs || refs.some((ref) => typeof ref !== "string" || !known.has(ref))) add(`${at}.${field}`, `${field} must name this Workflow's ${field === "choiceIds" ? "requiredScientificChoices" : "expectedArtifacts"}`);
+      if (!refs || refs.some((ref) => typeof ref !== "string" || !known.has(ref))) add(`${at}.${field}`, `${field} must name this Workflow's ${targets[field]}`);
     }
   });
 }

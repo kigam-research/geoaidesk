@@ -22,6 +22,7 @@
     "runThrough": "Every condition is set. Record details the settings and instructions leave open as assumptions (the recommended or source value) and run to the end. Stop and ask only when a required input is missing or its format or CRS does not fit.",
     "choiceOptions": "{label}: chosen by the researcher (options: {options})",
     "choiceOpen": "{label}: set by the researcher",
+    "choiceDefault": "(default: {value})",
     "inputAsk": "{label} ({need})",
     "cliArguments": "The values after the command are the researcher's settings:",
     "cliAsk": "Before you start, ask the researcher for any item below that those values do not give.",
@@ -57,6 +58,7 @@
     "headDecision": "{title} [researcher decision: {decisions}]",
     "skill": "Skill: {skill}",
     "skillRead": "Skill: {skill} (read first: {read})",
+    "inputs": "Uses inputs: {inputs}",
     "checks": "Check: {checks}",
     "outputs": "Writes: {outputs}"
   },

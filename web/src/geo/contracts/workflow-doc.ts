@@ -47,6 +47,8 @@ export interface GaidWorkflowStep {
   skill?: string | null;
   read?: Localized | null;
   checks?: Localized[];
+  /** Input role ids this step first uses (gaid-workflow-stages); the start window shows them on this step's page. */
+  inputIds?: string[];
   choiceIds?: string[];
   outputs?: string[];
 }
@@ -61,6 +63,8 @@ export interface WorkflowDocStep {
   /** Which part of that skill to read first (a SKILL.md section title). */
   read?: Localized | null;
   checks: Localized[];
+  /** Ids of `inputRoles` this step first uses (empty for Workflows written before stages). */
+  inputIds?: string[];
   /** Ids of `choices` this step depends on (researcher decisions). */
   choiceIds: string[];
   /** Ids of `artifacts` this step writes. */
@@ -81,7 +85,7 @@ export interface WorkflowDoc {
   /** Registered hub version (gaid-hub-versions, e.g. 0.1.2); null for catalogue Workflows and drafts (초안). */
   version: string | null;
   purpose: Localized | null;
-  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized; example?: WorkflowInputExample }[];
+  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized; multiple?: boolean; example?: WorkflowInputExample }[];
   choices: WorkflowChoice[];
   skills: WorkflowDocSkill[];
   steps: WorkflowDocStep[];
@@ -91,9 +95,12 @@ export interface WorkflowDoc {
   instructions: Localized | null;
 }
 
-/** The researcher's start settings: input role id → project path, choice id → option id or free text. */
+/**
+ * The researcher's start settings: input role id → project path (several paths for a `multiple` input), choice id →
+ * option id or free text.
+ */
 export interface WorkflowDocSettings {
-  inputs: Record<string, string>;
+  inputs: Record<string, string | string[]>;
   choices: Record<string, string>;
   /** Input role ids whose path is the Workflow's example data (gaid-workflow-example), not the researcher's own file. */
   examples?: string[];
@@ -128,6 +135,10 @@ const optionText = (choice: WorkflowChoice, value: string, locale: "ko" | "en") 
   return label ? pick(label, locale) : value;
 };
 
+/** A setting's paths as one line (a `multiple` input joins its files). */
+export const settingPaths = (value: string | string[] | undefined): string =>
+  (Array.isArray(value) ? value : value === undefined ? [] : [value]).map((path) => path.trim()).filter(Boolean).join(", ");
+
 /** Render the Workflow 지침 as Markdown. Deterministic: same doc, settings and locale give the same text. */
 export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions): string {
   const { locale, target, say } = options;
@@ -158,7 +169,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     if (doc.inputRoles.some((role) => role.example)) lines.push("", say("settings.exampleRule"));
   } else {
     for (const role of doc.inputRoles) {
-      const path = settings?.inputs[role.id]?.trim();
+      const path = settingPaths(settings?.inputs[role.id]);
       const example = role.example && used.has(role.id) && path ? role.example : null;
       const value = example
         ? say("settings.exampleUsed", { path: path!, title: exampleTitle(example), source: p(example.source) })
@@ -177,7 +188,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     if (settings) lines.push(say("settings.unresolved", { list: unresolved.length ? unresolved.join(", ") : say("settings.none") }));
     if (settings && !unresolved.length) lines.push(say("settings.runThrough"));
     else lines.push(say("settings.askBeforeStep"));
-    const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settings?.inputs[role.id]?.trim());
+    const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settingPaths(settings?.inputs[role.id]));
     if (exampleRoles.length) lines.push("", say("settings.examplesUsed", { labels: exampleRoles.map((role) => p(role.label)).join(", ") }), say("settings.exampleRule"));
   }
 
@@ -213,10 +224,13 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     }
     const choiceLabel = new Map(doc.choices.map((choice) => [choice.id, p(choice.label)]));
     const artifactLabel = new Map(doc.artifacts.map((artifact) => [artifact.id, p(artifact.label)]));
+    const inputLabel = new Map(doc.inputRoles.map((role) => [role.id, p(role.label)]));
     doc.steps.forEach((step, i) => {
       const decisions = step.choiceIds.map((id) => choiceLabel.get(id)).filter((x): x is string => Boolean(x));
       const head = decisions.length ? say("step.headDecision", { title: p(step.title), decisions: decisions.join(", ") }) : p(step.title);
       lines.push(`${i + 1}. ${head}: ${p(step.does)}`);
+      const inputs = (step.inputIds ?? []).map((id) => inputLabel.get(id)).filter((x): x is string => Boolean(x));
+      if (inputs.length) lines.push(`   ${say("step.inputs", { inputs: inputs.join(", ") })}`);
       if (step.skill) lines.push(`   ${p(step.read) ? say("step.skillRead", { skill: step.skill, read: p(step.read) }) : say("step.skill", { skill: step.skill })}`);
       if (step.checks.length) lines.push(`   ${say("step.checks", { checks: step.checks.map(p).join(" / ") })}`);
       const outputs = step.outputs.map((id) => artifactLabel.get(id)).filter((x): x is string => Boolean(x));
@@ -244,7 +258,8 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
 function choiceAsk(choice: WorkflowChoice, locale: "ko" | "en", say: WorkflowDocSay) {
   const label = pick(choice.label, locale);
   const options = (choice.options ?? []).map((option) => optionText(choice, option, locale));
-  return options.length ? say("settings.choiceOptions", { label, options: options.join(" / ") }) : say("settings.choiceOpen", { label });
+  const ask = options.length ? say("settings.choiceOptions", { label, options: options.join(" / ") }) : say("settings.choiceOpen", { label });
+  return choice.default?.trim() ? `${ask} ${say("settings.choiceDefault", { value: optionText(choice, choice.default.trim(), locale) })}` : ask;
 }
 
 // --- Chat block ------------------------------------------------------------------------------------------------
@@ -337,6 +352,7 @@ export function legacyWorkflowDoc(input: LegacyWorkflowInput): WorkflowDoc {
       skill: primary,
       read: null,
       checks: node.checks ?? [],
+      inputIds: [],
       choiceIds: (node.decisionIds ?? []).filter((id) => choiceIds.has(id)),
       outputs: [],
     })),

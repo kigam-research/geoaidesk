@@ -25,7 +25,7 @@ import type {
 } from "../../../../web/src/geo/contracts/authoring.ts";
 import { GAID_METHOD_SCHEMA } from "../../../../web/src/geo/contracts/methods.ts";
 import { lintProfile, type AtlasProfile, type LintFinding } from "./profile-lint.ts";
-import { headingMismatch, structuredDraft, workflowProblems } from "./workflow.ts";
+import { headingMismatch, stageWarningText, structuredDraft, workflowProblems, workflowStageWarnings } from "./workflow.ts";
 import { safeRelative, sourceFile } from "./sources.ts";
 import { bundledBytes, exampleFileBytes, packagedExample, packagedWorkflow } from "./examples.ts";
 import { EXAMPLE_LIMITS, exampleProblems } from "../../../../web/src/geo/contracts/workflow-examples.ts";
@@ -77,10 +77,13 @@ workflowProperties.skills = { type: "array", minItems: 1, maxItems: 100, items: 
 workflowProperties.steps = { type: "array", minItems: 3, maxItems: 12, items: {
   type: "object", required: ["id", "title", "does"], additionalProperties: false,
   properties: { id: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" }, title: textSchema, does: textSchema,
-    skill: { type: ["string", "null"] }, read: { anyOf: [textSchema, { type: "null" }] }, checks: textList, choiceIds: idList, outputs: idList },
+    skill: { type: ["string", "null"] }, read: { anyOf: [textSchema, { type: "null" }] }, checks: textList, inputIds: idList, choiceIds: idList, outputs: idList },
 } };
 // gaid-workflow-example: an input role may carry default example data (contract workflow-examples.ts).
 const inputRoleProperties = (workflowProperties.inputRoles as { items: { properties: Record<string, unknown> } }).items.properties;
+// gaid-workflow-stages: an input may take several files; a choice may carry the value used unless the researcher changes it.
+inputRoleProperties.multiple = { type: "boolean" };
+(workflowProperties.requiredScientificChoices as { items: { properties: Record<string, unknown> } }).items.properties.default = { type: "string", minLength: 1, maxLength: 200 };
 inputRoleProperties.example = {
   type: "object", required: ["title", "source", "files"], additionalProperties: false,
   properties: { title: textSchema, source: textSchema, license: { type: "string", maxLength: 500 }, synthetic: { type: "boolean" },
@@ -311,6 +314,7 @@ const PLAIN: Record<string, string> = {
   "workflow-schema": "Workflow 설정의 형식이 맞지 않습니다.",
   "workflow-links": "Workflow 단계에 사용 스킬, 필요한 조건과 결과 파일을 연결해 주세요.",
   "workflow-headings": "Workflow 단계와 스킬 처리 절차의 절 제목·순서를 맞춰 주세요.",
+  "workflow-stages": "Workflow 단계를 분석 흐름에 맞게 3~5단계로 나누고, 꼭 정할 조건은 6개 이하로 줄여 주세요.",
   "recipe-schema": "레시피 설정의 형식이 맞지 않습니다.",
   "recipe-choice": "레시피에 Workflow에 없는 선택 항목이 있습니다.",
   "recipe-conflict": "레시피의 같은 항목이 정한 값과 미정 목록에 함께 있습니다.",
@@ -506,6 +510,8 @@ export async function checkMethod(
       for (const problem of workflowProblems(w, draft.slug)) find("workflow", "workflow-links", "workflow/steps", problem);
       if (headingMismatch(draft.instructions, w.steps ?? [], draft.slug))
         find("workflow", "workflow-headings", "SKILL.md#처리 절차", "Workflow 단계와 SKILL.md 처리 절차의 절 제목·순서가 다릅니다. 단계 이름과 읽을 절을 맞춰 주세요.", "warning");
+      // Analysis-flow stages (gaid-workflow-stages): advice only, so older drafts still package and register.
+      for (const warning of workflowStageWarnings(w)) find("workflow", "workflow-stages", "workflow/steps", stageWarningText(w, warning), "warning");
     }
     if (!validateWorkflow(packagedWorkflow(w)))
       for (const e of validateWorkflow.errors ?? [])

@@ -36,7 +36,7 @@ import { renderDataSummary } from "./data-files.ts";
 import { pageFile, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
-import { procedureFor, structuredDraft, workflowProblems } from "./workflow.ts";
+import { procedureFor, structuredDraft, workflowProblems, workflowStageWarnings } from "./workflow.ts";
 import { carryExamples } from "./examples.ts";
 
 const localSkill = (slug: string) => `local:${slug}`;
@@ -382,6 +382,8 @@ export const CODE_USE_KEY = "code-use";
 export const TRIAL_SCALE_KEY = "trial-scale";
 /** Workflow choice the draft must carry when the researcher asked for a reduced first-trial setting. */
 export const RUN_SCALE_CHOICE = "run-scale";
+/** Repair errors from the analysis-flow stage check (gaid-workflow-stages). */
+export const STAGE_ERROR_PREFIX = "workflow stages: ";
 
 /**
  * Questions the hub asks for every method when they apply (gaid-hub-followups, user direction 2026-10-16: heavy
@@ -591,8 +593,11 @@ export function validateDraft(
 ): {
   draft?: Omit<MethodDraft, "revision" | "baseRevision" | "origin" | "createdAt" | "attemptId">;
   errors: string[];
+  /** Analysis-flow stage warnings of the proposed Workflow; they ask for a repair but do not reject the draft. */
+  stageErrors: string[];
 } {
   const errors: string[] = [];
+  const stageErrors: string[] = [];
   const notes: string[] = [];
   const known = (facet: TaxonomyFacet) => new Set(v.taxonomy[facet].map((t) => t.id));
   const filterKnown = (raw: unknown, facet: TaxonomyFacet, where: string) => {
@@ -868,12 +873,17 @@ export function validateDraft(
           errors.push(
             `workflow.requiredScientificChoices[${i}].options must be two or more {id, label} with short ids (letters, digits, - _ .)`,
           );
+        // A default is shown and editable in the start summary (gaid-workflow-stages); with options it is an option id.
+        const fallback = typeof x.default === "number" || typeof x.default === "boolean" ? String(x.default) : str(x.default, 200);
+        if (fallback && options.length && !options.includes(fallback))
+          errors.push(`workflow.requiredScientificChoices[${i}].default "${fallback}" must be one of its option ids`);
         return {
           id: uniqueId(x.id, `workflow.requiredScientificChoices[${i}]`),
           label: loc(str(x.label, 200)),
           why: loc(str(x.why, 600)),
           ...(options.length ? { options } : {}),
           ...(Object.keys(labels).length ? { optionLabels: labels } : {}),
+          ...(fallback ? { default: fallback } : {}),
         };
       });
     const inputRoles = arr(w.inputRoles)
@@ -892,6 +902,7 @@ export function validateDraft(
           label: loc(plainLabel(str(x.label, 200))),
           formats: f,
           required: x.required !== false,
+          ...(x.multiple === true ? { multiple: true } : {}),
         };
       });
     if (!inputRoles.length) errors.push("workflow.inputRoles needs at least one input");
@@ -958,7 +969,7 @@ export function validateDraft(
       title: loc(str(x.title, 120)), does: loc(str(x.does, 1200)),
       skill: str(x.skill, 64), read: loc(str(x.read, 200)),
       checks: arr(x.checks).map((x) => str(x, 300)).filter(Boolean).map(loc),
-      choiceIds: ids(x.choiceIds), outputs: ids(x.outputs),
+      inputIds: ids(x.inputIds), choiceIds: ids(x.choiceIds), outputs: ids(x.outputs),
     }));
     workflow.skills = skills;
     workflow.steps = steps;
@@ -967,6 +978,8 @@ export function validateDraft(
       [...v.catalogueIds].find((id) => id.split("/").at(-1) === s.name) ?? s.name);
     errors.push(...workflowProblems(workflow, slug));
     procedure = procedureFor(workflow);
+    // Fresh model output follows the analysis-flow stage form; these go to the bounded repair (see execute).
+    stageErrors.push(...workflowStageWarnings(workflow).map((w) => `${STAGE_ERROR_PREFIX}${w.detail}`));
     const keys = new Set(choices.map((c) => c.id));
     const r = isObj(value.recipe) ? value.recipe : {};
     const answered: Record<string, string | number | boolean> = {};
@@ -1000,9 +1013,14 @@ export function validateDraft(
         errors.push(
           `the researcher asked for a reduced first-trial setting: add workflow.requiredScientificChoices "${RUN_SCALE_CHOICE}" with options {"id": "quick", "label": "빠른 시험"} and {"id": "full", "label": "전체 설정"}, and describe both in SKILL.md`,
         );
-      else answered[RUN_SCALE_CHOICE] = "quick";
+      else {
+        answered[RUN_SCALE_CHOICE] = "quick";
+        scale.default ??= "quick";
+      }
     }
-    const unresolved = [...keys].filter((k) => !(k in answered));
+    // A choice with a default is not still to decide: the start summary shows its value (gaid-workflow-stages).
+    const defaulted = new Set(choices.filter((c) => c.default).map((c) => c.id));
+    const unresolved = [...keys].filter((k) => !(k in answered) && !defaulted.has(k));
     recipe = { choices: answered, unresolvedChoices: unresolved };
   } else if (value.workflow !== null && value.workflow !== undefined) errors.push("workflow must be an object or null");
   const evidence = arr(value.evidence)
@@ -1018,10 +1036,11 @@ export function validateDraft(
     errors.push('the researcher asked for a Workflow: add the "workflow" object and its "recipe"');
   if (project.target === "skill" && workflow)
     errors.push('the researcher asked for a skill only: set "workflow" and "recipe" to null');
-  if (errors.length) return { errors };
+  if (errors.length) return { errors, stageErrors };
   const scopes = ["reproduction", "generalization", "both", "unknown"] as const;
   return {
     errors,
+    stageErrors,
     draft: {
       sourceRevision: project.sourceRevision,
       decisionIds: project.decisions.filter((d) => !d.supersededBy).map((d) => d.id),
@@ -1317,7 +1336,7 @@ async function execute(
           if (!Array.isArray(parsed.value.codeFiles)) d.draft.codeFiles = previous.codeFiles;
           if (!Array.isArray(parsed.value.references)) d.draft.references = previous.references;
         }
-        result = { ok: !!d.draft, errors: d.errors, draft: d.draft };
+        result = { ok: !!d.draft, errors: [...d.errors, ...d.stageErrors], draft: d.draft };
         // Run the package checks on the candidate so the bounded repair can fix what packaging would refuse.
         if (d.draft) {
           declareImports(d.draft, ctx, project);
@@ -1332,7 +1351,9 @@ async function execute(
     let chosen: Parsed | undefined = first.ok ? first : undefined;
     let outcome: "accepted" | "repaired" | "rejected" = first.ok ? "accepted" : "rejected";
     const minor = first.errors.length <= Math.max(3, (first.analysis?.findings.length ?? 0) / 4);
-    if (!first.ok || !minor) {
+    // Stage warnings always get the one repair round: a Workflow split item by item or past five steps is reworked.
+    const staged = (p: Parsed) => p.errors.filter((e) => e.startsWith(STAGE_ERROR_PREFIX));
+    if (!first.ok || !minor || staged(first).length) {
       messages.push({ role: "user", content: REPAIR(first.errors.slice(0, 40)) });
       const second = await ask();
       const better =
@@ -1348,6 +1369,7 @@ async function execute(
     }
     const analysis = chosen?.analysis;
     const draft = chosen?.draft;
+    // Stage warnings left after the repair keep the draft; the package check and the draft screen show them.
     await save(messages);
     return await finish(store, projectId, attempt.id, (p, a) => {
       a.usage = usage;

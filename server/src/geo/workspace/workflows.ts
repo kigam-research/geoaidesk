@@ -24,10 +24,10 @@ import type { GeoWorkflow, LocalizedText } from "../catalogue-types.ts";
 import type { EnvironmentReadiness, GeoEnvironmentService } from "../environments.ts";
 import { extensionsFor } from "./formats.ts";
 import type { WorkflowDoc } from "../../../../web/src/geo/contracts/workflow-doc.ts";
-import { catalogueProcedure, workflowDocFor } from "../workflow-doc.ts";
+import { catalogueProcedure, choiceDefault, workflowDocFor } from "../workflow-doc.ts";
 
-type RawRole = { id: string; label: LocalizedText; formats?: string[]; required?: boolean; requiredWhen?: LocalizedText };
-type RawChoice = { id: string; label: LocalizedText; why?: LocalizedText; options?: unknown[]; optionLabels?: Record<string, unknown>; requiredWhen?: LocalizedText };
+type RawRole = { id: string; label: LocalizedText; formats?: string[]; required?: boolean; requiredWhen?: LocalizedText; multiple?: unknown };
+type RawChoice = { id: string; label: LocalizedText; why?: LocalizedText; options?: unknown[]; optionLabels?: Record<string, unknown>; requiredWhen?: LocalizedText; default?: unknown };
 type RawArtifact = { id: string; label: LocalizedText; required?: boolean; requiredWhen?: LocalizedText; files?: unknown[] };
 
 function text(value: unknown): Localized | null {
@@ -123,6 +123,7 @@ export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowRead
       extensions: extensionsFor(strings(role.formats)),
       required: role.required === true,
       ...(text(role.requiredWhen) ? { requiredWhen: text(role.requiredWhen)! } : {}),
+      ...(role.multiple === true ? { multiple: true } : {}),
     })),
     requiredScientificChoices: choices.map((choice) => ({
       id: choice.id,
@@ -131,6 +132,7 @@ export function summarizeWorkflow(workflow: GeoWorkflow, readiness: WorkflowRead
       ...(strings(choice.options).length ? { options: strings(choice.options) } : {}),
       ...(optionLabels(choice) ? { optionLabels: optionLabels(choice)! } : {}),
       ...(text(choice.requiredWhen) ? { requiredWhen: text(choice.requiredWhen)! } : {}),
+      ...(choiceDefault(choice) ? { default: choiceDefault(choice)! } : {}),
     })),
     prompt: text(workflow.prompt),
     skillIds: [...workflow.skillIds],
