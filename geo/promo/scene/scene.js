@@ -198,7 +198,7 @@
   });
 
   // S1 opening (v2 clock 0–5.2)
-  const SLOT = { opening: [0, 4.4], background: [4.1, 17.2], cycle: [16.9, 24.4] };
+  const SLOT = { opening: [0, 4.4], background: [4.1, 15.9], cycle: [15.6, 22.3] };
   timed([0, 5.2], SLOT.opening, () => {
     const layer = h('div', 'layer');
     const dial = sv('svg', { width: 1920, height: 1080 }, layer);
@@ -266,8 +266,8 @@
     return segs.length ? { ...c, a: segs[0].a, b: segs[segs.length - 1].b } : null;
   }).filter(Boolean);
   const DEMO = { a: CHAPTERS[0].a, b: CHAPTERS[CHAPTERS.length - 1].b };
-  SLOT.brain = [DEMO.b - 0.25, DEMO.b - 0.25 + 8.4];
-  SLOT.closing = [SLOT.brain[1] - 0.3, SLOT.brain[1] - 0.3 + 4.6];
+  SLOT.brain = [DEMO.b - 0.25, DEMO.b - 0.25 + 7.8];
+  SLOT.closing = [SLOT.brain[1] - 0.3, SLOT.brain[1] - 0.3 + 4.3];
   const DURATION = Math.ceil(SLOT.closing[1]);
 
   const stationIcon = (st, size, color) => (st.icon === 'orbit'
