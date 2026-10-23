@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:54:28Z
+updated: 2026-10-23T08:57:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -211,8 +211,11 @@ Blocked: second pass waits for the hub's review-app update to main 1684c887+ (re
 1. Wait for the hub (unit gaid-hub-rollout-versions) to update the review app to main 1684c887+ (loopback-only,
    http://127.0.0.1:3000 on PC74 until the user re-enables LAN on 2026-10-26).
 2. Second pass on the new main: 서재 → Workflow 만들기 (GPT-6.1 Sol, 높음 from the screen) with paper + ESM1 + the six
-   example files as data sources (C), plus Astic & Oldenburg 2019 (GJI, PGI method; source for the GMM-proportion
-   check, F19) from 서재 → answers (if the proportion check is still missing: revise feedback — conditional
+   example files as data sources (C), plus the PGI method paper from 서재 — Astic, Heagy & Oldenburg 2020 (GJI 224,
+   doi 10.1093/gji/ggaa378, cited by Heo et al.; arXiv 2002.09515 preprint PDF, added 2026-10-23 17:5x as a GAID 서재
+   item with Crossref metadata, 47 pages text extracted; Astic & Oldenburg 2019 is closed access). Its appendix B
+   (eqs B.3-B.7) gives the GMM update with volumetric proportions over the active mesh and the confidence κ in the
+   means (0 = learned, ∞ = fixed); the source for the F19 proportion check → answers (if the proportion check is still missing: revise feedback — conditional
    proportion check when PGI-none's learned ore mean collapses, a mesh-volume-fraction option in "GMM 분류와 성분
    가중치", report both; keep the run ≤ 10 min by running the extra PGI-none only on collapse) → answers → draft → attach the examples per input (B) → register (new entry) →
    new project → start settings with no own files (examples selected; check F17) → run → research note → bring the
