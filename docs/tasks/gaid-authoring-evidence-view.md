@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:45:42Z
+updated: 2026-10-23T07:53:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"18d7f503-0e2f-44c7-a932-c7055bd2c385","pid":2512963,"provider":"claude","session":"44724507-b03c-4f81-8a86-8ba8fb6c63a4","start":"62748122","token":"95149b68f88f25b2cc88125567a9d482dea12e9e0e8824d13a7f22052038e299"}
 branch: task/gaid-authoring-evidence-view
 target: main
@@ -58,11 +58,16 @@ Implemented (2026-10-23), by this writer alone (no child units):
   (`pdf-viewer.tsx` exports `loadPdfjs`).
 - Verified: server geo-authoring tests (17), web hub tests (99), copy + UI checks clean; screenshots 48 (2 styles x 2 themes x
   2 sizes x 6 scenes) from an own instance (ports 18131/3131, units gaev-api/gaev-web, stopped), seed and shots in
-  ~/data/geoaidesk/work/gaid-authoring-evidence-view/. scripts/check: running at last update (log there, logs/check.log).
+  ~/data/geoaidesk/work/gaid-authoring-evidence-view/. scripts/check passed 2026-10-23 (exit 0; backend 2265 passed / 8 skipped,
+  frontend 1248 passed, GAID checks incl. production smoke; log logs/check.log there).
+- Route f-pdf-pane (G's PdfPane notice): answered without reuse; the evidence viewer needs single-page quote boxes that
+  PdfPane/PdfViewer lack; it shares `loadPdfjs` + `usePdfPageRendering`. Optional later: SourcePageDialog could host PdfPane
+  after G merges. G and F both edit pdf-viewer.tsx on different lines.
 ## Next steps
-1. Confirm scripts/check passes; task save; review-copy the report; task finish.
+1. task finish (check passed, report pushed and review-copied); then update route f-pdf-pane after integration.
 ## Failed approaches
 ## Notes and decisions
+- Rollout: none by this unit (review app and institute hub server unchanged; no hub-server protocol change).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
