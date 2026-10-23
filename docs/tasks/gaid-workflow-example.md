@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:34:29Z
+updated: 2026-10-23T06:35:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cc577db8-acf4-4fcd-b382-03314cb2af71","pid":1746984,"provider":"claude","session":"bf5e0624-c00c-4da3-8d48-be9d0472fbca","start":"62320911","token":"08ec02ef4d15776d4adca0405d68c76559de4aefe662e800ff9e1e1ba2940de0"}
 branch: task/gaid-workflow-example
 target: main
@@ -94,7 +94,8 @@ Recommended answers the user accepted:
   in the hint), Q3 (example card placed before 기타, which stays last apart from 사용하지 않음 as before), Q4 (inputs with an
   example count as answered), Q5 (summary lists example values, note and mixed warning).
 ## Next steps
-1. Wait for child A's finish; `task complete gaid-workflow-example--example-authoring`, then scripts/check again, write
+1. Child A writer 4c42e845 still running (Paseo status running at 15:41 KST).
+   Wait for child A's finish; `task complete gaid-workflow-example--example-authoring`, then scripts/check again, write
    the report `reports/2026-10-23-gaid-workflow-example/index.md` (humanizer), `task finish`.
 
 ## Plan (orchestration)
@@ -122,6 +123,8 @@ Sequential decisions: contract first (done), then two independent packages.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-workflow-example/index.md
+(draft; placeholders {{...}} filled after child A and the final scripts/check)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
