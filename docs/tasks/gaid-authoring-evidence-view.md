@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T08:03:58Z
+status: done
+updated: 2026-10-23T08:04:00Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"18d7f503-0e2f-44c7-a932-c7055bd2c385","pid":2512963,"provider":"claude","session":"44724507-b03c-4f81-8a86-8ba8fb6c63a4","start":"62748122","token":"95149b68f88f25b2cc88125567a9d482dea12e9e0e8824d13a7f22052038e299"}
 branch: task/gaid-authoring-evidence-view
 target: main
@@ -65,7 +65,7 @@ Implemented (2026-10-23), by this writer alone (no child units):
   after G merges. G and F both edit pdf-viewer.tsx on different lines.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T07:53:42Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T08:04:00Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
