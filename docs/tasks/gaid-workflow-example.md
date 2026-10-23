@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:18:10Z
+updated: 2026-10-23T06:36:02Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cc577db8-acf4-4fcd-b382-03314cb2af71","pid":1746984,"provider":"claude","session":"bf5e0624-c00c-4da3-8d48-be9d0472fbca","start":"62320911","token":"08ec02ef4d15776d4adca0405d68c76559de4aefe662e800ff9e1e1ba2940de0"}
 branch: task/gaid-workflow-example
 target: main
@@ -81,10 +81,23 @@ Recommended answers the user accepted:
   tsc clean both; copy 0 errors; ui 0 errors.
 - Unit D was told the declaration shape (Paseo message to f483b642, 2026-10-23 15:18 KST; route-report
   d-interface-gaid-workflow-example).
+- Full scripts/check run 1 (before child A, log `~/data/geoaidesk/work/gaid-workflow-example/check-1.log`): 2261 passed,
+  1 failed: `geo-hub-server.test.ts` launcher CLI test timed out at 5 s under load average ~35 (other units testing in
+  parallel); rerun alone passed in 4.4 s. Not related to this change.
+- End-to-end in a dev app (ports 3300/18300, data `~/data/geoaidesk/work/gaid-workflow-example/app`, fixture method
+  pocheon-mag with bundled + loopback-remote examples): start settings selected the examples, "시작 초안 만들기" wrote four
+  files under `user_data/examples/pocheon-mag/<role>-<key>/`, the composer card showed 예제 자료로 실행, the tree showed the
+  folder on its 15 s refresh, and the reopened setup reported 프로젝트에 이미 있습니다. Screenshots (both styles, both themes,
+  1440x900 and 1280x800) in `~/data/geoaidesk/work/gaid-workflow-example/playwright/`; five copied to
+  `reports/2026-10-23-gaid-workflow-example/figures/`. Dev app stopped.
+- UI rules: Q1 (one input per step), Q2 (example pre-selected only when the researcher has no fitting file, reason shown
+  in the hint), Q3 (example card placed before 기타, which stays last apart from 사용하지 않음 as before), Q4 (inputs with an
+  example count as answered), Q5 (summary lists example values, note and mixed warning).
 ## Next steps
-1. Wait for full `scripts/check` (log `~/data/geoaidesk/work/gaid-workflow-example/check-1.log`) and child A's finish;
-   `task complete gaid-workflow-example--example-authoring`, then scripts/check again and Korean screenshots of the start
-   settings (both styles, both themes, 1440x900 and 1280x800) from a dev app on non-review ports.
+Blocked: waiting for child unit gaid-workflow-example--example-authoring (writer 4c42e845 running); its finish notifies this session.
+1. Child A writer 4c42e845 still running (Paseo status running at 15:41 KST).
+   Wait for child A's finish; `task complete gaid-workflow-example--example-authoring`, then scripts/check again, write
+   the report `reports/2026-10-23-gaid-workflow-example/index.md` (humanizer), `task finish`.
 
 ## Plan (orchestration)
 Sequential decisions: contract first (done), then two independent packages.
@@ -111,6 +124,8 @@ Sequential decisions: contract first (done), then two independent packages.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-workflow-example/index.md
+(draft; placeholders {{...}} filled after child A and the final scripts/check)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

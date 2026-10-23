@@ -168,16 +168,16 @@ export function InputStep({ role, files, answer, onAnswer, onUpload }: {
     <div role="radiogroup" aria-labelledby={id} className="space-y-2">
       {fitting.map((path) => <OptionCard key={path} selected={answer?.mode === "file" && answer.path === path} onSelect={() => onAnswer({ mode: "file", path })}
           title={baseName(path)} hint={folderName(path)} />)}
+      {role.example && <OptionCard selected={answer?.mode === "example"} onSelect={() => exampleUsable(role) && onAnswer({ mode: "example" })}
+        title={t("workspace.setup.example.use", { title: exampleTitle(role) })}
+        badge={<><Badge variant="outline">{t("workspace.setup.example.badge")}</Badge>{role.example.synthetic && <Badge variant="outline">{t("workspace.setup.example.synthetic")}</Badge>}</>}
+        hint={<ExampleHint role={role} />} />}
       {others.length > 0 && <OptionCard selected={answer?.mode === "other"} onSelect={() => onAnswer({ mode: "other", path: otherPath })} title={t("workspace.setup.input.other")}>
         <select aria-label={t("workspace.setup.input.otherField")} className={fieldClass} value={otherPath} onChange={(event) => onAnswer({ mode: "other", path: event.target.value })}>
           <option value="">{t("workspace.setup.input.pick")}</option>
           {others.map((path) => <option key={path} value={path}>{path}</option>)}
         </select>
       </OptionCard>}
-      {role.example && <OptionCard selected={answer?.mode === "example"} onSelect={() => exampleUsable(role) && onAnswer({ mode: "example" })}
-        title={t("workspace.setup.example.use", { title: exampleTitle(role) })}
-        badge={<><Badge variant="outline">{t("workspace.setup.example.badge")}</Badge>{role.example.synthetic && <Badge variant="outline">{t("workspace.setup.example.synthetic")}</Badge>}</>}
-        hint={<ExampleHint role={role} />} />}
       {!role.required && <OptionCard selected={answer?.mode === "none"} onSelect={() => onAnswer({ mode: "none" })} title={t("workspace.setup.input.none")} />}
     </div>
   </section>;
