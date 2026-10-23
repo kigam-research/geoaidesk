@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:37:38Z
+updated: 2026-10-23T08:02:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f75e7f74-2f75-4d5d-b96b-137e0a14db9e","pid":2754815,"provider":"claude","session":"93327dd7-0b61-40a2-83ee-249e0e597909","start":"62895788","token":"58f1a24e303320d9c3e5923b48745944bb113f45060027b125d1f22014065274"}
 branch: task/gaid-library-pdf-panel
 target: main
@@ -48,9 +48,27 @@ C gaid-authoring-sources, D gaid-pocheon-trial (authoring prompts/agent model). 
 onto them when they merge first.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented (2026-10-23, single writer, no child units: small and tightly coupled):
+- Shared part `web/src/geo/pdf/pdf-pane.tsx` (`PdfPane`, test `pdf-pane.test.tsx`): pane header (title, close, Escape closes,
+  focus moves to close) on the chrome layer with `--gaid-frame` edges, the upstream `PdfViewer` in view-only `sourceUrl` mode
+  below. Strings `viewers.pdfPane.*`. F (gaid-authoring-evidence-view) may reuse it; hub told.
+- Upstream seam: `PdfViewer` optional `renderError` (boundaries entry of pdf-viewer.tsx updated).
+- Library summary `storedPdf` (server `store.ts`, contract, server test): `hasPdf` also counts Zotero-only attachments,
+  which `/geo/library/items/:id/pdf` cannot serve.
+- 서재 (`library-screen.tsx`): "PDF 열기" opens reading mode: list 38 : PDF pane 62, list keeps paper + year; another row with
+  `storedPdf` switches the PDF, any other row returns to its detail; detail stays mounted (hidden) and gets focus back on its
+  PDF button after close; pane is sticky at viewport height.
+- Verified: web vitest (pdf, library, pdf-viewer: 20 passed), server geo-library test, copy validator (0 errors, no new
+  warnings), check-ui (0 errors), distribution test; isolated app (start-gaid.sh, GAID_HOME
+  ~/data/geoaidesk/work/gaid-library-pdf-panel/home, ports 3720/18720, unit gaid-pdfpanel-app, stopped) in a real browser:
+  open, switch rows, Zotero-only row → detail, Escape focus return, sticky pane, error fallback; 8 screenshots both
+  styles/themes/sizes.
+- scripts/check: passed 2026-10-23 (exit 0; server vitest 2284 passed/8 skipped, web vitest 1250 passed, geo node tests 58
+  passed; log ~/data/geoaidesk/work/gaid-library-pdf-panel/logs/check.log). Review copy made.
+- F (gaid-authoring-evidence-view) answered: it does not reuse PdfPane (needs quote-highlight seam); both units edit
+  pdf-viewer.tsx on different lines (F exports loadPdfjs, G adds renderError), textual merge only.
 ## Next steps
-1. (the next session's first action)
+1. task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -60,6 +78,8 @@ onto them when they merge first.
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-library-pdf-panel/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

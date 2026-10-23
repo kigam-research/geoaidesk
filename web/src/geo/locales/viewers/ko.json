@@ -57,5 +57,10 @@
   "oversize.state": "앞부분 {rows}행 표본 · 열 {columns}개{estimate, plural, =-1 {} other { · 전체 약 #행(추정)}}",
   "oversize.lines": "앞부분 {rows}줄 표본",
   "oversize.allColumns": "열 {count}개 모두 보기",
-  "oversize.fewerColumns": "처음 8개 열만 보기"
+  "oversize.fewerColumns": "처음 8개 열만 보기",
+  "pdfPane.label": "PDF: {title}",
+  "pdfPane.close.button": "PDF 닫기",
+  "pdfPane.closeHint": "논문 상세로 돌아갑니다 (Esc)",
+  "pdfPane.error": "GAID 화면에서 PDF를 그리지 못했습니다. 새 탭에서 여세요.",
+  "pdfPane.newTab.button": "새 탭에서 열기"
 }
