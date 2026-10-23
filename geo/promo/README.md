@@ -1,29 +1,31 @@
 # GAID promo film
 
-A 90-second internal review film (1920×1080, 30 fps, silent; user decision 2026-10-22: "무음이고 내부검토용 영상이다.").
-`CONTRACT.md` is the capture interface; `CAPTURE.md` describes the real-footage take. Report:
-`reports/2026-10-23-gaid-promo-video/index.md`.
+v2 (task `gaid-promo-video-v2`): a ~105-second internal review film (1920×1080, 30 fps, silent; user decision
+2026-10-22: "무음이고 내부검토용 영상이다."). Structure: background (existing skill ecosystems) → the research cycle →
+real-system demo in six chapters (내 서재 → 논문에서 Workflow → GAID 허브 공유 → 연구 분석 → 연구노트 → 다시 내 서재) →
+KIGAM second brain → closing. `CONTRACT.md` is the capture interface (v2); `CAPTURE.md` describes the take. v1
+(90 s, 2026-10-23) is in the git history of these files and `reports/2026-10-23-gaid-promo-video/`.
 
 | File | Role |
 |---|---|
-| `prepare_data.py` | Real numbers for the charts: pinned catalogue archive, one registered hub Workflow, the 2026-10-22 acceptance-test citation check |
 | `scene/` | The film as one HTML page; `window.motion.frame(t)` draws film second `t` deterministically |
 | `render.py` | Serves the page, steps Chrome frame by frame, pipes PNG screenshots to H.264 (imageio-ffmpeg) |
-| `capture*.py` | Real GAID footage from a separate instance with copied review data (capture child) |
+| `capture*.py` | Real GAID footage recorded in the review app (study-and-capture child) |
+| `prepare_data.py` | v1 chart numbers; the v2 scenes do not use them (`--data` is optional) |
 
 ```sh
-W=~/data/geoaidesk/work/gaid-promo-video
-uv run --no-project python geo/promo/prepare_data.py --hub $W/home/pi-agent/skill-hub/shared --out $W/data-v1/data.json
+W=~/data/geoaidesk/work/gaid-promo-video-v2
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
-  python geo/promo/render.py --data $W/data-v1/data.json --capture $W/capture-v1 --out <new dir> --stills-only
+  python geo/promo/render.py --capture $W/capture-v2 --out <new dir> --stills-only
 task job run -- uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
-  python geo/promo/render.py --data $W/data-v1/data.json --capture $W/capture-v1
+  python geo/promo/render.py --capture $W/capture-v2
 ```
 
-The final render refuses to run without the capture (no placeholder footage) and writes `manifest.json` (input hashes,
-frame count, video hash), `stills/` and `contact-sheet.jpg` next to the video. Outputs never go into Git.
+The final render refuses to run without the capture and writes `manifest.json` (input hashes, frame count, video hash),
+`stills/` and `contact-sheet.jpg` next to `gaid-promo-v2.mp4`. Outputs never go into Git.
 
-Visual language follows `docs/design/ui-guide.md` (계측 identity: white faces on aluminium chrome, 45° chamfers,
-graduated scales, the orbit as "the AI agent is working", brand blue only as signal, Pretendard, tabular figures).
-The scattered-files scene is the one illustrative scene and carries an on-screen `개념도` tag. Icons: Lucide via the
-pinned Icon Wiki asset (`scene/icons/README.md`); logo paths come unchanged from `geo/brand/logo/horizontal-color.svg`.
+Demo frames are shown whole at one scale (1280×720 CSS → 1696 px wide), never zoomed or panned (user feedback
+2026-10-23); each feature gets a blue box, a light dim outside it and a Korean tag from `capture.json` beats. Shot
+timing comes from the capture frame counts. Visual language follows `docs/design/ui-guide.md` (계측). Conceptual scenes
+(scattered sources, second brain) carry an on-screen `개념도` tag. Icons: Lucide via the pinned Icon Wiki asset
+(`scene/icons/README.md`); logo paths come unchanged from `geo/brand/logo/horizontal-color.svg`.
