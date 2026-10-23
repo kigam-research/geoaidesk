@@ -87,7 +87,7 @@ supersedes:
     - version 없이 저장된 기록은 0.1.0, 0.1.1, 0.1.2로 읽고, 저장 기록 자체는 바꾸지 않습니다.
   - 두 계정이 실제 HTTP 허브 서버를 함께 쓰는 시험에서 관리자가 제거하고 복원했습니다. 다른 연구자의 설치 기록은 남았습니다.
   - 격리된 로컬 앱(리뷰 앱과 다른 포트)에서 직접 제거하고 복원했습니다. 제거하면 등록 수가 0, 제거 수가 1이 되고, 복원하면 등록 수가 다시 1이 됩니다.
-  - 전체 검사(`scripts/check`) 결과는 부록 A에 적습니다.
+  - 하위 작업을 통합한 브랜치에서 전체 검사를 통과했습니다. 서버 시험 2260개(8개 건너뜀), 웹 시험 1246개, 문구 검사, 화면 규칙 검사, 운영 배포판을 새 데이터로 두 번 켜고 끄는 시험이 모두 통과했습니다.
 
 ## 5. 한계
 
@@ -128,12 +128,12 @@ supersedes:
 | 제거·복원 | `server/src/geo/hub-shared/{store,routes,records}.ts`, `server/src/geo/hub-client/remote-store.ts`, `server/src/geo/hub-server/{records,index,core,import}.ts`(migration 5 `hub_entry_removals`) |
 | 화면 | `web/src/geo/hub/`(제거 확인 창, `#hub/removed`, 등록 창 version 선택) |
 | 시험 | `server/test/geo-hub-shared.test.ts`, `geo-hub-server.test.ts`, `geo-hub-e2e.test.ts`, `geo-cli-export.test.ts`, `geo-methods.test.ts`, 웹 시험 |
-| 전체 검사 | `scripts/check` (결과: 작성 시점에 기록) |
+| 전체 검사 | `scripts/check` 통과 (commit f534c8da 기준, 로그 `PC74:~/data/geoaidesk/work/gaid-hub-versions/check-parent.log`) |
 | 화면 캡처 32장과 캡처 스크립트 | `PC74:~/data/geoaidesk/work/gaid-hub-versions/screenshots/` (`{entry,remove,removed,register}-{instrument,mapsheet}-{light,dark}-{1440x900,1280x800}.png`) |
 | 문구 변경 목록(한·영 변경 전후 78개) | `docs/tasks/gaid-hub-versions--ui.md`(하위 작업 문서, 통합 뒤 저장소 기록) |
 | 운영 안내 | `docs/geo/hub-server.md` "Workflow versions and removal" |
 | 배포 | 없음. 원내 허브 서버(PC74 :8700)는 migration 5 때문에 재시작이 필요합니다(hub rollout). |
 
-작성 시점: 2026-10-23.
+작성 시점: 2026-10-23, commit f534c8da.
 
 </details>
