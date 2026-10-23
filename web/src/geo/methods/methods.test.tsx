@@ -116,8 +116,10 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
   try {
     render(<Catalogue />);
     fireEvent.click(await screen.findByRole("button", { name: /^논문 방법 시험/ }));
-    // The recipe opens at the summary: its Fold value, its unresolved Threshold left to the chat.
-    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByText("5")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument(); expect(start).not.toHaveBeenCalled();
+    // A Workflow's own default settings open on Workflow 소개 (gaid-workflow-start-ui); its summary holds the Fold value and
+    // the unresolved Threshold left to the chat.
+    const dialog = screen.getByRole("dialog"); expect(within(dialog).getByRole("region", { name: "Workflow 소개" })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("tab", { name: /요약$/ })); expect(within(dialog).getByText("5")).toBeInTheDocument(); expect(within(dialog).getByText("작업 중 결정")).toBeInTheDocument(); expect(start).not.toHaveBeenCalled();
     fireEvent.click(within(dialog).getByRole("button", { name: "시작 초안 만들기" }));
     await waitFor(() => expect(start).toHaveBeenCalledOnce());
     expect(start.mock.calls[0][0].geoExposure).toBe("method:paper-method:trial");
