@@ -108,7 +108,10 @@
     "attachFailed": "Could not attach to the project. Try again.",
     "ownWork": "Own work selected from ORCID",
     "orcidOrigin": "Reference details from ORCID",
-    "useNoteRemote": "Research note “{title}” · project {name}"
+    "useNoteRemote": "Research note “{title}” · project {name}",
+    "workflowNoPdf": "A Workflow needs the paper's PDF. Attach the PDF in Zotero or add the paper again with its PDF.",
+    "workflowReadsPdf": "Extracts the text from the PDF in Zotero first, then makes the Workflow draft.",
+    "workflowReading": "Extracting text"
   },
   "dialog": {
     "title": "Add paper",

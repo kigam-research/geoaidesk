@@ -333,6 +333,7 @@ function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, 
   const [data, setData] = useState<LibraryItemResponse | null>(null);
   const [sendNote, setSendNote] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
+  const [workflowBusy, setWorkflowBusy] = useState(false);
   useEffect(() => {
     let live = true;
     setData(null);
@@ -385,13 +386,23 @@ function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, 
       setSendNote(state ? t(`library.zotero.states.${state}`) : L("send.failed"));
     }
   };
+  // A Zotero paper whose PDF GAID has not read yet: "Workflow 만들기" reads it first (the draft needs the PDF in GAID).
+  const canWorkflow = hasPdf || canRead;
   const makeWorkflow = async () => {
+    setWorkflowBusy(true);
     try {
+      if (!hasPdf) {
+        try { await readItemText(item.id); }
+        catch { toast.error(L("read.failed")); return; }
+        onChanged();
+      }
       const { authoringId } = await startWorkflowFromItem(item.id);
       toast.success(L("detail.workflowStarted"));
       window.location.hash = `#hub/${authoringId}`;
     } catch {
       toast.error(L("detail.workflowNeedsPdf"));
+    } finally {
+      setWorkflowBusy(false);
     }
   };
 
@@ -417,14 +428,15 @@ function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, 
             ))}
           </PopoverContent>
         </Popover>
-        <Button variant="outline" onClick={() => void makeWorkflow()} disabled={!hasPdf} title={hasPdf ? undefined : L("detail.workflowNeedsPdf")}>
-          <WorkflowIcon data-icon="inline-start" />{L("detail.workflow.button")}
+        <Button variant="outline" onClick={() => void makeWorkflow()} disabled={!canWorkflow || workflowBusy} title={hasPdf || !canWorkflow ? undefined : L("detail.workflowReadsPdf")}>
+          <WorkflowIcon data-icon="inline-start" />{workflowBusy && !hasPdf ? L("detail.workflowReading") : L("detail.workflow.button")}
         </Button>
         {hasPdf && <Button variant="outline" asChild><a href={libraryPdfUrl(item.id)} target="_blank" rel="noreferrer"><FileTextIcon data-icon="inline-start" />{L("detail.pdf.button")}</a></Button>}
         {canRead && <Button variant="outline" onClick={() => void readText()}><BookOpenIcon data-icon="inline-start" />{L("read.button")}</Button>}
         {item.source === "gaid" && zoteroConnected && <Button variant="outline" onClick={() => void send()}><ExternalLinkIcon data-icon="inline-start" />{L("send.button")}</Button>}
         {zotero && <Button variant="outline" asChild><a href={zotero}><ExternalLinkIcon data-icon="inline-start" />{L("detail.zotero.button")}</a></Button>}
       </div>
+      {!canWorkflow && <p className="text-xs text-muted-foreground">{L("detail.workflowNoPdf")}</p>}
       {sendNote && <p className="text-sm" role="status">{sendNote}</p>}
       <ItemFolders item={item} collections={collections} onChanged={async () => { setData(await getLibraryItem(item.id)); onChanged(); }} />
       <div className="flex flex-col gap-2 rounded-xl border p-4">
