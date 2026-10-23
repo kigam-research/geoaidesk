@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-23T09:05:00Z
+status: active
+updated: 2026-10-23T09:49:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -61,7 +61,8 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
   map viewer test timing out under load 35 (passes alone, 9/9); copy 0 errors; check-ui 0 errors. Own app instance (ports
   3392/18392, data `~/data/geoaidesk/work/gaid-workflow-start-ui/home/`, unit `gaid-wfsu-app`, stopped) with a Yilgarn project
   copy: 48 screenshots `app-shots/` (both styles, both themes, 1440/1280) and a live 일반 Workflow start (draft + file in a new chat).
-- scripts/check run 2 passed (exit 0): backend 2278 passed / 8 skipped, frontend 1249 passed, copy 0 errors, ui 0 errors,
+- After the finish-time merge of main (gaid-hub-versions: `WorkflowDoc.version`, term "version" replaces 판), the header shows
+  `version x.y.z` (`workspace.start.version`); screenshots retaken (48). scripts/check run 2 passed (exit 0): backend 2278 passed / 8 skipped, frontend 1249 passed, copy 0 errors, ui 0 errors,
   launcher and production smoke passed; log `~/data/geoaidesk/work/gaid-workflow-start-ui/check-2.log`. Run 1 failed only on
   methods.test expecting the old open-at-summary rule (test updated).
 ## Next steps

@@ -35,7 +35,7 @@ supersedes:
 ## 2. 수행한 것
 
 1. 두 가지 단계 표시안과 일반 Workflow 시작 방식을 시안으로 만들어 보였고, 사용자가 권장안을 골랐습니다.
-2. 시작 창 틀 하나를 만들었습니다. 머리말에는 출처(기본 Workflow, 허브 Workflow, 허브 초안, 일반 Workflow), 판, 미시험 표시가 들어갑니다. 왼쪽에는 모든 단계 이름이 입력 자료·분석 조건으로 묶여 나오고, 아래쪽에는 현재 위치와 시작 단추 하나가 있습니다.
+2. 시작 창 틀 하나를 만들었습니다. 머리말에는 출처(기본 Workflow, 허브 Workflow, 허브 초안, 일반 Workflow), 등록된 Workflow의 version, 미시험 표시가 들어갑니다. 왼쪽에는 모든 단계 이름이 입력 자료·분석 조건으로 묶여 나오고, 아래쪽에는 현재 위치와 시작 단추 하나가 있습니다.
 3. 첫 단계 "Workflow 소개"를 만들었습니다. Workflow에 기록된 하는 일, 넣는 자료와 예제 자료 여부, 정할 조건, 만드는 결과, 진행 단계, 해석 한계만 보여 줍니다. 기록이 없는 항목은 줄을 빼고, 전체 Workflow 보기는 접어 둡니다. 환경 준비가 필요하면 그 안내와 해결 단추도 이 단계에 나옵니다.
 4. 입력 단계의 파일 후보를 형식이 맞는 파일로 한정했습니다. 내 자료(프로젝트의 자료 폴더)를 먼저 보여 주고, 나머지는 접힌 "이전 결과"로 넣었습니다. 포천 검증의 지적 F17에 따라, 파일 이름이 한 입력과만 맞으면 그 파일을 고른 상태로 시작하고 "이름이 맞음"으로 표시합니다. 맞는 파일이 있는데도 쓰지 않는 선택 입력은 요약에 따로 표시합니다.
 5. 일반 Workflow를 같은 창으로 옮겼습니다. 영어 지시문은 "AI agent가 받는 지침 보기" 아래 접혀 있고 요약에서 편집할 수 있습니다. 시작하면 새 채팅에 시작 초안과 고른 파일이 들어가며, 모델은 채팅 입력창에서 고릅니다.
@@ -122,7 +122,7 @@ supersedes:
 
 문구 변경(문자열 id, 한국어 / 영어):
 
-- 새 문자열: `workspace.start.*` 전체. 대표: `intro` "Workflow 소개" / "About this Workflow"; `toInputs` "입력 자료 고르기" / "Choose input data"; `fact.purpose|inputs|choices|outputs|steps|boundary|note` "하는 일·넣는 자료·정할 조건·만드는 결과·진행 단계·해석 한계·알아둘 점" / "What it does · Data it takes · Conditions to set · What it makes · Steps · Limits · Note"; `mine` "내 자료" / "Your data"; `earlier` "이전 결과" / "Earlier results"; `nameMatch` "이름이 맞음" / "Name matches"; `unusedFit` "맞는 형식의 파일이 있지만 쓰지 않습니다" / "A file in a fitting format exists but is not used"; `upstream.note` "K-Dense에서 가져온 작업 지시입니다. 만드는 결과와 진행 단계는 기록되어 있지 않습니다." / "Task instructions taken from K-Dense. Outputs and steps are not recorded."
+- 새 문자열: `workspace.start.*` 전체. 대표: `intro` "Workflow 소개" / "About this Workflow"; `version` "version {version}" / "version {version}"; `toInputs` "입력 자료 고르기" / "Choose input data"; `fact.purpose|inputs|choices|outputs|steps|boundary|note` "하는 일·넣는 자료·정할 조건·만드는 결과·진행 단계·해석 한계·알아둘 점" / "What it does · Data it takes · Conditions to set · What it makes · Steps · Limits · Note"; `mine` "내 자료" / "Your data"; `earlier` "이전 결과" / "Earlier results"; `nameMatch` "이름이 맞음" / "Name matches"; `unusedFit` "맞는 형식의 파일이 있지만 쓰지 않습니다" / "A file in a fitting format exists but is not used"; `upstream.note` "K-Dense에서 가져온 작업 지시입니다. 만드는 결과와 진행 단계는 기록되어 있지 않습니다." / "Task instructions taken from K-Dense. Outputs and steps are not recorded."
 - 지운 문자열(더는 쓰지 않음): `workspace.setup.description` "입력 파일과 분석 조건을 차례로 고르세요." / "Choose the input files and analysis conditions step by step."; `workspace.setup.moreAbout` "작업 내용과 입력 형식 보기" / "Show what it does and input formats"; `workspace.setup.group.inputs|choices` "입력 파일·분석 조건" / "Input files · Analysis conditions"; `workspace.setup.counter` "{n} / {total}".
 
 작성 시점: 2026-10-23, 작업 브랜치 `task/gaid-workflow-start-ui`.

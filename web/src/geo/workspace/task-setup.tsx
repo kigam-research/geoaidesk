@@ -76,7 +76,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   exposure?: string;
   /** Set when the setup comes from a saved recipe (gaid-workflow-catalog). */
   recipe?: { title: string; onDelete: () => Promise<void> };
-  /** Where the Workflow comes from, shown above the title (기본 Workflow, 등록됨 n판, 허브 초안 …). */
+  /** Where the Workflow comes from, shown above the title (기본 Workflow, 허브 Workflow, 허브 초안 …). */
   source?: string;
   /** Opened from the researcher's own saved start settings (a `.geo-start.json` file): skip the introduction. */
   resume?: boolean;
@@ -191,7 +191,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const purpose = localText(workflow.doc?.purpose) || text(workflow.description);
   const meta = <>
     {source && <span>{source}</span>}
-    {workflow.doc?.revision ? <><span aria-hidden>·</span><span className="tabular-nums">{t("workspace.start.revision", { revision: workflow.doc.revision })}</span></> : null}
+    {workflow.doc?.version ? <><span aria-hidden>·</span><span className="tabular-nums">{t("workspace.start.version", { version: workflow.doc.version })}</span></> : null}
     {untested && <Badge variant="outline" title={t("workspace.readiness.untested")}>{t("workspace.badge.untested")}</Badge>}
   </>;
   const notice = (state !== "ready" || wasBlocked) ? <div className="mb-4"><ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} /></div> : null;

@@ -223,7 +223,6 @@
     "position": "{group} {n} / {total}",
     "toInputs": "Choose input data",
     "toChoices": "Choose analysis conditions",
-    "revision": "Revision {revision}",
     "source": {
       "catalogue": "Built-in Workflow",
       "hub": "Hub Workflow",
@@ -270,6 +269,7 @@
       "uploadFiles": "Upload files",
       "uploadFolder": "Upload folder",
       "note": "Task instructions taken from K-Dense. Outputs and steps are not recorded."
-    }
+    },
+    "version": "version {version}"
   }
 }

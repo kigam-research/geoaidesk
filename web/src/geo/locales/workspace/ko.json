@@ -223,7 +223,6 @@
     "position": "{group} {n} / {total}",
     "toInputs": "입력 자료 고르기",
     "toChoices": "분석 조건 고르기",
-    "revision": "{revision}판",
     "source": {
       "catalogue": "기본 Workflow",
       "hub": "허브 Workflow",
@@ -270,6 +269,7 @@
       "uploadFiles": "파일 올리기",
       "uploadFolder": "폴더 올리기",
       "note": "K-Dense에서 가져온 작업 지시입니다. 만드는 결과와 진행 단계는 기록되어 있지 않습니다."
-    }
+    },
+    "version": "version {version}"
   }
 }

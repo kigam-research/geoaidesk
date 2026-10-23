@@ -19,7 +19,7 @@ const roles = [role("aeromag-lines", "Aeromagnetic lines"), role("base-station",
 const projectFiles = ["user_data/aeromag_lines.csv", "user_data/base_station.csv", "user_data/boreholes.csv", "user_data/core_samples.csv", "user_data/README.md"];
 
 const doc: WorkflowDoc = {
-  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "pgi", title: { ko: "자철석 광체 추정" }, revision: 2, purpose: { ko: "항공자력과 시추 자료로 광체를 추정합니다." },
+  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "pgi", title: { ko: "자철석 광체 추정" }, version: "0.1.1", purpose: { ko: "항공자력과 시추 자료로 광체를 추정합니다." },
   inputRoles: [], choices: [{ id: "cell", label: { ko: "격자 크기" }, options: ["50", "100"] }], skills: [{ name: "pgi", source: "bundled", role: "primary" }],
   steps: [{ id: "a", title: { ko: "자료 점검" }, does: { ko: "점검" }, skill: "pgi", read: null, checks: [], choiceIds: [], outputs: [] },
     { id: "b", title: { ko: "역산" }, does: { ko: "역산" }, skill: "pgi", read: null, checks: [], choiceIds: ["cell"], outputs: [] }],
@@ -59,7 +59,7 @@ describe("GAID Workflow start window", () => {
     expect(within(intro).getAllByText("감수율 모델")[0]).toBeVisible();
     expect(within(intro).getByTitle("역산")).toBeInTheDocument();
     expect(within(intro).getAllByText("추정이며 검토 전입니다.")[0]).toBeVisible();
-    expect(within(dialog).getByText("허브 Workflow")).toBeInTheDocument(); expect(within(dialog).getByText("2판")).toBeInTheDocument();
+    expect(within(dialog).getByText("허브 Workflow")).toBeInTheDocument(); expect(within(dialog).getByText("version 0.1.1")).toBeInTheDocument();
     expect(within(dialog).getAllByRole("tab").map((tab) => tab.textContent)).toEqual(["Workflow 소개", "dem", "boreholes", "격자 크기", "요약"]);
     await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
     expect(within(dialog).getByText("입력 자료 1 / 2")).toBeInTheDocument();
