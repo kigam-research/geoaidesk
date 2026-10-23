@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { isExamplePath, sizeText } from "@/geo/contracts/workflow-examples";
 import { workflowStages } from "@/geo/contracts/workflow-stages";
 import { accepts, text } from "./api";
+import { ClampedText } from "./start-intro";
 
 /**
  * An input role answer: a fitting file, another project file, several files (a `multiple` input), the Workflow's example
@@ -230,12 +231,14 @@ function ExampleHint({ role }: { role: WorkflowInputRole }) {
   return <span className="flex flex-col gap-0.5">{lines.map((line) => <span key={line}>{line}</span>)}</span>;
 }
 
-export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3 }: {
+export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3, compact = false }: {
   role: WorkflowInputRole; files: string[]; answer: InputAnswer | undefined; onAnswer: (answer: InputAnswer) => void;
   /** Upload the researcher's own files into the project; resolves to the saved project paths. */
   onUpload?: (files: FileList) => Promise<string[]>;
-  /** Heading level: 4 when the input is one of several on a stage page. */
+  /** Heading level: 4 when the input is part of a stage page. */
   level?: 3 | 4;
+  /** One of several inputs on a page: a chosen file is shown alone, the other candidates one click away. */
+  compact?: boolean;
 }) {
   const id = useId();
   const picker = useRef<HTMLInputElement | null>(null);
@@ -262,6 +265,10 @@ export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3 }
   const formats = role.extensions.join(", ");
   const otherPath = answer?.mode === "other" ? answer.path : "";
   const otherPicked = picked.filter((path) => others.includes(path));
+  // On a stage page with several inputs, an input with its file already chosen shows only that file; the other
+  // candidates are one click away, so the page stays short (gaid-workflow-stages).
+  const chosenFiles = fitting.filter(chosen);
+  const [expanded, setExpanded] = useState(() => !compact || chosenFiles.length === 0);
   const upload = async (list: FileList | null) => {
     if (!list?.length || !onUpload) return;
     setUploading(true); setUploadError(false);
@@ -287,6 +294,15 @@ export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3 }
       {uploadError && <span role="alert" className="text-sm text-destructive">{t("workspace.setup.input.uploadFailed")}</span>}
     </div>}
     <div role={many ? "group" : "radiogroup"} aria-labelledby={id} className="space-y-2">
+      {!expanded && <>
+        {chosenFiles.map(card)}
+        <button type="button" aria-expanded={false} onClick={() => setExpanded(true)}
+          className="flex w-full items-center gap-1.5 rounded-md border border-dashed border-gaid-edge px-3 py-2 text-left text-sm text-gaid-ink-2 hover:bg-gaid-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <ChevronRightIcon className="size-3.5" aria-hidden />
+          {t("workspace.setup.input.showAll")}<span className="text-gaid-ink-3 tabular-nums">{fitting.length - chosenFiles.length + others.length}</span>
+        </button>
+      </>}
+      {expanded && <>
       {mine.length > 0 && <p className="flex items-baseline gap-1.5 text-[13px] font-semibold text-gaid-ink-2">{t("workspace.start.mine")}<span className="font-medium text-gaid-ink-3 tabular-nums">{mine.length}</span></p>}
       {mine.map(card)}
       {earlier.length > 0 && <details open={earlierChosen} className="group">
@@ -313,6 +329,7 @@ export function InputStep({ role, files, answer, onAnswer, onUpload, level = 3 }
         {others.filter((path) => !picked.includes(path)).map((path) => <option key={path} value={path}>{path}</option>)}
       </select>}
       {!role.required && <OptionCard selected={answer?.mode === "none"} onSelect={() => onAnswer({ mode: "none" })} title={t("workspace.setup.input.none")} />}
+      </>}
     </div>
   </section>;
 }
@@ -363,8 +380,6 @@ export function StagePage({ page, files, inputs, choices, recipeChoices, onInput
   useEffect(() => {
     if (focus) document.getElementById(itemAnchor(focus))?.scrollIntoView?.({ block: "start" });
   }, [focus, defaultsOpen]);
-  const required = page.groups.reduce((sum, group) => sum + group.choices.length, 0);
-  const lines = [page.does, page.kind === "flow" ? stageHint({ inputs: page.roles.length, choices: required, defaults: page.defaults.length }) : null];
   const choice = (item: WorkflowChoice) => <div key={item.id} id={itemAnchor(item.id)} className="scroll-mt-4 border-t border-gaid-edge pt-5">
     <ChoiceStep level={4} choice={item} answer={choices[item.id]} recipeValue={recipeChoices?.[item.id]} onAnswer={(answer) => onChoice(item.id, answer)} />
   </div>;
@@ -373,9 +388,12 @@ export function StagePage({ page, files, inputs, choices, recipeChoices, onInput
     return !(answer && answer.mode !== "defer" && answer.value.trim() === item.default?.trim());
   }).length;
   return <section aria-labelledby={id} className="space-y-6">
-    <StepHeading id={id} title={page.title} lines={lines} />
+    <div className="space-y-1">
+      <h3 id={id} className="text-base font-semibold leading-snug break-words">{page.title}</h3>
+      {page.does && <p className="text-sm text-muted-foreground break-words"><ClampedText value={page.does} /></p>}
+    </div>
     {page.roles.map((role) => <div key={role.id} id={itemAnchor(role.id)} className="scroll-mt-4 border-t border-gaid-edge pt-5">
-      <InputStep level={4} role={role} files={files} answer={inputs[role.id]} onAnswer={(answer) => onInput(role.id, answer)} onUpload={onUpload} />
+      <InputStep level={4} compact={page.roles.length > 1} role={role} files={files} answer={inputs[role.id]} onAnswer={(answer) => onInput(role.id, answer)} onUpload={onUpload} />
     </div>)}
     {page.groups.map((group, g) => <div key={group.title ?? `group-${g}`} className="space-y-5">
       {group.title && <p className="-mb-2 text-[13px] font-semibold text-gaid-ink-2">{group.title}</p>}
@@ -400,13 +418,14 @@ export function inputValue(answer: InputAnswer | undefined, role?: WorkflowInput
 }
 export function choiceValue(choice: WorkflowChoice, answer: ChoiceAnswer | undefined): string {
   if (!answer || answer.mode === "defer" || !answer.value.trim()) return t("workspace.setup.decideLater");
-  const value = answer.mode === "option" ? optionLabel(choice, answer.value) : answer.value.trim();
-  return choice.default?.trim() === answer.value.trim() ? t("workspace.setup.choice.defaultValue", { value }) : value;
+  return answer.mode === "option" ? optionLabel(choice, answer.value) : answer.value.trim();
 }
 
 /** Summary rows with Edit links (Q5); the parent adds the limit line, disclosures and the one primary action. */
 export type SummaryRow = {
   step: number; label: string; value: string | null; muted?: boolean; title?: string; group?: string; note?: string;
+  /** A neutral line under the value (e.g. 기본값 for an unchanged parameter). */
+  hint?: string;
   /** The input or condition the Edit link leads to on its stage page. */
   target?: string;
 };
@@ -419,6 +438,7 @@ export function SummaryRows({ rows, onEdit }: { rows: SummaryRow[]; onEdit: (ste
       <dt className="truncate text-muted-foreground" title={row.label}>{row.label}</dt>
       <dd className={cn("min-w-0", row.value === null ? "text-destructive" : row.muted ? "text-muted-foreground" : "font-medium")} title={row.title ?? row.value ?? undefined}>
         <span className="block truncate">{row.value ?? t("workspace.setup.notChosen")}</span>
+        {row.hint && <span className="block text-xs font-normal text-gaid-ink-3">{row.hint}</span>}
         {row.note && <span className="block text-xs font-normal text-gaid-warning">{row.note}</span>}
       </dd>
       <Button variant="ghost" size="sm" className="h-7 px-2 text-primary" aria-label={t("workspace.setup.editLabel", { label: row.label })} onClick={() => onEdit(row.step, row.target)}>

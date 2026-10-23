@@ -70,6 +70,9 @@ describe("GAID Workflow start window", () => {
     // Own data first with the name match selected; earlier results folded.
     const dem = within(dialog).getByRole("region", { name: "dem" });
     expect(within(dem).getByRole("radio", { name: /dem\.csv/ })).toHaveAttribute("aria-checked", "true");
+    // Several inputs on one page: a chosen file is shown alone, the other candidates one click away.
+    expect(within(dem).queryByText("이전 결과")).not.toBeInTheDocument();
+    await userEvent.click(within(dem).getByRole("button", { name: /다른 파일 고르기/ }));
     expect(within(dem).getByText("이전 결과").closest("details")).not.toHaveAttribute("open");
     await userEvent.click(within(dialog).getByRole("tab", { name: /요약$/ }));
     expect(within(dialog).getByText("맞는 형식의 파일이 있지만 쓰지 않습니다")).toBeInTheDocument();
@@ -189,7 +192,8 @@ describe("start window by analysis-flow stage", () => {
     await userEvent.click(within(dialog).getByRole("tab", { name: /요약$/ }));
     expect(within(dialog).getByText("line_a.csv 외 1개")).toBeInTheDocument();
     expect(within(dialog).getByText("기본값이 있는 조건")).toBeInTheDocument();
-    expect(within(dialog).getByText("50 m (기본값)")).toBeInTheDocument(); expect(within(dialog).getByText("coarse (기본값)")).toBeInTheDocument();
+    expect(within(dialog).getByText("50 m")).toBeInTheDocument(); expect(within(dialog).getByText("coarse")).toBeInTheDocument();
+    expect(within(dialog).getAllByText("기본값")).toHaveLength(2);
     // Edit on a default opens its stage page with the fold open.
     await userEvent.click(within(dialog).getByRole("button", { name: "재표본화 간격 수정" }));
     expect(within(dialog).getByText("기본값이 있는 조건 1개").closest("details")).toHaveAttribute("open");

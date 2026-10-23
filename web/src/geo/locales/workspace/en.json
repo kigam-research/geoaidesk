@@ -78,7 +78,8 @@
       "emptyExample": "No project file has a matching format. Upload your own files or use the example data below.",
       "many": "you can pick several files",
       "files": "{first} and {rest} more",
-      "addOther": "Add another project file"
+      "addOther": "Add another project file",
+      "showAll": "Choose another file"
     },
     "choice": {
       "other": "Other (type it)",
@@ -86,8 +87,7 @@
       "placeholder": "Write the value and its reason in one line",
       "deferHint": "The chat asks again before the analysis.",
       "recipe": "saved start settings value",
-      "default": "Default",
-      "defaultValue": "{value} (default)"
+      "default": "Default"
     },
     "next": "Next step",
     "toSummary": "View summary",

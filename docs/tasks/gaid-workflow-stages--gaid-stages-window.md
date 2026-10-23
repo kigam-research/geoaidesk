@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T12:32:55Z
+updated: 2026-10-23T13:18:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"08164288-7806-46a6-9e82-956577998a76","pid":790060,"provider":"claude","session":"f9dbf0b8-76e0-462b-b70b-5ced3cf12897","start":"64608299","token":"7a4c953115a20fde3c930ab89ac5a15005cbbdc2c3a944e2bab8d7766326cb7a"}
 branch: task/gaid-workflow-stages--gaid-stages-window
 target: task/gaid-workflow-stages
@@ -71,14 +71,20 @@ raw.githubusercontent.com (use `gh api` or codeload).
   (position "시작 설정 n / 2"; the conditions page sub-heads by doc step when > 3 conditions). Rail items carry a hint
   ("자료 2개 · 조건 3개 · 기본값 1개"). `multiple` inputs: checkbox cards, `{mode:"files"}` answer, binding `string[]`,
   start message joins paths (`workflowStartMessage` type widened in `web/src/geo/workflow/render.ts`, one line outside the
-  listed scope). Defaults: start answered, folded "기본값이 있는 조건 n개" per page, own summary group "기본값이 있는 조건",
-  value "(기본값)"; Edit on a default opens its page with the fold open and scrolls to it. 일반 Workflow: 소개 → 자료 →
-  분석 조건 (all placeholders on one page) → 요약.
-- Verified: `cd web && npx tsc --noEmit && npx vitest run src/geo` (69 files, 355 tests), `node geo/ui/check-ui.mjs` (0 errors),
-  `node geo/copy/validate-copy.mjs web/src/geo/locales` (0 errors, no workspace warnings).
+  listed scope). Defaults: start answered, folded "기본값이 있는 조건 n개" per page, own summary group, "기본값" hint line
+  when unchanged; Edit on a default opens its page with the fold open and scrolls to it. Pages with several inputs show a
+  chosen file alone ("다른 파일 고르기 n"). 일반 Workflow: 소개 → 자료 → 분석 조건 (all placeholders on one page) → 요약.
+- Verified: `cd web && npx tsc --noEmit && npx vitest run src/geo` (354/355; `src/geo/viewers/map/viewer.test.tsx` "inspects before
+  paging …" times out at 5 s in the full run (twice), passes alone (9/9); viewers untouched here), `node geo/ui/check-ui.mjs` (0 errors), `node geo/copy/validate-copy.mjs web/src/geo/locales`.
+- Own instance: unit `gaid-stages-window-app` (systemd --user), ports 3393/18393, GAID_HOME
+  `~/data/geoaidesk/work/gaid-stages-window/home`, project proj-980e47 with methods from `scripts/build_methods.py`.
+  Shots `~/data/geoaidesk/work/gaid-stages-window/shots/` (`scripts/appshot.sh`); `/geo/methods` is route-patched with
+  `multiple`/`default` because the server summary mapping is package B's (not in 9949b08d).
+- Report section: `reports/2026-10-23-gaid-workflow-stages/start-window.md` + `figures/start-*.png`.
 ## Next steps
-1. Screenshots (own app instance, data under ~/data/geoaidesk/work/gaid-stages-window/) and
-   `reports/2026-10-23-gaid-workflow-stages/start-window.md`; then `task finish`.
+1. Done: figures copied, own instance stopped (unit gaid-stages-window-app), shot hashes in
+   `~/data/geoaidesk/work/gaid-stages-window/shots.sha256`. Parent: integrate after package B; update `docs/design/ui-guide.md`
+   Q1/Q4/D2 and checklist item 5 for stage pages (outside this unit's scope).
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

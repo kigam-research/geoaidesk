@@ -203,7 +203,8 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       title: Array.isArray(bound) ? bound.join("\n") : bound, note: unusedFit ? t("workspace.start.unusedFit") : undefined };
   });
   const choiceRow = (group: string) => (choice: GeoWorkflowSummary["requiredScientificChoices"][number]): SummaryRow =>
-    ({ step: pageOf(choice.id), target: choice.id, group, label: text(choice.label), value: choiceValue(choice, choices[choice.id]), muted: !(choice.id in values) });
+    ({ step: pageOf(choice.id), target: choice.id, group, label: text(choice.label), value: choiceValue(choice, choices[choice.id]), muted: !(choice.id in values),
+      hint: hasDefault(choice) && values[choice.id] === choice.default!.trim() ? t("workspace.setup.choice.default") : undefined });
   const rows: SummaryRow[] = [
     ...inputRows,
     ...workflow.requiredScientificChoices.filter((choice) => !hasDefault(choice)).map(choiceRow(t("workspace.start.group.choice"))),
