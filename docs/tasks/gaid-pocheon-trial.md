@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:20:41Z
+updated: 2026-10-23T08:48:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -183,17 +183,30 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 - 2026-10-23 16:11: interim sync → main b74950e7 (PR #85; F1/F2/F3/F9-F16 + example generator/asset), merged with C;
   hub restarted the review app on b74950e7 at 16:12. Verified there without in-page patches: the reasoning selector
   shows on the sources step and the revise attempt ran as openai/gpt-6.1-sol high from a LAN browser (F1, F9).
-- First pass so far: authoring ap-bab647f7-674 (서재 → Workflow 만들기; sources heo2025.pdf + ESM1 zip); analyze
+- First pass done 17:24 KST: hub entry "PGI 기반 3차원 자철석 광체 추정" 1판 (registered 16:24 on the institute hub,
+  folder 지구물리 역산, from authoring ap-bab647f7-674 draft 3); installed into project pgi-2c2f48; run 16:29 → interview
+  expired (F18) → researcher answered at 16:45 → finished 17:24. Agent: wrote pgi_run/run_pgi_workflow.py, fixed two
+  SimPEG 0.25 incompatibilities of ESM1 (SaveEveryIteration abstract; masked DEM array), 758 data, 57,503 active
+  cells; PGI-full 23 iterations 235 s, PGI-none 25 iterations 241 s (inversion 479 s ≤ 10 min). Target body vs truth
+  488,000 m3: full/property 640,625 (IoU 0.34), full/probability 171,875 (0.17), none/property 1,625,000 (0.26),
+  none/probability 859,375 (0.35); PGI-none learned ore mean 0.290 → 0.143 SI; sensitivity cut-offs 0-0.05 identical.
+  Research note 연구노트/2026-10-23-PGI-입력확인/index.md (title "두 PGI 조건으로 복원한 합성 자철석 광체", 3 decisions).
+  Copies in ~/data/geoaidesk/work/gaid-pocheon-trial/pass1-run/. Note → 서재 not possible on b74950e7 (A not deployed).
+- First pass history: authoring ap-bab647f7-674 (서재 → Workflow 만들기; sources heo2025.pdf + ESM1 zip); analyze
   (38 findings, 7 questions) → answers → draft 1 (package error, F13/F16) → revise 1 with researcher feedback
   (passes the package check; quick run keeps the core window, 25 m, all data, 30 iterations) → revise 2 (feedback:
   quick results interpretable at resolution; no per-step approval gates) running. Analysis project pgi-2c2f48
   ("포천 자철석 PGI 실전 검증") with the example files in user_data/.
 
 ## Next steps
-1. Finish the first authoring pass (review app, project ap-bab647f7-674, GPT-6.1 Sol high via an in-page fetch patch
-   for F1 and a randomUUID polyfill for F9); answer questions as a researcher; record steering findings.
-2. Reference PGI: tune the synthetic example until PGI behaves as in the paper (ore mean shift, both criteria);
-   time ≤ 10 min (run 2: 220 s for both variants on 82,807 active cells, 620 data).
+1. Wait for the hub (unit gaid-hub-rollout-versions) to update the review app to main 1684c887+ (loopback-only,
+   http://127.0.0.1:3000 on PC74 until the user re-enables LAN on 2026-10-26).
+2. Second pass on the new main: 서재 → Workflow 만들기 (GPT-6.1 Sol, 높음 from the screen) with paper + ESM1 + the six
+   example files as data sources (C) → answers → draft → attach the examples per input (B) → register (new entry) →
+   new project → start settings with no own files (examples selected; check F17) → run → research note → bring the
+   note into 서재 (A) → check library sync.
+3. Report reports/2026-10-23-gaid-pocheon-trial/ (result first, figures from pass 1 and 2, findings, paper comparison).
+
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-23: Example data = SYNTHETIC at the real site (decision 2 fallback, pending the Oracle survey for real
