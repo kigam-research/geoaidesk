@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:51:38Z
+updated: 2026-10-23T02:52:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -132,6 +132,7 @@ leaves the study records in `~/.geoaidesk`, and since the review app is connecte
   (Seoul shp map + basemap, area table, LAS, note decision, citations, connection map) may be reused in the demo where
   they look better; the child writes the Yilgarn zone map as EPSG:3857 (grid values match Web Mercator over WA) on a
   basemap.
+- User 2026-10-23: "면적표와 LAS검층은 불필요 하다." → no area table, no LAS depth viewer in v2.
 - Review app risk: the hub plans one more review-app update after gaid-orcid phase 2; the child waits and continues if
   it restarts mid-run.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
