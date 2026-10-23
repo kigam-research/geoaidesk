@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T01:58:09Z
+updated: 2026-10-23T01:58:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -90,6 +90,7 @@ Outside check: no outside check.
    account linked 0000-0003-2034-5770 (production). Afterwards: hub link removed (DELETE /geo/orcid/auth), local iD removed,
    client file cleared from the e2e hub, jobs 3/4 stopped and disposed (cancelled, deliberate stop). The institute hub
    (PC74 :8700) was not touched; configuring it with the production client is a rollout step for the operator.
+Blocked: waiting for child gaid-orcid--authui's `task finish` (its final scripts/check is running in the child session; checkpoint b231b17d).
 5. After 2–3: full scripts/check, report section for phase 2, humanizer, review-copy, task finish.
 ## Failed approaches
 ## Notes and decisions
