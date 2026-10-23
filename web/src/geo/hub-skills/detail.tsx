@@ -1,4 +1,5 @@
 "use client";
+import { hubRefVersion } from "@/geo/contracts/hub-version";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +65,7 @@ export function SkillDetail({ id, projects, onBack, onWorkflow, onCreateProject 
           {reviewState === "deprecated" && <label className="block space-y-2 text-sm"><span>{text("replacement")}</span><Input value={replacement} onChange={(e) => setReplacement(e.target.value)} /></label>}
           {!hubIdentity()?.account && <p className="text-xs text-gaid-ink-2">{text("unverified")}</p>}<Button variant="outline" disabled={busy || !note.trim()}>{text("saveReview")}</Button>
         </form></details>
-        <details><summary className="cursor-pointer text-lg font-semibold">{text("usedBy")}</summary><ul className="mt-3 space-y-2">{skill.usedBy.length ? skill.usedBy.map((w) => <li key={`${w.entryId}:${w.revision}`}><a href={`#hub/e/${encodeURIComponent(w.entryId)}`} onClick={(e) => { e.preventDefault(); onWorkflow(w.entryId); }} className="text-sm underline underline-offset-4">{w.title} · {text("revision", { revision: w.revision })}</a></li>) : <li className="text-sm text-gaid-ink-2">{text("unused")}</li>}</ul></details>
+        <details><summary className="cursor-pointer text-lg font-semibold">{text("usedBy")}</summary><ul className="mt-3 space-y-2">{skill.usedBy.length ? skill.usedBy.map((w) => <li key={`${w.entryId}:${w.revision}`}><a href={`#hub/e/${encodeURIComponent(w.entryId)}`} onClick={(e) => { e.preventDefault(); onWorkflow(w.entryId); }} className="text-sm underline underline-offset-4">{w.title} · {text("workflowVersion", { version: hubRefVersion(w) ?? "" })}</a></li>) : <li className="text-sm text-gaid-ink-2">{text("unused")}</li>}</ul></details>
         <section className="max-w-[680px] space-y-4"><h2 className="text-lg font-semibold">{text("comments")}</h2>{detail.comments.length ? detail.comments.map((c) => <article key={c.id} className="space-y-2 border-b border-gaid-edge pb-4"><p className="text-xs text-gaid-ink-2">{c.author} · {when(c.at)}</p><p className="text-xs tabular-nums text-gaid-ink-2">{text("revision", { revision: c.revision })}</p><p className="whitespace-pre-wrap text-sm">{c.body}</p></article>) : <p className="text-sm text-gaid-ink-2">{text("noComments")}</p>}<form className="space-y-3" onSubmit={(e) => { e.preventDefault(); mutate(() => hubSkills.comment(id, comment.trim()), () => setComment("")); }}><Textarea aria-label={text("comment")} maxLength={4000} required value={comment} onChange={(e) => setComment(e.target.value)} /><Button variant="outline" disabled={busy || !comment.trim()}>{text("postComment")}</Button></form></section>
       </>}
     </div>{named.dialog}

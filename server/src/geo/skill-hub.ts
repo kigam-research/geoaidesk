@@ -1,4 +1,5 @@
 /** skill_hub packages are durable local sources for the existing preview/install gate. */
+import { hubVersionOf, legacyHubVersion } from "../../../web/src/geo/contracts/hub-version.ts";
 import { previewPinnedHubSkills } from "./methods/hub-pin-install.ts";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -221,6 +222,8 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   const record = ref ? await store!.read(ref.id) : null;
   const snapshot = ref && record ? record.snapshots[String(ref.revision)] : undefined;
   if (ref && !snapshot) return fail("input", "Hub entry revision was not found; search the hub again");
+  // Only the id and revision come from the client; the version is the registered one.
+  const hubRef = ref && record ? { id: ref.id, revision: ref.revision, version: hubVersionOf(record.entry, ref.revision) ?? legacyHubVersion(ref.revision) } : null;
   const descriptorRef = input.url !== undefined ? resolveDescriptorUrl(input.url, deps.sites) : null;
   const descriptor = descriptorRef ? await fetchHubDescriptor(descriptorRef.descriptorUrl, descriptorRef.site, deps.fetcher) : null;
   const resolved = input.url !== undefined && !descriptorRef ? resolveSkillHubUrl(input.url, deps.sites) : undefined;
@@ -247,7 +250,7 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   writePackageOrigin(packageStore(deps.agentDir), {
     sha256: staged.sha256,
     kind: ref ? "gaid-hub" : input.archive ? "upload" : "skill-hub",
-    ...(ref ? { hubEntry: ref } : {}),
+    ...(hubRef ? { hubEntry: hubRef } : {}),
     ...(snapshot ? { hub: { methodId: snapshot.package.methodId, revision: snapshot.package.revision, lifecycle: "draft" as const } } : {}),
     ...(descriptorRef ? { siteId: descriptorRef.siteId, descriptorUrl: descriptorRef.displayUrl } : {}),
     ...(resolved ? { siteId: resolved.siteId, pageUrl: resolved.pageUrl } : {}),
@@ -261,7 +264,7 @@ export async function previewSkillHub(paths: ProjectPaths, input: { url?: string
   const hubSkills = (await Promise.all(methodFiles.map((file) => previewPinnedHubSkills(paths, file, { agentDir: deps.agentDir })))).flat();
   return { ...preview, contents, ...(hubSkills.length ? { hubSkills } : {}), skillHub: {
     sha256: staged.sha256, siteId: resolved?.siteId ?? descriptorRef?.siteId, skillId: resolved?.skillId, pageUrl: resolved?.pageUrl,
-    ...(ref ? { hubEntry: { ...ref, title: record!.entry.title } } : {}),
+    ...(hubRef ? { hubEntry: { ...hubRef, title: record!.entry.title } } : {}),
     ...(descriptor ? { draft: { methodId: descriptor.methodId, revision: descriptor.revision, lifecycle: descriptor.lifecycle, url: descriptorRef!.displayUrl } } : {}),
     catalogueAvailable: catalogue.available,
     catalogueNames: preview.skills.filter((s) => catalogue.skills.some((c) => c.runtimeName === s.name)).map((s) => s.name),

@@ -1,5 +1,6 @@
 "use client";
 
+import { hubVersionOf } from "@/geo/contracts/hub-version";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +43,7 @@ export function HubPicker({ recipesOnly = false, disabled, onSelect }: {
             <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="max-w-40 truncate">{entry.author}</span>
               <span>{t("hubPicker.stars", { count: entry.stars })}</span>
-              <span>{t("hubPicker.revision", { count: entry.latestRevision })}</span>
+              <span>{t("hubPicker.revision", { version: hubVersionOf(entry) ?? "" })}</span>
               <span className="rounded-full border px-1.5 py-px" title={t("hubPicker.kindTip")}>{t(`hubPicker.kind.${entry.kind}`)}</span>
               {entry.recipe && <span className="rounded-full border px-1.5 py-px" title={t("hubPicker.recipeTip")}>{t("hubPicker.recipe")}</span>}
             </span>

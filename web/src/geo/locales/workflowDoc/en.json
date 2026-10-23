@@ -1,7 +1,7 @@
 {
   "heading": {
     "title": "# Workflow: {title}",
-    "titleRevision": "# Workflow: {title} (revision {revision})"
+    "titleVersion": "# Workflow: {title} (version {version})"
   },
   "section": {
     "settings": "Researcher's settings (these take precedence over example values in this document)",
@@ -18,6 +18,7 @@
     "none": "none",
     "unresolved": "Conditions not set: {list}",
     "askBeforeStep": "Ask the researcher about a condition that is not set before the step that uses it.",
+    "runThrough": "Every condition is set. Record details the settings and instructions leave open as assumptions (the recommended or source value) and run to the end. Stop and ask only when a required input is missing or its format or CRS does not fit.",
     "choiceOptions": "{label}: chosen by the researcher (options: {options})",
     "choiceOpen": "{label}: set by the researcher",
     "inputAsk": "{label} ({need})",
@@ -46,7 +47,7 @@
     "primary": "primary skill",
     "usedIn": "Used in step {steps}.",
     "readRule": "Before you start a step that uses a skill, read that skill's instruction file (SKILL.md).",
-    "hubRevision": "revision {revision}"
+    "hubRevision": "version {revision}"
   },
   "steps": {
     "legacy": "This Workflow uses the earlier format. For the detailed method of each step, follow the procedure in the instructions of skill {skill}."
@@ -64,7 +65,7 @@
   },
   "card": {
     "label": "Workflow · {title}",
-    "labelRevision": "Workflow · {title} · revision {revision}",
+    "labelVersion": "Workflow · {title} · version {version}",
     "expand": "Show instructions",
     "collapse": "Hide instructions",
     "remove": "Remove Workflow",

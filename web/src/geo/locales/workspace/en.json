@@ -193,8 +193,8 @@
     "enabling": "Turning on skills",
     "notInstalled": "Skills not installed in the project: {names}. Install them in Settings → Skills.",
     "error": "Could not turn on the skills. Turn them on again in Settings → Skills.",
-    "hub": "Hub skill {name} (revision {revision}):",
-    "hubInstall": "Install revision {revision} from the hub"
+    "hub": "Hub skill {name} (version {revision}):",
+    "hubInstall": "Install version {revision} from the hub"
   },
   "badge": {
     "readiness": "{state, select, ready {Ready} missing-skills {Skills needed} needs-environment {Environment needed} unavailable {Unavailable} other {State unknown}}",

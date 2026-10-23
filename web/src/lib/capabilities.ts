@@ -33,7 +33,8 @@ export interface SkillInfo {
   ref?: string;
   /** A support skill the app runtime seeds into every project (not from the catalogue, not written by the user). */
   builtin?: boolean;
-  workflow?: { title: { ko: string; en?: string }; revision: number };
+  /** A skill installed from a GAID hub Workflow: its title and registered version (null: a draft, shown as 초안). */
+  workflow?: { title: { ko: string; en?: string }; version: string | null };
   /** gaid-brand-copy: the project a catalogue skill was taken from (e.g. K-Dense), shown wherever the skill is. */
   upstream?: { name: string; repository: string; url: string };
 }

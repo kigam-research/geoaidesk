@@ -39,7 +39,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
-- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`; gaid-workflow-model): Settings → Skills adds skills from GitHub and similar sources first (upstream `skills` CLI: owner/repo, Git URL, local path) and no longer searches the shared hub (hub Workflows install from the hub or the Workflow panel). Every skill row has a read-only 지침 보기 (SKILL.md and file list, `server/src/geo/skill-details.ts`, `web/src/geo/skills/`); a skill installed from the hub shows its Workflow title and 판, never the storage path. Hub installs (shared entry, picker, draft trial) show one install preview (`web/src/geo/skill-hub/install-preview.tsx`) before consent, through the existing acknowledgement/install gate (origin `gaid-hub`; registered installs show 등록됨 + 판, drafts 초안). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`; gaid-workflow-model): Settings → Skills adds skills from GitHub and similar sources first (upstream `skills` CLI: owner/repo, Git URL, local path) and no longer searches the shared hub (hub Workflows install from the hub or the Workflow panel). Every skill row has a read-only 지침 보기 (SKILL.md and file list, `server/src/geo/skill-details.ts`, `web/src/geo/skills/`); a skill installed from the hub shows its Workflow title and version (초안 for a draft), never the storage path. Hub installs (shared entry, picker, draft trial) show one install preview (`web/src/geo/skill-hub/install-preview.tsx`) before consent, through the existing acknowledgement/install gate (origin `gaid-hub`; registered installs show 등록됨 + version, drafts 초안). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; original producer contract skill_hub
   `docs/specs/gaid-method-package.md` v1 — skill_hub is legacy since 2026-10-20 and GAID owns the format, see "Workflow model"): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
   레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
@@ -58,11 +58,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Workflow model (gaid-workflow-model, ADR `docs/adr/2026-10-20-workflow-runtime-form.md`, report
   `reports/2026-10-20-gaid-workflow-model/`; user decisions 2026-10-20): GAID is Workflow-centred. Researcher-facing terms:
   the hub unit and the Workflow panel row are "Workflow" (never 방법/패키지 in copy), catalogue Workflows "기본 Workflow",
-  upstream BYOK ones "일반 Workflow", 레시피 → "저장한 시작 설정", revisions "판"; skills are parts a Workflow uses (built-in,
+  upstream BYOK ones "일반 Workflow", 레시피 → "저장한 시작 설정", registered revisions "version" (the English word on Korean
+  screens too, never 판/버전; gaid-hub-versions, see "GAID hub"); skills are parts a Workflow uses (built-in,
   imported from GitHub and similar, bundled with the Workflow; hub-managed skills later). The hub registers Workflows only
   (Workflow-less drafts are refused). A Workflow reaches the agent as one rendered 지침 document:
   `web/src/geo/contracts/workflow-doc.ts` (IO-free `WorkflowDoc` schema `gaid-workflow/v1`, `renderWorkflowDocument` for
-  `chat|preview|cli`, `<workflow id revision title>` block, `legacyWorkflowDoc`), wording in locale namespace `workflowDoc`,
+  `chat|preview|cli`, `<workflow id version title>` block (older `revision="n"` blocks read as 0.1.(n-1)), `legacyWorkflowDoc`), wording in locale namespace `workflowDoc`,
   server side `server/src/geo/workflow-doc.ts` (`workflowDocFor`: own `steps[]`, else steps derived from the primary skill's
   procedure in catalogue details / package `atlas.yaml`, marked 이전 형식; stored data is never rewritten). `GeoWorkflowSummary.doc`
   and `HubEntryDetail.workflowDoc` carry it. Starting a Workflow puts the `<workflow>` block (researcher's settings filled in)
@@ -134,7 +135,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `#hub/<authoring id>`; entry on the project list and a Projects/GAID hub header switch; gaid-hub-layout: every hub screen
   keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,
   default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
-  together (plus the standard `code-use`/`trial-scale` questions), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
+  together (plus the standard `code-use`/`trial-scale` questions), each question beside a side viewer of the passages it and its
+  options cite (gaid-authoring-evidence-view, `web/src/geo/hub/evidence/`: PDF page through pdf.js with the quote marked from
+  text-item coordinates, web page text, code/note file lines, data-file summary; `QuestionOption.evidence`, and anchors the server
+  did not find are kept as `verified: false` and shown as unconfirmed), the draft as a flow diagram, install into a project through the normal gate (origin `gaid-hub`) and the
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
   store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,
@@ -144,7 +148,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   latest revision when that draft is not on this server; registering adds the next revision), any other name gets one own
   copy (`<slug>-copy`; sources, questions and current answers come along when the original draft is on this server) that
   registers as a separate entry with `basedOn`; drafts carry `hubEntry`. Registration keeps pictures whose cover, step or
-  output still exists. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
+  output still exists. Versions and removal (gaid-hub-versions, user decisions 2026-10-23): a first registration is version
+  0.1.0 and each update the registrant picks a patch, minor or major step (`RegisterBody.bump`; 1.0.0 = main release;
+  helpers in `web/src/geo/contracts/hub-version.ts`); revisions registered before versions read 0.1.0, 0.1.1, … (views fill
+  `revisions[].version`, stored records are never rewritten; the hub server checks a new revision's step); drafts show 초안.
+  Installs record the version in the package origin (`hubEntry.version`); the package-internal `gaid-method.json` version is
+  not shown. The registrant or a hub server administrator removes a registered Workflow (`POST /geo/hub/entries/:id/remove`):
+  hidden from every list and read until restored, records/files/comments/stars kept, installed project copies untouched,
+  re-registration refused; administrators restore (`GET /geo/hub/removed`, `POST /geo/hub/entries/:id/restore`; hub server
+  migration 5 `hub_entry_removals`, audited); the local store has no administrators, so there the registrant restores. Recorded answers stay editable: changed ones are sent again and the draft is revised to them
   (`answersFeedback`). Concept pictures can be redone one at a time or revised by a researcher instruction (≤ 500 chars,
   previous picture as input to `codex/images/edits`); older picture files stay. Each picture is two files
   (gaid-concept-pictures, user decision 2026-10-22): the light one generated on the picture-well colour (`PICTURE_WELL` in
@@ -219,6 +231,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
   and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+  Research notes in 서재 (gaid-note-library, user decision 2026-10-23: GAID library only, hub-synced, no Zotero writes): a note
+  item (`LibraryItem.kind: "note"`, `note: LibraryNoteRef`; `server/src/geo/library/notes.ts`) mirrors one
+  `연구노트/<id>/index.md` (title, date, status, headline, citations resolved to library papers, ≤ 64 KiB text snapshot); the
+  file stays the master and the GAID instance holding the project (`<library>/instance.json`) refreshes the item on library
+  reads and before hub sync (missing file → `missingAt`). Routes `POST /geo/library/notes`, `GET /geo/library/notes/candidates`,
+  list `?kind=note|paper`. Notes are not references: no citation key, not exported, not in folder checks, citation scope,
+  agent `library_*` tools or ORCID matching, never sent to Zotero. Screens: 서재 논문 / 정리 노트 switch
+  (`web/src/geo/library/note-items.tsx`), 정리 노트 가져오기, note detail 더 보기 → 서재에 넣기; 프로젝트에서 열기 goes through
+  `web/src/geo/notes/open-note.ts` (pending request taken by that project's workspace, which opens the notebook tab on the note).
 - ORCID (gaid-orcid phase 1, user decision 2026-10-22): the researcher types an ORCID iD in 서재 (`<library>/orcid.json`, local,
   `authenticated: false`, shown with ORCID's unauthenticated iD icon and "(인증 안 됨)" per ORCID display guidelines) and imports
   public works read anonymously from `https://pub.orcid.org/v3.0` (`server/src/geo/orcid/`, routes `/geo/orcid*` in

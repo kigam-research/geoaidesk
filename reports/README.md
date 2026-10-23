@@ -7,6 +7,10 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-23-gaid-authoring-evidence-view/figures/01-question-pdf.png" width="120"> | 2026-10-23 17:53 | [Workflow 만들기 질문 옆에 논문 해당 부분과 근거 자료 보기](2026-10-23-gaid-authoring-evidence-view/index.md) | GAID 허브에서 Workflow를 만들 때 질문마다 옆 뷰어에 근거가 된 논문 쪽과 코드 줄, 자료 파일 요약이 열리고, 선택지를 고르면 그 선택지의 근거로 이동합니다. | 검토 전 | 미정 | 0 |
+| <img src="2026-10-23-gaid-hub-versions/figures/register-version.png" width="120"> | 2026-10-23 17:25 | [GAID 허브 Workflow 제거·복원과 version 관리](2026-10-23-gaid-hub-versions/index.md) | 등록한 Workflow를 허브에서 제거하고 다시 복원할 수 있습니다. 다시 등록할 때는 등록한 연구자가 다음 version(patch·minor·major)을 고릅니다. | 검토 전 | 미정 | 0 |
+| <img src="2026-10-23-gaid-library-pdf-panel/figures/01-pdf-pane-instrument-light.png" width="120"> | 2026-10-23 17:14 | [서재 PDF를 목록 옆 패널에서 보기](2026-10-23-gaid-library-pdf-panel/index.md) | 서재에서 "PDF 열기"를 누르면 새 브라우저 탭 대신 목록 옆 패널에 PDF가 열리고, 닫으면 논문 상세로 돌아옵니다. | 검토 전 | 미정 | 0 |
+| <img src="2026-10-23-gaid-note-library/figures/01-library-notes.png" width="120"> | 2026-10-23 16:35 | [정리 노트를 서재에 넣고 다시 프로젝트에서 열기](2026-10-23-gaid-note-library/index.md) | 정리 노트를 논문과 따로 나뉜 종류로 서재에 넣고, 폴더에 넣고, 프로젝트에서 다시 열 수 있습니다. 노트 파일이 원본입니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-example/figures/01-setup-input.png" width="120"> | 2026-10-23 16:25 | [Workflow 예제 자료, 내 자료가 없어도 분석 시작하기](2026-10-23-gaid-workflow-example/index.md) | Workflow가 입력마다 예제 자료를 함께 제공하고, 연구자가 자기 파일을 고르지 않으면 예제 자료로 분석을 시작하며 그 사실을 지침과 채팅에 적습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-authoring-sources/figures/01-sources.png" width="120"> | 2026-10-23 15:56 | [Workflow 만들기에 여러 자료와 자료 파일, 서재 논문, 연구 노트 넣기](2026-10-23-gaid-authoring-sources/index.md) | GAID 허브의 Workflow 만들기가 자료 파일, 서재 논문, 연구 노트를 여러 개 함께 받고, AI agent는 자료 파일을 GAID 자료 검사 요약으로 읽습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | 검토 전 | 미정 | 0 |

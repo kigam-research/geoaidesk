@@ -67,7 +67,7 @@
       "path": "web/src/app/page.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub; gaid-project-resume: a project workspace mounts after its last state was read from the GAID server (loadServerProjectWorkspaceState), and the page-hide flush also sends unsent changes there"
+      "responsibility": "gaid-fork-base changed only the update link target (NEXT_PUBLIC_RELEASES_URL). gaid-korean-workspace: the gaid:start-task listener (web/src/geo/workspace/events.ts) opens a new tab holding a task draft and its geoExposure; GeoTaskCatalogue wraps the workflows view; branding and copy; WP07 primary-path catalogue copy and accessible localized controls; gaid-workflow-catalog: GeoTaskCatalogue passes its Geoscience rows to WorkflowsPanel through a render prop; gaid-hub: the GAID hub (web/src/geo/hub/) as a third place of the page kept in the URL hash (#hub), shown over the project list/workspace; gaid-system-ui: the workspace header carries the same 내 연구 / GAID 허브 switch (GaidTopNav); gaid-notebook-review: onOpenNotebookChat opens the chat that wrote a research note (openSession); gaid-hub-versions: passes the #hub/removed place to GaidHub; gaid-hub-feeds: passes the #hub/feeds place (hub.feeds) to GaidHub; gaid-project-resume: a project workspace mounts after its last state was read from the GAID server (loadServerProjectWorkspaceState), and the page-hide flush also sends unsent changes there; gaid-note-library: a pending 서재 request (web/src/geo/notes/open-note.ts) opens the notebook tab on a research note (researchNoteFocus)"
     },
     {
       "path": ".github/workflows/release.yml",
@@ -198,7 +198,7 @@
       "path": "web/src/components/file-preview-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
-      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:); gaid-notebook-review: the pinned notebook tab renders ResearchNotesPanel (web/src/geo/notes/) with the Lab Notebook view as its work record, plus the onOpenNotebookChat prop; gaid-first-use-fixes: Markdown file links resolve against the file's folder and open in the file panel"
+      "responsibility": "Append an explicit read-only TableInspectionOption around the existing FileViewer in view mode; CSV/TSV/XLSX generic viewers and editors are unchanged.; WP07 primary-path catalogue copy and accessible localized controls; gaid-system-ui: load-error markers are recognised in both catalogue languages ([Error: / [오류:); gaid-notebook-review: the pinned notebook tab renders ResearchNotesPanel (web/src/geo/notes/) with the Lab Notebook view as its work record, plus the onOpenNotebookChat prop; gaid-first-use-fixes: Markdown file links resolve against the file's folder and open in the file panel; gaid-note-library: passes researchNoteFocus to ResearchNotesPanel (noteFocus)"
     },
     {
       "path": "server/src/cost/billing.ts, server/src/cost/ledger.ts, server/src/agent/subagent-bridge.ts, server/src/agent/subagent-meter.ts, server/src/agent/custom-models.ts",
@@ -462,7 +462,7 @@
       "path": "web/src/components/pdf-viewer/pdf-viewer.tsx",
       "owner": "gaid-improve--source-preview",
       "status": "edited",
-      "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default."
+      "responsibility": "Additive raw source URL and controlled page navigation seam for real PDF preview with annotation APIs disabled; preserve existing sandbox behavior by default. gaid-library-pdf-panel: optional renderError prop so a GAID pane (web/src/geo/pdf/pdf-pane.tsx) shows its own error with an open-in-new-tab fallback. gaid-authoring-evidence-view: `loadPdfjs` exported (unchanged) so the authoring evidence viewer renders single pages with the same pdf.js setup."
     },
     {
       "path": ".gitignore",
@@ -966,7 +966,7 @@
       "path": "server/test/geo-hub-server.test.ts",
       "owner": "gaid-backend",
       "status": "added",
-      "responsibility": "Standalone institute hub account, ownership, revision, library isolation, backup and legacy import integration coverage"
+      "responsibility": "Standalone institute hub account, ownership, revision, library isolation, backup and legacy import integration coverage; gaid-note-library: explicit 30 s timeout on the launcher CLI test (five sequential launcher processes exceeded the 5 s default under the full suite)"
     },
     {
       "path": "geo/tests/distribution.test.mjs",
@@ -1021,6 +1021,12 @@
       "owner": "gaid-first-use-fixes",
       "status": "edited",
       "responsibility": "Streaming-link and file-relative link regressions"
+    },
+    {
+      "path": "web/src/components/skills-panel.test.tsx",
+      "owner": "gaid-hub-versions",
+      "status": "edited",
+      "responsibility": "Update hub skill integer-version copy expectations after the user replaced 판 with version."
     }
   ],
   "notTouched": [

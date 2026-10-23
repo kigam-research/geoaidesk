@@ -16,6 +16,12 @@
  * folder comes from Zotero, every other membership is kept by GAID. A folder (with its subfolders) is a citation scope:
  * export, reference check and, when attached to a project, the project's citations.
  *
+ * Research notes (gaid-note-library): a research note (`연구노트/<date>-<topic>/index.md`) can be brought into the library
+ * as an item of its own category (`kind: "note"`). The note file stays the master: the item mirrors its title, status,
+ * citations and a bounded text snapshot, refreshed from the file by the GAID instance whose project holds it. Note items
+ * sync with the institute hub like other items, are never written to Zotero and are not references (no citation key,
+ * not exported, not checked as papers).
+ *
  * IO-free; the server imports it.
  */
 
@@ -75,7 +81,45 @@ export interface CslItem {
  * `orcid`: filled from the researcher's public ORCID record (a work without DOI metadata elsewhere).
  * `datacite`: DOIs Crossref does not register, such as arXiv preprints (`10.48550/arXiv.*`) and data repositories.
  */
-export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "orcid" | "import" | "manual";
+export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "orcid" | "import" | "manual" | "note";
+
+/** Library category: a paper (or other reference) or a research note brought in from a project. */
+export type LibraryItemKind = "paper" | "note";
+/** Research-note status as written in the note file (`web/src/geo/contracts/research-notes.ts`). */
+export type LibraryNoteStatus = "pending" | "confirmed" | "superseded";
+/** Largest note text kept in a library item (UTF-8 bytes); longer notes keep the beginning and set `truncated`. */
+export const LIBRARY_NOTE_SNAPSHOT_BYTES = 64 * 1024;
+
+/**
+ * Where a research-note item comes from and what the library last read from the file. Projects live on one GAID
+ * instance (and the project id `default` exists on every instance), so `origin` names that instance; only it refreshes
+ * the item. `noteId` is the note folder name (`getResearchNote(paths, noteId)`).
+ */
+export interface LibraryNoteRef {
+  origin: string;
+  /** Host name of the origin instance, for "on another PC" wording. */
+  originLabel: string;
+  projectId: string;
+  projectName: string;
+  noteId: string;
+  /** Project-relative note file (`연구노트/<id>/index.md`). */
+  path: string;
+  date: string;
+  status: LibraryNoteStatus;
+  headline?: string;
+  /** Note Markdown at the last refresh (bounded by LIBRARY_NOTE_SNAPSHOT_BYTES). */
+  markdown: string;
+  truncated?: boolean;
+  contentSha256: string;
+  fileUpdatedAt: string;
+  refreshedAt: string;
+  /** Citation keys in the note and the library papers (id, title) they resolved to at the last refresh. */
+  citations: { key: string; itemId?: string; title?: string; locators: string[] }[];
+  /** Set when the note file (or its project) was not found at the last refresh; cleared when it is back. */
+  missingAt?: string;
+}
+
+export const isNoteItem = (item: Pick<LibraryItem, "kind">): boolean => item.kind === "note";
 
 export interface LibraryAttachment {
   id: string;
@@ -141,6 +185,10 @@ export interface LibraryItem {
    * 내 논문). GAID-side: kept across Zotero refreshes and merges.
    */
   ownWork?: OwnWorkMark;
+  /** `note` for a research note brought in from a project; absent or `paper` for references. */
+  kind?: LibraryItemKind;
+  /** Research-note items only. */
+  note?: LibraryNoteRef;
 }
 
 /** Provenance of an own-work mark: the ORCID iD and the work's put-code on that record. */
@@ -311,6 +359,8 @@ export interface LibraryItemSummary {
   citationKey?: string;
   coverage: ReadCoverage;
   hasPdf: boolean;
+  /** A PDF stored in GAID, which 서재 can show in its PDF pane (`GET /geo/library/items/:id/pdf`); a Zotero-only PDF is not. */
+  storedPdf?: boolean;
   collectionIds: string[];
   tags: string[];
   used: { notes: number; workflows: number; projects: number };
@@ -320,11 +370,32 @@ export interface LibraryItemSummary {
   retracted?: boolean;
   /** The researcher's own work (from ORCID). */
   ownWork?: boolean;
+  kind: LibraryItemKind;
+  /** Research-note items only. `local`: the note's project is on this GAID instance, so it can be opened and read. */
+  note?: LibraryNoteSummary;
+}
+
+export interface LibraryNoteSummary {
+  projectId: string;
+  noteId: string;
+  projectName: string;
+  originLabel: string;
+  date: string;
+  status: LibraryNoteStatus;
+  headline?: string;
+  local: boolean;
+  missing?: boolean;
+  /** Papers of this library the note cites. */
+  cites: number;
 }
 
 export interface LibraryListQuery {
   q?: string;
   source?: LibrarySource;
+  /** Category; absent = both. */
+  kind?: LibraryItemKind;
+  /** Research notes only: status in the note file. */
+  noteStatus?: LibraryNoteStatus;
   collectionId?: string;
   /** `unread` = coverage none/abstract; `cited` = cited in at least one research note; `mine` = own works (ORCID). */
   filter?: "unread" | "cited" | "project" | "mine";
@@ -335,22 +406,58 @@ export interface LibraryListQuery {
 export interface LibraryListResponse {
   items: LibraryItemSummary[];
   total: number;
-  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number; mine: number };
+  /** Paper counts (`all` = papers) plus `notes` (research notes) and notes per status. */
+  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number; mine: number; notes: number; notesPending: number; notesConfirmed: number };
   collections: LibraryCollection[];
-  /** Items per folder, subfolders included. */
+  /** Items of the requested category (`kind`; papers when absent) per folder, subfolders included. */
   folderCounts: Record<string, number>;
   zotero: ZoteroLibraryState[];
 }
 
 /** Where an item is used (가안 detail pane "내 연구에서 쓰인 곳"). */
 export type LibraryUse =
-  | { kind: "note"; projectId: string; projectName: string; noteId: string; title: string; locators: string[] }
+  /** `libraryItemId`: the citing note is in the library; `remote`: known only from that item (project on another PC). */
+  | { kind: "note"; projectId: string; projectName: string; noteId: string; title: string; locators: string[]; libraryItemId?: string; remote?: boolean }
   | { kind: "workflow"; entryId?: string; authoringId?: string; title: string; revision?: number }
   | { kind: "project"; projectId: string; projectName: string };
 
 export interface LibraryItemResponse {
   item: LibraryItem;
   uses: LibraryUse[];
+  /** Research-note items: whether the note can be opened on this GAID instance (project present, file found). */
+  noteLocal?: boolean;
+}
+
+/** `POST /geo/library/notes`: bring a research note into the library (project from the body, else the request scope). */
+export interface AddLibraryNoteBody {
+  projectId?: string;
+  noteId: string;
+  collectionIds?: string[];
+}
+
+export interface AddLibraryNoteResponse {
+  item: LibraryItem;
+  /** False when the note was already in the library (the existing item, refreshed). */
+  created: boolean;
+}
+
+/** `GET /geo/library/notes/candidates`: research notes of the projects on this GAID instance. */
+export interface LibraryNoteCandidate {
+  projectId: string;
+  projectName: string;
+  noteId: string;
+  title: string;
+  date: string;
+  status: LibraryNoteStatus;
+  headline?: string;
+  /** Library item of this note, when it is already in the library. */
+  itemId?: string;
+}
+
+export interface LibraryNoteCandidatesResponse {
+  notes: LibraryNoteCandidate[];
+  /** True when the list stopped at its bound. */
+  truncated: boolean;
 }
 
 /** Add a GAID-managed item after the researcher confirmed the looked-up or typed metadata. */
@@ -429,7 +536,7 @@ export interface SendToZoteroResult {
   /** Folders created in or linked to Zotero. */
   folders: number;
   /** Items not sent, with a research-language reason id for the screen. */
-  skipped: { itemId: string; reason: "unsupported-type" | "pdf-failed" | "other-library" }[];
+  skipped: { itemId: string; reason: "unsupported-type" | "pdf-failed" | "other-library" | "research-note" }[];
   /** Set when Zotero refused further writes (single-use key spent, key revoked); earlier steps are kept. */
   stopped?: ZoteroLibraryState["state"];
   item?: LibraryItem;

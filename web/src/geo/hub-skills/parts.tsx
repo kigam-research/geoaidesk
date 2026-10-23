@@ -1,4 +1,5 @@
 "use client";
+import { hubRefVersion } from "@/geo/contracts/hub-version";
 import { useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export function Findings({ findings }: { findings: HubSkillFinding[] }) {
   </section>;
 }
 export function Origin({ origin }: { origin: HubSkillOrigin }) {
-  return <div className="space-y-2 text-sm"><p>{text(`origin.${origin.kind}`, { title: origin.workflow?.title ?? "", revision: origin.workflow?.revision ?? 0, source: origin.source ?? "" })}</p>
+  return <div className="space-y-2 text-sm"><p>{text(`origin.${origin.kind}`, { title: origin.workflow?.title ?? "", version: hubRefVersion(origin.workflow) ?? "", source: origin.source ?? "" })}</p>
     {origin.kind === "github" && <details><summary className="cursor-pointer">{text("sourceRecord")}</summary><dl className="mt-2 space-y-2 break-all">{[["ref", origin.ref], ["commit", origin.commit], ["fetched", origin.fetchedAt && when(origin.fetchedAt)]].filter(([, v]) => v).map(([k, v]) => <div key={k}><dt className="text-gaid-ink-2">{text(k!)}</dt><dd className="font-mono">{v}</dd></div>)}</dl></details>}
   </div>;
 }

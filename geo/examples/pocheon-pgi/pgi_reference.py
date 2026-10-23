@@ -135,6 +135,8 @@ def main():
     ap.add_argument("--npad", type=int, default=8)
     ap.add_argument("--max-iter", type=int, default=30)
     ap.add_argument("--sens-mask", type=float, default=0.02)
+    ap.add_argument("--weights", default="0.9,0.075,0.025", help="GMM proportions host,low,ore (paper ESM1)")
+    ap.add_argument("--modes", default="full,none")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     np.random.seed(518936)
@@ -150,7 +152,7 @@ def main():
     log("anomaly range nT", round(float(dobs.min()), 1), round(float(dobs.max()), 1), "n", dobs.size)
 
     order, means, var, n = gmm_from_samples(args.data)
-    weights = np.r_[0.9, 0.075, 0.025]
+    weights = np.array([float(w) for w in args.weights.split(",")])
     log("GMM means", means.round(4), "var", var.round(6), "n", n)
 
     # topography
@@ -206,7 +208,7 @@ def main():
         truth_ore[ok] = np.nan_to_num(kt[idx]) >= 0.25
     holes = np.loadtxt(args.data / "boreholes.csv", delimiter=",", skiprows=1, usecols=range(1, 7))
     hole_mid = holes[:, :3] * 0.5 + holes[:, 3:] * 0.5
-    for mode in ("full", "none"):
+    for mode in args.modes.split(","):
         cache = {}
         log(f"PGI-{mode} start")
         m, learned, phi_d, sim = run_pgi(mode, mesh, active, rx, dobs, std, ifield, means, var, weights,

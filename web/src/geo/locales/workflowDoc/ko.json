@@ -1,7 +1,7 @@
 {
   "heading": {
     "title": "# Workflow: {title}",
-    "titleRevision": "# Workflow: {title} ({revision}판)"
+    "titleVersion": "# Workflow: {title} (version {version})"
   },
   "section": {
     "settings": "연구자가 정한 설정 (지침의 예시 값보다 우선합니다)",
@@ -18,6 +18,7 @@
     "none": "없음",
     "unresolved": "정하지 않은 조건: {list}",
     "askBeforeStep": "정하지 않은 조건은 해당 조건을 쓰는 단계 전에 연구자에게 물으세요.",
+    "runThrough": "연구자가 조건을 모두 정했습니다. 설정과 지침에 없는 세부는 지침의 권장값이나 원본 값을 가정으로 적고 끝까지 진행하세요. 필수 입력이 없거나 형식·좌표계가 맞지 않을 때만 멈추고 물으세요.",
     "choiceOptions": "{label}: 연구자가 고릅니다 (선택지: {options})",
     "choiceOpen": "{label}: 연구자가 정합니다",
     "inputAsk": "{label} ({need})",
@@ -46,7 +47,7 @@
     "primary": "주 스킬",
     "usedIn": "{steps}단계에서 씁니다.",
     "readRule": "스킬은 해당 스킬을 쓰는 단계를 시작하기 전에 지침 파일(SKILL.md)을 읽으세요.",
-    "hubRevision": "{revision}판"
+    "hubRevision": "version {revision}"
   },
   "steps": {
     "legacy": "이전 형식의 Workflow입니다. 단계별 자세한 방법은 스킬 {skill}의 지침에 있는 처리 절차를 따르세요."
@@ -64,7 +65,7 @@
   },
   "card": {
     "label": "Workflow · {title}",
-    "labelRevision": "Workflow · {title} · {revision}판",
+    "labelVersion": "Workflow · {title} · version {version}",
     "expand": "지침 펼치기",
     "collapse": "지침 접기",
     "remove": "Workflow 빼기",

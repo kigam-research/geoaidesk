@@ -23,6 +23,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 
 import { ExternalLinkIcon } from "lucide-react";
@@ -132,7 +133,7 @@ async function buildWorkerUrl(): Promise<string> {
   }
 }
 
-function loadPdfjs(): Promise<PdfjsModule> {
+export function loadPdfjs(): Promise<PdfjsModule> {
   if (pdfjsPromise) return pdfjsPromise;
   pdfjsPromise = (async () => {
     installMapUpsertPolyfill();
@@ -173,6 +174,8 @@ export interface PdfViewerProps {
   onSyncClick?: (pos: PdfSyncClick) => void; // Cmd/Ctrl+click on a page
   hideAnnotationUi?: boolean; // view-only: hide annotation UI and skip loading/polling the sidecar
   initialFitWidth?: boolean;
+  /** GAID: the caller's own error state (e.g. with an open-in-new-tab fallback) instead of the bare message. */
+  renderError?: () => ReactNode;
 }
 
 export function PdfViewer({
@@ -187,6 +190,7 @@ export function PdfViewer({
   onSyncClick,
   hideAnnotationUi = false,
   initialFitWidth = false,
+  renderError,
 }: PdfViewerProps) {
   const contextProjectId = useProjectScopeId();
   const scopedProjectId = projectId ?? contextProjectId;
@@ -699,6 +703,7 @@ export function PdfViewer({
   // --------------------------------------------------------------------
 
   if (error) {
+    if (renderError) return <>{renderError()}</>;
     return (
       <div role="alert" className="flex h-full items-center justify-center p-6 text-sm text-destructive">
         {error}

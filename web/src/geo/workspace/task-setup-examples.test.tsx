@@ -17,7 +17,7 @@ const example = (state: "bundled" | "remote" | "present" | "broken" = "bundled")
   size: 2048, download: state === "remote" ? 2048 : 0, path: EXAMPLE_PATH, state,
 });
 const doc: WorkflowDoc = {
-  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "mag-inversion", title: { ko: "자력 역산" }, revision: 1, purpose: null,
+  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "mag-inversion", title: { ko: "자력 역산" }, version: "0.1.0", purpose: null,
   inputRoles: [{ id: "grid", label: { ko: "항공자력 격자" }, formats: ["csv"], required: true,
     example: { title: { ko: "공개 항공자력 격자" }, source: { ko: "예시 기관" }, files: [{ name: "tmi.csv", sha256: "a".repeat(64), size: 2048, path: "examples/grid/tmi.csv" }] } }],
   choices: [], skills: [{ name: "mag-inv", source: "bundled", role: "primary" }],

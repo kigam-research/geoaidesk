@@ -101,6 +101,9 @@ export const sharedHub = {
   catalogue: (id: string) => call<{ doc: import("@/geo/contracts/workflow-doc").WorkflowDoc }>(`/catalogue/${encodeURIComponent(id)}`),
   skillSource: (id: string, revision: number, name: string) => call<{ content: string }>(`${eid(id)}/skill-source?revision=${revision}&name=${encodeURIComponent(name)}`),
   entry: (id: string) => call<HubEntryDetail>(eid(id)),
+  removed: () => call<{ entries: HubEntry[] }>("/removed"),
+  remove: (id: string, reason?: string) => post<void>(`${eid(id)}/remove`, { reason }),
+  restore: (id: string) => post<HubEntry>(`${eid(id)}/restore`, {}),
   register: (body: RegisterBody) => post<HubEntry>("/entries", body),
   /** The draft to open for "방법 고치기" (author) or "복사해서 고치기" (anyone else). */
   edit: (id: string) => post<EditEntryResult>(`${eid(id)}/edit`, {}),

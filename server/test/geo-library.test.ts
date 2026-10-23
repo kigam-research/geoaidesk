@@ -92,7 +92,7 @@ describe("library routes, reading and uses", () => {
 
     const list = (await server.inject({ method: "GET", url: "/geo/library?q=spatial" })).json();
     expect(list).toMatchObject({ total: 1, counts: { all: 1, gaid: 1, cited: 1 } });
-    expect(list.items[0]).toMatchObject({ authors: "Hong 외", year: 2026, coverage: "partial", hasPdf: true, used: { notes: 1, projects: 1 } });
+    expect(list.items[0]).toMatchObject({ authors: "Hong 외", year: 2026, coverage: "partial", hasPdf: true, storedPdf: true, used: { notes: 1, projects: 1 } });
     const detail = (await server.inject({ method: "GET", url: `/geo/library/items/${item.id}` })).json();
     expect(detail.uses).toEqual(expect.arrayContaining([
       expect.objectContaining({ kind: "note", noteId: "2026-10-21-test", title: "니켈 후보지", locators: ["p. 3"] }),

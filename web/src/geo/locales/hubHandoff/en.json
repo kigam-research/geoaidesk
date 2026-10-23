@@ -48,7 +48,7 @@
   },
   "followUps": "Later requests ({count})",
   "methodTrial": "Workflow trial",
-  "methodTrialLine": "Workflow {method} · revision {revision} · {workflow}",
+  "methodTrialLine": "Workflow {method} · {workflow}",
   "assessment": "Researcher assessment: {outcome, select, useful {useful} needs-revision {needs revision} failed {failed} other {not recorded}} · {note}",
   "noAssessment": "No researcher assessment yet. Save one in the Workflow's trial record to send it along.",
   "excludedFile": "{path}: {reason, select, policy {path not allowed} unavailable {could not be read} too-large {over 5 MiB} file-limit {over the file limit} other {left out}}",

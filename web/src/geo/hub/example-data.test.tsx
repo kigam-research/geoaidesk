@@ -94,7 +94,7 @@ describe("draft example data area", () => {
     expect(screen.getByText("3 MiB, 파일 1개")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "예제 자료 빼기" }));
     expect(remove).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "예제 자료 뺀 판 만들기" }));
+    fireEvent.click(screen.getByRole("button", { name: "예제 자료 뺀 초안 만들기" }));
     await waitFor(() => expect(remove).toHaveBeenCalledWith(project.id, "grid", draft.revision));
   });
 });

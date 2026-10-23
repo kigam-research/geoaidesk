@@ -9,7 +9,8 @@ import AdmZip from "adm-zip";
 import type { ProjectPaths } from "../projects.ts";
 import { loadGeoCatalogue, type GeoCatalogue } from "./catalogue.ts";
 import { GEO_CATALOGUE_MODE } from "../config.ts";
-import { findInstalledMethod } from "./methods/local-methods.ts";
+import { findInstalledMethod, installedHubVersion } from "./methods/local-methods.ts";
+import { hubVersionOf } from "../../../web/src/geo/contracts/hub-version.ts";
 import { LOCAL_SKILL_PREFIX } from "../../../web/src/geo/contracts/methods.ts";
 import type { GeoWorkflow } from "./catalogue-types.ts";
 import { catalogueProcedure, packageProcedure, procedureSteps, workflowDocFor, workflowDocSay } from "./workflow-doc.ts";
@@ -125,7 +126,7 @@ export function projectCliSource(paths: ProjectPaths, catalogue: GeoCatalogue | 
     const file = installed?.file.method;
     const workflow = file?.workflows.find(w => w.id === id);
     if (!installed || !file || !workflow) throw new CliExportError("Workflow was not found", 404);
-    const doc = workflowDocFor(workflow, { revision: file.revision, skills: skillsFor(workflow, catalogue, method), procedure: packageProcedure(installed.dir) });
+    const doc = workflowDocFor(workflow, { version: installedHubVersion(paths, installed), skills: skillsFor(workflow, catalogue, method), procedure: packageProcedure(installed.dir) });
     return resolveFiles(doc, paths, catalogue, { name: method, dir: installed.dir });
   }
   const workflow = catalogue?.workflows.find(w => w.id === id);
@@ -170,7 +171,7 @@ export async function hubCliSource(paths: ProjectPaths, catalogue: GeoCatalogue 
   const files = entries.filter(e => e.type === "file").map(e => ({ ...e, path: e.path.slice(slug.length + 1) }));
   if (!files.some(f => f.path === "SKILL.md")) throw new CliExportError("Package has no SKILL.md");
   const workflow = snapshot.draft.workflow as unknown as GeoWorkflow;
-  const doc = workflowDocFor(workflow, { revision: record.entry.latestRevision, skills: skillsFor(workflow, catalogue, slug), procedure: procedureSteps(snapshot.draft.profile) });
+  const doc = workflowDocFor(workflow, { version: hubVersionOf(record.entry), skills: skillsFor(workflow, catalogue, slug), procedure: procedureSteps(snapshot.draft.profile) });
   return resolveFiles(doc, paths, catalogue, { name: slug, files }, await pinnedHubFiles(doc, hubStore));
 }
 export function buildCliZip(source: CliSource, target: CliTarget, locale: "ko" | "en", limits = SKILL_HUB_LIMITS): Buffer {

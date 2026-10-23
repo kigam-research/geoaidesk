@@ -98,7 +98,14 @@ export type { HubOrcidLink, OrcidEnvironment };
 // GET    /hub/v1/entries                             → { entries: StoredEntry[] }       (newest first)
 // GET    /hub/v1/entries/:id                         → StoredEntry                      (404)
 // PUT    /hub/v1/entries/:id                         StoredEntry → StoredEntry (as stored; author fields from the
-//                                                    account; 403 not the author; 409 revision rules or missing files)
+//                                                    account; 403 not the author; 409 revision/version rules, missing
+//                                                    files or a removed entry). A new revision's `version` must be 0.1.0
+//                                                    first, then one patch/minor/major step; absent: the patch step.
+// POST   /hub/v1/entries/:id/remove                  RemoveEntryRequest → 204 (author or admin; 409 already removed). A
+//                                                    removed entry answers 404 on every entry route and is left out of
+//                                                    GET /entries until restored.
+// GET    /hub/v1/admin/entries/removed               → { entries: StoredEntry[] } with `entry.removed` (admin)
+// POST   /hub/v1/admin/entries/:id/restore           {} → StoredEntry (admin; 404 not removed)
 // POST   /hub/v1/entries/:id/installs                { install: AuthoringInstall } → 204
 // GET    /hub/v1/entries/:id/files/<path>            bytes (application/octet-stream)   (404)
 // PUT    /hub/v1/entries/:id/files/<path>            raw bytes, header `X-Content-SHA256` → 204 (409 different bytes;
@@ -116,6 +123,10 @@ export interface EntriesResponse {
 }
 export interface InstallRequest {
   install: AuthoringInstall;
+}
+export interface RemoveEntryRequest {
+  /** Up to 500 characters; may be empty. */
+  reason?: string;
 }
 export type { HubComment, HubFolder, StoredEntry };
 

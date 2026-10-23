@@ -1,5 +1,6 @@
 "use client";
 
+import { hubRefVersion } from "@/geo/contracts/hub-version";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { BookmarkIcon, PackageIcon } from "lucide-react";
 import type { WorkflowPanelCategory, WorkflowPanelRow } from "@/components/workflows-panel";
@@ -32,7 +33,7 @@ const trialsBadge = (workflow: LocalMethodWorkflow) => workflow.trials.count ===
   ? <span key="trials" className={pill} title={t("methods.badge.noTrials")}>{t("workspace.badge.untested")}</span>
   : <span key="trials" className={pill} title={t("methods.badge.trialsTip")}>{t("methods.badge.trials", { count: workflow.trials.count, outcome: workflow.trials.lastOutcome ?? "none" })}</span>;
 const stageBadge = (method: LocalMethodSummary, withCode: boolean) =>
-  <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{method.origin.hubEntry ? t("methods.registered", { revision: method.origin.hubEntry.revision }) : t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
+  <span key="stage" className={pill} title={t("methods.badge.stageTip")}>{method.origin.hubEntry ? t("methods.registered", { version: method.hubVersion ?? hubRefVersion(method.origin.hubEntry) ?? "" }) : t("methods.badge.stage", { stage: method.lifecycle })}{withCode && method.implementation === "descriptive" ? ` · ${t("methods.implementation.descriptive")}` : ""}</span>;
 
 /** The start window's source line: hub Workflow and its registered revision, or the hub stage of a draft. */
 const methodSource = (method: LocalMethodSummary) => method.origin.hubEntry
@@ -197,7 +198,7 @@ export function MethodDetail({ method, projectId, onClose, onSetup, exportAction
       <p className="flex flex-wrap gap-x-1 text-xs">
         <span>{t("methods.origin", { origin: t(`methods.origin.${method.origin.kind === "skill-hub" ? "hub" : method.origin.kind}`) })}</span>
         <span aria-hidden>·</span>
-        <span>{t("methods.revision", { revision: method.origin.hubEntry?.revision ?? method.revision ?? t("methods.unknown") })}</span>
+        <span>{method.origin.hubEntry ? t("methods.revision", { version: method.hubVersion ?? hubRefVersion(method.origin.hubEntry) ?? "" }) : t("methods.draft")}</span>
         {page && <><span aria-hidden>·</span><a className="text-primary underline" href={page} target="_blank" rel="noopener noreferrer">{t("methods.page")}</a></>}
       </p>
       {method.hubChecks && <HubCheckSummary checks={method.hubChecks} />}

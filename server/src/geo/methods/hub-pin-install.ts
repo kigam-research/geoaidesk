@@ -83,15 +83,15 @@ export async function hubPinProblems(skills: { name: string; source: string; hub
   for (const skill of skills) {
     if (skill.source !== "hub") continue;
     const pin = skill.hub;
-    if (!pin) { problems.push(`허브 스킬 ${skill.name}의 판 정보가 없습니다.`); continue; }
+    if (!pin) { problems.push(`허브 스킬 ${skill.name}의 version 정보가 없습니다.`); continue; }
     try {
       const { revision } = await readHubSkillRevision(store, pin.skillId, pin.revision);
-      if (revision.treeHash !== pin.treeHash) problems.push(`허브 스킬 ${skill.name} ${pin.revision}판의 내용이 초안에 기록한 것과 다릅니다.`);
-      else if (revisionState(revision) === "suspended") problems.push(`허브 스킬 ${skill.name} ${pin.revision}판은 사용 중지되었습니다. 다른 판을 고르세요.`);
+      if (revision.treeHash !== pin.treeHash) problems.push(`허브 스킬 ${skill.name} version ${pin.revision}의 내용이 초안에 기록한 것과 다릅니다.`);
+      else if (revisionState(revision) === "suspended") problems.push(`허브 스킬 ${skill.name} version ${pin.revision}은 사용 중지되었습니다. 다른 version을 고르세요.`);
       else if (revision.licence.state !== "institute" && revision.licence.state !== "declared")
-        problems.push(`허브 스킬 ${skill.name} ${pin.revision}판은 라이선스를 확인할 수 없어 다른 연구자에게 보이지 않습니다.`);
+        problems.push(`허브 스킬 ${skill.name} version ${pin.revision}은 라이선스를 확인할 수 없어 다른 연구자에게 보이지 않습니다.`);
     } catch {
-      problems.push(`허브 스킬 ${skill.name} ${pin.revision}판을 허브에서 찾을 수 없습니다.`);
+      problems.push(`허브 스킬 ${skill.name} version ${pin.revision}을 허브에서 찾을 수 없습니다.`);
     }
   }
   return problems;

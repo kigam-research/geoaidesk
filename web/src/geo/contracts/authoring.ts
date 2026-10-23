@@ -322,7 +322,11 @@ export interface ExtractionRecord {
   at: string;
 }
 
-/** A pointer into a source. `verified`: the server found the quote on that page or in that file. */
+/**
+ * A pointer into a source. `verified`: the server found the quote on that page or in that file. Question and option
+ * evidence may also carry `verified: false`: the coauthor cited the source but the server did not find the quote (or
+ * the page/file does not exist, then `page`/`path` is absent); screens show it as unconfirmed, never as a passage.
+ */
 export interface Anchor {
   sourceId: string;
   page?: number;
@@ -360,6 +364,8 @@ export interface QuestionOption {
   label: string;
   /** Optional one-line consequence of choosing it. */
   hint?: string;
+  /** Passages this option rests on (at most 2); the side viewer moves to them when the option is chosen. */
+  evidence?: Anchor[];
 }
 
 export type QuestionStatus = "open" | "answered" | "deferred" | "superseded";
@@ -570,6 +576,8 @@ export interface HubEntryLink {
   entryId: string;
   /** The registered revision the draft started from. */
   revision: number;
+  /** Its version (gaid-hub-versions); older links omit it (`legacyHubVersion(revision)`). */
+  version?: string;
   mode: "edit" | "copy";
   /** Title and author of that entry when the draft was opened (shown on the draft). */
   title: string;

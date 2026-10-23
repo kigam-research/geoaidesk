@@ -13,7 +13,7 @@ import { HubOrcid } from "./orcid.ts";
 import { SQLiteHubStore } from "./records.ts";
 import { SQLiteHubSkillStore } from "./skills.ts";
 import { HUB_API as API, HUB_FILE_LIMIT, HUB_SERVER_SCHEMA, LIBRARY_FILE_LIMIT, type AcceptInviteRequest,
-  type InstallRequest, type LibraryPushRequest, type LoginRequest, type ReviewInput, type StoredHubSkill, type StoredEntry } from "./protocol.ts";
+  type InstallRequest, type LibraryPushRequest, type RemoveEntryRequest, type LoginRequest, type ReviewInput, type StoredHubSkill, type StoredEntry } from "./protocol.ts";
 
 export type HubServerApp = FastifyInstance & { hub: HubDatabase; accounts: HubAccounts; store: SQLiteHubStore; library: HubLibrary; feeds: HubFeeds; orcid: HubOrcid };
 export interface HubServeOptions extends HubServerOptions, FeedFetchOptions {
@@ -46,7 +46,8 @@ export function buildHubServer(options: HubServeOptions): HubServerApp {
   const authentication = new WeakMap<FastifyRequest, Authenticated>();
   const auth = (req: FastifyRequest) => authentication.get(req)!;
   const records = (req: FastifyRequest) => new SQLiteHubStore(hub, auth(req).device);
-  const actor = (req: FastifyRequest) => ({ id: auth(req).id, name: auth(req).account.displayName });
+  const actor = (req: FastifyRequest) => ({ id: auth(req).id, name: auth(req).account.displayName,
+    ...(auth(req).account.role === "admin" ? { admin: true } : {}) });
   const skills = (req: FastifyRequest) => new SQLiteHubSkillStore(hub, actor(req), auth(req).device);
   const admin = (req: FastifyRequest) => {
     if (auth(req).account.role !== "admin") throw new HubServerError("관리자만 사용할 수 있습니다.", 403);
@@ -127,6 +128,11 @@ export function buildHubServer(options: HubServeOptions): HubServerApp {
     if (!Buffer.isBuffer(req.body) || sha256(req.body) !== expected) throw new HubServerError("파일 내용과 해시가 맞지 않습니다.");
     await records(req).immutableBytes(req.params.id, req.params["*"], req.body, actor(req)); return reply.code(204).send();
   });
+  app.post<{ Params: { id: string }; Body: RemoveEntryRequest }>(`${API}/entries/:id/remove`, async (req, reply) => {
+    await records(req).remove(req.params.id, actor(req), req.body?.reason ?? ""); return reply.code(204).send();
+  });
+  app.get(`${API}/admin/entries/removed`, async (req) => { admin(req); return { entries: await records(req).removed(actor(req)) }; });
+  app.post<{ Params: { id: string } }>(`${API}/admin/entries/:id/restore`, async (req) => { admin(req); return records(req).restore(req.params.id, actor(req)); });
   app.get<{ Params: { id: string } }>(`${API}/entries/:id/comments`, async (req) => ({ comments: await store.comments(req.params.id) }));
   app.post<{ Params: { id: string }; Body: { body: string } }>(`${API}/entries/:id/comments`, async (req, reply) =>
     reply.code(201).send(await records(req).addComment(req.params.id, actor(req), req.body?.body)));
