@@ -181,7 +181,7 @@ export async function listWorkflows(
 /** The 지침 document of a catalogue Workflow: steps from its primary skill's catalogue procedure. */
 export function catalogueWorkflowDoc(catalogue: GeoCatalogue, workflow: GeoWorkflow, skills: WorkflowSkillState[]): WorkflowDoc {
   return workflowDocFor(workflow, {
-    revision: null,
+    version: null,
     skills: skills.map((skill) => ({ name: skill.runtimeName ?? skill.id, title: skill.title, source: "catalogue" as const })),
     procedure: workflow.skillIds[0] ? catalogueProcedure(catalogue, workflow.skillIds[0]) : null,
   });

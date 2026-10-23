@@ -576,6 +576,8 @@ export interface HubEntryLink {
   entryId: string;
   /** The registered revision the draft started from. */
   revision: number;
+  /** Its version (gaid-hub-versions); older links omit it (`legacyHubVersion(revision)`). */
+  version?: string;
   mode: "edit" | "copy";
   /** Title and author of that entry when the draft was opened (shown on the draft). */
   title: string;

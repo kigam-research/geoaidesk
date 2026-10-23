@@ -81,7 +81,7 @@ it("lists hub packages and previews the descriptor through the existing gate", a
 
 it("shows hub draft identity, revision and effective lifecycle in preview notes", () => {
   render(<SkillHubPreviewNotes preview={{ ...result, skillHub: { ...result.skillHub, draft: { methodId: "local/paper", revision: 2, lifecycle: "draft", url: "https://hub.test/api/gaid/packages/local/paper/2" } } }} />);
-  expect(screen.getByText("Workflow: local/paper · revision 2 · Draft")).toBeInTheDocument();
+  expect(screen.getByText("Workflow: local/paper · Draft")).toBeInTheDocument();
   expect(screen.getByText(/Changes on the site are not fetched automatically/)).toBeInTheDocument();
 });
 

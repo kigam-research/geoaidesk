@@ -1,4 +1,5 @@
 "use client";
+import { hubRefVersion } from "@/geo/contracts/hub-version";
 import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/projects";
 import type { SkillScope, SkillSourcePreview } from "@/lib/capabilities";
@@ -10,10 +11,10 @@ import type { Localized } from "@/geo/contracts/workspace";
 import { text } from "@/geo/workspace/api";
 
 export interface SkillHubPreview extends SkillSourcePreview {
-  skillHub?: { sha256: string; pageUrl?: string; skillId?: string; siteId?: string; hubEntry?: { id: string; revision: number; title: string }; catalogueAvailable: boolean; catalogueNames: string[]; draft?: { methodId: string; revision: number; lifecycle: MethodLifecycle; url: string } };
+  skillHub?: { sha256: string; pageUrl?: string; skillId?: string; siteId?: string; hubEntry?: { id: string; revision: number; version?: string; title: string }; catalogueAvailable: boolean; catalogueNames: string[]; draft?: { methodId: string; revision: number; lifecycle: MethodLifecycle; url: string } };
 }
 export function skillHubSource(preview: SkillHubPreview): string {
-  if (preview.skillHub?.hubEntry) return t("hubPicker.previewSource", { title: preview.skillHub.hubEntry.title, count: preview.skillHub.hubEntry.revision });
+  if (preview.skillHub?.hubEntry) return t("hubPicker.previewSource", { title: preview.skillHub.hubEntry.title, version: hubRefVersion(preview.skillHub.hubEntry) ?? "" });
   return preview.skillHub?.pageUrl ?? (preview.skillHub ? t("skillHub.source", { digest: preview.skillHub.sha256.slice(0, 12) }) : preview.source);
 }
 export function SkillHubPreviewNotes({ preview }: { preview: SkillHubPreview }) {
@@ -142,7 +143,7 @@ export function SkillHubMethods({ projectId, disabled, onPreview }: { projectId:
       {hub.state === "error" ? <p role="alert" className="text-destructive">{t("skillHub.methodsError", { detail: hub.detail ?? hub.url })}</p> : hub.methods.length === 0 ? <p>{t("skillHub.methodsEmpty")}</p> : hub.methods.map((method) => <div key={`${method.methodId}:${method.revision}`} className="space-y-1 border-t pt-2">
         <p className="font-medium">{text(method.title)}</p>
         <p className="text-muted-foreground" title={t("skillHub.methodCreated", { at: Number.isNaN(Date.parse(method.createdAt)) ? method.createdAt : new Date(method.createdAt).toLocaleString() })}>
-          {t("methods.revision", { version: method.version, revision: method.revision })} · {t(`methods.lifecycle.${method.lifecycle}`)} · {t(`methods.implementation.${method.implementation}`)}
+          {t("methods.draft")} · {t(`methods.lifecycle.${method.lifecycle}`)} · {t(`methods.implementation.${method.implementation}`)}
         </p>
         <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={() => onPreview(method.descriptorUrl)}>{t("skillHub.methodPreview")}</Button>
       </div>)}

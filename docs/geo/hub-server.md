@@ -115,6 +115,23 @@ their own link in GAID. The researcher's GAID must run its backend at `127.0.0.1
 reach it, and the browser must run on the same PC. ORCID production and sandbox both accepted this loopback HTTP redirect in
 an end-to-end test on 2026-10-23 (see the ADR).
 
+## Workflow versions and removal
+
+Database migration 5 (gaid-hub-versions) adds `hub_entry_removals`; existing homes upgrade automatically at the next start,
+so a server that should offer removal must be restarted on this release. An older server keeps working with newer GAIDs,
+but removal and restore then fail with a "not found" message.
+
+Each registered revision carries a version. The first registration is `0.1.0`; each later one must be exactly one patch,
+minor or major step after the previous version (`1.0.0` is the main release). A GAID from before versions sends none and
+gets the patch step. Revisions stored before this release keep their records unchanged and read as 0.1.0, 0.1.1, ….
+
+The registrant or an administrator removes a registered Workflow (`POST /hub/v1/entries/:id/remove`, optional reason up to
+500 characters). A removed Workflow answers 404 on every entry route, is left out of lists and cannot receive new revisions
+or files; its record, files, comments, stars and install records stay, and copies already installed in projects are not
+touched. Administrators see removed Workflows in GAID's hub (제거한 Workflow) and restore them there
+(`GET /hub/v1/admin/entries/removed`, `POST /hub/v1/admin/entries/:id/restore`). Both actions are audited
+(`entry.remove`, `entry.restore`). `import-hub` keeps a Workflow removed in the local hub removed.
+
 ## Shared skill shelf
 
 The `/hub/v1/skills` API stores named skills, immutable revision archives, origin/licence information, per-revision reviews,

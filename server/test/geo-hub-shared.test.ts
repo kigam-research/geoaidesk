@@ -441,7 +441,7 @@ describe("shared GAID hub", () => {
       install: { projectId: project.id, methodKey: `project:${draftReply.slug}` },
     });
     const recorded = getSkillProvenance(projectSkillRoot(resolvePaths(project.id)), draftReply.slug);
-    expect(originOfSource(recorded?.source, packageStore(f.agentDir)).origin).toMatchObject({ kind: "gaid-hub", hubEntry: { id: entry.id, revision: 1 } });
+    expect(originOfSource(recorded?.source, packageStore(f.agentDir)).origin).toMatchObject({ kind: "gaid-hub", hubEntry: { id: entry.id, revision: 1, version: "0.1.0" } });
     expect((await install()).statusCode).toBe(201);
     expect((await f.shared.read(entry.id)).installs).toHaveLength(2);
     // The revision the researcher looked at is installed; an unknown or malformed revision is refused.
@@ -569,6 +569,75 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect((await f.app.inject(`/geo/hub/entries/${entry.id}/package.tar.gz?revision=1`)).statusCode).toBe(200);
   });
 
+  it("registers 0.1.0 first, then the version step the registrant picks, and reads older records as 0.1.x", async () => {
+    const f = await setup();
+    const first = (await f.register()).json<HubEntry>();
+    expect(first.revisions.map((r) => r.version)).toEqual(["0.1.0"]);
+    await reviseSummary(f, f.projectId, "고친 요약");
+    expect((await f.register("김 연구원", { bump: "huge" })).statusCode).toBe(400);
+    const minor = await f.register("김 연구원", { bump: "minor" });
+    expect(minor.statusCode, minor.body).toBe(201);
+    expect(minor.json<HubEntry>().revisions.map((r) => r.version)).toEqual(["0.1.0", "0.2.0"]);
+    await reviseSummary(f, f.projectId, "정식 배포 요약");
+    const major = await f.register("김 연구원", { bump: "major" });
+    expect(major.json<HubEntry>().revisions.map((r) => r.version)).toEqual(["0.1.0", "0.2.0", "1.0.0"]);
+    const detail = (await f.app.inject(`/geo/hub/entries/${first.id}`)).json<HubEntryDetail>();
+    expect(detail.workflowDoc?.version).toBe("1.0.0");
+    // A record registered before versions (no stored version) reads 0.1.0, 0.1.1, 0.1.2; the stored record is not rewritten.
+    const raw = await f.shared.read(first.id);
+    for (const r of raw.entry.revisions) delete r.version;
+    await f.shared.write(raw);
+    const listed = (await f.app.inject({ url: "/geo/hub/entries", headers: headers() })).json<{ entries: HubEntry[] }>().entries;
+    expect(listed[0].revisions.map((r) => r.version)).toEqual(["0.1.0", "0.1.1", "0.1.2"]);
+    expect((await f.shared.read(first.id)).entry.revisions.every((r) => r.version === undefined)).toBe(true);
+    await reviseSummary(f, f.projectId, "그다음 요약");
+    const patch = await f.register();
+    expect(patch.json<HubEntry>().revisions.map((r) => r.version)).toEqual(["0.1.0", "0.1.1", "0.1.2", "0.1.3"]);
+  });
+
+  it("removes a registered Workflow for its registrant only, hides it everywhere, keeps installed copies and restores it", async () => {
+    const f = await setup();
+    const entry = (await f.register()).json<HubEntry>();
+    const project = target();
+    const install = () => f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/install`, headers: headers("이 연구원"),
+      payload: { projectId: project.id, acknowledged: true } });
+    expect((await install()).statusCode).toBe(201);
+    const installedDir = join(resolvePaths(project.id).sandbox, ".pi", "skills", draftReply.slug);
+    const remove = (user: string, reason?: string) => f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/remove`,
+      headers: headers(user), payload: reason === undefined ? {} : { reason } });
+    expect((await f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/remove`, payload: {} })).statusCode).toBe(401);
+    expect((await remove("이 연구원")).statusCode).toBe(403);
+    expect((await remove("김 연구원", "x".repeat(501))).statusCode).toBe(400);
+    expect((await remove("김 연구원", "중복 등록")).statusCode).toBe(204);
+    expect((await remove("김 연구원")).statusCode).toBe(409);
+    expect((await f.app.inject({ url: "/geo/hub/entries", headers: headers() })).json().entries).toEqual([]);
+    expect((await f.app.inject(`/geo/hub/entries/${entry.id}`)).statusCode).toBe(404);
+    expect((await f.app.inject("/geo/hub/folders")).json().folders.find((x: { id: string }) => x.id === DEFAULT_FOLDER).entries).toBe(0);
+    expect((await install()).statusCode).toBe(404);
+    expect((await f.app.inject(`/geo/hub/entries/${entry.id}/package.tar.gz`)).statusCode).toBe(404);
+    // The copy installed before the removal stays in the project.
+    expect((await readFile(join(installedDir, "SKILL.md"), "utf8")).length).toBeGreaterThan(0);
+    // Registering again from the same draft is refused while removed.
+    await reviseSummary(f, f.projectId, "제거 뒤 고친 요약");
+    const again = await f.register();
+    expect(again.statusCode).toBe(409);
+    expect(again.json().error).toContain("제거한 Workflow");
+    expect((await f.app.inject({ url: "/geo/hub/removed", headers: headers("이 연구원") })).json().entries).toEqual([]);
+    const removed = (await f.app.inject({ url: "/geo/hub/removed", headers: headers() })).json<{ entries: HubEntry[] }>().entries;
+    expect(removed.map((e) => [e.id, e.removed?.by, e.removed?.reason, e.revisions[0].version])).toEqual([[entry.id, "김 연구원", "중복 등록", "0.1.0"]]);
+    const restore = (user: string) => f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/restore`, headers: headers(user), payload: {} });
+    expect((await restore("이 연구원")).statusCode).toBe(403);
+    const restored = await restore("김 연구원");
+    expect(restored.statusCode, restored.body).toBe(200);
+    expect(restored.json<HubEntry>()).toMatchObject({ id: entry.id, latestRevision: 1 });
+    expect(restored.json<HubEntry>().removed).toBeUndefined();
+    expect((await restore("김 연구원")).statusCode).toBe(404);
+    expect((await f.app.inject({ url: "/geo/hub/entries", headers: headers() })).json().entries).toHaveLength(1);
+    const history = (await readFile(join(f.shared.entryDir(entry.id), "removals.jsonl"), "utf8")).trim().split("\n").map((l) => JSON.parse(l));
+    expect(history.map((h) => [h.action, h.by])).toEqual([["remove", "김 연구원"], ["restore", "김 연구원"]]);
+    expect((await f.register()).statusCode).toBe(201);
+  });
+
   it("seeds a draft from the registered revision when the author's draft is not on this server", async () => {
     const f = await setup();
     await f.store.writeFile(f.projectId, "visuals/prepare.png", PNG);
@@ -691,7 +760,7 @@ describe("editing a registered method (gaid-hub-editing)", () => {
     expect(own).toMatchObject({
       author: "박 연구원",
       latestRevision: 1,
-      basedOn: { entryId: entry.id, revision: 1, author: "김 연구원" },
+      basedOn: { entryId: entry.id, revision: 1, version: "0.1.0", author: "김 연구원" },
     });
     const untouched = (await f.app.inject(`/geo/hub/entries/${entry.id}`)).json<HubEntryDetail>();
     expect(untouched.entry.latestRevision).toBe(1);

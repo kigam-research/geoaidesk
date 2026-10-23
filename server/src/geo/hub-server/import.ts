@@ -1,7 +1,7 @@
 /** Read-only migration from SharedHubStore's on-disk format; never initializes or changes the source. */
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
-import type { HubComment, HubFolder } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import type { HubComment, HubFolder, HubRemoval } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import type { Actor } from "../hub-shared/records.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
 import { HubAccounts } from "./accounts.ts";
@@ -10,7 +10,7 @@ import { SQLiteHubStore } from "./records.ts";
 import { revisionState, shareable, validName, type StoredHubSkill } from "../hub-skills/records.ts";
 import { SQLiteHubSkillStore } from "./skills.ts";
 export interface ImportOptions { from: string; authors: Record<string, string>; unmappedTo?: string; apply?: boolean }
-interface ImportEntry { record: StoredEntry; files: Map<string, Buffer>; comments: HubComment[]; stars: string[]; digest: string; actor: Actor; skip: boolean }
+interface ImportEntry { record: StoredEntry; files: Map<string, Buffer>; comments: HubComment[]; stars: string[]; digest: string; actor: Actor; skip: boolean; removal: HubRemoval | null }
 interface ImportSkill { record: StoredHubSkill; archives: Map<number, Buffer>; comments: HubComment[]; stars: string[]; digest: string; actor: Actor; skip: boolean }
 export interface ImportResult { dryRun: boolean; entries: number; imported: number; skipped: number; files: number; comments: number; stars: number;
   skills: number; skillsImported: number; skillsSkipped: number; skillArchives: number; skillComments: number; skillStars: number }
@@ -71,11 +71,17 @@ export async function importHub(hub: HubDatabase, options: ImportOptions): Promi
       actorFor(c.author, false);
     }
     for (const name of stars) actorFor(name, false);
-    const digest = sha256(JSON.stringify([bytes.toString("base64"), [...files].map(([p, b]) => [p, sha256(b)]), stars, comments]));
+    // A Workflow removed from the local hub (gaid-hub-versions) stays removed on the server.
+    const removedBytes = read(`entries/${dir.name}/removed.json`, true);
+    const removal = removedBytes ? JSON.parse(removedBytes.toString("utf8")) as HubRemoval : null;
+    if (removal && (!object(removal) || typeof removal.by !== "string" || typeof removal.at !== "string" || typeof removal.reason !== "string"))
+      throw new HubServerError("가져올 제거 기록을 확인해 주세요.", 409);
+    const digest = sha256(JSON.stringify([bytes.toString("base64"), [...files].map(([p, b]) => [p, sha256(b)]), stars, comments,
+      ...(removedBytes ? [sha256(removedBytes)] : [])]));
     const prior = hub.get<{ digest: string }>("SELECT digest FROM hub_imports WHERE source=? AND entry_id=?", source, dir.name);
     if (prior && prior.digest !== digest) throw new HubServerError("이미 가져온 원본이 달라졌습니다. 새 가져오기를 별도로 검토하세요.", 409);
     if (!prior && await store.find(dir.name)) throw new HubServerError("같은 식별자의 Workflow가 서버에 있습니다.", 409);
-    entries.push({ record, files, comments, stars, digest, actor, skip: Boolean(prior) });
+    entries.push({ record, files, comments, stars, digest, actor, skip: Boolean(prior), removal });
   }
   const skills = loadSkills(hub, source, read, actorFor);
   const result: ImportResult = { dryRun: !options.apply, entries: entries.length, imported: 0, skipped: entries.filter((e) => e.skip).length,
@@ -129,6 +135,10 @@ export async function importHub(hub: HubDatabase, options: ImportOptions): Promi
           const id = `comment-${sha256(`${source}\n${current.entry.id}\n${comment.id}`)}`;
           imported.id = id;
           hub.run("INSERT INTO hub_comments VALUES (?,?,?,?,?)", id, current.entry.id, author.id, JSON.stringify(imported), imported.at);
+        }
+        if (entry.removal) {
+          const by = actorFor(entry.removal.by, false);
+          hub.run("INSERT INTO hub_entry_removals VALUES (?,?,?,?,?)", current.entry.id, by.id, by.name, entry.removal.reason.slice(0, 500), entry.removal.at);
         }
         hub.run("INSERT INTO hub_imports VALUES (?,?,?,?)", source, current.entry.id, entry.digest, hub.now());
         hub.audit({ id: "operator", device: "CLI" }, "import.entry", current.entry.id, { authorId: actor.id, comments: entry.comments.length });

@@ -223,7 +223,7 @@ export function HubHome({
   view: HubView;
   onView: (view: HubView) => void;
   /** My methods already registered in the shared hub, by authoring project id. */
-  registered?: Record<string, { entryId: string; stars: number; comments: number; revision: number }>;
+  registered?: Record<string, { entryId: string; stars: number; comments: number; version: string | null }>;
   onOpenEntry?: (entryId: string) => void;
   recommended: RecommendedCard[];
   /** Folders of my methods (filter of 내 Workflow). */
@@ -371,7 +371,7 @@ export function HubHome({
                         </button>
                         {registered[p.id] && (
                           <Button variant="outline" size="sm" onClick={() => onOpenEntry?.(registered[p.id].entryId)}>
-                            {text("home.registered", { n: registered[p.id].revision })}
+                            {text("home.registered", { version: registered[p.id].version ?? "" })}
                             <StarIcon data-icon="inline-end" />
                             <span className="tabular-nums">{registered[p.id].stars}</span>
                           </Button>

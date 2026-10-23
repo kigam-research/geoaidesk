@@ -32,7 +32,7 @@ export async function installHubSkillRevision(
   const paths = projectPaths(body.projectId);
   return store.serial(body.skillId, () => store.serial(`project:${body.projectId}`, async () => {
     const { skill, revision: r, archive } = await readHubSkillRevision(store, body.skillId, body.revision);
-    if (revisionState(r) === "suspended") throw new AuthoringError("사용 중지된 스킬 판은 설치할 수 없습니다.", 409);
+    if (revisionState(r) === "suspended") throw new AuthoringError("사용 중지된 스킬 version은 설치할 수 없습니다.", 409);
     const root = projectSkillRoot(paths);
     const existingDir = findSkillDir(root, skill.name);
     let checkedHash: string | undefined;

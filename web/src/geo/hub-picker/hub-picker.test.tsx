@@ -12,7 +12,7 @@ vi.mock("@/geo/workspace/task-setup", () => ({ fieldClass: "field" }));
 vi.mock("@/components/workflows-panel", () => ({ WORKFLOW_CATEGORIES: [] }));
 export const entry = (over: Partial<HubEntry> = {}): HubEntry => ({
   id: "entry-paper", methodId: "local/paper", slug: "paper", title: "논문 분석", tagline: "암상 분류", summary: "분류 설정", kind: "workflow", implementation: "descriptive", recipe: true,
-  tags: [], author: "연구자", folderId: "general", cover: null, latestRevision: 2, revisions: [], stars: 3, starredByMe: false, comments: 0, trials: 0, updatedAt: "2026-10-20", ...over,
+  tags: [], author: "연구자", folderId: "general", cover: null, latestRevision: 2, revisions: [{ revision: 1, version: "0.1.0" }, { revision: 2, version: "0.2.0" }] as HubEntry["revisions"], stars: 3, starredByMe: false, comments: 0, trials: 0, updatedAt: "2026-10-20", ...over,
 });
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
 beforeEach(() => {
@@ -32,7 +32,7 @@ it("filters recipes, shows metadata and searches with the shared hub client", as
   fireEvent.click(await screen.findByRole("button", { name: /논문 분석/ }));
   expect(screen.queryByText("스킬만")).not.toBeInTheDocument();
   expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ latestRevision: 2 }));
-  expect(screen.getByText("2판")).toBeInTheDocument(); expect(screen.getByText("★ 3")).toBeInTheDocument();
+  expect(screen.getByText("version 0.2.0")).toBeInTheDocument(); expect(screen.getByText("★ 3")).toBeInTheDocument();
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "암상" } });
   await waitFor(() => expect(apiFetch).toHaveBeenCalledWith("/geo/hub/entries?q=%EC%95%94%EC%83%81", expect.anything()));
 });

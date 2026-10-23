@@ -15,7 +15,7 @@
   "loading": "Reading skills.",
   "empty": "No skills match. Change the search term or folder.",
   "count": "{count} skills",
-  "revision": "Revision {revision}",
+  "revision": "Version {revision}",
   "state": {
     "unreviewed": "Unreviewed",
     "checked": "Checked",
@@ -23,7 +23,7 @@
     "suspended": "Suspended"
   },
   "error": "Could not read or save the content. Try again.",
-  "installed": "Installed {name} revision {revision}.",
+  "installed": "Installed {name} version {revision}.",
   "install": "Install in project",
   "project": "Project to install in",
   "chooseProject": "Select project",
@@ -32,12 +32,12 @@
   "code": "Executable code: {code, select, yes {present} other {none}}",
   "runNotice": "After installation the AI agent can use the files and code according to the instructions.",
   "installState": {
-    "installed": "The same revision is already installed. No files will change.",
+    "installed": "The same version is already installed. No files will change.",
     "missing": "Installs a new skill in the project.",
-    "other-revision": "Replaces the project’s existing revision with the selected revision.",
+    "other-revision": "Replaces the project’s existing version with the selected version.",
     "edited": "Edited project skills are not overwritten. Keep your changes separately and try again.",
     "conflict": "Another skill has the same name. Rename the project skill and try again.",
-    "suspended": "Suspended revisions cannot be installed. Check another revision."
+    "suspended": "Suspended versions cannot be installed. Check another version."
   },
   "instructions": "Instructions",
   "files": "{count} files",
@@ -45,7 +45,7 @@
   "sourceTitle": "Origin and licence",
   "origin": {
     "own": "Written by researcher",
-    "workflow": "Taken from Workflow: {title}, revision {revision}",
+    "workflow": "Taken from Workflow: {title}, version {version}",
     "github": "Fetched from external source: {source}"
   },
   "sourceRecord": "View origin record",
@@ -72,7 +72,7 @@
     "outside-write": "Writes outside the working folder"
   },
   "line": "{file}, line {line}",
-  "history": "Revisions and reviews",
+  "history": "Versions and reviews",
   "unverified": "Name not verified",
   "review": "Record review",
   "note": "What was read or changed",
@@ -108,9 +108,9 @@
   "workflow": "Hub Workflow",
   "previewAction": "Preview source content",
   "registerPreview": "Registration preview",
-  "nextRevision": "This name exists; adds revision {revision}.",
+  "nextRevision": "This name exists; adds version {revision}.",
   "taken": "Another registrant owns this name. Rename it in your project before registering.",
-  "sameTree": "The content matches the latest revision, so a new revision cannot be registered.",
+  "sameTree": "The content matches the latest version, so a new version cannot be registered.",
   "blocked": "This content cannot be registered. Check the source instructions and name.",
   "tags": "Tags (comma-separated, optional)",
   "formats": "File formats (comma-separated, optional)",
@@ -119,12 +119,13 @@
   "registered": "Skill registered.",
   "settingsSource": "From GAID hub",
   "githubSource": "From GitHub or similar",
-  "installedRevision": "Hub skill · revision {revision}",
+  "installedRevision": "Hub skill · version {revision}",
   "edited": "Locally edited",
-  "newRevision": "New revision: {revision}",
-  "update": "Switch to revision {revision}",
-  "suspended": "This revision is suspended. New installs and Workflow use are blocked.",
+  "newRevision": "New version: {revision}",
+  "update": "Switch to version {revision}",
+  "suspended": "This version is suspended. New installs and Workflow use are blocked.",
   "settingsBack": "View installed skills",
   "projectOnly": "Hub skills install into a project. Change the scope to project.",
-  "unchanged": "{name} revision {revision} is already installed. No files were changed."
+  "unchanged": "{name} version {revision} is already installed. No files were changed.",
+  "workflowVersion": "version {version}"
 }

@@ -18,8 +18,10 @@ import type {
   HubEntryDetail,
   HubRecommendation,
   RegisterBody,
+  RemoveEntryBody,
   SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRefVersion, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
 import { structuredDraft } from "../authoring/workflow.ts";
@@ -69,7 +71,7 @@ const imageTypes: Record<string, string> = {
 const snapshotOf = (record: StoredEntry, revision?: string): RegisteredSnapshot => {
   const n = revision === undefined ? record.entry.latestRevision : Number(revision);
   if (!Number.isSafeInteger(n) || n < 1 || !record.snapshots[n])
-    throw new AuthoringError("등록 판을 찾을 수 없습니다.", 404);
+    throw new AuthoringError("등록한 version을 찾을 수 없습니다.", 404);
   return record.snapshots[n];
 };
 
@@ -82,7 +84,12 @@ export async function registerSharedHubRoutes(
   const hubOf = (req: FastifyRequest) => resolveHub(req, options.store);
 
   const entryView = async (store: HubRecordStore, record: StoredEntry, actor: Actor | null): Promise<HubEntry> => {
-    const [stars, comments] = await Promise.all([store.stars(record.entry.id), store.comments(record.entry.id)]);
+    // A removed entry (the removed list) has no readable stars/comments on a hub server (404 there): count none.
+    const removed = Boolean(record.entry.removed);
+    const [stars, comments] = await Promise.all([
+      store.stars(record.entry.id).catch((e) => (removed ? {} : Promise.reject(e))),
+      store.comments(record.entry.id).catch((e) => (removed ? [] : Promise.reject(e))),
+    ]);
     const identities = new Map<string, Set<string>>();
     for (const snapshot of Object.values(record.snapshots)) {
       const hashes = identities.get(snapshot.package.methodId) ?? new Set<string>();
@@ -101,8 +108,11 @@ export async function registerSharedHubRoutes(
         for (const [methodId, hashes] of identities)
           trials += countRegisteredMethodTrials(resolvePaths(projectId), methodId, hashes);
     }
+    const versions = hubRevisionVersions(record.entry.revisions);
     return {
       ...record.entry,
+      revisions: record.entry.revisions.map((r, i) => ({ ...r, version: versions[i] })),
+      ...(record.entry.basedOn ? { basedOn: { ...record.entry.basedOn, version: hubRefVersion(record.entry.basedOn)! } } : {}),
       tagline: korean(snapshotOf(record).draft.profile.tagline),
       implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       recipe: Boolean(snapshotOf(record).draft.workflow && snapshotOf(record).draft.recipe),
@@ -133,7 +143,7 @@ export async function registerSharedHubRoutes(
 
     scope.get("/geo/hub/me", async (req) => {
       const hub = hubOf(req);
-      return { name: hub.actor?.name ?? null, ...(hub.account ? { account: true } : {}) };
+      return { name: hub.actor?.name ?? null, ...(hub.account ? { account: true } : {}), ...(hub.actor?.admin ? { admin: true } : {}) };
     });
     scope.get("/geo/hub/folders", async (req) => {
       const { store } = hubOf(req);
@@ -177,12 +187,15 @@ export async function registerSharedHubRoutes(
       const id = link?.mode === "edit" ? link.entryId : `entry-${projectId}`;
       const folderId = text(body?.folderId, "폴더 식별자", 80);
       const note = text(body?.note, "등록 설명", 4000, true);
+      if (body?.bump !== undefined && !HUB_VERSION_BUMPS.includes(body.bump))
+        throw new AuthoringError("version 단계는 patch, minor, major 가운데 하나여야 합니다.");
+      const bump = body?.bump ?? "patch";
       if (!(await store.folders()).some((f) => f.id === folderId))
         throw new AuthoringError("주제 폴더를 찾을 수 없습니다.", 404);
       const result = await store.serial(id, async () => {
         const previous = await store.find(id);
         if (previous && !isEntryAuthor(previous.entry, actor))
-          throw new AuthoringError("등록한 연구자만 새 판을 등록할 수 있습니다.", 403);
+          throw new AuthoringError("등록한 연구자만 새 version을 등록할 수 있습니다.", 403);
         if (link?.mode === "edit" && !previous) throw new AuthoringError("고치던 등록 방법을 찾을 수 없습니다.", 404);
         const original = link?.mode === "copy" ? await store.find(link.entryId) : null;
         const prepared = await authoring.mutate(projectId, async (project) => {
@@ -190,7 +203,7 @@ export async function registerSharedHubRoutes(
             body.draftRevision === undefined
               ? project.drafts.at(-1)
               : project.drafts.find((d) => d.revision === body.draftRevision);
-          if (!selectedDraft) throw new AuthoringError("등록할 초안 판을 찾을 수 없습니다.", 404);
+          if (!selectedDraft) throw new AuthoringError("등록할 초안을 찾을 수 없습니다.", 404);
           const draft = structuredDraft(selectedDraft);
           if (!draft.workflow) throw new AuthoringError("Workflow가 없는 초안은 등록할 수 없습니다. 초안을 고쳐 입력 자료, 분석 조건과 AI agent 지시문을 갖춘 Workflow를 추가하세요.", 422);
           // Pinned hub skills must be installable by every researcher who installs this Workflow.
@@ -256,6 +269,8 @@ export async function registerSharedHubRoutes(
         if (prepared.check) return { check: prepared.check };
         const { draft, pkg, revision, visuals } = prepared;
         const at = now();
+        const current = previous ? hubVersionOf(previous.entry) : null;
+        const version = current ? bumpHubVersion(current, bump) : FIRST_HUB_VERSION;
         const entry: StoredEntry = {
           schemaVersion: "gaid-hub-entry/v1",
           authoringProjectId: projectId,
@@ -278,6 +293,7 @@ export async function registerSharedHubRoutes(
                     basedOn: {
                       entryId: link.entryId,
                       revision: link.revision,
+                      version: (original ? hubVersionOf(original.entry, link.revision) : null) ?? hubRefVersion(link)!,
                       title: original?.entry.title ?? link.title,
                       author: original?.entry.author ?? link.author,
                     },
@@ -293,6 +309,7 @@ export async function registerSharedHubRoutes(
               ...(previous?.entry.revisions ?? []),
               {
                 revision,
+                version,
                 authoringProjectId: projectId,
                 draftRevision: draft.revision,
                 packageRevision: pkg.revision,
@@ -349,13 +366,29 @@ export async function registerSharedHubRoutes(
         workflowTitle: snapshot.draft.workflow?.title ?? null,
         workflowDoc: snapshot.draft.workflow
           ? workflowDocFor(snapshot.draft.workflow as unknown as GeoWorkflow, {
-            revision: record.entry.latestRevision,
+            version: hubVersionOf(record.entry),
             skills: [{ name: snapshot.draft.slug, source: "bundled" }],
             procedure: procedureSteps(snapshot.draft.profile),
           })
           : null,
         comments: await store.comments(record.entry.id),
       };
+    });
+    scope.post<{ Params: { id: string }; Body: RemoveEntryBody }>("/geo/hub/entries/:id/remove", async (req, reply) => {
+      const hub = hubOf(req);
+      const reason = text(req.body?.reason, "제거 사유", 500, true);
+      await hub.store.remove(req.params.id, actorRequired(hub), reason);
+      return reply.code(204).send();
+    });
+    scope.get("/geo/hub/removed", async (req) => {
+      const { store, actor } = hubOf(req);
+      const records = await store.removed(actor);
+      return { entries: await Promise.all(records.map((r) => entryView(store, r, actor))) };
+    });
+    scope.post<{ Params: { id: string } }>("/geo/hub/entries/:id/restore", async (req) => {
+      const hub = hubOf(req);
+      const actor = actorRequired(hub);
+      return entryView(hub.store, await hub.store.restore(req.params.id, actor), actor);
     });
     scope.post<{ Params: { id: string }; Body: { on: boolean } }>("/geo/hub/entries/:id/star", async (req) => {
       if (typeof req.body?.on !== "boolean") throw new AuthoringError("별표 상태를 선택해 주세요.");
@@ -426,14 +459,14 @@ export async function registerSharedHubRoutes(
           // Install the revision the researcher looked at (immutable snapshot), not whatever is latest now.
           const asked = req.body?.revision;
           if (asked !== undefined && (!Number.isSafeInteger(asked) || asked < 1))
-            throw new AuthoringError("등록 판 번호를 확인해 주세요.");
+            throw new AuthoringError("등록한 version을 확인해 주세요.");
           const revision = asked ?? record.entry.latestRevision;
           const snapshot = snapshotOf(record, String(revision));
           const result = await installPackageBytes(
             await store.bytes(record.entry.id, `packages/${revision}.tar.gz`),
             snapshot.package,
             req.body ?? ({} as InstallBody),
-            { ...options, hubEntry: { id: record.entry.id, revision } },
+            { ...options, hubEntry: { id: record.entry.id, revision, version: hubVersionOf(record.entry, revision)! } },
           );
           await store.recordInstall(record.entry.id, result.install, actor);
           return result;

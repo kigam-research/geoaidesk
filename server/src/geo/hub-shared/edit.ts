@@ -4,6 +4,7 @@
  * anyone else edits a copy that is registered as a separate entry naming its original. Opening never changes the entry's
  * registered revisions.
  */
+import { hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { cp } from "node:fs/promises";
 import { extname } from "node:path";
 import type { AuthoringProject, HubEntryLink, MethodDraft } from "../../../../web/src/geo/contracts/authoring.ts";
@@ -30,6 +31,7 @@ export async function openEntryForEdit(
     const link: HubEntryLink = {
       entryId,
       revision: record.entry.latestRevision,
+      ...(hubVersionOf(record.entry) ? { version: hubVersionOf(record.entry)! } : {}),
       mode,
       title: record.entry.title,
       author: record.entry.author,
@@ -67,7 +69,7 @@ async function seedFromEntry(
 ): Promise<AuthoringProject> {
   const revision = record.entry.latestRevision;
   const snapshot = record.snapshots[revision];
-  if (!snapshot) throw new AuthoringError("등록 판을 찾을 수 없습니다.", 404);
+  if (!snapshot) throw new AuthoringError("등록한 version을 찾을 수 없습니다.", 404);
   const project = await authoring.create({
     author: user,
     title: record.entry.title,

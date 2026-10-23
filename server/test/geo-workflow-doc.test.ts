@@ -77,11 +77,11 @@ describe("gaid-workflow/v1 in gaid-method.json", () => {
 });
 
 describe("workflowDocFor", () => {
-  const context = { revision: 2, skills: [{ name: "grid-priority", source: "bundled" as const }] };
+  const context = { version: "0.1.1", skills: [{ name: "grid-priority", source: "bundled" as const }] };
 
   it("uses a gaid-workflow/v1 Workflow's own steps and skills", () => {
     const doc = workflowDocFor(structured as unknown as GeoWorkflow, context);
-    expect(doc).toMatchObject({ kind: "structured", revision: 2, instructions: { ko: "첫 시험은 줄인 설정으로 하세요." } });
+    expect(doc).toMatchObject({ kind: "structured", version: "0.1.1", instructions: { ko: "첫 시험은 줄인 설정으로 하세요." } });
     expect(doc.skills.map((skill) => [skill.name, skill.source, skill.role])).toEqual([["grid-priority", "bundled", "primary"], ["geo-tools", "imported", "supporting"]]);
     const text = renderWorkflowDocument(doc, { locale: "ko", target: "chat", say: workflowDocSay("ko"), settings: { inputs: { grid: "user_data/g.csv" }, choices: { alpha: "0.15" } } });
     expect(text).toContain("- geo-tools (가져온 스킬, example/geo-tools@v1) 1단계에서 씁니다.");

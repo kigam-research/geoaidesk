@@ -1,6 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import type { AuthoringInstall } from "../../../../web/src/geo/contracts/authoring.ts";
-import type { HubComment, HubFolder } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import type { HubComment, HubFolder, HubRemoval } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import { allowedHubVersion, bumpHubVersion, hubRevisionVersions, parseHubVersion } from "../../../../web/src/geo/contracts/hub-version.ts";
 import type { Actor, HubRecordStore } from "../hub-shared/records.ts";
 import type { StoredEntry } from "../hub-shared/store.ts";
 import { HUB_FILE_LIMIT } from "./protocol.ts";
@@ -35,8 +36,15 @@ export class SQLiteHubStore implements HubRecordStore {
       return folder;
     });
   }
-  private findSync(id: string): StoredEntry | null {
+  private removal(id: string): HubRemoval | null {
+    const row = this.hub.get<{ account_id: string; display_name: string; reason: string; at: string }>(
+      "SELECT account_id,display_name,reason,at FROM hub_entry_removals WHERE entry_id=?", id);
+    return row ? { at: row.at, by: row.display_name, byId: row.account_id, reason: row.reason } : null;
+  }
+  /** `includeRemoved`: ownership checks and the removed list; every other read treats a removed entry as missing. */
+  private findSync(id: string, includeRemoved = false): StoredEntry | null {
     entryId(id);
+    if (!includeRemoved && this.removal(id)) return null;
     const row = this.hub.get<{ record: string }>("SELECT record FROM hub_entries WHERE id=?", id);
     if (!row) return null;
     const record = JSON.parse(row.record) as StoredEntry;
@@ -55,10 +63,40 @@ export class SQLiteHubStore implements HubRecordStore {
   }
   async find(id: string): Promise<StoredEntry | null> { return this.findSync(id); }
   async list(): Promise<StoredEntry[]> {
-    return this.hub.all<{ id: string }>("SELECT id FROM hub_entries ORDER BY updated_at DESC,id").map((r) => this.findSync(r.id)!);
+    return this.hub.all<{ id: string }>("SELECT id FROM hub_entries WHERE id NOT IN (SELECT entry_id FROM hub_entry_removals) ORDER BY updated_at DESC,id").map((r) => this.findSync(r.id)!);
+  }
+  async remove(id: string, actor: Actor, value: string): Promise<void> {
+    const reason = text(value ?? "", "제거 사유", 500, true);
+    this.hub.tx(() => {
+      const record = this.findSync(id, true);
+      if (!record) throw new HubServerError("등록한 Workflow를 찾을 수 없습니다.", 404);
+      if (record.entry.authorId !== actor.id && !actor.admin) throw new HubServerError("등록한 연구자나 관리자만 Workflow를 허브에서 제거할 수 있습니다.", 403);
+      if (this.removal(id)) throw new HubServerError("이미 허브에서 제거한 Workflow입니다.", 409);
+      this.hub.run("INSERT INTO hub_entry_removals VALUES (?,?,?,?,?)", id, actor.id, actor.name, reason, this.hub.now());
+      this.audit(actor, "entry.remove", id, { reason, revision: record.entry.latestRevision });
+    });
+  }
+  async removed(actor: Actor | null): Promise<StoredEntry[]> {
+    if (!actor?.admin) return [];
+    return this.hub.all<{ entry_id: string }>("SELECT entry_id FROM hub_entry_removals ORDER BY at DESC,entry_id").map((r) => {
+      const record = this.findSync(r.entry_id, true)!;
+      record.entry.removed = this.removal(r.entry_id)!;
+      return record;
+    });
+  }
+  async restore(id: string, actor: Actor): Promise<StoredEntry> {
+    return this.hub.tx(() => {
+      if (!actor.admin) throw new HubServerError("관리자만 제거한 Workflow를 복원할 수 있습니다.", 403);
+      if (!this.findSync(id, true)) throw new HubServerError("등록한 Workflow를 찾을 수 없습니다.", 404);
+      if (!this.removal(id)) throw new HubServerError("제거한 Workflow가 아닙니다.", 404);
+      this.hub.run("DELETE FROM hub_entry_removals WHERE entry_id=?", id);
+      this.audit(actor, "entry.restore", id);
+      return this.findSync(id)!;
+    });
   }
   private checkOwner(id: string, actor: Actor) {
-    const record = this.findSync(id);
+    const record = this.findSync(id, true);
+    if (record && this.removal(id)) throw new HubServerError("허브에서 제거한 Workflow입니다. 관리자가 복원한 뒤에 새 version을 등록할 수 있습니다.", 409);
     if (record && record.entry.authorId !== actor.id) throw new HubServerError("등록한 연구자만 Workflow를 바꿀 수 있습니다.", 403);
     if (!record && this.hub.get("SELECT entry_id FROM hub_files WHERE entry_id=? AND uploader_id<>? LIMIT 1", id, actor.id))
       throw new HubServerError("다른 연구자가 등록을 준비하는 Workflow입니다.", 403);
@@ -122,6 +160,12 @@ export class SQLiteHubStore implements HubRecordStore {
           }
         }
         if (n > oldN) {
+          // gaid-hub-versions: the first registration is 0.1.0, each update one patch/minor/major step; a client from before
+          // versions sends none and gets the patch step.
+          const before = n === 1 ? null : hubRevisionVersions(e.revisions.slice(0, n - 1)).at(-1)!;
+          if (revision.version === undefined) revision.version = before === null ? "0.1.0" : bumpHubVersion(before, "patch");
+          if (!parseHubVersion(revision.version) || !allowedHubVersion(before, revision.version))
+            throw new HubServerError("version은 처음 등록이 0.1.0이고, 다음 등록은 바로 다음 patch, minor 또는 major version이어야 합니다.", 409);
           revision.registeredBy = actor.name;
           revision.registeredById = actor.id;
           revision.registeredAt = this.hub.now();

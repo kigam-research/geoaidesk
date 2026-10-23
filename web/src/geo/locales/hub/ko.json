@@ -30,7 +30,7 @@
     "folders": "폴더",
     "newFolder": "새 폴더",
     "allFolders": "전체",
-    "registered": "허브 등록 {n}판",
+    "registered": "허브 등록 version {version}",
     "catalogueHint": "{title}: 카탈로그 Workflow입니다. 내 연구 프로젝트의 Workflow 패널에서 시작합니다.",
     "browse": {
       "title": "허브에 등록된 Workflow",
@@ -91,8 +91,8 @@
         "text": "아직 허브에 등록하지 않은 Workflow입니다. 다른 연구자의 허브 목록에는 나오지 않습니다."
       },
       "revision": {
-        "term": "판",
-        "text": "등록한 Workflow를 고쳐 다시 등록할 때마다 올라가는 번호입니다. 의견은 판마다 남습니다."
+        "term": "version",
+        "text": "등록한 Workflow의 version입니다. 0.1.0으로 시작하며, 갱신할 때 등록자가 patch·minor·major를 고릅니다. 1.0.0은 메인 배포입니다."
       },
       "trial": {
         "term": "시험",
@@ -109,7 +109,7 @@
       "name": "이름",
       "folder": "주제 폴더",
       "author": "연구자",
-      "revision": "판",
+      "revision": "version",
       "stars": "star",
       "updated": "수정"
     }
@@ -291,7 +291,7 @@
     "private": "개인 초안",
     "untested": "미시험",
     "tested": "시험 {count}회",
-    "revision": "{n}판",
+    "revision": "초안",
     "flow": "Workflow 단계",
     "you": "직접 정함",
     "inputs": "입력",
@@ -339,7 +339,7 @@
       "needs-revision": "수정 필요",
       "failed": "실패"
     },
-    "newer": "{n}판 초안이 새로 있습니다. 시험한 판은 {installed}판입니다.",
+    "newer": "시험한 뒤 수정한 초안이 있습니다. 다시 시험할 수 있습니다.",
     "toDraft": "초안 화면에서 설치하기",
     "newProject": {
       "action": "새 프로젝트 만들기",
@@ -391,7 +391,7 @@
   },
   "register": {
     "open": "허브 등록 미리보기",
-    "update": "허브 등록 갱신 ({n}판)",
+    "update": "허브 등록 갱신",
     "title": "GAID 허브에 등록",
     "folder": "허브 공개 분류 (폴더)",
     "note": "다른 연구자에게 남길 말",
@@ -400,20 +400,31 @@
     "notShared": "공유하지 않음: 올린 원문 PDF와 압축 파일 원본, 연구 자료, 프로젝트 실행 기록과 시험 평가",
     "submit": "허브에 등록",
     "line": "허브에 등록하면 다른 연구자가 보고 star와 의견을 남길 수 있습니다. 등록 전 모습을 먼저 확인하세요.",
-    "registeredLine": "{n}판이 허브에 등록되어 있습니다.",
+    "registeredLine": "version {version}이 허브에 등록되어 있습니다.",
     "previewBanner": "미리보기: 허브에 등록하면 다른 연구자에게 이렇게 보입니다.",
     "backToDraft": "초안으로 돌아가기",
     "notYet": "허브 공유 저장소는 화면 협의 후 연결합니다. 지금은 미리보기만 됩니다.",
     "before": "등록 전",
     "newFolder": "폴더 만들기",
-    "newFolderPlaceholder": "새 폴더 이름"
+    "newFolderPlaceholder": "새 폴더 이름",
+    "firstVersion": "처음 등록하면 version {version}이 됩니다.",
+    "versionChoice": "다음 version (현재 {version})",
+    "bump": {
+      "patch": "작은 수정: version {version} (권장)",
+      "minor": "기능 추가: version {version}",
+      "major": "주요 배포: version {version}"
+    },
+    "mainRelease": "작은 수정은 patch, 기능 추가는 minor입니다. 주요 배포를 고르면 메인 배포인 1.0.0이 됩니다.",
+    "versionHint": "수정 범위에 맞게 고르세요. 주요 배포는 첫 숫자를 올립니다.",
+    "versionLoading": "현재 version을 읽는 중입니다.",
+    "versionFailed": "현재 version을 읽지 못했습니다. 등록창을 닫고 다시 여세요."
   },
   "shared": {
     "by": "{author} · {folder} · {when}",
     "star": "Star",
     "starred": "Star 함",
     "try": "내 프로젝트에서 시험",
-    "trials": "등록한 판으로 시작한 시험 {count}회 (검토 결과 아님)",
+    "trials": "등록된 version으로 시작한 시험 {count}회 (검토 결과 아님)",
     "comments": "의견 {count}개",
     "commentPlaceholder": "시험해 본 결과나 고칠 점을 적으세요.",
     "comment": "의견 남기기",
@@ -424,18 +435,19 @@
     "note": "작성자의 말",
     "edit": {
       "button": "Workflow 고치기",
-      "hint": "고친 내용은 새 판으로 등록합니다. 이전 판도 계속 설치할 수 있습니다."
+      "hint": "다음 version은 등록할 때 고릅니다. 이전 version도 계속 설치할 수 있습니다."
     },
     "copy": {
       "button": "복사해서 고치기",
       "hint": "내 Workflow로 복사해 고칩니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
     },
-    "basedOn": "{author}의 「{title}」 {revision}판을 복사해 고친 Workflow입니다.",
+    "basedOn": "{author}의 「{title}」 version {version}을 복사해 고친 Workflow입니다.",
     "openOriginal": "원본 보기",
     "revisions": {
-      "title": "판 기록 {count}개",
-      "row": "{revision}판 · {when} · {author}"
-    }
+      "title": "version 기록 {count}개",
+      "row": "version {version} · {when} · {author}"
+    },
+    "version": "version {version}"
   },
   "flow": {
     "decide": "연구자가 정함: {question}",
@@ -524,8 +536,31 @@
     "copied": "기술 정보를 복사했습니다"
   },
   "editing": {
-    "edit": "등록한 Workflow의 {revision}판을 고치고 있습니다. 허브에 등록하면 {next}판이 됩니다.",
-    "copy": "{author}의 「{title}」 {revision}판을 복사한 내 Workflow입니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
+    "edit": "등록한 Workflow의 version {version}을 고치고 있습니다. 다음 version은 등록할 때 고릅니다.",
+    "copy": "{author}의 「{title}」 version {version}을 복사한 내 Workflow입니다. 등록하면 원본을 밝힌 별도 Workflow가 됩니다."
+  },
+  "remove": {
+    "action": "허브에서 제거",
+    "title": "Workflow 제거",
+    "body": "「{title}」을 허브 목록에서 제거합니다. 프로젝트에 이미 설치한 사본은 유지됩니다.",
+    "restoreAdmin": "관리자가 제거된 Workflow 목록에서 복원할 수 있습니다.",
+    "restoreLocal": "기관 허브 서버를 쓰지 않는 경우, 등록자가 제거된 Workflow 목록에서 복원할 수 있습니다.",
+    "reason": "제거 사유 (선택, 500자 이내)",
+    "cancel": "취소",
+    "busy": "제거 중",
+    "failed": "Workflow를 제거하지 못했습니다. 권한과 연결 상태를 확인한 뒤 다시 시도하세요."
+  },
+  "removed": {
+    "title": "제거된 Workflow",
+    "body": "복원하면 허브 목록에 다시 표시됩니다. 프로젝트의 설치본은 바뀌지 않습니다.",
+    "empty": "복원할 Workflow가 없습니다. 허브 목록에서 Workflow를 살펴보세요.",
+    "meta": "version {version} · {author}",
+    "by": "{author} 님이 {when} 제거",
+    "reason": "제거 사유: {reason}",
+    "restore": "Workflow 복원",
+    "busy": "복원 중",
+    "failed": "Workflow를 복원하지 못했습니다. 권한과 연결 상태를 확인한 뒤 다시 시도하세요.",
+    "restored": "「{title}」을 허브 목록에 복원했습니다."
   },
   "example": {
     "heading": "예제 자료",
@@ -547,10 +582,10 @@
     "meta": "{size}, 파일 {files}개",
     "license": "이용 조건: {license}",
     "noLicense": "이용 조건을 적지 않았습니다.",
-    "removeAsk": "새 판에서 예제 자료를 뺍니다. 이전 판에는 남습니다.",
+    "removeAsk": "새 초안에서 예제 자료를 뺍니다. 이전 초안과 등록한 version에는 남습니다.",
     "remove": {
       "action": "예제 자료 빼기",
-      "confirm": "예제 자료 뺀 판 만들기"
+      "confirm": "예제 자료 뺀 초안 만들기"
     },
     "cancel": "취소",
     "edit": {

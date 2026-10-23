@@ -14,7 +14,7 @@ const skillPath = (id: string) => {
   return `/skills/${encodeURIComponent(id)}`;
 };
 const revisionPath = (id: string, revision: number) => {
-  if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("스킬 판을 찾을 수 없습니다.", 404);
+  if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("스킬 version을 찾을 수 없습니다.", 404);
   return `${skillPath(id)}/revisions/${revision}`;
 };
 
