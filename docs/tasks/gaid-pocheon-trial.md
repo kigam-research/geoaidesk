@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:15:38Z
+updated: 2026-10-23T07:30:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -160,6 +160,10 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   with the method. Cause: DRAFT_SYSTEM says to write code paths "in full from <skill>/" and nothing about where run-time
   files go. — D — fixed (DRAFT_SYSTEM: skill folder read-only; agent-written code and outputs in a named project work
   folder). Researcher feedback in the trial asked for `pgi_run/`.
+- F17 — Workflow start settings (review app b74950e7) — every optional input defaults to "사용하지 않음" even when a fitting
+  file is in the project; opened at the summary, one click would start the paper's method with only the DEM and a
+  README (6 of 8 inputs unused). CSV roles list every CSV as candidate. — B (start settings, example selection) —
+  routed 2026-10-23 16:31.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
