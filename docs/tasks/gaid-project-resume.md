@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-23T03:02:51Z
-writer: {"host":"seongin3","reserved":"54f15532caa6f0bb44aa2320e3a60c342b9ddac56953f1cfc70157047cf250d7"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24ac6438-9d3c-40bf-aed3-558f9bb47f6f","pid":3710210,"provider":"claude","session":"5e080e46-115a-40f8-bbc8-5648ad5fea05","start":"61251758","token":"54f15532caa6f0bb44aa2320e3a60c342b9ddac56953f1cfc70157047cf250d7"}
 branch: task/gaid-project-resume
 target: main
 parent: 
