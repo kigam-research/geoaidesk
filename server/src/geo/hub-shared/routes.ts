@@ -21,7 +21,7 @@ import type {
   RemoveEntryBody,
   SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
-import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
+import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRefVersion, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
 import { structuredDraft } from "../authoring/workflow.ts";
@@ -84,7 +84,12 @@ export async function registerSharedHubRoutes(
   const hubOf = (req: FastifyRequest) => resolveHub(req, options.store);
 
   const entryView = async (store: HubRecordStore, record: StoredEntry, actor: Actor | null): Promise<HubEntry> => {
-    const [stars, comments] = await Promise.all([store.stars(record.entry.id), store.comments(record.entry.id)]);
+    // A removed entry (the removed list) has no readable stars/comments on a hub server (404 there): count none.
+    const removed = Boolean(record.entry.removed);
+    const [stars, comments] = await Promise.all([
+      store.stars(record.entry.id).catch((e) => (removed ? {} : Promise.reject(e))),
+      store.comments(record.entry.id).catch((e) => (removed ? [] : Promise.reject(e))),
+    ]);
     const identities = new Map<string, Set<string>>();
     for (const snapshot of Object.values(record.snapshots)) {
       const hashes = identities.get(snapshot.package.methodId) ?? new Set<string>();
@@ -107,6 +112,7 @@ export async function registerSharedHubRoutes(
     return {
       ...record.entry,
       revisions: record.entry.revisions.map((r, i) => ({ ...r, version: versions[i] })),
+      ...(record.entry.basedOn ? { basedOn: { ...record.entry.basedOn, version: hubRefVersion(record.entry.basedOn)! } } : {}),
       tagline: korean(snapshotOf(record).draft.profile.tagline),
       implementation: snapshotOf(record).draft.codeFiles.length ? "implemented" : "descriptive",
       recipe: Boolean(snapshotOf(record).draft.workflow && snapshotOf(record).draft.recipe),
@@ -287,6 +293,7 @@ export async function registerSharedHubRoutes(
                     basedOn: {
                       entryId: link.entryId,
                       revision: link.revision,
+                      version: (original ? hubVersionOf(original.entry, link.revision) : null) ?? hubRefVersion(link)!,
                       title: original?.entry.title ?? link.title,
                       author: original?.entry.author ?? link.author,
                     },
@@ -376,7 +383,7 @@ export async function registerSharedHubRoutes(
     scope.get("/geo/hub/removed", async (req) => {
       const { store, actor } = hubOf(req);
       const records = await store.removed(actor);
-      return { entries: await Promise.all(records.map(async (r) => ({ ...(await entryView(store, r, actor)), removed: r.entry.removed }))) };
+      return { entries: await Promise.all(records.map((r) => entryView(store, r, actor))) };
     });
     scope.post<{ Params: { id: string } }>("/geo/hub/entries/:id/restore", async (req) => {
       const hub = hubOf(req);

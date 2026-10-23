@@ -514,6 +514,13 @@ describe("backup, restore check and legacy import", () => {
     expect(app.hub.counts()).toEqual(after);
     expect(readFileSync(join(source.root, "entries/entry-example/entry.json"))).toEqual(before);
   });
+  it("keeps a Workflow removed in the local hub removed after import", async () => {
+    const u = await user("mapped@example.org", "member", "새 계정 이름"); const source = await legacy();
+    await source.remove("entry-example", { id: "이전 작성자", name: "이전 작성자" }, "중복");
+    expect(await importHub(app.hub, { from: source.root, authors: { "이전 작성자": u.account.email }, apply: true })).toMatchObject({ imported: 1 });
+    expect(await app.store.list()).toEqual([]);
+    expect(app.hub.all<{ account_id: string; reason: string }>("SELECT account_id,reason FROM hub_entry_removals")).toEqual([{ account_id: u.account.id, reason: "중복" }]);
+  });
   it("refuses unmapped authors and changed imports; explicit fallback is required", async () => {
     const u = await user("mapped@example.org"); const source = await legacy();
     await expect(importHub(app.hub, { from: source.root, authors: {}, apply: true })).rejects.toThrow(/대응표/);
@@ -526,7 +533,7 @@ describe("backup, restore check and legacy import", () => {
     const u = await user("mapped@example.org"); const source = await legacy();
     const r = await source.read("entry-example"); r.entry.revisions[1].revision = 3;
     await source.write(r);
-    await expect(importHub(app.hub, { from: source.root, authors: { "이전 작성자": u.account.email }, apply: true })).rejects.toThrow(/등록 판/);
+    await expect(importHub(app.hub, { from: source.root, authors: { "이전 작성자": u.account.email }, apply: true })).rejects.toThrow(/등록 판/); // hub server operator message (CLI), not researcher copy
     expect(app.hub.counts().hub_entries).toBe(0);
     expect(app.hub.counts().hub_files).toBe(0);
   });

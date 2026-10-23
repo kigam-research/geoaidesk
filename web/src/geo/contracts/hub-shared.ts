@@ -68,8 +68,11 @@ export interface HubEntry {
   mine?: boolean;
   /** The author account's authenticated ORCID iD at read time (institute hub server only; gaid-orcid phase 2). */
   authorOrcid?: { id: string; environment: "production" | "sandbox" };
-  /** The registered method this one was copied from ("복사해서 고치기"). */
-  basedOn?: { entryId: string; revision: number; title: string; author: string };
+  /**
+   * The registered method this one was copied from ("복사해서 고치기"). `version`: the original's version that was copied;
+   * views always fill it (records made before versions: `legacyHubVersion(revision)`).
+   */
+  basedOn?: { entryId: string; revision: number; version?: string; title: string; author: string };
   folderId: string;
   /** Cover image URL (`/geo/hub/entries/:id/cover`), when the draft has one. */
   cover: string | null;

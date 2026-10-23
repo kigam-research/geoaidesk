@@ -15,7 +15,7 @@ export async function registerGeoWorkflowViewRoutes(app: FastifyInstance, option
       if (!Number.isSafeInteger(revision) || revision < 1) throw new AuthoringError("초안 번호를 확인해 주세요.", 400);
       const project = await store.read(req.params.id);
       const draft = project.drafts.find((d) => d.revision === revision);
-      if (!draft) throw new AuthoringError("초안 판을 찾을 수 없습니다.", 404);
+      if (!draft) throw new AuthoringError("초안을 찾을 수 없습니다.", 404);
       return { doc: draft.workflow ? workflowDocFor(draft.workflow as unknown as GeoWorkflow, {
         version: null, skills: [{ name: draft.slug, source: "bundled" }], procedure: procedureSteps(draft.profile),
       }) : null };

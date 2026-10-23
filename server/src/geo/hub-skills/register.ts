@@ -52,7 +52,7 @@ async function sourceSnapshot(store: HubSkillRecordStore, body: RegisterSkillSou
   if (body?.from === "workflow") {
     const record = await store.shared.read(body.entryId);
     if (!Number.isSafeInteger(body.revision) || body.revision < 1 || !Object.hasOwn(record.snapshots, String(body.revision)))
-      throw new AuthoringError("Workflow 판을 찾을 수 없습니다.", 404);
+      throw new AuthoringError("Workflow version을 찾을 수 없습니다.", 404);
     const snapshot = record.snapshots[body.revision];
     const archive = await store.shared.bytes(body.entryId, `packages/${body.revision}.tar.gz`);
     if (digest(archive) !== snapshot.package.sha256) throw new AuthoringError("Workflow 압축 파일의 해시가 맞지 않습니다.", 409);

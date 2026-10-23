@@ -769,7 +769,7 @@ export async function buildPackage(
     };
   const path = `packages/${revision}/${draft.slug}.tar.gz`;
   if (ctx.store.exists(project.id, path) && !(await ctx.store.readFile(project.id, path)).equals(bytes))
-    throw new AuthoringError("같은 패키지 판의 파일이 이미 있습니다. 기존 파일은 바꾸지 않았습니다.", 409);
+    throw new AuthoringError("같은 패키지의 파일이 이미 있습니다. 기존 파일은 바꾸지 않았습니다.", 409);
   await ctx.store.writeFile(project.id, path, bytes);
   return {
     record: {

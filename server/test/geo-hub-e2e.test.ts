@@ -132,6 +132,7 @@ it("shares a Workflow between two accounts and syncs one account's library acros
   const installed = await b.call("POST", `/geo/hub/entries/${entry.id}/install`, { projectId: target.id, acknowledged: true, revision: 1 });
   expect(installed.status, JSON.stringify(installed.body)).toBe(201);
   expect((await hub.store.read(entry.id)).installs).toHaveLength(1);
+  expect(listed.body.entries[0].revisions[0].version).toBe("0.1.0");
   // B is not an admin and has no access to A's library.
   expect((await b.call("GET", "/geo/hub-server/admin/users")).status).toBe(403);
   const pulledB = await b.call("POST", "/geo/library/sync", {});
@@ -151,6 +152,21 @@ it("shares a Workflow between two accounts and syncs one account's library acros
   expect(await readdir(join(a2.dir, "library", "files"))).toContain(stored.sha256);
   // The entry list on the second PC still marks A's own entry.
   expect((await a2.call("GET", "/geo/hub/entries")).body.entries[0].mine).toBe(true);
+  // Removal through the hub server (the last GAID built in this process answers the remote provider, so A acts from a2;
+  // B's refusal is covered in geo-hub-server.test.ts): A, an administrator here, removes the entry; it leaves every list,
+  // B's installed copy and install record stay, and A restores it.
+  const removedByA = await a2.call("POST", `/geo/hub/entries/${entry.id}/remove`, { reason: "다시 정리합니다" });
+  expect(removedByA.status, JSON.stringify(removedByA.body)).toBe(204);
+  expect(await hub.store.list()).toEqual([]);
+  expect((await a2.call("GET", `/geo/hub/entries/${entry.id}`)).status).toBe(404);
+  const removedA = await a2.call("GET", "/geo/hub/removed");
+  expect(removedA.status, JSON.stringify(removedA.body)).toBe(200);
+  expect(removedA.body.entries.map((e: { id: string; removed: { by: string; reason: string } }) => [e.id, e.removed.by, e.removed.reason]))
+    .toEqual([[entry.id, "김연구", "다시 정리합니다"]]);
+  const restoredA = await a2.call("POST", `/geo/hub/entries/${entry.id}/restore`, {});
+  expect(restoredA.status, JSON.stringify(restoredA.body)).toBe(200);
+  expect((await hub.store.read(entry.id)).installs).toHaveLength(1);
+  expect((await a2.call("GET", "/geo/hub/entries")).body.entries).toHaveLength(1);
 
   // Both PCs change the same paper; the later change wins and the replaced copy is kept.
   await a2.library.editGaidItem(paper.id, { tags: ["from-pc-a2"] });

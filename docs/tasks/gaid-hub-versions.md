@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:56:23Z
+updated: 2026-10-23T07:03:04Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e1c6a78f-11ec-46f9-83ba-acc24d237672","pid":2123332,"provider":"claude","session":"328f1569-b8ae-42a5-b1df-4474b7414b05","start":"62565307","token":"531aa2e1e3ef35b52322f15aaf618da80fc168d4620d8ba20079dacaadf3241b"}
 branch: task/gaid-hub-versions
 target: main
@@ -70,7 +70,7 @@ Orchestration (2026-10-23):
   hub-skills,workflow/workflow-view.tsx} and locales except workflowDoc, terminology.csv). Integration: child completes into
   this branch, then writer runs scripts/check and writes the report.
 ## Next steps
-1. Add GAID-side tests (local store removal/restore, register bump) in server/test/geo-hub-shared.test.ts.
+1. Done: GAID-side tests (local removal/restore, register bump, older records), e2e remote removal, server version/removal/import tests. Child `gaid-hub-versions--ui` (writer 85dddf2d) runs the UI package.
 2. When the child finishes: `task complete`, integrate, scripts/check, AGENTS.md wording (판 → version), report.
 ## Failed approaches
 ## Notes and decisions
