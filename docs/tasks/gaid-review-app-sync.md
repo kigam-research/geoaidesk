@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T04:08:29Z
+status: done
+updated: 2026-10-23T04:08:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"037fe804-20b3-4b8d-9e0c-c1be1dd8fd8c","pid":489203,"provider":"claude","session":"22c1f103-16a1-439b-abc6-3bf6b0e57fc0","start":"61617457","token":"dac1280ed95fd7a5b9961c7cfbcb087bf7a31151fc22f6199affc785e973e137"}
 branch: task/gaid-review-app-sync
 target: main
@@ -69,7 +69,9 @@ institute hub server was not touched (still 982389c5, active since 10:03 KST).
 - Re-verify: `systemctl --user status gaid-review`; `git -C ~/deploy/geoaidesk rev-parse HEAD`;
   `curl -s -o /dev/null -w '%{http_code}' http://10.13.15.74:18000/projects/activity` (401).
 ## Next steps
-1. None; finish.
+<!-- task:closed -->
+Closed 2026-10-23T04:08:41Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
