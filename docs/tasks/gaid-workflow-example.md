@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T07:01:16Z
+status: done
+updated: 2026-10-23T07:03:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cc577db8-acf4-4fcd-b382-03314cb2af71","pid":1746984,"provider":"claude","session":"bf5e0624-c00c-4da3-8d48-be9d0472fbca","start":"62320911","token":"08ec02ef4d15776d4adca0405d68c76559de4aefe662e800ff9e1e1ba2940de0"}
 branch: task/gaid-workflow-example
 target: main
@@ -100,7 +100,8 @@ Recommended answers the user accepted:
   (server 2269 passed + 8 skipped, web 1241 passed, copy 0 errors, ui 0 errors / 0 new debt, smoke PASS).
 - Report written and humanized: `reports/2026-10-23-gaid-workflow-example/index.md`.
 ## Next steps
-1. `task finish`.
+<!-- task:closed -->
+Closed 2026-10-23T07:03:52Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Plan (orchestration)
 Sequential decisions: contract first (done), then two independent packages.
