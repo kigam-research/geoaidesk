@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:44:53Z
+updated: 2026-10-23T06:45:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64631b91-f6bd-4f6d-ad02-2996e80f1f79","pid":1743744,"provider":"claude","session":"5414cf7f-13a5-428a-ae32-343cc6475005","start":"62319888","token":"b8608a00206a30d58748fdcf6af8f6920102d148e2631acb42ae68af6fd45eee"}
 branch: task/gaid-note-library
 target: main
@@ -77,7 +77,7 @@ Recommended answers the user accepted:
 - scripts/check run 1: backend 2260/2269 pass, 1 timeout in geo-hub-server launcher CLI test (passes alone, 38/38);
   the run stopped there. Run 2 started after the UI fixes (log check-2.log).
 ## Next steps
-1. Read check-2.log; if green, review copy of the report, remove build caches (.next etc.), then `task finish`.
+1. Read check-2.log (route a-workflow-button done and reported, e72dda34); if green, review copy of the report, remove build caches (.next etc.), then `task finish`.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
