@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T13:08:40Z
+status: done
+updated: 2026-10-23T13:08:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"26afde7c-3d1a-468d-95dd-0bc61144c3fa","pid":970986,"provider":"codex","session":"01a168c1-c2ab-78f2-9ae9-dc1c2eaad85e","start":"64682980","token":"90a3e40fb9066b5b5c4954bc054f67e529051d61a73d19c80eafa019af455bb8"}
 branch: task/gaid-visual-benchmark
 target: main
@@ -74,8 +74,9 @@ or triggered by this unit.
 - App tests were not run because there is no app change. No code integration, deployment or delivered asset is claimed.
   The original implementation criteria were canceled by the latest user instruction, not completed.
 ## Next steps
-1. Finish the documentation-only closure through the task CLI. Hub verification/retirement follows the normal workflow.
-2. No further design, generation, implementation or approval request remains under the user's latest instruction.
+<!-- task:closed -->
+Closed 2026-10-23T13:08:41Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - First visual exploration: two new header-image sizes and generic terrain/folio illustrations. The user rejected the
   displayed UI as worse than no imagery. Failure premise: assuming added geoscience imagery justified altering a working
