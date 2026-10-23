@@ -226,14 +226,18 @@
   const DURATION = 105;
   // Real-system segments: one shot each, whole app frame at one scale (no zoom, no pan; user feedback 2026-10-23).
   // a/b are film seconds; consecutive shots overlap by 0.1 s. Beats (feature tags) come from capture.json.
-  const SEG = [
-    { shot: 'L1', a: 28.3, b: 34.5 }, { shot: 'L1b', a: 34.4, b: 38.6 },
-    { shot: 'A1', a: 38.5, b: 42.6 }, { shot: 'A2', a: 42.5, b: 47.0 }, { shot: 'A3', a: 46.9, b: 50.8 },
-    { shot: 'H1', a: 50.7, b: 54.8 }, { shot: 'H2', a: 54.7, b: 58.8 },
-    { shot: 'R1', a: 58.7, b: 63.8 }, { shot: 'R2', a: 63.7, b: 69.8 }, { shot: 'M1', a: 69.7, b: 74.8 },
-    { shot: 'N1', a: 74.7, b: 80.4 }, { shot: 'N2', a: 80.3, b: 84.4 },
-    { shot: 'L2', a: 84.3, b: 88.6 }, { shot: 'L3', a: 88.5, b: 92.2 },
-  ];
+  const SHOT_ORDER = ['L1', 'L1b', 'A1', 'A2', 'A3', 'H1', 'H2', 'R1', 'R2', 'M1', 'N1', 'N2', 'L2', 'L3'];
+  const SHOT_TARGET = { L1: 6, L1b: 4, A1: 4, A2: 4.5, A3: 4, H1: 4, H2: 4, R1: 6, R2: 6, M1: 5, N1: 5.5, N2: 3.5, L2: 4.5, L3: 4 };
+  const SEG = [];
+  {
+    let at = 28.3;
+    for (const id of SHOT_ORDER) {
+      const info = CAP && CAP.shots ? CAP.shots.find(s => s.id === id) : null;
+      const dur = info ? info.frames / FPS : SHOT_TARGET[id];
+      SEG.push({ shot: id, a: at, b: at + dur });
+      at += dur - 0.1;
+    }
+  }
   const STATIONS = [
     { icon: 'library', label: '내 서재' },
     { icon: 'file-text', label: 'Workflow 만들기' },
@@ -498,9 +502,14 @@
       const beats = (info && info.beats) || drawn.sg.beats || [];
       const bt = beats.find(b => drawn.local >= b.t0 && drawn.local <= b.t1);
       if (!bt) { put(over, { o: 0 }); return; }
-      const bo = win(drawn.local, bt.t0, bt.t1, 0.3, 0.25);
+      const joinedIn = beats.some(b => b !== bt && Math.abs(b.t1 - bt.t0) < 0.05);
+      const joinedOut = beats.some(b => b !== bt && Math.abs(b.t0 - bt.t1) < 0.05);
+      const bo = Math.min(joinedIn ? 1 : ramp(drawn.local, bt.t0 + 0.15, bt.t0 + 0.45, lin), joinedOut ? 1 : 1 - ramp(drawn.local, bt.t1 - 0.3, bt.t1, lin));
       put(over, { o: bo });
-      const r = bt.rect;
+      // a box that follows on from the previous beat glides there instead of jumping
+      const prevB = beats.find(b => b !== bt && Math.abs(b.t1 - bt.t0) < 0.05);
+      const glide = prevB ? inOut((drawn.local - bt.t0) / 0.45) : 1;
+      const r = prevB ? ['x', 'y', 'width', 'height'].reduce((o, k) => ({ ...o, [k]: lerp(prevB.rect[k], bt.rect[k], glide) }), {}) : bt.rect;
       const rx = r.x * FRAME.k, ry = r.y * FRAME.k, rw = r.width * FRAME.k, rh = r.height * FRAME.k;
       box(hi, rx - 6, ry - 6, rw + 12, rh + 12);
       tagEl.textContent = bt.label;
