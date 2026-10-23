@@ -81,6 +81,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/cli-export.ts`, `GET /geo/workflows/:id/cli-export`, `GET /geo/hub/entries/:id/cli-export`,
   `web/src/geo/workflow/cli-export.tsx`, namespace `workflowCli`) downloads the 지침 as a prompt/command file (`$ARGUMENTS`)
   plus the skill folders for Pi and Claude Code (verified with the real CLIs); Codex is not offered until verified.
+- Workflow stages (gaid-workflow-stages; user decision 2026-10-23: steps follow the data-analysis or research flow, never
+  one per item, with a step cap): contract `web/src/geo/contracts/workflow-stages.ts` (IO-free). A gaid-workflow/v1 Workflow
+  has 3-5 `steps` (e.g. 자료 준비 → 처리·모델링 → 평가 → 해석·결과); each step names the input roles (`inputIds`) and choices
+  (`choiceIds`) it first uses; an input role may take several files (`multiple: true`, binding `string[]`); at most 6
+  `requiredScientificChoices` without a `default` (option id or text) — choices with a default are parameters shown and
+  editable in the start summary. `stageWarnings` (codes `stage-count|required-choices|item-split|unmapped-input|
+  unknown-input`) drives authoring repair and the package/registration warning; older Workflows are never rewritten.
+  The start window rail is 소개 → one page per stage with something to set → 요약 (≤ 7, `workflowStages`); a Workflow whose
+  steps map nothing or more than 5 pages shows two pages 입력 자료 / 분석 조건 (display only).
 - Workflow example data (gaid-workflow-example; contract `web/src/geo/contracts/workflow-examples.ts`): a gaid-workflow/v1
   input role may carry `example` {title, source, license?, synthetic?, files[]}: files bundled in the package at exactly
   `examples/<roleId>/<name>` (≤ 10 MiB each, ≤ 15 MiB per Workflow) or a public https `url` + sha256 + size (≤ 512 MiB),
@@ -117,7 +126,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   start window (gaid-workflow-start-ui, user decision 2026-10-23; `start-window.tsx`, a 920 px sheet with every step named in a
   left `StepList`, `web/src/geo/shell/step-list.tsx`): Workflow 소개 first (`start-intro.tsx`: purpose, inputs and example data,
   conditions, outputs, steps, limits from the WorkflowDoc; missing parts left out; full `WorkflowView` behind a disclosure;
-  readiness blockers with their fix), then one input file or analysis condition per step, then a summary with Edit links
+  readiness blockers with their fix), then one page per analysis-flow stage holding its input files and conditions (see "Workflow stages"), then a summary with Edit links
   and the one primary action. Only the researcher's own saved start settings (`.geo-start.json`) resume at the summary.
   File candidates fit the input's formats; `user_data/` files come first ("내 자료"), others under a folded "이전 결과"; a file
   whose name matches one input (`nameMatches`, names only) starts bound to it and is listed first, and the summary flags an
