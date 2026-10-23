@@ -1,4 +1,5 @@
 /** Registration snapshots all source bytes before inspecting/publishing; previews never publish shelf records. */
+import { hubVersionOf, legacyHubVersion } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { join } from "node:path";
 import type { HubSkillOrigin, RegisterSkillBody, RegisterSkillPreview, RegisterSkillSource } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import { previewSkillSource } from "../../agent/skills-install.ts";
@@ -52,7 +53,7 @@ async function sourceSnapshot(store: HubSkillRecordStore, body: RegisterSkillSou
   if (body?.from === "workflow") {
     const record = await store.shared.read(body.entryId);
     if (!Number.isSafeInteger(body.revision) || body.revision < 1 || !Object.hasOwn(record.snapshots, String(body.revision)))
-      throw new AuthoringError("Workflow 판을 찾을 수 없습니다.", 404);
+      throw new AuthoringError("Workflow version을 찾을 수 없습니다.", 404);
     const snapshot = record.snapshots[body.revision];
     const archive = await store.shared.bytes(body.entryId, `packages/${body.revision}.tar.gz`);
     if (digest(archive) !== snapshot.package.sha256) throw new AuthoringError("Workflow 압축 파일의 해시가 맞지 않습니다.", 409);
@@ -60,7 +61,7 @@ async function sourceSnapshot(store: HubSkillRecordStore, body: RegisterSkillSou
     nameRequired(name);
     // These root files belong to the Workflow package, not to the extracted runtime skill.
     const entries = readArchive(archive, name).filter((e) => !["gaid-method.json", "atlas.yaml"].includes(e.path));
-    return { name, entries, origin: { kind: "workflow", workflow: { entryId: body.entryId, revision: body.revision, title: record.entry.title } } satisfies HubSkillOrigin };
+    return { name, entries, origin: { kind: "workflow", workflow: { entryId: body.entryId, revision: body.revision, version: hubVersionOf(record.entry, body.revision) ?? legacyHubVersion(body.revision), title: record.entry.title } } satisfies HubSkillOrigin };
   }
   if (body?.from === "source") {
     const source = sourceText(body.source);

@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 export interface HubLocation {
   /** 자료 소식 (gaid-hub-feeds). */
   feeds?: boolean;
+  removed?: boolean;
   skills?: boolean;
   skillId?: string | null;
   open: boolean;
@@ -19,6 +20,7 @@ export interface HubLocation {
 }
 
 export function parseHubHash(hash: string): HubLocation {
+  if (hash === "#hub/removed") return { open: true, projectId: null, removed: true };
   if (hash === "#hub/skills") return { open: true, projectId: null, skills: true };
   if (hash === "#hub/feeds") return { open: true, projectId: null, feeds: true };
   const skill = /^#hub\/s\/([a-z0-9][a-z0-9._-]{0,119})$/.exec(hash);
@@ -51,7 +53,9 @@ export function useHubLocation(): [HubLocation, (next: HubLocation) => void] {
   }, []);
   const navigate = useCallback((next: HubLocation) => {
     const hash = next.open
-      ? next.skillId
+      ? next.removed
+        ? "#hub/removed"
+        : next.skillId
         ? `#hub/s/${encodeURIComponent(next.skillId)}`
         : next.skills
           ? "#hub/skills"

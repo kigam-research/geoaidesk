@@ -1,5 +1,6 @@
 "use client";
 /** On-demand detail of the GAID hub: change request, generated files, check issues, agent record, source page. */
+import { FIRST_HUB_VERSION, HUB_VERSION_BUMPS, nextHubVersions, type HubVersionBump } from "@/geo/contracts/hub-version";
 import { useEffect, useState } from "react";
 
 import { PdfViewer } from "@/components/pdf-viewer/pdf-viewer";
@@ -317,6 +318,9 @@ export function SourcePageDialog({
 
 /** Register a draft in the shared GAID hub: folder, a short note for other researchers, what is and is not shared. */
 export function RegisterDialog({
+  currentVersion = null,
+  versionPending = false,
+  versionFailed = false,
   open,
   onOpenChange,
   folders,
@@ -329,9 +333,17 @@ export function RegisterDialog({
   initialFolder?: string;
   /** Create a topic folder here (no detour to the hub list); returns its id. */
   onCreateFolder?: (name: string) => Promise<string>;
-  onRegister: (folderId: string, note: string) => Promise<void>;
+  currentVersion?: string | null;
+  versionPending?: boolean;
+  versionFailed?: boolean;
+  onRegister: (folderId: string, note: string, bump: HubVersionBump) => Promise<void>;
 }) {
+  const [bump, setBump] = useState<HubVersionBump>("patch");
+  useEffect(() => { if (open) setBump("patch"); }, [open, currentVersion]);
+  const versions = nextHubVersions(currentVersion);
   const [folder, setFolder] = useState(initialFolder ?? folders[0]?.id ?? "");
+  // The entry may arrive after the folder list. Apply its preset once, without clearing the note or later choices.
+  useEffect(() => { if (open && initialFolder) setFolder(initialFolder); }, [open, initialFolder]);
   // The folder list arrives after the dialog opens: select the preset (or first) folder once it is known.
   useEffect(() => {
     if (folders.length && !folders.some((f) => f.id === folder))
@@ -342,10 +354,20 @@ export function RegisterDialog({
   const [busy, setBusy] = useState(false);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>{text("register.title")}</DialogTitle>
         </DialogHeader>
+        {versionFailed ? <p role="alert" className="text-sm text-destructive">{text("register.versionFailed")}</p>
+          : versionPending ? <p role="status" className="text-sm">{text("register.versionLoading")}</p>
+          : versions ? <fieldset disabled={busy} className="space-y-2">
+            <legend className="mb-2 text-sm font-medium">{text("register.versionChoice", { version: currentVersion! })}</legend>
+            {HUB_VERSION_BUMPS.map((value) => <label key={value} className="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm">
+              <input type="radio" name="hub-version" value={value} checked={bump === value} onChange={() => setBump(value)} className="accent-primary" />
+              <span>{text(`register.bump.${value}`, { version: versions[value] })}</span>
+            </label>)}
+            <p className="text-xs text-muted-foreground">{text(currentVersion?.startsWith("0.") ? "register.mainRelease" : "register.versionHint")}</p>
+          </fieldset> : <p className="text-sm tabular-nums">{text("register.firstVersion", { version: FIRST_HUB_VERSION })}</p>}
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {text("register.folder")}
           <select
@@ -401,11 +423,11 @@ export function RegisterDialog({
             {text("draft.close")}
           </Button>
           <Button
-            disabled={busy || !folder}
+            disabled={busy || !folder || versionPending || versionFailed}
             onClick={async () => {
               setBusy(true);
               try {
-                await onRegister(folder, note.trim());
+                await onRegister(folder, note.trim(), bump);
                 onOpenChange(false);
               } catch {
                 // The caller reported the error; the dialog stays open with the researcher's note.

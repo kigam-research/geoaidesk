@@ -27,7 +27,7 @@ import { AuthoringError, now, type AuthoringStore } from "./store.ts";
 export interface InstallDeps {
   agentDir?: string;
   /** Set only by the shared registry route, never from the request body. */
-  hubEntry?: { id: string; revision: number };
+  hubEntry?: { id: string; revision: number; version: string };
 }
 
 export async function installPackage(

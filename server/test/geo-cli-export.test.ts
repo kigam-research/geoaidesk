@@ -65,7 +65,7 @@ describe("CLI export routes", () => {
   });
   it("exports the latest registered immutable hub package without installing it", async () => {
     const archive = tarGz([{ path: "bundled/SKILL.md", data: Buffer.from(skill.replace("name: inspect", "name: bundled")) }]);
-    const record = { entry: { latestRevision: 3 }, snapshots: { 3: { draft: { slug: "bundled", workflow: { ...workflow, skillIds: ["local:bundled", "kigam/inspect"] }, profile: {} }, package: { size: archive.length, sha256: createHash("sha256").update(archive).digest("hex") } } } } as unknown as StoredEntry;
+    const record = { entry: { latestRevision: 3, revisions: [{ revision: 1 }, { revision: 2 }, { revision: 3, version: "0.2.0" }] }, snapshots: { 3: { draft: { slug: "bundled", workflow: { ...workflow, skillIds: ["local:bundled", "kigam/inspect"] }, profile: {} }, package: { size: archive.length, sha256: createHash("sha256").update(archive).digest("hex") } } } } as unknown as StoredEntry;
     const store = { read: async () => record, bytes: async (_id: string, file: string) => { expect(file).toBe("packages/3.tar.gz"); return archive; } } as SharedHubStore;
     const app = Fastify();
     await registerGeoCliExportRoutes(app, { paths: () => paths, catalogue: () => catalogue, store });
@@ -74,6 +74,9 @@ describe("CLI export routes", () => {
     const zip = new AdmZip(response.rawPayload);
     expect(zip.readAsText(".claude/skills/bundled/SKILL.md")).toContain("bundled");
     expect(zip.readAsText(".claude/skills/inspect/SKILL.md")).toContain("inspect");
+    // The 지침 names the registered version, not the revision number.
+    const command = zip.getEntries().find((e) => e.entryName.startsWith(".claude/commands/"));
+    expect(command && zip.readAsText(command)).toContain("version 0.2.0");
     expect(fs.readdirSync(paths.skillsDir)).toEqual([]);
     await app.close();
   });

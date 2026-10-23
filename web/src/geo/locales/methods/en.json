@@ -12,7 +12,7 @@
   "recipes": "saved start settings",
   "sources": "Sources",
   "questions": "Questions unresolved in the hub",
-  "revision": "Revision {revision}",
+  "revision": "version {version}",
   "unknown": "Not recorded",
   "edited": "Edited in GAID",
   "origin": "Installed from: {origin}",
@@ -58,7 +58,7 @@
   "badge.stage": "{stage, select, draft {Hub draft} submitted {Hub submitted} published {Hub published} other {Hub stage unknown}}",
   "badge.stageTip": "The stage the hub records for this Workflow. Separate from this project's preparation and trials.",
   "badge.codeTip": "Whether the Workflow contains executable code.",
-  "registered": "Registered · revision {revision}",
+  "registered": "Registered · version {version}",
   "record.show": "View record",
   "checks.passed": "Passed the hub check · {at}",
   "checks.notes": "Passed the hub check · {at} · {count, plural, one {# note} other {# notes}}",
@@ -76,7 +76,7 @@
   "checks.record.item": "{id}: {status}{detail}",
   "checks.record.warning": "[{code}] {path}: {message}",
   "issues.summary": "{count, plural, one {# part of the Workflow file could not be read} other {# parts of the Workflow file could not be read}}. Workflows and start settings that could not be read are not listed.",
-  "trials.heading": "Trial {at} · revision {revision}",
+  "trials.heading": "Trial {at}",
   "trials.assessed": "Researcher assessment: {outcome}",
   "trials.unassessed": "Not yet assessed by the researcher",
   "trials.expect.line": "{label} · {need} · {state}",
@@ -86,7 +86,7 @@
   "trials.expect.notDeclared": "not matched: no file name declared",
   "trials.outputs.summary": "{count, plural, one {# output file} other {# output files}}: {files}{more, plural, =0 {} other { and # more}}",
   "trials.outputs.none": "No output files were produced.",
-  "trials.record.workflow": "Workflow ID: {id} · revision {revision}",
+  "trials.record.workflow": "Workflow ID: {id} · draft number {revision}",
   "trials.record.window": "Started {at} · last step {last}",
   "trials.record.calls": "{calls} tool calls · {failed} failed",
   "trials.record.models": "Models: {models}",
@@ -98,5 +98,6 @@
   "trials.record.found": "Found: {files}",
   "trials.record.missing": "No matching files: {files}",
   "trials.record.elsewhere": "Saved in another folder: {files} (expected: {expected})",
-  "trials.record.notDeclared": "No output file name was declared, so GAID did not match outputs against it."
+  "trials.record.notDeclared": "No output file name was declared, so GAID did not match outputs against it.",
+  "draft": "Draft"
 }

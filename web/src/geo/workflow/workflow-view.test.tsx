@@ -6,7 +6,7 @@ import { workflowDocText } from "./render";
 import { fixtureDraft } from "@/geo/hub/fixtures";
 
 export const doc: WorkflowDoc = {
-  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "test", title: { ko: "격자 분석" }, revision: 2, purpose: { ko: "입력 격자를 확인합니다." },
+  schemaVersion: "gaid-workflow/v1", kind: "structured", id: "test", title: { ko: "격자 분석" }, version: "0.1.1", purpose: { ko: "입력 격자를 확인합니다." },
   inputRoles: [{ id: "grid", label: { ko: "격자 표" }, formats: ["csv"], required: true }],
   choices: [{ id: "split", label: { ko: "블록 크기" }, options: ["small", "large"], optionLabels: { small: { ko: "작은 블록" }, large: { ko: "큰 블록" } } }, { id: "seed", label: { ko: "시드" } }],
   skills: [{ name: "grid", source: "bundled", role: "primary", purpose: { ko: "격자 검사" } }, { name: "extra", source: "imported", ref: "owner/repo#v1", role: "supporting" }],
