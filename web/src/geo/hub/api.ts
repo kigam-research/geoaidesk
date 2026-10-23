@@ -20,6 +20,9 @@ import type {
   SourceDocument,
   ExtractionRecord,
   Decision,
+  AttachExampleBody,
+  EditExampleBody,
+  MethodDraft,
 } from "@/geo/contracts/authoring";
 import { apiFetch } from "@/lib/projects";
 
@@ -80,6 +83,12 @@ export const hubApi = {
     post<MethodPackageRecord>(`${pid(id)}/packages`, { opId: newOpId(), draftRevision }),
   install: (id: string, rev: number, body: InstallBody) =>
     post<InstallResult>(`${pid(id)}/packages/${rev}/install`, body),
+  /** Example data of a Workflow input (gaid-workflow-example); each change returns the new draft revision. */
+  attachExample: (id: string, body: AttachExampleBody) => post<MethodDraft>(`${pid(id)}/examples`, body),
+  editExample: (id: string, roleId: string, body: EditExampleBody) =>
+    post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}`, body),
+  removeExample: (id: string, roleId: string, baseRevision: number) =>
+    post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}/remove`, { baseRevision }),
   originalUrl: (id: string, sourceId: string) =>
     `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
 };
