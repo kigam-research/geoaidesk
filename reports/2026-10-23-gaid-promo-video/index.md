@@ -4,12 +4,14 @@ date: 2026-10-23
 project: geoaidesk
 task: gaid-promo-video
 headline: 모션그래픽과 실제 GAID 화면을 섞은 90초 무음 영상을 만들었습니다. 서재, shp 지도 뷰어, GAID 허브를 실제 화면으로 보여 주고, 차트의 수치는 모두 실제 기록에서 가져왔습니다.
-review_status: pending
+review_status: superseded
 decisions: 0
 cover: figures/01-motion.png
 supersedes:
 ---
 # GAID 90초 홍보 영상 (내부 검토용)
+
+> 이 보고서는 2026-10-23-gaid-promo-video-v2로 대체되었습니다.
 
 ## 0. 한눈에
 

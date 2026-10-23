@@ -1,5 +1,5 @@
 ---
-title: GAID 홍보 영상 v2 — 연구 순환으로 다시 짠 105초 영상 (내부 검토용)
+title: GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)
 date: 2026-10-23
 project: geoaidesk
 task: gaid-promo-video-v2
@@ -9,7 +9,7 @@ decisions: 0
 cover: figures/01-motion.png
 supersedes: 2026-10-23-gaid-promo-video
 ---
-# GAID 홍보 영상 v2 — 연구 순환으로 다시 짠 105초 영상 (내부 검토용)
+# GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)
 
 ## 0. 한눈에
 
@@ -58,7 +58,7 @@ supersedes: 2026-10-23-gaid-promo-video
 
 ![시연 앞부분](figures/02-demo-a.png)
 
-그림 2. 시연 앞부분입니다(서재, 논문에서 Workflow, 허브 등록, Workflow 시작 설정). 볼 것: 앱 화면 전체가 한 크기로 보이고, 기능마다 파란 상자와 이름표가 붙습니다. 위쪽 띠가 지금 단계를 표시합니다.
+그림 2. 시연 앞부분입니다(서재 폴더, 논문에서 Workflow를 만들 때 받는 질문, 기관 허브에 등록한 Workflow, 내 프로젝트로 가져올 때의 입력 준비). 볼 것: 앱 화면 전체가 한 크기로 보이고, 기능마다 파란 상자와 이름표가 붙습니다. 위쪽 띠가 지금 단계를 표시합니다.
 
 ![시연 뒷부분](figures/03-demo-b.png)
 
@@ -93,7 +93,7 @@ supersedes: 2026-10-23-gaid-promo-video
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 새로 계산한 연구 결과가 없습니다. 지도와 그림은 논문 작업 때 만든 우선순위 존 결과를 다시 그린 것입니다.
-- 영상 출력: @@VIDEO_CHECK@@
+- 영상 출력: 최종 파일을 다시 읽었습니다. 105.00초, 3,150프레임, 1920×1080, 30fps, H.264이고 음성 트랙이 없습니다. 보고서 그림 세 장은 최종 파일에서 뽑았고, 장면 전환 구간(28초, 92초)은 정지 화면으로 겹침과 빈 화면을 확인해 고쳤습니다.
 - 실제 화면: 촬영 프레임 1,950장이 모두 2880×1620입니다. 강조 상자 31개를 각 장면 가운데 프레임에 그려 화면 요소와 맞는지 눈으로 확인했습니다. 브라우저 오류는 없었습니다.
 - 검토용 앱: 연구 전에 있던 프로젝트, 서재 항목, 허브 기록 27건의 크기와 수정 시각이 그대로입니다. 바뀐 것은 이번 연구가 만든 기록, 기존 허브 Workflow의 시험 횟수 1회 증가, 자동 동기화 기록입니다.
 - 화면 검토: 정지 화면으로 글자 크기, 겹침, 연출이 드러나는 문구를 확인하고 다시 찍었습니다.
@@ -140,9 +140,9 @@ supersedes: 2026-10-23-gaid-promo-video
 | 실제 화면 촬영 | PC74: `~/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json` (14 shots, 1,950 frames), `beat-checks/`, `study.json` |
 | 검토용 앱 기록 | 서재 항목 `li-9c9d1be4e0ca` (`ahn2026`), 폴더 `lc-0a58cae5488a`, Workflow 초안 `ap-33965983-5f2`, 기관 허브 `entry-ap-33965983-5f2` 1판, 프로젝트 `yilgarn-cd7814`, 대화 `01a166b1-256d-71f4-b5e3-53298806a36d`, 노트 `연구노트/2026-10-23-yilgarn-priority/index.md` |
 | 가져온 결과 | `~/pc71-projects/narr/mpm_nested_cv/outputs/test_evaluation_oof/baggingpu_xgboost/outer_fold_{0..4}/zone_assignments.csv` (해시 `prior-results.json`) |
-| 렌더 job | @@JOB@@ |
-| 영상 | @@VIDEO@@ |
-| 출력 기록 | @@MANIFEST@@ |
+| 렌더 job | `job-geoaidesk-gaid-promo-video-v2-1`, PC74: `~/data/geoaidesk/runs/gaid-promo-video-v2-20261023T040221.069950Z/``receipt.json`, 렌더 소스 `3212415681fe7d9130855c68060dd44d1cb56b1b` |
+| 영상 | PC74: `~/data/geoaidesk/runs/gaid-promo-video-v2-20261023T040221.069950Z/``out/gaid-promo-v2.mp4`, 9,165,953 bytes, SHA256 `82dfc3cc76a4e62662fab4fab03e6f8a0634ebc802a2d175a7fe3f440607cf63` |
+| 출력 기록 | `out/manifest.json` SHA256 `bc1b788c46af3d1694415afa91bcc91dffb23d9a016ea6a1e2fe420b7e637826` (capture.json SHA256 `4a3be64e83123389b4c98866b8d7453f5a9d93c13d278350fcd0d49d86439dcb`), `out/contact-sheet.jpg` SHA256 `1947f2e7cf3f4060f77f509dbfd61df01cc99d7e69ee1179ffb73a663283a325`, 인코딩 후 검사 PC74: `~/data/geoaidesk/work/gaid-promo-video-v2/qa-v2/probe.json` |
 | 도구 | Google Chrome, Playwright 1.63.0, imageio-ffmpeg 0.6.0 (H.264, CRF 17), Pillow 12.3.0 |
 | 아이콘·글꼴 | Lucide (Icon Wiki 20261007, ISC/MIT), Pretendard (OFL) |
 

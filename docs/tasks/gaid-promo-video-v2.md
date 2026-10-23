@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T04:03:37Z
+updated: 2026-10-23T04:10:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f4cd2575-3fed-45e7-936c-0a07c06a866f","pid":3212762,"provider":"claude","session":"66de04a7-5405-43d1-9619-f33293fd5834","start":"60956824","token":"9c6762835f05577c7bc99cd26f9e701ba9a2efc8547e7c6ac6ccccf622f1397f"}
 branch: task/gaid-promo-video-v2
 target: main
@@ -65,6 +65,9 @@ media-craft for video tools, outputs outside Git, small PNG key frames in the re
   brain (개념도), closing; `render.py` 105 s, `gaid-promo-v2.mp4`, capture schema v2, data optional. Previews
   `~/data/geoaidesk/work/gaid-promo-video-v2/preview-0{1..4}` (preview-03/04 use v1 frames as stand-ins via
   `fake-capture/`, preview only).
+- Render job 1 (source 3212415, capture.json 4a3be64e…) succeeded: `gaid-promo-v2.mp4` 105.00 s, 3,150 frames,
+  1920×1080, 30 fps, H.264, no audio (re-read, `qa-v2/probe.json`), sha256 82dfc3cc…cf63. Report figures taken from the
+  final file. Registry `gaid-promo-video-v2` (review); v1 report marked superseded.
 - capture-v2 first pass (14 shots, 1,950 frames) wired: SEG timing now comes from capture frame counts; preview-05 has
   a still per beat. Parent asked the child for retakes (M1 without "promotional" names, R2 while the agent works,
   promo-quality figure + note, N1/N2) and for beat rects re-measured against the frames (`beat-checks/`). Child noted
