@@ -14,6 +14,7 @@ import {
   liveQuestions,
   runningAttempt,
   type AuthoringProject,
+  type AuthoringThinkingLevel,
   type CheckResult,
   type MethodDraft,
   type ProjectSummary,
@@ -401,8 +402,13 @@ export function recordedAnswers(p: AuthoringProject): Record<string, DraftAnswer
     if (q.status === "open") continue;
     const d = p.decisions.find((x) => x.questionId === q.id && !x.supersededBy);
     if (!d) continue;
+    const label = q.options.find((o) => o.id === d.optionId)?.label;
     out[q.id] =
-      d.status === "deferred" ? { defer: true } : d.optionId ? { optionId: d.optionId } : { response: d.response };
+      d.status === "deferred"
+        ? { defer: true }
+        : d.optionId
+          ? { optionId: d.optionId, ...(d.response && d.response !== label ? { response: d.response } : {}) }
+          : { response: d.response };
   }
   return out;
 }
@@ -437,6 +443,7 @@ function HubProject({
   const [goal, setGoal] = useState("");
   const [target, setTarget] = useState<Target>("workflow");
   const [agentModel, setAgentModel] = useState("");
+  const [agentThinking, setAgentThinking] = useState<AuthoringThinkingLevel | "">("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [urls, setUrls] = useState<{ url: string; kind: WebSourceKind; status: "fetching" | "failed" }[]>([]);
@@ -486,6 +493,7 @@ function HubProject({
       setGoal((g) => g || p.goal || "");
       setTarget("workflow");
       setAgentModel((m) => m || p.model || "");
+      setAgentThinking((t) => t || p.thinkingLevel || "");
     } catch (e) {
       setError((e as Error).message);
     }
@@ -603,7 +611,7 @@ function HubProject({
   const title = project.title || text("home.new");
 
   // "" = the app default, sent explicitly so a project created with another model can switch back to the default.
-  const withModel = { model: agentModel };
+  const withModel = { model: agentModel, ...(agentThinking ? { thinkingLevel: agentThinking } : {}) };
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
@@ -611,6 +619,7 @@ function HubProject({
       goal: goal || undefined,
       target,
       ...(agentModel ? { model: agentModel } : {}),
+      ...(agentThinking ? { thinkingLevel: agentThinking } : {}),
     });
     return created.id;
   };
@@ -812,6 +821,8 @@ function HubProject({
           urls={urls}
           agentModel={agentModel}
           onAgentModel={setAgentModel}
+          agentThinking={agentThinking}
+          onAgentThinking={setAgentThinking}
           uploading={uploading}
           onStart={startAnalysis}
           analyzed={project.findings.length > 0}

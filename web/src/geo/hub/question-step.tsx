@@ -38,7 +38,9 @@ export function answerLabel(q: Question, a: DraftAnswer | undefined): string {
   if (!a || !isAnswered(a)) return text("questions.unanswered");
   if (a.defer) return text("questions.deferred");
   const option = q.options.find((o) => o.id === a.optionId);
-  return option?.label ?? a.response?.trim() ?? "";
+  const words = a.response?.trim() ?? "";
+  if (!option) return words;
+  return words && words !== option.label ? `${option.label} · ${words}` : option.label;
 }
 
 /** A figure of the source that a question refers to (page image and caption). */
@@ -337,7 +339,13 @@ function QuestionCard({
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  onClick={() => onChange({ optionId: option.id })}
+                  // Words in the text field stay as an addition to the chosen option; choosing it again clears the choice.
+                  onClick={() =>
+                    onChange({
+                      ...(selected ? {} : { optionId: option.id }),
+                      ...(!answer?.defer && answer?.response?.trim() ? { response: answer.response } : {}),
+                    })
+                  }
                   className={cn(
                     "flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors hover:border-primary/60",
                     selected && "border-primary bg-primary/5 ring-1 ring-primary",
@@ -370,18 +378,25 @@ function QuestionCard({
       {free && (
         <div className="flex flex-col gap-2">
           <label htmlFor={otherId} className="text-sm font-medium">
-            {choice && question.options.length ? text("questions.other") : text("questions.answer")}
+            {choice && question.options.length
+              ? text(answer?.optionId && !answer.defer ? "questions.addToOption" : "questions.other")
+              : text("questions.answer")}
           </label>
           <Textarea
             id={otherId}
             rows={2}
             placeholder={
               choice && question.options.length
-                ? text("questions.otherPlaceholder")
+                ? text(answer?.optionId && !answer.defer ? "questions.addToOptionPlaceholder" : "questions.otherPlaceholder")
                 : text("questions.answerPlaceholder")
             }
             value={answer?.defer ? "" : (answer?.response ?? "")}
-            onChange={(event) => onChange({ response: event.target.value })}
+            onChange={(event) =>
+              onChange({
+                ...(answer?.optionId && !answer.defer ? { optionId: answer.optionId } : {}),
+                response: event.target.value,
+              })
+            }
           />
         </div>
       )}

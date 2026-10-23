@@ -519,6 +519,8 @@ export interface AuthoringProject {
   target?: "skill" | "workflow" | "auto";
   /** Model ref chosen for this project; absent = the app default at call time. */
   model?: string;
+  /** Reasoning level chosen for this project's model calls; absent = medium. */
+  thinkingLevel?: AuthoringThinkingLevel;
   /** Hub topic folder the researcher filed this method under (my methods on the hub home). */
   folderId?: string;
   /** A registered hub method this draft edits (`edit`: registering adds its next revision) or was copied from (`copy`). */
@@ -635,6 +637,7 @@ export interface CreateProjectBody {
   goal?: string;
   target?: "skill" | "workflow" | "auto";
   model?: string;
+  thinkingLevel?: AuthoringThinkingLevel;
 }
 
 export interface AddUrlSourceBody {
@@ -744,8 +747,12 @@ export interface OperationBody {
   target?: "skill" | "workflow" | "auto";
   /** Override the project's model for this call. */
   model?: string;
-  thinkingLevel?: "low" | "medium" | "high" | "xhigh";
+  thinkingLevel?: AuthoringThinkingLevel;
 }
+
+/** Reasoning levels a researcher can choose for the authoring agent (the server default is medium). */
+export const AUTHORING_THINKING_LEVELS = ["low", "medium", "high", "xhigh"] as const;
+export type AuthoringThinkingLevel = (typeof AUTHORING_THINKING_LEVELS)[number];
 
 export interface AnswerItem {
   questionId: string;
