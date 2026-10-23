@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:01:43Z
+updated: 2026-10-23T06:17:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"64631b91-f6bd-4f6d-ad02-2996e80f1f79","pid":1743744,"provider":"claude","session":"5414cf7f-13a5-428a-ae32-343cc6475005","start":"62319888","token":"b8608a00206a30d58748fdcf6af8f6920102d148e2631acb42ae68af6fd45eee"}
 branch: task/gaid-note-library
 target: main
@@ -73,6 +73,30 @@ Recommended answers the user accepted:
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+
+Design (settled 2026-10-23, writer):
+- Contract (`web/src/geo/contracts/library.ts`): `LibraryItem.kind?: "paper" | "note"` (absent = paper, older items stay
+  valid) and `LibraryItem.note?: LibraryNoteRef` = { origin (this GAID instance id; projects are per machine and
+  `default` exists everywhere), originLabel (host name), projectId, projectName, noteId (folder id that
+  `getResearchNote(paths, id)` takes), path, date, status, headline?, markdown snapshot (≤ 64 KiB, `truncated`),
+  contentSha256, fileUpdatedAt, refreshedAt, citations [{ key, itemId?, locators[] }], missingAt? }. Note items are
+  `source: "gaid"`, `metadataOrigin: "note"`, `csl { type: "document", title, issued }`, no citationKey, no attachments,
+  `read.coverage: "full"`. `LibraryItemSummary.kind` + `note` { projectId, noteId, projectName, date, status, headline?,
+  local, missing?, cites }. List query `kind=paper|note` (default: all? → screen sends paper/note), counts `papers`, `notes`.
+  Note-use rows carry `libraryItemId` when the citing note is in the library.
+- Server: `server/src/geo/library/notes.ts` (instance id in `<libraryDir>/instance.json`; add = idempotent per origin +
+  project + note; refresh on library list/item read and before hub sync: re-read when the file mtime/size changed, mark
+  `missingAt` when gone; only the origin instance refreshes). Routes `POST /geo/library/notes` {projectId?, noteId},
+  `GET /geo/library/notes/candidates` (notes of local projects with their library item id). Removal deletes only the
+  library item. Notes excluded from: bibliography export, folder check, agent `library_*` tools, ORCID matching,
+  "Zotero로 보내기" (skipped reason `research-note`; single item 409). Folder membership of a note is GAID's (no Zotero write).
+- Hub sync: note items sync as ordinary items (no files); push is split into ≤ 3 MiB / ≤ 500-change requests.
+- Web: 서재 category switch 논문 / 연구 노트 with its own table, note detail (project, status, headline, cited papers,
+  snapshot, 프로젝트에서 열기, remove); `연구 노트 가져오기` dialog; note detail in the project gets `서재에 넣기`.
+  `web/src/geo/notes/open-note.ts` pending request (like hub handoff) opens the project, its notebook tab and the note;
+  paper-detail note uses open the note too. Seams: page.tsx, file-preview-panel.tsx (boundaries file).
+- Sibling C relies on `note.projectId`/`note.noteId` on item and summary and `kind=note` in the list query (told C).
+- Work packages: all tightly coupled (contract → server → web); done by this writer, no child writers.
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,

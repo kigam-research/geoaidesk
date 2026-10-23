@@ -107,7 +107,8 @@
     "attached": "Attached to {name}",
     "attachFailed": "Could not attach to the project. Try again.",
     "ownWork": "Own work selected from ORCID",
-    "orcidOrigin": "Reference details from ORCID"
+    "orcidOrigin": "Reference details from ORCID",
+    "useNoteRemote": "Research note “{title}” · project {name}"
   },
   "dialog": {
     "title": "Add paper",
@@ -357,5 +358,78 @@
     "pickTitle": "Project to open the map in",
     "notes": "Cited in {n} notes",
     "attached": "Attached to the project"
+  },
+  "category": {
+    "label": "Library item type",
+    "paper": "Papers {n}",
+    "note": "Research notes {n}"
+  },
+  "notes": {
+    "category": "Research note",
+    "add": {
+      "button": "Bring in research notes"
+    },
+    "search": "Search research notes · title, headline, project, text",
+    "empty": "No research notes in the library. Bring in research notes from your projects.",
+    "noMatch": "No research notes match.",
+    "state": "Research notes matching {shown} / total {total}",
+    "stateFolder": "Research notes matching {shown} / folder {total}",
+    "filter": {
+      "pending": "Not reviewed {n}",
+      "confirmed": "Confirmed {n}"
+    },
+    "side": "{n} research notes",
+    "date": "{year}-{month}-{day}",
+    "table": {
+      "note": "Research note",
+      "date": "Date",
+      "project": "Project",
+      "status": "Status",
+      "cites": "Cited papers",
+      "none": "—"
+    },
+    "otherPc": "Another PC ({name})",
+    "otherPcLong": "This note's project is on another PC ({name}). The library shows what it last read.",
+    "missingShort": "Note file not found",
+    "missing": "The note file was not found in its project. The library shows what it last read.",
+    "project": "Project {name}",
+    "open": {
+      "button": "Open in project"
+    },
+    "remove": {
+      "button": "Remove from library"
+    },
+    "removeConfirm": "Removes it from the library only. The note file stays in its project.",
+    "removeYes": {
+      "button": "Remove from library"
+    },
+    "removed": "Removed from the library",
+    "removeFailed": "Could not remove it from the library. Try again.",
+    "citedTitle": "Cited papers",
+    "citedNone": "This note cites no papers.",
+    "citedMissing": "Citations not found in the library: {keys}",
+    "openPaper": {
+      "action": "Show paper"
+    },
+    "content": {
+      "title": "Note text",
+      "read": "Read from the note file at {when}. See the figures in the project.",
+      "readTruncated": "Beginning of the note file as read at {when}. See the full note and figures in the project."
+    },
+    "dialog": {
+      "title": "Bring in research notes",
+      "body": "Choose research notes from the projects on this PC to put in the library. The note files stay in their projects, and the library follows the files.",
+      "bodyFolder": "Puts the chosen research notes in the library and the folder {name}. The note files stay in their projects.",
+      "loading": "Reading the projects' research notes.",
+      "failed": "Could not read the research notes. Open this again shortly.",
+      "empty": "The projects on this PC have no research notes.",
+      "inLibrary": "In the library",
+      "saving": "Putting them in the library.",
+      "save": {
+        "button": "Put {n} in library"
+      },
+      "added": "Put {n} research notes in the library",
+      "partly": "Put {n} of {total} in the library"
+    }
   }
 }

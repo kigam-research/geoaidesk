@@ -1,5 +1,7 @@
 /** Client for `/geo/library/*` (contract: web/src/geo/contracts/library.ts). */
 import type {
+  AddLibraryNoteBody,
+  AddLibraryNoteResponse,
   CitationResolution,
   CreateLibraryItemBody,
   CslItem,
@@ -14,6 +16,7 @@ import type {
   LibraryItemResponse,
   LibraryListQuery,
   LibraryListResponse,
+  LibraryNoteCandidatesResponse,
   ProjectLiterature,
   SendToZoteroResult,
   UploadedLibraryFile,
@@ -60,6 +63,15 @@ export function listLibrary(query: LibraryListQuery = {}): Promise<LibraryListRe
 export const getLibraryItem = (id: string) => call<LibraryItemResponse>(`/items/${encodeURIComponent(id)}`);
 
 export const addLibraryItem = (body: CreateLibraryItemBody) => call<LibraryItem>("/items", { method: "POST", body: JSON.stringify(body) });
+
+// --- Research notes in the library (gaid-note-library) ------------------------------------------------------------------
+/** "서재에 넣기" for a research note; the same note again returns its existing item (`created: false`). */
+export const addNoteToLibrary = (body: AddLibraryNoteBody, projectId?: string) =>
+  call<AddLibraryNoteResponse>("/notes", { method: "POST", body: JSON.stringify(body) }, projectId);
+/** Research notes of the projects on this GAID, with their library item when already brought in. */
+export const listNoteCandidates = () => call<LibraryNoteCandidatesResponse>("/notes/candidates");
+/** Removes a library item (a research note item only; the note file stays). */
+export const removeLibraryItem = (id: string) => call<null>(`/items/${encodeURIComponent(id)}`, { method: "DELETE" });
 
 export async function uploadLibraryPdf(file: File): Promise<UploadedLibraryFile> {
   const bytes = new Uint8Array(await file.arrayBuffer());

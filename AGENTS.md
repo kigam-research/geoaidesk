@@ -187,6 +187,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
   and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+  Research notes in 서재 (gaid-note-library, user decision 2026-10-23: GAID library only, hub-synced, no Zotero writes): a note
+  item (`LibraryItem.kind: "note"`, `note: LibraryNoteRef`; `server/src/geo/library/notes.ts`) mirrors one
+  `연구노트/<id>/index.md` (title, date, status, headline, citations resolved to library papers, ≤ 64 KiB text snapshot); the
+  file stays the master and the GAID instance holding the project (`<library>/instance.json`) refreshes the item on library
+  reads and before hub sync (missing file → `missingAt`). Routes `POST /geo/library/notes`, `GET /geo/library/notes/candidates`,
+  list `?kind=note|paper`. Notes are not references: no citation key, not exported, not in folder checks, citation scope,
+  agent `library_*` tools or ORCID matching, never sent to Zotero. Screens: 서재 논문 / 정리 노트 switch
+  (`web/src/geo/library/note-items.tsx`), 정리 노트 가져오기, note detail 더 보기 → 서재에 넣기; 프로젝트에서 열기 goes through
+  `web/src/geo/notes/open-note.ts` (pending request taken by that project's workspace, which opens the notebook tab on the note).
 - ORCID (gaid-orcid phase 1, user decision 2026-10-22): the researcher types an ORCID iD in 서재 (`<library>/orcid.json`, local,
   `authenticated: false`, shown with ORCID's unauthenticated iD icon and "(인증 안 됨)" per ORCID display guidelines) and imports
   public works read anonymously from `https://pub.orcid.org/v3.0` (`server/src/geo/orcid/`, routes `/geo/orcid*` in
