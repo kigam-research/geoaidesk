@@ -322,7 +322,9 @@
     "environment": "Run environment",
     "openProject": "Open the project",
     "extraPackages": "Python libraries outside the prepared environment: {packages}. The AI agent installs them during analysis following the skill instructions. If installation is blocked, that step stops.",
-    "optionalPackage": "{name} (optional step)"
+    "optionalPackage": "{name} (optional step)",
+    "example": "Without an uploaded file, the example data is used: {title}",
+    "exampleAlso": "The start settings also offer the example data: {title}"
   },
   "register": {
     "open": "Preview hub page",

@@ -173,3 +173,15 @@ export function examplePath(method: string, roleId: string, example: WorkflowInp
 export function isExamplePath(path: string): boolean {
   return path.startsWith("user_data/examples/");
 }
+
+/** Bytes as a short size (KB/MB/GB, base 1024) for screens and the 지침. */
+export function sizeText(bytes: number): string {
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${unit === 0 ? value : value.toFixed(value < 10 ? 1 : 0)} ${units[unit]}`;
+}
