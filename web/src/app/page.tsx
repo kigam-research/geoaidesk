@@ -329,6 +329,7 @@ export default function HomePage() {
           catalogueId={hub.catalogueId ?? null}
           skills={hub.skills}
           feeds={hub.feeds}
+          removed={hub.removed}
           skillId={hub.skillId}
           onNavigate={(next) => setHub(next)}
           onOpenProjects={() => {

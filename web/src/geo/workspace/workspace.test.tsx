@@ -194,7 +194,7 @@ describe("task catalogue and setup", () => {
     catalogue(); await userEvent.click(await screen.findByRole("button", { name: "허브에서 Workflow 가져오기" })); const dialog = await screen.findByRole("dialog");
     await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 저장한 시작 설정 파일"), { target: { files: [recipeFile({})] } });
-    expect(await within(dialog).findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 저장한 시작 설정입니다: 0.1.0");
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent("다른 카탈로그 version의 저장한 시작 설정입니다: 0.1.0");
     expect(within(dialog).getByRole("button", { name: "저장한 시작 설정 저장" })).toBeDisabled(); expect(within(dialog).getByRole("button", { name: "저장하지 않고 열기" })).toBeDisabled();
     expect(apiFetch).toHaveBeenCalledWith("/geo/recipes/check", expect.objectContaining({ body: JSON.stringify({ recipe: {} }) }), "p1");
   });
@@ -239,7 +239,7 @@ describe("task catalogue and setup", () => {
     catalogue(); const row = await screen.findByRole("button", { name: /^옛 레시피/ });
     expect(within(row).getByText("사용 불가")).toBeInTheDocument(); expect(screen.getByRole("heading", { name: /^논문·원고/ })).toBeInTheDocument();
     await userEvent.click(row); const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByRole("alert")).toHaveTextContent("다른 카탈로그 판의 저장한 시작 설정입니다: 0.1.0");
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("다른 카탈로그 version의 저장한 시작 설정입니다: 0.1.0");
   });
 });
 
@@ -261,7 +261,7 @@ describe("file actions and recipes", () => {
   });
   it("reads the open recipe, shows issues, then prefills editable choices without starting", async () => {
     suggestions = []; render(<GeoFileActions path="recipe.geo-start.json" projectId="p1" />);
-    await userEvent.click(await screen.findByRole("button", { name: "시작 설정 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 판의 저장한 시작 설정입니다");
+    await userEvent.click(await screen.findByRole("button", { name: "시작 설정 가져오기" })); expect(await screen.findByRole("alert")).toHaveTextContent("다른 카탈로그 version의 저장한 시작 설정입니다");
     recipeResult = { ok: true, issues: [], setup: { workflowId: "well-qc", choices: { depth: "MD", units: "m" }, unresolvedChoices: ["units"], skillIds: ["geo/well"], exampleId: null } };
     await userEvent.click(screen.getByRole("button", { name: "시작 설정 가져오기" })); const dialog = await screen.findByRole("dialog");
     // An unresolved choice stays open even with a value in the recipe.

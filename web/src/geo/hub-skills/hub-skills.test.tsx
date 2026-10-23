@@ -37,13 +37,13 @@ describe("skill detail", () => {
     render(<SkillDetail id="table-check" projects={[]} onBack={vi.fn()} onWorkflow={vi.fn()} />);
     await screen.findByRole("heading", { name: "표 자료 확인" });
     expect(screen.getByRole("heading", { name: "볼 곳" })).toBeInTheDocument();
-    fireEvent.click(screen.getByText("판 기록과 검토"));
+    fireEvent.click(screen.getByText("version 기록과 검토"));
     expect(screen.getByText(/이연구/)).toBeInTheDocument();
     expect(screen.getAllByText(/이름 확인 안 됨/).length).toBeGreaterThan(0);
     expect(screen.getByRole("option", { name: "확인함" })).toBeInTheDocument();
     fireEvent.click(screen.getByText("파일 3개")); fireEvent.click(screen.getByRole("button", { name: "scripts/check.py" }));
     await screen.findByText("print('read only')");
-    const old = screen.getByRole("button", { name: "1판" }); fireEvent.click(old);
+    const old = screen.getByRole("button", { name: "version 1" }); fireEvent.click(old);
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith(expect.stringContaining("?revision=1"), expect.anything()));
   });
   it("does not offer checking the registrant’s own revision", async () => {
@@ -52,7 +52,7 @@ describe("skill detail", () => {
     await screen.findByRole("heading", { name: "table-check" });
     fireEvent.click(screen.getByText("검토 기록 남기기"));
     expect(screen.queryByRole("option", { name: "확인함" })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("textbox", { name: "살펴본 내용 또는 바뀐 점" }), { target: { value: "대신 쓸 판을 정했습니다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "살펴본 내용 또는 바뀐 점" }), { target: { value: "대신 쓸 version을 정했습니다." } });
     fireEvent.click(screen.getByRole("button", { name: "검토 기록 저장" }));
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith(expect.stringContaining("/revisions/2/review"), expect.objectContaining({ body: expect.stringContaining('"state":"deprecated"') })));
   });
@@ -99,7 +99,7 @@ describe("registration", () => {
     fireEvent.change(screen.getByRole("combobox", { name: "설치할 프로젝트" }), { target: { value: "p1" } });
     await screen.findByRole("option", { name: "table-check" }); fireEvent.change(screen.getByRole("combobox", { name: "스킬 이름" }), { target: { value: "table-check" } });
     fireEvent.click(screen.getByRole("button", { name: "가져올 내용 확인" }));
-    await screen.findByText("같은 이름이 있어 3판으로 올립니다.");
+    await screen.findByText("같은 이름이 있어 version 3으로 올립니다.");
     expect(apiFetch).not.toHaveBeenCalledWith("/geo/hub/skills", expect.anything());
     fireEvent.click(screen.getByRole("button", { name: "다음 단계" }));
     fireEvent.change(screen.getByRole("textbox", { name: "살펴본 내용 또는 바뀐 점" }), { target: { value: "단위 확인 보강" } });
@@ -116,9 +116,9 @@ describe("registration", () => {
     fireEvent.click(screen.getByRole("button", { name: "다음 단계" }));
     await screen.findByRole("option", { name: "표 연구" });
     fireEvent.change(screen.getByRole("combobox", { name: "허브 Workflow" }), { target: { value: "table-analysis" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "판 기록과 검토" }), { target: { value: "2" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "version 기록과 검토" }), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: "가져올 내용 확인" }));
-    await screen.findByText("Workflow에서 꺼냄: 표 연구 2판");
+    await screen.findByText("Workflow에서 꺼냄: 표 연구 version 0.1.1");
     expect(apiFetch).toHaveBeenLastCalledWith("/geo/hub/skills/preview", expect.objectContaining({ body: JSON.stringify({ from: "workflow", entryId: "table-analysis", revision: 2 }) }));
   });
   it("offers source skill choices and previews again with the selected name", async () => {

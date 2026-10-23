@@ -28,7 +28,7 @@
   "methodsError": "Workflow 목록을 읽지 못했습니다: {detail}",
   "methodPreview": "파일 묶음 미리보기",
   "methodCreated": "생성 시각: {at}",
-  "methodDraft": "Workflow: {id} · {revision}판 · {lifecycle}",
+  "methodDraft": "Workflow: {id} · 초안",
   "chooseFile": "파일 묶음 파일 선택",
   "noFile": "선택한 파일 없음",
   "workflowSkill": "「{title}」 Workflow에 딸린 스킬 · {version, select, draft {초안} other {version {version}}}",
@@ -47,7 +47,7 @@
   "previewRun": "설치만으로 실행하지 않습니다. 입력과 조건을 정하고 시작하면 AI agent가 아래 지시문과 스킬 지침을 따라 분석합니다.",
   "previewPrompt": "시작할 때 보낼 지시문",
   "previewRetry": "미리보기 다시 읽기",
-  "previewHubSkill": "{name} {revision}판",
+  "previewHubSkill": "{name} version {revision}",
   "previewHubSkills": "Workflow가 쓰는 허브 스킬도 함께 설치합니다: {names}",
   "previewHubBlocked": "함께 설치하지 못하는 허브 스킬: {names}. 설치한 뒤 준비 확인에서 이유를 볼 수 있습니다."
 }

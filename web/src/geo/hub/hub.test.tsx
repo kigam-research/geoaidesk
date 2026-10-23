@@ -159,6 +159,6 @@ describe("GAID hub registration", () => {
     const submit = screen.getByRole("button", { name: "허브에 등록" });
     expect((submit as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(submit);
-    await vi.waitFor(() => expect(onRegister).toHaveBeenCalledWith("general", ""));
+    await vi.waitFor(() => expect(onRegister).toHaveBeenCalledWith("general", "", "patch"));
   });
 });

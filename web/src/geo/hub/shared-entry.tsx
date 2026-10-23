@@ -3,6 +3,8 @@
  * A registered method in the shared GAID hub (`#hub/e/<id>`): details, method flow, stars and comments, and "use in my
  * research" (install into one of my projects, prepare its inputs, open its start settings).
  */
+import { hubVersionOf, hubRefVersion } from "@/geo/contracts/hub-version";
+import { RemoveWorkflowDialog } from "./removed-workflows";
 import { ChevronLeftIcon } from "lucide-react";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -95,7 +97,9 @@ export function SharedEntryScreen({
   onOpenDraft,
   onOpenEntry,
   exportAction,
+  onRemoved,
 }: {
+  onRemoved?: () => void;
   exportAction?: (detail: HubEntryDetail) => ReactNode;
   /** Back to the hub list. */
   onBack?: () => void;
@@ -113,6 +117,8 @@ export function SharedEntryScreen({
   const [useOpen, setUseOpen] = useState(false);
   const [opening, setOpening] = useState(false);
   const named = useNamedAction();
+  const identity = useHubIdentity();
+  const [removeOpen, setRemoveOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -173,6 +179,7 @@ export function SharedEntryScreen({
           authorOrcid: e.authorOrcid,
           folder: folders[e.folderId] ?? null,
           revision: e.latestRevision,
+          version: hubVersionOf(e),
           registeredAt: latest ? text("shared.registeredAt", { when: when(latest.registeredAt) }) : "",
           kind: e.kind,
           implementation: e.implementation,
@@ -184,10 +191,11 @@ export function SharedEntryScreen({
           imageThemed: Boolean(e.coverThemed),
           basedOn:
             e.basedOn && onOpenEntry
-              ? { ...e.basedOn, onOpen: () => onOpenEntry(e.basedOn!.entryId) }
+              ? { ...e.basedOn, version: hubRefVersion(e.basedOn), onOpen: () => onOpenEntry(e.basedOn!.entryId) }
               : undefined,
           revisions: e.revisions.map((r) => ({
             revision: r.revision,
+            version: hubVersionOf(e, r.revision),
             at: when(r.registeredAt),
             by: r.registeredBy,
             note: r.note,
@@ -198,6 +206,7 @@ export function SharedEntryScreen({
             at: when(c.at),
             body: c.body,
             revision: c.revision,
+            version: hubVersionOf(e, c.revision),
           })),
         }}
         profile={detail.profile}
@@ -220,6 +229,7 @@ export function SharedEntryScreen({
           })
         }
         onTry={() => named.run(() => setUseOpen(true))}
+        onRemove={(e.mine || identity?.admin) ? () => setRemoveOpen(true) : undefined}
         onEdit={
           onOpenDraft
             ? {
@@ -239,6 +249,7 @@ export function SharedEntryScreen({
             : undefined
         }
       />
+      <RemoveWorkflowDialog open={removeOpen} onOpenChange={setRemoveOpen} entry={e} local={!identity?.configured} onRemoved={() => { onRemoved?.(); if (!onRemoved) onBack?.(); }} />
       <UseInProjectDialog
         open={useOpen}
         onOpenChange={setUseOpen}

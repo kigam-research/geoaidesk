@@ -28,7 +28,7 @@ import { PROVIDER_AUTH_CHANGED_EVENT } from "@/lib/use-provider-auth";
 import { CAPABILITIES_CHANGED_EVENT } from "@/lib/capability-events";
 import { HUB_CONNECTION_CHANGED } from "@/geo/hub-server/api";
 
-import { fileBase64, hubApi, newOpId } from "./api";
+import { fileBase64, hubApi, newOpId, HubApiError } from "./api";
 import { DraftStep, TrialCard } from "./draft-step";
 import { AgentRecordDialog, FeedbackDialog, FilesDialog, IssuesDialog, SourcePageDialog } from "./hub-dialogs";
 import { HubHome } from "./hub-home";
@@ -54,6 +54,8 @@ import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
 import { SkillShelf } from "@/geo/hub-skills/shelf";
 import { SkillDetail } from "@/geo/hub-skills/detail";
 import { RegisterSkill } from "@/geo/hub-skills/register";
+import { RemovedWorkflows } from "./removed-workflows";
+import { hubVersionOf, hubRefVersion } from "@/geo/contracts/hub-version";
 import { FeedScreen } from "@/geo/hub-feeds/feeds";
 
 const text = geoText("hub");
@@ -64,6 +66,7 @@ export function GaidHub({
   catalogueId = null,
   skills = false,
   feeds = false,
+  removed = false,
   skillId = null,
   onNavigate,
   onOpenProjects,
@@ -77,6 +80,7 @@ export function GaidHub({
   skills?: boolean;
   /** 자료 소식 (`#hub/feeds`). */
   feeds?: boolean;
+  removed?: boolean;
   skillId?: string | null;
   onNavigate: (next: HubLocation) => void;
   onOpenProjects: () => void;
@@ -98,24 +102,26 @@ export function GaidHub({
   const hubProjects = projects.filter((p) => !p.archived).map((p) => ({ id: p.id, name: p.name }));
   const [registerSkill, setRegisterSkill] = useState(false);
   const skillPlace = skills || !!skillId;
-  const listShown = !feeds && !skillPlace && !entryId && !catalogueId && authoringId === null;
+  const identity = useHubIdentity();
+  const listShown = !removed && !feeds && !skillPlace && !entryId && !catalogueId && authoringId === null;
   const index = useHubIndex(listShown);
   // The list the hub shows; on a detail screen, the list it was opened from (a registered Workflow opened by a link
   // belongs to 등록된 Workflow).
-  const [view, setView] = useState<HubView>(() => (feeds ? { kind: "feeds" } : skillPlace ? { kind: "skills" } : entryId ? { kind: "registry", folder: "all" } : { kind: "home" }));
+  const [view, setView] = useState<HubView>(() => (removed ? { kind: "removed" } : feeds ? { kind: "feeds" } : skillPlace ? { kind: "skills" } : entryId ? { kind: "registry", folder: "all" } : { kind: "home" }));
   const [mineFolder, setMineFolder] = useState("all");
   const [newFolder, setNewFolder] = useState(false);
   const named = useNamedAction();
   const [collapsed, toggleCollapsed] = useHubSidebarCollapsed();
   useShortcut("sidebar", toggleCollapsed);
   // A Workflow being made is one of mine; built-in Workflows are shown under 추천.
-  const marked: HubView = feeds ? { kind: "feeds" } : skillPlace ? { kind: "skills" } : authoringId !== null ? { kind: "mine" } : catalogueId ? { kind: "home" } : view;
+  const marked: HubView = removed ? { kind: "removed" } : feeds ? { kind: "feeds" } : skillPlace ? { kind: "skills" } : authoringId !== null ? { kind: "mine" } : catalogueId ? { kind: "home" } : view;
   const openList = (next: HubView) => {
     setRegisterSkill(false);
     setView(next);
+    if (next.kind === "removed") { onNavigate({ open: true, projectId: null, removed: true }); return; }
     if (next.kind === "skills") { onNavigate({ open: true, projectId: null, skills: true }); return; }
     if (next.kind === "feeds") { onNavigate({ open: true, projectId: null, feeds: true }); return; }
-    if (!listShown) onNavigate({ open: true, projectId: null });
+    if (!listShown || removed) onNavigate({ open: true, projectId: null });
   };
   const toList = () => onNavigate({ open: true, projectId: null, ...(view.kind === "skills" ? { skills: true } : {}) });
   return (
@@ -133,12 +139,16 @@ export function GaidHub({
           folders={index.folders.map((f) => ({ id: f.id, name: f.name, count: f.entries }))}
           registryTotal={index.folders.reduce((n, f) => n + f.entries, 0)}
           mineCount={index.mine.length}
+          removedCount={index.removed.length}
+          showRemoved={Boolean(identity?.admin) || index.removed.length > 0}
           collapsed={collapsed}
           onView={openList}
           onNewFolder={() => named.run(() => setNewFolder(true))}
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {feeds ? (
+          {removed ? (
+            <RemovedWorkflows loading={index.removedLoading} error={index.removedError} entries={index.removed} onRestored={index.reloadShared} onBack={() => openList({ kind: "registry", folder: "all" })} />
+          ) : feeds ? (
             <FeedScreen projects={hubProjects} />
           ) : skillPlace ? (
             skillId ? <SkillDetail key={skillId} id={skillId} projects={hubProjects} onCreateProject={(name) => create({ name })} onBack={() => onNavigate({ open: true, projectId: null, skills: true })} onWorkflow={(entryId) => onNavigate({ open: true, projectId: null, entryId })} />
@@ -150,6 +160,7 @@ export function GaidHub({
               entryId={entryId}
               projects={hubProjects}
               onBack={toList}
+              onRemoved={() => { void index.reloadShared(); openList({ kind: "registry", folder: "all" }); }}
               onOpenDraft={(id) => onNavigate({ open: true, projectId: id })}
               onOpenEntry={(id) => onNavigate({ open: true, projectId: null, entryId: id })}
               onOpenSetup={(projectId, methodKey, workflowId, recipeId) => {
@@ -163,7 +174,7 @@ export function GaidHub({
           ) : authoringId === null ? (
             <HubList
               index={index}
-              view={view.kind === "skills" || view.kind === "feeds" ? { kind: "home" } : view}
+              view={view.kind === "skills" || view.kind === "feeds" || view.kind === "removed" ? { kind: "home" } : view}
               onView={setView}
               mineFolder={mineFolder}
               onMineFolder={setMineFolder}
@@ -210,6 +221,9 @@ interface HubIndex {
   /** My methods on a shared institute GAID: those started under my hub name, plus older ones without a recorded name. */
   mine: ProjectSummary[];
   entries: HubEntry[];
+  removed: HubEntry[];
+  removedLoading: boolean;
+  removedError: string | null;
   folders: (HubFolder & { entries: number })[];
   cards: HubRecommendation[];
   loading: boolean;
@@ -225,13 +239,19 @@ function useHubIndex(listShown: boolean): HubIndex {
   const identity = useHubIdentity();
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [entries, setEntries] = useState<HubEntry[]>([]);
+  const [removed, setRemoved] = useState<HubEntry[]>([]);
+  const [removedLoading, setRemovedLoading] = useState(true);
+  const [removedError, setRemovedError] = useState<string | null>(null);
   const [folders, setFolders] = useState<(HubFolder & { entries: number })[]>([]);
   const [cards, setCards] = useState<HubRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const reloadShared = useCallback(async () => {
     // The shared hub may be unavailable (older server): my methods still list.
-    const [f, e, r] = await Promise.allSettled([sharedHub.folders(), sharedHub.entries(), sharedHub.recommended()]);
+    const [f, e, r, d] = await Promise.allSettled([sharedHub.folders(), sharedHub.entries(), sharedHub.recommended(), sharedHub.removed()]);
+    if (d.status === "fulfilled") { setRemoved(d.value.entries); setRemovedError(null); }
+    else { setRemoved([]); setRemovedError(String(d.reason)); }
+    setRemovedLoading(false);
     if (f.status === "fulfilled") setFolders(f.value.folders);
     if (e.status === "fulfilled") setEntries(e.value.entries);
     if (r.status === "fulfilled") setCards(r.value.cards);
@@ -257,9 +277,10 @@ function useHubIndex(listShown: boolean): HubIndex {
       window.clearInterval(timer);
     };
   }, [listShown, reloadShared]);
+  useEffect(() => { void reloadShared(); }, [identity, reloadShared]);
   const me = identity?.account ? identity.name : hubUserName();
   const mine = useMemo(() => (me ? projects.filter((p) => !p.author || p.author === me) : projects), [projects, me]);
-  return { mine, entries, folders, cards, loading, error, reloadShared };
+  return { mine, entries, removed, removedLoading, removedError, folders, cards, loading, error, reloadShared };
 }
 
 function HubList({
@@ -321,7 +342,7 @@ function HubList({
           mine.flatMap((p) => {
             const e = entryOf(p);
             return e
-              ? [[p.id, { entryId: e.id, stars: e.stars, comments: e.comments, revision: e.latestRevision }]]
+              ? [[p.id, { entryId: e.id, stars: e.stars, comments: e.comments, version: hubVersionOf(e) }]]
               : [];
           }),
         )}
@@ -451,22 +472,28 @@ function HubProject({
   const [feedbackPrefill, setFeedbackPrefill] = useState("");
   const [registerOpen, setRegisterOpen] = useState(false);
   const [hubFolders, setHubFolders] = useState<HubFolder[]>([]);
+  const [registrationEntry, setRegistrationEntry] = useState<HubEntry | null>(null);
+  const [registrationLoading, setRegistrationLoading] = useState(true);
+  const [registrationFailed, setRegistrationFailed] = useState(false);
   const [entryFolder, setEntryFolder] = useState<string | undefined>(undefined);
   const named = useNamedAction();
   const editedEntry = project?.hubEntry?.mode === "edit" ? project.hubEntry.entryId : null;
   useEffect(() => {
-    if (!registerOpen) return;
-    void sharedHub
-      .folders()
-      .then((r) => setHubFolders(r.folders))
-      .catch(() => setHubFolders([]));
-    // The next revision of an edited entry stays in its folder unless the researcher picks another.
-    if (editedEntry)
-      void sharedHub
-        .entry(editedEntry)
-        .then((d) => setEntryFolder(d.entry.folderId))
-        .catch(() => setEntryFolder(undefined));
-  }, [registerOpen, editedEntry]);
+    let alive = true;
+    if (registerOpen) void sharedHub.folders().then((r) => { if (alive) setHubFolders(r.folders); }).catch(() => { if (alive) setHubFolders([]); });
+    setRegistrationLoading(true);
+    setRegistrationFailed(false);
+    // First-authored drafts have no edit link, but may already have a registered entry.
+    void sharedHub.entry(editedEntry ?? `entry-${id}`).then((d) => {
+      if (alive) { setEntryFolder(d.entry.folderId); setRegistrationEntry(d.entry); }
+    }).catch((e) => {
+      if (alive) {
+        setEntryFolder(undefined); setRegistrationEntry(null);
+        setRegistrationFailed(Boolean(editedEntry) || !(e instanceof HubApiError && e.status === 404));
+      }
+    }).finally(() => { if (alive) setRegistrationLoading(false); });
+    return () => { alive = false; };
+  }, [id, registerOpen, editedEntry]);
   const [page, setPage] = useState<{ sourceId: string; page: number } | null>(null);
   const [trialProject, setTrialProject] = useState<string>("");
   const [consent, setConsent] = useState(false);
@@ -839,6 +866,7 @@ function HubProject({
     const issues = check ? check.findings.filter((f) => f.level === "error").length : null;
     body = (
       <DraftStep
+        registered={registrationEntry ? hubVersionOf(registrationEntry) : null}
         draft={draft}
         authoringId={id}
         visuals={pictures.steps}
@@ -942,8 +970,10 @@ function HubProject({
         <div className="min-h-0 flex-1">{body}</div>
       </main>
       <RegisterDialog
-        key={entryFolder ?? "folder"}
         initialFolder={entryFolder}
+        currentVersion={registrationEntry ? hubVersionOf(registrationEntry) : null}
+        versionPending={registrationLoading}
+        versionFailed={registrationFailed}
         open={registerOpen}
         onOpenChange={setRegisterOpen}
         folders={hubFolders}
@@ -952,13 +982,14 @@ function HubProject({
           setHubFolders((cur) => [...cur, folder]);
           return folder.id;
         }}
-        onRegister={async (folderId, note) => {
+        onRegister={async (folderId, note, bump) => {
           try {
             const entry = await sharedHub.register({
               authoringProjectId: id,
               draftRevision: draft?.revision,
               folderId,
               note,
+              bump,
             });
             onRegistered(entry.id);
           } catch (e) {
@@ -1019,8 +1050,8 @@ function EditingNotice({ link }: { link: NonNullable<AuthoringProject["hubEntry"
     <p className="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
       <PencilIcon className="size-4 shrink-0 text-primary" aria-hidden />
       {link.mode === "edit"
-        ? text("editing.edit", { revision: link.revision, next: link.revision + 1 })
-        : text("editing.copy", { author: link.author, title: link.title, revision: link.revision })}
+        ? text("editing.edit", { version: hubRefVersion(link) ?? "" })
+        : text("editing.copy", { author: link.author, title: link.title, version: hubRefVersion(link) ?? "" })}
     </p>
   );
 }

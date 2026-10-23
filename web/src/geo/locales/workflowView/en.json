@@ -41,13 +41,13 @@
     "button": "Import from GitHub or elsewhere"
   },
   "importRef": "Source to import: {ref}",
-  "hubRevision": "revision {revision}",
+  "hubRevision": "version {revision}",
   "hubOpen": "Open in hub",
   "hubState": {
     "missing": "Not installed yet.",
-    "other-revision": "Another revision is installed. This Workflow uses its pinned revision.",
+    "other-revision": "Another version is installed. This Workflow uses its pinned version.",
     "edited": "An edited copy is installed in this project.",
     "conflict": "Another skill with the same name is installed, so this one cannot be installed.",
-    "suspended": "This revision is suspended in the hub. Tell the Workflow author."
+    "suspended": "This version is suspended in the hub. Tell the Workflow author."
   }
 }
