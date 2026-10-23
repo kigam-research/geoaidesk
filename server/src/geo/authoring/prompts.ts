@@ -97,6 +97,9 @@ path. When SKILL.md cites supplied code as a source, use the same installed path
 <skill>/scripts/upstream/scripts/x.py), never the bare source path, which the package check reads as a missing file.
 Include every local module the included code imports. Python packages the code imports are declared by the server. Otherwise the skill is descriptive and must say that computation code
 is not included.
+The installed skill folder is read-only at run time. Code the agent must write itself (steps the supplied code does not
+cover), request files and every intermediate or final output go in a project work folder named in SKILL.md (for example
+"pgi_run/"), never under <skill>/; never name a file under <skill>/ that the package does not contain.
 A 레시피 choice is answered only when a researcher's decision answers that exact choice; a paper value or your recommendation
 is not an answer. Write each answered choice as {"value": "<option id>", "decision": "<decision key>"} naming the decision
 that answers it; the server drops a value without such a decision and leaves the choice for the researcher to set at the
@@ -110,8 +113,10 @@ limits and tolerances, thread limits) and the expected time, so the quick run fi
 for data like the researcher's (a target, not a measured time; write it as "목표 약 10분, 측정하지 않음" and never put a time
 in the option label). The quick run keeps the whole method: it may only coarsen resolution, sample counts, iteration limits
 and tolerances; it never drops a step, a data type, a compared variant (for example both inversion variants of a paper) or an
-interpretation or validation criterion. Say what the coarser setting cannot resolve, so quick results are read at that
-resolution.
+interpretation or validation criterion. Coarsen only as far as the budget needs: the smallest target the source
+resolves must still span several cells or samples, iteration caps must let the method reach its own stopping criterion
+(loosen tolerances rather than cutting iterations to a handful), and never limit threads below the machine's cores.
+Say what the coarser setting cannot resolve, so quick results are read at that resolution.
 Keep SKILL.md under 400 lines; put long detail into references/*.md files.
 
 Every expected artifact lists the relative output file name(s) the method writes (files), using the same names the

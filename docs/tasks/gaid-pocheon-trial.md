@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:32:58Z
+updated: 2026-10-23T06:51:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -137,6 +137,27 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   one at the boreholes"). — D (optional) — open.
 - F12 — trial-scale question text on main says quick results are "흐름 확인용" (flow check only), which contradicts the
   user's bar (coarse but paper-level, interpretable). — D — fixed with F3 (question reason/hint reworded).
+- F13 — first draft (GPT-6.1 Sol high, accepted after one repair; 8 steps covering preprocessing, GMM, PGI-full and
+  PGI-none, sensitivity thresholds, body separation, volume/depth/overlap against a reference body, report) — its
+  "빠른 시험 설정" caps the quick run at 300 data, 2,000 active cells, 5 iterations, CG 10, 1 thread and says quick results
+  are not for ore-body interpretation. 2,000 cells cannot resolve a 0.5 Mm3 body (~30 cells of 25 m); the writer's
+  reference ran 82,807 active cells, 620 data, both variants in 220 s. Cause: DRAFT_SYSTEM asked for "about 10 minutes"
+  with examples of what to cut but no floor (resolution of the target, convergence, threads), and main's text says
+  quick results only check the flow. — D — fixed in DRAFT_SYSTEM (with F3); in the trial the researcher asks for a
+  revision.
+- F14 — first draft — 17 Workflow choices, 10 left for the start ("input-route", "preprocessing-settings",
+  "uncertainty-policy", "gmm-weights", "mesh-design", "field-mode", "inversion-controls", "sensitivity-cutoffs",
+  "boundary-policy", "body-rules") and approval gates in four steps ("승인받은 뒤 계산"). Paper values are offered as
+  options but, by the authoring rule, never as defaults. — observe in the start settings and the run before deciding.
+- F15 — first response referenced `scripts/run_pgi_workflow.py`, a script the authoring model cannot create; the repair
+  removed it. The supplied ESM1 covers mesh → PGI only, so preprocessing and interpretation code is written by the run
+  agent. — observe in the run.
+- F16 — first draft SKILL.md tells the run agent to create `<skill>/scripts/run_pgi_workflow.py`, `<skill>/work/request.json`
+  and write results under `<skill>/outputs/`. The package check rejects the missing script (error; "프로젝트에 설치하기"
+  disabled although the draft was accepted after repair), and writing into the installed skill folder mixes results
+  with the method. Cause: DRAFT_SYSTEM says to write code paths "in full from <skill>/" and nothing about where run-time
+  files go. — D — fixed (DRAFT_SYSTEM: skill folder read-only; agent-written code and outputs in a named project work
+  folder). Researcher feedback in the trial asked for `pgi_run/`.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
