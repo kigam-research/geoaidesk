@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-23T08:04:00Z
+status: active
+updated: 2026-10-23T08:16:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"18d7f503-0e2f-44c7-a932-c7055bd2c385","pid":2512963,"provider":"claude","session":"44724507-b03c-4f81-8a86-8ba8fb6c63a4","start":"62748122","token":"95149b68f88f25b2cc88125567a9d482dea12e9e0e8824d13a7f22052038e299"}
 branch: task/gaid-authoring-evidence-view
 target: main
