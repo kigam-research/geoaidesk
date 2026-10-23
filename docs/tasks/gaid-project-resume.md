@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T03:03:40Z
+updated: 2026-10-23T03:22:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24ac6438-9d3c-40bf-aed3-558f9bb47f6f","pid":3710210,"provider":"claude","session":"5e080e46-115a-40f8-bbc8-5648ad5fea05","start":"61251758","token":"54f15532caa6f0bb44aa2320e3a60c342b9ddac56953f1cfc70157047cf250d7"}
 branch: task/gaid-project-resume
 target: main
@@ -49,11 +49,31 @@ reopens the project in its last state. The user answered (verbatim):
 - Outside check: none (not a research goal).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented (single writer, no child units; the change is one tightly coupled server+client seam):
+- Server: `server/src/geo/workspace/workspace-state.ts` (store, `.kady/geo/workspace-state.json`, atomic write, revision,
+  malformed file → 409 never rewritten, 4 MiB bound), `server/src/geo/routes/workspace-state.ts` (`GET/PUT /geo/workspace-state`),
+  contract `web/src/geo/contracts/workspace-state.ts`. Scoping/auth come from the app's existing hooks (X-Project-Id; unknown
+  project → PUT 404, GET falls back to default and the reply's `projectId` shows it).
+- Client: `web/src/lib/workspace-persistence.ts` (`loadServerProjectWorkspaceState`, dirty-checked `queueServerSave`,
+  `flushServerProjectWorkspaceState` keepalive on page hide), `web/src/app/page.tsx` (mount a project's workspace after its
+  server state was read). ProjectSwitcher and mounted workspaces unchanged. No visible text changed.
+- Verified: `server/test/geo-workspace-state.test.ts` (6) and `web/src/lib/workspace-persistence.test.ts` (14) pass; web and
+  server typecheck clean. Real app (own instance, ports 13610/18610, data `~/data/geoaidesk/work/gaid-project-resume/`):
+  browser 1 opened a project, a file and a second chat tab with draft text; a fresh browser 2 opened the same project with
+  both tabs, the active tab, the draft and the open file restored; after browser 2 changed the active tab, closing the stale
+  browser 1 did not overwrite it (revision unchanged); ProjectSwitcher Alpha → Beta → Alpha kept the Alpha workspace mounted.
+- `scripts/check` passed (exit 0): server vitest 2255 passed / 8 skipped, web vitest 1236 passed, GAID checks and production smoke PASS.
 ## Next steps
-1. (the next session's first action)
+1. None in this unit; the hub updates the review app after integration.
 ## Failed approaches
 ## Notes and decisions
+- Two browsers on one project: the last save wins. A browser sends a save only when its state differs from what it last read
+  from or wrote to the server, so merely having the project open (or closing that browser) never overwrites a newer save.
+  An already-mounted workspace is not refreshed from the server while open (no live sync).
+- Browser-local: composer image attachments and queued-message images (IndexedDB blobs; the server record names them by key).
+  Another browser drops attachments it lacks and drops a queued message whose images are missing rather than sending it
+  without them. The shell state (which projects were opened in this browser) stays per browser.
+- Migration: a project with no server record mounts from the browser's existing local copy and uploads it on the next save.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:

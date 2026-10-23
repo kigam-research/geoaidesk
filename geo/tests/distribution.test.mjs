@@ -96,6 +96,7 @@ test("integration boundaries list existing seams with an owner", () => {
     "gaid-hub-skills",
     "gaid-orcid",
     "gaid-first-use-fixes",
+    "gaid-project-resume",
   ]);
   for (const seam of boundaries.seams) {
     assert.ok(owners.has(seam.owner), `${seam.path}: owner ${seam.owner}`);
