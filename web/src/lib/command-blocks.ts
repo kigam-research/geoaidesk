@@ -31,7 +31,7 @@ export function parseCommandBlock(text: string): CommandBlock | null {
 export function commandPreview(raw: string): string {
   const text = stripComposerContext(raw);
   // GeoAIDesk (gaid-workflow-model): a Workflow start shows as "Workflow · <title>", plus the researcher's text.
-  const workflow = text.match(/^<workflow id="[^"]*"(?: revision="\d+")? title="([^"]*)">/);
+  const workflow = text.match(/^<workflow id="[^"]*"(?: revision="\d+"| version="\d+\.\d+\.\d+")? title="([^"]*)">/);
   if (workflow) {
     const tail = parseWorkflowBlock(text)?.tail.split("\n")[0]?.trim();
     return tail ? `Workflow · ${workflow[1]} — ${tail}` : `Workflow · ${workflow[1]}`;

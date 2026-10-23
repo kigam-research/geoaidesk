@@ -46,9 +46,10 @@ export function hubRevisionVersions(revisions: readonly { version?: string }[]):
 }
 
 /** The version of revision `n` (default: the latest) of an entry, or null when it has no such revision. */
-export function hubVersionOf(entry: { revisions: readonly { revision: number; version?: string }[] }, revision?: number): string | null {
-  const versions = hubRevisionVersions(entry.revisions);
-  const index = revision === undefined ? versions.length - 1 : entry.revisions.findIndex((r) => r.revision === revision);
+export function hubVersionOf(entry: { revisions?: readonly { revision: number; version?: string }[] }, revision?: number): string | null {
+  const revisions = entry.revisions ?? [];
+  const versions = hubRevisionVersions(revisions);
+  const index = revision === undefined ? versions.length - 1 : revisions.findIndex((r) => r.revision === revision);
   return index >= 0 ? (versions[index] ?? null) : null;
 }
 

@@ -1,4 +1,5 @@
 /** Skill views and immutable revision verification, shared by routes and Workflow integrations. */
+import { hubVersionOf, legacyHubVersion } from "../../../../web/src/geo/contracts/hub-version.ts";
 import type { HubSkill, HubSkillRevision } from "../../../../web/src/geo/contracts/hub-skills.ts";
 import { AuthoringError } from "../authoring/store.ts";
 import { digest, fileList, readArchive, treeHash } from "./archive.ts";
@@ -28,7 +29,7 @@ export async function skillView(store: HubSkillRecordStore, skill: StoredHubSkil
       if (!pin || pin.skillId !== skill.id || !allowed.has(pin.revision)) continue;
       if (skill.revisions.find((r) => r.revision === pin.revision)?.treeHash !== pin.treeHash) continue;
       if (!usedBy.some((u) => u.entryId === e.entry.id && u.revision === Number(n) && u.skillRevision === pin.revision))
-        usedBy.push({ entryId: e.entry.id, revision: Number(n), title: e.entry.title, skillRevision: pin.revision });
+        usedBy.push({ entryId: e.entry.id, revision: Number(n), version: hubVersionOf(e.entry, Number(n)) ?? legacyHubVersion(Number(n)), title: e.entry.title, skillRevision: pin.revision });
     }
   }
   return { ...skill, usedBy, mine: isSkillAuthor(skill, actorId), stars: Object.keys(stars).length, starredByMe: !!actorId && Object.hasOwn(stars, actorId), comments: comments.filter((c) => allowed.has(c.revision)).length };

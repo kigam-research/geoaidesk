@@ -1,7 +1,7 @@
 /**
  * Hub-managed skills (gaid-hub-skills, ADR docs/adr/2026-10-22-hub-managed-skills.md; user decisions 2026-10-22: all three
- * recommended options). The GAID hub keeps a skill shelf next to its Workflows: each skill has immutable revisions (판)
- * stored as one archive per revision, with origin, licence, automatic findings and a per-revision review state. Workflows
+ * recommended options). The GAID hub keeps a skill shelf next to its Workflows: each skill has immutable revisions
+ * stored as one archive per revision (shown as "version N"; integers, unlike Workflow versions), with origin, licence, automatic findings and a per-revision review state. Workflows
  * pin a skill revision (`skills[].source: "hub"` in gaid-workflow/v1, see `HubSkillRef`); a new revision never changes a
  * Workflow that pinned an older one. Researchers install a revision into a project through the existing preview and
  * acknowledgement gate; installs never fetch GitHub.
@@ -25,7 +25,8 @@ export const HUB_SKILL_SCHEMA = "gaid-hub-skill/v1";
  */
 export interface HubSkillOrigin {
   kind: "own" | "workflow" | "github";
-  workflow?: { entryId: string; revision: number; title: string };
+  /** `version`: the Workflow's registered version (gaid-hub-versions); older origins omit it (`hubRefVersion`). */
+  workflow?: { entryId: string; revision: number; version?: string; title: string };
   /** `github`: the source as given (`owner/repo`, Git URL), the requested ref and skill path, the resolved commit when known. */
   source?: string;
   ref?: string;
@@ -118,6 +119,8 @@ export interface HubSkillRevision {
 export interface HubSkillUse {
   entryId: string;
   revision: number;
+  /** That Workflow revision's registered version. */
+  version: string;
   title: string;
   /** The skill revision that Workflow revision pins. */
   skillRevision: number;
