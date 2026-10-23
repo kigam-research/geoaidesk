@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:41:06Z
+updated: 2026-10-23T09:36:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"63c6aa87-c4a4-4624-9c99-d7f3096d74a3","pid":3356915,"provider":"claude","session":"abfb67d2-5d61-4efb-96c3-d2f9ec8416bb","start":"63255981","token":"96268dc30643485eaa762b4dfbb47ec9211b079885bf6e4624511700c1495289"}
 branch: task/gaid-hub-rollout-versions
 target: main
@@ -60,18 +60,31 @@ Main at request time: 7703739a.
    Rollback: `cp <backup>/gaid-hub-server.service.982389c5 ~/.config/systemd/user/gaid-hub-server.service`,
    `systemctl --user daemon-reload && systemctl --user restart gaid-hub-server` (migrations 4/5 only add tables/columns; if
    needed restore the backup with check-backup first). Old snapshot `982389c5…` kept.
-2. Review app: waiting for D (gaid-pocheon-trial) to free it. Currently b74950e7, loopback only (env PATH, HOME, KADY_PORT).
-   Version labels (0.1.0, 0.1.1 for the 2-revision entry) and the ORCID "not configured" screen are checked there after the
-   update (client-side view fills versions).
-3. PROJECT.md: hub SHA, backup, loopback mode recorded; review app SHA to update after step 2.
-Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `systemctl --user cat gaid-hub-server | grep WorkingDirectory`.
+2. Review app DONE 2026-10-23 ~18:31 KST at origin/main `3171c57c` (contains D's 1684c887, PR #91, and gaid-authoring-evidence-view;
+   hub confirmed no hub-server code change since 7703739a). Config backup
+   `~/data/geoaidesk/work/review-app/config-backup-20261023T183027` (config.env + pi-agent without packages/sessions);
+   stopped, detached ~/deploy/geoaidesk at 3171c57c, restarted with the loopback recipe (env PATH, HOME, KADY_PORT only);
+   `next build` ran; listens on 127.0.0.1:3000 and 127.0.0.1:18000 only. `pi-agent/hub-server/connection.json` untouched;
+   `/geo/hub-server/status` = admin seongin@kigam.re.kr, reachable, same serverId.
+   Browser checks (playwright-cli 1440x900, screenshots in `~/data/geoaidesk/work/gaid-hub-rollout-versions/playwright/`):
+   - Workflow list 8 → the 2-revision entry shows version 0.1.1 with history 0.1.0, 0.1.1; others 0.1.0 (also via API).
+   - Remove + restore on a test entry I created (`entry-ap-rollout-test1`, "[시험] 삭제·복원 확인용 (지울 항목)", folder 일반):
+     made from a copy of the user's draft ap-04567077-100 with a new id/slug/title (copy edited on disk; the review app was
+     restarted once at the same SHA because the authoring store caches projects). Removed in the UI with a reason → list 7,
+     entry read 404, 제거된 Workflow 1; restored from 제거된 Workflow → list 8, removed 0. Cleanup: removed it again (stays
+     hidden in the hub server's removed list, records kept as designed; re-registration of that id refused) and deleted the
+     test draft (DELETE /geo/authoring/projects/ap-rollout-test1 → 204). The user's entries and drafts untouched.
+   - ORCID: `/geo/orcid` hub state `not-configured`; 서재 shows "허브에 ORCID 연결이 설정되지 않았습니다."
+   - 서재: 논문 7 / 정리 노트 0 switch present; a paper's "PDF 열기" opens the PDF side panel with page navigation.
+   - 자료 소식: 18 approved sources, 166 items, last collection 17:40; 0 console errors.
+3. PROJECT.md: hub server 7703739a + backup, review app 3171c57c + config backup, loopback mode recorded.
+Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `git -C ~/deploy/geoaidesk rev-parse HEAD`;
+`ss -ltn | grep -E ':3000|:18000'`; `curl -s http://127.0.0.1:18000/geo/hub-server/status`.
 ## Next steps
-1. Routed request `rollout-review-app-free` (consumed): D reports the review app free; wait for the hub's next message with the
-   main SHA containing D's sync (F8, F18), deploy the review app there (not an older main), then `task route-report` so the hub
-   starts D's second pass. Hub server stays at 7703739a unless that SHA changes hub-server code.
-2. When that SHA arrives: back up ~/.geoaidesk config, update the review app to the main SHA
-   7703739a (or current main if the hub server is moved with it) with the loopback recipe, browser checks, PROJECT.md, finish.
+1. route-report rollout-review-app-free and rollout-deploy-sha, then task finish.
 ## Failed approaches
+- Editing an authoring project.json while the review app runs does not take effect: the authoring store caches
+  projects in memory and writes its copy back on the next mutate. Edit with the app stopped (or restart it).
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items

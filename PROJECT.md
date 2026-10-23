@@ -45,8 +45,9 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 - Deployed SHAs: hub server `7703739a40ef0ac99ae1bb3e3d130c745ea8376b` (2026-10-23, gaid-hub-rollout-versions; schema
   migrations 4 (ORCID) and 5 (Workflow removal); ORCID client not configured, open item gaid-orcid#1; backup
   `.../hub-server/backups/2026-10-23-before-7703739a` with the previous unit file; previous snapshot
-  `982389c59f5cda2b666fc9893d0d27a8017cad6c` kept for rollback); review app `b74950e700301c9f2edba6f7ba1a47c183225b2b`
-  (loopback only).
+  `982389c59f5cda2b666fc9893d0d27a8017cad6c` kept for rollback); review app `3171c57c8a99d1a0995fb091c07a1a861f2e02f2`
+  (2026-10-23, gaid-hub-rollout-versions; loopback only; config backup
+  `~/data/geoaidesk/work/review-app/config-backup-20261023T183027`).
 
 ## Upstream
 - Remote `upstream` = `https://github.com/K-Dense-AI/k-dense-byok.git`; integration base
