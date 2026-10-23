@@ -10,6 +10,7 @@ import type {
   CreateProjectBody,
   Decision,
   EditDraftBody,
+  AddNoteSourcesBody,
   InstallBody,
   MethodDraft,
   OperationBody,
@@ -20,7 +21,10 @@ import { startOperation } from "./agent.ts";
 import { installPackage, previewPackageBytes } from "./install.ts";
 import { modelConfig } from "./model.ts";
 import { buildPackage, checkMethod, draftFiles, type PackageContext } from "./package.ts";
-import { addSource, pageImage, pageText, pdftotextVersion, safeRelative, sourceFile } from "./sources.ts";
+import { addLibrarySources, addNoteSource, libraryDeps, linkLibraryAuthoring } from "./library-sources.ts";
+import { libraryStore, type LibraryStore } from "../library/store.ts";
+import { zoteroService } from "../library/zotero-service.ts";
+import { addSource, pageImage, pageText, pdftotextVersion, removeSource, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, AuthoringStore, authoringOwner, newId, now } from "./store.ts";
 import { loadVocabulary, type Vocabulary } from "./vocabulary.ts";
 import { activePaths } from "../../projects.ts";
@@ -33,7 +37,15 @@ export interface AuthoringOptions {
   /** Tests: fixed vocabulary and model transport. */
   vocabulary?: Vocabulary;
   chat?: import("./model.ts").ChatFn;
+  /** Tests: the library the handoff reads papers from. */
+  library?: () => LibraryStore;
 }
+
+const HANDOFF_EXTRA = 20;
+const stringList = (v: unknown, max: number): string[] | undefined =>
+  Array.isArray(v) && v.length <= max && v.every((x) => typeof x === "string" && x.length > 0 && x.length <= 255) && new Set(v).size === v.length
+    ? (v as string[])
+    : undefined;
 
 const stores = new WeakMap<FastifyInstance, AuthoringStore>();
 /** The authoring store registered on this app (shared by the hub-shared and authoring-extra routes). */
@@ -76,7 +88,7 @@ export function editDraft(project: AuthoringProject, body: EditDraftBody): Metho
       if (
         !safeRelative(f.path) ||
         !f.path.startsWith("scripts/") ||
-        !extraction?.files?.some((e) => e.path === f.sourcePath && e.text)
+        !extraction?.files?.some((e) => e.path === f.sourcePath && e.text && !e.data)
       )
         throw new AuthoringError("제공한 코드에 없는 파일이거나 경로가 올바르지 않습니다.");
     }
@@ -199,28 +211,50 @@ export async function registerAuthoringRoutes(
       reply.code(201).send(await store.create(req.body ?? {})),
     );
     // Hub-side receive (gaid-hub-followups): the chat's "send to the hub draft" bundles the analysis of the request's
-    // project and starts a new method with that bundle as its first source (kind gaid-analysis).
-    scope.post<{ Body: { sessionId?: unknown; files?: unknown; note?: unknown } }>(
-      "/geo/authoring/handoffs",
-      async (req, reply) => {
-        let built: Awaited<ReturnType<typeof buildHandoff>>;
+    // project and starts a new method with that bundle as its first source (kind gaid-analysis). The researcher may add
+    // the project's research notes (`notes`, note ids) and papers from 서재 (`libraryItemIds`); they enter through the
+    // same source functions as in the authoring screen (gaid-authoring-sources).
+    scope.post<{
+      Body: { sessionId?: unknown; files?: unknown; note?: unknown; notes?: unknown; libraryItemIds?: unknown };
+    }>("/geo/authoring/handoffs", async (req, reply) => {
+      const body = req.body ?? {};
+      const notes = body.notes === undefined ? [] : stringList(body.notes, HANDOFF_EXTRA);
+      const itemIds = body.libraryItemIds === undefined ? [] : stringList(body.libraryItemIds, HANDOFF_EXTRA);
+      if (!notes || !itemIds)
+        return reply.code(400).send({ code: "input", error: `Select at most ${HANDOFF_EXTRA} distinct notes and papers` });
+      const paths = activePaths();
+      let built: Awaited<ReturnType<typeof buildHandoff>>;
+      try {
+        built = await buildHandoff(paths, body);
+      } catch (e) {
+        if (e instanceof HandoffError) return reply.code(e.status).send({ code: e.code, error: e.message });
+        throw e;
+      }
+      const note = typeof body.note === "string" ? body.note.trim() : "";
+      const project = await store.create({ title: "분석에서 시작한 방법", ...(note ? { goal: note.slice(0, 2000) } : {}) });
+      await addSource(store, project.id, {
+        name: built.filename,
+        mediaType: "application/gzip",
+        kind: "gaid-analysis",
+        contentBase64: built.archive.toString("base64"),
+      });
+      const skipped: { id: string; reason: string }[] = [];
+      for (const noteId of notes) {
         try {
-          built = await buildHandoff(activePaths(), req.body ?? {});
+          await addNoteSource(store, project.id, { projectId: paths.id, noteId }, undefined, paths);
         } catch (e) {
-          if (e instanceof HandoffError) return reply.code(e.status).send({ code: e.code, error: e.message });
-          throw e;
+          if (!(e instanceof AuthoringError)) throw e;
+          skipped.push({ id: noteId, reason: e.message });
         }
-        const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
-        const project = await store.create({ title: "분석에서 시작한 방법", ...(note ? { goal: note.slice(0, 2000) } : {}) });
-        await addSource(store, project.id, {
-          name: built.filename,
-          mediaType: "application/gzip",
-          kind: "gaid-analysis",
-          contentBase64: built.archive.toString("base64"),
-        });
-        return reply.code(201).send({ projectId: project.id });
-      },
-    );
+      }
+      if (itemIds.length) {
+        const library = (options.library ?? libraryStore)();
+        const added = await addLibrarySources(store, project.id, itemIds, libraryDeps(library, zoteroService(library)));
+        linkLibraryAuthoring(library, added.added.map((a) => a.itemId), project.id);
+        skipped.push(...added.skipped.map((x) => ({ id: x.itemId, reason: x.reason })));
+      }
+      return reply.code(201).send({ projectId: project.id, ...(skipped.length ? { skipped } : {}) });
+    });
     scope.get("/geo/authoring/projects/:id", async (req) => store.read(id(req.params)));
     scope.delete("/geo/authoring/projects/:id", async (req, reply) => {
       await store.archive(id(req.params));
@@ -230,6 +264,21 @@ export async function registerAuthoringRoutes(
     scope.post("/geo/authoring/projects/:id/sources", { bodyLimit: 42 * 1024 * 1024 }, async (req, reply) =>
       reply.code(201).send(await addSource(store, id(req.params), req.body as never)),
     );
+    scope.delete("/geo/authoring/projects/:id/sources/:sid", async (req, reply) => {
+      await removeSource(store, id(req.params), (req.params as { sid: string }).sid);
+      return reply.code(204).send();
+    });
+    // Research notes from GAID projects on this machine (index.md and the figures in the note folder), each one source.
+    scope.post<{ Body: AddNoteSourcesBody }>("/geo/authoring/projects/:id/sources/notes", async (req, reply) => {
+      const notes = req.body?.notes;
+      if (!Array.isArray(notes) || !notes.length || notes.length > 20)
+        throw new AuthoringError("연구 노트를 1~20개 골라 주세요.");
+      const projectId = id(req.params);
+      await store.read(projectId);
+      const added = [];
+      for (const ref of notes) added.push((await addNoteSource(store, projectId, ref)).source);
+      return reply.code(201).send({ sources: added });
+    });
     scope.get("/geo/authoring/projects/:id/sources/:sid/original", async (req, reply) => {
       const project = await store.read(id(req.params));
       const sid = (req.params as { sid: string }).sid;

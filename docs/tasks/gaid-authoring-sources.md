@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:02:03Z
+updated: 2026-10-23T06:13:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d9c962d0-e8cb-40ea-99b0-533c123efd1e","pid":1749971,"provider":"claude","session":"f1d989bf-fb2e-4eca-99d5-c8f12b163333","start":"62322102","token":"2bd23210d4cf17c490186594ae6dcd5bda7a1d6ef94946851c8cc2c5a5a4bc7c"}
 branch: task/gaid-authoring-sources
 target: main
@@ -67,11 +67,39 @@ Recommended answers the user accepted:
 - Do not restart or change the review app except D as a user of it; the hub updates the review app after A–C merge.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Plan settled (below); implementation by the top writer (no child writers: contract, server and screen are tightly
+coupled).
+- P1 server done: contract (`SourceKind` data/note, `DataFileSummary`, `AddSourceBody.files`, `AUTHORING_SOURCE_LIMITS`,
+  library/note bodies), `server/src/geo/authoring/{data-files,library-sources}.ts`, `storeSource`/`removeSource` in
+  `sources.ts`, routes (DELETE source, POST sources/notes, POST /geo/library/authoring, handoff notes/libraryItemIds),
+  prompts mention data files and research notes (versions 2026-10-23.1). Verified: `cd server && npm run typecheck`,
+  `npx vitest run test/geo-authoring-sources.test.ts test/geo-hub-handoff.test.ts` (22 passed) and the earlier
+  authoring/library/handoff suites (168 passed).
 ## Next steps
-1. (the next session's first action)
+1. P2 screens (source step, library picker, handoff dialog, locales), then scripts/check and screenshots.
 ## Failed approaches
 ## Notes and decisions
+- Plan (2026-10-23). P1 server (`server/src/geo/authoring/`, contract `web/src/geo/contracts/authoring.ts`):
+  - `SourceKind` adds `data` and `note`. A data source is one file or a set (`AddSourceBody.files[]`, e.g. a shapefile
+    set picked together, or a .zip of data). Files live at `sources/<sid>/files/<path>`, listed in
+    `extractions[sid].files[]` with sha256; each geo file gets `CodeFileEntry.data` (compact `DataFileSummary` from
+    `inspectGeoFile` run over a pseudo sandbox = that files folder; companions marked `companionOf`). The same
+    inspection runs on data files inside code archives and gaid-analysis bundles (handoff path). The agent context shows
+    the summary, never raw bytes; anchors on a data file check against its summary text.
+  - Bounded intake: 30 MiB per source (unchanged), at most 30 sources and 300 MiB per authoring project, 40 inspected
+    files per source.
+  - `DELETE /geo/authoring/projects/:id/sources/:sid` (refused while a draft's code files use it).
+  - Library sources: `server/src/geo/authoring/library-sources.ts`; `POST /geo/library/authoring {itemIds[], authoringId?}`
+    adds papers (stored PDF; Zotero PDF read first; else a metadata-only text source) and research notes (A's contract:
+    `LibraryItem.kind === "note"`, `item.note {projectId, noteId, markdown snapshot}`; local project → index.md + figures,
+    else the snapshot). Library "used in" links recorded as before. `POST /geo/authoring/projects/:id/sources/notes`
+    adds project research notes directly.
+  - Handoff: `/geo/authoring/handoffs` also takes `notes[]` and `libraryItemIds[]` and adds them through the same
+    functions; the handoff dialog preselects the session's notes and the project's cited papers.
+  - P2 screens: source step accepts data files (shp companions grouped into one set), shows data lines, remove button,
+    "서재에서 추가" picker (논문 / 연구 노트 tabs, several at once); handoff dialog lists notes and papers.
+- Interfaces sent to siblings (2026-10-23): B gets `{sourceId, sourcePath, sha256}` addressing for data-file examples;
+  A confirmed note item shape (`kind`, `note.{projectId,noteId,markdown,...}`, summary `note.local`; `GET /geo/library?kind=note`).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
