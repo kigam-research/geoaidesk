@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T09:52:39Z
+updated: 2026-10-23T10:06:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -188,6 +188,9 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 - F20 — minor, second pass: (a) the data-file summary reads the `#` comment line of orebody_reference.csv as the header
   ("열 2개"); the analysis model noticed it and still read x, y, z, cell_m. — C (inspection) — note. (b) 서재 lists
   "Uncertainty-Aware Mineral Prospectivity Mapping…" (Ahn 2026) twice in the authoring picker. — A — note.
+- F21 — hub registration dialog (review app 3171c57c) — the list says "공유하지 않음: … 연구 자료" while the Workflow
+  carries six bundled example files (~1.8 MB) that are shared with it; the dialog does not mention example data. — B
+  (finished) — open item.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
@@ -200,7 +203,15 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   analyze 18:39–18:50 (GPT-6.1 Sol high stored on the project — F8 verified; 38 findings incl. Appendix B volumetric
   proportions and κ, the 0.5 SI upper bound below the synthetic 0.80 SI ore, ESM1's fixed IGRF date 2020-07-16 vs
   survey 2022-05-17; 6 questions, recommendations keep the whole method — F10 verified; new trial-scale text — F12
-  verified) → answers with option + added words (F11 verified) → draft running from 18:52.
+  verified) → answers with option + added words (F11 verified) → draft 1 accepted first try 18:59, package check
+  passed (9 steps; "초기 성분 부피 비율" as its own choice citing Astic 2020 p.40 "volumetric proportions instead of cell
+  counts", κ semantics, mean-change diagnostics in the convergence step; work folder pgi_run/; no approval gates; 16
+  combinations) → examples attached per input from the draft's data sources (B↔C; each attach makes a draft revision,
+  ended at 8; DEM marked real, the rest synthetic) → registered 19:03 on the institute hub, folder 지구물리 역산, entry
+  "항공자력·시추 코어 PGI 광체 추정" version 0.1.0 → "내 프로젝트에서 시험" with a new project pgi-2-ea1e81 ("포천 자철석 PGI
+  2차 검증") → start settings: all 6 inputs on the example without any action (F17 resolved for Workflows with
+  examples), 7 open conditions set by the researcher (proportions = code values on purpose, to test the diagnosis) →
+  start 19:05:59 on GPT-6.1 Sol high; example files written to user_data/examples/aeromag-core-pgi-volume/<role>-<key>/.
 - First pass done 17:24 KST: hub entry "PGI 기반 3차원 자철석 광체 추정" 1판 (registered 16:24 on the institute hub,
   folder 지구물리 역산, from authoring ap-bab647f7-674 draft 3); installed into project pgi-2c2f48; run 16:29 → interview
   expired (F18) → researcher answered at 16:45 → finished 17:24. Agent: wrote pgi_run/run_pgi_workflow.py, fixed two
@@ -262,6 +273,7 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
+- [부채] 허브 등록 대화상자의 "공유하지 않음: 연구 자료" 문구가, Workflow에 들어 있는 예제 자료(입력별 파일)가 함께 공유된다는 사실을 알리지 않음 (F21) — 가) 등록 대화상자에 "공유: 예제 자료 N개(크기)"를 더함 — 나) 그대로 둠 — 권장: 가) 연구 자료 공유 여부는 연구자가 등록 전에 알아야 함 — 막힌 일: 없음 — 조건: gaid-workflow-example 이후 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#5-한계
 ## Report
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
