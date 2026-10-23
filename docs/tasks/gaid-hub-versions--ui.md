@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-23T07:19:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"85dddf2d-e5cf-4fd4-9e09-1bd517612fc9","pid":2306567,"provider":"codex","session":"01a1678c-afff-7a90-bcc6-4c8ff80df8f6","start":"62657466","token":"439122785c0ef2741fb6290719f33f7d911ae7984a2150a314072fcd11f03a42"}
 branch: task/gaid-hub-versions--ui
@@ -109,7 +109,9 @@ Evidence:
 Sequential decisions and integration: retain numeric revisions only for transport; use stored registered versions for UI; parent owns all server/contracts changes. Parent 8cd0ba6d is merged; final finish must include parent c75207ee (chat-label parser, server expectations and Workflow references in hub skills). No manual Git publication.
 
 ## Next steps
-1. Run task finish (merges parent c75207ee, runs declared checks). Fix remaining in-scope failures in place. All temporary app jobs are stopped and disposed; browser closed.
+<!-- task:closed -->
+Closed 2026-10-23T07:19:41Z: ready; the parent gaid-hub-versions integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - `task sync` merged parent commit 8cd0ba6d, then ran the full scripts/check. Its server suite reported the pre-existing parent-owned workflow-doc expected-version failure. Stopped that duplicate full check with SIGINT (exit 130) after reporting it to parent; no integration was claimed. Parent owns the server fix and final full check.
 - First full web suite found ten stale wording expectations and one parent-owned chat-label parser failure. Copy expectations were updated, relevant suites passed; parent c75207ee fixes the parser.
