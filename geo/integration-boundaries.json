@@ -981,6 +981,12 @@
       "responsibility": "Hub shelf installed revision, current shelf state and local-edit annotations on GET /skills and /skills/all."
     },
     {
+      "path": "web/public/geo/orcid/",
+      "owner": "gaid-orcid",
+      "status": "edited",
+      "responsibility": "Unmodified official ORCID authenticated/unauthenticated iD icons. Phase 1 shows the unauthenticated icon only."
+    },
+    {
       "path": "web/src/components/ai-elements/message.tsx",
       "owner": "gaid-first-use-fixes",
       "status": "edited",

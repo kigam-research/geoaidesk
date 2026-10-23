@@ -28,7 +28,8 @@
     "zotero": "Zotero {n}",
     "gaid": "GAID {n}",
     "unread": "No full text {n}",
-    "cited": "Cited in notes {n}"
+    "cited": "Cited in notes {n}",
+    "mine": "My works {n}"
   },
   "table": {
     "paper": "Paper",
@@ -104,7 +105,9 @@
     "workflowStarted": "Workflow draft created",
     "attachTitle": "Project to attach to",
     "attached": "Attached to {name}",
-    "attachFailed": "Could not attach to the project. Try again."
+    "attachFailed": "Could not attach to the project. Try again.",
+    "ownWork": "Own work selected from ORCID",
+    "orcidOrigin": "Reference details from ORCID"
   },
   "dialog": {
     "title": "Add paper",

@@ -71,8 +71,11 @@ export interface CslItem {
 }
 
 /** Where the metadata of an item came from; `gaid` items are confirmed by the researcher before they count as checked. */
-/** `datacite`: DOIs Crossref does not register, such as arXiv preprints (`10.48550/arXiv.*`) and data repositories. */
-export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "import" | "manual";
+/**
+ * `orcid`: filled from the researcher's public ORCID record (a work without DOI metadata elsewhere).
+ * `datacite`: DOIs Crossref does not register, such as arXiv preprints (`10.48550/arXiv.*`) and data repositories.
+ */
+export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "orcid" | "import" | "manual";
 
 export interface LibraryAttachment {
   id: string;
@@ -133,6 +136,18 @@ export interface LibraryItem {
   aliases?: { ids?: string[]; citationKeys?: string[] };
   /** Retraction/correction evidence seen when the metadata was looked up (Crossref, OpenAlex). */
   signals?: UpdateSignal[];
+  /**
+   * Set when the researcher confirmed this paper as their own work from their ORCID record (gaid-orcid; basis of
+   * 내 논문). GAID-side: kept across Zotero refreshes and merges.
+   */
+  ownWork?: OwnWorkMark;
+}
+
+/** Provenance of an own-work mark: the ORCID iD and the work's put-code on that record. */
+export interface OwnWorkMark {
+  orcid: string;
+  putCode: number;
+  markedAt: string;
 }
 
 /**
@@ -303,14 +318,16 @@ export interface LibraryItemSummary {
   addedAt: string;
   /** True when a retraction notice was seen for this paper. */
   retracted?: boolean;
+  /** The researcher's own work (from ORCID). */
+  ownWork?: boolean;
 }
 
 export interface LibraryListQuery {
   q?: string;
   source?: LibrarySource;
   collectionId?: string;
-  /** `unread` = coverage none/abstract; `cited` = cited in at least one research note. */
-  filter?: "unread" | "cited" | "project";
+  /** `unread` = coverage none/abstract; `cited` = cited in at least one research note; `mine` = own works (ORCID). */
+  filter?: "unread" | "cited" | "project" | "mine";
   limit?: number;
   offset?: number;
 }
@@ -318,7 +335,7 @@ export interface LibraryListQuery {
 export interface LibraryListResponse {
   items: LibraryItemSummary[];
   total: number;
-  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number };
+  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number; mine: number };
   collections: LibraryCollection[];
   /** Items per folder, subfolders included. */
   folderCounts: Record<string, number>;

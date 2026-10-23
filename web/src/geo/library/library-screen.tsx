@@ -23,6 +23,10 @@ import { zoteroStatus } from "./zotero-status";
 import { FolderTree, ITEM_DRAG_TYPE, folderPath } from "./folder-tree";
 import { FolderPanel, sendResultLine } from "./folder-panel";
 import { FolderNameDialog } from "./folder-name-dialog";
+import { OrcidCard } from "@/geo/orcid/orcid-card";
+import { OrcidImportDialog } from "@/geo/orcid/import-dialog";
+import { getOrcid } from "@/geo/orcid/api";
+import type { OrcidStatus } from "@/geo/contracts/orcid";
 import { LibrarySyncLine } from "./sync-line";
 import { PaperMapEntry } from "./paper-map-entry";
 
@@ -36,7 +40,7 @@ const COVERAGE_TONE: Record<ReadCoverage, string> = {
   abstract: "border-transparent bg-gaid-warning-tint text-gaid-warning",
   none: "border-gaid-edge text-gaid-ink-3",
 };
-type Filter = "all" | "zotero" | "gaid" | "unread" | "cited";
+type Filter = "all" | "zotero" | "gaid" | "unread" | "cited" | "mine";
 
 function Badge({ label, hint, tone }: { label: string; hint: string; tone: string }) {
   return (
@@ -61,6 +65,15 @@ export interface LibraryScreenProps {
 }
 
 export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
+  const [orcid, setOrcid] = useState<OrcidStatus | null>(null);
+  const [orcidError, setOrcidError] = useState(false);
+  const [orcidOpen, setOrcidOpen] = useState(false);
+  const [orcidStarted, setOrcidStarted] = useState(false);
+  const loadOrcid = useCallback(async () => {
+    try { setOrcid(await getOrcid()); setOrcidError(false); }
+    catch { setOrcidError(true); }
+  }, []);
+  useEffect(() => { void loadOrcid(); }, [loadOrcid]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [data, setData] = useState<LibraryListResponse | null>(null);
@@ -73,7 +86,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   const load = useCallback(async () => {
     const q: LibraryListQuery = { q: query.trim() || undefined, collectionId: folderId ?? undefined };
     if (filter === "zotero" || filter === "gaid") q.source = filter;
-    if (filter === "unread" || filter === "cited") q.filter = filter;
+    if (filter === "unread" || filter === "cited" || filter === "mine") q.filter = filter;
     try {
       setData(await listLibrary(q));
       setError(false);
@@ -116,6 +129,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
     else { const made = await createFolder(name, naming?.parentId); setFolderId(made.id); setSelected(null); }
     await load();
   };
+  const refreshAfterOrcid = () => { void loadOrcid(); void load(); };
   const chips: { id: Filter; label: string }[] = counts
     ? [
         { id: "all", label: L("filter.all", { n: counts.all }) },
@@ -125,6 +139,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
         { id: "cited", label: L("filter.cited", { n: counts.cited }) },
       ]
     : [];
+  if (counts && (counts.mine > 0 || orcid?.profile || filter === "mine")) chips.splice(1, 0, { id: "mine", label: L("filter.mine", { n: counts.mine }) });
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-4 py-6 sm:px-6">
@@ -221,9 +236,13 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
             onSelectItem={setSelected} onCreateSub={() => setNaming({ mode: "create", parentId: folder.id })} onRename={() => setNaming({ mode: "rename" })}
             onDeleted={() => { setFolderId(null); void load(); }} onChanged={load} />
         ) : (
-          <SidePanel data={data} onSelect={setSelected} onChanged={load} />
+          <>
+            <OrcidCard status={orcid} loadError={orcidError} onStatus={setOrcid} onChanged={refreshAfterOrcid} onRetry={() => void loadOrcid()} onImport={() => { setOrcidStarted(true); setOrcidOpen(true); }} />
+            <SidePanel data={data} onSelect={setSelected} onChanged={load} />
+          </>
         )}
       </aside>
+      {orcidStarted && orcid?.profile && <OrcidImportDialog key={orcid.profile.orcid} open={orcidOpen} onOpenChange={setOrcidOpen} collections={collections} onImported={refreshAfterOrcid} />}
       <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => {
         if (item && folderId) void addToFolder(folderId, item.id); else void load();
         if (item) setSelected(item.id);
@@ -349,6 +368,8 @@ function ItemDetail({ id, collections, zoteroConnected, onClose, onOpenProject, 
         <Button variant="ghost" size="icon-sm" aria-label={L("detail.close")} onClick={onClose}><XIcon /></Button>
       </div>
       <h2 className="text-lg font-semibold leading-snug">{item.csl.title}</h2>
+      {item.ownWork && <p className="text-xs text-gaid-ink-2">{L("detail.ownWork")}</p>}
+      {item.metadataOrigin === "orcid" && <p className="text-xs text-gaid-ink-2">{L("detail.orcidOrigin")}</p>}
       <p className="text-sm text-muted-foreground">
         {[authors.length > 3 ? `${authors.slice(0, 3).join(", ")} …` : authors.join(", "), year, item.csl["container-title"] as string | undefined, item.csl.DOI ? L("detail.doi", { doi: item.csl.DOI }) : ""].filter(Boolean).join(" · ")}
       </p>

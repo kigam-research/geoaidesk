@@ -176,6 +176,8 @@ export class ZoteroService {
         const old = previous.get(item.id);
         const kept = keepGaidFiles(item, old);
         if (old?.aliases) kept.aliases = structuredClone(old.aliases);
+        // GAID-side own-work mark (gaid-orcid): Zotero does not know it.
+        if (old?.ownWork) kept.ownWork = old.ownWork;
         if (!kept.citationKey) {
           kept.citationKey = old?.citationKey ?? defaultCitationKey(kept.csl, taken);
           taken.add(kept.citationKey);
@@ -407,6 +409,7 @@ export class ZoteroService {
         citationKeys: [...new Set([...(mirror.aliases?.citationKeys ?? []), ...(item.citationKey && item.citationKey !== mirror.citationKey ? [item.citationKey] : []), ...(item.aliases?.citationKeys ?? [])])],
       },
       ...(mirror.read.coverage === "none" && item.read.coverage !== "none" ? { read: item.read } : {}),
+      ...(!mirror.ownWork && item.ownWork ? { ownWork: item.ownWork } : {}),
       sentToZoteroAt: at,
       updatedAt: at,
     });

@@ -175,6 +175,14 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
   and the note reference list. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+- ORCID (gaid-orcid phase 1, user decision 2026-10-22): the researcher types an ORCID iD in 서재 (`<library>/orcid.json`, local,
+  `authenticated: false`, shown with ORCID's unauthenticated iD icon and "(인증 안 됨)" per ORCID display guidelines) and imports
+  public works read anonymously from `https://pub.orcid.org/v3.0` (`server/src/geo/orcid/`, routes `/geo/orcid*` in
+  `server/src/geo/routes/orcid.ts`, contract `web/src/geo/contracts/orcid.ts`; `GAID_ORCID_API_URL` points at the sandbox). Preview
+  first; confirm re-reads the record, fills by DOI (Crossref → OpenAlex) else from the ORCID work (`metadataOrigin: "orcid"`), marks
+  a same-DOI or earlier-imported item instead of adding (`LibraryItem.ownWork`, kept across Zotero refresh/merge; list filter `mine`);
+  a similar title never merges. Nothing is written to ORCID and nothing is polled (Public API terms). Phase 2 (authenticated iD via
+  OIDC, client secret only in hub server config, iD on hub accounts) waits for the user's ORCID client registration.
 - Output style (gaid-output-style, user feedback 2026-10-18): chat answers follow `REPLY_STYLE_RULE` in GEO_INSTRUCTIONS (a
   compact Attention Control Korean rule; same principles in other languages). Research-note prose is polished with the
   shipped skill `geo/skills/gaid-note-style/` (condensed humanizer + Korean rules), which `server/src/geo/note-style.ts`
