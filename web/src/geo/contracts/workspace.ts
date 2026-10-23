@@ -11,6 +11,7 @@
 
 import type { WorkflowDoc, WorkflowSkillSource } from "./workflow-doc";
 import type { HubSkillInstallState } from "./hub-skills";
+import type { WorkflowInputExampleState } from "./workflow-examples";
 
 export interface Localized {
   ko: string;
@@ -28,6 +29,8 @@ export interface WorkflowInputRole {
   extensions: string[];
   required: boolean;
   requiredWhen?: Localized;
+  /** Default example data used when the researcher gives no file (gaid-workflow-example; installed methods only). */
+  example?: WorkflowInputExampleState;
 }
 
 export interface WorkflowChoice {

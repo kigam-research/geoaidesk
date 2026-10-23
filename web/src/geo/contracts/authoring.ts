@@ -16,6 +16,7 @@
 
 import type { HubSkillInstallState } from "./hub-skills";
 import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
+import type { WorkflowExampleFile, WorkflowInputExample } from "./workflow-examples";
 export interface AtlasText {
   ko: string;
   en?: string;
@@ -174,6 +175,8 @@ export interface LocalWorkflow {
     formats: string[];
     required: boolean;
     requiredWhen?: MethodText;
+    /** Default example data; attached by the researcher, never by the coauthor model (gaid-workflow-example). */
+    example?: DraftInputExample;
   }[];
   requiredScientificChoices: {
     id: string;
@@ -204,6 +207,19 @@ export interface LocalWorkflow {
   skills?: WorkflowDocSkill[];
   /** gaid-workflow/v1: the procedure the Workflow 지침 lists (single written source). */
   steps?: GaidWorkflowStep[];
+}
+
+/**
+ * A draft's example file: the package entry plus, for a bundled file, where its bytes are in the authoring store. The
+ * package carries `WorkflowExampleFile` only (`from` is dropped when packaging).
+ */
+export interface DraftExampleFile extends WorkflowExampleFile {
+  /** A data source file (`sources/<sourceId>/files/<sourcePath>`, unit C) or an upload kept at `examples/<sha256>`. */
+  from?: { sourceId: string; sourcePath: string } | { upload: true };
+}
+
+export interface DraftInputExample extends Omit<WorkflowInputExample, "files"> {
+  files: DraftExampleFile[];
 }
 
 export interface DraftRecipe {

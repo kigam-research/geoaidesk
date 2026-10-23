@@ -8,6 +8,7 @@
  * passes `t`, the server a formatter over the same catalogue.
  */
 import type { Localized, WorkflowArtifact, WorkflowChoice } from "./workspace";
+import type { WorkflowInputExample } from "./workflow-examples";
 
 export const WORKFLOW_DOC_SCHEMA = "gaid-workflow/v1";
 
@@ -80,7 +81,7 @@ export interface WorkflowDoc {
   /** Registered revision (판); null for catalogue Workflows and unregistered drafts. */
   revision: number | null;
   purpose: Localized | null;
-  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized }[];
+  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized; example?: WorkflowInputExample }[];
   choices: WorkflowChoice[];
   skills: WorkflowDocSkill[];
   steps: WorkflowDocStep[];
@@ -94,6 +95,8 @@ export interface WorkflowDoc {
 export interface WorkflowDocSettings {
   inputs: Record<string, string>;
   choices: Record<string, string>;
+  /** Input role ids whose path is the Workflow's example data (gaid-workflow-example), not the researcher's own file. */
+  examples?: string[];
 }
 
 /**

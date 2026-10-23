@@ -67,9 +67,27 @@ Recommended answers the user accepted:
 - Do not restart or change the review app except D as a user of it; the hub updates the review app after A–C merge.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Shared contract settled: `web/src/geo/contracts/workflow-examples.ts` (`WorkflowInputExample`, files bundled at
+  `examples/<roleId>/<name>` or `url` + sha256 + size, limits, validator `exampleProblems`, project folder
+  `user_data/examples/<method>/<roleId>-<key>/`, `POST /geo/methods/examples`); `inputRoles[].example` added to
+  `LocalWorkflow` (draft form `DraftInputExample` with `from` = data source file of unit C or upload at `examples/<sha256>`),
+  `WorkflowDoc.inputRoles[].example`, `WorkflowDocSettings.examples`, summary `WorkflowInputRole.example` (state).
 ## Next steps
-1. (the next session's first action)
+1. Runtime side (this writer), then integrate the authoring child and run scripts/check.
+
+## Plan (orchestration)
+Sequential decisions: contract first (done), then two independent packages.
+- Package R (this writer): method-file validation, `server/src/geo/methods/examples.ts` (state, copy, bounded download,
+  hash check, provenance user step), `local-methods.ts` summary, `routes/methods.ts` `POST /geo/methods/examples`,
+  `workflow-doc.ts` (server roles + render: chat/preview/cli say example used), `cli-export.ts` README, start settings
+  (`task-setup.tsx`, `setup-steps.tsx`: example option, upload option, default to example, mixed-data warning),
+  `hub/input-prep.tsx`, `workflow/workflow-view.tsx` inputs, locales `workspace`/`workflowDoc`/`workflowView`/`hub` (prep keys).
+- Package A (child `gaid-workflow-example--authoring`): hub authoring attach (upload / data source of unit C / public URL
+  with server-side bounded fetch for sha256+size), store bytes, carry researcher examples across model revisions, package
+  builder writes `examples/<roleId>/<name>` and strips `from`, schema extension, checks (limits), shared-hub edit seeding
+  keeps bundled bytes, draft screen UI. Owns `server/src/geo/authoring/**`, `server/src/geo/hub-shared/edit.ts`,
+  `web/src/geo/hub/**` except `input-prep.tsx`, locale namespace `hub` keys it adds.
+- Integration order: R and A in parallel → complete A → merge into this branch → scripts/check → UI screenshots.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
