@@ -89,7 +89,7 @@ it("shares a Workflow between two accounts and syncs one account's library acros
   expect(joinedA.status, JSON.stringify(joinedA.body)).toBe(200);
   expect(joinedA.body.account).toMatchObject({ email: "kim@example.org", role: "admin", displayName: "김연구" });
   expect(JSON.stringify(joinedA.body)).not.toContain("token");
-  expect((await a.call("GET", "/geo/hub/me")).body).toEqual({ name: "김연구", account: true });
+  expect((await a.call("GET", "/geo/hub/me")).body).toEqual({ name: "김연구", account: true, admin: true });
   const draftId = await registrableDraft(a.authoring, "김연구");
   const registered = await a.call("POST", "/geo/hub/entries", { authoringProjectId: draftId, folderId: "general", note: "first" });
   expect(registered.status, JSON.stringify(registered.body)).toBe(201);

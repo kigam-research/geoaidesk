@@ -6,7 +6,7 @@ import { WorkflowBlockCard } from "./workflow-card";
 import { workflowStartMessage } from "./render";
 
 const doc: WorkflowDoc = {
-  schemaVersion: "gaid-workflow/v1", kind: "legacy", id: "well-qc", title: { ko: "검층 점검", en: "Well-log QC" }, revision: 2, purpose: null,
+  schemaVersion: "gaid-workflow/v1", kind: "legacy", id: "well-qc", title: { ko: "검층 점검", en: "Well-log QC" }, version: "0.1.1", purpose: null,
   inputRoles: [{ id: "log", label: { ko: "검층 파일" }, formats: ["las-welllog"], required: true }],
   choices: [{ id: "depth", label: { ko: "심도 기준" }, options: ["MD", "TVD"] }],
   skills: [{ name: "well-log-qc-quicklook", source: "catalogue", role: "primary" }],
@@ -20,7 +20,7 @@ describe("Workflow start message", () => {
   it("puts the 지침 with the researcher's settings in a <workflow> block", () => {
     const message = workflowStartMessage(doc, { log: "logs/A.LAS" }, { depth: "MD" });
     const block = parseWorkflowBlock(message);
-    expect(block).toMatchObject({ id: "well-qc", revision: 2, title: "검층 점검", tail: "" });
+    expect(block).toMatchObject({ id: "well-qc", version: "0.1.1", title: "검층 점검", tail: "" });
     expect(block!.body).toContain("- 검층 파일: logs/A.LAS");
     expect(block!.body).toContain("- 심도 기준: MD");
     expect(block!.body).toContain("1. 파일 확인: LAS 판과 단위를 확인합니다.");
@@ -29,7 +29,7 @@ describe("Workflow start message", () => {
   it("shows the Workflow as a card that opens the 지침", async () => {
     const block = parseWorkflowBlock(`${workflowStartMessage(doc, {}, {})}\n\n북쪽 구간만 보세요.`)!;
     render(<WorkflowBlockCard block={block} />);
-    const toggle = screen.getByRole("button", { name: /Workflow · 검층 점검 · 2판/ });
+    const toggle = screen.getByRole("button", { name: /Workflow · 검층 점검 · version 0.1.1/ });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(screen.getByText("북쪽 구간만 보세요.")).toBeInTheDocument();
     await userEvent.click(toggle);
@@ -44,7 +44,7 @@ describe("pending Workflow in the composer", () => {
     const block = workflowStartMessage(doc, { log: "logs/A.LAS" }, {});
     let removed = false;
     render(<PendingWorkflowChip block={block} onRemove={() => { removed = true; }} />);
-    expect(screen.getByRole("button", { name: /Workflow · 검층 점검 · 2판/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Workflow · 검층 점검 · version 0.1.1/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Workflow 빼기" }));
     expect(removed).toBe(true);
     // chat-tab sends `${block}\n\n${typed text + attached paths + context}`.

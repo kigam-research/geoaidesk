@@ -26,7 +26,8 @@ export async function registerGeoHubServerRoutes(app: FastifyInstance, options: 
   setRemoteHubProvider(() => {
     const c = client.connection.current;
     const identity = client.identity;
-    return identity && c.account ? { store: remote.forIdentity(identity), actor: { id: c.account.id, name: c.account.displayName } } : null;
+    return identity && c.account ? { store: remote.forIdentity(identity), actor: { id: c.account.id, name: c.account.displayName,
+      ...(c.account.role === "admin" ? { admin: true } : {}) } } : null;
   });
   setOrcidHubProvider(() => hubClientOrcid(client));
   const remoteSkills = new RemoteHubSkillStore(client, remote);

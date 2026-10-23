@@ -5,6 +5,7 @@ import { apiRelative } from "../sandbox-fs.ts";
 import { findSkillDir, type SkillRoot } from "../agent/skills.ts";
 import { readMethodFile } from "./methods/method-file.ts";
 import { originOfSource } from "./methods/package-origin.ts";
+import { hubRefVersion } from "../../../web/src/geo/contracts/hub-version.ts";
 
 export function skillWorkflow(root: SkillRoot, name: string, source?: string) {
   // A standalone gaid-hub-skill is not a Workflow, even if its folder includes old method metadata.
@@ -12,7 +13,9 @@ export function skillWorkflow(root: SkillRoot, name: string, source?: string) {
   const dir = findSkillDir(root, name);
   const method = dir ? readMethodFile(dir, name).method : null;
   if (!method) return undefined;
-  return { title: method.title, revision: originOfSource(source).record?.hubEntry?.revision ?? method.revision };
+  const ref = originOfSource(source).record?.hubEntry;
+  // A hub install shows its registered version; any other package is a draft (초안, no version).
+  return { title: method.title, version: hubRefVersion(ref) };
 }
 
 export function skillFileList(root: SkillRoot, name: string) {

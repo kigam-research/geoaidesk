@@ -77,8 +77,8 @@ export interface WorkflowDoc {
   kind: WorkflowDocKind;
   id: string;
   title: Localized;
-  /** Registered revision (판); null for catalogue Workflows and unregistered drafts. */
-  revision: number | null;
+  /** Registered hub version (gaid-hub-versions, e.g. 0.1.2); null for catalogue Workflows and drafts (초안). */
+  version: string | null;
   purpose: Localized | null;
   inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized }[];
   choices: WorkflowChoice[];
@@ -127,7 +127,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
   const settings = target === "cli" ? null : options.settings ?? null;
   const lines: string[] = [];
   const title = p(doc.title);
-  lines.push(doc.revision ? say("heading.titleRevision", { title, revision: doc.revision }) : say("heading.title", { title }));
+  lines.push(doc.version ? say("heading.titleVersion", { title, version: doc.version }) : say("heading.title", { title }));
   if (p(doc.purpose)) lines.push("", p(doc.purpose));
 
   // Settings.
@@ -221,29 +221,32 @@ const attr = (value: string) => value.replace(/["\n\r]/g, " ").trim();
 
 /**
  * The chat's first message: the rendered document in a `<workflow>` block, then the researcher's own text. The
- * transcript shows the block as a "Workflow · <title> · <n>판" card (like the skill and template chips).
+ * transcript shows the block as a "Workflow · <title> · version <x.y.z>" card (like the skill and template chips).
  */
-export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "revision">, body: string, locale: "ko" | "en"): string {
+export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "version">, body: string, locale: "ko" | "en"): string {
   const title = attr(pick(doc.title, locale));
-  const revision = doc.revision ? ` revision="${doc.revision}"` : "";
-  return `<workflow id="${attr(doc.id)}"${revision} title="${title}">\n${body}\n</workflow>`;
+  const version = doc.version ? ` version="${attr(doc.version)}"` : "";
+  return `<workflow id="${attr(doc.id)}"${version} title="${title}">\n${body}\n</workflow>`;
 }
 
 export interface ParsedWorkflowBlock {
   id: string;
   title: string;
-  revision: number | null;
+  /** Hub version; a block written before versions (`revision="n"`) reads as 0.1.(n-1). */
+  version: string | null;
   body: string;
   /** Text after the block (the researcher's additions). */
   tail: string;
 }
 
-const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)")? title="([^"]*)">\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
+const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)"| version="(\d+\.\d+\.\d+)")? title="([^"]*)">\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
 
 export function parseWorkflowBlock(text: string): ParsedWorkflowBlock | null {
   const match = text.match(WORKFLOW_RE);
   if (!match) return null;
-  return { id: match[1], revision: match[2] ? Number(match[2]) : null, title: match[3], body: match[4], tail: match[5] ?? "" };
+  // Same rule as `legacyHubVersion` (hub-version.ts); no value import, the server loads contracts without a resolver.
+  const version = match[3] ?? (match[2] ? `0.1.${Math.max(0, Number(match[2]) - 1)}` : null);
+  return { id: match[1], version, title: match[4], body: match[5], tail: match[6] ?? "" };
 }
 
 // --- Older Workflows -------------------------------------------------------------------------------------------
@@ -266,7 +269,7 @@ export interface LegacyWorkflowInput {
   prompt: Localized | null;
   expectedArtifacts: WorkflowArtifact[];
   boundary: Localized | null;
-  revision?: number | null;
+  version?: string | null;
   /** The Workflow's skills in `skillIds` order (primary first), resolved to runtime names. */
   skills: { name: string; title?: Localized | null; source: WorkflowSkillSource; ref?: string | null; hub?: WorkflowHubSkillPin | null }[];
   /** The primary skill's procedure; absent when unknown. */
@@ -285,7 +288,7 @@ export function legacyWorkflowDoc(input: LegacyWorkflowInput): WorkflowDoc {
     kind: "legacy",
     id: input.id,
     title: input.title,
-    revision: input.revision ?? null,
+    version: input.version ?? null,
     purpose: input.description,
     inputRoles: input.inputRoles,
     choices: input.requiredScientificChoices,

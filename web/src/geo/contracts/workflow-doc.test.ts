@@ -10,7 +10,7 @@ const doc: WorkflowDoc = {
   kind: "structured",
   id: "conformal-grid-priority",
   title: { ko: "격자 탐사 우선순위", en: "Grid exploration priority" },
-  revision: 1,
+  version: "0.1.0",
   purpose: { ko: "격자 표로 탐사 우선순위 구역을 만듭니다." },
   inputRoles: [{ id: "grid-csv", label: { ko: "집계 격자 CSV" }, formats: ["csv"], required: true }],
   choices: [
@@ -30,7 +30,7 @@ const doc: WorkflowDoc = {
 describe("renderWorkflowDocument", () => {
   it("fills the researcher's settings for the chat and lists unresolved conditions", () => {
     const text = renderWorkflowDocument(doc, { ...ko, target: "chat", settings: { inputs: { "grid-csv": "user_data/grid.csv" }, choices: { alpha: "paper-015" } } });
-    expect(text.split("\n")[0]).toBe("# Workflow: 격자 탐사 우선순위 (1판)");
+    expect(text.split("\n")[0]).toBe("# Workflow: 격자 탐사 우선순위 (version 0.1.0)");
     expect(text).toContain("- 집계 격자 CSV: user_data/grid.csv");
     expect(text).toContain("- 순응 보정 alpha: 0.15");
     // The sentences after the settings list start after a blank line, so Markdown does not join them to the last item.
@@ -60,7 +60,7 @@ describe("renderWorkflowDocument", () => {
   it("is deterministic and renders English", () => {
     const options = { locale: "en" as const, say: sayIn("en"), target: "preview" as const };
     expect(renderWorkflowDocument(doc, options)).toBe(renderWorkflowDocument(doc, options));
-    expect(renderWorkflowDocument(doc, options).split("\n")[0]).toBe("# Workflow: Grid exploration priority (revision 1)");
+    expect(renderWorkflowDocument(doc, options).split("\n")[0]).toBe("# Workflow: Grid exploration priority (version 0.1.0)");
   });
 });
 
@@ -69,12 +69,12 @@ describe("workflow chat block", () => {
     const body = renderWorkflowDocument(doc, { ...ko, target: "chat", settings: { inputs: {}, choices: {} } });
     const message = `${workflowBlock(doc, body, "ko")}\n\n첫 시험은 북쪽 절반만 써 주세요.`;
     const parsed = parseWorkflowBlock(message);
-    expect(parsed).toEqual({ id: "conformal-grid-priority", revision: 1, title: "격자 탐사 우선순위", body, tail: "첫 시험은 북쪽 절반만 써 주세요." });
+    expect(parsed).toEqual({ id: "conformal-grid-priority", version: "0.1.0", title: "격자 탐사 우선순위", body, tail: "첫 시험은 북쪽 절반만 써 주세요." });
   });
 
   it("keeps attribute values on one line without quotes", () => {
-    const block = workflowBlock({ id: "a", revision: null, title: { ko: '이름 "따옴표"\n둘째 줄' } }, "본문", "ko");
-    expect(parseWorkflowBlock(block)).toMatchObject({ id: "a", revision: null, title: "이름  따옴표  둘째 줄", body: "본문" });
+    const block = workflowBlock({ id: "a", version: null, title: { ko: '이름 "따옴표"\n둘째 줄' } }, "본문", "ko");
+    expect(parseWorkflowBlock(block)).toMatchObject({ id: "a", version: null, title: "이름  따옴표  둘째 줄", body: "본문" });
   });
 });
 
@@ -89,7 +89,7 @@ describe("legacyWorkflowDoc", () => {
       prompt: { ko: "첫 시험은 줄인 설정으로 하세요." },
       expectedArtifacts: doc.artifacts,
       boundary: null,
-      revision: 2,
+      version: "0.1.1",
       skills: [{ name: "conformal-grid-priority", source: "bundled" }, { name: "geopandas", source: "catalogue" }],
       procedure: [{ id: "block", label: { ko: "블록 크기 산정" }, summary: { ko: "블록 크기를 정합니다." }, decisionIds: ["alpha", "unknown"] }],
     });

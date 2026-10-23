@@ -17,7 +17,7 @@ export async function registerGeoWorkflowViewRoutes(app: FastifyInstance, option
       const draft = project.drafts.find((d) => d.revision === revision);
       if (!draft) throw new AuthoringError("초안 판을 찾을 수 없습니다.", 404);
       return { doc: draft.workflow ? workflowDocFor(draft.workflow as unknown as GeoWorkflow, {
-        revision: null, skills: [{ name: draft.slug, source: "bundled" }], procedure: procedureSteps(draft.profile),
+        version: null, skills: [{ name: draft.slug, source: "bundled" }], procedure: procedureSteps(draft.profile),
       }) : null };
     } catch (error) {
       if (error instanceof AuthoringError) return reply.code(error.status).send({ error: error.message });

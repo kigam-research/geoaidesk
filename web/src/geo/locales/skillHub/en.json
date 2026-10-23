@@ -31,7 +31,7 @@
   "methodDraft": "Workflow: {id} · revision {revision} · {lifecycle}",
   "chooseFile": "Choose archive",
   "noFile": "No file chosen",
-  "workflowSkill": "Skill included with “{title}” Workflow · revision {revision}",
+  "workflowSkill": "Skill included with “{title}” Workflow · {version, select, draft {draft} other {version {version}}}",
   "read": "Read instructions",
   "readSkill": "Read {name} instructions",
   "backSkills": "Back to skills",

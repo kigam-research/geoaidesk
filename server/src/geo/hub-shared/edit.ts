@@ -4,6 +4,7 @@
  * anyone else edits a copy that is registered as a separate entry naming its original. Opening never changes the entry's
  * registered revisions.
  */
+import { hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { cp } from "node:fs/promises";
 import { extname } from "node:path";
 import type { AuthoringProject, HubEntryLink, MethodDraft } from "../../../../web/src/geo/contracts/authoring.ts";
@@ -28,6 +29,7 @@ export async function openEntryForEdit(
     const link: HubEntryLink = {
       entryId,
       revision: record.entry.latestRevision,
+      ...(hubVersionOf(record.entry) ? { version: hubVersionOf(record.entry)! } : {}),
       mode,
       title: record.entry.title,
       author: record.entry.author,

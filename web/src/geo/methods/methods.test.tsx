@@ -14,7 +14,7 @@ const workflow: LocalMethodWorkflow = {
   readiness: { state: "ready", skills: [{ id: "local:paper-method", runtimeName: "paper-method", title: null, installed: true, enabled: true }], environment: { id: "geo-core", title: null, state: "ready", missing: [] }, runRecord: "none", compatibilityRef: null },
 };
 const method: LocalMethodSummary = {
-  key: "project:paper-method", scope: "project", runtimeName: "paper-method", enabled: true, methodId: "local/paper-method", revision: 2, version: "0.2.0", title: { ko: "논문 기반 방법" }, summary: { ko: "시험할 분석 방법입니다." },
+  key: "project:paper-method", scope: "project", runtimeName: "paper-method", enabled: true, methodId: "local/paper-method", revision: 2, version: "0.2.0", hubVersion: null, title: { ko: "논문 기반 방법" }, summary: { ko: "시험할 분석 방법입니다." },
   lifecycle: "draft", lifecycleClaimed: "published", implementation: "implemented", codeOrigin: "generated", origin: { kind: "upload", pageUrl: "https://hub.test/method" }, editedLocally: true, treeHash: "abc",
   sources: [{ kind: "doi", ref: "10.1234/paper", title: "Paper" }], hubChecks: { checker: "hub-check", checkedAt: "2026-10-15T10:00:00Z", items: [{ id: "manifest", status: "pass" }], warnings: [{ code: "untested", path: "scripts", message: "No run recorded" }] },
   authoring: { hubUrl: "https://hub.test", projectId: "p1", draftRevision: 2, decisions: 1, openQuestions: [{ id: "q1", text: "대조 자료는 미정입니다." }], attempts: [] },

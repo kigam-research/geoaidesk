@@ -33,6 +33,16 @@ export class RemoteHubStore implements HubRecordStore {
   async list(): Promise<StoredEntry[]> { return (await this.request<{ entries: StoredEntry[] }>("/entries")).entries; }
   async write(record: StoredEntry, _actor: Actor): Promise<void> { await this.request(entryPath(record.entry.id), { method: "PUT", body: record }); }
   async recordInstall(id: string, install: AuthoringInstall, _actor: Actor): Promise<void> { await this.request(`${entryPath(id)}/installs`, { method: "POST", body: { install } }); }
+  async remove(id: string, _actor: Actor, reason: string): Promise<void> {
+    await this.request(`${entryPath(id)}/remove`, { method: "POST", body: { reason } });
+  }
+  /** Only an administrator's list exists on the server; anyone else may restore nothing. */
+  async removed(actor: Actor | null): Promise<StoredEntry[]> {
+    return actor?.admin ? (await this.request<{ entries: StoredEntry[] }>("/admin/entries/removed")).entries : [];
+  }
+  restore(id: string, _actor: Actor): Promise<StoredEntry> {
+    return this.request(`/admin${entryPath(id)}/restore`, { method: "POST", body: {} });
+  }
   bytes(id: string, file: string): Promise<Buffer> { return this.request(filePath(id, file), { file: true }); }
   async immutableBytes(id: string, file: string, bytes: Buffer, _actor: Actor): Promise<void> {
     await this.request(filePath(id, file), { method: "PUT", bytes, file: true, headers: { "X-Content-SHA256": createHash("sha256").update(bytes).digest("hex") } });

@@ -1,7 +1,7 @@
 {
   "heading": {
     "title": "# Workflow: {title}",
-    "titleRevision": "# Workflow: {title} (revision {revision})"
+    "titleVersion": "# Workflow: {title} (version {version})"
   },
   "section": {
     "settings": "Researcher's settings (these take precedence over example values in this document)",
@@ -38,7 +38,7 @@
     "primary": "primary skill",
     "usedIn": "Used in step {steps}.",
     "readRule": "Before you start a step that uses a skill, read that skill's instruction file (SKILL.md).",
-    "hubRevision": "revision {revision}"
+    "hubRevision": "version {revision}"
   },
   "steps": {
     "legacy": "This Workflow uses the earlier format. For the detailed method of each step, follow the procedure in the instructions of skill {skill}."
@@ -56,7 +56,7 @@
   },
   "card": {
     "label": "Workflow · {title}",
-    "labelRevision": "Workflow · {title} · revision {revision}",
+    "labelVersion": "Workflow · {title} · version {version}",
     "expand": "Show instructions",
     "collapse": "Hide instructions",
     "remove": "Remove Workflow",

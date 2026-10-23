@@ -12,13 +12,13 @@ import { t } from "../i18n";
 const DOC_TEXT = "[&_h1]:text-base [&_h1]:font-semibold [&_h2]:mt-3 [&_h2]:text-sm [&_h2]:font-semibold [&_h3]:text-sm";
 
 /**
- * A chat message that starts a Workflow (gaid-workflow-model): the card names the Workflow and its 판, the 지침 the
+ * A chat message that starts a Workflow (gaid-workflow-model): the card names the Workflow and its version, the 지침 the
  * agent received opens behind a toggle, and the researcher's own text follows.
  */
 export function WorkflowBlockCard({ block }: { block: ParsedWorkflowBlock }) {
   const [open, setOpen] = useState(false);
-  const label = block.revision
-    ? t("workflowDoc.card.labelRevision", { title: block.title, revision: block.revision })
+  const label = block.version
+    ? t("workflowDoc.card.labelVersion", { title: block.title, version: block.version })
     : t("workflowDoc.card.label", { title: block.title });
   return (
     <div className="flex flex-col gap-1.5" data-workflow-block={block.id}>
@@ -54,8 +54,8 @@ export function PendingWorkflowChip({ block, onRemove }: { block: string; onRemo
   const [open, setOpen] = useState(false);
   const parsed = parseWorkflowBlock(block);
   if (!parsed) return null;
-  const label = parsed.revision
-    ? t("workflowDoc.card.labelRevision", { title: parsed.title, revision: parsed.revision })
+  const label = parsed.version
+    ? t("workflowDoc.card.labelVersion", { title: parsed.title, version: parsed.version })
     : t("workflowDoc.card.label", { title: parsed.title });
   return (
     <div className="flex w-full flex-col items-start gap-1.5 self-stretch border-b px-3 py-2 text-left" data-pending-workflow={parsed.id}>

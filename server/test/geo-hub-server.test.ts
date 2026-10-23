@@ -58,7 +58,8 @@ function nextRevision(previous: StoredEntry, bytes = Buffer.from("second package
   r.snapshots[n] = structuredClone(r.snapshots[n - 1]);
   r.snapshots[n].package = { ...r.snapshots[n].package, revision: n, draftRevision: n, sha256: sha256(bytes), size: bytes.length };
   r.snapshots[n].draft.revision = n;
-  r.entry.revisions.push({ ...r.entry.revisions[n - 2], revision: n, packageRevision: n, draftRevision: n, packageSha256: sha256(bytes), registeredBy: "위조자", registeredById: "forged" });
+  const { version: _previousVersion, ...earlier } = r.entry.revisions[n - 2];
+  r.entry.revisions.push({ ...earlier, revision: n, packageRevision: n, draftRevision: n, packageSha256: sha256(bytes), registeredBy: "위조자", registeredById: "forged" });
   return r;
 }
 const put = (headers: Record<string, string>, r: StoredEntry) => app.inject({ method: "PUT", url: `${API}/entries/${r.entry.id}`, headers, payload: r });
@@ -72,7 +73,7 @@ describe("home and process surface", () => {
     expect((await app.inject(`${API}/health`)).json().serverId).toBe(first.serverId);
     expect(app.hub.get("PRAGMA journal_mode")).toMatchObject({ journal_mode: "wal" });
     expect(app.hub.get("PRAGMA foreign_keys")).toMatchObject({ foreign_keys: 1 });
-    expect(app.hub.counts().schema_migrations).toBe(4);
+    expect(app.hub.counts().schema_migrations).toBe(5);
   });
   it.each([{ origin: "http://localhost" }, { origin: "" }, { "sec-fetch-site": "none" }])("refuses browser headers before routing: %j", async (headers) => {
     for (const url of [`${API}/health`, "/projects", `${API}/auth/login`]) {
@@ -236,6 +237,62 @@ describe("hub records and files", () => {
     expect((await put(u.headers, saved)).statusCode).toBe(409);
     const changedRevision = structuredClone(first); changedRevision.entry.revisions[0].note = "바꾼 이력";
     expect((await put(u.headers, changedRevision)).statusCode).toBe(409);
+  });
+  it("assigns 0.1.0 first, a patch step to a client without versions, and accepts only one patch/minor/major step", async () => {
+    const u = await user(); const first = await publish(u.headers);
+    expect(first.entry.revisions[0].version).toBe("0.1.0");
+    const bytes = Buffer.from("second package"); const second = nextRevision(first, bytes);
+    expect((await upload(u.headers, first.entry.id, "packages/2.tar.gz", bytes)).statusCode).toBe(204);
+    for (const version of ["0.1.0", "0.1.2", "0.3.0", "2.0.0", "1.0"]) {
+      second.entry.revisions[1].version = version;
+      expect((await put(u.headers, second)).statusCode, version).toBe(409);
+    }
+    second.entry.revisions[1].version = "1.0.0";
+    const major = await put(u.headers, second);
+    expect(major.statusCode, major.body).toBe(200);
+    expect(major.json<StoredEntry>().entry.revisions.map((r) => r.version)).toEqual(["0.1.0", "1.0.0"]);
+    const bytes3 = Buffer.from("third package"); const third = nextRevision(major.json<StoredEntry>(), bytes3);
+    expect((await upload(u.headers, first.entry.id, "packages/3.tar.gz", bytes3)).statusCode).toBe(204);
+    const patch = await put(u.headers, third);
+    expect(patch.statusCode, patch.body).toBe(200);
+    expect(patch.json<StoredEntry>().entry.revisions.at(-1)!.version).toBe("1.0.1");
+  });
+  it("removes an entry for its author or an admin, hides it everywhere and lets only an admin restore it", async () => {
+    const owner = await user(); const other = await user("other@example.org"); const admin = await user("admin@example.org", "admin");
+    const stored = await publish(owner.headers);
+    const id = stored.entry.id;
+    const remove = (headers: Record<string, string>, reason = "중복 등록") =>
+      app.inject({ method: "POST", url: `${API}/entries/${id}/remove`, headers, payload: { reason } });
+    expect((await remove(other.headers)).statusCode).toBe(403);
+    expect((await remove(owner.headers)).statusCode).toBe(204);
+    expect((await remove(owner.headers)).statusCode).toBe(409);
+    expect((await app.inject({ url: `${API}/entries`, headers: other.headers })).json().entries).toEqual([]);
+    expect((await app.inject({ url: `${API}/entries/${id}`, headers: owner.headers })).statusCode).toBe(404);
+    expect((await app.inject({ url: `${API}/entries/${id}/files/packages/1.tar.gz`, headers: owner.headers })).statusCode).toBe(404);
+    expect((await app.inject({ method: "POST", url: `${API}/entries/${id}/comments`, headers: other.headers, payload: { body: "의견" } })).statusCode).toBe(404);
+    // The author cannot publish over a removed entry, not even a second revision.
+    const bytes = Buffer.from("second package");
+    expect((await upload(owner.headers, id, "packages/2.tar.gz", bytes)).statusCode).toBe(409);
+    expect((await put(owner.headers, stored)).statusCode).toBe(409);
+    expect((await app.inject({ url: `${API}/admin/entries/removed`, headers: owner.headers })).statusCode).toBe(403);
+    const listed = await app.inject({ url: `${API}/admin/entries/removed`, headers: admin.headers });
+    expect(listed.json().entries.map((e: StoredEntry) => [e.entry.id, e.entry.removed?.by, e.entry.removed?.reason]))
+      .toEqual([[id, owner.account.displayName, "중복 등록"]]);
+    expect((await app.inject({ method: "POST", url: `${API}/admin/entries/${id}/restore`, headers: owner.headers })).statusCode).toBe(403);
+    const restored = await app.inject({ method: "POST", url: `${API}/admin/entries/${id}/restore`, headers: admin.headers });
+    expect(restored.statusCode, restored.body).toBe(200);
+    expect(restored.json<StoredEntry>().entry.removed).toBeUndefined();
+    expect(restored.json<StoredEntry>().entry.revisions).toEqual(stored.entry.revisions);
+    expect((await app.inject({ url: `${API}/entries`, headers: other.headers })).json().entries).toHaveLength(1);
+    expect((await app.inject({ method: "POST", url: `${API}/admin/entries/${id}/restore`, headers: admin.headers })).statusCode).toBe(404);
+    // An admin may remove someone else's entry.
+    expect((await remove(admin.headers, "")).statusCode).toBe(204);
+    const actions = app.hub.all<{ action: string; account_id: string }>("SELECT action,account_id FROM audit_events WHERE target=? AND action LIKE 'entry.re%' ORDER BY rowid", id);
+    expect(actions).toEqual([
+      { action: "entry.remove", account_id: owner.account.id },
+      { action: "entry.restore", account_id: admin.account.id },
+      { action: "entry.remove", account_id: admin.account.id },
+    ]);
   });
   it("rejects skipped revisions, deleted history and basedOn changes", async () => {
     const u = await user(); const first = await publish(u.headers);

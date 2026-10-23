@@ -23,7 +23,7 @@ export interface PackageOriginRecord {
   pageUrl?: string;
   descriptorUrl?: string;
   /** Registered GAID hub entry and the exact shared revision selected for preview. */
-  hubEntry?: { id: string; revision: number };
+  hubEntry?: { id: string; revision: number; version?: string };
   /** From the hub descriptor, never from the package's own files. */
   hub?: { methodId?: string; revision?: number; lifecycle?: MethodLifecycle; pageUrl?: string };
   /** `gaid-hub-skill`: the hub skill revision these bytes are (set by the hub skill install, never from the archive). */

@@ -93,7 +93,8 @@ export function packageProcedure(skillDir: string): SkillProcedureStep[] | null 
 }
 
 export interface WorkflowDocContext {
-  revision?: number | null;
+  /** Registered hub version (gaid-hub-versions); null/absent for catalogue Workflows and drafts. */
+  version?: string | null;
   /** The Workflow's skills resolved to runtime names, in `skillIds` order (primary first). */
   skills: { name: string; title?: Localized | null; source: WorkflowSkillSource; ref?: string | null }[];
   /** Procedure of the primary skill, for an older Workflow without its own steps. */
@@ -185,7 +186,7 @@ export function workflowDocFor(workflow: GeoWorkflow, context: WorkflowDocContex
       kind: "structured",
       id: workflow.id,
       title: text(workflow.title) ?? { ko: workflow.id },
-      revision: context.revision ?? null,
+      version: context.version ?? null,
       purpose: text(workflow.description),
       inputRoles: roles(workflow),
       choices: choices(workflow),
@@ -206,7 +207,7 @@ export function workflowDocFor(workflow: GeoWorkflow, context: WorkflowDocContex
     prompt: text(workflow.prompt),
     expectedArtifacts: artifacts(workflow),
     boundary: text(workflow.boundary),
-    revision: context.revision ?? null,
+    version: context.version ?? null,
     skills: context.skills,
     procedure: context.procedure ?? null,
   });

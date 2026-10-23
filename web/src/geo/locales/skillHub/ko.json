@@ -31,7 +31,7 @@
   "methodDraft": "Workflow: {id} · {revision}판 · {lifecycle}",
   "chooseFile": "파일 묶음 파일 선택",
   "noFile": "선택한 파일 없음",
-  "workflowSkill": "「{title}」 Workflow에 딸린 스킬 · {revision}판",
+  "workflowSkill": "「{title}」 Workflow에 딸린 스킬 · {version, select, draft {초안} other {version {version}}}",
   "read": "지침 보기",
   "readSkill": "{name} 지침 보기",
   "backSkills": "스킬 목록으로 돌아가기",

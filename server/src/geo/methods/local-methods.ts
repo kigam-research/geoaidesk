@@ -26,6 +26,7 @@ import { extraPackages } from "./extra-packages.ts";
 import { environmentState, projectSkillState, readinessOf, summarizeWorkflow } from "../workspace/workflows.ts";
 import { readMethodFile, type MethodFile } from "./method-file.ts";
 import { originOfSource, packageStore } from "./package-origin.ts";
+import { hubRefVersion } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { trialCounts } from "./trials.ts";
 import { packageProcedure, workflowDocFor } from "../workflow-doc.ts";
 
@@ -87,6 +88,12 @@ export function installedMethods(paths: ProjectPaths, roots: SkillRoot[] = [proj
 export function findInstalledMethod(paths: ProjectPaths, runtimeName: string, roots?: SkillRoot[]): InstalledMethod | null {
   // Project entries shadow user-scope entries of the same name (Pi's first-wins rule).
   return installedMethods(paths, roots).find((method) => method.runtimeName === runtimeName) ?? null;
+}
+
+/** Registered hub version of an installed method (null: not installed from the GAID hub, shown as 초안). */
+export function installedHubVersion(paths: ProjectPaths, method: InstalledMethod, store = packageStore()): string | null {
+  const root = method.scope === "global" ? globalSkillRoot() : projectSkillRoot(paths);
+  return hubRefVersion(originOfSource(getSkillProvenance(root, method.runtimeName)?.source, store).record?.hubEntry);
 }
 
 /** Hub skill revision lookup for readiness: whether a pinned revision is suspended in the hub (C2 passes the store). */
@@ -175,7 +182,7 @@ export async function listLocalMethods(
       // screen that shows "untested" agrees with the trial count.
       return {
         ...summarizeWorkflow(workflow, { ...readiness, runRecord: tried.count > 0 ? "recorded" : "none" }, workflowDocFor(workflow, {
-          revision: file?.revision ?? null,
+          version: hubRefVersion(origin.hubEntry),
           skills: workflow.skillIds.map((id, i) => ({
             name: skills[i]?.runtimeName ?? id,
             title: skills[i]?.title ?? null,
@@ -196,6 +203,7 @@ export async function listLocalMethods(
       methodId: file?.methodId ?? null,
       revision: file?.revision ?? null,
       version: file?.version ?? null,
+      hubVersion: hubRefVersion(origin.hubEntry),
       title: file?.title ?? { ko: method.runtimeName },
       summary: file?.summary ?? null,
       lifecycle,

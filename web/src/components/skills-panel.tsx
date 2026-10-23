@@ -835,7 +835,7 @@ export function SkillsPanel() {
                     {r.description}
                   </div>
                   {r.hubSkill ? <InstalledSkillState skill={r.hubSkill} onUpdate={scope === "project" ? () => { setHubSource(false); setHubInstall({ skillId: r.hubSkill!.id, revision: r.hubSkill!.latestRevision! }); } : undefined} /> : r.workflow ? (
-                    <div className="truncate text-xs text-muted-foreground" title={t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}>{t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), revision: r.workflow.revision })}</div>
+                    <div className="truncate text-xs text-muted-foreground" title={t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), version: r.workflow.version ?? "draft" })}>{t("skillHub.workflowSkill", { title: localizedText(r.workflow.title), version: r.workflow.version ?? "draft" })}</div>
                   ) : r.source && origin === "registry" && (
                     <div className="truncate text-[10px] text-muted-foreground/80">
                       {r.source}
