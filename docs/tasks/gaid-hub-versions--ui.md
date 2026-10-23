@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T07:19:41Z
+status: active
+updated: 2026-10-23T07:29:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"85dddf2d-e5cf-4fd4-9e09-1bd517612fc9","pid":2306567,"provider":"codex","session":"01a1678c-afff-7a90-bcc6-4c8ff80df8f6","start":"62657466","token":"439122785c0ef2741fb6290719f33f7d911ae7984a2150a314072fcd11f03a42"}
 branch: task/gaid-hub-versions--ui
 target: task/gaid-hub-versions
@@ -92,9 +92,10 @@ UI delivered; final integration/checks pending. Changes include:
 - Copy: version glossary, Korean/English copy, skill/release terminology; no prohibited revision terminology remains in owned Korean namespaces.
 
 Checks completed:
-- `cd web && npx tsc --noEmit`: passed (before parent c75207ee; compatible UI refs use optional helper fields).
+- `cd web && npx tsc --noEmit`: passed before and after merging parent c75207ee/db8bb897.
 - Focused web suite, 7 files: 51 tests passed. After updating stale copy expectations: 5 files / 75 tests passed. After the delayed-folder regression test: 2 files / 12 tests passed.
-- First complete web suite: 187 files passed / 5 failed, 1234 tests passed / 11 failed. Ten failures were stale expected strings (fixed, targeted suites pass); the remaining chat-label parser regression was fixed by parent c75207ee. Final full suite will run on integration.
+- Final integrated web suite: **192 files / 1246 tests passed** (`npm test`, scripts/check). Integrated server suite: **203 files / 2260 tests passed**, 1 file / 8 tests skipped by the suite; no failures.
+- First complete web suite: 187 files passed / 5 failed, 1234 tests passed / 11 failed. Ten failures were stale expected strings (fixed, targeted suites pass); the remaining chat-label parser regression was fixed by parent c75207ee. The later integrated full suite passed (above).
 - `node geo/copy/validate-copy.mjs web/src/geo/locales`: 0 errors, 100 warnings (existing copy warnings, not strict mode).
 - `node geo/ui/check-ui.mjs`: 0 errors, 78 accepted debt entries; no baseline changes.
 - Actual isolated browser: removal returned to the hub list, registered count became 0 and removed count 1, restoration returned registered count to 1. No project install/write or model call was made. Entry/draft content is an illustrative fixture, not a scientific result.
@@ -106,13 +107,14 @@ Evidence:
 - Isolated frontend/backend :3137/:8137. Projects `~/data/geoaidesk/work/gaid-hub-versions/projects`, shared store `~/data/geoaidesk/work/gaid-hub-versions/hub-shared`, authoring and agent data also isolated there. Review/deployed apps :3000/:18000 untouched.
 - Codegraph unavailable for this exact worktree (unindexed); relevant files read natively. No delegated workers.
 
-Sequential decisions and integration: retain numeric revisions only for transport; use stored registered versions for UI; parent owns all server/contracts changes. Parent 8cd0ba6d is merged; final finish must include parent c75207ee (chat-label parser, server expectations and Workflow references in hub skills). No manual Git publication.
+Sequential decisions and integration: retain numeric revisions only for transport; use stored registered versions for UI; parent owns all server/contracts changes. Parent db8bb897 (including c75207ee: chat-label parser, server expectations and Workflow references in hub skills) is merged. No manual Git publication.
 
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-23T07:19:41Z: ready; the parent gaid-hub-versions integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First `task finish`: server (2260 tests) and web (1246 tests) passed. Distribution test rejected the new integration-boundary owner `gaid-hub-versions`, absent from its explicit allowlist. Added the actual package owner to `geo/tests/distribution.test.mjs`; targeted distribution suite: 7/7 passed. No runtime or UI source changed for this fix.
 - `task sync` merged parent commit 8cd0ba6d, then ran the full scripts/check. Its server suite reported the pre-existing parent-owned workflow-doc expected-version failure. Stopped that duplicate full check with SIGINT (exit 130) after reporting it to parent; no integration was claimed. Parent owns the server fix and final full check.
 - First full web suite found ten stale wording expectations and one parent-owned chat-label parser failure. Copy expectations were updated, relevant suites passed; parent c75207ee fixes the parser.
 - Isolated backend initially omitted KADY_FRONTEND_PORT, so the request guard correctly refused the :3137 origin. Restarted with KADY_FRONTEND_PORT=3137; actual removal/restoration then passed.
