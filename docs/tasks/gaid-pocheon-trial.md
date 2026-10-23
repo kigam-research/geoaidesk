@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T11:05:44Z
+updated: 2026-10-23T11:45:13Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
