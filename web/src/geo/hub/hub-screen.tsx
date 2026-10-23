@@ -53,6 +53,7 @@ import { hubUserName, sharedHub } from "./shared-api";
 import { CatalogueWorkflowScreen } from "./catalogue-workflow";
 import { hubImage, SharedEntryScreen, useHubIdentity, useNamedAction } from "./shared-entry";
 import { NewFolderDialog, RegisterDialog } from "./hub-dialogs";
+import { StageNotice } from "./stage-notice";
 
 import { SkillShelf } from "@/geo/hub-skills/shelf";
 import { SkillDetail } from "@/geo/hub-skills/detail";
@@ -653,6 +654,12 @@ function HubProject({
 
   // "" = the app default, sent explicitly so a project created with another model can switch back to the default.
   const withModel = { model: agentModel, ...(agentThinking ? { thinkingLevel: agentThinking } : {}) };
+  // The researcher reviews the revised draft as with any revise (stage regrouping, gaid-workflow-stages).
+  const reviseDraft = async (feedback: string) => {
+    await hubApi.revise(id, { opId: newOpId(), feedback, ...withModel });
+    setStep(null);
+    await reload();
+  };
   const ensureProject = async (): Promise<string> => {
     if (!isNew) return id;
     const created = await hubApi.create({
@@ -892,6 +899,8 @@ function HubProject({
     );
   } else if (draft && current === "publish") {
     body = (
+      <>
+      <div className="mb-4"><StageNotice check={check} onRevise={reviseDraft} /></div>
       <SharedMethod
         preview={{
           onBack: () => setStep("draft"),
@@ -922,6 +931,7 @@ function HubProject({
         onComment={() => undefined}
         onTry={() => setStep("trial")}
       />
+      </>
     );
   } else if (draft && current === "draft") {
     const issues = check ? check.findings.filter((f) => f.level === "error").length : null;
@@ -954,6 +964,7 @@ function HubProject({
         onShowIssues={() => setDialog("issues")}
         onRegister={() => setStep("publish")}
         examples={{ project, onChanged: () => void reload() }}
+        stageNotice={<StageNotice check={check} onRevise={reviseDraft} />}
         rail={
           <TrialCard
             key={`${draft.revision}:${trialProject}`}

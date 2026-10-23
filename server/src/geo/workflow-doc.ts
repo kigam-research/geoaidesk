@@ -108,6 +108,7 @@ function roles(workflow: GeoWorkflow): WorkflowDoc["inputRoles"] {
     label: text(role.label) ?? { ko: role.id },
     formats: strings(role.formats),
     required: role.required === true,
+    ...((role as { multiple?: unknown }).multiple === true ? { multiple: true } : {}),
     ...(text((role as { requiredWhen?: unknown }).requiredWhen) ? { requiredWhen: text((role as { requiredWhen?: unknown }).requiredWhen)! } : {}),
     ...(roleExample(role.id, (role as { example?: unknown }).example)),
   }));
@@ -128,6 +129,14 @@ function roleExample(roleId: string, value: unknown): { example?: WorkflowInputE
   };
 }
 
+/** The value a choice uses unless the researcher changes it (gaid-workflow-stages); an option id when it has options. */
+export function choiceDefault(choice: Record<string, unknown>): string | null {
+  const value = typeof choice.default === "string" ? choice.default.trim() : "";
+  if (!value) return null;
+  const options = strings(choice.options);
+  return options.length && !options.includes(value) ? null : value;
+}
+
 function choices(workflow: GeoWorkflow): WorkflowChoice[] {
   return (workflow.requiredScientificChoices ?? []).map((raw) => {
     const choice = raw as Record<string, unknown> & { id: string };
@@ -142,6 +151,7 @@ function choices(workflow: GeoWorkflow): WorkflowChoice[] {
       ...(text(choice.why) ? { why: text(choice.why)! } : {}),
       ...(strings(choice.options).length ? { options: strings(choice.options) } : {}),
       ...(Object.keys(labels).length ? { optionLabels: labels } : {}),
+      ...(choiceDefault(choice) ? { default: choiceDefault(choice)! } : {}),
     };
   });
 }
@@ -186,6 +196,7 @@ function ownSteps(workflow: GeoWorkflow): WorkflowDocStep[] {
       skill: typeof step.skill === "string" ? step.skill : null,
       read: text(step.read),
       checks: Array.isArray(step.checks) ? step.checks.map(text).filter((item): item is Localized => Boolean(item)) : [],
+      inputIds: strings(step.inputIds),
       choiceIds: strings(step.choiceIds),
       outputs: strings(step.outputs),
     }];

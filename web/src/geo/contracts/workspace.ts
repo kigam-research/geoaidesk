@@ -29,6 +29,8 @@ export interface WorkflowInputRole {
   extensions: string[];
   required: boolean;
   requiredWhen?: Localized;
+  /** The input takes several files (e.g. survey lines + base-station record; gaid-workflow-stages). */
+  multiple?: boolean;
   /** Default example data used when the researcher gives no file (gaid-workflow-example; installed methods only). */
   example?: WorkflowInputExampleState;
 }
@@ -42,6 +44,11 @@ export interface WorkflowChoice {
   /** Display labels of `options` (gaid-method/v1 packages); an option without one shows its id. */
   optionLabels?: Record<string, Localized>;
   requiredWhen?: Localized;
+  /**
+   * Value used unless the researcher changes it (an option id, or text when there are no options; gaid-workflow-stages).
+   * A choice with a default is a parameter shown and editable in the start summary, not asked on a stage page.
+   */
+  default?: string;
 }
 
 export interface WorkflowArtifact {

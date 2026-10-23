@@ -653,5 +653,13 @@
     "otherPc": "Note on another PC",
     "noPdf": "No PDF",
     "addEmpty": "Add"
+  },
+  "stages": {
+    "title": "Check the Workflow stages",
+    "body": "A Workflow is split by the analysis flow, such as data preparation → processing and modelling → evaluation → interpretation and results, into 3-5 stages. At most 6 conditions must be set at the start; the others get a default that can be changed in the start summary.",
+    "detail": "{count, plural, one {# point} other {# points}} to check",
+    "action": "Regroup stages by analysis flow",
+    "reviewNote": "The AI agent writes a new draft. Review the changed stages and conditions before you try or register it.",
+    "failed": "Regrouping could not start."
   }
 }
