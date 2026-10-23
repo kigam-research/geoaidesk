@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:17:39Z
+updated: 2026-10-23T06:18:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"cc577db8-acf4-4fcd-b382-03314cb2af71","pid":1746984,"provider":"claude","session":"bf5e0624-c00c-4da3-8d48-be9d0472fbca","start":"62320911","token":"08ec02ef4d15776d4adca0405d68c76559de4aefe662e800ff9e1e1ba2940de0"}
 branch: task/gaid-workflow-example
 target: main
@@ -72,8 +72,19 @@ Recommended answers the user accepted:
   `user_data/examples/<method>/<roleId>-<key>/`, `POST /geo/methods/examples`); `inputRoles[].example` added to
   `LocalWorkflow` (draft form `DraftInputExample` with `from` = data source file of unit C or upload at `examples/<sha256>`),
   `WorkflowDoc.inputRoles[].example`, `WorkflowDocSettings.examples`, summary `WorkflowInputRole.example` (state).
+- Package R done (commits f6c29c3, d0ab2a4): validation, `server/src/geo/methods/examples.ts`, method summary states,
+  `POST /geo/methods/examples`, 지침 rendering (chat/preview/cli), CLI README, start settings (example option, upload,
+  default to example, mixed warning, summary note, preparing state), Workflow card label 예제 자료로 실행, hub InputPrep,
+  workflow-view inputs, glossary term 예제 자료, AGENTS.md bullet.
+  Verified: `server` `npx vitest run test/geo-workflow-examples.test.ts test/geo-methods.test.ts test/geo-workflow-doc.test.ts
+  test/geo-cli-export.test.ts` 37 passed; `web` `npx vitest run src/geo src/lib` 827 passed after fixing one parse expectation;
+  tsc clean both; copy 0 errors; ui 0 errors.
+- Unit D was told the declaration shape (Paseo message to f483b642, 2026-10-23 15:18 KST; route-report
+  d-interface-gaid-workflow-example).
 ## Next steps
-1. Runtime side (this writer), then integrate the authoring child and run scripts/check.
+1. Wait for full `scripts/check` (log `~/data/geoaidesk/work/gaid-workflow-example/check-1.log`) and child A's finish;
+   `task complete gaid-workflow-example--example-authoring`, then scripts/check again and Korean screenshots of the start
+   settings (both styles, both themes, 1440x900 and 1280x800) from a dev app on non-review ports.
 
 ## Plan (orchestration)
 Sequential decisions: contract first (done), then two independent packages.
