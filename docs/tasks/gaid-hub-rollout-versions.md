@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:37:43Z
+updated: 2026-10-23T08:40:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"63c6aa87-c4a4-4624-9c99-d7f3096d74a3","pid":3356915,"provider":"claude","session":"abfb67d2-5d61-4efb-96c3-d2f9ec8416bb","start":"63255981","token":"96268dc30643485eaa762b4dfbb47ec9211b079885bf6e4624511700c1495289"}
 branch: task/gaid-hub-rollout-versions
 target: main
@@ -48,8 +48,26 @@ Main at request time: 7703739a.
 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
+1. Hub server DONE 2026-10-23 08:39Z. Backup `~/data/geoaidesk/hub-server/backups/2026-10-23-before-7703739a` (+ unit file copy
+   `gaid-hub-server.service.982389c5`), `check-backup` passed: accounts 1, hub_entries 7 (the user registered two since the
+   last rollout), hub_files 19, stars 1, comments 5, installs 8, library_objects 9, library_files 5, feed_sources 18,
+   feed_items 334. Snapshot `git archive 7703739a` + `npm ci` in `server/` at `~/deploy/geoaidesk-hub-server/7703739a…`
+   (npm skipped install scripts as before); smoke-served a copy of the backup on 127.0.0.1:8791 first (migrations 4+5 applied,
+   same serverId). Unit repointed (comment, Description, WorkingDirectory, TASK_SOURCE_SHA), daemon-reload, restart: active,
+   health same serverId `hub-1f510d4fd3f6345b1d11c3506d878fc6`, migrations 4 and 5 applied 2026-10-23T08:39:31Z, all row counts
+   unchanged, `hub_entry_removals` 0. No `orcid-client.json` in the home (ORCID not configured). The review app (still
+   b74950e7) reaches the hub as admin and lists the 7 entries.
+   Rollback: `cp <backup>/gaid-hub-server.service.982389c5 ~/.config/systemd/user/gaid-hub-server.service`,
+   `systemctl --user daemon-reload && systemctl --user restart gaid-hub-server` (migrations 4/5 only add tables/columns; if
+   needed restore the backup with check-backup first). Old snapshot `982389c5…` kept.
+2. Review app: waiting for D (gaid-pocheon-trial) to free it. Currently b74950e7, loopback only (env PATH, HOME, KADY_PORT).
+   Version labels (0.1.0, 0.1.1 for the 2-revision entry) and the ORCID "not configured" screen are checked there after the
+   update (client-side view fills versions).
+3. PROJECT.md: hub SHA, backup, loopback mode recorded; review app SHA to update after step 2.
+Re-verify: `curl -s http://127.0.0.1:8700/hub/v1/health`; `systemctl --user cat gaid-hub-server | grep WorkingDirectory`.
 ## Next steps
-1. (the next session's first action)
+1. When the hub or D says the review app is free: back up ~/.geoaidesk config, update the review app to the main SHA
+   7703739a (or current main if the hub server is moved with it) with the loopback recipe, browser checks, PROJECT.md, finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)

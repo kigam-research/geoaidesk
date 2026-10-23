@@ -37,13 +37,16 @@ the skill_hub hub sends app packages here (first: WP02 `gaid-fork-base`).
 - Institute hub server service (gaid-hub-server-trial): `pc74` user unit `gaid-hub-server.service`, `0.0.0.0:8700` (plain HTTP
   pilot; HTTPS switch in `docs/geo/hub-server-https.md`), pinned snapshot `~/deploy/geoaidesk-hub-server/<sha>/`, home
   `pc74:~/data/geoaidesk/hub-server/home`, log `.../hub-server/logs/hub-server.log`, backups `.../hub-server/backups/`, frozen
-  import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`
-  on the institute LAN (`KADY_HOST=0.0.0.0`, `NEXT_PUBLIC_ADK_API_URL=http://10.13.15.74:18000`, fixed `KADY_AUTH_TOKEN` from
-  `~/data/geoaidesk/work/review-app/access-token`), data `~/.geoaidesk`, log `~/data/geoaidesk/work/review-app/launcher.log`.
-- Deployed SHAs: hub server `982389c59f5cda2b666fc9893d0d27a8017cad6c` (2026-10-23; schema migration 3, 18 feed sources
-  approved; previous snapshot `cb63b1184f8839e3d0fc34b9f5981e59614350f1` kept for rollback; ORCID phase 2 not deployed,
-  open item gaid-orcid#1); review app `a8d35c6b24ee8cb9bb131a93c7221b29336afac9` (2026-10-23; ORCID phase 1+2 and
-  project workspace state; config backup `~/data/geoaidesk/work/review-app/config-backup-20261023T130459`).
+  import source `.../hub-server/import-source/`. The review app (`gaid-review`, :3000/:18000) runs from `~/deploy/geoaidesk`,
+  loopback only since 2026-10-23 (user: token access off until the following Monday; started without `KADY_HOST`,
+  `NEXT_PUBLIC_ADK_API_URL`, `KADY_AUTH_TOKEN`; the LAN mode used `KADY_HOST=0.0.0.0`,
+  `NEXT_PUBLIC_ADK_API_URL=http://10.13.15.74:18000` and the fixed token in `~/data/geoaidesk/work/review-app/access-token`),
+  data `~/.geoaidesk`, log `~/data/geoaidesk/work/review-app/launcher.log`.
+- Deployed SHAs: hub server `7703739a40ef0ac99ae1bb3e3d130c745ea8376b` (2026-10-23, gaid-hub-rollout-versions; schema
+  migrations 4 (ORCID) and 5 (Workflow removal); ORCID client not configured, open item gaid-orcid#1; backup
+  `.../hub-server/backups/2026-10-23-before-7703739a` with the previous unit file; previous snapshot
+  `982389c59f5cda2b666fc9893d0d27a8017cad6c` kept for rollback); review app `b74950e700301c9f2edba6f7ba1a47c183225b2b`
+  (loopback only).
 
 ## Upstream
 - Remote `upstream` = `https://github.com/K-Dense-AI/k-dense-byok.git`; integration base
