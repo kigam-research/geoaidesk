@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T17:48:05Z
+updated: 2026-10-23T17:59:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
@@ -61,6 +61,10 @@ Request from the starter:
   it; cycle plate shows `version 0.1.0 → 0.1.1` (the study's real versions); render.py takes duration and stills from the page, writes
   `gaid-promo-v3.mp4`. Preview with v2 frames as stand-ins: `~/data/geoaidesk/work/gaid-promo-video-v3/preview-01/`
   (94 s with the 12 v2 shots that share ids; with all 16 v3 targets ≈ 100–105 s).
+- Final render job `job-geoaidesk-gaid-promo-video-v3-1` succeeded (exit 0): `gaid-promo-v3.mp4` 105.00 s, 3,150 frames,
+  1920×1080, 30 fps, H.264, no audio (re-read with imageio-ffmpeg), sha256 1fe73715…72ea5f, source 344c7e44, capture.json
+  aab24b2e…. Report `reports/2026-10-24-gaid-promo-video-v3/` (figures from the final MP4), registry `gaid-promo-video-v3`
+  (review, supersedes v2), v2 report marked superseded. Hub told the review app is free.
 - Child progress (its messages): folder lc-0b809e67ade8 `포천 자철석 PGI`; draft ap-574620c7-44d (9 sources, 4 stages, 6
   example roles, revision 7 check passed); new hub entry entry-ap-574620c7-44d version 0.1.0 in 지구물리 역산; takes
   L1 L2 A1-A4 R1 R2 done; project proj-af4c46, session 01a169b9-9c13-74e2-b9da-57749e4f1203: the one real run started
@@ -121,11 +125,14 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-promo-video-v3/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v3-20261023T174817.846561Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

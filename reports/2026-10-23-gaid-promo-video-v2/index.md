@@ -4,12 +4,14 @@ date: 2026-10-23
 project: geoaidesk
 task: gaid-promo-video-v2
 headline: 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다.
-review_status: pending
+review_status: superseded
 decisions: 0
 cover: figures/01-motion.png
 supersedes: 2026-10-23-gaid-promo-video
 ---
 # GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)
+
+> 이 보고서는 2026-10-24-gaid-promo-video-v3로 대체되었습니다.
 
 ## 0. 한눈에
 
