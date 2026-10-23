@@ -433,7 +433,7 @@
       if (loop >= 0.999) { st[0].el.style.borderColor = BLUE; }
       const W = st[1];
       const panN = loop >= 0.42 ? 2 : 1;
-      pan.textContent = `version 0.${panN}.0`;
+      pan.textContent = `version 0.1.${panN - 1}`; // the study's real versions: 0.1.0, then the run-learned patch 0.1.1
       box(pan, W.px - pan.offsetWidth / 2, W.py - 150);
       put(pan, { o: ramp(t, 22.6, 23.0, lin), s: loop >= 0.42 ? 1 + 0.12 * (1 - ramp(t, 24.0, 24.4)) : 1 });
     };
