@@ -193,11 +193,13 @@ export function SourceStep({
           onFiles(Array.from(e.dataTransfer.files));
         }}
         className={cn(
-          "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed p-8 text-center",
+          "flex flex-col items-center gap-3 rounded-xl border-2 border-dashed text-center",
+          // Once sources are listed the drop area shrinks so the primary action stays near the first view.
+          project.sources.length ? "p-4" : "p-8",
           over && "border-primary bg-primary/5",
         )}
       >
-        <UploadIcon className="size-6 text-muted-foreground" aria-hidden />
+        {!project.sources.length && <UploadIcon className="size-6 text-muted-foreground" aria-hidden />}
         <p className="text-sm text-muted-foreground">{text("sources.drop")}</p>
         <div className="flex flex-wrap justify-center gap-2">
           <Button variant="outline" size="sm" onClick={() => input.current?.click()}>
@@ -232,7 +234,7 @@ export function SourceStep({
       )}
       {!pdfText && <p className="text-sm text-muted-foreground">{text("sources.noPdfText")}</p>}
       {(project.sources.length > 0 || uploading || urls.length > 0) && (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex max-h-[19rem] flex-col gap-2 overflow-y-auto" aria-label={text("sources.list")}>
           {project.sources.map((s) => {
             const detail = sourceDetail(project, s);
             return (

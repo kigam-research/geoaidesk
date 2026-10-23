@@ -41,6 +41,8 @@ export function summarizeInspection(insp: GeoInspection, primary: string): DataF
       ? { companions: insp.asset.sourceFiles.filter((f) => f !== primary).slice(0, 20) }
       : {}),
     crs: crs ? (crs.authority ?? crs.name ?? crs.status) : "unknown",
+    // Without an authority code the projection name alone hides the datum: keep the start of the WKT.
+    ...(crs && !crs.authority && crs.wkt ? { crsWkt: crs.wkt.replace(/\s+/g, " ").slice(0, 400) } : {}),
     ...(extent?.bbox ? { bbox: extent.bbox, coordinateSpace: extent.coordinateSpace } : {}),
     ...(insp.layers?.length
       ? {
@@ -124,13 +126,14 @@ export async function inspectDataFiles(root: string, entries: CodeFileEntry[]): 
   return inspected;
 }
 
-const fmt = (v: number) => (Math.abs(v) >= 1e5 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(4) : String(+v.toFixed(4)));
+const fmt = (v: number) =>
+  Math.abs(v) >= 1e12 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(4) : String(+v.toFixed(Math.abs(v) >= 1000 ? 1 : 4));
 
 /** Plain-text summary of a data file for the coauthor's context; anchors on the file are checked against this text. */
 export function renderDataSummary(path: string, size: number, d: DataFileSummary): string {
   const lines = [`Data file ${path} (${d.format}, ${d.family}, ${size} bytes; read by ${d.inspector})`];
   if (d.companions?.length) lines.push(`Companion files: ${d.companions.join(", ")}`);
-  lines.push(`CRS: ${d.crs ?? "unknown"}`);
+  lines.push(`CRS: ${d.crs ?? "unknown"}${d.crsWkt ? ` (WKT: ${d.crsWkt})` : ""}`);
   if (d.bbox) lines.push(`Extent (${d.coordinateSpace ?? "crs"}): ${d.bbox.map(fmt).join(", ")}`);
   for (const l of d.layers ?? [])
     lines.push(
@@ -143,7 +146,7 @@ export function renderDataSummary(path: string, size: number, d: DataFileSummary
   if (d.dimensions?.length) lines.push(`Dimensions: ${d.dimensions.map((x) => `${x.name}=${x.size}${x.unit ? ` ${x.unit}` : ""}`).join(", ")}`);
   if (d.depth)
     lines.push(
-      `Depth: ${d.depth.basis}${d.depth.unit ? ` ${d.depth.unit}` : ""}${d.depth.start !== undefined ? ` from ${d.depth.start}` : ""}${d.depth.stop !== undefined ? ` to ${d.depth.stop}` : ""}${d.depth.step !== undefined ? ` step ${d.depth.step}` : ""}`,
+      `Depth (basis ${d.depth.basis})${d.depth.unit ? ` ${d.depth.unit}` : ""}${d.depth.start !== undefined ? ` from ${d.depth.start}` : ""}${d.depth.stop !== undefined ? ` to ${d.depth.stop}` : ""}${d.depth.step !== undefined ? ` step ${d.depth.step}` : ""}`,
     );
   if (d.columns?.length)
     lines.push(`Columns: ${d.columns.map((c) => `${c.name}${c.type ? `:${c.type}` : ""}${c.unit ? ` [${c.unit}]` : ""}`).join(", ")}`);

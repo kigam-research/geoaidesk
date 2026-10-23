@@ -179,7 +179,7 @@ export function LibrarySourcePicker({
               }
             }}
           >
-            {text(busy ? "library.adding" : "library.addAction", { count: chosen.length })}
+            {text(busy ? "library.adding" : chosen.length ? "library.addAction" : "library.addEmpty", { count: chosen.length })}
           </Button>
         </DialogFooter>
       </DialogContent>

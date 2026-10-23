@@ -184,7 +184,8 @@
     "fact_bands": "밴드 {count}개",
     "fact_features": "객체 {count}개",
     "crsUnknown": "CRS 없음",
-    "moreData": "자료 {count}개 더"
+    "moreData": "자료 {count}개 더",
+    "list": "올린 자료"
   },
   "reading": {
     "title": "자료를 읽고 있습니다",
@@ -496,6 +497,7 @@
     "adding": "추가하는 중",
     "skipped": "{count}개 항목은 넣지 못했습니다.",
     "otherPc": "다른 PC의 노트",
-    "noPdf": "PDF 없음"
+    "noPdf": "PDF 없음",
+    "addEmpty": "추가"
   }
 }

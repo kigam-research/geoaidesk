@@ -10,7 +10,7 @@ import type { AddLibrarySourcesResult, SourceDocument } from "../../../../web/sr
 import type { LibraryItem } from "../../../../web/src/geo/contracts/library.ts";
 import { RESEARCH_NOTES_DIR, RESEARCH_NOTE_FILE } from "../../../../web/src/geo/contracts/research-notes.ts";
 import { getProject, resolvePaths, type ProjectPaths } from "../../projects.ts";
-import { isWithin } from "../../sandbox-fs.ts";
+import { apiRelative, isWithin } from "../../sandbox-fs.ts";
 import { markdownImageTargets } from "../markdown-images.ts";
 import { getResearchNote, safeNoteId } from "../notes/store.ts";
 import { SourceCapacityError, storeSource } from "./sources.ts";
@@ -54,7 +54,7 @@ function noteFigures(sandbox: string, noteId: string, markdown: string): Map<str
       const real = fs.realpathSync(abs);
       const stat = fs.statSync(real);
       if (!isWithin(root, real) || !stat.isFile() || stat.size > FIGURE_BYTES) continue;
-      const key = path.relative(folder, abs).split(path.sep).join("/");
+      const key = apiRelative(folder, abs);
       if (!out.has(key)) out.set(key, new Uint8Array(fs.readFileSync(real)));
     } catch {
       /* a missing figure is left out; the note text still names it */

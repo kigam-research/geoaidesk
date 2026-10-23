@@ -254,6 +254,8 @@ export interface DataFileSummary {
   companions?: string[];
   /** Declared CRS (authority or name), or "unknown". */
   crs?: string;
+  /** Start of the declared WKT when the CRS has no authority code. */
+  crsWkt?: string;
   bbox?: [number, number, number, number];
   coordinateSpace?: "crs" | "pixel" | "native";
   layers?: { name: string; geometryType?: string; featureCount?: number; fields?: string[] }[];

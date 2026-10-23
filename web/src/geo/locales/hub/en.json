@@ -184,7 +184,8 @@
     "fact_bands": "{count, plural, one {# band} other {# bands}}",
     "fact_features": "{count, plural, one {# feature} other {# features}}",
     "crsUnknown": "No CRS",
-    "moreData": "{count} more data files"
+    "moreData": "{count} more data files",
+    "list": "Added sources"
   },
   "reading": {
     "title": "Reading sources",
@@ -496,6 +497,7 @@
     "adding": "Adding",
     "skipped": "{count, plural, one {# item was} other {# items were}} not added.",
     "otherPc": "Note on another PC",
-    "noPdf": "No PDF"
+    "noPdf": "No PDF",
+    "addEmpty": "Add"
   }
 }

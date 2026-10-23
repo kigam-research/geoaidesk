@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T06:20:10Z
+updated: 2026-10-23T06:45:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"d9c962d0-e8cb-40ea-99b0-533c123efd1e","pid":1749971,"provider":"claude","session":"f1d989bf-fb2e-4eca-99d5-c8f12b163333","start":"62322102","token":"2bd23210d4cf17c490186594ae6dcd5bda7a1d6ef94946851c8cc2c5a5a4bc7c"}
 branch: task/gaid-authoring-sources
 target: main
@@ -75,8 +75,19 @@ coupled).
   prompts mention data files and research notes (versions 2026-10-23.1). Verified: `cd server && npm run typecheck`,
   `npx vitest run test/geo-authoring-sources.test.ts test/geo-hub-handoff.test.ts` (22 passed) and the earlier
   authoring/library/handoff suites (168 passed).
+- P2 screens done: source step (data files, shp/world-file grouping `web/src/geo/hub/source-files.ts`, data row detail
+  line, remove button, compact drop zone once sources exist), 서재 picker `web/src/geo/hub/library-picker.tsx`
+  (papers/research notes filter, multi-select; notes tab fills once unit A merges), handoff dialog "함께 넣을 연구 노트와
+  논문" (chat's notes and project papers preselected; sent only to the GAID hub). Copy in `locales/hub`,
+  `locales/hubHandoff`; copy validator and check-ui pass. Web tests: `npx vitest run src/geo/hub src/geo/hub-handoff`
+  (90 passed). Screenshots (16, both styles/themes, 1440/1280) from a worktree instance on ports 3123/18123 with real
+  sample data (stopped afterwards); summaries the agent sees were checked by eye.
+- AGENTS.md GAID hub paragraph documents the new sources.
+- scripts/check passed 2026-10-23 (log `~/data/geoaidesk/work/gaid-authoring-sources/logs/check2.log`): backend 2263 passed /
+  8 skipped, frontend 1239 passed, copy 0 errors, ui 0 errors, production smoke. First run failed only
+  `win-portability` (path.relative in library-sources.ts → apiRelative).
 ## Next steps
-1. P2 screens (source step, library picker, handoff dialog, locales), then scripts/check and screenshots.
+1. `task finish` (checks passed; nothing else pending).
 ## Failed approaches
 ## Notes and decisions
 - Plan (2026-10-23). P1 server (`server/src/geo/authoring/`, contract `web/src/geo/contracts/authoring.ts`):
@@ -98,6 +109,10 @@ coupled).
     functions; the handoff dialog preselects the session's notes and the project's cited papers.
   - P2 screens: source step accepts data files (shp companions grouped into one set), shows data lines, remove button,
     "서재에서 추가" picker (논문 / 연구 노트 tabs, several at once); handoff dialog lists notes and papers.
+- Routed request d-interface-gaid-authoring-sources (D's F1-F3 notice) consumed: replied to D that the source helper is
+  `sourceContext` (data summaries included), C did not touch DRAFT_SYSTEM, and AgentModelSelect props pass through.
+- Optional (not done): restructure the source step so the primary action stays in the first view with many sources
+  (model/goal/target fields sit above it; pre-existing layout).
 - Interfaces sent to siblings (2026-10-23): B gets `{sourceId, sourcePath, sha256}` addressing for data-file examples;
   A confirmed note item shape (`kind`, `note.{projectId,noteId,markdown,...}`, summary `note.local`; `GET /geo/library?kind=note`).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -107,6 +122,7 @@ coupled).
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-23-gaid-authoring-sources/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
