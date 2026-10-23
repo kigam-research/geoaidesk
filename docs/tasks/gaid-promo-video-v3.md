@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T17:00:15Z
+updated: 2026-10-23T17:09:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
@@ -63,7 +63,8 @@ Request from the starter:
   (94 s with the 12 v2 shots that share ids; with all 16 v3 targets ≈ 100–105 s).
 - Child progress (its messages): folder lc-0b809e67ade8 `포천 자철석 PGI`; draft ap-574620c7-44d (9 sources, 4 stages, 6
   example roles, revision 7 check passed); new hub entry entry-ap-574620c7-44d version 0.1.0 in 지구물리 역산; takes
-  L1 L2 A1 A2 A3 A4 done; next: new project, one bounded run, then a run-derived improvement → next version (H1).
+  L1 L2 A1-A4 R1 R2 done; project proj-af4c46, session 01a169b9-9c13-74e2-b9da-57749e4f1203: the one real run started
+  17:05Z (≤600 s compute, 50×50×25 m grid); R3 partly taken. Next: M1, N1, L3-L5, improvement → next version (H1, H2).
 - Structure draft v3 written below and shown to the user (2026-10-24). Hub notified (request a11aeb361b50) that the
   review app is in use. Child `gaid-promo-video-v3--gaid-promo-v3-study` started: Paseo agent adb2ab89 (codex gpt-6.1-sol
   high), worktree `~/worktrees/geoaidesk/gaid-promo-video-v3--gaid-promo-v3-study`, prompt
