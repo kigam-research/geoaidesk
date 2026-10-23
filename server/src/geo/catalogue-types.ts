@@ -3,6 +3,7 @@
  * (skill_hub docs/specs/gaid-interfaces.md §3–§4, §9). Fields the app does not
  * use stay `unknown`; contracts grow additively, so unknown keys are ignored.
  */
+import type { WorkflowInputExample } from "../../../web/src/geo/contracts/workflow-examples.ts";
 
 /** `{ko, en?}` text as the catalogue ships it. */
 export interface LocalizedText {
@@ -71,7 +72,7 @@ export interface GeoWorkflow {
   title: LocalizedText;
   description?: LocalizedText;
   disciplines?: string[];
-  inputRoles?: { id: string; label: LocalizedText; formats: string[]; required: boolean }[];
+  inputRoles?: { id: string; label: LocalizedText; formats: string[]; required: boolean; example?: WorkflowInputExample }[];
   requiredScientificChoices?: { id: string; label: LocalizedText; why?: LocalizedText }[];
   prompt?: LocalizedText;
   /** Atlas ids (`publisher/slug`), primary first: the workflow's exposure set. */

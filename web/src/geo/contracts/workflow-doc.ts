@@ -8,6 +8,7 @@
  * passes `t`, the server a formatter over the same catalogue.
  */
 import type { Localized, WorkflowArtifact, WorkflowChoice } from "./workspace";
+import type { WorkflowInputExample } from "./workflow-examples";
 
 export const WORKFLOW_DOC_SCHEMA = "gaid-workflow/v1";
 
@@ -80,7 +81,7 @@ export interface WorkflowDoc {
   /** Registered revision (판); null for catalogue Workflows and unregistered drafts. */
   revision: number | null;
   purpose: Localized | null;
-  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized }[];
+  inputRoles: { id: string; label: Localized; formats: string[]; required: boolean; requiredWhen?: Localized; example?: WorkflowInputExample }[];
   choices: WorkflowChoice[];
   skills: WorkflowDocSkill[];
   steps: WorkflowDocStep[];
@@ -94,6 +95,8 @@ export interface WorkflowDoc {
 export interface WorkflowDocSettings {
   inputs: Record<string, string>;
   choices: Record<string, string>;
+  /** Input role ids whose path is the Workflow's example data (gaid-workflow-example), not the researcher's own file. */
+  examples?: string[];
 }
 
 /**
@@ -132,14 +135,29 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
 
   // Settings.
   lines.push("", `## ${say("section.settings")}`);
+  const exampleTitle = (example: WorkflowInputExample) =>
+    example.synthetic ? say("settings.syntheticTitle", { title: p(example.title) }) : p(example.title);
+  const used = new Set(settings?.examples ?? []);
   if (target === "cli") {
     lines.push(say("settings.cliArguments"), "", "$ARGUMENTS", "", say("settings.cliAsk"));
-    for (const role of doc.inputRoles) lines.push(`- ${say("settings.inputAsk", { label: p(role.label), need: say(role.required ? "need.required" : "need.optional") })}`);
+    const bundledSkill = doc.skills.find((skill) => skill.source === "bundled")?.name ?? "";
+    for (const role of doc.inputRoles) {
+      const ask = say("settings.inputAsk", { label: p(role.label), need: say(role.required ? "need.required" : "need.optional") });
+      if (!role.example) { lines.push(`- ${ask}`); continue; }
+      const files = role.example.files.map((file) => file.path
+        ? say("settings.cliExampleBundled", { skill: bundledSkill, path: file.path })
+        : say("settings.cliExampleRemote", { url: file.url ?? "", sha256: file.sha256, size: file.size }));
+      lines.push(`- ${ask}. ${say("settings.cliExample", { title: exampleTitle(role.example), source: p(role.example.source), files: files.join("; ") })}`);
+    }
     for (const choice of doc.choices) lines.push(`- ${choiceAsk(choice, locale, say)}`);
+    if (doc.inputRoles.some((role) => role.example)) lines.push("", say("settings.exampleRule"));
   } else {
     for (const role of doc.inputRoles) {
       const path = settings?.inputs[role.id]?.trim();
-      const value = path || (settings ? say("settings.notUsed") : say("settings.researcherPicks"));
+      const example = role.example && used.has(role.id) && path ? role.example : null;
+      const value = example
+        ? say("settings.exampleUsed", { path: path!, title: exampleTitle(example), source: p(example.source) })
+        : path || (settings ? say("settings.notUsed") : role.example ? say("settings.researcherPicksExample", { title: exampleTitle(role.example) }) : say("settings.researcherPicks"));
       lines.push(`- ${p(role.label)}: ${value}`);
     }
     const unresolved: string[] = [];
@@ -153,6 +171,8 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     lines.push("");
     if (settings) lines.push(say("settings.unresolved", { list: unresolved.length ? unresolved.join(", ") : say("settings.none") }));
     lines.push(say("settings.askBeforeStep"));
+    const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settings?.inputs[role.id]?.trim());
+    if (exampleRoles.length) lines.push("", say("settings.examplesUsed", { labels: exampleRoles.map((role) => p(role.label)).join(", ") }), say("settings.exampleRule"));
   }
 
   // Skills.
@@ -223,10 +243,12 @@ const attr = (value: string) => value.replace(/["\n\r]/g, " ").trim();
  * The chat's first message: the rendered document in a `<workflow>` block, then the researcher's own text. The
  * transcript shows the block as a "Workflow · <title> · <n>판" card (like the skill and template chips).
  */
-export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "revision">, body: string, locale: "ko" | "en"): string {
+export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "revision">, body: string, locale: "ko" | "en", options: { example?: boolean } = {}): string {
   const title = attr(pick(doc.title, locale));
   const revision = doc.revision ? ` revision="${doc.revision}"` : "";
-  return `<workflow id="${attr(doc.id)}"${revision} title="${title}">\n${body}\n</workflow>`;
+  // `data="example"`: the run uses the Workflow's example data for at least one input (gaid-workflow-example).
+  const data = options.example ? ` data="example"` : "";
+  return `<workflow id="${attr(doc.id)}"${revision} title="${title}"${data}>\n${body}\n</workflow>`;
 }
 
 export interface ParsedWorkflowBlock {
@@ -236,14 +258,16 @@ export interface ParsedWorkflowBlock {
   body: string;
   /** Text after the block (the researcher's additions). */
   tail: string;
+  /** The run uses the Workflow's example data for at least one input. */
+  example: boolean;
 }
 
-const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)")? title="([^"]*)">\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
+const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)")? title="([^"]*)"( data="example")?>\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
 
 export function parseWorkflowBlock(text: string): ParsedWorkflowBlock | null {
   const match = text.match(WORKFLOW_RE);
   if (!match) return null;
-  return { id: match[1], revision: match[2] ? Number(match[2]) : null, title: match[3], body: match[4], tail: match[5] ?? "" };
+  return { id: match[1], revision: match[2] ? Number(match[2]) : null, title: match[3], body: match[5], tail: match[6] ?? "", example: Boolean(match[4]) };
 }
 
 // --- Older Workflows -------------------------------------------------------------------------------------------

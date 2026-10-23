@@ -16,6 +16,7 @@
 
 import type { HubSkillInstallState } from "./hub-skills";
 import type { GaidWorkflowStep, WorkflowDocSkill } from "./workflow-doc";
+import type { WorkflowExampleFile, WorkflowInputExample } from "./workflow-examples";
 export interface AtlasText {
   ko: string;
   en?: string;
@@ -174,6 +175,8 @@ export interface LocalWorkflow {
     formats: string[];
     required: boolean;
     requiredWhen?: MethodText;
+    /** Default example data; attached by the researcher, never by the coauthor model (gaid-workflow-example). */
+    example?: DraftInputExample;
   }[];
   requiredScientificChoices: {
     id: string;
@@ -206,6 +209,19 @@ export interface LocalWorkflow {
   steps?: GaidWorkflowStep[];
 }
 
+/**
+ * A draft's example file: the package entry plus, for a bundled file, where its bytes are in the authoring store. The
+ * package carries `WorkflowExampleFile` only (`from` is dropped when packaging).
+ */
+export interface DraftExampleFile extends WorkflowExampleFile {
+  /** A data source file (`sources/<sourceId>/files/<sourcePath>`, unit C) or an upload kept at `examples/<sha256>`. */
+  from?: { sourceId: string; sourcePath: string } | { upload: true };
+}
+
+export interface DraftInputExample extends Omit<WorkflowInputExample, "files"> {
+  files: DraftExampleFile[];
+}
+
 export interface DraftRecipe {
   choices: Record<string, string | number | boolean>;
   unresolvedChoices: string[];
@@ -215,7 +231,11 @@ export interface DraftRecipe {
 
 export const AUTHORING_PROJECT_SCHEMA = "gaid-authoring-project/v1";
 
-export type SourceKind = "pdf" | "code" | "text" | "gaid-analysis" | "web";
+/**
+ * `data`: data files (CSV, shapefile set, GeoTIFF, LAS …), one file or a set read together; `note`: a GAID research note
+ * (index.md and its figures) from a project or from 서재.
+ */
+export type SourceKind = "pdf" | "code" | "text" | "gaid-analysis" | "web" | "data" | "note";
 export type SourceStatus = "received" | "extracted" | "partial" | "failed";
 
 /** A supplied file or fetched URL. Original bytes stay private and never enter a package. */
@@ -233,6 +253,41 @@ export interface SourceDocument {
   title?: string;
   url?: string;
   fetch?: { requestedUrl: string; finalUrl?: string; fetchedAt: string; status?: number; contentHash?: string };
+  /** Added from 서재: the library item (a paper or a research note). */
+  library?: { itemId: string; citationKey?: string; category: "paper" | "note" };
+  /** A research note: its project and note folder; `snapshot` when read from the library copy, not the project file. */
+  note?: { projectId: string; noteId: string; title?: string; snapshot?: boolean };
+}
+
+/**
+ * Compact geo inspection of one data file (`geo-inspection/v1` from the shared dispatcher, server/src/geo/inspection.ts).
+ * The coauthor reads this summary, never the file bytes.
+ */
+export interface DataFileSummary {
+  format: string;
+  family: string;
+  /** Companion files read with this one (shapefile .shx/.dbf/.prj, world files). */
+  companions?: string[];
+  /** Declared CRS (authority or name), or "unknown". */
+  crs?: string;
+  /** Start of the declared WKT when the CRS has no authority code. */
+  crsWkt?: string;
+  bbox?: [number, number, number, number];
+  coordinateSpace?: "crs" | "pixel" | "native";
+  layers?: { name: string; geometryType?: string; featureCount?: number; fields?: string[] }[];
+  bands?: { index: number; dtype?: string; nodata?: number | null; min?: number; max?: number; unit?: string; description?: string }[];
+  dimensions?: { name: string; size: number; unit?: string }[];
+  depth?: { basis: string; unit?: string; start?: number; stop?: number; step?: number };
+  columns?: { name: string; type?: string; unit?: string; nullCount?: number }[];
+  curves?: { mnemonic: string; unit?: string; description?: string; nullCount?: number }[];
+  /** Data rows in the file when the inspector counted them. */
+  rows?: number;
+  /** `rows` is estimated from the first bytes of a large file. */
+  rowsEstimated?: boolean;
+  /** First rows (at most 5), as the inspector read them. */
+  preview?: (string | number | null)[][];
+  issues?: { code: string; severity: "info" | "warning" | "error"; message: string }[];
+  inspector: string;
 }
 
 export interface ExtractedFigure {
@@ -246,6 +301,10 @@ export interface CodeFileEntry {
   size: number;
   sha256: string;
   text: boolean;
+  /** Geo data file: what the inspection dispatcher read from it. */
+  data?: DataFileSummary;
+  /** A companion file (e.g. `.dbf` of a shapefile): the primary file it belongs to. */
+  companionOf?: string;
 }
 
 /** What the program actually read from a source. Pages without text stay listed as empty. */
@@ -476,6 +535,8 @@ export interface AuthoringProject {
   target?: "skill" | "workflow" | "auto";
   /** Model ref chosen for this project; absent = the app default at call time. */
   model?: string;
+  /** Reasoning level chosen for this project's model calls; absent = medium. */
+  thinkingLevel?: AuthoringThinkingLevel;
   /** Hub topic folder the researcher filed this method under (my methods on the hub home). */
   folderId?: string;
   /** A registered hub method this draft edits (`edit`: registering adds its next revision) or was copied from (`copy`). */
@@ -592,6 +653,7 @@ export interface CreateProjectBody {
   goal?: string;
   target?: "skill" | "workflow" | "auto";
   model?: string;
+  thinkingLevel?: AuthoringThinkingLevel;
 }
 
 export interface AddUrlSourceBody {
@@ -654,10 +716,42 @@ export interface AddSourceBody {
   name: string;
   mediaType: string;
   kind?: SourceKind;
-  /** Base64 bytes, 30 MiB decoded max. */
+  /** Base64 bytes, 30 MiB decoded max. Empty when `files` carries the content. */
   contentBase64: string;
+  /**
+   * Several files forming one source (a shapefile set, a raster with its world file): kind `data`, `name` names the
+   * set. 30 MiB decoded in total.
+   */
+  files?: { name: string; contentBase64: string }[];
   documentKind?: string;
   doi?: string;
+}
+
+/** Limits of what one authoring project takes in. */
+export const AUTHORING_SOURCE_LIMITS = {
+  sourceBytes: 30 * 1024 * 1024,
+  projectBytes: 300 * 1024 * 1024,
+  sources: 30,
+  setFiles: 50,
+  inspectedFiles: 40,
+} as const;
+
+/** Research notes from GAID projects to add as sources. */
+export interface AddNoteSourcesBody {
+  notes: { projectId: string; noteId: string }[];
+}
+
+/** Papers and research notes from 서재; without `authoringId` a new authoring project starts with them. */
+export interface AddLibrarySourcesBody {
+  itemIds: string[];
+  authoringId?: string;
+}
+
+export interface AddLibrarySourcesResult {
+  authoringId: string;
+  added: { itemId: string; sourceId: string; kind: SourceKind }[];
+  /** Items not added, with the reason (no readable content, unavailable note …). */
+  skipped: { itemId: string; reason: string }[];
 }
 
 export interface OperationBody {
@@ -669,8 +763,12 @@ export interface OperationBody {
   target?: "skill" | "workflow" | "auto";
   /** Override the project's model for this call. */
   model?: string;
-  thinkingLevel?: "low" | "medium" | "high" | "xhigh";
+  thinkingLevel?: AuthoringThinkingLevel;
 }
+
+/** Reasoning levels a researcher can choose for the authoring agent (the server default is medium). */
+export const AUTHORING_THINKING_LEVELS = ["low", "medium", "high", "xhigh"] as const;
+export type AuthoringThinkingLevel = (typeof AUTHORING_THINKING_LEVELS)[number];
 
 export interface AnswerItem {
   questionId: string;
@@ -725,4 +823,67 @@ export interface InstallResult {
   recipeId: string | null;
   /** Hub skills the Workflow pins (gaid-hub-skills): installed now, already present, or blocked (readiness explains). */
   hubSkills?: { name: string; revision: number; state: HubSkillInstallState; outcome?: "installed" | "present" | "blocked" }[];
+}
+
+// --- Example data of Workflow inputs (gaid-workflow-example) ------------------
+//
+// POST /geo/authoring/projects/:id/examples                    AttachExampleBody → MethodDraft (new researcher revision)
+// POST /geo/authoring/projects/:id/examples/:roleId            EditExampleBody → MethodDraft
+// POST /geo/authoring/projects/:id/examples/:roleId/remove     { baseRevision } → MethodDraft
+//
+// The researcher attaches, edits and removes examples; the coauthor model never writes them. Uploads and data-source
+// files are bundled in the package (`examples/<roleId>/<name>`); a public URL is fetched once to record sha256 and size,
+// its bytes are not kept.
+
+/** Where the example's files come from. */
+export type AttachExampleFrom =
+  /** Files chosen on the researcher's PC (base64; each ≤ EXAMPLE_LIMITS.bundledFile). */
+  | { kind: "upload"; files: { name: string; contentBase64: string }[] }
+  /** Files of a project source whose extraction lists them (`extractions[sourceId].files[].path`). */
+  | { kind: "source"; sourceId: string; paths: string[] }
+  /** Public https URLs; `name` defaults to the URL's last path segment. */
+  | { kind: "url"; files: { url: string; name?: string }[] };
+
+/** The researcher's description of an example (Korean text). */
+export interface ExampleText {
+  title: string;
+  source: string;
+  /** Empty string removes it. */
+  license?: string;
+  synthetic?: boolean;
+}
+
+export interface AttachExampleBody extends ExampleText {
+  /** The latest draft revision the researcher saw. */
+  baseRevision: number;
+  /** Workflow input role id; an existing example of that role is replaced. */
+  roleId: string;
+  from: AttachExampleFrom;
+}
+
+export interface EditExampleBody extends Partial<ExampleText> {
+  baseRevision: number;
+}
+
+/** A starting title and source for the form, from the chosen source document or URL; the researcher edits them. */
+export function suggestExampleText(
+  project: Pick<AuthoringProject, "sources">,
+  from: { kind: "upload" } | { kind: "source"; sourceId: string } | { kind: "url"; url: string },
+): { title: string; source: string } {
+  if (from.kind === "source") {
+    const source = project.sources.find((s) => s.id === from.sourceId);
+    if (!source) return { title: "", source: "" };
+    const title = source.title?.trim() || source.name;
+    return { title, source: [title, source.doi ? `doi:${source.doi}` : source.url].filter(Boolean).join(", ") };
+  }
+  if (from.kind === "url") {
+    try {
+      const url = new URL(from.url);
+      const name = decodeURIComponent(url.pathname.split("/").filter(Boolean).at(-1) ?? "");
+      return { title: name, source: url.host };
+    } catch {
+      return { title: "", source: "" };
+    }
+  }
+  return { title: "", source: "" };
 }

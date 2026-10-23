@@ -47,9 +47,27 @@ export async function directHandoff(projectId: string, sessionId: string, files:
   return { path: "direct" as const, ...data };
 }
 /** GAID hub receive: a new method draft in this app's hub with the bundle as its first source. */
-export async function sendToHub(projectId: string, sessionId: string, files: string[], note: string): Promise<{ projectId: string }> {
-  const response = await checked(await apiFetch("/geo/authoring/handoffs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, files, note }) }, projectId));
+export async function sendToHub(projectId: string, sessionId: string, files: string[], note: string, extra: { notes?: string[]; libraryItemIds?: string[] } = {}): Promise<{ projectId: string; skipped?: { id: string; reason: string }[] }> {
+  const response = await checked(await apiFetch("/geo/authoring/handoffs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, files, note, ...(extra.notes?.length ? { notes: extra.notes } : {}), ...(extra.libraryItemIds?.length ? { libraryItemIds: extra.libraryItemIds } : {}) }) }, projectId));
   return response.json();
+}
+/** What else the GAID hub draft can start with (gaid-authoring-sources): the project's research notes and its papers. */
+export interface HandoffExtras {
+  notes: { id: string; title: string; date: string; sessions: string[] }[];
+  papers: { id: string; title: string; authors: string; year?: number }[];
+}
+export async function handoffExtras(projectId: string): Promise<HandoffExtras> {
+  const json = async <T,>(path: string): Promise<T | null> => {
+    try { const res = await apiFetch(path, {}, projectId); return res.ok ? await res.json() as T : null; } catch { return null; }
+  };
+  const [notes, papers] = await Promise.all([
+    json<{ notes: HandoffExtras["notes"] }>("/geo/notes"),
+    json<{ items: (HandoffExtras["papers"][number] & { kind?: string })[] }>("/geo/library?filter=project&kind=paper&limit=50"),
+  ]);
+  return {
+    notes: (notes?.notes ?? []).map(n => ({ id: n.id, title: n.title, date: n.date, sessions: n.sessions ?? [] })),
+    papers: (papers?.items ?? []).filter(p => p.kind !== "note").map(p => ({ id: p.id, title: p.title, authors: p.authors, year: p.year })),
+  };
 }
 export function saveDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);

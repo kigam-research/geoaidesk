@@ -1,5 +1,7 @@
 /** Client for `/geo/authoring/*` (contract: web/src/geo/contracts/authoring.ts). */
 import type {
+  AddLibrarySourcesBody,
+  AddLibrarySourcesResult,
   AddSourceBody,
   AddUrlSourceBody,
   GenerateVisualsBody,
@@ -20,6 +22,9 @@ import type {
   SourceDocument,
   ExtractionRecord,
   Decision,
+  AttachExampleBody,
+  EditExampleBody,
+  MethodDraft,
 } from "@/geo/contracts/authoring";
 import { apiFetch } from "@/lib/projects";
 
@@ -52,7 +57,17 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 const post = <T>(path: string, body: unknown) => call<T>(path, { method: "POST", body: JSON.stringify(body) });
 const pid = (id: string) => `/projects/${encodeURIComponent(id)}`;
 
-export const newOpId = () => `op-${crypto.randomUUID()}`;
+/** crypto.randomUUID exists only in secure contexts; the LAN review app is plain http, where getRandomValues still works. */
+const randomId = (): string => {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+};
+
+export const newOpId = () => `op-${randomId()}`;
 
 export const hubApi = {
   health: () => call<AuthoringHealth>("/health"),
@@ -80,9 +95,29 @@ export const hubApi = {
     post<MethodPackageRecord>(`${pid(id)}/packages`, { opId: newOpId(), draftRevision }),
   install: (id: string, rev: number, body: InstallBody) =>
     post<InstallResult>(`${pid(id)}/packages/${rev}/install`, body),
+  /** Example data of a Workflow input (gaid-workflow-example); each change returns the new draft revision. */
+  attachExample: (id: string, body: AttachExampleBody) => post<MethodDraft>(`${pid(id)}/examples`, body),
+  editExample: (id: string, roleId: string, body: EditExampleBody) =>
+    post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}`, body),
+  removeExample: (id: string, roleId: string, baseRevision: number) =>
+    post<MethodDraft>(`${pid(id)}/examples/${encodeURIComponent(roleId)}/remove`, { baseRevision }),
+  removeSource: (id: string, sourceId: string) =>
+    call<null>(`${pid(id)}/sources/${encodeURIComponent(sourceId)}`, { method: "DELETE" }),
   originalUrl: (id: string, sourceId: string) =>
     `/geo/authoring${pid(id)}/sources/${encodeURIComponent(sourceId)}/original`,
 };
+
+/** Papers and research notes from 서재 as sources (`/geo/library/authoring`). */
+export async function addLibrarySources(body: AddLibrarySourcesBody): Promise<AddLibrarySourcesResult> {
+  const res = await apiFetch("/geo/library/authoring", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && typeof data.error === "string" && data.error) || `HTTP ${res.status}`);
+  return data as AddLibrarySourcesResult;
+}
 
 /** Base64 of a File for `AddSourceBody.contentBase64`. */
 export async function fileBase64(file: File): Promise<string> {

@@ -32,10 +32,12 @@ import {
   REPAIR,
   REVISE_ADDENDUM,
 } from "./prompts.ts";
+import { renderDataSummary } from "./data-files.ts";
 import { pageFile, safeRelative, sourceFile } from "./sources.ts";
 import { AuthoringError, newId, now, type AuthoringStore } from "./store.ts";
 
 import { procedureFor, structuredDraft, workflowProblems } from "./workflow.ts";
+import { carryExamples } from "./examples.ts";
 
 const localSkill = (slug: string) => `local:${slug}`;
 
@@ -67,6 +69,8 @@ const MAX_QUESTIONS = 5;
 const PAPER_BUDGET = 260_000;
 const CODE_BUDGET = 120_000;
 const CODE_FILE_BUDGET = 12_000;
+/** Data-file summaries (format, CRS, extent, columns …) across all sources. */
+const DATA_BUDGET = 40_000;
 
 type Json = Record<string, unknown>;
 const isObj = (v: unknown): v is Json => !!v && typeof v === "object" && !Array.isArray(v);
@@ -106,12 +110,13 @@ async function sourceContext(store: AuthoringStore, project: AuthoringProject): 
   const parts: string[] = [];
   let paperBudget = PAPER_BUDGET;
   let codeBudget = CODE_BUDGET;
+  let dataBudget = DATA_BUDGET;
   project.sources.forEach((s, i) => aliases.set(`S${i + 1}`, s.id));
   for (const [alias, id] of aliases) {
     const s = project.sources.find((x) => x.id === id)!;
     const x = project.extractions[id];
     const head = [
-      `### ${alias}: ${s.name} (${s.kind}${s.documentKind ? `; ${s.documentKind}` : ""}${s.doi ? `; DOI ${s.doi}` : ""})`,
+      `### ${alias}: ${s.name} (${s.kind}${s.documentKind ? `; ${s.documentKind}` : ""}${s.doi ? `; DOI ${s.doi}` : ""}${s.title && s.title !== s.name ? `; title "${s.title}"` : ""}${s.library ? `; from the researcher's library (${s.library.category})` : ""}${s.note ? `; GAID research note${s.note.snapshot ? " (library copy)" : ""}` : ""})`,
     ];
     if (x?.pages) {
       const texts: string[] = [];
@@ -154,8 +159,25 @@ async function sourceContext(store: AuthoringStore, project: AuthoringProject): 
               : /\.(py|r|m|jl|sh)$/i.test(p)
                 ? 3
                 : 4;
+      // Data files: the inspection summary stands for the file (anchors on the file are checked against it, plus the
+      // raw text of a text table); the bytes never enter the context.
+      const data = x.files.filter((f) => f.data);
+      const companions = x.files.filter((f) => f.companionOf).length;
+      if (data.length) {
+        parts.push(`Data files read through GAID's geo inspection: ${data.length}${companions ? ` (+${companions} companion files)` : ""}`);
+        for (const f of data) {
+          const summary = renderDataSummary(f.path, f.size, f.data!);
+          const raw = f.text ? (await store.readFile(project.id, sourceFile(id, f.path))).toString("utf8") : "";
+          map.set(f.path, raw ? `${summary}\n${raw}` : summary);
+          if (dataBudget <= 0) continue;
+          const chunk = summary.slice(0, dataBudget);
+          dataBudget -= chunk.length;
+          parts.push(`=== ${alias} data ${f.path} ===\n${chunk}`);
+        }
+        if (dataBudget <= 0) parts.push(`(${alias}: later data summaries omitted for length)`);
+      }
       for (const f of [...x.files]
-        .filter((f) => f.text)
+        .filter((f) => f.text && !f.data)
         .sort((a, b) => rank(a.path) - rank(b.path) || (a.path < b.path ? -1 : 1))) {
         const t = (await store.readFile(project.id, sourceFile(id, f.path))).toString("utf8");
         map.set(f.path, t);
@@ -374,13 +396,14 @@ export function standardQuestions(project: AuthoringProject, proposed: Question[
       id: newId("q"),
       key: TRIAL_SCALE_KEY,
       text: "빠른 첫 시험용 줄인 설정을 함께 만들까요?",
-      reason: "무거운 계산을 줄이면 첫 시험이 몇 분 안에 끝나지만, 그 결과는 흐름 확인용입니다.",
+      reason:
+        "해상도·표본 수·반복 횟수·허용 오차를 줄이면 첫 실행이 몇 분 안에 끝납니다. 분석 단계와 비교는 줄이지 않으며, 결과는 낮춘 해상도만큼만 해석합니다.",
       affects: "시작 설정과 계산 단계",
       options: [
         {
           id: "quick-and-full",
           label: "줄인 설정 포함",
-          hint: "표본 수·반복 횟수·탐색을 줄인 설정으로 먼저 시험하고, 전체 설정도 고를 수 있습니다.",
+          hint: "격자·표본 수·반복 횟수·허용 오차를 줄인 설정으로 먼저 실행하고, 전체 설정도 고를 수 있습니다.",
         },
         { id: "full-only", label: "전체 설정만", hint: "원본 연구와 같은 규모로만 실행합니다." },
       ],
@@ -399,6 +422,7 @@ function draftRequest(
   project: AuthoringProject,
   ctx: SourceContext,
   v: Vocabulary,
+  includeSources = true,
 ): { text: string; findingIds: Map<string, string> } {
   const findingIds = new Map<string, string>();
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
@@ -413,7 +437,7 @@ function draftRequest(
       const q = project.questions.find((x) => x.id === d.questionId);
       return d.status === "deferred"
         ? `- ${d.key}: "${q?.text}" → deferred (unresolved)`
-        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId})` : ""}`;
+        : `- ${d.key}: "${q?.text}" → researcher answered: "${d.response}"${d.optionId ? ` (option ${d.optionId}: ${q?.options.find((o) => o.id === d.optionId)?.label ?? ""})` : ""}`;
     });
   const open = project.questions.filter((q) => q.status === "open").map((q) => `- ${q.key}: ${q.text} (unanswered)`);
   const code = project.sources
@@ -444,6 +468,9 @@ function draftRequest(
         : "## Supplied code files\n(none: the skill is descriptive)",
       previous ? `## Current draft slug\n${previous.slug} (keep it)` : "",
       `## Vocabularies\n${vocabularyText(v)}`,
+      // The findings are a bounded index; the method's full procedure (every processing step, parameter, comparison and
+      // interpretation criterion) is in the sources, so the first draft reads them too (same budget as analyze/revise).
+      includeSources ? `## Sources (the full method; findings above are an index, not the whole method)\n${ctx.text}` : "",
     ]
       .filter(Boolean)
       .join("\n\n"),
@@ -469,7 +496,7 @@ function reviseRequest(
   v: Vocabulary,
   feedback: string,
 ): { text: string; findingIds: Map<string, string> } {
-  const base = draftRequest(project, ctx, v);
+  const base = draftRequest(project, ctx, v, false);
   const d = structuredDraft(project.drafts.at(-1)!);
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
   const current = {
@@ -487,6 +514,8 @@ function reviseRequest(
     workflow: d.workflow
       ? plain({
           ...d.workflow,
+          // Example data belongs to the researcher; the model neither sees nor writes it.
+          inputRoles: d.workflow.inputRoles.map(({ example: _example, ...role }) => role),
           requiredScientificChoices: d.workflow.requiredScientificChoices.map((c) => ({
             ...c,
             options: (c.options ?? []).map((o) => ({ id: o, label: c.optionLabels?.[o]?.ko ?? o })),
@@ -772,7 +801,7 @@ export function validateDraft(
       const entry = sourceId ? project.extractions[sourceId]?.files?.find((f) => f.path === sourcePath) : undefined;
       if (!sourceId || !entry) return errors.push(`codeFiles[${i}]: ${str(x.source, 10)} has no file "${sourcePath}"`);
       // Data and binaries stay with the researcher (their own terms); only text code/config files enter a skill.
-      if (!entry.text)
+      if (!entry.text || entry.data)
         return errors.push(
           `codeFiles[${i}]: "${sourcePath}" is data or binary; include only code or config text files`,
         );
@@ -1333,6 +1362,8 @@ async function execute(
             ...(changed ? [`작성 중에 들어온 답 ${changed}개는 아직 반영되지 않았습니다.`] : []),
           ],
         };
+        // The researcher's example data stays with its input role; the model never writes examples.
+        carryExamples(p.drafts.at(-1), next);
         p.drafts.push(next);
         a.result = { draftRevision: next.revision };
       }
