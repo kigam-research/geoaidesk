@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T10:06:27Z
+updated: 2026-10-23T10:51:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"f483b642-f754-4209-bbab-640075e87a30","pid":1752543,"provider":"claude","session":"a8cd0069-059b-4ae1-a797-ae4c8ab3d65a","start":"62323311","token":"d43db119f0119fe97744373582ba5c12357a55bd4821fadf676c064c1f62efa6"}
 branch: task/gaid-pocheon-trial
 target: main
@@ -191,6 +191,12 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
 - F21 — hub registration dialog (review app 3171c57c) — the list says "공유하지 않음: … 연구 자료" while the Workflow
   carries six bundled example files (~1.8 MB) that are shared with it; the dialog does not mention example data. — B
   (finished) — open item.
+- F22 — second-pass draft — the paper's crop step ("extract the magnetic responses only around our target area")
+  became a mesh choice "자료 범위에 맞춥니다" with no crop; with that choice the run covered the whole survey and the
+  quick setting coarsened cells to 37.5 m (the authoring model cannot know that 25 m on the paper's window ran in 8
+  min), leaving the 115 m wide target ~3 cells wide. Cause: the crop step was not carried as a method step, and the
+  quick-run floor in DRAFT_SYSTEM ("smallest target must span several cells") was met only nominally. — D (researcher
+  feedback in the trial; prompt rule already asks to keep every processing step) — revise 19:51.
 - F6 — data-file sources — authoring accepts pdf/code/text/web only; the example dataset cannot be given as a source
   yet. — C's scope (gaid-authoring-sources). — known to C (its goal).
 
@@ -212,6 +218,13 @@ Integration order: A, B, C merge first; D rebases, then verifies the whole cycle
   2차 검증") → start settings: all 6 inputs on the example without any action (F17 resolved for Workflows with
   examples), 7 open conditions set by the researcher (proportions = code values on purpose, to test the diagnosis) →
   start 19:05:59 on GPT-6.1 Sol high; example files written to user_data/examples/aeromag-core-pgi-volume/<role>-<key>/.
+  Run finished 19:49 with no interview (F18 verified): mesh over the whole survey (1,805 data, 122,540 active cells,
+  37.5×37.5×25 m quick cells), PGI-full 20 it 226 s, PGI-none 18 it 205 s; PGI-full found no hole-linked body
+  (property: 2 candidates not touching ore core cells; probability: none); PGI-none collapsed (ore-host mean gap
+  0.86 % of initial; property 17.5 Mm3 = 35.9× truth, not adopted). The note reports the collapse but does not tie it
+  to the proportions (F19 not closed). Outputs copied to ~/data/geoaidesk/work/gaid-pocheon-trial/pass2-run1/.
+  19:51 revise of ap-43431e17-f09 with researcher feedback (crop to the paper's target window, 25 m kept in quick,
+  conditional proportion check for a collapsed PGI-none) → re-register as the next version → rerun.
 - First pass done 17:24 KST: hub entry "PGI 기반 3차원 자철석 광체 추정" 1판 (registered 16:24 on the institute hub,
   folder 지구물리 역산, from authoring ap-bab647f7-674 draft 3); installed into project pgi-2c2f48; run 16:29 → interview
   expired (F18) → researcher answered at 16:45 → finished 17:24. Agent: wrote pgi_run/run_pgi_workflow.py, fixed two
