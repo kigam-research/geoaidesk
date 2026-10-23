@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T08:49:58Z
+updated: 2026-10-23T08:50:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -64,6 +64,7 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
 - Full scripts/check run 1: `~/data/geoaidesk/work/gaid-workflow-start-ui/check-1.log` (result below when done).
 ## Next steps
 1. Read check-1.log; fix failures; then task finish (report declared below).
+Blocked: scripts/check run 1 is still running in this writer's background shell (log ~/data/geoaidesk/work/gaid-workflow-start-ui/check-1.log); the shell notifies the writer when it exits.
 ## Failed approaches
 ## Notes and decisions
 - F17 (from gaid-pocheon-trial via hub request h-f17, 2026-10-23) accepted into the implementation, inside decision 3
