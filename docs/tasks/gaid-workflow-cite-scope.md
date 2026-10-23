@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T13:58:43Z
+status: done
+updated: 2026-10-23T13:59:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"56c05725-7189-46a4-9615-7e1ddddb7ee0","pid":515641,"provider":"claude","session":"31d96ed7-e560-44e9-9232-a2b8aa7a787b","start":"64415659","token":"705a5edd3ea6c16b909c87cbd34aa6359cc9106a13b769c29f4592a9e6ef672d"}
 branch: task/gaid-workflow-cite-scope
 target: main
@@ -76,8 +76,9 @@ Result for the hub (F23 + F21 done; report reports/2026-10-23-gaid-workflow-cite
   PDFs/page text, authoring project ap-43431e17-f09, models.json; no credentials). Screens in .../shots/.
 - Observation (not fixed): Qwen ended the run without a final chat text after writing the note.
 ## Next steps
-1. `task finish` (done: final check, review copy in the vault, own instance stopped, browser closed). Build caches in
-   the worktree (web/.next etc.) come from the own instance.
+<!-- task:closed -->
+Closed 2026-10-23T13:59:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
