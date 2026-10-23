@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-23T14:53:27Z
+status: done
+updated: 2026-10-23T15:08:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"08164288-7806-46a6-9e82-956577998a76","pid":790060,"provider":"claude","session":"f9dbf0b8-76e0-462b-b70b-5ced3cf12897","start":"64608299","token":"7a4c953115a20fde3c930ab89ac5a15005cbbdc2c3a944e2bab8d7766326cb7a"}
 branch: task/gaid-workflow-stages--gaid-stages-window
 target: task/gaid-workflow-stages
@@ -83,7 +83,7 @@ raw.githubusercontent.com (use `gh api` or codeload).
 - Report section: `reports/2026-10-23-gaid-workflow-stages/start-window.md` + `figures/start-*.png`.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T14:53:27Z: ready; the parent gaid-workflow-stages integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T15:08:44Z: integrated into gaid-workflow-stages; closed with it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
