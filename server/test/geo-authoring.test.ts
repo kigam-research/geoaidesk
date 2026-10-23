@@ -1,3 +1,5 @@
+import Fastify from "fastify";
+import { registerAuthoringRoutes } from "../src/geo/authoring/routes.ts";
 /**
  * GAID hub authoring service (server/src/geo/authoring/), ported from skill_hub web/server/authoring.test.ts
  * (54fe477) to vitest. No real model is called: each test passes a scripted transport.
@@ -5,7 +7,7 @@
 import { execFileSync } from "node:child_process";
 import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { AuthoringError, AuthoringStore } from "../src/geo/authoring/store.ts";
 import { addSource } from "../src/geo/authoring/sources.ts";
 import { runOperation } from "../src/geo/authoring/agent.ts";
@@ -294,6 +296,24 @@ describe("GAID hub authoring", () => {
     expect(created.thinkingLevel).toBe("high");
     const ignored = await store.create({ title: "t", thinkingLevel: "max" as never });
     expect(ignored.thinkingLevel).toBeUndefined();
+  });
+
+  it("keeps the model and reasoning level a call names on the project (a reopened screen shows them)", async () => {
+    const { store, projectId } = await fixture();
+    const app = Fastify();
+    await registerAuthoringRoutes(app, { store, vocabulary: testVocabulary(), chat: reply(analysis) });
+    const res = await app.inject({
+      method: "POST",
+      url: `/geo/authoring/projects/${projectId}/analyze`,
+      payload: { opId: "op-remember-1", model: "test/fake", thinkingLevel: "high" },
+    });
+    expect(res.statusCode).toBe(202);
+    const p = await store.read(projectId);
+    expect(p.model).toBe("test/fake");
+    expect(p.thinkingLevel).toBe("high");
+    await vi.waitFor(async () => expect((await store.read(projectId)).attempts[0].outcome).not.toBe("running"));
+    expect((await store.read(projectId)).attempts[0].thinkingLevel).toBe("high");
+    await app.close();
   });
 
   it("drafts with vocabulary filtering, server-owned fields, a recipe and stale-base protection", async () => {
