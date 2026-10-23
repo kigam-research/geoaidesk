@@ -48,3 +48,15 @@ files = ["author-manuscript.pdf", "MANIFEST.json"]
 sha256 = { "author-manuscript.pdf" = "de611db0be9cda7caa5851b5f7e1593593c389c51a3ce02cd3cf249637ba5ff0" }
 source = "Author R3 manuscript for DOI 10.1007/s11053-026-10778-w, supplied by the author; not verified publisher PDF"
 consumers = ["web/src/geo/authoring-preview/sample.ts"]
+
+[[input]]
+name = "pocheon_pgi_example"
+layer = "asset"
+id = "gaid-pocheon-pgi-example"
+version = "2026-10-23"
+path = "gaid-pocheon-pgi-example/2026-10-23"
+manifest_sha256 = "501e509560785fb487c8884a608d3060c5fa6fbf362aa03b63d92767cb77f6cf"
+files = ["README.md", "aeromag_lines.csv", "base_station.csv", "dem.tif", "boreholes.csv", "core_samples.csv", "orebody_reference.csv", "truth/kappa_true.npy", "truth/truth.json"]
+source = "SYNTHETIC except dem.tif (Copernicus GLO-30 DSM N38 E127, resampled): geo/examples/pocheon-pgi/make_example.py --dem <25 m crop> (task gaid-pocheon-trial); statistics from Heo et al. 2025 doi:10.1007/s12303-025-00067-8; CC BY 4.0 + Copernicus DEM attribution (README.md)"
+consumers = ["geo/examples/pocheon-pgi/pgi_reference.py"]
+size_bytes = 3408701
