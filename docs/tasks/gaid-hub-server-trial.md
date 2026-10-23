@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-22T09:24:01Z
+status: done
+updated: 2026-10-23T00:48:09Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"400aacd9-7779-4bf3-ab8c-e98d550c4052","pid":1863145,"provider":"claude","session":"b20776ed-6e09-404a-9a44-f314dc51b675","start":"54717064","token":"e6b2d7e50e6e07340078e8ed28d9158f46d4e63bfcf7a50af80c3fc8d260fc7d"}
 branch: task/gaid-hub-server-trial
 target: main
@@ -31,6 +31,12 @@ gaid-hub-skills-2 (reviewer roles, admin disable, reports, GitHub upstream compa
 for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outside check.
 
 ## Current state
+- Resumed 2026-10-23 09:45 KST on the user's direct message in this tab ("사용자가 seongin로 초대코드를 이용해 관리자 계정을
+  만들었다."). Admin account acc-6c937e14… (seongin@kigam.re.kr, display name seongin) exists. Import: source verified
+  against SHA256SUMS, dry-run then `--apply`: 5 entries, 17 files, 5 comments, stars 5 → 2 (collapsed), 0 skills. Backup
+  `~/data/geoaidesk/hub-server/backups/2026-10-23-after-import` passed check-backup. Review app (:18000) is logged in as the
+  admin account and lists the 5 Workflows as mine.
+- Removed the first snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6…` (the migrated database refuses that older server).
 - Hub server deployed on PC74 (item 1, first pass): pinned snapshot `~/deploy/geoaidesk-hub-server/8a9fc2f6c5342b9ec5a80d6c3b790caa611a621a`
   (`git archive` of origin/main), user unit `~/.config/systemd/user/gaid-hub-server.service` (enabled, `0.0.0.0:8700`,
   Restart=on-failure, UMask 0077), home `~/data/geoaidesk/hub-server/home`, log `~/data/geoaidesk/hub-server/logs/hub-server.log`.
@@ -57,20 +63,26 @@ for a reviewer role. UI per docs/design/ui-guide.md v2. Outside check: no outsid
 - PC74 TLS files prepared (not active): `~/data/geoaidesk/hub-server/tls/` (CA key in `ca/`, `gaid-hub-ca.crt` sha256
   57621a32…cee2, `hub.crt` SAN IP:10.13.15.74, expires 2029-01-24). Throwaway TLS instance on 10.13.15.74:8701 with a temp
   home: HTTPS health OK with the CA, plain HTTP and no-CA refused; stopped and removed.
+- Full `scripts/check` passed on 59a8fbe4 (backend 2203 passed/8 skipped, web 1202 passed, GAID checks; log check-1.log);
+  `task sync` integrated into main (PR #71, main cb63b118).
+- Redeployed the service at main `cb63b1184f8839e3d0fc34b9f5981e59614350f1` (snapshot `~/deploy/geoaidesk-hub-server/cb63b118…`,
+  unit updated, restarted): health same serverId, `schema_migrations` 1 and 2, the admin invite still unused. Backup before the
+  switch `~/data/geoaidesk/hub-server/backups/2026-10-22-before-cb63b118` passed check-backup.
 - Report draft `reports/2026-10-22-gaid-hub-server-trial/index.md` (check result, commit and import still to fill).
 - Server TLS: `serve --tls-cert/--tls-key` (or env), `--trust-proxy` (loopback), tested in `geo-hub-client-tls.test.ts` (4/4).
 ## Next steps
-Blocked: waiting for the background full `scripts/check` (started 18:19) and for the user to create the admin account.
-1. Full `scripts/check` running on 59a8fbe4 (code identical to 179f8fac): log `~/data/geoaidesk/work/gaid-hub-server-trial/check-1.log`.
-2. After the user creates the admin account (invite code given in this tab; terminal or GAID route): dry-run then `--apply`
-   import from the frozen source with `authors.json`; backup + check-backup.
-3. Redeploy the service at this branch's merged main SHA (migration 2 applies on start), prepare the TLS files on PC74 and test
-   a throwaway TLS instance (not the live data); keep the live service on HTTP for the test group.
-4. Report `reports/2026-10-22-gaid-hub-server-trial/index.md`.
-5. When the hub says gaid-user-acceptance testing is done: ask the hub to connect the review app to the server.
+<!-- task:closed -->
+Closed 2026-10-23T00:48:09Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-hub-server-trial.md.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
+Closes: gaid-backend#1
+Closes: gaid-backend#2
+Closes: gaid-backend#3
+- Work hours (route workhours-gaid-hub-server-trial, user via backbone hub 2026-10-22 23:00 KST): until 2026-10-23 03:00 KST work
+  normally; check `TZ=Asia/Seoul date` before any new job/phase/worker and start none at or after 03:00; then stop at the next
+  safe point (task save, exact next action in Current state) and resume only on the user's resume instruction to the hub.
 - User decisions 2026-10-22 (asked in this tab): author mapping "모두 내 계정 (권장)" — all 5 review-hub Workflows go to the
   admin account; admin email "seongin@kigam.re.kr". Comments/stars by the mapped names collapse to that account (star counts
   drop where several test names starred one entry).
@@ -92,6 +104,7 @@ Blocked: waiting for the background full `scripts/check` (started 18:19) and for
   - Integration order: B merged into this branch → e2e (two accounts, skill register/review/star/comment/install over HTTP)
     → scripts/check → redeploy.
 ## Open items
+- [대기 gaid-hub-server-trial#1] 시험 그룹 밖으로 넓히기 전에 허브 서버 HTTPS를 켭니다(인증서 준비 완료, 절차 docs/geo/hub-server-https.md) — 막힌 일: 시험 그룹 밖 사용 — 조건: 시험 그룹 확대 결정 — 근거: reports/2026-10-22-gaid-hub-server-trial#3-결과
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
