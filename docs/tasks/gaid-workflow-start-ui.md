@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-23T09:49:43Z
+status: done
+updated: 2026-10-23T09:49:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"2f9e2449-5478-49ce-bda9-905940bc1376","pid":2215228,"provider":"claude","session":"839f4e31-b041-486a-b080-352989dcf135","start":"62613024","token":"9b47fa3d33263728d39d99edef8dc6760a706164bcbf9056c2b888fb651b313a"}
 branch: task/gaid-workflow-start-ui
 target: main
@@ -67,7 +67,7 @@ screens from an own instance under `~/data/geoaidesk/work/<slug>/`. Outside chec
   methods.test expecting the old open-at-summary rule (test updated).
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-23T09:05:00Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-23T09:49:45Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
