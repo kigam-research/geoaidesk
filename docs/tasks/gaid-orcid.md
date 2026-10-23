@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T02:19:36Z
+updated: 2026-10-23T02:28:20Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"ca53ee3a-1baa-4c53-a886-8b6a2b35ab75","pid":2058627,"provider":"claude","session":"f7c1067b-f670-4e6e-8814-18489c0168f7","start":"54821171","token":"dae9ec8a184e9be9fa328343821519f08272071bd5d8e2924897cb9c9d582b43"}
 branch: task/gaid-orcid
 target: main
@@ -91,6 +91,7 @@ Outside check: no outside check.
    client file cleared from the e2e hub, jobs 3/4 stopped and disposed (cancelled, deliberate stop). The institute hub
    (PC74 :8700) was not touched; configuring it with the production client is a rollout step for the operator.
 5. Child authui completed/closed 2026-10-23 (integrated 8105d988). User decision 2026-10-23 (this tab, verbatim): "아직은 기관 허브서브에 배포하지 않는다. 검토용 앱에 통합은 할 것이다." → no institute hub deploy; old hubs (no /orcid route, 404) now show not-configured.
+- Full scripts/check PASSED on f155e3e3 (2026-10-23): backend 2249 passed / 8 skipped, frontend 1231, distribution/copy/UI/environment checks, production smoke PASS.
 6. Remaining: full scripts/check → task sync (main) → update the review app (~/deploy/geoaidesk, unit gaid-review, recipe in memory/PROJECT.md; back up config first, keep hub connection) and verify → PROJECT.md review-app SHA → humanizer + review-copy → task finish.
 ## Failed approaches
 ## Notes and decisions
