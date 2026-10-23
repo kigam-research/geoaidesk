@@ -10,6 +10,7 @@ import { withApiToken } from "@/lib/api-auth";
 import { API_BASE } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { ConceptPicture } from "./concept-picture";
+import { OrcidId } from "@/geo/orcid/id-display";
 import { sharedHub } from "./shared-api";
 import { TechnicalDetail } from "./technical";
 
@@ -134,13 +135,14 @@ export function SharedBrowse({
             {entries.map((entry) => {
               const cover = entry.cover ? withApiToken(`${API_BASE}${entry.cover}`) : null;
               return (
-                <li key={entry.id} className="border-b border-gaid-edge">
+                <li key={entry.id} className={cn(ROW, "relative min-h-16 border-b border-gaid-edge px-3 py-2.5 text-left transition-colors hover:bg-gaid-hover/60")}>
                   <button
                     type="button"
                     onClick={() => onOpen(entry.id)}
                     aria-label={text("home.browse.open", { title: entry.title })}
-                    className={cn(ROW, "min-h-16 w-full px-3 py-2.5 text-left transition-colors hover:bg-gaid-hover/60", focus)}
-                  >
+                    className={cn("absolute inset-0 w-full", focus)}
+                  />
+                  <span className="pointer-events-none relative">
                     {cover ? (
                       <ConceptPicture
                         src={cover}
@@ -154,18 +156,21 @@ export function SharedBrowse({
                         <Grid3x3Icon className="size-5" aria-hidden />
                       </span>
                     )}
-                    <span className="flex min-w-0 flex-col">
+                  </span>
+                    <span className="pointer-events-none relative flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold" title={entry.title}>{entry.title}</span>
                       <span className="truncate text-sm text-gaid-ink-2" title={entry.tagline || entry.summary}>{entry.tagline || entry.summary}</span>
                     </span>
-                    <span className="truncate text-sm text-gaid-ink-2" title={folderName(entry.folderId)}>{folderName(entry.folderId)}</span>
-                    <span className="truncate text-sm text-gaid-ink-2" title={entry.author}>{entry.author}</span>
-                    <span className="text-right text-sm tabular-nums text-gaid-ink-2">{entry.latestRevision ? text("draft.revision", { n: entry.latestRevision }) : ""}</span>
-                    <span className="inline-flex items-center justify-end gap-1 text-sm tabular-nums text-gaid-ink-2" aria-label={text("home.browse.stars", { count: entry.stars })}>
+                    <span className="pointer-events-none relative truncate text-sm text-gaid-ink-2" title={folderName(entry.folderId)}>{folderName(entry.folderId)}</span>
+                    <span className="pointer-events-none relative flex min-w-0 items-center gap-1 text-sm text-gaid-ink-2">
+                      <span className="truncate" title={entry.author}>{entry.author}</span>
+                      {entry.authorOrcid && <OrcidId id={entry.authorOrcid.id} environment={entry.authorOrcid.environment} authenticated compact />}
+                    </span>
+                    <span className="pointer-events-none relative text-right text-sm tabular-nums text-gaid-ink-2">{entry.latestRevision ? text("draft.revision", { n: entry.latestRevision }) : ""}</span>
+                    <span className="pointer-events-none relative inline-flex items-center justify-end gap-1 text-sm tabular-nums text-gaid-ink-2" aria-label={text("home.browse.stars", { count: entry.stars })}>
                       <StarIcon className="size-3.5" aria-hidden />{entry.stars}
                     </span>
-                    <span className="text-right text-sm tabular-nums text-gaid-ink-2">{shortDate(entry.updatedAt)}</span>
-                  </button>
+                    <span className="pointer-events-none relative text-right text-sm tabular-nums text-gaid-ink-2">{shortDate(entry.updatedAt)}</span>
                 </li>
               );
             })}

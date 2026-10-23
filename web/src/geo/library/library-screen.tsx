@@ -242,7 +242,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           </>
         )}
       </aside>
-      {orcidStarted && orcid?.profile && <OrcidImportDialog key={orcid.profile.orcid} open={orcidOpen} onOpenChange={setOrcidOpen} collections={collections} onImported={refreshAfterOrcid} />}
+      {orcidStarted && orcid?.profile && <OrcidImportDialog profile={orcid.profile} key={orcid.profile.orcid} open={orcidOpen} onOpenChange={setOrcidOpen} collections={collections} onImported={refreshAfterOrcid} />}
       <AddPaperDialog open={adding} onOpenChange={setAdding} onAdded={(item) => {
         if (item && folderId) void addToFolder(folderId, item.id); else void load();
         if (item) setSelected(item.id);

@@ -170,6 +170,7 @@ export function SharedEntryScreen({
           note: latest?.note || undefined,
           summary: localText(detail.profile.summary) || e.summary,
           author: e.author,
+          authorOrcid: e.authorOrcid,
           folder: folders[e.folderId] ?? null,
           revision: e.latestRevision,
           registeredAt: latest ? text("shared.registeredAt", { when: when(latest.registeredAt) }) : "",

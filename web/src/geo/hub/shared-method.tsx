@@ -10,6 +10,8 @@ import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { DraftProfile } from "@/geo/contracts/authoring";
+import { OrcidId } from "@/geo/orcid/id-display";
+import type { HubEntry } from "@/geo/contracts/hub-shared";
 import { geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +40,7 @@ export interface SharedMethodView {
   note?: string;
   summary: string;
   author: string;
+  authorOrcid?: HubEntry["authorOrcid"];
   /** Folder display name, or null before registration. */
   folder: string | null;
   revision: number;
@@ -146,6 +149,7 @@ export function SharedMethod({
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Avatar name={method.author} />
               <span className="font-medium text-foreground">{method.author}</span>
+              {method.authorOrcid && <OrcidId id={method.authorOrcid.id} environment={method.authorOrcid.environment} authenticated compact />}
               <span aria-hidden>·</span>
               <span>{method.registeredAt}</span>
             </div>
