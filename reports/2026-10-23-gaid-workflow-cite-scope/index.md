@@ -76,7 +76,6 @@ supersedes:
 - 실제 순환에서 Qwen은 노트를 쓴 뒤 채팅 답변 본문 없이 끝났습니다. 노트와 결과 파일은 정상으로 남았습니다. 모델 쪽 동작으로 보고 이 작업에서는 고치지 않았습니다.
 - 등록 창은 예제 자료를 다 보여 주려면 창 안에서 스크롤해야 합니다. 공유 범위 문장과 개수·크기는 목록 위에 있어 스크롤 없이 보입니다.
 - 검토 앱과 기관 허브 서버는 건드리지 않았습니다. 허브 서버 코드는 바뀌지 않았고, 검토 앱 반영은 허브가 합니다.
-- 전체 검사는 중간 커밋에서 통과했고, 마지막 커밋에서 다시 돌린 결과는 작업 문서에 기록합니다.
 
 ## 6. 결정할 일
 
@@ -97,7 +96,7 @@ supersedes:
 
 - 코드: `server/src/geo/library/workflow-papers.ts` (맞춤), `server/src/geo/routes/library.ts` (`GET /geo/library/workflow-papers?method=`, `POST /geo/library/workflow-papers/attach`, 사용처 주입), `server/src/geo/library/uses.ts` (`ProjectWorkflowPapers`), `server/src/geo/connections/index.ts` (연결 지도), `server/src/geo/instructions.ts` (`RESEARCH_NOTE_RULE`), `web/src/geo/workspace/source-papers.tsx`, `web/src/geo/workspace/start-intro.tsx`, `web/src/geo/workspace/task-setup.tsx`, `web/src/geo/contracts/workflow-doc.ts` (`settings.papers`), `web/src/geo/library/add-paper-dialog.tsx` (`initialDoi`), `web/src/geo/library/library-screen.tsx`, `web/src/geo/hub/hub-dialogs.tsx` (`SharedExamples`, 고정 버튼 줄), `web/src/geo/hub/hub-screen.tsx`.
 - 시험: `server/test/geo-workflow-papers.test.ts`, `web/src/geo/workspace/source-papers.test.tsx`, `web/src/geo/workflow/workflow-card.test.tsx`, `web/src/geo/hub/hub.test.tsx`.
-- 전체 검사: job `job-geoaidesk-gaid-workflow-cite-scope-1`, 커밋 02e10dfa, "All geoaidesk checks passed". 마지막 커밋의 재검사는 작업 문서 `docs/tasks/gaid-workflow-cite-scope.md`에 기록합니다.
+- 전체 검사: job `job-geoaidesk-gaid-workflow-cite-scope-1`(커밋 02e10dfa)과 `job-geoaidesk-gaid-workflow-cite-scope-2`(마지막 코드 커밋 44bafdf3) 모두 "All geoaidesk checks passed".
 - 별도 인스턴스: systemd user unit `gaid-cite-scope-app`, 포트 3360/18360, `GAID_HOME=~/data/geoaidesk/work/gaid-workflow-cite-scope/home`. 검토 앱 자료에서 읽기 전용으로 복사한 것: 서재 항목 `li-79b57a297a46`(heo2025, Zotero), `li-a313027670f8`(astic2020)와 PDF·쪽 텍스트, 저작 프로젝트 `ap-43431e17-f09`, `models.json`(kigam-qwen). 인증 정보는 복사하지 않았습니다.
 - 실제 순환: 로컬 허브 항목 `entry-ap-43431e17-f09` version 0.1.0 등록(화면 촬영 중 0.1.1이 한 번 더 등록됨, 이 인스턴스 안에서만). 프로젝트 `pgi-b937d9`: 붙인 뒤 `.kady/geo/literature.json` itemIds = [li-79b57a297a46, li-a313027670f8]. 대화 세션 `01a168af-848d-72ed-b527-180a7b88402f`(2026-10-23 12:14–13:32 UTC, 모델 `kigam-qwen/qwen3.8-flash-next`, 도구 호출 중 `library_search` 2회, `library_read` 1회). 노트 `연구노트/2026-10-23-pgi-orebody-volume-example/index.md`: `[@heo2025]` 5곳(p.4, p.8 ×2, p.9, 쪽 없음 1), `[@astic2020]` 3곳(p.12, p.40, 쪽 없음 1). 노트 서재 항목 `li-74b1ed77b62d`의 인용: heo2025 → li-79b57a297a46 (p.8, p.9, p.4), astic2020 → li-a313027670f8 (p.12, p.40). 두 번째 프로젝트 `pgi-944a90`(설치만, 붙이지 않음)는 그림 1 촬영용입니다.
 - 화면: `~/data/geoaidesk/work/gaid-workflow-cite-scope/shots/`: `start-intro-{1440,1280}-{instrument,mapsheet}-{light,dark}.png`, `register-{1440,1280}-{instrument,mapsheet}-{light,dark}.png`, `library-uses.png`. 스타일·테마는 `<html data-style>`와 `dark` 클래스로 바꿔 찍었습니다.

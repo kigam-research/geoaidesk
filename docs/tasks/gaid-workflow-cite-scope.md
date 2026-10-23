@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T13:43:49Z
+updated: 2026-10-23T13:58:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"56c05725-7189-46a4-9615-7e1ddddb7ee0","pid":515641,"provider":"claude","session":"31d96ed7-e560-44e9-9232-a2b8aa7a787b","start":"64415659","token":"705a5edd3ea6c16b909c87cbd34aa6359cc9106a13b769c29f4592a9e6ef672d"}
 branch: task/gaid-workflow-cite-scope
 target: main
@@ -66,8 +66,9 @@ Result for the hub (F23 + F21 done; report reports/2026-10-23-gaid-workflow-cite
   under "공유: 예제 자료 파일 N개 (size)" and states everyone who can see the Workflow in the hub can download them;
   "공유하지 않음" now says "예제 자료로 넣지 않은 연구 자료"; the footer is sticky so 허브에 등록 stays visible.
   Closes gaid-pocheon-trial#2.
-- Checks: scripts/check passed at 02e10dfa (job-geoaidesk-gaid-workflow-cite-scope-1); rerun on the final snapshot is
-  recorded below. New tests: server geo-workflow-papers (3), web source-papers (2), workflow-card (+1), hub (+1).
+- Checks: scripts/check passed at 02e10dfa (job-geoaidesk-gaid-workflow-cite-scope-1) and on the final code snapshot
+  44bafdf3 (job-geoaidesk-gaid-workflow-cite-scope-2, "All geoaidesk checks passed"; later commits only touch this
+  document and the report). New tests: server geo-workflow-papers (3), web source-papers (2), workflow-card (+1), hub (+1).
   UI guide: 16 screenshots (start window 소개 + register dialog × 계측/도폭 × light/dark × 1440×900/1280×800),
   check-ui 0 errors, no new accepted debt.
 - Own instance: systemd user unit `gaid-cite-scope-app` (ports 3360/18360), GAID_HOME
@@ -75,8 +76,8 @@ Result for the hub (F23 + F21 done; report reports/2026-10-23-gaid-workflow-cite
   PDFs/page text, authoring project ap-43431e17-f09, models.json; no credentials). Screens in .../shots/.
 - Observation (not fixed): Qwen ended the run without a final chat text after writing the note.
 ## Next steps
-1. Finish: final scripts/check job on the last commit, review-copy of the report, stop `gaid-cite-scope-app` and close
-   the playwright session, then `task finish`. Build caches in the worktree (web/.next etc.) come from the own instance.
+1. `task finish` (done: final check, review copy in the vault, own instance stopped, browser closed). Build caches in
+   the worktree (web/.next etc.) come from the own instance.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.)
@@ -114,6 +115,7 @@ Report: reports/2026-10-23-gaid-workflow-cite-scope/index.md
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-workflow-cite-scope-20261023T120649.699277Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-workflow-cite-scope-20261023T134403.662062Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
