@@ -76,7 +76,7 @@
   "checks.record.item": "{id}: {status}{detail}",
   "checks.record.warning": "[{code}] {path}: {message}",
   "issues.summary": "{count, plural, one {# part of the Workflow file could not be read} other {# parts of the Workflow file could not be read}}. Workflows and start settings that could not be read are not listed.",
-  "trials.heading": "Trial {at} · Draft",
+  "trials.heading": "Trial {at}",
   "trials.assessed": "Researcher assessment: {outcome}",
   "trials.unassessed": "Not yet assessed by the researcher",
   "trials.expect.line": "{label} · {need} · {state}",

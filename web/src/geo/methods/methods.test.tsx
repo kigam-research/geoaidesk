@@ -82,7 +82,7 @@ it("keeps an invalid method as a detail row and exposes its issues", async () =>
 const inRecord = (element: HTMLElement) => { const details = element.closest("details"); expect(details).not.toBeNull(); expect(details).not.toHaveAttribute("open"); };
 it("summarises origin, hub check and trials for the researcher and keeps the raw records behind 기록 보기", async () => {
   render(<MethodDetail method={method} projectId="p1" onClose={vi.fn()} onSetup={vi.fn()} />);
-  expect(screen.getByText("설치 출처: 파일 업로드")).toBeInTheDocument(); expect(screen.getByText("2판")).toBeInTheDocument();
+  expect(screen.getByText("설치 출처: 파일 업로드")).toBeInTheDocument(); expect(screen.getByText("초안")).toBeInTheDocument();
   expect(screen.getByText("허브에서 미해결인 질문")).toBeInTheDocument(); expect(screen.getByText("대조 자료는 미정입니다.")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Paper" })).toHaveAttribute("href", "https://doi.org/10.1234/paper");
   // Hub check: one plain line and a sentence per warning kind; checker, check ids and raw messages are the record.
@@ -90,14 +90,14 @@ it("summarises origin, hub check and trials for the researcher and keeps the raw
   expect(screen.getByText("다른 참고 사항이 있습니다. 내용은 기록 보기에 있습니다.")).toBeInTheDocument();
   inRecord(screen.getByText("manifest: 통과")); inRecord(screen.getByText("[untested] scripts: No run recorded")); inRecord(screen.getByText(/검사 도구: hub-check/));
   // Trial: when, which 판, assessment, what became of each expected result and which files appeared.
-  expect(await screen.findByText(/시험 · 1판$/)).toBeInTheDocument();
+  expect(await screen.findByText(/시험$/)).toBeInTheDocument();
   expect(screen.getByText("연구자 평가 전")).toBeInTheDocument();
   expect(screen.getByText(/현재 파일은 해당 시험에 포함되지 않습니다/)).toBeInTheDocument();
   expect(screen.getByText("보고서 · 필수 · 생김")).toBeInTheDocument(); expect(screen.getByText("지도 · 필수 · 생기지 않음")).toBeInTheDocument();
   expect(screen.getByText("결과 파일 1개: results/report.md")).toBeInTheDocument();
   expect(screen.getByText(/과학적 검토 결과가 아닙니다/)).toBeInTheDocument();
   // Agent machinery only in the record: tool calls, model, chat id, file matching.
-  for (const raw of ["도구 호출 3회 · 실패 1회", "모델: local/qwen", "채팅 ID: session-one", "파일 연결이 불완전한 단계: 1개", "Workflow ID: trial · 1판"]) inRecord(screen.getByText(raw));
+  for (const raw of ["도구 호출 3회 · 실패 1회", "모델: local/qwen", "채팅 ID: session-one", "파일 연결이 불완전한 단계: 1개", "Workflow ID: trial · 초안 번호 1"]) inRecord(screen.getByText(raw));
   inRecord(screen.getByText(/파일 일치 없음: results\/map.png/)); inRecord(screen.getByText(/발견됨: results\/report.md/));
   expect(screen.getAllByText("기록 보기")).toHaveLength(2);
 });
@@ -105,7 +105,7 @@ it("names the expected result states and folds long output lists into a count", 
   const many = { ...trial, assessment: { outcome: "useful" as const, note: "", recordedAt: "now" }, observed: { ...trial.observed, outputs: ["a.csv", "b.csv", "c.csv", "d.csv", "e.csv"].map((path) => ({ path })) },
     expected: [{ id: "x", label: { ko: "표" }, required: false, files: ["x.csv"], found: [], foundElsewhere: ["out/x.csv"] }, { id: "y", label: { ko: "그림" }, required: true, files: [], found: [] }] };
   render(<TrialCard trial={many} projectId="p1" workflowTitle="논문 방법 시험" />);
-  expect(screen.getByText(/시험 · 1판 · 논문 방법 시험$/)).toBeInTheDocument();
+  expect(screen.getByText(/시험 · 논문 방법 시험$/)).toBeInTheDocument();
   expect(screen.getByText("연구자 평가: 유용함")).toBeInTheDocument();
   expect(screen.getByText("표 · 선택 · 다른 폴더에 생김")).toBeInTheDocument(); expect(screen.getByText("그림 · 필수 · 파일 이름이 정해지지 않아 대조하지 않음")).toBeInTheDocument();
   expect(screen.getByText("결과 파일 5개: a.csv, b.csv, c.csv 외 2개")).toBeInTheDocument();

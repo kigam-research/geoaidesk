@@ -1,4 +1,5 @@
 "use client";
+import { hubRefVersion } from "@/geo/contracts/hub-version";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { t } from "@/geo/i18n";
@@ -9,6 +10,7 @@ import { hubApi } from "@/geo/hub/api";
 import type { HubSkillInstallState } from "@/geo/contracts/hub-skills";
 
 export interface InstallPreviewData {
+  skillHub?: { hubEntry?: { revision: number; version?: string } };
   skills: { name: string; files: number }[];
   contents: { name: string; files: string[]; hasCode: boolean; prompts: Localized[] }[];
   /** Hub skills the Workflow pins (gaid-hub-skills), with their state in the target project. */
@@ -46,6 +48,7 @@ export function InstallPreview({ projectId, entryId, revision, authoringId, onRe
   return <section className="min-w-0 space-y-2 rounded-md border p-3 text-sm" aria-label={t("skillHub.installPreview")}>
     <h4 className="font-medium">{t("skillHub.installPreview")}</h4>
     {failed ? <><p role="alert">{t("skillHub.previewError")}</p><Button variant="outline" size="sm" onClick={() => { setFailed(false); setData(null); setRetry((n) => n + 1); }}>{t("skillHub.previewRetry")}</Button></> : !data ? <p role="status">{t("skillHub.previewLoading")}</p> : <>
+      <p className="text-xs text-muted-foreground tabular-nums">{data.skillHub?.hubEntry ? t("methods.registered", { version: hubRefVersion(data.skillHub.hubEntry) ?? "" }) : t("methods.draft")}</p>
       {data.contents.map((skill) => <div key={skill.name} className="space-y-2">
         <p>{t("skillHub.previewSkill", { name: skill.name, count: skill.files.length })}</p>
         <p>{t("skillHub.previewCode", { code: skill.hasCode ? "yes" : "no" })}</p>

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T07:03:17Z
+updated: 2026-10-23T07:10:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"85dddf2d-e5cf-4fd4-9e09-1bd517612fc9","pid":2306567,"provider":"codex","session":"01a1678c-afff-7a90-bcc6-4c8ff80df8f6","start":"62657466","token":"439122785c0ef2741fb6290719f33f7d911ae7984a2150a314072fcd11f03a42"}
 branch: task/gaid-hub-versions--ui
 target: task/gaid-hub-versions
@@ -84,15 +84,20 @@ Evidence to return in your task document: changed files, string ids before→aft
 screenshot paths, open questions. Finish with `task finish`.
 
 ## Current state
-Implementation in progress: removal dialog, removed Workflow list and hash route, sidebar visibility/counts, registration patch/minor/major choices, registered version display and draft labels. No server/contracts edits. Codegraph is unavailable for this exact worktree (unindexed); relevant native files were read.
+Implementation complete, verification in progress: removal dialog, removed Workflow list and hash route, sidebar visibility/counts, registration patch/minor/major choices, registered version display and draft labels. No server/contracts edits. Codegraph is unavailable for this exact worktree (unindexed); relevant native files were read.
 
 Sequential decisions: preserve revision numbers for transport, resolve registered display through hubVersionOf/hubRefVersion, never show package build versions as registered versions. This child owns web screens/locales plus terminology and page.tsx one-line seam; parent owns contracts/server/report. Integration order: UI implementation, web tests and typecheck, copy/UI checks, isolated screenshots, finish into parent. No delegated workers.
 
-Verification pending: this worktree has no web/server node_modules. Two tsc invocations found the unrelated npx tsc placeholder (root, then web); stop retrying compiler until npm ci installs the declared dependencies. task job refused dirty source; save this checkpoint before installing.
+Backend contract follow-up: basedOn.version is now supplied by parent 8cd0ba6d (merged). Requested version fields for hub skill usedBy/origin Workflow references; UI handles older refs with hubRefVersion.
+
+Initial dependency state: this worktree had no web/server node_modules. npm ci is now installed in both (server by task sync; web by npm ci, 13 s). Two tsc invocations found the unrelated npx tsc placeholder (root, then web); stop retrying compiler until npm ci installs the declared dependencies. task job refused dirty source; save this checkpoint before installing.
 ## Next steps
-1. Save reviewed checkpoint, install lockfile dependencies with task job, then run web typecheck/tests.
+1. Web typecheck passed; focused 7-file suite passed 51 tests. Full web suite running, then recheck changed expectations.
 2. Capture Korean screens in the isolated app; finish after declared checks.
 ## Failed approaches
+- `task sync` merged parent commit 8cd0ba6d, then ran the full scripts/check. Its server suite reported the pre-existing parent-owned workflow-doc expected-version failure. Stopped that duplicate full check with SIGINT (exit 130) after reporting it to parent; no integration was claimed. Parent owns the server fix and final full check.
+- Initial web full test run finds only old wording expectations so far; updating them rather than changing implementation back.
+
 ## Notes and decisions
 - `판` is not a globally forbidden glossary substring: unrelated strings use 판단, 판정, 출판. `버전` is a forbidden variant; the version contexts owned here use version.
 - Asked parent to supply HubEntry.basedOn.version (currently only revision); legacy mapping is not enough after minor/major updates. Trial headings will omit package numbers because MethodTrial has no registered version.

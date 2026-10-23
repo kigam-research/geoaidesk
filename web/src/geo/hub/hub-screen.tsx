@@ -147,7 +147,7 @@ export function GaidHub({
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {removed ? (
-            <RemovedWorkflows entries={index.removed} onRestored={index.reloadShared} onBack={() => openList({ kind: "registry", folder: "all" })} />
+            <RemovedWorkflows loading={index.removedLoading} error={index.removedError} entries={index.removed} onRestored={index.reloadShared} onBack={() => openList({ kind: "registry", folder: "all" })} />
           ) : feeds ? (
             <FeedScreen projects={hubProjects} />
           ) : skillPlace ? (
@@ -222,6 +222,8 @@ interface HubIndex {
   mine: ProjectSummary[];
   entries: HubEntry[];
   removed: HubEntry[];
+  removedLoading: boolean;
+  removedError: string | null;
   folders: (HubFolder & { entries: number })[];
   cards: HubRecommendation[];
   loading: boolean;
@@ -238,6 +240,8 @@ function useHubIndex(listShown: boolean): HubIndex {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [entries, setEntries] = useState<HubEntry[]>([]);
   const [removed, setRemoved] = useState<HubEntry[]>([]);
+  const [removedLoading, setRemovedLoading] = useState(true);
+  const [removedError, setRemovedError] = useState<string | null>(null);
   const [folders, setFolders] = useState<(HubFolder & { entries: number })[]>([]);
   const [cards, setCards] = useState<HubRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -245,7 +249,9 @@ function useHubIndex(listShown: boolean): HubIndex {
   const reloadShared = useCallback(async () => {
     // The shared hub may be unavailable (older server): my methods still list.
     const [f, e, r, d] = await Promise.allSettled([sharedHub.folders(), sharedHub.entries(), sharedHub.recommended(), sharedHub.removed()]);
-    setRemoved(d.status === "fulfilled" ? d.value.entries : []);
+    if (d.status === "fulfilled") { setRemoved(d.value.entries); setRemovedError(null); }
+    else { setRemoved([]); setRemovedError(String(d.reason)); }
+    setRemovedLoading(false);
     if (f.status === "fulfilled") setFolders(f.value.folders);
     if (e.status === "fulfilled") setEntries(e.value.entries);
     if (r.status === "fulfilled") setCards(r.value.cards);
@@ -274,7 +280,7 @@ function useHubIndex(listShown: boolean): HubIndex {
   useEffect(() => { void reloadShared(); }, [identity, reloadShared]);
   const me = identity?.account ? identity.name : hubUserName();
   const mine = useMemo(() => (me ? projects.filter((p) => !p.author || p.author === me) : projects), [projects, me]);
-  return { mine, entries, removed, folders, cards, loading, error, reloadShared };
+  return { mine, entries, removed, removedLoading, removedError, folders, cards, loading, error, reloadShared };
 }
 
 function HubList({

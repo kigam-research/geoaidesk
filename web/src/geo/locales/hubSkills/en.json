@@ -45,7 +45,7 @@
   "sourceTitle": "Origin and licence",
   "origin": {
     "own": "Written by researcher",
-    "workflow": "Taken from Workflow: {title}, version {revision}",
+    "workflow": "Taken from Workflow: {title}, version {version}",
     "github": "Fetched from external source: {source}"
   },
   "sourceRecord": "View origin record",
@@ -126,5 +126,6 @@
   "suspended": "This version is suspended. New installs and Workflow use are blocked.",
   "settingsBack": "View installed skills",
   "projectOnly": "Hub skills install into a project. Change the scope to project.",
-  "unchanged": "{name} version {revision} is already installed. No files were changed."
+  "unchanged": "{name} version {revision} is already installed. No files were changed.",
+  "workflowVersion": "version {version}"
 }

@@ -76,7 +76,7 @@
   "checks.record.item": "{id}: {status}{detail}",
   "checks.record.warning": "[{code}] {path}: {message}",
   "issues.summary": "Workflow 파일에서 읽지 못한 부분이 {count}곳 있습니다. 읽지 못한 Workflow와 시작 설정은 목록에 나오지 않습니다.",
-  "trials.heading": "{at} 시험 · 초안",
+  "trials.heading": "{at} 시험",
   "trials.assessed": "연구자 평가: {outcome}",
   "trials.unassessed": "연구자 평가 전",
   "trials.expect.line": "{label} · {need} · {state}",

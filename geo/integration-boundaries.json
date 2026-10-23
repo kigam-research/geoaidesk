@@ -1021,6 +1021,12 @@
       "owner": "gaid-first-use-fixes",
       "status": "edited",
       "responsibility": "Streaming-link and file-relative link regressions"
+    },
+    {
+      "path": "web/src/components/skills-panel.test.tsx",
+      "owner": "gaid-hub-versions",
+      "status": "edited",
+      "responsibility": "Update hub skill integer-version copy expectations after the user replaced 판 with version."
     }
   ],
   "notTouched": [

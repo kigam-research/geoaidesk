@@ -45,7 +45,7 @@
   "sourceTitle": "출처와 이용 조건",
   "origin": {
     "own": "직접 작성",
-    "workflow": "Workflow에서 꺼냄: {title} version {revision}",
+    "workflow": "Workflow에서 꺼냄: {title} version {version}",
     "github": "외부에서 가져옴: {source}"
   },
   "sourceRecord": "출처 기록 보기",
@@ -126,5 +126,6 @@
   "suspended": "사용 중지된 version입니다. 새 설치와 Workflow 사용이 막힙니다.",
   "settingsBack": "설치한 스킬 보기",
   "projectOnly": "허브 스킬은 프로젝트에 설치합니다. 적용 범위를 프로젝트로 바꾸세요.",
-  "unchanged": "{name} version {revision}이 이미 설치되어 있어 파일을 바꾸지 않았습니다."
+  "unchanged": "{name} version {revision}이 이미 설치되어 있어 파일을 바꾸지 않았습니다.",
+  "workflowVersion": "version {version}"
 }

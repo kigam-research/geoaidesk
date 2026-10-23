@@ -18,7 +18,8 @@ export function RemoveWorkflowDialog({ open, onOpenChange, entry, local, onRemov
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { if (open) { setReason(""); setError(null); } }, [open, entry.id]);
+  useEffect(() => { setReason(""); }, [entry.id]);
+  useEffect(() => { if (open) setError(null); }, [open]);
   return <Dialog open={open} onOpenChange={(next) => { if (!busy) onOpenChange(next); }}>
     <DialogContent className="sm:max-w-lg">
       <DialogHeader>
@@ -43,8 +44,8 @@ export function RemoveWorkflowDialog({ open, onOpenChange, entry, local, onRemov
   </Dialog>;
 }
 
-export function RemovedWorkflows({ entries, onRestored, onBack }: {
-  entries: HubEntry[]; onRestored: () => Promise<void>; onBack: () => void;
+export function RemovedWorkflows({ entries, onRestored, onBack, loading = false, error: loadError = null }: {
+  loading?: boolean; error?: string | null; entries: HubEntry[]; onRestored: () => Promise<void>; onBack: () => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<{ id: string; detail: string } | null>(null);
@@ -57,7 +58,9 @@ export function RemovedWorkflows({ entries, onRestored, onBack }: {
       </header>
       <p className="text-sm text-muted-foreground">{text("removed.body")}</p>
       {restored && <p role="status" className="text-sm">{text("removed.restored", { title: restored })}</p>}
-      {!entries.length && <p className="text-sm text-muted-foreground">{text("removed.empty")}</p>}
+      {loading && <p role="status" className="text-sm">{text("home.loading")}</p>}
+      {loadError && <div role="alert" className="space-y-2 text-sm"><p>{text("home.browse.error")}</p><TechnicalDetail detail={loadError} /><Button variant="outline" onClick={() => void onRestored()}>{text("home.browse.retry.button")}</Button></div>}
+      {!loading && !loadError && !entries.length && <p className="text-sm text-muted-foreground">{text("removed.empty")}</p>}
       <ul className="divide-y divide-gaid-edge">
         {entries.map((entry) => <li key={entry.id} className="flex flex-wrap items-start justify-between gap-4 py-4">
           <div className="min-w-0 flex-1 space-y-1 text-sm">
