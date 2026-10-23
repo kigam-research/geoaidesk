@@ -9,7 +9,7 @@ Task `gaid-promo-video-v3` (v1/v2 contracts: git history of this file). Output: 
 
 - Parent (`gaid-promo-video-v3`): this contract, `render.py`, `scene/`, `prepare_data.py`, README, task document,
   report, integration and the final video. All film work (scenes, tags, timing, render) is the parent's.
-- Study-and-capture child (`gaid-promo-video-v3--study`): `capture*.py` (prefix `capture_` for new helpers), `CAPTURE.md`,
+- Study-and-capture child (`gaid-promo-v3-study`): `capture*.py` (prefix `capture_` for new helpers), `CAPTURE.md`,
   the study in the review app and the external directories below. It does not edit the parent's files. Its beat labels
   are suggestions.
 - Payloads (frames, video, copies) stay outside Git under `~/data/geoaidesk/work/gaid-promo-video-v3/`.

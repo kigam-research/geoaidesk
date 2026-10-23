@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-23T16:26:48Z
+updated: 2026-10-23T16:27:18Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6049dc5d-4e08-4477-91a7-c4f979551d95","pid":2267643,"provider":"claude","session":"005e4fa9-23ac-4415-a900-3b79a1cdfb1a","start":"66051222","token":"c55cfd44431ac013718069a11296a9ea2387fc17354f825cfb49c5ad98458837"}
 branch: task/gaid-promo-video-v3
 target: main
@@ -88,12 +88,12 @@ per action, no settings change) → registered as the next version of `entry-ap-
 in place is refused) → new project, start window with example data and both papers attached → one real run, coarse
 (≤10 min compute, method kept whole), plus a GeoTIFF map the viewer opens → note with a decision → 서재에 넣기.
 ## Next steps
-1. Child `gaid-promo-video-v3--study` runs the study and capture-v3 (contract `geo/promo/CONTRACT.md` v3); parent adapts
+1. Child `gaid-promo-v3-study` runs the study and capture-v3 (contract `geo/promo/CONTRACT.md` v3); parent adapts
    `scene/` and `render.py` to structure v3 meanwhile (version wording, chapter timing, new chapter content).
 ## Failed approaches
 ## Notes and decisions
 - Packages (2026-10-24): (P) parent owns `scene/`, `render.py`, `prepare_data.py`, README, CONTRACT.md, report,
-  integration, render; (C) child `gaid-promo-video-v3--study` ("general work") owns the review-app study, `capture*.py`,
+  integration, render; (C) child `gaid-promo-v3-study` ("general work") owns the review-app study, `capture*.py`,
   `CAPTURE.md`, `~/data/geoaidesk/work/gaid-promo-video-v3/` capture-v3 data. Interface: `capture.json` (v2 schema) beats.
   Integration order: scenes with v2 frames as stand-ins → capture-v3 → beats wired → render → report.
 - v2 user rules kept: writer does all film work, worker only study/raw takes; promotional film, staging allowed and
