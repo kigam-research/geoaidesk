@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:13:12Z
+updated: 2026-10-24T06:14:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
@@ -68,6 +68,7 @@ Outside check: none.
 ## Next steps
 1. Wait for the user's answers to the four decisions (report §6). On approval, plan phase 2 packages (Orchestration below),
    apply the ADR (status accepted), terminology, AGENTS.md and UI guide; then implement.
+Blocked: waiting for the user's answers to the four decisions in report §6 (asked 2026-10-24).
 ## Orchestration
 - Sequential: (1) place names, app-bar structure and 서재 entry (decided by the user, drawn here); (2) user approval of the
   mockups; (3) phase 2 implementation.
