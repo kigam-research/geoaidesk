@@ -2,3 +2,4 @@
 
 Written by `task item` on main; each line keeps the answer and evidence.
 - [부채 gaid-pocheon-trial#2] 허브 등록 대화상자의 "공유하지 않음: 연구 자료" 문구가, Workflow에 들어 있는 예제 자료(입력별 파일)가 함께 공유된다는 사실을 알리지 않음 (F21) — 가) 등록 대화상자에 "공유: 예제 자료 N개(크기)"를 더함 — 나) 그대로 둠 — 권장: 가) 연구 자료 공유 여부는 연구자가 등록 전에 알아야 함 — 막힌 일: 없음 — 조건: gaid-workflow-example 이후 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#5-한계 — 닫힘 2026-10-23:  (근거: 후속 gaid-workflow-cite-scope 완료 (merge 66d6cf7b66e9))
+- [결정 gaid-pocheon-trial#1] 허브의 포천 Workflow에 들어 있는 논문 보충 코드(Springer ESM1, 공개 이용 조건 미표시)의 공유 범위 — 가) 기관 허브 안 공유는 유지하고 기관 밖 공유 전에 저자에게 이용 허락을 받음 — 나) 보충 코드를 빼고 방법 설명과 GAID가 쓴 코드만 남김 — 권장: 가) 같은 기관 저자의 공개 보충 자료이고 허브는 기관 안에서만 쓰임 — 막힌 일: 기관 밖 공유 — 조건: 없음 — 근거: reports/2026-10-23-gaid-pocheon-trial/index.md#6-결정할-일 — 닫힘 2026-10-24: 가) 기관 허브 안 공유 유지, 기관 밖 공유 전 저자 이용 허락 (사용자 2026-10-23 "gaid-pocheon-trial와 관련해서는 권장으로 진행한다.") (근거: No code change needed; the rule applies when sharing outside the institute is proposed.)
