@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:33:59Z
+updated: 2026-10-24T02:03:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
@@ -81,11 +81,22 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
 `task finish`. If a decision needs the user, ask the parent via your task document's open items and finish; do not block on it.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Sources in geo/promo-lemo-40/ (TREATMENT.md, scene/, render.py, mix.py, master.py, build.sh, README.md, CREDITS).
+  Film: 42.0 s, one-orbit structure (TREATMENT.md §2–6); real takes only inside station windows (PGI L1/A3/H2/L3,
+  Yilgarn R2/N1), per the user's 2026-10-24 message forwarded by the parent.
+- Review loop done on previews in ~/data/geoaidesk/work/gaid-promo-video-v4-lemo--promo-40s/ (prev1–prev5): two contact
+  sheets (prev1, prev2), full preview prev4 with 0.2 s strips (prev4/strips/), fixes recorded in TREATMENT.md §11.
+  prev4 master: 1260 frames, −14.1 LUFS, TP −1.1 dBTP, no black or empty frames, reading check 0 short.
+- Re-verify: `sh geo/promo-lemo-40/build.sh <new dir>` (fails on loudness, peak, black/empty frames, browser errors).
 ## Next steps
-1. (the next session's first action)
+1. Final render with `task job run -- sh geo/promo-lemo-40/build.sh`; then section draft
+   reports/2026-10-24-gaid-promo-video-v4-lemo/section-40s.md with figures/40s-*.png from the job's stills; task finish.
 ## Failed approaches
 ## Notes and decisions
+- Structure: one orbit (the AI agent's dot) instead of the parent's disorder→grid arc, so the 40 s cut differs from the
+  103 s cut. Demo comparison: TREATMENT.md §10 (4 of 6 differ outright).
+- Audio packages resolved by uv and pinned: numpy 2.5.4, scipy 1.18.1, soundfile 0.14.0, soxr 1.1.0.
+- master.py ports lemo mux.sh to imageio-ffmpeg 0.6.0 (bundled ffmpeg 7.0.2); no grain (vector style).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
