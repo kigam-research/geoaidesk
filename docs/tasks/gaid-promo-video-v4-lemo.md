@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:46:42Z
+updated: 2026-10-24T01:54:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -55,14 +55,17 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
   rows with a leader line to the box on the take); PGI takes (capture-v3) and Yilgarn takes (capture-v2: M1 map, N1 note,
   L3 connection map) per the user's 2026-10-24 message. Preview pv1 (work dir) mastered to -14.1 LUFS / TP -1.3 dB,
   3069 frames, 102.3 s, no black segments; contact sheets look/sheetA.jpg, sheetB.jpg and press strip checked by eye.
-- Final render: job job-geoaidesk-gaid-promo-video-v4-lemo-1 (build.sh, --input assets:lemo-opuscar/3961ddb), receipt
-  ~/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/receipt.json.
+- Final render: job job-geoaidesk-gaid-promo-video-v4-lemo-1 succeeded (source 4a58eec1): out/gaid-promo-lemo.mp4
+  sha256 22dba68e…5717, 102.3 s, 3069 frames, -14.1 LUFS, TP -1.3 dB, no black segments (out/master.json). Report written
+  with figures from the final file; registry entry `gaid-promo-video-v4-lemo` (review). Reading check: 17 of 44 texts
+  under lemo's hold rule (rows, cycle labels, second-brain lines 2.8/3.3 s) — stated in the report limits.
 - lemo-opuscar at 3961ddb + VCSL pack registered as asset `lemo_opuscar` (configs/inputs.toml, ~/assets/lemo-opuscar/3961ddb).
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
-1. When job -1 exits: verify master.json (loudness, frames, black segments) and the film hash; pull report key frames.
-2. Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
+1. Wait for the 40 s child; then `task complete gaid-promo-video-v4-lemo--promo-40s`, merge section-40s.md into report §8,
+   add its registry entry, humanizer pass, review-copy, task finish.
+2. (done for A) Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
    review-copy; merge the child's section-40s.md after `task complete gaid-promo-video-v4-lemo--promo-40s`.
 ## Failed approaches
 ## Notes and decisions
@@ -98,6 +101,7 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-promo-video-v4-lemo/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
