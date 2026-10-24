@@ -4,6 +4,7 @@ import { commandPreview, parseCommandBlock, slashMenuItems } from "@/lib/command
 it("labels full and truncated command expansions without exposing wrapper paths", () => {
   expect(commandPreview('<skill name="audit" location="/private/path')).toBe('/skill:audit');
   expect(commandPreview('<prompt-template name="qc">\nRead a.csv\n</prompt-template>')).toBe('/qc — Read a.csv');
+  expect(commandPreview('문헌 정리를 만들어 주세요: 포천\n\n<library-digest-request id="dr-1" workflow="compare-papers" path="문헌정리/x/index.md">\nPapers\n</library-digest-request>')).toBe('문헌 정리를 만들어 주세요: 포천');
   expect(commandPreview('<skill name="audit" location="/path">\nInstructions\n</skill>\n\na.csv')).toBe('/skill:audit — a.csv');
   expect(commandPreview('Explain <skill name="audit"')).toBe('Explain <skill name="audit"');
 });

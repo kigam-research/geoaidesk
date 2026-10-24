@@ -36,6 +36,9 @@ export function commandPreview(raw: string): string {
     const tail = parseWorkflowBlock(text)?.tail.split("\n")[0]?.trim();
     return tail ? `Workflow · ${workflow[1]} — ${tail}` : `Workflow · ${workflow[1]}`;
   }
+  // GeoAIDesk (gaid-library-prep): a 문헌 정리 request shows its one-line request, not the instructions after it.
+  const digest = text.match(/^([^\n]+)\n\n<library-digest-request /);
+  if (digest) return digest[1];
   const prefix = text.match(/^<(skill|prompt-template) name="([^"]+)"/);
   if (!prefix) return text;
   const command = prefix[1] === "skill" ? `/skill:${prefix[2]}` : `/${prefix[2]}`;

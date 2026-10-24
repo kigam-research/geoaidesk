@@ -4,6 +4,7 @@ import type { LibraryItem, LibraryItemResponse, LibraryItemSummary } from "@/geo
 import { DigestItemDetail, DigestTable } from "./digest-items";
 import { DigestMakeSheet } from "./digest-make-sheet";
 import { onDigestChatRequest, takeDigestChat } from "./digest-handoff";
+import { DigestRequestCard, parseDigestRequest } from "./digest-request-card";
 
 const api = vi.hoisted(() => ({
   setDigestStatus: vi.fn(), removeLibraryItem: vi.fn(), attachToProject: vi.fn(), checkFolder: vi.fn(), listLibrary: vi.fn(), makeDigest: vi.fn(),
@@ -83,5 +84,16 @@ describe("문헌 정리 in 서재", () => {
     expect(seen).toHaveBeenCalled();
     expect(takeDigestChat("proj")?.task).toMatchObject({ title: "문헌 정리", text: "문헌 정리를 만들어 주세요: x" });
     off();
+  });
+
+  it("shows a sent request as one line plus a collapsed card of the agent's instructions", () => {
+    const text = '문헌 정리를 만들어 주세요: 포천\n\n<library-digest-request id="dr-1" workflow="compare-papers" path="문헌정리/x/index.md">\n## 연구 질문 first\n</library-digest-request>';
+    const parsed = parseDigestRequest(text)!;
+    expect(parsed).toMatchObject({ line: "문헌 정리를 만들어 주세요: 포천", workflow: "compare-papers", path: "문헌정리/x/index.md" });
+    expect(parseDigestRequest("문헌 정리를 만들어 주세요")).toBeNull();
+    render(<DigestRequestCard request={parsed} />);
+    expect(screen.queryByText(/연구 질문 first/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /문헌 정리 요청 · 논문 비교/ }));
+    expect(screen.getByText(/연구 질문 first/)).toBeInTheDocument();
   });
 });
