@@ -128,6 +128,11 @@ export async function buildApp() {
   // lifecycle inside its AsyncLocalStorage context. Calling `done` inside
   // withActiveProject keeps the store active for downstream hooks + handler.
   app.addHook("onRequest", (req, reply, done) => {
+    // The cross-project home is read-only and has no active-project scope (including no on-demand seeding).
+    if (req.method === "GET" && req.url.split("?")[0] === "/geo/workspace/home") {
+      done();
+      return;
+    }
     let projectId = resolveProjectId(req);
     try {
       // Only the default project is created on demand. An unknown id here is

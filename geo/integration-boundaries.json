@@ -4,6 +4,12 @@
   "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
   "seams": [
     {
+      "path": "server/test/geo-workspace-home.test.ts",
+      "owner": "gaid-ia-connect-workspace",
+      "status": "added",
+      "responsibility": "Read-only cross-project Workspace home summary: session activity, notes, installed and used Workflows, bounded discovery and project-independent routing"
+    },
+    {
       "path": "web/src/components/project-view.test.tsx",
       "owner": "gaid-hub",
       "status": "edited",
