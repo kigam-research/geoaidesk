@@ -132,7 +132,7 @@
   // Real-system takes from two examples (user, 2026-10-24: "예제도 yilgarn예제와 PGI예제를 둘다써도되고 … 적합한것을 사용"):
   // `p` = 포천 자철석 광체 추정 (PGI example, capture-v3), `y` = Yilgarn 니켈 탐사 우선순위 (capture-v2). A take is shown whole at one
   // scale as a window inside the motion graphics (no zoom, no scroll inside it). `use` = shot seconds; tags = [shot t0, t1, beat, label].
-  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역' };
+  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역', v: '예제 · Yilgarn 니켈 탐사 우선순위 구역' };
   const shotInfo = (src, id) => CAP[src].shots.find(s => s.id === id);
   const BR = (src, id, k) => { const i = shotInfo(src, id); return i && i.beats && i.beats[k] ? i.beats[k].rect : null; };
   const UNION = (a, b) => (a && b ? { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x), height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y) } : a || b);
@@ -140,40 +140,43 @@
     { icon: 'library', label: '내 서재' },
     { icon: 'workflow', label: 'Workflow 만들기' },
     { icon: 'share-2', label: 'GAID 허브 공유' },
-    { icon: 'map-gis', label: '연구 분석' },
+    { icon: 'map-gis', label: 'Workflow 설치·분석' },
     { icon: 'notebook-pen', label: '연구노트' },
   ];
-  // Copy: v4 chapter purposes and outcome tags; two Yilgarn tags keep their v2 wording.
-  // Tags are [beat index, label]: a box is shown only inside its beat's own window from capture.json (t0..t1) and only where
-  // the beat's rect was measured; consecutive beats glide (self-review 2026-10-24: boxes used outside their window pointed at
-  // the wrong place). `use` ends before a take's layout changes.
+  // Parts (user, 2026-10-24): GAID = GAID 허브 (make and share geoscience Workflows from papers, literature and notes) + GAID 시스템
+  // (install Workflows and analyse with the AI agent: the analysis framework). 내 서재 is the researcher's own literature space,
+  // shown on its own, not as either part's main feature.
+  const PART = { lib: '내 서재', hub: 'GAID 허브', sys: 'GAID 시스템' };
+  // Takes: p = capture-v3 (PGI), y = capture-v2 and v = capture-v5 (Yilgarn). Tags are [beat index, label]; a box is drawn only
+  // while the drawn capture pointer is inside the beat's rect (pointer tracks from the frames), so the box follows the pointer;
+  // a beat the pointer never visits lights its row without a box (round-3 diagnosis: 12 of 31 boxes had the pointer elsewhere).
+  // Fewer, slower outcomes (round 3: 22 -> 15 rows).
   const CHAPTERS = [
-    { st: 0, part: 'GAID 시스템', title: '연구는 내 서재의 논문에서 시작합니다', shots: [
-      { src: 'p', id: 'L1', use: [0, 2.6], tags: [[0, '주제별 폴더에 모은 논문']] },
-      { src: 'p', id: 'L2', use: [0.6, 3.6], hold: 0.5, tags: [[0, '논문을 곁에 두고 읽기'], [1, '논문을 곁에 두고 읽기']] },
+    { st: 0, part: 'lib', title: '연구는 내 서재의 논문에서 시작합니다', shots: [
+      { src: 'p', id: 'L1', use: [0.6, 2.6], hold: 0.4, tags: [[0, '주제별 폴더에 모은 논문']] },
+      { src: 'p', id: 'L2', use: [0.6, 3.6], tags: [[0, '논문을 곁에 두고 읽기'], [1, '논문을 곁에 두고 읽기']] },
     ] },
-    { st: 1, part: 'GAID 허브', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', shots: [
-      { src: 'p', id: 'A1', use: [0.3, 5], tags: [[0, '논문·코드·자료를 함께'], [1, '논문·코드·자료를 함께']] },
-      { src: 'p', id: 'A2', use: [0.2, 5], tags: [[0, '원문 근거를 바로 곁에'], [1, '근거를 보고 연구자가 결정']] },
-      { src: 'p', id: 'A3', use: [0, 4], tags: [[0, '단계로 정리된 분석 절차'], [1, '단계로 정리된 분석 절차']] },
+    { st: 1, part: 'hub', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', shots: [
+      { src: 'p', id: 'A1', use: [1.0, 5], hold: 0.6, tags: [[0, '논문·코드·자료를 함께'], [1, '논문·코드·자료를 함께']] },
+      { src: 'p', id: 'A2', use: [0, 5], hold: 0.5, tags: [[0, '원문 근거를 곁에 두고 결정'], [1, '원문 근거를 곁에 두고 결정']] },
+      { src: 'v', id: 'Y2', use: [0.2, 4.6], hold: 0.4, tags: [[0, '단계로 정리된 분석 절차'], [1, '단계로 정리된 분석 절차']] },
     ] },
-    { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', shots: [
-      { src: 'p', id: 'H1', use: [0, 4.5], tags: [[0, '다음 version으로 등록'], [1, '예제 자료와 함께 공유'], [2, '다음 version으로 등록']] },
-      { src: 'p', id: 'H2', use: [1.6, 3.5], hold: 1.3, tags: [[1, '허브에서 가져다 쓰기']] },
+    { st: 2, part: 'hub', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', shots: [
+      { src: 'p', id: 'H1', use: [0, 3.0], hold: 0.5, tags: [[0, '다음 version으로 등록'], [1, '예제 자료와 함께 공유']] },
+      { src: 'p', id: 'H2', use: [1.0, 3.5], hold: 1.2, tags: [[1, '허브에서 가져다 쓰기']] },
     ] },
-    { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', shots: [
-      { src: 'p', id: 'R1', use: [0, 4.5], tags: [[0, 'Workflow의 목적과 근거'], [1, '근거 논문을 붙여 시작']] },
-      { src: 'p', id: 'R3', use: [0.3, 6], tags: [[0, 'AI agent가 Workflow대로'], [1, 'AI agent가 Workflow대로'], [2, '결과 그림까지 저장']] },
-      { src: 'y', id: 'M1', use: [0, 4.6], hold: 0.7, tags: [[0, '지도에서 우선순위 확인'], [1, '원본 값을 바로 확인']] },
+    { st: 3, part: 'sys', title: '허브의 Workflow를 설치하고 AI agent와 분석합니다', shots: [
+      { src: 'y', id: 'R1', use: [0, 6], hold: 0.4, tags: [[0, 'Workflow 설치와 자료 준비'], [1, 'Workflow 설치와 자료 준비'], [2, '단계마다 자료와 조건']] },
+      { src: 'p', id: 'R3', use: [0, 2], tags: [[0, 'AI agent가 Workflow대로 분석']] },
+      { src: 'y', id: 'R2', use: [2, 4], hold: 0.3, tags: [[1, 'AI agent가 Workflow대로 분석']] },
+      { src: 'y', id: 'M1', use: [0, 5], hold: 0.6, tags: [[0, '결과를 지도에서 원본 값까지'], [1, '결과를 지도에서 원본 값까지']] },
     ] },
-    { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', shots: [
-      { src: 'p', id: 'N1', use: [0, 4.5], tags: [[0, '결과부터 쓴 연구노트'], [1, '결과부터 쓴 연구노트'], [2, '두 논문의 쪽수까지 인용']] },
-      { src: 'y', id: 'N1', use: [1.5, 4.8], hold: 1.1, tags: [[1, '결과와 그림을 노트로 정리'], [2, '판단은 연구자가 답합니다']] },
+    { st: 4, part: 'sys', title: '결과와 판단은 연구노트에 남습니다', shots: [
+      { src: 'y', id: 'N1', use: [0, 4.8], hold: 1.4, tags: [[0, '결과와 그림을 담은 연구노트'], [1, '결과와 그림을 담은 연구노트'], [2, '판단은 연구자가 답합니다']] },
     ] },
-    { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', shots: [
-      { src: 'p', id: 'L3', use: [0.5, 3.6], tags: [[0, '연구노트도 서재에'], [1, '연구노트도 서재에']] },
-      { src: 'p', id: 'L4', use: [0, 4], tags: [[0, '논문에서 이어진 연구 이력'], [1, '논문에서 이어진 연구 이력']] },
-      { src: 'y', id: 'L3', use: [0, 4], tags: [[0, '논문·Workflow·노트의 연결'], [1, '논문·Workflow·노트의 연결']] },
+    { st: 0, back: true, part: 'lib', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', shots: [
+      { src: 'y', id: 'N2', use: [1.0, 3.5], hold: 0.6, tags: [[1, '인용한 논문을 서재와 연결']] },
+      { src: 'y', id: 'L3', use: [0, 2.6], hold: 0.8, tags: [[0, '논문·Workflow·노트의 연결']] },
     ] },
   ];
   const SEG = [];
@@ -569,8 +572,8 @@
     const track = sv('polyline', { fill: 'none', stroke: C.sys, 'stroke-width': 6, opacity: 0, points: polyPts(0, 360) }, svg);
     const progress = sv('polyline', { fill: 'none', stroke: C.signal, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0 }, svg);
     const hubArc = sv('polyline', { fill: 'none', stroke: C.signal, 'stroke-width': 14, 'stroke-linecap': 'round', opacity: 0 }, svg);
-    const sysArc = sv('polyline', { fill: 'none', stroke: '#4a515d', 'stroke-width': 14, 'stroke-linecap': 'round', opacity: 0 }, svg);
-    const HUB = [238, 372], SYS = [22, 222];
+    const sysArc = sv('polyline', { fill: 'none', stroke: C.signalInk, 'stroke-width': 14, 'stroke-linecap': 'round', opacity: 0 }, svg);
+    const HUB = [240, 372], SYS = [40, 162]; // 내 서재 (200°) belongs to neither arc: the researcher's own literature space
     const trail = Array.from({ length: 14 }, (_, i) => sv('line', { stroke: C.signalInk, 'stroke-width': 10 - i * 0.55, 'stroke-linecap': 'round', opacity: 0 }, svg));
     const halo = sv('circle', { r: 26, fill: C.signal, opacity: 0 }, svg);
     const dot = sv('circle', { r: 12, fill: '#ffffff', opacity: 0 }, svg);
@@ -588,6 +591,10 @@
       return { el, p, w, hh, t0, ic: el.querySelector('.icon') };
     });
     Object.assign(CHIP0, { x: stations[0].p.x, y: stations[0].p.y, w: stations[0].w, h: stations[0].hh });
+    const libCap = h('div', 'abs small', layer, '연구자의 문헌 공간');
+    Object.assign(libCap.style, { width: '300px', textAlign: 'center', color: C.ink2, fontSize: '22px' });
+    at(libCap, stations[0].p.x - 150, stations[0].p.y - stations[0].hh / 2 - 38);
+    TEXTS.push({ id: 'lib-cap', text: '연구자의 문헌 공간', a: stations[0].t0 + 0.3, b: exp[0], el: libCap });
     // version chip rides above Workflow 만들기
     const ver = h('div', 'abs', layer);
     const verA = h('span', 'pill accent', ver, 'version 0.1.0');
@@ -598,14 +605,14 @@
     ev(tVer, 'version');
     // part labels inside the orbit, beside their arcs
     const hubLab = h('div', 'abs', layer);
-    hubLab.innerHTML = `<span class="badge hub" style="position:static">GAID 허브</span><div class="label" style="margin-top:10px;color:${C.signalInk}">함께 쓰고 고쳐 가는 Workflow</div>`;
-    at(hubLab, 1110, 512);
+    hubLab.innerHTML = `<span class="badge hub" style="position:static">GAID 허브</span><div class="label" style="margin-top:10px;color:${C.ink}">논문·문헌·연구노트로 Workflow를 만들고 공유</div>`;
+    at(hubLab, 1300, 230);
     const sysLab = h('div', 'abs', layer);
-    sysLab.innerHTML = `<span class="badge sys" style="position:static">GAID 시스템</span><div class="label" style="margin-top:10px">내 서재에서 분석하고 기록하는 연구</div>`;
-    at(sysLab, 530, 548);
+    sysLab.innerHTML = `<span class="badge sys" style="position:static">GAID 시스템</span><div class="label" style="margin-top:10px;color:${C.ink}">Workflow를 설치하고 AI agent와 분석</div>`;
+    at(sysLab, 780, 912);
     ev(tArc, 'arc');
-    TEXTS.push({ id: 'hub-lab', text: '함께 쓰고 고쳐 가는 Workflow', a: tArc + 0.2, b: exp[0], el: hubLab });
-    TEXTS.push({ id: 'sys-lab', text: '내 서재에서 분석하고 기록하는 연구', a: tArc + 0.5, b: exp[0], el: sysLab });
+    TEXTS.push({ id: 'hub-lab', text: '논문·문헌·연구노트로 Workflow를 만들고 공유', a: tArc + 0.2, b: exp[0], el: hubLab });
+    TEXTS.push({ id: 'sys-lab', text: 'Workflow를 설치하고 AI agent와 분석', a: tArc + 0.5, b: exp[0], el: sysLab });
     const who = h('div', 'abs h3', layer, '연구자 + AI agent');
     Object.assign(who.style, { width: '600px', textAlign: 'center', fontSize: '34px' });
     at(who, ORB.cx - 300, ORB.cy + 46);
@@ -671,11 +678,13 @@
         const pp = ramp(t, s.t0, s.t0 + 0.25);
         const near = Math.abs(((d - ST_DEG[i]) % 360 + 540) % 360 - 180) < 14 && live;
         s.el.style.borderColor = near ? C.signal : 'rgba(255,255,255,0.08)';
-        s.ic.style.color = near || (i === 1 || i === 2) && t >= tArc ? C.signalInk : C.ink2;
+        s.ic.style.color = near || (i >= 1 && t >= tArc) ? C.signalInk : (i === 0 ? C.ink : C.ink2);
+        if (i === 0 && !near) s.el.style.borderColor = 'rgba(231,233,238,0.55)';
         const o0 = t >= s.t0 ? clamp(pp * 3) : 0;
         const keep = i === 0 ? 1 - ramp(t, exp[0] + 0.05, exp[0] + 0.15, lin) : out;
         put(s.el, { o: o0 * keep, x: s.p.x - s.w / 2, y: s.p.y - s.hh / 2, s: lerp(0.7, 1, back(pp, 1.8)) });
       }
+      put(libCap, { o: (t >= stations[0].t0 ? ramp(t, stations[0].t0 + 0.1, stations[0].t0 + 0.4, lin) : 0) * out });
       const vf = ramp(t, tVer, tVer + 0.3, eio);
       put(ver, { o: ramp(t, tArc + 0.6, tArc + 0.85, lin) * out });
       put(verA, { o: 1 - vf, y: -20 * vf });
@@ -712,26 +721,39 @@
     const leadDot = sv('circle', { r: 7, fill: C.signal }, lead);
     // mini cycle (position in the story)
     const MC = { x: 1792, y: 70, r: 34 };
-    sv('circle', { cx: MC.x, cy: MC.y, r: MC.r, fill: 'none', stroke: C.sys, 'stroke-width': 4 }, lead);
+    sv('circle', { cx: MC.x, cy: MC.y, r: MC.r, fill: 'none', stroke: C.sys, 'stroke-width': 2 }, lead);
     sv('circle', { cx: MC.x, cy: MC.y, r: MC.r, fill: 'none', stroke: C.signal, 'stroke-width': 5, transform: `rotate(-54 ${MC.x} ${MC.y})`, 'stroke-dasharray': `${2 * Math.PI * MC.r * 144 / 360} 999` }, lead);
+    sv('circle', { cx: MC.x, cy: MC.y, r: MC.r, fill: 'none', stroke: C.signalInk, 'stroke-width': 5, transform: `rotate(108 ${MC.x} ${MC.y})`, 'stroke-dasharray': `${2 * Math.PI * MC.r * 108 / 360} 999` }, lead);
     const mdots = STATIONS.map((_, i) => sv('circle', { cx: MC.x + MC.r * Math.cos(stAngle(i)), cy: MC.y + MC.r * Math.sin(stAngle(i)), r: 6, fill: '#20242c', stroke: C.ink3, 'stroke-width': 2 }, lead));
     const mdot = sv('circle', { r: 9, fill: C.mark }, lead);
 
     // tag schedule in film time; rows = the chapter's distinct outcomes in order
     const tagSched = [];
+    const inside = (p, r, m = 14) => p && p[0] >= r.x - m && p[0] <= r.x + r.width + m && p[1] >= r.y - m && p[1] <= r.y + r.height + m;
     for (const sg of SEG) {
       const info = shotInfo(sg.src, sg.shot);
-      const lead = SEG.indexOf(sg) > 0 ? 0.6 : 0.2; // first box appears after the light sweep
+      const ptr = info.pointer || [];
+      const lead = SEG.indexOf(sg) > 0 ? 0.6 : 0.2; // nothing is marked while the light sweep crosses
       let last = null;
       for (const [k, label] of sg.tags) {
         const beat = info.beats[k];
         const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + sg.play);
         const ta = sg.a + (t0 - sg.skip) + (last ? 0 : lead);
-        const tb = t1 >= sg.skip + sg.play - 0.01 ? sg.b : sg.a + (t1 - sg.skip); // a beat that runs to the end covers the hold
+        const tb = t1 >= sg.skip + sg.play - 0.01 ? sg.b : sg.a + (t1 - sg.skip);
         if (tb <= ta + 0.3) continue;
-        const entry = { a: ta, b: tb, rect: beat.rect, label, same: !!last && last.label === label, prev: last, sg };
+        // box: from the frame the pointer enters the rect to the last frame it is inside (end of take covers the hold)
+        let fIn = null, fOut = null;
+        for (let f = Math.ceil(t0 * FPS); f < Math.floor(t1 * FPS); f++) if (inside(ptr[f], beat.rect)) { if (fIn === null) fIn = f; fOut = f; }
+        let box = null;
+        if (fIn !== null) {
+          const ba = Math.max(ta, sg.a + (fIn / FPS - sg.skip) - 0.1);
+          const bb = fOut >= Math.floor(t1 * FPS) - 2 ? tb : Math.min(tb, sg.a + (fOut / FPS - sg.skip) + 0.35);
+          if (bb - ba >= 0.8) box = { a: ba, b: bb };
+        }
+        const entry = { a: ta, b: tb, rect: beat.rect, label, box, same: !!last && last.label === label, prev: last, sg };
         tagSched.push(entry);
         if (!entry.same) ev(entry.a, 'tag', { shot: sg.shot });
+        if (box) ev(box.a, 'box', { shot: sg.shot });
         last = entry;
       }
     }
@@ -753,8 +775,8 @@
       TEXTS.push({ id: `ch-${ci}`, text: c.title, a: c.a - 0.1, b: c.b, el: title });
     });
     for (const c of CHAPTERS) for (const r of c.rows) r.w = r.el.querySelector('.lb').getBoundingClientRect().width;
-    window.TAGSCHED = tagSched.map(e => ({ a: e.a, b: e.b, label: e.label, shot: `${e.sg.src}:${e.sg.shot}`, rect: e.rect, same: !!e.same }));
-    CHAPTERS.forEach((c, ci) => { ev(ci === 0 ? c.a - 0.3 : c.a, 'chapter', { i: ci, part: c.part === 'GAID 허브' ? 'hub' : 'sys' }); });
+    window.TAGSCHED = tagSched.map(e => ({ a: e.a, b: e.b, label: e.label, shot: `${e.sg.src}:${e.sg.shot}`, rect: e.rect, same: !!e.same, box: e.box }));
+    CHAPTERS.forEach((c, ci) => { ev(ci === 0 ? c.a - 0.3 : c.a, 'chapter', { i: ci, part: c.part }); });
     SEG.forEach((sg, i) => { if (i > 0) ev(sg.a, 'cut', { example: sg.src !== SEG[i - 1].src, chapter: SEG[i - 1].ch !== sg.ch }); });
     ev(DEMO_END, 'collapse');
     const frameSrc = (sg, local) => {
@@ -822,8 +844,8 @@
       // left column: the old chapter leaves up as the next one is due, the new one rises in
       const hin = ci === 0 ? ramp(t, c.a - 0.3, c.a) : ramp(t, c.a, c.a + 0.35);
       const hout = next ? ramp(t, next.a - 0.3, next.a, lin) : ramp(t, DEMO_END, DEMO_END + 0.25, lin);
-      badge.textContent = c.part;
-      badge.className = `badge ${c.part === 'GAID 허브' ? 'hub' : 'sys'}`;
+      badge.textContent = PART[c.part];
+      badge.className = `badge ${c.part}`;
       at(badge, COL.x, 260);
       put(badge, { o: clamp(hin * 1.5) * (1 - hout), x: -20 * (1 - hin), y: -16 * hout });
       title.textContent = c.title;
@@ -853,23 +875,29 @@
       mdots.forEach((d, i) => d.setAttribute('stroke', i === mc.st ? C.signalInk : C.ink3));
       const mini = Math.min(ramp(t, first.a - 0.2, first.a + 0.2, lin), 1 - ramp(t, DEMO_END + 0.3, DEMO_END + 0.5, lin));
       lead.querySelectorAll('circle').forEach(el => { if (el !== leadDot) el.style.opacity = mini; });
-      // box on the take: only inside its beat window, gliding from the previous beat of the same take; kept inside the window
-      if (!curTag || sw < 1 || t >= DEMO_END) { box.style.visibility = 'hidden'; leadLine.setAttribute('opacity', 0); leadDot.setAttribute('opacity', 0); return; }
+      // box on the take: shown only while the drawn pointer is in the region (see tagSched); it glides from the previous box of
+      // the same take when the pointer moves on, draws itself in otherwise; kept inside the window
+      const bx = curTag && curTag.box && t >= curTag.box.a && t < curTag.box.b && sw >= 1 && t < DEMO_END ? curTag.box : null;
+      if (!bx) { box.style.visibility = 'hidden'; leadLine.setAttribute('opacity', 0); leadDot.setAttribute('opacity', 0); return; }
+      const pb = curTag.prev && curTag.prev.box && Math.abs(curTag.prev.box.b - bx.a) < 0.2 ? curTag.prev : null;
       let r = curTag.rect;
-      const glide = curTag.prev ? ramp(t, curTag.a, curTag.a + 0.35, eio) : 1;
-      if (curTag.prev) { const p = curTag.prev.rect; r = { x: lerp(p.x, r.x, glide), y: lerp(p.y, r.y, glide), width: lerp(p.width, r.width, glide), height: lerp(p.height, r.height, glide) }; }
+      const glide = pb ? ramp(t, bx.a, bx.a + 0.35, eio) : 1;
+      if (pb) { const p = pb.rect; r = { x: lerp(p.x, r.x, glide), y: lerp(p.y, r.y, glide), width: lerp(p.width, r.width, glide), height: lerp(p.height, r.height, glide) }; }
       const pad = 5, M = 6;
       const x0 = clamp(r.x * KS - pad, M, TAKE.w - M), x1 = clamp((r.x + r.width) * KS + pad, M, TAKE.w - M);
       const y0 = clamp(r.y * KS - pad, M, TAKE.h - M), y1 = clamp((r.y + r.height) * KS + pad, M, TAKE.h - M);
       at(box, x0, y0, x1 - x0, y1 - y0);
-      const pin = curTag.prev ? 1 : ramp(t, curTag.a, curTag.a + 0.25);
+      const pin = (pb ? 1 : ramp(t, bx.a, bx.a + 0.22)) * (1 - ramp(t, bx.b - 0.15, bx.b, lin));
       box.style.visibility = 'visible'; box.style.opacity = pin;
+      // draw-in: the outline grows from the pointer's corner (clip) the first time a box appears
+      const di = pb ? 1 : ramp(t, bx.a, bx.a + 0.3, eio);
+      box.style.clipPath = di < 1 ? `inset(0 ${100 - di * 100}% ${100 - di * 100}% 0)` : 'none';
       const row = curTag.row;
-      const rowChanged = !curTag.prev || curTag.prev.row !== row;
+      const rowChanged = !pb || pb.row !== row;
       const lx0 = COL.x + 32 + row.w + 18, ly0 = row.y + 20;
       const lx1 = TAKE.x + x0, ly1 = TAKE.y + y0 + Math.min((y1 - y0) / 2, 60);
       const xm = Math.min(lx0 + 30, TAKE.x - 24);
-      const grow = rowChanged ? ramp(t, curTag.a, curTag.a + 0.3, eio) : 1;
+      const grow = rowChanged ? ramp(t, bx.a, bx.a + 0.3, eio) : 1;
       const end = [lerp(lx0, lx1, grow), lerp(ly0, ly1, grow)];
       leadLine.setAttribute('points', grow < 1 ? `${lx0},${ly0} ${end[0]},${end[1]}` : `${lx0},${ly0} ${xm},${ly0} ${lx1},${ly1}`);
       leadLine.setAttribute('opacity', 0.9 * pin);
@@ -1033,7 +1061,7 @@
     window.EV = EV;
     window.CUES = {
       bpm: 120, hook: T.hook, tools: T.tools, freeze: T.freeze, press: T.press, chord: T.chord, title: T.title, cycle: T.cycle,
-      demo: [CHAPTERS[0].a, DEMO_END], chapters: CHAPTERS.map(c => ({ a: c.a, b: c.b, part: c.part === 'GAID 허브' ? 'hub' : 'sys', st: c.st })),
+      demo: [CHAPTERS[0].a, DEMO_END], chapters: CHAPTERS.map(c => ({ a: c.a, b: c.b, part: c.part, st: c.st })),
       silence: T.silence, brain: T.brain, end: T.end, dur: DUR,
     };
     window.SEG = SEG;

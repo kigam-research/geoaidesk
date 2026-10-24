@@ -1,7 +1,7 @@
 """Picture for the GAID promo film, lemo edition: stills, events and the silent video (1920x1080, 30 fps).
 
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
-  python geo/promo-lemo/render.py --capture <capture-v3> --capture-y <capture-v2> --out <new dir> [--stills-only] [--times 1,2] [--workers 4]
+  python geo/promo-lemo/render.py --capture <capture-v3> --capture-y <capture-v2> --capture-v <capture-v5> --out <new dir> [--stills-only] [--times 1,2] [--workers 4]
 
 The page (scene/) follows lemo-opuscar's page contract: window.DUR, async window.render(t), window.READY, window.EV,
 window.CUES, window.TEXTS(t), window.STILLS. Each frame is a Chrome screenshot piped to H.264 (imageio-ffmpeg's bundled
@@ -20,6 +20,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
@@ -27,6 +28,7 @@ from pathlib import Path
 
 FPS, WIDTH, HEIGHT = 30, 1920, 1080
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 REPO = HERE.parents[1]
 V4_ICONS = REPO / "geo/promo/scene/icons"  # read-only reuse of v4's pinned icon copies
 
@@ -78,9 +80,20 @@ def prepare(root: Path, captures: dict[str, Path]) -> dict:
     shutil.copy2(REPO / "web/public/fonts/PretendardVariable.woff2", root / "fonts")
     (root / "brand").mkdir(exist_ok=True)
     shutil.copy2(REPO / "geo/brand/logo/horizontal-on-dark.svg", root / "brand")
+    from pointer_track import track
+
     take = {}
     for key, capture in captures.items():
         take[key] = validate_capture(capture)
+        # the drawn capture pointer per frame: boxes follow it (round 3)
+        cache = root.parent / f"pointer-{key}.json"
+        if cache.exists():
+            tracks = json.loads(cache.read_text())
+        else:
+            tracks = track(str(capture), take[key]["shots"])
+            cache.write_text(json.dumps(tracks))
+        for shot in take[key]["shots"]:
+            shot["pointer"] = tracks.get(shot["id"])
         link = root / f"capture-{key}"
         if link.is_symlink():
             link.unlink()
@@ -175,6 +188,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--capture", type=Path, required=True, help="PGI example takes (capture-v3)")
     parser.add_argument("--capture-y", type=Path, required=True, help="Yilgarn example takes (capture-v2)")
+    parser.add_argument("--capture-v", type=Path, required=True, help="Yilgarn example takes (capture-v5)")
     parser.add_argument("--out", type=Path, default=Path(os.environ.get("TASK_OUTPUT_DIR", "")) or None)
     parser.add_argument("--stills-only", action="store_true")
     parser.add_argument("--times", help="comma-separated preview times instead of the standard stills")
@@ -188,7 +202,7 @@ def main():
     video = out / "picture.mp4"
     if video.exists() and not args.stills_only:
         raise FileExistsError("Use a new output directory")
-    captures = {"p": args.capture.resolve(), "y": args.capture_y.resolve()}
+    captures = {"p": args.capture.resolve(), "y": args.capture_y.resolve(), "v": args.capture_v.resolve()}
     take = prepare(out / "web", captures)
 
     import imageio_ffmpeg
