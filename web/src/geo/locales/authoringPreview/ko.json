@@ -1,11 +1,11 @@
 {
   "brand": "GAID",
   "nav": {
-    "workspace": "연구 공간",
+    "workspace": "Workspace",
     "method": "Workflow 만들기",
     "scope": "자료에서 Workflow를 정리하는 화면 시안입니다."
   },
-  "breadcrumb": "연구 공간 / 새 Workflow",
+  "breadcrumb": "Workspace / 새 Workflow",
   "title": "논문에서 Workflow 만들기",
   "status": "화면 시안",
   "description": "원문을 살펴보고, 연구에 필요한 선택을 정리한 뒤 스킬과 Workflow의 초안을 구성합니다.",

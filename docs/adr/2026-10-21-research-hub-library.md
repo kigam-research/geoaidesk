@@ -3,6 +3,8 @@
 Status: accepted 2026-10-21 (user chose the recommended option for all questions, added the hybrid requirement and
 combined the layout drafts, gaid-research-hub). Context: reports/2026-10-21-gaid-research-hub §3.5–3.10, §6.
 
+Superseded in part by [ADR 2026-10-24 GAID Connect/Workspace](2026-10-24-gaid-connect-workspace.md): decision 1’s place structure is replaced; 서재 is personal and opens from either place.
+
 ## Context
 
 GAID has no reference library, bibliography or literature entry (inventory 2026-10-21): notebook entry types are

@@ -27,7 +27,7 @@ describe("hub skill navigation and shelf", () => {
     fireEvent.click(await screen.findByRole("button", { name: /table-check/ })); expect(onOpen).toHaveBeenCalledWith("table-check");
     fireEvent.change(screen.getByRole("combobox", { name: "주제 폴더" }), { target: { value: "tables" } });
     await waitFor(() => expect(apiFetch).toHaveBeenCalledWith(expect.stringContaining("folder=tables"), expect.anything()));
-    fireEvent.change(screen.getByRole("searchbox", { name: "허브 스킬 검색" }), { target: { value: "missing" } });
+    fireEvent.change(screen.getByRole("searchbox", { name: "Connect 스킬 검색" }), { target: { value: "missing" } });
     await screen.findByText("조건에 맞는 스킬이 없습니다. 검색어나 폴더를 바꾸세요.");
   });
 });
@@ -111,11 +111,11 @@ describe("registration", () => {
   it("previews the selected Workflow revision without editing the Workflow", async () => {
     vi.mocked(apiFetch).mockImplementation(async (url) => response(String(url).endsWith("/entries") ? { entries: [{ id: "table-analysis", title: "표 연구", latestRevision: 3, revisions: [{ revision: 2 }, { revision: 3 }] }] } : previewFixture({ origin: { kind: "workflow", workflow: { entryId: "table-analysis", revision: 2, title: "표 연구" } } })));
     render(<RegisterSkill projects={[]} folders={folders} onBack={vi.fn()} onRegistered={vi.fn()} />);
-    fireEvent.click(screen.getByRole("radio", { name: "허브 Workflow에서 꺼내기" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Connect Workflow에서 꺼내기" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "다음 단계" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "다음 단계" }));
     await screen.findByRole("option", { name: "표 연구" });
-    fireEvent.change(screen.getByRole("combobox", { name: "허브 Workflow" }), { target: { value: "table-analysis" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Connect Workflow" }), { target: { value: "table-analysis" } });
     fireEvent.change(screen.getByRole("combobox", { name: "version 기록과 검토" }), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: "가져올 내용 확인" }));
     await screen.findByText("Workflow에서 꺼냄: 표 연구 version 0.1.1");

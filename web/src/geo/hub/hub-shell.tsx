@@ -1,6 +1,6 @@
 "use client";
 /**
- * Frame shared by every GAID hub screen: the GAID app bar (mark, 내 연구 / GAID 허브 switch, settings), then a page
+ * Frame shared by every GAID Connect screen: the GAID app bar (mark, Workspace / Connect switch, 서재, settings), then a page
  * area that fills the window so screens scroll inside their own panels, not the page.
  */
 import { CheckIcon, ChevronLeftIcon } from "lucide-react";
@@ -28,9 +28,9 @@ export function HubShell({
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-background">
       <GaidAppBar
-        place="hub"
+        place="connect"
         onNavigate={onNavigate}
-        onHome={() => onNavigate("projects")}
+        onHome={() => onNavigate("workspace")}
         trailing={actions}
         onOpenSettings={onOpenSettings}
       />

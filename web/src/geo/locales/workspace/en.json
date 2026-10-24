@@ -49,7 +49,7 @@
     "create": "Create start draft",
     "creating": "Creating start draft",
     "tabLimit": "All chat tabs are in use. Close a tab, then create it again. Your choices are kept.",
-    "noWorkspace": "No workspace found. Open it again from the project workspace. Your choices are kept.",
+    "noWorkspace": "No project found. Open it again from the project. Your choices are kept.",
     "error": "Could not create the start draft. Create it again in a moment.",
     "none": "None",
     "noBoundary": "The catalogue does not record interpretation limits.",
@@ -175,7 +175,7 @@
     }
   },
   "recipe": {
-    "import": "Import Workflow from hub",
+    "import": "Import from Connect",
     "file": "Geo task saved start settings file",
     "checking": "Checking saved start settings",
     "error": "Could not read or check the saved start settings. {detail}",
@@ -221,8 +221,8 @@
     "enabling": "Turning on skills",
     "notInstalled": "Skills not installed in the project: {names}. Install them in Settings → Skills.",
     "error": "Could not turn on the skills. Turn them on again in Settings → Skills.",
-    "hub": "Hub skill {name} (version {revision}):",
-    "hubInstall": "Install version {revision} from the hub"
+    "hub": "Connect skill {name} (version {revision}):",
+    "hubInstall": "Install version {revision}"
   },
   "badge": {
     "readiness": "{state, select, ready {Ready} missing-skills {Skills needed} needs-environment {Environment needed} unavailable {Unavailable} other {State unknown}}",
@@ -256,7 +256,7 @@
     "toChoices": "Choose analysis conditions",
     "source": {
       "catalogue": "Built-in Workflow",
-      "hub": "Hub Workflow",
+      "hub": "Connect Workflow",
       "upstream": "General Workflow"
     },
     "fact": {

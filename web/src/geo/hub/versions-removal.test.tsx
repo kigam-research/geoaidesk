@@ -20,14 +20,14 @@ describe("Workflow removal and restoration", () => {
   it("states the effect and local restoration rule, then sends an optional bounded reason only on confirmation", async () => {
     const onRemoved = vi.fn();
     render(<RemoveWorkflowDialog open onOpenChange={vi.fn()} entry={entry} local onRemoved={onRemoved} />);
-    expect(screen.getByText(/「공간 예측 Workflow」을 허브 목록에서 제거/)).toBeInTheDocument();
+    expect(screen.getByText(/「공간 예측 Workflow」을 Connect 목록에서 제거/)).toBeInTheDocument();
     expect(screen.getByText(/프로젝트에 이미 설치한 사본은 유지/)).toBeInTheDocument();
-    expect(screen.getByText(/등록자가 제거된 Workflow 목록에서 복원/)).toBeInTheDocument();
+    expect(screen.getByText(/공유한 연구자가 제거된 Workflow 목록에서 복원/)).toBeInTheDocument();
     expect(sharedHub.remove).not.toHaveBeenCalled();
     const reason = screen.getByRole("textbox");
     expect(reason).toHaveAttribute("maxLength", "500");
     fireEvent.change(reason, { target: { value: "  새 절차로 교체  " } });
-    fireEvent.click(screen.getByRole("button", { name: "허브에서 제거" }));
+    fireEvent.click(screen.getByRole("button", { name: "Connect에서 제거" }));
     await waitFor(() => expect(onRemoved).toHaveBeenCalledOnce());
     expect(sharedHub.remove).toHaveBeenCalledWith(entry.id, "새 절차로 교체");
   });
@@ -38,7 +38,7 @@ describe("Workflow removal and restoration", () => {
     render(<RemoveWorkflowDialog open onOpenChange={vi.fn()} entry={entry} local={false} onRemoved={done} />);
     expect(screen.getByText(/관리자가 제거된 Workflow 목록에서 복원/)).toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "사유 유지" } });
-    fireEvent.click(screen.getByRole("button", { name: "허브에서 제거" }));
+    fireEvent.click(screen.getByRole("button", { name: "Connect에서 제거" }));
     await screen.findByRole("alert");
     expect(screen.getByRole("textbox")).toHaveValue("사유 유지");
     expect(screen.getByText("HTTP 403").closest("details")).not.toHaveAttribute("open");
@@ -54,7 +54,7 @@ describe("Workflow removal and restoration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Workflow 복원" }));
     await waitFor(() => expect(refresh).toHaveBeenCalledOnce());
     expect(sharedHub.restore).toHaveBeenCalledWith(entry.id);
-    expect(await screen.findByRole("status")).toHaveTextContent("허브 목록에 복원했습니다");
+    expect(await screen.findByRole("status")).toHaveTextContent("Connect 목록에 복원했습니다");
   });
 
   it("exposes the removed route and hides its sidebar item when not permitted", () => {
@@ -71,7 +71,7 @@ describe("registration version choices", () => {
   const props = { open: true, onOpenChange: vi.fn(), folders: [{ id: "geo", name: "Geoscience" }] };
   it("assigns 0.1.0 only on first registration", () => {
     render(<RegisterDialog {...props} onRegister={vi.fn()} />);
-    expect(screen.getByText("처음 등록하면 version 0.1.0이 됩니다.")).toBeInTheDocument();
+    expect(screen.getByText("처음 공유하면 version 0.1.0이 됩니다.")).toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 
@@ -85,14 +85,14 @@ describe("registration version choices", () => {
     expect(group).toHaveTextContent("version 0.2.0");
     expect(group).toHaveTextContent("version 1.0.0");
     fireEvent.click(choices[["patch", "minor", "major"].indexOf(bump)]);
-    fireEvent.click(screen.getByRole("button", { name: "허브에 등록" }));
+    fireEvent.click(screen.getByRole("button", { name: "Connect에 공유" }));
     await waitFor(() => expect(save).toHaveBeenCalledWith("geo", "", bump));
   });
 
   it("does not register an unknown current version as a first release", () => {
     render(<RegisterDialog {...props} versionPending onRegister={vi.fn()} />);
-    expect(screen.getByRole("button", { name: "허브에 등록" })).toBeDisabled();
-    expect(screen.queryByText(/처음 등록하면/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Connect에 공유" })).toBeDisabled();
+    expect(screen.queryByText(/처음 공유하면/)).not.toBeInTheDocument();
   });
 
   it("keeps the entry's folder when it arrives after the folder list, without losing the note", () => {
