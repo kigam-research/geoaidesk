@@ -1,0 +1,168 @@
+{
+  "bundle": {
+    "button": "결과 묶음 내려받기",
+    "title": "결과 묶음 내려받기",
+    "intro": "다른 연구자나 심사자가 확인할 수 있도록 정리 노트의 본문, 그림, 쓴 자료의 지문, 환경 기록, Workflow version, 인용 논문을 ZIP 파일 하나로 묶습니다.",
+    "boundary": "자료 파일 자체는 넣지 않습니다. 묶음은 결과를 다시 실행했다는 증명이 아니고, 기록된 지문과 지금 파일을 비교한 결과만 담습니다.",
+    "loading": "묶을 내용을 확인하는 중",
+    "summary": "파일 {count}개, 모두 {size}",
+    "part": {
+      "note": "노트 본문과 그림",
+      "data": "쓴 자료의 지문",
+      "environment": "환경 기록",
+      "workflow": "Workflow",
+      "references": "인용 논문",
+      "about": "안내문",
+      "checksums": "파일 지문 목록"
+    },
+    "files": "{count, plural, other {파일 #개}}",
+    "data": {
+      "heading": "쓴 자료 {count}개",
+      "none": "기록된 자료 사용이 없습니다.",
+      "use": {
+        "read": "입력",
+        "written": "만들거나 바꾼 파일"
+      },
+      "now": {
+        "same": "기록과 같음",
+        "changed": "기록 뒤 바뀜",
+        "missing": "지금 없음",
+        "unknown": "비교하지 않음"
+      },
+      "more": "나머지 {count}개는 묶음의 목록에 있습니다."
+    },
+    "environment": "{count, plural, =0 {환경 기록 없음} other {환경 기록 #개}}",
+    "workflow": {
+      "version": "{title} · version {version}",
+      "draft": "{title} · 초안",
+      "none": "Workflow로 시작한 채팅이 아닙니다."
+    },
+    "references": "{count, plural, =0 {인용한 논문 없음} other {인용 논문 #편}}",
+    "gaps": {
+      "heading": "넣지 못했거나 확인하지 못한 것"
+    },
+    "showFiles": "들어갈 파일 보기",
+    "download": {
+      "button": "묶음 내려받기",
+      "busy": "내려받는 중",
+      "done": "내려받았습니다. 받은 파일의 지문이 서버 기록과 같습니다."
+    },
+    "close": {
+      "button": "닫기"
+    },
+    "error": {
+      "load": "묶을 내용을 확인하지 못했습니다. 다시 시도하세요.",
+      "changed": "확인한 뒤에 노트나 파일이 바뀌었습니다. 내용을 다시 확인한 뒤 내려받으세요.",
+      "tooLarge": "노트 폴더가 커서 묶지 못했습니다. 큰 파일을 노트 폴더 밖으로 옮긴 뒤 다시 시도하세요.",
+      "download": "내려받지 못했습니다. 다시 시도하세요.",
+      "integrity": "받은 파일이 서버 기록과 다릅니다. 다시 내려받으세요.",
+      "retry": {
+        "button": "다시 확인"
+      }
+    },
+    "menu": "결과 묶음 내려받기…"
+  },
+  "public": {
+    "button": "공개 자료 내보내기",
+    "title": "공개 자료 내보내기",
+    "intro": "Gemini Notebook에 직접 올릴 파일을 고릅니다. GAID는 Google에 아무것도 보내지 않으며, 내려받은 파일은 연구자가 직접 올립니다.",
+    "confirmEach": "파일마다 기관 밖으로 내보내도 되는 자료인지 확인하세요. 확인한 파일만 묶습니다.",
+    "loading": "내보낼 수 있는 파일을 확인하는 중",
+    "kind": {
+      "note": "정리 노트",
+      "workflow": "Workflow 지침",
+      "paper": "논문 PDF"
+    },
+    "noteDetail": "Markdown 파일입니다. 인용한 논문의 참고문헌 목록을 끝에 덧붙입니다.",
+    "workflowDetail": "Workflow 지침을 Markdown으로 씁니다.",
+    "licence": "이용 조건: {licence}",
+    "licenceUnknown": "이용 조건 확인 안 됨. 논문의 공개 이용 조건을 직접 확인하세요.",
+    "mayLeave": "기관 밖으로 내보내도 되는 자료입니다",
+    "skipped": {
+      "heading": "넣을 수 없는 인용 논문",
+      "not-in-library": "서재에 없음",
+      "no-pdf": "서재에 PDF 없음",
+      "too-large": "PDF가 50 MB보다 큼",
+      "summary": "{count, plural, other {넣을 수 없는 인용 논문 #편}}"
+    },
+    "selected": "{count, plural, =0 {고른 파일 없음} other {파일 #개, {size}}}",
+    "export": {
+      "button": "고른 파일 내려받기",
+      "busy": "내려받는 중",
+      "done": "내려받았습니다. Gemini Notebook에서 소스로 추가하세요."
+    },
+    "record": "내보낸 파일의 이름과 지문은 프로젝트 기록에 남깁니다.",
+    "none": "내보낼 파일을 하나 이상 확인하세요.",
+    "close": {
+      "button": "닫기"
+    },
+    "error": {
+      "load": "내보낼 파일을 확인하지 못했습니다. 다시 시도하세요.",
+      "changed": "확인한 뒤에 파일이 바뀌었습니다. 목록을 다시 확인한 뒤 내려받으세요.",
+      "download": "내려받지 못했습니다. 다시 시도하세요.",
+      "integrity": "받은 파일이 서버 기록과 다릅니다. 다시 내려받으세요."
+    },
+    "referencesHeading": "참고문헌",
+    "menu": "공개 자료 내보내기…"
+  },
+  "gap": {
+    "no-chat": "노트를 쓴 채팅 기록이 없어 쓴 자료와 환경을 알 수 없습니다.",
+    "no-provenance": "노트를 쓴 채팅에 기록된 파일 사용이 없습니다.",
+    "data-limit": "자료가 많아 앞의 일부만 지문 목록에 넣었습니다.",
+    "unhashed-data": "일부 자료는 쓴 때 지문을 기록하지 않았습니다.",
+    "no-environment": "노트를 쓴 채팅의 환경 기록이 없습니다.",
+    "no-workflow": "Workflow로 시작한 채팅이 아니어서 Workflow version이 없습니다.",
+    "workflow-removed": "Workflow가 프로젝트에서 지워져 지침은 넣지 못했습니다. version은 남겼습니다.",
+    "unresolved-citations": "일부 인용 키가 서재에 없습니다.",
+    "missing-figure": "노트가 가리키는 그림 중 없는 파일이 있습니다."
+  },
+  "readme": {
+    "intro": "GAID 정리 노트의 결과 묶음입니다. 다른 연구자나 심사자가 결과의 근거를 확인할 수 있도록 노트와 기록을 모았습니다.",
+    "date": "노트 날짜: {date}",
+    "status": {
+      "pending": "상태: 검토 전",
+      "confirmed": "상태: 연구자가 확인함",
+      "superseded": "상태: 새 노트로 대체됨"
+    },
+    "headline": "한 줄 결과: {headline}",
+    "updated": "노트 수정일: {date}",
+    "contents": "들어 있는 것",
+    "part": {
+      "note": "정리 노트 본문(index.md)과 노트 폴더의 그림",
+      "data": "노트를 쓴 채팅이 읽거나 만든 자료 {count}개의 지문(sha256), 크기, 쓴 때, 지금 파일과의 비교",
+      "environment": "분석에 쓴 환경 기록 {count}개(Python과 R 패키지, lockfile 지문)",
+      "workflow": "Workflow 기록(workflow.json)과 지침(instructions.md)",
+      "references": "인용 논문 {count}편의 참고문헌과 CSL JSON",
+      "checksums": "묶음 파일마다의 지문 목록"
+    },
+    "workflow": "Workflow",
+    "version": "version {version} (채팅을 시작할 때)",
+    "draft": "초안 (등록된 version 없음)",
+    "data": "쓴 자료의 지문",
+    "noData": "기록된 자료 사용이 없습니다.",
+    "col": {
+      "path": "파일",
+      "use": "쓰임",
+      "bytes": "크기(바이트)",
+      "now": "지금 파일"
+    },
+    "use": {
+      "read": "입력",
+      "written": "만들거나 바꿈"
+    },
+    "unhashed": "기록 안 됨",
+    "now": {
+      "same": "기록과 같음",
+      "changed": "기록 뒤 바뀜",
+      "missing": "지금 없음",
+      "unknown": "비교하지 않음"
+    },
+    "references": "인용 논문",
+    "noReferences": "인용한 논문이 없습니다.",
+    "notInLibrary": "서재에 없는 인용 키",
+    "gaps": "넣지 못했거나 확인하지 못한 것",
+    "limits": "한계",
+    "limitsText": "결과 묶음은 결과를 다시 실행했다는 증명이 아닙니다. 자료 파일은 들어 있지 않고, 쓴 때 기록한 지문과 묶을 때의 파일을 비교한 결과만 들어 있습니다.",
+    "verify": "묶음의 파일이 바뀌지 않았는지는 `sha256sum -c SHA256SUMS`로 확인합니다."
+  }
+}

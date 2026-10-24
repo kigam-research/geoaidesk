@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:44:06Z
+updated: 2026-10-24T01:58:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"41dbea06-326f-4f1c-b1e0-05cf1380bd4f","pid":1132461,"provider":"claude","session":"7898f15a-75bb-457c-98ce-bcd12e76095b","start":"69414348","token":"33e8cf317ab33bac9151faf65006114ce8fd8a1b39690d843d61a72029a0e651"}
 branch: task/gaid-note-bundle-export
 target: main
@@ -32,11 +32,39 @@ Checks: scripts/check; UI guide v2 (sections 1, 2, 10 + components touched; Kore
 after integration. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Features 1 and 2 implemented (not yet screenshotted or fully checked):
+- Contract `web/src/geo/contracts/note-export.ts`; server `server/src/geo/notes/export.ts` (preview/build for the result
+  bundle and the public export; reuses evidence-package safe reads, `packageProvenance`, `storedEnvironment`); routes
+  `GET/POST /geo/notes/:id/bundle`, `GET/POST /geo/notes/:id/public-export` in `server/src/geo/routes/notes.ts`;
+  `localeSay(namespace)` in `server/src/geo/workflow-doc.ts` for server-rendered README text.
+- UI `web/src/geo/notes/note-export.tsx` (two 640 px sheets), mounted from the note detail 더 보기 menu; namespace
+  `noteExport`.
+- Verified: `cd server && npx tsc --noEmit`; `GAID_CATALOGUE=off npx vitest run test/geo-note-export.test.ts` (6 passed);
+  `cd web && npx tsc --noEmit && npx vitest run src/geo/notes/` (15 passed); copy validator 0 errors; check-ui 0 errors.
 ## Next steps
-1. (the next session's first action)
+1. Contract `web/src/geo/contracts/note-export.ts` written. Child `notebook-links` started 2026-10-24 (writer
+   6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d, worktree ~/worktrees/geoaidesk/gaid-note-bundle-export--notebook-links,
+   prompt ~/data/geoaidesk/work/gaid-note-bundle-export/child-notebook-links.md); on its finish run
+   `task complete gaid-note-bundle-export--notebook-links`, then mount `ProjectNotebookLink` in research-notes-panel.tsx.
+2. After the child: mount ProjectNotebookLink, AGENTS.md + docs/geo/research-notes.md, screenshots (both styles, both
+   themes, 1440×900 and 1280×800), report `reports/2026-10-24-gaid-note-bundle-export/index.md`, scripts/check, finish.
 ## Failed approaches
 ## Notes and decisions
+Plan (orchestration):
+- Sequential: shared contract `web/src/geo/contracts/note-export.ts` first (features 1 and 2 share the note file
+  listing, Workflow 지침 rendering and citation resolution).
+- Packages: (A) features 1+2, writer itself (server `server/src/geo/notes/export.ts`, routes `server/src/geo/routes/notes.ts`,
+  UI `web/src/geo/notes/export-*.tsx`, namespace `noteExport`); (B) feature 3 notebook links, child writer `notebook-links`
+  ("general work"): owns library collection field + routes + `web/src/geo/library/folder-panel.tsx` edits, project link
+  store `server/src/geo/workspace/notebook-link.ts` + route, component `web/src/geo/notebook-link/`; the writer mounts the
+  project component in `research-notes-panel.tsx` (writer-owned file).
+- Integration order: B merged into the parent branch via `task complete`, then the writer mounts it, checks, report.
+- Coordination: gaid-cite-open-pdf touches note views (citation rendering in note markdown). This unit edits only the note
+  detail header/더 보기 menu in `research-notes-panel.tsx`; no changes to `note-markdown.ts` citation rendering.
+- Design choices (no user decision needed, within the request): bundle holds data fingerprints (sha256 + size + when
+  recorded), never the data files themselves; public export contains only the files the researcher ticks, each with its
+  own "기관 밖으로 내보내도 되는 자료" confirmation, enforced server-side; PDFs are never pre-ticked; licence is shown
+  when the paper metadata has one, otherwise "이용 조건 확인 안 됨". GAID never contacts Google; links open in a new tab.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
