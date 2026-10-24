@@ -28,7 +28,7 @@ beforeEach(() => {
 it("filters recipes, shows metadata and searches with the shared hub client", async () => {
   const onSelect = vi.fn();
   render(<HubPicker recipesOnly onSelect={onSelect} />);
-  expect(screen.getByRole("status")).toHaveTextContent("허브 목록을 읽는 중");
+  expect(screen.getByRole("status")).toHaveTextContent("Connect 목록을 읽는 중");
   fireEvent.click(await screen.findByRole("button", { name: /논문 분석/ }));
   expect(screen.queryByText("스킬만")).not.toBeInTheDocument();
   expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ latestRevision: 2 }));
@@ -41,7 +41,7 @@ it("recovers a failed list and explains the empty filtered state without raw err
   render(<HubPicker recipesOnly onSelect={vi.fn()} />);
   expect(await screen.findByRole("alert")).not.toHaveTextContent("private server failure");
   fireEvent.click(screen.getByRole("button", { name: "목록 다시 읽기" }));
-  expect(await screen.findByRole("status")).toHaveTextContent(/저장한 시작 설정이 있는 Workflow|허브 목록을 읽는 중/);
+  expect(await screen.findByRole("status")).toHaveTextContent(/저장한 시작 설정이 있는 Workflow|Connect 목록을 읽는 중/);
   await screen.findByText(/저장한 시작 설정이 있는 Workflow가 없습니다/);
 });
 it("ignores an old search response", async () => {
@@ -56,12 +56,12 @@ it("ignores an old search response", async () => {
 });
 function recipeDialog() {
   render(<RecipeAdd projectId="p1" workflows={[]} categories={[]} onSaved={vi.fn()} onOpen={vi.fn()} />);
-  fireEvent.click(screen.getByRole("button", { name: "허브에서 Workflow 가져오기" }));
+  fireEvent.click(screen.getByRole("button", { name: "Connect에서 가져오기" }));
   return screen.getByRole("dialog");
 }
 it("RecipeAdd installs the shown revision only after acknowledgement and hands off the recipe", async () => {
   const dialog = recipeDialog();
-  expect(within(dialog).getByRole("button", { name: "GAID 허브에서 찾기" })).toHaveAttribute("aria-pressed", "true");
+  expect(within(dialog).getByRole("button", { name: "Connect에서 찾기" })).toHaveAttribute("aria-pressed", "true");
   fireEvent.click(await screen.findByRole("button", { name: /논문 분석/ }));
   const install = screen.getByRole("button", { name: "설치 후 시작 설정 열기" });
   expect(install).toBeDisabled(); expect(openMethodSetup).not.toHaveBeenCalled();

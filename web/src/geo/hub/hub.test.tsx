@@ -158,7 +158,7 @@ describe("GAID hub registration", () => {
     const props = { open: true, onOpenChange: () => undefined, onRegister };
     const { rerender } = render(<RegisterDialog {...props} folders={[]} />);
     rerender(<RegisterDialog {...props} folders={[{ id: "general", name: "일반" }]} />);
-    const submit = screen.getByRole("button", { name: "허브에 등록" });
+    const submit = screen.getByRole("button", { name: "Connect에 공유" });
     expect((submit as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(submit);
     await vi.waitFor(() => expect(onRegister).toHaveBeenCalledWith("general", "", "patch"));
@@ -175,7 +175,7 @@ describe("GAID hub registration", () => {
     expect(screen.getByText("2.0 KB")).toBeInTheDocument();
     expect(screen.getByText("· 합성 자료", { exact: false, selector: "span.text-muted-foreground" })).toBeInTheDocument();
     expect(screen.getByText(/이용 조건: 적지 않음/)).toBeInTheDocument();
-    expect(screen.getByText(/허브에서 Workflow를 볼 수 있는 연구자는 누구나 내려받을 수 있습니다/)).toBeInTheDocument();
+    expect(screen.getByText(/Connect에서 Workflow를 볼 수 있는 연구자는 누구나 내려받을 수 있습니다/)).toBeInTheDocument();
     expect(screen.getByText(/공개 주소로 받는 예제 자료의 주소와 해시 \(공개 항공자력 격자\)/)).toBeInTheDocument();
     expect(screen.getByText(/예제 자료로 넣지 않은 연구 자료/)).toBeInTheDocument();
   });

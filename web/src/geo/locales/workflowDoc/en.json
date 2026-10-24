@@ -43,7 +43,7 @@
     "catalogue": "built-in skill",
     "bundled": "skill bundled with this Workflow",
     "imported": "imported skill",
-    "hub": "hub skill"
+    "hub": "Connect skill"
   },
   "skill": {
     "primary": "primary skill",

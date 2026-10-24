@@ -36,13 +36,13 @@ export function hubSkillQuestion(project: AuthoringProject, candidates: HubSkill
   if (!matches.length) return null;
   return {
     key: HUB_SKILLS_KEY,
-    text: "허브에 있는 스킬 가운데 Workflow 단계에서 함께 쓸 것이 있나요?",
-    reason: "허브 스킬을 고르면 그 스킬의 판을 고정해 단계에 연결하고, 같은 내용을 새로 쓰지 않습니다.",
+    text: "Connect에 있는 스킬 가운데 Workflow 단계에서 함께 쓸 것이 있나요?",
+    reason: "Connect 스킬을 고르면 그 스킬의 판을 고정해 단계에 연결하고, 같은 내용을 새로 쓰지 않습니다.",
     affects: "Workflow의 사용 스킬과 단계",
     answerType: "choice-or-text",
     options: [
       ...matches.map((c) => ({ id: c.name, label: c.name, hint: c.description.slice(0, 120) })),
-      { id: NONE, label: "새 스킬만 쓰기", hint: "허브 스킬 없이 Workflow에 딸린 스킬만 씁니다." },
+      { id: NONE, label: "새 스킬만 쓰기", hint: "Connect 스킬 없이 Workflow에 딸린 스킬만 씁니다." },
     ],
   };
 }

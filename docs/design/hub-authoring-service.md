@@ -1,4 +1,4 @@
-# GAID hub authoring service
+# GAID Connect authoring service
 
 Status: implemented in task gaid-hub (2026-10-16). Moved from skill_hub (`web/server/authoring/`, spec
 `docs/specs/hub-authoring-service.md` at 54fe477) into GAID's backend. Contract: `web/src/geo/contracts/authoring.ts`.
@@ -7,13 +7,13 @@ Package format: skill_hub `docs/specs/gaid-method-package.md` v1 (`gaid-method/v
 
 ## Flow
 
-1. The researcher opens the GAID hub (project list → "GAID 허브", URL `#hub`) and uploads sources: paper PDF, code
+1. The researcher opens GAID Connect (app-bar "Connect", URL `#connect`; legacy `#hub` links remain valid) and uploads sources: paper PDF, code
    archive (`.zip`/`.tar.gz`) or single files. The server keeps the original bytes privately, hashes them and extracts
    page text (poppler `pdftotext`/`pdfinfo`) or a file inventory (in-process tar/zip readers; links, devices, absolute
    paths and `..` are refused; 64 MiB / 10,000 entries expanded).
 2. `analyze`: the coauthor reads the extracted text and returns anchored findings, a scope proposal and at most five
    questions. The server verifies every anchor (source, page or file, quote found there) and drops the rest.
-   The hub adds two standard questions unless the model asked the same thing: `code-use` (include the supplied code;
+   Connect adds two standard questions unless the model asked the same thing: `code-use` (include the supplied code;
    only when a code source exists) and `trial-scale` (add a reduced quick first-trial setting; recommended), see
    `standardQuestions` in `server/src/geo/authoring/agent.ts` (gaid-hub-followups).
 3. The researcher answers one question at a time (options with a marked recommendation, a free-text "기타" field,
@@ -29,9 +29,9 @@ Package format: skill_hub `docs/specs/gaid-method-package.md` v1 (`gaid-method/v
    revision) and installs it into the chosen GAID project through the normal gate, then opens the Workflow start
    settings there. Trial feedback (`revise`) produces the next draft revision.
 
-Hub-side receive: the chat's "허브 초안으로 보내기" (`HandoffDialog`) calls `POST /geo/authoring/handoffs` (request's
+Connect-side receive: the chat's "Connect 초안으로 보내기" (`HandoffDialog`) calls `POST /geo/authoring/handoffs` (request's
 project scope, `{sessionId, files, note}`): the server builds the `gaid-analysis-handoff/v1` bundle, creates a new method
-(goal = note) and attaches the bundle as its first source (kind `gaid-analysis`), then the hub opens `#hub/<id>`. An
+(goal = note) and attaches the bundle as its first source (kind `gaid-analysis`), then Connect opens the draft (legacy `#hub/<id>` remains valid). An
 uploaded `gaid-analysis-*.tar.gz` is recognised as the same kind. The download and external-hub paths remain.
 
 ## Storage
