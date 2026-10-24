@@ -367,7 +367,9 @@ export function WorkspaceHome({
 
             <section className="flex flex-col gap-3" aria-labelledby="ws-workflows">
               <SectionHead id="ws-workflows" title={text("home.workflows.heading")} trailing={findInConnect} />
-              {data && data.workflows.length === 0 ? (
+              {error ? (
+                <p className="text-sm text-gaid-ink-2">{text("home.continue.error")}</p>
+              ) : data && data.workflows.length === 0 ? (
                 <p className="text-sm text-gaid-ink-2">{text("home.workflows.empty")}</p>
               ) : (
                 <WorkflowRows workflows={(data?.workflows ?? []).slice(0, 5)} onStart={startWorkflow} />
