@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:28:01Z
+updated: 2026-10-24T04:28:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"de68e451-97f8-4d7d-b9dd-6dd12ceee4d8","pid":2621511,"provider":"claude","session":"f940d4c6-cc49-4d80-8904-a915a4b5d7ac","start":"70284572","token":"0fe8e40f1ea359a56f63a8022e870ac31a328d0a3a949ee5845ab1c5ed4fdbf6"}
 branch: task/gaid-ui-shared-contrast
 target: main
@@ -59,6 +59,7 @@ starts scenario A. Outside check: none.
 - Scope: the focus-ring rule was applied to all shared ui/ primitives that drew the 3 px /50 ring (switch, select,
   textarea, badge, accordion, scroll-area, input-group too), not only button/tabs/sidebar/input, so S7 holds for every
   shared part; screen files untouched. Dark outline button and active tab keep `dark:bg-input/30` (they pass S4).
+Closes: gaid-ui-quality-kit#1
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
