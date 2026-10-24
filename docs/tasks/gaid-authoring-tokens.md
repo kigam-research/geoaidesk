@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T08:26:18Z
+status: done
+updated: 2026-10-24T08:27:26Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"e896d271-7333-4186-98ae-944a52f44a16","pid":1773046,"provider":"claude","session":"382ebad8-73c0-485f-bbb5-f2d76e75cc1e","start":"71311349","token":"ffa3f128b777be79f7322ce01266e6ae766dabade12df1d8e2037ffc2afa638f"}
 branch: task/gaid-authoring-tokens
 target: main
@@ -71,7 +71,9 @@ Result (2026-10-24, one paper = asset authoring_preview_paper, one run each, GPT
 - Review-app store note: its "Sign in with ChatGPT" (openai) login is stale (refresh invalid_grant, needsReauth); the legacy
   Codex login works.
 ## Next steps
-1. task finish (report written, checks recorded above).
+<!-- task:closed -->
+Closed 2026-10-24T08:27:26Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-24 user decision (this tab, question "측정 로그인"): "검토 앱 로그인 사용 (Recommended)" — the measurement
