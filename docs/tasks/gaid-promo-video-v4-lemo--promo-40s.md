@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:29:02Z
+updated: 2026-10-24T05:32:14Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
@@ -84,11 +84,11 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
 - Done. Sources in geo/promo-lemo-40/ (TREATMENT.md, scene/, render.py, mix.py, master.py, build.sh, README.md, CREDITS).
   Film: 42.0 s one-orbit structure (TREATMENT.md §2–6); real takes only inside six station windows (PGI L1/A3/H2/L3,
   Yilgarn R2/N1), per the user's 2026-10-24 message forwarded by the parent.
-- Final render (round 2): job job-geoaidesk-gaid-promo-video-v4-lemo--promo-40s-2 (source 906fd451), exit 0. Film
-  ~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T051524.027365Z/out/gaid-promo-40s.mp4,
-  sha256 95701356eccfcf45c187a5aed83c17d30a701ccf407ced7bc8ab87fe3581ab05, 1260 frames, 42.0 s, 1920×1080 30 fps,
-  −14.1 LUFS, LRA 7.5 LU, TP −1.1 dBTP, no black or empty frames, reading check 46 texts / 0 short. Round 1 render
-  (job -1, sha256 e390feba…) is superseded.
+- Final render (round 3): job job-geoaidesk-gaid-promo-video-v4-lemo--promo-40s-3 (source 1c5a8798), exit 0. Film
+  ~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T052859.356543Z/out/gaid-promo-40s.mp4,
+  sha256 52b0055d004bad90b8ac1428cdf7923d1912d14543bf514af3283fcf958e3546, 1260 frames, 42.0 s, 1920×1080 30 fps,
+  −14.1 LUFS, LRA 7.5 LU, TP −1.1 dBTP, no black or empty frames, reading check 46 texts / 0 short. Renders of jobs -1
+  (e390feba…) and -2 (95701356…) are superseded.
 - Review loop: contact sheets prev1, prev2 and the final job's; 0.2 s strips on prev4 (work dir
   ~/data/geoaidesk/work/gaid-promo-video-v4-lemo--promo-40s/); fixes in TREATMENT.md §11. Sound checked only by
   measurement (loudness, band energy), not by listening.
@@ -96,9 +96,8 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
   figures/40s-{1-scatter,2-cycle,3-brain,4-end}.png. Humanizer not run on it; the parent runs it before review-copy.
 - Checks: no automated checks for the film sources; scripts/check unchanged and not run.
 ## Next steps
-1. Round 3 (user, 2026-10-24, this tab: "왼쪽 고리에 있는 것은 왼쪽에 창이 만들어지고 오른쪽 고리에 있는 것은 오른쪽에
-   만들어지는 방식"): fixed ring, windows on each station's side, done in scene/film.js. Re-render with a job, update
-   section-40s.md numbers and figures, task finish, then verify origin/task/gaid-promo-video-v4-lemo--promo-40s moved.
+1. Parent: merge section-40s.md into its report §8 (includes rounds 2 and 3), add the registry entry, run humanizer before
+   review-copy.
 
 ## Failed approaches
 - Round 2 dial ring (job -2, sha256 95701356…): the ring turned so the active station faced one right-hand window. The

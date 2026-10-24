@@ -19,9 +19,9 @@
 
 그림 1. 9.4초. 흩어진 스킬과 도구 카드입니다. 볼 것: 연구자에게서 뻗은 점선이 카드에 닿지 못합니다. 빨간 점은 이 장면에만 나오고, 이후에는 다시 나오지 않습니다.
 
-![연구 순환과 GAID 허브 창](figures/40s-2-cycle.png)
+![연구 순환과 내 서재 창](figures/40s-2-cycle.png)
 
-그림 2. 21.9초. 연구 순환의 GAID 허브 역입니다. 볼 것: 오른쪽 역(GAID 허브)의 창이 오른쪽에 열리고, 연결선은 역에서 바깥쪽으로 짧게 뻗어 고리를 지나지 않습니다. 아래쪽 설명은 GAID 허브와 GAID 시스템을 한 플랫폼의 두 부분으로, 내 서재를 연구자 개인의 문헌 관리 공간으로 소개합니다. 오른쪽 창은 허브에 등록된 Workflow와 version을 보여 주는 실제 화면입니다.
+그림 2. 17.9초. 연구 순환의 내 서재 역입니다. 볼 것: 고리 왼쪽 역(내 서재)의 창이 왼쪽에 열리고, 연결선은 역에서 바깥쪽으로 짧게 뻗어 고리를 지나지 않습니다. 오른쪽 역(GAID 허브, 연구 분석, 연구노트)의 창은 오른쪽에 열립니다. 아래쪽 설명은 GAID 허브와 GAID 시스템을 한 플랫폼의 두 부분으로, 내 서재를 연구자 개인의 문헌 관리 공간으로 소개합니다.
 
 ![여러 연구자의 순환](figures/40s-3-brain.png)
 
@@ -51,11 +51,11 @@
 
 | 항목 | 값 |
 |---|---|
-| 영상 | `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T051524.027365Z/out/gaid-promo-40s.mp4` |
-| sha256 | `95701356eccfcf45c187a5aed83c17d30a701ccf407ced7bc8ab87fe3581ab05` |
+| 영상 | `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T052859.356543Z/out/gaid-promo-40s.mp4` |
+| sha256 | `52b0055d004bad90b8ac1428cdf7923d1912d14543bf514af3283fcf958e3546` |
 | 길이 | 42.0초, 1260프레임, 1920×1080, 30fps |
 | 음량 | −14.1 LUFS(통합), LRA 7.5 LU, 실제 피크 −1.1 dBTP |
-| 렌더 기록 | job `job-geoaidesk-gaid-promo-video-v4-lemo--promo-40s-2`, receipt `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T051524.027365Z/receipt.json`, 소스 커밋 `906fd451887c` |
+| 렌더 기록 | job `job-geoaidesk-gaid-promo-video-v4-lemo--promo-40s-3`, receipt `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T052859.356543Z/receipt.json`, 소스 커밋 `1c5a8798bf50` |
 | 소스 | `geo/promo-lemo-40/` (연출안 TREATMENT.md, 장면 scene/, render.py, mix.py, master.py, 한 줄 재생성 build.sh) |
 
 - 빈 화면: 완성 파일에서 완전한 검은 화면은 없었습니다(blackdetect). 무대 위에 그린 요소가 거의 없는 프레임도 없었습니다(모든 프레임을 480×270으로 줄여 밝은 픽셀 비율을 셌습니다).
