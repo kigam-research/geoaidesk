@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:46:12Z
+updated: 2026-10-24T01:46:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -50,15 +50,20 @@ Running in parallel: gaid-promo-video-v4 (finishing) and gaid-promo-video-v4-bra
 own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside Git.
 
 ## Current state
-- lemo-opuscar downloaded at 3961ddb3d24d8876e0e2754f7790d66908acee51 (codeload tarball) to
-  ~/data/geoaidesk/work/gaid-promo-video-v4-lemo/dl/ (not installed as a Claude plugin; no ~/lemo-opuscar).
-- Licence (README "Licence"): code and docs MIT; demo films and stills CC BY 4.0 (credit LemoLab + repo link, say if
-  changed); films made with the library belong to the maker, no credit needed; third-party assets keep their licences.
-- Style candidates shown to the user (writer tab + vault copy `연구 보고서/geoaidesk/2026-10-24-style-choice`, work dir
-  `style-choice/`): A Dark Tech Keynote (chosen), B Swiss Motion Graphics, C Living Screencast.
-- v4 merged to main (PR #102); merged origin/main into this branch.
+- (A) ~102 s Dark Tech Keynote cut: sources in geo/promo-lemo/ (TREATMENT.md, scene/, render.py, mix.py, master.py,
+  build.sh, CREDITS, README). Demo = real takes as windows inside the motion graphics (left: part badge, purpose, outcome
+  rows with a leader line to the box on the take); PGI takes (capture-v3) and Yilgarn takes (capture-v2: M1 map, N1 note,
+  L3 connection map) per the user's 2026-10-24 message. Preview pv1 (work dir) mastered to -14.1 LUFS / TP -1.3 dB,
+  3069 frames, 102.3 s, no black segments; contact sheets look/sheetA.jpg, sheetB.jpg and press strip checked by eye.
+- Final render: job job-geoaidesk-gaid-promo-video-v4-lemo-1 (build.sh, --input assets:lemo-opuscar/3961ddb), receipt
+  ~/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/receipt.json.
+- lemo-opuscar at 3961ddb + VCSL pack registered as asset `lemo_opuscar` (configs/inputs.toml, ~/assets/lemo-opuscar/3961ddb).
+- (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
+- Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
-1. Write geo/promo-lemo/TREATMENT.md (three structures, shot list, cue map, sound table), then style frames.
+1. When job -1 exits: verify master.json (loudness, frames, black segments) and the film hash; pull report key frames.
+2. Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
+   review-copy; merge the child's section-40s.md after `task complete gaid-promo-video-v4-lemo--promo-40s`.
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-24 user (writer tab, verbatim): "메시지는 동등해도 되는데 연출은 오히려 더 자유롭게 홍보성으로 만들자. 그리고 분량은 40초로하고
@@ -98,6 +103,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
