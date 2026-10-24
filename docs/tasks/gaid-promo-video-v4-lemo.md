@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:27:45Z
+updated: 2026-10-24T06:39:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -50,39 +50,21 @@ Running in parallel: gaid-promo-video-v4 (finishing) and gaid-promo-video-v4-bra
 own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside Git.
 
 ## Current state
-- (A) ~102 s Dark Tech Keynote cut: sources in geo/promo-lemo/ (TREATMENT.md, scene/, render.py, mix.py, master.py,
-  build.sh, CREDITS, README). Demo = real takes as windows inside the motion graphics (left: part badge, purpose, outcome
-  rows with a leader line to the box on the take); PGI takes (capture-v3) and Yilgarn takes (capture-v2: M1 map, N1 note,
-  L3 connection map) per the user's 2026-10-24 message. Preview pv1 (work dir) mastered to -14.1 LUFS / TP -1.3 dB,
-  3069 frames, 102.3 s, no black segments; contact sheets look/sheetA.jpg, sheetB.jpg and press strip checked by eye.
-- Final render: job job-geoaidesk-gaid-promo-video-v4-lemo-1 succeeded (source 4a58eec1): out/gaid-promo-lemo.mp4
-  sha256 22dba68e…5717, 102.3 s, 3069 frames, -14.1 LUFS, TP -1.3 dB, no black segments (out/master.json). Report written
-  with figures from the final file; registry entry `gaid-promo-video-v4-lemo` (review). Reading check: 17 of 44 texts
-  under lemo's hold rule (rows, cycle labels, second-brain lines 2.8/3.3 s) — stated in the report limits.
-- lemo-opuscar at 3961ddb + VCSL pack registered as asset `lemo_opuscar` (configs/inputs.toml, ~/assets/lemo-opuscar/3961ddb).
-- (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
-- Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
+- Result (2026-10-24): two lemo-opuscar (Dark Tech Keynote) GAID promo films, internal review, music + effects, no narration.
+  103 s cut: job job-geoaidesk-gaid-promo-video-v4-lemo-8 (source c7f20680), film
+  ~/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T062754.451258Z/out/gaid-promo-lemo.mp4 sha256 499c7b53…f40e,
+  102.9 s, 3087 frames, 1920×1080 30 fps, -14.4 LUFS, TP -1.1 dB, no black segments; boxes follow the drawn pointer (20 boxes,
+  each checked at start/end on the final file, look/tagqa8-*), 16 outcome rows (13 held >= 3 s), live AI agent run footage
+  (capture-v6, AG2 3x marked 빠르게 보기), GAID 허브/시스템/내 서재 wording and colours per the user. 40 s film: child
+  promo-40s job -3, sha256 52b0055d…3546, 42.0 s, -14.1 LUFS. Report reports/2026-10-24-gaid-promo-video-v4-lemo/index.md
+  (§8 = 40 s), registry entries gaid-promo-video-v4-lemo and gaid-promo-video-v4-lemo-40s (review). Children promo-40s and
+  agent-capture completed and closed (agent-capture's failed export job 2 disposed as superseded by job 3).
+- Superseded renders of this unit: jobs -1 (102.3 s round 1), -2/-3 (round 2 picture), -4 (failed mastering attempt), -5 (round 2
+  film), -6/-7 (round 3 before click-box fixes). Sound checked by measurement only, not by listening.
+- lemo-opuscar 3961ddb + VCSL registered as asset `lemo_opuscar` (configs/inputs.toml). Checks: no automated checks for the
+  film sources; scripts/check is run by task finish.
 ## Next steps
-40 s child completed and closed 2026-10-24 (round 3 = user round 2: film 52b0055d…3546, job …promo-40s-3; section-40s.md + figures 40s-* integrated, merge into report §8 pending; check caches removed before close).
-Round 3 status: code done and saved (pv4 preview: 40 box windows checked, pointer inside the box in all but the y:N1 end, fixed by trimming to 4.8 s; -14.1 LUFS). Waiting for the live agent capture child to integrate AG takes as source `g` (render.py --capture-g, per-shot `speed`/`fps` supported, '빠르게 보기' chip), then final job, report round 3, finish.
-Round 3 (user feedback 2026-10-24, verbatim in Notes): (a) boxes follow the drawn pointer (tracks from frames, #14213d arrow;
-geo/promo-lemo/pointer_track.py) and appear only while the pointer is in the region; passive regions get no box; (b) fewer,
-slower outcomes (22 -> 15 rows, >= 3 s each), takes chosen for pointer engagement, mixing capture-v3 (PGI), capture-v2 and
-capture-v5 (Yilgarn); (c) live agent footage from child `gaid-promo-video-v4-lemo--agent-capture` (writer
-bc6e9cee-ee39-46ef-a805-4ff63734ee67, prompt prompts/child-agent-capture.md), placeholder until it lands; (d) concept/colour:
-GAID 허브 = make & share geoscience Workflows from papers/literature/notes, GAID 시스템 = install Workflows and analyse with the
-AI agent (framework), 내 서재 = the researcher's personal literature space (neither part's main feature); 시스템 in light blue
-#7fa2ff, never grey. 40 s round 2 sent to its writer (24b0e76b…, same unit; its earlier finish was never published:
-origin still 6a59a8a5, `task complete` finds no record).
-0. Round 2 done: picture + mix job -3 (20f1dc1a, 100.4 s, 3012 frames; tag QA on the final file 62 frames all on target,
-   look/tagqa3-*.jpg); mastering job -5 (9939c6ca) from job -3's picture/mix: film sha256 36290838…f075, -14.3 LUFS,
-   TP -1.9 dB, no black segments. Job -4 (-3 dBFS limiter) measured TP -0.4: premise "limiter level sets final TP" was false
-   (limiter raised AAC overshoot; tested pre/post AAC), so master.py now steps the loudnorm TP target down until the encoded
-   file measures <= -1 dBTP. Report and registry updated to round 2.
-1. Wait for the 40 s child; then `task complete gaid-promo-video-v4-lemo--promo-40s`, merge section-40s.md into report §8,
-   add its registry entry, humanizer pass, review-copy, task finish.
-2. (done for A) Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
-   review-copy; merge the child's section-40s.md after `task complete gaid-promo-video-v4-lemo--promo-40s`.
+1. None in this unit after finish; user review of both films.
 ## Failed approaches
 - Round 1 (job -1, 102.3 s) user feedback 2026-10-24 (verbatim): "102초판의 경우 피드백으로 사각형 박스로 영역을 표시할 때
   올바르게 표시해야한다. 현재 해당 영역을 올바르지 못하게 표시하거나 화면에서 엉뚱한 곳을 가리키거나 화면을 자르는 사각 박스가
@@ -162,6 +144,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T024655.879578Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T060710.491859Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T061728.672417Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T062754.451258Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
