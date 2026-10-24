@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-parts-four.png
 supersedes:
+reviewed: 2026-10-24
 ---
 # UI 점검 체계: 부품 상태 견본과 네 화면 조합 자동 점검
 
