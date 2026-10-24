@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:51:25Z
+updated: 2026-10-24T01:52:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d","pid":1195251,"provider":"codex","session":"01a16b98-98fb-76e2-936a-665bab0a74ca","start":"69446405","token":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
 branch: task/gaid-note-bundle-export--notebook-links
 target: task/gaid-note-bundle-export
@@ -80,6 +80,8 @@ The exact worktree has no codegraph index; direct source reads are used per know
 2. Add contract, route, reconcile/sync and component tests; run the declared checks.
 3. Review changes and finish this child unit for parent integration.
 ## Failed approaches
+Dependency installation job was refused twice before launch because edits were made before the launcher checked source cleanliness.
+No job receipt was created and no install started. Save and wait for job launch before further edits.
 ## Notes and decisions
 Sequential plan: settle the shared contract and storage first, build the common UI second, then verify persistence and UI together.
 This is tightly coupled work; the single writer owns all listed files and does not delegate.
