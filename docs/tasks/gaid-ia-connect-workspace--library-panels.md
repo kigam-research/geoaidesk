@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T06:49:27Z
+status: ready
+updated: 2026-10-24T06:49:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -37,8 +37,8 @@ Scoped verification: web component/PDF/persistence tests 30/30; server library/f
 Code is on this child branch; parent integration and its full scripts/check remain separate. No deployment is part of this unit.
 
 ## Next steps
-1. Parent: run task complete gaid-ia-connect-workspace--library-panels, integrate the checked child, and run the declared full scripts/check.
-2. Parent: incorporate the implementation result and figures 08/09 into the one canonical parent report. The child did not edit its prose concurrently.
+<!-- task:closed -->
+Closed 2026-10-24T06:49:29Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Initial tsc invocation found no dependencies (no node_modules). Installed pinned dependencies with npm ci via recorded job -1, exit 0. Initial job run refused dirty source before starting; saved then ran the recorded install.
