@@ -282,6 +282,28 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   agent `library_*` tools or ORCID matching, never sent to Zotero. Screens: 서재 논문 / 정리 노트 switch
   (`web/src/geo/library/note-items.tsx`), 정리 노트 가져오기, note detail 더 보기 → 서재에 넣기; 프로젝트에서 열기 goes through
   `web/src/geo/notes/open-note.ts` (pending request taken by that project's workspace, which opens the notebook tab on the note).
+- 문헌 정리 (literature digests; gaid-library-prep, report `reports/2026-10-24-gaid-library-prep/`, user decision 2026-10-24
+  "모두 권장으로 하자."): a third 서재 kind (`LibraryItem.kind: "digest"`, `LibraryDigestRef`; `isPaperItem` is the reference
+  test — digests have no citation key and stay out of exports, folder checks, citation scope, Zotero and ORCID). Origins:
+  `gaid` = made by the AI agent with a general literature Workflow (`DIGEST_WORKFLOWS`: compare-papers, summarize-paper,
+  methods-comparison): 서재 → 문헌 정리 만들기 (`web/src/geo/library/digest-make-sheet.tsx`) calls
+  `POST /geo/library/digests/requests`, which attaches the papers to the project's citation scope, records the request in
+  `.kady/geo/digest-requests.json` and returns the chat message; the project opens a new chat holding it
+  (`web/src/geo/library/digest-handoff.ts`, never sent automatically); the lead's write of `문헌정리/<id>/index.md`
+  (`makeDigestExtension`) mirrors the file into 서재 and the file stays the master (refreshed like research notes; missing →
+  `missingAt`). `external` = 외부 정리, a Gemini Notebook export (Word, PDF, Markdown, text, CSV) imported through
+  `POST /geo/library/digests/import/preview` + `/import` (`server/src/geo/library/digest-import.ts`, sheet
+  `web/src/geo/library/digest-import-sheet.tsx`); the original file stays local (`LibraryStore.storeFile`; the hub server keeps
+  PDFs only), the converted text syncs; GAID sends nothing to Google. Both enter 검토 전 (`POST /geo/library/digests/:id/status`);
+  a paper added to the digest's folder later shows as "정리 뒤 더한 논문" with 다시 만들기. Workflows read a digest first and
+  cite the original papers' pages: the start window's "먼저 읽을 정리" (`GET /geo/library/digests/for-start`; a GAID digest
+  covering every basis paper is recommended, an 외부 정리 is "참고로만 읽음" and never pre-selected), the start message's
+  `<library-digest>` section and the agent tool `library_digest` (digests covering project-scope papers only); a
+  `[@digest:…]` citation in a note is flagged. Connect authoring takes digests as `text` sources marked as reading material
+  (`library.category: "digest"`), optionally with the papers they cover (`AddLibrarySourcesBody.withDigestPapers`). The project
+  library panel lists digests covering the project's papers. Code: `server/src/geo/library/digests.ts`,
+  `web/src/geo/library/digest-items.tsx`; strings in namespaces `digest`, `digestImport`, `digestStart`. Hub-synced PDFs get
+  their page text extracted in the background after a sync (`LibrarySync.readPulledPdfs`), so `library_read` has pages there.
 - ORCID (gaid-orcid phase 1, user decision 2026-10-22): the researcher types an ORCID iD in 서재 (`<library>/orcid.json`, local,
   `authenticated: false`, shown with ORCID's unauthenticated iD icon and "(인증 안 됨)" per ORCID display guidelines) and imports
   public works read anonymously from `https://pub.orcid.org/v3.0` (`server/src/geo/orcid/`, routes `/geo/orcid*` in

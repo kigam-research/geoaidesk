@@ -12,6 +12,8 @@
 | 저장한 시작 설정 | saved start settings | Workflow의 입력과 조건 값을 미리 정해 둔 것입니다. | 레시피 (연구 기능 제외) |
 | 기본 Workflow | built-in Workflow | GAID와 함께 배포되는 Workflow입니다. | — |
 | 일반 Workflow | general Workflow | 단계와 스킬 없이 지시문으로 시작하는 Workflow입니다. | — |
+| 문헌 정리 | literature digest | 서재의 여러 논문을 미리 읽고 비교·요약과 인용 목록으로 묶은 서재 항목입니다. GAID의 일반 Workflow로 만들거나 Gemini Notebook 결과를 가져옵니다. Workflow가 먼저 읽지만 인용은 원래 논문의 쪽으로 겁니다. 검토 전으로 들어오고 연구자가 확인함으로 표시합니다. | 문헌 요약, 요약 노트 |
+| 외부 정리 | external summary | Gemini Notebook처럼 GAID 밖에서 만든 결과 파일을 가져온 문헌 정리입니다. 검토 전으로 들어오고 참고로만 읽으며 인용 근거로 쓰지 않습니다. | 외부 노트 |
 | 예제 자료 | example data | Workflow가 입력마다 함께 제공하는 자료입니다. 연구자가 자기 파일을 고르지 않으면 이 자료로 분석을 시작하고, 지침과 결과에 예제 자료로 실행했다고 적습니다. 작은 자료는 Workflow에 들어 있고, 큰 자료는 처음 쓸 때 공개 주소에서 받아 해시를 확인합니다. 시뮬레이션으로 만든 자료는 합성 자료로 표시합니다. | 샘플 데이터, 예시 데이터 |
 | Workflow 시작 창 | Workflow start window | Workflow를 고르면 열리는 하나의 창입니다. Workflow 소개, 입력 자료, 분석 조건, 요약 순서로 진행하고 마지막에 새 채팅에 시작 초안을 만듭니다. 기본 Workflow, Connect Workflow, 일반 Workflow가 모두 이 창을 씁니다. | 시작 대화상자, 실행 창 |
 | 내 자료 / 이전 결과 | your data / earlier results | 입력 파일 후보를 나누는 두 묶음입니다. 프로젝트의 `user_data/` 아래 파일이 내 자료이고, 그 밖의 파일(이전 분석의 결과, 연구노트 그림 등)이 이전 결과입니다. | 원본, 산출물 (이 구분에서) |
