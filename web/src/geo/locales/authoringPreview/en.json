@@ -1,11 +1,11 @@
 {
   "brand": "GAID",
   "nav": {
-    "workspace": "Research workspace",
+    "workspace": "Workspace",
     "method": "Create a research Workflow",
     "scope": "A screen prototype for shaping Workflows from source material."
   },
-  "breadcrumb": "Research workspace / New research Workflow",
+  "breadcrumb": "Workspace / New research Workflow",
   "title": "Create a Workflow from a paper",
   "status": "Screen prototype",
   "description": "Read the original, decide what your research needs, and shape a draft skill and workflow.",

@@ -45,9 +45,9 @@ it("connects, signs in and logs out through the local backend without browser cr
   status.url = null;
   const changed = vi.fn(); window.addEventListener(HUB_CONNECTION_CHANGED, changed);
   render(<HubServerCard />);
-  await screen.findByText("기관 허브를 연결하지 않았습니다.");
-  await waitFor(() => expect(screen.getByLabelText("허브 서버 주소")).toBeEnabled());
-  change("허브 서버 주소", "http://hub.test:8020"); await click("허브 연결");
+  await screen.findByText("기관 Connect 서버를 연결하지 않았습니다.");
+  await waitFor(() => expect(screen.getByLabelText("기관 Connect 서버 주소")).toBeEnabled());
+  change("기관 Connect 서버 주소", "http://hub.test:8020"); await click("서버 연결");
   await screen.findByRole("button", { name: "계정 로그인" });
   expect(screen.getByText(/비밀번호와 파일을 암호화하지 않습니다/)).toBeVisible();
   change("이메일", "kim@example.org"); change("비밀번호", "sample-secret"); await click("계정 로그인");
@@ -59,9 +59,9 @@ it("connects, signs in and logs out through the local backend without browser cr
   expect(changed).toHaveBeenCalledTimes(3); window.removeEventListener(HUB_CONNECTION_CHANGED, changed);
 });
 it("keeps environment addresses disabled and offers no disconnect", async () => {
-  status.fromEnv = true; render(<HubServerCard />); await screen.findByText("기관 허브에 연결했습니다.");
+  status.fromEnv = true; render(<HubServerCard />); await screen.findByText("기관 Connect 서버에 연결했습니다.");
   fireEvent.click(await screen.findByText("연결 주소 설정"));
-  expect(screen.getByLabelText("허브 서버 주소")).toBeDisabled();
+  expect(screen.getByLabelText("기관 Connect 서버 주소")).toBeDisabled();
   expect(screen.getByText(/시작 환경에서 정한 주소/)).toBeVisible();
   expect(screen.queryByRole("button", { name: "연결 끊기" })).not.toBeInTheDocument();
 });
@@ -81,10 +81,10 @@ it("updates display name and password, then removes the server address", async (
   await waitFor(() => expect(screen.queryByLabelText("현재 비밀번호")).not.toBeInTheDocument());
   expect(calls().filter(([p]) => p.endsWith("/me")).at(-1)?.[1]?.body).toBe(JSON.stringify({ password: { current: "old-password", next: "new-password" } }));
   fireEvent.click(screen.getByText("연결 주소 설정")); await click("연결 끊기");
-  await screen.findByText("기관 허브를 연결하지 않았습니다.");
+  await screen.findByText("기관 Connect 서버를 연결하지 않았습니다.");
 });
 it("shows admin members, role changes and reversible account suspension; explains last-admin rejection", async () => {
-  status.account = account; render(<HubServerCard />); fireEvent.click(await screen.findByText("허브 서버 관리"));
+  status.account = account; render(<HubServerCard />); fireEvent.click(await screen.findByText("기관 Connect 서버 관리"));
   const userRow = (await screen.findByText("이연구")).closest("li")!;
   fireEvent.click(within(userRow).getByRole("button", { name: "관리자로 변경" }));
   await waitFor(() => expect(within(userRow).getByRole("button", { name: "계정 사용 중지" })).toBeEnabled());
@@ -100,11 +100,11 @@ it("shows admin members, role changes and reversible account suspension; explain
 });
 it("creates an invite, shows/copies its code only in the creation view and revokes unused invites", async () => {
   status.account = account; const writeText = vi.fn().mockResolvedValue(undefined); Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
-  const { unmount } = render(<HubServerCard />); fireEvent.click(await screen.findByText("허브 서버 관리")); await click("초대");
+  const { unmount } = render(<HubServerCard />); fireEvent.click(await screen.findByText("기관 Connect 서버 관리")); await click("초대");
   change("이메일", "new@example.org"); await click("초대 만들기"); await screen.findByText("one-time-code");
   expect(screen.getByText(/코드는 지금만 표시/)).toBeInTheDocument(); await click("초대 코드 복사"); expect(writeText).toHaveBeenCalledWith("one-time-code");
   await click("코드 닫기"); expect(screen.queryByText("one-time-code")).not.toBeInTheDocument();
-  unmount(); render(<HubServerCard />); fireEvent.click(await screen.findByText("허브 서버 관리")); await click("초대");
+  unmount(); render(<HubServerCard />); fireEvent.click(await screen.findByText("기관 Connect 서버 관리")); await click("초대");
   expect(screen.queryByText("one-time-code")).not.toBeInTheDocument(); await click("초대 취소"); await screen.findByText("만든 초대가 없습니다.");
 });
 it("does not show admin controls for a member and keeps failures retryable", async () => {
@@ -113,5 +113,5 @@ it("does not show admin controls for a member and keeps failures retryable", asy
   render(<HubServerCard />); expect(await screen.findByRole("alert")).toHaveTextContent("요청을 처리하지 못했습니다");
   expect(screen.getByText("private backend failure").closest("details")).not.toHaveAttribute("open");
   vi.mocked(apiFetch).mockImplementation(impl); await click("상태 새로 읽기"); await screen.findByText("김연구");
-  expect(screen.queryByText("허브 서버 관리")).not.toBeInTheDocument();
+  expect(screen.queryByText("기관 Connect 서버 관리")).not.toBeInTheDocument();
 });

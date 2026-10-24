@@ -136,7 +136,7 @@
     },
     "workflow": "Workflow",
     "version": "version {version} (when the chat started)",
-    "draft": "Draft (no registered version)",
+    "draft": "Draft (no shared version)",
     "data": "Fingerprints of data used",
     "noData": "No recorded data use.",
     "col": {

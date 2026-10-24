@@ -1,35 +1,40 @@
 "use client";
-/** Header switch between the project list and the GAID hub: one app, two places. */
-import { ArrowRightIcon, FolderIcon, WorkflowIcon } from "lucide-react";
+/**
+ * Place switch of the app bar (UI guide v2 N1; ADR 2026-10-24 gaid-connect-workspace): GAID Workspace and GAID Connect,
+ * the two places of one app. The researcher's 서재 is not a place: it has its own app-bar entry (`LibraryEntry`).
+ */
+import { BookOpenIcon, PanelsTopLeftIcon, WaypointsIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
 import { geoText } from "@/geo/i18n";
+import type { GaidPlace } from "@/geo/places/navigation";
 import { cn } from "@/lib/utils";
 
-const text = geoText("hub");
+export type { GaidPlace } from "@/geo/places/navigation";
 
-export type GaidPlace = "projects" | "hub";
+const text = geoText("places");
 
 export function GaidTopNav({
   current,
   onNavigate,
   className,
 }: {
-  current: GaidPlace;
+  /** The place shown; null while the full 서재 screen is open. */
+  current: GaidPlace | null;
   onNavigate: (place: GaidPlace) => void;
   className?: string;
 }) {
-  const items: { id: GaidPlace; label: string; icon: typeof FolderIcon }[] = [
-    { id: "projects", label: text("nav.projects"), icon: FolderIcon },
-    { id: "hub", label: text("nav.hub"), icon: WorkflowIcon },
+  const items: { id: GaidPlace; icon: typeof PanelsTopLeftIcon }[] = [
+    { id: "workspace", icon: PanelsTopLeftIcon },
+    { id: "connect", icon: WaypointsIcon },
   ];
   return (
-    <nav aria-label={text("nav.label")} className={cn("gaid-seg flex items-center gap-0.5 rounded-lg border border-gaid-edge bg-gaid-hover p-0.5", className)}>
-      {items.map(({ id, label, icon: Icon }) => (
+    <nav aria-label={text("bar.label")} className={cn("gaid-seg flex items-center gap-0.5 rounded-lg border border-gaid-edge bg-gaid-hover p-0.5", className)}>
+      {items.map(({ id, icon: Icon }) => (
         <button
           key={id}
           type="button"
+          title={text(`bar.${id}Tip`)}
           aria-current={current === id ? "page" : undefined}
           onClick={() => current !== id && onNavigate(id)}
           className={cn(
@@ -40,26 +45,26 @@ export function GaidTopNav({
           )}
         >
           <Icon className="size-4" aria-hidden />
-          {label}
+          {text(`bar.${id}`)}
         </button>
       ))}
     </nav>
   );
 }
 
-/** Entry row on the project list: one line on what the hub does and a button into it (no card, no AI symbol). */
-export function GaidHubEntry({ onOpen }: { onOpen: () => void }) {
+/** The app-bar entry to the researcher's 서재 (personal, opened over either place). */
+export function LibraryEntry({ open, onOpen }: { open: boolean; onOpen: () => void }) {
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-gaid-edge bg-gaid-face px-4 py-3 sm:flex-row sm:items-center">
-      <WorkflowIcon className="size-5 shrink-0 text-gaid-signal-ink" aria-hidden />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <h2 className="text-sm font-semibold">{text("entry.title")}</h2>
-        <p className="text-sm text-gaid-ink-2">{text("entry.body")}</p>
-      </div>
-      <Button variant="outline" onClick={onOpen} className="shrink-0">
-        {text("entry.open")}
-        <ArrowRightIcon data-icon="inline-end" />
-      </Button>
-    </section>
+    <Button
+      variant="outline"
+      size="sm"
+      title={text("bar.libraryTip")}
+      aria-pressed={open}
+      onClick={onOpen}
+      className={cn(open && "border-transparent bg-gaid-signal-tint text-gaid-signal-ink hover:bg-gaid-signal-tint")}
+    >
+      <BookOpenIcon data-icon="inline-start" />
+      {text("bar.library")}
+    </Button>
   );
 }
