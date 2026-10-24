@@ -94,6 +94,7 @@ describe("literature digests (문헌 정리)", () => {
 
     const candidates = (await server.inject({ url: "/geo/library/digests/for-start" })).json() as DigestCandidatesResponse;
     expect(candidates.digests).toEqual([expect.objectContaining({ itemId: item.id, covered: 2, total: 2, recommended: true, status: "confirmed" })]);
+    expect(candidates.digests[0].papers!.map((p) => p.key).sort()).toEqual([a.citationKey, b.citationKey].sort());
 
     // A deleted file is marked missing and keeps its text.
     fs.rmSync(path.join(paths.sandbox, made.path));

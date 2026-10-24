@@ -425,6 +425,7 @@ export async function addExternalDigest(store: LibraryStore, input: {
  */
 export function digestCandidates(all: LibraryItem[], collections: LibraryCollection[], basis: string[]): DigestCandidate[] {
   const wanted = new Set(basis);
+  const byId = new Map(all.filter((i) => isPaperItem(i) && !i.removedFromSourceAt).map((i) => [i.id, i]));
   const out: DigestCandidate[] = [];
   for (const item of all) {
     if (!isDigestItem(item) || !item.digest || item.removedFromSourceAt) continue;
@@ -440,6 +441,10 @@ export function digestCandidates(all: LibraryItem[], collections: LibraryCollect
       total: wanted.size,
       recommended: item.digest.origin === "gaid" && covered === wanted.size,
       newPapers: newPapersSince(item, all, collections),
+      papers: item.digest.covers.flatMap((id) => {
+        const paper = byId.get(id);
+        return paper ? [{ key: paper.citationKey ?? paper.id, title: paper.csl.title }] : [];
+      }),
     });
   }
   return out.sort((a, b) => Number(b.recommended) - Number(a.recommended) || b.covered - a.covered || b.date.localeCompare(a.date)).slice(0, 10);

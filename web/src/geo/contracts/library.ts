@@ -840,6 +840,8 @@ export interface DigestCandidate {
   /** GAID-made and covers every paper counted in `total` (external digests are never recommended). */
   recommended: boolean;
   newPapers: number;
+  /** Live covered library papers (citation key, else the item id; title), for the start message's `covers` list. */
+  papers?: { key: string; title: string }[];
 }
 
 export interface DigestCandidatesResponse {
