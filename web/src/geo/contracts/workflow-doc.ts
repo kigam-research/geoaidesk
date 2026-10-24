@@ -96,6 +96,25 @@ export interface WorkflowDoc {
 }
 
 /**
+ * How the AI agent fills an input the researcher has no data for (gaid-input-fallback): `search` finds a small public
+ * dataset like it and proposes candidates, `synthetic` makes synthetic data after confirming what it must represent,
+ * `instruction` follows the researcher's own text. The agent asks before acting on any of them.
+ */
+export type InputFallbackKind = "search" | "synthetic" | "instruction";
+export const INPUT_FALLBACK_KINDS: readonly InputFallbackKind[] = ["search", "synthetic", "instruction"];
+
+export interface InputFallback {
+  kind: InputFallbackKind;
+  /** The researcher's note: what to look for or represent (optional), or the instruction itself (`instruction`). */
+  note?: string;
+}
+
+/** Project folder the agent writes an input's found or synthetic data to (`user_data/` is guard-protected). */
+export function fallbackFolder(kind: InputFallbackKind, roleId: string): string | null {
+  return kind === "search" ? `toy_data/${roleId}/` : kind === "synthetic" ? `synthetic_data/${roleId}/` : null;
+}
+
+/**
  * The researcher's start settings: input role id → project path (several paths for a `multiple` input), choice id →
  * option id or free text.
  */
@@ -109,6 +128,8 @@ export interface WorkflowDocSettings {
    * Named in the chat start message so the agent can cite them in the research note.
    */
   papers?: { key: string; title: string }[];
+  /** Input role id → how the agent fills an input with no data (gaid-input-fallback); only for inputs without a path. */
+  fallbacks?: Record<string, InputFallback>;
 }
 
 /**
@@ -171,8 +192,10 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     for (const role of doc.inputRoles) {
       const path = settingPaths(settings?.inputs[role.id]);
       const example = role.example && used.has(role.id) && path ? role.example : null;
+      const fallback = !path ? settings?.fallbacks?.[role.id] : undefined;
       const value = example
         ? say("settings.exampleUsed", { path: path!, title: exampleTitle(example), source: p(example.source) })
+        : fallback ? say(`fallback.value.${fallback.kind}`)
         : path || (settings ? say("settings.notUsed") : role.example ? say("settings.researcherPicksExample", { title: exampleTitle(role.example) }) : say("settings.researcherPicks"));
       lines.push(`- ${p(role.label)}: ${value}`);
     }
@@ -190,6 +213,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     else lines.push(say("settings.askBeforeStep"));
     const exampleRoles = doc.inputRoles.filter((role) => role.example && used.has(role.id) && settingPaths(settings?.inputs[role.id]));
     if (exampleRoles.length) lines.push("", say("settings.examplesUsed", { labels: exampleRoles.map((role) => p(role.label)).join(", ") }), say("settings.exampleRule"));
+    lines.push(...fallbackSection(doc, settings, locale, say));
   }
 
   const papers = settings?.papers ?? [];
@@ -255,6 +279,44 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
   return lines.join("\n");
 }
 
+/** Inputs without data and how the agent fills them (gaid-input-fallback); nothing when no input uses a fallback. */
+function fallbackSection(doc: WorkflowDoc, settings: WorkflowDocSettings | null, locale: "ko" | "en", say: WorkflowDocSay): string[] {
+  const rows = doc.inputRoles.flatMap((role) => {
+    const fallback = settings?.fallbacks?.[role.id];
+    return fallback && !settingPaths(settings?.inputs[role.id]) ? [{ role, fallback }] : [];
+  });
+  if (!rows.length) return [];
+  const lines = ["", `## ${say("section.fallback")}`, say("fallback.intro"), ""];
+  for (const { role, fallback } of rows) {
+    const folder = fallbackFolder(fallback.kind, role.id);
+    const note = fallback.note?.trim().replace(/\s+/g, " ") ?? "";
+    const head = `- ${pick(role.label, locale)} (${say(`fallback.value.${fallback.kind}`)})`;
+    const parts = [folder ? say("fallback.folder", { folder }) : "", note ? say(fallback.kind === "instruction" ? "fallback.instructionText" : "fallback.note", { note }) : ""].filter(Boolean);
+    lines.push(parts.length ? `${head}: ${parts.join(" ")}` : head);
+  }
+  lines.push("");
+  for (const kind of INPUT_FALLBACK_KINDS) {
+    if (!rows.some((row) => row.fallback.kind === kind)) continue;
+    lines.push(say(`fallback.rule.${kind}`));
+    if (kind === "search") lines.push(say("fallback.rule.searchLimit"), say("fallback.rule.searchRecord"));
+  }
+  if (rows.some((row) => row.fallback.kind !== "instruction")) lines.push(say("fallback.rule.label"));
+  return lines;
+}
+
+/** `fallback` attribute of a `<workflow>` block: `role=kind;role=kind` (role ids are local ids without `=`/`;`). */
+const fallbackAttr = (fallbacks: Record<string, InputFallbackKind>) =>
+  Object.entries(fallbacks).map(([role, kind]) => `${role}=${kind}`).join(";");
+
+function parseFallbackAttr(value: string | undefined): Record<string, InputFallbackKind> {
+  const out: Record<string, InputFallbackKind> = {};
+  for (const part of (value ?? "").split(";")) {
+    const [role, kind] = part.split("=");
+    if (role && (INPUT_FALLBACK_KINDS as readonly string[]).includes(kind)) out[role] = kind as InputFallbackKind;
+  }
+  return out;
+}
+
 function choiceAsk(choice: WorkflowChoice, locale: "ko" | "en", say: WorkflowDocSay) {
   const label = pick(choice.label, locale);
   const options = (choice.options ?? []).map((option) => optionText(choice, option, locale));
@@ -271,12 +333,14 @@ const attr = (value: string) => value.replace(/["\n\r]/g, " ").trim();
  * The chat's first message: the rendered document in a `<workflow>` block, then the researcher's own text. The
  * transcript shows the block as a "Workflow · <title> · version <x.y.z>" card (like the skill and template chips).
  */
-export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "version">, body: string, locale: "ko" | "en", options: { example?: boolean } = {}): string {
+export function workflowBlock(doc: Pick<WorkflowDoc, "id" | "title" | "version">, body: string, locale: "ko" | "en", options: { example?: boolean; fallbacks?: Record<string, InputFallbackKind> } = {}): string {
   const title = attr(pick(doc.title, locale));
   const version = doc.version ? ` version="${attr(doc.version)}"` : "";
   // `data="example"`: the run uses the Workflow's example data for at least one input (gaid-workflow-example).
   const data = options.example ? ` data="example"` : "";
-  return `<workflow id="${attr(doc.id)}"${version} title="${title}"${data}>\n${body}\n</workflow>`;
+  // `fallback="dem=search;holes=synthetic"`: inputs with no data and how the agent fills them (gaid-input-fallback).
+  const fallback = options.fallbacks && Object.keys(options.fallbacks).length ? ` fallback="${attr(fallbackAttr(options.fallbacks))}"` : "";
+  return `<workflow id="${attr(doc.id)}"${version} title="${title}"${data}${fallback}>\n${body}\n</workflow>`;
 }
 
 export interface ParsedWorkflowBlock {
@@ -289,16 +353,18 @@ export interface ParsedWorkflowBlock {
   tail: string;
   /** The run uses the Workflow's example data for at least one input. */
   example: boolean;
+  /** Inputs started without data and how the agent fills them (empty for older blocks). */
+  fallbacks: Record<string, InputFallbackKind>;
 }
 
-const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)"| version="(\d+\.\d+\.\d+)")? title="([^"]*)"( data="example")?>\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
+const WORKFLOW_RE = /^<workflow id="([^"]*)"(?: revision="(\d+)"| version="(\d+\.\d+\.\d+)")? title="([^"]*)"( data="example")?(?: fallback="([^"]*)")?>\n([\s\S]*?)\n<\/workflow>(?:\n\n([\s\S]+))?$/;
 
 export function parseWorkflowBlock(text: string): ParsedWorkflowBlock | null {
   const match = text.match(WORKFLOW_RE);
   if (!match) return null;
   // Same rule as `legacyHubVersion` (hub-version.ts); no value import, the server loads contracts without a resolver.
   const version = match[3] ?? (match[2] ? `0.1.${Math.max(0, Number(match[2]) - 1)}` : null);
-  return { id: match[1], version, title: match[4], body: match[6], tail: match[7] ?? "", example: Boolean(match[5]) };
+  return { id: match[1], version, title: match[4], body: match[7], tail: match[8] ?? "", example: Boolean(match[5]), fallbacks: parseFallbackAttr(match[6]) };
 }
 
 // --- Older Workflows -------------------------------------------------------------------------------------------
