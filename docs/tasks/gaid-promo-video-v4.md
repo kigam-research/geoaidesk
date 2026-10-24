@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-24T00:46:47Z
-writer: {"host":"seongin3","reserved":"20327401a56788b2a02c2d0c9f6ab09686a1e58eb736400cc9099e9218ac6d15"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9041d1a3-7e91-4078-bcd9-c922396931bf","pid":756157,"provider":"claude","session":"3069c8ee-f8d2-4558-9415-78ea443ef91b","start":"69075424","token":"20327401a56788b2a02c2d0c9f6ab09686a1e58eb736400cc9099e9218ac6d15"}
 branch: task/gaid-promo-video-v4
 target: main
 parent: 
