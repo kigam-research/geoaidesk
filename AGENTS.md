@@ -327,7 +327,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `SidebarItem`; `StepScale`; `SystemResourcesButton`), `.gaid-orbit` (the AI agent is working; the one loop), `.gaid-index`,
   `.gaid-seg`. User rules that hold: colours only through tokens, original pixels for figures/maps/PDFs, no
   Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an impeccable +
-  design-taste-frontend + brand-guide expert (user rule 2026-10-21; skills in skill_hub `.claude/skills/`). Before UI work,
+  design-taste-frontend + brand-guide expert (user rule 2026-10-21; pinned read-only copies of impeccable 4.7.0 and
+  design-taste-frontend v2.1.4 in `.claude/skills/`, sources and telemetry in `.claude/skills/SOURCE.md`; the brand is
+  `geo/brand/`; the older skill_hub copies are legacy). Before UI work,
   read guide sections 1, 2 and 10 and those for the components you touch. A change report lists the rule ids it follows or
   breaks (with reason) and includes Korean screenshots in both styles and both themes at 1440×900 and 1280×800 checked
   against section 12. `scripts/check` runs `node geo/ui/check-ui.mjs` (copy length, agent internals in researcher views,

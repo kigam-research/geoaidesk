@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:50:45Z
+updated: 2026-10-24T02:08:36Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1a91e208-7b70-439e-8b39-477b8539d9b0","pid":1214844,"provider":"claude","session":"935f0de9-bf01-4092-ac64-61673682a5ce","start":"69454174","token":"3dff85c378d3f25a9e25cd3e5cb5168bcefd62820b51026e8e6382502701c477"}
 branch: task/gaid-design-skills-refresh
 target: main
@@ -49,11 +49,29 @@ Mockups (code-built from the real tokens/components, no generated images) and th
 (branch task/gaid-uiux-skills-scan until integrated). Lesson to keep: no generated imagery; the current system is the visual authority.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Done in the worktree: `.claude/skills/impeccable/` = upstream pbakaus/impeccable tag `skill-v4.7.0` commit
+  `aeeb3d8c30b5f95aeeb3e893b0f1a308af8fdb8f`, path `.claude/skills/impeccable/` (Claude Code build; Apache-2.0);
+  `.claude/skills/design-taste-frontend/` = Leonxlnx/taste-skill tag `v2.1.4` commit
+  `6010f91a9935f1c167dfc500fb1a475681892e6b`, path `skills/taste-skill/` (frontmatter name `design-taste-frontend`; MIT,
+  redistribution permitted with the notice). Fetched via codeload; `diff -r` identical incl. the one exec bit. Licences in
+  `.claude/skills/licenses/`, provenance/telemetry/omissions in `.claude/skills/SOURCE.md`, THIRD_PARTY_NOTICES section
+  "Design skills for developers", AGENTS.md UI guide v2 bullet repointed, `.gitignore` tracks only these copies under
+  `.claude/` (+ ignores `/.taste-skill/`; boundaries entry updated). Largest file 1.1 MB (`impeccable/scripts/data/font-index.json`).
+- Telemetry: `.impeccable/config.json` gains `"telemetry": false` (project opt-out). Verified with the 0.1.16 engine cached in
+  `~/data/geoaidesk/work/gaid-design-skills-refresh/impeccable-home` (IMPECCABLE_HOME, `~/.impeccable` untouched):
+  `telemetry status` in the repo = off (config), outside the repo = on. taste-skill has no telemetry.
+- Not copied (deliberate): impeccable hook manifest (`.claude/settings.json`) and reviewer agents (`.claude/agents/`); they
+  would change every Claude session in the repo. skill_hub and ~/.claude untouched. Historical task docs/reports that cite
+  the skill_hub paths are left as dated records.
+- scripts/check passed 2026-10-24 (exit 0; backend 2300 passed / 8 skipped, web 1289 passed, GAID checks and production
+  smoke PASS; log ~/data/geoaidesk/work/gaid-design-skills-refresh/check.log).
 ## Next steps
-1. (the next session's first action)
+1. task finish.
 ## Failed approaches
 ## Notes and decisions
+- No report: config/vendoring task (no result for user review). Small and coupled: no child writers.
+- Optional (not done): vendor impeccable's reviewer agents / design hook if the user wants the full impeccable build loop
+  in this repo; scenario D (gaid-ui-quality-kit) can call `.claude/skills/impeccable/scripts/impeccable detect` directly.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

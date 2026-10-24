@@ -468,7 +468,7 @@
       "path": ".gitignore",
       "owner": "gaid-improve",
       "status": "edited",
-      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git."
+      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git. gaid-design-skills-refresh: track only the pinned design-skill copies under .claude/skills/ (rest of .claude/ stays ignored) and ignore design-taste-frontend's .taste-skill/ sheets."
     },
     {
       "path": "web/src/app/authoring-preview/page.tsx",
