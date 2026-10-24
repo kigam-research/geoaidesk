@@ -21,8 +21,22 @@ describe("library source side panel", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: /포천 연구 정리/ }));
     expect(screen.getByText("2개 고름")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "자료 2개 더하기" }));
-    await waitFor(() => expect(add).toHaveBeenCalledWith(["paper", "note"]));
+    await waitFor(() => expect(add).toHaveBeenCalledWith(["paper", "note"], { withDigestPapers: false }));
     expect(close).toHaveBeenCalledWith(false);
+  });
+
+  it("adds a 문헌 정리 with the papers it covers unless the researcher turns that off", async () => {
+    const digest: LibraryItemSummary = { ...paper, id: "digest", kind: "digest", title: "포천 문헌 정리", digest: { origin: "gaid", status: "pending", workflow: "compare-papers", covers: 3, unmatched: 0, date: "2026-10-24", newPapers: 0, local: true } };
+    listLibrary.mockResolvedValue({ items: [paper, note, digest] });
+    const add = vi.fn().mockResolvedValue(undefined);
+    render(<LibrarySourcePicker open onOpenChange={vi.fn()} onAdd={add} />);
+    fireEvent.click(await screen.findByRole("button", { name: "문헌 정리 1" }));
+    expect(screen.getByText(/논문 3편 · GAID에서 만듦 · 검토 전/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: /포천 문헌 정리/ }));
+    const withPapers = screen.getByRole("checkbox", { name: /다룬 논문 3편도 근거 자료로 넣기/ });
+    expect(withPapers).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "자료 1개 더하기" }));
+    await waitFor(() => expect(add).toHaveBeenCalledWith(["digest"], { withDigestPapers: true }));
   });
 
   it("searches, focuses its field, and closes with Escape", async () => {

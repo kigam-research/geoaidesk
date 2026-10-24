@@ -136,5 +136,10 @@
     "empty": "No literature digests in the library. You can make one from a folder's papers in the library.",
     "withPapers": "Also add the {count} papers it covers as sources",
     "withPapersHint": "The evidence view beside each question opens the original paper's page. A digest is read first and never cited."
+  },
+  "panel": {
+    "title": "Literature digests {count}",
+    "covers": "Covers {covered} of {total} project papers",
+    "openTip": "Open the literature digest in the library"
   }
 }

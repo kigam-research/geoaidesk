@@ -9,9 +9,11 @@ import { geoText } from "@/geo/i18n";
 import { openLibrary } from "@/geo/places/navigation";
 import { SEG_TRACK, segItem } from "@/geo/shell/segmented";
 import { cn } from "@/lib/utils";
-import { attachToProject, getLibraryItem, listLibrary } from "./api";
+import { attachToProject, getDigestCandidates, getLibraryItem, listLibrary } from "./api";
+import type { DigestCandidate } from "@/geo/contracts/library";
 
 const text = geoText("library");
+const digestText = geoText("digest");
 const PAGE_SIZE = 100;
 
 /** The project's citation scope, including attached folders and their descendants, beside the work it supports. */
@@ -35,6 +37,13 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citation
   const [refresh, setRefresh] = useState(0);
   const [attached, setAttached] = useState<string[]>([]);
   const request = useRef(0);
+  // gaid-library-prep: 문헌 정리 covering the project's papers, which its Workflow starts can read first.
+  const [digests, setDigests] = useState<DigestCandidate[]>([]);
+  useEffect(() => {
+    let active = true;
+    getDigestCandidates(projectId).then((r) => { if (active) setDigests(r.digests); }).catch(() => { if (active) setDigests([]); });
+    return () => { active = false; };
+  }, [projectId, refresh]);
   const selectionGeneration = useRef(0);
   const handledCitation = useRef<{ id?: string; sequence?: number }>({});
 
@@ -116,6 +125,18 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citation
         {!loading && !error && !rows.length && <p className="p-4 text-sm text-gaid-ink-2">
           {text(query.trim() ? "panel.noMatch" : scope === "project" ? "panel.emptyProject" : "panel.empty")}
         </p>}
+        {scope === "project" && !query.trim() && digests.length > 0 && <div className="border-b border-gaid-edge px-4 py-3">
+          <p className="pb-1.5 text-xs font-semibold text-gaid-ink-3">{digestText("panel.title", { count: digests.length })}</p>
+          <ul className="flex flex-col gap-1">
+            {digests.map((d) => <li key={d.itemId}>
+              <button type="button" onClick={() => openLibrary({ itemId: d.itemId })} title={digestText("panel.openTip")}
+                className="-mx-2 flex w-[calc(100%+1rem)] flex-col rounded-md px-2 py-1.5 text-left hover:bg-gaid-hover focus-visible:outline-2 focus-visible:outline-ring">
+                <span className="block truncate text-sm font-medium">{d.title}</span>
+                <span className="block truncate text-xs text-gaid-ink-2 tabular-nums">{[digestText("panel.covers", { covered: d.covered, total: d.total }), digestText(`origin.${d.origin}`), digestText(`status.${d.status}`)].join(" · ")}</span>
+              </button>
+            </li>)}
+          </ul>
+        </div>}
         <ul className="divide-y divide-gaid-edge">
           {!loading && rows.map((row) => <li key={row.id}>
             <button type="button" aria-pressed={selected?.id === row.id}

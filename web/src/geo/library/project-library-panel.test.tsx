@@ -4,8 +4,8 @@ import type { LibraryItemSummary } from "@/geo/contracts/library";
 import { ProjectLibraryPanel } from "./project-library-panel";
 import { OPEN_LIBRARY_EVENT } from "@/geo/places/navigation";
 
-const { listLibrary, attachToProject, getLibraryItem } = vi.hoisted(() => ({ listLibrary: vi.fn(), attachToProject: vi.fn(), getLibraryItem: vi.fn() }));
-vi.mock("./api", () => ({ listLibrary, attachToProject, getLibraryItem }));
+const { listLibrary, attachToProject, getLibraryItem, getDigestCandidates } = vi.hoisted(() => ({ listLibrary: vi.fn(), attachToProject: vi.fn(), getLibraryItem: vi.fn(), getDigestCandidates: vi.fn() }));
+vi.mock("./api", () => ({ listLibrary, attachToProject, getLibraryItem, getDigestCandidates }));
 const paper: LibraryItemSummary = {
   id: "p1", title: "포천 자력 이상 연구", authors: "김민수 외", year: 2025, citationKey: "kim2025", source: "gaid", kind: "paper",
   storedPdf: true, hasPdf: true, coverage: "full", collectionIds: ["folder"], tags: [], used: { notes: 8, workflows: 0, projects: 2 }, metadataConfirmed: true, addedAt: "2026-10-24",
@@ -16,6 +16,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   listLibrary.mockImplementation(async (q) => ({ total: q.filter === "project" ? 1 : 2, items: q.filter === "project" ? [paper] : [paper, other] }));
   getLibraryItem.mockRejectedValue(new Error("not available"));
+  getDigestCandidates.mockResolvedValue({ digests: [] });
   attachToProject.mockResolvedValue({ itemIds: ["p1", "p2"], collectionIds: [] });
 });
 
