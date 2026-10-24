@@ -1,5 +1,5 @@
 ---
-title: UI 점검 체계 — 부품 상태 견본과 네 화면 조합 자동 점검
+title: UI 점검 체계: 부품 상태 견본과 네 화면 조합 자동 점검
 date: 2026-10-24
 project: geoaidesk
 task: gaid-ui-quality-kit
@@ -9,7 +9,7 @@ decisions: 1
 cover: figures/01-parts-four.png
 supersedes:
 ---
-# UI 점검 체계 — 부품 상태 견본과 네 화면 조합 자동 점검
+# UI 점검 체계: 부품 상태 견본과 네 화면 조합 자동 점검
 
 ## 0. 한눈에
 
@@ -22,9 +22,9 @@ supersedes:
 
 ## 1. 요청한 것
 
-> 모두 권장으로 진행하자. — 2026-10-24, 조사 보고서(최신 UI/UX 스킬·템플릿 조사) 6절의 두 결정에 대한 답
+> 모두 권장으로 진행하자. — 2026-10-24 요청
 
-이 답으로 정한 첫 작업(전달받은 목표 원문):
+조사 보고서(최신 UI/UX 스킬·템플릿 조사) 6절의 두 결정에 대한 답입니다. 이 답으로 정한 첫 작업은 다음과 같습니다(전달받은 목표 원문).
 
 > Implement scenario D first: UI quality kit. A development-only "부품 상태 견본" page (shared parts pinned in every state with the shadcn skill's data-preview custom variants, live token contrast table), shadcn lint (`shadcn-ui/lint`, MIT) mapped onto UI guide V1 rules, impeccable detect (Apache-2.0, telemetry off via DO_NOT_TRACK), Playwright screenshot comparison of the four combos (계측/도폭 × light/dark, 1440×900) and axe-core checks, added to scripts/check first as report-only, blocking later after false positives are settled. Fix the two facts found while drawing the kit: UI guide S1 names an `--on-signal` role that globals.css does not define (buttons use `--primary-foreground`); `web/src/components/ui/button.tsx` has no press (active) style although S7 requires one. Also check `web/src/components/tool-activity.tsx` BrainIcon/WandSparklesIcon against V2.
 
@@ -129,8 +129,8 @@ impeccable과 axe가 같은 다섯 곳을 서로 독립적으로 찾았습니다
 
 <details><summary>펼치기 — 3건</summary>
 
-- 위험 버튼 누름 색을 처음에는 채움을 더 옅게(80%) 만들었습니다. 두 검사기가 흰 글자 대비가 3.6:1로 떨어진다고 알렸고, 짙은 빨강 토큰으로 바꿨습니다. 점검이 이 작업 안에서 제 실수를 잡은 사례입니다.
-- impeccable의 실제 화면 검사를 처음에는 브라우저를 직접 띄우게 했는데, Ubuntu 24.04의 보안 설정이 그 브라우저를 막았습니다. Playwright가 띄운 브라우저에 붙어 검사하는 방식으로 바꿨고, 그 덕에 네 조합을 모두 검사합니다.
+- 위험 버튼 누름 색을 처음에는 채움을 더 옅게(80%) 만들었습니다. 두 검사기가 흰 글자 대비가 3.6:1로 떨어진다고 알렸고, 짙은 빨강 토큰으로 바꿨습니다.
+- impeccable의 실제 화면 검사를 처음에는 브라우저를 직접 띄우게 했는데, Ubuntu 24.04의 보안 설정이 그 브라우저를 막았습니다. Playwright가 띄운 브라우저에 붙어 검사하도록 바꿨고, 이렇게 하면 네 조합을 모두 검사할 수 있습니다.
 - 화면 비교에 논문에서 Workflow 만들기 시안 화면도 넣으려 했으나, 그 화면은 GAID 토큰 대신 자체 스타일을 쓰는 따로 떨어진 시안이라 뺐습니다.
 
 </details>
