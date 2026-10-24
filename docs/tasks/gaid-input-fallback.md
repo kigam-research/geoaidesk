@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:08:23Z
+updated: 2026-10-24T07:39:49Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8326432c-0a38-43d0-92f0-76db7e868732","pid":1778976,"provider":"claude","session":"21c916ad-8c56-4943-818b-6f9dae6aa973","start":"71313221","token":"dd814f54f4df4db1c88c4132afa7ed1942ef6ba2f237a42360f61d5b48b0e522"}
 branch: task/gaid-input-fallback
 target: main
@@ -58,8 +58,16 @@ Plan (2026-10-24, writer): small, tightly coupled change; done by this writer, n
   file and no example, folded otherwise); summary rows + summary notice in `task-setup.tsx`; card badge in `workflow-card.tsx`.
 - Files owned: workflow-doc.ts, render.ts, setup-steps.tsx, task-setup.tsx, workflow-card.tsx, locales workspace/workflowDoc,
   tests. Avoids gaid-ia-connect-workspace files (its copy-rename child edits other keys of the same locale files).
+Done (2026-10-24): implemented as planned (commits 2acded4a, 13676fec + report). Web typecheck clean; new
+`web/src/geo/workspace/input-fallback.test.tsx` (5) + workspace/workflow/contracts suites pass; copy validator 0 errors;
+check-ui 0 errors. Real-app check on PC74 dev app (systemd unit gaid-input-fallback-app, ports 3390/18390, home
+~/data/geoaidesk/work/gaid-input-fallback/app; stopped): fixture Workflow pocheon-mag, aeromag=search, dem=synthetic,
+boreholes=instruction; GPT-6.1 Sol (openai-codex) web-searched, asked one interview (3 USGS candidates with size/terms,
+synthetic DEM conditions, borehole table), downloaded only the picked one into toy_data/aeromag/ with SOURCE.md (sha256),
+generated synthetic_data/{dem,boreholes}/ with README/code; all 15 files in provenance; research note labels toy/synthetic
+at the top and in 한계. Screenshots 16 (both styles × themes × 1440/1280) in ~/data/geoaidesk/work/gaid-input-fallback/shots/.
 ## Next steps
-1. Implement contract + renderer + UI, tests, scripts/check, real-app check, report.
+1. Wait for scripts/check (log ~/data/geoaidesk/work/gaid-input-fallback/check-1.log); on pass, task save + task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
@@ -71,6 +79,7 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-input-fallback/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
