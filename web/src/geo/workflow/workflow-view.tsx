@@ -62,7 +62,7 @@ export function WorkflowView({ doc, projectId, readiness, profile, visuals, outp
             {skill.purpose && <p>{localText(skill.purpose)}</p>}
             <div className="flex flex-wrap gap-2">
               {readable && <Button variant="outline" size="sm" onClick={() => setReading(skill.name)}>{text("instructions.button")}</Button>}
-              {hub && <Button variant="ghost" size="sm" asChild><a href={`#hub/s/${encodeURIComponent(hub.skillId)}`}>{text("hubOpen")}</a></Button>}
+              {hub && <Button variant="ghost" size="sm" asChild><a href={`#connect/s/${encodeURIComponent(hub.skillId)}`}>{text("hubOpen")}</a></Button>}
             </div>
             {reading === skill.name && (hub
               ? <RemoteSkillSource key={skill.name} name={skill.name} load={() => loadHubSkillSource(hub.skillId, hub.revision)} onBack={() => setReading(null)} />

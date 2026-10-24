@@ -17,3 +17,37 @@ export function openLibrary(detail: OpenLibraryDetail = {}): void {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new CustomEvent<OpenLibraryDetail>(OPEN_LIBRARY_EVENT, { detail }));
 }
+
+/**
+ * Workspace home → project hand-off: opening a recent chat or the Workflow list of a project. The request is kept until
+ * the workspace of that project takes it (it mounts after the switch), like `openMethodSetup` in `geo/hub/handoff.ts`.
+ */
+export interface WorkspaceOpenRequest {
+  projectId: string;
+  /** Chat to open in a tab. */
+  sessionId?: string;
+  title?: string;
+  /** Show the Workflow list in the right pane. */
+  workflows?: boolean;
+}
+
+export const WORKSPACE_OPEN_EVENT = "gaid:workspace-open";
+let pendingOpen: WorkspaceOpenRequest | null = null;
+
+export function requestWorkspaceOpen(request: WorkspaceOpenRequest): void {
+  pendingOpen = request;
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(WORKSPACE_OPEN_EVENT));
+}
+
+/** The workspace of `projectId` takes a pending request (once). */
+export function takeWorkspaceOpen(projectId: string): WorkspaceOpenRequest | null {
+  if (!pendingOpen || pendingOpen.projectId !== projectId) return null;
+  const request = pendingOpen;
+  pendingOpen = null;
+  return request;
+}
+
+export function onWorkspaceOpenRequest(handler: () => void): () => void {
+  window.addEventListener(WORKSPACE_OPEN_EVENT, handler);
+  return () => window.removeEventListener(WORKSPACE_OPEN_EVENT, handler);
+}
