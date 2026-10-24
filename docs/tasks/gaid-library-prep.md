@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T12:56:16Z
+updated: 2026-10-24T12:58:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bb1c54f-ec00-4ede-b538-8689a6d7266d","pid":1785127,"provider":"claude","session":"3dbb251a-b5a3-49b3-8474-ccc8cde7b5f6","start":"71315213","token":"0c6b923018272ee28d6b79696503be8b04037904a1f5d58759fec6ee23f1986e"}
 branch: task/gaid-library-prep
 target: main
@@ -60,11 +60,12 @@ No app behaviour changed. The user approved all three recommendations (see Notes
 library panel on main. Rechecked after the Paseo daemon restart (2026-10-24): worktree clean at c0f37e33, origin/main
 ecc06f59 still lacks the library panel (gaid-authoring-tokens is now on main); no jobs or child units. Still waiting.
 ## Next steps
-1. Phase 2 once gaid-ia-connect-workspace--library-panels is on main (checked 2026-10-24: origin/main 75227da7 has an interim
-   sync of the parent, but not the library panel): rebase on fresh main, then gaid-ia-connect-workspace--library-panels on main: decide work packages (server digest item kind
-   + import + make flow; start-window/start-message + agent `library_digest` tool; authoring source kind on top of
-   gaid-authoring-tokens; fix hub-synced PDFs lacking a page cache), implement, scripts/check, real-app check with one folder.
-Blocked: gaid-ia-connect-workspace--library-panels is not yet on main (user decision 2026-10-24: implement after it).
+1. Phase 2 running (started 2026-10-24 after library-panels reached main; branch merged with origin/main c11c0c15).
+   Writer now: 서재 screen (문헌 정리 segment, list/detail, make sheet → open project chat with the returned message, mount
+   the import sheet), project library panel digest rows, Connect authoring picker + digest source, hub-synced PDF page
+   cache fix, docs (AGENTS.md, glossary, terminology, docs/geo), report section, real-app check with one folder.
+2. Children (task start --parent, "general work"): --digest-import and --digest-start (see Phase 2 plan). `task complete`
+   each when its finish arrives, then integrate, scripts/check, report, task finish.
 ## Failed approaches
 ## Notes and decisions
 - Diagnosis (2026-10-24, code read): chat/start read attached papers via library_search (3 snippets/paper) and library_read (5
@@ -81,6 +82,22 @@ Blocked: gaid-ia-connect-workspace--library-panels is not yet on main (user deci
   main, authoring part on top of gaid-authoring-tokens; (2) the 서재 item is named "문헌 정리", Gemini imports are marked
   "외부 정리"; (3) 외부 정리 is offered in the Workflow start window as "참고로만 읽음", never pre-selected. Glossary and
   terminology entries for 문헌 정리/외부 정리 go in with the phase-2 implementation.
+- Phase 2 plan (2026-10-24). Settled interfaces (writer, commit 5e33df79 + web client): contract types in
+  web/src/geo/contracts/library.ts (LibraryItemKind "digest", LibraryDigestRef/Made/External/Summary, DigestCandidate,
+  MakeDigest*, DigestImport*, isPaperItem/isDigestItem, digestKey); server/src/geo/library/digests.ts (requests, mirror
+  hook, refresh, status, addExternalDigest, digestCandidates); routes POST /geo/library/digests/requests,
+  POST /geo/library/digests/:id/status, GET /geo/library/digests/for-start; web client in web/src/geo/library/api.ts
+  (makeDigest, setDigestStatus, getDigestCandidates, previewDigestImport, importDigest); locale namespaces digest
+  (writer), digestImport (child A), digestStart (child B), pre-registered empty.
+  Packages: A --digest-import owns server/src/geo/library/digest-import.ts (+ the two import routes in routes/library.ts,
+  minimal hunk), web/src/geo/library/digest-import-sheet.tsx, namespace digestImport, tests. B --digest-start owns
+  library_digest tool + digest-citation flag in server/src/geo/library/tools.ts, start window "먼저 읽을 정리"
+  (web/src/geo/workspace/digest-choice.tsx new; minimal hunks in start-intro.tsx, task-setup.tsx/setup-steps.tsx summary),
+  start-message section in web/src/geo/contracts/workflow-doc.ts + workflowDoc locale, namespace digestStart, tests.
+  Writer owns everything else (서재 screens, project panel, authoring picker/source, sync fix, docs, report).
+  Integration order: A and B in any order, then writer's screens, then scripts/check.
+- Hub server accepts PDFs only (not touched by this unit): imported 외부 정리 originals stay local; the item (converted
+  text) syncs.
 - Orchestration (phase 1): sequential and tightly coupled (diagnosis → design → mockup → report); done by the writer alone,
   no child writers. Phase 2 packages (server digest store/import, start-window/authoring wiring, agent instructions) are
   decided after approval.
