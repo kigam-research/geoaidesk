@@ -8,6 +8,9 @@
 import {
   BookOpenIcon,
   CheckIcon,
+  FileTextIcon,
+  NotebookPenIcon,
+  PanelsTopLeftIcon,
   DatabaseIcon,
   DropletsIcon,
   FlaskConicalIcon,
@@ -33,8 +36,37 @@ import { TechnicalDetail } from "./technical";
 import { ConceptPicture } from "./concept-picture";
 import { StagePlate, stagesLabel } from "./stage-plate";
 import { PageHeader } from "@/geo/shell/page-header";
+import { openLibrary, openWorkspace } from "@/geo/places/navigation";
 
 const text = geoText("hub");
+const placesText = geoText("places");
+
+/**
+ * Where a Workflow can start from (ADR 2026-10-24 gaid-connect-workspace): a paper PDF or research notes start a new
+ * draft (the source step takes both), 서재 opens the library (a paper's "Workflow 만들기"), a Workspace analysis is sent
+ * from its chat (Connect로 보내기).
+ */
+function MakeFrom({ onCreate }: { onCreate: () => void }) {
+  const routes = [
+    { id: "pdf", icon: FileTextIcon, run: onCreate },
+    { id: "library", icon: BookOpenIcon, run: () => openLibrary() },
+    { id: "notes", icon: NotebookPenIcon, run: onCreate },
+    { id: "analysis", icon: PanelsTopLeftIcon, run: openWorkspace },
+  ] as const;
+  return (
+    <section className="flex flex-wrap items-center gap-x-4 gap-y-3" aria-labelledby="hub-make">
+      <h2 id="hub-make" className="text-base font-semibold">{placesText("connect.make.heading")}</h2>
+      <div className="flex flex-wrap gap-2">
+        {routes.map(({ id, icon: Icon, run }) => (
+          <Button key={id} variant="outline" title={placesText(`connect.make.${id}Tip`)} onClick={run}>
+            <Icon data-icon="inline-start" />
+            {placesText(`connect.make.${id}`)}
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /** Authoring stage of my methods: a text chip with a status tint, never a coloured side stripe (UI guide v2 V7) and never
  * the signal blue (S3). A registered method always shows the success tint, whatever stage its draft is in. */
@@ -298,6 +330,8 @@ export function HubHome({
               <Featured cards={recommended} onOpen={onOpenRecommended} />
             </section>
           )}
+
+          {view.kind === "home" && !query.trim() && <MakeFrom onCreate={onCreate} />}
 
           {view.kind !== "mine" && (
             <section className="flex flex-col gap-3" aria-labelledby="hub-registry">
