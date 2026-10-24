@@ -1,0 +1,59 @@
+@font-face {
+  font-family: "Pretendard";
+  src: url("fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+}
+:root {
+  --ink: #171b23;
+  --ink-2: #525a68;
+  --ink-3: #646c7a;
+  --face: #ffffff;
+  --chrome: #f1f3f6;
+  --edge: #dce0e6;
+  --signal: #1f5eff;
+  --signal-ink: #1d4fd8;
+  --signal-tint: #e8eeff;
+  --on-dark: #4d7fff;
+  --on-dark-ink: #e7ebf2;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); }
+body { font-family: "Pretendard", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" 1; }
+#stage { position: absolute; inset: 0; overflow: hidden; background: var(--ink); }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.line { position: absolute; overflow: hidden; white-space: nowrap; padding: 0.06em 0.04em 0.14em; }
+.line > span { display: inline-block; will-change: transform; }
+.kin { font-weight: 800; letter-spacing: -0.035em; line-height: 1.08; }
+.chip {
+  position: absolute; left: 0; top: 0; white-space: nowrap; background: var(--face); border: 1px solid var(--edge);
+  border-radius: 10px; corner-shape: bevel; padding: 14px 22px 16px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+.chip .src { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 600; color: var(--ink-3); }
+.chip .name { margin-top: 6px; font-size: 30px; font-weight: 700; color: var(--ink); }
+.icon { display: inline-flex; flex: none; }
+.icon svg { width: 100%; height: 100%; }
+.win {
+  position: absolute; left: 0; top: 0; background: var(--face); border: 1px solid var(--edge); border-radius: 14px;
+  corner-shape: bevel; overflow: hidden; box-shadow: 0 28px 70px rgba(23, 27, 35, 0.20), 0 4px 14px rgba(23, 27, 35, 0.08);
+}
+.win .bar {
+  height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--edge);
+  background: var(--chrome); font-size: 21px; font-weight: 600; color: var(--ink-2); white-space: nowrap;
+}
+.win .bar i { width: 10px; height: 10px; transform: rotate(45deg); background: var(--signal); display: inline-block; }
+.win .body { position: relative; overflow: hidden; }
+.win .body img { position: absolute; display: block; }
+.plate {
+  display: inline-flex; align-items: center; font-size: 30px; font-weight: 700; padding: 6px 18px; border-radius: 8px;
+  corner-shape: bevel; white-space: nowrap;
+}
+.tag {
+  position: absolute; display: inline-flex; align-items: center; gap: 12px; font-size: 34px; font-weight: 700; color: #fff;
+  background: var(--signal); padding: 10px 24px; border-radius: 10px; corner-shape: bevel; white-space: nowrap;
+}
+.station {
+  position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 14px; padding: 0 26px; height: 84px;
+  background: var(--face); border: 2px solid var(--edge); border-radius: 10px; corner-shape: bevel; white-space: nowrap;
+  font-size: 36px; font-weight: 700;
+}
