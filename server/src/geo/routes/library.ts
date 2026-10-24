@@ -9,6 +9,8 @@ import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../.
 import { folderSubtree, isDigestItem, isNoteItem, isPaperItem, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
 import type { DigestCandidatesResponse, DigestStatusBody, MakeDigestBody, MakeDigestResponse } from "../../../../web/src/geo/contracts/library.ts";
 import { createDigestRequest, digestCandidates, digestSummary, refreshDigestItems, setDigestStatus } from "../library/digests.ts";
+import { DigestImporter } from "../library/digest-import.ts";
+import { DIGEST_IMPORT_BYTES, type DigestImportBody, type DigestImportPreviewBody } from "../../../../web/src/geo/contracts/library.ts";
 import type {
   AddLibraryNoteBody,
   AddLibraryNoteResponse,
@@ -417,6 +419,11 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     });
 
     // 문헌 정리 (gaid-library-prep): make in a project, review mark, and what a Workflow start can read first.
+    const digestImporter = new DigestImporter();
+    scope.addHook("onClose", async () => digestImporter.close());
+    scope.post<{ Body: DigestImportPreviewBody }>("/geo/library/digests/import/preview", { bodyLimit: Math.ceil(DIGEST_IMPORT_BYTES / 3) * 4 + 4096 }, (req) => digestImporter.preview(storeOf(), req.body));
+    scope.post<{ Body: DigestImportBody }>("/geo/library/digests/import", { bodyLimit: 64 * 1024 }, async (req, reply) => reply.code(201).send({ item: await digestImporter.import(storeOf(), req.body) }));
+
     scope.post<{ Body: MakeDigestBody }>("/geo/library/digests/requests", { bodyLimit: 64 * 1024 }, async (req): Promise<MakeDigestResponse> => {
       const store = storeOf();
       const made = await createDigestRequest(store, req.body ?? ({} as MakeDigestBody));

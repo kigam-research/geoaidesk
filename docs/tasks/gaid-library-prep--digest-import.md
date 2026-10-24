@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T13:00:08Z
+updated: 2026-10-24T13:04:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1ef64c16-7ce7-4dc0-b515-7ddd6f5be993","pid":612268,"provider":"codex","session":"01a16dfe-ec96-7931-8a4e-8c46fe624b05","start":"73472374","token":"8c86f6aacd6d99a9587f369d850ab7400e204640366550f87dd91b9c95692e53"}
 branch: task/gaid-library-prep--digest-import
 target: task/gaid-library-prep
@@ -33,11 +33,14 @@ Rules: follow AGENTS.md (UI guide v2 sections 1, 2, 10 and D2/B1/B6/F5/R1/R2 bef
 Evidence: cd server && npm run typecheck && npx vitest run test/geo-library-digest*.test.ts test/geo-library.test.ts; cd web && npx tsc --noEmit && npx vitest run <your test>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs. One Korean screenshot of the sheet with a real converted file at 1440×900 (instrument/light; mapsheet/dark too) into ~/data/geoaidesk/work/gaid-library-prep--digest-import/ (a dev harness or the running app; do not commit harness pages). Record what you changed, the rule ids followed, string ids (ko/en) and check results in your task document, then task finish. The parent runs full scripts/check after integration.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the printed worktree. Settled contracts and approved mockup verified. Codegraph is unavailable for this unindexed worktree; native source reads used. Implementation not yet complete.
 ## Next steps
-1. (the next session's first action)
+1. Implement bounded file conversion + preview token service and minimal import routes.
+2. Implement the sheet and ko/en strings, then meaningful server/component tests.
+3. Run declared checks and capture real-conversion screenshots; finish for parent integration.
 ## Failed approaches
 ## Notes and decisions
+- Phase plan: tightly coupled implementation owned here; no additional worker. Service and routes first, then UI using the settled contract, then checks/screenshots. Parent owns library-screen mounting and full scripts/check. No existing contract change planned.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
