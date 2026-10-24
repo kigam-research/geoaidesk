@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:41:47Z
+updated: 2026-10-24T04:56:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"10d83d80-51b9-4bf0-99ff-b999647a0bce","pid":2850321,"provider":"claude","session":"d6c1897c-a3f3-4329-a5ee-9c0c3508a3e7","start":"70480721","token":"00c14d6dd6304a7e205cd4a0aa93d107e3a761b0ada434db515eb05d24ebb6cf"}
 branch: task/gaid-hub-stage-cards
 target: main
@@ -64,11 +64,29 @@ Mockups (code-built from the real tokens/components, no generated images) and th
 (branch task/gaid-uiux-skills-scan until integrated). Lesson to keep: no generated imagery; the current system is the visual authority.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented 2026-10-24 (single writer, no child units).
+- Contract `HubWorkflowStages`/`hubWorkflowStages`/`hubFormatName` (`web/src/geo/contracts/hub-shared.ts`); `HubEntry.stages`,
+  `HubRecommendation.stages` filled in `server/src/geo/hub-shared/routes.ts` (`snapshotWorkflowDoc` shared with entry detail).
+- `web/src/geo/hub/stage-plate.tsx` (`StagePlate`, `StageCount`), wired in `hub-home.tsx`, `shared-browse.tsx`, `hub-screen.tsx`;
+  strings `hub.home.stages.*`; UI guide I10 sentence; AGENTS.md GAID hub line.
+- Tests: server `geo-hub-shared.test.ts` 17 passed; web `src/geo/hub/` 59 passed; web/server tsc clean; copy + check-ui 0 errors.
+- Screens: real app on isolated home `~/data/geoaidesk/work/gaid-hub-stage-cards/home` (hub store copied from the review app),
+  16 shots + 2 row shots in `.../shots/`, axe 0 violations in all 4 combos (both states). Temp units gaid-stage-cards-{api,web}
+  stopped. Report figures in `reports/2026-10-24-gaid-hub-stage-cards/figures/`.
+- scripts/check: running as user unit gaid-stage-cards-check, log `~/data/geoaidesk/work/gaid-hub-stage-cards/check.log`.
+
 ## Next steps
-1. (the next session's first action)
+1. Read check.log result (CHECK_EXIT line), record it in the report appendix and here; then review-copy and task finish.
+
 ## Failed approaches
 ## Notes and decisions
+- I10 decision (writer, 2026-10-24): a Workflow's stage list on a hub card shows order, not a position, so it is drawn as a
+  plain numbered list (tabular ordinals, no ticks, no scale bar, no fill); the scenario mockup's graduated / scale-bar plate
+  is not used. The list-row readout is an I11 readout plate (`4` over `단계`). I10 gets one clarifying sentence; no
+  amendment for the user is needed because the rule is kept.
+- gaid-ui-audit#1 fold-in: neither item is small (authoring stage display needs the authoring flow re-laid out; 63 native
+  select boxes need a new shared part) and neither sits on the hub home cards/rows, so both stay open (no Keeps line needed:
+  this unit is not that item's follow-up).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
@@ -78,6 +96,8 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-hub-stage-cards/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

@@ -12,6 +12,7 @@
 import type { WorkflowDoc } from "./workflow-doc";
 import type { DraftProfile, MethodText } from "./authoring";
 import type { HubVersionBump } from "./hub-version";
+import type { Localized } from "./workspace";
 
 export const HUB_USER_HEADER = "X-GAID-User";
 
@@ -88,6 +89,52 @@ export interface HubEntry {
   updatedAt: string;
   /** Set only in the removed list (`GET /geo/hub/removed`): the entry is hidden from the hub until restored. */
   removed?: HubRemoval;
+  /** The latest revision's Workflow stages (gaid-hub-stage-cards); absent when it has no Workflow or older servers. */
+  stages?: HubWorkflowStages;
+}
+
+/**
+ * A Workflow's analysis stages for hub cards and rows that have no concept picture (gaid-hub-stage-cards): the stage
+ * titles of its WorkflowDoc `steps[]` in order, the input formats and the output names. Shown as an ordered list, never a
+ * scale (UI guide I10: there is no current position).
+ */
+export interface HubWorkflowStages {
+  titles: Localized[];
+  /** Input formats in input order without repeats, as display names (`CSV`, `GeoTIFF`). */
+  inputs: string[];
+  /** Output names (WorkflowDoc `artifacts[].label`) in order. */
+  outputs: Localized[];
+  /** Stages derived from an older Workflow's skill procedure (이전 형식): they may be more than five. */
+  legacy?: boolean;
+}
+
+const FORMAT_NAMES: Record<string, string> = {
+  geotiff: "GeoTIFF",
+  geojson: "GeoJSON",
+  geopackage: "GeoPackage",
+  shapefile: "Shapefile",
+  "las-welllog": "LAS",
+  netcdf: "NetCDF",
+  parquet: "Parquet",
+  markdown: "Markdown",
+};
+
+/** Display name of a taxonomy format id: known names, short ids upper-cased (`csv` → `CSV`), anything else as given. */
+export function hubFormatName(id: string): string {
+  const key = id.trim().toLowerCase();
+  return FORMAT_NAMES[key] ?? (/^[a-z0-9]{1,5}$/.test(key) ? key.toUpperCase() : id.trim());
+}
+
+/** Stage summary of a Workflow doc; null when it has no stages (nothing is invented). IO-free. */
+export function hubWorkflowStages(doc: WorkflowDoc | null | undefined): HubWorkflowStages | null {
+  if (!doc || doc.steps.length === 0) return null;
+  const inputs = [...new Set(doc.inputRoles.flatMap((role) => role.formats.map(hubFormatName)).filter(Boolean))];
+  return {
+    titles: doc.steps.map((step) => step.title),
+    inputs,
+    outputs: doc.artifacts.map((artifact) => artifact.label),
+    ...(doc.kind === "legacy" ? { legacy: true } : {}),
+  };
 }
 
 /** Who removed a registered Workflow from the hub and why (gaid-hub-versions decision 2). */
@@ -147,6 +194,8 @@ export interface HubRecommendation {
   author?: string;
   /** `shared`: hub entry id; `catalogue`: catalogue workflow id. */
   ref: string;
+  /** The Workflow's stages, drawn in place of a missing picture (gaid-hub-stage-cards). */
+  stages?: HubWorkflowStages;
 }
 
 // --- HTTP API (`/geo/hub`, not project-scoped). With a hub server the researcher's own GAID answers these routes for
