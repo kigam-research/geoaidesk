@@ -1,0 +1,18 @@
+{
+  "open.action": "노트북 열기",
+  "add.action": "노트북 링크 저장",
+  "edit.action": "링크 바꾸기",
+  "folder.title": "폴더의 Gemini Notebook 링크",
+  "project.title": "프로젝트의 Gemini Notebook 링크",
+  "url.label": "노트북 주소 (https://)",
+  "openOnly": "GAID는 페이지만 열며 자료를 보내지 않습니다.",
+  "invalid": "노트북 주소를 확인하세요. https://로 시작하고 로그인 정보가 없는 주소를 입력하세요.",
+  "saveFailed": "링크를 저장하지 못했습니다. 주소와 연결을 확인한 뒤 다시 저장하세요.",
+  "save.action": "링크 저장",
+  "remove.action": "링크 삭제",
+  "cancel.action": "취소",
+  "saving": "링크 저장 중",
+  "loadFailed": "저장한 노트북 링크를 읽지 못했습니다.",
+  "retry.action": "링크 다시 읽기",
+  "loading": "노트북 링크 읽는 중"
+}
