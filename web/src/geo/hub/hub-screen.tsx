@@ -331,6 +331,7 @@ function HubList({
           source: c.source,
           stars: c.stars,
           author: c.author,
+          stages: c.stages,
         }))}
         folders={[
           { id: "all", name: text("home.allFolders"), count: mine.length },

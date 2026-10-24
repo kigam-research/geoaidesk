@@ -112,6 +112,14 @@
       "revision": "version",
       "stars": "star",
       "updated": "수정"
+    },
+    "stages": {
+      "label": "분석 단계 {count}개: {list}",
+      "more": "외 {count}단계",
+      "moreItems": "외 {count}",
+      "firstAndMore": "{first} 외 {count}",
+      "flow": "{from} → {to}",
+      "unit": "단계"
     }
   },
   "stage": {

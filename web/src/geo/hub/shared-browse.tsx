@@ -11,6 +11,7 @@ import { withApiToken } from "@/lib/api-auth";
 import { API_BASE } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { ConceptPicture } from "./concept-picture";
+import { StageCount, stagesLabel } from "./stage-plate";
 import { OrcidId } from "@/geo/orcid/id-display";
 import { sharedHub } from "./shared-api";
 import { TechnicalDetail } from "./technical";
@@ -152,6 +153,8 @@ export function SharedBrowse({
                         className="size-11 rounded-md border-gaid-edge"
                         imageClassName="h-full"
                       />
+                    ) : entry.stages ? (
+                      <StageCount stages={entry.stages} />
                     ) : (
                       <span className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-gaid-edge bg-gaid-face-2 text-gaid-ink-2">
                         <Grid3x3Icon className="size-5" aria-hidden />
@@ -161,6 +164,7 @@ export function SharedBrowse({
                     <span className="pointer-events-none relative flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold" title={entry.title}>{entry.title}</span>
                       <span className="truncate text-sm text-gaid-ink-2" title={entry.tagline || entry.summary}>{entry.tagline || entry.summary}</span>
+                      {!cover && entry.stages && <span className="sr-only">{stagesLabel(entry.stages)}</span>}
                     </span>
                     <span className="pointer-events-none relative truncate text-sm text-gaid-ink-2" title={folderName(entry.folderId)}>{folderName(entry.folderId)}</span>
                     <span className="pointer-events-none relative flex min-w-0 items-center gap-1 text-sm text-gaid-ink-2">
