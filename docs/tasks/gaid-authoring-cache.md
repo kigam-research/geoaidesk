@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T13:15:15Z
+status: done
+updated: 2026-10-24T13:15:33Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4c7a414c-4971-467e-bd4e-be3a24b50c1e","pid":908712,"provider":"claude","session":"a59c5297-7707-4492-9e14-c91549b87e67","start":"72988241","token":"01b6763312835def33e04b6cef6092bb6449bf54aa80b7e7776c7a4cc604157f"}
 branch: task/gaid-authoring-cache
 target: main
@@ -120,7 +120,9 @@ Details:
   younger than CODEX_WARM_TTL_MS (10 min placeholder until delay600/1200 probes end). Ledgered, in attempt.calls with
   purpose "prewarm". Test added (geo-authoring-cache.test.ts, 8 tests).
 ## Next steps
-1. task finish (checks passed: see report appendix A "검사"; logs ~/data/geoaidesk/work/gaid-authoring-cache/check/).
+<!-- task:closed -->
+Closed 2026-10-24T13:15:33Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - H1 "an implicit entry is reusable only by a request that contains the whole earlier input" — refuted by probes (above).
 - Explicit prompt_cache_breakpoint on the legacy Codex backend — refused by the backend.
