@@ -48,6 +48,11 @@ default (Settings → Defaults). Thinking level from the request (`low|medium|hi
 `GAID_AUTHORING_TIMEOUT_MS` (15 min), `GAID_AUTHORING_MAX_TOKENS` (32,000). Every response is ledgered in the `default`
 project under session `gaid-hub-authoring` before validation; its spend cap applies (402). A repair turn is folded into one
 user message, so no provider-specific assistant message is rebuilt. Replies are JSON by prompt and server validation only.
+Prompt cost (gaid-authoring-tokens, report `reports/2026-10-24-gaid-authoring-tokens/`): every call of a project has the
+same system prompt (`AUTHORING_SYSTEM`) and starts its user message with the sources, the operation's task text after
+them, and passes the authoring project id as Pi `sessionId` (prompt-cache key), so analyze, draft, revise and repair share a
+cacheable prefix. A draft repair after a usable reply and every revise return only the top-level fields they change; the
+server lays them over the previous reply / current draft before validation (analysis repairs and first drafts stay whole).
 
 ## Checks and inputs
 

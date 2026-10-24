@@ -22,6 +22,11 @@ export interface ModelConfig {
   thinkingLevel: AuthoringThinking;
   timeoutMs: number;
   maxTokens: number;
+  /**
+   * Stable prompt-cache key (the authoring project id): providers that cache by session (ChatGPT Codex backend, OpenAI,
+   * OpenRouter affinity) reuse the shared prefix of one project's calls (instructions and sources).
+   */
+  cacheKey?: string;
 }
 
 export function modelConfig(ref?: string, thinkingLevel?: string): ModelConfig {
@@ -42,7 +47,7 @@ export interface ChatMessage {
 export interface ChatResult {
   content: string;
   finishReason?: string;
-  usage?: { input?: number; output?: number; costUsd?: number };
+  usage?: { input?: number; output?: number; cacheRead?: number; costUsd?: number };
 }
 
 export type ChatFn = (messages: ChatMessage[], config: ModelConfig) => Promise<ChatResult>;
@@ -113,6 +118,7 @@ export function runtimeChat(complete?: Complete): ChatFn {
         maxTokens: config.maxTokens,
         reasoning: config.thinkingLevel as ThinkingLevel,
         signal: controller.signal,
+        ...(config.cacheKey ? { sessionId: config.cacheKey } : {}),
       });
     } finally {
       clearTimeout(timer);
@@ -146,7 +152,12 @@ export function runtimeChat(complete?: Complete): ChatFn {
     return {
       content,
       finishReason: message.stopReason === "length" ? "length" : message.stopReason,
-      usage: { input: usage.input, output: usage.output, costUsd: entry?.costUsd ?? usage.cost.total },
+      usage: {
+        input: usage.input,
+        output: usage.output,
+        cacheRead: usage.cacheRead,
+        costUsd: entry?.costUsd ?? usage.cost.total,
+      },
     };
   };
 }
