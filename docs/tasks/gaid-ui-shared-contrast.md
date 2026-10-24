@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:19:28Z
+updated: 2026-10-24T04:28:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"de68e451-97f8-4d7d-b9dd-6dd12ceee4d8","pid":2621511,"provider":"claude","session":"f940d4c6-cc49-4d80-8904-a915a4b5d7ac","start":"70284572","token":"0fe8e40f1ea359a56f63a8022e870ac31a328d0a3a949ee5845ab1c5ed4fdbf6"}
 branch: task/gaid-ui-shared-contrast
 target: main
@@ -48,9 +48,11 @@ starts scenario A. Outside check: none.
 - Kit (PC74, ~/data/geoaidesk/work/gaid-ui-shared-contrast/): before shadcn 248 / impeccable 7 / visual 0 / axe 11;
   after (after2, baselines updated) 248 / 0 / 0 / 0. 1280x800 four combos: no horizontal overflow (shots/).
 - Report: reports/2026-10-24-gaid-ui-shared-contrast/index.md (figures from old vs new baselines).
+- scripts/check passed on PC74 (exit 0; backend 2322 pass/8 skip, frontend 1326, distribution 58/59 + 1 skip, kit 248/0/0/0);
+  log ~/data/geoaidesk/work/gaid-ui-shared-contrast/check.log.
 - Re-verify: `node geo/ui/quality/run.mjs --out <dir>` (after `npm ci` in geo/ui/quality and web), `scripts/check`.
 ## Next steps
-1. Fill the scripts/check result into report section 4, humanizer pass, task review-copy, remove build caches, finish.
+1. task finish (report done, humanizer pass done, review copy made).
 ## Failed approaches
 - Raising 도폭 dark `--gaid-ink-3` to fix the placeholder: would need ~ink-2 brightness, erasing the ink-2/ink-3 split.
 ## Notes and decisions
