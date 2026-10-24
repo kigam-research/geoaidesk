@@ -246,9 +246,9 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
           <p className="py-8 text-sm text-muted-foreground">{L("screen.error")}</p>
         ) : !data ? (
           <p className="py-8 text-sm text-muted-foreground">{L("screen.loading")}</p>
-        ) : folder && data.total === 0 && !query.trim() && filter === "all" ? (
+        ) : !digests && folder && data.total === 0 && !query.trim() && filter === "all" ? (
           <p className="py-8 text-sm text-muted-foreground">{L("folders.emptyFolder")}</p>
-        ) : digests && data.counts.digests === 0 ? (
+        ) : digests && (folder ? data.total === 0 && !query.trim() : data.counts.digests === 0) ? (
           <div className="flex flex-col items-start gap-3 py-8">
             <p className="text-sm text-muted-foreground">{t("digest.empty")}</p>
             <Button variant="outline" onClick={() => setMaking({ folderId })}><NotebookTextIcon data-icon="inline-start" />{t("digest.make.button")}</Button>
@@ -327,7 +327,7 @@ export function LibraryScreen({ onOpenProject, initialItemId = null }: LibrarySc
       <aside className={cn("w-[340px] shrink-0 flex-col gap-3", paneOpen ? "hidden" : "flex")}>
         {selected ? (
           <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} focusPdf={refocusPdf === selected} onPdfFocused={() => setRefocusPdf(null)} onOpenPdf={(title) => setPdf({ id: selected, title })} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onOpenNote={openNote} onSelect={setSelected} onChanged={load} onRemake={(id) => setMaking({ folderId: id })} />
-        ) : folder ? (
+        ) : folder && !digests ? (
           <FolderPanel folder={folder} collections={collections} count={data?.folderCounts[folder.id] ?? 0} zoteroConnected={zoteroConnected}
             onSelectItem={setSelected} onCreateSub={() => setNaming({ mode: "create", parentId: folder.id })} onRename={() => setNaming({ mode: "rename" })}
             onDeleted={() => { setFolderId(null); void load(); }} onChanged={load} />

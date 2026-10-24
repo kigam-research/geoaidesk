@@ -188,13 +188,15 @@ export async function createDigestRequest(store: LibraryStore, body: MakeDigestB
   if (!papers.length) throw new LibraryError("Choose at least one paper");
   if (papers.length > DIGEST_LIMITS.papers) throw new LibraryError(`At most ${DIGEST_LIMITS.papers} papers per digest`, 413);
   const folderName = body.collectionId ? collections.find((c) => c.id === body.collectionId)?.name : undefined;
-  const title = ((typeof body.title === "string" && body.title.trim()) || `${folderName ?? papers[0].csl.title} 문헌 정리`).slice(0, DIGEST_LIMITS.title);
+  const base = (folderName ?? papers[0].csl.title).trim();
+  // "광상 탐사 문헌" → "광상 탐사 문헌 정리", not "… 문헌 문헌 정리".
+  const title = ((typeof body.title === "string" && body.title.trim()) || (/문헌$/.test(base) ? `${base} 정리` : `${base} 문헌 정리`)).slice(0, DIGEST_LIMITS.title);
   const paths = resolvePaths(meta.id);
   const requests = readDigestRequests(paths);
-  const base = digestFolderId(title);
+  const folderBase = digestFolderId(title);
   const taken = new Set([...requests.map((r) => r.digestId.normalize("NFC")), ...existingDigestFolders(paths)]);
-  let digestId = base;
-  for (let n = 2; taken.has(digestId.normalize("NFC")); n++) digestId = `${base}-${n}`;
+  let digestId = folderBase;
+  for (let n = 2; taken.has(digestId.normalize("NFC")); n++) digestId = `${folderBase}-${n}`;
   const request: DigestRequest = {
     id: `dr-${randomUUID().replace(/-/g, "").slice(0, 12)}`,
     digestId,

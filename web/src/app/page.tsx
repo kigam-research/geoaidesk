@@ -18,7 +18,7 @@ import { useProjects } from "@/lib/use-projects";
 import { useUpdateCheck } from "@/lib/version";
 import { useSkills } from "@/lib/use-skills";
 import { flattenFiles, flattenFolders, useSandbox } from "@/lib/use-sandbox";
-import { ProjectScopeProvider } from "@/lib/projects";
+import { ProjectScopeProvider, setActiveProjectId } from "@/lib/projects";
 import {
   hasProjectActivity,
   sameProjectActivity,
@@ -254,6 +254,9 @@ export default function HomePage() {
   }, []);
 
   const openProject = useCallback((projectId: string) => {
+    // Callers outside the project list (서재, Connect) open a specific project, so it becomes the active one here
+    // (gaid-library-prep; the project list already did this before calling).
+    setActiveProjectId(projectId);
     rememberProject(projectId);
     setScreen("workspace");
   }, [rememberProject]);
@@ -347,6 +350,9 @@ export default function HomePage() {
             }
           }}
           onOpenProject={(projectId) => {
+            // gaid-library-prep: opening a project from 서재 (a note, a 문헌 정리 request) leaves 서재 for that workspace.
+            closeLibrary();
+            window.history.replaceState(null, "", window.location.pathname + window.location.search);
             setHub({ open: false, projectId: null });
             openProject(projectId);
           }}
