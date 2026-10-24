@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T07:34:23Z
+status: ready
+updated: 2026-10-24T07:34:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88242334-24a3-4030-852c-b9e9ffb2a8dd","pid":1391055,"provider":"codex","session":"01a16c9e-0b00-7740-8c11-82980cf46d08","start":"71159800","token":"6c5b08a03458b5c901586e5be96b4af834d24c257068e81294c29e8e68ac58eb"}
 branch: task/gaid-ia-connect-workspace--home-summary
 target: task/gaid-ia-connect-workspace
@@ -37,7 +37,7 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 - Dependencies job exited 0 (receipt below). Implementation is ready for parent integration; no deployment was performed.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T07:21:40Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T07:34:24Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 - Automatic full check at `706c4131`: the default frontend concurrency timed out `src/geo/viewers/map/viewer.test.tsx:38` while several project check suites ran on the host. The test passes unchanged with one worker. First log: `~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-so06ssza.log`; output: `~/data/geoaidesk/work/checks/706c4131dbf1-20261024T064742.450078Z`.
