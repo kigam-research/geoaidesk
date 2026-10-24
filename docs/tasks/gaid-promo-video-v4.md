@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T01:06:57Z
+status: done
+updated: 2026-10-24T01:07:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9041d1a3-7e91-4078-bcd9-c922396931bf","pid":756157,"provider":"claude","session":"3069c8ee-f8d2-4558-9415-78ea443ef91b","start":"69075424","token":"20327401a56788b2a02c2d0c9f6ab09686a1e58eb736400cc9099e9218ac6d15"}
 branch: task/gaid-promo-video-v4
 target: main
@@ -117,7 +117,9 @@ Decisions: all film work is tightly coupled in `geo/promo/scene/scene.js`; the w
   `review` like v2, the registry has no superseded state).
 - Review app not used; no recapture.
 ## Next steps
-1. task review-copy of the report, then task finish; the hub verifies and offers the private Drive upload.
+<!-- task:closed -->
+Closed 2026-10-24T01:07:54Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
