@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-24T00:51:48Z
-writer: {"host":"seongin3","reserved":"c7338ccd182951a8d9472e383f1059d02101897697f5d7b0d3f61a8479e1dd49"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"69425b78-d16e-474b-81c8-6378bfc1d28d","pid":780318,"provider":"claude","session":"254af796-1400-4a2e-aa38-aeb0c37c99eb","start":"69105472","token":"c7338ccd182951a8d9472e383f1059d02101897697f5d7b0d3f61a8479e1dd49"}
 branch: task/gaid-notebooklm-review
 target: main
 parent: 
