@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:14:36Z
+updated: 2026-10-24T06:33:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
@@ -68,25 +68,39 @@ Outside check: none.
 ## Next steps
 1. Wait for the user's answers to the four decisions (report §6). On approval, plan phase 2 packages (Orchestration below),
    apply the ADR (status accepted), terminology, AGENTS.md and UI guide; then implement.
-Blocked: waiting for the user's answers to the four decisions in report §6 (asked 2026-10-24).
 ## Orchestration
 - Sequential: (1) place names, app-bar structure and 서재 entry (decided by the user, drawn here); (2) user approval of the
   mockups; (3) phase 2 implementation.
 - Phase 1 is one tightly coupled design package: done by this writer. Read-only inventory of naming collisions by a native
   Explore sub-agent.
-- Phase 2 packages (decide after approval): app bar + routes (`top-nav.tsx`, `app-bar.tsx`, `page.tsx`, hash aliases);
-  Workspace home (`project-view.tsx`); 서재 relocation (`research-tabs.tsx`, `library-screen.tsx`, side panels); copy + docs
-  (locales, terminology.csv, AGENTS.md, UI guide, ADR).
+- Phase 2 (approved 2026-10-24), shared interfaces settled first: `web/src/geo/contracts/workspace-home.ts`
+  (`GET /geo/workspace/home`), `web/src/geo/places/navigation.ts` (`openLibrary()` → `gaid:open-library` event).
+  Packages and owned files:
+  - P1 shell (this writer): `geo/hub/top-nav.tsx`, `geo/shell/app-bar.tsx`, `app/page.tsx` (HomePage + WorkspacePage app
+    bar only), `geo/hub/location.ts` (`#connect…` + `#hub…` alias, `#library`), `components/project-view.tsx` (no
+    ResearchTabs, Workspace home), `geo/library/research-tabs.tsx`, new `geo/places/*`, locale namespace `places`.
+  - Child `gaid-ia-connect-workspace--home-summary` (general work): server `GET /geo/workspace/home` per the contract;
+    new server files only (+ route registration), tests.
+  - Child `gaid-ia-connect-workspace--library-panels` (general work): 서재 as the third view of the workspace right pane
+    (`chat | workflows | library`; ChatTabsBar button, new `geo/library/project-library-panel.tsx`; page.tsx right-pane
+    hunk only) and the Connect authoring source picker as a side panel (`geo/hub/library-picker.tsx`, `hub-screen.tsx`
+    picker hunk); its strings in namespace `library`.
+  - Child `gaid-ia-connect-workspace--copy-rename` (general work): visible copy renames (report §3.6, decisions 3 and 4)
+    in existing locale namespaces except `places`/`devPlaces`, tests that assert them, terminology.csv, docs/glossary.md,
+    AGENTS.md, docs/design/ui-guide.md, ADR status accepted + note in ADR 2026-10-21 research-hub-library,
+    docs/design/hub-authoring-service.md; copy change list (ids, ko/en before/after) for the report.
+  - Integration order: home-summary → library-panels → copy-rename into this branch (`task complete` each), then P1
+    finishing touches, scripts/check, screenshots, report phase-2 section.
 ## Failed approaches
 ## Notes and decisions
+- User answer 2026-10-24 to report §6 (verbatim): "모두 권장대로 하자." → 1 가) mockups approved, phase 2 proceeds;
+  2 가) app bar shows `Workspace` / `Connect`, homes are titled `GAID Workspace` / `GAID Connect`; 3 가) the institute hub
+  server is "기관 Connect 서버" in visible copy; 4 가) "등록" becomes "공유" (공유된 Workflow, Connect에 공유, 공유됨; version
+  wording unchanged).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-- [결정] 시안 구조를 승인합니까 — 가) 그대로 2단계(실제 화면 적용) 진행 — 나) 고칠 화면과 내용을 지정해 시안 수정 — 권장: 가) 피드백의 세 가지(두 장소 역할, 서재 개인화, 시스템 핵심 노출)를 모두 반영 — 막힌 일: 2단계 구현 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ia-connect-workspace#6
-- [결정] 앱 바 장소 이름 표기 — 가) 앱 바는 Workspace·Connect, 홈 제목은 GAID Workspace·GAID Connect — 나) 앱 바에도 전체 이름 — 권장: 가) 바로 왼쪽 GAID 표지와 겹치지 않음 — 막힌 일: 앱 바 구현 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ia-connect-workspace#6
-- [결정] 기관 서버 이름 — 가) 기관 Connect 서버 — 나) 기관 GAID 허브 유지 — 권장: 가) 화면에서 허브라는 말이 사라지고 역할이 이름에 드러남 — 막힌 일: 설정·자료 소식·ORCID 문구 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ia-connect-workspace#6
-- [결정] Workflow를 올리는 동작 이름 — 가) 등록을 공유로(공유된 Workflow, Connect에 공유, 공유됨) — 나) 등록 유지(Connect에 등록) — 권장: 가) 피드백이 Connect를 생성하고 공유하는 공간으로 정의 — 막힌 일: Connect 문구 변경 — 조건: version 표기는 그대로 — 근거: reports/2026-10-24-gaid-ia-connect-workspace#6
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
