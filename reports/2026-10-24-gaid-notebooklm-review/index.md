@@ -4,7 +4,7 @@ date: 2026-10-24
 project: geoaidesk
 task: gaid-notebooklm-review
 headline: Gemini Notebook은 문헌 이해와 설명 자료 만들기에서 GAID보다 앞서고, 이제 코드도 실행합니다. GAID가 앞서는 곳은 기관 안에서 지구과학 자료를 다루고, 방법을 Workflow로 공유하며, 분석 기록을 남기는 일입니다. 우선 인용을 눌러 PDF 쪽을 여는 기능과 노트 결과 묶음을 만들고, 연계는 링크 저장과 공개 자료 내보내기부터 하기를 권합니다.
-review_status: pending
+review_status: adopted
 decisions: 2
 cover:
 supersedes:
