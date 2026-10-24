@@ -28,6 +28,8 @@ export interface CostSnapshot {
   input: number;
   output: number;
   cacheRead: number;
+  /** Prompt-cache write tokens (GAID authoring rows; absent elsewhere). */
+  cacheWrite?: number;
   total: number;
 }
 
@@ -42,6 +44,7 @@ export function snapshotDelta(before: CostSnapshot, after: CostSnapshot): CostSn
     input: Math.max(0, after.input - before.input),
     output: Math.max(0, after.output - before.output),
     cacheRead: Math.max(0, after.cacheRead - before.cacheRead),
+    ...(after.cacheWrite !== undefined ? { cacheWrite: Math.max(0, after.cacheWrite - (before.cacheWrite ?? 0)) } : {}),
     total: Math.max(0, after.total - before.total),
   };
 }
@@ -96,6 +99,8 @@ export interface CostEntry {
   completionTokens: number;
   totalTokens: number;
   cachedTokens: number;
+  /** Prompt-cache write tokens, when the row's producer records them (GAID authoring). */
+  cacheWriteTokens?: number;
   /** Billable/estimated USD counted against the project spend cap. */
   costUsd: number;
   provider?: string;
@@ -191,6 +196,7 @@ export function recordRun(args: {
     completionTokens: delta.output,
     totalTokens: delta.total,
     cachedTokens: delta.cacheRead,
+    ...(delta.cacheWrite ? { cacheWriteTokens: delta.cacheWrite } : {}),
   };
   // Nothing happened (no tokens, no cost) → skip the row.
   if (d.totalTokens === 0 && d.costUsd === 0) return null;

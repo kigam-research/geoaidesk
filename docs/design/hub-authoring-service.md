@@ -46,13 +46,36 @@ uploaded `gaid-analysis-*.tar.gz` is recognised as the same kind. The download a
 GAID's own model runtime (`ModelRuntime.completeSimple`): the project's model, else the request's `model`, else the app
 default (Settings → Defaults). Thinking level from the request (`low|medium|high|xhigh`, default medium), timeout
 `GAID_AUTHORING_TIMEOUT_MS` (15 min), `GAID_AUTHORING_MAX_TOKENS` (32,000). Every response is ledgered in the `default`
-project under session `gaid-hub-authoring` before validation; its spend cap applies (402). A repair turn is folded into one
-user message, so no provider-specific assistant message is rebuilt. Replies are JSON by prompt and server validation only.
+project under session `gaid-hub-authoring` before validation (with `cachedTokens` and `cacheWriteTokens`); its spend cap
+applies (402). Replies are JSON by prompt and server validation only.
 Prompt cost (gaid-authoring-tokens, report `reports/2026-10-24-gaid-authoring-tokens/`): every call of a project has the
 same system prompt (`AUTHORING_SYSTEM`) and starts its user message with the sources, the operation's task text after
 them, and passes the authoring project id as Pi `sessionId` (prompt-cache key), so analyze, draft, revise and repair share a
 cacheable prefix. A draft repair after a usable reply and every revise return only the top-level fields they change; the
 server lays them over the previous reply / current draft before validation (analysis repairs and first drafts stay whole).
+
+### Prompt cache
+
+gaid-authoring-cache (report `reports/2026-10-24-gaid-authoring-cache/`). The sources are their own text block, the first
+of the user message (`ChatMessage.cacheBoundary`); the task follows as a second block. `server/src/geo/authoring/cache.ts`
+picks a path from the model's API and the credential Pi resolved, marks the boundary in Pi's final payload (`onPayload`)
+and sets Pi's `cacheRetention`:
+
+| Path | Boundary | Retention | Why |
+|---|---|---|---|
+| OpenAI API key, GPT-5.6+ (`supportsExplicitPromptCacheMode`) | `prompt_cache_breakpoint` on the sources block | default 30m | 12h writes cost 2× input; Pi's `long` only re-sends 30m |
+| OpenAI API key, older models | implicit | `long` → `prompt_cache_retention: 24h` | no write premium |
+| Sign in with ChatGPT (`openai` OAuth) | implicit | — | Pi omits every cache option as unsupported; breakpoints not verified (login stale on PC74) |
+| OpenAI Codex (legacy) | implicit | — | backend refuses `prompt_cache_breakpoint` ("not supported on this model"); its implicit cache reuses the shared leading prefix (probe) |
+| Anthropic (key or OAuth) | `cache_control` on the sources block (with Pi's system and last-block markers ≤ 4) | 5m; 1h for system + sources when the gap since the project's previous call exceeded 5 min (the tail stays 5m) | 1h writes cost 2× vs 1.25×; reads refresh the entry |
+| Others (OpenRouter, vLLM, MiniMax, Ollama …) | implicit | provider default | automatic prefix caching needs a stable prefix only |
+
+Repairs send the earlier reply as the provider's own assistant message on the legacy Codex path (`historyFor`; the
+WebSocket continuation then sends only the correction) and fold it after the task elsewhere; `GAID_AUTHORING_HISTORY=fold|
+native` overrides for measurements. Each call's record (attempt file `calls[]`, summary in `AuthoringAttempt.calls`) keeps
+provider/model/API, credential type, the cache plan, the payload's block sizes and markers, a hash of instructions +
+sources (`prefixSha`; equal hashes mean an identical cacheable prefix), raw and normalised usage (Pi's `input` excludes
+cache reads and writes), response/request ids, response/first-event/end times and, on Codex, WebSocket reuse and delta.
 
 ## Checks and inputs
 
