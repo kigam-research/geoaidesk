@@ -4,7 +4,7 @@ uv run --no-project --with imageio-ffmpeg==0.6.0 python geo/promo-lemo/master.py
   --mix <dir>/mix.wav --out <dir>/gaid-promo-lemo.mp4
 
 Port of lemo-opuscar core/render/mux.sh with imageio-ffmpeg's bundled ffmpeg (this PC has no system ffmpeg/ffprobe):
-two-pass loudnorm to -14 LUFS / true peak -1.2 dB, then a -3 dBFS limiter as headroom for AAC overshoot,
+two-pass loudnorm to -14 LUFS (true-peak target stepped down until the encoded file measures <= -1 dBTP),
 AAC 256 kb/s 48 kHz stereo, the H.264 picture copied unchanged (grain 0: vector style). Prints and writes the measured loudness of the finished file (ebur128) and a blackdetect scan.
 """
 
@@ -44,30 +44,38 @@ def main():
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     if args.out.exists():
         raise FileExistsError(args.out)
-    log = run([ff, "-hide_banner", "-nostats", "-i", str(args.mix), "-af", "loudnorm=I=-14:TP=-1.2:LRA=11:print_format=json", "-f", "null", "-"])
-    m = json.loads(log[log.rindex("{"): log.rindex("}") + 1])
-    if any(v in ("-inf", "inf", "nan") for v in (m["input_i"], m["input_tp"])):
-        raise ValueError(f"Mix is silent or unreadable: {m}")
-    ln = (f"loudnorm=I=-14:TP=-1.2:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
-          f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+    # The AAC encoder overshoots by a varying amount, and a limiter before it made that worse (measured 2026-10-24),
+    # so the true-peak target of the linear loudnorm steps down until the encoded file itself measures <= -1 dBTP.
     tmp = args.out.with_suffix(".tmp.mp4")
-    run([ff, "-y", "-loglevel", "error", "-i", str(args.picture), "-i", str(args.mix),
-         "-filter_complex", f"[1:a]{ln},aresample=48000,alimiter=limit=0.708:attack=2:release=60:level=disabled[a]", "-map", "0:v", "-map", "[a]",
-         "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-ac", "2", "-movflags", "+faststart", "-shortest", str(tmp)])
+    attempts = []
+    for tp_target in (-1.5, -2.0, -2.5, -3.0, -3.5, -4.0):
+        log = run([ff, "-hide_banner", "-nostats", "-i", str(args.mix), "-af",
+                   f"loudnorm=I=-14:TP={tp_target}:LRA=11:print_format=json", "-f", "null", "-"])
+        m = json.loads(log[log.rindex("{"): log.rindex("}") + 1])
+        if any(v in ("-inf", "inf", "nan") for v in (m["input_i"], m["input_tp"])):
+            raise ValueError(f"Mix is silent or unreadable: {m}")
+        ln = (f"loudnorm=I=-14:TP={tp_target}:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
+              f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+        run([ff, "-y", "-loglevel", "error", "-i", str(args.picture), "-i", str(args.mix),
+             "-filter_complex", f"[1:a]{ln},aresample=48000[a]", "-map", "0:v", "-map", "[a]",
+             "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-ac", "2", "-movflags", "+faststart", "-shortest", str(tmp)])
+        eb = run([ff, "-hide_banner", "-nostats", "-i", str(tmp), "-af", "ebur128=peak=true", "-f", "null", "-"])
+        summary = eb[eb.rfind("Summary:"):]
+        loud = {
+            "integrated_lufs": float(re.search(r"I:\s+(-?[\d.]+) LUFS", summary).group(1)),
+            "lra_lu": float(re.search(r"LRA:\s+(-?[\d.]+) LU", summary).group(1)),
+            "true_peak_dbfs": float(re.search(r"Peak:\s+(-?[\d.]+) dBFS", summary).group(1)),
+        }
+        attempts.append({"tp_target": tp_target, **loud})
+        if loud["true_peak_dbfs"] <= -1.0 and -15 <= loud["integrated_lufs"] <= -13:
+            break
     tmp.rename(args.out)
-    eb = run([ff, "-hide_banner", "-nostats", "-i", str(args.out), "-af", "ebur128=peak=true", "-f", "null", "-"])
-    summary = eb[eb.rfind("Summary:"):]
-    loud = {
-        "integrated_lufs": float(re.search(r"I:\s+(-?[\d.]+) LUFS", summary).group(1)),
-        "lra_lu": float(re.search(r"LRA:\s+(-?[\d.]+) LU", summary).group(1)),
-        "true_peak_dbfs": float(re.search(r"Peak:\s+(-?[\d.]+) dBFS", summary).group(1)),
-    }
     bd = run([ff, "-hide_banner", "-nostats", "-i", str(args.out), "-vf", "blackdetect=d=0.1:pix_th=0.02", "-an", "-f", "null", "-"])
     black = re.findall(r"black_start:([\d.]+) black_end:([\d.]+)", bd)
     count, seconds = imageio_ffmpeg.count_frames_and_secs(str(args.out))
     report = {
         "film": args.out.name, "sha256": digest(args.out), "bytes": args.out.stat().st_size,
-        "frames": count, "seconds": seconds, "loudness": loud, "first_pass": m, "black_segments": black,
+        "frames": count, "seconds": seconds, "loudness": loud, "attempts": attempts, "first_pass": m, "black_segments": black,
         "picture_sha256": digest(args.picture), "mix_sha256": digest(args.mix),
     }
     (args.out.parent / "master.json").write_text(json.dumps(report, indent=2) + "\n")
