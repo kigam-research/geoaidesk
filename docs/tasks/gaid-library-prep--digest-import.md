@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T13:07:38Z
+updated: 2026-10-24T13:11:44Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"1ef64c16-7ce7-4dc0-b515-7ddd6f5be993","pid":612268,"provider":"codex","session":"01a16dfe-ec96-7931-8a4e-8c46fe624b05","start":"73472374","token":"8c86f6aacd6d99a9587f369d850ab7400e204640366550f87dd91b9c95692e53"}
 branch: task/gaid-library-prep--digest-import
 target: task/gaid-library-prep
@@ -33,7 +33,7 @@ Rules: follow AGENTS.md (UI guide v2 sections 1, 2, 10 and D2/B1/B6/F5/R1/R2 bef
 Evidence: cd server && npm run typecheck && npx vitest run test/geo-library-digest*.test.ts test/geo-library.test.ts; cd web && npx tsc --noEmit && npx vitest run <your test>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs. One Korean screenshot of the sheet with a real converted file at 1440×900 (instrument/light; mapsheet/dark too) into ~/data/geoaidesk/work/gaid-library-prep--digest-import/ (a dev harness or the running app; do not commit harness pages). Record what you changed, the rule ids followed, string ids (ko/en) and check results in your task document, then task finish. The parent runs full scripts/check after integration.
 
 ## Current state
-Resumed in the printed worktree. Settled contracts and approved mockup verified. Codegraph is unavailable for this unindexed worktree; native source reads used. Implementation not yet complete.
+Resumed in the printed worktree. Settled contracts and approved mockup verified. Codegraph is unavailable for this unindexed worktree; native source reads used. Implementation and declared targeted checks pass: server typecheck; web tsc; server digest/library tests 16/16; import sheet tests 3/3; copy validator 0 errors (101 existing warnings); UI static check 0 errors. Real-file visual QA remains. Dependencies installed by recorded job (exit 0), reused locally with unchanged lockfiles.
 ## Next steps
 1. Implement bounded file conversion + preview token service and minimal import routes.
 2. Implement the sheet and ko/en strings, then meaningful server/component tests.
@@ -55,6 +55,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-library-prep--digest-import-20261024T130820.073353Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

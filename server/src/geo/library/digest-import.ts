@@ -154,7 +154,7 @@ export class DigestImporter {
       if (!text.trim()) return fail("읽을 수 있는 텍스트가 없습니다. 스캔 PDF라면 문자를 인식한 파일이나 텍스트로 다시 가져오세요.");
       if (Buffer.byteLength(text) > DIGEST_IMPORT_LIMITS.textBytes) return fail("가져올 본문이 너무 큽니다. 문서를 나누어 가져오세요.", 413);
       const outline = digestOutline(text), token = randomUUID();
-      const preview: DigestImportPreview = { token, fileName: body.fileName, mediaType: media[extension], size: bytes.length, title: outline.title ?? path.basename(body.fileName, path.extname(body.fileName)).slice(0, 120), headings: outline.headings, excerpt: text.slice(0, 600), ...matchesFor(text, await store.all()) };
+      const preview: DigestImportPreview = { token, fileName: body.fileName, mediaType: media[extension], size: bytes.length, title: outline.title ?? /^#{1,6}\s+(.+?)\s*#*\s*$/m.exec(text)?.[1]?.trim().slice(0, 120) ?? path.basename(body.fileName, path.extname(body.fileName)).slice(0, 120), headings: outline.headings, excerpt: text.slice(0, 600), ...matchesFor(text, await store.all()) };
       const timer = setTimeout(() => { if (!this.pending.get(token)?.importing) this.pending.delete(token); }, DIGEST_IMPORT_LIMITS.ttlMs);
       timer.unref();
       this.pending.set(token, { preview, text, bytes, root: store.root, expires: Date.now() + DIGEST_IMPORT_LIMITS.ttlMs, timer });
