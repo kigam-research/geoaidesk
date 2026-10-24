@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:44:27Z
+updated: 2026-10-24T06:45:29Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c0846cc2-2d3c-4451-a536-928158b01728","pid":1419314,"provider":"codex","session":"01a16c9f-037c-7000-9c73-3a2648766336","start":"71166182","token":"eb92e9d2636de378ea79a8a04d9e6f61f7cc7146a51b50e547fadd07a2f678b8"}
 branch: task/gaid-ia-connect-workspace--copy-rename
 target: task/gaid-ia-connect-workspace
@@ -31,6 +31,7 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 ## Current state
 - Implemented 147 locale-id changes and 8 researcher-visible server copy entries. Complete Korean/English before → after inventory: `/home/seongin3/data/geoaidesk/work/gaid-ia-connect-workspace--copy-rename/copy-changes.md` (155 total entries). Current terminology/docs and the accepted ADR are updated; user quotes and historical ADR content are preserved.
 - Copy validator: 38 catalogues, 0 errors, 101 warnings (pre-existing warnings in unchanged copy). UI checker: 15,270 strings, 0 errors, 78 accepted debt; no new baseline debt. `git diff --check` passes.
+- Verification job 3: server typecheck passed; 3 server suites / 19 tests passed (`geo-hub-pins`, `geo-hub-orcid`, `geo-orcid`). Web `tsc --noEmit` passed; the affected web suites are still running. Read its receipt/log before any retry; do not relaunch it.
 - Dependency install jobs 1/2 both exited 0. Their isolated snapshots contain web/server dependencies for the same source-lockfiles; reuse those modules in the pinned verification snapshot rather than modifying dependencies or lockfiles.
 - Resumed in the printed worktree; baseline is clean. Read the parent report §3.6–3.7, the proposed ADR, copy policy, terminology and UI guide sections 1, 2 and 10.
 - Sequential work: rename locale values without changing ids; reconcile terminology and current design docs; update affected string assertions; run copy/UI, type and focused test checks; generate the complete ko/en change inventory; finish for parent integration.
