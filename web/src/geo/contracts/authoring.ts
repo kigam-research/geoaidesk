@@ -258,7 +258,7 @@ export interface SourceDocument {
   url?: string;
   fetch?: { requestedUrl: string; finalUrl?: string; fetchedAt: string; status?: number; contentHash?: string };
   /** Added from 서재: the library item (a paper or a research note). */
-  library?: { itemId: string; citationKey?: string; category: "paper" | "note" };
+  library?: { itemId: string; citationKey?: string; category: "paper" | "note" | "digest" };
   /** A research note: its project and note folder; `snapshot` when read from the library copy, not the project file. */
   note?: { projectId: string; noteId: string; title?: string; snapshot?: boolean };
 }
@@ -757,6 +757,8 @@ export interface AddNoteSourcesBody {
 export interface AddLibrarySourcesBody {
   itemIds: string[];
   authoringId?: string;
+  /** 문헌 정리 items also bring the library papers they cover (gaid-library-prep). */
+  withDigestPapers?: boolean;
 }
 
 export interface AddLibrarySourcesResult {

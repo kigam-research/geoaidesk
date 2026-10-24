@@ -142,6 +142,29 @@ export async function addLibrarySources(
     }
     const ref = { itemId: item.id, ...(item.citationKey ? { citationKey: item.citationKey } : {}) };
     try {
+      // A 문헌 정리 (gaid-library-prep) enters as its Markdown text, marked as reading material: the coauthor reads it first,
+      // but evidence and citations come from the original papers (added alongside when the researcher asked for them).
+      if (item.kind === "digest" && item.digest) {
+        const d = item.digest;
+        if (!d.text.trim()) throw new AuthoringError("문헌 정리에 본문이 없습니다.", 409);
+        const covered = await Promise.all(d.covers.map(async (id) => { try { const p = await deps.get(id); return `- [@${p.citationKey ?? p.id}] ${p.csl.title}`; } catch { return ""; } }));
+        const header = [
+          `<!-- GAID literature digest (${d.origin === "external" ? "external summary imported from Gemini Notebook; reference only" : "made in GAID from the papers below"}; status ${d.status}). Read it first; every evidence anchor and citation must point to an original paper's page, never to this digest. -->`,
+          covered.filter(Boolean).length ? `<!-- Papers it covers:\n${covered.filter(Boolean).join("\n")}\n-->` : "",
+        ].filter(Boolean).join("\n");
+        const safe = item.csl.title.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").slice(0, 60) || "digest";
+        const added = await storeSource(store, authoringId, {
+          name: `${safe}.md`,
+          mediaType: "text/markdown",
+          kind: "text",
+          bytes: new Uint8Array(Buffer.from(`${header}\n\n${d.text}`)),
+          documentKind: d.origin === "external" ? "literature digest (external summary, reference only; cite the original papers)" : "literature digest (read first; cite the original papers)",
+          title: item.csl.title,
+          library: { ...ref, category: "digest" as const },
+        });
+        result.added.push({ itemId, sourceId: added.source.id, kind: added.source.kind });
+        continue;
+      }
       if (isNoteItem(item)) {
         const note = (item as NoteItem).note!;
         const library = { ...ref, category: "note" as const };

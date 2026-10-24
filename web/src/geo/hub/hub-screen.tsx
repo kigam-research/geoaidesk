@@ -707,10 +707,10 @@ function HubProject({
     }
   };
 
-  const addFromLibrary = async (itemIds: string[]) => {
+  const addFromLibrary = async (itemIds: string[], options?: { withDigestPapers: boolean }) => {
     const pid = await ensureProject();
     try {
-      const result = await addLibrarySources({ itemIds, authoringId: pid });
+      const result = await addLibrarySources({ itemIds, authoringId: pid, ...(options?.withDigestPapers ? { withDigestPapers: true } : {}) });
       if (result.skipped.length) toast.error(text("library.skipped", { count: result.skipped.length }));
     } finally {
       if (pid !== id) onCreated(pid);

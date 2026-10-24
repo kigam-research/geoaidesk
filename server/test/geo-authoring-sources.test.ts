@@ -18,6 +18,7 @@ import { registerAuthoringRoutes } from "../src/geo/authoring/routes.ts";
 import { addSource } from "../src/geo/authoring/sources.ts";
 import { AuthoringStore } from "../src/geo/authoring/store.ts";
 import { registerGeoLibraryRoutes } from "../src/geo/routes/library.ts";
+import { addExternalDigest } from "../src/geo/library/digests.ts";
 import { LibraryStore } from "../src/geo/library/store.ts";
 import { cleanup, config, pdf, PAPER, testVocabulary, work } from "./helpers/geo-authoring.ts";
 
@@ -256,6 +257,32 @@ describe("research notes and library items as sources", () => {
     expect(local.note).toMatchObject({ projectId: gaidProject });
     expect(local.note?.snapshot).toBeUndefined();
     expect(remote.note).toMatchObject({ snapshot: true, noteId: "2026-10-20-gravity" });
+  });
+
+  it("adds a 문헌 정리 as reading material and, when asked, the papers it covers (gaid-library-prep)", async () => {
+    const dir = await work("authoring-digest-");
+    const library = new LibraryStore(path.join(dir, "library"));
+    const project = createProject({ name: "문헌 정리 경로" });
+    projects.push(project.id);
+    const server = Fastify();
+    server.addHook("onRequest", (_req, _reply, done) => withActiveProject(project.id, done));
+    const authoring = new AuthoringStore(path.join(dir, "authoring"));
+    await registerAuthoringRoutes(server, { store: authoring });
+    await registerGeoLibraryRoutes(server, { store: () => library, paths: () => resolvePaths(project.id) });
+    const stored = await library.storePdf(pdf(PAPER));
+    const paper = (await server.inject({ method: "POST", url: "/geo/library/items", payload: { csl: { type: "article-journal", title: "Magnetite inversion" }, metadataOrigin: "manual", pdfSha256: stored.sha256 } })).json();
+    const file = await library.storeFile(Buffer.from("briefing"), 1024);
+    const digest = await addExternalDigest(library, { title: "Pocheon briefing", text: "# Briefing\n\n## Claims\n\nPGI narrows the boundary.", external: { service: "gemini-notebook", fileName: "b.md", mediaType: "text/markdown", file }, covers: [paper.id] });
+    const res = await server.inject({ method: "POST", url: "/geo/library/authoring", payload: { itemIds: [digest.id], withDigestPapers: true } });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().added.map((a: { itemId: string }) => a.itemId)).toEqual([digest.id, paper.id]);
+    const p = await authoring.read(res.json().authoringId);
+    const [d, pdfSource] = p.sources;
+    expect(d).toMatchObject({ kind: "text", library: { itemId: digest.id, category: "digest" }, documentKind: expect.stringMatching(/external summary, reference only/) });
+    expect((await authoring.readFile(p.id, `sources/${d.id}/files/Pocheon briefing.md`)).toString()).toMatch(/never to this digest[\s\S]*PGI narrows/);
+    expect(pdfSource).toMatchObject({ kind: "pdf", library: { itemId: paper.id, category: "paper" } });
+    const without = await server.inject({ method: "POST", url: "/geo/library/authoring", payload: { itemIds: [digest.id] } });
+    expect(without.json().added.map((a: { itemId: string }) => a.itemId)).toEqual([digest.id]);
   });
 
   it("starts a new authoring project from several library items and records the uses", async () => {

@@ -8,6 +8,7 @@ import { HubClient, type RequestOptions } from "../../hub-client/client.ts";
 import { LIBRARY_FILE_LIMIT, type LibraryChangesResponse, type LibraryObject, type LibraryPushChange, type LibraryPushResponse } from "../../hub-server/protocol.ts";
 import { LibraryStore } from "../store.ts";
 import { refreshNoteItems } from "../notes.ts";
+import { readStoredPdf } from "../reader.ts";
 
 type Data = LibraryItem | LibraryCollection;
 interface ObjectState { version: number; hash: string | null }
@@ -94,6 +95,26 @@ export class LibrarySync {
       pending: { items: changes.filter((c) => c.kind === "item").length, folders: changes.filter((c) => c.kind === "folder").length, files: files.size },
       conflicts, ...(this.lastError ? { lastError: this.lastError } : {}) };
   }
+  private reading?: Promise<void>;
+  /**
+   * PDFs that arrived through sync carry the other PC's read state but no page text here, so the agent's library_read
+   * would return empty pages (gaid-library-prep). Extract the missing page caches in the background, one PDF at a time;
+   * readStoredPdf returns at once for PDFs already read. Exposed for tests.
+   */
+  readPulledPdfs(): Promise<void> {
+    this.reading ??= (async () => {
+      try {
+        for (const item of await this.store.all()) {
+          for (const a of item.attachments) {
+            if (a.kind !== "pdf" || !a.stored) continue;
+            try { await readStoredPdf(this.store, a.stored.sha256); } catch { /* left unread; shown by read coverage */ }
+          }
+        }
+      } finally { this.reading = undefined; }
+    })();
+    return this.reading;
+  }
+
   async sync(): Promise<LibrarySyncResult> {
     if (this.running) throw new AuthoringError("서재를 동기화하고 있습니다. 끝난 뒤 다시 시도해 주세요.", 409);
     const context = this.context();
@@ -212,6 +233,7 @@ export class LibrarySync {
       state.lastSyncedAt = new Date().toISOString();
       await this.save(context.file, state);
       this.running = false;
+      this.readPulledPdfs();
       return { status: await this.status(), pulled, pushed, conflicts };
     } catch (e) {
       this.lastError = e instanceof AuthoringError ? e.message : "서재를 동기화하지 못했습니다. 로컬 파일과 서버 연결을 확인해 주세요.";

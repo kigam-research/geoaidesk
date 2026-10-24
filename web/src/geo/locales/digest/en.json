@@ -131,5 +131,10 @@
       "gone": "The project or folder was not found. Reopen the list and choose again.",
       "tooMany": "A digest holds up to 60 papers. Choose a subfolder instead."
     }
+  },
+  "picker": {
+    "empty": "No literature digests in the library. You can make one from a folder's papers in the library.",
+    "withPapers": "Also add the {count} papers it covers as sources",
+    "withPapersHint": "The evidence view beside each question opens the original paper's page. A digest is read first and never cited."
   }
 }

@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { join } from "node:path";
 import { readFile, readdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import type { LibraryItem, LibraryCollection } from "../../web/src/geo/contracts/library.ts";
 import { LibraryStore } from "../src/geo/library/store.ts";
 import { LibrarySync } from "../src/geo/library/sync/index.ts";
@@ -70,6 +72,20 @@ describe("personal library hub sync", () => {
     const library2 = new LibraryStore(join(f.root, "second-library")); const sync2 = new LibrarySync(f.client, library2);
     expect((await sync2.sync()).pulled.files).toBe(1); expect(await readFile(library2.filePath(stored.sha256))).toEqual(bytes);
     expect((await library2.get(paper.id)).attachments[0].stored?.sha256).toBe(stored.sha256);
+  });
+  it("builds the page text of PDFs that arrived through sync, so library_read has pages on this PC", async () => {
+    let hasPdftotext = true;
+    try { execFileSync("pdftotext", ["-v"], { stdio: "ignore" }); } catch { hasPdftotext = false; }
+    if (!hasPdftotext) return; // Page extraction needs poppler; the read state then stays as synced.
+    const f = await setup();
+    const stream = "BT /F1 12 Tf 72 720 Td (Magnetite susceptibility of drill cores from the Pocheon deposit) Tj ET";
+    const pdf = `%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n4 0 obj<</Length ${stream.length}>>stream\n${stream}\nendstream endobj\n5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n`;
+    const stored = await f.library.storePdf(Buffer.from(pdf));
+    const paper = item(); paper.attachments.push({ id: "la-local", kind: "pdf", stored: { ...stored, mediaType: "application/pdf" } }); paper.read = { coverage: "full", pagesRead: 1, pagesTotal: 1 };
+    await f.library.put(paper); await f.sync.sync();
+    const library2 = new LibraryStore(join(f.root, "second-library")); const sync2 = new LibrarySync(f.client, library2);
+    await sync2.sync(); await sync2.readPulledPdfs();
+    expect(existsSync(join(library2.root, "pages", stored.sha256, "meta.json"))).toBe(true);
   });
   it("deduplicates Zotero identities across connections, keeps pulled id and citation aliases, never syncs zotero.json", async () => {
     const f = await setup(); const local = item(); local.source = "zotero"; local.citationKey = "OldKey";

@@ -511,7 +511,18 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         const first = await store.get(ids[0]);
         authoringId = (await authoring.create({ title: first.csl.title.slice(0, 120) })).id;
       }
-      const result = await addLibrarySources(authoring, authoringId, ids, librarySourceDeps(store));
+      // A 문헌 정리 can bring the papers it covers, so the evidence view opens their pages (gaid-library-prep); bounded like the request.
+      let wanted = ids;
+      if (body.withDigestPapers) {
+        const extra: string[] = [];
+        for (const id of ids) {
+          const item = await store.get(id).catch(() => undefined);
+          if (item && isDigestItem(item)) extra.push(...(item.digest?.covers ?? []));
+        }
+        wanted = [...new Set([...ids, ...extra])];
+        if (wanted.length > 30) throw new LibraryError("Choose 1-30 distinct library items (with the papers the digests cover)", 400);
+      }
+      const result = await addLibrarySources(authoring, authoringId, wanted, librarySourceDeps(store));
       linkLibraryAuthoring(store, result.added.map((a) => a.itemId), authoringId);
       reply.code(body.authoringId ? 200 : 201);
       return result;
