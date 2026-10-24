@@ -122,7 +122,7 @@ def main():
     # ---------- press: felt mallet + sine drop; landings in one key, centred; one chord ----------
     note(music, "marimba", "D3", 1.2, 0.95, press, 1.0, 0.0)
     X.add(fx, sine(55, 38, 0.8, 0.25), press, 0.55, 0.0)
-    X.add(fx, X.thump(0.8, 60), press, 0.6, 0.0)
+    X.add(fx, X.thump(0.8, 60), press, 0.4, 0.0)
     X.add(fx, shimmer(1.4), press + 0.05, 0.12, 0.0)
     X.add(fx, X.whoosh(0.9), press + 0.1, 0.25, 0.0)
     shelf_pitch = {0: [deg(7, 62)], 1: [deg(9), deg(11)], 2: [deg(8)], 3: [deg(10)], 4: [deg(13)]}
@@ -273,9 +273,16 @@ def main():
     # music tail before the near-silence must not ring through it
     fade_out = np.clip((np.arange(N) / SR - (DUR - 1.2)) / 1.2, 0, 1)
     mix *= (1 - fade_out ** 2)[:, None]
-    for c in range(2):
-        mix[:, c] = X.limit(mix[:, c], 0.9)
+    # level for mastering: about -21 dBFS RMS over the sounding parts, peaks held 12.5 dB lower so the -14 LUFS loudnorm
+    # stays linear (the press and the chord are the hottest moments)
     mix = mix[: int(DUR * SR)]
+    m = mix.mean(1)
+    sounding = np.abs(m) > 1e-4
+    rms = float(np.sqrt(np.mean(m[sounding] ** 2)))
+    mix *= 10 ** (-21 / 20) / max(rms, 1e-9)
+    for c in range(2):
+        mix[:, c] = X.limit(mix[:, c], 10 ** (-12.5 / 20), look=0.004)
+        mix[:, c] = X.limit(mix[:, c], 10 ** (-12.5 / 20), look=0.002)
     args.out.mkdir(parents=True, exist_ok=True)
     sf.write(args.out / "mix.wav", mix.astype(np.float32), SR, subtype="FLOAT")
     (args.out / "instruments.json").write_text(json.dumps(sorted(used)) + "\n")
