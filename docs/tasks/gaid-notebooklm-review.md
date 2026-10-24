@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:22:47Z
+updated: 2026-10-24T01:23:22Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"69425b78-d16e-474b-81c8-6378bfc1d28d","pid":780318,"provider":"claude","session":"254af796-1400-4a2e-aa38-aeb0c37c99eb","start":"69105472","token":"c7338ccd182951a8d9472e383f1059d02101897697f5d7b0d3f61a8479e1dd49"}
 branch: task/gaid-notebooklm-review
 target: main
@@ -55,7 +55,7 @@ One report for the user (`reports/<date>-gaid-notebooklm-review/index.md`, resul
 - Done: report written, humanizer applied (Korean rules: bold labels removed, one name "Gemini Notebook" in prose,
   0-row conclusion shortened). No app code changed; no automated checks apply (report-only unit).
 ## Next steps
-1. task save, task review-copy, then task finish.
+1. Saved (9c5f94b7) and review copy made (vault 연구 보고서/geoaidesk/2026-10-24-gaid-notebooklm-review). Next: task finish; user decisions go through the hub.
 ## Failed approaches
 ## Notes and decisions
 - 2026-10-24 web research: vault `웹 조사/geoaidesk/2026-10-24-2026-10-24-google-notebooklm--a6dfb78488.md`
