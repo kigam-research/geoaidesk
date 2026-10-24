@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:47:45Z
+updated: 2026-10-24T05:51:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
@@ -65,44 +65,32 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - If something needs the user (credentials, a decision), write it as an open item in your task document and finish; do not block.
 
 ## Current state
-- Export job 3 is running after the timestamp-order fix, pinned at bace939c7e78. AG1/AG2 PNGs and contacts are present and visually checked. The only remaining work depends on this recorded job: full-run/result exports, audit, final visual QA and task finish.
-- Controller job 1 exited 0 and port 18349 is inactive. Its log retains the already-resolved UI-staging exception; both actual runs completed and no third run was sent. Export job 2 exited 1 at the native timestamp-order assertion; this is fixed for job 3.
-- Capture is closed. The retake completed in 623.05 s wall time (122.692 s reported pipeline/validation processes), including a packaging hash-path repair without numerical rerun. This is 23 s beyond the nominal ~10-minute target.
-- Selected same-run shots are AG1 5.5 s, AG2 65 s sampled at 10 fps from a genuine 12.755 fps source interval, AG2-whole 623 s sampled at 2 fps, and AG3 6 s. AG3 opens pgi_live_retake/outputs/orebody_3d.png through the real file tree. No internal cut in any selected take.
-- Chrome 156.0.8078.47 closed; Korean/light/instrument preferences read back; pageerror count 0. Final PNG export and artifact checks remain.
-- First run finished in 507.21 s wall time (102.3 s reported pipeline stages); all five models remained unconverged. Corrected compositor source is archived.
-- The sole authorized retake started at 2026-10-24T05:28:56Z, in pgi_live_retake/. AG1-final has been exported and its real click/Workflow-card geometry checked. The full retake is continuously recorded; fixed-cadence screenshots supplement sparse compositor events for the >=10 fps active-work requirement.
-- One actual Pocheon example run is in progress under GPT-6.1 Sol/high, with separate pgi_live_capture/ outputs. A corrected native take now records full-size streaming activity; initial footage is archived as failed capture geometry.
-- Resumed in the assigned worktree. Review app is accessible on loopback without a token gate. Deployed checkout HEAD reads 4e198c762b9bde20ca23b1f3223243fb2af16ab0.
-- No app/model/service settings changed. Inspector Chrome was closed before starting the capture browser.
+- Delivered 2,241 verified 2880×1620 PNGs at `~/data/geoaidesk/work/gaid-promo-video-v4-lemo--agent-capture/capture-v6/`, with capture.json, verification.json, frame-checks.json, README, four contact sheets, seven visually checked beat images and original result stills.
+- Same selected Pocheon example run: AG1 165 frames / 5.5 s at 30 fps; AG2 650 / 65 s at 10 fps (genuine source interval 12.755 fps); AG2-whole 1,246 / 623 s at 2 fps; AG3 180 / 6 s at 30 fps. Per-shot fps is authoritative: AG2 at 30 fps is 3×, whole at 30 fps is 15× and must be labelled as sped up. No internal cuts; explicit trims are recorded.
+- capture.json SHA-256: `e4f120e64293ef46917a2b858552d566d3d4cc7c9dafba44acff3f0a4a15ab98`. App SHA 4e198c762b9bde20ca23b1f3223243fb2af16ab0; GPT-6.1 Sol/high; Korean/light/instrument. AG3 genuinely opens new pgi_live_retake/outputs/orebody_3d.png. README identifies useful activity ranges and capture limits.
+- Export job 3 and audit passed: all frame dimensions/counts/timestamps, pointer-action containment, example/result hashes and 185 protected files unchanged. Contacts and remaining seven beats visually checked. Syntax and git diff checks passed. No app tests were run because app code is unchanged.
+- One capture-error retake was used; both full methods completed, all five models unconverged. The selected run took about 10 min 21 s from UI send to observed ready, with 623 s captured; nominal ~10-minute overrun came from packaging repair, not enlarged numerical work. Initial failed capture is archived, not selected.
+- Chrome is closed, controller port inactive, hub before/after notices delivered. Controller job 1 and export job 3 exited 0; failed export job 2 was corrected and superseded. No new model/settings/service change or third analysis run occurred.
 ## Next steps
-1. Wait for recorded export job 3 to exit (receipt in Running jobs; no periodic polling). If it succeeds, set capture.json's legacy top-level fps to 30 to match the final export.py; per-shot fps stays 30/10/2/30. Job 3 was pinned before this metadata-only default changed.
-2. Run `uv run --no-project python geo/promo-lemo/capture/audit.py`. Inspect contact-AG2-whole.jpg, contact-AG3.jpg and every remaining beat image. AG1 and AG2 contacts plus their first beat are already visually checked; verify AG3 pointer rectangles and original new image opening.
-3. Confirm verification.json/README.md/frame-checks.json and 2241 PNG frames exist under the external capture-v6 payload. Update Current state with final self-contained handoff and source/capture manifest hashes, then run task finish. No further analysis or review-app operation is authorized or needed.
+1. Run task finish to notify the parent. The parent integrates with task complete and owns the film edit/report. No more review-app use or analysis run is needed.
+2. Safe read-only recheck: `uv run --no-project python geo/promo-lemo/capture/audit.py`; no model or browser calls. Do not rerun retake.py or resend either request file.
 ## Failed approaches
 - Export job 2 failed its chronological-arrival assertion on AG2-whole. Direct inspection found 25 native frame deliveries out of presentation-time order, with unique timestamps and small delays during concurrent readbacks. Export now sorts by the native presentation timestamp while retaining original arrival frame IDs. No source image, time interval or UI content is changed.
 - Native view scale also scales CDP input coordinates. A normal Playwright click hit the header rather than Workflow during retake staging. Direct hit testing confirmed the 2.25 coordinate factor; staging now resets native scale, and filmed pointer events multiply only dispatched coordinates while logging CSS coordinates. No second analysis was sent during that failed staging attempt.
 - Chrome emits sparse screencast events when the app presents no visual changes. The whole-run stream retains them honestly; an additional screenshot readback stream records unchanged states at an independently measured cadence. No animation or DOM text was added.
 - The initial direct screenshot path was too slow at full resolution; pipelining did not reliably satisfy cadence.
 - A native-view/screencast attempt assumed deviceScaleFactor alone set backing-view scale. The actual image test disproved this: a 2880×1620 file contained only a 1280×720 image in its top-left. Explicit Emulation scale 2.25 plus visible size 2880×1620 fixed geometry; confirmed visually and with native frame timestamps (~30 fps).
-- The first real analysis is retained as a failed capture attempt, not selected footage. Its initial full-run capture geometry is invalid. The task explicitly allows one second run for capture failure; the second run will use a separate output directory and the corrected native compositor capture from before send. No third analysis run is authorized.
+- The first real analysis is retained as a failed capture attempt, not selected footage. Its initial full-run capture geometry was invalid. The task explicitly allowed one second run for capture failure; that retake used a separate output directory and corrected capture from before send. No third run was sent.
 ## Notes and decisions
+- Final visual QA removed the passive AG1 Workflow-card callout because the composer resized after its DOM measurement. The real start-click callout remains correct. AG3 retains a genuine failed packaging-check row in the chat; that failure was repaired later in the same run, without numerical rerun. The result-pane focus is clean; no visible error was hidden.
 - Sequential decisions: validate capture throughput before starting any model work; select the faster installed example with complete methodology; record continuously, then export and verify.
 - Owned files: geo/promo-lemo/capture/ and this task document. No independent worker package is needed for this tightly coupled browser session.
 - No automated app checks are planned because app code is unchanged; capture syntax, artifact/timing checks and visual inspection are the declared checks.
 
-(To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
-Complete also closes every item that the hub answered with this unit as follow-up; add one literal
-`Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None.
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child capture handoff only; the parent owns the canonical film report. Technical locator, source receipts, timing, limits and hashes are in the external payload README and verification.json.
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--agent-capture-20261024T051313.832789Z/receipt.json
