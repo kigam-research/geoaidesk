@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T05:25:24Z
+status: done
+updated: 2026-10-24T05:25:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"755a15f3-f2f7-4942-8c0a-e8091304de3f","pid":2896468,"provider":"claude","session":"24fdc1a9-65a4-4763-bc45-5d33b264d1d2","start":"70520948","token":"18bae5c8cafe7f4c15eadbf94560db92131b6a58406595657162165b5629a912"}
 branch: task/gaid-ui-checks-blocking
 target: main
@@ -58,7 +58,9 @@ server. Outside check: none.
 - Fail-path test: temporary <img> without alt on the parts page, `run.mjs --only axe,impeccable` → axe 4 image-alt (A1),
   exit 1, failure message printed; file restored (git clean). Log fail-test.log. The not-checked path was not provoked.
 ## Next steps
-1. task save, task finish.
+<!-- task:closed -->
+Closed 2026-10-24T05:25:43Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - PC70 run 1 (main f504ace4 unchanged): backend tests 25 failed / 2297 passed / 8 skipped, all `EACCES mkdir '/home/seongin3'`
   from the hard-coded base path in server/test/geo-hub-client-fake.ts (gaid-backend--hub-client); scripts/check stopped there
