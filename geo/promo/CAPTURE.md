@@ -152,3 +152,148 @@ uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py --ta
 ```
 
 Do not resend `analysis-request.txt`, recreate the study records, reinstall the updated Workflow into the existing project or restart app/hub services to reproduce a take. The results and frame payloads are retained externally; the parent can edit from them without the live controller.
+
+
+## v5 Yilgarn takes (2026-10-24)
+
+Seven real-app takes are ready in `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`: 1,096 frames (36.533 s),
+2880×1620, 30 fps, viewport 1280×720 at scale 2.25. They revisit the existing Yilgarn study in the PC74 review app,
+`http://127.0.0.1:3000`, deployed main `7650e012`. Korean UI, light theme and 계측 style were selected in the isolated
+browser profile. Tools: Google Chrome 156.0.8078.47, Playwright 1.63.0 and Pillow 12.3.0.
+`capture_v5.py` reuses the v3/StudyTake pointer, click ripple and static-hold recorder without text masks.
+The film parent owns selection and composition; these takes have no captions or film graphics baked in.
+
+### Takes
+
+| Take | Frames | Seconds | Off-camera cuts | Captured states |
+|---|---:|---:|---:|---|
+| Y1 | 135 | 4.500 | 1 | Recommended PU-conformal card, then MPM folder and all five Workflow rows |
+| Y2 | 150 | 5.000 | 2 | Entry title/version/author/picture/actions, then the complete selected-step card |
+| Y3 | 187 | 6.233 | 4 | Introduction, existing Yilgarn CSV selected, conditions, summary; no start action |
+| Y4 | 159 | 5.300 | 2 | Collapsed original Workflow card, original tool sequence, structured result map |
+| Y5 | 150 | 5.000 | 1 | Original GeoPackage on OpenStreetMap with legend/table, then original feature attributes |
+| Y6 | 180 | 6.000 | 4 | Note summary, whole map figure, zone table, recorded answer and decision-status text |
+| Y7 | 135 | 4.500 | 2 | Mineral-prospectivity paper table, then the complete paper uses card |
+
+All takes hold 12 frames (0.4 s) at both ends. A cut removes navigation/scroll/loading time; no recorded action is a scroll.
+`capture.json` records each cut's frame, omitted seconds and reason. The Y3 conditions page is an additional 18-frame
+view between the input and summary beats. These are start-window settings only, not a replay of the previous calculation.
+The selected system is Ni / 코마티이트. Its four undecided conditions remain undecided; the start action was never pressed.
+
+### Whole-region beat geometry
+
+Each single-element rect came directly from `getBoundingClientRect()`, with viewport and scroll-ancestor clipping checks.
+The final Y6 rect is the union of two complete sibling elements. Values below are rounded for reading; `capture.json`
+retains the measured precision. Selectors describe the actual Playwright locators.
+
+| Take / beat | Region | Selector | CSS rect (x, y, w, h) |
+|---|---|---|---|
+| Y1 / 1 | Recommended PU-conformal Workflow card | `text exact PU-컨포멀 탐사 우선순위 존 분류 -> ../..` | 280, 272, 578.656, 348 |
+| Y1 / 2 | MPM folder Workflow list, heading and all five rows | `text exact 이름 -> ../..` | 280, 272, 968, 352 |
+| Y2 / 1 | Hub entry header: title, version, author, picture and actions | `button name 내 프로젝트에서 시험 -> ../..` | 297, 149, 934, 478 |
+| Y2 / 2 | Whole selected Workflow step card including input examples | `text exact 단계 1 / 10 -> ../..` | 560, 116, 696, 568.625 |
+| Y3 / 1 | Whole Workflow introduction and start-window rail | `role=dialog at Workflow 소개` | 180, 54, 920, 612 |
+| Y3 / 2 | Whole input stage with existing Yilgarn CSV bound | `role=dialog at 입력 자료` | 180, 54, 920, 612 |
+| Y3 / 3 | Whole summary with selected Yilgarn CSV and Ni/komatiite condition | `role=dialog at 요약` | 180, 54, 920, 612 |
+| Y4 / 1 | Whole collapsed original Workflow card | `button aria-label starts Workflow · PU-컨포멀` | 712.359, 120, 424.906, 32 |
+| Y4 / 2 | Whole original tool sequence for creating and checking the map | `text exact outputs/yilgarn_priority_map.png:last -> ../../..` | 667, 132.375, 557.641, 356 |
+| Y4 / 3 | Complete original map figure in structured chat result | `article containing h3 Yilgarn 니켈 탐사 우선순위 구역 -> img` | 681, 117.625, 529.641, 384 |
+| Y5 / 1 | Whole map workspace with OSM, legend and original attribute table | `.gaid-map-body` | 0, 225, 1279, 495 |
+| Y5 / 2 | Whole original feature attribute popup | `text exact 선택한 피처의 속성 -> ../../..` | 582, 233, 288, 218 |
+| Y6 / 1 | Whole 한눈에 research-note summary table | `[data-streamdown=table-wrapper]:first` | 159.5, 311, 960, 248 |
+| Y6 / 2 | Whole map figure in the research-note viewer, resized by real pane controls | `img alt exact Yilgarn 니켈 탐사 우선순위 구역입니다.` | 289, 347, 332.984, 346.859 |
+| Y6 / 3 | Union of whole decision-status heading and paragraph; recorded answer remains in the completed-work list above | `h1 text exact 결정할 일 + following-sibling::p[1] (whole sibling union)` | 159.5, 648.125, 960, 54 |
+| Y7 / 1 | Whole paper table in the mineral-prospectivity folder | `visible table:first after folder 광상 부존 가능성` | 260, 374, 636, 180 |
+| Y7 / 2 | Whole paper uses card with project, note and two Workflow links | `text exact 내 연구에서 쓰인 곳 -> ../..` | 916, 274.5, 340, 274 |
+
+The Y6 figure is 332.984×346.859 CSS px in the note viewer. Real file/chat pane controls and the supported maximum chat
+width made the whole figure fit; no CSS zoom or image substitution was used. Its complete original pixels are also in the
+still below. The original final-list rect excluded outside-painted bullets. It was replaced with the whole decision-status
+heading and paragraph, remeasured in the identical scroll state (the list bounds matched exactly). The screen pixels were
+not changed. `geometryChanges` and `elementRects` retain that check.
+
+### Read-only protection and inventory
+
+No messages, model runs, Workflow starts, uploads, installations, stars, comments, registrations, note/library edits or
+service changes were requested. The controller closed both Chrome sessions normally; jobs 1 and 2 exited 0. The review app
+and hub server were not restarted or reconfigured.
+
+All PUT/DELETE requests and non-allowlisted POST requests were answered locally with HTTP 200 `{}`. The final helper also
+blocks PATCH. No PATCH request occurred. Only these POST paths were allowlisted:
+`/geo/inspect`, `/geo/result`, `/geo/vector-page`, `/geo/raster-window`, `/geo/raster-style`, `/geo/raster-point`,
+`/geo/series-window`. The initial `/geo/result` attempt was blocked. After checking its read-only implementation in
+`server/src/geo/routes/maps.ts`, it was explicitly allowed and the map reopened off camera.
+
+| Request | Count | Outcome |
+|---|---:|---|
+| PUT /geo/workspace-state | 21 | Blocked locally; no save reached the server |
+| POST /geo/suggestions | 7 | Blocked locally |
+| POST /geo/result | 1 | Initial attempt blocked locally |
+| POST /geo/inspect | 2 | Allowed read |
+| POST /geo/result | 1 | Allowed manifest read |
+| POST /geo/vector-page | 1 | Allowed attribute/geometry read |
+
+Inventories cover the full Yilgarn project, library and skill-hub trees, excluding `.venv`, symlinks and prohibited secret
+files/directories. They retain paths, sizes, nanosecond mtimes and SHA-256. Both inventories contain 1,641 files. There are
+no added or removed files. Every Yilgarn project file, including its stored workspace, and every skill-hub file is unchanged.
+
+One existing file changed: `~/.geoaidesk/pi-agent/research/library/zotero.json` (427 bytes before and after). Its SHA-256
+changed from `0405d18850ea3c32c0f88ea96b97bfbe305add0b5610616a20cc5f55b7d1cfe1` to
+`2190eabb76daf416e669da435fc196fcbe934c0a46ec3984add26e0a14110239`; mtime changed from
+`1792806423589381789` to `1792807161988660357` ns. The app's GET `/geo/library` invokes `refreshIfStale()`
+(`server/src/geo/routes/library.ts`); the Zotero service can update its state after a failed background refresh
+(`server/src/geo/library/zotero-service.ts`). This is consistent with the observed Zotero refresh-failure notice.
+The baseline retained hashes, not file contents, so the exact changed JSON field was not established. Thus the contract's
+literal identical-inventory check is **not met**. No unrelated data was restored or edited to conceal this difference.
+All other 1,640 files retain size, mtime and hash.
+
+Evidence at the payload root: `evidence-before.json`, `evidence-after.json`, `evidence-comparison.json`, `requests.json`,
+`browser-errors.json`; capture-specific checks are `capture-v5/verification-v5.json` and the manifest.
+
+### Stills
+
+- `stills/yilgarn-hub-concept.png`: original served bytes; source `http://localhost:18000/geo/hub/entries/entry-ap-a135f290-1c4/cover?revision=2`; SHA-256 `49ca4777d1b1d66eb760bcb880015698c4db338e5b34ee5cdc5e6b8055e7275a`.
+- `stills/yilgarn_priority_map.png`: original file bytes; source `/home/seongin3/.geoaidesk/projects/yilgarn-cd7814/sandbox/outputs/yilgarn_priority_map.png`; SHA-256 `509e3805ea50dd0cd6ef095c0feb32af4bc578c5eaa70c29eea6767a50cb7fbc`.
+
+### Visible limits and staging
+
+- Y1's recommended PU-conformal entry belongs to the hub's 일반 folder. Clicking the MPM folder shows five other existing
+  entries; no move, rename or implied new registration was made.
+- Y2 and Y3 retain the existing ten-step, previous-format Workflow. Y3 therefore uses the app's input/conditions fallback
+  pages. The legacy expanded chat instruction was not used because it contains `(1판)`; Y4's collapsed original card
+  reads `version 0.1.0` and the installed Workflow in Y3 reads `version 0.1.1`. No text was substituted.
+- Y4 shows the actual disconnected model chip and preexisting unsent composer draft. Neither was hidden, edited or sent.
+  The app's scroll-to-bottom button remains over the lower white margin of the result figure. Tool rows are historical
+  records, not new execution during capture.
+- Y5 shows the existing viewer colours and legend as rendered, including its nodata entry; they were not replaced by the
+  scientific figure's colours. The original click selected `priority_zones` feature 1414: index 42226, X 13610000,
+  Y -3330000, zone 2, zone_name FOLLOW_UP, 구역 후속 검토 구역.
+- Y6 retains 검토 전 and 형식 확인 필요. Its recorded choice is to inspect the immediate/priority zones first; no new answer
+  was sent. The decision-status paragraph says the answer is already reflected and nothing else is pending.
+- Y7 retains the existing Zotero refresh-failure status and the two preexisting global Workflow links. The uses card also
+  shows the Yilgarn project and the note's p.14 citation. Its Workflow names are the app's original truncated paper titles.
+
+### Verification and reuse
+
+`capture_verify.py` and `capture_v5_verify.py` pass: all 1,096 consecutive frames exist at 2880×1620; all 17 beats have
+region/selector evidence, last at least 1.5 s, stay non-overlapping within their take and fit the viewport. Both original
+stills match their source hashes. All 17 drawn midpoint images were individually opened and inspected, along with every
+take's first/middle/last contact sheet (updated Y4 separately). No selected first/last frame has loading or error overlays.
+There are zero browser page exceptions. Three HTTP 413 console resource messages occurred while staging the stored
+15.3 MB CSV; the selected takes do not show its preview-limit card. Original connection/status notices remain as above.
+
+No automated app checks were run: this child changed capture helpers and evidence, not app code. Helper syntax,
+`git diff --check`, frame checks and visual checks were run. The only unmet verification condition is the one-file
+service-maintained inventory difference documented above. Parent integration and the final film are separate.
+
+Safe offline checks (no browser or model work):
+
+```sh
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_v5_verify.py
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_verify.py --take ~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_beat_checks.py --take ~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5
+uv run --no-project --with pillow==12.3.0 python geo/promo/capture_sheet.py --take ~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5
+```
+
+Use `capture-v5/` as the film input. Rejected alternatives `Y3-alternative-inherited-CuPGE-settings/` and
+`Y4-alternative-no-tools/` remain one level above it and are not inputs to the film.
