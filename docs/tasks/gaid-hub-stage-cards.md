@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:56:41Z
+updated: 2026-10-24T05:05:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"10d83d80-51b9-4bf0-99ff-b999647a0bce","pid":2850321,"provider":"claude","session":"d6c1897c-a3f3-4329-a5ee-9c0c3508a3e7","start":"70480721","token":"00c14d6dd6304a7e205cd4a0aa93d107e3a761b0ada434db515eb05d24ebb6cf"}
 branch: task/gaid-hub-stage-cards
 target: main
@@ -73,10 +73,10 @@ Implemented 2026-10-24 (single writer, no child units).
 - Screens: real app on isolated home `~/data/geoaidesk/work/gaid-hub-stage-cards/home` (hub store copied from the review app),
   16 shots + 2 row shots in `.../shots/`, axe 0 violations in all 4 combos (both states). Temp units gaid-stage-cards-{api,web}
   stopped. Report figures in `reports/2026-10-24-gaid-hub-stage-cards/figures/`.
-- scripts/check: running as user unit gaid-stage-cards-check, log `~/data/geoaidesk/work/gaid-hub-stage-cards/check.log`.
+- scripts/check: CHECK_EXIT=0 at a9398ae0 (log check.log). shadcn lint then flagged `text-[12px]` in stage-plate.tsx → `text-xs`; lint rerun 248 (file 0, baseline), shared-browse test 10 passed, hub/row shots retaken (axe 0).
 
 ## Next steps
-1. Read check.log result (CHECK_EXIT line), record it in the report appendix and here; then review-copy and task finish.
+1. review-copy the report, then task finish.
 
 ## Failed approaches
 ## Notes and decisions

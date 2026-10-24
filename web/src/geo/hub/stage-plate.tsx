@@ -72,7 +72,7 @@ export function StageCount({ stages }: { stages: HubWorkflowStages }) {
       aria-hidden
     >
       <span className="text-sm font-semibold leading-4 tabular-nums">{stages.titles.length}</span>
-      <span className="text-[12px] leading-4 text-gaid-ink-2">{text("home.stages.unit")}</span>
+      <span className="text-xs leading-4 text-gaid-ink-2">{text("home.stages.unit")}</span>
     </span>
   );
 }

@@ -81,7 +81,7 @@ UI 가이드 규칙:
 | I5 | 단계 번호와 단계 수는 고정폭 숫자입니다. 장식용 번호(01, 02)는 없습니다. |
 | I6 | 개념 그림이 있으면 그림을 먼저 쓰고, 그림 픽셀은 손대지 않습니다. |
 | G3 | 카드는 지금처럼 추천 Workflow에만 쓰고, 목록은 줄로 둡니다. |
-| T1 | 옆 카드의 단계는 설명 크기(13 px), 첫 카드는 본문 크기(15 px), 단계 수 아래 "단계"는 단위 크기(12 px)입니다. |
+| T1 | 옆 카드의 단계는 설명 크기(13 px), 첫 카드는 본문 크기(15 px), 단계 수 아래 "단계"도 설명 크기입니다. |
 | V1, 2절 | 색은 역할 토큰만 쓰고, 부품은 계측·도폭을 코드에서 나누지 않습니다. |
 | S2 | 단계가 없는 오래된 기록은 이전 중립 칸과 아이콘을 그대로 씁니다. |
 
@@ -92,7 +92,8 @@ UI 가이드 규칙:
   - 서버 시험 한 건을 더했습니다. 등록된 Workflow의 목록 항목과 추천 카드에 단계 3개, 입력 CSV, 결과 "점수 표"가 실리는지 봅니다. 단계도 절차도 없는 기본 Workflow 카드에는 단계가 실리지 않는지도 봅니다. 허브 공유 시험 파일 17건이 통과했습니다.
   - 화면 시험 두 건을 더했습니다. 5단계 Workflow가 옆 카드에서 3단계 + "외 2단계"로 줄고 "CSV, XLSX → 점검 표 외 1"이 보이는지, 그림이 있으면 단계를 그리지 않는지, 목록 줄에 단계 수가 보이는지 봅니다. 허브 화면 시험 59건이 통과했습니다.
   - 실제 앱 화면: 네 조합 × 두 크기 × 두 상태로 16장을 찍었습니다. 1440×900 여덟 장에서 axe 접근성 검사(WCAG 2.1 A/AA)는 위반 0건입니다.
-  - 문구 검사와 UI 규칙 검사는 오류 0건이고, 새 문구에 경고가 없습니다. 전체 검사 결과는 부록 A에 적습니다.
+  - 문구 검사와 UI 규칙 검사는 오류 0건이고, 새 문구에 경고가 없습니다.
+  - 전체 검사는 통과했습니다(종료 코드 0). 화면 점검 도구 중 shadcn lint가 새 부품에서 임의 글자 크기 1건을 찾아, 단계 수 아래 "단계"를 12 px에서 설명 크기(13 px)로 바꿨습니다. 그 뒤 lint, 해당 화면 시험, 목록 화면 촬영과 axe를 다시 돌렸고 전체 검사는 다시 돌리지 않았습니다. 점검 도구의 나머지 결과(impeccable, 화면 비교, axe)는 0건입니다.
 
 ## 5. 한계
 
@@ -129,7 +130,7 @@ UI 가이드 규칙:
 | 시험 | `server/test/geo-hub-shared.test.ts` "carries the Workflow's own stages…", `web/src/geo/hub/shared-browse.test.tsx` "Workflow stages without a picture" |
 | 화면 원본 | pc74:`~/data/geoaidesk/work/gaid-hub-stage-cards/shots/` (16장 + 목록 2장, axe 결과 `axe-hub.json`, `axe-fresh.json`), 촬영 스크립트 `.../scripts/` |
 | 실행 환경 | 격리 자료 폴더 pc74:`~/data/geoaidesk/work/gaid-hub-stage-cards/home` (허브 자료는 `~/.geoaidesk/pi-agent/skill-hub/shared` 사본), backend `tsx src/index.ts` 8710, `next dev -p 3710`, 카탈로그 0.3.0 |
-| 전체 검사 | `scripts/check` 기록 pc74:`~/data/geoaidesk/work/gaid-hub-stage-cards/check.log` |
+| 전체 검사 | `scripts/check` CHECK_EXIT=0, 기록 pc74:`~/data/geoaidesk/work/gaid-hub-stage-cards/check.log` (commit a9398ae0 기준). 이후 `text-[12px]` → `text-xs` 한 곳: `node geo/ui/quality/run.mjs --only shadcnLint` 248건(이 파일 0건, 기준선과 같음), `shared-browse.test.tsx` 10건 통과, 목록 화면 재촬영·axe 0건 |
 
 문구 id(한·영 새로 추가, 바꾼 문구 없음):
 
