@@ -54,7 +54,8 @@ body { font-family: "Pretendard", sans-serif; color: var(--ink); font-feature-se
   position: absolute; font-size: 30px; font-weight: 700; padding: 6px 18px; border-radius: 8px; corner-shape: bevel; white-space: nowrap;
 }
 .badge.hub { background: var(--signal); color: #ffffff; }
-.badge.sys { background: var(--chrome); color: var(--ink); border: 1px solid #4a515d; }
+.badge.sys { background: var(--signal-ink); color: #0b0d11; }
+.badge.lib { background: transparent; color: var(--ink); border: 2px solid var(--ink-2); }
 
 .take {
   position: absolute; overflow: hidden; background: #ffffff; border-radius: 14px; corner-shape: bevel;

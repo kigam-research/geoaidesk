@@ -226,7 +226,8 @@ def main():
             ci = next((i for i, c in enumerate(chapters) if c["a"] - 0.01 <= tt < c["b"] + 0.01), 0)
             r = ROOTS[ci % len(ROOTS)]
             note(music, "hand_chimes", deg(r + 7 + (int(tt * 8) % 3) * 2, 62), 0.9, 0.42, tt, 0.30, 0.15)
-            X.add(fx, X.click(1.4, 0.7), tt, 0.05, 0.15)
+        elif e["type"] == "box":  # the box draws in where the pointer arrives
+            X.add(fx, X.click(1.4, 0.7), tt, 0.06, 0.2)
 
     # ---------- near-silence before the second brain; first sound after it: low bell + chord ----------
     mask = np.ones(N, np.float32)

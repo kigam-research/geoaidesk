@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:51:15Z
+updated: 2026-10-24T05:48:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -63,7 +63,17 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
-Blocked: the 40 s child's `task finish` is still running scripts/check (finish commit a26b8bcd not yet published); complete it when its finish notice arrives.
+40 s child completed and closed 2026-10-24 (round 3 = user round 2: film 52b0055d…3546, job …promo-40s-3; section-40s.md + figures 40s-* integrated, merge into report §8 pending; check caches removed before close).
+Round 3 status: code done and saved (pv4 preview: 40 box windows checked, pointer inside the box in all but the y:N1 end, fixed by trimming to 4.8 s; -14.1 LUFS). Waiting for the live agent capture child to integrate AG takes as source `g` (render.py --capture-g, per-shot `speed`/`fps` supported, '빠르게 보기' chip), then final job, report round 3, finish.
+Round 3 (user feedback 2026-10-24, verbatim in Notes): (a) boxes follow the drawn pointer (tracks from frames, #14213d arrow;
+geo/promo-lemo/pointer_track.py) and appear only while the pointer is in the region; passive regions get no box; (b) fewer,
+slower outcomes (22 -> 15 rows, >= 3 s each), takes chosen for pointer engagement, mixing capture-v3 (PGI), capture-v2 and
+capture-v5 (Yilgarn); (c) live agent footage from child `gaid-promo-video-v4-lemo--agent-capture` (writer
+bc6e9cee-ee39-46ef-a805-4ff63734ee67, prompt prompts/child-agent-capture.md), placeholder until it lands; (d) concept/colour:
+GAID 허브 = make & share geoscience Workflows from papers/literature/notes, GAID 시스템 = install Workflows and analyse with the
+AI agent (framework), 내 서재 = the researcher's personal literature space (neither part's main feature); 시스템 in light blue
+#7fa2ff, never grey. 40 s round 2 sent to its writer (24b0e76b…, same unit; its earlier finish was never published:
+origin still 6a59a8a5, `task complete` finds no record).
 0. Round 2 done: picture + mix job -3 (20f1dc1a, 100.4 s, 3012 frames; tag QA on the final file 62 frames all on target,
    look/tagqa3-*.jpg); mastering job -5 (9939c6ca) from job -3's picture/mix: film sha256 36290838…f075, -14.3 LUFS,
    TP -1.9 dB, no black segments. Job -4 (-3 dBFS limiter) measured TP -0.4: premise "limiter level sets final TP" was false
@@ -92,6 +102,21 @@ Blocked: the 40 s child's `task finish` is still running scripts/check (finish c
   leaves up and rises in; the window shrinks into the mini cycle, which flies in as the first second-brain ring; second brain
   9 s (lines ~4.2 s each); put-away and logo tightened. Length 102.3 -> 96.9 s.
 ## Notes and decisions
+- 2026-10-24 round-2 feedback (verbatim): "103초판에 대해서는 첨부한 이미지처럼 40초 구간을 보면 마우스 포인터랑 영역 선택 부분이
+  일치하지 않는다. 이러한 부분이 40초 구간 뿐만 아니라 다수 존재한다. 현황 진단 후 마우스 포인터랑 영역 선택이 자연스럽게 되어야
+  한다. 멈춰있는 듯한 인상을 주어서는 안된다. 또한, GAID 허브와 GAID 시스템을 구분하다보니 색상을 다르게 선택했지만 오히려
+  이로인해 GAID 시스템쪽은 마치 활성화가 되지 않은 부분처럼 느껴진다. 이부분은 수정이 필요하다. 그리고 기능 설명을 병합하여
+  장면을 줄이더라도 사람의 인지적 관점에서 너무 빠른 전환이나 설명은 정보량을 받아들일 수 없다. 특히 60초 이후 구간부터는
+  진행이 갑자기 빨라지는 것은 너무 많은 기능을 소개하고 있어서라고 생각한다. 해당 부분들을 병합하여 설명하면 더 효과적일
+  것이라고 생각한다. 그리고 57초 구간 근처에 있는 에이전트 계산 부분은 실제로 에이전트 작업되고 있는 부분들이 보였으면 한다.
+  멈춰있는 사진들을 사용하는 것은 적절하지만 촬영을 통한 움직음으로 보이는 것이 적절한 것은 섞어가면서 완성도를 높였으면 한다.
+  [40 s part forwarded to its writer] … GAID 허브는 지구과학 연구자들이 논문, 문헌, 연구노트 등을 기반으로 양질의 지구과학용
+  워크플로우(또는 스킬)을 생성하고 공유하는 공간이고, 시스템은 해당 워크플로우를 설치하고 에이전트형 분석 작업을 수행하고 IDE와
+  에이전틱 기반 작업 및 지구과학친화적 분석 시스템이 종합된 분석 프레임워크이다. 이를 모두 합친 것이 GAID이며, 서재의 경우에는
+  GAID 시스템에 포함되어도 되고, 허브에 포함될 수 있지만 전체적으로 연구자 개인의 문헌 관리 공간으로 간주해야한다."
+  Diagnosis: pointer inside the box for only 11 of 31 boxes (12 at 0 %): beats came from capture.json windows, the capture has no
+  pointer path, so boxes ignored where the pointer acted; R3/v2 R2/v5 Y4 agent takes are cuts of finished states (v3 R3 cut
+  132.29 s + 1,328.22 s), no live footage exists.
 - 2026-10-24 user (writer tab, verbatim): "메시지는 동등해도 되는데 연출은 오히려 더 자유롭게 홍보성으로 만들자. 그리고 분량은 40초로하고
   코드로 된 영상 기반으로 전면 새로 만들어도 좋다. 현재 촬영자료가 있다고 너무 v4스타일로 만들필요는없다. 현재 렌더링중인것은
   계속만들고 별도로하나더 생성하자." -> two deliverables: (A) the ~103 s Dark Tech Keynote cut with real takes (this writer,
