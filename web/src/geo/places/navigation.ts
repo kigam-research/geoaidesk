@@ -51,3 +51,10 @@ export function onWorkspaceOpenRequest(handler: () => void): () => void {
   window.addEventListener(WORKSPACE_OPEN_EVENT, handler);
   return () => window.removeEventListener(WORKSPACE_OPEN_EVENT, handler);
 }
+
+/** Leaves GAID Connect (or 서재) for the Workspace: clears the place hash; hash readers follow on popstate. */
+export function openWorkspace(): void {
+  if (typeof window === "undefined") return;
+  window.history.pushState(null, "", window.location.pathname + window.location.search);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}

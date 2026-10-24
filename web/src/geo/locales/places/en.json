@@ -62,5 +62,18 @@
       "new": "Create a project",
       "cancel": "Cancel"
     }
+  },
+  "connect": {
+    "make": {
+      "heading": "Start from your material",
+      "pdf": "Paper PDF",
+      "library": "Pick from the library",
+      "notes": "Research notes",
+      "analysis": "Workspace analysis",
+      "pdfTip": "Upload a paper PDF to make a Workflow draft",
+      "libraryTip": "Pick a paper in the library to start making a Workflow",
+      "notesTip": "Add a project's research notes as sources",
+      "analysisTip": "Send a Workspace chat's analysis bundle to Connect"
+    }
   }
 }
