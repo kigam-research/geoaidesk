@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-24T08:10:24Z
+status: active
+updated: 2026-10-24T08:20:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8326432c-0a38-43d0-92f0-76db7e868732","pid":1778976,"provider":"claude","session":"21c916ad-8c56-4943-818b-6f9dae6aa973","start":"71313221","token":"dd814f54f4df4db1c88c4132afa7ed1942ef6ba2f237a42360f61d5b48b0e522"}
 branch: task/gaid-input-fallback
 target: main
