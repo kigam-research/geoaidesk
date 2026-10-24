@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:49:51Z
+updated: 2026-10-24T01:59:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -45,12 +45,21 @@ Request from the starter:
 
 ## Current state
 - Analysis of v4 and Direction v5 written (below); capture contract `geo/promo/CONTRACT.md` (v5, Yilgarn shot list Y1–Y7).
-- Review app: hub told before use (request d7fb43947212); read-only exploration screenshots in
-  `~/data/geoaidesk/work/gaid-promo-video-v5/explore/` (workspace-state PUTs blocked; Yilgarn workspace-state.json mtime
-  unchanged 2026-10-23 13:24:46 KST).
+- Capture child `gaid-promo-video-v5--capture` started 2026-10-24 (profile "general work"); it owns `capture_v5*.py`,
+  the v5 section of `CAPTURE.md` and `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`.
+- Scene reworked (`scene.js` v5 window stage: `CHAPTERS_DEF` steps, `V3` whole-region rects, `mkWin`/`mkDetail` lifts,
+  pair step Y5+M1); `render.py` merges `--capture v3=… --capture v5=…`; `frame_check.py` for box checks.
+  Previews with v3 only (Y shots as placeholders): `~/data/geoaidesk/work/gaid-promo-video-v5/prev1`, `prev2` (95 s).
+- V3 rects checked on drawn/zoomed frames (`~/data/geoaidesk/work/gaid-promo-video-v5/rects/`): edges lie in gaps between
+  whole elements or on panel borders. Rejected v3 regions: L1 side panel (runs past the viewport), H1 shared-file list
+  (scrolls; the whole dialog is framed instead), N1 figure (clipped by the pane), L4 uses list (runs past the viewport).
+- Review app: hub told before use (request d7fb43947212); my exploration blocked workspace-state PUTs; Yilgarn
+  workspace-state.json mtime unchanged (2026-10-23 13:24:46 KST).
 ## Next steps
-1. Start capture child `gaid-promo-video-v5--capture` (Y1–Y7) and meanwhile rework `scene.js` (window stage + callouts) on
-   the v3 takes with re-derived whole-region rects.
+1. When the child finishes: `task complete gaid-promo-video-v5--capture`, render stills with both captures, check every
+   beat (stills `NN-<shot>-<k>`), tune Y beats/labels/timing.
+2. Tell the hub the review app is free (after the child's captures).
+3. Final render job, report `reports/2026-10-24-gaid-promo-video-v5/index.md` with key frames incl. box checks, registry.
 ## Failed approaches
 ## Notes and decisions
 

@@ -65,3 +65,21 @@ body { font-family: "Pretendard", sans-serif; color: var(--ink); font-feature-se
 }
 .caption .sub { font-size: 30px; font-weight: 500; color: var(--ink-2); }
 svg text { font-family: "Pretendard", sans-serif; }
+/* v5 window stage */
+.window .winbar {
+  position: absolute; left: 0; top: 0; right: 0; height: 46px; display: flex; align-items: center; gap: 10px;
+  padding: 0 18px; background: var(--face-2); border-bottom: 1px solid var(--edge);
+  font-size: 22px; font-weight: 600; color: var(--ink-2); white-space: nowrap;
+}
+.window .screen { position: absolute; overflow: hidden; }
+.window .screen img { position: absolute; }
+.window .hl {
+  position: absolute; border: 3px solid var(--signal); border-radius: 8px; corner-shape: bevel; pointer-events: none;
+}
+.detail {
+  position: absolute; overflow: hidden; background: var(--face); border: 3px solid var(--signal);
+  border-radius: 10px; corner-shape: bevel;
+  box-shadow: 0 2px 4px rgba(23, 27, 35, 0.06), 0 24px 60px rgba(23, 27, 35, 0.16);
+}
+.detail img { position: absolute; }
+.tag-text { font-size: 46px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); line-height: 1.2; }
