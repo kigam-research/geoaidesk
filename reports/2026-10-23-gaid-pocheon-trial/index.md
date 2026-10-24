@@ -4,7 +4,7 @@ date: 2026-10-23
 project: geoaidesk
 task: gaid-pocheon-trial
 headline: 서재의 논문에서 Workflow를 만들어 허브에 등록하고, 예제 자료로 논문 수준의 PGI 분석과 연구 노트를 만든 뒤 노트를 서재로 가져오는 흐름이 실제 앱에서 이어졌습니다. 그 과정에서 찾은 문제 23건 가운데 13건을 이 작업에서 고쳤고 4건은 다른 단위가 해소했습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-orebody-3d.png
 supersedes:
