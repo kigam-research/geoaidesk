@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T04:28:16Z
+status: done
+updated: 2026-10-24T04:28:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"de68e451-97f8-4d7d-b9dd-6dd12ceee4d8","pid":2621511,"provider":"claude","session":"f940d4c6-cc49-4d80-8904-a915a4b5d7ac","start":"70284572","token":"0fe8e40f1ea359a56f63a8022e870ac31a328d0a3a949ee5845ab1c5ed4fdbf6"}
 branch: task/gaid-ui-shared-contrast
 target: main
@@ -52,7 +52,9 @@ starts scenario A. Outside check: none.
   log ~/data/geoaidesk/work/gaid-ui-shared-contrast/check.log.
 - Re-verify: `node geo/ui/quality/run.mjs --out <dir>` (after `npm ci` in geo/ui/quality and web), `scripts/check`.
 ## Next steps
-1. task finish (report done, humanizer pass done, review copy made).
+<!-- task:closed -->
+Closed 2026-10-24T04:28:45Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: open items carried to docs/open-items/gaid-ui-shared-contrast.md.
+
 ## Failed approaches
 - Raising 도폭 dark `--gaid-ink-3` to fix the placeholder: would need ~ink-2 brightness, erasing the ink-2/ink-3 split.
 ## Notes and decisions
@@ -64,7 +66,7 @@ Closes: gaid-ui-quality-kit#1
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-- [결정] 대비 결과가 0건이 된 impeccable과 axe를 언제 막는 단계로 바꿀까요? — 가) 다른 PC 한 대에서 전체 점검을 한 번 돌려 같은 결과(0건)가 나오면 두 도구를 막는 단계로 바꾸고, 화면 비교와 shadcn 검사기는 보고만 하는 단계로 둔다 — 나) 지금은 모두 보고만 하고 실제 화면까지 점검 대상에 넣은 뒤 함께 바꾼다 — 권장: 가) 전환 규칙의 남은 조건 하나만 채우면 되고 두 도구는 글꼴 차이에 덜 민감하다 — 막힌 일: 없음 — 조건: 다른 PC에서 점검 실행 — 근거: reports/2026-10-24-gaid-ui-shared-contrast/index.md#6-결정할-일
+- [결정 gaid-ui-shared-contrast#1] 대비 결과가 0건이 된 impeccable과 axe를 언제 막는 단계로 바꿀까요? — 가) 다른 PC 한 대에서 전체 점검을 한 번 돌려 같은 결과(0건)가 나오면 두 도구를 막는 단계로 바꾸고, 화면 비교와 shadcn 검사기는 보고만 하는 단계로 둔다 — 나) 지금은 모두 보고만 하고 실제 화면까지 점검 대상에 넣은 뒤 함께 바꾼다 — 권장: 가) 전환 규칙의 남은 조건 하나만 채우면 되고 두 도구는 글꼴 차이에 덜 민감하다 — 막힌 일: 없음 — 조건: 다른 PC에서 점검 실행 — 근거: reports/2026-10-24-gaid-ui-shared-contrast/index.md#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
