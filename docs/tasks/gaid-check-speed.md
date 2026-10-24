@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T13:11:25Z
+status: done
+updated: 2026-10-24T13:12:01Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4b8e0e17-3fea-48d0-b063-69304df1ad95","pid":2429809,"provider":"claude","session":"63970a14-62e0-4041-afb8-314c6e8a5445","start":"73218387","token":"a2a1e3d206cb0ff8ffa8126fa33175459610479150f50ccbaef399569abbec08"}
 branch: task/gaid-check-speed
 target: main
@@ -64,11 +64,9 @@ Chromium once per PC).
 Re-verify: `scripts/check` (prints `task-stage:` lines and a stage table at exit); logs of the runs above in
 ~/data/geoaidesk/work/gaid-check-speed/{baseline1,baseline-tail,after1,after2,after3}.log on PC74.
 ## Next steps
-1. task finish.
-- Optional (not done): the production smoke rebuilds the UI on every run (~40-60 s) because NEXT_PUBLIC_ADK_API_URL holds its
-  random backend port; a fixed smoke-only build port or a port-independent API URL would let the build be reused.
-- Optional: the server psims probe and two mzML tests need the network; giving psims a local PSI-MS vocabulary copy
-  (configure_obo_store) would remove it, but that changes the helper app code.
+<!-- task:closed -->
+Closed 2026-10-24T13:12:01Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Plan (sequential, done by this writer; small and tightly coupled, no child units): 1) stage markers in scripts/check
