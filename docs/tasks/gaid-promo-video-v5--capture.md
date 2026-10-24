@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:50:41Z
+updated: 2026-10-24T01:51:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7b6c0c70-dc29-4c26-aee1-6a9e2549e4b2","pid":1222631,"provider":"codex","session":"01a16b9a-30c0-7823-bbfa-e604026a2474","start":"69456843","token":"8d41e205d92dc2e9f2d13e4620748ccd6276cd4ae4f4294f054d0afbb6e2d1fb"}
 branch: task/gaid-promo-video-v5--capture
 target: task/gaid-promo-video-v5
@@ -54,11 +54,12 @@ frame. Commit only `geo/promo/capture_v5*.py` and `geo/promo/CAPTURE.md` (plus y
 If a take cannot show its state cleanly, deliver the others and report that take with the reason.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Read the v5 contract and existing v3 capture helpers. Implemented a strict read-only capture controller with whole-element geometry and full inventory hashes. No app writes are authorized.
 ## Next steps
-1. (the next session's first action)
+1. Launch the recorded controller job, stage Y1–Y7, measure and inspect every beat, then verify payloads and inventory.
 ## Failed approaches
 ## Notes and decisions
+- Sequential work: browser guard/inventory → UI staging and capture → midpoint geometry inspection → evidence and finish. Single writer owns only capture_v5*.py, CAPTURE.md v5 section and this task document. Parent owns film integration; no further child units.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
