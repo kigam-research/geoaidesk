@@ -45,8 +45,8 @@ it("provides Workflow and recipe rows with at most three badges: trials, lifecyc
   expect(rows.map((row) => row.id)).toEqual(["method:project:paper-method:workflow:trial"]);
   render(<>{rows[0].badges}</>);
   // Each badge names its scope: the hub package stage, GAID trials in this project (novice review round 3).
-  expect(screen.getByText("허브 초안")).toHaveAttribute("title", "허브에 기록된 Workflow 파일 묶음의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.");
-  expect(screen.queryByText("허브 공개됨")).not.toBeInTheDocument();
+  expect(screen.getByText("Connect 초안")).toHaveAttribute("title", "Connect에 기록된 Workflow 파일 묶음의 단계입니다. 현재 프로젝트의 준비·시험 상태와 별개입니다.");
+  expect(screen.queryByText("Connect 공개됨")).not.toBeInTheDocument();
   expect(screen.getByText("GAID에서 수정됨")).toBeInTheDocument();
   expect(screen.getByText("미시험")).toHaveAttribute("title", "현재 프로젝트에서 해당 Workflow를 GAID로 시험한 기록이 없습니다.");
 
@@ -60,7 +60,7 @@ it("scopes every row badge and leaves the fixed required-input property to the i
   const needsData = { ...workflow, inputRoles: [{ id: "grid", label: { ko: "격자 표" }, formats: ["csv"], extensions: ["csv"], required: true }], readiness: { ...workflow.readiness, state: "needs-environment" as const } };
   render(<>{methodRows([{ ...method, editedLocally: false, workflows: [needsData] }], vi.fn())[0].badges}</>);
   expect(screen.getByText("환경 준비 필요")).toHaveAttribute("title", "현재 프로젝트에서 해당 Workflow를 시작하는 데 필요한 준비 상태입니다.");
-  expect(screen.getByText("허브 초안")).toBeInTheDocument();
+  expect(screen.getByText("Connect 초안")).toBeInTheDocument();
   expect(screen.queryByText("사용자 자료 필요")).not.toBeInTheDocument();
 });
 it("shows GAID trial counts and the latest assessment instead of the untested badge", () => {
@@ -83,10 +83,10 @@ const inRecord = (element: HTMLElement) => { const details = element.closest("de
 it("summarises origin, hub check and trials for the researcher and keeps the raw records behind 기록 보기", async () => {
   render(<MethodDetail method={method} projectId="p1" onClose={vi.fn()} onSetup={vi.fn()} />);
   expect(screen.getByText("설치 출처: 파일 업로드")).toBeInTheDocument(); expect(screen.getByText("초안")).toBeInTheDocument();
-  expect(screen.getByText("허브에서 미해결인 질문")).toBeInTheDocument(); expect(screen.getByText("대조 자료는 미정입니다.")).toBeInTheDocument();
+  expect(screen.getByText("Connect에서 미해결인 질문")).toBeInTheDocument(); expect(screen.getByText("대조 자료는 미정입니다.")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Paper" })).toHaveAttribute("href", "https://doi.org/10.1234/paper");
   // Hub check: one plain line and a sentence per warning kind; checker, check ids and raw messages are the record.
-  expect(screen.getByText(/허브 검사를 통과했습니다 · .* · 참고 사항 1개/)).toBeInTheDocument();
+  expect(screen.getByText(/Connect 검사를 통과했습니다 · .* · 참고 사항 1개/)).toBeInTheDocument();
   expect(screen.getByText("다른 참고 사항이 있습니다. 내용은 기록 보기에 있습니다.")).toBeInTheDocument();
   inRecord(screen.getByText("manifest: 통과")); inRecord(screen.getByText("[untested] scripts: No run recorded")); inRecord(screen.getByText(/검사 도구: hub-check/));
   // Trial: when, which 판, assessment, what became of each expected result and which files appeared.
@@ -128,7 +128,7 @@ it("opens recipe choices as editable setup and forwards method exposure only whe
 });
 it("provides detail actions alongside Workflow rows without starting a task", async () => {
   render(<Catalogue />); fireEvent.click(await screen.findByRole("button", { name: "Workflow 상세 보기: 논문 기반 방법" }));
-  expect(screen.getByRole("dialog")).toHaveTextContent("허브 검사를 통과했습니다");
+  expect(screen.getByRole("dialog")).toHaveTextContent("Connect 검사를 통과했습니다");
   await screen.findByText("도구 호출 3회 · 실패 1회");
 });
 it("stores a researcher assessment verbatim in the current project", async () => {

@@ -21,7 +21,7 @@ describe("shared method evidence labels", () => {
     show("descriptive");
     expect(screen.getByText("분석 지침만 · 실행 코드 없음")).toBeTruthy();
     expect(screen.getByText("시험하면 AI agent가 스킬 지침에 따라 분석 코드를 새로 씁니다.")).toBeTruthy();
-    expect(screen.getByText("등록된 version으로 시작한 시험 1회 (검토 결과 아님)")).toBeTruthy();
+    expect(screen.getByText("공유된 version으로 시작한 시험 1회 (검토 결과 아님)")).toBeTruthy();
     expect(screen.getByRole("button", { name: "내 프로젝트에서 시험" })).toBeTruthy();
   });
 
@@ -49,7 +49,7 @@ describe("editing a registered method", () => {
       onComment={vi.fn()} onTry={vi.fn()} onEdit={{ mode: "edit", run }} />);
     fireEvent.click(screen.getByRole("button", { name: "Workflow 고치기" }));
     expect(run).toHaveBeenCalledOnce();
-    expect(screen.getByText(/다음 version은 등록할 때 고릅니다/)).toBeTruthy();
+    expect(screen.getByText(/다음 version은 공유할 때 고릅니다/)).toBeTruthy();
     expect(screen.getByText(/김 연구원의 「원본 방법」 version 0.1.1을 복사해 고친 Workflow입니다/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "원본 보기" }));
     expect(onOpen).toHaveBeenCalledOnce();

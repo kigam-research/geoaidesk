@@ -86,9 +86,9 @@ it("shows a sandbox authenticated iD, hides typed input and confirms the hub unl
   expect(unlinkOrcid).not.toHaveBeenCalled();
 });
 it.each([
-  ["no-account", "ORCID 본인 확인에는 기관 GAID 허브 로그인이 필요합니다."],
-  ["not-configured", "허브에 ORCID 연결이 설정되지 않았습니다. 허브 관리자에게 문의하세요."],
-  ["unreachable", "기관 GAID 허브에 연결하지 못했습니다. 연결 상태를 다시 읽으세요."],
+  ["no-account", "ORCID 본인 확인에는 기관 Connect 서버 로그인이 필요합니다."],
+  ["not-configured", "기관 Connect 서버에 ORCID 연결이 설정되지 않았습니다. 서버 관리자에게 문의하세요."],
+  ["unreachable", "기관 Connect 서버에 연결하지 못했습니다. 연결 상태를 다시 읽으세요."],
 ] as const)("keeps typed-iD linking available with hub state %s", (state, hint) => {
   render(<OrcidCard {...props} status={{ profile: null, ownWorks: 0, hub: { state } }} />);
   expect(screen.getByText(hint)).toBeInTheDocument();

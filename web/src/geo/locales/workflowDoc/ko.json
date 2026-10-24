@@ -43,7 +43,7 @@
     "catalogue": "기본 제공 스킬",
     "bundled": "Workflow에 딸린 스킬",
     "imported": "가져온 스킬",
-    "hub": "허브 스킬"
+    "hub": "Connect 스킬"
   },
   "skill": {
     "primary": "주 스킬",

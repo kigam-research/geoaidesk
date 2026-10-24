@@ -48,7 +48,7 @@
   "detail": {
     "back": "목록으로 돌아가기",
     "method": "사용한 방법: {name}",
-    "methodUnnamed": "허브 방법",
+    "methodUnnamed": "Connect 방법",
     "assessment": {
       "useful": "시험 평가: 유용함",
       "needs-revision": "시험 평가: 수정 필요",

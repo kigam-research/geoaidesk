@@ -1,8 +1,8 @@
 {
-  "open": "Send the analysis just done to a GAID hub draft",
-  "openLabel": "Send to hub draft",
-  "title": "Analysis for a hub draft",
-  "description": "Bundle the request, final answer and selected files and send them to the GAID hub as material for a new Workflow draft.",
+  "open": "Send the analysis just done to a Connect draft",
+  "openLabel": "Send to Connect draft",
+  "title": "Analysis for a Connect draft",
+  "description": "Bundle the request, final answer and selected files and send them to GAID Connect as material for a new Workflow draft.",
   "rawData": "Raw data under user_data/ is included only when you select it. Content written in the request and answer is included, so review it before sending.",
   "loading": "Reading the analysis and file list.",
   "request": "User's first request",
@@ -37,7 +37,7 @@
     "download": "Requested the analysis bundle download.",
     "direct": "Sent to the external hub. If no new tab opens, use the draft link.",
     "download-fallback": "Could not confirm direct delivery, so the bundle was downloaded instead. Check whether the external hub already created a draft, then attach the bundle.",
-    "hub": "Created a new GAID hub draft with the analysis bundle as its material."
+    "hub": "Created a new GAID Connect draft with the analysis bundle as its material."
   },
   "errors": {
     "input": "Check the file selection and note, then send again.",
@@ -52,11 +52,11 @@
   "assessment": "Researcher assessment: {outcome, select, useful {useful} needs-revision {needs revision} failed {failed} other {not recorded}} · {note}",
   "noAssessment": "No researcher assessment yet. Save one in the Workflow's trial record to send it along.",
   "excludedFile": "{path}: {reason, select, policy {path not allowed} unavailable {could not be read} too-large {over 5 MiB} file-limit {over the file limit} other {left out}}",
-  "sendHub": "Send to hub draft",
-  "sendingHub": "Creating the hub draft.",
-  "openHubDraft": "Open hub draft",
+  "sendHub": "Send to Connect draft",
+  "sendingHub": "Creating draft",
+  "openHubDraft": "Open Connect draft",
   "extras": "Research notes and papers to include",
-  "extrasHelp": "Included only when sending to the GAID hub. The research notes this chat wrote and the library papers attached to the project are preselected. Up to {limit} of each.",
+  "extrasHelp": "Included only when sending to Connect. The research notes this chat wrote and the library papers attached to the project are preselected. Up to {limit} of each.",
   "noteLine": "Research note · {date}",
   "paperLine": "Library paper · {authors} {year}"
 }

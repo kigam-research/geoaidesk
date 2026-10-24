@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:35:46Z
+updated: 2026-10-24T06:41:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c0846cc2-2d3c-4451-a536-928158b01728","pid":1419314,"provider":"codex","session":"01a16c9f-037c-7000-9c73-3a2648766336","start":"71166182","token":"eb92e9d2636de378ea79a8a04d9e6f61f7cc7146a51b50e547fadd07a2f678b8"}
 branch: task/gaid-ia-connect-workspace--copy-rename
 target: task/gaid-ia-connect-workspace
@@ -29,11 +29,17 @@ Rules: follow AGENTS.md of your worktree (UI guide v2 sections 1, 2, 10 before U
 Evidence: run the relevant checks (cd server && npm run typecheck && npm test -- <your tests>; cd web && npx tsc --noEmit && npm test -- <your tests>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs). Full scripts/check is run by the parent after integration; you may run it if time allows. Record in your task document what you changed and the check results, then task finish.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the printed worktree; baseline is clean. Read the parent report §3.6–3.7, the proposed ADR, copy policy, terminology and UI guide sections 1, 2 and 10.
+- Sequential work: rename locale values without changing ids; reconcile terminology and current design docs; update affected string assertions; run copy/UI, type and focused test checks; generate the complete ko/en change inventory; finish for parent integration.
+- This package is tightly coupled copy maintenance and stays with this writer. Parent owns `places`/`devPlaces`; library-panels owns new library keys. No runtime interfaces change.
+- Parent extended ownership on 2026-10-24 to researcher-visible server place copy. Changed `server/src/geo/authoring/hub-skills.ts` (standard question/reason/option) and `server/src/geo/routes/orcid.ts` (bilingual callback page). Inspected `orcid/service.ts`, `hub-client/{client,connection,remote-store}.ts` and `routes/hub-server.ts`: their errors are shown only in technical-detail disclosures by `orcid-card.tsx`, `hub-server/parts.tsx` and `hub-feeds/feeds.tsx`, so they remain unchanged as instructed. Model prompts/logs/identifiers are unchanged.
 ## Next steps
-1. (the next session's first action)
+1. Apply the approved names and sharing verbs, preserving external skill_hub wording and generic Office/connector workspace terms.
 ## Failed approaches
+- `task job run` refused dependency installation while source edits were dirty (`job source dirty; save first`); checkpoint reviewed changes before launching checks. No install job started.
 ## Notes and decisions
+- Follow UI rules L2, N1, N5, D6 and W1–W4. Shorten the import action to `Connect에서 가져오기` / `Import from Connect` (the Workflow panel supplies the object), version-install action to `version {revision} 설치`, and the busy handoff action to `초안 만드는 중` to keep W1's 16/32-character button limits. Pure wording changes need no screenshots (UI guide §0.3).
+- Terminology forbids unambiguous `GAID 허브` / `GAID 시스템`; bare `허브` and `내 연구` cannot be forbidden globally by the substring-based validator because external skill_hub and ordinary research language remain valid.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

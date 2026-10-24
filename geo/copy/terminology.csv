@@ -1,10 +1,13 @@
 ko,en,definition,forbidden_ko,forbidden_en,note
 GeoAIDesk,GeoAIDesk,"Product name; use in titles and first mentions.",지오AI데스크|지오에이아이데스크,Geo AI Desk|GeoAI Desk,Keep the Latin spelling in both languages.
 GAID,GAID,"Short product name for compact UI chrome after GeoAIDesk has appeared.",,,
+GAID Workspace,GAID Workspace,"Workflow를 설치하고 AI agent와 내 자료를 분석하는 곳입니다. 프로젝트, 파일과 코드, 지구과학 뷰어, 정리 노트가 여기에 있습니다.",GAID 시스템,GAID system,"Short name Workspace; 내 연구 is forbidden only as a place name because the validator has no concept scope."
+GAID Connect,GAID Connect,"논문·문헌·연구노트·자료·분석 결과로 지구과학 Workflow와 스킬을 만들고 공유하고 평가하는 곳입니다. 자료 소식도 여기에 있습니다.",GAID 허브,GAID hub,"Short name Connect; bare 허브 is not globally forbidden because external skill_hub wording remains valid."
+서재,library,"연구자 개인의 논문과 정리 노트 공간입니다. Workspace와 Connect에서 함께 씁니다.",,,"Personal literature space; not a third place alongside Workspace and Connect."
 Geoscience 자료,geoscience data,"Data of any geoscience field handled by GeoAIDesk.",지구과학 자료|지구과학 데이터,,"User decision 2026-10-11: 지구과학 자료 reads as translated; mix the English term."
 에이전틱 프레임워크,agentic framework,"Product category of GeoAIDesk (user decision 2026-10-11): a framework, not a platform.",연구 보조 플랫폼|AI 플랫폼,research assistant platform,
 AI agent,AI agent,"The model-driven assistant that runs skills and analysis code in a project.",AI 에이전트|인공지능 에이전트,,
-Workflow,Workflow,"연구 작업 하나를 AI agent에게 맡기는 절차입니다. 입력 자료, 연구자가 정할 조건, 단계, AI agent 지시문, 사용하는 스킬, 결과와 해석 한계로 이루어집니다.",워크플로우|작업 흐름,,Avoid 방법 when naming a hub unit; ordinary scientific/installation uses remain valid. Validator has no concept scope.
+Workflow,Workflow,"연구 작업 하나를 AI agent에게 맡기는 절차입니다. 입력 자료, 연구자가 정할 조건, 단계, AI agent 지시문, 사용하는 스킬, 결과와 해석 한계로 이루어집니다.",워크플로우|작업 흐름,,Avoid 방법 when naming a Connect unit; ordinary scientific/installation uses remain valid. Validator has no concept scope.
 context 길이,context length,"Token context of the connected model; must match the model server setting.",문맥 길이,,
 upstream,upstream,"The K-Dense BYOK repository GeoAIDesk is forked from.",상류 앱|상류 저장소,,
 spatial leakage,spatial leakage,"Optimistic evaluation from spatially dependent training and test data.",공간 누출|공간 누수,,
@@ -28,8 +31,8 @@ CRS,coordinate reference system (CRS),"Spatial reference of a dataset; keep the 
 모델 연결,model connection,"The configured route to a language model: subscription sign-in, personal API key or local endpoint.",모델 접속,,
 연결 방식,connection method,"One of the supported routes for a model connection.",접속 방식,,
 로컬 모델,local model,"A model served on the user's own computer (for example via Ollama).",온디바이스 모델,on-device model,
-스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬, 허브 스킬이 있습니다.",,,Keep SKILL.md untranslated.
-허브 스킬,hub skill,"GAID 허브의 스킬 선반에 version마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 version을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
+스킬,skill,"Workflow가 쓰는 지침과 도구 꾸러미입니다. 기본 제공 스킬, GitHub 등에서 가져온 스킬, Workflow에 딸린 스킬, Connect 스킬이 있습니다.",,,Keep SKILL.md untranslated.
+Connect 스킬,Connect skill,"GAID Connect의 스킬 선반에 version마다 사본으로 올린 스킬입니다. 출처, 라이선스, 검토 상태를 함께 기록하고, 여러 Workflow가 version을 고정해 씁니다.",,,gaid-hub-skills (ADR 2026-10-22).
 작업 예제,worked example,"A recorded task with data, steps and outputs that a user can run.",데모,demo,
 예제 자료,example data,"Data a Workflow supplies for an input (bundled or downloaded by URL with its hash) so it can run when the researcher gives no file; results describe the example area.",샘플 데이터|예시 데이터,sample data|demo data,"Label synthetic examples 합성 자료 / synthetic data."
 실행 기록,run record,"The stored inputs, code, outputs and settings of one run.",실행 로그,run log,
@@ -51,6 +54,6 @@ unlabeled 셀,unlabeled cell,"A PU cell without a recorded occurrence; not a con
 그림 기록,figure record,"One figure in a research note with its kind, the chat, script and data that made it, whether they changed since, the latest journal check and an AI-use disclosure draft. Derived from provenance; not stored.",그림 이력,figure history,gaid-research-visuals 2026-10-22
 그림 점검,figure check,"Comparison of a figure file with the target journal's figure rules (width, resolution, minimum text size, format, colour, AI-image policy). Not a compliance verdict.",규정 검증|적합 판정,compliance check,gaid-research-visuals 2026-10-22
 연결 지도,connection map,"View of the links around one chosen item (paper, research note, figure, file, chat, Workflow), built only from links GAID already records.",인용 지도,citation map,gaid-research-visuals 2026-10-22
-version,version,"Registered Workflow version; starts at 0.1.0; the registrant chooses patch/minor/major for updates; 1.0.0 is the main release.",버전,,"gaid-hub-versions 2026-10-23; 판 is not globally forbidden because the validator has no concept scope."
+version,version,"Shared Workflow version; starts at 0.1.0; the researcher sharing it chooses patch/minor/major for updates; 1.0.0 is the main release.",버전,,"gaid-hub-versions 2026-10-23; 판 is not globally forbidden because the validator has no concept scope."
 결과 묶음,result bundle,"ZIP of one research note for another researcher or a reviewer: body and figures, sha256 of data the note chats used, environment records, Workflow version and 지침, cited papers. No data files; not a reproduction claim.",재현 패키지,reproduction package,"gaid-note-bundle-export 2026-10-24."
 공개 자료 내보내기,public material export,"Researcher-chosen files (note Markdown, Workflow 지침, cited paper PDFs) for manual upload to Gemini Notebook; each file confirmed as allowed to leave the institute; GAID sends nothing.",,,"gaid-note-bundle-export 2026-10-24."
