@@ -133,7 +133,7 @@ export function GaidHub({
   const toList = () => onNavigate({ open: true, projectId: null, ...(view.kind === "skills" ? { skills: true } : {}) });
   return (
     <HubShell
-      onNavigate={(place) => place === "projects" && onOpenProjects()}
+      onNavigate={(place) => place === "workspace" && onOpenProjects()}
       onOpenSettings={() => {
         setSettingsRequest(null);
         setSettingsOpen(true);

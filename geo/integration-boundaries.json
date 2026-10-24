@@ -267,6 +267,12 @@
       "responsibility": "WP07 primary-path catalogue copy, branding and localized accessible controls; GAID compact lockup and an accessible name on the header link; gaid-hub: Projects/GAID hub header switch and the GAID hub entry card (optional onOpenHub prop); 내 연구 tab bar (프로젝트/서재) and the library screen in place of the project list (gaid-research-hub)"
     },
     {
+      "path": "web/src/app/page.tsx, web/src/components/project-view.tsx",
+      "owner": "gaid-ia-connect-workspace",
+      "status": "edited",
+      "responsibility": "GAID Workspace + GAID Connect (ADR 2026-10-24 gaid-connect-workspace): the project list becomes one view of the Workspace home (web/src/geo/places/workspace-home.tsx; upstream layout kept when no Connect is wired); the page shows the full 서재 screen over either place (`#library`, web/src/geo/places/library-place.tsx) and the project workspace takes Workspace-home open requests (recent chat, Workflow list); the app bar uses the Workspace / Connect switch and the 서재 entry."
+    },
+    {
       "path": "web/src/components/sandbox-panel.tsx",
       "owner": "gaid-korean-workspace",
       "status": "edited",
