@@ -1,0 +1,176 @@
+{
+  "badge": "개발용 시안",
+  "screens": {
+    "label": "시안 화면",
+    "workspace": "Workspace 홈",
+    "connect": "Connect 홈",
+    "library": "서재",
+    "project": "프로젝트 안 서재",
+    "authoring": "Workflow 만들기 안 서재"
+  },
+  "bar": {
+    "label": "GAID 장소",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: Workflow를 설치하고 내 자료를 분석합니다",
+    "connectTip": "GAID Connect: 지구과학 Workflow를 만들고 공유합니다",
+    "library": "서재",
+    "libraryTip": "내 논문과 정리 노트를 엽니다",
+    "home": "Workspace 홈으로 가기",
+    "project": "프로젝트 바꾸기",
+    "resources": "컴퓨터 자원",
+    "settings": "설정 열기"
+  },
+  "workspace": {
+    "title": "GAID Workspace",
+    "context": "Workflow를 설치하고 AI agent와 함께 내 자료를 분석합니다.",
+    "start": "분석 시작",
+    "newProject": "새 프로젝트",
+    "nav": "Workspace 목록",
+    "side": {
+      "home": "홈",
+      "projects": "프로젝트",
+      "workflows": "설치한 Workflow",
+      "recent": "최근 프로젝트",
+      "archived": "보관한 프로젝트"
+    },
+    "continue": {
+      "heading": "이어서 하기",
+      "open": "이어서 열기",
+      "running": "실행 중",
+      "decisions": "결정 {count}",
+      "unreviewed": "검토 전",
+      "checked": "확인함"
+    },
+    "projects": {
+      "heading": "프로젝트",
+      "all": "전체 {count}개 보기"
+    },
+    "workflows": {
+      "heading": "설치한 Workflow",
+      "start": "시작",
+      "find": "Connect에서 Workflow 찾기",
+      "ready": "준비됨",
+      "envNeeded": "환경 준비 필요",
+      "catalogue": "기본",
+      "shared": "공유",
+      "projects": "프로젝트 {count}곳"
+    }
+  },
+  "connect": {
+    "title": "GAID Connect",
+    "context": "논문·문헌·연구노트로 지구과학 Workflow를 만들고 연구자들과 공유합니다.",
+    "create": "Workflow 만들기",
+    "glossary": "용어 보기",
+    "search": "제목, 한 줄 설명, 연구자, 분류 검색",
+    "nav": "Connect 목록",
+    "side": {
+      "recommended": "추천 Workflow",
+      "shared": "공유된 Workflow",
+      "folders": "주제 폴더",
+      "mine": "내 Workflow",
+      "mineItem": "초안과 공유한 것",
+      "skills": "스킬",
+      "skillsAll": "전체 스킬",
+      "feeds": "자료 소식",
+      "feedsAll": "전체 소식"
+    },
+    "recommended": "추천 Workflow",
+    "make": {
+      "heading": "내 자료로 만들기",
+      "pdf": "논문 PDF",
+      "library": "서재에서 고르기",
+      "notes": "정리 노트",
+      "analysis": "Workspace 분석 결과",
+      "pdfLine": "PDF를 올립니다",
+      "libraryLine": "내 논문과 노트",
+      "notesLine": "프로젝트의 노트",
+      "analysisLine": "채팅의 분석 묶음"
+    },
+    "shared": {
+      "heading": "공유된 Workflow",
+      "order": "star 많은 순",
+      "name": "이름",
+      "folder": "주제 폴더",
+      "author": "연구자",
+      "version": "version"
+    },
+    "feeds": {
+      "heading": "자료 소식",
+      "unreviewed": "검토 전",
+      "all": "소식 모두 보기"
+    },
+    "catalogue": "기본 Workflow",
+    "sharedBadge": "공유"
+  },
+  "library": {
+    "title": "서재",
+    "context": "내 논문과 정리 노트입니다. Workspace 프로젝트와 Connect의 Workflow 만들기에서 함께 씁니다.",
+    "add": "논문 넣기",
+    "export": "서지 내보내기",
+    "folders": "폴더",
+    "allPapers": "전체 논문",
+    "papers": "논문 {count}",
+    "notes": "정리 노트 {count}",
+    "search": "서재에서 찾기",
+    "col": {
+      "paper": "논문",
+      "year": "연도",
+      "source": "출처",
+      "used": "쓰인 곳"
+    },
+    "usedLine": "프로젝트 {projects} · Workflow {workflows}",
+    "unused": "아직 안 씀",
+    "closeTip": "서재 닫고 돌아가기",
+    "back": "{place}로 돌아가기"
+  },
+  "panel": {
+    "title": "서재",
+    "agent": "AI agent",
+    "inspector": "오른쪽 패널",
+    "scope": "프로젝트 문헌",
+    "all": "전체 서재",
+    "cited": "인용 {count}회",
+    "page": "p. {page}",
+    "openPdf": "PDF 열기",
+    "openFull": "서재 전체 화면",
+    "attach": "프로젝트에 넣기",
+    "close": "서재 패널 닫기",
+    "selected": "{count}개 고름",
+    "addSources": "자료 {count}개 더하기",
+    "pickTitle": "서재에서 자료 고르기",
+    "pickContext": "고른 논문과 노트는 Workflow 초안의 근거 자료가 됩니다."
+  },
+  "project": {
+    "files": "파일",
+    "notes": "정리 노트",
+    "noteTitle": "포천 자철석 광체 3차원 추정",
+    "noteStatus": "검토 전",
+    "workflow": "Workflow 포천 자철석 광체 추정 0.1.1",
+    "citeTip": "PDF의 인용한 쪽을 엽니다"
+  },
+  "authoring": {
+    "title": "Workflow 만들기",
+    "context": "근거 자료를 모은 뒤 질문에 답하면 Workflow 초안이 만들어집니다.",
+    "steps": {
+      "label": "Workflow 만들기 단계",
+      "sources": "자료",
+      "questions": "질문",
+      "draft": "초안",
+      "trial": "시험",
+      "share": "공유"
+    },
+    "added": "모은 자료 {count}",
+    "addHeading": "자료 더하기",
+    "upload": "파일 올리기",
+    "web": "웹 주소",
+    "fromLibrary": "서재에서 고르기",
+    "next": "다음 단계",
+    "back": "이전 단계",
+    "kinds": {
+      "pdf": "논문 PDF",
+      "note": "정리 노트",
+      "data": "자료 파일"
+    }
+  }
+}

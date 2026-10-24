@@ -1,0 +1,176 @@
+{
+  "badge": "Development mockup",
+  "screens": {
+    "label": "Mockup screens",
+    "workspace": "Workspace home",
+    "connect": "Connect home",
+    "library": "Library",
+    "project": "Library in a project",
+    "authoring": "Library in Workflow authoring"
+  },
+  "bar": {
+    "label": "GAID places",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: install Workflows and analyse your data",
+    "connectTip": "GAID Connect: make and share geoscience Workflows",
+    "library": "Library",
+    "libraryTip": "Open your papers and research notes",
+    "home": "Go to the Workspace home",
+    "project": "Switch project",
+    "resources": "Computer resources",
+    "settings": "Open settings"
+  },
+  "workspace": {
+    "title": "GAID Workspace",
+    "context": "Install Workflows and analyse your data with the AI agent.",
+    "start": "Start an analysis",
+    "newProject": "New project",
+    "nav": "Workspace sections",
+    "side": {
+      "home": "Home",
+      "projects": "Projects",
+      "workflows": "Installed Workflows",
+      "recent": "Recent projects",
+      "archived": "Archived projects"
+    },
+    "continue": {
+      "heading": "Continue",
+      "open": "Continue",
+      "running": "Running",
+      "decisions": "{count} decisions",
+      "unreviewed": "Not reviewed",
+      "checked": "Checked"
+    },
+    "projects": {
+      "heading": "Projects",
+      "all": "Show all {count}"
+    },
+    "workflows": {
+      "heading": "Installed Workflows",
+      "start": "Start",
+      "find": "Find Workflows in Connect",
+      "ready": "Ready",
+      "envNeeded": "Environment needed",
+      "catalogue": "Built-in",
+      "shared": "Shared",
+      "projects": "{count} projects"
+    }
+  },
+  "connect": {
+    "title": "GAID Connect",
+    "context": "Make geoscience Workflows from papers, literature and research notes, and share them with other researchers.",
+    "create": "Make a Workflow",
+    "glossary": "Show terms",
+    "search": "Search titles, summaries, researchers and categories",
+    "nav": "Connect sections",
+    "side": {
+      "recommended": "Recommended Workflows",
+      "shared": "Shared Workflows",
+      "folders": "Topic folders",
+      "mine": "My Workflows",
+      "mineItem": "Drafts and shared ones",
+      "skills": "Skills",
+      "skillsAll": "All skills",
+      "feeds": "Research feeds",
+      "feedsAll": "All items"
+    },
+    "recommended": "Recommended Workflows",
+    "make": {
+      "heading": "Start from your material",
+      "pdf": "Paper PDF",
+      "library": "Pick from the library",
+      "notes": "Research notes",
+      "analysis": "Workspace analysis",
+      "pdfLine": "Upload a PDF",
+      "libraryLine": "Your papers and notes",
+      "notesLine": "Notes of a project",
+      "analysisLine": "Analysis bundle of a chat"
+    },
+    "shared": {
+      "heading": "Shared Workflows",
+      "order": "Most starred first",
+      "name": "Name",
+      "folder": "Topic folder",
+      "author": "Researcher",
+      "version": "version"
+    },
+    "feeds": {
+      "heading": "Research feeds",
+      "unreviewed": "Not reviewed",
+      "all": "Show all items"
+    },
+    "catalogue": "Built-in Workflow",
+    "sharedBadge": "Shared"
+  },
+  "library": {
+    "title": "Library",
+    "context": "Your papers and research notes. Workspace projects and Workflow authoring in Connect use them.",
+    "add": "Add a paper",
+    "export": "Export references",
+    "folders": "Folders",
+    "allPapers": "All papers",
+    "papers": "Papers {count}",
+    "notes": "Research notes {count}",
+    "search": "Search the library",
+    "col": {
+      "paper": "Paper",
+      "year": "Year",
+      "source": "Source",
+      "used": "Used in"
+    },
+    "usedLine": "{projects} projects · {workflows} Workflows",
+    "unused": "Not used yet",
+    "closeTip": "Close the library and go back",
+    "back": "Back to {place}"
+  },
+  "panel": {
+    "title": "Library",
+    "agent": "AI agent",
+    "inspector": "Right panel",
+    "scope": "This project's literature",
+    "all": "Whole library",
+    "cited": "Cited {count} times",
+    "page": "p. {page}",
+    "openPdf": "Open PDF",
+    "openFull": "Full library",
+    "attach": "Add to project",
+    "close": "Close the library panel",
+    "selected": "{count} picked",
+    "addSources": "Add {count} sources",
+    "pickTitle": "Pick sources from the library",
+    "pickContext": "Picked papers and notes become the sources of this Workflow draft."
+  },
+  "project": {
+    "files": "Files",
+    "notes": "Research notes",
+    "noteTitle": "3D estimate of the Pocheon magnetite body",
+    "noteStatus": "Not reviewed",
+    "workflow": "Workflow Pocheon magnetite body estimate 0.1.1",
+    "citeTip": "Opens that page of the PDF"
+  },
+  "authoring": {
+    "title": "Make a Workflow",
+    "context": "Collect the sources, then answer the questions and a Workflow draft is made.",
+    "steps": {
+      "label": "Workflow authoring steps",
+      "sources": "Sources",
+      "questions": "Questions",
+      "draft": "Draft",
+      "trial": "Trial",
+      "share": "Share"
+    },
+    "added": "Sources {count}",
+    "addHeading": "Add sources",
+    "upload": "Upload files",
+    "web": "Web address",
+    "fromLibrary": "Pick from the library",
+    "next": "Next step",
+    "back": "Previous step",
+    "kinds": {
+      "pdf": "Paper PDF",
+      "note": "Research note",
+      "data": "Data file"
+    }
+  }
+}
