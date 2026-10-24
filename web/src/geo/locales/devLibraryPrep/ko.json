@@ -1,0 +1,185 @@
+{
+  "bar": {
+    "label": "GAID 장소",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: Workflow를 설치하고 내 자료를 분석합니다",
+    "connectTip": "GAID Connect: 지구과학 Workflow를 만들고 공유합니다",
+    "library": "서재",
+    "libraryTip": "내 논문과 정리 노트를 엽니다",
+    "home": "Workspace 홈으로 가기",
+    "project": "프로젝트 바꾸기",
+    "resources": "컴퓨터 자원",
+    "settings": "설정 열기"
+  },
+  "state": {
+    "unreviewed": "검토 전",
+    "checked": "확인함"
+  },
+  "origin": {
+    "gaid": "GAID에서 만듦",
+    "gemini": "외부 정리",
+    "gaidTip": "AI agent가 서재 논문을 읽고 일반 Workflow로 만든 문헌 정리입니다",
+    "geminiTip": "Gemini Notebook에서 내보낸 파일을 가져온 정리입니다. 인용 근거로 쓰지 않습니다"
+  },
+  "sheet": {
+    "close": "창 닫기",
+    "cancel": "취소"
+  },
+  "library": {
+    "back": "Workspace로 돌아가기",
+    "all": "모든 논문",
+    "folders": "폴더",
+    "newFolder": "폴더 만들기",
+    "folderContext": "논문 6편 · 프로젝트 {project}에 붙어 있음",
+    "importGemini": "Gemini 결과 가져오기",
+    "make": "문헌 정리 만들기",
+    "kinds": "서재 항목 종류",
+    "papers": "논문 {count}",
+    "notes": "정리 노트 {count}",
+    "digests": "문헌 정리 {count}",
+    "search": "서재에서 찾기",
+    "rowLine": "논문 {count}편 · {date}",
+    "rowLineUnmatched": "논문 {count}편 · 서재에 없는 문헌 {unmatched} · {date}",
+    "digestNote": "문헌 정리는 여러 논문을 미리 읽고 묶은 자료입니다. Workflow를 시작할 때 AI agent가 이것을 먼저 읽고, 인용은 원래 논문의 쪽으로 확인합니다."
+  },
+  "detail": {
+    "header": "문헌 정리",
+    "markChecked": "확인함으로 표시",
+    "more": "더 보기",
+    "madeLine": "일반 Workflow {workflow} · {date}",
+    "stale": "정리한 뒤 폴더에 논문 {count}편이 더해졌습니다.",
+    "remake": "다시 만들기",
+    "fact": {
+      "covers": "다룬 논문",
+      "contents": "정리 내용",
+      "used": "쓰인 곳"
+    },
+    "coversLine": "{count}편 · 폴더 {folder}",
+    "coversMore": "{count}편 더 보기",
+    "noPdf": "PDF가 없는 {count}편은 서지와 초록만 읽었습니다.",
+    "usedLine": "프로젝트 {projects} · Workflow 시작 {workflows}",
+    "read": "정리 전문 읽기",
+    "readHint": "Markdown",
+    "record": "만든 기록 보기",
+    "recordHint": "채팅, 읽은 쪽",
+    "openProject": "프로젝트에서 열기",
+    "useInWorkflow": "Workflow에서 쓰기"
+  },
+  "make": {
+    "title": "문헌 정리 만들기",
+    "context": "AI agent가 고른 논문을 읽고 비교·요약과 인용 목록을 만들어 서재에 넣습니다.",
+    "papers": "다룰 논문",
+    "papersHint": "서재의 폴더나 논문을 고릅니다. 고른 논문만 읽습니다.",
+    "papersCount": "{count}편 · PDF {pdf}편",
+    "papersEdit": "논문 바꾸기",
+    "noPdf": "PDF가 없는 {count}편은 서지와 초록만 읽습니다.",
+    "kind": "정리 방식",
+    "kindHint": "GAID에 있는 일반 Workflow 가운데 하나로 정리합니다.",
+    "recommended": "권장",
+    "kinds": {
+      "compare": "논문 비교",
+      "compareHint": "논문 2편 이상: 주장, 방법, 자료, 한계를 한 표로 비교하고 쪽 인용을 붙입니다.",
+      "summarize": "논문 요약",
+      "summarizeHint": "논문마다 목적, 방법, 결과, 의의를 따로 요약합니다. 비교표는 없습니다.",
+      "methods": "방법 비교",
+      "methodsHint": "연구 질문에 쓸 수 있는 방법을 장단점과 필요한 자료로 비교합니다."
+    },
+    "question": "연구 질문",
+    "questionHint": "정리의 기준이 됩니다. 한두 문장으로 적으세요.",
+    "where": "정리할 프로젝트",
+    "whereHint": "AI agent가 고른 프로젝트의 채팅에서 읽고, 결과 파일은 해당 프로젝트의 문헌정리 폴더에 남습니다.",
+    "whereAttached": "폴더가 붙은 프로젝트",
+    "footer": "끝나면 서재에 검토 전으로 들어옵니다.",
+    "start": "정리 시작"
+  },
+  "import": {
+    "title": "Gemini Notebook 결과 가져오기",
+    "context": "Gemini Notebook에서 내려받은 보고서나 표를 서재에 외부 정리로 넣습니다.",
+    "file": "가져올 파일",
+    "fileHint": "Word, PDF, Markdown, 텍스트, CSV · 30 MB까지",
+    "replace": "다른 파일 고르기",
+    "name": "이름",
+    "link": "노트북 주소 (선택)",
+    "linkFromFolder": "폴더에 저장한 노트북 주소를 넣었습니다.",
+    "covers": "다룬 논문",
+    "coversHint": "파일에서 찾은 DOI와 제목을 서재와 맞췄습니다. 맞는 것만 남기세요.",
+    "byDoi": "DOI로 찾음",
+    "byTitle": "제목으로 찾음",
+    "notInLibrary": "서재에 없음 · 연결하지 않음",
+    "limit": "외부 정리는 검토 전으로 들어오고 인용 근거로 쓰지 않습니다. 파일은 연구자 PC의 서재에만 저장되고, GAID는 Google에 아무것도 보내지 않습니다.",
+    "footer": "폴더 포천 자철석 PGI에 넣습니다.",
+    "add": "서재에 넣기"
+  },
+  "start": {
+    "meta": "공유된 Workflow · version {version} · 준비됨",
+    "steps": {
+      "label": "시작 설정 단계",
+      "intro": "Workflow 소개",
+      "stage": "분석 단계",
+      "hint1": "자료 2개",
+      "hint2": "조건 1개",
+      "summary": "요약"
+    },
+    "fact": {
+      "purpose": "하는 일",
+      "papers": "근거 논문",
+      "digest": "먼저 읽을 정리",
+      "inputs": "입력 자료",
+      "outputs": "결과"
+    },
+    "papersLine": "{count}편 · 모두 프로젝트에 붙어 있음",
+    "papersAttached": "AI agent가 근거 논문을 인용 근거로 씁니다.",
+    "digestHint": "근거 논문 {total}편 중 {covers}편을 다룸 · {date}",
+    "digestWhy": "근거 논문을 모두 다루어서 권장합니다. 검토 전이라 AI agent가 결과에 쓰는 주장은 원래 논문의 쪽으로 확인합니다.",
+    "digestHintExternal": "근거 논문 {total}편 중 {covers}편을 다룸 · 참고로만 읽음",
+    "digestNone": "정리 없이 시작",
+    "digestNoneHint": "AI agent가 필요할 때마다 논문을 쪽 단위로 찾아 읽습니다.",
+    "toInputs": "입력 자료 고르기",
+    "summaryTitle": "시작 설정 요약",
+    "sum": {
+      "digest": "먼저 읽을 정리",
+      "digestNote": "AI agent가 분석 전에 읽습니다. 인용은 정리가 아니라 원래 논문의 쪽으로 겁니다.",
+      "papers": "근거 논문",
+      "papersLine": "{count}편",
+      "papersNote": "정리에 없는 내용이나 확인할 쪽만 원래 논문에서 읽습니다."
+    },
+    "edit": "수정",
+    "instructions": "AI agent가 받는 지침",
+    "instructionsHint": "시작 메시지에 들어갑니다",
+    "back": "이전 단계",
+    "begin": "분석 시작"
+  },
+  "authoring": {
+    "nav": "Connect 메뉴",
+    "title": "새 Workflow 만들기",
+    "context": "논문, 정리 노트, 문헌 정리, 자료에서 Workflow 초안을 만듭니다.",
+    "steps": {
+      "label": "Workflow 만들기 단계",
+      "sources": "자료",
+      "questions": "질문",
+      "draft": "초안",
+      "trial": "시험",
+      "share": "공유"
+    },
+    "added": "넣은 자료 {count}",
+    "kinds": {
+      "pdf": "PDF",
+      "data": "자료 파일"
+    },
+    "addHeading": "자료 더하기",
+    "upload": "파일 올리기",
+    "web": "웹 주소",
+    "fromLibrary": "서재에서 고르기",
+    "back": "이전 단계",
+    "next": "질문으로"
+  },
+  "panel": {
+    "title": "서재에서 자료 고르기",
+    "context": "문헌 정리를 고르면 AI agent가 논문 전문 대신 정리를 먼저 읽고 질문을 만듭니다.",
+    "withPapers": "다룬 논문 {count}편도 근거 자료로 넣기",
+    "withPapersHint": "질문 옆 근거 보기에 원래 논문의 쪽이 열립니다. 본문은 필요한 쪽만 읽습니다.",
+    "selected": "정리 {count} · 논문 {papers}편",
+    "add": "자료 {count}개 더하기"
+  }
+}

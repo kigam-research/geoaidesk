@@ -1,0 +1,185 @@
+{
+  "bar": {
+    "label": "GAID places",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: install Workflows and analyse your data",
+    "connectTip": "GAID Connect: make and share geoscience Workflows",
+    "library": "Library",
+    "libraryTip": "Open your papers and research notes",
+    "home": "Go to the Workspace home",
+    "project": "Switch project",
+    "resources": "Computer resources",
+    "settings": "Open settings"
+  },
+  "state": {
+    "unreviewed": "Not reviewed",
+    "checked": "Checked"
+  },
+  "origin": {
+    "gaid": "Made in GAID",
+    "gemini": "External summary",
+    "gaidTip": "A literature digest the AI agent made from library papers with a general Workflow",
+    "geminiTip": "A summary imported from a file exported from Gemini Notebook. Never used as a citation source"
+  },
+  "sheet": {
+    "close": "Close window",
+    "cancel": "Cancel"
+  },
+  "library": {
+    "back": "Back to Workspace",
+    "all": "All papers",
+    "folders": "Folders",
+    "newFolder": "Create folder",
+    "folderContext": "6 papers · attached to project {project}",
+    "importGemini": "Import Gemini result",
+    "make": "Make literature digest",
+    "kinds": "Library item kinds",
+    "papers": "Papers {count}",
+    "notes": "Research notes {count}",
+    "digests": "Literature digests {count}",
+    "search": "Search the library",
+    "rowLine": "{count} papers · {date}",
+    "rowLineUnmatched": "{count} papers · {unmatched} sources not in the library · {date}",
+    "digestNote": "A literature digest is material prepared from several papers in advance. When a Workflow starts, the AI agent reads it first and checks citations against the pages of the original papers."
+  },
+  "detail": {
+    "header": "Literature digest",
+    "markChecked": "Mark as checked",
+    "more": "More",
+    "madeLine": "General Workflow {workflow} · {date}",
+    "stale": "{count} papers were added to this folder after the digest was made.",
+    "remake": "Make again",
+    "fact": {
+      "covers": "Papers covered",
+      "contents": "Contents",
+      "used": "Used in"
+    },
+    "coversLine": "{count} papers · folder {folder}",
+    "coversMore": "Show {count} more",
+    "noPdf": "For {count} papers without a PDF only the record and abstract were read.",
+    "usedLine": "Projects {projects} · Workflow starts {workflows}",
+    "read": "Read full digest",
+    "readHint": "Markdown",
+    "record": "Show how it was made",
+    "recordHint": "Chat, pages read",
+    "openProject": "Open in project",
+    "useInWorkflow": "Use in a Workflow"
+  },
+  "make": {
+    "title": "Make a literature digest",
+    "context": "The AI agent reads the chosen papers, writes a comparison or summary with a citation list, and adds it to the library.",
+    "papers": "Papers to cover",
+    "papersHint": "Choose a library folder or papers. Only these papers are read.",
+    "papersCount": "{count} papers · {pdf} PDFs",
+    "papersEdit": "Change papers",
+    "noPdf": "For {count} papers without a PDF only the record and abstract are read.",
+    "kind": "Digest type",
+    "kindHint": "Made with one of the general Workflows in GAID.",
+    "recommended": "Recommended",
+    "kinds": {
+      "compare": "Compare papers",
+      "compareHint": "Two or more papers: compares claims, methods, data and limits in one table with page citations.",
+      "summarize": "Summarize papers",
+      "summarizeHint": "Summarizes each paper's objective, methods, findings and significance separately. No comparison table.",
+      "methods": "Compare methods",
+      "methodsHint": "Compares methods for the research question by strengths, weaknesses and the data they need."
+    },
+    "question": "Research question",
+    "questionHint": "The digest is organised around it. Write one or two sentences.",
+    "where": "Project to work in",
+    "whereHint": "The AI agent reads in a chat of this project, and the output file stays in its 문헌정리 folder.",
+    "whereAttached": "Project this folder is attached to",
+    "footer": "When finished it enters the library as not reviewed.",
+    "start": "Start digest"
+  },
+  "import": {
+    "title": "Import a Gemini Notebook result",
+    "context": "Adds a report or table downloaded from Gemini Notebook to the library as an external summary.",
+    "file": "File to import",
+    "fileHint": "Word, PDF, Markdown, text, CSV · up to 30 MB",
+    "replace": "Choose another file",
+    "name": "Name",
+    "link": "Notebook address (optional)",
+    "linkFromFolder": "Filled in from the notebook address saved on the folder.",
+    "covers": "Papers covered",
+    "coversHint": "DOIs and titles found in the file were matched with the library. Keep only the right ones.",
+    "byDoi": "Found by DOI",
+    "byTitle": "Found by title",
+    "notInLibrary": "Not in the library · not linked",
+    "limit": "External summaries enter as not reviewed and are never used as citation sources. The file is stored only in this PC's library, and GAID sends nothing to Google.",
+    "footer": "Adds it to the folder 포천 자철석 PGI.",
+    "add": "Add to library"
+  },
+  "start": {
+    "meta": "Shared Workflow · version {version} · Ready",
+    "steps": {
+      "label": "Start setting steps",
+      "intro": "Workflow overview",
+      "stage": "Analysis stages",
+      "hint1": "2 inputs",
+      "hint2": "1 condition",
+      "summary": "Summary"
+    },
+    "fact": {
+      "purpose": "What it does",
+      "papers": "Source papers",
+      "digest": "Read first",
+      "inputs": "Inputs",
+      "outputs": "Outputs"
+    },
+    "papersLine": "{count} papers · all attached to this project",
+    "papersAttached": "The AI agent uses these papers as citation sources.",
+    "digestHint": "Covers {covers} of {total} source papers · {date}",
+    "digestWhy": "Recommended because it covers every source paper. It is not reviewed, so the AI agent checks each claim it uses in results against the original paper's page.",
+    "digestHintExternal": "Covers {covers} of {total} source papers · read for reference only",
+    "digestNone": "Start without a digest",
+    "digestNoneHint": "The AI agent looks up and reads paper pages whenever it needs them.",
+    "toInputs": "Choose inputs",
+    "summaryTitle": "Start settings summary",
+    "sum": {
+      "digest": "Read first",
+      "digestNote": "The AI agent reads it before the analysis. Citations point to the original papers' pages, not to this digest.",
+      "papers": "Source papers",
+      "papersLine": "{count} papers",
+      "papersNote": "Only content missing from the digest or pages to check are read from the original papers."
+    },
+    "edit": "Edit",
+    "instructions": "Instructions the AI agent receives",
+    "instructionsHint": "Included in the start message",
+    "back": "Previous step",
+    "begin": "Start analysis"
+  },
+  "authoring": {
+    "nav": "Connect menu",
+    "title": "Make a new Workflow",
+    "context": "Makes a Workflow draft from papers, research notes, literature digests and data.",
+    "steps": {
+      "label": "Workflow making steps",
+      "sources": "Sources",
+      "questions": "Questions",
+      "draft": "Draft",
+      "trial": "Trial",
+      "share": "Share"
+    },
+    "added": "Added sources {count}",
+    "kinds": {
+      "pdf": "PDF",
+      "data": "Data file"
+    },
+    "addHeading": "Add sources",
+    "upload": "Upload files",
+    "web": "Web address",
+    "fromLibrary": "Choose from library",
+    "back": "Previous step",
+    "next": "To questions"
+  },
+  "panel": {
+    "title": "Choose sources from the library",
+    "context": "With a literature digest, the AI agent reads the digest first instead of whole papers to make its questions.",
+    "withPapers": "Also add the {count} papers it covers as sources",
+    "withPapersHint": "The evidence view beside each question opens the original paper's page. Only the pages needed are read.",
+    "selected": "Digests {count} · papers {papers}",
+    "add": "Add {count} sources"
+  }
+}

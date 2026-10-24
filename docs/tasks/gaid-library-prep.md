@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:00:53Z
+updated: 2026-10-24T07:18:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bb1c54f-ec00-4ede-b538-8689a6d7266d","pid":1785127,"provider":"claude","session":"3dbb251a-b5a3-49b3-8474-ccc8cde7b5f6","start":"71315213","token":"0c6b923018272ee28d6b79696503be8b04037904a1f5d58759fec6ee23f1986e"}
 branch: task/gaid-library-prep
 target: main
@@ -50,20 +50,47 @@ This unit owns: "서재에서 워크플로우로 논문이나 자료를 읽히�
 Do not touch the review app or the hub server. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Phase 1 design delivered for user review (2026-10-24): report reports/2026-10-24-gaid-library-prep/index.md with 6 mockup
+screens (서재 문헌 정리 list/detail, make sheet, Gemini import sheet, start window intro + summary, Connect picker).
+Mockup page /dev/library-prep (web/src/app/dev/library-prep/page.dev.tsx, web/src/geo/dev/library-prep/, locale namespace
+devLibraryPrep). Checks: web tsc clean; copy validator 0 errors, 0 warnings in devLibraryPrep; check-ui 0 errors.
+48 screenshots (6 screens × 계측/도폭 × light/dark × 1440×900/1280×800) in pc74:~/data/geoaidesk/work/gaid-library-prep/shots/
+(re-shoot: start `npx next dev -p 3241` in web/, then ~/data/geoaidesk/work/gaid-library-prep/shoot.sh shots <w> <h> [screens]).
+No app behaviour changed. Phase 2 not started.
 ## Next steps
-1. (the next session's first action)
+1. Wait for the user's answer on the three decisions (report §6) in this conversation.
+2. Phase 2 after approval AND gaid-ia-connect-workspace--library-panels on main: decide work packages (server digest item kind
+   + import + make flow; start-window/start-message + agent `library_digest` tool; authoring source kind on top of
+   gaid-authoring-tokens; fix hub-synced PDFs lacking a page cache), implement, scripts/check, real-app check with one folder.
+Blocked: user decision on the phase-1 design (report §6) and library-panels integration on main.
 ## Failed approaches
 ## Notes and decisions
+- Diagnosis (2026-10-24, code read): chat/start read attached papers via library_search (3 snippets/paper) and library_read (5
+  pages/call); start message lists 근거 논문 + one "check" sentence; authoring sends up to 260,000 chars of paper text per model
+  call (analyze/draft/revise); general literature Workflows (summarize-paper, compare-papers, methods-comparison, …) use web
+  search and write sandbox Markdown, never 서재; no import path for Gemini output. Correction to the goal text: only `pyzotero`
+  is in DEFAULT_DISABLED_SKILLS; paper-lookup, citation-management, literature-review are enabled (no Workflow uses them).
+  Found: hub-synced PDFs are stored without a page cache (sync/index.ts), so library_read may return empty pages there.
+- Design: new 서재 item kind "문헌 정리" (origins GAID-made via a general Workflow, or 외부 정리 imported from Gemini Notebook);
+  검토 전 until 확인함; never cited itself (citations go to original paper pages); start window offers "먼저 읽을 정리";
+  authoring picker gets a 문헌 정리 segment with "다룬 논문도 근거 자료로 넣기". Authoring token mechanics stay with
+  gaid-authoring-tokens.
+- Orchestration (phase 1): sequential and tightly coupled (diagnosis → design → mockup → report); done by the writer alone,
+  no child writers. Phase 2 packages (server digest store/import, start-window/authoring wiring, agent instructions) are
+  decided after approval.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
+- [결정] 이 설계와 시안대로 2단계(구현)를 진행할지 — 가) 시안대로 진행(서재 옆 패널 작업이 main에 들어온 뒤, Workflow 만들기 쪽은 gaid-authoring-tokens 결과 위에) — 나) 고칠 곳을 받아 시안을 고친 뒤 다시 보기 — 권장: 가) 요청한 세 가지를 모두 화면에 담았고 인용은 원래 논문의 쪽으로 남음 — 막힌 일: 2단계 구현 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
+- [결정] 새 서재 항목 이름 — 가) "문헌 정리"(Gemini 출처는 "외부 정리" 표시) — 나) "문헌 요약" — 권장: 가) "정리 노트"와 겹치지 않고 "요약 노트"는 금지어 — 막힌 일: 2단계 문구·용어집 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
+- [결정] 외부 정리를 Workflow 시작에서 고를 수 있게 할지 — 가) 고를 수 있게 하되 "참고로만 읽음", 권장 선택 안 함 — 나) 서재 안에서만 보기 — 권장: 가) 선택폭을 지키고 검토되지 않은 외부 결과가 인용 근거가 되지 않음 — 막힌 일: 2단계 시작 창 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-library-prep/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
