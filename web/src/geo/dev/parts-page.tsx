@@ -37,6 +37,7 @@ const PAIRS = [
   { id: "placeholder", fg: "--gaid-ink-3", bg: "--gaid-face", min: 4.5 },
   { id: "link", fg: "--gaid-signal-ink", bg: "--gaid-face", min: 4.5 },
   { id: "onSignal", fg: "--gaid-on-signal", bg: "--gaid-signal", min: 4.5 },
+  { id: "onSignalHover", fg: "--gaid-on-signal", bg: "--gaid-signal-hover", min: 4.5 },
   { id: "onSignalPressed", fg: "--gaid-on-signal", bg: "--gaid-brand-hover", min: 4.5 },
   { id: "selected", fg: "--gaid-ink", bg: "--gaid-signal-tint", min: 7 },
   { id: "success", fg: "--gaid-success", bg: "--gaid-success-tint", min: 4.5 },
@@ -45,6 +46,7 @@ const PAIRS = [
   { id: "untested", fg: "--gaid-untested", bg: "--gaid-face", min: 4.5 },
   { id: "controlEdge", fg: "--gaid-control-edge", bg: "--gaid-face", min: 3 },
   { id: "ring", fg: "--ring", bg: "--gaid-face", min: 3 },
+  { id: "ringChrome", fg: "--ring", bg: "--gaid-chrome", min: 3 },
 ] as const;
 
 // Resolves any CSS colour to sRGB by painting one pixel (shadcn skill showcase color-pair.tsx, MIT).
@@ -118,7 +120,7 @@ function ContrastTable() {
                     style={{ "--pair-bg": `var(${pair.bg})`, "--pair-fg": `var(${pair.fg})` } as CSSProperties}
                     aria-hidden
                   >
-                    {pair.id === "controlEdge" || pair.id === "ring" ? <span className="h-4 w-6 rounded-sm border-2 border-current" /> : text("contrast.sample")}
+                    {pair.id === "controlEdge" || pair.id.startsWith("ring") ? <span className="h-4 w-6 rounded-sm border-2 border-current" /> : text("contrast.sample")}
                   </span>
                 </td>
                 <th scope="row" className="py-1.5 pr-3 text-left font-normal">{text(`contrast.pairs.${pair.id}`)}</th>

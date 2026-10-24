@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:09:08Z
+updated: 2026-10-24T04:19:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"de68e451-97f8-4d7d-b9dd-6dd12ceee4d8","pid":2621511,"provider":"claude","session":"f940d4c6-cc49-4d80-8904-a915a4b5d7ac","start":"70284572","token":"0fe8e40f1ea359a56f63a8022e870ac31a328d0a3a949ee5845ab1c5ed4fdbf6"}
 branch: task/gaid-ui-shared-contrast
 target: main
@@ -38,20 +38,36 @@ Do not touch the review app or the hub server. Running in parallel: gaid-promo-v
 starts scenario A. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Done (single writer, no child units: small, tightly coupled colour-role change). Tokens: new `--gaid-signal-hover`
+  (#1a54e8 / #2f60df), dark `--ring`/`--sidebar-ring` = `--gaid-signal-ink`, base outline `outline-ring` (was /50).
+  Parts: link button text `text-gaid-signal-ink` (pressed `text-gaid-ink`), filled hover `bg-gaid-signal-hover`, tab
+  inactive `text-muted-foreground`, sidebar count `text-gaid-ink-2`, dark field fill `dark:bg-gaid-face-2` (input,
+  textarea, select, input-group). Focus ring = `focus-visible:outline-2 focus-visible:outline-offset-2
+  focus-visible:outline-ring` on every shared ui/ part with the old 3 px /50 ring and on SidebarItem (scroll area inset).
+  Parts page: contrast rows `onSignalHover`, `ringChrome`. Guide token table/S1/S7 and ui-rules roles updated.
+- Kit (PC74, ~/data/geoaidesk/work/gaid-ui-shared-contrast/): before shadcn 248 / impeccable 7 / visual 0 / axe 11;
+  after (after2, baselines updated) 248 / 0 / 0 / 0. 1280x800 four combos: no horizontal overflow (shots/).
+- Report: reports/2026-10-24-gaid-ui-shared-contrast/index.md (figures from old vs new baselines).
+- Re-verify: `node geo/ui/quality/run.mjs --out <dir>` (after `npm ci` in geo/ui/quality and web), `scripts/check`.
 ## Next steps
-1. (the next session's first action)
+1. Fill the scripts/check result into report section 4, humanizer pass, task review-copy, remove build caches, finish.
 ## Failed approaches
+- Raising 도폭 dark `--gaid-ink-3` to fix the placeholder: would need ~ink-2 brightness, erasing the ink-2/ink-3 split.
 ## Notes and decisions
+- Scope: the focus-ring rule was applied to all shared ui/ primitives that drew the 3 px /50 ring (switch, select,
+  textarea, badge, accordion, scroll-area, input-group too), not only button/tabs/sidebar/input, so S7 holds for every
+  shared part; screen files untouched. Dark outline button and active tab keep `dark:bg-input/30` (they pass S4).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
+- [결정] 대비 결과가 0건이 된 impeccable과 axe를 언제 막는 단계로 바꿀까요? — 가) 다른 PC 한 대에서 전체 점검을 한 번 돌려 같은 결과(0건)가 나오면 두 도구를 막는 단계로 바꾸고, 화면 비교와 shadcn 검사기는 보고만 하는 단계로 둔다 — 나) 지금은 모두 보고만 하고 실제 화면까지 점검 대상에 넣은 뒤 함께 바꾼다 — 권장: 가) 전환 규칙의 남은 조건 하나만 채우면 되고 두 도구는 글꼴 차이에 덜 민감하다 — 막힌 일: 없음 — 조건: 다른 PC에서 점검 실행 — 근거: reports/2026-10-24-gaid-ui-shared-contrast/index.md#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-ui-shared-contrast/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

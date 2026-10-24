@@ -114,6 +114,7 @@
   --color-gaid-signal: var(--gaid-signal);
   --color-gaid-signal-ink: var(--gaid-signal-ink);
   --color-gaid-signal-tint: var(--gaid-signal-tint);
+  --color-gaid-signal-hover: var(--gaid-signal-hover);
   --color-gaid-hover: var(--gaid-hover);
   --color-gaid-press: var(--gaid-press);
   --color-gaid-danger-press: var(--gaid-danger-press);
@@ -151,6 +152,7 @@
   --gaid-signal: #1f5eff;
   --gaid-signal-ink: #1d4fd8;
   --gaid-signal-tint: #e8eeff;
+  --gaid-signal-hover: #1a54e8;
   --gaid-on-signal: #ffffff;
   --gaid-hover: #e9ecf1;
   --gaid-press: #dde1e8;
@@ -231,6 +233,7 @@
   --gaid-signal: #3366e8;
   --gaid-signal-ink: #7fa2ff;
   --gaid-signal-tint: #1e2b4d;
+  --gaid-signal-hover: #2f60df;
   --gaid-hover: #262b34;
   --gaid-press: #2f3540;
   --gaid-brand-hover: #2b5ad6;
@@ -247,6 +250,9 @@
   --gaid-shadow-overlay: 0 18px 44px -10px rgb(0 0 0 / 0.7), 0 0 0 1px #2e333c;
 
   --popover: #1e2229;
+  /* Focus rings use the blue text role on dark: ≥ 3:1 on dark chrome too (UI guide v2 S4, S7). */
+  --ring: var(--gaid-signal-ink);
+  --sidebar-ring: var(--gaid-signal-ink);
   --sidebar-accent: #2a2f38;
   --chart-1: #7fa2ff;
   --chart-2: #4cc38a;
@@ -302,7 +308,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
   body {
     @apply bg-background text-foreground;
