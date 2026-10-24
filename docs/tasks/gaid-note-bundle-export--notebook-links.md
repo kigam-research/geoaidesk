@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T01:55:35Z
+status: active
+updated: 2026-10-24T02:12:06Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d","pid":1195251,"provider":"codex","session":"01a16b98-98fb-76e2-936a-665bab0a74ca","start":"69446405","token":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
 branch: task/gaid-note-bundle-export--notebook-links
 target: task/gaid-note-bundle-export
@@ -79,13 +79,13 @@ Parent integration: mount `ProjectNotebookLink` from `web/src/geo/notebook-link/
 
 Checks passed: server and web `npx tsc --noEmit`; server route/persistence suite (15 tests); web contract/control/project-wrapper suites (24 tests); copy validator (0 errors, 100 existing warnings); UI validator (0 errors, 78 accepted existing debt); `git diff --check`. Full `scripts/check` and visual screenshots remain the parent's integration checks, as agreed.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-24T01:55:35Z: ready; the parent gaid-note-bundle-export integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Retry `VITEST_MAX_WORKERS=1 task finish` after verifying the default-parallel web failures. Parent then runs `task complete gaid-note-bundle-export--notebook-links`, mounts the project control and checks the integrated UI.
 
 ## Failed approaches
 Dependency installation job was refused twice before launch because edits were made before the launcher checked source cleanliness.
 No job receipt was created and no install started. Save and wait for job launch before further edits.
 Initial web typecheck rejected an unsupported `exact` option on Testing Library `getByRole`. Removed it (role names match exactly by default); typecheck and all web tests passed afterward.
+First automatic finish check: backend passed 210 files/2315 tests (1 file/8 tests skipped); web failed 6 existing tests in csv-viewer, file-preview-panel (2), settings-dialog and map viewer (2). Four were 5-second timeouts; two were late/missing editor or settings queries. Notebook tests passed. The four affected files with maxWorkers=2 passed 25/26 tests; a.tex draft assertion then failed, but file-preview-panel alone with maxWorkers=1 passed all 8. Installed Vitest supports `VITEST_MAX_WORKERS` (read from its resolver), so retry will use 1 without changing unrelated source. Log: `/home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-9z1z66hr.log`. Full-suite resource/timing interference is suspected, not proven.
 ## Notes and decisions
 Sequential plan: settle the shared contract and storage first, build the common UI second, then verify persistence and UI together.
 This is tightly coupled work; the single writer owns all listed files and does not delegate.
