@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:45:07Z
+updated: 2026-10-24T01:49:51Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -44,11 +44,47 @@ Request from the starter:
   video to Google Drive (user rule).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Analysis of v4 and Direction v5 written (below); capture contract `geo/promo/CONTRACT.md` (v5, Yilgarn shot list Y1–Y7).
+- Review app: hub told before use (request d7fb43947212); read-only exploration screenshots in
+  `~/data/geoaidesk/work/gaid-promo-video-v5/explore/` (workspace-state PUTs blocked; Yilgarn workspace-state.json mtime
+  unchanged 2026-10-23 13:24:46 KST).
 ## Next steps
-1. (the next session's first action)
+1. Start capture child `gaid-promo-video-v5--capture` (Y1–Y7) and meanwhile rework `scene.js` (window stage + callouts) on
+   the v3 takes with re-derived whole-region rects.
 ## Failed approaches
 ## Notes and decisions
+
+### Analysis of v4 (2026-10-24)
+- Examples: all 15 demo takes are the Pocheon PGI study (capture-v3). The review app also holds the Yilgarn nickel MPM
+  example: hub folder 광상 부존 가능성(MPM) (5 entries) and the recommended card "PU-컨포멀 탐사 우선순위 존 분류" with a concept
+  picture (`entry-ap-a135f290-1c4`, version 0.1.1), project `yilgarn-cd7814` (Workflow "PU-컨포멀 탐사 존 분류 (새 지역)",
+  chat with the run, priority-zone map `outputs/yilgarn_priority_zones.{gpkg,geomap.json}` over OSM, research note
+  `연구노트/2026-10-23-yilgarn-priority` with a map figure and an answered decision), paper `ahn2026` in 서재.
+- Highlight boxes: the v3 beat rects were hand-drawn per state and often end inside a region. In
+  `capture-v3/beat-checks/` e.g. L1 beat 2 ends mid side panel ("내 연구에서 쓰인 곳" list cut at the bottom), A1 beat 2 cuts
+  between two source rows, A3 beat 2 cuts the step-detail column mid-list, A4 beats cut cards, and v4 additionally used
+  `UNION` of two partial rects. Rule for v5: a frame is the bounds of whole DOM elements (v5 takes: measured in the
+  capture; v3 takes: re-derived from the frames along visible panel/card edges and checked on drawn frames).
+- Layout: every demo step showed the app full-frame (1696 px) with a dim; the motion design stopped at the header.
+
+### Direction v5
+- Keep v4's structure and messages: opening → background motion graphics → research cycle (GAID 허브/시스템) → six demo
+  chapters with purpose line, part plate, mini ring and one outcome tag per step → KIGAM Second brain → closing.
+- Demo as a window stage: the real screen is a framed window (GAID chrome bar with an example chip such as
+  "포천 자철석 PGI" / "Yilgarn 니켈 MPM") placed and moved inside the motion design, not full-frame. A step's feature is
+  framed on the window (whole region) and lifted out as an enlarged detail window of the same original pixels, joined by
+  projection lines, with the outcome tag as large type beside it. Some steps pair two windows (PGI and Yilgarn side by
+  side: maps, notes). No filters on the footage; tokens, Pretendard, brand blue; no gradients/glass/AI icons/emoji.
+- Example per chapter (best fit, not one example end to end): 내 서재 = PGI (L1, L2); Workflow 만들기 = PGI live authoring
+  (A1, A2) + Workflow stages; 허브 공유 = PGI version register (H1) + Yilgarn hub card/MPM folder/entry (Y1, Y2); 연구 분석 =
+  Yilgarn start window (Y3) + PGI AI agent run (R3) + map pair Yilgarn/PGI (Y5, M1); 연구노트 = Yilgarn note (Y6) + PGI page
+  citations (N1); 다시 서재로 = paper uses and connection map (L4/Y7, L5). Target 95–103 s.
+
+### Work packages and integration order
+1. Capture child `gaid-promo-video-v5--capture` ("general work"): owns `geo/promo/capture_v5*.py`, the v5 section of
+   `geo/promo/CAPTURE.md`, `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`. Interface: `CONTRACT.md` v5.
+2. Parent (me): `scene/`, `render.py` (multi-capture input), README, rects for v3 takes, render, report, registry.
+3. Integration: complete the child → previews with both captures → box checks on key frames → final render job → report.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
