@@ -7,7 +7,8 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
-| <img src="2026-10-24-gaid-promo-video-v3/figures/02-demo-a.png" width="120"> | 2026-10-24 03:26 | [GAID 홍보 영상 v3: 최종 앱에서 포천 연구 한 바퀴로 다시 찍은 105초 영상 (내부 검토용)](2026-10-24-gaid-promo-video-v3/index.md) | v2의 구성과 연출은 그대로 두고, 시연을 최종 앱에서 포천 자철석 PGI 연구 한 바퀴로 다시 찍었습니다. 서재 옆 PDF, 여러 자료로 만드는 Workflow, 질문 옆 근거 뷰어, 단계별 시작 창과 예제 자료, 근거 논문 인용, 노트를 서재에 넣기, Workflow version이 순환 속 제자리에 나옵니다. | 검토 전 | 미정 | 0 |
+| — | 2026-10-24 10:32 | [GAID와 Gemini Notebook(구 NotebookLM) 비교, 차별화와 연계 제안](2026-10-24-gaid-notebooklm-review/index.md) | Gemini Notebook은 문헌 이해와 설명 자료 만들기에서 GAID보다 앞서고, 이제 코드도 실행합니다. GAID가 앞서는 곳은 기관 안에서 지구과학 자료를 다루고, 방법을 Workflow로 공유하며, 분석 기록을 남기는 일입니다. 우선 인용을 눌러 PDF 쪽을 여는 기능과 노트 결과 묶음을 만들고, 연계는 링크 저장과 공개 자료 내보내기부터 하기를 권합니다. | 검토함 10-24 | 미정 | 2 |
+| <img src="2026-10-24-gaid-promo-video-v4/figures/01-background.png" width="120"> | 2026-10-24 10:17 | [GAID 홍보 영상 v4: 배경을 움직이는 그림으로 바꾸고 목적부터 말하는 103초 영상 (내부 검토용)](2026-10-24-gaid-promo-video-v4/index.md) | 배경 파트는 연구자가 자료를 조사하고 논문을 읽고 코드를 짜는 모습과, 흩어진 스킬·도구가 GAID로 모이는 모습을 움직이는 그림으로 보여 줍니다. 시연은 장마다 목적 문장과 "GAID 시스템/GAID 허브" 표시로 시작하고, 기능은 그 목적을 따라 하나씩 나옵니다. "개념도" 표시는 지웠습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-24-gaid-ui-audit/figures/01-hub-headers.png" width="120"> | 2026-10-24 01:19 | [10월 22~23일에 바뀐 화면을 UI 가이드 v2로 점검하고 고침](2026-10-24-gaid-ui-audit/index.md) | 22~23일 작업으로 바뀐 화면 30여 개를 두 스타일·두 테마·두 창 크기로 찍어 가이드와 대조했습니다. 위반 31건 가운데 26건을 고쳤고, 남은 5건은 다듬기 수준이라 목록으로 남겼습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-stages/figures/start-stages-model.png" width="120"> | 2026-10-23 | [Workflow를 분석 흐름 단계로 나누고 시작 창 단계를 7칸 이하로 줄임](2026-10-23-gaid-workflow-stages/index.md) | Workflow는 이제 자료 준비 → 처리·모델링 → 평가 → 해석처럼 분석 흐름에 따라 3~5단계로 만들어지고, 시작 창은 소개·단계·요약을 7칸 이하로 보입니다. 포천 Workflow는 23칸에서 다시 만든 초안 기준 7칸이 되었습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-23-gaid-workflow-cite-scope/figures/01-start-window-papers.png" width="120"> | 2026-10-23 23:31 | [Workflow의 근거 논문을 프로젝트 인용 범위에 붙여 서재·Workflow·노트를 잇기](2026-10-23-gaid-workflow-cite-scope/index.md) | 허브 Workflow를 시작할 때 근거 논문을 연구자 동의를 받아 인용 범위에 붙이고, 노트가 그 논문을 인용해 서재에서 논문·Workflow·노트가 서로 이어집니다. 허브 등록 창은 함께 공유되는 예제 자료를 파일별로 보여 줍니다. | 검토 전 | 미정 | 0 |
@@ -68,10 +69,11 @@
 | <img src="2026-10-11-gaid-runtime/figures/01-start-prompt.png" width="120"> | 2026-10-11 13:35 | [GeoAIDesk 실행 기반 — 고정 카탈로그, 준비된 환경, 파일 요약, 로컬 모델 설정 (WP03 gaid-runtime)](2026-10-11-gaid-runtime/index.md) | 앱이 skill_hub 카탈로그 0.2.0을 해시로 확인해 설치하고, 지질 패키지를 미리 갖춘 환경과 파일 요약·대용량 읽기 안내를 제공하며, 채팅마다 시작 프롬프트 크기를 보여 줍니다. 다만 도구 설명만 약 19K 토큰이라 32K 로컬 모델은 여전히 부족합니다. | 검토함 10-11 | 채택 | 2 |
 | <img src="2026-10-11-gaid-fork-base/figures/01-workspace.png" width="120"> | 2026-10-11 11:35 | [GeoAIDesk 배포 기반 (WP02 gaid-fork-base)](2026-10-11-gaid-fork-base/index.md) | 새 checkout에서 한 줄 명령으로 설치·실행되고, 중지·재시작 후에도 프로젝트가 남으며, 사용자 자료는 소스 밖에 저장됩니다. | 검토함 10-11 | 미정 | 0 |
 
-<details><summary>대체된 보고서 2건</summary>
+<details><summary>대체된 보고서 3건</summary>
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-24-gaid-promo-video-v3/figures/02-demo-a.png" width="120"> | 2026-10-24 03:26 | [GAID 홍보 영상 v3: 최종 앱에서 포천 연구 한 바퀴로 다시 찍은 105초 영상 (내부 검토용)](2026-10-24-gaid-promo-video-v3/index.md) | v2의 구성과 연출은 그대로 두고, 시연을 최종 앱에서 포천 자철석 PGI 연구 한 바퀴로 다시 찍었습니다. 서재 옆 PDF, 여러 자료로 만드는 Workflow, 질문 옆 근거 뷰어, 단계별 시작 창과 예제 자료, 근거 논문 인용, 노트를 서재에 넣기, Workflow version이 순환 속 제자리에 나옵니다. | — | 대체됨 → 2026-10-24-gaid-promo-video-v4 | 0 |
 | <img src="2026-10-23-gaid-promo-video-v2/figures/01-motion.png" width="120"> | 2026-10-23 13:38 | [GAID 홍보 영상 v2: 연구 순환으로 다시 짠 105초 영상 (내부 검토용)](2026-10-23-gaid-promo-video-v2/index.md) | 한 연구자가 서재의 논문으로 Workflow를 만들어 공유하고, 분석과 연구노트를 거쳐 다시 서재로 돌아오는 고리를 중심으로 영상을 다시 짰습니다. 실제 화면은 확대·스크롤 없이 기능마다 이름표로 설명합니다. | — | 대체됨 → 2026-10-24-gaid-promo-video-v3 | 0 |
 | <img src="2026-10-23-gaid-promo-video/figures/01-motion.png" width="120"> | 2026-10-23 01:11 | [GAID 90초 홍보 영상 (내부 검토용)](2026-10-23-gaid-promo-video/index.md) | 모션그래픽과 실제 GAID 화면을 섞은 90초 무음 영상을 만들었습니다. 서재, shp 지도 뷰어, GAID 허브를 실제 화면으로 보여 주고, 차트의 수치는 모두 실제 기록에서 가져왔습니다. | — | 대체됨 → 2026-10-23-gaid-promo-video-v2 | 0 |
 
