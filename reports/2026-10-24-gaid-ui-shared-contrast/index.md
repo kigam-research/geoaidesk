@@ -8,6 +8,7 @@ review_status: pending
 decisions: 1
 cover: figures/01-parts-four-after.png
 supersedes:
+reviewed: 2026-10-24
 ---
 # 공용 부품 대비와 초점 고리 수정
 
