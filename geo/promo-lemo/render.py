@@ -93,7 +93,10 @@ def prepare(root: Path, captures: dict[str, Path]) -> dict:
             tracks = track(str(capture), take[key]["shots"])
             cache.write_text(json.dumps(tracks))
         for shot in take[key]["shots"]:
-            shot["pointer"] = tracks.get(shot["id"])
+            if not any(shot.get("pointer") or []):  # a capture that recorded its pointer keeps it
+                shot["pointer"] = tracks.get(shot["id"])
+            else:  # capture-v6 records {x, y}; the scene reads [x, y]
+                shot["pointer"] = [[q["x"], q["y"]] if isinstance(q, dict) else q for q in shot["pointer"]]
         link = root / f"capture-{key}"
         if link.is_symlink():
             link.unlink()

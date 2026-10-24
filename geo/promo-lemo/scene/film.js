@@ -132,7 +132,7 @@
   // Real-system takes from two examples (user, 2026-10-24: "예제도 yilgarn예제와 PGI예제를 둘다써도되고 … 적합한것을 사용"):
   // `p` = 포천 자철석 광체 추정 (PGI example, capture-v3), `y` = Yilgarn 니켈 탐사 우선순위 (capture-v2). A take is shown whole at one
   // scale as a window inside the motion graphics (no zoom, no scroll inside it). `use` = shot seconds; tags = [shot t0, t1, beat, label].
-  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역', v: '예제 · Yilgarn 니켈 탐사 우선순위 구역', g: '예제 실행 · 실제 AI agent 작업' };
+  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역', v: '예제 · Yilgarn 니켈 탐사 우선순위 구역', g: '예제 · 포천 자철석 광체 추정 · 실제 실행' };
   const shotInfo = (src, id) => CAP[src].shots.find(s => s.id === id);
   const BR = (src, id, k) => { const i = shotInfo(src, id); return i && i.beats && i.beats[k] ? i.beats[k].rect : null; };
   const UNION = (a, b) => (a && b ? { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x), height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y) } : a || b);
@@ -167,8 +167,10 @@
     ] },
     { st: 3, part: 'sys', title: '허브의 Workflow를 설치하고 AI agent와 분석합니다', shots: [
       { src: 'y', id: 'R1', use: [0, 6], hold: 0.4, tags: [[0, 'Workflow 설치와 자료 준비'], [1, 'Workflow 설치와 자료 준비'], [2, '단계마다 자료와 조건']] },
-      { src: 'p', id: 'R3', use: [0, 2], tags: [[0, 'AI agent가 Workflow대로 분석']] },
-      { src: 'y', id: 'R2', use: [2, 4], hold: 0.3, tags: [[1, 'AI agent가 Workflow대로 분석']] },
+      // live footage of one real run (capture-v6, Pocheon example): start, the agent working (10 fps, played 3x, marked), result
+      { src: 'g', id: 'AG1', use: [1.0, 4.6], tags: [[0, 'AI agent가 Workflow대로 분석']] },
+      { src: 'g', id: 'AG2', use: [8, 20], speed: 3, tags: [[0, 'AI agent가 Workflow대로 분석']] },
+      { src: 'g', id: 'AG3', use: [0.2, 5.8], tags: [[0, 'AI agent가 Workflow대로 분석'], [2, 'AI agent가 Workflow대로 분석']] },
       { src: 'y', id: 'M1', use: [0, 5], hold: 0.6, tags: [[0, '결과를 지도에서 원본 값까지'], [1, '결과를 지도에서 원본 값까지']] },
     ] },
     { st: 4, part: 'sys', title: '결과와 판단은 연구노트에 남습니다', shots: [
@@ -740,17 +742,19 @@
       let last = null;
       for (const [k, label] of sg.tags) {
         const beat = info.beats[k];
-        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + sg.span);
-        const ta = sg.a + (t0 - sg.skip) / sg.speed + (last ? 0 : lead);
+        const short = beat.t1 - beat.t0 < 1.2; // a click beat: show it from just before the click until after it lands
+        const t0 = Math.max(short ? beat.t0 - 0.7 : beat.t0, sg.skip), t1 = Math.min(short ? beat.t1 + 1.0 : beat.t1, sg.skip + sg.span);
+        const ta = Math.max(sg.a + (t0 - sg.skip) / sg.speed, last ? 0 : sg.a + lead);
         const tb = t1 >= sg.skip + sg.span - 0.01 ? sg.b : sg.a + (t1 - sg.skip) / sg.speed;
         if (tb <= ta + 0.3) continue;
         // box: from the frame the pointer enters the rect to the last frame it is inside (end of take covers the hold)
         let fIn = null, fOut = null;
-        for (let f = Math.ceil(t0 * sg.fps); f < Math.floor(t1 * sg.fps); f++) if (inside(ptr[f], beat.rect)) { if (fIn === null) fIn = f; fOut = f; }
+        const s0 = t0, s1 = t1;
+        for (let f = Math.ceil(s0 * sg.fps); f < Math.floor(s1 * sg.fps); f++) if (inside(ptr[f], beat.rect)) { if (fIn === null) fIn = f; fOut = f; }
         let box = null;
         if (fIn !== null) {
           const ba = Math.max(ta, sg.a + (fIn / sg.fps - sg.skip) / sg.speed - 0.1);
-          const bb = fOut >= Math.floor(t1 * sg.fps) - 2 ? tb : Math.min(tb, sg.a + (fOut / sg.fps - sg.skip) / sg.speed + 0.35);
+          const bb = fOut >= Math.floor(s1 * sg.fps) - 2 ? Math.max(tb, sg.a + (s1 - sg.skip) / sg.speed) : Math.min(Math.max(tb, sg.a + (fOut / sg.fps - sg.skip) / sg.speed + 0.35), sg.b);
           if (bb - ba >= 0.8) box = { a: ba, b: bb };
         }
         const entry = { a: ta, b: tb, rect: beat.rect, label, box, same: !!last && last.label === label, prev: last, sg };
