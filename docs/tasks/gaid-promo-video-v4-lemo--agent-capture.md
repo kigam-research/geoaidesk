@@ -1,6 +1,6 @@
 ---
 format: 1
-status: active
+status: ready
 updated: 2026-10-24T05:51:40Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
@@ -72,8 +72,9 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - One capture-error retake was used; both full methods completed, all five models unconverged. The selected run took about 10 min 21 s from UI send to observed ready, with 623 s captured; nominal ~10-minute overrun came from packaging repair, not enlarged numerical work. Initial failed capture is archived, not selected.
 - Chrome is closed, controller port inactive, hub before/after notices delivered. Controller job 1 and export job 3 exited 0; failed export job 2 was corrected and superseded. No new model/settings/service change or third analysis run occurred.
 ## Next steps
-1. Run task finish to notify the parent. The parent integrates with task complete and owns the film edit/report. No more review-app use or analysis run is needed.
-2. Safe read-only recheck: `uv run --no-project python geo/promo-lemo/capture/audit.py`; no model or browser calls. Do not rerun retake.py or resend either request file.
+<!-- task:closed -->
+Closed 2026-10-24T05:51:40Z: ready; the parent gaid-promo-video-v4-lemo integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 - Export job 2 failed its chronological-arrival assertion on AG2-whole. Direct inspection found 25 native frame deliveries out of presentation-time order, with unique timestamps and small delays during concurrent readbacks. Export now sorts by the native presentation timestamp while retaining original arrival frame IDs. No source image, time interval or UI content is changed.
 - Native view scale also scales CDP input coordinates. A normal Playwright click hit the header rather than Workflow during retake staging. Direct hit testing confirmed the 2.25 coordinate factor; staging now resets native scale, and filmed pointer events multiply only dispatched coordinates while logging CSS coordinates. No second analysis was sent during that failed staging attempt.
