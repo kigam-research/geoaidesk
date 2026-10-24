@@ -64,6 +64,7 @@ describe("Gemini output import", () => {
   });
   it("handles UTF-8 text and bounded quoted CSV with a kept-row notice", async () => {
     expect((await importer.preview(store, body("정리.txt", "한글 자료"))).title).toBe("정리");
+    expect((await importer.preview(store, body("heading.markdown", "## First heading\n\nText"))).title).toBe("First heading");
     const csv = 'Name,Description\n"A|B","one,two"\n' + Array.from({ length: 250 }, (_, i) => `${i},value`).join("\n");
     const p = await importer.preview(store, body("table.csv", csv));
     const item = await importer.import(store, { token: p.token, title: p.title, covers: [] });
