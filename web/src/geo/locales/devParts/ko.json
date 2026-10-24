@@ -28,6 +28,7 @@
       "placeholder": "안내 글",
       "link": "링크와 파란 글",
       "onSignal": "주 동작 버튼 글자",
+      "onSignalHover": "올린 주 동작 버튼 글자",
       "onSignalPressed": "누른 주 동작 버튼 글자",
       "selected": "선택한 항목",
       "success": "성공 표시",
@@ -35,7 +36,8 @@
       "danger": "위험 표시",
       "untested": "미시험 표시",
       "controlEdge": "입력칸 경계",
-      "ring": "초점 고리"
+      "ring": "초점 고리",
+      "ringChrome": "기능층 초점 고리"
     }
   },
   "states": {

@@ -28,6 +28,7 @@
       "placeholder": "Placeholder text",
       "link": "Links and blue text",
       "onSignal": "Primary button label",
+      "onSignalHover": "Hovered primary button label",
       "onSignalPressed": "Pressed primary button label",
       "selected": "Selected item",
       "success": "Success mark",
@@ -35,7 +36,8 @@
       "danger": "Danger mark",
       "untested": "Untested mark",
       "controlEdge": "Input boundary",
-      "ring": "Focus ring"
+      "ring": "Focus ring",
+      "ringChrome": "Focus ring on chrome"
     }
   },
   "states": {
