@@ -133,3 +133,15 @@ files = [{ path = "gaid-promo-v3.mp4", sha256 = "1fe7371596ac2c53e6d18534cf43a0c
 report = "reports/2026-10-24-gaid-promo-video-v3/index.md"
 replicas = []
 supersedes = "gaid-promo-video-v2"
+
+[[result]]
+id = "gaid-promo-video-v4"
+title = "GAID 홍보 영상 v4 — 배경을 모션그래픽으로, 시연을 목적 중심으로 다시 연출한 103초 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-20261024T005812.015692Z/out"
+source_sha = "f66c4f89f9b9e985966ad6f1d0f93807a8ead73c"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "user:2026-10-24-gaid-promo-video-v3-feedback"]
+files = [{ path = "gaid-promo-v4.mp4", sha256 = "5f6d50ca02a4364363b01ca2f430c1e9796ff6969020950692e472d3da40f098" }, { path = "manifest.json", sha256 = "18f897775152c7268dc098b2a947af7de82f110025fa2951cf82c8256f824342" }]
+report = "reports/2026-10-24-gaid-promo-video-v4/index.md"
+replicas = []
+supersedes = "gaid-promo-video-v3"
