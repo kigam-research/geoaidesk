@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-24T12:01:31Z
+status: active
+updated: 2026-10-24T12:12:16Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
