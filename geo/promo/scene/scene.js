@@ -179,12 +179,10 @@
     a3Rail: R(272, 180, 272, 234), // A3: four-stage rail
     h1Version: R(334, 104, 606, 206), // H1: next-version fieldset with its helper line
     h1Dialog: R(320, 54, 640, 614), // H1: the whole register dialog (shared files list scrolls inside it)
-    r3Chat: R(662, 120, 566, 234), // R3: the AI agent's message and its five tool rows below it
-    r3Figure: R(48, 151, 542, 553), // R3: the saved 3D comparison figure in the file viewer
     m1Raster: R(344, 390, 256, 223), // M1: the GeoTIFF's extent on the map
     m1Popup: R(482, 532, 288, 81), // M1: original pixel value popup
     n1Cites: R(4, 246, 628, 348), // N1: three cited paragraphs
-    n1Decision: R(16, 250, 606, 339), // N1: decision card with options and the send button
+    n1Decision: R(16, 250, 606, 339), // N1: decision card before sending (it grows after the send, so the step ends first)
     l5Nodes: R(228, 312, 728, 248), // L5: all five connection-map nodes
   };
   const BR = (id, k) => { const i = shotInfo(id); return i && i.beats && i.beats[k] ? i.beats[k].rect : null; };
@@ -204,22 +202,22 @@
     ] },
     { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', steps: [
       S('H1', 'pgi', [0, 3], [[0.3, 1.5, () => V3.h1Version, '다음 version으로 등록'], [1.5, 3, () => V3.h1Dialog, '예제 자료와 함께 공유']]),
-      S('Y1', 'yil', [0, 4.5], [[0.3, 2.2, () => BR('Y1', 0), '연구자들이 올린 Workflow'], [2.2, 4.5, () => BR('Y1', 1), '분야별 폴더에서 찾기']]),
-      S('Y2', 'yil', [0, 4.2], [[0.3, 2.1, () => BR('Y2', 0), '내 프로젝트에서 바로 시험'], [2.1, 4.2, () => BR('Y2', 1), '단계를 먼저 읽어 보기']]),
+      S('Y1', 'yil', [0, 4.5], [[0.4, 2.35, () => BR('Y1', 0), '연구자들이 올린 Workflow'], [2.4, 4.5, () => BR('Y1', 1), '분야별 폴더에서 찾기']]),
+      S('Y2', 'yil', [0, 5], [[0.4, 2.45, () => BR('Y2', 0), '내 프로젝트에서 바로 시험'], [2.5, 5, () => BR('Y2', 1), '단계마다 처리 지침']]),
     ] },
     { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', steps: [
-      S('Y3', 'yil', [0, 6], [[0.3, 2.1, () => BR('Y3', 0), '내 자료로 시작 설정'], [2.1, 4.1, () => BR('Y3', 1), '단계마다 자료와 조건'], [4.1, 6, () => BR('Y3', 2), '시작 전에 요약 확인']]),
-      S('R3', 'pgi', [2, 6], [[0.2, 2, () => V3.r3Chat, 'AI agent가 Workflow대로'], [2, 4, () => V3.r3Figure, '결과 그림까지 저장']]),
-      { pair: [S('Y5', 'yil', [0, 4.8], [[0.3, 2.4, () => BR('Y5', 0)], [2.4, 4.8, () => BR('Y5', 1)]]),
-        S('M1', 'pgi', [0.8, 4.6], [[0.3, 2.4, () => V3.m1Raster], [2.4, 3.8, () => V3.m1Popup]])],
-      tags: [[0.3, 2.4, '원본 좌표 그대로 지도에'], [2.4, 4.8, '원본 값을 바로 확인']] },
+      S('Y3', 'yil', [0, 6.2], [[0.4, 2.2, () => BR('Y3', 0), 'Workflow 소개부터 확인'], [2.23, 4.3, () => BR('Y3', 1), '내 자료로 시작 설정'], [4.33, 6.2, () => BR('Y3', 2), '시작 전에 조건 요약']]),
+      S('Y4', 'yil', [1.9, 5.3], [[0.1, 1.5, () => BR('Y4', 1), 'AI agent가 Workflow대로'], [1.5, 3.4, () => BR('Y4', 2), '결과 지도까지 대화에']]),
+      { pair: [S('Y5', 'yil', [0, 5], [[0.4, 2.75, () => BR('Y5', 0)], [2.8, 5, () => BR('Y5', 1)]]),
+        S('M1', 'pgi', [0, 5], [[0.4, 2.45, () => V3.m1Raster], [2.5, 5, () => V3.m1Popup]])],
+      tags: [[0.4, 2.75, '원본 좌표 그대로 지도에'], [2.8, 5, '원본 값을 바로 확인']] },
     ] },
     { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', steps: [
-      S('Y6', 'yil', [0, 5.5], [[0.3, 2.6, () => BR('Y6', 0), '결과부터 쓴 연구노트'], [2.6, 5.5, () => BR('Y6', 1), '지도 그림까지 노트에']]),
-      S('N1', 'pgi', [3, 6.5], [[0.1, 1.5, () => V3.n1Cites, '두 논문의 쪽수까지 인용'], [1.5, 3.5, () => V3.n1Decision, '판단은 연구자가 답합니다']]),
+      S('Y6', 'yil', [0, 3.7], [[0.4, 1.98, () => BR('Y6', 0), '결과부터 쓴 연구노트'], [2.0, 3.7, () => BR('Y6', 1), '지도 그림까지 노트에']]),
+      S('N1', 'pgi', [3, 5.95], [[0.1, 1.5, () => V3.n1Cites, '두 논문의 쪽수까지 인용'], [1.5, 2.95, () => V3.n1Decision, '판단은 연구자가 답합니다']]),
     ] },
     { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', steps: [
-      S('Y7', 'yil', [0, 4.5], [[0.3, 2.2, () => BR('Y7', 0), '분야별 폴더의 논문'], [2.2, 4.5, () => BR('Y7', 1), '논문에서 이어진 연구 이력']]),
+      S('Y7', 'yil', [0, 4.5], [[0.4, 2.35, () => BR('Y7', 0), '분야별 폴더의 근거 논문'], [2.4, 4.5, () => BR('Y7', 1), '논문에서 이어진 연구 이력']]),
       S('L5', 'pgi', [0, 3.5], [[0.3, 3.5, () => V3.l5Nodes, '논문·Workflow·노트의 연결']]),
     ] },
   ];
@@ -700,7 +698,10 @@
       mark(r, x, y, w, o) {
         const k = w / VW;
         const fx = (r.x - PAD) * k, fy = BAR + (r.y - PAD) * k, fw = (r.width + 2 * PAD) * k, fh = (r.height + 2 * PAD) * k;
-        box(frame, fx - 3, fy - 3, fw + 6, fh + 6);
+        // a region that reaches the window edge keeps its whole frame inside the window
+        const x0 = Math.max(fx - 3, 2), y0 = Math.max(fy - 3, BAR + 2);
+        const x1 = Math.min(fx + fw + 3, w - 2), y1 = Math.min(fy + fh + 3, BAR + VH * k - 2);
+        box(frame, x0, y0, x1 - x0, y1 - y0);
         put(frame, { o });
         return { x: x + fx, y: y + fy, w: fw, h: fh };
       },
@@ -1027,7 +1028,7 @@
         '05-cycle': lerp(...SLOT.cycle, 0.75),
         // per step: the middle of each beat (box checks), pair steps once per tag
         ...Object.fromEntries(SEG.flatMap((sg, i) => (sg.pair ? sg.tags.map(([t0, t1], j) => [`${String(i + 6).padStart(2, '0')}-${sg.pair.map(p => p.shot).join('')}-${j + 1}`, +(sg.a + (t0 + t1) / 2).toFixed(2)])
-          : sg.beats.map(([t0, t1], j) => [`${String(i + 6).padStart(2, '0')}-${sg.shot}-${j + 1}`, +(sg.a + Math.min((t0 + t1) / 2 + 0.5, t1 - 0.3)).toFixed(2)])))),
+          : sg.beats.map(([t0, t1], j) => [`${String(i + 6).padStart(2, '0')}-${sg.shot}-${j + 1}`, +(sg.a + Math.min((t0 + t1) / 2 + 0.4, t1 - 0.3, sg.dur - 0.5)).toFixed(2)])))),
         [`${String(SEG.length + 6).padStart(2, '0')}-network`]: lerp(...SLOT.brain, 0.4),
         [`${String(SEG.length + 7).padStart(2, '0')}-second-brain`]: lerp(...SLOT.brain, 0.85),
         [`${String(SEG.length + 8).padStart(2, '0')}-closing`]: DURATION - 0.3,
