@@ -1,3 +1,4 @@
 {
-  "buildPath": "comp"
+  "buildPath": "comp",
+  "telemetry": false
 }
