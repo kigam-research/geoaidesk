@@ -340,6 +340,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   against section 12. `scripts/check` runs `node geo/ui/check-ui.mjs` (copy length, agent internals in researcher views,
   hard-coded colours/small text, AI-slop proxies: hue utilities, gradients, glass, image filters, side stripes, AI icons,
   emoji, brand @font-face); accepted debt lives in `geo/ui/ui-baseline.json`, added only with the reason in the report.
+  UI quality kit (gaid-ui-quality-kit): the development-only 부품 상태 견본 page `/dev/parts` (`web/src/geo/dev/parts-page.tsx`,
+  shared parts pinned in every state with `data-preview`, live token contrast table; 404 in production unless
+  `GAID_DEV_PAGES=1` at build time: `page.dev.tsx` + dev-only `pageExtensions` in `web/next.config.ts`) and `geo/ui/quality/run.mjs` (own package + lock, installed only by `scripts/check`): shadcn lint
+  (`@shadcn/lint`), impeccable detect (telemetry off), Playwright screenshots of 계측/도폭 × light/dark at 1440×900 against
+  `geo/ui/quality/baseline/` and axe-core, each finding mapped to a guide id (`geo/ui/ui-rules.json` `quality`). Report-only
+  until `quality.switchRule` is met (then `quality.modes.<tool>` = `block`, accepted debt in `ui-baseline.json` `quality`).
 - Names in visible copy (gaid-brand-copy, user decision 2026-10-15): the assistant is "AI agent" and the app is GAID;
   "Kady"/"K-Dense"/"BYOK" stay only in code identifiers, env vars, routes, model-facing text and the upstream attribution
   line. Content taken from K-Dense shows its source where it is shown: catalogue skills via `SkillInfo.upstream`
@@ -352,7 +358,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Upstream sync: `docs/upstream-sync.md` (merge commit on a task branch, update `geo/upstream.lock.json`, log it).
 - Checks: `scripts/check` runs the upstream CI steps (`.github/workflows/tests.yml`) on Linux, then the GAID
   checks (`node --test 'geo/tests/*.test.mjs'`, `geo/tests/environments-smoke.mjs`, `start-gaid.sh --check`,
-  `geo/tests/production-smoke.mjs`). It needs Node >= 22.19, uv, network access to the npm registry, PyPI and GitHub,
+  `geo/tests/production-smoke.mjs`, then the report-only UI quality kit). It needs Node >= 22.19, uv, network access to the npm registry, PyPI and GitHub,
   and the pinned catalogue archive (asset) for the geo steps.
 
 ## Work policy v1
