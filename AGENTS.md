@@ -148,7 +148,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
 - GAID Connect (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
   Backend `server/src/geo/authoring/` (`/geo/authoring/*`, user-level store under `<agentDir>/skill-hub/authoring/`; model
-  calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
+  calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`; calls share a sources-first cacheable prefix
+  keyed by the authoring project id, and draft repairs/revisions return only changed top-level fields, see
+  `docs/design/hub-authoring-service.md`); vendored schemas/taxonomy in `geo/hub/`
   (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, `#hub/e/<entry>`, `#hub/c/<catalogue Workflow>`,
   `#hub/<authoring id>` (written as `#connect…` since gaid-ia-connect-workspace); a Workspace/Connect header switch with the personal 서재 entry; gaid-hub-layout: every hub screen
   keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,

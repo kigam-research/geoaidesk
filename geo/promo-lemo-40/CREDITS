@@ -1,0 +1,29 @@
+GAID 40 s promo (internal review film) — third-party material in the film and its build
+
+Film style and tools
+- lemo-opuscar, commit 3961ddb3d24d8876e0e2754f7790d66908acee51 (asset ~/assets/lemo-opuscar/3961ddb/), MIT License,
+  Copyright (c) 2026 LemoLab. Used: the directing method and Dark Tech Keynote style guide (read only), core/audio/sfx.py
+  and core/audio/sampler.py imported at build time, the loudness logic of core/render/mux.sh ported to master.py.
+  No demo film, still, footage, melody or code from the library's demos is in the film. Films made with the library need
+  no credit; this file records the tools.
+
+Music samples
+- VCSL (Versilian Community Sample Library), via lemo-opuscar's instrument pack (sha256
+  3ed8f753500e629485e323fc7f883b35aca6a77a1ab04522d1d47037d503f6e1), CC0 1.0. Instruments used: glockenspiel, hand
+  chimes, marimba, shaker, vibraphone (soft and hard mallets), bowed vibraphone, xylophone.
+- All other sounds (foley, ambience, sine drops and pulses) are synthesised in code.
+
+Type and graphics
+- Pretendard Variable (web/public/fonts/PretendardVariable.woff2), SIL Open Font License 1.1.
+- Lucide icons (scene/icons/, copied unchanged; plug.svg and file-code.svg from the pinned Icon Wiki asset
+  ~/assets/icons/iconwiki/20261007/assets/lucide/), ISC License (Feather: MIT); notice in
+  geo/brand/licenses/LUCIDE-LICENSE.txt. well-log.svg and map-gis.svg are GAID's own domain icons.
+- GAID logo (geo/brand/logo/horizontal-on-dark.svg, mark-on-dark.svg): GAID's own mark, paths unchanged.
+
+GAID screen recordings shown inside windows
+- Real GAID takes recorded by earlier GAID tasks (read-only inputs): PGI example (capture-v3, shots L1, A3, H2, L3) and
+  Yilgarn example (capture-v2, shots R2, N1). They show GAID's own screens with the example data the Workflows ship;
+  the Yilgarn map view includes an OpenStreetMap basemap with GAID's on-screen attribution
+  ("© OpenStreetMap contributors"; data ODbL), as the app displays it.
+
+Fonts, samples and screens are used under the licences above; the user is responsible for the material used in the film.
