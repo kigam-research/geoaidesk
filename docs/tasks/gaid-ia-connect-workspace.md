@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:33:01Z
+updated: 2026-10-24T06:35:37Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
@@ -65,9 +65,13 @@ Outside check: none.
   devPlaces warnings; `check-ui.mjs`: 0 errors; web `tsc --noEmit`: no errors in the new files. scripts/check not run
   (no app change in phase 1).
 - Re-render: `cd web && npx next dev -p 3210`, then `~/data/geoaidesk/work/gaid-ia-connect-workspace/shoot.sh <out> 1440 900`.
+- Phase 2 children started 2026-10-24 (prompts in ~/data/geoaidesk/work/gaid-ia-connect-workspace/prompts/):
+  `gaid-ia-connect-workspace--home-summary` writer 88242334-24a3-4030-852c-b9e9ffb2a8dd,
+  `gaid-ia-connect-workspace--library-panels` writer c206f174-c6d7-4de4-9d76-d5f1849dec13,
+  `gaid-ia-connect-workspace--copy-rename` writer c0846cc2-2d3c-4451-a536-928158b01728 (all "general work").
 ## Next steps
-1. Wait for the user's answers to the four decisions (report §6). On approval, plan phase 2 packages (Orchestration below),
-   apply the ADR (status accepted), terminology, AGENTS.md and UI guide; then implement.
+1. P1 shell work in this worktree (Orchestration). When a child's finish arrives: `task complete <child>`, then `task sync`.
+2. After all three: integrate, scripts/check, screenshots (계측/도폭 × light/dark, 1440×900 + 1280×800), report phase-2 section.
 ## Orchestration
 - Sequential: (1) place names, app-bar structure and 서재 entry (decided by the user, drawn here); (2) user approval of the
   mockups; (3) phase 2 implementation.
