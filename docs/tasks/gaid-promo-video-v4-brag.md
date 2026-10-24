@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:44:40Z
+updated: 2026-10-24T01:50:46Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88cca85b-4b8e-4edd-b09b-2d41608083e0","pid":926474,"provider":"claude","session":"fa954eb4-c14c-4138-b556-4c278eaf0e94","start":"69251314","token":"9825be956e484ea4be90d2e182aaed55b5cf2c9ca62fa47c866e8d332f9219cb"}
 branch: task/gaid-promo-video-v4-brag
 target: main
@@ -74,9 +74,15 @@ they help. Sources `geo/promo/brag/promo40/`; both films in the one report and r
 - promo40 (user: Yilgarn + PGI examples, screens as windows inside motion graphics): sources `geo/promo/brag/promo40/`,
   previews `~/data/geoaidesk/work/gaid-promo-video-v4-brag/p40-prev1..4` (fixed: inactive layers leaked through
   `visibility`; now `display`), soundtrack onsets on the 120 BPM sixteenth grid, peak −1.75 dBFS, RMS −15.5 dBFS.
+- promo40 final: job 2 done (exit 0): 40.00 s, 1,200 frames, H.264 + AAC; decoded audio = WAV (1,920,000 samples, offset 0).
+  Video sha256 9e2c07ae2bab2aac85ba44479fd126c5813dab2307a3e35bf32be13b20b37b59.
+- Report written (both films), humanizer pass done, registry entries `gaid-promo-video-v4-brag` and
+  `gaid-promo-video-v4-brag-40s` (`review`, alongside v4).
 ## Next steps
-1. promo40 render job, then report `reports/2026-10-24-gaid-promo-video-v4-brag/index.md`, registry entry `review`.
+1. None in this unit; the user reviews both films (sound not checked by ear here).
 ## Failed approaches
+- promo40 preview 1: inactive scene layers hidden with `visibility: hidden` still showed children that `put()` set to
+  `visible`; fixed by `display: none` for inactive layers and highlight items.
 ## Notes and decisions
 - Orchestration: one tightly coupled package (scene timing ↔ soundtrack cues ↔ renderer); done by the writer, no children.
 - brag's 15–25 s law is overridden by the user's length decision (90–105 s); brag's other laws apply (hook in the first bar,
@@ -92,12 +98,15 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-promo-video-v4-brag/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-brag-20261024T012900.343394Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-brag-20261024T014452.245293Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
