@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:52:30Z
+updated: 2026-10-24T06:53:07Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
@@ -79,7 +79,8 @@ Outside check: none.
 - Live check app: `~/data/geoaidesk/work/gaid-ia-connect-workspace/app/run.sh` (backend 18100, UI 3220, isolated data);
   verified Workspace home, 서재 open/back, Connect switch, old `#hub/feeds` link.
 ## Next steps
-1. P1 shell work in this worktree (Orchestration) — done; integrate children as their finishes arrive. When a child's finish arrives: `task complete <child>`, then `task sync`.
+1. P1 shell work in this worktree (Orchestration) — done; integrate children as their finishes arrive.
+Blocked: the three children are `ready` and their task finish is still running scripts/check; `task complete` refuses until each finish records completion. When a child's finish arrives: `task complete <child>`, then `task sync`.
 2. After all three: integrate, scripts/check, screenshots (계측/도폭 × light/dark, 1440×900 + 1280×800), report phase-2 section.
 ## Orchestration
 - Sequential: (1) place names, app-bar structure and 서재 entry (decided by the user, drawn here); (2) user approval of the
