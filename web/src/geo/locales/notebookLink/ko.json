@@ -14,5 +14,6 @@
   "saving": "링크 저장 중",
   "loadFailed": "저장한 노트북 링크를 읽지 못했습니다.",
   "retry.action": "링크 다시 읽기",
-  "loading": "노트북 링크 읽는 중"
+  "loading": "노트북 링크 읽는 중",
+  "label": "Gemini Notebook"
 }

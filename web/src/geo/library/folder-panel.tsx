@@ -103,9 +103,10 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
           <p className="text-xs text-muted-foreground">{linked ? L("linked") : L("gaid")}</p>
           <h2 className="flex items-center gap-1.5 text-lg font-semibold leading-snug"><FolderIcon className="size-4 shrink-0" aria-hidden /><span className="truncate">{folderPath(collections, folder.id)}</span></h2>
           <p className="text-sm text-muted-foreground">{L("papers", { n: count })}</p>
+          {/* The folder's Gemini Notebook link sits under the folder facts, outside the header's action row (UI guide B4). */}
+          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><span>{t("notebookLink.label")}</span><FolderNotebookLink key={folder.id} folder={folder} onChanged={onChanged} /></div>
         </div>
         <div className="flex items-center gap-2">
-          <FolderNotebookLink key={folder.id} folder={folder} onChanged={onChanged} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={L("more")}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end">

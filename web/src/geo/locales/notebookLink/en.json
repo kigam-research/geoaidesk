@@ -14,5 +14,6 @@
   "saving": "Saving link",
   "loadFailed": "Could not read the saved notebook link.",
   "retry.action": "Reload link",
-  "loading": "Reading notebook link"
+  "loading": "Reading notebook link",
+  "label": "Gemini Notebook"
 }

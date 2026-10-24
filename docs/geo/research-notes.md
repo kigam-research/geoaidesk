@@ -143,3 +143,6 @@ files or the candidate list changed in between. The browser saves a file only wh
   each). Nothing is pre-ticked; each chosen file needs its own "기관 밖으로 내보내도 되는 자료입니다" confirmation, and the
   server refuses a file without `mayLeave: true`. Each export appends a local record to `.kady/geo/public-exports.jsonl`
   (time, note, file names, sha256). GAID calls no Google service and uploads nothing.
+
+A project can also keep the address of a related Gemini Notebook (under the 정리 노트 list summary: 노트북 열기, 링크 바꾸기),
+and so can each 서재 folder. GAID stores only the https address and opens it in a new tab; it never reads the page.

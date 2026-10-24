@@ -27,6 +27,7 @@ import { NoteReferences } from "@/geo/library/note-references";
 import { NoteFigures } from "@/geo/figures";
 import { ConnectionMapButton } from "@/geo/connections";
 import { NoteBundleDialog, PublicExportDialog } from "./note-export";
+import { ProjectNotebookLink } from "@/geo/notebook-link/project-notebook-link";
 
 /**
  * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
@@ -180,6 +181,8 @@ function NoteList({ state, onOpen, onRecord }: {
                 : t("notes.panel.summaryNoDecisions", { count: live.length })}
             </p>
           )}
+          {/* The project's Gemini Notebook link sits under the summary, outside the header's action row (UI guide B4). */}
+          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><span>{t("notebookLink.label")}</span><ProjectNotebookLink /></div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Button variant="outline" size="sm" onClick={onRecord}>{t("notes.record.button")}</Button>

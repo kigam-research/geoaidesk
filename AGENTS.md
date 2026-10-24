@@ -239,6 +239,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   a per-file "기관 밖으로 내보내도 되는 자료" confirmation enforced server-side, local record `.kady/geo/public-exports.jsonl`;
   for manual Gemini Notebook upload, no Google calls). Preview first; download refused (409) when the preview's digest no
   longer matches. Gemini Notebook result import, Drive sync and the Enterprise API are not built.
+- Gemini Notebook links (gaid-note-bundle-export--notebook-links): a researcher saves a related notebook URL (https only, no
+  credentials, `normalizeNotebookUrl` in `web/src/geo/contracts/notebook-link.ts`) on a project (`.kady/geo/notebook-link.json`,
+  `GET/PUT /geo/notebook-link`, store `server/src/geo/workspace/notebook-link.ts`, shown under the 정리 노트 list summary) or a 서재
+  folder (`LibraryCollection.notebookUrl`, `PUT /geo/library/collections/:id/notebook`, Zotero-linked folders too, kept across
+  Zotero reconcile and hub sync; shown under the folder facts). `web/src/geo/notebook-link/` (namespace `notebookLink`): the link
+  opens in a new tab; GAID never fetches, embeds or sends anything to it.
 - Personal library (gaid-research-hub, ADR `docs/adr/2026-10-21-research-hub-library.md`; folders gaid-library-folders,
   ADR `docs/adr/2026-10-21-library-folders.md`): "내 연구" → 서재, user-level store `server/src/geo/library/` (contract
   `web/src/geo/contracts/library.ts`, routes `/geo/library/*`, screens `web/src/geo/library/`). Items are Zotero-linked
