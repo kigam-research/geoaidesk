@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:39:49Z
+updated: 2026-10-24T07:59:55Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8326432c-0a38-43d0-92f0-76db7e868732","pid":1778976,"provider":"claude","session":"21c916ad-8c56-4943-818b-6f9dae6aa973","start":"71313221","token":"dd814f54f4df4db1c88c4132afa7ed1942ef6ba2f237a42360f61d5b48b0e522"}
 branch: task/gaid-input-fallback
 target: main
@@ -67,7 +67,7 @@ synthetic DEM conditions, borehole table), downloaded only the picked one into t
 generated synthetic_data/{dem,boreholes}/ with README/code; all 15 files in provenance; research note labels toy/synthetic
 at the top and in 한계. Screenshots 16 (both styles × themes × 1440/1280) in ~/data/geoaidesk/work/gaid-input-fallback/shots/.
 ## Next steps
-1. Wait for scripts/check (log ~/data/geoaidesk/work/gaid-input-fallback/check-1.log); on pass, task save + task finish.
+1. task finish. scripts/check run 2 passed (exit 0; impeccable/axe 0 findings; shadcn report-only flags the new 13 px group label, same as the existing 내 자료 label). Earlier: run 2 (log ~/data/geoaidesk/work/gaid-input-fallback/check-2.log; run 1 stopped at web vitest on three 5 s timeouts under load, all pass alone; the new long test now has a 30 s limit); on pass, task save + task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.

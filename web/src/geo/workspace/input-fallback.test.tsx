@@ -95,7 +95,7 @@ describe("start settings: 내 자료가 없을 때", () => {
       expect(block.body).toContain("연구자 메모: 경기 북부");
       expect(block.body).toContain("`synthetic_data/holes/`");
     } finally { off(); }
-  });
+  }, 30_000);
 
   it("folds the choices when the project has a fitting file", async () => {
     render(<TaskSetup workflow={workflow} projectId="p1" open onOpenChange={vi.fn()} onRefresh={vi.fn()} availableFiles={["user_data/dem.csv", "user_data/other.csv"]} />);

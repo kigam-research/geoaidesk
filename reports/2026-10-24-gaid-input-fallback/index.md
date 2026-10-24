@@ -81,7 +81,7 @@ supersedes:
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 자료를 마련하는 절차를 바꾼 작업이며 분석 결과의 타당성은 다루지 않았습니다. 실제 실행에서 AI agent가 고른 공개 자료와 합성 조건이 연구 목적에 맞는지는 검토하지 않았습니다.
-- 소프트웨어 검증: 새 자동 시험 5건(지침 절 내용, 이전 지침이 그대로인지, 메시지 표시의 기록·읽기, 시작 설정에서 세 방법 선택부터 요약과 시작 메시지까지, 파일이 있을 때 접힘)과 관련 시험을 통과했습니다. 문구 검사 오류 0건, UI 검사 오류 0건입니다. 전체 검사 결과는 부록 A에 적었습니다.
+- 소프트웨어 검증: 새 자동 시험 5건(지침 절 내용, 이전 지침이 그대로인지, 메시지 표시의 기록·읽기, 시작 설정에서 세 방법 선택부터 요약과 시작 메시지까지, 파일이 있을 때 접힘)과 관련 시험을 통과했습니다. 문구 검사 오류 0건, UI 검사 오류 0건입니다. 전체 검사(웹·서버 시험, GAID 검사, production smoke, UI 품질 검사)를 통과했습니다. UI 품질 검사에서 차단 항목인 impeccable과 axe의 지적은 0건입니다. 보고용 shadcn lint는 새 묶음 제목의 13 px 글자 크기 지정을 지적했습니다. 같은 화면의 기존 "내 자료" 제목과 같은 값입니다.
 - 화면: 두 스타일(계측, 도폭) × 두 테마 × 1440×900, 1280×800에서 자료 확인 단계와 요약을 캡처해 12절 점검표로 확인했습니다. 따른 규칙은 Q1(단계 화면 안에서 입력마다 선택지), Q2(근거가 없어 미리 고르지 않음), Q3(직접 입력 칸), Q5(요약과 수정 링크), Q6(입력 칸 안내 문구), P3(파일이나 예제 자료가 있으면 접음), P5(AI agent가 제안하고 연구자가 고름), P9(toy·합성 자료 표시), W2·W4(문구 길이)입니다.
 
 ## 5. 한계
@@ -123,7 +123,7 @@ supersedes:
 | 개발 앱 | PC74 `~/data/geoaidesk/work/gaid-input-fallback/app` (설정·Workflow는 gaid-workflow-example 개발 앱 사본, 로그인은 gaid-hub-followups 개발 홈 사본), 포트 3390/18390, 실행 후 중지 |
 | 실제 실행 | 프로젝트 Default, 세션 `01a16cc2-4e2c-70dd-a2a7-f67a1aa14a2c`, 모델 OpenAI Codex (legacy) GPT-6.1 Sol; 결과 `toy_data/aeromag/SOURCE.md`, `synthetic_data/dem/README.md`, `synthetic_data/boreholes/`, `연구노트/2026-10-24-mag-inversion/index.md`; provenance `.kady/provenance/01a16cc2-…/steps.jsonl` (43행, 파일 15개) |
 | 화면 원본 | `~/data/geoaidesk/work/gaid-input-fallback/shots/` (16장: 2 화면 × 계측·도폭 × 밝은·어두운 × 1440·1280), `…/playwright/`; 캡처 스크립트 `…/appshot.sh` |
-| 검사 | `scripts/check` 로그 `~/data/geoaidesk/work/gaid-input-fallback/check-1.log` |
+| 검사 | `scripts/check` 2회차 통과 `~/data/geoaidesk/work/gaid-input-fallback/check-2.log` (1회차 `check-1.log`는 부하 중 웹 시험 3건이 5초 제한을 넘겨 중단, 단독 재실행 통과; 새 긴 시험은 30초 제한) |
 | 문자열 변경 (한·영 전후) | `workspace.setup.input.empty` 전: "프로젝트에 맞는 형식의 파일이 없습니다. 작업 폴더에 파일을 올린 뒤 고르세요." / "The project has no file in a matching format. Upload a file to the work folder, then choose it." → 후: "프로젝트에 맞는 형식의 파일이 없습니다. 파일을 올리거나, AI agent가 자료를 마련할 방법을 아래에서 고르세요." / "No project file has a matching format. Upload a file, or choose below how the AI agent provides the data." `workspace.setup.input.emptyExample` 전: "… 내 파일을 올리거나 아래 예제 자료를 쓰세요." / "… Upload your own files or use the example data below." → 후: 뒤에 "다른 방법은 '내 자료가 없을 때'에 있습니다." / "Other ways are under 'When you have no data'." 추가. 나머지는 새 문자열입니다. |
 
 작성 시점: 2026-10-24, commit 13676fec (보고서 커밋 전).
