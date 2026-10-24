@@ -17,7 +17,7 @@ import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/p
 import { join, resolve } from "node:path";
 import { KADY_PI_AGENT_DIR } from "../../config.ts";
 import { citationKeyFor } from "./formats/index.ts";
-import { folderSubtree } from "../../../../web/src/geo/contracts/library.ts";
+import { folderSubtree, isPaperItem } from "../../../../web/src/geo/contracts/library.ts";
 import { normalizeNotebookUrl } from "../../../../web/src/geo/contracts/notebook-link.ts";
 import type {
   CslItem,
@@ -25,6 +25,7 @@ import type {
   LibraryItem,
   LibraryItemSummary,
   LibraryNoteSummary,
+  LibraryDigestSummary,
   MetadataOrigin,
   ZoteroLibraryState,
 } from "../../../../web/src/geo/contracts/library.ts";
@@ -194,7 +195,7 @@ export class LibraryStore {
     if (this.items.size >= LIBRARY_LIMITS.items) throw new LibraryError("Library is full", 413);
     const doi = normalizeDoi(csl.DOI);
     if (doi) {
-      const existing = [...this.items.values()].find((i) => !i.removedFromSourceAt && i.kind !== "note" && normalizeDoi(i.csl.DOI) === doi);
+      const existing = [...this.items.values()].find((i) => !i.removedFromSourceAt && isPaperItem(i) && normalizeDoi(i.csl.DOI) === doi);
       if (existing) throw new LibraryError(`Already in the library: ${existing.id}`, 409);
     }
     const collections = await this.collections();
@@ -233,6 +234,8 @@ export class LibraryStore {
     if (item.source !== "gaid") throw new LibraryError("Edit this item in Zotero", 409);
     // A research note's title and date come from its file (the master).
     if (item.kind === "note" && patch.csl !== undefined) throw new LibraryError("Edit the research note file instead", 409);
+    // A GAID-made 문헌 정리 follows its file too; an imported one may be renamed.
+    if (item.kind === "digest" && item.digest?.origin === "gaid" && patch.csl !== undefined) throw new LibraryError("Edit the digest file instead", 409);
     const csl = patch.csl === undefined ? undefined : validCsl(patch.csl);
     const collections = await this.collections();
     return this.mutate(id, (next) => {
@@ -262,6 +265,16 @@ export class LibraryStore {
     await this.load();
     if (bytes.length > LIBRARY_LIMITS.pdfBytes) throw new LibraryError("PDF exceeds 64 MiB", 413);
     if (bytes.subarray(0, 5).toString("latin1") !== "%PDF-") throw new LibraryError("Not a PDF file", 415);
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    const file = this.filePath(sha256);
+    if (!existsSync(file)) await this.serial(() => this.writeBytes(file, bytes));
+    return { sha256, size: bytes.length };
+  }
+
+  /** Stores any file by content hash (idempotent): imported 외부 정리 originals (gaid-library-prep); local only, never synced. */
+  async storeFile(bytes: Buffer, maxBytes: number): Promise<{ sha256: string; size: number }> {
+    await this.load();
+    if (bytes.length > maxBytes) throw new LibraryError(`File exceeds ${Math.round(maxBytes / 1024 / 1024)} MiB`, 413);
     const sha256 = createHash("sha256").update(bytes).digest("hex");
     const file = this.filePath(sha256);
     if (!existsSync(file)) await this.serial(() => this.writeBytes(file, bytes));
@@ -418,7 +431,7 @@ export function samePaper(a: CslItem, b: CslItem): boolean {
   return cslYear(a) === cslYear(b) && fam(a) === fam(b);
 }
 
-export function summarize(item: LibraryItem, used: LibraryItemSummary["used"], note?: LibraryNoteSummary): LibraryItemSummary {
+export function summarize(item: LibraryItem, used: LibraryItemSummary["used"], note?: LibraryNoteSummary, digest?: LibraryDigestSummary): LibraryItemSummary {
   const year = cslYear(item.csl);
   return {
     id: item.id,
@@ -438,7 +451,8 @@ export function summarize(item: LibraryItem, used: LibraryItemSummary["used"], n
     addedAt: item.addedAt,
     ...(isRetracted(item.signals) ? { retracted: true } : {}),
     ...(item.ownWork ? { ownWork: true } : {}),
-    kind: item.kind === "note" ? "note" : "paper",
+    kind: item.kind === "note" || item.kind === "digest" ? item.kind : "paper",
     ...(note ? { note } : {}),
+    ...(digest ? { digest } : {}),
   };
 }

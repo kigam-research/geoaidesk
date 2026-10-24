@@ -293,6 +293,7 @@ export class ZoteroService {
     const item = await this.store.get(id);
     if (item.source !== "gaid") throw new LibraryError("Already a Zotero item", 409);
     if (item.kind === "note") throw new LibraryError("Research notes stay in the GAID library", 409);
+    if (item.kind === "digest") throw new LibraryError("Literature digests stay in the GAID library", 409);
     const result = await this.send([item.id], undefined);
     return { ...result, item: await this.store.get(item.id) };
   }
@@ -325,7 +326,7 @@ export class ZoteroService {
         const item = await this.store.get(id);
         if (item.removedFromSourceAt) continue;
         // Research notes are never written to Zotero (user decision 2026-10-23).
-        if (item.kind === "note") { result.skipped.push({ itemId: item.id, reason: "research-note" }); continue; }
+        if (item.kind === "note" || item.kind === "digest") { result.skipped.push({ itemId: item.id, reason: "research-note" }); continue; }
         if (item.source === "zotero") {
           if (!item.zotero || !sameLibrary(item.zotero, partition)) { result.skipped.push({ itemId: item.id, reason: "other-library" }); continue; }
           const keys = await linkedKeys(item);

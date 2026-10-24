@@ -196,7 +196,7 @@ export class OrcidService {
     const profile = this.linked();
     const [person, body] = [await this.client.person(profile.orcid), await this.client.works(profile.orcid)];
     const { works, omitted } = parseWorks(body, ORCID_LIMITS.works);
-    const items = (await this.store.all()).filter((i) => !i.removedFromSourceAt && i.kind !== "note");
+    const items = (await this.store.all()).filter((i) => !i.removedFromSourceAt && (!i.kind || i.kind === "paper"));
     const readAt = iso(this.now);
     await this.serial(async () => {
       const current = this.profile();
@@ -223,7 +223,7 @@ export class OrcidService {
       let lookupFailed = 0;
 
       // Metadata for works that will become new items: DOI lookups first, then one bulk read for the rest.
-      const items = (await this.store.all()).filter((i) => !i.removedFromSourceAt && i.kind !== "note");
+      const items = (await this.store.all()).filter((i) => !i.removedFromSourceAt && (!i.kind || i.kind === "paper"));
       const drafts = new Map<number, { csl: unknown; metadataOrigin: MetadataOrigin; signals: UpdateSignal[] }>();
       const needDetails: number[] = [];
       for (const code of wanted) {
@@ -252,7 +252,7 @@ export class OrcidService {
       for (const putCode of wanted) {
         const work = byCode.get(putCode);
         if (!work) { outcomes.push({ putCode, kind: "failed", reason: "not-found" }); continue; }
-        const current = (await this.store.all()).filter((i) => !i.removedFromSourceAt && i.kind !== "note");
+        const current = (await this.store.all()).filter((i) => !i.removedFromSourceAt && (!i.kind || i.kind === "paper"));
         const match = matchWork(work, current, profile.orcid);
         if (match.kind === "in-library") {
           await this.markOwn(match.itemId, { ...mark, putCode });

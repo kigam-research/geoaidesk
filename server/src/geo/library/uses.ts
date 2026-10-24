@@ -62,7 +62,7 @@ export function scopeFolders(literature: ProjectLiterature, collections: Pick<Li
 export function projectItems(literature: ProjectLiterature, items: LibraryItem[], collections: Pick<LibraryCollection, "id" | "parentId">[] = []): LibraryItem[] {
   const ids = new Set(literature.itemIds), cols = scopeFolders(literature, collections);
   // Research notes are not references, so never part of a citation scope.
-  return items.filter((i) => !i.removedFromSourceAt && i.kind !== "note" && (ids.has(i.id) || (i.aliases?.ids ?? []).some((a) => ids.has(a)) || i.collectionIds.some((c) => cols.has(c))));
+  return items.filter((i) => !i.removedFromSourceAt && (!i.kind || i.kind === "paper") && (ids.has(i.id) || (i.aliases?.ids ?? []).some((a) => ids.has(a)) || i.collectionIds.some((c) => cols.has(c))));
 }
 
 /** True when the project has attached anything (otherwise the whole library counts for its citations). */

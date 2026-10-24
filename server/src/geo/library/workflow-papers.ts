@@ -39,7 +39,7 @@ export function resolveWorkflowPapers(
   literature: ProjectLiterature,
   collections: Pick<LibraryCollection, "id" | "parentId">[] = [],
 ): WorkflowPaper[] {
-  const papers = items.filter((i) => i.kind !== "note" && !i.removedFromSourceAt);
+  const papers = items.filter((i) => (!i.kind || i.kind === "paper") && !i.removedFromSourceAt);
   const byDoi = new Map<string, LibraryItem>();
   const byTitle = new Map<string, LibraryItem>();
   for (const item of papers) {

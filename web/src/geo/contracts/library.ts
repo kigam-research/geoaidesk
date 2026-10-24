@@ -83,8 +83,11 @@ export interface CslItem {
  */
 export type MetadataOrigin = "zotero" | "crossref" | "openalex" | "kci" | "datacite" | "orcid" | "import" | "manual" | "note";
 
-/** Library category: a paper (or other reference) or a research note brought in from a project. */
-export type LibraryItemKind = "paper" | "note";
+/**
+ * Library category: a paper (or other reference), a research note brought in from a project, or a 문헌 정리 (literature
+ * digest: several papers read in advance and summarised, made in GAID or imported as 외부 정리; gaid-library-prep).
+ */
+export type LibraryItemKind = "paper" | "note" | "digest";
 /** Research-note status as written in the note file (`web/src/geo/contracts/research-notes.ts`). */
 export type LibraryNoteStatus = "pending" | "confirmed" | "superseded";
 /** Largest note text kept in a library item (UTF-8 bytes); longer notes keep the beginning and set `truncated`. */
@@ -120,6 +123,74 @@ export interface LibraryNoteRef {
 }
 
 export const isNoteItem = (item: Pick<LibraryItem, "kind">): boolean => item.kind === "note";
+/** A 문헌 정리 item (gaid-library-prep). */
+export const isDigestItem = (item: Pick<LibraryItem, "kind">): boolean => item.kind === "digest";
+/** A reference (paper): the only kind with citation keys, exports, Zotero, ORCID, folder checks and citation scope. */
+export const isPaperItem = (item: Pick<LibraryItem, "kind">): boolean => !item.kind || item.kind === "paper";
+
+// --- 문헌 정리 (literature digests; gaid-library-prep, user decision 2026-10-24 "모두 권장으로 하자.") --------------
+
+/** General (upstream BYOK) Workflows a GAID 문헌 정리 is made with (`web/src/data/workflows.json` ids). */
+export const DIGEST_WORKFLOWS = ["compare-papers", "summarize-paper", "methods-comparison"] as const;
+export type DigestWorkflowId = (typeof DIGEST_WORKFLOWS)[number];
+/** `gaid`: made by the AI agent from library papers; `external`: a file exported from Gemini Notebook (외부 정리). */
+export type LibraryDigestOrigin = "gaid" | "external";
+/** 검토 전 until the researcher marks it 확인함. */
+export type LibraryDigestStatus = "pending" | "confirmed";
+/** Largest digest text kept in a library item (UTF-8 bytes); longer text keeps the beginning and sets `truncated`. */
+export const LIBRARY_DIGEST_TEXT_BYTES = 256 * 1024;
+/** Project folder that holds GAID-made digests: `문헌정리/<YYYY-MM-DD>-<topic>/index.md` (the file is the master). */
+export const DIGEST_FOLDER = "문헌정리";
+/** Start-message key of a digest (never a citation key). */
+export const digestKey = (itemId: string): string => `digest:${itemId}`;
+
+/** Where a GAID-made digest lives; only the origin instance refreshes it from the file (like research notes). */
+export interface LibraryDigestMade {
+  workflow: DigestWorkflowId;
+  question?: string;
+  origin: string;
+  originLabel: string;
+  projectId: string;
+  projectName: string;
+  /** Digest folder name under DIGEST_FOLDER. */
+  digestId: string;
+  /** Project-relative file (`문헌정리/<id>/index.md`). */
+  path: string;
+  contentSha256: string;
+  fileUpdatedAt: string;
+  refreshedAt: string;
+  /** Set when the file (or its project) was not found at the last refresh; cleared when it is back. */
+  missingAt?: string;
+}
+
+/** An imported external summary (외부 정리). The original file is kept in library storage by content hash. */
+export interface LibraryDigestExternal {
+  service: "gemini-notebook";
+  fileName: string;
+  mediaType: string;
+  file: { sha256: string; size: number };
+  notebookUrl?: string;
+}
+
+export interface LibraryDigestRef {
+  origin: LibraryDigestOrigin;
+  made?: LibraryDigestMade;
+  external?: LibraryDigestExternal;
+  status: LibraryDigestStatus;
+  confirmedAt?: string;
+  /** Library paper ids the digest covers (read by the AI agent, or matched and confirmed on import). */
+  covers: string[];
+  /** Sources the digest names that are not in the library (import only); never linked. */
+  unmatched?: { title: string; doi?: string }[];
+  /** Folder the digest was made from or imported into, for "papers added since". */
+  collectionId?: string;
+  /** Digest text as Markdown (bounded by LIBRARY_DIGEST_TEXT_BYTES); external files are converted to text on import. */
+  text: string;
+  truncated?: boolean;
+  /** Level-2 headings of the text, in order (the outline shown in 서재). */
+  headings: string[];
+  createdAt: string;
+}
 
 export interface LibraryAttachment {
   id: string;
@@ -189,6 +260,8 @@ export interface LibraryItem {
   kind?: LibraryItemKind;
   /** Research-note items only. */
   note?: LibraryNoteRef;
+  /** 문헌 정리 items only. */
+  digest?: LibraryDigestRef;
 }
 
 /** Provenance of an own-work mark: the ORCID iD and the work's put-code on that record. */
@@ -447,6 +520,24 @@ export interface LibraryItemSummary {
   kind: LibraryItemKind;
   /** Research-note items only. `local`: the note's project is on this GAID instance, so it can be opened and read. */
   note?: LibraryNoteSummary;
+  /** 문헌 정리 items only. */
+  digest?: LibraryDigestSummary;
+}
+
+export interface LibraryDigestSummary {
+  origin: LibraryDigestOrigin;
+  status: LibraryDigestStatus;
+  workflow?: DigestWorkflowId;
+  /** Imported file name (external). */
+  fileName?: string;
+  covers: number;
+  unmatched: number;
+  date: string;
+  /** Papers in the digest's folder (subfolders included) that it does not cover; > 0 suggests making it again. */
+  newPapers: number;
+  missing?: boolean;
+  /** GAID-made digests: the project is on this GAID instance. */
+  local?: boolean;
 }
 
 export interface LibraryNoteSummary {
@@ -470,6 +561,8 @@ export interface LibraryListQuery {
   kind?: LibraryItemKind;
   /** Research notes only: status in the note file. */
   noteStatus?: LibraryNoteStatus;
+  /** 문헌 정리 only: items covering this paper id. */
+  covers?: string;
   collectionId?: string;
   /** `unread` = coverage none/abstract; `cited` = cited in at least one research note; `mine` = own works (ORCID). */
   filter?: "unread" | "cited" | "project" | "mine";
@@ -481,7 +574,7 @@ export interface LibraryListResponse {
   items: LibraryItemSummary[];
   total: number;
   /** Paper counts (`all` = papers) plus `notes` (research notes) and notes per status. */
-  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number; mine: number; notes: number; notesPending: number; notesConfirmed: number };
+  counts: { all: number; zotero: number; gaid: number; unread: number; cited: number; mine: number; notes: number; notesPending: number; notesConfirmed: number; digests: number };
   collections: LibraryCollection[];
   /** Items of the requested category (`kind`; papers when absent) per folder, subfolders included. */
   folderCounts: Record<string, number>;
@@ -657,4 +750,98 @@ export interface LookupResponse {
 export interface ImportPreview {
   items: CslItem[];
   errors: { index: number; message: string }[];
+}
+
+// --- 문헌 정리 routes (gaid-library-prep) ------------------------------------------------------------------------
+
+/** `POST /geo/library/digests/:id/status`: the researcher's review mark (확인함 / back to 검토 전). */
+export interface DigestStatusBody {
+  status: LibraryDigestStatus;
+}
+
+/**
+ * `POST /geo/library/digests/requests`: make a GAID 문헌 정리 in a project. The server attaches the papers to the
+ * project's citation scope, records the request and returns the chat message that asks the AI agent to read them with
+ * the chosen general Workflow and write `path`; the write is then mirrored into 서재 as a digest item (검토 전).
+ */
+export interface MakeDigestBody {
+  projectId: string;
+  workflow: DigestWorkflowId;
+  question: string;
+  /** Papers to cover: a folder (subfolders included) and/or explicit items. */
+  collectionId?: string;
+  itemIds?: string[];
+  title?: string;
+}
+
+export interface MakeDigestResponse {
+  requestId: string;
+  projectId: string;
+  /** Project-relative file the AI agent is asked to write. */
+  path: string;
+  covers: string[];
+  /** Chat text for the new chat's composer (the researcher sends it). */
+  message: string;
+}
+
+/** `POST /geo/library/digests/import/preview`: read an exported Gemini Notebook file and match its sources. */
+export interface DigestImportPreviewBody {
+  fileName: string;
+  /** Base64 file content (Word, PDF, Markdown, text, CSV; at most DIGEST_IMPORT_BYTES). */
+  data: string;
+}
+
+export const DIGEST_IMPORT_BYTES = 30 * 1024 * 1024;
+export const DIGEST_IMPORT_TYPES = [".docx", ".pdf", ".md", ".markdown", ".txt", ".csv"] as const;
+
+export interface DigestImportMatch {
+  itemId: string;
+  title: string;
+  authors: string;
+  year?: number;
+  by: "doi" | "title";
+}
+
+export interface DigestImportPreview {
+  /** Hands the read file to the confirm call (valid for this server process). */
+  token: string;
+  fileName: string;
+  mediaType: string;
+  size: number;
+  /** Suggested name (first heading or file name). */
+  title: string;
+  headings: string[];
+  /** First characters of the converted text, for the researcher to recognise the file. */
+  excerpt: string;
+  matches: DigestImportMatch[];
+  /** Sources named in the file (DOI or reference-like lines) that are not in the library. */
+  unmatched: { title: string; doi?: string }[];
+}
+
+export interface DigestImportBody {
+  token: string;
+  title: string;
+  notebookUrl?: string;
+  collectionId?: string;
+  /** Matched item ids the researcher kept. */
+  covers: string[];
+}
+
+/** `GET /geo/library/digests/for-start?method=`: digests the Workflow start window offers (project scope + Workflow papers). */
+export interface DigestCandidate {
+  itemId: string;
+  title: string;
+  origin: LibraryDigestOrigin;
+  status: LibraryDigestStatus;
+  date: string;
+  /** Covered papers among `total` (the Workflow's source papers in 서재, else the project's attached papers). */
+  covered: number;
+  total: number;
+  /** GAID-made and covers every paper counted in `total` (external digests are never recommended). */
+  recommended: boolean;
+  newPapers: number;
+}
+
+export interface DigestCandidatesResponse {
+  digests: DigestCandidate[];
 }

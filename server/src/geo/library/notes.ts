@@ -14,6 +14,7 @@ import { getResearchNote, listResearchNotes, ResearchNoteError, safeNoteId } fro
 import {
   LIBRARY_NOTE_SNAPSHOT_BYTES,
   isNoteItem,
+  isPaperItem,
   parseCitations,
   type LibraryItem,
   type LibraryNoteCandidate,
@@ -62,7 +63,7 @@ async function resolveCitations(store: LibraryStore, keys: { key: string; locato
   const out: LibraryNoteRef["citations"] = [];
   for (const { key, locators } of keys) {
     const item = await store.byCitationKey(key);
-    const paper = item && !item.removedFromSourceAt && !isNoteItem(item) ? item : undefined;
+    const paper = item && !item.removedFromSourceAt && isPaperItem(item) ? item : undefined;
     out.push({ key, ...(paper ? { itemId: paper.id, title: paper.csl.title.slice(0, 300) } : {}), locators });
   }
   return out;

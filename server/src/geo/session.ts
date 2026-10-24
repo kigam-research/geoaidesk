@@ -20,6 +20,8 @@ import { makeResearchNoteExtension } from "./notes/extension.ts";
 import { entryLanguageExtension } from "./entry-language.ts";
 import { makeGeoTools } from "./tools.ts";
 import { makeLibraryTools, makeNoteCitationExtension } from "./library/tools.ts";
+import { makeDigestExtension } from "./library/digests.ts";
+import { libraryStore } from "./library/store.ts";
 import { seedShippedSkills } from "./shipped-skills.ts";
 
 export interface GeoSessionContext {
@@ -62,6 +64,7 @@ export function geoSessionParts(ctx: GeoSessionContext): GeoSessionParts {
       markdownImageExtension,
       makeResearchNoteExtension(ctx.paths, ctx.sessionId),
       makeNoteCitationExtension(ctx.paths),
+      makeDigestExtension(ctx.paths, ctx.projectId, libraryStore),
       entryLanguageExtension,
     ].filter(
       (factory): factory is ExtensionFactory => factory !== null,

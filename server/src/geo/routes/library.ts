@@ -6,7 +6,9 @@ import fs from "node:fs";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
 import { activePaths, listProjects, resolvePaths, type ProjectPaths } from "../../projects.ts";
-import { folderSubtree, isNoteItem, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
+import { folderSubtree, isDigestItem, isNoteItem, isPaperItem, numericCslDates } from "../../../../web/src/geo/contracts/library.ts";
+import type { DigestCandidatesResponse, DigestStatusBody, MakeDigestBody, MakeDigestResponse } from "../../../../web/src/geo/contracts/library.ts";
+import { createDigestRequest, digestCandidates, digestSummary, refreshDigestItems, setDigestStatus } from "../library/digests.ts";
 import type {
   AddLibraryNoteBody,
   AddLibraryNoteResponse,
@@ -137,14 +139,16 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       zoteroOf(store).refreshIfStale();
       // Research notes follow their files (the master); a failed refresh keeps the last snapshot.
       try { await refreshNoteItems(store); } catch (error) { scope.log.warn({ err: error }, "research-note refresh failed"); }
+      try { await refreshDigestItems(store); } catch (error) { scope.log.warn({ err: error }, "literature-digest refresh failed"); }
       const everything = (await store.all()).filter((i) => !i.removedFromSourceAt);
       const collections = await store.collections();
       const instance = libraryInstance(store), projectIds = new Set(listProjects().map((p) => p.id));
       const uses = buildUsesIndex(everything, await workflowUses(store), collections, instance.id, projectWorkflows(everything, collections));
-      const kind = q.kind === "note" || q.kind === "paper" ? q.kind : undefined;
+      const kind = q.kind === "note" || q.kind === "paper" || q.kind === "digest" ? q.kind : undefined;
       const notes = everything.filter(isNoteItem);
-      const all = everything.filter((i) => !isNoteItem(i));
-      const ofKind = kind === "note" ? notes : kind === "paper" ? all : everything;
+      const digests = everything.filter(isDigestItem);
+      const all = everything.filter(isPaperItem);
+      const ofKind = kind === "note" ? notes : kind === "digest" ? digests : kind === "paper" ? all : everything;
       const inProject = q.filter === "project" ? new Set(projectItems(readProjectLiterature(pathsOf()), all, collections).map((i) => i.id)) : undefined;
       // A folder shows its subfolders' papers too.
       const inFolder = q.collectionId ? folderSubtree(collections, q.collectionId) : undefined;
@@ -153,6 +157,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const rows = ofKind
         .filter((i) => !q.source || i.source === q.source)
         .filter((i) => !q.noteStatus || i.note?.status === q.noteStatus)
+        .filter((i) => !q.covers || Boolean(i.digest?.covers.includes(q.covers)))
         .filter((i) => !inFolder || i.collectionIds.some((c) => inFolder.has(c)))
         .filter((i) => q.filter !== "unread" || unread(i))
         .filter((i) => q.filter !== "cited" || uses.counts(i).notes > 0)
@@ -161,7 +166,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         .filter((i) => {
           if (!terms.length) return true;
           const hay = [i.csl.title, i.csl["container-title"], i.csl.abstract, i.citationKey, ...(i.csl.author ?? []).map((a) => `${a.given ?? ""} ${a.family ?? a.literal ?? ""}`), ...i.tags,
-            i.note?.projectName, i.note?.markdown]
+            i.note?.projectName, i.note?.markdown, i.digest?.text, i.digest?.external?.fileName]
             .filter((x): x is string => typeof x === "string").join(" ").toLowerCase();
           return terms.every((t) => hay.includes(t));
         })
@@ -169,7 +174,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const limit = Math.min(Math.max(Number(q.limit) || 100, 1), 500), offset = Math.max(Number(q.offset) || 0, 0);
       const z = await store.zotero();
       return {
-        items: rows.slice(offset, offset + limit).map((i) => summarize(i, uses.counts(i), noteSummary(i, noteIsLocal(i, instance.id, projectIds)))),
+        items: rows.slice(offset, offset + limit).map((i) => summarize(i, uses.counts(i), noteSummary(i, noteIsLocal(i, instance.id, projectIds)), digestSummary(i, everything, collections, instance.id, projectIds))),
         total: rows.length,
         counts: {
           all: all.length,
@@ -181,6 +186,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
           notes: notes.length,
           notesPending: notes.filter((i) => i.note?.status === "pending").length,
           notesConfirmed: notes.filter((i) => i.note?.status === "confirmed").length,
+          digests: digests.length,
         },
         collections,
         folderCounts: Object.fromEntries(collections.map((c) => {
@@ -196,6 +202,9 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       let item = await store.get(req.params.id);
       if (isNoteItem(item)) {
         try { if (await refreshNoteItems(store, [item])) item = await store.get(item.id); } catch (error) { scope.log.warn({ err: error }, "research-note refresh failed"); }
+      }
+      if (isDigestItem(item)) {
+        try { if (await refreshDigestItems(store, [item])) item = await store.get(item.id); } catch (error) { scope.log.warn({ err: error }, "literature-digest refresh failed"); }
       }
       const instance = libraryInstance(store), all = await store.all(), collections = await store.collections();
       const uses = buildUsesIndex(all, await workflowUses(store), collections, instance.id, projectWorkflows(all, collections));
@@ -283,7 +292,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
         name = c.name.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").slice(0, 60) || "folder";
       }
       // Research notes are not references: never in a bibliography.
-      const items = (await store.all()).filter((i) => !i.removedFromSourceAt && !isNoteItem(i) && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
+      const items = (await store.all()).filter((i) => !i.removedFromSourceAt && isPaperItem(i) && (!wanted.size || wanted.has(i.id)) && (!folder || i.collectionIds.some((c) => folder!.has(c))));
       const text = format === "text"
         ? referenceList(items, req.query?.lang === "en" ? "en" : "ko")
         : exportBibliography(items.map((i) => ({ ...numericCslDates(i.csl), ...(i.citationKey ? { "citation-key": i.citationKey } : {}) })), format);
@@ -343,7 +352,7 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       if (!collections.some((c) => c.id === req.params.id)) throw new LibraryError("Folder not found", 404);
       const sub = folderSubtree(collections, req.params.id);
       const all = await store.all();
-      const items = all.filter((i) => !isNoteItem(i) && i.collectionIds.some((c) => sub.has(c)));
+      const items = all.filter((i) => isPaperItem(i) && i.collectionIds.some((c) => sub.has(c)));
       const issues: FolderIssue[] = [];
       const one = (kind: Extract<FolderIssue, { itemId: string }>["kind"], i: LibraryItem) => issues.push({ kind, itemId: i.id, title: i.csl.title });
       for (const i of items) {
@@ -405,6 +414,28 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       const saved = writeProjectLiterature(pathsOf(), next);
       readAttachedPdfs(store, saved, all, collections);
       return { method, papers: resolveWorkflowPapers(findInstalledMethod(pathsOf(), method)!.file.method!.sources, all, saved, collections), added: next.added };
+    });
+
+    // 문헌 정리 (gaid-library-prep): make in a project, review mark, and what a Workflow start can read first.
+    scope.post<{ Body: MakeDigestBody }>("/geo/library/digests/requests", { bodyLimit: 64 * 1024 }, async (req): Promise<MakeDigestResponse> => {
+      const store = storeOf();
+      const made = await createDigestRequest(store, req.body ?? ({} as MakeDigestBody));
+      const paths = resolvePaths(made.projectId), all = await store.all(), collections = await store.collections();
+      readAttachedPdfs(store, readProjectLiterature(paths), all, collections);
+      return made;
+    });
+    scope.post<{ Params: { id: string }; Body: DigestStatusBody }>("/geo/library/digests/:id/status", { bodyLimit: 4 * 1024 }, async (req) => ({ item: await setDigestStatus(storeOf(), req.params.id, req.body?.status) }));
+    scope.get<{ Querystring: { method?: string } }>("/geo/library/digests/for-start", async (req): Promise<DigestCandidatesResponse> => {
+      const store = storeOf();
+      try { await refreshDigestItems(store); } catch (error) { scope.log.warn({ err: error }, "literature-digest refresh failed"); }
+      const all = (await store.all()).filter((i) => !i.removedFromSourceAt), collections = await store.collections();
+      let basis: string[] = [];
+      if (req.query?.method) {
+        const { papers } = await workflowPapers(req.query.method);
+        basis = papers.flatMap((p) => (p.itemId ? [p.itemId] : []));
+      }
+      if (!basis.length) basis = projectItems(readProjectLiterature(pathsOf()), all, collections).map((i) => i.id);
+      return { digests: basis.length ? digestCandidates(all, collections, basis) : [] };
     });
 
     scope.get("/geo/library/zotero", async () => ({ libraries: await zoteroOf(storeOf()).libraries() }));
