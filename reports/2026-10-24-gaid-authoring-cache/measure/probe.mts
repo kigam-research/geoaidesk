@@ -15,7 +15,8 @@ import { parseArgs } from "node:util";
 const { getModelRegistry, getModelRuntime } = await import("../../../server/src/agent/session-registry.ts");
 const { resolveModel } = await import("../../../server/src/agent/models.ts");
 const { getOpenAICodexWebSocketDebugStats } = await import(
-  new URL("../../../server/node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js", import.meta.url).href
+  // The copy the model runtime uses (pi-coding-agent's own pi-ai): the counters are module state.
+  new URL("../../../server/node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js", import.meta.url).href
 );
 
 const { values } = parseArgs({
@@ -25,12 +26,14 @@ const { values } = parseArgs({
     model: { type: "string", default: "openai-codex/gpt-6.1-sol" },
     thinking: { type: "string", default: "high" },
     only: { type: "string" },
+    draft: { type: "string" },
   },
 });
 const record = JSON.parse(fs.readFileSync(values.record!, "utf8"));
 const system: string = record.messages[0].content;
 const user: string = record.messages[1].content;
-const S = user.slice(0, user.indexOf("\n\n# Task\n"));
+// Records of this unit carry the sources as their own message; older ones as the start of one user message.
+const S = record.messages[2]?.role === "user" ? user : user.slice(0, user.indexOf("\n\n# Task\n"));
 const T1 = "# Task\nReply with exactly this JSON and nothing else: {\"probe\": 1}";
 const T2 = "# Task\nReply with exactly this JSON and nothing else: {\"probe\": \"second\", \"ok\": true}";
 const T3 = "# Task\nReply with exactly this JSON and nothing else: {\"probe\": 3}";
@@ -120,6 +123,10 @@ async function send(seq: string, step: string, nonce: string, turns: Turn[], opt
   return message;
 }
 
+// Real task blocks of a draft and an analysis call (attempt records of this unit's run), when given.
+const draftRecord = values.draft ? JSON.parse(fs.readFileSync(values.draft, "utf8")) : undefined;
+const TDRAFT = draftRecord ? `${draftRecord.messages[2].content}\n\nIgnore the task above for this probe and reply with exactly {"probe": "big"}.` : "";
+const TANALYZE = record.messages[2]?.role === "user" ? record.messages[2].content : "";
 const TLONG =
   "# Task\nWrite a plain-text summary of the sources in about 1500 English words (no JSON), section by section.";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -150,6 +157,31 @@ const sequences: Record<string, () => Promise<void>> = {
     await send("long", "A", n, [{ role: "user", blocks: [{ text: S }, { text: TLONG }] }]);
     await send("long", "B", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
   },
+  // How far from the end of the first request's input the second may diverge: first tails of about 200-2,500 tokens.
+  ...Object.fromEntries(
+    [200, 600, 1100, 2500].map((tokens) => [
+      `tail${tokens}`,
+      async () => {
+        const n = nonce();
+        const filler = Array.from({ length: Math.round(tokens / 6) }, (_, i) => `Note ${i}: this line is padding for the probe.`).join("\n");
+        await send(`tail${tokens}`, "A", n, [{ role: "user", blocks: [{ text: S }, { text: `${T1}\n\n${filler}` }] }]);
+        await send(`tail${tokens}`, "B", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
+      },
+    ]),
+  ),
+  // A 10K-token task after the sources (the draft call's shape), the reply kept short.
+  bigtail: async () => {
+    const n = nonce();
+    await send("bigtail", "A", n, [{ role: "user", blocks: [{ text: S }, { text: T1 }] }]);
+    await send("bigtail", "B", n, [{ role: "user", blocks: [{ text: S }, { text: TDRAFT }] }]);
+    await send("bigtail", "C", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
+  },
+  // The real analysis call (a ~5-minute reply), then a short task.
+  analysis: async () => {
+    const n = nonce();
+    await send("analysis", "A", n, [{ role: "user", blocks: [{ text: S }, { text: TANALYZE }] }]);
+    await send("analysis", "B", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
+  },
   // Gaps within (270 s) and beyond (330 s) Pi's 5-minute WebSocket idle limit.
   delay270: async () => {
     const n = nonce();
@@ -157,6 +189,17 @@ const sequences: Record<string, () => Promise<void>> = {
     await sleep(270_000);
     await send("delay270", "B", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
   },
+  ...Object.fromEntries(
+    [600, 1200].map((s) => [
+      `delay${s}`,
+      async () => {
+        const n = nonce();
+        await send(`delay${s}`, "A", n, [{ role: "user", blocks: [{ text: S }, { text: T1 }] }]);
+        await sleep(s * 1000);
+        await send(`delay${s}`, "B", n, [{ role: "user", blocks: [{ text: S }, { text: T2 }] }]);
+      },
+    ]),
+  ),
   delay330: async () => {
     const n = nonce();
     await send("delay330", "A", n, [{ role: "user", blocks: [{ text: S }, { text: T1 }] }]);

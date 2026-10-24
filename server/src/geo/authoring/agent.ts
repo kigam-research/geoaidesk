@@ -1265,6 +1265,7 @@ async function execute(
     );
   const callSummary = () =>
     calls.map((c) => ({
+      ...(c.purpose ? { purpose: c.purpose } : {}),
       startedAt: c.startedAt,
       ms: c.ms,
       input: c.usage.input,
@@ -1278,6 +1279,11 @@ async function execute(
     let lastCallStart = project.attempts
       .filter((a) => a.id !== attempt.id)
       .flatMap((a) => (a.calls?.length ? a.calls.map((c) => Date.parse(c.startedAt)) : a.endedAt ? [Date.parse(a.startedAt)] : []))
+      .filter(Number.isFinite)
+      .reduce<number | undefined>((m, x) => (m === undefined || x > m ? x : m), undefined);
+    // Start of the project's latest sources warm-up (model.ts): its cache entry may still be alive.
+    let lastWarmAt = project.attempts
+      .flatMap((a) => (a.calls ?? []).filter((c) => c.purpose === "prewarm").map((c) => Date.parse(c.startedAt)))
       .filter(Number.isFinite)
       .reduce<number | undefined>((m, x) => (m === undefined || x > m ? x : m), undefined);
     const ctx = await sourceContext(store, project);
@@ -1341,19 +1347,22 @@ async function execute(
       const reply = await call(messages, {
         ...config,
         ...(lastCallStart !== undefined ? { recentGapMs: now - lastCallStart } : {}),
+        // Only an operation's first call may warm the sources; the repair extends that call.
+        warmUp: calls.length === 0,
+        ...(lastWarmAt !== undefined ? { lastWarmAt } : {}),
       }).catch((e: Error & { call?: CallRecord }) => {
         if (e.call) calls.push(e.call);
         throw e;
       });
+      if (reply.prewarm) {
+        calls.push(reply.prewarm.call);
+        lastWarmAt = Date.parse(reply.prewarm.call.startedAt);
+      }
       lastCallStart = reply.call ? Date.parse(reply.call.startedAt) : now;
       if (reply.call) calls.push(reply.call);
-      usage = {
-        input: (usage.input ?? 0) + (reply.usage?.input ?? 0),
-        cacheRead: (usage.cacheRead ?? 0) + (reply.usage?.cacheRead ?? 0),
-        cacheWrite: (usage.cacheWrite ?? 0) + (reply.usage?.cacheWrite ?? 0),
-        output: (usage.output ?? 0) + (reply.usage?.output ?? 0),
-        costUsd: (usage.costUsd ?? 0) + (reply.usage?.costUsd ?? 0),
-      };
+      const add = (k: "input" | "cacheRead" | "cacheWrite" | "output" | "costUsd") =>
+        (usage[k] ?? 0) + (reply.usage?.[k] ?? 0) + (reply.prewarm?.usage[k] ?? 0);
+      usage = { input: add("input"), cacheRead: add("cacheRead"), cacheWrite: add("cacheWrite"), output: add("output"), costUsd: add("costUsd") };
       responses.push({ content: reply.content, finishReason: reply.finishReason });
       messages.push({ role: "assistant", content: reply.content, ...(reply.native ? { native: reply.native } : {}) });
       const parsed = parseReply(reply.content);

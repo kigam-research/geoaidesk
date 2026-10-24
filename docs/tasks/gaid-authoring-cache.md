@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T12:11:35Z
+updated: 2026-10-24T12:37:32Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4c7a414c-4971-467e-bd4e-be3a24b50c1e","pid":908712,"provider":"claude","session":"a59c5297-7707-4492-9e14-c91549b87e67","start":"72988241","token":"01b6763312835def33e04b6cef6092bb6449bf54aa80b7e7776c7a4cc604157f"}
 branch: task/gaid-authoring-cache
 target: main
@@ -88,15 +88,32 @@ login instead of substituting. Outside check: the gaid-authoring-tokens baseline
 - Tests: server typecheck clean; vitest test/geo-authoring* 81 passed (incl. new geo-authoring-cache.test.ts, 7).
 - First-draft data (all PC74 authoring stores, prompt versions 10-22.1 … 10-24.1): 23 draft/revise attempts, 8 passed
   first; 13 of 15 failures only had the three errors the prompt now addresses.
+- Re-measure 1 (run-codex, code without warm-up, 21:02-21:28 KST): analyze 25,893 uncached / 0 read / 15,213 out, 343 s;
+  draft accepted on the FIRST reply (no repair), 35,068 uncached / 0 read / 22,776 out, 616 s; list $0.50. Records: same
+  prefixSha, key, instructions (830 tokens) and sources block (24,017 tokens, provider attribution) in both calls, draft
+  sent 8 s after the analysis ended, still 0 read. Codex WebSocket counters were empty: pi-coding-agent has its own pi-ai
+  copy (same 1.0.0 files); model.ts now reads that copy.
+- Cause found (probes codex-3/4): the legacy backend keeps an implicit entry only at the end of a request's input, and a
+  later request reuses it only when it diverges within a few tokens of that end: after a first request with a ~30-token
+  tail after the sources the next one read 24,704; with tails of ~400, 1,200, 2,200, 5,000 tokens, and after the real
+  analysis task (1,044 tokens), it read 0. A 10K-token task after a short-tail first request read 24,704. So every
+  operation's first call misses by structure on this path (analysis → draft, draft → revise); repairs hit (they extend).
+- Fix: warm-up call (cache.ts `plan.prewarm`, model.ts `PREWARM_TAIL`, agent.ts `warmUp`/`lastWarmAt`): on openai-codex
+  only, before an operation's first call, send [system, sources, one-line tail] unless a warm-up of this project is
+  younger than CODEX_WARM_TTL_MS (10 min placeholder until delay600/1200 probes end). Ledgered, in attempt.calls with
+  purpose "prewarm". Test added (geo-authoring-cache.test.ts, 8 tests).
 ## Next steps
-Blocked: waiting for the re-measure systemd unit gaid-cache-drive (user unit, not a task job; ~15 min, a Monitor reports its end).
-1. Re-measure running: units gaid-cache-serve (port 18733) + gaid-cache-drive, run dir
-   ~/data/geoaidesk/work/gaid-authoring-cache/run-codex (answers from gaid-authoring-tokens/after/result/answers.json).
-   Then tally.py before/after/new, stop the server unit.
-2. Report reports/2026-10-24-gaid-authoring-cache/index.md (Korean, result first, humanizer), scripts/check, task finish.
+1. Waiting: probe gaid-cache-probe5 (delay600/delay1200, ends ~21:53 KST) → set CODEX_WARM_TTL_MS from it; re-measure 2
+   with warm-up running: units gaid-cache-serve2 (port 18734) + gaid-cache-drive2, run dir
+   ~/data/geoaidesk/work/gaid-authoring-cache/run-codex-warm. Then tally before/after/cache/warm, stop serve2.
+2. Report reports/2026-10-24-gaid-authoring-cache/index.md (Korean, result first, humanizer), scripts/check (wait for load
+   < 14), task finish.
+Blocked: waiting for user systemd units gaid-cache-probe5 and gaid-cache-drive2 (not task jobs).
 ## Failed approaches
 - H1 "an implicit entry is reusable only by a request that contains the whole earlier input" — refuted by probes (above).
 - Explicit prompt_cache_breakpoint on the legacy Codex backend — refused by the backend.
+- "Provider-side variance" for the analyze→draft miss (first reading after probes 1-2) — wrong; it is the end-of-input
+  entry rule above, reproduced every time.
 ## Notes and decisions
 - Orchestration: tightly coupled (model.ts/agent.ts/prompts.ts/ledger.ts + measurement), done by this writer; no child
   units. Owned upstream seam: server/src/cost/ledger.ts (optional cacheWrite) — added to geo/integration-boundaries.json.

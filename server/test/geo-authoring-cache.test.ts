@@ -14,7 +14,7 @@ import { resolveModel } from "../src/agent/models.ts";
 import { getModelRegistry } from "../src/agent/session-registry.ts";
 import { anthropicRetention, cachePlan, markSourcesBoundary, rawUsageOf, summarisePayload } from "../src/geo/authoring/cache.ts";
 import { runOperation } from "../src/geo/authoring/agent.ts";
-import { toContext, type CallRecord, type ChatFn, type ChatMessage } from "../src/geo/authoring/model.ts";
+import { PREWARM_TAIL, runtimeChat, toContext, type CallRecord, type ChatFn, type ChatMessage } from "../src/geo/authoring/model.ts";
 import { analysis, cleanup, config, draftReply, fixture, testVocabulary } from "./helpers/geo-authoring.ts";
 
 afterEach(cleanup);
@@ -178,6 +178,32 @@ describe("GAID hub authoring prompt cache", () => {
     const record = JSON.parse(await readFile(join(dir, "projects", projectId, drafted.record!), "utf8"));
     expect(record.calls).toHaveLength(2);
     expect(record.messages.some((m: { native?: unknown }) => m.native)).toBe(false);
+  });
+
+  it("warms the sources once before an operation's first call on the legacy Codex path", async () => {
+    const sent: { blocks: string[]; maxTokens?: number }[] = [];
+    const complete = async (model: Model<Api>, context: ReturnType<typeof toContext>, options?: { maxTokens?: number }) => {
+      sent.push({ blocks: (context.messages[0].content as { text: string }[]).map((b) => b.text), maxTokens: options?.maxTokens });
+      return {
+        role: "assistant", api: model.api, provider: model.provider, model: model.id, stopReason: "stop", timestamp: Date.now(),
+        content: [{ type: "text", text: "{}" }],
+        usage: { input: 5, output: 2, cacheRead: 100, cacheWrite: 0, totalTokens: 107, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } },
+      } as unknown as AssistantMessage;
+    };
+    const chat = runtimeChat(complete as never);
+    const base = { ref: "openai-codex/gpt-6.1-sol", thinkingLevel: "high" as const, timeoutMs: 60_000, maxTokens: 32_000, cacheKey: "ap-warm" };
+    const first = await chat(messages, { ...base, warmUp: true });
+    expect(sent.map((s) => s.blocks)).toEqual([[SOURCES, PREWARM_TAIL], [SOURCES, "# Task\nWrite the draft."]]);
+    expect(first.prewarm?.call.purpose).toBe("prewarm");
+    expect(first.prewarm?.call.cache.prewarm).toBeDefined();
+    expect(first.call?.purpose).toBeUndefined();
+    // A warm-up that is still alive is not repeated; a repair (warmUp false) never warms.
+    await chat(messages, { ...base, warmUp: true, lastWarmAt: Date.now() - 60_000 });
+    await chat(repair, { ...base, warmUp: false });
+    expect(sent).toHaveLength(4);
+    // Other paths never warm.
+    await chat(messages, { ...base, ref: "openai/gpt-6.1-sol", warmUp: true });
+    expect(sent).toHaveLength(5);
   });
 });
 

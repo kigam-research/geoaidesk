@@ -4,7 +4,9 @@
  * project spend cap of the `default` project applies. Replies are validated by the caller, never trusted.
  */
 import type { Api, AssistantMessage, Context, Message, Model, SimpleStreamOptions, TextContent, ThinkingLevel } from "@earendil-works/pi-ai";
-import { getOpenAICodexWebSocketDebugStats } from "@earendil-works/pi-ai/api/openai-codex-responses";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { DEFAULT_PROJECT_ID } from "../../config.ts";
 import { billingCountsTowardBudget, billingForModel } from "../../cost/billing.ts";
 import { emptySnapshot, isBudgetExceeded, recordRun } from "../../cost/ledger.ts";
@@ -37,6 +39,10 @@ export interface ModelConfig {
   history?: HistoryMode;
   /** Gap between the project's two latest model-call starts (ms): the retention predictor (see cache.ts). */
   recentGapMs?: number;
+  /** This is an operation's first call: a path with `plan.prewarm` may warm the sources first. */
+  warmUp?: boolean;
+  /** Start of the project's latest warm-up call (ms), so a live entry is not warmed again. */
+  lastWarmAt?: number;
 }
 
 export type HistoryMode = "fold" | "native";
@@ -93,6 +99,8 @@ export interface CallRecord {
   auth: string;
   cache: CachePlan;
   history: HistoryMode;
+  /** Set on the warm-up call (sources plus a one-line tail, sent before an operation's first call). */
+  purpose?: "prewarm";
   startedAt: string;
   /** ms from the start to the HTTP response, to the first provider stream event, and to the end. */
   responseMs?: number;
@@ -114,7 +122,12 @@ export interface ChatResult {
   usage?: ChatUsage;
   native?: AssistantMessage;
   call?: CallRecord;
+  /** The warm-up call made before this one, if any (ledgered like any call). */
+  prewarm?: { usage: ChatUsage; call: CallRecord };
 }
+
+/** The warm-up's task: a few tokens, so the cache entry it leaves ends right after the sources. */
+export const PREWARM_TAIL = "Cache warm-up: reply with exactly {} and nothing else.";
 
 export type ChatFn = (messages: ChatMessage[], config: ModelConfig) => Promise<ChatResult>;
 
@@ -162,6 +175,30 @@ export function toContext(messages: ChatMessage[], mode: HistoryMode = "fold", m
   return { systemPrompt: system, messages: out };
 }
 
+type CodexStats = { connectionsReused: number; deltaRequests: number; sseFallbacks: number };
+let codexStatsReader: Promise<((sessionId: string) => CodexStats | undefined) | undefined> | undefined;
+
+/**
+ * Pi's Codex WebSocket counters, read from the pi-ai copy the model runtime uses: npm may install pi-coding-agent's own
+ * copy of pi-ai next to ours, and the counters live in module state.
+ */
+function codexStats(): Promise<((sessionId: string) => CodexStats | undefined) | undefined> {
+  codexStatsReader ??= (async () => {
+    try {
+      let dir = path.dirname(fileURLToPath(import.meta.resolve("@earendil-works/pi-coding-agent")));
+      while (!fs.existsSync(path.join(dir, "package.json")) && path.dirname(dir) !== dir) dir = path.dirname(dir);
+      const nested = path.join(dir, "node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js");
+      const mod = fs.existsSync(nested)
+        ? await import(pathToFileURL(nested).href)
+        : await import("@earendil-works/pi-ai/api/openai-codex-responses");
+      return mod.getOpenAICodexWebSocketDebugStats as (sessionId: string) => CodexStats | undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  return codexStatsReader;
+}
+
 /** Resolve the model and refuse before any call when it is not connected or the cap is reached. */
 export async function preflight(config: ModelConfig): Promise<{ model: Model<Api> }> {
   if (config.ref.startsWith("fusion/"))
@@ -194,120 +231,139 @@ export function runtimeChat(complete?: Complete): ChatFn {
     const plan = cachePlan(model, billing.authType, config.recentGapMs);
     const history = config.history ?? historyFor(plan.path);
     const sources = messages.find((m) => m.cacheBoundary)?.content ?? "";
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), config.timeoutMs);
-    const started = Date.now();
-    const wsBefore = config.cacheKey && model.api === "openai-codex-responses" ? getOpenAICodexWebSocketDebugStats(config.cacheKey) : undefined;
-    let payload: PayloadSummary | undefined;
-    let rawUsage: Record<string, unknown> | undefined;
-    let responseMs: number | undefined;
-    let firstEventMs: number | undefined;
-    let requestId: string | undefined;
-    let message: AssistantMessage;
-    try {
-      const call: Complete = complete ?? ((m, c, o) => runtime.completeSimple(m, c, o));
-      message = await call(model, toContext(messages, history, model), {
-        maxTokens: config.maxTokens,
-        reasoning: config.thinkingLevel as ThinkingLevel,
-        signal: controller.signal,
-        cacheRetention: plan.retention,
-        ...(config.cacheKey ? { sessionId: config.cacheKey } : {}),
-        onPayload: (body) => {
-          if (sources) markSourcesBoundary(body, plan, sources);
-          payload = summarisePayload(body, sources, config.cacheKey);
-          return undefined;
+    const send = async (msgs: ChatMessage[], purpose: "reply" | "prewarm"): Promise<ChatResult> => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), config.timeoutMs);
+      const started = Date.now();
+      const stats = config.cacheKey && model.api === "openai-codex-responses" ? await codexStats() : undefined;
+      const wsBefore = stats?.(config.cacheKey!);
+      let payload: PayloadSummary | undefined;
+      let rawUsage: Record<string, unknown> | undefined;
+      let responseMs: number | undefined;
+      let firstEventMs: number | undefined;
+      let requestId: string | undefined;
+      let message: AssistantMessage;
+      try {
+        const call: Complete = complete ?? ((m, c, o) => runtime.completeSimple(m, c, o));
+        message = await call(model, toContext(msgs, purpose === "prewarm" ? "fold" : history, model), {
+          maxTokens: purpose === "prewarm" ? 256 : config.maxTokens,
+          reasoning: config.thinkingLevel as ThinkingLevel,
+          signal: controller.signal,
+          cacheRetention: plan.retention,
+          ...(config.cacheKey ? { sessionId: config.cacheKey } : {}),
+          onPayload: (body) => {
+            if (sources) markSourcesBoundary(body, plan, sources);
+            payload = summarisePayload(body, sources, config.cacheKey);
+            return undefined;
+          },
+          onResponse: (response) => {
+            responseMs = Date.now() - started;
+            const h = response.headers ?? {};
+            requestId = h["x-request-id"] ?? h["request-id"] ?? h["x-oai-request-id"];
+          },
+          onProviderStreamEvent: (event) => {
+            firstEventMs ??= Date.now() - started;
+            rawUsage = rawUsageOf(event, rawUsage);
+          },
+        } as SimpleStreamOptions);
+      } finally {
+        clearTimeout(timer);
+      }
+      const usage = message.usage;
+      const wsAfter = stats?.(config.cacheKey!);
+      const record: CallRecord = {
+        provider: model.provider,
+        model: model.id,
+        api: model.api,
+        auth: billing.authType,
+        cache: plan,
+        history,
+        ...(purpose === "prewarm" ? { purpose } : {}),
+        startedAt: new Date(started).toISOString(),
+        ...(responseMs !== undefined ? { responseMs } : {}),
+        ...(firstEventMs !== undefined ? { firstEventMs } : {}),
+        ms: Date.now() - started,
+        ...(message.responseId ? { responseId: message.responseId } : {}),
+        ...(requestId ? { requestId } : {}),
+        stopReason: message.stopReason,
+        usage: {
+          input: usage.input,
+          cacheRead: usage.cacheRead,
+          cacheWrite: usage.cacheWrite,
+          ...(usage.cacheWrite1h ? { cacheWrite1h: usage.cacheWrite1h } : {}),
+          output: usage.output,
+          ...(usage.reasoning !== undefined ? { reasoning: usage.reasoning } : {}),
+          total: usage.totalTokens,
         },
-        onResponse: (response) => {
-          responseMs = Date.now() - started;
-          const h = response.headers ?? {};
-          requestId = h["x-request-id"] ?? h["request-id"] ?? h["x-oai-request-id"];
+        ...(rawUsage ? { rawUsage } : {}),
+        ...(payload ? { payload } : {}),
+        ...(wsAfter
+          ? {
+              transport: {
+                connectionReused: wsAfter.connectionsReused > (wsBefore?.connectionsReused ?? 0),
+                delta: wsAfter.deltaRequests > (wsBefore?.deltaRequests ?? 0),
+                sseFallback: wsAfter.sseFallbacks > (wsBefore?.sseFallbacks ?? 0),
+              },
+            }
+          : {}),
+      };
+      const entry = recordRun({
+        projectId: DEFAULT_PROJECT_ID,
+        sessionId: AUTHORING_LEDGER_SESSION,
+        role: "agent",
+        model: modelReference(model),
+        billing,
+        before: emptySnapshot(),
+        after: {
+          costUsd: usage.cost.total,
+          input: usage.input,
+          output: usage.output,
+          cacheRead: usage.cacheRead,
+          cacheWrite: usage.cacheWrite,
+          total: usage.totalTokens,
         },
-        onProviderStreamEvent: (event) => {
-          firstEventMs ??= Date.now() - started;
-          rawUsage = rawUsageOf(event, rawUsage);
+      });
+      if (message.stopReason === "error" || message.stopReason === "aborted")
+        throw Object.assign(
+          new Error(
+            message.stopReason === "aborted" && controller.signal.aborted
+              ? `응답이 ${Math.round(config.timeoutMs / 60_000)}분 안에 끝나지 않았습니다`
+              : message.errorMessage || `model stopped (${message.stopReason})`,
+          ),
+          { call: record },
+        );
+      const content = message.content
+        .filter((c) => c.type === "text")
+        .map((c) => (c.type === "text" ? c.text : ""))
+        .join("\n");
+      return {
+        content,
+        finishReason: message.stopReason === "length" ? "length" : message.stopReason,
+        usage: {
+          input: usage.input,
+          output: usage.output,
+          cacheRead: usage.cacheRead,
+          cacheWrite: usage.cacheWrite,
+          costUsd: entry?.costUsd ?? usage.cost.total,
         },
-      } as SimpleStreamOptions);
-    } finally {
-      clearTimeout(timer);
+        native: message,
+        call: record,
+      };
+    };
+    // Warm-up: on a path whose cache keeps only the end of a request, first leave an entry at the end of the sources.
+    let prewarm: ChatResult["prewarm"];
+    if (sources && plan.prewarm && config.warmUp && !(config.lastWarmAt && Date.now() - config.lastWarmAt < plan.prewarm.ttlMs)) {
+      const system = messages.filter((m) => m.role === "system");
+      try {
+        const warm = await send([...system, { role: "user", content: sources, cacheBoundary: true }, { role: "user", content: PREWARM_TAIL }], "prewarm");
+        prewarm = { usage: warm.usage!, call: warm.call! };
+      } catch (e) {
+        // A failed warm-up only costs the cache; the reply call goes on. Its record keeps the failure.
+        const call = (e as { call?: CallRecord }).call;
+        if (call) prewarm = { usage: { input: call.usage.input, output: call.usage.output, cacheRead: call.usage.cacheRead, cacheWrite: call.usage.cacheWrite }, call };
+      }
     }
-    const usage = message.usage;
-    const wsAfter = config.cacheKey && model.api === "openai-codex-responses" ? getOpenAICodexWebSocketDebugStats(config.cacheKey) : undefined;
-    const record: CallRecord = {
-      provider: model.provider,
-      model: model.id,
-      api: model.api,
-      auth: billing.authType,
-      cache: plan,
-      history,
-      startedAt: new Date(started).toISOString(),
-      ...(responseMs !== undefined ? { responseMs } : {}),
-      ...(firstEventMs !== undefined ? { firstEventMs } : {}),
-      ms: Date.now() - started,
-      ...(message.responseId ? { responseId: message.responseId } : {}),
-      ...(requestId ? { requestId } : {}),
-      stopReason: message.stopReason,
-      usage: {
-        input: usage.input,
-        cacheRead: usage.cacheRead,
-        cacheWrite: usage.cacheWrite,
-        ...(usage.cacheWrite1h ? { cacheWrite1h: usage.cacheWrite1h } : {}),
-        output: usage.output,
-        ...(usage.reasoning !== undefined ? { reasoning: usage.reasoning } : {}),
-        total: usage.totalTokens,
-      },
-      ...(rawUsage ? { rawUsage } : {}),
-      ...(payload ? { payload } : {}),
-      ...(wsAfter
-        ? {
-            transport: {
-              connectionReused: wsAfter.connectionsReused > (wsBefore?.connectionsReused ?? 0),
-              delta: wsAfter.deltaRequests > (wsBefore?.deltaRequests ?? 0),
-              sseFallback: wsAfter.sseFallbacks > (wsBefore?.sseFallbacks ?? 0),
-            },
-          }
-        : {}),
-    };
-    const entry = recordRun({
-      projectId: DEFAULT_PROJECT_ID,
-      sessionId: AUTHORING_LEDGER_SESSION,
-      role: "agent",
-      model: modelReference(model),
-      billing,
-      before: emptySnapshot(),
-      after: {
-        costUsd: usage.cost.total,
-        input: usage.input,
-        output: usage.output,
-        cacheRead: usage.cacheRead,
-        cacheWrite: usage.cacheWrite,
-        total: usage.totalTokens,
-      },
-    });
-    if (message.stopReason === "error" || message.stopReason === "aborted")
-      throw Object.assign(
-        new Error(
-          message.stopReason === "aborted" && controller.signal.aborted
-            ? `응답이 ${Math.round(config.timeoutMs / 60_000)}분 안에 끝나지 않았습니다`
-            : message.errorMessage || `model stopped (${message.stopReason})`,
-        ),
-        { call: record },
-      );
-    const content = message.content
-      .filter((c) => c.type === "text")
-      .map((c) => (c.type === "text" ? c.text : ""))
-      .join("\n");
-    return {
-      content,
-      finishReason: message.stopReason === "length" ? "length" : message.stopReason,
-      usage: {
-        input: usage.input,
-        output: usage.output,
-        cacheRead: usage.cacheRead,
-        cacheWrite: usage.cacheWrite,
-        costUsd: entry?.costUsd ?? usage.cost.total,
-      },
-      native: message,
-      call: record,
-    };
+    const reply = await send(messages, "reply");
+    return prewarm ? { ...reply, prewarm } : reply;
   };
 }

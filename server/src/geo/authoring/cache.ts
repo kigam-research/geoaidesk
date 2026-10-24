@@ -28,7 +28,17 @@ export interface CachePlan {
   retention: CacheRetention;
   /** Why this retention (for the call record). */
   reason: string;
+  /**
+   * Warm the sources before an operation's first call: the path's implicit cache keeps an entry only at the end of a
+   * request's input and a later request reuses it only when it diverges within a few tokens of that end (probe
+   * 2026-10-24: a 30-token tail after the sources was reused, 400 tokens and more never). The warm-up's entry ends right
+   * after the sources, so every later operation of the project reads them while it lives (`ttlMs`, measured).
+   */
+  prewarm?: { ttlMs: number };
 }
+
+/** How long a legacy Codex warm-up entry was still read (probe 2026-10-24). */
+export const CODEX_WARM_TTL_MS = 10 * 60_000;
 
 /** Anthropic's short TTL: a later call that reuses the sources after this gap pays the write again. */
 export const ANTHROPIC_SHORT_TTL_MS = 5 * 60_000;
@@ -72,8 +82,15 @@ export function cachePlan(
       const r = anthropicRetention(recentGapMs);
       return { path, boundary: "explicit", ...r };
     }
-    case "openai-chatgpt":
     case "openai-codex":
+      return {
+        path,
+        boundary: "implicit",
+        retention: "short",
+        reason: "subscription path: cache options and breakpoints unsupported; sources warmed",
+        prewarm: { ttlMs: CODEX_WARM_TTL_MS },
+      };
+    case "openai-chatgpt":
       return { path, boundary: "implicit", retention: "short", reason: "subscription path: cache options unsupported" };
     default:
       return { path, boundary: "implicit", retention: "short", reason: "provider default" };
