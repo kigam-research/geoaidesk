@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:23:54Z
+updated: 2026-10-24T12:11:43Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bb1c54f-ec00-4ede-b538-8689a6d7266d","pid":1785127,"provider":"claude","session":"3dbb251a-b5a3-49b3-8474-ccc8cde7b5f6","start":"71315213","token":"0c6b923018272ee28d6b79696503be8b04037904a1f5d58759fec6ee23f1986e"}
 branch: task/gaid-library-prep
 target: main
@@ -57,7 +57,8 @@ devLibraryPrep). Checks: web tsc clean; copy validator 0 errors, 0 warnings in d
 48 screenshots (6 screens × 계측/도폭 × light/dark × 1440×900/1280×800) in pc74:~/data/geoaidesk/work/gaid-library-prep/shots/
 (re-shoot: start `npx next dev -p 3241` in web/, then ~/data/geoaidesk/work/gaid-library-prep/shoot.sh shots <w> <h> [screens]).
 No app behaviour changed. The user approved all three recommendations (see Notes). Phase 2 not started: waiting for the
-library panel on main.
+library panel on main. Rechecked after the Paseo daemon restart (2026-10-24): worktree clean at c0f37e33, origin/main
+ecc06f59 still lacks the library panel (gaid-authoring-tokens is now on main); no jobs or child units. Still waiting.
 ## Next steps
 1. Phase 2 once gaid-ia-connect-workspace--library-panels is on main (checked 2026-10-24: origin/main 75227da7 has an interim
    sync of the parent, but not the library panel): rebase on fresh main, then gaid-ia-connect-workspace--library-panels on main: decide work packages (server digest item kind
