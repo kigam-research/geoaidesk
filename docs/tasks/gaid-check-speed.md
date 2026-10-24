@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T13:03:56Z
+updated: 2026-10-24T13:11:25Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4b8e0e17-3fea-48d0-b063-69304df1ad95","pid":2429809,"provider":"claude","session":"63970a14-62e0-4041-afb8-314c6e8a5445","start":"73218387","token":"a2a1e3d206cb0ff8ffa8126fa33175459610479150f50ccbaef399569abbec08"}
 branch: task/gaid-check-speed
 target: main
@@ -36,11 +36,39 @@ Source: backbone reports/2026-10-24-worktree-workflow-review/index.md §3.4 and 
   are active, so keep the change self-contained in scripts/check and its helpers; do not touch the review app or the hub server.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Result: scripts/check passes on PC74 in 394-451 s (3 runs after the change, all exit 0) against a baseline of about
+1020 s that also failed on 5 load timeouts in the web tests. Coverage unchanged: server 2324 passed / 8 skipped (212 files),
+web 1341 passed (211 files), geo 58 pass / 1 skipped (59 tests; the maps split keeps all 13 maps tests).
+
+| stage (task-stage) | baseline s | after 1 / 2 / 3 s | change |
+|---|---|---|---|
+| server-install | 45 | 0 / 0 / 0 | npm ci only when package-lock.json changes (scripts/npm-ci-locked.mjs) |
+| helper-env | 1 | 0 / 0 / 0 | unchanged (uv sync --frozen already reused) |
+| server-typecheck | 27 | 15 / 22 / 13 | unchanged (load) |
+| server-unit | 571 | 128 / 105 / 118 | files in parallel (TASK_CHECK_JOBS, default 8), one projects root / Pi agent dir / skills cache per worker |
+| web-install | 27 | 0 / 0 / 0 | install reuse |
+| web-unit | 68 (5 failed) | 95 / 110 / 110 | workers capped at TASK_CHECK_JOBS (was all CPUs but one); waitFor 5 s, test timeout 20 s; 0 failures |
+| geo-tests | 39 | 53 / 72 / 31 | maps-helper tests split into three files (run 3) |
+| geo-environments | 8 | 15 / 11 / 14 | unchanged |
+| production-smoke | 196 | 101 / 85 / 75 | no second npm ci of server and web (shared launcher stamp) |
+| ui-quality-install + ui-quality | 1 + 35 | 1+37 / 0+40 / 0+31 | install reuse |
+| others (launchers, copy, guide) | ~2 | ~5 / ~2 / ~2 | |
+| total | ~1020 | 451 / 447 / 394 | |
+
+Load differed (baseline 45-78, after 23-38); the server-unit gain holds at equal load (563 s serial vs 114 s with 8 workers,
+both at load ~50, srv8 experiment). The web-unit stage is slower than before because the standard forbids all-CPU workers;
+with the task CLI's TASK_CHECK_JOBS (up to 16) after rollout it gets more workers. Failure causes from 142 failed PC74 logs:
+load timeouts in web/server tests (addressed for web by the longer waits) and missing integration-boundaries entries (real
+failures, not flakes). Network: remaining steps are declared in AGENTS.md "Checks" (cache misses, the PSI-MS probe, Playwright
+Chromium once per PC).
+Re-verify: `scripts/check` (prints `task-stage:` lines and a stage table at exit); logs of the runs above in
+~/data/geoaidesk/work/gaid-check-speed/{baseline1,baseline-tail,after1,after2,after3}.log on PC74.
 ## Next steps
-1. Baseline check runs as systemd user unit `gaid-check-speed-base1` (log ~/data/geoaidesk/work/gaid-check-speed/baseline1.log,
-   stage summary at its end). When it ends, record the stage times, then apply the prepared changes
-   (scripts/npm-ci-locked.mjs, parallel server vitest with per-worker dirs) and measure again.
+1. task finish.
+- Optional (not done): the production smoke rebuilds the UI on every run (~40-60 s) because NEXT_PUBLIC_ADK_API_URL holds its
+  random backend port; a fixed smoke-only build port or a port-independent API URL would let the build be reused.
+- Optional: the server psims probe and two mzML tests need the network; giving psims a local PSI-MS vocabulary copy
+  (configure_obo_store) would remove it, but that changes the helper app code.
 ## Failed approaches
 ## Notes and decisions
 - Plan (sequential, done by this writer; small and tightly coupled, no child units): 1) stage markers in scripts/check
@@ -65,6 +93,17 @@ Source: backbone reports/2026-10-24-worktree-workflow-review/index.md §3.4 and 
   --maxWorkers=8: 115 s (slower than 31 workers), 1 failure (settings Modal credentials, findByText after 1 s).
   Decision: keep TASK_CHECK_JOBS (default 8) for web too (standard: never all CPUs) and raise the web async wait to 5 s
   and the test timeout to 20 s, which removes the load timeouts without dropping tests.
+- Baseline tail (same commands as main, stamps removed as every main run leaves them; load ~30-45):
+  launcher-check 0, geo-tests 39 (59 tests: 58 pass, 1 skipped), ui-copy 1, ui-guide 1, geo-environments 8,
+  gaid-launcher-check 0, production-smoke 196 (start 1 re-ran npm ci for server and web: the stamps reappeared), ui-quality
+  npm ci 1, ui-quality 35. Baseline total ~1020 s (571 + 68 + 196 dominate).
+- After 1 / after 2 (scripts/check with the changes, load 23-38): 451 s / 447 s, exit 0 both; server-unit 128 / 105,
+  web-unit 95 / 110, geo-tests 53 / 72, production-smoke 101 / 85, installs 0 s. Counts unchanged (server 2324 passed
+  8 skipped; web 1341 passed; geo 58 pass 1 skipped).
+- geo-tests was then bound by one file: maps-helper.test.mjs alone took 40-60 s (55 sequential GDAL helper calls); split
+  into three files with a shared setup module (geo/tests/maps-helper-common.mjs): 13/13 pass in 18 s.
+- The production smoke rebuilds the UI on every run because it picks free ports and NEXT_PUBLIC_ADK_API_URL carries the
+  backend port into the build stamp (geo/start.mjs). Left as is (the smoke checks a real first start); see Optional.
 - Found: scripts/check's `npm ci` deletes `node_modules/.launcher-ci-stamp`, so the production smoke's first
   `start-gaid` start runs `npm ci` again for server and web. One stamp shared by scripts/check and start.mjs fixes both.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
