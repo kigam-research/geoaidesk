@@ -6,10 +6,15 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["test/**/*.test.ts"],
-    // Multiple test files reset/repopulate this same shared directory in
-    // beforeEach/afterAll; running files concurrently races on it (ENOTEMPTY,
-    // files vanishing mid-assertion). Run test files serially to avoid that.
-    fileParallelism: false,
+    // Multiple test files reset/repopulate the projects root, Pi agent dir and
+    // skills cache in beforeEach/afterAll; running files concurrently on one
+    // directory races (ENOTEMPTY, files vanishing mid-assertion). Files run in
+    // parallel workers, and the setup file gives each worker its own copy of
+    // those directories (suffix -w<VITEST_POOL_ID>). Workers: TASK_CHECK_JOBS
+    // (free CPUs, set by the task CLI) or 8, never all CPUs; scripts/check
+    // passes the same value as --maxWorkers.
+    setupFiles: ["./test/setup-worker-dirs.ts"],
+    maxWorkers: Number(process.env.TASK_CHECK_JOBS) || 8,
     // Each run gets an isolated projects root under the OS temp dir.
     env: {
       KADY_PROJECTS_ROOT:

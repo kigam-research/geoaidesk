@@ -4,6 +4,30 @@
   "source": "skill_hub docs/specs/geo-byok-plan.md sections 2.4 and 7.1 (main d5b8d86)",
   "seams": [
     {
+      "path": "scripts/check",
+      "owner": "gaid-check-speed",
+      "status": "edited",
+      "responsibility": "Stage markers (task-stage: <name>) with an exit summary of stage seconds; installs through scripts/npm-ci-locked.mjs; test workers capped by TASK_CHECK_JOBS (default 8)"
+    },
+    {
+      "path": "scripts/npm-ci-locked.mjs",
+      "owner": "gaid-check-speed",
+      "status": "added",
+      "responsibility": "npm ci per directory only when package-lock.json or the Node ABI changed, with the stamp start.mjs --production writes, so the check, the production smoke and the launcher reuse one install"
+    },
+    {
+      "path": "server/vitest.config.ts, server/test/setup-worker-dirs.ts",
+      "owner": "gaid-check-speed",
+      "status": "edited",
+      "responsibility": "Test files run in parallel workers; the setup file gives each worker its own projects root, Pi agent dir and skills cache (suffix -w<VITEST_POOL_ID>), which replaces fileParallelism: false"
+    },
+    {
+      "path": "web/vitest.config.ts, web/vitest.setup.ts",
+      "owner": "gaid-check-speed",
+      "status": "edited",
+      "responsibility": "testTimeout 20 s and testing-library asyncUtilTimeout 5 s so lazy panels under PC load do not fail unrelated tests; drop if upstream raises them"
+    },
+    {
       "path": "server/test/geo-workspace-home.test.ts",
       "owner": "gaid-ia-connect-workspace",
       "status": "added",

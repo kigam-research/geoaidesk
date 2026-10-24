@@ -390,9 +390,16 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Checks: `scripts/check` runs the upstream CI steps (`.github/workflows/tests.yml`) on Linux, then the GAID
   checks (`node --test 'geo/tests/*.test.mjs'`, `geo/tests/environments-smoke.mjs`, `start-gaid.sh --check`,
   `geo/tests/production-smoke.mjs`, then the UI quality kit: impeccable and axe blocking, shadcn lint and screenshots report-only). It needs Node >= 22.19,
-  uv, network access to the npm registry, PyPI and GitHub (and once per PC the Playwright CDN for Chromium; on the KIGAM
-  network Node must trust the institute CA, e.g. `NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt`, or the browser
-  tools are skipped), and the pinned catalogue archive (asset) for the geo steps.
+  uv and the pinned catalogue archive (asset) for the geo steps. Each stage prints `task-stage: <name>` and the run ends
+  with a table of stage seconds (gaid-check-speed). Speed: `npm ci` runs per directory (server/, web/, geo/ui/quality/) only
+  when its package-lock.json or the Node ABI changed (`scripts/npm-ci-locked.mjs`, the stamp `start.mjs --production`
+  also uses, so the production smoke reuses the install); test workers come from `TASK_CHECK_JOBS` (default 8; server
+  vitest runs files in parallel with one projects root per worker, `server/test/setup-worker-dirs.ts`). Declared network
+  steps: installs download only what the npm/uv caches lack (a changed lockfile, a new PC); the Backend tests stage probes
+  the PSI-MS vocabulary (psims downloads it on every mzML parse, no local copy) and skips only the two mzML tests,
+  visibly, when the network returns no vocabulary; the production smoke and environment smoke prepare uv environments
+  from the uv cache; the UI quality kit fetches Playwright's Chromium once per PC (on the KIGAM network Node must trust
+  the institute CA, e.g. `NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt`, or the browser tools are skipped).
 
 ## Work policy v1
 

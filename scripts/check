@@ -2,7 +2,9 @@
 # Declared checks for geoaidesk: the upstream CI steps (.github/workflows/tests.yml) on Linux.
 # Backend typecheck + vitest (with the scientific helper env), frontend vitest, launcher --check,
 # then the GAID distribution checks and the production smoke (geo/tests/).
-# Needs Node >= 22, uv, and network access to the npm registry and PyPI (dependencies come from the lockfiles).
+# Needs Node >= 22 and uv. Installs are reused while each package-lock.json matches (scripts/npm-ci-locked.mjs) and come
+# from the npm/uv caches; only packages missing there are downloaded. Network steps that remain are declared in
+# AGENTS.md "Checks". Test workers: TASK_CHECK_JOBS (free CPUs, set by the task CLI), default 8.
 set -euo pipefail
 # Preserve full output when the task CLI captures subprocess streams without exposing them.
 if [ -n "${CHECK_LOG_FILE:-}" ]; then
@@ -13,15 +15,33 @@ unset PYTHONPATH PYTHONSAFEPATH
 # Upstream tests assume the en-US locale of CI runners (e.g. Intl currency text "$25"); host locales such as ko_KR differ.
 export LC_ALL=C.UTF-8
 cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-step() { printf '\n== %s\n' "$*"; }
+JOBS=${TASK_CHECK_JOBS:-8}
+# Stage markers (backbone project standard §3.1): the task CLI times each stage from the `task-stage: <name>` line
+# printed at its start. The summary at exit repeats the times for runs outside the CLI.
+STAGE_TIMES=() STAGE_NAME='' STAGE_START=0
+stage_end() {
+    if [ -n "$STAGE_NAME" ]; then STAGE_TIMES+=("$(printf '%6ds  %s' "$((SECONDS - STAGE_START))" "$STAGE_NAME")"); fi
+}
+step() {
+    stage_end
+    STAGE_NAME=$1 STAGE_START=$SECONDS
+    printf '\ntask-stage: %s\n== %s (%s)\n' "$1" "$2" "$(date +%T)"
+}
+stage_summary() {
+    local code=$?
+    stage_end
+    printf '\nStage times (exit %s, total %ss):\n' "$code" "$SECONDS"
+    printf '%s\n' "${STAGE_TIMES[@]}"
+}
+trap stage_summary EXIT
 
-step 'Backend: install dependencies'
-(cd server && npm ci --no-audit --no-fund)
-step 'Backend: scientific helper environment'
+step server-install 'Backend: install dependencies'
+node scripts/npm-ci-locked.mjs server
+step helper-env 'Backend: scientific helper environment'
 uv sync --frozen --project server/src/helpers --python 3.12.14 --python-preference only-managed
-step 'Backend: typecheck'
+step server-typecheck 'Backend: typecheck'
 (cd server && npm run typecheck)
-step 'Backend: tests'
+step server-unit 'Backend: tests'
 # psims (mzML parsing) downloads the PSI-MS vocabulary on first use with a browser User-Agent. Some networks
 # (KIGAM) answer that request with an HTML page, so the two mzML-parsing tests cannot pass there: skip only them,
 # visibly. The probe uses psims' own opener so it sees the same response.
@@ -34,38 +54,39 @@ except Exception:
     sys.exit(1)
 sys.exit(0 if head.startswith(b"format-version") else 1)
 '; then
-    (cd server && npm test)
+    (cd server && npm test -- --maxWorkers="$JOBS")
 else
     echo 'SKIPPED: 2 mzML-parsing tests (PSI-MS vocabulary not downloadable by psims on this network)'
-    (cd server && npm test -- -t '^(?!.*(summarizes an mzML run with an MS1 chromatogram|reports the parse error for a corrupt mzML)).*$')
+    (cd server && npm test -- --maxWorkers="$JOBS" -t '^(?!.*(summarizes an mzML run with an MS1 chromatogram|reports the parse error for a corrupt mzML)).*$')
 fi
 
-step 'Frontend: install dependencies'
-(cd web && npm ci --no-audit --no-fund)
-step 'Frontend: tests'
-(cd web && npm run test)
+step web-install 'Frontend: install dependencies'
+node scripts/npm-ci-locked.mjs web
+step web-unit 'Frontend: tests'
+(cd web && npm run test -- --maxWorkers="$JOBS")
 
-step 'Launcher: --check'
+step launcher-check 'Launcher: --check'
 ./start.sh --check
 
-step 'GAID: distribution checks'
-node --test 'geo/tests/*.test.mjs'
-step 'GAID: UI copy (WP00 validator over the locale catalogues)'
+step geo-tests 'GAID: distribution checks'
+node --test --test-concurrency="$JOBS" 'geo/tests/*.test.mjs'
+step ui-copy 'GAID: UI copy (WP00 validator over the locale catalogues)'
 node geo/copy/validate-copy.mjs web/src/geo/locales
-step 'GAID: UI guide checks (docs/design/ui-guide.md: copy length, agent internals, style tokens)'
+step ui-guide 'GAID: UI guide checks (docs/design/ui-guide.md: copy length, agent internals, style tokens)'
 node geo/ui/check-ui.mjs
-step 'GAID: catalogue environments (every declared module imports in the helper and a fresh project environment)'
+step geo-environments 'GAID: catalogue environments (every declared module imports in the helper and a fresh project environment)'
 node geo/tests/environments-smoke.mjs
-step 'GAID: launcher --check'
+step gaid-launcher-check 'GAID: launcher --check'
 ./start-gaid.sh --check
-step 'GAID: production smoke (clean data home, start, stop, restart)'
+step production-smoke 'GAID: production smoke (clean data home, start, stop, restart)'
 # Free ports and a temporary data home; network for the first-start catalogue and sandbox environment.
 node geo/tests/production-smoke.mjs
-step 'GAID: UI quality kit (impeccable and axe blocking; shadcn lint and screenshots of 계측/도폭 × light/dark report-only; geo/ui/ui-rules.json quality)'
+step ui-quality-install 'GAID: UI quality kit (impeccable and axe blocking; shadcn lint and screenshots of 계측/도폭 × light/dark report-only; geo/ui/ui-rules.json quality)'
 # Tools install from their own lock (never into the app); impeccable telemetry is off. A tool in "block" mode fails on a
 # finding that is not accepted debt in geo/ui/ui-baseline.json quality.<tool>; "report" only prints; quality.switchRule says
 # when a tool switches. A tool that cannot run (no Chromium, no network) is reported as skipped. Results go to a temporary folder.
-(cd geo/ui/quality && npm ci --no-audit --no-fund)
+node scripts/npm-ci-locked.mjs geo/ui/quality
+step ui-quality 'GAID: UI quality kit: run the tools'
 DO_NOT_TRACK=1 IMPECCABLE_NO_TELEMETRY=1 node geo/ui/quality/run.mjs
 
 printf '\nAll geoaidesk checks passed.\n'
