@@ -1,4 +1,4 @@
-"""Render the GAID promo film (v3, ~100 s, 1920x1080, 30 fps, silent) from the scene and the capture.
+"""Render the GAID promo film (v4, ~103 s, 1920x1080, 30 fps, silent) from the scene and the capture.
 
 uv run --no-project --with playwright==1.63.0 --with imageio-ffmpeg==0.6.0 --with pillow==12.3.0 \
   python geo/promo/render.py [--capture <capture-v3>] --out <new dir> [--stills-only] [--times 1,2]
@@ -124,7 +124,7 @@ def main():
     if not args.stills_only and not args.capture:
         parser.error("The film needs the real capture; no placeholder footage")
     out = args.out.resolve()
-    video = out / "gaid-promo-v3.mp4"
+    video = out / "gaid-promo-v4.mp4"
     if video.exists():
         raise FileExistsError("Use a new output directory")
     world, take = prepare(out / "web", args.data.resolve() if args.data else None, args.capture.resolve() if args.capture else None)
@@ -191,7 +191,7 @@ def main():
         raise RuntimeError("Browser errors: " + "; ".join(errors))
     sheet = contact_sheet(stills, out)
     manifest = {
-        "schema": "gaid-promo-video-v3",
+        "schema": "gaid-promo-video-v4",
         "created_utc": datetime.now(UTC).isoformat(),
         "source_sha": os.environ.get("TASK_SOURCE_SHA", "unrecorded-preview"),
         "width": WIDTH, "height": HEIGHT, "fps": FPS, "seconds": seconds_total,

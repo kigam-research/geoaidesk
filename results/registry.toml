@@ -133,3 +133,26 @@ files = [{ path = "gaid-promo-v3.mp4", sha256 = "1fe7371596ac2c53e6d18534cf43a0c
 report = "reports/2026-10-24-gaid-promo-video-v3/index.md"
 replicas = []
 supersedes = "gaid-promo-video-v2"
+
+[[result]]
+id = "gaid-promo-video-v4"
+title = "GAID 홍보 영상 v4 — 배경을 모션그래픽으로, 시연을 목적 중심으로 다시 연출한 103초 영상 (내부 검토용, 무음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-20261024T005812.015692Z/out"
+source_sha = "f66c4f89f9b9e985966ad6f1d0f93807a8ead73c"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "user:2026-10-24-gaid-promo-video-v3-feedback"]
+files = [{ path = "gaid-promo-v4.mp4", sha256 = "5f6d50ca02a4364363b01ca2f430c1e9796ff6969020950692e472d3da40f098" }, { path = "manifest.json", sha256 = "18f897775152c7268dc098b2a947af7de82f110025fa2951cf82c8256f824342" }]
+report = "reports/2026-10-24-gaid-promo-video-v4/index.md"
+replicas = []
+supersedes = "gaid-promo-video-v3"
+
+[[result]]
+id = "gaid-promo-video-v4-lemo"
+title = "GAID 홍보 영상 lemo판 — Dark Tech Keynote 스타일, 포천·Yilgarn 실제 화면을 창으로 넣은 102초 영상 (내부 검토용, 음악·효과음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/out"
+source_sha = "4a58eec17a8ccd48e1a9b46acd8346bb34799788"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "assets:lemo-opuscar/3961ddb", "user:2026-10-24-gaid-promo-video-v4-lemo-requests"]
+files = [{ path = "gaid-promo-lemo.mp4", sha256 = "22dba68e4a95455f4be451628c2392b68bda2a321025899ff5ee250607665717" }, { path = "master.json", sha256 = "0390eb407b9807c519bdd6aebbf1bcfc7836fdabe31f69148076039977e3b02b" }, { path = "picture-manifest.json", sha256 = "9254e95dd67925df765c34d73b6b444d59b830f1388daa0b27cc3858f6d6d7e6" }]
+report = "reports/2026-10-24-gaid-promo-video-v4-lemo/index.md"
+replicas = []

@@ -1,0 +1,22 @@
+GAID promo film, lemo edition (Dark Tech Keynote) — third-party material in the film and its build
+
+Style and tools
+- lemo-opuscar, LemoLab, https://github.com/lemomo-ai/lemo-opuscar at 3961ddb3d24d8876e0e2754f7790d66908acee51.
+  Code and docs MIT (style prompt styles/dark-keynote/STYLE.md, DIRECTOR.md, TECHNIQUE.md; core/audio/sampler.py and sfx.py
+  are imported unchanged from the local asset ~/assets/lemo-opuscar/3961ddb/lib, not copied into this repository).
+  No lemo demo film, still or voice track is used in the film. Films made with the library need no credit (README "Licence").
+
+Music samples
+- Versilian Community Sample Library (VCSL), Versilian Studios LLC, CC0 1.0, via lemo-opuscar's release pack
+  instruments-vcsl.tar (sha256 3ed8f753500e629485e323fc7f883b35aca6a77a1ab04522d1d47037d503f6e1).
+  Instruments: glockenspiel, hand_chimes, marimba, mbira, tubular_bells, vibraphone, vibraphone_bowed, vibraphone_hard,
+  woodblock, xylophone. Score is original; foley is synthesised in code (lemo core/audio/sfx.py).
+
+Picture
+- Pretendard Variable, OFL 1.1 (web/public/fonts/PRETENDARD-LICENSE.txt).
+- Lucide icons, ISC / Feather MIT, copies in geo/promo/scene/icons (notice geo/brand/licenses/LUCIDE-LICENSE.txt);
+  well-log and map-gis are GAID's own domain icons.
+- GAID logo geo/brand/logo/horizontal-on-dark.svg (GAID's own mark).
+- Real GAID screen recordings: capture-v3 (포천 자철석 광체 추정, task gaid-promo-video-v3) and capture-v2
+  (Yilgarn 니켈 광상 부존 가능성, task gaid-promo-video-v2), recorded in a GAID review instance. Map tiles visible inside the
+  takes are © OpenStreetMap contributors (shown in the takes), Copernicus DEM credits are shown in the takes' data lists.
