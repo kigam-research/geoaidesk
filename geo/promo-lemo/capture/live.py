@@ -27,8 +27,12 @@ class Pointer:
     def __init__(self, page):
         self.page, self.pointer, self.actions = page, None, []
         self.t0 = time.monotonic()
+        self.cdp = None
+        self.view_scale = 2.25
 
     async def move(self, loc, seconds=.5):
+        if self.cdp is None:
+            self.cdp = await self.page.context.new_cdp_session(self.page)
         rect = await loc.bounding_box()
         if not rect:
             raise RuntimeError('Target is not visible')
@@ -37,14 +41,18 @@ class Pointer:
         for k in range(1, 13):
             u=k/12; u=u*u*(3-2*u)
             self.pointer = {a:start[a]+(end[a]-start[a])*u for a in ('x','y')}
-            await self.page.mouse.move(**self.pointer)
+            await self.cdp.send('Input.dispatchMouseEvent', {'type':'mouseMoved',
+                'x':self.pointer['x']*self.view_scale,'y':self.pointer['y']*self.view_scale})
             await self.page.evaluate(DRAW, [self.pointer, None])
             await asyncio.sleep(seconds/12)
         return rect
 
     async def click(self, label, rect):
         self.actions.append({'t': time.monotonic()-self.t0, 'kind':'click', 'target':label, 'rect':rect})
-        await self.page.mouse.click(**self.pointer)
+        for kind in ('mousePressed','mouseReleased'):
+            await self.cdp.send('Input.dispatchMouseEvent', {'type':kind,
+                'x':self.pointer['x']*self.view_scale,'y':self.pointer['y']*self.view_scale,
+                'button':'left','clickCount':1})
         for k in range(10):
             await self.page.evaluate(DRAW, [self.pointer, k/10])
             await asyncio.sleep(.025)
@@ -116,6 +124,54 @@ class StreamRecorder:
         await self.observer
         await self.cdp.send('Page.stopScreencast')
         await asyncio.gather(*self.pending)
+        self.dump()
+
+
+class SurfaceRecorder(StreamRecorder):
+    """Fixed-cadence full-surface sampling when Chrome emits sparse damage frames.
+
+    Four concurrent readbacks hide transfer latency. Every frame is a genuine
+    screenshot, including unchanged states. Receipt times and request latency
+    are retained; no viewport override, animation or interpolation is applied.
+    """
+    async def start(self, name):
+        self.dest=OUT/'raw'/name
+        self.dest.mkdir(parents=True,exist_ok=False)
+        self.started=datetime.now(UTC).isoformat()
+        self.t0,self.wall0=time.monotonic(),time.time()
+        self.cdp=await self.page.context.new_cdp_session(self.page)
+        self.recording=True
+        self.observer=asyncio.create_task(self.observe())
+        self.worker=asyncio.create_task(self.loop())
+
+    async def loop(self):
+        active=set()
+        async def capture():
+            before=time.monotonic()
+            result=await self.cdp.send('Page.captureScreenshot', {
+                'format':'jpeg','quality':75,'optimizeForSpeed':True})
+            after=time.monotonic()
+            k=len(self.rows)
+            (self.dest/f'frame-{k:05d}.jpg').write_bytes(base64.b64decode(result['data']))
+            self.rows.append({'frame':k,'t':after-self.t0,'latency':after-before,
+                'timestamp':self.wall0+after-self.t0,'pointer':self.pointer_provider()})
+        while self.recording:
+            active={x for x in active if not x.done()}
+            if len(active)<4:
+                active.add(asyncio.create_task(capture()))
+            await asyncio.sleep(1/30)
+        await asyncio.gather(*active)
+
+    def dump(self):
+        (self.dest/'timing.json').write_text(json.dumps({'startedAt':self.started,
+            'elapsedSeconds':time.monotonic()-self.t0,'frames':self.rows,
+            'evidence':self.evidence,'actions':self.actions,
+            'source':'Chrome full-surface JPEG quality 75, native size, screenshot receipt timestamps'},indent=2)+'\n')
+
+    async def stop(self):
+        self.recording=False
+        await self.worker
+        await self.observer
         self.dump()
 
 

@@ -5,7 +5,13 @@ start summary. Starting real model work remains an explicit capture command.
 """
 
 async def stage_setup(page):
-    await page.get_by_role('button',name='Workflow',exact=True).first.click()
+    cdp=await page.context.new_cdp_session(page)
+    await cdp.send('Emulation.setDeviceMetricsOverride', {
+        'width':1280,'height':720,'deviceScaleFactor':2.25,'mobile':False,
+        'scale':1,'screenWidth':1280,'screenHeight':720})
+    await cdp.send('Emulation.setVisibleSize', {'width':1280,'height':720})
+    if not await page.get_by_text('허브에서 설치한 Workflow1',exact=True).count():
+        await page.get_by_role('button',name='Workflow',exact=True).first.click()
     await page.get_by_text('포천 자철석 광체 추정',exact=True).last.click()
     d=page.get_by_role('dialog')
     await d.get_by_role('tab',name='자료 준비와 전처리').click()

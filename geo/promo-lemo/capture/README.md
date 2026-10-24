@@ -32,7 +32,8 @@ viewport changes can alter the native view.
 `Pointer` moves the real mouse in CSS coordinates and draws the capture arrow
 and click ripple. Set `stream.pointer_provider = lambda: pointer.pointer` while
 the overlay is visible, and return None when it is hidden. Measure action bounds
-from the target locator immediately before the click. The stream's observer
+from the target locator immediately before the click. Input dispatch coordinates are multiplied by the native view scale; recorded
+coordinates and DOM bounds stay in CSS px. The stream's observer
 records viewport, scroll-region bounds and actual page text once per second.
 
 `await stream.stop()` drains acknowledgements and saves timing.json. To close
@@ -47,6 +48,12 @@ external `edit.json`, then run:
 ```sh
 uv run --no-project --with pillow==12.3.0 python geo/promo-lemo/capture/export.py --root ~/data/geoaidesk/work/gaid-promo-video-v4-lemo--agent-capture/capture-v6
 ```
+
+`SurfaceRecorder` supplements sparse compositor damage events with genuine
+full-surface screenshots. It retains receipt timestamps and readback latency,
+and changes no viewport, animation or page text. The selected active-work take
+uses JPEG quality 75; the compositor sources use quality 94. PNG exports decode
+those sources and do not restore compression losses.
 
 The exporter selects the most recent genuine browser frame at each requested
 real-time sampling point. It does not interpolate motion. Unchanged intervals

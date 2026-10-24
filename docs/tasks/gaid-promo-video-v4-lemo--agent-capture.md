@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:25:31Z
+updated: 2026-10-24T05:40:08Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
@@ -65,6 +65,11 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - If something needs the user (credentials, a decision), write it as an open item in your task document and finish; do not block.
 
 ## Current state
+- Capture is closed. The retake completed in 623.05 s wall time (122.692 s reported pipeline/validation processes), including a packaging hash-path repair without numerical rerun. This is 23 s beyond the nominal ~10-minute target.
+- Selected same-run shots are AG1 5.5 s, AG2 65 s sampled at 10 fps from a genuine 12.755 fps source interval, AG2-whole 623 s sampled at 2 fps, and AG3 6 s. AG3 opens pgi_live_retake/outputs/orebody_3d.png through the real file tree. No internal cut in any selected take.
+- Chrome 156.0.8078.47 closed; Korean/light/instrument preferences read back; pageerror count 0. Final PNG export and artifact checks remain.
+- First run finished in 507.21 s wall time (102.3 s reported pipeline stages); all five models remained unconverged. Corrected compositor source is archived.
+- The sole authorized retake started at 2026-10-24T05:28:56Z, in pgi_live_retake/. AG1-final has been exported and its real click/Workflow-card geometry checked. The full retake is continuously recorded; fixed-cadence screenshots supplement sparse compositor events for the >=10 fps active-work requirement.
 - One actual Pocheon example run is in progress under GPT-6.1 Sol/high, with separate pgi_live_capture/ outputs. A corrected native take now records full-size streaming activity; initial footage is archived as failed capture geometry.
 - Resumed in the assigned worktree. Review app is accessible on loopback without a token gate. Deployed checkout HEAD reads 4e198c762b9bde20ca23b1f3223243fb2af16ab0.
 - No app/model/service settings changed. Inspector Chrome was closed before starting the capture browser.
@@ -72,6 +77,8 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 1. Benchmark live capture cadence, stage the installed example Workflow, then record one complete run.
 2. Verify frame timing, pointer containment, figures and cut provenance; deliver external payload and finish.
 ## Failed approaches
+- Native view scale also scales CDP input coordinates. A normal Playwright click hit the header rather than Workflow during retake staging. Direct hit testing confirmed the 2.25 coordinate factor; staging now resets native scale, and filmed pointer events multiply only dispatched coordinates while logging CSS coordinates. No second analysis was sent during that failed staging attempt.
+- Chrome emits sparse screencast events when the app presents no visual changes. The whole-run stream retains them honestly; an additional screenshot readback stream records unchanged states at an independently measured cadence. No animation or DOM text was added.
 - The initial direct screenshot path was too slow at full resolution; pipelining did not reliably satisfy cadence.
 - A native-view/screencast attempt assumed deviceScaleFactor alone set backing-view scale. The actual image test disproved this: a 2880×1620 file contained only a 1280×720 image in its top-left. Explicit Emulation scale 2.25 plus visible size 2880×1620 fixed geometry; confirmed visually and with native frame timestamps (~30 fps).
 - The first real analysis is retained as a failed capture attempt, not selected footage. Its initial full-run capture geometry is invalid. The task explicitly allows one second run for capture failure; the second run will use a separate output directory and the corrected native compositor capture from before send. No third analysis run is authorized.

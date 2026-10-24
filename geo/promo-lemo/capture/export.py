@@ -74,6 +74,14 @@ def main():
                 im.thumbnail((480,270));sheet.paste(im,(480*j,24))
             draw.text((480*j+4,5),f"{shot['id']} {k} / {k/fps:.2f}s",fill='black')
         sheet.save(root/f"contact-{shot['id']}.jpg",quality=90)
+        for j,beat in enumerate(record['beats']):
+            k=min(len(selected)-1,round((beat['t0']+beat['t1'])*fps/2))
+            with Image.open(dest/f'frame-{k:05d}.png') as source_image:
+                overlay=source_image.convert('RGB')
+            draw=ImageDraw.Draw(overlay); rect=beat['rect']
+            draw.rectangle(tuple(round(v*2.25) for v in (rect['x'],rect['y'],
+                rect['x']+rect['width'],rect['y']+rect['height'])),outline='#ff0077',width=4)
+            overlay.save(root/f"beat-{shot['id']}-{j}.jpg",quality=90)
     (root/'capture.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     (root/'frame-checks.json').write_text(json.dumps(checks,indent=2)+'\n')
     print(json.dumps([{k:v for k,v in c.items() if k!='sha256List'} for c in checks],indent=2))
