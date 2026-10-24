@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T07:18:17Z
+updated: 2026-10-24T07:23:54Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7bb1c54f-ec00-4ede-b538-8689a6d7266d","pid":1785127,"provider":"claude","session":"3dbb251a-b5a3-49b3-8474-ccc8cde7b5f6","start":"71315213","token":"0c6b923018272ee28d6b79696503be8b04037904a1f5d58759fec6ee23f1986e"}
 branch: task/gaid-library-prep
 target: main
@@ -56,13 +56,14 @@ Mockup page /dev/library-prep (web/src/app/dev/library-prep/page.dev.tsx, web/sr
 devLibraryPrep). Checks: web tsc clean; copy validator 0 errors, 0 warnings in devLibraryPrep; check-ui 0 errors.
 48 screenshots (6 screens × 계측/도폭 × light/dark × 1440×900/1280×800) in pc74:~/data/geoaidesk/work/gaid-library-prep/shots/
 (re-shoot: start `npx next dev -p 3241` in web/, then ~/data/geoaidesk/work/gaid-library-prep/shoot.sh shots <w> <h> [screens]).
-No app behaviour changed. Phase 2 not started.
+No app behaviour changed. The user approved all three recommendations (see Notes). Phase 2 not started: waiting for the
+library panel on main.
 ## Next steps
-1. Wait for the user's answer on the three decisions (report §6) in this conversation.
-2. Phase 2 after approval AND gaid-ia-connect-workspace--library-panels on main: decide work packages (server digest item kind
+1. Phase 2 once gaid-ia-connect-workspace--library-panels is on main (checked 2026-10-24: origin/main 75227da7 has an interim
+   sync of the parent, but not the library panel): rebase on fresh main, then gaid-ia-connect-workspace--library-panels on main: decide work packages (server digest item kind
    + import + make flow; start-window/start-message + agent `library_digest` tool; authoring source kind on top of
    gaid-authoring-tokens; fix hub-synced PDFs lacking a page cache), implement, scripts/check, real-app check with one folder.
-Blocked: user decision on the phase-1 design (report §6) and library-panels integration on main.
+Blocked: gaid-ia-connect-workspace--library-panels is not yet on main (user decision 2026-10-24: implement after it).
 ## Failed approaches
 ## Notes and decisions
 - Diagnosis (2026-10-24, code read): chat/start read attached papers via library_search (3 snippets/paper) and library_read (5
@@ -75,6 +76,10 @@ Blocked: user decision on the phase-1 design (report §6) and library-panels int
   검토 전 until 확인함; never cited itself (citations go to original paper pages); start window offers "먼저 읽을 정리";
   authoring picker gets a 문헌 정리 segment with "다룬 논문도 근거 자료로 넣기". Authoring token mechanics stay with
   gaid-authoring-tokens.
+- User decision 2026-10-24 on report §6 (verbatim): "모두 권장으로 하자." → (1) phase 2 as mocked, after library-panels is on
+  main, authoring part on top of gaid-authoring-tokens; (2) the 서재 item is named "문헌 정리", Gemini imports are marked
+  "외부 정리"; (3) 외부 정리 is offered in the Workflow start window as "참고로만 읽음", never pre-selected. Glossary and
+  terminology entries for 문헌 정리/외부 정리 go in with the phase-2 implementation.
 - Orchestration (phase 1): sequential and tightly coupled (diagnosis → design → mockup → report); done by the writer alone,
   no child writers. Phase 2 packages (server digest store/import, start-window/authoring wiring, agent instructions) are
   decided after approval.
@@ -82,9 +87,6 @@ Blocked: user decision on the phase-1 design (report §6) and library-panels int
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-- [결정] 이 설계와 시안대로 2단계(구현)를 진행할지 — 가) 시안대로 진행(서재 옆 패널 작업이 main에 들어온 뒤, Workflow 만들기 쪽은 gaid-authoring-tokens 결과 위에) — 나) 고칠 곳을 받아 시안을 고친 뒤 다시 보기 — 권장: 가) 요청한 세 가지를 모두 화면에 담았고 인용은 원래 논문의 쪽으로 남음 — 막힌 일: 2단계 구현 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
-- [결정] 새 서재 항목 이름 — 가) "문헌 정리"(Gemini 출처는 "외부 정리" 표시) — 나) "문헌 요약" — 권장: 가) "정리 노트"와 겹치지 않고 "요약 노트"는 금지어 — 막힌 일: 2단계 문구·용어집 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
-- [결정] 외부 정리를 Workflow 시작에서 고를 수 있게 할지 — 가) 고를 수 있게 하되 "참고로만 읽음", 권장 선택 안 함 — 나) 서재 안에서만 보기 — 권장: 가) 선택폭을 지키고 검토되지 않은 외부 결과가 인용 근거가 되지 않음 — 막힌 일: 2단계 시작 창 — 근거: reports/2026-10-24-gaid-library-prep#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
