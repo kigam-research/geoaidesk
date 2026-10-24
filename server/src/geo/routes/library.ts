@@ -324,6 +324,10 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     scope.patch<{ Params: { id: string }; Body: { name?: unknown; parentId?: unknown } }>("/geo/library/collections/:id", async (req) =>
       storeOf().editGaidCollection(req.params.id, req.body ?? {}));
     scope.delete<{ Params: { id: string } }>("/geo/library/collections/:id", async (req) => storeOf().removeGaidCollection(req.params.id));
+    scope.put<{ Params: { id: string }; Body: { url?: unknown } }>("/geo/library/collections/:id/notebook", async (req) => {
+      if (req.body?.url !== null && typeof req.body?.url !== "string") throw new LibraryError("Expected { url: string | null }", 400);
+      return storeOf().setCollectionNotebook(req.params.id, req.body.url);
+    });
     /** Adds or removes papers; a Zotero item added to a folder linked to its library is also added in Zotero. */
     scope.post<{ Params: { id: string }; Body: { itemIds?: unknown; action?: unknown } }>("/geo/library/collections/:id/items", async (req) => {
       const ids = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((x): x is string => typeof x === "string") : [];

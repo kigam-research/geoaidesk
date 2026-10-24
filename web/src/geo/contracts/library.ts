@@ -211,6 +211,8 @@ export interface LibraryCollection {
   parentId?: string;
   zotero?: { connection: ZoteroConnectionKind; serverId?: string; libraryType: "user" | "group"; libraryId: string; collectionKey: string };
   createdAt?: string;
+  /** Researcher-saved external notebook page, opened only; GAID-side field kept across Zotero reconcile and hub sync. */
+  notebookUrl?: string;
 }
 
 /** CSL with numeric date parts: Zotero's CSL export writes them as strings ("2023"); CSL-JSON and GAID use numbers. */

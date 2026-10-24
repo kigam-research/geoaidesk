@@ -1,4 +1,8 @@
+import noteExportKo from "./noteExport/ko.json";
+import noteExportEn from "./noteExport/en.json";
 import orcidKo from "./orcid/ko.json";
+import notebookLinkKo from "./notebookLink/ko.json";
+import notebookLinkEn from "./notebookLink/en.json";
 import orcidEn from "./orcid/en.json";
 import hubFeedsKo from "./hubFeeds/ko.json";
 import hubFeedsEn from "./hubFeeds/en.json";
@@ -108,9 +112,11 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   hubFeeds: pair(hubFeedsKo, hubFeedsEn),
   connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
+  noteExport: pair(noteExportKo, noteExportEn),
   figures: pair(figuresKo, figuresEn),
   library: pair(libraryKo, libraryEn),
   orcid: pair(orcidKo, orcidEn),
+  notebookLink: pair(notebookLinkKo, notebookLinkEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),
   workflowCli: pair(workflowCliKo, workflowCliEn),

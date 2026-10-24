@@ -230,6 +230,21 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail where the researcher picks an option or writes a
   별도 지시 for each decision and sends all answers at once with 답변 보내기 to the chat that wrote the note (gaid-note-decisions,
   `send` prefill in `web/src/lib/chat-prefill.ts`), 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
+- Note exports (gaid-note-bundle-export, user decision 2026-10-24 "gaid-notebooklm-review 모두 권장대로 진행하자."; contract
+  `web/src/geo/contracts/note-export.ts`, server `server/src/geo/notes/export.ts`, sheets `web/src/geo/notes/note-export.tsx`,
+  namespace `noteExport`, detail in `docs/geo/research-notes.md` "Exports"): from a research note's 더 보기 menu, 결과 묶음
+  (`/geo/notes/:id/bundle`: note folder, data fingerprints from the note chats' provenance, environment records, Workflow
+  version + 지침, cited papers, README, `SHA256SUMS`; never the data files, no reproduction claim) and 공개 자료 내보내기
+  (`/geo/notes/:id/public-export`: note Markdown, Workflow 지침 Markdown, cited paper PDFs the researcher ticks, each with
+  a per-file "기관 밖으로 내보내도 되는 자료" confirmation enforced server-side, local record `.kady/geo/public-exports.jsonl`;
+  for manual Gemini Notebook upload, no Google calls). Preview first; download refused (409) when the preview's digest no
+  longer matches. Gemini Notebook result import, Drive sync and the Enterprise API are not built.
+- Gemini Notebook links (gaid-note-bundle-export--notebook-links): a researcher saves a related notebook URL (https only, no
+  credentials, `normalizeNotebookUrl` in `web/src/geo/contracts/notebook-link.ts`) on a project (`.kady/geo/notebook-link.json`,
+  `GET/PUT /geo/notebook-link`, store `server/src/geo/workspace/notebook-link.ts`, shown under the 정리 노트 list summary) or a 서재
+  folder (`LibraryCollection.notebookUrl`, `PUT /geo/library/collections/:id/notebook`, Zotero-linked folders too, kept across
+  Zotero reconcile and hub sync; shown under the folder facts). `web/src/geo/notebook-link/` (namespace `notebookLink`): the link
+  opens in a new tab; GAID never fetches, embeds or sends anything to it.
 - Personal library (gaid-research-hub, ADR `docs/adr/2026-10-21-research-hub-library.md`; folders gaid-library-folders,
   ADR `docs/adr/2026-10-21-library-folders.md`): "내 연구" → 서재, user-level store `server/src/geo/library/` (contract
   `web/src/geo/contracts/library.ts`, routes `/geo/library/*`, screens `web/src/geo/library/`). Items are Zotero-linked

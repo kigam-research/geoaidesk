@@ -6,7 +6,7 @@
  * column is narrow; the note file itself also opens as an ordinary file tab for editing.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowLeftIcon, BookOpenIcon, CheckIcon, ChevronRightIcon, FileTextIcon, LibraryIcon, MessageSquareIcon, MoreHorizontalIcon, NotebookPenIcon, SendIcon } from "lucide-react";
+import { ArrowLeftIcon, BookOpenIcon, CheckIcon, ChevronRightIcon, FileArchiveIcon, FileTextIcon, LibraryIcon, ShareIcon, MessageSquareIcon, MoreHorizontalIcon, NotebookPenIcon, SendIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -26,6 +26,8 @@ import { StepScale } from "@/geo/shell/step-scale";
 import { NoteReferences } from "@/geo/library/note-references";
 import { NoteFigures } from "@/geo/figures";
 import { ConnectionMapButton } from "@/geo/connections";
+import { NoteBundleDialog, PublicExportDialog } from "./note-export";
+import { ProjectNotebookLink } from "@/geo/notebook-link/project-notebook-link";
 
 /**
  * Note body headings on the GAID type scale (sections 16 px, subsections 14 px) instead of the chat's larger defaults.
@@ -179,6 +181,8 @@ function NoteList({ state, onOpen, onRecord }: {
                 : t("notes.panel.summaryNoDecisions", { count: live.length })}
             </p>
           )}
+          {/* The project's Gemini Notebook link sits under the summary, outside the header's action row (UI guide B4). */}
+          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><span>{t("notebookLink.label")}</span><ProjectNotebookLink /></div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Button variant="outline" size="sm" onClick={onRecord}>{t("notes.record.button")}</Button>
@@ -331,6 +335,7 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
   const [error, setError] = useState<string | null>(null);
   const [statusError, setStatusError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState<"bundle" | "public" | null>(null);
   const decisionsRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -443,8 +448,12 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onSelect={() => onOpenFile(note.path)}><FileTextIcon aria-hidden />{t("notes.detail.openFile.button")}</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => void toLibrary()} title={t("notes.detail.toLibraryTip")}><LibraryIcon aria-hidden />{t("notes.detail.toLibrary.button")}</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setExporting("bundle")}><FileArchiveIcon aria-hidden />{t("noteExport.bundle.menu")}</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setExporting("public")}><ShareIcon aria-hidden />{t("noteExport.public.menu")}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <NoteBundleDialog projectId={projectId} noteId={note.id} open={exporting === "bundle"} onOpenChange={(open) => setExporting(open ? "bundle" : null)} />
+              <PublicExportDialog projectId={projectId} noteId={note.id} open={exporting === "public"} onOpenChange={(open) => setExporting(open ? "public" : null)} />
             </div>
             {statusError && <p role="alert" className="mt-1 text-xs text-destructive">{t("notes.error.status")}</p>}
             {note.supersededBy && (

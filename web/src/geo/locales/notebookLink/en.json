@@ -1,0 +1,19 @@
+{
+  "open.action": "Open notebook",
+  "add.action": "Save notebook link",
+  "edit.action": "Change link",
+  "folder.title": "Folder's Gemini Notebook link",
+  "project.title": "Project's Gemini Notebook link",
+  "url.label": "Notebook address (https://)",
+  "openOnly": "GAID only opens the page and sends no research data.",
+  "invalid": "Check the notebook address. Enter an https:// address without sign-in information.",
+  "saveFailed": "Could not save the link. Check the address and connection, then save again.",
+  "save.action": "Save link",
+  "remove.action": "Remove link",
+  "cancel.action": "Cancel",
+  "saving": "Saving link",
+  "loadFailed": "Could not read the saved notebook link.",
+  "retry.action": "Reload link",
+  "loading": "Reading notebook link",
+  "label": "Gemini Notebook"
+}

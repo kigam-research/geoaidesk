@@ -213,3 +213,10 @@ export function setResearchNoteStatus(paths: ProjectPaths, id: string, status: u
   atomicReplace(file, updated);
   return getResearchNote(paths, id).note;
 }
+
+/** A note with the actual on-disk path of its index.md (exports read the note folder beside it). */
+export function researchNoteLocation(paths: ProjectPaths, id: string): { response: ResearchNoteResponse; file: string; dir: string } {
+  const response = getResearchNote(paths, id);
+  const file = sandboxFile(paths, notePath(response.note.id));
+  return { response, file, dir: path.dirname(file) };
+}
