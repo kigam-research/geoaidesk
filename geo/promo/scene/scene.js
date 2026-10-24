@@ -163,10 +163,9 @@
 
 
   // ================= timeline v5 (direction v5, task document) =================
-  // The demo is a window stage (user feedback 2026-10-24): the real screen is a framed window inside the motion design,
-  // with an example chip (포천 자철석 PGI / Yilgarn 니켈 MPM). Each step frames one whole UI region on the window and, when
-  // that gains legibility, lifts the same original pixels out into an enlarged detail window beside it. Pair steps put
-  // the two examples side by side. Frames are never zoomed or panned inside the window.
+  // The demo is a window stage (user feedback 2026-10-24): the real screen is one framed window inside the motion design,
+  // with an example chip (포천 자철석 PGI / Yilgarn 니켈 MPM), beside a narrative column (see the demo scene). Each step frames
+  // one whole UI region on the window. Pair steps place the two examples as two windows. Frames are never zoomed or panned.
   // Highlight rects are whole UI regions: v5 takes carry DOM-measured beat rects (capture-v5); for the v3 takes the rects
   // below were re-derived from the frames along panel/card edges and checked on drawn frames (frame_check.py).
   const R = (x, y, w, hh) => ({ x, y, width: w, height: hh });
@@ -206,7 +205,7 @@
       S('Y2', 'yil', [0, 5], [[0.4, 2.45, () => BR('Y2', 0), '내 프로젝트에서 바로 시험'], [2.5, 5, () => BR('Y2', 1), '단계마다 처리 지침']]),
     ] },
     { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', steps: [
-      S('Y3', 'yil', [0, 6.2], [[0.4, 2.2, () => BR('Y3', 0), 'Workflow 소개부터 확인'], [2.23, 4.3, () => BR('Y3', 1), '내 자료로 시작 설정'], [4.33, 6.2, () => BR('Y3', 2), '시작 전에 조건 요약']]),
+      S('Y3', 'yil', [0, 6.2], [[0.4, 4.3, () => BR('Y3', 0), '소개를 읽고 내 자료로 설정'], [4.33, 6.2, () => BR('Y3', 2), '시작 전에 조건 요약']]),
       S('Y4', 'yil', [1.9, 5.3], [[0.1, 1.5, () => BR('Y4', 1), 'AI agent가 Workflow대로'], [1.5, 3.4, () => BR('Y4', 2), '결과 지도까지 대화에']]),
       { pair: [S('Y5', 'yil', [0, 5], [[0.4, 2.75, () => BR('Y5', 0)], [2.8, 5, () => BR('Y5', 1)]]),
         S('M1', 'pgi', [0, 5], [[0.4, 2.45, () => V3.m1Raster], [2.5, 5, () => V3.m1Popup]])],
@@ -640,18 +639,17 @@
     };
   });
 
-  // ---------- demo: purpose line, part of GAID, mini cycle ring, window stage with lifted details ----------
+  // ---------- demo: a narrative column on the left, the real screen as one window on the right ----------
+  // v5 (user feedback 2026-10-24, pointing at the v4-lemo cut): the screens of the hub and the system need not fill the
+  // film; as one element of the motion design they are easier to follow for a first-time viewer. The left column carries
+  // the part of GAID, the chapter's purpose and its outcome rows; the current row is joined by a leader line to the whole
+  // UI region framed on the window. Pair steps place both examples as two staggered windows.
   const BAR = 46; // window chrome bar (example chip)
   const LAY = {
-    main: { x: 96, w: 1040 }, // single window, left
-    col: { x: 1190, w: 634, top: 170, bottom: 1010 }, // right column: tag + detail window
-    pair: [{ x: 48, w: 902 }, { x: 970, w: 902 }],
+    col: { x: 96, w: 500, plateY: 214, titleY: 274, rowsY: 560, rowH: 60 },
+    main: { x: 650, y: 185, w: 1180 },
+    pair: [{ x: 650, y: 150, w: 690 }, { x: 1140, y: 596, w: 690 }],
   };
-  LAY.main.k = LAY.main.w / VW;
-  LAY.main.h = VH * LAY.main.k + BAR;
-  LAY.main.y = 226;
-  LAY.pairY = 222;
-  const LIFT_MIN = 1.15; // lift only when the detail is at least this much larger than the region on the window
   const PAD = 5; // CSS px kept around a region (whitespace between whole elements)
   function frameSrc(shot, local) {
     const info = shotInfo(shot);
@@ -674,10 +672,10 @@
     const frame = h('div', 'hl', el);
     return {
       el, frame,
-      draw({ x, y, w, o, dx = 0, shot, local, ex }) {
+      draw({ x, y, w, o, dx = 0, dy = 0, shot, local, ex }) {
         const k = w / VW, sh = VH * k;
         box(el, x, y, w, sh + BAR);
-        put(el, { o, x: dx });
+        put(el, { o, x: dx, y: dy });
         if (o <= 0.002) return;
         bar.innerHTML = `${icon(EX[ex].icon, 24, 'var(--ink-2)')}<span>${EX[ex].label}</span>`;
         box(screen, 0, BAR, w, sh);
@@ -694,43 +692,31 @@
         setImg(img, src);
         Object.assign(img.style, { width: `${w}px`, height: `${sh}px`, left: '0px', top: '0px' });
       },
-      // a whole-region frame on the window; returns its film rect
+      // a whole-region frame on the window (kept inside the window when the region reaches its edge); film rect back
       mark(r, x, y, w, o) {
         const k = w / VW;
         const fx = (r.x - PAD) * k, fy = BAR + (r.y - PAD) * k, fw = (r.width + 2 * PAD) * k, fh = (r.height + 2 * PAD) * k;
-        // a region that reaches the window edge keeps its whole frame inside the window
         const x0 = Math.max(fx - 3, 2), y0 = Math.max(fy - 3, BAR + 2);
         const x1 = Math.min(fx + fw + 3, w - 2), y1 = Math.min(fy + fh + 3, BAR + VH * k - 2);
         box(frame, x0, y0, x1 - x0, y1 - y0);
         put(frame, { o });
-        return { x: x + fx, y: y + fy, w: fw, h: fh };
+        return { x: x + x0, y: y + y0, w: x1 - x0, h: y1 - y0 };
       },
     };
   }
-  function mkDetail(layer) {
-    const el = h('div', 'detail', layer);
-    const img = h('img', '', el);
-    return {
-      el,
-      draw({ from, to, f, o, shot, local, r }) {
-        const x = lerp(from.x, to.x, f), y = lerp(from.y, to.y, f), w = lerp(from.w, to.w, f), hh = lerp(from.h, to.h, f);
-        box(el, x, y, w, hh);
-        put(el, { o });
-        if (o <= 0.002) return;
-        const src = frameSrc(shot, local);
-        if (!src) { img.style.display = 'none'; return; }
-        img.style.display = 'block';
-        setImg(img, src);
-        const s = w / (r.width + 2 * PAD);
-        Object.assign(img.style, { width: `${VW * s}px`, height: `${VH * s}px`, left: `${-(r.x - PAD) * s}px`, top: `${-(r.y - PAD) * s}px` });
-      },
-    };
+  // every chapter's outcome rows, in order (a pair step contributes its tags)
+  for (const c of CHAPTERS) {
+    c.rows = [];
+    for (const s of c.steps) {
+      const labels = s.pair ? s.tags.map(tg => tg[2]) : s.beats.map(b => b[3]);
+      for (const l of labels) if (!c.rows.includes(l)) c.rows.push(l);
+    }
   }
   scenes.push(() => {
     const layer = h('div', 'layer');
     // mini cycle ring at the top right: the same five stations as the big ring, the GAID 허브 arc tinted
-    const MR = { cx: 1716, cy: 54, rx: 88, ry: 34 };
-    const msvg = sv('svg', { width: 1920, height: 108 }, layer);
+    const MR = { cx: 1716, cy: 76, rx: 88, ry: 34 };
+    const msvg = sv('svg', { width: 1920, height: 140 }, layer);
     msvg.style.position = 'absolute';
     const ept = (deg, d = 0) => { const a = (deg * Math.PI) / 180; return [MR.cx + (MR.rx - d) * Math.cos(a), MR.cy + (MR.ry - d) * Math.sin(a)]; };
     sv('ellipse', { cx: MR.cx, cy: MR.cy, rx: MR.rx, ry: MR.ry, fill: 'none', stroke: '#c9ced6', 'stroke-width': 3 }, msvg);
@@ -747,32 +733,36 @@
     const mpoint = sv('circle', { r: 9, fill: BLUE }, msvg);
     const mlogo = markAt(layer, MR.cx, MR.cy, 34);
     mlogo.set({ ringF: 1, gO: 1, gS: 1, lettersF: 0 });
-    // header: part plate + purpose line per chapter
-    const titles = CHAPTERS.map(c => {
+    // left column per chapter: part plate, purpose, outcome rows
+    const C = LAY.col;
+    const cols = CHAPTERS.map(c => {
       const g = h('div', 'abs', layer);
-      Object.assign(g.style, { left: '112px', top: '28px', display: 'flex', alignItems: 'center', gap: '20px', whiteSpace: 'nowrap' });
+      box(g, C.x, 0, C.w);
       const hub = c.part === 'GAID 허브';
-      g.innerHTML = `<span style="font-size:28px;font-weight:700;padding:6px 16px;border-radius:6px;corner-shape:bevel;background:${hub ? 'var(--signal-tint)' : 'var(--face)'};color:${hub ? 'var(--signal-ink)' : 'var(--ink)'};border:2px solid ${hub ? BLUE : 'var(--control-edge)'}">${c.part}</span>`
-        + `<span class="h2" style="font-size:42px">${c.title}</span>`;
-      return { el: g, c };
+      const plate = h('div', 'abs', g, c.part);
+      Object.assign(plate.style, { left: '0px', top: `${C.plateY}px`, fontSize: '28px', fontWeight: 700, padding: '6px 16px', borderRadius: '6px', cornerShape: 'bevel', whiteSpace: 'nowrap',
+        background: hub ? 'var(--signal-tint)' : 'var(--face)', color: hub ? 'var(--signal-ink)' : 'var(--ink)', border: `2px solid ${hub ? BLUE : 'var(--control-edge)'}` });
+      const title = h('div', 'abs h2', g, c.title);
+      Object.assign(title.style, { left: '0px', top: `${C.titleY}px`, width: `${C.w}px`, fontSize: '50px', lineHeight: 1.24, wordBreak: 'keep-all' });
+      const rows = c.rows.map((label, i) => {
+        const r = h('div', 'row', g);
+        box(r, 0, C.rowsY + i * C.rowH);
+        r.innerHTML = `<span class="sq"></span><span class="lab">${label}</span>`;
+        return { el: r, label, lab: r.querySelector('.lab'), sq: r.querySelector('.sq') };
+      });
+      return { g, c, plate, title, rows };
     });
-    // windows: two singles (crossfading steps) and a pair
     const wins = [mkWin(layer), mkWin(layer)];
     const pairWins = [mkWin(layer), mkWin(layer)];
     const links = sv('svg', { width: 1920, height: 1080 }, layer);
     links.style.position = 'absolute';
-    const linkA = sv('line', { stroke: BLUE, 'stroke-width': 2 }, links);
-    const linkB = sv('line', { stroke: BLUE, 'stroke-width': 2 }, links);
-    const details = [mkDetail(layer), mkDetail(layer)];
-    const tagBox = h('div', 'abs', layer);
-    Object.assign(tagBox.style, { width: `${LAY.col.w}px`, display: 'flex', alignItems: 'center', gap: '18px' });
-    const tagIcon = h('span', '', tagBox);
-    const tagText = h('span', 'tag-text', tagBox);
-    const pairTag = text(layer, 'tag-text', 0, 0, '', { width: '1920px', textAlign: 'center' });
-    const beatAt = (step, lt) => {
-      const bs = step.beats.map(([t0, t1, rect, label]) => ({ t0, t1, r: rect(), label })).filter(b => b.r);
-      return bs.find(b => lt >= b.t0 && lt < b.t1) || null;
-    };
+    const leaders = [0, 1].map(() => ({
+      line: sv('polyline', { fill: 'none', stroke: BLUE, 'stroke-width': 2.5 }, links),
+      dot: sv('circle', { r: 6, fill: BLUE }, links),
+    }));
+    const beatsOf = (step, lt) => step.beats.map(([t0, t1, rect, label]) => ({ t0, t1, r: rect(), label })).filter(b => b.r)
+      .find(b => lt >= b.t0 && lt < b.t1) || null;
+    const bo = (lt, b) => Math.min(ramp(lt, b.t0, b.t0 + 0.3, lin), 1 - ramp(lt, b.t1 - 0.25, b.t1, lin));
     return t => {
       const o = win(t, DEMO.a - 0.05, DEMO.b + 0.05, 0.45, 0.4);
       put(layer, { o });
@@ -780,7 +770,6 @@
       const ci = CHAPTERS.findIndex(c => t >= c.a - 0.05 && t < c.b - 0.05);
       const cur = CHAPTERS[ci === -1 ? CHAPTERS.length - 1 : ci];
       const prev = CHAPTERS[Math.max(0, (ci === -1 ? CHAPTERS.length - 1 : ci) - 1)];
-      titles.forEach(({ el, c }) => put(el, { o: win(t, c.a, c.b, 0.35, 0.25), y: 12 * (1 - ramp(t, c.a, c.a + 0.6)) }));
       const toDeg = MSTART + (cur.back ? 5 : cur.st) * 72;
       const fromDeg = cur === CHAPTERS[0] ? toDeg : MSTART + (prev.back ? 5 : prev.st) * 72;
       const mv = ramp(t, cur.a, cur.a + 0.8, inOut);
@@ -791,77 +780,79 @@
         d.setAttribute('fill', active ? BLUE : '#ffffff');
         d.setAttribute('stroke', active ? BLUE : '#878f9d');
       });
-      // active steps (at most two overlap); the later one is drawn on top
-      const live = SEG.filter(s => t >= s.a && t <= s.b);
+      // windows and frames of the live steps; collect the current row and the frames it points at
+      for (const w of [...wins, ...pairWins]) { w.draw({ o: 0 }); put(w.frame, { o: 0 }); }
+      leaders.forEach(L => { L.line.setAttribute('opacity', 0); L.dot.setAttribute('opacity', 0); });
       let wi = 0;
-      for (const w of wins) w.draw({ o: 0 });
-      for (const w of pairWins) w.draw({ o: 0 });
-      for (const w of [...wins, ...pairWins]) put(w.frame, { o: 0 });
-      for (const d of details) d.draw({ from: { x: 0, y: 0, w: 1, h: 1 }, to: { x: 0, y: 0, w: 1, h: 1 }, f: 0, o: 0 });
-      linkA.setAttribute('opacity', 0); linkB.setAttribute('opacity', 0);
-      put(tagBox, { o: 0 }); put(pairTag, { o: 0 });
-      let di = 0;
-      for (const s of live) {
+      let label = null, targets = [], lo = 0;
+      for (const s of SEG.filter(sg => t >= sg.a && t <= sg.b)) {
         const lt = t - s.a;
         const enter = ramp(lt, 0, 0.55), leave = ramp(t, s.b - 0.4, s.b, lin);
         const so = Math.min(ramp(lt, 0, 0.4, lin), 1 - leave);
-        const dx = 70 * (1 - enter) - 50 * leave;
         if (s.pair) {
           s.pair.forEach((p, k) => {
             const L = LAY.pair[k];
-            const W = pairWins[k];
-            const ddx = k === 0 ? -dx : dx;
-            W.draw({ x: L.x, y: LAY.pairY, w: L.w, o: so * ramp(lt, k * 0.15, k * 0.15 + 0.4, lin), dx: ddx, shot: p.shot, local: p.use[0] + lt, ex: p.ex });
-            const b = beatAt(p, lt);
-            if (b) W.mark(b.r, L.x, LAY.pairY, L.w, so * Math.min(ramp(lt, b.t0, b.t0 + 0.3, lin), 1 - ramp(lt, b.t1 - 0.25, b.t1, lin)));
+            const a0 = ramp(lt, k * 0.25, k * 0.25 + 0.55);
+            const wo = so * ramp(lt, k * 0.25, k * 0.25 + 0.4, lin);
+            const dx = 60 * (1 - a0) - 40 * leave;
+            pairWins[k].draw({ x: L.x, y: L.y, w: L.w, o: wo, dx, shot: p.shot, local: p.use[0] + lt, ex: p.ex });
+            const b = beatsOf(p, lt);
+            if (b) {
+              const fo = wo * bo(lt, b);
+              targets.push({ ...pairWins[k].mark(b.r, L.x + dx, L.y, L.w, fo), o: fo });
+            }
           });
           const tg = s.tags.find(([t0, t1]) => lt >= t0 && lt < t1);
-          if (tg) {
-            pairTag.textContent = tg[2];
-            box(pairTag, 0, LAY.pairY + LAY.pair[0].w * 9 / 16 + BAR + 64, 1920);
-            put(pairTag, { o: so * Math.min(ramp(lt, tg[0], tg[0] + 0.35, lin), 1 - ramp(lt, tg[1] - 0.25, tg[1], lin)), y: 10 * (1 - ramp(lt, tg[0], tg[0] + 0.5)) });
-          }
+          if (tg) { label = tg[2]; lo = so * Math.min(ramp(lt, tg[0], tg[0] + 0.3, lin), 1 - ramp(lt, tg[1] - 0.25, tg[1], lin)); }
           continue;
         }
-        const W = wins[wi++ % 2];
         const M = LAY.main;
+        const dx = 70 * (1 - enter) - 50 * leave;
+        const W = wins[wi++ % 2];
         W.draw({ x: M.x, y: M.y, w: M.w, o: so, dx, shot: s.shot, local: s.use[0] + lt, ex: s.ex });
-        const b = beatAt(s, lt);
+        const b = beatsOf(s, lt);
         if (!b) continue;
-        const bo = so * Math.min(ramp(lt, b.t0, b.t0 + 0.3, lin), 1 - ramp(lt, b.t1 - 0.25, b.t1, lin));
-        const fr = W.mark(b.r, M.x + dx, M.y, M.w, bo);
-        // detail window: the same pixels, enlarged in the right column when that gains legibility
-        const C = LAY.col;
-        const rw = b.r.width + 2 * PAD, rh = b.r.height + 2 * PAD;
-        const sc = Math.min(C.w / rw, 540 / rh, 1.7);
-        const lift = sc >= M.k * LIFT_MIN;
-        tagText.textContent = b.label;
-        tagIcon.innerHTML = stationIcon(STATIONS[cur.st], 44, BLUE);
-        const tagH = 64;
-        const cy = fr.y + fr.h / 2;
-        if (lift) {
-          const D = { w: rw * sc, h: rh * sc };
-          D.x = C.x + (C.w - D.w) / 2;
-          D.y = clamp(cy - D.h / 2 + tagH / 2, C.top + tagH + 26, C.bottom - D.h);
-          const f = ramp(lt, b.t0 + 0.15, b.t0 + 0.7, out);
-          const dO = bo * ramp(lt, b.t0 + 0.1, b.t0 + 0.3, lin);
-          details[di++ % 2].draw({ from: fr, to: D, f, o: dO, shot: s.shot, local: s.use[0] + lt, r: b.r });
-          const lo = dO * ramp(lt, b.t0 + 0.5, b.t0 + 0.8, lin) * 0.7;
-          const X = lerp(fr.x, D.x, f), Y = lerp(fr.y, D.y, f), HH = lerp(fr.h, D.h, f);
-          linkA.setAttribute('x1', fr.x + fr.w); linkA.setAttribute('y1', fr.y); linkA.setAttribute('x2', X); linkA.setAttribute('y2', Y);
-          linkB.setAttribute('x1', fr.x + fr.w); linkB.setAttribute('y1', fr.y + fr.h); linkB.setAttribute('x2', X); linkB.setAttribute('y2', Y + HH);
-          linkA.setAttribute('opacity', lo); linkB.setAttribute('opacity', lo);
-          box(tagBox, C.x, D.y - tagH - 22);
-        } else {
-          // a large region: the frame on the window carries it; the tag sits level with it, joined by one line
-          const ty = clamp(cy - tagH / 2, C.top, C.bottom - tagH);
-          box(tagBox, C.x, ty);
-          linkA.setAttribute('x1', fr.x + fr.w); linkA.setAttribute('y1', cy);
-          linkA.setAttribute('x2', C.x - 14); linkA.setAttribute('y2', ty + tagH / 2);
-          linkA.setAttribute('opacity', bo * ramp(lt, b.t0 + 0.2, b.t0 + 0.5, lin) * 0.7);
-        }
-        put(tagBox, { o: bo, y: 10 * (1 - ramp(lt, b.t0, b.t0 + 0.5)) });
+        const fo = so * bo(lt, b);
+        targets = [{ ...W.mark(b.r, M.x + dx, M.y, M.w, fo), o: fo }];
+        label = b.label; lo = fo;
       }
+      // left column: this chapter's rows; the current one is blue, done rows stay, coming rows are light
+      cols.forEach(({ g, c, plate, title, rows }) => {
+        const co = win(t, c.a, c.b, 0.35, 0.3);
+        put(g, { o: co });
+        if (co <= 0) return;
+        const e = ramp(t, c.a, c.a + 0.7);
+        put(plate, { y: 12 * (1 - e) });
+        put(title, { o: ramp(t, c.a + 0.05, c.a + 0.5, lin), y: 16 * (1 - ramp(t, c.a + 0.05, c.a + 0.75)) });
+        const ki = c === cur && label ? c.rows.indexOf(label) : -1;
+        // the last row reached so far (rows stay lit between beats)
+        let reached = -1;
+        for (const s of c.steps) {
+          const lt = t - s.a;
+          const ls = s.pair ? s.tags.map(([t0, , l]) => [t0, l]) : s.beats.map(([t0, , , l]) => [t0, l]);
+          for (const [t0, l] of ls) if (lt >= t0) reached = Math.max(reached, c.rows.indexOf(l));
+        }
+        rows.forEach((r, i) => {
+          put(r.el, { o: ramp(t, c.a + 0.3 + i * 0.08, c.a + 0.7 + i * 0.08, lin), x: 14 * (1 - ramp(t, c.a + 0.3 + i * 0.08, c.a + 0.9 + i * 0.08)) });
+          const now = i === ki, done = i <= reached;
+          r.el.style.color = now ? 'var(--signal-ink)' : done ? 'var(--ink)' : 'var(--ink-3)';
+          r.el.style.fontWeight = now ? 700 : 550;
+          r.sq.style.background = now ? BLUE : done ? 'var(--ink-2)' : '#c3c9d2';
+        });
+        if (ki >= 0) {
+          const row = rows[ki];
+          const rx = C.x + row.lab.offsetLeft + row.lab.offsetWidth + 18, ry = C.rowsY + ki * C.rowH + 22;
+          targets.forEach((tg, j) => {
+            const L = leaders[j];
+            const ex = tg.x, ey = tg.y + tg.h / 2;
+            const mx = Math.max(rx + 16, Math.min(LAY.main.x - 22, ex - 22));
+            L.line.setAttribute('points', `${rx},${ry} ${mx},${ry} ${ex},${ey}`);
+            L.line.setAttribute('opacity', Math.min(lo, tg.o) * ramp(lo, 0.6, 1, lin));
+            L.dot.setAttribute('cx', ex); L.dot.setAttribute('cy', ey);
+            L.dot.setAttribute('opacity', Math.min(lo, tg.o) * ramp(lo, 0.6, 1, lin));
+          });
+        }
+      });
     };
   });
 
