@@ -3,7 +3,7 @@ title: GAID 홍보 영상 lemo판: v4 메시지를 발표 영상 스타일로 �
 date: 2026-10-24
 project: geoaidesk
 task: gaid-promo-video-v4-lemo
-headline: lemo-opuscar의 Dark Tech Keynote 스타일로 v4와 같은 메시지를 담은 103초 영상과 40초 영상을 만들었습니다. 103초판은 박스가 화면 속 포인터를 따라가고, 기능 설명을 15개로 합쳐 천천히 보여 주며, AI agent가 실제로 작업하는 장면을 새로 촬영해 넣었습니다. GAID 허브(Workflow를 만들고 공유)와 GAID 시스템(Workflow를 설치하고 AI agent와 분석)을 한 플랫폼의 두 부분으로, 내 서재를 연구자 개인의 문헌 공간으로 소개합니다.
+headline: lemo-opuscar의 Dark Tech Keynote 스타일로 v4와 같은 메시지를 담은 103초 영상과 40초 영상을 만들었습니다. 103초판은 박스가 화면 속 포인터를 따라가고, 기능 설명을 16개로 합쳐 천천히 보여 주며, AI agent가 실제로 작업하는 장면을 새로 촬영해 넣었습니다. GAID 허브(Workflow를 만들고 공유)와 GAID 시스템(Workflow를 설치하고 AI agent와 분석)을 한 플랫폼의 두 부분으로, 내 서재를 연구자 개인의 문헌 공간으로 소개합니다.
 review_status: pending
 decisions: 0
 cover: figures/02-demo.png
@@ -16,7 +16,7 @@ supersedes:
 | | |
 |---|---|
 | 요청 | lemo-opuscar에서 GAID 허브 홍보에 맞는 스타일을 골라 v4 메시지로 영상을 만듭니다. 작업 중에 40초 홍보판, 두 예제 사용, 모션그래픽 속 창 배치, 박스·전환·고리 장면·속도·AI agent 실제 작업·허브와 시스템 설명에 대한 요청이 더해졌습니다. |
-| 결론 | 103초판(3차 수정본, @@DUR@@초)과 40초판(42.0초)을 만들었습니다. 둘 다 1920×1080, 30fps, 스테레오 음악·효과음, 약 −14 LUFS입니다. 103초판의 박스는 포인터가 그 영역에 있는 동안에만 보입니다. |
+| 결론 | 103초판(3차 수정본, 102.9초)과 40초판(42.0초)을 만들었습니다. 둘 다 1920×1080, 30fps, 스테레오 음악·효과음, 약 −14 LUFS입니다. 103초판의 박스는 포인터가 그 영역에 있는 동안에만 보입니다. |
 | 믿을 수 있는 정도 | 실제 화면은 GAID에서 촬영한 것이고 화면 문구는 바꾸지 않았습니다. AI agent 장면은 이번에 실제 실행을 한 번 촬영한 것입니다. 배경, 연구 순환, Second brain 장면은 설명 그림입니다. 소리는 측정값과 파형으로만 확인했습니다(5절). |
 | 결정할 일 | 없음. 영상 검토 의견을 받습니다. |
 
@@ -51,7 +51,7 @@ supersedes:
 4. 2차 영상 피드백을 받고 자가 진단했습니다(7절). 촬영 프레임에서 그려진 포인터를 찾아 박스와 대조해 보니, 박스 31개 중 포인터가 박스 안에 머문 것은 11개뿐이었고 12개는 포인터가 박스 밖에만 있었습니다. 기존 AI agent 장면은 실제 분석 시간을 잘라낸 완료 화면이었습니다.
 5. 3차 수정본을 만들었습니다.
    - 박스: 포인터가 그 영역에 들어오는 순간 박스가 그려지고, 포인터가 머무는 동안만 보입니다. 포인터가 가지 않는 영역은 박스 없이 왼쪽 목록만 켭니다. 박스가 나타날 때 작은 효과음이 납니다.
-   - 장면: 기능 설명을 22개에서 15개로 합쳤습니다. 포인터가 실제로 움직이는 촬영본을 골랐습니다. 포천 예제(v3), Yilgarn 예제(v2·v5), 이번에 새로 찍은 AI agent 실행을 섞었습니다.
+   - 장면: 기능 설명을 22개에서 16개로 합쳤습니다. 포인터가 실제로 움직이는 촬영본을 골랐습니다. 포천 예제(v3), Yilgarn 예제(v2·v5), 이번에 새로 찍은 AI agent 실행을 섞었습니다.
    - AI agent 실제 작업: 하위 작업이 검토용 앱에서 포천 예제 Workflow를 실제로 한 번 실행하며 촬영했습니다. 시작 클릭, 도구 호출과 코드 수정이 쌓이는 장면(3배속, "빠르게 보기" 표시), 새 결과 그림을 여는 장면입니다. 설정은 바꾸지 않았고, 허브에 사용 전후를 알렸습니다.
    - 설명과 색: GAID 허브는 "논문·문헌·연구노트로 Workflow를 만들고 공유", GAID 시스템은 "Workflow를 설치하고 AI agent와 분석"으로 고쳤습니다. 내 서재는 어느 한쪽의 주 기능이 아닌 "연구자의 문헌 공간"으로 따로 표시하고, 서재 장의 표시도 "내 서재"로 바꿨습니다. GAID 시스템 색은 회색에서 밝은 파랑으로 바꿨습니다.
 6. 40초판은 하위 작업이 만들었습니다. 2차 피드백에 따라 단계마다 창을 그 단계 쪽에 열고, 허브·시스템·서재 설명과 색을 같은 기준으로 고쳤습니다(8절).
@@ -88,9 +88,9 @@ supersedes:
 | 완료 기준 | 결과 | 근거 |
 |---|---|---|
 | 스타일 후보를 보여 드리고 고르기 | 충족. Dark Tech Keynote | 2절 |
-| v4 이야기, 1920×1080, 30fps, 스테레오, 90~105초 | 충족. @@DUR@@초 | 4절 |
-| 박스와 포인터 일치 | 충족. 박스 @@NBOX@@개, 시작·끝 프레임 대조 | 4절, 그림 2 |
-| 전환과 속도 | 충족. 창을 접지 않는 전환, 기능 15개, 대부분 3초 넘게 표시 | 3절 표 |
+| v4 이야기, 1920×1080, 30fps, 스테레오, 90~105초 | 충족. 102.9초 | 4절 |
+| 박스와 포인터 일치 | 충족. 박스 20개, 시작·끝 프레임 대조 | 4절, 그림 2 |
+| 전환과 속도 | 충족. 창을 접지 않는 전환, 기능 16개, 16개 중 13개가 3초 넘게 표시 | 3절 표 |
 | AI agent 실제 작업 | 충족. 새로 촬영한 실제 실행, 빠르게 보기 표시 | 그림 2 |
 | 허브·시스템·서재 설명과 색 | 충족. 103초판과 40초판 모두 | 그림 1, 8절 |
 | 40초 홍보판 | 충족. 42.0초 | 8절 |
@@ -101,7 +101,7 @@ supersedes:
 ## 4. 검증
 
 - 과학적 검증: 해당 없음. 시연에 나오는 분석은 예제 자료로 한 홍보용 실행입니다.
-- 103초판 영상: 완성 파일을 다시 읽었습니다. @@DUR@@초, @@FRAMES@@프레임, 1920×1080, 30fps입니다. 검은 화면 검사에서 걸린 구간은 없습니다. 음량은 @@LUFS@@ LUFS, 최대치 @@TP@@ dB입니다.
+- 103초판 영상: 완성 파일을 다시 읽었습니다. 102.9초, 3,087프레임, 1920×1080, 30fps입니다. 검은 화면 검사에서 걸린 구간은 없습니다. 음량은 −14.4 LUFS, 최대치 −1.1 dB입니다.
 - 박스와 포인터: 박스가 보이는 구간마다 시작 직후와 끝 직전 프레임을 완성 파일에서 뽑아 대조했습니다. 박스가 보이는 동안 포인터는 박스 안에 있습니다. 포인터 위치는 촬영 때 화면에 그린 화살표(#14213d)를 프레임마다 찾아 얻었고, 새 촬영본은 촬영 기록의 포인터 좌표를 썼습니다.
 - AI agent 장면: 하위 작업이 실제 실행 한 번을 촬영했습니다. 분석 계산은 약 123초였고, 전체 실행은 응답과 문서 정리를 포함해 약 10분 23초였습니다. 영상에는 그중 12초를 3배속으로 넣었고 "빠르게 보기"로 표시했습니다. 촬영 오류로 한 번 다시 실행했으며, 앱 설정은 바꾸지 않았습니다.
 - 읽는 시간: 기능 목록 항목은 모두 2.2초 이상 보이고, 대부분 3초를 넘습니다. 앞부분 제목 줄과 순환 장면 설명 일부는 lemo 기준(한글 4.5자/초 + 1.5초)보다 짧습니다.
@@ -233,12 +233,12 @@ supersedes:
 | 스타일 후보 | PC74: `~/data/geoaidesk/work/gaid-promo-video-v4-lemo/style-choice/`, vault `연구 보고서/geoaidesk/2026-10-24-style-choice` |
 | lemo-opuscar | `lemomo-ai/lemo-opuscar@3961ddb3d24d8876e0e2754f7790d66908acee51`, 자산 `lemo_opuscar` (`configs/inputs.toml`, PC74 `~/assets/lemo-opuscar/3961ddb`) |
 | 실제 화면 촬영 | 포천 PC74: `~/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json` SHA256 `aab24b2ef94aea09a60748ed8b3b0168adca477af353e496406efe2b9cad2f3a`; Yilgarn: `~/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json` SHA256 `4a3be64e83123389b4c98866b8d7453f5a9d93c13d278350fcd0d49d86439dcb`, `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/capture.json`; AI agent 실행: `~/data/geoaidesk/work/gaid-promo-video-v4-lemo--agent-capture/capture-v6/capture.json` SHA256 `e4f120e64293ef46917a2b858552d566d3d4cc7c9dafba44acff3f0a4a15ab98` (검토용 앱 4e198c76, GPT-6.1 Sol/높음) |
-| 103초판 렌더 job | @@JOB@@ |
-| 103초판 영상 | @@FILM@@ |
+| 103초판 렌더 job | `job-geoaidesk-gaid-promo-video-v4-lemo-8`, PC74: `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T062754.451258Z/receipt.json`, 소스 `c7f20680a0f4f7404ebcaeec06369a1f57670757`, 명령 `sh geo/promo-lemo/build.sh`; `out/picture.mp4` SHA256 `9b112a8b25125d317859ba8ec5d438b4259450f71f2d55f18d611540e8e6e324`, `out/mix.wav` SHA256 `a338a424d278f5de24ff61f4599ae15fa09828b4df60cc3b455dbe8f9e4f68a2`, `out/events.json` SHA256 `cf694e9f12898842e9cf14502be0f5ec9a03e3047994f55a244f349b211dcb59`, `out/picture-manifest.json` SHA256 `3c23b27dc30d5136a560f73ffe1fcd96f14956d699559dc367e577b6da6f3a8a` |
+| 103초판 영상 | PC74: `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T062754.451258Z/out/gaid-promo-lemo.mp4`, 22,604,083 bytes, SHA256 `499c7b538aae69768005a831308f4601f8c46ae2272742f7f951cbf12a28f40e`; `out/master.json` SHA256 `7427fc81d15369a3e4698dbd38c11ee3e4139862cf946bdee59b18be68aad664` |
 | 40초판 영상 | PC74: `~/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T052859.356543Z/out/gaid-promo-40s.mp4` SHA256 `52b0055d004bad90b8ac1428cdf7923d1912d14543bf514af3283fcf958e3546`; job `job-geoaidesk-gaid-promo-video-v4-lemo--promo-40s-3`, 소스 `1c5a8798bf50` |
-| 대체된 영상 | 1차 job-1 SHA256 `22dba68e4a95455f4be451628c2392b68bda2a321025899ff5ee250607665717`; 2차 job-5 SHA256 `36290838484486d5945dbf7c9cdea31af4a5a38f42b6cce0ffa8128edd96f075`; 중간 렌더 job-2·job-3·job-4·job-6 |
-| 자가 검토 자료 | PC74: `~/data/geoaidesk/work/gaid-promo-video-v4-lemo/look/` (`tagqa0-*` 1차, `tagqa3-*` 2차, `tagqa6-*`·`tagqa7-*` 3차 박스 대조), `pointer/` (프레임에서 찾은 포인터 위치) |
-| 보고서 그림 | 103초판 최종 화면의 @@FIGT@@ 프레임; 40초판 그림은 그 영상의 9.4/17.9/31.5/39.0초 |
+| 대체된 영상 | 1차 job-1 SHA256 `22dba68e4a95455f4be451628c2392b68bda2a321025899ff5ee250607665717`; 2차 job-5 SHA256 `36290838484486d5945dbf7c9cdea31af4a5a38f42b6cce0ffa8128edd96f075`; 중간 렌더 job-2·job-3·job-4·job-6·job-7 |
+| 자가 검토 자료 | PC74: `~/data/geoaidesk/work/gaid-promo-video-v4-lemo/look/` (`tagqa0-*` 1차, `tagqa3-*` 2차, `tagqa4-*`·`tagqa6-*`·`tagqa7-*`·`tagqa8-*` 3차 박스 대조), `pointer/` (프레임에서 찾은 포인터 위치) |
+| 보고서 그림 | 103초판 최종 화면의 8.6/11.4/16.5/22.4초(그림 1), 42.6/57.0/64.0/75.0초(그림 2), 88.0/97.0초(그림 3) 프레임; 40초판 그림은 그 영상의 9.4/17.9/31.5/39.0초 |
 | 도구 | Google Chrome, Playwright 1.63.0, imageio-ffmpeg 0.6.0, Pillow 12.3.0, numpy 2.3.4, scipy 1.16.3, soundfile 0.13.1, soxr 1.0.0 |
 | 음원·글꼴·아이콘 | VCSL 샘플(CC0), lemo `core/audio` 합성 효과음(MIT), Pretendard(OFL), Lucide(ISC/MIT). 목록 `geo/promo-lemo/CREDITS` |
 | 라이선스 | lemo-opuscar 코드·문서 MIT, 데모 영상·정지 화면 CC BY 4.0(영상에는 쓰지 않음; 후보 비교 포스터에만 출처 표시와 함께 사용). 라이브러리로 만든 영상은 만든 사람의 것이며 출처 표시 의무가 없습니다(lemo README "Licence") |

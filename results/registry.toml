@@ -148,11 +148,22 @@ supersedes = "gaid-promo-video-v3"
 
 [[result]]
 id = "gaid-promo-video-v4-lemo"
-title = "GAID 홍보 영상 lemo판 — Dark Tech Keynote 스타일, 포천·Yilgarn 실제 화면을 창으로 넣은 100초 영상 (2차 수정본, 내부 검토용, 음악·효과음)"
+title = "GAID 홍보 영상 lemo판 103초 — Dark Tech Keynote, 포인터를 따라가는 박스, AI agent 실제 작업 촬영 (3차 수정본, 내부 검토용, 음악·효과음)"
 state = "review"
-run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T024655.879578Z/out"
-source_sha = "20f1dc1a527740e1657513280d73417997aa08a0"
-inputs = ["pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T023619.972785Z/out/picture.mp4", "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T023619.972785Z/out/mix.wav", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "assets:lemo-opuscar/3961ddb", "user:2026-10-24-gaid-promo-video-v4-lemo-requests"]
-files = [{ path = "gaid-promo-lemo.mp4", sha256 = "36290838484486d5945dbf7c9cdea31af4a5a38f42b6cce0ffa8128edd96f075" }, { path = "master.json", sha256 = "0fa36d5107ce21666f8db77413dbf441d7c009826c0602934e75a626c5ede390" }]
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T062754.451258Z/out"
+source_sha = "c7f20680a0f4f7404ebcaeec06369a1f57670757"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v4-lemo--agent-capture/capture-v6/capture.json", "assets:lemo-opuscar/3961ddb", "user:2026-10-24-gaid-promo-video-v4-lemo-requests"]
+files = [{ path = "gaid-promo-lemo.mp4", sha256 = "499c7b538aae69768005a831308f4601f8c46ae2272742f7f951cbf12a28f40e" }, { path = "master.json", sha256 = "7427fc81d15369a3e4698dbd38c11ee3e4139862cf946bdee59b18be68aad664" }, { path = "picture-manifest.json", sha256 = "3c23b27dc30d5136a560f73ffe1fcd96f14956d699559dc367e577b6da6f3a8a" }]
+report = "reports/2026-10-24-gaid-promo-video-v4-lemo/index.md"
+replicas = []
+
+[[result]]
+id = "gaid-promo-video-v4-lemo-40s"
+title = "GAID 홍보 영상 lemo판 40초 — 코드로 그린 홍보판, 단계 옆 실제 화면 창 (2차 수정본, 내부 검토용, 음악·효과음)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--promo-40s-20261024T052859.356543Z/out"
+source_sha = "1c5a8798bf50543e2b56141a8c339f3327bc45c6"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "assets:lemo-opuscar/3961ddb", "user:2026-10-24-gaid-promo-video-v4-lemo-requests"]
+files = [{ path = "gaid-promo-40s.mp4", sha256 = "52b0055d004bad90b8ac1428cdf7923d1912d14543bf514af3283fcf958e3546" }]
 report = "reports/2026-10-24-gaid-promo-video-v4-lemo/index.md"
 replicas = []
