@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T06:47:19Z
+status: active
+updated: 2026-10-24T06:56:10Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c0846cc2-2d3c-4451-a536-928158b01728","pid":1419314,"provider":"codex","session":"01a16c9f-037c-7000-9c73-3a2648766336","start":"71166182","token":"eb92e9d2636de378ea79a8a04d9e6f61f7cc7146a51b50e547fadd07a2f678b8"}
 branch: task/gaid-ia-connect-workspace--copy-rename
 target: task/gaid-ia-connect-workspace
@@ -42,6 +42,7 @@ Closed 2026-10-24T06:47:19Z: ready; the parent gaid-ia-connect-workspace integra
 
 ## Failed approaches
 - `task job run` refused dependency installation while source edits were dirty (`job source dirty; save first`); checkpoint reviewed changes before launching checks. No install job started.
+- First `task finish` merged parent interim work and ran full `scripts/check`. Backend: 2,322 passed, 8 skipped, one unchanged `geo-workspace.test.ts:349` session-exposure test exceeded its 5,000 ms timeout (6,233 ms). Log: `/home/seongin3/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-hlsg1kbw.log`; output: `/home/seongin3/data/geoaidesk/work/checks/e02b11668196-20261024T064719.269546Z`. An immediate isolated rerun of that whole file passed 19/19 in 4.75 s, without code edits. Retry finish once with `VITEST_MAX_WORKERS=1`; do not weaken assertions or increase timeouts for a copy-only change.
 ## Notes and decisions
 - Follow UI rules L2, N1, N5, D6 and W1–W4. Shorten the import action to `Connect에서 가져오기` / `Import from Connect` (the Workflow panel supplies the object), version-install action to `version {revision} 설치`, and the busy handoff action to `초안 만드는 중` to keep W1's 16/32-character button limits. Pure wording changes need no screenshots (UI guide §0.3).
 - Terminology forbids unambiguous `GAID 허브` / `GAID 시스템`; bare `허브` and `내 연구` cannot be forbidden globally by the substring-based validator because external skill_hub and ordinary research language remain valid.
