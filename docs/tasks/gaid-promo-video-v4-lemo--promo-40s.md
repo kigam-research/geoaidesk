@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T02:08:09Z
+status: active
+updated: 2026-10-24T02:19:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
