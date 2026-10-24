@@ -147,3 +147,34 @@ it("keeps the author's ORCID link separate from the row's open action", async ()
   fireEvent.click(await loaded());
   expect(open).toHaveBeenCalledWith(entry.id);
 });
+
+describe("Workflow stages without a picture (gaid-hub-stage-cards)", () => {
+  const stages = {
+    titles: ["자료 확인", "단위·검출한계 점검", "조성 탐색 그림", "패턴·이상치", "해석·결과"].map((ko) => ({ ko })),
+    inputs: ["CSV", "XLSX"],
+    outputs: [{ ko: "점검 표" }, { ko: "조성 그림" }],
+  };
+  const card = { id: "catalogue:assay", title: "분석값 조성 탐색", line: "분석값을 점검합니다.", image: null, source: "catalogue" as const, stars: 0 };
+  const home = (recommended: Parameters<typeof HubHome>[0]["recommended"]) =>
+    render(<HubHome view={{ kind: "home" }} onView={vi.fn()} recommended={recommended} folders={[]} folderId="all" onFolder={vi.fn()} projects={[]} onCreate={vi.fn()} onOpen={vi.fn()} />);
+
+  it("draws the stages in order with the input and output formats, shortening a long list", async () => {
+    home([card, { ...card, id: "catalogue:b", stages }]);
+    await loaded();
+    expect(screen.getByText("단위·검출한계 점검")).toBeTruthy();
+    expect(screen.getByText("외 2단계")).toBeTruthy();
+    expect(screen.queryByText("패턴·이상치")).toBeNull();
+    expect(screen.getByText("CSV, XLSX → 점검 표 외 1")).toBeTruthy();
+    expect(screen.getByText("분석 단계 5개: 자료 확인, 단위·검출한계 점검, 조성 탐색 그림, 패턴·이상치, 해석·결과")).toBeTruthy();
+  });
+
+  it("keeps the concept picture first and shows a stage-count readout in rows without a cover", async () => {
+    vi.mocked(sharedHub.entries).mockResolvedValueOnce({ entries: [{ ...entry, cover: null, stages }] });
+    home([{ ...card, image: "/cover.png", stages }]);
+    await loaded();
+    expect(screen.queryByText("자료 확인")).toBeNull();
+    expect(screen.getAllByText("분석 단계 5개: 자료 확인, 단위·검출한계 점검, 조성 탐색 그림, 패턴·이상치, 해석·결과")).toHaveLength(1);
+    expect(screen.getByText("5")).toBeTruthy();
+    expect(screen.getByText("단계")).toBeTruthy();
+  });
+});

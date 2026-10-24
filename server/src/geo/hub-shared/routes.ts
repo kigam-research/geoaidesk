@@ -21,6 +21,7 @@ import type {
   RemoveEntryBody,
   SharedInstallBody,
 } from "../../../../web/src/geo/contracts/hub-shared.ts";
+import { hubWorkflowStages } from "../../../../web/src/geo/contracts/hub-shared.ts";
 import { bumpHubVersion, FIRST_HUB_VERSION, HUB_VERSION_BUMPS, hubRefVersion, hubRevisionVersions, hubVersionOf } from "../../../../web/src/geo/contracts/hub-version.ts";
 import { getProject, resolvePaths } from "../../projects.ts";
 import { installPackageBytes, type InstallDeps } from "../authoring/install.ts";
@@ -75,6 +76,16 @@ const snapshotOf = (record: StoredEntry, revision?: string): RegisteredSnapshot 
   return record.snapshots[n];
 };
 
+/** The Workflow doc of a registered snapshot (entry detail and stage summary); null for a Workflow-less snapshot. */
+const snapshotWorkflowDoc = (record: StoredEntry, snapshot: RegisteredSnapshot) =>
+  snapshot.draft.workflow
+    ? workflowDocFor(snapshot.draft.workflow as unknown as GeoWorkflow, {
+      version: hubVersionOf(record.entry),
+      skills: [{ name: snapshot.draft.slug, source: "bundled" }],
+      procedure: procedureSteps(snapshot.draft.profile),
+    })
+    : null;
+
 export async function registerSharedHubRoutes(
   app: FastifyInstance,
   options: SharedHubOptions = {},
@@ -109,6 +120,13 @@ export async function registerSharedHubRoutes(
           trials += countRegisteredMethodTrials(resolvePaths(projectId), methodId, hashes);
     }
     const versions = hubRevisionVersions(record.entry.revisions);
+    // A malformed older Workflow must not hide the entry from the lists: no stages then.
+    let stages: HubEntry["stages"] | null = null;
+    try {
+      stages = hubWorkflowStages(snapshotWorkflowDoc(record, snapshotOf(record)));
+    } catch {
+      stages = null;
+    }
     return {
       ...record.entry,
       revisions: record.entry.revisions.map((r, i) => ({ ...r, version: versions[i] })),
@@ -121,6 +139,7 @@ export async function registerSharedHubRoutes(
       mine: isEntryAuthor(record.entry, actor),
       comments: comments.length,
       trials,
+      ...(stages ? { stages } : {}),
     };
   };
 
@@ -364,13 +383,7 @@ export async function registerSharedHubRoutes(
         visuals,
         outputImages,
         workflowTitle: snapshot.draft.workflow?.title ?? null,
-        workflowDoc: snapshot.draft.workflow
-          ? workflowDocFor(snapshot.draft.workflow as unknown as GeoWorkflow, {
-            version: hubVersionOf(record.entry),
-            skills: [{ name: snapshot.draft.slug, source: "bundled" }],
-            procedure: procedureSteps(snapshot.draft.profile),
-          })
-          : null,
+        workflowDoc: snapshotWorkflowDoc(record, snapshot),
         comments: await store.comments(record.entry.id),
       };
     });
@@ -525,6 +538,7 @@ export async function registerSharedHubRoutes(
           stars: e.stars,
           author: e.author,
           ref: e.id,
+          ...(e.stages ? { stages: e.stages } : {}),
         }));
       if (cards.length < 4) {
         const workflows = options.catalogueWorkflows
@@ -532,7 +546,18 @@ export async function registerSharedHubRoutes(
           : geoCatalogueActive()
             ? loadGeoCatalogue().workflows
             : [];
+        const catalogue = !options.catalogueWorkflows && geoCatalogueActive() ? loadGeoCatalogue() : null;
         for (const w of workflows.slice(0, 4 - cards.length)) {
+          let stages: HubRecommendation["stages"] | null = null;
+          try {
+            stages = hubWorkflowStages(
+              catalogue
+                ? catalogueWorkflowDoc(catalogue, w, [])
+                : workflowDocFor(w, { skills: w.skillIds.map((id) => ({ name: id, source: "catalogue" })) }),
+            );
+          } catch {
+            stages = null;
+          }
           const image =
             typeof w.image === "string"
               ? w.image
@@ -547,6 +572,7 @@ export async function registerSharedHubRoutes(
             image,
             stars: 0,
             ref: w.id,
+            ...(stages ? { stages } : {}),
           });
         }
       }

@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { ProjectSummary } from "@/geo/contracts/authoring";
+import type { HubWorkflowStages } from "@/geo/contracts/hub-shared";
 import { geoLocale, geoText } from "@/geo/i18n";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ import type { HubView } from "./hub-sidebar";
 import { SharedBrowse } from "./shared-browse";
 import { TechnicalDetail } from "./technical";
 import { ConceptPicture } from "./concept-picture";
+import { StagePlate, stagesLabel } from "./stage-plate";
 import { PageHeader } from "@/geo/shell/page-header";
 
 const text = geoText("hub");
@@ -44,7 +46,10 @@ const STAGE_TONE: Record<ProjectSummary["stage"], string> = {
   package: "bg-gaid-success-tint text-gaid-success",
 };
 
-/** A Workflow without a picture: a neutral plate with an icon that matches its subject (UI guide v2 S2). */
+/**
+ * A Workflow with neither a picture nor stages (an older record): a neutral plate with an icon that matches its subject
+ * (UI guide v2 S2). Workflows with stages draw them instead (`StagePlate`).
+ */
 function CardArt({ title, className }: { title: string; className?: string }) {
   const Icon = /지도|좌표|map|crs/i.test(title)
     ? MapIcon
@@ -117,6 +122,8 @@ export interface RecommendedCard {
   source: "catalogue" | "shared";
   stars: number;
   author?: string;
+  /** The Workflow's own analysis stages, drawn when there is no picture (gaid-hub-stage-cards). */
+  stages?: HubWorkflowStages;
 }
 
 export interface HubFolder {
@@ -159,6 +166,8 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
             className="flex w-[58%] shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-2.5"
             imageClassName="max-h-full"
           />
+        ) : lead.stages ? (
+          <StagePlate stages={lead.stages} max={8} large className="w-[58%] shrink-0 border-r border-gaid-edge" />
         ) : (
           <span className="flex w-[58%] shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-2.5">
             <CardArt title={lead.title} />
@@ -166,6 +175,7 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
         )}
         <span className="flex min-w-0 flex-1 flex-col gap-2 p-5">
           <span className="text-xl font-semibold leading-7">{lead.title}</span>
+          {!lead.image && lead.stages && <span className="sr-only">{stagesLabel(lead.stages)}</span>}
           <span className="line-clamp-4 text-sm text-gaid-ink-2" title={lead.line}>{lead.line}</span>
           <CardMeta card={lead} />
         </span>
@@ -183,16 +193,19 @@ function Featured({ cards, onOpen }: { cards: RecommendedCard[]; onOpen?: (id: s
                 <ConceptPicture
                   src={card.image}
                   themed={card.imageThemed}
-                  className="flex w-40 shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-1.5"
+                  className="flex w-48 shrink-0 items-center justify-center rounded-none border-0 border-r border-gaid-edge p-1.5"
                   imageClassName="max-h-full"
                 />
+              ) : card.stages ? (
+                <StagePlate stages={card.stages} max={4} className="w-48 shrink-0 border-r border-gaid-edge" />
               ) : (
-                <span className="flex w-40 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
+                <span className="flex w-48 shrink-0 items-center justify-center border-r border-gaid-edge bg-gaid-face-2 p-1.5">
                   <CardArt title={card.title} />
                 </span>
               )}
               <span className="flex min-w-0 flex-1 flex-col gap-1.5 p-4">
                 <span className="line-clamp-2 font-semibold">{card.title}</span>
+                {!card.image && card.stages && <span className="sr-only">{stagesLabel(card.stages)}</span>}
                 <span className="line-clamp-2 text-sm text-gaid-ink-2" title={card.line}>{card.line}</span>
                 <CardMeta card={card} />
               </span>

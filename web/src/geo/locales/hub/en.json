@@ -112,6 +112,14 @@
       "revision": "version",
       "stars": "Stars",
       "updated": "Updated"
+    },
+    "stages": {
+      "label": "{count} analysis stages: {list}",
+      "more": "{count} more stages",
+      "moreItems": "+{count}",
+      "firstAndMore": "{first} +{count}",
+      "flow": "{from} → {to}",
+      "unit": "stages"
     }
   },
   "stage": {

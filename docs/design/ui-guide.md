@@ -102,7 +102,7 @@ GAID reports results (P9). Brand lives in precise details, never in costume (imp
 | I7 | **Two tones.** A cool aluminium functional layer (`--gaid-chrome`: top bar, sidebars, tab strips, toolbars) around white content faces (`--gaid-face`); hairlines `--gaid-edge`. |
 | I8 | **Chamfered corners.** Every rounded box gets a 45° chamfer (`corner-shape: bevel` from `--gaid-corner`, applied in `globals.css` to `rounded-*` classes except `rounded-full`): 4–6 px controls, 8 px containers, 12 px dialogs. Browsers without `corner-shape` show round corners; nothing depends on the bevel. |
 | I9 | **Index mark.** The current item in a sidebar or list carries `.gaid-index`: a small signal-blue pointer at the pane edge, plus tint and weight. |
-| I10 | **Graduated scale.** Step progress (start settings, research-note decisions) is drawn by `StepScale`: a scale with a major tick per step, minor ticks between, filled to the current step, a pointer above it. Scales appear only where they show a position; never as decoration. |
+| I10 | **Graduated scale.** Step progress (start settings, research-note decisions) is drawn by `StepScale`: a scale with a major tick per step, minor ticks between, filled to the current step, a pointer above it. Scales appear only where they show a position; never as decoration. A list of stages with no current one (a Workflow's analysis stages on a hub card, gaid-hub-stage-cards) is a plain numbered list, and its count in a row is an I11 readout. |
 | I11 | **Readouts.** Counts that need the researcher (`결정 3`) are short tinted plates with tabular figures. |
 
 | Token (light / dark) | Value |

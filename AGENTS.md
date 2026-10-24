@@ -151,7 +151,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
   store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,
-  recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
+  recommended cards (catalogue + most starred; gaid-hub-stage-cards: a card or registered row without a concept picture draws
+  the Workflow's own stages from its WorkflowDoc, `HubWorkflowStages` on `HubEntry`/`HubRecommendation`,
+  `web/src/geo/hub/stage-plate.tsx`, as a numbered list with input formats → outputs, rows as a stage-count readout) and "use in my research" (install → input/environment prep → start
   settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
   `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
   latest revision when that draft is not on this server; registering adds the next revision), any other name gets one own

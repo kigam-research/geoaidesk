@@ -7,6 +7,7 @@
 
 | 그림 | 날짜 | 보고서 | 한 줄 결론 | 검토 | 결론 상태 | 결정할 일 |
 |---|---|---|---|---|---|---|
+| <img src="2026-10-24-gaid-hub-stage-cards/figures/01-fresh-four-1440.png" width="120"> | 2026-10-24 14:16 | [허브 카드에 Workflow의 분석 단계 그리기](2026-10-24-gaid-hub-stage-cards/index.md) | 개념 그림이 없는 허브 카드는 제목으로 고른 아이콘 대신 그 Workflow의 분석 단계와 입력·결과를 보이고, 목록 줄은 단계 수를 보입니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-24-gaid-ui-shared-contrast/figures/01-parts-four-after.png" width="120"> | 2026-10-24 13:38 | [공용 부품 대비와 초점 고리 수정](2026-10-24-gaid-ui-shared-contrast/index.md) | 공용 버튼·탭·사이드바·입력칸의 대비 미달 다섯 곳과 초점 고리를 색 역할만 바꿔 고쳤습니다. 네 화면 조합에서 impeccable 대비 결과가 7건에서 0건, axe 결과가 11건에서 0건이 되었습니다. | 검토함 10-24 | 미정 | 1 |
 | <img src="2026-10-24-gaid-note-bundle-export/figures/01-result-bundle.png" width="120"> | 2026-10-24 13:01 | [정리 노트 결과 묶음, 공개 자료 내보내기, Gemini Notebook 링크](2026-10-24-gaid-note-bundle-export/index.md) | 정리 노트 하나를 근거째 ZIP으로 내려받을 수 있고, Gemini Notebook에 올릴 파일은 파일마다 반출 확인을 받아 따로 묶습니다. 서재 폴더와 프로젝트에는 관련 노트북 주소를 저장해 열 수 있습니다. | 검토 전 | 미정 | 0 |
 | <img src="2026-10-24-gaid-promo-video-v5/figures/01-demo.png" width="120"> | 2026-10-24 12:41 | [GAID 홍보 영상 v5(93초, 두 예제와 창 배치)와 45초 제품 영상 (내부 검토용)](2026-10-24-gaid-promo-video-v5/index.md) | v5는 포천 PGI와 Yilgarn 니켈 예제를 장면마다 골라 쓰고, 실제 화면을 왼쪽 설명 열과 연결선으로 이어진 창으로 넣었으며, 강조 상자는 모두 화면 요소를 통째로 감쌉니다. 따로 만든 45초 제품 영상은 실제 화면 없이 한 연구자의 하루를 그림과 음악으로 보여 줍니다. | 검토 전 | 미정 | 0 |
