@@ -201,8 +201,8 @@ flowchart LR
 
 | 항목 | 위치 |
 |---|---|
-| 시안 코드 | `web/src/geo/dev/places/` (app-bar.tsx, screens.tsx, fixtures.ts, places-page.tsx), 경로 `web/src/app/dev/places/page.dev.tsx`, 문구 `web/src/geo/locales/devPlaces/{ko,en}.json` |
-| 시안 열기 | `cd web && npx next dev`, `/dev/places?screen=workspace|connect|library|project|authoring&style=instrument|mapsheet&theme=light|dark` |
+| 시안 코드 | commit bd22855a: `web/src/geo/dev/places/` (app-bar.tsx, screens.tsx, fixtures.ts, places-page.tsx), 경로 `web/src/app/dev/places/page.dev.tsx`, 문구 `web/src/geo/locales/devPlaces/{ko,en}.json`. 2단계 구현 뒤 삭제 |
+| 시안 열기 | commit bd22855a를 checkout한 뒤 `cd web && npx next dev`, `/dev/places?screen=workspace|connect|library|project|authoring&style=instrument|mapsheet&theme=light|dark` |
 | 캡처 스크립트 | PC74 `~/data/geoaidesk/work/gaid-ia-connect-workspace/shoot.sh <outdir> <w> <h> [screens…]` |
 | 원본 캡처 | PC74 `~/data/geoaidesk/work/gaid-ia-connect-workspace/shots/v1/` (1440×900, 20장), `shots/v1-1280/` (1280×800, 16장), `shots/before/` (지금 화면) · 해시 `shots/SHA256SUMS` |
 | 이름 겹침 조사 | 이 작업의 읽기 전용 조사(문자열 id 목록은 2단계 문구 변경 보고에 옮김) |
