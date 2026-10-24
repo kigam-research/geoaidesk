@@ -207,6 +207,18 @@
       "responsibility": "Recognize the dedicated gaid-local provider as local/$0/not cap-counted consistently in live billing, inferred ledger rows, child admission/receipts and picker metadata; other custom providers remain payg"
     },
     {
+      "path": "server/src/cost/ledger.ts",
+      "owner": "gaid-authoring-cache",
+      "status": "edited",
+      "responsibility": "Optional prompt-cache write tokens on snapshots and ledger rows (CostSnapshot.cacheWrite, CostEntry.cacheWriteTokens), written by GAID hub authoring; other producers and existing rows are unchanged"
+    },
+    {
+      "path": "server/test/geo-authoring-cache.test.ts",
+      "owner": "gaid-authoring-cache",
+      "status": "added",
+      "responsibility": "Authoring prompt cache: sources block and repair history in the Pi context, the boundary in Pi's final OpenAI/Codex/Anthropic payloads, per-path retention, raw usage, attempt cache reads/writes and call records"
+    },
+    {
       "path": "server/test/geo-local-model.test.ts, server/test/subagent-integration.test.ts",
       "owner": "gaid-runtime",
       "status": "edited",

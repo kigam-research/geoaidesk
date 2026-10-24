@@ -21,7 +21,16 @@ import type {
 import { distributionOf, pythonImports, pythonStdlib, withBundled, type PackageFile } from "./python.ts";
 import { checkMethod } from "./package.ts";
 import { quoteFound, readablePage } from "./anchors.ts";
-import { modelConfig, preflight, runtimeChat, type ChatFn, type ChatMessage, type ModelConfig } from "./model.ts";
+import {
+  historyMode,
+  modelConfig,
+  preflight,
+  runtimeChat,
+  type CallRecord,
+  type ChatFn,
+  type ChatMessage,
+  type ModelConfig,
+} from "./model.ts";
 import { chosenHubSkills, hubSkillQuestion, HUB_SKILLS_KEY, loadHubSkillCandidates, type HubSkillCandidate } from "./hub-skills.ts";
 import { loadVocabulary, vocabularyText, type TaxonomyFacet, type Vocabulary } from "./vocabulary.ts";
 import {
@@ -1240,20 +1249,37 @@ async function execute(
   deps: AgentDeps,
 ): Promise<AuthoringAttempt> {
   // One cache key per authoring project: its calls share the instructions-and-sources prefix.
-  const config: ModelConfig = { ...(deps.config ?? modelConfig()), cacheKey: projectId };
+  const history = historyMode();
+  const config: ModelConfig = { ...(history ? { history } : {}), ...(deps.config ?? modelConfig()), cacheKey: projectId };
   const call = deps.chat ?? runtimeChat();
   const responses: { content: string; finishReason?: string }[] = [];
   const errorsByResponse: string[][] = [];
   let usage: NonNullable<AuthoringAttempt["usage"]> = {};
+  const calls: CallRecord[] = [];
   const record = `attempts/${attempt.id}.json`;
   const save = (messages: ChatMessage[], extra: Record<string, unknown> = {}) =>
     store.writeFile(
       projectId,
       record,
-      `${JSON.stringify({ attempt: attempt.id, op: attempt.op, promptVersion: attempt.promptVersion, model: config.ref, thinkingLevel: config.thinkingLevel, messages, responses, errors: errorsByResponse, ...extra }, null, 2)}\n`,
+      `${JSON.stringify({ attempt: attempt.id, op: attempt.op, promptVersion: attempt.promptVersion, model: config.ref, thinkingLevel: config.thinkingLevel, messages: messages.map(({ native: _native, ...m }) => m), responses, errors: errorsByResponse, calls, ...extra }, null, 2)}\n`,
     );
+  const callSummary = () =>
+    calls.map((c) => ({
+      startedAt: c.startedAt,
+      ms: c.ms,
+      input: c.usage.input,
+      cacheRead: c.usage.cacheRead,
+      cacheWrite: c.usage.cacheWrite,
+      output: c.usage.output,
+    }));
   try {
     const project = await store.read(projectId);
+    // Start of the project's latest model call: its sources cache entry was last used then (retention predictor).
+    let lastCallStart = project.attempts
+      .filter((a) => a.id !== attempt.id)
+      .flatMap((a) => (a.calls?.length ? a.calls.map((c) => Date.parse(c.startedAt)) : a.endedAt ? [Date.parse(a.startedAt)] : []))
+      .filter(Number.isFinite)
+      .reduce<number | undefined>((m, x) => (m === undefined || x > m ? x : m), undefined);
     const ctx = await sourceContext(store, project);
     const v = attempt.op === "analyze" ? undefined : structuredClone(deps.vocabulary ?? loadVocabulary());
     // A shelf that cannot be read only means no hub-skill question or binding; authoring itself goes on.
@@ -1294,10 +1320,12 @@ async function execute(
         : attempt.op === "revise"
           ? `${DRAFT_TASK}\n\n${REVISE_ADDENDUM}`
           : DRAFT_TASK;
-    // Same system prompt and sources first for every operation and repair of this project: a cacheable shared prefix.
+    // Same system prompt and sources block first for every operation and repair of this project: a cacheable shared prefix
+    // whose end is the cache boundary (cache.ts); the task follows as its own block.
     const messages: ChatMessage[] = [
       { role: "system", content: AUTHORING_SYSTEM },
-      { role: "user", content: `## Sources\n${ctx.text}\n\n# Task\n${task}\n\n${request.text}` },
+      { role: "user", content: `## Sources\n${ctx.text}`, cacheBoundary: true },
+      { role: "user", content: `# Task\n${task}\n\n${request.text}` },
     ];
     // A revision and a draft repair return only the top-level fields they change, laid over this base before validation.
     let base: Json | undefined = (request as { base?: Json }).base;
@@ -1309,14 +1337,25 @@ async function execute(
       draft?: ReturnType<typeof validateDraft>["draft"];
     };
     const ask = async (): Promise<Parsed> => {
-      const reply = await call(messages, config);
+      const now = Date.now();
+      const reply = await call(messages, {
+        ...config,
+        ...(lastCallStart !== undefined ? { recentGapMs: now - lastCallStart } : {}),
+      }).catch((e: Error & { call?: CallRecord }) => {
+        if (e.call) calls.push(e.call);
+        throw e;
+      });
+      lastCallStart = reply.call ? Date.parse(reply.call.startedAt) : now;
+      if (reply.call) calls.push(reply.call);
       usage = {
         input: (usage.input ?? 0) + (reply.usage?.input ?? 0),
+        cacheRead: (usage.cacheRead ?? 0) + (reply.usage?.cacheRead ?? 0),
+        cacheWrite: (usage.cacheWrite ?? 0) + (reply.usage?.cacheWrite ?? 0),
         output: (usage.output ?? 0) + (reply.usage?.output ?? 0),
         costUsd: (usage.costUsd ?? 0) + (reply.usage?.costUsd ?? 0),
       };
       responses.push({ content: reply.content, finishReason: reply.finishReason });
-      messages.push({ role: "assistant", content: reply.content });
+      messages.push({ role: "assistant", content: reply.content, ...(reply.native ? { native: reply.native } : {}) });
       const parsed = parseReply(reply.content);
       if (parsed.value && attempt.op !== "analyze") {
         const patch = parsed.value;
@@ -1383,6 +1422,7 @@ async function execute(
     await save(messages);
     return await finish(store, projectId, attempt.id, (p, a) => {
       a.usage = usage;
+      a.calls = callSummary();
       a.validationErrors = errorsByResponse;
       a.record = record;
       if (outcome === "rejected") {
@@ -1438,6 +1478,7 @@ async function execute(
     return finish(store, projectId, attempt.id, (_p, a) => {
       a.outcome = "failed";
       a.usage = usage;
+      a.calls = callSummary();
       a.validationErrors = errorsByResponse;
       a.record = record;
       a.error = `모델 호출이 실패했습니다: ${(e as Error).message}`.slice(0, 600);

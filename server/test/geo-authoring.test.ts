@@ -150,7 +150,7 @@ describe("GAID hub authoring", () => {
     ]);
     expect(context.systemPrompt).toBe("S");
     expect(context.messages).toHaveLength(1);
-    const text = String(context.messages[0].content);
+    const text = (context.messages[0].content as { text: string }[]).map((b) => b.text).join("\n\n");
     expect(text).toContain("request");
     expect(text).toContain("## Your previous reply\nbad reply");
     expect(text).toContain("## Correction request\nfix it");

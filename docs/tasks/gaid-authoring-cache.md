@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T11:39:44Z
+updated: 2026-10-24T12:11:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4c7a414c-4971-467e-bd4e-be3a24b50c1e","pid":908712,"provider":"claude","session":"a59c5297-7707-4492-9e14-c91549b87e67","start":"72988241","token":"01b6763312835def33e04b6cef6092bb6449bf54aa80b7e7776c7a4cc604157f"}
 branch: task/gaid-authoring-cache
 target: main
@@ -64,11 +64,44 @@ Constraints: do not touch the review app or the hub server. Logins: use what wor
 login instead of substituting. Outside check: the gaid-authoring-tokens baseline (same paper, same answers).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+(2026-10-24, implementation done, re-measure running; not yet committed)
+- Logins on PC74 (~/.geoaidesk/pi-agent, also the review app's /model-providers): only OpenAI Codex (legacy) works.
+  Sign in with ChatGPT is stored but not connected (stale since 10-24), no Anthropic login, no API keys. Paths without a
+  login are verified offline on Pi's real adapters' final payloads (test/geo-authoring-cache.test.ts).
+- Pi 1.0.0 verified in server/node_modules (pi-ai 1.0.0, openai SDK 7.19.0): openai-responses omits prompt_cache_* and
+  max_output_tokens for Sign in with ChatGPT; `long` → 24h only without supportsExplicitPromptCacheMode (gpt-6.1-sol has
+  it), else {ttl:"30m"}; openai-codex sends prompt_cache_key + session-id only, one WebSocket per sessionId (5 min idle),
+  previous_response_id delta only for an exact extension; Anthropic marks system block(s) + last user block (an effort
+  system message may follow); adapters need `normalizeContext` (ModelRuntime does it).
+- Probes on legacy Codex (~/data/geoaidesk/work/gaid-authoring-cache/probe/codex-{1,2}.jsonl, sources 24.9K tokens, fresh
+  nonce per sequence): S+T1 → S+T2 hits 24,704 as one string and as blocks; after a 151 s / 9.4K-token reply; after 270 s;
+  after 330 s on a new WebSocket. prompt_cache_breakpoint → "Codex error: prompt_cache_breakpoint is not supported on this
+  model". Prewarm [S] works but adds nothing here. Repair after a 9.5K reply: native history 233 uncached / 34,176 read,
+  fold 8,714 uncached / 24,704 read. So H1 (entry reusable only as whole) is false on this backend; the 10-24 analyze→draft
+  miss (identical 95,770-char prefix, draft started ~15 s after analysis ended) is not reproducible: provider side.
+- Code: cache.ts (path/plan/boundary/payload summary/raw usage), model.ts (sources block + task block, fold/native
+  history, historyFor: native on openai-codex, call records, cacheRetention, ledger cacheWrite), agent.ts (sources message
+  with cacheBoundary, usage keeps cacheRead/cacheWrite, attempt.calls + record calls, recentGapMs), ledger.ts
+  (optional cacheWrite / cacheWriteTokens; boundaries entry), contract AuthoringAttempt.usage/calls, prompts
+  (gaid-draft/2026-10-24.2: ≥2 options or drop a settled choice, recipe keyed by choice ids, workflow needs
+  decisions + userDecisions), docs/design/hub-authoring-service.md "Prompt cache", AGENTS.md line.
+- Tests: server typecheck clean; vitest test/geo-authoring* 81 passed (incl. new geo-authoring-cache.test.ts, 7).
+- First-draft data (all PC74 authoring stores, prompt versions 10-22.1 … 10-24.1): 23 draft/revise attempts, 8 passed
+  first; 13 of 15 failures only had the three errors the prompt now addresses.
 ## Next steps
-1. (the next session's first action)
+Blocked: waiting for the re-measure systemd unit gaid-cache-drive (user unit, not a task job; ~15 min, a Monitor reports its end).
+1. Re-measure running: units gaid-cache-serve (port 18733) + gaid-cache-drive, run dir
+   ~/data/geoaidesk/work/gaid-authoring-cache/run-codex (answers from gaid-authoring-tokens/after/result/answers.json).
+   Then tally.py before/after/new, stop the server unit.
+2. Report reports/2026-10-24-gaid-authoring-cache/index.md (Korean, result first, humanizer), scripts/check, task finish.
 ## Failed approaches
+- H1 "an implicit entry is reusable only by a request that contains the whole earlier input" — refuted by probes (above).
+- Explicit prompt_cache_breakpoint on the legacy Codex backend — refused by the backend.
 ## Notes and decisions
+- Orchestration: tightly coupled (model.ts/agent.ts/prompts.ts/ledger.ts + measurement), done by this writer; no child
+  units. Owned upstream seam: server/src/cost/ledger.ts (optional cacheWrite) — added to geo/integration-boundaries.json.
+- Logins: same as gaid-authoring-tokens (user decision there): KADY_PI_AGENT_DIR=~/.geoaidesk/pi-agent read through Pi,
+  all stores under ~/data/geoaidesk/work/gaid-authoring-cache/. Its Sign in with ChatGPT login was stale on 10-24.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

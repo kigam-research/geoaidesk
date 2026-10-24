@@ -479,7 +479,10 @@ export interface AuthoringAttempt {
   outcome: AttemptOutcome;
   /** Validation errors of each response, in order (first response, then the repair). */
   validationErrors: string[][];
-  usage?: { input?: number; output?: number; costUsd?: number };
+  /** Summed over the attempt's calls; `input` excludes cache reads and writes (whole input = input + cacheRead + cacheWrite). */
+  usage?: { input?: number; cacheRead?: number; cacheWrite?: number; output?: number; costUsd?: number };
+  /** Each model call of the attempt (first response, then the repair); the record file holds the full call records. */
+  calls?: { startedAt: string; ms: number; input: number; cacheRead: number; cacheWrite: number; output: number }[];
   /** File under the project's attempts/ folder with the request and raw responses (no hidden reasoning). */
   record?: string;
   /** Researcher-readable failure sentence (Korean); technical detail stays in `record`. */
