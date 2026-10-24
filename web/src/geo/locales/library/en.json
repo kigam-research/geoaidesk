@@ -450,5 +450,26 @@
     "failed": "Could not read the library, so the PDF of @{key} did not open. Press it again.",
     "closeHint": "Close the PDF (Esc)",
     "closeNoteHint": "Return to the research note (Esc)"
+  },
+  "panel": {
+    "title": "Library",
+    "scope": "Literature scope",
+    "project": "Project papers {count}",
+    "all": "All library",
+    "search": "Search by title or author",
+    "loading": "Loading papers.",
+    "failed": "Could not read the papers. Try again.",
+    "retry": "Reload papers",
+    "noMatch": "No papers match.",
+    "emptyProject": "No papers are attached. Choose papers from the full library.",
+    "empty": "The library has no papers.",
+    "openPdf": "Open PDF page {page}",
+    "noPdf": "No stored PDF",
+    "attach": "Add to project",
+    "attaching": "Adding to project",
+    "attached": "Added to project",
+    "attachFailed": "Could not add the paper. Try again.",
+    "fullScreen": "Full library",
+    "more": "Show more papers"
   }
 }

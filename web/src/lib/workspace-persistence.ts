@@ -26,7 +26,7 @@ const MAX_TABS = 10;
 const MAX_QUEUE = 5;
 
 export type WorkspaceScreen = "projects" | "workspace";
-export type WorkspaceView = "chat" | "workflows";
+export type WorkspaceView = "chat" | "workflows" | "library";
 
 export interface PromptDraftAttachment {
   id: string;
@@ -366,7 +366,7 @@ function sanitizeStoredProject(value: unknown): StoredProjectState | null {
   return {
     tabs,
     activeTabId,
-    view: value.view === "workflows" ? "workflows" : "chat",
+    view: value.view === "workflows" || value.view === "library" ? value.view : "chat",
     showNotebook,
     showCompute: !showNotebook && value.showCompute === true,
     showAutomation: !showNotebook && value.showCompute !== true && value.showAutomation === true,

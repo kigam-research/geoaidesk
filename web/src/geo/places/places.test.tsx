@@ -11,7 +11,7 @@ import type { Project } from "@/lib/projects";
 
 import { parseLibraryHash } from "./library-location";
 import { OPEN_LIBRARY_EVENT, takeWorkspaceOpen } from "./navigation";
-import { WorkspaceHome } from "./workspace-home";
+import { recentTitle, WorkspaceHome } from "./workspace-home";
 
 const HOME: WorkspaceHomeResponse = {
   schemaVersion: "gaid-workspace-home/v1",
@@ -98,6 +98,12 @@ describe("Workspace home", () => {
     expect(screen.getByText("프로젝트 1곳을 읽지 못해 목록에서 빠졌습니다.")).toBeInTheDocument();
     // Archived projects are counted in the sidebar, not listed among recent projects.
     expect(screen.getByRole("button", { name: /보관한 프로젝트/ })).toBeInTheDocument();
+  });
+
+  it("titles a Workflow chat by its request", () => {
+    const entry = { ...HOME.recent[0], title: "Workflow · 포천 자철석 광체 추정 — 이 설정으로 실행해 주세요." };
+    expect(recentTitle(entry)).toBe("이 설정으로 실행해 주세요.");
+    expect(recentTitle({ ...entry, workflow: null })).toBe(entry.title);
   });
 
   it("opens a recent chat in its project", async () => {

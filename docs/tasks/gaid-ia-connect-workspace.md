@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T06:53:07Z
+status: done
+updated: 2026-10-24T12:12:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"49e229f5-e223-4c4b-a51f-f69c6338d534","pid":470090,"provider":"claude","session":"1fed3167-fbe4-42c0-a6c3-57caef2f6f2a","start":"70915334","token":"13d0611975a16df25fac763a23c5ed15b1bf5ceff296277f35904f28695964ae"}
 branch: task/gaid-ia-connect-workspace
 target: main
@@ -78,10 +78,18 @@ Outside check: none.
   writes `#connect/<draft>` + its test expectation (copy child edits that test).
 - Live check app: `~/data/geoaidesk/work/gaid-ia-connect-workspace/app/run.sh` (backend 18100, UI 3220, isolated data);
   verified Workspace home, 서재 open/back, Connect switch, old `#hub/feeds` link.
+- Children integrated and closed 2026-10-24: copy-rename (90dd72b4), home-summary (52492ea2), library-panels (cdfa4c63);
+  each passed its own scripts/check (load timeouts on this PC resolved with VITEST_MAX_WORKERS=1 and a task-owned TMPDIR,
+  no source workaround; library-panels fixed one owned selection race). After integration: hub-handoff writes
+  `#connect/<draft>`; Workspace home shows only confirmed 준비됨, Workflow chats titled by request, 5 recent rows;
+  AGENTS.md "Places" entry gained code pointers. Real-app captures (copied review data, no credentials) in
+  `~/data/geoaidesk/work/gaid-ia-connect-workspace/shots/p2/final/` (40 PNG + SHA256SUMS); report §3.1, §4, §5 updated,
+  phase-2 figures 10–16, copy inventory `reports/2026-10-24-gaid-ia-connect-workspace/copy-changes.md`.
+- Not done here by design: review app update (hub deploys after integration; user instruction "Do not touch the review app").
 ## Next steps
-1. P1 shell work in this worktree (Orchestration) — done; integrate children as their finishes arrive.
-Blocked: the three children are `ready` and their task finish is still running scripts/check; `task complete` refuses until each finish records completion. When a child's finish arrives: `task complete <child>`, then `task sync`.
-2. After all three: integrate, scripts/check, screenshots (계측/도폭 × light/dark, 1440×900 + 1280×800), report phase-2 section.
+<!-- task:closed -->
+Closed 2026-10-24T12:12:17Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Orchestration
 - Sequential: (1) place names, app-bar structure and 서재 entry (decided by the user, drawn here); (2) user approval of the
   mockups; (3) phase 2 implementation.

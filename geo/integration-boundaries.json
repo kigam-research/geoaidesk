@@ -28,6 +28,12 @@
       "responsibility": "testTimeout 20 s and testing-library asyncUtilTimeout 5 s so lazy panels under PC load do not fail unrelated tests; drop if upstream raises them"
     },
     {
+      "path": "server/test/geo-workspace-home.test.ts",
+      "owner": "gaid-ia-connect-workspace",
+      "status": "added",
+      "responsibility": "Read-only cross-project Workspace home summary: session activity, notes, installed and used Workflows, bounded discovery and project-independent routing"
+    },
+    {
       "path": "web/src/components/project-view.test.tsx",
       "owner": "gaid-hub",
       "status": "edited",
@@ -1099,6 +1105,12 @@
       "owner": "gaid-cite-open-pdf",
       "status": "edited",
       "responsibility": "서재 citations open their PDF page: MessageResponse gains an opt-in `libraryCitations` prop (rehype pass `libraryCitationLinks` after harden, `button` mapped to `CitationButton`, web/src/geo/library/citation-links.tsx); chat assistant text turns it on; the workspace provides `CitationPdfContext` and shows `CitationPdfPane` as a column between the preview and the chat."
+    },
+    {
+      "path": "web/src/app/page.tsx, web/src/components/chat-tabs-bar.tsx, web/src/lib/workspace-persistence.ts, web/src/lib/workspace-persistence.test.ts",
+      "owner": "gaid-ia-connect-workspace",
+      "status": "edited",
+      "responsibility": "Project library inspector, explicit switch beside Workflows, and persistence of its library view."
     }
   ],
   "notTouched": [
