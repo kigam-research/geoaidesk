@@ -20,7 +20,7 @@ def main():
     args=ap.parse_args()
     root=args.root.expanduser()
     edit=json.loads((root/'edit.json').read_text())
-    manifest={'schema':'gaid-promo-capture-v2','fps':10,'width':2880,'height':1620,
+    manifest={'schema':'gaid-promo-capture-v2','fps':30,'width':2880,'height':1620,
         'css':{'width':1280,'height':720,'scale':2.25},'app':edit['app'],'shots':[],'stills':[]}
     checks=[]
     for shot in edit['shots']:

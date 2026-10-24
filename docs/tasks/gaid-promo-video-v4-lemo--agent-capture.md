@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:43:30Z
+updated: 2026-10-24T05:47:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
@@ -65,6 +65,8 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - If something needs the user (credentials, a decision), write it as an open item in your task document and finish; do not block.
 
 ## Current state
+- Export job 3 is running after the timestamp-order fix, pinned at bace939c7e78. AG1/AG2 PNGs and contacts are present and visually checked. The only remaining work depends on this recorded job: full-run/result exports, audit, final visual QA and task finish.
+- Controller job 1 exited 0 and port 18349 is inactive. Its log retains the already-resolved UI-staging exception; both actual runs completed and no third run was sent. Export job 2 exited 1 at the native timestamp-order assertion; this is fixed for job 3.
 - Capture is closed. The retake completed in 623.05 s wall time (122.692 s reported pipeline/validation processes), including a packaging hash-path repair without numerical rerun. This is 23 s beyond the nominal ~10-minute target.
 - Selected same-run shots are AG1 5.5 s, AG2 65 s sampled at 10 fps from a genuine 12.755 fps source interval, AG2-whole 623 s sampled at 2 fps, and AG3 6 s. AG3 opens pgi_live_retake/outputs/orebody_3d.png through the real file tree. No internal cut in any selected take.
 - Chrome 156.0.8078.47 closed; Korean/light/instrument preferences read back; pageerror count 0. Final PNG export and artifact checks remain.
@@ -74,8 +76,9 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - Resumed in the assigned worktree. Review app is accessible on loopback without a token gate. Deployed checkout HEAD reads 4e198c762b9bde20ca23b1f3223243fb2af16ab0.
 - No app/model/service settings changed. Inspector Chrome was closed before starting the capture browser.
 ## Next steps
-1. Benchmark live capture cadence, stage the installed example Workflow, then record one complete run.
-2. Verify frame timing, pointer containment, figures and cut provenance; deliver external payload and finish.
+1. Wait for recorded export job 3 to exit (receipt in Running jobs; no periodic polling). If it succeeds, set capture.json's legacy top-level fps to 30 to match the final export.py; per-shot fps stays 30/10/2/30. Job 3 was pinned before this metadata-only default changed.
+2. Run `uv run --no-project python geo/promo-lemo/capture/audit.py`. Inspect contact-AG2-whole.jpg, contact-AG3.jpg and every remaining beat image. AG1 and AG2 contacts plus their first beat are already visually checked; verify AG3 pointer rectangles and original new image opening.
+3. Confirm verification.json/README.md/frame-checks.json and 2241 PNG frames exist under the external capture-v6 payload. Update Current state with final self-contained handoff and source/capture manifest hashes, then run task finish. No further analysis or review-app operation is authorized or needed.
 ## Failed approaches
 - Export job 2 failed its chronological-arrival assertion on AG2-whole. Direct inspection found 25 native frame deliveries out of presentation-time order, with unique timestamps and small delays during concurrent readbacks. Export now sorts by the native presentation timestamp while retaining original arrival frame IDs. No source image, time interval or UI content is changed.
 - Native view scale also scales CDP input coordinates. A normal Playwright click hit the header rather than Workflow during retake staging. Direct hit testing confirmed the 2.25 coordinate factor; staging now resets native scale, and filmed pointer events multiply only dispatched coordinates while logging CSS coordinates. No second analysis was sent during that failed staging attempt.
@@ -104,6 +107,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--agent-capture-20261024T051313.832789Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--agent-capture-20261024T054028.627085Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--agent-capture-20261024T054434.323462Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
