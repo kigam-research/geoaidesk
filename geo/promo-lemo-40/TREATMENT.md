@@ -70,7 +70,7 @@ expand/collapse (windows into nodes, the GAID window into the dot, rings into th
 | 6.2 → 10.5 | 스킬과 도구는 흩어져 있습니다 | 3.9 s |
 | 11.0 → 15.0 | GAID가 한곳에 모읍니다 | 3.6 s |
 | 15.8 → 29.3 | legend: GAID 허브 · 논문·문헌·연구노트로 Workflow를 만들고 공유하는 공간 / GAID 시스템 · Workflow를 설치하고 AI agent와 분석하는 연구 프레임워크 / 내 서재 · 연구자 개인의 문헌 관리 공간 | legend, bottom |
-| 17.2, 19.2, 21.2, 23.2, 25.2, 27.2 → 30.5+ | 내 문헌에서 시작합니다 / 논문 속 방법을 Workflow로 / 공유하고 고쳐 다음 version으로 / 설치한 Workflow로 AI agent와 분석 / 결과와 판단은 연구노트에 / 연구노트도 내 서재로 | station rows, left |
+| 17.2, 19.2, 21.2, 23.2, 25.2, 27.2 → 30.5+ | 내 문헌에서 시작합니다 / 논문 속 방법을 Workflow로 / 공유하고 고쳐 다음 version으로 / 설치한 Workflow로 AI agent와 분석 / 결과와 판단은 연구노트에 / 연구노트도 내 서재로 | station rows above each side's window |
 | 30.4 → 35.6 | 연구 고리가 모여 KIGAM Second brain이 됩니다 | 5.0 s |
 | 36.4 → 42.0 | GAID lockup · 지구과학 연구자를 위한 AI agent 연구 지원 플랫폼 · 내부 검토용 영상 | 5.6 s |
 
@@ -143,9 +143,11 @@ Four of six differ outright; the press-and-freeze beat and the 120 BPM grid are 
   window; two headlines were held longer.
 - Review pass 2 (full preview, 0.2 s strips): frame 0 already shows a window landing; a faint plan of the ring shows
   while the dot flies in (no near-empty frames); the end-card glint stays on the mark's pixels.
-- Round 2 (user feedback 2026-10-24, forwarded by the parent): the ring now turns like a dial so the active station
-  always sits at 3 o'clock beside its window (the hairline is short and never crosses the ring); the GAID mark sits at the
-  ring's centre (one platform). Copy follows the parent's shared wording: GAID 허브 = 논문·문헌·연구노트로 Workflow를 만들고
+- Round 2 (user feedback 2026-10-24, forwarded by the parent): the ring stays centred and each station opens its window
+  on its own side (내 서재 and Workflow on the left, GAID 허브, 연구 분석 and 연구노트 on the right); a window unfolds from
+  its edge nearest the station and the hairline runs outward from the node, so nothing crosses the ring. An intermediate
+  dial version (the ring turned so the active station faced one right-hand window) was rejected by the user: it kept the
+  window on one side. Each side lists its stations above its window. The GAID mark sits at the ring's centre (one platform). Copy follows the parent's shared wording: GAID 허브 = 논문·문헌·연구노트로 Workflow를 만들고
   공유하는 공간, GAID 시스템 = Workflow를 설치하고 AI agent와 분석하는 연구 프레임워크, 내 서재 = 연구자 개인의 문헌 관리 공간
   (a personal node, not GAID 시스템's main function). Colours: GAID 허브 #3366e8, GAID 시스템 #7fa2ff, 내 서재 ink; no grey
   for either part. The windows carry no highlight boxes, so the pointer-track rule does not apply.

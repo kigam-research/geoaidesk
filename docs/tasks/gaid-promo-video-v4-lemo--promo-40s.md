@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T05:19:13Z
+status: active
+updated: 2026-10-24T05:28:50Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"24b0e76b-628b-401e-adf8-0eca667720c5","pid":1060493,"provider":"claude","session":"23acab05-738d-4eb4-a516-d0f306fbf009","start":"69353657","token":"58b40e34279b58109446810b4fe4e2083e762187fbfcd1e612e152007331cea0"}
 branch: task/gaid-promo-video-v4-lemo--promo-40s
 target: task/gaid-promo-video-v4-lemo
@@ -96,10 +96,13 @@ Do not edit geo/promo/ or geo/promo-lemo/. No review app, no outside publication
   figures/40s-{1-scatter,2-cycle,3-brain,4-end}.png. Humanizer not run on it; the parent runs it before review-copy.
 - Checks: no automated checks for the film sources; scripts/check unchanged and not run.
 ## Next steps
-<!-- task:closed -->
-Closed 2026-10-24T05:19:13Z: ready; the parent gaid-promo-video-v4-lemo integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+1. Round 3 (user, 2026-10-24, this tab: "왼쪽 고리에 있는 것은 왼쪽에 창이 만들어지고 오른쪽 고리에 있는 것은 오른쪽에
+   만들어지는 방식"): fixed ring, windows on each station's side, done in scene/film.js. Re-render with a job, update
+   section-40s.md numbers and figures, task finish, then verify origin/task/gaid-promo-video-v4-lemo--promo-40s moved.
 
 ## Failed approaches
+- Round 2 dial ring (job -2, sha256 95701356…): the ring turned so the active station faced one right-hand window. The
+  line no longer crossed the ring, but the user wanted each window on its station's side; replaced in round 3.
 ## Notes and decisions
 - Structure: one orbit (the AI agent's dot) instead of the parent's disorder→grid arc, so the 40 s cut differs from the
   103 s cut. Demo comparison: TREATMENT.md §10 (4 of 6 differ outright).

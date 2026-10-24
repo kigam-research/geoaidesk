@@ -155,7 +155,7 @@
     q.fillStyle = rg; q.fillRect(0, 0, 128, 128);
   }
 
-  const RC = { x: 790, y: 545 }, R = 210;
+  const RC = { x: 960, y: 527 }, R = 190;
   const zPull = monotone([[30, 0], [31, Math.log(0.68)], [32, Math.log(0.47)], [33, Math.log(0.34)], [34, Math.log(0.26)], [35, Math.log(0.22)]]);
   const lateral = () => [0, 0]; // the dial turns instead of the camera leaning
   function camAt(t) {
@@ -443,8 +443,8 @@
 
   // ---------- section E: the ring and its stations ----------
   // One platform: GAID 허브 (make and share Workflows) + GAID 시스템 (install them and analyse with an AI agent), with
-  // 내 서재 as the researcher's own literature space. The ring turns like a dial so the active station always faces its
-  // window on the right: the hairline to the window never crosses the ring.
+  // 내 서재 as the researcher's own literature space. The ring stays centred; each station opens its window on its own
+  // side (left stations left, right stations right), so the short hairline to the window never crosses the ring.
   const PART = {
     hub: { name: 'GAID 허브', color: C.sig, desc: '논문·문헌·연구노트로 Workflow를 만들고 공유하는 공간' },
     sys: { name: 'GAID 시스템', color: C.sigInk, desc: 'Workflow를 설치하고 AI agent와 분석하는 연구 프레임워크' },
@@ -457,7 +457,8 @@
     { name: '연구 분석', icon: 'message-square-text', part: 'sys' },
     { name: '연구노트', icon: 'notebook-pen', part: 'sys' },
   ];
-  const ST_ANG = [162, 234, 306, 378, 450];
+  const ST_ANG = [180, 240, 300, 360, 450];
+  const ST_SIDE = ['L', 'L', 'R', 'R', 'R'];
   const LEGS = [
     { st: 0, cap: '내 문헌에서 시작합니다', take: 'lib' },
     { st: 1, cap: '논문 속 방법을 Workflow로', take: 'wf' },
@@ -465,8 +466,9 @@
     { st: 3, cap: '설치한 Workflow로 AI agent와 분석', take: 'run' },
     { st: 4, cap: '결과와 판단은 연구노트에', take: 'note' },
     { st: 0, cap: '연구노트도 내 서재로', take: 'back' },
-  ].map((l, k) => ({ ...l, k, t: T.cycle + 2 * k, ang: k === 5 ? 522 : ST_ANG[l.st] }));
-  const WR = { x: 1100, y: 307, w: 776, h: 476 };
+  ].map((l, k) => ({ ...l, k, t: T.cycle + 2 * k, ang: k === 5 ? 540 : ST_ANG[l.st], side: ST_SIDE[l.st] }));
+  const WRS = { L: { x: 64, y: 330, w: 660, h: 409 }, R: { x: 1196, y: 330, w: 660, h: 409 } };
+  { const col = { L: 0, R: 0 }; for (const lg of LEGS) lg.row = col[lg.side]++; }
   for (const lg of LEGS) {
     lg.o0 = lg.t - 0.05; lg.c0 = lg.k === 5 ? 29.0 : lg.t + 1.85;
     if (lg.k > 0) ev(lg.t - 0.5, 'move', { k: lg.k });
@@ -483,10 +485,10 @@
   function stationPos(angDeg) { const a = rad(angDeg); return { x: RC.x + R * Math.cos(a), y: RC.y + R * Math.sin(a) }; }
   function dotAngle(t) { // ring-local angle of the AI agent's dot
     if (t < T.ringDraw) return ST_ANG[0];
-    if (t < T.ringDraw + 1.25) return 162 + 360 * (t - T.ringDraw) / 1.25;
-    if (t < T.cycle + 0.5) return 522;
+    if (t < T.ringDraw + 1.25) return 180 + 360 * (t - T.ringDraw) / 1.25;
+    if (t < T.cycle + 0.5) return 540;
     if (t < 29.0) {
-      let a = 162;
+      let a = 180;
       for (let k = 1; k < LEGS.length; k++) {
         const u = inOut(seg(t, LEGS[k].t - 0.5, LEGS[k].t));
         a = lerp(a, LEGS[k].ang, u);
@@ -494,19 +496,15 @@
       }
       return a;
     }
-    if (t < T.lap) return 522;
-    if (t < T.lap + 0.625) return 522 + 360 * (t - T.lap) / 0.625;
-    return 882 + 180 * (t - (T.lap + 0.625));
+    if (t < T.lap) return 540;
+    if (t < T.lap + 0.625) return 540 + 360 * (t - T.lap) / 0.625;
+    return 900 + 180 * (t - (T.lap + 0.625));
   }
-  function ringRot(t) { // the dial: keeps the active station (and the dot) at 3 o'clock until the lap ends
-    if (t < T.ringDraw + 1.25) return -162;
-    if (t < T.lap + 0.625) return -dotAngle(t);
-    return -882;
-  }
+  const ringRot = () => 0; // the ring stays put; windows open on each station's side
   const worldPos = (ang, t) => stationPos(ang + ringRot(t));
-  function visitedAng(t) { // how far the cycle has gone, degrees from 162 (ring-local)
+  function visitedAng(t) { // how far the cycle has gone, degrees from 180 (ring-local)
     if (t < T.cycle) return 0;
-    if (t < 29.0) return dotAngle(t) - 162;
+    if (t < 29.0) return dotAngle(t) - 180;
     return 360;
   }
   function arcStroke(cx, cy, r, a0, a1, style, lw) { if (a1 <= a0) return; ctx.save(); ctx.lineWidth = lw; ctx.strokeStyle = style; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, r, rad(a0), rad(a1)); ctx.stroke(); ctx.restore(); }
@@ -519,8 +517,8 @@
     for (const ang of ST_ANG) { const p = worldPos(ang, t); ctx.beginPath(); ctx.arc(p.x, p.y, 30, 0, 2 * Math.PI); ctx.stroke(); }
     ctx.restore();
   }
-  // ring-local arcs: 내 서재 around 162, GAID 허브 over Workflow and 허브, GAID 시스템 over 분석 and 연구노트
-  const ARCS = [[162, 198, 'me'], [198, 342, 'hub'], [342, 486, 'sys'], [486, 522, 'me']];
+  // ring-local arcs: 내 서재 around 180, GAID 허브 over Workflow and 허브, GAID 시스템 over 분석 and 연구노트
+  const ARCS = [[180, 210, 'me'], [210, 330, 'hub'], [330, 510, 'sys'], [510, 540, 'me']];
   function drawRing(t, c, layer) {
     if (layer === 'arcs') drawGhostPlan(t);
     if (t < T.ring || t > T.end + 0.05) return;
@@ -528,13 +526,13 @@
     const lw = 1.6 / Math.max(c.z, 0.2) * Math.max(c.z, 0.45);
     const drawn = t < T.ringDraw ? 0 : Math.min(360, 360 * (t - T.ringDraw) / 1.25);
     if (drawn <= 0) return;
-    const rot = ringRot(t), va = visitedAng(t), head = 162 + drawn;
+    const rot = ringRot(t), va = visitedAng(t), head = 180 + drawn;
     for (const [a0, a1, part] of ARCS) {
-      const s = a0 + (a0 === 162 ? 0 : 2.5), e = Math.min(a1 - (a1 === 522 ? 0 : 2.5), head);
+      const s = a0 + (a0 === 180 ? 0 : 2.5), e = Math.min(a1 - (a1 === 540 ? 0 : 2.5), head);
       if (e <= s) continue;
       const col = PART[part].color, w = (part === 'me' ? 2.0 : 2.8) * lw;
       arcStroke(RC.x, RC.y, R, s + rot, e + rot, rgba(col, t > 29 ? 0.85 : 0.38), w);
-      const ve = Math.min(e, 162 + va);
+      const ve = Math.min(e, 180 + va);
       if (ve > s) arcStroke(RC.x, RC.y, R, s + rot, ve + rot, rgba(col, 0.95), w * 1.25);
     }
     if (drawn < 360) arcStroke(RC.x, RC.y, R, head - 40 + rot, head + rot, 'rgba(127,162,255,0.9)', 3 * lw);
@@ -588,32 +586,34 @@
     }
     dot(p.x, p.y, r);
   }
-  function drawRows(t) { // HUD: the stations as the cycle reaches them
+  function drawRows(t) { // HUD: each side lists its stations above its window, as the cycle reaches them
     if (t < T.cycle || t > 31.1) return;
     LEGS.forEach((lg, k) => {
       const a0 = lg.t + 0.15, ra = 30.45 + 0.0625 * k;
       const a = out3(seg(t, a0, a0 + 0.2)) * (1 - out3(seg(t, ra, ra + 0.15)));
       if (a <= 0) return;
-      const dx = -24 * (1 - out3(seg(t, a0, a0 + 0.2))) - 30 * out3(seg(t, ra, ra + 0.15));
-      const y = 240 + 84 * k, x = 112 + dx, col = PART[ST[lg.st].part].color;
+      const dy = 14 * (1 - out3(seg(t, a0, a0 + 0.2))) + 14 * out3(seg(t, ra, ra + 0.15));
+      const W0 = WRS[lg.side], x = W0.x + 18, y = 132 + 64 * lg.row + dy, col = PART[ST[lg.st].part].color;
       const active = t >= lg.t - 0.05 && t < (k === 5 ? 29.0 : lg.t + 1.95);
       const keep = t < ra;
-      ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x - 18, y - 10, 5, 0, 7); ctx.fill();
-      if (active) glow(x - 18, y - 10, 26, 0.7);
+      ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x - 18, y - 9, 5, 0, 7); ctx.fill();
+      if (active) glow(x - 18, y - 9, 26, 0.7);
       ctx.restore();
-      text(keep ? `row-${k}-t` : null, ST[lg.st].name, x, y, { size: 28, weight: 700, color: active ? C.ink : C.ink2, alpha: a });
-      text(keep ? `row-${k}-c` : null, lg.cap, x, y + 34, { size: 24, weight: 500, color: active ? C.ink2 : C.ink3, alpha: a });
+      const nw = text(keep ? `row-${k}-t` : null, ST[lg.st].name, x, y, { size: 26, weight: 700, color: active ? C.ink : C.ink2, alpha: a });
+      text(keep ? `row-${k}-c` : null, lg.cap, x + nw + 16, y, { size: 22, weight: 500, color: active ? C.ink2 : C.ink3, alpha: a });
     });
   }
   function takeIndex(lg, t) { const tk = TAKES[lg.take]; if (!tk) return -1; return clamp(Math.floor((t - lg.o0) * FPS), 0, tk.n - 1); }
   function windowRect(lg, t, c) {
     const w = worldPos(lg.ang, t), p = toScreen(c, w.x, w.y);
-    const node = { x: p.x - 30, y: p.y - 30, w: 60, h: 60 };
+    const WR0 = WRS[lg.side], inner = lg.side === 'L' ? WR0.x + WR0.w : WR0.x, ay = clamp(p.y, WR0.y + 52, WR0.y + WR0.h - 18);
+    const node = { x: inner, y: ay - 30, w: 0, h: 60 }; // the window unfolds from its edge nearest the station, outside the ring
     let e;
     if (t < lg.c0) e = back(seg(t, lg.o0, lg.o0 + 0.25), 1.15);
     else e = 1 - inC(seg(t, lg.c0, lg.c0 + 0.2));
     if (t < lg.o0 || e <= 0.002) return null;
-    return { x: lerp(node.x, WR.x, e), y: lerp(node.y, WR.y, e), w: lerp(node.w, WR.w, e), h: lerp(node.h, WR.h, e), e, p };
+    const WR = WR0;
+    return { x: lerp(node.x, WR.x, e), y: lerp(node.y, WR.y, e), w: lerp(node.w, WR.w, e), h: lerp(node.h, WR.h, e), e, p, WR };
   }
   function drawWindows(t, c) {
     if (t < T.cycle - 0.1 || t > 29.3) return;
@@ -623,15 +623,15 @@
       const r = windowRect(lg, t, c); if (!r) continue;
       const la = t < lg.c0 ? seg(t, lg.o0 + 0.1, lg.o0 + 0.3) : 1 - seg(t, lg.c0, lg.c0 + 0.08);
       const col = PART[ST[lg.st].part].color;
-      if (la > 0) { // short hairline from the station (at 3 o'clock) to its window, outside the ring
-        const p = r.p, ex = r.x, ey = r.y + r.h / 2;
+      if (la > 0) { // short horizontal hairline from the station outward to the near edge of its window
+        const p = r.p, left = lg.side === 'L', ex = left ? r.x + r.w : r.x, ey = clamp(p.y, r.y + 52, r.y + r.h - 18);
         ctx.save(); ctx.globalAlpha = la; ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(col, 0.6);
-        ctx.beginPath(); ctx.moveTo(p.x + 36, p.y); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(p.x + (left ? -34 : 34), p.y); ctx.lineTo(ex, ey); ctx.stroke();
         ctx.fillStyle = col; ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, 7); ctx.fill(); ctx.restore();
       }
       ctx.save();
       panel(r.x, r.y, r.w, r.h, 14 * clamp(r.e), 1, { blur: 50, sy: 20 });
-      const tb = 40 * clamp(r.h / WR.h);
+      const tb = 38 * clamp(r.h / r.WR.h);
       ctx.save(); rr(r.x, r.y, r.w, r.h, 14); ctx.clip();
       ctx.fillStyle = C.chrome; ctx.fillRect(r.x, r.y, r.w, tb);
       const im = takeFrame(lg.take, takeIndex(lg, t));
