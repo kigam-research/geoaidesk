@@ -1542,7 +1542,7 @@ export const AssistantMessageBody = memo(function AssistantMessageBody({
       replyWorkflowScript = workflowScriptsIn(segment.content).at(-1) ?? replyWorkflowScript;
       if (segment.content) {
         orderedBlocks.push(
-          <MessageResponse key={`text-${index}`} onOpenFile={onOpenFile}>{segment.content}</MessageResponse>,
+          <MessageResponse key={`text-${index}`} onOpenFile={onOpenFile} libraryCitations>{segment.content}</MessageResponse>,
         );
       }
       continue;

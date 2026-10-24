@@ -37,7 +37,10 @@ import type { OrcidStatus } from "@/geo/contracts/orcid";
 import { LibrarySyncLine } from "./sync-line";
 import { PaperMapEntry } from "./paper-map-entry";
 import { PdfPane } from "@/geo/pdf/pdf-pane";
+import { CitationPdfContext } from "./citation-links";
+import { CitationPdfPane, useCitationPdf } from "./citation-pdf";
 
+const PANE_CLASS = "sticky top-6 h-[calc(100dvh-9rem)] min-h-[480px] min-w-[560px] flex-[62] self-start";
 const L = (key: string, values?: Record<string, unknown>) => t(`library.${key}`, values as never);
 const PILL = "inline-flex items-center rounded-full border px-2 py-px text-xs font-medium whitespace-nowrap";
 // Source is provenance, not status: both stay neutral (guide v2 I2, S3); read coverage is the row's one status mark (S2).
@@ -99,6 +102,13 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   // After the pane closes, that paper's "PDF 열기" button takes focus back (A2).
   const [refocusPdf, setRefocusPdf] = useState<string | null>(null);
   const reading = pdf && pdf.id === selected ? pdf : null;
+  // gaid-cite-open-pdf: a citation pressed in a note's text opens the cited paper's PDF in the same pane, while that note
+  // stays selected; closing returns to the note.
+  const citation = useCitationPdf();
+  const [citeFrom, setCiteFrom] = useState<string | null>(null);
+  const citing = !reading && citation.pdf && citeFrom === selected ? citation.pdf : null;
+  const paneOpen = Boolean(reading || citing);
+  const citationOpener = useMemo(() => ({ open: (c: { key: string; locator?: string }) => { setCiteFrom(selected); return citation.open(c); } }), [selected, citation.open]);
   const selectRow = (row: { id: string; title: string; storedPdf?: boolean }) => {
     setSelected(row.id);
     setPdf(reading && row.storedPdf ? { id: row.id, title: row.title } : null);
@@ -173,15 +183,16 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   if (counts && !notes && (counts.mine > 0 || orcid?.profile || filter === "mine")) chips.splice(1, 0, { id: "mine", label: L("filter.mine", { n: counts.mine }) });
 
   return (
+    <CitationPdfContext.Provider value={citationOpener}>
     <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-4 py-6 sm:px-6">
       <FolderTree collections={collections} counts={data?.folderCounts ?? {}} total={(notes ? counts?.notes : counts?.all) ?? 0} allLabel={notes ? L("notes.allFolder") : undefined} selected={folderId}
         onSelect={(id) => { setFolderId(id); setSelected(null); }} onCreate={() => setNaming({ mode: "create" })} onDropItem={(f, item) => void addToFolder(f, item)} />
-      <section className={cn("flex min-w-0 flex-col gap-3", reading ? "flex-[38]" : "flex-1")} aria-label={L("screen.title")}>
+      <section className={cn("flex min-w-0 flex-col gap-3", paneOpen ? "flex-[38]" : "flex-1")} aria-label={L("screen.title")}>
         {/* Title first, top-leading, at the 내 연구 page-title size; the hub sync state is the one context line under it (L4, T1, W6). */}
         <div className="flex items-center justify-between gap-3">
           <h1 className="min-w-0 truncate text-2xl font-bold" title={folder ? folderPath(collections, folder.id) : undefined}>{folder ? folderPath(collections, folder.id) : L("screen.title")}</h1>
           <div className="flex items-center gap-3">
-            {!notes && !reading && <span className="text-xs text-muted-foreground">{zoteroLine}</span>}
+            {!notes && !paneOpen && <span className="text-xs text-muted-foreground">{zoteroLine}</span>}
             {notes ? (
               <Button onClick={() => setAddingNotes(true)}><NotebookTextIcon data-icon="inline-start" />{L("notes.add.button")}</Button>
             ) : (<>
@@ -233,7 +244,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
         ) : notes ? (
           <>
             <p className="text-xs text-muted-foreground">{folder ? L("notes.stateFolder", { shown: data.total, total: data.folderCounts[folder.id] ?? 0 }) : L("notes.state", { shown: data.total, total: data.counts.notes })}</p>
-            <div className="min-h-0 flex-1 overflow-auto"><NoteTable rows={data.items} selected={selected} onSelect={setSelected} /></div>
+            <div className="min-h-0 flex-1 overflow-auto"><NoteTable rows={data.items} selected={selected} onSelect={setSelected} compact={paneOpen} /></div>
           </>
         ) : data.counts.all === 0 ? (
           <div className="flex flex-col items-start gap-3 py-8">
@@ -247,9 +258,9 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
               <table className="w-full border-collapse text-sm">
                 <thead className="sticky top-0 bg-background">
                   <tr className="border-b text-left text-xs text-muted-foreground">
-                    <th className={cn("px-2 py-2 font-medium", !reading && "w-[52%]")}>{L("table.paper")}</th>
+                    <th className={cn("px-2 py-2 font-medium", !paneOpen && "w-[52%]")}>{L("table.paper")}</th>
                     <th className="px-2 py-2 text-right font-medium">{L("table.year")}</th>
-                    {!reading && <>
+                    {!paneOpen && <>
                     <th className="px-2 py-2 font-medium">{L("table.source")}</th>
                     <th className="px-2 py-2 font-medium">{L("table.read")}</th>
                     <th className="px-2 py-2 font-medium">{L("table.used")}</th>
@@ -258,7 +269,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
                 </thead>
                 <tbody>
                   {data.items.length === 0 && (
-                    <tr><td colSpan={reading ? 2 : 5} className="px-2 py-6 text-muted-foreground">{L("screen.noMatch")}</td></tr>
+                    <tr><td colSpan={paneOpen ? 2 : 5} className="px-2 py-6 text-muted-foreground">{L("screen.noMatch")}</td></tr>
                   )}
                   {data.items.map((row) => (
                     <tr key={row.id} onClick={() => selectRow(row)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectRow(row); } }}
@@ -270,7 +281,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
                         <div className="text-xs text-muted-foreground">{[row.authors, row.container].filter(Boolean).join(" · ")}</div>
                       </td>
                       <td className="gaid-numeric px-2 py-2.5 text-right">{row.year ?? ""}</td>
-                      {!reading && <>
+                      {!paneOpen && <>
                       <td className="px-2 py-2.5"><Badge label={L(`source.${row.source}`)} hint={L(`source.${row.source}Hint`)} tone={SOURCE_TONE[row.source]} /></td>
                       <td className="px-2 py-2.5">
                         {row.retracted
@@ -287,9 +298,10 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
           </>
         )}
       </section>
-      {reading && <PdfPane title={reading.title} url={libraryPdfUrl(reading.id)} onClose={closePdf} className="sticky top-6 h-[calc(100dvh-9rem)] min-h-[480px] min-w-[560px] flex-[62] self-start" />}
+      {reading && <PdfPane title={reading.title} url={libraryPdfUrl(reading.id)} onClose={closePdf} className={PANE_CLASS} />}
+      {citing && <CitationPdfPane pdf={citing} onClose={citation.close} onDocumentReady={citation.documentReady} closeHint={L("cite.closeNoteHint")} className={PANE_CLASS} />}
       {/* Hidden, not unmounted, while the PDF is open: closing it returns to the same detail without reloading (L9). */}
-      <aside className={cn("w-[340px] shrink-0 flex-col gap-3", reading ? "hidden" : "flex")}>
+      <aside className={cn("w-[340px] shrink-0 flex-col gap-3", paneOpen ? "hidden" : "flex")}>
         {selected ? (
           <ItemDetail id={selected} collections={collections} zoteroConnected={zoteroConnected} focusPdf={refocusPdf === selected} onPdfFocused={() => setRefocusPdf(null)} onOpenPdf={(title) => setPdf({ id: selected, title })} onClose={() => setSelected(null)} onOpenProject={onOpenProject} onOpenNote={openNote} onSelect={setSelected} onChanged={load} />
         ) : folder ? (
@@ -313,6 +325,7 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
         parentName={naming?.parentId ? collections.find((c) => c.id === naming.parentId)?.name : undefined}
         onClose={() => setNaming(null)} onSubmit={submitName} />
     </div>
+    </CitationPdfContext.Provider>
   );
 }
 
