@@ -4,8 +4,8 @@ uv run --no-project --with imageio-ffmpeg==0.6.0 python geo/promo-lemo/master.py
   --mix <dir>/mix.wav --out <dir>/gaid-promo-lemo.mp4
 
 Port of lemo-opuscar core/render/mux.sh with imageio-ffmpeg's bundled ffmpeg (this PC has no system ffmpeg/ffprobe):
-two-pass loudnorm to -14 LUFS / true peak -1.2 dB, AAC 256 kb/s 48 kHz stereo, the H.264 picture copied unchanged
-(grain 0: vector style). Prints and writes the measured loudness of the finished file (ebur128) and a blackdetect scan.
+two-pass loudnorm to -14 LUFS / true peak -1.2 dB, then a -2 dBFS limiter as headroom for AAC overshoot,
+AAC 256 kb/s 48 kHz stereo, the H.264 picture copied unchanged (grain 0: vector style). Prints and writes the measured loudness of the finished file (ebur128) and a blackdetect scan.
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ def main():
           f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
     tmp = args.out.with_suffix(".tmp.mp4")
     run([ff, "-y", "-loglevel", "error", "-i", str(args.picture), "-i", str(args.mix),
-         "-filter_complex", f"[1:a]{ln},aresample=48000[a]", "-map", "0:v", "-map", "[a]",
+         "-filter_complex", f"[1:a]{ln},aresample=48000,alimiter=limit=0.79:attack=2:release=60:level=disabled[a]", "-map", "0:v", "-map", "[a]",
          "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-ac", "2", "-movflags", "+faststart", "-shortest", str(tmp)])
     tmp.rename(args.out)
     eb = run([ff, "-hide_banner", "-nostats", "-i", str(args.out), "-af", "ebur128=peak=true", "-f", "null", "-"])

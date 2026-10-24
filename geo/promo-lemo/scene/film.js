@@ -144,40 +144,43 @@
     { icon: 'notebook-pen', label: '연구노트' },
   ];
   // Copy: v4 chapter purposes and outcome tags; two Yilgarn tags keep their v2 wording.
+  // Tags are [beat index, label]: a box is shown only inside its beat's own window from capture.json (t0..t1) and only where
+  // the beat's rect was measured; consecutive beats glide (self-review 2026-10-24: boxes used outside their window pointed at
+  // the wrong place). `use` ends before a take's layout changes.
   const CHAPTERS = [
     { st: 0, part: 'GAID 시스템', title: '연구는 내 서재의 논문에서 시작합니다', shots: [
-      { src: 'p', id: 'L1', use: [0, 4.5], tags: [[0.2, 4.5, 0, '주제별 폴더에 모은 논문']] },
-      { src: 'p', id: 'L2', use: [0.6, 3.6], tags: [[0.6, 3.6, 0, '논문을 곁에 두고 읽기']] },
+      { src: 'p', id: 'L1', use: [0, 2.6], tags: [[0, '주제별 폴더에 모은 논문']] },
+      { src: 'p', id: 'L2', use: [0.6, 3.6], tags: [[0, '논문을 곁에 두고 읽기'], [1, '논문을 곁에 두고 읽기']] },
     ] },
     { st: 1, part: 'GAID 허브', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', shots: [
-      { src: 'p', id: 'A1', use: [0.3, 5], tags: [[0.3, 5, [0, 1], '논문·코드·자료를 함께']] },
-      { src: 'p', id: 'A2', use: [0.2, 5], tags: [[0.2, 2.5, 0, '원문 근거를 바로 곁에'], [2.5, 5, 1, '근거를 보고 연구자가 결정']] },
-      { src: 'p', id: 'A3', use: [0, 4], tags: [[0.2, 4, [0, 1], '단계로 정리된 분석 절차']] },
+      { src: 'p', id: 'A1', use: [0.3, 5], tags: [[0, '논문·코드·자료를 함께'], [1, '논문·코드·자료를 함께']] },
+      { src: 'p', id: 'A2', use: [0.2, 5], tags: [[0, '원문 근거를 바로 곁에'], [1, '근거를 보고 연구자가 결정']] },
+      { src: 'p', id: 'A3', use: [0, 4], tags: [[0, '단계로 정리된 분석 절차'], [1, '단계로 정리된 분석 절차']] },
     ] },
     { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', shots: [
-      { src: 'p', id: 'H1', use: [0, 4.5], tags: [[0.2, 1.6, 0, '다음 version으로 등록'], [1.6, 4.5, 1, '예제 자료와 함께 공유']] },
-      { src: 'p', id: 'H2', use: [0, 3.5], tags: [[0.2, 3.5, 1, '허브에서 가져다 쓰기']] },
+      { src: 'p', id: 'H1', use: [0, 4.5], tags: [[0, '다음 version으로 등록'], [1, '예제 자료와 함께 공유'], [2, '다음 version으로 등록']] },
+      { src: 'p', id: 'H2', use: [1.6, 3.5], tags: [[1, '허브에서 가져다 쓰기']] },
     ] },
     { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', shots: [
-      { src: 'p', id: 'R1', use: [0, 4.5], tags: [[0.2, 2.5, 0, 'Workflow의 목적과 근거'], [2.5, 4.5, 1, '근거 논문을 붙여 시작']] },
-      { src: 'p', id: 'R3', use: [0.3, 6], tags: [[0.3, 2, 0, 'AI agent가 Workflow대로'], [2, 4, 1, 'AI agent가 Workflow대로'], [4, 6, 2, '결과 그림까지 저장']] },
-      { src: 'y', id: 'M1', use: [0, 4.6], tags: [[0.1, 2.5, 0, '지도에서 우선순위 확인'], [2.5, 4.6, 1, '원본 값을 바로 확인']] },
+      { src: 'p', id: 'R1', use: [0, 4.5], tags: [[0, 'Workflow의 목적과 근거'], [1, '근거 논문을 붙여 시작']] },
+      { src: 'p', id: 'R3', use: [0.3, 6], tags: [[0, 'AI agent가 Workflow대로'], [1, 'AI agent가 Workflow대로'], [2, '결과 그림까지 저장']] },
+      { src: 'y', id: 'M1', use: [0, 4.6], tags: [[0, '지도에서 우선순위 확인'], [1, '원본 값을 바로 확인']] },
     ] },
     { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', shots: [
-      { src: 'p', id: 'N1', use: [0, 4.5], tags: [[0.2, 3, 1, '결과부터 쓴 연구노트'], [3, 4.5, 2, '두 논문의 쪽수까지 인용']] },
-      { src: 'y', id: 'N1', use: [1.5, 5.5], tags: [[1.5, 3, 1, '결과와 그림을 노트로 정리'], [3, 5.5, 2, '판단은 연구자가 답합니다']] },
+      { src: 'p', id: 'N1', use: [0, 4.5], tags: [[0, '결과부터 쓴 연구노트'], [1, '결과부터 쓴 연구노트'], [2, '두 논문의 쪽수까지 인용']] },
+      { src: 'y', id: 'N1', use: [1.5, 4.8], tags: [[1, '결과와 그림을 노트로 정리'], [2, '판단은 연구자가 답합니다']] },
     ] },
     { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', shots: [
-      { src: 'p', id: 'L3', use: [0.5, 3.6], tags: [[0.5, 2, 0, '연구노트도 서재에'], [2, 3.6, 1, '연구노트도 서재에']] },
-      { src: 'p', id: 'L4', use: [0, 4], tags: [[0.2, 4, [0, 1], '논문에서 이어진 연구 이력']] },
-      { src: 'y', id: 'L3', use: [0, 4], tags: [[0.2, 4, 0, '논문·Workflow·노트의 연결']] },
+      { src: 'p', id: 'L3', use: [0.5, 3.6], tags: [[0, '연구노트도 서재에'], [1, '연구노트도 서재에']] },
+      { src: 'p', id: 'L4', use: [0, 4], tags: [[0, '논문에서 이어진 연구 이력'], [1, '논문에서 이어진 연구 이력']] },
+      { src: 'y', id: 'L3', use: [0, 4], tags: [[0, '논문·Workflow·노트의 연결'], [1, '논문·Workflow·노트의 연결']] },
     ] },
   ];
   const SEG = [];
   {
     let tcur = T.cycle[1];
     CHAPTERS.forEach((c, ci) => {
-      if (ci > 0) tcur = qup(tcur + 0.52, BEAT / 2); // collapse 0.22 s + expand 0.3 s, the new chapter lands on an eighth
+      if (ci > 0) tcur = qup(tcur, BEAT / 2); // the window stays; the next chapter sweeps in on the next eighth
       c.a = tcur;
       for (const s of c.shots) {
         const info = shotInfo(s.src, s.id);
@@ -192,8 +195,8 @@
   }
   const DEMO_END = CHAPTERS[CHAPTERS.length - 1].b;
   T.silence = [DEMO_END + 0.05, DEMO_END + 0.5];
-  T.brain = [T.silence[1], qup(T.silence[1] + 6.8)];
-  T.end = [T.brain[1], T.brain[1] + 3.8];
+  T.brain = [T.silence[1], qup(T.silence[1] + 9.0)];
+  T.end = [T.brain[1], T.brain[1] + 3.4];
   const DUR = +(T.end[1]).toFixed(3);
 
   // ================= stage (background) =================
@@ -511,12 +514,20 @@
   }
 
   // ================= S4 title, S5 cycle (the mark's orbit becomes the research cycle) =================
-  const RING = { x: 960, y: 590, r: 300 };
-  const stAngle = i => (-90 + i * 72) * Math.PI / 180;
-  const stPos = i => ({ x: RING.x + RING.r * Math.cos(stAngle(i)), y: RING.y + RING.r * Math.sin(stAngle(i)) });
-  // the logo's orbit as an ellipse in logo coordinates (fitted to the ring path's ends)
-  const ORBIT = { cx: 32, cy: 32, rx: 30, ry: 11, rot: -19.3 };
+  // The research cycle as the logo's orbit (user feedback 2026-10-24: the ring animation after the logo was weak; v4 and
+  // brag show a large tilted orbit with labelled station chips, the G at the centre, inner arcs for GAID 허브 / GAID 시스템).
+  // A point travels the orbit and lights each station as it arrives; a comet trail and a progress arc follow it.
+  const stAngle = i => (-90 + i * 72) * Math.PI / 180; // mini cycle in the demo
+  const ORB = { cx: 960, cy: 610, rx: 640, ry: 250, rot: -7 };
+  const orbPt = (deg, k = 1) => {
+    const a = deg * Math.PI / 180, r = ORB.rot * Math.PI / 180;
+    const x = ORB.rx * k * Math.cos(a), y = ORB.ry * k * Math.sin(a);
+    return { x: ORB.cx + x * Math.cos(r) - y * Math.sin(r), y: ORB.cy + x * Math.sin(r) + y * Math.cos(r) };
+  };
+  const ST_DEG = [200, 263, 352, 70, 132]; // 내 서재, Workflow 만들기, GAID 허브 공유, 연구 분석, 연구노트 (clockwise on screen)
+  const ORBIT = { cx: 32, cy: 32, rx: 30, ry: 11, rot: -19.3 }; // the logo's orbit in logo coordinates
   const TITLE_MARK = { x: 960 - (175 * 220 / 64) / 2 + 32 * 220 / 64, y: 470, hgt: 220 };
+  const CHIP0 = { x: 0, y: 0, w: 0, h: 0 }; // 내 서재 chip, measured; the demo window expands from it
 
   function buildTitleCycle() {
     const layer = h('div', 'layer', world);
@@ -531,100 +542,144 @@
     ev(sweepAt - 0.3, 'sweep');
     ev(T.title[0] + 0.5, 'title');
 
-    // cycle
-    const ring = sv('ellipse', { fill: 'none', stroke: C.sys, 'stroke-width': 10 }, svg);
-    const C2 = 2 * Math.PI * RING.r;
-    const arcHub = sv('circle', { cx: RING.x, cy: RING.y, r: RING.r, fill: 'none', stroke: C.signal, 'stroke-width': 12, transform: `rotate(-54 ${RING.x} ${RING.y})`, 'stroke-dasharray': `0 ${C2}` }, svg);
-    const dot = sv('circle', { r: 13, fill: C.mark }, svg);
+    const C0 = T.cycle[0];
+    const tMorph = [C0 + 0.15, C0 + 1.15];
+    const lap = [C0 + 1.15, C0 + 4.15];                // first lap: 3 s
+    const tArc = C0 + 3.0, tVer = C0 + 4.85, exp = [T.cycle[1] - 0.5, T.cycle[1]];
+    const degAt = t => {                                 // travelling point: first lap, then a slower second lap
+      if (t < lap[0]) return ST_DEG[0];
+      if (t < lap[1]) return ST_DEG[0] + 360 * eio(seg(t, lap[0], lap[1]));
+      return ST_DEG[0] + 360 + 150 * eo(seg(t, lap[1], exp[0] + 0.2));
+    };
+    const reach = i => { // first-lap time at which the point reaches station i (inverse of the eased lap)
+      const f = (((ST_DEG[i] - ST_DEG[0]) % 360) + 360) % 360 / 360;
+      let lo = 0, hi = 1;
+      for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (eio(m) < f) lo = m; else hi = m; }
+      return lap[0] + (lap[1] - lap[0]) * lo;
+    };
+    const polyPts = (d0, d1, k = 1, step = 2) => {
+      const pts = [];
+      const n = Math.max(1, Math.ceil(Math.abs(d1 - d0) / step));
+      for (let i = 0; i <= n; i++) { const p = orbPt(d0 + (d1 - d0) * i / n, k); pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`); }
+      return pts.join(' ');
+    };
+
+    // orbit: the logo ellipse morphs into it, then it settles to the neutral track
+    const ring = sv('ellipse', { fill: 'none' }, svg);
+    const track = sv('polyline', { fill: 'none', stroke: C.sys, 'stroke-width': 6, opacity: 0, points: polyPts(0, 360) }, svg);
+    const progress = sv('polyline', { fill: 'none', stroke: C.signal, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0 }, svg);
+    const hubArc = sv('polyline', { fill: 'none', stroke: C.signal, 'stroke-width': 14, 'stroke-linecap': 'round', opacity: 0 }, svg);
+    const sysArc = sv('polyline', { fill: 'none', stroke: '#4a515d', 'stroke-width': 14, 'stroke-linecap': 'round', opacity: 0 }, svg);
+    const HUB = [238, 372], SYS = [22, 222];
+    const trail = Array.from({ length: 14 }, (_, i) => sv('line', { stroke: C.signalInk, 'stroke-width': 10 - i * 0.55, 'stroke-linecap': 'round', opacity: 0 }, svg));
+    const halo = sv('circle', { r: 26, fill: C.signal, opacity: 0 }, svg);
+    const dot = sv('circle', { r: 12, fill: '#ffffff', opacity: 0 }, svg);
+
+    // station chips on the orbit
     const stations = STATIONS.map((st, i) => {
-      const p = stPos(i);
-      const el = h('div', 'abs', layer);
-      el.innerHTML = `<div class="panel raised" style="position:absolute;left:-40px;top:-40px;width:80px;height:80px;border-radius:40px;display:flex;align-items:center;justify-content:center">${icon(st.icon, 38, C.ink)}</div>`;
-      const lab = h('div', 'abs h3', layer, st.label);
-      const lx = RING.x + (RING.r + 66) * Math.cos(stAngle(i)), ly = RING.y + (RING.r + 66) * Math.sin(stAngle(i));
-      const anchor = Math.cos(stAngle(i)) > 0.3 ? 'left' : Math.cos(stAngle(i)) < -0.3 ? 'right' : 'center';
-      Object.assign(lab.style, { width: '420px', textAlign: anchor, fontSize: '32px' });
-      const lxPos = anchor === 'left' ? lx - 10 : anchor === 'right' ? lx - 410 : lx - 210;
-      const lyPos = i === 0 ? ly - 60 : ly - 22;
-      const t0 = T.cycle[0] + 1.25 + i * BEAT;
+      const p = orbPt(ST_DEG[i]);
+      const el = h('div', 'panel raised', layer);
+      el.innerHTML = `<div style="display:flex;align-items:center;gap:14px;padding:12px 22px">${icon(st.icon, 34, C.ink2)}<span class="lb" style="font-size:30px;font-weight:650;white-space:nowrap">${st.label}</span></div>`;
+      Object.assign(el.style, { borderRadius: '10px' });
+      const w = el.getBoundingClientRect().width, hh = el.getBoundingClientRect().height;
+      const t0 = qnear(reach(i), SIXTEENTH);
       ev(t0, 'station', { i, pan: +((p.x - 960) / 960).toFixed(3) });
-      TEXTS.push({ id: `st-${i}`, text: st.label, a: t0 + 0.2, b: T.cycle[1] - 0.5, el: lab });
-      return { el, lab, p, t0, lxPos, lyPos };
+      TEXTS.push({ id: `st-${i}`, text: st.label, a: t0 + 0.2, b: exp[0], el });
+      return { el, p, w, hh, t0, ic: el.querySelector('.icon') };
     });
-    const hubLab = h('div', 'abs', layer);
-    hubLab.innerHTML = `<span class="badge hub" style="position:static">GAID 허브</span><div class="label" style="margin-top:10px;color:${C.signalInk}">함께 쓰고 고쳐 가는 Workflow</div>`;
-    at(hubLab, 1300, 236);
-    const sysLab = h('div', 'abs', layer);
-    sysLab.innerHTML = `<span class="badge sys" style="position:static">GAID 시스템</span><div class="label" style="margin-top:10px">내 서재에서 분석하고 기록하는 연구</div>`;
-    at(sysLab, 250, 760);
-    const tArc = T.cycle[0] + 3.0;
-    ev(tArc, 'arc');
-    TEXTS.push({ id: 'hub-lab', text: '함께 쓰고 고쳐 가는 Workflow', a: tArc + 0.2, b: T.cycle[1] - 0.5, el: hubLab });
-    TEXTS.push({ id: 'sys-lab', text: '내 서재에서 분석하고 기록하는 연구', a: tArc + 0.7, b: T.cycle[1] - 0.5, el: sysLab });
-    const who = h('div', 'abs h3', layer, '연구자 + AI agent');
-    Object.assign(who.style, { width: '600px', textAlign: 'center', fontSize: '36px' });
-    at(who, RING.x - 300, RING.y + 40);
+    Object.assign(CHIP0, { x: stations[0].p.x, y: stations[0].p.y, w: stations[0].w, h: stations[0].hh });
+    // version chip rides above Workflow 만들기
     const ver = h('div', 'abs', layer);
-    at(ver, 1300, 352);
     const verA = h('span', 'pill accent', ver, 'version 0.1.0');
     const verB = h('span', 'pill accent', ver, 'version 0.1.1');
-    Object.assign(verA.style, { position: 'absolute', fontSize: '26px' });
-    Object.assign(verB.style, { position: 'absolute', fontSize: '26px' });
-    const tVer = T.cycle[0] + 4.4;
+    for (const v of [verA, verB]) Object.assign(v.style, { position: 'absolute', left: '0px', top: '0px', fontSize: '24px' });
+    const s1 = stations[1];
+    at(ver, s1.p.x - 80, s1.p.y - s1.hh / 2 - 48);
     ev(tVer, 'version');
-    const head = headline(layer, 110, 64, [[T.cycle[0] + 0.4, T.cycle[1] - 0.15, '논문과 분석이 공유된 Workflow가 되고, 쓰일수록 나아집니다']]);
-    const exp = [T.cycle[1] - 0.5, T.cycle[1]];
+    // part labels inside the orbit, beside their arcs
+    const hubLab = h('div', 'abs', layer);
+    hubLab.innerHTML = `<span class="badge hub" style="position:static">GAID 허브</span><div class="label" style="margin-top:10px;color:${C.signalInk}">함께 쓰고 고쳐 가는 Workflow</div>`;
+    at(hubLab, 1110, 512);
+    const sysLab = h('div', 'abs', layer);
+    sysLab.innerHTML = `<span class="badge sys" style="position:static">GAID 시스템</span><div class="label" style="margin-top:10px">내 서재에서 분석하고 기록하는 연구</div>`;
+    at(sysLab, 530, 548);
+    ev(tArc, 'arc');
+    TEXTS.push({ id: 'hub-lab', text: '함께 쓰고 고쳐 가는 Workflow', a: tArc + 0.2, b: exp[0], el: hubLab });
+    TEXTS.push({ id: 'sys-lab', text: '내 서재에서 분석하고 기록하는 연구', a: tArc + 0.5, b: exp[0], el: sysLab });
+    const who = h('div', 'abs h3', layer, '연구자 + AI agent');
+    Object.assign(who.style, { width: '600px', textAlign: 'center', fontSize: '34px' });
+    at(who, ORB.cx - 300, ORB.cy + 46);
+    const head = headline(layer, 110, 64, [[C0 + 0.4, T.cycle[1] - 0.15, '논문과 분석이 공유된 Workflow가 되고, 쓰일수록 나아집니다']]);
     ev(exp[0], 'expand');
+    const G_END = { x: ORB.cx, y: ORB.cy - 20, hgt: 120 };
 
     return t => {
       const show = t >= T.title[0] && t < T.cycle[1] + 0.05;
       layer.style.display = show ? '' : 'none';
       if (!show) return;
       head(t);
-      // the small mark flies from the panel's corner to the title position and grows
+      // title: the small mark flies in and grows; a light band reveals the lettering
       const fly = ramp(t, T.title[0] + 0.15, T.title[0] + 0.65, eio);
-      const mx = lerp(MARK_LEFT.x, TITLE_MARK.x, fly), my = lerp(MARK_LEFT.y, TITLE_MARK.y, fly), mh = lerp(72, TITLE_MARK.hgt, fly);
-      const lettersF = ramp(t, sweepAt, sweepAt + 1.1, lin) * (1 - ramp(t, T.cycle[0], T.cycle[0] + 0.35, ei));
+      const morph = ramp(t, tMorph[0], tMorph[1], eio);
+      let mx = lerp(MARK_LEFT.x, TITLE_MARK.x, fly), my = lerp(MARK_LEFT.y, TITLE_MARK.y, fly), mh = lerp(72, TITLE_MARK.hgt, fly);
+      mx = lerp(mx, G_END.x, morph); my = lerp(my, G_END.y, morph); mh = lerp(mh, G_END.hgt, morph);
+      const lettersF = ramp(t, sweepAt, sweepAt + 1.1, lin) * (1 - ramp(t, C0, C0 + 0.3, ei));
       const glintO = 0.22 * Math.min(ramp(t, sweepAt, sweepAt + 0.1, lin), 1 - ramp(t, sweepAt + 1.0, sweepAt + 1.15, lin));
-      const morph = ramp(t, T.cycle[0] + 0.2, T.cycle[0] + 1.2, eio);
+      const out = 1 - ramp(t, exp[0], exp[0] + 0.3, lin);
       L.place(mx, my, mh);
-      L.set({ o: t >= T.title[0] + 0.15 ? 1 : 0, ringO: 1 - ramp(t, T.cycle[0] + 0.2, T.cycle[0] + 0.35, lin), gO: 1 - ramp(t, T.cycle[0] + 0.2, T.cycle[0] + 0.7, lin), lettersF, glintO });
-      put(sub, { o: win(t, T.title[0] + 1.1, T.cycle[0] + 0.2, 0.2, 0.2), y: 14 * (1 - ramp(t, T.title[0] + 1.1, T.title[0] + 1.4)) });
-      // the orbit ellipse (in screen space at the title scale) morphs into the research cycle
+      L.set({ o: (t >= T.title[0] + 0.15 ? 1 : 0) * out, ringO: 1 - ramp(t, tMorph[0], tMorph[0] + 0.12, lin), gO: 1, lettersF, glintO });
+      put(sub, { o: win(t, T.title[0] + 1.1, C0 + 0.2, 0.2, 0.2), y: 14 * (1 - ramp(t, T.title[0] + 1.1, T.title[0] + 1.4)) });
+      // the logo's orbit ellipse (title scale) grows into the cycle orbit
       const k = TITLE_MARK.hgt / 64;
-      const ex0 = TITLE_MARK.x, ey0 = TITLE_MARK.y;
-      const cx = lerp(ex0, RING.x, morph), cy = lerp(ey0, RING.y, morph);
-      const rx = lerp(ORBIT.rx * k, RING.r, morph), ry = lerp(ORBIT.ry * k, RING.r, morph), rot = lerp(ORBIT.rot, 0, morph);
-      const ringOn = t >= T.cycle[0] + 0.2;
+      const fx = lerp(TITLE_MARK.x, G_END.x, 0), fy = TITLE_MARK.y;
+      const cx = lerp(fx, ORB.cx, morph), cy = lerp(fy, ORB.cy, morph);
+      const rx = lerp(ORBIT.rx * k, ORB.rx, morph), ry = lerp(ORBIT.ry * k, ORB.ry, morph), rot = lerp(ORBIT.rot, ORB.rot, morph);
+      const ringOn = t >= tMorph[0] && morph < 1;
       ring.setAttribute('cx', cx); ring.setAttribute('cy', cy); ring.setAttribute('rx', rx); ring.setAttribute('ry', ry);
       ring.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
-      ring.setAttribute('stroke', morph < 1 ? C.mark : C.sys);
-      ring.setAttribute('stroke-width', lerp(5 * k, 10, morph));
-      const out = 1 - ramp(t, exp[0], exp[0] + 0.25, lin);
-      ring.setAttribute('opacity', ringOn ? out : 0);
-      // orbit dot rides the ring
-      const da = (-30 + 360 * ramp(t, T.cycle[0] + 1.2, T.cycle[1], lin) * 1.0) * Math.PI / 180;
-      const rr = Math.hypot(rx, ry) > 0 ? 1 : 1;
-      const dx = cx + rx * Math.cos(da) * rr, dy = cy + ry * Math.sin(da) * rr;
-      dot.setAttribute('cx', dx); dot.setAttribute('cy', dy);
-      dot.setAttribute('opacity', ringOn ? out : 0);
-      // hub arc: Workflow 만들기 → 허브 공유 (-54° … 90°)
-      const arcF = ramp(t, tArc, tArc + 0.5, eio);
-      arcHub.setAttribute('stroke-dasharray', `${(C2 * 144 / 360) * arcF} ${C2}`);
-      arcHub.setAttribute('opacity', out);
+      ring.setAttribute('stroke', C.mark); ring.setAttribute('stroke-width', lerp(5 * k, 6, morph));
+      ring.setAttribute('opacity', ringOn ? 1 : 0);
+      track.setAttribute('opacity', (morph >= 1 ? 1 : 0) * out);
+      // travelling point, comet trail, progress arc (first lap)
+      const d = degAt(t);
+      const live = t >= lap[0] - 0.05 && t < exp[0] + 0.3;
+      const p = orbPt(d);
+      dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('opacity', live ? out : 0);
+      halo.setAttribute('cx', p.x); halo.setAttribute('cy', p.y); halo.setAttribute('opacity', live ? 0.35 * out : 0);
+      const dPrev = degAt(t - 0.12);
+      trail.forEach((ln, i) => {
+        const a1 = d - (d - dPrev) * (i / trail.length) * 2.2, a2 = d - (d - dPrev) * ((i + 1) / trail.length) * 2.2;
+        const q1 = orbPt(a1), q2 = orbPt(a2);
+        ln.setAttribute('x1', q1.x); ln.setAttribute('y1', q1.y); ln.setAttribute('x2', q2.x); ln.setAttribute('y2', q2.y);
+        ln.setAttribute('opacity', live ? 0.8 * (1 - i / trail.length) * out : 0);
+      });
+      if (t >= lap[0] && t < lap[1] + 0.6) {
+        progress.setAttribute('points', polyPts(ST_DEG[0], Math.min(d, ST_DEG[0] + 360)));
+        progress.setAttribute('opacity', 0.9 * (1 - ramp(t, lap[1], lap[1] + 0.6, lin)));
+      } else progress.setAttribute('opacity', 0);
+      // inner arcs draw in from their first station
+      const ah = ramp(t, tArc, tArc + 0.6, eio), as = ramp(t, tArc + 0.3, tArc + 0.9, eio);
+      hubArc.setAttribute('points', polyPts(HUB[0], lerp(HUB[0] + 1, HUB[1], ah), 0.82));
+      hubArc.setAttribute('opacity', (t >= tArc ? 1 : 0) * out);
+      sysArc.setAttribute('points', polyPts(SYS[0], lerp(SYS[0] + 1, SYS[1], as), 0.82));
+      sysArc.setAttribute('opacity', (t >= tArc + 0.3 ? 1 : 0) * out);
+      put(hubLab, { o: ramp(t, tArc + 0.2, tArc + 0.45, lin) * out, y: 10 * (1 - ramp(t, tArc + 0.2, tArc + 0.5)) });
+      put(sysLab, { o: ramp(t, tArc + 0.5, tArc + 0.75, lin) * out, y: 10 * (1 - ramp(t, tArc + 0.5, tArc + 0.8)) });
+      put(who, { o: ramp(t, tMorph[1] - 0.1, tMorph[1] + 0.25, lin) * out });
+      // station chips pop as the point reaches them; a lit border while the point passes
       for (const [i, s] of stations.entries()) {
-        const p = ramp(t, s.t0, s.t0 + 0.25);
-        const expandIt = i === 0 ? 1 : out;
-        put(s.el, { o: (t >= s.t0 ? clamp(p * 3) : 0) * (i === 0 ? 1 - ramp(t, exp[0] + 0.05, exp[0] + 0.15, lin) : out), x: s.p.x, y: s.p.y, s: lerp(0.6, 1, back(p, 2)) * expandIt });
-        put(s.lab, { o: (t >= s.t0 + 0.1 ? ramp(t, s.t0 + 0.1, s.t0 + 0.3, lin) : 0) * out, x: s.lxPos, y: s.lyPos });
+        const pp = ramp(t, s.t0, s.t0 + 0.25);
+        const near = Math.abs(((d - ST_DEG[i]) % 360 + 540) % 360 - 180) < 14 && live;
+        s.el.style.borderColor = near ? C.signal : 'rgba(255,255,255,0.08)';
+        s.ic.style.color = near || (i === 1 || i === 2) && t >= tArc ? C.signalInk : C.ink2;
+        const o0 = t >= s.t0 ? clamp(pp * 3) : 0;
+        const keep = i === 0 ? 1 - ramp(t, exp[0] + 0.05, exp[0] + 0.15, lin) : out;
+        put(s.el, { o: o0 * keep, x: s.p.x - s.w / 2, y: s.p.y - s.hh / 2, s: lerp(0.7, 1, back(pp, 1.8)) });
       }
-      put(hubLab, { o: ramp(t, tArc, tArc + 0.2, lin) * out, y: 10 * (1 - ramp(t, tArc, tArc + 0.25)) });
-      put(sysLab, { o: ramp(t, tArc + 0.5, tArc + 0.7, lin) * out, y: 10 * (1 - ramp(t, tArc + 0.5, tArc + 0.75)) });
-      put(who, { o: ramp(t, T.cycle[0] + 1.6, T.cycle[0] + 1.9, lin) * out });
       const vf = ramp(t, tVer, tVer + 0.3, eio);
-      put(ver, { o: ramp(t, tArc + 0.6, tArc + 0.8, lin) * out });
-      put(verA, { o: 1 - vf, y: -24 * vf });
-      put(verB, { o: vf, y: 24 * (1 - vf) });
+      put(ver, { o: ramp(t, tArc + 0.6, tArc + 0.85, lin) * out });
+      put(verA, { o: 1 - vf, y: -20 * vf });
+      put(verB, { o: vf, y: 20 * (1 - vf) });
     };
   }
 
@@ -665,12 +720,15 @@
     // tag schedule in film time; rows = the chapter's distinct outcomes in order
     const tagSched = [];
     for (const sg of SEG) {
+      const info = shotInfo(sg.src, sg.shot);
+      const lead = SEG.indexOf(sg) > 0 ? 0.6 : 0.2; // first box appears after the light sweep
       let last = null;
-      for (const [t0, t1, k, label] of sg.tags) {
-        const ta = sg.a + (t0 - sg.skip), tb = Math.min(sg.b, sg.a + (t1 - sg.skip));
-        if (tb <= ta) continue;
-        const rect = Array.isArray(k) ? UNION(BR(sg.src, sg.shot, k[0]), BR(sg.src, sg.shot, k[1])) : BR(sg.src, sg.shot, k);
-        const entry = { a: Math.max(sg.a, ta), b: tb, rect, label, same: last && last.label === label, prev: last, sg };
+      for (const [k, label] of sg.tags) {
+        const beat = info.beats[k];
+        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + (sg.b - sg.a));
+        const ta = sg.a + (t0 - sg.skip) + (last ? 0 : lead), tb = sg.a + (t1 - sg.skip);
+        if (tb <= ta + 0.3) continue;
+        const entry = { a: ta, b: tb, rect: beat.rect, label, same: !!last && last.label === label, prev: last, sg };
         tagSched.push(entry);
         if (!entry.same) ev(entry.a, 'tag', { shot: sg.shot });
         last = entry;
@@ -694,8 +752,9 @@
       TEXTS.push({ id: `ch-${ci}`, text: c.title, a: c.a - 0.1, b: c.b, el: title });
     });
     for (const c of CHAPTERS) for (const r of c.rows) r.w = r.el.querySelector('.lb').getBoundingClientRect().width;
-    CHAPTERS.forEach((c, ci) => { ev(c.a - 0.3, 'chapter', { i: ci, part: c.part === 'GAID 허브' ? 'hub' : 'sys' }); if (ci > 0) ev(CHAPTERS[ci - 1].b, 'collapse'); });
-    SEG.forEach((sg, i) => { if (i > 0 && SEG[i - 1].ch === sg.ch) ev(sg.a, 'cut', { example: sg.src !== SEG[i - 1].src }); });
+    window.TAGSCHED = tagSched.map(e => ({ a: e.a, b: e.b, label: e.label, shot: `${e.sg.src}:${e.sg.shot}`, rect: e.rect, same: !!e.same }));
+    CHAPTERS.forEach((c, ci) => { ev(ci === 0 ? c.a - 0.3 : c.a, 'chapter', { i: ci, part: c.part === 'GAID 허브' ? 'hub' : 'sys' }); });
+    SEG.forEach((sg, i) => { if (i > 0) ev(sg.a, 'cut', { example: sg.src !== SEG[i - 1].src, chapter: SEG[i - 1].ch !== sg.ch }); });
     ev(DEMO_END, 'collapse');
     const frameSrc = (sg, local) => {
       const info = shotInfo(sg.src, sg.shot);
@@ -704,46 +763,49 @@
     };
     const setImg = (img, src) => { if (img.dataset.src !== src) { img.dataset.src = src; img.src = src; pending.push(img.decode().catch(() => {})); } };
 
+    const MC_ = { x: 1792, y: 70, r: 34 };
     return t => {
       const first = CHAPTERS[0];
-      const show = t >= first.a - 0.5 && t < DEMO_END + 0.4;
+      const show = t >= first.a - 0.5 && t < DEMO_END + 0.55;
       layer.style.display = show ? '' : 'none';
       if (!show) return;
-      let ci = CHAPTERS.findIndex((c, i) => t < (i + 1 < CHAPTERS.length ? CHAPTERS[i + 1].a - 0.3 : DEMO_END + 1));
-      if (ci < 0) ci = CHAPTERS.length - 1;
+      // current take: the last segment that has started (a held last frame fills the eighth before the next chapter)
+      let gi = SEG.findIndex(s => t < s.a);
+      gi = gi < 0 ? SEG.length - 1 : Math.max(0, gi - 1);
+      const sg = SEG[gi];
+      const ci = sg.ch;
       const c = CHAPTERS[ci];
-      // window: expand from the cycle station (first chapter) or from a thin bar; collapse to a bar between chapters
-      let o = 1, sx = 1, sy = 1, ox = 0, oy = 0;
+      const next = CHAPTERS[ci + 1];
+      const local = clamp(t - sg.a, 0, sg.b - sg.a - 1 / FPS);
+      // window: expands from the cycle station into place; stays put through the demo (cuts are light sweeps);
+      // at the end it shrinks into the mini cycle, which becomes the first ring of the second brain
+      let o = 1, s = 1, sx, sy, ox = 0, oy = 0;
+      const prev = gi > 0 ? SEG[gi - 1] : null;
+      const sw = prev ? seg(t, sg.a, sg.a + 0.6) : 1;
       if (ci === 0 && t < c.a) {
         const p = ramp(t, c.a - 0.5, c.a, eio);
-        const s0 = stPos(0);
-        const cx = lerp(s0.x, TAKE.x + TAKE.w / 2, p), cy = lerp(s0.y, TAKE.y + TAKE.h / 2, p);
-        sx = lerp(80 / TAKE.w, 1, p); sy = lerp(80 / TAKE.h, 1, p);
+        const cx = lerp(CHIP0.x, TAKE.x + TAKE.w / 2, p), cy = lerp(CHIP0.y, TAKE.y + TAKE.h / 2, p);
+        sx = lerp(CHIP0.w / TAKE.w, 1, p); sy = lerp(CHIP0.h / TAKE.h, 1, p);
         ox = cx - (TAKE.x + TAKE.w / 2); oy = cy - (TAKE.y + TAKE.h / 2);
-      } else if (t < c.a) sy = lerp(0.01, 1, ramp(t, c.a - 0.3, c.a, eo));
-      const prevEnd = ci > 0 ? CHAPTERS[ci - 1].b : -1;
-      if (ci > 0 && t >= prevEnd && t < c.a - 0.3) sy = lerp(1, 0.01, ramp(t, prevEnd, prevEnd + 0.22, ei));
-      if (ci > 0 && t >= prevEnd + 0.22 && t < c.a - 0.3) o = 0;
-      if (t >= DEMO_END) { sy = lerp(1, 0.01, ramp(t, DEMO_END, DEMO_END + 0.22, ei)); sx = lerp(1, 0, ramp(t, DEMO_END + 0.18, DEMO_END + 0.35, ei)); o = t < DEMO_END + 0.35 ? 1 : 0; }
+      } else if (t >= DEMO_END) {
+        const p = ramp(t, DEMO_END, DEMO_END + 0.5, eio);
+        s = lerp(1, 0.07, p);
+        ox = (MC_.x - (TAKE.x + TAKE.w / 2)) * p; oy = (MC_.y - (TAKE.y + TAKE.h / 2)) * p;
+        o = 1 - ramp(t, DEMO_END + 0.3, DEMO_END + 0.5, lin);
+      } else if (prev && prev.ch !== sg.ch && sw < 1) {
+        s = 1 - 0.015 * Math.sin(Math.PI * sw); // a small breath on a chapter change
+      }
       at(win2, TAKE.x, TAKE.y, TAKE.w, TAKE.h);
       win2.style.transformOrigin = '50% 50%';
-      put(win2, { o, x: ox, y: oy, sx, sy });
-      glow.style.opacity = o * Math.min(sx, sy);
-      // shot and frame
-      const segsC = SEG.filter(s => s.ch === ci);
-      let si = segsC.findIndex(s => t < s.b);
-      if (si < 0) si = segsC.length - 1;
-      const sg = segsC[si];
-      const local = clamp(t - sg.a, 0, sg.b - sg.a - 1 / FPS);
+      put(win2, { o, x: ox, y: oy, s, sx, sy });
+      glow.style.opacity = o * (sx ? Math.min(sx, sy) : s);
       setImg(imgB, frameSrc(sg, local));
-      const prev = si > 0 ? segsC[si - 1] : null;
-      const sw = prev ? seg(t, sg.a, sg.a + 0.45) : 1;
       if (prev && sw < 1) {
         setImg(imgA, frameSrc(prev, prev.b - prev.a - 1 / FPS));
         imgA.style.visibility = 'visible';
-        const edge = lerp(-15, 115, eio(sw));
-        imgB.style.webkitMaskImage = imgB.style.maskImage = `linear-gradient(100deg, #000 ${edge - 12}%, transparent ${edge}%)`;
-        glint.style.background = `linear-gradient(100deg, rgba(255,255,255,0) ${edge - 14}%, rgba(255,255,255,0.18) ${edge - 6}%, rgba(255,255,255,0) ${edge + 1}%)`;
+        const edge = lerp(-30, 130, eio(sw));
+        imgB.style.webkitMaskImage = imgB.style.maskImage = `linear-gradient(100deg, #000 ${edge - 24}%, transparent ${edge}%)`;
+        glint.style.background = `linear-gradient(100deg, rgba(255,255,255,0) ${edge - 26}%, rgba(255,255,255,0.14) ${edge - 10}%, rgba(255,255,255,0) ${edge + 2}%)`;
         glint.style.visibility = 'visible';
       } else {
         imgA.style.visibility = 'hidden';
@@ -753,62 +815,65 @@
       // example chip above the window (changes with the example)
       chip.textContent = EXAMPLE[sg.src];
       at(chip, TAKE.x, TAKE.y - 58);
-      const chipIn = prev && prev.src !== sg.src ? ramp(t, sg.a, sg.a + 0.25) : ramp(t, c.a - 0.1, c.a + 0.15);
-      put(chip, { o: chipIn * o, y: 8 * (1 - chipIn) });
-      // left column: badge, purpose, rows
-      const hin = ramp(t, c.a - 0.3, c.a);
-      const hout = ramp(t, ci + 1 < CHAPTERS.length ? c.b : DEMO_END, (ci + 1 < CHAPTERS.length ? c.b : DEMO_END) + 0.2, lin);
+      const chipIn = prev && prev.src !== sg.src ? ramp(t, sg.a, sg.a + 0.3) : (gi === 0 ? ramp(t, c.a - 0.1, c.a + 0.2) : 1);
+      const endOut = 1 - ramp(t, DEMO_END, DEMO_END + 0.25, lin);
+      put(chip, { o: chipIn * endOut, y: 8 * (1 - chipIn) });
+      // left column: the old chapter leaves up as the next one is due, the new one rises in
+      const hin = ci === 0 ? ramp(t, c.a - 0.3, c.a) : ramp(t, c.a, c.a + 0.35);
+      const hout = next ? ramp(t, next.a - 0.3, next.a, lin) : ramp(t, DEMO_END, DEMO_END + 0.25, lin);
       badge.textContent = c.part;
       badge.className = `badge ${c.part === 'GAID 허브' ? 'hub' : 'sys'}`;
       at(badge, COL.x, 260);
-      put(badge, { o: clamp(hin * 1.5) * (1 - hout), x: -20 * (1 - hin) });
+      put(badge, { o: clamp(hin * 1.5) * (1 - hout), x: -20 * (1 - hin), y: -16 * hout });
       title.textContent = c.title;
       at(title, COL.x, 330);
-      const tin = ramp(t, c.a - 0.2, c.a + 0.15);
-      put(title, { o: clamp(tin * 1.3) * (1 - hout), y: 18 * (1 - tin) });
+      const tin = ci === 0 ? ramp(t, c.a - 0.2, c.a + 0.15) : ramp(t, c.a + 0.05, c.a + 0.45);
+      put(title, { o: clamp(tin * 1.3) * (1 - hout), y: 18 * (1 - tin) - 16 * hout });
+      const curTag = tagSched.find(e => t >= e.a && t < e.b && e.sg === sg);
       for (const [k, cc] of CHAPTERS.entries()) {
         for (const r of cc.rows) {
           if (k !== ci) { r.el.style.display = 'none'; continue; }
           r.el.style.display = '';
-          const rin = ramp(t, r.a, r.a + 0.2);
-          const cur = tagSched.find(e => e.row === r && t >= e.a && t < e.b);
-          const on = !!cur && sw >= 1;
-          r.el.querySelector('.lb').style.color = on ? C.ink : (t >= r.a ? C.ink3 : C.ink3);
+          const rin = ramp(t, r.a, r.a + 0.25);
+          const on = !!curTag && curTag.row === r && sw >= 1;
+          r.el.querySelector('.lb').style.color = on ? C.ink : C.ink3;
           r.el.querySelector('.mk').style.background = on ? C.signal : C.ink4;
-          put(r.el, { o: (t >= r.a ? clamp(rin * 1.4) : 0) * (1 - hout), x: -16 * (1 - rin) });
+          put(r.el, { o: (t >= r.a ? clamp(rin * 1.4) : 0) * (1 - hout), x: -16 * (1 - rin), y: -16 * hout });
         }
       }
-      // mini cycle position
-      const prevSt = ci > 0 ? CHAPTERS[ci - 1].st : 0;
-      const a0 = prevSt * 72, a1 = (c.back ? 5 : c.st) * 72;
-      const ang = (-90 + lerp(a0, a1, ramp(t, c.a - 0.3, c.a + 0.2, eio))) * Math.PI / 180;
+      // mini cycle position (moves as the next chapter is due)
+      let mi = ci;
+      if (next && t >= next.a - 0.3) mi = ci + 1;
+      const mc = CHAPTERS[mi];
+      const prevSt = mi > 0 ? CHAPTERS[mi - 1].st : 0;
+      const a0 = prevSt * 72, a1 = (mc.back ? 5 : mc.st) * 72;
+      const ang = (-90 + lerp(a0, a1, ramp(t, mc.a - 0.3, mc.a + 0.2, eio))) * Math.PI / 180;
       mdot.setAttribute('cx', MC.x + MC.r * Math.cos(ang)); mdot.setAttribute('cy', MC.y + MC.r * Math.sin(ang));
-      mdots.forEach((d, i) => d.setAttribute('stroke', i === c.st ? C.signalInk : C.ink3));
-      // box on the take + leader line to the current row
-      const cur = tagSched.find(e => t >= e.a && t < e.b && e.sg === sg);
-      const mini = Math.min(ramp(t, first.a - 0.2, first.a + 0.2, lin), 1 - ramp(t, DEMO_END, DEMO_END + 0.3, lin));
-      for (const el of [...mdots]) el.style.opacity = mini;
-      mdot.style.opacity = mini;
-      if (!cur || sw < 1 || sy < 0.99) { box.style.visibility = 'hidden'; leadLine.setAttribute('opacity', 0); leadDot.setAttribute('opacity', 0); return; }
-      let r = cur.rect;
-      if (cur.same && cur.prev) { const g = ramp(t, cur.a, cur.a + 0.3, eio); const p = cur.prev.rect; r = { x: lerp(p.x, r.x, g), y: lerp(p.y, r.y, g), width: lerp(p.width, r.width, g), height: lerp(p.height, r.height, g) }; }
-      const pad = 5;
-      const bx = clamp(r.x * KS - pad, 2, TAKE.w - 10), by = clamp(r.y * KS - pad, 2, TAKE.h - 10);
-      const bw = Math.min(r.width * KS + 2 * pad, TAKE.w - bx - 2), bh = Math.min(r.height * KS + 2 * pad, TAKE.h - by - 2);
-      at(box, bx, by, bw, bh);
-      const pin = cur.same ? 1 : ramp(t, cur.a, cur.a + 0.2);
+      mdots.forEach((d, i) => d.setAttribute('stroke', i === mc.st ? C.signalInk : C.ink3));
+      const mini = Math.min(ramp(t, first.a - 0.2, first.a + 0.2, lin), 1 - ramp(t, DEMO_END + 0.3, DEMO_END + 0.5, lin));
+      lead.querySelectorAll('circle').forEach(el => { if (el !== leadDot) el.style.opacity = mini; });
+      // box on the take: only inside its beat window, gliding from the previous beat of the same take; kept inside the window
+      if (!curTag || sw < 1 || t >= DEMO_END) { box.style.visibility = 'hidden'; leadLine.setAttribute('opacity', 0); leadDot.setAttribute('opacity', 0); return; }
+      let r = curTag.rect;
+      const glide = curTag.prev ? ramp(t, curTag.a, curTag.a + 0.35, eio) : 1;
+      if (curTag.prev) { const p = curTag.prev.rect; r = { x: lerp(p.x, r.x, glide), y: lerp(p.y, r.y, glide), width: lerp(p.width, r.width, glide), height: lerp(p.height, r.height, glide) }; }
+      const pad = 5, M = 6;
+      const x0 = clamp(r.x * KS - pad, M, TAKE.w - M), x1 = clamp((r.x + r.width) * KS + pad, M, TAKE.w - M);
+      const y0 = clamp(r.y * KS - pad, M, TAKE.h - M), y1 = clamp((r.y + r.height) * KS + pad, M, TAKE.h - M);
+      at(box, x0, y0, x1 - x0, y1 - y0);
+      const pin = curTag.prev ? 1 : ramp(t, curTag.a, curTag.a + 0.25);
       box.style.visibility = 'visible'; box.style.opacity = pin;
-      const row = cur.row;
-      const x0 = COL.x + 32 + row.w + 18, y0 = row.y + 20;
-      const x1 = TAKE.x + bx, y1 = TAKE.y + by + Math.min(bh / 2, 60);
-      const xm = Math.min(x0 + 30, TAKE.x - 24);
-      const grow = cur.same ? 1 : ramp(t, cur.a, cur.a + 0.25, eio);
-      const pts = [[x0, y0], [xm, y0], [lerp(xm, x1, 1), y1]];
-      const end = [lerp(x0, x1, grow), lerp(y0, y1, grow)];
-      leadLine.setAttribute('points', grow < 1 ? `${x0},${y0} ${end[0]},${end[1]}` : pts.map(p => p.join(',')).join(' '));
+      const row = curTag.row;
+      const rowChanged = !curTag.prev || curTag.prev.row !== row;
+      const lx0 = COL.x + 32 + row.w + 18, ly0 = row.y + 20;
+      const lx1 = TAKE.x + x0, ly1 = TAKE.y + y0 + Math.min((y1 - y0) / 2, 60);
+      const xm = Math.min(lx0 + 30, TAKE.x - 24);
+      const grow = rowChanged ? ramp(t, curTag.a, curTag.a + 0.3, eio) : 1;
+      const end = [lerp(lx0, lx1, grow), lerp(ly0, ly1, grow)];
+      leadLine.setAttribute('points', grow < 1 ? `${lx0},${ly0} ${end[0]},${end[1]}` : `${lx0},${ly0} ${xm},${ly0} ${lx1},${ly1}`);
       leadLine.setAttribute('opacity', 0.9 * pin);
-      leadDot.setAttribute('cx', x1); leadDot.setAttribute('cy', y1);
-      leadDot.setAttribute('opacity', grow >= 1 ? 1 : 0);
+      leadDot.setAttribute('cx', lx1); leadDot.setAttribute('cy', ly1);
+      leadDot.setAttribute('opacity', grow >= 1 ? pin : 0);
     };
   }
 
@@ -868,13 +933,13 @@
     ].map(([s, l]) => `<span style="display:flex;align-items:center;gap:12px">${s}<span class="label" style="font-size:28px;color:${C.ink}">${l}</span></span>`).join('');
     const A = T.brain[0], B = T.brain[1];
     const head = headline(layer, 110, 64, [
-      [A + 0.3, A + 3.75, '연구자마다 고리가 돌면 지구과학 AI agent 생태계가 자랍니다'],
-      [A + 3.85, B - 0.1, '논문, Workflow, 연구노트가 이어져 KIGAM의 Second brain이 됩니다'],
+      [A + 0.5, A + 4.7, '연구자마다 고리가 돌면 지구과학 AI agent 생태계가 자랍니다'],
+      [A + 4.8, B - 0.1, '논문, Workflow, 연구노트가 이어져 KIGAM의 Second brain이 됩니다'],
     ], 52);
-    TEXTS.push({ id: 'plate', text: 'KIGAM Second brain', a: A + 4.2, b: B, el: plate });
+    TEXTS.push({ id: 'plate', text: 'KIGAM Second brain', a: A + 5.0, b: B, el: plate });
     ev(A, 'brain');
     // pull-back keyed per bar in log space: 1 → 0.16 over the first three bars
-    const keys = [[A, 1], [A + 2, 0.52], [A + 4, 0.3], [A + 6, 0.21]];
+    const keys = [[A + 0.6, 1], [A + 2.6, 0.52], [A + 4.6, 0.3], [A + 6.6, 0.21]];
     const zoomAt = t => {
       if (t <= keys[0][0]) return 1;
       for (let i = 1; i < keys.length; i++) {
@@ -882,7 +947,7 @@
       }
       return keys[keys.length - 1][1];
     };
-    ringEls.forEach((re, i) => { re.t0 = i === 0 ? A : A + 0.5 + (i < 8 ? (i - 1) * 0.25 : 2.5 + (i - 8) * 0.25); if (i > 0) ev(re.t0, 'ring', { i, pan: +((re.R.x - 960) / 3400).toFixed(3) }); });
+    ringEls.forEach((re, i) => { re.t0 = i === 0 ? A : A + 1.1 + (i < 8 ? (i - 1) * 0.25 : 2.5 + (i - 8) * 0.25); if (i > 0) ev(re.t0, 'ring', { i, pan: +((re.R.x - 960) / 3400).toFixed(3) }); });
     links.forEach(l => { l.t0 = ringEls[l.i].t0 + 0.25; });
 
     // ending: put-away one ring per beat, then the mark alone with the lockup
@@ -894,29 +959,31 @@
     const note = h('div', 'abs small', layer, '내부 검토용 영상');
     Object.assign(note.style, { width: '1840px', textAlign: 'right' });
     at(note, 0, 1010);
-    TEXTS.push({ id: 'end-sub', text: sub.textContent, a: E0 + 1.6, b: DUR, el: sub });
+    TEXTS.push({ id: 'end-sub', text: sub.textContent, a: E0 + 1.0, b: DUR, el: sub });
     const order = ringEls.slice(1).map(r => r.i).reverse();
-    order.forEach((ri, k) => { ringEls[ri].tOut = E0 - 1.0 + k * 0.08; });
-    ringEls[0].tOut = E0 + 0.5;
-    ev(E0 - 1.0, 'retract');
-    ev(E0 + 0.5, 'final');
-    ev(E0 + 1.0, 'logo');
+    order.forEach((ri, k) => { ringEls[ri].tOut = E0 - 0.8 + k * 0.06; });
+    ringEls[0].tOut = E0 + 0.2;
+    ev(E0 - 0.8, 'retract');
+    ev(E0 + 0.2, 'final');
+    ev(E0 + 0.6, 'logo');
     return t => {
       const show = t >= A - 0.05;
       layer.style.display = show ? '' : 'none';
       if (!show) return;
       head(t);
       const z = zoomAt(t);
-      net.style.transform = `scale(${z})`;
+      // the demo window shrank into the mini cycle; that ring flies in and becomes the first researcher's ring
+      const iu = ramp(t, A, A + 0.6, eio);
+      net.style.transform = `translate(${(1792 - 960) * (1 - iu)}px,${(70 - 560) * (1 - iu)}px) scale(${lerp(34 / 300, 1, iu) * z})`;
       for (const re of ringEls) {
         const p = ramp(t, re.t0, re.t0 + 0.4);
         const outF = re.tOut != null ? ramp(t, re.tOut, re.tOut + 0.3, ei) : 0;
-        re.g.setAttribute('opacity', (re.i === 0 ? ramp(t, A - 0.05, A + 0.15, lin) : clamp(p * 2)) * (1 - outF));
+        re.g.setAttribute('opacity', (re.i === 0 ? 1 : clamp(p * 2)) * (1 - outF));
         re.g.setAttribute('transform', `translate(${re.R.x} ${re.R.y}) scale(${(re.i === 0 ? 1 : lerp(0.7, 1, back(p, 1.6))) * (1 - 0.7 * outF)}) translate(${-re.R.x} ${-re.R.y})`);
         const da = (-90 + 360 * ((t - A) * 0.18 + re.i * 0.13)) * Math.PI / 180;
         re.d.setAttribute('cx', re.R.x + re.R.r * Math.cos(da)); re.d.setAttribute('cy', re.R.y + re.R.r * Math.sin(da));
       }
-      const fade = 1 - ramp(t, E0 - 1.0, E0 - 0.4, lin);
+      const fade = 1 - ramp(t, E0 - 0.8, E0 - 0.3, lin);
       for (const l of links) {
         const p = ramp(t, l.t0, l.t0 + 0.5, eio);
         const x2 = lerp(l.A.x, l.B.x, p), y2 = lerp(l.A.y, l.B.y, p);
@@ -928,17 +995,16 @@
         l.sym.setAttribute('opacity', (t >= l.t0 + 0.5 ? 1 : 0) * fade);
       }
       // plate at the centre when the network is whole
-      const pp = ramp(t, A + 4.0, A + 4.3);
-      const pr = plate.getBoundingClientRect();
+      const pp = ramp(t, A + 4.8, A + 5.1);
       at(plate, 960 - plate.offsetWidth / 2, 560 - plate.offsetHeight / 2);
       put(plate, { o: pp * (1 - ramp(t, E0 - 0.6, E0 - 0.3, lin)), s: lerp(0.9, 1, back(pp, 1.6)) });
       put(legend, { o: ramp(t, A + 2.2, A + 2.5, lin) * (1 - ramp(t, E0 - 0.6, E0 - 0.3, lin)) });
       // ending: the last ring shrinks into the mark at the centre; lockup letters wipe in
-      const lp = ramp(t, E0 + 0.5, E0 + 1.0, eio);
+      const lp = ramp(t, E0 + 0.2, E0 + 0.6, eio);
       L.place(960 - (175 * 200 / 64) / 2 + 32 * 200 / 64, 480, 200);
-      L.set({ o: t >= E0 + 0.5 ? ramp(t, E0 + 0.5, E0 + 0.7, lin) : 0, ringO: 1, gO: lp, lettersF: ramp(t, E0 + 0.9, E0 + 1.6, lin) });
-      put(sub, { o: ramp(t, E0 + 1.5, E0 + 1.7, lin), y: 12 * (1 - ramp(t, E0 + 1.5, E0 + 1.75)) });
-      put(note, { o: ramp(t, E0 + 1.8, E0 + 2.0, lin) });
+      L.set({ o: t >= E0 + 0.2 ? ramp(t, E0 + 0.2, E0 + 0.4, lin) : 0, ringO: 1, gO: lp, lettersF: ramp(t, E0 + 0.5, E0 + 1.1, lin) });
+      put(sub, { o: ramp(t, E0 + 0.9, E0 + 1.1, lin), y: 12 * (1 - ramp(t, E0 + 0.9, E0 + 1.15)) });
+      put(note, { o: ramp(t, E0 + 1.1, E0 + 1.3, lin) });
     };
   }
 
@@ -974,7 +1040,7 @@
       '01-work': 3.6, '02-scattered': 8.6, '03-freeze': 9.85, '04-snap': 11.4, '05-gathered': 12.9, '06-title': 16.5,
       '07-cycle': T.cycle[1] - 1.0,
       ...Object.fromEntries(CHAPTERS.map((c, i) => [`${String(i + 8).padStart(2, '0')}-ch${i + 1}`, +(Math.min(c.a + 2.2, c.b - 0.3)).toFixed(2)])),
-      '14-network': T.brain[0] + 3.0, '15-second-brain': T.brain[1] - 0.6, '16-closing': DUR - 0.3,
+      '14-network': T.brain[0] + 3.6, '15-second-brain': T.brain[1] - 0.6, '16-closing': DUR - 0.3,
     };
     window.TEXTS = t => TEXTS.filter(x => t >= x.a && t < x.b).map(x => {
       const r = x.el.getBoundingClientRect();

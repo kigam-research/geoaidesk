@@ -216,11 +216,12 @@ def main():
     for e in EV:
         tt = e["t"]
         if e["type"] == "chapter":
-            X.add(fx, X.whoosh(0.32), tt, 0.28, 0.25)
+            X.add(fx, X.whoosh(0.5), tt - 0.1, 0.24, 0.25)
+            X.add(fx, shimmer(0.7), tt, 0.10, -0.2)
         elif e["type"] == "collapse":
             X.add(fx, sine(1600, 300, 0.2, 0.06), tt, 0.07, 0.0)
-        elif e["type"] == "cut":
-            X.add(fx, shimmer(0.5), tt, 0.10 if not e.get("example") else 0.16, 0.3)
+        elif e["type"] == "cut" and not e.get("chapter"):
+            X.add(fx, shimmer(0.6), tt, 0.10 if not e.get("example") else 0.16, 0.3)
         elif e["type"] == "tag":
             ci = next((i for i, c in enumerate(chapters) if c["a"] - 0.01 <= tt < c["b"] + 0.01), 0)
             r = ROOTS[ci % len(ROOTS)]
@@ -253,8 +254,8 @@ def main():
             note(music, "glockenspiel", deg(7 + (ri * 2) % 9, 74), 0.6, 0.3, e["t"] + 0.02, 0.15, float(np.clip(e["pan"] * 2, -0.8, 0.8)))
             ri += 1
         elif e["type"] == "retract":
-            for j in range(14):
-                X.add(fx, X.click(1.6 - j * 0.05, 0.6), e["t"] + j * 0.08, 0.05, 0.6 - j * 0.09)
+            for j in range(13):
+                X.add(fx, X.click(1.6 - j * 0.05, 0.6), e["t"] + j * 0.06, 0.05, 0.6 - j * 0.09)
         elif e["type"] == "final":
             note(music, "glockenspiel", deg(7, 74), 2.5, 0.6, e["t"], 0.45, 0.0)
             note(music, "hand_chimes", deg(0, 74), 3.0, 0.5, e["t"], 0.35, 0.0)
@@ -273,7 +274,7 @@ def main():
     # music tail before the near-silence must not ring through it
     fade_out = np.clip((np.arange(N) / SR - (DUR - 1.2)) / 1.2, 0, 1)
     mix *= (1 - fade_out ** 2)[:, None]
-    # level for mastering: about -21 dBFS RMS over the sounding parts, peaks held 12.5 dB lower so the -14 LUFS loudnorm
+    # level for mastering: about -21 dBFS RMS over the sounding parts, peaks held 10 dB above it (limiter at -11 dBFS) so the -14 LUFS loudnorm
     # stays linear (the press and the chord are the hottest moments)
     mix = mix[: int(DUR * SR)]
     m = mix.mean(1)
@@ -281,8 +282,8 @@ def main():
     rms = float(np.sqrt(np.mean(m[sounding] ** 2)))
     mix *= 10 ** (-21 / 20) / max(rms, 1e-9)
     for c in range(2):
-        mix[:, c] = X.limit(mix[:, c], 10 ** (-12.5 / 20), look=0.004)
-        mix[:, c] = X.limit(mix[:, c], 10 ** (-12.5 / 20), look=0.002)
+        mix[:, c] = X.limit(mix[:, c], 10 ** (-11 / 20), look=0.004)
+        mix[:, c] = X.limit(mix[:, c], 10 ** (-11 / 20), look=0.002)
     args.out.mkdir(parents=True, exist_ok=True)
     sf.write(args.out / "mix.wav", mix.astype(np.float32), SR, subtype="FLOAT")
     (args.out / "instruments.json").write_text(json.dumps(sorted(used)) + "\n")
