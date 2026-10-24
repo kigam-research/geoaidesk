@@ -26,7 +26,12 @@ def main():
     for shot in edit['shots']:
         raw=root/'raw'/shot['source']
         timing=json.loads((raw/'timing.json').read_text())
-        source=timing['frames']; times=[f['t'] for f in source]
+        arrival=timing['frames']
+        regressions=sum(b['t']<a['t'] for a,b in zip(arrival,arrival[1:]))
+        # Chrome can deliver a previously presented frame after a newer one
+        # during concurrent readbacks. Select by presentation time, not arrival.
+        source=sorted(arrival,key=lambda f:(f['t'],f['frame']))
+        times=[f['t'] for f in source]
         assert all(a<=b for a,b in zip(times,times[1:])),shot['id']
         start,end,fps=shot['start'],shot['end'],shot['fps']
         assert end<=timing['elapsedSeconds']+.1
@@ -50,7 +55,8 @@ def main():
         native_fps=(len(native)-1)/(native[-1]['t']-native[0]['t']) if len(native)>1 else 0
         record={'id':shot['id'],'frames':len(selected),'fps':fps,
             'pattern':f"shots/{shot['id']}/frame-%05d.png",'url':edit['app']['url'],
-            'source':{'raw':shot['source'],'start':start,'end':end,'nativeFps':native_fps},
+            'source':{'raw':shot['source'],'start':start,'end':end,'nativeFps':native_fps,
+                'arrivalTimestampRegressions':regressions},
             'pointer':[f.get('pointer') for f in selected],
             'sourceFrame':[f['frame'] for f in selected],
             'sourceTimestamp':[f['t'] for f in selected],
