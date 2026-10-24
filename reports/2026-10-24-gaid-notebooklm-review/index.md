@@ -8,6 +8,7 @@ review_status: pending
 decisions: 2
 cover:
 supersedes:
+reviewed: 2026-10-24
 ---
 # GAID와 Gemini Notebook(구 NotebookLM) 비교, 차별화와 연계 제안
 
