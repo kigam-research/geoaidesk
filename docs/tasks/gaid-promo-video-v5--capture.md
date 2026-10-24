@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:04:03Z
+updated: 2026-10-24T02:09:03Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7b6c0c70-dc29-4c26-aee1-6a9e2549e4b2","pid":1222631,"provider":"codex","session":"01a16b9a-30c0-7823-bbfa-e604026a2474","start":"69456843","token":"8d41e205d92dc2e9f2d13e4620748ccd6276cd4ae4f4294f054d0afbb6e2d1fb"}
 branch: task/gaid-promo-video-v5--capture
 target: task/gaid-promo-video-v5
@@ -54,31 +54,46 @@ frame. Commit only `geo/promo/capture_v5*.py` and `geo/promo/CAPTURE.md` (plus y
 If a take cannot show its state cleanly, deliver the others and report that take with the reason.
 
 ## Current state
-Y1–Y7 captured: 1,081 frames / 36.033 s, 16 whole-element beats. capture_verify.py and capture_v5_verify.py pass. All 16 drawn midpoint frames and all first/middle/last frames inspected. Geometry QA found outside list markers on the final note highlight; switch that highlight to the complete decision-status heading/paragraph. Y4 will retain original composer connection status; no DOM masks. Inventory 1,641 before/after: only library/zotero.json changed; all project and skill-hub files unchanged. GET /geo/library calls refreshIfStale (server source), so browser write blocking cannot guarantee literal full-store immutability. No model run or Workflow start occurred.
+Y1–Y7 are ready at ~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/: 1,096 frames / 36.533 s, 2880×1620, 30 fps; 17 whole-element beats with region/selector. capture_verify.py and capture_v5_verify.py pass. All 17 drawn midpoint images and every take's first/middle/last states were visually inspected. Y4 includes original Workflow card, tools and map. Y6's final rect is a measured union of whole decision-status siblings, avoiding outside list markers. Original map/concept stills have verified hashes. Complete take/geometry tables and evidence are in geo/promo/CAPTURE.md (v5 section).
+
+No model runs, messages, starts, registrations, installs or user-data edits were requested. Browser blocked 21 workspace PUTs, 7 suggestion POSTs and the first manifest POST; only explicit inspection/map reads reached the server. Both controller jobs exited 0 and Chrome/port 18359 are closed. No app/hub restart. Page exceptions: 0; three staging-only resource 413 notices.
+
+Inventory: 1,641 files before/after; all Yilgarn project and skill-hub files unchanged. Only library/zotero.json changed hash/mtime. GET library triggers automatic Zotero refresh in server code; exact changed field was not established. Thus literal identical-inventory criterion is unmet and must be reported by the parent. No data was restored to hide it. Film integration remains the parent's work.
+
 ## Next steps
-1. Measure the final note decision-status element, update its beat, recheck drawn frame, record full evidence and finish.
+1. Parent: task complete gaid-promo-video-v5--capture, then use capture-v5/capture.json for composition and preserve the documented inventory exception in its report.
+2. Offline recheck: uv run --no-project --with pillow==12.3.0 python geo/promo/capture_v5_verify.py.
 ## Failed approaches
 - First job launch refused dirty source; saved reviewed helper before launching job 1.
 - First map manifest request was blocked; confirmed /geo/result is read-only and explicitly allowlisted it.
 - Start-window selections are role=radio and stage controls role=tab, not button; inspected outerHTML and corrected locators after two failed button lookups.
 - Initial Y3 inherited Cu-PGE settings; archived outside Git and recaptured using locally selected Ni/komatiite. Never started.
+- Initial Y4 lacked a tool beat; archived and recaptured with the complete historical tool group.
+- A whole UL bounding box excludes outside-painted list markers. Replaced the final Y6 highlight with the whole sibling heading/paragraph union, measured in the identical scroll state (old list bounds matched exactly). Original screen pixels retained.
 ## Notes and decisions
 - Sequential work: browser guard/inventory → UI staging and capture → midpoint geometry inspection → evidence and finish. Single writer owns only capture_v5*.py, CAPTURE.md v5 section and this task document. Parent owns film integration; no further child units.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
-(user decisions, checks and accepted debt that outlive this unit, one line each:
-`- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
-kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
-the project hub answers or closes them with `task item`)
+None. The one-file service-maintained inventory exception is evidence for parent reporting, not a request to change or restore unrelated data.
+
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Child unit: no separate report. The parent's canonical film report incorporates geo/promo/CAPTURE.md, v5 section. Only the allowed capture helpers, CAPTURE.md and this task document changed.
+
+## Checks
+- capture_verify.py: passed, seven takes / 1,096 consecutive 2880×1620 frames / 17 beats.
+- capture_v5_verify.py: passed frame/timeline/selector/still checks; reports the inventory exception explicitly.
+- All 17 current drawn midpoint images opened individually; first/middle/last contact sheets inspected for all seven takes.
+- AST parse of capture_v5*.py and git diff --check passed.
+- No automated app checks (no application/runtime source edits).
+- Controller job 1 and job 2 exit files both read back as 0; neither remains running.
+- Humanizer file-mode pass applied to the new CAPTURE.md section; names, paths, selectors, numbers, hashes and quoted UI copy preserved.
+
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5--capture-20261024T015207.627452Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5--capture-20261024T020415.994673Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
