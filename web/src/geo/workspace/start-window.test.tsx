@@ -53,7 +53,7 @@ describe("file candidates (F17, decision 3)", () => {
 describe("GAID Workflow start window", () => {
   it("opens on what the Workflow does, groups files and flags an unused fitting file in the summary", async () => {
     render(<TaskSetup workflow={summary([role("dem", "DEM", true), role("boreholes", "Boreholes")])} projectId="p1" open onOpenChange={vi.fn()} onRefresh={vi.fn()}
-      availableFiles={["user_data/dem.csv", "user_data/holes.csv", "outputs/dem_resampled.csv"]} source="허브 Workflow" />);
+      availableFiles={["user_data/dem.csv", "user_data/holes.csv", "outputs/dem_resampled.csv"]} source="Connect Workflow" />);
     const dialog = await screen.findByRole("dialog");
     // Introduction: purpose, inputs, conditions, outputs, steps, limits; every step named in the step list.
     const intro = within(dialog).getByRole("region", { name: "Workflow 소개" });
@@ -61,7 +61,7 @@ describe("GAID Workflow start window", () => {
     expect(within(intro).getAllByText("감수율 모델")[0]).toBeVisible();
     expect(within(intro).getByTitle("역산")).toBeInTheDocument();
     expect(within(intro).getAllByText("추정이며 검토 전입니다.")[0]).toBeVisible();
-    expect(within(dialog).getByText("허브 Workflow")).toBeInTheDocument(); expect(within(dialog).getByText("version 0.1.1")).toBeInTheDocument();
+    expect(within(dialog).getByText("Connect Workflow")).toBeInTheDocument(); expect(within(dialog).getByText("version 0.1.1")).toBeInTheDocument();
     // The steps name only the condition: the inputs join the first step's page (gaid-workflow-stages).
     expect(tabs(dialog)).toEqual(["Workflow 소개", "자료 점검", "역산", "요약"]);
     await userEvent.click(within(dialog).getByRole("button", { name: "입력 자료 고르기" }));
@@ -125,7 +125,7 @@ function staged(inputRoles: WorkflowInputRole[], choices: GeoWorkflowSummary["re
     doc: { ...doc, inputRoles: inputRoles.map((r) => ({ id: r.id, label: r.label, formats: r.formats, required: r.required, ...(r.multiple ? { multiple: true } : {}) })), choices, steps } };
 }
 const open = (workflow: GeoWorkflowSummary, files: string[]) => {
-  render(<TaskSetup workflow={workflow} projectId="p1" open onOpenChange={vi.fn()} onRefresh={vi.fn()} availableFiles={files} source="허브 Workflow" />);
+  render(<TaskSetup workflow={workflow} projectId="p1" open onOpenChange={vi.fn()} onRefresh={vi.fn()} availableFiles={files} source="Connect Workflow" />);
   return screen.findByRole("dialog");
 };
 

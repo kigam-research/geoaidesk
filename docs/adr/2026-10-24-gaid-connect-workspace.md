@@ -1,7 +1,8 @@
 # ADR 2026-10-24: GAID = GAID Connect + GAID Workspace; 서재 is the researcher's personal literature space
 
-Status: proposed 2026-10-24 (gaid-ia-connect-workspace phase 1). The place names are the user's decision; the structure
-below waits for the user's approval of the mockups in `reports/2026-10-24-gaid-ia-connect-workspace/`. It replaces
+Status: accepted 2026-10-24 (gaid-ia-connect-workspace). User decision (verbatim): "모두 권장대로 하자."
+The user approved the mockup structure, short app-bar names `Workspace | Connect`, visible institute-server name
+"기관 Connect 서버", and sharing copy "공유된 Workflow", "Connect에 공유", "공유됨" (version wording unchanged). It replaces
 decision 1 ("Information architecture") of ADR 2026-10-21 research-hub-library where that ADR puts the library under "내 연구".
 
 ## Context
@@ -39,7 +40,8 @@ were accepted as recommended ("2, 3은 권장이다.").
    research notes, Workspace analysis bundle) that makes the research cycle visible.
 6. **Research cycle (docs, help, videos).** 연구 질문·자료 → Connect에서 Workflow 만들기·고르기 → Workspace에서 설치·분석 →
    정리 노트 → Connect에 공유·개선; 서재 supplies the literature at every step.
-7. **Compatibility.** Old `#hub…` links keep opening (new `#connect…` addresses are added); code identifiers, server routes
+7. **Institute server and sharing.** Visible copy calls the institute hub server "기관 Connect 서버" (Institute Connect server). The action is "Connect에 공유" (Share on Connect), lists show "공유된 Workflow" (Shared Workflows), and the state is "공유됨" (Shared). Version numbering and stored registration records are unchanged.
+8. **Compatibility.** Old `#hub…` links keep opening (new `#connect…` addresses are added); code identifiers, server routes
    (`/geo/hub/*`), modules and locale namespaces keep their names. Stored data is not rewritten.
 
 ## Alternatives considered
@@ -52,8 +54,8 @@ were accepted as recommended ("2, 3은 권장이다.").
 ## Consequences
 
 - Visible copy that names the places changes (inventory in the report §3.6); `geo/copy/terminology.csv` gains
-  GAID Workspace, GAID Connect and 서재 rows with the old place names as forbidden terms.
-- AGENTS.md, `docs/design/ui-guide.md` (L2, N1, N5), the hub authoring design doc and the research-hub-library ADR are
-  updated in phase 2.
+  GAID Workspace, GAID Connect and 서재 rows. Old place names are forbidden only where the validator can distinguish them from ordinary or external uses.
+- AGENTS.md, `docs/design/ui-guide.md` (L2, N1, N5, D6), the hub authoring design doc and the research-hub-library ADR are
+  updated with the implementation.
 - The Workspace home needs cross-project summaries (recent sessions, notes with open decisions, installed Workflows) that
   today exist per project only.

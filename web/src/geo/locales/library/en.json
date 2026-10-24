@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "label": "My research views",
+    "label": "Library views",
     "projects": "Projects",
     "library": "Library"
   },
@@ -80,7 +80,7 @@
     "zotero": {
       "button": "Open in Zotero"
     },
-    "usesTitle": "Used in your research",
+    "usesTitle": "Used in",
     "usesEmpty": "Not used in a note, Workflow or project yet.",
     "useNote": "Research note “{title}”",
     "useWorkflow": "Workflow “{title}”",

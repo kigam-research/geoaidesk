@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "label": "내 연구 화면",
+    "label": "서재 화면",
     "projects": "프로젝트",
     "library": "서재"
   },
@@ -80,7 +80,7 @@
     "zotero": {
       "button": "Zotero에서 열기"
     },
-    "usesTitle": "내 연구에서 쓰인 곳",
+    "usesTitle": "쓰인 곳",
     "usesEmpty": "아직 노트·Workflow·프로젝트에서 쓰지 않았습니다.",
     "useNote": "연구노트 「{title}」",
     "useWorkflow": "Workflow 「{title}」",

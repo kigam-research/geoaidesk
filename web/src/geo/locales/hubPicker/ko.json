@@ -1,32 +1,32 @@
 {
   "search": {
-    "label": "GAID 허브 검색",
+    "label": "GAID Connect 검색",
     "placeholder": "이름이나 분석 주제 검색"
   },
-  "loading": "허브 목록을 읽는 중입니다.",
-  "error": "허브 목록을 읽지 못했습니다. 다시 읽으세요.",
+  "loading": "Connect 목록을 읽는 중입니다.",
+  "error": "Connect 목록을 읽지 못했습니다. 다시 읽으세요.",
   "retry": {
     "button": "목록 다시 읽기"
   },
   "empty": "조건에 맞는 항목이 없습니다. 검색어를 바꾸세요.",
   "emptyRecipes": "저장한 시작 설정이 있는 Workflow가 없습니다. 검색어를 바꾸거나 파일에서 가져오세요.",
-  "results": "허브 검색 결과",
+  "results": "Connect 검색 결과",
   "stars": "★ {count}",
   "revision": "version {version}",
   "kind": {
     "skill": "스킬",
     "workflow": "Workflow"
   },
-  "kindTip": "허브에 등록된 Workflow의 유형입니다.",
+  "kindTip": "Connect에 공유된 Workflow의 유형입니다.",
   "recipe": "저장한 시작 설정",
   "recipeTip": "Workflow에 저장한 시작 설정이 있습니다.",
   "browse": {
-    "button": "GAID 허브에서 찾기"
+    "button": "Connect에서 찾기"
   },
   "file": {
     "button": "파일에서 가져오기"
   },
-  "description": "GAID 허브에서 Workflow를 찾거나 저장한 시작 설정 파일을 가져옵니다.",
+  "description": "GAID Connect에서 Workflow를 찾거나 저장한 시작 설정 파일을 가져옵니다.",
   "back": {
     "button": "목록으로 돌아가기"
   },
@@ -36,7 +36,7 @@
     "button": "설치 후 시작 설정 열기"
   },
   "installing": "Workflow를 설치하는 중입니다.",
-  "installError": "Workflow를 설치하지 못했습니다. 허브에서 선택한 version을 확인한 뒤 다시 시도하세요.",
+  "installError": "Workflow를 설치하지 못했습니다. Connect에서 선택한 version을 확인한 뒤 다시 시도하세요.",
   "installed": "프로젝트에서 이미 사용할 수 있습니다. 저장된 시작 설정을 엽니다.",
   "installedNeedsCheck": "이미 설치된 Workflow입니다. Workflow를 열어 사용 상태와 저장한 시작 설정을 확인하세요.",
   "method": {
@@ -46,11 +46,11 @@
     "button": "시작 설정 열기"
   },
   "methodsError": "설치된 Workflow를 읽지 못했습니다. 대화창을 닫고 다시 여세요.",
-  "skillTitle": "GAID 허브에서 스킬 찾기",
+  "skillTitle": "Connect에서 스킬 찾기",
   "skillHelp": "스킬을 선택한 뒤 포함 파일을 미리 확인합니다.",
   "preview": {
     "button": "파일 묶음 미리보기"
   },
   "legacy": "이전 skill_hub",
-  "previewSource": "GAID 허브 · {title} · version {version}"
+  "previewSource": "GAID Connect · {title} · version {version}"
 }

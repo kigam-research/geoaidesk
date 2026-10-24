@@ -48,7 +48,7 @@
   "detail": {
     "back": "Back to list",
     "method": "Method used: {name}",
-    "methodUnnamed": "hub method",
+    "methodUnnamed": "Connect method",
     "assessment": {
       "useful": "Trial assessment: useful",
       "needs-revision": "Trial assessment: needs revision",

@@ -252,6 +252,8 @@ export interface LoadGeoCatalogueOptions {
   repoRoot?: string;
   cacheDir?: string;
   pin?: CataloguePin;
+  /** Read-only summaries may reuse a verified tree, but must not stage or repair it. */
+  readOnly?: boolean;
 }
 
 let cached: { key: string; catalogue: GeoCatalogue } | null = null;
@@ -285,6 +287,7 @@ export function loadGeoCatalogue(options: LoadGeoCatalogueOptions = {}): GeoCata
     archivePath =
       readJson<{ archive?: string }>(path.join(root, STAGED_MARKER)).archive ?? stagingDirFor(pin, cacheDir);
   } else {
+    if (options.readOnly) throw new GeoCatalogueError("archive-missing", "No verified staged catalogue is available for read-only use");
     archivePath = locateArchive(pin, env, repoRoot);
     root = stage(pin, archivePath, cacheDir);
   }

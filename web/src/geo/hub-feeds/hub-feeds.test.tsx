@@ -65,7 +65,7 @@ describe("research feeds place", () => {
   it("without a hub server login explains where to connect", async () => {
     vi.mocked(apiFetch).mockImplementation(async () => response({ ...list, connected: false, items: [], sources: [], collectedAt: null }));
     render(<FeedScreen projects={[]} />);
-    fireEvent.click(await screen.findByRole("button", { name: "허브 서버 설정 열기" }));
+    fireEvent.click(await screen.findByRole("button", { name: "기관 서버 설정 열기" }));
     expect(settings).toHaveBeenCalledWith({ tab: "services", section: "gaid-hub-server" });
   });
 

@@ -165,7 +165,7 @@ describe("task catalogue and setup", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Workflow 검색" }), { target: { value: "review a paper" } });
     expect(screen.queryByRole("button", { name: /^Well log QC well-qc/ })).not.toBeInTheDocument(); expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument();
     view.unmount(); catalogueState = "off"; catalogue(); expect(await screen.findByText(/Geo 카탈로그 상태: off/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "허브에서 Workflow 가져오기" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^논문 검토/ })).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "Connect에서 가져오기" })).not.toBeInTheDocument();
   });
   it("explicitly prepares the project environment and refreshes readiness", async () => {
     rows = [workflow("needs-environment")]; catalogue(); const dialog = await openSetup(); within(dialog).getByText("준비되지 않은 실행 환경: Geo core"); expect(apiFetch.mock.calls.some(([path]) => path.endsWith("/prepare"))).toBe(false);
@@ -195,7 +195,7 @@ describe("task catalogue and setup", () => {
     expect(await within(dialog).findByText("준비를 마쳤습니다. 시작 초안을 만들 수 있습니다.")).toBeInTheDocument();
   });
   it("checks a local recipe without starting, showing a localized issue", async () => {
-    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "허브에서 Workflow 가져오기" })); const dialog = await screen.findByRole("dialog");
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "Connect에서 가져오기" })); const dialog = await screen.findByRole("dialog");
     await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 저장한 시작 설정 파일"), { target: { files: [recipeFile({})] } });
     expect(await within(dialog).findByRole("alert")).toHaveTextContent("다른 카탈로그 version의 저장한 시작 설정입니다: 0.1.0");
@@ -204,7 +204,7 @@ describe("task catalogue and setup", () => {
   });
   it("saves a checked recipe under a new category, lists it there, opens it prefilled and deletes it", async () => {
     recipeResult = { ok: true, issues: [], setup: okSetup };
-    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "허브에서 Workflow 가져오기" })); let dialog = await screen.findByRole("dialog");
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "Connect에서 가져오기" })); let dialog = await screen.findByRole("dialog");
     await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 저장한 시작 설정 파일"), { target: { files: [recipeFile(okRecipe)] } });
     expect(await within(dialog).findByLabelText("저장한 시작 설정 제목")).toHaveValue("Well log QC well-qc");
@@ -231,7 +231,7 @@ describe("task catalogue and setup", () => {
   });
   it("opens a checked recipe once without saving", async () => {
     recipeResult = { ok: true, issues: [], setup: okSetup };
-    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "허브에서 Workflow 가져오기" })); const dialog = await screen.findByRole("dialog");
+    catalogue(); await userEvent.click(await screen.findByRole("button", { name: "Connect에서 가져오기" })); const dialog = await screen.findByRole("dialog");
     await userEvent.click(within(dialog).getByRole("button", { name: "파일에서 가져오기" }));
     fireEvent.change(within(dialog).getByLabelText("Geo 작업 저장한 시작 설정 파일"), { target: { files: [recipeFile(okRecipe)] } });
     await userEvent.click(await within(dialog).findByRole("button", { name: "저장하지 않고 열기" }));

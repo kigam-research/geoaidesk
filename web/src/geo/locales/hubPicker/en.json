@@ -1,32 +1,32 @@
 {
   "search": {
-    "label": "Search GAID hub",
+    "label": "Search GAID Connect",
     "placeholder": "Search by name or research topic"
   },
-  "loading": "Reading hub entries.",
-  "error": "Could not read hub entries. Reload the list.",
+  "loading": "Reading Connect entries.",
+  "error": "Could not read Connect entries. Reload the list.",
   "retry": {
     "button": "Reload list"
   },
   "empty": "No entries match. Change the search term.",
   "emptyRecipes": "No Workflows with saved start settings match. Change the search term or import a file.",
-  "results": "Hub search results",
+  "results": "Connect search results",
   "stars": "★ {count}",
   "revision": "version {version}",
   "kind": {
     "skill": "Skill",
     "workflow": "Workflow"
   },
-  "kindTip": "The type of Workflow registered in the hub.",
+  "kindTip": "The type of Workflow shared on Connect.",
   "recipe": "saved start settings",
   "recipeTip": "The Workflow has saved start settings.",
   "browse": {
-    "button": "Find in GAID hub"
+    "button": "Find in Connect"
   },
   "file": {
     "button": "Import from file"
   },
-  "description": "Find a Workflow in the GAID hub or import a saved start settings file.",
+  "description": "Find a Workflow in GAID Connect or import a saved start settings file.",
   "back": {
     "button": "Back to list"
   },
@@ -36,7 +36,7 @@
     "button": "Install and open start settings"
   },
   "installing": "Installing the Workflow.",
-  "installError": "Could not install the Workflow. Check the selected version in the hub and try again.",
+  "installError": "Could not install the Workflow. Check the selected version in Connect and try again.",
   "installed": "Already available in the project. Open its saved start settings.",
   "installedNeedsCheck": "This Workflow is already installed. Open it to check its availability and saved start settings.",
   "method": {
@@ -46,11 +46,11 @@
     "button": "Open start settings"
   },
   "methodsError": "Could not read installed Workflows. Close and reopen the dialog.",
-  "skillTitle": "Find skills in GAID hub",
+  "skillTitle": "Find skills in Connect",
   "skillHelp": "Select a skill, then preview its included files.",
   "preview": {
     "button": "Preview archive"
   },
   "legacy": "Previous skill_hub",
-  "previewSource": "GAID hub · {title} · version {version}"
+  "previewSource": "GAID Connect · {title} · version {version}"
 }
