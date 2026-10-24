@@ -71,6 +71,7 @@ import { CommandBlockChip } from "@/components/command-block-chip";
 import { parseCommandBlock, slashMenuItems, type SlashMenuItem } from "@/lib/command-blocks";
 import { parseWorkflowBlock } from "@/geo/contracts/workflow-doc";
 import { PendingWorkflowChip, WorkflowBlockCard } from "@/geo/workflow/workflow-card";
+import { DigestRequestCard, parseDigestRequest } from "@/geo/library/digest-request-card";
 import { usePromptTemplates } from "@/lib/use-prompts";
 import { KadyFileIcon } from "@/components/file-icon";
 import { ScientificResultCard } from "@/components/scientific-result-card";
@@ -1628,10 +1629,11 @@ export const ChatMessageRow = memo(function ChatMessageRow({
             {(() => {
               const { text, context } = splitComposerContext(message.content);
               const workflow = parseWorkflowBlock(text);
-              const block = workflow ? null : parseCommandBlock(text);
+              const digestRequest = workflow ? null : parseDigestRequest(text);
+              const block = workflow || digestRequest ? null : parseCommandBlock(text);
               return (
                 <>
-                  {workflow ? <WorkflowBlockCard block={workflow} /> : block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
+                  {workflow ? <WorkflowBlockCard block={workflow} /> : digestRequest ? <DigestRequestCard request={digestRequest} /> : block ? <CommandBlockChip block={block} /> : <MessageResponse>{text}</MessageResponse>}
                   {context && <SentContextChips context={context} />}
                 </>
               );

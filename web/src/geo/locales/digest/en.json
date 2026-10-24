@@ -141,5 +141,10 @@
     "title": "Literature digests {count}",
     "covers": "Covers {covered} of {total} project papers",
     "openTip": "Open the literature digest in the library"
+  },
+  "request": {
+    "label": "Literature digest request · {workflow}",
+    "expand": "Show the instructions the AI agent received",
+    "collapse": "Hide the instructions the AI agent received"
   }
 }

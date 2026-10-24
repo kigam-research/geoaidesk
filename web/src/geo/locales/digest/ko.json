@@ -141,5 +141,10 @@
     "title": "문헌 정리 {count}",
     "covers": "프로젝트 논문 {total}편 중 {covered}편",
     "openTip": "서재에서 문헌 정리를 엽니다"
+  },
+  "request": {
+    "label": "문헌 정리 요청 · {workflow}",
+    "expand": "AI agent가 받은 지시 펼치기",
+    "collapse": "AI agent가 받은 지시 접기"
   }
 }
