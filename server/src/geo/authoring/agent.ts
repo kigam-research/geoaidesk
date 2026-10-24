@@ -26,9 +26,10 @@ import { chosenHubSkills, hubSkillQuestion, HUB_SKILLS_KEY, loadHubSkillCandidat
 import { loadVocabulary, vocabularyText, type TaxonomyFacet, type Vocabulary } from "./vocabulary.ts";
 import {
   ANALYZE_PROMPT_VERSION,
-  ANALYZE_SYSTEM,
+  ANALYZE_TASK,
+  AUTHORING_SYSTEM,
   DRAFT_PROMPT_VERSION,
-  DRAFT_SYSTEM,
+  DRAFT_TASK,
   REPAIR,
   REVISE_ADDENDUM,
 } from "./prompts.ts";
@@ -456,7 +457,6 @@ function draftRequest(
   project: AuthoringProject,
   ctx: SourceContext,
   v: Vocabulary,
-  includeSources = true,
 ): { text: string; findingIds: Map<string, string> } {
   const findingIds = new Map<string, string>();
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
@@ -494,7 +494,9 @@ function draftRequest(
       targetLine(project),
       `Sources: ${[...ctx.aliases].map(([a, id]) => `${a} = ${project.sources.find((s) => s.id === id)!.name}`).join("; ")}`,
       scope?.result?.scope ? `## Scope proposed in the analysis\n${scope.result.scope}` : "",
-      `## Verified findings\n${findings.join("\n")}`,
+      // The findings are a bounded index; the method's full procedure (every processing step, parameter, comparison and
+      // interpretation criterion) is in the sources at the top of the request, which the draft reads too.
+      `## Verified findings (an index; the sources above hold the full method)\n${findings.join("\n")}`,
       `## Researcher's decisions\n${decisions.join("\n") || "(none yet)"}`,
       `## Open questions\n${open.join("\n") || "(none)"}`,
       code.length
@@ -502,9 +504,6 @@ function draftRequest(
         : "## Supplied code files\n(none: the skill is descriptive)",
       previous ? `## Current draft slug\n${previous.slug} (keep it)` : "",
       `## Vocabularies\n${vocabularyText(v)}`,
-      // The findings are a bounded index; the method's full procedure (every processing step, parameter, comparison and
-      // interpretation criterion) is in the sources, so the first draft reads them too (same budget as analyze/revise).
-      includeSources ? `## Sources (the full method; findings above are an index, not the whole method)\n${ctx.text}` : "",
     ]
       .filter(Boolean)
       .join("\n\n"),
@@ -529,8 +528,8 @@ function reviseRequest(
   ctx: SourceContext,
   v: Vocabulary,
   feedback: string,
-): { text: string; findingIds: Map<string, string> } {
-  const base = draftRequest(project, ctx, v, false);
+): { text: string; findingIds: Map<string, string>; base: Json } {
+  const base = draftRequest(project, ctx, v);
   const d = structuredDraft(project.drafts.at(-1)!);
   const aliasOf = new Map([...ctx.aliases].map(([a, id]) => [id, a]));
   const current = {
@@ -560,9 +559,10 @@ function reviseRequest(
   };
   return {
     findingIds: base.findingIds,
+    // The reply carries only the fields it changes; they are laid over this object before validation.
+    base: current as Json,
     text: [
       base.text,
-      `## Sources (for checking details the feedback asks about)\n${ctx.text}`,
       `## Current draft (revision ${d.revision}, JSON in the output format)\n${JSON.stringify(current)}`,
       `## Feedback to address (verbatim)\n${feedback}`,
     ].join("\n\n"),
@@ -1239,7 +1239,8 @@ async function execute(
   attempt: AuthoringAttempt,
   deps: AgentDeps,
 ): Promise<AuthoringAttempt> {
-  const config = deps.config ?? modelConfig();
+  // One cache key per authoring project: its calls share the instructions-and-sources prefix.
+  const config: ModelConfig = { ...(deps.config ?? modelConfig()), cacheKey: projectId };
   const call = deps.chat ?? runtimeChat();
   const responses: { content: string; finishReason?: string }[] = [];
   const errorsByResponse: string[][] = [];
@@ -1281,25 +1282,26 @@ async function execute(
                   .map((q) => q.key)
                   .join(", ") || "none"
               }`,
-              `## Sources\n${ctx.text}`,
             ].join("\n\n"),
             findingIds: new Map<string, string>(),
           }
         : attempt.op === "revise"
           ? reviseRequest(project, ctx, v!, attempt.feedback ?? "")
           : draftRequest(project, ctx, v!);
+    const task =
+      attempt.op === "analyze"
+        ? ANALYZE_TASK
+        : attempt.op === "revise"
+          ? `${DRAFT_TASK}\n\n${REVISE_ADDENDUM}`
+          : DRAFT_TASK;
+    // Same system prompt and sources first for every operation and repair of this project: a cacheable shared prefix.
     const messages: ChatMessage[] = [
-      {
-        role: "system",
-        content:
-          attempt.op === "analyze"
-            ? ANALYZE_SYSTEM
-            : attempt.op === "revise"
-              ? `${DRAFT_SYSTEM}\n\n${REVISE_ADDENDUM}`
-              : DRAFT_SYSTEM,
-      },
-      { role: "user", content: request.text },
+      { role: "system", content: AUTHORING_SYSTEM },
+      { role: "user", content: `## Sources\n${ctx.text}\n\n# Task\n${task}\n\n${request.text}` },
     ];
+    // A revision and a draft repair return only the top-level fields they change, laid over this base before validation.
+    let base: Json | undefined = (request as { base?: Json }).base;
+    const replyKeys = new Set<string>();
     type Parsed = {
       ok: boolean;
       errors: string[];
@@ -1316,6 +1318,13 @@ async function execute(
       responses.push({ content: reply.content, finishReason: reply.finishReason });
       messages.push({ role: "assistant", content: reply.content });
       const parsed = parseReply(reply.content);
+      if (parsed.value && attempt.op !== "analyze") {
+        const patch = parsed.value;
+        parsed.value = base ? { ...base, ...patch } : patch;
+        base = parsed.value;
+        // codeFiles/references that no reply of a revision named keep the current draft's (checked below).
+        for (const key of Object.keys(patch)) replyKeys.add(key);
+      }
       let result: Parsed;
       if (!parsed.value)
         result = {
@@ -1333,8 +1342,8 @@ async function execute(
         // A revision that omits code or references keeps the current ones instead of dropping them.
         const previous = project.drafts.at(-1);
         if (d.draft && attempt.op === "revise" && previous) {
-          if (!Array.isArray(parsed.value.codeFiles)) d.draft.codeFiles = previous.codeFiles;
-          if (!Array.isArray(parsed.value.references)) d.draft.references = previous.references;
+          if (!replyKeys.has("codeFiles") || !Array.isArray(parsed.value.codeFiles)) d.draft.codeFiles = previous.codeFiles;
+          if (!replyKeys.has("references") || !Array.isArray(parsed.value.references)) d.draft.references = previous.references;
         }
         result = { ok: !!d.draft, errors: [...d.errors, ...d.stageErrors], draft: d.draft };
         // Run the package checks on the candidate so the bounded repair can fix what packaging would refuse.
@@ -1354,7 +1363,8 @@ async function execute(
     // Stage warnings always get the one repair round: a Workflow split item by item or past five steps is reworked.
     const staged = (p: Parsed) => p.errors.filter((e) => e.startsWith(STAGE_ERROR_PREFIX));
     if (!first.ok || !minor || staged(first).length) {
-      messages.push({ role: "user", content: REPAIR(first.errors.slice(0, 40)) });
+      // After a usable draft reply only the changed fields come back; analysis replies and unparsable ones come back whole.
+      messages.push({ role: "user", content: REPAIR(first.errors.slice(0, 40), attempt.op !== "analyze" && replyKeys.size > 0) });
       const second = await ask();
       const better =
         second.ok &&
