@@ -37,8 +37,10 @@ class Mix:
         self.n = int(round(seconds * SR))
         self.dry = np.zeros((self.n, 2))
         self.wet = np.zeros((self.n, 2))
+        self.times: list[float] = []
 
     def add(self, t: float, sig: np.ndarray, gain=1.0, pan=0.0, send=0.0):
+        self.times.append(t)
         i = int(round(t * SR))
         if i >= self.n or len(sig) == 0:
             return
@@ -225,36 +227,36 @@ def compose(seconds: float) -> Mix:
         mx.add(t, tone(m, 0.25, 0.06, (1.0, 0.4)), gain=g, pan=pan, send=0.3)
 
     mx.add(1.5 * BAR, riser(0.5 * BAR), gain=0.10, send=0.2)                         # into the stamp
-    mx.add(5.0 - 0.15, whoosh(0.45), gain=0.10, send=0.3)                             # blue wipe
+    mx.add(5.0 - S16, whoosh(0.45), gain=0.10, send=0.3)                              # blue wipe
     mx.add(5.0, impact(), gain=0.32, send=0.25)                                        # stamp
     mx.add(5.0, pad([62, 66, 69, 74], 1.6), gain=0.22, send=0.6)                       # chord stab
     mx.add(5.0, tone(86, 1.2, 0.35, (1.0, 0.3)), gain=0.08, send=0.6)
-    mx.add(6.5, whoosh(0.6, rise=False), gain=0.06, send=0.3)                          # field folds into the orbit
+    mx.add(6.5625, whoosh(0.6, rise=False), gain=0.06, send=0.3)                       # field folds into the orbit
     for i in range(5):                                                                  # pieces land on the shelves
         tick(8.4375 + i * S16, SCALE[(i * 2) % 8] + 12, 0.07, pan=-0.3 + 0.15 * i)
     for j, t in enumerate((11.25, 11.875, 12.5, 13.125)):                              # highlights
         tick(t, [69, 71, 73, 74][j] + 12, 0.08)
     for j in range(4):                                                                  # lines become steps
-        tick(13.75 + j * BEAT / 2 + 0.55, [62, 66, 69, 74][j] + 12, 0.09, pan=0.3)
+        tick(13.75 + j * BEAT / 2 + BEAT, [62, 66, 69, 74][j] + 12, 0.09, pan=0.3)
     for j, t in enumerate((15.625, 16.25, 16.875, 17.5)):                              # the AI agent passes a step
         mx.add(t, bell([74, 78, 81, 86][j], 1.0, 0.35), gain=0.07, pan=0.25, send=0.4)
     mx.add(21.25, kick(0.6), gain=0.25)                                                 # 내 자료 drops in
     tick(21.25, 81, 0.09)
     for j, t in enumerate((23.75, 24.375, 25.0, 25.625)):                              # the map fills, step by step
         mx.add(t, bell([74, 76, 78, 81][j], 1.0, 0.3), gain=0.06, pan=-0.2, send=0.4)
-    mx.add(27.5 - 0.15, whoosh(0.45), gain=0.10, send=0.3)                              # into the hub
+    mx.add(27.5 - S16, whoosh(0.45), gain=0.10, send=0.3)                               # into the hub
     for i in range(4):                                                                  # colleagues appear
         tick(28.125 + i * BEAT / 2, [74, 78, 81, 86][i], 0.07, pan=[-0.5, -0.2, 0.2, 0.5][i])
     for m in (86, 90, 93):                                                              # version 0.1.1
         mx.add(30.625, bell(m, 1.8, 0.7), gain=0.07, pan=0.1, send=0.6)
-    mx.add(32.2, whoosh(0.35, rise=False), gain=0.08, send=0.3)                          # back to the desk
+    mx.add(32.5 - 2 * S16, whoosh(0.35, rise=False), gain=0.08, send=0.3)                # back to the desk
     tick(33.75, 81, 0.08); tick(34.0625, 85, 0.08)                                      # evidence marks
-    tick(35.9, 74, 0.10)                                                                # the note is home
+    tick(35.9375, 74, 0.10)                                                             # the note is home
     for i in range(8):                                                                  # the loop closes
-        tick(36.0 + i * S16 * 0.8, SCALE[i] + 12, 0.045, pan=-0.4 + 0.1 * i)
+        tick(36.25 + i * S16, SCALE[i] + 12, 0.045, pan=-0.4 + 0.1 * i)
     for i in range(8):                                                                  # rings of colleagues
         tick(37.5 + i * BEAT / 4, SCALE[(i * 3) % 8] + 12, 0.04, pan=-0.6 + 0.15 * i)
-    mx.add(39.0, riser(2.25), gain=0.11, send=0.2)                                     # into the end card
+    mx.add(39.0625, riser(END - 39.0625), gain=0.11, send=0.2)                         # into the end card
     mx.add(END, impact(), gain=0.26, send=0.3)
     mx.add(END, pad([50, 62, 66, 69, 76], seconds - END), gain=0.30, send=0.7)         # Dadd9
     mx.add(END, bell(86, 3.5, 1.2), gain=0.08, send=0.6)
@@ -281,6 +283,8 @@ def render(path: Path, seconds: float) -> dict:
         w.writeframes(pcm.tobytes())
     return {
         "samples": int(len(y)), "rate": SR, "bpm": 96,
+        "events": len(mx.times),
+        "events_off_grid": [round(t, 4) for t in mx.times if abs(t / S16 - round(t / S16)) * S16 > 0.001],
         "peak_dbfs": round(float(20 * np.log10(np.max(np.abs(y)))), 2),
         "rms_dbfs": round(float(20 * np.log10(np.sqrt(np.mean(y ** 2)))), 2),
     }

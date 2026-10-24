@@ -58,7 +58,7 @@ Synthesised in `soundtrack.py` (numpy, 48 kHz stereo), all on the 96 BPM grid:
 - bars 12–13 (hub): open hats and a bell line; a chime on the version tick; whooshes on both blue wipes;
 - bars 14–17: same groove, thinner; a riser into 41.25 s;
 - 41.25 s: final Dadd9 chord with a soft impact, decaying to silence at 45 s.
-Effects sit under the music, same key, same reverb. Target: peak ≤ −1 dBFS, overall RMS about −16 dBFS.
+Effects sit under the music, same key, same reverb. Target: peak ≤ −1 dBFS, overall RMS about −16 dBFS. `render()` reports every event time that is off the 16th grid (expected: none).
 
 ## Deliverables (outside Git)
 

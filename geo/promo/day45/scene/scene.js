@@ -242,7 +242,7 @@
       field.style.display = fo ? '' : 'none';
       if (fo) {
         const wipe = ramp(t, 5.0, 5.3, inOut);
-        const shrink = ramp(t, 6.55, 7.15, inOut);
+        const shrink = ramp(t, 6.5625, 7.1875, inOut);
         const r = lerp(1200, 0, shrink);
         field.style.clipPath = shrink > 0 ? `circle(${r}px at 960px 540px)` : `inset(0 ${100 - wipe * 100}% 0 0)`;
         const si = ramp(t, 5.3, 6.1);
@@ -351,13 +351,13 @@
       const wfIn = ramp(t, 13.4, 14.0);
       put(wf, { o: wfIn * (1 - ramp(t, 19.4, 19.85, lin)), x: 40 * (1 - wfIn) });
       HL.forEach((k, j) => {
-        const a = 13.75 + j * BEAT * 0.5, f = ramp(t, a, a + 0.55, inOut);
+        const a = 13.75 + j * BEAT * 0.5, f = ramp(t, a, a + BEAT, inOut); // lands on the grid
         const fl = flyers[j];
         const sx = PG.x + 34, sy = PG.y + lines[k].y - 9, sw = lines[k].w + 12;
         const tx = WF.x + 32, ty = WF.y + 92 + j * WF.stepH, tw = WF.w - 64;
         box(fl, lerp(sx, tx, f), lerp(sy, ty, f), lerp(sw, tw, f), lerp(30, WF.stepH - 26, f));
         put(fl, { o: t >= a && f < 1 ? 1 : 0 });
-        put(steps[j], { o: f >= 1 ? 1 : 0, s: f >= 1 ? lerp(1.06, 1, ramp(t, a + 0.55, a + 0.8)) : 1 });
+        put(steps[j], { o: f >= 1 ? 1 : 0, s: f >= 1 ? lerp(1.06, 1, ramp(t, a + BEAT, a + BEAT + 0.25)) : 1 });
       });
       arrows.forEach((ar, i) => ar.setAttribute('opacity', ramp(t, 14.7 + i * 0.1, 15.0 + i * 0.1, lin) * (1 - ramp(t, 19.4, 19.85, lin))));
       // the AI agent follows the steps on the beat: 15.625, 16.25, 16.875, 17.5; stays on the last
@@ -532,21 +532,21 @@
       if (!o) return;
       // the note unfolds (32.5–33.2), evidence marks on 33.75 / 34.06, then it goes to the shelf (35.0–35.9)
       const unf = ramp(t, 32.5, 33.2, out);
-      const home = ramp(t, 35.0, 35.9, inOut);
+      const home = ramp(t, 35.0, 35.9375, inOut);
       const tx = SHELF.x + SHELF.w - 120, ty = rowY(4);
       const sc = lerp(lerp(0.6, 1, unf), 0.09, home);
       put(note, { o: unf * (1 - ramp(home, 0.85, 1, lin)), x: lerp(0, tx - (NT.x + NT.w / 2), home), y: lerp(0, ty - (NT.y + NT.h / 2), home), s: sc });
       txt.forEach((l, k) => put(l, { o: ramp(t, 33.2 + k * 0.15, 33.5 + k * 0.15, lin) }));
       ev.forEach((e, k) => put(e, { o: ramp(t, 33.75 + k * 0.3125, 33.95 + k * 0.3125, lin), s: lerp(1.2, 1, ramp(t, 33.75 + k * 0.3125, 34.1 + k * 0.3125)) }));
       if (deskShelf) deskShelf.rows[4].lit = home >= 1 ? 1 : 0;
-      // the loop around the shelf: 서재 → Workflow → 연구노트 → 서재 (36.0–37.0)
+      // the loop around the shelf: 서재 → Workflow → 연구노트 → 서재 (36.25–37.19)
       const x0 = SHELF.x + SHELF.w + 30, y0 = rowY(0), y1 = rowY(4);
       loop.setAttribute('d', `M ${x0} ${y0} C ${x0 + 120} ${y0} ${x0 + 120} ${y1} ${x0} ${y1} M ${x0 - 30 - SHELF.w - 34} ${y1} C ${SHELF.x - 70} ${y1} ${SHELF.x - 70} ${y0} ${SHELF.x - 4} ${y0}`);
-      const lf = ramp(t, 36.0, 37.0, inOut);
+      const lf = ramp(t, 36.25, 37.1875, inOut);
       loop.setAttribute('stroke-dasharray', `${lf} 1`);
-      loop.setAttribute('opacity', 1 - ramp(t, 37.15, 37.5, lin));
+      loop.setAttribute('opacity', 1 - ramp(t, 37.1875, 37.5, lin));
       head.setAttribute('d', lf >= 1 ? `M ${SHELF.x - 4} ${y0} l -16 -10 l 0 20 Z` : '');
-      head.setAttribute('opacity', 1 - ramp(t, 37.15, 37.5, lin));
+      head.setAttribute('opacity', 1 - ramp(t, 37.1875, 37.5, lin));
     };
   });
 
@@ -667,7 +667,7 @@
     window.motion = {
       ready: true,
       duration: DURATION,
-      poster: 9.2,
+      poster: 31.4,
       stills: {
         '01-hook': 4.2, '02-stamp': 5.9, '03-gathered': 9.3, '04-paper': 12.9, '05-workflow': 17.2, '06-data': 21.4,
         '07-map': 26.4, '08-hub': 29.4, '09-version': 31.4, '10-note': 34.4, '11-loop': 37.0, '12-network': 40.4, '13-end': 44.5,
