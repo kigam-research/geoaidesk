@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T00:57:56Z
+updated: 2026-10-24T00:59:38Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"9041d1a3-7e91-4078-bcd9-c922396931bf","pid":756157,"provider":"claude","session":"3069c8ee-f8d2-4558-9415-78ea443ef91b","start":"69075424","token":"20327401a56788b2a02c2d0c9f6ab09686a1e58eb736400cc9099e9218ac6d15"}
 branch: task/gaid-promo-video-v4
 target: main
@@ -101,9 +101,20 @@ Honesty without the tag: no invented numbers; the report names the illustrative 
 Decisions: all film work is tightly coupled in `geo/promo/scene/scene.js`; the writer does it alone (no child writers).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Analysis + direction v4 written above and shown to the user in the writer tab (2026-10-24) before rendering.
+- `geo/promo/scene/scene.js` v4: new background (S2, local clock 0–15.3), cycle zones (GAID 허브 / GAID 시스템), demo
+  header (part plate + purpose line + mini ring), `TAGS` (22 outcome tags), `USE` trims, A4 dropped, 개념도 tags removed,
+  subtitle "지구과학 연구자를 위한 AI agent 연구 지원 플랫폼". Length 103 s (DURATION from the page).
+- Previews (stills only): `~/data/geoaidesk/work/gaid-promo-video-v4/prev1..prev4t`. Fixed: panel z-order over flying
+  cards, researcher overlapping the panel (moved left before the panel appears; left-hand tools fly first).
+- Final render job `job-geoaidesk-gaid-promo-video-v4-1` from f66c4f89 (receipt
+  `~/data/geoaidesk/runs/gaid-promo-video-v4-20261024T005812.015692Z/receipt.json`).
+- Report draft `reports/2026-10-24-gaid-promo-video-v4/index.md` (placeholders @@…@@ until the job finishes).
+- Review app not used; no recapture.
 ## Next steps
-1. (the next session's first action)
+1. When the job exits: verify the MP4 (frames, length, no audio), fill the report placeholders, extract figures
+   01-background (4 stills) and 02-demo (A2/H1/R3/N1), add registry entry `gaid-promo-video-v4` (review, supersedes v3),
+   mark the v3 report superseded, humanizer pass, review-copy, task finish.
 ## Failed approaches
 ## Notes and decisions
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
@@ -115,11 +126,14 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-promo-video-v4/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-20261024T005812.015692Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
