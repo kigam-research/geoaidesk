@@ -743,7 +743,7 @@
       for (const [k, label] of sg.tags) {
         const beat = info.beats[k];
         const short = beat.t1 - beat.t0 < 1.2; // a click beat: show it from just before the click until after it lands
-        const t0 = Math.max(short ? beat.t0 - 0.7 : beat.t0, sg.skip), t1 = Math.min(short ? beat.t1 + 1.0 : beat.t1, sg.skip + sg.span);
+        const t0 = Math.max(short ? beat.t0 - 0.7 : beat.t0, sg.skip), t1 = Math.min(short ? beat.t1 + 0.4 : beat.t1, sg.skip + sg.span);
         const ta = Math.max(sg.a + (t0 - sg.skip) / sg.speed, last ? 0 : sg.a + lead);
         const tb = t1 >= sg.skip + sg.span - 0.01 ? sg.b : sg.a + (t1 - sg.skip) / sg.speed;
         if (tb <= ta + 0.3) continue;
