@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:17:06Z
+updated: 2026-10-24T01:42:34Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -50,11 +50,40 @@ Running in parallel: gaid-promo-video-v4 (finishing) and gaid-promo-video-v4-bra
 own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside Git.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- lemo-opuscar downloaded at 3961ddb3d24d8876e0e2754f7790d66908acee51 (codeload tarball) to
+  ~/data/geoaidesk/work/gaid-promo-video-v4-lemo/dl/ (not installed as a Claude plugin; no ~/lemo-opuscar).
+- Licence (README "Licence"): code and docs MIT; demo films and stills CC BY 4.0 (credit LemoLab + repo link, say if
+  changed); films made with the library belong to the maker, no credit needed; third-party assets keep their licences.
+- Style candidates shown to the user (writer tab + vault copy `연구 보고서/geoaidesk/2026-10-24-style-choice`, work dir
+  `style-choice/`): A Dark Tech Keynote (chosen), B Swiss Motion Graphics, C Living Screencast.
+- v4 merged to main (PR #102); merged origin/main into this branch.
 ## Next steps
-1. (the next session's first action)
+1. Write geo/promo-lemo/TREATMENT.md (three structures, shot list, cue map, sound table), then style frames.
 ## Failed approaches
 ## Notes and decisions
+- 2026-10-24 user (writer tab, verbatim): "메시지는 동등해도 되는데 연출은 오히려 더 자유롭게 홍보성으로 만들자. 그리고 분량은 40초로하고
+  코드로 된 영상 기반으로 전면 새로 만들어도 좋다. 현재 촬영자료가 있다고 너무 v4스타일로 만들필요는없다. 현재 렌더링중인것은
+  계속만들고 별도로하나더 생성하자." -> two deliverables: (A) the ~103 s Dark Tech Keynote cut with real takes (this writer,
+  geo/promo-lemo/), (B) a new ~40 s promotional film drawn entirely in code (child unit
+  `gaid-promo-video-v4-lemo--promo-40s`, profile orchestrator = Claude Opus 5.5 high, the model the user set for this work;
+  owns geo/promo-lemo-40/ and reports/<parent report>/section-40s.md + figures/40s-*.png). Prompt:
+  ~/data/geoaidesk/work/gaid-promo-video-v4-lemo/prompts/child-40s.md. Writer agent 24b0e76b-628b-401e-adf8-0eca667720c5.
+  Integration: `task complete gaid-promo-video-v4-lemo--promo-40s` after its finish, then merge its section into the canonical
+  report and add both films to results/registry.toml.
+- 2026-10-24 style: Dark Tech Keynote (`styles/dark-keynote`). Why: its native moves (generated accumulation, snap grid,
+  type streams, light reveal) and its two sound families (scattered vs one in-key family) carry v4's storyline (scattered
+  skills/tools -> GAID gathers them -> hub/system cycle); one accent = GAID brand blue. Deviations: real GAID takes
+  appear as windows on the dark stage (the style itself avoids real apps); Pretendard replaces Inter; JetBrains Mono
+  (OFL) for labels. B Swiss: too close to v4's light flat look, screenshots clash with pure 2D. C Living Screencast: needs
+  an invented pixel mascot and redrawn UI, conflicts with real takes. User may override in the writer tab.
+- Standing user feedback (gaid-promo-video-v2, 2026-10-23): no zoom/scroll inside real takes. Takes play whole at one
+  scale; camera moves only on the stage between takes and in graphic scenes; expand/collapse transitions only.
+- Plan (orchestration): sequential = treatment -> timeline (timeline.json, EV) -> picture + sound -> mux -> review.
+  Picture and sound share the timeline and are tightly coupled; the writer does both (no child writers). A reader may
+  review the final cut if useful. Owned files: geo/promo-lemo/** only (geo/promo/ untouched).
+- Toolchain: picture = page contract of lemo (DUR/render/READY/EV/TEXTS) rendered with Python Playwright 1.63.0 +
+  imageio-ffmpeg 0.6.0 (as v4); sound = lemo core/audio sfx.py + sampler.py with numpy/scipy/soundfile/soxr via uv;
+  mux = two-pass loudnorm -14 LUFS with the imageio-ffmpeg binary (port of core/render/mux.sh; no system ffmpeg).
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
