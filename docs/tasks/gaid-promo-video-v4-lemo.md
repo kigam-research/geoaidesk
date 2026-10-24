@@ -1,7 +1,7 @@
 ---
 format: 1
-status: done
-updated: 2026-10-24T06:52:29Z
+status: active
+updated: 2026-10-24T08:04:08Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -59,6 +59,9 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
   promo-40s job -3, sha256 52b0055d…3546, 42.0 s, -14.1 LUFS. Report reports/2026-10-24-gaid-promo-video-v4-lemo/index.md
   (§8 = 40 s), registry entries gaid-promo-video-v4-lemo and gaid-promo-video-v4-lemo-40s (review). Children promo-40s and
   agent-capture completed and closed (agent-capture's failed export job 2 disposed as superseded by job 3).
+- Google Drive review copies (user: "올려라.", 2026-10-24): gdrive:obsidian-refs/review_now/geoaidesk/2026-10-24/20261024T160435724953/
+  gaid-promo-lemo.mp4 (22,604,083 B) and gaid-promo-40s.mp4 (15,754,455 B) + .sha256.txt sidecars; standard verification (rclone
+  transfer + exact size), remote SHA-256 not reread; no public links.
 - Superseded renders of this unit: jobs -1 (102.3 s round 1), -2/-3 (round 2 picture), -4 (failed mastering attempt), -5 (round 2
   film), -6/-7 (round 3 before click-box fixes). Sound checked by measurement only, not by listening.
 - lemo-opuscar 3961ddb + VCSL registered as asset `lemo_opuscar` (configs/inputs.toml). Checks: no automated checks for the
