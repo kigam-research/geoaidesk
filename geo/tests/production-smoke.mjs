@@ -160,6 +160,9 @@ async function checkWorkspace() {
   assert.equal(page.status, 200, "UI answers 200");
   assert.match(page.text, /<html/i, "UI serves the app page");
   assert.ok(!/__nextjs_original-stack-frame|next-dev|webpack-hmr|turbopack-hmr/i.test(page.text), "UI is not the dev server");
+  // The development parts page (gaid-ui-quality-kit) is not part of the distribution.
+  const parts = await request(`${ui}/dev/parts`);
+  assert.equal(parts.status, 404, "development parts page answers 404 in production");
   const health = await request(`${api}/health`);
   assert.equal(health.status, 200, "backend /health answers 200");
   // What the browser does: the UI origin calling the backend it was built against.

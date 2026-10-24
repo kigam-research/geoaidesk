@@ -29,6 +29,7 @@ export function SidebarItem({
   onClick,
   title,
   children,
+  preview,
 }: {
   icon?: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   label: string;
@@ -37,6 +38,8 @@ export function SidebarItem({
   onClick?: () => void;
   title?: string;
   children?: ReactNode;
+  /** Pins hover/focus for the development parts page (data-preview, globals.css). */
+  preview?: "hover" | "focus";
 }) {
   return (
     <button
@@ -44,6 +47,7 @@ export function SidebarItem({
       onClick={onClick}
       aria-current={selected ? "page" : undefined}
       title={title}
+      data-preview={preview}
       className={cn(
         "relative flex min-h-[34px] w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-sm transition-colors",
         "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
