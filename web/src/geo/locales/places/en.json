@@ -48,7 +48,6 @@
       "startLabel": "Start {title}",
       "find": "Find Workflows in Connect",
       "ready": "Ready",
-      "notReady": "Needs preparation",
       "catalogue": "Built-in",
       "shared": "Shared",
       "draft": "Draft",
