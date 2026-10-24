@@ -111,3 +111,31 @@ describe("legacyWorkflowDoc", () => {
     expect(text).toContain("## 작성자의 추가 지시\n첫 시험은 줄인 설정으로 하세요.");
   });
 });
+
+describe("first-reading literature digest", () => {
+  const digest = { key: "digest:li-aaaaaaaaaaaa", title: '광체 "연구" <정리>', origin: "gaid" as const, status: "pending" as const, covers: ["hong2026", "kim2025"] };
+  it("renders the digest after source papers in chat and preview settings, preserving the original paper rule", () => {
+    for (const target of ["chat", "preview"] as const) {
+      const text = renderWorkflowDocument(doc, { ...ko, target, settings: { inputs: {}, choices: {}, papers: [{ key: "hong2026", title: "Original" }], digest } });
+      expect(text).toContain('## 먼저 읽을 문헌 정리\n<library-digest key="digest:li-aaaaaaaaaaaa" status="pending" origin="gaid" covers="hong2026 kim2025">광체 &quot;연구&quot; &lt;정리&gt;</library-digest>');
+      expect(text.indexOf("## 먼저 읽을 문헌 정리")).toBeGreaterThan(text.indexOf("## 근거 논문"));
+      expect(text).toContain("library_digest"); expect(text).toContain("library_read"); expect(text).toContain("[@key, p. N]");
+      expect(text).toContain("문헌 정리 자체는 인용하지 마세요.");
+      expect(text).not.toContain("[@digest:");
+    }
+  });
+  it("marks external summaries reference only in both languages and ignores project choices in CLI exports", () => {
+    for (const locale of ["ko", "en"] as const) {
+      const text = renderWorkflowDocument(doc, { locale, say: sayIn(locale), target: "chat", settings: { inputs: {}, choices: {}, digest: { ...digest, origin: "external", status: "confirmed" } } });
+      expect(text).toContain('status="confirmed" origin="external"');
+      expect(text).toContain(locale === "ko" ? "참고로만 읽습니다" : "reference only");
+    }
+    expect(renderWorkflowDocument(doc, { ...ko, target: "cli", settings: { inputs: {}, choices: {}, digest } })).not.toContain("library-digest");
+  });
+  it("does not add a section when no digest was selected or no start settings were supplied", () => {
+    for (const target of ["chat", "preview", "cli"] as const) {
+      expect(renderWorkflowDocument(doc, { ...ko, target })).not.toContain("먼저 읽을 문헌 정리");
+      expect(renderWorkflowDocument(doc, { ...ko, target, settings: { inputs: {}, choices: {} } })).not.toContain("library-digest");
+    }
+  });
+});

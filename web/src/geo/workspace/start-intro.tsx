@@ -13,6 +13,7 @@ import { localText } from "@/geo/hub/text";
 import { text } from "./api";
 import { hasDefault } from "@/geo/contracts/workflow-stages";
 import { SourcePapers, type WorkflowPapersState } from "./source-papers";
+import { DigestChoice, type DigestChoiceState } from "./digest-choice";
 
 export interface IntroRow { label: string; content: ReactNode }
 
@@ -55,7 +56,7 @@ export function IntroDisclosure({ title, hint, children }: { title: string; hint
 }
 
 /** The introduction of a GAID Workflow (catalogue or hub). */
-export function GeoIntro({ workflow, projectId, notice, papers }: { workflow: GeoWorkflowSummary; projectId: string; notice?: ReactNode; papers?: WorkflowPapersState }) {
+export function GeoIntro({ workflow, projectId, notice, papers, digest }: { workflow: GeoWorkflowSummary; projectId: string; notice?: ReactNode; papers?: WorkflowPapersState; digest?: DigestChoiceState }) {
   const doc = workflow.doc;
   const purpose = localText(doc?.purpose) || text(workflow.description);
   const roles = workflow.inputRoles;
@@ -70,6 +71,7 @@ export function GeoIntro({ workflow, projectId, notice, papers }: { workflow: Ge
   if (purpose) rows.push({ label: t("workspace.start.fact.purpose"), content: <ClampedText value={purpose} /> });
   // gaid-workflow-cite-scope: the papers the Workflow was made from (hub Workflows that record them).
   if (papers?.papers?.length) rows.push({ label: t("workspace.start.fact.papers"), content: <SourcePapers state={papers} /> });
+  if (digest?.candidates.length) rows.push({ label: t("digestStart.label"), content: <DigestChoice state={digest} /> });
   if (roles.length) rows.push({ label: t("workspace.start.fact.inputs"), content: <>
     {roles.map((role) => <span key={role.id} className="block">{text(role.label)}<IntroQual>{t(role.required ? "workspace.setup.required" : "workspace.setup.optional")}</IntroQual>{role.extensions.length > 0 && <IntroFormat>{role.extensions.join(", ")}</IntroFormat>}</span>)}
     <IntroNote>{examples.length ? t("workspace.start.exampleSome", { titles: [...new Set(examples)].join(", ") }) : t("workspace.start.exampleNone")}</IntroNote>

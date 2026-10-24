@@ -16,6 +16,8 @@ import { workflowDisplayText, type Workflow } from "@/components/workflows-panel
 import { buildWorkflowPrompt } from "@/lib/workflow-inputs";
 import { SourceBadge, UPSTREAM_APP_SOURCE } from "@/geo/attribution/source-badge";
 import { geoText, t } from "@/geo/i18n";
+import { workflowDigestText } from "@/geo/workflow/render";
+import { DigestChoice, DigestSummary, digestSettings, useDigestCandidates } from "./digest-choice";
 import { startGeoTask } from "./events";
 import { OptionCard, StepHeading, SummaryRows, isOwnData, type SummaryRow } from "./setup-steps";
 import { StartWindow, introNextLabel, type StartStep } from "./start-window";
@@ -28,8 +30,8 @@ const baseName = (path: string) => path.split("/").pop() || path;
 type Field = { key: string; label: string; required: boolean };
 type Step = { kind: "intro" } | { kind: "data" } | { kind: "text"; fields: Field[] } | { kind: "summary" };
 
-export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [], availableFolders = [], filesReady = true, onUploadFiles }: {
-  workflow: Workflow; open: boolean; onOpenChange: (open: boolean) => void;
+export function UpstreamStart({ workflow, projectId, open, onOpenChange, availableFiles = [], availableFolders = [], filesReady = true, onUploadFiles }: {
+  workflow: Workflow; projectId?: string; open: boolean; onOpenChange: (open: boolean) => void;
 } & WorkflowInputProps) {
   const name = workflowDisplayText(workflow, "name", workflow.name);
   const description = workflowDisplayText(workflow, "description", workflow.description);
@@ -48,10 +50,12 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
   const [editing, setEditing] = useState(false);
   const [edited, setEdited] = useState<string | null>(null);
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
+  const digest = useDigestCandidates(projectId, null);
 
   const assembled = useMemo(() => workflow.placeholders.reduce(
     (prompt, ph) => prompt.replaceAll(`{${ph.key}}`, values[ph.key]?.trim() || `[${ph.label}]`), workflow.prompt), [workflow, values]);
-  const finalPrompt = buildWorkflowPrompt(edited ?? assembled, files, sources, folders);
+  const digestText = workflowDigestText(digestSettings(digest.selected));
+  const finalPrompt = buildWorkflowPrompt(edited ?? assembled, files, sources, folders) + (digestText ? `\n${digestText}` : "");
   const hasData = files.length + folders.length > 0 || sources.trim().length > 0;
   const dataDone = hasData || !workflow.requiresFiles;
   const textDone = (key: string) => Boolean(values[key]?.trim());
@@ -74,6 +78,7 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
     const result = startGeoTask({ title: name, text: finalPrompt, attachedFiles: files, skills: [] });
     if (result !== "opened") { setError({ message: t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`) }); return; }
     setIndex(0); setFiles([]); setFolders([]); setSources(""); setValues({}); setEdited(null); setEditing(false);
+    digest.reset();
     onOpenChange(false);
   };
 
@@ -107,6 +112,7 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
     </> }] : []),
     { label: t("workspace.start.fact.note"), content: t("workspace.start.upstream.note") },
   ];
+  if (digest.candidates.length) introRows.splice(1, 0, { label: t("digestStart.label"), content: <DigestChoice state={digest} /> });
 
   const rows: SummaryRow[] = steps.flatMap((s, i): SummaryRow[] => {
     if (s.kind === "data") {
@@ -143,6 +149,7 @@ export function UpstreamStart({ workflow, open, onOpenChange, availableFiles = [
         <h3 id="gaid-upstream-summary" className="text-base font-semibold">{t("workspace.setup.summaryTitle")}</h3>
         <p className="text-sm text-muted-foreground">{t("workspace.setup.summaryBody")}</p>
       </div>
+      <DigestSummary state={digest} onEdit={() => setIndex(0)} />
       <SummaryRows rows={rows} onEdit={setIndex} />
       <p className="text-sm">{t("workspace.setup.limitUntested")}</p>
       {instructions(true)}

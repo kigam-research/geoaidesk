@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T13:00:25Z
+updated: 2026-10-24T13:13:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b38c7b0e-5839-4ccb-b913-3c52ce2378aa","pid":621868,"provider":"codex","session":"01a16dff-2bab-7821-86c4-9f2515e1131d","start":"73474056","token":"2c5f071640de697d06a68e008336f902e2b38b2cba5df24bcb51f606c2c2325e"}
 branch: task/gaid-library-prep--digest-start
 target: task/gaid-library-prep
@@ -31,11 +31,32 @@ Rules: follow AGENTS.md (UI guide v2 sections 1, 2, 10 and Q1–Q7, G2, F6, R1 b
 Evidence: cd server && npm run typecheck && npx vitest run <your tests> test/geo-library-digests.test.ts; cd web && npx tsc --noEmit && npx vitest run <your tests> src/geo/contracts src/geo/workspace; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs. Korean screenshots of Workflow 소개 with the digest row and the summary step at 1440×900 (instrument/light and mapsheet/dark) into ~/data/geoaidesk/work/gaid-library-prep--digest-start/ (dev harness with intercepted API replies or the running app; do not commit harness pages). Record changes, rule ids, string ids (ko/en) and check results in your task document, then task finish. The parent runs full scripts/check after integration.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Resumed in the printed worktree. Read the approved design, UI guide, copy rules and settled interfaces. Implementation
+is implemented. Focused server tests: 27 passed (5 files). Focused web tests: 98 passed (12 files). Server and web
+typechecks passed. Copy validator: 0 errors, 101 pre-existing warnings; UI check: 0 errors. Codegraph has no index for
+this exact worktree, so native source reads are used. A screenshot job using the actual TaskSetup components is next.
 ## Next steps
-1. (the next session's first action)
+1. Run the prepared screenshot job (isolated snapshot, temporary uncommitted harness, port 3267), inspect images.
+2. Re-run checks after final small fixes, review the diff, record evidence and finish for parent integration.
 ## Failed approaches
 ## Notes and decisions
+- Sequential decisions: tool scope/window contract first, shared start-message settings next, then UI wiring and tests.
+  Owned files are the starter's exact file list. This child has no independent substantial work package to delegate.
+- The digest choice is in-memory state only; it is not persisted into `.geo-start.json` saved start settings.
+- Requested the parent add optional `DigestCandidate.papers` (citation keys/titles of covered papers) for the approved
+  `covers` start-message attribute. Parent supplied it at 49c8d53b; merged origin/task/gaid-library-prep.
+- General Workflow support fits a small hunk: pass projectId from task-catalogue, use the same hook and renderer. Older
+  GAID workflows without a WorkflowDoc also append the reading section to their existing draft.
+- UI rules followed: P2/P3/P5/P9, Q1-Q7, G2, F6, R1, I2/I6, A1. No free-text Other is needed for a closed list of existing
+  digests; “정리 없이 시작” is the alternative. More than two digest candidates sit behind a disclosure.
+- New locale ids (absent before; ko/en): digestStart.label/recommended/external/gaid/status.pending/status.confirmed/
+  coverage/referenceOnly/newPapers/none/noneHint/summaryState/citationNote/externalNote/failed/retry/more;
+  workflowDoc.section.digest/digest.rule/digest.externalRule. Existing string meanings are unchanged.
+- Dependencies were absent in this new worktree; installed with npm ci --prefer-offline in server and web. First tsc
+  attempts failed before installation, then both passed. A targeted lint run exposed an existing missing allUntested
+  dependency in touched task-catalogue.tsx; added the dependency, with no change to the computed value.
+- One web regression test initially failed because its broad mock returned a non-digest response for the new API; the
+  hook now treats a malformed response as a failed refresh instead of crashing the start window. All 98 tests then passed.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

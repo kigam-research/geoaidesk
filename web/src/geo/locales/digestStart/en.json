@@ -1,1 +1,21 @@
-{}
+{
+  "label": "Read first",
+  "recommended": "Recommended",
+  "external": "External summary",
+  "gaid": "Made in GAID",
+  "status": {
+    "pending": "Not reviewed",
+    "confirmed": "Confirmed"
+  },
+  "coverage": "Covers {covered} of {total} source papers.",
+  "referenceOnly": "Reference only",
+  "newPapers": "{count} papers have been added to the folder since this digest.",
+  "none": "Start without a digest",
+  "noneHint": "Find and read the needed papers page by page.",
+  "summaryState": "{origin} · {status}",
+  "citationNote": "Cite the original paper pages.",
+  "externalNote": "Read for reference only and cite the original paper pages.",
+  "failed": "Could not refresh the digest list. Reload it or start without a digest.",
+  "retry": "Reload list",
+  "more": "Show {count} other digests"
+}

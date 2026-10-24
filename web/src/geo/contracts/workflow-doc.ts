@@ -118,6 +118,15 @@ export function fallbackFolder(kind: InputFallbackKind, roleId: string): string 
  * The researcher's start settings: input role id → project path (several paths for a `multiple` input), choice id →
  * option id or free text.
  */
+export interface WorkflowDigestChoice {
+  key: string;
+  title: string;
+  status: "pending" | "confirmed";
+  origin: "gaid" | "external";
+  /** Citation keys of the original covered papers; never a digest citation. */
+  covers: string[];
+}
+
 export interface WorkflowDocSettings {
   inputs: Record<string, string | string[]>;
   choices: Record<string, string>;
@@ -128,6 +137,8 @@ export interface WorkflowDocSettings {
    * Named in the chat start message so the agent can cite them in the research note.
    */
   papers?: { key: string; title: string }[];
+  /** In-memory start choice only (never saved into geo-start/v1). */
+  digest?: WorkflowDigestChoice;
   /** Input role id → how the agent fills an input with no data (gaid-input-fallback); only for inputs without a path. */
   fallbacks?: Record<string, InputFallback>;
 }
@@ -222,6 +233,7 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
     for (const paper of papers) lines.push(`- [@${paper.key}] ${paper.title}`);
     lines.push("", say("papers.rule"));
   }
+  lines.push(...renderDigestSection(settings?.digest, say));
 
   // Skills.
   if (doc.skills.length) {
@@ -277,6 +289,15 @@ export function renderWorkflowDocument(doc: WorkflowDoc, options: RenderOptions)
   lines.push("", `## ${say("section.closing")}`, say("closing.review"));
   if (settings || target === "cli") lines.push(say("closing.examples"));
   return lines.join("\n");
+}
+
+/** Shared by structured Workflow starts and general Workflow prompts. No choice means byte-identical older text. */
+export function renderDigestSection(digest: WorkflowDigestChoice | undefined, say: WorkflowDocSay): string[] {
+  if (!digest) return [];
+  const escape = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/[\r\n]/g, " ");
+  return ["", `## ${say("section.digest")}`,
+    `<library-digest key="${escape(digest.key)}" status="${digest.status}" origin="${digest.origin}" covers="${escape(digest.covers.join(" "))}">${escape(digest.title)}</library-digest>`,
+    say("digest.rule"), ...(digest.origin === "external" ? [say("digest.externalRule")] : [])];
 }
 
 /** Inputs without data and how the agent fills them (gaid-input-fallback); nothing when no input uses a fallback. */

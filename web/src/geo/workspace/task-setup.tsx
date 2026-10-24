@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { t } from "@/geo/i18n";
@@ -10,7 +10,7 @@ import { accepts, request, taskDraft, text } from "./api";
 import { startGeoTask } from "./events";
 import { apiFetch } from "@/lib/projects";
 import { WorkflowInstructions } from "@/geo/workflow/workflow-view";
-import { workflowStartMessage } from "@/geo/workflow/render";
+import { workflowDigestText, workflowStartMessage } from "@/geo/workflow/render";
 import { ReadinessNotice } from "./readiness";
 import { DeleteRecipe } from "./recipe-add";
 import { StagePage, SummaryRows, answerPaths, choiceDone, choiceValue, exampleUsable, inputDone, inputValue, nameMatches, pageChoices, setupSteps, sizeText, stageHint, stepName, type ChoiceAnswer, type InputAnswer, type SummaryRow } from "./setup-steps";
@@ -21,6 +21,7 @@ import { localText } from "@/geo/hub/text";
 import { isExamplePath, type PrepareExamplesResponse } from "@/geo/contracts/workflow-examples";
 import { hasDefault } from "@/geo/contracts/workflow-stages";
 import type { InputFallback } from "@/geo/contracts/workflow-doc";
+import { DigestSummary, digestSettings, useDigestCandidates } from "./digest-choice";
 
 export const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -157,6 +158,12 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
   const download = exampleRoles.reduce((sum, role) => sum + (role.example?.download ?? 0), 0);
   const method = exposure?.startsWith("method:") ? exposure.split(":")[1] : null;
   const papers = useWorkflowPapers(projectId, method);
+  const digest = useDigestCandidates(projectId, method);
+  const selectedDigest = digestSettings(digest.selected);
+  // Source papers become readable only after the researcher's attach action; then refresh the recommendations too.
+  const paperScope = (papers.papers ?? []).map((p) => `${p.itemId}:${p.state}`).join(";");
+  const reloadDigests = digest.reload;
+  useEffect(() => { if (paperScope) void reloadDigests(); }, [paperScope, reloadDigests]);
   const unattachedPapers = (papers.papers ?? []).filter((p) => p.state === "in-library").length;
 
   const uploadFiles = async (list: FileList): Promise<string[]> => {
@@ -185,7 +192,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         Object.assign(bindings, prepared.inputs);
       }
       if (workflow.doc) {
-        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples, citablePapers(papers), fallbacks);
+        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples, citablePapers(papers), fallbacks, selectedDigest);
       } else {
         // /skills is the merged list the composer's picker uses, not /skills/all.
         const response = await request<SkillInfo[]>("/skills", projectId);
@@ -193,12 +200,14 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         const skill = primary?.enabled ? response.find((row) => row.name === primary.runtimeName) : undefined;
         if (skill) skills = [{ id: skill.id, name: skill.name, description: skill.description }];
         draft = taskDraft(workflow, bindings, values);
+        const digestText = workflowDigestText(selectedDigest);
+        if (digestText) draft += `\n${digestText}`;
       }
       const result = startGeoTask({ title: text(workflow.title), text: draft, ...(workflowBlock ? { workflowBlock } : {}),
         attachedFiles: [...new Set(Object.values(bindings).flat())], skills, geoExposure: (exposure ?? `workflow:${workflow.id}`) as GeoExposureMode });
       if (result !== "opened") { setError({ message: t(`workspace.setup.${result === "tab-limit" ? "tabLimit" : "noWorkspace"}`) }); return; }
       if (examples.length) void onRefresh();
-      setInputs(initialInputs(workflow, files, {})); setChoices(initialChoices(workflow, undefined)); setOpenDefaults(new Set()); setIndex(0); onOpenChange(false);
+      setInputs(initialInputs(workflow, files, {})); setChoices(initialChoices(workflow, undefined)); digest.reset(); setOpenDefaults(new Set()); setIndex(0); onOpenChange(false);
     } catch (error) { setError({ message: t(examples.length ? "workspace.setup.example.failed" : "workspace.setup.error"), detail: (error as Error).message }); }
     finally { setBusy(false); }
   };
@@ -251,7 +260,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         ? <Button disabled={Boolean(nextBlocked)} onClick={() => goTo(index + 1)}>{index === 0 ? introNextLabel(first) : t(index === summary - 1 ? "workspace.setup.toSummary" : "workspace.setup.next")}</Button>
         : <Button disabled={busy || Boolean(blocked)} onClick={() => void start()}>{t(busy ? (examples.length ? "workspace.setup.example.preparing" : "workspace.setup.creating") : "workspace.setup.create")}</Button>}
     </>}>
-    {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} papers={papers} />}
+    {step.kind === "intro" && <GeoIntro workflow={workflow} projectId={projectId} notice={notice} papers={papers} digest={digest} />}
     {step.kind === "stage" && <StagePage key={step.page.id} page={step.page} files={files} inputs={inputs} choices={choices} recipeChoices={initialSetup?.choices}
       onInput={(id, answer) => setInputs((previous) => ({ ...previous, [id]: answer }))} onChoice={(id, answer) => setChoices((previous) => ({ ...previous, [id]: answer }))}
       onUpload={uploadFiles} focus={focus}
@@ -264,6 +273,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         <p className="text-sm text-muted-foreground">{t("workspace.setup.summaryBody")}</p>
       </div>
       {state !== "ready" && <ReadinessNotice value={workflow.readiness} projectId={projectId} onPrepared={onRefresh} />}
+      <DigestSummary state={digest} onEdit={() => goTo(0)} />
       {rows.length > 0 && <SummaryRows rows={rows} onEdit={goTo} />}
       {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
       {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
@@ -271,7 +281,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       {fallbackCount > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.fallback.summary", { count: fallbackCount })}</p>}
       {unattachedPapers > 0 && <p className="text-sm text-gaid-ink-2">{t("workspace.start.papers.summary", { count: unattachedPapers })} <button type="button" onClick={() => setIndex(0)} className="text-gaid-signal-ink underline-offset-4 hover:underline">{t("workspace.start.papers.review")}</button></p>}
       <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
-      {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples, ...(fallbackCount ? { fallbacks } : {}) }} />}
+      {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples, papers: citablePapers(papers), ...(fallbackCount ? { fallbacks } : {}), ...(selectedDigest ? { digest: selectedDigest } : {}) }} />}
       <details className="text-sm">
         <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
         <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>

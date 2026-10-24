@@ -12,7 +12,8 @@
     "boundary": "Interpretation limits",
     "closing": "When you finish",
     "papers": "Source papers (in the project's citation scope)",
-    "fallback": "Inputs without data"
+    "fallback": "Inputs without data",
+    "digest": "Literature digest to read first"
   },
   "settings": {
     "researcherPicks": "chosen by the researcher",
@@ -98,5 +99,9 @@
       "instruction": "Separate instruction: follow the researcher's instruction. Ask first when it is ambiguous, or when data must be downloaded or generated and the instruction does not say how.",
       "label": "For results from such data, state at the top and in the limits of the answer, the result files and the research note that similar public data (toy data) or synthetic data was used. Do not present the results as conclusions about the researcher's study area or real data."
     }
+  },
+  "digest": {
+    "rule": "Before analysis, read the digest first with library_digest. Verify every claim used in results with library_read on the original paper pages and cite [@key, p. N]. Never cite the digest itself.",
+    "externalRule": "An external summary (Gemini Notebook) is reference only. A confirmed mark does not replace checking the original papers."
   }
 }

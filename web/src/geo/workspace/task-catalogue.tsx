@@ -161,7 +161,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
       };
     });
     return [...methods.rows, ...geo, ...recipes];
-  }, [byId, methods.rows, saved, workflows]);
+  }, [byId, methods.rows, saved, workflows, allUntested]);
 
   const removeRecipe = async (recipe: GeoSavedRecipe) => {
     setSaved(await request<GeoSavedRecipesResponse>(`/geo/recipes/${encodeURIComponent(recipe.id)}`, projectId, undefined, "DELETE"));
@@ -180,7 +180,7 @@ function TaskCatalogue({ projectId, availableFiles, children }: { projectId: str
     collapseUpstream: ready ? { showLabel: (count) => t("workspace.catalogue.showOther", { count }), hideLabel: t("workspace.catalogue.hideOther") } : undefined,
     headerAction: ready ? <RecipeAdd projectId={projectId} workflows={workflows} categories={saved.categories} onSaved={setSaved}
       onOpen={(setup) => { setOpened((previous) => ({ revision: (previous?.revision ?? 0) + 1, setup })); setSelected({ workflowId: setup.workflowId }); }} /> : null,
-    renderLaunch: (props) => <UpstreamStart key={props.workflow.id} {...props} />,
+    renderLaunch: (props) => <UpstreamStart key={props.workflow.id} {...props} projectId={projectId} />,
     notice: <>
       {status && <p role="status" className="text-xs text-muted-foreground break-words">{status}</p>}
       {error && data && <p role="alert" className="text-xs text-destructive break-words">{error}</p>}

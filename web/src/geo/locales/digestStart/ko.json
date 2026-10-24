@@ -1,1 +1,21 @@
-{}
+{
+  "label": "먼저 읽을 정리",
+  "recommended": "권장",
+  "external": "외부 정리",
+  "gaid": "GAID에서 만듦",
+  "status": {
+    "pending": "검토 전",
+    "confirmed": "확인함"
+  },
+  "coverage": "근거 논문 {total}편 중 {covered}편을 다룹니다.",
+  "referenceOnly": "참고로만 읽음",
+  "newPapers": "정리 뒤 폴더에 논문 {count}편이 더해졌습니다.",
+  "none": "정리 없이 시작",
+  "noneHint": "필요한 논문을 쪽 단위로 찾아 읽습니다.",
+  "summaryState": "{origin} · {status}",
+  "citationNote": "인용은 원래 논문의 쪽으로 겁니다.",
+  "externalNote": "참고로만 읽고, 인용은 원래 논문의 쪽으로 겁니다.",
+  "failed": "문헌 정리 목록을 새로 읽지 못했습니다. 다시 읽거나 정리 없이 시작하세요.",
+  "retry": "목록 다시 읽기",
+  "more": "다른 정리 {count}개 보기"
+}
