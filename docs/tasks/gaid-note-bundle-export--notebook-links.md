@@ -1,7 +1,7 @@
 ---
 format: 1
 status: ready
-updated: 2026-10-24T02:12:10Z
+updated: 2026-10-24T02:36:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d","pid":1195251,"provider":"codex","session":"01a16b98-98fb-76e2-936a-665bab0a74ca","start":"69446405","token":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
 branch: task/gaid-note-bundle-export--notebook-links
 target: task/gaid-note-bundle-export
@@ -80,7 +80,7 @@ Parent integration: mount `ProjectNotebookLink` from `web/src/geo/notebook-link/
 Checks passed: server and web `npx tsc --noEmit`; server route/persistence suite (15 tests); web contract/control/project-wrapper suites (24 tests); copy validator (0 errors, 100 existing warnings); UI validator (0 errors, 78 accepted existing debt); `git diff --check`. Full `scripts/check` and visual screenshots remain the parent's integration checks, as agreed.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T02:12:10Z: ready; the parent gaid-note-bundle-export integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T02:36:24Z: ready; the parent gaid-note-bundle-export integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 Dependency installation job was refused twice before launch because edits were made before the launcher checked source cleanliness.
