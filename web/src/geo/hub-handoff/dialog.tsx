@@ -69,7 +69,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
   }, [projectId, sessionId]);
   const size = preview?.files.filter(f => selected.includes(f.path)).reduce((sum, f) => sum + f.size, 0) ?? 0;
   const clearTransfer = () => { setDownloaded(false); setTransferPath(null); setDraftUrl(""); setHubDraft(""); };
-  // The GAID hub is a place of this page (#hub/<draft>): the new draft opens there with the bundle attached.
+  // GAID Connect is a place of this page (#connect/<draft>): the new draft opens there with the bundle attached.
   const sendHub = async () => {
     if (busy || loading || isStreaming || !preview) return;
     setBusy(true); setError(""); clearTransfer();
@@ -80,7 +80,7 @@ export function HandoffDialog({ projectId, sessionId, isStreaming, onClose }: { 
     } catch (err) { if (live.current) setError(err instanceof Error ? err.message : t("hubHandoff.errors.request")); }
     finally { if (live.current) setBusy(false); }
   };
-  const openHubDraft = () => { onClose(); window.location.hash = `#hub/${hubDraft}`; };
+  const openHubDraft = () => { onClose(); window.location.hash = `#connect/${hubDraft}`; };
   const download = async (direct = false) => {
     if (busy || loading || isStreaming || !preview) return;
     setBusy(true); setError(""); setDownloaded(false); setTransferPath(null); setDraftUrl("");

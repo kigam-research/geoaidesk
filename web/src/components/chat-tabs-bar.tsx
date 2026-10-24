@@ -1,6 +1,7 @@
 "use client";
 import { geoLocale, geoText } from "@/geo/i18n";
 import {
+  BookOpenIcon,
   DownloadIcon,
   FileTextIcon,
   HistoryIcon,
@@ -27,6 +28,7 @@ import { apiFetch } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { commandPreview } from "@/lib/command-blocks";
 
+const libraryText = geoText("library");
 const appText = geoText("app");
 
 export interface ChatTabDescriptor {
@@ -40,13 +42,14 @@ export interface ChatTabsBarProps {
   projectId: string;
   tabs: ChatTabDescriptor[];
   activeTabId: string;
-  view: "chat" | "workflows";
+  view: "chat" | "workflows" | "library";
   maxTabs: number;
   onSelect: (id: string) => void;
   onClose: (id: string) => void;
   onNew: () => void;
   onRename: (id: string, title: string) => void;
   onSelectWorkflows: () => void;
+  onSelectLibrary: () => void;
   /** Reopen a stored session (from the History menu) into a tab. */
   onOpenSession: (sessionId: string, title: string) => void;
   /** Session id of the active tab, for reproducibility export. */
@@ -252,6 +255,7 @@ export function ChatTabsBar({
   onNew,
   onRename,
   onSelectWorkflows,
+  onSelectLibrary,
   onOpenSession,
   activeSessionId,
   canExport = false,
@@ -442,6 +446,12 @@ export function ChatTabsBar({
             <WorkflowIcon className="size-3.5" />
             {appText("chat.tabs.workflows")}</button>
         </InfoTooltip>
+        <button type="button" onClick={onSelectLibrary} aria-pressed={view === "library"}
+          className={cn("flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+            view === "library" ? "bg-gaid-signal-tint text-gaid-signal-ink" : "text-gaid-ink-2 hover:bg-gaid-hover hover:text-gaid-ink")}>
+          <BookOpenIcon className="size-3.5" aria-hidden />
+          {libraryText("panel.title")}
+        </button>
       </div>
     </div>
   );

@@ -42,6 +42,20 @@ export function relativeWhen(iso: string, now = Date.now()): string {
   return format.format(Math.round(hours / 24), "day");
 }
 
+/** Recent entries the home shows (the summary may hold more; the project list has the rest). */
+const HOME_RECENT = 5;
+
+/**
+ * A chat started from a Workflow is titled with its first message ("Workflow · <title> — <request>"); the Workflow is
+ * already named on the second line, so the row shows the request.
+ */
+export function recentTitle(entry: WorkspaceHomeRecent): string {
+  const prefix = entry.workflow ? `Workflow · ${entry.workflow.title}` : null;
+  if (entry.kind !== "chat" || !prefix || !entry.title.startsWith(prefix)) return entry.title;
+  const rest = entry.title.slice(prefix.length).replace(/^\s*[—–-]\s*/, "").trim();
+  return rest || entry.title;
+}
+
 function StateChip({ entry }: { entry: WorkspaceHomeRecent }) {
   switch (entry.state) {
     case "running":
@@ -92,9 +106,9 @@ function WorkflowRows({ workflows, onStart }: { workflows: WorkspaceHomeWorkflow
             </span>
           </span>
           <SourceTag workflow={w} />
-          <span className={cn(CHIP, w.ready ? "bg-gaid-success-tint text-gaid-success" : "bg-gaid-warning-tint text-gaid-warning")}>
-            {text(w.ready ? "home.workflows.ready" : "home.workflows.notReady")}
-          </span>
+          {/* `ready: false` also covers "not checked yet" (no environment probe on this server run), so only a confirmed
+              ready state is shown; what a Workflow still needs appears on its start window (UI guide P9, Q4). */}
+          {w.ready && <span className={cn(CHIP, "bg-gaid-success-tint text-gaid-success")}>{text("home.workflows.ready")}</span>}
           <Button variant="ghost" size="sm" aria-label={text("home.workflows.startLabel", { title: w.title })} onClick={() => onStart(w)}>
             {text("home.workflows.start")}
           </Button>
@@ -304,17 +318,17 @@ export function WorkspaceHome({
               <p className="text-sm text-gaid-ink-2">{text("home.continue.empty")}</p>
             ) : (
               <ul className="border-t border-gaid-frame" aria-busy={!data}>
-                {(data?.recent ?? []).map((entry) => (
+                {(data?.recent ?? []).slice(0, HOME_RECENT).map((entry) => (
                   <li key={`${entry.kind}:${entry.projectId}:${entry.id}`} className="border-b border-gaid-edge">
                     <button
                       type="button"
-                      aria-label={text("home.continue.open", { title: entry.title })}
+                      aria-label={text("home.continue.open", { title: recentTitle(entry) })}
                       onClick={() => openRecent(entry)}
                       className="flex min-h-14 w-full items-center gap-4 px-3 py-2 text-left hover:bg-gaid-hover focus-visible:outline-2 focus-visible:outline-ring"
                     >
                       <span className="flex w-24 shrink-0"><StateChip entry={entry} /></span>
                       <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate font-semibold">{entry.title}</span>
+                        <span className="truncate font-semibold" title={entry.title}>{recentTitle(entry)}</span>
                         <span className="truncate text-sm text-gaid-ink-2">
                           {[entry.projectName, entry.workflow && `Workflow ${entry.workflow.title}${entry.workflow.version ? ` ${entry.workflow.version}` : ""}`]
                             .filter(Boolean)

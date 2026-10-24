@@ -2,6 +2,7 @@ import { act, fireEvent, render, renderHook, screen } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageResponse } from "@/components/ai-elements/message";
+import type { LibraryItemSummary } from "@/geo/contracts/library";
 import { CitationPdfContext } from "./citation-links";
 import { pageMissing, useCitationPdf } from "./citation-pdf";
 
@@ -49,6 +50,15 @@ describe("library citations in Markdown (gaid-cite-open-pdf)", () => {
 
 describe("useCitationPdf", () => {
   beforeEach(() => { resolveCitations.mockReset(); });
+
+  it("opens a selected stored PDF by item even without a citation key", () => {
+    const { result } = renderHook(() => useCitationPdf());
+    const item = { id: "li-no-key", title: "시추 연구", storedPdf: true } as LibraryItemSummary;
+    act(() => result.current.openItem(item, 1));
+    expect(result.current.pdf).toMatchObject({ itemId: item.id, title: item.title, page: 1 });
+    act(() => result.current.openItem({ ...item, id: "not-stored", storedPdf: false }));
+    expect(result.current.pdf?.itemId).toBe(item.id);
+  });
 
   it("opens a stored PDF at the cited page and repeats the jump on a second press", async () => {
     resolveCitations.mockResolvedValue([{ key: "hong2026", itemId: "li-1", title: "Spatial PU learning", pdf: { pages: 3 } }]);

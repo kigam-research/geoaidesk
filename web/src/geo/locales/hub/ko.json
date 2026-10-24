@@ -654,11 +654,11 @@
     "saving": "저장 중"
   },
   "library": {
-    "title": "서재에서 자료 추가",
-    "description": "고른 논문은 PDF 본문으로, 연구 노트는 글과 그림으로 넣습니다. PDF가 없는 논문은 서지 정보와 초록만 넣습니다.",
+    "title": "서재에서 자료 고르기",
+    "description": "논문과 정리 노트를 Workflow의 근거 자료로 넣습니다.",
     "category": "자료 종류",
     "papers": "논문",
-    "notes": "연구 노트",
+    "notes": "정리 노트",
     "search": "제목, 저자, 프로젝트로 찾기",
     "loading": "서재를 불러오는 중입니다.",
     "noMatch": "맞는 항목이 없습니다.",
@@ -666,12 +666,15 @@
     "emptyNotes": "서재에 연구 노트가 없습니다. 연구 노트 화면에서 서재로 가져오세요.",
     "selected": "{count}개 고름",
     "cancel": "취소",
-    "addAction": "{count}개 추가",
+    "addAction": "자료 {count}개 더하기",
     "adding": "추가하는 중",
     "skipped": "{count}개 항목은 넣지 못했습니다.",
     "otherPc": "다른 PC의 노트",
     "noPdf": "PDF 없음",
-    "addEmpty": "추가"
+    "addEmpty": "자료 더하기",
+    "close": "서재 패널 닫기",
+    "failed": "서재를 읽지 못했습니다. 잠시 뒤 다시 여세요.",
+    "addFailed": "자료를 넣지 못했습니다. 다시 시도하세요."
   },
   "stages": {
     "title": "Workflow 단계 구성 확인",

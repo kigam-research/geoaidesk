@@ -58,7 +58,10 @@ export interface WorkspaceHomeWorkflow {
   /** `catalogue` = 기본 Workflow; `shared` = installed from GAID Connect; `draft` = an installed Connect draft (초안). */
   source: "catalogue" | "shared" | "draft";
   version: string | null;
-  /** Ready to start in at least one of `projects` (no missing skill, environment or required input). */
+  /**
+   * Ready to start in at least one of `projects` (no missing skill, environment or required input). `false` also means
+   * "not checked yet" (only settled cached environment probes count), so the UI shows only `true`.
+   */
   ready: boolean;
   /** Projects where it is installed (built-in Workflows: the projects that used it); most recent first. */
   projects: { id: string; name: string }[];

@@ -139,6 +139,12 @@ describe("workspace persistence schema", () => {
     });
   });
 
+  it("retains the library inspector when restoring a project", () => {
+    const restored = validateWorkspaceMetadata({ version: WORKSPACE_SCHEMA_VERSION, screen: "workspace",
+      openedProjectIds: ["project-a"], projects: { "project-a": { ...projectState, view: "library" } } });
+    expect(restored.projects["project-a"].view).toBe("library");
+  });
+
   it("repairs corrupt tabs, selections, and panel sizes", () => {
     const repaired = validateWorkspaceMetadata({
       version: WORKSPACE_SCHEMA_VERSION,

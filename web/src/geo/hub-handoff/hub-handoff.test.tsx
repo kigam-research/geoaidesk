@@ -152,7 +152,7 @@ describe("hub analysis handoff", () => {
     expect(JSON.parse(call[1].body)).toEqual({ sessionId: "s1", files: ["analysis.py", "plot.png"], note: "격자 분석 방법" });
     expect(dialog.getByRole("button", { name: "Connect 초안으로 보내기" })).toBeDisabled();
     await userEvent.click(dialog.getByRole("button", { name: "Connect 초안 열기" }));
-    expect(window.location.hash).toBe("#hub/ap-12345678-abc");
+    expect(window.location.hash).toBe("#connect/ap-12345678-abc");
     expect(saveDownload).not.toHaveBeenCalled();
   });
   it("offers the chat's research notes and the project's papers for the hub draft", async () => {
