@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T13:13:17Z
+updated: 2026-10-24T13:16:35Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"b38c7b0e-5839-4ccb-b913-3c52ce2378aa","pid":621868,"provider":"codex","session":"01a16dff-2bab-7821-86c4-9f2515e1131d","start":"73474056","token":"2c5f071640de697d06a68e008336f902e2b38b2cba5df24bcb51f606c2c2325e"}
 branch: task/gaid-library-prep--digest-start
 target: task/gaid-library-prep
@@ -32,13 +32,17 @@ Evidence: cd server && npm run typecheck && npx vitest run <your tests> test/geo
 
 ## Current state
 Resumed in the printed worktree. Read the approved design, UI guide, copy rules and settled interfaces. Implementation
-is implemented. Focused server tests: 27 passed (5 files). Focused web tests: 98 passed (12 files). Server and web
+is complete. Focused server tests: 27 passed (5 files). Focused web tests: 98 passed (12 files). Server and web
 typechecks passed. Copy validator: 0 errors, 101 pre-existing warnings; UI check: 0 errors. Codegraph has no index for
 this exact worktree, so native source reads are used. A screenshot job using the actual TaskSetup components is next.
 ## Next steps
 1. Run the prepared screenshot job (isolated snapshot, temporary uncommitted harness, port 3267), inspect images.
 2. Re-run checks after final small fixes, review the diff, record evidence and finish for parent integration.
 ## Failed approaches
+- First screenshot job failed only in the external harness: instrument style deliberately has no data-style attribute;
+  the screenshot wait expected data-style=instrument. Corrected the condition to treat a missing attribute as instrument.
+- The immediate second job launch was rejected before starting because task job had added its first receipt to the task
+  document (and a new malformed-response test was unsaved). Save first; this launch produced no receipt/job to resume.
 ## Notes and decisions
 - Sequential decisions: tool scope/window contract first, shared start-message settings next, then UI wiring and tests.
   Owned files are the starter's exact file list. This child has no independent substantial work package to delegate.
@@ -71,6 +75,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-library-prep--digest-start-20261024T131352.567639Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

@@ -111,3 +111,11 @@ it("offers digests for a general Workflow and adds the same first-reading instru
   expect(listener).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining(`key="digest:${gaid.itemId}"`) }));
   unsubscribe();
 });
+
+it("treats a malformed candidate response as unavailable without breaking Workflow setup", async () => {
+  getDigestCandidates.mockResolvedValue({ skills: [] });
+  const { result } = renderHook(() => useDigestCandidates("p1", null));
+  await waitFor(() => expect(result.current.failed).toBe(true));
+  expect(result.current.candidates).toEqual([]);
+  expect(result.current.selected).toBeNull();
+});
