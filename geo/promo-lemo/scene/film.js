@@ -150,7 +150,7 @@
   const CHAPTERS = [
     { st: 0, part: 'GAID 시스템', title: '연구는 내 서재의 논문에서 시작합니다', shots: [
       { src: 'p', id: 'L1', use: [0, 2.6], tags: [[0, '주제별 폴더에 모은 논문']] },
-      { src: 'p', id: 'L2', use: [0.6, 3.6], tags: [[0, '논문을 곁에 두고 읽기'], [1, '논문을 곁에 두고 읽기']] },
+      { src: 'p', id: 'L2', use: [0.6, 3.6], hold: 0.5, tags: [[0, '논문을 곁에 두고 읽기'], [1, '논문을 곁에 두고 읽기']] },
     ] },
     { st: 1, part: 'GAID 허브', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', shots: [
       { src: 'p', id: 'A1', use: [0.3, 5], tags: [[0, '논문·코드·자료를 함께'], [1, '논문·코드·자료를 함께']] },
@@ -159,16 +159,16 @@
     ] },
     { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', shots: [
       { src: 'p', id: 'H1', use: [0, 4.5], tags: [[0, '다음 version으로 등록'], [1, '예제 자료와 함께 공유'], [2, '다음 version으로 등록']] },
-      { src: 'p', id: 'H2', use: [1.6, 3.5], tags: [[1, '허브에서 가져다 쓰기']] },
+      { src: 'p', id: 'H2', use: [1.6, 3.5], hold: 1.3, tags: [[1, '허브에서 가져다 쓰기']] },
     ] },
     { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', shots: [
       { src: 'p', id: 'R1', use: [0, 4.5], tags: [[0, 'Workflow의 목적과 근거'], [1, '근거 논문을 붙여 시작']] },
       { src: 'p', id: 'R3', use: [0.3, 6], tags: [[0, 'AI agent가 Workflow대로'], [1, 'AI agent가 Workflow대로'], [2, '결과 그림까지 저장']] },
-      { src: 'y', id: 'M1', use: [0, 4.6], tags: [[0, '지도에서 우선순위 확인'], [1, '원본 값을 바로 확인']] },
+      { src: 'y', id: 'M1', use: [0, 4.6], hold: 0.7, tags: [[0, '지도에서 우선순위 확인'], [1, '원본 값을 바로 확인']] },
     ] },
     { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', shots: [
       { src: 'p', id: 'N1', use: [0, 4.5], tags: [[0, '결과부터 쓴 연구노트'], [1, '결과부터 쓴 연구노트'], [2, '두 논문의 쪽수까지 인용']] },
-      { src: 'y', id: 'N1', use: [1.5, 4.8], tags: [[1, '결과와 그림을 노트로 정리'], [2, '판단은 연구자가 답합니다']] },
+      { src: 'y', id: 'N1', use: [1.5, 4.8], hold: 1.1, tags: [[1, '결과와 그림을 노트로 정리'], [2, '판단은 연구자가 답합니다']] },
     ] },
     { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', shots: [
       { src: 'p', id: 'L3', use: [0.5, 3.6], tags: [[0, '연구노트도 서재에'], [1, '연구노트도 서재에']] },
@@ -186,9 +186,9 @@
         const info = shotInfo(s.src, s.id);
         const full = info.frames / FPS;
         const [from, to] = s.use;
-        const dur = Math.min(to, full) - from;
-        SEG.push({ src: s.src, shot: s.id, a: tcur, b: tcur + dur, skip: from, ch: ci, tags: s.tags });
-        tcur += dur;
+        const play = Math.min(to, full) - from, hold = s.hold || 0; // hold: the last frame stays so the last outcome can be read
+        SEG.push({ src: s.src, shot: s.id, a: tcur, b: tcur + play + hold, play, skip: from, ch: ci, tags: s.tags });
+        tcur += play + hold;
       }
       c.b = tcur;
     });
@@ -725,8 +725,9 @@
       let last = null;
       for (const [k, label] of sg.tags) {
         const beat = info.beats[k];
-        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + (sg.b - sg.a));
-        const ta = sg.a + (t0 - sg.skip) + (last ? 0 : lead), tb = sg.a + (t1 - sg.skip);
+        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + sg.play);
+        const ta = sg.a + (t0 - sg.skip) + (last ? 0 : lead);
+        const tb = t1 >= sg.skip + sg.play - 0.01 ? sg.b : sg.a + (t1 - sg.skip); // a beat that runs to the end covers the hold
         if (tb <= ta + 0.3) continue;
         const entry = { a: ta, b: tb, rect: beat.rect, label, same: !!last && last.label === label, prev: last, sg };
         tagSched.push(entry);
@@ -758,7 +759,7 @@
     ev(DEMO_END, 'collapse');
     const frameSrc = (sg, local) => {
       const info = shotInfo(sg.src, sg.shot);
-      const idx = clamp(Math.floor((sg.skip + local) * FPS + 1e-6), 0, info.frames - 1);
+      const idx = clamp(Math.floor((sg.skip + Math.min(local, sg.play - 1 / FPS)) * FPS + 1e-6), 0, info.frames - 1);
       return `capture-${sg.src}/${info.pattern.replace('%05d', String(idx).padStart(5, '0'))}`;
     };
     const setImg = (img, src) => { if (img.dataset.src !== src) { img.dataset.src = src; img.src = src; pending.push(img.decode().catch(() => {})); } };
@@ -801,7 +802,7 @@
       glow.style.opacity = o * (sx ? Math.min(sx, sy) : s);
       setImg(imgB, frameSrc(sg, local));
       if (prev && sw < 1) {
-        setImg(imgA, frameSrc(prev, prev.b - prev.a - 1 / FPS));
+        setImg(imgA, frameSrc(prev, prev.play - 1 / FPS));
         imgA.style.visibility = 'visible';
         const edge = lerp(-30, 130, eio(sw));
         imgB.style.webkitMaskImage = imgB.style.maskImage = `linear-gradient(100deg, #000 ${edge - 24}%, transparent ${edge}%)`;
