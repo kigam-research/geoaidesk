@@ -2,7 +2,7 @@
 format: 1
 status: waiting
 updated: 2026-10-24T01:48:31Z
-writer: {"host":"seongin3","reserved":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
+writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d","pid":1195251,"provider":"codex","session":"01a16b98-98fb-76e2-936a-665bab0a74ca","start":"69446405","token":"5ced0ccb082ec0b914e81e989d8affe48c55c4635f80cdf377dfbffaa29a1f8e"}
 branch: task/gaid-note-bundle-export--notebook-links
 target: task/gaid-note-bundle-export
 parent: gaid-note-bundle-export
