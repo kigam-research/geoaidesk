@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T03:19:35Z
+updated: 2026-10-24T03:21:05Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -55,14 +55,12 @@ Request from the starter:
 - Report `reports/2026-10-24-gaid-promo-video-v5/index.md` (figures 01-demo, 02-boxcheck, 03-day45 from the final files /
   capture frames), humanizer pass done. Registry: `gaid-promo-video-v5` (review, supersedes v4; v4 report marked
   superseded) and `gaid-promo-video-v5-day45` (review).
-- Capture child `gaid-promo-video-v5--capture`: captures delivered (capture.json sha256 a4503407…9841, unchanged at
-  11:45 KST). Its first `task finish` stopped: scripts/check had 4 frontend tests time out at 5000 ms under PC load
-  (unrelated to its files); local Finish commit 669311f7 unpushed. Asked the child (agent 7b6c0c70) to rerun `task finish`.
+- Capture child `gaid-promo-video-v5--capture`: completed and closed 2026-10-24 (integrated, 2 jobs succeeded, no open
+  items; its regenerable check caches removed before `task close`). capture.json sha256 a4503407…9841 unchanged.
 - Review app: hub told before (d7fb43947212) and after (1ac626ae9bf6) use. Checks: no automated checks for the film
   sources (scripts/check not run by this unit; the child runs it in its finish).
 ## Next steps
-1. When the child finishes: `task complete gaid-promo-video-v5--capture`, confirm capture.json hash unchanged.
-2. Then `task finish` (report review copy already made).
+1. `task finish` (report and review copy done).
 ## Failed approaches
 ## Notes and decisions
 
