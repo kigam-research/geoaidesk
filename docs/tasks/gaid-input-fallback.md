@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T08:10:23Z
+status: done
+updated: 2026-10-24T08:10:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8326432c-0a38-43d0-92f0-76db7e868732","pid":1778976,"provider":"claude","session":"21c916ad-8c56-4943-818b-6f9dae6aa973","start":"71313221","token":"dd814f54f4df4db1c88c4132afa7ed1942ef6ba2f237a42360f61d5b48b0e522"}
 branch: task/gaid-input-fallback
 target: main
@@ -68,7 +68,7 @@ generated synthetic_data/{dem,boreholes}/ with README/code; all 15 files in prov
 at the top and in 한계. Screenshots 16 (both styles × themes × 1440/1280) in ~/data/geoaidesk/work/gaid-input-fallback/shots/.
 ## Next steps
 <!-- task:closed -->
-Closed 2026-10-24T08:00:05Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+Closed 2026-10-24T08:10:24Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
 ## Notes and decisions
