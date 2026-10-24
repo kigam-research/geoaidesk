@@ -129,6 +129,7 @@ describe("library folders", () => {
     const refs = (await server.inject({ url: `/geo/library/citations?keys=${inside.citationKey},${outside.citationKey}` })).json();
     expect(refs[0].outsideScope).toBeUndefined();
     expect(refs[1]).toMatchObject({ itemId: outside.id, outsideScope: true });
+    expect(refs[1].pdf).toBeUndefined(); // no PDF stored in GAID: the citation cannot open one
 
     let handler: ((e: unknown) => Promise<unknown>) | undefined;
     makeNoteCitationExtension(paths, () => store)({ on: (name: string, h: never) => { if (name === "tool_result") handler = h; } } as never);

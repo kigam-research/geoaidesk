@@ -440,5 +440,15 @@
     },
     "allFolder": "전체 정리 노트",
     "recentTitle": "최근 넣은 정리 노트"
+  },
+  "cite": {
+    "open": "@{key} PDF 열기",
+    "openPage": "@{key} PDF {page}쪽 열기",
+    "unknown": "서재에 없는 인용 키라 PDF를 열 수 없습니다. (@{key})",
+    "noPdf": "「{title}」의 PDF가 GAID에 없습니다. 서재에서 PDF를 넣으세요. (@{key})",
+    "pageMissing": "인용한 {page}쪽이 없습니다. PDF는 {pages}쪽까지라 첫 쪽을 보여 줍니다. (@{key})",
+    "failed": "서재를 읽지 못해 @{key}의 PDF를 열지 못했습니다. 다시 누르세요.",
+    "closeHint": "PDF를 닫습니다 (Esc)",
+    "closeNoteHint": "정리 노트로 돌아갑니다 (Esc)"
   }
 }
