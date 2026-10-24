@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T03:21:05Z
+status: done
+updated: 2026-10-24T03:21:52Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -60,7 +60,9 @@ Request from the starter:
 - Review app: hub told before (d7fb43947212) and after (1ac626ae9bf6) use. Checks: no automated checks for the film
   sources (scripts/check not run by this unit; the child runs it in its finish).
 ## Next steps
-1. `task finish` (report and review copy done).
+<!-- task:closed -->
+Closed 2026-10-24T03:21:52Z: finished; task finish integrates it into main. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 
