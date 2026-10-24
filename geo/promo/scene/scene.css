@@ -76,10 +76,5 @@ svg text { font-family: "Pretendard", sans-serif; }
 .window .hl {
   position: absolute; border: 3px solid var(--signal); border-radius: 8px; corner-shape: bevel; pointer-events: none;
 }
-.detail {
-  position: absolute; overflow: hidden; background: var(--face); border: 3px solid var(--signal);
-  border-radius: 10px; corner-shape: bevel;
-  box-shadow: 0 2px 4px rgba(23, 27, 35, 0.06), 0 24px 60px rgba(23, 27, 35, 0.16);
-}
-.detail img { position: absolute; }
-.tag-text { font-size: 46px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); line-height: 1.2; }
+.row { position: absolute; display: flex; align-items: center; gap: 16px; white-space: nowrap; font-size: 32px; letter-spacing: -0.01em; }
+.row .sq { flex: none; width: 14px; height: 14px; }

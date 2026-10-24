@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:59:25Z
+updated: 2026-10-24T02:44:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -44,22 +44,23 @@ Request from the starter:
   video to Google Drive (user rule).
 
 ## Current state
-- Analysis of v4 and Direction v5 written (below); capture contract `geo/promo/CONTRACT.md` (v5, Yilgarn shot list Y1–Y7).
-- Capture child `gaid-promo-video-v5--capture` started 2026-10-24 (profile "general work"); it owns `capture_v5*.py`,
-  the v5 section of `CAPTURE.md` and `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`.
-- Scene reworked (`scene.js` v5 window stage: `CHAPTERS_DEF` steps, `V3` whole-region rects, `mkWin`/`mkDetail` lifts,
-  pair step Y5+M1); `render.py` merges `--capture v3=… --capture v5=…`; `frame_check.py` for box checks.
-  Previews with v3 only (Y shots as placeholders): `~/data/geoaidesk/work/gaid-promo-video-v5/prev1`, `prev2` (95 s).
-- V3 rects checked on drawn/zoomed frames (`~/data/geoaidesk/work/gaid-promo-video-v5/rects/`): edges lie in gaps between
-  whole elements or on panel borders. Rejected v3 regions: L1 side panel (runs past the viewport), H1 shared-file list
-  (scrolls; the whole dialog is framed instead), N1 figure (clipped by the pane), L4 uses list (runs past the viewport).
-- Review app: hub told before use (request d7fb43947212); my exploration blocked workspace-state PUTs; Yilgarn
-  workspace-state.json mtime unchanged (2026-10-23 13:24:46 KST).
+- v5 final: job 2 (`job-geoaidesk-gaid-promo-video-v5-2`, source 528f09e8) exit 0: 93.00 s, 2,790 frames, silent,
+  video sha256 0e5126b8…05ff, manifest cd2a2e82…e3f1; out `~/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021454.162971Z/out`.
+  Layout: narrative column + one window (user feedback), 16 shot uses (PGI 9, Yilgarn 7), 27 whole-region frames
+  (PGI 13 re-derived, Yilgarn 14 DOM-measured). Job 1 (first layout, lifted detail windows) exit 0, not used.
+- day45 final: job 4 (`job-geoaidesk-gaid-promo-video-v5-4`, source f69be169) exit 0: 45.00 s, 1,350 frames, H.264 + AAC
+  48 kHz stereo, decoded peak −0.85 dBFS, RMS −15.6 dBFS, 483 sound events all on the 16th grid (soundtrack.py check),
+  poster = hub frame 31.4 s; video sha256 b550272a…d5fb, manifest 0879a90b…9c1a. Job 3 (first day45 render) exit 0, not
+  used (off-grid effects). Sound checked by measurement only, not by listening.
+- Report `reports/2026-10-24-gaid-promo-video-v5/index.md` (figures 01-demo, 02-boxcheck, 03-day45 from the final files /
+  capture frames), humanizer pass done. Registry: `gaid-promo-video-v5` (review, supersedes v4; v4 report marked
+  superseded) and `gaid-promo-video-v5-day45` (review).
+- Capture child `gaid-promo-video-v5--capture`: captures delivered (capture.json sha256 a4503407…9841), its finish pending.
+- Review app: hub told before (d7fb43947212) and after (1ac626ae9bf6) use. Checks: no automated checks for the film
+  sources (scripts/check not run by this unit; the child runs it in its finish).
 ## Next steps
-1. When the child finishes: `task complete gaid-promo-video-v5--capture`, render stills with both captures, check every
-   beat (stills `NN-<shot>-<k>`), tune Y beats/labels/timing.
-2. Tell the hub the review app is free (after the child's captures).
-3. Final render job, report `reports/2026-10-24-gaid-promo-video-v5/index.md` with key frames incl. box checks, registry.
+1. When the child finishes: `task complete gaid-promo-video-v5--capture`, confirm capture.json hash unchanged.
+2. review-copy the report, then `task finish`.
 ## Failed approaches
 ## Notes and decisions
 
@@ -89,6 +90,25 @@ Request from the starter:
   Yilgarn start window (Y3) + PGI AI agent run (R3) + map pair Yilgarn/PGI (Y5, M1); 연구노트 = Yilgarn note (Y6) + PGI page
   citations (N1); 다시 서재로 = paper uses and connection map (L4/Y7, L5). Target 95–103 s.
 
+### User feedback during v5 (2026-10-24, verbatim)
+> 똑같이 만들 필요는 없지만 7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d 세션의 102초 영상 처럼 꼭 허브와 시스템을 설명하는 창이 영상 전체를 차지할 필요가 없고 모션 그래픽의 한 요소로 배치되는 것이 처음 보는 독자의 입장에서는 더 이해하기 쉽다. 사용자의 피드백이다
+
+(The session is the writer of `gaid-promo-video-v4-lemo`, its 102 s "Dark Tech Keynote" cut.) Applied: the demo now has a
+narrative column on the left (part plate, purpose in 50 px, the chapter's outcome rows; the current row is blue and a
+leader line runs to the whole-region frame on the window) and one 1180 px window on the right. The lifted detail windows
+of the first v5 layout were dropped (one focus per moment for a first-time viewer); the pair step shows the two examples
+as two staggered 690 px windows. v5's light 계측 style, example mix and whole-region rects stay. Y3's three beats share one
+rect (whole start window), so they became two rows. Job 1 (render of the first layout) is superseded by job 2.
+
+### Added scope: 45 s product film (user request 2026-10-24, verbatim)
+> 좋다. 해당 렌더와 함께 추가 영상을 제작하고 싶다. 현재 방식은 기능 설명 홍보 영상에 가깝다. 제품 홍보영상으로서는 너무 기능 위주의 설명이 가득하고 처음 보는 이용자의 입장에서는 한번에 기능을 2~3초만에 이해할 수 없다. 이러한 관점에서 제품 홍보 영상으로는 중요 메시지를 코드만 사용하는 모션 그래픽으로 잘 설명하여 그림만으로도 홍보하려는 도구의 강점을 파악하고 구매하거나 이용하고 싶게 만들어야 한다. 그리고 분량은 45초 정도로 구성해야한다. 현재 설치된 brag스킬을 활용하면 소리도 생성 가능할 것으로 기대한다. 어떻게 연출해야할지 논의하여 생성해보자.
+
+Proposal discussed in the tab (one message per scene, no feature names, code-only motion graphics, cuts on a 96 BPM bar
+grid = 18 bars × 2.5 s = 45 s, music + effects synthesised, no narration, internal review). User choices (AskUserQuestion):
+structure "한 연구자의 하루형", tone "밝은 계측 + 블루 전환 (권장)", music "경쾌한 미니멀 (권장)". The v5 film continues
+unchanged. Made by me (tightly coupled to this discussion; brag-slim is built for Opus 5.5). Sources `geo/promo/day45/`,
+outputs outside Git; it sits beside v5 in the report and registry (`review`, does not supersede anything).
+
 ### Work packages and integration order
 1. Capture child `gaid-promo-video-v5--capture` ("general work"): owns `geo/promo/capture_v5*.py`, the v5 section of
    `geo/promo/CAPTURE.md`, `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`. Interface: `CONTRACT.md` v5.
@@ -103,11 +123,13 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
-(for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
-written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
-child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-24-gaid-promo-video-v5/index.md
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021150.866300Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021454.162971Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T023353.091711Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T023841.916242Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

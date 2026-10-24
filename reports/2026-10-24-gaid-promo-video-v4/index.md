@@ -4,12 +4,14 @@ date: 2026-10-24
 project: geoaidesk
 task: gaid-promo-video-v4
 headline: 배경 파트는 연구자가 자료를 조사하고 논문을 읽고 코드를 짜는 모습과, 흩어진 스킬·도구가 GAID로 모이는 모습을 움직이는 그림으로 보여 줍니다. 시연은 장마다 목적 문장과 "GAID 시스템/GAID 허브" 표시로 시작하고, 기능은 그 목적을 따라 하나씩 나옵니다. "개념도" 표시는 지웠습니다.
-review_status: pending
+review_status: superseded
 decisions: 0
 cover: figures/01-background.png
 supersedes: 2026-10-24-gaid-promo-video-v3
 ---
 # GAID 홍보 영상 v4: 배경을 움직이는 그림으로 바꾸고 목적부터 말하는 103초 영상 (내부 검토용)
+
+> 이 보고서는 2026-10-24-gaid-promo-video-v5로 대체되었습니다.
 
 ## 0. 한눈에
 
