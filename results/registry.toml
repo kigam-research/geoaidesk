@@ -147,6 +147,28 @@ replicas = []
 supersedes = "gaid-promo-video-v3"
 
 [[result]]
+id = "gaid-promo-video-v4-brag"
+title = "GAID 홍보 영상 v4_brag — v4를 brag 스킬로 100 BPM 박자에 맞춰 다시 자르고 음악·효과음을 넣은 101초 영상 (내부 검토용)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-brag-20261024T012900.343394Z/out"
+source_sha = "a0b6d7741a7f5dc6feaa35276a508ac68f9dcf00"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "user:2026-10-24-gaid-promo-video-v4-brag"]
+files = [{ path = "brag.mp4", sha256 = "5b99a82c2327de1c921e3582fa8c57eb106fb28e43702ecff3382f1fd784250a" }, { path = "brag.jpg", sha256 = "2e33ae973fc172a8880ce79e97e45ac1d0d78199950282cb77328eb9a65a5064" }, { path = "manifest.json", sha256 = "dcce978f60840d1e661757447613ffbd3027393e3415cdb334b0c72e0eacad42" }]
+report = "reports/2026-10-24-gaid-promo-video-v4-brag/index.md"
+replicas = []
+
+[[result]]
+id = "gaid-promo-video-v4-brag-40s"
+title = "GAID 홍보 영상 v4_brag 40초판 — 같은 메시지를 코드 모션그래픽으로 새로 만들고 포천 PGI·Yilgarn 화면을 창으로 넣은 홍보형 영상 (내부 검토용)"
+state = "review"
+run = "pc74:/home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-brag-20261024T014452.245293Z/out"
+source_sha = "7266e701ac4ebf209fb340417b38079d74c5c159"
+inputs = ["pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v3/capture-v3/capture.json", "pc74:/home/seongin3/data/geoaidesk/work/gaid-promo-video-v2/capture-v2/capture.json", "user:2026-10-24-gaid-promo-video-v4-brag-40s"]
+files = [{ path = "brag.mp4", sha256 = "9e2c07ae2bab2aac85ba44479fd126c5813dab2307a3e35bf32be13b20b37b59" }, { path = "brag.jpg", sha256 = "b70697718ee3f6ddd1da8e12163d841264167ced597ebb330242b3dd227eb7eb" }, { path = "manifest.json", sha256 = "46a674c67474ab0ec825369def14c76b741373261312b4f607814ef583f638f7" }]
+report = "reports/2026-10-24-gaid-promo-video-v4-brag/index.md"
+replicas = []
+
+[[result]]
 id = "gaid-promo-video-v5"
 title = "GAID 홍보 영상 v5 — 포천 PGI와 Yilgarn 니켈 예제, 화면 요소를 통째로 감싼 강조 상자, 설명 열과 창 배치의 93초 영상 (내부 검토용, 무음)"
 state = "review"

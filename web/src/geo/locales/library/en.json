@@ -440,5 +440,15 @@
     },
     "allFolder": "All research notes",
     "recentTitle": "Recently added research notes"
+  },
+  "cite": {
+    "open": "Open the PDF of @{key}",
+    "openPage": "Open the PDF of @{key} at p. {page}",
+    "unknown": "This citation key is not in your library, so no PDF can be opened. (@{key})",
+    "noPdf": "GAID has no PDF of “{title}”. Add the PDF in the library. (@{key})",
+    "pageMissing": "The cited p. {page} is not in the PDF. It has {pages} pages, so the first page is shown. (@{key})",
+    "failed": "Could not read the library, so the PDF of @{key} did not open. Press it again.",
+    "closeHint": "Close the PDF (Esc)",
+    "closeNoteHint": "Return to the research note (Esc)"
   }
 }

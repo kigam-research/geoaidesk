@@ -42,6 +42,16 @@ The colour-vision previews implement the full-severity matrices of Machado, Oliv
 | Attention Control (`aaddrick/attention-control`), through KIGAM's Korean adaptation: delivery rules for chat answers | `REPLY_STYLE_RULE` in `server/src/geo/instructions.ts` (condensed, reworded) | MIT, Copyright (c) 2026 aaddrick; portions Copyright (c) 2026 Ayoub Ghriss |
 | Humanizer (`blader/humanizer` v3.1.0), through KIGAM's Korean adaptation: prose patterns for research notes; its patterns come from Wikipedia's "Signs of AI writing" (WikiProject AI Cleanup) | `geo/skills/gaid-note-style/` (condensed, reworded; seeded into each project's `.pi/skills/`) | MIT, Copyright (c) 2025 Siqi Chen; text in `geo/skills/gaid-note-style/LICENSE` |
 
+## Design skills for developers (not shipped in the app)
+
+Unmodified copies read by coding agents working on GAID's screens; the app never loads them. Pins, telemetry and what
+was left out: `.claude/skills/SOURCE.md`.
+
+| Material | Where | License |
+|---|---|---|
+| Impeccable (`pbakaus/impeccable` skill 4.7.0, tag `skill-v4.7.0`, commit `aeeb3d8c`); its `reference/ios.md` and `reference/android.md` derive from `ehmo/platform-design-skills` (MIT) | `.claude/skills/impeccable/` | Apache-2.0; `.claude/skills/licenses/impeccable-LICENSE` and its notices `impeccable-NOTICE.md` |
+| tasteskill (`Leonxlnx/taste-skill` v2.1.4, commit `6010f91a`), skill `design-taste-frontend` | `.claude/skills/design-taste-frontend/` | MIT, Copyright (c) 2026 Leonxlnx; `.claude/skills/licenses/taste-skill-LICENSE` |
+
 ## Content fetched at runtime
 
 | Content | When | Terms |

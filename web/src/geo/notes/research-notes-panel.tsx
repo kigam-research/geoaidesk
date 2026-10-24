@@ -466,17 +466,17 @@ function NoteDetail({ projectId, id, focusDecisions, summary, onBack, onOpenNote
           <p className="text-muted-foreground">{t("notes.panel.loading")}</p>
         ) : (
           <div className="mx-auto max-w-[960px]">
-            <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.before}</MessageResponse>
+            <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile} libraryCitations>{parts.before}</MessageResponse>
             {parts.decisions !== null && (
               <div ref={decisionsRef} className="mt-6 scroll-mt-4">
                 {data.note.decisions.length ? (
                   <DecisionCards key={data.note.id} projectId={projectId} note={data.note} onSend={sendAnswers} />
                 ) : (
-                  <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.decisions}</MessageResponse>
+                  <MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile} libraryCitations>{parts.decisions}</MessageResponse>
                 )}
               </div>
             )}
-            {parts.after.trim() && <div className="mt-6"><MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile}>{parts.after}</MessageResponse></div>}
+            {parts.after.trim() && <div className="mt-6"><MessageResponse className={NOTE_PROSE} onOpenFile={onOpenFile} libraryCitations>{parts.after}</MessageResponse></div>}
             <NoteReferences content={data.content} />
             <div className="mt-8 border-t border-gaid-edge pt-6">
               <NoteFigures

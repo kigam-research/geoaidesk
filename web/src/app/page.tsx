@@ -64,6 +64,8 @@ import { GaidHub } from "@/geo/hub/hub-screen";
 import { useHubLocation } from "@/geo/hub/location";
 import { hasMethodSetup, onMethodSetupRequest } from "@/geo/hub/handoff";
 import { onOpenResearchNoteRequest, takeOpenResearchNote } from "@/geo/notes/open-note";
+import { CitationPdfContext } from "@/geo/library/citation-links";
+import { CitationPdfPane, useCitationPdf } from "@/geo/library/citation-pdf";
 import { GaidAppBar } from "@/geo/shell/app-bar";
 import { SystemResourcesButton } from "@/geo/shell/system-resources";
 import { focusSearchTarget, shortcutLabel, useShortcut } from "@/geo/shell/shortcuts";
@@ -78,6 +80,7 @@ import {
 } from "react";
 
 const appText = geoText("app");
+const libraryText = geoText("library");
 
 const MAX_CHAT_TABS = 10;
 
@@ -1053,7 +1056,13 @@ function WorkspacePage({
     [tabs, tabsMeta],
   );
 
+  // GeoAIDesk (gaid-cite-open-pdf): a 서재 citation pressed in a chat answer or a research note opens its PDF page in a
+  // column between the preview and the chat.
+  const citationPdf = useCitationPdf();
+  const citationOpener = useMemo(() => ({ open: citationPdf.open }), [citationPdf.open]);
+
   return (
+    <CitationPdfContext.Provider value={citationOpener}>
     <div className="flex h-dvh min-w-0 flex-col">
       {/* GAID app bar (UI guide v2 L2): mark, place switch, project; status and panel toggles; settings. */}
       <GaidAppBar
@@ -1244,6 +1253,18 @@ function WorkspacePage({
             />
         </div>
 
+        {/* GeoAIDesk (gaid-cite-open-pdf): the cited PDF shares the preview's width (the note or file that cites it stays
+            readable beside it); on compact desktops it stays left of the chat sheet. */}
+        {isActive && citationPdf.pdf && (
+          <div
+            className={cn("flex min-h-0 min-w-[360px] flex-1 border-l border-gaid-edge", chatOpen && "max-xl:mr-[min(var(--chat-width),calc(100%-48px))]")}
+            style={{ "--chat-width": `${chatWidth}px` } as CSSProperties}
+          >
+            <CitationPdfPane pdf={citationPdf.pdf} onClose={citationPdf.close} onDocumentReady={citationPdf.documentReady}
+              closeHint={libraryText("cite.closeHint")} className="min-w-0 flex-1 rounded-none border-0" />
+          </div>
+        )}
+
         {/* Drag handle: preview ↔ chat */}
         {isActive && chatOpen && (
           <div className="hidden xl:flex">
@@ -1336,5 +1357,6 @@ function WorkspacePage({
 
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
     </div>
+    </CitationPdfContext.Provider>
   );
 }
