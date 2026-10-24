@@ -4,7 +4,7 @@ date: 2026-10-24
 project: geoaidesk
 task: gaid-ui-quality-kit
 headline: 공용 부품을 모든 상태로 고정한 개발자용 견본 화면과, 그 화면을 계측·도폭 × 밝은·어두운 테마로 찍어 비교하고 검사기 셋을 돌리는 점검을 전체 점검에 붙였습니다. 첫 실행에서 공용 부품의 대비 미달 다섯 곳을 찾았습니다.
-review_status: pending
+review_status: adopted
 decisions: 1
 cover: figures/01-parts-four.png
 supersedes:
