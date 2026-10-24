@@ -22,7 +22,7 @@ describe("NotebookLinkControl", () => {
     expect(screen.getByText("프로젝트의 Gemini Notebook 링크")).toBeInTheDocument();
     expect(screen.getByText("GAID는 페이지만 열며 자료를 보내지 않습니다.")).toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: `  ${savedUrl}  ` } });
-    fireEvent.click(screen.getByRole("button", { name: "링크 저장", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "링크 저장" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(savedUrl));
     await waitFor(() => expect(screen.queryByRole("textbox")).not.toBeInTheDocument());
   });
@@ -31,7 +31,7 @@ describe("NotebookLinkControl", () => {
     render(<NotebookLinkControl context="folder" url={null} onSave={onSave} />);
     fireEvent.click(screen.getByRole("button", { name: "노트북 링크 저장" }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "javascript:alert(1)" } });
-    fireEvent.click(screen.getByRole("button", { name: "링크 저장", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "링크 저장" }));
     expect(screen.getByRole("alert")).toHaveTextContent("노트북 주소를 확인하세요.");
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByRole("textbox")).toHaveFocus();
@@ -56,7 +56,7 @@ describe("NotebookLinkControl", () => {
     render(<NotebookLinkControl context="folder" url={null} onSave={vi.fn().mockRejectedValue(new Error("Internal path /secret"))} />);
     fireEvent.click(screen.getByRole("button", { name: "노트북 링크 저장" }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: savedUrl } });
-    fireEvent.click(screen.getByRole("button", { name: "링크 저장", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "링크 저장" }));
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("링크를 저장하지 못했습니다."));
     expect(screen.getByRole("textbox")).toHaveValue(savedUrl);
     expect(screen.queryByText(/secret/)).not.toBeInTheDocument();

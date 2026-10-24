@@ -105,15 +105,15 @@ export function FolderPanel({ folder, collections, count, zoteroConnected, onSel
           <p className="text-sm text-muted-foreground">{L("papers", { n: count })}</p>
         </div>
         <div className="flex items-center gap-2">
-        <FolderNotebookLink key={folder.id} folder={folder} onChanged={onChanged} />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={L("more")}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={onCreateSub}>{L("sub.button")}</DropdownMenuItem>
-            <DropdownMenuItem disabled={linked} onSelect={onRename}>{L("rename.button")}</DropdownMenuItem>
-            <DropdownMenuItem disabled={linked} variant="destructive" onSelect={() => void remove()}>{L("delete.button")}</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <FolderNotebookLink key={folder.id} folder={folder} onChanged={onChanged} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={L("more")}><MoreHorizontalIcon /></Button></DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={onCreateSub}>{L("sub.button")}</DropdownMenuItem>
+              <DropdownMenuItem disabled={linked} onSelect={onRename}>{L("rename.button")}</DropdownMenuItem>
+              <DropdownMenuItem disabled={linked} variant="destructive" onSelect={() => void remove()}>{L("delete.button")}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       {linked && <p className="text-xs text-muted-foreground">{L("linkedRule")}</p>}
