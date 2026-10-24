@@ -1,0 +1,78 @@
+{
+  "bar": {
+    "label": "GAID places",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: install Workflows and analyse your data",
+    "connectTip": "GAID Connect: make and share geoscience Workflows",
+    "library": "Library",
+    "libraryTip": "Open your papers and research notes"
+  },
+  "library": {
+    "back": "Back to {place}",
+    "backTip": "Close the library and return where you opened it"
+  },
+  "home": {
+    "title": "GAID Workspace",
+    "context": "Install Workflows and analyse your data with the AI agent.",
+    "start": "Start an analysis",
+    "newProject": "New project",
+    "nav": "Workspace sections",
+    "side": {
+      "home": "Home",
+      "projects": "Projects",
+      "workflows": "Installed Workflows",
+      "recent": "Recent projects",
+      "archived": "Archived projects"
+    },
+    "continue": {
+      "heading": "Continue",
+      "open": "Continue {title}",
+      "running": "Running",
+      "decisions": "{count} decisions",
+      "unreviewed": "Not reviewed",
+      "checked": "Checked",
+      "chat": "Chat",
+      "empty": "Nothing to continue yet. Open a project and start an analysis with a Workflow.",
+      "partial": "{count} projects could not be read and are missing from the list.",
+      "error": "Recent analyses could not be read. Open this page again in a moment."
+    },
+    "projects": {
+      "heading": "Projects",
+      "all": "Show all {count}",
+      "line": "Changed {when}"
+    },
+    "workflows": {
+      "heading": "Installed Workflows",
+      "start": "Start",
+      "startLabel": "Start {title}",
+      "find": "Find Workflows in Connect",
+      "ready": "Ready",
+      "catalogue": "Built-in",
+      "shared": "Shared",
+      "draft": "Draft",
+      "projects": "{count} projects",
+      "empty": "No Workflow installed yet. Pick a Workflow in Connect and install it into a project."
+    },
+    "pick": {
+      "title": "Choose a project to analyse",
+      "context": "The project opens and you start the analysis from its Workflow list on the right.",
+      "workflowTitle": "Choose a project for the Workflow",
+      "new": "Create a project",
+      "cancel": "Cancel"
+    }
+  },
+  "connect": {
+    "make": {
+      "heading": "Start from your material",
+      "pdf": "Paper PDF",
+      "library": "Pick from the library",
+      "notes": "Research notes",
+      "analysis": "Workspace analysis",
+      "pdfTip": "Upload a paper PDF to make a Workflow draft",
+      "libraryTip": "Pick a paper in the library to start making a Workflow",
+      "notesTip": "Add a project's research notes as sources",
+      "analysisTip": "Send a Workspace chat's analysis bundle to Connect"
+    }
+  }
+}

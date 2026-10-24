@@ -278,20 +278,26 @@ describe("GAID hub authoring", () => {
     expect(d.recipe).toEqual({ choices: { "block-size": "km50", "run-scale": "quick" }, unresolvedChoices: ["label-def"] });
   });
 
-  it("gives the first draft the source text and keeps the project's reasoning level", async () => {
+  it("gives the first draft the source text in a prefix shared with the analysis, under the project's cache key", async () => {
     const { store, projectId } = await fixture();
-    await runOperation(store, projectId, "analyze", "op-analyze-s", deps(reply(analysis)));
     const seen: string[] = [];
-    const answer = reply(draftReply);
-    const capture: ChatFn = async (messages, c) => {
+    const keys: (string | undefined)[] = [];
+    const capturing = (inner: ChatFn): ChatFn => async (messages, c) => {
       seen.push(messages.map((m) => m.content).join("\n"));
-      return answer(messages, c);
+      keys.push(c.cacheKey);
+      return inner(messages, c);
     };
-    const attempt = await runOperation(store, projectId, "draft", "op-draft-s", deps(capture));
+    await runOperation(store, projectId, "analyze", "op-analyze-s", deps(capturing(reply(analysis))));
+    const attempt = await runOperation(store, projectId, "draft", "op-draft-s", deps(capturing(reply(draftReply))));
     expect(attempt.outcome, JSON.stringify(attempt.validationErrors)).toBe("accepted");
     // The findings are only an index; method details that did not become a finding must still reach the draft.
-    expect(seen[0]).toContain("## Sources (the full method");
-    expect(seen[0]).toContain(PAPER[0].slice(0, 40));
+    expect(seen[1]).toContain("## Verified findings (an index; the sources above hold the full method)");
+    expect(seen[1]).toContain(PAPER[0].slice(0, 40));
+    // Analysis and draft share everything up to the task text, so a provider cache can reuse it.
+    const prefix = (text: string) => text.slice(0, text.indexOf("\n# Task\n"));
+    expect(prefix(seen[1])).toContain(PAPER[0].slice(0, 40));
+    expect(prefix(seen[1])).toBe(prefix(seen[0]));
+    expect(keys).toEqual([projectId, projectId]);
     const created = await store.create({ title: "t", thinkingLevel: "high" });
     expect(created.thinkingLevel).toBe("high");
     const ignored = await store.create({ title: "t", thinkingLevel: "max" as never });
@@ -568,6 +574,40 @@ describe("GAID hub authoring", () => {
     expect(draft.profile.procedure.nodes.map((n) => n.label)).toEqual(draft.workflow!.steps!.map((s) => s.title));
     expect(draft.profile.procedure.nodes[1]).toMatchObject({ summary: draft.workflow!.steps![1].does, decisionIds: ["block-size"] });
     expect(draft.profile.procedure.nodes[2].outputs).toEqual(["scores"]);
+  });
+
+  it("takes only the changed top-level fields in a draft repair and in a revision", async () => {
+    const { store, projectId } = await fixture();
+    await runOperation(store, projectId, "analyze", "patch-analyze", deps(reply(analysis)));
+    const good = structuredClone(draftReply);
+    const bad = structuredClone(good);
+    bad.workflow.steps[1].choiceIds = [];
+    const asked: string[] = [];
+    const capture = (inner: ChatFn): ChatFn => async (messages, c) => {
+      asked.push(messages.at(-1)!.content);
+      return inner(messages, c);
+    };
+    // The repair reply carries only "workflow"; everything else comes from the first reply.
+    const repaired = await runOperation(store, projectId, "draft", "patch-draft", deps(capture(reply(bad, { workflow: good.workflow }))));
+    expect(repaired.outcome, JSON.stringify(repaired.validationErrors)).toBe("repaired");
+    expect(asked[1]).toContain("only the top-level");
+    const draft = (await store.read(projectId)).drafts.at(-1)!;
+    expect(draft.instructions).toBe(good.instructions);
+    expect(draft.workflow!.steps![1].choiceIds).toEqual(good.workflow.steps[1].choiceIds);
+    // A revision that changes only the summary keeps the rest of the current draft.
+    const revised = await runOperation(store, projectId, "revise", "patch-revise", {
+      ...deps(reply({ summary: "요약을 고쳤습니다." })),
+      feedback: "요약을 짧게 써 주세요.",
+    });
+    expect(revised.outcome, JSON.stringify(revised.validationErrors)).toBe("accepted");
+    const next = (await store.read(projectId)).drafts.at(-1)!;
+    expect(next.revision).toBe(draft.revision + 1);
+    expect(next.profile.summary).toEqual({ ko: "요약을 고쳤습니다." });
+    expect(next.instructions).toBe(draft.instructions);
+    expect(next.workflow!.steps).toEqual(draft.workflow!.steps);
+    // Choices round-trip through the model-facing form (as when a reply echoes them): same ids, options and labels.
+    const choices = (d: typeof draft) => d.workflow!.requiredScientificChoices.map((c) => [c.id, c.options, c.label]);
+    expect(choices(next)).toEqual(choices(draft));
   });
 
 });

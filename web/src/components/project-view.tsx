@@ -61,10 +61,8 @@ import { DEFAULT_PROJECT_ID, type Project } from "@/lib/projects";
 import type { ProjectActivitySummary } from "@/lib/project-activity";
 import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
 import { useProjects } from "@/lib/use-projects";
-import { GaidHubEntry } from "@/geo/hub/top-nav";
 import { GaidAppBar } from "@/geo/shell/app-bar";
-import { LibraryScreen } from "@/geo/library/library-screen";
-import { ResearchTabs, useResearchTab } from "@/geo/library/research-tabs";
+import { WorkspaceHome } from "@/geo/places/workspace-home";
 import { cn } from "@/lib/utils";
 
 const appText = geoText("app");
@@ -153,8 +151,6 @@ export function ProjectView({
     remove,
   } = useProjects();
   const { confirm, dialog: confirmDialog } = useConfirm();
-  // GAID (gaid-research-hub): 내 연구 has a 프로젝트 / 서재 tab bar; 서재 replaces the project list below it.
-  const [researchTab, setResearchTab] = useResearchTab();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsRequest, setSettingsRequest] = useState<OpenSettingsRequest | null>(null);
   const [search, setSearch] = useState("");
@@ -249,35 +245,7 @@ export function ProjectView({
     [confirm, remove],
   );
 
-  return (
-    <div className="flex min-h-dvh flex-col bg-background">
-      {confirmDialog}
-      <GaidAppBar
-        place="projects"
-        onNavigate={onOpenHub ? (place) => place === "hub" && onOpenHub() : undefined}
-        onOpenSettings={() => {
-          setSettingsRequest(null);
-          setSettingsOpen(true);
-        }}
-      />
-
-      {onOpenHub && <ResearchTabs value={researchTab} onChange={setResearchTab} />}
-      {onOpenHub && researchTab === "library" && <LibraryScreen onOpenProject={handleOpen} />}
-      <main className={cn("mx-auto flex w-full max-w-[1180px] flex-1 flex-col gap-6 px-8 pb-12 pt-7", onOpenHub && researchTab === "library" && "hidden")}>
-        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-          <div className="flex max-w-2xl flex-col gap-2">
-            <h1 className="text-2xl font-bold tracking-[-0.01em]">
-              {appText("projects.choose_a_project")}</h1>
-            <p className="text-sm text-muted-foreground">
-              {appText("projects.each_project_keeps_its_files_chats_notebook")}</p>
-          </div>
-          <Button onClick={openCreate}>
-            <PlusIcon data-icon="inline-start" />
-            {appText("projects.new_project")}</Button>
-        </div>
-
-        {onOpenHub && <GaidHubEntry onOpen={onOpenHub} />}
-
+  const searchRow = (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <InputGroup className="max-w-sm bg-background">
             <InputGroupAddon>
@@ -318,8 +286,8 @@ export function ProjectView({
             </SelectContent>
           </Select>
         </div>
-
-        {error && (
+  );
+  const errorAlert = error ? (
           <Alert variant="destructive">
             <AlertTitle>{appText("projects.projects_could_not_be_loaded")}</AlertTitle>
             <AlertDescription>
@@ -328,59 +296,125 @@ export function ProjectView({
                 {appText("projects.try_again")}</Button>
             </AlertDescription>
           </Alert>
-        )}
+  ) : null;
+  const activeSection = (
+    <ProjectSection
+      title={appText("projects.projects")}
+      projects={visibleProjects}
+      projectActivities={projectActivities}
+      activeProjectId={activeProjectId}
+      onOpen={handleOpen}
+      onEdit={openEdit}
+      onToggleArchive={handleToggleArchive}
+      onDelete={handleDelete}
+      emptyMessage={
+        search.trim()
+          ? appText("projects.no_active_projects_match_your_search")
+          : appText("projects.create_your_first_project_to_start_researching")
+      }
+    />
+  );
+  const archivedSection = (collapsible: boolean) => (
+    <ProjectSection
+      title={appText("projects.archived")}
+      projects={archivedProjects}
+      projectActivities={projectActivities}
+      activeProjectId={activeProjectId}
+      onOpen={handleOpen}
+      onEdit={openEdit}
+      onToggleArchive={handleToggleArchive}
+      onDelete={handleDelete}
+      collapsible={collapsible}
+      open={collapsible ? showArchived : true}
+      onOpenChange={setArchivedOpen}
+    />
+  );
+  const loadingLine = (
+    <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
+      <Spinner />
+      {appText("projects.loading_projects")}</div>
+  );
+  const newProjectButton = (
+    <Button onClick={openCreate}>
+      <PlusIcon data-icon="inline-start" />
+      {appText("projects.new_project")}</Button>
+  );
+  const dialogs = (
+    <>
+      <ProjectCreateDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(project) => handleOpen(project.id)}
+      />
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
+    </>
+  );
+  const appBar = (
+    <GaidAppBar
+      place="workspace"
+      onNavigate={onOpenHub ? (place) => place === "connect" && onOpenHub() : undefined}
+      onOpenSettings={() => {
+        setSettingsRequest(null);
+        setSettingsOpen(true);
+      }}
+    />
+  );
 
-        {loading ? (
-          <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Spinner />
-            {appText("projects.loading_projects")}</div>
-        ) : (
+  // GAID Workspace home (ADR 2026-10-24 gaid-connect-workspace): sidebar + home; the project list is one of its views.
+  if (onOpenHub)
+    return (
+      <div className="flex h-dvh flex-col bg-background">
+        {confirmDialog}
+        {appBar}
+        <WorkspaceHome
+          isActive={isActive}
+          projects={projects}
+          projectActivities={projectActivities}
+          projectLine={projectActivityLabel}
+          onOpenProject={handleOpen}
+          onCreateProject={openCreate}
+          onOpenConnect={onOpenHub}
+          projectsActions={newProjectButton}
+          projectsView={
+            <>
+              {searchRow}
+              {errorAlert}
+              {loading ? loadingLine : activeSection}
+            </>
+          }
+          archivedView={loading ? loadingLine : archivedSection(false)}
+        />
+        {dialogs}
+      </div>
+    );
+
+  return (
+    <div className="flex min-h-dvh flex-col bg-background">
+      {confirmDialog}
+      {appBar}
+      <main className="mx-auto flex w-full max-w-[1180px] flex-1 flex-col gap-6 px-8 pb-12 pt-7">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="flex max-w-2xl flex-col gap-2">
+            <h1 className="text-2xl font-bold tracking-[-0.01em]">
+              {appText("projects.choose_a_project")}</h1>
+            <p className="text-sm text-muted-foreground">
+              {appText("projects.each_project_keeps_its_files_chats_notebook")}</p>
+          </div>
+          {newProjectButton}
+        </div>
+        {searchRow}
+        {errorAlert}
+        {loading ? loadingLine : (
           <div className="flex flex-col gap-8">
-            <ProjectSection
-              title={appText("projects.projects")}
-              projects={visibleProjects}
-              projectActivities={projectActivities}
-              activeProjectId={activeProjectId}
-              onOpen={handleOpen}
-              onEdit={openEdit}
-              onToggleArchive={handleToggleArchive}
-              onDelete={handleDelete}
-              emptyMessage={
-                search.trim()
-                  ? appText("projects.no_active_projects_match_your_search")
-                  : appText("projects.create_your_first_project_to_start_researching")
-              }
-            />
-
-            {archivedProjects.length > 0 && (
-              <ProjectSection
-                title={appText("projects.archived")}
-                projects={archivedProjects}
-                projectActivities={projectActivities}
-                activeProjectId={activeProjectId}
-                onOpen={handleOpen}
-                onEdit={openEdit}
-                onToggleArchive={handleToggleArchive}
-                onDelete={handleDelete}
-                collapsible
-                open={showArchived}
-                onOpenChange={setArchivedOpen}
-              />
-            )}
+            {activeSection}
+            {archivedProjects.length > 0 && archivedSection(true)}
           </div>
         )}
       </main>
 
       <footer className="border-t px-6 py-4 text-center text-xs text-muted-foreground">
         {appText("projects.all_project_data_stays_on_this_machine")}</footer>
-
-      <ProjectCreateDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onCreated={(project) => handleOpen(project.id)}
-      />
-
-      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} request={settingsRequest} />
+      {dialogs}
     </div>
   );
 }

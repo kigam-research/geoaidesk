@@ -1,0 +1,78 @@
+{
+  "bar": {
+    "label": "GAID 장소",
+    "workspace": "Workspace",
+    "connect": "Connect",
+    "workspaceTip": "GAID Workspace: Workflow를 설치하고 내 자료를 분석합니다",
+    "connectTip": "GAID Connect: 지구과학 Workflow를 만들고 공유합니다",
+    "library": "서재",
+    "libraryTip": "내 논문과 정리 노트를 엽니다"
+  },
+  "library": {
+    "back": "{place}로 돌아가기",
+    "backTip": "서재를 닫고 연 곳으로 돌아갑니다"
+  },
+  "home": {
+    "title": "GAID Workspace",
+    "context": "Workflow를 설치하고 AI agent와 함께 내 자료를 분석합니다.",
+    "start": "분석 시작",
+    "newProject": "새 프로젝트",
+    "nav": "Workspace 목록",
+    "side": {
+      "home": "홈",
+      "projects": "프로젝트",
+      "workflows": "설치한 Workflow",
+      "recent": "최근 프로젝트",
+      "archived": "보관한 프로젝트"
+    },
+    "continue": {
+      "heading": "이어서 하기",
+      "open": "{title} 이어서 열기",
+      "running": "실행 중",
+      "decisions": "결정 {count}",
+      "unreviewed": "검토 전",
+      "checked": "확인함",
+      "chat": "채팅",
+      "empty": "아직 이어서 할 분석이 없습니다. 프로젝트를 열고 Workflow로 분석을 시작하세요.",
+      "partial": "프로젝트 {count}곳을 읽지 못해 목록에서 빠졌습니다.",
+      "error": "최근 분석을 읽지 못했습니다. 잠시 뒤 다시 여세요."
+    },
+    "projects": {
+      "heading": "프로젝트",
+      "all": "전체 {count}개 보기",
+      "line": "{when} 수정"
+    },
+    "workflows": {
+      "heading": "설치한 Workflow",
+      "start": "시작",
+      "startLabel": "{title} 시작",
+      "find": "Connect에서 Workflow 찾기",
+      "ready": "준비됨",
+      "catalogue": "기본",
+      "shared": "공유",
+      "draft": "초안",
+      "projects": "프로젝트 {count}곳",
+      "empty": "설치한 Workflow가 없습니다. Connect에서 Workflow를 골라 프로젝트에 설치하세요."
+    },
+    "pick": {
+      "title": "분석할 프로젝트 고르기",
+      "context": "프로젝트를 열면 오른쪽 Workflow 목록에서 분석을 시작합니다.",
+      "workflowTitle": "Workflow를 시작할 프로젝트 고르기",
+      "new": "새 프로젝트 만들기",
+      "cancel": "취소"
+    }
+  },
+  "connect": {
+    "make": {
+      "heading": "내 자료로 만들기",
+      "pdf": "논문 PDF",
+      "library": "서재에서 고르기",
+      "notes": "정리 노트",
+      "analysis": "Workspace 분석 결과",
+      "pdfTip": "논문 PDF를 올려 Workflow 초안을 만듭니다",
+      "libraryTip": "서재에서 논문을 골라 Workflow 만들기를 시작합니다",
+      "notesTip": "프로젝트의 정리 노트를 근거 자료로 넣습니다",
+      "analysisTip": "Workspace 채팅의 분석 묶음을 Connect로 보냅니다"
+    }
+  }
+}

@@ -11,7 +11,8 @@
     "artifacts": "Result files",
     "boundary": "Interpretation limits",
     "closing": "When you finish",
-    "papers": "Source papers (in the project's citation scope)"
+    "papers": "Source papers (in the project's citation scope)",
+    "fallback": "Inputs without data"
   },
   "settings": {
     "researcherPicks": "chosen by the researcher",
@@ -43,7 +44,7 @@
     "catalogue": "built-in skill",
     "bundled": "skill bundled with this Workflow",
     "imported": "imported skill",
-    "hub": "hub skill"
+    "hub": "Connect skill"
   },
   "skill": {
     "primary": "primary skill",
@@ -73,9 +74,29 @@
     "collapse": "Hide instructions",
     "remove": "Remove Workflow",
     "pendingHint": "When you send, these Workflow instructions go first and what you type follows them.",
-    "example": "Runs on example data"
+    "example": "Runs on example data",
+    "fallback": "{count, plural, one {# input without data} other {# inputs without data}}"
   },
   "papers": {
     "rule": "The papers the Workflow is based on. Check them with library_search and library_read, and cite them as [@key] in the research note where a method or threshold comes from them."
+  },
+  "fallback": {
+    "intro": "The researcher has no data for the inputs below. Before the first step, provide data for each input as chosen. Ask everything needed together with the interview tool, and do not download or generate data before the answer.",
+    "value": {
+      "search": "no data; the AI agent finds similar public data",
+      "synthetic": "no data; the AI agent generates synthetic data",
+      "instruction": "no data; follow the researcher's separate instruction"
+    },
+    "folder": "Files go in `{folder}`.",
+    "note": "Researcher's note: {note}",
+    "instructionText": "Instruction: {note}",
+    "rule": {
+      "search": "Find similar public data: use web search to find a small public dataset of the same format and kind as the input. Show 2-3 candidates with source URL, provider, terms of use, size, area and format, and download only the candidate the researcher picks.",
+      "searchLimit": "Do not download data whose terms are unclear, that needs a login or that is larger than 100 MB; say why it was not downloaded. If no candidate fits, ask whether to use synthetic data.",
+      "searchRecord": "Next to the downloaded files, write SOURCE.md with the source URL, download date, terms of use and each file's sha256.",
+      "synthetic": "Generate synthetic data: before generating, confirm with the researcher what the data must represent (subject and scale, value ranges and units, CRS, noise or gaps). Keep the generating code (fixed random seed) and a README.md stating the assumptions in the same folder.",
+      "instruction": "Separate instruction: follow the researcher's instruction. Ask first when it is ambiguous, or when data must be downloaded or generated and the instruction does not say how.",
+      "label": "For results from such data, state at the top and in the limits of the answer, the result files and the research note that similar public data (toy data) or synthetic data was used. Do not present the results as conclusions about the researcher's study area or real data."
+    }
   }
 }

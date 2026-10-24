@@ -136,7 +136,7 @@
     },
     "workflow": "Workflow",
     "version": "version {version} (채팅을 시작할 때)",
-    "draft": "초안 (등록된 version 없음)",
+    "draft": "초안 (공유된 version 없음)",
     "data": "쓴 자료의 지문",
     "noData": "기록된 자료 사용이 없습니다.",
     "col": {

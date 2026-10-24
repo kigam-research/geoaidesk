@@ -21,6 +21,7 @@ import {
   type VisualSourceInfo,
 } from "@/geo/contracts/authoring";
 import { geoText } from "@/geo/i18n";
+import { cn } from "@/lib/utils";
 import { API_BASE } from "@/lib/projects";
 import { withApiToken } from "@/lib/api-auth";
 import { onOpenSettings, type OpenSettingsRequest } from "@/lib/settings-nav";
@@ -132,7 +133,7 @@ export function GaidHub({
   const toList = () => onNavigate({ open: true, projectId: null, ...(view.kind === "skills" ? { skills: true } : {}) });
   return (
     <HubShell
-      onNavigate={(place) => place === "projects" && onOpenProjects()}
+      onNavigate={(place) => place === "workspace" && onOpenProjects()}
       onOpenSettings={() => {
         setSettingsRequest(null);
         setSettingsOpen(true);
@@ -853,7 +854,8 @@ function HubProject({
     );
   } else if (current === "sources") {
     body = (
-      <>
+      <div className="relative flex h-full min-h-0">
+        <div className="min-w-0 flex-1 overflow-y-auto px-6 py-5">
         {lastFailed && lastFailed.op === "analyze" && (
           <FailedNotice outcome={lastFailed.outcome} message={lastFailed.error} onRetry={startAnalysis} />
         )}
@@ -875,8 +877,9 @@ function HubProject({
           analyzed={project.findings.length > 0}
           onNext={project.findings.length > 0 ? () => setStep("questions") : undefined}
         />
+        </div>
         <LibrarySourcePicker open={libraryOpen} onOpenChange={setLibraryOpen} onAdd={addFromLibrary} />
-      </>
+      </div>
     );
   } else if (current === "questions") {
     body = (
@@ -1037,7 +1040,7 @@ function HubProject({
           ) : null
         }
       />
-      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
+      <main className={cn("flex min-h-0 flex-1 flex-col", current === "sources" && !running ? "overflow-hidden" : "overflow-y-auto px-6 py-5")}>
         {project.hubEntry && <EditingNotice link={project.hubEntry} />}
         <div className="min-h-0 flex-1">{body}</div>
       </main>

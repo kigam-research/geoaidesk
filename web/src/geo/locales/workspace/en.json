@@ -49,7 +49,7 @@
     "create": "Create start draft",
     "creating": "Creating start draft",
     "tabLimit": "All chat tabs are in use. Close a tab, then create it again. Your choices are kept.",
-    "noWorkspace": "No workspace found. Open it again from the project workspace. Your choices are kept.",
+    "noWorkspace": "No project found. Open it again from the project. Your choices are kept.",
     "error": "Could not create the start draft. Create it again in a moment.",
     "none": "None",
     "noBoundary": "The catalogue does not record interpretation limits.",
@@ -66,7 +66,7 @@
     "input": {
       "required": "Required input · formats {formats}",
       "optional": "Optional input · formats {formats}",
-      "empty": "The project has no file in a matching format. Upload a file to the work folder, then choose it.",
+      "empty": "No project file has a matching format. Upload a file, or choose below how the AI agent provides the data.",
       "root": "Work folder",
       "other": "Other (another project file)",
       "otherField": "Project file",
@@ -75,7 +75,7 @@
       "upload": "Upload my files",
       "uploading": "Uploading files",
       "uploadFailed": "Could not upload the files. Upload them again.",
-      "emptyExample": "No project file has a matching format. Upload your own files or use the example data below.",
+      "emptyExample": "No project file has a matching format. Upload your own file or use the example data below. Other ways are under 'When you have no data'.",
       "many": "you can pick several files",
       "files": "{first} and {rest} more",
       "addOther": "Add another project file",
@@ -148,10 +148,34 @@
       "mixed": "Example data and your own data are used together. The example data covers the example area, so its area or CRS may differ from your data.",
       "preparing": "Preparing example data",
       "failed": "Could not prepare the example data. Try again or choose your own file."
+    },
+    "fallback": {
+      "heading": "When you have no data",
+      "search": {
+        "title": "AI agent finds similar public data",
+        "hint": "At the start it shows candidates with source, terms of use and size, and downloads only the one you pick. Results say they come from public example data.",
+        "noteLabel": "What to look for",
+        "placeholder": "Area, resolution, scale (optional)",
+        "value": "AI agent finds similar public data"
+      },
+      "synthetic": {
+        "title": "AI agent generates synthetic data",
+        "hint": "At the start it asks what the data must represent, then generates it. Results say they come from synthetic data.",
+        "noteLabel": "What the synthetic data represents",
+        "placeholder": "Subject, scale, value range (optional)",
+        "value": "AI agent generates synthetic data"
+      },
+      "instruction": {
+        "title": "Give a separate instruction",
+        "hint": "The AI agent follows your instruction and asks at the start if it is ambiguous.",
+        "placeholder": "Write in a line or two how to get the data",
+        "value": "Separate instruction: {note}"
+      },
+      "summary": "{count, plural, one {# input starts without your data. Before the first step the AI agent asks how to provide it and states in the results which data was used.} other {# inputs start without your data. Before the first step the AI agent asks how to provide them and states in the results which data was used.}}"
     }
   },
   "recipe": {
-    "import": "Import Workflow from hub",
+    "import": "Import from Connect",
     "file": "Geo task saved start settings file",
     "checking": "Checking saved start settings",
     "error": "Could not read or check the saved start settings. {detail}",
@@ -197,8 +221,8 @@
     "enabling": "Turning on skills",
     "notInstalled": "Skills not installed in the project: {names}. Install them in Settings → Skills.",
     "error": "Could not turn on the skills. Turn them on again in Settings → Skills.",
-    "hub": "Hub skill {name} (version {revision}):",
-    "hubInstall": "Install version {revision} from the hub"
+    "hub": "Connect skill {name} (version {revision}):",
+    "hubInstall": "Install version {revision}"
   },
   "badge": {
     "readiness": "{state, select, ready {Ready} missing-skills {Skills needed} needs-environment {Environment needed} unavailable {Unavailable} other {State unknown}}",
@@ -232,7 +256,7 @@
     "toChoices": "Choose analysis conditions",
     "source": {
       "catalogue": "Built-in Workflow",
-      "hub": "Hub Workflow",
+      "hub": "Connect Workflow",
       "upstream": "General Workflow"
     },
     "fact": {

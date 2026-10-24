@@ -60,3 +60,15 @@ files = ["README.md", "aeromag_lines.csv", "base_station.csv", "dem.tif", "boreh
 source = "SYNTHETIC except dem.tif (Copernicus GLO-30 DSM N38 E127, resampled): geo/examples/pocheon-pgi/make_example.py --dem <25 m crop> (task gaid-pocheon-trial); statistics from Heo et al. 2025 doi:10.1007/s12303-025-00067-8; CC BY 4.0 + Copernicus DEM attribution (README.md)"
 consumers = ["geo/examples/pocheon-pgi/pgi_reference.py"]
 size_bytes = 3408701
+
+[[input]]
+name = "lemo_opuscar"
+layer = "asset"
+id = "lemo-opuscar"
+version = "3961ddb"
+path = "lemo-opuscar/3961ddb"
+files = ["lemo-opuscar-3961ddb.tar.gz", "instruments-vcsl.tar"]
+sha256 = { "lemo-opuscar-3961ddb.tar.gz" = "a3e150b32661edd6b1d426acac7989ba891df07ef4d47890a3e2ff0270dfb60a", "instruments-vcsl.tar" = "3ed8f753500e629485e323fc7f883b35aca6a77a1ab04522d1d47037d503f6e1" }
+source = "lemomo-ai/lemo-opuscar@3961ddb3d24d8876e0e2754f7790d66908acee51 (codeload tarball; code/docs MIT, demo films CC BY 4.0) + release 'assets' pack instruments-vcsl.tar (VCSL, CC0); both unpacked into lib/ (lib/core/audio/instruments/vcsl)"
+consumers = ["geo/promo-lemo/mix.py", "geo/promo-lemo-40/"]
+size_bytes = 373292832

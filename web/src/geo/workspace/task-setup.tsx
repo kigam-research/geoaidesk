@@ -20,6 +20,7 @@ import { citablePapers, useWorkflowPapers } from "./source-papers";
 import { localText } from "@/geo/hub/text";
 import { isExamplePath, type PrepareExamplesResponse } from "@/geo/contracts/workflow-examples";
 import { hasDefault } from "@/geo/contracts/workflow-stages";
+import type { InputFallback } from "@/geo/contracts/workflow-doc";
 
 export const fieldClass = "w-full min-w-0 rounded-md border bg-background px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -146,6 +147,12 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
     return paths.length ? [[role.id, role.multiple ? paths : paths[0]]] : [];
   }));
   const examples = exampleRoles.map((role) => role.id);
+  // gaid-input-fallback: inputs started without data, and how the AI agent is to fill each (asked at the start).
+  const fallbacks: Record<string, InputFallback> = Object.fromEntries(workflow.inputRoles.flatMap((role) => {
+    const answer = inputs[role.id];
+    return answer?.mode === "fallback" ? [[role.id, { kind: answer.kind, ...(answer.note.trim() ? { note: answer.note.trim() } : {}) }]] : [];
+  }));
+  const fallbackCount = Object.keys(fallbacks).length;
   const mixed = examples.length > 0 && Object.values(inputs).some((answer) => answerPaths(answer).length > 0);
   const download = exampleRoles.reduce((sum, role) => sum + (role.example?.download ?? 0), 0);
   const method = exposure?.startsWith("method:") ? exposure.split(":")[1] : null;
@@ -178,7 +185,7 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
         Object.assign(bindings, prepared.inputs);
       }
       if (workflow.doc) {
-        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples, citablePapers(papers));
+        workflowBlock = workflowStartMessage(workflow.doc, bindings, values, examples, citablePapers(papers), fallbacks);
       } else {
         // /skills is the merged list the composer's picker uses, not /skills/all.
         const response = await request<SkillInfo[]>("/skills", projectId);
@@ -261,9 +268,10 @@ export function TaskSetup({ workflow, projectId, availableFiles, open, onOpenCha
       {undecided > 0 && <p className="text-sm text-muted-foreground">{t("workspace.setup.undecided", { count: undecided })}</p>}
       {examples.length > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.example.summary", { count: examples.length })}{download > 0 ? ` ${t("workspace.setup.example.summaryDownload", { size: sizeText(download) })}` : ""}</p>}
       {mixed && <p className="text-sm text-gaid-ink-2">{t("workspace.setup.example.mixed")}</p>}
+      {fallbackCount > 0 && <p className="rounded-md bg-gaid-face-2 px-3 py-2 text-sm">{t("workspace.setup.fallback.summary", { count: fallbackCount })}</p>}
       {unattachedPapers > 0 && <p className="text-sm text-gaid-ink-2">{t("workspace.start.papers.summary", { count: unattachedPapers })} <button type="button" onClick={() => setIndex(0)} className="text-gaid-signal-ink underline-offset-4 hover:underline">{t("workspace.start.papers.review")}</button></p>}
       <p className="text-sm">{t(untested ? "workspace.setup.limitUntested" : "workspace.setup.limit")}</p>
-      {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples }} />}
+      {workflow.doc && <WorkflowInstructions doc={workflow.doc} target="chat" settings={{ inputs: bindings, choices: values, examples, ...(fallbackCount ? { fallbacks } : {}) }} />}
       <details className="text-sm">
         <summary className="cursor-pointer text-muted-foreground select-none">{t("workspace.setup.moreResults")}</summary>
         <div className="mt-2 rounded-lg bg-muted/60 px-3 py-2"><WorkflowOutputs workflow={workflow} /></div>

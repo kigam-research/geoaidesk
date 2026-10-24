@@ -160,7 +160,7 @@ export class GeoEnvironmentService {
   private readonly helperDir: string;
   private readonly helperInterpreter: () => string;
   private readonly uv: () => string | null;
-  private readonly cache = new Map<string, { expires: number; value: Promise<EnvironmentReadiness> }>();
+  private readonly cache = new Map<string, { expires: number; value: Promise<EnvironmentReadiness>; settled?: EnvironmentReadiness }>();
   private readonly preparing = new Set<string>();
   constructor(options: EnvironmentServiceOptions = {}) {
     this.runner = options.runner ?? runEnvironmentCommand;
@@ -181,8 +181,20 @@ export class GeoEnvironmentService {
     if (!fresh && cached && cached.expires > Date.now()) return cached.value;
     const value = this.probe(id, target, packages, closure.flatMap((env) => env.tools ?? []), dir, interpreter);
     if (this.cache.size >= 128) this.cache.clear();
-    this.cache.set(key, { expires: Date.now() + 60_000, value });
+    const entry: { expires: number; value: Promise<EnvironmentReadiness>; settled?: EnvironmentReadiness } = { expires: Date.now() + 60_000, value };
+    this.cache.set(key, entry);
+    void value.then(result => { entry.settled = result; }, () => {});
     return value;
+  }
+
+  /** Workspace home must not spawn one interpreter per project. Reuse only a current, stamp-matched probe. */
+  cachedReadiness(data: GeoEnvironments, id: string, target: EnvironmentTarget, sandbox: string): Promise<EnvironmentReadiness> | undefined {
+    const closure = environmentClosure(data, id).filter((env) => env.targets.includes(target));
+    const dir = target === "helper" ? this.helperDir : sandbox;
+    const interpreter = target === "helper" ? this.helperInterpreter() : projectPython(sandbox);
+    const key = JSON.stringify([dir, id, target, closure, stamp(dir, interpreter)]);
+    const cached = this.cache.get(key);
+    return cached?.settled && cached.expires > Date.now() ? Promise.resolve(cached.settled) : undefined;
   }
 
   private async probe(id: string, target: EnvironmentTarget, packages: GeoEnvironmentPackage[], declaredTools: GeoEnvironmentTool[], dir: string, interpreter: string): Promise<EnvironmentReadiness> {

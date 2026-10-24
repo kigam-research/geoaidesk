@@ -86,6 +86,8 @@ import workflowViewKo from "./workflowView/ko.json";
 import workflowViewEn from "./workflowView/en.json";
 import devPartsKo from "./devParts/ko.json";
 import devPartsEn from "./devParts/en.json";
+import placesKo from "./places/ko.json";
+import placesEn from "./places/en.json";
 import devLibraryPrepKo from "./devLibraryPrep/ko.json";
 import devLibraryPrepEn from "./devLibraryPrep/en.json";
 
@@ -109,6 +111,7 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
   devParts: pair(devPartsKo, devPartsEn),
+  places: pair(placesKo, placesEn),
   devLibraryPrep: pair(devLibraryPrepKo, devLibraryPrepEn),
   hubServer: pair(hubServerKo, hubServerEn),
   hubSkills: pair(hubSkillsKo, hubSkillsEn),
