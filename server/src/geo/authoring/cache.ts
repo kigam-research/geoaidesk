@@ -37,8 +37,8 @@ export interface CachePlan {
   prewarm?: { ttlMs: number };
 }
 
-/** How long a legacy Codex warm-up entry was still read (probe 2026-10-24). */
-export const CODEX_WARM_TTL_MS = 10 * 60_000;
+/** A legacy Codex entry was still read 20 minutes after it was written (probe 2026-10-24; longer gaps not measured). */
+export const CODEX_WARM_TTL_MS = 20 * 60_000;
 
 /** Anthropic's short TTL: a later call that reuses the sources after this gap pays the write again. */
 export const ANTHROPIC_SHORT_TTL_MS = 5 * 60_000;

@@ -23,8 +23,11 @@ def run(label, root):
     records = []
     for f in sorted(root.glob("authoring/projects/*/attempts/*.json")):
         d = json.loads(f.read_text())
-        for i, c in enumerate(d.get("calls") or []):
-            records.append({"op": d["op"], "step": "first" if i == 0 else "repair", **c})
+        replies = 0
+        for c in d.get("calls") or []:
+            step = "prewarm" if c.get("purpose") == "prewarm" else "first" if replies == 0 else "repair"
+            replies += step != "prewarm"
+            records.append({"op": d["op"], "step": step, **c})
     records.sort(key=lambda c: c["startedAt"])
     calls = []
     for i, row in enumerate(ledger):

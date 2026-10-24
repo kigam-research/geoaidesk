@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T12:37:32Z
+updated: 2026-10-24T13:15:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4c7a414c-4971-467e-bd4e-be3a24b50c1e","pid":908712,"provider":"claude","session":"a59c5297-7707-4492-9e14-c91549b87e67","start":"72988241","token":"01b6763312835def33e04b6cef6092bb6449bf54aa80b7e7776c7a4cc604157f"}
 branch: task/gaid-authoring-cache
 target: main
@@ -64,7 +64,24 @@ Constraints: do not touch the review app or the hub server. Logins: use what wor
 login instead of substituting. Outside check: the gaid-authoring-tokens baseline (same paper, same answers).
 
 ## Current state
-(2026-10-24, implementation done, re-measure running; not yet committed)
+Result for the hub (2026-10-24, legacy Codex login, same paper/answers as gaid-authoring-tokens, one run each; report
+reports/2026-10-24-gaid-authoring-cache/index.md):
+- Cause of the low reuse: the legacy Codex backend keeps an implicit cache entry only at the end of a request's input and
+  reuses it only when a later request diverges within a few tens of tokens of that end (40 probe calls: short tail 13/13
+  hits; tails >= ~400 tokens and the real analysis task 0, also in both real runs). It refuses prompt_cache_breakpoint.
+- Changes: sources as their own block; per-path boundary/retention (OpenAI API key: explicit breakpoint, 30m default /
+  24h older models; Sign in with ChatGPT and Codex: nothing sent; Anthropic: cache_control on the sources, 1h only after a
+  >5 min gap); per-call records (path, auth, payload blocks/markers, prefix hash, raw + normalised usage, times, Codex
+  WebSocket reuse); attempt usage keeps cacheRead/cacheWrite, ledger cacheWriteTokens; native repair history on Codex
+  only; a sources warm-up before an operation's first call on Codex (not repeated within 20 min); draft prompt rules for
+  the three most frequent first-reply failures (gaid-draft/2026-10-24.2).
+- Before/after (list price, GPT-6.1 Sol API rates): 10-24 after $0.50, 31% cache; re-measure 1 (no warm-up) $0.50, 0%;
+  re-measure 2 (warm-up) $0.40, 60% (uncached input 76,116 → 33,865). Both re-measures passed the draft on the first reply.
+- Checks: scripts/check passed after reruns (web vitest load flakes in 4 untouched files passed on rerun; a geo test needed
+  the new boundaries owner listed).
+- Not verified: Anthropic, OpenAI API key and Sign in with ChatGPT (no working login on PC74; payloads checked offline);
+  repair quality native vs fold (no repair happened); Codex TTL beyond 20 min.
+Details:
 - Logins on PC74 (~/.geoaidesk/pi-agent, also the review app's /model-providers): only OpenAI Codex (legacy) works.
   Sign in with ChatGPT is stored but not connected (stale since 10-24), no Anthropic login, no API keys. Paths without a
   login are verified offline on Pi's real adapters' final payloads (test/geo-authoring-cache.test.ts).
@@ -103,12 +120,7 @@ login instead of substituting. Outside check: the gaid-authoring-tokens baseline
   younger than CODEX_WARM_TTL_MS (10 min placeholder until delay600/1200 probes end). Ledgered, in attempt.calls with
   purpose "prewarm". Test added (geo-authoring-cache.test.ts, 8 tests).
 ## Next steps
-1. Waiting: probe gaid-cache-probe5 (delay600/delay1200, ends ~21:53 KST) → set CODEX_WARM_TTL_MS from it; re-measure 2
-   with warm-up running: units gaid-cache-serve2 (port 18734) + gaid-cache-drive2, run dir
-   ~/data/geoaidesk/work/gaid-authoring-cache/run-codex-warm. Then tally before/after/cache/warm, stop serve2.
-2. Report reports/2026-10-24-gaid-authoring-cache/index.md (Korean, result first, humanizer), scripts/check (wait for load
-   < 14), task finish.
-Blocked: waiting for user systemd units gaid-cache-probe5 and gaid-cache-drive2 (not task jobs).
+1. task finish (checks passed: see report appendix A "검사"; logs ~/data/geoaidesk/work/gaid-authoring-cache/check/).
 ## Failed approaches
 - H1 "an implicit entry is reusable only by a request that contains the whole earlier input" — refuted by probes (above).
 - Explicit prompt_cache_breakpoint on the legacy Codex backend — refused by the backend.
@@ -128,6 +140,7 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-authoring-cache/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
