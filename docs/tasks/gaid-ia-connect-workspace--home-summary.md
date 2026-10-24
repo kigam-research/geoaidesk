@@ -1,7 +1,7 @@
 ---
 format: 1
-status: active
-updated: 2026-10-24T06:47:41Z
+status: ready
+updated: 2026-10-24T06:47:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88242334-24a3-4030-852c-b9e9ffb2a8dd","pid":1391055,"provider":"codex","session":"01a16c9e-0b00-7740-8c11-82980cf46d08","start":"71159800","token":"6c5b08a03458b5c901586e5be96b4af834d24c257068e81294c29e8e68ac58eb"}
 branch: task/gaid-ia-connect-workspace--home-summary
 target: task/gaid-ia-connect-workspace
@@ -33,7 +33,9 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 - Checks passed: server typecheck; 58 tests across home/workspace-state/environments/notes/catalogue, followed by all 10 final home tests after the trial-link and hub-pin refinements; copy validator (0 errors, 101 pre-existing warnings); UI checker (0 errors, 78 accepted debt); git diff --check. No web files or visible copy changed. Parent runs web/full `scripts/check` after integration.
 - Dependencies job exited 0 (receipt below). Implementation is ready for parent integration; no deployment was performed.
 ## Next steps
-1. `task finish` this child; parent integrates with `task complete gaid-ia-connect-workspace--home-summary` and runs the combined checks.
+<!-- task:closed -->
+Closed 2026-10-24T06:47:42Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
+
 ## Failed approaches
 ## Notes and decisions
 - Sequential plan: establish read-only project/session access, reuse note/method contracts and live run broker, then aggregate/order and verify the route. This is one tightly coupled server package; no additional workers.
