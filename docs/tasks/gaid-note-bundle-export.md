@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:54:53Z
+updated: 2026-10-24T03:20:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"41dbea06-326f-4f1c-b1e0-05cf1380bd4f","pid":1132461,"provider":"claude","session":"7898f15a-75bb-457c-98ce-bcd12e76095b","start":"69414348","token":"33e8cf317ab33bac9151faf65006114ce8fd8a1b39690d843d61a72029a0e651"}
 branch: task/gaid-note-bundle-export
 target: main
@@ -32,25 +32,22 @@ Checks: scripts/check; UI guide v2 (sections 1, 2, 10 + components touched; Kore
 after integration. Outside check: none.
 
 ## Current state
-Features 1 and 2 implemented (not yet screenshotted or fully checked):
-- Contract `web/src/geo/contracts/note-export.ts`; server `server/src/geo/notes/export.ts` (preview/build for the result
-  bundle and the public export; reuses evidence-package safe reads, `packageProvenance`, `storedEnvironment`); routes
-  `GET/POST /geo/notes/:id/bundle`, `GET/POST /geo/notes/:id/public-export` in `server/src/geo/routes/notes.ts`;
-  `localeSay(namespace)` in `server/src/geo/workflow-doc.ts` for server-rendered README text.
-- UI `web/src/geo/notes/note-export.tsx` (two 640 px sheets), mounted from the note detail 더 보기 menu; namespace
-  `noteExport`.
-- Verified: `cd server && npx tsc --noEmit`; `GAID_CATALOGUE=off npx vitest run test/geo-note-export.test.ts` (6 passed);
-  `cd web && npx tsc --noEmit && npx vitest run src/geo/notes/` (15 passed); copy validator 0 errors; check-ui 0 errors.
+Result for the hub (2026-10-24): all three requested features are built on this branch.
+1. 결과 묶음: from a research note's 더 보기 menu, a previewed ZIP with the note folder, data fingerprints from the note
+   chats' provenance (same/changed/missing/not compared now), environment records, Workflow version + 지침, cited papers,
+   README and SHA256SUMS; no data files, no reproduction claim; 409 when the preview is stale.
+2. 공개 자료 내보내기: note Markdown (+ reference list), Workflow 지침 Markdown, cited paper PDFs; nothing pre-ticked, each
+   file needs its own "기관 밖으로 내보내도 되는 자료입니다" confirmation (enforced server-side), local export record; no Google
+   calls.
+3. Gemini Notebook links (child gaid-note-bundle-export--notebook-links, completed and closed): project link under the notes
+   list summary, 서재 folder link under the folder facts; https only, opened in a new tab, never fetched.
+Verified: server tests (note export 7, notebook link 15), web tests (notes/notebook-link/library 35), typechecks, copy and UI
+validators 0 errors; trial app (unit gaid-note-bundle-export-app, stopped) walked both downloads (ZIP sha matched the
+header, `sha256sum -c SHA256SUMS` passed) and both link places; 40 UI-guide shots in
+~/data/geoaidesk/work/gaid-note-bundle-export/shots/. Report: reports/2026-10-24-gaid-note-bundle-export/index.md.
+Full scripts/check: run by task finish.
 ## Next steps
-1. Contract `web/src/geo/contracts/note-export.ts` written. Child `notebook-links` started 2026-10-24 (writer
-   6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d, worktree ~/worktrees/geoaidesk/gaid-note-bundle-export--notebook-links,
-   prompt ~/data/geoaidesk/work/gaid-note-bundle-export/child-notebook-links.md); on its finish run
-   `task complete gaid-note-bundle-export--notebook-links`, then mount `ProjectNotebookLink` in research-notes-panel.tsx.
-2. Trial app running: systemd unit gaid-note-bundle-export-app (ports 13620/18620, GAID_HOME
-   ~/data/geoaidesk/work/gaid-note-bundle-export/home, seeded project proj-df9fb8 via seed.sh; nav.sh/shots.sh there;
-   24 export shots in shots/). Stop it before finish.
-3. After the child: mount ProjectNotebookLink as a second line under the notes list summary (keeps B4), AGENTS.md + docs/geo/research-notes.md, screenshots (both styles, both
-   themes, 1440×900 and 1280×800), report `reports/2026-10-24-gaid-note-bundle-export/index.md`, scripts/check, finish.
+1. `task finish` (runs scripts/check; if web tests time out under load, rerun with VITEST_MAX_WORKERS=1 as the child did).
 ## Failed approaches
 ## Notes and decisions
 Plan (orchestration):
@@ -80,6 +77,7 @@ the project hub answers or closes them with `task item`)
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
+Report: reports/2026-10-24-gaid-note-bundle-export/index.md
 ## Running jobs
 <!-- task:jobs -->
 <!-- /task:jobs -->
