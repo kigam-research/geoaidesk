@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:16:57Z
+updated: 2026-10-24T01:28:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88cca85b-4b8e-4edd-b09b-2d41608083e0","pid":926474,"provider":"claude","session":"fa954eb4-c14c-4138-b556-4c278eaf0e94","start":"69251314","token":"9825be956e484ea4be90d2e182aaed55b5cf2c9ca62fa47c866e8d332f9219cb"}
 branch: task/gaid-promo-video-v4-brag
 target: main
@@ -54,11 +54,22 @@ v4 (gaid-promo-video-v4) is rendered and reported on branch task/gaid-promo-vide
 Writer: Opus 5.5 high fast (user). Outside check: none. Tell the hub before any use of the review app (not expected).
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- brag-slim installed user-level: `~/.claude/skills/brag-slim/` (SKILL.md sha256 `42f58aa8a2e0c0c1aa5b072ae77fd2674ccca699f8ecb01e97713e1eb56749af`,
+  `SOURCE.txt`, MIT `LICENSE`), from latent-spaces/brag `669ab9286aa28b6c3ee30e75f181ee74319d012a` via codeload. Invoked with
+  `--tone polished --format landscape --duration 100.8`.
+- v4 sources merged in from `origin/task/gaid-promo-video-v4` (merge 094819cb; v4 is finished, not yet on main).
+- Sources in `geo/promo/brag/` (plan, scene, soundtrack, renderer, share copy, README). Timeline 100 BPM, 42 bars = 100.8 s.
+- Preview (stills + transitions): `~/data/geoaidesk/work/gaid-promo-video-v4-brag/prev1/` — scenes and dips on bar lines checked by eye.
+- Soundtrack check (prev1 cues): all detected onsets on the 16th grid; peak −1.9 dBFS, RMS −16.8 dBFS; sections −14 to −21 dBFS.
 ## Next steps
-1. (the next session's first action)
+1. Final render job, then report `reports/2026-10-24-gaid-promo-video-v4-brag/index.md`, registry entry `review`.
 ## Failed approaches
 ## Notes and decisions
+- Orchestration: one tightly coupled package (scene timing ↔ soundtrack cues ↔ renderer); done by the writer, no children.
+- brag's 15–25 s law is overridden by the user's length decision (90–105 s); brag's other laws apply (hook in the first bar,
+  cuts on bar lines, one mixed soundtrack, poster as frame 0, share copy). The logo lockup moves from 0 s to the reveal.
+- brag writes `brag-output/` in the current directory; here the deliverables go to the job output (`~/data/...`) per the
+  project layout, intermediates to its `work/`.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
