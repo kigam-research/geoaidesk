@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:48:53Z
+updated: 2026-10-24T02:51:15Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -63,6 +63,7 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
+Blocked: the 40 s child's `task finish` is still running scripts/check (finish commit a26b8bcd not yet published); complete it when its finish notice arrives.
 0. Round 2 done: picture + mix job -3 (20f1dc1a, 100.4 s, 3012 frames; tag QA on the final file 62 frames all on target,
    look/tagqa3-*.jpg); mastering job -5 (9939c6ca) from job -3's picture/mix: film sha256 36290838…f075, -14.3 LUFS,
    TP -1.9 dB, no black segments. Job -4 (-3 dBFS limiter) measured TP -0.4: premise "limiter level sets final TP" was false
