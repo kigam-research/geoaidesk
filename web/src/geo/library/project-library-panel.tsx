@@ -35,6 +35,8 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citation
   const [refresh, setRefresh] = useState(0);
   const [attached, setAttached] = useState<string[]>([]);
   const request = useRef(0);
+  const selectionGeneration = useRef(0);
+  const handledCitation = useRef<{ id?: string; sequence?: number }>({});
 
   useEffect(() => {
     let active = true;
@@ -65,20 +67,26 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citation
 
   // A citation selects its paper even when it is outside the project's scope or current search page.
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId || (handledCitation.current.id === selectedId && handledCitation.current.sequence === citationSequence)) return;
     let active = true;
+    const generation = ++selectionGeneration.current;
+    const select = (item: LibraryItemSummary) => {
+      if (!active || generation !== selectionGeneration.current) return;
+      handledCitation.current = { id: selectedId, sequence: citationSequence };
+      setSelected(item);
+    };
     const existing = rows.find((row) => row.id === selectedId);
-    if (existing) { setSelected(existing); return; }
+    if (existing) { select(existing); return; }
     // A targeted citation-key lookup is not needed: the existing PDF state supplies the item id, and a paginated
     // scan is avoided by loading only the selected item's detail.
     getLibraryItem(selectedId).then(({ item }) => {
-      if (!active) return;
+      if (!active || generation !== selectionGeneration.current) return;
       const year = item.csl.issued?.["date-parts"]?.[0]?.[0];
-      setSelected({ id: item.id, title: item.csl.title, authors: (item.csl.author ?? []).map((a) => a.family ?? a.literal ?? "").slice(0, 2).join(", "), year, citationKey: item.citationKey,
+      select({ id: item.id, title: item.csl.title, authors: (item.csl.author ?? []).map((a) => a.family ?? a.literal ?? "").slice(0, 2).join(", "), year, citationKey: item.citationKey,
         storedPdf: item.attachments.some((a) => a.kind === "pdf" && Boolean(a.stored)), hasPdf: true,
         source: item.source, coverage: item.read.coverage, collectionIds: item.collectionIds, tags: item.tags,
         used: { notes: 0, projects: 0, workflows: 0 }, metadataConfirmed: item.metadataConfirmed, addedAt: item.addedAt, kind: "paper" });
-    }).catch(() => { if (active) setError(text("panel.failed")); });
+    }).catch(() => { if (active && generation === selectionGeneration.current) setError(text("panel.failed")); });
     return () => { active = false; };
   }, [selectedId, citationSequence, rows]);
 
@@ -112,7 +120,12 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, citation
           {!loading && rows.map((row) => <li key={row.id}>
             <button type="button" aria-pressed={selected?.id === row.id}
               className={cn("relative flex min-h-14 w-full flex-col justify-center px-4 py-2 text-left hover:bg-gaid-hover", selected?.id === row.id && "gaid-index bg-gaid-signal-tint")}
-              onClick={() => setSelected(row)}>
+              onClick={() => {
+                // Browsing is newer than the last citation request, including a still-pending detail lookup.
+                selectionGeneration.current++;
+                handledCitation.current = { id: selectedId, sequence: citationSequence };
+                setSelected(row);
+              }}>
               <span className="block w-full truncate text-sm font-medium" title={row.title}>{row.title}</span>
               <span className="block w-full truncate text-xs text-gaid-ink-2">{[row.authors, row.year].filter(Boolean).join(" · ")}</span>
             </button>

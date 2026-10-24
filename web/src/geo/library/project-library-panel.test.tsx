@@ -59,6 +59,9 @@ describe("project library inspector", () => {
     fireEvent.click(screen.getByRole("button", { name: "전체 서재" }));
     fireEvent.click(await screen.findByRole("button", { name: /단층의 수리 특성/ }));
     expect(screen.getByRole("button", { name: /단층의 수리 특성/ })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.change(screen.getByRole("textbox", { name: "제목, 저자로 찾기" }), { target: { value: "단층" } });
+    await waitFor(() => expect(listLibrary).toHaveBeenCalledWith(expect.objectContaining({ q: "단층" }), "a"));
+    expect(await screen.findByRole("button", { name: /단층의 수리 특성/ })).toHaveAttribute("aria-pressed", "true");
     rerender(<ProjectLibraryPanel projectId="a" selectedId="p1" citationSequence={2} onOpenPdf={vi.fn()} />);
     expect(screen.getByRole("button", { name: /포천 자력 이상 연구/ })).toHaveAttribute("aria-pressed", "true");
   });
