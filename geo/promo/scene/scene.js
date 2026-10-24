@@ -1,10 +1,11 @@
-/* GAID promo film v4 (~103 s, direction v4 in docs/tasks/gaid-promo-video-v4.md). Deterministic: window.motion.frame(t) draws film second t.
- * Footage and feature tags from PROMO_CAPTURE (capture-v3); demo frames are shown whole at one scale.
- * The cycle, second-brain and closing scenes keep their v2 clock; timed() maps each scene onto its v4 slot, and the demo length
- * (and so everything after it) follows the capture frame counts.
- * v4 (user feedback 2026-10-24): no on-screen "개념도" tag; the report names the illustrative scenes (background, cycle,
- * second brain). The background is motion graphics with one short caption per phase; the demo leads with each chapter's
- * purpose and the part of GAID (시스템 / 허브) that carries it, with one outcome tag per step.
+/* GAID promo film v5 (~100 s, direction v5 in docs/tasks/gaid-promo-video-v5.md). Deterministic: window.motion.frame(t) draws film second t.
+ * Footage from PROMO_CAPTURE: the v3 takes (Pocheon PGI study) and the v5 takes (Yilgarn nickel MPM example), merged by
+ * render.py with patterns prefixed v3/ and v5/. The cycle, second-brain and closing scenes keep their v2 clock; timed() maps
+ * each scene onto its slot, and the demo length (and so everything after it) follows the capture frame counts.
+ * v4 (user feedback 2026-10-24): no on-screen "개념도" tag; background as motion graphics; each demo chapter leads with its
+ * purpose and the part of GAID (시스템 / 허브) that carries it, one outcome tag per step.
+ * v5 (user feedback 2026-10-24 on v4): examples chosen per step (PGI and Yilgarn); highlight frames are whole UI regions;
+ * the real screens are windows inside the motion design, with lifted detail windows and side-by-side pairs.
  * Legibility rule (user, 2026-10-23): film text >= 22 px, primary labels >= 30 px, no large empty areas.
  */
 (() => {
@@ -118,78 +119,6 @@
   // ---------- footage ----------
   const shotInfo = id => (CAP && CAP.shots ? CAP.shots.find(s => s.id === id) : null);
   const pending = [];
-  function footageWindow(layer) {
-    const el = h('div', 'window', layer);
-    const img = h('img', '', el);
-    const ph = h('div', 'ph', el);
-    let current = '';
-    return {
-      draw({ x = 0, y = 0, w = 10, o = 0, shot, local = 0, view }) {
-        const hgt = (w * 9) / 16;
-        box(el, x, y, w, hgt);
-        put(el, { o });
-        if (o <= 0.002) return;
-        const info = shotInfo(shot);
-        const v = view || [0, 0, VW, VH];
-        const k = w / v[2];
-        if (!info) {
-          img.style.display = 'none';
-          ph.style.display = 'flex';
-          box(ph, 0, 0, w, hgt);
-          ph.innerHTML = `<div>실제 화면 ${shot}</div><div style="font-size:26px;font-weight:500">촬영본 연결 전 자리</div>`;
-          return;
-        }
-        ph.style.display = 'none';
-        img.style.display = 'block';
-        const idx = clamp(Math.floor(local * FPS) + (info.offset || 0), 0, info.frames - 1);
-        const src = `capture/${info.pattern.replace('%05d', String(idx).padStart(5, '0'))}`;
-        if (src !== current) {
-          current = src;
-          img.src = src;
-          pending.push(img.decode().catch(() => {}));
-        }
-        Object.assign(img.style, { width: `${VW * k}px`, height: `${VH * k}px`, left: `${-v[0] * k}px`, top: `${-v[1] * k}px` });
-      },
-    };
-  }
-  // Zoom path: keys [{t, rect}] in shot-local seconds; each move eases over up to 0.9 s ending at k.t.
-  function viewAt(keys, local, dur) {
-    const full = [0, 0, VW, VH];
-    if (!keys || !keys.length) {
-      const z = lerp(1.0, 1.06, clamp(local / dur));
-      const w = VW / z, hh = VH / z;
-      return [(VW - w) / 2, (VH - hh) / 2, w, hh];
-    }
-    let prev = { t: 0, rect: full };
-    for (const k of keys) {
-      if (local < k.t) {
-        const span = Math.min(0.9, k.t - prev.t);
-        const f = local < k.t - span ? 0 : inOut((local - (k.t - span)) / span);
-        return prev.rect.map((p, i) => lerp(p, k.rect[i], f));
-      }
-      prev = k;
-    }
-    return prev.rect;
-  }
-  const fit169 = (r, pad = 24) => {
-    if (!r) return null;
-    let [x, y, w, hh] = [r[0] - pad, r[1] - pad, r[2] + 2 * pad, r[3] + 2 * pad];
-    if (w / hh > 16 / 9) { const nh = (w * 9) / 16; y -= (nh - hh) / 2; hh = nh; } else { const nw = (hh * 16) / 9; x -= (nw - w) / 2; w = nw; }
-    // at most 1.5× so the zoomed region keeps its context; never show outside the frame
-    w = clamp(w, VW / 1.5, VW); hh = (w * 9) / 16;
-    x = clamp(x, 0, VW - w); y = clamp(y, 0, VH - hh);
-    return [x, y, w, hh];
-  };
-  // Default zoom for a shot: its focus rects from capture.json, in order, held until the next one.
-  function shotKeys(id) {
-    const info = shotInfo(id);
-    if (!info || !info.focus || !info.focus.length) return null;
-    // pointer-sized targets (buttons, single rows) would crop away their context; frame only regions
-    const regions = info.focus.filter(f => f.rect.width >= 300 && f.rect.height >= 120);
-    if (!regions.length) return null;
-    return regions.map(f => ({ t: Math.max(0.6, f.t), rect: fit169([f.rect.x, f.rect.y, f.rect.width, f.rect.height]) }));
-  }
-
   // ================= scenes =================
   const scenes = [];
   // Run a scene written on its own clock [srcA, srcB] inside the film slot [dstA, dstB] (linear time map).
@@ -233,47 +162,90 @@
   });
 
 
-  // ================= timeline v4 (direction v4, task document) =================
-  // Real-system segments: one shot each, whole app frame at one scale (no zoom, no pan; user feedback 2026-10-23).
-  // a/b are film seconds; consecutive shots overlap by 0.1 s. Beats (feature tags) come from capture.json.
-  // v4: A4 is left out (its example data still shows in H1 and R2); `use` trims a take to [from, to] shot seconds.
-  const SHOT_ORDER = ['L1', 'L2', 'A1', 'A2', 'A3', 'H1', 'H2', 'R1', 'R2', 'R3', 'M1', 'N1', 'L3', 'L4', 'L5'];
-  const SHOT_TARGET = { L1: 4.5, L2: 3, A1: 5, A2: 5, A3: 4, H1: 4.5, H2: 3.5, R1: 4.5, R2: 3.7, R3: 6, M1: 3.8, N1: 6.5, L3: 3.1, L4: 4, L5: 3.5 };
-  const USE = { L1: [0, 4.5], L2: [0.6, 3.6], R2: [0.8, 4.5], M1: [0.8, 4.6], L3: [0.5, 3.6] };
-  // One outcome tag per step of the story (v4, user feedback 2026-10-24: purpose first, features along the way).
-  // Rects come from the capture's beats (CSS px); consecutive entries with the same label glide.
+  // ================= timeline v5 (direction v5, task document) =================
+  // The demo is a window stage (user feedback 2026-10-24): the real screen is one framed window inside the motion design,
+  // with an example chip (포천 자철석 PGI / Yilgarn 니켈 MPM), beside a narrative column (see the demo scene). Each step frames
+  // one whole UI region on the window. Pair steps place the two examples as two windows. Frames are never zoomed or panned.
+  // Highlight rects are whole UI regions: v5 takes carry DOM-measured beat rects (capture-v5); for the v3 takes the rects
+  // below were re-derived from the frames along panel/card edges and checked on drawn frames (frame_check.py).
+  const R = (x, y, w, hh) => ({ x, y, width: w, height: hh });
+  const V3 = {
+    l1Table: R(260, 374, 636, 267), // L1: the folder's paper table
+    l2Pdf: R(650, 116, 606, 576), // L2: PDF side panel
+    a1Rows: R(428, 207, 672, 274), // A1: two library papers, the code and two data files (five whole rows)
+    a2Evidence: R(732, 213, 524, 418), // A2: evidence viewer panel
+    a2Option: R(272, 412, 432, 124), // A2: the recommended option card
+    a3Rail: R(272, 180, 272, 234), // A3: four-stage rail
+    h1Version: R(334, 104, 606, 206), // H1: next-version fieldset with its helper line
+    h1Dialog: R(320, 54, 640, 614), // H1: the whole register dialog (shared files list scrolls inside it)
+    m1Raster: R(344, 390, 256, 223), // M1: the GeoTIFF's extent on the map
+    m1Popup: R(482, 532, 288, 81), // M1: original pixel value popup
+    n1Cites: R(4, 246, 628, 348), // N1: three cited paragraphs
+    n1Decision: R(16, 250, 606, 339), // N1: decision card before sending (it grows after the send, so the step ends first)
+    l5Nodes: R(228, 312, 728, 248), // L5: all five connection-map nodes
+  };
   const BR = (id, k) => { const i = shotInfo(id); return i && i.beats && i.beats[k] ? i.beats[k].rect : null; };
-  const UNION = (a, b) => (a && b ? { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x), height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y) } : a || b);
-  const TAGS = {
-    L1: [[0.2, 4.5, () => BR('L1', 0), '주제별 폴더에 모은 논문']],
-    L2: [[0.6, 3.6, () => BR('L2', 0), '논문을 곁에 두고 읽기']],
-    A1: [[0.2, 5, () => UNION(BR('A1', 0), BR('A1', 1)), '논문·코드·자료를 함께']],
-    A2: [[0.2, 2.5, () => BR('A2', 0), '원문 근거를 바로 곁에'], [2.5, 5, () => BR('A2', 1), '근거를 보고 연구자가 결정']],
-    A3: [[0.2, 4, () => UNION(BR('A3', 0), BR('A3', 1)), '단계로 정리된 분석 절차']],
-    H1: [[0.2, 1.5, () => BR('H1', 0), '다음 version으로 등록'], [1.5, 3.2, () => BR('H1', 1), '예제 자료와 함께 공유']],
-    H2: [[0.2, 3.5, () => BR('H2', 1), '허브에서 가져다 쓰기']],
-    R1: [[0.2, 2.5, () => BR('R1', 0), 'Workflow의 목적과 근거'], [2.5, 4.5, () => BR('R1', 1), '근거 논문을 붙여 시작']],
-    R2: [[0.8, 2, () => BR('R2', 0), '단계마다 자료와 조건'], [2, 4, () => BR('R2', 1), '단계마다 자료와 조건']],
-    R3: [[2, 4, () => BR('R3', 1), 'AI agent가 Workflow대로'], [4, 6, () => BR('R3', 2), '결과 그림까지 저장']],
-    M1: [[0.8, 2.4, () => BR('M1', 0), '원본 좌표 그대로 지도에'], [2.4, 4.6, () => BR('M1', 1), '원본 값을 바로 확인']],
-    N1: [[0.2, 3, () => BR('N1', 1), '결과부터 쓴 연구노트'], [3, 4.5, () => BR('N1', 2), '두 논문의 쪽수까지 인용'], [4.5, 6.5, () => BR('N1', 3), '판단은 연구자가 답합니다']],
-    L3: [[0.5, 2, () => BR('L3', 0), '연구노트도 서재에'], [2, 3.6, () => BR('L3', 1), '연구노트도 서재에']],
-    L4: [[0.2, 4, () => UNION(BR('L4', 0), BR('L4', 1)), '논문에서 이어진 연구 이력']],
-    L5: [[0.2, 3.5, () => UNION(BR('L5', 0), BR('L5', 1)), '논문·Workflow·노트의 연결']],
+  const EX = { pgi: { label: '예제 · 포천 자철석 PGI', icon: 'map' }, yil: { label: '예제 · Yilgarn 니켈 MPM', icon: 'map-gis' } };
+  const SHOT_TARGET = { Y1: 4.5, Y2: 5, Y3: 6, Y4: 5, Y5: 5, Y6: 6, Y7: 4.5 };
+  // A step: one shot (or a pair) played over `use` (shot seconds); beats in step-local seconds [t0, t1, rect(), tag].
+  const S = (shot, ex, use, beats) => ({ shot, ex, use, beats });
+  const CHAPTERS_DEF = [
+    { st: 0, part: 'GAID 시스템', title: '연구는 내 서재의 논문에서 시작합니다', steps: [
+      S('L1', 'pgi', [0, 2.4], [[0.3, 2.4, () => V3.l1Table, '주제별 폴더에 모은 논문']]),
+      S('L2', 'pgi', [0.3, 3.9], [[0.2, 3.6, () => V3.l2Pdf, '논문을 곁에 두고 읽기']]),
+    ] },
+    { st: 1, part: 'GAID 허브', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', steps: [
+      S('A1', 'pgi', [0, 4.2], [[0.3, 4.2, () => V3.a1Rows, '논문·코드·자료를 함께']]),
+      S('A2', 'pgi', [0, 5], [[0.3, 2.5, () => V3.a2Evidence, '원문 근거를 바로 곁에'], [2.5, 5, () => V3.a2Option, '근거를 보고 연구자가 결정']]),
+      S('A3', 'pgi', [0, 2], [[0.2, 2, () => V3.a3Rail, '단계로 정리된 분석 절차']]),
+    ] },
+    { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', steps: [
+      S('H1', 'pgi', [0, 3], [[0.3, 1.5, () => V3.h1Version, '다음 version으로 등록'], [1.5, 3, () => V3.h1Dialog, '예제 자료와 함께 공유']]),
+      S('Y1', 'yil', [0, 4.5], [[0.4, 2.35, () => BR('Y1', 0), '연구자들이 올린 Workflow'], [2.4, 4.5, () => BR('Y1', 1), '분야별 폴더에서 찾기']]),
+      S('Y2', 'yil', [0, 5], [[0.4, 2.45, () => BR('Y2', 0), '내 프로젝트에서 바로 시험'], [2.5, 5, () => BR('Y2', 1), '단계마다 처리 지침']]),
+    ] },
+    { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', steps: [
+      S('Y3', 'yil', [0, 6.2], [[0.4, 4.3, () => BR('Y3', 0), '소개를 읽고 내 자료로 설정'], [4.33, 6.2, () => BR('Y3', 2), '시작 전에 조건 요약']]),
+      S('Y4', 'yil', [1.9, 5.3], [[0.1, 1.5, () => BR('Y4', 1), 'AI agent가 Workflow대로'], [1.5, 3.4, () => BR('Y4', 2), '결과 지도까지 대화에']]),
+      { pair: [S('Y5', 'yil', [0, 5], [[0.4, 2.75, () => BR('Y5', 0)], [2.8, 5, () => BR('Y5', 1)]]),
+        S('M1', 'pgi', [0, 5], [[0.4, 2.45, () => V3.m1Raster], [2.5, 5, () => V3.m1Popup]])],
+      tags: [[0.4, 2.75, '원본 좌표 그대로 지도에'], [2.8, 5, '원본 값을 바로 확인']] },
+    ] },
+    { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', steps: [
+      S('Y6', 'yil', [0, 3.7], [[0.4, 1.98, () => BR('Y6', 0), '결과부터 쓴 연구노트'], [2.0, 3.7, () => BR('Y6', 1), '지도 그림까지 노트에']]),
+      S('N1', 'pgi', [3, 5.95], [[0.1, 1.5, () => V3.n1Cites, '두 논문의 쪽수까지 인용'], [1.5, 2.95, () => V3.n1Decision, '판단은 연구자가 답합니다']]),
+    ] },
+    { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', steps: [
+      S('Y7', 'yil', [0, 4.5], [[0.4, 2.35, () => BR('Y7', 0), '분야별 폴더의 근거 논문'], [2.4, 4.5, () => BR('Y7', 1), '논문에서 이어진 연구 이력']]),
+      S('L5', 'pgi', [0, 3.5], [[0.3, 3.5, () => V3.l5Nodes, '논문·Workflow·노트의 연결']]),
+    ] },
+  ];
+  const STEP_GAP = 0.35; // consecutive steps overlap while one window leaves and the next arrives
+  const shotLen = (id, use) => {
+    const info = shotInfo(id);
+    const full = info ? info.frames / FPS : SHOT_TARGET[id] || 4;
+    return Math.max(0.5, Math.min(use[1], full) - use[0]);
   };
   const SEG = [];
+  const CHAPTERS = [];
   {
     let at = SLOT.cycle[1] + 0.05;
-    for (const id of SHOT_ORDER) {
-      const info = CAP && CAP.shots ? CAP.shots.find(s => s.id === id) : null;
-      if (CAP && CAP.shots && !info) continue; // a take the capture does not have (preview with older frames)
-      const full = info ? info.frames / FPS : SHOT_TARGET[id];
-      const [from, to] = USE[id] || [0, full];
-      const dur = Math.min(to, full) - from;
-      SEG.push({ shot: id, a: at, b: at + dur, skip: from });
-      at += dur - 0.1;
+    for (const c of CHAPTERS_DEF) {
+      const steps = [];
+      for (const s of c.steps) {
+        const dur = s.pair ? Math.max(...s.pair.map(p => shotLen(p.shot, p.use))) : shotLen(s.shot, s.use);
+        const step = { ...s, a: at, b: at + dur, dur, ch: CHAPTERS.length };
+        steps.push(step);
+        SEG.push(step);
+        at += dur - STEP_GAP;
+      }
+      CHAPTERS.push({ ...c, steps, a: steps[0].a, b: steps[steps.length - 1].b });
     }
   }
+  const DEMO = { a: CHAPTERS[0].a, b: CHAPTERS[CHAPTERS.length - 1].b };
+  SLOT.brain = [DEMO.b - 0.25, DEMO.b - 0.25 + 7.8];
+  SLOT.closing = [SLOT.brain[1] - 0.3, SLOT.brain[1] - 0.3 + 4.3];
+  const DURATION = Math.ceil(SLOT.closing[1]);
   const STATIONS = [
     { icon: 'library', label: '내 서재' },
     { icon: 'file-text', label: 'Workflow 만들기' },
@@ -281,23 +253,6 @@
     { icon: 'orbit', label: '연구 분석' },
     { icon: 'notebook-pen', label: '연구노트' },
   ];
-  // Each chapter says what it is for (purpose line) and which part of GAID carries it.
-  const CHAPTERS = [
-    { st: 0, part: 'GAID 시스템', title: '연구는 내 서재의 논문에서 시작합니다', shots: ['L1', 'L2'] },
-    { st: 1, part: 'GAID 허브', title: '논문 속 방법을 AI agent가 따르는 Workflow로 만듭니다', shots: ['A1', 'A2', 'A3'] },
-    { st: 2, part: 'GAID 허브', title: '만든 Workflow는 허브에서 함께 쓰고 고쳐 갑니다', shots: ['H1', 'H2'] },
-    { st: 3, part: 'GAID 시스템', title: '공유된 Workflow로 내 자료를 분석합니다', shots: ['R1', 'R2', 'R3', 'M1'] },
-    { st: 4, part: 'GAID 시스템', title: '결과와 판단은 연구노트에 남습니다', shots: ['N1'] },
-    { st: 0, back: true, part: 'GAID 시스템', title: '연구가 서재로 돌아와 다음 연구로 이어집니다', shots: ['L3', 'L4', 'L5'] },
-  ].map(c => {
-    const segs = SEG.filter(s => c.shots.includes(s.shot));
-    return segs.length ? { ...c, a: segs[0].a, b: segs[segs.length - 1].b } : null;
-  }).filter(Boolean);
-  const DEMO = { a: CHAPTERS[0].a, b: CHAPTERS[CHAPTERS.length - 1].b };
-  SLOT.brain = [DEMO.b - 0.25, DEMO.b - 0.25 + 7.8];
-  SLOT.closing = [SLOT.brain[1] - 0.3, SLOT.brain[1] - 0.3 + 4.3];
-  const DURATION = Math.ceil(SLOT.closing[1]);
-
   const stationIcon = (st, size, color) => (st.icon === 'orbit'
     ? `<span class="icon" style="width:${size * 1.5}px;height:${size}px;color:${color}">${ORBIT_ICON(size)}</span>`
     : icon(st.icon, size, color));
@@ -684,15 +639,84 @@
     };
   });
 
-  // ---------- demo: purpose line, part of GAID, mini cycle ring, whole-frame footage, outcome tags ----------
-  const FRAME = { x: 112, y: 108, w: 1696 };
-  FRAME.k = FRAME.w / VW;
-  FRAME.h = VH * FRAME.k;
+  // ---------- demo: a narrative column on the left, the real screen as one window on the right ----------
+  // v5 (user feedback 2026-10-24, pointing at the v4-lemo cut): the screens of the hub and the system need not fill the
+  // film; as one element of the motion design they are easier to follow for a first-time viewer. The left column carries
+  // the part of GAID, the chapter's purpose and its outcome rows; the current row is joined by a leader line to the whole
+  // UI region framed on the window. Pair steps place both examples as two staggered windows.
+  const BAR = 46; // window chrome bar (example chip)
+  const LAY = {
+    col: { x: 96, w: 500, plateY: 214, titleY: 274, rowsY: 560, rowH: 60 },
+    main: { x: 650, y: 185, w: 1180 },
+    pair: [{ x: 650, y: 150, w: 690 }, { x: 1140, y: 596, w: 690 }],
+  };
+  const PAD = 5; // CSS px kept around a region (whitespace between whole elements)
+  function frameSrc(shot, local) {
+    const info = shotInfo(shot);
+    if (!info) return null;
+    const idx = clamp(Math.floor(local * FPS), 0, info.frames - 1);
+    return `capture/${info.pattern.replace('%05d', String(idx).padStart(5, '0'))}`;
+  }
+  function setImg(img, src) {
+    if (img.dataset.src === src) return;
+    img.dataset.src = src;
+    img.src = src;
+    pending.push(img.decode().catch(() => {}));
+  }
+  function mkWin(layer) {
+    const el = h('div', 'window', layer);
+    const bar = h('div', 'winbar', el);
+    const screen = h('div', 'screen', el);
+    const img = h('img', '', screen);
+    const ph = h('div', 'ph', screen);
+    const frame = h('div', 'hl', el);
+    return {
+      el, frame,
+      draw({ x, y, w, o, dx = 0, dy = 0, shot, local, ex }) {
+        const k = w / VW, sh = VH * k;
+        box(el, x, y, w, sh + BAR);
+        put(el, { o, x: dx, y: dy });
+        if (o <= 0.002) return;
+        bar.innerHTML = `${icon(EX[ex].icon, 24, 'var(--ink-2)')}<span>${EX[ex].label}</span>`;
+        box(screen, 0, BAR, w, sh);
+        const src = frameSrc(shot, local);
+        if (!src) {
+          img.style.display = 'none';
+          ph.style.display = 'flex';
+          box(ph, 0, 0, w, sh);
+          ph.innerHTML = `<div>실제 화면 ${shot}</div><div style="font-size:24px;font-weight:500">촬영본 연결 전 자리</div>`;
+          return;
+        }
+        ph.style.display = 'none';
+        img.style.display = 'block';
+        setImg(img, src);
+        Object.assign(img.style, { width: `${w}px`, height: `${sh}px`, left: '0px', top: '0px' });
+      },
+      // a whole-region frame on the window (kept inside the window when the region reaches its edge); film rect back
+      mark(r, x, y, w, o) {
+        const k = w / VW;
+        const fx = (r.x - PAD) * k, fy = BAR + (r.y - PAD) * k, fw = (r.width + 2 * PAD) * k, fh = (r.height + 2 * PAD) * k;
+        const x0 = Math.max(fx - 3, 2), y0 = Math.max(fy - 3, BAR + 2);
+        const x1 = Math.min(fx + fw + 3, w - 2), y1 = Math.min(fy + fh + 3, BAR + VH * k - 2);
+        box(frame, x0, y0, x1 - x0, y1 - y0);
+        put(frame, { o });
+        return { x: x + x0, y: y + y0, w: x1 - x0, h: y1 - y0 };
+      },
+    };
+  }
+  // every chapter's outcome rows, in order (a pair step contributes its tags)
+  for (const c of CHAPTERS) {
+    c.rows = [];
+    for (const s of c.steps) {
+      const labels = s.pair ? s.tags.map(tg => tg[2]) : s.beats.map(b => b[3]);
+      for (const l of labels) if (!c.rows.includes(l)) c.rows.push(l);
+    }
+  }
   scenes.push(() => {
     const layer = h('div', 'layer');
     // mini cycle ring at the top right: the same five stations as the big ring, the GAID 허브 arc tinted
-    const MR = { cx: 1716, cy: 54, rx: 88, ry: 34 };
-    const msvg = sv('svg', { width: 1920, height: 108 }, layer);
+    const MR = { cx: 1716, cy: 76, rx: 88, ry: 34 };
+    const msvg = sv('svg', { width: 1920, height: 140 }, layer);
     msvg.style.position = 'absolute';
     const ept = (deg, d = 0) => { const a = (deg * Math.PI) / 180; return [MR.cx + (MR.rx - d) * Math.cos(a), MR.cy + (MR.ry - d) * Math.sin(a)]; };
     sv('ellipse', { cx: MR.cx, cy: MR.cy, rx: MR.rx, ry: MR.ry, fill: 'none', stroke: '#c9ced6', 'stroke-width': 3 }, msvg);
@@ -709,34 +733,43 @@
     const mpoint = sv('circle', { r: 9, fill: BLUE }, msvg);
     const mlogo = markAt(layer, MR.cx, MR.cy, 34);
     mlogo.set({ ringF: 1, gO: 1, gS: 1, lettersF: 0 });
-    // header: part plate + purpose line per chapter
-    const titles = CHAPTERS.map(c => {
+    // left column per chapter: part plate, purpose, outcome rows
+    const C = LAY.col;
+    const cols = CHAPTERS.map(c => {
       const g = h('div', 'abs', layer);
-      Object.assign(g.style, { left: '112px', top: '28px', display: 'flex', alignItems: 'center', gap: '20px', whiteSpace: 'nowrap' });
+      box(g, C.x, 0, C.w);
       const hub = c.part === 'GAID 허브';
-      g.innerHTML = `<span style="font-size:28px;font-weight:700;padding:6px 16px;border-radius:6px;corner-shape:bevel;background:${hub ? 'var(--signal-tint)' : 'var(--face)'};color:${hub ? 'var(--signal-ink)' : 'var(--ink)'};border:2px solid ${hub ? BLUE : 'var(--control-edge)'}">${c.part}</span>`
-        + `<span class="h2" style="font-size:42px">${c.title}</span>`;
-      return { el: g, c };
+      const plate = h('div', 'abs', g, c.part);
+      Object.assign(plate.style, { left: '0px', top: `${C.plateY}px`, fontSize: '28px', fontWeight: 700, padding: '6px 16px', borderRadius: '6px', cornerShape: 'bevel', whiteSpace: 'nowrap',
+        background: hub ? 'var(--signal-tint)' : 'var(--face)', color: hub ? 'var(--signal-ink)' : 'var(--ink)', border: `2px solid ${hub ? BLUE : 'var(--control-edge)'}` });
+      const title = h('div', 'abs h2', g, c.title);
+      Object.assign(title.style, { left: '0px', top: `${C.titleY}px`, width: `${C.w}px`, fontSize: '50px', lineHeight: 1.24, wordBreak: 'keep-all' });
+      const rows = c.rows.map((label, i) => {
+        const r = h('div', 'row', g);
+        box(r, 0, C.rowsY + i * C.rowH);
+        r.innerHTML = `<span class="sq"></span><span class="lab">${label}</span>`;
+        return { el: r, label, lab: r.querySelector('.lab'), sq: r.querySelector('.sq') };
+      });
+      return { g, c, plate, title, rows };
     });
-    const main = footageWindow(layer);
-    // outcome tags: highlight frame + dim outside + label (all inside the frame box)
-    const over = h('div', 'abs', layer);
-    Object.assign(over.style, { overflow: 'hidden', borderRadius: '14px', cornerShape: 'bevel', pointerEvents: 'none' });
-    const hi = h('div', 'abs', over);
-    Object.assign(hi.style, { border: `4px solid ${BLUE}`, borderRadius: '10px', cornerShape: 'bevel', boxShadow: '0 0 0 3000px rgba(23,27,35,0.18)' });
-    const tagEl = h('div', 'abs', over);
-    Object.assign(tagEl.style, { background: BLUE, color: '#fff', fontSize: '32px', fontWeight: 700, padding: '8px 20px', borderRadius: '8px', cornerShape: 'bevel', whiteSpace: 'nowrap', letterSpacing: '-0.01em' });
-    const tagsOf = id => (TAGS[id] || []).map(([t0, t1, rect, label]) => ({ t0, t1, rect: rect(), label })).filter(b => b.rect);
+    const wins = [mkWin(layer), mkWin(layer)];
+    const pairWins = [mkWin(layer), mkWin(layer)];
+    const links = sv('svg', { width: 1920, height: 1080 }, layer);
+    links.style.position = 'absolute';
+    const leaders = [0, 1].map(() => ({
+      line: sv('polyline', { fill: 'none', stroke: BLUE, 'stroke-width': 2.5 }, links),
+      dot: sv('circle', { r: 6, fill: BLUE }, links),
+    }));
+    const beatsOf = (step, lt) => step.beats.map(([t0, t1, rect, label]) => ({ t0, t1, r: rect(), label })).filter(b => b.r)
+      .find(b => lt >= b.t0 && lt < b.t1) || null;
+    const bo = (lt, b) => Math.min(ramp(lt, b.t0, b.t0 + 0.3, lin), 1 - ramp(lt, b.t1 - 0.25, b.t1, lin));
     return t => {
       const o = win(t, DEMO.a - 0.05, DEMO.b + 0.05, 0.45, 0.4);
       put(layer, { o });
       if (o <= 0) return;
-      // chapter state
       const ci = CHAPTERS.findIndex(c => t >= c.a - 0.05 && t < c.b - 0.05);
       const cur = CHAPTERS[ci === -1 ? CHAPTERS.length - 1 : ci];
       const prev = CHAPTERS[Math.max(0, (ci === -1 ? CHAPTERS.length - 1 : ci) - 1)];
-      titles.forEach(({ el, c }) => put(el, { o: win(t, c.a, c.b, 0.35, 0.25), y: 12 * (1 - ramp(t, c.a, c.a + 0.6)) }));
-      // mini ring: the point travels from the previous station to this one
       const toDeg = MSTART + (cur.back ? 5 : cur.st) * 72;
       const fromDeg = cur === CHAPTERS[0] ? toDeg : MSTART + (prev.back ? 5 : prev.st) * 72;
       const mv = ramp(t, cur.a, cur.a + 0.8, inOut);
@@ -747,44 +780,79 @@
         d.setAttribute('fill', active ? BLUE : '#ffffff');
         d.setAttribute('stroke', active ? BLUE : '#878f9d');
       });
-      // footage
-      let drawn = null;
-      SEG.forEach((sg, idx) => {
-        if (t < sg.a || t > sg.b) return;
-        const local = t - sg.a + (sg.skip || 0);
-        const first = idx === 0;
-        const dy = first ? 24 * (1 - ramp(t, sg.a, sg.a + 0.7)) : 0;
-        main.draw({ x: FRAME.x, y: FRAME.y + dy, w: FRAME.w, o: 1, shot: sg.shot, local, view: [0, 0, VW, VH] });
-        drawn = { sg, local, dy };
+      // windows and frames of the live steps; collect the current row and the frames it points at
+      for (const w of [...wins, ...pairWins]) { w.draw({ o: 0 }); put(w.frame, { o: 0 }); }
+      leaders.forEach(L => { L.line.setAttribute('opacity', 0); L.dot.setAttribute('opacity', 0); });
+      let wi = 0;
+      let label = null, targets = [], lo = 0;
+      for (const s of SEG.filter(sg => t >= sg.a && t <= sg.b)) {
+        const lt = t - s.a;
+        const enter = ramp(lt, 0, 0.55), leave = ramp(t, s.b - 0.4, s.b, lin);
+        const so = Math.min(ramp(lt, 0, 0.4, lin), 1 - leave);
+        if (s.pair) {
+          s.pair.forEach((p, k) => {
+            const L = LAY.pair[k];
+            const a0 = ramp(lt, k * 0.25, k * 0.25 + 0.55);
+            const wo = so * ramp(lt, k * 0.25, k * 0.25 + 0.4, lin);
+            const dx = 60 * (1 - a0) - 40 * leave;
+            pairWins[k].draw({ x: L.x, y: L.y, w: L.w, o: wo, dx, shot: p.shot, local: p.use[0] + lt, ex: p.ex });
+            const b = beatsOf(p, lt);
+            if (b) {
+              const fo = wo * bo(lt, b);
+              targets.push({ ...pairWins[k].mark(b.r, L.x + dx, L.y, L.w, fo), o: fo });
+            }
+          });
+          const tg = s.tags.find(([t0, t1]) => lt >= t0 && lt < t1);
+          if (tg) { label = tg[2]; lo = so * Math.min(ramp(lt, tg[0], tg[0] + 0.3, lin), 1 - ramp(lt, tg[1] - 0.25, tg[1], lin)); }
+          continue;
+        }
+        const M = LAY.main;
+        const dx = 70 * (1 - enter) - 50 * leave;
+        const W = wins[wi++ % 2];
+        W.draw({ x: M.x, y: M.y, w: M.w, o: so, dx, shot: s.shot, local: s.use[0] + lt, ex: s.ex });
+        const b = beatsOf(s, lt);
+        if (!b) continue;
+        const fo = so * bo(lt, b);
+        targets = [{ ...W.mark(b.r, M.x + dx, M.y, M.w, fo), o: fo }];
+        label = b.label; lo = fo;
+      }
+      // left column: this chapter's rows; the current one is blue, done rows stay, coming rows are light
+      cols.forEach(({ g, c, plate, title, rows }) => {
+        const co = win(t, c.a, c.b, 0.35, 0.3);
+        put(g, { o: co });
+        if (co <= 0) return;
+        const e = ramp(t, c.a, c.a + 0.7);
+        put(plate, { y: 12 * (1 - e) });
+        put(title, { o: ramp(t, c.a + 0.05, c.a + 0.5, lin), y: 16 * (1 - ramp(t, c.a + 0.05, c.a + 0.75)) });
+        const ki = c === cur && label ? c.rows.indexOf(label) : -1;
+        // the last row reached so far (rows stay lit between beats)
+        let reached = -1;
+        for (const s of c.steps) {
+          const lt = t - s.a;
+          const ls = s.pair ? s.tags.map(([t0, , l]) => [t0, l]) : s.beats.map(([t0, , , l]) => [t0, l]);
+          for (const [t0, l] of ls) if (lt >= t0) reached = Math.max(reached, c.rows.indexOf(l));
+        }
+        rows.forEach((r, i) => {
+          put(r.el, { o: ramp(t, c.a + 0.3 + i * 0.08, c.a + 0.7 + i * 0.08, lin), x: 14 * (1 - ramp(t, c.a + 0.3 + i * 0.08, c.a + 0.9 + i * 0.08)) });
+          const now = i === ki, done = i <= reached;
+          r.el.style.color = now ? 'var(--signal-ink)' : done ? 'var(--ink)' : 'var(--ink-3)';
+          r.el.style.fontWeight = now ? 700 : 550;
+          r.sq.style.background = now ? BLUE : done ? 'var(--ink-2)' : '#c3c9d2';
+        });
+        if (ki >= 0) {
+          const row = rows[ki];
+          const rx = C.x + row.lab.offsetLeft + row.lab.offsetWidth + 18, ry = C.rowsY + ki * C.rowH + 22;
+          targets.forEach((tg, j) => {
+            const L = leaders[j];
+            const ex = tg.x, ey = tg.y + tg.h / 2;
+            const mx = Math.max(rx + 16, Math.min(LAY.main.x - 22, ex - 22));
+            L.line.setAttribute('points', `${rx},${ry} ${mx},${ry} ${ex},${ey}`);
+            L.line.setAttribute('opacity', Math.min(lo, tg.o) * ramp(lo, 0.6, 1, lin));
+            L.dot.setAttribute('cx', ex); L.dot.setAttribute('cy', ey);
+            L.dot.setAttribute('opacity', Math.min(lo, tg.o) * ramp(lo, 0.6, 1, lin));
+          });
+        }
       });
-      if (!drawn) { main.draw({}); put(over, { o: 0 }); return; }
-      box(over, FRAME.x, FRAME.y + drawn.dy, FRAME.w, FRAME.h);
-      const beats = tagsOf(drawn.sg.shot);
-      const bt = beats.find(b => drawn.local >= b.t0 && drawn.local <= b.t1);
-      if (!bt) { put(over, { o: 0 }); return; }
-      const joinedIn = beats.some(b => b !== bt && Math.abs(b.t1 - bt.t0) < 0.05);
-      const joinedOut = beats.some(b => b !== bt && Math.abs(b.t0 - bt.t1) < 0.05);
-      const bo = Math.min(joinedIn ? 1 : ramp(drawn.local, bt.t0 + 0.15, bt.t0 + 0.45, lin), joinedOut ? 1 : 1 - ramp(drawn.local, bt.t1 - 0.3, bt.t1, lin));
-      put(over, { o: bo });
-      // a box that follows on from the previous beat glides there instead of jumping
-      const prevB = beats.find(b => b !== bt && Math.abs(b.t1 - bt.t0) < 0.05);
-      const glide = prevB ? inOut((drawn.local - bt.t0) / 0.45) : 1;
-      const r = prevB ? ['x', 'y', 'width', 'height'].reduce((o, k) => ({ ...o, [k]: lerp(prevB.rect[k], bt.rect[k], glide) }), {}) : bt.rect;
-      const rx = r.x * FRAME.k, ry = r.y * FRAME.k, rw = r.width * FRAME.k, rh = r.height * FRAME.k;
-      box(hi, rx - 6, ry - 6, rw + 12, rh + 12);
-      tagEl.textContent = bt.label;
-      const tw = tagEl.offsetWidth, th = tagEl.offsetHeight;
-      // tag outside the box where it fits in the frame: above, below, right, left; last resort inside top-right
-      const m = 12, gap = 10, L0 = rx - 6, T0 = ry - 6, R0 = rx + rw + 6, B0 = ry + rh + 6;
-      const fits = (x, y) => x >= m && y >= m && x + tw <= FRAME.w - m && y + th <= FRAME.h - m;
-      const cands = [
-        [clamp(L0, m, FRAME.w - tw - m), T0 - th - gap],
-        [clamp(L0, m, FRAME.w - tw - m), B0 + gap],
-        [R0 + gap, clamp(T0, m, FRAME.h - th - m)],
-        [L0 - tw - gap, clamp(T0, m, FRAME.h - th - m)],
-      ];
-      const [tx, ty] = cands.find(([x, y]) => fits(x, y)) || [R0 - tw - 16, T0 + 16];
-      box(tagEl, tx, ty);
     };
   });
 
@@ -949,7 +1017,9 @@
         '03-scattered': lerp(...SLOT.background, 0.58),
         '04-gathered': lerp(...SLOT.background, 0.93),
         '05-cycle': lerp(...SLOT.cycle, 0.75),
-        ...Object.fromEntries(SEG.map((sg, i) => [`${String(i + 6).padStart(2, '0')}-${sg.shot}`, +((sg.a + sg.b) / 2).toFixed(2)])),
+        // per step: the middle of each beat (box checks), pair steps once per tag
+        ...Object.fromEntries(SEG.flatMap((sg, i) => (sg.pair ? sg.tags.map(([t0, t1], j) => [`${String(i + 6).padStart(2, '0')}-${sg.pair.map(p => p.shot).join('')}-${j + 1}`, +(sg.a + (t0 + t1) / 2).toFixed(2)])
+          : sg.beats.map(([t0, t1], j) => [`${String(i + 6).padStart(2, '0')}-${sg.shot}-${j + 1}`, +(sg.a + Math.min((t0 + t1) / 2 + 0.4, t1 - 0.3, sg.dur - 0.5)).toFixed(2)])))),
         [`${String(SEG.length + 6).padStart(2, '0')}-network`]: lerp(...SLOT.brain, 0.4),
         [`${String(SEG.length + 7).padStart(2, '0')}-second-brain`]: lerp(...SLOT.brain, 0.85),
         [`${String(SEG.length + 8).padStart(2, '0')}-closing`]: DURATION - 0.3,
