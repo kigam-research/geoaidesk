@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:36:11Z
+updated: 2026-10-24T02:36:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -63,11 +63,10 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
-0. Round 2 (boxes, smooth cuts, cycle rebuilt after the user's 2026-10-24 note "lemo 버전에서 아쉬운 것은 GAID로고 이후 GAID 허브와
-   GAID 시스템을 설명하는 18초 이후 장면의 고리 애니메이션 품질이 낮다. V4 방식이나 BRAG 방식을 보고 개선할 필요가 있다."):
-   job job-geoaidesk-gaid-promo-video-v4-lemo-2 (source 8c50ae98) running. Preview pv3 checked: 31/31 boxes on their regions
-   (look/tagqa1-*.jpg), -14.1 LUFS / TP -1.2 dB, 96.9 s. When it exits: verify master.json, update the report to round 2
-   (figures, numbers, §7 failed attempts, registry entry hash), keep round 1 as a superseded registry note.
+0. Round 2: job -2 (8c50ae98) succeeded (96.9 s, -14.1 LUFS, TP -1.2) but two outcome rows held only 1.0/1.6 s, so
+   short chapter-final takes now hold their last frame (L2 0.5, H2 1.3, y:M1 0.7, y:N1 1.1 s; 100.4 s); job -3 (20f1dc1a)
+   running. When it exits: verify master.json, tag QA on the final file, update the report to round 2 (figures, numbers,
+   §2/§4/§7, registry entry hash).
 1. Wait for the 40 s child; then `task complete gaid-promo-video-v4-lemo--promo-40s`, merge section-40s.md into report §8,
    add its registry entry, humanizer pass, review-copy, task finish.
 2. (done for A) Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
@@ -131,6 +130,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/receipt.json
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T022827.582770Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T023619.972785Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
