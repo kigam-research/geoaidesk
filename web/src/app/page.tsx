@@ -67,6 +67,9 @@ import { onOpenResearchNoteRequest, takeOpenResearchNote } from "@/geo/notes/ope
 import { CitationPdfContext } from "@/geo/library/citation-links";
 import { CitationPdfPane, useCitationPdf } from "@/geo/library/citation-pdf";
 import { GaidAppBar } from "@/geo/shell/app-bar";
+import { LibraryPlace } from "@/geo/places/library-place";
+import { useLibraryLocation } from "@/geo/places/library-location";
+import { onWorkspaceOpenRequest, takeWorkspaceOpen } from "@/geo/places/navigation";
 import { SystemResourcesButton } from "@/geo/shell/system-resources";
 import { focusSearchTarget, shortcutLabel, useShortcut } from "@/geo/shell/shortcuts";
 import { Button } from "@/components/ui/button";
@@ -167,8 +170,11 @@ function ResizeHandle({ label, value, range, grows, onMouseDown, onResize }: {
 
 export default function HomePage() {
   const [screen, setScreen] = useState<WorkspaceScreen>("projects");
-  // GAID hub: a third place of this page (URL hash), shown over the project list/workspace.
+  // GAID Connect: the second place of this page (URL hash `#connect…`), shown over the Workspace (project list/workspace).
   const [hub, setHub] = useHubLocation();
+  // 서재: the researcher's personal space (`#library`), shown over either place and closed back to it.
+  const [library, libraryReturn, closeLibrary] = useLibraryLocation();
+  const covered = hub.open || library.open;
   const [openedProjectIds, setOpenedProjectIds] = useState<string[]>([]);
   const [restoredProjects, setRestoredProjects] = useState<
     Record<string, ProjectWorkspaceState>
@@ -322,11 +328,29 @@ export default function HomePage() {
   }, [openedProjectIds, screen, workspaceHydrated]);
 
   // ⌘K / Ctrl K on the hub and the project list focuses their search field (UI guide v2 N6); the workspace has its own.
-  useShortcut("search", () => focusSearchTarget(), hub.open || screen === "projects");
+  useShortcut("search", () => focusSearchTarget(), hub.open || library.open || screen === "projects");
 
   return (
     <>
-      {hub.open && (
+      {library.open && (
+        <LibraryPlace
+          itemId={library.itemId}
+          returnTo={libraryReturn}
+          onClose={closeLibrary}
+          onNavigate={(place) => {
+            if (place === "connect") setHub({ open: true, projectId: null });
+            else {
+              setHub({ open: false, projectId: null });
+              setScreen("projects");
+            }
+          }}
+          onOpenProject={(projectId) => {
+            setHub({ open: false, projectId: null });
+            openProject(projectId);
+          }}
+        />
+      )}
+      {hub.open && !library.open && (
         <GaidHub
           authoringId={hub.projectId}
           entryId={hub.entryId ?? null}
@@ -347,11 +371,11 @@ export default function HomePage() {
         />
       )}
       <div
-        className={!hub.open && screen === "projects" ? "contents" : "hidden"}
-        aria-hidden={hub.open || screen !== "projects"}
+        className={!covered && screen === "projects" ? "contents" : "hidden"}
+        aria-hidden={covered || screen !== "projects"}
       >
         <ProjectView
-          isActive={!hub.open && screen === "projects"}
+          isActive={!covered && screen === "projects"}
           onOpenProject={openProject}
           projectActivities={displayedProjectActivities}
           onOpenHub={() => setHub({ open: true, projectId: null })}
@@ -359,7 +383,7 @@ export default function HomePage() {
       </div>
       {projectDirectoryHydrated && openedProjectIds.map((projectId) => {
         if (!serverStateChecked.has(projectId)) return null;
-        const isActive = !hub.open && screen === "workspace" && projectId === activeProjectId;
+        const isActive = !covered && screen === "workspace" && projectId === activeProjectId;
         return (
           <ProjectScopeProvider key={projectId} value={projectId}>
             <div className={isActive ? "contents" : "hidden"} aria-hidden={!isActive}>
@@ -398,7 +422,7 @@ function WorkspacePage({
     activity: ProjectActivitySummary,
   ) => void;
   onOpenProjectView: () => void;
-  /** GeoAIDesk: the same 내 연구 / GAID 허브 switch as the project list (gaid-system-ui, novice review). */
+  /** GeoAIDesk: the same Workspace / Connect switch as the Workspace home (ADR 2026-10-24 gaid-connect-workspace). */
   onOpenHub?: () => void;
 }) {
   const [sandboxWorkspace, setSandboxWorkspace] = useState<SandboxWorkspaceState>(
@@ -890,6 +914,20 @@ function WorkspacePage({
     [tabsMeta],
   );
 
+  // GAID Workspace home: a recent chat opens in a tab, 분석 시작 / a built-in Workflow shows the Workflow list.
+  useEffect(() => {
+    if (!isActive) return;
+    const take = () => {
+      const request = takeWorkspaceOpen(projectId);
+      if (!request) return;
+      if (request.sessionId) openSession(request.sessionId, request.title ?? "");
+      else if (request.workflows) setView("workflows");
+    };
+    take();
+    return onWorkspaceOpenRequest(take);
+  }, [isActive, openSession, projectId]);
+
+
   // ------------------------------------------------------------------
   // Workflow launch — routes to the active chat tab via its imperative
   // handle and switches the view back to "chat".
@@ -1066,8 +1104,8 @@ function WorkspacePage({
     <div className="flex h-dvh min-w-0 flex-col">
       {/* GAID app bar (UI guide v2 L2): mark, place switch, project; status and panel toggles; settings. */}
       <GaidAppBar
-        place="projects"
-        onNavigate={onOpenHub ? (place) => (place === "hub" ? onOpenHub() : onOpenProjectView()) : undefined}
+        place="workspace"
+        onNavigate={onOpenHub ? (place) => (place === "connect" ? onOpenHub() : onOpenProjectView()) : undefined}
         onHome={onOpenProjectView}
         leading={
           <>
