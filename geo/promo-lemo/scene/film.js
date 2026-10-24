@@ -132,7 +132,7 @@
   // Real-system takes from two examples (user, 2026-10-24: "예제도 yilgarn예제와 PGI예제를 둘다써도되고 … 적합한것을 사용"):
   // `p` = 포천 자철석 광체 추정 (PGI example, capture-v3), `y` = Yilgarn 니켈 탐사 우선순위 (capture-v2). A take is shown whole at one
   // scale as a window inside the motion graphics (no zoom, no scroll inside it). `use` = shot seconds; tags = [shot t0, t1, beat, label].
-  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역', v: '예제 · Yilgarn 니켈 탐사 우선순위 구역' };
+  const EXAMPLE = { p: '예제 · 포천 자철석 광체 추정', y: '예제 · Yilgarn 니켈 탐사 우선순위 구역', v: '예제 · Yilgarn 니켈 탐사 우선순위 구역', g: '예제 실행 · 실제 AI agent 작업' };
   const shotInfo = (src, id) => CAP[src].shots.find(s => s.id === id);
   const BR = (src, id, k) => { const i = shotInfo(src, id); return i && i.beats && i.beats[k] ? i.beats[k].rect : null; };
   const UNION = (a, b) => (a && b ? { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x), height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y) } : a || b);
@@ -187,10 +187,11 @@
       c.a = tcur;
       for (const s of c.shots) {
         const info = shotInfo(s.src, s.id);
-        const full = info.frames / FPS;
+        const fps = info.fps || FPS, speed = s.speed || 1; // live takes may have their own frame rate and play sped up
+        const full = info.frames / fps;
         const [from, to] = s.use;
-        const play = Math.min(to, full) - from, hold = s.hold || 0; // hold: the last frame stays so the last outcome can be read
-        SEG.push({ src: s.src, shot: s.id, a: tcur, b: tcur + play + hold, play, skip: from, ch: ci, tags: s.tags });
+        const span = Math.min(to, full) - from, play = span / speed, hold = s.hold || 0; // hold: the last frame stays so the last outcome can be read
+        SEG.push({ src: s.src, shot: s.id, a: tcur, b: tcur + play + hold, play, span, speed, fps, skip: from, ch: ci, tags: s.tags });
         tcur += play + hold;
       }
       c.b = tcur;
@@ -713,6 +714,8 @@
     box.style.boxShadow = 'none';
     const chip = h('span', 'pill', layer);
     Object.assign(chip.style, { position: 'absolute', fontSize: '24px' });
+    const fast = h('span', 'pill accent', layer, '빠르게 보기');
+    Object.assign(fast.style, { position: 'absolute', fontSize: '24px' });
     const badge = h('span', 'badge', layer);
     const title = h('div', 'headline', layer);
     Object.assign(title.style, { whiteSpace: 'normal', wordBreak: 'keep-all', width: `${COL.w}px`, fontSize: '50px', lineHeight: '1.26' });
@@ -737,17 +740,17 @@
       let last = null;
       for (const [k, label] of sg.tags) {
         const beat = info.beats[k];
-        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + sg.play);
-        const ta = sg.a + (t0 - sg.skip) + (last ? 0 : lead);
-        const tb = t1 >= sg.skip + sg.play - 0.01 ? sg.b : sg.a + (t1 - sg.skip);
+        const t0 = Math.max(beat.t0, sg.skip), t1 = Math.min(beat.t1, sg.skip + sg.span);
+        const ta = sg.a + (t0 - sg.skip) / sg.speed + (last ? 0 : lead);
+        const tb = t1 >= sg.skip + sg.span - 0.01 ? sg.b : sg.a + (t1 - sg.skip) / sg.speed;
         if (tb <= ta + 0.3) continue;
         // box: from the frame the pointer enters the rect to the last frame it is inside (end of take covers the hold)
         let fIn = null, fOut = null;
-        for (let f = Math.ceil(t0 * FPS); f < Math.floor(t1 * FPS); f++) if (inside(ptr[f], beat.rect)) { if (fIn === null) fIn = f; fOut = f; }
+        for (let f = Math.ceil(t0 * sg.fps); f < Math.floor(t1 * sg.fps); f++) if (inside(ptr[f], beat.rect)) { if (fIn === null) fIn = f; fOut = f; }
         let box = null;
         if (fIn !== null) {
-          const ba = Math.max(ta, sg.a + (fIn / FPS - sg.skip) - 0.1);
-          const bb = fOut >= Math.floor(t1 * FPS) - 2 ? tb : Math.min(tb, sg.a + (fOut / FPS - sg.skip) + 0.35);
+          const ba = Math.max(ta, sg.a + (fIn / sg.fps - sg.skip) / sg.speed - 0.1);
+          const bb = fOut >= Math.floor(t1 * sg.fps) - 2 ? tb : Math.min(tb, sg.a + (fOut / sg.fps - sg.skip) / sg.speed + 0.35);
           if (bb - ba >= 0.8) box = { a: ba, b: bb };
         }
         const entry = { a: ta, b: tb, rect: beat.rect, label, box, same: !!last && last.label === label, prev: last, sg };
@@ -781,7 +784,7 @@
     ev(DEMO_END, 'collapse');
     const frameSrc = (sg, local) => {
       const info = shotInfo(sg.src, sg.shot);
-      const idx = clamp(Math.floor((sg.skip + Math.min(local, sg.play - 1 / FPS)) * FPS + 1e-6), 0, info.frames - 1);
+      const idx = clamp(Math.floor((sg.skip + Math.min(local, sg.play - 1 / FPS) * sg.speed) * sg.fps + 1e-6), 0, info.frames - 1);
       return `capture-${sg.src}/${info.pattern.replace('%05d', String(idx).padStart(5, '0'))}`;
     };
     const setImg = (img, src) => { if (img.dataset.src !== src) { img.dataset.src = src; img.src = src; pending.push(img.decode().catch(() => {})); } };
@@ -841,6 +844,8 @@
       const chipIn = prev && prev.src !== sg.src ? ramp(t, sg.a, sg.a + 0.3) : (gi === 0 ? ramp(t, c.a - 0.1, c.a + 0.2) : 1);
       const endOut = 1 - ramp(t, DEMO_END, DEMO_END + 0.25, lin);
       put(chip, { o: chipIn * endOut, y: 8 * (1 - chipIn) });
+      at(fast, TAKE.x + TAKE.w - fast.offsetWidth, TAKE.y - 58);
+      put(fast, { o: sg.speed > 1 ? ramp(t, sg.a, sg.a + 0.3, lin) * (1 - ramp(t, sg.a + sg.play - 0.2, sg.a + sg.play, lin)) : 0 });
       // left column: the old chapter leaves up as the next one is due, the new one rises in
       const hin = ci === 0 ? ramp(t, c.a - 0.3, c.a) : ramp(t, c.a, c.a + 0.35);
       const hout = next ? ramp(t, next.a - 0.3, next.a, lin) : ramp(t, DEMO_END, DEMO_END + 0.25, lin);

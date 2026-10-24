@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:21:34Z
+updated: 2026-10-24T05:22:28Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -63,6 +63,7 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
+Round 3 status: code done and saved (pv4 preview: 40 box windows checked, pointer inside the box in all but the y:N1 end, fixed by trimming to 4.8 s; -14.1 LUFS). Waiting for the live agent capture child to integrate AG takes as source `g` (render.py --capture-g, per-shot `speed`/`fps` supported, '빠르게 보기' chip), then final job, report round 3, finish.
 Round 3 (user feedback 2026-10-24, verbatim in Notes): (a) boxes follow the drawn pointer (tracks from frames, #14213d arrow;
 geo/promo-lemo/pointer_track.py) and appear only while the pointer is in the region; passive regions get no box; (b) fewer,
 slower outcomes (22 -> 15 rows, >= 3 s each), takes chosen for pointer engagement, mixing capture-v3 (PGI), capture-v2 and

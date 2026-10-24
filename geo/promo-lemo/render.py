@@ -189,6 +189,7 @@ def main():
     parser.add_argument("--capture", type=Path, required=True, help="PGI example takes (capture-v3)")
     parser.add_argument("--capture-y", type=Path, required=True, help="Yilgarn example takes (capture-v2)")
     parser.add_argument("--capture-v", type=Path, required=True, help="Yilgarn example takes (capture-v5)")
+    parser.add_argument("--capture-g", type=Path, help="live AI agent takes (capture-v6, optional)")
     parser.add_argument("--out", type=Path, default=Path(os.environ.get("TASK_OUTPUT_DIR", "")) or None)
     parser.add_argument("--stills-only", action="store_true")
     parser.add_argument("--times", help="comma-separated preview times instead of the standard stills")
@@ -203,6 +204,8 @@ def main():
     if video.exists() and not args.stills_only:
         raise FileExistsError("Use a new output directory")
     captures = {"p": args.capture.resolve(), "y": args.capture_y.resolve(), "v": args.capture_v.resolve()}
+    if args.capture_g:
+        captures["g"] = args.capture_g.resolve()
     take = prepare(out / "web", captures)
 
     import imageio_ffmpeg
