@@ -335,7 +335,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   emoji, brand @font-face); accepted debt lives in `geo/ui/ui-baseline.json`, added only with the reason in the report.
   UI quality kit (gaid-ui-quality-kit): the development-only 부품 상태 견본 page `/dev/parts` (`web/src/geo/dev/parts-page.tsx`,
   shared parts pinned in every state with `data-preview`, live token contrast table; 404 in production unless
-  `GAID_DEV_PAGES=1`) and `geo/ui/quality/run.mjs` (own package + lock, installed only by `scripts/check`): shadcn lint
+  `GAID_DEV_PAGES=1` at build time: `page.dev.tsx` + dev-only `pageExtensions` in `web/next.config.ts`) and `geo/ui/quality/run.mjs` (own package + lock, installed only by `scripts/check`): shadcn lint
   (`@shadcn/lint`), impeccable detect (telemetry off), Playwright screenshots of 계측/도폭 × light/dark at 1440×900 against
   `geo/ui/quality/baseline/` and axe-core, each finding mapped to a guide id (`geo/ui/ui-rules.json` `quality`). Report-only
   until `quality.switchRule` is met (then `quality.modes.<tool>` = `block`, accepted debt in `ui-baseline.json` `quality`).

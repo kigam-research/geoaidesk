@@ -109,7 +109,7 @@ impeccable과 axe가 같은 다섯 곳을 서로 독립적으로 찾았습니다
 - 과학적 검증: 해당 없음(화면 점검 도구).
 - 화면 검증: 견본 화면을 네 조합 1440×900으로 찍어 눈으로 확인했고, 1280×800 네 조합에서 잘리는 곳이 없음을 확인했습니다. 대비 표의 파란 버튼 글자 값(5.1:1, 5.0:1)이 가이드의 계산값과 같습니다.
 - 점검 도구 검증: 같은 PC에서 두 번 연달아 돌려 화면 차이 0, 검사기 결과가 같았습니다. 다른 PC에서는 돌리지 않았습니다(미확인). 운영 서버가 견본 화면에 "찾을 수 없음"으로 답하는지는 운영 점검에 시험으로 넣어 전체 점검에서 확인했습니다.
-- 소프트웨어 검증: {CHECK}
+- 소프트웨어 검증: 전체 점검을 PC74에서 단계별로 확인했습니다. 백엔드 시험 2297개 통과(8개는 원래 건너뜀), 프런트엔드 시험 1289개 통과, 배포 점검 58개 통과, 문구·UI 검사 오류 0, 환경 점검 통과, 운영 점검 통과(견본 화면 404 포함), UI 점검 묶음 실행. 백엔드 단계는 다른 작업이 PC를 크게 쓰는 동안 시험 프로세스 하나가 예기치 않게 끝나 한 번에 통과하지 못했고, 시험 자체의 실패는 없었습니다. 작업을 마칠 때 전체 점검을 한 번 더 돌립니다.
 
 ## 5. 한계
 
@@ -127,10 +127,11 @@ impeccable과 axe가 같은 다섯 곳을 서로 독립적으로 찾았습니다
 
 ## 7. 대체되었거나 실패한 시도
 
-<details><summary>펼치기 — 3건</summary>
+<details><summary>펼치기 — 4건</summary>
 
 - 위험 버튼 누름 색을 처음에는 채움을 더 옅게(80%) 만들었습니다. 두 검사기가 흰 글자 대비가 3.6:1로 떨어진다고 알렸고, 짙은 빨강 토큰으로 바꿨습니다.
 - impeccable의 실제 화면 검사를 처음에는 브라우저를 직접 띄우게 했는데, Ubuntu 24.04의 보안 설정이 그 브라우저를 막았습니다. Playwright가 띄운 브라우저에 붙어 검사하도록 바꿨고, 이렇게 하면 네 조합을 모두 검사할 수 있습니다.
+- 견본 화면을 처음에는 운영에서 요청마다 "찾을 수 없음"을 그리게 했습니다. 운영 점검에 넣은 시험이 그 응답의 상태 코드가 404가 아니라 200임을 잡았습니다. 그래서 운영 빌드에는 그 화면 파일이 아예 들어가지 않도록 바꿨고, 운영 서버가 404로 답하는 것을 확인했습니다.
 - 화면 비교에 논문에서 Workflow 만들기 시안 화면도 넣으려 했으나, 그 화면은 GAID 토큰 대신 자체 스타일을 쓰는 따로 떨어진 시안이라 뺐습니다.
 
 </details>
@@ -145,7 +146,7 @@ impeccable과 axe가 같은 다섯 곳을 서로 독립적으로 찾았습니다
 
 | 항목 | 위치 |
 |---|---|
-| 견본 화면 | `web/src/geo/dev/parts-page.tsx`, 경로 `/dev/parts` (`web/src/app/dev/parts/page.tsx`; 운영에서는 `GAID_DEV_PAGES=1`일 때만), 문구 `web/src/geo/locales/devParts/` |
+| 견본 화면 | `web/src/geo/dev/parts-page.tsx`, 경로 `/dev/parts` (`web/src/app/dev/parts/page.dev.tsx`; 페이지 확장자 `dev.tsx`는 `next dev`나 `GAID_DEV_PAGES=1`로 만든 빌드에만 있음, `web/next.config.ts`), 문구 `web/src/geo/locales/devParts/` |
 | 토큰·버튼·아이콘 | `web/src/app/globals.css` (`--gaid-on-signal`, `--gaid-press`, `--gaid-danger-press`, data-preview 변형), `web/src/components/ui/button.tsx`, `web/src/components/tool-activity.tsx` (`ScrollTextIcon`), `web/src/geo/shell/sidebar.tsx` (`preview`) |
 | 점검 묶음 | `geo/ui/quality/` (`run.mjs`, `shadcn-lint.config.mjs`, `playwright.config.mjs`, `pages.spec.mjs`, 기준 화면 `baseline/`), 설정과 규칙 대응표·전환 규칙 `geo/ui/ui-rules.json` `quality`, 받아들인 부채 `geo/ui/ui-baseline.json` `quality` |
 | 실행 | `cd geo/ui/quality && npm ci`, `node geo/ui/quality/run.mjs [--only shadcnLint,impeccable,visual,axe] [--update-baseline] [--out <dir>]`; 전체 점검 `scripts/check`의 마지막 단계 |
@@ -155,6 +156,6 @@ impeccable과 axe가 같은 다섯 곳을 서로 독립적으로 찾았습니다
 | 전체 점검 기록 | `pc74:~/data/geoaidesk/work/gaid-ui-quality-kit/check.log` |
 | 라이선스 | `THIRD_PARTY_NOTICES.md` "UI quality kit" |
 
-작성 시점: 2026-10-24, commit {SHA}.
+작성 시점: 2026-10-24, commit b434ae0f (작업 브랜치).
 
 </details>

@@ -1047,16 +1047,22 @@
       "responsibility": "UI guide V2: a skill call row shows ScrollTextIcon instead of WandSparklesIcon; the reasoning disclosure drops BrainIcon"
     },
     {
-      "path": "web/src/app/dev/parts/page.tsx",
+      "path": "web/src/app/dev/parts/page.dev.tsx",
       "owner": "gaid-ui-quality-kit",
       "status": "added",
-      "responsibility": "Development parts page route (web/src/geo/dev/parts-page.tsx); 404 in production unless GAID_DEV_PAGES=1"
+      "responsibility": "Development parts page route (web/src/geo/dev/parts-page.tsx); the dev.tsx page extension exists only in next dev or a GAID_DEV_PAGES=1 build, so production has no such route (404)"
     },
     {
       "path": "scripts/check",
       "owner": "gaid-ui-quality-kit",
       "status": "edited",
       "responsibility": "Appends the report-only UI quality kit step (geo/ui/quality/run.mjs)"
+    },
+    {
+      "path": "web/next.config.ts",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Config as a phase function: pageExtensions add dev.tsx only for the development server or GAID_DEV_PAGES=1 builds (development pages such as /dev/parts); everything else unchanged"
     }
   ],
   "notTouched": [

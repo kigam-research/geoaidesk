@@ -3,7 +3,7 @@
  * Development parts page (/dev/parts, gaid-ui-quality-kit): the shared parts pinned in every state on one screen, plus a
  * contrast table computed from the live tokens. The UI quality check (geo/ui/quality/) screenshots it in 계측/도폭 × light/dark
  * at 1440×900 and runs axe on it. States are pinned with data-preview (shadcn skill preview states, globals.css), so the
- * page needs no pointer. The route answers 404 in production unless GAID_DEV_PAGES=1 (web/src/app/dev/parts/page.tsx).
+ * page needs no pointer. The route exists only in `next dev` or a GAID_DEV_PAGES=1 build (web/src/app/dev/parts/page.dev.tsx).
  */
 import { CheckIcon, FolderIcon, LoaderIcon, TriangleAlertIcon, XIcon } from "lucide-react";
 import { useTheme } from "next-themes";

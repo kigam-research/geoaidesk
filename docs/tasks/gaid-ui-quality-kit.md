@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:20:21Z
+updated: 2026-10-24T02:51:45Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8903c027-bae6-4d62-be5f-363a50e7cd24","pid":1209415,"provider":"claude","session":"75265567-6398-46a1-800a-916e466ecb73","start":"69452397","token":"e8629b2b35ed6c90a1d8703ce6bad2bc0e6d8d0733cee71031a1026cfc73221f"}
 branch: task/gaid-ui-quality-kit
 target: main
@@ -49,7 +49,15 @@ Mockups (code-built from the real tokens/components, no generated images) and th
 (branch task/gaid-uiux-skills-scan until integrated). Lesson to keep: no generated imagery; the current system is the visual authority.
 
 ## Current state
-Implemented (2026-10-24), not yet integrated:
+Result for the requester (scenario D, UI quality kit): done on the task branch. The development-only 부품 상태 견본 page
+`/dev/parts` (absent from production builds), the report-only UI quality kit in scripts/check (shadcn lint, impeccable
+detect with telemetry off, Playwright screenshots of 계측/도폭 × light/dark at 1440×900 against baselines, axe-core; every
+finding mapped to a UI guide id; switch rule to blocking in geo/ui/ui-rules.json quality.switchRule), `--gaid-on-signal`
+(S1) and pressed fills for every Button variant (S7), tool-activity icons fixed (V2). First kit run: 5 pre-existing S4
+contrast issues in shared parts plus the Button focus ring vs S7, left for the user's decision (open item). Report:
+reports/2026-10-24-gaid-ui-quality-kit/index.md. Scenario A and C units can start after this one integrates.
+
+Details (2026-10-24):
 - P1: `--gaid-on-signal` (+ `--gaid-press`, `--gaid-danger-press`) in globals.css, shadcn preview-state variants;
   Button pressed fills per variant; tool-activity skill row ScrollTextIcon, reasoning without BrainIcon; guide S1/S7 text.
 - P2: `/dev/parts` page (web/src/geo/dev/parts-page.tsx, locale devParts), 404 in production (assert in production-smoke).
@@ -57,23 +65,38 @@ Implemented (2026-10-24), not yet integrated:
   (modes report, switchRule, guide maps); baselines in geo/ui/quality/baseline/; scripts/check last step.
 - Kit run on PC74 twice: visual 0 diffs on the second run; impeccable/axe find 5 pre-existing S4 issues in shared parts
   (link button text-primary, primary hover /90, tabs inactive, sidebar count on hover, mapsheet-dark placeholder).
-- Report draft: reports/2026-10-24-gaid-ui-quality-kit/index.md (placeholders {LINT} {IMP} {AXE} {CHECK} {RUNS} {SHA}).
+- Report: reports/2026-10-24-gaid-ui-quality-kit/index.md (complete).
+- Checks by step on PC74 (2026-10-24): backend 2297 passed/8 skipped (one vitest worker exit under load), frontend
+  1289 passed, geo 58 pass, copy/ui 0 errors, environments, launcher, production smoke PASS (incl. /dev/parts 404), kit ran.
 Re-verify: `cd geo/ui/quality && npm ci && cd ../../.. && node geo/ui/quality/run.mjs --out /tmp/x` (report-only, ~1 min).
 
 ## Next steps
-1. After scripts/check (log ~/data/geoaidesk/work/gaid-ui-quality-kit/check.log) finishes: rerun the kit with
-   --update-baseline (the page gained activity rows), make figures, fill the report placeholders, humanizer, review-copy.
-2. task save (name new paths), task sync with main, task finish.
+1. task review-copy of the report, task save, task finish (finish reruns scripts/check).
 
 ## Failed approaches
+- First full scripts/check (check-1.log, 2026-10-24): backend sandbox-upload.test.ts failed 8 tests with "Cannot find
+  module 'abstract-logging' / 'light-my-request'" while the kit and a dev server ran in parallel (import phase 312 s);
+  the file passes alone (8/8) and the modules exist. Likely cause: `task sync` (started 11:20) ran its own scripts/check
+  in this worktree at the same time, so its `npm ci` replaced server/node_modules under the running tests. Do not run a
+  manual scripts/check while task sync/finish runs one. Server code is untouched by this unit.
+- Second full run (check.log): backend 2297 passed / 8 skipped, 0 failed, but "Worker exited unexpectedly" (vitest fork)
+  → exit 1. PC74 load average ~30/32 threads from other units (ffmpeg, chrome). Remaining steps run separately
+  (check-rest.log); task finish reruns scripts/check.
+- check-rest.log: frontend 1289/1289 passed, launcher --check passed, geo distribution test failed: the new seam owner
+  gaid-ui-quality-kit was missing from the owners allowlist in geo/tests/distribution.test.mjs (fixed; 58 pass, 0 fail).
+- check-tail.log: copy 0 errors, check-ui 0 errors, environments smoke passed, launcher passed; production smoke failed
+  on the new assertion: /dev/parts answered 200 (a dynamic notFound() renders the 404 page with status 200 here).
+  Fixed with page.dev.tsx + dev-only pageExtensions; fresh next start answers 404, next dev serves the page (kit-run3,
+  visual 0 diffs). Leftover manual next servers (mine) were killed; earlier "still 200" was a stale server.
 ## Notes and decisions
 Orchestration (2026-10-24):
 - Sequential decisions: route `/dev/parts` (Next app route, dev-only: 404 unless `NODE_ENV!=production` or
-  `GAID_DEV_PAGES=1` at request time); combos set through localStorage `gaid:style` + next-themes `theme` before load.
+  `GAID_DEV_PAGES=1` at request time; changed: `page.dev.tsx` + dev-only pageExtensions in web/next.config.ts, because
+  a dynamic notFound() answered 200 in production); combos set through localStorage `gaid:style` + next-themes `theme` before load.
 - Packages, all done by this writer (tightly coupled; the tooling is tuned against the page):
   P1 app fixes: `--on-signal` token in globals.css (shadcn `--primary-foreground` maps onto it), data-preview custom
   variants (shadcn skill preview-states, MIT), Button pressed style, tool-activity icons (V2), guide S1/S7 text.
-  P2 parts page: `web/src/geo/dev/` specimen (+ locale namespace) and `web/src/app/dev/parts/page.tsx`.
+  P2 parts page: `web/src/geo/dev/` specimen (+ locale namespace) and `web/src/app/dev/parts/page.dev.tsx`.
   P3 tooling: `geo/ui/quality/` own package + lock (not in web/: researchers' installs stay unchanged): shadcn lint
   config with rule → guide id map, impeccable detect (DO_NOT_TRACK=1, IMPECCABLE_NO_TELEMETRY=1), Playwright 1.63.0
   (matches the cached chromium-1243) screenshots of 4 combos at 1440×900 against baselines + axe-core; one report-only
