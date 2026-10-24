@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:20:37Z
+updated: 2026-10-24T02:54:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"41dbea06-326f-4f1c-b1e0-05cf1380bd4f","pid":1132461,"provider":"claude","session":"7898f15a-75bb-457c-98ce-bcd12e76095b","start":"69414348","token":"33e8cf317ab33bac9151faf65006114ce8fd8a1b39690d843d61a72029a0e651"}
 branch: task/gaid-note-bundle-export
 target: main
@@ -46,7 +46,10 @@ Features 1 and 2 implemented (not yet screenshotted or fully checked):
    6f438c48-ca8f-43cb-a763-3e2c3f4e1f5d, worktree ~/worktrees/geoaidesk/gaid-note-bundle-export--notebook-links,
    prompt ~/data/geoaidesk/work/gaid-note-bundle-export/child-notebook-links.md); on its finish run
    `task complete gaid-note-bundle-export--notebook-links`, then mount `ProjectNotebookLink` in research-notes-panel.tsx.
-2. After the child: mount ProjectNotebookLink, AGENTS.md + docs/geo/research-notes.md, screenshots (both styles, both
+2. Trial app running: systemd unit gaid-note-bundle-export-app (ports 13620/18620, GAID_HOME
+   ~/data/geoaidesk/work/gaid-note-bundle-export/home, seeded project proj-df9fb8 via seed.sh; nav.sh/shots.sh there;
+   24 export shots in shots/). Stop it before finish.
+3. After the child: mount ProjectNotebookLink as a second line under the notes list summary (keeps B4), AGENTS.md + docs/geo/research-notes.md, screenshots (both styles, both
    themes, 1440×900 and 1280×800), report `reports/2026-10-24-gaid-note-bundle-export/index.md`, scripts/check, finish.
 ## Failed approaches
 ## Notes and decisions
