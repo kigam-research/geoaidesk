@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:10:47Z
+updated: 2026-10-24T05:12:57Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
@@ -65,11 +65,17 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - If something needs the user (credentials, a decision), write it as an open item in your task document and finish; do not block.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Resumed in the assigned worktree. Review app is accessible on loopback without a token gate. Deployed checkout HEAD reads 4e198c762b9bde20ca23b1f3223243fb2af16ab0.
+- No app/model/service settings changed. Inspector Chrome was closed before starting the capture browser.
 ## Next steps
-1. (the next session's first action)
+1. Benchmark live capture cadence, stage the installed example Workflow, then record one complete run.
+2. Verify frame timing, pointer containment, figures and cut provenance; deliver external payload and finish.
 ## Failed approaches
 ## Notes and decisions
+- Sequential decisions: validate capture throughput before starting any model work; select the faster installed example with complete methodology; record continuously, then export and verify.
+- Owned files: geo/promo-lemo/capture/ and this task document. No independent worker package is needed for this tightly coupled browser session.
+- No automated app checks are planned because app code is unchanged; capture syntax, artifact/timing checks and visual inspection are the declared checks.
+
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
