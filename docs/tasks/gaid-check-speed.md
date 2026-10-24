@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T12:18:12Z
+updated: 2026-10-24T13:03:56Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"4b8e0e17-3fea-48d0-b063-69304df1ad95","pid":2429809,"provider":"claude","session":"63970a14-62e0-4041-afb8-314c6e8a5445","start":"73218387","token":"a2a1e3d206cb0ff8ffa8126fa33175459610479150f50ccbaef399569abbec08"}
 branch: task/gaid-check-speed
 target: main
@@ -38,9 +38,35 @@ Source: backbone reports/2026-10-24-worktree-workflow-review/index.md §3.4 and 
 ## Current state
 (what is done, how it was verified, safe commands to re-verify)
 ## Next steps
-1. (the next session's first action)
+1. Baseline check runs as systemd user unit `gaid-check-speed-base1` (log ~/data/geoaidesk/work/gaid-check-speed/baseline1.log,
+   stage summary at its end). When it ends, record the stage times, then apply the prepared changes
+   (scripts/npm-ci-locked.mjs, parallel server vitest with per-worker dirs) and measure again.
 ## Failed approaches
 ## Notes and decisions
+- Plan (sequential, done by this writer; small and tightly coupled, no child units): 1) stage markers in scripts/check
+  (`task-stage: <name>` + an exit summary of stage seconds, since `task check-times` is not rolled out on PC74 yet);
+  2) baseline run; 3) changes to the slow stages; 4) same measurement after. Owned files: scripts/check,
+  scripts/npm-ci-locked.mjs, server/vitest.config.ts, server/test/setup-worker-dirs.ts, web vitest settings if needed.
+- Past logs (PC74 `~/.local/state/backbone/check-logs/beb99bb9d216ecd9`, 142 failed logs kept, passing logs are deleted):
+  last stage of a failed run: Frontend tests 52, Backend tests 45, distribution checks 24, production smoke 7, other 14.
+  The most frequent failing tests are load timeouts (`Test timed out in 5000ms`, `Unable to find role=...` after
+  waitFor's 1 s): map viewer GPKG paging (20), file-preview draft retention (26), CSV pagination (11+7), settings
+  Modal credentials (10). Backend vitest took 324–638 s in those logs (fully serial, `fileParallelism: false`; about
+  half is module import), frontend vitest 28–72 s (default workers = all CPUs but one).
+  Failed distribution checks are almost all `integration boundaries list existing seams with an owner` (23): a
+  writer edited an upstream file without adding it to geo/integration-boundaries.json, a real failure, not a flake.
+- Baseline 1 (scripts/check of main 901f1b76 + markers, PC74, load 45-78, log
+  ~/data/geoaidesk/work/gaid-check-speed/baseline1.log): server-install 45 s, helper-env 1 s, server-typecheck 27 s,
+  server-unit 571 s (vitest 563 s; 211 files passed, 1 skipped; 2324 tests passed, 8 skipped), web-install 27 s, web-unit
+  68 s (31 default workers; failed: 5 of 1341 tests, all load timeouts — file-preview draft, settings Modal credentials,
+  workflows-locale, map viewer x2). The run stopped there (exit 1), so the later stages are measured separately
+  (baseline-tail.sh, same commands).
+- Experiments: server vitest with --maxWorkers=8 and per-worker dirs: 114 s, same counts, exit 0 (load ~50). Web vitest
+  --maxWorkers=8: 115 s (slower than 31 workers), 1 failure (settings Modal credentials, findByText after 1 s).
+  Decision: keep TASK_CHECK_JOBS (default 8) for web too (standard: never all CPUs) and raise the web async wait to 5 s
+  and the test timeout to 20 s, which removes the load timeouts without dropping tests.
+- Found: scripts/check's `npm ci` deletes `node_modules/.launcher-ci-stamp`, so the production smoke's first
+  `start-gaid` start runs `npm ci` again for server and web. One stamp shared by scripts/check and start.mjs fixes both.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)

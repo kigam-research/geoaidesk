@@ -1,6 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, vi } from "vitest";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
+
+// GeoAIDesk (gaid-check-speed): findBy*/waitFor wait up to 5 s instead of 1 s. The declared check shares the PC with
+// other checks and jobs; under that load lazy panels and editors took longer than 1 s to appear and unrelated tests
+// failed (PC74 check logs, 2026-10-10..24). Passing tests still finish as soon as the element appears.
+configure({ asyncUtilTimeout: 5000 });
 
 afterEach(() => {
   cleanup();
