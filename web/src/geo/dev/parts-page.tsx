@@ -230,7 +230,7 @@ export function DevPartsPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-gaid-face text-gaid-ink">
       <GaidAppBar
-        place="projects"
+        place="workspace"
         leading={<Badge variant="outline">{text("badge")}</Badge>}
         onOpenSettings={() => {}}
       />

@@ -73,9 +73,11 @@ function usedLine(row: LibraryItemSummary): string {
 
 export interface LibraryScreenProps {
   onOpenProject: (projectId: string) => void;
+  /** Item to select when the screen opens (`#library/<itemId>`, `openLibrary({ itemId })`). */
+  initialItemId?: string | null;
 }
 
-export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
+export function LibraryScreen({ onOpenProject, initialItemId = null }: LibraryScreenProps) {
   // A research note opens in its project's notebook tab (the workspace takes the request after the switch).
   const openNote = useCallback((projectId: string, noteId: string) => {
     requestOpenResearchNote({ projectId, noteId });
@@ -96,7 +98,10 @@ export function LibraryScreen({ onOpenProject }: LibraryScreenProps) {
   const [filter, setFilter] = useState<Filter>("all");
   const [data, setData] = useState<LibraryListResponse | null>(null);
   const [error, setError] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(initialItemId);
+  useEffect(() => {
+    if (initialItemId) setSelected(initialItemId);
+  }, [initialItemId]);
   // The paper whose PDF is open in the pane; it only shows while that paper is the selected one.
   const [pdf, setPdf] = useState<{ id: string; title: string } | null>(null);
   // After the pane closes, that paper's "PDF 열기" button takes focus back (A2).
@@ -392,7 +397,7 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
 
   const openUse = (use: LibraryUse) => {
     if (use.kind === "workflow" && use.projectId) onOpenProject(use.projectId);
-    else if (use.kind === "workflow" && use.authoringId) window.location.hash = `#hub/${use.authoringId}`;
+    else if (use.kind === "workflow" && use.authoringId) window.location.hash = `#connect/${use.authoringId}`;
     // A note whose project is on another PC opens as its library item; a local note opens in its project.
     else if (use.kind === "note") { if (use.remote && use.libraryItemId) onSelect(use.libraryItemId); else onOpenNote(use.projectId, use.noteId); }
     else if (use.kind === "project") onOpenProject(use.projectId);
@@ -438,7 +443,7 @@ function ItemDetail({ id, collections, zoteroConnected, focusPdf, onPdfFocused, 
       }
       const { authoringId } = await startWorkflowFromItem(item.id);
       toast.success(L("detail.workflowStarted"));
-      window.location.hash = `#hub/${authoringId}`;
+      window.location.hash = `#connect/${authoringId}`;
     } catch {
       toast.error(L("detail.workflowNeedsPdf"));
     } finally {

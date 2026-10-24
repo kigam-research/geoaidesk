@@ -113,7 +113,7 @@ function EnableSkills({ value, projectId, onEnabled }: { value: WorkflowReadines
         ? <details><summary className="cursor-pointer">{t("workspace.skills.hubInstall", { revision: skill.hub!.revision })}</summary>
           <div className="mt-2"><HubSkillInstall skillId={skill.hub!.skillId} revision={skill.hub!.revision} projectId={projectId} onInstalled={() => void onEnabled()} /></div>
         </details>
-        : <a className="underline" href={`#hub/s/${encodeURIComponent(skill.hub!.skillId)}`}>{t("workflowView.hubOpen")}</a>}
+        : <a className="underline" href={`#connect/s/${encodeURIComponent(skill.hub!.skillId)}`}>{t("workflowView.hubOpen")}</a>}
     </div>)}
     {error && <div role="alert" className="space-y-1"><p className="text-destructive">{t("workspace.skills.error")}</p><TechnicalDetail detail={error} /></div>}
   </div>;
