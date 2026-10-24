@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T06:40:21Z
+updated: 2026-10-24T06:43:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -28,11 +28,13 @@ Rules: follow AGENTS.md of your worktree (UI guide v2 sections 1, 2, 10 before U
 Evidence: run the relevant checks (cd server && npm run typecheck && npm test -- <your tests>; cd web && npx tsc --noEmit && npm test -- <your tests>; node geo/copy/validate-copy.mjs web/src/geo/locales; node geo/ui/check-ui.mjs). Full scripts/check is run by the parent after integration; you may run it if time allows. Record in your task document what you changed and the check results, then task finish.
 
 ## Current state
-Implementation in progress. Existing GET /geo/library?filter=project already expands attached folders and descendants; no server route needed. Citation frequency is omitted because summary counts are global, not project-specific.
+Implementation and scoped tests complete; visual checks next. Existing GET /geo/library?filter=project already expands attached folders and descendants; no server route needed. Citation frequency is omitted because summary counts are global, not project-specific.
 ## Next steps
-1. Implement and test the project library panel, then convert the source picker to a responsive side panel.
+1. Capture the implemented panels in the browser, inspect both sizes, then review the final diff.
 2. Capture both panels in Korean across both styles/themes and two desktop sizes; run scoped checks, then finish.
 ## Failed approaches
+- Initial tsc invocation found no dependencies (no node_modules). Installed pinned dependencies with npm ci via recorded job -1, exit 0. Initial job run refused dirty source before starting; saved then ran the recorded install.
+- First picker test exposed a missing space in the segmented control accessible name; added an explicit separator. Recheck passed.
 ## Notes and decisions
 - Sequential plan: reuse the library API and PDF state; build the project panel; integrate the right-pane switch; convert the authoring picker; test and capture. No independent writer package remains within this child unit. Owned interfaces: panel PDF callback, listLibrary optional projectId, unchanged picker onAdd contract.
 - Minimal additional seams: library/api.ts adds explicit project scope; citation-pdf.tsx opens stored PDFs by item (including papers without a citation key); workspace-persistence.ts retains the new library view.
@@ -40,6 +42,9 @@ Implementation in progress. Existing GET /geo/library?filter=project already exp
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
+- Checks: web npx tsc --noEmit passed; web scoped component/PDF/persistence suite 29/29 passed; server npm run typecheck passed; geo-library and geo-library-folders 13/13 passed. Copy validator: 0 errors, 101 existing warnings; UI validator: 0 errors, 78 accepted debt.
+- Screenshot plan: temporary dev-only harness renders the implemented components on the approved static context, with browser-intercepted library API fixtures. No user data, review app, or hub server is touched.
+
 ## Open items
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
@@ -51,6 +56,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-ia-connect-workspace--library-panels-20261024T064045.938876Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

@@ -54,6 +54,7 @@ export function ProjectLibraryPanel({ projectId, selectedId, citedPage, onOpenPd
           if (current !== request.current) return;
           setRows((old) => offset ? [...old, ...res.items] : res.items);
           setTotal(res.total);
+          setError(undefined);
         })
         .catch(() => { if (current === request.current) setError(text("panel.failed")); })
         .finally(() => { if (current === request.current) setLoading(false); });

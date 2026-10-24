@@ -78,7 +78,7 @@ export function LibrarySourcePicker({
     setChosen([]);
     listLibrary({ limit: 500 })
       .then((res) => active && setRows(res.items))
-      .catch((e) => active && setError(text("library.failed")));
+      .catch(() => active && setError(text("library.failed")));
     return () => {
       active = false;
     };
@@ -127,7 +127,7 @@ export function LibrarySourcePicker({
                 onClick={() => setCategory(c)}
                 className={segItem(category === c, "flex-1 justify-center gap-2")}
               >
-                {text(c === "paper" ? "library.papers" : "library.notes")}
+                {text(c === "paper" ? "library.papers" : "library.notes")} {" "}
                 <span className="tabular-nums text-gaid-ink-3">{counts[c]}</span>
               </button>
             ))}
@@ -191,7 +191,7 @@ export function LibrarySourcePicker({
               try {
                 await onAdd(chosen);
                 onOpenChange(false);
-              } catch (e) {
+              } catch {
                 setError(text("library.addFailed"));
               } finally {
                 setBusy(false);
