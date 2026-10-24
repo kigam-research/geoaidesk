@@ -1078,7 +1078,7 @@
     },
     {
       "path": "web/src/app/page.tsx, web/src/components/chat-tabs-bar.tsx, web/src/lib/workspace-persistence.ts, web/src/lib/workspace-persistence.test.ts",
-      "owner": "gaid-ia-connect-workspace--library-panels",
+      "owner": "gaid-ia-connect-workspace",
       "status": "edited",
       "responsibility": "Project library inspector, explicit switch beside Workflows, and persistence of its library view."
     }

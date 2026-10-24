@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T06:49:29Z
+status: active
+updated: 2026-10-24T07:01:27Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -34,13 +34,14 @@ Existing GET /geo/library?filter=project expands attached folders and descendant
 
 Scoped verification: web component/PDF/persistence tests 30/30; server library/folder tests 13/13; both typechecks; copy validator 0 errors (101 existing warnings); UI validator 0 errors (78 existing accepted debt). Korean screenshots cover both panels × both styles × both themes at 1440×900 and 1280×800 (16), plus 1100×800 instrument/light (2). Screenshots use the implemented components with intercepted sample API replies over the approved static surrounding context, not a live researcher project. No browser console errors in the final session. No user data, review app or hub server was touched.
 
-Code is on this child branch; parent integration and its full scripts/check remain separate. No deployment is part of this unit.
+Code is on this child branch; parent integration remains separate. First automatic scripts/check: backend 2323 passed/8 skipped, frontend 1346 passed; distribution checks rejected the child seam owner. Corrected it to the existing parent package; distribution test 7/7 now passes. Retrying task finish in place for the remaining full-check stages. No deployment is part of this unit.
 
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-24T06:49:29Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- First task finish automatically ran scripts/check. Backend 2323 passed/8 skipped and frontend 1346 passed; distribution checks rejected the child task name as a seam owner. Corrected the owner to the existing registered parent package (no test allowlist expansion). Re-verified the distribution test directly before retry. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-b0xw5j7p.log.
 - Initial tsc invocation found no dependencies (no node_modules). Installed pinned dependencies with npm ci via recorded job -1, exit 0. Initial job run refused dirty source before starting; saved then ran the recorded install.
 - Initial screenshot attempt on 127.0.0.1 could not hydrate because Next dev blocked the HMR origin; used localhost (no product configuration change).
 - First picker test exposed a missing space in the segmented control accessible name; added an explicit separator. Recheck passed.
