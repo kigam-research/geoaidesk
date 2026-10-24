@@ -1,56 +1,56 @@
 {
   "nav": {
-    "projects": "My research",
-    "hub": "GAID hub",
+    "projects": "Workspace",
+    "hub": "Connect",
     "label": "GAID screens"
   },
   "sidebar": {
-    "hide": "Hide hub sections",
-    "show": "Show hub sections"
+    "hide": "Hide Connect sections",
+    "show": "Show Connect sections"
   },
   "entry": {
-    "title": "GAID hub",
-    "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
-    "open": "Open GAID hub"
+    "title": "GAID Connect",
+    "body": "Use analysis Workflows other researchers shared with your own data, or make a new Workflow from your paper or code.",
+    "open": "Open Connect"
   },
   "home": {
-    "title": "GAID hub",
-    "body": "Use analysis Workflows other researchers registered with your own data, or make a new Workflow from your paper or code.",
+    "title": "GAID Connect",
+    "body": "Use analysis Workflows other researchers shared with your own data, or make a new Workflow from your paper or code.",
     "new": "Make a Workflow",
     "empty": "No Workflows yet. Upload a paper PDF or code to start.",
     "loading": "Reading the list.",
     "error": "Could not read the list. Open it again in a moment.",
     "updated": "Updated {when}",
     "open": "Open {title}",
-    "back": "Hub list",
+    "back": "Connect list",
     "recommended": "Recommended analysis Workflows",
     "catalogue": "Built-in Workflow",
     "shared": "Shared",
-    "mine": "Workflows I made (drafts and registered)",
+    "mine": "Workflows I made (drafts and shared)",
     "folders": "Folders",
     "newFolder": "New folder",
     "allFolders": "All",
-    "registered": "Hub registration version {version}",
-    "catalogueHint": "{title} is a catalogue Workflow. Start it from the Workflow panel of a research project.",
+    "registered": "Shared · version {version}",
+    "catalogueHint": "{title} is a catalogue Workflow. Start it from a Workspace project’s Workflow panel.",
     "browse": {
-      "title": "Workflows registered in the hub",
+      "title": "Shared Workflows",
       "tabs": "Workflow lists",
       "all": "All",
-      "folders": "Registered Workflow topic folders",
+      "folders": "Shared Workflow topic folders",
       "search": {
-        "label": "Search registered Workflows",
+        "label": "Search shared Workflows",
         "placeholder": "Search title, tagline, author or taxonomy",
         "hint": "You can also search by element symbol (Ni) or Workflow name (PU)."
       },
-      "order": "Most stars · Newest registration",
+      "order": "Most stars · Recently shared",
       "count": "{count} Workflows",
-      "loading": "Reading registered Workflows.",
-      "error": "Could not read registered Workflows. Reload the list.",
+      "loading": "Reading shared Workflows.",
+      "error": "Could not read shared Workflows. Reload the list.",
       "retry": {
         "button": "Reload list"
       },
       "noResults": "No Workflows match. Change the search term or folder.",
-      "empty": "No Workflows are registered. Browse the recommended analysis Workflows.",
+      "empty": "No Workflows are shared. Browse the recommended analysis Workflows.",
       "reset": {
         "button": "View all Workflows"
       },
@@ -62,7 +62,7 @@
     },
     "route": {
       "use": {
-        "title": "Use a registered Workflow",
+        "title": "Use a shared Workflow",
         "body": "Pick a Workflow, install it in your project and start it with your data.",
         "button": "Browse Workflows"
       },
@@ -73,7 +73,7 @@
     },
     "glossary": {
       "button": "Show terms",
-      "title": "Words used in the hub",
+      "title": "Words used in Connect",
       "skill": {
         "term": "Skill",
         "text": "Instructions and tools used by a Workflow: built-in skills, skills imported from GitHub or other sources, and skills included with a Workflow."
@@ -88,11 +88,11 @@
       },
       "draft": {
         "term": "Draft",
-        "text": "A Workflow not yet registered in the hub. It does not appear in other researchers' hub lists."
+        "text": "A Workflow not yet shared on Connect. It does not appear in other researchers’ Connect lists."
       },
       "revision": {
         "term": "version",
-        "text": "A registered Workflow starts at version 0.1.0. For updates, its registrant chooses patch, minor or major. Version 1.0.0 is the main release."
+        "text": "A shared Workflow starts at version 0.1.0. For updates, the researcher who shared it chooses patch, minor or major. Version 1.0.0 is the main release."
       },
       "trial": {
         "term": "Trial",
@@ -101,10 +101,10 @@
     },
     "byUpdated": "{author} · updated {when}",
     "noAuthor": "Maker unknown",
-    "nav": "Hub sections",
+    "nav": "Connect sections",
     "foldersTitle": "Topic folders",
     "mineTitle": "My Workflows",
-    "mineItem": "Drafts and registered",
+    "mineItem": "Drafts and shared",
     "list": {
       "name": "Name",
       "folder": "Folder",
@@ -128,8 +128,8 @@
     "questions": "{count, plural, one {# question} other {# questions}}",
     "drafting": "Drafting",
     "draft": "Draft",
-    "package": "Ready to try and register",
-    "registered": "Registered in the hub"
+    "package": "Ready to try and share",
+    "registered": "Shared"
   },
   "steps": {
     "label": "Steps",
@@ -137,8 +137,8 @@
     "questions": "Questions",
     "draft": "Draft",
     "trial": "Trial",
-    "publish": "Register in hub",
-    "trialOptional": "Try in my research (optional)",
+    "publish": "Share on Connect",
+    "trialOptional": "Try in Workspace (optional)",
     "doneLabel": "Step {n} {name}, done",
     "stepLabel": "Step {n} {name}"
   },
@@ -209,7 +209,7 @@
     "pages": "Read text of {pages} PDF pages",
     "files": "Checked {count} code files",
     "analysis": "Finding the Workflow and missing decisions",
-    "note": "Reading continues if you close this screen. Reopen it from 'Workflows I made' on the hub home. A long paper takes several minutes or more.",
+    "note": "Reading continues if you close this screen. Reopen it from 'Workflows I made' on Connect home. A long paper takes several minutes or more.",
     "failed": "Could not analyze the sources. Run it again.",
     "interrupted": "The app restarted and the analysis stopped. Run it again.",
     "retry": "Run analysis again",
@@ -330,7 +330,7 @@
     }
   },
   "trial": {
-    "title": "Try in my research project first (optional)",
+    "title": "Try in a project first (optional)",
     "body": "Install the draft into a project, prepare its inputs, then open the Workflow start settings.",
     "project": "Project",
     "consent": "I understand that the Workflow to install can run code in the project.",
@@ -400,24 +400,24 @@
     "exampleAlso": "The start settings also offer the example data: {title}"
   },
   "register": {
-    "open": "Preview hub page",
-    "update": "Update hub entry",
-    "title": "Register in the GAID hub",
-    "folder": "Hub category (folder)",
+    "open": "Preview sharing",
+    "update": "Update shared Workflow",
+    "title": "Share on Connect",
+    "folder": "Connect category (folder)",
     "note": "Note for other researchers",
     "notePlaceholder": "e.g. Built for grid data from other regions. Please try it and leave feedback.",
     "shared": "Shared: Workflow description, steps and files, included code and concept pictures, file check summary",
     "notShared": "Not shared: original uploaded PDFs and archives, research data not added as example data, project run records and trial assessments",
-    "submit": "Register in hub",
-    "line": "Registered Workflows can be viewed, starred and discussed by other researchers. Check how it will look first.",
-    "registeredLine": "Version {version} is registered in the hub.",
-    "previewBanner": "Preview: this is how other researchers will see it in the hub.",
+    "submit": "Share on Connect",
+    "line": "Shared Workflows can be viewed, starred and discussed by other researchers. Check how it will look first.",
+    "registeredLine": "Version {version} is shared on Connect.",
+    "previewBanner": "Preview: this is how other researchers will see it in Connect.",
     "backToDraft": "Back to draft",
-    "notYet": "The shared hub store is connected after the screens are agreed. Preview only for now.",
-    "before": "not registered",
+    "notYet": "The shared Connect store is connected after the screens are agreed. Preview only for now.",
+    "before": "not shared",
     "newFolder": "Create folder",
     "newFolderPlaceholder": "New folder name",
-    "firstVersion": "The first registration will be version {version}.",
+    "firstVersion": "The first shared version will be {version}.",
     "versionChoice": "Next version (current {version})",
     "bump": {
       "patch": "Small changes: version {version} (recommended)",
@@ -427,14 +427,14 @@
     "mainRelease": "Small changes use patch; new functionality uses minor. Choosing a major release declares the main release, 1.0.0.",
     "versionHint": "Choose according to the scope of changes. A major release increases the first number.",
     "versionLoading": "Reading the current version.",
-    "versionFailed": "Could not read the current version. Close and reopen the registration dialog.",
+    "versionFailed": "Could not read the current version. Close and reopen the sharing dialog.",
     "examples": {
       "shared": "{count, plural, one {Shared: # example data file} other {Shared: # example data files}} ({size})",
       "synthetic": "synthetic data",
       "source": "Source: {source}",
       "license": "Terms of use: {license}",
       "unstated": "not stated",
-      "who": "Example data files go to the hub with the Workflow. Every researcher who can see the Workflow in the hub can download them.",
+      "who": "Example data files go to Connect with the Workflow. Every researcher who can see the Workflow in Connect can download them.",
       "remote": "Shared: address and hash of example data downloaded from a public address ({titles}). The files are not uploaded."
     }
   },
@@ -443,22 +443,22 @@
     "star": "Star",
     "starred": "Starred",
     "try": "Try in my project",
-    "trials": "{count, plural, one {# trial started with registered versions} other {# trials started with registered versions}} (not a review)",
+    "trials": "{count, plural, one {# trial started with shared versions} other {# trials started with shared versions}} (not a review)",
     "comments": "{count, plural, one {# comment} other {# comments}}",
     "commentPlaceholder": "Write what you found when you tried it, or what to fix.",
     "comment": "Add comment",
     "toComments": "{count, plural, one {Show # comment} other {Show # comments}}",
-    "registeredAt": "registered {when}",
-    "afterRegister": "After registration, other researchers can star it and comment.",
-    "back": "Hub list",
+    "registeredAt": "shared {when}",
+    "afterRegister": "After sharing, other researchers can star it and comment.",
+    "back": "Connect list",
     "note": "Author's note",
     "edit": {
       "button": "Edit Workflow",
-      "hint": "Choose the next version when registering. Earlier versions stay installable."
+      "hint": "Choose the next version when sharing. Earlier versions stay installable."
     },
     "copy": {
       "button": "Copy and edit",
-      "hint": "Copies the Workflow into your own Workflows. Registered, it becomes a separate Workflow that names the original."
+      "hint": "Copies the Workflow into your own Workflows. Shared, it becomes a separate Workflow that names the original."
     },
     "basedOn": "Copied and edited from version {version} of “{title}” by {author}.",
     "openOriginal": "View original",
@@ -483,8 +483,8 @@
     "value": "Value"
   },
   "user": {
-    "title": "Name in the hub",
-    "body": "The name shown on Workflows you make, registrations, stars and comments. It is saved in this browser.",
+    "title": "Name in Connect",
+    "body": "The name shown on Workflows you make, sharing, stars and comments. It is saved in this browser.",
     "placeholder": "e.g. Jane Doe (Mineral Resources Division)",
     "save": "Save name"
   },
@@ -521,7 +521,7 @@
     "making": "Making concept pictures ({done}/{total})",
     "note": "Concept illustration, not analysis data or results",
     "title": "Concept pictures",
-    "explanation": "Illustrations of the Workflow, not analysis data or results. They appear in the draft and hub registration.",
+    "explanation": "Illustrations of the Workflow, not analysis data or results. They appear in the draft and Connect sharing preview.",
     "how": "View generation Workflow",
     "source": {
       "record": "Made with gpt-image-2 through your OpenAI Codex (legacy) login only when you request it. Each picture has light-screen and dark-screen versions, so it uses two images of that subscription's quota, with no other source. Sign in with ChatGPT does not support pictures."
@@ -555,15 +555,15 @@
     "copied": "Copied technical details"
   },
   "editing": {
-    "edit": "You are editing version {version} of your registered Workflow. Choose its next version when registering.",
-    "copy": "Your copy of version {version} of “{title}” by {author}. Registered, it becomes a separate Workflow that names the original."
+    "edit": "You are editing version {version} of your shared Workflow. Choose its next version when sharing.",
+    "copy": "Your copy of version {version} of “{title}” by {author}. Shared, it becomes a separate Workflow that names the original."
   },
   "remove": {
-    "action": "Remove from hub",
+    "action": "Remove from Connect",
     "title": "Remove Workflow",
-    "body": "“{title}” will disappear from hub lists. Copies already installed in projects will stay.",
+    "body": "“{title}” will disappear from Connect lists. Copies already installed in projects will stay.",
     "restoreAdmin": "An administrator can restore it from the removed Workflows list.",
-    "restoreLocal": "Without an institute hub server, the registrant can restore it from the removed Workflows list.",
+    "restoreLocal": "Without an institute Connect server, the researcher who shared it can restore it from the removed Workflows list.",
     "reason": "Reason (optional, up to 500 characters)",
     "cancel": "Cancel",
     "busy": "Removing",
@@ -571,15 +571,15 @@
   },
   "removed": {
     "title": "Removed Workflows",
-    "body": "Restoring returns a Workflow to hub lists. Copies installed in projects do not change.",
-    "empty": "No Workflows to restore. Browse the hub list.",
+    "body": "Restoring returns a Workflow to Connect lists. Copies installed in projects do not change.",
+    "empty": "No Workflows to restore. Browse Connect list.",
     "meta": "version {version} · {author}",
     "by": "Removed by {author} at {when}",
     "reason": "Reason: {reason}",
     "restore": "Restore Workflow",
     "busy": "Restoring",
     "failed": "Could not restore the Workflow. Check your permissions and connection, then try again.",
-    "restored": "“{title}” is back in hub lists."
+    "restored": "“{title}” is back in Connect lists."
   },
   "example": {
     "heading": "Example data",
@@ -601,7 +601,7 @@
     "meta": "{size}, {files} files",
     "license": "Terms of use: {license}",
     "noLicense": "No terms of use given.",
-    "removeAsk": "The new draft drops this example data. Earlier drafts and registered versions keep it.",
+    "removeAsk": "The new draft drops this example data. Earlier drafts and shared versions keep it.",
     "remove": {
       "action": "Remove example data",
       "confirm": "Make draft without it"
@@ -678,7 +678,7 @@
     "body": "A Workflow is split by the analysis flow, such as data preparation → processing and modelling → evaluation → interpretation and results, into 3-5 stages. At most 6 conditions must be set at the start; the others get a default that can be changed in the start summary.",
     "detail": "{count, plural, one {# point} other {# points}} to check",
     "action": "Regroup stages by analysis flow",
-    "reviewNote": "The AI agent writes a new draft. Review the changed stages and conditions before you try or register it.",
+    "reviewNote": "The AI agent writes a new draft. Review the changed stages and conditions before you try or share it.",
     "failed": "Regrouping could not start."
   }
 }

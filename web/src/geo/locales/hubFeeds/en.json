@@ -31,7 +31,7 @@
   "count": "{count} items",
   "loading": "Reading research feeds.",
   "empty": "No items match. Change the category, field or search words.",
-  "emptyAll": "Approved sources have no collected items yet. Once an administrator approves sources, the hub server collects them on a schedule.",
+  "emptyAll": "Approved sources have no collected items yet. Once an administrator approves sources, the institute Connect server collects them on a schedule.",
   "failed": "Could not read the research feeds.",
   "retry": "Read again",
   "technical": "Technical details",
@@ -62,12 +62,12 @@
     "noProjects": "There is no project to import into. Create a project first."
   },
   "offline": {
-    "title": "Log in to the institute GAID hub to see research feeds",
-    "body": "The institute hub server collects the sources an administrator approved. Log in under Settings → Services → Institute GAID hub.",
-    "button": "Open hub server settings"
+    "title": "Log in to the institute Connect server",
+    "body": "The institute Connect server collects the sources an administrator approved. Log in under Settings → Services → Institute Connect server.",
+    "button": "Open institute server settings"
   },
   "admin": {
-    "intro": "The hub server reads approved sources only, every {hours} hours. It stores the original title, the feed summary and the link.",
+    "intro": "The institute Connect server reads approved sources only, every {hours} hours. It stores the original title, the feed summary and the link.",
     "approveProposed": {
       "button": "Approve all proposals"
     },

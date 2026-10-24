@@ -48,6 +48,6 @@
   "previewPrompt": "Request sent when starting",
   "previewRetry": "Reload preview",
   "previewHubSkill": "{name} version {revision}",
-  "previewHubSkills": "The hub skills this Workflow uses are installed with it: {names}",
-  "previewHubBlocked": "Hub skills that cannot be installed with it: {names}. After installing, readiness shows why."
+  "previewHubSkills": "The Connect skills this Workflow uses are installed with it: {names}",
+  "previewHubBlocked": "Connect skills that cannot be installed with it: {names}. After installing, readiness shows why."
 }

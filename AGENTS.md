@@ -39,7 +39,8 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   (`server/src/geo/provision.ts`, once per pinned label; untracked/edited/user skills are kept): at startup (`prep`), in
   `POST /projects` before the reply (geo mode), and on `sandbox/init`. Vitest runs with
   `GAID_CATALOGUE=off`; geo tests pass explicit options.
-- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`; gaid-workflow-model): Settings → Skills adds skills from GitHub and similar sources first (upstream `skills` CLI: owner/repo, Git URL, local path) and no longer searches the shared hub (hub Workflows install from the hub or the Workflow panel). Every skill row has a read-only 지침 보기 (SKILL.md and file list, `server/src/geo/skill-details.ts`, `web/src/geo/skills/`); a skill installed from the hub shows its Workflow title and version (초안 for a draft), never the storage path. Hub installs (shared entry, picker, draft trial) show one install preview (`web/src/geo/skill-hub/install-preview.tsx`) before consent, through the existing acknowledgement/install gate (origin `gaid-hub`; registered installs show 등록됨 + version, drafts 초안). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
+- Places (gaid-ia-connect-workspace, ADR `docs/adr/2026-10-24-gaid-connect-workspace.md`): GAID is **GAID Workspace** (install Workflows, AI agent analysis, projects, files/code, geoscience viewers and research notes) + **GAID Connect** (create, share and evaluate Workflows and skills; research feeds). App bar `Workspace | Connect`, home titles `GAID Workspace` / `GAID Connect`; personal entries 서재, computer resources and settings are available from both. 서재 is the researcher’s personal literature space, not a third place or a tab beside projects. Visible copy uses "Connect에 공유", "공유된 Workflow", "공유됨" and "기관 Connect 서버"; version semantics, hub code identifiers/routes/namespaces and external skill_hub names stay unchanged. Research cycle: research question and material → Connect Workflow creation/selection → Workspace install/analysis → research note → Connect sharing/improvement; 서재 supplies literature throughout.
+- Skill install (`server/src/geo/skill-hub.ts`, `web/src/geo/skill-hub/`; gaid-workflow-model): Settings → Skills adds skills from GitHub and similar sources first (upstream `skills` CLI: owner/repo, Git URL, local path) and no longer searches the shared hub (hub Workflows install from the hub or the Workflow panel). Every skill row has a read-only 지침 보기 (SKILL.md and file list, `server/src/geo/skill-details.ts`, `web/src/geo/skills/`); a skill installed from the hub shows its Workflow title and version (초안 for a draft), never the storage path. Hub installs (shared entry, picker, draft trial) show one install preview (`web/src/geo/skill-hub/install-preview.tsx`) before consent, through the existing acknowledgement/install gate (origin `gaid-hub`; registered installs show 공유됨 + version, drafts 초안). The collapsed "이전 skill_hub" keeps the configured site, skill-page URL and `.tar.gz` inputs. Packages are bounded (20 MiB compressed / 64 MiB expanded / 10,000 entries), reject links/traversal, and persist by SHA-256 under the agent data directory; site changes are never auto-fetched.
 - Hub method packages and LocalMethod (gaid-hub-integration, `docs/design/hub-method-package.md`; original producer contract skill_hub
   `docs/specs/gaid-method-package.md` v1 — skill_hub is legacy since 2026-10-20 and GAID owns the format, see "Workflow model"): a skill_hub package may carry `<slug>/gaid-method.json` (`gaid-method/v1`: Workflows,
   레시피, hub-recorded lifecycle, check receipt, `files[]`/`packageDigest`). Hub drafts come through descriptors
@@ -59,7 +60,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `reports/2026-10-20-gaid-workflow-model/`; user decisions 2026-10-20): GAID is Workflow-centred. Researcher-facing terms:
   the hub unit and the Workflow panel row are "Workflow" (never 방법/패키지 in copy), catalogue Workflows "기본 Workflow",
   upstream BYOK ones "일반 Workflow", 레시피 → "저장한 시작 설정", registered revisions "version" (the English word on Korean
-  screens too, never 판/버전; gaid-hub-versions, see "GAID hub"); skills are parts a Workflow uses (built-in,
+  screens too, never 판/버전; gaid-hub-versions, see "GAID Connect"); skills are parts a Workflow uses (built-in,
   imported from GitHub and similar, bundled with the Workflow; hub-managed skills later). The hub registers Workflows only
   (Workflow-less drafts are refused). A Workflow reaches the agent as one rendered 지침 document:
   `web/src/geo/contracts/workflow-doc.ts` (IO-free `WorkflowDoc` schema `gaid-workflow/v1`, `renderWorkflowDocument` for
@@ -133,15 +134,15 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   optional input left unused while a fitting file exists (F17). 일반 Workflow uses `upstream-start.tsx` through the panel's
   `extension.renderLaunch` seam: its English instructions are folded under "AI agent가 받는 지침" (editable on the summary)
   and the start action puts a draft into a new chat (no model choice in the window). The start message is the
-  Workflow 지침 (see "Workflow model"), researcher's settings first and stated to take precedence. "허브에서 Workflow 가져오기" searches the GAID hub first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
+  Workflow 지침 (see "Workflow model"), researcher's settings first and stated to take precedence. "Connect에서 가져오기" searches GAID Connect first (`web/src/geo/hub-picker/`), installs the selected registered revision after acknowledgement and opens its start settings; an existing method opens without reinstalling. The second, file-import route checks a `.geo-start.json`
   and saves it under a chosen category (Geoscience, an upstream category or a user-added one) in `.kady/geo/recipes.json`
   (`GET/POST /geo/recipes`, `DELETE /geo/recipes/:id`, `server/src/geo/workspace/saved-recipes.ts`); listing re-checks each
   recipe, so a stale one is shown as unavailable, never dropped. A malformed store answers 409 and is not rewritten.
-- GAID hub (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
+- GAID Connect (gaid-hub, `docs/design/hub-authoring-service.md`): source-grounded authoring moved from skill_hub into GAID.
   Backend `server/src/geo/authoring/` (`/geo/authoring/*`, user-level store under `<agentDir>/skill-hub/authoring/`; model
   calls through GAID's runtime, ledgered in `default` as `gaid-hub-authoring`); vendored schemas/taxonomy in `geo/hub/`
   (`SOURCE.md`). Screens `web/src/geo/hub/` as a place of the main page (`#hub`, `#hub/e/<entry>`, `#hub/c/<catalogue Workflow>`,
-  `#hub/<authoring id>`; entry on the project list and a Projects/GAID hub header switch; gaid-hub-layout: every hub screen
+  `#hub/<authoring id>`; a Workspace/Connect header switch with the personal 서재 entry; gaid-hub-layout: every hub screen
   keeps one sidebar, `hub-sidebar.tsx` drawn by `GaidHub`, marking the list a detail came from; hidden = 48 px rail,
   default below 1280 px, app-bar button and ⌘\): one question at a time with a recommended option and "기타", all answers applied
   together (plus the standard `code-use`/`trial-scale` questions), each question beside a side viewer of the passages it and its
@@ -194,7 +195,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   accounts (admin invites, email + password, scrypt, hashed sessions), the shared hub records and per-account library sync in
   SQLite (`node:sqlite`) + `blobs/<sha256>` under `GAID_HUB_SERVER_HOME` (default `~/.geoaidesk-hub`); no agent, shell, projects
   or web UI, and it refuses browser requests. Plain HTTP on the institute LAN is the accepted pilot setting. Researchers' GAIDs
-  connect in Settings → 서비스 → 기관 GAID 허브 (`web/src/geo/hub-server/`, contract `web/src/geo/contracts/hub-server.ts`, routes
+  connect in Settings → 서비스 → 기관 Connect 서버 (`web/src/geo/hub-server/`, contract `web/src/geo/contracts/hub-server.ts`, routes
   `/geo/hub-server/*` and `/geo/library/sync` in `server/src/geo/routes/hub-server.ts`; token in
   `<agentDir>/hub-server/connection.json`, never sent to the browser; `GAID_HUB_SERVER_URL` fixes the address). The `/geo/hub/*`
   routes resolve per request (`server/src/geo/hub-shared/active.ts`): logged in → `RemoteHubStore` (`server/src/geo/hub-client/`)
@@ -217,7 +218,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   every `GAID_HUB_FEEDS_INTERVAL_HOURS` = 6 by default) and keeps the original title, the feed's own summary (≤ 400 chars, plain
   text) and the link; no model calls, never full text. Shipped proposals `geo/feeds/sources.json` (10 geoscience sources by field,
   GeekNews, releases of Pi, pi-subagents, pi-web-access, skills CLI, Claude Code, Codex, a GitHub geoscience skill search) stay
-  `proposed` until an administrator approves them (Settings → 기관 GAID 허브 → 허브 서버 관리 → 자료 소식 출처, or the CLI).
+  `proposed` until an administrator approves them (Settings → 기관 Connect 서버 → 기관 Connect 서버 관리 → 자료 소식 출처, or the CLI).
   Contract `web/src/geo/contracts/hub-feeds.ts`; GAID proxies `GET /geo/hub/feeds` and `/geo/hub-server/admin/feeds/*`
   (`server/src/geo/routes/hub-server.ts`); the hub place 자료 소식 (`#hub/feeds`, `web/src/geo/hub-feeds/`, namespace `hubFeeds`)
   marks items 검토 전, filters by category/field/words, and hands a GitHub skill repository to Settings → Skills of a chosen
@@ -248,7 +249,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Zotero reconcile and hub sync; shown under the folder facts). `web/src/geo/notebook-link/` (namespace `notebookLink`): the link
   opens in a new tab; GAID never fetches, embeds or sends anything to it.
 - Personal library (gaid-research-hub, ADR `docs/adr/2026-10-21-research-hub-library.md`; folders gaid-library-folders,
-  ADR `docs/adr/2026-10-21-library-folders.md`): "내 연구" → 서재, user-level store `server/src/geo/library/` (contract
+  ADR `docs/adr/2026-10-21-library-folders.md`): app-bar 서재 from either Workspace or Connect, user-level store `server/src/geo/library/` (contract
   `web/src/geo/contracts/library.ts`, routes `/geo/library/*`, screens `web/src/geo/library/`). Items are Zotero-linked
   (mirrored, Zotero is the source) or GAID-managed. Nested folders (`LibraryCollection`, subfolders included in views,
   export, check and scope); a folder may be linked to a Zotero collection (a Zotero item's membership in a linked folder of
@@ -337,7 +338,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   쓰지 않는다. 실행 완료를 검증 완료로 바꾸지 않는다. 추정·미시험·검토 전 같은 한계를 지우지 않는다. 확인되지 않은 기능·지원
   환경·성능·비용을 쓰지 않는다. 변경 보고에 문자열 id와 한·영 변경 전후를 적는다.
 - UI guide v2 (gaid-design-identity--fresh, adopted 2026-10-22): `docs/design/ui-guide.md` is the standard for every
-  visible GAID screen, rebuilt from Samsung One UI and Apple HIG for the GAID hub and system (values in
+  visible GAID screen, rebuilt from Samsung One UI and Apple HIG for GAID Connect and GAID Workspace (values in
   `geo/ui/ui-rules.json`). Identity from the fixed logo (octagonal G, orbit ring, brand blue, Pretendard lettering): **계측**
   (Instrument) is the default (chrome functional layer around white faces, 45° chamfered corners via `corner-shape`, index
   mark, graduated step scale); **도폭** (Map sheet) is a style a researcher may choose in Settings → 화면 표시 → 화면 스타일
@@ -345,7 +346,7 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   User decision verbatim: "계측을 기본으로 하고 도폭을 사용자 설정 테마에서 설정할 수 있게 할 수 있나?" → "가로 진행하자."
   Tokens and both styles live in `web/src/app/globals.css` (role tokens `--gaid-face/-chrome/-edge/-frame/-ink/-signal…`,
   also as Tailwind `bg-gaid-*`/`text-gaid-*`); components use roles, never branch on the style. Shared parts:
-  `web/src/geo/shell/` (`GaidAppBar`: mark once, 내 연구/GAID 허브 switch, settings, no theme switch; `SidebarGroup`/
+  `web/src/geo/shell/` (`GaidAppBar`: mark once, Workspace/Connect switch, personal 서재 entry, settings, no theme switch; `SidebarGroup`/
   `SidebarItem`; `StepScale`; `SystemResourcesButton`), `.gaid-orbit` (the AI agent is working; the one loop), `.gaid-index`,
   `.gaid-seg`. User rules that hold: colours only through tokens, original pixels for figures/maps/PDFs, no
   Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an impeccable +
