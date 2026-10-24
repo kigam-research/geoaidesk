@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T02:14:45Z
+updated: 2026-10-24T02:33:42Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"da0f8189-d65f-4333-a4a4-2417e324fc5e","pid":1147050,"provider":"claude","session":"0d2db664-c41d-4de7-9a1b-3e6669655de8","start":"69420486","token":"c8c20319620da0999781644a90cc81b9cf57d815ece33d3e3953b030303d683e"}
 branch: task/gaid-promo-video-v5
 target: main
@@ -89,6 +89,25 @@ Request from the starter:
   Yilgarn start window (Y3) + PGI AI agent run (R3) + map pair Yilgarn/PGI (Y5, M1); 연구노트 = Yilgarn note (Y6) + PGI page
   citations (N1); 다시 서재로 = paper uses and connection map (L4/Y7, L5). Target 95–103 s.
 
+### User feedback during v5 (2026-10-24, verbatim)
+> 똑같이 만들 필요는 없지만 7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d 세션의 102초 영상 처럼 꼭 허브와 시스템을 설명하는 창이 영상 전체를 차지할 필요가 없고 모션 그래픽의 한 요소로 배치되는 것이 처음 보는 독자의 입장에서는 더 이해하기 쉽다. 사용자의 피드백이다
+
+(The session is the writer of `gaid-promo-video-v4-lemo`, its 102 s "Dark Tech Keynote" cut.) Applied: the demo now has a
+narrative column on the left (part plate, purpose in 50 px, the chapter's outcome rows; the current row is blue and a
+leader line runs to the whole-region frame on the window) and one 1180 px window on the right. The lifted detail windows
+of the first v5 layout were dropped (one focus per moment for a first-time viewer); the pair step shows the two examples
+as two staggered 690 px windows. v5's light 계측 style, example mix and whole-region rects stay. Y3's three beats share one
+rect (whole start window), so they became two rows. Job 1 (render of the first layout) is superseded by job 2.
+
+### Added scope: 45 s product film (user request 2026-10-24, verbatim)
+> 좋다. 해당 렌더와 함께 추가 영상을 제작하고 싶다. 현재 방식은 기능 설명 홍보 영상에 가깝다. 제품 홍보영상으로서는 너무 기능 위주의 설명이 가득하고 처음 보는 이용자의 입장에서는 한번에 기능을 2~3초만에 이해할 수 없다. 이러한 관점에서 제품 홍보 영상으로는 중요 메시지를 코드만 사용하는 모션 그래픽으로 잘 설명하여 그림만으로도 홍보하려는 도구의 강점을 파악하고 구매하거나 이용하고 싶게 만들어야 한다. 그리고 분량은 45초 정도로 구성해야한다. 현재 설치된 brag스킬을 활용하면 소리도 생성 가능할 것으로 기대한다. 어떻게 연출해야할지 논의하여 생성해보자.
+
+Proposal discussed in the tab (one message per scene, no feature names, code-only motion graphics, cuts on a 96 BPM bar
+grid = 18 bars × 2.5 s = 45 s, music + effects synthesised, no narration, internal review). User choices (AskUserQuestion):
+structure "한 연구자의 하루형", tone "밝은 계측 + 블루 전환 (권장)", music "경쾌한 미니멀 (권장)". The v5 film continues
+unchanged. Made by me (tightly coupled to this discussion; brag-slim is built for Opus 5.5). Sources `geo/promo/day45/`,
+outputs outside Git; it sits beside v5 in the report and registry (`review`, does not supersede anything).
+
 ### Work packages and integration order
 1. Capture child `gaid-promo-video-v5--capture` ("general work"): owns `geo/promo/capture_v5*.py`, the v5 section of
    `geo/promo/CAPTURE.md`, `~/data/geoaidesk/work/gaid-promo-video-v5/capture-v5/`. Interface: `CONTRACT.md` v5.
@@ -109,6 +128,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021150.866300Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v5-20261024T021454.162971Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->

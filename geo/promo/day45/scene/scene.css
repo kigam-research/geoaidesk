@@ -1,0 +1,97 @@
+@font-face {
+  font-family: "Pretendard";
+  src: url("fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+}
+:root {
+  --face: #ffffff; --face-2: #f6f7f9; --chrome: #f1f3f6; --edge: #dce0e6; --control-edge: #878f9d;
+  --ink: #171b23; --ink-2: #525a68; --ink-3: #646c7a; --signal: #1f5eff; --signal-ink: #1d4fd8; --signal-tint: #e8eeff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--chrome); }
+body { font-family: "Pretendard", sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+#stage { position: absolute; inset: 0; overflow: hidden; background: var(--chrome); }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.icon { display: inline-block; flex: none; }
+.icon svg { width: 100%; height: 100%; display: block; }
+.face {
+  position: absolute; background: var(--face); border: 1px solid var(--edge); border-radius: 12px; corner-shape: bevel;
+  box-shadow: 0 1px 2px rgba(23, 27, 35, 0.04), 0 14px 36px rgba(23, 27, 35, 0.08);
+}
+.small { font-size: 22px; font-weight: 500; color: var(--ink-3); }
+/* captions */
+.cap { text-align: center; font-size: 60px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.25; color: var(--ink); white-space: nowrap; }
+.cap > div { display: block; }
+.cap.white { color: #ffffff; }
+.tod { width: 260px; height: 64px; }
+.tod-word { font-size: 30px; font-weight: 700; color: var(--ink-2); }
+/* hook fragments */
+.frag { padding: 12px 14px; overflow: hidden; transform-origin: 50% 50%; }
+.frag i { display: block; height: 8px; border-radius: 3px; background: #c9ced6; margin: 9px 0 0 4px; }
+.frag .ftag { font-size: 20px; font-weight: 700; color: var(--signal-ink); }
+.frag .fname { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 600; color: var(--ink-2); margin-bottom: 10px; white-space: nowrap; }
+.frag b { display: block; height: 9px; border-radius: 3px; margin-top: 9px; }
+.frag .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+.frag .grid span { height: 18px; background: var(--face-2); border: 1px solid var(--edge); }
+.frag .grid span.hd { background: #dfe3ea; }
+.chipcard {
+  position: absolute; display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: var(--face); white-space: nowrap;
+  border: 2px solid var(--edge); border-radius: 8px; corner-shape: bevel; font-size: 24px; font-weight: 650; color: var(--ink);
+  box-shadow: 0 10px 24px rgba(23, 27, 35, 0.07);
+}
+/* the shelf */
+.shelf .shelfrow {
+  position: absolute; display: flex; align-items: center; gap: 18px; padding: 0 22px; border: 2px solid var(--edge);
+  border-radius: 8px; corner-shape: bevel; background: var(--face); overflow: hidden; white-space: nowrap;
+}
+.shelfrow .nm { font-size: 32px; font-weight: 700; width: 210px; flex: none; }
+.shelfrow .pills { display: flex; gap: 10px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 650; padding: 6px 14px; border-radius: 6px;
+  corner-shape: bevel; background: var(--signal-tint); color: var(--signal-ink); border: 1px solid #c8d6ff; white-space: nowrap;
+}
+.pill.big { position: absolute; font-size: 30px; padding: 10px 20px; box-shadow: 0 10px 26px rgba(23, 27, 35, 0.12); background: #fff; }
+/* paper page and the Workflow */
+.page .ptitle, .wftitle { position: absolute; left: 28px; top: 22px; display: flex; align-items: center; gap: 12px; font-size: 34px; font-weight: 750; }
+.txline { height: 12px; border-radius: 4px; background: #c9ced6; }
+.hlbar { background: var(--signal-tint); border-radius: 4px; }
+.flyer { background: var(--signal-tint); border: 2px solid var(--signal); border-radius: 8px; corner-shape: bevel; }
+.step {
+  position: absolute; display: flex; align-items: center; gap: 18px; padding: 0 22px; font-size: 34px; font-weight: 700;
+  border: 2px solid var(--edge); border-radius: 8px; corner-shape: bevel; background: var(--face); color: var(--ink);
+}
+.step .num {
+  width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none;
+  background: var(--face-2); border: 2px solid var(--control-edge); font-size: 24px;
+}
+.step.lit { border-color: var(--signal); background: var(--signal-tint); color: var(--signal-ink); }
+.step.lit .num { background: var(--signal); border-color: var(--signal); color: #fff; }
+.step.small { font-size: 26px; gap: 12px; padding: 0 14px; }
+.step.small .num { width: 36px; height: 36px; font-size: 20px; }
+.wf.small .wftitle { font-size: 28px; top: 16px; left: 20px; }
+.agent { width: 70px; height: 46px; }
+.mapface { overflow: hidden; }
+/* the hub field */
+.blue { position: absolute; inset: 0; background: var(--signal); }
+.hubword { display: flex; justify-content: center; align-items: center; gap: 14px; color: #fff; font-size: 40px; font-weight: 750; }
+.hubcard { padding-top: 70px; }
+.hubcard .mini { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 650; padding: 4px 28px; color: var(--ink); }
+.hubcard .num { width: 26px; height: 26px; border-radius: 50%; background: var(--signal-tint); color: var(--signal-ink); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.peercard { background: #fff; border-radius: 8px; corner-shape: bevel; display: flex; align-items: center; justify-content: center; }
+.verchip {
+  width: 220px; text-align: center; font-size: 30px; font-weight: 750; padding: 8px 0; border-radius: 8px; corner-shape: bevel;
+  background: rgba(255, 255, 255, 0.16); color: #fff; border: 2px solid rgba(255, 255, 255, 0.7);
+}
+.verchip.new { background: #fff; color: var(--signal-ink); border-color: #fff; }
+.plus { background: #fff; color: var(--signal); font-size: 40px; font-weight: 800; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+/* the note */
+.note .headline { position: absolute; left: 36px; top: 104px; width: 400px; height: 22px; border-radius: 5px; background: var(--ink); }
+.note .headline.short { top: 140px; width: 260px; background: var(--ink-2); }
+.evchip {
+  display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; color: var(--signal-ink); background: var(--signal-tint);
+  padding: 6px 14px; border-radius: 6px; corner-shape: bevel; border: 1px solid #c8d6ff;
+}
+.plate2 { font-size: 46px; font-weight: 750; text-align: center; padding: 12px 0; color: var(--ink); }
+.endsub { text-align: center; font-size: 50px; font-weight: 600; color: var(--ink-2); }
+svg text { font-family: "Pretendard", sans-serif; }
