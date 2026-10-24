@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T07:21:40Z
+status: active
+updated: 2026-10-24T07:34:23Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88242334-24a3-4030-852c-b9e9ffb2a8dd","pid":1391055,"provider":"codex","session":"01a16c9e-0b00-7740-8c11-82980cf46d08","start":"71159800","token":"6c5b08a03458b5c901586e5be96b4af834d24c257068e81294c29e8e68ac58eb"}
 branch: task/gaid-ia-connect-workspace--home-summary
 target: task/gaid-ia-connect-workspace
@@ -32,6 +32,8 @@ Evidence: run the relevant checks (cd server && npm run typecheck && npm test --
 - Read-only verified through the real app hooks: changing/missing X-Project-Id does not change the summary or seed a project; snapshots show no project/index writes. Catalogue loading cannot stage/repair files. Environment checks reuse settled, current probes only; no subprocess or pending-probe wait. Hub pin checks use local/last-seen records, not archive downloads; unknown pins are not ready.
 - Checks passed: server typecheck; 58 tests across home/workspace-state/environments/notes/catalogue, followed by all 10 final home tests after the trial-link and hub-pin refinements; copy validator (0 errors, 101 pre-existing warnings); UI checker (0 errors, 78 accepted debt); git diff --check. No web files or visible copy changed.
 - First `task finish` automatically ran full `scripts/check`: backend 2,333 passed / 8 skipped; frontend 1,327 passed / 1 existing map-viewer test timed out at 5 seconds. Direct map-viewer recheck with `VITEST_MAX_WORKERS=1`: all 9 tests passed. Retrying finish with that worker cap, without speculative source changes.
+- The capped full check passed on candidate `1d173c5a` (backend 2,333 passed / 8 skipped; frontend 1,336 passed; distribution, environments, production smoke and UI quality completed). The CLI then automatically merged a newer target (`90dd72b4`, merge `539a9e16`, finish candidate `918d9ede`) and rechecked it. That run failed only 14 hub-server-skills tests: `dataHome` found a `.git` ancestor of a temporary home. The offending ancestor was not logged. The same merged suite passes all 14 unchanged in a direct run; the parent confirms 14 pass without this child's changes too. Web typecheck also passed.
+- Environment correction for the next finish: dedicated external `TMPDIR=~/data/geoaidesk/work/gaid-ia-connect-workspace--home-summary/check-tmp`, `VITEST_MAX_WORKERS=1`, institute CA. A read-only `dataHome(tmpdir())` probe accepts that directory. No hub guard or test-source workaround. Parent agreed to keep the target stable after `7f46c6c5` to avoid automatic whole-suite reruns for further target changes.
 - Dependencies job exited 0 (receipt below). Implementation is ready for parent integration; no deployment was performed.
 ## Next steps
 <!-- task:closed -->
@@ -39,6 +41,7 @@ Closed 2026-10-24T07:21:40Z: ready; the parent gaid-ia-connect-workspace integra
 
 ## Failed approaches
 - Automatic full check at `706c4131`: the default frontend concurrency timed out `src/geo/viewers/map/viewer.test.tsx:38` while several project check suites ran on the host. The test passes unchanged with one worker. First log: `~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-so06ssza.log`; output: `~/data/geoaidesk/work/checks/706c4131dbf1-20261024T064742.450078Z`.
+- Automatic target-refresh check at `918d9ede`: backend 2,319 passed / 14 failed / 8 skipped. All failures are the existing hub data-home Git-ancestor guard, first at `geo-hub-server-skills.test.ts:76`, subsequent at beforeEach line 24; direct merged recheck passes 14/14. Log: `~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-gg_we86f.log`. `/tmp/.git` does not exist at diagnosis time; its presence during failure is unproven. The correction isolates temporary files outside shared `/tmp`, rather than changing the guard.
 ## Notes and decisions
 - Sequential plan: establish read-only project/session access, reuse note/method contracts and live run broker, then aggregate/order and verify the route. This is one tightly coupled server package; no additional workers.
 - Parent approved narrow extra hunks in `server/src/index.ts` (skip project seeding only for exact GET `/geo/workspace/home`) and `server/src/geo/environments.ts` (cached-only readiness, all existing callers unchanged). Existing project/session list functions write; existing method readiness probes subprocesses. Home must do neither. Unprobed environments are conservatively not ready.
