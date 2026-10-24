@@ -1,4 +1,8 @@
+import noteExportKo from "./noteExport/ko.json";
+import noteExportEn from "./noteExport/en.json";
 import orcidKo from "./orcid/ko.json";
+import notebookLinkKo from "./notebookLink/ko.json";
+import notebookLinkEn from "./notebookLink/en.json";
 import orcidEn from "./orcid/en.json";
 import hubFeedsKo from "./hubFeeds/ko.json";
 import hubFeedsEn from "./hubFeeds/en.json";
@@ -80,6 +84,8 @@ import workflowCliEn from "./workflowCli/en.json";
 
 import workflowViewKo from "./workflowView/ko.json";
 import workflowViewEn from "./workflowView/en.json";
+import devPartsKo from "./devParts/ko.json";
+import devPartsEn from "./devParts/en.json";
 
 export type Catalogue = Record<string, string>;
 
@@ -100,14 +106,17 @@ export const GEO_CATALOGUES: Record<string, { ko: Catalogue; en: Catalogue }> = 
   previewSource: pair(previewSourceKo, previewSourceEn),
   previewMethod: pair(previewMethodKo, previewMethodEn),
   hub: pair(hubKo, hubEn),
+  devParts: pair(devPartsKo, devPartsEn),
   hubServer: pair(hubServerKo, hubServerEn),
   hubSkills: pair(hubSkillsKo, hubSkillsEn),
   hubFeeds: pair(hubFeedsKo, hubFeedsEn),
   connections: pair(connectionsKo, connectionsEn),
   notes: pair(notesKo, notesEn),
+  noteExport: pair(noteExportKo, noteExportEn),
   figures: pair(figuresKo, figuresEn),
   library: pair(libraryKo, libraryEn),
   orcid: pair(orcidKo, orcidEn),
+  notebookLink: pair(notebookLinkKo, notebookLinkEn),
   workflowDoc: pair(workflowDocKo, workflowDocEn),
   workflowView: pair(workflowViewKo, workflowViewEn),
   workflowCli: pair(workflowCliKo, workflowCliEn),

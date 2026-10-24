@@ -29,6 +29,20 @@
 }
 
 @custom-variant dark (&:is(.dark *));
+/* shadcn skill preview states (skills/shadcn/assets/showcase/preview-states.css, MIT): the development parts page
+   (/dev/parts) pins hover, focus and pressed states with data-preview="hover focus active"; nothing else sets it. */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &[data-preview~="hover"] {
+    @slot;
+  }
+}
+@custom-variant focus-visible (&:focus-visible, &[data-preview~="focus"]);
+@custom-variant active (&:active, &[data-preview~="active"]);
 
 /* GAID brand face: the logo lettering is outlined Pretendard (geo/brand/licenses), so the UI uses the same family
    (UI guide v2, I3). Self-hosted, OFL licence in web/public/fonts/PRETENDARD-LICENSE.txt. */
@@ -100,7 +114,11 @@
   --color-gaid-signal: var(--gaid-signal);
   --color-gaid-signal-ink: var(--gaid-signal-ink);
   --color-gaid-signal-tint: var(--gaid-signal-tint);
+  --color-gaid-signal-hover: var(--gaid-signal-hover);
   --color-gaid-hover: var(--gaid-hover);
+  --color-gaid-press: var(--gaid-press);
+  --color-gaid-danger-press: var(--gaid-danger-press);
+  --color-gaid-on-signal: var(--gaid-on-signal);
   --color-gaid-success: var(--gaid-success);
   --color-gaid-success-tint: var(--gaid-success-tint);
   --color-gaid-warning: var(--gaid-warning);
@@ -134,7 +152,10 @@
   --gaid-signal: #1f5eff;
   --gaid-signal-ink: #1d4fd8;
   --gaid-signal-tint: #e8eeff;
+  --gaid-signal-hover: #1a54e8;
+  --gaid-on-signal: #ffffff;
   --gaid-hover: #e9ecf1;
+  --gaid-press: #dde1e8;
   --gaid-brand-hover: #1749cc;
   --gaid-brand-on-dark: #4d7fff;
   --gaid-success: #1e7a46;
@@ -143,6 +164,7 @@
   --gaid-warning-tint: #fff2d9;
   --gaid-danger: #c2261d;
   --gaid-danger-tint: #fde9e7;
+  --gaid-danger-press: #9e1f17;
   --gaid-untested: #646c7a;
   --gaid-nodata: #8e96a4;
   --gaid-scale-tick: #9aa1ad;
@@ -156,7 +178,7 @@
   --popover: var(--gaid-face);
   --popover-foreground: var(--gaid-ink);
   --primary: var(--gaid-signal);
-  --primary-foreground: #ffffff;
+  --primary-foreground: var(--gaid-on-signal);
   --secondary: var(--gaid-face-2);
   --secondary-foreground: var(--gaid-ink);
   --muted: var(--gaid-face-2);
@@ -170,7 +192,7 @@
   --sidebar: var(--gaid-chrome);
   --sidebar-foreground: var(--gaid-ink);
   --sidebar-primary: var(--gaid-signal);
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary-foreground: var(--gaid-on-signal);
   --sidebar-accent: #e4e8ee;
   --sidebar-accent-foreground: var(--gaid-ink);
   --sidebar-border: var(--gaid-edge);
@@ -211,7 +233,9 @@
   --gaid-signal: #3366e8;
   --gaid-signal-ink: #7fa2ff;
   --gaid-signal-tint: #1e2b4d;
+  --gaid-signal-hover: #2f60df;
   --gaid-hover: #262b34;
+  --gaid-press: #2f3540;
   --gaid-brand-hover: #2b5ad6;
   --gaid-success: #4cc38a;
   --gaid-success-tint: #12301f;
@@ -219,13 +243,16 @@
   --gaid-warning-tint: #3a2c12;
   --gaid-danger: #ff7a6e;
   --gaid-danger-tint: #3b1715;
+  --gaid-danger-press: #6e302b;
   --gaid-untested: #98a0ad;
   --gaid-nodata: #6b7382;
   --gaid-scale-tick: #6b7382;
   --gaid-shadow-overlay: 0 18px 44px -10px rgb(0 0 0 / 0.7), 0 0 0 1px #2e333c;
 
   --popover: #1e2229;
-  --primary-foreground: #ffffff;
+  /* Focus rings use the blue text role on dark: ≥ 3:1 on dark chrome too (UI guide v2 S4, S7). */
+  --ring: var(--gaid-signal-ink);
+  --sidebar-ring: var(--gaid-signal-ink);
   --sidebar-accent: #2a2f38;
   --chart-1: #7fa2ff;
   --chart-2: #4cc38a;
@@ -250,6 +277,7 @@
   --gaid-ink-3: #62676f;
   --gaid-signal-tint: #eaf0ff;
   --gaid-hover: #eef0f2;
+  --gaid-press: #e2e5e9;
   --gaid-corner: round;
   --gaid-shadow-overlay: 0 0 0 1px #15171a, 0 12px 28px -10px rgb(21 23 26 / 0.3);
   --sidebar-accent: #eef0f2;
@@ -267,6 +295,7 @@
   --gaid-ink-3: #8d939c;
   --gaid-signal-tint: #1b2747;
   --gaid-hover: #1d2024;
+  --gaid-press: #292d32;
   --gaid-shadow-overlay: 0 0 0 1px #d9dce0, 0 16px 40px -10px rgb(0 0 0 / 0.8);
   --popover: #16191c;
   --sidebar-accent: #1d2024;
@@ -279,7 +308,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
   body {
     @apply bg-background text-foreground;

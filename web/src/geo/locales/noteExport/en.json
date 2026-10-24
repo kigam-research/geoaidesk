@@ -1,0 +1,167 @@
+{
+  "bundle": {
+    "button": "Download result bundle",
+    "title": "Download result bundle",
+    "intro": "Packs the research note's body, figures, fingerprints of the data it used, environment records, Workflow version and cited papers into one ZIP file, so another researcher or a reviewer can check it.",
+    "boundary": "Data files themselves are not included. The bundle does not prove the result was run again; it holds the recorded fingerprints compared with the files as they are now.",
+    "loading": "Checking what goes into the bundle",
+    "summary": "{count} files, {size} in total",
+    "part": {
+      "note": "Note body and figures",
+      "data": "Fingerprints of data used",
+      "environment": "Environment records",
+      "workflow": "Workflow",
+      "references": "Cited papers",
+      "about": "Read-me",
+      "checksums": "File fingerprint list"
+    },
+    "files": "{count, plural, one {# file} other {# files}}",
+    "data": {
+      "heading": "{count} data files used",
+      "none": "No recorded data use.",
+      "use": {
+        "read": "Input",
+        "written": "Created or changed"
+      },
+      "now": {
+        "same": "Same as recorded",
+        "changed": "Changed since",
+        "missing": "Missing now",
+        "unknown": "Not compared"
+      },
+      "more": "The other {count} are listed in the bundle."
+    },
+    "environment": "{count, plural, =0 {No environment record} one {# environment record} other {# environment records}}",
+    "workflow": {
+      "version": "{title} · version {version}",
+      "draft": "{title} · draft"
+    },
+    "references": "{count, plural, =0 {No cited papers} one {# cited paper} other {# cited papers}}",
+    "gaps": {
+      "heading": "Not included or not confirmed"
+    },
+    "showFiles": "Show files to include",
+    "download": {
+      "button": "Download bundle",
+      "busy": "Downloading",
+      "done": "Downloaded. The file's fingerprint matches the server's record."
+    },
+    "close": {
+      "button": "Close"
+    },
+    "error": {
+      "load": "Could not check what goes into the bundle. Try again.",
+      "changed": "The note or its files changed after the check. Check the contents again, then download.",
+      "tooLarge": "The note folder is too large to bundle. Move large files out of the note folder and try again.",
+      "download": "Could not download. Try again.",
+      "integrity": "The downloaded file differs from the server's record. Download it again.",
+      "retry": {
+        "button": "Check again"
+      }
+    },
+    "menu": "Download result bundle…"
+  },
+  "public": {
+    "button": "Export public material",
+    "title": "Export public material",
+    "intro": "Choose files to upload to Gemini Notebook yourself. GAID sends nothing to Google; you upload the downloaded files.",
+    "confirmEach": "Confirm for each file that it may leave the institute. Only confirmed files are packed.",
+    "loading": "Checking which files can be exported",
+    "kind": {
+      "note": "Research note",
+      "workflow": "Workflow instructions",
+      "paper": "Paper PDF"
+    },
+    "noteDetail": "A Markdown file, with the reference list of the cited papers appended.",
+    "workflowDetail": "The Workflow instructions as Markdown.",
+    "licence": "Terms of use: {licence}",
+    "licenceUnknown": "Terms of use not checked. Check the paper's open-use terms yourself.",
+    "mayLeave": "This file may leave the institute",
+    "skipped": {
+      "heading": "Cited papers that cannot be included",
+      "not-in-library": "Not in the library",
+      "no-pdf": "No PDF in the library",
+      "too-large": "PDF larger than 50 MB",
+      "summary": "{count, plural, one {# cited paper cannot be included} other {# cited papers cannot be included}}"
+    },
+    "selected": "{count, plural, =0 {No files chosen} one {# file, {size}} other {# files, {size}}}",
+    "export": {
+      "button": "Download chosen files",
+      "busy": "Downloading",
+      "done": "Downloaded. Add the files as sources in Gemini Notebook."
+    },
+    "record": "The names and fingerprints of exported files are kept in the project record.",
+    "none": "Confirm at least one file to export.",
+    "close": {
+      "button": "Close"
+    },
+    "error": {
+      "load": "Could not check the files to export. Try again.",
+      "changed": "Files changed after the check. Check the list again, then download.",
+      "download": "Could not download. Try again.",
+      "integrity": "The downloaded file differs from the server's record. Download it again."
+    },
+    "referencesHeading": "References",
+    "menu": "Export public material…"
+  },
+  "gap": {
+    "no-chat": "No chat is recorded as having written the note, so the data and environment are unknown.",
+    "no-provenance": "The chats that wrote the note have no recorded file use.",
+    "data-limit": "There were many data files; only the first part is in the fingerprint list.",
+    "unhashed-data": "Some data files were used without a recorded fingerprint.",
+    "no-environment": "The chats that wrote the note have no environment record.",
+    "no-workflow": "The chat did not start from a Workflow, so there is no Workflow version.",
+    "workflow-removed": "The Workflow was removed from the project, so its instructions are not included. The version is kept.",
+    "unresolved-citations": "Some citation keys are not in the library.",
+    "missing-figure": "Some figures the note links to do not exist."
+  },
+  "readme": {
+    "intro": "Result bundle of a GAID research note. It gathers the note and its records so another researcher or a reviewer can check the evidence behind the result.",
+    "date": "Note date: {date}",
+    "status": {
+      "pending": "Status: not reviewed",
+      "confirmed": "Status: confirmed by the researcher",
+      "superseded": "Status: replaced by a newer note"
+    },
+    "headline": "Result in one line: {headline}",
+    "updated": "Note last changed: {date}",
+    "contents": "Contents",
+    "part": {
+      "note": "Research note body (index.md) and the figures in the note folder",
+      "data": "Fingerprints (sha256), size, time of use and comparison with the current file for {count} data files the note's chats read or created",
+      "environment": "{count} environment records used in the analysis (Python and R packages, lockfile fingerprints)",
+      "workflow": "Workflow record (workflow.json) and instructions (instructions.md)",
+      "references": "References and CSL JSON of {count} cited papers",
+      "checksums": "Fingerprint of every bundle file"
+    },
+    "workflow": "Workflow",
+    "version": "version {version} (when the chat started)",
+    "draft": "Draft (no registered version)",
+    "data": "Fingerprints of data used",
+    "noData": "No recorded data use.",
+    "col": {
+      "path": "File",
+      "use": "Use",
+      "bytes": "Size (bytes)",
+      "now": "Current file"
+    },
+    "use": {
+      "read": "Input",
+      "written": "Created or changed"
+    },
+    "unhashed": "Not recorded",
+    "now": {
+      "same": "Same as recorded",
+      "changed": "Changed since",
+      "missing": "Missing now",
+      "unknown": "Not compared"
+    },
+    "references": "Cited papers",
+    "noReferences": "No cited papers.",
+    "notInLibrary": "Citation key not in the library",
+    "gaps": "Not included or not confirmed",
+    "limits": "Limits",
+    "limitsText": "This bundle does not prove the result was run again. It holds no data files, only the fingerprints recorded at the time of use compared with the files when the bundle was made.",
+    "verify": "Check that the bundle's files are unchanged with `sha256sum -c SHA256SUMS`."
+  }
+}

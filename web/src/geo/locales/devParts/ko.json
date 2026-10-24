@@ -1,0 +1,110 @@
+{
+  "badge": "개발용 화면",
+  "title": "부품 상태 견본",
+  "context": "공용 부품을 모든 상태로 고정해 보입니다. 연구자에게는 열리지 않습니다.",
+  "style": {
+    "label": "화면 스타일",
+    "instrument": "계측",
+    "mapsheet": "도폭"
+  },
+  "theme": {
+    "label": "테마",
+    "light": "밝은 테마",
+    "dark": "어두운 테마"
+  },
+  "contrast": {
+    "heading": "색 역할과 대비",
+    "context": "지금 화면의 토큰 값으로 계산합니다. 기준은 UI 가이드 S4입니다.",
+    "sample": "가A",
+    "pass": "통과",
+    "fail": "미달",
+    "ratio": "{ratio} : 1",
+    "minimum": "기준 {min} : 1",
+    "pairs": {
+      "body": "본문",
+      "bodyChrome": "기능층 본문",
+      "secondary": "보조 글",
+      "secondaryChrome": "기능층 보조 글",
+      "placeholder": "안내 글",
+      "link": "링크와 파란 글",
+      "onSignal": "주 동작 버튼 글자",
+      "onSignalHover": "올린 주 동작 버튼 글자",
+      "onSignalPressed": "누른 주 동작 버튼 글자",
+      "selected": "선택한 항목",
+      "success": "성공 표시",
+      "warning": "경고 표시",
+      "danger": "위험 표시",
+      "untested": "미시험 표시",
+      "controlEdge": "입력칸 경계",
+      "ring": "초점 고리",
+      "ringChrome": "기능층 초점 고리"
+    }
+  },
+  "states": {
+    "heading": "버튼 상태",
+    "context": "누르지 않아도 각 상태가 보이도록 data-preview로 고정했습니다.",
+    "default": "기본",
+    "hover": "올림",
+    "active": "누름",
+    "focus": "초점",
+    "disabled": "사용 안 함",
+    "loading": "진행 중",
+    "variants": {
+      "default": "주 동작",
+      "outline": "보조",
+      "secondary": "조용한 보조",
+      "ghost": "도구",
+      "destructive": "위험 동작",
+      "link": "링크"
+    },
+    "sampleAction": "결과 저장",
+    "sampleLoading": "저장하는 중"
+  },
+  "controls": {
+    "heading": "입력",
+    "placeholder": "파일 이름 검색",
+    "value": "yilgarn_ni_grid.tif",
+    "invalid": "형식이 맞지 않습니다",
+    "switchOn": "켜짐",
+    "switchOff": "꺼짐",
+    "switchDisabled": "사용 안 함",
+    "tabs": {
+      "papers": "논문",
+      "notes": "정리 노트",
+      "files": "파일"
+    }
+  },
+  "parts": {
+    "heading": "공용 부품",
+    "sidebar": "사이드바 항목",
+    "segmented": "분할 버튼",
+    "scale": "단계 눈금",
+    "list": "단계 목록",
+    "status": "상태 표시",
+    "agent": "AI agent 작업 표시",
+    "itemSelected": "선택한 항목",
+    "itemDefault": "기본 항목",
+    "itemHover": "올린 항목",
+    "itemFocus": "초점 항목",
+    "segPapers": "논문",
+    "segNotes": "정리 노트",
+    "segHover": "올림",
+    "steps": {
+      "intro": "소개",
+      "data": "자료 준비",
+      "model": "처리·모델링",
+      "review": "평가",
+      "summary": "요약"
+    },
+    "stepGroup": "분석 단계",
+    "done": "실행 완료",
+    "review": "검토 전",
+    "failed": "읽지 못함",
+    "untested": "미시험",
+    "nodata": "결측값",
+    "readout": "결정 {count}",
+    "running": "격자 표 만드는 중 2/5",
+    "activity": "작업 기록 줄",
+    "reasoning": "입력 격자의 좌표계를 먼저 확인합니다."
+  }
+}

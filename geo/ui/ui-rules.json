@@ -83,6 +83,9 @@
         "textSecondary": "--gaid-ink-2",
         "textTertiary": "--gaid-ink-3",
         "signal": "--gaid-signal",
+        "signalHover": "--gaid-signal-hover",
+        "signalPressed": "--gaid-brand-hover",
+        "onSignal": "--gaid-on-signal",
         "signalText": "--gaid-signal-ink",
         "selection": "--gaid-signal-tint",
         "hover": "--gaid-hover",
@@ -429,6 +432,335 @@
     "fontFace": {
       "css": "web/src/app/globals.css",
       "family": "Pretendard Variable"
+    }
+  },
+  "quality": {
+    "note": "UI quality kit (gaid-ui-quality-kit), run by geo/ui/quality/run.mjs from scripts/check. Each tool has a mode: 'report' prints findings and never fails the check; 'block' fails on findings that are not accepted debt in geo/ui/ui-baseline.json under quality.<tool>. Findings carry the UI guide v2 rule ids below.",
+    "switchRule": "A tool moves from report to block (one-line change of modes.<tool>) when (1) every current finding on main is fixed or recorded as accepted debt with its reason in geo/ui/ui-baseline.json quality.<tool>, (2) two consecutive scripts/check runs, on PC74 and on one other PC, give the same findings and, for visual, no screenshot differences beyond the threshold, and (3) the switch is recorded in a task report. A tool that cannot run (missing browser, no network) stays report-only on that run and says so.",
+    "switches": [
+      {
+        "tools": [
+          "impeccable",
+          "axe"
+        ],
+        "date": "2026-10-24",
+        "task": "gaid-ui-checks-blocking",
+        "evidence": "same findings (impeccable 0, axe 0, screenshots 0, shadcn 248) in scripts/check on PC74 (gaid-ui-shared-contrast) and PC70 at main f504ace4; report reports/2026-10-24-gaid-ui-checks-blocking/index.md"
+      }
+    ],
+    "modes": {
+      "shadcnLint": "report",
+      "impeccable": "block",
+      "visual": "report",
+      "axe": "block"
+    },
+    "pages": [
+      {
+        "id": "parts",
+        "path": "/dev/parts",
+        "note": "development parts page (web/src/geo/dev/parts-page.tsx); served by next dev"
+      }
+    ],
+    "combos": [
+      {
+        "id": "instrument-light",
+        "style": "instrument",
+        "theme": "light"
+      },
+      {
+        "id": "instrument-dark",
+        "style": "instrument",
+        "theme": "dark"
+      },
+      {
+        "id": "mapsheet-light",
+        "style": "mapsheet",
+        "theme": "light"
+      },
+      {
+        "id": "mapsheet-dark",
+        "style": "mapsheet",
+        "theme": "dark"
+      }
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "visual": {
+      "maxDiffPixelRatio": 0.002,
+      "threshold": 0.2,
+      "baselineDir": "geo/ui/quality/baseline"
+    },
+    "axe": {
+      "tags": [
+        "wcag2a",
+        "wcag2aa",
+        "wcag21a",
+        "wcag21aa",
+        "wcag22aa"
+      ]
+    },
+    "shadcnLint": {
+      "config": "geo/ui/quality/shadcn-lint.config.mjs",
+      "guide": {
+        "shadcn/no-raw-colors": [
+          "V1",
+          "S1"
+        ],
+        "shadcn/no-arbitrary-values": [
+          "T1",
+          "V1",
+          "S6",
+          "I8",
+          "L5"
+        ],
+        "shadcn/no-inline-styles": [
+          "V1"
+        ],
+        "shadcn/no-restyle": [
+          "B2",
+          "S7"
+        ],
+        "shadcn/no-unknown-classes": [
+          "S1"
+        ]
+      },
+      "note": "no-arbitrary-values takes the id of the class family (run.mjs arbitraryGuide): type T1, colour V1, shadow S6, corners I8, else spacing L5; layout sizes (panes, measure: L2, L6) are exempt in the config."
+    },
+    "impeccable": {
+      "telemetryEnv": {
+        "DO_NOT_TRACK": "1",
+        "IMPECCABLE_NO_TELEMETRY": "1"
+      },
+      "guide": {
+        "side-tab": [
+          "V7"
+        ],
+        "border-accent-on-rounded": [
+          "V7"
+        ],
+        "overused-font": [
+          "I3"
+        ],
+        "flat-type-hierarchy": [
+          "T2"
+        ],
+        "gradient-text": [
+          "V3"
+        ],
+        "ai-color-palette": [
+          "V1",
+          "V3"
+        ],
+        "nested-cards": [
+          "V5",
+          "L4"
+        ],
+        "monotonous-spacing": [
+          "L5"
+        ],
+        "bounce-easing": [
+          "M2"
+        ],
+        "pulsing-dot": [
+          "V4",
+          "M3"
+        ],
+        "blinking-cursor": [
+          "M3"
+        ],
+        "dark-glow": [
+          "V3"
+        ],
+        "radial-halo": [
+          "V3"
+        ],
+        "radial-spotlight-glow": [
+          "V3"
+        ],
+        "marquee": [
+          "M3",
+          "A4"
+        ],
+        "icon-tile-stack": [
+          "V5"
+        ],
+        "hero-eyebrow-chip": [
+          "V4"
+        ],
+        "kicker-above-heading": [
+          "V4"
+        ],
+        "numbered-section-labels": [
+          "V4",
+          "I5"
+        ],
+        "em-dash-overuse": [
+          "V9"
+        ],
+        "marketing-buzzword": [
+          "W6"
+        ],
+        "aphoristic-cadence": [
+          "W6"
+        ],
+        "oversized-h1": [
+          "T1"
+        ],
+        "extreme-negative-tracking": [
+          "T3"
+        ],
+        "buried-raster": [
+          "V6"
+        ],
+        "text-occlusion": [
+          "T5"
+        ],
+        "gray-on-color": [
+          "S4"
+        ],
+        "low-contrast": [
+          "S4"
+        ],
+        "line-length": [
+          "L6"
+        ],
+        "cramped-padding": [
+          "L5"
+        ],
+        "tight-leading": [
+          "T1",
+          "T3"
+        ],
+        "skipped-heading": [
+          "A1"
+        ],
+        "heading-rhythm": [
+          "L5"
+        ],
+        "straggler": [
+          "T3"
+        ],
+        "unbalanced-heading": [
+          "T3"
+        ],
+        "tiny-text": [
+          "T1"
+        ],
+        "undersized-ui-text": [
+          "T1"
+        ],
+        "all-caps-body": [
+          "T3"
+        ],
+        "wide-tracking": [
+          "T3"
+        ],
+        "text-overflow": [
+          "T5"
+        ],
+        "clipped-overflow-container": [
+          "T5"
+        ],
+        "gpt-thin-border-wide-shadow": [
+          "S6"
+        ],
+        "repeating-stripes-gradient": [
+          "V3"
+        ],
+        "codex-grid-background": [
+          "V4"
+        ]
+      }
+    },
+    "axeGuide": {
+      "color-contrast": [
+        "S4"
+      ],
+      "color-contrast-enhanced": [
+        "S4"
+      ],
+      "link-in-text-block": [
+        "S3"
+      ],
+      "button-name": [
+        "A1",
+        "B2"
+      ],
+      "link-name": [
+        "A1"
+      ],
+      "label": [
+        "A1"
+      ],
+      "image-alt": [
+        "A1"
+      ],
+      "input-button-name": [
+        "A1"
+      ],
+      "aria-allowed-attr": [
+        "A1"
+      ],
+      "aria-required-attr": [
+        "A1"
+      ],
+      "aria-required-children": [
+        "A1"
+      ],
+      "aria-required-parent": [
+        "A1"
+      ],
+      "aria-valid-attr-value": [
+        "A1"
+      ],
+      "aria-prohibited-attr": [
+        "A1"
+      ],
+      "aria-toggle-field-name": [
+        "A1"
+      ],
+      "aria-command-name": [
+        "A1"
+      ],
+      "target-size": [
+        "A3",
+        "B2"
+      ],
+      "nested-interactive": [
+        "A2"
+      ],
+      "scrollable-region-focusable": [
+        "A2"
+      ],
+      "focus-order-semantics": [
+        "A2"
+      ],
+      "region": [
+        "A2"
+      ],
+      "landmark-one-main": [
+        "A2"
+      ],
+      "page-has-heading-one": [
+        "T2"
+      ],
+      "heading-order": [
+        "T2"
+      ],
+      "list": [
+        "A1"
+      ],
+      "listitem": [
+        "A1"
+      ],
+      "duplicate-id-aria": [
+        "A1"
+      ],
+      "meta-viewport": [
+        "T5"
+      ]
     }
   }
 }

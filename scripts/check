@@ -61,5 +61,11 @@ step 'GAID: launcher --check'
 step 'GAID: production smoke (clean data home, start, stop, restart)'
 # Free ports and a temporary data home; network for the first-start catalogue and sandbox environment.
 node geo/tests/production-smoke.mjs
+step 'GAID: UI quality kit (impeccable and axe blocking; shadcn lint and screenshots of 계측/도폭 × light/dark report-only; geo/ui/ui-rules.json quality)'
+# Tools install from their own lock (never into the app); impeccable telemetry is off. A tool in "block" mode fails on a
+# finding that is not accepted debt in geo/ui/ui-baseline.json quality.<tool>; "report" only prints; quality.switchRule says
+# when a tool switches. A tool that cannot run (no Chromium, no network) is reported as skipped. Results go to a temporary folder.
+(cd geo/ui/quality && npm ci --no-audit --no-fund)
+DO_NOT_TRACK=1 IMPECCABLE_NO_TELEMETRY=1 node geo/ui/quality/run.mjs
 
 printf '\nAll geoaidesk checks passed.\n'

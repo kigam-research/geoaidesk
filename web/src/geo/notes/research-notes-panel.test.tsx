@@ -10,6 +10,7 @@ vi.mock("@/lib/chat-prefill", () => ({ prefillChat: vi.fn() }));
 // The figure record and connection map have their own tests; here they only need to be mounted with the note's scope.
 vi.mock("@/geo/figures", () => ({ NoteFigures: ({ noteId }: { noteId: string }) => <div data-testid="note-figures">{noteId}</div> }));
 vi.mock("@/geo/connections", () => ({ ConnectionMapButton: ({ focus }: { focus: string }) => <button type="button" data-testid="map-button">{focus}</button> }));
+vi.mock("@/geo/notebook-link/project-notebook-link", () => ({ ProjectNotebookLink: () => <span data-testid="notebook-link" /> }));
 vi.mock("@/components/ai-elements/message", () => ({ MessageResponse: ({ children }: { children: string }) => <div data-testid="md">{children}</div> }));
 
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
@@ -49,6 +50,7 @@ it("groups notes by decisions, not reviewed and reviewed", async () => {
   expect(screen.getByText("검토 전 1")).toBeInTheDocument();
   expect(screen.getByText("확인함 1")).toBeInTheDocument();
   expect(screen.getByText("정리 노트 2개 · 결정할 일 2건")).toBeInTheDocument();
+  expect(screen.getByTestId("notebook-link")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /노트 정리/ }));
   expect(prefillChat).toHaveBeenCalledWith(expect.stringContaining("정리 노트"));
 });

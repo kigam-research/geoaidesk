@@ -151,7 +151,9 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   Workflow start settings opened there (`gaid:open-method-setup`). Shared hub (`server/src/geo/hub-shared/`, contract
   `web/src/geo/contracts/hub-shared.ts`, `/geo/hub/*`): with an institute hub server the researcher's account, without one the local
   store and a display name in `X-GAID-User` (see "Institute hub server"), topic folders, registration of a checked draft (preview first), stars, comments,
-  recommended cards (catalogue + most starred) and "use in my research" (install → input/environment prep → start
+  recommended cards (catalogue + most starred; gaid-hub-stage-cards: a card or registered row without a concept picture draws
+  the Workflow's own stages from its WorkflowDoc, `HubWorkflowStages` on `HubEntry`/`HubRecommendation`,
+  `web/src/geo/hub/stage-plate.tsx`, as a numbered list with input formats → outputs, rows as a stage-count readout) and "use in my research" (install → input/environment prep → start
   settings). Editing a registered method (gaid-hub-editing, `server/src/geo/hub-shared/edit.ts`,
   `POST /geo/hub/entries/:id/edit`): the registering display name edits in place (its linked draft, or a draft seeded from the
   latest revision when that draft is not on this server; registering adds the next revision), any other name gets one own
@@ -230,6 +232,21 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   screens `web/src/geo/notes/` (list grouped 결정할 일 / 검토 전 / 확인함, note detail where the researcher picks an option or writes a
   별도 지시 for each decision and sends all answers at once with 답변 보내기 to the chat that wrote the note (gaid-note-decisions,
   `send` prefill in `web/src/lib/chat-prefill.ts`), 노트 정리). The upstream notebook timeline stays as the 작업 기록 one click behind.
+- Note exports (gaid-note-bundle-export, user decision 2026-10-24 "gaid-notebooklm-review 모두 권장대로 진행하자."; contract
+  `web/src/geo/contracts/note-export.ts`, server `server/src/geo/notes/export.ts`, sheets `web/src/geo/notes/note-export.tsx`,
+  namespace `noteExport`, detail in `docs/geo/research-notes.md` "Exports"): from a research note's 더 보기 menu, 결과 묶음
+  (`/geo/notes/:id/bundle`: note folder, data fingerprints from the note chats' provenance, environment records, Workflow
+  version + 지침, cited papers, README, `SHA256SUMS`; never the data files, no reproduction claim) and 공개 자료 내보내기
+  (`/geo/notes/:id/public-export`: note Markdown, Workflow 지침 Markdown, cited paper PDFs the researcher ticks, each with
+  a per-file "기관 밖으로 내보내도 되는 자료" confirmation enforced server-side, local record `.kady/geo/public-exports.jsonl`;
+  for manual Gemini Notebook upload, no Google calls). Preview first; download refused (409) when the preview's digest no
+  longer matches. Gemini Notebook result import, Drive sync and the Enterprise API are not built.
+- Gemini Notebook links (gaid-note-bundle-export--notebook-links): a researcher saves a related notebook URL (https only, no
+  credentials, `normalizeNotebookUrl` in `web/src/geo/contracts/notebook-link.ts`) on a project (`.kady/geo/notebook-link.json`,
+  `GET/PUT /geo/notebook-link`, store `server/src/geo/workspace/notebook-link.ts`, shown under the 정리 노트 list summary) or a 서재
+  folder (`LibraryCollection.notebookUrl`, `PUT /geo/library/collections/:id/notebook`, Zotero-linked folders too, kept across
+  Zotero reconcile and hub sync; shown under the folder facts). `web/src/geo/notebook-link/` (namespace `notebookLink`): the link
+  opens in a new tab; GAID never fetches, embeds or sends anything to it.
 - Personal library (gaid-research-hub, ADR `docs/adr/2026-10-21-research-hub-library.md`; folders gaid-library-folders,
   ADR `docs/adr/2026-10-21-library-folders.md`): "내 연구" → 서재, user-level store `server/src/geo/library/` (contract
   `web/src/geo/contracts/library.ts`, routes `/geo/library/*`, screens `web/src/geo/library/`). Items are Zotero-linked
@@ -239,7 +256,12 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   when sending a folder, add to collection, create item + PDF + full text, tags, note link; `zotero/writes.ts`); sending
   syncs first and merges a duplicate into its Zotero copy (`aliases` keep old ids/keys). A project's attached folders and
   papers (`.kady/geo/literature.json`) are its citation scope for the agent's `library_*` tools, the note citation check
-  and the note reference list. Workflow source papers (gaid-workflow-cite-scope): an installed Workflow's `gaid-method.json` `sources[]` papers are found in the researcher's 서재 by DOI, else exact title (`server/src/geo/library/workflow-papers.ts`, `GET /geo/library/workflow-papers?method=`, `POST …/attach`); the start window's 소개 step shows them as 근거 논문 (`web/src/geo/workspace/source-papers.tsx`) and attaches them only on the researcher's action (papers not in 서재 open 논문 넣기 with the DOI); attached ones are named with their keys in the `<workflow>` start message, and 서재 uses/the connection map link each paper to the project-installed Workflow. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
+  and the note reference list. Citations open their PDF (gaid-cite-open-pdf): in chat answers, research notes and 서재 note
+  views each `@key, p. N` of a Pandoc citation is a button (`MessageResponse` `libraryCitations`, rehype pass and
+  `CitationPdfContext` in `web/src/geo/library/citation-links.tsx`, opening in `citation-pdf.tsx`) that shows the stored PDF
+  at that PDF page in `PdfPane` (workspace: a column between preview and chat; 서재: the existing pane); an unknown key or
+  a paper without a stored PDF says so beside the citation, a page beyond the PDF says so in the pane
+  (`CitationResolution.pdf` from `GET /geo/library/citations`). Workflow source papers (gaid-workflow-cite-scope): an installed Workflow's `gaid-method.json` `sources[]` papers are found in the researcher's 서재 by DOI, else exact title (`server/src/geo/library/workflow-papers.ts`, `GET /geo/library/workflow-papers?method=`, `POST …/attach`); the start window's 소개 step shows them as 근거 논문 (`web/src/geo/workspace/source-papers.tsx`) and attaches them only on the researcher's action (papers not in 서재 open 논문 넣기 with the DOI); attached ones are named with their keys in the `<workflow>` start message, and 서재 uses/the connection map link each paper to the project-installed Workflow. `GAID_ZOTERO_LOCAL_URL` points the PC connection at a test Zotero (`oat-zotero sandbox`).
   Research notes in 서재 (gaid-note-library, user decision 2026-10-23: GAID library only, hub-synced, no Zotero writes): a note
   item (`LibraryItem.kind: "note"`, `note: LibraryNoteRef`; `server/src/geo/library/notes.ts`) mirrors one
   `연구노트/<id>/index.md` (title, date, status, headline, citations resolved to library papers, ≤ 64 KiB text snapshot); the
@@ -327,12 +349,23 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
   `SidebarItem`; `StepScale`; `SystemResourcesButton`), `.gaid-orbit` (the AI agent is working; the one loop), `.gaid-index`,
   `.gaid-seg`. User rules that hold: colours only through tokens, original pixels for figures/maps/PDFs, no
   Toss/Apple/Samsung proprietary assets or fonts. Design every screen, mockup or logo as an impeccable +
-  design-taste-frontend + brand-guide expert (user rule 2026-10-21; skills in skill_hub `.claude/skills/`). Before UI work,
+  design-taste-frontend + brand-guide expert (user rule 2026-10-21; pinned read-only copies of impeccable 4.7.0 and
+  design-taste-frontend v2.1.4 in `.claude/skills/`, sources and telemetry in `.claude/skills/SOURCE.md`; the brand is
+  `geo/brand/`; the older skill_hub copies are legacy). Before UI work,
   read guide sections 1, 2 and 10 and those for the components you touch. A change report lists the rule ids it follows or
   breaks (with reason) and includes Korean screenshots in both styles and both themes at 1440×900 and 1280×800 checked
   against section 12. `scripts/check` runs `node geo/ui/check-ui.mjs` (copy length, agent internals in researcher views,
   hard-coded colours/small text, AI-slop proxies: hue utilities, gradients, glass, image filters, side stripes, AI icons,
   emoji, brand @font-face); accepted debt lives in `geo/ui/ui-baseline.json`, added only with the reason in the report.
+  UI quality kit (gaid-ui-quality-kit): the development-only 부품 상태 견본 page `/dev/parts` (`web/src/geo/dev/parts-page.tsx`,
+  shared parts pinned in every state with `data-preview`, live token contrast table; 404 in production unless
+  `GAID_DEV_PAGES=1` at build time: `page.dev.tsx` + dev-only `pageExtensions` in `web/next.config.ts`) and `geo/ui/quality/run.mjs` (own package + lock, installed only by `scripts/check`): shadcn lint
+  (`@shadcn/lint`), impeccable detect (telemetry off), Playwright screenshots of 계측/도폭 × light/dark at 1440×900 against
+  `geo/ui/quality/baseline/` and axe-core, each finding mapped to a guide id (`geo/ui/ui-rules.json` `quality`). Modes per
+  `quality.switchRule`: impeccable and axe block (since gaid-ui-checks-blocking, 2026-10-24: same findings on PC74 and PC70;
+  a finding that is not accepted debt in `ui-baseline.json` `quality`, or a page/combination left unchecked, fails
+  `scripts/check` and points to `/dev/parts`); shadcn lint and the screenshot comparison stay report-only. A tool that cannot
+  run (no Chromium, no network) is reported as skipped and does not fail.
 - Names in visible copy (gaid-brand-copy, user decision 2026-10-15): the assistant is "AI agent" and the app is GAID;
   "Kady"/"K-Dense"/"BYOK" stay only in code identifiers, env vars, routes, model-facing text and the upstream attribution
   line. Content taken from K-Dense shows its source where it is shown: catalogue skills via `SkillInfo.upstream`
@@ -345,8 +378,10 @@ Guidance for coding agents (Claude Code loads it via `CLAUDE.md`) working in thi
 - Upstream sync: `docs/upstream-sync.md` (merge commit on a task branch, update `geo/upstream.lock.json`, log it).
 - Checks: `scripts/check` runs the upstream CI steps (`.github/workflows/tests.yml`) on Linux, then the GAID
   checks (`node --test 'geo/tests/*.test.mjs'`, `geo/tests/environments-smoke.mjs`, `start-gaid.sh --check`,
-  `geo/tests/production-smoke.mjs`). It needs Node >= 22.19, uv, network access to the npm registry, PyPI and GitHub,
-  and the pinned catalogue archive (asset) for the geo steps.
+  `geo/tests/production-smoke.mjs`, then the UI quality kit: impeccable and axe blocking, shadcn lint and screenshots report-only). It needs Node >= 22.19,
+  uv, network access to the npm registry, PyPI and GitHub (and once per PC the Playwright CDN for Chromium; on the KIGAM
+  network Node must trust the institute CA, e.g. `NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt`, or the browser
+  tools are skipped), and the pinned catalogue archive (asset) for the geo steps.
 
 ## Work policy v1
 

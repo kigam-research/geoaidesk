@@ -26,6 +26,22 @@ Scientific colour maps used through cmcrameri should be cited in research: Crame
 <https://doi.org/10.5194/gmd-11-2541-2018>, and Crameri, Shephard & Heron (2020),
 <https://doi.org/10.1038/s41467-020-19160-7>.
 
+## UI quality kit (development checks only)
+
+`geo/ui/quality/` has its own `package.json` and lock, installed only by `scripts/check`; nothing from it ships with
+the app or is installed by the launchers.
+
+| Component | Where | License |
+|---|---|---|
+| `@shadcn/lint` 0.2.3 (shadcn) | `geo/ui/quality/package.json`; configured in `geo/ui/quality/shadcn-lint.config.mjs` | MIT |
+| `impeccable` 4.7.0 CLI and its platform binary (`@impeccable/cli-*`, Paul Bakaus) | `geo/ui/quality/package.json`; run with `DO_NOT_TRACK=1` and `IMPECCABLE_NO_TELEMETRY=1` | Apache-2.0; license and `NOTICE.md` in the installed packages |
+| `@playwright/test` and `playwright-core` 1.63.0 (Microsoft); `@axe-core/playwright` and `axe-core` 4.14.0 (Deque Systems) | `geo/ui/quality/package.json` | Apache-2.0 (Playwright); MPL-2.0 (axe) |
+| `eslint` 9.39.3, `@typescript-eslint/parser` 8.72.0 | `geo/ui/quality/package.json` | MIT |
+| shadcn skill showcase code (shadcn/ui repository, `skills/shadcn/assets/showcase/`): the preview-state custom variants (`preview-states.css`) and the one-pixel colour resolution of `color-pair.tsx` | adapted in `web/src/app/globals.css` (the three `@custom-variant` rules) and `web/src/geo/dev/parts-page.tsx` (`toRgb`) | MIT, Copyright (c) 2023 shadcn |
+
+The guide-rule mappings in `geo/ui/ui-rules.json` `quality` (which UI guide id each lint rule, impeccable antipattern
+and axe rule belongs to) are GAID's own; no rule text from these tools is copied into the repository.
+
 ## Scientific figure skill adapted into GeoAIDesk
 
 `geo/skills/gaid-figures/` adapts K-Dense-AI/scientific-agent-skills' `scientific-visualization` v1.4,
@@ -41,6 +57,16 @@ The colour-vision previews implement the full-severity matrices of Machado, Oliv
 |---|---|---|
 | Attention Control (`aaddrick/attention-control`), through KIGAM's Korean adaptation: delivery rules for chat answers | `REPLY_STYLE_RULE` in `server/src/geo/instructions.ts` (condensed, reworded) | MIT, Copyright (c) 2026 aaddrick; portions Copyright (c) 2026 Ayoub Ghriss |
 | Humanizer (`blader/humanizer` v3.1.0), through KIGAM's Korean adaptation: prose patterns for research notes; its patterns come from Wikipedia's "Signs of AI writing" (WikiProject AI Cleanup) | `geo/skills/gaid-note-style/` (condensed, reworded; seeded into each project's `.pi/skills/`) | MIT, Copyright (c) 2025 Siqi Chen; text in `geo/skills/gaid-note-style/LICENSE` |
+
+## Design skills for developers (not shipped in the app)
+
+Unmodified copies read by coding agents working on GAID's screens; the app never loads them. Pins, telemetry and what
+was left out: `.claude/skills/SOURCE.md`.
+
+| Material | Where | License |
+|---|---|---|
+| Impeccable (`pbakaus/impeccable` skill 4.7.0, tag `skill-v4.7.0`, commit `aeeb3d8c`); its `reference/ios.md` and `reference/android.md` derive from `ehmo/platform-design-skills` (MIT) | `.claude/skills/impeccable/` | Apache-2.0; `.claude/skills/licenses/impeccable-LICENSE` and its notices `impeccable-NOTICE.md` |
+| tasteskill (`Leonxlnx/taste-skill` v2.1.4, commit `6010f91a`), skill `design-taste-frontend` | `.claude/skills/design-taste-frontend/` | MIT, Copyright (c) 2026 Leonxlnx; `.claude/skills/licenses/taste-skill-LICENSE` |
 
 ## Content fetched at runtime
 

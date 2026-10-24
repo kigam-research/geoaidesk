@@ -211,6 +211,8 @@ export interface LibraryCollection {
   parentId?: string;
   zotero?: { connection: ZoteroConnectionKind; serverId?: string; libraryType: "user" | "group"; libraryId: string; collectionKey: string };
   createdAt?: string;
+  /** Researcher-saved external notebook page, opened only; GAID-side field kept across Zotero reconcile and hub sync. */
+  notebookUrl?: string;
 }
 
 /** CSL with numeric date parts: Zotero's CSL export writes them as strings ("2023"); CSL-JSON and GAID use numbers. */
@@ -372,6 +374,45 @@ export function parseCitations(markdown: string): NoteCitation[] {
   return out;
 }
 
+/** Where one citation of a bracket group sits in a text: `@key` up to the end of its locator (gaid-cite-open-pdf). */
+export interface CitationSpan {
+  key: string;
+  locator?: string;
+  /** Offset of the `@` (or the `-` of `-@key`). */
+  start: number;
+  /** Offset just past the locator, or past the key when there is none. */
+  end: number;
+}
+
+/**
+ * The citations of the bracketed Pandoc groups in a plain text run (no Markdown code handling: the caller passes text
+ * outside code), with their offsets, so a renderer can make each `@key, p. 12` clickable inside its brackets.
+ */
+export function citationSpans(text: string): CitationSpan[] {
+  const out: CitationSpan[] = [];
+  for (const group of text.matchAll(GROUP)) {
+    const innerStart = (group.index ?? 0) + 1;
+    for (const item of group[1].matchAll(ITEM)) {
+      const lead = item[0].search(/[-@]/);
+      const locator = item[2]?.trim();
+      const tail = item[0].length - (item[2] ? item[2].length - item[2].trimEnd().length : 0);
+      out.push({ key: item[1], ...(locator ? { locator } : {}), start: innerStart + (item.index ?? 0) + lead, end: innerStart + (item.index ?? 0) + tail });
+    }
+  }
+  return out;
+}
+
+/**
+ * The PDF page a citation locator points at: the first page of `p. 12`, `pp. 3-5`, `page 7`, `12쪽` or `12면`; none for
+ * other locators (`그림 4`, `chap. 2`). Library tools and the note citation check count PDF pages, not printed ones.
+ */
+export function citationPage(locator: string | undefined): number | undefined {
+  if (!locator) return undefined;
+  const match = /^(?:pp?\.?|pages?)\s*(\d+)|^(\d+)\s*(?:쪽|면|페이지)/iu.exec(locator.trim());
+  const page = Number(match?.[1] ?? match?.[2]);
+  return Number.isInteger(page) && page > 0 ? page : undefined;
+}
+
 /** Replace fenced blocks and inline code spans with spaces so offsets stay valid. */
 function maskCode(text: string): string {
   const blank = (s: string) => s.replace(/[^\n]/g, " ");
@@ -521,6 +562,8 @@ export interface CitationResolution {
   reference?: string;
   /** In the library but outside the project's citation scope (attached folders and items). */
   outsideScope?: boolean;
+  /** The paper's PDF is stored in GAID (`GET /geo/library/items/:id/pdf`); `pages` when GAID has counted them. */
+  pdf?: { pages?: number };
 }
 
 // --- Folders ---------------------------------------------------------------------------------------------------------

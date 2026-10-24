@@ -29,6 +29,7 @@ export function SidebarItem({
   onClick,
   title,
   children,
+  preview,
 }: {
   icon?: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   label: string;
@@ -37,6 +38,8 @@ export function SidebarItem({
   onClick?: () => void;
   title?: string;
   children?: ReactNode;
+  /** Pins hover/focus for the development parts page (data-preview, globals.css). */
+  preview?: "hover" | "focus";
 }) {
   return (
     <button
@@ -44,16 +47,17 @@ export function SidebarItem({
       onClick={onClick}
       aria-current={selected ? "page" : undefined}
       title={title}
+      data-preview={preview}
       className={cn(
         "relative flex min-h-[34px] w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-sm transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         selected ? "gaid-index bg-gaid-signal-tint font-semibold text-gaid-ink" : "text-gaid-ink hover:bg-sidebar-accent",
       )}
     >
       {Icon && <Icon className={cn("size-4 shrink-0", selected ? "text-gaid-signal-ink" : "text-gaid-ink-2")} aria-hidden />}
       <span className="min-w-0 flex-1 truncate">{label}</span>
       {children}
-      {count !== undefined && <span className="text-xs font-medium tabular-nums text-gaid-ink-3">{count}</span>}
+      {count !== undefined && <span className="text-xs font-medium tabular-nums text-gaid-ink-2">{count}</span>}
     </button>
   );
 }

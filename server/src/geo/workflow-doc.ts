@@ -243,7 +243,7 @@ export function workflowDocFor(workflow: GeoWorkflow, context: WorkflowDocContex
 
 // --- Wording for server-rendered text ----------------------------------------------------------------------------
 
-const LOCALE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../web/src/geo/locales/workflowDoc");
+const LOCALES_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../web/src/geo/locales");
 const catalogues = new Map<string, Record<string, string>>();
 
 function flatten(value: unknown, prefix = "", out: Record<string, string> = {}): Record<string, string> {
@@ -255,19 +255,25 @@ function flatten(value: unknown, prefix = "", out: Record<string, string> = {}):
   return out;
 }
 
-function catalogue(locale: "ko" | "en"): Record<string, string> {
-  let entries = catalogues.get(locale);
+function catalogue(namespace: string, locale: "ko" | "en"): Record<string, string> {
+  const cacheKey = `${namespace}/${locale}`;
+  let entries = catalogues.get(cacheKey);
   if (!entries) {
-    entries = flatten(JSON.parse(fs.readFileSync(path.join(LOCALE_DIR, `${locale}.json`), "utf8")));
-    catalogues.set(locale, entries);
+    entries = flatten(JSON.parse(fs.readFileSync(path.join(LOCALES_ROOT, namespace, `${locale}.json`), "utf8")));
+    catalogues.set(cacheKey, entries);
   }
   return entries;
 }
 
-/** `say` for renderWorkflowDocument on the server: same catalogue and formatter as the web's `t`. */
-export function workflowDocSay(locale: "ko" | "en"): WorkflowDocSay {
+/** Server-side `say` over one GAID locale namespace: same catalogue and formatter as the web's `t`; keys without the namespace. */
+export function localeSay(namespace: string, locale: "ko" | "en"): WorkflowDocSay {
   return (key, values = {}) => {
-    const message = catalogue(locale)[key] ?? catalogue("ko")[key];
+    const message = catalogue(namespace, locale)[key] ?? catalogue(namespace, "ko")[key];
     return message === undefined ? key : formatMessage(message, locale, values);
   };
+}
+
+/** `say` for renderWorkflowDocument on the server: same catalogue and formatter as the web's `t`. */
+export function workflowDocSay(locale: "ko" | "en"): WorkflowDocSay {
+  return localeSay("workflowDoc", locale);
 }

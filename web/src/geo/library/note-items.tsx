@@ -46,20 +46,23 @@ export function snapshotForLibrary(markdown: string): string {
     .replace(/\[([^\]]+)\]\((?![a-z][a-z0-9+.-]*:)[^)]*\)/gi, "$1");
 }
 
-export function NoteTable({ rows, selected, onSelect }: { rows: LibraryItemSummary[]; selected: string | null; onSelect: (id: string) => void }) {
+/** `compact` while a PDF pane is open beside the table (gaid-cite-open-pdf): only the note and its date, like the paper table. */
+export function NoteTable({ rows, selected, onSelect, compact = false }: { rows: LibraryItemSummary[]; selected: string | null; onSelect: (id: string) => void; compact?: boolean }) {
   return (
     <table className="w-full border-collapse text-sm">
       <thead className="sticky top-0 bg-background">
         <tr className="border-b text-left text-xs text-muted-foreground">
-          <th className="w-[50%] px-2 py-2 font-medium">{L("table.note")}</th>
+          <th className={cn("px-2 py-2 font-medium", !compact && "w-[50%]")}>{L("table.note")}</th>
           <th className="whitespace-nowrap px-2 py-2 font-medium">{L("table.date")}</th>
+          {!compact && <>
           <th className="px-2 py-2 font-medium">{L("table.project")}</th>
           <th className="px-2 py-2 font-medium">{L("table.status")}</th>
           <th className="whitespace-nowrap px-2 py-2 text-right font-medium">{L("table.cites")}</th>
+          </>}
         </tr>
       </thead>
       <tbody>
-        {rows.length === 0 && <tr><td colSpan={5} className="px-2 py-6 text-muted-foreground">{L("noMatch")}</td></tr>}
+        {rows.length === 0 && <tr><td colSpan={compact ? 2 : 5} className="px-2 py-6 text-muted-foreground">{L("noMatch")}</td></tr>}
         {rows.map((row) => (
           <tr key={row.id} onClick={() => onSelect(row.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(row.id); } }}
             tabIndex={0} aria-selected={selected === row.id} aria-label={row.title}
@@ -70,12 +73,14 @@ export function NoteTable({ rows, selected, onSelect }: { rows: LibraryItemSumma
               {row.note?.headline && <div className="line-clamp-1 text-xs text-muted-foreground">{row.note.headline}</div>}
             </td>
             <td className="gaid-numeric whitespace-nowrap px-2 py-2.5">{row.note?.date ? formatDate(row.note.date) : ""}</td>
+            {!compact && <>
             <td className="px-2 py-2.5">
               <div className="line-clamp-1" title={row.note?.projectName}>{row.note?.projectName}</div>
               {row.note && !row.note.local && <div className="text-xs text-muted-foreground">{row.note.missing ? L("missingShort") : L("otherPc", { name: row.note.originLabel })}</div>}
             </td>
             <td className="px-2 py-2.5">{row.note && <NoteStatusBadge status={row.note.status} />}</td>
             <td className="gaid-numeric px-2 py-2.5 text-right text-muted-foreground">{row.note?.cites || L("table.none")}</td>
+            </>}
           </tr>
         ))}
       </tbody>
@@ -158,7 +163,7 @@ export function NoteItemDetail({ data, collections, onClose, onOpenNote, onSelec
         <summary className="cursor-pointer text-base font-semibold"><NotebookTextIcon className="mr-1.5 inline size-4 align-[-2px]" aria-hidden />{L("content.title")}</summary>
         <p className="mt-2 text-xs text-muted-foreground">{L(note.truncated ? "content.readTruncated" : "content.read", { when: new Date(note.refreshedAt).toLocaleString() })}</p>
         <div className="mt-2 max-h-[420px] overflow-y-auto text-sm">
-          <MessageResponse className={NOTE_PROSE}>{body}</MessageResponse>
+          <MessageResponse className={NOTE_PROSE} libraryCitations>{body}</MessageResponse>
         </div>
       </details>
     </div>

@@ -48,6 +48,7 @@ import {
   useState,
 } from "react";
 import { Block, Streamdown, defaultRehypePlugins, type BlockProps } from "streamdown";
+import { CitationButton, libraryCitationLinks } from "@/geo/library/citation-links";
 
 const workText = geoText("work");
 
@@ -344,6 +345,8 @@ export type MessageResponseProps = ComponentProps<typeof Streamdown> & {
   onOpenFile?: (path: string) => void;
   /** Sandbox folder that relative links and images are resolved against (a Markdown file's own folder). */
   baseDir?: string;
+  /** GeoAIDesk (gaid-cite-open-pdf): 서재 citations (`[@key, p. 12]`) become buttons that open the PDF page. */
+  libraryCitations?: boolean;
 };
 
 const OpenMarkdownFileContext = createContext<((path: string) => void) | undefined>(undefined);
@@ -507,17 +510,20 @@ const streamdownComponents = {
   a: SandboxLink,
   th: TableHeaderCell,
   td: TableCell,
+  button: CitationButton,
 } as unknown as ComponentProps<typeof Streamdown>["components"];
 
 export const MessageResponse = memo(
-  ({ className, children, onOpenFile, baseDir, ...props }: MessageResponseProps) => {
+  ({ className, children, onOpenFile, baseDir, libraryCitations, ...props }: MessageResponseProps) => {
     const projectId = useProjectScopeId();
     const rehypePlugins = useMemo<NonNullable<ComponentProps<typeof Streamdown>["rehypePlugins"]>>(() => [
       defaultRehypePlugins.raw,
       defaultRehypePlugins.sanitize,
       [sandboxMarkdownUrls, { projectId, baseDir: baseDir ?? "" }] as [typeof sandboxMarkdownUrls, Parameters<typeof sandboxMarkdownUrls>[0]],
       defaultRehypePlugins.harden,
-    ], [projectId, baseDir]);
+      // Last, so sanitize and harden never see the citation buttons it adds.
+      ...(libraryCitations ? [libraryCitationLinks] : []),
+    ], [projectId, baseDir, libraryCitations]);
     return (
       <OpenMarkdownFileContext.Provider value={onOpenFile}>
         <Streamdown

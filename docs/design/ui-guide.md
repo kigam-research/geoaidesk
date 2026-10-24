@@ -43,6 +43,13 @@ Section 13 lists where GAID deliberately differs from both.
    screen in Korean in both styles (계측, 도폭) and both themes (light, dark), at 1440×900 and 1280×800, and check it
    against section 12.
 4. Run `node geo/ui/check-ui.mjs` (part of `scripts/check`).
+5. UI quality kit (`geo/ui/quality/`, part of `scripts/check`): `node geo/ui/quality/run.mjs` after `npm ci` in that folder.
+   It runs shadcn lint over the GAID sources, impeccable's detector, axe-core and full-page screenshots of the development
+   parts page (`/dev/parts`, served by `next dev`) in 계측/도폭 × light/dark at 1440×900 against
+   `geo/ui/quality/baseline/`, and names the guide rule of every finding (`geo/ui/ui-rules.json` `quality`). impeccable and axe
+   block (switched 2026-10-24 under the switch rule there): a finding fails unless it is accepted debt in
+   `geo/ui/ui-baseline.json` `quality`; shadcn lint and the screenshot comparison report only. A change to a shared part updates its specimen on the parts page and the
+   baselines (`--update-baseline`, reviewed images in the change report).
 
 Rule ids: P principles, I identity, L layout, T type, S colour, materials and states, B buttons, N navigation and
 toolbars, D dialogs, sheets, popovers and menus, Q questions and start settings, G lists and cards, X tables, MAP maps,
@@ -95,7 +102,7 @@ GAID reports results (P9). Brand lives in precise details, never in costume (imp
 | I7 | **Two tones.** A cool aluminium functional layer (`--gaid-chrome`: top bar, sidebars, tab strips, toolbars) around white content faces (`--gaid-face`); hairlines `--gaid-edge`. |
 | I8 | **Chamfered corners.** Every rounded box gets a 45° chamfer (`corner-shape: bevel` from `--gaid-corner`, applied in `globals.css` to `rounded-*` classes except `rounded-full`): 4–6 px controls, 8 px containers, 12 px dialogs. Browsers without `corner-shape` show round corners; nothing depends on the bevel. |
 | I9 | **Index mark.** The current item in a sidebar or list carries `.gaid-index`: a small signal-blue pointer at the pane edge, plus tint and weight. |
-| I10 | **Graduated scale.** Step progress (start settings, research-note decisions) is drawn by `StepScale`: a scale with a major tick per step, minor ticks between, filled to the current step, a pointer above it. Scales appear only where they show a position; never as decoration. |
+| I10 | **Graduated scale.** Step progress (start settings, research-note decisions) is drawn by `StepScale`: a scale with a major tick per step, minor ticks between, filled to the current step, a pointer above it. Scales appear only where they show a position; never as decoration. A list of stages with no current one (a Workflow's analysis stages on a hub card, gaid-hub-stage-cards) is a plain numbered list, and its count in a row is an I11 readout. |
 | I11 | **Readouts.** Counts that need the researcher (`결정 3`) are short tinted plates with tabular figures. |
 
 | Token (light / dark) | Value |
@@ -107,11 +114,17 @@ GAID reports results (P9). Brand lives in precise details, never in costume (imp
 | `--gaid-control-edge` | #878f9d / #6b7382 (≥ 3:1) |
 | `--gaid-ink`, `--gaid-ink-2`, `--gaid-ink-3` | #171b23, #525a68, #646c7a / #e7e9ee, #b3b9c4, #98a0ad |
 | `--gaid-signal` (fill), `--gaid-signal-ink` (text) | #1f5eff, #1d4fd8 / #3366e8, #7fa2ff |
+| `--gaid-signal-hover` (hovered blue fill), `--gaid-brand-hover` (pressed blue fill) | #1a54e8, #1749cc / #2f60df, #2b5ad6 |
 | `--gaid-signal-tint` | #e8eeff / #1e2b4d |
+| `--gaid-on-signal` (text on blue) | #ffffff / #ffffff |
+| `--gaid-hover`, `--gaid-press` | #e9ecf1, #dde1e8 / #262b34, #2f3540 |
+| `--gaid-danger-press` (pressed destructive fill) | #9e1f17 / #6e302b |
+| `--ring` (focus ring) | `--gaid-signal` / `--gaid-signal-ink` |
 | status (`success`, `warning`, `danger` with `-tint`) | #1e7a46, #8a5300, #c2261d / #4cc38a, #f0b44c, #ff7a6e |
 
 Contrast (computed): body 17.3:1 light, 14.5:1 dark; secondary 7.0:1 / 8.9:1; placeholders 5.3:1 / 6.7:1; blue text 6.6:1 /
-7.1:1; white on blue buttons 5.1:1 / 5.0:1; control boundaries 3.3:1 / 3.7:1.
+7.1:1; white on blue buttons 5.1:1 / 5.0:1 (hovered 6.0:1 / 5.4:1, pressed 7.3:1 / 5.9:1); control boundaries 3.3:1 / 3.7:1;
+focus ring on face and chrome 5.1:1 and 4.6:1 / 7.1:1 and 6.3:1.
 
 ### 도폭 (Map sheet), the style a researcher may choose
 
@@ -161,13 +174,13 @@ utilities (V1). Data palettes for maps and depth tracks are the exception (`ui-r
 
 | Id | Rule | Source |
 |---|---|---|
-| S1 | **Roles.** `--face` content background, `--face-2` quiet content panels (table headers, code), `--chrome` functional layer, `--edge` hairlines, `--control-edge` input and control boundaries (≥ 3:1), `--ink` text, `--ink-2` secondary text, `--ink-3` placeholders and disabled text (≥ 4.5:1), `--signal` primary fill, `--signal-ink` blue text and links, `--signal-tint` selection, `--on-signal` text on blue; status `--gaid-success`, `--gaid-warning`, `--gaid-danger`, `--gaid-untested`, `--gaid-nodata` with `-tint` backgrounds. shadcn variables (`--background`, `--primary`, …) map onto these roles. | HIG Color "dynamic system colors … semantically defined by purpose"; OneUI Color system |
+| S1 | **Roles.** Each role is a `--gaid-` token: `--gaid-face` content background, `--gaid-face-2` quiet content panels (table headers, code), `--gaid-chrome` functional layer, `--gaid-edge` hairlines, `--gaid-control-edge` input and control boundaries (≥ 3:1), `--gaid-ink` text, `--gaid-ink-2` secondary text, `--gaid-ink-3` placeholders and disabled text (≥ 4.5:1), `--gaid-signal` primary fill (`--gaid-signal-hover` hovered, `--gaid-brand-hover` pressed), `--gaid-signal-ink` blue text and links (also the link-style button), `--gaid-signal-tint` selection, `--gaid-on-signal` text and icons on blue, `--gaid-hover` and `--gaid-press` the hover and pressed fills of bordered and plain controls; status `--gaid-success`, `--gaid-warning`, `--gaid-danger`, `--gaid-untested`, `--gaid-nodata` with `-tint` backgrounds. shadcn variables map onto these roles (`--background` → face, `--primary` → signal, `--primary-foreground` → on-signal, …); Tailwind reads them as `bg-gaid-*`/`text-gaid-*`. | HIG Color "dynamic system colors … semantically defined by purpose"; OneUI Color system |
 | S2 | **Calm large areas, colour on small areas.** Surfaces stay neutral; colour marks only the primary action, selection, focus, agent activity and status. At most one coloured status mark per row. No gradients, glass or blur in work areas (V3). | OneUI Color system "Background color"; HIG Color "Liquid Glass color: apply color sparingly" |
 | S3 | **Same colour, same meaning.** Blue never marks status; status colours never mark interactivity; meaning is never carried by colour alone (text, icon or pattern too; check in greyscale). | HIG Color "Avoid using the same color to mean different things", Accessibility "Convey information with more than color alone"; OneUI Accessibility "Use of color" |
 | S4 | **Contrast.** Body text ≥ 7:1 on its surface; secondary text, captions and placeholders ≥ 4.5:1; large text (≥ 24 px, or ≥ 18.7 px bold) ≥ 3:1; control boundaries and focus rings ≥ 3:1. Checked in light and dark. | HIG Dark Mode "strive for a contrast ratio of 7:1, especially in small text", Accessibility (WCAG AA); OneUI Accessibility "Minimum contrast ratio" |
 | S5 | **Light and dark follow the system.** The app follows `prefers-color-scheme` by default (`시스템 테마`); Settings → 화면 표시 may override it (`밝은 테마` / `어두운 테마`), and the header carries no theme switch. Dark surfaces are dimmer, foreground brighter; elevated overlays are lighter than the base. Both themes ship and are reviewed for every changed screen. | HIG Dark Mode "Avoid offering an app-specific appearance setting", iOS "base and elevated"; OneUI Color "Theme" |
 | S6 | **Three plies of depth.** Ply 0 chrome and face (flat; separated by tone and hairlines); ply 1 raised controls only where they need it (none by default); ply 2 overlays (popover, menu, sheet, toast) with one soft shadow and a 1 px edge. Cards never cast shadows. A modal dims the window (one dim level); a related overlay gets the shadow without dim; never both stacked. | OneUI Structure "Visual depth" (dim for unrelated, shadow for related, never both); HIG Materials (functional vs content layer) |
-| S7 | **States.** Every interactive element has default, hover, pressed, focus-visible (2 px `--ring` with 2 px offset), selected, disabled and, where it applies, loading and error. A disabled primary action says why on one line beside it. Loading replaces the label with progress text and keeps the width. Selection is shown by tint plus a non-colour cue (weight, index mark or check). | HIG Buttons "Always include a press state", Feedback "Show people when a command can't be carried out"; OneUI Accessibility "Screen reader" |
+| S7 | **States.** Every interactive element has default, hover, pressed, focus-visible (2 px `--ring` outline with 2 px offset: `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`; never a translucent ring), selected, disabled and, where it applies, loading and error. A disabled primary action says why on one line beside it. Loading replaces the label with progress text and keeps the width. Selection is shown by tint plus a non-colour cue (weight, index mark or check). Pressed differs from hover and darkens: filled buttons hover on `--gaid-signal-hover` and take `--gaid-brand-hover` when pressed, destructive ones `--gaid-danger-press`, bordered and plain ones `--gaid-press` (`web/src/components/ui/button.tsx`). The development parts page (`/dev/parts`) pins every state with `data-preview` for review. | HIG Buttons "Always include a press state", Feedback "Show people when a command can't be carried out"; OneUI Accessibility "Screen reader" |
 | S8 | **Browser surfaces carry the design.** Text selection, caret, scrollbars (thin, `--edge`/`--ink-3` thumb), focus rings, link underlines (offset 3 px) and placeholder text are themed from the tokens in both themes. | impeccable craft floor "Browser surfaces" |
 | S9 | **Increased contrast.** Under `prefers-contrast: more`, hairlines become `--control-edge`, `--ink-2` becomes `--ink`, and tints double their strength. | HIG Color "an increased contrast option for each variant", Accessibility |
 

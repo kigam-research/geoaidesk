@@ -468,7 +468,7 @@
       "path": ".gitignore",
       "owner": "gaid-improve",
       "status": "edited",
-      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git."
+      "responsibility": "Ignore symlinked Impeccable build/review output directories stored under task data, not Git. gaid-design-skills-refresh: track only the pinned design-skill copies under .claude/skills/ (rest of .claude/ stays ignored) and ignore design-taste-frontend's .taste-skill/ sheets."
     },
     {
       "path": "web/src/app/authoring-preview/page.tsx",
@@ -1027,6 +1027,48 @@
       "owner": "gaid-hub-versions",
       "status": "edited",
       "responsibility": "Update hub skill integer-version copy expectations after the user replaced 판 with version."
+    },
+    {
+      "path": "web/src/app/globals.css",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Role tokens --gaid-on-signal (shadcn --primary-foreground/--sidebar-primary-foreground map onto it), --gaid-press and --gaid-danger-press (pressed fills, UI guide S1/S7) in both styles; shadcn skill preview-state custom variants (hover, focus-visible, active also match data-preview) for the development parts page"
+    },
+    {
+      "path": "web/src/components/ui/button.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Pressed (active) fill per variant (UI guide S7): filled --gaid-brand-hover, destructive --gaid-danger-press, bordered/plain --gaid-press, link signal-ink; dark destructive hover"
+    },
+    {
+      "path": "web/src/components/tool-activity.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "UI guide V2: a skill call row shows ScrollTextIcon instead of WandSparklesIcon; the reasoning disclosure drops BrainIcon"
+    },
+    {
+      "path": "web/src/app/dev/parts/page.dev.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "added",
+      "responsibility": "Development parts page route (web/src/geo/dev/parts-page.tsx); the dev.tsx page extension exists only in next dev or a GAID_DEV_PAGES=1 build, so production has no such route (404)"
+    },
+    {
+      "path": "scripts/check",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Appends the UI quality kit step (geo/ui/quality/run.mjs; impeccable and axe blocking, the rest report-only)"
+    },
+    {
+      "path": "web/next.config.ts",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Config as a phase function: pageExtensions add dev.tsx only for the development server or GAID_DEV_PAGES=1 builds (development pages such as /dev/parts); everything else unchanged"
+    },
+    {
+      "path": "web/src/components/ai-elements/message.tsx, web/src/components/chat-tab.tsx, web/src/app/page.tsx",
+      "owner": "gaid-cite-open-pdf",
+      "status": "edited",
+      "responsibility": "서재 citations open their PDF page: MessageResponse gains an opt-in `libraryCitations` prop (rehype pass `libraryCitationLinks` after harden, `button` mapped to `CitationButton`, web/src/geo/library/citation-links.tsx); chat assistant text turns it on; the workspace provides `CitationPdfContext` and shows `CitationPdfPane` as a column between the preview and the chat."
     }
   ],
   "notTouched": [

@@ -332,6 +332,19 @@ describe("shared GAID hub", () => {
     ).toBe(409);
   });
 
+  it("carries the Workflow's own stages on entries and recommended cards, inventing none", async () => {
+    const f = await setup(true);
+    const entry = (await f.register()).json<HubEntry>();
+    const stages = { titles: [{ ko: "자료 준비" }, { ko: "nested CV" }, { ko: "보고" }], inputs: ["CSV"], outputs: [{ ko: "점수 표" }] };
+    expect(entry.stages).toEqual(stages);
+    expect((await f.app.inject("/geo/hub/entries")).json().entries[0].stages).toEqual(stages);
+    await f.app.inject({ method: "POST", url: `/geo/hub/entries/${entry.id}/star`, headers: headers(), payload: { on: true } });
+    const cards = (await f.app.inject("/geo/hub/recommended")).json().cards;
+    expect(cards[0]).toMatchObject({ source: "shared", stages });
+    // Catalogue Workflows without steps or a skill procedure get no stages (the card keeps its neutral plate).
+    expect(cards.slice(1).every((c: { stages?: unknown }) => c.stages === undefined)).toBe(true);
+  });
+
   it("orders starred entries first and skips catalogue fallback when the catalogue is off", async () => {
     const f = await setup();
     const first = (await f.register()).json<HubEntry>();

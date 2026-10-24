@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseCitations } from "./library";
+import { citationPage, citationSpans, parseCitations } from "./library";
 
 describe("parseCitations", () => {
   it("reads keys and locators in order", () => {
@@ -29,5 +29,23 @@ describe("parseCitations", () => {
 
   it("does not take trailing punctuation into the key", () => {
     expect(parseCitations("[@lee2024.]").map((c) => c.key)).toEqual(["lee2024"]);
+  });
+});
+
+describe("citationSpans and citationPage (gaid-cite-open-pdf)", () => {
+  it("gives the offsets of each citation inside its brackets", () => {
+    const text = "같습니다 [see @roberts2022, pp. 3-5; @zhang2023]. 그리고 [-@hong_2026:pu, 그림 4 ]";
+    const spans = citationSpans(text);
+    expect(spans.map((s) => text.slice(s.start, s.end))).toEqual(["@roberts2022, pp. 3-5", "@zhang2023", "-@hong_2026:pu, 그림 4"]);
+    expect(spans.map((s) => [s.key, s.locator])).toEqual([["roberts2022", "pp. 3-5"], ["zhang2023", undefined], ["hong_2026:pu", "그림 4"]]);
+  });
+
+  it("finds nothing in links, e-mail addresses and bare mentions", () => {
+    expect(citationSpans("[링크 @x](https://example.org) [a@b.com] @loose")).toEqual([]);
+  });
+
+  it("reads the first PDF page of page locators only", () => {
+    expect(["p. 12", "pp. 3-5", "p.7", "page 9", "pages 2–4", "12쪽", "4 페이지"].map(citationPage)).toEqual([12, 3, 7, 9, 2, 12, 4]);
+    expect(["그림 4", "chap. 2", "p. 0", undefined].map(citationPage)).toEqual([undefined, undefined, undefined, undefined]);
   });
 });

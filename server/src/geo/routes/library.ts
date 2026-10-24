@@ -324,6 +324,10 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
     scope.patch<{ Params: { id: string }; Body: { name?: unknown; parentId?: unknown } }>("/geo/library/collections/:id", async (req) =>
       storeOf().editGaidCollection(req.params.id, req.body ?? {}));
     scope.delete<{ Params: { id: string } }>("/geo/library/collections/:id", async (req) => storeOf().removeGaidCollection(req.params.id));
+    scope.put<{ Params: { id: string }; Body: { url?: unknown } }>("/geo/library/collections/:id/notebook", async (req) => {
+      if (req.body?.url !== null && typeof req.body?.url !== "string") throw new LibraryError("Expected { url: string | null }", 400);
+      return storeOf().setCollectionNotebook(req.params.id, req.body.url);
+    });
     /** Adds or removes papers; a Zotero item added to a folder linked to its library is also added in Zotero. */
     scope.post<{ Params: { id: string }; Body: { itemIds?: unknown; action?: unknown } }>("/geo/library/collections/:id/items", async (req) => {
       const ids = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((x): x is string => typeof x === "string") : [];
@@ -436,7 +440,9 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       return Promise.all(keys.map(async (key) => {
         const item = await store.byCitationKey(key);
         if (!item || item.removedFromSourceAt) return { key };
-        return { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item), ...(scope && !scope.has(item.id) ? { outsideScope: true } : {}) };
+        const sha = storedPdf(item), pages = item.attachments.find((a) => a.stored?.sha256 === sha)?.pages ?? item.read.pagesTotal;
+        return { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item), ...(scope && !scope.has(item.id) ? { outsideScope: true } : {}),
+          ...(sha ? { pdf: pages ? { pages } : {} } : {}) };
       }));
     });
 

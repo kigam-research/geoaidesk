@@ -62,7 +62,14 @@ benchmarking/
 /graphify-out
 TODO.md
 .agents/
-.claude/
+.claude/*
+# GeoAIDesk: pinned read-only design-skill copies (provenance in .claude/skills/SOURCE.md)
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/SOURCE.md
+!.claude/skills/licenses/
+!.claude/skills/impeccable/
+!.claude/skills/design-taste-frontend/
 skills-lock.json
 AGENTS.md
 CLAUDE.md
@@ -75,3 +82,5 @@ geo/catalogue/*.tar.gz
 # Design tool outputs live under TASK_DATA_DIR via local symlinks
 /.impeccable/build
 /.impeccable/review
+# design-taste-frontend draw sheets (.claude/skills/SOURCE.md)
+/.taste-skill/

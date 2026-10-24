@@ -24,10 +24,16 @@ export interface PdfPaneProps {
   onClose: () => void;
   /** Optional page to scroll to; bump `sequence` to repeat a jump to the same page. */
   pageRequest?: { page: number; sequence: number };
+  /** Page count once pdf.js has loaded the document. */
+  onDocumentReady?: (pages: number) => void;
+  /** One line under the header, e.g. a cited page the PDF does not have (gaid-cite-open-pdf). */
+  notice?: string;
+  /** Tooltip of the close button; defaults to returning to the paper detail (서재). */
+  closeHint?: string;
   className?: string;
 }
 
-export function PdfPane({ title, url, onClose, pageRequest, className }: PdfPaneProps) {
+export function PdfPane({ title, url, onClose, pageRequest, onDocumentReady, notice, closeHint, className }: PdfPaneProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   // Focus moves into the pane when it opens (A2), so Escape and the toolbar are one Tab away.
   useEffect(() => { closeRef.current?.focus(); }, [url]);
@@ -47,11 +53,12 @@ export function PdfPane({ title, url, onClose, pageRequest, className }: PdfPane
           <TooltipTrigger asChild>
             <Button ref={closeRef} variant="ghost" size="icon-sm" aria-label={text("pdfPane.close.button")} onClick={onClose}><XIcon /></Button>
           </TooltipTrigger>
-          <TooltipContent>{text("pdfPane.closeHint")}</TooltipContent>
+          <TooltipContent>{closeHint ?? text("pdfPane.closeHint")}</TooltipContent>
         </Tooltip>
       </header>
+      {notice && <p role="status" className="shrink-0 border-b border-gaid-frame bg-gaid-warning-tint px-4 py-2 text-sm text-gaid-warning">{notice}</p>}
       <div className="min-h-0 flex-1">
-        <PdfViewer key={url} path={title} sourceUrl={url} pageRequest={pageRequest} hideAnnotationUi initialFitWidth
+        <PdfViewer key={url} path={title} sourceUrl={url} pageRequest={pageRequest} onDocumentReady={onDocumentReady} hideAnnotationUi initialFitWidth
           renderError={() => (
             <div role="alert" className="flex h-full flex-col items-start gap-3 p-6">
               <p className="text-sm">{text("pdfPane.error")}</p>

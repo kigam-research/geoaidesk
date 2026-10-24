@@ -1,0 +1,110 @@
+{
+  "badge": "Development page",
+  "title": "Parts state specimen",
+  "context": "Shared parts pinned in every state. Researchers cannot open this page.",
+  "style": {
+    "label": "Screen style",
+    "instrument": "Instrument",
+    "mapsheet": "Map sheet"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light theme",
+    "dark": "Dark theme"
+  },
+  "contrast": {
+    "heading": "Colour roles and contrast",
+    "context": "Computed from the current screen's token values against UI guide S4.",
+    "sample": "Aa",
+    "pass": "Pass",
+    "fail": "Below",
+    "ratio": "{ratio} : 1",
+    "minimum": "Minimum {min} : 1",
+    "pairs": {
+      "body": "Body text",
+      "bodyChrome": "Body text on chrome",
+      "secondary": "Secondary text",
+      "secondaryChrome": "Secondary text on chrome",
+      "placeholder": "Placeholder text",
+      "link": "Links and blue text",
+      "onSignal": "Primary button label",
+      "onSignalHover": "Hovered primary button label",
+      "onSignalPressed": "Pressed primary button label",
+      "selected": "Selected item",
+      "success": "Success mark",
+      "warning": "Warning mark",
+      "danger": "Danger mark",
+      "untested": "Untested mark",
+      "controlEdge": "Input boundary",
+      "ring": "Focus ring",
+      "ringChrome": "Focus ring on chrome"
+    }
+  },
+  "states": {
+    "heading": "Button states",
+    "context": "Each state is pinned with data-preview, so no pointer is needed.",
+    "default": "Default",
+    "hover": "Hover",
+    "active": "Pressed",
+    "focus": "Focus",
+    "disabled": "Disabled",
+    "loading": "Working",
+    "variants": {
+      "default": "Primary",
+      "outline": "Secondary",
+      "secondary": "Quiet secondary",
+      "ghost": "Tool",
+      "destructive": "Destructive",
+      "link": "Link"
+    },
+    "sampleAction": "Save result",
+    "sampleLoading": "Saving"
+  },
+  "controls": {
+    "heading": "Inputs",
+    "placeholder": "Search file names",
+    "value": "yilgarn_ni_grid.tif",
+    "invalid": "The format does not match",
+    "switchOn": "On",
+    "switchOff": "Off",
+    "switchDisabled": "Disabled",
+    "tabs": {
+      "papers": "Papers",
+      "notes": "Notes",
+      "files": "Files"
+    }
+  },
+  "parts": {
+    "heading": "Shared parts",
+    "sidebar": "Sidebar items",
+    "segmented": "Segmented control",
+    "scale": "Step scale",
+    "list": "Step list",
+    "status": "Status marks",
+    "agent": "AI agent activity",
+    "itemSelected": "Selected item",
+    "itemDefault": "Default item",
+    "itemHover": "Hovered item",
+    "itemFocus": "Focused item",
+    "segPapers": "Papers",
+    "segNotes": "Notes",
+    "segHover": "Hover",
+    "steps": {
+      "intro": "Introduction",
+      "data": "Prepare data",
+      "model": "Process and model",
+      "review": "Evaluate",
+      "summary": "Summary"
+    },
+    "stepGroup": "Analysis stages",
+    "done": "Run finished",
+    "review": "Not reviewed",
+    "failed": "Could not read",
+    "untested": "Untested",
+    "nodata": "No data",
+    "readout": "Decisions {count}",
+    "running": "Building grid table 2/5",
+    "activity": "Activity rows",
+    "reasoning": "Check the input grid coordinate system first."
+  }
+}
