@@ -440,7 +440,9 @@ export async function registerGeoLibraryRoutes(app: FastifyInstance, options: Li
       return Promise.all(keys.map(async (key) => {
         const item = await store.byCitationKey(key);
         if (!item || item.removedFromSourceAt) return { key };
-        return { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item), ...(scope && !scope.has(item.id) ? { outsideScope: true } : {}) };
+        const sha = storedPdf(item), pages = item.attachments.find((a) => a.stored?.sha256 === sha)?.pages ?? item.read.pagesTotal;
+        return { key, itemId: item.id, title: item.csl.title, reference: referenceLine(item), ...(scope && !scope.has(item.id) ? { outsideScope: true } : {}),
+          ...(sha ? { pdf: pages ? { pages } : {} } : {}) };
       }));
     });
 
