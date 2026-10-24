@@ -155,21 +155,31 @@ async function browserTools() {
     }
     record("visual", { findings, pages: tests.length, diffDir: path.join(out, "playwright") })
   }
+  // Once a tool ran on some page and combination, one it did not check is a finding: a page that stops rendering
+  // must not pass a blocking tool by leaving no results.
+  const expected = rules.pages.flatMap((p) => rules.combos.map((c) => `${p.id}-${c.id}`))
+  const notChecked = (checked, why) => expected.filter((name) => !checked.has(name)).map((name) => ({ key: `${name}:not-checked`, rule: "not-checked", guide: ["section 12"], where: name, detail: why(name) }))
   if (wanted.includes("axe")) {
     const findings = []
+    const checked = new Set()
     for (const [name, violations] of readDir("axe")) {
+      checked.add(name)
       for (const v of violations) for (const node of v.nodes) findings.push({ key: `${name}:${v.id}:${node.target}`, rule: v.id, guide: guideFor(rules.axeGuide, v.id), where: `${name} ${node.target}`, detail: `${v.help} (${v.impact})` })
     }
+    findings.push(...notChecked(checked, (name) => `axe did not check ${name}; see ${path.join(out, "playwright.log")}`))
     record("axe", { findings })
   }
   if (wanted.includes("impeccable")) {
     const findings = []
     const errors = []
+    const checked = new Set()
     for (const [name, data] of readDir("impeccable")) {
       if (!Array.isArray(data)) { errors.push(`${name}: ${data.error}`); continue }
+      checked.add(name)
       for (const f of data) findings.push({ key: `${name}:${f.antipattern}:${f.selector ?? f.snippet}`, rule: f.antipattern, guide: guideFor(rules.impeccable.guide, f.antipattern), where: `${name} ${f.selector ?? ""}`.trim(), detail: `${f.name}: ${f.snippet}` })
     }
-    results.impeccable = { ...results.impeccable, live: errors.length && !findings.length ? { skipped: errors.join("; ") } : { findings, errors } }
+    if (checked.size) findings.push(...notChecked(checked, (name) => `impeccable did not scan ${name}: ${errors.find((e) => e.startsWith(`${name}: `))?.slice(name.length + 2, name.length + 202) ?? `no result; see ${path.join(out, "playwright.log")}`}`))
+    results.impeccable = { ...results.impeccable, live: !checked.size ? { skipped: errors.join("; ") || "the live scan wrote no results" } : { findings, errors } }
   }
 }
 
@@ -208,5 +218,10 @@ else {
   console.log(`ui-quality: full results in ${path.join(out, "summary.json")}`)
 }
 const blocking = summary.filter((s) => s.mode === "block" && s.fresh.length)
-if (blocking.length) console.log(`ui-quality: blocking tool(s) with findings: ${blocking.map((s) => s.tool).join(", ")}`)
+if (blocking.length) {
+  console.log(`ui-quality: FAILED — blocking tool(s) with findings that are not accepted debt: ${blocking.map((s) => s.tool).join(", ")}`)
+  console.log("  See the parts in every state on the 부품 상태 견본 page: `cd web && npm run dev`, open http://localhost:3000/dev/parts")
+  console.log("  (style and theme switches at the top; web/src/geo/dev/parts-page.tsx). Fix the finding, or record its key from")
+  console.log(`  ${path.join(out, "summary.json")} with the reason as accepted debt in geo/ui/ui-baseline.json quality.<tool>.`)
+}
 process.exit(blocking.length ? 1 : 0)

@@ -46,9 +46,9 @@ Section 13 lists where GAID deliberately differs from both.
 5. UI quality kit (`geo/ui/quality/`, part of `scripts/check`): `node geo/ui/quality/run.mjs` after `npm ci` in that folder.
    It runs shadcn lint over the GAID sources, impeccable's detector, axe-core and full-page screenshots of the development
    parts page (`/dev/parts`, served by `next dev`) in 계측/도폭 × light/dark at 1440×900 against
-   `geo/ui/quality/baseline/`, and names the guide rule of every finding (`geo/ui/ui-rules.json` `quality`). Every tool is
-   report-only until the switch rule there is met; then a finding fails unless it is accepted debt in
-   `geo/ui/ui-baseline.json` `quality`. A change to a shared part updates its specimen on the parts page and the
+   `geo/ui/quality/baseline/`, and names the guide rule of every finding (`geo/ui/ui-rules.json` `quality`). impeccable and axe
+   block (switched 2026-10-24 under the switch rule there): a finding fails unless it is accepted debt in
+   `geo/ui/ui-baseline.json` `quality`; shadcn lint and the screenshot comparison report only. A change to a shared part updates its specimen on the parts page and the
    baselines (`--update-baseline`, reviewed images in the change report).
 
 Rule ids: P principles, I identity, L layout, T type, S colour, materials and states, B buttons, N navigation and

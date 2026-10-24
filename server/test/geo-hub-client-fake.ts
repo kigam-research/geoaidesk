@@ -2,6 +2,7 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import type { HubAccount } from "../../web/src/geo/contracts/hub-server.ts";
 import type { LibraryObject, LibraryPushRequest } from "../src/geo/hub-server/protocol.ts";
@@ -9,7 +10,7 @@ import { SharedHubStore, type StoredEntry } from "../src/geo/hub-shared/store.ts
 import { ConnectionStore } from "../src/geo/hub-client/connection.ts";
 import { HubClient } from "../src/geo/hub-client/client.ts";
 
-const base = "/home/seongin3/data/geoaidesk/work/gaid-backend--hub-client/tests";
+const base = join(homedir(), "data/geoaidesk/work/gaid-backend--hub-client/tests");
 export async function directory() { await mkdir(base, { recursive: true }); return mkdtemp(join(base, "case-")); }
 export const account: HubAccount = { id: "acc-test", email: "test@example.org", displayName: "연구원", role: "member", createdAt: "2026-10-01T00:00:00Z" };
 export const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");

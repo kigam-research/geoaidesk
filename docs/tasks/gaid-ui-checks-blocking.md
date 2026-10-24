@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T04:48:33Z
+updated: 2026-10-24T05:25:24Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"755a15f3-f2f7-4942-8c0a-e8091304de3f","pid":2896468,"provider":"claude","session":"24fdc1a9-65a4-4763-bc45-5d33b264d1d2","start":"70520948","token":"18bae5c8cafe7f4c15eadbf94560db92131b6a58406595657162165b5629a912"}
 branch: task/gaid-ui-checks-blocking
 target: main
@@ -43,11 +43,32 @@ Running in parallel: gaid-hub-stage-cards (scenario A, screens) and gaid-promo-v
 server. Outside check: none.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+- Orchestration: small, tightly coupled change; done by the writer alone (no child units or readers).
+- PC70 run 3 (main f504ace4 + hub-client-fake path fix, NODE_EXTRA_CA_CERTS for that run): scripts/check passed; backend
+  2322 passed / 8 skipped, frontend 1326 passed; quality kit shadcn 248 (166 keys), impeccable 0, visual 0, axe 0; Chromium
+  v1243 = Chrome for Testing 153.0.8010.12 (Playwright 1.63.0). Finding keys identical to PC74 gaid-ui-shared-contrast/after2.
+  Copies in ~/data/geoaidesk/work/gaid-ui-checks-blocking/pc70/. Nothing left running on PC70 (scratch clone 3.8 GB kept).
+- Switched: ui-rules.json modes impeccable/axe = block + `switches` record; run.mjs `not-checked` coverage findings and
+  failure message (/dev/parts); AGENTS.md (quality kit, Checks incl. NODE_EXTRA_CA_CERTS note), ui-guide.md §10.5,
+  scripts/check step title, integration-boundaries responsibility; server/test/geo-hub-client-fake.ts base under homedir.
+- Report reports/2026-10-24-gaid-ui-checks-blocking/index.md (humanizer applied, review copy in the vault).
+- PC74 scripts/check with the switch (unit gaid-check-pc74-1): passed; backend 2322 passed / 8 skipped, frontend 1326,
+  copy/ui 0 errors; quality kit shadcn 248, impeccable [block] 0, visual 0, axe [block] 0; keys identical to PC70 run 3.
+  Log ~/data/geoaidesk/work/gaid-ui-checks-blocking/pc74-check.log.
+- Fail-path test: temporary <img> without alt on the parts page, `run.mjs --only axe,impeccable` → axe 4 image-alt (A1),
+  exit 1, failure message printed; file restored (git clean). Log fail-test.log. The not-checked path was not provoked.
 ## Next steps
-1. (the next session's first action)
+1. task save, task finish.
 ## Failed approaches
+- PC70 run 1 (main f504ace4 unchanged): backend tests 25 failed / 2297 passed / 8 skipped, all `EACCES mkdir '/home/seongin3'`
+  from the hard-coded base path in server/test/geo-hub-client-fake.ts (gaid-backend--hub-client); scripts/check stopped there
+  (set -e), quality kit not reached. Fixed in this unit (base under os.homedir()); run 2 = main + that one-line patch.
+- PC70 run 2: all checks passed, but Chromium (Playwright 1.63 = chromium v1243, Chrome for Testing 153.0.8010.12) could
+  not be downloaded: `self-signed certificate in certificate chain` (KIGAM TLS inspection; PC70's Node has no
+  NODE_EXTRA_CA_CERTS while PC74 sets it). Browser tools skipped (shadcn 248, impeccable static 0, live/visual/axe skipped).
+  Run 3 passes NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt (contains KIGAM.crt) for that run only; PC70 profile unchanged.
 ## Notes and decisions
+Closes: gaid-ui-shared-contrast#1
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
@@ -57,6 +78,7 @@ Complete also closes every item that the hub answered with this unit as follow-u
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-ui-checks-blocking/index.md
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
