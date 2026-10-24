@@ -99,7 +99,7 @@ describe("library routes, reading and uses", () => {
       expect.objectContaining({ kind: "project", projectId }),
     ]));
     const cites = (await server.inject({ method: "GET", url: "/geo/library/citations?keys=hong2026,missing2020" })).json();
-    expect(cites[0]).toMatchObject({ key: "hong2026", itemId: item.id });
+    expect(cites[0]).toMatchObject({ key: "hong2026", itemId: item.id, pdf: { pages: 3 } });
     expect(cites[0].reference).toContain("https://doi.org/10.1234/x");
     expect(cites[1]).toEqual({ key: "missing2020" });
 
