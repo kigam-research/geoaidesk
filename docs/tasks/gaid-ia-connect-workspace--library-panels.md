@@ -1,7 +1,7 @@
 ---
 format: 1
-status: ready
-updated: 2026-10-24T07:01:30Z
+status: active
+updated: 2026-10-24T07:16:41Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"c206f174-c6d7-4de4-9d76-d5f1849dec13","pid":1414880,"provider":"codex","session":"01a16c9e-d2f2-70e3-ba32-e30d39d2facc","start":"71164929","token":"8fdfa25da058480f039db194f018f505b36bb16b6f1c7344e4f841a9563f5a08"}
 branch: task/gaid-ia-connect-workspace--library-panels
 target: task/gaid-ia-connect-workspace
@@ -34,13 +34,14 @@ Existing GET /geo/library?filter=project expands attached folders and descendant
 
 Scoped verification: web component/PDF/persistence tests 30/30; server library/folder tests 13/13; both typechecks; copy validator 0 errors (101 existing warnings); UI validator 0 errors (78 existing accepted debt). Korean screenshots cover both panels × both styles × both themes at 1440×900 and 1280×800 (16), plus 1100×800 instrument/light (2). Screenshots use the implemented components with intercepted sample API replies over the approved static surrounding context, not a live researcher project. No browser console errors in the final session. No user data, review app or hub server was touched.
 
-Code is on this child branch; parent integration remains separate. First automatic scripts/check: backend 2323 passed/8 skipped, frontend 1346 passed; distribution checks rejected the child seam owner. Corrected it to the existing parent package; distribution test 7/7 now passes. Retrying task finish in place for the remaining full-check stages. No deployment is part of this unit.
+Code is on this child branch; parent integration remains separate. First automatic scripts/check: backend 2323 passed/8 skipped, frontend 1346 passed; distribution checks rejected the child seam owner. Corrected it to the existing parent package; distribution test 7/7 now passes. Second full check: backend passed again; frontend had 5 timing/lookup failures in existing file-preview/settings/LaTeX/map tests under unrestricted parallel load. The four affected files pass all 31 tests with maxWorkers=2, without source changes. Retrying task finish with VITEST_MAX_WORKERS=1 (also follows the server-test constraint) to bound resource use. No deployment is part of this unit.
 
 ## Next steps
 <!-- task:closed -->
 Closed 2026-10-24T07:01:30Z: ready; the parent gaid-ia-connect-workspace integrates it. No further steps in this unit; `task complete` verifies jobs and rollout and reports the outcome. Residual work: no open items recorded.
 
 ## Failed approaches
+- Second task finish had 5 existing frontend test timing/lookup failures in four files; all 31 tests in those files passed with --maxWorkers=2. The previous full frontend run had passed 1346/1346 at the same runtime source. Inference: unrestricted concurrent suites exceeded existing 1 s waits / 5 s test budgets under shared host load (load ~21, 32 threads). Local Vitest implementation explicitly supports VITEST_MAX_WORKERS. No product/test timeout changes; rerun full check with VITEST_MAX_WORKERS=1.
 - First task finish automatically ran scripts/check. Backend 2323 passed/8 skipped and frontend 1346 passed; distribution checks rejected the child task name as a seam owner. Corrected the owner to the existing registered parent package (no test allowlist expansion). Re-verified the distribution test directly before retry. Log: ~/.local/state/backbone/check-logs/beb99bb9d216ecd9/check-b0xw5j7p.log.
 - Initial tsc invocation found no dependencies (no node_modules). Installed pinned dependencies with npm ci via recorded job -1, exit 0. Initial job run refused dirty source before starting; saved then ran the recorded install.
 - Initial screenshot attempt on 127.0.0.1 could not hydrate because Next dev blocked the HMR origin; used localhost (no product configuration change).
@@ -56,6 +57,7 @@ Closed 2026-10-24T07:01:30Z: ready; the parent gaid-ia-connect-workspace integra
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 - Checks: web npx tsc --noEmit passed; web scoped component/PDF/persistence suite 30/30 passed; server npm run typecheck passed; geo-library and geo-library-folders 13/13 passed. Copy validator: 0 errors, 101 existing warnings; UI validator: 0 errors, 78 accepted debt.
+- Screenshot dev job -2 exited 0 after all 18 captures; its log contains successful 200 responses for each requested combination. The temporary route was removed and port 3107 stopped intentionally.
 - Screenshot method: temporary dev-only harness renders the implemented components on the approved static context, with browser-intercepted library API fixtures. No user data, review app, or hub server is touched.
 
 ## Open items
