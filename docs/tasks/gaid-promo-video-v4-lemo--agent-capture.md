@@ -1,7 +1,7 @@
 ---
 format: 1
-status: waiting
-updated: 2026-10-24T05:10:28Z
+status: active
+updated: 2026-10-24T05:10:47Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
