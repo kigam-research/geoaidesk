@@ -205,6 +205,7 @@ def main():
             events = {
                 "dur": dur, "fps": FPS, "ev": page.evaluate("window.EV"), "cues": page.evaluate("window.CUES"),
                 "texts": page.evaluate("window.TEXT_SPANS"), "segments": page.evaluate("window.SEG"),
+                "tags": page.evaluate("window.TAGSCHED"),
             }
             (out / "events.json").write_text(json.dumps(events, ensure_ascii=False, indent=1) + "\n")
             checks = read_check(events["texts"])

@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:54:17Z
+updated: 2026-10-24T02:28:39Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"7a3e05f2-d0b7-4b67-8d3a-6702b12a9d7d","pid":928827,"provider":"claude","session":"59746d33-e6ee-462e-8b2d-75b3d3e44afd","start":"69252382","token":"cf5c8f589e76a6dbecf6337ab862cef0503ee6d44a62675d7a617b3f37b86d07"}
 branch: task/gaid-promo-video-v4-lemo
 target: main
@@ -63,11 +63,33 @@ own; put lemo sources in a separate folder (e.g. `geo/promo-lemo/`) or outside G
 - (B) 40 s child unit gaid-promo-video-v4-lemo--promo-40s running (user's later message forwarded to it).
 - Style candidates shown to the user: vault `연구 보고서/geoaidesk/2026-10-24-style-choice` (A Dark Tech Keynote chosen).
 ## Next steps
+0. Round 2 (boxes, smooth cuts, cycle rebuilt after the user's 2026-10-24 note "lemo 버전에서 아쉬운 것은 GAID로고 이후 GAID 허브와
+   GAID 시스템을 설명하는 18초 이후 장면의 고리 애니메이션 품질이 낮다. V4 방식이나 BRAG 방식을 보고 개선할 필요가 있다."):
+   job job-geoaidesk-gaid-promo-video-v4-lemo-2 (source 8c50ae98) running. Preview pv3 checked: 31/31 boxes on their regions
+   (look/tagqa1-*.jpg), -14.1 LUFS / TP -1.2 dB, 96.9 s. When it exits: verify master.json, update the report to round 2
+   (figures, numbers, §7 failed attempts, registry entry hash), keep round 1 as a superseded registry note.
 1. Wait for the 40 s child; then `task complete gaid-promo-video-v4-lemo--promo-40s`, merge section-40s.md into report §8,
    add its registry entry, humanizer pass, review-copy, task finish.
 2. (done for A) Write reports/2026-10-24-gaid-promo-video-v4-lemo/index.md (+ figures), registry entry `review`, humanizer pass,
    review-copy; merge the child's section-40s.md after `task complete gaid-promo-video-v4-lemo--promo-40s`.
 ## Failed approaches
+- Round 1 (job -1, 102.3 s) user feedback 2026-10-24 (verbatim): "102초판의 경우 피드백으로 사각형 박스로 영역을 표시할 때
+  올바르게 표시해야한다. 현재 해당 영역을 올바르지 못하게 표시하거나 화면에서 엉뚱한 곳을 가리키거나 화면을 자르는 사각 박스가
+  있는 경우도 있다. 102초판의 경우 장면 전환을 스무스하게 하고 영상을 최적화한다면 꽤 적절한 영상으로 활용가능하다고 생각한다.
+  자가 검토하여 무엇이 부족했는지 진단후 개선하자."
+  Self-review (per-tag frames from the final file, look/tagqa0-*.jpg; probe of the box geometry in the page):
+  1. Coordinate mapping was right (probe matched capture rects × 0.922). Wrong boxes came from using a beat's rect outside its
+     own capture window: p:L1 after 2.5 s (detail panel opened), p:H1 after 3.0 s (dialog closed, box on the entry page),
+     p:H2 before 1.75 s, p:N1 0–1.5 s (beat 1 rect on the beat 0 screen), y:N1 after ~5.2 s (layout changed: chat panel opened).
+  2. Unions of two beats (A1, A3, L4) made oversized boxes.
+  3. Rects touching the window edge (y:M1 map, x = 0) put the box border on the window edge: looked like the take was cut.
+  4. Chapter changes collapsed the window to a bar and left the right side empty for up to ~0.5 s; the demo ended in a 0.5 s
+     near-empty frame before the second brain; ending had ~2 s of almost nothing; second-brain lines held 2.8/3.3 s.
+  Fixes (round 2): tags = [beat, label] with the beat's own window only, glide between consecutive beats, box inset 6 px inside
+  the window; `use` trimmed where layout changes or no beat covers (L1 0–2.6, H2 1.6–3.5, y:N1 1.5–4.8); the window stays
+  through the demo and every cut (chapters too) is a 0.6 s soft light sweep with a small breath on chapter change, left column
+  leaves up and rises in; the window shrinks into the mini cycle, which flies in as the first second-brain ring; second brain
+  9 s (lines ~4.2 s each); put-away and logo tightened. Length 102.3 -> 96.9 s.
 ## Notes and decisions
 - 2026-10-24 user (writer tab, verbatim): "메시지는 동등해도 되는데 연출은 오히려 더 자유롭게 홍보성으로 만들자. 그리고 분량은 40초로하고
   코드로 된 영상 기반으로 전면 새로 만들어도 좋다. 현재 촬영자료가 있다고 너무 v4스타일로 만들필요는없다. 현재 렌더링중인것은
@@ -108,6 +130,7 @@ child unit, which adds sections to the parent's report. Dated snapshot; live sta
 ## Running jobs
 <!-- task:jobs -->
 - /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T014625.342944Z/receipt.json
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo-20261024T022827.582770Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
