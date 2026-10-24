@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:50:28Z
+updated: 2026-10-24T02:19:17Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"8903c027-bae6-4d62-be5f-363a50e7cd24","pid":1209415,"provider":"claude","session":"75265567-6398-46a1-800a-916e466ecb73","start":"69452397","token":"e8629b2b35ed6c90a1d8703ce6bad2bc0e6d8d0733cee71031a1026cfc73221f"}
 branch: task/gaid-ui-quality-kit
 target: main
@@ -49,20 +49,48 @@ Mockups (code-built from the real tokens/components, no generated images) and th
 (branch task/gaid-uiux-skills-scan until integrated). Lesson to keep: no generated imagery; the current system is the visual authority.
 
 ## Current state
-(what is done, how it was verified, safe commands to re-verify)
+Implemented (2026-10-24), not yet integrated:
+- P1: `--gaid-on-signal` (+ `--gaid-press`, `--gaid-danger-press`) in globals.css, shadcn preview-state variants;
+  Button pressed fills per variant; tool-activity skill row ScrollTextIcon, reasoning without BrainIcon; guide S1/S7 text.
+- P2: `/dev/parts` page (web/src/geo/dev/parts-page.tsx, locale devParts), 404 in production (assert in production-smoke).
+- P3: geo/ui/quality/ (own lock): run.mjs + shadcn lint config + Playwright config/spec; ui-rules.json `quality`
+  (modes report, switchRule, guide maps); baselines in geo/ui/quality/baseline/; scripts/check last step.
+- Kit run on PC74 twice: visual 0 diffs on the second run; impeccable/axe find 5 pre-existing S4 issues in shared parts
+  (link button text-primary, primary hover /90, tabs inactive, sidebar count on hover, mapsheet-dark placeholder).
+- Report draft: reports/2026-10-24-gaid-ui-quality-kit/index.md (placeholders {LINT} {IMP} {AXE} {CHECK} {RUNS} {SHA}).
+Re-verify: `cd geo/ui/quality && npm ci && cd ../../.. && node geo/ui/quality/run.mjs --out /tmp/x` (report-only, ~1 min).
+
 ## Next steps
-1. (the next session's first action)
+1. After scripts/check (log ~/data/geoaidesk/work/gaid-ui-quality-kit/check.log) finishes: rerun the kit with
+   --update-baseline (the page gained activity rows), make figures, fill the report placeholders, humanizer, review-copy.
+2. task save (name new paths), task sync with main, task finish.
+
 ## Failed approaches
 ## Notes and decisions
+Orchestration (2026-10-24):
+- Sequential decisions: route `/dev/parts` (Next app route, dev-only: 404 unless `NODE_ENV!=production` or
+  `GAID_DEV_PAGES=1` at request time); combos set through localStorage `gaid:style` + next-themes `theme` before load.
+- Packages, all done by this writer (tightly coupled; the tooling is tuned against the page):
+  P1 app fixes: `--on-signal` token in globals.css (shadcn `--primary-foreground` maps onto it), data-preview custom
+  variants (shadcn skill preview-states, MIT), Button pressed style, tool-activity icons (V2), guide S1/S7 text.
+  P2 parts page: `web/src/geo/dev/` specimen (+ locale namespace) and `web/src/app/dev/parts/page.tsx`.
+  P3 tooling: `geo/ui/quality/` own package + lock (not in web/: researchers' installs stay unchanged): shadcn lint
+  config with rule → guide id map, impeccable detect (DO_NOT_TRACK=1, IMPECCABLE_NO_TELEMETRY=1), Playwright 1.63.0
+  (matches the cached chromium-1243) screenshots of 4 combos at 1440×900 against baselines + axe-core; one report-only
+  runner appended to scripts/check.
+- Integration order: P1 → P2 → P3 → baselines → report.
 (To close an existing ledger item when this top-level unit completes, add one literal `Closes: <slug>#<n>` line.
 Complete also closes every item that the hub answered with this unit as follow-up; add one literal
 `Keeps: <slug>#<n>` line for each such item that this unit leaves unresolved, and complete reopens it instead.)
 ## Open items
+- [결정] 첫 점검이 찾은 공용 부품 문제(대비 미달 다섯 곳, 초점 고리 모양)를 어떻게 할까요? — 가) 다음 화면 작업(A) 전에 작은 수정 작업 하나로 고친다 — 나) 점검 결과로만 두고 해당 화면을 다룰 때 고친다 — 권장: 가) 모든 화면에 쓰이는 부품이라 효과가 넓고 막는 단계 전환이 쉬워진다 — 막힌 일: 점검 도구의 막는 단계 전환 — 조건: 없음 — 근거: reports/2026-10-24-gaid-ui-quality-kit/index.md#6-결정할-일
 (user decisions, checks and accepted debt that outlive this unit, one line each:
 `- [<kind>] <question> — 가) <option> — 나) <option> — 권장: 가) <why> — 막힌 일: <x> — 조건: <y> — 근거: reports/<folder>#<section>`,
 kind 결정|확인|대기|선택|부채; task finish numbers them <slug>#<n> and carries them to docs/open-items/<slug>.md;
 the project hub answers or closes them with `task item`)
 ## Report
+Report: reports/2026-10-24-gaid-ui-quality-kit/index.md
+
 (for a result the user reviews: `Report: reports/<date>-<topic>/index.md`, its one canonical report in Git,
 written from backbone templates/report.md; none for workflow-only or trivial tasks, and none of its own for a
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)

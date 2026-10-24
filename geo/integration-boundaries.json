@@ -1027,6 +1027,36 @@
       "owner": "gaid-hub-versions",
       "status": "edited",
       "responsibility": "Update hub skill integer-version copy expectations after the user replaced 판 with version."
+    },
+    {
+      "path": "web/src/app/globals.css",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Role tokens --gaid-on-signal (shadcn --primary-foreground/--sidebar-primary-foreground map onto it), --gaid-press and --gaid-danger-press (pressed fills, UI guide S1/S7) in both styles; shadcn skill preview-state custom variants (hover, focus-visible, active also match data-preview) for the development parts page"
+    },
+    {
+      "path": "web/src/components/ui/button.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Pressed (active) fill per variant (UI guide S7): filled --gaid-brand-hover, destructive --gaid-danger-press, bordered/plain --gaid-press, link signal-ink; dark destructive hover"
+    },
+    {
+      "path": "web/src/components/tool-activity.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "UI guide V2: a skill call row shows ScrollTextIcon instead of WandSparklesIcon; the reasoning disclosure drops BrainIcon"
+    },
+    {
+      "path": "web/src/app/dev/parts/page.tsx",
+      "owner": "gaid-ui-quality-kit",
+      "status": "added",
+      "responsibility": "Development parts page route (web/src/geo/dev/parts-page.tsx); 404 in production unless GAID_DEV_PAGES=1"
+    },
+    {
+      "path": "scripts/check",
+      "owner": "gaid-ui-quality-kit",
+      "status": "edited",
+      "responsibility": "Appends the report-only UI quality kit step (geo/ui/quality/run.mjs)"
     }
   ],
   "notTouched": [
