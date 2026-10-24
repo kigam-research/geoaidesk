@@ -755,7 +755,10 @@
         if (fIn !== null) {
           const ba = Math.max(ta, sg.a + (fIn / sg.fps - sg.skip) / sg.speed - 0.1);
           const bb = fOut >= Math.floor(s1 * sg.fps) - 2 ? Math.max(tb, sg.a + (s1 - sg.skip) / sg.speed) : Math.min(Math.max(tb, sg.a + (fOut / sg.fps - sg.skip) / sg.speed + 0.35), sg.b);
-          if (bb - ba >= 0.8) box = { a: ba, b: bb };
+          // a click changes the screen: the box ends just after the recorded click (capture actions)
+          const click = short ? (info.actions || []).find(x => x.kind === 'click' && x.t >= beat.t0 - 0.2 && x.t <= beat.t1 + 0.2) : null;
+          const bEnd = click ? Math.min(bb, sg.a + (click.t + 0.15 - sg.skip) / sg.speed) : bb;
+          if (bEnd - ba >= 0.6) box = { a: ba, b: bEnd };
         }
         const entry = { a: ta, b: tb, rect: beat.rect, label, box, same: !!last && last.label === label, prev: last, sg };
         tagSched.push(entry);
