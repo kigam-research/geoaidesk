@@ -48,6 +48,6 @@
   "previewPrompt": "시작할 때 보낼 지시문",
   "previewRetry": "미리보기 다시 읽기",
   "previewHubSkill": "{name} version {revision}",
-  "previewHubSkills": "Workflow가 쓰는 허브 스킬도 함께 설치합니다: {names}",
-  "previewHubBlocked": "함께 설치하지 못하는 허브 스킬: {names}. 설치한 뒤 준비 확인에서 이유를 볼 수 있습니다."
+  "previewHubSkills": "Workflow가 쓰는 Connect 스킬도 함께 설치합니다: {names}",
+  "previewHubBlocked": "함께 설치하지 못하는 Connect 스킬: {names}. 설치한 뒤 준비 확인에서 이유를 볼 수 있습니다."
 }

@@ -30,7 +30,7 @@ beforeEach(() => {
     throw new Error(`Unexpected request: ${path}`);
   });
 });
-const action = "방금 한 분석을 GAID 허브 초안으로 보내기";
+const action = "방금 한 분석을 Connect 초안으로 보내기";
 async function open() {
   await userEvent.click(screen.getByRole("button", { name: action }));
   const dialog = await screen.findByRole("dialog");
@@ -107,7 +107,7 @@ describe("hub analysis handoff", () => {
   it("renders English Workflow wording and truncation notice", async () => {
     setGeoLocaleSetting("en"); preview.truncated.finalAnswer = true;
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
-    await userEvent.click(screen.getByRole("button", { name: "Send the analysis just done to a GAID hub draft" }));
+    await userEvent.click(screen.getByRole("button", { name: "Send the analysis just done to a Connect draft" }));
     expect(await screen.findByText(/Long text or per-file step lists were truncated/)).toBeInTheDocument();
     expect(screen.getByText(/material for a new Workflow draft/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download analysis bundle" })).toBeEnabled();
@@ -146,12 +146,12 @@ describe("hub analysis handoff", () => {
     render(<GeoChatActions projectId="p1" sessionId="s1" isStreaming={false} />);
     const dialog = await open();
     fireEvent.change(dialog.getByRole("textbox"), { target: { value: "격자 분석 방법" } });
-    await userEvent.click(dialog.getByRole("button", { name: "허브 초안으로 보내기" }));
-    expect(await dialog.findByText("GAID 허브에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.")).toBeInTheDocument();
+    await userEvent.click(dialog.getByRole("button", { name: "Connect 초안으로 보내기" }));
+    expect(await dialog.findByText("GAID Connect에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.")).toBeInTheDocument();
     const call = apiFetch.mock.calls.find(([path]) => path === "/geo/authoring/handoffs")!;
     expect(JSON.parse(call[1].body)).toEqual({ sessionId: "s1", files: ["analysis.py", "plot.png"], note: "격자 분석 방법" });
-    expect(dialog.getByRole("button", { name: "허브 초안으로 보내기" })).toBeDisabled();
-    await userEvent.click(dialog.getByRole("button", { name: "허브 초안 열기" }));
+    expect(dialog.getByRole("button", { name: "Connect 초안으로 보내기" })).toBeDisabled();
+    await userEvent.click(dialog.getByRole("button", { name: "Connect 초안 열기" }));
     expect(window.location.hash).toBe("#hub/ap-12345678-abc");
     expect(saveDownload).not.toHaveBeenCalled();
   });
@@ -170,8 +170,8 @@ describe("hub analysis handoff", () => {
     expect(await dialog.findByRole("checkbox", { name: /격자 결과/ })).toBeChecked();
     expect(dialog.getByRole("checkbox", { name: /이전 노트/ })).not.toBeChecked();
     expect(dialog.getByRole("checkbox", { name: /Magnetite inversion/ })).toBeChecked();
-    await userEvent.click(dialog.getByRole("button", { name: "허브 초안으로 보내기" }));
-    await dialog.findByText("GAID 허브에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.");
+    await userEvent.click(dialog.getByRole("button", { name: "Connect 초안으로 보내기" }));
+    await dialog.findByText("GAID Connect에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다.");
     const call = apiFetch.mock.calls.find(([path]) => path === "/geo/authoring/handoffs")!;
     expect(JSON.parse(call[1].body)).toMatchObject({ notes: ["2026-10-23-grid"], libraryItemIds: ["li-1"] });
   });

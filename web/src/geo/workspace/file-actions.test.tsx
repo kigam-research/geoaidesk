@@ -51,7 +51,7 @@ describe("file method actions", () => {
   it("shows a named hub-draft action and opens the existing handoff", () => {
     render(<GeoChatActions projectId="p" sessionId="s" isStreaming={false} />);
     const button = screen.getByRole("button", { name: t("hubHandoff.open") });
-    expect(button).toHaveTextContent("허브 초안으로 보내기");
+    expect(button).toHaveTextContent("Connect 초안으로 보내기");
     fireEvent.click(button);
     expect(screen.getByTestId("handoff")).toBeInTheDocument();
   });

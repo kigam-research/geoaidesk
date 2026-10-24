@@ -1,8 +1,8 @@
 {
-  "open": "방금 한 분석을 GAID 허브 초안으로 보내기",
-  "openLabel": "허브 초안으로 보내기",
-  "title": "허브 초안으로 보낼 분석",
-  "description": "요청과 마지막 답변, 선택한 파일을 묶어 GAID 허브의 새 Workflow 초안 자료로 보냅니다.",
+  "open": "방금 한 분석을 Connect 초안으로 보내기",
+  "openLabel": "Connect 초안으로 보내기",
+  "title": "Connect 초안으로 보낼 분석",
+  "description": "요청과 마지막 답변, 선택한 파일을 묶어 GAID Connect의 새 Workflow 초안 자료로 보냅니다.",
   "rawData": "user_data/ 원본 자료는 직접 선택한 파일만 포함합니다. 요청과 답변에 적힌 내용은 함께 포함되므로 보내기 전에 확인하세요.",
   "loading": "보낼 분석과 파일 목록을 읽는 중입니다.",
   "request": "사용자의 첫 요청",
@@ -37,7 +37,7 @@
     "download": "분석 묶음 다운로드를 요청했습니다.",
     "direct": "외부 허브에 직접 전달했습니다. 새 탭이 열리지 않으면 초안 링크를 누르세요.",
     "download-fallback": "직접 전달 결과를 확인하지 못해 다운로드 경로로 전환했습니다. 외부 허브에 초안이 이미 생겼는지 확인한 뒤 묶음을 첨부하세요.",
-    "hub": "GAID 허브에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다."
+    "hub": "GAID Connect에 새 초안을 만들고 분석 묶음을 자료로 붙였습니다."
   },
   "errors": {
     "input": "파일 선택과 메모를 확인한 뒤 다시 보내세요.",
@@ -52,11 +52,11 @@
   "assessment": "연구자 평가: {outcome, select, useful {유용함} needs-revision {수정 필요} failed {실패} other {기록 없음}} · {note}",
   "noAssessment": "연구자 평가가 아직 없습니다. Workflow 상세의 시험 기록에서 평가를 저장하면 함께 보냅니다.",
   "excludedFile": "{path}: {reason, select, policy {보낼 수 없는 경로} unavailable {읽을 수 없음} too-large {5 MiB 초과} file-limit {파일 수 한도 초과} other {제외}}",
-  "sendHub": "허브 초안으로 보내기",
-  "sendingHub": "허브 초안을 만드는 중입니다.",
-  "openHubDraft": "허브 초안 열기",
+  "sendHub": "Connect 초안으로 보내기",
+  "sendingHub": "초안 만드는 중",
+  "openHubDraft": "Connect 초안 열기",
   "extras": "함께 넣을 연구 노트와 논문",
-  "extrasHelp": "GAID 허브로 보낼 때만 넣습니다. 현재 채팅이 쓴 연구 노트와 프로젝트에 연결한 서재 논문을 미리 골랐습니다. 각각 {limit}개까지입니다.",
+  "extrasHelp": "Connect로 보낼 때만 넣습니다. 현재 채팅이 쓴 연구 노트와 프로젝트에 연결한 서재 논문을 미리 골랐습니다. 각각 {limit}개까지입니다.",
   "noteLine": "연구 노트 · {date}",
   "paperLine": "서재 논문 · {authors} {year}"
 }
