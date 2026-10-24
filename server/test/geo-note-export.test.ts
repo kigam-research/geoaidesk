@@ -12,6 +12,7 @@ import { buildNoteBundle, buildPublicExport, previewNoteBundle, previewPublicExp
 import { registerGeoNoteRoutes } from "../src/geo/routes/notes.ts";
 import { LibraryStore } from "../src/geo/library/store.ts";
 import { environmentId } from "../src/provenance/environment.ts";
+import { packageStore, writePackageOrigin } from "../src/geo/methods/package-origin.ts";
 
 const id = "2026-10-24-분석";
 const sid = "sess-1";
@@ -127,6 +128,30 @@ describe("research-note result bundle", () => {
     expect(preview.workflow).toMatchObject({ methodId: "m-demo", workflowId: "wf", version: null, instructions: false });
     expect(preview.gaps).toContain("workflow-removed");
     expect(preview.files.map((f) => f.name)).toContain("workflow/workflow.json");
+  });
+});
+
+describe("Workflow in the result bundle", () => {
+  it("includes the version recorded at chat start and the rendered 지침 of an installed method", async () => {
+    await setup();
+    const label = { ko: "중력 이상 분석", en: "Gravity anomaly analysis" };
+    const workflow = { schemaVersion: "geo-workflow/v1", id: "gravity", title: label, skillIds: ["local:bundled"], environmentProfile: "geo-core", prompt: label };
+    write(".pi/skills/bundled/SKILL.md", "---\nname: bundled\ndescription: Gravity.\n---\n# Skill\n");
+    write(".pi/skills/bundled/gaid-method.json", JSON.stringify({ schemaVersion: "gaid-method/v1", methodId: "local/bundled", revision: 2, lifecycle: "draft", implementation: "descriptive", title: label, workflows: [workflow] }));
+    const packageSha = "a".repeat(64);
+    writePackageOrigin(packageStore(), { sha256: packageSha, kind: "gaid-hub", hubEntry: { id: "entry-1", revision: 2, version: "0.1.1" }, fetchedAt: "2026-10-24T00:00:00Z" });
+    fs.mkdirSync(path.join(geoStateDir(paths), "method-trials"), { recursive: true });
+    fs.writeFileSync(path.join(geoStateDir(paths), "method-trials", `${sid}.json`), JSON.stringify({
+      schemaVersion: "gaid-method-trial/v1", sessionId: sid, methodKey: "project:bundled", runtimeName: "bundled", workflowId: "gravity", methodId: "local/bundled", revision: 2, packageSha256: packageSha, treeHash: "t", startedAt: "2026-10-24T00:00:00Z",
+    }));
+    const preview = await previewNoteBundle(paths, id, "ko", options());
+    expect(preview.workflow).toEqual({ title: "중력 이상 분석", methodId: "local/bundled", workflowId: "gravity", version: "0.1.1", instructions: true });
+    expect(preview.gaps).not.toContain("no-workflow");
+    const zip = new AdmZip((await buildNoteBundle(paths, id, { digest: preview.digest, locale: "ko" }, options())).zip);
+    expect(zip.getEntry("workflow/instructions.md")!.getData().toString()).toContain("중력 이상 분석");
+    expect(JSON.parse(zip.getEntry("workflow/workflow.json")!.getData().toString())).toMatchObject({ versionAtStart: "0.1.1", installedNow: true });
+    const pub = await previewPublicExport(paths, id, "ko", options());
+    expect(pub.candidates.map((c) => c.id)).toEqual(["note", "workflow", expect.stringMatching(/^paper:/)]);
   });
 });
 

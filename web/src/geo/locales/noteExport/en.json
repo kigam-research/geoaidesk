@@ -34,8 +34,7 @@
     "environment": "{count, plural, =0 {No environment record} one {# environment record} other {# environment records}}",
     "workflow": {
       "version": "{title} · version {version}",
-      "draft": "{title} · draft",
-      "none": "The chat did not start from a Workflow."
+      "draft": "{title} · draft"
     },
     "references": "{count, plural, =0 {No cited papers} one {# cited paper} other {# cited papers}}",
     "gaps": {
