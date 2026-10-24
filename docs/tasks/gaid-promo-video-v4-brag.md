@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T01:28:47Z
+updated: 2026-10-24T01:30:53Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"88cca85b-4b8e-4edd-b09b-2d41608083e0","pid":926474,"provider":"claude","session":"fa954eb4-c14c-4138-b556-4c278eaf0e94","start":"69251314","token":"9825be956e484ea4be90d2e182aaed55b5cf2c9ca62fa47c866e8d332f9219cb"}
 branch: task/gaid-promo-video-v4-brag
 target: main
@@ -84,6 +84,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-brag-20261024T012900.343394Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
