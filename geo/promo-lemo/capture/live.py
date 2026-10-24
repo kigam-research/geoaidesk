@@ -2,9 +2,11 @@
 
 Run with task job run. POST bounded async Python to localhost:18349.
 PNG export is separate so encoding cannot stall the live browser capture.
+Capture with StreamRecorder; Pointer draws only the real mouse path.
 No request interception, animation disabling, text replacement or held frames.
 """
 import asyncio
+import base64
 import contextlib
 import io
 import json
@@ -20,58 +22,11 @@ WORK = Path.home() / 'data/geoaidesk/work/gaid-promo-video-v4-lemo--agent-captur
 OUT = WORK / 'capture-v6'
 
 
-class Recorder:
+class Pointer:
+    """Real UI motion and the unchanged capture.py pointer overlay."""
     def __init__(self, page):
-        self.page = page
-        self.recording = False
-        self.rows = []
-        self.actions = []
-        self.evidence = []
-        self.pointer = None
-        self.worker = None
-
-    async def start(self, name, fps=12):
-        if self.recording:
-            raise RuntimeError('Already recording')
-        self.name, self.fps = name, fps
-        self.dest = OUT / 'raw' / name
-        self.dest.mkdir(parents=True, exist_ok=False)
-        self.rows, self.actions, self.evidence = [], [], []
-        self.start_wall = datetime.now(UTC).isoformat()
+        self.page, self.pointer, self.actions = page, None, []
         self.t0 = time.monotonic()
-        self.recording = True
-        self.worker = asyncio.create_task(self.loop())
-
-    async def loop(self):
-        try:
-            while self.recording:
-                before = time.monotonic()
-                raw = await self.page.screenshot(type='jpeg', quality=94, timeout=10000)
-                after = time.monotonic()
-                k = len(self.rows)
-                (self.dest / f'frame-{k:05d}.jpg').write_bytes(raw)
-                self.rows.append({'frame': k, 't': round((before+after)/2-self.t0, 6),
-                                  'latency': round(after-before, 6), 'pointer': self.pointer})
-                if not self.evidence or after-self.t0-self.evidence[-1]['t'] >= 1:
-                    self.evidence.append({'t': round(after-self.t0, 3),
-                        'text': await self.page.locator('body').inner_text()})
-                await asyncio.sleep(max(0, self.t0 + len(self.rows)/self.fps - time.monotonic()))
-        finally:
-            self.dump()
-
-    def dump(self):
-        (self.dest / 'timing.json').write_text(json.dumps({'name': self.name,
-            'requestedFps': self.fps, 'startedAt': self.start_wall,
-            'elapsedSeconds': time.monotonic()-self.t0, 'frames': self.rows,
-            'actions': self.actions, 'evidence': self.evidence}, ensure_ascii=False, indent=2)+'\n')
-
-    async def stop(self):
-        self.recording = False
-        if self.worker:
-            await self.worker
-        self.dump()
-        return {'frames': len(self.rows), 'seconds': self.rows[-1]['t'] if self.rows else 0,
-                'measuredFps': (len(self.rows)-1)/(self.rows[-1]['t']-self.rows[0]['t']) if len(self.rows)>1 else 0}
 
     async def move(self, loc, seconds=.5):
         rect = await loc.bounding_box()
@@ -96,6 +51,74 @@ class Recorder:
         await self.page.evaluate(DRAW, [self.pointer, None])
 
 
+class StreamRecorder:
+    """Chrome compositor frames with native browser presentation timestamps.
+
+    Static intervals emit no new frames. The exporter samples these genuine
+    frames on a regular timeline, explicitly retaining static holds.
+    """
+    def __init__(self, page):
+        self.page, self.rows, self.pending = page, [], set()
+        self.pointer_provider = lambda: None
+        self.evidence, self.actions = [], []
+        self.recording = False
+
+    async def start(self, name):
+        self.dest = OUT/'raw'/name
+        self.dest.mkdir(parents=True, exist_ok=False)
+        self.started = datetime.now(UTC).isoformat()
+        self.t0, self.wall0 = time.monotonic(), time.time()
+        self.cdp = await self.page.context.new_cdp_session(self.page)
+        # Screencast follows the native view size, not deviceScaleFactor alone.
+        # Keep layout at 1280 CSS px while explicitly sizing/scaling its backing view.
+        await self.cdp.send('Emulation.setDeviceMetricsOverride', {
+            'width':1280,'height':720,'deviceScaleFactor':2.25,'mobile':False,
+            'scale':2.25,'screenWidth':2880,'screenHeight':1620})
+        await self.cdp.send('Emulation.setVisibleSize', {'width':2880,'height':1620})
+        self.cdp.on('Page.screencastFrame', self.frame)
+        await self.cdp.send('Page.startScreencast', {'format':'jpeg','quality':94,
+            'maxWidth':2880,'maxHeight':1620,'everyNthFrame':1})
+        self.recording = True
+        self.observer = asyncio.create_task(self.observe())
+
+    async def observe(self):
+        while self.recording:
+            self.evidence.append({'t':time.monotonic()-self.t0,
+                'text':await self.page.locator('body').inner_text(),
+                'regions':await self.page.locator('div').evaluate_all('''es=>es.filter(e=>
+                    e.scrollHeight>e.clientHeight+100&&e.clientHeight>150&&
+                    /auto|scroll/.test(getComputedStyle(e).overflowY))
+                    .map(e=>e.getBoundingClientRect().toJSON())'''),
+                'viewport':await self.page.evaluate('({width:innerWidth,height:innerHeight,dpr:devicePixelRatio,style:document.documentElement.dataset.style})')})
+            self.dump()
+            await asyncio.sleep(1)
+
+    def frame(self, event):
+        k=len(self.rows)
+        raw=base64.b64decode(event['data'])
+        (self.dest/f'frame-{k:05d}.jpg').write_bytes(raw)
+        meta=event['metadata']
+        self.rows.append({'frame':k,'t':meta['timestamp']-self.wall0,
+            'timestamp':meta['timestamp'],'receivedT':time.monotonic()-self.t0,
+            'pointer':self.pointer_provider()})
+        task=asyncio.create_task(self.cdp.send('Page.screencastFrameAck', {'sessionId':event['sessionId']}))
+        self.pending.add(task)
+        task.add_done_callback(self.pending.discard)
+
+    def dump(self):
+        (self.dest/'timing.json').write_text(json.dumps({'startedAt':self.started,
+            'elapsedSeconds':time.monotonic()-self.t0,'frames':self.rows,
+            'evidence':self.evidence,'actions':self.actions,
+            'source':'Chrome Page.screencastFrame native timestamp; static intervals have no new presentation'},indent=2)+'\n')
+
+    async def stop(self):
+        self.recording = False
+        await self.observer
+        await self.cdp.send('Page.stopScreencast')
+        await asyncio.gather(*self.pending)
+        self.dump()
+
+
 async def main():
     OUT.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as pw:
@@ -109,7 +132,7 @@ async def main():
         errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto('http://127.0.0.1:3000', wait_until='domcontentloaded')
-        recorder = Recorder(page)
+        recorder = Pointer(page)
         done = asyncio.Event()
         env = globals() | {'page':page,'ctx':ctx,'browser':browser,'r':recorder,'errors':errors,'done':done}
 
@@ -135,8 +158,6 @@ async def main():
         server = await asyncio.start_server(handle, '127.0.0.1', 18349)
         print('live controller ready on 18349', flush=True)
         await done.wait()
-        if recorder.recording:
-            await recorder.stop()
         server.close()
         await server.wait_closed()
         (OUT/'browser-errors.json').write_text(json.dumps(errors,ensure_ascii=False,indent=2)+'\n')

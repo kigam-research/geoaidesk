@@ -1,7 +1,7 @@
 ---
 format: 1
 status: active
-updated: 2026-10-24T05:12:57Z
+updated: 2026-10-24T05:25:31Z
 writer: {"boot":"b8f70902-d391-463d-a34d-115acded7724","host":"seongin3","paseo":"bc6e9cee-ee39-46ef-a805-4ff63734ee67","pid":3074304,"provider":"codex","session":"01a16c51-66d7-7da0-9e3f-54c9f0e81781","start":"70657535","token":"9c009c4d569b64974ce26d76748af332f16430ba0ec0d5d410c3e01f9ef54674"}
 branch: task/gaid-promo-video-v4-lemo--agent-capture
 target: task/gaid-promo-video-v4-lemo
@@ -65,12 +65,16 @@ Korean UI, light theme, 계측 style, installed Google Chrome through Playwright
 - If something needs the user (credentials, a decision), write it as an open item in your task document and finish; do not block.
 
 ## Current state
+- One actual Pocheon example run is in progress under GPT-6.1 Sol/high, with separate pgi_live_capture/ outputs. A corrected native take now records full-size streaming activity; initial footage is archived as failed capture geometry.
 - Resumed in the assigned worktree. Review app is accessible on loopback without a token gate. Deployed checkout HEAD reads 4e198c762b9bde20ca23b1f3223243fb2af16ab0.
 - No app/model/service settings changed. Inspector Chrome was closed before starting the capture browser.
 ## Next steps
 1. Benchmark live capture cadence, stage the installed example Workflow, then record one complete run.
 2. Verify frame timing, pointer containment, figures and cut provenance; deliver external payload and finish.
 ## Failed approaches
+- The initial direct screenshot path was too slow at full resolution; pipelining did not reliably satisfy cadence.
+- A native-view/screencast attempt assumed deviceScaleFactor alone set backing-view scale. The actual image test disproved this: a 2880×1620 file contained only a 1280×720 image in its top-left. Explicit Emulation scale 2.25 plus visible size 2880×1620 fixed geometry; confirmed visually and with native frame timestamps (~30 fps).
+- The first real analysis is retained as a failed capture attempt, not selected footage. Its initial full-run capture geometry is invalid. The task explicitly allows one second run for capture failure; the second run will use a separate output directory and the corrected native compositor capture from before send. No third analysis run is authorized.
 ## Notes and decisions
 - Sequential decisions: validate capture throughput before starting any model work; select the faster installed example with complete methodology; record continuously, then export and verify.
 - Owned files: geo/promo-lemo/capture/ and this task document. No independent worker package is needed for this tightly coupled browser session.
@@ -90,6 +94,7 @@ written from backbone templates/report.md; none for workflow-only or trivial tas
 child unit, which adds sections to the parent's report. Dated snapshot; live status stays here.)
 ## Running jobs
 <!-- task:jobs -->
+- /home/seongin3/data/geoaidesk/runs/gaid-promo-video-v4-lemo--agent-capture-20261024T051313.832789Z/receipt.json
 <!-- /task:jobs -->
 <!-- task:cloud -->
 <!-- /task:cloud -->
